@@ -39,6 +39,8 @@ written for.* Met; the `linux` preset is unrun.
 
 ## 2. One module runs
 
+Done, on Windows. `PHASE2.md` is what it built and found.
+
 `bridge-backend.h` with all sixteen entries, and the wasm backend as a shared library behind it,
 which Bridge-ASM700 opens by the name config gives - `backend.md`, *What a backend is asked for*. A core
 wasm module importing a Bridge-ASM700 memory, which means `wasm_multi_memory` on since the module has its
@@ -58,7 +60,8 @@ init timeout - `limits.md`, *What bounds a run*.
 *Done when the host reads the bytes a module wrote to the shared memory; an out-of-bounds access, a runaway
 loop and growth past the limit each return an error with the process alive; and an export whose
 shape is not `() -> i32`, a wrong ABI version, a backend that cannot be
-opened and a null sink are each refused with a record naming the cause.*
+opened and a null sink are each refused with a record naming the cause.* Met; the `linux` preset is
+unrun, and the shared memory is read by a test of the backend alone, since storage is phase 3's.
 
 ## 3. Storage
 

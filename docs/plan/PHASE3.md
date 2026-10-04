@@ -1,7 +1,7 @@
 # Phase 3: storage
 
 **Not planned yet.** This document exists because an open question waits in the plan of the phase
-it blocks - `PHASE0.md` - and phase 2 raised two that are phase 3's.
+it blocks - `PHASE0.md` - and phase 2 raised three that are phase 3's.
 
 ## Open questions
 
@@ -15,3 +15,8 @@ measuring a system's loop with fuel on and off, then by the method.
 the merged module - `wasm.md`, *A compiled module reaches them through accessors*. An export
 Bridge-ASM700 did not ask for is an entry the scheduler could be handed by name. To settle: how the
 build removes them, and whether load refuses a module that still has one.
+
+**Nothing releases an adopted memory.** `memory_adopt` answers a handle and no entry of
+`backend.md`, *What a backend is asked for*, takes one back. Phase 2 adopts nothing through
+`bridge_load`, so it leaked nothing. Phase 3 adopts a private block per module, and a module can be
+unloaded. To settle: a seventeenth entry, or the handle dying with the instance that used it.

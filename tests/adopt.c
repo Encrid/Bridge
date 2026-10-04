@@ -49,6 +49,13 @@ static int run(backend_instance *i, const char *name, int32_t *status, backend_e
     return api.call(f, status, err);
 }
 
+/* what the host answers a module that calls it: both arguments, added */
+static void ping(void *ud, const uint64_t *args, uint64_t *results)
+{
+    (void)ud;
+    results[0] = args[0] + args[1];
+}
+
 typedef struct { const char *name; int rounds, failed; } job;
 
 static void worker(void *arg)
@@ -121,6 +128,23 @@ int main(void)
     printf("stray load: %s\n", err.text);
     if (run(one, "write", &status, &err) || status) { printf("FAIL: after the trap: %s\n", err.text); return 1; }
     printf("after the trap: the store still runs\n");
+
+    /* 4. a function the host defines, with the signature it declared */
+    {
+        static const uint8_t params[2] = { BACKEND_I32, BACKEND_I64 }, results[1] = { BACKEND_I32 };
+        backend_sig sig = { params, 2, results, 1 };
+        void *host_bytes = read_file(MODULE_DIR "/host.wasm", &len);
+        backend_module *host = api.module_compile(be, host_bytes, len, NULL, &err);
+        backend_instance *hi = host ? api.instance_create(be, host, NULL, 0, &err) : NULL;
+        if (!hi || api.define_func(hi, "bridge", "ping", ping, NULL, &sig, &err)
+            || run(hi, "init", &status, &err) || status != 16) {
+            printf("FAIL: a host function: %d: %s\n", status, err.text);
+            return 1;
+        }
+        printf("a host function: called with an i32 and an i64, answered %d\n", status);
+        api.instance_destroy(hi);
+        api.module_destroy(host);
+    }
 
     api.instance_destroy(one);
     api.module_destroy(module);

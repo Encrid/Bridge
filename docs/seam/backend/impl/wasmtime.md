@@ -20,13 +20,24 @@ check every load, on the path this design exists to keep free.
 **Adoption** goes through wasmtime's host memory creator, the hook by which an embedder supplies the
 pages behind a memory. The backend answers it with the block Bridge-ASM700 allocated, and one block
 backs a memory in every store that imports it - each module has its own store, `backend.md`, *What
-the backend does not do*.
+the backend does not do*. `tests/adopt.c` is the proof: two stores on two threads write one block
+at once, each sees the other's bytes, and a load past it traps.
+
+**Through a holder module, because the creator is asked less than its header says.** wasmtime's C
+API documents the creator as used "when creating host Memory objects". In 48.0.5 it is not: a memory
+the host creates is allocated by wasmtime's own default. The creator is asked only for a memory an
+*instance defines*. So the backend builds, per adopted block, a module of a few bytes that defines
+one memory of that size and exports it, instantiates it in the store, and hands the export to the
+module that imports it. Nothing in it runs.
+
+That rests on behaviour wasmtime does not document, so it is what an upgrade must re-prove, and the
+test above is how.
 
 wasmtime's own mechanism for one memory in many stores is a shared memory, and it is refused here:
 it allocates its own pages, so it cannot adopt, and it brings the threads proposal with it, whose
 wait instruction blocks a thread in a way neither fuel nor a deadline can interrupt - `limits.md`,
 *What bounds a run*, rests on nothing a module can reach blocking. The condition that brings it back
-is the creator proving unable to serve one block to several stores.
+is the creator no longer being asked for a memory an instance defines.
 
 The creator is asked for every memory, a module's own included, and is not told which. The backend
 knows because it asks: an adoption is in progress, or it is not.

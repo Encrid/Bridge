@@ -1,93 +1,89 @@
 # Phase 2: one module runs
 
-**Draft.** Nothing here is settled until the done-when holds.
+Done, on Windows. The `linux` preset and the POSIX half of `src/os.c` are written and have not been
+run.
 
-The first Bridge-ASM700 code. It produces **the backend seam and the wasm backend behind it**, the
+The first Bridge-ASM700 code. It produced **the backend seam and the wasm backend behind it**, the
 part of the host seam needed to load one module through them, and the tests that show a module
 running, failing and being refused. No storage, no systems, no phases: those are phase 3.
 
-What is settled and not to be re-argued here: the sixteen entries and what each means -
-`backend.md`, *What a backend is asked for*; signatures - `signatures.md`; capabilities -
-`capabilities.md`; what `bridge_create` and `bridge_load` take and refuse - `host-api.md`,
-`create.md`, `lifecycle.md`; what bounds a module - `limits.md`; the manifest - `module.md`, *The
-manifest*.
+What each piece is and why is in the documents it belongs to: `backend.md`, `wasmtime.md`,
+`host-api.md`, `create.md`, `lifecycle.md`, `limits.md`. This document is what the phase built and
+what it found on the way.
 
-## Decided for this phase
-
-**wasmtime 48.0.5, vendored.** 48 is a long-term release, supported for 24 months where an ordinary
-one gets two; the wasm backend exists for its sandbox, so security fixes outweigh matching the 47 the
-original Bridge runs. Its C API has every call this phase needs, and the header lines `backend.md`
-and `signatures.md` cite are the same in it. The official C API archive is unpacked under
-`third_party/wasmtime/`: headers, the shared library and its import library, per platform.
-
-**Test modules are wasm text.** Each case is a few instructions, a second memory needs nothing
-extra, and `wasm-tools parse` assembles it, manifest section included. The compiled route - C, then
-Binaryen - is phase 3's, with the generator: `wasm.md`, *A compiled module reaches them through
-accessors*.
-
-## What it produces
+## What it produced
 
     include/bridge-backend.h      the sixteen entries, backend_sig, the capability flags
     include/bridge.h              begins: bridge_create, bridge_destroy, bridge_load,
                                   their structs, bridge_record and the sink
     include/bridge-abi.h          begins: the ABI version, the import names
-    src/                          the library: create, load, records, opening a backend
-    backends/wasm/                the wasm backend, a shared library over wasmtime
+    src/bridge.c                  create, load, records
+    src/backend.c                 opening a backend library, finding its entries by name
+    src/os.c                      address space, libraries, one thread and one event
+    backends/wasm/wasm.c          the wasm backend, a shared library over wasmtime
     third_party/wasmtime/         48.0.5 C API, with a README: version, hashes, licence
-    tests/modules/*.wat           one module per case
-    tests/phase2.c                a host: creates, loads, reads memory, collects records
+    tests/modules/*.wat           one module per case, assembled by wasm-tools
+    tests/adopt.c                 the backend alone: the memory question, and a host function
+    tests/phase2.c                a host that links the library and nothing else
 
-`wasm-tools` joins Python as something the test build needs.
+`wasm-tools` joined Python as something the test build needs.
 
-Every backend entry is implemented in the wasm backend now, since each is a thin call into wasmtime.
-Bridge-ASM700 calls only what this phase's claim needs: `instance_set_fuel` exists and is first
-called in phase 3, with the first system.
+## The tests
+
+Fifteen new ones, beside phase 1's five. Every refusal is checked by the record it emits and by the
+process still being there to print "alive" afterwards.
+
+    adopt             one block: the host reads what a module wrote; two stores on two
+                      threads fill it at once and each sees the other's half; a load past
+                      it traps and the store still runs; a host function is called
+    phase2-ok         a module loads
+    phase2-nolimit    "no limit" is a value, and a module stating it loads
+    phase2-oob        init reads out of bounds:      "trapped: out of bounds memory access"
+    phase2-spin       init never returns:            "trapped: interrupt", after its timeout
+    phase2-grow       init grows past its limit:     "its init answered 7"
+    phase2-big        its own memory exceeds the limit: "cannot instantiate"
+    phase2-shape      init takes an argument:        "its export 'init' is not () -> i32"
+    phase2-noinit     no init:                       "no exported function 'init'"
+    phase2-abi        another ABI version:           "it wants ABI 2 and this is ABI 1"
+    phase2-nobackend  an unconfigured backend:       "no backend named 'native'"
+    phase2-unset      a key left at zero:            "memory_limit is unset"
+    phase2-stop       on_error = fail stops the bridge; skip does not
+    phase2-nolib      a backend library that will not open: create refuses, with a record
+    phase2-nosink     no sink: create refuses
+
+## What the phase found
+
+**One block does back a memory in two stores.** The question the phase opened with. Two stores on
+two threads each wrote a page of one block two hundred times, byte by byte; both pages came out
+whole, a third read found the other store's bytes, and a load one byte past the block trapped by
+faulting on the reservation. So Bridge-ASM700 allocates, every backend adopts, and no shared memory
+or threads proposal is needed - `backend.md`, *Memory is adopted, not created*.
+
+**But not the way wasmtime's header says.** Its C API documents the host memory creator as "used
+when creating host Memory objects". In 48.0.5 it is not: a memory the host creates is allocated by
+wasmtime's own default, and the creator is never asked. It **is** asked for a memory an instance
+defines. So an adopted block enters a store as the memory of a module that does nothing but define
+one and export it - `wasmtime.md`, *Memory*. Found by the test printing nothing where the creator
+should have spoken, and confirmed in wasmtime's source.
+
+**Storage is not handed to a module yet.** `bridge_load` gives a module no memories, because the
+shared and private blocks arrive with `[budget]` in phase 3. A module that imports one fails to
+instantiate, by name, which is the right refusal until then. The phase's claim that a module writes
+the shared memory and the host reads it is `tests/adopt.c`, against the backend alone.
+
+**A refusal this phase cannot test.** "A capability the backend lacks" needs a backend that lacks
+one. The check is written and has never run false; phase 4's native backend is where it does.
+
+**Two things about wasmtime's C API worth knowing.** `wasmtime_error_delete` crashes on NULL, though
+every call that can fail returns NULL on success. And a trap's message leads with a backtrace and
+ends with the reason, so the backend reports the part after "wasm trap: ".
 
 ## Open questions
 
-One, and it is the first code of the phase.
-
-**Whether one block can back a memory in two wasmtime stores at once.** Bridge-ASM700 allocates the
-shared block to the shape the backend states, and the wasm backend hands it to wasmtime through the
-host memory creator - `backend.md`, *Memory is adopted, not created*, and `wasmtime.md`, *Memory*.
-wasmtime's documentation describes creator memory as owned by the instance it was made for, and says
-nothing about serving the same pages twice. Each module has its own store, and from phase 3 two
-modules import one shared memory, so this must hold. Settled by `tests/adopt.c`: two stores on two
-threads write disjoint ranges of one block, and a stray access traps with the process alive.
-
-If it does not hold, the fallback is wasmtime's shared memory, which `wasmtime.md` refuses and
-states the cost of. That is a decision for the method again, not a step of this phase.
-
-Closed while planning, each in the document it belongs to: who runs the clock - `wasmtime.md`,
-*Deadlines*; where a wrong export shape is caught - at `instance_func`, as `signatures.md` already
-says; and what `bridge_create` needs before phases exist - nothing: the phase list and its refusal
-arrive together in phase 3.
-
-## Steps
-
-1. **Vendor wasmtime**, hash-checked, with its README.
-2. **`bridge-backend.h`**, and a wasm backend that creates and destroys.
-3. **The open question**, as `tests/adopt.c` against the backend alone: adopt a block, instantiate
-   a module that imports it, write from wasm, read from the host; then the same block in a second
-   store on a second thread; then a stray access. Nothing else is written until this passes.
-4. **The rest of the sixteen**: compile, imports, instance, limits, `define_func`, `instance_func`,
-   `call`.
-5. **`bridge.h`**: create opens the backend library and finds its entries by name; the sink and
-   Bridge-ASM700's own records; load checks identity, ABI version and capabilities, then runs `init`.
-6. **The cases**, one module each: writes shared memory; reads out of bounds; never returns from
-   `init`; grows past its limit; exports `init` with a parameter; declares another ABI version.
-7. **ctest**, with each refusal checked by the record it emits, not by a return code alone.
-
-## Done when
-
-`PLAN.md` states it. In practice: the host reads the bytes a module wrote; the three failures each
-come back as an error with the process alive and a record naming the module; the four refusals each
-emit a record naming the cause; and the two-store test passes or has changed the design.
+None for this phase. Three were raised for the next and wait in `PHASE3.md`.
 
 ## What would make us stop
 
-If one block cannot back a memory in two stores without a copy or a bounds check per load, the
-shared memory is not what `wasm.md` says it is, and that is a design question rather than a detail
-of this phase. The options then are two the documents already refuse: one store for every module,
-which `backend.md` declines and which costs parallelism, or blocks mapped into each module's own
-memory, which `wasm.md` declines.
+It did not happen: the block backs two stores with no copy and no check on a load. It stays the
+condition for the next wasmtime: adoption rests on how 48.0.5 treats a memory an instance defines,
+which its documentation does not promise. `tests/adopt.c` is what says whether an upgrade kept it.
