@@ -33,7 +33,7 @@ say which address space it came from. idTech3 and flecs never faced it, because 
 against a single `dataBase` (`vm.c:607`) and `ecs_os_api.log_` takes a real pointer.
 
 **So a literal is copied in, and costs a `memcpy` of its length.** Writing it instead as an offset
-into its own memory would be free, and would need a sixteenth seam entry to read a memory
+into its own memory would be free, and would need a seventeenth seam entry to read a memory
 Bridge-ASM700 does not own - paying surface for zero copies on a path whose own claim is only that a
 line costs stores. Godot's alternative is refused too: it copies at the boundary and hands back a
 handle - `string_new_with_utf8_chars_and_len2` - which is a call with a payload, the crossing this

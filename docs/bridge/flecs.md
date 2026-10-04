@@ -7,7 +7,7 @@ it. The data model built on it is `data.md`.
 
 The backend surface abstracts a **behaviour**: Bridge-ASM700 hands over bytes, memories and host
 functions and asks for a function to be run, never looking inside. That is why the native backend
-implements the same fifteen entries and nothing leaks.
+implements the same sixteen entries and nothing leaks.
 
 An ECS surface would have to abstract a **memory layout**. Bridge-ASM700 needs four things of flecs: its
 column addresses, because a span's `base[]` *are* offsets into its columns; its entity index, to

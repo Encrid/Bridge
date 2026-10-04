@@ -6,7 +6,7 @@ The first Bridge-ASM700 code. It produces **the backend seam and the wasm backen
 part of the host seam needed to load one module through them, and the tests that show a module
 running, failing and being refused. No storage, no systems, no phases: those are phase 3.
 
-What is settled and not to be re-argued here: the fifteen entries and what each means -
+What is settled and not to be re-argued here: the sixteen entries and what each means -
 `backend.md`, *What a backend is asked for*; signatures - `signatures.md`; capabilities -
 `capabilities.md`; what `bridge_create` and `bridge_load` take and refuse - `host-api.md`,
 `create.md`, `lifecycle.md`; what bounds a module - `limits.md`; the manifest - `module.md`, *The
@@ -27,7 +27,7 @@ accessors*.
 
 ## What it produces
 
-    include/bridge-backend.h      the fifteen entries, backend_sig, the capability flags
+    include/bridge-backend.h      the sixteen entries, backend_sig, the capability flags
     include/bridge.h              begins: bridge_create, bridge_destroy, bridge_load,
                                   their structs, bridge_record and the sink
     include/bridge-abi.h          begins: the ABI version, the import names
@@ -45,42 +45,32 @@ called in phase 3, with the first system.
 
 ## Open questions
 
-Settled by trying, in this order. The first is the one that could send the phase back to the method.
+One, and it is the first code of the phase.
 
-**1. How a block Bridge-ASM700 owns becomes a memory a module imports.** wasmtime offers a host
-memory creator, `wasmtime_config_host_memory_creator_set`: the engine asks a callback for every
-linear memory and uses the pages it is given. Three things are unknown until tried:
+**Whether one block can back a memory in two wasmtime stores at once.** Bridge-ASM700 allocates the
+shared block to the shape the backend states, and the wasm backend hands it to wasmtime through the
+host memory creator - `backend.md`, *Memory is adopted, not created*, and `wasmtime.md`, *Memory*.
+wasmtime's documentation describes creator memory as owned by the instance it was made for, and says
+nothing about serving the same pages twice. Each module has its own store, and from phase 3 two
+modules import one shared memory, so this must hold. Settled by `tests/adopt.c`: two stores on two
+threads write disjoint ranges of one block, and a stray access traps with the process alive.
 
-- whether the same block can back a memory in **two stores at once**. `backend.md` gives each
-  instance its own store, and from phase 3 two modules import one shared memory. wasmtime's own
-  answer to sharing across stores is a `shared` memory, which brings the threads proposal with it.
-- what wasmtime requires of the pages. It asks for a reservation and a guard region; pages without
-  them make it emit an explicit bounds check on every load, on the path this design exists to keep
-  free. The alternative is Bridge-ASM700 reserving address space around its blocks.
-- how the callback tells an adopted memory from a module's own, since it is asked for both and is
-  told neither which.
+If it does not hold, the fallback is wasmtime's shared memory, which `wasmtime.md` refuses and
+states the cost of. That is a decision for the method again, not a step of this phase.
 
-A two-store test is part of this phase for that reason, though two modules are phase 3's claim:
-`memory_adopt` is this phase's entry, and its shape depends on the answer.
-
-**2. Who runs the clock.** `instance_set_deadline` takes nanoseconds and wasmtime counts epochs, so
-the backend runs a timer that increments the epoch - `backend.md`, *The backend owns its clock*.
-Whether that is one thread per backend, and how it stops, is not written anywhere.
-
-**3. Where a refusal is detected.** An export of the wrong shape is refused "at load"; whether
-`instance_func` can see a shape before instantiation or only after is wasmtime's to say.
-
-**4. What `bridge_create` needs before there are phases.** `create.md` refuses a config with no
-phases, and phases arrive with `bridge_phase` in phase 3. This phase either carries the phase list
-unused or adds that refusal with the thing it protects.
+Closed while planning, each in the document it belongs to: who runs the clock - `wasmtime.md`,
+*Deadlines*; where a wrong export shape is caught - at `instance_func`, as `signatures.md` already
+says; and what `bridge_create` needs before phases exist - nothing: the phase list and its refusal
+arrive together in phase 3.
 
 ## Steps
 
 1. **Vendor wasmtime**, hash-checked, with its README.
 2. **`bridge-backend.h`**, and a wasm backend that creates and destroys.
-3. **Open question 1**, as a test against the backend alone: adopt a block, instantiate a module
-   that imports it, write from wasm, read from the host; then the same block in a second store.
-4. **The rest of the fifteen**: compile, imports, instance, limits, `define_func`, `instance_func`,
+3. **The open question**, as `tests/adopt.c` against the backend alone: adopt a block, instantiate
+   a module that imports it, write from wasm, read from the host; then the same block in a second
+   store on a second thread; then a stray access. Nothing else is written until this passes.
+4. **The rest of the sixteen**: compile, imports, instance, limits, `define_func`, `instance_func`,
    `call`.
 5. **`bridge.h`**: create opens the backend library and finds its entries by name; the sink and
    Bridge-ASM700's own records; load checks identity, ABI version and capabilities, then runs `init`.

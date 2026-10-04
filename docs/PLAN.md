@@ -39,7 +39,7 @@ written for.* Met; the `linux` preset is unrun.
 
 ## 2. One module runs
 
-`bridge-backend.h` with all fifteen entries, and the wasm backend as a shared library behind it,
+`bridge-backend.h` with all sixteen entries, and the wasm backend as a shared library behind it,
 which Bridge-ASM700 opens by the name config gives - `backend.md`, *What a backend is asked for*. A core
 wasm module importing a Bridge-ASM700 memory, which means `wasm_multi_memory` on since the module has its
 own. `bridge-abi.h` begins here, because a module reading the shared memory with plain loads needs the span
@@ -53,7 +53,7 @@ route - `create.md`, *The sink*. Load checks the identity and the ABI version, a
 config key demands - `capabilities.md`, *Capabilities, so the swap is honest*.
 
 What bounds a module on this backend, as far as one lifecycle call shows it: `memory_limit`, and the
-init timeout with the backend's tick period - `limits.md`, *What bounds a run*.
+init timeout - `limits.md`, *What bounds a run*.
 
 *Done when the host reads the bytes a module wrote to the shared memory; an out-of-bounds access, a runaway
 loop and growth past the limit each return an error with the process alive; and an export whose

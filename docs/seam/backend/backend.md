@@ -12,7 +12,7 @@ What matters at this seam is the far side of that list: config, discovery and th
 host's, so **a backend never has a file to find**. It is handed a module's bytes and its path,
 uninspected, and the settings that are its own.
 
-**Bridge-ASM700 opens the backend libraries its config names**, and finds the fifteen entries in each by
+**Bridge-ASM700 opens the backend libraries its config names**, and finds the sixteen entries in each by
 name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
 
 ## What a backend is asked for
@@ -21,6 +21,7 @@ name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
     backend_destroy(backend)
     backend_capabilities(backend)              -> flags
 
+    memory_shape(backend)                      -> reservation, guard
     memory_adopt(backend, ptr, len)            -> memory
     module_compile(backend, bytes, len, path)  -> module
     module_imports(module)                     -> names and kinds
@@ -36,8 +37,8 @@ name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
     instance_func(instance, name, &arity, &results) -> func
     call(func, status)                         -> err
 
-Fifteen entries. The original Bridge's `ModuleRuntime` trait had fourteen, four of which were filesystem and
-timer work that has moved out.
+Sixteen entries. The original Bridge's `ModuleRuntime` trait had fourteen, four of which were
+filesystem and timer work that has moved out.
 
 **`module` at this seam is a module's loaded image**: compiled bytes on the wasm backend, an opened
 library on the native one. `module_compile` takes
@@ -55,6 +56,18 @@ module. It does not ask the backend to allocate. That is the whole of what "Brid
 memory" means at this seam, and it is why the same region reaches a native module as a raw pointer
 and a wasm module as an import.
 
+**A backend states the shape it needs, and Bridge-ASM700 allocates to it.** An engine does not care
+who allocated a block; it cares what surrounds it. One that enforces bounds by faulting needs
+address space reserved after the block and left unmapped, so that a stray access lands on nothing.
+`memory_shape` answers the reservation and the guard a backend needs; Bridge-ASM700 takes the largest
+of every backend's and allocates each block once, to that. A backend with no requirement answers
+zero for both.
+
+That is what keeps the block one answer for any number of backends. Refused: one backend creating
+the block and the others adopting it, which works for exactly one backend that insists on allocating
+and makes "who owns the memory" depend on which backends a deployment has. The condition that brings
+it back is a backend that cannot run over memory it did not allocate, whatever its shape.
+
 There is no read-only variant and no verification pass, because access mode is not enforced - see
 `data.md`, *Access mode*.
 
@@ -63,20 +76,17 @@ is the shape a good abstraction should have.
 
 ## The backend owns its clock
 
-`instance_set_deadline` takes **nanoseconds, not ticks**, and the backend converts. wasmtime's own
-deadline is in epochs - `store.h:224` takes `ticks_beyond_current`, and a tick is one call to
-`wasmtime_engine_increment_epoch` (`engine.h:38`) - so **a tick has no duration until somebody
-increments on a timer.** Whoever runs that timer owns the clock.
+`instance_set_deadline` takes **nanoseconds**, and the backend converts to whatever its engine
+counts in. Bridge-ASM700 asks in real time because that is the only unit every backend can mean the
+same thing by.
 
 It is the backend rather than the host, even though `split.md`, *The split*, sends a policy about
-time the other way. The host has no handle on an engine internal, the native backend has no epoch at
-all, and a host that forgot to tick would silently disable every deadline in the deployment. So the
-tick period is a `backend_create` setting, and a backend that cannot interrupt says so through
-`deadline` in `capabilities.md`, *Capabilities, so the swap is honest*, instead of accepting a
-number it will ignore.
+time the other way. The host has no handle on an engine's internals, and a host that forgot to drive
+a clock would silently disable every deadline in the deployment. A backend that cannot interrupt
+says so through `deadline` in `capabilities.md`, *Capabilities, so the swap is honest*, instead of
+accepting a number it will ignore. How the wasm backend keeps time is `wasmtime.md`, *Deadlines*.
 
-Bridge-ASM700 asks in real time because that is the only unit both backends can mean the same thing by.
-What it is asking for is a **lifecycle call's** timeout; a system is bounded by fuel alone, for the
+What is asked for is a **lifecycle call's** timeout; a system is bounded by fuel alone, for the
 reason in `limits.md`, *What bounds a run*. And `instance_set_fuel` is called **before every
 dispatch**, not once at load, because fuel only depletes.
 
@@ -101,7 +111,7 @@ grouping policy would be a decision shaped by one engine. The condition that wou
 is a backend where instances **must** share state to be viable at all - one global heap for all of
 them, say - at which point a grouping entry belongs here and the instance is the wrong unit.
 
-The test each entry passes is that it means something to **both** backends. `module_compile` is
+The test each entry passes is that it means something to **every** backend. `module_compile` is
 compile-or-dlopen; `instance_set_fuel` is set-fuel-or-say-you-cannot, which is what `meter` in
 `capabilities.md`, *Capabilities, so the swap is honest*, exists to say.
 
@@ -110,5 +120,5 @@ Meaningless to one backend is a different thing, and that is `store_create`: not
 "the word names nothing here", which no capability flag could rescue.
 
 Bridge-ASM700 hands it bytes, memories and host functions, and asks it to run a function. That is the
-entire relationship, and it is why the surface is fifteen entries rather than a second copy of
+entire relationship, and it is why the surface is sixteen entries rather than a second copy of
 Bridge-ASM700.

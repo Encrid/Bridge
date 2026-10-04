@@ -143,7 +143,7 @@ nothing here records a source.
 pass walks every column - `validation.md`, *The checksum pass, when asked* - and the other times
 every dispatch, `profile.md`, *The profile*. Nothing else Bridge-ASM700 does is optional.
 
-**A backend's `settings` are its own** - the cache directory, the pooling limits, the tick period -
+**A backend's `settings` are its own** - the cache directory, the pooling limits -
 and Bridge-ASM700 passes them to `backend_create` unread: `backend.md`, *The backend owns its clock*.
 
 **A module's `settings` seed a component, and nothing more** - `config.md`, *A module's own
