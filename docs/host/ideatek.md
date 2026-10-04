@@ -1,7 +1,7 @@
 # IdeaTek
 
-The standalone binary. It links BridgeC and does the three things a library cannot do for itself: own
-`main`, own the loop, and decide when to stop. Why it is a separate target is `PLAN.md`.
+The standalone binary. It links BridgeC and does the three things a library cannot do for itself:
+own `main`, own the loop, and decide when to stop. Why it is a separate target is `README.md`.
 
 ## What it is
 
@@ -15,20 +15,18 @@ The standalone binary. It links BridgeC and does the three things a library cann
     --watch       watch the deployment's paths, bridge_reload on change
     --list        load the deployment, report each result, exit
 
-**Three of those a library cannot do and the rest it declines**, which are different reasons and
-worth telling apart. `main`, the loop and the exit are impossible for a library - something has to
-own them. TOML, the layer resolution, the directory walk and the log destination are all things
-BridgeC could have done and does not, and `DESIGN.md`, *The split*, is the rule that sends each of
-them this way.
+**Three of those a library cannot do and the rest it declines**, which are different reasons.
+`main`, the loop and the exit are impossible for a library - something has to own them. TOML, the
+layer resolution, the directory walk and the log destination are all things BridgeC could have done
+and does not, and `DESIGN.md`, *The split*, is the rule that sends each of them this way.
 
-Thinner than idTech3's shell, which also polls input at `win_main.c:1240`. Input is a plugin here, so
-IdeaTek creates, loops, destroys.
+Thinner than idTech3's shell, which also polls input at `win_main.c:1240`. Input is a plugin here,
+so IdeaTek creates, loops, destroys.
 
 ## Its own keys
 
 `config.md` says which tables are IdeaTek's; what is inside one is decided here, and a host that
-brings its own config system has none of them. Two were carried over from Bridge without a meaning
-anywhere, and settling them is settling what IdeaTek does rather than what BridgeC allows.
+brings its own config system has none of them.
 
     [content]   paths    files and directories. a directory is walked; a file
                          named directly is taken regardless of ignore
@@ -51,16 +49,15 @@ optional table here.
 
 ## The pass is config's order
 
-IdeaTek is generic: it cannot know a deployment's phases, and BridgeC does not have any to fall back
-on - `bridge.md`, *BridgeC ships no phase names*. So it reads them from config and walks them in
-order. TOML arrays keep their order, so **the `phases` list is the pass** - and a phase carries
-nothing but its name, so there is nothing else here to read: `bridge.md`, *A phase is a name and
-nothing else*.
+IdeaTek is generic: it cannot know a deployment's phases, and BridgeC has none to fall back on -
+`bridge.md`, *BridgeC ships no phase names*. So it reads them from config and walks them in order.
+TOML arrays keep their order, so **the `phases` list is the pass** - and a phase carries nothing but
+its name, so there is nothing else here to read: `bridge.md`, *A phase is a name and nothing else*.
 
-That is why dropping `after` costs nothing in practice. `host-api.md` records the cost - a host can
-call one phase every frame and another never, and BridgeC cannot detect it - and IdeaTek cannot make
-that mistake, because it walks the list rather than naming phases. A host that wants a fixed timestep
-calls `bridge_phase` itself and takes the responsibility with it.
+That is why having no `after` relation costs nothing in practice. `host-api.md` records the cost - a
+host can call one phase every frame and another never, and BridgeC cannot detect it - and IdeaTek
+cannot make that mistake, because it walks the list rather than naming phases. A host that wants a
+fixed timestep calls `bridge_phase` itself and takes the responsibility with it.
 
 ## --list is a load check, not an inventory
 
@@ -68,14 +65,14 @@ It loads everything the deployment declares, prints what each `bridge_load` answ
 information is **IdeaTek's own return codes**, not `bridge_elements`.
 
 That call answers who is *still running* - `host-api.md`, *Introspection* - and nothing has been
-stopped before the loop has run, so at startup it could only ever say "all of them". What a reader of
-`--list` actually wants is whether this deployment loads at all, and only the shell can answer that,
+stopped before the loop has run, so at startup it could only ever say "all of them". What a reader
+of `--list` wants is whether this deployment loads at all, and only the shell can answer that,
 because only the shell walked the paths.
 
-**So IdeaTek never calls `bridge_elements`**, and that is worth saying plainly rather than leaving
-the entry looking unused. Its consumer is a host with something to show or something to decide - a
-game greying out a stopped mod, a supervisor restarting one. A generic shell that loops until a
-signal has nothing to do with the answer, and gets the diagnostic from the sink anyway.
+**So IdeaTek never calls `bridge_elements`.** Its consumer is a host with something to show or
+something to decide - a game greying out a stopped mod, a supervisor restarting one. A generic shell
+that loops until a signal has nothing to do with the answer, and gets the diagnostic from the sink
+anyway.
 
 ## When it stops
 
@@ -91,6 +88,6 @@ buried in a module.
 Watching the filesystem is a capability, and capabilities are plugins - but **a plugin cannot call
 `bridge_reload`**, which is host API. So the watcher lives here.
 
-That is not a loophole in the no-builtins rule: the rule constrains what BridgeC exposes to elements,
-not what a program linking it may do. And it gives hot reload the property that matters - **ship
-without `--watch` and nothing in the process can ask for one.**
+That is not a loophole in the no-builtins rule: the rule constrains what BridgeC exposes to
+elements, not what a program linking it may do. And it gives hot reload the property that matters -
+**ship without `--watch` and nothing in the process can ask for one.**

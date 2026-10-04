@@ -1,21 +1,20 @@
 # Plan
 
-The order the work goes in, and nothing else. What the design is and why is `DESIGN.md`; what the
-documents are is `README.md`.
+The build order, and nothing else. What the design is and why is `DESIGN.md`; what the documents are
+is `README.md`.
 
-**Every phase ends in a claim that can be false.** A phase is not done because its code exists; it is
-done when the stated thing is observably true, and a phase whose done-when cannot fail is a phase
-that will be declared finished while broken.
+**Every phase ends in a claim that can be false.** A phase is not done because its code exists. It
+is done when the stated thing is observably true. A phase whose done-when cannot fail will be
+declared finished while broken.
 
 ## 0. Documents, and the spikes they need
 
 The fifteen in `README.md`, `PHASE0.md` and `OPEN.md` aside. Cheap to change now, expensive later.
 
-Two questions could not be settled by argument, so a throwaway spike settled them inside this phase
-rather than becoming a reason to defer: whether flecs can be confined to our block, and whether its
-events are enough to keep the entity mirror in step. Both answered with numbers, and the second
-answered *no* - `memory.md`, *It can be confined, and the patch is thirteen sites*, and `data.md`,
-*flecs will not tell you which*.
+Two questions could not be settled by argument, so a throwaway spike settled them inside this phase:
+whether flecs can be confined to our block, and whether its events are enough to keep the entity
+mirror in step. Both answered with numbers, and the second answered *no* - `memory.md`, *It can be
+confined, and the patch is thirteen sites*, and `data.md`, *flecs will not tell you which*.
 
 *Done when OPEN.md is empty and all fifteen are out of draft.*
 
@@ -45,15 +44,15 @@ refused at load rather than on the first frame.*
 ## 3. Storage
 
 flecs' columns inside the shared memory a module imports, plus each element's own memory 2 carrying
-its spans and `column_base`. `declare`, the published query spans, and the entity index mirror driven
-off the patched callback and `EcsOnTableCreate` / `EcsOnTableDelete`. Access mode and queries are part
-of declaration from the start, not retrofitted. The schema generator: the `ECS_STRUCT` shim and
-accessors carrying the `row < count` test.
+its spans and `column_base`. `declare`, the published query spans, and the entity index mirror
+driven off the patched callback and `EcsOnTableCreate` / `EcsOnTableDelete`. Access mode and queries
+are part of declaration from the start, not retrofitted. The schema generator: the `ECS_STRUCT` shim
+and accessors carrying the `row < count` test.
 
 *Done when two modules share a component array with no crossing per access, neither can reach the
 other's spans, a mirror lookup survives a batch of swap-removes, and the accessor's test is measured
-against a build without it* - `diagnostics.md`, *Always on*, states that cost as reasoning and this is
-where it stops being reasoning.
+against a build without it* - `diagnostics.md`, *Always on*, states that cost as reasoning, and this
+is where it becomes a measurement.
 
 ## 4. Plugins
 
@@ -66,19 +65,19 @@ of a module's run in the same phase with neither able to tell.*
 
 ## 5. Scheduling
 
-Phases from the host, a barrier after each, and the refusal when two conflicting systems in one phase
-are left unordered. Observers at the barrier, one hop per barrier. Threads running non-overlapping
-writers, which the declared sets do give us.
+Phases from the host, a barrier after each, and the refusal when two conflicting systems in one
+phase are left unordered. Observers at the barrier, one hop per barrier. Threads running
+non-overlapping writers, which the declared sets give us.
 
 *Done when a deployment orders two conflicting systems with `[order]` alone, an ambiguous pair is
 named instead of guessed, a component a plugin sets runs a module's observer at that same barrier, a
-three-deep observer chain settles in three barriers rather than hanging, and two elements provably run
-in parallel.*
+three-deep observer chain settles in three barriers rather than hanging, and two elements provably
+run in parallel.*
 
 ## 6. The host seam, and IdeaTek
 
-`bridge.h`: `bridge_create`, `bridge_phase`, `load`/`unload`/`reload`, and the binary that uses them.
-The seam is tested by existing - if IdeaTek links the library and nothing else, it is real.
+`bridge.h`: `bridge_create`, `bridge_phase`, `load`/`unload`/`reload`, and the binary that uses
+them. The seam is tested by existing - if IdeaTek links the library and nothing else, it is real.
 
 *Done when `--once` runs a deployment, a host linking only the library needs no part of IdeaTek, and
 `bridge_create` refuses a config with no phases.*
@@ -89,9 +88,9 @@ The three layers resolved into structs by the host - `bridge_manifest_parse` bes
 inside it. `[content]` walked with ignore patterns, `[element.defaults]`, and the per-element keys
 with their periods.
 
-*Done when a real `config.toml` drives a deployment, `--watch` reloads a changed module, a key omitted
-by all three layers is an error naming the key, and a key set under a disabled table is refused rather
-than ignored.*
+*Done when a real `config.toml` drives a deployment, `--watch` reloads a changed module, a key
+omitted by all three layers is an error naming the key, and a key set under a disabled table is
+refused rather than ignored.*
 
 ## 8. Diagnostics
 
@@ -102,8 +101,8 @@ one - `bridge.md`, *What a pass depends on*, for the capture point and why there
 lands here if a deployment wants it.
 
 *Done when a deliberate stray write is reported with the element that made it, a system made slow on
-purpose is the one the profile names, and an element stopped past its failure budget shows as STOPPED
-rather than having to be inferred from log lines.*
+purpose is the one the profile names, and an element stopped past its failure budget shows as
+STOPPED rather than having to be inferred from log lines.*
 
 ## 9. Prove it
 
@@ -111,10 +110,10 @@ Port the Godot adapter. The probe asserts 191 checks today and two of them ask a
 synchronously - `DESIGN.md`, *What we give up*, names both - so 189 is the number that can pass.
 
 *Done when 189 of the probe's checks pass, the two that cannot are the two named, and the GDExample
-frame is an order of magnitude under 42 us. If it is not, the architecture did not deliver and we find
-out here.*
+frame is an order of magnitude under 42 us. If it is not, the architecture did not deliver and we
+find out here.*
 
 ---
 
-Throughout: the Rust Bridge is the reference implementation. Same modules, same observable behaviour.
-A divergence is either a deliberate design change or a bug.
+Throughout: the Rust Bridge is the reference implementation. Same modules, same observable
+behaviour. A divergence is either a deliberate design change or a bug.
