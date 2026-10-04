@@ -1,7 +1,5 @@
 # The element model
 
-**Draft.** Open items are tracked in OPEN.md; nothing here is settled until that register is empty.
-
 An **element** is a module or a plugin. There is one model for both, and BridgeC has no opinion about
 which you use for what - choosing is the deployment's, because the trade is about guarantees rather
 than about where code belongs.

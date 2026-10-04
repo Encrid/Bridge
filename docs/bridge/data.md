@@ -1,7 +1,5 @@
 # The data model
 
-**Draft.** Open items are tracked in OPEN.md; nothing here is settled until that register is empty.
-
 What a component is, how an element reaches one, and when the world changes. Where the bytes live is
 `memory.md`; how you find out what happened is `diagnostics.md`.
 

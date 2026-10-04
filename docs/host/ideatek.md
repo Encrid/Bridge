@@ -1,7 +1,5 @@
 # IdeaTek
 
-**Draft.** Open items are tracked in OPEN.md; nothing here is settled until that register is empty.
-
 The standalone binary. It links BridgeC and does the three things a library cannot do for itself: own
 `main`, own the loop, and decide when to stop. Why it is a separate target is `PLAN.md`.
 

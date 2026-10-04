@@ -1,7 +1,5 @@
 # Module ABI
 
-**Draft.** Open items are tracked in OPEN.md; nothing here is settled until that register is empty.
-
 A module is a core wasm module with a `bridge:manifest` section. What it can *do* is `element.md`;
 this file is how wasm binds to it.
 

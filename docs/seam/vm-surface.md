@@ -1,8 +1,5 @@
 # VM surface
 
-**Draft.** Open items are tracked in OPEN.md; nothing here is settled until that register is
-empty.
-
 The surface a VM backend implements. BridgeC defines it; a shared library provides it. One
 implementation wraps wasmtime. Another could load shared libraries and call them directly,
 for code that does not need sandboxing.

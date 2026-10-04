@@ -1,8 +1,5 @@
 # Plugin ABI
 
-**Draft.** Open items are tracked in OPEN.md; nothing here is settled until that register is
-empty.
-
 A plugin is an **element** - same capabilities as a module, three guarantees fewer, `element.md`.
 What it can *do* is there; this file is the native mechanics only.
 

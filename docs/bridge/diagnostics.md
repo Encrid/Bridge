@@ -1,7 +1,5 @@
 # Diagnostics
 
-**Draft.** Open items are tracked in OPEN.md; nothing here is settled until that register is empty.
-
 How you find out what happened: what a bad write costs and what finds it, the log an element writes,
 and the counters BridgeC keeps when asked. None of it is a second way to read the design - a
 diagnostic says what occurred, and state is pulled: `host-api.md`, *Introspection*.

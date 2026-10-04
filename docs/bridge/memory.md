@@ -1,7 +1,5 @@
 # Memory
 
-**Draft.** Open items are tracked in OPEN.md; nothing here is settled until that register is empty.
-
 Which block each thing lives in, who may read it, and what it costs when one runs out. What the
 data *is* is `data.md`.
 

@@ -1,7 +1,5 @@
 # Design
 
-**Draft.** Open items are tracked in OPEN.md; nothing here is settled until that register is empty.
-
 Why BridgeC is shaped the way it is, which side owns what, and what the shape costs. What the
 documents are is `README.md`; in what order it gets built is `PLAN.md`.
 

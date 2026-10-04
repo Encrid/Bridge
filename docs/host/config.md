@@ -1,7 +1,5 @@
 # Config
 
-**Draft.** Open items are tracked in OPEN.md; nothing here is settled until that register is empty.
-
 Three files, because three parties know three different things. The host reads all of them; BridgeC
 reads none - it is handed the result as data, `host-api.md`.
 

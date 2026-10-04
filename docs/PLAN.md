@@ -1,7 +1,5 @@
 # Plan
 
-**Draft.** Open items are tracked in OPEN.md; nothing here is settled until that register is empty.
-
 The order the work goes in, and nothing else. What the design is and why is `DESIGN.md`; what the
 documents are is `README.md`.
 

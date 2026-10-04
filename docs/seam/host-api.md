@@ -1,7 +1,5 @@
 # Host API
 
-**Draft.** Open items are tracked in OPEN.md; nothing here is settled until that register is empty.
-
 The surface any host links against. Why there are two targets at all is `PLAN.md`; the reference host
 is `ideatek.md`.
 

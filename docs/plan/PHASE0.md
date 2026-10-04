@@ -83,7 +83,7 @@ and the scan found both where thinking had not.
 
 ## What no script can do
 
-Steps 1 to 8 here, and steps 5 to 8 of the scan, are reading and judgement. The four scripts exist so
+Steps 1 to 8 here, and steps 4 to 7 of the scan, are reading and judgement. The three scripts exist so
 that the **mechanical** checks are never what gets skipped - a count, a reference, a duplicated run, a
 ragged line. They cannot weigh an option, re-read an open item against a decision just made, or
 notice that an edit left `"Create or Call a module"` behind.
@@ -95,19 +95,19 @@ weighed.
 
 Run from `docs/`. The paths below are relative to that, not to this file -
 `plan/` is where a phase's own document lives, and the scan is run over the
-whole tree from one place. The two scripts walk subdirectories; the two
-shell one-liners are written for the layered tree, so a document in a new folder is covered without
-editing them.
+whole tree from one place. The two scripts walk subdirectories; the
+shell one-liner is written for the layered tree, so a document in a new folder is covered without
+editing it.
 
-Steps 1 to 4 are scripts because a listed check gets skipped and a script gets run. Steps 5 to 8 are
+Steps 1 to 3 are scripts because a listed check gets skipped and a script gets run. Steps 4 to 7 are
 reading, in this order, because each one has caught something the one before it could not.
 
 **1. Cross-references resolve.**
 
     python ../tools/xref.py
 
-Every `doc.md`, *Section* pointing at a heading that exists, and every "item N" naming an item still
-in the register. This has caught six references that resolved to nothing, every one in text written
+Every `doc.md`, *Section* pointing at a heading that exists, and no "item N" left now that the
+register is gone. This has caught six references that resolved to nothing, every one in text written
 minutes earlier.
 
 The item half used to be step 5, a grep per closed number, and it **had a permanent hole**: the
@@ -124,32 +124,24 @@ a document re-arguing a conclusion that lives elsewhere is not.
 **3. Formatting.**
 
     awk 'length>108 {print FILENAME":"FNR": "length}' */*.md *.md
-    python ../tools/reflow.py OPEN.md
 
 108, not 100: the documents are hand-wrapped near 100 to 102, so a tighter threshold reports a
 hundred normal lines and the check gets ignored.
 
-`reflow.py` rewraps whole paragraphs at 100. Run it on files maintained with it - `OPEN.md` - not on
-a hand-wrapped document, where it would rewrite every line to no purpose.
-
 Fix the block, not the line. Rewrapping one long line pushes the overflow onto the next.
 
-**4. Draft markers.** One per document and none in `OPEN.md`:
-
-    grep -rlc '^\*\*Draft\.\*\*' --include='*.md' .
-
-**5. Counts against their lists.** Count the rows; do not trust the word in front of them.
+**4. Counts against their lists.** Count the rows; do not trust the word in front of them.
 "Eight regions" has been wrong twice, both times because a row was added and the sentence was
 not.
 
-**6. Every open item, re-read against the decision just made.** Some are sharpened, some
+**5. Every open item, re-read against the decision just made.** Some are sharpened, some
 absorb a case that would otherwise be a new item, some lose a sub-question. This is where most
 of the register's movement comes from - more than from closing things.
 
-**7. New questions the decision raises.** A decision that answers one thing usually asks
+**6. New questions the decision raises.** A decision that answers one thing usually asks
 another. Open it as an item rather than leaving it in the margin, and prefer sharpening an
 existing item to adding a number.
 
-**8. Read the sections the greps pointed at.** A grep finds a stale word, not mangled grammar.
+**7. Read the sections the greps pointed at.** A grep finds a stale word, not mangled grammar.
 One edit left `"Create or Call a module; if something needs to"` behind, and no pattern would
 have found it.

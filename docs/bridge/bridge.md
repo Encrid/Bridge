@@ -1,7 +1,5 @@
 # The orchestrator
 
-**Draft.** Open items are tracked in OPEN.md; nothing here is settled until that register is empty.
-
 What BridgeC does between an element's systems and observers: when they run, what is visible while
 they do, and what happens when one fails. The data they run over is `data.md`; what an element can
 ask for is `element.md`.

@@ -1,7 +1,5 @@
 # BridgeC
 
-**Draft.** Open items are tracked in OPEN.md; nothing here is settled until that register is empty.
-
 A rewrite of Bridge in C. The name is temporary: this replaces Bridge when it is ready.
 
 **Two build targets, because they are two concerns.** BridgeC is a **library**. **IdeaTek** is the
@@ -19,7 +17,6 @@ with. One concern per document, in reading order:
     README.md            this file
     DESIGN.md            why, what the design is, the split, what it costs
     PLAN.md              the ten phases, each with a done-when that can fail
-    OPEN.md              the register
 
     plan/   PHASE0.md    how we decide things. method, not design
             phaseN.md    one per phase, written before that phase starts

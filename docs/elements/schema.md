@@ -1,8 +1,5 @@
 # Schema
 
-**Draft.** Open items are tracked in OPEN.md; nothing here is settled until that register is
-empty.
-
 ## There is no schema format
 
 The schema is a C header using flecs' own declaration macros, compiled by both sides:

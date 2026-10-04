@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
-"""Every reference resolves: `doc.md`, *Section* to a real heading, and "item N"
-to an item still open in OPEN.md.
+"""Every reference resolves: `doc.md`, *Section* to a real heading, and no
+"item N" is left behind.
 
 Catches the failure the restructure makes likely: a pointer that looks right and
-resolves to nothing. The item half exists because a gap in the register means
-closed, so a document citing one points at text nobody can read - and the number
-wraps onto the next line often enough that a line-at-a-time grep misses it.
-Run from docs/.
+resolves to nothing. The item half exists because the register went when phase 0
+ended, so a document citing an item points at text nobody can read - and the
+number wraps onto the next line often enough that a line-at-a-time grep misses
+it. Run from docs/.
 """
 import glob
-import io
 import os
 import re
 import sys
@@ -26,34 +25,25 @@ for full in glob.glob('**/*.md', recursive=True):
     f = os.path.basename(full)
     paths[f] = full
     heads[f] = set()
-    for line in io.open(paths[f], encoding='utf-8'):
+    for line in open(paths[f], encoding='utf-8'):
         m = re.match(r'#{2,4}\s+(.*?)\s*$', line)
         if m:
             heads[f].add(m.group(1).lower())
 
-# the register is deleted when phase 0 ends, and then no item number is valid -
-# so an absent OPEN.md means every "item N" reference is dangling, not that the
-# check is off.
-open_items = set()
-if os.path.exists('OPEN.md'):
-    open_items = set(re.findall(r'(?m)^\*\*(\d+)\.',
-                                io.open('OPEN.md', encoding='utf-8').read()))
-
 bad = 0
 for f in sorted(paths):
-    raw = io.open(paths[f], encoding='utf-8').read()
+    raw = open(paths[f], encoding='utf-8').read()
     # citations wrap, so a reference is matched against unwrapped prose. without
     # this, `doc.md`, *A section whose
     # title wrapped* silently matched nothing and a wrong file went unnoticed.
     text = re.sub(r'\n(?=\S)', ' ', raw)
 
-    # item N, across a line break too: the register is the only place an item
-    # number means anything, and a closed one is a gap.
+    # item N, across a line break too: the register was the only place an item
+    # number meant anything, and it is gone.
     for m in re.finditer(r'[Ii]tem\s+(\d+)', text):
-        if m.group(1) not in open_items:
-            line = text.count('\n', 0, m.start()) + 1
-            print('%-14s:%d -> item %s is closed' % (f, line, m.group(1)))
-            bad += 1
+        line = text.count('\n', 0, m.start()) + 1
+        print('%-14s:%d -> item %s is closed' % (f, line, m.group(1)))
+        bad += 1
 
     # cross-document: `other.md`, *Section*   (backticked or not)
     for m in re.finditer(r'`?([a-z-]+\.md)`?[^.\n]{0,30}?\*([^*\n]+)\*', text):

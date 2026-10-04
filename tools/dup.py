@@ -12,22 +12,16 @@ hits; do not chase the number to zero.
 """
 import collections
 import glob
-import io
 import os
 import re
 
 N = 8
-files = [f for f in glob.glob('**/*.md', recursive=True) if f != 'OPEN.md']
+files = glob.glob('**/*.md', recursive=True)
 grams = collections.defaultdict(set)
 words_of = {}
-# every document carries this line; it is boilerplate, not drift. matched loosely
-# because the files wrap it in different places.
-BOILER = re.compile(r'open\s+items\s+are\s+tracked\s+in\s+open\.md;\s+nothing\s+here\s+is'
-                    r'\s+settled\s+until\s+that\s+register\s+is\s+empty\.', re.S)
 
 for f in files:
-    text = io.open(f, encoding='utf-8').read().lower()
-    text = BOILER.sub(' ', text)
+    text = open(f, encoding='utf-8').read().lower()
     text = re.sub(r'[`*_#\[\]()]', ' ', text)
     words = re.findall(r"[a-z0-9']+", text)
     words_of[f] = words
