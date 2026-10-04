@@ -77,3 +77,72 @@ add_test (NAME patch-version
     COMMAND "${Python3_EXECUTABLE}" "${PATCH}" "${other}" "${other}/out")
 set_tests_properties (patch-version PROPERTIES
     PASS_REGULAR_EXPRESSION "version 4.1.7, and this script was written for 4.1.6")
+
+# ---- phase 2: the backend seam and the wasm backend. docs/plan/PHASE2.md ----
+
+find_program (WASM_TOOLS wasm-tools REQUIRED)
+
+# wasmtime's C API, vendored: third_party/wasmtime/README.md
+set (WASMTIME "${CMAKE_CURRENT_SOURCE_DIR}/third_party/wasmtime")
+add_library (wasmtime SHARED IMPORTED)
+target_include_directories (wasmtime INTERFACE "${WASMTIME}/include")
+if (WIN32)
+    set_target_properties (wasmtime PROPERTIES
+        IMPORTED_LOCATION "${WASMTIME}/windows/wasmtime.dll"
+        IMPORTED_IMPLIB "${WASMTIME}/windows/wasmtime.dll.lib")
+else ()
+    set_target_properties (wasmtime PROPERTIES
+        IMPORTED_LOCATION "${WASMTIME}/linux/libwasmtime.so")
+endif ()
+
+# what the operating system is asked for, shared by the library, a backend and the tests
+add_library (bridge-os STATIC src/os.c)
+set_target_properties (bridge-os PROPERTIES
+    C_STANDARD 11 C_STANDARD_REQUIRED YES POSITION_INDEPENDENT_CODE ON)
+target_include_directories (bridge-os PUBLIC src)
+if (UNIX)
+    target_link_libraries (bridge-os PUBLIC dl pthread)
+endif ()
+
+# the wasm backend: a shared library exporting the sixteen entries
+add_library (bridge-wasm SHARED backends/wasm/wasm.c)
+set_target_properties (bridge-wasm PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES PREFIX "")
+target_include_directories (bridge-wasm PRIVATE include)
+target_link_libraries (bridge-wasm PRIVATE wasmtime bridge-os)
+if (WIN32)
+    # the backend loads wasmtime.dll from beside itself
+    add_custom_command (TARGET bridge-wasm POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+            "${WASMTIME}/windows/wasmtime.dll" "$<TARGET_FILE_DIR:bridge-wasm>")
+endif ()
+
+# test modules are wasm text, assembled here
+set (MODULES "${CMAKE_CURRENT_BINARY_DIR}/modules")
+file (GLOB WAT CONFIGURE_DEPENDS "tests/modules/*.wat")
+set (WASM)
+foreach (wat ${WAT})
+    get_filename_component (name "${wat}" NAME_WE)
+    add_custom_command (
+        OUTPUT "${MODULES}/${name}.wasm"
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${MODULES}"
+        COMMAND "${WASM_TOOLS}" parse "${wat}" -o "${MODULES}/${name}.wasm"
+        DEPENDS "${wat}"
+        COMMENT "assembling ${name}.wat"
+        VERBATIM)
+    list (APPEND WASM "${MODULES}/${name}.wasm")
+endforeach ()
+add_custom_target (modules ALL DEPENDS ${WASM})
+
+function (backend_test name)
+    add_executable (${name} "tests/${name}.c" src/backend.c ${ARGN})
+    set_target_properties (${name} PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES)
+    target_include_directories (${name} PRIVATE include)
+    target_link_libraries (${name} PRIVATE bridge-os)
+    target_compile_definitions (${name} PRIVATE
+        "BACKEND_PATH=\"$<TARGET_FILE:bridge-wasm>\"" "MODULE_DIR=\"${MODULES}\"")
+    add_dependencies (${name} bridge-wasm modules)
+    add_test (NAME ${name} COMMAND ${name})
+endfunction ()
+
+# one block backing a memory in two stores at once: the question the phase opens with
+backend_test (adopt)

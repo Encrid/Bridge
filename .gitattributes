@@ -1,2 +1,5 @@
 third_party/flecs/flecs.c -text
 third_party/flecs/flecs.h -text
+third_party/wasmtime/include/** -text
+third_party/wasmtime/windows/* binary
+third_party/wasmtime/linux/* binary

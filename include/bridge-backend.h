@@ -1,0 +1,104 @@
+/* The backend seam: what Bridge-ASM700 asks of the thing that runs a module.
+ * docs/seam/backend/backend.md is the contract; this header is its C form.
+ *
+ * A backend is a shared library exporting the sixteen functions below by name.
+ * Only a backend and Bridge-ASM700 compile this header. */
+#ifndef BRIDGE_BACKEND_H
+#define BRIDGE_BACKEND_H
+
+#include <stddef.h>
+#include <stdint.h>
+
+#ifdef _WIN32
+#define BACKEND_EXPORT __declspec(dllexport)
+#else
+#define BACKEND_EXPORT __attribute__((visibility("default")))
+#endif
+
+typedef struct backend          backend;
+typedef struct backend_memory   backend_memory;
+typedef struct backend_module   backend_module;
+typedef struct backend_instance backend_instance;
+typedef struct backend_func     backend_func;
+
+/* Why an entry failed. The caller owns the buffer, so there is no lifetime to get wrong. */
+typedef struct { char text[256]; } backend_err;
+
+/* What a backend can actually do - capabilities.md. */
+enum {
+    BACKEND_SANDBOX  = 1 << 0,
+    BACKEND_METER    = 1 << 1,
+    BACKEND_DEADLINE = 1 << 2,
+    BACKEND_LIMIT    = 1 << 3,
+    BACKEND_RELOAD   = 1 << 4
+};
+
+/* ponytail: string pairs, since no backend setting exists yet. Typed values when one needs them. */
+typedef struct { const char *key, *value; } backend_setting;
+
+/* A signature is declared going in and checked coming out - signatures.md. */
+enum { BACKEND_I32 = 1, BACKEND_I64 = 2 };
+typedef struct {
+    const uint8_t *params;  uint32_t param_count;
+    const uint8_t *results; uint32_t result_count;
+} backend_sig;
+
+/* A function Bridge-ASM700 provides to a module. Every value travels as 64 bits. */
+typedef void (*backend_fn)(void *ud, const uint64_t *args, uint64_t *results);
+
+enum { BACKEND_IMPORT_FUNC = 1, BACKEND_IMPORT_MEMORY = 2, BACKEND_IMPORT_OTHER = 3 };
+typedef struct {
+    const char *ns;    size_t ns_len;       /* not NUL-terminated */
+    const char *field; size_t field_len;
+    uint8_t     kind;
+} backend_import;
+
+/* Which adopted memory answers which of a module's imports. */
+typedef struct {
+    const char     *ns, *field;
+    backend_memory *memory;
+} backend_memory_import;
+
+typedef struct backend_api {
+    backend *(*backend_create)(const backend_setting *settings, uint32_t count, backend_err *err);
+    void     (*backend_destroy)(backend *b);
+    uint32_t (*backend_capabilities)(backend *b);
+
+    /* The address space this backend needs around a block: `reservation` bytes from its
+     * start, then `guard` bytes nothing is mapped into. Zero for both if it needs none. */
+    void            (*memory_shape)(backend *b, uint64_t *reservation, uint64_t *guard);
+    backend_memory *(*memory_adopt)(backend *b, void *ptr, uint64_t len, backend_err *err);
+
+    backend_module *(*module_compile)(backend *b, const void *bytes, size_t len,
+                                      const char *path, backend_err *err);
+    uint32_t        (*module_imports)(backend_module *m, backend_import *out, uint32_t max);
+    void            (*module_destroy)(backend_module *m);
+
+    backend_instance *(*instance_create)(backend *b, backend_module *m,
+                                         const backend_memory_import *memories, uint32_t count,
+                                         backend_err *err);
+    void (*instance_destroy)(backend_instance *i);
+    void (*instance_set_fuel)(backend_instance *i, uint64_t units);
+    void (*instance_set_deadline)(backend_instance *i, uint64_t nanos);     /* the next call only */
+    void (*instance_set_memory_limit)(backend_instance *i, uint64_t bytes);
+
+    int (*define_func)(backend_instance *i, const char *ns, const char *field,
+                       backend_fn fn, void *ud, const backend_sig *sig, backend_err *err);
+    /* `arity` and `results` are -1 if the backend cannot tell. NULL if there is no such export. */
+    backend_func *(*instance_func)(backend_instance *i, const char *name,
+                                   int32_t *arity, int32_t *results, backend_err *err);
+    /* 0 if the function returned, and then `status` is what it returned. */
+    int (*call)(backend_func *f, int32_t *status, backend_err *err);
+} backend_api;
+
+/* The names a backend exports, in the order of backend_api's members. */
+#define BACKEND_ENTRIES \
+    "backend_create", "backend_destroy", "backend_capabilities", \
+    "memory_shape", "memory_adopt", \
+    "module_compile", "module_imports", "module_destroy", \
+    "instance_create", "instance_destroy", \
+    "instance_set_fuel", "instance_set_deadline", "instance_set_memory_limit", \
+    "define_func", "instance_func", "call"
+#define BACKEND_ENTRY_COUNT 16
+
+#endif
