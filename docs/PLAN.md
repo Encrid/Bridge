@@ -18,24 +18,24 @@ and deleted, and the documents left draft.
 Two questions could not be settled by argument, so a throwaway spike settled them inside this phase:
 whether flecs can be confined to our block, and whether its events are enough to keep the entity
 mirror in step. Both answered with numbers, and the second answered *no* - `flecs.md`, *It can be
-confined, and the patch is thirteen sites*, and *flecs will not tell you which*.
+confined*, and *flecs will not tell you which*.
 
 *Done when the register is empty and every design document is out of draft.* Met.
 
 ## 1. Vendor and patch flecs
 
-flecs 4.1.6, vendored pristine as the amalgamation and patched by a script: **thirteen allocator
-sites and one row-move hook** - `flecs.md`, *It can be confined, and the patch is thirteen sites*,
-*flecs will not tell you which*, and *How it is carried* for the shape. The sites are in two files
-upstream and in one here, since the amalgamation is a single `flecs.c`. The build is CMake with
-Ninja presets, and it starts in this phase. `PHASE1.md` is the detail.
+Done, on Windows. flecs v4.1.6, vendored pristine as the amalgamation and patched by a script: the
+allocator argument at the twenty-three calls that allocate a column or an entity array, and one
+row-move hook - `flecs.md`, *It can be confined*, *flecs will not tell you which*, and *How it is
+carried* for the shape. The build is CMake with Ninja presets, and it starts in this phase.
+`PHASE1.md` is what it built and found.
 
-**First, because everything else needs it.** Columns cannot be in memory 1 without the thirteen, and
-the mirror cannot be correct without the hook.
+**First, because everything else needs it.** Columns cannot be in memory 1 without the allocator,
+and the mirror cannot be correct without the hook.
 
 *Done when ctest's confinement test fails if one pointer escapes the block, its row-move test fails
 if one moved record goes unreported, and the patch script declines a flecs version it was not
-written for.*
+written for.* Met; the `linux` preset is unrun.
 
 ## 2. One module runs
 

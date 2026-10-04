@@ -1,0 +1,2 @@
+third_party/flecs/flecs.c -text
+third_party/flecs/flecs.h -text
