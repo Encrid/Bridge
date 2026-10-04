@@ -26,7 +26,8 @@ for full in glob.glob('**/*.md', recursive=True):
     paths[f] = full
     heads[f] = set()
     for line in open(paths[f], encoding='utf-8'):
-        m = re.match(r'#{2,4}\s+(.*?)\s*$', line)
+        # a title counts: a document that is one section has only that heading.
+        m = re.match(r'#{1,4}\s+(.*?)\s*$', line)
         if m:
             heads[f].add(m.group(1).lower())
 

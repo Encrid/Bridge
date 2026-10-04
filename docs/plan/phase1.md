@@ -7,9 +7,9 @@ arrays from a block we hand it**, a script that produces that flecs from a prist
 that proves the confinement rather than asserting it.
 
 What is already settled and not to be re-argued: the version, the site count, what the sites are,
-what confinement is worth, and how the patch is carried - `memory.md`, *It can be confined, and the
-patch is thirteen sites* and *How it is carried*, plus the fourteenth in `data.md`, *flecs will not
-tell you which*. Why this is phase 1 rather than part of storage is `PLAN.md`.
+what confinement is worth, and how the patch is carried - `flecs.md`, *It can be confined, and the
+patch is thirteen sites*, *How it is carried*, and the fourteenth site in *flecs will not tell you
+which*. Why this is phase 1 rather than part of storage is `PLAN.md`.
 
 ## What it produces
 
@@ -63,4 +63,4 @@ decline rather than proceed.
 
 If a site cannot be routed without changing a signature flecs calls from many places, the patch
 stops being fourteen lines and the fork gets expensive to carry. That is where the condition in
-`memory.md`, *How it is carried*, applies - ask upstream for the hook instead.
+`flecs.md`, *How it is carried*, applies - ask upstream for the hook instead.

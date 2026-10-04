@@ -41,8 +41,8 @@ discovers nothing, it binds names to what the binary already expects.
 
 ## Exports
 
-    init()      -> result   declares components, systems and observers. Once, before any
-                            phase runs.
+    init()      -> result   declares components, systems and observers. Once per load,
+                            before any of its systems run.
     shutdown()  -> result   called once, before the instance goes away.
     reload()    -> result   optional. Absent means "cannot be hot-reloaded".
 
@@ -57,7 +57,7 @@ would shift the moment a system is added ahead of it. The profile reports per sy
 module. A trap says which one. Names also survive reordering across a reload, where indices assigned
 in declaration order do not.
 
-`init`, `shutdown` and `reload` being reserved - `element.md`, *The ABI* - is an export-name
+`init`, `shutdown` and `reload` being reserved - `abi.md`, *The ABI* - is an export-name
 collision here: resolving one would hand the scheduler an export that already means something else.
 
 Two systems sharing one body is two exports that both call it. That is the whole cost of names.
@@ -66,15 +66,15 @@ Two systems sharing one body is two exports that both call it. That is the whole
 module is not reloadable and they are not saying the same thing: the author by leaving the export
 out, the deployment by turning the key off. So **`hot_reload` only ever forbids** - a deployment can
 decline a capability the author provided and cannot conjure one, exactly as a config key demands a
-capability of a backend and never synthesises it (`vm-surface.md`, *Capabilities, so the swap is
+capability of a backend and never synthesises it (`capabilities.md`, *Capabilities, so the swap is
 honest*). `hot_reload = true` against a module with no `reload` export is config contradicting the
-artifact, and it is refused at load, by name - `bridge.md`, *When something fails*.
+artifact, and it is refused at load, by name - `failure.md`, *When something fails*.
 
 ## Reaching a component
 
 Through its system's query. BridgeC publishes the matched spans into memory 2 at every barrier, and
-iterating them is two loops and no call. The layout is in `data.md`, *The interface is a query*;
-following a single reference by id is in *Reference following*.
+iterating them is two loops and no call. The layout is in `query.md`, *The interface is a query*;
+following a single reference by id is in `reference.md`, *Reference following*.
 
 A fixed header at offset 0 of memory 2 says where each of this module's regions begins. BridgeC owns
 that memory outright, so there is nothing to negotiate and no capacity for the module to declare -
@@ -110,7 +110,7 @@ game engine and knows what an entity is. **BridgeC orchestrates and knows nothin
 says how to find data and never what data there is: no component, no field, and no prefix a module
 must start its struct with.
 
-**BridgeC declares no components at all**, not even about itself - see `DESIGN.md`, *No builtins*.
+**BridgeC declares no components at all**, not even about itself - see `no-builtins.md`, *No builtins*.
 The line it does draw is the log record's: BridgeC owns the record's shape, the element owns the
 message. No field name of a component is in the header either, even though BridgeC has them -
 `schema.md`, *There is no schema format*.

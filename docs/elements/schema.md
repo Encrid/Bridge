@@ -45,12 +45,12 @@ flecs', minus pointers:
     f32, f64                  EcsF32, EcsF64
     enum, bitmask             EcsEnum, EcsBitmask
     struct, inline array      EcsStructType, EcsArray
-    entity id                 EcsEntity - what *Reference following* is built on
+    entity id                 EcsEntity - what `reference.md`, *Reference following* is built on
 
 **Rejected: pointer-sized or pointer-holding.** `EcsString`, `EcsVector`, `EcsUPtr`, `EcsIPtr`. A
 wasm32 pointer is four bytes and the host's is eight, so flecs' host-computed offsets would not
 match the module's struct. A host pointer is not addressable from a module anyway. Same reason
-`string` and `list` are not components: `memory.md`, *Variable length*.
+`string` and `list` are not components: `strings.md`, *Variable length*.
 
 Letting flecs compute offsets is sound **because** of that rejection.
 
@@ -69,7 +69,7 @@ A module built against an older layout gets an error at init instead of reading 
 
 **Nothing else is fingerprinted: nothing else has two parties.** A query has one: the element
 declares it and only that element walks it. A system has none: every function BridgeC calls is
-`() -> i32` - `vm-surface.md`, *A call takes nothing and answers a status* - so core wasm's numeric
+`() -> i32` - `signatures.md`, *A call takes nothing and answers a status* - so core wasm's numeric
 match is the whole check.
 
 No signature fingerprint either. Core wasm links `(entity, slot)` and `(slot, entity)` alike, both
@@ -81,7 +81,7 @@ component model needed a type system.
 ## What the generator still emits
 
 One thing: accessors over a span, carrying the `row < count` test - **always, with no switch to
-remove it**: `diagnostics.md`, *Always on*.
+remove it**: `validation.md`, *Always on*.
 
 Not structs, not the component fingerprint, and not the published layouts. Those are `bridge-abi.h`:
 `module-abi.md`, *The published layouts*.

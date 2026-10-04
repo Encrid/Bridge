@@ -9,20 +9,21 @@ declared finished while broken.
 
 ## 0. Documents, and the spikes they need
 
-The fifteen in `README.md`, `PHASE0.md` and `OPEN.md` aside. Cheap to change now, expensive later.
+The design documents `README.md` lists, `PHASE0.md` and `OPEN.md` aside. Cheap to change now,
+expensive later.
 
 Two questions could not be settled by argument, so a throwaway spike settled them inside this phase:
 whether flecs can be confined to our block, and whether its events are enough to keep the entity
-mirror in step. Both answered with numbers, and the second answered *no* - `memory.md`, *It can be
-confined, and the patch is thirteen sites*, and `data.md`, *flecs will not tell you which*.
+mirror in step. Both answered with numbers, and the second answered *no* - `flecs.md`, *It can be
+confined, and the patch is thirteen sites*, and `flecs.md`, *flecs will not tell you which*.
 
-*Done when OPEN.md is empty and all fifteen are out of draft.*
+*Done when OPEN.md is empty and every one of them is out of draft.*
 
 ## 1. Vendor and patch flecs
 
-Vendored, pinned, and patched at fourteen sites in two files - `memory.md`, *How it is carried*,
-for the shape of all three, and *It can be confined, and the patch is thirteen sites* for the
-thirteen plus the one `data.md`, *flecs will not tell you which*, adds.
+Vendored, pinned, and patched at fourteen sites in two files - `flecs.md`, *How it is carried*,
+for the shape of all three, and `flecs.md`, *It can be confined, and the patch is thirteen sites* for the
+thirteen plus the one `flecs.md`, *flecs will not tell you which*, adds.
 
 **First, because everything else needs it.** Columns cannot be in memory 1 without it, and the
 mirror cannot be correct without the fourteenth site.
@@ -34,7 +35,7 @@ patch script refuses a flecs version it was not written for.*
 
 A core module through wasmtime's C API, importing a BridgeC memory, which means `wasm_multi_memory`
 on since the module has its own. `bridge-abi.h` begins here, because a module reading memory 1 with
-plain loads needs the span layout. `define_func` with a real signature - `vm-surface.md`, *Imports
+plain loads needs the span layout. `define_func` with a real signature - `signatures.md`, *Imports
 are declared, exports are checked* - `instance_func`'s `() -> i32` check, and `call`.
 
 *Done when a module writes memory 1, the host reads the same bytes, a deliberate out-of-bounds
@@ -51,7 +52,7 @@ and accessors carrying the `row < count` test.
 
 *Done when two modules share a component array with no crossing per access, neither can reach the
 other's spans, a mirror lookup survives a batch of swap-removes, and the accessor's test is measured
-against a build without it* - `diagnostics.md`, *Always on*, states that cost as reasoning, and this
+against a build without it* - `validation.md`, *Always on*, states that cost as reasoning, and this
 is where it becomes a measurement.
 
 ## 4. Plugins
@@ -97,7 +98,7 @@ refused rather than ignored.*
 The log ring drained to the sink, with its text always in the scratch arena. `[checks] validate` and
 `[checks] profile` - the barrier's checksum pass and the per-system counters. `bridge_elements` and
 `bridge_profile`, both pulls. A journal is this machinery with a blocking sink instead of a dropping
-one - `bridge.md`, *What a pass depends on*, for the capture point and why there is only one - and
+one - `schedule.md`, *What a pass depends on*, for the capture point and why there is only one - and
 lands here if a deployment wants it.
 
 *Done when a deliberate stray write is reported with the element that made it, a system made slow on
@@ -107,7 +108,7 @@ STOPPED rather than having to be inferred from log lines.*
 ## 9. Prove it
 
 Port the Godot adapter. The probe asserts 191 checks today and two of them ask a module a question
-synchronously - `DESIGN.md`, *What we give up*, names both - so 189 is the number that can pass.
+synchronously - `costs.md`, *What we give up*, names both - so 189 is the number that can pass.
 
 *Done when 189 of the probe's checks pass, the two that cannot are the two named, and the GDExample
 frame is an order of magnitude under 42 us. If it is not, the architecture did not deliver and we

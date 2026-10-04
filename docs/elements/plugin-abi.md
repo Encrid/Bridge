@@ -66,11 +66,17 @@ Three exported symbols, the lifecycle every element has:
 An absent `bridge_reload` is how a plugin says it **cannot** be reloaded, the same convention a
 module's missing `reload` export uses. `hot_reload = false` is a deployment saying it **may not**,
 which is a different statement: `module-abi.md`, *Exports*, has why that means the key can only ever
-forbid. Each symbol returns a code, which `on_error` governs - `bridge.md`, *When something fails*.
+forbid. Each symbol returns a code, which `on_error` governs - `failure.md`, *When something fails*.
 
-`bridge_init` runs once at boot, before any element is running and before any module exists.
-Everything the plugin sets up happens there: declaring components, registering its systems and its
-observers, taking hold of whatever device it exists for.
+`bridge_init` runs once per load, before any of the plugin's systems or observers run. When that is,
+the host decides - `lifecycle.md`, *The runtime lifecycle*. Everything the plugin sets up happens
+there: declaring components, registering its systems and its observers, taking hold of whatever
+device it exists for.
+
+**A plugin need not load before a module.** Bridge loaded every plugin first because modules
+imported plugin functions. Here nothing calls, so a module loaded before its plugin iterates zero
+spans until the plugin arrives. The condition that brings an order back is an element needing
+another's code, rather than its data, at init.
 
 `bridge_shutdown` closes a leak Bridge has: a plugin holding a device releases it on teardown rather
 than when whichever module would have closed it happens to get there - or does not, having crashed.
@@ -97,12 +103,12 @@ Everything else - `declare`, the structural forms, `alloc` - is `element.md`'s l
 `attach` takes a real pointer for its initial value where a module passes an offset.
 
 And nothing else. No value marshalling, no call context, no buffer interface, no service registry,
-and **no way to call another element** - `element.md`, *The ABI*. The first two have nothing to do
+and **no way to call another element** - `abi.md`, *The ABI*. The first two have nothing to do
 when data does not travel through calls, and the rest answer a question subscription answers.
 
 ## Reaching a component
 
-**The same spans a module reads** - `data.md`, *The interface is a query* - rewritten at every
+**The same spans a module reads** - `query.md`, *The interface is a query* - rewritten at every
 barrier. A query matches many tables, so there is one span per table and a plugin iterates them the
 way a module does. What differs is only how it gets there: a module finds the span array through
 memory 2's header, and a plugin is handed a pointer.
@@ -134,36 +140,6 @@ plugin has the process's address space and a module has memory 2.
 The pointer is good for the phase it was read in, for the same reason a module's row number is:
 storage may be compacted or migrated at a barrier.
 
-## Threads
-
-A plugin's systems run on whichever thread BridgeC schedules its element on, and different elements
-run at once - `memory.md`, *Threads*. For most plugins that is the end of it.
-
-For the rest it is not, and the case is not theoretical: **Godot must be driven from the thread that
-created it.** So a plugin says so, with one key in its manifest:
-
-    pinned = true     every system and observer of this element runs on the thread
-                      bridge_init ran on
-
-**It is the author's key, not the deployment's**, which is the *who holds the knowledge* rule
-`config.md` is ordered by. A plugin author knows their library must be driven from one thread; a
-deployment author has no access to that fact, so declaring it there would be the deployment
-guessing, and a wrong guess is a race nobody will find quickly. It reaches BridgeC as a field in
-`bridge_element_config`, like every other manifest value.
-
-**The cost is that pinned elements serialise with each other.** They are all on one thread by
-construction. That is not a flaw - elements all driving one thing that is not thread-safe **must**
-serialise - and it is visible at load rather than as a race.
-
-**Nothing is proxied and nothing is deferred.** Godot's answer to a wrong-thread call is
-`call_deferred`, a queue it drains itself. Ours is that the wrong thread never happens, because the
-element was placed on the right one before it ran. There is no call to proxy in the first place.
-
-A plugin appends to a log ring of its own, exactly as a module does, through a real pointer rather
-than a wasm memory - `diagnostics.md`, *The log*. Not a direct call into BridgeC, even though one
-would cost two nanoseconds here: a plugin may be running on a thread of its own, and a ring each is
-what keeps every writer single and lock-free.
-
 ## What a plugin must not do
 
 Not *cannot* - **nothing here is enforced**, and that is the whole difference. The three-memory
@@ -180,25 +156,3 @@ survives an unload by design**, so the handle outlives the plugin that made it a
 uses it happily. Two plugins that must share a device share it the way two native libraries in one
 process always have - by being built to - and that is not BridgeC's business. BridgeC's storage is
 for data a component describes, and a pointer is not that.
-
-## An engine callback answers from storage
-
-This is where the design pays. An engine's callbacks mostly ask for **state**, and state is in
-storage, so a plugin answers from it with no call and no crossing:
-
-    _process              the module's logic is a system; its output is a component the
-                          plugin flushes
-    _get, _set            a module's properties are components; the plugin reads them
-    _get_property_list    the descriptors are a component array
-    _has_point            the shape is a component; the plugin does the test
-    a signal firing       an entity carrying an event component; whoever subscribed runs
-                          at the barrier - `data.md`, *Observers*
-
-Godot's own documented example needs none of it: a position computed from elapsed time is a system
-writing a component. It also fixes a Bridge defect, where a module could not set its own property
-because `Object.set` came back as a re-entry.
-
-What is left over is the callback whose return value the engine consumes **inside its own loop**,
-with the engine on the stack waiting - `Array.sort_custom` asking a comparator for a bool N log N
-times. No component write answers a question that has to be answered now, so **a deployment cannot
-express that one**, and `DESIGN.md`, *What we give up*, is where it is written down.

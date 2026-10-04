@@ -96,8 +96,8 @@ weighed.
 Run from `docs/`. The paths below are relative to that, not to this file -
 `plan/` is where a phase's own document lives, and the scan is run over the
 whole tree from one place. The two scripts walk subdirectories; the
-shell one-liner is written for the layered tree, so a document in a new folder is covered without
-editing it.
+shell one-liner takes its list from git, so a document in a new folder is covered without editing
+it.
 
 Steps 1 to 3 are scripts because a listed check gets skipped and a script gets run. Steps 4 to 7 are
 reading, in this order, because each one has caught something the one before it could not.
@@ -123,7 +123,7 @@ a document re-arguing a conclusion that lives elsewhere is not.
 
 **3. Formatting.**
 
-    awk 'length>108 {print FILENAME":"FNR": "length}' */*.md *.md
+    awk 'length>108 {print FILENAME":"FNR": "length}' $(git ls-files '*.md')
 
 108, not 100: the documents are hand-wrapped near 100 to 102, so a tighter threshold reports a
 hundred normal lines and the check gets ignored.

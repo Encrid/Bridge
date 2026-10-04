@@ -18,7 +18,7 @@ own `main`, own the loop, and decide when to stop. Why it is a separate target i
 **Three of those a library cannot do and the rest it declines**, which are different reasons.
 `main`, the loop and the exit are impossible for a library - something has to own them. TOML, the
 layer resolution, the directory walk and the log destination are all things BridgeC could have done
-and does not, and `DESIGN.md`, *The split*, is the rule that sends each of them this way.
+and does not, and `split.md`, *The split*, is the rule that sends each of them this way.
 
 Thinner than idTech3's shell, which also polls input at `win_main.c:1240`. Input is a plugin here,
 so IdeaTek creates, loops, destroys.
@@ -50,9 +50,9 @@ optional table here.
 ## The pass is config's order
 
 IdeaTek is generic: it cannot know a deployment's phases, and BridgeC has none to fall back on -
-`bridge.md`, *BridgeC ships no phase names*. So it reads them from config and walks them in order.
+`schedule.md`, *BridgeC ships no phase names*. So it reads them from config and walks them in order.
 TOML arrays keep their order, so **the `phases` list is the pass** - and a phase carries nothing but
-its name, so there is nothing else here to read: `bridge.md`, *A phase is a name and nothing else*.
+its name, so there is nothing else here to read: `schedule.md`, *A phase is a name and nothing else*.
 
 That is why having no `after` relation costs nothing in practice. `host-api.md` records the cost - a
 host can call one phase every frame and another never, and BridgeC cannot detect it - and IdeaTek
@@ -64,7 +64,7 @@ fixed timestep calls `bridge_phase` itself and takes the responsibility with it.
 It loads everything the deployment declares, prints what each `bridge_load` answered, and exits. The
 information is **IdeaTek's own return codes**, not `bridge_elements`.
 
-That call answers who is *still running* - `host-api.md`, *Introspection* - and nothing has been
+That call answers who is *still running* - `introspection.md`, *Introspection* - and nothing has been
 stopped before the loop has run, so at startup it could only ever say "all of them". What a reader
 of `--list` wants is whether this deployment loads at all, and only the shell can answer that,
 because only the shell walked the paths.
@@ -79,7 +79,7 @@ anyway.
 BridgeC has no notion of being done, so this is entirely IdeaTek's: a signal, `--once`, or a
 deployment that asked for neither and runs until killed.
 
-Nothing an element does ends the process. That is deliberate - `host-api.md`, *BridgeC has no notion
+Nothing an element does ends the process. That is deliberate - `loop.md`, *BridgeC has no notion
 of being done* - and it means the exit condition is always visible in the command line rather than
 buried in a module.
 
