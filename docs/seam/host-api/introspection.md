@@ -1,7 +1,7 @@
 # Introspection
 
 `bridge_elements` exists for one reason, and it is not a console: **an element that loaded can be
-stopped later, and nothing else says so.** Past its failure budget BridgeC stops an element - its
+stopped later, and nothing else says so.** Past its failure budget Bridge-ASM700 stops an element - its
 systems and observers stop running and its components stay, `failure.md`, *When something fails*.
 That happens at frame nine thousand, long after any return code the host saw.
 

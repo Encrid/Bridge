@@ -1,11 +1,11 @@
 # The schedule
 
-What BridgeC does between an element's systems and observers: when they run, and what is visible
+What Bridge-ASM700 does between an element's systems and observers: when they run, and what is visible
 while they do. What bounds a run is `limits.md`; what happens when one fails is `failure.md`; which
 systems run at once is `threads.md`. The data they run over is `data.md`; what an element can ask
 for is `abi.md`.
 
-BridgeC owns this because no host could do it differently - `split.md`, *The split*.
+Bridge-ASM700 owns this because no host could do it differently - `split.md`, *The split*.
 
 ## Phases
 
@@ -20,10 +20,10 @@ A phase runs, then a barrier. The host asks for them one at a time and decides t
 an immediate form that would need a phase of its own - `abi.md`, *The ABI* - so no second phase
 is forced.
 
-### BridgeC ships no phase names
+### Bridge-ASM700 ships no phase names
 
 Not one, and not a default set. **A phase name is a name somebody has to invent**, and inventing one
-here would turn BridgeC's guess about the shape of a frame into something every element references.
+here would turn Bridge-ASM700's guess about the shape of a frame into something every element references.
 That is the last clause of `no-builtins.md`, *No builtins*, and it fails that rule's universality test: a
 one-run tool and a game do not want the same phases.
 
@@ -64,18 +64,18 @@ world, not the goal. **Here there is no way to ask for the actual world**: every
 declared term, and even `get` by id is indexed by the terms *this* element declared.
 
 The three cases for it each live somewhere else. A system driving something that is not thread-safe
-is `pinned`, and every pinned element is on one thread already - `plugin-threads.md`, *Threads*. A
+is `pinned`, and every pinned element is on one thread already - `pinned.md`, *Threads*. A
 system that wants the whole world to itself has one, for the whole of a phase - *What a phase shows
 you*. A system that walks everything must declare everything, so it conflicts with every writer and
 the conflict graph serialises it anyway - `threads.md`, *Threads*.
 
 What is left is a flag somebody sets hoping to fix a race, where the cause is an undeclared write
 that is wrong whether or not anything ran beside it. **The condition that brings it back** is an
-element kind that can share an external resource without being pinnable; nothing like that exists
+element that can share an external resource without being pinnable; nothing like that exists
 today.
 
 Rows move when storage is compacted or migrated, so **nothing moves while any phase is in flight.**
-That is the whole reason for the shape. Every phase defers its structural change, so BridgeC has one
+That is the whole reason for the shape. Every phase defers its structural change, so Bridge-ASM700 has one
 safe moment to restructure, and it is the same moment it republishes the spans - which is what lets
 a span be a snapshot. **Every phase, without exception**: `data.md`, *Structural change*.
 
@@ -105,7 +105,7 @@ elements and only the deployment knows both are there.
 ### Order within a phase is never implicit
 
 If two systems in the same phase conflict - one writes what the other reads or writes - and nothing
-orders them, **BridgeC refuses to start** and names both. Not declaration order, not load order,
+orders them, **Bridge-ASM700 refuses to start** and names both. Not declaration order, not load order,
 nothing decided by which element happened to be found first. Conflicts are already computed for
 parallelism, so detecting this costs nothing.
 
@@ -123,7 +123,7 @@ done by luck, so making it explicit is the point rather than a regression.
 ## What a phase shows you
 
 **A spawn is visible at the next barrier.** `spawn` answers a usable id at once, since the id is
-BridgeC's to mint, but the row does not exist and no query counts it until then. Deletion mirrors
+Bridge-ASM700's to mint, but the row does not exist and no query counts it until then. Deletion mirrors
 it: a destroyed entity stays readable for the rest of the phase that destroyed it.
 
 So **every system sees one world for the whole of a phase**, which is what lets parallel systems
@@ -132,19 +132,19 @@ side.
 
 ## What a pass depends on
 
-Storage, the phase the host asked for, and **what plugins wrote**. Nothing else crosses in:
-everything a deployment learns from outside reaches a module as a column some plugin declared `out`,
+Storage, the phase the host asked for, and **what native elements wrote**. Nothing else crosses in:
+everything a deployment learns from outside reaches the rest as a column some native element declared `out`,
 applied at a barrier.
 
 That is one place, because of three decisions taken elsewhere for their own reasons. **No element
-can call another**, so no value ever arrives as a return - `abi.md`, *The ABI*. **A plugin's
-code runs inside a phase** and a foreign-thread callback touches no storage at all -
-`plugin-abi.md`, *The invariant*. And **two writers of one component are never in flight together**,
+can call another**, so no value ever arrives as a return - `abi.md`, *The ABI*. **A native
+element's code runs inside a phase** and a foreign-thread callback touches no storage at all -
+`native.md`, *The invariant*. And **two writers of one component are never in flight together**,
 so the order the rest happen to run in cannot change the result - the conflict graph exists for
 parallelism and hands this over for nothing.
 
 So a pass is reproducible from its storage and that one column set. Entity ids and arena offsets are
-BridgeC's to mint in order, iteration order follows from the same history, and fuel is deterministic
+Bridge-ASM700's to mint in order, iteration order follows from the same history, and fuel is deterministic
 by period - `limits.md`, *What bounds a run*.
 
 **The one thing that is not reproducible is a timeout firing.** The same `init` may finish on a

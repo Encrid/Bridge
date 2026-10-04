@@ -4,17 +4,16 @@ What a component is and when the world changes. How an element reaches one is `q
 `reference.md`; what survives a reload is `lifetime.md`. Where the bytes live is `memory.md`; why
 the ECS is flecs is `flecs.md`.
 
-BridgeC embeds **flecs**. Storage, archetypes, queries, entity ids and the conflict information the
-scheduler needs are all flecs'. BridgeC owns the seam: getting query results somewhere a wasm module
+Bridge-ASM700 embeds **flecs**. Storage, archetypes, queries, entity ids and the conflict information the
+scheduler needs are all flecs'. Bridge-ASM700 owns the seam: getting query results somewhere a wasm element
 can read them with plain loads.
 
-flecs is an **implementation detail, not the contract**. No element sees it - not a module, not a
-plugin. The ABI is BridgeC's own, which holds it to the eight entries in `abi.md`, *The ABI*,
-rather than letting flecs' whole surface become what a module author has to know - half of which
+flecs is an **implementation detail, not the contract**. No element sees it, on either
+backend. The ABI is Bridge-ASM700's own, which holds it to the eight entries in `abi.md`, *The ABI*,
+rather than letting flecs' whole surface become what an element author has to know - half of which
 cannot cross a wasm boundary anyway.
 
-Throughout these documents, **element** means a module or a plugin - the word for when something is
-true of both.
+Throughout these documents, an **element** is code Bridge-ASM700 runs through a backend - `element.md`.
 
 ## Components
 
@@ -35,8 +34,8 @@ does not outlive a barrier.
 ## Access mode
 
 Query terms carry it, as flecs' do: `in`, `out`, `inout`. It is a **scheduling input and nothing
-else** - BridgeC uses it to know which elements may run at once, and flecs' pipeline uses it for the
-same purpose inside BridgeC.
+else** - Bridge-ASM700 uses it to know which elements may run at once, and flecs' pipeline uses it for the
+same purpose inside Bridge-ASM700.
 
 It is not enforced, which is how every ECS works. An element that writes a term it declared `in` is
 a bug in that element, no different from one writing nonsense into a term it owns. The second is
@@ -81,10 +80,10 @@ change here is deferred** - `abi.md`, *The ABI* - and under flecs' own defer not
 arrives early: 360 deferred operations produced 360 observer calls, all at the merge point and none
 during the batch.
 
-So BridgeC uses flecs' observers as they are. Nothing to arrange, and no change detection to write:
+So Bridge-ASM700 uses flecs' observers as they are. Nothing to arrange, and no change detection to write:
 an observer runs where the world is already consistent, and never inside somebody else's work.
 
-**This is how an event crosses.** A plugin with a fired signal spawns an entity carrying an event
+**This is how an event crosses.** A native element with a fired signal spawns an entity carrying an event
 component; the change applies at the barrier and the subscriber's observer runs there. Same latency
 a dedicated ring would have given, since there is a barrier after every phase. And the entity
 ceiling already budgets it, so there is no second size to pick and no overflow policy to invent.

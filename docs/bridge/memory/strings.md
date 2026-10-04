@@ -11,7 +11,7 @@ split by who can see it.
 
 The **scratch arena** is for anything transient: a message, a formatted number, a name assembled to
 be logged. Each element gets one in its own memory 2 at registration and bumps its own pointer, so
-allocating costs no crossing, and BridgeC resets them all at each barrier.
+allocating costs no crossing, and Bridge-ASM700 resets them all at each barrier.
 
 It is named for what it is rather than for a frame: its lifetime is a phase.
 
@@ -51,11 +51,11 @@ So **replacing a string is free and growing one is not**, which is the asymmetry
 An element that grows a string once a level will never notice. One that does it per frame exhausts
 the arena and fails by name, which under *It is never reclaimed* is fatal rather than wasteful.
 
-**BridgeC reuses its own range.** An element's `[.config]` strings are allocated by BridgeC at init,
-and `init` runs again on every load - so a day of unload-and-load would leak one copy per cycle.
-That range has exactly one owner, BridgeC itself, which is the property the next section's refusal
-turns on. So BridgeC keeps each element's config-string range and writes into it again rather than
-allocating afresh.
+**Bridge-ASM700 reuses its own range.** An element's `[.config]` strings are allocated by
+Bridge-ASM700 at init, and `init` runs again on every load - so a day of unload-and-load would leak
+one copy per cycle. That range has exactly one owner, Bridge-ASM700 itself, which is the property
+the next section's refusal turns on. So Bridge-ASM700 keeps each element's config-string range and
+writes into it again rather than allocating afresh.
 
 ## It is never reclaimed
 
@@ -79,7 +79,7 @@ immediate forms either: `abi.md`, *The ABI*.
 **What it costs, and it is a real cost.** The arena is a **process-lifetime high-water budget**, not
 a live-set one: a string overwritten and never read again is dead space, and so is everything an
 unloaded element allocated. **An unload-and-load cycle pays it for whatever the element allocates in
-`init` itself** - config strings are BridgeC's and are reused, *Changing one, and the cost of
+`init` itself** - config strings are Bridge-ASM700's and are reused, *Changing one, and the cost of
 growing*, but an element that builds its own name table at init builds another one every cycle. A
 reload does not pay it, since `init` does not run again.
 

@@ -5,9 +5,9 @@ You do not get storage. You get your query's results, which is how an ECS is use
     declare(...)   registers a component type
     system(...)    registers a query, a function and a phase together, and gets a slot
 
-At each barrier BridgeC runs every registered query and writes the matched spans into the element's
-private memory - memory 2, which nothing else reads; see `module-abi.md`, *Memories*. One span per
-matched table - exactly what `ecs_query_next` yields inside BridgeC, materialised for a reader that
+At each barrier Bridge-ASM700 runs every registered query and writes the matched spans into the element's
+private memory - memory 2, which nothing else reads; see `wasm.md`, *Memories*. One span per
+matched table - exactly what `ecs_query_next` yields inside Bridge-ASM700, materialised for a reader that
 cannot call it.
 
     per query slot:
@@ -60,7 +60,7 @@ base-and-stride form at all.
 Both are refused at `system` and `observe`, by name - that is where terms are handed over, not
 `declare`, which only registers a type. Three mechanisms cover it. `EcsQueryCacheAll` makes flecs
 fail query creation unless every term matches whole archetypes, which is what one-span-per-table
-assumes. Wildcards pass that test, so BridgeC refuses those by inspecting the terms it was handed.
+assumes. Wildcards pass that test, so Bridge-ASM700 refuses those by inspecting the terms it was handed.
 `row_fields` catches the rest after creation. So every refusal has a diagnostic and none costs a
 frame.
 

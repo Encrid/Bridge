@@ -6,24 +6,32 @@ host is `ideatek.md`.
 The arrangement is idTech3's: the engine is `qcommon/`, and `win32/win_main.c:1212` calls `Com_Init`
 then loops on `Com_Frame`.
 
-This is the third seam. `element.md` and the two ABI files are BridgeC to elements; `vm-surface.md`
-is BridgeC to a VM backend; this is **host to BridgeC**. Everything in this folder is `bridge.h`,
-which is the only header a host includes - one per seam, `README.md`, *Three layers, three seams*.
+This is the third seam. `element.md` and the two binding files are Bridge-ASM700 to elements;
+`backend.md` is Bridge-ASM700 to a backend; this is **host to Bridge-ASM700**. Everything in this
+folder is `bridge.h`, which is the only header a host includes - one per seam, `README.md`, *Three
+layers, three seams*.
 
-## BridgeC parses nothing
+## Bridge-ASM700 parses nothing
 
-Which side owns what is `split.md`, *The split*. At this seam it comes to one thing: **BridgeC
+Which side owns what is `split.md`, *The split*. At this seam it comes to one thing: **Bridge-ASM700
 parses nothing** - not TOML, not object files, not wasm sections. `bridge_create` takes a struct;
-`bridge_load` takes a struct plus bytes and a path, and passes those two straight to the backend
-without inspecting either.
+`bridge_load` takes a struct plus bytes and a path, and passes those two straight to the element's
+backend without inspecting either - `lifecycle.md`, *The runtime lifecycle*.
+
+**The one kind of file Bridge-ASM700 opens is a backend library.** Config names each backend and its
+library, and `bridge_create` opens them - `create.md`, *Create*. A backend is Bridge-ASM700's own
+machinery rather than content, and a deployment that names one it cannot open has not got an
+orchestrator to start. Refused: the host opening the library and handing over a table of functions,
+which keeps Bridge-ASM700 away from every file and costs every host the same loader. The condition that
+brings it back is an embedder that must link a backend statically.
 
 So an embedder with its own config system - a database, compiled-in constants, another format -
-hands over data rather than being made to write a file for BridgeC to read. And the three platform
+hands over data rather than being made to write a file for Bridge-ASM700 to read. And the three platform
 parsers that would otherwise sit in the library do not: `bridge_manifest_parse` ships **beside** it
-as a helper - `plugin-abi.md`, *Identity*.
+as a helper - `native.md`, *Identity*.
 
 **No discovery either.** Walking `[content] paths` is filesystem work, so the host walks and calls
-`bridge_load` per element. `autoload` is not a BridgeC key.
+`bridge_load` per element. `autoload` is not a Bridge-ASM700 key.
 
 ## The surface
 
@@ -56,17 +64,24 @@ as a helper - `plugin-abi.md`, *Identity*.
     } bridge_budget;
 
     typedef struct {
+        const char *key;
+        uint8_t     kind;                                    /* bool | i64 | f64 | string */
+        union { bool b; int64_t i; double f; const char *s; } v;
+    } bridge_setting;
+
+    typedef struct {
+        const char *name;            /* what an artifact names: "wasm", "native" */
+        const char *library;         /* the shared library Bridge-ASM700 opens */
+        const bridge_setting *settings; uint32_t setting_count;  /* for backend_create */
+    } bridge_backend;
+
+    typedef struct {
+        const bridge_backend *backends; uint32_t backend_count;
         const char *const *phases;   uint32_t phase_count;   /* array order IS the order */
         const bridge_order *order;   uint32_t order_count;
         bridge_budget       budget;
         bool                validate, profile;               /* [checks] */
     } bridge_config;
-
-    typedef struct {
-        const char *key;
-        uint8_t     kind;                                    /* bool | i64 | f64 | string */
-        union { bool b; int64_t i; double f; const char *s; } v;
-    } bridge_setting;
 
     typedef struct {
         const char *identity;        /* "tri:triangle" */
@@ -89,13 +104,14 @@ as a helper - `plugin-abi.md`, *Identity*.
 
     typedef struct {
         bridge_element_config cfg;
-        const void *bytes; size_t len;   /* the module image, for the backend */
-        const char *path;                /* for dlopen; null for a module */
+        const char *backend;             /* which backend runs it, by name */
+        const void *bytes; size_t len;   /* the image, or null */
+        const char *path;                /* where it is, or null. both go to the backend */
     } bridge_artifact;
 
     /* what comes back out */
     typedef struct {
-        const char *identity;            /* null for BridgeC's own records */
+        const char *identity;            /* null for Bridge-ASM700's own records */
         const char *system;              /* null outside a system */
         const char *text;                /* THIS CALL ONLY - see `create.md`, *The sink* */
         uint32_t    len;
@@ -116,7 +132,7 @@ phase is a name and nothing else* - which also disposes of a collision: a typede
 share one namespace in C, and `bridge_phase` is the call.
 
 **The host resolves the three layers** - the manifest, the deployment's file, the local one - and
-hands one flat struct per element. BridgeC has no notion of where a value came from, which is why
+hands one flat struct per element. Bridge-ASM700 has no notion of where a value came from, which is why
 nothing here records a layer.
 
 **Every limit here carries its period, because a number without one means nothing** - `limits.md`,
@@ -124,15 +140,18 @@ nothing here records a layer.
 
 **`validate` and `profile` are the two diagnostic switches here**, and both are deployment-wide: one
 pass walks every column - `validation.md`, *The checksum pass, when asked* - and the other times
-every dispatch, `profile.md`, *The profile*. Nothing else BridgeC does is optional.
+every dispatch, `profile.md`, *The profile*. Nothing else Bridge-ASM700 does is optional.
 
-**`settings` seeds a component, and nothing more** - `config.md`, *An element's own settings are a
-component*, for why that means there is no reconfigure entry here.
+**A backend's `settings` are its own** - the cache directory, the pooling limits, the tick period -
+and Bridge-ASM700 passes them to `backend_create` unread: `backend.md`, *The backend owns its clock*.
 
-### Nothing here is a BridgeC layout
+**An element's `settings` seed a component, and nothing more** - `config.md`, *An element's own
+settings are a component*, for why that means there is no reconfigure entry here.
 
-The two structs coming back out carry **resolved values**, never the shapes BridgeC keeps
-internally. That is *BridgeC parses nothing* pointing the other way: no formats in, no internal
+### Nothing here is a Bridge-ASM700 layout
+
+The two structs coming back out carry **resolved values**, never the shapes Bridge-ASM700 keeps
+internally. That is *Bridge-ASM700 parses nothing* pointing the other way: no formats in, no internal
 layouts out, and a host that can be replaced without touching the library.
 
 It is not a preference. The record an element writes into its ring - `log.md`, *The log* -

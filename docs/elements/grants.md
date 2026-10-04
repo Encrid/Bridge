@@ -15,5 +15,5 @@ without it. A mod's own components need no config at all; touching the game need
 point where somebody should be asked.
 
 It composes with `schedule.md`, *Order within a phase is never implicit*: grant two elements write on
-`game:Transform` and their systems conflict, so BridgeC refuses to start until the deployment orders
+`game:Transform` and their systems conflict, so Bridge-ASM700 refuses to start until the deployment orders
 them.

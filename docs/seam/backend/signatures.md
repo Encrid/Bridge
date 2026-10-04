@@ -1,21 +1,21 @@
 # Signatures
 
-What crosses the VM seam as a function: the eight imports BridgeC defines, and the one shape it
+What crosses the backend seam as a function: the eight imports Bridge-ASM700 defines, and the one shape it
 calls.
 
 ## Imports are declared, exports are checked
 
 The two directions are not symmetric, and the asymmetry is the design rather than an oversight.
 
-    BridgeC -> a module's imports   eight functions, and their signatures VARY
-    a module's exports -> BridgeC   every one is () -> i32
+    Bridge-ASM700 -> an element's imports   eight functions, and their signatures VARY
+    an element's exports -> Bridge-ASM700   every one is () -> i32
 
 So **a signature is declared going in and verified coming out.** `define_func` carries one:
 
     typedef struct {
         const uint8_t *params;  uint32_t param_count;   /* I32 | I64 */
         const uint8_t *results; uint32_t result_count;
-    } vm_sig;
+    } backend_sig;
 
 **An arity would not do, and not as a matter of taste.** Five of the eight entries answer a value -
 `declare`, `system` and `observe` a slot, `spawn` an id, `alloc` an offset - and a count of
@@ -28,16 +28,16 @@ params and results with their widths, which **cannot be constructed from a numbe
 entity id is 64 - and **no ABI entry takes or returns a float.**
 
 **Why the type travels as data rather than as the engine's own.** wasmtime wants a `wasm_functype_t`
-and a native backend wants nothing at all, so handing over arrays lets each do its own thing, and
+and the native backend wants only the pointers, so handing over arrays lets each do its own thing, and
 passing wasmtime's type would leak the engine into the seam. It also keeps **one copy of the fact**:
 a backend told the signature cannot drift from it, where a backend compiling our ABI's signatures
-itself would re-derive what BridgeC already holds - the thing `module-abi.md`, *The published
+itself would re-derive what Bridge-ASM700 already holds - the thing `wasm.md`, *The published
 layouts*, refuses for that header.
 
 **What it buys beyond being implementable.** Core wasm checks an import's shape at link time -
-`module-abi.md`, *Identity*, for what that catches and what it does not - so a module that declares
-`declare` wrongly is **refused at instantiation, by name**. Bind to whatever the module declared
-instead and the same module links happily and passes garbage - a load-time refusal traded for
+`wasm.md`, *Identity*, for what that catches and what it does not - so an element that declares
+`declare` wrongly is **refused at instantiation, by name**. Bind to whatever the element declared
+instead and the same element links happily and passes garbage - a load-time refusal traded for
 runtime corruption.
 
 `module_imports` is not a second source for this: it answers *which memories to supply*, and nothing
@@ -47,19 +47,19 @@ about what shape a function has.
 
     err call(func, int32_t *status);
 
-**Every function BridgeC calls has the same signature**, because there are only five kinds of them -
+**Every function Bridge-ASM700 calls has the same signature**, because there are only five kinds of them -
 `init`, `shutdown`, `reload`, a system and an observer - and all of them take no arguments and
 return an i32. Data never travels through a call here: a system reads its spans and writes its
 columns, so there is nothing to pass. No marshalling at this seam, no arity to arrange, and nothing
 a backend could get wrong about either.
 
 `status` is what the function returned; `err` is whether it returned at all. A trap is an ordinary
-outcome - a module that reads out of bounds, exhausts a system's fuel, or runs past a lifecycle
+outcome - an element that reads out of bounds, exhausts a system's fuel, or runs past a lifecycle
 call's timeout produces one, and the process keeps running - and `failure.md`, *When something
 fails*, treats the two alike on purpose.
 
 `instance_func` still answers arity and result count beside the handle, and that is a **check rather
-than a contract** - the other half of *Imports are declared, exports are checked*: BridgeC refuses
+than a contract** - the other half of *Imports are declared, exports are checked*: Bridge-ASM700 refuses
 an export whose shape is not `() -> i32` at init instead of discovering it on the first frame. A
-backend that cannot tell - a native one, where the symbol came from `dlsym` and carries no type -
-answers -1, and BridgeC skips the check rather than refusing to load.
+backend that cannot tell - the native one, where the symbol came from `dlsym` and carries no type -
+answers -1, and Bridge-ASM700 skips the check rather than refusing to load.

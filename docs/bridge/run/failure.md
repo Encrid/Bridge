@@ -3,7 +3,7 @@
 `result` is an i32. Zero for success; otherwise a code, with any detail written to the log - see
 `log.md`, *The log*.
 
-A non-zero `result` and a trap are **the same failure**. They differ only in how the VM classified
+A non-zero `result` and a trap are **the same failure**. They differ only in how the backend classified
 it. Treating them alike keeps an `init` that returns an error and an `init` that reads out of bounds
 from needing two policies.
 
@@ -11,7 +11,7 @@ The element says only *that* it failed, never how badly. Severity is a deploymen
 declaring its own failure fatal would take the game down, which is backwards from everything else
 the deployment grants it.
 
-What BridgeC does is mostly not a choice, because the set of coherent outcomes differs by call site:
+What Bridge-ASM700 does is mostly not a choice, because the set of coherent outcomes differs by call site:
 
     init        the element never ran, so running without it is coherent:
                 `on_error = fail | skip`, per element, default fail
@@ -30,7 +30,7 @@ elements' components on those entities with it. Stale-but-readable is the less d
 A deployment that wants the data gone unloads the element - the verb that says so: `lifetime.md`,
 *Lifetime*.
 
-BridgeC's own refusals - a grant denied, a fingerprint mismatch, an undeclared phase, a reserved
+Bridge-ASM700's own refusals - a grant denied, a fingerprint mismatch, an undeclared phase, a reserved
 system name, an ambiguous order, a capability the backend cannot honour - take init's path, because
 they are failures to start.
 

@@ -16,17 +16,18 @@ Any time, queued and applied at the next barrier:
     alloc(len)                     -> offset into the persistent arena
 
 `desc` is the descriptor string `ECS_STRUCT` already emits beside the typedef - `schema.md`, *There
-is no schema format*, for what BridgeC does with it and what it does not.
+is no schema format*, for what Bridge-ASM700 does with it and what it does not.
 
 **`attach` carries the initial value.** `ptr` and `len` point at the element's own memory - an
-offset for a module, a pointer for a plugin - and BridgeC copies the bytes into the row when it
-applies the change, bounds-checking them the way it checks a log record's text. Null means zeroed.
+offset on the wasm backend, a pointer on the native one - and Bridge-ASM700 copies the bytes into
+the row when it applies the change, bounds-checking them the way it checks a log record's text. Null
+means zeroed.
 
 That is there because **nothing applies immediately.** Every structural change is queued, so a row
 exists at the next barrier and not before, and the only thing an element could have wanted sooner
 was to fill a row it just made. Carrying the value does that without reaching the row at all.
 
-`spawn` still answers a usable id at once - the id is BridgeC's to mint - so a parent can be spawned
+`spawn` still answers a usable id at once - the id is Bridge-ASM700's to mint - so a parent can be spawned
 and referenced by its children in the same system.
 
 **There are no immediate forms.** They could not deliver acting at once: a span is a snapshot from
@@ -64,18 +65,19 @@ happened**. Ten subscribers to a rare event cost ten calls a pass forever. An ob
 when nothing changed - a saving on the hot path proportional to how many elements are listening, and
 the hot path is the one budget this design exists to protect.
 
-Either kind **is** a query plus a function, so one call registers the pair. `init`, `shutdown` and
-`reload` are reserved names that `system` and `observe` refuse. `terms` is an array of term structs,
-flecs' `ecs_term_t` shape rather than a string, so there is no parser in BridgeC and no string
-handed over at init. What a query may not ask for is `query.md`, *What a query may not ask for*.
+A system or an observer **is** a query plus a function, so one call registers the pair. `init`,
+`shutdown` and `reload` are reserved names that `system` and `observe` refuse. `terms` is an array
+of term structs, flecs' `ecs_term_t` shape rather than a string, so there is no parser in Bridge-ASM700
+and no string handed over at init. What a query may not ask for is `query.md`, *What a query may not
+ask for*.
 
 A system declares its phase and **nothing about order**, and never names another element's system.
 So no independently shipped element depends on another's internals, and no ordering cycle can span
 authors who have never met.
 
 **A system takes no arguments.** Its spans are already in its memory, found through the slot
-`system` answered. Frame time is not an argument and not a component BridgeC declares: the system
-clock is hardware, so a plugin reads it - usually the one already talking to the OS for input or a
+`system` answered. Frame time is not an argument and not a component Bridge-ASM700 declares: the system
+clock is hardware, so a native element reads it - usually the one already talking to the OS for input or a
 window - and writes the interval into a component of its own, which anything needing it reads under
 a grant.
 

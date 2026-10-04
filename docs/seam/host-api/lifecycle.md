@@ -1,15 +1,21 @@
 # The runtime lifecycle
 
 **Legal only between phases**, never while `bridge_phase` is executing. All three restructure
-storage and the schedule, which is what a barrier makes safe. A plugin holding the pointer could
-break this; nothing contains a plugin, so it is a contract rather than a guarantee.
+storage and the schedule, which is what a barrier makes safe. A native element holding the
+pointer could break this; nothing contains native code, so it is a contract rather than a guarantee.
 
-**`load`** takes an artifact rather than a path, because BridgeC decides on `cfg` and never opens
-anything. In order: check the ABI version, check `trusted` against the backend's `sandbox`, check
-the grants, take a per-element budget slot, hand `bytes` or `path` to the backend, call `init` -
-which calls `declare`, `system` and `observe` - recompute the conflict graph and
-**refuse-and-unwind if a new system or observer conflicts unordered with an existing one**, then
-publish spans.
+**`load`** takes an artifact rather than a path, because Bridge-ASM700 decides on `cfg` and never finds
+or reads an element's file. In order: find the backend the artifact names, check the ABI version,
+check `trusted` against that backend's `sandbox`, check the grants, take a per-element budget slot,
+hand `bytes` and `path` to the backend, call `init` - which calls `declare`, `system` and
+`observe` - recompute the conflict graph and **refuse-and-unwind if a new system or observer
+conflicts unordered with an existing one**, then publish spans.
+
+**Every element loads through a backend, and the steps are the same on each.** An artifact naming a
+backend the deployment did not configure is refused by name. Refused: Bridge-ASM700 opening a native
+library itself, which would make native code a case of its own in Bridge-ASM700 where a backend already
+has the entry for it. The condition that brings it back is native code that must run with no backend
+at all.
 
 **Read, then decide, then load** survives the host owning the filesystem: the identity arrives as
 data in `cfg`, so the decision is made with the artifact untouched.
@@ -18,8 +24,8 @@ That refusal is the startup rule generalised. At create it refuses to start; her
 load, and the explicit call is what gives it somebody to tell.
 
 **`unload`** - drop its systems and observers from the schedule; call `shutdown`; drop its exclusive
-components, `data.md`, *Structural change*; free its element record; destroy the instance or
-`dlclose`.
+components, `data.md`, *Structural change*; free its element record; destroy the instance and its
+module, which on the native backend closes the library.
 
 **Its persistent-arena space is not reclaimed** - `strings.md`, *It is never reclaimed*. That is what
 keeps a surviving shared component's string readable, like the float beside it.

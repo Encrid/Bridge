@@ -13,11 +13,11 @@ not from memory. Most defects found so far were documents contradicting each oth
 than being wrong. If a settled section already answers it, say so and stop - **five times now** a
 question has been treated as open when another section had already decided it. Twice it was the
 register; twice it was a signature with a parameter nobody had explained, where the explanation was
-in the document that says what BridgeC knows about a component.
+in the document that says what Bridge-ASM700 knows about a component.
 
 And look in the **general** rules, not only the sections that name the subject. Item 16 asked what
 happens when a backend lacks a capability; the answer was in *When something fails*, which says
-BridgeC's own refusals take init's path and lists examples. Checking the documents that mention
+Bridge-ASM700's own refusals take init's path and lists examples. Checking the documents that mention
 capabilities found nothing, because the answer was in the document that says what happens when
 anything is refused.
 

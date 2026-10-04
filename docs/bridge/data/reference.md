@@ -4,7 +4,7 @@ Iterating a query covers the hot path, but not everything: a projectile creditin
 monster reading its target, a trigger reaching its door. Following a reference means reaching *one*
 entity by id, and that is a lookup rather than a walk.
 
-It is arithmetic, not a call. BridgeC publishes two flat arrays and the whole of `get` is:
+It is arithmetic, not a call. Bridge-ASM700 publishes two flat arrays and the whole of `get` is:
 
     record = entity_index[id & 0xffffffff]     // u32 table, u32 row, u32 generation
     if record.generation != id >> 32           -> stale id, refuse

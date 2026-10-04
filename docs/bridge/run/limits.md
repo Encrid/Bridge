@@ -18,7 +18,7 @@ It cannot be shared across a phase either, which would be cheaper. One greedy sy
 its siblings and the trap would land on whichever ran last - destroying the attribution
 `validation.md`, *What a bad write costs, and what finds it*, is built on.
 
-**So BridgeC re-sets fuel before every dispatch.** It has no choice: fuel only depletes, and a store
+**So Bridge-ASM700 re-sets fuel before every dispatch.** It has no choice: fuel only depletes, and a store
 left at zero traps immediately (`signatures.md`, *A call takes nothing and answers a status*). One
 store write before a call is nothing against the call.
 
@@ -27,8 +27,8 @@ That is Quake's model: `pr_exec.c:382` sets `runaway = 100000` at the top of `PR
 no way to interrupt.
 
 **Counting is enough for a system, which is why there is no per-invocation deadline.** Fuel counts
-only wasm instructions, so it would miss a module blocked inside a host call - except that a module
-has no such call. Its only imports are BridgeC's eight ABI entries (`module-abi.md`, *Memories*),
+only wasm instructions, so it would miss an element blocked inside a host call - except that an element
+has no such call. Its only imports are Bridge-ASM700's eight ABI entries (`wasm.md`, *Memories*),
 and none of them waits on anything. A wall-clock bound beside fuel would guard a case the design
 does not contain.
 

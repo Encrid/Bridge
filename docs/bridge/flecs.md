@@ -3,13 +3,13 @@
 Why flecs is embedded rather than swappable, where its memory lives, and the fork that confines
 it. The data model built on it is `data.md`.
 
-## Why the VM is swappable and this is not
+## Why the backend is swappable and this is not
 
-The VM surface abstracts a **behaviour**: BridgeC hands over bytes, memories and host functions and
-asks for a function to be run, never looking inside. That is why a native backend implements the
-same fifteen entries and nothing leaks.
+The backend surface abstracts a **behaviour**: Bridge-ASM700 hands over bytes, memories and host
+functions and asks for a function to be run, never looking inside. That is why the native backend
+implements the same fifteen entries and nothing leaks.
 
-An ECS surface would have to abstract a **memory layout**. BridgeC needs four things of flecs: its
+An ECS surface would have to abstract a **memory layout**. Bridge-ASM700 needs four things of flecs: its
 column addresses, because a span's `base[]` *are* offsets into its columns; its entity index, to
 mirror; a row move it does not publish at all, so the mirror cannot drift; and control of its
 allocator, so columns land inside memory 1. None of that is what an ECS does - it is how *this* ECS
@@ -17,7 +17,7 @@ stores things, so the surface would be shaped by flecs and leak its only impleme
 confinement settles it by force - *It can be confined, and the patch is thirteen sites* - because a
 library you patch is a fork you ship rather than a backend you swap.
 
-Underneath is the trade the rewrite rests on. **Zero-copy direct access to the ECS's memory is
+Underneath is the trade this design rests on. **Zero-copy direct access to the ECS's memory is
 incompatible with treating the ECS as a black box.** A swappable ECS would mean asking it for data,
 which is a copy or a call per access - the cost we are here to remove.
 
@@ -34,21 +34,22 @@ have been weakest, and it is MIT and already vendored in Bridge-Ironwail.
 
 ## Where flecs' memory lives
 
-The one place the embedding is not free. A module reads component bytes with plain loads, so those
+The one place the embedding is not free. A wasm element reads component bytes with plain loads, so those
 bytes must sit inside the block backing memory 1 - and flecs, left alone, allocates wherever the
 system allocator puts it.
 
-So BridgeC allocates that block, hands it to the VM as memory 1, and gives flecs an allocator that
-carves columns out of it. One copy of the data: a plugin reads it through real pointers, a module
-reads the same bytes at `pointer - block start`. Neither goes through flecs to do it.
+So Bridge-ASM700 allocates that block, hands it to each backend as memory 1, and gives flecs an allocator
+that carves columns out of it. One copy of the data: a native element reads it through real
+pointers, a wasm element reads the same bytes at `pointer - block start`. Neither goes through flecs
+to do it.
 
 ### It can be confined, and the patch is thirteen sites
 
 Left alone, `ecs_os_api` is global: override it and flecs' **whole** heap lands in
-module-addressable memory - hash maps, query caches, the block and stack allocators' pages.
+element-addressable memory - hash maps, query caches, the block and stack allocators' pages.
 Confining it to columns means patching flecs, which a spike measured.
 
-**What a module reads is coverable.** Tag every allocation that touches column data or a table's
+**What an element reads is coverable.** Tag every allocation that touches column data or a table's
 entity array. Run a workload with table moves, column resizes, swap-removes and deletes. Then check
 that every pointer `ecs_get_id` answers and every `it.entities` an iterator exposes lands in a
 tagged allocation:
@@ -59,7 +60,7 @@ tagged allocation:
                         4 entity arrays,    0 escaped     internals 6.83 MB
 
 **And not confining is expensive, which argument could not supply.** Internals are **87% of
-module-addressable bytes at 4,000 entities and 38% at 200,000** - a large fixed floor of bootstrap
+element-addressable bytes at 4,000 entities and 38% at 200,000** - a large fixed floor of bootstrap
 plus growth that is sublinear against columns. So a stray write is likelier to land in flecs' own
 structures than in game state, and that is the failure with no attribution: a crash inside flecs
 rather than a wrong number in a component somebody declared.
@@ -93,7 +94,7 @@ there is passed `NULL`.
 The one thing a spike had to settle, because getting it wrong is silent. flecs' events name every
 entity whose **components** changed and **no entity whose row merely moved**. Of those 503 changes,
 303 had no event naming them, every one a pure row move inside a single table, 0.8 per operation. An
-event-driven mirror would point a module at the wrong row that often, and nothing would say so.
+event-driven mirror would point an element at the wrong row that often, and nothing would say so.
 
 So the mirror takes **one more patched site** than the columns did - `flecs_table_delete`, in the
 file *It can be confined, and the patch is thirteen sites* already forks, which makes it fourteen.
@@ -101,6 +102,6 @@ flecs computes the moved entity and its destination row there and updates its ow
 the patch is to say so out loud. That option is cheap only because the columns settled first: a
 callback into a library we were not already forking would have been a different question.
 
-**Table ids are BridgeC's own.** `ecs_record_t` is public and carries an `ecs_table_t *`, where a
-span needs a dense `u32` to index `column_base`. So BridgeC keeps pointer-to-id itself, off
+**Table ids are Bridge-ASM700's own.** `ecs_record_t` is public and carries an `ecs_table_t *`, where a
+span needs a dense `u32` to index `column_base`. So Bridge-ASM700 keeps pointer-to-id itself, off
 `EcsOnTableCreate` and `EcsOnTableDelete`, and never reads `ecs_table_t`'s layout.

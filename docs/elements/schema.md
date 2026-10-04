@@ -10,7 +10,7 @@ Native build: that expands to the struct plus a descriptor string.
 `ECS_META_COMPONENT(world, Position)` registers it; flecs parses the descriptor and computes the
 offsets.
 
-A wasm module cannot link flecs. It redefines the macro to emit only the typedef and the string:
+A wasm element cannot link flecs. It redefines the macro to emit only the typedef and the string:
 
     #define ECS_STRUCT(name, ...) \
         ECS_STRUCT_TYPE(name, __VA_ARGS__); \
@@ -18,13 +18,13 @@ A wasm module cannot link flecs. It redefines the macro to emit only the typedef
 
 `ECS_STRUCT_TYPE` is `typedef struct name {...} name`. Four lines of shim, no flecs.
 
-**BridgeC parses no C.** It hands the descriptor string to flecs' meta, which answers with the
+**Bridge-ASM700 parses no C.** It hands the descriptor string to flecs' meta, which answers with the
 offsets and the field names. That is how `[.config]` seeds a component by matching keys to field
 names: `config.md`, *An element's own settings are a component*.
 
 **None of that crosses.** An element is held to three numbers: size, alignment, and a hash of that
-string. The field table stays on BridgeC's side. No field name is in `bridge-abi.h` and none reaches
-an element: `module-abi.md`, *It holds no content*.
+string. The field table stays on Bridge-ASM700's side. No field name is in `bridge-abi.h` and none reaches
+an element: `wasm.md`, *It holds no content*.
 
 ## Why a header and not a format
 
@@ -49,7 +49,7 @@ flecs', minus pointers:
 
 **Rejected: pointer-sized or pointer-holding.** `EcsString`, `EcsVector`, `EcsUPtr`, `EcsIPtr`. A
 wasm32 pointer is four bytes and the host's is eight, so flecs' host-computed offsets would not
-match the module's struct. A host pointer is not addressable from a module anyway. Same reason
+match the element's struct. A host pointer is not addressable from wasm anyway. Same reason
 `string` and `list` are not components: `strings.md`, *Variable length*.
 
 Letting flecs compute offsets is sound **because** of that rejection.
@@ -65,10 +65,10 @@ because both expanded the same macro over the same tokens. No generator.
 `#` stringification normalises whitespace to single spaces and strips comments. So the hash survives
 reformatting and a new comment, and changes when a field is added, removed, retyped or reordered.
 
-A module built against an older layout gets an error at init instead of reading the wrong bytes.
+An element built against an older layout gets an error at init instead of reading the wrong bytes.
 
 **Nothing else is fingerprinted: nothing else has two parties.** A query has one: the element
-declares it and only that element walks it. A system has none: every function BridgeC calls is
+declares it and only that element walks it. A system has none: every function Bridge-ASM700 calls is
 `() -> i32` - `signatures.md`, *A call takes nothing and answers a status* - so core wasm's numeric
 match is the whole check.
 
@@ -84,7 +84,7 @@ One thing: accessors over a span, carrying the `row < count` test - **always, wi
 remove it**: `validation.md`, *Always on*.
 
 Not structs, not the component fingerprint, and not the published layouts. Those are `bridge-abi.h`:
-`module-abi.md`, *The published layouts*.
+`wasm.md`, *The published layouts*.
 
 ## Not WIT
 
