@@ -7,27 +7,32 @@ Read `module.md` first, then `data.md` and `memory.md`.
 
 ## Memories
 
-A wasm module has its own private memory and imports two of Bridge-ASM700's:
+A wasm module has a memory of its own and imports two of Bridge-ASM700's:
 
-    memory 0   its own     stack, heap, whatever its language needs
-    memory 1   "shared"    component columns, the entity index, the persistent arena
-    memory 2   "private"   its spans, its column_base, its scratch arena, its log ring
+    own        defined by the module    stack, heap, whatever its language needs
+    shared     `bridge.shared`          component columns, the entity index, the persistent arena
+    private    `bridge.private`         its spans, its column_base, its scratch arena, its log ring
 
-Three, and the split is by **who else reads it**. Memory 1 is shared because sharing is the point:
-two modules iterating `game:Position` address one column. Memory 2 is what Bridge-ASM700 writes and only
-this module reads, so another module's bad arithmetic cannot land there - wasm's bounds check does
-the work, which is the mechanism idTech3's `& dataMask` used.
+**They go by name, never by number.** Wasm numbers imported memories before a module's own, so in
+the binary the shared and private memories are indices 0 and 1 and the module's own comes last -
+the reverse of how one would count them. An import is matched by its name, and so is every mention
+in these documents.
 
-That matters more than it looks, because memory 2 holds the `base` and `count` that every address in
-memory 1 is computed from. Private inputs, shared data.
+Three, and the split is by **who else reads it**. The shared memory is shared because sharing is the
+point: two modules iterating `game:Position` address one column. The private memory is what
+Bridge-ASM700 writes and only this module reads, so another module's bad arithmetic cannot land
+there - wasm's bounds check does the work, which is the mechanism idTech3's `& dataMask` used.
+
+That matters more than it looks, because the private memory holds the `base` and `count` that every
+address in the shared memory is computed from. Private inputs, shared data.
 
 Not one per component and not one per access mode, for two reasons. **wasm imports are static** -
 they are in the binary, so they cannot be created by a call at init. And access mode rides on a
 query term, where two systems of one module may declare different access on one component, so no
-arrangement of memories could express it: `data.md`, *Access mode*. Memory 2 is neither: it is per
+arrangement of memories could express it: `data.md`, *Access mode*. The private memory is neither: it is per
 module, which a static import states perfectly well.
 
-A module that touches no storage imports neither. One that does can address all of memory 1, and
+A module that touches no storage imports neither. One that does can address all of the shared memory, and
 is trusted not to write what it declared read.
 
 **Everything is imported from `bridge`.** Core wasm names an import by a module string and a field
@@ -38,6 +43,28 @@ change how a span is laid out and `declare`'s meaning changes with it.
 
 The generator emits the imports, so declaration is static before it is dynamic: `declare` at init
 discovers nothing, it binds names to what the binary already expects.
+
+### A compiled module reaches them through accessors
+
+**No C compiler can emit a load from a memory other than the module's own.** Wasm can express it and
+C has the syntax for it, but LLVM's WebAssembly backend - which C, C++, Rust and zig all go through -
+only carries a feature flag for multiple memories: a pointer always means the module's own.
+
+So the accessors the generator emits - `schema.md`, *What the generator still emits* - are a small
+module in wasm's text format, where a load names its memory directly. The module build merges it
+into the compiled module and inlines it, with Binaryen's `wasm-merge` and `wasm-opt`. What comes out
+has plain loads and stores on the shared memory in the loop and no call left: checked on a C loop
+before this was written down.
+
+The compiler sees those accessors as opaque calls until the merge, so it cannot vectorise across
+them. That is the cost, and the measurement in `PLAN.md` phase 3 is where it shows if it matters.
+
+Refused: a rewriter of our own doing the same substitution, which is Binaryen's job done twice. The
+condition that brings it back is Binaryen being unable to inline or strip something this needs.
+Refused: one memory per module with the shared and private blocks mapped into it, which makes a C
+pointer enough and costs the TLB aliasing `costs.md`, *What we give up*, already declines. The
+condition that brings it back is the opaque calls measurably costing the loop, or LLVM learning to
+address a second memory, which retires the accessor module altogether.
 
 ## Exports
 
@@ -72,19 +99,20 @@ artifact, and it is refused at load, by name - `failure.md`, *When something fai
 
 ## Reaching a component
 
-Through its system's query. Bridge-ASM700 publishes the matched spans into memory 2 at every barrier, and
-iterating them is two loops and no call. The layout is in `query.md`, *The interface is a query*;
-following a single reference by id is in `reference.md`, *Reference following*.
+Through its system's query. Bridge-ASM700 publishes the matched spans into the private memory at
+every barrier, and iterating them is two loops and no call. The layout is in `query.md`, *The
+interface is a query*; following a single reference by id is in `reference.md`, *Reference
+following*.
 
-A fixed header at offset 0 of memory 2 says where each of this module's regions begins. Bridge-ASM700
-owns that memory outright, so there is nothing to negotiate and no capacity for the module to
-declare - see `memory.md`, *Where the seven regions live*, for what the header holds and why no
-module could have sized it.
+A fixed header at offset 0 of the private memory says where each of this module's regions begins.
+Bridge-ASM700 owns that memory outright, so there is nothing to negotiate and no capacity for the
+module to declare - see `memory.md`, *Where the seven regions live*, for what the header holds and
+why no module could have sized it.
 
 ## The published layouts
 
 A module reads Bridge-ASM700's structures with plain loads, so both sides have to lay them out
-identically: the span, memory 2's header, the log record, the entity-index record, and
+identically: the span, the private memory's header, the log record, the entity-index record, and
 `column_base`'s indexing.
 
 **One header, `bridge-abi.h`, compiled by Bridge-ASM700 and by every module, on either backend.** Nothing

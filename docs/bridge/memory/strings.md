@@ -10,7 +10,7 @@ rather than a hunk and a zone**, since neither has a free; what idTech3 split be
 split by who can see it.
 
 The **scratch arena** is for anything transient: a message, a formatted number, a name assembled to
-be logged. Each module gets one in its own memory 2 at registration and bumps its own pointer, so
+be logged. Each module gets one in its own private memory at registration and bumps its own pointer, so
 allocating costs no crossing, and Bridge-ASM700 resets them all at each barrier.
 
 It is named for what it is rather than for a frame: its lifetime is a phase.

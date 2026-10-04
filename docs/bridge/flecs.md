@@ -12,7 +12,7 @@ implements the same fifteen entries and nothing leaks.
 An ECS surface would have to abstract a **memory layout**. Bridge-ASM700 needs four things of flecs: its
 column addresses, because a span's `base[]` *are* offsets into its columns; its entity index, to
 mirror; a row move it does not publish at all, so the mirror cannot drift; and control of its
-allocator, so columns land inside memory 1. None of that is what an ECS does - it is how *this* ECS
+allocator, so columns land inside the shared memory. None of that is what an ECS does - it is how *this* ECS
 stores things, so the surface would be shaped by flecs and leak its only implementation. And
 confinement settles it by force - *It can be confined* - because a
 library you patch is a fork you ship rather than a backend you swap.
@@ -35,13 +35,13 @@ have been weakest, and it is MIT and already vendored in Bridge-Ironwail.
 ## Where flecs' memory lives
 
 The one place the embedding is not free. A wasm module reads component bytes with plain loads, so those
-bytes must sit inside the block backing memory 1 - and flecs, left alone, allocates wherever the
+bytes must sit inside the block backing the shared memory - and flecs, left alone, allocates wherever the
 system allocator puts it.
 
-So Bridge-ASM700 allocates that block, hands it to each backend as memory 1, and gives flecs an allocator
-that carves columns out of it. One copy of the data: a native module reads it through real
-pointers, a wasm module reads the same bytes at `pointer - block start`. Neither goes through flecs
-to do it.
+So Bridge-ASM700 allocates that block, hands it to each backend as the shared memory, and gives
+flecs an allocator that carves columns out of it. One copy of the data: a native module reads it
+through real pointers, a wasm module reads the same bytes at `pointer - block start`. Neither goes
+through flecs to do it.
 
 ### It can be confined
 

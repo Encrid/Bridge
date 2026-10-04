@@ -30,7 +30,7 @@ row-move hook - `flecs.md`, *It can be confined*, *flecs will not tell you which
 carried* for the shape. The build is CMake with Ninja presets, and it starts in this phase.
 `PHASE1.md` is what it built and found.
 
-**First, because everything else needs it.** Columns cannot be in memory 1 without the allocator,
+**First, because everything else needs it.** Columns cannot be in the shared memory without the allocator,
 and the mirror cannot be correct without the hook.
 
 *Done when ctest's confinement test fails if one pointer escapes the block, its row-move test fails
@@ -42,7 +42,7 @@ written for.* Met; the `linux` preset is unrun.
 `bridge-backend.h` with all fifteen entries, and the wasm backend as a shared library behind it,
 which Bridge-ASM700 opens by the name config gives - `backend.md`, *What a backend is asked for*. A core
 wasm module importing a Bridge-ASM700 memory, which means `wasm_multi_memory` on since the module has its
-own. `bridge-abi.h` begins here, because a module reading memory 1 with plain loads needs the span
+own. `bridge-abi.h` begins here, because a module reading the shared memory with plain loads needs the span
 layout. `define_func` with a real signature
 and `instance_func`'s `() -> i32` check - `signatures.md`, *Imports are declared, exports are
 checked*.
@@ -55,25 +55,25 @@ config key demands - `capabilities.md`, *Capabilities, so the swap is honest*.
 What bounds a module on this backend, as far as one lifecycle call shows it: `memory_limit`, and the
 init timeout with the backend's tick period - `limits.md`, *What bounds a run*.
 
-*Done when the host reads the bytes a module wrote to memory 1; an out-of-bounds access, a runaway
+*Done when the host reads the bytes a module wrote to the shared memory; an out-of-bounds access, a runaway
 loop and growth past the limit each return an error with the process alive; and an export whose
 shape is not `() -> i32`, a wrong ABI version, a backend that cannot be
 opened and a null sink are each refused with a record naming the cause.*
 
 ## 3. Storage
 
-Memory 1's three regions and each module's memory 2: the header, the spans, `column_base`, the
-scratch arena and the log ring - `memory.md`, *Where the seven regions live*. `[budget]`, with
-exhaustion fatal where it happens - `budgets.md`, *Budgets*.
+The shared memory's three regions and each module's private memory: the header, the spans,
+`column_base`, the scratch arena and the log ring - `memory.md`, *Where the seven regions live*.
+`[budget]`, with exhaustion fatal where it happens - `budgets.md`, *Budgets*.
 
 `declare`, with the fingerprint, type-set and grant checks. `system`, with the query refusals -
 `query.md`, *What a query may not ask for*. The structural entries `spawn`, `destroy`, `attach` and
-`detach`, and `alloc`. Fuel, re-set before every dispatch. `bridge_phase` and the barrier, serial for
-now: queued changes applied, spans
-republished, rings drained, scratch reset. The entity index mirror, driven off the patched hook and
-`EcsOnTableCreate` / `EcsOnTableDelete`, and `get` over it - `reference.md`, *Reference following*.
-The row-count check - `validation.md`, *Always on*. The schema generator: the `ECS_STRUCT` shim and
-accessors carrying the `row < count` test.
+`detach`, and `alloc`. Fuel, re-set before every dispatch. `bridge_phase` and the barrier, serial
+for now: queued changes applied, spans republished, rings drained, scratch reset. The entity index
+mirror, driven off the patched hook and `EcsOnTableCreate` / `EcsOnTableDelete`, and `get` over it -
+`reference.md`, *Reference following*. The row-count check - `validation.md`, *Always on*. The
+schema generator and the module build that merges its output: the `ECS_STRUCT` shim and accessors
+carrying the `row < count` test.
 
 Access mode and queries are part of declaration from the start, not retrofitted.
 

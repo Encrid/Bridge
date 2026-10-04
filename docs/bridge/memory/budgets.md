@@ -8,20 +8,20 @@ arrives as a struct rather than a file, because Bridge-ASM700 reads none: `host-
 *Bridge-ASM700 parses nothing*.
 
 **Per module, when that module registers:** its scratch arena and its log ring - which is to say,
-this tier sizes that module's memory 2.
+this tier sizes that module's private memory.
 
 Because modules come and go, `max_modules` bounds **how many module records exist at once**, not
-how memory 2 is divided. A record is taken at load and freed at unload, and exhaustion refuses the
+how the private memory is divided. A record is taken at load and freed at unload, and exhaustion refuses the
 load, the same discipline as every other budget. The shared tier is untouched - the entity ceiling
 and the persistent arena do not care how many modules exist.
 
-**Each module's memory 2 is its own**, sized from that module's own `cfg` when it loads. It is not
+**Each module's private memory is its own**, sized from that module's own `cfg` when it loads. It is not
 a share of anybody's block, and it could not be: the isolation in `wasm.md`, *Memories*, is
 wasm's bounds check, which only separates two modules if each has a memory of its own.
 
 So **a reload that wants more just gets it.** Reload builds a fresh instance over surviving storage
-- `module.md`, *Three guarantees differ* - and a fresh instance means a fresh memory 2 at whatever
-size the new `cfg` asks for. The block that cannot grow is memory 1, and nothing per-module lives
+- `module.md`, *Three guarantees differ* - and a fresh instance means a fresh private memory at whatever
+size the new `cfg` asks for. The block that cannot grow is the shared memory, and nothing per-module lives
 there.
 
 A ring each rather than one shared matters beyond budgeting: no write needs an atomic - `log.md`,
@@ -29,7 +29,7 @@ A ring each rather than one shared matters beyond budgeting: no write needs an a
 
 Every budget is **fixed for as long as the block exists**, and exhaustion is fatal where it happens.
 Growing one in place is impossible, since that would relocate a block already handed to a backend. So a
-bigger memory 2 arrives with a new instance and a bigger memory 1 does not arrive at all.
+bigger private memory arrives with a new instance and a bigger shared memory does not arrive at all.
 
 ## Bridge-ASM700 defaults none of them
 

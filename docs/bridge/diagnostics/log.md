@@ -4,7 +4,7 @@ The log is Bridge-ASM700's, not a module's, and it passes the test in `no-builti
 anything can fail, so every deployment needs it, and a failure nobody can report is worse than a
 missing feature.
 
-A module says things by appending to **one ring in its memory 2**, with a single writer by
+A module says things by appending to **one ring in its private memory**, with a single writer by
 construction: a module's systems are serialised - `threads.md`, *Threads* - so no line needs an
 atomic. No call either, so a line costs stores rather than the 500 ns a host call cost in the
 original Bridge. Bridge-ASM700 drains every ring at each barrier.
@@ -33,14 +33,14 @@ say which address space it came from. idTech3 and flecs never faced it, because 
 against a single `dataBase` (`vm.c:607`) and `ecs_os_api.log_` takes a real pointer.
 
 **So a literal is copied in, and costs a `memcpy` of its length.** Writing it instead as an offset
-into memory 0 would be free, and would need a sixteenth seam entry to read a memory Bridge-ASM700 does not
-own - paying surface for zero copies on a path whose own claim is only that a line costs stores.
-Godot's alternative is refused too: it copies at the boundary and hands back a handle -
-`string_new_with_utf8_chars_and_len2` - which is a call with a payload, the crossing this ring
-replaced.
+into its own memory would be free, and would need a sixteenth seam entry to read a memory
+Bridge-ASM700 does not own - paying surface for zero copies on a path whose own claim is only that a
+line costs stores. Godot's alternative is refused too: it copies at the boundary and hands back a
+handle - `string_new_with_utf8_chars_and_len2` - which is a call with a payload, the crossing this
+ring replaced.
 
 **That is also why the scratch arena exists**: it is the only memory a module can write that
-**Bridge-ASM700 can read**. Memory 0 is a wasm module's own and never adopted; memory 1 is columns.
+**Bridge-ASM700 can read**. A wasm module's own memory is never adopted; the shared memory is columns.
 
 Two rules follow. **Drain precedes the scratch-arena reset**, because the message lives in that
 arena and the barrier does both - and so does applying a queued `attach`, whose value lives there
@@ -49,7 +49,7 @@ block, which is what makes the check writable at all. One compare per record is 
 
 Levels are flecs' signed convention, so flecs' own output needs no mapping - `ecs_os_api.log_` takes
 `(level, file, line, msg)`, warn at -2 and err at -3. Filtering is at the writer: the generator
-emits `if (level > threshold) return` against a threshold in the memory-2 header, so a line that is
+emits `if (level > threshold) return` against a threshold in the private-memory header, so a line that is
 switched off costs a load and a branch.
 
 **Drop and count, never block.** A log may lose lines, and that is exactly what separates it from an

@@ -106,8 +106,8 @@ does not, having crashed.
 where a wasm module compiles only the second:
 
     the eight entries     `abi.md`, *The ABI*, as function pointers, unchanged
-    shared                where memory 1 begins
-    private               where this module's memory 2 begins
+    shared                where the shared memory begins
+    private               where this module's private memory begins
 
 That is the `bridge` import namespace of `wasm.md`, *Memories*, as a C struct: the same eight
 functions and the same two memories, because the memory layout and the function semantics are one
@@ -129,10 +129,10 @@ every barrier. A query matches many tables, so there is one span per table and a
 iterates them the way a wasm module does. What differs is only the address space: an offset is
 added to a base the module was handed, where wasm adds it to a memory.
 
-    span    = private + what memory 2's header and the query slot say
+    span    = private + what the private memory's header and the query slot say
     row r   = shared + span.base[t] + r * sizeof(T)
 
-`base` is an offset from the start of memory 1, identical to what a wasm module sees, so a native
+`base` is an offset from the start of the shared memory, identical to what a wasm module sees, so a native
 module adds `shared`, which does not move.
 
 **`sizeof(T)` comes from the schema header, not from the span.** Stride is never published, for the

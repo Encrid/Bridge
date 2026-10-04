@@ -6,7 +6,7 @@ pulled: `introspection.md`, *Introspection*. The log is `log.md`; the counters a
 Two things get confused here. **A module writing a component another module reads is normal** - it
 is the whole mechanism, and conflicting systems never run at once, so the scheduler already
 serialises them. What is not normal is a module writing *outside the columns it declared*, and
-memory 1 cannot prevent that.
+the shared memory cannot prevent that.
 
 Three things narrow it, none of them costing anything per frame:
 
@@ -28,7 +28,7 @@ module's own artifact, which Bridge-ASM700 only ever sees as bytes, so no Bridge
 could remove it and the generator offers none. An author who wants it gone writes their own
 accessor, at which point it is their code. It is not redundant with wasm's bounds check either: wasm
 catches a load outside the *memory*, and this catches one past the span's rows and still inside
-memory 1, which wasm permits.
+the shared memory, which wasm permits.
 
 A compare and branch per access, which a compiler can usually remove because the loop bound is the
 same `count` load. That is reasoning, not measurement - `PLAN.md` phase 3 is where it gets measured,
@@ -59,10 +59,10 @@ per barrier. flecs compiles its expensive tier out (`FLECS_SANITIZE`, *"will sev
 code"*) because its checks are scattered through hot code where a branch each would be the cost;
 ours is one pass at one site, so that force does not act on us.
 
-**Columns only, of memory 1's three regions.** The entity index has its own check above, cheaper and
-always on. The persistent arena is deliberately left out: a corrupt string is visible to whoever
-reads it, where a corrupt float is not, so hashing it would double the pass's cost to find the one
-kind of damage that announces itself.
+**Columns only, of the shared memory's three regions.** The entity index has its own check above,
+cheaper and always on. The persistent arena is deliberately left out: a corrupt string is visible to
+whoever reads it, where a corrupt float is not, so hashing it would double the pass's cost to find
+the one kind of damage that announces itself.
 
 **What Bridge-ASM700 does not check is a component's own invariants.** It knows no content -
 `wasm.md`, *It holds no content* - so a module that wants its invariants checked writes a

@@ -81,7 +81,9 @@ component model needed a type system.
 ## What the generator still emits
 
 One thing: accessors over a span, carrying the `row < count` test - **always, with no switch to
-remove it**: `validation.md`, *Always on*.
+remove it**: `validation.md`, *Always on*. On the wasm backend they are emitted as wasm text and
+merged into the compiled module, because no C compiler can address the shared memory itself:
+`wasm.md`, *A compiled module reaches them through accessors*.
 
 Not structs, not the component fingerprint, and not the published layouts. Those are `bridge-abi.h`:
 `wasm.md`, *The published layouts*.

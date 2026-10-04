@@ -6,7 +6,7 @@ You do not get storage. You get your query's results, which is how an ECS is use
     system(...)    registers a query, a function and a phase together, and gets a slot
 
 At each barrier Bridge-ASM700 runs every registered query and writes the matched spans into the module's
-private memory - memory 2, which nothing else reads; see `wasm.md`, *Memories*. One span per
+private memory, which nothing else reads; see `wasm.md`, *Memories*. One span per
 matched table - exactly what `ecs_query_next` yields inside Bridge-ASM700, materialised for a reader that
 cannot call it.
 
@@ -24,7 +24,7 @@ cannot call it.
 `entities`, `ids` and `sources` per field. The three cases a reader must tell apart are the three
 flecs' own JSON serialiser tells apart when it publishes an iterator to an external consumer, in
 `src/addons/json/serialize_iter_result_query.c:177-186`. It does so with two null checks, `!ptr`
-then `!it->sources[f]`, which is why nothing here carries a flag. **Offset 0 of memory 1 is
+then `!it->sources[f]`, which is why nothing here carries a flag. **Offset 0 of the shared memory is
 reserved** so that zero is never a valid base, which also makes the same sentinel sound in
 `reference.md`, *Reference following*.
 
