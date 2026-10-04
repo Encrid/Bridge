@@ -1,13 +1,13 @@
 # An engine callback answers from storage
 
 This is where the design pays. An engine's callbacks mostly ask for **state**, and state is in
-storage, so the native element that wraps the engine answers from it with no call and no crossing:
+storage, so the native module that wraps the engine answers from it with no call and no crossing:
 
-    _process              the game's logic is a system of some other element; its output
-                          is a component the engine's element flushes
-    _get, _set            a property is a component; the engine's element reads it
+    _process              the game's logic is a system of some other module; its output
+                          is a component the engine's module flushes
+    _get, _set            a property is a component; the engine's module reads it
     _get_property_list    the descriptors are a component array
-    _has_point            the shape is a component; the engine's element does the test
+    _has_point            the shape is a component; the engine's module does the test
     a signal firing       an entity carrying an event component; whoever subscribed runs
                           at the barrier - `data.md`, *Observers*
 

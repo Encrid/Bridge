@@ -7,8 +7,8 @@ calls.
 
 The two directions are not symmetric, and the asymmetry is the design rather than an oversight.
 
-    Bridge-ASM700 -> an element's imports   eight functions, and their signatures VARY
-    an element's exports -> Bridge-ASM700   every one is () -> i32
+    Bridge-ASM700 -> a module's imports   eight functions, and their signatures VARY
+    a module's exports -> Bridge-ASM700   every one is () -> i32
 
 So **a signature is declared going in and verified coming out.** `define_func` carries one:
 
@@ -20,7 +20,8 @@ So **a signature is declared going in and verified coming out.** `define_func` c
 **An arity would not do, and not as a matter of taste.** Five of the eight entries answer a value -
 `declare`, `system` and `observe` a slot, `spawn` an id, `alloc` an offset - and a count of
 arguments cannot say so. Nor can it say how wide they are: `attach(id, slot, ptr, len)` has four
-parameters of which the first is a 64-bit entity id and the rest are 32-bit. And wasmtime's own
+parameters of which the first is a 64-bit entity id and the rest are 32-bit, `ptr` being an offset
+into the scratch arena on every backend. And wasmtime's own
 entry settles it - `wasmtime_linker_define_func` takes `const wasm_functype_t *ty` (`linker.h:137`),
 params and results with their widths, which **cannot be constructed from a number**.
 
@@ -35,9 +36,9 @@ itself would re-derive what Bridge-ASM700 already holds - the thing `wasm.md`, *
 layouts*, refuses for that header.
 
 **What it buys beyond being implementable.** Core wasm checks an import's shape at link time -
-`wasm.md`, *Identity*, for what that catches and what it does not - so an element that declares
-`declare` wrongly is **refused at instantiation, by name**. Bind to whatever the element declared
-instead and the same element links happily and passes garbage - a load-time refusal traded for
+`wasm.md`, *Identity*, for what that catches and what it does not - so a module that declares
+`declare` wrongly is **refused at instantiation, by name**. Bind to whatever the module declared
+instead and the same module links happily and passes garbage - a load-time refusal traded for
 runtime corruption.
 
 `module_imports` is not a second source for this: it answers *which memories to supply*, and nothing
@@ -54,7 +55,7 @@ columns, so there is nothing to pass. No marshalling at this seam, no arity to a
 a backend could get wrong about either.
 
 `status` is what the function returned; `err` is whether it returned at all. A trap is an ordinary
-outcome - an element that reads out of bounds, exhausts a system's fuel, or runs past a lifecycle
+outcome - a module that reads out of bounds, exhausts a system's fuel, or runs past a lifecycle
 call's timeout produces one, and the process keeps running - and `failure.md`, *When something
 fails*, treats the two alike on purpose.
 

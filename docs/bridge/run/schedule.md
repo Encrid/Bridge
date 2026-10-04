@@ -1,8 +1,8 @@
 # The schedule
 
-What Bridge-ASM700 does between an element's systems and observers: when they run, and what is visible
+What Bridge-ASM700 does between a module's systems and observers: when they run, and what is visible
 while they do. What bounds a run is `limits.md`; what happens when one fails is `failure.md`; which
-systems run at once is `threads.md`. The data they run over is `data.md`; what an element can ask
+systems run at once is `threads.md`. The data they run over is `data.md`; what a module can ask
 for is `abi.md`.
 
 Bridge-ASM700 owns this because no host could do it differently - `split.md`, *The split*.
@@ -23,13 +23,12 @@ is forced.
 ### Bridge-ASM700 ships no phase names
 
 Not one, and not a default set. **A phase name is a name somebody has to invent**, and inventing one
-here would turn Bridge-ASM700's guess about the shape of a frame into something every element references.
+here would turn Bridge-ASM700's guess about the shape of a frame into something every module references.
 That is the last clause of `no-builtins.md`, *No builtins*, and it fails that rule's universality test: a
 one-run tool and a game do not want the same phases.
 
 So a deployment declares its own, and `bridge_create` refuses a config with none, exactly as it
-refuses one with a phase named twice. The reference host has no default to use either: `ideatek.md`,
-*The pass is config's order*.
+refuses one with a phase named twice.
 
 **flecs does ship eight, and where it ships them is the point.** `EcsOnLoad` through `EcsOnStore`
 are bootstrapped by the **pipeline addon** (`src/addons/pipeline/pipeline.c:968`), not by the core,
@@ -61,17 +60,17 @@ flecs has the equivalent and says what it is for: `ecs_system_desc_t.immediate`,
 have access to the actual world. Cannot be true at the same time as multi_threaded"* -
 `flecs.h:14371`. So running alone is the **consequence** of wanting undeclared access to the real
 world, not the goal. **Here there is no way to ask for the actual world**: every read goes through a
-declared term, and even `get` by id is indexed by the terms *this* element declared.
+declared term, and even `get` by id is indexed by the terms *this* module declared.
 
 The three cases for it each live somewhere else. A system driving something that is not thread-safe
-is `pinned`, and every pinned element is on one thread already - `pinned.md`, *Threads*. A
+is `pinned`, and every pinned module is on one thread already - `pinned.md`, *Threads*. A
 system that wants the whole world to itself has one, for the whole of a phase - *What a phase shows
 you*. A system that walks everything must declare everything, so it conflicts with every writer and
 the conflict graph serialises it anyway - `threads.md`, *Threads*.
 
 What is left is a flag somebody sets hoping to fix a race, where the cause is an undeclared write
-that is wrong whether or not anything ran beside it. **The condition that brings it back** is an
-element that can share an external resource without being pinnable; nothing like that exists
+that is wrong whether or not anything ran beside it. **The condition that brings it back** is a
+module that can share an external resource without being pinnable; nothing like that exists
 today.
 
 Rows move when storage is compacted or migrated, so **nothing moves while any phase is in flight.**
@@ -100,16 +99,18 @@ a thing to be able to see.
 
 **The conflict graph covers them.** Two observers that conflict with nothing ordering them refuse at
 load, exactly as two systems in one phase do, and for the same reason: the parties are different
-elements and only the deployment knows both are there.
+modules and only the deployment knows both are there.
 
 ### Order within a phase is never implicit
 
 If two systems in the same phase conflict - one writes what the other reads or writes - and nothing
-orders them, **Bridge-ASM700 refuses to start** and names both. Not declaration order, not load order,
-nothing decided by which element happened to be found first. Conflicts are already computed for
+orders them, **Bridge-ASM700 refuses the load that introduces the conflict** and names both. Never
+declaration order or load order: nothing is decided by which module happened to be found first.
+There is no moment called start to refuse at, since the host loads modules one at a time -
+`lifecycle.md`, *The runtime lifecycle*. Conflicts are already computed for
 parallelism, so detecting this costs nothing.
 
-**The deployment resolves it, not the elements.** The only party that knows both are present is the
+**The deployment resolves it, not the modules.** The only party that knows both are present is the
 one that chose to deploy them. Either move one into a new phase, or state the pair:
 
     phases = ["setup", "physics", "present"]
@@ -117,7 +118,7 @@ one that chose to deploy them. Either move one into a new phase, or state the pa
     [order]
     before = [["mymod:movement", "othermod:collision"]]
 
-The cost: a deployment combining two conflicting elements has work to do. That work was previously
+The cost: a deployment combining two conflicting modules has work to do. That work was previously
 done by luck, so making it explicit is the point rather than a regression.
 
 ## What a phase shows you
@@ -132,13 +133,13 @@ side.
 
 ## What a pass depends on
 
-Storage, the phase the host asked for, and **what native elements wrote**. Nothing else crosses in:
-everything a deployment learns from outside reaches the rest as a column some native element declared `out`,
+Storage, the phase the host asked for, and **what native modules wrote**. Nothing else crosses in:
+everything a deployment learns from outside reaches the rest as a column some native module declared `out`,
 applied at a barrier.
 
-That is one place, because of three decisions taken elsewhere for their own reasons. **No element
+That is one place, because of three decisions taken elsewhere for their own reasons. **No module
 can call another**, so no value ever arrives as a return - `abi.md`, *The ABI*. **A native
-element's code runs inside a phase** and a foreign-thread callback touches no storage at all -
+module's code runs inside a phase** and a foreign-thread callback touches no storage at all -
 `native.md`, *The invariant*. And **two writers of one component are never in flight together**,
 so the order the rest happen to run in cannot change the result - the conflict graph exists for
 parallelism and hands this over for nothing.
@@ -151,6 +152,6 @@ by period - `limits.md`, *What bounds a run*.
 quiet machine and be killed on a busy one. That is the cost of wall time, and it is why fuel and a
 timeout are not interchangeable.
 
-Record and replay is what this is for, and it is not built - `PLAN.md` phase 8 is where it could
-land. It is stated here because an input path that bypassed a column would quietly make a pass
+Record and replay is what this is for, and it is not built - `PLAN.md`, *Not in this plan*. It is
+stated here because an input path that bypassed a column would quietly make a pass
 depend on something nobody can see, and no later phase could recover that.

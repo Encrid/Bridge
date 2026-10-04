@@ -1,11 +1,11 @@
 # The ABI
 
-At init, and again whenever an element is loaded while the program runs - `lifecycle.md`, *The
-runtime lifecycle*. All three may take names, because registration is not a hot path.
+At init, which runs each time a module is loaded - `lifecycle.md`, *The runtime lifecycle*. All
+three may take names, because registration is not a hot path.
 
-    declare(name, name_len, size, align, desc, desc_len)        -> slot
-    system (name, name_len, phase, phase_len, terms, term_count) -> slot
-    observe(name, name_len, events, terms, term_count)           -> slot
+    declare(name, name_len, size, align, desc, desc_len, on_unload) -> slot
+    system (name, name_len, phase, phase_len, terms, term_count)    -> slot
+    observe(name, name_len, events, terms, term_count)              -> slot
 
 Any time, queued and applied at the next barrier:
 
@@ -18,13 +18,29 @@ Any time, queued and applied at the next barrier:
 `desc` is the descriptor string `ECS_STRUCT` already emits beside the typedef - `schema.md`, *There
 is no schema format*, for what Bridge-ASM700 does with it and what it does not.
 
-**`attach` carries the initial value.** `ptr` and `len` point at the element's own memory - an
-offset on the wasm backend, a pointer on the native one - and Bridge-ASM700 copies the bytes into
-the row when it applies the change, bounds-checking them the way it checks a log record's text. Null
-means zeroed.
+`on_unload` is what becomes of the entities carrying the component when this module is unloaded:
+`strip`, `sweep` or `delete` - `lifetime.md`, *What unload leaves behind*. It is stated, like every
+other value: there is no default.
+
+**Every pointer here is an offset into the module's scratch arena**, on every backend: `name`,
+`desc`, `phase`, `terms`, and `attach`'s `ptr`. A module writes the bytes there first and passes
+where they are. An offset means nothing without a memory, so the memory is fixed by the binding
+rather than carried in the value - the rule `log.md`, *The log*, already set for a record's text,
+and for the same reason: the scratch arena is the one memory a module can write that Bridge-ASM700
+can read and bounds-check. So one signature serves both backends, and every argument is 32 or 64
+bits wide - `signatures.md`, *Imports are declared, exports are checked*.
+
+Refused: a pointer type the backend translates, which would have the backend reading a module's own
+memory and pairing each pointer with its length. The condition that brings it back is a value too
+large for a scratch arena.
+
+**`attach` carries the initial value.** `ptr` and `len` say where it is, and Bridge-ASM700 copies the
+bytes into the row when it applies the change, bounds-checking them the way it checks a log record's
+text. Zero means zeroed. The change is applied at the barrier **before the scratch arena is reset**,
+as the log is drained before it.
 
 That is there because **nothing applies immediately.** Every structural change is queued, so a row
-exists at the next barrier and not before, and the only thing an element could have wanted sooner
+exists at the next barrier and not before, and the only thing a module could have wanted sooner
 was to fill a row it just made. Carrying the value does that without reaching the row at all.
 
 `spawn` still answers a usable id at once - the id is Bridge-ASM700's to mint - so a parent can be spawned
@@ -33,20 +49,20 @@ and referenced by its children in the same system.
 **There are no immediate forms.** They could not deliver acting at once: a span is a snapshot from
 the last barrier, so a row made immediately would be unreachable anyway. Worse, flecs swap-removes -
 `src/storage/table.c:1465`, *"move last element to deleted element"* - so an immediate destroy would
-move **another** entity's row, silently invalidating offsets the element already held for rows it
+move **another** entity's row, silently invalidating offsets the module already held for rows it
 never touched, with no check that could catch it.
 
-**And nothing else. There is no way for one element to call another.**
+**And nothing else. There is no way for one module to call another.**
 
-That is the whole of the model rather than a restriction inside it. An element that needs something
-done writes data describing it, and whichever element subscribes to that shape does it - which is
+That is the whole of the model rather than a restriction inside it. A module that needs something
+done writes data describing it, and whichever module subscribes to that shape does it - which is
 what a system and an observer are. Nothing asks; everything subscribes.
 
 So reading and writing components is not on this list because it is not a call, and *calling* is not
 on it because there is nothing left for a call to do.
 
 **No `access` on `declare`.** Access mode is how a *system* uses a component, not a property of the
-type, so it rides on the query term - `data.md`, *Access mode*. Two elements declaring
+type, so it rides on the query term - `data.md`, *Access mode*. Two modules declaring
 `game:Position` must agree on its layout and need not agree on how they touch it.
 
 **No `find`.** `declare` is idempotent - the first caller creates a component and later callers get
@@ -62,7 +78,7 @@ trigger.
 event component does the same job by polling, and that is the alternative it has to beat: a poll
 costs a dispatch and a zero-span walk **every pass, per subscriber, whether or not anything
 happened**. Ten subscribers to a rare event cost ten calls a pass forever. An observer costs nothing
-when nothing changed - a saving on the hot path proportional to how many elements are listening, and
+when nothing changed - a saving on the hot path proportional to how many modules are listening, and
 the hot path is the one budget this design exists to protect.
 
 A system or an observer **is** a query plus a function, so one call registers the pair. `init`,
@@ -71,13 +87,13 @@ of term structs, flecs' `ecs_term_t` shape rather than a string, so there is no 
 and no string handed over at init. What a query may not ask for is `query.md`, *What a query may not
 ask for*.
 
-A system declares its phase and **nothing about order**, and never names another element's system.
-So no independently shipped element depends on another's internals, and no ordering cycle can span
+A system declares its phase and **nothing about order**, and never names another module's system.
+So no independently shipped module depends on another's internals, and no ordering cycle can span
 authors who have never met.
 
 **A system takes no arguments.** Its spans are already in its memory, found through the slot
 `system` answered. Frame time is not an argument and not a component Bridge-ASM700 declares: the system
-clock is hardware, so a native element reads it - usually the one already talking to the OS for input or a
+clock is hardware, so a native module reads it - usually the one already talking to the OS for input or a
 window - and writes the interval into a component of its own, which anything needing it reads under
 a grant.
 
@@ -85,4 +101,4 @@ Work with no components to iterate is still a system: one with an empty query, w
 pass of its phase.
 
 **There is no `tick` and no `build`.** Everything per-frame is a system, and a system carries a
-phase, so "every frame" and "every frame, alone" are both just phases.
+phase, so the original Bridge's two per-frame entry points are both just systems in a phase.

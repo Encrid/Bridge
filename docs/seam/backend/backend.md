@@ -2,14 +2,14 @@
 
 The surface a backend implements. Bridge-ASM700 defines it; a shared library provides it. Two exist: the
 **wasm** backend, which wraps wasmtime, and the **native** backend, which opens a shared library and
-calls it directly, for code that does not need sandboxing. An element names the one that runs it -
+calls it directly, for code that does not need sandboxing. A module names the one that runs it -
 `host-api.md`, *The data*.
 
 Bridge-ASM700 keeps everything that is not the engine's business - `split.md`, *The split* - so a backend
 does not reimplement a scheduler to swap an interpreter.
 
 What matters at this seam is the far side of that list: config, discovery and the formats are the
-host's, so **a backend never has a file to find**. It is handed an element's bytes and its path,
+host's, so **a backend never has a file to find**. It is handed a module's bytes and its path,
 uninspected, and the settings that are its own.
 
 **Bridge-ASM700 opens the backend libraries its config names**, and finds the fifteen entries in each by
@@ -32,28 +32,28 @@ name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
     instance_set_deadline(instance, nanos)
     instance_set_memory_limit(instance, bytes)
 
-    define_func(instance, module, field, fn, sig)
+    define_func(instance, namespace, field, fn, sig)
     instance_func(instance, name, &arity, &results) -> func
     call(func, status)                         -> err
 
-Fifteen entries. The Rust `ModuleRuntime` trait had fourteen, four of which were filesystem and
+Fifteen entries. The original Bridge's `ModuleRuntime` trait had fourteen, four of which were filesystem and
 timer work that has moved out.
 
-**`module` is the backend's word for a loaded image**, kept from wasm: compiled bytes on the wasm
-backend, an opened library on the native one. It is not a kind of element. `module_compile` takes
+**`module` at this seam is a module's loaded image**: compiled bytes on the wasm backend, an opened
+library on the native one. `module_compile` takes
 both the bytes and the path because Bridge-ASM700 inspects neither, and each backend uses the one it
 needs.
 
 `module_imports` is there for one decision: **which memories to hand `instance_create`.** Not every
-element imports both - `wasm.md`, *Memories* - so Bridge-ASM700 reads the list rather than supplying
+module imports both - `wasm.md`, *Memories* - so Bridge-ASM700 reads the list rather than supplying
 memories nobody asked for and letting the link fail.
 
 ## Memory is adopted, not created
 
-`memory_adopt` takes pages Bridge-ASM700 already owns and asks the backend to make them addressable by an
-element. It does not ask the backend to allocate. That is the whole of what "Bridge-ASM700 owns the
-memory" means at this seam, and it is why the same region reaches a native element as a raw pointer
-and a wasm element as an import.
+`memory_adopt` takes pages Bridge-ASM700 already owns and asks the backend to make them addressable by a
+module. It does not ask the backend to allocate. That is the whole of what "Bridge-ASM700 owns the
+memory" means at this seam, and it is why the same region reaches a native module as a raw pointer
+and a wasm module as an import.
 
 There is no read-only variant and no verification pass, because access mode is not enforced - see
 `data.md`, *Access mode*.
@@ -91,8 +91,8 @@ dispose"*, so one per instance is both idiomatic and what Bridge-ASM700 wants. T
 therefore the **instance**, and how a backend groups instances internally is its business: wasmtime
 gives each a store, the native backend gives each nothing.
 
-Fuel, a lifecycle call's timeout and the memory limit all move with it. They are per element in
-config, and a limiter that knows which element is executing can hold co-tenants to their own
+Fuel, a lifecycle call's timeout and the memory limit all move with it. They are per module in
+config, and a limiter that knows which module is executing can hold co-tenants to their own
 ceilings - so scoping them to one backend's concept would be wrong twice over.
 
 **What this gives up: a backend cannot be told to group instances.** It may group them internally -

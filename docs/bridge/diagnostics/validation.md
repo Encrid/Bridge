@@ -3,14 +3,14 @@
 A diagnostic says what occurred. None of it is a second way to read the design, and state is
 pulled: `introspection.md`, *Introspection*. The log is `log.md`; the counters are `profile.md`.
 
-Two things get confused here. **An element writing a component another element reads is normal** - it
+Two things get confused here. **A module writing a component another module reads is normal** - it
 is the whole mechanism, and conflicting systems never run at once, so the scheduler already
-serialises them. What is not normal is an element writing *outside the columns it declared*, and
+serialises them. What is not normal is a module writing *outside the columns it declared*, and
 memory 1 cannot prevent that.
 
 Three things narrow it, none of them costing anything per frame:
 
-**The suspects are the declared writers.** If a component is corrupt, the elements that declared it
+**The suspects are the declared writers.** If a component is corrupt, the modules that declared it
 `out` or `inout` are the list and the rest are cleared - from data the scheduler keeps anyway.
 
 **The culprit is the system that was running.** Conflicting systems never run at once, so at any
@@ -24,7 +24,7 @@ and always paid for; what we check always and what we check when asked are two d
 ## Always on
 
 **The `row < count` test the generator emits.** Not a policy: that code is compiled into the
-element's own artifact, which Bridge-ASM700 only ever sees as bytes, so no Bridge-ASM700 setting
+module's own artifact, which Bridge-ASM700 only ever sees as bytes, so no Bridge-ASM700 setting
 could remove it and the generator offers none. An author who wants it gone writes their own
 accessor, at which point it is their code. It is not redundant with wasm's bounds check either: wasm
 catches a load outside the *memory*, and this catches one past the span's rows and still inside
@@ -37,21 +37,22 @@ and its done-when says so.
 **Row counts against table sizes.** O(matched tables), the same order as publishing, so it is not in
 the expensive tier at all - a few comparisons on a walk Bridge-ASM700 is already doing.
 
-**What it catches is our own patch failing**, not flecs. The patch in *flecs will not tell you
-which* exists so the mirror cannot drift. This check notices if the patch is wrong, against the one
-mechanism whose failure is silent and sends elements to rows that are not theirs. Nearly free, and
-aimed at the code we wrote rather than the library we vendored.
+**What it catches is our own patch failing**, not flecs. The patch in `flecs.md`, *flecs will not
+tell you which*, exists so the mirror cannot drift. This check notices if the patch is wrong,
+against the one mechanism whose failure is silent and sends modules to rows that are not theirs.
+Nearly free, and aimed at the code we wrote rather than the library we vendored.
 
 ## The checksum pass, when asked
 
 One check, behind `[checks] validate`. Hash each column at every barrier and compare with the last.
-**If a column changed and no system that ran declared it `out`, the log names the element** - which
+**If a column changed and no system that ran declared it `out`, the log names the module** - which
 is what the three narrowing facts above stop short of: they produce a suspect list, and this
 produces a culprit.
 
-That matters because the person reading the log is usually not the author of the element that broke
-it, so narrowing is not enough. It is also **the only thing that finds a native element's stray write**:
-it has no sandbox and need not use the generated accessor, so neither always-on check applies to it.
+That matters because the person reading the log is usually not the author of the module that broke
+it, so narrowing is not enough. It is also **the only thing that finds a native module's stray write**:
+it has no sandbox and need not use the generated accessor, so the `row < count` test does not reach
+it.
 
 O(data) per barrier, which is why it is off. A runtime key rather than a build flag costs one branch
 per barrier. flecs compiles its expensive tier out (`FLECS_SANITIZE`, *"will severely slow down
@@ -64,6 +65,6 @@ reads it, where a corrupt float is not, so hashing it would double the pass's co
 kind of damage that announces itself.
 
 **What Bridge-ASM700 does not check is a component's own invariants.** It knows no content -
-`wasm.md`, *It holds no content* - so an element that wants its invariants checked writes a
+`wasm.md`, *It holds no content* - so a module that wants its invariants checked writes a
 system that checks them. That is not a missing feature; it is the same rule that keeps
 `bridge-abi.h` empty of components.

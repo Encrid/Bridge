@@ -8,9 +8,9 @@ Against the original Bridge, which is the comparison point because this replaces
     string, list args    passed as (offset, len) where genuinely needed
     nine config keys     tick_order, autoload, call_timeout, the three restart
                          keys, [store], field_names and the profile's crossing
-                         table. See `config-changes.md`, *Keys that are gone*
-    column isolation     an element can write outside the columns it declared
-    a synchronous answer no element can ask another a question and wait for the reply
+                         table
+    column isolation     a module can write outside the columns it declared
+    a synchronous answer no module can ask another a question and wait for the reply
 
 **The last one is what dropping calls costs**, and it is a real loss. An engine callback that
 consumes a return value inside its own loop cannot be served from storage: `Array.sort_custom` wants
@@ -23,18 +23,18 @@ storage*.
 
 Column isolation is the ECS bargain, and it is **partly** recovered. Read and write declarations
 exist so the scheduler can keep two writers apart, and they are not policed. Why no arrangement of
-memories could express it instead: `wasm.md`, *Memories*. An element that writes a component
-it declared read is a bug in that element, and `validation.md`, *What a bad write costs, and what
+memories could express it instead: `wasm.md`, *Memories*. A module that writes a component
+it declared read is a bug in that module, and `validation.md`, *What a bad write costs, and what
 finds it*, is how it gets a name.
 
-What is recovered is everything that is not a shared column. A wasm element's spans, its `column_base`,
-its scratch arena and its log ring sit in a private memory no other element imports, so the `base`
+What is recovered is everything that is not a shared column. A wasm module's spans, its `column_base`,
+its scratch arena and its log ring sit in a private memory no other module imports, so the `base`
 and `count` its arithmetic reads cannot be corrupted from outside - `memory.md`, *Where the seven
 regions live*. What stays exposed is the columns and the entity index. One thing would change that,
-and we decline it: reserve address space per component and map only an element's own columns into its
+and we decline it: reserve address space per component and map only a module's own columns into its
 memory, which `wasmtime_config_host_memory_creator_set` makes possible. It costs a per-component
 budget, platform-specific mapping code in Bridge-ASM700, and - the actual reason - TLB aliasing: one
-physical page mapped for N elements is N entries where one would do, on the inner loop this design
+physical page mapped for N modules is N entries where one would do, on the inner loop this design
 exists to protect.
 
 **The condition that would change the answer: Bridge-ASM700 being asked to run code the operator did not
@@ -54,5 +54,5 @@ the manifest section, threading.
 Hot reload improves in one direction and gains a refusal. In the original Bridge a reloaded module loses
 its state; with storage in Bridge-ASM700's region **the data survives the swap**, which is what idTech3's
 `VM_Restart` was for too. A layout change is caught by the fingerprint and refused by name rather
-than silently reinterpreted, and the refusal cannot be waived: starting an element over with its
+than silently reinterpreted, and the refusal cannot be waived: starting a module over with its
 data gone is `unload` then `load`. See `lifetime.md`, *Lifetime*.

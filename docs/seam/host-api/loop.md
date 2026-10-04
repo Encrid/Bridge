@@ -30,14 +30,14 @@ What survives untouched is the refusal when two systems *within* one phase confl
 
 It runs the systems registered to the phase it was asked for, and at the barrier the observers of
 whatever changed. If nothing is registered, it runs nothing. There is no idle status, no completion
-tracking, and no way for an element to ask the process to stop - an element handles its own
+tracking, and no way for a module to ask the process to stop - a module handles its own
 lifecycle, and a system with nothing to do iterates zero spans.
 
-**When the program ends is the host's question.** A shell loops until a signal, or a window closes,
+**When the program ends is the host's question.** A host loops until a signal, or a window closes,
 or because it was told to run once. A one-run program is then not a special case: it calls each
 phase once and exits.
 
-The one thing Bridge-ASM700 does track per element is failure - *"past the budget the element is
+The one thing Bridge-ASM700 does track per module is failure - *"past the budget the module is
 stopped"*, `failure.md`, *When something fails*. That is noticing you keep failing, not asking
 whether you are finished, and it exists because a system failing every pass forever is what
 idTech3's escalation guards against.

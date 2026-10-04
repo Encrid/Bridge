@@ -16,7 +16,7 @@ Two dependent loads and a multiply. No crossing, which is the point: a crossing 
 reintroduce the per-operation cost this design exists to remove.
 
 `column_base` is needed because a component sits at a different offset in every table, so the table
-alone is not enough. It is indexed by table and by the terms *this* element declared, so ten
+alone is not enough. It is indexed by table and by the terms *this* module declared, so ten
 components across a thousand tables is forty kilobytes.
 
 **The stale-id check falls out of it.** The generation is in the record, so refusing an id whose

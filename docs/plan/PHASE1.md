@@ -21,7 +21,7 @@ which*. Why this is phase 1 rather than part of storage is `PLAN.md`.
                                   copy states, with the reason it cannot hold here
     tools/patch-flecs.py          thirteen allocator sites and one hook, gated on
                                   FLECS_VERSION
-    tests/confined.c              no pointer an element reads lands outside the block
+    tests/confined.c              no pointer a module reads lands outside the block
     tests/rowmove.c               no row moves without the hook saying so
     CMakeLists.txt                patch, compile, test
     CMakePresets.json             Ninja, one preset per platform
@@ -55,9 +55,9 @@ free - and one for the row move. Two constraints rule out carrying them on the w
   to `ecs_vec_set_count(allocator, ...)` - a path other `NULL`-allocator callers share, so "NULL
   means ours" would capture more than columns.
 
-## The one open question
+## Open questions
 
-How the three vec sites are routed. They probably need the vec call replaced with explicit calls to
+**How the three vec sites are routed.** They probably need the vec call replaced with explicit calls to
 the allocator pointers rather than a crafted allocator.
 
 **Settled by trying it rather than by arguing.** The spike that counted the sites is not on disk, so

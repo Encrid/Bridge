@@ -5,7 +5,7 @@ You do not get storage. You get your query's results, which is how an ECS is use
     declare(...)   registers a component type
     system(...)    registers a query, a function and a phase together, and gets a slot
 
-At each barrier Bridge-ASM700 runs every registered query and writes the matched spans into the element's
+At each barrier Bridge-ASM700 runs every registered query and writes the matched spans into the module's
 private memory - memory 2, which nothing else reads; see `wasm.md`, *Memories*. One span per
 matched table - exactly what `ecs_query_next` yields inside Bridge-ASM700, materialised for a reader that
 cannot call it.

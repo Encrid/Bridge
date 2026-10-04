@@ -34,22 +34,22 @@ have been weakest, and it is MIT and already vendored in Bridge-Ironwail.
 
 ## Where flecs' memory lives
 
-The one place the embedding is not free. A wasm element reads component bytes with plain loads, so those
+The one place the embedding is not free. A wasm module reads component bytes with plain loads, so those
 bytes must sit inside the block backing memory 1 - and flecs, left alone, allocates wherever the
 system allocator puts it.
 
 So Bridge-ASM700 allocates that block, hands it to each backend as memory 1, and gives flecs an allocator
-that carves columns out of it. One copy of the data: a native element reads it through real
-pointers, a wasm element reads the same bytes at `pointer - block start`. Neither goes through flecs
+that carves columns out of it. One copy of the data: a native module reads it through real
+pointers, a wasm module reads the same bytes at `pointer - block start`. Neither goes through flecs
 to do it.
 
 ### It can be confined, and the patch is thirteen sites
 
 Left alone, `ecs_os_api` is global: override it and flecs' **whole** heap lands in
-element-addressable memory - hash maps, query caches, the block and stack allocators' pages.
+module-addressable memory - hash maps, query caches, the block and stack allocators' pages.
 Confining it to columns means patching flecs, which a spike measured.
 
-**What an element reads is coverable.** Tag every allocation that touches column data or a table's
+**What a module reads is coverable.** Tag every allocation that touches column data or a table's
 entity array. Run a workload with table moves, column resizes, swap-removes and deletes. Then check
 that every pointer `ecs_get_id` answers and every `it.entities` an iterator exposes lands in a
 tagged allocation:
@@ -60,7 +60,7 @@ tagged allocation:
                         4 entity arrays,    0 escaped     internals 6.83 MB
 
 **And not confining is expensive, which argument could not supply.** Internals are **87% of
-element-addressable bytes at 4,000 entities and 38% at 200,000** - a large fixed floor of bootstrap
+module-addressable bytes at 4,000 entities and 38% at 200,000** - a large fixed floor of bootstrap
 plus growth that is sublinear against columns. So a stray write is likelier to land in flecs' own
 structures than in game state, and that is the failure with no attribution: a crash inside flecs
 rather than a wrong number in a component somebody declared.
@@ -92,9 +92,10 @@ there is passed `NULL`.
 ## flecs will not tell you which
 
 The one thing a spike had to settle, because getting it wrong is silent. flecs' events name every
-entity whose **components** changed and **no entity whose row merely moved**. Of those 503 changes,
-303 had no event naming them, every one a pure row move inside a single table, 0.8 per operation. An
-event-driven mirror would point an element at the wrong row that often, and nothing would say so.
+entity whose **components** changed and **no entity whose row merely moved**. Of the 503 record
+changes the spike's 360 operations made, 303 had no event naming them, every one a pure row move
+inside a single table, 0.8 per operation. An event-driven mirror would point a module at the wrong
+row that often, and nothing would say so.
 
 So the mirror takes **one more patched site** than the columns did - `flecs_table_delete`, in the
 file *It can be confined, and the patch is thirteen sites* already forks, which makes it fourteen.

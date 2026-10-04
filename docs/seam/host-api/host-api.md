@@ -1,12 +1,12 @@
 # Host API
 
-The surface any host links against. Why there are two targets at all is `README.md`; the reference
-host is `ideatek.md`.
+The surface any host links against. What Bridge-ASM700 requires of the values a host hands over is
+`config.md`.
 
 The arrangement is idTech3's: the engine is `qcommon/`, and `win32/win_main.c:1212` calls `Com_Init`
 then loops on `Com_Frame`.
 
-This is the third seam. `element.md` and the two binding files are Bridge-ASM700 to elements;
+This is the third seam. `module.md` and the two binding files are Bridge-ASM700 to modules;
 `backend.md` is Bridge-ASM700 to a backend; this is **host to Bridge-ASM700**. Everything in this
 folder is `bridge.h`, which is the only header a host includes - one per seam, `README.md`, *Three
 layers, three seams*.
@@ -15,7 +15,7 @@ layers, three seams*.
 
 Which side owns what is `split.md`, *The split*. At this seam it comes to one thing: **Bridge-ASM700
 parses nothing** - not TOML, not object files, not wasm sections. `bridge_create` takes a struct;
-`bridge_load` takes a struct plus bytes and a path, and passes those two straight to the element's
+`bridge_load` takes a struct plus bytes and a path, and passes those two straight to the module's
 backend without inspecting either - `lifecycle.md`, *The runtime lifecycle*.
 
 **The one kind of file Bridge-ASM700 opens is a backend library.** Config names each backend and its
@@ -30,8 +30,8 @@ hands over data rather than being made to write a file for Bridge-ASM700 to read
 parsers that would otherwise sit in the library do not: `bridge_manifest_parse` ships **beside** it
 as a helper - `native.md`, *Identity*.
 
-**No discovery either.** Walking `[content] paths` is filesystem work, so the host walks and calls
-`bridge_load` per element. `autoload` is not a Bridge-ASM700 key.
+**No discovery either.** Finding modules is filesystem work, so the host finds them and calls
+`bridge_load` for each.
 
 ## The surface
 
@@ -48,7 +48,7 @@ as a helper - `native.md`, *Identity*.
     int bridge_reload(bridge *b, const bridge_artifact *a);
 
     /* introspection */
-    int bridge_elements(bridge *b, bridge_element_info *out, int max);
+    int bridge_modules(bridge *b, bridge_module_info *out, int max);
     int bridge_profile (bridge *b, bridge_profile_row *out, int max);
 
 `bridge_profile` and its row are `profile.md`, *The profile*.
@@ -60,7 +60,7 @@ as a helper - `native.md`, *Identity*.
     typedef struct {
         uint64_t entities;        /* the index mirror ceiling */
         uint64_t persistent;      /* the persistent arena */
-        uint32_t max_elements;    /* the per-element slot pool */
+        uint32_t max_modules;     /* the per-module slot pool */
     } bridge_budget;
 
     typedef struct {
@@ -84,12 +84,13 @@ as a helper - `native.md`, *Identity*.
     } bridge_config;
 
     typedef struct {
-        const char *identity;        /* "tri:triangle" */
+        const char *identity;        /* "tri:triangle@0.1.0" */
         uint32_t    abi;
 
         bool     trusted, hot_reload, pinned;
-        uint8_t  on_error;           /* FAIL | SKIP */
+        uint8_t  on_error;           /* FAIL | SKIP. zero is unset */
         uint32_t max_system_failures;
+        /* each of the next five: zero is unset, -1 is "no limit" */
         int64_t  fuel;               /* units per system invocation */
         int64_t  memory_limit;       /* bytes. a ceiling, never re-set */
         int64_t  init_timeout, reload_timeout, shutdown_timeout;   /* nanoseconds, per call */
@@ -100,10 +101,10 @@ as a helper - `native.md`, *Identity*.
         const char *const *write; uint32_t write_count;
 
         const bridge_setting *settings; uint32_t setting_count;  /* its own [.config] */
-    } bridge_element_config;
+    } bridge_module_config;
 
     typedef struct {
-        bridge_element_config cfg;
+        bridge_module_config cfg;
         const char *backend;             /* which backend runs it, by name */
         const void *bytes; size_t len;   /* the image, or null */
         const char *path;                /* where it is, or null. both go to the backend */
@@ -125,15 +126,15 @@ as a helper - `native.md`, *Identity*.
     typedef struct {
         const char *identity;
         uint8_t     state;               /* RUNNING | STOPPED */
-    } bridge_element_info;
+    } bridge_module_info;
 
 **A phase is a string, not a struct.** It has one property and that is its name - `schedule.md`, *A
 phase is a name and nothing else* - which also disposes of a collision: a typedef and a function
 share one namespace in C, and `bridge_phase` is the call.
 
-**The host resolves the three layers** - the manifest, the deployment's file, the local one - and
-hands one flat struct per element. Bridge-ASM700 has no notion of where a value came from, which is why
-nothing here records a layer.
+**The host resolves its own sources** - a manifest, a deployment's file, whatever it has - and
+hands one flat struct per module. Bridge-ASM700 has no notion of where a value came from, which is why
+nothing here records a source.
 
 **Every limit here carries its period, because a number without one means nothing** - `limits.md`,
 *What bounds a run*. One is per invocation, three are per call, and one is a ceiling.
@@ -145,16 +146,16 @@ every dispatch, `profile.md`, *The profile*. Nothing else Bridge-ASM700 does is 
 **A backend's `settings` are its own** - the cache directory, the pooling limits, the tick period -
 and Bridge-ASM700 passes them to `backend_create` unread: `backend.md`, *The backend owns its clock*.
 
-**An element's `settings` seed a component, and nothing more** - `config.md`, *An element's own
+**A module's `settings` seed a component, and nothing more** - `config.md`, *A module's own
 settings are a component*, for why that means there is no reconfigure entry here.
 
 ### Nothing here is a Bridge-ASM700 layout
 
-The two structs coming back out carry **resolved values**, never the shapes Bridge-ASM700 keeps
+The structs coming back out carry **resolved values**, never the shapes Bridge-ASM700 keeps
 internally. That is *Bridge-ASM700 parses nothing* pointing the other way: no formats in, no internal
 layouts out, and a host that can be replaced without touching the library.
 
-It is not a preference. The record an element writes into its ring - `log.md`, *The log* -
+It is not a preference. The record a module writes into its ring - `log.md`, *The log* -
 stores `text` as an offset into a wasm memory a host cannot address, `system` as a slot number, and
 no identity at all, since the ring it sits in is what says whose it is. Handed over as-is it would
 tell a host nothing it could print. Three of its fields have to be resolved, which is why these are

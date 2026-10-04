@@ -10,7 +10,7 @@ rather than a hunk and a zone**, since neither has a free; what idTech3 split be
 split by who can see it.
 
 The **scratch arena** is for anything transient: a message, a formatted number, a name assembled to
-be logged. Each element gets one in its own memory 2 at registration and bumps its own pointer, so
+be logged. Each module gets one in its own memory 2 at registration and bumps its own pointer, so
 allocating costs no crossing, and Bridge-ASM700 resets them all at each barrier.
 
 It is named for what it is rather than for a frame: its lifetime is a phase.
@@ -48,18 +48,18 @@ when it is stale - which the ECS frees.
                           old range is dead space for the rest of the run
 
 So **replacing a string is free and growing one is not**, which is the asymmetry to design around.
-An element that grows a string once a level will never notice. One that does it per frame exhausts
+A module that grows a string once a level will never notice. One that does it per frame exhausts
 the arena and fails by name, which under *It is never reclaimed* is fatal rather than wasteful.
 
-**Bridge-ASM700 reuses its own range.** An element's `[.config]` strings are allocated by
+**Bridge-ASM700 reuses its own range.** A module's `[.config]` strings are allocated by
 Bridge-ASM700 at init, and `init` runs again on every load - so a day of unload-and-load would leak
 one copy per cycle. That range has exactly one owner, Bridge-ASM700 itself, which is the property
-the next section's refusal turns on. So Bridge-ASM700 keeps each element's config-string range and
+the next section's refusal turns on. So Bridge-ASM700 keeps each module's config-string range and
 writes into it again rather than allocating afresh.
 
 ## It is never reclaimed
 
-**Nothing frees persistent-arena space while the process runs.** Not an element, not an unload, not
+**Nothing frees persistent-arena space while the process runs.** Not a module, not an unload, not
 a reload. One rule with no conditions on it: anything conditional here would make cleanup depend on
 something an author was not thinking about.
 
@@ -72,18 +72,18 @@ survival rules by field type is a surprise no diagnostic would explain.
 has them - `zone.c:444`, `common.c:1576`, flecs' `flecs_stack_restore_cursor`, Source's
 `FreeToAllocPoint` - and in all four **the region being reset has a single owner**, whether by
 geometry, by one instance per subsystem, or by one author sequencing it. Ours has one writer and
-many readers by design, since a string lives in a shared component another element reads under a
-grant. A reset would invalidate offsets held by elements that never asked - the reason there are no
+many readers by design, since a string lives in a shared component another module reads under a
+grant. A reset would invalidate offsets held by modules that never asked - the reason there are no
 immediate forms either: `abi.md`, *The ABI*.
 
 **What it costs, and it is a real cost.** The arena is a **process-lifetime high-water budget**, not
 a live-set one: a string overwritten and never read again is dead space, and so is everything an
-unloaded element allocated. **An unload-and-load cycle pays it for whatever the element allocates in
+unloaded module allocated. **An unload-and-load cycle pays it for whatever the module allocates in
 `init` itself** - config strings are Bridge-ASM700's and are reused, *Changing one, and the cost of
-growing*, but an element that builds its own name table at init builds another one every cycle. A
+growing*, but a module that builds its own name table at init builds another one every cycle. A
 reload does not pay it, since `init` does not run again.
 
-A deployment that churns elements indefinitely exhausts the arena, and `alloc` then fails fatally
+A deployment that churns modules indefinitely exhausts the arena, and `alloc` then fails fatally
 and by name, which is every other budget's discipline. Unbounded churn means restarting - which is
 what idTech3 did too, a level restart clearing the hunk.
 

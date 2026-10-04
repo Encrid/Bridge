@@ -50,7 +50,7 @@ item 15 was applied that way, steps 1 to 3 and then straight to the documents, f
 design rots: both drift, and neither is clearly wrong. Several ways to *store* data is useful; several
 schemas is not. When an option's appeal is "we keep ours and also use theirs", check whether ours still
 has a job - the schema format's only remaining job turned out to be one flecs' own macro did directly.
-This applies to the register too: an item that overlaps another is a bad cut, not two problems.
+This applies to open questions too: one that overlaps another is a bad cut, not two problems.
 
 **6. Weigh against named needs.** Fast, scalable, modular, extensible, minimal, **explicit**. Say
 which need decides. Check whether a cost lands on the hot path - that is the one budget this project
@@ -59,8 +59,8 @@ cannot spend, and it is what refused per-module page mapping.
 **Explicit is the one that gets forgotten**, and it is the one that costs most when it is. Nothing
 may behave differently from what the person reading it expected, which rules out more than it looks:
 a value clamped instead of refused, a capability downgraded instead of declined, a cleanup whose
-condition depends on what somebody else's element declared. Item 40 was decided wrong once for
-exactly that - the chosen option made an element's arena cleanup depend on whether another element
+condition depends on what somebody else's module declared. Item 40 was decided wrong once for
+exactly that - the chosen option made a module's arena cleanup depend on whether another module
 had happened to declare the same component.
 
 **7. Tailor rather than adopt.** Take placement from one reference and naming from another if
@@ -71,9 +71,13 @@ in-process.
 **8. Choose, and record what was refused.** A refusal with no condition attached reads
 identically to an oversight a year later. Write the condition that would change the answer.
 
-**9. Apply to the documents.** The decision goes in the document it belongs to, never in the
-register. The register holds open items only, or it becomes a second place to read the design
-and a second place for it to be wrong.
+**9. Apply to the documents.** The decision goes in the document it belongs to, never in a list of
+open questions. Such a list holds what is undecided and nothing else, or it becomes a second place
+to read the design and a second place for it to be wrong.
+
+**An open question waits in the plan of the phase it blocks** - `PHASEN.md`, in a section of its
+own - and the phase is not done while one stands. Phase 0 kept a single register for all of them; it
+was emptied and deleted when the phase closed, because a standing list outlives its questions.
 
 **10. Scan.** Every time, and in order - see below.
 
@@ -83,9 +87,9 @@ and the scan found both where thinking had not.
 
 ## What no script can do
 
-Steps 1 to 8 here, and steps 4 to 7 of the scan, are reading and judgement. The three scripts exist so
+Steps 1 to 8 here, and steps 4 to 7 of the scan, are reading and judgement. The three checks exist so
 that the **mechanical** checks are never what gets skipped - a count, a reference, a duplicated run, a
-ragged line. They cannot weigh an option, re-read an open item against a decision just made, or
+ragged line. They cannot weigh an option, re-read an open question against a decision just made, or
 notice that an edit left `"Create or Call a module"` behind.
 
 So the failure to watch for is not a missed grep. It is a decision that looks settled and was never
@@ -106,19 +110,19 @@ reading, in this order, because each one has caught something the one before it 
 
     python ../tools/xref.py
 
-Every `doc.md`, *Section* pointing at a heading that exists, and no "item N" left now that the
-register is gone. This has caught six references that resolved to nothing, every one in text written
-minutes earlier.
+Every `doc.md`, *Section* pointing at a heading that exists, and no "item N" left: the numbers
+belonged to phase 0's register, which is gone. This has caught six references that resolved to
+nothing, every one in text written minutes earlier.
 
-The item half used to be step 5, a grep per closed number, and it **had a permanent hole**: the
-number wraps onto the next line as often as not, so a line-at-a-time grep never saw `item` and `44`
-together. Two dangling references survived several clean scans that way.
+The script reads unwrapped text, because a citation wraps onto the next line as often as not and a
+line-at-a-time grep never sees its two halves together. Two dangling references survived several
+clean scans that way.
 
 **2. Duplication.**
 
     python ../tools/dup.py
 
-Read the hits rather than chasing the number down. A signature in both ABI documents is fine;
+Read the hits rather than chasing the number down. A signature in both binding documents is fine;
 a document re-arguing a conclusion that lives elsewhere is not.
 
 **3. Formatting.**
@@ -134,13 +138,13 @@ Fix the block, not the line. Rewrapping one long line pushes the overflow onto t
 "Eight regions" has been wrong twice, both times because a row was added and the sentence was
 not.
 
-**5. Every open item, re-read against the decision just made.** Some are sharpened, some
-absorb a case that would otherwise be a new item, some lose a sub-question. This is where most
-of the register's movement comes from - more than from closing things.
+**5. Every open question, re-read against the decision just made.** Some are sharpened, some
+absorb a case that would otherwise be a new one, some lose a sub-question. This is where most of the
+movement comes from - more than from closing things.
 
 **6. New questions the decision raises.** A decision that answers one thing usually asks
-another. Open it as an item rather than leaving it in the margin, and prefer sharpening an
-existing item to adding a number.
+another. Write it into the phase plan rather than leaving it in the margin, and prefer sharpening an
+existing question to adding one.
 
 **7. Read the sections the greps pointed at.** A grep finds a stale word, not mangled grammar.
 One edit left `"Create or Call a module; if something needs to"` behind, and no pattern would

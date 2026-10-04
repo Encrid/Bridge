@@ -1,10 +1,10 @@
 # Whose component it is
 
-A component name is namespaced - `mymod:Explosion`. **An element may always declare a component in
+A component name is namespaced - `mymod:Explosion`. **A module may always declare a component in
 its own namespace, and reaching another namespace's needs a grant from the deployment.** Refused at
 init, by name: one check per declaration and nothing per frame.
 
-    [element."mods:bigger-explosions"]
+    [module."mods:bigger-explosions"]
     write = ["game:Transform"]
     read  = ["game:Health"]
 
@@ -14,6 +14,6 @@ of that defaulting to every component in the deployment - which is what global i
 without it. A mod's own components need no config at all; touching the game needs one line, at the
 point where somebody should be asked.
 
-It composes with `schedule.md`, *Order within a phase is never implicit*: grant two elements write on
-`game:Transform` and their systems conflict, so Bridge-ASM700 refuses to start until the deployment orders
-them.
+It composes with `schedule.md`, *Order within a phase is never implicit*: grant two modules write on
+`game:Transform` and their systems conflict, so Bridge-ASM700 refuses to load the second until the
+deployment orders them.

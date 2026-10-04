@@ -1,26 +1,35 @@
 # Capabilities, so the swap is honest
 
 `backend_capabilities` is not decoration. A backend says what it can actually do, and these flags
-are the guarantees in `element.md`, *Three guarantees differ*, as a backend states them:
+are how it states the guarantees in `module.md`, *Three guarantees differ* - metering is three flags,
+`meter`, `deadline` and `limit`:
 
                    wasm   native
-    sandbox        yes    no      an element cannot reach memory it was not given
+    sandbox        yes    no      a module cannot reach memory it was not given
     meter          yes    no      fuel, or an equivalent
-    deadline       yes    no      a running element can be interrupted
+    deadline       yes    no      a running module can be interrupted
+    limit          yes    no      a module's own memory has a ceiling
     reload         yes    yes     an instance can be replaced while the process runs -
                                   cleanly on wasm, fragile on native
 
-`sandbox` is about the **host boundary and nothing else**. It does not mean one element cannot
+`sandbox` is about the **host boundary and nothing else**. It does not mean one module cannot
 corrupt another's components: they share a memory by design - see `costs.md`, *What we give up*.
 idTech3 drew the same line, `VMI_NATIVE` against `VMI_BYTECODE` per VM with a cvar each and shipped
 set to the safe one. It got isolation between its VMs only because the three had three blocks and
 shared no data.
 
-Each flag is demanded by a **config key**, not by an element: `sandbox` by `trusted = false`,
-`meter` by `fuel`, `deadline` by a timeout, `reload` by `hot_reload`. So a mismatch is not an
-element arguing with a backend - it is **config contradicting config**, since the deployment chose
-both. It is therefore one of Bridge-ASM700's own refusals and takes init's path under `on_error`, exactly
-as a denied grant or an ambiguous order does: `failure.md`, *When something fails*.
+Each flag is demanded by a **config key**, not by a module: `sandbox` by `trusted = false`,
+`meter` by `fuel`, `deadline` by a timeout, `limit` by `memory_limit`, `reload` by `hot_reload`. So
+a mismatch is not a module arguing with a backend - it is **config contradicting config**, since the
+deployment chose both. It is therefore one of Bridge-ASM700's own refusals and takes init's path
+under `on_error`, exactly as a denied grant or an ambiguous order does: `failure.md`, *When
+something fails*.
+
+**A key stated as "no limit" demands nothing.** `fuel`, a timeout and `memory_limit` each take `-1`
+for that, which is how a module on the native backend states them at all. It is the same move as
+`trusted = true`: the absence of a guarantee is written down by somebody rather than arrived at.
+Refused: letting zero mean "not applicable" on a backend that cannot meter, which would give one
+field two readings. `config.md`, *No unaccountable values*.
 
 ## Nothing is downgraded
 
@@ -37,5 +46,5 @@ The native backend answers no to `sandbox`, truthfully, and Bridge-ASM700 then r
 marked untrusted onto it, before the library is opened. That makes the native backend a deliberate
 choice for code you wrote rather than a hole you discover.
 
-Without this the surface would let a backend silently stop enforcing the guarantees the documents
-above promise, which is the failure worth designing out.
+Without this the surface would let a backend silently stop enforcing the guarantees these
+documents promise, which is the failure worth designing out.

@@ -1,22 +1,23 @@
 # Bridge-ASM700
 
-An orchestrator, written in C, that runs elements over shared ECS storage. The name is temporary:
+An orchestrator, written in C, that runs modules over shared ECS storage. The name is temporary:
 this replaces the original Bridge when it is ready.
 
 **It is its own design, not a rewrite.** The original Bridge is a reference here - cited where it
 gives a reason, as idTech3, flecs and Godot are - and never the specification.
 
-**Two build targets, because they are two concerns.** Bridge-ASM700 is a **library**. **IdeaTek** is the
-standalone binary over it, and a host with its own loop links the library and never ships IdeaTek.
+**Bridge-ASM700 is a library.** A host links it and owns `main`, the loop and every file. Hosts are
+separate projects, and none is part of this one.
 
-Three documents sit beside this one. `DESIGN.md` is why the shape is what it is and what it costs.
+Three documents go with this one. `DESIGN.md` is why the shape is what it is and what it costs.
 `PLAN.md` is the build order. `PHASE0.md` is how a decision gets made here at all, which is method
 rather than design.
 
 ## Three layers, three seams
 
-**The tree is the structure**, so the layers are directories rather than a diagram to keep in step
-with. One concern per document, in reading order:
+The three layers are a host, Bridge-ASM700 and the modules. A host is somebody else's project, so
+it has no directory here: only its seam does. **The tree is the structure** otherwise, rather than a
+diagram to keep in step with. One concern per document, in reading order:
 
     README.md            this file
     DESIGN.md            why, and what the design is
@@ -31,17 +32,13 @@ with. One concern per document, in reading order:
         PHASE0.md            how we decide things. method, not design
         PHASEN.md            one per phase, written before that phase starts
 
-    host/
-        ideatek.md           the binary: the loop, the flags, when to stop, its keys
-        config.md            the three config layers, and who owns which table
-        config-changes.md    coming from the original Bridge: what became of its keys
-
     seam/host-api/           host to Bridge-ASM700
         host-api.md          the surface and its structs
         create.md            bridge_create, and the sink
         loop.md              who advances, and who decides when it ends
         lifecycle.md         load, unload, reload
-        introspection.md     the one pull about elements
+        introspection.md     the one pull about modules
+        config.md            what Bridge-ASM700 requires of the values it is handed
 
     seam/backend/            Bridge-ASM700 to a backend
         backend.md           the fifteen entries, memory, the clock
@@ -70,37 +67,38 @@ with. One concern per document, in reading order:
 
     bridge/diagnostics/
         validation.md        what a bad write costs, and what finds it
-        log.md               the ring an element writes
+        log.md               the ring a module writes
         profile.md           per-system counters
 
-    elements/
-        element.md           what an element is: identity, the rules, the guarantees
+    modules/
+        module.md            what a module is: identity, the rules, the guarantees
         abi.md               the eight entries
         grants.md            whose component it is
-        pinned.md            one thread for one element
+        pinned.md            one thread for one module
         engine-callbacks.md  answering an engine from storage
-        schema.md            how an element declares its data
+        schema.md            how a module declares its data
 
-    elements/impl/           how an element binds, per backend
+    modules/impl/            how a module binds, per backend
         wasm.md              on the wasm backend
         native.md            on the native backend
 
-The seams are host to Bridge-ASM700, Bridge-ASM700 to a backend, and Bridge-ASM700 to elements. The
+The seams are host to Bridge-ASM700, Bridge-ASM700 to a backend, and Bridge-ASM700 to modules. The
 first two have a directory of their own under `seam/`: a separate build target sits on the far side,
-and filing the contract under either side would suggest that one owns it. The element seam is
-documented in `elements/`, beside what an element is.
+and filing the contract under either side would suggest that one owns it. The module seam is
+documented in `modules/`, beside what a module is.
 
-A backend is below the orchestrator rather than being a fourth layer: it has no elements and no
+A backend is below the orchestrator rather than being a fourth layer: it has no modules and no
 deployment, it runs code. The one thing it is configured with is its own - a cache directory, a tick
 period: `backend.md`, *The backend owns its clock*.
 
-**One header per seam**, so nothing compiles a declaration it cannot use:
+**A header per seam, and one more for the native binding**, so nothing compiles a declaration it
+cannot use:
 
     bridge.h          host seam: the functions and their structs
-    bridge-abi.h      element seam: the layouts both sides read with plain loads -
+    bridge-abi.h      module seam: the layouts both sides read with plain loads -
                       `wasm.md`, *The published layouts*
-    bridge-native.h   element seam, native backend only: `bridge_api` - a wasm
-                      element gets imports, not pointers
+    bridge-native.h   module seam, native backend only: `bridge_api` - a wasm
+                      module gets imports, not pointers
     bridge-backend.h  backend seam: the fifteen entries in `backend.md`
 
 **Prose cites a document by name, never by path** - `data.md`, not `bridge/data/data.md` - because a
@@ -108,5 +106,5 @@ reader wants the document and not its location, and `tools/xref.py` resolves the
 
 ## Where to start
 
-`DESIGN.md`, *Why*, is three paragraphs and explains the whole shape. Then `element.md` for what an
-element is, and `data.md` for what it works on. Everything else answers a question those raise.
+`DESIGN.md`, *Why*, is three paragraphs and explains the whole shape. Then `module.md` for what a
+module is, and `data.md` for what it works on. Everything else answers a question those raise.
