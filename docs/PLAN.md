@@ -106,6 +106,8 @@ lacks, before its library is opened.* Met; the `linux` preset is unrun.
 
 ## 5. Scheduling
 
+Done, on Windows. `PHASE5.md` is what it built and found.
+
 The conflict graph, and the refusal when two conflicting systems in one phase are left unordered.
 `[order]`. `observe`, with observers at the barrier, one hop
 per barrier, and the reserved names refused. Threads running non-overlapping writers, which the
@@ -114,7 +116,7 @@ declared sets give us, and `pinned` - `pinned.md`, *Threads*.
 *Done when a deployment orders two conflicting systems with `[order]` alone, an ambiguous pair is
 named instead of guessed, a component a native module sets runs a wasm module's observer at that
 same barrier, a three-deep observer chain settles in three barriers rather than hanging, and two
-modules provably run in parallel. And when every system of a pinned module reports one thread id.*
+modules provably run in parallel. And when every system of a pinned module reports one thread id.* Met; the `linux` preset is unrun.
 
 ## 6. Failure and lifecycle
 
