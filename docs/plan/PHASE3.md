@@ -1,6 +1,6 @@
 # Phase 3: storage
 
-Done, on Windows. The `linux` preset is written and has not been run.
+Done. The `linux` preset was first run after phase 5, and passed as written.
 
 The phase gave a module storage: the shared memory and its private one, the ABI entries that fill
 them, a phase that runs systems and the barrier after it. `PLAN.md` phase 3 is the claim.

@@ -1,6 +1,6 @@
 # Phase 5: scheduling
 
-Done, on Windows. The `linux` preset is written and has not been run.
+Done. The `linux` preset was first run after phase 5, and passed as written.
 
 The phase replaced "registration order, one at a time" with the schedule `schedule.md` describes: a
 conflict graph, `[order]`, observers at the barrier, threads, and `pinned`. `PLAN.md` phase 5 is
@@ -90,8 +90,8 @@ gives it.
 
 ## Closed after the phase
 
-Three things earlier phases had built without testing, or listed and not built, found by asking
-what "left" meant in a phase report.
+Four things earlier phases had built without testing, listed and not built, or never run, found by
+asking what "left" meant in a phase report.
 
 **The set and remove events, and observers that conflict across modules**, had no test. They have
 `events`, `obsconflict`, `obsorder` and `obsreorder` above.
@@ -106,6 +106,11 @@ declared type is named in flecs under its namespace - `schema.md`, *The type set
 Found on the way: flecs finishes an enum's layout in observers of its own, and what they queue is
 only applied when a deferral ends. `declare` had suspended deferral, which is not ending it, so an
 enum had no layout until the next barrier. It ends it now, for the length of the declaration.
+
+**Linux.** Five phases had been met on Windows alone. Every source was cross-compiled and linked
+for Linux with zig, clean under `-Wall -Wextra`; then `.github/workflows/linux.yml` ran the `linux`
+preset on a real one, and all sixty-three tests passed on the first run. It runs on every push now -
+`PLAN.md`, at its head.
 
 ## Shortcuts taken
 

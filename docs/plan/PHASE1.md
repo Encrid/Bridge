@@ -1,6 +1,6 @@
 # Phase 1: vendor and patch flecs
 
-Done, on Windows. The `linux` preset is written and has not been run.
+Done. The `linux` preset was first run after phase 5, and passed as written.
 
 This phase wrote no Bridge-ASM700. It produced **a flecs that allocates component columns and entity
 arrays from a block we hand it, and says so when a row moves**; a script that produces that flecs

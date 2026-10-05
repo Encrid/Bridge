@@ -1,7 +1,7 @@
 # Phase 2: one module runs
 
-Done, on Windows. The `linux` preset and the POSIX half of `src/os.c` are written and have not been
-run.
+Done. The `linux` preset and the POSIX half of `src/os.c` were first run after phase 5, and passed
+as written.
 
 The first Bridge-ASM700 code. It produced **the backend seam and the wasm backend behind it**, the
 part of the host seam needed to load one module through them, and the tests that show a module

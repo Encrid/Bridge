@@ -1,6 +1,6 @@
 # Phase 4: the native backend
 
-Done, on Windows. The `linux` preset is written and has not been run.
+Done. The `linux` preset was first run after phase 5, and passed as written.
 
 The second backend: a shared library that opens a module's library and calls it directly. What it
 is and why is `native.md` and `capabilities.md`. This document is what the phase built and what it

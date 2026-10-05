@@ -10,6 +10,10 @@ declared finished while broken.
 **No done-when names something a later phase builds.** A phase is tested with what exists when it
 ends, so each one carries the part of the host seam, the sink and the scheduler its own claim needs.
 
+**Met means on Windows and on Linux.** The `windows` preset is run where the code is written, and
+the `linux` preset by `.github/workflows/linux.yml` on every push. Phases 1 to 5 were first met on
+Windows alone and said so; the Linux run caught up with them after phase 5, and passed as written.
+
 ## 0. Documents, and the spikes they need
 
 Done. The design documents `README.md` lists were written, the register of open items was emptied
@@ -24,7 +28,7 @@ confined*, and *flecs will not tell you which*.
 
 ## 1. Vendor and patch flecs
 
-Done, on Windows. flecs v4.1.6, vendored pristine as the amalgamation and patched by a script: the
+Done. flecs v4.1.6, vendored pristine as the amalgamation and patched by a script: the
 allocator argument at the twenty-three calls that allocate a column or an entity array, and one
 row-move hook - `flecs.md`, *It can be confined*, *flecs will not tell you which*, and *How it is
 carried* for the shape. The build is CMake with Ninja presets, and it starts in this phase.
@@ -35,11 +39,11 @@ and the mirror cannot be correct without the hook.
 
 *Done when ctest's confinement test fails if one pointer escapes the block, its row-move test fails
 if one moved record goes unreported, and the patch script declines a flecs version it was not
-written for.* Met; the `linux` preset is unrun.
+written for.* Met.
 
 ## 2. One module runs
 
-Done, on Windows. `PHASE2.md` is what it built and found.
+Done. `PHASE2.md` is what it built and found.
 
 `bridge-backend.h` with all sixteen entries, and the wasm backend as a shared library behind it,
 which Bridge-ASM700 opens by the name config gives - `backend.md`, *What a backend is asked for*. A core
@@ -60,12 +64,12 @@ init timeout - `limits.md`, *What bounds a run*.
 *Done when the host reads the bytes a module wrote to the shared memory; an out-of-bounds access, a runaway
 loop and growth past the limit each return an error with the process alive; and an export whose
 shape is not `() -> i32`, a wrong ABI version, a backend that cannot be
-opened and a null sink are each refused with a record naming the cause.* Met; the `linux` preset is
-unrun, and the shared memory is read by a test of the backend alone, since storage is phase 3's.
+opened and a null sink are each refused with a record naming the cause.* Met; the shared memory is
+read by a test of the backend alone, since storage is phase 3's.
 
 ## 3. Storage
 
-Done, on Windows. `PHASE3.md` is what it built and found.
+Done. `PHASE3.md` is what it built and found.
 
 The shared memory's three regions and each module's private memory: the header, the spans,
 `column_base`, the scratch arena and the log ring - `memory.md`, *Where the seven regions live*.
@@ -88,11 +92,11 @@ against a build without it* - `validation.md`, *Always on*, states that cost as 
 is where it becomes a measurement. *And when a fingerprint mismatch, an ungranted declare and a
 wildcard term are each refused by name; a system that never returns is stopped by its fuel; a
 `spawn` past the entity ceiling fails where it happens; a log line reaches the sink; and an
-overflowing ring reports how many it dropped.* Met; the `linux` preset is unrun.
+overflowing ring reports how many it dropped.* Met.
 
 ## 4. The native backend
 
-Done, on Windows. `PHASE4.md` is what it built and found.
+Done. `PHASE4.md` is what it built and found.
 
 The second backend: a shared library that opens a module's library and calls it directly -
 `native.md`. `bridge-native.h`, `bridge_bind`, and exports found by name as `bridge_<name>`. Nothing
@@ -102,11 +106,11 @@ the same spans through `private` and `shared`, and its log ring is reached throu
 *Done when a native module iterates a component array through a raw pointer; a native system and a
 wasm system run in the same phase with the scheduler unable to tell; and a module that
 sets `trusted = false` or any limit is refused on the native backend, by the capability it
-lacks, before its library is opened.* Met; the `linux` preset is unrun.
+lacks, before its library is opened.* Met.
 
 ## 5. Scheduling
 
-Done, on Windows. `PHASE5.md` is what it built and found.
+Done. `PHASE5.md` is what it built and found.
 
 The conflict graph, and the refusal when two conflicting systems in one phase are left unordered.
 `[order]`. `observe`, with observers at the barrier, one hop
@@ -117,7 +121,7 @@ declared sets give us, and `pinned` - `pinned.md`, *Threads*.
 named instead of guessed, a component a native module sets runs a wasm module's observer at that
 same barrier, a three-deep observer chain settles in three barriers rather than hanging, and two
 modules provably run in parallel. And when every system of a pinned module reports one thread id.*
-Met; the `linux` preset is unrun.
+Met.
 
 ## 6. Failure and lifecycle
 
