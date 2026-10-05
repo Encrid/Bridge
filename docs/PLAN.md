@@ -145,7 +145,7 @@ the module never declared is an error naming it.* Met.
 
 Done. One compiler and one script. zig compiles everything on every platform, and `build.py` does what
 CMake did: patches flecs, compiles, links, builds the test modules and runs the tests - `build.md`,
-*One compiler* and *One script*. Windows becomes `x86_64-windows-gnu`, and until phase 10 it links
+*One compiler* and *One script*. Windows becomes `x86_64-windows-gnu`, and until phase 11 it links
 the C runtime zig carries.
 
 **Nothing about the library changes**, which is the claim: the same tests, saying the same things,
@@ -185,12 +185,33 @@ states is asserted in the header that states it; a stated size that overflows is
 key; the row loop is the same code and reads the same; and every test passes on Windows, Linux
 and macOS.* Met.
 
-## 10. Self contained
+## 10. Storage of our own
+
+flecs leaves, and what Bridge-ASM700 used it for becomes its own: the entity index, tables and
+their columns, moving a row between them, matching a system's terms to tables, the events an
+observer hears, and reading a struct's fields out of its text. It is the reversal of a decision
+this plan began with, and `PHASE10.md` is why.
+
+**flecs was never on the path that repeats.** A system reads its columns through the spans
+Bridge-ASM700 publishes, and no row loop calls flecs. What flecs did, it did at a barrier and at
+load. Scheduling, deferral, threads, the entity mirror and where memory sits were ours already. So
+what is replaced is a hundred thousand lines kept for forty-one calls.
+
+**Nothing of flecs is deleted until numbers say it may be.** flecs is measured first, as it is.
+Ours is built beside it, behind one internal header, and both run the same cases. flecs goes only
+when ours passes all of them and is not slower on any measured operation. If it is, flecs stays
+and this phase has failed its claim.
+
+*Done when every case passes on storage that is Bridge-ASM700's own, on Windows, Linux and macOS,
+alone and under load; on every measured operation it is not slower than flecs was, with both sets
+of figures recorded; no line of flecs is left in the tree; and the behaviours no test covered
+before this phase each have one.*
+
+## 11. Self contained
 
 Nothing fetched and nothing installed but the toolchain - `build.md`, *Self contained*. The parts
 of a C library that can be carried are carried: the routines our source and flecs call, and an
-allocator, in `third_party` and linked privately - `build.md`, *The C library*. flecs is built with
-the addons Bridge-ASM700 uses and no others, which is most of what shrinks that list. On Windows no
+allocator, in `third_party` and linked privately - `build.md`, *The C library*. On Windows no
 C runtime is linked at all. Where each routine comes from, and what "in the tree" means for the
 tools the build runs, are settled in this phase's own plan, with the sources read first.
 
@@ -198,7 +219,7 @@ tools the build runs, are settled in this phase's own plan, with the sources rea
 system's libraries and wasmtime and nothing else; the build fetches nothing; one formatted record
 is the same bytes on every platform; and every test passes.*
 
-## 11. A host, from outside
+## 12. A host, from outside
 
 A standalone host, built in its own repository against the library and nothing else, which is what
 tests the host seam: if it needs no part of Bridge-ASM700's inside, the seam is real. It has this
@@ -211,7 +232,7 @@ and reports one that failed to load; a key it left unset is an error naming the 
 `bridge_manifest_parse` reads an identity out of a wasm binary and out of a native library in each
 of the three platforms' formats.*
 
-## 12. Diagnostics
+## 13. Diagnostics
 
 `[checks] validate` and `[checks] profile` - the barrier's checksum pass and the per-system
 counters - and `bridge_profile`, a pull. `validation.md`, *The checksum pass, when asked*, and
@@ -221,7 +242,7 @@ counters - and `bridge_profile`, a pull. `validation.md`, *The checksum pass, wh
 purpose is the one the profile names, and an observer cycle shows as call counts that never fall to
 zero.*
 
-## 13. Tests, by capability
+## 14. Tests, by capability
 
 Every test so far was written to meet one phase's claim, and is named for the phase: `phase2`
 to `phase6`. That says when a thing was built and not what is covered. This phase turns the
@@ -242,7 +263,7 @@ one that has none; no case is named for a phase; every case passes on Windows, L
 alone and with several copies running at once; and the standalone host's capabilities are covered
 the same way in its own repository.*
 
-## 14. Prove it
+## 15. Prove it
 
 Port the original Bridge's Godot adapter to this design, as a native module. It is a real workload
 with a measured baseline, which is why it is the proof. Its probe asserts 191 checks, and two of

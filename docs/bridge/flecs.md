@@ -23,6 +23,11 @@ which is a copy or a call per access - the cost we are here to remove.
 
 ## Why flecs rather than our own
 
+**This is the decision `PLAN.md` phase 10 reverses**, and what follows is the reasoning it was
+made on. `PHASE10.md` is what changed: flecs turned out not to be on the path that repeats, and
+to cost a hundred thousand lines and fifty C library functions for forty-one calls. This document
+describes flecs as it is carried until that phase's gate is passed.
+
 The model we reasoned out from scratch turned out to be flecs' model, term for term: components
 stored by type, entities as ids carrying a generation, access modes declared for scheduling,
 structural change deferred to a merge point, pipeline phases. Writing our own would have produced a

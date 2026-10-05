@@ -12,7 +12,7 @@ first: the build. `PLAN.md` phase 7 is the claim.
 Each by every step of `PHASE0.md`, one at a time. Most belong to later phases and are recorded
 here because this is where they were asked.
 
-    how a host gets the library   as a submodule, built by `build.py`: `PLAN.md` phase 11
+    how a host gets the library   as a submodule, built by `build.py`: `PLAN.md` phase 12
     the manifest's section        `.bridge`, on every format: `native.md`, *Identity*
     macOS                         a platform, arm64: `build.md`, *Platforms*
     the standard                  C99, for everything. Withdrawn in phase 9: `PHASE9.md`
@@ -47,7 +47,7 @@ Nothing in `src/`, `backends/` or `include/` changed for it. One line of `src/st
 function of `src/os.c` did for what it found, below. They are still compiled as C11, since C99
 needs the changes that are phase 9.
 
-On Windows the target is `x86_64-windows-gnu` with the C runtime zig carries, which phase 10 takes
+On Windows the target is `x86_64-windows-gnu` with the C runtime zig carries, which phase 11 takes
 away, and the vendored wasmtime is the one built for that target:
 `third_party/wasmtime/README.md`.
 
@@ -105,5 +105,5 @@ Each is a later phase's claim in `PLAN.md`, not something left behind this one.
 
     macOS                             phase 8
     the standard                      phase 9
-    no C runtime on Windows; nothing  phase 10
+    no C runtime on Windows; nothing  phase 11
       fetched; the C routines carried

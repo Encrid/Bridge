@@ -4,7 +4,7 @@ What Bridge-ASM700 is compiled with, for what, in which C, and against which C l
 is the design of the library. All of it decides whether the library can be built the same way on
 three systems by somebody who installed two tools.
 
-`PLAN.md` phases 7 to 10 build what this file states, one part each, and say which. Until a phase
+`PLAN.md` phases 7 to 11 build what this file states, one part each, and say which. Until a phase
 is done, its part here is the decision and not yet the tree.
 
 ## One compiler
@@ -40,7 +40,7 @@ CMake's work was to find and drive three compilers. With one compiler that takes
 argument, what is left is running commands in order, and `tools/` was Python already.
 
 It takes every path from where it is and from the output directory it is given, so that a host
-with this repository as a submodule builds it by calling the same script - `PLAN.md` phase 11.
+with this repository as a submodule builds it by calling the same script - `PLAN.md` phase 12.
 
 What this gives up: the rebuild check, the parallelism and the choice of tests are ours to get
 right, and an editor that reads CMake finds nothing to read. Refused: `build.zig`, which has the
@@ -125,7 +125,7 @@ compiler without C23.
 **Thread-local storage stays.** Three variables are found by which thread is running: the bridge
 flecs' allocator is working for, the native module whose entry was called, the memory wasmtime is
 being asked to create. Each is there because a callback Bridge-ASM700 does not own carries no
-context. Phase 10 has one thing to verify about them: on Windows the compiler reaches a
+context. Phase 11 has one thing to verify about them: on Windows the compiler reaches a
 thread-local variable through a runtime helper, and that phase links no C runtime.
 
 ## The C library
@@ -162,7 +162,7 @@ platform, where three C runtimes formatted three ways.
 
 **Nothing is fetched, and nothing is installed but zig and Python.** What Bridge-ASM700 depends on
 is in the tree, with where it came from and its hash beside it: flecs and wasmtime today, the C
-routines and the tools the build runs from phase 10.
+routines and the tools the build runs from phase 11.
 
 Third-party code is not refused. Code that arrives from somewhere the tree does not record is.
 That includes a C library: it has to be installed like anything else, so it counts.
