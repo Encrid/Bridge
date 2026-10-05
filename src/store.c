@@ -329,7 +329,9 @@ int store_refill(bridge *b, module *m)
         m->ids = realloc(m->ids, want * sizeof *m->ids);
         m->id_room = want;
     }
-    memmove(m->ids, m->ids + m->id_next, kept * sizeof *m->ids);
+    /* nothing used since the last barrier is nothing to move: the block is as long as its
+     * `spawns`, and moving it onto itself was most of a quiet barrier's cost */
+    if (m->id_next) memmove(m->ids, m->ids + m->id_next, kept * sizeof *m->ids);
     m->id_next = 0;
     m->id_count = kept;
     m->ids_short = 0;

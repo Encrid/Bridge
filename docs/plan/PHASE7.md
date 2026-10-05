@@ -79,11 +79,15 @@ is easy to never see. Our own code is compiled with warnings as errors. It had t
 an initializer that leaves members out, in the tests and in flecs' own descriptor idiom. C makes
 those members zero, and that one warning is off.
 
-**The row loop reads 0.43 ns where it read 0.41 on the same day under `cl`**, and both read more
-than the 0.39 the documents had. `validation.md`, *Always on*, and `limits.md`, *What a bound
-costs*, now carry what this build measures. The difference is in the host's own code and not in
-wasmtime's library: the new host measures the same against either build of it. Compiling at a
-higher optimisation level does not move it.
+**A quiet barrier was moving 1.6 MB onto itself.** The row loop read 0.43 ns a row where it read
+0.41 on the same day under `cl`, and the difference was not in the loop. Swapping the backend and
+wasmtime's library between the two builds moved nothing, so it was the host's own code; timing a
+phase over one row showed a fixed cost per phase; and timers around the barrier's parts put all of
+it in `store_refill`. That moved the ids a module had not used to the front of its block, and when
+it had used none the move was the whole block onto itself: eight bytes times its `spawns`, at
+every barrier. The two C runtimes' `memmove` differ in speed, which is all the two builds
+disagreed about. With nothing used, nothing is moved now: a barrier of that test went from 5.2
+microseconds under `cl` and 7.7 under zig to 0.6 under both, and both read 0.39 ns a row.
 
 wasmtime's `mingw` library linked and loaded at the first attempt, which was the one thing that
 could have sent the Windows target back to be asked again. Nothing trapped in a debug build.
