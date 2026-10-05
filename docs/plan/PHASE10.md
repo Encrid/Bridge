@@ -395,3 +395,74 @@ all the rows arriving takes as many as fit, found by halving what it asks for.
 storage of our own: nothing a module can ask for finds a term on another entity. A span is count,
 entities and a base for each term - `query.md`, *The interface is a query*. No version moved for
 it: nothing outside this tree is built against the layout yet.
+
+## The repair
+
+What the section above began became a track of its own. A full reading of the documents and of
+the three public headers, line by line, found the same error in earlier phases: decisions that
+were called forced and never weighed, things kept because something else had them, statements
+no longer true, refusals with no condition. This is the list, and it is closed in this order.
+A line is open until the commit that closes it is named beside it.
+
+**Closed**
+
+    strip at unload                    a table at a time, in place or joined      d36e0a8
+    what storage allocates             [budget] types, systems; none after create 7d09844
+    source[] in a span                 removed                                    657a687
+    what an observer is told           the net change of a barrier                4f41c57
+    the schema macros' names           BRIDGE_SCHEMA_STRUCT, _ENUM, _BITMASK      7e2189f
+    the log levels' numbers            syslog's                                   575f3bd
+    terms a query                      [budget] terms                             81c347d
+    bridge_budget                      counts then bytes; modules                 34e20cd
+
+**1. `PLAN.md`, *Not in this plan***: ten things "refused or deferred", not said which. Each is
+read in its document and becomes a phase, a refusal with its condition, or nothing.
+
+    open    the journal, record and replay
+    open    a default phase set
+    open    bridge:clock@1 and its kind
+    open    per-component page mapping
+    open    a phase exclusivity flag
+    open    memory high-water per module
+    open    an instance-grouping entry
+    open    arena mark and reset
+    open    layout migration
+    open    bindings for a non-C module
+
+**2. Statements that are false now**: one commit, no decision.
+
+    open    "at every barrier", "compacted or migrated", "archetype order", and the rest
+
+**3. Decided without the steps, or inherited**: one at a time.
+
+    open    the native ABI held to the wasm one: offsets, a thread-local, no argument to init
+    open    a pinned module runs on the thread that calls bridge_phase
+    open    BRIDGE_OR and BRIDGE_WILDCARD, which exist to be refused
+    open    BRIDGE_IN, BRIDGE_OUT, BRIDGE_INOUT, of which the scheduler reads one bit
+    open    a setting defined twice, and differently, for a host and for a backend
+    open    `terms` in a module's header, which is not [budget] terms
+    open    three events, now that an observer is told the net change
+    open    BRIDGE_NO_LIMIT and BRIDGE_NONE, one value
+    open    the reserved fields, and the widths of the enums
+    open    a signature the native backend cannot check
+    open    a memory handle kept for a backend that does not exist
+    open    why an enum is four bytes
+    open    a reload counting both instances toward [budget] systems
+    open    numbers with no reason: the grain, the doubling, the first four rows, two arguments
+    open    "change a layout, bump the version", before anything is released
+
+**4. Refusals with no condition**: each with its subject above, and the rest in one pass.
+
+    open    about twenty, in thirteen documents
+
+**5. Found while building**
+
+    open    which entities are placed when columns run short
+    open    a test that a barrier allocates nothing
+    open    an allocation that fails at load
+    open    a log_level nobody stated
+    open    the schema macros defined twice
+    open    the log levels named twice
+
+**6. Close**: both sets of figures measured again side by side, `PLAN.md` phase 10 marked done
+by its done-when as first written, and every line above closed.
