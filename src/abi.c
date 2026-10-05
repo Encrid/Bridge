@@ -145,13 +145,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
 
         /* A field's type is a bare C name, and flecs looks it up from the scope it is in. So
          * a declared type is named in flecs under its namespace, and a descriptor is parsed
-         * from inside that namespace: `Vec3` in game:Body is game:Vec3 - schema.md.
-         *
-         * Deferral is ended for this, not suspended: flecs finishes a type in observers of
-         * its own, and what those queue is only applied when a deferral ends. Suspended, an
-         * enum would have no layout until the next barrier. Ending it applies what this
-         * module's init has queued so far, a barrier early and before anything can read it. */
-        ecs_defer_end(b->world);
+         * from inside that namespace: `Vec3` in game:Body is game:Vec3 - schema.md. */
         *bare = 0;
         scope = ecs_entity(b->world, { .name = name, .parent = b->names });
         *bare = ':';
@@ -181,10 +175,8 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
                     layout->alignment);
             }
             if (id) ecs_delete(b->world, id);
-            ecs_defer_begin(b->world);
             return 1;
         }
-        ecs_defer_begin(b->world);
 
         c = calloc(1, sizeof *c);
         c->name = copy(name, strlen(name));
@@ -205,6 +197,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     }
     m->declared = realloc(m->declared, (m->declared_count + 1) * sizeof *m->declared);
     m->declared[m->declared_count] = c;
+    c->declarers ++;
     b->layout_moved = 1;
     r[0] = m->declared_count ++;
     return 0;
@@ -305,7 +298,6 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         s->writes[i] = t.access != BRIDGE_IN;
     }
 
-    ecs_defer_suspend(b->world);
     if (events) {
         ecs_observer_desc_t od = {0};
         uint32_t k = 0;
@@ -326,7 +318,6 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
             s->query = NULL;
         }
     }
-    ecs_defer_resume(b->world);
     if (events ? !s->observing : count && !s->query) {
         free(s);
         return refuse(m, "%s '%s' asks for something flecs refuses, or a term with no "
@@ -385,32 +376,50 @@ static int abi_observe(void *ud, const uint64_t *a, uint64_t *r)
     return subscribe(m, a[0], a[1], m->b->phase_count, (uint32_t)a[2], a[3], a[4], r);
 }
 
+/* Nothing below touches flecs. Modules run at once, and what one asks for must not depend on
+ * who ran beside it - schedule.md, *What a pass depends on*. So an id comes from a block set
+ * aside for the module, arena space from its own share, and a change goes on its own queue,
+ * which the barrier applies in an order that never varies. No lock: a module's systems are
+ * serialised, so each of the three has one writer. */
+
+static void queue(module *m, uint32_t op, ecs_entity_t id, component *c, const void *value)
+{
+    change ch = { id, c, value ? c->size : 0, op };
+    uint32_t need = (uint32_t)sizeof ch + ((ch.size + 7u) & ~7u);
+    if (m->queue_len + need > m->queue_room) {
+        m->queue_room = (m->queue_room + need) * 2;
+        m->queue = realloc(m->queue, m->queue_room);
+    }
+    memcpy(m->queue + m->queue_len, &ch, sizeof ch);
+    /* the value is copied now: the scratch arena it is in is reset before it is applied */
+    if (value) memcpy(m->queue + m->queue_len + sizeof ch, value, ch.size);
+    m->queue_len += need;
+}
+
 /* spawn() -> id */
 static int abi_spawn(void *ud, const uint64_t *a, uint64_t *r)
 {
     module *m = ud;
-    bridge *b = m->b;
-    ecs_entity_t e = ecs_new(b->world);
     (void)a;
-    /* the index is twelve bytes times the highest id, and that is what was budgeted */
-    if ((uint32_t)e >= b->entities) {
-        ecs_delete(b->world, e);
-        return refuse(m, "spawn: [budget] entities of %u is reached", b->entities);
+    if (m->id_next == m->id_count) {
+        if (m->spawns <= 0) return refuse(m, "spawn: it stated that it spawns nothing");
+        if (m->ids_short) {
+            /* the index is twelve bytes times the highest id, and that is what was budgeted */
+            return refuse(m, "spawn: [budget] entities of %u is reached", m->b->entities);
+        }
+        return refuse(m, "spawn: its spawns of %lld between two barriers are used up",
+            (long long)m->spawns);
     }
-    store_touch(b, e);
-    r[0] = e;
+    r[0] = m->ids[m->id_next ++];
     return 0;
 }
 
-/* destroy(id). An id that has already died is nobody's mistake: two modules may both want it gone. */
+/* destroy(id). An id that has already died is nobody's mistake: two modules may both want it
+ * gone, and which of them is told at the barrier, where it is looked at. */
 static int abi_destroy(void *ud, const uint64_t *a, uint64_t *r)
 {
-    module *m = ud;
     (void)r;
-    if (a[0] && ecs_is_alive(m->b->world, a[0])) {
-        ecs_delete(m->b->world, a[0]);
-        store_touch(m->b, a[0]);
-    }
+    queue(ud, CHANGE_DESTROY, a[0], NULL, NULL);
     return 0;
 }
 
@@ -441,10 +450,7 @@ static int abi_attach(void *ud, const uint64_t *a, uint64_t *r)
             (unsigned long long)a[3], c->size);
     }
     if (!value) return refuse(m, "attach: the value lies outside the scratch arena");
-    if (a[0] && ecs_is_alive(m->b->world, a[0])) {
-        ecs_set_id(m->b->world, a[0], c->id, c->size, value);
-        store_touch(m->b, a[0]);
-    }
+    queue(m, CHANGE_ATTACH, a[0], c, value);
     return 0;
 }
 
@@ -455,10 +461,7 @@ static int abi_detach(void *ud, const uint64_t *a, uint64_t *r)
     component *c = written(m, a[1], "detach");
     (void)r;
     if (!c) return 1;
-    if (a[0] && ecs_is_alive(m->b->world, a[0])) {
-        ecs_remove_id(m->b->world, a[0], c->id);
-        store_touch(m->b, a[0]);
-    }
+    queue(m, CHANGE_DETACH, a[0], c, NULL);
     return 0;
 }
 
@@ -466,32 +469,18 @@ static int abi_detach(void *ud, const uint64_t *a, uint64_t *r)
 static int abi_alloc(void *ud, const uint64_t *a, uint64_t *r)
 {
     module *m = ud;
-    bridge *b = m->b;
     uint64_t len = (a[0] + 7u) & ~7ull;
-    if (len > b->arena_len - b->arena_used) {
-        return refuse(m, "alloc: [budget] persistent of %u bytes is exhausted", b->arena_len);
+    if (m->persistent <= 0) {
+        return refuse(m, "alloc: it stated that it keeps nothing in the persistent arena");
     }
-    r[0] = b->arena + b->arena_used;
-    b->arena_used += (uint32_t)len;
+    if (len > m->arena_left) {
+        return refuse(m, "alloc: its persistent of %lld bytes is exhausted", (long long)m->persistent);
+    }
+    r[0] = m->arena_at;
+    m->arena_at += (uint32_t)len;
+    m->arena_left -= (uint32_t)len;
     return 0;
 }
-
-/* ponytail: one lock around every entry. flecs' world and the arena are not safe from two
- * threads, and an entry is not the hot path - reading and writing components is, and that is
- * no call. Entries of different modules serialise; flecs' stages are what lifts that. */
-#define LOCKED(name) \
-    static int locked_##name(void *ud, const uint64_t *a, uint64_t *r) \
-    { \
-        module *m = ud; \
-        int refused; \
-        os_mutex_lock(m->b->entries); \
-        store_enter(m->b);          /* an entry may be the first thing a worker does for it */ \
-        refused = abi_##name(ud, a, r); \
-        os_mutex_unlock(m->b->entries); \
-        return refused; \
-    }
-LOCKED(declare) LOCKED(system) LOCKED(observe) LOCKED(spawn)
-LOCKED(destroy) LOCKED(attach) LOCKED(detach) LOCKED(alloc)
 
 int abi_define(module *m, backend_err *err)
 {
@@ -504,14 +493,14 @@ int abi_define(module *m, backend_err *err)
         uint8_t     results[1];
         uint32_t    result_count;
     } entries[] = {
-        { "declare", locked_declare, { I, I, I, I, I, I, I, I }, 8, { I }, 1 },
-        { "system",  locked_system,  { I, I, I, I, I, I },    6, { I }, 1 },
-        { "observe", locked_observe, { I, I, I, I, I },       5, { I }, 1 },
-        { "spawn",   locked_spawn,   { 0 },                   0, { L }, 1 },
-        { "destroy", locked_destroy, { L },                   1, { 0 }, 0 },
-        { "attach",  locked_attach,  { L, I, I, I },          4, { 0 }, 0 },
-        { "detach",  locked_detach,  { L, I },                2, { 0 }, 0 },
-        { "alloc",   locked_alloc,   { I },                   1, { I }, 1 },
+        { "declare", abi_declare, { I, I, I, I, I, I, I, I }, 8, { I }, 1 },
+        { "system",  abi_system,  { I, I, I, I, I, I },    6, { I }, 1 },
+        { "observe", abi_observe, { I, I, I, I, I },       5, { I }, 1 },
+        { "spawn",   abi_spawn,   { 0 },                   0, { L }, 1 },
+        { "destroy", abi_destroy, { L },                   1, { 0 }, 0 },
+        { "attach",  abi_attach,  { L, I, I, I },          4, { 0 }, 0 },
+        { "detach",  abi_detach,  { L, I },                2, { 0 }, 0 },
+        { "alloc",   abi_alloc,   { I },                   1, { I }, 1 },
     };
     size_t i;
     for (i = 0; i < sizeof entries / sizeof *entries; i ++) {

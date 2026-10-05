@@ -30,10 +30,19 @@ static uint32_t threads_seen[64], seen, pins, pins_here;
 /* two bridges, one sink: each says which it is, and its last sum is kept */
 static uint32_t last_sum[2];
 
+/* the ids a run's modules were given, in the order the records arrived */
+static uint32_t minted[3][256], minted_count[3];
+static int minting = -1;
+
 static void sink(void *ud, const bridge_record *r)
 {
     if (ud) {
         if (r->len == 3 && !memcmp(r->text, "sum", 3)) last_sum[*(int *)ud] = r->arg[0];
+        return;
+    }
+    if (minting >= 0 && r->len == 3 && !memcmp(r->text, "ids", 3)) {
+        uint32_t *n = &minted_count[minting];
+        if (*n + 2 <= 256) { minted[minting][(*n) ++] = r->arg[0]; minted[minting][(*n) ++] = r->arg[1]; }
         return;
     }
     if (r->len == 3 && !memcmp(r->text, "pin", 3)) {
@@ -73,6 +82,8 @@ static bridge_artifact native(const char *identity, const char *path)
     a.cfg.scratch = 64 << 10;
     a.cfg.log_ring = 64 * 24;
     a.cfg.spans = 16 << 10;
+    a.cfg.spawns = BRIDGE_NONE;
+    a.cfg.persistent = BRIDGE_NONE;
     a.backend = "native";
     a.path = path;
     return a;
@@ -102,6 +113,10 @@ static bridge_artifact wasm(const char *identity, const char *file)
     a.cfg.fuel = 10000000;
     a.cfg.memory_limit = 16 << 20;
     a.cfg.init_timeout = 2000 * MS;
+    /* what each test module mints between two barriers: most mint nothing, and say so */
+    a.cfg.spawns = !strcmp(file, "mover") ? 1024
+                 : !strcmp(file, "twostep") || !strcmp(file, "chain") || !strcmp(file, "events")
+                   || !strcmp(file, "nested") || !strcmp(file, "nested2") ? 8 : BRIDGE_NONE;
     return a;
 }
 
@@ -211,6 +226,36 @@ int main(int argc, char **argv)
     if (!strcmp(what, "hop")) cfg.threads = 4;
     if (!strcmp(what, "nothreads")) cfg.threads = 0;
 
+    if (!strcmp(what, "minted")) {
+        /* Two modules spawn in one level. On one thread, then twice on four: the ids each
+         * is given are the same all three times, because they were set aside for it at the
+         * barrier and not taken in whatever order the threads arrived. */
+        static const uint32_t threads[3] = { 1, 4, 4 };
+        int run;
+        for (run = 0; run < 3; run ++) {
+            int f;
+            cfg.threads = threads[run];
+            b = bridge_create(&cfg, sink, NULL);
+            if (!b) { printf("bridge_create refused\n"); return 0; }
+            minting = run;
+            a = wasm("test:spawn1@0.1.0", "spawner");
+            a.cfg.spawns = 16;
+            bridge_load(b, &a);
+            a = wasm("test:spawn2@0.1.0", "spawner");
+            a.cfg.spawns = 16;
+            bridge_load(b, &a);
+            for (f = 0; f < 20; f ++) bridge_phase(b, "update");
+            bridge_destroy(b);
+        }
+        printf("minted %u ids a run; on four threads %s, and again %s\n", minted_count[0],
+            minted_count[0] == minted_count[1]
+                && !memcmp(minted[0], minted[1], sizeof minted[0]) ? "the same" : "DIFFERENT",
+            minted_count[0] == minted_count[2]
+                && !memcmp(minted[0], minted[2], sizeof minted[0]) ? "the same" : "DIFFERENT");
+        printf("alive\n");
+        return 0;
+    }
+
     if (!strcmp(what, "two")) {
         /* two bridges in one process, each with its own storage, running at once on two
          * threads. The same modules in both, a different number of frames in each: the
@@ -274,6 +319,7 @@ int main(int argc, char **argv)
         frames(b, 1);
     } else if (!strcmp(what, "observe")) {      /* a native attach, a wasm observer */
         a = native("game:setter@0.1.0", NSETTER_PATH);
+        a.cfg.spawns = 8;
         load(b, &a);
         a = wasm("view:watcher@0.1.0", "watcher");
         a.cfg.read = game;
@@ -285,6 +331,7 @@ int main(int argc, char **argv)
         /* two observers of one change, in two modules, one of them writing what the other
          * reads: the barrier is a phase like any other to the conflict graph */
         a = native("game:setter@0.1.0", NSETTER_PATH);
+        a.cfg.spawns = 8;
         load(b, &a);
         a = wasm("view:watcher@0.1.0", "watcher");
         a.cfg.read = game;

@@ -49,9 +49,8 @@ static void free_list_of(char **list, uint32_t count)
     free(list);
 }
 
-/* Take a module out: its systems, its instance, its image, its private memory. The order is
- * the backend seam's: a memory is released after the last instance it was handed to. */
-static void discard(bridge *b, module *m)
+/* A module's systems and observers, out of the schedule and out of flecs. */
+static void drop_systems(bridge *b, module *m)
 {
     uint32_t i, kept = 0;
     for (i = 0; i < b->system_count; i ++) {
@@ -61,24 +60,56 @@ static void discard(bridge *b, module *m)
             continue;
         }
         if (s->query) ecs_query_fini(s->query);
-        if (s->observing) {
-            /* at once, not queued: its callback must not be reached after `s` is gone */
-            ecs_defer_suspend(b->world);
-            ecs_delete(b->world, s->observing);
-            ecs_defer_resume(b->world);
-        }
+        if (s->observing) ecs_delete(b->world, s->observing);
         free(s->pending);
         free(s->name);
         free(s->full);
         free(s);
     }
     b->system_count = kept;
+    m->system_count = m->observer_count = 0;
+}
+
+/* A load that failed leaves storage as it was: the ids set aside for it, what it took of the
+ * arena, and every component nobody else declared. What it queued goes with its queue. */
+static void undo(bridge *b, module *m)
+{
+    uint32_t i, k;
+    drop_systems(b, m);         /* first: a query must not outlive a component it names */
+    for (i = 0; i < m->id_count; i ++) ecs_delete(b->world, m->ids[i]);
+    m->id_count = m->id_next = 0;
+    /* its share is the last one carved, since nothing loads during a load */
+    if (m->arena_share && m->arena_base + m->arena_share == b->arena + b->arena_used) {
+        b->arena_used -= m->arena_share;
+    }
+    /* last declared first: a type is used by what was declared after it */
+    for (i = m->declared_count; i --;) {
+        component *c = m->declared[i];
+        if (-- c->declarers) continue;
+        ecs_delete(b->world, c->id);
+        for (k = 0; b->components[k] != c; k ++) {}
+        b->components[k] = b->components[-- b->component_count];
+        free(c->name);
+        free(c->zero);
+        free(c);
+    }
+    m->declared_count = 0;
+    b->layout_moved = 1;
+}
+
+/* Take a module out: its systems, its instance, its image, its private memory. The order is
+ * the backend seam's: a memory is released after the last instance it was handed to. */
+static void discard(bridge *b, module *m)
+{
+    drop_systems(b, m);
     if (m->instance) m->on->api.instance_destroy(m->instance);
     if (m->image) m->on->api.module_destroy(m->image);
     if (m->memory) m->on->api.memory_release(m->memory);
     if (m->priv) os_release(m->priv, m->priv_reserve);
     free_list_of(m->read, m->read_count);
     free_list_of(m->write, m->write_count);
+    free(m->ids);
+    free(m->queue);
     free(m->systems);
     free(m->observers);
     free(m->declared);
@@ -101,7 +132,6 @@ void bridge_destroy(bridge *b)
     free(b->systems);
     store_destroy(b);
     pool_destroy(b->pool);
-    if (b->entries) os_mutex_free(b->entries);
     for (i = 0; i < b->order_count; i ++) {
         free(b->before[i]);
         free(b->after[i]);
@@ -131,7 +161,6 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
     b = calloc(1, sizeof *b);
     b->sink = sink;
     b->ud = ud;
-    b->entries = os_mutex_new();
     b->backends = calloc(cfg->backend_count ? cfg->backend_count : 1, sizeof *b->backends);
     b->phases = calloc(cfg->phase_count ? cfg->phase_count : 1, sizeof *b->phases);
 
@@ -331,7 +360,21 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     }
     if (unset(b, id, "fuel", cfg->fuel) || unset(b, id, "memory_limit", cfg->memory_limit)
         || unset(b, id, "init_timeout", cfg->init_timeout) || unset(b, id, "scratch", cfg->scratch)
-        || unset(b, id, "log_ring", cfg->log_ring) || unset(b, id, "spans", cfg->spans)) return 1;
+        || unset(b, id, "log_ring", cfg->log_ring) || unset(b, id, "spans", cfg->spans)
+        || unset(b, id, "spawns", cfg->spawns) || unset(b, id, "persistent", cfg->persistent)) {
+        return 1;
+    }
+    if (cfg->persistent > 0 && (uint64_t)cfg->persistent > b->arena_len - b->arena_used) {
+        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: its persistent of %lld bytes "
+            "does not fit in the %u left of [budget] persistent", id, (long long)cfg->persistent,
+            b->arena_len - b->arena_used);
+        return 1;
+    }
+    if (cfg->spawns > (int64_t)b->entities) {
+        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: its spawns of %lld is more "
+            "than [budget] entities of %u", id, (long long)cfg->spawns, b->entities);
+        return 1;
+    }
     /* budgets.md: the one floor with an argument. A module that can report nothing is the one
      * legal number that makes a deployment incoherent. */
     if (cfg->log_ring < sizeof(bridge_log_record)) {
@@ -375,6 +418,17 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     colon = strchr(id, ':');
     m->ns = copy(id, colon ? (size_t)(colon - id) : strlen(id));
     m->fuel = cfg->fuel;
+    m->spawns = cfg->spawns;
+    m->persistent = cfg->persistent;
+    if (cfg->persistent > 0) {
+        /* its share of the arena, for its life: nobody else allocates from it */
+        uint32_t share = ((uint32_t)cfg->persistent + 7u) & ~7u;
+        if (share > b->arena_len - b->arena_used) share = b->arena_len - b->arena_used;
+        m->arena_share = share;
+        m->arena_base = m->arena_at = b->arena + b->arena_used;
+        m->arena_left = share;
+        b->arena_used += share;
+    }
     m->read = copy_list(cfg->read, cfg->read_count);
     m->read_count = cfg->read_count;
     m->write = copy_list(cfg->write, cfg->write_count);
@@ -385,6 +439,12 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     if (!m->image) goto failed;
     if (private_memory(b, m, cfg, &err)) goto failed;
     store_header(b, m);
+    /* init may spawn, so its ids are set aside before it runs */
+    if (store_refill(b, m)) {
+        snprintf(err.text, sizeof err.text, "its spawns of %lld do not fit under [budget] "
+            "entities of %u", (long long)cfg->spawns, b->entities);
+        goto failed;
+    }
 
     /* a module is handed the memories it imports, and no other - backend.md */
     import_count = o->api.module_imports(m->image, imports, 64);
@@ -449,8 +509,12 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     /* lifecycle.md: refuse-and-unwind if a new system or observer conflicts unordered */
     if (schedule_build(b, err.text, sizeof err.text)) goto failed;
 
-    m->next = b->modules;
-    b->modules = m;
+    /* at the end: the order modules loaded in is the order their changes are applied in */
+    {
+        module **last = &b->modules;
+        while (*last) last = &(*last)->next;
+        *last = m;
+    }
     b->module_count ++;
     b->layout_moved = 1;
     store_barrier(b);           /* what init queued is applied, and its spans are published */
@@ -464,8 +528,7 @@ failed:
         snprintf(why, sizeof why, "module '%s' failed and its on_error is fail", id);
         b->stopped_by = copy(why, strlen(why));
     }
-    /* ponytail: what its init declared and queued before failing stays. Leaving storage as
-     * it was is docs/PLAN.md phase 6's claim, and arrives with unload. */
+    undo(b, m);
     discard(b, m);
     schedule_build(b, err.text, sizeof err.text);   /* as it was: this cannot refuse */
     return 1;

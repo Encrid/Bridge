@@ -36,6 +36,7 @@ typedef struct {
     ecs_entity_t id;
     uint32_t     size, align;
     uint64_t     fingerprint;       /* of the descriptor string - schema.md, *Fingerprints* */
+    uint32_t     declarers;         /* how many loaded modules declared it */
     void        *zero;              /* `size` zero bytes: what an attach with no value copies */
 } component;
 
@@ -91,6 +92,16 @@ struct module {
     uint32_t       observer_count;
 
     int64_t   fuel;
+    /* What is set aside for it alone - threads.md. Ids it may hand out, taken from flecs at a
+     * barrier; its share of the persistent arena; and what it asked to have changed, applied
+     * at the next barrier in the order it asked. Only its own thread touches any of them. */
+    ecs_entity_t *ids;
+    uint32_t  id_count, id_next;
+    int       ids_short;            /* the entity ceiling cut its last refill short */
+    int64_t   spawns, persistent;
+    uint32_t  arena_at, arena_left, arena_base, arena_share;
+    uint8_t  *queue;
+    uint32_t  queue_len, queue_room;
     char    **read, **write;        /* grants */
     uint32_t  read_count, write_count;
 
@@ -101,6 +112,14 @@ struct module {
     char  why[256];                 /* and this is why */
     module *next;
 };
+
+/* One queued change: `size` bytes of value follow it, padded to eight. */
+enum { CHANGE_DESTROY = 1, CHANGE_ATTACH = 2, CHANGE_DETACH = 3 };
+typedef struct {
+    ecs_entity_t id;
+    component   *c;
+    uint32_t     size, op;
+} change;
 
 typedef struct { ecs_table_t *table; int32_t rows; } table_slot;
 typedef struct { uint32_t at, len; } gap;       /* in the column region, from its start */
@@ -120,7 +139,6 @@ struct bridge {
     char   **before, **after;       /* [order], pair by pair */
     uint32_t order_count;
     pool    *pool;
-    os_mutex *entries;              /* every ABI entry runs under it */
 
     /* the shared block: a reserved page, the entity index, the persistent arena, the columns */
     uint8_t       *shared;
@@ -175,6 +193,7 @@ void     store_enter(bridge *b);                                  /* this thread
 int      store_create(bridge *b, const bridge_budget *budget);    /* 0, or a record was emitted */
 void     store_destroy(bridge *b);
 void     store_touch(bridge *b, ecs_entity_t e);                  /* e may have moved: look at the barrier */
+int      store_refill(bridge *b, module *m);                      /* 1 if the ceiling cut its ids short */
 void     store_barrier(bridge *b);
 void     store_header(bridge *b, module *m);                      /* what a module reads at offset 0 */
 uint32_t store_offset(bridge *b, const void *p);                  /* into the shared memory, 0 for NULL */

@@ -49,6 +49,7 @@ typedef struct {
 
 enum { BRIDGE_FAIL = 1, BRIDGE_SKIP = 2 };      /* on_error. zero is unset */
 #define BRIDGE_NO_LIMIT (-1)                    /* a limit stated as none */
+#define BRIDGE_NONE     (-1)                    /* a reservation stated as none */
 
 typedef struct {
     const char *identity;        /* "tri:triangle@0.1.0" */
@@ -63,6 +64,10 @@ typedef struct {
     int64_t  init_timeout;       /* nanoseconds */
     int8_t   log_level;          /* a line above it is not written */
     uint32_t scratch, log_ring, spans;   /* its private memory, each in bytes */
+    /* what is set aside for it alone, so that what it mints does not depend on who ran
+     * beside it. each: zero is unset, BRIDGE_NONE is "it mints none" */
+    int64_t  spawns;             /* entity ids it may take between two barriers */
+    int64_t  persistent;         /* its share of the persistent arena, in bytes, for its life */
 
     const char *const *read;  uint32_t read_count;       /* grants */
     const char *const *write; uint32_t write_count;

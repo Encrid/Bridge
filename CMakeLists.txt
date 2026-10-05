@@ -282,7 +282,7 @@ phase3_case (fingerprint "module 'game:fp@0.1.0' did not load: component 'game:P
 phase3_case (grant       "module 'view:reader@0.1.0' did not load: it may not declare 'game:Position': that is another namespace's, and no grant names it")
 phase3_case (wildcard    "module 'game:wildcard@0.1.0' did not load: term 0 of system 'any' is a wildcard")
 phase3_case (fuel        "test:spin@0.1.0/forever: system 'forever' failed: trapped: all fuel consumed.*still here.*all fuel consumed.*still here")
-phase3_case (ceiling     "test:flood@0.1.0/flood: system 'flood' failed: spawn: .budget. entities of 4096 is reached")
+phase3_case (ceiling     "system 'flood' failed: spawn: its spawns of 3000 between two barriers are used up.*system 'flood' failed: spawn: .budget. entities of 4096 is reached")
 phase3_case (ring        "line 15 0.*test:chatty@0.1.0/-: 84 log lines were dropped: its ring holds 16")
 phase3_case (nospans     "module 'view:reader@0.1.0' is stopped: what its queries match no longer fits in its spans of 16 bytes.*moved 2 1000")
 phase3_case (nocolumns   "the bridge has stopped: .budget. columns of 60000 bytes ran out.*game:mover@0.1.0: not loaded.*update refused" 60000)
@@ -325,13 +325,13 @@ phase4_case (mixed     "view:reader@0.1.0/sum: sum 250500 0.*native tally 2 1000
 phase4_case (untrusted "module 'game:mover@0.1.0' is refused: trusted = false needs 'sandbox', which backend 'native' lacks")
 phase4_case (limit     "module 'game:mover@0.1.0' is refused: fuel needs 'meter', which backend 'native' lacks")
 phase4_case (nolib     "module 'game:mover@0.1.0' did not load: cannot open the library 'no-such-library'")
-phase4_case (refuse    "test:flood@0.1.0/flood: system 'flood' failed: spawn: .budget. entities of 4096 is reached")
+phase4_case (refuse    "test:flood@0.1.0/flood: system 'flood' failed: spawn: its spawns of 1024 between two barriers are used up")
 # before its library is opened: the path names nothing, and nothing says it was looked for
 set_tests_properties (phase4-untrusted phase4-limit PROPERTIES FAIL_REGULAR_EXPRESSION "cannot open")
 
 # ---- phase 5: the schedule, observers, threads. docs/plan/PHASE5.md ----
 
-foreach (name halver twostep watcher chain badobs events fixer nested nested2)
+foreach (name halver twostep watcher chain badobs events fixer nested nested2 namer spawner)
     wasm_module (${name} ${name} checked)
 endforeach ()
 get_property (C_MODULES GLOBAL PROPERTY C_MODULES)
@@ -365,7 +365,7 @@ phase5_case (reorder     "sum 125500 0")
 phase5_case (ambiguous   "module 'view:halver@0.1.0' did not load: 'game:mover:move' and 'view:halver:halve' both touch 'game:Position' in phase 'update', one of them writing it, and nothing orders them")
 phase5_case (ownorder    "game:twostep@0.1.0/show: x 3 0")
 phase5_case (cycle       ".order. contradicts itself.*bridge_create refused")
-phase5_case (observe     "b2 view:watcher@0.1.0/seen: seen 1 77.*b2 game:setter@0.1.0/mark: marked")
+phase5_case (observe     "b2 game:setter@0.1.0/mark: marked.*b2 view:watcher@0.1.0/seen: seen 1 77")
 phase5_case (chain       "b1 game:chain@0.1.0/got_a: hop A.*b2 game:chain@0.1.0/got_b: hop B.*b3 game:chain@0.1.0/got_c: hop C")
 phase5_case (reserved    "'init' is a reserved name, and no observer may take it")
 phase5_case (parallel    "on 2 thread.s.[^a-z]*they ran at once")
@@ -388,3 +388,12 @@ phase5_case (nested2     "module 'game:nested@0.1.0' did not load: component 'ga
 phase4_case (setting   "backend 'native' would not start: it knows no setting 'cache'.*bridge_create refused")
 # two bridges in one process, on two threads: 250000 + 500 a frame, fifty frames and thirty
 phase5_case (two         "two bridges: sums 275000 and 265000")
+
+# what a module mints is set aside for it: docs/bridge/memory/budgets.md
+phase3_case (strings     "game:namer@0.1.0/say: kept in the arena")
+phase3_case (noarena     "module 'game:namer@0.1.0' did not load: alloc: its persistent of 4 bytes is exhausted")
+phase3_case (bigarena    "module 'game:namer@0.1.0' is refused: its persistent of 1048576 bytes does not fit in the 4096 left of .budget. persistent")
+phase3_case (nospawns    "module 'game:mover@0.1.0' did not load: spawn: it stated that it spawns nothing")
+phase3_case (undo        "game:wildcard@0.1.0: not loaded.*game:fp@0.1.0: loaded")
+# what two modules mint in one level does not depend on which thread got there first
+phase5_case (minted      "minted 160 ids a run. on four threads the same, and again the same")

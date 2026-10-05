@@ -251,6 +251,55 @@ static void sync(bridge *b)
     b->dirty_count = 0;
 }
 
+/* ---- what modules asked for since the last barrier ---- */
+
+/* Each module's changes, in the order it loaded and then the order it asked: the same every
+ * run, whichever thread ran what. An id that died in the meantime is passed over. */
+static void replay(bridge *b)
+{
+    module *m;
+    for (m = b->modules; m; m = m->next) {
+        uint32_t at = 0;
+        while (at < m->queue_len) {
+            change ch;
+            const void *value = m->queue + at + sizeof ch;
+            memcpy(&ch, m->queue + at, sizeof ch);
+            at += (uint32_t)sizeof ch + ((ch.size + 7u) & ~7u);
+            if (!ch.id || !ecs_is_alive(b->world, ch.id)) continue;
+            if (ch.op == CHANGE_DESTROY) ecs_delete(b->world, ch.id);
+            else if (ch.op == CHANGE_ATTACH) ecs_set_id(b->world, ch.id, ch.c->id, ch.size, value);
+            else ecs_remove_id(b->world, ch.id, ch.c->id);
+            store_touch(b, ch.id);
+        }
+        m->queue_len = 0;
+    }
+}
+
+/* A module's ids for the time until the next barrier: what it did not use, topped up to what
+ * its config stated. They are real entities with nothing on them, which no query matches. */
+int store_refill(bridge *b, module *m)
+{
+    uint32_t want = m->spawns > 0 ? (uint32_t)m->spawns : 0, kept = m->id_count - m->id_next;
+    if (!want) return 0;
+    if (!m->ids) m->ids = calloc(want, sizeof *m->ids);
+    memmove(m->ids, m->ids + m->id_next, kept * sizeof *m->ids);
+    m->id_next = 0;
+    m->id_count = kept;
+    m->ids_short = 0;
+    while (m->id_count < want) {
+        ecs_entity_t e = ecs_new(b->world);
+        /* the index is twelve bytes times the highest id, and that is what was budgeted */
+        if ((uint32_t)e >= b->entities) {
+            ecs_delete(b->world, e);
+            m->ids_short = 1;
+            break;
+        }
+        store_touch(b, e);
+        m->ids[m->id_count ++] = e;
+    }
+    return m->ids_short;
+}
+
 /* ---- publishing: the header, column_base, and one span per matched table ---- */
 
 void store_header(bridge *b, module *m)
@@ -397,11 +446,9 @@ void store_barrier(bridge *b)
     module *m;
     uint32_t tables, i;
 
-    ecs_defer_end(b->world);            /* queued changes applied */
+    replay(b);                          /* queued changes applied */
+    for (m = b->modules; m; m = m->next) store_refill(b, m);
     sync(b);
-    /* deferred again before anything else runs: what an observer queues is the next
-     * barrier's - schedule.md, *An observer runs at the barrier, one hop per barrier* */
-    ecs_defer_begin(b->world);
     do {                                /* spans republished */
         tables = b->table_count;
         for (m = b->modules; m; m = m->next) {
@@ -412,7 +459,10 @@ void store_barrier(bridge *b)
         }
     } while (tables != b->table_count);
     b->layout_moved = 0;
-    schedule_run(b, b->phase_count);    /* then the observers of what changed */
+    /* then the observers of what changed. What they ask for goes on their queues, and so
+     * is the next barrier's - schedule.md, *An observer runs at the barrier, one hop per
+     * barrier* */
+    schedule_run(b, b->phase_count);
     for (i = 0; i < b->system_count; i ++) b->systems[i]->pending_count = 0;
     for (m = b->modules; m; m = m->next) drain(b, m);
     b->barriers ++;
@@ -497,7 +547,6 @@ int store_create(bridge *b, const bridge_budget *budget)
         .ctx = b
     });
     b->names = ecs_entity(b->world, { .name = "bridge-asm700" });
-    ecs_defer_begin(b->world);          /* and it stays deferred outside a barrier */
     if (b->columns_out) {
         say(b, NULL, NULL, BRIDGE_ERR, "[budget] columns of %u bytes does not hold flecs' own "
             "tables, before any module's", b->columns_len);
@@ -522,7 +571,6 @@ void store_destroy(bridge *b)
     uint32_t i;
     live = b;
     if (b->world) {
-        ecs_defer_end(b->world);
         os_global_lock();
         ecs_fini(b->world);
         os_global_unlock();

@@ -33,6 +33,8 @@ static bridge_artifact native(const char *identity, const char *path)
     a.cfg.scratch = 64 << 10;
     a.cfg.log_ring = 64 * 24;
     a.cfg.spans = 16 << 10;
+    a.cfg.spawns = 1024;
+    a.cfg.persistent = BRIDGE_NONE;
     a.backend = "native";
     a.path = path;
     return a;
@@ -60,6 +62,7 @@ static bridge_artifact wasm_reader(void)
     a.cfg.init_timeout = 2000 * MS;
     a.cfg.read = grants;
     a.cfg.read_count = 2;
+    a.cfg.spawns = BRIDGE_NONE;         /* it only reads */
     return a;
 }
 

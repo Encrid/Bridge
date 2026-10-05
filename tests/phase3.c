@@ -54,6 +54,10 @@ static bridge_artifact artifact(const char *identity, const char *file)
     a.cfg.scratch = 64 << 10;
     a.cfg.log_ring = 64 * 24;
     a.cfg.spans = 16 << 10;
+    /* what each test module mints between two barriers: most mint nothing, and say so */
+    a.cfg.spawns = !strcmp(file, "mover") ? 1024 : !strcmp(file, "refs") ? 128
+                 : !strcmp(file, "namer") ? 8 : BRIDGE_NONE;
+    a.cfg.persistent = BRIDGE_NONE;
     a.backend = "wasm";
     a.bytes = read_file(file, &a.len);
     return a;
@@ -100,6 +104,7 @@ static void bench(bridge_config *cfg)
             double best = 1e30;
             a.cfg.fuel = metered ? 1000000000 : BRIDGE_NO_LIMIT;
             a.cfg.init_timeout = BRIDGE_NO_LIMIT;
+            a.cfg.spawns = 200000;
             if (!b || bridge_load(b, &a)) { printf("bench: cannot load\n"); exit(2); }
             for (round = 0; round < 20; round ++) {
                 struct timespec t0, t1;
@@ -169,7 +174,10 @@ int main(int argc, char **argv)
         load(b, &a);
         frames(b, 2);
     } else if (!strcmp(what, "ceiling")) {
+        /* 3,000 ids a barrier under a ceiling of 4,096: the first frame runs out of what
+         * was set aside for it, and the second of what the deployment has */
         a = artifact("test:flood@0.1.0", "flood");
+        a.cfg.spawns = 3000;
         load(b, &a);
         frames(b, 2);
     } else if (!strcmp(what, "ring")) {
@@ -188,6 +196,23 @@ int main(int argc, char **argv)
         a = artifact("game:mover@0.1.0", "mover");
         load(b, &a);
         frames(b, 1);
+    } else if (!strcmp(what, "strings") || !strcmp(what, "noarena") || !strcmp(what, "bigarena")) {
+        /* a string a component keeps: allocated from the module's share of the arena */
+        a = artifact("game:namer@0.1.0", "namer");
+        a.cfg.persistent = !strcmp(what, "strings") ? 64 : !strcmp(what, "noarena") ? 4 : 1 << 20;
+        load(b, &a);
+        frames(b, 1);
+    } else if (!strcmp(what, "nospawns")) {     /* the mover, stating that it spawns nothing */
+        a = artifact("game:mover@0.1.0", "mover");
+        a.cfg.spawns = BRIDGE_NONE;
+        load(b, &a);
+    } else if (!strcmp(what, "undo")) {
+        /* a load that fails after declaring and spawning leaves nothing: the same component
+         * name with another layout then loads, which a ghost of the first would refuse */
+        a = artifact("game:wildcard@0.1.0", "wildcard");
+        load(b, &a);
+        a = artifact("game:fp@0.1.0", "fp");
+        load(b, &a);
     } else if (!strcmp(what, "nophase")) {
         if (bridge_phase(b, "render")) printf("render refused\n");
     }
