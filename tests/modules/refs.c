@@ -3,7 +3,7 @@
 #include "bridge-wasm.h"
 #include "game.h"
 
-#define ENTITIES 100
+constexpr uint32_t ENTITIES = 100;
 
 static uint32_t position, round;
 static uint64_t ids[ENTITIES];

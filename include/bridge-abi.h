@@ -3,14 +3,16 @@
  *
  * It says how to find data and never what data there is: no component, no field. Everything
  * here is read by a module with plain loads, so every member is a fixed width and the structs
- * have no padding a compiler could place differently. */
+ * have no padding a compiler could place differently: each layout is asserted where it is
+ * stated, and a module and Bridge-ASM700 that disagreed about one would not both compile. */
 #ifndef BRIDGE_ABI_H
 #define BRIDGE_ABI_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 /* A module states the version it was built against; one built against another is refused. */
-#define BRIDGE_ABI 1
+constexpr uint32_t BRIDGE_ABI = 1;
 
 /* Everything a module imports comes from one namespace; the two memories go by name. */
 #define BRIDGE_NAMESPACE "bridge"
@@ -19,32 +21,39 @@
 
 /* declare's kind: what the descriptor describes - docs/modules/schema.md, *The type set*.
  * Zero is unset, and refused. */
-enum { BRIDGE_STRUCT = 1, BRIDGE_ENUM = 2, BRIDGE_BITMASK = 3 };
+enum bridge_kind : uint32_t { BRIDGE_STRUCT = 1, BRIDGE_ENUM = 2, BRIDGE_BITMASK = 3 };
 
 /* declare's on_unload - docs/bridge/data/lifetime.md. Zero is unset, and refused. */
-enum { BRIDGE_STRIP = 1, BRIDGE_SWEEP = 2, BRIDGE_DELETE = 3 };
+enum bridge_on_unload : uint32_t { BRIDGE_STRIP = 1, BRIDGE_SWEEP = 2, BRIDGE_DELETE = 3 };
 
 /* A query term: which component, how the system touches it, and how it must match.
  * `slot` is what declare answered. Zero is unset for `access` and `oper`, and refused. */
-enum { BRIDGE_IN = 1, BRIDGE_OUT = 2, BRIDGE_INOUT = 3 };
-enum { BRIDGE_AND = 1, BRIDGE_NOT = 2, BRIDGE_OPTIONAL = 3, BRIDGE_OR = 4 };
-#define BRIDGE_WILDCARD  0xffffffffu
-#define BRIDGE_TERMS_MAX 32
+enum bridge_access : uint8_t { BRIDGE_IN = 1, BRIDGE_OUT = 2, BRIDGE_INOUT = 3 };
+enum bridge_oper : uint8_t { BRIDGE_AND = 1, BRIDGE_NOT = 2, BRIDGE_OPTIONAL = 3, BRIDGE_OR = 4 };
+constexpr uint32_t BRIDGE_WILDCARD = 0xffffffffu;
+constexpr uint32_t BRIDGE_TERMS_MAX = 32;
 
 typedef struct {
-    uint32_t slot;
-    uint8_t  access, oper;
-    uint16_t reserved;
+    uint32_t           slot;
+    enum bridge_access access;
+    enum bridge_oper   oper;
+    uint16_t           reserved;
 } bridge_term;
+static_assert(sizeof(bridge_term) == 8 && alignof(bridge_term) == 4);
+static_assert(offsetof(bridge_term, slot) == 0 && offsetof(bridge_term, access) == 4);
+static_assert(offsetof(bridge_term, oper) == 5 && offsetof(bridge_term, reserved) == 6);
 
-/* observe's events, as a mask, and what an observer reads: who triggered it, and how. */
-enum { BRIDGE_ON_ADD = 1, BRIDGE_ON_SET = 2, BRIDGE_ON_REMOVE = 4 };
+/* observe's events, as a mask of these, and what an observer reads: who triggered it, and how. */
+enum bridge_event : uint32_t { BRIDGE_ON_ADD = 1, BRIDGE_ON_SET = 2, BRIDGE_ON_REMOVE = 4 };
 
 typedef struct {
-    uint64_t id;
-    uint32_t events;
-    uint32_t reserved;
+    uint64_t          id;
+    enum bridge_event events;
+    uint32_t          reserved;
 } bridge_trigger;
+static_assert(sizeof(bridge_trigger) == 16 && alignof(bridge_trigger) == 8);
+static_assert(offsetof(bridge_trigger, id) == 0 && offsetof(bridge_trigger, events) == 8);
+static_assert(offsetof(bridge_trigger, reserved) == 12);
 
 /* Offset 0 of the private memory: where each of this module's regions begins. Bridge-ASM700
  * writes all of it; a module writes `scratch_used` and `ring_head` and nothing else. */
@@ -65,24 +74,43 @@ typedef struct {
     int32_t  log_level;                 /* a line above it is not written */
     uint32_t observers;                 /* bridge_list, one per slot `observe` answered */
 } bridge_header;
+static_assert(sizeof(bridge_header) == 72 && alignof(bridge_header) == 4);
+static_assert(offsetof(bridge_header, abi) == 0 && offsetof(bridge_header, scratch) == 4);
+static_assert(offsetof(bridge_header, scratch_len) == 8 && offsetof(bridge_header, scratch_used) == 12);
+static_assert(offsetof(bridge_header, ring) == 16 && offsetof(bridge_header, ring_len) == 20);
+static_assert(offsetof(bridge_header, ring_head) == 24 && offsetof(bridge_header, ring_tail) == 28);
+static_assert(offsetof(bridge_header, queries) == 32 && offsetof(bridge_header, column_base) == 36);
+static_assert(offsetof(bridge_header, terms) == 40 && offsetof(bridge_header, tables) == 44);
+static_assert(offsetof(bridge_header, entity_index) == 48 && offsetof(bridge_header, entities) == 52);
+static_assert(offsetof(bridge_header, when) == 56 && offsetof(bridge_header, system) == 60);
+static_assert(offsetof(bridge_header, log_level) == 64 && offsetof(bridge_header, observers) == 68);
 
 typedef struct { uint32_t spans, at; } bridge_query;
+static_assert(sizeof(bridge_query) == 8 && alignof(bridge_query) == 4);
+static_assert(offsetof(bridge_query, spans) == 0 && offsetof(bridge_query, at) == 4);
 
 /* Text a component keeps: where its bytes are in the persistent arena, and how many. A field
  * may be of this type under any namespace - docs/modules/schema.md, *The type set*. */
 typedef struct { uint32_t at, len; } bridge_text;
+static_assert(sizeof(bridge_text) == 8 && alignof(bridge_text) == 4);
+static_assert(offsetof(bridge_text, at) == 0 && offsetof(bridge_text, len) == 4);
 
 /* An observer's slot: how many bridge_trigger records this barrier, and where they begin. */
 typedef struct { uint32_t count, at; } bridge_list;
+static_assert(sizeof(bridge_list) == 8 && alignof(bridge_list) == 4);
+static_assert(offsetof(bridge_list, count) == 0 && offsetof(bridge_list, at) == 4);
 
 /* A span, one per matched table - docs/bridge/data/query.md:
  *     u32 count, u32 entities, u32 base[terms], then at the next multiple of 8, u64 source[terms] */
-#define BRIDGE_SPAN_BASE       8u
+constexpr uint32_t BRIDGE_SPAN_BASE = 8;
 #define BRIDGE_SPAN_SOURCE(n)  ((8u + 4u * (n) + 7u) & ~7u)
 #define BRIDGE_SPAN_SIZE(n)    (BRIDGE_SPAN_SOURCE(n) + 8u * (n))
 
 /* The entity index, by the low 32 bits of an id. Table 0 is no table. */
 typedef struct { uint32_t table, row, generation; } bridge_entity;
+static_assert(sizeof(bridge_entity) == 12 && alignof(bridge_entity) == 4);
+static_assert(offsetof(bridge_entity, table) == 0 && offsetof(bridge_entity, row) == 4);
+static_assert(offsetof(bridge_entity, generation) == 8);
 
 /* A log record. `text` is an offset into the writer's scratch arena, always. */
 typedef struct {
@@ -93,5 +121,10 @@ typedef struct {
     uint32_t text, len;
     uint32_t arg[2];
 } bridge_log_record;
+static_assert(sizeof(bridge_log_record) == 24 && alignof(bridge_log_record) == 4);
+static_assert(offsetof(bridge_log_record, when) == 0 && offsetof(bridge_log_record, reserved) == 4);
+static_assert(offsetof(bridge_log_record, level) == 5 && offsetof(bridge_log_record, system) == 6);
+static_assert(offsetof(bridge_log_record, text) == 8 && offsetof(bridge_log_record, len) == 12);
+static_assert(offsetof(bridge_log_record, arg) == 16);
 
 #endif

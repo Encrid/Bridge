@@ -22,11 +22,12 @@
  * An entry may be called only from inside a call the backend made: init, a system, an
  * observer. That is native.md, *The invariant*, and it is how an entry knows whose it is. */
 typedef struct bridge_api {
-    uint32_t (*declare)(uint32_t name, uint32_t name_len, uint32_t kind, uint32_t size,
-                        uint32_t align, uint32_t desc, uint32_t desc_len, uint32_t on_unload);
+    uint32_t (*declare)(uint32_t name, uint32_t name_len, enum bridge_kind kind, uint32_t size,
+                        uint32_t align, uint32_t desc, uint32_t desc_len,
+                        enum bridge_on_unload on_unload);
     uint32_t (*system)(uint32_t name, uint32_t name_len, uint32_t phase, uint32_t phase_len,
                        uint32_t terms, uint32_t term_count);
-    uint32_t (*observe)(uint32_t name, uint32_t name_len, uint32_t events, uint32_t terms,
+    uint32_t (*observe)(uint32_t name, uint32_t name_len, enum bridge_event events, uint32_t terms,
                         uint32_t term_count);
     uint64_t (*spawn)();
     void     (*destroy)(uint64_t id);
@@ -48,10 +49,14 @@ typedef struct bridge_api {
 #define ECS_STRUCT(name, ...) \
     typedef struct name __VA_ARGS__ name; \
     static const char name##_desc[] = #__VA_ARGS__
+/* an enum is four bytes signed and a bitmask four unsigned, and the type says so: it is what
+ * Bridge-ASM700 lays the field out as, whatever a compiler would have chosen */
 #define ECS_ENUM(name, ...) \
-    typedef enum name __VA_ARGS__ name; \
+    typedef enum name : int32_t __VA_ARGS__ name; \
     static const char name##_desc[] = #__VA_ARGS__
-#define ECS_BITMASK(name, ...) ECS_ENUM(name, __VA_ARGS__)
+#define ECS_BITMASK(name, ...) \
+    typedef enum name : uint32_t __VA_ARGS__ name; \
+    static const char name##_desc[] = #__VA_ARGS__
 
 /* ---- the scratch arena ---- */
 

@@ -37,7 +37,7 @@ void      os_mutex_unlock(os_mutex *m);
 /* An event one thread sets and another waits for. Setting it before the wait
  * is not lost; a wait consumes it. */
 typedef struct os_event os_event;
-#define OS_FOREVER UINT64_MAX
+constexpr uint64_t OS_FOREVER = UINT64_MAX;
 os_event *os_event_new();
 void      os_event_free(os_event *e);
 void      os_event_set(os_event *e);

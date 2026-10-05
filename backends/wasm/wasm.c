@@ -13,15 +13,16 @@
 /* wasmtime enforces a 32-bit memory's bounds by faulting: the whole 4 GiB an index can
  * reach is reserved, then a guard, and loads are emitted with no check. Stated here and
  * to wasmtime both, so that what memory_shape answers is what the engine assumes. */
-#define RESERVATION ((uint64_t)1 << 32)
-#define GUARD       ((uint64_t)32 << 20)
-#define PAGE        65'536u
+constexpr uint64_t RESERVATION = (uint64_t)1 << 32;
+constexpr uint64_t GUARD = (uint64_t)32 << 20;
+constexpr uint32_t PAGE = 65'536;
 /* a deadline no call reaches: every store needs one once epochs are on */
-#define FAR         ((uint64_t)1 << 62)
+constexpr uint64_t FAR = (uint64_t)1 << 62;
 
 /* Fuel and epoch interruption are an engine's settings and put code in every loop, so there
  * is an engine per combination a module can demand, made at its first use. */
-enum { METERED = 1, INTERRUPTIBLE = 2, ENGINES = 4 };
+enum engine_kind : uint8_t { METERED = 1, INTERRUPTIBLE = 2 };     /* a mask of these */
+constexpr int ENGINES = 4;
 
 struct backend {
     wasm_engine_t *engines[ENGINES];
@@ -39,7 +40,7 @@ struct backend_memory { void *ptr; uint64_t len; };
 
 struct backend_module {
     backend *b;
-    int kind;                       /* METERED | INTERRUPTIBLE */
+    enum engine_kind kind;
     wasmtime_module_t *module;
     wasm_importtype_vec_t imports;
 };
@@ -206,7 +207,7 @@ static void watchdog(void *arg)
     }
 }
 
-static wasm_engine_t *engine_for(backend *b, int kind)
+static wasm_engine_t *engine_for(backend *b, enum engine_kind kind)
 {
     if (!b->engines[kind]) {
         wasm_config_t *config = wasm_config_new();
@@ -260,7 +261,7 @@ BACKEND_EXPORT void backend_destroy(backend *b)
     free(b);
 }
 
-BACKEND_EXPORT uint32_t backend_capabilities(backend *b)
+BACKEND_EXPORT enum backend_capability backend_capabilities(backend *b)
 {
     (void)b;
     return BACKEND_SANDBOX | BACKEND_METER | BACKEND_DEADLINE | BACKEND_LIMIT | BACKEND_RELOAD
@@ -293,7 +294,7 @@ BACKEND_EXPORT void memory_release(backend_memory *m)
 }
 
 BACKEND_EXPORT backend_module *module_compile(backend *b, const void *bytes, size_t len,
-                                              const char *path, uint32_t demands,
+                                              const char *path, enum backend_capability demands,
                                               backend_err *err)
 {
     (void)path;                 /* a wasm module is its bytes */
@@ -301,7 +302,7 @@ BACKEND_EXPORT backend_module *module_compile(backend *b, const void *bytes, siz
         fail(err, "this backend compiles a module from its bytes, and was handed none", nullptr, nullptr);
         return nullptr;
     }
-    int kind = (demands & BACKEND_METER ? METERED : 0)
+    enum engine_kind kind = (demands & BACKEND_METER ? METERED : 0)
              | (demands & BACKEND_DEADLINE ? INTERRUPTIBLE : 0);
     wasmtime_module_t *module = nullptr;
     wasmtime_error_t *error = wasmtime_module_new(engine_for(b, kind), bytes, len, &module);

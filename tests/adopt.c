@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define PAGE 65'536u
+constexpr uint32_t PAGE = 65'536;
 
 static backend_api api;
 static backend *be;

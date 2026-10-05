@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MS 1'000'000ll
+constexpr int64_t MS = 1'000'000;
 
 static void sink(void *ud, const bridge_record *r)
 {

@@ -10,7 +10,7 @@ void *backend_open(const char *path, backend_api *api, char *why, size_t why_len
     static const char *const names[BACKEND_ENTRY_COUNT] = { BACKEND_ENTRIES };
     void **slots = (void **)api;
     void *lib = os_lib_open(path);
-    int i;
+    uint32_t i;
     if (!lib) {
         snprintf(why, why_len, "cannot open backend library '%s'", path);
         return nullptr;

@@ -100,8 +100,9 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     module *m = ud;
     bridge *b = m->b;
     const char *name_at = scratch(m, a[0], a[1]), *desc_at = scratch(m, a[5], a[6]);
-    uint32_t kind = (uint32_t)a[2], size = (uint32_t)a[3], align = (uint32_t)a[4];
-    uint32_t on_unload = (uint32_t)a[7], i;
+    enum bridge_kind kind = (enum bridge_kind)a[2];
+    enum bridge_on_unload on_unload = (enum bridge_on_unload)a[7];
+    uint32_t size = (uint32_t)a[3], align = (uint32_t)a[4], i;
     component *c = nullptr;
     char name[128], *bare;
     uint64_t print;
@@ -214,8 +215,8 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         }
     }
     m->declared = realloc(m->declared, (m->declared_count + 1) * sizeof *m->declared);
-    m->policy = realloc(m->policy, m->declared_count + 1);
-    m->policy[m->declared_count] = (uint8_t)on_unload;
+    m->policy = realloc(m->policy, (m->declared_count + 1) * sizeof *m->policy);
+    m->policy[m->declared_count] = on_unload;
     m->declared[m->declared_count] = c;
     c->declarers ++;
     b->layout_moved = 1;
@@ -248,7 +249,7 @@ static void on_trigger(ecs_iter_t *it)
 /* A system or an observer is a query plus a function, so one registration serves both.
  * `events` is zero for a system, and then `phase` is the phase it named. */
 static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t phase,
-                     uint32_t events, uint64_t terms_off, uint64_t term_count, uint64_t *r)
+                     enum bridge_event events, uint64_t terms_off, uint64_t term_count, uint64_t *r)
 {
     bridge *b = m->b;
     const char *what = events ? "observer" : "system";
@@ -402,7 +403,7 @@ static int abi_observe(void *ud, const uint64_t *a, uint64_t *r)
  * which the barrier applies in an order that never varies. No lock: a module's systems are
  * serialised, so each of the three has one writer. */
 
-static void queue(module *m, uint32_t op, ecs_entity_t id, component *c, const void *value)
+static void queue(module *m, enum change_op op, ecs_entity_t id, component *c, const void *value)
 {
     change ch = { id, c, value ? c->size : 0, op };
     uint32_t need = (uint32_t)sizeof ch + ((ch.size + 7u) & ~7u);

@@ -2,7 +2,7 @@
 #include "bridge-native.h"
 #include "../game.h"
 
-#define ENTITIES 1000
+constexpr uint32_t ENTITIES = 1000;
 
 static const bridge_api *api;
 static uint32_t position, marked, moving, tallying;

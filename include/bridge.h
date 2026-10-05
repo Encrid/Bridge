@@ -11,13 +11,15 @@ typedef struct bridge bridge;
 
 /* A backend the deployment configures: Bridge-ASM700 opens the library, and a module names
  * the backend that runs it. */
+enum bridge_setting_kind : uint8_t {
+    BRIDGE_BOOL = 1, BRIDGE_INT = 2, BRIDGE_FLOAT = 3, BRIDGE_STRING = 4
+};
+
 typedef struct {
     const char *key;
-    uint8_t     kind;                           /* BRIDGE_BOOL | INT | FLOAT | STRING */
+    enum bridge_setting_kind kind;              /* zero is unset */
     union { bool b; int64_t i; double f; const char *s; } v;
 } bridge_setting;
-
-enum { BRIDGE_BOOL = 1, BRIDGE_INT = 2, BRIDGE_FLOAT = 3, BRIDGE_STRING = 4 };
 
 typedef struct {
     const char *name;
@@ -46,9 +48,9 @@ typedef struct {
     bridge_budget budget;
 } bridge_config;
 
-enum { BRIDGE_FAIL = 1, BRIDGE_SKIP = 2 };      /* on_error. zero is unset */
-#define BRIDGE_NO_LIMIT (-1)                    /* a limit stated as none */
-#define BRIDGE_NONE     (-1)                    /* a reservation stated as none */
+enum bridge_on_error : uint8_t { BRIDGE_FAIL = 1, BRIDGE_SKIP = 2 };    /* zero is unset */
+constexpr int64_t BRIDGE_NO_LIMIT = -1;         /* a limit stated as none */
+constexpr int64_t BRIDGE_NONE = -1;             /* a reservation stated as none */
 /* A module with no settings component says so. No component is named without a colon, so
  * this names none of them; a config left null is unset, and refused. */
 #define BRIDGE_NO_CONFIG "none"
@@ -61,7 +63,7 @@ typedef struct {
     bool     reloadable;         /* its author says it can be reloaded: from the manifest */
     bool     hot_reload;         /* the deployment allows bridge_reload. it only ever forbids */
     bool     pinned;             /* its systems run on the thread that loaded it, and no other */
-    uint8_t  on_error;           /* BRIDGE_FAIL | BRIDGE_SKIP: what losing it costs the deployment */
+    enum bridge_on_error on_error;   /* what losing it costs the deployment */
     /* each of the next six: zero is unset, BRIDGE_NO_LIMIT is "no limit" */
     int64_t  max_system_failures;    /* raised by a failed barrier, lowered by a clean one */
     int64_t  fuel;               /* units per system invocation */
@@ -101,7 +103,8 @@ typedef struct {
     int8_t      level;               /* negative is worse - flecs' convention */
 } bridge_record;
 
-enum { BRIDGE_WARN = -2, BRIDGE_ERR = -3 };
+/* two points on that scale, which is a number and not a set: any level may be written */
+enum bridge_level : int8_t { BRIDGE_WARN = -2, BRIDGE_ERR = -3 };
 
 typedef void (*bridge_sink_fn)(void *ud, const bridge_record *r);
 
@@ -129,10 +132,10 @@ int bridge_reload(bridge *b, const bridge_artifact *a);
 
 /* What is loaded, and whether it still runs: a module at its failure budget is stopped long
  * after any return code. Answers how many there are; fills at most `max`. */
-enum { BRIDGE_RUNNING = 1, BRIDGE_STOPPED = 2 };
+enum bridge_state : uint8_t { BRIDGE_RUNNING = 1, BRIDGE_STOPPED = 2 };
 typedef struct {
-    const char *identity;       /* until the next load, unload or reload */
-    uint8_t     state;
+    const char       *identity;     /* until the next load, unload or reload */
+    enum bridge_state state;
 } bridge_module_info;
 int bridge_modules(bridge *b, bridge_module_info *out, int max);
 

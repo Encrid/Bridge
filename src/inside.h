@@ -10,7 +10,7 @@
 #include "flecs.h"
 #include "flecs_confine.h"
 
-#define PAGE 65'536u
+constexpr uint32_t PAGE = 65'536;
 
 typedef struct module module;
 typedef struct pool pool;
@@ -20,7 +20,7 @@ typedef struct {
     void            *lib;
     backend_api      api;
     backend         *be;
-    uint32_t         capabilities;
+    enum backend_capability capabilities;
     backend_memory  *shared;        /* the shared block, as this backend sees it */
 } open_backend;
 
@@ -38,7 +38,7 @@ struct component {
     void        *zero;              /* `size` zero bytes: what an attach with no value copies */
 };
 
-typedef struct { ecs_entity_t id; uint32_t events; } pending;
+typedef struct { ecs_entity_t id; enum bridge_event events; } pending;
 
 /* A system, or an observer: a query and a function either way. An observer's phase is the one
  * past the deployment's last, which is the barrier. */
@@ -84,7 +84,7 @@ struct module {
     uint32_t  spans, spans_len;     /* the span region: query slots, column_base, spans */
 
     component    **declared;        /* by slot */
-    uint8_t       *policy;          /* by slot: what it stated for on_unload */
+    enum bridge_on_unload *policy;  /* by slot: what it stated */
     uint32_t       declared_count;
     bridge_system **systems;        /* by slot */
     uint32_t       system_count;
@@ -112,7 +112,7 @@ struct module {
     int      pinned;
     uint64_t thread;                /* the one that loaded it */
     int      hot_reload;
-    uint8_t  on_error;
+    enum bridge_on_error on_error;
     backend_func *shutdown;
     int64_t  shutdown_timeout;
     /* failure.md, *The budget*: raised by a failed barrier, lowered by a clean one */
@@ -129,11 +129,12 @@ struct module {
 };
 
 /* One queued change: `size` bytes of value follow it, padded to eight. */
-enum { CHANGE_DESTROY = 1, CHANGE_ATTACH = 2, CHANGE_DETACH = 3 };
+enum change_op : uint32_t { CHANGE_DESTROY = 1, CHANGE_ATTACH = 2, CHANGE_DETACH = 3 };
 typedef struct {
     ecs_entity_t id;
     component   *c;
-    uint32_t     size, op;
+    uint32_t     size;
+    enum change_op op;
 } change;
 
 typedef struct { ecs_table_t *table; int32_t rows; } table_slot;

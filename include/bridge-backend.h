@@ -25,7 +25,7 @@ typedef struct backend_func     backend_func;
 typedef struct { char text[256]; } backend_err;
 
 /* What a backend can actually do - capabilities.md. */
-enum {
+enum backend_capability : uint32_t {
     BACKEND_SANDBOX  = 1 << 0,
     BACKEND_METER    = 1 << 1,
     BACKEND_DEADLINE = 1 << 2,
@@ -37,29 +37,33 @@ enum {
 
 /* A setting is the backend's own: Bridge-ASM700 passes each through unread. A backend refuses a
  * key it does not know, by name, as Bridge-ASM700 refuses one of its own it does not. */
-enum { BACKEND_BOOL = 1, BACKEND_INT = 2, BACKEND_FLOAT = 3, BACKEND_STRING = 4 };
+enum backend_setting_kind : uint8_t {
+    BACKEND_BOOL = 1, BACKEND_INT = 2, BACKEND_FLOAT = 3, BACKEND_STRING = 4
+};
 typedef struct {
     const char *key;
-    uint8_t     kind;
+    enum backend_setting_kind kind;
     union { int b; int64_t i; double f; const char *s; } v;
 } backend_setting;
 
 /* A signature is declared going in and checked coming out - signatures.md. */
-enum { BACKEND_I32 = 1, BACKEND_I64 = 2 };
+enum backend_type : uint8_t { BACKEND_I32 = 1, BACKEND_I64 = 2 };
 typedef struct {
-    const uint8_t *params;  uint32_t param_count;
-    const uint8_t *results; uint32_t result_count;
+    const enum backend_type *params;  uint32_t param_count;
+    const enum backend_type *results; uint32_t result_count;
 } backend_sig;
 
 /* A function Bridge-ASM700 provides to a module. Every value travels as 64 bits. Non-zero says
  * the call that reached it must not go on: a backend that can unwind a module does so there. */
 typedef int (*backend_fn)(void *ud, const uint64_t *args, uint64_t *results);
 
-enum { BACKEND_IMPORT_FUNC = 1, BACKEND_IMPORT_MEMORY = 2, BACKEND_IMPORT_OTHER = 3 };
+enum backend_import_kind : uint8_t {
+    BACKEND_IMPORT_FUNC = 1, BACKEND_IMPORT_MEMORY = 2, BACKEND_IMPORT_OTHER = 3
+};
 typedef struct {
     const char *ns;    size_t ns_len;       /* not NUL-terminated */
     const char *field; size_t field_len;
-    uint8_t     kind;
+    enum backend_import_kind kind;
 } backend_import;
 
 /* Which adopted memory answers which of a module's imports. */
@@ -71,7 +75,7 @@ typedef struct {
 typedef struct backend_api {
     backend *(*backend_create)(const backend_setting *settings, uint32_t count, backend_err *err);
     void     (*backend_destroy)(backend *b);
-    uint32_t (*backend_capabilities)(backend *b);
+    enum backend_capability (*backend_capabilities)(backend *b);
 
     /* The address space this backend needs around a block: `reservation` bytes from its
      * start, then `guard` bytes nothing is mapped into. Zero for both if it needs none. */
@@ -83,7 +87,8 @@ typedef struct backend_api {
     /* `demands` is the capability flags this module's config asks for: a backend need not
      * compile in a guarantee nobody demanded, and may never enforce less than was. */
     backend_module *(*module_compile)(backend *b, const void *bytes, size_t len,
-                                      const char *path, uint32_t demands, backend_err *err);
+                                      const char *path, enum backend_capability demands,
+                                      backend_err *err);
     uint32_t        (*module_imports)(backend_module *m, backend_import *out, uint32_t max);
     void            (*module_destroy)(backend_module *m);
 
@@ -112,6 +117,7 @@ typedef struct backend_api {
     "instance_create", "instance_destroy", \
     "instance_set_fuel", "instance_set_deadline", "instance_set_memory_limit", \
     "define_func", "instance_func", "call"
-#define BACKEND_ENTRY_COUNT 17
+constexpr uint32_t BACKEND_ENTRY_COUNT = 17;
+static_assert(sizeof(backend_api) == BACKEND_ENTRY_COUNT * sizeof(void (*)()));
 
 #endif

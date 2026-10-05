@@ -4,7 +4,7 @@
 
 ECS_STRUCT(Link, { uint32_t n; });
 
-#define NONE 0xffffffffu
+constexpr uint32_t NONE = 0xffffffffu;
 
 static uint32_t a, b, c, on_a, on_b, on_c, started;
 static uint64_t entity;

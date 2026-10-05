@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-enum { DECLARE, SYSTEM, OBSERVE, SPAWN, DESTROY, ATTACH, DETACH, ALLOC, ENTRIES };
+enum entry : uint32_t { DECLARE, SYSTEM, OBSERVE, SPAWN, DESTROY, ATTACH, DETACH, ALLOC, ENTRIES };
 static const char *const entry_names[ENTRIES] = {
     "declare", "system", "observe", "spawn", "destroy", "attach", "detach", "alloc"
 };
@@ -117,7 +117,7 @@ BACKEND_EXPORT void backend_destroy(backend *b)
 
 /* No sandbox, no meter, no deadline, no limit: nothing contains code in this process. And not
  * side by side: a process cannot hold two copies of one library. */
-BACKEND_EXPORT uint32_t backend_capabilities(backend *b)
+BACKEND_EXPORT enum backend_capability backend_capabilities(backend *b)
 {
     (void)b;
     return BACKEND_RELOAD;
@@ -146,7 +146,7 @@ BACKEND_EXPORT void memory_release(backend_memory *m)
 }
 
 BACKEND_EXPORT backend_module *module_compile(backend *b, const void *bytes, size_t len,
-                                              const char *path, uint32_t demands,
+                                              const char *path, enum backend_capability demands,
                                               backend_err *err)
 {
     backend_module *m;
@@ -232,7 +232,7 @@ BACKEND_EXPORT void instance_set_memory_limit(backend_instance *i, uint64_t byte
 BACKEND_EXPORT int define_func(backend_instance *i, const char *ns, const char *field,
                                backend_fn fn, void *ud, const backend_sig *sig, backend_err *err)
 {
-    int k;
+    uint32_t k;
     (void)sig;
     for (k = 0; k < ENTRIES; k ++) {
         if (!strcmp(ns, BRIDGE_NAMESPACE) && !strcmp(field, entry_names[k])) {

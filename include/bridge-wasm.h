@@ -17,12 +17,13 @@
 
 /* ---- the ABI: docs/modules/abi.md. Every pointer is an offset into the scratch arena ---- */
 
-BRIDGE_IMPORT(declare) uint32_t bridge_declare(uint32_t name, uint32_t name_len, uint32_t kind,
-    uint32_t size, uint32_t align, uint32_t desc, uint32_t desc_len, uint32_t on_unload);
+BRIDGE_IMPORT(declare) uint32_t bridge_declare(uint32_t name, uint32_t name_len,
+    enum bridge_kind kind, uint32_t size, uint32_t align, uint32_t desc, uint32_t desc_len,
+    enum bridge_on_unload on_unload);
 BRIDGE_IMPORT(system)  uint32_t bridge_system(uint32_t name, uint32_t name_len, uint32_t phase,
     uint32_t phase_len, uint32_t terms, uint32_t term_count);
-BRIDGE_IMPORT(observe) uint32_t bridge_observe(uint32_t name, uint32_t name_len, uint32_t events,
-    uint32_t terms, uint32_t term_count);
+BRIDGE_IMPORT(observe) uint32_t bridge_observe(uint32_t name, uint32_t name_len,
+    enum bridge_event events, uint32_t terms, uint32_t term_count);
 BRIDGE_IMPORT(spawn)   uint64_t bridge_spawn();
 BRIDGE_IMPORT(destroy) void     bridge_destroy(uint64_t id);
 BRIDGE_IMPORT(attach)  void     bridge_attach(uint64_t id, uint32_t slot, uint32_t ptr, uint32_t len);
@@ -58,10 +59,14 @@ BRIDGE_ACC(acc_from_shared) void acc_from_shared(void *to, uint32_t from, uint32
 #define ECS_STRUCT(name, ...) \
     typedef struct name __VA_ARGS__ name; \
     static const char name##_desc[] = #__VA_ARGS__
+/* an enum is four bytes signed and a bitmask four unsigned, and the type says so: it is what
+ * Bridge-ASM700 lays the field out as, whatever a compiler would have chosen */
 #define ECS_ENUM(name, ...) \
-    typedef enum name __VA_ARGS__ name; \
+    typedef enum name : int32_t __VA_ARGS__ name; \
     static const char name##_desc[] = #__VA_ARGS__
-#define ECS_BITMASK(name, ...) ECS_ENUM(name, __VA_ARGS__)
+#define ECS_BITMASK(name, ...) \
+    typedef enum name : uint32_t __VA_ARGS__ name; \
+    static const char name##_desc[] = #__VA_ARGS__
 
 /* ---- the header and the scratch arena ---- */
 
@@ -204,7 +209,7 @@ static inline int bridge_alive(uint64_t id)
 
 /* ---- the log: stores, and no call. docs/bridge/diagnostics/log.md ---- */
 
-enum { BRIDGE_LOG_ERR = -3, BRIDGE_LOG_WARN = -2, BRIDGE_LOG_INFO = 0 };
+enum bridge_log : int8_t { BRIDGE_LOG_ERR = -3, BRIDGE_LOG_WARN = -2, BRIDGE_LOG_INFO = 0 };
 
 static inline void bridge_log(int level, const char *text, uint32_t len, uint32_t a0, uint32_t a1)
 {

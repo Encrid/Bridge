@@ -43,7 +43,7 @@ static void component_delete(bridge *b, component *c)
 }
 
 /* lifetime.md, *What unload leaves behind*: what becomes of the entities that carried it */
-static void drop_rows(bridge *b, component *c, uint32_t policy)
+static void drop_rows(bridge *b, component *c, enum bridge_on_unload policy)
 {
     ecs_entity_t *carried = nullptr;
     uint32_t count = 0, room = 0, i;
@@ -76,7 +76,7 @@ static void drop_rows(bridge *b, component *c, uint32_t policy)
 
 /* A module stops declaring `c`. Shared, it stays; the last to leave applies its own policy.
  * Policy zero is a load that failed: nothing can carry what was never applied. */
-static void component_release(bridge *b, component *c, uint32_t policy)
+static void component_release(bridge *b, component *c, enum bridge_on_unload policy)
 {
     if (-- c->declarers) return;
     if (policy) drop_rows(b, c, policy);
@@ -172,7 +172,8 @@ static int lacks(bridge *b, const char *identity, open_backend *o, uint32_t flag
 }
 
 /* Everything a load and a reload both refuse before the artifact is touched. */
-static int checks(bridge *b, const bridge_artifact *a, open_backend **on, uint32_t *demands)
+static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
+                  enum backend_capability *demands)
 {
     const bridge_module_config *cfg = &a->cfg;
     const char *id = cfg->identity;
@@ -366,7 +367,7 @@ static int lifecycle_call(module *m, backend_func *f, const char *name, int64_t 
 
 /* An image, an instance, a private memory, and the first call into it: `init` for a load,
  * `reload` for a reload. 0 if the module registered and every export it named is there. */
-static int start(bridge *b, module *m, const bridge_artifact *a, uint32_t demands,
+static int start(bridge *b, module *m, const bridge_artifact *a, enum backend_capability demands,
                  const char *entry, backend_err *err)
 {
     const bridge_module_config *cfg = &a->cfg;
@@ -432,7 +433,7 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     const char *id = cfg->identity;
     open_backend *o = nullptr;
     backend_err err = {};
-    uint32_t demands = 0;
+    enum backend_capability demands = 0;
     module *m, *other;
 
     store_enter(b);
@@ -562,7 +563,8 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     const char *id = cfg->identity;
     open_backend *o = nullptr;
     backend_err err = {};
-    uint32_t demands = 0, i, extra = 0;
+    enum backend_capability demands = 0;
+    uint32_t i, extra = 0;
     int64_t had, wants;
     module *old, *n, **link;
     int side_by_side;

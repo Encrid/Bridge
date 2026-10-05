@@ -31,7 +31,7 @@ uint32_t store_offset(bridge *b, const void *p)
  * offset order and joined to its neighbours, and a request takes the smallest gap that holds
  * it before it takes fresh space. The gaps are kept outside the block: a module's stray write
  * must not be able to reach them. */
-#define GRAIN 16u
+constexpr uint32_t GRAIN = 16;
 
 static uint32_t grain(ecs_size_t size)
 {

@@ -22,7 +22,7 @@
 #define thread_id() ((uint32_t)(uintptr_t)pthread_self())
 #endif
 
-#define MS 1'000'000ll
+constexpr int64_t MS = 1'000'000;
 
 /* the thread a native test module said it ran on, for the lines that say so */
 static uint32_t threads_seen[64], seen, pins, pins_here;
