@@ -3,6 +3,8 @@
  * what a failure costs. All three are legal only between phases. */
 #include "inside.h"
 
+#include <stdckdint.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -172,6 +174,21 @@ static int lacks(bridge *b, const char *identity, open_backend *o, uint32_t flag
 }
 
 /* Everything a load and a reload both refuse before the artifact is touched. */
+/* Where a module's regions sit in its private memory: the header, then scratch, the log ring
+ * and the spans, each at a multiple of 8. 1 if what it stated cannot be laid out in 32 bits,
+ * which is what every offset into that memory is. */
+static int private_layout(const bridge_module_config *cfg, uint32_t *ring, uint32_t *spans,
+                          uint32_t *end)
+{
+    constexpr uint32_t scratch = 128;
+    uint32_t at;
+    if (ckd_add(&at, scratch, cfg->scratch) || ckd_add(&at, at, 7u)) return 1;
+    *ring = at & ~7u;
+    if (ckd_add(&at, *ring, cfg->log_ring) || ckd_add(&at, at, 7u)) return 1;
+    *spans = at & ~7u;
+    return ckd_add(end, *spans, cfg->spans) || ckd_add(&at, *end, PAGE - 1);
+}
+
 static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
                   enum backend_capability *demands)
 {
@@ -218,6 +235,13 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
     if (cfg->spawns > (int64_t)b->entities) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its spawns of %lld is more "
             "than [budget] entities of %u", id, (long long)cfg->spawns, b->entities);
+        return 1;
+    }
+    uint32_t ring, spans, end;
+    if (private_layout(cfg, &ring, &spans, &end)) {
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its scratch of %u, log_ring of "
+            "%u and spans of %u bytes come to more than an offset of 32 bits can reach", id,
+            cfg->scratch, cfg->log_ring, cfg->spans);
         return 1;
     }
     /* budgets.md: the one floor with an argument. A module that can report nothing is the one
@@ -299,10 +323,12 @@ static module *record(bridge *b, const bridge_artifact *a, open_backend *o)
 /* The private block: the header at 0, then the three regions its config sized. */
 static int private_memory(bridge *b, module *m, const bridge_module_config *cfg, backend_err *err)
 {
-    uint64_t scratch = 128, ring, spans, len, reserve;
-    ring = (scratch + cfg->scratch + 7u) & ~7ull;
-    spans = (ring + cfg->log_ring + 7u) & ~7ull;
-    len = (spans + cfg->spans + PAGE - 1) & ~(uint64_t)(PAGE - 1);
+    constexpr uint32_t scratch = 128;
+    uint32_t ring, spans, end;
+    uint64_t len, reserve;
+    /* checks() refused a config this could not lay out, so it cannot fail here */
+    if (private_layout(cfg, &ring, &spans, &end)) unreachable();
+    len = ((uint64_t)end + PAGE - 1) & ~(uint64_t)(PAGE - 1);
     reserve = (len > b->reservation ? len : b->reservation) + b->guard;
     m->priv = os_reserve((size_t)reserve, (size_t)len);
     if (!m->priv) {
@@ -312,11 +338,11 @@ static int private_memory(bridge *b, module *m, const bridge_module_config *cfg,
     }
     m->priv_len = (size_t)len;
     m->priv_reserve = (size_t)reserve;
-    m->scratch = (uint32_t)scratch;
+    m->scratch = scratch;
     m->scratch_len = cfg->scratch;
-    m->ring = (uint32_t)ring;
+    m->ring = ring;
     m->ring_len = cfg->log_ring / (uint32_t)sizeof(bridge_log_record);
-    m->spans = (uint32_t)spans;
+    m->spans = spans;
     m->spans_len = cfg->spans;
     ((bridge_header *)m->priv)->log_level = cfg->log_level;
     ((bridge_header *)m->priv)->system = UINT32_MAX;        /* no system is running */

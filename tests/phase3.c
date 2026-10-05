@@ -145,6 +145,12 @@ int main(int argc, char **argv)
     if (!strcmp(what, "nophases")) cfg.phase_count = 0;
     if (!strcmp(what, "nobudget")) cfg.budget.columns = 0;
     if (!strcmp(what, "nocolumns")) cfg.budget.columns = (uint64_t)atoi(argc > 2 ? argv[2] : "0");
+    /* a size no offset reaches, and three that are each in reach and together are not */
+    if (!strcmp(what, "beyond")) cfg.budget.entities = (uint64_t)1 << 40;
+    if (!strcmp(what, "toobig")) {
+        cfg.budget.persistent = (uint64_t)3 << 30;
+        cfg.budget.columns = (uint64_t)2 << 30;
+    }
 
     b = bridge_create(&cfg, sink, nullptr);
     if (!b) {
@@ -207,6 +213,11 @@ int main(int argc, char **argv)
         a.cfg.persistent = !strcmp(what, "strings") ? 64 : !strcmp(what, "noarena") ? 4 : 1 << 20;
         load(b, &a);
         frames(b, 1);
+    } else if (!strcmp(what, "bigprivate")) {   /* regions that do not fit in 32 bits of offset */
+        a = artifact("game:mover@0.1.0", "mover");
+        a.cfg.scratch = 0xffffff00u;
+        a.cfg.spans = 4096;
+        load(b, &a);
     } else if (!strcmp(what, "nospawns")) {     /* the mover, stating that it spawns nothing */
         a = artifact("game:mover@0.1.0", "mover");
         a.cfg.spawns = BRIDGE_NONE;

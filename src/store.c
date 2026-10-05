@@ -540,6 +540,15 @@ static int unset(bridge *b, const char *key, uint64_t value)
     return 1;
 }
 
+/* an offset is 32 bits: a size it cannot reach is refused by name, before any sum is made of it */
+static int beyond(bridge *b, const char *key, uint64_t value)
+{
+    if (value <= UINT32_MAX) return 0;
+    say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] %s of %llu is more than an offset of 32 bits can "
+        "reach", key, (unsigned long long)value);
+    return 1;
+}
+
 int store_create(bridge *b, const bridge_budget *budget)
 {
     uint64_t index = PAGE, arena, columns, len, reserve;
@@ -550,12 +559,16 @@ int store_create(bridge *b, const bridge_budget *budget)
         || unset(b, "columns", budget->columns) || unset(b, "max_modules", budget->max_modules)) {
         return 1;
     }
+    if (beyond(b, "entities", budget->entities) || beyond(b, "persistent", budget->persistent)
+        || beyond(b, "columns", budget->columns)) {
+        return 1;
+    }
+    /* each is under 2^32 now, so none of these sums can leave 64 bits */
     arena = (index + sizeof(bridge_entity) * budget->entities + 15u) & ~15ull;
     columns = (arena + budget->persistent + 15u) & ~15ull;
     len = (columns + budget->columns + PAGE - 1) & ~(uint64_t)(PAGE - 1);
-    /* an offset is 32 bits, so the shared memory is never more than it can reach */
-    if (budget->entities > UINT32_MAX || budget->persistent > UINT32_MAX
-        || budget->columns > UINT32_MAX || len > (uint64_t)1 << 32) {
+    /* and together they are never more than an offset can reach */
+    if (len > (uint64_t)1 << 32) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: the shared memory would "
             "be %llu bytes and an offset into it is 32 bits", (unsigned long long)len);
         return 1;
