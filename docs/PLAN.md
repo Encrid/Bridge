@@ -10,8 +10,9 @@ declared finished while broken.
 **No done-when names something a later phase builds.** A phase is tested with what exists when it
 ends, so each one carries the part of the host seam, the sink and the scheduler its own claim needs.
 
-**Met means on Windows and on Linux.** The `windows` preset is run where the code is written, and
-the `linux` preset by `.github/workflows/linux.yml` on every push. Phases 1 to 5 were first met on
+**Met means on every platform the phase has.** Through phase 7 that is Windows and Linux, and from
+phase 8 macOS as well - `build.md`, *Platforms*. Windows is run where the code is written, and the
+others by the workflows under `.github/workflows/` on every push. Phases 1 to 5 were first met on
 Windows alone and said so; the Linux run caught up with them after phase 5, and passed as written.
 
 ## 0. Documents, and the spikes they need
@@ -31,7 +32,8 @@ confined*, and *flecs will not tell you which*.
 Done. flecs v4.1.6, vendored pristine as the amalgamation and patched by a script: the
 allocator argument at the twenty-three calls that allocate a column or an entity array, and one
 row-move hook - `flecs.md`, *It can be confined*, *flecs will not tell you which*, and *How it is
-carried* for the shape. The build is CMake with Ninja presets, and it starts in this phase.
+carried* for the shape. The build starts in this phase. It was CMake with Ninja presets, until
+phase 7 replaced it.
 `PHASE1.md` is what it built and found.
 
 **First, because everything else needs it.** Columns cannot be in the shared memory without the allocator,
@@ -139,19 +141,71 @@ shows as STOPPED; a reload keeps a row's bytes; a changed layout is refused nami
 fingerprints; an unload drops an exclusive component and keeps a shared one; and a `[.config]` key
 the module never declared is an error naming it.* Met.
 
-## 7. A host, from outside
+## 7. The build
+
+One compiler and one script. zig compiles everything on every platform, and `build.py` does what
+CMake did: patches flecs, compiles, links, builds the test modules and runs the tests - `build.md`,
+*One compiler* and *One script*. Windows becomes `x86_64-windows-gnu`, and until phase 10 it links
+the C runtime zig carries.
+
+**Nothing about the library changes**, which is the claim: the same tests, saying the same things,
+by another route. `PHASE7.md` is what it built and found.
+
+*Done when `python build.py test` passes every test on Windows, in a release build and a debug one,
+and on Linux; the Linux build compiles and links on Windows; the two tests that must fail still
+fail for their stated reason; and CMake is gone from the tree.*
+
+## 8. macOS
+
+arm64, as a third platform: a target, the POSIX half of `src/os.c` on a second system, wasmtime's
+library for it and a workflow - `build.md`, *Platforms*. It comes straight after the build because
+it is then one more target, and because every later phase is met on a second processor instead of
+finding out last.
+
+*Done when every test passes on macOS arm64 on every push, and that build compiles and links on
+Windows.*
+
+## 9. C99, and the context passed
+
+The source and every header become C99 - `build.md`, *The standard*. Three things the code leaned
+on go with it. A thread-local variable becomes a context that is passed: a native module's entries
+take their `api` first, the wasm backend keeps what it is adopting in its own state, and the flecs
+patch hands the allocator the world it is working for. flecs' log callback carries no context at
+all, so what it says goes to the sink of every live bridge. And a typed accessor reaches a field's
+bits through a temporary of the struct's own type, where `_Generic` chose a load by the field's.
+
+*Done when everything compiles as C99 with `-pedantic-errors` on every platform; no thread-local
+variable is left; two bridges still run in one process on two threads; a flecs message reaches
+every live bridge's sink; and the row test reads what it read before, with one typed load for each
+accessor in the built module.*
+
+## 10. Self contained
+
+Nothing fetched and nothing installed but the toolchain - `build.md`, *Self contained*. The parts
+of a C library that can be carried are carried: the routines our source and flecs call, and an
+allocator, in `third_party` and linked privately - `build.md`, *The C library*. flecs is built with
+the addons Bridge-ASM700 uses and no others, which is most of what shrinks that list. On Windows no
+C runtime is linked at all. Where each routine comes from, and what "in the tree" means for the
+tools the build runs, are settled in this phase's own plan, with the sources read first.
+
+*Done when a Windows build of the library, both backends and a test program imports the operating
+system's libraries and wasmtime and nothing else; the build fetches nothing; one formatted record
+is the same bytes on every platform; and every test passes.*
+
+## 11. A host, from outside
 
 A standalone host, built in its own repository against the library and nothing else, which is what
-tests the host seam: if it needs no part of Bridge-ASM700's inside, the seam is real. Whatever it
-reads - files, layers, a manifest - it resolves into the structs of `host-api.md`, *The data*.
-`bridge_manifest_parse` ships beside the library, not inside it, for a host that wants it -
-`native.md`, *Identity*.
+tests the host seam: if it needs no part of Bridge-ASM700's inside, the seam is real. It has this
+repository as a submodule and builds it with `build.py`. Whatever it reads - files, layers, a
+manifest - it resolves into the structs of `host-api.md`, *The data*. `bridge_manifest_parse` ships
+beside the library, not inside it, for a host that wants it - `native.md`, *Identity*.
 
 *Done when that host drives a real deployment for one pass and for many; it reloads a changed module
 and reports one that failed to load; a key it left unset is an error naming the key; and
-`bridge_manifest_parse` reads an identity out of both a wasm binary and a native library.*
+`bridge_manifest_parse` reads an identity out of a wasm binary and out of a native library in each
+of the three platforms' formats.*
 
-## 8. Diagnostics
+## 12. Diagnostics
 
 `[checks] validate` and `[checks] profile` - the barrier's checksum pass and the per-system
 counters - and `bridge_profile`, a pull. `validation.md`, *The checksum pass, when asked*, and
@@ -161,7 +215,7 @@ counters - and `bridge_profile`, a pull. `validation.md`, *The checksum pass, wh
 purpose is the one the profile names, and an observer cycle shows as call counts that never fall to
 zero.*
 
-## 9. Prove it
+## 13. Prove it
 
 Port the original Bridge's Godot adapter to this design, as a native module. It is a real workload
 with a measured baseline, which is why it is the proof. Its probe asserts 191 checks, and two of

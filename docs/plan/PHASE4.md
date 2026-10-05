@@ -68,7 +68,7 @@ process with it, which is what `sandbox = no` says.
 **`bridge_reload` and `bridge_shutdown` are not called yet.** Neither is a wasm module's; both
 arrive with unload and reload in `PLAN.md` phase 6.
 
-**The manifest section is not read.** `bridge_manifest_parse` is phase 7's, beside the library.
+**The manifest section is not read.** `bridge_manifest_parse` is the host phase's, beside the library.
 
 ## Open questions
 

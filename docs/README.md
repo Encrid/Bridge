@@ -21,12 +21,13 @@ diagram to keep in step with. One concern per document, in reading order:
 
     README.md            this file
     DESIGN.md            why, and what the design is
-    PLAN.md              the ten phases, each with a done-when that can fail
+    PLAN.md              the fourteen phases, each with a done-when that can fail
 
     design/
         no-builtins.md       the rule, and its universality test
         split.md             which side owns what
         costs.md             what we give up
+        build.md             the compiler, the platforms, the standard, the C library
 
     plan/
         PHASE0.md            how we decide things. method, not design

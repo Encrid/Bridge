@@ -32,10 +32,14 @@ sits in decides input latency, which is a deployment's choice rather than ours.
 
 ## Identity
 
-A named section in the library, read by parsing the file before anything in it runs:
+A section named `.bridge` in the library, read by parsing the file before anything in it runs:
 
-    __attribute__((section("bridge.manifest")))
     const char bridge_manifest[] = "godot:adapter@0.1.0\0abi=1\0pinned=true";
+
+placed in that section by whatever the author's compiler spells it with: an attribute, a pragma, a
+`link_section`. **One name on every format**, and a short one, because a PE image's section table
+holds eight characters and the name has to be the same thing everywhere to be a convention. On
+Mach-O it sits in the `__TEXT` segment.
 
 The same contents a wasm module's `bridge:manifest` carries - `module.md`, *The manifest*. What is
 specific to this backend is **when** it is read.
