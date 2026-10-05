@@ -44,7 +44,8 @@ does what they did, as commands in order:
     wasm modules      assembled from text, or compiled, merged with the accessors and inlined
     the tests         one table: a name, a command, what its output must match and must not
 
-Nothing in `src/`, `backends/` or `include/` changed. They are still compiled as C11, since C99
+Nothing in `src/`, `backends/` or `include/` changed for it, and one line of `src/store.c` did for
+what it found, below. They are still compiled as C11, since C99
 needs the changes that are phase 9.
 
 On Windows the target is `x86_64-windows-gnu` with the C runtime zig carries, which phase 10 takes
