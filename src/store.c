@@ -90,7 +90,10 @@ void *store_column_regrow(bridge *b, void *ptr, uint32_t old_size, uint32_t new_
     uint32_t had = grain(old_size), want = grain(new_size), at = 0, to, i;
     if (ptr) {
         at = (uint32_t)((uint8_t *)ptr - base);
-        if (want <= had) return ptr;
+        if (want <= had) {
+            if (want < had) give(b, at + want, had - want);
+            return ptr;
+        }
         /* where it is, when what follows it is free: a block mostly grows, and mostly it is
          * the last one */
         if (at + had == b->columns_used && want - had <= b->columns_len - b->columns_used) {

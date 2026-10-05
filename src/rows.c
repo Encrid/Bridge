@@ -60,6 +60,8 @@ typedef struct {
     uint32_t incoming;              /* rows this barrier will add: room is found for them first */
     bool     live, touched;
     bool     sized;                 /* and it has been: `incoming` is how many it has room for */
+    bool     named;                 /* it is the table its set is found as: lifetime.md, *What
+                                     * unload leaves behind*, for when one is not */
 } table;
 
 struct rows {
@@ -210,10 +212,60 @@ static bool matches(const rows_terms *t, const uint64_t *set)
     return true;
 }
 
+/* The table a set is found as, and no longer. What followed it in its run of the hash is put
+ * back where it is still found. */
+static void named(rows *r, uint32_t t)
+{
+    uint32_t i;
+    for (i = hashed(r, set_of(r, t)); r->hash[i]; i = (i + 1) & (r->hash_room - 1)) {}
+    r->hash[i] = t;
+    r->tables[t].named = true;
+}
+
+static void unnamed(rows *r, uint32_t t)
+{
+    uint32_t i = hashed(r, set_of(r, t)), k;
+    while (r->hash[i] != t) i = (i + 1) & (r->hash_room - 1);
+    r->hash[i] = 0;
+    for (k = (i + 1) & (r->hash_room - 1); r->hash[k]; k = (k + 1) & (r->hash_room - 1)) {
+        uint32_t other = r->hash[k], home = hashed(r, set_of(r, other));
+        r->hash[k] = 0;
+        while (r->hash[home]) home = (home + 1) & (r->hash_room - 1);
+        r->hash[home] = other;
+    }
+    r->tables[t].named = false;
+}
+
+/* Systems are fixed at load, so a table is matched against them when it is made, and again only
+ * if its set changes: in each list it belongs in, and out of every one. */
+static void listed(rows *r, uint32_t t)
+{
+    for (uint32_t i = 0; i < r->system_count; i ++) {
+        rows_terms *s = r->systems[i];
+        if (!matches(s, set_of(r, t))) continue;
+        s->list[s->matched] = t;
+        s->pos[t] = ++ s->matched;
+        s->changed = true;
+    }
+}
+
+static void unlisted(rows *r, uint32_t t)
+{
+    for (uint32_t i = 0; i < r->system_count; i ++) {
+        rows_terms *s = r->systems[i];
+        uint32_t at = s->pos[t];
+        if (!at) continue;
+        s->list[at - 1] = s->list[-- s->matched];
+        s->pos[s->list[at - 1]] = at;
+        s->pos[t] = 0;
+        s->changed = true;
+    }
+}
+
 /* the table of this set, made if there is none. 0 if there is no room for another. */
 static uint32_t table_for(rows *r, const uint64_t *set)
 {
-    uint32_t t = table_of(r, set), i;
+    uint32_t t = table_of(r, set);
     if (t) return t;
     if (r->table_free) {
         t = r->table_free;
@@ -227,16 +279,8 @@ static uint32_t table_for(rows *r, const uint64_t *set)
     r->tables[t] = (table){ .live = true, .touched = r->tables[t].touched };
     memcpy(r->sets + (size_t)t * r->words, set, 8u * r->words);
     memset(columns_of(r, t), 0, 4u * r->type_room);
-    for (i = hashed(r, set); r->hash[i]; i = (i + 1) & (r->hash_room - 1)) {}
-    r->hash[i] = t;
-    /* systems are fixed at load, so a table is matched against them once, here */
-    for (i = 0; i < r->system_count; i ++) {
-        rows_terms *s = r->systems[i];
-        if (!matches(s, set)) continue;
-        s->list[s->matched] = t;
-        s->pos[t] = ++ s->matched;
-        s->changed = true;
-    }
+    named(r, t);
+    listed(r, t);
     touch(r, t);
     return t;
 }
@@ -245,32 +289,48 @@ static uint32_t table_for(rows *r, const uint64_t *set)
 static void table_gone(rows *r, uint32_t t)
 {
     table *tab = &r->tables[t];
-    uint32_t i = hashed(r, set_of(r, t)), k;
     if (tab->block) store_column_free(r->b, r->b->shared + tab->block, tab->block_len);
-    /* out of the hash, and what followed it in its run moved up to where it is still found */
-    while (r->hash[i] != t) i = (i + 1) & (r->hash_room - 1);
-    r->hash[i] = 0;
-    for (k = (i + 1) & (r->hash_room - 1); r->hash[k]; k = (k + 1) & (r->hash_room - 1)) {
-        uint32_t moved = r->hash[k], home = hashed(r, set_of(r, moved));
-        r->hash[k] = 0;
-        while (r->hash[home]) home = (home + 1) & (r->hash_room - 1);
-        r->hash[home] = moved;
-    }
-    for (i = 0; i < r->system_count; i ++) {
-        rows_terms *s = r->systems[i];
-        uint32_t at = s->pos[t];
-        if (!at) continue;
-        s->list[at - 1] = s->list[-- s->matched];
-        s->pos[s->list[at - 1]] = at;
-        s->pos[t] = 0;
-        s->changed = true;
-    }
+    if (tab->named) unnamed(r, t);
+    unlisted(r, t);
     memset(columns_of(r, t), 0, 4u * r->type_room);
     touch(r, t);
     tab->live = false;
     tab->rows = tab->room = tab->block = tab->block_len = 0;
     r->table_next[t] = r->table_free;
     r->table_free = t;
+}
+
+/* A table stops carrying `type`, where it stands: the column goes, the ones after it close up,
+ * and what the block no longer needs is given back. No row moves and nothing is asked of the
+ * column region, so this cannot fail. `name` if no other table is found as what is left. */
+static void stripped(rows *r, uint32_t t, const rows_type *type, bool name)
+{
+    table *tab = &r->tables[t];
+    bridge *b = r->b;
+    uint64_t *set = r->sets + (size_t)t * r->words;
+    uint32_t *columns = columns_of(r, t);
+    uint32_t gone = (uint32_t)padded((uint64_t)type->size * tab->room);
+
+    if (tab->named) unnamed(r, t);
+    unlisted(r, t);
+    for (uint32_t w = type->id >> 6; w < r->words; w ++) {
+        for (uint64_t bits = set[w]; bits; bits &= bits - 1) {
+            const rows_type *after = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
+            if (after->id <= type->id) continue;
+            memmove(b->shared + columns[after->id] - gone, b->shared + columns[after->id],
+                (size_t)after->size * tab->rows);
+            columns[after->id] -= gone;
+        }
+    }
+    columns[type->id] = 0;
+    take(set, type->id);
+    /* the same block, shorter: what a smaller size is answered with is where it already is */
+    if (store_column_regrow(b, b->shared + tab->block, tab->block_len, tab->block_len - gone)
+        != b->shared + tab->block) unreachable();
+    tab->block_len -= gone;
+    if (name) named(r, t);
+    listed(r, t);
+    touch(r, t);
 }
 
 /* ---- rows ---- */
@@ -433,7 +493,12 @@ void rows_apply(rows *r)
     for (i = 0; i < r->changed_count; i ++) {
         uint32_t index = r->changed[i], t = 0;
         if (r->folded[index] & DESTROYED) continue;
-        if (!empty(r, work_of(r, index))) {
+        /* what it carries already, it carries where it is: an attach of what it has is a value
+         * and no move, in whichever table of that set it happens to be */
+        uint32_t from = r->places[index].table;
+        if (from && !memcmp(work_of(r, index), set_of(r, from), 8u * r->words)) {
+            t = from;
+        } else if (!empty(r, work_of(r, index))) {
             t = table_for(r, work_of(r, index));
             if (!t) {
                 dropped(r, index, false);
@@ -717,7 +782,7 @@ static void widen(rows *r, uint32_t types)
     r->type_room = room;
     for (uint32_t t = 1; t < r->table_high; t ++) {
         uint32_t i;
-        if (!r->tables[t].live) continue;
+        if (!r->tables[t].live || !r->tables[t].named) continue;
         for (i = hashed(r, set_of(r, t)); r->hash[i]; i = (i + 1) & (r->hash_room - 1)) {}
         r->hash[i] = t;
     }
@@ -865,20 +930,35 @@ static void destroyed(rows *r, uint32_t index)
     if (from && r->tables[from].live && !r->tables[from].rows) table_gone(r, from);
 }
 
+/* lifetime.md, *What unload leaves behind*. A table at a time. */
 void rows_drop(rows *r, rows_type *type, enum bridge_on_unload policy)
 {
     uint64_t *set = r->scratch + r->words;
     for (uint32_t t = 1; t < r->table_high; t ++) {
-        if (!r->tables[t].live || !has(set_of(r, t), type->id)) continue;
+        table *tab = &r->tables[t];
+        uint32_t to;
+        bool none;
+        if (!tab->live || !has(set_of(r, t), type->id)) continue;
         memcpy(set, set_of(r, t), 8u * r->words);
         take(set, type->id);
-        /* from the last row, so that none is moved into the place of one already seen */
-        while (r->tables[t].live && has(set_of(r, t), type->id) && r->tables[t].rows) {
-            uint32_t index = (uint32_t)who_of(r, &r->tables[t])[r->tables[t].rows - 1];
-            if (policy == BRIDGE_DELETE || (policy == BRIDGE_SWEEP && empty(r, set))
-                || !became(r, index, set, CHANGE_DETACH, type->id)) {
-                destroyed(r, index);
-            }
+        none = empty(r, set);
+        if (policy == BRIDGE_DELETE || (policy == BRIDGE_SWEEP && none)) {
+            /* from the last row, so that none is moved into the place of one already seen */
+            while (tab->live) destroyed(r, (uint32_t)who_of(r, tab)[tab->rows - 1]);
+            continue;
+        }
+        for (uint32_t row = tab->rows; row --;) {
+            told(r, who_of(r, tab)[row], set_of(r, t), set, CHANGE_DETACH, type->id);
+        }
+        to = none ? 0 : table_of(r, set);
+        if (none || (to && grow(r, to, r->tables[to].rows + tab->rows))) {
+            /* nothing left to carry, or a table of what is left with room for them all */
+            while (tab->rows) moved(r, (uint32_t)who_of(r, tab)[tab->rows - 1], to);
+            table_gone(r, t);
+        } else {
+            /* no table of what is left, and this one becomes it; or one that has no room,
+             * and until either empties there are two */
+            stripped(r, t, type, !to);
         }
     }
 }

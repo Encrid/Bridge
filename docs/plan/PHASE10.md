@@ -1,6 +1,7 @@
 # Phase 10: storage of our own
 
-Done.
+In progress: flecs is out and the gate is passed, and *What was not in the plan* lists what was
+built without being decided and is being decided now, one at a time.
 
 `flecs.md`, *Why flecs rather than our own*, said that writing our own would have produced a
 worse flecs. This phase did it anyway, and this document is why that was no longer the same bet,
@@ -316,23 +317,33 @@ were and runs on, where the bridge stopped. `phase6-configceiling` runs out at `
 where 440 was flecs' own entities and one more. And `phase5-nested2` is refused by the word the
 reading stopped at.
 
+Two more came with the decision on strip: `storage strip` and `storage stripfull`.
+
 Six cases went with flecs: the two that held its patch to its claim and the two that showed each
 failing without it, the one that declined another version, and the one that freed a table each of
 the ways flecs could.
 
 ## What was not in the plan
 
-**Storage allocates at load, and not only at create.** The plan said nothing after
-`bridge_create`. What a budget sizes is allocated there; but a set is as wide as there are
-declared types and a system keeps a list of its tables, and no budget states how many types or
-systems there will be. Those are allocated when a module loads. A barrier allocates nothing, which
-is what the sentence was for.
+Five things were built as whatever was nearest to hand and written up as settled. None had been
+through the steps of `PHASE0.md`. Each is put back as a question, and this section says where
+each stands.
 
-**A strip at unload can fail to place an entity**, and then destroys it with a record -
-`lifetime.md`, *What unload leaves behind*. It moves an entity to the table of what it has left
-while the table it is leaving still stands, so a deployment at exactly its `tables` has no room
-for the move. Leaving the entity as it was is not available there: the component is going.
+**A strip at unload: decided.** As first built it moved an entity at a time to the table of what
+it had left, needed that table to stand beside the one it was leaving, and destroyed the entity
+when `tables` or `columns` could not give it. The plan had said a table at a time, and `strip`
+says the entity stays. It is now worked a table at a time, in place wherever a join is not to be
+had, and cannot fail: `lifetime.md`, *What unload leaves behind*. `storage strip` and `storage
+stripfull` are its cases, each run with its rule taken out and failing.
 
-**`source[]` in a span is always zero.** Under flecs it could name the entity a term came from;
+**Open: what storage may allocate after `bridge_create`.** The plan said nothing. As built, what
+a budget sizes is allocated there; a set's width and a system's list of tables are sized by how
+many types and systems there are, which no budget states, and are allocated when a module loads.
+A barrier allocates nothing, and no test holds that yet, which is a second open item.
+
+**Open: which entities are placed when columns run short.** As built, a table that cannot take
+all the rows arriving takes as many as fit, found by halving what it asks for.
+
+**Open: `source[]` in a span, which is always zero.** Under flecs it could name the entity a term came from;
 nothing a module could ask for ever made it do so, and storage of our own has no such term. The
 field stays in the span, and `query.md`, *The interface is a query*, says what it holds.

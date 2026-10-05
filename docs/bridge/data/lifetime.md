@@ -40,11 +40,30 @@ application can enumerate every entity and find its orphans. **No module here ca
 terms, so an entity with no component and no remembered id could never be destroyed by anyone, and
 it would count against the entity ceiling for the life of the process.
 
-**A strip moves each entity to the table of what it has left**, one entity at a time, and that
-table may have to be made while the one it is leaving still stands. Where `[budget] tables` or
-`[budget] columns` cannot give it, the entity is destroyed and a record says so: the component is
-going, so the entity cannot stay as it was, which is what running out means anywhere else -
-`budgets.md`, *What running out does*.
+**A strip never fails, and never costs an entity.** It is worked a table at a time, and what it
+needs is never more than what is there: afterwards there are no more tables than before, and no
+more bytes. For each table that carries the component:
+
+    nothing else on its entities     they are left with nothing, in no table, and it is released
+    no table of what is left         it becomes that table where it stands: the column goes,
+                                     the ones after it close up, and no row moves
+    a table of what is left,         its rows join that one, and it is released
+    with room for them
+    one without room, and the        it becomes a second table of that set, where it stands
+    column region cannot give it
+
+The last is the one case with a trace. Two tables then carry the same set until either empties;
+a module sees a span for each, which is no more than it could ever rely on - `module.md`, *What
+no module may do*. An entity given that set afterwards goes to the one that was there first, and
+an entity already in either stays where it is for as long as its set does not change.
+
+Refused: destroying what cannot be placed, which is what this first did. `strip` says the entity
+stays, and a reload that stops declaring a component is a strip too, on a call that means "keep
+running". Refused: never joining, and leaving every stripped table where it stands, which is one
+path and no row moved: it doubles the tables and spans of every set that already had one, for as
+long as their entities live. The condition that brings it back is the join costing more than the
+second table does. Refused: moving every block of the column region so that a join always fits.
+The condition that brings that back is second tables seen to pile up in a deployment.
 
 **The policy applied is the unloading module's own**, and only when it is the last to declare the
 component. Two declarers need not agree, because the first to leave drops nothing.

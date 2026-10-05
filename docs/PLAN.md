@@ -187,10 +187,10 @@ and macOS.* Met.
 
 ## 10. Storage of our own
 
-Done. flecs leaves, and what Bridge-ASM700 used it for becomes its own: the entity index, tables and
-their columns, moving a row between them, matching a system's terms to tables, the events an
-observer hears, and reading a struct's fields out of its text. It is the reversal of a decision
-this plan began with, and `PHASE10.md` is why.
+In progress: `PHASE10.md`, *What was not in the plan*. flecs leaves, and what Bridge-ASM700 used it
+for becomes its own: the entity index, tables and their columns, moving a row between them, matching
+a system's terms to tables, the events an observer hears, and reading a struct's fields out of its
+text. It is the reversal of a decision this plan began with, and `PHASE10.md` is why.
 
 **flecs was never on the path that repeats.** A system reads its columns through the spans
 Bridge-ASM700 publishes, and no row loop calls flecs. What flecs did, it did at a barrier and at
@@ -201,7 +201,7 @@ what is replaced is a hundred thousand lines kept for forty-one calls.
 Bridge-ASM700 touches storage only at a barrier, with every change of that barrier already in
 hand, for queries fixed at load, and nobody iterates through it. Storage made for that works an
 entity once however much was asked of it, publishes what changed and nothing else, believes
-nothing a module can write, and allocates nothing at a barrier.
+nothing a module can write, and allocates nothing after it is created.
 
 **Nothing of flecs is deleted until numbers say it may be.** flecs is measured first, as it is.
 Ours is built beside it, behind one internal header, and both run the same cases. flecs goes only
@@ -210,9 +210,9 @@ and this phase has failed its claim.
 
 *Done when every case passes on storage that is Bridge-ASM700's own, on Windows, Linux and macOS,
 alone and under load; on every measured operation it is not slower than flecs was, with both sets
-of figures recorded; storage allocates nothing at a barrier and reads nothing back from the shared
-block; no line of flecs is left in the tree; and the behaviours no test covered before this phase
-each have one.* Met: `PHASE10.md`, *What it costs*.
+of figures recorded; storage allocates nothing after `bridge_create` and reads nothing back from
+the shared block; no line of flecs is left in the tree; and the behaviours no test covered before
+this phase each have one.*
 
 ## 11. Self contained
 

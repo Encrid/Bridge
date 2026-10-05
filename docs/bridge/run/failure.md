@@ -40,9 +40,9 @@ Refused: stopped until `bridge_destroy`, which is what this first said - the ori
 module, and made reload useless for exactly the modules a deployment calls essential. Refused:
 accepting unloads as well, which has no job once `bridge_destroy` shuts every module down.
 
-A bridge stopped because its columns ran out is not repairable, and nothing lifts it: what failed
-there is storage, and part of it is no longer where modules can read it - `budgets.md`, *What
-running out does*.
+Storage running out does not stop a bridge. A barrier that cannot place an entity, for want of a
+table or of columns, leaves it as it was and counts as a barrier the module that asked failed in,
+beside whatever its systems did - `budgets.md`, *What running out does*.
 
 **`fail` covers a stop as it covers a load.** A module stated `fail` and then stopped at its budget
 stops the bridge too, because the reason does not change with the frame number: the deployment

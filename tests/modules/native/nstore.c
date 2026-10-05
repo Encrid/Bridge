@@ -80,7 +80,7 @@ BRIDGE_NATIVE(see)
 #endif
 
 #if !defined(BIG) && !defined(TABLES)
-static uint32_t with_a, without_b, maybe_b;
+static uint32_t with_a, without_b, maybe_b, with_b;
 static uint64_t old[COUNT], gone[64];
 static uint32_t gone_count, reused;
 
@@ -254,6 +254,32 @@ BRIDGE_NATIVE(find)
     return 0;
 }
 
+/* B on the first half, each with a value of its own, and what a query for B alone then sees:
+ * for a column that has to be where it was after the one before it is taken away */
+BRIDGE_NATIVE(value_b)
+{
+    for (uint32_t i = 0; i < COUNT / 2; i ++) {
+        B value = { 70 + i };
+        api->attach(ids[i], b, bridge_native_put(api, &value, sizeof value), sizeof value);
+    }
+    return 0;
+}
+
+BRIDGE_NATIVE(look_b)
+{
+    const bridge_query *q = bridge_native_query(api, with_b);
+    uint32_t rows = 0, sum = 0;
+    for (uint32_t s = 0; s < q->spans; s ++) {
+        const uint32_t *span = bridge_native_span(api, q, s, 1);
+        auto values = (const B *)(api->shared_base + span[2]);
+        rows += span[0];
+        for (uint32_t row = 0; row < span[0]; row ++) sum += values[row].v;
+    }
+    say("with B: spans, rows", q->spans, rows);
+    say("with B: the sum of them", sum, 0);
+    return 0;
+}
+
 /* ---- what an observer hears: who, and how ---- */
 
 static uint32_t on_a, on_b, on_both;
@@ -312,6 +338,7 @@ BRIDGE_NATIVE(init)
     BRIDGE_NATIVE_SYSTEM(api, "attach_a_half", "attach_a_half", &none, 0);
     BRIDGE_NATIVE_SYSTEM(api, "scribble", "scribble", &none, 0);
     BRIDGE_NATIVE_SYSTEM(api, "find", "find", &none, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "value_b", "value_b", &none, 0);
     with_a = BRIDGE_NATIVE_SYSTEM(api, "look", "look", one, 1);
     without_b = BRIDGE_NATIVE_SYSTEM(api, "look_not", "never", two, 2);
     two[1].oper = BRIDGE_OPTIONAL;
@@ -319,6 +346,7 @@ BRIDGE_NATIVE(init)
     on_a = BRIDGE_NATIVE_OBSERVER(api, "heard_a",
         BRIDGE_ON_ADD | BRIDGE_ON_SET | BRIDGE_ON_REMOVE, one, 1);
     one[0].slot = b;
+    with_b = BRIDGE_NATIVE_SYSTEM(api, "look_b", "look_b", one, 1);
     on_b = BRIDGE_NATIVE_OBSERVER(api, "heard_b",
         BRIDGE_ON_ADD | BRIDGE_ON_SET | BRIDGE_ON_REMOVE, one, 1);
     two[1].oper = BRIDGE_AND;

@@ -8,6 +8,8 @@
  *     storage notables    [budget] tables used up: the entity is left as it was, and it is a
  *     storage nocolumns   failure of the module that asked. The same for [budget] columns
  *     storage scribble    a module writes over what storage publishes in the shared block
+ *     storage strip       a component stripped from every entity, a table at a time: into the
+ *     storage stripfull   table of what is left, or where it stands. And with no room to merge
  *     storage measure     nanoseconds for each kind of change, at a barrier
  *
  * The first two are a transcript and decide nothing themselves: build.py holds what it must
@@ -74,7 +76,7 @@ static const char *const phases[] = {
     "spawn", "attach_a", "attach_b", "detach_b", "destroy", "attach_b_half", "detach_b_half",
     "detach_b_absent", "value_a", "flicker", "destroy_half", "respawn_half", "touch_dead",
     "attach_a_half", "recycled", "combine", "look", "never", "work", "check", "attach_both",
-    "scribble", "find"
+    "scribble", "find", "value_b", "look_b"
 };
 constexpr uint32_t PHASES = sizeof phases / sizeof *phases;
 
@@ -95,6 +97,18 @@ static uint64_t barrier(bridge *b, const char *phase)
     t = os_now();
     store_barrier(b);
     return os_now() - t;
+}
+
+/* What unload does to a component with the policy `strip`, asked of storage directly so that the
+ * module is still there to look: lifetime.md, *What unload leaves behind*. */
+static void strip(bridge *b, const char *name)
+{
+    printf("strip %s\n", name);
+    for (uint32_t i = 0; i < b->component_count; i ++) {
+        if (!strcmp(b->components[i]->name, name)) rows_drop(b->rows, b->components[i]->type, BRIDGE_STRIP);
+    }
+    /* a barrier, for what was heard and for what a module reads */
+    run(b, "never");
 }
 
 /* Four of nstress, each in its own namespace, a hundred rounds of work and check. */
@@ -135,6 +149,7 @@ int main(int argc, char **argv)
     if (!strcmp(what, "stress")) cfg.threads = 4;
     if (!strcmp(what, "notables")) cfg.budget.tables = 1;
     if (!strcmp(what, "nocolumns")) cfg.budget.columns = 64;
+    if (!strcmp(what, "stripfull")) cfg.budget.columns = 160;
     b = bridge_create(&cfg, sink, nullptr);
     bridge_artifact a;
 
@@ -218,6 +233,35 @@ int main(int argc, char **argv)
         run(b, "attach_b_half");    /* the three that are left move to another table */
         run(b, "look");
         run(b, "find");             /* and each is where the index says, under its own id */
+    } else if (!strcmp(what, "strip")) {
+        a = store_module(NSTORE_PATH, 6, 1 << 20);
+        if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
+        run(b, "spawn");
+        run(b, "attach_a");
+        run(b, "value_a");
+        run(b, "value_b");          /* three with A, three with A and B */
+        strip(b, "st:B");           /* a table of what is left stands, with room: they join it */
+        run(b, "look");
+        run(b, "look_b");
+        run(b, "value_b");          /* and the same two tables again */
+        strip(b, "st:A");           /* no table of B alone: the one of A and B becomes it, where */
+        run(b, "look");             /* it stands, and three entities are left with nothing */
+        run(b, "look_b");           /* the column of B is where the index and the span say */
+        run(b, "find");
+    } else if (!strcmp(what, "stripfull")) {
+        a = store_module(NSTORE_PATH, 6, 1 << 20);
+        if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
+        run(b, "spawn");
+        run(b, "value_b");          /* B first, so that the table of A alone is made with */
+        run(b, "attach_a");         /* room for its three rows and the region is then full */
+        run(b, "look");
+        strip(b, "st:B");           /* the table of A has no room for three more and cannot */
+        run(b, "look");             /* grow: two tables of A, and every entity still there */
+        run(b, "find");
+        run(b, "attach_a");         /* a value for each, which moves none of them */
+        run(b, "look");
+        run(b, "destroy");          /* and both tables go when they empty */
+        run(b, "look");
     } else if (!strcmp(what, "stress")) {
         if (stress_load(b)) { printf("FAIL: not loaded\n"); return 1; }
         stress_run(b);

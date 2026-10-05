@@ -38,6 +38,10 @@ at a multiple of eight. A table that needs more rows asks for twice what it had,
 follows it is free, and otherwise elsewhere with its rows copied. A row that leaves is filled by
 the table's last row.
 
+**One table for each set, with one exception**: a strip at unload that had no room to join two
+tables leaves both - `lifetime.md`, *What unload leaves behind*. The set finds the one that was
+there first, and the other lasts until its rows have left.
+
 **A table lives while it has rows.** It is made when the first entity is placed in it and released,
 block and id, at the barrier its last one leaves. Table ids are dense, from 1; 0 is no table, which
 is where an entity with nothing on it is. A released id is used again by the next table made.
