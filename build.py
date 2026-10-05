@@ -549,7 +549,7 @@ CASES = [
     ('phase6-timeouts', ['phase6', 'timeouts'],
      r"its shutdown trapped: interrupt. its teardown continues.*test:hang@0.1.0: unloaded.*modules: .0..*alive", None),
     ('phase6-slots', ['phase6', 'slots'],
-     r"module 'game:ticker@0.1.0' is refused: .budget. max_modules of 1 is reached.*game:twostep@0.1.0: unloaded.*game:ticker@0.1.0: loaded.*modules: game:ticker@0.1.0=RUNNING .1..*alive", None),
+     r"module 'game:ticker@0.1.0' is refused: .budget. modules of 1 is reached.*game:twostep@0.1.0: unloaded.*game:ticker@0.1.0: loaded.*modules: game:ticker@0.1.0=RUNNING .1..*alive", None),
     ('phase6-reload', ['phase6', 'reload'],
      r"tick 102 1.*game:ticker@0.1.0/-: shutdown 1 0.*game:ticker@0.2.0: reloaded.*tick 112 10.*tick 122 10.*alive", None),
     ('phase6-reloadlayout', ['phase6', 'reloadlayout'],

@@ -455,7 +455,7 @@ int bridge_load(bridge *b, const bridge_artifact *a)
         return 1;
     }
     if (b->module_count >= b->max_modules) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: [budget] max_modules of %u is "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: [budget] modules of %u is "
             "reached", id, b->max_modules);
         return 1;
     }

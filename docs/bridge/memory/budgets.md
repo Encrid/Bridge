@@ -4,15 +4,18 @@ Two tiers, because two things are being sized.
 
 **Shared, when Bridge-ASM700 starts, from `bridge_config`:**
 
-    entities      how many entity indices there are. Index 0 is no entity
-    persistent    the persistent arena, in bytes
-    columns       every table's rows, in bytes: its entity ids and its columns
-    tables        how many sets of components entities may carry at once
-    types         how many types may be declared at once: components, and the structs, enums
-                  and bitmasks their fields name
-    systems       how many systems and observers may be registered at once
-    terms         how many terms one of them may have
-    max_modules   how many modules may be loaded at once
+    how many there may be at once
+    entities      entity indices. Index 0 is no entity
+    tables        sets of components entities carry
+    types         declared types: components, and the structs, enums and bitmasks their
+                  fields name
+    systems       systems and observers registered
+    terms         terms one of them may have
+    modules       modules loaded
+
+    how many bytes
+    persistent    the persistent arena
+    columns       every table's rows: its entity ids and its columns
 
 One block serves everyone, so no single module could size it. It arrives as a struct rather than a
 file, because Bridge-ASM700 reads none: `host-api.md`, *Bridge-ASM700 parses nothing*.
@@ -43,7 +46,7 @@ Refused: allocating at load for however many types and systems a module turns ou
 is what this first did: memory that is a stated budget times a number nobody stated. Refused: a
 module stating its own counts, which `init` already says by declaring. The condition that brings
 either back is a host that cannot state a ceiling for modules it has not seen - and it states one
-for `max_modules` already.
+for `modules` already.
 
 **Per module, when that module registers:** its scratch arena, its log ring and its spans - which
 is to say, this tier sizes that module's private memory. And what is set aside for it in the shared
@@ -71,7 +74,7 @@ stated number that would not be true.
 A module that spawns nothing, or keeps no string, says so: `-1`, as for any key where none is a
 real answer.
 
-Because modules come and go, `max_modules` bounds **how many module records exist at once**, not
+Because modules come and go, `modules` bounds **how many module records exist at once**, not
 how the private memory is divided. A record is taken at load and freed at unload, and exhaustion refuses the
 load, the same discipline as every other budget. The shared tier is untouched - the entity ceiling
 and the persistent arena do not care how many modules exist.
@@ -105,7 +108,7 @@ runs out:
     tables, columns        at a barrier         the entity is left as it was, and it is a
                                                 failure of the module that asked
     log_ring               at a write           the line is dropped and counted
-    max_modules            at a load            the load is refused
+    modules                at a load            the load is refused
     types, systems,        at a `declare` or    the module's `init` fails
       terms                a `system`
 

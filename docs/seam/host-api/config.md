@@ -33,11 +33,12 @@ as what it hands over is one stated value per key. The original Bridge had the s
     phases     an ordered list of names        trusted, reloadable, hot_reload
     threads    how many run a phase            on_error, max_system_failures
     [order]    before
-    [budget]   entities, persistent,           fuel, memory_limit
-               columns, max_modules            init/reload/shutdown timeouts
-    [checks]   validate, profile               log_level, scratch, log_ring,
-    [backend]  a name, a library and its       spans, spawns, persistent
-               settings, each                  pinned, config
+    [budget]   entities, tables, types,        fuel, memory_limit
+               systems, terms, modules,        init/reload/shutdown timeouts
+               persistent, columns             log_level, scratch, log_ring,
+    [checks]   validate, profile               spans, spawns, persistent
+    [backend]  a name, a library and its       pinned, config
+               settings, each
                                                read / write
                                                [.config]
 

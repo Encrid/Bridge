@@ -143,7 +143,9 @@ int main(int argc, char **argv)
 {
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[1] = {{ "native", NATIVE_PATH }};
-    bridge_config cfg = { backends, 1, phases, PHASES, nullptr, 0, 1, { 400'000, 4096, 64 << 20, 4, 32'768, 64, 64, 4 } };
+    bridge_config cfg = { backends, 1, phases, PHASES, nullptr, 0, 1, 
+        { .entities = 400'000, .tables = 32'768, .types = 64, .systems = 64, .terms = 4, .modules = 4,
+          .persistent = 4096, .columns = 64 << 20 } };
     bridge *b;
 
     /* the stress run is the one thing here that is run on more than one thread */

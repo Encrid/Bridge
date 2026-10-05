@@ -155,12 +155,14 @@ int main(int argc, char **argv)
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
     const char *phases[2] = { "update", "present" };
-    bridge_config cfg = { backends, 2, phases, 2, nullptr, 0, 1, { 4096, 4096, 1 << 20, 8, 64, 64, 128, 8 } };
+    bridge_config cfg = { backends, 2, phases, 2, nullptr, 0, 1, 
+        { .entities = 4096, .tables = 64, .types = 64, .systems = 128, .terms = 8, .modules = 8,
+          .persistent = 4096, .columns = 1 << 20 } };
     bridge_artifact a;
     bridge *b;
     setvbuf(stdout, nullptr, _IONBF, 0);
 
-    if (!strcmp(what, "slots")) cfg.budget.max_modules = 1;
+    if (!strcmp(what, "slots")) cfg.budget.modules = 1;
     /* every load carves a share of the arena that is never given back: room for 200 of them */
     if (!strcmp(what, "churn")) cfg.budget.persistent = 1 << 16;
     if (!strcmp(what, "configceiling")) cfg.budget.entities = (uint64_t)atoi(argc > 2 ? argv[2] : "0");
@@ -434,7 +436,7 @@ int main(int argc, char **argv)
             load(b, &a);
         }
     } else if (!strcmp(what, "slots")) {
-        /* [budget] max_modules: a record is taken at load and given back at unload */
+        /* [budget] modules: a record is taken at load and given back at unload */
         a = wasm("game:twostep@0.1.0", "twostep");
         load(b, &a);
         a = wasm("game:ticker@0.1.0", "ticker");

@@ -28,17 +28,18 @@ typedef struct {
     const bridge_setting *settings; uint32_t setting_count;
 } bridge_backend;
 
-/* Every one is stated: zero is unset, and refused. docs/bridge/memory/budgets.md. */
+/* Every one is stated: zero is unset, and refused. docs/bridge/memory/budgets.md. How many
+ * there may be at once of each thing, and then how many bytes. */
 typedef struct {
-    uint64_t entities;        /* how many entities there may be, less one: index 0 is none */
-    uint64_t persistent;      /* the persistent arena, in bytes */
-    uint64_t columns;         /* component columns and entity arrays, in bytes */
-    uint32_t max_modules;     /* how many modules are loaded at once */
-    uint32_t tables;          /* how many sets of components entities carry at once */
-    uint32_t types;           /* how many types are declared at once: components, and the
-                               * structs, enums and bitmasks their fields name */
-    uint32_t systems;         /* how many systems and observers are registered at once */
-    uint32_t terms;           /* how many terms one of them may have */
+    uint64_t entities;        /* entity indices: index 0 is none, so one fewer entities */
+    uint32_t tables;          /* sets of components entities carry */
+    uint32_t types;           /* declared types: components, and the structs, enums and
+                               * bitmasks their fields name */
+    uint32_t systems;         /* systems and observers registered */
+    uint32_t terms;           /* terms one of them may have */
+    uint32_t modules;         /* modules loaded */
+    uint64_t persistent;      /* the persistent arena */
+    uint64_t columns;         /* component columns and entity arrays */
 } bridge_budget;
 
 /* Two systems that conflict in one phase, in the order they are to run. A system is named by

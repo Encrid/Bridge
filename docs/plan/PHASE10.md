@@ -369,10 +369,15 @@ needed, since storage keeps a system's terms in a record made at create; what it
 deployment states: `[budget] terms`. `BRIDGE_TERMS_MAX` is gone from the ABI header, where no
 module used it, and the refusal has the case it never had.
 
-**Still inherited from flecs, and each to be decided**: the texts of
-records that were kept word for word; when a freed index is handed out again; the shape of an id
-and of an index record. And the order of the fields of `bridge_budget`, which followed what the
-tests already wrote.
+**What else was listed as inherited, and is not.** The texts of records are ours: nothing in
+the tree names flecs or forwards it. The shape of an id and of an index record is `reference.md`'s
+since phase 0, argued there on its own terms. A freed index comes back from a last-in-first-out
+list at the next refill, which already differs from flecs and which no module can see.
+
+**The order of `bridge_budget`, and `max_modules`: decided.** The fields had been appended one
+phase at a time so that the tests' initializers needed no rewriting. They are in the order
+`budgets.md` gives them, counts and then bytes, and `max_modules` is `modules`, a bare noun like
+every other key.
 
 **Open: a `log_level` nobody stated.** Zero is a severity, so a config that leaves it out is not
 caught as unset the way every other key is. It meant info before and means emergencies only now.

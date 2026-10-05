@@ -255,7 +255,7 @@ int store_create(bridge *b, const bridge_budget *budget)
     uint32_t i;
 
     if (unset(b, "entities", budget->entities) || unset(b, "persistent", budget->persistent)
-        || unset(b, "columns", budget->columns) || unset(b, "max_modules", budget->max_modules)
+        || unset(b, "columns", budget->columns) || unset(b, "modules", budget->modules)
         || unset(b, "tables", budget->tables) || unset(b, "types", budget->types)
         || unset(b, "systems", budget->systems) || unset(b, "terms", budget->terms)) {
         return 1;
@@ -289,7 +289,7 @@ int store_create(bridge *b, const bridge_budget *budget)
     b->arena_len = (uint32_t)budget->persistent;
     b->columns = (uint32_t)columns;
     b->columns_len = (uint32_t)budget->columns;
-    b->max_modules = budget->max_modules;
+    b->max_modules = budget->modules;
     b->tables = budget->tables;
     b->max_types = budget->types;
     b->max_systems = budget->systems;

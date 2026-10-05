@@ -62,14 +62,14 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
     typedef struct { const char *before, *after; } bridge_order;
 
     typedef struct {
-        uint64_t entities;        /* how many entity indices: index 0 is none */
-        uint64_t persistent;      /* the persistent arena */
+        uint64_t entities;        /* how many there may be at once: entity indices */
+        uint32_t tables;          /* sets of components */
+        uint32_t types;           /* declared types */
+        uint32_t systems;         /* systems and observers */
+        uint32_t terms;           /* terms one of them may have */
+        uint32_t modules;         /* modules loaded */
+        uint64_t persistent;      /* how many bytes: the persistent arena */
         uint64_t columns;         /* component columns and entity arrays */
-        uint32_t max_modules;     /* the per-module slot pool */
-        uint32_t tables;          /* how many sets of components at once */
-        uint32_t types;           /* how many declared types at once */
-        uint32_t systems;         /* how many systems and observers at once */
-        uint32_t terms;           /* how many terms one of them may have */
     } bridge_budget;
 
     typedef struct {
