@@ -63,8 +63,8 @@ asked - and nothing in that order is changed. What is changed is what the order 
 2. **Room.** The table of each final set is found, or made; and room for every row about to
    arrive is asked of the column region, a table at a time. What cannot be had is known here,
    while every entity is still where it was - `budgets.md`, *What running out does*.
-3. **Observers.** The queues are read again, and each change is compared with the entity's set
-   before it and after it: that is what an observer is owed - `data.md`, *Observers*.
+3. **Observers.** For each changed entity, the set it carried is compared with the set it will
+   carry: that difference is what an observer is owed - `data.md`, *Observers*.
 4. **Placement.** Each changed entity moves once, from the table it was in to the one it will be
    in, with what both carry copied and what is new zeroed. Or it is destroyed.
 5. **Values.** The queues are read a last time, and each `attach` writes its bytes where the

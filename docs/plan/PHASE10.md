@@ -189,8 +189,11 @@ What was not known until it ran:
     ten thousand tables         each entity of ten thousand in a table of its own: five
                                 thousand spans for a term half of them carry
 
-None of it looked accidental, so ours copies all of it. One line of the transcript was taken
-out before it was kept: how many tables there are, which counted flecs' own.
+"None of it looked accidental, so ours copies all of it" is what this said, and it was the error
+of the first plan again, moved from the seam to the behaviour: a transcript made to check a
+replacement was allowed to define it. *What was not in the plan* lists what has been decided
+since, and what is still inherited. One line of the transcript was taken out before it was kept:
+how many tables there are, which counted flecs' own.
 
 ## Found on the way: a sleep is a least time
 
@@ -342,6 +345,20 @@ were, which no budget stated, and allocated when a module loaded; and the plan's
 reworded to fit. There are two more keys now, `[budget] types` and `[budget] systems`, and
 storage allocates in `rows_create` and nowhere else: `budgets.md`, *Budgets*. A type's fields
 left storage for the component's record on the way, since storage only ever needed its size.
+
+**What an observer is told: decided, and it is what the barrier made of the entity.** flecs'
+answer had been copied: an event for each change, so that a component given and taken back in one
+phase was an add, a set and a remove at once, for an entity nobody could find. That was not even
+flecs' design, only how it behaved driven one call a change. An observer is owed the difference
+between what an entity carried before the barrier and after: `data.md`, *Observers*. The second
+reading of every queue went with it, and `storage-changes.txt` changed in the two lines that
+showed it.
+
+**Still inherited from flecs, and each to be decided**: the `ECS_` names of the three schema
+macros; the numbers of the log levels; thirty-two terms a query; the texts of records that were
+kept word for word; when a freed index is handed out again; the shape of an id and of an index
+record. And the order of the fields of `bridge_budget`, which followed what the tests already
+wrote.
 
 **Open: a test that a barrier allocates nothing.** It holds by reading: `src/rows.c` calls no
 allocator outside `rows_create`. Nothing checks it.

@@ -25,8 +25,7 @@ constexpr uint32_t ROWS_AT_FIRST = 4;
 
 /* what the fold has decided of an entity, for the length of one barrier */
 enum folded : uint8_t {
-    TOUCHED = 1, DESTROYED = 2, DROPPED = 4,
-    SEEN = 8, GONE = 16                         /* the same two, for the pass that tells observers */
+    TOUCHED = 1, DESTROYED = 2, DROPPED = 4
 };
 
 struct rows_type {
@@ -93,7 +92,9 @@ struct rows {
     uint8_t   *folded;
     uint32_t  *dest;                /* the table each will be in */
     module   **asker;               /* who asked the last change of each */
-    uint64_t  *scratch;             /* two sets */
+    uint64_t  *attached;            /* and of that, what an attach wrote a value of: kept
+                                     * only while there is an observer to be told */
+    uint64_t  *scratch;             /* one set */
 };
 
 /* ---- sets ---- */
@@ -419,32 +420,33 @@ static void killed(rows *r, uint32_t index)
     r->free_head = index;
 }
 
-/* ---- observers: what each is owed for one change, from the set before it and the set after ---- */
+/* ---- observers: what each is owed for an entity, from what it carried and what it carries ---- */
 
+/* data.md, *Observers*. `before` and `after` are null for an entity that carried nothing, or is
+ * gone; `attached` is what an attach wrote a value of, and is still carried. */
 static void told(const rows *r, uint64_t id, const uint64_t *before, const uint64_t *after,
-                 enum change_op op, uint32_t type)
+                 const uint64_t *attached)
 {
     for (uint32_t i = 0; i < r->observer_count; i ++) {
         const rows_terms *o = r->observers[i];
         /* an entity that carries nothing is in no table, and matches nothing */
         bool was = before && !empty(r, before) && matches(o, before);
-        bool is = after && !empty(r, after) && matches(o, after), names = false;
-        uint32_t owed = 0;
+        bool is = after && !empty(r, after) && matches(o, after), set = false;
+        uint32_t owed;
         if (!was && !is) continue;
-        for (uint32_t k = 0; k < o->count; k ++) names |= o->type[k] == type && o->oper[k] != BRIDGE_NOT;
-        if (!was) owed = BRIDGE_ON_ADD | (op == CHANGE_ATTACH ? BRIDGE_ON_SET : 0);
-        else if (!is) owed = BRIDGE_ON_REMOVE;
-        else if (op == CHANGE_ATTACH && names) owed = BRIDGE_ON_SET;
+        for (uint32_t k = 0; attached && k < o->count; k ++) {
+            set |= o->oper[k] != BRIDGE_NOT && has(attached, o->type[k]);
+        }
+        owed = !is ? BRIDGE_ON_REMOVE : (was ? 0 : BRIDGE_ON_ADD) | (set ? BRIDGE_ON_SET : 0);
         owed &= o->events;
-        if (owed & BRIDGE_ON_ADD) o->heard(o->ctx, id, BRIDGE_ON_ADD);
-        if (owed & BRIDGE_ON_SET) o->heard(o->ctx, id, BRIDGE_ON_SET);
-        if (owed & BRIDGE_ON_REMOVE) o->heard(o->ctx, id, BRIDGE_ON_REMOVE);
+        if (owed) o->heard(o->ctx, id, (enum bridge_event)owed);
     }
 }
 
 /* ---- at a barrier ---- */
 
 static uint64_t *work_of(const rows *r, uint32_t index) { return r->work + (size_t)index * r->words; }
+static uint64_t *attached_of(const rows *r, uint32_t index) { return r->attached + (size_t)index * r->words; }
 
 static void start_from(rows *r, uint32_t index)
 {
@@ -480,11 +482,18 @@ void rows_apply(rows *r)
                 r->folded[index] = TOUCHED;
                 r->changed[r->changed_count ++] = index;
                 start_from(r, index);
+                if (r->observer_count) memset(attached_of(r, index), 0, 8u * r->words);
             }
             r->asker[index] = m;
-            if (ch.op == CHANGE_DESTROY) r->folded[index] |= DESTROYED;
-            else if (ch.op == CHANGE_ATTACH) put(work_of(r, index), ch.c->type->id);
-            else take(work_of(r, index), ch.c->type->id);
+            if (ch.op == CHANGE_DESTROY) {
+                r->folded[index] |= DESTROYED;
+            } else if (ch.op == CHANGE_ATTACH) {
+                put(work_of(r, index), ch.c->type->id);
+                if (r->observer_count) put(attached_of(r, index), ch.c->type->id);
+            } else {
+                take(work_of(r, index), ch.c->type->id);
+                if (r->observer_count) take(attached_of(r, index), ch.c->type->id);
+            }
         }
     }
 
@@ -521,33 +530,12 @@ void rows_apply(rows *r)
         else dropped(r, index, true);
     }
 
-    /* 3. what observers are owed, change by change, while every set is still its table's */
-    if (r->observer_count) {
-        for (m = b->modules; m; m = m->next) {
-            for (uint32_t at = 0; at < m->queue_len;) {
-                change ch;
-                uint32_t index;
-                uint64_t *set;
-                memcpy(&ch, m->queue + at, sizeof ch);
-                at += (uint32_t)sizeof ch + ((ch.size + 7u) & ~7u);
-                index = (uint32_t)ch.id;
-                if (!alive(r, ch.id) || r->folded[index] & (GONE | DROPPED)) continue;
-                set = work_of(r, index);
-                if (!(r->folded[index] & SEEN)) {
-                    r->folded[index] |= SEEN;
-                    start_from(r, index);
-                }
-                memcpy(r->scratch, set, 8u * r->words);
-                if (ch.op == CHANGE_DESTROY) {
-                    r->folded[index] |= GONE;
-                    told(r, ch.id, r->scratch, nullptr, ch.op, 0);
-                    continue;
-                }
-                if (ch.op == CHANGE_ATTACH) put(set, ch.c->type->id);
-                else take(set, ch.c->type->id);
-                told(r, ch.id, r->scratch, set, ch.op, ch.c->type->id);
-            }
-        }
+    /* 3. what observers are owed: for each entity, what it carried against what it will */
+    for (i = 0; r->observer_count && i < r->changed_count; i ++) {
+        uint32_t index = r->changed[i], from = r->places[index].table;
+        if (r->folded[index] & DROPPED) continue;
+        told(r, (uint64_t)r->places[index].generation << 32 | index, from ? set_of(r, from) : nullptr,
+            r->folded[index] & DESTROYED ? nullptr : work_of(r, index), attached_of(r, index));
     }
 
     /* 4. each entity placed, once */
@@ -814,7 +802,7 @@ void rows_forget(rows *r, rows_terms *terms)
 
 /* the entity at `index` comes to carry `set`, told to whoever observes it. false, with a
  * record, if there is no table or no room for it: it is then as it was. */
-static bool became(rows *r, uint32_t index, const uint64_t *set, enum change_op op, uint32_t type)
+static bool became(rows *r, uint32_t index, const uint64_t *set)
 {
     uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
     uint32_t from = r->places[index].table, t = 0;
@@ -830,9 +818,7 @@ static bool became(rows *r, uint32_t index, const uint64_t *set, enum change_op 
             return false;
         }
     }
-    if (from) memcpy(r->scratch, set_of(r, from), 8u * r->words);
-    else memset(r->scratch, 0, 8u * r->words);
-    told(r, id, r->scratch, set, op, type);
+    told(r, id, from ? set_of(r, from) : nullptr, set, set);
     moved(r, index, t);
     if (from && r->tables[from].live && !r->tables[from].rows) table_gone(r, from);
     return true;
@@ -842,9 +828,7 @@ static void destroyed(rows *r, uint32_t index)
 {
     uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
     uint32_t from = r->places[index].table;
-    if (from) memcpy(r->scratch, set_of(r, from), 8u * r->words);
-    else memset(r->scratch, 0, 8u * r->words);
-    told(r, id, r->scratch, nullptr, CHANGE_DESTROY, 0);
+    told(r, id, from ? set_of(r, from) : nullptr, nullptr, nullptr);
     killed(r, index);
     if (from && r->tables[from].live && !r->tables[from].rows) table_gone(r, from);
 }
@@ -852,7 +836,7 @@ static void destroyed(rows *r, uint32_t index)
 /* lifetime.md, *What unload leaves behind*. A table at a time. */
 void rows_drop(rows *r, rows_type *type, enum bridge_on_unload policy)
 {
-    uint64_t *set = r->scratch + r->words;
+    uint64_t *set = r->scratch;
     for (uint32_t t = 1; t < r->table_high; t ++) {
         table *tab = &r->tables[t];
         uint32_t to;
@@ -867,7 +851,7 @@ void rows_drop(rows *r, rows_type *type, enum bridge_on_unload policy)
             continue;
         }
         for (uint32_t row = tab->rows; row --;) {
-            told(r, who_of(r, tab)[row], set_of(r, t), set, CHANGE_DETACH, type->id);
+            told(r, who_of(r, tab)[row], set_of(r, t), set, nullptr);
         }
         to = none ? 0 : table_of(r, set);
         if (none || (to && grow(r, to, r->tables[to].rows + tab->rows))) {
@@ -889,13 +873,13 @@ void rows_release(rows *r, const uint64_t *ids, uint32_t count)
 
 uint64_t rows_row(rows *r, rows_type *type, const void *bytes, uint32_t size)
 {
-    uint64_t id, *set = r->scratch + r->words;
+    uint64_t id, *set = r->scratch;
     uint32_t index;
     if (!rows_reserve(r, &id, 1)) return 0;
     index = (uint32_t)id;
     memset(set, 0, 8u * r->words);
     put(set, type->id);
-    if (!became(r, index, set, CHANGE_ATTACH, type->id)) {
+    if (!became(r, index, set)) {
         killed(r, index);
         return 0;
     }
@@ -938,7 +922,8 @@ rows *rows_create(bridge *b)
     r->folded = calloc(b->entities, 1);
     r->dest = calloc(b->entities, sizeof *r->dest);
     r->asker = calloc(b->entities, sizeof *r->asker);
-    r->scratch = calloc((size_t)r->words * 2, 8);       /* a set before a change, and after */
+    r->attached = calloc((size_t)b->entities * r->words, 8);
+    r->scratch = calloc(r->words, 8);
     /* one more than there may be, so that looking for a free one always ends */
     r->types = calloc((size_t)r->type_room + 1, sizeof *r->types);
     r->type_pool = calloc(r->type_room, sizeof *r->type_pool);
@@ -976,6 +961,7 @@ void rows_destroy(rows *r)
     free(r->folded);
     free(r->dest);
     free(r->asker);
+    free(r->attached);
     free(r->scratch);
     free(r);
 }

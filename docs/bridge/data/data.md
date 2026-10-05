@@ -73,22 +73,34 @@ structural change is deferred - `abi.md`, *The ABI* - so there is no change to h
 else. `tests/phase5.c` holds that on every build: an attach made in a phase reaches its observer
 under that phase's barrier count, and a chain of three takes three barriers.
 
-**What it is owed comes out of the barrier's own work.** Storage reads the queues in order and has,
-for each change, the set of components the entity carried before it and the set after -
-`storage.md`, *A barrier is worked an entity at a time*. An observer matches a set or does not:
+**It is told what the barrier made of an entity, and not each thing that was asked of it.** A
+barrier folds an entity's changes into what it will carry before it places it - `storage.md`, *A
+barrier is worked an entity at a time* - and an observer is owed the difference between what the
+entity carried before that barrier and what it carries after:
 
-    it did not match, and now does      add, and set if the change was an attach
-    it matched, and no longer does      remove
-    it matches before and after, and    set
-    the change attached one of its
-    terms
-    a destroy of one it matched         remove, once, however often it was asked
+    it did not match, and now does      add
+    it matched, and no longer does,     remove
+    or was destroyed
+    it matches now, and an attach of    set, with the add if it has only now come to match
+    one of its terms is still on it
 
 So an observer of two terms hears an entity when it comes to carry both, by whichever attach
-completed the pair. Changes to one entity at one barrier are one record, with every event that
-happened: an entity given a component and stripped of it in the same phase is heard once, as add,
-set and remove. A detach of what is not there, and any change to an id that is dead, is nothing.
-`tests/storage.c`, case `changes`, says each of these out loud.
+completed the pair. An entity made and destroyed inside one phase, or given a component and
+stripped of it, is not heard at all: nothing of it is there to read. One that loses a component
+and is given it back in the same phase is heard as a set, since it carries a new value. One record
+an entity at a barrier, with the events that hold. A detach of what is not there, and any change
+to an id that is dead, is nothing. `tests/storage.c`, case `changes`, says each of these out loud.
+
+**Every event is about something the observer can read**, which is what running after the
+republish is for - `schedule.md`, *An observer runs at the barrier, one hop per barrier*.
+
+Refused: an event for every change as it was asked, which is what this did while flecs kept the
+rows and what storage of our own first copied. It told an observer of an add, a set and a remove
+at once, for an entity it could not then find, and it cost a second reading of every queue. It
+was never flecs' design either: when flecs folds an entity's queued commands itself it commits
+once, with the difference (`flecs.c:6262`), and what we had was the way we drove it, a call for
+each change. The condition that brings it back is a module that must hear of a change that left
+nothing behind, and cannot say it with an entity that carries the event.
 
 **This is how an event crosses.** A native module with a fired signal spawns an entity carrying an event
 component; the change applies at the barrier and the subscriber's observer runs there. Same latency
