@@ -236,6 +236,15 @@ int main(int argc, char **argv)
         load(b, &a);                            /* refused: the type is still held */
         unload(b, "game:user@0.1.0");
         load(b, &a);                            /* and now it is not */
+    } else if (!strcmp(what, "destroy")) {
+        /* a bridge destroyed with modules loaded shuts each of them down first */
+        a = wasm("game:ticker@0.1.0", "ticker");
+        load(b, &a);
+        a = wasm("test:hang@0.1.0", "hang");
+        a.cfg.spawns = BRIDGE_NONE;
+        a.cfg.shutdown_timeout = 100 * MS;
+        load(b, &a);
+        frames(b, 1);
     } else if (!strcmp(what, "nounload")) {
         unload(b, "game:nobody@0.1.0");
     } else if (!strcmp(what, "timeouts")) {     /* a shutdown that never returns */

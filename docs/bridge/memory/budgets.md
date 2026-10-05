@@ -85,8 +85,9 @@ tables they were not told about. Its components stay, as for any stopped module.
 inside flecs, while the queued changes of several modules are being applied, and what failed is the
 deployment's storage. flecs cannot be unwound from the middle of a change, so the allocator serves
 what the block could not from the operating system, flecs finishes with its storage whole, and the
-bridge then refuses every `bridge_phase` and `bridge_load` until `bridge_destroy`, as after a `fail`
-module failed. No module runs again, so nothing ever reads the memory that landed outside the block.
+bridge then refuses every `bridge_phase` and `bridge_load` until `bridge_destroy`, and unlike a
+stop that a `fail` module caused, nothing lifts it - `failure.md`, *When something fails*. No module
+runs again, so nothing ever reads the memory that landed outside the block.
 
 Refused: stopping the bridge for every exhaustion, which is one rule and lets one module's `spawn`
 take the deployment down - and the entity ceiling recovers by itself when something is destroyed.

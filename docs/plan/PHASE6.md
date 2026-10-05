@@ -8,7 +8,7 @@ document is what the phase built and what it found on the way.
 
 ## What was settled first
 
-Twelve questions, each by every step of `PHASE0.md`, and each applied to the document it belongs
+Thirteen questions, each by every step of `PHASE0.md`, and each applied to the document it belongs
 to.
 
     what a reload runs            the new instance's reload, then the old one's shutdown:
@@ -33,6 +33,8 @@ to.
                                   `failure.md`, *When something fails*
     when a table's id is retired  when flecs says it freed the table:
                                   `flecs.md`, *flecs will not tell you which*
+    destroy, with a pinned        refused from any thread but the module's, with nothing torn
+    module loaded                 down: `create.md`, *Destroy*
 
 Three of them were first put with steps missing, and were put again. Reading the original Bridge's
 source for the second pass gave reload a fourth option and changed the recommendation for the
@@ -51,6 +53,10 @@ terminal, which made reload useless for the modules a deployment calls essential
 were retired on Bridge-ASM700's decision to delete a component rather than on flecs freeing the
 table, which missed two ways a table is freed. "Forced by the documents" was the same mistake four
 times: a choice with a justification bolted on, which is what `PHASE0.md` step 4 warns of.
+
+The thirteenth came out of reading for one of those. `bridge_destroy` had been discarding modules
+without calling their `shutdown`, against what `wasm.md` says of that export; it calls every one
+now, and answers a status, because a pinned module's is code that only its own thread may run.
 
 ## What it produced
 
@@ -71,7 +77,7 @@ another first call.
 
 ## The tests
 
-Fifty-six new ones, one hundred and twenty-seven in all, in a release build and a debug one. Most
+Fifty-seven new ones, one hundred and twenty-eight in all, in a release build and a debug one. Most
 are cases of `tests/phase6.c`; two are among phase 4's, one among phase 2's, and one reads the
 library from inside.
 
@@ -90,6 +96,8 @@ library from inside.
     nested-unload    a type outlives its declarer while another module's field names it, and
                      goes when that module does
     nounload         an identity that is not loaded: refused by name
+    destroy          a bridge destroyed with two modules loaded: one's shutdown is heard, the
+                     other's never returns and is ended by its timeout, and the bridge goes
     timeouts         a shutdown that never returns: ended by its timeout, and the unload completes
     slots            max_modules: refused when full, and a record is given back by an unload
     reload           a row's bytes kept: 102, then 112 and 122 from the new code

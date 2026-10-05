@@ -37,7 +37,7 @@ as a helper - `native.md`, *Identity*.
 
     /* instance */
     bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud);
-    void    bridge_destroy(bridge *b);
+    int     bridge_destroy(bridge *b);
 
     /* advance */
     int bridge_phase(bridge *b, const char *name);

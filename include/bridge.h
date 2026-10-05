@@ -108,7 +108,10 @@ typedef void (*bridge_sink_fn)(void *ud, const bridge_record *r);
 
 /* NULL if the deployment cannot start; which reason, the sink was told. */
 bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud);
-void    bridge_destroy(bridge *b);
+/* Every loaded module's shutdown, then everything else. 0 if the bridge is gone. With a pinned
+ * module loaded it answers 1 from any thread but the one that loaded it, with a record, and
+ * nothing has been torn down: the bridge is still there to be destroyed from the right one. */
+int     bridge_destroy(bridge *b);
 
 /* 0 if the module is loaded, its init answered 0, and the bridge can still run it. Otherwise
  * the load was refused or failed, or stopped the bridge, and a record says why. Between phases

@@ -156,7 +156,8 @@ static int elsewhere_result, elsewhere_frames;
 static void elsewhere_work(void)
 {
     int i;
-    if (!elsewhere_frames) elsewhere_result = bridge_phase(elsewhere_bridge, "update");
+    if (elsewhere_frames < 0) elsewhere_result = bridge_destroy(elsewhere_bridge);
+    else if (!elsewhere_frames) elsewhere_result = bridge_phase(elsewhere_bridge, "update");
     for (i = 0; i < elsewhere_frames; i ++) {
         bridge_phase(elsewhere_bridge, "update");
         bridge_phase(elsewhere_bridge, "present");
@@ -393,6 +394,13 @@ int main(int argc, char **argv)
         start_elsewhere(b, 0);
         join_elsewhere();
         printf("from another thread: %s\n", elsewhere_result ? "refused" : "ran");
+        /* and a destroy from there is refused too, leaving the bridge to be destroyed here */
+        start_elsewhere(b, -1);
+        join_elsewhere();
+        printf("destroy from another thread: %s\n", elsewhere_result ? "refused" : "done");
+        printf("destroy from the thread that loaded it: %s\n", bridge_destroy(b) ? "refused" : "done");
+        printf("alive\n");
+        return 0;
     }
 
     bridge_destroy(b);

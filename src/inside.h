@@ -212,6 +212,7 @@ void bridge_resume(bridge *b, const module *m);     /* if `m` is what it was wai
 
 /* lifecycle.c */
 void module_discard(bridge *b, module *m);
+void module_shut_down(bridge *b, module *m);    /* its shutdown, what it asked for, what it said */
 
 /* config.c */
 int  config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why, size_t len);

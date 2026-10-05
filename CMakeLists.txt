@@ -377,7 +377,7 @@ phase5_case (reserved    "'init' is a reserved name, and no observer may take it
 phase5_case (parallel    "on 2 thread.s.[^a-z]*they ran at once")
 phase5_case (serial      "on 1 thread.s.[^a-z]*they ran one after the other")
 phase5_case (pinned      "the others used [2-4] thread.s.[^a-z]*pinned: 9 of its 9 calls were on the thread that loaded it")
-phase5_case (wrongthread "module 'test:pinned@0.1.0' is pinned to the thread that loaded it, and this call comes from another.*from another thread: refused")
+phase5_case (wrongthread "module 'test:pinned@0.1.0' is pinned to the thread that loaded it, and this call comes from another.*from another thread: refused.*bridge_destroy is refused: module 'test:pinned@0.1.0' is pinned.*destroy from another thread: refused.*destroy from the thread that loaded it: done")
 phase5_case (nothreads   "threads is unset.*bridge_create refused")
 # a chain that hung would log a hop twice: each is said once
 set_tests_properties (phase5-chain PROPERTIES FAIL_REGULAR_EXPRESSION "hop A.*hop A")
@@ -527,3 +527,4 @@ target_link_libraries (tables PRIVATE bridge flecs bridge-os)
 add_test (NAME tables COMMAND tables)
 set_tests_properties (tables PROPERTIES PASS_REGULAR_EXPRESSION
     "a table flecs swept as empty: retired.*the table of a deleted parent's children: retired.*reused.*alive")
+phase6_case (destroy       "tick 101 1.*game:ticker@0.1.0/-: shutdown 1 0.*module 'test:hang@0.1.0': its shutdown trapped: interrupt. its teardown continues")

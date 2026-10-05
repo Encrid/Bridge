@@ -14,6 +14,26 @@ backend whose library cannot be opened or lacks an entry, or a null `sink`.
 emits the record naming the phase or the pair before it returns. The one failure no record can
 explain is a null `sink`, and a host that passed null already knows.
 
+## Destroy
+
+`bridge_destroy` calls every loaded module's `shutdown`, each under its own timeout, and then takes
+everything down. A `shutdown` that fails is logged and the rest go on - `failure.md`, *When
+something fails*. They run in the order the modules loaded: nothing here depends on anything else,
+so no other order would mean more, and the original Bridge's reverse order served modules that
+called each other.
+
+**It answers a status, because one thing can refuse it.** A pinned module's `shutdown` is that
+module's code, and runs on the thread that loaded it or not at all - `pinned.md`, *Threads*. Called
+from another thread with a pinned module loaded, `bridge_destroy` answers non-zero with a record
+naming the module, and has torn nothing down: the bridge is whole, to be destroyed from the thread
+that can. It is the refusal `bridge_phase` makes, made before anything is touched.
+
+Refused: skipping that one `shutdown` and saying so, which always finishes and leaves a device
+unreleased by the only code that knew how. Refused: calling it anyway, which breaks the one promise
+`pinned` makes at the moment a device is being torn down. What this costs is a destroy that can
+fail, so a host that ignores the answer leaks the bridge; the condition that brings the first
+refusal back is hosts that cannot get back to the right thread at exit.
+
 ## The sink
 
 `sink` is why an embedded host needs more than idTech3's three functions. Bridge-ASM700 emits records and

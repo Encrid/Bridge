@@ -34,13 +34,26 @@ char *copy(const char *s, size_t n)
     return c;
 }
 
-void bridge_destroy(bridge *b)
+int bridge_destroy(bridge *b)
 {
     uint32_t i;
-    if (!b) return;
+    module *m;
+    if (!b) return 0;
     store_enter(b);
+    /* pinned.md: a pinned module's shutdown is its code, and runs on its thread or not at
+     * all. Refused before anything is touched, so the bridge is whole for the call that can. */
+    for (m = b->modules; m; m = m->next) {
+        if (m->pinned && m->thread != os_thread_id()) {
+            say(b, NULL, NULL, BRIDGE_ERR, "bridge_destroy is refused: module '%s' is pinned to "
+                "the thread that loaded it, and this call comes from another", m->identity);
+            return 1;
+        }
+    }
+    /* each module's shutdown, in the order they loaded: nothing here depends on anything, so
+     * no other order would mean more */
+    for (m = b->modules; m; m = m->next) module_shut_down(b, m);
     while (b->modules) {
-        module *m = b->modules;
+        m = b->modules;
         b->modules = m->next;
         module_discard(b, m);
     }
@@ -65,6 +78,7 @@ void bridge_destroy(bridge *b)
     free(b->stopped_by);
     free(b->stopped_stem);
     free(b);
+    return 0;
 }
 
 bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)

@@ -503,7 +503,7 @@ failed:
 
 /* failure.md: a shutdown that fails is logged, and the teardown continues. Nothing else is
  * coherent, and it is not tried again. */
-static void shut_down(bridge *b, module *m)
+void module_shut_down(bridge *b, module *m)
 {
     backend_err err = {0};
     /* a module whose reload failed after its old instance went has no code left to call */
@@ -546,7 +546,7 @@ int bridge_unload(bridge *b, const char *identity)
         return 1;
     }
     drop_systems(b, m);         /* out of the schedule before its last call */
-    shut_down(b, m);
+    module_shut_down(b, m);
     take_out(b, m);
     schedule_build(b, why, sizeof why);
     b->layout_moved = 1;
@@ -645,7 +645,7 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     side_by_side = (o->capabilities & BACKEND_SIDE_BY_SIDE) != 0;
     if (!side_by_side) {
         /* a process cannot hold two copies of one library: the old one goes first */
-        shut_down(b, old);
+        module_shut_down(b, old);
         if (old->instance) o->api.instance_destroy(old->instance);
         if (old->image) o->api.module_destroy(old->image);
         old->instance = NULL;
@@ -679,7 +679,7 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
         return 1;
     }
 
-    if (side_by_side) shut_down(b, old);
+    if (side_by_side) module_shut_down(b, old);
     /* what the new instance no longer declares is treated as an unload treats it */
     drop_systems(b, old);
     for (i = old->declared_count; i --;) component_release(b, old->declared[i], old->policy[i]);

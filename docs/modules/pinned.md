@@ -12,7 +12,8 @@ created it.** So a module says so, with one key in its manifest:
 **That thread is the host's.** `init` runs inside `bridge_load`, on whichever thread called it, and
 Bridge-ASM700 has no thread of its own that existed then. So a pinned module's systems run on the
 thread that calls `bridge_phase`, and a host with a pinned module loaded calls both from one thread.
-A phase asked for from another is refused by name, before anything runs.
+A phase asked for from another is refused by name, before anything runs, and so is
+`bridge_destroy`, whose `shutdown` calls are that module's code too - `create.md`, *Destroy*.
 
 **It is the author's key, not the deployment's**, because a key belongs to whoever holds the
 knowledge. An author knows their library must be driven from one thread; a
