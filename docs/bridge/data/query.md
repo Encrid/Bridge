@@ -36,8 +36,8 @@ Iterating is two loops and no call, with the branch outside the row loop:
             elif source[t] != 0   one value, at base[t], for every row
             else                  row r is at base[t] + r * sizeof(T)
 
-`sizeof(T)` is a build-time constant from the schema, so stride is never published - the generator
-already knows it.
+`sizeof(T)` is a build-time constant from the schema, so stride is never published - the module's
+compiler already knows it.
 
 The span is laid out at natural alignment, so `source[]` begins at the next multiple of eight after
 `base[]`. A query takes at most 32 terms, inherited from flecs' `FLECS_TERM_COUNT_MAX`.
@@ -50,9 +50,9 @@ entity it came from. That makes an inherited term one load per span rather than 
 ## What a query may not ask for
 
 **Or-terms and wildcards.** Their matched id varies per table, which is why flecs publishes `ids`
-per field. Our generator emits a **typed** accessor at build time, and a term whose type changes per
-table has no type to emit. So a wildcard is incompatible with the generator, not merely awkward in
-the span.
+per field. A module reads a field through a **typed** accessor chosen at its build, and a term whose
+type changes per table has no type to choose. So a wildcard is incompatible with the accessors, not
+merely awkward in the span.
 
 **Terms needing `field_at`** - flecs' `row_fields` - because a field that is not an array has no
 base-and-stride form at all.

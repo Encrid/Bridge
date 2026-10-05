@@ -78,15 +78,23 @@ width link in either order, and there is no such call.
 A fingerprint detects disagreement and never describes it. That is why a hash is enough where the
 component model needed a type system.
 
-## What the generator still emits
+## What a module compiles against
 
-One thing: accessors over a span, carrying the `row < count` test - **always, with no switch to
-remove it**: `validation.md`, *Always on*. On the wasm backend they are emitted as wasm text and
-merged into the compiled module, because no C compiler can address the shared memory itself:
-`wasm.md`, *A compiled module reaches them through accessors*.
+Two files, and **nothing is generated**. `bridge-wasm.h` holds the imports, the `ECS_STRUCT` shim
+above, and the span, the header and the log ring read through accessors. `bridge-wasm.wat` holds
+the accessors themselves: a load or a store per width, and the row address carrying the
+`row < count` test - **always, with no switch to remove it**: `validation.md`, *Always on*. They are
+wasm text merged into the compiled module, because no C compiler can address the shared memory
+itself: `wasm.md`, *A compiled module reaches them through accessors*.
 
-Not structs, not the component fingerprint, and not the published layouts. Those are `bridge-abi.h`:
-`wasm.md`, *The published layouts*.
+A generator was planned and turned out to have nothing to compute. An accessor needs a field's
+type, its offset and its struct's size, and the module's own compiler has all three: `_Generic`
+picks the load by the field's type, `offsetof` and `sizeof` supply the rest. So a typed accessor is
+a macro over the struct the schema header already declares, and a second description of that struct
+for a tool to read would be the format *Why a header and not a format* refuses.
+
+The published layouts are not here either. Those are `bridge-abi.h`: `wasm.md`, *The published
+layouts*.
 
 ## Not WIT
 

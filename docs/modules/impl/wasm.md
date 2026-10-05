@@ -41,8 +41,8 @@ there is no WASI alongside and nothing to disambiguate from. The memories are fi
 `shared` and `private`, because the memory layout and the function semantics are one contract:
 change how a span is laid out and `declare`'s meaning changes with it.
 
-The generator emits the imports, so declaration is static before it is dynamic: `declare` at init
-discovers nothing, it binds names to what the binary already expects.
+`bridge-wasm.h` declares the imports, so declaration is static before it is dynamic: `declare` at
+init discovers nothing, it binds names to what the binary already expects.
 
 ### A compiled module reaches them through accessors
 
@@ -50,8 +50,8 @@ discovers nothing, it binds names to what the binary already expects.
 C has the syntax for it, but LLVM's WebAssembly backend - which C, C++, Rust and zig all go through -
 only carries a feature flag for multiple memories: a pointer always means the module's own.
 
-So the accessors the generator emits - `schema.md`, *What the generator still emits* - are a small
-module in wasm's text format, where a load names its memory directly. The module build merges it
+So the accessors - `schema.md`, *What a module compiles against* - are a small module in wasm's
+text format, `bridge-wasm.wat`, where a load names its memory directly. The module build merges it
 into the compiled module and inlines it, with Binaryen's `wasm-merge` and `wasm-opt`. What comes out
 has plain loads and stores on the shared memory in the loop and no call left: checked on a C loop
 before this was written down.

@@ -65,18 +65,20 @@ unrun, and the shared memory is read by a test of the backend alone, since stora
 
 ## 3. Storage
 
+Done, on Windows. `PHASE3.md` is what it built and found.
+
 The shared memory's three regions and each module's private memory: the header, the spans,
 `column_base`, the scratch arena and the log ring - `memory.md`, *Where the seven regions live*.
-`[budget]`, with exhaustion fatal where it happens - `budgets.md`, *Budgets*.
+`[budget]`, with exhaustion fatal where it happens - `budgets.md`, *What running out does*.
 
 `declare`, with the fingerprint, type-set and grant checks. `system`, with the query refusals -
 `query.md`, *What a query may not ask for*. The structural entries `spawn`, `destroy`, `attach` and
 `detach`, and `alloc`. Fuel, re-set before every dispatch. `bridge_phase` and the barrier, serial
 for now: queued changes applied, spans republished, rings drained, scratch reset. The entity index
-mirror, driven off the patched hook and `EcsOnTableCreate` / `EcsOnTableDelete`, and `get` over it -
-`reference.md`, *Reference following*. The row-count check - `validation.md`, *Always on*. The
-schema generator and the module build that merges its output: the `ECS_STRUCT` shim and accessors
-carrying the `row < count` test.
+mirror, driven off the patched hook and flecs' events, and `get` over it - `reference.md`,
+*Reference following*. The row-count check - `validation.md`, *Always on*. What a module compiles
+against, and the module build that merges it: the `ECS_STRUCT` shim and accessors carrying the
+`row < count` test - `schema.md`, *What a module compiles against*.
 
 Access mode and queries are part of declaration from the start, not retrofitted.
 
@@ -86,7 +88,7 @@ against a build without it* - `validation.md`, *Always on*, states that cost as 
 is where it becomes a measurement. *And when a fingerprint mismatch, an ungranted declare and a
 wildcard term are each refused by name; a system that never returns is stopped by its fuel; a
 `spawn` past the entity ceiling fails where it happens; a log line reaches the sink; and an
-overflowing ring reports how many it dropped.*
+overflowing ring reports how many it dropped.* Met; the `linux` preset is unrun.
 
 ## 4. The native backend
 

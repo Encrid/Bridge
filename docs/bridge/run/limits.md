@@ -55,8 +55,10 @@ and written back per row - that measured as:
     fuel                0.64            x2.2
     both                0.65            x2.2
 
-That is the worst case: the heavier a row's work, the smaller the share. It is still a factor and
-not a rounding error, so `-1` has to mean the cost is gone and not merely that the budget is large.
+That is the worst case: the heavier a row's work, the smaller the share. A system dispatched by
+`bridge_phase` over the same loop measures the same way, 0.39 ns a row without fuel and 0.66 with.
+It is still a factor and not a rounding error, so `-1` has to mean the cost is gone and not merely
+that the budget is large.
 A module stating `fuel = -1` is compiled without the count, and one stating `-1` for all three
 timeouts without the interrupt check - `backend.md`, *What a backend is asked for*, hands the
 backend what was demanded for that reason.

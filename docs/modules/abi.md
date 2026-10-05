@@ -83,9 +83,10 @@ the hot path is the one budget this design exists to protect.
 
 A system or an observer **is** a query plus a function, so one call registers the pair. `init`,
 `shutdown` and `reload` are reserved names that `system` and `observe` refuse. `terms` is an array
-of term structs, flecs' `ecs_term_t` shape rather than a string, so there is no parser in Bridge-ASM700
-and no string handed over at init. What a query may not ask for is `query.md`, *What a query may not
-ask for*.
+of term structs rather than a string, so there is no parser in Bridge-ASM700 and no string handed
+over at init. A term is what flecs' `ecs_term_t` says of one, less what a module cannot name: the
+slot `declare` answered, the access, and whether the term must match, must not, or may. What a
+query may not ask for is `query.md`, *What a query may not ask for*.
 
 A system declares its phase and **nothing about order**, and never names another module's system.
 So no independently shipped module depends on another's internals, and no ordering cycle can span

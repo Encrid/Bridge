@@ -126,5 +126,8 @@ sorting move rows silently and are not hooked: nothing here calls them. The cond
 hook there is Bridge-ASM700 using either.
 
 **Table ids are Bridge-ASM700's own.** `ecs_record_t` is public and carries an `ecs_table_t *`, where a
-span needs a dense `u32` to index `column_base`. So Bridge-ASM700 keeps pointer-to-id itself, off
-`EcsOnTableCreate` and `EcsOnTableDelete`, and never reads `ecs_table_t`'s layout.
+span needs a dense `u32` to index `column_base`. So Bridge-ASM700 keeps pointer-to-id itself and
+never reads `ecs_table_t`'s layout. A table gets its id the first time it is seen holding an entity:
+when the mirror places one in it, or when a query matches it. Id 0 is no table, which is what an
+entity with nothing on it has. Giving an id back waits for `EcsOnTableDelete`, and for the first
+thing that deletes a table: unload.

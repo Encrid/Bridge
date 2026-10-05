@@ -136,7 +136,7 @@ added to a base the module was handed, where wasm adds it to a memory.
 module adds `shared`, which does not move.
 
 **`sizeof(T)` comes from the schema header, not from the span.** Stride is never published, for the
-reason `query.md` gives: both sides compile the same declaration, so the generator already knows it.
+reason `query.md` gives: both sides compile the same declaration, so the compiler already knows it.
 
 One span layout for every backend rather than a resolved copy for native code: two layouts would be
 two rewrites at every barrier, and two things to disagree.

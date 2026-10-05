@@ -2,7 +2,7 @@
 
 Against the original Bridge, which is the comparison point because this replaces it.
 
-    wit-bindgen          a header both sides compile, plus a small generator for accessors
+    wit-bindgen          a header both sides compile, plus a small file of accessors
     resource types       handles by hand, as godot:host/handles already does
     wac composition      the statically-linked call path
     string, list args    passed as (offset, len) where genuinely needed

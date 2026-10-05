@@ -48,8 +48,8 @@ too. And **Bridge-ASM700 bounds-checks `text + len`** against a determinate
 block, which is what makes the check writable at all. One compare per record is the price.
 
 Levels are flecs' signed convention, so flecs' own output needs no mapping - `ecs_os_api.log_` takes
-`(level, file, line, msg)`, warn at -2 and err at -3. Filtering is at the writer: the generator
-emits `if (level > threshold) return` against a threshold in the private-memory header, so a line that is
+`(level, file, line, msg)`, warn at -2 and err at -3. Filtering is at the writer, which begins
+`if (level > threshold) return` against a threshold in the private-memory header, so a line that is
 switched off costs a load and a branch.
 
 **Drop and count, never block.** A log may lose lines, and that is exactly what separates it from an

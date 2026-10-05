@@ -102,6 +102,9 @@ cannot use:
                       `wasm.md`, *The published layouts*
     bridge-native.h   module seam, native backend only: `bridge_api` - a wasm
                       module gets imports, not pointers
+    bridge-wasm.h     module seam, wasm backend only: the imports, and the
+                      accessors of `bridge-wasm.wat` - `schema.md`, *What a module
+                      compiles against*
     bridge-backend.h  backend seam: the seventeen entries in `backend.md`
 
 **Prose cites a document by name, never by path** - `data.md`, not `bridge/data/data.md` - because a

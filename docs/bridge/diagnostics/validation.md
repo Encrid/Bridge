@@ -23,16 +23,28 @@ and always paid for; what we check always and what we check when asked are two d
 
 ## Always on
 
-**The `row < count` test the generator emits.** Not a policy: that code is compiled into the
+**The `row < count` test the accessors carry.** Not a policy: that code is compiled into the
 module's own artifact, which Bridge-ASM700 only ever sees as bytes, so no Bridge-ASM700 setting
-could remove it and the generator offers none. An author who wants it gone writes their own
+could remove it and the accessors offer none. An author who wants it gone writes their own
 accessor, at which point it is their code. It is not redundant with wasm's bounds check either: wasm
 catches a load outside the *memory*, and this catches one past the span's rows and still inside
 the shared memory, which wasm permits.
 
-A compare and branch per access, which a compiler can usually remove because the loop bound is the
-same `count` load. That is reasoning, not measurement - `PLAN.md` phase 3 is where it gets measured,
-and its done-when says so.
+**It is a compare and branch per row, and nothing removes it.** The loop bound is the same `count`
+and the test could be hoisted, but neither Binaryen nor wasmtime does. Over the tightest loop a
+system can have, one float read, changed and written back per row of 200,000:
+
+                         with the test    without
+    no fuel              0.39 ns a row    0.33      x1.2
+    fuel                 0.66             0.44      x1.5
+
+Under fuel it costs more than itself, because the branch it adds is a block and fuel is counted by
+the block - `limits.md`, *What a bound costs*. `tests/phase3.c`'s `bench` case is the measurement,
+and the build without the test exists only for it.
+
+It stays, at that price: a sixth of a tight loop buys the one check that catches a module reading
+rows that are not its span's. The condition that reopens it is a workload where that sixth is the
+difference, and the answer then is an accessor that tests once per span rather than once per row.
 
 **Row counts against table sizes.** O(matched tables), the same order as publishing, so it is not in
 the expensive tier at all - a few comparisons on a walk Bridge-ASM700 is already doing.

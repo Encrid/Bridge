@@ -83,3 +83,7 @@ module that cannot report anything is the one legal number that produces an inco
 `log.md`, *The log*, for why. `fuel` and `memory_limit` have floors too, but they are measurements
 rather than arguments: `PLAN.md` phases 2 and 3 enforce them, and are where a number becomes
 knowable.
+
+`columns` has a floor that is flecs' and not ours: its own tables take about 70 KB of the column
+region before any module declares anything. `bridge_create` refuses a budget they do not fit in,
+since a bridge that stops at its first barrier was never started.
