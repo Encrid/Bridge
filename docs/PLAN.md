@@ -157,13 +157,13 @@ fail for their stated reason; and CMake is gone from the tree.* Met.
 
 ## 8. macOS
 
-arm64, as a third platform: a target, the POSIX half of `src/os.c` on a second system, wasmtime's
+Done. `PHASE8.md` is what it built and found. arm64, as a third platform: a target, the POSIX half of `src/os.c` on a second system, wasmtime's
 library for it and a workflow - `build.md`, *Platforms*. It comes straight after the build because
 it is then one more target, and because every later phase is met on a second processor instead of
 finding out last.
 
 *Done when every test passes on macOS arm64 on every push, and that build compiles and links on
-Windows.*
+Windows.* Met.
 
 ## 9. C99, and the context passed
 

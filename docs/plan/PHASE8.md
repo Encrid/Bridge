@@ -1,6 +1,6 @@
 # Phase 8: macOS
 
-In progress.
+Done, on Windows, on Linux and on macOS.
 
 A third platform, arm64, straight after the build: with one compiler that takes its target as an
 argument it is one more target, and every phase after it is met on a second processor instead of
@@ -20,19 +20,37 @@ compiling for macOS on Windows is found there.
 Two things are the platform's and not choices. The lowest macOS is 11.0, the first that ran on
 arm64 and what wasmtime's library asks for. A shared library there ends in `.dylib`.
 
-## What it builds
+## What it built
 
     third_party/wasmtime/macos/     wasmtime's library for it, as vendored for the other two
     build.py                        a third target, and one table of what differs by target
     .github/workflows/macos.yml     the tools at the pins the Linux job uses, then the tests
 
-`src/os.c` has a POSIX half that compiles for macOS as it is. Whatever running it finds is fixed
-in this phase, each with a test that fails without the fix.
+`build.py` had asked one question of a target, whether it was Windows, in six places. It asks
+none now: a row per target says where it runs, how a program and a library are named, which of
+the system's declarations are asked for by name, what a link names, how a library finds what sits
+beside it, and which of wasmtime's files it uses.
 
-## What would make us stop
+Nothing in `src/`, `backends/`, `include/` or `tests/` changed.
 
-- wasmtime not delivering a trap or an interrupt there under our watchdog and threads: what
-  would fix it is a wasmtime setting, which is behaviour, so it is a question.
-- A test that cannot pass for a reason that is the platform's: its claim would have to be
-  restated, and that is not decided here. No test is skipped on macOS.
-- A timing test that is unreliable on the runner: its bound is a claim, not a knob.
+## What it found
+
+**Nothing, and that is the finding.** All one hundred and twenty-eight tests passed on the first
+run on macOS arm64, as they had on Linux at its first run after phase 5. The POSIX half of
+`src/os.c` was written against Linux and never against this system. Three things were expected to
+be able to stop it and none did: wasmtime delivers a trap and an interrupt there under the
+watchdog and the pool's threads, with nothing set; the timing tests hold on the runner's three
+cores; and the loader takes two copies of one library as two, which the native reload tests need.
+
+What made that possible is that the whole build was compiled and linked for macOS on Windows
+before anything was pushed. One declaration macro was missing there, `_DARWIN_C_SOURCE`, as
+`_DEFAULT_SOURCE` had been on Linux, and it was found by the compiler on the machine the code is
+written on.
+
+**The job costs less than was feared.** It was estimated at three minutes, thirty as a private
+repository is counted. It takes under one.
+
+## Tests
+
+The same one hundred and twenty-eight, in a release build on macOS and on Linux, and in a release
+build and a debug one on Windows. None is skipped on any of them.

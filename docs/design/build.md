@@ -51,7 +51,7 @@ releases. The condition that brings it back is zig at 1.0.
 
     Windows    x86-64    x86_64-windows-gnu     run where the code is written
     Linux      x86-64    x86_64-linux-gnu       run by a workflow, on every push
-    macOS      arm64     aarch64-macos          run by a workflow, on every push; phase 8
+    macOS      arm64     aarch64-macos          run by a workflow, on every push
 
 **A platform is one that is run.** wasmtime publishes its library for more than these, and zig
 compiles for all of them, so a fourth is a target name, an archive and a runner. Until it has the
