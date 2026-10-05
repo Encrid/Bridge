@@ -7,11 +7,19 @@
 #include <windows.h>
 #define nap() Sleep(100)
 #define thread_id() ((uint32_t)GetCurrentThreadId())
+#define now_ms() ((uint32_t)GetTickCount64())
 #else
 #include <pthread.h>
+#include <time.h>
 #include <unistd.h>
 #define nap() usleep(100'000)
 #define thread_id() ((uint32_t)(uintptr_t)pthread_self())
+static uint32_t now_ms()
+{
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    return (uint32_t)((uint64_t)t.tv_sec * 1000 + (uint64_t)t.tv_nsec / 1'000'000);
+}
 #endif
 
 static const bridge_api *api;
@@ -20,8 +28,10 @@ BRIDGE_NATIVE_BIND(api)
 
 BRIDGE_NATIVE(nap)
 {
+    /* when it began, in milliseconds: two that ran at once began within a few of each other */
+    uint32_t began = now_ms();
     nap();
-    bridge_native_log(api, 0, "nap", 3, thread_id(), 0);
+    bridge_native_log(api, 0, "nap", 3, thread_id(), began);
     return 0;
 }
 

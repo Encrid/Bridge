@@ -25,7 +25,7 @@
 constexpr int64_t MS = 1'000'000;
 
 /* the thread a native test module said it ran on, for the lines that say so */
-static uint32_t threads_seen[64], seen, pins, pins_here;
+static uint32_t threads_seen[64], began_seen[64], seen, pins, pins_here;
 
 /* two bridges, one sink: each says which it is, and its last sum is kept */
 static uint32_t last_sum[2];
@@ -51,7 +51,10 @@ static void sink(void *ud, const bridge_record *r)
         return;
     }
     if (r->len == 3 && !memcmp(r->text, "nap", 3)) {
-        if (seen < 64) threads_seen[seen ++] = r->arg[0];
+        if (seen < 64) {
+            began_seen[seen] = r->arg[1];
+            threads_seen[seen ++] = r->arg[0];
+        }
         return;
     }
     printf("record[%d] b%u %s/%s: %.*s %u %u\n", r->level, r->when >> 16,
@@ -370,6 +373,9 @@ int main(int argc, char **argv)
         load(b, &a);
         ms = phase_ms(b, "update");
         printf("two naps of 100 ms took %.0f ms on %u thread(s)\n", ms, distinct_threads());
+        /* not part of what is judged: how long the second waited to begin, for when it fails */
+        printf("the second began %u ms after the first\n", seen < 2 ? 0
+            : began_seen[1] > began_seen[0] ? began_seen[1] - began_seen[0] : began_seen[0] - began_seen[1]);
         printf("%s\n", ms < 180.0 && distinct_threads() == 2 ? "they ran at once"
              : ms > 190.0 && distinct_threads() == 1 ? "they ran one after the other"
              : "neither clearly");
