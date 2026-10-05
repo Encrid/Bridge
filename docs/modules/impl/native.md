@@ -106,8 +106,8 @@ does not, having crashed.
 where a wasm module compiles only the second:
 
     the eight entries     `abi.md`, *The ABI*, as function pointers, unchanged
-    shared                where the shared memory begins
-    private               where this module's private memory begins
+    shared_base           where the shared memory begins
+    private_base          where this module's private memory begins
 
 That is the `bridge` import namespace of `wasm.md`, *Memories*, as a C struct: the same eight
 functions and the same two memories, because the memory layout and the function semantics are one
@@ -117,6 +117,24 @@ contract on every backend.
 exported symbol, so the phase, the events, the terms and the slot are identical on both backends and
 the scheduler cannot tell them apart. Its arguments are
 offsets into the scratch arena, as on the wasm backend - `abi.md`, *The ABI*.
+
+**An entry knows whose it is by who is running.** A C function pointer carries no context, and the
+entries are unchanged, so none takes one. *The invariant* supplies it: native code runs only inside
+a call the backend made, so the backend notes the instance it is calling, per thread, and an entry
+reads that. An entry called from anywhere else - a foreign thread's callback - finds nobody and
+answers zero, which is the invariant enforced at the one place it can be.
+
+Refused: a context argument on every entry, which is a second ABI for one backend. The condition
+that brings it back is native code that must reach an entry from outside a call.
+
+**A refused entry answers zero, and so does every entry after it until the call returns.** Nothing
+can unwind native code - `budgets.md`, *What running out does* - so the backend does the nearest
+thing: the system runs to its end reaching nothing, and Bridge-ASM700 fails the invocation when it
+returns. Without the second half a loop of `spawn` past the entity ceiling would go on minting ids
+for as long as the loop ran.
+
+**A library is taken to import both memories.** It has no import section to read, so
+`module_imports` answers `shared` and `private` for every native module.
 
 And nothing else. No value marshalling, no call context, no buffer interface, no service registry,
 and **no way to call another module** - `abi.md`, *The ABI*. The first two have nothing to do

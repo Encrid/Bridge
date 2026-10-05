@@ -92,6 +92,8 @@ overflowing ring reports how many it dropped.* Met; the `linux` preset is unrun.
 
 ## 4. The native backend
 
+Done, on Windows. `PHASE4.md` is what it built and found.
+
 The second backend: a shared library that opens a module's library and calls it directly -
 `native.md`. `bridge-native.h`, `bridge_bind`, and exports found by name as `bridge_<name>`. Nothing
 changes above the backend seam: a native module's systems are scheduled like any other, it reads
@@ -100,7 +102,7 @@ the same spans through `private` and `shared`, and its log ring is reached throu
 *Done when a native module iterates a component array through a raw pointer; a native system and a
 wasm system run in the same phase with the scheduler unable to tell; and a module that
 sets `trusted = false` or any limit is refused on the native backend, by the capability it
-lacks, before its library is opened.*
+lacks, before its library is opened.* Met; the `linux` preset is unrun.
 
 ## 5. Scheduling
 
