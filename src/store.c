@@ -1,21 +1,14 @@
-/* Storage: the shared block, flecs over it, the entity index mirror, and the barrier.
- * docs/bridge/memory/memory.md, docs/bridge/flecs.md, docs/bridge/data/query.md and
- * reference.md, docs/bridge/diagnostics/log.md. */
+/* The shared block, the column region carved out of it, the log ring, and the barrier. Who
+ * keeps the rows is behind rows.h. docs/bridge/memory/memory.md, docs/bridge/diagnostics/log.md. */
 #include "inside.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* flecs_confine is a global, as ecs_os_api is, because the functions that allocate a column
- * have no world in scope. So which bridge a column is for is whichever this thread is working
- * for: every way into Bridge-ASM700 says so before it reaches flecs. Two bridges in a process
- * are then two worlds that never see each other's block. */
-static thread_local bridge *live;
-
 void store_enter(bridge *b)
 {
-    live = b;
+    rows_enter(b->rows);
 }
 
 uint32_t store_offset(bridge *b, const void *p)
@@ -25,15 +18,15 @@ uint32_t store_offset(bridge *b, const void *p)
     return (uint32_t)(c - b->shared);
 }
 
-/* ---- columns: flecs' allocator, carving the column region ---- */
+/* ---- columns: the column region, carved ---- */
 
-/* What flecs asks for is what it gets, to sixteen bytes: a freed range is a gap, kept in
+/* What storage asks for is what it gets, to sixteen bytes: a freed range is a gap, kept in
  * offset order and joined to its neighbours, and a request takes the smallest gap that holds
  * it before it takes fresh space. The gaps are kept outside the block: a module's stray write
  * must not be able to reach them. */
 constexpr uint32_t GRAIN = 16;
 
-static uint32_t grain(ecs_size_t size)
+static uint32_t grain(int32_t size)
 {
     return ((uint32_t)size + GRAIN - 1) & ~(GRAIN - 1);
 }
@@ -100,9 +93,8 @@ static int take(bridge *b, uint32_t len, uint32_t *at)
     return 1;
 }
 
-static void *column_alloc(ecs_size_t size)
+void *store_column_alloc(bridge *b, int32_t size)
 {
-    bridge *b = live;
     uint32_t at;
     if (size <= 0) return nullptr;
     b->layout_moved = 1;
@@ -114,9 +106,8 @@ static void *column_alloc(ecs_size_t size)
     return malloc((size_t)size);
 }
 
-static void column_free(void *ptr, ecs_size_t size)
+void store_column_free(bridge *b, void *ptr, int32_t size)
 {
-    bridge *b = live;
     if (!ptr) return;
     b->layout_moved = 1;
     if (!in_columns(b, ptr)) {
@@ -126,13 +117,12 @@ static void column_free(void *ptr, ecs_size_t size)
     give(b, (uint32_t)((uint8_t *)ptr - b->shared) - b->columns, grain(size));
 }
 
-static void *column_realloc(void *ptr, ecs_size_t old_size, ecs_size_t new_size)
+void *store_column_realloc(bridge *b, void *ptr, int32_t old_size, int32_t new_size)
 {
-    bridge *b = live;
     void *p;
-    if (!ptr) return column_alloc(new_size);
+    if (!ptr) return store_column_alloc(b, new_size);
     if (new_size <= 0) {
-        column_free(ptr, old_size);
+        store_column_free(b, ptr, old_size);
         return nullptr;
     }
     if (in_columns(b, ptr)) {
@@ -157,167 +147,13 @@ static void *column_realloc(void *ptr, ecs_size_t old_size, ecs_size_t new_size)
             return ptr;
         }
     }
-    p = column_alloc(new_size);
+    p = store_column_alloc(b, new_size);
     memcpy(p, ptr, (size_t)(old_size < new_size ? old_size : new_size));
-    column_free(ptr, old_size);
+    store_column_free(b, ptr, old_size);
     return p;
 }
 
-/* ---- table ids: dense, ours, given the first time a table is seen holding something ---- */
-
-static uint32_t table_id(bridge *b, ecs_table_t *t)
-{
-    uint32_t mask, i;
-    if (!t) return 0;
-    if (b->table_count * 2 >= b->table_hash_room || !b->table_hash) {
-        uint32_t room = b->table_hash_room ? b->table_hash_room : 256, k;
-        while (b->table_count * 2 >= room) room *= 2;
-        free(b->table_hash);
-        b->table_hash = calloc(room, sizeof *b->table_hash);
-        b->table_hash_room = room;
-        for (k = 1; k < b->table_count; k ++) {
-            if (!b->tables[k].table) continue;      /* retired */
-            i = (uint32_t)(((uintptr_t)b->tables[k].table >> 4) * 2'654'435'761u) & (room - 1);
-            while (b->table_hash[i]) i = (i + 1) & (room - 1);
-            b->table_hash[i] = k;
-        }
-    }
-    mask = b->table_hash_room - 1;
-    i = (uint32_t)(((uintptr_t)t >> 4) * 2'654'435'761u) & mask;
-    while (b->table_hash[i]) {
-        if (b->tables[b->table_hash[i]].table == t) return b->table_hash[i];
-        i = (i + 1) & mask;
-    }
-    b->layout_moved = 1;
-    if (b->free_count) {
-        /* an id whose table is gone, and which nothing in the index still says */
-        uint32_t id = b->free_tables[-- b->free_count];
-        b->tables[id].table = t;
-        b->tables[id].rows = 0;
-        b->table_hash[i] = id;
-        return id;
-    }
-    if (b->table_count >= b->table_room) {
-        b->table_room = b->table_room ? b->table_room * 2 : 64;
-        b->tables = realloc(b->tables, b->table_room * sizeof *b->tables);
-    }
-    b->tables[b->table_count].table = t;
-    b->tables[b->table_count].rows = 0;
-    b->table_hash[i] = b->table_count;
-    return b->table_count ++;
-}
-
-/* flecs says when it frees a table, from the one function every path to that goes through:
- * a component deleted, the children of something deleted, its own sweep of empty tables. The
- * id is dead until the next sync has moved every index record off it, then free. A table
- * with several ids in its type is announced once for each, so this has to be safe to repeat. */
-static void on_table_gone(ecs_iter_t *it)
-{
-    bridge *b = it->ctx;
-    uint32_t id;
-    for (id = 1; id < b->table_count && b->tables[id].table != it->table; id ++) {}
-    if (id >= b->table_count) return;
-    b->tables[id].table = nullptr;
-    b->tables[id].rows = 0;
-    if (b->dead_count == b->dead_room) {
-        b->dead_room = b->dead_room ? b->dead_room * 2 : 16;
-        b->dead_tables = realloc(b->dead_tables, b->dead_room * sizeof *b->dead_tables);
-    }
-    b->dead_tables[b->dead_count ++] = id;
-    free(b->table_hash);            /* rebuilt without it at the next lookup */
-    b->table_hash = nullptr;
-    b->layout_moved = 1;
-}
-
-/* ---- the entity index mirror - flecs.md, *flecs will not tell you which* ---- */
-
-void store_touch(bridge *b, ecs_entity_t e)
-{
-    uint32_t index = (uint32_t)e;
-    if (index >= b->entities || b->is_dirty[index]) return;
-    b->is_dirty[index] = 1;
-    if (b->dirty_count == b->dirty_room) {
-        b->dirty_room = b->dirty_room ? b->dirty_room * 2 : 1024;
-        b->dirty = realloc(b->dirty, b->dirty_room * sizeof *b->dirty);
-    }
-    b->dirty[b->dirty_count ++] = e;
-}
-
-/* an event names an entity whose components changed: where it ended up is read at the barrier */
-static void on_change(ecs_iter_t *it)
-{
-    int32_t i;
-    for (i = 0; i < it->count; i ++) store_touch(it->ctx, it->entities[i]);
-}
-
-/* and the hook names the one no event does: the entity a delete moved into the hole */
-static void on_row_moved([[maybe_unused]] ecs_world_t *world, ecs_entity_t e, ecs_table_t *table,
-                         int32_t row)
-{
-    bridge *b = live;
-    uint32_t index = (uint32_t)e;
-    if (index >= b->entities) return;
-    if (b->index[index].table == table_id(b, table)) b->index[index].row = (uint32_t)row;
-    else store_touch(b, e);
-}
-
-static void sync(bridge *b)
-{
-    uint32_t i;
-    for (i = 0; i < b->dirty_count; i ++) {
-        uint32_t index = (uint32_t)b->dirty[i];
-        /* by index, not by the id that was named: the index may have been recycled since */
-        ecs_entity_t e = ecs_get_alive(b->world, index);
-        bridge_entity *record = &b->index[index], now = { 0, 0, 0xffffffffu };
-        if (e) {
-            const ecs_record_t *r = ecs_record_find(b->world, e);
-            now.table = table_id(b, r->table);
-            now.row = (uint32_t)ECS_RECORD_TO_ROW(r->row);
-            now.generation = (uint32_t)(e >> 32);
-        }
-        if (record->table) b->tables[record->table].rows --;
-        if (now.table) b->tables[now.table].rows ++;
-        *record = now;
-        b->is_dirty[index] = 0;
-    }
-    b->dirty_count = 0;
-    /* every entity a retired table held was named by an event and has just been placed */
-    for (i = 0; i < b->dead_count; i ++) {
-        if (b->free_count == b->free_room) {
-            b->free_room = b->free_room ? b->free_room * 2 : 16;
-            b->free_tables = realloc(b->free_tables, b->free_room * sizeof *b->free_tables);
-        }
-        b->free_tables[b->free_count ++] = b->dead_tables[i];
-    }
-    b->dead_count = 0;
-}
-
-/* ---- what modules asked for since the last barrier ---- */
-
-/* Each module's changes, in the order it loaded and then the order it asked: the same every
- * run, whichever thread ran what. An id that died in the meantime is passed over. */
-void store_apply(bridge *b, module *m)
-{
-    uint32_t at = 0;
-    while (at < m->queue_len) {
-        change ch;
-        const void *value = m->queue + at + sizeof ch;
-        memcpy(&ch, m->queue + at, sizeof ch);
-        at += (uint32_t)sizeof ch + ((ch.size + 7u) & ~7u);
-        if (!ch.id || !ecs_is_alive(b->world, ch.id)) continue;
-        if (ch.op == CHANGE_DESTROY) ecs_delete(b->world, ch.id);
-        else if (ch.op == CHANGE_ATTACH) ecs_set_id(b->world, ch.id, ch.c->id, ch.size, value);
-        else ecs_remove_id(b->world, ch.id, ch.c->id);
-        store_touch(b, ch.id);
-    }
-    m->queue_len = 0;
-}
-
-static void replay(bridge *b)
-{
-    module *m;
-    for (m = b->modules; m; m = m->next) store_apply(b, m);
-}
+/* ---- what a module is given to hand out ---- */
 
 /* A module's ids for the time until the next barrier: what it did not use, topped up to what
  * its config stated. They are real entities with nothing on them, which no query matches. */
@@ -335,17 +171,9 @@ int store_refill(bridge *b, module *m)
     m->id_next = 0;
     m->id_count = kept;
     m->ids_short = 0;
-    while (m->id_count < want) {
-        ecs_entity_t e = ecs_new(b->world);
-        /* the index is twelve bytes times the highest id, and that is what was budgeted */
-        if ((uint32_t)e >= b->entities) {
-            ecs_delete(b->world, e);
-            m->ids_short = 1;
-            break;
-        }
-        store_touch(b, e);
-        m->ids[m->id_count ++] = e;
-    }
+    m->id_count += rows_reserve(b->rows, m->ids + kept, want - kept);
+    /* the index is twelve bytes times the highest id, and that is what was budgeted */
+    m->ids_short = m->id_count < want;
     return m->ids_short;
 }
 
@@ -364,89 +192,9 @@ void store_header(bridge *b, module *m)
     h->observers = m->spans + (uint32_t)sizeof(bridge_query) * m->system_count;
     h->column_base = h->observers + (uint32_t)sizeof(bridge_list) * m->observer_count;
     h->terms = m->declared_count;
-    h->tables = b->table_count;
+    h->tables = rows_tables(b->rows);
     h->entity_index = store_offset(b, b->index);
     h->entities = b->entities;
-}
-
-/* 1 if the module's span region cannot hold what its queries match */
-static int publish(bridge *b, module *m)
-{
-    auto h = (bridge_header *)m->priv;
-    uint64_t end = (uint64_t)m->spans + m->spans_len, at;
-    uint32_t q, t, s;
-
-    store_header(b, m);
-    at = ((uint64_t)h->column_base + 4ull * m->declared_count * b->table_count + 7u) & ~7ull;
-    if (at > end) return 1;
-
-    if (b->layout_moved) {
-        auto cell = (uint32_t *)(m->priv + h->column_base);
-        memset(cell, 0, 4u * m->declared_count);        /* table 0 is no table */
-        for (t = 1; t < b->table_count; t ++) {
-            for (s = 0; s < m->declared_count; s ++) {
-                ecs_table_t *table = b->tables[t].table;
-                int32_t column = !table ? -1
-                    : ecs_table_get_column_index(b->world, table, m->declared[s]->id);
-                cell[t * m->declared_count + s] =
-                    column < 0 ? 0 : store_offset(b, ecs_table_get_column(table, column, 0));
-            }
-        }
-    }
-
-    for (q = 0; q < m->system_count; q ++) {
-        bridge_system *sys = m->systems[q];
-        auto slot = (bridge_query *)(m->priv + m->spans) + q;
-        uint32_t size = BRIDGE_SPAN_SIZE(sys->terms), spans = 0;
-        ecs_iter_t it;
-        slot->spans = 0;
-        slot->at = (uint32_t)at;
-        if (!sys->query) continue;
-        it = ecs_query_iter(b->world, sys->query);
-        while (ecs_query_next(&it)) {
-            uint8_t *span = m->priv + at;
-            uint32_t id = table_id(b, it.table), value;
-            if (at + size > end) {
-                ecs_iter_fini(&it);
-                return 1;
-            }
-            /* validation.md, *Always on*: what this catches is our own patch failing */
-            if (b->tables[id].rows != it.count) {
-                say(b, nullptr, nullptr, BRIDGE_ERR, "the entity index is out of step with flecs: "
-                    "table %u has %d rows and the index counts %d", id, it.count, b->tables[id].rows);
-            }
-            memset(span, 0, size);
-            value = (uint32_t)it.count;
-            memcpy(span, &value, 4);
-            value = store_offset(b, it.entities);
-            memcpy(span + 4, &value, 4);
-            for (t = 0; t < sys->terms; t ++) {
-                uint64_t source = it.sources[t];
-                value = ecs_field_is_set(&it, (int8_t)t)
-                    ? store_offset(b, ecs_field_w_size(&it, sys->sizes[t], (int8_t)t)) : 0;
-                memcpy(span + BRIDGE_SPAN_BASE + 4u * t, &value, 4);
-                memcpy(span + BRIDGE_SPAN_SOURCE(sys->terms) + 8u * t, &source, 8);
-            }
-            at += size;
-            spans ++;
-        }
-        slot->spans = spans;
-    }
-
-    /* and each observer's list of who triggered it - abi.md, *The ABI* */
-    for (q = 0; q < m->observer_count; q ++) {
-        bridge_system *sys = m->observers[q];
-        auto slot = (bridge_list *)(m->priv + h->observers) + q;
-        if (at + (uint64_t)sys->pending_count * sizeof(bridge_trigger) > end) return 1;
-        slot->count = sys->pending_count;
-        slot->at = (uint32_t)at;
-        for (t = 0; t < sys->pending_count; t ++) {
-            bridge_trigger trigger = { sys->pending[t].id, sys->pending[t].events, 0 };
-            memcpy(m->priv + at, &trigger, sizeof trigger);
-            at += sizeof trigger;
-        }
-    }
-    return 0;
 }
 
 /* ---- the log ring ---- */
@@ -496,18 +244,18 @@ void store_barrier(bridge *b)
     module *m;
     uint32_t tables, i;
 
-    replay(b);                          /* queued changes applied */
+    rows_apply(b->rows);                /* queued changes applied */
     for (m = b->modules; m; m = m->next) store_refill(b, m);
-    sync(b);
+    rows_settle(b->rows);
     do {                                /* spans republished */
-        tables = b->table_count;
+        tables = rows_tables(b->rows);
         for (m = b->modules; m; m = m->next) {
-            if (m->stopped || !publish(b, m)) continue;
+            if (m->stopped || !rows_publish(b->rows, m)) continue;
             m->stopped = 1;
             say(b, m, nullptr, BRIDGE_ERR, "module '%s' is stopped: what its queries match no "
                 "longer fits in its spans of %u bytes", m->identity, m->spans_len);
         }
-    } while (tables != b->table_count);
+    } while (tables != rows_tables(b->rows));
     b->layout_moved = 0;
     /* then the observers of what changed. What they ask for goes on their queues, and so
      * is the next barrier's - schedule.md, *An observer runs at the barrier, one hop per
@@ -526,12 +274,6 @@ void store_barrier(bridge *b)
 }
 
 /* ---- create and destroy ---- */
-
-static void flecs_says(int32_t level, [[maybe_unused]] const char *file,
-                       [[maybe_unused]] int32_t line, const char *msg)
-{
-    if (live && level <= BRIDGE_WARN) say(live, nullptr, nullptr, (int8_t)level, "flecs: %s", msg);
-}
 
 static int unset(bridge *b, const char *key, uint64_t value)
 {
@@ -552,7 +294,6 @@ static int beyond(bridge *b, const char *key, uint64_t value)
 int store_create(bridge *b, const bridge_budget *budget)
 {
     uint64_t index = PAGE, arena, columns, len, reserve;
-    ecs_os_api_t os;
     uint32_t i;
 
     if (unset(b, "entities", budget->entities) || unset(b, "persistent", budget->persistent)
@@ -589,42 +330,8 @@ int store_create(bridge *b, const bridge_budget *budget)
     b->columns = (uint32_t)columns;
     b->columns_len = (uint32_t)budget->columns;
     b->max_modules = budget->max_modules;
-    b->is_dirty = calloc(b->entities, 1);
-    b->table_count = 1;                 /* table 0 is no table */
-
-    live = b;
-    /* flecs' own globals are set up by its first world, and are nobody's to race for */
-    os_global_lock();
-    flecs_confine = (flecs_confine_t){ column_alloc, column_realloc, column_free, on_row_moved };
-    ecs_os_set_api_defaults();
-    os = ecs_os_get_api();
-    if (os.log_ != flecs_says) {
-        os.log_ = flecs_says;
-        ecs_os_set_api(&os);
-    }
-    b->world = ecs_init();
-    os_global_unlock();
-    ecs_observer(b->world, {
-        .query.terms = {{ .id = EcsWildcard }},
-        .events = { EcsOnAdd, EcsOnRemove },
-        .callback = on_change,
-        .ctx = b
-    });
-    /* EcsAny, not a wildcard: a wildcard is not told of a table whose type is only pairs,
-     * and the tables of an enum's constants are that */
-    ecs_observer(b->world, {
-        .query.terms = {{ .id = EcsAny }},
-        .events = { EcsOnTableDelete },
-        .callback = on_table_gone,
-        .ctx = b
-    });
-    b->names = ecs_entity(b->world, { .name = "bridge-asm700" });
-    /* the one type that is given and not declared, where every namespace's lookup ends */
-    b->text_type = ecs_struct(b->world, {
-        .entity = ecs_entity(b->world, { .name = "bridge_text", .parent = b->names }),
-        .members = {{ .name = "at", .type = ecs_id(ecs_u32_t) },
-                    { .name = "len", .type = ecs_id(ecs_u32_t) }}
-    });
+    b->rows = rows_create(b);
+    if (!b->rows) return 1;
     if (b->columns_out) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] columns of %u bytes does not hold flecs' own "
             "tables, before any module's", b->columns_len);
@@ -647,12 +354,8 @@ int store_create(bridge *b, const bridge_budget *budget)
 void store_destroy(bridge *b)
 {
     uint32_t i;
-    live = b;
-    if (b->world) {
-        os_global_lock();
-        ecs_fini(b->world);
-        os_global_unlock();
-    }
+    /* first: what storage frees of the column region, it frees through the gap list */
+    if (b->rows) rows_destroy(b->rows);
     for (i = 0; i < b->backend_count; i ++) {
         open_backend *o = &b->backends[i];
         if (o->shared) o->api.memory_release(o->shared);
@@ -667,12 +370,5 @@ void store_destroy(bridge *b)
     }
     for (i = 0; i < b->kept_count; i ++) free(b->kept[i].stem);
     free(b->kept);
-    free(b->dead_tables);
-    free(b->free_tables);
     free(b->components);
-    free(b->tables);
-    free(b->table_hash);
-    free(b->dirty);
-    free(b->is_dirty);
-    live = nullptr;
 }

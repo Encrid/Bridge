@@ -6,9 +6,7 @@
 #include "bridge-abi.h"
 #include "backend.h"
 #include "os.h"
-
-#include "flecs.h"
-#include "flecs_confine.h"
+#include "rows.h"
 
 constexpr uint32_t PAGE = 65'536;
 
@@ -24,11 +22,12 @@ typedef struct {
     backend_memory  *shared;        /* the shared block, as this backend sees it */
 } open_backend;
 
-/* A component, by its namespaced name. flecs holds the storage; this is what load checks. */
+/* A component, by its namespaced name. Storage holds the rows; this is what load checks. */
 typedef struct component component;
 struct component {
     char        *name;
-    ecs_entity_t id;
+    rows_type   *type;              /* as storage knows it */
+    enum bridge_kind kind;
     uint32_t     size, align;
     uint64_t     fingerprint;       /* of the descriptor string - schema.md, *Fingerprints* */
     uint32_t     declarers;         /* how many loaded modules declared it */
@@ -38,7 +37,7 @@ struct component {
     void        *zero;              /* `size` zero bytes: what an attach with no value copies */
 };
 
-typedef struct { ecs_entity_t id; enum bridge_event events; } pending;
+typedef struct { uint64_t id; enum bridge_event events; } pending;
 
 /* A system, or an observer: a query and a function either way. An observer's phase is the one
  * past the deployment's last, which is the barrier. */
@@ -47,7 +46,7 @@ typedef struct {
     char         *name;
     char         *full;             /* how [order] names it: the module's stem, then the name */
     uint32_t      phase;
-    ecs_query_t  *query;            /* nullptr for a system with no terms, and for an observer */
+    rows_terms   *matched;          /* its terms, as storage holds them. nullptr with no terms */
     uint32_t      terms;
     uint32_t      sizes[BRIDGE_TERMS_MAX];
     component    *touches[BRIDGE_TERMS_MAX];    /* nullptr where a term reads nothing */
@@ -57,7 +56,6 @@ typedef struct {
     int           parked;           /* out of the schedule while a reload decides its fate */
 
     int           observer;
-    ecs_entity_t  observing;        /* flecs' observer */
     pending      *pending;          /* who triggered it since the last barrier */
     uint32_t      pending_count, pending_room;
 
@@ -92,10 +90,10 @@ struct module {
     uint32_t       observer_count;
 
     int64_t   fuel;
-    /* What is set aside for it alone - threads.md. Ids it may hand out, taken from flecs at a
+    /* What is set aside for it alone - threads.md. Ids it may hand out, taken from storage at a
      * barrier; its share of the persistent arena; and what it asked to have changed, applied
      * at the next barrier in the order it asked. Only its own thread touches any of them. */
-    ecs_entity_t *ids;
+    uint64_t *ids;
     uint32_t  id_count, id_next, id_room;
     int       ids_short;            /* the entity ceiling cut its last refill short */
     int64_t   spawns, persistent;
@@ -120,7 +118,7 @@ struct module {
     int      ran_now, failed_now;   /* since the last barrier */
     /* config.md: the component its settings seeded, the row, and where their text is */
     component   *config;
-    ecs_entity_t config_entity;
+    uint64_t     config_entity;
     uint32_t     text_at, text_room;
     int   in_init, stopped;
     int   refused;                  /* an entry refused during the call in progress */
@@ -131,13 +129,12 @@ struct module {
 /* One queued change: `size` bytes of value follow it, padded to eight. */
 enum change_op : uint32_t { CHANGE_DESTROY = 1, CHANGE_ATTACH = 2, CHANGE_DETACH = 3 };
 typedef struct {
-    ecs_entity_t id;
+    uint64_t     id;
     component   *c;
     uint32_t     size;
     enum change_op op;
 } change;
 
-typedef struct { ecs_table_t *table; int32_t rows; } table_slot;
 typedef struct { char *stem; uint32_t at, room; } kept_text;
 typedef struct { uint32_t at, len; } gap;       /* in the column region, from its start */
 
@@ -170,24 +167,10 @@ struct bridge {
     int            columns_out;     /* the column budget ran out during this barrier */
     int            layout_moved;    /* a column, a table or a declaration changed */
 
-    ecs_world_t   *world;
-    /* table ids are ours: dense, and 0 is no table - flecs.md, *Table ids are Bridge-ASM700's own* */
-    table_slot    *tables;
-    uint32_t       table_count, table_room;
-    uint32_t      *table_hash;      /* open addressing over `tables`, by pointer */
-    uint32_t       table_hash_room;
-    /* ids of tables flecs has deleted: dead until the index has let go of them, then free */
-    uint32_t      *dead_tables, *free_tables;
-    uint32_t       dead_count, free_count, dead_room, free_room;
-    /* entities something named since the last barrier: where they are is read once, then */
-    ecs_entity_t  *dirty;
-    uint32_t       dirty_count, dirty_room;
-    uint8_t       *is_dirty;
+    rows          *rows;            /* who keeps the rows: rows.h */
 
     component    **components;
     uint32_t       component_count;
-    ecs_entity_t   names;           /* under it, a scope per namespace: where a type name resolves */
-    ecs_entity_t   text_type;       /* bridge_text, as flecs knows it */
     kept_text     *kept;            /* where an unloaded module's settings text was */
     uint32_t       kept_count;
     bridge_system **systems;        /* every module's, in registration order */
@@ -230,13 +213,15 @@ void  pool_run(pool *p, pool_fn fn, void **jobs, const uint8_t *caller_only, uin
 void     store_enter(bridge *b);                                  /* this thread is working for b */
 [[nodiscard]] int store_create(bridge *b, const bridge_budget *budget);    /* 0, or a record was emitted */
 void     store_destroy(bridge *b);
-void     store_touch(bridge *b, ecs_entity_t e);                  /* e may have moved: look at a barrier */
 int      store_refill(bridge *b, module *m);                      /* 1 if the ceiling cut its ids short */
-void     store_apply(bridge *b, module *m);                       /* what it queued, now */
 void     store_drain(bridge *b, module *m);                       /* its log ring, to the sink */
 void     store_barrier(bridge *b);
 void     store_header(bridge *b, module *m);                      /* what a module reads at offset 0 */
 uint32_t store_offset(bridge *b, const void *p);                  /* into the shared memory, 0 for null */
+/* the column region, carved: what storage asks for is what it gets, to sixteen bytes */
+void    *store_column_alloc(bridge *b, int32_t size);
+void    *store_column_realloc(bridge *b, void *ptr, int32_t old_size, int32_t new_size);
+void     store_column_free(bridge *b, void *ptr, int32_t size);
 
 /* abi.c */
 [[nodiscard]] int abi_define(module *m, backend_err *err);                      /* the eight imports */

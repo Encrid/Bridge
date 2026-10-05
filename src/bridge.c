@@ -130,7 +130,8 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
             for (k = 0; k < want->setting_count; k ++) {
                 const bridge_setting *from = &want->settings[k];
                 settings[k].key = from->key;
-                settings[k].kind = from->kind;
+                /* the same four kinds under the two seams' names, and the same numbers */
+                settings[k].kind = (enum backend_setting_kind)from->kind;
                 if (from->kind == BRIDGE_BOOL) settings[k].v.b = from->v.b;
                 else if (from->kind == BRIDGE_INT) settings[k].v.i = from->v.i;
                 else if (from->kind == BRIDGE_FLOAT) settings[k].v.f = from->v.f;

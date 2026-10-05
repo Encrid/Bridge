@@ -61,41 +61,9 @@ static int may_write(module *m, const component *c)
     return !foreign(m, c->name) || listed(m->write, m->write_count, c->name);
 }
 
-/* schema.md, *The type set*: flecs', minus anything pointer-sized or pointer-holding */
-static const char *outside_type_set(ecs_world_t *world, ecs_entity_t type)
-{
-    const EcsType *t = ecs_get(world, type, EcsType);
-    if (!t) return "a type nothing describes";
-    switch (t->kind) {
-    case EcsPrimitiveType: {
-        ecs_primitive_kind_t kind = ecs_get(world, type, EcsPrimitive)->kind;
-        return kind == EcsString || kind == EcsUPtr || kind == EcsIPtr
-            ? "a pointer-sized type" : nullptr;
-    }
-    case EcsStructType: {
-        const EcsStruct *s = ecs_get(world, type, EcsStruct);
-        ecs_member_t *members = ecs_vec_first(&s->members);
-        int32_t i, count = ecs_vec_count(&s->members);
-        for (i = 0; i < count; i ++) {
-            const char *why = outside_type_set(world, members[i].type);
-            if (why) return why;
-        }
-        return nullptr;
-    }
-    case EcsArrayType:
-        return outside_type_set(world, ecs_get(world, type, EcsArray)->type);
-    case EcsEnumType:
-    case EcsBitmaskType:
-        return nullptr;
-    default:
-        return "a vector or an opaque type";
-    }
-}
-
 /* declare(name, name_len, kind, size, align, desc, desc_len, on_unload) -> slot */
 static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
 {
-    static const ecs_type_kind_t kinds[] = { 0, EcsStructType, EcsEnumType, EcsBitmaskType };
     static const char *const kind_names[] = { "", "a struct", "an enum", "a bitmask" };
     module *m = ud;
     bridge *b = m->b;
@@ -137,51 +105,36 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
             (unsigned long long)c->fingerprint);
     }
     if (!c) {
-        /* flecs parses the descriptor and computes the layout: Bridge-ASM700 parses no C */
+        /* Storage reads the descriptor and lays the type out. A field's type is a bare C name,
+         * looked for in the declarer's namespace: `Vec3` in game:Body is game:Vec3 - schema.md. */
         char *desc = copy(desc_at, a[6]);
-        const EcsComponent *layout;
         const char *why = nullptr;
-        ecs_entity_t id, scope, before;
-        int parsed;
+        const rows_field *fields = nullptr;
+        rows_type *type = nullptr;
+        uint32_t laid = 0, aligned = 0, field_count, k;
+        enum rows_declared declared;
 
-        /* A field's type is a bare C name, and flecs looks it up from the scope it is in. So
-         * a declared type is named in flecs under its namespace, and a descriptor is parsed
-         * from inside that namespace: `Vec3` in game:Body is game:Vec3 - schema.md. */
         *bare = 0;
-        scope = ecs_entity(b->world, { .name = name, .parent = b->names });
+        declared = rows_declare(b->rows, name, bare + 1, kind, desc, &type, &laid, &aligned, &why);
         *bare = ':';
-        id = ecs_entity(b->world, { .name = bare + 1, .parent = scope });
-        /* flecs makes an entity an enum when its underlying type is set, which parsing a
-         * descriptor does not do. 32 bits, as a C enum is on every target a module has. */
-        if (id && kind == BRIDGE_ENUM) {
-            /* in place: flecs forbids copying an EcsEnum, so it cannot be set by value */
-            ecs_ensure(b->world, id, EcsEnum)->underlying_type = ecs_id(ecs_i32_t);
-            ecs_modified(b->world, id, EcsEnum);
-        }
-        before = ecs_set_scope(b->world, scope);
-        parsed = id && !ecs_meta_from_desc(b->world, id, kinds[kind], desc);
-        ecs_set_scope(b->world, before);
-        layout = parsed ? ecs_get(b->world, id, EcsComponent) : nullptr;
-        if (layout) why = outside_type_set(b->world, id);
         free(desc);
-        if (!layout || why || (uint32_t)layout->size != size || (uint32_t)layout->alignment != align) {
-            if (!layout) {
-                refuse(m, "component '%s': its descriptor does not describe %s, or names a "
-                    "type its namespace has not declared", name, kind_names[kind]);
-            } else if (why) {
-                refuse(m, "component '%s' holds %s, which no column can", name, why);
-            } else {
-                refuse(m, "component '%s' is %u bytes aligned to %u in the module and %d "
-                    "aligned to %d by its descriptor", name, size, align, layout->size,
-                    layout->alignment);
-            }
-            if (id) ecs_delete(b->world, id);
-            return 1;
+        if (declared == ROWS_NOT_DESCRIBED) {
+            return refuse(m, "component '%s': its descriptor does not describe %s, or names a "
+                "type its namespace has not declared", name, kind_names[kind]);
+        }
+        if (declared == ROWS_NOT_STORABLE) {
+            return refuse(m, "component '%s' holds %s, which no column can", name, why);
+        }
+        if (laid != size || aligned != align) {
+            rows_undeclare(b->rows, type);
+            return refuse(m, "component '%s' is %u bytes aligned to %u in the module and %d "
+                "aligned to %d by its descriptor", name, size, align, (int)laid, (int)aligned);
         }
 
         c = calloc(1, sizeof *c);
         c->name = copy(name, strlen(name));
-        c->id = id;
+        c->type = type;
+        c->kind = kind;
         c->size = size;
         c->align = align;
         c->fingerprint = print;
@@ -189,21 +142,15 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         b->components = realloc(b->components, (b->component_count + 1) * sizeof *b->components);
         b->components[b->component_count ++] = c;
         /* a declared type a field of this one names is held for as long as this one is */
-        if (kind == BRIDGE_STRUCT) {
-            const EcsStruct *layout = ecs_get(b->world, id, EcsStruct);
-            ecs_member_t *members = ecs_vec_first(&layout->members);
-            int32_t k, member_count = ecs_vec_count(&layout->members);
-            for (k = 0; k < member_count; k ++) {
-                ecs_entity_t named = members[k].type;
-                const EcsType *t = ecs_get(b->world, named, EcsType);
-                if (t && t->kind == EcsArrayType) named = ecs_get(b->world, named, EcsArray)->type;
-                for (i = 0; i < b->component_count; i ++) {
-                    component *held = b->components[i];
-                    if (held->id != named || held == c) continue;
-                    c->deps = realloc(c->deps, (c->dep_count + 1) * sizeof *c->deps);
-                    c->deps[c->dep_count ++] = held;
-                    held->users ++;
-                }
+        field_count = kind == BRIDGE_STRUCT ? rows_fields(b->rows, type, &fields) : 0;
+        for (k = 0; k < field_count; k ++) {
+            if (!fields[k].type) continue;
+            for (i = 0; i < b->component_count; i ++) {
+                component *held = b->components[i];
+                if (held->type != fields[k].type || held == c) continue;
+                c->deps = realloc(c->deps, (c->dep_count + 1) * sizeof *c->deps);
+                c->deps[c->dep_count ++] = held;
+                held->users ++;
             }
         }
     }
@@ -224,26 +171,20 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     return 0;
 }
 
-/* flecs says who and what; the observer itself runs at the barrier, after the republish */
-static void on_trigger(ecs_iter_t *it)
+/* storage says who and what; the observer itself runs at the barrier, after the republish */
+static void heard(void *ctx, uint64_t id, enum bridge_event event)
 {
-    bridge_system *s = it->ctx;
-    uint32_t event = it->event == EcsOnAdd ? BRIDGE_ON_ADD
-                   : it->event == EcsOnSet ? BRIDGE_ON_SET : BRIDGE_ON_REMOVE;
-    int32_t i;
-    for (i = 0; i < it->count; i ++) {
-        ecs_entity_t e = it->entities[i];
-        if (s->pending_count && s->pending[s->pending_count - 1].id == e) {
-            s->pending[s->pending_count - 1].events |= event;
-            continue;
-        }
-        if (s->pending_count == s->pending_room) {
-            s->pending_room = s->pending_room ? s->pending_room * 2 : 16;
-            s->pending = realloc(s->pending, s->pending_room * sizeof *s->pending);
-        }
-        s->pending[s->pending_count].id = e;
-        s->pending[s->pending_count ++].events = event;
+    bridge_system *s = ctx;
+    if (s->pending_count && s->pending[s->pending_count - 1].id == id) {
+        s->pending[s->pending_count - 1].events |= event;
+        return;
     }
+    if (s->pending_count == s->pending_room) {
+        s->pending_room = s->pending_room ? s->pending_room * 2 : 16;
+        s->pending = realloc(s->pending, s->pending_room * sizeof *s->pending);
+    }
+    s->pending[s->pending_count].id = id;
+    s->pending[s->pending_count ++].events = event;
 }
 
 /* A system or an observer is a query plus a function, so one registration serves both.
@@ -256,7 +197,7 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
     const char *name_at = scratch(m, name_off, name_len);
     const bridge_term *terms = scratch(m, terms_off, term_count * sizeof(bridge_term));
     uint32_t count = (uint32_t)term_count, i;
-    ecs_query_desc_t desc = {};
+    rows_term asked[BRIDGE_TERMS_MAX] = {};
     bridge_system *s;
     char name[128], full[256];
 
@@ -285,8 +226,6 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
     s = calloc(1, sizeof *s);
     /* query.md, *What a query may not ask for* */
     for (i = 0; i < count; i ++) {
-        static const int16_t access[] = { 0, EcsIn, EcsOut, EcsInOut };
-        static const int16_t oper[] = { 0, EcsAnd, EcsNot, EcsOptional };
         bridge_term t;
         component *c;
         memcpy(&t, &terms[i], sizeof t);
@@ -310,36 +249,19 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
             return 1;
         }
         c = m->declared[t.slot];
-        desc.terms[i].id = c->id;
-        desc.terms[i].inout = access[t.access];
-        desc.terms[i].oper = oper[t.oper];
+        asked[i].type = c->type;
+        asked[i].oper = t.oper;
         s->sizes[i] = c->size;
         /* what the conflict graph reads: a term that must not match touches nothing */
         s->touches[i] = t.oper == BRIDGE_NOT ? nullptr : c;
         s->writes[i] = t.access != BRIDGE_IN;
     }
 
-    if (events) {
-        ecs_observer_desc_t od = {};
-        uint32_t k = 0;
-        memcpy(od.query.terms, desc.terms, sizeof desc.terms);
-        if (events & BRIDGE_ON_ADD) od.events[k ++] = EcsOnAdd;
-        if (events & BRIDGE_ON_SET) od.events[k ++] = EcsOnSet;
-        if (events & BRIDGE_ON_REMOVE) od.events[k ++] = EcsOnRemove;
-        od.callback = on_trigger;
-        od.ctx = s;
-        s->observing = ecs_observer_init(b->world, &od);
-    } else if (count) {
-        /* flecs fails creation unless every term matches whole tables, which one span per
-         * table assumes; what is left needs a read per row */
-        desc.cache_kind = EcsQueryCacheAll;
-        s->query = ecs_query_init(b->world, &desc);
-        if (s->query && s->query->row_fields) {
-            ecs_query_fini(s->query);
-            s->query = nullptr;
-        }
-    }
-    if (events ? !s->observing : count && !s->query) {
+    /* storage refuses what has no base-and-stride form: one span a table assumes that every
+     * term matches whole tables */
+    s->matched = events ? rows_observer(b->rows, asked, count, events, heard, s)
+               : count ? rows_system(b->rows, asked, count) : nullptr;
+    if (count && !s->matched) {
         free(s);
         return refuse(m, "%s '%s' asks for something flecs refuses, or a term with no "
             "base-and-stride form", what, name);
@@ -403,7 +325,7 @@ static int abi_observe(void *ud, const uint64_t *a, uint64_t *r)
  * which the barrier applies in an order that never varies. No lock: a module's systems are
  * serialised, so each of the three has one writer. */
 
-static void queue(module *m, enum change_op op, ecs_entity_t id, component *c, const void *value)
+static void queue(module *m, enum change_op op, uint64_t id, component *c, const void *value)
 {
     change ch = { id, c, value ? c->size : 0, op };
     uint32_t need = (uint32_t)sizeof ch + ((ch.size + 7u) & ~7u);

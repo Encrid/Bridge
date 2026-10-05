@@ -58,6 +58,8 @@ TIMEOUT = 120
 FLECS = [('flecs', []), ('flecs-unconfined', ['allocator']), ('flecs-nohook', ['hook'])]
 
 BRIDGE = ['bridge', 'lifecycle', 'config', 'store', 'abi', 'schedule', 'pool', 'backend']
+# who keeps the rows, behind src/rows.h. The one file of the library that sees flecs
+ROWS = 'rows-flecs'
 
 # a native module is a shared library: the name, its source, what it is compiled with. The same
 # library twice is one module to the loader, so one source is built under several names.
@@ -233,17 +235,18 @@ def build(target, debug, out):
             compile_('%s-%s' % (test, name), ROOT / 'tests' / (test + '.c'),
                      ours + ['-I%s' % (out / name)], [out / name / 'flecs.h'])
     os_o = compile_('os', ROOT / 'src/os.c', ours + [src])
-    bridge_o = [compile_(name, ROOT / 'src' / (name + '.c'), ours + [include, src, flecs],
-                         [out / 'flecs/flecs.h']) for name in BRIDGE]
+    bridge_o = [compile_(name, ROOT / 'src' / (name + '.c'), ours + [include, src]) for name in BRIDGE]
+    bridge_o.append(compile_(ROWS, ROOT / 'src' / (ROWS + '.c'), ours + [include, src, flecs],
+                             [out / 'flecs/flecs.h']))
     wasm_o = compile_('wasm', ROOT / 'backends/wasm/wasm.c',
                       ours + [include, src, '-I%s' % (wasmtime / 'include')])
     native_o = compile_('native', ROOT / 'backends/native/native.c', ours + [include, src])
     adopt_o = compile_('adopt', ROOT / 'tests/adopt.c', ours + [include, src] + defines)
     phase_o = {name: compile_(name, ROOT / 'tests' / (name + '.c'), ours + [include] + defines)
                for name in ('phase2', 'phase3', 'phase4', 'phase5', 'phase6')}
-    inside_o = {name: compile_(name, ROOT / 'tests' / (name + '.c'),
-                               ours + [include, src, flecs] + defines, [out / 'flecs/flecs.h'])
-                for name in ('tables', 'storage')}
+    inside_o = {'tables': compile_('tables', ROOT / 'tests/tables.c',
+                                   ours + [include, src, flecs] + defines, [out / 'flecs/flecs.h']),
+                'storage': compile_('storage', ROOT / 'tests/storage.c', ours + [include, src] + defines)}
     module_o = {name: compile_(name, ROOT / 'tests/modules/native' / (source + '.c'),
                                ours + [include] + ['-D' + d for d in flags])
                 for name, source, flags in NATIVE}

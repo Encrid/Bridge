@@ -26,12 +26,12 @@ static void free_list_of(char **list, uint32_t count)
 
 /* ---- components leaving ---- */
 
-/* A component's record goes: its tables' ids, its flecs entity, and its hold on the types its
- * fields name, which go with it when nothing else declares or names them. */
+/* A component's record goes: what storage knows of it, and its hold on the types its fields
+ * name, which go with it when nothing else declares or names them. */
 static void component_delete(bridge *b, component *c)
 {
     uint32_t k;
-    ecs_delete(b->world, c->id);
+    rows_undeclare(b->rows, c->type);
     for (k = 0; b->components[k] != c; k ++) {}
     b->components[k] = b->components[-- b->component_count];
     for (k = 0; k < c->dep_count; k ++) {
@@ -44,44 +44,12 @@ static void component_delete(bridge *b, component *c)
     free(c);
 }
 
-/* lifetime.md, *What unload leaves behind*: what becomes of the entities that carried it */
-static void drop_rows(bridge *b, component *c, enum bridge_on_unload policy)
-{
-    ecs_entity_t *carried = nullptr;
-    uint32_t count = 0, room = 0, i;
-    if (policy == BRIDGE_DELETE) {
-        ecs_delete_with(b->world, c->id);
-        return;
-    }
-    if (policy == BRIDGE_SWEEP) {
-        ecs_iter_t it = ecs_each_id(b->world, c->id);
-        while (ecs_each_next(&it)) {
-            int32_t r;
-            for (r = 0; r < it.count; r ++) {
-                if (count == room) {
-                    room = room ? room * 2 : 64;
-                    carried = realloc(carried, room * sizeof *carried);
-                }
-                carried[count ++] = it.entities[r];
-            }
-        }
-    }
-    ecs_remove_all(b->world, c->id);
-    /* sweep: an entity left with nothing could never be found again, so it goes too */
-    for (i = 0; i < count; i ++) {
-        const ecs_type_t *type = ecs_is_alive(b->world, carried[i])
-                               ? ecs_get_type(b->world, carried[i]) : nullptr;
-        if (type && !type->count) ecs_delete(b->world, carried[i]);
-    }
-    free(carried);
-}
-
 /* A module stops declaring `c`. Shared, it stays; the last to leave applies its own policy.
  * Policy zero is a load that failed: nothing can carry what was never applied. */
 static void component_release(bridge *b, component *c, enum bridge_on_unload policy)
 {
     if (-- c->declarers) return;
-    if (policy) drop_rows(b, c, policy);
+    if (policy) rows_drop(b->rows, c->type, policy);
     /* a type some other component's field still names is kept as a type, with no rows */
     if (!c->users) component_delete(b, c);
     b->layout_moved = 1;
@@ -98,8 +66,7 @@ static void drop_systems(bridge *b, module *m)
             b->systems[kept ++] = s;
             continue;
         }
-        if (s->query) ecs_query_fini(s->query);
-        if (s->observing) ecs_delete(b->world, s->observing);
+        if (s->matched) rows_forget(b->rows, s->matched);
         free(s->pending);
         free(s->name);
         free(s->full);
@@ -140,9 +107,9 @@ static void undo(bridge *b, module *m)
 {
     uint32_t i;
     drop_systems(b, m);         /* first: a query must not outlive a component it names */
-    for (i = 0; i < m->id_count; i ++) ecs_delete(b->world, m->ids[i]);
+    rows_release(b->rows, m->ids, m->id_count);
     m->id_count = m->id_next = 0;
-    if (m->config_entity) ecs_delete(b->world, m->config_entity);
+    if (m->config_entity) rows_release(b->rows, &m->config_entity, 1);
     /* its share is the last one carved, since nothing loads during a load */
     if (m->arena_share && m->arena_base + m->arena_share == b->arena + b->arena_used) {
         b->arena_used -= m->arena_share;
@@ -539,7 +506,7 @@ void module_shut_down(bridge *b, module *m)
     if (m->instance && lifecycle_call(m, m->shutdown, "shutdown", m->shutdown_timeout, &err)) {
         say(b, m, nullptr, BRIDGE_ERR, "module '%s': %s; its teardown continues", m->identity, err.text);
     }
-    store_apply(b, m);          /* what it had asked for, shutdown's requests included */
+    rows_apply(b->rows);        /* what it had asked for, shutdown's requests included */
     store_drain(b, m);          /* and what it said: its ring is about to go with it */
 }
 
@@ -549,12 +516,12 @@ static void take_out(bridge *b, module *m)
     module **link = &b->modules;
     uint32_t i;
     drop_systems(b, m);
-    if (m->config_entity) ecs_delete(b->world, m->config_entity);
+    if (m->config_entity) rows_release(b->rows, &m->config_entity, 1);
     /* last declared first: a type is used by what was declared after it */
     for (i = m->declared_count; i --;) component_release(b, m->declared[i], m->policy[i]);
     m->declared_count = 0;
     /* the ids held ready for it are entities nobody will ever spawn */
-    for (i = m->id_next; i < m->id_count; i ++) ecs_delete(b->world, m->ids[i]);
+    rows_release(b->rows, m->ids + m->id_next, m->id_count - m->id_next);
     config_keep(b, m);
     while (*link != m) link = &(*link)->next;
     *link = m->next;
@@ -718,7 +685,7 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     /* the settings component among them: its row was Bridge-ASM700's own, and goes too */
     for (i = 0; i < n->declared_count && n->declared[i] != n->config; i ++) {}
     if (n->config && i == n->declared_count) {
-        if (ecs_is_alive(b->world, n->config_entity)) ecs_delete(b->world, n->config_entity);
+        if (rows_alive(b->rows, n->config_entity)) rows_release(b->rows, &n->config_entity, 1);
         n->config = nullptr;
         n->config_entity = 0;
     }
