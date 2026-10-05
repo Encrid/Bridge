@@ -97,7 +97,6 @@ void *store_column_alloc(bridge *b, int32_t size)
 {
     uint32_t at;
     if (size <= 0) return nullptr;
-    b->layout_moved = 1;
     if (take(b, grain(size), &at)) return b->shared + b->columns + at;
     /* flecs cannot be unwound from the middle of a change, so it is given what it asked for
      * from outside the block, and the bridge stops when the barrier returns - budgets.md,
@@ -109,7 +108,6 @@ void *store_column_alloc(bridge *b, int32_t size)
 void store_column_free(bridge *b, void *ptr, int32_t size)
 {
     if (!ptr) return;
-    b->layout_moved = 1;
     if (!in_columns(b, ptr)) {
         free(ptr);
         return;
@@ -151,6 +149,35 @@ void *store_column_realloc(bridge *b, void *ptr, int32_t old_size, int32_t new_s
     memcpy(p, ptr, (size_t)(old_size < new_size ? old_size : new_size));
     store_column_free(b, ptr, old_size);
     return p;
+}
+
+void *store_column_regrow(bridge *b, void *ptr, uint32_t old_size, uint32_t new_size)
+{
+    uint8_t *base = b->shared + b->columns;
+    uint32_t had = grain((int32_t)old_size), want = grain((int32_t)new_size), at = 0, to, i;
+    if (ptr) {
+        at = (uint32_t)((uint8_t *)ptr - base);
+        if (want <= had) return ptr;
+        /* where it is, when what follows it is free: a block mostly grows, and mostly it is
+         * the last one */
+        if (at + had == b->columns_used && want - had <= b->columns_len - b->columns_used) {
+            b->columns_used += want - had;
+            return ptr;
+        }
+        for (i = 0; i < b->gap_count && b->gaps[i].at <= at + had; i ++) {
+            if (b->gaps[i].at != at + had || b->gaps[i].len < want - had) continue;
+            b->gaps[i].at += want - had;
+            b->gaps[i].len -= want - had;
+            if (!b->gaps[i].len) gap_drop(b, i);
+            return ptr;
+        }
+    }
+    if (!take(b, want, &to)) return nullptr;
+    if (ptr) {
+        memcpy(base + to, ptr, had);
+        give(b, at, had);
+    }
+    return base + to;
 }
 
 /* ---- what a module is given to hand out ---- */
@@ -250,12 +277,14 @@ void store_barrier(bridge *b)
     do {                                /* spans republished */
         tables = rows_tables(b->rows);
         for (m = b->modules; m; m = m->next) {
+            if (m->stopped) m->published = false;       /* and all of it again, if it returns */
             if (m->stopped || !rows_publish(b->rows, m)) continue;
             m->stopped = 1;
             say(b, m, nullptr, BRIDGE_ERR, "module '%s' is stopped: what its queries match no "
                 "longer fits in its spans of %u bytes", m->identity, m->spans_len);
         }
     } while (tables != rows_tables(b->rows));
+    rows_written(b->rows);
     b->layout_moved = 0;
     /* then the observers of what changed. What they ask for goes on their queues, and so
      * is the next barrier's - schedule.md, *An observer runs at the barrier, one hop per
@@ -297,7 +326,8 @@ int store_create(bridge *b, const bridge_budget *budget)
     uint32_t i;
 
     if (unset(b, "entities", budget->entities) || unset(b, "persistent", budget->persistent)
-        || unset(b, "columns", budget->columns) || unset(b, "max_modules", budget->max_modules)) {
+        || unset(b, "columns", budget->columns) || unset(b, "max_modules", budget->max_modules)
+        || unset(b, "tables", budget->tables)) {
         return 1;
     }
     if (beyond(b, "entities", budget->entities) || beyond(b, "persistent", budget->persistent)
@@ -330,6 +360,10 @@ int store_create(bridge *b, const bridge_budget *budget)
     b->columns = (uint32_t)columns;
     b->columns_len = (uint32_t)budget->columns;
     b->max_modules = budget->max_modules;
+    b->tables = budget->tables;
+    /* a gap lies between two blocks, and a table has one block: never more gaps than tables */
+    b->gap_room = b->tables + 1;
+    b->gaps = malloc(b->gap_room * sizeof *b->gaps);
     b->rows = rows_create(b);
     if (!b->rows) return 1;
     if (b->columns_out) {

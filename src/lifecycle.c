@@ -369,6 +369,7 @@ static int start(bridge *b, module *m, const bridge_artifact *a, enum backend_ca
     backend_memory_import memories[2];
     uint32_t i, import_count, memory_count = 0;
     backend_func *first;
+    uint64_t need;
     int reloading = !strcmp(entry, "reload");
 
     m->image = o->api.module_compile(o->be, a->bytes, a->len, a->path, demands, err);
@@ -415,6 +416,17 @@ static int start(bridge *b, module *m, const bridge_artifact *a, enum backend_ca
     /* the three lifecycle exports are every module's: none is left out to mean something */
     m->shutdown = export_of(m, "shutdown", err);
     if (!m->shutdown || !export_of(m, "reload", err)) return 1;
+
+    /* budgets.md: column_base has a cell for each of its components in every table there may
+     * be, so whether its spans hold it is known here, and not at some barrier */
+    need = sizeof(bridge_query) * m->system_count + sizeof(bridge_list) * m->observer_count
+         + 4ull * m->declared_count * rows_tables(b->rows);
+    if (need > m->spans_len) {
+        snprintf(err->text, sizeof err->text, "its spans of %u bytes do not hold a column_base of "
+            "%u components by %u tables, which with its queries is %llu bytes", m->spans_len,
+            m->declared_count, rows_tables(b->rows), (unsigned long long)need);
+        return 1;
+    }
     return 0;
 }
 

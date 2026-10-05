@@ -132,7 +132,7 @@ int main(int argc, char **argv)
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[1] = {{ "wasm", BACKEND_PATH }};
     const char *phases[2] = { "update", "present" };
-    bridge_config cfg = { backends, 1, phases, 2, nullptr, 0, 1, { 4096, 4096, 1 << 20, 8 } };
+    bridge_config cfg = { backends, 1, phases, 2, nullptr, 0, 1, { 4096, 4096, 1 << 20, 8, 64 } };
     bridge_artifact a;
     bridge *b;
     setvbuf(stdout, nullptr, _IONBF, 0);

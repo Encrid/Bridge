@@ -24,10 +24,21 @@ void rows_enter(rows *r)
 
 /* ---- columns: flecs' allocator, carving the column region ---- */
 
-static void *column_alloc(ecs_size_t size) { return store_column_alloc(live->b, size); }
-static void column_free(void *ptr, ecs_size_t size) { store_column_free(live->b, ptr, size); }
+static void *column_alloc(ecs_size_t size)
+{
+    live->b->layout_moved = 1;
+    return store_column_alloc(live->b, size);
+}
+
+static void column_free(void *ptr, ecs_size_t size)
+{
+    live->b->layout_moved = 1;
+    store_column_free(live->b, ptr, size);
+}
+
 static void *column_realloc(void *ptr, ecs_size_t old_size, ecs_size_t new_size)
 {
+    live->b->layout_moved = 1;
     return store_column_realloc(live->b, ptr, old_size, new_size);
 }
 
@@ -205,6 +216,8 @@ uint32_t rows_tables(rows *r)
 {
     return r->table_count;
 }
+
+void rows_written([[maybe_unused]] rows *r) { }
 
 /* 1 if the module's span region cannot hold what its queries match */
 int rows_publish(rows *r, module *m)

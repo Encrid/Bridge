@@ -85,7 +85,7 @@ static int stress_load(bridge *b)
         NSTRESS1_PATH, NSTRESS2_PATH, NSTRESS3_PATH, NSTRESS4_PATH
     };
     for (uint32_t i = 0; i < STRESSED; i ++) {
-        bridge_artifact a = store_module(paths[i], 20'000, 1 << 20);
+        bridge_artifact a = store_module(paths[i], 20'000, 2 << 20);
         a.cfg.identity = identities[i];
         a.cfg.scratch = 1 << 20;
         if (bridge_load(b, &a)) return 1;
@@ -104,7 +104,7 @@ int main(int argc, char **argv)
 {
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[1] = {{ "native", NATIVE_PATH }};
-    bridge_config cfg = { backends, 1, phases, PHASES, nullptr, 0, 1, { 400'000, 4096, 64 << 20, 4 } };
+    bridge_config cfg = { backends, 1, phases, PHASES, nullptr, 0, 1, { 400'000, 4096, 64 << 20, 4, 32'768 } };
     bridge *b;
 
     /* the stress run is the one thing here that is run on more than one thread */
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
     if (!b) { printf("FAIL: bridge_create\n"); return 1; }
 
     if (!strcmp(what, "changes")) {
-        a = store_module(NSTORE_PATH, 6, 64 << 10);
+        a = store_module(NSTORE_PATH, 6, 1 << 20);
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         run(b, "spawn");
         run(b, "attach_a");         /* six entities gain A */
@@ -172,7 +172,7 @@ int main(int argc, char **argv)
         };
         constexpr uint32_t OPS = sizeof ops / sizeof *ops, ROUNDS = 6, COUNT = 100'000;
         uint64_t first[OPS], best[OPS], t;
-        a = store_module(NSTOREBIG_PATH, COUNT, 64 << 10);
+        a = store_module(NSTOREBIG_PATH, COUNT, 1 << 20);
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         for (uint32_t round = 0; round < ROUNDS; round ++) {
             for (uint32_t i = 0; i < OPS; i ++) {

@@ -22,7 +22,7 @@ static int check(const char *what, int ok)
 int main()
 {
     const char *phases[1] = { "update" };
-    bridge_config cfg = { nullptr, 0, phases, 1, nullptr, 0, 1, { 4096, 4096, 1 << 20, 8 } };
+    bridge_config cfg = { nullptr, 0, phases, 1, nullptr, 0, 1, { 4096, 4096, 1 << 20, 8, 64 } };
     bridge *b = bridge_create(&cfg, sink, nullptr);
     ecs_world_t *w;
     ecs_entity_t kind, other, e, parent, child;

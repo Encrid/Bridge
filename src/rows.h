@@ -85,6 +85,8 @@ uint32_t rows_reserve(rows *r, uint64_t *ids, uint32_t want);
 void rows_settle(rows *r);
 /* what a module reads: its spans, its column_base, its observers' lists. 1 if they do not fit */
 [[nodiscard]] int rows_publish(rows *r, module *m);
+/* once every module has been written for: what changed since the last time is forgotten */
+void rows_written(rows *r);
 /* how many table ids there are, counting 0, which is no table */
 uint32_t rows_tables(rows *r);
 

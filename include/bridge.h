@@ -34,6 +34,7 @@ typedef struct {
     uint64_t persistent;      /* the persistent arena, in bytes */
     uint64_t columns;         /* component columns and entity arrays, in bytes */
     uint32_t max_modules;     /* how many modules are loaded at once */
+    uint32_t tables;          /* how many sets of components entities carry at once */
 } bridge_budget;
 
 /* Two systems that conflict in one phase, in the order they are to run. A system is named by

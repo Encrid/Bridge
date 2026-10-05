@@ -80,6 +80,10 @@ struct module {
     uint32_t  scratch, scratch_len;
     uint32_t  ring, ring_len, ring_tail;
     uint32_t  spans, spans_len;     /* the span region: query slots, column_base, spans */
+    /* what storage last wrote there: whether it has, where its spans end, and whether an
+     * observer's list was not empty */
+    bool      published, had_triggers;
+    uint32_t  spans_end;
 
     component    **declared;        /* by slot */
     enum bridge_on_unload *policy;  /* by slot: what it stated */
@@ -116,6 +120,9 @@ struct module {
     /* failure.md, *The budget*: raised by a failed barrier, lowered by a clean one */
     int64_t  max_failures, failures;
     int      ran_now, failed_now;   /* since the last barrier */
+    /* budgets.md, *What running out does*: how many entities it changed were left as they were
+     * at this barrier, for want of a table and for want of columns */
+    uint32_t left[2];
     /* config.md: the component its settings seeded, the row, and where their text is */
     component   *config;
     uint64_t     config_entity;
@@ -166,6 +173,7 @@ struct bridge {
     uint32_t       gap_count, gap_room;
     int            columns_out;     /* the column budget ran out during this barrier */
     int            layout_moved;    /* a column, a table or a declaration changed */
+    uint32_t       tables;          /* [budget] tables: how many may exist at once */
 
     rows          *rows;            /* who keeps the rows: rows.h */
 
@@ -222,6 +230,9 @@ uint32_t store_offset(bridge *b, const void *p);                  /* into the sh
 void    *store_column_alloc(bridge *b, int32_t size);
 void    *store_column_realloc(bridge *b, void *ptr, int32_t old_size, int32_t new_size);
 void     store_column_free(bridge *b, void *ptr, int32_t size);
+/* `new_size` bytes holding what the `old_size` at `ptr` held, or fresh if `ptr` is null. Null,
+ * and nothing changed, if the region cannot give them: nothing comes from outside it */
+[[nodiscard]] void *store_column_regrow(bridge *b, void *ptr, uint32_t old_size, uint32_t new_size);
 
 /* abi.c */
 [[nodiscard]] int abi_define(module *m, backend_err *err);                      /* the eight imports */
