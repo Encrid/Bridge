@@ -503,3 +503,7 @@ set_tests_properties (phase6-ntimeout PROPERTIES FAIL_REGULAR_EXPRESSION "cannot
 add_test (NAME phase6-configceiling COMMAND phase6 configceiling 440)
 set_tests_properties (phase6-configceiling PROPERTIES PASS_REGULAR_EXPRESSION
     "the row its settings go on does not fit under .budget. entities of 440.*alive")
+
+# what a backend needs of an artifact and was not handed, said by the backend that needs it
+phase4_case (nopath    "module 'game:mover@0.1.0' did not load: this backend opens a module's library by its path, and was handed none")
+phase4_case (nobytes   "module 'view:reader@0.1.0' did not load: this backend compiles a module from its bytes, and was handed none")

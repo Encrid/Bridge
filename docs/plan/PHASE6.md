@@ -8,7 +8,7 @@ document is what the phase built and what it found on the way.
 
 ## What was settled first
 
-Seven questions, each by every step of `PHASE0.md`, and each applied to the document it belongs
+Eight questions, each by every step of `PHASE0.md`, and each applied to the document it belongs
 to.
 
     what a reload runs            the new instance's reload, then the old one's shutdown:
@@ -24,13 +24,17 @@ to.
                                   `wasm.md`, *Exports*
     how a module has no settings  it says `config = none`; left out, `config` is unset:
                                   `config.md`, *A module's own settings are a component*
+    an artifact with no bytes,    a fact, not a statement; the backend that needs the missing
+    or no path                    one refuses by name: `backend.md`, *What a backend is asked for*
 
 Three of them were first put with steps missing, and were put again. Reading the original Bridge's
 source for the second pass gave reload a fourth option and changed the recommendation for the
 budget. The sixth was asked after the phase was reported: its report called `reload` optional, which
 is how these documents had it from the start, and a statement made by leaving something out is what
 this project refuses everywhere else. The seventh is the same defect found by looking for it: a
-null `config` meant "no settings".
+null `config` meant "no settings". The eighth looked like it and was not: an artifact's bytes or
+path may be null, and the answer was to keep that and make the two refusals exact, `nopath` and
+`nobytes` among phase 4's cases.
 
 ## What it produced
 
@@ -51,7 +55,8 @@ another first call.
 
 ## The tests
 
-Forty-five new ones, one hundred and sixteen in all, in a release build and a debug one.
+Forty-five new ones here and two more among phase 4's, one hundred and eighteen in all, in a
+release build and a debug one.
 
     skipinit         a failed init, skipped: the other module runs on and is the one listed
     refusedload      a refused load leaves nothing: its component's name takes another layout

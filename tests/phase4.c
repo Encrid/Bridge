@@ -119,6 +119,14 @@ int main(int argc, char **argv)
         a = native("game:mover@0.1.0", "no-such-library");
         a.cfg.fuel = 1000;
         load(b, &a);
+    } else if (!strcmp(what, "nopath")) {       /* a native module, and nowhere to find it */
+        a = native("game:mover@0.1.0", NULL);
+        load(b, &a);
+    } else if (!strcmp(what, "nobytes")) {      /* a wasm module, and nothing to compile */
+        a = wasm_reader();
+        a.bytes = NULL;
+        a.len = 0;
+        load(b, &a);
     } else if (!strcmp(what, "nolib")) {
         a = native("game:mover@0.1.0", "no-such-library");
         load(b, &a);

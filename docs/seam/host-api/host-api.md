@@ -112,8 +112,9 @@ as a helper - `native.md`, *Identity*.
     typedef struct {
         bridge_module_config cfg;
         const char *backend;             /* which backend runs it, by name */
-        const void *bytes; size_t len;   /* the image, or null */
-        const char *path;                /* where it is, or null. both go to the backend */
+        const void *bytes; size_t len;   /* the image, if the host has it */
+        const char *path;                /* where it is, if it is anywhere. both go to the
+                                            backend, which refuses if the one it needs is null */
     } bridge_artifact;
 
     /* what comes back out */

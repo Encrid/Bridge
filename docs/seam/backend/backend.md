@@ -46,6 +46,15 @@ library on the native one. `module_compile` takes
 both the bytes and the path because Bridge-ASM700 inspects neither, and each backend uses the one it
 needs.
 
+**Either may be null, and that is a fact rather than a statement.** A host with no bytes for a
+module hands none; nothing behaves differently for it, which is what separates this from a key left
+out. The backend that needs the one it was not handed refuses by name - *"this backend compiles a
+module from its bytes, and was handed none"* - and that is the module's failure, on `init`'s path.
+Refused: the backend stating which it needs so that Bridge-ASM700 could refuse first, which has
+Bridge-ASM700 inspect what it is built not to and answers once more a question the backend already
+answers. The condition that brings it back is a backend for which "which one" is not obvious.
+Refused: one tagged source, which makes a host that has both choose for a backend it does not know.
+
 **It also takes the capabilities this module's config demands**, as the flags of `capabilities.md`,
 *Capabilities, so the swap is honest*. A guarantee can cost something on every instruction, and a
 backend that knows a module declined one need not compile it in - `limits.md`, *What a bound

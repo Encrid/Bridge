@@ -158,9 +158,14 @@ BACKEND_EXPORT backend_module *module_compile(backend *b, const void *bytes, siz
     backend_module *m;
     void *lib;
     (void)b; (void)bytes; (void)len; (void)demands;     /* a native module is its library */
-    lib = path ? os_lib_open(path) : NULL;
+    if (!path || !*path) {
+        snprintf(err->text, sizeof err->text, "this backend opens a module's library by its "
+            "path, and was handed none");
+        return NULL;
+    }
+    lib = os_lib_open(path);
     if (!lib) {
-        snprintf(err->text, sizeof err->text, "cannot open the library '%.180s'", path ? path : "");
+        snprintf(err->text, sizeof err->text, "cannot open the library '%.180s'", path);
         return NULL;
     }
     m = calloc(1, sizeof *m);

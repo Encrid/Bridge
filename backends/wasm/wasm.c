@@ -303,6 +303,10 @@ BACKEND_EXPORT backend_module *module_compile(backend *b, const void *bytes, siz
                                               backend_err *err)
 {
     (void)path;                 /* a wasm module is its bytes */
+    if (!bytes || !len) {
+        fail(err, "this backend compiles a module from its bytes, and was handed none", NULL, NULL);
+        return NULL;
+    }
     int kind = (demands & BACKEND_METER ? METERED : 0)
              | (demands & BACKEND_DEADLINE ? INTERRUPTIBLE : 0);
     wasmtime_module_t *module = NULL;
