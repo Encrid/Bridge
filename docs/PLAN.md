@@ -169,6 +169,8 @@ Windows.* Met.
 
 ## 9. C23, used fully
 
+Done. `PHASE9.md` is what it built and found.
+
 Everything of Bridge-ASM700's own becomes C23 - the source, the tests, the test modules and all
 five headers - and uses it: named enums with stated widths, typed constants, `nullptr`,
 attributes, every layout of the ABI asserted where it is stated, and sums of stated sizes checked.
@@ -181,7 +183,7 @@ before planning it showed what it cost, and the standard was chosen again: `PHAS
 every platform, and flecs as C99; `tools/c23.py` finds no older spelling; every layout the ABI
 states is asserted in the header that states it; a stated size that overflows is refused by its
 key; the row loop is the same code and reads the same; and every test passes on Windows, Linux
-and macOS.*
+and macOS.* Met.
 
 ## 10. Self contained
 
