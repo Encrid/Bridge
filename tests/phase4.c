@@ -117,7 +117,11 @@ int main(int argc, char **argv)
         /* What a destroyed bridge leaves in the process: the library of a backend that does
          * not say it can be unloaded, and not the library of one that does. The wasm
          * backend's brought wasmtime in, whose own threads do not survive being unloaded.
-         * docs/seam/backend/capabilities.md. */
+         * docs/seam/backend/capabilities.md.
+         *
+         * Bridge-ASM700 closes the native backend's library on every system. What the system
+         * then does is its own: macOS keeps an image mapped once it has a thread-local
+         * variable, and that backend has one, so there the answer that is right is "kept". */
         b = bridge_create(&cfg, sink, nullptr);
         if (!b || bridge_destroy(b)) {
             printf("FAIL: the bridge was not created and destroyed\n");
@@ -125,7 +129,11 @@ int main(int argc, char **argv)
         }
         printf("the wasm backend's library is %s, the native backend's is %s\n",
             loaded(BACKEND_PATH) ? "still loaded" : "GONE",
+#ifdef __APPLE__
+            loaded(NATIVE_PATH) ? "kept by the loader" : "GONE, WHICH THIS LOADER WAS NOT KNOWN TO DO");
+#else
             loaded(NATIVE_PATH) ? "STILL LOADED" : "gone");
+#endif
         printf("alive\n");
         return 0;
     }

@@ -25,7 +25,9 @@ Each flag is demanded by a **config key**, not by a module: `sandbox` by `truste
 `side by side` is demanded by nothing: it is how Bridge-ASM700 learns which order a reload takes -
 `lifecycle.md`, *The runtime lifecycle*. `unload` is demanded by nothing either: it is how
 Bridge-ASM700 learns what to do with a backend's library at `bridge_destroy` - `create.md`,
-*Destroy*. So
+*Destroy*. It says the library **may** go, and Bridge-ASM700 then closes it; whether the system
+unmaps it is the system's. Windows and Linux do. macOS keeps an image that has a thread-local
+variable, which the native backend's has, so there it is closed and stays. So
 a mismatch is not a module arguing with a backend - it is **config contradicting config**, since the
 deployment chose both. It is therefore one of Bridge-ASM700's own refusals and takes init's path
 under `on_error`, exactly as a denied grant or an ambiguous order does: `failure.md`, *When
