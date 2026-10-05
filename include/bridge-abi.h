@@ -33,6 +33,15 @@ typedef struct {
     uint16_t reserved;
 } bridge_term;
 
+/* observe's events, as a mask, and what an observer reads: who triggered it, and how. */
+enum { BRIDGE_ON_ADD = 1, BRIDGE_ON_SET = 2, BRIDGE_ON_REMOVE = 4 };
+
+typedef struct {
+    uint64_t id;
+    uint32_t events;
+    uint32_t reserved;
+} bridge_trigger;
+
 /* Offset 0 of the private memory: where each of this module's regions begins. Bridge-ASM700
  * writes all of it; a module writes `scratch_used` and `ring_head` and nothing else. */
 typedef struct {
@@ -50,9 +59,13 @@ typedef struct {
     uint32_t when;                      /* set before every dispatch */
     uint32_t system;                    /* the slot of the system running */
     int32_t  log_level;                 /* a line above it is not written */
+    uint32_t observers;                 /* bridge_list, one per slot `observe` answered */
 } bridge_header;
 
 typedef struct { uint32_t spans, at; } bridge_query;
+
+/* An observer's slot: how many bridge_trigger records this barrier, and where they begin. */
+typedef struct { uint32_t count, at; } bridge_list;
 
 /* A span, one per matched table - docs/bridge/data/query.md:
  *     u32 count, u32 entities, u32 base[terms], then at the next multiple of 8, u64 source[terms] */

@@ -182,42 +182,62 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     return 0;
 }
 
-/* system(name, name_len, phase, phase_len, terms, term_count) -> slot */
-static int abi_system(void *ud, const uint64_t *a, uint64_t *r)
+/* flecs says who and what; the observer itself runs at the barrier, after the republish */
+static void on_trigger(ecs_iter_t *it)
 {
-    module *m = ud;
+    bridge_system *s = it->ctx;
+    uint32_t event = it->event == EcsOnAdd ? BRIDGE_ON_ADD
+                   : it->event == EcsOnSet ? BRIDGE_ON_SET : BRIDGE_ON_REMOVE;
+    int32_t i;
+    for (i = 0; i < it->count; i ++) {
+        ecs_entity_t e = it->entities[i];
+        if (s->pending_count && s->pending[s->pending_count - 1].id == e) {
+            s->pending[s->pending_count - 1].events |= event;
+            continue;
+        }
+        if (s->pending_count == s->pending_room) {
+            s->pending_room = s->pending_room ? s->pending_room * 2 : 16;
+            s->pending = realloc(s->pending, s->pending_room * sizeof *s->pending);
+        }
+        s->pending[s->pending_count].id = e;
+        s->pending[s->pending_count ++].events = event;
+    }
+}
+
+/* A system or an observer is a query plus a function, so one registration serves both.
+ * `events` is zero for a system, and then `phase` is the phase it named. */
+static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t phase,
+                     uint32_t events, uint64_t terms_off, uint64_t term_count, uint64_t *r)
+{
     bridge *b = m->b;
-    const char *name_at = scratch(m, a[0], a[1]), *phase_at = scratch(m, a[2], a[3]);
-    const bridge_term *terms = scratch(m, a[4], a[5] * sizeof(bridge_term));
-    uint32_t count = (uint32_t)a[5], phase, i;
+    const char *what = events ? "observer" : "system";
+    const char *name_at = scratch(m, name_off, name_len);
+    const bridge_term *terms = scratch(m, terms_off, term_count * sizeof(bridge_term));
+    uint32_t count = (uint32_t)term_count, i;
     ecs_query_desc_t desc = {0};
     bridge_system *s;
-    char name[128];
+    char name[128], full[256];
 
-    if (!m->in_init) return refuse(m, "system is called outside init");
-    if (a[5] > BRIDGE_TERMS_MAX) {
-        return refuse(m, "a system asks for %llu terms and a query takes %d",
-            (unsigned long long)a[5], BRIDGE_TERMS_MAX);
+    if (term_count > BRIDGE_TERMS_MAX) {
+        return refuse(m, "a%s %s asks for %llu terms and a query takes %d", events ? "n" : "",
+            what, (unsigned long long)term_count, BRIDGE_TERMS_MAX);
     }
-    if (!name_at || !phase_at || !terms || !a[1] || a[1] >= sizeof name) {
-        return refuse(m, "system: a name, a phase or a term lies outside the scratch arena");
+    if (!name_at || !terms || !name_len || name_len >= sizeof name) {
+        return refuse(m, "%s: a name or a term lies outside the scratch arena", what);
     }
-    memcpy(name, name_at, a[1]);
-    name[a[1]] = 0;
+    memcpy(name, name_at, name_len);
+    name[name_len] = 0;
     if (!strcmp(name, "init") || !strcmp(name, "shutdown") || !strcmp(name, "reload")) {
-        return refuse(m, "'%s' is a reserved name, and no system may take it", name);
+        return refuse(m, "'%s' is a reserved name, and no %s may take it", name, what);
     }
-    for (i = 0; i < m->system_count; i ++) {
-        if (!strcmp(m->systems[i]->name, name)) {
-            return refuse(m, "system '%s' is registered twice", name);
-        }
+    /* a system and an observer are both exports, and an export has one name */
+    for (i = 0; i < m->system_count + m->observer_count; i ++) {
+        bridge_system *other = i < m->system_count ? m->systems[i]
+                                                   : m->observers[i - m->system_count];
+        if (!strcmp(other->name, name)) return refuse(m, "'%s' is registered twice", name);
     }
-    for (phase = 0; phase < b->phase_count; phase ++) {
-        if (strlen(b->phases[phase]) == a[3] && !memcmp(b->phases[phase], phase_at, a[3])) break;
-    }
-    if (phase == b->phase_count) {
-        return refuse(m, "system '%s' names phase '%.*s', which the deployment did not declare",
-            name, (int)a[3], phase_at);
+    if (events && !count) {
+        return refuse(m, "observer '%s' has no term, and so nothing to observe", name);
     }
 
     s = calloc(1, sizeof *s);
@@ -229,17 +249,18 @@ static int abi_system(void *ud, const uint64_t *a, uint64_t *r)
         component *c;
         memcpy(&t, &terms[i], sizeof t);
         if (t.slot == BRIDGE_WILDCARD) {
-            refuse(m, "term %u of system '%s' is a wildcard", i, name);
+            refuse(m, "term %u of %s '%s' is a wildcard", i, what, name);
         } else if (t.oper == BRIDGE_OR) {
-            refuse(m, "term %u of system '%s' is an or-term", i, name);
+            refuse(m, "term %u of %s '%s' is an or-term", i, what, name);
         } else if (t.slot >= m->declared_count) {
-            refuse(m, "term %u of system '%s' names slot %u, which it never declared", i, name, t.slot);
+            refuse(m, "term %u of %s '%s' names slot %u, which it never declared", i, what, name,
+                t.slot);
         } else if (t.access < BRIDGE_IN || t.access > BRIDGE_INOUT) {
-            refuse(m, "term %u of system '%s': its access is unset", i, name);
+            refuse(m, "term %u of %s '%s': its access is unset", i, what, name);
         } else if (t.oper < BRIDGE_AND || t.oper > BRIDGE_OPTIONAL) {
-            refuse(m, "term %u of system '%s': its operator is unset", i, name);
+            refuse(m, "term %u of %s '%s': its operator is unset", i, what, name);
         } else if (t.access != BRIDGE_IN && !may_write(m, m->declared[t.slot])) {
-            refuse(m, "system '%s' may not write '%s': no grant says so", name,
+            refuse(m, "%s '%s' may not write '%s': no grant says so", what, name,
                 m->declared[t.slot]->name);
         }
         if (m->refused) {
@@ -251,40 +272,89 @@ static int abi_system(void *ud, const uint64_t *a, uint64_t *r)
         desc.terms[i].inout = access[t.access];
         desc.terms[i].oper = oper[t.oper];
         s->sizes[i] = c->size;
+        /* what the conflict graph reads: a term that must not match touches nothing */
+        s->touches[i] = t.oper == BRIDGE_NOT ? NULL : c;
+        s->writes[i] = t.access != BRIDGE_IN;
     }
-    if (count) {
+
+    ecs_defer_suspend(b->world);
+    if (events) {
+        ecs_observer_desc_t od = {0};
+        uint32_t k = 0;
+        memcpy(od.query.terms, desc.terms, sizeof desc.terms);
+        if (events & BRIDGE_ON_ADD) od.events[k ++] = EcsOnAdd;
+        if (events & BRIDGE_ON_SET) od.events[k ++] = EcsOnSet;
+        if (events & BRIDGE_ON_REMOVE) od.events[k ++] = EcsOnRemove;
+        od.callback = on_trigger;
+        od.ctx = s;
+        s->observing = ecs_observer_init(b->world, &od);
+    } else if (count) {
         /* flecs fails creation unless every term matches whole tables, which one span per
          * table assumes; what is left needs a read per row */
         desc.cache_kind = EcsQueryCacheAll;
-        ecs_defer_suspend(b->world);
         s->query = ecs_query_init(b->world, &desc);
         if (s->query && s->query->row_fields) {
             ecs_query_fini(s->query);
             s->query = NULL;
         }
-        ecs_defer_resume(b->world);
-        if (!s->query) {
-            free(s);
-            return refuse(m, "system '%s' asks for a term with no base-and-stride form", name);
-        }
     }
+    ecs_defer_resume(b->world);
+    if (events ? !s->observing : count && !s->query) {
+        free(s);
+        return refuse(m, "%s '%s' asks for something flecs refuses, or a term with no "
+            "base-and-stride form", what, name);
+    }
+
+    snprintf(full, sizeof full, "%s:%s", m->stem, name);
     s->m = m;
     s->name = copy(name, strlen(name));
+    s->full = copy(full, strlen(full));
     s->phase = phase;
     s->terms = count;
+    s->observer = events != 0;
     b->systems = realloc(b->systems, (b->system_count + 1) * sizeof *b->systems);
     b->systems[b->system_count ++] = s;
-    m->systems = realloc(m->systems, (m->system_count + 1) * sizeof *m->systems);
-    m->systems[m->system_count] = s;
-    r[0] = m->system_count ++;
+    if (events) {
+        m->observers = realloc(m->observers, (m->observer_count + 1) * sizeof *m->observers);
+        m->observers[m->observer_count] = s;
+        r[0] = m->observer_count ++;
+    } else {
+        m->systems = realloc(m->systems, (m->system_count + 1) * sizeof *m->systems);
+        m->systems[m->system_count] = s;
+        r[0] = m->system_count ++;
+    }
     return 0;
 }
 
-/* observe(name, name_len, events, terms, term_count) -> slot */
+/* system(name, name_len, phase, phase_len, terms, term_count) -> slot */
+static int abi_system(void *ud, const uint64_t *a, uint64_t *r)
+{
+    module *m = ud;
+    bridge *b = m->b;
+    const char *phase_at = scratch(m, a[2], a[3]);
+    uint32_t phase;
+    if (!m->in_init) return refuse(m, "system is called outside init");
+    if (!phase_at) return refuse(m, "system: a phase lies outside the scratch arena");
+    for (phase = 0; phase < b->phase_count; phase ++) {
+        if (strlen(b->phases[phase]) == a[3] && !memcmp(b->phases[phase], phase_at, a[3])) break;
+    }
+    if (phase == b->phase_count) {
+        return refuse(m, "a system names phase '%.*s', which the deployment did not declare",
+            (int)a[3], phase_at);
+    }
+    return subscribe(m, a[0], a[1], phase, 0, a[4], a[5], r);
+}
+
+/* observe(name, name_len, events, terms, term_count) -> slot. It takes no phase: it has one
+ * already, the barrier that applied its trigger. */
 static int abi_observe(void *ud, const uint64_t *a, uint64_t *r)
 {
-    (void)a; (void)r;
-    return refuse(ud, "observers are not built yet: docs/PLAN.md phase 5");
+    module *m = ud;
+    if (!m->in_init) return refuse(m, "observe is called outside init");
+    if (!a[2] || a[2] & ~(uint64_t)(BRIDGE_ON_ADD | BRIDGE_ON_SET | BRIDGE_ON_REMOVE)) {
+        return refuse(m, "observe: its events are unset, or name one there is not");
+    }
+    return subscribe(m, a[0], a[1], m->b->phase_count, (uint32_t)a[2], a[3], a[4], r);
 }
 
 /* spawn() -> id */
@@ -378,6 +448,22 @@ static int abi_alloc(void *ud, const uint64_t *a, uint64_t *r)
     return 0;
 }
 
+/* ponytail: one lock around every entry. flecs' world and the arena are not safe from two
+ * threads, and an entry is not the hot path - reading and writing components is, and that is
+ * no call. Entries of different modules serialise; flecs' stages are what lifts that. */
+#define LOCKED(name) \
+    static int locked_##name(void *ud, const uint64_t *a, uint64_t *r) \
+    { \
+        module *m = ud; \
+        int refused; \
+        os_mutex_lock(m->b->entries); \
+        refused = abi_##name(ud, a, r); \
+        os_mutex_unlock(m->b->entries); \
+        return refused; \
+    }
+LOCKED(declare) LOCKED(system) LOCKED(observe) LOCKED(spawn)
+LOCKED(destroy) LOCKED(attach) LOCKED(detach) LOCKED(alloc)
+
 int abi_define(module *m, backend_err *err)
 {
     enum { I = BACKEND_I32, L = BACKEND_I64 };
@@ -389,14 +475,14 @@ int abi_define(module *m, backend_err *err)
         uint8_t     results[1];
         uint32_t    result_count;
     } entries[] = {
-        { "declare", abi_declare, { I, I, I, I, I, I, I }, 7, { I }, 1 },
-        { "system",  abi_system,  { I, I, I, I, I, I },    6, { I }, 1 },
-        { "observe", abi_observe, { I, I, I, I, I },       5, { I }, 1 },
-        { "spawn",   abi_spawn,   { 0 },                   0, { L }, 1 },
-        { "destroy", abi_destroy, { L },                   1, { 0 }, 0 },
-        { "attach",  abi_attach,  { L, I, I, I },          4, { 0 }, 0 },
-        { "detach",  abi_detach,  { L, I },                2, { 0 }, 0 },
-        { "alloc",   abi_alloc,   { I },                   1, { I }, 1 },
+        { "declare", locked_declare, { I, I, I, I, I, I, I }, 7, { I }, 1 },
+        { "system",  locked_system,  { I, I, I, I, I, I },    6, { I }, 1 },
+        { "observe", locked_observe, { I, I, I, I, I },       5, { I }, 1 },
+        { "spawn",   locked_spawn,   { 0 },                   0, { L }, 1 },
+        { "destroy", locked_destroy, { L },                   1, { 0 }, 0 },
+        { "attach",  locked_attach,  { L, I, I, I },          4, { 0 }, 0 },
+        { "detach",  locked_detach,  { L, I },                2, { 0 }, 0 },
+        { "alloc",   locked_alloc,   { I },                   1, { I }, 1 },
     };
     size_t i;
     for (i = 0; i < sizeof entries / sizeof *entries; i ++) {

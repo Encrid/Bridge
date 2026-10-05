@@ -92,6 +92,10 @@ static inline uint32_t bridge_put(const void *bytes, uint32_t len)
                   bridge_put(phase, sizeof phase - 1), sizeof phase - 1, \
                   bridge_put(terms, (count) * sizeof(bridge_term)), count)
 
+#define BRIDGE_OBSERVER(name, events, terms, count) \
+    bridge_observe(bridge_put(name, sizeof name - 1), sizeof name - 1, events, \
+                   bridge_put(terms, (count) * sizeof(bridge_term)), count)
+
 /* an initial value travels with the attach - abi.md, *The ABI* */
 #define BRIDGE_ATTACH(id, slot, value) \
     bridge_attach(id, slot, bridge_put(&(value), sizeof(value)), sizeof(value))
@@ -129,6 +133,22 @@ static inline uint64_t bridge_entity_at(uint32_t entities, uint32_t row, uint32_
 {
     return acc_ld_64(acc_row(entities, row, count, 8u));
 }
+
+/* ---- an observer's list: who triggered it at this barrier, and how ---- */
+
+static inline uint32_t bridge_triggers(uint32_t observer)
+{
+    return acc_own_32(BRIDGE_HEADER(observers) + observer * sizeof(bridge_list));
+}
+
+static inline uint32_t bridge_trigger_at(uint32_t observer, uint32_t i)
+{
+    uint32_t at = acc_own_32(BRIDGE_HEADER(observers) + observer * sizeof(bridge_list) + 4u);
+    return at + i * (uint32_t)sizeof(bridge_trigger);
+}
+
+static inline uint64_t bridge_trigger_id(uint32_t trigger)     { return acc_own_64(trigger); }
+static inline uint32_t bridge_trigger_events(uint32_t trigger) { return acc_own_32(trigger + 8u); }
 
 /* ---- a component's fields ---- */
 

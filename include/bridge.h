@@ -1,7 +1,6 @@
 /* The host seam: the only header a host includes.
  * docs/seam/host-api/host-api.md is the contract. This is as much of it as exists so far:
- * create, destroy, load and phase. Order, unload, reload and the pulls arrive with what they
- * act on. */
+ * create, destroy, load and phase. Unload, reload and the pulls arrive with what they act on. */
 #ifndef BRIDGE_H
 #define BRIDGE_H
 
@@ -26,9 +25,15 @@ typedef struct {
     uint32_t max_modules;     /* how many modules are loaded at once */
 } bridge_budget;
 
+/* Two systems that conflict in one phase, in the order they are to run. A system is named by
+ * its module's identity without the version, then itself: "game:actors:movement". */
+typedef struct { const char *before, *after; } bridge_order;
+
 typedef struct {
     const bridge_backend *backends; uint32_t backend_count;
     const char *const *phases;      uint32_t phase_count;   /* a phase is a name, and no more */
+    const bridge_order *order;      uint32_t order_count;
+    uint32_t threads;               /* how many run a phase, counting the caller's. zero is unset */
     bridge_budget budget;
 } bridge_config;
 
@@ -40,6 +45,7 @@ typedef struct {
     uint32_t    abi;
 
     bool     trusted;
+    bool     pinned;             /* its systems run on the thread that loaded it, and no other */
     uint8_t  on_error;           /* BRIDGE_FAIL | BRIDGE_SKIP */
     /* each of the next three: zero is unset, BRIDGE_NO_LIMIT is "no limit" */
     int64_t  fuel;               /* units per system invocation */
@@ -83,7 +89,8 @@ void    bridge_destroy(bridge *b);
 int bridge_load(bridge *b, const bridge_artifact *a);
 
 /* Run the systems registered to one phase, then its barrier. 0 if the phase ran, whatever
- * its systems did: a system that failed is a record, not a return code. */
+ * its systems did: a system that failed is a record, not a return code. With a pinned module
+ * loaded, from the thread that loaded it. */
 int bridge_phase(bridge *b, const char *name);
 
 #endif

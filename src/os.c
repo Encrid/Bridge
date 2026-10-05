@@ -172,3 +172,39 @@ int os_event_wait(os_event *e, uint64_t nanos)
 }
 
 #endif
+
+#ifdef _WIN32
+
+uint64_t os_thread_id(void) { return GetCurrentThreadId(); }
+
+struct os_mutex { CRITICAL_SECTION section; };
+
+os_mutex *os_mutex_new(void)
+{
+    os_mutex *m = malloc(sizeof *m);
+    InitializeCriticalSection(&m->section);
+    return m;
+}
+
+void os_mutex_free(os_mutex *m) { DeleteCriticalSection(&m->section); free(m); }
+void os_mutex_lock(os_mutex *m) { EnterCriticalSection(&m->section); }
+void os_mutex_unlock(os_mutex *m) { LeaveCriticalSection(&m->section); }
+
+#else
+
+uint64_t os_thread_id(void) { return (uint64_t)(uintptr_t)pthread_self(); }
+
+struct os_mutex { pthread_mutex_t mutex; };
+
+os_mutex *os_mutex_new(void)
+{
+    os_mutex *m = malloc(sizeof *m);
+    pthread_mutex_init(&m->mutex, NULL);
+    return m;
+}
+
+void os_mutex_free(os_mutex *m) { pthread_mutex_destroy(&m->mutex); free(m); }
+void os_mutex_lock(os_mutex *m) { pthread_mutex_lock(&m->mutex); }
+void os_mutex_unlock(os_mutex *m) { pthread_mutex_unlock(&m->mutex); }
+
+#endif

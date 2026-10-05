@@ -78,6 +78,10 @@ static inline uint32_t bridge_native_put(const bridge_api *api, const void *byte
                   bridge_native_put(api, phase, sizeof phase - 1), sizeof phase - 1, \
                   bridge_native_put(api, terms, (count) * sizeof(bridge_term)), count)
 
+#define BRIDGE_NATIVE_OBSERVER(api, name, events, terms, count) \
+    (api)->observe(bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, events, \
+                   bridge_native_put(api, terms, (count) * sizeof(bridge_term)), count)
+
 /* ---- a query's spans, through real pointers. native.md, *Reaching a component* ---- */
 
 static inline const bridge_query *bridge_native_query(const bridge_api *api, uint32_t query)
@@ -90,6 +94,12 @@ static inline const uint32_t *bridge_native_span(const bridge_api *api, const br
                                                  uint32_t i, uint32_t terms)
 {
     return (const uint32_t *)(api->private_base + q->at + i * BRIDGE_SPAN_SIZE(terms));
+}
+
+/* an observer's list: `count` bridge_trigger records, at private_base + `at` */
+static inline const bridge_list *bridge_native_list(const bridge_api *api, uint32_t observer)
+{
+    return (const bridge_list *)(api->private_base + bridge_native_header(api)->observers) + observer;
 }
 
 /* ---- the log ---- */

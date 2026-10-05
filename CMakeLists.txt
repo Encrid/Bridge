@@ -148,7 +148,8 @@ endfunction ()
 backend_test (adopt)
 
 # Bridge-ASM700 itself, as far as it exists
-add_library (bridge STATIC src/bridge.c src/store.c src/abi.c src/backend.c)
+add_library (bridge STATIC src/bridge.c src/store.c src/abi.c src/schedule.c src/pool.c
+    src/backend.c)
 set_target_properties (bridge PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES)
 target_include_directories (bridge PUBLIC include PRIVATE src)
 target_link_libraries (bridge PRIVATE bridge-os flecs)
@@ -327,3 +328,51 @@ phase4_case (nolib     "module 'game:mover@0.1.0' did not load: cannot open the 
 phase4_case (refuse    "test:flood@0.1.0/flood: system 'flood' failed: spawn: .budget. entities of 4096 is reached")
 # before its library is opened: the path names nothing, and nothing says it was looked for
 set_tests_properties (phase4-untrusted phase4-limit PROPERTIES FAIL_REGULAR_EXPRESSION "cannot open")
+
+# ---- phase 5: the schedule, observers, threads. docs/plan/PHASE5.md ----
+
+foreach (name halver twostep watcher chain badobs)
+    wasm_module (${name} ${name} checked)
+endforeach ()
+get_property (C_MODULES GLOBAL PROPERTY C_MODULES)
+add_custom_target (c-modules-5 ALL DEPENDS ${C_MODULES})
+
+# the same library twice is one module to the loader, so the sleeper is built as two
+foreach (name nsetter nsleep1 nsleep2 npinned)
+    string (REGEX REPLACE "[0-9]$" "" source "${name}")
+    add_library (${name} MODULE tests/modules/native/${source}.c)
+    set_target_properties (${name} PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES PREFIX "")
+    target_include_directories (${name} PRIVATE include)
+endforeach ()
+
+add_executable (phase5 tests/phase5.c)
+set_target_properties (phase5 PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES)
+target_link_libraries (phase5 PRIVATE bridge)
+target_compile_definitions (phase5 PRIVATE
+    "BACKEND_PATH=\"$<TARGET_FILE:bridge-wasm>\"" "NATIVE_PATH=\"$<TARGET_FILE:bridge-native>\""
+    "NSETTER_PATH=\"$<TARGET_FILE:nsetter>\"" "NSLEEP1_PATH=\"$<TARGET_FILE:nsleep1>\""
+    "NSLEEP2_PATH=\"$<TARGET_FILE:nsleep2>\"" "NPINNED_PATH=\"$<TARGET_FILE:npinned>\""
+    "MODULE_DIR=\"${MODULES}\"")
+add_dependencies (phase5 bridge-wasm bridge-native nsetter nsleep1 nsleep2 npinned c-modules-5)
+
+function (phase5_case name expect)
+    add_test (NAME phase5-${name} COMMAND phase5 ${name})
+    set_tests_properties (phase5-${name} PROPERTIES PASS_REGULAR_EXPRESSION "${expect}.*alive")
+endfunction ()
+
+phase5_case (order       "sum 125250 0")
+phase5_case (reorder     "sum 125500 0")
+phase5_case (ambiguous   "module 'view:halver@0.1.0' did not load: 'game:mover:move' and 'view:halver:halve' both touch 'game:Position' in phase 'update', one of them writing it, and nothing orders them")
+phase5_case (ownorder    "game:twostep@0.1.0/show: x 3 0")
+phase5_case (cycle       ".order. contradicts itself.*bridge_create refused")
+phase5_case (observe     "b2 view:watcher@0.1.0/seen: seen 1 77.*b2 game:setter@0.1.0/mark: marked")
+phase5_case (chain       "b1 game:chain@0.1.0/got_a: hop A.*b2 game:chain@0.1.0/got_b: hop B.*b3 game:chain@0.1.0/got_c: hop C")
+phase5_case (reserved    "'init' is a reserved name, and no observer may take it")
+phase5_case (parallel    "on 2 thread.s.[^a-z]*they ran at once")
+phase5_case (serial      "on 1 thread.s.[^a-z]*they ran one after the other")
+phase5_case (pinned      "the others used [2-4] thread.s.[^a-z]*pinned: 9 of its 9 calls were on the thread that loaded it")
+phase5_case (wrongthread "module 'test:pinned@0.1.0' is pinned to the thread that loaded it, and this call comes from another.*from another thread: refused")
+phase5_case (nothreads   "threads is unset.*bridge_create refused")
+# a chain that hung would log a hop twice: each is said once
+set_tests_properties (phase5-chain PROPERTIES FAIL_REGULAR_EXPRESSION "hop A.*hop A")
+phase5_case (hop         "sum 275000 0")

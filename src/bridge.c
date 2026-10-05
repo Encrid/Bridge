@@ -61,7 +61,15 @@ static void discard(bridge *b, module *m)
             continue;
         }
         if (s->query) ecs_query_fini(s->query);
+        if (s->observing) {
+            /* at once, not queued: its callback must not be reached after `s` is gone */
+            ecs_defer_suspend(b->world);
+            ecs_delete(b->world, s->observing);
+            ecs_defer_resume(b->world);
+        }
+        free(s->pending);
         free(s->name);
+        free(s->full);
         free(s);
     }
     b->system_count = kept;
@@ -72,8 +80,10 @@ static void discard(bridge *b, module *m)
     free_list_of(m->read, m->read_count);
     free_list_of(m->write, m->write_count);
     free(m->systems);
+    free(m->observers);
     free(m->declared);
     free(m->identity);
+    free(m->stem);
     free(m->ns);
     free(m);
 }
@@ -89,6 +99,14 @@ void bridge_destroy(bridge *b)
     }
     free(b->systems);
     store_destroy(b);
+    pool_destroy(b->pool);
+    if (b->entries) os_mutex_free(b->entries);
+    for (i = 0; i < b->order_count; i ++) {
+        free(b->before[i]);
+        free(b->after[i]);
+    }
+    free(b->before);
+    free(b->after);
     for (i = 0; i < b->backend_count; i ++) {
         open_backend *o = &b->backends[i];
         if (o->be) o->api.backend_destroy(o->be);
@@ -112,6 +130,7 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
     b = calloc(1, sizeof *b);
     b->sink = sink;
     b->ud = ud;
+    b->entries = os_mutex_new();
     b->backends = calloc(cfg->backend_count ? cfg->backend_count : 1, sizeof *b->backends);
     b->phases = calloc(cfg->phase_count ? cfg->phase_count : 1, sizeof *b->phases);
 
@@ -173,6 +192,14 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
         b->phase_count = i + 1;
     }
 
+    if (schedule_order(b, cfg->order, cfg->order_count)) goto refuse;
+    /* config.md, *No unaccountable values*: how many threads is not ours to guess */
+    if (!cfg->threads) {
+        say(b, NULL, NULL, BRIDGE_ERR, "threads is unset");
+        goto refuse;
+    }
+    b->pool = pool_create(cfg->threads - 1);
+
     if (store_create(b, &cfg->budget)) goto refuse;
     return b;
 
@@ -201,9 +228,21 @@ static int lacks(bridge *b, const char *identity, open_backend *o, uint32_t flag
 
 static int stopped(bridge *b)
 {
-    if (!b->stopped_by) return 0;
-    say(b, NULL, NULL, BRIDGE_ERR, "the bridge has stopped: %s", b->stopped_by);
-    return 1;
+    module *m;
+    if (b->stopped_by) {
+        say(b, NULL, NULL, BRIDGE_ERR, "the bridge has stopped: %s", b->stopped_by);
+        return 1;
+    }
+    /* pinned.md: a pinned module's thread is the one that loaded it, and Bridge-ASM700 has no
+     * other to run it on. Both calls that run module code come through here. */
+    for (m = b->modules; m; m = m->next) {
+        if (m->pinned && m->thread != os_thread_id()) {
+            say(b, NULL, NULL, BRIDGE_ERR, "refused: module '%s' is pinned to the thread that "
+                "loaded it, and this call comes from another", m->identity);
+            return 1;
+        }
+    }
+    return 0;
 }
 
 /* The private block: the header at 0, then the three regions its config sized. */
@@ -237,7 +276,8 @@ static int private_memory(bridge *b, module *m, const bridge_module_config *cfg,
 int bridge_load(bridge *b, const bridge_artifact *a)
 {
     const bridge_module_config *cfg = &a->cfg;
-    const char *id = cfg->identity, *colon;
+    const char *id = cfg->identity, *colon, *at;
+    size_t stem;
     open_backend *o = NULL;
     backend_func *init;
     backend_err err = {0};
@@ -287,9 +327,14 @@ int bridge_load(bridge *b, const bridge_artifact *a)
         || (cfg->init_timeout > 0 && lacks(b, id, o, BACKEND_DEADLINE, "init_timeout", "deadline"))) {
         return 1;
     }
+    /* a system is named by its module without the version, so two versions of one module
+     * could not be told apart - schedule.md, *Order within a phase is never implicit* */
+    at = strchr(id, '@');
+    stem = at ? (size_t)(at - id) : strlen(id);
     for (other = b->modules; other; other = other->next) {
-        if (!strcmp(other->identity, id)) {
-            say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: it is loaded already", id);
+        if (strlen(other->stem) == stem && !memcmp(other->stem, id, stem)) {
+            say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: '%s' is loaded already", id,
+                other->identity);
             return 1;
         }
     }
@@ -306,6 +351,9 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     m->b = b;
     m->on = o;
     m->identity = copy(id, strlen(id));
+    m->stem = copy(id, stem);
+    m->pinned = cfg->pinned;
+    m->thread = os_thread_id();
     colon = strchr(id, ':');
     m->ns = copy(id, colon ? (size_t)(colon - id) : strlen(id));
     m->fuel = cfg->fuel;
@@ -370,8 +418,8 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     }
 
     /* a system is an export, found once and checked here rather than on its first frame */
-    for (i = 0; i < m->system_count; i ++) {
-        bridge_system *s = m->systems[i];
+    for (i = 0; i < m->system_count + m->observer_count; i ++) {
+        bridge_system *s = i < m->system_count ? m->systems[i] : m->observers[i - m->system_count];
         s->fn = o->api.instance_func(m->instance, s->name, &arity, &results, &err);
         if (!s->fn) goto failed;
         if ((arity != -1 && arity != 0) || (results != -1 && results != 1)) {
@@ -379,6 +427,9 @@ int bridge_load(bridge *b, const bridge_artifact *a)
             goto failed;
         }
     }
+
+    /* lifecycle.md: refuse-and-unwind if a new system or observer conflicts unordered */
+    if (schedule_build(b, err.text, sizeof err.text)) goto failed;
 
     m->next = b->modules;
     b->modules = m;
@@ -397,12 +448,13 @@ failed:
     /* ponytail: what its init declared and queued before failing stays. Leaving storage as
      * it was is docs/PLAN.md phase 6's claim, and arrives with unload. */
     discard(b, m);
+    schedule_build(b, err.text, sizeof err.text);   /* as it was: this cannot refuse */
     return 1;
 }
 
 int bridge_phase(bridge *b, const char *name)
 {
-    uint32_t phase, i, ran = 0;
+    uint32_t phase;
     if (stopped(b)) return 1;
     for (phase = 0; phase < b->phase_count; phase ++) {
         if (name && !strcmp(b->phases[phase], name)) break;
@@ -413,33 +465,7 @@ int bridge_phase(bridge *b, const char *name)
         return 1;
     }
 
-    /* ponytail: registration order, one at a time. The conflict graph, [order] and threads
-     * are docs/PLAN.md phase 5. */
-    for (i = 0; i < b->system_count; i ++) {
-        bridge_system *s = b->systems[i];
-        module *m = s->m;
-        bridge_header *h = (bridge_header *)m->priv;
-        backend_err err = {0};
-        int32_t status = 0;
-        uint32_t slot = 0;
-        if (s->phase != phase || m->stopped) continue;
-
-        while (m->systems[slot] != s) slot ++;
-        /* validation.md: the culprit is the system that was running. One store per dispatch. */
-        h->when = b->barriers << 16 | (ran ++ & 0xffffu);
-        h->system = slot;
-        /* fuel only depletes, so it is set again before every dispatch - limits.md */
-        if (m->fuel > 0) m->on->api.instance_set_fuel(m->instance, (uint64_t)m->fuel);
-        m->refused = 0;
-        if (m->on->api.call(s->fn, &status, &err) || m->refused) {
-            /* failure.md: the invocation is abandoned, and logged */
-            say(b, m, s, BRIDGE_ERR, "system '%s' failed: %s", s->name,
-                m->refused ? m->why : err.text);
-        } else if (status) {
-            say(b, m, s, BRIDGE_ERR, "system '%s' failed: it answered %d", s->name, status);
-        }
-        h->system = UINT32_MAX;
-    }
+    schedule_run(b, phase);
     store_barrier(b);
     return 0;
 }

@@ -195,7 +195,8 @@ void store_header(bridge *b, module *m)
     h->ring_len = m->ring_len;
     h->ring_tail = m->ring_tail;
     h->queries = m->spans;
-    h->column_base = m->spans + (uint32_t)sizeof(bridge_query) * m->system_count;
+    h->observers = m->spans + (uint32_t)sizeof(bridge_query) * m->system_count;
+    h->column_base = h->observers + (uint32_t)sizeof(bridge_list) * m->observer_count;
     h->terms = m->declared_count;
     h->tables = b->table_count;
     h->entity_index = store_offset(b, b->index);
@@ -264,6 +265,20 @@ static int publish(bridge *b, module *m)
         }
         slot->spans = spans;
     }
+
+    /* and each observer's list of who triggered it - abi.md, *The ABI* */
+    for (q = 0; q < m->observer_count; q ++) {
+        bridge_system *sys = m->observers[q];
+        bridge_list *slot = (bridge_list *)(m->priv + h->observers) + q;
+        if (at + (uint64_t)sys->pending_count * sizeof(bridge_trigger) > end) return 1;
+        slot->count = sys->pending_count;
+        slot->at = (uint32_t)at;
+        for (t = 0; t < sys->pending_count; t ++) {
+            bridge_trigger trigger = { sys->pending[t].id, sys->pending[t].events, 0 };
+            memcpy(m->priv + at, &trigger, sizeof trigger);
+            at += sizeof trigger;
+        }
+    }
     return 0;
 }
 
@@ -281,7 +296,9 @@ static void drain(bridge *b, module *m)
         bridge_record r = {0};
         memcpy(&rec, m->priv + m->ring + ((m->ring_tail + i) % m->ring_len) * sizeof rec, sizeof rec);
         r.identity = m->identity;
-        r.system = rec.system < m->system_count ? m->systems[rec.system]->name : NULL;
+        r.system = rec.system < m->system_count ? m->systems[rec.system]->name
+                 : rec.system >= 0x8000u && rec.system - 0x8000u < m->observer_count
+                 ? m->observers[rec.system - 0x8000u]->name : NULL;
         if (rec.text >= m->scratch && rec.len <= m->scratch_len
             && rec.text - m->scratch <= m->scratch_len - rec.len) {
             r.text = (const char *)m->priv + rec.text;
@@ -310,10 +327,13 @@ static void drain(bridge *b, module *m)
 void store_barrier(bridge *b)
 {
     module *m;
-    uint32_t tables;
+    uint32_t tables, i;
 
     ecs_defer_end(b->world);            /* queued changes applied */
     sync(b);
+    /* deferred again before anything else runs: what an observer queues is the next
+     * barrier's - schedule.md, *An observer runs at the barrier, one hop per barrier* */
+    ecs_defer_begin(b->world);
     do {                                /* spans republished */
         tables = b->table_count;
         for (m = b->modules; m; m = m->next) {
@@ -324,8 +344,9 @@ void store_barrier(bridge *b)
         }
     } while (tables != b->table_count);
     b->layout_moved = 0;
+    schedule_run(b, b->phase_count);    /* then the observers of what changed */
+    for (i = 0; i < b->system_count; i ++) b->systems[i]->pending_count = 0;
     for (m = b->modules; m; m = m->next) drain(b, m);
-    ecs_defer_begin(b->world);
     b->barriers ++;
 
     if (b->columns_out && !b->stopped_by) {

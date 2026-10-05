@@ -1,5 +1,5 @@
 /* The operating system, as far as Bridge-ASM700 and its backends need it:
- * address space, shared libraries, one thread and one event. Nothing here knows
+ * address space, shared libraries, threads, an event and a mutex. Nothing here knows
  * what a module is. */
 #ifndef BRIDGE_OS_H
 #define BRIDGE_OS_H
@@ -21,6 +21,13 @@ void  os_lib_close(void *lib);
 typedef struct os_thread os_thread;
 os_thread *os_thread_start(void (*fn)(void *), void *arg);
 void       os_thread_join(os_thread *t);
+uint64_t   os_thread_id(void);                      /* of the calling thread */
+
+typedef struct os_mutex os_mutex;
+os_mutex *os_mutex_new(void);
+void      os_mutex_free(os_mutex *m);
+void      os_mutex_lock(os_mutex *m);
+void      os_mutex_unlock(os_mutex *m);
 
 /* An event one thread sets and another waits for. Setting it before the wait
  * is not lost; a wait consumes it. */

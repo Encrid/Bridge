@@ -13,6 +13,7 @@
 #define PAGE 65536u
 
 typedef struct module module;
+typedef struct pool pool;
 
 typedef struct {
     char            *name;
@@ -32,19 +33,37 @@ typedef struct {
     void        *zero;              /* `size` zero bytes: what an attach with no value copies */
 } component;
 
+typedef struct { ecs_entity_t id; uint32_t events; } pending;
+
+/* A system, or an observer: a query and a function either way. An observer's phase is the one
+ * past the deployment's last, which is the barrier. */
 typedef struct {
     module       *m;
     char         *name;
+    char         *full;             /* how [order] names it: the module's stem, then the name */
     uint32_t      phase;
-    ecs_query_t  *query;            /* NULL for a system with no terms */
+    ecs_query_t  *query;            /* NULL for a system with no terms, and for an observer */
     uint32_t      terms;
     uint32_t      sizes[BRIDGE_TERMS_MAX];
+    component    *touches[BRIDGE_TERMS_MAX];    /* NULL where a term reads nothing */
+    uint8_t       writes[BRIDGE_TERMS_MAX];
     backend_func *fn;
+    uint32_t      level;            /* within its phase: a level runs before the next */
+
+    int           observer;
+    ecs_entity_t  observing;        /* flecs' observer */
+    pending      *pending;          /* who triggered it since the last barrier */
+    uint32_t      pending_count, pending_room;
+
+    uint32_t      when;             /* of the dispatch in progress */
+    int           failed;           /* and how it ended, said after the join */
+    char          why[256];
 } bridge_system;
 
 struct module {
     bridge           *b;
     char             *identity, *ns;
+    char             *stem;         /* the identity without its version */
     open_backend     *on;
     backend_module   *image;
     backend_instance *instance;
@@ -62,11 +81,15 @@ struct module {
     uint32_t       declared_count;
     bridge_system **systems;        /* by slot */
     uint32_t       system_count;
+    bridge_system **observers;      /* by slot */
+    uint32_t       observer_count;
 
     int64_t   fuel;
     char    **read, **write;        /* grants */
     uint32_t  read_count, write_count;
 
+    int      pinned;
+    uint64_t thread;                /* the one that loaded it */
     int   in_init, stopped;
     int   refused;                  /* an entry refused during the call in progress */
     char  why[256];                 /* and this is why */
@@ -88,6 +111,10 @@ struct bridge {
     char   **phases;
     uint32_t phase_count;
     uint32_t barriers;
+    char   **before, **after;       /* [order], pair by pair */
+    uint32_t order_count;
+    pool    *pool;
+    os_mutex *entries;              /* every ABI entry runs under it */
 
     /* the shared block: a reserved page, the entity index, the persistent arena, the columns */
     uint8_t       *shared;
@@ -122,6 +149,18 @@ struct bridge {
 /* bridge.c */
 void say(bridge *b, const module *m, const bridge_system *s, int8_t level, const char *fmt, ...);
 char *copy(const char *s, size_t n);
+
+/* schedule.c */
+int  schedule_order(bridge *b, const bridge_order *order, uint32_t count);  /* at create */
+int  schedule_build(bridge *b, char *why, size_t why_len);     /* 0, or why it cannot be */
+void schedule_run(bridge *b, uint32_t phase);
+
+/* pool.c */
+typedef void (*pool_fn)(void *job);
+pool *pool_create(uint32_t workers);
+void  pool_destroy(pool *p);
+/* fn(jobs[i]) for every i, on the workers and the caller; a job marked is the caller's alone */
+void  pool_run(pool *p, pool_fn fn, void **jobs, const uint8_t *caller_only, uint32_t count);
 
 /* store.c */
 int      store_create(bridge *b, const bridge_budget *budget);    /* 0, or a record was emitted */
