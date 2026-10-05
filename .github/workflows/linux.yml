@@ -1,0 +1,41 @@
+# The linux preset, on every push: the half of every phase's claim a Windows machine cannot check.
+# The tools are the ones the build asks for, at the versions the Windows runs use.
+name: linux
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  preset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ZIG_VERSION: 0.16.0
+      WASM_TOOLS_VERSION: 1.259.0
+      BINARYEN_VERSION: 133
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y ninja-build
+          mkdir -p "$HOME/tools"
+          cd "$HOME/tools"
+          curl -fsSL "https://ziglang.org/download/${ZIG_VERSION}/zig-x86_64-linux-${ZIG_VERSION}.tar.xz" | tar -xJ
+          curl -fsSL "https://github.com/bytecodealliance/wasm-tools/releases/download/v${WASM_TOOLS_VERSION}/wasm-tools-${WASM_TOOLS_VERSION}-x86_64-linux.tar.gz" | tar -xz
+          curl -fsSL "https://github.com/WebAssembly/binaryen/releases/download/version_${BINARYEN_VERSION}/binaryen-version_${BINARYEN_VERSION}-x86_64-linux.tar.gz" | tar -xz
+          echo "$HOME/tools/zig-x86_64-linux-${ZIG_VERSION}" >> "$GITHUB_PATH"
+          echo "$HOME/tools/wasm-tools-${WASM_TOOLS_VERSION}-x86_64-linux" >> "$GITHUB_PATH"
+          echo "BINARYEN_ROOT=$HOME/tools/binaryen-version_${BINARYEN_VERSION}" >> "$GITHUB_ENV"
+
+      - name: Configure
+        run: cmake --preset linux
+
+      - name: Build
+        run: cmake --build --preset linux
+
+      - name: Test
+        run: ctest --preset linux --output-on-failure
