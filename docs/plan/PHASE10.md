@@ -83,3 +83,58 @@ variable. Ours places every row, so the index is written where the row is placed
 5. flecs removed.
 
 **What stops it**: ours slower on any line and not to be made otherwise.
+
+## What flecs does, pinned
+
+`tests/storage.c` drives a native module, `tests/modules/native/nstore.c`, that makes one kind of
+change in a phase of its own and says what a system and an observer then see. The host prints
+it. What it prints is kept in `tests/storage-changes.txt` and `tests/storage-tables.txt`, and
+the two cases pass only by saying the same, word for word. Nothing in a transcript depends on
+how ids are numbered, so the same two files will judge storage of our own.
+
+What was not known until it ran:
+
+    an emptied table            gets no span: a system never sees a span of no rows
+    a term that is NOT          takes a span's place and has no base
+    an OPTIONAL term            has a base in the tables that carry it and none in the rest
+    an observer of two terms    hears an entity when it comes to match both, by whichever
+                                change completed the pair: add and set. A set of either, while
+                                it matches, is a set. Losing either is a remove
+    a destroy                   is a remove to each observer the entity matched, once, however
+                                many times it was asked for
+    there and gone in one       is one record with all three events: add, set, remove
+    barrier
+    a detach of what is not     nothing, and no event
+    there; a change to a dead
+    id
+    a value attached            is the bytes at the call, whatever is written there after
+    a freed index               comes back under another generation, some barriers later,
+                                since ids are set aside a barrier ahead. Every destroyed id
+                                reads as dead in the index meanwhile
+    ten thousand tables         each entity of ten thousand in a table of its own: five
+                                thousand spans for a term half of them carry
+
+None of it looked accidental, so ours copies all of it. One line of the transcript was taken
+out before it was kept: how many tables there are, which counted flecs' own.
+
+## What flecs costs
+
+`storage measure`, on Windows, with nothing else running. A hundred thousand entities, each
+change made to all of them in one phase, and the barrier that applies them timed alone. The best
+of six rounds, three runs. This is the line ours has to stay under.
+
+    an id handed out                          16 to 17 ns
+    attach, the entity's first component     120 to 140 ns
+    attach, a component it has                26 to 27 ns
+    attach, a second component               126 to 146 ns
+    detach                                    97 to 111 ns
+    destroy                                   66 to  75 ns
+    a barrier with nothing to do             about 100 ns
+
+    ten thousand tables made                 3.4 us a table
+    a barrier with nothing to do, then       82 to 85 us
+    ten thousand more, by one attach each    2.8 us a table
+
+The second figure of the lower three is the one that was not expected: with ten thousand tables
+standing and nothing changed, a barrier is eight hundred times dearer than with one. Every
+barrier walks every query's matched tables to publish them again, changed or not.

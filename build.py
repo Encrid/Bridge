@@ -66,6 +66,7 @@ NATIVE = [
     ('nsleep1', 'nsleep', []), ('nsleep2', 'nsleep', []), ('npinned', 'npinned', []),
     ('nticker1', 'nticker', ['STEP=1']), ('nticker2', 'nticker', ['STEP=10']),
     ('nticker3', 'nticker', ['STEP=10', 'FAIL_RELOAD']),
+    ('nstore', 'nstore', []), ('nstorebig', 'nstore', ['BIG']), ('nstoretab', 'nstore', ['TABLES']),
 ]
 
 # a module in C: the name, its source, which accessors it is merged with, what it is compiled
@@ -240,8 +241,9 @@ def build(target, debug, out):
     adopt_o = compile_('adopt', ROOT / 'tests/adopt.c', ours + [include, src] + defines)
     phase_o = {name: compile_(name, ROOT / 'tests' / (name + '.c'), ours + [include] + defines)
                for name in ('phase2', 'phase3', 'phase4', 'phase5', 'phase6')}
-    tables_o = compile_('tables', ROOT / 'tests/tables.c', ours + [include, src, flecs] + defines,
-                        [out / 'flecs/flecs.h'])
+    inside_o = {name: compile_(name, ROOT / 'tests' / (name + '.c'),
+                               ours + [include, src, flecs] + defines, [out / 'flecs/flecs.h'])
+                for name in ('tables', 'storage')}
     module_o = {name: compile_(name, ROOT / 'tests/modules/native' / (source + '.c'),
                                ours + [include] + ['-D' + d for d in flags])
                 for name, source, flags in NATIVE}
@@ -273,7 +275,8 @@ def build(target, debug, out):
     whole = bridge_o + [os_o, flecs_o['flecs']]
     for name, o in phase_o.items():
         link(name, [o] + whole, system)
-    link('tables', [tables_o] + whole, system)
+    for name, o in inside_o.items():
+        link(name, [o] + whole, system)
     together(links)
 
     # ---- wasm modules: text assembled, C compiled and merged with the accessors ----
@@ -335,7 +338,10 @@ def test(out, built, only):
             why = 'did not end in %d seconds' % TIMEOUT
         elif never and re.search(never, said, re.S):
             why = 'said what it must not: %s' % never
-        elif match and not re.search(match, said, re.S):
+        elif match and match.startswith('@') and \
+                said.replace('\r', '') != (ROOT / match[1:]).read_text(encoding='utf-8'):
+            why = 'did not say what %s holds, word for word' % match[1:]
+        elif match and not match.startswith('@') and not re.search(match, said, re.S):
             why = 'ended with %s and did not say: %s' % (code, match)
         elif not match and code:
             why = 'ended with %s' % code
@@ -372,9 +378,16 @@ def main():
 
 # Every case: its name, what is run, what its output must match, what it must not. A phase's
 # cases end in "alive": checked by what was said, and by the process still being there to say it.
+# A match that begins with @ names a file the output must equal, word for word: a transcript.
 CASES = [
     ('c23', ['c23'],
      None, None),
+    ('storage-changes', ['storage', 'changes'],
+     '@tests/storage-changes.txt', None),
+    ('storage-tables', ['storage', 'tables'],
+     '@tests/storage-tables.txt', None),
+    ('storage-measure', ['storage', 'measure'],
+     r"an id handed out +[0-9.]+ ns each.*ten thousand tables made.*alive", None),
     ('confined', ['confined'],
      None, None),
     ('rowmove', ['rowmove'],

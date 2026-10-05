@@ -1,0 +1,152 @@
+spawn
+attach_a
+  heard_a: A: who, events 0 3
+  heard_a: A: who, events 1 3
+  heard_a: A: who, events 2 3
+  heard_a: A: who, events 3 3
+  heard_a: A: who, events 4 3
+  heard_a: A: who, events 5 3
+look
+  look: with A: spans, rows 1 6
+  look: first A 0 0
+  look: with A and not B: spans, rows 1 6
+  look: with A and maybe B: spans, rows 1 6
+  look: of them with B: rows 0 0
+value_a
+  heard_a: A: who, events 0 2
+look
+  look: with A: spans, rows 1 6
+  look: first A 41 0
+  look: with A and not B: spans, rows 1 6
+  look: with A and maybe B: spans, rows 1 6
+  look: of them with B: rows 0 0
+attach_b_half
+  heard_b: B: who, events 0 3
+  heard_b: B: who, events 1 3
+  heard_b: B: who, events 2 3
+  heard_both: A and B: who, events 0 3
+  heard_both: A and B: who, events 1 3
+  heard_both: A and B: who, events 2 3
+look
+  look: with A: spans, rows 2 6
+  look: first A 0 0
+  look: with A and not B: spans, rows 1 3
+  look: with A and maybe B: spans, rows 2 6
+  look: of them with B: rows 3 0
+attach_a
+  heard_a: A: who, events 0 2
+  heard_a: A: who, events 1 2
+  heard_a: A: who, events 2 2
+  heard_a: A: who, events 3 2
+  heard_a: A: who, events 4 2
+  heard_a: A: who, events 5 2
+  heard_both: A and B: who, events 0 2
+  heard_both: A and B: who, events 1 2
+  heard_both: A and B: who, events 2 2
+detach_b_absent
+flicker
+  heard_a: A: who, events 0 7
+  heard_b: B: who, events 5 7
+  heard_both: A and B: who, events 5 7
+  heard_both: A and B: who, events 0 7
+look
+  look: with A: spans, rows 2 6
+  look: first A 0 0
+  look: with A and not B: spans, rows 1 3
+  look: with A and maybe B: spans, rows 2 6
+  look: of them with B: rows 3 0
+detach_b_half
+  heard_b: B: who, events 0 4
+  heard_b: B: who, events 1 4
+  heard_b: B: who, events 2 4
+  heard_both: A and B: who, events 0 4
+  heard_both: A and B: who, events 1 4
+  heard_both: A and B: who, events 2 4
+look
+  look: with A: spans, rows 1 6
+  look: first A 0 0
+  look: with A and not B: spans, rows 1 6
+  look: with A and maybe B: spans, rows 1 6
+  look: of them with B: rows 0 0
+destroy_half
+  heard_a: A: who, events 3 4
+  heard_a: A: who, events 4 4
+  heard_a: A: who, events 5 4
+look
+  look: with A: spans, rows 1 3
+  look: first A 0 0
+  look: with A and not B: spans, rows 1 3
+  look: with A and maybe B: spans, rows 1 3
+  look: of them with B: rows 0 0
+respawn_half
+  respawn_half: destroyed ids that read as dead, of 3 3
+  respawn_half: ids that came back whole 0 0
+touch_dead
+look
+  look: with A: spans, rows 1 3
+  look: first A 0 0
+  look: with A and not B: spans, rows 1 3
+  look: with A and maybe B: spans, rows 1 3
+  look: of them with B: rows 0 0
+destroy_half
+respawn_half
+  respawn_half: destroyed ids that read as dead, of 6 6
+  respawn_half: ids that came back whole 0 0
+destroy_half
+respawn_half
+  respawn_half: destroyed ids that read as dead, of 9 9
+  respawn_half: ids that came back whole 0 0
+destroy_half
+respawn_half
+  respawn_half: destroyed ids that read as dead, of 12 12
+  respawn_half: ids that came back whole 0 0
+recycled
+  recycled: an index was used again 1 0
+attach_a_half
+  heard_a: A: who, events 3 3
+  heard_a: A: who, events 4 3
+  heard_a: A: who, events 5 3
+attach_b
+  heard_b: B: who, events 0 3
+  heard_b: B: who, events 1 3
+  heard_b: B: who, events 2 3
+  heard_b: B: who, events 3 3
+  heard_b: B: who, events 4 3
+  heard_b: B: who, events 5 3
+  heard_both: A and B: who, events 0 3
+  heard_both: A and B: who, events 1 3
+  heard_both: A and B: who, events 2 3
+  heard_both: A and B: who, events 3 3
+  heard_both: A and B: who, events 4 3
+  heard_both: A and B: who, events 5 3
+look
+  look: with A: spans, rows 1 6
+  look: first A 0 0
+  look: with A and not B: spans, rows 0 0
+  look: with A and maybe B: spans, rows 1 6
+  look: of them with B: rows 6 0
+destroy
+  heard_a: A: who, events 0 4
+  heard_a: A: who, events 1 4
+  heard_a: A: who, events 2 4
+  heard_a: A: who, events 3 4
+  heard_a: A: who, events 4 4
+  heard_a: A: who, events 5 4
+  heard_b: B: who, events 0 4
+  heard_b: B: who, events 1 4
+  heard_b: B: who, events 2 4
+  heard_b: B: who, events 3 4
+  heard_b: B: who, events 4 4
+  heard_b: B: who, events 5 4
+  heard_both: A and B: who, events 0 4
+  heard_both: A and B: who, events 1 4
+  heard_both: A and B: who, events 2 4
+  heard_both: A and B: who, events 3 4
+  heard_both: A and B: who, events 4 4
+  heard_both: A and B: who, events 5 4
+look
+  look: with A: spans, rows 0 0
+  look: with A and not B: spans, rows 0 0
+  look: with A and maybe B: spans, rows 0 0
+  look: of them with B: rows 0 0
+alive

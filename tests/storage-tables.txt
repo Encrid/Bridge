@@ -1,0 +1,11 @@
+spawn
+combine
+look
+  see: the first kind: spans, rows 5000 5000
+attach_a
+look
+  see: the first kind: spans, rows 5000 5000
+destroy
+look
+  see: the first kind: spans, rows 0 0
+alive
