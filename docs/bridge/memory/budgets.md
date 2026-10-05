@@ -57,19 +57,21 @@ one, so that what it mints is its own - `threads.md`, *Threads*:
                   query matches, and which count against the entity ceiling
     persistent    its share of the persistent arena, for as long as it is loaded
 
-`[budget] persistent` is the whole arena, and a module whose share does not fit in what is left of
-it is refused at load.
+`[budget] persistent` is the whole arena, and a module whose share does not fit in one piece of
+what is left of it is refused at load. A share is given back when its module is unloaded, unless
+a string in it is still held by a row - `strings.md`, *It is given back when nothing points into
+it*.
 
 **A reload may state a larger share, and never a smaller one.** A budget is the deployment's to
 change by reloading - `config.md`, *A module's own settings are a component* - and this one could
-not be, at first: any change was refused, so raising it cost the module's data by an unload. What
-is added is carved from what is left of the arena: where the module's share was the last one
-carved it grows in place, and otherwise it gains a further range, which `alloc` moves to once what
-is asked no longer fits in the one before. What was left of that one is dead space, the cost
-`strings.md`, *Changing one, and the cost of growing*, already names. Offsets handed out stay
-good, which is the rule flecs' own stack allocator keeps when it chains a page. Stating less is
-refused: nothing can be given back. Refused: accepting less and keeping the share as it was, a
-stated number that would not be true.
+not be, at first: any change was refused, so raising it cost the module's data by an unload. What is
+added is carved from what is left of the arena: where what follows the module's share is free it
+grows in place, and otherwise it gains a further range, which `alloc` moves to once what is asked no
+longer fits in the one before. What was left of that one is dead space, the cost `strings.md`,
+*Changing one, and the cost of growing*, already names. Offsets handed out stay good, which is the
+rule flecs' own stack allocator keeps when it chains a page. Stating less is refused: what the
+module allocated is in its share, and it is still loaded. Refused: accepting less and keeping the
+share as it was, a stated number that would not be true.
 
 A module that spawns nothing, or keeps no string, says so: `-1`, as for any key where none is a
 real answer.

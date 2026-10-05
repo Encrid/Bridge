@@ -82,8 +82,10 @@ against an older `Vec3` is refused at `Vec3`, before `Body`.
 
 **One type is given and not declared: `bridge_text`**, the `(offset, length)` pair of
 `strings.md`, *Variable length*. It is a layout of `bridge-abi.h` and a field may be of it under any
-namespace. It exists so that a deployment's text can be told from two integers - `config.md`, *A
-module's own settings are a component* - and it is no component: nothing carries it but a field.
+namespace. It exists so that text can be told from two integers: by a deployment's settings -
+`config.md`, *A module's own settings are a component* - and by an unload, which gives a module's
+share of the arena back only if no `bridge_text` left in any row lies in it - `strings.md`, *It is
+given back when nothing points into it*. It is no component: nothing carries it but a field.
 
 **Rejected: pointer-sized or pointer-holding.** A pointer, `size_t`, `intptr_t`. A wasm32 pointer
 is four bytes and the host's is eight, so one text would lay out to two structs. A host pointer is

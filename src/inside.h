@@ -40,6 +40,7 @@ struct component {
 };
 
 typedef struct { uint64_t id; enum bridge_event events; } pending;
+typedef struct { uint32_t at, len; } range;
 
 /* A system, or an observer: a query and a function either way. An observer's phase is the one
  * past the deployment's last, which is the barrier. */
@@ -103,11 +104,13 @@ struct module {
     uint32_t  id_count, id_next, id_room;
     int       ids_short;            /* the entity ceiling cut its last refill short */
     int64_t   spawns, persistent;
-    uint32_t  arena_at, arena_left, arena_base, arena_share;
-    /* what a reload added to its share where it could not be added in place: used in order,
-     * once the range before is too small for what is asked - budgets.md */
-    struct { uint32_t at, left; } *more;
-    uint32_t  more_count, more_next;
+    uint32_t  arena_at, arena_left, arena_share;
+    /* The ranges of the arena that are its share: one from its load, and one more for each
+     * reload that could not add to the last where it stood. `alloc` moves to the next once
+     * what is asked no longer fits in the one before - budgets.md. They are what goes back to
+     * the arena at unload, if nothing left alive points into them - strings.md */
+    range    *owned;
+    uint32_t  own_count, own_next;
     uint8_t  *queue;
     uint32_t  queue_len, queue_room;
     char    **read, **write;        /* grants */
@@ -145,7 +148,15 @@ typedef struct {
 } change;
 
 typedef struct { char *stem; uint32_t at, room; } kept_text;
-typedef struct { uint32_t at, len; } gap;       /* in the column region, from its start */
+/* A stretch of the shared block handed out in pieces and taken back: the column region, and
+ * the persistent arena. What is free is kept here, outside the block, where no module's stray
+ * write reaches it: by offset from the region's start, joined to its neighbours. */
+typedef struct {
+    range   *gaps;
+    uint32_t count, room;
+    uint32_t used;                  /* everything past it has never been handed out */
+    uint32_t len;
+} region;
 
 struct bridge {
     bridge_sink_fn sink;
@@ -169,10 +180,9 @@ struct bridge {
     size_t         shared_len, shared_reserve;
     bridge_entity *index;
     uint32_t       entities;
-    uint32_t       arena, arena_len, arena_used;
-    uint32_t       columns, columns_len, columns_used;
-    gap           *gaps;            /* freed column space, by offset. kept outside the block */
-    uint32_t       gap_count, gap_room;
+    uint32_t       arena, arena_len;
+    uint32_t       columns, columns_len;
+    region         arena_space, column_space;   /* what of each is handed out */
     int            layout_moved;    /* a module came or went, or a declaration changed */
     uint32_t       tables;          /* [budget] tables: how many may exist at once */
     uint32_t       max_types, max_systems;      /* [budget] types, [budget] systems */
@@ -206,6 +216,7 @@ void module_shut_down(bridge *b, module *m);    /* its shutdown, what it asked f
 /* config.c */
 [[nodiscard]] int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why, size_t len);
 void config_keep(bridge *b, module *m);
+void config_forget(bridge *b, const module *m);
 
 /* schedule.c */
 [[nodiscard]] int schedule_order(bridge *b, const bridge_order *order, uint32_t count);  /* at create */
@@ -228,6 +239,13 @@ void     store_drain(bridge *b, module *m);                       /* its log rin
 void     store_barrier(bridge *b);
 void     store_header(bridge *b, module *m);                      /* what a module reads at offset 0 */
 uint32_t store_offset(bridge *b, const void *p);                  /* into the shared memory, 0 for null */
+/* a piece of a region: 0 if it has none that long; and a piece given back */
+[[nodiscard]] int region_take(region *r, uint32_t len, uint32_t *at);
+void     region_give(region *r, uint32_t at, uint32_t len);
+/* the piece at `at` made longer where it stands: false, and nothing changed, if what follows it
+ * is not free */
+[[nodiscard]] bool region_grow(region *r, uint32_t at, uint32_t had, uint32_t want);
+uint32_t region_most(const region *r);          /* the longest piece it could give now */
 /* the column region, carved: what storage asks for is what it gets, to sixteen bytes.
  * `new_size` bytes holding what the `old_size` at `ptr` held, or fresh if `ptr` is null. Null,
  * and nothing changed, if the region cannot give them: nothing comes from outside it */

@@ -163,8 +163,9 @@ int main(int argc, char **argv)
     setvbuf(stdout, nullptr, _IONBF, 0);
 
     if (!strcmp(what, "slots")) cfg.budget.modules = 1;
-    /* every load carves a share of the arena that is never given back: room for 200 of them */
-    if (!strcmp(what, "churn")) cfg.budget.persistent = 1 << 16;
+    /* room for one module's share and no more: every load of the two hundred takes it, and
+     * every unload gives it back - strings.md, *It is given back when nothing points into it* */
+    if (!strcmp(what, "churn") || !strncmp(what, "arena", 5)) cfg.budget.persistent = 64;
     if (!strcmp(what, "configceiling")) cfg.budget.entities = (uint64_t)atoi(argc > 2 ? argv[2] : "0");
     b = bridge_create(&cfg, sink, nullptr);
     if (!b) {
@@ -449,26 +450,46 @@ int main(int argc, char **argv)
          * Each unload frees tables, and each load makes new ones where the freed ones were:
          * a table id that outlived its table would be handed to the wrong one, and the
          * row-count check would say the index is out of step. */
-        int i;
+        int i, refused = 0;
         quiet = 1;
         for (i = 0; i < 200; i ++) {
             a = wasm("game:nested@0.1.0", "nested");
             a.cfg.spawns = 8;
-            (void)bridge_load(b, &a);
+            refused += bridge_load(b, &a);
             frames(b, 1);
             (void)bridge_unload(b, "game:nested@0.1.0");
             a = configured("game:settings@0.1.0");
-            (void)bridge_load(b, &a);
+            refused += bridge_load(b, &a);
             frames(b, 1);
             (void)bridge_unload(b, "game:settings@0.1.0");
             a = wasm("game:keeper@0.1.0", "keeper-sweep");
-            (void)bridge_load(b, &a);
+            refused += bridge_load(b, &a);
             frames(b, 1);
             (void)bridge_unload(b, "game:keeper@0.1.0");
         }
         quiet = 0;
-        printf("churned 200 times, %u records of the index out of step\n", out_of_step);
+        printf("churned 200 times, %d loads refused, %u records of the index out of step\n", refused,
+            out_of_step);
         modules(b);
+    } else if (!strncmp(what, "arena", 5)) {
+        /* The whole arena is one module's share, and it keeps a string there. Alone, its
+         * unload gives the share back and the next module has it. With another module that
+         * declares the same component the row stays, the string with it, and the share is
+         * not given to anybody: the reader still says it, after the refusal as before. */
+        a = wasm("game:namer@0.1.0", "namer");
+        a.cfg.persistent = 64;
+        load(b, &a);
+        if (!strcmp(what, "arenakept")) {
+            a = wasm("game:reader@0.1.0", "namer-reader");
+            load(b, &a);
+        }
+        frames(b, 1);
+        unload(b, "game:namer@0.1.0");
+        frames(b, 1);
+        a = wasm("game:ticker@0.1.0", "ticker");
+        a.cfg.persistent = 64;
+        load(b, &a);
+        frames(b, 1);
     } else if (!strcmp(what, "configtwice")) {  /* one row, so one module */
         a = configured("game:settings@0.1.0");
         load(b, &a);

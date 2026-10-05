@@ -89,7 +89,7 @@ void module_discard(bridge *b, module *m)
     free_list_of(m->read, m->read_count);
     free_list_of(m->write, m->write_count);
     free(m->ids);
-    free(m->more);
+    free(m->owned);
     free(m->queue);
     free(m->systems);
     free(m->observers);
@@ -111,10 +111,11 @@ static void undo(bridge *b, module *m)
     rows_release(b->rows, m->ids, m->id_count);
     m->id_count = m->id_next = 0;
     if (m->config_entity) rows_release(b->rows, &m->config_entity, 1);
-    /* its share is the last one carved, since nothing loads during a load */
-    if (m->arena_share && m->arena_base + m->arena_share == b->arena + b->arena_used) {
-        b->arena_used -= m->arena_share;
+    /* nothing of it was applied, so nothing points into its share */
+    for (i = 0; i < m->own_count; i ++) {
+        region_give(&b->arena_space, m->owned[i].at - b->arena, m->owned[i].len);
     }
+    m->own_count = 0;
     /* last declared first: a type is used by what was declared after it */
     for (i = m->declared_count; i --;) component_release(b, m->declared[i], 0);
     m->declared_count = 0;
@@ -459,22 +460,25 @@ int bridge_load(bridge *b, const bridge_artifact *a)
             "reached", id, b->max_modules);
         return 1;
     }
-    if (cfg->persistent > 0 && (uint64_t)cfg->persistent > b->arena_len - b->arena_used) {
+    if (cfg->persistent > 0 && (uint64_t)cfg->persistent > region_most(&b->arena_space)) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its persistent of %lld bytes "
             "does not fit in the %u left of [budget] persistent", id, (long long)cfg->persistent,
-            b->arena_len - b->arena_used);
+            region_most(&b->arena_space));
         return 1;
     }
 
     m = record(b, a, o);
     if (cfg->persistent > 0) {
-        /* its share of the arena, for its life: nobody else allocates from it */
-        uint32_t share = ((uint32_t)cfg->persistent + 7u) & ~7u;
-        if (share > b->arena_len - b->arena_used) share = b->arena_len - b->arena_used;
+        /* its share of the arena, for as long as it is loaded: nobody else allocates from it */
+        uint32_t share = ((uint32_t)cfg->persistent + 7u) & ~7u, at;
+        if (share > region_most(&b->arena_space)) share = region_most(&b->arena_space);
+        if (!region_take(&b->arena_space, share, &at)) unreachable();
+        m->owned = calloc(1, sizeof *m->owned);
+        m->owned[0] = (range){ b->arena + at, share };
+        m->own_count = m->own_next = 1;
         m->arena_share = share;
-        m->arena_base = m->arena_at = b->arena + b->arena_used;
+        m->arena_at = b->arena + at;
         m->arena_left = share;
-        b->arena_used += share;
     }
 
     /* from here a failure is the module's, and its on_error decides what it costs. init may
@@ -527,6 +531,49 @@ void module_shut_down(bridge *b, module *m)
     store_drain(b, m);          /* and what it said: its ring is about to go with it */
 }
 
+/* strings.md, *It is given back when nothing points into it*. A string a component keeps is a
+ * bridge_text field, so every reference there is can be found: in a field, in an array of
+ * them, or in a struct a field holds. */
+typedef struct { const bridge *b; const module *m; const component *c; } pointing;
+
+static bool points_in(const pointing *p, const component *c, const uint8_t *bytes)
+{
+    for (uint32_t k = 0; k < c->s.field_count; k ++) {
+        const schema_field *f = &c->s.fields[k];
+        const component *held = f->type;
+        if (f->kind != SCHEMA_TEXT && f->kind != SCHEMA_STRUCT) continue;
+        for (uint32_t i = 0; i < f->count; i ++) {
+            bridge_text text;
+            if (f->kind == SCHEMA_STRUCT) {
+                if (points_in(p, held, bytes + f->offset + (size_t)i * held->size)) return true;
+                continue;
+            }
+            memcpy(&text, bytes + f->offset + (size_t)i * sizeof text, sizeof text);
+            for (uint32_t o = 0; text.len && o < p->m->own_count; o ++) {
+                const range *own = &p->m->owned[o];
+                if (text.at < own->at + own->len && own->at < (uint64_t)text.at + text.len) return true;
+            }
+        }
+    }
+    return false;
+}
+
+static bool row_points_in(void *ctx, const uint8_t *row)
+{
+    const pointing *p = ctx;
+    return points_in(p, p->c, row);
+}
+
+static bool share_is_pointed_into(bridge *b, const module *m)
+{
+    pointing p = { b, m, nullptr };
+    for (uint32_t i = 0; i < b->component_count; i ++) {
+        p.c = b->components[i];
+        if (p.c->kind == BRIDGE_STRUCT && rows_any(b->rows, p.c->type, row_points_in, &p)) return true;
+    }
+    return false;
+}
+
 /* The rest of an unload, once the module's code has run for the last time. */
 static void take_out(bridge *b, module *m)
 {
@@ -539,7 +586,15 @@ static void take_out(bridge *b, module *m)
     m->declared_count = 0;
     /* the ids held ready for it are entities nobody will ever spawn */
     rows_release(b->rows, m->ids + m->id_next, m->id_count - m->id_next);
-    config_keep(b, m);
+    /* its share of the arena: back to it, unless a row that is staying holds a string there */
+    if (m->own_count && !share_is_pointed_into(b, m)) {
+        for (i = 0; i < m->own_count; i ++) {
+            region_give(&b->arena_space, m->owned[i].at - b->arena, m->owned[i].len);
+        }
+        config_forget(b, m);
+    } else {
+        config_keep(b, m);
+    }
     while (*link != m) link = &(*link)->next;
     *link = m->next;
     b->module_count --;
@@ -575,7 +630,9 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     open_backend *o = nullptr;
     backend_err err = {};
     enum backend_capability demands = 0;
-    uint32_t i, extra = 0;
+    uint32_t i, extra = 0, extra_at = 0;
+    range last = {};
+    bool in_place = false;
     int64_t had, wants;
     module *old, *n, **link;
     int side_by_side;
@@ -598,21 +655,27 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
             "and a reload does not move it to '%s'", old->identity, old->on->name, o->name);
         return 1;
     }
-    /* budgets.md: a budget changes by reload, and this one only upwards, since nothing in the
-     * arena is ever given back */
+    /* budgets.md: a budget changes by reload, and this one only upwards: what it has allocated
+     * is in its share, and stays there for as long as it is loaded */
     had = old->persistent > 0 ? old->persistent : 0;
     wants = cfg->persistent > 0 ? cfg->persistent : 0;
     if (wants < had) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is not reloaded: its persistent is %lld "
-            "and a reload states less, which nothing can give back", old->identity, (long long)had);
+            "and a reload states less, which a loaded module's share cannot become", old->identity, (long long)had);
         return 1;
     }
     if (wants > had) {
         extra = (((uint32_t)wants + 7u) & ~7u) - old->arena_share;
-        if (extra > b->arena_len - b->arena_used) {
+        /* where its last range stands, if that is the one it allocates from and what follows
+         * it is free; and otherwise a range more */
+        if (old->own_count && old->own_next == old->own_count) {
+            last = old->owned[old->own_count - 1];
+            in_place = region_grow(&b->arena_space, last.at - b->arena, last.len, last.len + extra);
+        }
+        if (!in_place && !region_take(&b->arena_space, extra, &extra_at)) {
             say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is not reloaded: its persistent of %lld "
                 "bytes does not fit in the %u left of [budget] persistent", old->identity,
-                (long long)wants, b->arena_len - b->arena_used + old->arena_share);
+                (long long)wants, region_most(&b->arena_space) + old->arena_share);
             return 1;
         }
     }
@@ -624,26 +687,23 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     n->id_count = old->id_count;
     n->id_next = old->id_next;
     n->id_room = old->id_room;
-    n->arena_base = old->arena_base;
     n->arena_share = old->arena_share + extra;
     n->arena_at = old->arena_at;
     n->arena_left = old->arena_left;
-    n->more = calloc(old->more_count + 1, sizeof *n->more);
-    if (old->more_count) memcpy(n->more, old->more, old->more_count * sizeof *n->more);
-    n->more_count = old->more_count;
-    n->more_next = old->more_next;
-    if (extra) {
-        uint32_t top = b->arena + b->arena_used;
-        if (!old->arena_share) {
-            n->arena_base = n->arena_at = top;
+    n->owned = calloc(old->own_count + 1, sizeof *n->owned);
+    if (old->own_count) memcpy(n->owned, old->owned, old->own_count * sizeof *n->owned);
+    n->own_count = old->own_count;
+    n->own_next = old->own_next;
+    if (in_place) {
+        n->owned[n->own_count - 1].len += extra;
+        n->arena_left += extra;
+    } else if (extra) {
+        n->owned[n->own_count ++] = (range){ b->arena + extra_at, extra };
+        if (!old->own_count) {              /* it had none: this is where it starts */
+            n->arena_at = b->arena + extra_at;
             n->arena_left = extra;
-        } else if (!(old->more_count - old->more_next) && old->arena_at + old->arena_left == top) {
-            n->arena_left += extra;         /* nothing was carved after it: it grows in place */
-        } else {
-            n->more[n->more_count].at = top;
-            n->more[n->more_count ++].left = extra;
+            n->own_next = 1;
         }
-        b->arena_used += extra;
     }
     n->config = old->config;
     n->config_entity = old->config_entity;
@@ -671,7 +731,9 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
         n->declared_count = 0;
         n->ids = nullptr;              /* they are the old record's */
         n->config_entity = 0;
-        b->arena_used -= extra;     /* the last thing carved, so it can go back */
+        /* what the reload added goes back: nothing was allocated from it that lived */
+        if (in_place) region_give(&b->arena_space, last.at - b->arena + last.len, extra);
+        else if (extra) region_give(&b->arena_space, extra_at, extra);
         module_discard(b, n);
         if (side_by_side) {
             /* failure.md: the old instance is kept, and it was never touched */

@@ -37,10 +37,10 @@ static void held(const bridge *b)
 {
     held_counters c = { .cb = sizeof c };
     if (!K32GetProcessMemoryInfo(GetCurrentProcess(), &c, sizeof c)) return;
-    printf("columns in use %u KB, and the process holds %zu KB\n", b->columns_used >> 10, c.now >> 10);
+    printf("columns in use %u KB, and the process holds %zu KB\n", b->column_space.used >> 10, c.now >> 10);
 }
 #else
-static void held(const bridge *b) { printf("columns in use %u KB\n", b->columns_used >> 10); }
+static void held(const bridge *b) { printf("columns in use %u KB\n", b->column_space.used >> 10); }
 #endif
 
 static void sink([[maybe_unused]] void *ud, const bridge_record *r)

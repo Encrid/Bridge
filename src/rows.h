@@ -67,5 +67,7 @@ void rows_release(rows *r, const uint64_t *ids, uint32_t count);
 /* one entity carrying one row of `type`: its id, or 0 if the entity ceiling is reached */
 [[nodiscard]] uint64_t rows_row(rows *r, rows_type *type, const void *bytes, uint32_t size);
 bool rows_alive(rows *r, uint64_t id);
+/* whether `is` answers true for any row of `type`, handed the row's bytes */
+bool rows_any(rows *r, rows_type *type, bool (*is)(void *ctx, const uint8_t *row), void *ctx);
 
 #endif

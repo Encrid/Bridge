@@ -73,6 +73,7 @@ PLAIN = ('mover reader refs fp wildcard spin3 flood chatty rows halver twostep w
          'badobs events fixer nested nested2 namer spawner counter typer user settings hang')
 WASM = [(name, name, 'checked', []) for name in PLAIN.split()] + [
     ('rows-unchecked', 'rows', 'unchecked', []),
+    ('namer-reader', 'namer', 'checked', ['READER']),
     ('flaky-always', 'flaky', 'checked', ['OF=1', 'FAILS=1']),
     ('flaky-third', 'flaky', 'checked', ['OF=3', 'FAILS=1']),
     ('flaky-twothirds', 'flaky', 'checked', ['OF=3', 'FAILS=2']),
@@ -565,7 +566,7 @@ CASES = [
     ('phase6-sharesame', ['phase6', 'sharesame'],
      r"was not reloaded: alloc: its persistent of 16 bytes is exhausted.*tick 103 1.*tick 104 1.*alive", None),
     ('phase6-shareless', ['phase6', 'shareless'],
-     r"is not reloaded: its persistent is 16 and a reload states less, which nothing can give back.*tick 104 1.*alive", None),
+     r"is not reloaded: its persistent is 16 and a reload states less, which a loaded module's share cannot become.*tick 104 1.*alive", None),
     ('phase6-sharebig', ['phase6', 'sharebig'],
      r"is not reloaded: its persistent of 1048576 bytes does not fit in the [0-9]+ left of .budget. persistent.*tick 104 1.*alive", None),
     ('phase6-repair', ['phase6', 'repair'],
@@ -631,7 +632,11 @@ CASES = [
     ('phase4-nobytes', ['phase4', 'nobytes'],
      r"module 'view:reader@0.1.0' did not load: this backend compiles a module from its bytes, and was handed none.*alive", None),
     ('phase6-churn', ['phase6', 'churn'],
-     r"churned 200 times, 0 records of the index out of step.*alive", None),
+     r"churned 200 times, 0 loads refused, 0 records of the index out of step.*alive", None),
+    ('phase6-arenaback', ['phase6', 'arenaback'],
+     r"game:namer@0.1.0/say: kept in the arena.*game:namer@0.1.0: unloaded.*game:ticker@0.1.0: loaded.*alive", None),
+    ('phase6-arenakept', ['phase6', 'arenakept'],
+     r"game:namer@0.1.0: unloaded.*game:reader@0.1.0/say: kept in the arena.*module 'game:ticker@0.1.0' is refused: its persistent of 64 bytes does not fit in the 0 left of .budget. persistent.*game:reader@0.1.0/say: kept in the arena.*alive", None),
     ('phase6-destroy', ['phase6', 'destroy'],
      r"tick 101 1.*game:ticker@0.1.0/-: shutdown 1 0.*module 'test:hang@0.1.0': its shutdown trapped: interrupt. its teardown continues.*alive", None),
 ]

@@ -33,8 +33,9 @@ its exclusive components, each by its `on_unload` policy - `lifetime.md`, *What 
 behind*; destroy the ids held ready for it and the row its settings were on; free its module
 record; destroy the instance and its loaded image, which on the native backend closes the library.
 
-**Its persistent-arena space is not reclaimed** - `strings.md`, *It is never reclaimed*. That is what
-keeps a surviving shared component's string readable, like the float beside it.
+**Its share of the persistent arena goes back, unless a row that is staying holds a string in
+it** - `strings.md`, *It is given back when nothing points into it*. That is what keeps a
+surviving shared component's string readable, like the float beside it.
 
 **Nothing can be holding anything.** No module ever had a reference to this one - it had a query,
 and a query that now matches nothing iterates zero spans. That is what dropping calls bought: unload
@@ -86,7 +87,7 @@ must be able to follow. Refused: no reload at all on such a backend, which gives
 **What a reload may change is what is the instance's.** Fuel, limits, timeouts, the log level and
 the three sizes of the private memory all arrive with the new `cfg`, as do `spawns` and the grants.
 `persistent` too, upwards only: a reload that states more is given more, and one that states less
-is refused by name, since nothing in the arena is ever given back - `budgets.md`, *Budgets*. A
+is refused by name, since what it allocated is in that share - `budgets.md`, *Budgets*. A
 component the new instance
 no longer declares is treated as an unload treats it. And **settings are not seeded again** -
 `config.md`, *A module's own settings are a component*: after init the component is the state.

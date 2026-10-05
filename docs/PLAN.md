@@ -322,6 +322,5 @@ Each is refused or deferred in the document named, with the condition that would
     a phase exclusivity flag         `schedule.md`, *A phase is a name and nothing else*
     memory high-water per module     `profile.md`, *The profile*
     an instance-grouping entry       `backend.md`, *What the backend does not do*
-    arena mark and reset             `strings.md`, *It is never reclaimed*
     layout migration                 `lifetime.md`, *When the layout changed*
     bindings for a non-C module      `wasm.md`, *The published layouts*

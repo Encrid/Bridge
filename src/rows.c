@@ -897,6 +897,19 @@ bool rows_alive(rows *r, uint64_t id)
     return alive(r, id);
 }
 
+bool rows_any(rows *r, rows_type *type, bool (*is)(void *ctx, const uint8_t *row), void *ctx)
+{
+    for (uint32_t t = 1; t < r->table_high; t ++) {
+        const uint8_t *column;
+        if (!r->tables[t].live || !has(set_of(r, t), type->id)) continue;
+        column = r->b->shared + columns_of(r, t)[type->id];
+        for (uint32_t row = 0; row < r->tables[t].rows; row ++) {
+            if (is(ctx, column + (size_t)row * type->size)) return true;
+        }
+    }
+    return false;
+}
+
 /* ---- create and destroy ---- */
 
 rows *rows_create(bridge *b)

@@ -240,3 +240,15 @@ void config_keep(bridge *b, module *m)
     b->kept[b->kept_count].at = m->text_at;
     b->kept[b->kept_count ++].room = m->text_room;
 }
+
+
+/* Its share has gone back to the arena, and the block its settings text was in with it. */
+void config_forget(bridge *b, const module *m)
+{
+    for (uint32_t i = 0; i < b->kept_count; i ++) {
+        if (strcmp(b->kept[i].stem, m->stem)) continue;
+        free(b->kept[i].stem);
+        b->kept[i] = b->kept[-- b->kept_count];
+        return;
+    }
+}

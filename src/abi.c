@@ -414,7 +414,8 @@ static int abi_detach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
     return 0;
 }
 
-/* alloc(len) -> offset into the persistent arena. Never reclaimed - strings.md. */
+/* alloc(len) -> offset into the persistent arena. Nothing frees it while its module is
+ * loaded - strings.md. */
 static int abi_alloc(void *ud, const uint64_t *a, uint64_t *r)
 {
     module *m = ud;
@@ -424,9 +425,9 @@ static int abi_alloc(void *ud, const uint64_t *a, uint64_t *r)
     }
     /* what is left of a range too small for this is dead space, as a string that outgrew
      * its place leaves - strings.md */
-    while (len > m->arena_left && m->more_next < m->more_count) {
-        m->arena_at = m->more[m->more_next].at;
-        m->arena_left = m->more[m->more_next ++].left;
+    while (len > m->arena_left && m->own_next < m->own_count) {
+        m->arena_at = m->owned[m->own_next].at;
+        m->arena_left = m->owned[m->own_next ++].len;
     }
     if (len > m->arena_left) {
         return refuse(m, "alloc: its persistent of %lld bytes is exhausted", (long long)m->persistent);

@@ -423,12 +423,14 @@ read in its document and becomes a phase, a refusal with its condition, or nothi
             the same on one thread as on four                                         7e6eadf
     closed  a default phase set, and bridge:clock@1 and its kind: one question. Nothing ships
             either; the first real deployment, `PLAN.md` 16, states its own and asks whether
-            they are shared
+            they are shared                                                           5c4e577
     open    per-component page mapping
     open    a phase exclusivity flag
     open    memory high-water per module
     open    an instance-grouping entry
-    open    arena mark and reset
+    closed  arena mark and reset: still refused, with its condition. What was behind it is
+            not: a share goes back to the arena at unload unless a row still holds a string
+            in it, so loading and unloading no longer ends in a restart
     open    layout migration
     open    bindings for a non-C module
 

@@ -13,13 +13,93 @@ uint32_t store_offset(bridge *b, const void *p)
     return (uint32_t)(c - b->shared);
 }
 
-/* ---- columns: the column region, carved ---- */
+/* ---- a region, carved ---- */
 
-/* What storage asks for is what it gets, to sixteen bytes: a freed range is a gap, kept in
- * offset order and joined to its neighbours, and a request takes the smallest gap that holds
- * it before it takes fresh space. The gaps are kept outside the block: a module's stray write
- * must not be able to reach them. Nothing is ever taken from outside the region: a request it
- * cannot meet is refused - budgets.md, *What running out does*. */
+/* A freed range is a gap, kept in offset order and joined to its neighbours, and a request
+ * takes the smallest gap that holds it before it takes fresh space. Nothing is ever taken from
+ * outside the region: a request it cannot meet is refused - budgets.md, *What running out
+ * does*. */
+static void gap_drop(region *r, uint32_t i)
+{
+    memmove(&r->gaps[i], &r->gaps[i + 1], (r->count - i - 1) * sizeof *r->gaps);
+    r->count --;
+}
+
+void region_give(region *r, uint32_t at, uint32_t len)
+{
+    uint32_t i = 0;
+    while (i < r->count && r->gaps[i].at < at) i ++;
+    if (i && r->gaps[i - 1].at + r->gaps[i - 1].len == at) {
+        r->gaps[-- i].len += len;
+    } else {
+        /* the column region's list is as long as there may be tables, and never grows: a gap
+         * lies between two blocks. The arena's grows here, which is never at a barrier */
+        if (r->count == r->room) {
+            r->room = r->room ? r->room * 2 : 16;
+            r->gaps = realloc(r->gaps, r->room * sizeof *r->gaps);
+        }
+        memmove(&r->gaps[i + 1], &r->gaps[i], (r->count - i) * sizeof *r->gaps);
+        r->gaps[i] = (range){ at, len };
+        r->count ++;
+    }
+    if (i + 1 < r->count && r->gaps[i].at + r->gaps[i].len == r->gaps[i + 1].at) {
+        r->gaps[i].len += r->gaps[i + 1].len;
+        gap_drop(r, i + 1);
+    }
+    /* a gap at the top is not a gap: it is space never used */
+    if (r->gaps[i].at + r->gaps[i].len == r->used) {
+        r->used = r->gaps[i].at;
+        gap_drop(r, i);
+    }
+}
+
+int region_take(region *r, uint32_t len, uint32_t *at)
+{
+    uint32_t i, best = UINT32_MAX;
+    for (i = 0; i < r->count; i ++) {
+        if (r->gaps[i].len >= len && (best == UINT32_MAX || r->gaps[i].len < r->gaps[best].len)) {
+            best = i;
+        }
+    }
+    if (best != UINT32_MAX) {
+        *at = r->gaps[best].at;
+        r->gaps[best].at += len;
+        r->gaps[best].len -= len;
+        if (!r->gaps[best].len) gap_drop(r, best);
+        return 1;
+    }
+    if (len > r->len - r->used) return 0;
+    *at = r->used;
+    r->used += len;
+    return 1;
+}
+
+bool region_grow(region *r, uint32_t at, uint32_t had, uint32_t want)
+{
+    /* mostly it is the last piece handed out, and what follows it has never been used */
+    if (at + had == r->used && want - had <= r->len - r->used) {
+        r->used += want - had;
+        return true;
+    }
+    for (uint32_t i = 0; i < r->count && r->gaps[i].at <= at + had; i ++) {
+        if (r->gaps[i].at != at + had || r->gaps[i].len < want - had) continue;
+        r->gaps[i].at += want - had;
+        r->gaps[i].len -= want - had;
+        if (!r->gaps[i].len) gap_drop(r, i);
+        return true;
+    }
+    return false;
+}
+
+uint32_t region_most(const region *r)
+{
+    uint32_t most = r->len - r->used;
+    for (uint32_t i = 0; i < r->count; i ++) if (r->gaps[i].len > most) most = r->gaps[i].len;
+    return most;
+}
+
+/* ---- columns: what storage asks for is what it gets, to sixteen bytes ---- */
+
 constexpr uint32_t GRAIN = 16;
 
 static uint32_t grain(uint32_t size)
@@ -27,91 +107,28 @@ static uint32_t grain(uint32_t size)
     return (size + GRAIN - 1) & ~(GRAIN - 1);
 }
 
-static void gap_drop(bridge *b, uint32_t i)
-{
-    memmove(&b->gaps[i], &b->gaps[i + 1], (b->gap_count - i - 1) * sizeof *b->gaps);
-    b->gap_count --;
-}
-
-/* [at, at + len) is free again */
-static void give(bridge *b, uint32_t at, uint32_t len)
-{
-    uint32_t i = 0;
-    while (i < b->gap_count && b->gaps[i].at < at) i ++;
-    if (i && b->gaps[i - 1].at + b->gaps[i - 1].len == at) {
-        b->gaps[-- i].len += len;
-    } else {
-        memmove(&b->gaps[i + 1], &b->gaps[i], (b->gap_count - i) * sizeof *b->gaps);
-        b->gaps[i].at = at;
-        b->gaps[i].len = len;
-        b->gap_count ++;
-    }
-    if (i + 1 < b->gap_count && b->gaps[i].at + b->gaps[i].len == b->gaps[i + 1].at) {
-        b->gaps[i].len += b->gaps[i + 1].len;
-        gap_drop(b, i + 1);
-    }
-    /* a gap at the top is not a gap: it is space never used */
-    if (b->gaps[i].at + b->gaps[i].len == b->columns_used) {
-        b->columns_used = b->gaps[i].at;
-        gap_drop(b, i);
-    }
-}
-
-/* `len` bytes: from the smallest gap that holds them, or from the unused end. 0 if neither. */
-static int take(bridge *b, uint32_t len, uint32_t *at)
-{
-    uint32_t i, best = UINT32_MAX;
-    for (i = 0; i < b->gap_count; i ++) {
-        if (b->gaps[i].len >= len && (best == UINT32_MAX || b->gaps[i].len < b->gaps[best].len)) {
-            best = i;
-        }
-    }
-    if (best != UINT32_MAX) {
-        *at = b->gaps[best].at;
-        b->gaps[best].at += len;
-        b->gaps[best].len -= len;
-        if (!b->gaps[best].len) gap_drop(b, best);
-        return 1;
-    }
-    if (len > b->columns_len - b->columns_used) return 0;
-    *at = b->columns_used;
-    b->columns_used += len;
-    return 1;
-}
-
 void store_column_free(bridge *b, void *ptr, uint32_t size)
 {
-    give(b, (uint32_t)((uint8_t *)ptr - b->shared) - b->columns, grain(size));
+    region_give(&b->column_space, (uint32_t)((uint8_t *)ptr - b->shared) - b->columns, grain(size));
 }
 
 void *store_column_regrow(bridge *b, void *ptr, uint32_t old_size, uint32_t new_size)
 {
     uint8_t *base = b->shared + b->columns;
-    uint32_t had = grain(old_size), want = grain(new_size), at = 0, to, i;
+    uint32_t had = grain(old_size), want = grain(new_size), at = 0, to;
     if (ptr) {
         at = (uint32_t)((uint8_t *)ptr - base);
         if (want <= had) {
-            if (want < had) give(b, at + want, had - want);
+            if (want < had) region_give(&b->column_space, at + want, had - want);
             return ptr;
         }
-        /* where it is, when what follows it is free: a block mostly grows, and mostly it is
-         * the last one */
-        if (at + had == b->columns_used && want - had <= b->columns_len - b->columns_used) {
-            b->columns_used += want - had;
-            return ptr;
-        }
-        for (i = 0; i < b->gap_count && b->gaps[i].at <= at + had; i ++) {
-            if (b->gaps[i].at != at + had || b->gaps[i].len < want - had) continue;
-            b->gaps[i].at += want - had;
-            b->gaps[i].len -= want - had;
-            if (!b->gaps[i].len) gap_drop(b, i);
-            return ptr;
-        }
+        /* where it is, when what follows it is free: a block mostly grows */
+        if (region_grow(&b->column_space, at, had, want)) return ptr;
     }
-    if (!take(b, want, &to)) return nullptr;
+    if (!region_take(&b->column_space, want, &to)) return nullptr;
     if (ptr) {
         memcpy(base + to, ptr, had);
-        give(b, at, had);
+        region_give(&b->column_space, at, had);
     }
     return base + to;
 }
@@ -295,8 +312,9 @@ int store_create(bridge *b, const bridge_budget *budget)
     b->max_systems = budget->systems;
     b->max_terms = budget->terms;
     /* a gap lies between two blocks, and a table has one block: never more gaps than tables */
-    b->gap_room = b->tables + 1;
-    b->gaps = malloc(b->gap_room * sizeof *b->gaps);
+    b->column_space = (region){ .room = b->tables + 1, .len = b->columns_len };
+    b->column_space.gaps = malloc(b->column_space.room * sizeof(range));
+    b->arena_space = (region){ .len = b->arena_len };
     b->rows = rows_create(b);
     if (!b->rows) return 1;
 
@@ -322,7 +340,8 @@ void store_destroy(bridge *b)
         if (o->shared) o->api.memory_release(o->shared);
     }
     if (b->shared) os_release(b->shared, b->shared_reserve);
-    free(b->gaps);
+    free(b->column_space.gaps);
+    free(b->arena_space.gaps);
     for (i = 0; i < b->component_count; i ++) {
         schema_free(&b->components[i]->s);
         free(b->components[i]->deps);

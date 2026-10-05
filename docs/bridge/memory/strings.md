@@ -55,44 +55,53 @@ when it is stale - which the ECS frees.
 
 So **replacing a string is free and growing one is not**, which is the asymmetry to design around.
 A module that grows a string once a level will never notice. One that does it per frame exhausts
-the arena and fails by name, which under *It is never reclaimed* is fatal rather than wasteful.
+the arena and fails by name: nothing gives that space back while the module is loaded.
 
 **Bridge-ASM700 reuses its own range.** A module's `[.config]` strings are allocated by
 Bridge-ASM700 at init, from that module's own share, and `init` runs again on every load - so a day
-of unload-and-load would leak one copy per cycle. That range has exactly one owner, Bridge-ASM700
-itself, which is the property the next section's refusal turns on. So Bridge-ASM700 keeps each
-module's config-string range after the module is gone, and the next load of it writes there again
-when the text fits, and takes from its new share only when it does not.
+of unload-and-load would leak one copy per cycle wherever the module's share has to stay - *It
+is given back when nothing points into it*. So where a share stays, Bridge-ASM700 keeps the
+module's config-string range in it, and the next load of the module writes there again when the
+text fits, and takes from its new share only when it does not.
 
-## It is never reclaimed
+## It is given back when nothing points into it
 
-**Nothing frees persistent-arena space while the process runs.** Not a module, not an unload, not
-a reload. One rule with no conditions on it: anything conditional here would make cleanup depend on
-something an author was not thinking about.
+**While a module is loaded, nothing frees what it allocated.** There is no `mark` and no `reset`,
+and the ABI stays at eight. Every allocator we looked at has them - `zone.c:444`,
+`common.c:1576`, flecs' `flecs_stack_restore_cursor`, Source's `FreeToAllocPoint` - and in all
+four **the region being reset has a single owner**, who knows nobody else holds a pointer into
+it. A module does not know that: a string lives in a component another module may read under a
+grant, and a reset would invalidate offsets held by modules that never asked - the reason there
+are no immediate forms either: `abi.md`, *The ABI*.
 
-That is what makes a component's fields behave alike. A shared component survives an unload -
-`data.md`, *Structural change* - so its `float x` is still readable afterwards. Under any scheme
-that released the writer's arena, its string beside it would not be. One component with two
-survival rules by field type is a surprise no diagnostic would explain.
+**At unload its share goes back to the arena, unless a row that is staying holds a string in
+it.** Bridge-ASM700 can know what the module could not. A string a component keeps is a
+`bridge_text` field - `schema.md`, *The type set* - so every reference there is can be found:
+after the module's own components are dropped, every `bridge_text` of every row left is read,
+in a field, in an array of them, or in a struct a field holds. If none lies in the leaving
+module's share, the share is free for the next load. If one does, the share stays whole, and so
+does the string, readable like the float beside it.
 
-**So there is no `mark` and no `reset`, and the ABI stays at eight.** Every allocator we looked at
-has them - `zone.c:444`, `common.c:1576`, flecs' `flecs_stack_restore_cursor`, Source's
-`FreeToAllocPoint` - and in all four **the region being reset has a single owner**, whether by
-geometry, by one instance per subsystem, or by one author sequencing it. Ours has one writer and
-many readers by design, since a string lives in a shared component another module reads under a
-grant. A reset would invalidate offsets held by modules that never asked - the reason there are no
-immediate forms either: `abi.md`, *The ABI*.
+So no offset anybody holds in a component is ever made stale, and that is the one rule a reader
+has to know: **what a component keeps stays good for as long as the component's row does.** An
+offset kept anywhere else - in a module's own memory, or in a field that is two integers and not
+a `bridge_text` - is good only for as long as the module that allocated it is loaded.
 
-**What it costs, and it is a real cost.** The arena is a **process-lifetime high-water budget**, not
-a live-set one: a string overwritten and never read again is dead space, and so is everything an
-unloaded module allocated. **An unload-and-load cycle pays it for whatever the module allocates in
-`init` itself** - config strings are Bridge-ASM700's and are reused, *Changing one, and the cost of
-growing*, but a module that builds its own name table at init builds another one every cycle. A
-reload does not pay it, since `init` does not run again.
+**What it costs.** An unload reads every text field of every surviving row, once. Never at a
+barrier. And a share with one surviving string in it stays dead whole.
 
-A deployment that churns modules indefinitely exhausts the arena, and `alloc` then fails fatally
-and by name, which is every other budget's discipline. Unbounded churn means restarting - which is
-what idTech3 did too, a level restart clearing the hunk.
+**What it buys.** Loading and unloading modules can go on for as long as a deployment runs:
+`tests/phase6.c`, case `churn`, does two hundred cycles in an arena with room for one share. It
+could not, once: the arena was a high-water mark for the life of the process, and unbounded churn
+meant restarting. That was decided before a module's share was its own and before text was a type
+the library could see, and it was not read again when both became true.
 
-The bargain is idTech3's, taken one step further: level-lifetime allocation with no per-object
-bookkeeping, where our level is the process.
+Refused: never giving anything back, which was the rule. The condition that brings it back is the
+reading at unload proving too slow for a deployment that unloads often. Refused: `mark` and
+`reset` in the ABI. The condition is a module that must free strings in mid-life and can show
+nobody else holds them. Refused: giving back each string a row no longer holds, and not only whole
+shares, which is a general allocator inside the arena. The condition is shares kept for one
+surviving string being seen to pile up.
+
+The discipline while a module runs is still idTech3's: allocation for a lifetime, with no
+per-object bookkeeping. The lifetime is the module's, where theirs was a level's.
