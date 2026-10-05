@@ -418,7 +418,9 @@ A line is open until the commit that closes it is named beside it.
 **1. `PLAN.md`, *Not in this plan***: ten things "refused or deferred", not said which. Each is
 read in its document and becomes a phase, a refusal with its condition, or nothing.
 
-    open    the journal, record and replay
+    closed  the journal, record and replay: a phase of its own, `PLAN.md` 14, with the
+            library's half and the host's half named apart; and a case, now, that a run says
+            the same on one thread as on four
     open    a default phase set
     open    bridge:clock@1 and its kind
     open    per-component page mapping

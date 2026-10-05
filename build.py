@@ -350,6 +350,8 @@ CASES = [
      '@tests/storage-tables.txt', None),
     ('storage-stress', ['storage', 'stress'],
      '@tests/storage-stress.txt', None),
+    ('storage-stress1', ['storage', 'stress1'],
+     '@tests/storage-stress.txt', None),
     ('storage-notables', ['storage', 'notables'],
      '@tests/storage-notables.txt', None),
     ('storage-nocolumns', ['storage', 'nocolumns'],

@@ -172,6 +172,22 @@ by period - `limits.md`, *What bounds a run*.
 quiet machine and be killed on a busy one. That is the cost of wall time, and it is why fuel and a
 timeout are not interchangeable.
 
-Record and replay is what this is for, and it is not built - `PLAN.md`, *Not in this plan*. It is
-stated here because an input path that bypassed a column would quietly make a pass
-depend on something nobody can see, and no later phase could recover that.
+**That is a claim, and it has a case.** `tests/storage.c` runs four modules through eight million
+changes on four threads and again on one, and what they say of their own account has to be the
+same file, word for word, on every run. `[checks] validate` hashes every column at every barrier
+- `validation.md`, *The checksum pass, when asked* - and with it the same is held barrier by
+barrier: `PLAN.md`, phase 13.
+
+It is stated here because an input path that bypassed a column would quietly make a pass depend
+on something nobody can see, and nothing later could recover that.
+
+**Recording a run and playing it back is what this is for**, and it is `PLAN.md`, phase 14. The
+work is in two halves, and `split.md`, *The split*, is what divides it:
+
+    Bridge-ASM700     what a recording is made of, and nothing on disk: handing a host what
+                      native modules wrote at a barrier, and taking a recorded set in place of
+                      running them; and the promise that a run played back is the run recorded
+    the host          the journal: its file and its format, when a run is recorded, and driving
+                      one that is played back
+
+A journal may not drop a record, which is why it is not the log's path - `log.md`, *The log*.

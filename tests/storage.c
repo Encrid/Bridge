@@ -5,6 +5,8 @@
  *     storage tables      ten thousand tables
  *     storage stress      four modules at once on four threads, eight million changes, each
  *                         keeping its own account of what should be there and checking it
+ *     storage stress1     the same on one thread, which must say the same, word for word:
+ *                         schedule.md, *What a pass depends on*
  *     storage notables    [budget] tables used up: the entity is left as it was, and it is a
  *     storage nocolumns   failure of the module that asked. The same for [budget] columns
  *     storage scribble    a module writes over what storage publishes in the shared block
@@ -150,6 +152,7 @@ int main(int argc, char **argv)
 
     /* the stress run is the one thing here that is run on more than one thread */
     if (!strcmp(what, "stress")) cfg.threads = 4;
+    if (!strcmp(what, "stress1")) what = "stress";      /* the same, on the caller's thread alone */
     if (!strcmp(what, "notables")) cfg.budget.tables = 1;
     if (!strcmp(what, "nocolumns")) cfg.budget.columns = 64;
     if (!strcmp(what, "stripfull")) cfg.budget.columns = 160;

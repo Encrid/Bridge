@@ -246,10 +246,36 @@ counters - and `bridge_profile`, a pull. `validation.md`, *The checksum pass, wh
 `profile.md`, *The profile*.
 
 *Done when a deliberate stray write is reported with the module that made it, a system made slow on
-purpose is the one the profile names, and an observer cycle shows as call counts that never fall to
-zero.*
+purpose is the one the profile names, an observer cycle shows as call counts that never fall to
+zero, and one deployment run twice, and on one thread and on four, gives the same checksum of
+every column at every barrier - `schedule.md`, *What a pass depends on*.*
 
-## 14. Tests, by capability
+## 14. Record and replay
+
+A pass depends on storage, the phase asked for, and what native modules wrote, and on nothing
+else - `schedule.md`, *What a pass depends on*. The design has paid for that since phase 0: one
+path in, no deadline on a system. This phase is what it was paid for. It was listed as not in this
+plan, with no condition and no phase, which is a deferral; it is planned now.
+
+**The library's half, here.** What a recording is made of, and the two things a host needs to
+make one and to play one: to be handed what native modules wrote at a barrier, and to supply a
+recorded set in place of running them. No file, no format, no clock: `split.md`, *The split*. What
+exactly the set is, and what a played-back run does with a native module's code, are this phase's
+questions, each by the method of `PHASE0.md`.
+
+**The host's half, in the host's repository.** The journal: its file, its format, when a run is
+recorded and how one is played back. It is listed there, and it is not this repository's to build.
+
+After diagnostics, because the checksum pass is how a replay is judged; before the tests by
+capability, so that their list is whole.
+
+*Done when a run is recorded and played back inside this repository's own tests, with a native
+module that writes something different every run, and the checksum of every column at every
+barrier is the same in both; a played-back run that is handed a set recorded from another
+deployment is refused by name; and the standalone host records a run to a file and plays it back
+from one, in its own repository.*
+
+## 15. Tests, by capability
 
 Every test so far was written to meet one phase's claim, and is named for the phase: `phase2`
 to `phase6`. That says when a thing was built and not what is covered. This phase turns the
@@ -270,7 +296,7 @@ one that has none; no case is named for a phase; every case passes on Windows, L
 alone and with several copies running at once; and the standalone host's capabilities are covered
 the same way in its own repository.*
 
-## 15. Prove it
+## 16. Prove it
 
 Port the original Bridge's Godot adapter to this design, as a native module. It is a real workload
 with a measured baseline, which is why it is the proof. Its probe asserts 191 checks, and two of
@@ -285,7 +311,6 @@ find out here.*
 
 Each is refused or deferred in the document named, with the condition that would bring it in.
 
-    the journal, record and replay   `schedule.md`, *What a pass depends on*
     a default phase set              `schedule.md`, *Bridge-ASM700 ships no phase names*
     bridge:clock@1 and its kind      `no-builtins.md`, *No builtins*
     per-component page mapping       `costs.md`, *What we give up*
