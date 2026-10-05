@@ -39,7 +39,6 @@ int bridge_destroy(bridge *b)
     uint32_t i;
     module *m;
     if (!b) return 0;
-    store_enter(b);
     /* pinned.md: a pinned module's shutdown is its code, and runs on its thread or not at
      * all. Refused before anything is touched, so the bridge is whole for the call that can. */
     for (m = b->modules; m; m = m->next) {
@@ -242,7 +241,6 @@ int bridge_stopped(bridge *b, const char *repairing)
 int bridge_phase(bridge *b, const char *name)
 {
     uint32_t phase;
-    store_enter(b);
     if (bridge_stopped(b, nullptr)) return 1;
     for (phase = 0; phase < b->phase_count; phase ++) {
         if (name && !strcmp(b->phases[phase], name)) break;

@@ -94,8 +94,6 @@ struct rows {
     uint64_t  *scratch;             /* two sets */
 };
 
-void rows_enter([[maybe_unused]] rows *r) { }
-
 /* ---- sets ---- */
 
 static bool has(const uint64_t *set, uint32_t type) { return set[type >> 6] >> (type & 63) & 1; }
@@ -248,7 +246,7 @@ static void table_gone(rows *r, uint32_t t)
 {
     table *tab = &r->tables[t];
     uint32_t i = hashed(r, set_of(r, t)), k;
-    if (tab->block) store_column_free(r->b, r->b->shared + tab->block, (int32_t)tab->block_len);
+    if (tab->block) store_column_free(r->b, r->b->shared + tab->block, tab->block_len);
     /* out of the hash, and what followed it in its run moved up to where it is still found */
     while (r->hash[i] != t) i = (i + 1) & (r->hash_room - 1);
     r->hash[i] = 0;
@@ -560,8 +558,6 @@ uint32_t rows_reserve(rows *r, uint64_t *ids, uint32_t want)
     return count;
 }
 
-void rows_settle([[maybe_unused]] rows *r) { }
-
 uint32_t rows_tables(rows *r)
 {
     return r->table_room + 1;
@@ -727,9 +723,8 @@ static void widen(rows *r, uint32_t types)
     }
 }
 
-enum rows_declared rows_declare(rows *r, const char *ns, const char *name, enum bridge_kind kind,
-                                const char *desc, rows_type **type, uint32_t *size,
-                                uint32_t *align, const char **why)
+rows_type *rows_declare(rows *r, const char *ns, const char *name, enum bridge_kind kind,
+                        const char *desc, uint32_t *size, uint32_t *align, const char **why)
 {
     static thread_local char said[200];
     looking l = { r, ns };
@@ -739,7 +734,7 @@ enum rows_declared rows_declare(rows *r, const char *ns, const char *name, enum 
 
     if (schema_parse(kind, desc, find, &l, &s, said, sizeof said)) {
         *why = said;
-        return ROWS_NOT_DESCRIBED;
+        return nullptr;
     }
     for (id = 0; id < r->type_count && r->types[id]; id ++) {}
     if (id == r->type_count) {
@@ -756,10 +751,9 @@ enum rows_declared rows_declare(rows *r, const char *ns, const char *name, enum 
     t->name = copy(name, strlen(name));
     t->s = s;
     r->types[id] = t;
-    *type = t;
     *size = s.size;
     *align = s.align;
-    return ROWS_DECLARED;
+    return t;
 }
 
 uint32_t rows_fields([[maybe_unused]] rows *r, rows_type *type, const rows_field **fields)

@@ -6,11 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-void store_enter(bridge *b)
-{
-    rows_enter(b->rows);
-}
-
 uint32_t store_offset(bridge *b, const void *p)
 {
     const uint8_t *c = p;
@@ -23,18 +18,13 @@ uint32_t store_offset(bridge *b, const void *p)
 /* What storage asks for is what it gets, to sixteen bytes: a freed range is a gap, kept in
  * offset order and joined to its neighbours, and a request takes the smallest gap that holds
  * it before it takes fresh space. The gaps are kept outside the block: a module's stray write
- * must not be able to reach them. */
+ * must not be able to reach them. Nothing is ever taken from outside the region: a request it
+ * cannot meet is refused - budgets.md, *What running out does*. */
 constexpr uint32_t GRAIN = 16;
 
-static uint32_t grain(int32_t size)
+static uint32_t grain(uint32_t size)
 {
-    return ((uint32_t)size + GRAIN - 1) & ~(GRAIN - 1);
-}
-
-static int in_columns(bridge *b, const void *p)
-{
-    const uint8_t *c = p, *base = b->shared + b->columns;
-    return c >= base && c < base + b->columns_len;
+    return (size + GRAIN - 1) & ~(GRAIN - 1);
 }
 
 static void gap_drop(bridge *b, uint32_t i)
@@ -51,10 +41,6 @@ static void give(bridge *b, uint32_t at, uint32_t len)
     if (i && b->gaps[i - 1].at + b->gaps[i - 1].len == at) {
         b->gaps[-- i].len += len;
     } else {
-        if (b->gap_count == b->gap_room) {
-            b->gap_room = b->gap_room ? b->gap_room * 2 : 64;
-            b->gaps = realloc(b->gaps, b->gap_room * sizeof *b->gaps);
-        }
         memmove(&b->gaps[i + 1], &b->gaps[i], (b->gap_count - i) * sizeof *b->gaps);
         b->gaps[i].at = at;
         b->gaps[i].len = len;
@@ -93,68 +79,15 @@ static int take(bridge *b, uint32_t len, uint32_t *at)
     return 1;
 }
 
-void *store_column_alloc(bridge *b, int32_t size)
+void store_column_free(bridge *b, void *ptr, uint32_t size)
 {
-    uint32_t at;
-    if (size <= 0) return nullptr;
-    if (take(b, grain(size), &at)) return b->shared + b->columns + at;
-    /* flecs cannot be unwound from the middle of a change, so it is given what it asked for
-     * from outside the block, and the bridge stops when the barrier returns - budgets.md,
-     * *What running out does*. No module runs again to read this. */
-    b->columns_out = 1;
-    return malloc((size_t)size);
-}
-
-void store_column_free(bridge *b, void *ptr, int32_t size)
-{
-    if (!ptr) return;
-    if (!in_columns(b, ptr)) {
-        free(ptr);
-        return;
-    }
     give(b, (uint32_t)((uint8_t *)ptr - b->shared) - b->columns, grain(size));
-}
-
-void *store_column_realloc(bridge *b, void *ptr, int32_t old_size, int32_t new_size)
-{
-    void *p;
-    if (!ptr) return store_column_alloc(b, new_size);
-    if (new_size <= 0) {
-        store_column_free(b, ptr, old_size);
-        return nullptr;
-    }
-    if (in_columns(b, ptr)) {
-        uint32_t at = (uint32_t)((uint8_t *)ptr - b->shared) - b->columns;
-        uint32_t had = grain(old_size), want = grain(new_size), i;
-        if (want == had) return ptr;
-        if (want < had) {
-            give(b, at + want, had - want);
-            return ptr;
-        }
-        /* a column mostly grows, and mostly it is the last thing allocated: grow it where
-         * it is when what follows it is free */
-        if (at + had == b->columns_used && want - had <= b->columns_len - b->columns_used) {
-            b->columns_used += want - had;
-            return ptr;
-        }
-        for (i = 0; i < b->gap_count && b->gaps[i].at <= at + had; i ++) {
-            if (b->gaps[i].at != at + had || b->gaps[i].len < want - had) continue;
-            b->gaps[i].at += want - had;
-            b->gaps[i].len -= want - had;
-            if (!b->gaps[i].len) gap_drop(b, i);
-            return ptr;
-        }
-    }
-    p = store_column_alloc(b, new_size);
-    memcpy(p, ptr, (size_t)(old_size < new_size ? old_size : new_size));
-    store_column_free(b, ptr, old_size);
-    return p;
 }
 
 void *store_column_regrow(bridge *b, void *ptr, uint32_t old_size, uint32_t new_size)
 {
     uint8_t *base = b->shared + b->columns;
-    uint32_t had = grain((int32_t)old_size), want = grain((int32_t)new_size), at = 0, to, i;
+    uint32_t had = grain(old_size), want = grain(new_size), at = 0, to, i;
     if (ptr) {
         at = (uint32_t)((uint8_t *)ptr - base);
         if (want <= had) return ptr;
@@ -273,7 +206,6 @@ void store_barrier(bridge *b)
 
     rows_apply(b->rows);                /* queued changes applied */
     for (m = b->modules; m; m = m->next) store_refill(b, m);
-    rows_settle(b->rows);
     do {                                /* spans republished */
         tables = rows_tables(b->rows);
         for (m = b->modules; m; m = m->next) {
@@ -294,12 +226,6 @@ void store_barrier(bridge *b)
     schedule_account(b);                /* failure.md, *The budget* */
     for (m = b->modules; m; m = m->next) store_drain(b, m);
     b->barriers ++;
-
-    if (b->columns_out && !b->stopped_by) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "the bridge has stopped: [budget] columns of %u bytes "
-            "ran out", b->columns_len);
-        b->stopped_by = copy("[budget] columns ran out", 24);
-    }
 }
 
 /* ---- create and destroy ---- */
@@ -366,11 +292,6 @@ int store_create(bridge *b, const bridge_budget *budget)
     b->gaps = malloc(b->gap_room * sizeof *b->gaps);
     b->rows = rows_create(b);
     if (!b->rows) return 1;
-    if (b->columns_out) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] columns of %u bytes does not hold flecs' own "
-            "tables, before any module's", b->columns_len);
-        return 1;
-    }
 
     for (i = 0; i < b->backend_count; i ++) {
         open_backend *o = &b->backends[i];
@@ -388,7 +309,6 @@ int store_create(bridge *b, const bridge_budget *budget)
 void store_destroy(bridge *b)
 {
     uint32_t i;
-    /* first: what storage frees of the column region, it frees through the gap list */
     if (b->rows) rows_destroy(b->rows);
     for (i = 0; i < b->backend_count; i ++) {
         open_backend *o = &b->backends[i];

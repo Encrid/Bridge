@@ -171,8 +171,7 @@ struct bridge {
     uint32_t       columns, columns_len, columns_used;
     gap           *gaps;            /* freed column space, by offset. kept outside the block */
     uint32_t       gap_count, gap_room;
-    int            columns_out;     /* the column budget ran out during this barrier */
-    int            layout_moved;    /* a column, a table or a declaration changed */
+    int            layout_moved;    /* a module came or went, or a declaration changed */
     uint32_t       tables;          /* [budget] tables: how many may exist at once */
 
     rows          *rows;            /* who keeps the rows: rows.h */
@@ -218,7 +217,6 @@ void  pool_destroy(pool *p);
 void  pool_run(pool *p, pool_fn fn, void **jobs, const uint8_t *caller_only, uint32_t count);
 
 /* store.c */
-void     store_enter(bridge *b);                                  /* this thread is working for b */
 [[nodiscard]] int store_create(bridge *b, const bridge_budget *budget);    /* 0, or a record was emitted */
 void     store_destroy(bridge *b);
 int      store_refill(bridge *b, module *m);                      /* 1 if the ceiling cut its ids short */
@@ -226,13 +224,11 @@ void     store_drain(bridge *b, module *m);                       /* its log rin
 void     store_barrier(bridge *b);
 void     store_header(bridge *b, module *m);                      /* what a module reads at offset 0 */
 uint32_t store_offset(bridge *b, const void *p);                  /* into the shared memory, 0 for null */
-/* the column region, carved: what storage asks for is what it gets, to sixteen bytes */
-void    *store_column_alloc(bridge *b, int32_t size);
-void    *store_column_realloc(bridge *b, void *ptr, int32_t old_size, int32_t new_size);
-void     store_column_free(bridge *b, void *ptr, int32_t size);
-/* `new_size` bytes holding what the `old_size` at `ptr` held, or fresh if `ptr` is null. Null,
+/* the column region, carved: what storage asks for is what it gets, to sixteen bytes.
+ * `new_size` bytes holding what the `old_size` at `ptr` held, or fresh if `ptr` is null. Null,
  * and nothing changed, if the region cannot give them: nothing comes from outside it */
 [[nodiscard]] void *store_column_regrow(bridge *b, void *ptr, uint32_t old_size, uint32_t new_size);
+void     store_column_free(bridge *b, void *ptr, uint32_t size);
 
 /* abi.c */
 [[nodiscard]] int abi_define(module *m, backend_err *err);                      /* the eight imports */

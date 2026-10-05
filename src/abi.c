@@ -64,7 +64,6 @@ static int may_write(module *m, const component *c)
 /* declare(name, name_len, kind, size, align, desc, desc_len, on_unload) -> slot */
 static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
 {
-    static const char *const kind_names[] = { "", "a struct", "an enum", "a bitmask" };
     module *m = ud;
     bridge *b = m->b;
     const char *name_at = scratch(m, a[0], a[1]), *desc_at = scratch(m, a[5], a[6]);
@@ -110,21 +109,14 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         char *desc = copy(desc_at, a[6]);
         const char *why = nullptr;
         const rows_field *fields = nullptr;
-        rows_type *type = nullptr;
+        rows_type *type;
         uint32_t laid = 0, aligned = 0, field_count, k;
-        enum rows_declared declared;
 
         *bare = 0;
-        declared = rows_declare(b->rows, name, bare + 1, kind, desc, &type, &laid, &aligned, &why);
+        type = rows_declare(b->rows, name, bare + 1, kind, desc, &laid, &aligned, &why);
         *bare = ':';
         free(desc);
-        if (declared == ROWS_NOT_DESCRIBED) {
-            return refuse(m, "component '%s': its descriptor does not describe %s, or names a "
-                "type its namespace has not declared", name, kind_names[kind]);
-        }
-        if (declared == ROWS_NOT_STORABLE) {
-            return refuse(m, "component '%s' holds %s, which no column can", name, why);
-        }
+        if (!type) return refuse(m, "component '%s': its descriptor %s", name, why);
         if (laid != size || aligned != align) {
             rows_undeclare(b->rows, type);
             return refuse(m, "component '%s' is %u bytes aligned to %u in the module and %d "
@@ -257,15 +249,8 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         s->writes[i] = t.access != BRIDGE_IN;
     }
 
-    /* storage refuses what has no base-and-stride form: one span a table assumes that every
-     * term matches whole tables */
     s->matched = events ? rows_observer(b->rows, asked, count, events, heard, s)
                : count ? rows_system(b->rows, asked, count) : nullptr;
-    if (count && !s->matched) {
-        free(s);
-        return refuse(m, "%s '%s' asks for something flecs refuses, or a term with no "
-            "base-and-stride form", what, name);
-    }
 
     snprintf(full, sizeof full, "%s:%s", m->stem, name);
     s->m = m;
@@ -319,7 +304,7 @@ static int abi_observe(void *ud, const uint64_t *a, uint64_t *r)
     return subscribe(m, a[0], a[1], m->b->phase_count, (uint32_t)a[2], a[3], a[4], r);
 }
 
-/* Nothing below touches flecs. Modules run at once, and what one asks for must not depend on
+/* Nothing below touches storage. Modules run at once, and what one asks for must not depend on
  * who ran beside it - schedule.md, *What a pass depends on*. So an id comes from a block set
  * aside for the module, arena space from its own share, and a change goes on its own queue,
  * which the barrier applies in an order that never varies. No lock: a module's systems are

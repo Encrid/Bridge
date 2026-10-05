@@ -91,7 +91,6 @@ static uint64_t barrier(bridge *b, const char *phase)
     uint32_t i;
     uint64_t t;
     for (i = 0; i < PHASES && strcmp(phases[i], phase); i ++) { }
-    store_enter(b);
     schedule_run(b, i);
     t = os_now();
     store_barrier(b);

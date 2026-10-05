@@ -30,7 +30,7 @@ typedef struct {
 
 /* Every one is stated: zero is unset, and refused. docs/bridge/memory/budgets.md. */
 typedef struct {
-    uint64_t entities;        /* the index mirror ceiling */
+    uint64_t entities;        /* how many entities there may be, less one: index 0 is none */
     uint64_t persistent;      /* the persistent arena, in bytes */
     uint64_t columns;         /* component columns and entity arrays, in bytes */
     uint32_t max_modules;     /* how many modules are loaded at once */
@@ -101,7 +101,7 @@ typedef struct {
     uint32_t    len;
     uint32_t    when;                /* barrier count, then offset in the phase */
     uint32_t    arg[2];
-    int8_t      level;               /* negative is worse - flecs' convention */
+    int8_t      level;               /* negative is worse */
 } bridge_record;
 
 /* two points on that scale, which is a number and not a set: any level may be written */

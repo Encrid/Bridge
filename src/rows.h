@@ -3,7 +3,7 @@
  * Each entry is named for the request, as the backend seam's are, and not for how any storage
  * goes about it: at load a type is declared and a system's terms are handed over, at a barrier
  * the queues are applied and what a module reads is written, at unload a component is dropped.
- * Whether a barrier is worked a change at a time or an entity at a time is storage's own.
+ * How a barrier is worked is storage's own: src/rows.c says how, and why.
  *
  * Nothing here is reachable from a module or from a host. */
 #ifndef BRIDGE_ROWS_H
@@ -21,9 +21,6 @@ typedef struct rows_terms rows_terms;   /* a system's terms, or an observer's, m
 /* nullptr if it cannot be made, and a record says why */
 [[nodiscard]] rows *rows_create(bridge *b);
 void rows_destroy(rows *r);
-/* this thread is about to work for this storage. For as long as a storage's own callbacks
- * carry no context, that is how they find it */
-void rows_enter(rows *r);
 
 /* ---- at load ---- */
 
@@ -41,18 +38,12 @@ typedef struct {
     rows_type     *type;        /* the declared type an enum, a bitmask or a struct field names */
 } rows_field;
 
-enum rows_declared : uint8_t {
-    ROWS_DECLARED = 0,
-    ROWS_NOT_DESCRIBED,         /* the text is not such a type, or names one not declared */
-    ROWS_NOT_STORABLE           /* it holds something no column can, and `why` says what */
-};
-
-/* A type from its descriptor: `ns` is where a field's bare type name is looked for. On
- * ROWS_DECLARED, `size` and `align` are what the text lays out to. */
-[[nodiscard]] enum rows_declared rows_declare(rows *r, const char *ns, const char *name,
-                                              enum bridge_kind kind, const char *desc,
-                                              rows_type **type, uint32_t *size, uint32_t *align,
-                                              const char **why);
+/* A type from its descriptor: `ns` is where a field's bare type name is looked for. The type,
+ * with what the text lays out to in `size` and `align`; or nullptr, and `why` is the rest of a
+ * sentence that begins "its descriptor" and names the word it stopped at. */
+[[nodiscard]] rows_type *rows_declare(rows *r, const char *ns, const char *name,
+                                      enum bridge_kind kind, const char *desc, uint32_t *size,
+                                      uint32_t *align, const char **why);
 void rows_undeclare(rows *r, rows_type *type);
 /* a struct's fields, in the order it states them: how many, and where the first is */
 uint32_t rows_fields(rows *r, rows_type *type, const rows_field **fields);
@@ -67,7 +58,6 @@ typedef struct {
 /* who an observer is owed for, and how: one call a change, in the order they were applied */
 typedef void (*rows_heard)(void *ctx, uint64_t id, enum bridge_event event);
 
-/* nullptr if the terms ask for something that has no base-and-stride form */
 [[nodiscard]] rows_terms *rows_system(rows *r, const rows_term *terms, uint32_t count);
 [[nodiscard]] rows_terms *rows_observer(rows *r, const rows_term *terms, uint32_t count,
                                         enum bridge_event events, rows_heard heard, void *ctx);
@@ -80,9 +70,6 @@ void rows_forget(rows *r, rows_terms *terms);
 void rows_apply(rows *r);
 /* up to `want` ids with nothing on them, for a module to hand out: how many there were */
 uint32_t rows_reserve(rows *r, uint64_t *ids, uint32_t want);
-/* Once a barrier, when everything has been applied and set aside and before anything is
- * written for a module: whatever storage still owes the entity index, it settles now. */
-void rows_settle(rows *r);
 /* what a module reads: its spans, its column_base, its observers' lists. 1 if they do not fit */
 [[nodiscard]] int rows_publish(rows *r, module *m);
 /* once every module has been written for: what changed since the last time is forgotten */

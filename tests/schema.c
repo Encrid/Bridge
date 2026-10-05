@@ -119,7 +119,7 @@ int main()
     constants(BRIDGE_BITMASK, "{ Loud = 1, Wide = 2 }", (int32_t[]){ 1, 2 }, 2);
     constants(BRIDGE_BITMASK, "{ Top = 0x80000000 }", (int32_t[]){ INT32_MIN }, 1);
 
-    /* what flecs' parser took and this one does not, and what was never C */
+    /* what a looser parser would take and this one does not, and what was never C */
     refused(BRIDGE_STRUCT, "{ unsigned x; }", "'unsigned'");
     refused(BRIDGE_STRUCT, "{ _Bool b; }", "'_Bool'");
     refused(BRIDGE_STRUCT, "{ ecs_entity_t e; }", "'ecs_entity_t'");

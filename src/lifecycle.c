@@ -441,7 +441,6 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     enum backend_capability demands = 0;
     module *m, *other;
 
-    store_enter(b);
     if (bridge_stopped(b, id) || checks(b, a, &o, &demands)) return 1;
     other = loaded(b, id);
     if (other) {
@@ -545,7 +544,6 @@ int bridge_unload(bridge *b, const char *identity)
 {
     char why[256];
     module *m;
-    store_enter(b);
     if (bridge_stopped(b, nullptr)) return 1;
     for (m = b->modules; m && (!identity || strcmp(m->identity, identity)); m = m->next) {}
     if (!m) {
@@ -576,7 +574,6 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     module *old, *n, **link;
     int side_by_side;
 
-    store_enter(b);
     if (bridge_stopped(b, id) || checks(b, a, &o, &demands)) return 1;
     old = loaded(b, id);
     if (!old) {

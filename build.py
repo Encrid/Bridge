@@ -4,7 +4,6 @@
     python build.py test [-k NAME]       build, then run the tests (all, or those matching)
     python build.py --target T ...       x86_64-windows-gnu | x86_64-linux-gnu | aarch64-macos
     python build.py --debug ...          unoptimised, with debug information
-    python build.py --storage S ...      flecs | own: who keeps the rows. Both, when not said
 
 Needs zig and wasm-tools on the path. Binaryen is taken from BINARYEN_ROOT or the path, and on
 Windows fetched at its pin when it is in neither. Every path is taken from where this file is
@@ -54,19 +53,8 @@ FEATURES = ['--enable-multimemory', '--enable-bulk-memory', '--enable-sign-ext',
 ROW_TEST = '(if (i32.ge_u (local.get $row) (local.get $count)) (then (unreachable)))'
 TIMEOUT = 120
 
-# flecs, patched: the name, and the groups of the patch left out. Only the tests that must fail
-# use the last two.
-FLECS = [('flecs', []), ('flecs-unconfined', ['allocator']), ('flecs-nohook', ['hook'])]
-
-BRIDGE = ['bridge', 'lifecycle', 'config', 'store', 'abi', 'schedule', 'pool', 'backend']
-# who keeps the rows, behind src/rows.h: the files of the library that do it, by --storage. While
-# both are in the tree every case is run on both, but for those that are about flecs itself.
-ROWS = ('flecs', 'own')
-FLECS_ONLY = ('tables', 'confined', 'rowmove', 'confined-unconfined', 'rowmove-nohook',
-              'patch-version')
-# and the cases, by name, of what only storage of our own does: docs/plan/PHASE10.md
-OWN_ONLY = ('storage-notables', 'storage-nocolumns', 'storage-scribble')
-
+BRIDGE = ['bridge', 'lifecycle', 'config', 'store', 'rows', 'schema', 'abi', 'schedule', 'pool',
+          'backend']
 # a native module is a shared library: the name, its source, what it is compiled with. The same
 # library twice is one module to the loader, so one source is built under several names.
 NATIVE = [
@@ -178,7 +166,7 @@ def binaryen(build):
     return merge, opt
 
 
-def build(target, debug, out, storage):
+def build(target, debug, out):
     row = TARGETS[target]
     exe, lib = row['program'], row['library']
     zig = tool('zig') or die('zig is not on the path')
@@ -191,7 +179,7 @@ def build(target, debug, out, storage):
     cc = [zig, 'cc', '-target', target] + (['-O0', '-g'] if debug else ['-O2', '-DNDEBUG'])
     cc += row['compile']
     # an error, since zig says a warning once and then answers from its cache without it. Members
-    # an initializer leaves out are zero, which C states and flecs' descriptors are written for.
+    # an initializer leaves out are zero, which C states.
     ours = cc + ['-std=c23', '-pedantic-errors', '-Wall', '-Wextra', '-Werror',
                  '-Wno-missing-field-initializers']
     system, here = row['link'], row['beside']
@@ -199,30 +187,7 @@ def build(target, debug, out, storage):
     headers = [Path(__file__)] + [h for d in ('include', 'src', 'tests', 'tests/modules')
                                   for h in (ROOT / d).glob('*.h')]
 
-    # ---- flecs, patched at build time from the pristine copy: third_party/ is never edited ----
-    patch, pristine = ROOT / 'tools/patch-flecs.py', ROOT / 'third_party/flecs'
-    for name, omit in FLECS if storage == 'flecs' else []:
-        step('patching flecs into %s' % name,
-             [out / name / f for f in ('flecs.c', 'flecs.h', 'flecs_confine.h')],
-             [patch, pristine / 'flecs.c', pristine / 'flecs.h'],
-             [[sys.executable, patch, pristine, out / name] + [a for g in omit for a in ('--omit', g)]])
-
-    # the script declines a flecs it was not written for: a copy that says it is another version
-    other = out / 'other-version'
-
-    def another_version():
-        header = (pristine / 'flecs.h').read_text(encoding='utf-8')
-        changed = header.replace('#define FLECS_VERSION_PATCH 6', '#define FLECS_VERSION_PATCH 7')
-        if changed == header:
-            die('flecs.h: its patch version is not where the build expects it')
-        (other / 'flecs.h').write_text(changed, encoding='utf-8')
-        shutil.copyfile(pristine / 'flecs.c', other / 'flecs.c')
-    if storage == 'flecs':
-        step('another flecs version', [other / 'flecs.h', other / 'flecs.c'],
-             [pristine / 'flecs.h', pristine / 'flecs.c', Path(__file__)], [another_version])
-
     # ---- objects ----
-    flecs = '-I%s' % (out / 'flecs')
     defines = ['-D%s="%s"' % (key, path.as_posix()) for key, path in
                [('BACKEND_PATH', backends / ('bridge-wasm' + lib)),
                 ('NATIVE_PATH', backends / ('bridge-native' + lib)), ('MODULE_DIR', modules)] +
@@ -235,34 +200,16 @@ def build(target, debug, out, storage):
                          [flags + ['-c', source, '-o', obj / (name + '.o')]]))
         return obj / (name + '.o')
 
-    flecs_o = {}
-    for name, _ in FLECS if storage == 'flecs' else []:
-        # built on its own terms: its own warnings, none of ours
-        flecs_o[name] = compile_(name, out / name / 'flecs.c',
-                                 cc + ['-std=c99', '-w', '-I%s' % (out / name)])
-        for test in ('confined', 'rowmove'):
-            compile_('%s-%s' % (test, name), ROOT / 'tests' / (test + '.c'),
-                     ours + ['-I%s' % (out / name)], [out / name / 'flecs.h'])
     os_o = compile_('os', ROOT / 'src/os.c', ours + [src])
     bridge_o = [compile_(name, ROOT / 'src' / (name + '.c'), ours + [include, src]) for name in BRIDGE]
-    if storage == 'flecs':
-        bridge_o.append(compile_('rows-flecs', ROOT / 'src/rows-flecs.c', ours + [include, src, flecs],
-                                 [out / 'flecs/flecs.h']))
-        bridge_o.append(flecs_o['flecs'])
-    else:
-        bridge_o.append(compile_('rows', ROOT / 'src/rows.c', ours + [include, src]))
     wasm_o = compile_('wasm', ROOT / 'backends/wasm/wasm.c',
                       ours + [include, src, '-I%s' % (wasmtime / 'include')])
     native_o = compile_('native', ROOT / 'backends/native/native.c', ours + [include, src])
-    schema_o = compile_('schema', ROOT / 'src/schema.c', ours + [include, src])
     schema_test_o = compile_('schema-test', ROOT / 'tests/schema.c', ours + [include, src])
     adopt_o = compile_('adopt', ROOT / 'tests/adopt.c', ours + [include, src] + defines)
     phase_o = {name: compile_(name, ROOT / 'tests' / (name + '.c'), ours + [include] + defines)
                for name in ('phase2', 'phase3', 'phase4', 'phase5', 'phase6')}
-    inside_o = {'storage': compile_('storage', ROOT / 'tests/storage.c', ours + [include, src] + defines)}
-    if storage == 'flecs':
-        inside_o['tables'] = compile_('tables', ROOT / 'tests/tables.c',
-                                      ours + [include, src, flecs] + defines, [out / 'flecs/flecs.h'])
+    storage_o = compile_('storage', ROOT / 'tests/storage.c', ours + [include, src] + defines)
     module_o = {name: compile_(name, ROOT / 'tests/modules/native' / (source + '.c'),
                                ours + [include] + ['-D' + d for d in flags])
                 for name, source, flags in NATIVE}
@@ -286,18 +233,12 @@ def build(target, debug, out, storage):
     link('backends/bridge-native', [native_o, os_o], system, shared=True)
     for name, _, _ in NATIVE:
         link(name, [module_o[name]], shared=True)
-    for test, variant, name in ((('confined', 'flecs', 'confined'), ('rowmove', 'flecs', 'rowmove'),
-                                 ('confined', 'flecs-unconfined', 'confined-unconfined'),
-                                 ('rowmove', 'flecs-nohook', 'rowmove-nohook'))
-                                if storage == 'flecs' else ()):
-        link(name, [obj / ('%s-%s.o' % (test, variant)), flecs_o[variant]], system)
     link('adopt', [adopt_o, obj / 'backend.o', os_o], system)
-    link('schema', [schema_test_o, schema_o], system)
-    whole = bridge_o + [os_o] + ([schema_o] if storage == 'own' else [])
+    link('schema', [schema_test_o, obj / 'schema.o'], system)
+    whole = bridge_o + [os_o]
     for name, o in phase_o.items():
         link(name, [o] + whole, system)
-    for name, o in inside_o.items():
-        link(name, [o] + whole, system)
+    link('storage', [storage_o] + whole, system)
     together(links)
 
     # ---- wasm modules: text assembled, C compiled and merged with the accessors ----
@@ -331,23 +272,18 @@ def build(target, debug, out, storage):
             [opt, merged] + FEATURES + ['-O3', '--remove-exports=acc_*',
                                          '--remove-unused-module-elements', '-o', final]]))
     together(compiled)
-    return {'python': sys.executable, 'patch': patch, 'other': other, 'nocall': ROOT / 'tools/nocall.py',
+    return {'python': sys.executable, 'nocall': ROOT / 'tools/nocall.py',
             'wasm-tools': wasm_tools, 'modules': modules, 'exe': exe}
 
 
-def test(out, built, only, storage):
+def test(out, built, only):
     """Each case by what it said. With a pattern, the pattern decides and the exit code does
     not: several cases are a refusal that ends the program. Without one, the exit code does."""
-    cases = [c for c in CASES if (not only or only in c[0])
-             and (c[0] not in OWN_ONLY if storage == 'flecs' else c[1][0] not in FLECS_ONLY)]
+    cases = [c for c in CASES if not only or only in c[0]]
     failed = []
     for name, command, match, never in cases:
-        if storage == 'own' and name in OWN:
-            command, match, never = OWN[name]
         argv = [str(out / (command[0] + built['exe']))] + command[1:]
-        if command[0] == 'patch-version':
-            argv = [str(built[k]) for k in ('python', 'patch', 'other')] + [str(built['other'] / 'out')]
-        elif command[0] == 'c23':
+        if command[0] == 'c23':
             argv = [str(built['python']), str(ROOT / 'tools/c23.py')]
         elif command[0] == 'nocall':
             argv = [str(built[k]) for k in ('python', 'nocall', 'wasm-tools')] + \
@@ -374,26 +310,11 @@ def test(out, built, only, storage):
             continue
         print('FAIL  %s: %s\n%s' % (name, why, said))
         failed.append(name)
-    print('%d of %d passed, on storage that is %s' % (len(cases) - len(failed), len(cases), storage))
+    print('%d of %d passed' % (len(cases) - len(failed), len(cases)))
     if failed:
         die('failed: %s' % ' '.join(failed))
     if not cases:
         die('no test is named like %r' % only)
-
-
-# The cases a decision of docs/plan/PHASE10.md changed the answer of, as storage of our own
-# answers them: what is run, what it must say, what it must not.
-OWN = {
-    # out of columns: the entities that did not fit are left as they were, and the bridge runs on
-    'phase3-nocolumns': (['phase3', 'nocolumns', '4096'],
-                         r"module 'game:mover@0.1.0': .budget. columns of 4096 bytes is used up. Left as "
-                         r"they were, of the entities it changed: 747 .*moved 2 253.*alive",
-                         r"has stopped"),
-    # [budget] entities counts entities and nothing else: index 0 is no entity, so 1 holds none
-    'phase6-configceiling': (['phase6', 'configceiling', '1'],
-                             r"the row its settings go on does not fit under .budget. entities of 1 .*alive",
-                             None),
-}
 
 
 def main():
@@ -402,7 +323,6 @@ def main():
     ap.add_argument('--target', choices=sorted(TARGETS))
     ap.add_argument('--debug', action='store_true')
     ap.add_argument('--out', type=Path, help='where to build: build/<target> beside this file')
-    ap.add_argument('--storage', choices=ROWS, help='who keeps the rows: both, when not said')
     ap.add_argument('-k', metavar='NAME', help='only the tests whose name has this in it')
     args = ap.parse_args()
     machine = (platform.system(), platform.machine())
@@ -411,11 +331,9 @@ def main():
     if args.command == 'test' and target != mine:
         die('%s cannot be run here: build it, and test it where it runs' % target)
     out = (args.out or ROOT / 'build' / (target + ('-debug' if args.debug else ''))).resolve()
-    for storage in [args.storage] if args.storage else ROWS:
-        where = out if storage == 'flecs' else out.with_name(out.name + '-own')
-        built = build(target, args.debug, where, storage)
-        if args.command == 'test':
-            test(where, built, args.k, storage)
+    built = build(target, args.debug, out)
+    if args.command == 'test':
+        test(out, built, args.k)
 
 
 # Every case: its name, what is run, what its output must match, what it must not. A phase's
@@ -440,16 +358,6 @@ CASES = [
      '@tests/storage-scribble.txt', None),
     ('storage-measure', ['storage', 'measure'],
      r"an id handed out +[0-9.]+ ns each.*ten thousand tables made.*the stress run, on 1 thread.*alive", None),
-    ('confined', ['confined'],
-     None, None),
-    ('rowmove', ['rowmove'],
-     None, None),
-    ('confined-unconfined', ['confined-unconfined'],
-     r"FAIL: [0-9]+ pointers escaped the block", None),
-    ('rowmove-nohook', ['rowmove-nohook'],
-     r"FAIL: [0-9]+ row mismatches", None),
-    ('patch-version', ['patch-version'],
-     r"version 4.1.7, and this script was written for 4.1.6", None),
     ('adopt', ['adopt'],
      None, None),
     ('phase2-ok', ['phase2', 'ok'],
@@ -506,8 +414,8 @@ CASES = [
      r"line 15 0.*test:chatty@0.1.0/-: 84 log lines were dropped: its ring holds 16.*alive", None),
     ('phase3-nospans', ['phase3', 'nospans'],
      r"module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \d+ tables.*moved 2 1000.*alive", None),
-    ('phase3-nocolumns', ['phase3', 'nocolumns', '60000'],
-     r"the bridge has stopped: .budget. columns of 60000 bytes ran out.*game:mover@0.1.0: not loaded.*update refused.*alive", None),
+    ('phase3-nocolumns', ['phase3', 'nocolumns', '4096'],
+     r"module 'game:mover@0.1.0': .budget. columns of 4096 bytes is used up. Left as they were, of the entities it changed: 747 .*moved 2 253.*alive", r"has stopped"),
     ('phase3-nophase', ['phase3', 'nophase'],
      r"phase 'render' is not one the deployment declared.*alive", None),
     ('phase3-nophases', ['phase3', 'nophases'],
@@ -575,7 +483,7 @@ CASES = [
     ('phase5-nested', ['phase5', 'nested'],
      r"read: body 2 2.*read: more 3 4.*alive", None),
     ('phase5-nested2', ['phase5', 'nested2'],
-     r"module 'game:nested@0.1.0' did not load: component 'game:Body': its descriptor does not describe a struct, or names a type its namespace has not declared.*alive", None),
+     r"module 'game:nested@0.1.0' did not load: component 'game:Body': its descriptor says 'Vec2', which is neither a type a field can be nor one its namespace has declared.*alive", None),
     ('phase4-setting', ['phase4', 'setting'],
      r"backend 'native' would not start: it knows no setting 'cache'.*bridge_create refused.*alive", None),
     ('phase5-two', ['phase5', 'two'],
@@ -692,16 +600,14 @@ CASES = [
      r"the bridge has stopped: module 'game:ticker@0.1.0' could not be reloaded and its on_error is fail.*update refused.*the bridge runs again: module 'game:ticker@0.3.0' is back.*tick 112 10.*game:ticker@0.3.0=RUNNING.*alive", None),
     ('phase6-ntimeout', ['phase6', 'ntimeout'],
      r"module 'game:ticker@0.1.0' is refused: shutdown_timeout needs 'deadline', which backend 'native' lacks.*alive", r"cannot open"),
-    ('phase6-configceiling', ['phase6', 'configceiling', '440'],
-     r"the row its settings go on does not fit under .budget. entities of 440.*alive", None),
+    ('phase6-configceiling', ['phase6', 'configceiling', '1'],
+     r"the row its settings go on does not fit under .budget. entities of 1 .*alive", None),
     ('phase4-nopath', ['phase4', 'nopath'],
      r"module 'game:mover@0.1.0' did not load: this backend opens a module's library by its path, and was handed none.*alive", None),
     ('phase4-nobytes', ['phase4', 'nobytes'],
      r"module 'view:reader@0.1.0' did not load: this backend compiles a module from its bytes, and was handed none.*alive", None),
     ('phase6-churn', ['phase6', 'churn'],
      r"churned 200 times, 0 records of the index out of step.*alive", None),
-    ('tables', ['tables'],
-     r"a table flecs swept as empty: retired.*the table of a deleted parent's children: retired.*reused.*alive", None),
     ('phase6-destroy', ['phase6', 'destroy'],
      r"tick 101 1.*game:ticker@0.1.0/-: shutdown 1 0.*module 'test:hang@0.1.0': its shutdown trapped: interrupt. its teardown continues.*alive", None),
 ]
