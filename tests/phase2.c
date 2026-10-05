@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MS 1000000ll
+#define MS 1'000'000ll
 
 static void sink(void *ud, const bridge_record *r)
 {
@@ -47,7 +47,7 @@ static bridge_artifact artifact(const char *name)
     a.cfg.trusted = false;
     a.cfg.on_error = BRIDGE_SKIP;
     a.cfg.max_system_failures = 3;
-    a.cfg.fuel = 1000000;
+    a.cfg.fuel = 1'000'000;
     a.cfg.memory_limit = 1 << 20;
     a.cfg.init_timeout = 200 * MS;
     a.cfg.reload_timeout = 200 * MS;

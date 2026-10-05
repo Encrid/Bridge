@@ -84,7 +84,7 @@ void os_event_set(os_event *e) { SetEvent(e->handle); }
 
 int os_event_wait(os_event *e, uint64_t nanos)
 {
-    DWORD ms = nanos == OS_FOREVER ? INFINITE : (DWORD)((nanos + 999999) / 1000000);
+    DWORD ms = nanos == OS_FOREVER ? INFINITE : (DWORD)((nanos + 999'999) / 1'000'000);
     return WaitForSingleObject(e->handle, ms) == WAIT_OBJECT_0;
 }
 
@@ -169,9 +169,9 @@ int os_event_wait(os_event *e, uint64_t nanos)
     struct timespec until;
     int got;
     clock_gettime(CLOCK_REALTIME, &until);
-    until.tv_sec += (time_t)(nanos / 1000000000u);
-    until.tv_nsec += (long)(nanos % 1000000000u);
-    if (until.tv_nsec >= 1000000000L) { until.tv_sec ++; until.tv_nsec -= 1000000000L; }
+    until.tv_sec += (time_t)(nanos / 1'000'000'000u);
+    until.tv_nsec += (long)(nanos % 1'000'000'000u);
+    if (until.tv_nsec >= 1'000'000'000L) { until.tv_sec ++; until.tv_nsec -= 1'000'000'000L; }
 
     pthread_mutex_lock(&e->lock);
     while (!e->set) {
@@ -195,8 +195,8 @@ uint64_t os_now()
     LARGE_INTEGER frequency, count;
     QueryPerformanceFrequency(&frequency);
     QueryPerformanceCounter(&count);
-    return (uint64_t)(count.QuadPart / frequency.QuadPart) * 1000000000ull
-         + (uint64_t)(count.QuadPart % frequency.QuadPart) * 1000000000ull / (uint64_t)frequency.QuadPart;
+    return (uint64_t)(count.QuadPart / frequency.QuadPart) * 1'000'000'000ull
+         + (uint64_t)(count.QuadPart % frequency.QuadPart) * 1'000'000'000ull / (uint64_t)frequency.QuadPart;
 }
 
 static SRWLOCK global_lock = SRWLOCK_INIT;
@@ -224,7 +224,7 @@ uint64_t os_now()
 {
     struct timespec t;
     clock_gettime(CLOCK_MONOTONIC, &t);
-    return (uint64_t)t.tv_sec * 1000000000ull + (uint64_t)t.tv_nsec;
+    return (uint64_t)t.tv_sec * 1'000'000'000ull + (uint64_t)t.tv_nsec;
 }
 
 static pthread_mutex_t global_lock = PTHREAD_MUTEX_INITIALIZER;

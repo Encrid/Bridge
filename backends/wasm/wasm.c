@@ -15,7 +15,7 @@
  * to wasmtime both, so that what memory_shape answers is what the engine assumes. */
 #define RESERVATION ((uint64_t)1 << 32)
 #define GUARD       ((uint64_t)32 << 20)
-#define PAGE        65536u
+#define PAGE        65'536u
 /* a deadline no call reaches: every store needs one once epochs are on */
 #define FAR         ((uint64_t)1 << 62)
 

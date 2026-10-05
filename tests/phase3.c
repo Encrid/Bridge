@@ -13,7 +13,7 @@
 #include <string.h>
 #include <time.h>
 
-#define MS 1000000ll
+#define MS 1'000'000ll
 
 static void sink(void *ud, const bridge_record *r)
 {
@@ -48,7 +48,7 @@ static bridge_artifact artifact(const char *identity, const char *file)
     a.cfg.trusted = false;
     a.cfg.on_error = BRIDGE_SKIP;
     a.cfg.max_system_failures = 3;
-    a.cfg.fuel = 10000000;
+    a.cfg.fuel = 10'000'000;
     a.cfg.memory_limit = 16 << 20;
     a.cfg.init_timeout = 2000 * MS;
     a.cfg.reload_timeout = 2000 * MS;
@@ -99,18 +99,18 @@ static void bench(bridge_config *cfg)
 {
     static const char *const builds[2] = { "rows", "rows-unchecked" };
     int build, metered, round, pass;
-    cfg->budget.entities = 262144;
+    cfg->budget.entities = 262'144;
     cfg->budget.columns = 64 << 20;
     for (build = 0; build < 2; build ++) {
         for (metered = 1; metered >= 0; metered --) {
             bridge *b = bridge_create(cfg, sink, nullptr);
             bridge_artifact a = artifact("game:rows@0.1.0", builds[build]);
             double best = 1e30;
-            a.cfg.fuel = metered ? 1000000000 : BRIDGE_NO_LIMIT;
+            a.cfg.fuel = metered ? 1'000'000'000 : BRIDGE_NO_LIMIT;
             a.cfg.init_timeout = BRIDGE_NO_LIMIT;
             a.cfg.reload_timeout = BRIDGE_NO_LIMIT;
             a.cfg.shutdown_timeout = BRIDGE_NO_LIMIT;
-            a.cfg.spawns = 200000;
+            a.cfg.spawns = 200'000;
             if (!b || bridge_load(b, &a)) { printf("bench: cannot load\n"); exit(2); }
             for (round = 0; round < 20; round ++) {
                 struct timespec t0, t1;
@@ -122,7 +122,7 @@ static void bench(bridge_config *cfg)
                 if (ns < best) best = ns;
             }
             printf("%-15s %-9s %.3f ns a row\n", builds[build], metered ? "fuel" : "no fuel",
-                best / (50.0 * 200000.0));
+                best / (50.0 * 200'000.0));
             bridge_destroy(b);
         }
     }

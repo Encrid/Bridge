@@ -10,7 +10,7 @@
 #else
 #include <pthread.h>
 #include <unistd.h>
-#define nap() usleep(100000)
+#define nap() usleep(100'000)
 #define thread_id() ((uint32_t)(uintptr_t)pthread_self())
 #endif
 

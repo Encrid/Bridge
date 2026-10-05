@@ -2,7 +2,7 @@
 #include "bridge-wasm.h"
 #include "game.h"
 
-#define ENTITIES 200000
+#define ENTITIES 200'000
 
 static uint32_t position, moving;
 

@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MS 1000000ll
+#define MS 1'000'000ll
 
 static void sink(void *ud, const bridge_record *r)
 {
@@ -61,7 +61,7 @@ static bridge_artifact wasm_reader()
     a.bytes = data;
     a.backend = "wasm";
     a.cfg.trusted = false;
-    a.cfg.fuel = 10000000;
+    a.cfg.fuel = 10'000'000;
     a.cfg.memory_limit = 16 << 20;
     a.cfg.init_timeout = 2000 * MS;
     a.cfg.reload_timeout = 2000 * MS;

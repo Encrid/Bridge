@@ -146,7 +146,7 @@ int main()
     os.free_ = own_free;
     ecs_os_set_api(&os);
 
-    int escaped = run(4000) + run(200000);
+    int escaped = run(4000) + run(200'000);
     if (escaped) {
         printf("FAIL: %d pointers escaped the block\n", escaped);
         return 1;

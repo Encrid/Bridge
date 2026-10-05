@@ -22,7 +22,7 @@
 #define thread_id() ((uint32_t)(uintptr_t)pthread_self())
 #endif
 
-#define MS 1000000ll
+#define MS 1'000'000ll
 
 /* the thread a native test module said it ran on, for the lines that say so */
 static uint32_t threads_seen[64], seen, pins, pins_here;
@@ -114,7 +114,7 @@ static bridge_artifact wasm(const char *identity, const char *file)
     a.bytes = data;
     a.backend = "wasm";
     a.cfg.trusted = false;
-    a.cfg.fuel = 10000000;
+    a.cfg.fuel = 10'000'000;
     a.cfg.memory_limit = 16 << 20;
     a.cfg.init_timeout = 2000 * MS;
     a.cfg.reload_timeout = 2000 * MS;

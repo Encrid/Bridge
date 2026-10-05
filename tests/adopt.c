@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define PAGE 65536u
+#define PAGE 65'536u
 
 static backend_api api;
 static backend *be;
@@ -164,8 +164,8 @@ int main()
             printf("FAIL: timed calls: %s\n", err.text);
             return 1;
         }
-        for (k = 0; k < 20000; k ++) {
-            api.instance_set_deadline(ti, 1000000000ull);
+        for (k = 0; k < 20'000; k ++) {
+            api.instance_set_deadline(ti, 1'000'000'000ull);
             if (api.call(f, &status, &err) || status != 16) {
                 printf("FAIL: timed call %d: %d: %s\n", k, status, err.text);
                 return 1;

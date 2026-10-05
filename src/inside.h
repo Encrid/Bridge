@@ -10,7 +10,7 @@
 #include "flecs.h"
 #include "flecs_confine.h"
 
-#define PAGE 65536u
+#define PAGE 65'536u
 
 typedef struct module module;
 typedef struct pool pool;

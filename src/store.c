@@ -177,13 +177,13 @@ static uint32_t table_id(bridge *b, ecs_table_t *t)
         b->table_hash_room = room;
         for (k = 1; k < b->table_count; k ++) {
             if (!b->tables[k].table) continue;      /* retired */
-            i = (uint32_t)(((uintptr_t)b->tables[k].table >> 4) * 2654435761u) & (room - 1);
+            i = (uint32_t)(((uintptr_t)b->tables[k].table >> 4) * 2'654'435'761u) & (room - 1);
             while (b->table_hash[i]) i = (i + 1) & (room - 1);
             b->table_hash[i] = k;
         }
     }
     mask = b->table_hash_room - 1;
-    i = (uint32_t)(((uintptr_t)t >> 4) * 2654435761u) & mask;
+    i = (uint32_t)(((uintptr_t)t >> 4) * 2'654'435'761u) & mask;
     while (b->table_hash[i]) {
         if (b->tables[b->table_hash[i]].table == t) return b->table_hash[i];
         i = (i + 1) & mask;

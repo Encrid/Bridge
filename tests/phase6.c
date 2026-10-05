@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MS 1000000ll
+#define MS 1'000'000ll
 
 static uint32_t path_at[4], path_count;
 static uint32_t out_of_step;
@@ -70,7 +70,7 @@ static bridge_artifact wasm(const char *identity, const char *file)
     a.bytes = data;
     a.backend = "wasm";
     a.cfg.trusted = false;
-    a.cfg.fuel = 10000000;
+    a.cfg.fuel = 10'000'000;
     a.cfg.memory_limit = 16 << 20;
     a.cfg.init_timeout = 2000 * MS;
     a.cfg.reload_timeout = 2000 * MS;
@@ -136,7 +136,7 @@ static bridge_setting everything[11] = {
     { "small", BRIDGE_INT,    { .i = 7 } },
     { "flags", BRIDGE_INT,    { .i = 3 } },             /* a bitmask, by its bits */
     { "ratio", BRIDGE_INT,    { .i = 3 } },             /* an integer into a float field */
-    { "big",   BRIDGE_INT,    { .i = 8589934592ll } },  /* more than 32 bits */
+    { "big",   BRIDGE_INT,    { .i = 8'589'934'592ll } },  /* more than 32 bits */
     { nullptr, 0, { 0 } },
 };
 

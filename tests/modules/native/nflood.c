@@ -9,7 +9,7 @@ BRIDGE_NATIVE_BIND(api)
 BRIDGE_NATIVE(flood)
 {
     uint32_t i;
-    for (i = 0; i < 100000; i ++) api->spawn();
+    for (i = 0; i < 100'000; i ++) api->spawn();
     return 0;
 }
 

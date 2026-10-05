@@ -4,7 +4,7 @@
 BRIDGE_EXPORT(flood) int flood()
 {
     uint32_t i;
-    for (i = 0; i < 1000000; i ++) bridge_spawn();
+    for (i = 0; i < 1'000'000; i ++) bridge_spawn();
     return 0;
 }
 

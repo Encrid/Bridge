@@ -34,9 +34,9 @@ static const void *scratch(module *m, uint64_t at, uint64_t len)
 
 static uint64_t fingerprint(const char *s, size_t n)
 {
-    uint64_t h = 1469598103934665603ull;       /* FNV-1a */
+    uint64_t h = 1'469'598'103'934'665'603ull;       /* FNV-1a */
     size_t i;
-    for (i = 0; i < n; i ++) h = (h ^ (uint8_t)s[i]) * 1099511628211ull;
+    for (i = 0; i < n; i ++) h = (h ^ (uint8_t)s[i]) * 1'099'511'628'211ull;
     return h;
 }
 

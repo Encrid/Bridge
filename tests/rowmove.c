@@ -61,8 +61,8 @@ static void os_free(void *p, ecs_size_t size) { (void)size; free(p); }
 
 int main()
 {
-    int32_t count = 20000, i, wrong = 0, live = 0;
-    capacity = count * 2 + 100000;
+    int32_t count = 20'000, i, wrong = 0, live = 0;
+    capacity = count * 2 + 100'000;
     shadow = calloc((size_t)capacity, sizeof(where_t));
     dirty = calloc((size_t)capacity, sizeof(ecs_entity_t));
     is_dirty = calloc((size_t)capacity, 1);
