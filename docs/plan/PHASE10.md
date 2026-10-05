@@ -364,7 +364,12 @@ no schema format*.
 `log_level` past 7 is refused: `log.md`, *The log*. The names a module writes moved to
 `bridge-abi.h`, where a native module can reach them: it had none, and wrote 0.
 
-**Still inherited from flecs, and each to be decided**: thirty-two terms a query; the texts of
+**Thirty-two terms a query: decided, and it is a key.** The number was flecs' default. A most is
+needed, since storage keeps a system's terms in a record made at create; what it is, the
+deployment states: `[budget] terms`. `BRIDGE_TERMS_MAX` is gone from the ABI header, where no
+module used it, and the refusal has the case it never had.
+
+**Still inherited from flecs, and each to be decided**: the texts of
 records that were kept word for word; when a freed index is handed out again; the shape of an id
 and of an index record. And the order of the fields of `bridge_budget`, which followed what the
 tests already wrote.

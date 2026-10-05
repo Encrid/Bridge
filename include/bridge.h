@@ -38,6 +38,7 @@ typedef struct {
     uint32_t types;           /* how many types are declared at once: components, and the
                                * structs, enums and bitmasks their fields name */
     uint32_t systems;         /* how many systems and observers are registered at once */
+    uint32_t terms;           /* how many terms one of them may have */
 } bridge_budget;
 
 /* Two systems that conflict in one phase, in the order they are to run. A system is named by

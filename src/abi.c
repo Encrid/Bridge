@@ -209,16 +209,16 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
     const char *name_at = scratch(m, name_off, name_len);
     const bridge_term *terms = scratch(m, terms_off, term_count * sizeof(bridge_term));
     uint32_t count = (uint32_t)term_count, i;
-    rows_term asked[BRIDGE_TERMS_MAX] = {};
+    rows_term *asked;
     bridge_system *s;
     char name[128], full[256];
 
     if (b->system_count >= b->max_systems) {
         return refuse(m, "it registers one more than [budget] systems of %u", b->max_systems);
     }
-    if (term_count > BRIDGE_TERMS_MAX) {
-        return refuse(m, "a%s %s asks for %llu terms and a query takes %d", events ? "n" : "",
-            what, (unsigned long long)term_count, BRIDGE_TERMS_MAX);
+    if (term_count > b->max_terms) {
+        return refuse(m, "a%s %s asks for %llu terms, which is more than [budget] terms of %u",
+            events ? "n" : "", what, (unsigned long long)term_count, b->max_terms);
     }
     if (!name_at || !terms || !name_len || name_len >= sizeof name) {
         return refuse(m, "%s: a name or a term lies outside the scratch arena", what);
@@ -238,7 +238,8 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         return refuse(m, "observer '%s' has no term, and so nothing to observe", name);
     }
 
-    s = calloc(1, sizeof *s);
+    s = calloc(1, sizeof *s + count * sizeof *s->term);
+    asked = calloc(count + 1, sizeof *asked);
     /* query.md, *What a query may not ask for* */
     for (i = 0; i < count; i ++) {
         bridge_term t;
@@ -260,20 +261,21 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
                 m->declared[t.slot]->name);
         }
         if (m->refused) {
+            free(asked);
             free(s);
             return 1;
         }
         c = m->declared[t.slot];
         asked[i].type = c->type;
         asked[i].oper = t.oper;
-        s->sizes[i] = c->size;
-        /* what the conflict graph reads: a term that must not match touches nothing */
-        s->touches[i] = t.oper == BRIDGE_NOT ? nullptr : c;
-        s->writes[i] = t.access != BRIDGE_IN;
+        /* a term that must not match touches nothing */
+        s->term[i].touches = t.oper == BRIDGE_NOT ? nullptr : c;
+        s->term[i].writes = t.access != BRIDGE_IN;
     }
 
     s->matched = events ? rows_observer(b->rows, asked, count, events, heard, s)
                : count ? rows_system(b->rows, asked, count) : nullptr;
+    free(asked);
 
     snprintf(full, sizeof full, "%s:%s", m->stem, name);
     s->m = m;

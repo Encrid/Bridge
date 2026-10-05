@@ -11,6 +11,7 @@ Two tiers, because two things are being sized.
     types         how many types may be declared at once: components, and the structs, enums
                   and bitmasks their fields name
     systems       how many systems and observers may be registered at once
+    terms         how many terms one of them may have
     max_modules   how many modules may be loaded at once
 
 One block serves everyone, so no single module could size it. It arrives as a struct rather than a
@@ -30,6 +31,13 @@ keeps an offset for every type there may be, and a system keeps a place for ever
 be. With the two stated, everything storage holds is known and allocated when the bridge is
 created, and it allocates nothing after - `storage.md`, *What bounds it*. A `declare` or a
 `system` past its key is refused there, by name, which fails that module's `init`.
+
+**`terms` is the most one system or observer may ask for**, and it is a key for the same reason:
+storage keeps a system's terms in a record made when the bridge is, so the record has a length.
+It was a constant, 32, and the number was flecs' default with nothing of ours behind it. Refused:
+keeping a constant and saying it is arbitrary. Refused: no most, which is a record of any length
+and so an allocation at load. No module compiles against the number, so it is one number and
+the deployment's.
 
 Refused: allocating at load for however many types and systems a module turns out to have, which
 is what this first did: memory that is a stated budget times a number nobody stated. Refused: a
@@ -98,8 +106,8 @@ runs out:
                                                 failure of the module that asked
     log_ring               at a write           the line is dropped and counted
     max_modules            at a load            the load is refused
-    types, systems         at a `declare` or    the module's `init` fails
-                           a `system`
+    types, systems,        at a `declare` or    the module's `init` fails
+      terms                a `system`
 
 **An entry that cannot be honoured abandons the invocation that made it.** `spawn` answers an id and
 no status, so a module has nothing to test - `abi.md`, *The ABI* - and the failure cannot be a value.

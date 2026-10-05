@@ -136,7 +136,9 @@ barrier's second step is where that is found out, before anything has moved.
     [budget] columns     the rows, and the list of which entity is in which
     [budget] types       how wide a set is, and with `tables`, an offset for each type in
                          each table
-    [budget] systems     each one's terms, and with `tables`, its list of the tables it matches
+    [budget] systems     with `terms`, each one's terms; and with `tables`, its list of the
+                         tables it matches
+    [budget] terms       how long a system's record of its terms is
 
 **All of it is allocated when the bridge is created, and nothing after**: not at a barrier, not
 when a module loads. What a module declares takes a place that is already there, and a `declare`

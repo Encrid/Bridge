@@ -35,8 +35,8 @@ struct rows_type {
 
 struct rows_terms {
     uint32_t          count;
-    uint32_t          type[BRIDGE_TERMS_MAX];
-    enum bridge_oper  oper[BRIDGE_TERMS_MAX];
+    uint32_t         *type;         /* [budget] terms of each, of which `count` are its own */
+    enum bridge_oper *oper;
     /* a system's: the tables it matches, and where each is in that list, less one */
     uint32_t         *list, *pos;
     uint32_t          matched;
@@ -83,6 +83,8 @@ struct rows {
     rows_type  *type_pool;
     rows_terms *terms_pool;
     uint32_t   *lists;              /* every system's `list` and `pos`, one after another */
+    uint32_t   *term_types;         /* and every one's terms */
+    enum bridge_oper *term_opers;
     rows_terms **systems, **observers;
     uint32_t   system_count, observer_count;
     /* the fold */
@@ -750,6 +752,8 @@ static rows_terms *terms_of(rows *r, const rows_term *terms, uint32_t count)
     for (k = 0; r->terms_pool[k].used; k ++) {}     /* whoever registers counted: there is one */
     t = &r->terms_pool[k];
     *t = (rows_terms){ .count = count, .used = true };
+    t->type = r->term_types + (size_t)k * r->b->max_terms;
+    t->oper = r->term_opers + (size_t)k * r->b->max_terms;
     t->list = r->lists + (size_t)k * 2 * (r->table_room + 2);
     t->pos = t->list + r->table_room + 2;
     memset(t->list, 0, 8u * (r->table_room + 2));
@@ -929,6 +933,8 @@ rows *rows_create(bridge *b)
     r->type_pool = calloc(r->type_room, sizeof *r->type_pool);
     r->terms_pool = calloc((size_t)r->terms_room + 1, sizeof *r->terms_pool);
     r->lists = calloc((size_t)r->terms_room * 2 * (tables + 1), sizeof *r->lists);
+    r->term_types = calloc((size_t)r->terms_room * b->max_terms, sizeof *r->term_types);
+    r->term_opers = calloc((size_t)r->terms_room * b->max_terms, sizeof *r->term_opers);
     r->systems = calloc(r->terms_room, sizeof *r->systems);
     r->observers = calloc(r->terms_room, sizeof *r->observers);
     if (!r->who) {
@@ -947,6 +953,8 @@ void rows_destroy(rows *r)
     free(r->type_pool);
     free(r->terms_pool);
     free(r->lists);
+    free(r->term_types);
+    free(r->term_opers);
     free(r->systems);
     free(r->observers);
     free(r->places);

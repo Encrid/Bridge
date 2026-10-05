@@ -50,9 +50,6 @@ typedef struct {
     uint32_t      phase;
     rows_terms   *matched;          /* its terms, as storage holds them. nullptr with no terms */
     uint32_t      terms;
-    uint32_t      sizes[BRIDGE_TERMS_MAX];
-    component    *touches[BRIDGE_TERMS_MAX];    /* nullptr where a term reads nothing */
-    uint8_t       writes[BRIDGE_TERMS_MAX];
     backend_func *fn;
     uint32_t      level;            /* within its phase: a level runs before the next */
     int           parked;           /* out of the schedule while a reload decides its fate */
@@ -64,6 +61,9 @@ typedef struct {
     uint32_t      when;             /* of the dispatch in progress */
     int           failed;           /* and how it ended, said after the join */
     char          why[256];
+    /* what the conflict graph reads of each term: the component, or nullptr where the term reads
+     * nothing, and whether it is written. `terms` of them */
+    struct { component *touches; bool writes; } term[];
 } bridge_system;
 
 struct module {
@@ -176,6 +176,7 @@ struct bridge {
     int            layout_moved;    /* a module came or went, or a declaration changed */
     uint32_t       tables;          /* [budget] tables: how many may exist at once */
     uint32_t       max_types, max_systems;      /* [budget] types, [budget] systems */
+    uint32_t       max_terms;                   /* [budget] terms */
 
     rows          *rows;            /* who keeps the rows: rows.h */
 

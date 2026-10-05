@@ -224,7 +224,7 @@ int main(int argc, char **argv)
                              { "view:halver:halve", "game:mover:move" }};
     bridge_order seen_first = { "view:watcher:seen", "view:fixer:fix" };
     bridge_order fix_first = { "view:fixer:fix", "view:watcher:seen" };
-    bridge_config cfg = { backends, 2, phases, 2, nullptr, 0, 1, { 4096, 4096, 1 << 20, 8, 64, 64, 128 } };
+    bridge_config cfg = { backends, 2, phases, 2, nullptr, 0, 1, { 4096, 4096, 1 << 20, 8, 64, 64, 128, 8 } };
     bridge_artifact a;
     bridge *b;
     setvbuf(stdout, nullptr, _IONBF, 0);

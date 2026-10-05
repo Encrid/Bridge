@@ -92,8 +92,9 @@ static const char *conflict(const bridge_system *a, const bridge_system *b)
     uint32_t i, j;
     for (i = 0; i < a->terms; i ++) {
         for (j = 0; j < b->terms; j ++) {
-            if (a->touches[i] && a->touches[i] == b->touches[j] && (a->writes[i] || b->writes[j])) {
-                return a->touches[i]->name;
+            if (a->term[i].touches && a->term[i].touches == b->term[j].touches
+                && (a->term[i].writes || b->term[j].writes)) {
+                return a->term[i].touches->name;
             }
         }
     }

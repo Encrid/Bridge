@@ -69,6 +69,7 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
         uint32_t tables;          /* how many sets of components at once */
         uint32_t types;           /* how many declared types at once */
         uint32_t systems;         /* how many systems and observers at once */
+        uint32_t terms;           /* how many terms one of them may have */
     } bridge_budget;
 
     typedef struct {

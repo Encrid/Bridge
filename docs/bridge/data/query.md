@@ -39,8 +39,8 @@ Iterating is two loops and no call, with the branch outside the row loop:
 `sizeof(T)` is a build-time constant from the schema, so stride is never published - the module's
 compiler already knows it.
 
-A span is three kinds of `u32` and nothing else, so it is `8 + 4n` bytes. A query takes at most 32
-terms, `BRIDGE_TERMS_MAX` in `bridge-abi.h`.
+A span is three kinds of `u32` and nothing else, so it is `8 + 4n` bytes. How many terms a query
+may have is the deployment's to state: `[budget] terms` - `budgets.md`, *Budgets*.
 
 `entities` is there because a system that wants to destroy the row it is on, attach a component to
 it, or store a reference to it needs the id and has no other route to one.

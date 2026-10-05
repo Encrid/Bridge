@@ -31,7 +31,6 @@ enum bridge_on_unload : uint32_t { BRIDGE_STRIP = 1, BRIDGE_SWEEP = 2, BRIDGE_DE
 enum bridge_access : uint8_t { BRIDGE_IN = 1, BRIDGE_OUT = 2, BRIDGE_INOUT = 3 };
 enum bridge_oper : uint8_t { BRIDGE_AND = 1, BRIDGE_NOT = 2, BRIDGE_OPTIONAL = 3, BRIDGE_OR = 4 };
 constexpr uint32_t BRIDGE_WILDCARD = 0xffffffffu;
-constexpr uint32_t BRIDGE_TERMS_MAX = 32;
 
 typedef struct {
     uint32_t           slot;
