@@ -43,7 +43,7 @@ another first call.
 
 ## The tests
 
-Forty-two new ones, one hundred and thirteen in all, in a release build and a debug one.
+Forty-three new ones, one hundred and fourteen in all, in a release build and a debug one.
 
     skipinit         a failed init, skipped: the other module runs on and is the one listed
     refusedload      a refused load leaves nothing: its component's name takes another layout
@@ -91,6 +91,8 @@ Forty-two new ones, one hundred and thirteen in all, in a release build and a de
     configreload     a reload handing over other settings: the row keeps what it had
     configdrop       a reload that stops declaring the settings struct: the row goes with it
     reseed           unload and load: the settings' text is written where it was
+    image            a module whose own memory begins with data loads, on a system where
+                     wasmtime would have mapped that data
 
 ## What the phase found
 
@@ -122,6 +124,13 @@ waited for the thread. Nothing before this phase made two timed calls in a row; 
 that, and one test run in some hundreds stuck. It reads what is running under a lock now, and the
 event only says to look - `wasmtime.md`, *Deadlines*. Twenty thousand timed calls back to back are
 part of `tests/adopt.c`, and every test has a timeout, so one that hangs fails.
+
+**On Linux the wasm backend could abort the process, since phase 2.** wasmtime initialises a
+memory from a copy-on-write image there, and asserts the memory is one it mapped; every memory of
+ours comes from the host memory creator. Whether a module tripped it depended on the shape of its
+data segments, and for five phases none did. The Linux job caught the first that does. That
+initialisation is off now - `wasmtime.md`, *Memory* - and a module built to trip it is part of the
+suite.
 
 **A failed native reload costs data, and that had to be said.** With no old instance to keep, the
 module is out as an unload leaves it, exclusive components dropped. It follows from the reason

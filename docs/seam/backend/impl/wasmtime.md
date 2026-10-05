@@ -39,6 +39,13 @@ wait instruction blocks a thread in a way neither fuel nor a deadline can interr
 *What bounds a run*, rests on nothing a module can reach blocking. The condition that brings it back
 is the creator no longer being asked for a memory an instance defines.
 
+**Copy-on-write initialisation is off.** Where the system offers it wasmtime lays a module's data
+segments down as a mapped image rather than copying them, and asserts that the memory under the
+image is one it mapped itself. No memory here is: all of them come from the creator. Left on, a
+module whose data happens to fit an image aborts the process at instantiation - on Linux and not on
+Windows, which has no such images, so the first run of the `linux` preset over such a module is
+what found it. `tests/modules/image.wat` is a module that would.
+
 The creator is asked for every memory, a module's own included, and is not told which. The backend
 knows because it asks: an adoption is in progress, or it is not.
 

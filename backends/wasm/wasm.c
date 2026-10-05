@@ -223,6 +223,10 @@ static wasm_engine_t *engine_for(backend *b, int kind)
         wasmtime_config_memory_reservation_set(config, RESERVATION);
         wasmtime_config_memory_guard_size_set(config, GUARD);
         wasmtime_config_memory_may_move_set(config, false);
+        /* wasmtime initialises a memory from a copy-on-write image where the system has one,
+         * and asserts that such a memory is one it mapped itself. Every memory here comes
+         * from the creator below, so there is no memory an image could be laid on. */
+        wasmtime_config_memory_init_cow_set(config, false);
         wasmtime_config_host_memory_creator_set(config, &creator);
         b->engines[kind] = wasm_engine_new_with_config(config);
     }

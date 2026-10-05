@@ -170,6 +170,7 @@ endfunction ()
 
 phase2_case (ok        "test:ok@0.1.0: loaded")
 phase2_case (nolimit   "test:ok@0.1.0: loaded")
+phase2_case (image     "test:image@0.1.0: loaded")
 phase2_case (oob       "module 'test:oob@0.1.0' did not load: its init trapped: out of bounds memory access")
 phase2_case (spin      "module 'test:spin@0.1.0' did not load: its init trapped: interrupt")
 phase2_case (grow      "module 'test:grow@0.1.0' did not load: its init answered 7")
