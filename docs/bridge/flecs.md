@@ -141,5 +141,12 @@ hook there is Bridge-ASM700 using either.
 span needs a dense `u32` to index `column_base`. So Bridge-ASM700 keeps pointer-to-id itself and
 never reads `ecs_table_t`'s layout. A table gets its id the first time it is seen holding an entity:
 when the mirror places one in it, or when a query matches it. Id 0 is no table, which is what an
-entity with nothing on it has. Giving an id back waits for `EcsOnTableDelete`, and for the first
-thing that deletes a table: unload.
+entity with nothing on it has.
+
+**An id is given back when its table is about to go, and that is known without asking flecs.** One
+thing here deletes a table: deleting a component, which an unload or a reload does when a module was
+the last to declare it. So just before a component is deleted, the ids of the tables that hold it
+are retired; they are dead until the next barrier has moved every index record off them, and free
+after it. Refused: taking it from `EcsOnTableDelete`, which is what the plan named - an event for
+something Bridge-ASM700 has itself just decided, and one more thing of flecs' to depend on. The
+condition that brings it back is flecs deleting a table for a reason of its own.

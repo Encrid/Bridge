@@ -81,7 +81,9 @@ address a second memory, which retires the accessor module altogether.
 
     init()      -> result   declares components, systems and observers. Once per load,
                             before any of its systems run.
-    shutdown()  -> result   called once, before the instance goes away.
+    shutdown()  -> result   called once, before the instance goes away. Not optional:
+                            a module with nothing to release answers 0. What it asks
+                            for there is applied, and what it logs reaches the sink.
     reload()    -> result   optional. Absent means "cannot be hot-reloaded". Called in a
                             new instance instead of init: it declares and registers over
                             storage that is already there - `lifecycle.md`, *The runtime

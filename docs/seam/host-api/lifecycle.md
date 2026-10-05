@@ -69,7 +69,12 @@ registering the same things.
 copies of one library, so on a backend that says so - `capabilities.md`, *Capabilities, so the swap
 is honest* - the order is the old `shutdown`, the library closed, the new one opened, its `reload`.
 A failure then has no old instance to keep, which is the other half of the rule in `failure.md`:
-it is `init`'s case, and `on_error` decides.
+it is `init`'s case, and `on_error` decides. The module is gone as an unload would have left it,
+its exclusive components dropped by their policies, and for the reason unload drops them -
+`data.md`, *Structural change*: rows nobody declares are rows nothing can ever collect. That is
+data lost on a call that meant "keep running", which is why `module.md`, *Three guarantees differ*,
+calls a native reload fragile, and a deployment that cannot afford it does not state `hot_reload`
+for a native module.
 
 **What a reload may change is what is the instance's.** Fuel, limits, timeouts, the log level and
 the three sizes of the private memory all arrive with the new `cfg`, as do `spawns` and the grants.

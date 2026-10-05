@@ -125,6 +125,8 @@ Met.
 
 ## 6. Failure and lifecycle
 
+Done. `PHASE6.md` is what it built and found.
+
 `on_error`, `max_system_failures` and the stop, and the two escalation guards - `failure.md`, *When
 something fails*. `bridge_unload` and `bridge_reload` with their rules, `hot_reload`, and the reload
 and shutdown timeouts - `lifetime.md`, *Lifetime*. `[.config]` seeding a singleton component -
@@ -135,7 +137,7 @@ state it exists to report - `introspection.md`, *Introspection*.
 storage as they were; a module past its failure budget
 shows as STOPPED; a reload keeps a row's bytes; a changed layout is refused naming both
 fingerprints; an unload drops an exclusive component and keeps a shared one; and a `[.config]` key
-the module never declared is an error naming it.*
+the module never declared is an error naming it.* Met.
 
 ## 7. A host, from outside
 
