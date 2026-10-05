@@ -232,6 +232,13 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on, uint32
         || (cfg->hot_reload && lacks(b, id, o, BACKEND_RELOAD, "hot_reload", "reload"))) {
         return 1;
     }
+    /* wasm.md, *Exports*: the author says "cannot" and the deployment "may not", each with a
+     * key. A deployment allowing what the author says cannot be done is config against config. */
+    if (cfg->hot_reload && !cfg->reloadable) {
+        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: hot_reload is stated, and its "
+            "author states it is not reloadable", id);
+        return 1;
+    }
     *on = o;
     *demands = (cfg->trusted ? 0 : BACKEND_SANDBOX) | (cfg->fuel > 0 ? BACKEND_METER : 0)
              | (cfg->memory_limit > 0 ? BACKEND_LIMIT : 0)
@@ -407,13 +414,9 @@ static int start(bridge *b, module *m, const bridge_artifact *a, uint32_t demand
         s->fn = export_of(m, s->name, err);
         if (!s->fn) return 1;
     }
+    /* the three lifecycle exports are every module's: none is left out to mean something */
     m->shutdown = export_of(m, "shutdown", err);
-    if (!m->shutdown) return 1;
-    /* wasm.md, *Exports*: an absent reload is "cannot", and the deployment said it may */
-    if (cfg->hot_reload && !reloading && !export_of(m, "reload", err)) {
-        snprintf(err->text, sizeof err->text, "hot_reload is stated and it exports no 'reload'");
-        return 1;
-    }
+    if (!m->shutdown || !export_of(m, "reload", err)) return 1;
     return 0;
 }
 

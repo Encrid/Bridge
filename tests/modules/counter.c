@@ -34,3 +34,4 @@ BRIDGE_EXPORT(init) int init(void)
 
 BRIDGE_EXPORT(rosters) int rosters_(void) { return 0; }
 BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }
+BRIDGE_EXPORT(reload) int reload(void) { return 0; }

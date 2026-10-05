@@ -19,8 +19,8 @@ a budget.
 one, and zero is never a legal value for it: a budget, `fuel`, a timeout, `on_error`. Where "none"
 is a real answer - `fuel`, a timeout, `memory_limit` - it is stated as `-1`, never by leaving the
 field alone: `capabilities.md`, *Capabilities, so the swap is honest*. A boolean
-cannot be unset. Left alone it is `false`, which is the off or the safe side for all five: `trusted`,
-`hot_reload`, `pinned`, `validate`, `profile`.
+cannot be unset. Left alone it is `false`, which is the off or the safe side for all six: `trusted`,
+`reloadable`, `hot_reload`, `pinned`, `validate`, `profile`.
 
 What that protects against is not a missing key but a value nobody can account for. A host may layer
 its sources however it likes - a module author's stated values under a deployment's, say - as long
@@ -30,8 +30,8 @@ as what it hands over is one stated value per key. The original Bridge had the s
 
     the deployment's                           a module's
     ----------------------------------------   ------------------------------
-    phases     an ordered list of names        trusted, hot_reload, on_error
-    threads    how many run a phase            max_system_failures
+    phases     an ordered list of names        trusted, reloadable, hot_reload
+    threads    how many run a phase            on_error, max_system_failures
     [order]    before
     [budget]   entities, persistent,           fuel, memory_limit
                columns, max_modules            init/reload/shutdown timeouts

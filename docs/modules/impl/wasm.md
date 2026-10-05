@@ -81,13 +81,15 @@ address a second memory, which retires the accessor module altogether.
 
     init()      -> result   declares components, systems and observers. Once per load,
                             before any of its systems run.
-    shutdown()  -> result   called once, before the instance goes away. Not optional:
-                            a module with nothing to release answers 0. What it asks
-                            for there is applied, and what it logs reaches the sink.
-    reload()    -> result   optional. Absent means "cannot be hot-reloaded". Called in a
-                            new instance instead of init: it declares and registers over
-                            storage that is already there - `lifecycle.md`, *The runtime
-                            lifecycle*.
+    shutdown()  -> result   called once, before the instance goes away. What it asks for
+                            there is applied, and what it logs reaches the sink.
+    reload()    -> result   called in a new instance instead of init: it declares and
+                            registers over storage that is already there -
+                            `lifecycle.md`, *The runtime lifecycle*.
+
+**Every module has all three**, and a load that does not find one is refused by its name. A module
+with nothing to release answers 0 from `shutdown`; one that cannot be reloaded still has a `reload`,
+and says that it cannot where such things are said: below.
 
     <system>()  -> result   one export per system and per observer, named by the module
 
@@ -105,13 +107,23 @@ here: resolving one would hand the scheduler an export that already means someth
 
 Two systems sharing one body is two exports that both call it. That is the whole cost of names.
 
-**An absent `reload` is *cannot*, and `hot_reload = false` is *may not*.** Two parties can say a
-module is not reloadable and they are not saying the same thing: the author by leaving the export
-out, the deployment by turning the key off. So **`hot_reload` only ever forbids** - a deployment can
-decline a capability the author provided and cannot conjure one, exactly as a config key demands a
-capability of a backend and never synthesises it (`capabilities.md`, *Capabilities, so the swap is
-honest*). `hot_reload = true` against a module with no `reload` export is config contradicting the
-artifact, and it is refused at load, by name - `failure.md`, *When something fails*.
+**`reloadable` is *cannot*, and `hot_reload` is *may not*.** Two parties can say a module is not
+reloaded and they are not saying the same thing: the author that its code cannot be, the deployment
+that here it may not be. Each says it with a key of its own. `reloadable` is the author's, and
+travels in the manifest as `pinned` does - `module.md`, *The manifest*; `hot_reload` is the
+deployment's. So **`hot_reload` only ever forbids** - a deployment can decline what the author
+provided and cannot conjure it, exactly as a config key demands a capability of a backend and never
+synthesises it (`capabilities.md`, *Capabilities, so the swap is honest*). `hot_reload = true`
+against `reloadable = false` is config contradicting config, and it is refused at load, by name -
+`failure.md`, *When something fails*.
+
+Refused: leaving `reload` out to say "cannot", which is what these documents first had. It is a
+statement made by an absence, and nothing can tell an export left out on purpose from one
+forgotten; `capabilities.md` already holds that the absence of a guarantee is written down by
+somebody rather than arrived at. Refused: a `reload` that answers "no" when asked, which says it
+only by being tried - and on a backend that cannot hold two instances the old one is shut down
+before the new one can answer. The condition that brings that back is no backend taking that
+order.
 
 ## Reaching a component
 

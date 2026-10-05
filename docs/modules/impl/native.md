@@ -63,7 +63,7 @@ Four exported symbols. Three are the lifecycle every module has, and one is this
     void bridge_bind(const bridge_api *api);   /* the backend's, once, before bridge_init */
     int  bridge_init(void);
     int  bridge_shutdown(void);
-    int  bridge_reload(void);                  /* optional; absent means cannot be reloaded */
+    int  bridge_reload(void);
 
 **`bridge_bind` is the native backend's, not Bridge-ASM700's.** A wasm module gets its imports when it is
 linked; a shared library has no import section Bridge-ASM700 could fill, so the native backend hands the
@@ -80,10 +80,10 @@ backend and need a native case in Bridge-ASM700.
 flat symbol namespace, so `init` is not a name a library can safely export; the prefix is the
 backend's stated rule rather than a rename nobody can see.
 
-An absent `bridge_reload` is how a native module says it **cannot** be reloaded, the same
-convention a wasm module's missing `reload` export uses. `hot_reload = false` is a deployment
-saying it **may not**, which is a different statement: `wasm.md`, *Exports*, has why that means the
-key can only ever forbid. Each symbol returns a code, which `on_error` governs - `failure.md`, *When
+All three are every module's, on this backend as on the other. A native module that **cannot** be
+reloaded says so with `reloadable` in its manifest, and a deployment that says it **may not** with
+`hot_reload`: `wasm.md`, *Exports*, has why those are two statements and why neither is made by
+leaving a symbol out. Each symbol returns a code, which `on_error` governs - `failure.md`, *When
 something fails*.
 
 `bridge_init` runs once per load, before any of the module's systems or observers run. When that

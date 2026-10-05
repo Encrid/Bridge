@@ -47,7 +47,7 @@ can: a changed struct body hashes differently and is refused by name, shared or 
 `lifetime.md`, *When the layout changed*.
 
 **A reload is the new instance's `reload`, and then the old one's `shutdown`.** In order: the
-checks a load makes, and that the deployment allows it and the module has the export; a new image,
+checks a load makes, and that the deployment allows it; a new image,
 a new instance and a fresh private memory; the new instance's `reload`, which declares and
 registers as `init` did and does nothing else; the schedule again, with the same refusal; then the
 old instance's `shutdown`, and the swap. Until that last step the old instance has not been

@@ -89,7 +89,7 @@ as a helper - `native.md`, *Identity*.
         const char *identity;        /* "tri:triangle@0.1.0" */
         uint32_t    abi;
 
-        bool     trusted, hot_reload, pinned;
+        bool     trusted, reloadable, hot_reload, pinned;
         uint8_t  on_error;           /* FAIL | SKIP. zero is unset */
         /* each of the next six: zero is unset, -1 is "no limit" */
         int64_t  max_system_failures;    /* raised by a failed barrier, lowered by a clean one */

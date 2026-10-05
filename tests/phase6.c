@@ -242,17 +242,18 @@ int main(int argc, char **argv)
                || !strcmp(what, "reloadshare") || !strcmp(what, "reloadmove")
                || !strcmp(what, "reloaddrop") || !strcmp(what, "maynot")) {
         a = wasm("game:ticker@0.1.0", "ticker");
+        a.cfg.reloadable = true;
         a.cfg.hot_reload = strcmp(what, "maynot") != 0;
         load(b, &a);
         frames(b, 2);
         a = wasm("game:ticker@0.2.0", !strcmp(what, "reloadlayout") ? "ticker-wide"
                                     : !strcmp(what, "reloadfail") ? "ticker-fail"
                                     : !strcmp(what, "reloaddrop") ? "ticker-noextra" : "ticker-ten");
-        a.cfg.hot_reload = true;
+        a.cfg.hot_reload = a.cfg.reloadable = true;
         if (!strcmp(what, "reloadshare")) a.cfg.persistent = 64;
         if (!strcmp(what, "reloadmove")) {
             a = native("game:ticker@0.2.0", NTICKER1_PATH);
-            a.cfg.hot_reload = true;
+            a.cfg.hot_reload = a.cfg.reloadable = true;
         }
         reload(b, &a);
         frames(b, 2);
@@ -265,22 +266,27 @@ int main(int argc, char **argv)
         modules(b);
     } else if (!strcmp(what, "revive")) {       /* a stopped module, reloaded into one that works */
         a = wasm("game:ticker@0.1.0", "ticker-trip");
-        a.cfg.hot_reload = true;
+        a.cfg.hot_reload = a.cfg.reloadable = true;
         load(b, &a);
         frames(b, 4);
         modules(b);
         a = wasm("game:ticker@0.2.0", "ticker-ten");
-        a.cfg.hot_reload = true;
+        a.cfg.hot_reload = a.cfg.reloadable = true;
         reload(b, &a);
         frames(b, 2);
         modules(b);
-    } else if (!strcmp(what, "noreload")) {     /* hot_reload stated, and no reload export */
+    } else if (!strcmp(what, "notreloadable")) {
+        /* the deployment allows what the author says cannot be done */
         a = wasm("game:twostep@0.1.0", "twostep");
         a.cfg.hot_reload = true;
         load(b, &a);
+    } else if (!strcmp(what, "noreload")) {     /* one of the three exports is missing */
+        a = wasm("test:noreload@0.1.0", "noreload");
+        a.cfg.spawns = BRIDGE_NONE;
+        load(b, &a);
     } else if (!strcmp(what, "reloadnothing")) {
         a = wasm("game:ticker@0.2.0", "ticker-ten");
-        a.cfg.hot_reload = true;
+        a.cfg.hot_reload = a.cfg.reloadable = true;
         reload(b, &a);
     } else if (!strcmp(what, "ntimeout")) {     /* a timeout is a deadline, which native lacks */
         a = native("game:ticker@0.1.0", "no-such-library");
@@ -292,11 +298,11 @@ int main(int argc, char **argv)
         a = wasm("game:twostep@0.1.0", "twostep");
         load(b, &a);
         a = native("game:ticker@0.1.0", NTICKER1_PATH);
-        a.cfg.hot_reload = true;
+        a.cfg.hot_reload = a.cfg.reloadable = true;
         load(b, &a);
         frames(b, 2);
         a = native("game:ticker@0.2.0", !strcmp(what, "nreload") ? NTICKER2_PATH : NTICKER3_PATH);
-        a.cfg.hot_reload = true;
+        a.cfg.hot_reload = a.cfg.reloadable = true;
         /* with nothing left to keep, a failed reload is init's case: on_error decides */
         if (!strcmp(what, "nreloadfailstop")) a.cfg.on_error = BRIDGE_FAIL;
         reload(b, &a);
@@ -328,15 +334,15 @@ int main(int argc, char **argv)
          * component is the state. With DROP the new instance declares nothing, and the row
          * goes with the component. */
         a = configured("game:settings@0.1.0");
-        a.cfg.hot_reload = true;
+        a.cfg.hot_reload = a.cfg.reloadable = true;
         load(b, &a);
         frames(b, 1);
         everything[1].v.i = 640;
         a = configured("game:settings@0.2.0");
-        a.cfg.hot_reload = true;
+        a.cfg.hot_reload = a.cfg.reloadable = true;
         if (!strcmp(what, "configdrop")) {
             a = wasm("game:settings@0.2.0", "settings-drop");
-            a.cfg.hot_reload = true;
+            a.cfg.hot_reload = a.cfg.reloadable = true;
             a.cfg.persistent = 64;
         }
         reload(b, &a);

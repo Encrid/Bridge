@@ -56,6 +56,7 @@ typedef struct {
     uint32_t    abi;
 
     bool     trusted;
+    bool     reloadable;         /* its author says it can be reloaded: from the manifest */
     bool     hot_reload;         /* the deployment allows bridge_reload. it only ever forbids */
     bool     pinned;             /* its systems run on the thread that loaded it, and no other */
     uint8_t  on_error;           /* BRIDGE_FAIL | BRIDGE_SKIP: what losing it costs the deployment */

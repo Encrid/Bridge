@@ -8,7 +8,7 @@ document is what the phase built and what it found on the way.
 
 ## What was settled first
 
-Five questions, each by every step of `PHASE0.md`, and each applied to the document it belongs to.
+Six questions, each by every step of `PHASE0.md`, and each applied to the document it belongs to.
 
     what a reload runs            the new instance's reload, then the old one's shutdown:
                                   `lifecycle.md`, *The runtime lifecycle*
@@ -19,10 +19,14 @@ Five questions, each by every step of `PHASE0.md`, and each applied to the docum
     which component is settings   the one the author names:
                                   `config.md`, *A module's own settings are a component*
     where a text setting goes     where its field's type says: the same section
+    how an author says "cannot"   with a key, `reloadable`, and never by leaving `reload` out:
+                                  `wasm.md`, *Exports*
 
 Three of them were first put with steps missing, and were put again. Reading the original Bridge's
 source for the second pass gave reload a fourth option and changed the recommendation for the
-budget.
+budget. The sixth was asked after the phase was reported: its report called `reload` optional, which
+is how these documents had it from the start, and a statement made by leaving something out is what
+this project refuses everywhere else.
 
 ## What it produced
 
@@ -43,7 +47,7 @@ another first call.
 
 ## The tests
 
-Forty-three new ones, one hundred and fourteen in all, in a release build and a debug one.
+Forty-four new ones, one hundred and fifteen in all, in a release build and a debug one.
 
     skipinit         a failed init, skipped: the other module runs on and is the one listed
     refusedload      a refused load leaves nothing: its component's name takes another layout
@@ -70,7 +74,8 @@ Forty-three new ones, one hundred and fourteen in all, in a release build and a 
     reloaddrop       a component the new instance no longer declares is gone
     maynot           hot_reload false: refused
     revive           a stopped module reloaded into one that works: RUNNING again
-    noreload         hot_reload stated, no reload export: refused at load
+    notreloadable    hot_reload stated, and the author says not reloadable: refused at load
+    noreload         a module without one of the three exports: refused by its name
     reloadnothing    nothing of that name loaded: refused
     nreload          native: the old shutdown, then the new library; the row's bytes kept
     nreloadfail      native, the new reload fails: the module is gone, the other runs on
@@ -114,8 +119,9 @@ record inherits, and after it, the swap.
 goes with it, and the barrier that would have drained it comes after. It is drained where the
 `shutdown` returns.
 
-**`shutdown` is required, and the documents had not said so.** `wasm.md` listed it beside `init` and
-marked only `reload` optional. Every test module gained one.
+**All three lifecycle exports are required, and the documents had not said so.** `wasm.md` listed
+`shutdown` beside `init` without a word, and called `reload` optional. Every test module has all
+three now, and what an absent `reload` used to say is a key - `wasm.md`, *Exports*.
 
 **The wasm backend's watchdog could hang, since phase 2.** It waited for a call to start and then
 for it to end, one event each, and two timed calls back to back could set an event twice before it

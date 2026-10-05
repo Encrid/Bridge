@@ -37,3 +37,4 @@ BRIDGE_EXPORT(shutdown) int shutdown(void)
     bridge_destroy(first);
     return 0;
 }
+BRIDGE_EXPORT(reload) int reload(void) { return 0; }

@@ -476,7 +476,8 @@ phase6_case (reloadmove    "it runs on backend 'wasm' and a reload does not move
 phase6_case (reloaddrop    "game:ticker@0.2.0: reloaded.*tick 122 10.*game:retype@0.1.0: loaded")
 phase6_case (maynot        "is not reloaded: its hot_reload is false.*tick 104 1")
 phase6_case (revive        "game:ticker@0.1.0=STOPPED.*game:ticker@0.2.0: reloaded.*tick 1[0-9]3 10.*game:ticker@0.2.0=RUNNING")
-phase6_case (noreload      "did not load: hot_reload is stated and it exports no 'reload'")
+phase6_case (noreload      "module 'test:noreload@0.1.0' did not load: no exported function 'reload'")
+phase6_case (notreloadable "module 'game:twostep@0.1.0' is refused: hot_reload is stated, and its author states it is not reloadable")
 phase6_case (reloadnothing "is not reloaded: nothing of that name is loaded")
 # native: the old instance's shutdown comes before the new one's first tick, and before the swap
 phase6_case (nreload       "tick 102 1.*game:ticker@0.1.0/-: shutdown 1 0.*game:ticker@0.2.0: reloaded.*tick 112 10.*tick 122 10")
