@@ -2,18 +2,30 @@
 
 Two tiers, because two things are being sized.
 
-**Shared, when Bridge-ASM700 starts, from `bridge_config`:** the entity ceiling behind the index
-mirror, the persistent arena, and the columns. One block serves everyone, so no single module could
-size it. It
-arrives as a struct rather than a file, because Bridge-ASM700 reads none: `host-api.md`,
-*Bridge-ASM700 parses nothing*.
+**Shared, when Bridge-ASM700 starts, from `bridge_config`:**
+
+    entities      how many entity indices there are. Index 0 is no entity
+    persistent    the persistent arena, in bytes
+    columns       every table's rows, in bytes: its entity ids and its columns
+    tables        how many sets of components entities may carry at once
+    max_modules   how many modules may be loaded at once
+
+One block serves everyone, so no single module could size it. It arrives as a struct rather than a
+file, because Bridge-ASM700 reads none: `host-api.md`, *Bridge-ASM700 parses nothing*.
+
+**`tables` is a count of what exists, not of what was ever seen.** A table lives while it has rows
+- `storage.md`, *A table* - so the number to state is how many different sets of components
+entities carry at one time. It sizes everything storage keeps a table, and one more thing that
+is a module's: `column_base` has a cell for each of the module's components in every table there
+may be, inside its `spans`. A module whose `spans` cannot hold that is refused at load, by the
+arithmetic, and not stopped at whichever barrier made one table too many.
 
 **Per module, when that module registers:** its scratch arena, its log ring and its spans - which
 is to say, this tier sizes that module's private memory. And what is set aside for it in the shared
 one, so that what it mints is its own - `threads.md`, *Threads*:
 
-    spawns        how many entity ids it may take between two barriers. They are taken from
-                  flecs at a barrier and held: real entities with nothing on them, which no
+    spawns        how many entity ids it may take between two barriers. They are set aside
+                  at a barrier and held: real entities with nothing on them, which no
                   query matches, and which count against the entity ceiling
     persistent    its share of the persistent arena, for as long as it is loaded
 
@@ -62,8 +74,11 @@ runs out:
 
     spawns, persistent,    at an ABI entry      the invocation is abandoned at that call
       entities
-    spans                  at a barrier         that module is stopped, by name
-    columns                at a barrier         the bridge stops
+    spans                  at a load            the load is refused, if `column_base` alone
+                                                does not fit
+                           at a barrier         that module is stopped, by name
+    tables, columns        at a barrier         the entity is left as it was, and it is a
+                                                failure of the module that asked
     log_ring               at a write           the line is dropped and counted
     max_modules            at a load            the load is refused
 
@@ -81,13 +96,23 @@ barrier gives it as many as fit, and the ceiling is what its next `spawn` names.
 **A module whose spans no longer fit is stopped**, since its systems would otherwise run over
 tables they were not told about. Its components stay, as for any stopped module.
 
-**Columns running out stops the bridge, because nobody can be named.** It happens at a barrier,
-inside flecs, while the queued changes of several modules are being applied, and what failed is the
-deployment's storage. flecs cannot be unwound from the middle of a change, so the allocator serves
-what the block could not from the operating system, flecs finishes with its storage whole, and the
-bridge then refuses every `bridge_phase` and `bridge_load` until `bridge_destroy`, and unlike a
-stop that a `fail` module caused, nothing lifts it - `failure.md`, *When something fails*. No module
-runs again, so nothing ever reads the memory that landed outside the block.
+**An entity that cannot be placed is left as it was.** A barrier knows what every changed entity
+will carry before it moves a row - `storage.md`, *A barrier is worked an entity at a time* - so
+it knows there what cannot be had: a table past `tables`, or rows past `columns`. Every change
+asked of that entity at that barrier is then dropped, all of them and not some: it keeps the
+components and the values it had, and no observer hears of it. Other entities are placed as usual.
+When a table cannot take all the rows arriving, it takes as many as the region still holds.
+
+**It is a failure of the module that asked**, the one whose change of that entity came last. A
+record names it, the key, and how many of its entities were left; and the barrier counts as one it
+failed in, toward its `max_system_failures` - `failure.md`, *The budget*. So a module that outgrows
+the deployment is stopped as any failing module is, by its own `on_error`, and one that asked once
+too often loses one barrier's changes and runs on.
+
+Nothing is taken from outside the block, ever. Until phase 10 a column that did not fit was served
+from the operating system and the bridge stopped for good, for two reasons that no longer hold:
+nobody could be named, and the storage of the time could not be unwound from the middle of a
+change. Here nothing has begun when the shortage is found.
 
 Refused: stopping the bridge for every exhaustion, which is one rule and lets one module's `spawn`
 take the deployment down - and the entity ceiling recovers by itself when something is destroyed.
@@ -113,6 +138,4 @@ module that cannot report anything is the one legal number that produces an inco
 rather than arguments: `PLAN.md` phases 2 and 3 enforce them, and are where a number becomes
 knowable.
 
-`columns` has a floor that is flecs' and not ours: its own tables take about 50 KB of the column
-region before any module declares anything. `bridge_create` refuses a budget they do not fit in,
-since a bridge that stops at its first barrier was never started.
+No budget has a floor that is storage's own: nothing of it is in the block before a module asks.

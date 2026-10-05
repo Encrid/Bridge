@@ -62,10 +62,11 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
     typedef struct { const char *before, *after; } bridge_order;
 
     typedef struct {
-        uint64_t entities;        /* the index mirror ceiling */
+        uint64_t entities;        /* how many entity indices: index 0 is none */
         uint64_t persistent;      /* the persistent arena */
         uint64_t columns;         /* component columns and entity arrays */
         uint32_t max_modules;     /* the per-module slot pool */
+        uint32_t tables;          /* how many sets of components at once */
     } bridge_budget;
 
     typedef struct {
@@ -129,7 +130,7 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
         uint32_t    len;
         uint32_t    when;                /* barrier count, then offset in the phase */
         uint32_t    arg[2];
-        int8_t      level;               /* negative is worse - flecs' convention */
+        int8_t      level;               /* negative is worse */
     } bridge_record;
 
     typedef void (*bridge_sink_fn)(void *ud, const bridge_record *r);

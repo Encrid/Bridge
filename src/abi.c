@@ -107,13 +107,13 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         /* Storage reads the descriptor and lays the type out. A field's type is a bare C name,
          * looked for in the declarer's namespace: `Vec3` in game:Body is game:Vec3 - schema.md. */
         char *desc = copy(desc_at, a[6]);
-        const char *why = nullptr;
+        char why[200];
         const rows_field *fields = nullptr;
         rows_type *type;
         uint32_t laid = 0, aligned = 0, field_count, k;
 
         *bare = 0;
-        type = rows_declare(b->rows, name, bare + 1, kind, desc, &laid, &aligned, &why);
+        type = rows_declare(b->rows, name, bare + 1, kind, desc, &laid, &aligned, why, sizeof why);
         *bare = ':';
         free(desc);
         if (!type) return refuse(m, "component '%s': its descriptor %s", name, why);

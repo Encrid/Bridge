@@ -80,9 +80,8 @@ any could be seeded - more than seeding is for, since a module can fill any row 
 The condition that brings that back is a module with two settings structs that do not belong in one.
 
 **The row is on an entity of Bridge-ASM700's own**, spawned for it and destroyed with the module. The
-module finds it the way it finds anything: a query on the component, one span, one row. Not on the
-component's own entity, which is where flecs puts a singleton: that entity lives among flecs'
-reflection data, which the index does not mirror. And a component is the settings of one loaded
+module finds it the way it finds anything: a query on the component, one span, one row. It counts
+against `[budget] entities` like any other. And a component is the settings of one loaded
 module at a time, or it would not be a singleton.
 
 **A setting is written by what its field is.** A bool into a bool, an integer into any integer

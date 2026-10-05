@@ -1,7 +1,7 @@
 # Memory
 
 Which block each thing lives in, and who may read it. What it costs when one runs out is
-`budgets.md`; where a string goes is `strings.md`; where flecs allocates is `flecs.md`. What the
+`budgets.md`; where a string goes is `strings.md`; who keeps the rows is `storage.md`. What the
 data *is* is `data.md`.
 
 ## Where the seven regions live
@@ -30,9 +30,15 @@ triggered it. Its size is the module's
 at a barrier, where nothing holds an offset into it. That is Quake's progs layout - fixed offsets at
 the bottom, everything else found through them.
 
-What fills it is archetype count, which is a property of the deployment and not of the module. So
-`spans` is the key an author states a guess for and a deployment is expected to correct, and a
-reload that states more just gets it.
+What fills it is `column_base`, which the deployment's `[budget] tables` sizes, and then spans,
+which follow how many tables the module's queries match: both are properties of the deployment and
+not of the module. So `spans` is the key an author states a guess for and a deployment is expected
+to correct, and a reload that states more just gets it.
 
 What stays exposed is the shared memory: the columns, because shared columns are the design, and the index,
 because a wasm module must read it with plain loads and wasm has no read-only import.
+
+**What storage itself keeps is in neither.** Where each entity is, which entity is in which row,
+every table's set and offsets: memory of the library's own, which no module can address. The index
+and the entity arrays in the shared block are copies of it, written and never read back -
+`storage.md`, *Nothing in the shared block is read back*.

@@ -46,13 +46,15 @@ fixed ring, reset or drained at a barrier. Budgets are declared at startup, and 
 where it happens rather than degrading quietly later. That is idTech3's discipline: "data does not
 cross" applied to memory instead of calls.
 
-**ECS shape, on flecs.** Components are data stored per type, entities are ids, systems are declared
-by modules. The native backend is for what cannot be reached from inside wasm; the wasm backend is for the
-three guarantees it buys. Either way it is the same module - `module.md`.
+**ECS shape, with storage of its own.** Components are data stored per type, entities are ids,
+systems are declared by modules. The native backend is for what cannot be reached from inside wasm;
+the wasm backend is for the three guarantees it buys. Either way it is the same module -
+`module.md`.
 
-Bridge-ASM700 embeds flecs rather than writing an ECS, and no module ever sees it: the ABI is
-Bridge-ASM700's own. Why that trade, why flecs is embedded rather than swappable like a backend, and
-what it costs: `flecs.md`, *Why flecs rather than our own*.
+Bridge-ASM700 keeps the rows itself, and no module ever calls what does: the ABI is eight entries.
+Storage is made for what the bridge already promises - rows touched only at a barrier, every change
+queued before the first is applied, systems fixed at load - and not for any program:
+`storage.md`, *Made for what the bridge promises*.
 
 **One ABI, eight entries, and every module gets all of it.**
 

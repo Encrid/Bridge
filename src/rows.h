@@ -43,7 +43,7 @@ typedef struct {
  * sentence that begins "its descriptor" and names the word it stopped at. */
 [[nodiscard]] rows_type *rows_declare(rows *r, const char *ns, const char *name,
                                       enum bridge_kind kind, const char *desc, uint32_t *size,
-                                      uint32_t *align, const char **why);
+                                      uint32_t *align, char *why, size_t why_len);
 void rows_undeclare(rows *r, rows_type *type);
 /* a struct's fields, in the order it states them: how many, and where the first is */
 uint32_t rows_fields(rows *r, rows_type *type, const rows_field **fields);

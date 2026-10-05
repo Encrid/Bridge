@@ -1,9 +1,10 @@
 # Phase 10: storage of our own
 
-In progress.
+Done.
 
-`flecs.md`, *Why flecs rather than our own*, says that writing our own would have produced a
-worse flecs. This phase does it anyway, and this document is why that is no longer the same bet.
+`flecs.md`, *Why flecs rather than our own*, said that writing our own would have produced a
+worse flecs. This phase did it anyway, and this document is why that was no longer the same bet,
+and what came of it. What keeps the rows now is `storage.md`.
 
 ## What changed
 
@@ -71,7 +72,8 @@ Seven questions followed, one at a time.
                                      uses, and nothing of flecs' vocabulary: `schema.md`, *The
                                      type set*
 
-Each is applied to its document in the last step, when the tree is what the document says.
+Each is in its document now: `storage.md`, `budgets.md`, *What running out does*, `schema.md`,
+*The type set*.
 
 The last of those was asked when the parser came to be written. flecs' own took `_Bool`,
 `ecs_entity_t`, `const`, pointers, C++ template spellings, any symbol flecs itself knew, and
@@ -203,7 +205,7 @@ takes what it was asked for. It decides now from what it claims: each system say
 and ended, and two ran at once if one began before the other ended. No length is asked of
 anything. Widening the bound was refused, as `PHASE8.md` said a bound would be.
 
-## What flecs costs
+## What flecs cost
 
 `storage measure`, on Windows, with nothing else running. A hundred thousand entities, each
 change made to all of them in one phase, and the barrier that applies them timed alone. The best
@@ -238,3 +240,99 @@ before them each measure one kind of change alone.
 The second figure of the lower three is the one that was not expected: with ten thousand tables
 standing and nothing changed, a barrier is eight hundred times dearer than with one. Every
 barrier walks every query's matched tables to publish them again, changed or not.
+
+## What it costs
+
+The same program, on the same machine, with storage of our own. One run beside one run of flecs
+taken the same hour, so the first column is not quite the ranges above.
+
+                                              flecs        ours
+    an id handed out                          17.0 ns       1.5 ns
+    attach, the entity's first component     123.9 ns      30.8 ns
+    attach, a component it has                27.4 ns      21.0 ns
+    attach, a second component               128.1 ns      38.3 ns
+    detach                                   100.5 ns      34.3 ns
+    destroy                                   66.1 ns      15.3 ns
+    attach, two components in one barrier    241.3 ns      37.1 ns
+    a barrier with nothing to do             100 ns        under 100 ns
+
+    ten thousand tables made                   3.4 us       0.3 us a table
+    a barrier with nothing to do, then        85.4 us       under 0.1 us
+    ten thousand more, by one attach each      2.9 us       0.3 us a table
+    ten thousand sets filled                   0.4 us       0.2 us a table
+    and emptied again                          0.3 us       0.2 us a table
+
+    the stress run, on four threads          3647 ms      1684 ms
+    the stress run, on one thread            5531 ms      3343 ms
+
+Not slower on any line, which was the gate. Three lines were added for it, each where a decision
+could have lost. **Two components in one barrier** is the fold: flecs moves the entity twice and
+ours once, so ours costs what one attach does. **A quiet barrier with ten thousand tables** is
+publishing only what changed. **Ten thousand sets filled and emptied** is the one that was a risk:
+flecs keeps the emptied tables and only moves rows into them again, where ours makes and releases
+ten thousand tables at every barrier, and still it is the quicker.
+
+**Memory is not ahead on every line, and it is a budget that decides.** What the process holds, as
+the system counts it, at the end of each of the three runs:
+
+                                    flecs        ours
+    a hundred thousand entities     30.3 MB      27.8 MB
+    ten thousand tables             86.6 MB      22.9 MB
+    the stress run                  46.4 MB      61.1 MB, and 48.1 MB with `tables` at 2,048
+
+The test states `[budget] tables` as 32,768 for all three, because one of them needs twenty
+thousand. The stress run has about a thousand, and pays for the rest: `column_base` has a cell for
+every table there may be, in each of four modules, and storage keeps a row of offsets a table.
+Stated at what it uses, the run holds what flecs did. Columns in use are 9,052 KB against 8,427,
+since a table asks for twice what it had.
+
+## What the cases say
+
+Every case passes on storage of our own on Windows, in release and in debug, on Linux and on
+macOS, and four runs of the whole suite at once on one machine pass too. Before flecs was removed
+both storages were built from one tree and run against the same cases by the same script, and the
+three transcripts - `storage-changes.txt`, `storage-tables.txt`, `storage-stress.txt` - were the
+same files for both, word for word.
+
+Three cases are new and are of what only this storage does. Each is a transcript.
+
+    storage notables     `tables` of 1: the entities that would have needed a second table are
+                         left as they were and unheard, a record names the module, and at its
+                         second failing barrier in a row it is stopped
+    storage nocolumns    `columns` of 64 bytes: three of six rows fit, then a fourth, then a
+                         fifth exactly, with the bridge running throughout; the sixth never
+                         does, and the module is stopped at its budget
+    storage scribble     a module writes over every index record and every entity array of
+                         its entities, each to name the first; rows are then destroyed and
+                         moved, and every entity left is where the index says, under its own id
+
+The first two were each run with the rule they test taken out, and failed. The third was run on
+flecs before it left: its observers heard the first entity removed three times over, and an entity
+nobody had made.
+
+Three cases changed their answer, as the decisions said they would. `phase3-nospans` is refused
+at load where it was stopped at a barrier. `phase3-nocolumns` leaves 747 of 1,000 entities as they
+were and runs on, where the bridge stopped. `phase6-configceiling` runs out at `entities` of 1,
+where 440 was flecs' own entities and one more. And `phase5-nested2` is refused by the word the
+reading stopped at.
+
+Six cases went with flecs: the two that held its patch to its claim and the two that showed each
+failing without it, the one that declined another version, and the one that freed a table each of
+the ways flecs could.
+
+## What was not in the plan
+
+**Storage allocates at load, and not only at create.** The plan said nothing after
+`bridge_create`. What a budget sizes is allocated there; but a set is as wide as there are
+declared types and a system keeps a list of its tables, and no budget states how many types or
+systems there will be. Those are allocated when a module loads. A barrier allocates nothing, which
+is what the sentence was for.
+
+**A strip at unload can fail to place an entity**, and then destroys it with a record -
+`lifetime.md`, *What unload leaves behind*. It moves an entity to the table of what it has left
+while the table it is leaving still stands, so a deployment at exactly its `tables` has no room
+for the move. Leaving the entity as it was is not available there: the component is going.
+
+**`source[]` in a span is always zero.** Under flecs it could name the entity a term came from;
+nothing a module could ask for ever made it do so, and storage of our own has no such term. The
+field stays in the span, and `query.md`, *The interface is a query*, says what it holds.

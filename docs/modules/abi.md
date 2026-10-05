@@ -50,8 +50,8 @@ barrier, `threads.md`, *Threads* - so a parent can be spawned
 and referenced by its children in the same system.
 
 **There are no immediate forms.** They could not deliver acting at once: a span is a snapshot from
-the last barrier, so a row made immediately would be unreachable anyway. Worse, flecs swap-removes -
-`src/storage/table.c:1465`, *"move last element to deleted element"* - so an immediate destroy would
+the last barrier, so a row made immediately would be unreachable anyway. Worse, a row that leaves
+is filled by its table's last - `storage.md`, *A table* - so an immediate destroy would
 move **another** entity's row, silently invalidating offsets the module already held for rows it
 never touched, with no check that could catch it.
 
@@ -89,12 +89,12 @@ the way any reference is followed - `reference.md`, *Reference following* - and 
 nothing was removed or destroyed, which is how `ON_REMOVE` is read.
 
 Ids and not a span, because an observer runs after the barrier has restructured and republished -
-`schedule.md`, *An observer runs at the barrier, one hop per barrier*. flecs reports a change as a
-range of rows that is good only inside its own callback, and rows move again before that callback's
-batch is done. An id does not move. Refused: the observer's whole query as spans, which is what a
-system gets and cannot say which entity changed - an event would be found by scanning every event.
-The condition that brings it back is an observer that wants the shape and not the change, and such
-a thing is a system.
+`schedule.md`, *An observer runs at the barrier, one hop per barrier*. What an observer is owed is
+worked out before rows are placed - `storage.md`, *A barrier is worked an entity at a time* - so a
+row would be one the entity is no longer in. An id does not move. Refused: the observer's whole
+query as spans, which is what a system gets and cannot say which entity changed - an event would be
+found by scanning every event. The condition that brings it back is an observer that wants the shape
+and not the change, and such a thing is a system.
 
 **Why it is an entry of its own, and not a system people write.** A system whose query matches an
 event component does the same job by polling, and that is the alternative it has to beat: a poll
@@ -106,7 +106,7 @@ the hot path is the one budget this design exists to protect.
 A system or an observer **is** a query plus a function, so one call registers the pair. `init`,
 `shutdown` and `reload` are reserved names that `system` and `observe` refuse. `terms` is an array
 of term structs rather than a string, so there is no parser in Bridge-ASM700 and no string handed
-over at init. A term is what flecs' `ecs_term_t` says of one, less what a module cannot name: the
+over at init. A term is three things: the
 slot `declare` answered, the access, and whether the term must match, must not, or may. What a
 query may not ask for is `query.md`, *What a query may not ask for*.
 

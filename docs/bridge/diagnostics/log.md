@@ -11,7 +11,7 @@ original Bridge. Bridge-ASM700 drains every ring at each barrier.
 
     u32 when      barrier count, and offset within the phase
     u8  -         reserved, to keep the stride at 24
-    i8  level     negative is worse, flecs' convention
+    i8  level     negative is worse
     u16 system    which system was running
     u32 text      offset into this module's scratch arena, always
     u32 len
@@ -46,8 +46,8 @@ Two rules follow. **Drain precedes the scratch-arena reset**, because the messag
 arena and the barrier does both. And **Bridge-ASM700 bounds-checks `text + len`** against a determinate
 block, which is what makes the check writable at all. One compare per record is the price.
 
-Levels are flecs' signed convention, so flecs' own output needs no mapping - `ecs_os_api.log_` takes
-`(level, file, line, msg)`, warn at -2 and err at -3. Filtering is at the writer, which begins
+Levels are signed, warn at -2 and err at -3, which is flecs' convention (`ecs_os_api.log_`) and was
+taken when its output shared the sink. Filtering is at the writer, which begins
 `if (level > threshold) return` against a threshold in the private-memory header, so a line that is
 switched off costs a load and a branch.
 

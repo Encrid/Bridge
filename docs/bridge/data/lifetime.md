@@ -1,6 +1,6 @@
 # Lifetime
 
-Storage is flecs' and outlives the module that declared a component, so a reloaded module finds its
+Storage is the bridge's and outlives the module that declared a component, so a reloaded module finds its
 components still there - which the original Bridge does not do. What happens when the layout has
 changed is *When the layout changed*, below.
 
@@ -33,12 +33,18 @@ memories Bridge-ASM700 cannot trace, so it cannot be collected when unreachable 
 is that the author knows what the component *is*: an attribute of something that exists anyway, or
 the reason the entity exists at all.
 
-That is flecs' own model, and its reason. Deleting a component there applies a cleanup policy,
+That is flecs' model, and its reason. Deleting a component there applies a cleanup policy,
 `EcsRemove` by default or `EcsDelete`, because only the component's author knows which is meant.
 `sweep` is ours: flecs, EnTT and Bevy all leave an emptied entity alive, and can afford to, since an
 application can enumerate every entity and find its orphans. **No module here can**: a query needs
 terms, so an entity with no component and no remembered id could never be destroyed by anyone, and
 it would count against the entity ceiling for the life of the process.
+
+**A strip moves each entity to the table of what it has left**, one entity at a time, and that
+table may have to be made while the one it is leaving still stands. Where `[budget] tables` or
+`[budget] columns` cannot give it, the entity is destroyed and a record says so: the component is
+going, so the entity cannot stay as it was, which is what running out means anywhere else -
+`budgets.md`, *What running out does*.
 
 **The policy applied is the unloading module's own**, and only when it is the last to declare the
 component. Two declarers need not agree, because the first to leave drops nothing.

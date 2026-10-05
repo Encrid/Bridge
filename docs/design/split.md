@@ -5,7 +5,7 @@ own corner of it and point here.
 
     Bridge-ASM700 - the library      the host
     ------------------------------   ----------------------------------------
-    storage: flecs, columns, spans   reading files, and every format in them
+    storage: tables, columns, spans  reading files, and every format in them
     the barrier and the republish    its config, in whatever form
     the scheduler: phases, the       the manifest, via bridge_manifest_parse
       conflict graph, the refusal      (a helper beside the library)
@@ -20,8 +20,6 @@ own corner of it and point here.
       escalation guards              the meaning of its own config keys
     the backend seam, and opening
       the backend libraries
-    the flecs fork: the patch, the
-      pin, and carrying both
     what it counts and checks when
       asked, and the two pulls
       that hand the answers back
@@ -35,8 +33,8 @@ as one of its settings, and Bridge-ASM700 never opens it. **The journal** is the
 reason: Bridge-ASM700 never writes a file. It does not travel the log's path, though - a log may drop a
 record and a journal may not: `schedule.md`, *What a pass depends on*.
 
-Three more, each on its side because nobody else could hold it. **The flecs fork** is Bridge-ASM700's:
-`flecs.md`, *How it is carried*. **The counters and the checksum pass** are Bridge-ASM700's: `config.md`,
+Two more, each on its side because nobody else could hold it. **The counters and the checksum
+pass** are Bridge-ASM700's: `config.md`,
 *The keys*. **The two pulls** that hand their answers back follow the state - only
 Bridge-ASM700 has it, `introspection.md`, *Introspection*. And **the meaning of a host key** is the host's:
 `config.md`, *The keys*, lists Bridge-ASM700's, and everything else is the host's to define.

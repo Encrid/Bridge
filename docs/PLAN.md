@@ -187,7 +187,7 @@ and macOS.* Met.
 
 ## 10. Storage of our own
 
-flecs leaves, and what Bridge-ASM700 used it for becomes its own: the entity index, tables and
+Done. flecs leaves, and what Bridge-ASM700 used it for becomes its own: the entity index, tables and
 their columns, moving a row between them, matching a system's terms to tables, the events an
 observer hears, and reading a struct's fields out of its text. It is the reversal of a decision
 this plan began with, and `PHASE10.md` is why.
@@ -201,7 +201,7 @@ what is replaced is a hundred thousand lines kept for forty-one calls.
 Bridge-ASM700 touches storage only at a barrier, with every change of that barrier already in
 hand, for queries fixed at load, and nobody iterates through it. Storage made for that works an
 entity once however much was asked of it, publishes what changed and nothing else, believes
-nothing a module can write, and allocates nothing after it is created.
+nothing a module can write, and allocates nothing at a barrier.
 
 **Nothing of flecs is deleted until numbers say it may be.** flecs is measured first, as it is.
 Ours is built beside it, behind one internal header, and both run the same cases. flecs goes only
@@ -210,14 +210,14 @@ and this phase has failed its claim.
 
 *Done when every case passes on storage that is Bridge-ASM700's own, on Windows, Linux and macOS,
 alone and under load; on every measured operation it is not slower than flecs was, with both sets
-of figures recorded; storage allocates nothing after `bridge_create` and reads nothing back from
-the shared block; no line of flecs is left in the tree; and the behaviours no test covered before
-this phase each have one.*
+of figures recorded; storage allocates nothing at a barrier and reads nothing back from the shared
+block; no line of flecs is left in the tree; and the behaviours no test covered before this phase
+each have one.* Met: `PHASE10.md`, *What it costs*.
 
 ## 11. Self contained
 
 Nothing fetched and nothing installed but the toolchain - `build.md`, *Self contained*. The parts
-of a C library that can be carried are carried: the routines our source and flecs call, and an
+of a C library that can be carried are carried: the routines our source calls, and an
 allocator, in `third_party` and linked privately - `build.md`, *The C library*. On Windows no
 C runtime is linked at all. Where each routine comes from, and what "in the tree" means for the
 tools the build runs, are settled in this phase's own plan, with the sources read first.
@@ -295,4 +295,3 @@ Each is refused or deferred in the document named, with the condition that would
     arena mark and reset             `strings.md`, *It is never reclaimed*
     layout migration                 `lifetime.md`, *When the layout changed*
     bindings for a non-C module      `wasm.md`, *The published layouts*
-    upstreaming the allocator hook   `flecs.md`, *How it is carried*

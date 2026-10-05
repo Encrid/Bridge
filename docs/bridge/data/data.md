@@ -1,21 +1,17 @@
 # The data model
 
 What a component is and when the world changes. How a module reaches one is `query.md` and
-`reference.md`; what survives a reload is `lifetime.md`. Where the bytes live is `memory.md`; why
-the ECS is flecs is `flecs.md`.
+`reference.md`; what survives a reload is `lifetime.md`. Where the bytes live is `memory.md`; who
+keeps the rows, and how, is `storage.md`.
 
-Bridge-ASM700 embeds **flecs**. Storage, archetypes, queries, entity ids and the conflict information the
-scheduler needs are all flecs'. Bridge-ASM700 owns the seam: getting query results somewhere a wasm module
-can read them with plain loads.
-
-flecs is an **implementation detail, not the contract**. No module sees it, on either
-backend. The ABI is Bridge-ASM700's own, which holds it to the eight entries in `abi.md`, *The ABI*,
-rather than letting flecs' whole surface become what a module author has to know - half of which
-cannot cross a wasm boundary anyway.
+It is an ECS: components stored by type, entities as ids, systems declared by modules. Storage is
+Bridge-ASM700's own, and it is **an implementation detail, not the contract**. No module calls it,
+on either backend: a module reads what a barrier wrote for it and asks for change through the
+eight entries of `abi.md`, *The ABI*.
 
 ## Components
 
-A component is a C type registered with flecs. Its size and alignment come from the type; which
+A component is a C type, declared by its text. Its size and alignment come from the type; which
 types the schema can express, and how two modules are held to the same layout, is `schema.md`.
 
 Its name is namespaced - `game:Position` - and who may name it is `grants.md`, *Whose component it
@@ -26,14 +22,15 @@ would be a second answer to the same question.
 
 ## Entities
 
-A flecs id: an index and a generation packed into a `u64`. An id outlives the row behind it; a row
-does not outlive a barrier.
+An id: an index in the low 32 bits and a generation in the high 32, in a `u64`. An id outlives the
+row behind it; a row does not outlive a barrier. An index whose entity was destroyed is handed out
+again under another generation, so the old id names nothing - `reference.md`, *Reference
+following*.
 
 ## Access mode
 
-Query terms carry it, as flecs' do: `in`, `out`, `inout`. It is a **scheduling input and nothing
-else** - Bridge-ASM700 uses it to know which modules may run at once, and flecs' pipeline uses it for the
-same purpose inside Bridge-ASM700.
+Query terms carry it: `in`, `out`, `inout`. It is a **scheduling input and nothing else** -
+Bridge-ASM700 uses it to know which modules may run at once, and storage is never told.
 
 It is not enforced, which is how every ECS works. A module that writes a term it declared `in` is
 a bug in that module, no different from one writing nonsense into a term it owns. The second is
@@ -46,7 +43,7 @@ it cannot touch the host, another module's memory, or anything it was not given.
 ## Structural change
 
 Deferred, onto the queue of the module that asked, and applied at the barrier - `threads.md`,
-*Threads*, for why the queue is the module's and not flecs'. There is one
+*Threads*, for why the queue is the module's own. There is one
 after every phase, and **no phase is an exception**: a phase is only a name, so no kind of phase
 could be one - `schedule.md`, *A phase is a name and nothing else*. A span is a snapshot taken at the
 last barrier, so a change applied sooner than the next one is a change nothing can address.
@@ -68,20 +65,30 @@ reload needs no flag to choose - `lifetime.md`, *Lifetime*.
 
 ## Observers
 
-A system runs every pass. An **observer** runs when its query's data changes - `flecs.h:453`, *"an
-observer is a system that is invoked when an event matches its query"* - with `ON_ADD`, `ON_SET` and
-`ON_REMOVE` as the triggers.
+A system runs every pass. An **observer** runs when what its terms describe changes for some
+entity, with `ON_ADD`, `ON_SET` and `ON_REMOVE` as the triggers.
 
-It runs **at the barrier where the change applied**, which is why it takes no phase. flecs arranges
-that itself, which is checked rather than assumed. An observer on an *immediate* operation
-does fire synchronously, on the caller's stack, mid-phase, against spans that are a snapshot from
-the last barrier - the one thing `schedule.md`, *Phases*, does not allow. But **every structural
-change here is deferred** - `abi.md`, *The ABI* - so flecs only ever sees one at a barrier, and not
-one invocation arrives early. `tests/phase5.c` holds that on every build: an attach made in a phase
-reaches its observer under that phase's barrier count, and a chain of three takes three barriers.
+It runs **at the barrier where the change applied**, which is why it takes no phase. Every
+structural change is deferred - `abi.md`, *The ABI* - so there is no change to hear of anywhere
+else. `tests/phase5.c` holds that on every build: an attach made in a phase reaches its observer
+under that phase's barrier count, and a chain of three takes three barriers.
 
-So Bridge-ASM700 uses flecs' observers as they are. Nothing to arrange, and no change detection to write:
-an observer runs where the world is already consistent, and never inside somebody else's work.
+**What it is owed comes out of the barrier's own work.** Storage reads the queues in order and has,
+for each change, the set of components the entity carried before it and the set after -
+`storage.md`, *A barrier is worked an entity at a time*. An observer matches a set or does not:
+
+    it did not match, and now does      add, and set if the change was an attach
+    it matched, and no longer does      remove
+    it matches before and after, and    set
+    the change attached one of its
+    terms
+    a destroy of one it matched         remove, once, however often it was asked
+
+So an observer of two terms hears an entity when it comes to carry both, by whichever attach
+completed the pair. Changes to one entity at one barrier are one record, with every event that
+happened: an entity given a component and stripped of it in the same phase is heard once, as add,
+set and remove. A detach of what is not there, and any change to an id that is dead, is nothing.
+`tests/storage.c`, case `changes`, says each of these out loud.
 
 **This is how an event crosses.** A native module with a fired signal spawns an entity carrying an event
 component; the change applies at the barrier and the subscriber's observer runs there. Same latency

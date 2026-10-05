@@ -67,7 +67,7 @@ diagram to keep in step with. One concern per document, in reading order:
         strings.md           the two arenas, and which one a string belongs in
         budgets.md           what is sized, and by whom
 
-    bridge/flecs.md          why flecs, where it allocates, and the fork
+    bridge/storage.md        who keeps the rows: tables, the barrier, what is written
 
     bridge/diagnostics/
         validation.md        what a bad write costs, and what finds it

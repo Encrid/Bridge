@@ -10,7 +10,7 @@ is done, its part here is the decision and not yet the tree.
 ## One compiler
 
 **zig, at one pinned version, compiles everything on every platform**: the library, the backends,
-flecs, the tests, and the test modules, wasm and native. `zig cc` is clang with the headers and
+the tests, and the test modules, wasm and native. `zig cc` is clang with the headers and
 runtimes of every target inside it, so the Linux and macOS builds are compiled where the code is
 written, by the compiler that will compile them there.
 
@@ -28,7 +28,7 @@ back is a class of bug that only one would have caught.
 
 ## One script
 
-**`build.py`, and Python is the only other tool.** It patches flecs, compiles, links, builds the
+**`build.py`, and Python is the only other tool.** It compiles, links, builds the
 test modules and runs the tests, as a list of commands a reader can follow from the top:
 
     python build.py                      build, for this machine
@@ -68,10 +68,10 @@ for a platform that is leaving. The condition that brings it back is a deploymen
 
 ## The standard
 
-**Each piece at its own.** flecs is C99 and says so. wasmtime's headers are C11. Everything of
-Bridge-ASM700's own is C23: the source, the tests, the test modules and all five headers.
+**Each piece at its own.** wasmtime's headers are C11. Everything of Bridge-ASM700's own is C23:
+the source, the tests, the test modules and all five headers. flecs was C99, built by its own flags
+as it asked, until phase 10 removed it.
 
-    third_party/flecs             C99    compiled by its own flags, as it asks
     third_party/wasmtime/include  C11    read by backends/wasm/wasm.c and nothing else
     everything else               C23
 
@@ -122,11 +122,12 @@ ABI header is where a stated width and an asserted layout are worth most. The co
 brings an earlier standard back for the headers is a host or a backend that has to be built by a
 compiler without C23.
 
-**Thread-local storage stays.** Three variables are found by which thread is running: the bridge
-flecs' allocator is working for, the native module whose entry was called, the memory wasmtime is
-being asked to create. Each is there because a callback Bridge-ASM700 does not own carries no
-context. Phase 11 has one thing to verify about them: on Windows the compiler reaches a
-thread-local variable through a runtime helper, and that phase links no C runtime.
+**Thread-local storage stays.** Two variables are found by which thread is running: the native
+module whose entry was called, and the memory wasmtime is being asked to create. A third went with
+flecs, whose allocator callbacks could not say which bridge they were working for. Each is there
+because a callback Bridge-ASM700 does not own carries no context. Phase 11 has one thing to verify
+about them: on Windows the compiler reaches a thread-local variable through a runtime helper, and
+that phase links no C runtime.
 
 ## The C library
 
@@ -138,8 +139,8 @@ A C library is three things under one name, and they do not go the same way:
                       loading a library            Linux and macOS
 
 **The first two are carried**: source in `third_party`, built by the build, linked privately into
-the library, as flecs is. What Bridge-ASM700's own source calls is fifteen functions. flecs calls
-more, mostly from addons that are never used, so it is built with the addons that are.
+the library. What Bridge-ASM700's own source calls is fifteen functions, and since phase 10 nothing
+else in the library calls any.
 
 **The third is not ours to carry.** Bridge-ASM700 is a library: it is loaded into a process whose C
 library the host's executable chose, and it loads native modules that somebody else built. On Linux
@@ -161,7 +162,7 @@ platform, where three C runtimes formatted three ways.
 ## Self contained
 
 **Nothing is fetched, and nothing is installed but zig and Python.** What Bridge-ASM700 depends on
-is in the tree, with where it came from and its hash beside it: flecs and wasmtime today, the C
+is in the tree, with where it came from and its hash beside it: wasmtime today, the C
 routines and the tools the build runs from phase 11.
 
 Third-party code is not refused. Code that arrives from somewhere the tree does not record is.

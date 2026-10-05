@@ -1,7 +1,12 @@
 # flecs
 
-Why flecs is embedded rather than swappable, where its memory lives, and the fork that confines
-it. The data model built on it is `data.md`.
+**A record, not a description.** flecs was removed in phase 10, and nothing below is true of the
+tree any more: `PHASE10.md` is why, and `storage.md` is what keeps the rows now. This is kept
+because the phases before that one cite it, and because the reasoning it holds is what phase 10
+was weighed against.
+
+Why flecs was embedded rather than swappable, where its memory lived, and the fork that confined
+it.
 
 ## Why the backend is swappable and this is not
 

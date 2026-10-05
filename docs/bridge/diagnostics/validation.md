@@ -46,13 +46,13 @@ It stays, at that price: a sixth of a tight loop buys the one check that catches
 rows that are not its span's. The condition that reopens it is a workload where that sixth is the
 difference, and the answer then is an accessor that tests once per span rather than once per row.
 
-**Row counts against table sizes.** O(matched tables), the same order as publishing, so it is not in
-the expensive tier at all - a few comparisons on a walk Bridge-ASM700 is already doing.
-
-**What it catches is our own patch failing**, not flecs. The patch in `flecs.md`, *flecs will not
-tell you which*, exists so the mirror cannot drift. This check notices if the patch is wrong,
-against the one mechanism whose failure is silent and sends modules to rows that are not theirs.
-Nearly free, and aimed at the code we wrote rather than the library we vendored.
+**The entity index needs no check of its own.** It did while flecs kept the rows: flecs moved a
+row and Bridge-ASM700 had to be told, by a patch whose failure would have been silent, so every
+barrier compared row counts against table sizes. Storage now writes a record at the place in the
+code where it places the row - `reference.md`, *Reference following* - and reads none of it back,
+so there is no second account to compare. `tests/storage.c`, case `stress`, is where that is held:
+four modules keep their own account of eight million changes and check every entity through the
+index, and every component through its spans, at every pass.
 
 ## The checksum pass, when asked
 

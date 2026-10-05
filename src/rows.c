@@ -724,18 +724,15 @@ static void widen(rows *r, uint32_t types)
 }
 
 rows_type *rows_declare(rows *r, const char *ns, const char *name, enum bridge_kind kind,
-                        const char *desc, uint32_t *size, uint32_t *align, const char **why)
+                        const char *desc, uint32_t *size, uint32_t *align, char *why,
+                        size_t why_len)
 {
-    static thread_local char said[200];
     looking l = { r, ns };
     rows_type *t;
     schema s;
     uint32_t id;
 
-    if (schema_parse(kind, desc, find, &l, &s, said, sizeof said)) {
-        *why = said;
-        return nullptr;
-    }
+    if (schema_parse(kind, desc, find, &l, &s, why, why_len)) return nullptr;
     for (id = 0; id < r->type_count && r->types[id]; id ++) {}
     if (id == r->type_count) {
         r->types = realloc(r->types, (r->type_count + 1) * sizeof *r->types);

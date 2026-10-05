@@ -12,7 +12,7 @@ it has, which is a value nobody stated and the wrong one inside a host with a th
 own. Refused: borrowing the host's threads through a callback, a new seam nothing asks for yet. The
 condition that brings it back is a host whose job system Bridge-ASM700 has to run on.
 
-**No entry takes a lock, and none reaches flecs.** Modules run at once, and what one is given must
+**No entry takes a lock, and none reaches storage.** Modules run at once, and what one is given must
 not depend on who ran beside it - `schedule.md`, *What a pass depends on*. So everything an entry
 touches while a phase runs is the calling module's alone, and a module's systems are serialised, so
 each has one writer:
@@ -26,13 +26,13 @@ they loaded, and within one in the order it asked. Then it tops each block up. T
 same every run, so the ids a module is given and the rows its changes land in are too, on one
 thread or on eight.
 
-Refused: one lock around every entry, which is what this replaced. It serialised modules that had
-no reason to wait for each other, and it made the ids two modules were given in one level a matter
-of which thread arrived first. Refused: flecs' own stages, which exist for this and assert that an
-entity cannot be created while they are in use. Refused: declaring that a system mints, as a write
-is declared, so that two such never share a level - no key to state, and two modules could then
-never spawn at once. The condition that brings that one back is the two keys below proving harder
-to state than the parallelism is worth.
+Refused: one lock around every entry, which is what this replaced. It serialised modules that had no
+reason to wait for each other, and it made the ids two modules were given in one level a matter of
+which thread arrived first. Refused: a queue inside storage for each thread, which is what an ECS
+offers for this: whose change is applied first would then follow which thread ran whom. Refused:
+declaring that a system mints, as a write is declared, so that two such never share a level - no key
+to state, and two modules could then never spawn at once. The condition that brings that one back is
+the two keys below proving harder to state than the parallelism is worth.
 
 What it costs is `spawns` and `persistent`, two more values a module states: `budgets.md`,
 *Budgets*.
