@@ -43,7 +43,7 @@ is the creator no longer being asked for a memory an instance defines.
 segments down as a mapped image rather than copying them, and asserts that the memory under the
 image is one it mapped itself. No memory here is: all of them come from the creator. Left on, a
 module whose data happens to fit an image aborts the process at instantiation - on Linux and not on
-Windows, which has no such images, so the first run of the `linux` preset over such a module is
+Windows, which has no such images, so the first Linux run over such a module is
 what found it. `tests/modules/image.wat` is a module that would.
 
 The creator is asked for every memory, a module's own included, and is not told which. The backend

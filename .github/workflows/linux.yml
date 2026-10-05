@@ -1,4 +1,4 @@
-# The linux preset, on every push: the half of every phase's claim a Windows machine cannot check.
+# The Linux build, on every push: the half of every phase's claim a Windows machine cannot check.
 # The tools are the ones the build asks for, at the versions the Windows runs use.
 name: linux
 
@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  preset:
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -20,8 +20,6 @@ jobs:
       - name: Tools
         run: |
           set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y ninja-build
           mkdir -p "$HOME/tools"
           cd "$HOME/tools"
           curl -fsSL "https://ziglang.org/download/${ZIG_VERSION}/zig-x86_64-linux-${ZIG_VERSION}.tar.xz" | tar -xJ
@@ -31,11 +29,5 @@ jobs:
           echo "$HOME/tools/wasm-tools-${WASM_TOOLS_VERSION}-x86_64-linux" >> "$GITHUB_PATH"
           echo "BINARYEN_ROOT=$HOME/tools/binaryen-version_${BINARYEN_VERSION}" >> "$GITHUB_ENV"
 
-      - name: Configure
-        run: cmake --preset linux
-
-      - name: Build
-        run: cmake --build --preset linux
-
-      - name: Test
-        run: ctest --preset linux --output-on-failure
+      - name: Build and test
+        run: python3 build.py test

@@ -39,7 +39,7 @@ phase 7 replaced it.
 **First, because everything else needs it.** Columns cannot be in the shared memory without the allocator,
 and the mirror cannot be correct without the hook.
 
-*Done when ctest's confinement test fails if one pointer escapes the block, its row-move test fails
+*Done when the confinement test fails if one pointer escapes the block, the row-move test fails
 if one moved record goes unreported, and the patch script declines a flecs version it was not
 written for.* Met.
 
