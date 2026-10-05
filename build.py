@@ -2,7 +2,7 @@
 
     python build.py                      build, for this machine
     python build.py test [-k NAME]       build, then run the tests (all, or those matching)
-    python build.py --target T ...       x86_64-windows-gnu | x86_64-linux-gnu
+    python build.py --target T ...       x86_64-windows-gnu | x86_64-linux-gnu | aarch64-macos
     python build.py --debug ...          unoptimised, with debug information
 
 Needs zig and wasm-tools on the path. Binaryen is taken from BINARYEN_ROOT or the path, and on
@@ -23,7 +23,27 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-TARGETS = {'Windows': 'x86_64-windows-gnu', 'Linux': 'x86_64-linux-gnu'}
+# What differs by target, and nothing else does: where it runs, how a program and a library are
+# named, which of the system's declarations are asked for by name (the language is ISO C, and a
+# compiler's gnu mode would have shown them unasked), what a link names, how a library finds what
+# sits beside it, and wasmtime's files under third_party/wasmtime: the one a backend is linked
+# against, and the one it loads.
+TARGETS = {
+    'x86_64-windows-gnu': {
+        'runs on': ('Windows', 'AMD64'), 'program': '.exe', 'library': '.dll',
+        'compile': [], 'link': ['-lws2_32', '-ldbghelp'], 'beside': [],
+        'wasmtime': ('windows/libwasmtime.dll.a', 'windows/wasmtime.dll')},
+    'x86_64-linux-gnu': {
+        'runs on': ('Linux', 'x86_64'), 'program': '', 'library': '.so',
+        'compile': ['-fPIC', '-D_DEFAULT_SOURCE'], 'link': ['-lm', '-lpthread', '-ldl'],
+        'beside': ['-Wl,-rpath,$ORIGIN'],
+        'wasmtime': ('linux/libwasmtime.so', 'linux/libwasmtime.so')},
+    'aarch64-macos': {
+        'runs on': ('Darwin', 'arm64'), 'program': '', 'library': '.dylib',
+        'compile': ['-fPIC', '-D_DARWIN_C_SOURCE'], 'link': [],
+        'beside': ['-Wl,-rpath,@loader_path'],
+        'wasmtime': ('macos/libwasmtime.dylib', 'macos/libwasmtime.dylib')},
+}
 BINARYEN = 'binaryen-version_133'
 BINARYEN_URL = ('https://github.com/WebAssembly/binaryen/releases/download/version_133/'
                 'binaryen-version_133-x86_64-windows.tar.gz')
@@ -148,26 +168,21 @@ def binaryen(build):
 
 
 def build(target, debug, out):
-    windows = 'windows' in target
-    exe, lib = ('.exe', '.dll') if windows else ('', '.so')
+    row = TARGETS[target]
+    exe, lib = row['program'], row['library']
     zig = tool('zig') or die('zig is not on the path')
     wasm_tools = tool('wasm-tools') or die('wasm-tools is not on the path')
     merge, opt = binaryen(out.parent)
     obj, modules, backends = out / 'obj', out / 'modules', out / 'backends'
     wasmtime = ROOT / 'third_party/wasmtime'
-    runtime = wasmtime / ('windows/wasmtime.dll' if windows else 'linux/libwasmtime.so')
-    link_wasmtime = wasmtime / 'windows/libwasmtime.dll.a' if windows else runtime
+    link_wasmtime, runtime = (wasmtime / f for f in row['wasmtime'])
 
     cc = [zig, 'cc', '-target', target] + (['-O0', '-g'] if debug else ['-O2', '-DNDEBUG'])
-    if not windows:
-        # the language is ISO C; what the system's headers declare beyond it is asked for by
-        # name, where a compiler's gnu mode would have shown it unasked
-        cc += ['-fPIC', '-D_DEFAULT_SOURCE']
+    cc += row['compile']
     # an error, since zig says a warning once and then answers from its cache without it. Members
     # an initializer leaves out are zero, which C states and flecs' descriptors are written for.
     ours = cc + ['-std=c11', '-Wall', '-Wextra', '-Werror', '-Wno-missing-field-initializers']
-    system = ['-lws2_32', '-ldbghelp'] if windows else ['-lm', '-lpthread', '-ldl']
-    here = ['-Wl,-rpath,$ORIGIN'] if not windows else []
+    system, here = row['link'], row['beside']
     include, src = '-I%s' % (ROOT / 'include'), '-I%s' % (ROOT / 'src')
     headers = [Path(__file__)] + [h for d in ('include', 'src', 'tests', 'tests/modules')
                                   for h in (ROOT / d).glob('*.h')]
@@ -335,13 +350,14 @@ def test(out, built, only):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('command', nargs='?', default='build', choices=['build', 'test'])
-    ap.add_argument('--target', choices=sorted(TARGETS.values()))
+    ap.add_argument('--target', choices=sorted(TARGETS))
     ap.add_argument('--debug', action='store_true')
     ap.add_argument('--out', type=Path, help='where to build: build/<target> beside this file')
     ap.add_argument('-k', metavar='NAME', help='only the tests whose name has this in it')
     args = ap.parse_args()
-    mine = TARGETS.get(platform.system())
-    target = args.target or mine or die('no target for %s: name one' % platform.system())
+    machine = (platform.system(), platform.machine())
+    mine = next((t for t, row in TARGETS.items() if row['runs on'] == machine), None)
+    target = args.target or mine or die('no target runs on %s %s: name one' % machine)
     if args.command == 'test' and target != mine:
         die('%s cannot be run here: build it, and test it where it runs' % target)
     out = (args.out or ROOT / 'build' / (target + ('-debug' if args.debug else ''))).resolve()

@@ -7,17 +7,22 @@ From the official release archives, unpacked and otherwise untouched:
         sha256 7842335b4199bb5cdf3031c0d9084db17ab3d0619829726ed19576d48b5b8ead
     wasmtime-v48.0.5-x86_64-linux-c-api.tar.xz
         sha256 81fffe5fe895c7f8f84a744f4d4d165dda28793d00ee943ee71fcfb6ab5ed923
+    wasmtime-v48.0.5-aarch64-macos-c-api.tar.xz
+        sha256 92e74e76ef06ae699beec893cf3268d439da4d05dbca020e8f608ca3f0c1e862
 
-Kept: `include/` (identical in both archives), the shared library for each platform, and the
-Windows import library. Not kept: the static libraries, which are 70 to 80 MB each, and `min/`.
+Kept: `include/` (the same in all three archives, line endings aside), the shared library for each
+platform, and the Windows import library. Not kept: the static libraries, which are 40 to 80 MB
+each, and `min/`.
 
 The Windows one is the `mingw` build, since the library is compiled for `x86_64-windows-gnu`:
 `docs/design/build.md`, *Platforms*.
 
     windows/wasmtime.dll          sha256 ba4c905a80c4d43b71afc16618c0d4142a04b5d17895a6d3194b658e712437ca
     windows/libwasmtime.dll.a     sha256 658a4273fed898c1a51bec469d65c093682b16e76a410204df4dac60dbbddf71
-    linux/libwasmtime.so       sha256 b85374b12274b0179209b44e1b6b7467fb3c6a5fb9a70b7e0964053e6d4932ed
+    linux/libwasmtime.so          sha256 b85374b12274b0179209b44e1b6b7467fb3c6a5fb9a70b7e0964053e6d4932ed
+    macos/libwasmtime.dylib       sha256 bd837ecc786a413da9e61d352de0e5e0bdd8df8151010ab361123568905a0c0c
 
-Vendored on 2026-10-04, and the Windows files again on 2026-10-05. Nothing here has been edited.
+Vendored on 2026-10-04; the Windows files again, and the macOS one, on 2026-10-05. Nothing here
+has been edited.
 48 is a long-term release; why that one, and
 what the wasm backend does with it, is `docs/seam/backend/impl/wasmtime.md`.
