@@ -42,3 +42,36 @@ backend, as `fuel` demands `meter`.
 
 All five are stated, and "no limit" is a value like any other: `-1`. `capabilities.md`,
 *Capabilities, so the swap is honest*.
+
+## What a bound costs
+
+**A bound is paid for by the module that states it, and by no other.** Fuel is counted in the
+compiled code, on the path this design exists to keep free, and so is the check that lets a deadline
+interrupt. On the wasm backend, over the tightest loop a system can have - one float read, changed
+and written back per row - that measured as:
+
+    neither             0.29 ns a row
+    a deadline          0.43            x1.5
+    fuel                0.64            x2.2
+    both                0.65            x2.2
+
+That is the worst case: the heavier a row's work, the smaller the share. It is still a factor and
+not a rounding error, so `-1` has to mean the cost is gone and not merely that the budget is large.
+A module stating `fuel = -1` is compiled without the count, and one stating `-1` for all three
+timeouts without the interrupt check - `backend.md`, *What a backend is asked for*, hands the
+backend what was demanded for that reason.
+
+The original Bridge found the same thing the slow way: its fuel accounting was on for every module
+while `fuel = -1` everywhere was the common deployment, "and it was paying anyway".
+
+What a module gives up with `fuel = -1` is exactly what it says: a system of its that never returns
+is never stopped, and the pass hangs with it, as it would for a native module.
+
+Refused: bounding a system by a deadline instead, which is the cheaper of the two. A timeout firing
+is the one thing a pass cannot reproduce - `schedule.md`, *What a pass depends on* - and it would
+have to be armed on every dispatch and for several systems at once. The condition that brings it
+back is record and replay being given up for good.
+
+Refused: counting in the module's own code at loop back-edges, by a rewriter of ours. That is an
+instrumenting compiler inside the library, for a gain nobody has measured. The condition that
+brings it back is a metered deployment that cannot afford the factor above.

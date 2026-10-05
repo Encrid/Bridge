@@ -60,6 +60,7 @@ as a helper - `native.md`, *Identity*.
     typedef struct {
         uint64_t entities;        /* the index mirror ceiling */
         uint64_t persistent;      /* the persistent arena */
+        uint64_t columns;         /* component columns and entity arrays */
         uint32_t max_modules;     /* the per-module slot pool */
     } bridge_budget;
 
@@ -95,7 +96,7 @@ as a helper - `native.md`, *Identity*.
         int64_t  memory_limit;       /* bytes. a ceiling, never re-set */
         int64_t  init_timeout, reload_timeout, shutdown_timeout;   /* nanoseconds, per call */
         int8_t   log_level;
-        uint32_t scratch, log_ring;
+        uint32_t scratch, log_ring, spans;   /* bytes, bytes, bytes */
 
         const char *const *read;  uint32_t read_count;       /* grants */
         const char *const *write; uint32_t write_count;

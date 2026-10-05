@@ -24,10 +24,14 @@ thing it reads there that it cannot derive. Every other shared-memory offset is 
 shared memory itself, including the `(offset, length)` a component holds into the persistent arena,
 so nothing else needs a base.
 
-The span region's size is Bridge-ASM700's too, and Bridge-ASM700 resizes it at a barrier, where
-nothing holds an offset into it. That is Quake's progs layout - fixed offsets at the bottom,
-everything else found through them. So no module has to declare a span capacity it could not
-compute: span count is archetype count, and archetype count is a property of the deployment.
+The span region holds the query slots, the spans and `column_base`. Its size is the module's
+`spans` budget, in bytes - `budgets.md`, *Budgets* - and how it is divided is Bridge-ASM700's, redone
+at a barrier, where nothing holds an offset into it. That is Quake's progs layout - fixed offsets at
+the bottom, everything else found through them.
+
+What fills it is archetype count, which is a property of the deployment and not of the module. So
+`spans` is the key an author states a guess for and a deployment is expected to correct, and a
+reload that states more just gets it.
 
 What stays exposed is the shared memory: the columns, because shared columns are the design, and the index,
 because a wasm module must read it with plain loads and wasm has no read-only import.

@@ -17,6 +17,11 @@ So **a signature is declared going in and verified coming out.** `define_func` c
         const uint8_t *results; uint32_t result_count;
     } backend_sig;
 
+**A function Bridge-ASM700 provides answers a status beside its results.** Non-zero says the call
+that reached it must not go on - `budgets.md`, *What running out does* - and a backend that can
+unwind a module does so there: the wasm backend raises a trap. One that cannot lets the call
+return, and Bridge-ASM700 fails the invocation when it does.
+
 **An arity would not do, and not as a matter of taste.** Five of the eight entries answer a value -
 `declare`, `system` and `observe` a slot, `spawn` an id, `alloc` an offset - and a count of
 arguments cannot say so. Nor can it say how wide they are: `attach(id, slot, ptr, len)` has four

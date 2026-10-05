@@ -12,7 +12,7 @@ What matters at this seam is the far side of that list: config, discovery and th
 host's, so **a backend never has a file to find**. It is handed a module's bytes and its path,
 uninspected, and the settings that are its own.
 
-**Bridge-ASM700 opens the backend libraries its config names**, and finds the sixteen entries in each by
+**Bridge-ASM700 opens the backend libraries its config names**, and finds the seventeen entries in each by
 name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
 
 ## What a backend is asked for
@@ -23,7 +23,8 @@ name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
 
     memory_shape(backend)                      -> reservation, guard
     memory_adopt(backend, ptr, len)            -> memory
-    module_compile(backend, bytes, len, path)  -> module
+    memory_release(memory)
+    module_compile(backend, bytes, len, path, demands) -> module
     module_imports(module)                     -> names and kinds
     module_destroy(module)
 
@@ -37,13 +38,19 @@ name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
     instance_func(instance, name, &arity, &results) -> func
     call(func, status)                         -> err
 
-Sixteen entries. The original Bridge's `ModuleRuntime` trait had fourteen, four of which were
+Seventeen entries. The original Bridge's `ModuleRuntime` trait had fourteen, four of which were
 filesystem and timer work that has moved out.
 
 **`module` at this seam is a module's loaded image**: compiled bytes on the wasm backend, an opened
 library on the native one. `module_compile` takes
 both the bytes and the path because Bridge-ASM700 inspects neither, and each backend uses the one it
 needs.
+
+**It also takes the capabilities this module's config demands**, as the flags of `capabilities.md`,
+*Capabilities, so the swap is honest*. A guarantee can cost something on every instruction, and a
+backend that knows a module declined one need not compile it in - `limits.md`, *What a bound
+costs*. A backend is free to ignore them and enforce more than was asked; it is never free to
+enforce less, which the load check has already settled before this is called.
 
 `module_imports` is there for one decision: **which memories to hand `instance_create`.** Not every
 module imports both - `wasm.md`, *Memories* - so Bridge-ASM700 reads the list rather than supplying
@@ -73,6 +80,19 @@ There is no read-only variant and no verification pass, because access mode is n
 
 For the native backend `memory_adopt` is almost nothing - the pointer is already addressable - which
 is the shape a good abstraction should have.
+
+**`memory_release` takes the handle back**, and frees nothing of the block, which was never the
+backend's. A module's private block is adopted when it loads and released when it unloads, so a
+handle without a counterpart would leak once per unload. The order is Bridge-ASM700's to keep:
+**a memory is released after the last instance it was handed to is destroyed**, never before, since
+an instance may hold the handle for as long as it runs.
+
+Refused: no handle at all, with `instance_create` taking a pointer and a length. On the two backends
+that exist the handle is those two numbers and nothing more, so it would cost nothing today. It is
+kept for the backend whose engine separates a block's backing from the object an instance sees, and
+must build the first once per block. Refused: the handle dying with the instance that used it,
+which is wrong for the shared memory - every instance uses it - and hides a count inside each
+backend.
 
 ## The backend owns its clock
 
@@ -120,5 +140,5 @@ Meaningless to one backend is a different thing, and that is `store_create`: not
 "the word names nothing here", which no capability flag could rescue.
 
 Bridge-ASM700 hands it bytes, memories and host functions, and asks it to run a function. That is the
-entire relationship, and it is why the surface is sixteen entries rather than a second copy of
+entire relationship, and it is why the surface is seventeen entries rather than a second copy of
 Bridge-ASM700.

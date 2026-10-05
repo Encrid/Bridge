@@ -41,7 +41,7 @@ diagram to keep in step with. One concern per document, in reading order:
         config.md            what Bridge-ASM700 requires of the values it is handed
 
     seam/backend/            Bridge-ASM700 to a backend
-        backend.md           the sixteen entries, memory, the clock
+        backend.md           the seventeen entries, memory, the clock
 
     seam/backend/impl/       one document per backend
         wasmtime.md          the wasm backend: the pin, adoption, deadlines
@@ -102,7 +102,7 @@ cannot use:
                       `wasm.md`, *The published layouts*
     bridge-native.h   module seam, native backend only: `bridge_api` - a wasm
                       module gets imports, not pointers
-    bridge-backend.h  backend seam: the sixteen entries in `backend.md`
+    bridge-backend.h  backend seam: the seventeen entries in `backend.md`
 
 **Prose cites a document by name, never by path** - `data.md`, not `bridge/data/data.md` - because a
 reader wants the document and not its location, and `tools/xref.py` resolves the name.

@@ -53,12 +53,24 @@ the call has not returned. Lifecycle calls never overlap - `lifecycle.md`, *The 
 so one armed deadline is all there ever is.
 
 An increment reaches every store of the engine, and a store with no deadline set traps at once. So
-every other call runs under a deadline too far away to be reached. That is this backend's business
-and invisible at the surface: a system still has no deadline as far as Bridge-ASM700 is concerned.
+every other call on that engine runs under a deadline too far away to be reached. That is this
+backend's business and invisible at the surface: a system still has no deadline as far as
+Bridge-ASM700 is concerned.
 
 Refused: a thread incrementing every tick period, which is wasmtime's usual pattern. It needs a
 period somebody must choose, wakes forever with nothing armed, and rounds every timeout to a tick.
 The condition that brings it back is several deadlines running at once.
+
+## One engine per demand
+
+Fuel and epoch interruption are settings of a wasmtime **engine**, fixed before anything is
+compiled, and each puts code in every loop - `limits.md`, *What a bound costs*, has the numbers. So
+the backend keeps up to four engines, one per combination of `meter` and `deadline`, each made the
+first time a module demanding that combination is compiled. A deployment where every module agrees
+has one.
+
+A module compiled without epoch checks cannot be interrupted, so its store sets no deadline and the
+watchdog increments only the engine of the call it was armed for.
 
 ## What it answers
 

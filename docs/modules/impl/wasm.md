@@ -56,6 +56,17 @@ into the compiled module and inlines it, with Binaryen's `wasm-merge` and `wasm-
 has plain loads and stores on the shared memory in the loop and no call left: checked on a C loop
 before this was written down.
 
+**The build then strips them.** The merge leaves every accessor exported, so the build removes the
+exports by their common prefix, `acc_`, and with them the bodies nothing calls any more:
+`wasm-opt --remove-exports=acc_* --remove-unused-module-elements`.
+
+Load does not check that it happened. Only a module can name one of its exports to the scheduler,
+through `system`, and every accessor takes a parameter, so the `() -> i32` check refuses each of
+them already - `signatures.md`, *Imports are declared, exports are checked*. Refused: refusing every
+export `init` did not register, which would refuse the `memory` and `__heap_base` a compiler emits
+unasked and make every toolchain strip to be loaded at all. The condition that brings it back is an
+export becoming callable by something other than its own module.
+
 The compiler sees those accessors as opaque calls until the merge, so it cannot vectorise across
 them. That is the cost, and the measurement in `PLAN.md` phase 3 is where it shows if it matters.
 
