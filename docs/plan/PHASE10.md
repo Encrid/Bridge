@@ -117,6 +117,20 @@ What was not known until it ran:
 None of it looked accidental, so ours copies all of it. One line of the transcript was taken
 out before it was kept: how many tables there are, which counted flecs' own.
 
+## Found on the way: a sleep is a least time
+
+`phase5-parallel` failed on macOS twice in four runs of one commit, with two systems on two
+threads taking 203 ms where two sleeps of 100 ms at once should take 100. Each system was made to
+say when it began, and four more runs showed both beginning in the same millisecond every time:
+the pool had woken its worker at once. What was late was the sleep. `usleep` for a tenth of a
+second returned after 116 to 200 ms on that runner, where Windows and Linux return within a few
+of it: macOS gathers timers together to save power, and a virtual machine adds its own delay.
+
+The case had been deciding "at once" from "took under 180 ms", which holds only where a sleep
+takes what it was asked for. It decides now from what it claims: each system says when it began
+and ended, and two ran at once if one began before the other ended. No length is asked of
+anything. Widening the bound was refused, as `PHASE8.md` said a bound would be.
+
 ## What flecs costs
 
 `storage measure`, on Windows, with nothing else running. A hundred thousand entities, each

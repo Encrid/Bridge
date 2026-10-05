@@ -1,5 +1,5 @@
-/* A system that takes a tenth of a second and says which thread it was on. Two of these that
- * finish in under two tenths ran at once. */
+/* A system that takes a tenth of a second or more, and says which thread it was on, when it
+ * began and when it ended. Two of these whose times overlap ran at once. */
 #include "bridge-native.h"
 
 #ifdef _WIN32
@@ -28,10 +28,13 @@ BRIDGE_NATIVE_BIND(api)
 
 BRIDGE_NATIVE(nap)
 {
-    /* when it began, in milliseconds: two that ran at once began within a few of each other */
+    /* When it began and when it ended, in milliseconds: two ran at once if one began before
+     * the other ended. How long a nap takes is not asked: a sleep is a least time, and some
+     * systems return from a tenth of a second after two. */
     uint32_t began = now_ms();
     nap();
     bridge_native_log(api, 0, "nap", 3, thread_id(), began);
+    bridge_native_log(api, 0, "end", 3, thread_id(), now_ms());
     return 0;
 }
 

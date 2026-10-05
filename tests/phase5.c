@@ -25,7 +25,7 @@
 constexpr int64_t MS = 1'000'000;
 
 /* the thread a native test module said it ran on, for the lines that say so */
-static uint32_t threads_seen[64], began_seen[64], seen, pins, pins_here;
+static uint32_t threads_seen[64], began_seen[64], ended_seen[64], seen, ended, pins, pins_here;
 
 /* two bridges, one sink: each says which it is, and its last sum is kept */
 static uint32_t last_sum[2];
@@ -55,6 +55,10 @@ static void sink(void *ud, const bridge_record *r)
             began_seen[seen] = r->arg[1];
             threads_seen[seen ++] = r->arg[0];
         }
+        return;
+    }
+    if (r->len == 3 && !memcmp(r->text, "end", 3)) {
+        if (ended < 64) ended_seen[ended ++] = r->arg[1];
         return;
     }
     printf("record[%d] b%u %s/%s: %.*s %u %u\n", r->level, r->when >> 16,
@@ -372,13 +376,19 @@ int main(int argc, char **argv)
         a = native("test:sleep2@0.1.0", NSLEEP2_PATH);
         load(b, &a);
         ms = phase_ms(b, "update");
-        printf("two naps of 100 ms took %.0f ms on %u thread(s)\n", ms, distinct_threads());
-        printf("%s\n", ms < 180.0 && distinct_threads() == 2 ? "they ran at once"
-             : ms > 190.0 && distinct_threads() == 1 ? "they ran one after the other"
+        /* At once is one beginning before the other ended, and nothing about how long either
+         * took: a sleep of a tenth of a second returns after two on some systems. The clock is
+         * in milliseconds, so two that follow each other may share one: not an overlap. */
+        bool both = seen == 2 && ended == 2;
+        bool overlap = both && began_seen[0] < ended_seen[1] && began_seen[1] < ended_seen[0];
+        printf("two naps took %.0f ms on %u thread(s)\n", ms, distinct_threads());
+        printf("%s\n", both && overlap && distinct_threads() == 2 ? "they ran at once"
+             : both && !overlap && distinct_threads() == 1 ? "they ran one after the other"
              : "neither clearly");
-        /* not part of what is judged: how long the second waited to begin, for when it fails */
-        printf("the second began %u ms after the first\n", seen < 2 ? 0
-            : began_seen[1] > began_seen[0] ? began_seen[1] - began_seen[0] : began_seen[0] - began_seen[1]);
+        if (both) {
+            printf("one from %u to %u ms, the other from %u to %u\n", 0, ended_seen[0] - began_seen[0],
+                began_seen[1] - began_seen[0], ended_seen[1] - began_seen[0]);
+        }
     } else if (!strcmp(what, "pinned")) {       /* three systems, pinned, among others */
         a = native("test:sleep1@0.1.0", NSLEEP1_PATH);
         load(b, &a);
