@@ -45,6 +45,16 @@ BRIDGE_NATIVE(attach_b) { for (uint32_t i = 0; i < COUNT; i ++) api->attach(ids[
 BRIDGE_NATIVE(detach_b) { for (uint32_t i = 0; i < COUNT; i ++) api->detach(ids[i], b); return 0; }
 BRIDGE_NATIVE(destroy) { for (uint32_t i = 0; i < COUNT; i ++) api->destroy(ids[i]); return 0; }
 
+/* two components in one barrier, on entities that carry neither */
+BRIDGE_NATIVE(attach_both)
+{
+    for (uint32_t i = 0; i < COUNT; i ++) {
+        api->attach(ids[i], a, 0, 0);
+        api->attach(ids[i], b, 0, 0);
+    }
+    return 0;
+}
+
 #ifdef TABLES
 static uint32_t kinds[KINDS], seeing;
 
@@ -203,6 +213,47 @@ BRIDGE_NATIVE(look)
     return 0;
 }
 
+/* What storage publishes in the shared block, written over by a module that should not: the
+ * index record of every one of its entities, and the entity array of every table with A. Each
+ * is made to name the first entity, which is alive: a storage that read either back would act
+ * on it. */
+BRIDGE_NATIVE(scribble)
+{
+    const bridge_header *h = bridge_native_header(api);
+    auto index = (bridge_entity *)(api->shared_base + h->entity_index);
+    const bridge_query *q = bridge_native_query(api, with_a);
+    bridge_entity first = index[(uint32_t)ids[0]];
+    for (uint32_t i = 0; i < COUNT; i ++) index[(uint32_t)ids[i]] = first;
+    for (uint32_t s = 0; s < q->spans; s ++) {
+        const uint32_t *span = bridge_native_span(api, q, s, 1);
+        auto who = (uint64_t *)(api->shared_base + span[1]);
+        for (uint32_t row = 0; row < span[0]; row ++) who[row] = ids[0];
+    }
+    return 0;
+}
+
+/* each entity that is left, by its own id: where the index says it is, and what is there */
+BRIDGE_NATIVE(find)
+{
+    const bridge_header *h = bridge_native_header(api);
+    auto index = (const bridge_entity *)(api->shared_base + h->entity_index);
+    auto base = (const uint32_t *)(api->private_base + h->column_base);
+    uint32_t found = 0, named = 0;
+    for (uint32_t i = 0; i < COUNT; i ++) {
+        const bridge_entity *e = &index[(uint32_t)ids[i]];
+        const bridge_query *q = bridge_native_query(api, with_a);
+        if (e->generation != (uint32_t)(ids[i] >> 32)) continue;
+        found += base[e->table * h->terms + a] != 0;
+        for (uint32_t s = 0; s < q->spans; s ++) {
+            const uint32_t *span = bridge_native_span(api, q, s, 1);
+            auto who = (const uint64_t *)(api->shared_base + span[1]);
+            for (uint32_t row = 0; row < span[0]; row ++) named += who[row] == ids[i];
+        }
+    }
+    say("alive and found through the index with A, and named in a span", found, named);
+    return 0;
+}
+
 /* ---- what an observer hears: who, and how ---- */
 
 static uint32_t on_a, on_b, on_both;
@@ -230,6 +281,7 @@ BRIDGE_NATIVE(init)
     BRIDGE_NATIVE_SYSTEM(api, "attach_b", "attach_b", &none, 0);
     BRIDGE_NATIVE_SYSTEM(api, "detach_b", "detach_b", &none, 0);
     BRIDGE_NATIVE_SYSTEM(api, "destroy", "destroy", &none, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "attach_both", "attach_both", &none, 0);
 #ifdef TABLES
     static const char *const names[KINDS] = {
         "st:T0", "st:T1", "st:T2", "st:T3", "st:T4", "st:T5", "st:T6",
@@ -258,6 +310,8 @@ BRIDGE_NATIVE(init)
     BRIDGE_NATIVE_SYSTEM(api, "touch_dead", "touch_dead", &none, 0);
     BRIDGE_NATIVE_SYSTEM(api, "recycled", "recycled", &none, 0);
     BRIDGE_NATIVE_SYSTEM(api, "attach_a_half", "attach_a_half", &none, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "scribble", "scribble", &none, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "find", "find", &none, 0);
     with_a = BRIDGE_NATIVE_SYSTEM(api, "look", "look", one, 1);
     without_b = BRIDGE_NATIVE_SYSTEM(api, "look_not", "never", two, 2);
     two[1].oper = BRIDGE_OPTIONAL;

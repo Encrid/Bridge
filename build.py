@@ -64,6 +64,8 @@ BRIDGE = ['bridge', 'lifecycle', 'config', 'store', 'abi', 'schedule', 'pool', '
 ROWS = ('flecs', 'own')
 FLECS_ONLY = ('tables', 'confined', 'rowmove', 'confined-unconfined', 'rowmove-nohook',
               'patch-version')
+# and the cases, by name, of what only storage of our own does: docs/plan/PHASE10.md
+OWN_ONLY = ('storage-notables', 'storage-nocolumns', 'storage-scribble')
 
 # a native module is a shared library: the name, its source, what it is compiled with. The same
 # library twice is one module to the loader, so one source is built under several names.
@@ -337,7 +339,7 @@ def test(out, built, only, storage):
     """Each case by what it said. With a pattern, the pattern decides and the exit code does
     not: several cases are a refusal that ends the program. Without one, the exit code does."""
     cases = [c for c in CASES if (not only or only in c[0])
-             and (storage == 'flecs' or c[1][0] not in FLECS_ONLY)]
+             and (c[0] not in OWN_ONLY if storage == 'flecs' else c[1][0] not in FLECS_ONLY)]
     failed = []
     for name, command, match, never in cases:
         if storage == 'own' and name in OWN:
@@ -384,8 +386,8 @@ def test(out, built, only, storage):
 OWN = {
     # out of columns: the entities that did not fit are left as they were, and the bridge runs on
     'phase3-nocolumns': (['phase3', 'nocolumns', '4096'],
-                         r"module 'game:mover@0.1.0': .budget. columns of 4096 bytes is used up, and 747 of "
-                         r"the entities it changed are left as they were.*moved 2 253.*alive",
+                         r"module 'game:mover@0.1.0': .budget. columns of 4096 bytes is used up. Left as "
+                         r"they were, of the entities it changed: 747 .*moved 2 253.*alive",
                          r"has stopped"),
     # [budget] entities counts entities and nothing else: index 0 is no entity, so 1 holds none
     'phase6-configceiling': (['phase6', 'configceiling', '1'],
@@ -430,6 +432,12 @@ CASES = [
      '@tests/storage-tables.txt', None),
     ('storage-stress', ['storage', 'stress'],
      '@tests/storage-stress.txt', None),
+    ('storage-notables', ['storage', 'notables'],
+     '@tests/storage-notables.txt', None),
+    ('storage-nocolumns', ['storage', 'nocolumns'],
+     '@tests/storage-nocolumns.txt', None),
+    ('storage-scribble', ['storage', 'scribble'],
+     '@tests/storage-scribble.txt', None),
     ('storage-measure', ['storage', 'measure'],
      r"an id handed out +[0-9.]+ ns each.*ten thousand tables made.*the stress run, on 1 thread.*alive", None),
     ('confined', ['confined'],

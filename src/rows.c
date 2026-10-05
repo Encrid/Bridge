@@ -530,10 +530,10 @@ void rows_apply(rows *r)
     }
     for (m = b->modules; m; m = m->next) {
         static const char *const text[2] = {
-            "module '%s': [budget] tables of %u is used up, and %u of the entities it changed "
-            "are left as they were",
-            "module '%s': [budget] columns of %u bytes is used up, and %u of the entities it "
-            "changed are left as they were" };
+            "module '%s': [budget] tables of %u is used up. Left as they were, of the entities it "
+            "changed: %u",
+            "module '%s': [budget] columns of %u bytes is used up. Left as they were, of the "
+            "entities it changed: %u" };
         for (i = 0; i < 2; i ++) {
             if (!m->left[i]) continue;
             say(b, m, nullptr, BRIDGE_ERR, text[i], m->identity, i ? b->columns_len : r->table_room,

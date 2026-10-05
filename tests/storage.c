@@ -5,6 +5,9 @@
  *     storage tables      ten thousand tables
  *     storage stress      four modules at once on four threads, eight million changes, each
  *                         keeping its own account of what should be there and checking it
+ *     storage notables    [budget] tables used up: the entity is left as it was, and it is a
+ *     storage nocolumns   failure of the module that asked. The same for [budget] columns
+ *     storage scribble    a module writes over what storage publishes in the shared block
  *     storage measure     nanoseconds for each kind of change, at a barrier
  *
  * The first two are a transcript and decide nothing themselves: build.py holds what it must
@@ -14,6 +17,27 @@
 
 #include <stdio.h>
 #include <string.h>
+
+/* What the process holds, in KB: the block's touched pages and everything outside it. Asked of
+ * the system, so that it is the same question whatever keeps the rows. The figures of
+ * docs/plan/PHASE10.md are taken on Windows, and elsewhere this says nothing. */
+#ifdef _WIN32
+typedef struct {
+    uint32_t cb, faults;
+    size_t peak, now, paged_peak, paged, nonpaged_peak, nonpaged, pagefile, pagefile_peak;
+} held_counters;
+[[gnu::dllimport]] void *GetCurrentProcess();
+[[gnu::dllimport]] int K32GetProcessMemoryInfo(void *process, held_counters *counters, uint32_t size);
+
+static void held(const bridge *b)
+{
+    held_counters c = { .cb = sizeof c };
+    if (!K32GetProcessMemoryInfo(GetCurrentProcess(), &c, sizeof c)) return;
+    printf("columns in use %u KB, and the process holds %zu KB\n", b->columns_used >> 10, c.now >> 10);
+}
+#else
+static void held(const bridge *b) { printf("columns in use %u KB\n", b->columns_used >> 10); }
+#endif
 
 static void sink([[maybe_unused]] void *ud, const bridge_record *r)
 {
@@ -49,7 +73,8 @@ static bridge_artifact store_module(const char *path, int64_t spawns, uint32_t s
 static const char *const phases[] = {
     "spawn", "attach_a", "attach_b", "detach_b", "destroy", "attach_b_half", "detach_b_half",
     "detach_b_absent", "value_a", "flicker", "destroy_half", "respawn_half", "touch_dead",
-    "attach_a_half", "recycled", "combine", "look", "never", "work", "check"
+    "attach_a_half", "recycled", "combine", "look", "never", "work", "check", "attach_both",
+    "scribble", "find"
 };
 constexpr uint32_t PHASES = sizeof phases / sizeof *phases;
 
@@ -109,6 +134,8 @@ int main(int argc, char **argv)
 
     /* the stress run is the one thing here that is run on more than one thread */
     if (!strcmp(what, "stress")) cfg.threads = 4;
+    if (!strcmp(what, "notables")) cfg.budget.tables = 1;
+    if (!strcmp(what, "nocolumns")) cfg.budget.columns = 64;
     b = bridge_create(&cfg, sink, nullptr);
     bridge_artifact a;
 
@@ -157,6 +184,41 @@ int main(int argc, char **argv)
         run(b, "look");
         run(b, "destroy");
         run(b, "look");
+    } else if (!strcmp(what, "notables")) {
+        a = store_module(NSTORE_PATH, 6, 1 << 20);
+        a.cfg.max_system_failures = 2;
+        if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
+        run(b, "spawn");
+        run(b, "attach_a");         /* the one table there may be */
+        run(b, "attach_b_half");    /* a second: three entities stay as they were, and are not heard */
+        run(b, "look");             /* a barrier it ran clean in */
+        run(b, "attach_b_half");
+        run(b, "attach_b_half");    /* the second in a row: its budget of two */
+        run(b, "look");
+    } else if (!strcmp(what, "nocolumns")) {
+        a = store_module(NSTORE_PATH, 6, 1 << 20);
+        a.cfg.max_system_failures = 2;
+        if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
+        run(b, "spawn");
+        run(b, "attach_a");         /* sixty-four bytes do not hold six rows of it: by halves, three */
+        run(b, "look");             /* and the bridge runs on */
+        run(b, "attach_a");         /* a set for those three, and the fourth row for one more */
+        run(b, "look");
+        run(b, "attach_a");         /* five rows are sixty-four bytes exactly */
+        run(b, "look");
+        run(b, "attach_a");         /* and the sixth is never to be had: */
+        run(b, "attach_a");         /* twice in a row is its budget of two */
+    } else if (!strcmp(what, "scribble")) {
+        a = store_module(NSTORE_PATH, 6, 1 << 20);
+        if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
+        run(b, "spawn");
+        run(b, "attach_a");
+        run(b, "scribble");         /* every copy in the block names the first entity */
+        run(b, "destroy_half");     /* rows leave, and the last is moved into each one's place */
+        run(b, "look");
+        run(b, "attach_b_half");    /* the three that are left move to another table */
+        run(b, "look");
+        run(b, "find");             /* and each is where the index says, under its own id */
     } else if (!strcmp(what, "stress")) {
         if (stress_load(b)) { printf("FAIL: not loaded\n"); return 1; }
         stress_run(b);
@@ -168,6 +230,9 @@ int main(int argc, char **argv)
             { "attach_b", "attach, a second component" },
             { "detach_b", "detach" },
             { "destroy",  "destroy" },
+            { "spawn",    nullptr },
+            { "attach_both", "attach, two components in one barrier" },
+            { "destroy",  nullptr },
             { "never",    "a barrier with nothing to do" },
         };
         constexpr uint32_t OPS = sizeof ops / sizeof *ops, ROUNDS = 6, COUNT = 100'000;
@@ -183,11 +248,14 @@ int main(int argc, char **argv)
         }
         printf("%u entities, the best of %u rounds, and the first, where tables are new\n", COUNT, ROUNDS);
         for (uint32_t i = 0; i < OPS - 1; i ++) {
-            printf("%-38s %7.1f ns each   first %7.1f\n", ops[i].what,
+            if (ops[i].what) printf("%-38s %7.1f ns each   first %7.1f\n", ops[i].what,
                 (double)best[i] / COUNT, (double)first[i] / COUNT);
         }
         printf("%-38s %7.0f ns\n", ops[OPS - 1].what, (double)best[OPS - 1]);
-        printf("columns in use %u KB\n", b->columns_used >> 10);
+        /* with every entity carrying both again: a destroyed one holds nothing in either */
+        (void)barrier(b, "spawn");
+        (void)barrier(b, "attach_both");
+        held(b);
         (void)bridge_destroy(b);
 
         /* and with ten thousand tables standing */
@@ -205,7 +273,17 @@ int main(int argc, char **argv)
         printf("%-38s %7.1f us\n", "a barrier with nothing to do, then", (double)best[0] / 1000.0);
         t = barrier(b, "attach_a");
         printf("%-38s %7.1f us a table\n", "ten thousand more, by one attach each", (double)t / 1000.0 / 10'000);
-        printf("columns in use %u KB\n", b->columns_used >> 10);
+        /* every one of ten thousand sets filled at one barrier and emptied at the next: where a
+         * table that lives only while it has rows is made and released each time */
+        for (uint32_t round = 0; round < ROUNDS; round ++) {
+            t = barrier(b, "attach_b");
+            if (!round || t < best[1]) best[1] = t;
+            t = barrier(b, "detach_b");
+            if (!round || t < best[2]) best[2] = t;
+        }
+        printf("%-38s %7.1f us a table\n", "ten thousand sets filled", (double)best[1] / 1000.0 / 10'000);
+        printf("%-38s %7.1f us a table\n", "and emptied again", (double)best[2] / 1000.0 / 10'000);
+        held(b);
         (void)bridge_destroy(b);
 
         /* and the stress run, on four threads and on one: eight million changes and their
@@ -219,7 +297,7 @@ int main(int argc, char **argv)
             stress_run(b);
             printf("the stress run, on %u thread%s            %7.0f ms\n", threads, threads > 1 ? "s" : " ",
                 (double)(os_now() - t) / 1e6);
-            printf("columns in use %u KB\n", b->columns_used >> 10);
+            held(b);
             if (threads > 1) (void)bridge_destroy(b);
         }
     } else {
