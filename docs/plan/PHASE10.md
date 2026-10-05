@@ -427,15 +427,26 @@ read in its document and becomes a phase, a refusal with its condition, or nothi
     open    per-component page mapping
     open    a phase exclusivity flag
     closed  memory high-water per module: wider than it said. How full every budget is, for
-            the bridge and for each module, as a pull, in `PLAN.md` 13 and its done-when
+            the bridge and for each module, as a pull, in `PLAN.md` 13 and its done-when 1183284
     open    an instance-grouping entry
     closed  arena mark and reset: still refused, with its condition. What was behind it is
             not: a share goes back to the arena at unload unless a row still holds a string
             in it, so loading and unloading no longer ends in a restart              f3d7480
-    open    layout migration
+    open    layout migration. It was read wrong, and had been since phase 0: the line means
+            more than one way to store a component, chosen as the right tool for the task,
+            and it points at a section about a struct's fields changing at a reload. The
+            first is the item, and nothing written holds it yet
+    open    a struct changed at reload: a question the misreading raised and nobody had
+            asked. `lifetime.md` says the library "cannot" tell what changed, which is false
     closed  bindings for a non-C module: a phase of its own, `PLAN.md` 15. The module seam
             is described once and the C header and one other language's binding are written
             from it. Tried first: the project's compiler cannot translate the header 3f73239
+
+**1b. Words**: found by the item above. "layout" is used sixty-two times in the documents for
+at least five things, none defined, and none of them the one that was meant.
+
+    open    every term of art defined once, and a word used for several things split:
+            "layout" first, then "terms", "type", "table", "share", "slot", "kind"
 
 **2. Statements that are false now**: one commit, no decision.
 
