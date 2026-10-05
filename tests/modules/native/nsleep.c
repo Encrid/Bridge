@@ -33,8 +33,8 @@ BRIDGE_NATIVE(nap)
      * systems return from a tenth of a second after two. */
     uint32_t began = now_ms();
     nap();
-    bridge_native_log(api, 0, "nap", 3, thread_id(), began);
-    bridge_native_log(api, 0, "end", 3, thread_id(), now_ms());
+    bridge_native_log(api, BRIDGE_LOG_INFO, "nap", 3, thread_id(), began);
+    bridge_native_log(api, BRIDGE_LOG_INFO, "end", 3, thread_id(), now_ms());
     return 0;
 }
 

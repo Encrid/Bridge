@@ -86,8 +86,8 @@ static void by_reference()
     }
     passes ++;
     if (passes % 25 == 0) {
-        bridge_native_log(api, 0, "live, digest", 12, live, digest);
-        bridge_native_log(api, 0, "disagreements so far", 20, wrong, 0);
+        bridge_native_log(api, BRIDGE_LOG_INFO, "live, digest", 12, live, digest);
+        bridge_native_log(api, BRIDGE_LOG_INFO, "disagreements so far", 20, wrong, 0);
     }
 }
 

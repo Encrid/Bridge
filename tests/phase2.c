@@ -54,6 +54,7 @@ static bridge_artifact artifact(const char *name)
     a.cfg.scratch = 4096;
     a.cfg.log_ring = 240;
     a.cfg.spans = 4096;
+    a.cfg.log_level = BRIDGE_INFO;
     a.cfg.spawns = BRIDGE_NONE;
     a.cfg.persistent = BRIDGE_NONE;
     a.cfg.config = BRIDGE_NO_CONFIG;

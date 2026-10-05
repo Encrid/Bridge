@@ -11,7 +11,7 @@ original Bridge. Bridge-ASM700 drains every ring at each barrier.
 
     u32 when      barrier count, and offset within the phase
     u8  -         reserved, to keep the stride at 24
-    i8  level     negative is worse
+    u8  level     a severity: lower is worse
     u16 system    which system was running
     u32 text      offset into this module's scratch arena, always
     u32 len
@@ -46,10 +46,19 @@ Two rules follow. **Drain precedes the scratch-arena reset**, because the messag
 arena and the barrier does both. And **Bridge-ASM700 bounds-checks `text + len`** against a determinate
 block, which is what makes the check writable at all. One compare per record is the price.
 
-Levels are signed, warn at -2 and err at -3, which is flecs' convention (`ecs_os_api.log_`) and was
-taken when its output shared the sink. Filtering is at the writer, which begins
-`if (level > threshold) return` against a threshold in the private-memory header, so a line that is
-switched off costs a load and a branch.
+**A level is a severity of syslog, RFC 5424, by its number**: 0 is the worst and 7 the most
+detail. Four are named, in `bridge.h` for a host and in `bridge-abi.h` for a module:
+
+    3  err      4  warn      6  info      7  debug
+
+A module may write any of the eight, and a module's `log_level` is one of them: a number past 7 is
+refused at load. Filtering is at the writer, which begins `if (level > threshold) return` against
+a threshold in the private-memory header, so a line that is switched off costs a load and a branch.
+
+Refused: a signed scale with warn at -2 and err at -3, which is what this was. Those were flecs'
+numbers, taken when its output shared the sink, and nothing was at -1 for no reason anyone here
+could give. Refused: the same scale with the hole closed. The condition that brings a scale of
+our own back is a need for more than eight levels.
 
 **Drop and count, never block.** A log may lose lines, and that is exactly what separates it from an
 event: an event is an entity, so the entity ceiling governs it and running out is a failure where it

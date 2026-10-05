@@ -190,7 +190,7 @@ struct bridge {
 };
 
 /* bridge.c */
-void say(bridge *b, const module *m, const bridge_system *s, int8_t level, const char *fmt, ...);
+void say(bridge *b, const module *m, const bridge_system *s, uint8_t level, const char *fmt, ...);
 [[nodiscard]] char *copy(const char *s, size_t n);
 /* 1, with a record, if nothing may run. `repairing` names a module being loaded or reloaded:
  * the one call a stopped bridge accepts is one that brings back the module that stopped it. */

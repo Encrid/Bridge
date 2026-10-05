@@ -52,7 +52,7 @@ static bridge_artifact artifact(const char *identity, const char *file)
     a.cfg.init_timeout = 2000 * MS;
     a.cfg.reload_timeout = 2000 * MS;
     a.cfg.shutdown_timeout = 2000 * MS;
-    a.cfg.log_level = 0;
+    a.cfg.log_level = BRIDGE_INFO;
     a.cfg.scratch = 64 << 10;
     a.cfg.log_ring = 64 * 24;
     a.cfg.spans = 16 << 10;
@@ -207,6 +207,13 @@ int main(int argc, char **argv)
         load(b, &a);
         a = reader();
         a.cfg.spans = 16;
+        load(b, &a);
+        frames(b, 1);
+    } else if (!strcmp(what, "loglevel") || !strcmp(what, "quiet")) {
+        /* a level that is no severity is refused; and at warnings, what the mover says at
+         * info is never written */
+        a = artifact("game:mover@0.1.0", "mover");
+        a.cfg.log_level = !strcmp(what, "quiet") ? BRIDGE_WARN : 8;
         load(b, &a);
         frames(b, 1);
     } else if (!strcmp(what, "notypes") || !strcmp(what, "nosystems")) {

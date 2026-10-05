@@ -14,7 +14,7 @@ BRIDGE_NATIVE(advance)
     const bridge_query *q = bridge_native_query(api, ticking);
     auto t = (Tick *)(api->shared_base + bridge_native_span(api, q, 0, 1)[2]);
     t->n += STEP;
-    bridge_native_log(api, 0, "tick", 4, t->n, STEP);
+    bridge_native_log(api, BRIDGE_LOG_INFO, "tick", 4, t->n, STEP);
     return 0;
 }
 
@@ -46,6 +46,6 @@ BRIDGE_NATIVE(reload)
 
 BRIDGE_NATIVE(shutdown)
 {
-    bridge_native_log(api, 0, "shutdown", 8, STEP, 0);
+    bridge_native_log(api, BRIDGE_LOG_INFO, "shutdown", 8, STEP, 0);
     return 0;
 }

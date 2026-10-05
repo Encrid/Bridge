@@ -115,7 +115,7 @@ static inline const bridge_list *bridge_native_list(const bridge_api *api, uint3
 
 /* ---- the log ---- */
 
-static inline void bridge_native_log(const bridge_api *api, int level, const char *text,
+static inline void bridge_native_log(const bridge_api *api, uint32_t level, const char *text,
                                      uint32_t len, uint32_t a0, uint32_t a1)
 {
     bridge_header *h = bridge_native_header(api);
@@ -127,7 +127,7 @@ static inline void bridge_native_log(const bridge_api *api, int level, const cha
     r = (bridge_log_record *)(api->private_base + h->ring) + head % h->ring_len;
     r->when = h->when;
     r->reserved = 0;
-    r->level = (int8_t)level;
+    r->level = (uint8_t)level;
     r->system = (uint16_t)h->system;
     r->text = bridge_native_put(api, text, len);
     r->len = len;

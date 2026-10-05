@@ -22,7 +22,7 @@ static void sink([[maybe_unused]] void *ud, const bridge_record *r)
 {
     if (r->len == 7 && !memcmp(r->text, "path at", 7) && path_count < 4) path_at[path_count ++] = r->arg[0];
     if (r->len > 40 && !memcmp(r->text, "the entity index is out of step", 31)) out_of_step ++;
-    if (quiet && r->level >= 0) return;
+    if (quiet && r->level > BRIDGE_WARN) return;
     printf("record[%d] %s/%s: %.*s %u %u\n", r->level, r->identity ? r->identity : "-",
         r->system ? r->system : "-", (int)r->len, r->text, r->arg[0], r->arg[1]);
 }
@@ -43,6 +43,7 @@ static bridge_artifact native(const char *identity, const char *path)
     a.cfg.scratch = 64 << 10;
     a.cfg.log_ring = 64 * 24;
     a.cfg.spans = 16 << 10;
+    a.cfg.log_level = BRIDGE_INFO;
     a.cfg.spawns = 32;
     a.cfg.persistent = BRIDGE_NONE;
     a.cfg.config = BRIDGE_NO_CONFIG;

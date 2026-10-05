@@ -9,7 +9,7 @@
 #include <string.h>
 
 /* A record of Bridge-ASM700's own. `m` and `s` say whose it is about, when it is anybody's. */
-void say(bridge *b, const module *m, const bridge_system *s, int8_t level, const char *fmt, ...)
+void say(bridge *b, const module *m, const bridge_system *s, uint8_t level, const char *fmt, ...)
 {
     char text[512];
     bridge_record r = {};

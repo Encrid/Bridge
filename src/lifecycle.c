@@ -196,6 +196,11 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
         || unset(b, id, "persistent", cfg->persistent)) {
         return 1;
     }
+    if (cfg->log_level > BRIDGE_LEVEL_MOST) {
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its log_level of %u is not "
+            "a severity, which is 0 to %u", id, cfg->log_level, BRIDGE_LEVEL_MOST);
+        return 1;
+    }
     if (!cfg->config || !*cfg->config) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: config is unset", id);
         return 1;

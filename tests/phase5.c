@@ -92,6 +92,7 @@ static bridge_artifact native(const char *identity, const char *path)
     a.cfg.scratch = 64 << 10;
     a.cfg.log_ring = 64 * 24;
     a.cfg.spans = 16 << 10;
+    a.cfg.log_level = BRIDGE_INFO;
     a.cfg.spawns = BRIDGE_NONE;
     a.cfg.persistent = BRIDGE_NONE;
     a.cfg.config = BRIDGE_NO_CONFIG;

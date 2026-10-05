@@ -26,7 +26,7 @@ BRIDGE_NATIVE(tally)
     const bridge_query *q = bridge_native_query(api, tallying);
     uint32_t s, rows = 0;
     for (s = 0; s < q->spans; s ++) rows += bridge_native_span(api, q, s, 1)[0];
-    bridge_native_log(api, 0, "native tally", 12, q->spans, rows);
+    bridge_native_log(api, BRIDGE_LOG_INFO, "native tally", 12, q->spans, rows);
     return 0;
 }
 

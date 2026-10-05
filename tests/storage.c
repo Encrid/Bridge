@@ -64,6 +64,7 @@ static bridge_artifact store_module(const char *path, int64_t spawns, uint32_t s
     a.cfg.shutdown_timeout = BRIDGE_NO_LIMIT;
     a.cfg.log_ring = 256 * 24;
     a.cfg.spans = spans;
+    a.cfg.log_level = BRIDGE_INFO;
     a.cfg.spawns = spawns;
     a.cfg.persistent = BRIDGE_NONE;
     a.cfg.config = BRIDGE_NO_CONFIG;

@@ -71,7 +71,7 @@ typedef struct {
     uint32_t entities;
     uint32_t when;                      /* set before every dispatch */
     uint32_t system;                    /* the slot of the system running */
-    int32_t  log_level;                 /* a line above it is not written */
+    uint32_t log_level;                 /* a line above it is not written */
     uint32_t observers;                 /* bridge_list, one per slot `observe` answered */
 } bridge_header;
 static_assert(sizeof(bridge_header) == 72 && alignof(bridge_header) == 4);
@@ -111,11 +111,17 @@ static_assert(sizeof(bridge_entity) == 12 && alignof(bridge_entity) == 4);
 static_assert(offsetof(bridge_entity, table) == 0 && offsetof(bridge_entity, row) == 4);
 static_assert(offsetof(bridge_entity, generation) == 8);
 
+/* What a log line is: the severities of syslog, RFC 5424, by its numbers. 0 is the worst and 7
+ * the most detail; these are the four the bindings name. docs/bridge/diagnostics/log.md. */
+enum bridge_log : uint8_t {
+    BRIDGE_LOG_ERR = 3, BRIDGE_LOG_WARN = 4, BRIDGE_LOG_INFO = 6, BRIDGE_LOG_DEBUG = 7
+};
+
 /* A log record. `text` is an offset into the writer's scratch arena, always. */
 typedef struct {
     uint32_t when;
     uint8_t  reserved;
-    int8_t   level;
+    uint8_t  level;                     /* enum bridge_log: lower is worse */
     uint16_t system;
     uint32_t text, len;
     uint32_t arg[2];

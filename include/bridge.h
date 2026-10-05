@@ -73,7 +73,7 @@ typedef struct {
     int64_t  fuel;               /* units per system invocation */
     int64_t  memory_limit;       /* bytes. a ceiling, never re-set */
     int64_t  init_timeout, reload_timeout, shutdown_timeout;    /* nanoseconds, per call */
-    int8_t   log_level;          /* a line above it is not written */
+    uint8_t  log_level;          /* a line above it is not written: enum bridge_level */
     uint32_t scratch, log_ring, spans;   /* its private memory, each in bytes */
     /* what is set aside for it alone, so that what it mints does not depend on who ran
      * beside it. each: zero is unset, BRIDGE_NONE is "it mints none" */
@@ -104,11 +104,14 @@ typedef struct {
     uint32_t    len;
     uint32_t    when;                /* barrier count, then offset in the phase */
     uint32_t    arg[2];
-    int8_t      level;               /* negative is worse */
+    uint8_t     level;               /* lower is worse: enum bridge_level */
 } bridge_record;
 
-/* two points on that scale, which is a number and not a set: any level may be written */
-enum bridge_level : int8_t { BRIDGE_WARN = -2, BRIDGE_ERR = -3 };
+/* The severities of syslog, RFC 5424, by its numbers: 0 is the worst and 7 the most detail.
+ * These four are the ones Bridge-ASM700 and its bindings name; a module may write any of the
+ * eight. */
+enum bridge_level : uint8_t { BRIDGE_ERR = 3, BRIDGE_WARN = 4, BRIDGE_INFO = 6, BRIDGE_DEBUG = 7 };
+constexpr uint8_t BRIDGE_LEVEL_MOST = 7;
 
 typedef void (*bridge_sink_fn)(void *ud, const bridge_record *r);
 

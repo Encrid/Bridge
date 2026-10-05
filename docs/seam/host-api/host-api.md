@@ -103,7 +103,7 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
         int64_t  fuel;               /* units per system invocation */
         int64_t  memory_limit;       /* bytes. a ceiling, never re-set */
         int64_t  init_timeout, reload_timeout, shutdown_timeout;   /* nanoseconds, per call */
-        int8_t   log_level;
+        uint8_t  log_level;
         uint32_t scratch, log_ring, spans;   /* bytes, bytes, bytes */
         /* each of the next two: zero is unset, -1 is "it mints none" */
         int64_t  spawns;             /* entity ids between two barriers */
@@ -132,7 +132,7 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
         uint32_t    len;
         uint32_t    when;                /* barrier count, then offset in the phase */
         uint32_t    arg[2];
-        int8_t      level;               /* negative is worse */
+        uint8_t     level;               /* lower is worse */
     } bridge_record;
 
     typedef void (*bridge_sink_fn)(void *ud, const bridge_record *r);

@@ -28,7 +28,7 @@ BRIDGE_NATIVE_BIND(api)
 
 [[maybe_unused]] static void say(const char *text, uint32_t x, uint32_t y)
 {
-    bridge_native_log(api, 0, text, (uint32_t)strlen(text), x, y);
+    bridge_native_log(api, BRIDGE_LOG_INFO, text, (uint32_t)strlen(text), x, y);
 }
 
 /* ---- the changes: one phase each ---- */

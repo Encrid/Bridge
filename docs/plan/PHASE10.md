@@ -359,10 +359,18 @@ showed it.
 `BRIDGE_SCHEMA_STRUCT`, `BRIDGE_SCHEMA_ENUM` and `BRIDGE_SCHEMA_BITMASK`: `schema.md`, *There is
 no schema format*.
 
-**Still inherited from flecs, and each to be decided**: the numbers of the log levels; thirty-two
-terms a query; the texts of records that were kept word for word; when a freed index is handed out
-again; the shape of an id and of an index record. And the order of the fields of `bridge_budget`,
-which followed what the tests already wrote.
+**The numbers of the log levels: decided, and they are syslog's.** They were flecs': warn -2, err
+-3, nothing at -1. They are the severities of RFC 5424: err 3, warn 4, info 6, debug 7, and a
+`log_level` past 7 is refused: `log.md`, *The log*. The names a module writes moved to
+`bridge-abi.h`, where a native module can reach them: it had none, and wrote 0.
+
+**Still inherited from flecs, and each to be decided**: thirty-two terms a query; the texts of
+records that were kept word for word; when a freed index is handed out again; the shape of an id
+and of an index record. And the order of the fields of `bridge_budget`, which followed what the
+tests already wrote.
+
+**Open: a `log_level` nobody stated.** Zero is a severity, so a config that leaves it out is not
+caught as unset the way every other key is. It meant info before and means emergencies only now.
 
 **Open: a test that a barrier allocates nothing.** It holds by reading: `src/rows.c` calls no
 allocator outside `rows_create`. Nothing checks it.

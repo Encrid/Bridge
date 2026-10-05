@@ -203,19 +203,17 @@ static inline int bridge_alive(uint64_t id)
 
 /* ---- the log: stores, and no call. docs/bridge/diagnostics/log.md ---- */
 
-enum bridge_log : int8_t { BRIDGE_LOG_ERR = -3, BRIDGE_LOG_WARN = -2, BRIDGE_LOG_INFO = 0 };
-
-static inline void bridge_log(int level, const char *text, uint32_t len, uint32_t a0, uint32_t a1)
+static inline void bridge_log(uint32_t level, const char *text, uint32_t len, uint32_t a0, uint32_t a1)
 {
     uint32_t head, at;
-    if (level > (int32_t)BRIDGE_HEADER(log_level)) return;
+    if (level > BRIDGE_HEADER(log_level)) return;
     head = BRIDGE_HEADER(ring_head);
     acc_own_st(offsetof(bridge_header, ring_head), head + 1u);
     /* full: the line is dropped, and counted by the head having moved */
     if (head - BRIDGE_HEADER(ring_tail) >= BRIDGE_HEADER(ring_len)) return;
     at = BRIDGE_HEADER(ring) + (head % BRIDGE_HEADER(ring_len)) * (uint32_t)sizeof(bridge_log_record);
     acc_own_st(at, BRIDGE_HEADER(when));
-    acc_own_st(at + 4u, ((uint32_t)level & 0xffu) << 8 | BRIDGE_HEADER(system) << 16);
+    acc_own_st(at + 4u, (level & 0xffu) << 8 | BRIDGE_HEADER(system) << 16);
     acc_own_st(at + 8u, bridge_put(text, len));
     acc_own_st(at + 12u, len);
     acc_own_st(at + 16u, a0);

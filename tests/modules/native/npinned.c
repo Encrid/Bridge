@@ -16,7 +16,7 @@ BRIDGE_NATIVE_BIND(api)
 
 static int pin()
 {
-    bridge_native_log(api, 0, "pin", 3, thread_id(), 0);
+    bridge_native_log(api, BRIDGE_LOG_INFO, "pin", 3, thread_id(), 0);
     return 0;
 }
 
