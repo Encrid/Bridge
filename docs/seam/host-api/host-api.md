@@ -51,6 +51,10 @@ as a helper - `native.md`, *Identity*.
     int bridge_modules(bridge *b, bridge_module_info *out, int max);
     int bridge_profile (bridge *b, bridge_profile_row *out, int max);
 
+Every answer above the two pulls is `[[nodiscard]]`: a status a host drops is one the compiler
+points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - `create.md`,
+*Destroy*.
+
 `bridge_profile` and its row are `profile.md`, *The profile*.
 
 ## The data
@@ -66,7 +70,7 @@ as a helper - `native.md`, *Identity*.
 
     typedef struct {
         const char *key;
-        uint8_t     kind;                                    /* bool | i64 | f64 | string */
+        enum bridge_setting_kind kind;                       /* bool | i64 | f64 | string */
         union { bool b; int64_t i; double f; const char *s; } v;
     } bridge_setting;
 
@@ -90,7 +94,7 @@ as a helper - `native.md`, *Identity*.
         uint32_t    abi;
 
         bool     trusted, reloadable, hot_reload, pinned;
-        uint8_t  on_error;           /* FAIL | SKIP. zero is unset */
+        enum bridge_on_error on_error;   /* FAIL | SKIP. zero is unset */
         /* each of the next six: zero is unset, -1 is "no limit" */
         int64_t  max_system_failures;    /* raised by a failed barrier, lowered by a clean one */
         int64_t  fuel;               /* units per system invocation */
@@ -132,7 +136,7 @@ as a helper - `native.md`, *Identity*.
 
     typedef struct {
         const char *identity;
-        uint8_t     state;               /* RUNNING | STOPPED */
+        enum bridge_state state;         /* RUNNING | STOPPED */
     } bridge_module_info;
 
 **A phase is a string, not a struct.** It has one property and that is its name - `schedule.md`, *A

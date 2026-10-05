@@ -65,9 +65,9 @@ host's trade to make.
 Four exported symbols. Three are the lifecycle every module has, and one is this backend's own:
 
     void bridge_bind(const bridge_api *api);   /* the backend's, once, before bridge_init */
-    int  bridge_init(void);
-    int  bridge_shutdown(void);
-    int  bridge_reload(void);
+    int  bridge_init();
+    int  bridge_shutdown();
+    int  bridge_reload();
 
 **`bridge_bind` is the native backend's, not Bridge-ASM700's.** A wasm module gets its imports when it is
 linked; a shared library has no import section Bridge-ASM700 could fill, so the native backend hands the

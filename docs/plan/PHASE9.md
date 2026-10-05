@@ -1,6 +1,6 @@
 # Phase 9: C23, used fully
 
-In progress.
+Done, on Windows, on Linux and on macOS.
 
 `PLAN.md` phase 9 was "C99, and the context passed". This document is why it is not, and what the
 phase builds in its place.
@@ -41,18 +41,88 @@ Withdrawn, since nothing forces them: the context passed in place of thread-loca
 log to every live bridge, the accessors through a temporary, the alignment helper. The code keeps
 `thread_local`, `_Generic` and the native ABI it had.
 
-## What it builds
+## What it built
 
-The rule of `build.md`, *The standard*, applied to about eight thousand lines, and
-`tools/c23.py` to hold it there.
+The rule of `build.md`, *The standard*, over about eight thousand lines, and `tools/c23.py` to
+hold it there: it runs with the tests and fails on an older spelling, and was shown to.
 
-One thing changes that a host can see: **a sum of stated sizes that overflows is refused, naming
-the key.** Those sums were unchecked.
+    nullptr for NULL                      266
+    f() for f(void)                       156
+    [[maybe_unused]] for (void)x;          46
+    large numbers with separators          40
+    enums named, with a width              27, and the fields and parameters that hold them
+    numbers with a name, as constexpr      24
+    = {} for { 0 }                         22
+    auto where a cast names the type       11
+    thread_local, and its macro gone        3
 
-## What would make us stop
+Every layout `bridge-abi.h` states is asserted in it: size, alignment and each offset of the
+eight structs. All of them held. A compiler's own attribute is written in the standard brackets,
+and `ECS_ENUM` and `ECS_BITMASK` state the four bytes Bridge-ASM700 lays such a field out as,
+where a module's compiler chose them before.
 
-- wasmtime's or flecs' headers failing as pedantic C23 when one of our files includes them: then
-  their directories are given to the compiler as system headers, which is how `build.py` already
-  treats flecs' own source.
-- The row loop compiling to other code, or reading another figure: the cause is found first.
-- Anything beyond the checked sums that would change what a host or a module sees: a question.
+**`[[nodiscard]]` found thirty-six dropped answers**, in the library and the tests. None was a
+failure being ignored. Five were a schedule rebuilt after something was taken out of it, which
+cannot be refused, and say so now where the answer is dropped. Two functions lost the attribute
+again: what they answer is information, not a status.
+
+Nothing compiled differently. Of the fifty-five test modules, fifty-four are the same code byte
+for byte as before the phase with their debug sections stripped, and the other had a line of its
+source changed. The row loop reads 0.39 ns a row, as it did.
+
+## What changed that a host can see
+
+**A stated size no offset reaches is refused by its key.** `[budget] entities`, `persistent` and
+`columns` are each checked against 32 bits before any sum is made of them, where one too large
+used to be reported as a total that had wrapped. And a module's `scratch`, `log_ring` and `spans`
+are laid out with checked additions: together past 32 bits they are refused at load. Before, the
+offsets were truncated and wasmtime answered "failed to parse WebAssembly module".
+
+The other sizes computed in the library are counts times a small size in 64 bits, or are bounded
+by a check already made, and cannot overflow: they are left as they were.
+
+**A backend's library is closed only if the backend says it can be**: a seventh capability,
+`unload` - `capabilities.md`, and `create.md`, *Destroy*.
+
+## What it found
+
+**Unloading wasmtime crashed, and had since phase 2.** `[[nodiscard]]` was being applied when one
+test failed once with no output. Run alone it passed a hundred and fifty times. Six copies at
+once made it fail about one run in sixty, by a segmentation fault or by never ending, and the
+tree before this phase did the same, so it was not the phase's.
+
+`bridge_destroy` closed every backend's library. The wasm backend's took wasmtime out of the
+process with it, and wasmtime keeps threads of its own for compiling and a handler registered
+with the operating system for faults, with no call that stops either. The test that failed is
+the one that makes three bridges in a row: the second loaded wasmtime again beside what the first
+had left pointing into unmapped memory.
+
+    six copies at once, a hundred runs each     crashed    never ended
+    every library closed at destroy                  10              2
+    the wasm backend's library left loaded            0              0
+
+It was asked what should close a library, and the answer was that the backend says. Never closing
+any was the recommendation, and it lost to not deciding on behalf of backends that can decide for
+themselves.
+
+**macOS does not unmap a library that has a thread-local variable.** The native backend's has
+one, so there it is closed and stays in the process, where Windows and Linux take it out. The
+test asks the operating system and not Bridge-ASM700, so it saw this, and it now states what each
+system does. The cause is what that system's loader is known to do, not something measured here.
+
+**One hundred and twenty-eight passing tests did not find the crash.** A busy machine did. The
+build's test runner says what a failed case ended with now, where it said only what was missing
+from its output.
+
+## Tests
+
+One hundred and thirty-three: the hundred and twenty-eight, and
+
+    c23                 no older spelling in what is ours
+    phase4-libraries    what a destroyed bridge leaves in the process, by backend and by system
+    phase3-beyond       a budget no offset reaches: refused by its key
+    phase3-toobig       budgets each in reach and together not: refused. This refusal existed
+                        and had no test
+    phase3-bigprivate   a module's regions past 32 bits: refused at load
+
+In a release build and a debug one on Windows, and in a release build on Linux and on macOS.
