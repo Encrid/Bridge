@@ -5,6 +5,10 @@ stopped later, and nothing else says so.** Past its failure budget Bridge-ASM700
 systems and observers stop running and its components stay, `failure.md`, *When something fails*.
 That happens at frame nine thousand, long after any return code the host saw.
 
+**And it says why the bridge stopped**, when a module's stop was what stopped it - `failure.md`,
+*When something fails*: the module shows as STOPPED like any other, and the record that named it may
+have been dropped.
+
 **Not for load failures.** The host calls `bridge_load` once per module and gets a code back each
 time, so what loaded is something the host already watched happen.
 

@@ -27,10 +27,11 @@ way. Refused: a separate start call validating the whole schedule, which would n
 complete deployment that Bridge-ASM700 does not have. The condition that brings it back is a host
 that needs all-or-nothing loading and cannot get it by destroying the bridge.
 
-**`unload`** - drop its systems and observers from the schedule; call `shutdown`; drop its exclusive
-components, each by its `on_unload` policy - `lifetime.md`, *What unload leaves behind*; free its
-module record; destroy the instance and its
-loaded image, which on the native backend closes the library.
+**`unload`** - drop its systems and observers from the schedule; call `shutdown`, under its
+timeout; apply what it had asked for and not yet been given, `shutdown`'s requests included; drop
+its exclusive components, each by its `on_unload` policy - `lifetime.md`, *What unload leaves
+behind*; destroy the ids held ready for it and the row its settings were on; free its module
+record; destroy the instance and its loaded image, which on the native backend closes the library.
 
 **Its persistent-arena space is not reclaimed** - `strings.md`, *It is never reclaimed*. That is what
 keeps a surviving shared component's string readable, like the float beside it.
@@ -44,6 +45,38 @@ that is also how a setting changes: hand over the new `cfg`. **Storage survives,
 point, and it is the one outcome nothing else here produces.** The fingerprint decides whether it
 can: a changed struct body hashes differently and is refused by name, shared or exclusive alike -
 `lifetime.md`, *When the layout changed*.
+
+**A reload is the new instance's `reload`, and then the old one's `shutdown`.** In order: the
+checks a load makes, and that the deployment allows it and the module has the export; a new image,
+a new instance and a fresh private memory; the new instance's `reload`, which declares and
+registers as `init` did and does nothing else; the schedule again, with the same refusal; then the
+old instance's `shutdown`, and the swap. Until that last step the old instance has not been
+touched, so a reload that fails anywhere before it leaves the module running as it was -
+`failure.md`, *When something fails*.
+
+**`reload` is not `init` run again.** `init` starts from nothing: it registers and it populates.
+`reload` starts over what exists. Kept apart so that no `init` has to ask whether this is the first
+time, which is Erlang's reason for giving new code an entry of its own. Refused: the original
+Bridge's arrangement, where the old instance's `reload` consents and the new one runs `init` - right
+there, where nothing survived a reload, and wrong here, where `init` would populate storage that is
+already populated. Its veto has no job left either: a reload is between phases, so no module is in
+the middle of anything. The condition that brings the veto back is a module that must be able to
+refuse. Refused: one `init` told by a flag that storage survived, which is one path to keep in step
+and a branch in every `init`. The condition that brings it back is authors unable to keep the two
+registering the same things.
+
+**Where two instances cannot exist at once, the old one goes first.** A process cannot hold two
+copies of one library, so on a backend that says so - `capabilities.md`, *Capabilities, so the swap
+is honest* - the order is the old `shutdown`, the library closed, the new one opened, its `reload`.
+A failure then has no old instance to keep, which is the other half of the rule in `failure.md`:
+it is `init`'s case, and `on_error` decides.
+
+**What a reload may change is what is the instance's.** Fuel, limits, timeouts, the log level and
+the three sizes of the private memory all arrive with the new `cfg`, as do `spawns` and the grants.
+`persistent` may not: the share lasts as long as the module is loaded and other modules hold
+offsets into it, so a reload stating another size is refused by name. A component the new instance
+no longer declares is treated as an unload treats it. And **settings are not seeded again** -
+`config.md`, *A module's own settings are a component*: after init the component is the state.
 
 **There is no `reset` flag** - `lifetime.md`, *Lifetime*, for why. That makes `hot_reload` mean
 something: it gates reload-in-place, the only thing with no alternative, rather than an outcome a

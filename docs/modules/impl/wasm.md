@@ -82,7 +82,10 @@ address a second memory, which retires the accessor module altogether.
     init()      -> result   declares components, systems and observers. Once per load,
                             before any of its systems run.
     shutdown()  -> result   called once, before the instance goes away.
-    reload()    -> result   optional. Absent means "cannot be hot-reloaded".
+    reload()    -> result   optional. Absent means "cannot be hot-reloaded". Called in a
+                            new instance instead of init: it declares and registers over
+                            storage that is already there - `lifecycle.md`, *The runtime
+                            lifecycle*.
 
     <system>()  -> result   one export per system and per observer, named by the module
 
@@ -123,8 +126,8 @@ why no module could have sized it.
 ## The published layouts
 
 A module reads Bridge-ASM700's structures with plain loads, so both sides have to lay them out
-identically: the span, the private memory's header, the log record, the entity-index record, and
-`column_base`'s indexing.
+identically: the span, the private memory's header, the log record, the entity-index record,
+`column_base`'s indexing, an observer's list, and the pair a field holds for text.
 
 **One header, `bridge-abi.h`, compiled by Bridge-ASM700 and by every module, on either backend.** Nothing
 re-derives anything, so there is nothing to disagree about - the same argument that made the schema

@@ -37,7 +37,7 @@ as what it hands over is one stated value per key. The original Bridge had the s
                columns, max_modules            init/reload/shutdown timeouts
     [checks]   validate, profile               log_level, scratch, log_ring,
     [backend]  a name, a library and its       spans, spawns, persistent
-               settings, each                  pinned
+               settings, each                  pinned, config
                                                read / write
                                                [.config]
 
@@ -65,8 +65,35 @@ inside one phase.
 module declares the struct in its schema header like any other. Bridge-ASM700 writes one row at
 init, matching the keys to field names from the reflection it registered - `schema.md`, *There is no
 schema format*. A key the deployment set that the module never declared is an error at init, by
-name, where the original Bridge silently ignores a typo. A string is `(offset, length)` into the
-persistent arena, as in any component holding text.
+name, where the original Bridge silently ignores a typo.
+
+**Which component is the author's to say**, as `config`, a key of the manifest like `pinned`: only
+the author knows which of a module's structs holds its settings, which is the reason a Linux module
+marks its own parameters. Settings handed over with no `config` named, or a `config` that `init`
+never declared, are refused by name. Refused: a component named by convention, which is a name
+Bridge-ASM700 would be inventing - `no-builtins.md`, *No builtins*. Refused: marking it at
+`declare`, which would have `kind` say two things. Refused: keys that name their component, so that
+any could be seeded - more than seeding is for, since a module can fill any row itself in `init`.
+The condition that brings that back is a module with two settings structs that do not belong in one.
+
+**The row is on an entity of Bridge-ASM700's own**, spawned for it and destroyed with the module. The
+module finds it the way it finds anything: a query on the component, one span, one row. Not on the
+component's own entity, which is where flecs puts a singleton: that entity lives among flecs'
+reflection data, which the index does not mirror. And a component is the settings of one loaded
+module at a time, or it would not be a singleton.
+
+**A setting is written by what its field is.** A bool into a bool, an integer into any integer
+field it fits, a float into a float. Text has three places to go, and the field's type says which:
+
+    char name[N]      the bytes, inline, and a zero after them. text that does not fit is refused
+    bridge_text       `(offset, length)` into the persistent arena - `strings.md`, *Variable
+                      length*. the pair is a layout `bridge-abi.h` gives, usable as a field's type
+    an enum           the constant of that name
+
+That is `strings.md`'s own split, bounded text in the column and unbounded text in the arena, left
+to the author to choose by declaring the field. Anything else - text into a float, a number too
+large for its field, a name the enum lacks - is refused naming the key. Refused: taking any struct
+of two integers for text, which would write an offset into somebody's width and height.
 
 **After init the component is the live state.** Changing `vsync` while running is a component write
 by whoever holds the grant - not a call, not a reload, not a reconfigure entry. Config is the initial

@@ -64,6 +64,11 @@ declares a struct of its own with the same body.
 are declared, so each has a fingerprint of its own, checked where it is declared: a module built
 against an older `Vec3` is refused at `Vec3`, before `Body`.
 
+**One type is given and not declared: `bridge_text`**, the `(offset, length)` pair of
+`strings.md`, *Variable length*. It is a layout of `bridge-abi.h` and a field may be of it under any
+namespace. It exists so that a deployment's text can be told from two integers - `config.md`, *A
+module's own settings are a component* - and it is no component: nothing carries it but a field.
+
 **Rejected: pointer-sized or pointer-holding.** `EcsString`, `EcsVector`, `EcsUPtr`, `EcsIPtr`. A
 wasm32 pointer is four bytes and the host's is eight, so flecs' host-computed offsets would not
 match the module's struct. A host pointer is not addressable from wasm anyway. Same reason

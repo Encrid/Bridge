@@ -57,10 +57,11 @@ A module that grows a string once a level will never notice. One that does it pe
 the arena and fails by name, which under *It is never reclaimed* is fatal rather than wasteful.
 
 **Bridge-ASM700 reuses its own range.** A module's `[.config]` strings are allocated by
-Bridge-ASM700 at init, and `init` runs again on every load - so a day of unload-and-load would leak
-one copy per cycle. That range has exactly one owner, Bridge-ASM700 itself, which is the property
-the next section's refusal turns on. So Bridge-ASM700 keeps each module's config-string range and
-writes into it again rather than allocating afresh.
+Bridge-ASM700 at init, from that module's own share, and `init` runs again on every load - so a day
+of unload-and-load would leak one copy per cycle. That range has exactly one owner, Bridge-ASM700
+itself, which is the property the next section's refusal turns on. So Bridge-ASM700 keeps each
+module's config-string range after the module is gone, and the next load of it writes there again
+when the text fits, and takes from its new share only when it does not.
 
 ## It is never reclaimed
 

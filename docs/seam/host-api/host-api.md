@@ -91,8 +91,8 @@ as a helper - `native.md`, *Identity*.
 
         bool     trusted, hot_reload, pinned;
         uint8_t  on_error;           /* FAIL | SKIP. zero is unset */
-        uint32_t max_system_failures;
-        /* each of the next five: zero is unset, -1 is "no limit" */
+        /* each of the next six: zero is unset, -1 is "no limit" */
+        int64_t  max_system_failures;    /* raised by a failed barrier, lowered by a clean one */
         int64_t  fuel;               /* units per system invocation */
         int64_t  memory_limit;       /* bytes. a ceiling, never re-set */
         int64_t  init_timeout, reload_timeout, shutdown_timeout;   /* nanoseconds, per call */
@@ -105,6 +105,7 @@ as a helper - `native.md`, *Identity*.
         const char *const *read;  uint32_t read_count;       /* grants */
         const char *const *write; uint32_t write_count;
 
+        const char *config;          /* the component its settings seed, or null */
         const bridge_setting *settings; uint32_t setting_count;  /* its own [.config] */
     } bridge_module_config;
 

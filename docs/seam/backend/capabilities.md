@@ -2,7 +2,7 @@
 
 `backend_capabilities` is not decoration. A backend says what it can actually do, and these flags
 are how it states the guarantees in `module.md`, *Three guarantees differ* - metering is three flags,
-`meter`, `deadline` and `limit`:
+`meter`, `deadline` and `limit`, and reload is two:
 
                    wasm   native
     sandbox        yes    no      a module cannot reach memory it was not given
@@ -11,6 +11,7 @@ are how it states the guarantees in `module.md`, *Three guarantees differ* - met
     limit          yes    no      a module's own memory has a ceiling
     reload         yes    yes     an instance can be replaced while the process runs -
                                   cleanly on wasm, fragile on native
+    side by side   yes    no      two instances of one module can exist at once
 
 `sandbox` is about the **host boundary and nothing else**. It does not mean one module cannot
 corrupt another's components: they share a memory by design - see `costs.md`, *What we give up*.
@@ -19,7 +20,9 @@ set to the safe one. It got isolation between its VMs only because the three had
 shared no data.
 
 Each flag is demanded by a **config key**, not by a module: `sandbox` by `trusted = false`,
-`meter` by `fuel`, `deadline` by a timeout, `limit` by `memory_limit`, `reload` by `hot_reload`. So
+`meter` by `fuel`, `deadline` by a timeout, `limit` by `memory_limit`, `reload` by `hot_reload`.
+`side by side` is demanded by nothing: it is how Bridge-ASM700 learns which order a reload takes -
+`lifecycle.md`, *The runtime lifecycle*. So
 a mismatch is not a module arguing with a backend - it is **config contradicting config**, since the
 deployment chose both. It is therefore one of Bridge-ASM700's own refusals and takes init's path
 under `on_error`, exactly as a denied grant or an ambiguous order does: `failure.md`, *When
