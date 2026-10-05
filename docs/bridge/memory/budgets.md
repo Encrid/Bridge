@@ -9,7 +9,17 @@ arrives as a struct rather than a file, because Bridge-ASM700 reads none: `host-
 *Bridge-ASM700 parses nothing*.
 
 **Per module, when that module registers:** its scratch arena, its log ring and its spans - which
-is to say, this tier sizes that module's private memory.
+is to say, this tier sizes that module's private memory. And what is set aside for it in the shared
+one, so that what it mints is its own - `threads.md`, *Threads*:
+
+    spawns        how many entity ids it may take between two barriers. They are taken from
+                  flecs at a barrier and held: real entities with nothing on them, which no
+                  query matches, and which count against the entity ceiling
+    persistent    its share of the persistent arena, for as long as it is loaded
+
+`[budget] persistent` is the whole arena, and a module whose share does not fit in what is left of
+it is refused at load. A module that spawns nothing, or keeps no string, says so: `-1`, as for any
+key where none is a real answer.
 
 Because modules come and go, `max_modules` bounds **how many module records exist at once**, not
 how the private memory is divided. A record is taken at load and freed at unload, and exhaustion refuses the
@@ -37,7 +47,8 @@ bigger private memory arrives with a new instance and a bigger shared memory doe
 "Fatal where it happens" is fatal **to whoever can be named**, and that differs by where a budget
 runs out:
 
-    entities, persistent   at an ABI entry      the invocation is abandoned at that call
+    spawns, persistent,    at an ABI entry      the invocation is abandoned at that call
+      entities
     spans                  at a barrier         that module is stopped, by name
     columns                at a barrier         the bridge stops
     log_ring               at a write           the line is dropped and counted
@@ -49,6 +60,10 @@ The call does not return: on the wasm backend it traps, and from there it is an 
 system, or a failed `init` - `failure.md`, *When something fails*. The same holds for an entry
 refused for any other reason: a `declare` without its grant, an `attach` naming a slot that was
 never declared. A module that spawns too much costs itself one invocation and nobody else anything.
+
+`spawn` runs out in two ways and says which. A module that used the ids set aside for it is past
+its own `spawns`. One whose ids could not all be set aside is past the deployment's `entities`: the
+barrier gives it as many as fit, and the ceiling is what its next `spawn` names.
 
 **A module whose spans no longer fit is stopped**, since its systems would otherwise run over
 tables they were not told about. Its components stay, as for any stopped module.

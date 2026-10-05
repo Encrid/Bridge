@@ -105,12 +105,9 @@ trapping in `init`.
 
 ## What it left
 
-**A load that fails after its `init` ran leaves what `init` did.** Components it declared stay
-registered and changes it queued are applied at the next barrier. Leaving storage as it was is
-`PLAN.md` phase 6's claim, and arrives with unload.
-
-The phase also closed with three shortcuts: an allocator in power-of-two classes, one bridge to a
-process, and `observe` refusing. None is left - `PHASE5.md`, *Closed after the phase*.
+Nothing, any more. The phase closed with a failed load leaving what its `init` had done, an
+allocator in power-of-two classes, one bridge to a process, and `observe` refusing - `PHASE5.md`,
+*Closed after the phase*, for each.
 
 ## Open questions
 

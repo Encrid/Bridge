@@ -36,16 +36,17 @@ Refused: a pointer type the backend translates, which would have the backend rea
 memory and pairing each pointer with its length. The condition that brings it back is a value too
 large for a scratch arena.
 
-**`attach` carries the initial value.** `ptr` and `len` say where it is, and Bridge-ASM700 copies the
-bytes into the row when it applies the change, bounds-checking them the way it checks a log record's
-text. Zero means zeroed. The change is applied at the barrier **before the scratch arena is reset**,
-as the log is drained before it.
+**`attach` carries the initial value.** `ptr` and `len` say where it is, and Bridge-ASM700 takes a
+copy of the bytes at the call, bounds-checking them the way it checks a log record's text. Zero
+means zeroed. The copy is what reaches the row at the barrier, so the scratch arena may be reset in
+between - which it is, when the call was an observer's.
 
 That is there because **nothing applies immediately.** Every structural change is queued, so a row
 exists at the next barrier and not before, and the only thing a module could have wanted sooner
 was to fill a row it just made. Carrying the value does that without reaching the row at all.
 
-`spawn` still answers a usable id at once - the id is Bridge-ASM700's to mint - so a parent can be spawned
+`spawn` still answers a usable id at once - one of those set aside for the module at the last
+barrier, `threads.md`, *Threads* - so a parent can be spawned
 and referenced by its children in the same system.
 
 **There are no immediate forms.** They could not deliver acting at once: a span is a snapshot from

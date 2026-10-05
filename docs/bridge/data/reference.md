@@ -31,7 +31,8 @@ the hook.
 **Memory is twelve bytes times the highest entity id** rather than the live count. flecs recycles
 ids, so that tracks peak concurrent entities and not everything ever spawned. It is a **budget
 declared at startup**, and the `spawn` that would exceed it fails, fatally and where it happened.
-Growing it instead is not available - `budgets.md`, *Budgets*.
+Growing it instead is not available - `budgets.md`, *What running out does*. The ids a module holds
+ready count against it: a row of the index each, pointing at no table.
 
 **What `get` does not buy.** Retrieval is memory-bound, not lookup-bound: two dependent cache
 misses, roughly ten nanoseconds warm and a hundred and sixty cold. A crossing would pay those same

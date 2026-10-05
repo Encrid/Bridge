@@ -43,8 +43,7 @@ ring replaced.
 **Bridge-ASM700 can read**. A wasm module's own memory is never adopted; the shared memory is columns.
 
 Two rules follow. **Drain precedes the scratch-arena reset**, because the message lives in that
-arena and the barrier does both - and so does applying a queued `attach`, whose value lives there
-too. And **Bridge-ASM700 bounds-checks `text + len`** against a determinate
+arena and the barrier does both. And **Bridge-ASM700 bounds-checks `text + len`** against a determinate
 block, which is what makes the check writable at all. One compare per record is the price.
 
 Levels are flecs' signed convention, so flecs' own output needs no mapping - `ecs_os_api.log_` takes

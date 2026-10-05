@@ -36,8 +36,9 @@ as what it hands over is one stated value per key. The original Bridge had the s
     [budget]   entities, persistent,           fuel, memory_limit
                columns, max_modules            init/reload/shutdown timeouts
     [checks]   validate, profile               log_level, scratch, log_ring,
-    [backend]  a name, a library and its       spans, pinned
-               settings, each                  read / write
+    [backend]  a name, a library and its       spans, spawns, persistent
+               settings, each                  pinned
+                                               read / write
                                                [.config]
 
 Each becomes a field in `host-api.md`, *The data*, and Bridge-ASM700's behaviour turns on it.

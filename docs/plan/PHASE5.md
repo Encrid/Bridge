@@ -37,7 +37,7 @@ which has to be the one that loaded it - `pinned.md`, *Threads*.
 
 ## The tests
 
-Twenty-two new ones, sixty-five in all, in a release build and a debug one. The three that depend on
+Twenty-eight new ones, seventy-one in all, in a release build and a debug one. The three that depend on
 timing were run six times over.
 
     order        the mover adds 1, then the halver halves, by one `[order]` pair: sum 125,250
@@ -133,10 +133,34 @@ confinement keeps out of reach went from 87% and 38% to 93% and 77%.
 **Reports that repeated the documents they fed** cite them now. A figure said twice is two figures
 the day one of them moves, and one already had: the column floor.
 
-## Still open
+**The lock around every ABI entry**, which was the last and took a decision: `threads.md`,
+*Threads*. Looking for what replaces it found two things. flecs' stages, which the note beside the
+lock named as its replacement, refuse to create an entity while they are in use. And the lock had
+been hiding a fault: with more than one thread, the ids two modules were given in one level, and
+the order their changes reached storage, depended on which thread took the lock first - against
+`schedule.md`, *What a pass depends on*.
 
-**Every ABI entry runs under one lock** - `threads.md`, *Threads*. It is the one item left, and it
-is a decision before it is work: see *Open questions*.
+So entries reach nothing shared. A module spawns from ids set aside for it, allocates from its own
+share of the arena, and queues its changes, and the barrier applies the queues in the order
+modules loaded. Two keys per module pay for it, `spawns` and `persistent`. flecs' own deferral is
+gone with it: nothing reaches flecs outside a barrier or a load.
+
+    minted       two modules spawning in one level: the same 160 ids on one thread, on four,
+                 and on four again
+    strings      a string kept in a component, from the module's share of the arena
+    noarena      a share too small for it: its `alloc` abandons `init`, by name
+    bigarena     a share larger than what is left of the arena: refused at load
+    nospawns     a module that stated it spawns nothing, and spawns: abandoned, by name
+    undo         a load that fails after declaring: the same name with another layout then
+                 loads, which a leftover of the first would refuse
+
+`undo` is the other thing this closed. A failed load now takes back the ids it was given, its
+share of the arena and every component nobody else declared, and what it queued goes with its
+queue. That was `PLAN.md` phase 6's clause, and phase 6 now only has to keep it true for unload.
+
+## Nothing left
+
+No shortcut is marked in the code, and no report lists one.
 
 ## Open questions
 

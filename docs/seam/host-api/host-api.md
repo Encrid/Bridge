@@ -98,6 +98,9 @@ as a helper - `native.md`, *Identity*.
         int64_t  init_timeout, reload_timeout, shutdown_timeout;   /* nanoseconds, per call */
         int8_t   log_level;
         uint32_t scratch, log_ring, spans;   /* bytes, bytes, bytes */
+        /* each of the next two: zero is unset, -1 is "it mints none" */
+        int64_t  spawns;             /* entity ids between two barriers */
+        int64_t  persistent;         /* its share of the persistent arena, in bytes */
 
         const char *const *read;  uint32_t read_count;       /* grants */
         const char *const *write; uint32_t write_count;

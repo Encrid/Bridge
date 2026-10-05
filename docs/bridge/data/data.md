@@ -45,7 +45,8 @@ it cannot touch the host, another module's memory, or anything it was not given.
 
 ## Structural change
 
-Deferred, into flecs' command queue, applied at the merge point - which is our barrier. There is one
+Deferred, onto the queue of the module that asked, and applied at the barrier - `threads.md`,
+*Threads*, for why the queue is the module's and not flecs'. There is one
 after every phase, and **no phase is an exception**: a phase is only a name, so no kind of phase
 could be one - `schedule.md`, *A phase is a name and nothing else*. A span is a snapshot taken at the
 last barrier, so a change applied sooner than the next one is a change nothing can address.
@@ -75,9 +76,9 @@ It runs **at the barrier where the change applied**, which is why it takes no ph
 that itself, which is checked rather than assumed. An observer on an *immediate* operation
 does fire synchronously, on the caller's stack, mid-phase, against spans that are a snapshot from
 the last barrier - the one thing `schedule.md`, *Phases*, does not allow. But **every structural
-change here is deferred** - `abi.md`, *The ABI* - and under flecs' own defer not one invocation
-arrives early. `tests/phase5.c` holds that on every build: an attach made in a phase reaches its
-observer under that phase's barrier count, and a chain of three takes three barriers.
+change here is deferred** - `abi.md`, *The ABI* - so flecs only ever sees one at a barrier, and not
+one invocation arrives early. `tests/phase5.c` holds that on every build: an attach made in a phase
+reaches its observer under that phase's barrier count, and a chain of three takes three barriers.
 
 So Bridge-ASM700 uses flecs' observers as they are. Nothing to arrange, and no change detection to write:
 an observer runs where the world is already consistent, and never inside somebody else's work.
