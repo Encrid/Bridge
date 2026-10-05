@@ -275,7 +275,38 @@ barrier is the same in both; a played-back run that is handed a set recorded fro
 deployment is refused by name; and the standalone host records a run to a file and plays it back
 from one, in its own repository.*
 
-## 15. Tests, by capability
+## 15. The module seam, described once
+
+What a module and the library both have to agree on - the layouts a module reads, the constants,
+the entries it may call and what each takes - is stated today in one C23 header, and `wasm.md`,
+*The published layouts*, says a module that is not C derives its binding from it. That was never
+tried, and the first try failed: the project's own compiler cannot translate the header, which
+stops at its first `constexpr`. So a module in any language but C is a claim, and it was listed as
+not in this plan, with no condition and no phase.
+
+This phase states the module seam once, in a description that has no language in it, and writes
+from it the C header and a binding for a language that is not C. A layout is then changed in one
+place, and nothing written by hand can fall out of step with it.
+
+**It is the module seam and nothing else.** Not the library, not a backend: `bridge-backend.h` is
+between the library and a backend, and nobody has asked for a backend in another language. And
+not a component's schema, which stays a header two modules compile - `schema.md`, *Why a header
+and not a format*: that argument is about a struct one author writes and another compiles, and
+it holds. This one is about a seam every language has to read.
+
+What the description covers and what stays a language's own code, what form it takes, and which
+languages are written from it are this phase's questions, each by the method of `PHASE0.md`.
+
+After record and replay, which adds no entry a module calls but may add to what one reads; and
+before the tests by capability, whose list this adds to.
+
+*Done when a layout, a constant and an entry's signature are each stated in one place and nowhere
+else; the C header a module compiles is written from it, and the build fails if the one in the
+tree is not what the description gives; a native module in a language that is not C, built
+against a binding written from the same description, runs as a case; and changing one layout in
+the description changes every binding, shown once.*
+
+## 16. Tests, by capability
 
 Every test so far was written to meet one phase's claim, and is named for the phase: `phase2`
 to `phase6`. That says when a thing was built and not what is covered. This phase turns the
@@ -296,7 +327,7 @@ one that has none; no case is named for a phase; every case passes on Windows, L
 alone and with several copies running at once; and the standalone host's capabilities are covered
 the same way in its own repository.*
 
-## 16. Prove it
+## 17. Prove it
 
 Port the original Bridge's Godot adapter to this design, as a native module. It is a real workload
 with a measured baseline, which is why it is the proof. Its probe asserts 191 checks, and two of
@@ -323,4 +354,3 @@ Each is refused or deferred in the document named, with the condition that would
     memory high-water per module     `profile.md`, *The profile*
     an instance-grouping entry       `backend.md`, *What the backend does not do*
     layout migration                 `lifetime.md`, *When the layout changed*
-    bindings for a non-C module      `wasm.md`, *The published layouts*

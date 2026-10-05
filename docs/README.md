@@ -21,7 +21,7 @@ diagram to keep in step with. One concern per document, in reading order:
 
     README.md            this file
     DESIGN.md            why, and what the design is
-    PLAN.md              the seventeen phases, each with a done-when that can fail
+    PLAN.md              the eighteen phases, each with a done-when that can fail
 
     design/
         no-builtins.md       the rule, and its universality test

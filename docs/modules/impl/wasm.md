@@ -150,9 +150,12 @@ in capitals: *"DO NOT MODIFY ANYTHING ABOVE THIS, THE SERVER EXPECTS THE FIELDS 
 Ours is the ABI version in `bridge:manifest` - change a layout, bump the version, and a module
 built against the old header is refused by name.
 
-A module that is not C cannot include the header, so it is **normative rather than mandatory** -
-bindings are derived from it, and the ABI version catches drift. The arrangement WASI has between
-its interface definition and its hand-written bindings.
+A module that is not C cannot include the header, and so far cannot be written from it either:
+the header is C23, and the one translator tried on it, the project's own compiler's, stops at its
+first `constexpr`. What a module in another language needs is the same facts with no language in
+them, which is `PLAN.md`, phase 15: the seam described once, and this header written from it
+beside a binding for a language that is not C. Until then the header is the only statement of
+the seam, and a binding from it is written by hand.
 
 **The native backend's `bridge_api` is not in it.** A struct of C function pointers has nothing a
 wasm module could derive, since it gets imports rather than pointers. It lives in

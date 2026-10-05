@@ -422,7 +422,7 @@ read in its document and becomes a phase, a refusal with its condition, or nothi
             library's half and the host's half named apart; and a case, now, that a run says
             the same on one thread as on four                                         7e6eadf
     closed  a default phase set, and bridge:clock@1 and its kind: one question. Nothing ships
-            either; the first real deployment, `PLAN.md` 16, states its own and asks whether
+            either; the first real deployment, `PLAN.md` 17, states its own and asks whether
             they are shared                                                           5c4e577
     open    per-component page mapping
     open    a phase exclusivity flag
@@ -430,9 +430,11 @@ read in its document and becomes a phase, a refusal with its condition, or nothi
     open    an instance-grouping entry
     closed  arena mark and reset: still refused, with its condition. What was behind it is
             not: a share goes back to the arena at unload unless a row still holds a string
-            in it, so loading and unloading no longer ends in a restart
+            in it, so loading and unloading no longer ends in a restart              f3d7480
     open    layout migration
-    open    bindings for a non-C module
+    closed  bindings for a non-C module: a phase of its own, `PLAN.md` 15. The module seam
+            is described once and the C header and one other language's binding are written
+            from it. Tried first: the project's compiler cannot translate the header
 
 **2. Statements that are false now**: one commit, no decision.
 
