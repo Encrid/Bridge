@@ -69,6 +69,8 @@ NATIVE = [
     ('nticker1', 'nticker', ['STEP=1']), ('nticker2', 'nticker', ['STEP=10']),
     ('nticker3', 'nticker', ['STEP=10', 'FAIL_RELOAD']),
     ('nstore', 'nstore', []), ('nstorebig', 'nstore', ['BIG']), ('nstoretab', 'nstore', ['TABLES']),
+    ('nstress1', 'nstress', ['SEED=1u', 'SPACE="s1"']), ('nstress2', 'nstress', ['SEED=2u', 'SPACE="s2"']),
+    ('nstress3', 'nstress', ['SEED=3u', 'SPACE="s3"']), ('nstress4', 'nstress', ['SEED=4u', 'SPACE="s4"']),
 ]
 
 # a module in C: the name, its source, which accessors it is merged with, what it is compiled
@@ -389,8 +391,10 @@ CASES = [
      '@tests/storage-changes.txt', None),
     ('storage-tables', ['storage', 'tables'],
      '@tests/storage-tables.txt', None),
+    ('storage-stress', ['storage', 'stress'],
+     '@tests/storage-stress.txt', None),
     ('storage-measure', ['storage', 'measure'],
-     r"an id handed out +[0-9.]+ ns each.*ten thousand tables made.*alive", None),
+     r"an id handed out +[0-9.]+ ns each.*ten thousand tables made.*the stress run, on 1 thread.*alive", None),
     ('confined', ['confined'],
      None, None),
     ('rowmove', ['rowmove'],

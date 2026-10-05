@@ -3,6 +3,8 @@
  *     storage changes     every structural change a module can ask for, one at a time, and what
  *                         a system and an observer see after each
  *     storage tables      ten thousand tables
+ *     storage stress      four modules at once on four threads, eight million changes, each
+ *                         keeping its own account of what should be there and checking it
  *     storage measure     nanoseconds for each kind of change, at a barrier
  *
  * The first two are a transcript and decide nothing themselves: build.py holds what it must
@@ -18,10 +20,13 @@ static void sink([[maybe_unused]] void *ud, const bridge_record *r)
     printf("  %s: %.*s %u %u\n", r->system ? r->system : "-", (int)r->len, r->text, r->arg[0], r->arg[1]);
 }
 
+static void quiet([[maybe_unused]] void *ud, [[maybe_unused]] const bridge_record *r) { }
+
 static bridge_artifact store_module(const char *path, int64_t spawns, uint32_t spans)
 {
     bridge_artifact a = {};
     a.cfg.identity = "st:store@0.1.0";
+    a.cfg.scratch = 64 << 10;
     a.cfg.abi = BRIDGE_ABI;
     a.cfg.trusted = true;
     a.cfg.on_error = BRIDGE_FAIL;
@@ -31,7 +36,6 @@ static bridge_artifact store_module(const char *path, int64_t spawns, uint32_t s
     a.cfg.init_timeout = BRIDGE_NO_LIMIT;
     a.cfg.reload_timeout = BRIDGE_NO_LIMIT;
     a.cfg.shutdown_timeout = BRIDGE_NO_LIMIT;
-    a.cfg.scratch = 64 << 10;
     a.cfg.log_ring = 256 * 24;
     a.cfg.spans = spans;
     a.cfg.spawns = spawns;
@@ -45,7 +49,7 @@ static bridge_artifact store_module(const char *path, int64_t spawns, uint32_t s
 static const char *const phases[] = {
     "spawn", "attach_a", "attach_b", "detach_b", "destroy", "attach_b_half", "detach_b_half",
     "detach_b_absent", "value_a", "flicker", "destroy_half", "respawn_half", "touch_dead",
-    "attach_a_half", "recycled", "combine", "look", "never"
+    "attach_a_half", "recycled", "combine", "look", "never", "work", "check"
 };
 constexpr uint32_t PHASES = sizeof phases / sizeof *phases;
 
@@ -69,12 +73,43 @@ static uint64_t barrier(bridge *b, const char *phase)
     return os_now() - t;
 }
 
+/* Four of nstress, each in its own namespace, a hundred rounds of work and check. */
+constexpr uint32_t STRESSED = 4, ROUNDS = 100;
+
+static int stress_load(bridge *b)
+{
+    static const char *const identities[STRESSED] = {
+        "s1:stress@0.1.0", "s2:stress@0.1.0", "s3:stress@0.1.0", "s4:stress@0.1.0"
+    };
+    static const char *const paths[STRESSED] = {
+        NSTRESS1_PATH, NSTRESS2_PATH, NSTRESS3_PATH, NSTRESS4_PATH
+    };
+    for (uint32_t i = 0; i < STRESSED; i ++) {
+        bridge_artifact a = store_module(paths[i], 20'000, 1 << 20);
+        a.cfg.identity = identities[i];
+        a.cfg.scratch = 1 << 20;
+        if (bridge_load(b, &a)) return 1;
+    }
+    return 0;
+}
+
+static void stress_run(bridge *b)
+{
+    for (uint32_t round = 0; round < ROUNDS; round ++) {
+        if (bridge_phase(b, "work") || bridge_phase(b, "check")) printf("  REFUSED\n");
+    }
+}
+
 int main(int argc, char **argv)
 {
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[1] = {{ "native", NATIVE_PATH }};
     bridge_config cfg = { backends, 1, phases, PHASES, nullptr, 0, 1, { 400'000, 4096, 64 << 20, 4 } };
-    bridge *b = bridge_create(&cfg, sink, nullptr);
+    bridge *b;
+
+    /* the stress run is the one thing here that is run on more than one thread */
+    if (!strcmp(what, "stress")) cfg.threads = 4;
+    b = bridge_create(&cfg, sink, nullptr);
     bridge_artifact a;
 
     setvbuf(stdout, nullptr, _IONBF, 0);
@@ -122,6 +157,9 @@ int main(int argc, char **argv)
         run(b, "look");
         run(b, "destroy");
         run(b, "look");
+    } else if (!strcmp(what, "stress")) {
+        if (stress_load(b)) { printf("FAIL: not loaded\n"); return 1; }
+        stress_run(b);
     } else if (!strcmp(what, "measure")) {
         static const struct { const char *phase, *what; } ops[] = {
             { "spawn",    "an id handed out" },
@@ -168,6 +206,22 @@ int main(int argc, char **argv)
         t = barrier(b, "attach_a");
         printf("%-38s %7.1f us a table\n", "ten thousand more, by one attach each", (double)t / 1000.0 / 10'000);
         printf("columns in use %u KB\n", b->columns_used >> 10);
+        (void)bridge_destroy(b);
+
+        /* and the stress run, on four threads and on one: eight million changes and their
+         * checks. Its records go nowhere here: what they say is the stress case's to judge */
+        for (uint32_t k = 0; k < 2; k ++) {
+            uint32_t threads = k ? 1 : 4;
+            cfg.threads = threads;
+            b = bridge_create(&cfg, quiet, nullptr);
+            if (!b || stress_load(b)) { printf("FAIL: not loaded\n"); return 1; }
+            t = os_now();
+            stress_run(b);
+            printf("the stress run, on %u thread%s            %7.0f ms\n", threads, threads > 1 ? "s" : " ",
+                (double)(os_now() - t) / 1e6);
+            printf("columns in use %u KB\n", b->columns_used >> 10);
+            if (threads > 1) (void)bridge_destroy(b);
+        }
     } else {
         printf("FAIL: no case '%s'\n", what);
         return 1;

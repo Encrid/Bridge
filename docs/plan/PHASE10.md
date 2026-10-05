@@ -210,6 +210,20 @@ of six rounds, three runs. This is the line ours has to stay under.
     a barrier with nothing to do, then       82 to 85 us
     ten thousand more, by one attach each    2.8 us a table
 
+    the stress run, on four threads          3.5 s
+    the stress run, on one thread            5.6 s
+
+**The stress run** is `storage stress`: four modules at once, each asking for twenty thousand
+changes a pass for a hundred passes, chosen by a generator it seeds itself - an entity made with
+a few components, one destroyed, a component attached, set or detached. Eight million changes.
+Each module keeps its own account of what every one of its entities ought to carry and with what
+value, and at every pass checks storage against it twice over: every entity through the index
+and `column_base`, and every component through its spans. What it prints is how many disagreed,
+which is none, and a digest of its own account, kept in `tests/storage-stress.txt`. The digest
+does not depend on what keeps the rows or on how many threads ran, so the same file judges ours;
+and the two times above are what ours is measured against on a mixed load, where the lines
+before them each measure one kind of change alone.
+
 The second figure of the lower three is the one that was not expected: with ten thousand tables
 standing and nothing changed, a barrier is eight hundred times dearer than with one. Every
 barrier walks every query's matched tables to publish them again, changed or not.
