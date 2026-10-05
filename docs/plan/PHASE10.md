@@ -359,10 +359,10 @@ showed it.
 `BRIDGE_SCHEMA_STRUCT`, `BRIDGE_SCHEMA_ENUM` and `BRIDGE_SCHEMA_BITMASK`: `schema.md`, *There is
 no schema format*.
 
-**Still inherited from flecs, and each to be decided**: the numbers of the log levels; thirty-two terms a query; the texts of records that were
-kept word for word; when a freed index is handed out again; the shape of an id and of an index
-record. And the order of the fields of `bridge_budget`, which followed what the tests already
-wrote.
+**Still inherited from flecs, and each to be decided**: the numbers of the log levels; thirty-two
+terms a query; the texts of records that were kept word for word; when a freed index is handed out
+again; the shape of an id and of an index record. And the order of the fields of `bridge_budget`,
+which followed what the tests already wrote.
 
 **Open: a test that a barrier allocates nothing.** It holds by reading: `src/rows.c` calls no
 allocator outside `rows_create`. Nothing checks it.
