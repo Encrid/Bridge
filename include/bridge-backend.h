@@ -33,8 +33,14 @@ enum {
     BACKEND_RELOAD   = 1 << 4
 };
 
-/* ponytail: string pairs, since no backend setting exists yet. Typed values when one needs them. */
-typedef struct { const char *key, *value; } backend_setting;
+/* A setting is the backend's own: Bridge-ASM700 passes each through unread. A backend refuses a
+ * key it does not know, by name, as Bridge-ASM700 refuses one of its own it does not. */
+enum { BACKEND_BOOL = 1, BACKEND_INT = 2, BACKEND_FLOAT = 3, BACKEND_STRING = 4 };
+typedef struct {
+    const char *key;
+    uint8_t     kind;
+    union { int b; int64_t i; double f; const char *s; } v;
+} backend_setting;
 
 /* A signature is declared going in and checked coming out - signatures.md. */
 enum { BACKEND_I32 = 1, BACKEND_I64 = 2 };

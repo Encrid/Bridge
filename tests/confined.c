@@ -8,6 +8,44 @@
 static char *block;
 static size_t block_size, block_used;
 
+/* What confinement keeps out of a module's reach: everything flecs allocates that is not a
+ * column. Counted by giving flecs an allocator that remembers each size, beside the bytes of
+ * column in use, so the share can be said with a number and not an argument. */
+static size_t own_live, column_live;
+
+static void *own_malloc(ecs_size_t size)
+{
+    size_t *p = malloc((size_t)size + 16);
+    p[0] = (size_t)size;
+    own_live += (size_t)size;
+    return (char *)p + 16;
+}
+
+static void *own_calloc(ecs_size_t size)
+{
+    void *p = own_malloc(size);
+    memset(p, 0, (size_t)size);
+    return p;
+}
+
+static void own_free(void *ptr)
+{
+    if (!ptr) return;
+    own_live -= ((size_t *)((char *)ptr - 16))[0];
+    free((char *)ptr - 16);
+}
+
+static void *own_realloc(void *ptr, ecs_size_t size)
+{
+    size_t *p;
+    if (!ptr) return own_malloc(size);
+    own_live -= ((size_t *)((char *)ptr - 16))[0];
+    p = realloc((char *)ptr - 16, (size_t)size + 16);
+    p[0] = (size_t)size;
+    own_live += (size_t)size;
+    return (char *)p + 16;
+}
+
 static void* block_alloc(ecs_size_t size)
 {
     size_t n = ((size_t)size + 15) & ~(size_t)15;
@@ -17,6 +55,7 @@ static void* block_alloc(ecs_size_t size)
     }
     void *p = block + block_used;
     block_used += n;
+    column_live += (size_t)size;
     return p;
 }
 
@@ -26,13 +65,14 @@ static void* block_realloc(void *ptr, ecs_size_t old_size, ecs_size_t new_size)
     void *p = block_alloc(new_size);
     if (ptr) {
         memcpy(p, ptr, (size_t)(old_size < new_size ? old_size : new_size));
+        column_live -= (size_t)old_size;
     }
     return p;
 }
 
 static void block_free(void *ptr, ecs_size_t size)
 {
-    (void)ptr; (void)size;
+    if (ptr) column_live -= (size_t)size;
 }
 
 static int inside(const void *p)
@@ -75,12 +115,16 @@ static int check(workload_t *w)
 
     printf("%8d entities %8d rows checked, %4d entity arrays, %d escaped, block %zu KB\n",
         w->count, rows, arrays, escaped, block_used / 1024);
+    printf("%8d entities: flecs' own memory %zu KB, columns %zu KB: %.0f%% is its own\n",
+        w->count, own_live / 1024, column_live / 1024,
+        100.0 * (double)own_live / (double)(own_live + column_live));
     return escaped;
 }
 
 static int run(int32_t count)
 {
     block_used = 0;
+    own_live = column_live = 0;
     workload_t w = { .world = ecs_init() };
     workload_run(&w, count, NULL);
     int escaped = check(&w);
@@ -94,6 +138,13 @@ int main(void)
     block_size = (size_t)512 << 20;
     block = malloc(block_size);
     flecs_confine = (flecs_confine_t){ block_alloc, block_realloc, block_free, NULL };
+    ecs_os_set_api_defaults();
+    ecs_os_api_t os = ecs_os_get_api();
+    os.malloc_ = own_malloc;
+    os.calloc_ = own_calloc;
+    os.realloc_ = own_realloc;
+    os.free_ = own_free;
+    ecs_os_set_api(&os);
 
     int escaped = run(4000) + run(200000);
     if (escaped) {

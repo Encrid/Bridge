@@ -177,6 +177,10 @@ int os_event_wait(os_event *e, uint64_t nanos)
 
 uint64_t os_thread_id(void) { return GetCurrentThreadId(); }
 
+static SRWLOCK global_lock = SRWLOCK_INIT;
+void os_global_lock(void) { AcquireSRWLockExclusive(&global_lock); }
+void os_global_unlock(void) { ReleaseSRWLockExclusive(&global_lock); }
+
 struct os_mutex { CRITICAL_SECTION section; };
 
 os_mutex *os_mutex_new(void)
@@ -193,6 +197,10 @@ void os_mutex_unlock(os_mutex *m) { LeaveCriticalSection(&m->section); }
 #else
 
 uint64_t os_thread_id(void) { return (uint64_t)(uintptr_t)pthread_self(); }
+
+static pthread_mutex_t global_lock = PTHREAD_MUTEX_INITIALIZER;
+void os_global_lock(void) { pthread_mutex_lock(&global_lock); }
+void os_global_unlock(void) { pthread_mutex_unlock(&global_lock); }
 
 struct os_mutex { pthread_mutex_t mutex; };
 

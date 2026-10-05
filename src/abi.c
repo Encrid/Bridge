@@ -485,6 +485,7 @@ static int abi_alloc(void *ud, const uint64_t *a, uint64_t *r)
         module *m = ud; \
         int refused; \
         os_mutex_lock(m->b->entries); \
+        store_enter(m->b);          /* an entry may be the first thing a worker does for it */ \
         refused = abi_##name(ud, a, r); \
         os_mutex_unlock(m->b->entries); \
         return refused; \

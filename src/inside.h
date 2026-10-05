@@ -12,6 +12,12 @@
 
 #define PAGE 65536u
 
+#ifdef _MSC_VER
+#define THREAD_LOCAL __declspec(thread)
+#else
+#define THREAD_LOCAL _Thread_local
+#endif
+
 typedef struct module module;
 typedef struct pool pool;
 
@@ -97,7 +103,7 @@ struct module {
 };
 
 typedef struct { ecs_table_t *table; int32_t rows; } table_slot;
-typedef struct { uint32_t *at; uint32_t count, room; } free_list;
+typedef struct { uint32_t at, len; } gap;       /* in the column region, from its start */
 
 struct bridge {
     bridge_sink_fn sink;
@@ -123,7 +129,8 @@ struct bridge {
     uint32_t       entities;
     uint32_t       arena, arena_len, arena_used;
     uint32_t       columns, columns_len, columns_used;
-    free_list      classes[32];     /* freed column space by power of two, kept outside the block */
+    gap           *gaps;            /* freed column space, by offset. kept outside the block */
+    uint32_t       gap_count, gap_room;
     int            columns_out;     /* the column budget ran out during this barrier */
     int            layout_moved;    /* a column, a table or a declaration changed */
 
@@ -164,6 +171,7 @@ void  pool_destroy(pool *p);
 void  pool_run(pool *p, pool_fn fn, void **jobs, const uint8_t *caller_only, uint32_t count);
 
 /* store.c */
+void     store_enter(bridge *b);                                  /* this thread is working for b */
 int      store_create(bridge *b, const bridge_budget *budget);    /* 0, or a record was emitted */
 void     store_destroy(bridge *b);
 void     store_touch(bridge *b, ecs_entity_t e);                  /* e may have moved: look at the barrier */

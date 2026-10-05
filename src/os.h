@@ -23,6 +23,10 @@ os_thread *os_thread_start(void (*fn)(void *), void *arg);
 void       os_thread_join(os_thread *t);
 uint64_t   os_thread_id(void);                      /* of the calling thread */
 
+/* One lock for the process, for what a library can only do one at a time. */
+void os_global_lock(void);
+void os_global_unlock(void);
+
 typedef struct os_mutex os_mutex;
 os_mutex *os_mutex_new(void);
 void      os_mutex_free(os_mutex *m);

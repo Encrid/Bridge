@@ -285,7 +285,7 @@ phase3_case (fuel        "test:spin@0.1.0/forever: system 'forever' failed: trap
 phase3_case (ceiling     "test:flood@0.1.0/flood: system 'flood' failed: spawn: .budget. entities of 4096 is reached")
 phase3_case (ring        "line 15 0.*test:chatty@0.1.0/-: 84 log lines were dropped: its ring holds 16")
 phase3_case (nospans     "module 'view:reader@0.1.0' is stopped: what its queries match no longer fits in its spans of 16 bytes.*moved 2 1000")
-phase3_case (nocolumns   "the bridge has stopped: .budget. columns of 90000 bytes ran out.*update refused" 90000)
+phase3_case (nocolumns   "the bridge has stopped: .budget. columns of 60000 bytes ran out.*game:mover@0.1.0: not loaded.*update refused" 60000)
 phase3_case (nophase     "phase 'render' is not one the deployment declared")
 phase3_case (nophases    "the deployment declares no phase.*bridge_create refused")
 phase3_case (nobudget    ".budget. columns is unset.*bridge_create refused")
@@ -383,3 +383,8 @@ phase5_case (obsreorder  "view:fixer@0.1.0: loaded.*seen 1 5")
 # a field whose type is another declared type: schema.md, *The type set*
 phase5_case (nested      "read: body 2 2.*read: more 3 4")
 phase5_case (nested2     "module 'game:nested@0.1.0' did not load: component 'game:Body': its descriptor does not describe a struct, or names a type its namespace has not declared")
+
+# a backend is handed its settings unread, and refuses one it does not know
+phase4_case (setting   "backend 'native' would not start: it knows no setting 'cache'.*bridge_create refused")
+# two bridges in one process, on two threads: 250000 + 500 a frame, fifty frames and thirty
+phase5_case (two         "two bridges: sums 275000 and 265000")

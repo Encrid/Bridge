@@ -211,7 +211,12 @@ static wasm_engine_t *engine_for(backend *b, int kind)
 BACKEND_EXPORT backend *backend_create(const backend_setting *settings, uint32_t count,
                                        backend_err *err)
 {
-    (void)settings; (void)count; (void)err;
+    /* this backend has no setting of its own, so any key is one it does not know */
+    if (count) {
+        snprintf(err->text, sizeof err->text, "it knows no setting '%.100s'",
+                 settings[0].key ? settings[0].key : "");
+        return NULL;
+    }
     backend *b = calloc(1, sizeof *b);
     b->armed = os_event_new();
     b->done = os_event_new();

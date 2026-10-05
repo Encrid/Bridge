@@ -107,7 +107,12 @@ static uint32_t t_alloc(uint32_t len)
 BACKEND_EXPORT backend *backend_create(const backend_setting *settings, uint32_t count,
                                        backend_err *err)
 {
-    (void)settings; (void)count; (void)err;
+    /* this backend has no setting of its own, so any key is one it does not know */
+    if (count) {
+        snprintf(err->text, sizeof err->text, "it knows no setting '%.100s'",
+                 settings[0].key ? settings[0].key : "");
+        return NULL;
+    }
     return calloc(1, sizeof(backend));
 }
 

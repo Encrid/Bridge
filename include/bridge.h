@@ -13,8 +13,18 @@ typedef struct bridge bridge;
 /* A backend the deployment configures: Bridge-ASM700 opens the library, and a module names
  * the backend that runs it. */
 typedef struct {
+    const char *key;
+    uint8_t     kind;                           /* BRIDGE_BOOL | INT | FLOAT | STRING */
+    union { bool b; int64_t i; double f; const char *s; } v;
+} bridge_setting;
+
+enum { BRIDGE_BOOL = 1, BRIDGE_INT = 2, BRIDGE_FLOAT = 3, BRIDGE_STRING = 4 };
+
+typedef struct {
     const char *name;
     const char *library;
+    /* the backend's own, passed to it unread: it refuses a key it does not know */
+    const bridge_setting *settings; uint32_t setting_count;
 } bridge_backend;
 
 /* Every one is stated: zero is unset, and refused. docs/bridge/memory/budgets.md. */
@@ -84,8 +94,9 @@ typedef void (*bridge_sink_fn)(void *ud, const bridge_record *r);
 bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud);
 void    bridge_destroy(bridge *b);
 
-/* 0 if the module is loaded and its init answered 0. Otherwise the load was refused or
- * failed, and a record says why. Between phases only. */
+/* 0 if the module is loaded, its init answered 0, and the bridge can still run it. Otherwise
+ * the load was refused or failed, or stopped the bridge, and a record says why. Between phases
+ * only. */
 int bridge_load(bridge *b, const bridge_artifact *a);
 
 /* Run the systems registered to one phase, then its barrier. 0 if the phase ran, whatever

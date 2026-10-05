@@ -74,10 +74,16 @@ int main(int argc, char **argv)
     bridge_backend backends[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
     const char *phases[2] = { "update", "present" };
     bridge_config cfg = { backends, 2, phases, 2, NULL, 0, 1, { 4096, 4096, 1 << 20, 8 } };
+    bridge_setting cache = { "cache", BRIDGE_STRING, { .s = "somewhere" } };
     bridge_artifact a;
     bridge *b;
     int i;
     setvbuf(stdout, NULL, _IONBF, 0);
+
+    if (!strcmp(what, "setting")) {             /* a key the backend does not know */
+        backends[1].settings = &cache;
+        backends[1].setting_count = 1;
+    }
 
     b = bridge_create(&cfg, sink, NULL);
     if (!b) {

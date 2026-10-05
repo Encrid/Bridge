@@ -1,25 +1,44 @@
 /* The schedule: which systems conflict, what orders them, and who runs at once.
  * docs/bridge/run/schedule.md, *Order within a phase is never implicit*, and threads.md.
  *
- * ponytail: a dense reachability matrix per phase, closed in O(n^3) at every load. Fine for
- * the tens of systems a phase has; adjacency lists and one topological sort if a phase ever
- * holds hundreds. */
+ * Who must run before whom is a reachability matrix per phase, a row of bits per system,
+ * closed by or-ing rows: n^3 / 64 word operations at a load, which for a phase of a thousand
+ * systems is some sixteen million. Nothing here runs per frame. */
 #include "inside.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Floyd-Warshall, on bytes */
-static void close_over(uint8_t *reach, uint32_t n)
+typedef struct { uint64_t *bits; uint32_t n, words; } matrix;
+
+static void matrix_init(matrix *m, uint32_t n)
 {
-    uint32_t i, j, k;
-    for (k = 0; k < n; k ++) {
-        for (i = 0; i < n; i ++) {
-            if (!reach[i * n + k]) continue;
-            for (j = 0; j < n; j ++) {
-                if (reach[k * n + j]) reach[i * n + j] = 1;
-            }
+    m->n = n;
+    m->words = (n + 63) / 64;
+    m->bits = calloc((size_t)n * m->words + 1, sizeof *m->bits);
+}
+
+static int reaches(const matrix *m, uint32_t i, uint32_t j)
+{
+    return (int)(m->bits[(size_t)i * m->words + j / 64] >> (j % 64) & 1);
+}
+
+static void edge(matrix *m, uint32_t i, uint32_t j)
+{
+    m->bits[(size_t)i * m->words + j / 64] |= (uint64_t)1 << (j % 64);
+}
+
+/* Warshall: whatever reaches k reaches all that k does */
+static void close_over(matrix *m)
+{
+    uint32_t i, k, w;
+    for (k = 0; k < m->n; k ++) {
+        const uint64_t *via = &m->bits[(size_t)k * m->words];
+        for (i = 0; i < m->n; i ++) {
+            uint64_t *row = &m->bits[(size_t)i * m->words];
+            if (!reaches(m, i, k)) continue;
+            for (w = 0; w < m->words; w ++) row[w] |= via[w];
         }
     }
 }
@@ -29,8 +48,10 @@ static void close_over(uint8_t *reach, uint32_t n)
 int schedule_order(bridge *b, const bridge_order *order, uint32_t count)
 {
     const char **names = calloc(count ? count * 2 : 1, sizeof *names);
-    uint8_t *reach = calloc(count ? (size_t)count * count * 4 : 1, 1);
+    matrix reach;
     uint32_t n = 0, i, k, refused = 0;
+
+    matrix_init(&reach, count * 2);
 
     b->before = calloc(count ? count : 1, sizeof *b->before);
     b->after = calloc(count ? count : 1, sizeof *b->after);
@@ -49,19 +70,19 @@ int schedule_order(bridge *b, const bridge_order *order, uint32_t count)
             for (at[k] = 0; at[k] < n && strcmp(names[at[k]], pair[k]); at[k] ++) {}
             if (at[k] == n) names[n ++] = pair[k];
         }
-        reach[at[0] * count * 2 + at[1]] = 1;
+        edge(&reach, at[0], at[1]);
     }
     if (!refused && count) {
-        close_over(reach, count * 2);
+        close_over(&reach);
         for (i = 0; i < n && !refused; i ++) {
-            if (!reach[i * count * 2 + i]) continue;
+            if (!reaches(&reach, i, i)) continue;
             say(b, NULL, NULL, BRIDGE_ERR, "[order] contradicts itself: '%s' would run before "
                 "itself", names[i]);
             refused = 1;
         }
     }
     free(names);
-    free(reach);
+    free(reach.bits);
     return (int)refused;
 }
 
@@ -83,41 +104,42 @@ static const char *conflict(const bridge_system *a, const bridge_system *b)
 int schedule_build(bridge *b, char *why, size_t why_len)
 {
     bridge_system **in = calloc(b->system_count ? b->system_count : 1, sizeof *in);
-    uint8_t *reach = calloc(b->system_count ? (size_t)b->system_count * b->system_count : 1, 1);
     uint32_t phase, i, j, k, refused = 0;
 
     for (phase = 0; phase <= b->phase_count && !refused; phase ++) {
         const char *where = phase < b->phase_count ? b->phases[phase] : NULL;
         uint32_t n = 0;
+        matrix reach;
         for (i = 0; i < b->system_count; i ++) {
             if (b->systems[i]->phase == phase) in[n ++] = b->systems[i];
         }
-        memset(reach, 0, (size_t)n * n);
+        matrix_init(&reach, n);
 
         for (k = 0; k < b->order_count; k ++) {
             for (i = 0; i < n && strcmp(in[i]->full, b->before[k]); i ++) {}
             for (j = 0; j < n && strcmp(in[j]->full, b->after[k]); j ++) {}
-            if (i < n && j < n) reach[i * n + j] = 1;
+            if (i < n && j < n) edge(&reach, i, j);
         }
-        close_over(reach, n);
+        close_over(&reach);
         /* a module orders its own systems by registering them, unless [order] says otherwise */
         for (i = 0; i < n; i ++) {
             for (j = i + 1; j < n; j ++) {
-                if (in[i]->m == in[j]->m && conflict(in[i], in[j]) && !reach[j * n + i]) {
-                    reach[i * n + j] = 1;
+                if (in[i]->m == in[j]->m && conflict(in[i], in[j]) && !reaches(&reach, j, i)) {
+                    edge(&reach, i, j);
                 }
             }
         }
-        close_over(reach, n);
+        close_over(&reach);
 
         for (i = 0; i < n && !refused; i ++) {
-            if (reach[i * n + i]) {
+            if (reaches(&reach, i, i)) {
                 snprintf(why, why_len, "[order] has '%.100s' run before itself", in[i]->full);
                 refused = 1;
             }
             for (j = i + 1; j < n && !refused; j ++) {
                 const char *shared = conflict(in[i], in[j]);
-                if (!shared || in[i]->m == in[j]->m || reach[i * n + j] || reach[j * n + i]) continue;
+                if (!shared || in[i]->m == in[j]->m || reaches(&reach, i, j)
+                    || reaches(&reach, j, i)) continue;
                 snprintf(why, why_len, "'%.80s' and '%.80s' both touch '%.60s' %s%.40s%s, one of them "
                     "writing it, and nothing orders them", in[i]->full, in[j]->full, shared,
                     where ? "in phase '" : "at the barrier", where ? where : "", where ? "'" : "");
@@ -130,15 +152,15 @@ int schedule_build(bridge *b, char *why, size_t why_len)
         for (k = 0; k < n && !refused; k ++) {
             for (i = 0; i < n; i ++) {
                 for (j = 0; j < n; j ++) {
-                    if (i != j && reach[i * n + j] && in[j]->level <= in[i]->level) {
+                    if (i != j && reaches(&reach, i, j) && in[j]->level <= in[i]->level) {
                         in[j]->level = in[i]->level + 1;
                     }
                 }
             }
         }
+        free(reach.bits);
     }
     free(in);
-    free(reach);
     return (int)refused;
 }
 

@@ -7,10 +7,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* ponytail: one bridge per process. flecs_confine is a global, as ecs_os_api is, because the
- * functions that allocate a column have no world in scope. A context argument through the
- * patch is what a second bridge would need. */
-static bridge *live;
+/* flecs_confine is a global, as ecs_os_api is, because the functions that allocate a column
+ * have no world in scope. So which bridge a column is for is whichever this thread is working
+ * for: every way into Bridge-ASM700 says so before it reaches flecs. Two bridges in a process
+ * are then two worlds that never see each other's block. */
+static THREAD_LOCAL bridge *live;
+
+void store_enter(bridge *b)
+{
+    live = b;
+}
 
 uint32_t store_offset(bridge *b, const void *p)
 {
@@ -21,15 +27,15 @@ uint32_t store_offset(bridge *b, const void *p)
 
 /* ---- columns: flecs' allocator, carving the column region ---- */
 
-/* ponytail: power-of-two classes, never split or joined, so up to half a column is slack and
- * a freed class is only reused by its own size. A buddy allocator if a deployment's columns
- * outgrow the budget on slack alone. The free lists are kept outside the block: a module's
- * stray write must not be able to reach them. */
-static int class_of(size_t size)
+/* What flecs asks for is what it gets, to sixteen bytes: a freed range is a gap, kept in
+ * offset order and joined to its neighbours, and a request takes the smallest gap that holds
+ * it before it takes fresh space. The gaps are kept outside the block: a module's stray write
+ * must not be able to reach them. */
+#define GRAIN 16u
+
+static uint32_t grain(ecs_size_t size)
 {
-    int c = 4;
-    while (c < 32 && ((size_t)1 << c) < size) c ++;
-    return c;
+    return ((uint32_t)size + GRAIN - 1) & ~(GRAIN - 1);
 }
 
 static int in_columns(bridge *b, const void *p)
@@ -38,23 +44,69 @@ static int in_columns(bridge *b, const void *p)
     return c >= base && c < base + b->columns_len;
 }
 
+static void gap_drop(bridge *b, uint32_t i)
+{
+    memmove(&b->gaps[i], &b->gaps[i + 1], (b->gap_count - i - 1) * sizeof *b->gaps);
+    b->gap_count --;
+}
+
+/* [at, at + len) is free again */
+static void give(bridge *b, uint32_t at, uint32_t len)
+{
+    uint32_t i = 0;
+    while (i < b->gap_count && b->gaps[i].at < at) i ++;
+    if (i && b->gaps[i - 1].at + b->gaps[i - 1].len == at) {
+        b->gaps[-- i].len += len;
+    } else {
+        if (b->gap_count == b->gap_room) {
+            b->gap_room = b->gap_room ? b->gap_room * 2 : 64;
+            b->gaps = realloc(b->gaps, b->gap_room * sizeof *b->gaps);
+        }
+        memmove(&b->gaps[i + 1], &b->gaps[i], (b->gap_count - i) * sizeof *b->gaps);
+        b->gaps[i].at = at;
+        b->gaps[i].len = len;
+        b->gap_count ++;
+    }
+    if (i + 1 < b->gap_count && b->gaps[i].at + b->gaps[i].len == b->gaps[i + 1].at) {
+        b->gaps[i].len += b->gaps[i + 1].len;
+        gap_drop(b, i + 1);
+    }
+    /* a gap at the top is not a gap: it is space never used */
+    if (b->gaps[i].at + b->gaps[i].len == b->columns_used) {
+        b->columns_used = b->gaps[i].at;
+        gap_drop(b, i);
+    }
+}
+
+/* `len` bytes: from the smallest gap that holds them, or from the unused end. 0 if neither. */
+static int take(bridge *b, uint32_t len, uint32_t *at)
+{
+    uint32_t i, best = UINT32_MAX;
+    for (i = 0; i < b->gap_count; i ++) {
+        if (b->gaps[i].len >= len && (best == UINT32_MAX || b->gaps[i].len < b->gaps[best].len)) {
+            best = i;
+        }
+    }
+    if (best != UINT32_MAX) {
+        *at = b->gaps[best].at;
+        b->gaps[best].at += len;
+        b->gaps[best].len -= len;
+        if (!b->gaps[best].len) gap_drop(b, best);
+        return 1;
+    }
+    if (len > b->columns_len - b->columns_used) return 0;
+    *at = b->columns_used;
+    b->columns_used += len;
+    return 1;
+}
+
 static void *column_alloc(ecs_size_t size)
 {
     bridge *b = live;
-    int c;
+    uint32_t at;
     if (size <= 0) return NULL;
     b->layout_moved = 1;
-    c = class_of((size_t)size);
-    if (c < 32) {
-        free_list *f = &b->classes[c];
-        size_t n = (size_t)1 << c;
-        if (f->count) return b->shared + f->at[-- f->count];
-        if (n <= b->columns_len - b->columns_used) {
-            void *p = b->shared + b->columns + b->columns_used;
-            b->columns_used += (uint32_t)n;
-            return p;
-        }
-    }
+    if (take(b, grain(size), &at)) return b->shared + b->columns + at;
     /* flecs cannot be unwound from the middle of a change, so it is given what it asked for
      * from outside the block, and the bridge stops when the barrier returns - budgets.md,
      * *What running out does*. No module runs again to read this. */
@@ -65,30 +117,46 @@ static void *column_alloc(ecs_size_t size)
 static void column_free(void *ptr, ecs_size_t size)
 {
     bridge *b = live;
-    free_list *f;
     if (!ptr) return;
     b->layout_moved = 1;
     if (!in_columns(b, ptr)) {
         free(ptr);
         return;
     }
-    f = &b->classes[class_of((size_t)size)];
-    if (f->count == f->room) {
-        f->room = f->room ? f->room * 2 : 16;
-        f->at = realloc(f->at, f->room * sizeof *f->at);
-    }
-    f->at[f->count ++] = store_offset(b, ptr);
+    give(b, (uint32_t)((uint8_t *)ptr - b->shared) - b->columns, grain(size));
 }
 
 static void *column_realloc(void *ptr, ecs_size_t old_size, ecs_size_t new_size)
 {
+    bridge *b = live;
     void *p;
     if (!ptr) return column_alloc(new_size);
     if (new_size <= 0) {
         column_free(ptr, old_size);
         return NULL;
     }
-    if (in_columns(live, ptr) && class_of((size_t)old_size) == class_of((size_t)new_size)) return ptr;
+    if (in_columns(b, ptr)) {
+        uint32_t at = (uint32_t)((uint8_t *)ptr - b->shared) - b->columns;
+        uint32_t had = grain(old_size), want = grain(new_size), i;
+        if (want == had) return ptr;
+        if (want < had) {
+            give(b, at + want, had - want);
+            return ptr;
+        }
+        /* a column mostly grows, and mostly it is the last thing allocated: grow it where
+         * it is when what follows it is free */
+        if (at + had == b->columns_used && want - had <= b->columns_len - b->columns_used) {
+            b->columns_used += want - had;
+            return ptr;
+        }
+        for (i = 0; i < b->gap_count && b->gaps[i].at <= at + had; i ++) {
+            if (b->gaps[i].at != at + had || b->gaps[i].len < want - had) continue;
+            b->gaps[i].at += want - had;
+            b->gaps[i].len -= want - had;
+            if (!b->gaps[i].len) gap_drop(b, i);
+            return ptr;
+        }
+    }
     p = column_alloc(new_size);
     memcpy(p, ptr, (size_t)(old_size < new_size ? old_size : new_size));
     column_free(ptr, old_size);
@@ -377,11 +445,6 @@ int store_create(bridge *b, const bridge_budget *budget)
     ecs_os_api_t os;
     uint32_t i;
 
-    if (live) {
-        say(b, NULL, NULL, BRIDGE_ERR, "another bridge exists in this process, and there is "
-            "room for one");
-        return 1;
-    }
     if (unset(b, "entities", budget->entities) || unset(b, "persistent", budget->persistent)
         || unset(b, "columns", budget->columns) || unset(b, "max_modules", budget->max_modules)) {
         return 1;
@@ -416,12 +479,17 @@ int store_create(bridge *b, const bridge_budget *budget)
     b->table_count = 1;                 /* table 0 is no table */
 
     live = b;
+    /* flecs' own globals are set up by its first world, and are nobody's to race for */
+    os_global_lock();
     flecs_confine = (flecs_confine_t){ column_alloc, column_realloc, column_free, on_row_moved };
     ecs_os_set_api_defaults();
     os = ecs_os_get_api();
-    os.log_ = flecs_says;
-    ecs_os_set_api(&os);
+    if (os.log_ != flecs_says) {
+        os.log_ = flecs_says;
+        ecs_os_set_api(&os);
+    }
     b->world = ecs_init();
+    os_global_unlock();
     ecs_observer(b->world, {
         .query.terms = {{ .id = EcsWildcard }},
         .events = { EcsOnAdd, EcsOnRemove },
@@ -452,16 +520,19 @@ int store_create(bridge *b, const bridge_budget *budget)
 void store_destroy(bridge *b)
 {
     uint32_t i;
+    live = b;
     if (b->world) {
         ecs_defer_end(b->world);
+        os_global_lock();
         ecs_fini(b->world);
+        os_global_unlock();
     }
     for (i = 0; i < b->backend_count; i ++) {
         open_backend *o = &b->backends[i];
         if (o->shared) o->api.memory_release(o->shared);
     }
     if (b->shared) os_release(b->shared, b->shared_reserve);
-    for (i = 0; i < 32; i ++) free(b->classes[i].at);
+    free(b->gaps);
     for (i = 0; i < b->component_count; i ++) {
         free(b->components[i]->name);
         free(b->components[i]->zero);
@@ -472,5 +543,5 @@ void store_destroy(bridge *b)
     free(b->table_hash);
     free(b->dirty);
     free(b->is_dirty);
-    if (live == b) live = NULL;
+    live = NULL;
 }

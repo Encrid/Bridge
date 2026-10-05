@@ -92,6 +92,7 @@ void bridge_destroy(bridge *b)
 {
     uint32_t i;
     if (!b) return;
+    store_enter(b);
     while (b->modules) {
         module *m = b->modules;
         b->modules = m->next;
@@ -159,7 +160,23 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
             say(b, NULL, NULL, BRIDGE_ERR, "backend '%s': %s", want->name, why);
             goto refuse;
         }
-        o->be = o->api.backend_create(NULL, 0, &err);
+        {
+            /* two structs for one fact, one per seam: copied member by member, so neither
+             * header has to know the other's layout */
+            backend_setting *settings = calloc(want->setting_count ? want->setting_count : 1,
+                                               sizeof *settings);
+            for (k = 0; k < want->setting_count; k ++) {
+                const bridge_setting *from = &want->settings[k];
+                settings[k].key = from->key;
+                settings[k].kind = from->kind;
+                if (from->kind == BRIDGE_BOOL) settings[k].v.b = from->v.b;
+                else if (from->kind == BRIDGE_INT) settings[k].v.i = from->v.i;
+                else if (from->kind == BRIDGE_FLOAT) settings[k].v.f = from->v.f;
+                else settings[k].v.s = from->v.s;
+            }
+            o->be = o->api.backend_create(settings, want->setting_count, &err);
+            free(settings);
+        }
         if (!o->be) {
             say(b, NULL, NULL, BRIDGE_ERR, "backend '%s' would not start: %s", want->name, err.text);
             goto refuse;
@@ -287,6 +304,7 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     uint32_t i, demands, import_count, memory_count = 0;
     module *m, *other;
 
+    store_enter(b);
     if (stopped(b)) return 1;
     if (!id || !*id) {
         say(b, NULL, NULL, BRIDGE_ERR, "a module with no identity is refused");
@@ -436,7 +454,8 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     b->module_count ++;
     b->layout_moved = 1;
     store_barrier(b);           /* what init queued is applied, and its spans are published */
-    return 0;
+    /* the module is in, and nothing will ever run it: that is not a load that succeeded */
+    return b->stopped_by ? 1 : 0;
 
 failed:
     say(b, NULL, NULL, BRIDGE_ERR, "module '%s' did not load: %s", id, err.text);
@@ -455,6 +474,7 @@ failed:
 int bridge_phase(bridge *b, const char *name)
 {
     uint32_t phase;
+    store_enter(b);
     if (stopped(b)) return 1;
     for (phase = 0; phase < b->phase_count; phase ++) {
         if (name && !strcmp(b->phases[phase], name)) break;
