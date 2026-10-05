@@ -50,10 +50,11 @@ static int run(backend_instance *i, const char *name, int32_t *status, backend_e
 }
 
 /* what the host answers a module that calls it: both arguments, added */
-static void ping(void *ud, const uint64_t *args, uint64_t *results)
+static int ping(void *ud, const uint64_t *args, uint64_t *results)
 {
     (void)ud;
     results[0] = args[0] + args[1];
+    return 0;
 }
 
 typedef struct { const char *name; int rounds, failed; } job;
@@ -93,7 +94,7 @@ int main(void)
     memory = api.memory_adopt(be, block, 2 * PAGE, &err);
 
     void *bytes = read_file(MODULE_DIR "/adopt.wasm", &len);
-    module = api.module_compile(be, bytes, len, NULL, &err);
+    module = api.module_compile(be, bytes, len, NULL, 0, &err);
     if (!module) { printf("FAIL: module_compile: %s\n", err.text); return 1; }
 
     /* 1. a module writes, the host reads the same bytes */
@@ -134,7 +135,7 @@ int main(void)
         static const uint8_t params[2] = { BACKEND_I32, BACKEND_I64 }, results[1] = { BACKEND_I32 };
         backend_sig sig = { params, 2, results, 1 };
         void *host_bytes = read_file(MODULE_DIR "/host.wasm", &len);
-        backend_module *host = api.module_compile(be, host_bytes, len, NULL, &err);
+        backend_module *host = api.module_compile(be, host_bytes, len, NULL, 0, &err);
         backend_instance *hi = host ? api.instance_create(be, host, NULL, 0, &err) : NULL;
         if (!hi || api.define_func(hi, "bridge", "ping", ping, NULL, &sig, &err)
             || run(hi, "init", &status, &err) || status != 16) {
@@ -148,6 +149,7 @@ int main(void)
 
     api.instance_destroy(one);
     api.module_destroy(module);
+    api.memory_release(memory);
     api.backend_destroy(be);
     os_release(block, (size_t)(reservation + guard));
     return 0;

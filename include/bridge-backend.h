@@ -1,7 +1,7 @@
 /* The backend seam: what Bridge-ASM700 asks of the thing that runs a module.
  * docs/seam/backend/backend.md is the contract; this header is its C form.
  *
- * A backend is a shared library exporting the sixteen functions below by name.
+ * A backend is a shared library exporting the seventeen functions below by name.
  * Only a backend and Bridge-ASM700 compile this header. */
 #ifndef BRIDGE_BACKEND_H
 #define BRIDGE_BACKEND_H
@@ -43,8 +43,9 @@ typedef struct {
     const uint8_t *results; uint32_t result_count;
 } backend_sig;
 
-/* A function Bridge-ASM700 provides to a module. Every value travels as 64 bits. */
-typedef void (*backend_fn)(void *ud, const uint64_t *args, uint64_t *results);
+/* A function Bridge-ASM700 provides to a module. Every value travels as 64 bits. Non-zero says
+ * the call that reached it must not go on: a backend that can unwind a module does so there. */
+typedef int (*backend_fn)(void *ud, const uint64_t *args, uint64_t *results);
 
 enum { BACKEND_IMPORT_FUNC = 1, BACKEND_IMPORT_MEMORY = 2, BACKEND_IMPORT_OTHER = 3 };
 typedef struct {
@@ -68,9 +69,13 @@ typedef struct backend_api {
      * start, then `guard` bytes nothing is mapped into. Zero for both if it needs none. */
     void            (*memory_shape)(backend *b, uint64_t *reservation, uint64_t *guard);
     backend_memory *(*memory_adopt)(backend *b, void *ptr, uint64_t len, backend_err *err);
+    /* After the last instance the memory was handed to is destroyed, never before. */
+    void            (*memory_release)(backend_memory *m);
 
+    /* `demands` is the capability flags this module's config asks for: a backend need not
+     * compile in a guarantee nobody demanded, and may never enforce less than was. */
     backend_module *(*module_compile)(backend *b, const void *bytes, size_t len,
-                                      const char *path, backend_err *err);
+                                      const char *path, uint32_t demands, backend_err *err);
     uint32_t        (*module_imports)(backend_module *m, backend_import *out, uint32_t max);
     void            (*module_destroy)(backend_module *m);
 
@@ -94,11 +99,11 @@ typedef struct backend_api {
 /* The names a backend exports, in the order of backend_api's members. */
 #define BACKEND_ENTRIES \
     "backend_create", "backend_destroy", "backend_capabilities", \
-    "memory_shape", "memory_adopt", \
+    "memory_shape", "memory_adopt", "memory_release", \
     "module_compile", "module_imports", "module_destroy", \
     "instance_create", "instance_destroy", \
     "instance_set_fuel", "instance_set_deadline", "instance_set_memory_limit", \
     "define_func", "instance_func", "call"
-#define BACKEND_ENTRY_COUNT 16
+#define BACKEND_ENTRY_COUNT 17
 
 #endif

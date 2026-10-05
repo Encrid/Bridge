@@ -1,6 +1,7 @@
 /* The host seam: the only header a host includes.
  * docs/seam/host-api/host-api.md is the contract. This is as much of it as exists so far:
- * create, destroy and load. Phases, unload, reload and the pulls arrive with what they act on. */
+ * create, destroy, load and phase. Order, unload, reload and the pulls arrive with what they
+ * act on. */
 #ifndef BRIDGE_H
 #define BRIDGE_H
 
@@ -17,8 +18,18 @@ typedef struct {
     const char *library;
 } bridge_backend;
 
+/* Every one is stated: zero is unset, and refused. docs/bridge/memory/budgets.md. */
+typedef struct {
+    uint64_t entities;        /* the index mirror ceiling */
+    uint64_t persistent;      /* the persistent arena, in bytes */
+    uint64_t columns;         /* component columns and entity arrays, in bytes */
+    uint32_t max_modules;     /* how many modules are loaded at once */
+} bridge_budget;
+
 typedef struct {
     const bridge_backend *backends; uint32_t backend_count;
+    const char *const *phases;      uint32_t phase_count;   /* a phase is a name, and no more */
+    bridge_budget budget;
 } bridge_config;
 
 enum { BRIDGE_FAIL = 1, BRIDGE_SKIP = 2 };      /* on_error. zero is unset */
@@ -30,9 +41,15 @@ typedef struct {
 
     bool     trusted;
     uint8_t  on_error;           /* BRIDGE_FAIL | BRIDGE_SKIP */
-    /* each of the next two: zero is unset, BRIDGE_NO_LIMIT is "no limit" */
+    /* each of the next three: zero is unset, BRIDGE_NO_LIMIT is "no limit" */
+    int64_t  fuel;               /* units per system invocation */
     int64_t  memory_limit;       /* bytes. a ceiling, never re-set */
     int64_t  init_timeout;       /* nanoseconds */
+    int8_t   log_level;          /* a line above it is not written */
+    uint32_t scratch, log_ring, spans;   /* its private memory, each in bytes */
+
+    const char *const *read;  uint32_t read_count;       /* grants */
+    const char *const *write; uint32_t write_count;
 } bridge_module_config;
 
 typedef struct {
@@ -48,7 +65,7 @@ typedef struct {
     const char *system;              /* null outside a system */
     const char *text;                /* THIS CALL ONLY */
     uint32_t    len;
-    uint32_t    when;
+    uint32_t    when;                /* barrier count, then offset in the phase */
     uint32_t    arg[2];
     int8_t      level;               /* negative is worse - flecs' convention */
 } bridge_record;
@@ -62,7 +79,11 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud);
 void    bridge_destroy(bridge *b);
 
 /* 0 if the module is loaded and its init answered 0. Otherwise the load was refused or
- * failed, and a record says why. */
+ * failed, and a record says why. Between phases only. */
 int bridge_load(bridge *b, const bridge_artifact *a);
+
+/* Run the systems registered to one phase, then its barrier. 0 if the phase ran, whatever
+ * its systems did: a system that failed is a record, not a return code. */
+int bridge_phase(bridge *b, const char *name);
 
 #endif

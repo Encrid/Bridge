@@ -1,4 +1,4 @@
-/* The wasm backend: the sixteen entries of bridge-backend.h, over wasmtime.
+/* The wasm backend: the seventeen entries of bridge-backend.h, over wasmtime.
  * docs/seam/backend/impl/wasmtime.md is why it is shaped this way. */
 #include "bridge-backend.h"
 #include "os.h"
@@ -25,8 +25,13 @@
 #define THREAD_LOCAL _Thread_local
 #endif
 
+/* Fuel and epoch interruption are an engine's settings and put code in every loop, so there
+ * is an engine per combination a module can demand, made at its first use. */
+enum { METERED = 1, INTERRUPTIBLE = 2, ENGINES = 4 };
+
 struct backend {
-    wasm_engine_t *engine;
+    wasm_engine_t *engines[ENGINES];
+    wasm_engine_t *ticking;         /* the engine of the call the watchdog is armed for */
     os_thread *watchdog;
     os_event  *armed, *done;
     uint64_t   nanos;
@@ -37,6 +42,7 @@ struct backend_memory { void *ptr; uint64_t len; };
 
 struct backend_module {
     backend *b;
+    int kind;                       /* METERED | INTERRUPTIBLE */
     wasmtime_module_t *module;
     wasm_importtype_vec_t imports;
 };
@@ -50,6 +56,7 @@ struct backend_func {
 struct backend_instance {
     backend *b;
     backend_module *m;
+    wasm_engine_t *engine;
     wasmtime_store_t   *store;
     wasmtime_context_t *ctx;
     wasmtime_linker_t  *linker;
@@ -176,31 +183,36 @@ static void watchdog(void *arg)
         os_event_wait(b->armed, OS_FOREVER);
         if (b->quit) return;
         if (!os_event_wait(b->done, b->nanos)) {
-            wasmtime_engine_increment_epoch(b->engine);
+            wasmtime_engine_increment_epoch(b->ticking);
             os_event_wait(b->done, OS_FOREVER);     /* the call does return, having trapped */
         }
     }
 }
 
-/* ---- the sixteen ---- */
+static wasm_engine_t *engine_for(backend *b, int kind)
+{
+    if (!b->engines[kind]) {
+        wasm_config_t *config = wasm_config_new();
+        wasmtime_memory_creator_t creator = { NULL, new_memory, NULL };
+        wasmtime_config_wasm_multi_memory_set(config, true);
+        wasmtime_config_consume_fuel_set(config, (kind & METERED) != 0);
+        wasmtime_config_epoch_interruption_set(config, (kind & INTERRUPTIBLE) != 0);
+        wasmtime_config_memory_reservation_set(config, RESERVATION);
+        wasmtime_config_memory_guard_size_set(config, GUARD);
+        wasmtime_config_memory_may_move_set(config, false);
+        wasmtime_config_host_memory_creator_set(config, &creator);
+        b->engines[kind] = wasm_engine_new_with_config(config);
+    }
+    return b->engines[kind];
+}
+
+/* ---- the seventeen ---- */
 
 BACKEND_EXPORT backend *backend_create(const backend_setting *settings, uint32_t count,
                                        backend_err *err)
 {
     (void)settings; (void)count; (void)err;
-    wasm_config_t *config = wasm_config_new();
-    wasmtime_config_wasm_multi_memory_set(config, true);
-    wasmtime_config_consume_fuel_set(config, true);
-    wasmtime_config_epoch_interruption_set(config, true);
-    wasmtime_config_memory_reservation_set(config, RESERVATION);
-    wasmtime_config_memory_guard_size_set(config, GUARD);
-    wasmtime_config_memory_may_move_set(config, false);
-
-    wasmtime_memory_creator_t creator = { NULL, new_memory, NULL };
-    wasmtime_config_host_memory_creator_set(config, &creator);
-
     backend *b = calloc(1, sizeof *b);
-    b->engine = wasm_engine_new_with_config(config);
     b->armed = os_event_new();
     b->done = os_event_new();
     b->watchdog = os_thread_start(watchdog, b);
@@ -214,7 +226,9 @@ BACKEND_EXPORT void backend_destroy(backend *b)
     os_thread_join(b->watchdog);
     os_event_free(b->armed);
     os_event_free(b->done);
-    wasm_engine_delete(b->engine);
+    for (int k = 0; k < ENGINES; k ++) {
+        if (b->engines[k]) wasm_engine_delete(b->engines[k]);
+    }
     free(b);
 }
 
@@ -244,18 +258,27 @@ BACKEND_EXPORT backend_memory *memory_adopt(backend *b, void *ptr, uint64_t len,
     return m;
 }
 
+BACKEND_EXPORT void memory_release(backend_memory *m)
+{
+    free(m);
+}
+
 BACKEND_EXPORT backend_module *module_compile(backend *b, const void *bytes, size_t len,
-                                              const char *path, backend_err *err)
+                                              const char *path, uint32_t demands,
+                                              backend_err *err)
 {
     (void)path;                 /* a wasm module is its bytes */
+    int kind = (demands & BACKEND_METER ? METERED : 0)
+             | (demands & BACKEND_DEADLINE ? INTERRUPTIBLE : 0);
     wasmtime_module_t *module = NULL;
-    wasmtime_error_t *error = wasmtime_module_new(b->engine, bytes, len, &module);
+    wasmtime_error_t *error = wasmtime_module_new(engine_for(b, kind), bytes, len, &module);
     if (error) {
         fail(err, "not a module this backend can compile", error, NULL);
         return NULL;
     }
     backend_module *m = calloc(1, sizeof *m);
     m->b = b;
+    m->kind = kind;
     m->module = module;
     wasmtime_module_imports(module, &m->imports);
     return m;
@@ -331,7 +354,7 @@ static wasmtime_error_t *adopt_into(backend_instance *i, backend_memory *mem,
     memcpy(wasm + n, "\7\5\1\1m\2\0", 7);           /* the export section: "m", memory 0 */
     n += 7;
 
-    error = wasmtime_module_new(i->b->engine, wasm, n, &holder);
+    error = wasmtime_module_new(i->engine, wasm, n, &holder);
     if (error) return error;
     adopting = mem;
     error = wasmtime_instance_new(i->ctx, holder, NULL, 0, &instance, trap);
@@ -352,11 +375,15 @@ BACKEND_EXPORT backend_instance *instance_create(backend *b, backend_module *m,
     uint32_t k;
     i->b = b;
     i->m = m;
-    i->store = wasmtime_store_new(b->engine, NULL, NULL);
+    i->engine = engine_for(b, m->kind);
+    i->store = wasmtime_store_new(i->engine, NULL, NULL);
     i->ctx = wasmtime_store_context(i->store);
-    i->linker = wasmtime_linker_new(b->engine);
-    /* fuel is on for the whole engine; a store with none traps at its first instruction */
-    drop(wasmtime_context_set_fuel(i->ctx, UINT64_MAX));
+    i->linker = wasmtime_linker_new(i->engine);
+    /* a metered store with no fuel traps at its first instruction */
+    if (m->kind & METERED) drop(wasmtime_context_set_fuel(i->ctx, UINT64_MAX));
+    /* and an interruptible one with no deadline at the first increment: the holder below runs
+     * nothing, but it is instantiated in this store */
+    if (m->kind & INTERRUPTIBLE) wasmtime_context_set_epoch_deadline(i->ctx, FAR);
 
     for (k = 0; k < count; k ++) {
         const backend_memory_import *mi = &memories[k];
@@ -383,7 +410,7 @@ BACKEND_EXPORT backend_instance *instance_create(backend *b, backend_module *m,
 
 BACKEND_EXPORT void instance_set_fuel(backend_instance *i, uint64_t units)
 {
-    drop(wasmtime_context_set_fuel(i->ctx, units));
+    if (i->m->kind & METERED) drop(wasmtime_context_set_fuel(i->ctx, units));
 }
 
 BACKEND_EXPORT void instance_set_deadline(backend_instance *i, uint64_t nanos)
@@ -410,7 +437,11 @@ static wasm_trap_t *host_call(void *env, wasmtime_caller_t *caller, const wasmti
     for (k = 0; k < nargs && k < 16; k ++) {
         in[k] = args[k].kind == WASMTIME_I32 ? (uint32_t)args[k].of.i32 : (uint64_t)args[k].of.i64;
     }
-    h->fn(h->ud, in, out);
+    if (h->fn(h->ud, in, out)) {
+        /* Bridge-ASM700 knows why and says so itself: the trap only has to unwind */
+        static const char refused[] = "refused by Bridge-ASM700";
+        return wasmtime_trap_new(refused, sizeof refused - 1);
+    }
     for (k = 0; k < nresults && k < 4; k ++) {
         if (h->result_kind[k] == BACKEND_I32) {
             results[k].kind = WASMTIME_I32;
@@ -464,7 +495,6 @@ static int instantiate(backend_instance *i, backend_err *err)
     wasm_trap_t *trap = NULL;
     wasmtime_error_t *error;
     if (i->instantiated) return 0;
-    wasmtime_context_set_epoch_deadline(i->ctx, FAR);
     error = wasmtime_linker_instantiate(i->linker, i->ctx, i->m->module, &i->instance, &trap);
     if (error || trap) {
         fail(err, "cannot instantiate", error, trap);
@@ -513,11 +543,14 @@ BACKEND_EXPORT int call(backend_func *f, int32_t *status, backend_err *err)
     uint64_t nanos = i->deadline;
     i->deadline = 0;
 
+    /* a module compiled without the check cannot be interrupted, and was not asked to be */
+    if (!(i->m->kind & INTERRUPTIBLE)) nanos = 0;
     if (nanos) {
         wasmtime_context_set_epoch_deadline(i->ctx, 1);
         b->nanos = nanos;
+        b->ticking = i->engine;
         os_event_set(b->armed);
-    } else {
+    } else if (i->m->kind & INTERRUPTIBLE) {
         wasmtime_context_set_epoch_deadline(i->ctx, FAR);
     }
     error = wasmtime_func_call(i->ctx, &f->func, NULL, 0, &result, 1, &trap);

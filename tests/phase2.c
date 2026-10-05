@@ -46,8 +46,12 @@ static bridge_artifact artifact(const char *name)
     a.cfg.abi = BRIDGE_ABI;
     a.cfg.trusted = false;
     a.cfg.on_error = BRIDGE_SKIP;
+    a.cfg.fuel = 1000000;
     a.cfg.memory_limit = 1 << 20;
     a.cfg.init_timeout = 200 * MS;
+    a.cfg.scratch = 4096;
+    a.cfg.log_ring = 240;
+    a.cfg.spans = 4096;
     a.backend = "wasm";
     a.bytes = read_file(name, &a.len);
     return a;
@@ -64,7 +68,8 @@ int main(int argc, char **argv)
 {
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[1] = {{ "wasm", BACKEND_PATH }};
-    bridge_config cfg = { backends, 1 };
+    const char *phases[1] = { "update" };
+    bridge_config cfg = { backends, 1, phases, 1, { 4096, 4096, 1 << 20, 8 } };
     bridge_artifact a;
     bridge *b;
     setvbuf(stdout, NULL, _IONBF, 0);
@@ -96,6 +101,7 @@ int main(int argc, char **argv)
         load(b, &a);
     } else if (!strcmp(what, "nolimit")) {      /* "none" is a value, and it loads */
         a = artifact("ok");
+        a.cfg.fuel = BRIDGE_NO_LIMIT;
         a.cfg.memory_limit = BRIDGE_NO_LIMIT;
         a.cfg.init_timeout = BRIDGE_NO_LIMIT;
         load(b, &a);

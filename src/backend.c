@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-/* A backend is a library exporting sixteen names. Every member of backend_api is a function
+/* A backend is a library exporting seventeen names. Every member of backend_api is a function
  * pointer, so the struct is filled as an array of them, in the order BACKEND_ENTRIES gives. */
 void *backend_open(const char *path, backend_api *api, char *why, size_t why_len)
 {
