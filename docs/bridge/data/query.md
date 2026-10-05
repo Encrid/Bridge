@@ -22,36 +22,36 @@ writes for a module*. A barrier at which nothing changed writes nothing.
         u32 count      rows in this table
         u32 entities   where the entity-id array for these rows begins
         u32 base[n]    one offset per term, in declared order. zero = absent here
-        u64 source[n]  entity a term came from. zero = per-row on the matched entity, which
-                       is every term there is today
 
-**This is the encoding an ECS already uses to hand an iterator to somebody outside it.** flecs'
-`ecs_iter_t` (`flecs.h:1192`) carries `entities`, `ids` and `sources` per field, and its JSON
-serialiser tells the same three cases apart with two null checks
-(`serialize_iter_result_query.c:177-186`), which is why nothing here carries a flag. **Offset 0 of
-the shared memory is reserved** so that zero is never a valid base, which also makes the same
-sentinel sound in `reference.md`, *Reference following*.
+**Absent is a zero base, and nothing carries a flag.** flecs hands an iterator to an outside
+reader the same way: its JSON serialiser tells a field that is not there by a null pointer
+(`serialize_iter_result_query.c:177-186`). **Offset 0 of the shared memory is reserved** so that
+zero is never a valid base, which also makes the same sentinel sound in `reference.md`, *Reference
+following*.
 
 Iterating is two loops and no call, with the branch outside the row loop:
 
     for each span:
         for each term t:
             if   base[t] == 0     term absent in this table
-            elif source[t] != 0   one value, at base[t], for every row
             else                  row r is at base[t] + r * sizeof(T)
 
 `sizeof(T)` is a build-time constant from the schema, so stride is never published - the module's
 compiler already knows it.
 
-The span is laid out at natural alignment, so `source[]` begins at the next multiple of eight after
-`base[]`. A query takes at most 32 terms, `BRIDGE_TERMS_MAX` in `bridge-abi.h`.
+A span is three kinds of `u32` and nothing else, so it is `8 + 4n` bytes. A query takes at most 32
+terms, `BRIDGE_TERMS_MAX` in `bridge-abi.h`.
 
 `entities` is there because a system that wants to destroy the row it is on, attach a component to
-it, or store a reference to it needs the id and has no other route to one. `source[t]` does double
-duty: zero says the term is per-row on the matched entity; non-zero says it is shared and names the
-entity it came from. **Storage writes zero for every term**: a term is a component the matched
-entity carries, and nothing yet lets a term be found on another entity. The field is the place such
-a term would say so, at one load per span rather than one per row.
+it, or store a reference to it needs the id and has no other route to one.
+
+**Every term is a component the matched entity itself carries.** flecs' iterator has a third case,
+a `source` for each field: the entity a value was found on when that is not the matched one, by
+inheritance or a fixed source. The span had the field for it until phase 10, always zero: nothing
+a module can ask for finds a term on another entity, and pairs, which inheritance is made of, are
+refused. Refused, then: publishing a field nothing can fill. The condition that brings it back is a
+term that may be matched on another entity, and it returns with that. Until then one entity's
+value is reached from another by `reference.md`, *Reference following*.
 
 ## What a query may not ask for
 

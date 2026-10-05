@@ -101,10 +101,9 @@ static_assert(sizeof(bridge_list) == 8 && alignof(bridge_list) == 4);
 static_assert(offsetof(bridge_list, count) == 0 && offsetof(bridge_list, at) == 4);
 
 /* A span, one per matched table - docs/bridge/data/query.md:
- *     u32 count, u32 entities, u32 base[terms], then at the next multiple of 8, u64 source[terms] */
+ *     u32 count, u32 entities, u32 base[terms] */
 constexpr uint32_t BRIDGE_SPAN_BASE = 8;
-#define BRIDGE_SPAN_SOURCE(n)  ((8u + 4u * (n) + 7u) & ~7u)
-#define BRIDGE_SPAN_SIZE(n)    (BRIDGE_SPAN_SOURCE(n) + 8u * (n))
+#define BRIDGE_SPAN_SIZE(n)    (8u + 4u * (n))
 
 /* The entity index, by the low 32 bits of an id. Table 0 is no table. */
 typedef struct { uint32_t table, row, generation; } bridge_entity;

@@ -135,12 +135,6 @@ static inline uint32_t bridge_base(uint32_t span, uint32_t term)
     return acc_own_32(span + BRIDGE_SPAN_BASE + 4u * term);
 }
 
-/* non-zero: one value at base, for every row, from this entity */
-static inline uint64_t bridge_source(uint32_t span, uint32_t term, uint32_t terms)
-{
-    return acc_own_64(span + BRIDGE_SPAN_SOURCE(terms) + 8u * term);
-}
-
 static inline uint64_t bridge_entity_at(uint32_t entities, uint32_t row, uint32_t count)
 {
     return acc_ld_64(acc_row(entities, row, count, 8u));

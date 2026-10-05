@@ -694,6 +694,9 @@ int rows_publish(rows *r, module *m)
             slot->spans = s->matched;
             s->changed = false;
         }
+        /* a span is a multiple of four bytes, and what follows the spans holds an id */
+        at = (at + 7u) & ~7ull;
+        if (at > end) return 1;
         m->spans_end = (uint32_t)at;
     } else {
         for (q = 0; q < m->system_count; q ++) {

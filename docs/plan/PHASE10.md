@@ -352,6 +352,7 @@ library's allocations when a module loads, one checks what it was given.
 **Open: which entities are placed when columns run short.** As built, a table that cannot take
 all the rows arriving takes as many as fit, found by halving what it asks for.
 
-**Open: `source[]` in a span, which is always zero.** Under flecs it could name the entity a term came from;
-nothing a module could ask for ever made it do so, and storage of our own has no such term. The
-field stays in the span, and `query.md`, *The interface is a query*, says what it holds.
+**`source[]` in a span: decided, and it is gone.** It was always zero, under flecs as under
+storage of our own: nothing a module can ask for finds a term on another entity. A span is count,
+entities and a base for each term - `query.md`, *The interface is a query*. No version moved for
+it: nothing outside this tree is built against the layout yet.
