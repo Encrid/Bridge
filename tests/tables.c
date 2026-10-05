@@ -8,9 +8,8 @@
 
 #include <stdio.h>
 
-static void sink(void *ud, const bridge_record *r)
+static void sink([[maybe_unused]] void *ud, const bridge_record *r)
 {
-    (void)ud;
     printf("record[%d]: %.*s\n", r->level, (int)r->len, r->text);
 }
 
@@ -74,7 +73,7 @@ int main()
         b->table_count == before ? "reused" : "FAIL: a new id though retired ones were free");
     failed += b->table_count != before;
 
-    bridge_destroy(b);
+    (void)bridge_destroy(b);
     printf("%s\n", failed ? "FAIL" : "alive");
     return failed;
 }

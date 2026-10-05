@@ -198,10 +198,10 @@ struct bridge {
 
 /* bridge.c */
 void say(bridge *b, const module *m, const bridge_system *s, int8_t level, const char *fmt, ...);
-char *copy(const char *s, size_t n);
+[[nodiscard]] char *copy(const char *s, size_t n);
 /* 1, with a record, if nothing may run. `repairing` names a module being loaded or reloaded:
  * the one call a stopped bridge accepts is one that brings back the module that stopped it. */
-int  bridge_stopped(bridge *b, const char *repairing);
+[[nodiscard]] int bridge_stopped(bridge *b, const char *repairing);
 void bridge_stop(bridge *b, const char *identity, const char *what);
 void bridge_resume(bridge *b, const module *m);     /* if `m` is what it was waiting for */
 
@@ -210,35 +210,35 @@ void module_discard(bridge *b, module *m);
 void module_shut_down(bridge *b, module *m);    /* its shutdown, what it asked for, what it said */
 
 /* config.c */
-int  config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why, size_t len);
+[[nodiscard]] int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why, size_t len);
 void config_keep(bridge *b, module *m);
 
 /* schedule.c */
-int  schedule_order(bridge *b, const bridge_order *order, uint32_t count);  /* at create */
-int  schedule_build(bridge *b, char *why, size_t why_len);     /* 0, or why it cannot be */
+[[nodiscard]] int schedule_order(bridge *b, const bridge_order *order, uint32_t count);  /* at create */
+[[nodiscard]] int schedule_build(bridge *b, char *why, size_t why_len);     /* 0, or why it cannot be */
 void schedule_run(bridge *b, uint32_t phase);
 void schedule_account(bridge *b);       /* at each barrier: the failure budgets, and the stops */
 
 /* pool.c */
 typedef void (*pool_fn)(void *job);
-pool *pool_create(uint32_t workers);
+[[nodiscard]] pool *pool_create(uint32_t workers);
 void  pool_destroy(pool *p);
 /* fn(jobs[i]) for every i, on the workers and the caller; a job marked is the caller's alone */
 void  pool_run(pool *p, pool_fn fn, void **jobs, const uint8_t *caller_only, uint32_t count);
 
 /* store.c */
 void     store_enter(bridge *b);                                  /* this thread is working for b */
-int      store_create(bridge *b, const bridge_budget *budget);    /* 0, or a record was emitted */
+[[nodiscard]] int store_create(bridge *b, const bridge_budget *budget);    /* 0, or a record was emitted */
 void     store_destroy(bridge *b);
-void     store_touch(bridge *b, ecs_entity_t e);                  /* e may have moved: look at the barrier */
+void     store_touch(bridge *b, ecs_entity_t e);                  /* e may have moved: look at a barrier */
 int      store_refill(bridge *b, module *m);                      /* 1 if the ceiling cut its ids short */
 void     store_apply(bridge *b, module *m);                       /* what it queued, now */
 void     store_drain(bridge *b, module *m);                       /* its log ring, to the sink */
 void     store_barrier(bridge *b);
 void     store_header(bridge *b, module *m);                      /* what a module reads at offset 0 */
-uint32_t store_offset(bridge *b, const void *p);                  /* into the shared memory, 0 for nullptr */
+uint32_t store_offset(bridge *b, const void *p);                  /* into the shared memory, 0 for null */
 
 /* abi.c */
-int abi_define(module *m, backend_err *err);                      /* the eight imports */
+[[nodiscard]] int abi_define(module *m, backend_err *err);                      /* the eight imports */
 
 #endif

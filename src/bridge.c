@@ -180,7 +180,7 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
     return b;
 
 refuse:
-    bridge_destroy(b);
+    (void)bridge_destroy(b);        /* nothing is loaded, so nothing can refuse it */
     return nullptr;
 }
 

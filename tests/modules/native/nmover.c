@@ -15,7 +15,7 @@ BRIDGE_NATIVE(move)
     uint32_t s, r;
     for (s = 0; s < q->spans; s ++) {
         const uint32_t *span = bridge_native_span(api, q, s, 1);
-        Position *p = (Position *)(api->shared_base + span[2]);
+        auto p = (Position *)(api->shared_base + span[2]);
         for (r = 0; r < span[0]; r ++) p[r].x += 1.0f;
     }
     return 0;

@@ -139,11 +139,11 @@ static void own_free(void *env)
     free(m);
 }
 
-static wasmtime_error_t *new_memory(void *env, const wasm_memorytype_t *ty, size_t minimum,
-                                    size_t maximum, size_t reserved, size_t guard,
+static wasmtime_error_t *new_memory([[maybe_unused]] void *env,
+                                    [[maybe_unused]] const wasm_memorytype_t *ty, size_t minimum,
+                                    [[maybe_unused]] size_t maximum, size_t reserved, size_t guard,
                                     wasmtime_linear_memory_t *ret)
 {
-    (void)env; (void)ty; (void)maximum;
     if (reserved > RESERVATION || guard > GUARD) {
         return wasmtime_error_new("wasmtime asked for more address space than memory_shape states");
     }
@@ -261,23 +261,21 @@ BACKEND_EXPORT void backend_destroy(backend *b)
     free(b);
 }
 
-BACKEND_EXPORT enum backend_capability backend_capabilities(backend *b)
+BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] backend *b)
 {
-    (void)b;
     return BACKEND_SANDBOX | BACKEND_METER | BACKEND_DEADLINE | BACKEND_LIMIT | BACKEND_RELOAD
          | BACKEND_SIDE_BY_SIDE;
 }
 
-BACKEND_EXPORT void memory_shape(backend *b, uint64_t *reservation, uint64_t *guard)
+BACKEND_EXPORT void memory_shape([[maybe_unused]] backend *b, uint64_t *reservation, uint64_t *guard)
 {
-    (void)b;
     *reservation = RESERVATION;
     *guard = GUARD;
 }
 
-BACKEND_EXPORT backend_memory *memory_adopt(backend *b, void *ptr, uint64_t len, backend_err *err)
+BACKEND_EXPORT backend_memory *memory_adopt(
+    [[maybe_unused]] backend *b, void *ptr, uint64_t len, backend_err *err)
 {
-    (void)b;
     if (!ptr || !len || len % PAGE) {
         fail(err, "an adopted block must be a whole number of 64 KiB pages", nullptr, nullptr);
         return nullptr;
@@ -293,11 +291,11 @@ BACKEND_EXPORT void memory_release(backend_memory *m)
     free(m);
 }
 
-BACKEND_EXPORT backend_module *module_compile(backend *b, const void *bytes, size_t len,
-                                              const char *path, enum backend_capability demands,
-                                              backend_err *err)
+BACKEND_EXPORT backend_module *module_compile(
+    backend *b, const void *bytes, size_t len, [[maybe_unused]] const char *path,
+    enum backend_capability demands, backend_err *err)
 {
-    (void)path;                 /* a wasm module is its bytes */
+    /* a wasm module is its bytes */
     if (!bytes || !len) {
         fail(err, "this backend compiles a module from its bytes, and was handed none", nullptr, nullptr);
         return nullptr;
@@ -461,13 +459,13 @@ BACKEND_EXPORT void instance_set_memory_limit(backend_instance *i, uint64_t byte
 
 typedef struct { backend_fn fn; void *ud; uint32_t params, results; uint8_t result_kind[4]; } host_fn;
 
-static wasm_trap_t *host_call(void *env, wasmtime_caller_t *caller, const wasmtime_val_t *args,
-                              size_t nargs, wasmtime_val_t *results, size_t nresults)
+static wasm_trap_t *host_call(void *env, [[maybe_unused]] wasmtime_caller_t *caller,
+                              const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results,
+                              size_t nresults)
 {
     host_fn *h = env;
     uint64_t in[16] = {0}, out[4] = {};
     size_t k;
-    (void)caller;
     for (k = 0; k < nargs && k < 16; k ++) {
         in[k] = args[k].kind == WASMTIME_I32 ? (uint32_t)args[k].of.i32 : (uint64_t)args[k].of.i64;
     }

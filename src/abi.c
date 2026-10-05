@@ -418,10 +418,9 @@ static void queue(module *m, enum change_op op, ecs_entity_t id, component *c, c
 }
 
 /* spawn() -> id */
-static int abi_spawn(void *ud, const uint64_t *a, uint64_t *r)
+static int abi_spawn(void *ud, [[maybe_unused]] const uint64_t *a, uint64_t *r)
 {
     module *m = ud;
-    (void)a;
     if (m->id_next == m->id_count) {
         if (m->spawns <= 0) return refuse(m, "spawn: it stated that it spawns nothing");
         if (m->ids_short) {
@@ -437,9 +436,8 @@ static int abi_spawn(void *ud, const uint64_t *a, uint64_t *r)
 
 /* destroy(id). An id that has already died is nobody's mistake: two modules may both want it
  * gone, and which of them is told at the barrier, where it is looked at. */
-static int abi_destroy(void *ud, const uint64_t *a, uint64_t *r)
+static int abi_destroy(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 {
-    (void)r;
     queue(ud, CHANGE_DESTROY, a[0], nullptr, nullptr);
     return 0;
 }
@@ -458,12 +456,11 @@ static component *written(module *m, uint64_t slot, const char *entry)
 }
 
 /* attach(id, slot, ptr, len). The value travels with it; zero length means zeroed. */
-static int abi_attach(void *ud, const uint64_t *a, uint64_t *r)
+static int abi_attach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 {
     module *m = ud;
     component *c = written(m, a[1], "attach");
     const void *value;
-    (void)r;
     if (!c) return 1;
     value = a[3] ? scratch(m, a[2], a[3]) : c->zero;
     if (a[3] && a[3] != c->size) {
@@ -476,11 +473,10 @@ static int abi_attach(void *ud, const uint64_t *a, uint64_t *r)
 }
 
 /* detach(id, slot) */
-static int abi_detach(void *ud, const uint64_t *a, uint64_t *r)
+static int abi_detach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 {
     module *m = ud;
     component *c = written(m, a[1], "detach");
-    (void)r;
     if (!c) return 1;
     queue(m, CHANGE_DETACH, a[0], c, nullptr);
     return 0;

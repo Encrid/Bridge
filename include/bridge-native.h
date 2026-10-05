@@ -10,9 +10,9 @@
 #include <string.h>
 
 #ifdef _WIN32
-#define BRIDGE_NATIVE_EXPORT __declspec(dllexport)
+#define BRIDGE_NATIVE_EXPORT [[gnu::dllexport]]
 #else
-#define BRIDGE_NATIVE_EXPORT __attribute__((visibility("default")))
+#define BRIDGE_NATIVE_EXPORT [[gnu::visibility("default")]]
 #endif
 
 /* The `bridge` namespace of a wasm module, as a C struct: the eight entries of

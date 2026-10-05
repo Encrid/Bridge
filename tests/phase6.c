@@ -18,9 +18,8 @@ static uint32_t path_at[4], path_count;
 static uint32_t out_of_step;
 static int quiet;
 
-static void sink(void *ud, const bridge_record *r)
+static void sink([[maybe_unused]] void *ud, const bridge_record *r)
 {
-    (void)ud;
     if (r->len == 7 && !memcmp(r->text, "path at", 7) && path_count < 4) path_at[path_count ++] = r->arg[0];
     if (r->len > 40 && !memcmp(r->text, "the entity index is out of step", 31)) out_of_step ++;
     if (quiet && r->level >= 0) return;
@@ -452,17 +451,17 @@ int main(int argc, char **argv)
         for (i = 0; i < 200; i ++) {
             a = wasm("game:nested@0.1.0", "nested");
             a.cfg.spawns = 8;
-            bridge_load(b, &a);
+            (void)bridge_load(b, &a);
             frames(b, 1);
-            bridge_unload(b, "game:nested@0.1.0");
+            (void)bridge_unload(b, "game:nested@0.1.0");
             a = configured("game:settings@0.1.0");
-            bridge_load(b, &a);
+            (void)bridge_load(b, &a);
             frames(b, 1);
-            bridge_unload(b, "game:settings@0.1.0");
+            (void)bridge_unload(b, "game:settings@0.1.0");
             a = wasm("game:keeper@0.1.0", "keeper-sweep");
-            bridge_load(b, &a);
+            (void)bridge_load(b, &a);
             frames(b, 1);
-            bridge_unload(b, "game:keeper@0.1.0");
+            (void)bridge_unload(b, "game:keeper@0.1.0");
         }
         quiet = 0;
         printf("churned 200 times, %u records of the index out of step\n", out_of_step);
@@ -484,7 +483,7 @@ int main(int argc, char **argv)
             ? "written to the same place" : "MOVED");
     }
 
-    bridge_destroy(b);
+    (void)bridge_destroy(b);
     printf("alive\n");
     return 0;
 }

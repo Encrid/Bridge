@@ -109,26 +109,26 @@ enum bridge_level : int8_t { BRIDGE_WARN = -2, BRIDGE_ERR = -3 };
 typedef void (*bridge_sink_fn)(void *ud, const bridge_record *r);
 
 /* nullptr if the deployment cannot start; which reason, the sink was told. */
-bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud);
+[[nodiscard]] bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud);
 /* Every loaded module's shutdown, then everything else. 0 if the bridge is gone. With a pinned
  * module loaded it answers 1 from any thread but the one that loaded it, with a record, and
  * nothing has been torn down: the bridge is still there to be destroyed from the right one. */
-int     bridge_destroy(bridge *b);
+[[nodiscard]] int bridge_destroy(bridge *b);
 
 /* 0 if the module is loaded, its init answered 0, and the bridge can still run it. Otherwise
  * the load was refused or failed, or stopped the bridge, and a record says why. Between phases
  * only. */
-int bridge_load(bridge *b, const bridge_artifact *a);
+[[nodiscard]] int bridge_load(bridge *b, const bridge_artifact *a);
 
 /* Take a module out, by its identity: its shutdown, then the components nobody else declared,
  * each by the policy it was declared with. 0 if it was loaded. Between phases only. */
-int bridge_unload(bridge *b, const char *identity);
+[[nodiscard]] int bridge_unload(bridge *b, const char *identity);
 
 /* Replace a loaded module's instance and keep its storage. 0 if the new instance is running;
  * otherwise a record says why. The old instance still runs where its backend can hold two at
  * once; where it cannot, the module is stopped, with everything it declared, until it is
  * reloaded again or unloaded. Between phases only. */
-int bridge_reload(bridge *b, const bridge_artifact *a);
+[[nodiscard]] int bridge_reload(bridge *b, const bridge_artifact *a);
 
 /* What is loaded, and whether it still runs: a module at its failure budget is stopped long
  * after any return code. Answers how many there are; fills at most `max`. */
@@ -142,6 +142,6 @@ int bridge_modules(bridge *b, bridge_module_info *out, int max);
 /* Run the systems registered to one phase, then its barrier. 0 if the phase ran, whatever
  * its systems did: a system that failed is a record, not a return code. With a pinned module
  * loaded, from the thread that loaded it. */
-int bridge_phase(bridge *b, const char *name);
+[[nodiscard]] int bridge_phase(bridge *b, const char *name);
 
 #endif

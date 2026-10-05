@@ -15,9 +15,8 @@
 
 constexpr int64_t MS = 1'000'000;
 
-static void sink(void *ud, const bridge_record *r)
+static void sink([[maybe_unused]] void *ud, const bridge_record *r)
 {
-    (void)ud;
     printf("record[%d] %s/%s: %.*s %u %u\n", r->level, r->identity ? r->identity : "-",
         r->system ? r->system : "-", (int)r->len, r->text, r->arg[0], r->arg[1]);
 }
@@ -116,14 +115,14 @@ static void bench(bridge_config *cfg)
                 struct timespec t0, t1;
                 double ns;
                 timespec_get(&t0, TIME_UTC);
-                for (pass = 0; pass < 50; pass ++) bridge_phase(b, "update");
+                for (pass = 0; pass < 50; pass ++) (void)bridge_phase(b, "update");
                 timespec_get(&t1, TIME_UTC);
                 ns = (double)(t1.tv_sec - t0.tv_sec) * 1e9 + (double)(t1.tv_nsec - t0.tv_nsec);
                 if (ns < best) best = ns;
             }
             printf("%-15s %-9s %.3f ns a row\n", builds[build], metered ? "fuel" : "no fuel",
                 best / (50.0 * 200'000.0));
-            bridge_destroy(b);
+            (void)bridge_destroy(b);
         }
     }
 }
@@ -223,7 +222,7 @@ int main(int argc, char **argv)
         if (bridge_phase(b, "render")) printf("render refused\n");
     }
 
-    bridge_destroy(b);
+    (void)bridge_destroy(b);
     printf("alive\n");
     return 0;
 }

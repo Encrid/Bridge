@@ -251,11 +251,11 @@ static void on_change(ecs_iter_t *it)
 }
 
 /* and the hook names the one no event does: the entity a delete moved into the hole */
-static void on_row_moved(ecs_world_t *world, ecs_entity_t e, ecs_table_t *table, int32_t row)
+static void on_row_moved([[maybe_unused]] ecs_world_t *world, ecs_entity_t e, ecs_table_t *table,
+                         int32_t row)
 {
     bridge *b = live;
     uint32_t index = (uint32_t)e;
-    (void)world;
     if (index >= b->entities) return;
     if (b->index[index].table == table_id(b, table)) b->index[index].row = (uint32_t)row;
     else store_touch(b, e);
@@ -353,7 +353,7 @@ int store_refill(bridge *b, module *m)
 
 void store_header(bridge *b, module *m)
 {
-    bridge_header *h = (bridge_header *)m->priv;
+    auto h = (bridge_header *)m->priv;
     h->abi = BRIDGE_ABI;
     h->scratch = m->scratch;
     h->scratch_len = m->scratch_len;
@@ -372,7 +372,7 @@ void store_header(bridge *b, module *m)
 /* 1 if the module's span region cannot hold what its queries match */
 static int publish(bridge *b, module *m)
 {
-    bridge_header *h = (bridge_header *)m->priv;
+    auto h = (bridge_header *)m->priv;
     uint64_t end = (uint64_t)m->spans + m->spans_len, at;
     uint32_t q, t, s;
 
@@ -381,7 +381,7 @@ static int publish(bridge *b, module *m)
     if (at > end) return 1;
 
     if (b->layout_moved) {
-        uint32_t *cell = (uint32_t *)(m->priv + h->column_base);
+        auto cell = (uint32_t *)(m->priv + h->column_base);
         memset(cell, 0, 4u * m->declared_count);        /* table 0 is no table */
         for (t = 1; t < b->table_count; t ++) {
             for (s = 0; s < m->declared_count; s ++) {
@@ -396,7 +396,7 @@ static int publish(bridge *b, module *m)
 
     for (q = 0; q < m->system_count; q ++) {
         bridge_system *sys = m->systems[q];
-        bridge_query *slot = (bridge_query *)(m->priv + m->spans) + q;
+        auto slot = (bridge_query *)(m->priv + m->spans) + q;
         uint32_t size = BRIDGE_SPAN_SIZE(sys->terms), spans = 0;
         ecs_iter_t it;
         slot->spans = 0;
@@ -436,7 +436,7 @@ static int publish(bridge *b, module *m)
     /* and each observer's list of who triggered it - abi.md, *The ABI* */
     for (q = 0; q < m->observer_count; q ++) {
         bridge_system *sys = m->observers[q];
-        bridge_list *slot = (bridge_list *)(m->priv + h->observers) + q;
+        auto slot = (bridge_list *)(m->priv + h->observers) + q;
         if (at + (uint64_t)sys->pending_count * sizeof(bridge_trigger) > end) return 1;
         slot->count = sys->pending_count;
         slot->at = (uint32_t)at;
@@ -454,7 +454,7 @@ static int publish(bridge *b, module *m)
 void store_drain(bridge *b, module *m)
 {
     static const char outside[] = "(a log line whose text lies outside the scratch arena)";
-    bridge_header *h = (bridge_header *)m->priv;
+    auto h = (bridge_header *)m->priv;
     uint32_t head = h->ring_head, written = head - m->ring_tail;
     uint32_t kept = written < m->ring_len ? written : m->ring_len, i;
 
@@ -527,9 +527,9 @@ void store_barrier(bridge *b)
 
 /* ---- create and destroy ---- */
 
-static void flecs_says(int32_t level, const char *file, int32_t line, const char *msg)
+static void flecs_says(int32_t level, [[maybe_unused]] const char *file,
+                       [[maybe_unused]] int32_t line, const char *msg)
 {
-    (void)file; (void)line;
     if (live && level <= BRIDGE_WARN) say(live, nullptr, nullptr, (int8_t)level, "flecs: %s", msg);
 }
 

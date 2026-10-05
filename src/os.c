@@ -23,9 +23,8 @@ int os_commit(void *base, size_t bytes)
     return VirtualAlloc(base, bytes, MEM_COMMIT, PAGE_READWRITE) ? 0 : -1;
 }
 
-void os_release(void *base, size_t reserve)
+void os_release(void *base, [[maybe_unused]] size_t reserve)
 {
-    (void)reserve;
     if (base) VirtualFree(base, 0, MEM_RELEASE);
 }
 
@@ -196,7 +195,8 @@ uint64_t os_now()
     QueryPerformanceFrequency(&frequency);
     QueryPerformanceCounter(&count);
     return (uint64_t)(count.QuadPart / frequency.QuadPart) * 1'000'000'000ull
-         + (uint64_t)(count.QuadPart % frequency.QuadPart) * 1'000'000'000ull / (uint64_t)frequency.QuadPart;
+         + (uint64_t)(count.QuadPart % frequency.QuadPart) * 1'000'000'000ull
+           / (uint64_t)frequency.QuadPart;
 }
 
 static SRWLOCK global_lock = SRWLOCK_INIT;

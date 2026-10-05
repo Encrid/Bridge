@@ -12,9 +12,8 @@
 
 constexpr int64_t MS = 1'000'000;
 
-static void sink(void *ud, const bridge_record *r)
+static void sink([[maybe_unused]] void *ud, const bridge_record *r)
 {
-    (void)ud;
     printf("record[%d] %s/%s: %.*s %u %u\n", r->level, r->identity ? r->identity : "-",
         r->system ? r->system : "-", (int)r->len, r->text, r->arg[0], r->arg[1]);
 }
@@ -108,8 +107,8 @@ int main(int argc, char **argv)
             load(b, &a);
         }
         for (i = 0; i < 2; i ++) {
-            bridge_phase(b, "update");
-            bridge_phase(b, "present");
+            (void)bridge_phase(b, "update");
+            (void)bridge_phase(b, "present");
         }
     } else if (!strcmp(what, "untrusted")) {    /* refused before any library is looked for */
         a = native("game:mover@0.1.0", "no-such-library");
@@ -133,10 +132,10 @@ int main(int argc, char **argv)
     } else if (!strcmp(what, "refuse")) {
         a = native("test:flood@0.1.0", NFLOOD_PATH);
         load(b, &a);
-        bridge_phase(b, "update");
+        (void)bridge_phase(b, "update");
     }
 
-    bridge_destroy(b);
+    (void)bridge_destroy(b);
     printf("alive\n");
     return 0;
 }

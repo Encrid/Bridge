@@ -13,9 +13,8 @@
 
 constexpr int64_t MS = 1'000'000;
 
-static void sink(void *ud, const bridge_record *r)
+static void sink([[maybe_unused]] void *ud, const bridge_record *r)
 {
-    (void)ud;
     printf("record[%d]: %.*s\n", r->level, (int)r->len, r->text);
 }
 
@@ -128,7 +127,7 @@ int main(int argc, char **argv)
         load(b, &a);
     }
 
-    bridge_destroy(b);
+    (void)bridge_destroy(b);
     printf("alive\n");
     return 0;
 }

@@ -496,7 +496,9 @@ failed:
     if (cfg->on_error == BRIDGE_FAIL) bridge_stop(b, id, "failed");
     undo(b, m);
     module_discard(b, m);
-    schedule_build(b, err.text, sizeof err.text);   /* as it was: this cannot refuse */
+    /* a schedule with this module's systems taken back out is one that was built before, and
+     * so is every rebuild below whose answer is dropped: none of them can be refused */
+    (void)schedule_build(b, err.text, sizeof err.text);
     return 1;
 }
 
@@ -549,7 +551,7 @@ int bridge_unload(bridge *b, const char *identity)
     drop_systems(b, m);         /* out of the schedule before its last call */
     module_shut_down(b, m);
     take_out(b, m);
-    schedule_build(b, why, sizeof why);
+    (void)schedule_build(b, why, sizeof why);
     b->layout_moved = 1;
     store_barrier(b);           /* what left is out of every module's spans, and observed */
     return 0;
@@ -666,7 +668,7 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
         if (side_by_side) {
             /* failure.md: the old instance is kept, and it was never touched */
             for (i = 0; i < b->system_count; i ++) b->systems[i]->parked = 0;
-            schedule_build(b, err.text, sizeof err.text);
+            (void)schedule_build(b, err.text, sizeof err.text);
             return 1;
         }
         /* There is no instance left to keep. The module stays, stopped, with everything it
@@ -677,7 +679,7 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
         say(b, old, nullptr, BRIDGE_ERR, "module '%s' is stopped: its reload failed after its old "
             "instance had been shut down. What it declared is kept", old->identity);
         if (old->on_error == BRIDGE_FAIL) bridge_stop(b, old->identity, "could not be reloaded");
-        schedule_build(b, err.text, sizeof err.text);
+        (void)schedule_build(b, err.text, sizeof err.text);
         return 1;
     }
 
@@ -698,7 +700,7 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     n->next = old->next;
     *link = n;                      /* in its place: the order modules loaded in is kept */
     module_discard(b, old);
-    schedule_build(b, err.text, sizeof err.text);
+    (void)schedule_build(b, err.text, sizeof err.text);
     b->layout_moved = 1;
     bridge_resume(b, n);
     store_barrier(b);

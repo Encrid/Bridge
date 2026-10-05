@@ -50,9 +50,8 @@ static int run(backend_instance *i, const char *name, int32_t *status, backend_e
 }
 
 /* what the host answers a module that calls it: both arguments, added */
-static int ping(void *ud, const uint64_t *args, uint64_t *results)
+static int ping([[maybe_unused]] void *ud, const uint64_t *args, uint64_t *results)
 {
-    (void)ud;
     results[0] = args[0] + args[1];
     return 0;
 }

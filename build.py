@@ -334,7 +334,7 @@ def test(out, built, only):
         elif never and re.search(never, said, re.S):
             why = 'said what it must not: %s' % never
         elif match and not re.search(match, said, re.S):
-            why = 'did not say: %s' % match
+            why = 'ended with %s and did not say: %s' % (code, match)
         elif not match and code:
             why = 'ended with %s' % code
         else:

@@ -10,9 +10,9 @@
 #include <stdint.h>
 
 #ifdef _WIN32
-#define BACKEND_EXPORT __declspec(dllexport)
+#define BACKEND_EXPORT [[gnu::dllexport]]
 #else
-#define BACKEND_EXPORT __attribute__((visibility("default")))
+#define BACKEND_EXPORT [[gnu::visibility("default")]]
 #endif
 
 typedef struct backend          backend;

@@ -177,7 +177,7 @@ static void run_job(void *arg)
 {
     job *j = arg;
     module *m = j->m;
-    bridge_header *h = (bridge_header *)m->priv;
+    auto h = (bridge_header *)m->priv;
     uint32_t i;
     for (i = 0; i < j->count; i ++) {
         bridge_system *s = j->list[i];

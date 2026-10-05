@@ -135,8 +135,8 @@ static void frames(bridge *b, int count)
 {
     int i;
     for (i = 0; i < count; i ++) {
-        bridge_phase(b, "update");
-        bridge_phase(b, "present");
+        (void)bridge_phase(b, "update");
+        (void)bridge_phase(b, "present");
     }
 }
 
@@ -144,7 +144,7 @@ static double phase_ms(bridge *b, const char *phase)
 {
     struct timespec t0, t1;
     timespec_get(&t0, TIME_UTC);
-    bridge_phase(b, phase);
+    (void)bridge_phase(b, phase);
     timespec_get(&t1, TIME_UTC);
     return (double)(t1.tv_sec - t0.tv_sec) * 1e3 + (double)(t1.tv_nsec - t0.tv_nsec) / 1e6;
 }
@@ -159,15 +159,14 @@ static void elsewhere_work()
     if (elsewhere_frames < 0) elsewhere_result = bridge_destroy(elsewhere_bridge);
     else if (!elsewhere_frames) elsewhere_result = bridge_phase(elsewhere_bridge, "update");
     for (i = 0; i < elsewhere_frames; i ++) {
-        bridge_phase(elsewhere_bridge, "update");
-        bridge_phase(elsewhere_bridge, "present");
+        (void)bridge_phase(elsewhere_bridge, "update");
+        (void)bridge_phase(elsewhere_bridge, "present");
     }
 }
 
 #ifdef _WIN32
-static DWORD WINAPI elsewhere(LPVOID arg)
+static DWORD WINAPI elsewhere([[maybe_unused]] LPVOID arg)
 {
-    (void)arg;
     elsewhere_work();
     return 0;
 }
@@ -187,9 +186,8 @@ static void join_elsewhere()
     CloseHandle(elsewhere_thread);
 }
 #else
-static void *elsewhere(void *arg)
+static void *elsewhere([[maybe_unused]] void *arg)
 {
-    (void)arg;
     elsewhere_work();
     return nullptr;
 }
@@ -247,12 +245,12 @@ int main(int argc, char **argv)
             minting = run;
             a = wasm("test:spawn1@0.1.0", "spawner");
             a.cfg.spawns = 16;
-            bridge_load(b, &a);
+            (void)bridge_load(b, &a);
             a = wasm("test:spawn2@0.1.0", "spawner");
             a.cfg.spawns = 16;
-            bridge_load(b, &a);
-            for (f = 0; f < 20; f ++) bridge_phase(b, "update");
-            bridge_destroy(b);
+            (void)bridge_load(b, &a);
+            for (f = 0; f < 20; f ++) (void)bridge_phase(b, "update");
+            (void)bridge_destroy(b);
         }
         printf("minted %u ids a run; on four threads %s, and again %s\n", minted_count[0],
             minted_count[0] == minted_count[1]
@@ -275,18 +273,18 @@ int main(int argc, char **argv)
             both[k] = bridge_create(&cfg, sink, &which[k]);
             if (!both[k]) { printf("bridge %d refused\n", k); return 0; }
             a = wasm("game:mover@0.1.0", "mover");
-            bridge_load(both[k], &a);
+            (void)bridge_load(both[k], &a);
             a = wasm("view:reader@0.1.0", "reader");
             a.cfg.read = game;
             a.cfg.read_count = 2;
-            bridge_load(both[k], &a);
+            (void)bridge_load(both[k], &a);
         }
         start_elsewhere(both[1], 30);
         frames(both[0], 50);
         join_elsewhere();
         printf("two bridges: sums %u and %u\n", last_sum[0], last_sum[1]);
-        bridge_destroy(both[0]);
-        bridge_destroy(both[1]);
+        (void)bridge_destroy(both[0]);
+        (void)bridge_destroy(both[1]);
         printf("alive\n");
         return 0;
     }
@@ -403,7 +401,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    bridge_destroy(b);
+    (void)bridge_destroy(b);
     printf("alive\n");
     return 0;
 }

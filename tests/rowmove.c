@@ -29,10 +29,10 @@ static void on_change(ecs_iter_t *it)
     }
 }
 
-static void on_row_moved(ecs_world_t *world, ecs_entity_t entity, ecs_table_t *table, int32_t row)
+static void on_row_moved([[maybe_unused]] ecs_world_t *world, ecs_entity_t entity,
+                         ecs_table_t *table, int32_t row)
 {
     uint32_t idx = index_of(entity);
-    (void)world;
     hook_calls ++;
     if (idx < (uint32_t)capacity) {
         shadow[idx].table = table;
@@ -56,8 +56,11 @@ static void sync(workload_t *w)
 }
 
 static void* os_alloc(ecs_size_t size) { return malloc((size_t)size); }
-static void* os_realloc(void *p, ecs_size_t o, ecs_size_t n) { (void)o; return realloc(p, (size_t)n); }
-static void os_free(void *p, ecs_size_t size) { (void)size; free(p); }
+static void* os_realloc(void *p, [[maybe_unused]] ecs_size_t o, ecs_size_t n)
+{
+    return realloc(p, (size_t)n);
+}
+static void os_free(void *p, [[maybe_unused]] ecs_size_t size) { free(p); }
 
 int main()
 {

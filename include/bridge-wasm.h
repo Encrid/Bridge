@@ -11,9 +11,9 @@
 #include "bridge-abi.h"
 #include <stddef.h>
 
-#define BRIDGE_IMPORT(name) __attribute__((import_module(BRIDGE_NAMESPACE), import_name(#name)))
-#define BRIDGE_ACC(name)    __attribute__((import_module("acc"), import_name(#name)))
-#define BRIDGE_EXPORT(name) __attribute__((export_name(#name)))
+#define BRIDGE_IMPORT(name) [[clang::import_module(BRIDGE_NAMESPACE), clang::import_name(#name)]]
+#define BRIDGE_ACC(name)    [[clang::import_module("acc"), clang::import_name(#name)]]
+#define BRIDGE_EXPORT(name) [[clang::export_name(#name)]]
 
 /* ---- the ABI: docs/modules/abi.md. Every pointer is an offset into the scratch arena ---- */
 
