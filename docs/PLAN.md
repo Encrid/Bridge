@@ -167,19 +167,21 @@ finding out last.
 *Done when every test passes on macOS arm64 on every push, and that build compiles and links on
 Windows.* Met.
 
-## 9. C99, and the context passed
+## 9. C23, used fully
 
-The source and every header become C99 - `build.md`, *The standard*. Three things the code leaned
-on go with it. A thread-local variable becomes a context that is passed: a native module's entries
-take their `api` first, the wasm backend keeps what it is adopting in its own state, and the flecs
-patch hands the allocator the world it is working for. flecs' log callback carries no context at
-all, so what it says goes to the sink of every live bridge. And a typed accessor reaches a field's
-bits through a temporary of the struct's own type, where `_Generic` chose a load by the field's.
+Everything of Bridge-ASM700's own becomes C23 - the source, the tests, the test modules and all
+five headers - and uses it: named enums with stated widths, typed constants, `nullptr`,
+attributes, every layout of the ABI asserted where it is stated, and sums of stated sizes checked.
+flecs stays C99 and wasmtime's headers C11. `build.md`, *The standard*, is the rule and why.
 
-*Done when everything compiles as C99 with `-pedantic-errors` on every platform; no thread-local
-variable is left; two bridges still run in one process on two threads; a flecs message reaches
-every live bridge's sink; and the row test reads what it read before, with one typed load for each
-accessor in the built module.*
+This phase was to be C99 with the context passed in place of thread-local storage. Compiling that
+before planning it showed what it cost, and the standard was chosen again: `PHASE9.md`.
+
+*Done when everything of ours compiles as C23 with `-pedantic-errors` and warnings as errors on
+every platform, and flecs as C99; `tools/c23.py` finds no older spelling; every layout the ABI
+states is asserted in the header that states it; a stated size that overflows is refused by its
+key; the row loop is the same code and reads the same; and every test passes on Windows, Linux
+and macOS.*
 
 ## 10. Self contained
 

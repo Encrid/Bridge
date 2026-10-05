@@ -15,13 +15,12 @@ here because this is where they were asked.
     how a host gets the library   as a submodule, built by `build.py`: `PLAN.md` phase 11
     the manifest's section        `.bridge`, on every format: `native.md`, *Identity*
     macOS                         a platform, arm64: `build.md`, *Platforms*
-    the standard                  C99, for everything: `build.md`, *The standard*
+    the standard                  C99, for everything. Withdrawn in phase 9: `PHASE9.md`
     the C library                 the parts that can be carried, carried: `build.md`, *The C
                                   library*
-    thread-local storage          none; the context is passed: `build.md`, *No thread-local
-                                  storage*
-    flecs' log callback           to every live bridge's sink: the same section
-    a typed accessor              through a temporary of the struct's type: `PLAN.md` phase 9
+    thread-local storage          none; the context is passed. Withdrawn in phase 9
+    flecs' log callback           to every live bridge's sink. Withdrawn in phase 9
+    a typed accessor              through a temporary of the struct's type. Withdrawn in phase 9
     Windows                       the `gnu` target, and no C runtime: `build.md`, *Platforms* and
                                   *The C library*
     where all this sits           a phase each, 7 to 10, before the host: `PLAN.md`
@@ -105,6 +104,6 @@ could have sent the Windows target back to be asked again. Nothing trapped in a 
 Each is a later phase's claim in `PLAN.md`, not something left behind this one.
 
     macOS                             phase 8
-    C99; no thread-local variable     phase 9
+    the standard                      phase 9
     no C runtime on Windows; nothing  phase 10
       fetched; the C routines carried
