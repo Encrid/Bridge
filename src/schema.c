@@ -20,13 +20,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const struct { const char *name; enum rows_kind kind; uint32_t size; } given[] = {
-    { "bool", ROWS_BOOL, 1 },       { "char", ROWS_CHAR, 1 },
-    { "int8_t", ROWS_I8, 1 },       { "uint8_t", ROWS_U8, 1 },
-    { "int16_t", ROWS_I16, 2 },     { "uint16_t", ROWS_U16, 2 },
-    { "int32_t", ROWS_I32, 4 },     { "uint32_t", ROWS_U32, 4 },
-    { "int64_t", ROWS_I64, 8 },     { "uint64_t", ROWS_U64, 8 },
-    { "float", ROWS_F32, 4 },       { "double", ROWS_F64, 8 },
+static const struct { const char *name; enum schema_kind kind; uint32_t size; } given[] = {
+    { "bool", SCHEMA_BOOL, 1 },       { "char", SCHEMA_CHAR, 1 },
+    { "int8_t", SCHEMA_I8, 1 },       { "uint8_t", SCHEMA_U8, 1 },
+    { "int16_t", SCHEMA_I16, 2 },     { "uint16_t", SCHEMA_U16, 2 },
+    { "int32_t", SCHEMA_I32, 4 },     { "uint32_t", SCHEMA_U32, 4 },
+    { "int64_t", SCHEMA_I64, 8 },     { "uint64_t", SCHEMA_U64, 8 },
+    { "float", SCHEMA_F32, 4 },       { "double", SCHEMA_F64, 8 },
 };
 
 typedef struct {
@@ -100,7 +100,7 @@ static int a_struct(reader *r, schema_find find, void *ctx, schema *out)
 {
     uint32_t room = 0;
     for (next(r); !is(r, "}"); next(r)) {
-        rows_field f = { .count = 1 };
+        schema_field f = { .count = 1 };
         uint32_t size = 0, align = 0, i;
         schema_named named;
 
@@ -110,12 +110,12 @@ static int a_struct(reader *r, schema_find find, void *ctx, schema *out)
             size = align = given[i].size;
         } else if (is(r, "bridge_text")) {
             /* given and not declared: (offset, length) into the persistent arena */
-            f.kind = ROWS_TEXT;
+            f.kind = SCHEMA_TEXT;
             size = sizeof(bridge_text);
             align = alignof(bridge_text);
         } else if (names(r) && find(ctx, r->word, &named)) {
-            f.kind = named.kind == BRIDGE_STRUCT ? ROWS_STRUCT
-                   : named.kind == BRIDGE_ENUM ? ROWS_ENUM : ROWS_BITMASK;
+            f.kind = named.kind == BRIDGE_STRUCT ? SCHEMA_STRUCT
+                   : named.kind == BRIDGE_ENUM ? SCHEMA_ENUM : SCHEMA_BITMASK;
             f.type = named.type;
             size = named.size;
             align = named.align;

@@ -35,6 +35,9 @@ typedef struct {
     uint64_t columns;         /* component columns and entity arrays, in bytes */
     uint32_t max_modules;     /* how many modules are loaded at once */
     uint32_t tables;          /* how many sets of components entities carry at once */
+    uint32_t types;           /* how many types are declared at once: components, and the
+                               * structs, enums and bitmasks their fields name */
+    uint32_t systems;         /* how many systems and observers are registered at once */
 } bridge_budget;
 
 /* Two systems that conflict in one phase, in the order they are to run. A system is named by

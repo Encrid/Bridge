@@ -24,31 +24,10 @@ void rows_destroy(rows *r);
 
 /* ---- at load ---- */
 
-/* what one field of a struct holds - schema.md, *The type set*. Zero is none of them. */
-enum rows_kind : uint8_t {
-    ROWS_BOOL = 1, ROWS_CHAR, ROWS_I8, ROWS_U8, ROWS_I16, ROWS_U16, ROWS_I32, ROWS_U32,
-    ROWS_I64, ROWS_U64, ROWS_F32, ROWS_F64, ROWS_ENUM, ROWS_BITMASK, ROWS_TEXT, ROWS_STRUCT
-};
-
-typedef struct {
-    const char    *name;
-    uint32_t       offset;
-    uint32_t       count;       /* 1, or how many of them an inline array holds */
-    enum rows_kind kind;
-    rows_type     *type;        /* the declared type an enum, a bitmask or a struct field names */
-} rows_field;
-
-/* A type from its descriptor: `ns` is where a field's bare type name is looked for. The type,
- * with what the text lays out to in `size` and `align`; or nullptr, and `why` is the rest of a
- * sentence that begins "its descriptor" and names the word it stopped at. */
-[[nodiscard]] rows_type *rows_declare(rows *r, const char *ns, const char *name,
-                                      enum bridge_kind kind, const char *desc, uint32_t *size,
-                                      uint32_t *align, char *why, size_t why_len);
+/* A type whose rows are `size` bytes. What it is made of is its declarer's to know: schema.h.
+ * There is room for [budget] types of them, and whoever declares counts. */
+[[nodiscard]] rows_type *rows_declare(rows *r, uint32_t size);
 void rows_undeclare(rows *r, rows_type *type);
-/* a struct's fields, in the order it states them: how many, and where the first is */
-uint32_t rows_fields(rows *r, rows_type *type, const rows_field **fields);
-/* the value of an enum's constant, by its name */
-[[nodiscard]] bool rows_constant(rows *r, rows_type *type, const char *name, int32_t *value);
 
 typedef struct {
     rows_type       *type;
@@ -58,6 +37,7 @@ typedef struct {
 /* who an observer is owed for, and how: one call a change, in the order they were applied */
 typedef void (*rows_heard)(void *ctx, uint64_t id, enum bridge_event event);
 
+/* There is room for [budget] systems of the two together, and whoever registers counts. */
 [[nodiscard]] rows_terms *rows_system(rows *r, const rows_term *terms, uint32_t count);
 [[nodiscard]] rows_terms *rows_observer(rows *r, const rows_term *terms, uint32_t count,
                                         enum bridge_event events, rows_heard heard, void *ctx);

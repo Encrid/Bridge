@@ -1,17 +1,34 @@
 /* A type from its text: what a descriptor may say, and what it lays out to.
- * docs/modules/schema.md, *The type set*. Storage of our own reads a descriptor with this. */
+ * docs/modules/schema.md, *The type set*. It reads text and answers a layout: who keeps the rows
+ * is not its business, and storage never sees a field. */
 #ifndef BRIDGE_SCHEMA_H
 #define BRIDGE_SCHEMA_H
 
-#include "rows.h"
+#include "bridge-abi.h"
 
 #include <stddef.h>
+
+/* what one field of a struct holds. Zero is none of them. */
+enum schema_kind : uint8_t {
+    SCHEMA_BOOL = 1, SCHEMA_CHAR, SCHEMA_I8, SCHEMA_U8, SCHEMA_I16, SCHEMA_U16, SCHEMA_I32,
+    SCHEMA_U32, SCHEMA_I64, SCHEMA_U64, SCHEMA_F32, SCHEMA_F64, SCHEMA_ENUM, SCHEMA_BITMASK,
+    SCHEMA_TEXT, SCHEMA_STRUCT
+};
+
+typedef struct {
+    const char      *name;
+    uint32_t         offset;
+    uint32_t         count;     /* 1, or how many of them an inline array holds */
+    enum schema_kind kind;
+    void            *type;      /* the declared type an enum, a bitmask or a struct field names:
+                                 * whatever `find` answered for it */
+} schema_field;
 
 /* a type declared before this one, in the same namespace, as a field may name it */
 typedef struct {
     enum bridge_kind kind;
     uint32_t         size, align;
-    rows_type       *type;
+    void            *type;
 } schema_named;
 
 /* false if the namespace has declared nothing of that name */
@@ -21,7 +38,7 @@ typedef struct { char *name; int32_t value; } schema_constant;
 
 typedef struct {
     uint32_t         size, align;
-    rows_field      *fields;            /* a struct's, in the order it states them */
+    schema_field    *fields;            /* a struct's, in the order it states them */
     uint32_t         field_count;
     schema_constant *constants;         /* an enum's or a bitmask's */
     uint32_t         constant_count;

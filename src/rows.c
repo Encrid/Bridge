@@ -11,11 +11,10 @@
  *     are one block of the column region: the entity ids, then a column for each type.
  *   - Nothing in the shared block is read back. Where an entity is, and which entity is in
  *     which row, are kept here; what the block holds of either is a copy for modules to read.
- *   - Everything sized by a budget is allocated when the bridge is created, and what is sized
- *     by how many types and systems there are, when a module loads. A barrier allocates nothing.
+ *   - Everything it holds is sized by a budget and allocated when the bridge is created:
+ *     entities, tables, columns, types, systems. Nothing is allocated after.
  *   - What a module reads is rewritten where a table was touched, and nowhere else. */
 #include "inside.h"
-#include "schema.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,11 +30,8 @@ enum folded : uint8_t {
 };
 
 struct rows_type {
-    uint32_t         id;            /* its bit in a set, and its column in the layout */
-    enum bridge_kind kind;
-    uint32_t         size, align;
-    char            *ns, *name;
-    schema           s;
+    uint32_t id;                    /* its bit in a set, and its column in the layout */
+    uint32_t size;
 };
 
 struct rows_terms {
@@ -46,6 +42,7 @@ struct rows_terms {
     uint32_t         *list, *pos;
     uint32_t          matched;
     bool              changed;      /* which tables it matches is not what was last written */
+    bool              used;         /* of the [budget] systems there are, this one is taken */
     /* an observer's */
     enum bridge_event events;
     rows_heard        heard;
@@ -78,12 +75,15 @@ struct rows {
     uint64_t  *sets;                /* [table][words]: which types a table's entities carry */
     uint32_t  *columns;             /* [table][types]: where a type's column is, 0 if absent */
     uint32_t   words, type_room;    /* how wide a set is, in 64-bit words and in types */
+    uint32_t   terms_room;
     uint64_t  *who;                 /* which entity is in which row: the column region's twin */
     uint32_t  *dirty;               /* tables touched since what modules read was last written */
     uint32_t   dirty_count;
-    /* types and terms: sized at load */
-    rows_type **types;
-    uint32_t   type_count;
+    /* types and terms: [budget] types and [budget] systems of them, and no more */
+    rows_type **types;              /* by id: nullptr where none is declared */
+    rows_type  *type_pool;
+    rows_terms *terms_pool;
+    uint32_t   *lists;              /* every system's `list` and `pos`, one after another */
     rows_terms **systems, **observers;
     uint32_t   system_count, observer_count;
     /* the fold */
@@ -736,110 +736,32 @@ void rows_written(rows *r)
     r->dirty_count = 0;
 }
 
-/* ---- at load: a type from its text ---- */
+/* ---- at load: a type, and terms ---- */
 
-typedef struct { rows *r; const char *ns; } looking;
-
-static bool find(void *ctx, const char *name, schema_named *named)
+rows_type *rows_declare(rows *r, uint32_t size)
 {
-    const looking *l = ctx;
-    for (uint32_t i = 0; i < l->r->type_count; i ++) {
-        rows_type *type = l->r->types[i];
-        if (!type || strcmp(type->ns, l->ns) || strcmp(type->name, name)) continue;
-        *named = (schema_named){ type->kind, type->size, type->align, type };
-        return true;
-    }
-    return false;
-}
-
-/* a set is as wide as there are types, in whole words: wider, and everything a set is kept in
- * is made again. At load, where storage may allocate. */
-static void widen(rows *r, uint32_t types)
-{
-    uint32_t words = (types + 63) / 64, room = words * 64;
-    size_t tables = (size_t)r->table_room + 1;
-    uint64_t *sets, *work;
-    uint32_t *columns;
-    if (room <= r->type_room) return;
-    sets = calloc(tables * words, 8);
-    work = calloc((size_t)r->b->entities * words, 8);
-    columns = calloc(tables * room, 4);
-    for (size_t t = 0; t < tables; t ++) {
-        if (r->words) memcpy(sets + t * words, r->sets + t * r->words, 8u * r->words);
-        if (r->type_room) memcpy(columns + t * room, r->columns + t * r->type_room, 4u * r->type_room);
-    }
-    free(r->sets);
-    free(r->work);
-    free(r->columns);
-    free(r->scratch);
-    r->sets = sets;
-    r->work = work;
-    r->columns = columns;
-    r->scratch = calloc((size_t)words * 2, 8);     /* a set before a change, and the set after */
-    /* a set hashes by all of its words, so every table is found again under the new width */
-    memset(r->hash, 0, 4u * r->hash_room);
-    r->words = words;
-    r->type_room = room;
-    for (uint32_t t = 1; t < r->table_high; t ++) {
-        uint32_t i;
-        if (!r->tables[t].live || !r->tables[t].named) continue;
-        for (i = hashed(r, set_of(r, t)); r->hash[i]; i = (i + 1) & (r->hash_room - 1)) {}
-        r->hash[i] = t;
-    }
-}
-
-rows_type *rows_declare(rows *r, const char *ns, const char *name, enum bridge_kind kind,
-                        const char *desc, uint32_t *size, uint32_t *align, char *why,
-                        size_t why_len)
-{
-    looking l = { r, ns };
-    rows_type *t;
-    schema s;
     uint32_t id;
-
-    if (schema_parse(kind, desc, find, &l, &s, why, why_len)) return nullptr;
-    for (id = 0; id < r->type_count && r->types[id]; id ++) {}
-    if (id == r->type_count) {
-        r->types = realloc(r->types, (r->type_count + 1) * sizeof *r->types);
-        r->types[r->type_count ++] = nullptr;
-    }
-    widen(r, r->type_count);
-    t = calloc(1, sizeof *t);
-    t->id = id;
-    t->kind = kind;
-    t->size = s.size;
-    t->align = s.align;
-    t->ns = copy(ns, strlen(ns));
-    t->name = copy(name, strlen(name));
-    t->s = s;
-    r->types[id] = t;
-    *size = s.size;
-    *align = s.align;
-    return t;
+    for (id = 0; r->types[id]; id ++) {}        /* its declarer counted: there is one */
+    r->types[id] = &r->type_pool[id];
+    *r->types[id] = (rows_type){ id, size };
+    return r->types[id];
 }
 
-uint32_t rows_fields([[maybe_unused]] rows *r, rows_type *type, const rows_field **fields)
+void rows_undeclare(rows *r, rows_type *type)
 {
-    *fields = type->s.fields;
-    return type->s.field_count;
+    r->types[type->id] = nullptr;
 }
 
-bool rows_constant([[maybe_unused]] rows *r, rows_type *type, const char *name, int32_t *value)
+static rows_terms *terms_of(rows *r, const rows_term *terms, uint32_t count)
 {
-    for (uint32_t i = 0; i < type->s.constant_count; i ++) {
-        if (strcmp(type->s.constants[i].name, name)) continue;
-        *value = type->s.constants[i].value;
-        return true;
-    }
-    return false;
-}
-
-/* ---- at load: terms ---- */
-
-static rows_terms *terms_of(const rows_term *terms, uint32_t count)
-{
-    rows_terms *t = calloc(1, sizeof *t);
-    t->count = count;
+    rows_terms *t;
+    uint32_t k;
+    for (k = 0; r->terms_pool[k].used; k ++) {}     /* whoever registers counted: there is one */
+    t = &r->terms_pool[k];
+    *t = (rows_terms){ .count = count, .used = true };
+    t->list = r->lists + (size_t)k * 2 * (r->table_room + 2);
+    t->pos = t->list + r->table_room + 2;
+    memset(t->list, 0, 8u * (r->table_room + 2));
     for (uint32_t i = 0; i < count; i ++) {
         t->type[i] = terms[i].type->id;
         t->oper[i] = terms[i].oper;
@@ -849,16 +771,13 @@ static rows_terms *terms_of(const rows_term *terms, uint32_t count)
 
 rows_terms *rows_system(rows *r, const rows_term *terms, uint32_t count)
 {
-    rows_terms *s = terms_of(terms, count);
-    s->list = calloc(r->table_room + 1, sizeof *s->list);
-    s->pos = calloc(r->table_room + 2, sizeof *s->pos);
+    rows_terms *s = terms_of(r, terms, count);
     for (uint32_t t = 1; t < r->table_high; t ++) {
         if (!r->tables[t].live || !matches(s, set_of(r, t))) continue;
         s->list[s->matched] = t;
         s->pos[t] = ++ s->matched;
     }
     s->changed = true;
-    r->systems = realloc(r->systems, (r->system_count + 1) * sizeof *r->systems);
     r->systems[r->system_count ++] = s;
     return s;
 }
@@ -866,11 +785,10 @@ rows_terms *rows_system(rows *r, const rows_term *terms, uint32_t count)
 rows_terms *rows_observer(rows *r, const rows_term *terms, uint32_t count,
                           enum bridge_event events, rows_heard heard, void *ctx)
 {
-    rows_terms *o = terms_of(terms, count);
+    rows_terms *o = terms_of(r, terms, count);
     o->events = events;
     o->heard = heard;
     o->ctx = ctx;
-    r->observers = realloc(r->observers, (r->observer_count + 1) * sizeof *r->observers);
     r->observers[r->observer_count ++] = o;
     return o;
 }
@@ -886,9 +804,7 @@ void rows_forget(rows *r, rows_terms *terms)
         memmove(&r->observers[i], &r->observers[i + 1], (r->observer_count - i - 1) * sizeof *r->observers);
         r->observer_count --;
     }
-    free(terms->list);
-    free(terms->pos);
-    free(terms);
+    terms->used = false;
 }
 
 /* ---- at unload, and for settings: one entity at a time, outside any barrier ---- */
@@ -963,15 +879,6 @@ void rows_drop(rows *r, rows_type *type, enum bridge_on_unload policy)
     }
 }
 
-void rows_undeclare(rows *r, rows_type *type)
-{
-    r->types[type->id] = nullptr;
-    schema_free(&type->s);
-    free(type->ns);
-    free(type->name);
-    free(type);
-}
-
 void rows_release(rows *r, const uint64_t *ids, uint32_t count)
 {
     for (uint32_t i = 0; i < count; i ++) if (alive(r, ids[i])) destroyed(r, (uint32_t)ids[i]);
@@ -1009,40 +916,49 @@ rows *rows_create(bridge *b)
     r->table_room = b->tables;
     r->table_high = 1;                  /* table 0 is no table */
     r->high = 1;                        /* and index 0 is no entity */
+    r->words = (b->max_types + 63) / 64;
+    r->type_room = r->words * 64;
+    r->terms_room = b->max_systems;
     r->places = calloc(b->entities, sizeof *r->places);
     r->tables = calloc(tables, sizeof *r->tables);
     r->table_next = calloc(tables, sizeof *r->table_next);
     r->dirty = calloc(tables, sizeof *r->dirty);
     for (r->hash_room = 16; r->hash_room < tables * 2; r->hash_room *= 2) {}
     r->hash = calloc(r->hash_room, sizeof *r->hash);
+    r->sets = calloc(tables * r->words, 8);
+    r->columns = calloc(tables * r->type_room, 4);
     /* a slot for each eight bytes of the column region: a table's ids sit in it, so its twin
      * sits at the same place here. What is never touched is never backed by memory. */
     r->who = os_reserve(b->columns_len, b->columns_len);
+    r->work = calloc((size_t)b->entities * r->words, 8);
     r->changed = calloc(b->entities, sizeof *r->changed);
     r->folded = calloc(b->entities, 1);
     r->dest = calloc(b->entities, sizeof *r->dest);
     r->asker = calloc(b->entities, sizeof *r->asker);
+    r->scratch = calloc((size_t)r->words * 2, 8);       /* a set before a change, and after */
+    /* one more than there may be, so that looking for a free one always ends */
+    r->types = calloc((size_t)r->type_room + 1, sizeof *r->types);
+    r->type_pool = calloc(r->type_room, sizeof *r->type_pool);
+    r->terms_pool = calloc((size_t)r->terms_room + 1, sizeof *r->terms_pool);
+    r->lists = calloc((size_t)r->terms_room * 2 * (tables + 1), sizeof *r->lists);
+    r->systems = calloc(r->terms_room, sizeof *r->systems);
+    r->observers = calloc(r->terms_room, sizeof *r->observers);
     if (!r->who) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: the system would not "
             "give storage %u bytes of its own for the columns it keeps", b->columns_len);
         rows_destroy(r);
         return nullptr;
     }
-    widen(r, 64);
     return r;
 }
 
 void rows_destroy(rows *r)
 {
-    for (uint32_t i = 0; i < r->type_count; i ++) {
-        if (!r->types[i]) continue;
-        schema_free(&r->types[i]->s);
-        free(r->types[i]->ns);
-        free(r->types[i]->name);
-        free(r->types[i]);
-    }
     if (r->who) os_release(r->who, r->b->columns_len);
     free(r->types);
+    free(r->type_pool);
+    free(r->terms_pool);
+    free(r->lists);
     free(r->systems);
     free(r->observers);
     free(r->places);

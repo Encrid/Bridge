@@ -38,6 +38,7 @@ static void component_delete(bridge *b, component *c)
         component *named = c->deps[k];
         if (!-- named->users && !named->declarers) component_delete(b, named);
     }
+    schema_free(&c->s);
     free(c->deps);
     free(c->name);
     free(c->zero);

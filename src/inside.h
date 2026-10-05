@@ -7,6 +7,7 @@
 #include "backend.h"
 #include "os.h"
 #include "rows.h"
+#include "schema.h"
 
 constexpr uint32_t PAGE = 65'536;
 
@@ -26,7 +27,8 @@ typedef struct {
 typedef struct component component;
 struct component {
     char        *name;
-    rows_type   *type;              /* as storage knows it */
+    rows_type   *type;              /* as storage knows it: a size */
+    schema       s;                 /* its fields or its constants, read from its text */
     enum bridge_kind kind;
     uint32_t     size, align;
     uint64_t     fingerprint;       /* of the descriptor string - schema.md, *Fingerprints* */
@@ -173,6 +175,7 @@ struct bridge {
     uint32_t       gap_count, gap_room;
     int            layout_moved;    /* a module came or went, or a declaration changed */
     uint32_t       tables;          /* [budget] tables: how many may exist at once */
+    uint32_t       max_types, max_systems;      /* [budget] types, [budget] systems */
 
     rows          *rows;            /* who keeps the rows: rows.h */
 

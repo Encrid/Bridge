@@ -336,10 +336,18 @@ says the entity stays. It is now worked a table at a time, in place wherever a j
 had, and cannot fail: `lifetime.md`, *What unload leaves behind*. `storage strip` and `storage
 stripfull` are its cases, each run with its rule taken out and failing.
 
-**Open: what storage may allocate after `bridge_create`.** The plan said nothing. As built, what
-a budget sizes is allocated there; a set's width and a system's list of tables are sized by how
-many types and systems there are, which no budget states, and are allocated when a module loads.
-A barrier allocates nothing, and no test holds that yet, which is a second open item.
+**What storage may allocate after `bridge_create`: decided, and it is nothing.** As first built,
+a set's width and each system's list of tables were sized by how many types and systems there
+were, which no budget stated, and allocated when a module loaded; and the plan's sentence had been
+reworded to fit. There are two more keys now, `[budget] types` and `[budget] systems`, and
+storage allocates in `rows_create` and nowhere else: `budgets.md`, *Budgets*. A type's fields
+left storage for the component's record on the way, since storage only ever needed its size.
+
+**Open: a test that a barrier allocates nothing.** It holds by reading: `src/rows.c` calls no
+allocator outside `rows_create`. Nothing checks it.
+
+**Open: an allocation that fails at load.** Older than this phase and found in it: of the
+library's allocations when a module loads, one checks what it was given.
 
 **Open: which entities are placed when columns run short.** As built, a table that cannot take
 all the rows arriving takes as many as fit, found by halving what it asks for.

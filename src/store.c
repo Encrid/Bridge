@@ -256,7 +256,8 @@ int store_create(bridge *b, const bridge_budget *budget)
 
     if (unset(b, "entities", budget->entities) || unset(b, "persistent", budget->persistent)
         || unset(b, "columns", budget->columns) || unset(b, "max_modules", budget->max_modules)
-        || unset(b, "tables", budget->tables)) {
+        || unset(b, "tables", budget->tables) || unset(b, "types", budget->types)
+        || unset(b, "systems", budget->systems)) {
         return 1;
     }
     if (beyond(b, "entities", budget->entities) || beyond(b, "persistent", budget->persistent)
@@ -290,6 +291,8 @@ int store_create(bridge *b, const bridge_budget *budget)
     b->columns_len = (uint32_t)budget->columns;
     b->max_modules = budget->max_modules;
     b->tables = budget->tables;
+    b->max_types = budget->types;
+    b->max_systems = budget->systems;
     /* a gap lies between two blocks, and a table has one block: never more gaps than tables */
     b->gap_room = b->tables + 1;
     b->gaps = malloc(b->gap_room * sizeof *b->gaps);
@@ -320,6 +323,7 @@ void store_destroy(bridge *b)
     if (b->shared) os_release(b->shared, b->shared_reserve);
     free(b->gaps);
     for (i = 0; i < b->component_count; i ++) {
+        schema_free(&b->components[i]->s);
         free(b->components[i]->deps);
         free(b->components[i]->name);
         free(b->components[i]->zero);

@@ -132,13 +132,19 @@ barrier's second step is where that is found out, before anything has moved.
 ## What bounds it
 
     [budget] entities    the index, and everything storage keeps an entity
-    [budget] tables      every table's record, its set, its columns' offsets, the hash that
-                         finds it, and each system's list of the tables it matches
+    [budget] tables      every table's record, its set, the hash that finds it
     [budget] columns     the rows, and the list of which entity is in which
+    [budget] types       how wide a set is, and with `tables`, an offset for each type in
+                         each table
+    [budget] systems     each one's terms, and with `tables`, its list of the tables it matches
 
-What a budget sizes is allocated when the bridge is created. What the number of declared types and
-of systems sizes - a set's width, a system's own list - is allocated when a module loads. **A
-barrier allocates nothing.**
+**All of it is allocated when the bridge is created, and nothing after**: not at a barrier, not
+when a module loads. What a module declares takes a place that is already there, and a `declare`
+or a `system` past its key is refused - `budgets.md`, *Budgets*.
+
+A type is a size to storage, and nothing else. Its fields, their names and an enum's constants
+are read from its text by `src/schema.c` and kept with the component's record, by the part of the
+library that checks a load - `schema.md`, *There is no schema format*.
 
 ## What is asked of it
 

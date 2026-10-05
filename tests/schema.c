@@ -37,7 +37,7 @@ typedef struct { Vec2 at; Team team; Flags flags; float mass; } Body;
 typedef struct { uint8_t a; uint16_t b; uint8_t c; uint64_t d; int8_t e; int16_t f; uint32_t g; } Mixed;
 
 #define FIELD(T, f, k, n) { #f, (uint32_t)offsetof(T, f), n, k }
-typedef struct { const char *name; uint32_t offset, count; enum rows_kind kind; } want_field;
+typedef struct { const char *name; uint32_t offset, count; enum schema_kind kind; } want_field;
 
 static void a_struct(const char *text, uint32_t size, uint32_t align, const want_field *want, uint32_t count)
 {
@@ -84,23 +84,23 @@ static void refused(enum bridge_kind kind, const char *text, const char *word)
 
 int main()
 {
-    static const want_field vec2[] = { FIELD(Vec2, x, ROWS_F32, 1), FIELD(Vec2, y, ROWS_F32, 1) };
+    static const want_field vec2[] = { FIELD(Vec2, x, SCHEMA_F32, 1), FIELD(Vec2, y, SCHEMA_F32, 1) };
     static const want_field settings[] = {
-        FIELD(Settings, vsync, ROWS_BOOL, 1), FIELD(Settings, width, ROWS_I32, 1),
-        FIELD(Settings, scale, ROWS_F32, 1), FIELD(Settings, mode, ROWS_ENUM, 1),
-        FIELD(Settings, title, ROWS_CHAR, 16), FIELD(Settings, path, ROWS_TEXT, 1),
-        FIELD(Settings, small, ROWS_U8, 1), FIELD(Settings, flags, ROWS_BITMASK, 1),
-        FIELD(Settings, ratio, ROWS_F64, 1), FIELD(Settings, big, ROWS_I64, 1),
+        FIELD(Settings, vsync, SCHEMA_BOOL, 1), FIELD(Settings, width, SCHEMA_I32, 1),
+        FIELD(Settings, scale, SCHEMA_F32, 1), FIELD(Settings, mode, SCHEMA_ENUM, 1),
+        FIELD(Settings, title, SCHEMA_CHAR, 16), FIELD(Settings, path, SCHEMA_TEXT, 1),
+        FIELD(Settings, small, SCHEMA_U8, 1), FIELD(Settings, flags, SCHEMA_BITMASK, 1),
+        FIELD(Settings, ratio, SCHEMA_F64, 1), FIELD(Settings, big, SCHEMA_I64, 1),
     };
-    static const want_field roster[] = { FIELD(Roster, ids, ROWS_U64, 5) };
+    static const want_field roster[] = { FIELD(Roster, ids, SCHEMA_U64, 5) };
     static const want_field body[] = {
-        FIELD(Body, at, ROWS_STRUCT, 1), FIELD(Body, team, ROWS_ENUM, 1),
-        FIELD(Body, flags, ROWS_BITMASK, 1), FIELD(Body, mass, ROWS_F32, 1),
+        FIELD(Body, at, SCHEMA_STRUCT, 1), FIELD(Body, team, SCHEMA_ENUM, 1),
+        FIELD(Body, flags, SCHEMA_BITMASK, 1), FIELD(Body, mass, SCHEMA_F32, 1),
     };
     static const want_field mixed[] = {
-        FIELD(Mixed, a, ROWS_U8, 1), FIELD(Mixed, b, ROWS_U16, 1), FIELD(Mixed, c, ROWS_U8, 1),
-        FIELD(Mixed, d, ROWS_U64, 1), FIELD(Mixed, e, ROWS_I8, 1), FIELD(Mixed, f, ROWS_I16, 1),
-        FIELD(Mixed, g, ROWS_U32, 1),
+        FIELD(Mixed, a, SCHEMA_U8, 1), FIELD(Mixed, b, SCHEMA_U16, 1), FIELD(Mixed, c, SCHEMA_U8, 1),
+        FIELD(Mixed, d, SCHEMA_U64, 1), FIELD(Mixed, e, SCHEMA_I8, 1), FIELD(Mixed, f, SCHEMA_I16, 1),
+        FIELD(Mixed, g, SCHEMA_U32, 1),
     };
 
     a_struct("{ float x; float y; }", sizeof(Vec2), alignof(Vec2), vec2, 2);

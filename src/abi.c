@@ -61,6 +61,22 @@ static int may_write(module *m, const component *c)
     return !foreign(m, c->name) || listed(m->write, m->write_count, c->name);
 }
 
+/* a type a field names bare is looked for in the namespace of the component it is a field of */
+typedef struct { bridge *b; const char *ns; } looking;
+
+static bool find(void *ctx, const char *bare, schema_named *named)
+{
+    const looking *l = ctx;
+    size_t ns = strlen(l->ns);
+    for (uint32_t i = 0; i < l->b->component_count; i ++) {
+        component *c = l->b->components[i];
+        if (strncmp(c->name, l->ns, ns) || c->name[ns] != ':' || strcmp(c->name + ns + 1, bare)) continue;
+        *named = (schema_named){ c->kind, c->size, c->align, c };
+        return true;
+    }
+    return false;
+}
+
 /* declare(name, name_len, kind, size, align, desc, desc_len, on_unload) -> slot */
 static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
 {
@@ -104,28 +120,36 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
             (unsigned long long)c->fingerprint);
     }
     if (!c) {
-        /* Storage reads the descriptor and lays the type out. A field's type is a bare C name,
-         * looked for in the declarer's namespace: `Vec3` in game:Body is game:Vec3 - schema.md. */
+        /* The descriptor is read and laid out. A field's type is a bare C name, looked for in
+         * the declarer's namespace: `Vec3` in game:Body is game:Vec3 - schema.md. */
         char *desc = copy(desc_at, a[6]);
         char why[200];
-        const rows_field *fields = nullptr;
-        rows_type *type;
-        uint32_t laid = 0, aligned = 0, field_count, k;
+        looking l = { b, name };
+        schema s;
+        int refused;
+        uint32_t k;
 
         *bare = 0;
-        type = rows_declare(b->rows, name, bare + 1, kind, desc, &laid, &aligned, why, sizeof why);
+        refused = schema_parse(kind, desc, find, &l, &s, why, sizeof why);
         *bare = ':';
         free(desc);
-        if (!type) return refuse(m, "component '%s': its descriptor %s", name, why);
-        if (laid != size || aligned != align) {
-            rows_undeclare(b->rows, type);
-            return refuse(m, "component '%s' is %u bytes aligned to %u in the module and %d "
-                "aligned to %d by its descriptor", name, size, align, (int)laid, (int)aligned);
+        if (refused) return refuse(m, "component '%s': its descriptor %s", name, why);
+        if (s.size != size || s.align != align) {
+            uint32_t laid = s.size, aligned = s.align;
+            schema_free(&s);
+            return refuse(m, "component '%s' is %u bytes aligned to %u in the module and %u "
+                "aligned to %u by its descriptor", name, size, align, laid, aligned);
+        }
+        if (b->component_count >= b->max_types) {
+            schema_free(&s);
+            return refuse(m, "component '%s' is one type more than [budget] types of %u", name,
+                b->max_types);
         }
 
         c = calloc(1, sizeof *c);
         c->name = copy(name, strlen(name));
-        c->type = type;
+        c->type = rows_declare(b->rows, size);
+        c->s = s;
         c->kind = kind;
         c->size = size;
         c->align = align;
@@ -134,16 +158,12 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         b->components = realloc(b->components, (b->component_count + 1) * sizeof *b->components);
         b->components[b->component_count ++] = c;
         /* a declared type a field of this one names is held for as long as this one is */
-        field_count = kind == BRIDGE_STRUCT ? rows_fields(b->rows, type, &fields) : 0;
-        for (k = 0; k < field_count; k ++) {
-            if (!fields[k].type) continue;
-            for (i = 0; i < b->component_count; i ++) {
-                component *held = b->components[i];
-                if (held->type != fields[k].type || held == c) continue;
-                c->deps = realloc(c->deps, (c->dep_count + 1) * sizeof *c->deps);
-                c->deps[c->dep_count ++] = held;
-                held->users ++;
-            }
+        for (k = 0; k < s.field_count; k ++) {
+            component *held = s.fields[k].type;
+            if (!held) continue;
+            c->deps = realloc(c->deps, (c->dep_count + 1) * sizeof *c->deps);
+            c->deps[c->dep_count ++] = held;
+            held->users ++;
         }
     }
 
@@ -193,6 +213,9 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
     bridge_system *s;
     char name[128], full[256];
 
+    if (b->system_count >= b->max_systems) {
+        return refuse(m, "it registers one more than [budget] systems of %u", b->max_systems);
+    }
     if (term_count > BRIDGE_TERMS_MAX) {
         return refuse(m, "a%s %s asks for %llu terms and a query takes %d", events ? "n" : "",
             what, (unsigned long long)term_count, BRIDGE_TERMS_MAX);

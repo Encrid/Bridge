@@ -16,17 +16,17 @@ static int misfit(char *why, size_t len, const bridge_setting *s, const char *fi
 }
 
 /* an integer into an integer field it fits */
-static int put_integer(uint8_t *at, enum rows_kind kind, int64_t v)
+static int put_integer(uint8_t *at, enum schema_kind kind, int64_t v)
 {
     switch (kind) {
-    case ROWS_CHAR: case ROWS_I8: if (v < INT8_MIN || v > INT8_MAX) return 1; *(int8_t *)at = (int8_t)v; return 0;
-    case ROWS_U8: if (v < 0 || v > UINT8_MAX) return 1; *at = (uint8_t)v; return 0;
-    case ROWS_I16: if (v < INT16_MIN || v > INT16_MAX) return 1; { int16_t x = (int16_t)v; memcpy(at, &x, 2); } return 0;
-    case ROWS_U16: if (v < 0 || v > UINT16_MAX) return 1; { uint16_t x = (uint16_t)v; memcpy(at, &x, 2); } return 0;
-    case ROWS_I32: if (v < INT32_MIN || v > INT32_MAX) return 1; { int32_t x = (int32_t)v; memcpy(at, &x, 4); } return 0;
-    case ROWS_U32: if (v < 0 || v > UINT32_MAX) return 1; { uint32_t x = (uint32_t)v; memcpy(at, &x, 4); } return 0;
-    case ROWS_I64: memcpy(at, &v, 8); return 0;
-    case ROWS_U64: if (v < 0) return 1; memcpy(at, &v, 8); return 0;
+    case SCHEMA_CHAR: case SCHEMA_I8: if (v < INT8_MIN || v > INT8_MAX) return 1; *(int8_t *)at = (int8_t)v; return 0;
+    case SCHEMA_U8: if (v < 0 || v > UINT8_MAX) return 1; *at = (uint8_t)v; return 0;
+    case SCHEMA_I16: if (v < INT16_MIN || v > INT16_MAX) return 1; { int16_t x = (int16_t)v; memcpy(at, &x, 2); } return 0;
+    case SCHEMA_U16: if (v < 0 || v > UINT16_MAX) return 1; { uint16_t x = (uint16_t)v; memcpy(at, &x, 2); } return 0;
+    case SCHEMA_I32: if (v < INT32_MIN || v > INT32_MAX) return 1; { int32_t x = (int32_t)v; memcpy(at, &x, 4); } return 0;
+    case SCHEMA_U32: if (v < 0 || v > UINT32_MAX) return 1; { uint32_t x = (uint32_t)v; memcpy(at, &x, 4); } return 0;
+    case SCHEMA_I64: memcpy(at, &v, 8); return 0;
+    case SCHEMA_U64: if (v < 0) return 1; memcpy(at, &v, 8); return 0;
     default: return 1;
     }
 }
@@ -40,7 +40,18 @@ static uint32_t put_text(bridge *b, module *m, uint32_t *used, const char *text,
     return at;
 }
 
-static int seed_one(bridge *b, module *m, uint8_t *row, const rows_field *field,
+/* the value of an enum's constant, by its name */
+static bool constant(const component *of, const char *name, int32_t *value)
+{
+    for (uint32_t i = 0; i < of->s.constant_count; i ++) {
+        if (strcmp(of->s.constants[i].name, name)) continue;
+        *value = of->s.constants[i].value;
+        return true;
+    }
+    return false;
+}
+
+static int seed_one(bridge *b, module *m, uint8_t *row, const schema_field *field,
                     const bridge_setting *s, uint32_t *text_used, char *why, size_t len)
 {
     uint8_t *at = row + field->offset;
@@ -48,7 +59,7 @@ static int seed_one(bridge *b, module *m, uint8_t *row, const rows_field *field,
 
     /* char name[N]: the bytes, inline, and a zero after them */
     if (field->count > 1) {
-        if (field->kind != ROWS_CHAR || s->kind != BRIDGE_STRING) {
+        if (field->kind != SCHEMA_CHAR || s->kind != BRIDGE_STRING) {
             return misfit(why, len, s, "an array, which only text into a char array fills");
         }
         if (text_len + 1 > field->count) {
@@ -61,21 +72,21 @@ static int seed_one(bridge *b, module *m, uint8_t *row, const rows_field *field,
     }
 
     switch (field->kind) {
-    case ROWS_BOOL:
+    case SCHEMA_BOOL:
         if (s->kind != BRIDGE_BOOL) return misfit(why, len, s, "a bool");
         *at = s->v.b ? 1 : 0;
         return 0;
-    case ROWS_F32:
-    case ROWS_F64: {
+    case SCHEMA_F32:
+    case SCHEMA_F64: {
         double v = s->kind == BRIDGE_FLOAT ? s->v.f : (double)s->v.i;
         float f = (float)v;
         if (s->kind != BRIDGE_FLOAT && s->kind != BRIDGE_INT) return misfit(why, len, s, "a float");
-        if (field->kind == ROWS_F32) memcpy(at, &f, 4);
+        if (field->kind == SCHEMA_F32) memcpy(at, &f, 4);
         else memcpy(at, &v, 8);
         return 0;
     }
-    case ROWS_CHAR: case ROWS_I8: case ROWS_U8: case ROWS_I16: case ROWS_U16:
-    case ROWS_I32: case ROWS_U32: case ROWS_I64: case ROWS_U64:
+    case SCHEMA_CHAR: case SCHEMA_I8: case SCHEMA_U8: case SCHEMA_I16: case SCHEMA_U16:
+    case SCHEMA_I32: case SCHEMA_U32: case SCHEMA_I64: case SCHEMA_U64:
         if (s->kind != BRIDGE_INT) return misfit(why, len, s, "an integer");
         if (put_integer(at, field->kind, s->v.i)) {
             snprintf(why, len, "its setting '%.80s' is %lld, which the field it names cannot hold",
@@ -83,11 +94,11 @@ static int seed_one(bridge *b, module *m, uint8_t *row, const rows_field *field,
             return 1;
         }
         return 0;
-    case ROWS_ENUM: {
+    case SCHEMA_ENUM: {
         int32_t value = (int32_t)s->v.i;
         if (s->kind == BRIDGE_STRING) {
             /* by the name of a constant: the one thing a deployment can be expected to know */
-            if (!s->v.s || !field->type || !rows_constant(b->rows, field->type, s->v.s, &value)) {
+            if (!s->v.s || !field->type || !constant(field->type, s->v.s, &value)) {
                 snprintf(why, len, "its setting '%.80s' is '%.60s', which the enum of the field "
                     "it names has no constant for", s->key, s->v.s ? s->v.s : "");
                 return 1;
@@ -98,11 +109,11 @@ static int seed_one(bridge *b, module *m, uint8_t *row, const rows_field *field,
         memcpy(at, &value, 4);
         return 0;
     }
-    case ROWS_BITMASK:
+    case SCHEMA_BITMASK:
         if (s->kind != BRIDGE_INT || s->v.i < 0 || s->v.i > UINT32_MAX) return misfit(why, len, s, "a bitmask");
         { uint32_t x = (uint32_t)s->v.i; memcpy(at, &x, 4); }
         return 0;
-    case ROWS_TEXT:
+    case SCHEMA_TEXT:
         /* bridge_text: (offset, length) into the persistent arena - strings.md */
         if (s->kind == BRIDGE_STRING) {
             bridge_text text = { put_text(b, m, text_used, s->v.s, text_len), text_len };
@@ -110,7 +121,7 @@ static int seed_one(bridge *b, module *m, uint8_t *row, const rows_field *field,
             return 0;
         }
         return misfit(why, len, s, "a struct, which only text into a bridge_text fills");
-    case ROWS_STRUCT:
+    case SCHEMA_STRUCT:
         return misfit(why, len, s, "a struct, which only text into a bridge_text fills");
     default:
         return misfit(why, len, s, "of a type no setting fills");
@@ -121,7 +132,7 @@ static int seed_one(bridge *b, module *m, uint8_t *row, const rows_field *field,
 int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why, size_t len)
 {
     component *c = nullptr;
-    const rows_field *fields = nullptr;
+    const schema_field *fields = nullptr;
     uint32_t field_count, k;
     uint32_t i, text_total = 0, text_used = 0;
     uint8_t *row;
@@ -150,13 +161,14 @@ int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why
             return 1;
         }
     }
-    field_count = rows_fields(b->rows, c->type, &fields);
+    fields = c->s.fields;
+    field_count = c->s.field_count;
 
     /* the text bridge_text fields will hold, to know where it goes before any is written */
     for (i = 0; i < cfg->setting_count; i ++) {
         const bridge_setting *s = &cfg->settings[i];
         for (k = 0; k < field_count; k ++) {
-            if (s->key && !strcmp(fields[k].name, s->key) && fields[k].kind == ROWS_TEXT
+            if (s->key && !strcmp(fields[k].name, s->key) && fields[k].kind == SCHEMA_TEXT
                 && fields[k].count == 1 && s->kind == BRIDGE_STRING && s->v.s) {
                 text_total += ((uint32_t)strlen(s->v.s) + 7u) & ~7u;
             }

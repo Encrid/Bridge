@@ -132,7 +132,7 @@ int main(int argc, char **argv)
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[1] = {{ "wasm", BACKEND_PATH }};
     const char *phases[2] = { "update", "present" };
-    bridge_config cfg = { backends, 1, phases, 2, nullptr, 0, 1, { 4096, 4096, 1 << 20, 8, 64 } };
+    bridge_config cfg = { backends, 1, phases, 2, nullptr, 0, 1, { 4096, 4096, 1 << 20, 8, 64, 64, 128 } };
     bridge_artifact a;
     bridge *b;
     setvbuf(stdout, nullptr, _IONBF, 0);
@@ -144,6 +144,12 @@ int main(int argc, char **argv)
     }
     if (!strcmp(what, "nophases")) cfg.phase_count = 0;
     if (!strcmp(what, "nobudget")) cfg.budget.columns = 0;
+    /* the three keys storage of our own brought: each unset, and the two counts used up */
+    if (!strcmp(what, "unsettables")) cfg.budget.tables = 0;
+    if (!strcmp(what, "unsettypes")) cfg.budget.types = 0;
+    if (!strcmp(what, "unsetsystems")) cfg.budget.systems = 0;
+    if (!strcmp(what, "notypes")) cfg.budget.types = 1;
+    if (!strcmp(what, "nosystems")) cfg.budget.systems = 1;
     if (!strcmp(what, "nocolumns")) cfg.budget.columns = (uint64_t)atoi(argc > 2 ? argv[2] : "0");
     /* a size no offset reaches, and three that are each in reach and together are not */
     if (!strcmp(what, "beyond")) cfg.budget.entities = (uint64_t)1 << 40;
@@ -203,6 +209,9 @@ int main(int argc, char **argv)
         a.cfg.spans = 16;
         load(b, &a);
         frames(b, 1);
+    } else if (!strcmp(what, "notypes") || !strcmp(what, "nosystems")) {
+        a = artifact("game:mover@0.1.0", "mover");      /* two components, and two systems */
+        load(b, &a);
     } else if (!strcmp(what, "nocolumns")) {    /* storage cannot hold what the mover spawns */
         a = artifact("game:mover@0.1.0", "mover");
         load(b, &a);

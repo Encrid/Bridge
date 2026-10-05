@@ -8,6 +8,9 @@ Two tiers, because two things are being sized.
     persistent    the persistent arena, in bytes
     columns       every table's rows, in bytes: its entity ids and its columns
     tables        how many sets of components entities may carry at once
+    types         how many types may be declared at once: components, and the structs, enums
+                  and bitmasks their fields name
+    systems       how many systems and observers may be registered at once
     max_modules   how many modules may be loaded at once
 
 One block serves everyone, so no single module could size it. It arrives as a struct rather than a
@@ -19,6 +22,20 @@ entities carry at one time. It sizes everything storage keeps a table, and one m
 is a module's: `column_base` has a cell for each of the module's components in every table there
 may be, inside its `spans`. A module whose `spans` cannot hold that is refused at load, by the
 arithmetic, and not stopped at whichever barrier made one table too many.
+
+**`types` and `systems` are counts of what is there at once, across every module.** A type two
+modules declare is one. A reload registers the new instance's systems before the old one's are
+dropped, so for its length both count. They exist because storage's memory is a product: a table
+keeps an offset for every type there may be, and a system keeps a place for every table there may
+be. With the two stated, everything storage holds is known and allocated when the bridge is
+created, and it allocates nothing after - `storage.md`, *What bounds it*. A `declare` or a
+`system` past its key is refused there, by name, which fails that module's `init`.
+
+Refused: allocating at load for however many types and systems a module turns out to have, which
+is what this first did: memory that is a stated budget times a number nobody stated. Refused: a
+module stating its own counts, which `init` already says by declaring. The condition that brings
+either back is a host that cannot state a ceiling for modules it has not seen - and it states one
+for `max_modules` already.
 
 **Per module, when that module registers:** its scratch arena, its log ring and its spans - which
 is to say, this tier sizes that module's private memory. And what is set aside for it in the shared
@@ -81,6 +98,8 @@ runs out:
                                                 failure of the module that asked
     log_ring               at a write           the line is dropped and counted
     max_modules            at a load            the load is refused
+    types, systems         at a `declare` or    the module's `init` fails
+                           a `system`
 
 **An entry that cannot be honoured abandons the invocation that made it.** `spawn` answers an id and
 no status, so a module has nothing to test - `abi.md`, *The ABI* - and the failure cannot be a value.
