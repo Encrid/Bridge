@@ -303,16 +303,21 @@ with a measured baseline, which is why it is the proof. Its probe asserts 191 ch
 them ask another module a question synchronously - `costs.md`, *What we give up*, names both - so
 189 is the number that can pass.
 
+It is also the first deployment that needs a clock and a set of phases, and nothing ships either:
+`no-builtins.md`, *No builtins*, and `schedule.md`, *Bridge-ASM700 ships no phase names*. Both are
+this deployment's own here. Whether either becomes content that deployments share - a module with
+a name and a version, a list of phase names - is this phase's question to put, by the method of
+`PHASE0.md`, with what the port actually needed in hand.
+
 *Done when 189 of the probe's checks pass, the two that cannot are the two named, and the GDExample
-frame is an order of magnitude under 42 us. If it is not, the architecture did not deliver and we
-find out here.*
+frame is an order of magnitude under 42 us: if it is not, the architecture did not deliver and we
+find out here. And when what the port needed of a clock and of phases is written down, with the
+answer to whether it is shared.*
 
 ## Not in this plan
 
 Each is refused or deferred in the document named, with the condition that would bring it in.
 
-    a default phase set              `schedule.md`, *Bridge-ASM700 ships no phase names*
-    bridge:clock@1 and its kind      `no-builtins.md`, *No builtins*
     per-component page mapping       `costs.md`, *What we give up*
     a phase exclusivity flag         `schedule.md`, *A phase is a name and nothing else*
     memory high-water per module     `profile.md`, *The profile*

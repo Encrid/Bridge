@@ -21,9 +21,17 @@ without its phases and its budgets. Storage and the memories are. A **clock is n
 program has no frame, and a component every deployment carried regardless would be content baked
 into the orchestrator. So is an engine, a device, a filesystem.
 
-The cost: nothing works out of the box, and two authors needing "time" no longer agree for free. The
-answer is a default set shipped as **versioned, named modules** - `bridge:clock@1` as something a
-deployment depends on - rather than a standard library bolted into the orchestrator.
+The cost: nothing works out of the box, and two authors needing "time" no longer agree for free.
 
-That is not a hole in the rule. A deployment depending on `bridge:clock@1` chose to, can fork it,
-and can do without it. A name baked into the orchestrator would be unavoidable and unreplaceable.
+**Nothing ships a clock, and nothing ships a set of phases.** Not the library, by the test above;
+and not a host, which runs what a deployment stated and invents nothing for it. A deployment that
+needs time has a native module that declares a component and writes it, and that module is the
+deployment's own.
+
+What would let two authors agree is content that is neither the library's nor a host's: a
+module with a name and a version - `bridge:clock@1`, say - that a deployment chooses to depend on,
+can fork, and can do without. That is not a hole in the rule: a name baked into the orchestrator
+would be unavoidable and unreplaceable, and this is neither. **It does not exist, and it is not
+built on a guess.** `PLAN.md`, phase 16, builds the first real deployment, which needs both a clock
+and phases; they are that deployment's own, and whether either becomes shared content is asked
+there. The condition that makes it is a second deployment, by another author, needing the same.

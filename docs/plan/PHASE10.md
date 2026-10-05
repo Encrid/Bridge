@@ -420,9 +420,10 @@ read in its document and becomes a phase, a refusal with its condition, or nothi
 
     closed  the journal, record and replay: a phase of its own, `PLAN.md` 14, with the
             library's half and the host's half named apart; and a case, now, that a run says
-            the same on one thread as on four
-    open    a default phase set
-    open    bridge:clock@1 and its kind
+            the same on one thread as on four                                         7e6eadf
+    closed  a default phase set, and bridge:clock@1 and its kind: one question. Nothing ships
+            either; the first real deployment, `PLAN.md` 16, states its own and asks whether
+            they are shared
     open    per-component page mapping
     open    a phase exclusivity flag
     open    memory high-water per module

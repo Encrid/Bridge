@@ -33,9 +33,10 @@ refuses one with a phase named twice.
 **flecs does ship eight, and where it ships them is the point.** `EcsOnLoad` through `EcsOnStore`
 are bootstrapped by the **pipeline addon** (`src/addons/pipeline/pipeline.c:968`), not by the core,
 and `ecs_pipeline_init` lets a world define its own instead. So they are an optional default made of
-replaceable data, not names the library imposes. A default belongs there here too: beside the
-library, as something a deployment chooses - the answer `no-builtins.md`, *No builtins*, gives for a
-clock.
+replaceable data, not names the library imposes. Here nothing ships one at all: not the library,
+and not a host, which hands over the phases its deployment stated. Whether a set of names ever
+becomes something deployments share is the question `no-builtins.md`, *No builtins*, puts for a
+clock, and it is asked where the first real deployment is built: `PLAN.md`, phase 16.
 
 flecs' phases carry `DependsOn` relationships, and `:942` records the care that needs -
 *"EcsOnUpdate doesn't have a direct DependsOn relationship on EcsPreUpdate, which ensures that when
