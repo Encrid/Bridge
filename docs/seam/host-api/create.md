@@ -6,6 +6,11 @@ size the shared block, and build the phase table. It loads no module - the host 
 **Opening a backend** is opening its library, finding the seventeen entries of `backend.md`, *What a
 backend is asked for*, by name, and calling `backend_create` with that backend's settings.
 
+**A library named by a path is looked for there, and so is what it needs.** A backend brings its
+runtime beside itself, and a host's executable is somewhere else. Windows searches beside the
+executable unless told otherwise, so it is told. A bare name, with no directory in it, is left to
+the operating system's own search on every platform. The same holds for a native module's library.
+
 It returns null only when the **deployment** cannot start: **no phases at all**, a phase named
 twice, an `[order]` pair that is malformed or contradicts another, a budget that cannot be satisfied, a
 backend whose library cannot be opened or lacks an entry, or a null `sink`.

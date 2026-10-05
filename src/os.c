@@ -1,6 +1,7 @@
 #include "os.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef _WIN32
 
@@ -28,7 +29,19 @@ void os_release(void *base, size_t reserve)
     if (base) VirtualFree(base, 0, MEM_RELEASE);
 }
 
-void *os_lib_open(const char *path) { return (void *)LoadLibraryA(path); }
+/* A library named by a path is looked for there, and so is what it needs: a backend brings its
+ * runtime beside itself, wherever the host's own executable is. Windows looks beside the
+ * library only when asked, and only for a full path written its own way. A bare name is left to
+ * the system's search, as on every platform. */
+void *os_lib_open(const char *path)
+{
+    char full[MAX_PATH];
+    DWORD len;
+    if (!strpbrk(path, "/\\")) return (void *)LoadLibraryA(path);
+    len = GetFullPathNameA(path, sizeof full, full, NULL);
+    if (!len || len >= sizeof full) return NULL;
+    return (void *)LoadLibraryExA(full, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+}
 void *os_lib_sym(void *lib, const char *name) { return (void *)GetProcAddress((HMODULE)lib, name); }
 void  os_lib_close(void *lib) { if (lib) FreeLibrary((HMODULE)lib); }
 

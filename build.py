@@ -153,7 +153,7 @@ def build(target, debug, out):
     zig = tool('zig') or die('zig is not on the path')
     wasm_tools = tool('wasm-tools') or die('wasm-tools is not on the path')
     merge, opt = binaryen(out.parent)
-    obj, modules = out / 'obj', out / 'modules'
+    obj, modules, backends = out / 'obj', out / 'modules', out / 'backends'
     wasmtime = ROOT / 'third_party/wasmtime'
     runtime = wasmtime / ('windows/wasmtime.dll' if windows else 'linux/libwasmtime.so')
     link_wasmtime = wasmtime / 'windows/libwasmtime.dll.a' if windows else runtime
@@ -196,8 +196,8 @@ def build(target, debug, out):
     # ---- objects ----
     flecs = '-I%s' % (out / 'flecs')
     defines = ['-D%s="%s"' % (key, path.as_posix()) for key, path in
-               [('BACKEND_PATH', out / ('bridge-wasm' + lib)),
-                ('NATIVE_PATH', out / ('bridge-native' + lib)), ('MODULE_DIR', modules)] +
+               [('BACKEND_PATH', backends / ('bridge-wasm' + lib)),
+                ('NATIVE_PATH', backends / ('bridge-native' + lib)), ('MODULE_DIR', modules)] +
                [('%s_PATH' % name.upper(), out / (name + lib)) for name, _, _ in NATIVE]]
     compiles = []
 
@@ -241,10 +241,12 @@ def build(target, debug, out):
                        ['-o', target_file]]))
 
     # the backend loads wasmtime from beside itself
-    step('copying wasmtime', [out / runtime.name], [runtime],
-         [lambda: shutil.copyfile(runtime, out / runtime.name)])
-    link('bridge-wasm', [wasm_o, os_o], [link_wasmtime] + system + here, shared=True)
-    link('bridge-native', [native_o, os_o], system, shared=True)
+    # the backend loads wasmtime from beside itself, which is not beside the programs: a host is
+    # not where its backends are, and the tests would not notice if they were
+    step('copying wasmtime', [backends / runtime.name], [runtime],
+         [lambda: shutil.copyfile(runtime, backends / runtime.name)])
+    link('backends/bridge-wasm', [wasm_o, os_o], [link_wasmtime] + system + here, shared=True)
+    link('backends/bridge-native', [native_o, os_o], system, shared=True)
     for name, _, _ in NATIVE:
         link(name, [module_o[name]], shared=True)
     for test, variant, name in (('confined', 'flecs', 'confined'), ('rowmove', 'flecs', 'rowmove'),

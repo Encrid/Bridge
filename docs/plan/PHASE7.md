@@ -44,8 +44,8 @@ does what they did, as commands in order:
     wasm modules      assembled from text, or compiled, merged with the accessors and inlined
     the tests         one table: a name, a command, what its output must match and must not
 
-Nothing in `src/`, `backends/` or `include/` changed for it, and one line of `src/store.c` did for
-what it found, below. They are still compiled as C11, since C99
+Nothing in `src/`, `backends/` or `include/` changed for it. One line of `src/store.c` and one
+function of `src/os.c` did for what it found, below. They are still compiled as C11, since C99
 needs the changes that are phase 9.
 
 On Windows the target is `x86_64-windows-gnu` with the C runtime zig carries, which phase 10 takes
@@ -89,6 +89,13 @@ it had used none the move was the whole block onto itself: eight bytes times its
 every barrier. The two C runtimes' `memmove` differ in speed, which is all the two builds
 disagreed about. With nothing used, nothing is moved now: a barrier of that test went from 5.2
 microseconds under `cl` and 7.7 under zig to 0.6 under both, and both read 0.39 ns a row.
+
+**A backend's runtime was found beside the program, not beside the backend.** Windows looks for
+what a library needs beside the executable, and every test passed because the build put everything
+in one directory. A host in a directory of its own would have been told the backend could not be
+opened. A library named by a path is now opened with its own directory searched - `create.md`,
+*Create* - and the build puts the backends in a directory the test programs are not in, so that
+all of them fail without it: one hundred and twenty did.
 
 wasmtime's `mingw` library linked and loaded at the first attempt, which was the one thing that
 could have sent the Windows target back to be asked again. Nothing trapped in a debug build.
