@@ -37,7 +37,7 @@ which has to be the one that loaded it - `pinned.md`, *Threads*.
 
 ## The tests
 
-Fourteen new ones, fifty-seven in all, in a release build and a debug one. The three that depend on
+Eighteen new ones, sixty-one in all, in a release build and a debug one. The three that depend on
 timing were run six times over.
 
     order        the mover adds 1, then the halver halves, by one `[order]` pair: sum 125,250
@@ -51,6 +51,13 @@ timing were run six times over.
                  id, under the same barrier count as the attach
     chain        three observers in a chain: barriers 1, 2 and 3, each hop said once
     reserved     an observer named `init`: refused
+    events       one observer of all three: an attach to an entity without the component
+                 arrives as add and set, an attach to one with it as set, a detach as remove,
+                 with an id that then leads nowhere
+    obsconflict  two modules' observers of one change, one writing what the other reads: the
+                 second load refused, both named, "at the barrier"
+    obsorder     the same two ordered by `[order]`: the reader sees 77, the value attached
+    obsreorder   the pair reversed: it sees 5, the value the other observer wrote
     parallel     two native modules each sleep 100 ms, two threads: 100 ms, two thread ids
     serial       the same on one thread: 200 ms, one thread id
     pinned       a pinned module among two others on four threads: 9 of its 9 calls on the
@@ -81,19 +88,14 @@ and a list instead of spans. `abi.md` had said so, and the code agrees in one fu
 is noted where it happens and said after the join, so the sink keeps the property `create.md`
 gives it.
 
-## What it left
+## Shortcuts taken
+
+Each works, is marked where it is written, and becomes work only if a measurement says so.
 
 **Every ABI entry runs under one lock** - `threads.md`, *Threads*, with what replaces it.
 
 **The schedule is recomputed whole at every load**, with a dense matrix per phase. Stated where it
 is written, with what replaces it.
-
-**Observers run by the same levels as systems**, so two that conflict across modules need an
-`[order]` pair as two systems would. No test loads such a pair; the path is the one `ambiguous`
-takes.
-
-**`ON_SET` and `ON_REMOVE` are passed to flecs and have no test of their own.** The chain and the
-cross-backend case both use `ON_ADD`.
 
 ## Open questions
 

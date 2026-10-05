@@ -166,6 +166,8 @@ int main(int argc, char **argv)
     const char *phases[2] = { "update", "present" };
     bridge_order pairs[2] = {{ "game:mover:move", "view:halver:halve" },
                              { "view:halver:halve", "game:mover:move" }};
+    bridge_order seen_first = { "view:watcher:seen", "view:fixer:fix" };
+    bridge_order fix_first = { "view:fixer:fix", "view:watcher:seen" };
     bridge_config cfg = { backends, 2, phases, 2, NULL, 0, 1, { 4096, 4096, 1 << 20, 8 } };
     bridge_artifact a;
     bridge *b;
@@ -174,6 +176,8 @@ int main(int argc, char **argv)
     if (!strcmp(what, "order")) { cfg.order = &pairs[0]; cfg.order_count = 1; }
     if (!strcmp(what, "reorder")) { cfg.order = &pairs[1]; cfg.order_count = 1; }
     if (!strcmp(what, "cycle")) { cfg.order = pairs; cfg.order_count = 2; }
+    if (!strcmp(what, "obsorder")) { cfg.order = &seen_first; cfg.order_count = 1; }
+    if (!strcmp(what, "obsreorder")) { cfg.order = &fix_first; cfg.order_count = 1; }
     if (!strcmp(what, "parallel")) cfg.threads = 2;
     if (!strcmp(what, "pinned") || !strcmp(what, "wrongthread")) cfg.threads = 4;
     if (!strcmp(what, "hop")) cfg.threads = 4;
@@ -220,6 +224,25 @@ int main(int argc, char **argv)
         a.cfg.read_count = 2;
         load(b, &a);
         frames(b, 2);
+    } else if (!strcmp(what, "obsconflict") || !strcmp(what, "obsorder")
+               || !strcmp(what, "obsreorder")) {
+        /* two observers of one change, in two modules, one of them writing what the other
+         * reads: the barrier is a phase like any other to the conflict graph */
+        a = native("game:setter@0.1.0", NSETTER_PATH);
+        load(b, &a);
+        a = wasm("view:watcher@0.1.0", "watcher");
+        a.cfg.read = game;
+        a.cfg.read_count = 2;
+        load(b, &a);
+        a = wasm("view:fixer@0.1.0", "fixer");
+        a.cfg.write = &game[1];
+        a.cfg.write_count = 1;
+        load(b, &a);
+        frames(b, 1);
+    } else if (!strcmp(what, "events")) {       /* add and set, then set, then remove */
+        a = wasm("game:events@0.1.0", "events");
+        load(b, &a);
+        frames(b, 3);
     } else if (!strcmp(what, "chain")) {
         a = wasm("game:chain@0.1.0", "chain");
         load(b, &a);

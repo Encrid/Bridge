@@ -331,7 +331,7 @@ set_tests_properties (phase4-untrusted phase4-limit PROPERTIES FAIL_REGULAR_EXPR
 
 # ---- phase 5: the schedule, observers, threads. docs/plan/PHASE5.md ----
 
-foreach (name halver twostep watcher chain badobs)
+foreach (name halver twostep watcher chain badobs events fixer)
     wasm_module (${name} ${name} checked)
 endforeach ()
 get_property (C_MODULES GLOBAL PROPERTY C_MODULES)
@@ -376,3 +376,7 @@ phase5_case (nothreads   "threads is unset.*bridge_create refused")
 # a chain that hung would log a hop twice: each is said once
 set_tests_properties (phase5-chain PROPERTIES FAIL_REGULAR_EXPRESSION "hop A.*hop A")
 phase5_case (hop         "sum 275000 0")
+phase5_case (events      "any: event 3 1.*any: event 2 2.*any: event 4 57005")
+phase5_case (obsconflict "module 'view:fixer@0.1.0' did not load: 'view:watcher:seen' and 'view:fixer:fix' both touch 'game:Marked' at the barrier, one of them writing it, and nothing orders them.*seen 1 77")
+phase5_case (obsorder    "view:fixer@0.1.0: loaded.*seen 1 77")
+phase5_case (obsreorder  "view:fixer@0.1.0: loaded.*seen 1 5")
