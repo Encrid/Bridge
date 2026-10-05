@@ -43,9 +43,6 @@ diagram to keep in step with. One concern per document, in reading order:
 
     seam/backend/            Bridge-ASM700 to a backend
         backend.md           the seventeen entries, memory, the clock
-
-    seam/backend/impl/       one document per backend
-        wasmtime.md          the wasm backend: the pin, adoption, deadlines
         capabilities.md      what a backend says it can do
         signatures.md        imports declared, exports checked
 
@@ -82,32 +79,46 @@ diagram to keep in step with. One concern per document, in reading order:
         engine-callbacks.md  answering an engine from storage
         schema.md            how a module declares its data
 
-    modules/impl/            how a module binds, per backend
-        wasm.md              on the wasm backend
-        native.md            on the native backend
+    backends/wasm/           the wasm backend, and how a module is written for it
+        wasm.md              a wasm module: memories, accessors, exports
+        wasmtime.md          the engine behind it: the pin, adoption, deadlines
+
+    backends/native/         the native backend, and how a module is written for it
+        native.md            a native module: the table of entries, the invariant
 
 The seams are host to Bridge-ASM700, Bridge-ASM700 to a backend, and Bridge-ASM700 to modules. The
 first two have a directory of their own under `seam/`: a separate build target sits on the far side,
-and filing the contract under either side would suggest that one owns it. The module seam is
-documented in `modules/`, beside what a module is.
+and filing the contract under either side would suggest that one owns it. The module seam is in
+two places because it has two owners. `modules/` is what is true of a module whatever runs it.
+`backends/` is how one is written for the backend that runs it.
 
 A backend is below the orchestrator rather than being a fourth layer: it has no modules and no
 deployment, it runs code. The one thing it is configured with is its own - a cache directory, a tick
 period: `backend.md`, *The backend owns its clock*.
 
-**A header per seam, in `include/`**, and beside each backend the binding a module on that
-backend is written with:
+**The repository is laid out the same way: a path says whose a thing is.**
 
-    include/bridge.h              host seam: the functions and their structs
-    include/bridge-abi.h          module seam: what Bridge-ASM700 writes for a module to read,
-                                  the same on every backend - `wasm.md`, *The published layouts*
-    include/bridge-backend.h      backend seam: the seventeen entries in `backend.md`
+    include/                 the three seams Bridge-ASM700 defines, and nothing else
+        bridge.h                 host seam: the functions and their structs
+        bridge-backend.h         backend seam: the seventeen entries in `backend.md`
+        bridge-abi.h             module seam: what Bridge-ASM700 writes for a module to read,
+                                 the same on every backend - `wasm.md`, *The published layouts*
+    src/                     the library. Nothing outside it is compiled against it
+    backends/wasm/           the wasm backend: its source, and what it needs of the system
+        sdk/                     how a wasm module is written: `bridge-wasm.h`, and the
+                                 accessors of `bridge-wasm.wat` that are merged into one
+        wasmtime/                the engine it is linked against
+    backends/native/         the native backend: its source, and what it needs of the system
+        sdk/                     how a native module is written: `bridge-native.h`
+    tests/                   the hosts that drive the cases
+        modules/wasm/            the modules they load, by the backend that runs each
+        modules/native/
+    tools/                   the scans
+    build.py                 the build - `build.md`, *One script*
 
-    backends/wasm/bridge-wasm.h   how a wasm module reaches it: the imports, and the accessors
-      and bridge-wasm.wat         of the text file merged into it - `schema.md`, *What a module
-                                  compiles against*
-    backends/native/              how a native module reaches it: `bridge_api`, and the names
-      bridge-native.h             it exports - `native.md`, *What the backend provides*
+A backend is compiled against `include/bridge-backend.h` and its own folder. It shares no code
+with the library, not even the few calls each makes to the operating system: a backend that
+somebody else writes has only the seam, and ours are held to the same.
 
 **How a module is written is its backend's, and not Bridge-ASM700's.** A backend is handed bytes,
 memories and host functions and asked to run a function - `backend.md`, *What the backend does not

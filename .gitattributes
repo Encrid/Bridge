@@ -1,4 +1,4 @@
-third_party/wasmtime/include/** -text
-third_party/wasmtime/windows/* binary
-third_party/wasmtime/linux/* binary
-third_party/wasmtime/macos/* binary
+backends/wasm/wasmtime/include/** -text
+backends/wasm/wasmtime/windows/* binary
+backends/wasm/wasmtime/linux/* binary
+backends/wasm/wasmtime/macos/* binary

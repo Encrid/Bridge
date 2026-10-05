@@ -6,7 +6,7 @@ wasmtime and would be different under another engine.
 
 ## The pin
 
-wasmtime **48.0.5**, its C API, vendored under `third_party/wasmtime/`. 48 is a long-term release,
+wasmtime **48.0.5**, its C API, vendored under `backends/wasm/wasmtime/`. 48 is a long-term release,
 supported for 24 months where an ordinary one gets two. This backend exists for its sandbox, so
 getting security fixes outweighs matching the 47 the original Bridge runs.
 
@@ -44,7 +44,7 @@ segments down as a mapped image rather than copying them, and asserts that the m
 image is one it mapped itself. No memory here is: all of them come from the creator. Left on, a
 module whose data happens to fit an image aborts the process at instantiation - on Linux and not on
 Windows, which has no such images, so the first Linux run over such a module is
-what found it. `tests/modules/image.wat` is a module that would.
+what found it. `tests/modules/wasm/image.wat` is a module that would.
 
 The creator is asked for every memory, a module's own included, and is not told which. The backend
 knows because it asks: an adoption is in progress, or it is not.

@@ -440,8 +440,10 @@ read in its document and becomes a phase, a refusal with its condition, or nothi
             asked. `lifetime.md` says the library "cannot" tell what changed, which is false
     closed  bindings for a non-C module: a phase of its own, `PLAN.md` 15, with two owners.
             What Bridge-ASM700 writes is its own to state; how a module reaches it is the
-            backend's, and the binding files moved beside their backends. Tried first: the
-            project's compiler cannot translate the header
+            backend's. Tried first: the project's compiler cannot translate the header
+    closed  the tree itself, which had said otherwise: a folder for each owner. A backend has
+            its binding, its dependency and its own calls to the system, and compiles nothing
+            of the library's inside; test modules are filed by the backend that runs them
 
 **1b. Words**: found by the item above. "layout" is used sixty-two times in the documents for
 at least five things, none defined, and none of them the one that was meant.

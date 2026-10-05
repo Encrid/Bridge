@@ -1,6 +1,6 @@
 /* Asks for a term whose type changes per table, which has no typed accessor. */
 #include "bridge-wasm.h"
-#include "game.h"
+#include "../game.h"
 
 BRIDGE_EXPORT(any) int any() { return 0; }
 

@@ -1,7 +1,7 @@
 /* One observer of all three events, and a system that causes each in turn: an attach to an
  * entity without the component, an attach to one with it, and a detach. */
 #include "bridge-wasm.h"
-#include "game.h"
+#include "../game.h"
 
 static uint32_t marked, watching, runs;
 static uint64_t entity;

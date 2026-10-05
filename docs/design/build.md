@@ -72,7 +72,7 @@ for a platform that is leaving. The condition that brings it back is a deploymen
 the source, the tests, the test modules and all five headers. flecs was C99, built by its own flags
 as it asked, until phase 10 removed it.
 
-    third_party/wasmtime/include  C11    read by backends/wasm/wasm.c and nothing else
+    backends/wasm/wasmtime        C11    read by backends/wasm/wasm.c and nothing else
     everything else               C23
 
 A file in a later standard reads a header in an earlier one, which is the direction that costs
@@ -174,6 +174,6 @@ All of the above is how Bridge-ASM700 is built. **A module is built with whateve
 in any language that can produce a wasm module or a shared library. What binds it is the ABI: the
 layouts of `bridge-abi.h`, the exported names, and the section its manifest sits in - `abi.md`,
 *The ABI*, and `module.md`, *The manifest*. `bridge-wasm.h` and `bridge-native.h` are C's binding
-of that, not the contract itself, and each is its backend's: it sits in `backends/`, beside the
-backend that runs what is written with it. They are C23, and so is whatever includes them: *The
+of that, not the contract itself, and each is its backend's: it sits in that backend's `sdk/`,
+beside the backend that runs what is written with it. They are C23, and so is whatever includes them: *The
 standard*.

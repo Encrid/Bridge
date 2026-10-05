@@ -1,6 +1,6 @@
-/* The operating system, as far as Bridge-ASM700 and its backends need it:
- * address space, shared libraries, threads, an event and a mutex. Nothing here knows
- * what a module is. */
+/* The operating system, as far as Bridge-ASM700 needs it: address space, shared libraries,
+ * threads, an event and a mutex. It is the library's own: a backend carries what it needs of
+ * the system itself, beside it, and compiles nothing from here. */
 #ifndef BRIDGE_OS_H
 #define BRIDGE_OS_H
 
@@ -11,7 +11,6 @@
  * readable, writable and zero. The rest faults when touched, which is what a
  * backend that enforces bounds by faulting needs after a block. nullptr on failure. */
 [[nodiscard]] void *os_reserve(size_t reserve, size_t commit);
-[[nodiscard]] int os_commit(void *base, size_t bytes);          /* 0 on success */
 void  os_release(void *base, size_t reserve);
 
 [[nodiscard]] void *os_lib_open(const char *path);                /* nullptr on failure */
@@ -23,10 +22,6 @@ typedef struct os_thread os_thread;
 void       os_thread_join(os_thread *t);
 uint64_t   os_thread_id();                      /* of the calling thread */
 uint64_t   os_now();                            /* nanoseconds, from a clock that only rises */
-
-/* One lock for the process, for what a library can only do one at a time. */
-void os_global_lock();
-void os_global_unlock();
 
 typedef struct os_mutex os_mutex;
 [[nodiscard]] os_mutex *os_mutex_new();

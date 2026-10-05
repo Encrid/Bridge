@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parent
 # What differs by target, and nothing else does: where it runs, how a program and a library are
 # named, which of the system's declarations are asked for by name (the language is ISO C, and a
 # compiler's gnu mode would have shown them unasked), what a link names, how a library finds what
-# sits beside it, and wasmtime's files under third_party/wasmtime: the one a backend is linked
+# sits beside it, and wasmtime's files under backends/wasm/wasmtime: the one that backend is linked
 # against, and the one it loads.
 TARGETS = {
     'x86_64-windows-gnu': {
@@ -174,7 +174,7 @@ def build(target, debug, out):
     wasm_tools = tool('wasm-tools') or die('wasm-tools is not on the path')
     merge, opt = binaryen(out.parent)
     obj, modules, backends = out / 'obj', out / 'modules', out / 'backends'
-    wasmtime = ROOT / 'third_party/wasmtime'
+    wasmtime = ROOT / 'backends/wasm/wasmtime'
     link_wasmtime, runtime = (wasmtime / f for f in row['wasmtime'])
 
     cc = [zig, 'cc', '-target', target] + (['-O0', '-g'] if debug else ['-O2', '-DNDEBUG'])
@@ -186,9 +186,10 @@ def build(target, debug, out):
     system, here = row['link'], row['beside']
     include, src = '-I%s' % (ROOT / 'include'), '-I%s' % (ROOT / 'src')
     # how a module is written is its backend's: each backend's binding sits beside the backend
-    sdk = {b: '-I%s' % (ROOT / 'backends' / b) for b in ('wasm', 'native')}
+    sdk = {b: '-I%s' % (ROOT / 'backends' / b / 'sdk') for b in ('wasm', 'native')}
     headers = [Path(__file__)] + [h for d in ('include', 'src', 'tests', 'tests/modules',
-                                              'backends/wasm', 'backends/native')
+                                              'backends/wasm', 'backends/wasm/sdk',
+                                              'backends/native', 'backends/native/sdk')
                                   for h in (ROOT / d).glob('*.h')]
 
     # ---- objects ----
@@ -206,10 +207,12 @@ def build(target, debug, out):
 
     os_o = compile_('os', ROOT / 'src/os.c', ours + [src])
     bridge_o = [compile_(name, ROOT / 'src' / (name + '.c'), ours + [include, src]) for name in BRIDGE]
-    wasm_o = compile_('wasm', ROOT / 'backends/wasm/wasm.c',
-                      ours + [include, src, '-I%s' % (wasmtime / 'include')])
-    native_o = compile_('native', ROOT / 'backends/native/native.c',
-                        ours + [include, src, sdk['native']])
+    # a backend is compiled against the backend seam and what is its own: nothing of src/
+    wasm_o = [compile_('wasm', ROOT / 'backends/wasm/wasm.c',
+                       ours + [include, '-I%s' % (wasmtime / 'include')]),
+              compile_('wasm-os', ROOT / 'backends/wasm/os.c', ours)]
+    native_o = [compile_('native', ROOT / 'backends/native/native.c', ours + [include, sdk['native']]),
+                compile_('native-os', ROOT / 'backends/native/os.c', ours)]
     schema_test_o = compile_('schema-test', ROOT / 'tests/schema.c', ours + [include, src])
     adopt_o = compile_('adopt', ROOT / 'tests/adopt.c', ours + [include, src] + defines)
     phase_o = {name: compile_(name, ROOT / 'tests' / (name + '.c'), ours + [include] + defines)
@@ -234,8 +237,8 @@ def build(target, debug, out):
     # not where its backends are, and the tests would not notice if they were
     step('copying wasmtime', [backends / runtime.name], [runtime],
          [lambda: shutil.copyfile(runtime, backends / runtime.name)])
-    link('backends/bridge-wasm', [wasm_o, os_o], [link_wasmtime] + system + here, shared=True)
-    link('backends/bridge-native', [native_o, os_o], system, shared=True)
+    link('backends/bridge-wasm', wasm_o, [link_wasmtime] + system + here, shared=True)
+    link('backends/bridge-native', native_o, system, shared=True)
     for name, _, _ in NATIVE:
         link(name, [module_o[name]], shared=True)
     link('adopt', [adopt_o, obj / 'backend.o', os_o], system)
@@ -247,7 +250,7 @@ def build(target, debug, out):
     together(links)
 
     # ---- wasm modules: text assembled, C compiled and merged with the accessors ----
-    accessors = ROOT / 'backends/wasm/bridge-wasm.wat'
+    accessors = ROOT / 'backends/wasm/sdk/bridge-wasm.wat'
     unchecked = out / 'bridge-wasm-unchecked.wat'
 
     def without_row_test():
@@ -259,7 +262,7 @@ def build(target, debug, out):
          [without_row_test])
     assembled = [('assembling %s' % wat.name, [modules / (wat.stem + '.wasm')], [wat],
                   [[wasm_tools, 'parse', wat, '-o', modules / (wat.stem + '.wasm')]])
-                 for wat in sorted((ROOT / 'tests/modules').glob('*.wat'))]
+                 for wat in sorted((ROOT / 'tests/modules/wasm').glob('*.wat'))]
     assembled += [('assembling the %s accessors' % kind, [modules / ('acc-%s.wasm' % kind)], [wat],
                    [[wasm_tools, 'parse', wat, '-o', modules / ('acc-%s.wasm' % kind)]])
                   for kind, wat in (('checked', accessors), ('unchecked', unchecked))]
@@ -268,7 +271,7 @@ def build(target, debug, out):
     for name, source, kind, flags in WASM:
         raw, merged, final = (modules / (name + s) for s in ('.raw.wasm', '.merged.wasm', '.wasm'))
         acc = modules / ('acc-%s.wasm' % kind)
-        c = ROOT / 'tests/modules' / (source + '.c')
+        c = ROOT / 'tests/modules/wasm' / (source + '.c')
         compiled.append(('building module %s' % name, [final], [c, acc] + headers, [
             [zig, 'cc', '-target', 'wasm32-freestanding', '-std=c23', '-pedantic-errors', '-Wall',
              '-Wextra', '-Werror', '-Wno-missing-field-initializers', '-O2', '-nostdlib'] +

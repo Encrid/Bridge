@@ -18,11 +18,6 @@ void *os_reserve(size_t reserve, size_t commit)
     return base;
 }
 
-int os_commit(void *base, size_t bytes)
-{
-    return VirtualAlloc(base, bytes, MEM_COMMIT, PAGE_READWRITE) ? 0 : -1;
-}
-
 void os_release(void *base, [[maybe_unused]] size_t reserve)
 {
     if (base) VirtualFree(base, 0, MEM_RELEASE);
@@ -106,7 +101,6 @@ void *os_reserve(size_t reserve, size_t commit)
     return base;
 }
 
-int os_commit(void *base, size_t bytes) { return mprotect(base, bytes, PROT_READ | PROT_WRITE); }
 void os_release(void *base, size_t reserve) { if (base) munmap(base, reserve); }
 
 void *os_lib_open(const char *path) { return dlopen(path, RTLD_NOW | RTLD_LOCAL); }
@@ -199,10 +193,6 @@ uint64_t os_now()
            / (uint64_t)frequency.QuadPart;
 }
 
-static SRWLOCK global_lock = SRWLOCK_INIT;
-void os_global_lock() { AcquireSRWLockExclusive(&global_lock); }
-void os_global_unlock() { ReleaseSRWLockExclusive(&global_lock); }
-
 struct os_mutex { CRITICAL_SECTION section; };
 
 os_mutex *os_mutex_new()
@@ -226,10 +216,6 @@ uint64_t os_now()
     clock_gettime(CLOCK_MONOTONIC, &t);
     return (uint64_t)t.tv_sec * 1'000'000'000ull + (uint64_t)t.tv_nsec;
 }
-
-static pthread_mutex_t global_lock = PTHREAD_MUTEX_INITIALIZER;
-void os_global_lock() { pthread_mutex_lock(&global_lock); }
-void os_global_unlock() { pthread_mutex_unlock(&global_lock); }
 
 struct os_mutex { pthread_mutex_t mutex; };
 

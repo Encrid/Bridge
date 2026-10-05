@@ -1,7 +1,7 @@
 /* Two systems of one module that conflict in one phase: the order they were registered in is
  * the order they run in. Doubling then adding gives 3 from 1; the other way gives 4. */
 #include "bridge-wasm.h"
-#include "game.h"
+#include "../game.h"
 
 static uint32_t position, doubling, adding, showing;
 

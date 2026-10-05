@@ -4,7 +4,7 @@
 
 Reads everything of Bridge-ASM700's own - the source, the backends, the headers, the tests and
 their modules - and fails on a spelling C23 replaced. Comments and string literals are not
-read: a document may say NULL. third_party/ is not ours and is not read either.
+read: a document may say NULL. A backend's dependency is not ours and is not read either.
 
 A macro stays where the preprocessor or a string literal is what is needed, so what is refused
 of #define is a number with a name, which is a constexpr.
@@ -14,8 +14,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OURS = ('src/*.c', 'src/*.h', 'backends/*/*.c', 'backends/*/*.h', 'include/*.h', 'tests/*.c', 'tests/*.h',
-        'tests/modules/*.c', 'tests/modules/*.h', 'tests/modules/native/*.c')
+OURS = ('src/*.c', 'src/*.h', 'backends/*/*.c', 'backends/*/*.h', 'backends/*/sdk/*.h', 'include/*.h',
+        'tests/*.c', 'tests/*.h', 'tests/modules/*.h', 'tests/modules/wasm/*.c',
+        'tests/modules/native/*.c')
 
 # what is found, and what C23 writes in its place
 OLDER = [

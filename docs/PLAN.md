@@ -285,7 +285,7 @@ What a module needs to be written falls in two parts, and they have two owners -
 
     Bridge-ASM700     what it writes for a module to read, the same on every backend:
                       `bridge-abi.h`
-    a backend         how a module it runs reaches that: the binding beside it in `backends/`
+    a backend         how a module it runs reaches that: the binding in its own `sdk/`
 
 Both are C23 today, and `wasm.md`, *The published layouts*, said a module in another language
 derives its binding from the header. That was never tried, and the first try failed: the
