@@ -15,8 +15,9 @@ This file is what every module shares. The calls are `abi.md`; who may name a co
 ## Identity
 
 `namespace:name@version` plus the **ABI version**, and **four things use it**: it is the config key,
-the grant key, the namespace components are declared in, and how `[order]` names a system. A
-module without one is refused.
+the grant key, the namespace components are declared in, and how `[order]` names a system -
+without the version there: `schedule.md`, *Order within a phase is never implicit*. A module without
+one is refused.
 
 Bridge-ASM700 is handed it as data, so **a host that cannot supply an identity cannot load a module**.
 The convention is a named section in the artifact - a wasm custom section on one backend, an

@@ -17,10 +17,10 @@ number with nothing marking it biased**. State must not arrive by a route that c
 the same argument `introspection.md`, *Introspection*, makes for `bridge_modules`.
 
 **Two counters, and `calls` is earned by observers.** A system runs once per pass by construction, so
-counting its calls says nothing; an observer runs once per matched span, so a count and a time are
-different facts there. flecs keeps **one** metric per system - `ecs_system_stats_t.time_spent`,
-`flecs.h:14813` - against sixty-one at the world level, and the discipline is the part worth
-copying.
+counting its calls says nothing; an observer runs once per barrier that triggered it, so a count
+and a time are different facts there. flecs keeps **one** metric per system -
+`ecs_system_stats_t.time_spent`, `flecs.h:14813` - against sixty-one at the world level, and the
+discipline is the part worth copying.
 
 **No per-phase row**, because a phase is the sum of its systems and the host can add. The same rule
 keeps `bridge_module_info` at two fields: do not report what the caller can derive.

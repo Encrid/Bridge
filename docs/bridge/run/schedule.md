@@ -116,10 +116,30 @@ one that chose to deploy them. Either move one into a new phase, or state the pa
     phases = ["setup", "physics", "present"]
 
     [order]
-    before = [["mymod:movement", "othermod:collision"]]
+    before = [["game:actors:movement", "mods:physics:collision"]]
+
+**A system is named by its module and then itself**: the module's identity without its version, and
+the name it registered. Two modules may both have a `movement`, so the system's own name is not
+enough; and the version is left out so that upgrading a module does not edit every deployment that
+orders it. Refused: namespace and system alone, which reads like a component's name and forbids two
+modules of one namespace from sharing a system name. The condition that brings it back is
+namespaces proving to be one module each. It follows that two modules differing only in version
+cannot be loaded together, since nothing could tell their systems apart.
 
 The cost: a deployment combining two conflicting modules has work to do. That work was previously
 done by luck, so making it explicit is the point rather than a regression.
+
+**A module orders its own systems by registering them.** The refusal above exists because two
+parties who never met cannot have agreed on an order. Two conflicting systems of one module have
+one author, who wrote both registrations in some order and meant it - so that order stands, with
+nothing for a deployment to state. `[order]` may still say otherwise, since it can name any system.
+Refused: refusing those pairs as well, which would have a deployment ordering the inside of a
+module it did not write. The condition that brings it back is a module whose registration order
+turns out to be an accident.
+
+An `[order]` pair is not required to name anything loaded: a deployment orders modules it may or
+may not load. Pairs that contradict each other are refused at create, and a module whose own order
+contradicts them is refused at load.
 
 ## What a phase shows you
 

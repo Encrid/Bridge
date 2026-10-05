@@ -9,6 +9,11 @@ created it.** So a module says so, with one key in its manifest:
     pinned = true     every system and observer of this module runs on the thread
                       its init ran on
 
+**That thread is the host's.** `init` runs inside `bridge_load`, on whichever thread called it, and
+Bridge-ASM700 has no thread of its own that existed then. So a pinned module's systems run on the
+thread that calls `bridge_phase`, and a host with a pinned module loaded calls both from one thread.
+A phase asked for from another is refused by name, before anything runs.
+
 **It is the author's key, not the deployment's**, because a key belongs to whoever holds the
 knowledge. An author knows their library must be driven from one thread; a
 deployment author has no access to that fact, so declaring it there would be the deployment

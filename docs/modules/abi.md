@@ -74,6 +74,24 @@ subscribes to a change - `data.md`, *Observers*. `events` is a mask of `ON_ADD`,
 `ON_REMOVE`, and an observer takes no phase because it has one already: the barrier that applied its
 trigger.
 
+**An observer reads which entities, not which rows.** Through the slot `observe` answered it finds
+a list in its private memory, one record per entity that triggered it and the events that did:
+
+    u64 id
+    u32 events    ON_ADD | ON_SET | ON_REMOVE
+
+It is called once per barrier, and only when the list is not empty. It follows an id the way any
+reference is followed - `reference.md`, *Reference following* - and an id that answers nothing was
+removed or destroyed, which is how `ON_REMOVE` is read.
+
+Ids and not a span, because an observer runs after the barrier has restructured and republished -
+`schedule.md`, *An observer runs at the barrier, one hop per barrier*. flecs reports a change as a
+range of rows that is good only inside its own callback, and rows move again before that callback's
+batch is done. An id does not move. Refused: the observer's whole query as spans, which is what a
+system gets and cannot say which entity changed - an event would be found by scanning every event.
+The condition that brings it back is an observer that wants the shape and not the change, and such
+a thing is a system.
+
 **Why it is an entry of its own, and not a system people write.** A system whose query matches an
 event component does the same job by polling, and that is the alternative it has to beat: a poll
 costs a dispatch and a zero-span walk **every pass, per subscriber, whether or not anything
@@ -90,7 +108,8 @@ query may not ask for is `query.md`, *What a query may not ask for*.
 
 A system declares its phase and **nothing about order**, and never names another module's system.
 So no independently shipped module depends on another's internals, and no ordering cycle can span
-authors who have never met.
+authors who have never met. Among a module's own systems the order it registered them in is the
+order: `schedule.md`, *Order within a phase is never implicit*.
 
 **A system takes no arguments.** Its spans are already in its memory, found through the slot
 `system` answered. Frame time is not an argument and not a component Bridge-ASM700 declares: the system

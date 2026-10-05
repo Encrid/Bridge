@@ -90,7 +90,7 @@ address a second memory, which retires the accessor module altogether.
 an integer because a QVM has exactly one entry by construction; core wasm has an export section, so
 that limitation is not ours to inherit. The two cost the same - Bridge-ASM700 resolves the export once at
 init and keeps the handle, so a frame is one call either way - and a name is what four other things
-already need. The deployment's `[order]` names a system: `"mymod:movement"`, not `"mymod:3"`, which
+already need. The deployment's `[order]` names a system: `"game:actors:movement"`, not `"...:3"`, which
 would shift the moment a system is added ahead of it. The profile reports per system rather than per
 module. A trap says which one. Names also survive reordering across a reload, where indices
 assigned in declaration order do not.

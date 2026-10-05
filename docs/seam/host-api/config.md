@@ -31,7 +31,8 @@ as what it hands over is one stated value per key. The original Bridge had the s
     the deployment's                           a module's
     ----------------------------------------   ------------------------------
     phases     an ordered list of names        trusted, hot_reload, on_error
-    [order]    before                          max_system_failures
+    threads    how many run a phase            max_system_failures
+    [order]    before
     [budget]   entities, persistent,           fuel, memory_limit
                columns, max_modules            init/reload/shutdown timeouts
     [checks]   validate, profile               log_level, scratch, log_ring,

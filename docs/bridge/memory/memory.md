@@ -24,7 +24,8 @@ thing it reads there that it cannot derive. Every other shared-memory offset is 
 shared memory itself, including the `(offset, length)` a component holds into the persistent arena,
 so nothing else needs a base.
 
-The span region holds the query slots, the spans and `column_base`. Its size is the module's
+The span region holds the query slots, the spans, `column_base`, and each observer's list of what
+triggered it. Its size is the module's
 `spans` budget, in bytes - `budgets.md`, *Budgets* - and how it is divided is Bridge-ASM700's, redone
 at a barrier, where nothing holds an offset into it. That is Quake's progs layout - fixed offsets at
 the bottom, everything else found through them.

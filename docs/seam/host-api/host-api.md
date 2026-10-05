@@ -80,6 +80,7 @@ as a helper - `native.md`, *Identity*.
         const bridge_backend *backends; uint32_t backend_count;
         const char *const *phases;   uint32_t phase_count;   /* array order IS the order */
         const bridge_order *order;   uint32_t order_count;
+        uint32_t            threads;                         /* counting the caller's */
         bridge_budget       budget;
         bool                validate, profile;               /* [checks] */
     } bridge_config;
