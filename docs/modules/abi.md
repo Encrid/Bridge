@@ -81,9 +81,9 @@ a list in its private memory, one record per entity that triggered it and the ev
     u32 events    ON_ADD | ON_SET | ON_REMOVE
 
 It is called once per barrier, and only when the list is not empty. So an observer has at least
-one term: with none there is no change to subscribe to, and `observe` refuses it. It follows an id the way any
-reference is followed - `reference.md`, *Reference following* - and an id that answers nothing was
-removed or destroyed, which is how `ON_REMOVE` is read.
+one term: with none there is no change to subscribe to, and `observe` refuses it. It follows an id
+the way any reference is followed - `reference.md`, *Reference following* - and an id that answers
+nothing was removed or destroyed, which is how `ON_REMOVE` is read.
 
 Ids and not a span, because an observer runs after the barrier has restructured and republished -
 `schedule.md`, *An observer runs at the barrier, one hop per barrier*. flecs reports a change as a
