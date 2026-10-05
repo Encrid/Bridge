@@ -221,7 +221,28 @@ counters - and `bridge_profile`, a pull. `validation.md`, *The checksum pass, wh
 purpose is the one the profile names, and an observer cycle shows as call counts that never fall to
 zero.*
 
-## 13. Prove it
+## 13. Tests, by capability
+
+Every test so far was written to meet one phase's claim, and is named for the phase: `phase2`
+to `phase6`. That says when a thing was built and not what is covered. This phase turns the
+tests around: **one case for each capability the documents state**, named for the capability, for
+the library and for the standalone host both, and a list that maps each capability to the case
+that proves it. The host's half lives in the host's repository.
+
+It comes after the last phase that adds a capability, so that the list is whole, and before the
+proof, which is a workload and not a test of anything in particular.
+
+Three things the phases did not test, and this one does. **Everything under load**: a hundred and
+twenty-eight passing cases never showed the crash phase 9 found, and six copies at once showed it
+in a minute - `PHASE9.md`. **Everything a document claims**: a claim with no case is found by the
+list and not by reading. **Every refusal**: one, at least, existed for five phases with no test.
+
+*Done when every capability the documents state has a case named for it, and the build fails on
+one that has none; no case is named for a phase; every case passes on Windows, Linux and macOS,
+alone and with several copies running at once; and the standalone host's capabilities are covered
+the same way in its own repository.*
+
+## 14. Prove it
 
 Port the original Bridge's Godot adapter to this design, as a native module. It is a real workload
 with a measured baseline, which is why it is the proof. Its probe asserts 191 checks, and two of
