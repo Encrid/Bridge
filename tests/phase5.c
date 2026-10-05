@@ -373,12 +373,12 @@ int main(int argc, char **argv)
         load(b, &a);
         ms = phase_ms(b, "update");
         printf("two naps of 100 ms took %.0f ms on %u thread(s)\n", ms, distinct_threads());
-        /* not part of what is judged: how long the second waited to begin, for when it fails */
-        printf("the second began %u ms after the first\n", seen < 2 ? 0
-            : began_seen[1] > began_seen[0] ? began_seen[1] - began_seen[0] : began_seen[0] - began_seen[1]);
         printf("%s\n", ms < 180.0 && distinct_threads() == 2 ? "they ran at once"
              : ms > 190.0 && distinct_threads() == 1 ? "they ran one after the other"
              : "neither clearly");
+        /* not part of what is judged: how long the second waited to begin, for when it fails */
+        printf("the second began %u ms after the first\n", seen < 2 ? 0
+            : began_seen[1] > began_seen[0] ? began_seen[1] - began_seen[0] : began_seen[0] - began_seen[1]);
     } else if (!strcmp(what, "pinned")) {       /* three systems, pinned, among others */
         a = native("test:sleep1@0.1.0", NSLEEP1_PATH);
         load(b, &a);
