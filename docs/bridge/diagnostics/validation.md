@@ -35,8 +35,8 @@ and the test could be hoisted, but neither Binaryen nor wasmtime does. Over the 
 system can have, one float read, changed and written back per row of 200,000:
 
                          with the test    without
-    no fuel              0.39 ns a row    0.33      x1.2
-    fuel                 0.66             0.44      x1.5
+    no fuel              0.43 ns a row    0.36      x1.2
+    fuel                 0.68             0.47      x1.4
 
 Under fuel it costs more than itself, because the branch it adds is a block and fuel is counted by
 the block - `limits.md`, *What a bound costs*. `tests/phase3.c`'s `bench` case is the measurement,

@@ -143,7 +143,7 @@ the module never declared is an error naming it.* Met.
 
 ## 7. The build
 
-One compiler and one script. zig compiles everything on every platform, and `build.py` does what
+Done. One compiler and one script. zig compiles everything on every platform, and `build.py` does what
 CMake did: patches flecs, compiles, links, builds the test modules and runs the tests - `build.md`,
 *One compiler* and *One script*. Windows becomes `x86_64-windows-gnu`, and until phase 10 it links
 the C runtime zig carries.
@@ -153,7 +153,7 @@ by another route. `PHASE7.md` is what it built and found.
 
 *Done when `python build.py test` passes every test on Windows, in a release build and a debug one,
 and on Linux; the Linux build compiles and links on Windows; the two tests that must fail still
-fail for their stated reason; and CMake is gone from the tree.*
+fail for their stated reason; and CMake is gone from the tree.* Met.
 
 ## 8. macOS
 
