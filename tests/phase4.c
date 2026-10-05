@@ -10,6 +10,26 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
+
+/* whether a library is in this process, asked of the operating system and of nothing of ours */
+static bool loaded(const char *path)
+{
+#ifdef _WIN32
+    char full[MAX_PATH];
+    DWORD len = GetFullPathNameA(path, sizeof full, full, nullptr);
+    return len && len < sizeof full && GetModuleHandleA(full);
+#else
+    void *lib = dlopen(path, RTLD_NOLOAD | RTLD_NOW);
+    if (lib) dlclose(lib);
+    return lib != nullptr;
+#endif
+}
+
 constexpr int64_t MS = 1'000'000;
 
 static void sink([[maybe_unused]] void *ud, const bridge_record *r)
@@ -91,6 +111,23 @@ int main(int argc, char **argv)
     if (!strcmp(what, "setting")) {             /* a key the backend does not know */
         backends[1].settings = &cache;
         backends[1].setting_count = 1;
+    }
+
+    if (!strcmp(what, "libraries")) {
+        /* What a destroyed bridge leaves in the process: the library of a backend that does
+         * not say it can be unloaded, and not the library of one that does. The wasm
+         * backend's brought wasmtime in, whose own threads do not survive being unloaded.
+         * docs/seam/backend/capabilities.md. */
+        b = bridge_create(&cfg, sink, nullptr);
+        if (!b || bridge_destroy(b)) {
+            printf("FAIL: the bridge was not created and destroyed\n");
+            return 1;
+        }
+        printf("the wasm backend's library is %s, the native backend's is %s\n",
+            loaded(BACKEND_PATH) ? "still loaded" : "GONE",
+            loaded(NATIVE_PATH) ? "STILL LOADED" : "gone");
+        printf("alive\n");
+        return 0;
     }
 
     b = bridge_create(&cfg, sink, nullptr);

@@ -455,6 +455,8 @@ CASES = [
      r"module 'game:mover@0.1.0' is refused: trusted = false needs 'sandbox', which backend 'native' lacks.*alive", r"cannot open"),
     ('phase4-limit', ['phase4', 'limit'],
      r"module 'game:mover@0.1.0' is refused: fuel needs 'meter', which backend 'native' lacks.*alive", r"cannot open"),
+    ('phase4-libraries', ['phase4', 'libraries'],
+     r"the wasm backend's library is still loaded, the native backend's is gone.*alive", None),
     ('phase4-nolib', ['phase4', 'nolib'],
      r"module 'game:mover@0.1.0' did not load: cannot open the library 'no-such-library'.*alive", None),
     ('phase4-refuse', ['phase4', 'refuse'],

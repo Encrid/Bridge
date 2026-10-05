@@ -119,7 +119,7 @@ BACKEND_EXPORT void backend_destroy(backend *b)
  * side by side: a process cannot hold two copies of one library. */
 BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] backend *b)
 {
-    return BACKEND_RELOAD;
+    return BACKEND_RELOAD | BACKEND_UNLOAD;
 }
 
 BACKEND_EXPORT void memory_shape([[maybe_unused]] backend *b, uint64_t *reservation, uint64_t *guard)

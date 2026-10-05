@@ -69,7 +69,10 @@ int bridge_destroy(bridge *b)
     for (i = 0; i < b->backend_count; i ++) {
         open_backend *o = &b->backends[i];
         if (o->be) o->api.backend_destroy(o->be);
-        if (o->lib) os_lib_close(o->lib);
+        /* capabilities.md: only a backend that says its library can go. One that brought a
+         * runtime in is left in the process, where the next bridge finds it again. A library
+         * that was opened and never became a backend said nothing, and is left too. */
+        if (o->lib && (o->capabilities & BACKEND_UNLOAD)) os_lib_close(o->lib);
         free(o->name);
     }
     for (i = 0; i < b->phase_count; i ++) free(b->phases[i]);

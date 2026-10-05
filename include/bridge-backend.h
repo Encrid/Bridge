@@ -32,7 +32,10 @@ enum backend_capability : uint32_t {
     BACKEND_LIMIT    = 1 << 3,
     BACKEND_RELOAD   = 1 << 4,
     /* two instances of one module can exist at once: which order a reload takes */
-    BACKEND_SIDE_BY_SIDE = 1 << 5
+    BACKEND_SIDE_BY_SIDE = 1 << 5,
+    /* its library can be taken out of the process once backend_destroy has returned. A backend
+     * that brought in a runtime with threads of its own does not say so, and stays loaded */
+    BACKEND_UNLOAD = 1 << 6
 };
 
 /* A setting is the backend's own: Bridge-ASM700 passes each through unread. A backend refuses a

@@ -39,6 +39,19 @@ unreleased by the only code that knew how. Refused: calling it anyway, which bre
 fail, so a host that ignores the answer leaks the bridge; the condition that brings the first
 refusal back is hosts that cannot get back to the right thread at exit.
 
+**A backend's library is closed only if the backend says it can be** - `capabilities.md`,
+*Capabilities, so the swap is honest*. The wasm backend does not: it brought wasmtime into the
+process, which keeps threads of its own and a handler registered with the operating system, and
+offers no call that stops either. Taken out from under them and loaded again by the next
+`bridge_create`, it crashed about one run in sixty of a test that makes three bridges in a row,
+and only on a busy machine. So its library stays for the life of the process, and the next bridge
+finds it there. A native module's library is another matter: it is closed at unload and at
+reload, which is what reload is.
+
+Refused: never closing any backend's library, which is one rule and makes a statement on behalf
+of backends that could have made their own. Refused: the wasm backend pinning wasmtime itself,
+which is operating-system code on three platforms for the same result.
+
 ## The sink
 
 `sink` is why an embedded host needs more than idTech3's three functions. Bridge-ASM700 emits records and
