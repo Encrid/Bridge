@@ -31,3 +31,5 @@ BRIDGE_EXPORT(init) int init(void)
     BRIDGE_ATTACH(bridge_spawn(), name, n);
     return 0;
 }
+
+BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }

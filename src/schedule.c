@@ -111,7 +111,7 @@ int schedule_build(bridge *b, char *why, size_t why_len)
         uint32_t n = 0;
         matrix reach;
         for (i = 0; i < b->system_count; i ++) {
-            if (b->systems[i]->phase == phase) in[n ++] = b->systems[i];
+            if (b->systems[i]->phase == phase && !b->systems[i]->parked) in[n ++] = b->systems[i];
         }
         matrix_init(&reach, n);
 
@@ -237,7 +237,7 @@ void schedule_run(bridge *b, uint32_t phase)
             for (k = i; k < n; k ++) {
                 bridge_system *s = b->systems[k];
                 if (s->m != j->m || s->phase != phase || s->level != level || s->m->stopped
-                    || (s->observer && !s->pending_count)) continue;
+                    || s->parked || (s->observer && !s->pending_count)) continue;
                 s->when = b->barriers << 16 | (ordinal ++ & 0xffffu);
                 s->failed = 0;
                 j->list[j->count ++] = s;
@@ -252,9 +252,11 @@ void schedule_run(bridge *b, uint32_t phase)
         /* failure.md: the invocation is abandoned, and logged - here, so that the sink is
          * only ever called on the thread that asked for the phase */
         for (k = 0; k < count; k ++) {
+            jobs[k].m->ran_now = 1;
             for (i = 0; i < jobs[k].count; i ++) {
                 bridge_system *s = jobs[k].list[i];
                 if (s->failed) {
+                    s->m->failed_now = 1;
                     say(b, s->m, s, BRIDGE_ERR, "%s '%s' failed: %s",
                         s->observer ? "observer" : "system", s->name, s->why);
                 }
@@ -265,4 +267,30 @@ void schedule_run(bridge *b, uint32_t phase)
     free(handed);
     free(callers);
     free(lists);
+}
+
+/* failure.md, *The budget*: a barrier in which a module failed raises its count, one in which
+ * it ran clean lowers it, and at its number it is stopped. Counted in barriers, so that the
+ * same history stops the same module at the same place every run. */
+void schedule_account(bridge *b)
+{
+    module *m;
+    for (m = b->modules; m; m = m->next) {
+        if (m->ran_now) {
+            if (m->failed_now) m->failures ++;
+            else if (m->failures) m->failures --;
+        }
+        m->ran_now = m->failed_now = 0;
+        if (m->stopped || m->max_failures <= 0 || m->failures < m->max_failures) continue;
+        m->stopped = 1;
+        say(b, m, NULL, BRIDGE_ERR, "module '%s' is stopped: it reached its max_system_failures "
+            "of %lld", m->identity, (long long)m->max_failures);
+        /* fail covers a stop as it covers a load: the deployment does not run without it */
+        if (m->on_error == BRIDGE_FAIL && !b->stopped_by) {
+            char why[256];
+            snprintf(why, sizeof why, "module '%s' was stopped and its on_error is fail", m->identity);
+            b->stopped_by = copy(why, strlen(why));
+            say(b, NULL, NULL, BRIDGE_ERR, "the bridge has stopped: %s", why);
+        }
+    }
 }

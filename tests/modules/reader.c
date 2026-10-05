@@ -31,3 +31,5 @@ BRIDGE_EXPORT(init) int init(void)
     summing = BRIDGE_SYSTEM("sum", "present", terms, 2);
     return 0;
 }
+
+BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }

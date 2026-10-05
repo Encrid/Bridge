@@ -1,6 +1,6 @@
 /* The host seam: the only header a host includes.
  * docs/seam/host-api/host-api.md is the contract. This is as much of it as exists so far:
- * create, destroy, load and phase. Unload, reload and the pulls arrive with what they act on. */
+ * everything but the profile, which arrives with what it measures. */
 #ifndef BRIDGE_H
 #define BRIDGE_H
 
@@ -56,12 +56,14 @@ typedef struct {
     uint32_t    abi;
 
     bool     trusted;
+    bool     hot_reload;         /* the deployment allows bridge_reload. it only ever forbids */
     bool     pinned;             /* its systems run on the thread that loaded it, and no other */
-    uint8_t  on_error;           /* BRIDGE_FAIL | BRIDGE_SKIP */
-    /* each of the next three: zero is unset, BRIDGE_NO_LIMIT is "no limit" */
+    uint8_t  on_error;           /* BRIDGE_FAIL | BRIDGE_SKIP: what losing it costs the deployment */
+    /* each of the next six: zero is unset, BRIDGE_NO_LIMIT is "no limit" */
+    int64_t  max_system_failures;    /* raised by a failed barrier, lowered by a clean one */
     int64_t  fuel;               /* units per system invocation */
     int64_t  memory_limit;       /* bytes. a ceiling, never re-set */
-    int64_t  init_timeout;       /* nanoseconds */
+    int64_t  init_timeout, reload_timeout, shutdown_timeout;    /* nanoseconds, per call */
     int8_t   log_level;          /* a line above it is not written */
     uint32_t scratch, log_ring, spans;   /* its private memory, each in bytes */
     /* what is set aside for it alone, so that what it mints does not depend on who ran
@@ -71,6 +73,10 @@ typedef struct {
 
     const char *const *read;  uint32_t read_count;       /* grants */
     const char *const *write; uint32_t write_count;
+
+    /* its own settings, and the component of its that they seed - docs/seam/host-api/config.md */
+    const char *config;
+    const bridge_setting *settings; uint32_t setting_count;
 } bridge_module_config;
 
 typedef struct {
@@ -103,6 +109,24 @@ void    bridge_destroy(bridge *b);
  * the load was refused or failed, or stopped the bridge, and a record says why. Between phases
  * only. */
 int bridge_load(bridge *b, const bridge_artifact *a);
+
+/* Take a module out, by its identity: its shutdown, then the components nobody else declared,
+ * each by the policy it was declared with. 0 if it was loaded. Between phases only. */
+int bridge_unload(bridge *b, const char *identity);
+
+/* Replace a loaded module's instance and keep its storage. 0 if the new instance is running;
+ * otherwise a record says why, and the old one still is wherever its backend could keep it.
+ * Between phases only. */
+int bridge_reload(bridge *b, const bridge_artifact *a);
+
+/* What is loaded, and whether it still runs: a module at its failure budget is stopped long
+ * after any return code. Answers how many there are; fills at most `max`. */
+enum { BRIDGE_RUNNING = 1, BRIDGE_STOPPED = 2 };
+typedef struct {
+    const char *identity;       /* until the next load, unload or reload */
+    uint8_t     state;
+} bridge_module_info;
+int bridge_modules(bridge *b, bridge_module_info *out, int max);
 
 /* Run the systems registered to one phase, then its barrier. 0 if the phase ran, whatever
  * its systems did: a system that failed is a record, not a return code. With a pinned module

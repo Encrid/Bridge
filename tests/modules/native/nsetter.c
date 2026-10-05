@@ -30,3 +30,5 @@ BRIDGE_NATIVE(init)
     }
     return 0;
 }
+
+BRIDGE_NATIVE(shutdown) { return 0; }

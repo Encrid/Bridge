@@ -68,6 +68,10 @@ typedef struct {
 
 typedef struct { uint32_t spans, at; } bridge_query;
 
+/* Text a component keeps: where its bytes are in the persistent arena, and how many. A field
+ * may be of this type under any namespace - docs/modules/schema.md, *The type set*. */
+typedef struct { uint32_t at, len; } bridge_text;
+
 /* An observer's slot: how many bridge_trigger records this barrier, and where they begin. */
 typedef struct { uint32_t count, at; } bridge_list;
 

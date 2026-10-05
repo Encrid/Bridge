@@ -148,8 +148,8 @@ endfunction ()
 backend_test (adopt)
 
 # Bridge-ASM700 itself, as far as it exists
-add_library (bridge STATIC src/bridge.c src/store.c src/abi.c src/schedule.c src/pool.c
-    src/backend.c)
+add_library (bridge STATIC src/bridge.c src/lifecycle.c src/config.c src/store.c src/abi.c
+    src/schedule.c src/pool.c src/backend.c)
 set_target_properties (bridge PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES)
 target_include_directories (bridge PUBLIC include PRIVATE src)
 target_link_libraries (bridge PRIVATE bridge-os flecs)
@@ -231,9 +231,13 @@ endforeach ()
 # A module in C: compiled, merged with the accessors, inlined, and stripped of their exports.
 function (wasm_module name source kind)
     set (src "${CMAKE_CURRENT_SOURCE_DIR}/tests/modules/${source}.c")
+    set (defines)
+    foreach (define ${ARGN})
+        list (APPEND defines "-D${define}")
+    endforeach ()
     add_custom_command (
         OUTPUT "${MODULES}/${name}.wasm"
-        COMMAND "${ZIG}" cc -target wasm32-freestanding -O2 -nostdlib
+        COMMAND "${ZIG}" cc -target wasm32-freestanding -O2 -nostdlib ${defines}
             "-I${CMAKE_CURRENT_SOURCE_DIR}/include" "-Wl,--no-entry"
             -o "${MODULES}/${name}.raw.wasm" "${src}"
         COMMAND "${WASM_MERGE}" "${MODULES}/${name}.raw.wasm" main
@@ -243,6 +247,7 @@ function (wasm_module name source kind)
             -o "${MODULES}/${name}.wasm"
         DEPENDS "${src}" "${MODULES}/acc-${kind}.wasm"
             "${CMAKE_CURRENT_SOURCE_DIR}/tests/modules/game.h"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/modules/roster.h"
             "${CMAKE_CURRENT_SOURCE_DIR}/include/bridge-wasm.h"
             "${CMAKE_CURRENT_SOURCE_DIR}/include/bridge-abi.h"
         COMMENT "building module ${name}"
@@ -397,3 +402,101 @@ phase3_case (nospawns    "module 'game:mover@0.1.0' did not load: spawn: it stat
 phase3_case (undo        "game:wildcard@0.1.0: not loaded.*game:fp@0.1.0: loaded")
 # what two modules mint in one level does not depend on which thread got there first
 phase5_case (minted      "minted 160 ids a run. on four threads the same, and again the same")
+
+# ---- phase 6: failure and lifecycle. docs/plan/PHASE6.md ----
+
+wasm_module (flaky-always flaky checked OF=1 FAILS=1)
+wasm_module (flaky-third flaky checked OF=3 FAILS=1)
+wasm_module (flaky-twothirds flaky checked OF=3 FAILS=2)
+wasm_module (keeper-strip keeper checked PRIVATE_POLICY=BRIDGE_STRIP)
+wasm_module (keeper-sweep keeper checked PRIVATE_POLICY=BRIDGE_SWEEP)
+wasm_module (keeper-delete keeper checked PRIVATE_POLICY=BRIDGE_DELETE)
+wasm_module (retype-private retype checked WHICH=1)
+wasm_module (retype-vec2 retype checked WHICH=2)
+wasm_module (retype-extra retype checked WHICH=3)
+wasm_module (retype-settings retype checked WHICH=4)
+wasm_module (settings-drop settings checked DROP)
+wasm_module (ticker ticker checked STEP=1)
+wasm_module (ticker-ten ticker checked STEP=10)
+wasm_module (ticker-wide ticker checked STEP=10 WIDE)
+wasm_module (ticker-fail ticker checked STEP=10 FAIL_RELOAD)
+wasm_module (ticker-noextra ticker checked STEP=10 NO_EXTRA)
+wasm_module (ticker-trip ticker checked STEP=1 TRIP)
+foreach (name counter typer user settings hang)
+    wasm_module (${name} ${name} checked)
+endforeach ()
+get_property (C_MODULES GLOBAL PROPERTY C_MODULES)
+add_custom_target (c-modules-6 ALL DEPENDS ${C_MODULES})
+
+# the native ticker three ways: a library per build, since one library is one module
+foreach (n 1 2 3)
+    add_library (nticker${n} MODULE tests/modules/native/nticker.c)
+    set_target_properties (nticker${n} PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES PREFIX "")
+    target_include_directories (nticker${n} PRIVATE include)
+endforeach ()
+target_compile_definitions (nticker1 PRIVATE STEP=1)
+target_compile_definitions (nticker2 PRIVATE STEP=10)
+target_compile_definitions (nticker3 PRIVATE STEP=10 FAIL_RELOAD)
+
+add_executable (phase6 tests/phase6.c)
+set_target_properties (phase6 PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES)
+target_link_libraries (phase6 PRIVATE bridge)
+target_compile_definitions (phase6 PRIVATE
+    "BACKEND_PATH=\"$<TARGET_FILE:bridge-wasm>\"" "NATIVE_PATH=\"$<TARGET_FILE:bridge-native>\""
+    "NTICKER1_PATH=\"$<TARGET_FILE:nticker1>\"" "NTICKER2_PATH=\"$<TARGET_FILE:nticker2>\""
+    "NTICKER3_PATH=\"$<TARGET_FILE:nticker3>\"" "MODULE_DIR=\"${MODULES}\"")
+add_dependencies (phase6 bridge-wasm bridge-native nticker1 nticker2 nticker3 c-modules-6)
+
+function (phase6_case name expect)
+    add_test (NAME phase6-${name} COMMAND phase6 ${name})
+    set_tests_properties (phase6-${name} PROPERTIES PASS_REGULAR_EXPRESSION "${expect}.*alive")
+endfunction ()
+
+phase6_case (skipinit      "game:badobs@0.1.0: not loaded.*show: x 3 0.*modules: game:twostep@0.1.0=RUNNING .1.")
+phase6_case (refusedload   "game:wildcard@0.1.0: not loaded.*game:fp@0.1.0: loaded")
+phase6_case (budget        "module 'test:flaky@0.1.0' is stopped: it reached its max_system_failures of 3.*show: x 63 0.*game:twostep@0.1.0=RUNNING test:flaky@0.1.0=STOPPED")
+phase6_case (forgiven      "modules: test:flaky@0.1.0=RUNNING")
+phase6_case (notforgiven   "it reached its max_system_failures of 3.*modules: test:flaky@0.1.0=STOPPED")
+phase6_case (neverstop     "modules: test:flaky@0.1.0=RUNNING")
+phase6_case (failstop      "the bridge has stopped: module 'test:flaky@0.1.0' was stopped and its on_error is fail.*update refused.*test:flaky@0.1.0=STOPPED.*game:twostep@0.1.0: not unloaded")
+phase6_case (strip         "left 10 5.*game:keeper@0.1.0: unloaded.*left 9 5.*game:retype@0.1.0: loaded")
+phase6_case (sweep         "left 10 5.*game:keeper@0.1.0: unloaded.*left 9 0.*game:retype@0.1.0: loaded")
+phase6_case (delete        "left 10 5.*game:keeper@0.1.0: unloaded.*left 0 0.*game:retype@0.1.0: loaded")
+phase6_case (nested-unload "game:typer@0.1.0: unloaded.*read: body 2 3.*game:retype@0.1.0: not loaded.*game:user@0.1.0: unloaded.*game:retype@0.1.0: loaded")
+phase6_case (nounload      "no module 'game:nobody@0.1.0' is loaded, so none is unloaded")
+phase6_case (timeouts      "its shutdown trapped: interrupt. its teardown continues.*test:hang@0.1.0: unloaded.*modules: .0.")
+phase6_case (slots         "module 'game:ticker@0.1.0' is refused: .budget. max_modules of 1 is reached.*game:twostep@0.1.0: unloaded.*game:ticker@0.1.0: loaded.*modules: game:ticker@0.1.0=RUNNING .1.")
+# the new instance's reload first, then the old one's shutdown: its line comes before the swap is said
+phase6_case (reload        "tick 102 1.*game:ticker@0.1.0/-: shutdown 1 0.*game:ticker@0.2.0: reloaded.*tick 112 10.*tick 122 10")
+phase6_case (reloadlayout  "was not reloaded: component 'game:Tick' has another layout here: fingerprint [0-9a-f]+, and it was declared with [0-9a-f]+.*tick 103 1.*tick 104 1")
+phase6_case (reloadfail    "was not reloaded: its reload answered 5.*tick 103 1.*tick 104 1.*game:ticker@0.1.0=RUNNING")
+phase6_case (reloadshare   "its persistent is -1 and a reload states 64, which only an unload and a load can change.*tick 104 1")
+phase6_case (reloadmove    "it runs on backend 'wasm' and a reload does not move it to 'native'.*tick 104 1")
+phase6_case (reloaddrop    "game:ticker@0.2.0: reloaded.*tick 122 10.*game:retype@0.1.0: loaded")
+phase6_case (maynot        "is not reloaded: its hot_reload is false.*tick 104 1")
+phase6_case (revive        "game:ticker@0.1.0=STOPPED.*game:ticker@0.2.0: reloaded.*tick 1[0-9]3 10.*game:ticker@0.2.0=RUNNING")
+phase6_case (noreload      "did not load: hot_reload is stated and it exports no 'reload'")
+phase6_case (reloadnothing "is not reloaded: nothing of that name is loaded")
+# native: the old instance's shutdown comes before the new one's first tick, and before the swap
+phase6_case (nreload       "tick 102 1.*game:ticker@0.1.0/-: shutdown 1 0.*game:ticker@0.2.0: reloaded.*tick 112 10.*tick 122 10")
+phase6_case (nreloadfail   "shutdown 1 0.*was not reloaded: its reload answered 5.*module 'game:ticker@0.1.0' is gone.*modules: game:twostep@0.1.0=RUNNING .1.")
+phase6_case (config        "vsync width 1 1280.*scale mode 150 2.*show: hello 7 0.*show: some/long/path.cfg 0 0.*flags ratio 3 3.*show: big 2 0")
+phase6_case (configkey     "its settings have a key 'vsynk', and 'game:Settings' has no field of that name")
+phase6_case (configkind    "its setting 'scale' is text, and the field it names is a float")
+phase6_case (configlong    "its setting 'title' is 20 bytes of text, and the field it names holds 16 with the zero that ends it")
+phase6_case (configrange   "its setting 'small' is 300, which the field it names cannot hold")
+phase6_case (configenum    "its setting 'mode' is 'Sometimes', which the enum of the field it names has no constant for")
+phase6_case (confignone    "it is handed 10 settings and names no config component for them")
+phase6_case (configmissing "its config is 'game:Nope', which is not a struct its init declared")
+phase6_case (configarena   "its settings hold 24 bytes of text, and its persistent share has 8 left")
+phase6_case (configtwice   "its config is 'game:Settings', which is already the settings of module 'game:settings@0.1.0'")
+phase6_case (configreload  "vsync width 1 1280.*game:settings@0.2.0: reloaded.*vsync width 1 1280")
+phase6_case (configdrop    "game:settings@0.2.0: reloaded.*game:retype@0.1.0: loaded")
+phase6_case (reseed        "settings text written to the same place")
+phase6_case (nreloadfailstop "module 'game:ticker@0.1.0' is gone.*the bridge has stopped: module 'game:ticker@0.1.0' could not be reloaded and its on_error is fail.*update refused")
+phase6_case (ntimeout      "module 'game:ticker@0.1.0' is refused: shutdown_timeout needs 'deadline', which backend 'native' lacks")
+set_tests_properties (phase6-ntimeout PROPERTIES FAIL_REGULAR_EXPRESSION "cannot open")
+# the row a module's settings go on is an entity, under the ceiling every entity is under
+add_test (NAME phase6-configceiling COMMAND phase6 configceiling 440)
+set_tests_properties (phase6-configceiling PROPERTIES PASS_REGULAR_EXPRESSION
+    "the row its settings go on does not fit under .budget. entities of 440.*alive")

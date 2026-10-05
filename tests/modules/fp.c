@@ -8,3 +8,5 @@ BRIDGE_EXPORT(init) int init(void)
     BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP);
     return 0;
 }
+
+BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }

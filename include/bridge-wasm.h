@@ -193,6 +193,15 @@ static inline uint32_t bridge_ref(uint64_t id, uint32_t slot, uint32_t stride)
     return base ? base + acc_ld_32(record + 4u) * stride : 0;
 }
 
+/* Whether `id` still names an entity: one that was destroyed, or never spawned, does not. */
+static inline int bridge_alive(uint64_t id)
+{
+    uint32_t index = (uint32_t)id;
+    if (!id || index >= BRIDGE_HEADER(entities)) return 0;
+    return acc_ld_32(BRIDGE_HEADER(entity_index) + index * (uint32_t)sizeof(bridge_entity) + 8u)
+           == (uint32_t)(id >> 32);
+}
+
 /* ---- the log: stores, and no call. docs/bridge/diagnostics/log.md ---- */
 
 enum { BRIDGE_LOG_ERR = -3, BRIDGE_LOG_WARN = -2, BRIDGE_LOG_INFO = 0 };

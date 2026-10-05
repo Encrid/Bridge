@@ -32,3 +32,5 @@ BRIDGE_NATIVE(init)
     BRIDGE_NATIVE_SYSTEM(api, "three", "present", &none, 0);
     return 0;
 }
+
+BRIDGE_NATIVE(shutdown) { return 0; }

@@ -22,6 +22,7 @@ typedef struct os_thread os_thread;
 os_thread *os_thread_start(void (*fn)(void *), void *arg);
 void       os_thread_join(os_thread *t);
 uint64_t   os_thread_id(void);                      /* of the calling thread */
+uint64_t   os_now(void);                            /* nanoseconds, from a clock that only rises */
 
 /* One lock for the process, for what a library can only do one at a time. */
 void os_global_lock(void);

@@ -19,3 +19,5 @@ BRIDGE_NATIVE(init)
     BRIDGE_NATIVE_SYSTEM(api, "flood", "update", &none, 0);
     return 0;
 }
+
+BRIDGE_NATIVE(shutdown) { return 0; }

@@ -31,3 +31,5 @@ BRIDGE_EXPORT(init) int init(void)
     for (i = 0; i < ENTITIES; i ++) bridge_attach(bridge_spawn(), position, 0, 0);
     return 0;
 }
+
+BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }

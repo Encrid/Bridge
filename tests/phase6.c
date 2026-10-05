@@ -1,0 +1,378 @@
+/* A host, as far as phase 6: modules that fail, stop, leave, come back changed, and are
+ * configured.
+ *
+ *     phase6 <case>
+ *
+ * Each case is one clause of docs/PLAN.md phase 6 or one refusal the phase added, checked by
+ * the records it emits and by what bridge_modules answers. */
+#include "bridge.h"
+#include "bridge-abi.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MS 1000000ll
+
+static uint32_t path_at[4], path_count;
+
+static void sink(void *ud, const bridge_record *r)
+{
+    (void)ud;
+    if (r->len == 7 && !memcmp(r->text, "path at", 7) && path_count < 4) path_at[path_count ++] = r->arg[0];
+    printf("record[%d] %s/%s: %.*s %u %u\n", r->level, r->identity ? r->identity : "-",
+        r->system ? r->system : "-", (int)r->len, r->text, r->arg[0], r->arg[1]);
+}
+
+static bridge_artifact native(const char *identity, const char *path)
+{
+    bridge_artifact a = {0};
+    a.cfg.identity = identity;
+    a.cfg.abi = BRIDGE_ABI;
+    a.cfg.trusted = true;
+    a.cfg.on_error = BRIDGE_SKIP;
+    a.cfg.max_system_failures = 3;
+    a.cfg.fuel = BRIDGE_NO_LIMIT;
+    a.cfg.memory_limit = BRIDGE_NO_LIMIT;
+    a.cfg.init_timeout = BRIDGE_NO_LIMIT;
+    a.cfg.reload_timeout = BRIDGE_NO_LIMIT;
+    a.cfg.shutdown_timeout = BRIDGE_NO_LIMIT;
+    a.cfg.scratch = 64 << 10;
+    a.cfg.log_ring = 64 * 24;
+    a.cfg.spans = 16 << 10;
+    a.cfg.spawns = 32;
+    a.cfg.persistent = BRIDGE_NONE;
+    a.backend = "native";
+    a.path = path;
+    return a;
+}
+
+static bridge_artifact wasm(const char *identity, const char *file)
+{
+    bridge_artifact a = native(identity, NULL);
+    char path[1024];
+    FILE *f;
+    void *data;
+    snprintf(path, sizeof path, "%s/%s.wasm", MODULE_DIR, file);
+    f = fopen(path, "rb");
+    if (!f) { printf("cannot read %s\n", path); exit(2); }
+    fseek(f, 0, SEEK_END);
+    a.len = (size_t)ftell(f);
+    fseek(f, 0, SEEK_SET);
+    data = malloc(a.len);
+    if (fread(data, 1, a.len, f) != a.len) { printf("cannot read %s\n", path); exit(2); }
+    fclose(f);
+    a.bytes = data;
+    a.backend = "wasm";
+    a.cfg.trusted = false;
+    a.cfg.fuel = 10000000;
+    a.cfg.memory_limit = 16 << 20;
+    a.cfg.init_timeout = 2000 * MS;
+    a.cfg.reload_timeout = 2000 * MS;
+    a.cfg.shutdown_timeout = 2000 * MS;
+    return a;
+}
+
+static void load(bridge *b, const bridge_artifact *a)
+{
+    printf("%s: %s\n", a->cfg.identity, bridge_load(b, a) ? "not loaded" : "loaded");
+}
+
+static void reload(bridge *b, const bridge_artifact *a)
+{
+    printf("%s: %s\n", a->cfg.identity, bridge_reload(b, a) ? "not reloaded" : "reloaded");
+}
+
+static void unload(bridge *b, const char *identity)
+{
+    printf("%s: %s\n", identity, bridge_unload(b, identity) ? "not unloaded" : "unloaded");
+}
+
+static void frames(bridge *b, int count)
+{
+    int i;
+    for (i = 0; i < count; i ++) {
+        if (bridge_phase(b, "update")) printf("update refused\n");
+        if (bridge_phase(b, "present")) printf("present refused\n");
+    }
+}
+
+/* the pull: what is loaded, and whether it still runs */
+static void modules(bridge *b)
+{
+    bridge_module_info info[8];
+    int n = bridge_modules(b, info, 8), i;
+    printf("modules:");
+    for (i = 0; i < n && i < 8; i ++) {
+        printf(" %s=%s", info[i].identity, info[i].state == BRIDGE_STOPPED ? "STOPPED" : "RUNNING");
+    }
+    printf(" (%d)\n", n);
+}
+
+static const char *const position[] = { "game:Position", "game:Roster" };
+
+static bridge_artifact counter(void)
+{
+    bridge_artifact a = wasm("view:counter@0.1.0", "counter");
+    a.cfg.read = position;
+    a.cfg.read_count = 2;
+    a.cfg.spawns = BRIDGE_NONE;
+    return a;
+}
+
+/* a module with every kind of setting, as a deployment would hand them over */
+static bridge_setting everything[11] = {
+    { "vsync", BRIDGE_BOOL,   { .b = true } },
+    { "width", BRIDGE_INT,    { .i = 1280 } },
+    { "scale", BRIDGE_FLOAT,  { .f = 1.5 } },
+    { "mode",  BRIDGE_STRING, { .s = "Adaptive" } },
+    { "title", BRIDGE_STRING, { .s = "hello" } },
+    { "path",  BRIDGE_STRING, { .s = "some/long/path.cfg" } },
+    { "small", BRIDGE_INT,    { .i = 7 } },
+    { "flags", BRIDGE_INT,    { .i = 3 } },             /* a bitmask, by its bits */
+    { "ratio", BRIDGE_INT,    { .i = 3 } },             /* an integer into a float field */
+    { "big",   BRIDGE_INT,    { .i = 8589934592ll } },  /* more than 32 bits */
+    { NULL, 0, { 0 } },
+};
+
+static bridge_artifact configured(const char *identity)
+{
+    bridge_artifact a = wasm(identity, "settings");
+    a.cfg.config = "game:Settings";
+    a.cfg.settings = everything;
+    a.cfg.setting_count = 10;
+    a.cfg.persistent = 64;
+    return a;
+}
+
+int main(int argc, char **argv)
+{
+    const char *what = argc > 1 ? argv[1] : "";
+    bridge_backend backends[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
+    const char *phases[2] = { "update", "present" };
+    bridge_config cfg = { backends, 2, phases, 2, NULL, 0, 1, { 4096, 4096, 1 << 20, 8 } };
+    bridge_artifact a;
+    bridge *b;
+    setvbuf(stdout, NULL, _IONBF, 0);
+
+    if (!strcmp(what, "slots")) cfg.budget.max_modules = 1;
+    if (!strcmp(what, "configceiling")) cfg.budget.entities = (uint64_t)atoi(argc > 2 ? argv[2] : "0");
+    b = bridge_create(&cfg, sink, NULL);
+    if (!b) {
+        printf("bridge_create refused\nalive\n");
+        return 0;
+    }
+
+    if (!strcmp(what, "skipinit")) {            /* a failed init, skipped: the rest runs on */
+        a = wasm("game:twostep@0.1.0", "twostep");
+        load(b, &a);
+        a = wasm("game:badobs@0.1.0", "badobs");
+        load(b, &a);
+        frames(b, 1);
+        modules(b);
+    } else if (!strcmp(what, "refusedload")) {  /* nothing of a refused load is left */
+        a = wasm("game:wildcard@0.1.0", "wildcard");
+        load(b, &a);
+        a = wasm("game:fp@0.1.0", "fp");
+        load(b, &a);
+        modules(b);
+    } else if (!strcmp(what, "budget") || !strcmp(what, "failstop")) {
+        a = wasm("game:twostep@0.1.0", "twostep");
+        load(b, &a);
+        a = wasm("test:flaky@0.1.0", "flaky-always");
+        a.cfg.spawns = BRIDGE_NONE;
+        if (!strcmp(what, "failstop")) a.cfg.on_error = BRIDGE_FAIL;
+        load(b, &a);
+        frames(b, 5);
+        modules(b);
+        /* a stopped bridge refuses an unload as it refuses a phase and a load */
+        if (!strcmp(what, "failstop")) unload(b, "game:twostep@0.1.0");
+    } else if (!strcmp(what, "forgiven") || !strcmp(what, "notforgiven")) {
+        /* one pass in three fails, or two in three: the count falls as fast as it rises */
+        a = wasm("test:flaky@0.1.0", !strcmp(what, "forgiven") ? "flaky-third" : "flaky-twothirds");
+        a.cfg.spawns = BRIDGE_NONE;
+        load(b, &a);
+        frames(b, 12);
+        modules(b);
+    } else if (!strcmp(what, "neverstop")) {    /* -1: it fails every pass and is never stopped */
+        a = wasm("test:flaky@0.1.0", "flaky-always");
+        a.cfg.spawns = BRIDGE_NONE;
+        a.cfg.max_system_failures = BRIDGE_NO_LIMIT;
+        load(b, &a);
+        frames(b, 8);
+        modules(b);
+    } else if (!strcmp(what, "strip") || !strcmp(what, "sweep") || !strcmp(what, "delete")) {
+        char file[32];
+        snprintf(file, sizeof file, "keeper-%s", what);
+        a = wasm("game:keeper@0.1.0", file);
+        load(b, &a);
+        a = counter();
+        load(b, &a);
+        frames(b, 1);
+        unload(b, "game:keeper@0.1.0");
+        frames(b, 1);
+        /* the component only the keeper declared is gone: its name is free for another layout */
+        a = wasm("game:retype@0.1.0", "retype-private");
+        a.cfg.spawns = BRIDGE_NONE;
+        load(b, &a);
+        modules(b);
+    } else if (!strcmp(what, "nested-unload")) {
+        a = wasm("game:typer@0.1.0", "typer");
+        a.cfg.spawns = BRIDGE_NONE;
+        load(b, &a);
+        a = wasm("game:user@0.1.0", "user");
+        load(b, &a);
+        unload(b, "game:typer@0.1.0");          /* the type's declarer goes; its user stays */
+        frames(b, 1);
+        a = wasm("game:retype@0.1.0", "retype-vec2");
+        a.cfg.spawns = BRIDGE_NONE;
+        load(b, &a);                            /* refused: the type is still held */
+        unload(b, "game:user@0.1.0");
+        load(b, &a);                            /* and now it is not */
+    } else if (!strcmp(what, "nounload")) {
+        unload(b, "game:nobody@0.1.0");
+    } else if (!strcmp(what, "timeouts")) {     /* a shutdown that never returns */
+        a = wasm("test:hang@0.1.0", "hang");
+        a.cfg.spawns = BRIDGE_NONE;
+        a.cfg.shutdown_timeout = 100 * MS;
+        load(b, &a);
+        unload(b, "test:hang@0.1.0");
+        modules(b);
+    } else if (!strcmp(what, "reload") || !strcmp(what, "reloadlayout") || !strcmp(what, "reloadfail")
+               || !strcmp(what, "reloadshare") || !strcmp(what, "reloadmove")
+               || !strcmp(what, "reloaddrop") || !strcmp(what, "maynot")) {
+        a = wasm("game:ticker@0.1.0", "ticker");
+        a.cfg.hot_reload = strcmp(what, "maynot") != 0;
+        load(b, &a);
+        frames(b, 2);
+        a = wasm("game:ticker@0.2.0", !strcmp(what, "reloadlayout") ? "ticker-wide"
+                                    : !strcmp(what, "reloadfail") ? "ticker-fail"
+                                    : !strcmp(what, "reloaddrop") ? "ticker-noextra" : "ticker-ten");
+        a.cfg.hot_reload = true;
+        if (!strcmp(what, "reloadshare")) a.cfg.persistent = 64;
+        if (!strcmp(what, "reloadmove")) {
+            a = native("game:ticker@0.2.0", NTICKER1_PATH);
+            a.cfg.hot_reload = true;
+        }
+        reload(b, &a);
+        frames(b, 2);
+        if (!strcmp(what, "reloaddrop")) {
+            /* what the new instance no longer declares went as an unload would take it */
+            a = wasm("game:retype@0.1.0", "retype-extra");
+            a.cfg.spawns = BRIDGE_NONE;
+            load(b, &a);
+        }
+        modules(b);
+    } else if (!strcmp(what, "revive")) {       /* a stopped module, reloaded into one that works */
+        a = wasm("game:ticker@0.1.0", "ticker-trip");
+        a.cfg.hot_reload = true;
+        load(b, &a);
+        frames(b, 4);
+        modules(b);
+        a = wasm("game:ticker@0.2.0", "ticker-ten");
+        a.cfg.hot_reload = true;
+        reload(b, &a);
+        frames(b, 2);
+        modules(b);
+    } else if (!strcmp(what, "noreload")) {     /* hot_reload stated, and no reload export */
+        a = wasm("game:twostep@0.1.0", "twostep");
+        a.cfg.hot_reload = true;
+        load(b, &a);
+    } else if (!strcmp(what, "reloadnothing")) {
+        a = wasm("game:ticker@0.2.0", "ticker-ten");
+        a.cfg.hot_reload = true;
+        reload(b, &a);
+    } else if (!strcmp(what, "ntimeout")) {     /* a timeout is a deadline, which native lacks */
+        a = native("game:ticker@0.1.0", "no-such-library");
+        a.cfg.shutdown_timeout = 100 * MS;
+        load(b, &a);
+    } else if (!strcmp(what, "nreload") || !strcmp(what, "nreloadfail")
+               || !strcmp(what, "nreloadfailstop")) {
+        /* native: the old instance is shut down before the new library is opened */
+        a = wasm("game:twostep@0.1.0", "twostep");
+        load(b, &a);
+        a = native("game:ticker@0.1.0", NTICKER1_PATH);
+        a.cfg.hot_reload = true;
+        load(b, &a);
+        frames(b, 2);
+        a = native("game:ticker@0.2.0", !strcmp(what, "nreload") ? NTICKER2_PATH : NTICKER3_PATH);
+        a.cfg.hot_reload = true;
+        /* with nothing left to keep, a failed reload is init's case: on_error decides */
+        if (!strcmp(what, "nreloadfailstop")) a.cfg.on_error = BRIDGE_FAIL;
+        reload(b, &a);
+        frames(b, 2);
+        modules(b);
+    } else if (!strcmp(what, "config")) {
+        a = configured("game:settings@0.1.0");
+        load(b, &a);
+        frames(b, 1);
+    } else if (!strcmp(what, "configkey") || !strcmp(what, "configkind") || !strcmp(what, "configlong")
+               || !strcmp(what, "configrange") || !strcmp(what, "configenum")
+               || !strcmp(what, "confignone") || !strcmp(what, "configmissing")
+               || !strcmp(what, "configarena") || !strcmp(what, "configceiling")) {
+        a = configured("game:settings@0.1.0");
+        if (!strcmp(what, "configkey")) everything[0].key = "vsynk";
+        if (!strcmp(what, "configkind")) { everything[2].kind = BRIDGE_STRING; everything[2].v.s = "fast"; }
+        if (!strcmp(what, "configlong")) everything[4].v.s = "twenty characters...";
+        if (!strcmp(what, "configrange")) everything[6].v.i = 300;
+        if (!strcmp(what, "configenum")) everything[3].v.s = "Sometimes";
+        if (!strcmp(what, "confignone")) a.cfg.config = NULL;
+        if (!strcmp(what, "configmissing")) a.cfg.config = "game:Nope";
+        if (!strcmp(what, "configarena")) a.cfg.persistent = 8;
+        /* the row its settings go on is an entity like any other, under the same ceiling */
+        if (!strcmp(what, "configceiling")) a.cfg.spawns = BRIDGE_NONE;
+        load(b, &a);
+        modules(b);
+    } else if (!strcmp(what, "configreload") || !strcmp(what, "configdrop")) {
+        /* a reload hands over other settings, and the row keeps what it had: after init the
+         * component is the state. With DROP the new instance declares nothing, and the row
+         * goes with the component. */
+        a = configured("game:settings@0.1.0");
+        a.cfg.hot_reload = true;
+        load(b, &a);
+        frames(b, 1);
+        everything[1].v.i = 640;
+        a = configured("game:settings@0.2.0");
+        a.cfg.hot_reload = true;
+        if (!strcmp(what, "configdrop")) {
+            a = wasm("game:settings@0.2.0", "settings-drop");
+            a.cfg.hot_reload = true;
+            a.cfg.persistent = 64;
+        }
+        reload(b, &a);
+        frames(b, 1);
+        if (!strcmp(what, "configdrop")) {
+            a = wasm("game:retype@0.1.0", "retype-settings");
+            a.cfg.spawns = BRIDGE_NONE;
+            load(b, &a);
+        }
+    } else if (!strcmp(what, "slots")) {
+        /* [budget] max_modules: a record is taken at load and given back at unload */
+        a = wasm("game:twostep@0.1.0", "twostep");
+        load(b, &a);
+        a = wasm("game:ticker@0.1.0", "ticker");
+        load(b, &a);
+        unload(b, "game:twostep@0.1.0");
+        load(b, &a);
+        modules(b);
+    } else if (!strcmp(what, "configtwice")) {  /* one row, so one module */
+        a = configured("game:settings@0.1.0");
+        load(b, &a);
+        a = configured("game:other@0.1.0");
+        load(b, &a);
+    } else if (!strcmp(what, "reseed")) {       /* unload, load: the text goes where it was */
+        a = configured("game:settings@0.1.0");
+        load(b, &a);
+        frames(b, 1);
+        unload(b, "game:settings@0.1.0");
+        a = configured("game:settings@0.1.0");
+        load(b, &a);
+        frames(b, 1);
+        printf("settings text %s\n", path_count == 2 && path_at[0] == path_at[1]
+            ? "written to the same place" : "MOVED");
+    }
+
+    bridge_destroy(b);
+    printf("alive\n");
+    return 0;
+}

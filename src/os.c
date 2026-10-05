@@ -177,6 +177,15 @@ int os_event_wait(os_event *e, uint64_t nanos)
 
 uint64_t os_thread_id(void) { return GetCurrentThreadId(); }
 
+uint64_t os_now(void)
+{
+    LARGE_INTEGER frequency, count;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&count);
+    return (uint64_t)(count.QuadPart / frequency.QuadPart) * 1000000000ull
+         + (uint64_t)(count.QuadPart % frequency.QuadPart) * 1000000000ull / (uint64_t)frequency.QuadPart;
+}
+
 static SRWLOCK global_lock = SRWLOCK_INIT;
 void os_global_lock(void) { AcquireSRWLockExclusive(&global_lock); }
 void os_global_unlock(void) { ReleaseSRWLockExclusive(&global_lock); }
@@ -197,6 +206,13 @@ void os_mutex_unlock(os_mutex *m) { LeaveCriticalSection(&m->section); }
 #else
 
 uint64_t os_thread_id(void) { return (uint64_t)(uintptr_t)pthread_self(); }
+
+uint64_t os_now(void)
+{
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    return (uint64_t)t.tv_sec * 1000000000ull + (uint64_t)t.tv_nsec;
+}
 
 static pthread_mutex_t global_lock = PTHREAD_MUTEX_INITIALIZER;
 void os_global_lock(void) { pthread_mutex_lock(&global_lock); }

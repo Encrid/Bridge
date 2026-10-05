@@ -46,9 +46,12 @@ static bridge_artifact artifact(const char *name)
     a.cfg.abi = BRIDGE_ABI;
     a.cfg.trusted = false;
     a.cfg.on_error = BRIDGE_SKIP;
+    a.cfg.max_system_failures = 3;
     a.cfg.fuel = 1000000;
     a.cfg.memory_limit = 1 << 20;
     a.cfg.init_timeout = 200 * MS;
+    a.cfg.reload_timeout = 200 * MS;
+    a.cfg.shutdown_timeout = 200 * MS;
     a.cfg.scratch = 4096;
     a.cfg.log_ring = 240;
     a.cfg.spans = 4096;
@@ -106,6 +109,8 @@ int main(int argc, char **argv)
         a.cfg.fuel = BRIDGE_NO_LIMIT;
         a.cfg.memory_limit = BRIDGE_NO_LIMIT;
         a.cfg.init_timeout = BRIDGE_NO_LIMIT;
+        a.cfg.reload_timeout = BRIDGE_NO_LIMIT;
+        a.cfg.shutdown_timeout = BRIDGE_NO_LIMIT;
         load(b, &a);
     } else if (!strcmp(what, "stop")) {         /* fail stops the bridge; skip does not */
         a = artifact("oob");

@@ -11,3 +11,5 @@ BRIDGE_EXPORT(init) int init(void)
     BRIDGE_SYSTEM("any", "update", terms, 1);
     return 0;
 }
+
+BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }

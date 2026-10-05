@@ -51,6 +51,9 @@
             "configurePreset": "windows",
             "output": {
                 "outputOnFailure": true
+            },
+            "execution": {
+                "timeout": 120
             }
         },
         {
@@ -58,6 +61,9 @@
             "configurePreset": "linux",
             "output": {
                 "outputOnFailure": true
+            },
+            "execution": {
+                "timeout": 120
             }
         }
     ]

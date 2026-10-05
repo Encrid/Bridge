@@ -121,7 +121,8 @@ BACKEND_EXPORT void backend_destroy(backend *b)
     free(b);
 }
 
-/* No sandbox, no meter, no deadline, no limit: nothing contains code in this process. */
+/* No sandbox, no meter, no deadline, no limit: nothing contains code in this process. And not
+ * side by side: a process cannot hold two copies of one library. */
 BACKEND_EXPORT uint32_t backend_capabilities(backend *b)
 {
     (void)b;

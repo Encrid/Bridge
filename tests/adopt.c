@@ -147,6 +147,35 @@ int main(void)
         api.module_destroy(host);
     }
 
+    /* 5. timed calls back to back. Each is over long before its second is up, so none may
+     * be interrupted, and the backend must still be able to stop its clock afterwards: a
+     * watchdog that counted wake-ups instead of looking would lose one here and wait forever. */
+    {
+        static const uint8_t params[2] = { BACKEND_I32, BACKEND_I64 }, results[1] = { BACKEND_I32 };
+        backend_sig sig = { params, 2, results, 1 };
+        void *host_bytes = read_file(MODULE_DIR "/host.wasm", &len);
+        backend_module *timed = api.module_compile(be, host_bytes, len, NULL, BACKEND_DEADLINE, &err);
+        backend_instance *ti = timed ? api.instance_create(be, timed, NULL, 0, &err) : NULL;
+        backend_func *f;
+        int32_t arity, count;
+        int k;
+        if (!ti || api.define_func(ti, "bridge", "ping", ping, NULL, &sig, &err)
+            || !(f = api.instance_func(ti, "init", &arity, &count, &err))) {
+            printf("FAIL: timed calls: %s\n", err.text);
+            return 1;
+        }
+        for (k = 0; k < 20000; k ++) {
+            api.instance_set_deadline(ti, 1000000000ull);
+            if (api.call(f, &status, &err) || status != 16) {
+                printf("FAIL: timed call %d: %d: %s\n", k, status, err.text);
+                return 1;
+            }
+        }
+        printf("20000 timed calls back to back: none interrupted\n");
+        api.instance_destroy(ti);
+        api.module_destroy(timed);
+    }
+
     api.instance_destroy(one);
     api.module_destroy(module);
     api.memory_release(memory);

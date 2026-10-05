@@ -25,3 +25,5 @@ BRIDGE_EXPORT(init) int init(void)
     seeing = BRIDGE_OBSERVER("seen", BRIDGE_ON_ADD, terms, 1);
     return 0;
 }
+
+BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }

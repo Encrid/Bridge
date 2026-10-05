@@ -26,3 +26,5 @@ BRIDGE_EXPORT(init) int init(void)
     halving = BRIDGE_SYSTEM("halve", "update", terms, 1);
     return 0;
 }
+
+BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }

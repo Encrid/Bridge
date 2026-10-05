@@ -16,3 +16,5 @@ BRIDGE_EXPORT(init) int init(void)
     BRIDGE_SYSTEM("make", "update", &none, 0);
     return 0;
 }
+
+BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }

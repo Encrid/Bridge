@@ -27,9 +27,12 @@ static bridge_artifact native(const char *identity, const char *path)
     a.cfg.abi = BRIDGE_ABI;
     a.cfg.trusted = true;
     a.cfg.on_error = BRIDGE_SKIP;
+    a.cfg.max_system_failures = 3;
     a.cfg.fuel = BRIDGE_NO_LIMIT;
     a.cfg.memory_limit = BRIDGE_NO_LIMIT;
     a.cfg.init_timeout = BRIDGE_NO_LIMIT;
+    a.cfg.reload_timeout = BRIDGE_NO_LIMIT;
+    a.cfg.shutdown_timeout = BRIDGE_NO_LIMIT;
     a.cfg.scratch = 64 << 10;
     a.cfg.log_ring = 64 * 24;
     a.cfg.spans = 16 << 10;
@@ -60,6 +63,8 @@ static bridge_artifact wasm_reader(void)
     a.cfg.fuel = 10000000;
     a.cfg.memory_limit = 16 << 20;
     a.cfg.init_timeout = 2000 * MS;
+    a.cfg.reload_timeout = 2000 * MS;
+    a.cfg.shutdown_timeout = 2000 * MS;
     a.cfg.read = grants;
     a.cfg.read_count = 2;
     a.cfg.spawns = BRIDGE_NONE;         /* it only reads */

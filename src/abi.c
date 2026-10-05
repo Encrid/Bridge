@@ -187,6 +187,24 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         c->zero = calloc(1, size);
         b->components = realloc(b->components, (b->component_count + 1) * sizeof *b->components);
         b->components[b->component_count ++] = c;
+        /* a declared type a field of this one names is held for as long as this one is */
+        if (kind == BRIDGE_STRUCT) {
+            const EcsStruct *layout = ecs_get(b->world, id, EcsStruct);
+            ecs_member_t *members = ecs_vec_first(&layout->members);
+            int32_t k, member_count = ecs_vec_count(&layout->members);
+            for (k = 0; k < member_count; k ++) {
+                ecs_entity_t named = members[k].type;
+                const EcsType *t = ecs_get(b->world, named, EcsType);
+                if (t && t->kind == EcsArrayType) named = ecs_get(b->world, named, EcsArray)->type;
+                for (i = 0; i < b->component_count; i ++) {
+                    component *held = b->components[i];
+                    if (held->id != named || held == c) continue;
+                    c->deps = realloc(c->deps, (c->dep_count + 1) * sizeof *c->deps);
+                    c->deps[c->dep_count ++] = held;
+                    held->users ++;
+                }
+            }
+        }
     }
 
     for (i = 0; i < m->declared_count; i ++) {
@@ -196,6 +214,8 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         }
     }
     m->declared = realloc(m->declared, (m->declared_count + 1) * sizeof *m->declared);
+    m->policy = realloc(m->policy, m->declared_count + 1);
+    m->policy[m->declared_count] = (uint8_t)on_unload;
     m->declared[m->declared_count] = c;
     c->declarers ++;
     b->layout_moved = 1;

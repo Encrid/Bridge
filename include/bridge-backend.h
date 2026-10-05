@@ -30,7 +30,9 @@ enum {
     BACKEND_METER    = 1 << 1,
     BACKEND_DEADLINE = 1 << 2,
     BACKEND_LIMIT    = 1 << 3,
-    BACKEND_RELOAD   = 1 << 4
+    BACKEND_RELOAD   = 1 << 4,
+    /* two instances of one module can exist at once: which order a reload takes */
+    BACKEND_SIDE_BY_SIDE = 1 << 5
 };
 
 /* A setting is the backend's own: Bridge-ASM700 passes each through unread. A backend refuses a

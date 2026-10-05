@@ -31,14 +31,18 @@ typedef struct {
 } open_backend;
 
 /* A component, by its namespaced name. flecs holds the storage; this is what load checks. */
-typedef struct {
+typedef struct component component;
+struct component {
     char        *name;
     ecs_entity_t id;
     uint32_t     size, align;
     uint64_t     fingerprint;       /* of the descriptor string - schema.md, *Fingerprints* */
     uint32_t     declarers;         /* how many loaded modules declared it */
+    uint32_t     users;             /* how many components name it as a field's type */
+    component  **deps;              /* the declared types its own fields name */
+    uint32_t     dep_count;
     void        *zero;              /* `size` zero bytes: what an attach with no value copies */
-} component;
+};
 
 typedef struct { ecs_entity_t id; uint32_t events; } pending;
 
@@ -56,6 +60,7 @@ typedef struct {
     uint8_t       writes[BRIDGE_TERMS_MAX];
     backend_func *fn;
     uint32_t      level;            /* within its phase: a level runs before the next */
+    int           parked;           /* out of the schedule while a reload decides its fate */
 
     int           observer;
     ecs_entity_t  observing;        /* flecs' observer */
@@ -85,6 +90,7 @@ struct module {
     uint32_t  spans, spans_len;     /* the span region: query slots, column_base, spans */
 
     component    **declared;        /* by slot */
+    uint8_t       *policy;          /* by slot: what it stated for on_unload */
     uint32_t       declared_count;
     bridge_system **systems;        /* by slot */
     uint32_t       system_count;
@@ -96,7 +102,7 @@ struct module {
      * barrier; its share of the persistent arena; and what it asked to have changed, applied
      * at the next barrier in the order it asked. Only its own thread touches any of them. */
     ecs_entity_t *ids;
-    uint32_t  id_count, id_next;
+    uint32_t  id_count, id_next, id_room;
     int       ids_short;            /* the entity ceiling cut its last refill short */
     int64_t   spawns, persistent;
     uint32_t  arena_at, arena_left, arena_base, arena_share;
@@ -107,6 +113,17 @@ struct module {
 
     int      pinned;
     uint64_t thread;                /* the one that loaded it */
+    int      hot_reload;
+    uint8_t  on_error;
+    backend_func *shutdown;
+    int64_t  shutdown_timeout;
+    /* failure.md, *The budget*: raised by a failed barrier, lowered by a clean one */
+    int64_t  max_failures, failures;
+    int      ran_now, failed_now;   /* since the last barrier */
+    /* config.md: the component its settings seeded, the row, and where their text is */
+    component   *config;
+    ecs_entity_t config_entity;
+    uint32_t     text_at, text_room;
     int   in_init, stopped;
     int   refused;                  /* an entry refused during the call in progress */
     char  why[256];                 /* and this is why */
@@ -122,6 +139,7 @@ typedef struct {
 } change;
 
 typedef struct { ecs_table_t *table; int32_t rows; } table_slot;
+typedef struct { char *stem; uint32_t at, room; } kept_text;
 typedef struct { uint32_t at, len; } gap;       /* in the column region, from its start */
 
 struct bridge {
@@ -158,6 +176,9 @@ struct bridge {
     uint32_t       table_count, table_room;
     uint32_t      *table_hash;      /* open addressing over `tables`, by pointer */
     uint32_t       table_hash_room;
+    /* ids of tables flecs has deleted: dead until the index has let go of them, then free */
+    uint32_t      *dead_tables, *free_tables;
+    uint32_t       dead_count, free_count, dead_room, free_room;
     /* entities something named since the last barrier: where they are is read once, then */
     ecs_entity_t  *dirty;
     uint32_t       dirty_count, dirty_room;
@@ -166,6 +187,9 @@ struct bridge {
     component    **components;
     uint32_t       component_count;
     ecs_entity_t   names;           /* under it, a scope per namespace: where a type name resolves */
+    ecs_entity_t   text_type;       /* bridge_text, as flecs knows it */
+    kept_text     *kept;            /* where an unloaded module's settings text was */
+    uint32_t       kept_count;
     bridge_system **systems;        /* every module's, in registration order */
     uint32_t       system_count;
     module        *modules;
@@ -175,11 +199,20 @@ struct bridge {
 /* bridge.c */
 void say(bridge *b, const module *m, const bridge_system *s, int8_t level, const char *fmt, ...);
 char *copy(const char *s, size_t n);
+int  bridge_stopped(bridge *b);     /* 1, with a record, if nothing may run */
+
+/* lifecycle.c */
+void module_discard(bridge *b, module *m);
+
+/* config.c */
+int  config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why, size_t len);
+void config_keep(bridge *b, module *m);
 
 /* schedule.c */
 int  schedule_order(bridge *b, const bridge_order *order, uint32_t count);  /* at create */
 int  schedule_build(bridge *b, char *why, size_t why_len);     /* 0, or why it cannot be */
 void schedule_run(bridge *b, uint32_t phase);
+void schedule_account(bridge *b);       /* at each barrier: the failure budgets, and the stops */
 
 /* pool.c */
 typedef void (*pool_fn)(void *job);
@@ -194,6 +227,9 @@ int      store_create(bridge *b, const bridge_budget *budget);    /* 0, or a rec
 void     store_destroy(bridge *b);
 void     store_touch(bridge *b, ecs_entity_t e);                  /* e may have moved: look at the barrier */
 int      store_refill(bridge *b, module *m);                      /* 1 if the ceiling cut its ids short */
+void     store_apply(bridge *b, module *m);                       /* what it queued, now */
+void     store_drain(bridge *b, module *m);                       /* its log ring, to the sink */
+void     store_retire(bridge *b, ecs_entity_t component);         /* its tables are about to go */
 void     store_barrier(bridge *b);
 void     store_header(bridge *b, module *m);                      /* what a module reads at offset 0 */
 uint32_t store_offset(bridge *b, const void *p);                  /* into the shared memory, 0 for NULL */

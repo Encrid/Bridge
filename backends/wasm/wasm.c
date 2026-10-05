@@ -31,10 +31,13 @@ enum { METERED = 1, INTERRUPTIBLE = 2, ENGINES = 4 };
 
 struct backend {
     wasm_engine_t *engines[ENGINES];
-    wasm_engine_t *ticking;         /* the engine of the call the watchdog is armed for */
     os_thread *watchdog;
-    os_event  *armed, *done;
-    uint64_t   nanos;
+    os_event  *wake;                /* something below changed */
+    os_mutex  *lock;                /* over the four below */
+    uint64_t   active;              /* which timed call is running: 0 for none */
+    uint64_t   calls;               /* how many there have been, to tell one from the next */
+    uint64_t   until;               /* when the running one is out of time, by os_now */
+    wasm_engine_t *ticking;         /* and the engine it runs on */
     int        quit;
 };
 
@@ -176,16 +179,36 @@ static wasmtime_error_t *new_memory(void *env, const wasm_memorytype_t *ty, size
 
 /* ---- the clock: one armed deadline at a time, and no tick period ---- */
 
+/* What is running is read afresh every time round, under the lock, and the event only says
+ * "look again". So an event that was set twice before it was waited for once loses nothing:
+ * two lifecycle calls back to back, a reload and then a shutdown, are exactly that. */
 static void watchdog(void *arg)
 {
     backend *b = arg;
+    uint64_t interrupted = 0;
     for (;;) {
-        os_event_wait(b->armed, OS_FOREVER);
-        if (b->quit) return;
-        if (!os_event_wait(b->done, b->nanos)) {
-            wasmtime_engine_increment_epoch(b->ticking);
-            os_event_wait(b->done, OS_FOREVER);     /* the call does return, having trapped */
+        uint64_t active, until, now;
+        wasm_engine_t *engine;
+        int quit;
+        os_mutex_lock(b->lock);
+        active = b->active;
+        until = b->until;
+        engine = b->ticking;
+        quit = b->quit;
+        os_mutex_unlock(b->lock);
+        if (quit) return;
+        if (!active || active == interrupted) {
+            os_event_wait(b->wake, OS_FOREVER);     /* nothing to time, or it is on its way out */
+            continue;
         }
+        now = os_now();
+        if (now < until) {
+            os_event_wait(b->wake, until - now);
+            continue;
+        }
+        /* out of time: the call traps at its next check, and its end is what wakes this */
+        wasmtime_engine_increment_epoch(engine);
+        interrupted = active;
     }
 }
 
@@ -218,19 +241,21 @@ BACKEND_EXPORT backend *backend_create(const backend_setting *settings, uint32_t
         return NULL;
     }
     backend *b = calloc(1, sizeof *b);
-    b->armed = os_event_new();
-    b->done = os_event_new();
+    b->wake = os_event_new();
+    b->lock = os_mutex_new();
     b->watchdog = os_thread_start(watchdog, b);
     return b;
 }
 
 BACKEND_EXPORT void backend_destroy(backend *b)
 {
+    os_mutex_lock(b->lock);
     b->quit = 1;
-    os_event_set(b->armed);
+    os_mutex_unlock(b->lock);
+    os_event_set(b->wake);
     os_thread_join(b->watchdog);
-    os_event_free(b->armed);
-    os_event_free(b->done);
+    os_event_free(b->wake);
+    os_mutex_free(b->lock);
     for (int k = 0; k < ENGINES; k ++) {
         if (b->engines[k]) wasm_engine_delete(b->engines[k]);
     }
@@ -240,7 +265,8 @@ BACKEND_EXPORT void backend_destroy(backend *b)
 BACKEND_EXPORT uint32_t backend_capabilities(backend *b)
 {
     (void)b;
-    return BACKEND_SANDBOX | BACKEND_METER | BACKEND_DEADLINE | BACKEND_LIMIT | BACKEND_RELOAD;
+    return BACKEND_SANDBOX | BACKEND_METER | BACKEND_DEADLINE | BACKEND_LIMIT | BACKEND_RELOAD
+         | BACKEND_SIDE_BY_SIDE;
 }
 
 BACKEND_EXPORT void memory_shape(backend *b, uint64_t *reservation, uint64_t *guard)
@@ -552,14 +578,22 @@ BACKEND_EXPORT int call(backend_func *f, int32_t *status, backend_err *err)
     if (!(i->m->kind & INTERRUPTIBLE)) nanos = 0;
     if (nanos) {
         wasmtime_context_set_epoch_deadline(i->ctx, 1);
-        b->nanos = nanos;
+        os_mutex_lock(b->lock);
+        b->active = ++ b->calls;
+        b->until = os_now() + nanos;
         b->ticking = i->engine;
-        os_event_set(b->armed);
+        os_mutex_unlock(b->lock);
+        os_event_set(b->wake);
     } else if (i->m->kind & INTERRUPTIBLE) {
         wasmtime_context_set_epoch_deadline(i->ctx, FAR);
     }
     error = wasmtime_func_call(i->ctx, &f->func, NULL, 0, &result, 1, &trap);
-    if (nanos) os_event_set(b->done);
+    if (nanos) {
+        os_mutex_lock(b->lock);
+        b->active = 0;
+        os_mutex_unlock(b->lock);
+        os_event_set(b->wake);
+    }
 
     if (error || trap) {
         fail(err, "trapped", error, trap);

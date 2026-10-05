@@ -42,3 +42,5 @@ BRIDGE_EXPORT(init) int init(void)
     }
     return 0;
 }
+
+BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }

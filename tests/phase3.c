@@ -47,9 +47,12 @@ static bridge_artifact artifact(const char *identity, const char *file)
     a.cfg.abi = BRIDGE_ABI;
     a.cfg.trusted = false;
     a.cfg.on_error = BRIDGE_SKIP;
+    a.cfg.max_system_failures = 3;
     a.cfg.fuel = 10000000;
     a.cfg.memory_limit = 16 << 20;
     a.cfg.init_timeout = 2000 * MS;
+    a.cfg.reload_timeout = 2000 * MS;
+    a.cfg.shutdown_timeout = 2000 * MS;
     a.cfg.log_level = 0;
     a.cfg.scratch = 64 << 10;
     a.cfg.log_ring = 64 * 24;
@@ -104,6 +107,8 @@ static void bench(bridge_config *cfg)
             double best = 1e30;
             a.cfg.fuel = metered ? 1000000000 : BRIDGE_NO_LIMIT;
             a.cfg.init_timeout = BRIDGE_NO_LIMIT;
+            a.cfg.reload_timeout = BRIDGE_NO_LIMIT;
+            a.cfg.shutdown_timeout = BRIDGE_NO_LIMIT;
             a.cfg.spawns = 200000;
             if (!b || bridge_load(b, &a)) { printf("bench: cannot load\n"); exit(2); }
             for (round = 0; round < 20; round ++) {
