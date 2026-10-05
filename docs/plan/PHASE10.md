@@ -67,7 +67,18 @@ Seven questions followed, one at a time.
                                      module that asked, toward its own budget
     out of columns                   the same, and no memory from outside the block
 
+    what a descriptor may say        exactly the type set, in the spellings a module's own header
+                                     uses, and nothing of flecs' vocabulary: `schema.md`, *The
+                                     type set*
+
 Each is applied to its document in the last step, when the tree is what the document says.
+
+The last of those was asked when the parser came to be written. flecs' own took `_Bool`,
+`ecs_entity_t`, `const`, pointers, C++ template spellings, any symbol flecs itself knew, and
+`ECS_PRIVATE`, after which the rest of a struct went undescribed. None of the tree's descriptors
+used one of them. `src/schema.c` states its whole grammar in the comment at its head, and
+`tests/schema.c` reads every accepted spelling against what the compiler lays the same struct out
+as, and has every other refused by the word it stopped at.
 
 **The fourth closes something that is open today.** When a row is removed, flecs reads from the
 table's array of entity ids which entity filled the hole, and updates that entity's record in

@@ -243,6 +243,8 @@ def build(target, debug, out):
     wasm_o = compile_('wasm', ROOT / 'backends/wasm/wasm.c',
                       ours + [include, src, '-I%s' % (wasmtime / 'include')])
     native_o = compile_('native', ROOT / 'backends/native/native.c', ours + [include, src])
+    schema_o = compile_('schema', ROOT / 'src/schema.c', ours + [include, src])
+    schema_test_o = compile_('schema-test', ROOT / 'tests/schema.c', ours + [include, src])
     adopt_o = compile_('adopt', ROOT / 'tests/adopt.c', ours + [include, src] + defines)
     phase_o = {name: compile_(name, ROOT / 'tests' / (name + '.c'), ours + [include] + defines)
                for name in ('phase2', 'phase3', 'phase4', 'phase5', 'phase6')}
@@ -277,6 +279,7 @@ def build(target, debug, out):
                                 ('rowmove', 'flecs-nohook', 'rowmove-nohook')):
         link(name, [obj / ('%s-%s.o' % (test, variant)), flecs_o[variant]], system)
     link('adopt', [adopt_o, obj / 'backend.o', os_o], system)
+    link('schema', [schema_test_o, schema_o], system)
     whole = bridge_o + [os_o, flecs_o['flecs']]
     for name, o in phase_o.items():
         link(name, [o] + whole, system)
@@ -387,6 +390,8 @@ def main():
 CASES = [
     ('c23', ['c23'],
      None, None),
+    ('schema', ['schema'],
+     r"every descriptor read as it should, and every other refused by its word.*alive", None),
     ('storage-changes', ['storage', 'changes'],
      '@tests/storage-changes.txt', None),
     ('storage-tables', ['storage', 'tables'],
