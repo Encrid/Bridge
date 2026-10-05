@@ -243,11 +243,14 @@ of the three platforms' formats.*
 
 `[checks] validate` and `[checks] profile` - the barrier's checksum pass and the per-system
 counters - and `bridge_profile`, a pull. `validation.md`, *The checksum pass, when asked*, and
-`profile.md`, *The profile*.
+`profile.md`, *The profile*. And a second pull: how much of each budget is in use, and the most
+that ever was, for the bridge and for each module - the reading a deployment sizes its budgets by.
+What a host does with it is the host's, in its own repository.
 
 *Done when a deliberate stray write is reported with the module that made it, a system made slow on
 purpose is the one the profile names, an observer cycle shows as call counts that never fall to
-zero, and one deployment run twice, and on one thread and on four, gives the same checksum of
+zero, every budget of the bridge and of a module reads as what a test made it use and as the
+most it ever used, and one deployment run twice, and on one thread and on four, gives the same checksum of
 every column at every barrier - `schedule.md`, *What a pass depends on*.*
 
 ## 14. Record and replay
@@ -351,6 +354,5 @@ Each is refused or deferred in the document named, with the condition that would
 
     per-component page mapping       `costs.md`, *What we give up*
     a phase exclusivity flag         `schedule.md`, *A phase is a name and nothing else*
-    memory high-water per module     `profile.md`, *The profile*
     an instance-grouping entry       `backend.md`, *What the backend does not do*
     layout migration                 `lifetime.md`, *When the layout changed*

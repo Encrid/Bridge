@@ -34,6 +34,19 @@ something not universal to every deployment, and a profile needs one: a shipped 
 measure itself. So `[checks] profile` beside `validate`, as the two things Bridge-ASM700 does only when
 asked, with two clock reads per dispatch as the cost when on.
 
-**Not recorded: memory high-water per module.** The original Bridge's profile had it and nothing
-here claims it. The condition that would add it is a deployment wanting to watch a limit be
-approached rather than hit.
+**How full each budget is, is asked for the same way, and is not built yet.** Every size a
+deployment states is a guess until something says how near it came: `memory.md`, *Where the seven
+regions live*, calls `spans` a key "a deployment is expected to correct", and nothing tells it
+what to correct it to but the refusal when it runs out. So a second pull, beside this one: for
+the bridge, what is in use and the most that ever was against each `[budget]` key; for each
+module, the same against each of its own. They are numbers the library keeps already, with a
+mark kept where it kept only the present value. `PLAN.md`, phase 13.
+
+It is a pull for the reason the profile is. What to do with the numbers - print them, and when -
+is the host's.
+
+Refused: the module's own memory only, which is what the original Bridge's profile had: its
+modules' memories grew, and ours are sized once. The condition that brings it back is nothing,
+since it is inside what is planned. Refused: a record when a budget passes some fraction, which
+arrives by a route that may drop and needs a fraction nobody stated. The condition is a host that
+cannot poll.

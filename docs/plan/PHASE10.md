@@ -426,7 +426,8 @@ read in its document and becomes a phase, a refusal with its condition, or nothi
             they are shared                                                           5c4e577
     open    per-component page mapping
     open    a phase exclusivity flag
-    open    memory high-water per module
+    closed  memory high-water per module: wider than it said. How full every budget is, for
+            the bridge and for each module, as a pull, in `PLAN.md` 13 and its done-when
     open    an instance-grouping entry
     closed  arena mark and reset: still refused, with its condition. What was behind it is
             not: a share goes back to the arena at unload unless a row still holds a string
@@ -434,7 +435,7 @@ read in its document and becomes a phase, a refusal with its condition, or nothi
     open    layout migration
     closed  bindings for a non-C module: a phase of its own, `PLAN.md` 15. The module seam
             is described once and the C header and one other language's binding are written
-            from it. Tried first: the project's compiler cannot translate the header
+            from it. Tried first: the project's compiler cannot translate the header 3f73239
 
 **2. Statements that are false now**: one commit, no decision.
 
