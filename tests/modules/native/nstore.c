@@ -7,15 +7,15 @@
  * docs/plan/PHASE10.md. */
 #include "bridge-native.h"
 
-ECS_STRUCT(A, { uint32_t v; });
-ECS_STRUCT(B, { uint32_t v; });
+BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });
+BRIDGE_SCHEMA_STRUCT(B, { uint32_t v; });
 
 #ifdef BIG
 constexpr uint32_t COUNT = 100'000;
 #elifdef TABLES
 constexpr uint32_t COUNT = 10'000;
 constexpr uint32_t KINDS = 14;                  /* 2^14 sets of them, each a table */
-ECS_STRUCT(T, { uint32_t v; });
+BRIDGE_SCHEMA_STRUCT(T, { uint32_t v; });
 #else
 constexpr uint32_t COUNT = 6;
 #endif

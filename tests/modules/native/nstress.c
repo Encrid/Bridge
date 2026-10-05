@@ -11,7 +11,7 @@
  * docs/plan/PHASE10.md. */
 #include "bridge-native.h"
 
-ECS_STRUCT(V, { uint32_t v; });
+BRIDGE_SCHEMA_STRUCT(V, { uint32_t v; });
 
 constexpr uint32_t KINDS = 8, SLOTS = 50'000, CHANGES = 20'000;
 

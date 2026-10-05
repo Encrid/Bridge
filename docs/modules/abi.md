@@ -15,8 +15,8 @@ Any time, queued and applied at the next barrier:
     detach(id, slot)
     alloc(len)                     -> offset into the persistent arena
 
-`desc` is the descriptor string `ECS_STRUCT` already emits beside the typedef - `schema.md`, *There
-is no schema format*, for what Bridge-ASM700 does with it and what it does not. `kind` says what it
+`desc` is the descriptor string `BRIDGE_SCHEMA_STRUCT` already emits beside the typedef -
+`schema.md`, *There is no schema format*, for what Bridge-ASM700 does with it and what it does not. `kind` says what it
 describes: a struct, an enum or a bitmask - `schema.md`, *The type set*. It is stated, like every
 other value.
 

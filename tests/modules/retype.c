@@ -2,7 +2,7 @@
  * that name is left: how a test sees that a component is gone. Built once per name. */
 #include "bridge-wasm.h"
 
-ECS_STRUCT(Retyped, { uint32_t a; uint32_t b; uint32_t c; });
+BRIDGE_SCHEMA_STRUCT(Retyped, { uint32_t a; uint32_t b; uint32_t c; });
 
 BRIDGE_EXPORT(init) int init()
 {

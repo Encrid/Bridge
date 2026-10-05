@@ -7,11 +7,11 @@
 #include "bridge-wasm.h"
 
 #ifdef WIDE
-ECS_STRUCT(Tick, { uint32_t n; uint32_t more; });
+BRIDGE_SCHEMA_STRUCT(Tick, { uint32_t n; uint32_t more; });
 #else
-ECS_STRUCT(Tick, { uint32_t n; });
+BRIDGE_SCHEMA_STRUCT(Tick, { uint32_t n; });
 #endif
-ECS_STRUCT(Extra, { uint32_t unused; });
+BRIDGE_SCHEMA_STRUCT(Extra, { uint32_t unused; });
 
 static uint32_t tick, ticking;
 

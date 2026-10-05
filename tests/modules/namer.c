@@ -2,7 +2,7 @@
  * where they are and how many. docs/bridge/memory/strings.md. */
 #include "bridge-wasm.h"
 
-ECS_STRUCT(Name, { uint32_t at; uint32_t len; });
+BRIDGE_SCHEMA_STRUCT(Name, { uint32_t at; uint32_t len; });
 
 static uint32_t name, saying;
 

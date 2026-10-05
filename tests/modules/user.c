@@ -3,7 +3,7 @@
 #include "bridge-wasm.h"
 
 typedef struct Vec2 { float x; float y; } Vec2;
-ECS_STRUCT(Body, { Vec2 at; float mass; });
+BRIDGE_SCHEMA_STRUCT(Body, { Vec2 at; float mass; });
 
 static uint32_t body, reading;
 

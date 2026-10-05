@@ -56,15 +56,15 @@ BRIDGE_ACC(acc_from_shared) void acc_from_shared(void *to, uint32_t from, uint32
 
 /* ---- the schema: a struct, and the string both sides hash ---- */
 
-#define ECS_STRUCT(name, ...) \
+#define BRIDGE_SCHEMA_STRUCT(name, ...) \
     typedef struct name __VA_ARGS__ name; \
     static const char name##_desc[] = #__VA_ARGS__
 /* an enum is four bytes signed and a bitmask four unsigned, and the type says so: it is what
  * Bridge-ASM700 lays the field out as, whatever a compiler would have chosen */
-#define ECS_ENUM(name, ...) \
+#define BRIDGE_SCHEMA_ENUM(name, ...) \
     typedef enum name : int32_t __VA_ARGS__ name; \
     static const char name##_desc[] = #__VA_ARGS__
-#define ECS_BITMASK(name, ...) \
+#define BRIDGE_SCHEMA_BITMASK(name, ...) \
     typedef enum name : uint32_t __VA_ARGS__ name; \
     static const char name##_desc[] = #__VA_ARGS__
 

@@ -40,7 +40,7 @@ Most strings belong in none of this:
                                      lifetime - a mod name, a path read at init
 
 An **inline array** is in the type set already - `schema.md`, *The type set* - so
-`ECS_STRUCT(Named, { char name[32]; })` is an ordinary component with nothing allocated anywhere.
+`BRIDGE_SCHEMA_STRUCT(Named, { char name[32]; })` is an ordinary component with nothing allocated anywhere.
 That is the answer to "how do I free it": put it where something already does.
 
 A list of things is not a string in a component. It is an entity each, with a fixed field, destroyed

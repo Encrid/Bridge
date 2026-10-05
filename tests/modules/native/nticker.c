@@ -2,7 +2,7 @@
  * of this one shuts the old instance down before the new one is opened. */
 #include "bridge-native.h"
 
-ECS_STRUCT(Tick, { uint32_t n; });
+BRIDGE_SCHEMA_STRUCT(Tick, { uint32_t n; });
 
 static const bridge_api *api;
 static uint32_t tick, ticking;

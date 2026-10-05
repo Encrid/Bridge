@@ -354,8 +354,12 @@ between what an entity carried before the barrier and after: `data.md`, *Observe
 reading of every queue went with it, and `storage-changes.txt` changed in the two lines that
 showed it.
 
-**Still inherited from flecs, and each to be decided**: the `ECS_` names of the three schema
-macros; the numbers of the log levels; thirty-two terms a query; the texts of records that were
+**The names of the three schema macros: decided.** They were `ECS_STRUCT`, `ECS_ENUM` and
+`ECS_BITMASK`, flecs' prefix on macros flecs no longer stood behind. They are
+`BRIDGE_SCHEMA_STRUCT`, `BRIDGE_SCHEMA_ENUM` and `BRIDGE_SCHEMA_BITMASK`: `schema.md`, *There is
+no schema format*.
+
+**Still inherited from flecs, and each to be decided**: the numbers of the log levels; thirty-two terms a query; the texts of records that were
 kept word for word; when a freed index is handed out again; the shape of an id and of an index
 record. And the order of the fields of `bridge_budget`, which followed what the tests already
 wrote.

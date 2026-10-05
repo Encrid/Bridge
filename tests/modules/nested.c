@@ -2,10 +2,10 @@
  * declared first, in the namespace the component is in. */
 #include "bridge-wasm.h"
 
-ECS_STRUCT(Vec2, { float x; float y; });
-ECS_ENUM(Team, { Red, Green, Blue });
-ECS_BITMASK(Flags, { Solid = 1, Hidden = 2 });
-ECS_STRUCT(Body, { Vec2 at; Team team; Flags flags; float mass; });
+BRIDGE_SCHEMA_STRUCT(Vec2, { float x; float y; });
+BRIDGE_SCHEMA_ENUM(Team, { Red, Green, Blue });
+BRIDGE_SCHEMA_BITMASK(Flags, { Solid = 1, Hidden = 2 });
+BRIDGE_SCHEMA_STRUCT(Body, { Vec2 at; Team team; Flags flags; float mass; });
 
 static uint32_t body, reading;
 

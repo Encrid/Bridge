@@ -2,8 +2,8 @@
 #ifndef TEST_ROSTER_H
 #define TEST_ROSTER_H
 
-ECS_STRUCT(Position, { float x; float y; });
-ECS_STRUCT(Private, { uint32_t secret; });
-ECS_STRUCT(Roster, { uint64_t ids[5]; });
+BRIDGE_SCHEMA_STRUCT(Position, { float x; float y; });
+BRIDGE_SCHEMA_STRUCT(Private, { uint32_t secret; });
+BRIDGE_SCHEMA_STRUCT(Roster, { uint64_t ids[5]; });
 
 #endif

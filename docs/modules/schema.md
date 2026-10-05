@@ -2,19 +2,23 @@
 
 ## There is no schema format
 
-The schema is a C header, using three macros that are flecs' by name and Bridge-ASM700's by
-definition:
+The schema is a C header, written with three macros of the binding headers:
 
-    ECS_STRUCT(Position, { float x; float y; })
+    BRIDGE_SCHEMA_STRUCT(Position, { float x; float y; })
 
 It expands to the type and a descriptor string, on either backend:
 
-    #define ECS_STRUCT(name, ...) \
-        ECS_STRUCT_TYPE(name, __VA_ARGS__); \
+    #define BRIDGE_SCHEMA_STRUCT(name, ...) \
+        typedef struct name __VA_ARGS__ name; \
         static const char name##_desc[] = #__VA_ARGS__
 
-`ECS_STRUCT_TYPE` is `typedef struct name {...} name`. The module's compiler lays the struct out;
-the string is handed over at `declare`.
+The module's compiler lays the struct out; the string is handed over at `declare`.
+`BRIDGE_SCHEMA_ENUM` and `BRIDGE_SCHEMA_BITMASK` do the same for the other two kinds.
+
+The shape is flecs' `ECS_STRUCT`, and until phase 10 so was the name. It is ours now because the
+name was a promise: a reader expected flecs behind it, and a native module that links flecs for
+its own use would have had the macro defined twice. Refused: `BRIDGE_STRUCT`, which is already the
+kind a `declare` states.
 
 **Bridge-ASM700 reads the string, and only the string.** `src/schema.c` lays the same struct out
 from its text, by the rule C states - each field at the next multiple of its alignment, the whole a
@@ -65,8 +69,8 @@ own namespace.** `Vec3 at;` in `game:Body` is `game:Vec3`, which a module declar
 an enum or a bitmask, each by its own macro and each with its kind stated at `declare`. A type that
 was not declared there is refused at the declaration that uses it, by its name.
 
-An enum is four bytes signed and a bitmask four unsigned, which is what `ECS_ENUM` and
-`ECS_BITMASK` state of them in the binding headers and so what a module's compiler lays out.
+An enum is four bytes signed and a bitmask four unsigned, which is what `BRIDGE_SCHEMA_ENUM` and
+`BRIDGE_SCHEMA_BITMASK` state of them in the binding headers and so what a module's compiler lays out.
 Refused: reaching across namespaces for a field's type, which
 would need the descriptor to carry a namespace C has no syntax for. The condition that brings it
 back is a mod that must embed one of the game's structs in its own component, and until then it
@@ -115,7 +119,7 @@ component model needed a type system.
 
 ## What a module compiles against
 
-Two files, and **nothing is generated**. `bridge-wasm.h` holds the imports, the `ECS_STRUCT` shim
+Two files, and **nothing is generated**. `bridge-wasm.h` holds the imports, the `BRIDGE_SCHEMA_STRUCT` shim
 above, and the span, the header and the log ring read through accessors. `bridge-wasm.wat` holds
 the accessors themselves: a load or a store per width, and the row address carrying the
 `row < count` test - **always, with no switch to remove it**: `validation.md`, *Always on*. They are

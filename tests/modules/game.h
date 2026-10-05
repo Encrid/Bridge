@@ -2,7 +2,7 @@
 #ifndef TEST_GAME_H
 #define TEST_GAME_H
 
-ECS_STRUCT(Position, { float x; float y; });
-ECS_STRUCT(Marked, { uint32_t by; });
+BRIDGE_SCHEMA_STRUCT(Position, { float x; float y; });
+BRIDGE_SCHEMA_STRUCT(Marked, { uint32_t by; });
 
 #endif

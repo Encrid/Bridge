@@ -2,7 +2,7 @@
  * One hop per barrier: three barriers, and no fixpoint. */
 #include "bridge-wasm.h"
 
-ECS_STRUCT(Link, { uint32_t n; });
+BRIDGE_SCHEMA_STRUCT(Link, { uint32_t n; });
 
 constexpr uint32_t NONE = 0xffffffffu;
 
