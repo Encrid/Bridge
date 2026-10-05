@@ -24,8 +24,9 @@ entity has died is one load and one compare.
 
 **What it costs.** The index changes only for entities created, destroyed, or moved between tables,
 so it is patched at the merge point rather than rebuilt - **O(structural changes), unrelated to
-world size**. Measured at 1.4 record writes per operation where the swap-remove suggests two: 360
-operations moved 503 records.
+world size**. Measured at 1.6 records an operation, where the swap-remove suggests two:
+`tests/rowmove.c` runs 44,845 operations, and 51,185 entities are named by an event and 19,584 by
+the hook.
 
 **Memory is twelve bytes times the highest entity id** rather than the live count. flecs recycles
 ids, so that tracks peak concurrent entities and not everything ever spawned. It is a **budget

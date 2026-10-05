@@ -59,12 +59,10 @@ whole, a third read found the other store's bytes, and a load one byte past the 
 faulting on the reservation. So Bridge-ASM700 allocates, every backend adopts, and no shared memory
 or threads proposal is needed - `backend.md`, *Memory is adopted, not created*.
 
-**But not the way wasmtime's header says.** Its C API documents the host memory creator as "used
-when creating host Memory objects". In 48.0.5 it is not: a memory the host creates is allocated by
-wasmtime's own default, and the creator is never asked. It **is** asked for a memory an instance
-defines. So an adopted block enters a store as the memory of a module that does nothing but define
-one and export it - `wasmtime.md`, *Memory*. Found by the test printing nothing where the creator
-should have spoken, and confirmed in wasmtime's source.
+**But not the way wasmtime's header says.** The host memory creator is not asked for the memory it
+is documented for, and is asked for another: `wasmtime.md`, *Memory*, has which, and the holder
+module that follows from it. Found by the test printing nothing where the creator should have
+spoken, and confirmed in wasmtime's source.
 
 **Storage is not handed to a module yet.** `bridge_load` gives a module no memories, because the
 shared and private blocks arrive with `[budget]` in phase 3. A module that imports one fails to

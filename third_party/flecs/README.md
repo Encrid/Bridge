@@ -13,5 +13,5 @@ into the build directory, because Bridge-ASM700 needs flecs to allocate componen
 block it owns, and no wrapper outside flecs can decide where flecs allocates. The script is the
 record of every change; `docs/bridge/flecs.md` is why.
 
-The version number does not identify this source: upstream's `master` kept saying 4.1.6 for months
-after the tag, with different table storage. The hashes above do, and the script checks them.
+The version number does not identify this source; the hashes above do, and the script checks them.
+`docs/bridge/flecs.md` has what was learned by trusting the number.

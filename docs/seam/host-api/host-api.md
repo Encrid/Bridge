@@ -145,6 +145,10 @@ nothing here records a source.
 pass walks every column - `validation.md`, *The checksum pass, when asked* - and the other times
 every dispatch, `profile.md`, *The profile*. Nothing else Bridge-ASM700 does is optional.
 
+**A backend refuses a setting it does not know, by name**, and `bridge_create` fails with it: a key
+nobody reads is a typo nobody would find, the argument `config.md`, *A module's own settings are a
+component*, makes for a module's. Neither backend built so far has a setting, so each refuses any.
+
 **A backend's `settings` are its own** - the cache directory, the pooling limits -
 and Bridge-ASM700 passes them to `backend_create` unread: `backend.md`, *The backend owns its clock*.
 

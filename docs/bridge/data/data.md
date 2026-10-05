@@ -72,12 +72,12 @@ observer is a system that is invoked when an event matches its query"* - with `O
 `ON_REMOVE` as the triggers.
 
 It runs **at the barrier where the change applied**, which is why it takes no phase. flecs arranges
-that itself, which the spike checked rather than assumed. An observer on an *immediate* operation
+that itself, which is checked rather than assumed. An observer on an *immediate* operation
 does fire synchronously, on the caller's stack, mid-phase, against spans that are a snapshot from
 the last barrier - the one thing `schedule.md`, *Phases*, does not allow. But **every structural
 change here is deferred** - `abi.md`, *The ABI* - and under flecs' own defer not one invocation
-arrives early: 360 deferred operations produced 360 observer calls, all at the merge point and none
-during the batch.
+arrives early. `tests/phase5.c` holds that on every build: an attach made in a phase reaches its
+observer under that phase's barrier count, and a chain of three takes three barriers.
 
 So Bridge-ASM700 uses flecs' observers as they are. Nothing to arrange, and no change detection to write:
 an observer runs where the world is already consistent, and never inside somebody else's work.

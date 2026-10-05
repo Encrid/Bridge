@@ -26,7 +26,8 @@ this backend a module runs on after one.
 
 ## The tests
 
-Six new ones, forty-three in all, in a release build and a debug one.
+Six new ones, forty-three in all, in a release build and a debug one. A seventh, `setting`, came
+after phase 5.
 
     raw          a native system adds to every row through a `Position *`, and another counts
                  two tables and 1,000 rows

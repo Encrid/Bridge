@@ -60,10 +60,11 @@ in the block - `tests/confined.c`, on every build:
 The same test against a flecs without the patch reports every one of them escaped, which is what
 makes the zero mean something.
 
-**And not confining is expensive, which argument could not supply.** The phase 0 spike measured it,
-on an upstream snapshot rather than on the release pinned now, so the figures are an order of
-magnitude: internals were **87% of module-addressable bytes at 4,000 entities and 38% at 200,000** -
-a large fixed floor of bootstrap plus growth that is sublinear against columns. So a stray write is
+**And not confining is expensive, which argument could not supply.** The same test counts what
+flecs allocates that is not a column. Left unconfined, all of it would sit where a module can
+write: **93% of the bytes at 4,000 entities, and 77% at 200,000** - 1.2 MB of flecs' own beside
+96 KB of columns, then 12 MB beside 3.6 MB. A fixed floor from bootstrap, and growth that keeps
+ahead of the columns it indexes. So a stray write is
 likelier to land in flecs' own structures than in game state, and that is the failure with no
 attribution: a crash inside flecs rather than a wrong number in a component somebody declared.
 
@@ -79,6 +80,17 @@ itself mean the block, which would capture every other caller that passes it.
 What reaches Bridge-ASM700 is `flecs_confine`: allocate, reallocate and free, each handed its sizes,
 set once before `ecs_init`. It is a global, as `ecs_os_api` is and for the same reason: the functions
 doing the allocating have no world in scope.
+
+**So which bridge a column is for is whichever the calling thread is working for.** Every way into
+Bridge-ASM700 notes its bridge for the thread before it reaches flecs, and the allocator reads that.
+Two bridges in one process are then two worlds that never see each other's block, on one thread or
+on two. flecs sets up globals of its own with its first world, so creating and destroying a world
+is done one at a time, under a lock that is the process's.
+
+**The column region is carved to what flecs asks for**, to sixteen bytes. A freed range is a gap,
+kept in order and joined to its neighbours, and a request takes the smallest gap that holds it
+before fresh space. A column that grows does so in place when what follows it is free. What says
+which ranges are free is kept outside the block, where a module's stray write cannot reach it.
 
 ### How it is carried
 

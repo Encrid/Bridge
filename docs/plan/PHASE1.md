@@ -73,13 +73,13 @@ The open question the plan carried - how the vec sites are routed - closed in th
 not expect: not explicit calls replacing the vec, but a sentinel allocator the vec itself
 understands. "NULL means ours" stays refused; other callers pass `NULL` and mean the OS.
 
-**One hook is enough for what Bridge-ASM700 does.** A table merge, which a component deletion
-causes, moves rows too; flecs' events name those entities, and the test's workload includes one.
-`ecs_table_swap_rows` and sorting move rows silently and are not hooked, because nothing here calls
-them.
+**One hook is enough for what Bridge-ASM700 does**, and the test's workload includes the other
+thing that moves rows - `flecs.md`, *flecs will not tell you which*, for which sites are silent and
+why two of them are not hooked.
 
-**Not measured again: what confinement is worth.** The 87% and 38% in `flecs.md` are the spike's, on
-the snapshot. They are kept as an order of magnitude.
+**What confinement is worth was not measured in this phase.** The spike's figures, from the
+snapshot, stood in `flecs.md` until phase 5 closed, when `tests/confined.c` took them on the
+release: `flecs.md`, *It can be confined*.
 
 ## Open questions
 
@@ -87,7 +87,5 @@ None.
 
 ## What would make us stop
 
-It did not happen: no edit changes a signature. It is still the condition for the next flecs. The
-storage this patch touches has already been rewritten upstream, so **an upgrade is a new site list**,
-not a version bump - the script fails by name, and the two tests say when the new list is complete.
-`flecs.md`, *How it is carried*.
+It did not happen: no edit changes a signature. It is still the condition for the next flecs, and
+what an upgrade takes is `flecs.md`, *How it is carried*.

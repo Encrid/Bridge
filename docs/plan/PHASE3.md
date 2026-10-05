@@ -78,24 +78,17 @@ accessor needs a field's type, offset and struct size, and a module's own compil
 `_Generic`, `offsetof`, `sizeof`. So what a module compiles against is a header and a file of wasm
 text, and no tool reads a schema - `schema.md`, *What a module compiles against*.
 
-**The accessor's test is not free, and under fuel it costs more than itself.** Nanoseconds a row,
-over one float read, changed and written back, 200,000 rows:
-
-                         with the test    without
-    no fuel              0.39             0.33      x1.2
-    fuel                 0.66             0.44      x1.5
-
-`validation.md`, *Always on*, had reasoned that a compiler would hoist it. Neither Binaryen nor
-wasmtime does. It stays, with the number beside it and the condition that reopens it.
+**The accessor's test is not free, and under fuel it costs more than itself.** `validation.md`,
+*Always on*, had reasoned that a compiler would hoist it. Neither Binaryen nor wasmtime does. It
+stays, with the measurement there beside it and the condition that reopens it.
 
 **The merge goes both ways.** The accessors copy bytes between a module's own memory and the other
 two, so the accessor module imports the compiled module's memory while the compiled module imports
 the accessors. Binaryen resolves both in one merge.
 
-**flecs' own tables take about 70 KB of columns.** Before any module declares anything. So
-`[budget] columns` has a floor that is flecs', and `bridge_create` refuses a budget under it rather
-than start a bridge that stops at its first barrier - `budgets.md`, *Bridge-ASM700 defaults none of
-them*.
+**flecs' own tables take columns before any module declares anything**, so `[budget] columns` has
+a floor that is not ours - `budgets.md`, *Bridge-ASM700 defaults none of them*, for the figure and
+what create does about it.
 
 **Table ids did not need flecs' table events.** A table gets its id the first time the mirror
 places an entity in it or a query matches it, which covers every table a module can reach.
@@ -116,13 +109,8 @@ trapping in `init`.
 registered and changes it queued are applied at the next barrier. Leaving storage as it was is
 `PLAN.md` phase 6's claim, and arrives with unload.
 
-**The column allocator is power-of-two classes**, never split or joined, so up to half a column is
-slack. Stated where it is written, with what replaces it.
-
-**One bridge in a process.** flecs' confinement is a global, as `ecs_os_api` is, and
-`bridge_create` refuses a second.
-
-**`observe` refuses.** It is defined so a module that imports it links; observers are phase 5.
+The phase also closed with three shortcuts: an allocator in power-of-two classes, one bridge to a
+process, and `observe` refusing. None is left - `PHASE5.md`, *Closed after the phase*.
 
 ## Open questions
 

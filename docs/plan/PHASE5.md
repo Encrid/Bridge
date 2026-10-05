@@ -37,7 +37,7 @@ which has to be the one that loaded it - `pinned.md`, *Threads*.
 
 ## The tests
 
-Twenty new ones, sixty-three in all, in a release build and a debug one. The three that depend on
+Twenty-two new ones, sixty-five in all, in a release build and a debug one. The three that depend on
 timing were run six times over.
 
     order        the mover adds 1, then the halver halves, by one `[order]` pair: sum 125,250
@@ -90,8 +90,8 @@ gives it.
 
 ## Closed after the phase
 
-Four things earlier phases had built without testing, listed and not built, or never run, found by
-asking what "left" meant in a phase report.
+Everything earlier phases had built without testing, listed and not built, never run, or marked as
+a shortcut, found by asking what "left" meant in a phase report.
 
 **The set and remove events, and observers that conflict across modules**, had no test. They have
 `events`, `obsconflict`, `obsorder` and `obsreorder` above.
@@ -112,14 +112,31 @@ for Linux with zig, clean under `-Wall -Wextra`; then `.github/workflows/linux.y
 preset on a real one, and all sixty-three tests passed on the first run. It runs on every push now -
 `PLAN.md`, at its head.
 
-## Shortcuts taken
+**Every shortcut that was marked in the code**, since a shortcut with a note beside it is deferred
+work, and deferred work and its documents drift apart:
 
-Each works, is marked where it is written, and becomes work only if a measurement says so.
+    backend settings      typed, passed through, and a key the backend does not know refused
+    the schedule          reachability as a row of bits per system
+    the column allocator  exact sizes, gaps joined, growth in place - `flecs.md`, *It can be
+                          confined*
+    one bridge a process  as many as a host creates, each its own world, at once
+    a load that stopped   answers that it did not succeed
+    the bridge
 
-**Every ABI entry runs under one lock** - `threads.md`, *Threads*, with what replaces it.
+`setting` and `two` are the tests the first and fourth gained. The allocator moved a number:
+flecs' own tables fit in about 50 KB of columns where the first allocator needed 70.
 
-**The schedule is recomputed whole at every load**, with a dense matrix per phase. Stated where it
-is written, with what replaces it.
+**Figures that had come from another flecs** were taken again on the one pinned - `reference.md`,
+*Reference following*, `data.md`, *Observers*, and `flecs.md`, *It can be confined*, where what
+confinement keeps out of reach went from 87% and 38% to 93% and 77%.
+
+**Reports that repeated the documents they fed** cite them now. A figure said twice is two figures
+the day one of them moves, and one already had: the column floor.
+
+## Still open
+
+**Every ABI entry runs under one lock** - `threads.md`, *Threads*. It is the one item left, and it
+is a decision before it is work: see *Open questions*.
 
 ## Open questions
 
