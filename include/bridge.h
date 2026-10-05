@@ -120,8 +120,9 @@ int bridge_load(bridge *b, const bridge_artifact *a);
 int bridge_unload(bridge *b, const char *identity);
 
 /* Replace a loaded module's instance and keep its storage. 0 if the new instance is running;
- * otherwise a record says why, and the old one still is wherever its backend could keep it.
- * Between phases only. */
+ * otherwise a record says why. The old instance still runs where its backend can hold two at
+ * once; where it cannot, the module is stopped, with everything it declared, until it is
+ * reloaded again or unloaded. Between phases only. */
 int bridge_reload(bridge *b, const bridge_artifact *a);
 
 /* What is loaded, and whether it still runs: a module at its failure budget is stopped long

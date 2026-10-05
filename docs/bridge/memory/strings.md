@@ -23,9 +23,10 @@ that is right: storing a string in a component is rare, and making it cheap woul
 a loop.
 
 **Each module allocates from a share of it that is its own**, sized by its `persistent` -
-`budgets.md`, *Budgets*. Not for isolation: the bytes are in the shared memory and any module can
-read them, which is the point. For order: two modules allocating in one phase would otherwise be
-handed offsets in whichever order their threads arrived - `threads.md`, *Threads*.
+`budgets.md`, *Budgets* - and made of more than one range if a reload enlarged it. Not for
+isolation: the bytes are in the shared memory and any module can read them, which is the point.
+For order: two modules allocating in one phase would otherwise be handed offsets in whichever order
+their threads arrived - `threads.md`, *Threads*.
 
 ## Which of the three a string belongs in
 

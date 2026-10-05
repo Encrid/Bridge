@@ -143,10 +143,20 @@ never reads `ecs_table_t`'s layout. A table gets its id the first time it is see
 when the mirror places one in it, or when a query matches it. Id 0 is no table, which is what an
 entity with nothing on it has.
 
-**An id is given back when its table is about to go, and that is known without asking flecs.** One
-thing here deletes a table: deleting a component, which an unload or a reload does when a module was
-the last to declare it. So just before a component is deleted, the ids of the tables that hold it
-are retired; they are dead until the next barrier has moved every index record off them, and free
-after it. Refused: taking it from `EcsOnTableDelete`, which is what the plan named - an event for
-something Bridge-ASM700 has itself just decided, and one more thing of flecs' to depend on. The
-condition that brings it back is flecs deleting a table for a reason of its own.
+**An id is given back when flecs frees its table, and flecs is who says so.** `EcsOnTableDelete` is
+emitted from the one function every path to freeing a table goes through - `flecs_table_fini` - so
+an observer of it hears of a component deleted, of the children of something deleted, and of flecs'
+own sweep of empty tables alike. The id is dead until the next barrier has moved every index record
+off it, and free after it.
+
+The observer's term is `EcsAny` and not a wildcard: a wildcard is not told of a table whose type is
+only pairs, which is what holds an enum's constants. `tests/tables.c` frees a table each way and
+fails for either that is missed; it is the one test that reads Bridge-ASM700's own structures,
+because an id that outlived its table is a pointer to freed memory and shows nowhere a host can
+look.
+
+Refused: retiring the ids of the tables that hold a component just before deleting it, which is
+what this first did. It retires on a decision rather than on the fact, and the two differ: flecs
+keeps a table a query still holds, and frees tables that hold no component of ours at all. It was
+right only while nothing else freed a table, a fact about the whole codebase that nobody changing
+it later would know to check.

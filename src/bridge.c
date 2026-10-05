@@ -63,6 +63,7 @@ void bridge_destroy(bridge *b)
     free(b->phases);
     free(b->backends);
     free(b->stopped_by);
+    free(b->stopped_stem);
     free(b);
 }
 
@@ -169,12 +170,44 @@ refuse:
     return NULL;
 }
 
-int bridge_stopped(bridge *b)
+static size_t stem_length(const char *identity)
+{
+    const char *at = strchr(identity, '@');
+    return at ? (size_t)(at - identity) : strlen(identity);
+}
+
+/* failure.md: a module stated `fail` is lost, and nothing runs until it is back. */
+void bridge_stop(bridge *b, const char *identity, const char *what)
+{
+    char why[256];
+    if (b->stopped_by) return;
+    snprintf(why, sizeof why, "module '%s' %s and its on_error is fail", identity, what);
+    b->stopped_by = copy(why, strlen(why));
+    b->stopped_stem = copy(identity, stem_length(identity));
+    say(b, NULL, NULL, BRIDGE_ERR, "the bridge has stopped: %s", why);
+}
+
+void bridge_resume(bridge *b, const module *m)
+{
+    if (!b->stopped_stem || strcmp(b->stopped_stem, m->stem)) return;
+    free(b->stopped_by);
+    free(b->stopped_stem);
+    b->stopped_by = b->stopped_stem = NULL;
+    say(b, m, NULL, 0, "the bridge runs again: module '%s' is back", m->identity);
+}
+
+int bridge_stopped(bridge *b, const char *repairing)
 {
     module *m;
     if (b->stopped_by) {
-        say(b, NULL, NULL, BRIDGE_ERR, "the bridge has stopped: %s", b->stopped_by);
-        return 1;
+        /* what stopped it can be brought back, and that is the one call it accepts. Storage
+         * that ran out cannot be: then nothing lifts it. */
+        size_t n = repairing ? stem_length(repairing) : 0;
+        if (!repairing || !b->stopped_stem || strlen(b->stopped_stem) != n
+            || memcmp(b->stopped_stem, repairing, n)) {
+            say(b, NULL, NULL, BRIDGE_ERR, "the bridge has stopped: %s", b->stopped_by);
+            return 1;
+        }
     }
     /* pinned.md: a pinned module's thread is the one that loaded it, and Bridge-ASM700 has no
      * other to run it on. Both calls that run module code come through here. */
@@ -192,7 +225,7 @@ int bridge_phase(bridge *b, const char *name)
 {
     uint32_t phase;
     store_enter(b);
-    if (bridge_stopped(b)) return 1;
+    if (bridge_stopped(b, NULL)) return 1;
     for (phase = 0; phase < b->phase_count; phase ++) {
         if (name && !strcmp(b->phases[phase], name)) break;
     }

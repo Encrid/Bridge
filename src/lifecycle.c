@@ -29,7 +29,6 @@ static void free_list_of(char **list, uint32_t count)
 static void component_delete(bridge *b, component *c)
 {
     uint32_t k;
-    store_retire(b, c->id);             /* before flecs deletes the tables that hold it */
     ecs_delete(b->world, c->id);
     for (k = 0; b->components[k] != c; k ++) {}
     b->components[k] = b->components[-- b->component_count];
@@ -120,6 +119,7 @@ void module_discard(bridge *b, module *m)
     free_list_of(m->read, m->read_count);
     free_list_of(m->write, m->write_count);
     free(m->ids);
+    free(m->more);
     free(m->queue);
     free(m->systems);
     free(m->observers);
@@ -424,14 +424,6 @@ static int start(bridge *b, module *m, const bridge_artifact *a, uint32_t demand
     return 0;
 }
 
-static void stop_the_bridge(bridge *b, const char *identity, const char *what)
-{
-    char why[256];
-    if (b->stopped_by) return;
-    snprintf(why, sizeof why, "module '%s' %s and its on_error is fail", identity, what);
-    b->stopped_by = copy(why, strlen(why));
-}
-
 /* ---- load ---- */
 
 int bridge_load(bridge *b, const bridge_artifact *a)
@@ -444,7 +436,7 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     module *m, *other;
 
     store_enter(b);
-    if (bridge_stopped(b) || checks(b, a, &o, &demands)) return 1;
+    if (bridge_stopped(b, id) || checks(b, a, &o, &demands)) return 1;
     other = loaded(b, id);
     if (other) {
         say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: '%s' is loaded already", id,
@@ -493,13 +485,14 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     }
     b->module_count ++;
     b->layout_moved = 1;
+    bridge_resume(b, m);
     store_barrier(b);           /* what init queued is applied, and its spans are published */
     /* the module is in, and nothing will ever run it: that is not a load that succeeded */
     return b->stopped_by ? 1 : 0;
 
 failed:
     say(b, NULL, NULL, BRIDGE_ERR, "module '%s' did not load: %s", id, err.text);
-    if (cfg->on_error == BRIDGE_FAIL) stop_the_bridge(b, id, "failed");
+    if (cfg->on_error == BRIDGE_FAIL) bridge_stop(b, id, "failed");
     undo(b, m);
     module_discard(b, m);
     schedule_build(b, err.text, sizeof err.text);   /* as it was: this cannot refuse */
@@ -513,8 +506,8 @@ failed:
 static void shut_down(bridge *b, module *m)
 {
     backend_err err = {0};
-    if (!m->instance || !m->shutdown) return;
-    if (lifecycle_call(m, m->shutdown, "shutdown", m->shutdown_timeout, &err)) {
+    /* a module whose reload failed after its old instance went has no code left to call */
+    if (m->instance && lifecycle_call(m, m->shutdown, "shutdown", m->shutdown_timeout, &err)) {
         say(b, m, NULL, BRIDGE_ERR, "module '%s': %s; its teardown continues", m->identity, err.text);
     }
     store_apply(b, m);          /* what it had asked for, shutdown's requests included */
@@ -545,7 +538,7 @@ int bridge_unload(bridge *b, const char *identity)
     char why[256];
     module *m;
     store_enter(b);
-    if (bridge_stopped(b)) return 1;
+    if (bridge_stopped(b, NULL)) return 1;
     for (m = b->modules; m && (!identity || strcmp(m->identity, identity)); m = m->next) {}
     if (!m) {
         say(b, NULL, NULL, BRIDGE_ERR, "no module '%s' is loaded, so none is unloaded",
@@ -569,12 +562,13 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     const char *id = cfg->identity;
     open_backend *o = NULL;
     backend_err err = {0};
-    uint32_t demands = 0, i;
+    uint32_t demands = 0, i, extra = 0;
+    int64_t had, wants;
     module *old, *n, **link;
     int side_by_side;
 
     store_enter(b);
-    if (bridge_stopped(b) || checks(b, a, &o, &demands)) return 1;
+    if (bridge_stopped(b, id) || checks(b, a, &o, &demands)) return 1;
     old = loaded(b, id);
     if (!old) {
         say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is not reloaded: nothing of that name is "
@@ -592,12 +586,23 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
             "and a reload does not move it to '%s'", old->identity, old->on->name, o->name);
         return 1;
     }
-    /* its share lasts as long as it is loaded, and others hold offsets into it */
-    if (cfg->persistent != old->persistent) {
+    /* budgets.md: a budget changes by reload, and this one only upwards, since nothing in the
+     * arena is ever given back */
+    had = old->persistent > 0 ? old->persistent : 0;
+    wants = cfg->persistent > 0 ? cfg->persistent : 0;
+    if (wants < had) {
         say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is not reloaded: its persistent is %lld "
-            "and a reload states %lld, which only an unload and a load can change",
-            old->identity, (long long)old->persistent, (long long)cfg->persistent);
+            "and a reload states less, which nothing can give back", old->identity, (long long)had);
         return 1;
+    }
+    if (wants > had) {
+        extra = (((uint32_t)wants + 7u) & ~7u) - old->arena_share;
+        if (extra > b->arena_len - b->arena_used) {
+            say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is not reloaded: its persistent of %lld "
+                "bytes does not fit in the %u left of [budget] persistent", old->identity,
+                (long long)wants, b->arena_len - b->arena_used + old->arena_share);
+            return 1;
+        }
     }
 
     /* The new instance takes over what was set aside for the module. Until the swap these
@@ -606,10 +611,28 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     n->ids = old->ids;
     n->id_count = old->id_count;
     n->id_next = old->id_next;
+    n->id_room = old->id_room;
     n->arena_base = old->arena_base;
-    n->arena_share = old->arena_share;
+    n->arena_share = old->arena_share + extra;
     n->arena_at = old->arena_at;
     n->arena_left = old->arena_left;
+    n->more = calloc(old->more_count + 1, sizeof *n->more);
+    if (old->more_count) memcpy(n->more, old->more, old->more_count * sizeof *n->more);
+    n->more_count = old->more_count;
+    n->more_next = old->more_next;
+    if (extra) {
+        uint32_t top = b->arena + b->arena_used;
+        if (!old->arena_share) {
+            n->arena_base = n->arena_at = top;
+            n->arena_left = extra;
+        } else if (!(old->more_count - old->more_next) && old->arena_at + old->arena_left == top) {
+            n->arena_left += extra;         /* nothing was carved after it: it grows in place */
+        } else {
+            n->more[n->more_count].at = top;
+            n->more[n->more_count ++].left = extra;
+        }
+        b->arena_used += extra;
+    }
     n->config = old->config;
     n->config_entity = old->config_entity;
     n->text_at = old->text_at;
@@ -623,8 +646,8 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     if (!side_by_side) {
         /* a process cannot hold two copies of one library: the old one goes first */
         shut_down(b, old);
-        o->api.instance_destroy(old->instance);
-        o->api.module_destroy(old->image);
+        if (old->instance) o->api.instance_destroy(old->instance);
+        if (old->image) o->api.module_destroy(old->image);
         old->instance = NULL;
         old->image = NULL;
     }
@@ -636,6 +659,7 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
         n->declared_count = 0;
         n->ids = NULL;              /* they are the old record's */
         n->config_entity = 0;
+        b->arena_used -= extra;     /* the last thing carved, so it can go back */
         module_discard(b, n);
         if (side_by_side) {
             /* failure.md: the old instance is kept, and it was never touched */
@@ -643,14 +667,15 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
             schedule_build(b, err.text, sizeof err.text);
             return 1;
         }
-        /* otherwise this is init's case: there is no instance left to keep */
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is gone: its backend cannot hold two "
-            "instances, so the old one had already been shut down", old->identity);
-        if (cfg->on_error == BRIDGE_FAIL) stop_the_bridge(b, old->identity, "could not be reloaded");
-        take_out(b, old);
+        /* There is no instance left to keep. The module stays, stopped, with everything it
+         * declared: a reload is a call that means "keep running", and those never discard -
+         * lifetime.md. An artifact that works brings it back; an unload is what ends it. */
+        drop_systems(b, old);
+        old->stopped = 1;
+        say(b, old, NULL, BRIDGE_ERR, "module '%s' is stopped: its reload failed after its old "
+            "instance had been shut down. What it declared is kept", old->identity);
+        if (old->on_error == BRIDGE_FAIL) bridge_stop(b, old->identity, "could not be reloaded");
         schedule_build(b, err.text, sizeof err.text);
-        b->layout_moved = 1;
-        store_barrier(b);
         return 1;
     }
 
@@ -673,6 +698,7 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     module_discard(b, old);
     schedule_build(b, err.text, sizeof err.text);
     b->layout_moved = 1;
+    bridge_resume(b, n);
     store_barrier(b);
     return b->stopped_by ? 1 : 0;
 }

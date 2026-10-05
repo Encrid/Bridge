@@ -106,6 +106,10 @@ struct module {
     int       ids_short;            /* the entity ceiling cut its last refill short */
     int64_t   spawns, persistent;
     uint32_t  arena_at, arena_left, arena_base, arena_share;
+    /* what a reload added to its share where it could not be added in place: used in order,
+     * once the range before is too small for what is asked - budgets.md */
+    struct { uint32_t at, left; } *more;
+    uint32_t  more_count, more_next;
     uint8_t  *queue;
     uint32_t  queue_len, queue_room;
     char    **read, **write;        /* grants */
@@ -149,7 +153,8 @@ struct bridge {
     uint32_t       backend_count;
     /* the address space every block is allocated with: the largest any backend stated */
     uint64_t       reservation, guard;
-    char          *stopped_by;      /* why nothing runs any more, until bridge_destroy */
+    char          *stopped_by;      /* why nothing runs any more */
+    char          *stopped_stem;    /* the module whose return lifts it, or NULL if nothing can */
 
     char   **phases;
     uint32_t phase_count;
@@ -199,7 +204,11 @@ struct bridge {
 /* bridge.c */
 void say(bridge *b, const module *m, const bridge_system *s, int8_t level, const char *fmt, ...);
 char *copy(const char *s, size_t n);
-int  bridge_stopped(bridge *b);     /* 1, with a record, if nothing may run */
+/* 1, with a record, if nothing may run. `repairing` names a module being loaded or reloaded:
+ * the one call a stopped bridge accepts is one that brings back the module that stopped it. */
+int  bridge_stopped(bridge *b, const char *repairing);
+void bridge_stop(bridge *b, const char *identity, const char *what);
+void bridge_resume(bridge *b, const module *m);     /* if `m` is what it was waiting for */
 
 /* lifecycle.c */
 void module_discard(bridge *b, module *m);
@@ -229,7 +238,6 @@ void     store_touch(bridge *b, ecs_entity_t e);                  /* e may have 
 int      store_refill(bridge *b, module *m);                      /* 1 if the ceiling cut its ids short */
 void     store_apply(bridge *b, module *m);                       /* what it queued, now */
 void     store_drain(bridge *b, module *m);                       /* its log ring, to the sink */
-void     store_retire(bridge *b, ecs_entity_t component);         /* its tables are about to go */
 void     store_barrier(bridge *b);
 void     store_header(bridge *b, module *m);                      /* what a module reads at offset 0 */
 uint32_t store_offset(bridge *b, const void *p);                  /* into the shared memory, 0 for NULL */

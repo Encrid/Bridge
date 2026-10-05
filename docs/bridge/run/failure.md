@@ -20,17 +20,29 @@ What Bridge-ASM700 does is mostly not a choice, because the set of coherent outc
     observer    stop running and its components stay - and `on_error`
                 says what that costs the deployment
     shutdown    logged, and teardown continues. Nothing else is coherent
-    reload      the old instance is kept if it still exists, otherwise
-                this is init's case
+    reload      the old instance is kept if it still exists. otherwise the
+                module is stopped, keeping what it declared
 
 A mod ships `on_error = "skip"` and the base game `"fail"`, which is the whole of what "a mod must
 not take the deployment down" needs.
 
 **`fail` stops the bridge, since Bridge-ASM700 cannot stop the program.** The host owns the process,
 so the most the library can do is refuse to go on: after a `fail` module fails, every `bridge_phase`
-and `bridge_load` is refused until `bridge_destroy`. `skip` refuses that one load and carries on.
+is refused, and every load, unload and reload but one. `skip` refuses that one load and carries on.
 Refused: answering a return code and nothing else, which would let a host that ignores it run a
 deployment without the module its config called essential.
+
+**The one call a stopped bridge accepts is the one that brings that module back**: a load of it, if
+it never loaded, or a reload of it. If that succeeds the bridge runs again, and says so. The reason
+for stopping was running without the module, and with the module back there is nothing left of it.
+Refused: stopped until `bridge_destroy`, which is what this first said - the original Bridge's
+`fail` ends its process, which it owns; ours would have ended every module's storage to mend one
+module, and made reload useless for exactly the modules a deployment calls essential. Refused:
+accepting unloads as well, which has no job once `bridge_destroy` shuts every module down.
+
+A bridge stopped because its columns ran out is not repairable, and nothing lifts it: what failed
+there is storage, and part of it is no longer where modules can read it - `budgets.md`, *What
+running out does*.
 
 **`fail` covers a stop as it covers a load.** A module stated `fail` and then stopped at its budget
 stops the bridge too, because the reason does not change with the frame number: the deployment

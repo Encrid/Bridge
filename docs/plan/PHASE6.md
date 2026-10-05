@@ -8,7 +8,7 @@ document is what the phase built and what it found on the way.
 
 ## What was settled first
 
-Eight questions, each by every step of `PHASE0.md`, and each applied to the document it belongs
+Twelve questions, each by every step of `PHASE0.md`, and each applied to the document it belongs
 to.
 
     what a reload runs            the new instance's reload, then the old one's shutdown:
@@ -26,6 +26,13 @@ to.
                                   `config.md`, *A module's own settings are a component*
     an artifact with no bytes,    a fact, not a statement; the backend that needs the missing
     or no path                    one refuses by name: `backend.md`, *What a backend is asked for*
+    a reload that fails with no   the module stays, stopped, with what it declared:
+    old instance left             `lifecycle.md`, *The runtime lifecycle*
+    a share, across a reload      it may grow and never shrink: `budgets.md`, *Budgets*
+    a stopped bridge              accepts the call that brings back what stopped it:
+                                  `failure.md`, *When something fails*
+    when a table's id is retired  when flecs says it freed the table:
+                                  `flecs.md`, *flecs will not tell you which*
 
 Three of them were first put with steps missing, and were put again. Reading the original Bridge's
 source for the second pass gave reload a fourth option and changed the recommendation for the
@@ -35,6 +42,15 @@ this project refuses everywhere else. The seventh is the same defect found by lo
 null `config` meant "no settings". The eighth looked like it and was not: an artifact's bytes or
 path may be null, and the answer was to keep that and make the two refusals exact, `nopath` and
 `nobytes` among phase 4's cases.
+
+The last four were decided while building and reported afterwards as "forced by the documents".
+Put through the method, every one came out differently from what had been built. A failed native
+reload had been removing the module and dropping its data, on a call that means "keep running".
+A share could not change at all, where every other budget changes by reload. A stopped bridge was
+terminal, which made reload useless for the modules a deployment calls essential. And table ids
+were retired on Bridge-ASM700's decision to delete a component rather than on flecs freeing the
+table, which missed two ways a table is freed. "Forced by the documents" was the same mistake four
+times: a choice with a justification bolted on, which is what `PHASE0.md` step 4 warns of.
 
 ## What it produced
 
@@ -55,8 +71,9 @@ another first call.
 
 ## The tests
 
-Forty-five new ones here and two more among phase 4's, one hundred and eighteen in all, in a
-release build and a debug one.
+Fifty-six new ones, one hundred and twenty-seven in all, in a release build and a debug one. Most
+are cases of `tests/phase6.c`; two are among phase 4's, one among phase 2's, and one reads the
+library from inside.
 
     skipinit         a failed init, skipped: the other module runs on and is the one listed
     refusedload      a refused load leaves nothing: its component's name takes another layout
@@ -78,7 +95,11 @@ release build and a debug one.
     reload           a row's bytes kept: 102, then 112 and 122 from the new code
     reloadlayout     a changed struct body: refused with both fingerprints, the old instance runs
     reloadfail       the new reload answers 5: the old instance runs on
-    reloadshare      another persistent: refused by name
+    sharegrow        a larger persistent: granted, and the new code's allocation fits in it
+    sharechain       the same with another module's share carved after: a second range
+    sharesame        the same persistent: the new code's allocation fails, the old runs on
+    shareless        a smaller persistent: refused by name
+    sharebig         more than the arena has left: refused by name
     reloadmove       another backend: refused by name
     reloaddrop       a component the new instance no longer declares is gone
     maynot           hot_reload false: refused
@@ -87,8 +108,17 @@ release build and a debug one.
     noreload         a module without one of the three exports: refused by its name
     reloadnothing    nothing of that name loaded: refused
     nreload          native: the old shutdown, then the new library; the row's bytes kept
-    nreloadfail      native, the new reload fails: the module is gone, the other runs on
-    nreloadfailstop  the same with fail: the bridge stops
+    nreloadfail      native, the new reload fails: the module is STOPPED with its rows, the
+                     other runs on, and a library that works picks the count up at 112
+    nreloadfailunload  the same, then unloaded: a module with no code left can still leave
+    nreloadfailstop  the same with fail: the bridge stops, and that reload starts it again
+    repair           an essential module stopped at its budget: the bridge stops, refuses
+                     another module's load, and runs again when the module is reloaded
+    repairload       the same when a load was what failed: loading it again lifts the stop
+    churn            three modules of enums and nested types loaded and unloaded 200 times:
+                     the index never out of step
+    tables           from inside: a table flecs swept as empty and the table of a deleted
+                     parent's children both lose their ids, and a retired id is reused
     ntimeout         a timeout on the native backend: refused for deadline, before any library
     config           a bool, two integers, a float, an enum by name, text inline and text in the
                      arena, a bitmask, an integer into a double, 64 bits: all read back
@@ -111,10 +141,12 @@ release build and a debug one.
 
 ## What the phase found
 
-**Unload did not need flecs to say a table was gone.** The plan had table ids retired from
-`EcsOnTableDelete`. The only thing here that deletes a table is deleting a component, which
-Bridge-ASM700 does itself, so the ids are retired just before - `flecs.md`, *flecs will not tell
-you which*. The first stop condition did not happen: every policy leaves the mirror agreeing with
+**flecs does say when a table is gone, to an observer that asks the right way.** The phase first
+retired ids itself, just before deleting a component, and called the plan's `EcsOnTableDelete`
+unnecessary. It was the other way round: flecs frees tables that hold no component of ours, and
+keeps ones a query still holds, so only flecs knows. An observer on `EcsAny` hears all of them; one
+on a wildcard misses a table whose type is only pairs - `flecs.md`, *flecs will not tell you
+which*. The first stop condition did not happen: every policy leaves the mirror agreeing with
 flecs.
 
 **Two wasm instances of one module coexist over the shared block.** The second stop condition did
@@ -148,10 +180,9 @@ data segments, and for five phases none did. The Linux job caught the first that
 initialisation is off now - `wasmtime.md`, *Memory* - and a module built to trip it is part of the
 suite.
 
-**A failed native reload costs data, and that had to be said.** With no old instance to keep, the
-module is out as an unload leaves it, exclusive components dropped. It follows from the reason
-unload drops them, and it is written beside the reload order - `lifecycle.md`, *The runtime
-lifecycle* - because it is the one place a call that means "keep running" loses something.
+**A failed native reload costs no data.** With no old instance to keep, the module stays, stopped,
+with what it declared, until an artifact that works is reloaded over it or it is unloaded -
+`lifecycle.md`, *The runtime lifecycle*.
 
 ## Nothing is left behind it
 

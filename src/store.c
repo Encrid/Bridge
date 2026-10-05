@@ -207,23 +207,24 @@ static uint32_t table_id(bridge *b, ecs_table_t *t)
     return b->table_count ++;
 }
 
-/* flecs deletes a table when a component it holds is deleted, and that is the only thing here
- * that deletes one. So the ids of the tables holding `component` are retired just before it
- * goes: dead until the next sync has moved every index record off them, then free. */
-void store_retire(bridge *b, ecs_entity_t component)
+/* flecs says when it frees a table, from the one function every path to that goes through:
+ * a component deleted, the children of something deleted, its own sweep of empty tables. The
+ * id is dead until the next sync has moved every index record off it, then free. A table
+ * with several ids in its type is announced once for each, so this has to be safe to repeat. */
+static void on_table_gone(ecs_iter_t *it)
 {
+    bridge *b = it->ctx;
     uint32_t id;
-    for (id = 1; id < b->table_count; id ++) {
-        if (!b->tables[id].table || !ecs_table_has_id(b->world, b->tables[id].table, component)) continue;
-        b->tables[id].table = NULL;
-        b->tables[id].rows = 0;
-        if (b->dead_count == b->dead_room) {
-            b->dead_room = b->dead_room ? b->dead_room * 2 : 16;
-            b->dead_tables = realloc(b->dead_tables, b->dead_room * sizeof *b->dead_tables);
-        }
-        b->dead_tables[b->dead_count ++] = id;
+    for (id = 1; id < b->table_count && b->tables[id].table != it->table; id ++) {}
+    if (id >= b->table_count) return;
+    b->tables[id].table = NULL;
+    b->tables[id].rows = 0;
+    if (b->dead_count == b->dead_room) {
+        b->dead_room = b->dead_room ? b->dead_room * 2 : 16;
+        b->dead_tables = realloc(b->dead_tables, b->dead_room * sizeof *b->dead_tables);
     }
-    free(b->table_hash);            /* rebuilt without them at the next lookup */
+    b->dead_tables[b->dead_count ++] = id;
+    free(b->table_hash);            /* rebuilt without it at the next lookup */
     b->table_hash = NULL;
     b->layout_moved = 1;
 }
@@ -592,6 +593,14 @@ int store_create(bridge *b, const bridge_budget *budget)
         .query.terms = {{ .id = EcsWildcard }},
         .events = { EcsOnAdd, EcsOnRemove },
         .callback = on_change,
+        .ctx = b
+    });
+    /* EcsAny, not a wildcard: a wildcard is not told of a table whose type is only pairs,
+     * and the tables of an enum's constants are that */
+    ecs_observer(b->world, {
+        .query.terms = {{ .id = EcsAny }},
+        .events = { EcsOnTableDelete },
+        .callback = on_table_gone,
         .ctx = b
     });
     b->names = ecs_entity(b->world, { .name = "bridge-asm700" });

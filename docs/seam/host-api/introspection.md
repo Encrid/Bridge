@@ -7,7 +7,9 @@ That happens at frame nine thousand, long after any return code the host saw.
 
 **And it says why the bridge stopped**, when a module's stop was what stopped it - `failure.md`,
 *When something fails*: the module shows as STOPPED like any other, and the record that named it may
-have been dropped.
+have been dropped. A module whose reload failed with no old instance to keep shows as STOPPED too:
+for a host the two are one state, neither runs, both keep their data, and a reload or an unload is
+what comes next.
 
 **Not for load failures.** The host calls `bridge_load` once per module and gets a code back each
 time, so what loaded is something the host already watched happen.

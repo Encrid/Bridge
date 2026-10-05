@@ -286,11 +286,6 @@ void schedule_account(bridge *b)
         say(b, m, NULL, BRIDGE_ERR, "module '%s' is stopped: it reached its max_system_failures "
             "of %lld", m->identity, (long long)m->max_failures);
         /* fail covers a stop as it covers a load: the deployment does not run without it */
-        if (m->on_error == BRIDGE_FAIL && !b->stopped_by) {
-            char why[256];
-            snprintf(why, sizeof why, "module '%s' was stopped and its on_error is fail", m->identity);
-            b->stopped_by = copy(why, strlen(why));
-            say(b, NULL, NULL, BRIDGE_ERR, "the bridge has stopped: %s", why);
-        }
+        if (m->on_error == BRIDGE_FAIL) bridge_stop(b, m->identity, "was stopped");
     }
 }

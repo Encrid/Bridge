@@ -15,11 +15,15 @@
 #define MS 1000000ll
 
 static uint32_t path_at[4], path_count;
+static uint32_t out_of_step;
+static int quiet;
 
 static void sink(void *ud, const bridge_record *r)
 {
     (void)ud;
     if (r->len == 7 && !memcmp(r->text, "path at", 7) && path_count < 4) path_at[path_count ++] = r->arg[0];
+    if (r->len > 40 && !memcmp(r->text, "the entity index is out of step", 31)) out_of_step ++;
+    if (quiet && r->level >= 0) return;
     printf("record[%d] %s/%s: %.*s %u %u\n", r->level, r->identity ? r->identity : "-",
         r->system ? r->system : "-", (int)r->len, r->text, r->arg[0], r->arg[1]);
 }
@@ -157,6 +161,8 @@ int main(int argc, char **argv)
     setvbuf(stdout, NULL, _IONBF, 0);
 
     if (!strcmp(what, "slots")) cfg.budget.max_modules = 1;
+    /* every load carves a share of the arena that is never given back: room for 200 of them */
+    if (!strcmp(what, "churn")) cfg.budget.persistent = 1 << 16;
     if (!strcmp(what, "configceiling")) cfg.budget.entities = (uint64_t)atoi(argc > 2 ? argv[2] : "0");
     b = bridge_create(&cfg, sink, NULL);
     if (!b) {
@@ -239,8 +245,58 @@ int main(int argc, char **argv)
         load(b, &a);
         unload(b, "test:hang@0.1.0");
         modules(b);
+    } else if (!strncmp(what, "share", 5)) {
+        /* A module with sixteen bytes of the arena, reloaded into one whose reload takes
+         * forty. Stating more gives it more; the same leaves it short; less is refused. With
+         * another module's share carved after its own, the more is a second range. */
+        a = wasm("game:ticker@0.1.0", "ticker");
+        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.persistent = 16;
+        load(b, &a);
+        if (!strcmp(what, "sharechain")) {
+            a = wasm("game:namer@0.1.0", "namer");
+            a.cfg.persistent = 64;
+            load(b, &a);
+        }
+        frames(b, 2);
+        a = wasm("game:ticker@0.2.0", "ticker-alloc");
+        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.persistent = !strcmp(what, "sharesame") ? 16 : !strcmp(what, "shareless") ? 8
+                         : !strcmp(what, "sharebig") ? 1 << 20 : 64;
+        reload(b, &a);
+        frames(b, 2);
+        modules(b);
+    } else if (!strcmp(what, "repair")) {
+        /* an essential module stopped at its budget stops the bridge; reloading it into one
+         * that works is the one thing a stopped bridge accepts, and it runs again */
+        a = wasm("game:ticker@0.1.0", "ticker-trip");
+        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.on_error = BRIDGE_FAIL;
+        load(b, &a);
+        frames(b, 4);
+        a = wasm("game:twostep@0.1.0", "twostep");
+        load(b, &a);                            /* another module: refused */
+        a = wasm("game:ticker@0.2.0", "ticker-ten");
+        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.on_error = BRIDGE_FAIL;
+        reload(b, &a);
+        frames(b, 2);
+        modules(b);
+    } else if (!strcmp(what, "repairload")) {
+        /* the same when what stopped it was a load: loading that module again, from an
+         * artifact that works, lifts it */
+        a = wasm("game:thing@0.1.0", "badobs");
+        a.cfg.on_error = BRIDGE_FAIL;
+        load(b, &a);
+        a = wasm("game:other@0.1.0", "twostep");
+        load(b, &a);
+        a = wasm("game:thing@0.2.0", "twostep");
+        a.cfg.on_error = BRIDGE_FAIL;
+        load(b, &a);
+        frames(b, 1);
+        modules(b);
     } else if (!strcmp(what, "reload") || !strcmp(what, "reloadlayout") || !strcmp(what, "reloadfail")
-               || !strcmp(what, "reloadshare") || !strcmp(what, "reloadmove")
+               || !strcmp(what, "reloadmove")
                || !strcmp(what, "reloaddrop") || !strcmp(what, "maynot")) {
         a = wasm("game:ticker@0.1.0", "ticker");
         a.cfg.reloadable = true;
@@ -251,7 +307,6 @@ int main(int argc, char **argv)
                                     : !strcmp(what, "reloadfail") ? "ticker-fail"
                                     : !strcmp(what, "reloaddrop") ? "ticker-noextra" : "ticker-ten");
         a.cfg.hot_reload = a.cfg.reloadable = true;
-        if (!strcmp(what, "reloadshare")) a.cfg.persistent = 64;
         if (!strcmp(what, "reloadmove")) {
             a = native("game:ticker@0.2.0", NTICKER1_PATH);
             a.cfg.hot_reload = a.cfg.reloadable = true;
@@ -294,21 +349,35 @@ int main(int argc, char **argv)
         a.cfg.shutdown_timeout = 100 * MS;
         load(b, &a);
     } else if (!strcmp(what, "nreload") || !strcmp(what, "nreloadfail")
-               || !strcmp(what, "nreloadfailstop")) {
+               || !strcmp(what, "nreloadfailstop") || !strcmp(what, "nreloadfailunload")) {
         /* native: the old instance is shut down before the new library is opened */
+        int essential = !strcmp(what, "nreloadfailstop");
         a = wasm("game:twostep@0.1.0", "twostep");
         load(b, &a);
         a = native("game:ticker@0.1.0", NTICKER1_PATH);
         a.cfg.hot_reload = a.cfg.reloadable = true;
+        if (essential) a.cfg.on_error = BRIDGE_FAIL;
         load(b, &a);
         frames(b, 2);
         a = native("game:ticker@0.2.0", !strcmp(what, "nreload") ? NTICKER2_PATH : NTICKER3_PATH);
         a.cfg.hot_reload = a.cfg.reloadable = true;
-        /* with nothing left to keep, a failed reload is init's case: on_error decides */
-        if (!strcmp(what, "nreloadfailstop")) a.cfg.on_error = BRIDGE_FAIL;
+        if (essential) a.cfg.on_error = BRIDGE_FAIL;
         reload(b, &a);
         frames(b, 2);
         modules(b);
+        if (!strcmp(what, "nreloadfailunload")) {
+            /* the verb that discards: a module with no code left can still be unloaded */
+            unload(b, "game:ticker@0.1.0");
+            modules(b);
+        } else if (strcmp(what, "nreload")) {
+            /* its rows were kept: an artifact that works picks up where the count was */
+            a = native("game:ticker@0.3.0", NTICKER2_PATH);
+            a.cfg.hot_reload = a.cfg.reloadable = true;
+            if (essential) a.cfg.on_error = BRIDGE_FAIL;
+            reload(b, &a);
+            frames(b, 2);
+            modules(b);
+        }
     } else if (!strcmp(what, "config")) {
         a = configured("game:settings@0.1.0");
         load(b, &a);
@@ -363,6 +432,31 @@ int main(int argc, char **argv)
         load(b, &a);
         unload(b, "game:twostep@0.1.0");
         load(b, &a);
+        modules(b);
+    } else if (!strcmp(what, "churn")) {
+        /* Modules whose types are enums and nested structs, loaded and unloaded many times.
+         * Each unload frees tables, and each load makes new ones where the freed ones were:
+         * a table id that outlived its table would be handed to the wrong one, and the
+         * row-count check would say the index is out of step. */
+        int i;
+        quiet = 1;
+        for (i = 0; i < 200; i ++) {
+            a = wasm("game:nested@0.1.0", "nested");
+            a.cfg.spawns = 8;
+            bridge_load(b, &a);
+            frames(b, 1);
+            bridge_unload(b, "game:nested@0.1.0");
+            a = configured("game:settings@0.1.0");
+            bridge_load(b, &a);
+            frames(b, 1);
+            bridge_unload(b, "game:settings@0.1.0");
+            a = wasm("game:keeper@0.1.0", "keeper-sweep");
+            bridge_load(b, &a);
+            frames(b, 1);
+            bridge_unload(b, "game:keeper@0.1.0");
+        }
+        quiet = 0;
+        printf("churned 200 times, %u records of the index out of step\n", out_of_step);
         modules(b);
     } else if (!strcmp(what, "configtwice")) {  /* one row, so one module */
         a = configured("game:settings@0.1.0");

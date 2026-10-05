@@ -68,18 +68,26 @@ registering the same things.
 **Where two instances cannot exist at once, the old one goes first.** A process cannot hold two
 copies of one library, so on a backend that says so - `capabilities.md`, *Capabilities, so the swap
 is honest* - the order is the old `shutdown`, the library closed, the new one opened, its `reload`.
-A failure then has no old instance to keep, which is the other half of the rule in `failure.md`:
-it is `init`'s case, and `on_error` decides. The module is gone as an unload would have left it,
-its exclusive components dropped by their policies, and for the reason unload drops them -
-`data.md`, *Structural change*: rows nobody declares are rows nothing can ever collect. That is
-data lost on a call that meant "keep running", which is why `module.md`, *Three guarantees differ*,
-calls a native reload fragile, and a deployment that cannot afford it does not state `hot_reload`
-for a native module.
+A failure then has no old instance to keep. **The module stays, stopped, with everything it
+declared.** Its record, its components and their rows are as they were; it has no code, so it
+shows as STOPPED and runs nothing; and `on_error` decides what that costs the deployment, as for
+any stop. A reload with an artifact that works brings it back over the same rows, and an unload is
+what ends it.
+
+That is `lifetime.md`, *When the layout changed*, applied here: Bridge-ASM700 never discards data on
+a call that means "keep running", and `bridge_reload` is such a call. Refused: taking the module
+out as an unload would, which is what this first did - whether a failed reload cost a module its
+data then depended on which backend it ran on, a cleanup whose condition nobody calling it was
+thinking of. The original Bridge marks a module whose reload failed as failed rather than stopped
+by an operator, for the reason that holds here: what failed was the new artifact, and a better one
+must be able to follow. Refused: no reload at all on such a backend, which gives up what
+`capabilities.md` lists.
 
 **What a reload may change is what is the instance's.** Fuel, limits, timeouts, the log level and
 the three sizes of the private memory all arrive with the new `cfg`, as do `spawns` and the grants.
-`persistent` may not: the share lasts as long as the module is loaded and other modules hold
-offsets into it, so a reload stating another size is refused by name. A component the new instance
+`persistent` too, upwards only: a reload that states more is given more, and one that states less
+is refused by name, since nothing in the arena is ever given back - `budgets.md`, *Budgets*. A
+component the new instance
 no longer declares is treated as an unload treats it. And **settings are not seeded again** -
 `config.md`, *A module's own settings are a component*: after init the component is the state.
 

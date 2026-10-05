@@ -423,6 +423,7 @@ wasm_module (ticker-wide ticker checked STEP=10 WIDE)
 wasm_module (ticker-fail ticker checked STEP=10 FAIL_RELOAD)
 wasm_module (ticker-noextra ticker checked STEP=10 NO_EXTRA)
 wasm_module (ticker-trip ticker checked STEP=1 TRIP)
+wasm_module (ticker-alloc ticker checked STEP=10 ALLOC)
 foreach (name counter typer user settings hang)
     wasm_module (${name} ${name} checked)
 endforeach ()
@@ -471,7 +472,13 @@ phase6_case (slots         "module 'game:ticker@0.1.0' is refused: .budget. max_
 phase6_case (reload        "tick 102 1.*game:ticker@0.1.0/-: shutdown 1 0.*game:ticker@0.2.0: reloaded.*tick 112 10.*tick 122 10")
 phase6_case (reloadlayout  "was not reloaded: component 'game:Tick' has another layout here: fingerprint [0-9a-f]+, and it was declared with [0-9a-f]+.*tick 103 1.*tick 104 1")
 phase6_case (reloadfail    "was not reloaded: its reload answered 5.*tick 103 1.*tick 104 1.*game:ticker@0.1.0=RUNNING")
-phase6_case (reloadshare   "its persistent is -1 and a reload states 64, which only an unload and a load can change.*tick 104 1")
+phase6_case (sharegrow     "game:ticker@0.2.0: reloaded.*tick 112 10.*tick 122 10")
+phase6_case (sharechain    "game:namer@0.1.0: loaded.*game:ticker@0.2.0: reloaded.*tick 112 10")
+phase6_case (sharesame     "was not reloaded: alloc: its persistent of 16 bytes is exhausted.*tick 103 1.*tick 104 1")
+phase6_case (shareless     "is not reloaded: its persistent is 16 and a reload states less, which nothing can give back.*tick 104 1")
+phase6_case (sharebig      "is not reloaded: its persistent of 1048576 bytes does not fit in the [0-9]+ left of .budget. persistent.*tick 104 1")
+phase6_case (repair        "the bridge has stopped: module 'game:ticker@0.1.0' was stopped and its on_error is fail.*game:twostep@0.1.0: not loaded.*the bridge runs again: module 'game:ticker@0.2.0' is back.*game:ticker@0.2.0: reloaded.*tick 1[0-9]3 10.*game:ticker@0.2.0=RUNNING")
+phase6_case (repairload    "the bridge has stopped: module 'game:thing@0.1.0' failed and its on_error is fail.*game:other@0.1.0: not loaded.*the bridge runs again: module 'game:thing@0.2.0' is back.*game:thing@0.2.0: loaded.*show: x 3 0")
 phase6_case (reloadmove    "it runs on backend 'wasm' and a reload does not move it to 'native'.*tick 104 1")
 phase6_case (reloaddrop    "game:ticker@0.2.0: reloaded.*tick 122 10.*game:retype@0.1.0: loaded")
 phase6_case (maynot        "is not reloaded: its hot_reload is false.*tick 104 1")
@@ -481,7 +488,8 @@ phase6_case (notreloadable "module 'game:twostep@0.1.0' is refused: hot_reload i
 phase6_case (reloadnothing "is not reloaded: nothing of that name is loaded")
 # native: the old instance's shutdown comes before the new one's first tick, and before the swap
 phase6_case (nreload       "tick 102 1.*game:ticker@0.1.0/-: shutdown 1 0.*game:ticker@0.2.0: reloaded.*tick 112 10.*tick 122 10")
-phase6_case (nreloadfail   "shutdown 1 0.*was not reloaded: its reload answered 5.*module 'game:ticker@0.1.0' is gone.*modules: game:twostep@0.1.0=RUNNING .1.")
+phase6_case (nreloadfail   "shutdown 1 0.*was not reloaded: its reload answered 5.*module 'game:ticker@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept.*game:ticker@0.1.0=STOPPED.*game:ticker@0.3.0: reloaded.*tick 112 10.*tick 122 10.*game:ticker@0.3.0=RUNNING")
+phase6_case (nreloadfailunload "game:ticker@0.1.0=STOPPED.*game:ticker@0.1.0: unloaded.*modules: game:twostep@0.1.0=RUNNING .1.")
 phase6_case (config        "vsync width 1 1280.*scale mode 150 2.*show: hello 7 0.*show: some/long/path.cfg 0 0.*flags ratio 3 3.*show: big 2 0")
 phase6_case (configkey     "its settings have a key 'vsynk', and 'game:Settings' has no field of that name")
 phase6_case (configkind    "its setting 'scale' is text, and the field it names is a float")
@@ -496,7 +504,7 @@ phase6_case (configtwice   "its config is 'game:Settings', which is already the 
 phase6_case (configreload  "vsync width 1 1280.*game:settings@0.2.0: reloaded.*vsync width 1 1280")
 phase6_case (configdrop    "game:settings@0.2.0: reloaded.*game:retype@0.1.0: loaded")
 phase6_case (reseed        "settings text written to the same place")
-phase6_case (nreloadfailstop "module 'game:ticker@0.1.0' is gone.*the bridge has stopped: module 'game:ticker@0.1.0' could not be reloaded and its on_error is fail.*update refused")
+phase6_case (nreloadfailstop "the bridge has stopped: module 'game:ticker@0.1.0' could not be reloaded and its on_error is fail.*update refused.*the bridge runs again: module 'game:ticker@0.3.0' is back.*tick 112 10.*game:ticker@0.3.0=RUNNING")
 phase6_case (ntimeout      "module 'game:ticker@0.1.0' is refused: shutdown_timeout needs 'deadline', which backend 'native' lacks")
 set_tests_properties (phase6-ntimeout PROPERTIES FAIL_REGULAR_EXPRESSION "cannot open")
 # the row a module's settings go on is an entity, under the ceiling every entity is under
@@ -507,3 +515,15 @@ set_tests_properties (phase6-configceiling PROPERTIES PASS_REGULAR_EXPRESSION
 # what a backend needs of an artifact and was not handed, said by the backend that needs it
 phase4_case (nopath    "module 'game:mover@0.1.0' did not load: this backend opens a module's library by its path, and was handed none")
 phase4_case (nobytes   "module 'view:reader@0.1.0' did not load: this backend compiles a module from its bytes, and was handed none")
+
+# loaded and unloaded two hundred times: no id of a freed table is handed to another
+phase6_case (churn         "churned 200 times, 0 records of the index out of step")
+
+# from inside: a table's id is retired when flecs frees the table, whichever way it does
+add_executable (tables tests/tables.c)
+set_target_properties (tables PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES)
+target_include_directories (tables PRIVATE src)
+target_link_libraries (tables PRIVATE bridge flecs bridge-os)
+add_test (NAME tables COMMAND tables)
+set_tests_properties (tables PROPERTIES PASS_REGULAR_EXPRESSION
+    "a table flecs swept as empty: retired.*the table of a deleted parent's children: retired.*reused.*alive")

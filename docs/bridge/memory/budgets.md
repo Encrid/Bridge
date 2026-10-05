@@ -18,8 +18,21 @@ one, so that what it mints is its own - `threads.md`, *Threads*:
     persistent    its share of the persistent arena, for as long as it is loaded
 
 `[budget] persistent` is the whole arena, and a module whose share does not fit in what is left of
-it is refused at load. A module that spawns nothing, or keeps no string, says so: `-1`, as for any
-key where none is a real answer.
+it is refused at load.
+
+**A reload may state a larger share, and never a smaller one.** A budget is the deployment's to
+change by reloading - `config.md`, *A module's own settings are a component* - and this one could
+not be, at first: any change was refused, so raising it cost the module's data by an unload. What
+is added is carved from what is left of the arena: where the module's share was the last one
+carved it grows in place, and otherwise it gains a further range, which `alloc` moves to once what
+is asked no longer fits in the one before. What was left of that one is dead space, the cost
+`strings.md`, *Changing one, and the cost of growing*, already names. Offsets handed out stay
+good, which is the rule flecs' own stack allocator keeps when it chains a page. Stating less is
+refused: nothing can be given back. Refused: accepting less and keeping the share as it was, a
+stated number that would not be true.
+
+A module that spawns nothing, or keeps no string, says so: `-1`, as for any key where none is a
+real answer.
 
 Because modules come and go, `max_modules` bounds **how many module records exist at once**, not
 how the private memory is divided. A record is taken at load and freed at unload, and exhaustion refuses the
@@ -32,8 +45,8 @@ wasm's bounds check, which only separates two modules if each has a memory of it
 
 So **a reload that wants more just gets it.** Reload builds a fresh instance over surviving storage
 - `module.md`, *Three guarantees differ* - and a fresh instance means a fresh private memory at whatever
-size the new `cfg` asks for. The block that cannot grow is the shared memory, and nothing per-module lives
-there.
+size the new `cfg` asks for. The block that cannot grow is the shared memory; what a module has in
+it - its ids, its share of the arena - is set aside from budgets the whole deployment stated.
 
 A ring each rather than one shared matters beyond budgeting: no write needs an atomic - `log.md`,
 *The log*.
