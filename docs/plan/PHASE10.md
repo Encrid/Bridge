@@ -438,9 +438,10 @@ read in its document and becomes a phase, a refusal with its condition, or nothi
             first is the item, and nothing written holds it yet
     open    a struct changed at reload: a question the misreading raised and nobody had
             asked. `lifetime.md` says the library "cannot" tell what changed, which is false
-    closed  bindings for a non-C module: a phase of its own, `PLAN.md` 15. The module seam
-            is described once and the C header and one other language's binding are written
-            from it. Tried first: the project's compiler cannot translate the header 3f73239
+    closed  bindings for a non-C module: a phase of its own, `PLAN.md` 15, with two owners.
+            What Bridge-ASM700 writes is its own to state; how a module reaches it is the
+            backend's, and the binding files moved beside their backends. Tried first: the
+            project's compiler cannot translate the header
 
 **1b. Words**: found by the item above. "layout" is used sixty-two times in the documents for
 at least five things, none defined, and none of them the one that was meant.

@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OURS = ('src/*.c', 'src/*.h', 'backends/*/*.c', 'include/*.h', 'tests/*.c', 'tests/*.h',
+OURS = ('src/*.c', 'src/*.h', 'backends/*/*.c', 'backends/*/*.h', 'include/*.h', 'tests/*.c', 'tests/*.h',
         'tests/modules/*.c', 'tests/modules/*.h', 'tests/modules/native/*.c')
 
 # what is found, and what C23 writes in its place

@@ -185,7 +185,10 @@ def build(target, debug, out):
                  '-Wno-missing-field-initializers']
     system, here = row['link'], row['beside']
     include, src = '-I%s' % (ROOT / 'include'), '-I%s' % (ROOT / 'src')
-    headers = [Path(__file__)] + [h for d in ('include', 'src', 'tests', 'tests/modules')
+    # how a module is written is its backend's: each backend's binding sits beside the backend
+    sdk = {b: '-I%s' % (ROOT / 'backends' / b) for b in ('wasm', 'native')}
+    headers = [Path(__file__)] + [h for d in ('include', 'src', 'tests', 'tests/modules',
+                                              'backends/wasm', 'backends/native')
                                   for h in (ROOT / d).glob('*.h')]
 
     # ---- objects ----
@@ -205,14 +208,15 @@ def build(target, debug, out):
     bridge_o = [compile_(name, ROOT / 'src' / (name + '.c'), ours + [include, src]) for name in BRIDGE]
     wasm_o = compile_('wasm', ROOT / 'backends/wasm/wasm.c',
                       ours + [include, src, '-I%s' % (wasmtime / 'include')])
-    native_o = compile_('native', ROOT / 'backends/native/native.c', ours + [include, src])
+    native_o = compile_('native', ROOT / 'backends/native/native.c',
+                        ours + [include, src, sdk['native']])
     schema_test_o = compile_('schema-test', ROOT / 'tests/schema.c', ours + [include, src])
     adopt_o = compile_('adopt', ROOT / 'tests/adopt.c', ours + [include, src] + defines)
     phase_o = {name: compile_(name, ROOT / 'tests' / (name + '.c'), ours + [include] + defines)
                for name in ('phase2', 'phase3', 'phase4', 'phase5', 'phase6')}
     storage_o = compile_('storage', ROOT / 'tests/storage.c', ours + [include, src] + defines)
     module_o = {name: compile_(name, ROOT / 'tests/modules/native' / (source + '.c'),
-                               ours + [include] + ['-D' + d for d in flags])
+                               ours + [include, sdk['native']] + ['-D' + d for d in flags])
                 for name, source, flags in NATIVE}
     together(compiles)
 
@@ -243,7 +247,7 @@ def build(target, debug, out):
     together(links)
 
     # ---- wasm modules: text assembled, C compiled and merged with the accessors ----
-    accessors = ROOT / 'include/bridge-wasm.wat'
+    accessors = ROOT / 'backends/wasm/bridge-wasm.wat'
     unchecked = out / 'bridge-wasm-unchecked.wat'
 
     def without_row_test():
@@ -268,7 +272,7 @@ def build(target, debug, out):
         compiled.append(('building module %s' % name, [final], [c, acc] + headers, [
             [zig, 'cc', '-target', 'wasm32-freestanding', '-std=c23', '-pedantic-errors', '-Wall',
              '-Wextra', '-Werror', '-Wno-missing-field-initializers', '-O2', '-nostdlib'] +
-            ['-D' + d for d in flags] + [include, '-Wl,--no-entry', '-o', raw, c],
+            ['-D' + d for d in flags] + [include, sdk['wasm'], '-Wl,--no-entry', '-o', raw, c],
             [merge, raw, 'main', acc, 'acc'] + FEATURES + ['-o', merged],
             [opt, merged] + FEATURES + ['-O3', '--remove-exports=acc_*',
                                          '--remove-unused-module-elements', '-o', final]]))

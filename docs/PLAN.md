@@ -278,36 +278,34 @@ barrier is the same in both; a played-back run that is handed a set recorded fro
 deployment is refused by name; and the standalone host records a run to a file and plays it back
 from one, in its own repository.*
 
-## 15. The module seam, described once
+## 15. A module that is not C
 
-What a module and the library both have to agree on - the layouts a module reads, the constants,
-the entries it may call and what each takes - is stated today in one C23 header, and `wasm.md`,
-*The published layouts*, says a module that is not C derives its binding from it. That was never
-tried, and the first try failed: the project's own compiler cannot translate the header, which
-stops at its first `constexpr`. So a module in any language but C is a claim, and it was listed as
-not in this plan, with no condition and no phase.
+What a module needs to be written falls in two parts, and they have two owners - `README.md`,
+*Three layers, three seams*.
 
-This phase states the module seam once, in a description that has no language in it, and writes
-from it the C header and a binding for a language that is not C. A layout is then changed in one
-place, and nothing written by hand can fall out of step with it.
+    Bridge-ASM700     what it writes for a module to read, the same on every backend:
+                      `bridge-abi.h`
+    a backend         how a module it runs reaches that: the binding beside it in `backends/`
 
-**It is the module seam and nothing else.** Not the library, not a backend: `bridge-backend.h` is
-between the library and a backend, and nobody has asked for a backend in another language. And
-not a component's schema, which stays a header two modules compile - `schema.md`, *Why a header
-and not a format*: that argument is about a struct one author writes and another compiles, and
-it holds. This one is about a seam every language has to read.
+Both are C23 today, and `wasm.md`, *The published layouts*, said a module in another language
+derives its binding from the header. That was never tried, and the first try failed: the
+project's own compiler cannot translate `bridge-abi.h`, which stops at its first `constexpr`. So
+a module in any language but C is a claim. It was listed as not in this plan, with no condition
+and no phase.
 
-What the description covers and what stays a language's own code, what form it takes, and which
-languages are written from it are this phase's questions, each by the method of `PHASE0.md`.
+This phase makes it true once, for one language that is not C, on the native backend: the layouts
+in a form that language can read, and that backend's binding in that language, each made by its
+owner. How Bridge-ASM700 states its layouts so that more than C can read them - a description
+with no language in it from which the header is written, or something less - is this phase's
+first question, by the method of `PHASE0.md`; which language, and what a backend's binding in it
+consists of, are the next two.
 
-After record and replay, which adds no entry a module calls but may add to what one reads; and
-before the tests by capability, whose list this adds to.
+After record and replay, which may add to what a module reads; and before the tests by
+capability, whose list this adds to.
 
-*Done when a layout, a constant and an entry's signature are each stated in one place and nowhere
-else; the C header a module compiles is written from it, and the build fails if the one in the
-tree is not what the description gives; a native module in a language that is not C, built
-against a binding written from the same description, runs as a case; and changing one layout in
-the description changes every binding, shown once.*
+*Done when a native module in a language that is not C runs as a case; what it was written with
+came from Bridge-ASM700 for the layouts and from the native backend for the rest, and neither was
+copied out of the other; and a layout changed in one place changes what both languages read.*
 
 ## 16. Tests, by capability
 

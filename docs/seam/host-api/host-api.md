@@ -6,7 +6,8 @@ The surface any host links against. What Bridge-ASM700 requires of the values a 
 The arrangement is idTech3's: the engine is `qcommon/`, and `win32/win_main.c:1212` calls `Com_Init`
 then loops on `Com_Frame`.
 
-This is the third seam. `module.md` and the two binding files are Bridge-ASM700 to modules;
+This is the third seam. `module.md` and `bridge-abi.h` are Bridge-ASM700 to modules, with each
+backend's binding beside that backend - `README.md`, *Three layers, three seams*;
 `backend.md` is Bridge-ASM700 to a backend; this is **host to Bridge-ASM700**. Everything in this
 folder is `bridge.h`, which is the only header a host includes - one per seam, `README.md`, *Three
 layers, three seams*.

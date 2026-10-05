@@ -152,10 +152,10 @@ built against the old header is refused by name.
 
 A module that is not C cannot include the header, and so far cannot be written from it either:
 the header is C23, and the one translator tried on it, the project's own compiler's, stops at its
-first `constexpr`. What a module in another language needs is the same facts with no language in
-them, which is `PLAN.md`, phase 15: the seam described once, and this header written from it
-beside a binding for a language that is not C. Until then the header is the only statement of
-the seam, and a binding from it is written by hand.
+first `constexpr`. A module in another language needs two things in that language. What
+Bridge-ASM700 writes, which is this header's content and Bridge-ASM700's to make readable. And
+how a module on this backend reaches it, which is this backend's binding and this backend's to
+provide - `README.md`, *Three layers, three seams*. `PLAN.md`, phase 15.
 
 **The native backend's `bridge_api` is not in it.** A struct of C function pointers has nothing a
 wasm module could derive, since it gets imports rather than pointers. It lives in

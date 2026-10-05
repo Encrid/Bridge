@@ -95,18 +95,26 @@ A backend is below the orchestrator rather than being a fourth layer: it has no 
 deployment, it runs code. The one thing it is configured with is its own - a cache directory, a tick
 period: `backend.md`, *The backend owns its clock*.
 
-**A header per seam, and one more for the native binding**, so nothing compiles a declaration it
-cannot use:
+**A header per seam, in `include/`**, and beside each backend the binding a module on that
+backend is written with:
 
-    bridge.h          host seam: the functions and their structs
-    bridge-abi.h      module seam: the layouts both sides read with plain loads -
-                      `wasm.md`, *The published layouts*
-    bridge-native.h   module seam, native backend only: `bridge_api` - a wasm
-                      module gets imports, not pointers
-    bridge-wasm.h     module seam, wasm backend only: the imports, and the
-                      accessors of `bridge-wasm.wat` - `schema.md`, *What a module
-                      compiles against*
-    bridge-backend.h  backend seam: the seventeen entries in `backend.md`
+    include/bridge.h              host seam: the functions and their structs
+    include/bridge-abi.h          module seam: what Bridge-ASM700 writes for a module to read,
+                                  the same on every backend - `wasm.md`, *The published layouts*
+    include/bridge-backend.h      backend seam: the seventeen entries in `backend.md`
+
+    backends/wasm/bridge-wasm.h   how a wasm module reaches it: the imports, and the accessors
+      and bridge-wasm.wat         of the text file merged into it - `schema.md`, *What a module
+                                  compiles against*
+    backends/native/              how a native module reaches it: `bridge_api`, and the names
+      bridge-native.h             it exports - `native.md`, *What the backend provides*
+
+**How a module is written is its backend's, and not Bridge-ASM700's.** A backend is handed bytes,
+memories and host functions and asked to run a function - `backend.md`, *What the backend does not
+do* - so Bridge-ASM700 never learns what a module is made of, and cannot say how one is written.
+What it can say is what it puts in memory, and that is `bridge-abi.h`. Everything about reaching
+it - imports or a table of pointers, accessors, the macros an author types, and the same for a
+language that is not C - belongs to the backend that runs the module, and lives with it.
 
 **Prose cites a document by name, never by path** - `data.md`, not `bridge/data/data.md` - because a
 reader wants the document and not its location, and `tools/xref.py` resolves the name.

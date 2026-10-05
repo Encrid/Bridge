@@ -174,4 +174,6 @@ All of the above is how Bridge-ASM700 is built. **A module is built with whateve
 in any language that can produce a wasm module or a shared library. What binds it is the ABI: the
 layouts of `bridge-abi.h`, the exported names, and the section its manifest sits in - `abi.md`,
 *The ABI*, and `module.md`, *The manifest*. `bridge-wasm.h` and `bridge-native.h` are C's binding
-of that, not the contract itself. They are C23, and so is whatever includes them: *The standard*.
+of that, not the contract itself, and each is its backend's: it sits in `backends/`, beside the
+backend that runs what is written with it. They are C23, and so is whatever includes them: *The
+standard*.
