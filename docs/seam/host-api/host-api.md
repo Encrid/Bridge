@@ -105,7 +105,7 @@ as a helper - `native.md`, *Identity*.
         const char *const *read;  uint32_t read_count;       /* grants */
         const char *const *write; uint32_t write_count;
 
-        const char *config;          /* the component its settings seed, or null */
+        const char *config;          /* the component its settings seed, or "none" */
         const bridge_setting *settings; uint32_t setting_count;  /* its own [.config] */
     } bridge_module_config;
 

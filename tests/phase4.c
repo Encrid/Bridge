@@ -38,6 +38,7 @@ static bridge_artifact native(const char *identity, const char *path)
     a.cfg.spans = 16 << 10;
     a.cfg.spawns = 1024;
     a.cfg.persistent = BRIDGE_NONE;
+    a.cfg.config = BRIDGE_NO_CONFIG;
     a.backend = "native";
     a.path = path;
     return a;

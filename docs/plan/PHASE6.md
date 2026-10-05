@@ -8,7 +8,8 @@ document is what the phase built and what it found on the way.
 
 ## What was settled first
 
-Six questions, each by every step of `PHASE0.md`, and each applied to the document it belongs to.
+Seven questions, each by every step of `PHASE0.md`, and each applied to the document it belongs
+to.
 
     what a reload runs            the new instance's reload, then the old one's shutdown:
                                   `lifecycle.md`, *The runtime lifecycle*
@@ -21,12 +22,15 @@ Six questions, each by every step of `PHASE0.md`, and each applied to the docume
     where a text setting goes     where its field's type says: the same section
     how an author says "cannot"   with a key, `reloadable`, and never by leaving `reload` out:
                                   `wasm.md`, *Exports*
+    how a module has no settings  it says `config = none`; left out, `config` is unset:
+                                  `config.md`, *A module's own settings are a component*
 
 Three of them were first put with steps missing, and were put again. Reading the original Bridge's
 source for the second pass gave reload a fourth option and changed the recommendation for the
 budget. The sixth was asked after the phase was reported: its report called `reload` optional, which
 is how these documents had it from the start, and a statement made by leaving something out is what
-this project refuses everywhere else.
+this project refuses everywhere else. The seventh is the same defect found by looking for it: a
+null `config` meant "no settings".
 
 ## What it produced
 
@@ -47,7 +51,7 @@ another first call.
 
 ## The tests
 
-Forty-four new ones, one hundred and fifteen in all, in a release build and a debug one.
+Forty-five new ones, one hundred and sixteen in all, in a release build and a debug one.
 
     skipinit         a failed init, skipped: the other module runs on and is the one listed
     refusedload      a refused load leaves nothing: its component's name takes another layout
@@ -88,7 +92,8 @@ Forty-four new ones, one hundred and fifteen in all, in a release build and a de
     configlong       text longer than its array: refused naming it
     configrange      300 into a byte: refused naming it
     configenum       a name the enum lacks: refused naming it
-    confignone       settings and no config named: refused
+    confignone       settings handed to a module that stated it has none: refused
+    configunset      `config` left out: refused as unset, by name
     configmissing    a config init never declared: refused
     configarena      more text than the share holds: refused
     configceiling    no room under the entity ceiling for the row: refused

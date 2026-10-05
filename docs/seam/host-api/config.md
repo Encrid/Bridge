@@ -69,8 +69,11 @@ name, where the original Bridge silently ignores a typo.
 
 **Which component is the author's to say**, as `config`, a key of the manifest like `pinned`: only
 the author knows which of a module's structs holds its settings, which is the reason a Linux module
-marks its own parameters. Settings handed over with no `config` named, or a `config` that `init`
-never declared, are refused by name. Refused: a component named by convention, which is a name
+marks its own parameters. A module with no settings component says that too: `config = none`,
+which no component is called, since every component's name has a namespace. Left out, `config` is
+unset and refused like any other key, so that an author who forgot it is told rather than taken to
+have meant none. Settings handed to a module that stated none, or a `config` that `init` never
+declared, are refused by name. Refused: a component named by convention, which is a name
 Bridge-ASM700 would be inventing - `no-builtins.md`, *No builtins*. Refused: marking it at
 `declare`, which would have `kind` say two things. Refused: keys that name their component, so that
 any could be seeded - more than seeding is for, since a module can fill any row itself in `init`.

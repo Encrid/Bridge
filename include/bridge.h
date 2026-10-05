@@ -50,6 +50,9 @@ typedef struct {
 enum { BRIDGE_FAIL = 1, BRIDGE_SKIP = 2 };      /* on_error. zero is unset */
 #define BRIDGE_NO_LIMIT (-1)                    /* a limit stated as none */
 #define BRIDGE_NONE     (-1)                    /* a reservation stated as none */
+/* A module with no settings component says so. No component is named without a colon, so
+ * this names none of them; a config left null is unset, and refused. */
+#define BRIDGE_NO_CONFIG "none"
 
 typedef struct {
     const char *identity;        /* "tri:triangle@0.1.0" */
@@ -75,7 +78,8 @@ typedef struct {
     const char *const *read;  uint32_t read_count;       /* grants */
     const char *const *write; uint32_t write_count;
 
-    /* its own settings, and the component of its that they seed - docs/seam/host-api/config.md */
+    /* its own settings, and the component of its that they seed - docs/seam/host-api/config.md.
+     * `config` is a component's name or BRIDGE_NO_CONFIG; null is unset */
     const char *config;
     const bridge_setting *settings; uint32_t setting_count;
 } bridge_module_config;

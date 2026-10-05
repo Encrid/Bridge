@@ -42,6 +42,7 @@ static bridge_artifact native(const char *identity, const char *path)
     a.cfg.spans = 16 << 10;
     a.cfg.spawns = 32;
     a.cfg.persistent = BRIDGE_NONE;
+    a.cfg.config = BRIDGE_NO_CONFIG;
     a.backend = "native";
     a.path = path;
     return a;
@@ -315,6 +316,7 @@ int main(int argc, char **argv)
     } else if (!strcmp(what, "configkey") || !strcmp(what, "configkind") || !strcmp(what, "configlong")
                || !strcmp(what, "configrange") || !strcmp(what, "configenum")
                || !strcmp(what, "confignone") || !strcmp(what, "configmissing")
+               || !strcmp(what, "configunset")
                || !strcmp(what, "configarena") || !strcmp(what, "configceiling")) {
         a = configured("game:settings@0.1.0");
         if (!strcmp(what, "configkey")) everything[0].key = "vsynk";
@@ -322,7 +324,8 @@ int main(int argc, char **argv)
         if (!strcmp(what, "configlong")) everything[4].v.s = "twenty characters...";
         if (!strcmp(what, "configrange")) everything[6].v.i = 300;
         if (!strcmp(what, "configenum")) everything[3].v.s = "Sometimes";
-        if (!strcmp(what, "confignone")) a.cfg.config = NULL;
+        if (!strcmp(what, "confignone")) a.cfg.config = BRIDGE_NO_CONFIG;
+        if (!strcmp(what, "configunset")) a.cfg.config = NULL;
         if (!strcmp(what, "configmissing")) a.cfg.config = "game:Nope";
         if (!strcmp(what, "configarena")) a.cfg.persistent = 8;
         /* the row its settings go on is an entity like any other, under the same ceiling */

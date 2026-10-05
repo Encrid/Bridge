@@ -210,6 +210,10 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on, uint32
         || unset(b, id, "persistent", cfg->persistent)) {
         return 1;
     }
+    if (!cfg->config || !*cfg->config) {
+        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: config is unset", id);
+        return 1;
+    }
     if (cfg->spawns > (int64_t)b->entities) {
         say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: its spawns of %lld is more "
             "than [budget] entities of %u", id, (long long)cfg->spawns, b->entities);

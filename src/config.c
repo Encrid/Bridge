@@ -142,9 +142,9 @@ int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why
     module *other;
     ecs_entity_t e;
 
-    if (!cfg->config) {
+    if (!strcmp(cfg->config, BRIDGE_NO_CONFIG)) {
         if (!cfg->setting_count) return 0;
-        snprintf(why, len, "it is handed %u settings and names no config component for them",
+        snprintf(why, len, "it is handed %u settings, and states that it has no config component",
             cfg->setting_count);
         return 1;
     }
