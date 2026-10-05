@@ -3,14 +3,29 @@
  * see afterwards. It says what it saw in its log and decides nothing.
  *
  * Built three ways. Plain: a handful of entities, with observers, for what storage does. BIG:
- * many entities and no observer, for what it costs. TABLES: ten thousand tables.
+ * many entities and no observer, for what it costs. TABLES: ten thousand tables. And BIG again
+ * with A made larger, FAT64 to FAT4K.
  * docs/plan/PHASE10.md. */
 #include "bridge-native.h"
 
+/* A is as big as the build says: for what a change costs an entity that carries more. The
+ * length is written out each time, since a descriptor is the text as it was typed. */
+#if defined(FAT64)
+BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; char rest[60]; });
+#elif defined(FAT256)
+BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; char rest[252]; });
+#elif defined(FAT1K)
+BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; char rest[1020]; });
+#elif defined(FAT4K)
+BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; char rest[4092]; });
+#else
 BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });
+#endif
 BRIDGE_SCHEMA_STRUCT(B, { uint32_t v; });
 
-#ifdef BIG
+#if defined(FAT1K) || defined(FAT4K)
+constexpr uint32_t COUNT = 10'000;
+#elifdef BIG
 constexpr uint32_t COUNT = 100'000;
 #elifdef TABLES
 constexpr uint32_t COUNT = 10'000;

@@ -435,7 +435,9 @@ read in its document and becomes a phase, a refusal with its condition, or nothi
     open    layout migration. It was read wrong, and had been since phase 0: the line means
             more than one way to store a component, chosen as the right tool for the task,
             and it points at a section about a struct's fields changing at a reload. The
-            first is the item, and nothing written holds it yet
+            first is the item, and nothing written holds it yet. Weighed before it is
+            decided: `storage weigh` measures the two things one storage layout is worst
+            at, and the figures are below
     open    a struct changed at reload: a question the misreading raised and nobody had
             asked. `lifetime.md` says the library "cannot" tell what changed, which is false
     closed  bindings for a non-C module: a phase of its own, `PLAN.md` 15, with two owners.
@@ -488,3 +490,28 @@ at least five things, none defined, and none of them the one that was meant.
 
 **6. Close**: both sets of figures measured again side by side, `PLAN.md` phase 10 marked done
 by its done-when as first written, and every line above closed.
+
+**What one storage layout costs where it is weakest**, measured so that more than one can be
+weighed on numbers. `storage weigh`, on Windows.
+
+A four-byte component given to and taken from an entity that already carries more. The entity
+moves to another table, and everything it carries moves with it:
+
+    the entity carries     attached     detached
+        4 bytes              40 ns        36 ns
+       64 bytes              42 ns        38 ns
+      256 bytes              56 ns        55 ns
+     1024 bytes             150 ns       145 ns
+     4096 bytes             530 ns       510 ns
+
+One system reading one component of 204,800 rows, the same rows spread over more tables. The
+loop does nothing but add, so this is the dearest the spread can look beside the work:
+
+       1 table           6.6 us     0.032 ns a row
+      16 tables         11.4 us     0.056 ns a row
+     256 tables         12.4 us     0.061 ns a row
+    4096 tables         19.9 us     0.097 ns a row
+
+Found while measuring: a component's array cannot be as long as a named constant says. The
+descriptor is the struct's text before the preprocessor has replaced the name, so `char
+rest[N]` is refused at `N`.

@@ -13,6 +13,9 @@
  *     storage strip       a component stripped from every entity, a table at a time: into the
  *     storage stripfull   table of what is left, or where it stands. And with no room to merge
  *     storage measure     nanoseconds for each kind of change, at a barrier
+ *     storage weigh       what the one storage layout there is costs where it is weakest: a
+ *                         change to an entity that carries a lot, and a system whose rows are
+ *                         spread over many tables. docs/plan/PHASE10.md, *The repair*
  *
  * The first two are a transcript and decide nothing themselves: build.py holds what it must
  * say. It is the same whatever stores the rows, which is the point - docs/plan/PHASE10.md.
@@ -49,6 +52,14 @@ static void sink([[maybe_unused]] void *ud, const bridge_record *r)
 }
 
 static void quiet([[maybe_unused]] void *ud, [[maybe_unused]] const bridge_record *r) { }
+
+/* what a system said it read: kept, so that a timing is of a loop that ran */
+static uint32_t said[2];
+static void counted([[maybe_unused]] void *ud, const bridge_record *r)
+{
+    if (r->system) said[0] = r->arg[0], said[1] = r->arg[1];
+    else if (r->level <= BRIDGE_WARN) printf("  -: %.*s\n", (int)r->len, r->text);
+}
 
 static bridge_artifact store_module(const char *path, int64_t spawns, uint32_t spans)
 {
@@ -112,6 +123,19 @@ static void strip(bridge *b, const char *name)
     }
     /* a barrier, for what was heard and for what a module reads */
     run(b, "never");
+}
+
+/* the systems of one phase, timed, and then its barrier */
+static uint64_t ran(bridge *b, const char *phase)
+{
+    uint32_t i;
+    uint64_t t;
+    for (i = 0; i < PHASES && strcmp(phases[i], phase); i ++) { }
+    t = os_now();
+    schedule_run(b, i);
+    t = os_now() - t;
+    store_barrier(b);
+    return t;
 }
 
 /* Four of nstress, each in its own namespace, a hundred rounds of work and check. */
@@ -271,6 +295,59 @@ int main(int argc, char **argv)
     } else if (!strcmp(what, "stress")) {
         if (stress_load(b)) { printf("FAIL: not loaded\n"); return 1; }
         stress_run(b);
+    } else if (!strcmp(what, "weigh")) {
+        static const struct { const char *path; uint32_t bytes, count; } fat[] = {
+            { NSTOREBIG_PATH, 4, 100'000 },     { NSTOREFAT64_PATH, 64, 100'000 },
+            { NSTOREFAT256_PATH, 256, 100'000 }, { NSTOREFAT1K_PATH, 1024, 10'000 },
+            { NSTOREFAT4K_PATH, 4096, 10'000 },
+        };
+        static const struct { const char *path; uint32_t tables; } split[] = {
+            { NFRAG1_PATH, 1 }, { NFRAG16_PATH, 16 }, { NFRAG256_PATH, 256 }, { NFRAG4096_PATH, 4096 },
+        };
+        constexpr uint32_t ROUNDS = 8, ROWS = 204'800;
+        (void)bridge_destroy(b);
+        cfg.budget.columns = 256 << 20;
+
+        /* a small component given to, and taken from, an entity that carries more and more:
+         * the entity moves to another table each time, and all it carries moves with it */
+        for (uint32_t k = 0; k < sizeof fat / sizeof *fat; k ++) {
+            uint64_t on = 0, off = 0, t;
+            b = bridge_create(&cfg, sink, nullptr);
+            a = store_module(fat[k].path, fat[k].count, 1 << 20);
+            if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
+            (void)barrier(b, "spawn");
+            (void)barrier(b, "attach_a");
+            for (uint32_t round = 0; round < ROUNDS; round ++) {
+                t = barrier(b, "attach_b");
+                if (!round || t < on) on = t;
+                t = barrier(b, "detach_b");
+                if (!round || t < off) off = t;
+            }
+            printf("an entity of %4u bytes: a component attached %6.1f ns, detached %6.1f ns\n",
+                fat[k].bytes, (double)on / fat[k].count, (double)off / fat[k].count);
+            (void)bridge_destroy(b);
+        }
+
+        /* one system reading one component of the same rows, in one table and in thousands */
+        for (uint32_t k = 0; k < sizeof split / sizeof *split; k ++) {
+            uint64_t best = 0, t;
+            b = bridge_create(&cfg, counted, nullptr);
+            a = store_module(split[k].path, ROWS, 8 << 20);
+            if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
+            (void)barrier(b, "spawn");
+            for (uint32_t round = 0; round < ROUNDS * 4; round ++) {
+                t = ran(b, "look");
+                if (!round || t < best) best = t;
+            }
+            if (said[0] != ROWS || said[1] != split[k].tables) {
+                printf("FAIL: it read %u rows in %u spans\n", said[0], said[1]);
+                return 1;
+            }
+            printf("%u rows in %4u table%s: %6.1f us for all of them, %.3f ns a row\n", ROWS,
+                split[k].tables, split[k].tables > 1 ? "s" : " ", (double)best / 1000.0,
+                (double)best / ROWS);
+            if (k + 1 < sizeof split / sizeof *split) (void)bridge_destroy(b);
+        }
     } else if (!strcmp(what, "measure")) {
         static const struct { const char *phase, *what; } ops[] = {
             { "spawn",    "an id handed out" },
