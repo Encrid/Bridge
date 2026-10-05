@@ -331,7 +331,7 @@ set_tests_properties (phase4-untrusted phase4-limit PROPERTIES FAIL_REGULAR_EXPR
 
 # ---- phase 5: the schedule, observers, threads. docs/plan/PHASE5.md ----
 
-foreach (name halver twostep watcher chain badobs events fixer)
+foreach (name halver twostep watcher chain badobs events fixer nested nested2)
     wasm_module (${name} ${name} checked)
 endforeach ()
 get_property (C_MODULES GLOBAL PROPERTY C_MODULES)
@@ -380,3 +380,6 @@ phase5_case (events      "any: event 3 1.*any: event 2 2.*any: event 4 57005")
 phase5_case (obsconflict "module 'view:fixer@0.1.0' did not load: 'view:watcher:seen' and 'view:fixer:fix' both touch 'game:Marked' at the barrier, one of them writing it, and nothing orders them.*seen 1 77")
 phase5_case (obsorder    "view:fixer@0.1.0: loaded.*seen 1 77")
 phase5_case (obsreorder  "view:fixer@0.1.0: loaded.*seen 1 5")
+# a field whose type is another declared type: schema.md, *The type set*
+phase5_case (nested      "read: body 2 2.*read: more 3 4")
+phase5_case (nested2     "module 'game:nested@0.1.0' did not load: component 'game:Body': its descriptor does not describe a struct, or names a type its namespace has not declared")

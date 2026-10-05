@@ -3,7 +3,7 @@
 At init, which runs each time a module is loaded - `lifecycle.md`, *The runtime lifecycle*. All
 three may take names, because registration is not a hot path.
 
-    declare(name, name_len, size, align, desc, desc_len, on_unload) -> slot
+    declare(name, name_len, kind, size, align, desc, desc_len, on_unload) -> slot
     system (name, name_len, phase, phase_len, terms, term_count)    -> slot
     observe(name, name_len, events, terms, term_count)              -> slot
 
@@ -16,7 +16,9 @@ Any time, queued and applied at the next barrier:
     alloc(len)                     -> offset into the persistent arena
 
 `desc` is the descriptor string `ECS_STRUCT` already emits beside the typedef - `schema.md`, *There
-is no schema format*, for what Bridge-ASM700 does with it and what it does not.
+is no schema format*, for what Bridge-ASM700 does with it and what it does not. `kind` says what it
+describes: a struct, an enum or a bitmask - `schema.md`, *The type set*. It is stated, like every
+other value.
 
 `on_unload` is what becomes of the entities carrying the component when this module is unloaded:
 `strip`, `sweep` or `delete` - `lifetime.md`, *What unload leaves behind*. It is stated, like every

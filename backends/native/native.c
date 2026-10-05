@@ -55,9 +55,9 @@ static uint64_t enter(int entry, const uint64_t *args)
 }
 
 static uint32_t t_declare(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f,
-                          uint32_t g)
+                          uint32_t g, uint32_t h)
 {
-    uint64_t args[7] = { a, b, c, d, e, f, g };
+    uint64_t args[8] = { a, b, c, d, e, f, g, h };
     return (uint32_t)enter(DECLARE, args);
 }
 

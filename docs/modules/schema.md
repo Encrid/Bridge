@@ -23,8 +23,8 @@ offsets and the field names. That is how `[.config]` seeds a component by matchi
 names: `config.md`, *A module's own settings are a component*.
 
 **None of that crosses.** A module is held to three numbers: size, alignment, and a hash of that
-string. The field table stays on Bridge-ASM700's side. No field name is in `bridge-abi.h` and none reaches
-a module: `wasm.md`, *It holds no content*.
+string and its kind. The field table stays on Bridge-ASM700's side. No field name is in
+`bridge-abi.h` and none reaches a module: `wasm.md`, *It holds no content*.
 
 ## Why a header and not a format
 
@@ -46,6 +46,23 @@ flecs', minus pointers:
     enum, bitmask             EcsEnum, EcsBitmask
     struct, inline array      EcsStructType, EcsArray
     entity id                 EcsEntity - what `reference.md`, *Reference following* is built on
+
+**A field whose type is another declared type names it bare, and it is found in the component's
+own namespace.** `Vec3 at;` in `game:Body` is `game:Vec3`, which a module declares first: a struct,
+an enum or a bitmask, each by its own macro and each with its kind stated at `declare`. flecs
+resolves a field's type by name from where it stands, so Bridge-ASM700 names each declared type
+under its namespace and parses a descriptor from inside it. A type that was not declared there is
+refused at the declaration that uses it, with the name flecs could not find.
+
+An enum and a bitmask are 32 bits, which is what flecs lays them out as and what a C enum is on
+every target a module is built for. Refused: reaching across namespaces for a field's type, which
+would need the descriptor to carry a namespace C has no syntax for. The condition that brings it
+back is a mod that must embed one of the game's structs in its own component, and until then it
+declares a struct of its own with the same body.
+
+**The fingerprint of a component covers its own body, not the bodies of the types it names.** Those
+are declared, so each has a fingerprint of its own, checked where it is declared: a module built
+against an older `Vec3` is refused at `Vec3`, before `Body`.
 
 **Rejected: pointer-sized or pointer-holding.** `EcsString`, `EcsVector`, `EcsUPtr`, `EcsIPtr`. A
 wasm32 pointer is four bytes and the host's is eight, so flecs' host-computed offsets would not

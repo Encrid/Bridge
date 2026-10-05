@@ -140,6 +140,7 @@ struct bridge {
 
     component    **components;
     uint32_t       component_count;
+    ecs_entity_t   names;           /* under it, a scope per namespace: where a type name resolves */
     bridge_system **systems;        /* every module's, in registration order */
     uint32_t       system_count;
     module        *modules;

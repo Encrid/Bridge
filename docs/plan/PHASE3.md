@@ -116,9 +116,6 @@ trapping in `init`.
 registered and changes it queued are applied at the next barrier. Leaving storage as it was is
 `PLAN.md` phase 6's claim, and arrives with unload.
 
-**A component cannot hold another struct yet.** flecs resolves a nested type by name, and
-Bridge-ASM700 does not feed it names. A descriptor may use the scalar types and inline arrays.
-
 **The column allocator is power-of-two classes**, never split or joined, so up to half a column is
 slack. Stated where it is written, with what replaces it.
 

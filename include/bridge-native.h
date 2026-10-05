@@ -22,8 +22,8 @@
  * An entry may be called only from inside a call the backend made: init, a system, an
  * observer. That is native.md, *The invariant*, and it is how an entry knows whose it is. */
 typedef struct bridge_api {
-    uint32_t (*declare)(uint32_t name, uint32_t name_len, uint32_t size, uint32_t align,
-                        uint32_t desc, uint32_t desc_len, uint32_t on_unload);
+    uint32_t (*declare)(uint32_t name, uint32_t name_len, uint32_t kind, uint32_t size,
+                        uint32_t align, uint32_t desc, uint32_t desc_len, uint32_t on_unload);
     uint32_t (*system)(uint32_t name, uint32_t name_len, uint32_t phase, uint32_t phase_len,
                        uint32_t terms, uint32_t term_count);
     uint32_t (*observe)(uint32_t name, uint32_t name_len, uint32_t events, uint32_t terms,
@@ -48,6 +48,10 @@ typedef struct bridge_api {
 #define ECS_STRUCT(name, ...) \
     typedef struct name __VA_ARGS__ name; \
     static const char name##_desc[] = #__VA_ARGS__
+#define ECS_ENUM(name, ...) \
+    typedef enum name __VA_ARGS__ name; \
+    static const char name##_desc[] = #__VA_ARGS__
+#define ECS_BITMASK(name, ...) ECS_ENUM(name, __VA_ARGS__)
 
 /* ---- the scratch arena ---- */
 
@@ -68,10 +72,12 @@ static inline uint32_t bridge_native_put(const bridge_api *api, const void *byte
     return h->scratch + used;
 }
 
-#define BRIDGE_NATIVE_COMPONENT(api, name, T, on_unload) \
-    (api)->declare(bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, sizeof(T), \
-                   _Alignof(T), bridge_native_put(api, T##_desc, sizeof T##_desc - 1), \
+#define BRIDGE_NATIVE_DECLARE(api, kind, name, T, on_unload) \
+    (api)->declare(bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, kind, \
+                   sizeof(T), _Alignof(T), bridge_native_put(api, T##_desc, sizeof T##_desc - 1), \
                    sizeof T##_desc - 1, on_unload)
+#define BRIDGE_NATIVE_COMPONENT(api, name, T, on_unload) \
+    BRIDGE_NATIVE_DECLARE(api, BRIDGE_STRUCT, name, T, on_unload)
 
 #define BRIDGE_NATIVE_SYSTEM(api, name, phase, terms, count) \
     (api)->system(bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, \

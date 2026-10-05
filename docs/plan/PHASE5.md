@@ -37,7 +37,7 @@ which has to be the one that loaded it - `pinned.md`, *Threads*.
 
 ## The tests
 
-Eighteen new ones, sixty-one in all, in a release build and a debug one. The three that depend on
+Twenty new ones, sixty-three in all, in a release build and a debug one. The three that depend on
 timing were run six times over.
 
     order        the mover adds 1, then the halver halves, by one `[order]` pair: sum 125,250
@@ -87,6 +87,25 @@ and a list instead of spans. `abi.md` had said so, and the code agrees in one fu
 **Records from a worker would have reached the sink off the calling thread.** A system's failure
 is noted where it happens and said after the join, so the sink keeps the property `create.md`
 gives it.
+
+## Closed after the phase
+
+Three things earlier phases had built without testing, or listed and not built, found by asking
+what "left" meant in a phase report.
+
+**The set and remove events, and observers that conflict across modules**, had no test. They have
+`events`, `obsconflict`, `obsorder` and `obsreorder` above.
+
+**A field whose type is another declared type** was in `schema.md`'s type set from the start and
+refused by phase 3's code: a nested struct, an enum, a bitmask. `declare` gained a kind, and a
+declared type is named in flecs under its namespace - `schema.md`, *The type set*. Two tests:
+
+    nested       a component of a struct, an enum, a bitmask and a float: all four read back
+    nested2      the same without declaring the struct: refused, with the name flecs missed
+
+Found on the way: flecs finishes an enum's layout in observers of its own, and what they queue is
+only applied when a deferral ends. `declare` had suspended deferral, which is not ending it, so an
+enum had no layout until the next barrier. It ends it now, for the length of the declaration.
 
 ## Shortcuts taken
 

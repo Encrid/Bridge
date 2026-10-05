@@ -428,6 +428,7 @@ int store_create(bridge *b, const bridge_budget *budget)
         .callback = on_change,
         .ctx = b
     });
+    b->names = ecs_entity(b->world, { .name = "bridge-asm700" });
     ecs_defer_begin(b->world);          /* and it stays deferred outside a barrier */
     if (b->columns_out) {
         say(b, NULL, NULL, BRIDGE_ERR, "[budget] columns of %u bytes does not hold flecs' own "

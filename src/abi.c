@@ -92,15 +92,18 @@ static const char *outside_type_set(ecs_world_t *world, ecs_entity_t type)
     }
 }
 
-/* declare(name, name_len, size, align, desc, desc_len, on_unload) -> slot */
+/* declare(name, name_len, kind, size, align, desc, desc_len, on_unload) -> slot */
 static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
 {
+    static const ecs_type_kind_t kinds[] = { 0, EcsStructType, EcsEnumType, EcsBitmaskType };
+    static const char *const kind_names[] = { "", "a struct", "an enum", "a bitmask" };
     module *m = ud;
     bridge *b = m->b;
-    const char *name_at = scratch(m, a[0], a[1]), *desc_at = scratch(m, a[4], a[5]);
-    uint32_t size = (uint32_t)a[2], align = (uint32_t)a[3], on_unload = (uint32_t)a[6], i;
+    const char *name_at = scratch(m, a[0], a[1]), *desc_at = scratch(m, a[5], a[6]);
+    uint32_t kind = (uint32_t)a[2], size = (uint32_t)a[3], align = (uint32_t)a[4];
+    uint32_t on_unload = (uint32_t)a[7], i;
     component *c = NULL;
-    char name[128];
+    char name[128], *bare;
     uint64_t print;
 
     if (!m->in_init) return refuse(m, "declare is called outside init");
@@ -109,7 +112,11 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     }
     memcpy(name, name_at, a[1]);
     name[a[1]] = 0;
-    if (!strchr(name, ':')) return refuse(m, "component '%s' has no namespace", name);
+    bare = strchr(name, ':');
+    if (!bare) return refuse(m, "component '%s' has no namespace", name);
+    if (kind < BRIDGE_STRUCT || kind > BRIDGE_BITMASK) {
+        return refuse(m, "component '%s': its kind is unset", name);
+    }
     if (foreign(m, name) && !listed(m->read, m->read_count, name)
         && !listed(m->write, m->write_count, name)) {
         return refuse(m, "it may not declare '%s': that is another namespace's, and no grant "
@@ -118,7 +125,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     if (on_unload < BRIDGE_STRIP || on_unload > BRIDGE_DELETE) {
         return refuse(m, "component '%s': on_unload is unset", name);
     }
-    print = fingerprint(desc_at, a[5]);
+    print = fingerprint(desc_at, a[6]) ^ kind;
 
     for (i = 0; i < b->component_count; i ++) {
         if (!strcmp(b->components[i]->name, name)) c = b->components[i];
@@ -130,21 +137,42 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     }
     if (!c) {
         /* flecs parses the descriptor and computes the layout: Bridge-ASM700 parses no C */
-        char *desc = copy(desc_at, a[5]);
+        char *desc = copy(desc_at, a[6]);
         const EcsComponent *layout;
         const char *why = NULL;
-        ecs_entity_t id;
+        ecs_entity_t id, scope, before;
         int parsed;
 
-        ecs_defer_suspend(b->world);
-        id = ecs_new(b->world);
-        parsed = !ecs_meta_from_desc(b->world, id, EcsStructType, desc);
+        /* A field's type is a bare C name, and flecs looks it up from the scope it is in. So
+         * a declared type is named in flecs under its namespace, and a descriptor is parsed
+         * from inside that namespace: `Vec3` in game:Body is game:Vec3 - schema.md.
+         *
+         * Deferral is ended for this, not suspended: flecs finishes a type in observers of
+         * its own, and what those queue is only applied when a deferral ends. Suspended, an
+         * enum would have no layout until the next barrier. Ending it applies what this
+         * module's init has queued so far, a barrier early and before anything can read it. */
+        ecs_defer_end(b->world);
+        *bare = 0;
+        scope = ecs_entity(b->world, { .name = name, .parent = b->names });
+        *bare = ':';
+        id = ecs_entity(b->world, { .name = bare + 1, .parent = scope });
+        /* flecs makes an entity an enum when its underlying type is set, which parsing a
+         * descriptor does not do. 32 bits, as a C enum is on every target a module has. */
+        if (id && kind == BRIDGE_ENUM) {
+            /* in place: flecs forbids copying an EcsEnum, so it cannot be set by value */
+            ecs_ensure(b->world, id, EcsEnum)->underlying_type = ecs_id(ecs_i32_t);
+            ecs_modified(b->world, id, EcsEnum);
+        }
+        before = ecs_set_scope(b->world, scope);
+        parsed = id && !ecs_meta_from_desc(b->world, id, kinds[kind], desc);
+        ecs_set_scope(b->world, before);
         layout = parsed ? ecs_get(b->world, id, EcsComponent) : NULL;
         if (layout) why = outside_type_set(b->world, id);
         free(desc);
         if (!layout || why || (uint32_t)layout->size != size || (uint32_t)layout->alignment != align) {
             if (!layout) {
-                refuse(m, "component '%s': its descriptor does not describe a struct", name);
+                refuse(m, "component '%s': its descriptor does not describe %s, or names a "
+                    "type its namespace has not declared", name, kind_names[kind]);
             } else if (why) {
                 refuse(m, "component '%s' holds %s, which no column can", name, why);
             } else {
@@ -152,11 +180,11 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
                     "aligned to %d by its descriptor", name, size, align, layout->size,
                     layout->alignment);
             }
-            ecs_delete(b->world, id);
-            ecs_defer_resume(b->world);
+            if (id) ecs_delete(b->world, id);
+            ecs_defer_begin(b->world);
             return 1;
         }
-        ecs_defer_resume(b->world);
+        ecs_defer_begin(b->world);
 
         c = calloc(1, sizeof *c);
         c->name = copy(name, strlen(name));
@@ -470,12 +498,12 @@ int abi_define(module *m, backend_err *err)
     static const struct {
         const char *name;
         backend_fn  fn;
-        uint8_t     params[7];
+        uint8_t     params[8];
         uint32_t    param_count;
         uint8_t     results[1];
         uint32_t    result_count;
     } entries[] = {
-        { "declare", locked_declare, { I, I, I, I, I, I, I }, 7, { I }, 1 },
+        { "declare", locked_declare, { I, I, I, I, I, I, I, I }, 8, { I }, 1 },
         { "system",  locked_system,  { I, I, I, I, I, I },    6, { I }, 1 },
         { "observe", locked_observe, { I, I, I, I, I },       5, { I }, 1 },
         { "spawn",   locked_spawn,   { 0 },                   0, { L }, 1 },

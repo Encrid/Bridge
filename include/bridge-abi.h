@@ -17,6 +17,10 @@
 #define BRIDGE_SHARED    "shared"
 #define BRIDGE_PRIVATE   "private"
 
+/* declare's kind: what the descriptor describes - docs/modules/schema.md, *The type set*.
+ * Zero is unset, and refused. */
+enum { BRIDGE_STRUCT = 1, BRIDGE_ENUM = 2, BRIDGE_BITMASK = 3 };
+
 /* declare's on_unload - docs/bridge/data/lifetime.md. Zero is unset, and refused. */
 enum { BRIDGE_STRIP = 1, BRIDGE_SWEEP = 2, BRIDGE_DELETE = 3 };
 

@@ -17,8 +17,8 @@
 
 /* ---- the ABI: docs/modules/abi.md. Every pointer is an offset into the scratch arena ---- */
 
-BRIDGE_IMPORT(declare) uint32_t bridge_declare(uint32_t name, uint32_t name_len, uint32_t size,
-    uint32_t align, uint32_t desc, uint32_t desc_len, uint32_t on_unload);
+BRIDGE_IMPORT(declare) uint32_t bridge_declare(uint32_t name, uint32_t name_len, uint32_t kind,
+    uint32_t size, uint32_t align, uint32_t desc, uint32_t desc_len, uint32_t on_unload);
 BRIDGE_IMPORT(system)  uint32_t bridge_system(uint32_t name, uint32_t name_len, uint32_t phase,
     uint32_t phase_len, uint32_t terms, uint32_t term_count);
 BRIDGE_IMPORT(observe) uint32_t bridge_observe(uint32_t name, uint32_t name_len, uint32_t events,
@@ -58,6 +58,10 @@ BRIDGE_ACC(acc_from_shared) void acc_from_shared(void *to, uint32_t from, uint32
 #define ECS_STRUCT(name, ...) \
     typedef struct name __VA_ARGS__ name; \
     static const char name##_desc[] = #__VA_ARGS__
+#define ECS_ENUM(name, ...) \
+    typedef enum name __VA_ARGS__ name; \
+    static const char name##_desc[] = #__VA_ARGS__
+#define ECS_BITMASK(name, ...) ECS_ENUM(name, __VA_ARGS__)
 
 /* ---- the header and the scratch arena ---- */
 
@@ -83,9 +87,12 @@ static inline uint32_t bridge_put(const void *bytes, uint32_t len)
 
 /* ---- registration, with names as literals ---- */
 
-#define BRIDGE_COMPONENT(name, T, on_unload) \
-    bridge_declare(bridge_put(name, sizeof name - 1), sizeof name - 1, sizeof(T), _Alignof(T), \
-                   bridge_put(T##_desc, sizeof T##_desc - 1), sizeof T##_desc - 1, on_unload)
+/* a type another declaration's fields use is declared before it, in the same namespace */
+#define BRIDGE_DECLARE(kind, name, T, on_unload) \
+    bridge_declare(bridge_put(name, sizeof name - 1), sizeof name - 1, kind, sizeof(T), \
+                   _Alignof(T), bridge_put(T##_desc, sizeof T##_desc - 1), sizeof T##_desc - 1, \
+                   on_unload)
+#define BRIDGE_COMPONENT(name, T, on_unload) BRIDGE_DECLARE(BRIDGE_STRUCT, name, T, on_unload)
 
 #define BRIDGE_SYSTEM(name, phase, terms, count) \
     bridge_system(bridge_put(name, sizeof name - 1), sizeof name - 1, \

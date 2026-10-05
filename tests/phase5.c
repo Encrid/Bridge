@@ -239,6 +239,10 @@ int main(int argc, char **argv)
         a.cfg.write_count = 1;
         load(b, &a);
         frames(b, 1);
+    } else if (!strcmp(what, "nested") || !strcmp(what, "nested2")) {
+        a = wasm("game:nested@0.1.0", what);
+        load(b, &a);
+        frames(b, 1);
     } else if (!strcmp(what, "events")) {       /* add and set, then set, then remove */
         a = wasm("game:events@0.1.0", "events");
         load(b, &a);
