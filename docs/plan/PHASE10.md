@@ -31,6 +31,55 @@ patch touches. A thread-local variable, because its allocator callbacks carry no
 Refused: extending the patch to cut flecs down, which is a fork kept by regular expression.
 Refused for now: a fork, a trimmed copy that is ours. It is what this falls back to.
 
+## Not a freestanding flecs
+
+The first plan for this phase drew the line between the library and its storage at flecs'
+primitives under other names: make an id, attach, detach, match, watch. Behind a line of that
+shape the best ours could be is a smaller flecs, and it was put back to be done again, from what
+the documents say and by every step of `PHASE0.md`.
+
+flecs has to serve any program. Bridge-ASM700 promises much more than any program does, and each
+promise is something a design made for it can spend:
+
+    storage is touched only at a barrier, by one thread    `threads.md`, *Threads*
+    every change of a barrier exists before the first      `data.md`, *Structural change*
+    is applied
+    queries are fixed at load                              a system registers in init only
+    nobody iterates through storage                        `query.md`, *The interface is a query*
+    no order of rows or spans is a module's to rely on     `module.md`, *What no module may do*
+    a closed set of types, with no pointer among them      `schema.md`, *The type set*
+    no pairs, no wildcards, no or-terms                    refused where terms are handed over
+
+Seven questions followed, one at a time.
+
+    where the seam sits              at what the library does: declare this, apply these queues,
+                                     write what this module reads. As the backend seam is drawn
+    the unit of work at a barrier    an entity. Its changes are folded, in the order stated,
+                                     into what it will be; then it is placed once. No table is
+                                     made that nothing stays in
+    what a barrier publishes         what changed, and a span for each table that has rows. A
+                                     barrier that changed nothing writes nothing
+    what storage trusts of the       nothing. Its own index and row lists are outside it; what is
+    shared block                     in it is a copy, written and never read back
+    what bounds storage's memory     a table lives while it has rows, and `[budget] tables` says
+                                     how many may exist at once. All of it allocated at create
+    out of tables                    the entity stays as it was, and it is a failure of the
+                                     module that asked, toward its own budget
+    out of columns                   the same, and no memory from outside the block
+
+Each is applied to its document in the last step, when the tree is what the document says.
+
+**The fourth closes something that is open today.** When a row is removed, flecs reads from the
+table's array of entity ids which entity filled the hole, and updates that entity's record in
+its own index. The patch of phase 1 moved that array into the shared block, so that modules could
+read it. A module can therefore write it, and what it writes is then an id flecs acts on. Nothing
+had asked what storage believes of memory a sandboxed module can reach; the answer now is nothing.
+
+**The last two exist because of the second.** Columns running out stopped the bridge for good,
+and the documents gave two reasons: nobody could be named, and flecs could not be unwound from
+the middle of a change. An entity's whole fate is known before a row of it moves, and so is who
+asked last, so neither reason holds, and one module's growth no longer takes a deployment down.
+
 ## What a replacement has to reproduce
 
 Every use of flecs was read, in the four files that reach it: `src/store.c`, `src/abi.c`,
@@ -73,16 +122,28 @@ variable. Ours places every row, so the index is written where the row is placed
     field tables            leave the shared block: a module could address them there
     records naming flecs    are reworded, and the forwarded "flecs: ..." ones are gone
     the generation          is 32 bits in fact, where flecs gave 16 in a field of 32
+    [budget] tables         a new key: how many sets of components may exist at once
+    out of tables, or of    the entity is left as it was and the module that asked has failed.
+    columns                 A bridge no longer stops for columns
+    spans                   too small for `column_base` at the stated `tables`: refused at load,
+                            where it was a stop at some later barrier
+    tables                  none that nothing stays in, and none once it is emptied
 
 ## The gate
 
 1. flecs measured as it is, and the untested behaviours pinned on it.
-2. One internal header, `src/ecs.h`, with flecs behind it and nothing changed.
+2. One internal header, `src/rows.h`, with flecs behind it and nothing changed. Not `ecs.h`:
+   while flecs is in the tree that prefix is its own.
 3. Ours beside it, chosen at build, the same cases run against both.
-4. Every case on ours, on three platforms, alone and under load; every figure measured again.
+4. Every case on ours, on three platforms, alone and under load; every figure measured again,
+   and three more on both: an entity given several components in one barrier, a barrier with
+   nothing to do and ten thousand tables standing, and a set of components filled and emptied
+   at every barrier.
 5. flecs removed.
 
-**What stops it**: ours slower on any line and not to be made otherwise.
+**What stops it**: ours slower on any line and not to be made otherwise. The last of the three
+new lines is where a table that lives only while it has rows could lose, and if it does that
+question is put again with the figures.
 
 ## What flecs does, pinned
 

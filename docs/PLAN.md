@@ -197,6 +197,12 @@ Bridge-ASM700 publishes, and no row loop calls flecs. What flecs did, it did at 
 load. Scheduling, deferral, threads, the entity mirror and where memory sits were ours already. So
 what is replaced is a hundred thousand lines kept for forty-one calls.
 
+**It is not a smaller flecs.** flecs serves any program, and so must be right at every call.
+Bridge-ASM700 touches storage only at a barrier, with every change of that barrier already in
+hand, for queries fixed at load, and nobody iterates through it. Storage made for that works an
+entity once however much was asked of it, publishes what changed and nothing else, believes
+nothing a module can write, and allocates nothing after it is created.
+
 **Nothing of flecs is deleted until numbers say it may be.** flecs is measured first, as it is.
 Ours is built beside it, behind one internal header, and both run the same cases. flecs goes only
 when ours passes all of them and is not slower on any measured operation. If it is, flecs stays
@@ -204,8 +210,9 @@ and this phase has failed its claim.
 
 *Done when every case passes on storage that is Bridge-ASM700's own, on Windows, Linux and macOS,
 alone and under load; on every measured operation it is not slower than flecs was, with both sets
-of figures recorded; no line of flecs is left in the tree; and the behaviours no test covered
-before this phase each have one.*
+of figures recorded; storage allocates nothing after `bridge_create` and reads nothing back from
+the shared block; no line of flecs is left in the tree; and the behaviours no test covered before
+this phase each have one.*
 
 ## 11. Self contained
 
