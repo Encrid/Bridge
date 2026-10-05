@@ -1,0 +1,117 @@
+/* What a native module compiles against, beside bridge-abi.h: the table its backend hands it,
+ * and the same layouts read through real pointers. docs/modules/impl/native.md.
+ *
+ * Only a native module and the native backend compile this header. */
+#ifndef BRIDGE_NATIVE_H
+#define BRIDGE_NATIVE_H
+
+#include "bridge-abi.h"
+#include <stddef.h>
+#include <string.h>
+
+#ifdef _WIN32
+#define BRIDGE_NATIVE_EXPORT __declspec(dllexport)
+#else
+#define BRIDGE_NATIVE_EXPORT __attribute__((visibility("default")))
+#endif
+
+/* The `bridge` namespace of a wasm module, as a C struct: the eight entries of
+ * docs/modules/abi.md, unchanged, and where the two memories begin. Every pointer argument
+ * is still an offset into the scratch arena.
+ *
+ * An entry may be called only from inside a call the backend made: init, a system, an
+ * observer. That is native.md, *The invariant*, and it is how an entry knows whose it is. */
+typedef struct bridge_api {
+    uint32_t (*declare)(uint32_t name, uint32_t name_len, uint32_t size, uint32_t align,
+                        uint32_t desc, uint32_t desc_len, uint32_t on_unload);
+    uint32_t (*system)(uint32_t name, uint32_t name_len, uint32_t phase, uint32_t phase_len,
+                       uint32_t terms, uint32_t term_count);
+    uint32_t (*observe)(uint32_t name, uint32_t name_len, uint32_t events, uint32_t terms,
+                        uint32_t term_count);
+    uint64_t (*spawn)(void);
+    void     (*destroy)(uint64_t id);
+    void     (*attach)(uint64_t id, uint32_t slot, uint32_t ptr, uint32_t len);
+    void     (*detach)(uint64_t id, uint32_t slot);
+    uint32_t (*alloc)(uint32_t len);
+    uint8_t  *shared_base;          /* the shared memory. it does not move */
+    uint8_t  *private_base;         /* this module's private memory */
+} bridge_api;
+
+/* What a native module exports. bridge_bind is the backend's, once, before bridge_init. A
+ * system called "move" is the export bridge_move. */
+#define BRIDGE_NATIVE(name) BRIDGE_NATIVE_EXPORT int bridge_##name(void)
+#define BRIDGE_NATIVE_BIND(api_variable) \
+    BRIDGE_NATIVE_EXPORT void bridge_bind(const bridge_api *bound_) { api_variable = bound_; }
+
+/* ---- the schema: a struct, and the string both sides hash ---- */
+
+#define ECS_STRUCT(name, ...) \
+    typedef struct name __VA_ARGS__ name; \
+    static const char name##_desc[] = #__VA_ARGS__
+
+/* ---- the scratch arena ---- */
+
+static inline bridge_header *bridge_native_header(const bridge_api *api)
+{
+    return (bridge_header *)api->private_base;
+}
+
+/* `len` bytes copied into the scratch arena: where they are, or 0 if they do not fit, which
+ * every entry refuses */
+static inline uint32_t bridge_native_put(const bridge_api *api, const void *bytes, uint32_t len)
+{
+    bridge_header *h = bridge_native_header(api);
+    uint32_t used = (h->scratch_used + 7u) & ~7u;
+    if (used > h->scratch_len || len > h->scratch_len - used) return 0;
+    memcpy(api->private_base + h->scratch + used, bytes, len);
+    h->scratch_used = used + len;
+    return h->scratch + used;
+}
+
+#define BRIDGE_NATIVE_COMPONENT(api, name, T, on_unload) \
+    (api)->declare(bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, sizeof(T), \
+                   _Alignof(T), bridge_native_put(api, T##_desc, sizeof T##_desc - 1), \
+                   sizeof T##_desc - 1, on_unload)
+
+#define BRIDGE_NATIVE_SYSTEM(api, name, phase, terms, count) \
+    (api)->system(bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, \
+                  bridge_native_put(api, phase, sizeof phase - 1), sizeof phase - 1, \
+                  bridge_native_put(api, terms, (count) * sizeof(bridge_term)), count)
+
+/* ---- a query's spans, through real pointers. native.md, *Reaching a component* ---- */
+
+static inline const bridge_query *bridge_native_query(const bridge_api *api, uint32_t query)
+{
+    return (const bridge_query *)(api->private_base + bridge_native_header(api)->queries) + query;
+}
+
+/* span `i` of a query that declared `terms` terms: u32 count, u32 entities, u32 base[terms] */
+static inline const uint32_t *bridge_native_span(const bridge_api *api, const bridge_query *q,
+                                                 uint32_t i, uint32_t terms)
+{
+    return (const uint32_t *)(api->private_base + q->at + i * BRIDGE_SPAN_SIZE(terms));
+}
+
+/* ---- the log ---- */
+
+static inline void bridge_native_log(const bridge_api *api, int level, const char *text,
+                                     uint32_t len, uint32_t a0, uint32_t a1)
+{
+    bridge_header *h = bridge_native_header(api);
+    bridge_log_record *r;
+    uint32_t head = h->ring_head;
+    if (level > h->log_level) return;
+    h->ring_head = head + 1u;
+    if (head - h->ring_tail >= h->ring_len) return;     /* full: dropped, and counted */
+    r = (bridge_log_record *)(api->private_base + h->ring) + head % h->ring_len;
+    r->when = h->when;
+    r->reserved = 0;
+    r->level = (int8_t)level;
+    r->system = (uint16_t)h->system;
+    r->text = bridge_native_put(api, text, len);
+    r->len = len;
+    r->arg[0] = a0;
+    r->arg[1] = a1;
+}
+
+#endif

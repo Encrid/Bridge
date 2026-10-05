@@ -290,3 +290,40 @@ phase3_case (nophases    "the deployment declares no phase.*bridge_create refuse
 phase3_case (nobudget    ".budget. columns is unset.*bridge_create refused")
 # a measurement, not a claim: it passes by running. docs/bridge/diagnostics/validation.md has what it said
 phase3_case (bench       "rows-unchecked  no fuel   [0-9.]+ ns a row")
+
+# ---- phase 4: the native backend. docs/plan/PHASE4.md ----
+
+add_library (bridge-native SHARED backends/native/native.c)
+set_target_properties (bridge-native PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES PREFIX "")
+target_include_directories (bridge-native PRIVATE include)
+target_link_libraries (bridge-native PRIVATE bridge-os)
+
+# a native module is a shared library, built by the compiler that builds everything else
+foreach (name nmover nflood)
+    add_library (${name} MODULE tests/modules/native/${name}.c)
+    set_target_properties (${name} PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES PREFIX "")
+    target_include_directories (${name} PRIVATE include)
+endforeach ()
+
+add_executable (phase4 tests/phase4.c)
+set_target_properties (phase4 PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED YES)
+target_link_libraries (phase4 PRIVATE bridge)
+target_compile_definitions (phase4 PRIVATE
+    "BACKEND_PATH=\"$<TARGET_FILE:bridge-wasm>\"" "NATIVE_PATH=\"$<TARGET_FILE:bridge-native>\""
+    "NMOVER_PATH=\"$<TARGET_FILE:nmover>\"" "NFLOOD_PATH=\"$<TARGET_FILE:nflood>\""
+    "MODULE_DIR=\"${MODULES}\"")
+add_dependencies (phase4 bridge-wasm bridge-native nmover nflood c-modules)
+
+function (phase4_case name expect)
+    add_test (NAME phase4-${name} COMMAND phase4 ${name})
+    set_tests_properties (phase4-${name} PROPERTIES PASS_REGULAR_EXPRESSION "${expect}.*alive")
+endfunction ()
+
+phase4_case (raw       "game:mover@0.1.0/tally: native tally 2 1000.*native tally 2 1000")
+phase4_case (mixed     "view:reader@0.1.0/sum: sum 250500 0.*native tally 2 1000.*sum 251000 0")
+phase4_case (untrusted "module 'game:mover@0.1.0' is refused: trusted = false needs 'sandbox', which backend 'native' lacks")
+phase4_case (limit     "module 'game:mover@0.1.0' is refused: fuel needs 'meter', which backend 'native' lacks")
+phase4_case (nolib     "module 'game:mover@0.1.0' did not load: cannot open the library 'no-such-library'")
+phase4_case (refuse    "test:flood@0.1.0/flood: system 'flood' failed: spawn: .budget. entities of 4096 is reached")
+# before its library is opened: the path names nothing, and nothing says it was looked for
+set_tests_properties (phase4-untrusted phase4-limit PROPERTIES FAIL_REGULAR_EXPRESSION "cannot open")

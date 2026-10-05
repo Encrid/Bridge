@@ -13,6 +13,9 @@
 static int refuse(module *m, const char *fmt, ...)
 {
     va_list args;
+    /* the first refusal of a call is the reason: a backend that cannot unwind lets the
+     * module run on, and what it meets afterwards is consequence */
+    if (m->refused) return 1;
     va_start(args, fmt);
     vsnprintf(m->why, sizeof m->why, fmt, args);
     va_end(args);

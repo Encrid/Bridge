@@ -1,0 +1,285 @@
+/* The native backend: the seventeen entries of bridge-backend.h, over a shared library.
+ * docs/modules/impl/native.md is the binding; docs/seam/backend/capabilities.md is what this
+ * backend truthfully cannot do. */
+#include "bridge-backend.h"
+#include "bridge-native.h"
+#include "os.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#ifdef _MSC_VER
+#define THREAD_LOCAL __declspec(thread)
+#else
+#define THREAD_LOCAL _Thread_local
+#endif
+
+enum { DECLARE, SYSTEM, OBSERVE, SPAWN, DESTROY, ATTACH, DETACH, ALLOC, ENTRIES };
+static const char *const entry_names[ENTRIES] = {
+    "declare", "system", "observe", "spawn", "destroy", "attach", "detach", "alloc"
+};
+
+struct backend { int unused; };
+struct backend_memory { void *ptr; uint64_t len; };
+struct backend_module { void *lib; };
+struct backend_func { backend_instance *instance; int (*fn)(void); backend_func *next; };
+
+struct backend_instance {
+    backend_module *m;
+    bridge_api      api;
+    backend_fn      fns[ENTRIES];
+    void           *uds[ENTRIES];
+    int             bound;
+    int             refused;        /* an entry refused during the call in progress */
+    backend_func   *funcs;
+};
+
+/* A C function pointer carries no context, so an entry finds its module by who is running:
+ * native code runs only inside a call this backend made - native.md, *The invariant*. A call
+ * from anywhere else, a foreign thread's callback say, finds nobody and answers zero. */
+static THREAD_LOCAL backend_instance *running;
+
+/* A refusal cannot unwind native code, so the entry answers zero and the call returns:
+ * Bridge-ASM700 fails the invocation then - signatures.md. Until it does return, every entry
+ * answers zero and reaches nothing, which is as near to stopped as native code can be put. */
+static uint64_t enter(int entry, const uint64_t *args)
+{
+    uint64_t result = 0;
+    if (!running || running->refused || !running->fns[entry]) return 0;
+    if (running->fns[entry](running->uds[entry], args, &result)) {
+        running->refused = 1;
+        return 0;
+    }
+    return result;
+}
+
+static uint32_t t_declare(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f,
+                          uint32_t g)
+{
+    uint64_t args[7] = { a, b, c, d, e, f, g };
+    return (uint32_t)enter(DECLARE, args);
+}
+
+static uint32_t t_system(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f)
+{
+    uint64_t args[6] = { a, b, c, d, e, f };
+    return (uint32_t)enter(SYSTEM, args);
+}
+
+static uint32_t t_observe(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e)
+{
+    uint64_t args[5] = { a, b, c, d, e };
+    return (uint32_t)enter(OBSERVE, args);
+}
+
+static uint64_t t_spawn(void)
+{
+    uint64_t args[1] = { 0 };
+    return enter(SPAWN, args);
+}
+
+static void t_destroy(uint64_t id)
+{
+    enter(DESTROY, &id);
+}
+
+static void t_attach(uint64_t id, uint32_t slot, uint32_t ptr, uint32_t len)
+{
+    uint64_t args[4] = { id, slot, ptr, len };
+    enter(ATTACH, args);
+}
+
+static void t_detach(uint64_t id, uint32_t slot)
+{
+    uint64_t args[2] = { id, slot };
+    enter(DETACH, args);
+}
+
+static uint32_t t_alloc(uint32_t len)
+{
+    uint64_t args[1] = { len };
+    return (uint32_t)enter(ALLOC, args);
+}
+
+/* ---- the seventeen ---- */
+
+BACKEND_EXPORT backend *backend_create(const backend_setting *settings, uint32_t count,
+                                       backend_err *err)
+{
+    (void)settings; (void)count; (void)err;
+    return calloc(1, sizeof(backend));
+}
+
+BACKEND_EXPORT void backend_destroy(backend *b)
+{
+    free(b);
+}
+
+/* No sandbox, no meter, no deadline, no limit: nothing contains code in this process. */
+BACKEND_EXPORT uint32_t backend_capabilities(backend *b)
+{
+    (void)b;
+    return BACKEND_RELOAD;
+}
+
+BACKEND_EXPORT void memory_shape(backend *b, uint64_t *reservation, uint64_t *guard)
+{
+    (void)b;
+    *reservation = 0;
+    *guard = 0;
+}
+
+/* almost nothing: the pointer is already addressable */
+BACKEND_EXPORT backend_memory *memory_adopt(backend *b, void *ptr, uint64_t len, backend_err *err)
+{
+    backend_memory *m = malloc(sizeof *m);
+    (void)b; (void)err;
+    m->ptr = ptr;
+    m->len = len;
+    return m;
+}
+
+BACKEND_EXPORT void memory_release(backend_memory *m)
+{
+    free(m);
+}
+
+BACKEND_EXPORT backend_module *module_compile(backend *b, const void *bytes, size_t len,
+                                              const char *path, uint32_t demands,
+                                              backend_err *err)
+{
+    backend_module *m;
+    void *lib;
+    (void)b; (void)bytes; (void)len; (void)demands;     /* a native module is its library */
+    lib = path ? os_lib_open(path) : NULL;
+    if (!lib) {
+        snprintf(err->text, sizeof err->text, "cannot open the library '%.180s'", path ? path : "");
+        return NULL;
+    }
+    m = calloc(1, sizeof *m);
+    m->lib = lib;
+    return m;
+}
+
+/* A library has no import section to read, so it is taken to want both memories. */
+BACKEND_EXPORT uint32_t module_imports(backend_module *m, backend_import *out, uint32_t max)
+{
+    static const char ns[] = BRIDGE_NAMESPACE;
+    static const char *const fields[2] = { BRIDGE_SHARED, BRIDGE_PRIVATE };
+    uint32_t i;
+    (void)m;
+    for (i = 0; i < 2 && i < max; i ++) {
+        out[i].ns = ns;
+        out[i].ns_len = sizeof ns - 1;
+        out[i].field = fields[i];
+        out[i].field_len = strlen(fields[i]);
+        out[i].kind = BACKEND_IMPORT_MEMORY;
+    }
+    return 2;
+}
+
+BACKEND_EXPORT void module_destroy(backend_module *m)
+{
+    os_lib_close(m->lib);
+    free(m);
+}
+
+BACKEND_EXPORT backend_instance *instance_create(backend *b, backend_module *m,
+                                                 const backend_memory_import *memories,
+                                                 uint32_t count, backend_err *err)
+{
+    backend_instance *i = calloc(1, sizeof *i);
+    uint32_t k;
+    (void)b; (void)err;
+    i->m = m;
+    i->api.declare = t_declare;
+    i->api.system = t_system;
+    i->api.observe = t_observe;
+    i->api.spawn = t_spawn;
+    i->api.destroy = t_destroy;
+    i->api.attach = t_attach;
+    i->api.detach = t_detach;
+    i->api.alloc = t_alloc;
+    for (k = 0; k < count; k ++) {
+        if (!strcmp(memories[k].field, BRIDGE_SHARED)) i->api.shared_base = memories[k].memory->ptr;
+        if (!strcmp(memories[k].field, BRIDGE_PRIVATE)) i->api.private_base = memories[k].memory->ptr;
+    }
+    return i;
+}
+
+BACKEND_EXPORT void instance_destroy(backend_instance *i)
+{
+    while (i->funcs) {
+        backend_func *f = i->funcs;
+        i->funcs = f->next;
+        free(f);
+    }
+    free(i);
+}
+
+/* this backend answered no to all three, so Bridge-ASM700 never has a number to hand them */
+BACKEND_EXPORT void instance_set_fuel(backend_instance *i, uint64_t units) { (void)i; (void)units; }
+BACKEND_EXPORT void instance_set_deadline(backend_instance *i, uint64_t nanos) { (void)i; (void)nanos; }
+BACKEND_EXPORT void instance_set_memory_limit(backend_instance *i, uint64_t bytes) { (void)i; (void)bytes; }
+
+/* The signature is the one bridge-native.h already declares, so only the pointer is kept. */
+BACKEND_EXPORT int define_func(backend_instance *i, const char *ns, const char *field,
+                               backend_fn fn, void *ud, const backend_sig *sig, backend_err *err)
+{
+    int k;
+    (void)sig;
+    for (k = 0; k < ENTRIES; k ++) {
+        if (!strcmp(ns, BRIDGE_NAMESPACE) && !strcmp(field, entry_names[k])) {
+            i->fns[k] = fn;
+            i->uds[k] = ud;
+            return 0;
+        }
+    }
+    snprintf(err->text, sizeof err->text, "the native binding has no entry '%.100s'", field);
+    return -1;
+}
+
+/* Exports are named bridge_<name>: a C process has one flat symbol namespace. */
+BACKEND_EXPORT backend_func *instance_func(backend_instance *i, const char *name,
+                                           int32_t *arity, int32_t *results, backend_err *err)
+{
+    char symbol[160];
+    backend_func *f;
+    int (*fn)(void);
+    if (!i->bound) {
+        /* a library has no imports to fill, so the same things are handed over in one call */
+        void (*bind)(const bridge_api *) = (void (*)(const bridge_api *))os_lib_sym(i->m->lib, "bridge_bind");
+        if (!bind) {
+            snprintf(err->text, sizeof err->text, "no exported function 'bridge_bind'");
+            return NULL;
+        }
+        bind(&i->api);
+        i->bound = 1;
+    }
+    snprintf(symbol, sizeof symbol, "bridge_%.150s", name);
+    fn = (int (*)(void))os_lib_sym(i->m->lib, symbol);
+    if (!fn) {
+        snprintf(err->text, sizeof err->text, "no exported function '%s'", symbol);
+        return NULL;
+    }
+    *arity = *results = -1;         /* a symbol carries no type: there is nothing to check */
+    f = calloc(1, sizeof *f);
+    f->instance = i;
+    f->fn = fn;
+    f->next = i->funcs;
+    i->funcs = f;
+    return f;
+}
+
+/* Nothing is caught: a native module that faults takes the process with it. */
+BACKEND_EXPORT int call(backend_func *f, int32_t *status, backend_err *err)
+{
+    backend_instance *before = running;
+    (void)err;
+    running = f->instance;
+    running->refused = 0;
+    *status = f->fn();
+    running = before;
+    return 0;
+}
