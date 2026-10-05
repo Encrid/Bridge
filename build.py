@@ -181,7 +181,8 @@ def build(target, debug, out):
     cc += row['compile']
     # an error, since zig says a warning once and then answers from its cache without it. Members
     # an initializer leaves out are zero, which C states and flecs' descriptors are written for.
-    ours = cc + ['-std=c11', '-Wall', '-Wextra', '-Werror', '-Wno-missing-field-initializers']
+    ours = cc + ['-std=c23', '-pedantic-errors', '-Wall', '-Wextra', '-Werror',
+                 '-Wno-missing-field-initializers']
     system, here = row['link'], row['beside']
     include, src = '-I%s' % (ROOT / 'include'), '-I%s' % (ROOT / 'src')
     headers = [Path(__file__)] + [h for d in ('include', 'src', 'tests', 'tests/modules')
@@ -229,7 +230,7 @@ def build(target, debug, out):
                                  cc + ['-std=c99', '-w', '-I%s' % (out / name)])
         for test in ('confined', 'rowmove'):
             compile_('%s-%s' % (test, name), ROOT / 'tests' / (test + '.c'),
-                     cc + ['-std=c99', '-I%s' % (out / name)], [out / name / 'flecs.h'])
+                     ours + ['-I%s' % (out / name)], [out / name / 'flecs.h'])
     os_o = compile_('os', ROOT / 'src/os.c', ours + [src])
     bridge_o = [compile_(name, ROOT / 'src' / (name + '.c'), ours + [include, src, flecs],
                          [out / 'flecs/flecs.h']) for name in BRIDGE]
@@ -299,7 +300,8 @@ def build(target, debug, out):
         acc = modules / ('acc-%s.wasm' % kind)
         c = ROOT / 'tests/modules' / (source + '.c')
         compiled.append(('building module %s' % name, [final], [c, acc] + headers, [
-            [zig, 'cc', '-target', 'wasm32-freestanding', '-O2', '-nostdlib'] +
+            [zig, 'cc', '-target', 'wasm32-freestanding', '-std=c23', '-pedantic-errors', '-Wall',
+             '-Wextra', '-Werror', '-Wno-missing-field-initializers', '-O2', '-nostdlib'] +
             ['-D' + d for d in flags] + [include, '-Wl,--no-entry', '-o', raw, c],
             [merge, raw, 'main', acc, 'acc'] + FEATURES + ['-o', merged],
             [opt, merged] + FEATURES + ['-O3', '--remove-exports=acc_*',

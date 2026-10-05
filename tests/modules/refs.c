@@ -33,8 +33,8 @@ BRIDGE_EXPORT(init) int init(void)
 {
     uint32_t i;
     position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE);
-    BRIDGE_SYSTEM("cull", "update", &i, 0);
-    BRIDGE_SYSTEM("check", "present", &i, 0);
+    BRIDGE_SYSTEM("cull", "update", nullptr, 0);
+    BRIDGE_SYSTEM("check", "present", nullptr, 0);
     for (i = 0; i < ENTITIES; i ++) {
         Position p = { (float)i, 0.0f };
         ids[i] = bridge_spawn();
