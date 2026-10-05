@@ -36,7 +36,7 @@ and `ecs_pipeline_init` lets a world define its own instead. So they are an opti
 replaceable data, not names the library imposes. Here nothing ships one at all: not the library,
 and not a host, which hands over the phases its deployment stated. Whether a set of names ever
 becomes something deployments share is the question `no-builtins.md`, *No builtins*, puts for a
-clock, and it is asked where the first real deployment is built: `PLAN.md`, phase 17.
+clock, and it is asked where the first real deployment is built: `PLAN.md`, phase 18.
 
 flecs' phases carry `DependsOn` relationships, and `:942` records the care that needs -
 *"EcsOnUpdate doesn't have a direct DependsOn relationship on EcsPreUpdate, which ensures that when
@@ -177,12 +177,12 @@ timeout are not interchangeable.
 changes on four threads and again on one, and what they say of their own account has to be the
 same file, word for word, on every run. `[checks] validate` hashes every column at every barrier
 - `validation.md`, *The checksum pass, when asked* - and with it the same is held barrier by
-barrier: `PLAN.md`, phase 13.
+barrier: `PLAN.md`, phase 14.
 
 It is stated here because an input path that bypassed a column would quietly make a pass depend
 on something nobody can see, and nothing later could recover that.
 
-**Recording a run and playing it back is what this is for**, and it is `PLAN.md`, phase 14. The
+**Recording a run and playing it back is what this is for**, and it is `PLAN.md`, phase 15. The
 work is in two halves, and `split.md`, *The split*, is what divides it:
 
     Bridge-ASM700     what a recording is made of, and nothing on disk: handing a host what

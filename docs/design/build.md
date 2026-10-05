@@ -40,7 +40,7 @@ CMake's work was to find and drive three compilers. With one compiler that takes
 argument, what is left is running commands in order, and `tools/` was Python already.
 
 It takes every path from where it is and from the output directory it is given, so that a host
-with this repository as a submodule builds it by calling the same script - `PLAN.md` phase 12.
+with this repository as a submodule builds it by calling the same script - `PLAN.md` phase 13.
 
 What this gives up: the rebuild check, the parallelism and the choice of tests are ours to get
 right, and an editor that reads CMake finds nothing to read. Refused: `build.zig`, which has the
@@ -125,7 +125,7 @@ compiler without C23.
 **Thread-local storage stays.** Two variables are found by which thread is running: the native
 module whose entry was called, and the memory wasmtime is being asked to create. A third went with
 flecs, whose allocator callbacks could not say which bridge they were working for. Each is there
-because a callback Bridge-ASM700 does not own carries no context. Phase 11 has one thing to verify
+because a callback Bridge-ASM700 does not own carries no context. Phase 12 has one thing to verify
 about them: on Windows the compiler reaches a thread-local variable through a runtime helper, and
 that phase links no C runtime.
 
@@ -163,7 +163,7 @@ platform, where three C runtimes formatted three ways.
 
 **Nothing is fetched, and nothing is installed but zig and Python.** What Bridge-ASM700 depends on
 is in the tree, with where it came from and its hash beside it: wasmtime today, the C
-routines and the tools the build runs from phase 11.
+routines and the tools the build runs from phase 12.
 
 Third-party code is not refused. Code that arrives from somewhere the tree does not record is.
 That includes a C library: it has to be installed like anything else, so it counts.

@@ -145,7 +145,7 @@ the module never declared is an error naming it.* Met.
 
 Done. One compiler and one script. zig compiles everything on every platform, and `build.py` does what
 CMake did: patches flecs, compiles, links, builds the test modules and runs the tests - `build.md`,
-*One compiler* and *One script*. Windows becomes `x86_64-windows-gnu`, and until phase 11 it links
+*One compiler* and *One script*. Windows becomes `x86_64-windows-gnu`, and until phase 12 it links
 the C runtime zig carries.
 
 **Nothing about the library changes**, which is the claim: the same tests, saying the same things,
@@ -214,7 +214,52 @@ of figures recorded; storage allocates nothing after `bridge_create` and reads n
 the shared block; no line of flecs is left in the tree; and the behaviours no test covered before
 this phase each have one.*
 
-## 11. Self contained
+## 11. Storage layouts
+
+Storage keeps every component one way: in the table of its entity's archetype, a column beside
+the entity's other components. That is the right way for what systems read together, and one
+way for everything is one trade made for everything. It was never chosen: it was what flecs did
+by default, and what was meant from the start was the right tool for each task. The line that
+carried the intent, "layout migration", was read for six phases as something else -
+`PHASE10.md`, *The repair*.
+
+**A component is kept in the storage layout stated for it.** Five, by the names the projects
+that have them use:
+
+    table             the archetype's table, a column a component. What systems read
+                      together, row by row. What exists
+    sparse set        the component's own packed array, and an index by entity. What comes and
+                      goes, what few entities carry, what sits on entities that carry a lot
+    toggle            a bit a row that turns a component on or off where it is. What an entity
+                      always has and sometimes does not use
+    direct-indexed    the value of entity i at slot i. What nearly every entity carries and is
+                      reached by id far more than it is walked
+    singleton         one value for the deployment, at one place. Settings, and what there is
+                      one of
+
+They do not overlap: each is weak where another is strong, and a component stored the wrong way
+pays that layout's price. `storage weigh` measures the price of the one there is: a component
+given to an entity that carries 4 KB costs thirteen times what it costs a small one, and the
+same rows read from 4,096 tables take three times as long as from one.
+
+This phase's questions, each by the method of `PHASE0.md`, and in this order: who states a
+component's storage layout, and where; what a module is handed for each, in `bridge-abi.h` and in
+each backend's binding, and what a query may ask across two of them; what each costs of which
+budget; whether a component may have no bytes at all, a tag; and what it takes to move a
+component from one storage layout to another, which is what "layout migration" meant.
+
+Before everything that reads storage or describes it: the readings of how full a budget is, what a
+recording is made of, and the module seam in a second language would each be made twice
+otherwise.
+
+*Done when a component can be declared in each of the five and a module reads it as that layout
+is read; each has a case for what it is for and a measurement beside the table's for the same
+work, and none is slower than the table at what it was chosen for; a query across two layouts
+either works as written or is refused by name; running out, strip at unload and what an observer
+is told each hold in every layout; and a component is moved from one layout to another with its
+values.*
+
+## 12. Self contained
 
 Nothing fetched and nothing installed but the toolchain - `build.md`, *Self contained*. The parts
 of a C library that can be carried are carried: the routines our source calls, and an
@@ -226,7 +271,7 @@ tools the build runs, are settled in this phase's own plan, with the sources rea
 system's libraries and wasmtime and nothing else; the build fetches nothing; one formatted record
 is the same bytes on every platform; and every test passes.*
 
-## 12. A host, from outside
+## 13. A host, from outside
 
 A standalone host, built in its own repository against the library and nothing else, which is what
 tests the host seam: if it needs no part of Bridge-ASM700's inside, the seam is real. It has this
@@ -239,7 +284,7 @@ and reports one that failed to load; a key it left unset is an error naming the 
 `bridge_manifest_parse` reads an identity out of a wasm binary and out of a native library in each
 of the three platforms' formats.*
 
-## 13. Diagnostics
+## 14. Diagnostics
 
 `[checks] validate` and `[checks] profile` - the barrier's checksum pass and the per-system
 counters - and `bridge_profile`, a pull. `validation.md`, *The checksum pass, when asked*, and
@@ -253,7 +298,7 @@ zero, every budget of the bridge and of a module reads as what a test made it us
 most it ever used, and one deployment run twice, and on one thread and on four, gives the same checksum of
 every column at every barrier - `schedule.md`, *What a pass depends on*.*
 
-## 14. Record and replay
+## 15. Record and replay
 
 A pass depends on storage, the phase asked for, and what native modules wrote, and on nothing
 else - `schedule.md`, *What a pass depends on*. The design has paid for that since phase 0: one
@@ -278,7 +323,7 @@ barrier is the same in both; a played-back run that is handed a set recorded fro
 deployment is refused by name; and the standalone host records a run to a file and plays it back
 from one, in its own repository.*
 
-## 15. A module that is not C
+## 16. A module that is not C
 
 What a module needs to be written falls in two parts, and they have two owners - `README.md`,
 *Three layers, three seams*.
@@ -307,7 +352,7 @@ capability, whose list this adds to.
 came from Bridge-ASM700 for the layouts and from the native backend for the rest, and neither was
 copied out of the other; and a layout changed in one place changes what both languages read.*
 
-## 16. Tests, by capability
+## 17. Tests, by capability
 
 Every test so far was written to meet one phase's claim, and is named for the phase: `phase2`
 to `phase6`. That says when a thing was built and not what is covered. This phase turns the
@@ -328,7 +373,7 @@ one that has none; no case is named for a phase; every case passes on Windows, L
 alone and with several copies running at once; and the standalone host's capabilities are covered
 the same way in its own repository.*
 
-## 17. Prove it
+## 18. Prove it
 
 Port the original Bridge's Godot adapter to this design, as a native module. It is a real workload
 with a measured baseline, which is why it is the proof. Its probe asserts 191 checks, and two of
@@ -353,4 +398,3 @@ Each is refused or deferred in the document named, with the condition that would
     per-component page mapping       `costs.md`, *What we give up*
     a phase exclusivity flag         `schedule.md`, *A phase is a name and nothing else*
     an instance-grouping entry       `backend.md`, *What the backend does not do*
-    layout migration                 `lifetime.md`, *When the layout changed*

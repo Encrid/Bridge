@@ -155,7 +155,7 @@ the header is C23, and the one translator tried on it, the project's own compile
 first `constexpr`. A module in another language needs two things in that language. What
 Bridge-ASM700 writes, which is this header's content and Bridge-ASM700's to make readable. And
 how a module on this backend reaches it, which is this backend's binding and this backend's to
-provide - `README.md`, *Three layers, three seams*. `PLAN.md`, phase 15.
+provide - `README.md`, *Three layers, three seams*. `PLAN.md`, phase 16.
 
 **The native backend's `bridge_api` is not in it.** A struct of C function pointers has nothing a
 wasm module could derive, since it gets imports rather than pointers. It lives in

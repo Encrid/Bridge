@@ -418,29 +418,28 @@ A line is open until the commit that closes it is named beside it.
 **1. `PLAN.md`, *Not in this plan***: ten things "refused or deferred", not said which. Each is
 read in its document and becomes a phase, a refusal with its condition, or nothing.
 
-    closed  the journal, record and replay: a phase of its own, `PLAN.md` 14, with the
+    closed  the journal, record and replay: a phase of its own, `PLAN.md` 15, with the
             library's half and the host's half named apart; and a case, now, that a run says
             the same on one thread as on four                                         7e6eadf
     closed  a default phase set, and bridge:clock@1 and its kind: one question. Nothing ships
-            either; the first real deployment, `PLAN.md` 17, states its own and asks whether
+            either; the first real deployment, `PLAN.md` 18, states its own and asks whether
             they are shared                                                           5c4e577
     open    per-component page mapping
     open    a phase exclusivity flag
     closed  memory high-water per module: wider than it said. How full every budget is, for
-            the bridge and for each module, as a pull, in `PLAN.md` 13 and its done-when 1183284
+            the bridge and for each module, as a pull, in `PLAN.md` 14 and its done-when 1183284
     open    an instance-grouping entry
     closed  arena mark and reset: still refused, with its condition. What was behind it is
             not: a share goes back to the arena at unload unless a row still holds a string
             in it, so loading and unloading no longer ends in a restart              f3d7480
-    open    layout migration. It was read wrong, and had been since phase 0: the line means
+    closed  layout migration. It was read wrong, and had been since phase 0: the line means
             more than one way to store a component, chosen as the right tool for the task,
             and it points at a section about a struct's fields changing at a reload. The
-            first is the item, and nothing written holds it yet. Weighed before it is
-            decided: `storage weigh` measures the two things one storage layout is worst
-            at, and the figures are below
+            first is the item. Weighed on `storage weigh`, whose figures are below, and
+            then each kind on its own: accepted, all five, as `PLAN.md` 11
     open    a struct changed at reload: a question the misreading raised and nobody had
             asked. `lifetime.md` says the library "cannot" tell what changed, which is false
-    closed  bindings for a non-C module: a phase of its own, `PLAN.md` 15, with two owners.
+    closed  bindings for a non-C module: a phase of its own, `PLAN.md` 16, with two owners.
             What Bridge-ASM700 writes is its own to state; how a module reaches it is the
             backend's. Tried first: the project's compiler cannot translate the header
     closed  the tree itself, which had said otherwise: a folder for each owner. A backend has
