@@ -320,6 +320,8 @@ def test(out, built, only):
         argv = [str(out / (command[0] + built['exe']))] + command[1:]
         if command[0] == 'patch-version':
             argv = [str(built[k]) for k in ('python', 'patch', 'other')] + [str(built['other'] / 'out')]
+        elif command[0] == 'c23':
+            argv = [str(built['python']), str(ROOT / 'tools/c23.py')]
         elif command[0] == 'nocall':
             argv = [str(built[k]) for k in ('python', 'nocall', 'wasm-tools')] + \
                    [str(built['modules'] / command[1]), command[2]]
@@ -371,6 +373,8 @@ def main():
 # Every case: its name, what is run, what its output must match, what it must not. A phase's
 # cases end in "alive": checked by what was said, and by the process still being there to say it.
 CASES = [
+    ('c23', ['c23'],
+     None, None),
     ('confined', ['confined'],
      None, None),
     ('rowmove', ['rowmove'],

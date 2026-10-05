@@ -507,22 +507,22 @@ static int abi_alloc(void *ud, const uint64_t *a, uint64_t *r)
 
 int abi_define(module *m, backend_err *err)
 {
-    enum { I = BACKEND_I32, L = BACKEND_I64 };
+    constexpr enum backend_type I = BACKEND_I32, L = BACKEND_I64;
     static const struct {
         const char *name;
         backend_fn  fn;
-        uint8_t     params[8];
+        enum backend_type params[8];
         uint32_t    param_count;
-        uint8_t     results[1];
+        enum backend_type results[1];
         uint32_t    result_count;
     } entries[] = {
         { "declare", abi_declare, { I, I, I, I, I, I, I, I }, 8, { I }, 1 },
         { "system",  abi_system,  { I, I, I, I, I, I },    6, { I }, 1 },
         { "observe", abi_observe, { I, I, I, I, I },       5, { I }, 1 },
-        { "spawn",   abi_spawn,   { 0 },                   0, { L }, 1 },
-        { "destroy", abi_destroy, { L },                   1, { 0 }, 0 },
-        { "attach",  abi_attach,  { L, I, I, I },          4, { 0 }, 0 },
-        { "detach",  abi_detach,  { L, I },                2, { 0 }, 0 },
+        { "spawn",   abi_spawn,   {},                      0, { L }, 1 },
+        { "destroy", abi_destroy, { L },                   1, {}, 0 },
+        { "attach",  abi_attach,  { L, I, I, I },          4, {}, 0 },
+        { "detach",  abi_detach,  { L, I },                2, {}, 0 },
         { "alloc",   abi_alloc,   { I },                   1, { I }, 1 },
     };
     size_t i;
