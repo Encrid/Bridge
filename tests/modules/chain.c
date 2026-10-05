@@ -15,35 +15,35 @@ static void hop(uint32_t observer, uint32_t next, uint32_t n)
     if (bridge_triggers(observer) && next != NONE) BRIDGE_ATTACH(entity, next, link);
 }
 
-BRIDGE_EXPORT(start) int start(void)
+BRIDGE_EXPORT(start) int start()
 {
     Link link = { 1 };
     if (!started ++) BRIDGE_ATTACH(entity, a, link);
     return 0;
 }
 
-BRIDGE_EXPORT(got_a) int got_a(void)
+BRIDGE_EXPORT(got_a) int got_a()
 {
     BRIDGE_LOG(BRIDGE_LOG_INFO, "hop A", 0, 0);
     hop(on_a, b, 2);
     return 0;
 }
 
-BRIDGE_EXPORT(got_b) int got_b(void)
+BRIDGE_EXPORT(got_b) int got_b()
 {
     BRIDGE_LOG(BRIDGE_LOG_INFO, "hop B", 0, 0);
     hop(on_b, c, 3);
     return 0;
 }
 
-BRIDGE_EXPORT(got_c) int got_c(void)
+BRIDGE_EXPORT(got_c) int got_c()
 {
     BRIDGE_LOG(BRIDGE_LOG_INFO, "hop C", 0, 0);
     hop(on_c, NONE, 0);
     return 0;
 }
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }};
     int none = 0;
@@ -61,5 +61,5 @@ BRIDGE_EXPORT(init) int init(void)
     return 0;
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }
-BRIDGE_EXPORT(reload) int reload(void) { return 0; }
+BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
+BRIDGE_EXPORT(reload) int reload() { return 0; }

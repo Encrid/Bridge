@@ -97,7 +97,7 @@ typedef struct backend_api {
 
     int (*define_func)(backend_instance *i, const char *ns, const char *field,
                        backend_fn fn, void *ud, const backend_sig *sig, backend_err *err);
-    /* `arity` and `results` are -1 if the backend cannot tell. NULL if there is no such export. */
+    /* `arity` and `results` are -1 if the backend cannot tell. nullptr if there is no such export. */
     backend_func *(*instance_func)(backend_instance *i, const char *name,
                                    int32_t *arity, int32_t *results, backend_err *err);
     /* 0 if the function returned, and then `status` is what it returned. */

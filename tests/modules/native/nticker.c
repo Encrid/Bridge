@@ -18,7 +18,7 @@ BRIDGE_NATIVE(advance)
     return 0;
 }
 
-static void registration(void)
+static void registration()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_INOUT, BRIDGE_AND, 0 }};
     tick = BRIDGE_NATIVE_COMPONENT(api, "game:Tick", Tick, BRIDGE_DELETE);

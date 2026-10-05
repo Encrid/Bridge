@@ -7,7 +7,7 @@ ECS_STRUCT(Body, { Vec2 at; float mass; });
 
 static uint32_t body, reading;
 
-BRIDGE_EXPORT(read) int read(void)
+BRIDGE_EXPORT(read) int read()
 {
     uint32_t span = bridge_span(reading, 0, 1);
     uint32_t at = BRIDGE_ROW(Body, bridge_base(span, 0), 0, bridge_rows(span));
@@ -16,7 +16,7 @@ BRIDGE_EXPORT(read) int read(void)
     return 0;
 }
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }};
     Body b = {{ 1.0f, 2.0f }, 3.0f };
@@ -27,5 +27,5 @@ BRIDGE_EXPORT(init) int init(void)
     return 0;
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }
-BRIDGE_EXPORT(reload) int reload(void) { return 0; }
+BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
+BRIDGE_EXPORT(reload) int reload() { return 0; }

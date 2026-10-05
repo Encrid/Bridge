@@ -6,7 +6,7 @@ ECS_STRUCT(Name, { uint32_t at; uint32_t len; });
 
 static uint32_t name, saying;
 
-BRIDGE_EXPORT(say) int say(void)
+BRIDGE_EXPORT(say) int say()
 {
     uint32_t span = bridge_span(saying, 0, 1);
     uint32_t at = BRIDGE_ROW(Name, bridge_base(span, 0), 0, bridge_rows(span));
@@ -18,7 +18,7 @@ BRIDGE_EXPORT(say) int say(void)
     return 0;
 }
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
     static const char hello[] = "kept in the arena";
     bridge_term terms[1] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }};
@@ -32,5 +32,5 @@ BRIDGE_EXPORT(init) int init(void)
     return 0;
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }
-BRIDGE_EXPORT(reload) int reload(void) { return 0; }
+BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
+BRIDGE_EXPORT(reload) int reload() { return 0; }

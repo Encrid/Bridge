@@ -31,9 +31,9 @@ static void *read_file(const char *path, size_t *len)
     return data;
 }
 
-static backend_instance *instance(void)
+static backend_instance *instance()
 {
-    backend_err err = {0};
+    backend_err err = {};
     backend_memory_import imports[1] = {{ "bridge", "shared", memory }};
     backend_instance *i = api.instance_create(be, module, imports, 1, &err);
     if (!i) { printf("FAIL: instance_create: %s\n", err.text); exit(1); }
@@ -63,7 +63,7 @@ static void worker(void *arg)
 {
     job *j = arg;
     backend_instance *i = instance();       /* a store of this thread's own */
-    backend_err err = {0};
+    backend_err err = {};
     int32_t status;
     int r;
     for (r = 0; r < j->rounds; r ++) {
@@ -72,18 +72,18 @@ static void worker(void *arg)
     api.instance_destroy(i);
 }
 
-int main(void)
+int main()
 {
     char why[256];
-    backend_err err = {0};
+    backend_err err = {};
     uint64_t reservation, guard;
     size_t len, k;
     int32_t status = -1;
     int bad = 0;
 
-    setvbuf(stdout, NULL, _IONBF, 0);       /* a crash must not swallow what was said */
+    setvbuf(stdout, nullptr, _IONBF, 0);       /* a crash must not swallow what was said */
     if (!backend_open(BACKEND_PATH, &api, why, sizeof why)) { printf("FAIL: %s\n", why); return 1; }
-    be = api.backend_create(NULL, 0, &err);
+    be = api.backend_create(nullptr, 0, &err);
     api.memory_shape(be, &reservation, &guard);
     printf("shape: reservation %llu MiB, guard %llu MiB\n",
         (unsigned long long)(reservation >> 20), (unsigned long long)(guard >> 20));
@@ -94,7 +94,7 @@ int main(void)
     memory = api.memory_adopt(be, block, 2 * PAGE, &err);
 
     void *bytes = read_file(MODULE_DIR "/adopt.wasm", &len);
-    module = api.module_compile(be, bytes, len, NULL, 0, &err);
+    module = api.module_compile(be, bytes, len, nullptr, 0, &err);
     if (!module) { printf("FAIL: module_compile: %s\n", err.text); return 1; }
 
     /* 1. a module writes, the host reads the same bytes */
@@ -135,9 +135,9 @@ int main(void)
         static const uint8_t params[2] = { BACKEND_I32, BACKEND_I64 }, results[1] = { BACKEND_I32 };
         backend_sig sig = { params, 2, results, 1 };
         void *host_bytes = read_file(MODULE_DIR "/host.wasm", &len);
-        backend_module *host = api.module_compile(be, host_bytes, len, NULL, 0, &err);
-        backend_instance *hi = host ? api.instance_create(be, host, NULL, 0, &err) : NULL;
-        if (!hi || api.define_func(hi, "bridge", "ping", ping, NULL, &sig, &err)
+        backend_module *host = api.module_compile(be, host_bytes, len, nullptr, 0, &err);
+        backend_instance *hi = host ? api.instance_create(be, host, nullptr, 0, &err) : nullptr;
+        if (!hi || api.define_func(hi, "bridge", "ping", ping, nullptr, &sig, &err)
             || run(hi, "init", &status, &err) || status != 16) {
             printf("FAIL: a host function: %d: %s\n", status, err.text);
             return 1;
@@ -154,12 +154,12 @@ int main(void)
         static const uint8_t params[2] = { BACKEND_I32, BACKEND_I64 }, results[1] = { BACKEND_I32 };
         backend_sig sig = { params, 2, results, 1 };
         void *host_bytes = read_file(MODULE_DIR "/host.wasm", &len);
-        backend_module *timed = api.module_compile(be, host_bytes, len, NULL, BACKEND_DEADLINE, &err);
-        backend_instance *ti = timed ? api.instance_create(be, timed, NULL, 0, &err) : NULL;
+        backend_module *timed = api.module_compile(be, host_bytes, len, nullptr, BACKEND_DEADLINE, &err);
+        backend_instance *ti = timed ? api.instance_create(be, timed, nullptr, 0, &err) : nullptr;
         backend_func *f;
         int32_t arity, count;
         int k;
-        if (!ti || api.define_func(ti, "bridge", "ping", ping, NULL, &sig, &err)
+        if (!ti || api.define_func(ti, "bridge", "ping", ping, nullptr, &sig, &err)
             || !(f = api.instance_func(ti, "init", &arity, &count, &err))) {
             printf("FAIL: timed calls: %s\n", err.text);
             return 1;

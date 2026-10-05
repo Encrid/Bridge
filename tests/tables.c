@@ -20,11 +20,11 @@ static int check(const char *what, int ok)
     return !ok;
 }
 
-int main(void)
+int main()
 {
     const char *phases[1] = { "update" };
-    bridge_config cfg = { NULL, 0, phases, 1, NULL, 0, 1, { 4096, 4096, 1 << 20, 8 } };
-    bridge *b = bridge_create(&cfg, sink, NULL);
+    bridge_config cfg = { nullptr, 0, phases, 1, nullptr, 0, 1, { 4096, 4096, 1 << 20, 8 } };
+    bridge *b = bridge_create(&cfg, sink, nullptr);
     ecs_world_t *w;
     ecs_entity_t kind, other, e, parent, child;
     uint32_t swept, orphaned, reused, before;
@@ -46,7 +46,7 @@ int main(void)
     for (k = 0; k < 3; k ++) {
         ecs_delete_empty_tables(w, &(ecs_delete_empty_tables_desc_t){ .delete_generation = 1 });
     }
-    failed += check("a table flecs swept as empty", b->tables[swept].table == NULL);
+    failed += check("a table flecs swept as empty", b->tables[swept].table == nullptr);
 
     /* 2. a table whose type is only a pair: the children of something deleted. A wildcard
      * observer is not told of this one. */
@@ -58,7 +58,7 @@ int main(void)
     orphaned = b->index[(uint32_t)child].table;
     if (!orphaned || !b->tables[orphaned].table) { printf("FAIL: the child's table has no id\n"); return 1; }
     ecs_delete(w, parent);
-    failed += check("the table of a deleted parent's children", b->tables[orphaned].table == NULL);
+    failed += check("the table of a deleted parent's children", b->tables[orphaned].table == nullptr);
 
     /* 3. and a retired id is free once the index has let go of it: the next table takes one,
      * and the count of ids does not grow */

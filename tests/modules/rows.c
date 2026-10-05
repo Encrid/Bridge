@@ -6,7 +6,7 @@
 
 static uint32_t position, moving;
 
-BRIDGE_EXPORT(move) int move(void)
+BRIDGE_EXPORT(move) int move()
 {
     uint32_t spans = bridge_spans(moving), s, r;
     for (s = 0; s < spans; s ++) {
@@ -20,7 +20,7 @@ BRIDGE_EXPORT(move) int move(void)
     return 0;
 }
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_INOUT, BRIDGE_AND, 0 }};
     uint32_t i;
@@ -32,5 +32,5 @@ BRIDGE_EXPORT(init) int init(void)
     return 0;
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }
-BRIDGE_EXPORT(reload) int reload(void) { return 0; }
+BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
+BRIDGE_EXPORT(reload) int reload() { return 0; }

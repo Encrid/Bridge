@@ -8,7 +8,7 @@
 static uint32_t position, round;
 static uint64_t ids[ENTITIES];
 
-BRIDGE_EXPORT(cull) int cull(void)
+BRIDGE_EXPORT(cull) int cull()
 {
     uint32_t i;
     for (i = round; i < ENTITIES && round < 2; i += 3) bridge_destroy(ids[i]);
@@ -16,7 +16,7 @@ BRIDGE_EXPORT(cull) int cull(void)
     return 0;
 }
 
-BRIDGE_EXPORT(check) int check(void)
+BRIDGE_EXPORT(check) int check()
 {
     uint32_t i, right = 0, wrong = 0;
     for (i = 0; i < ENTITIES; i ++) {
@@ -29,7 +29,7 @@ BRIDGE_EXPORT(check) int check(void)
     return 0;
 }
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
     uint32_t i;
     position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE);
@@ -43,5 +43,5 @@ BRIDGE_EXPORT(init) int init(void)
     return 0;
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }
-BRIDGE_EXPORT(reload) int reload(void) { return 0; }
+BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
+BRIDGE_EXPORT(reload) int reload() { return 0; }

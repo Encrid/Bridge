@@ -13,14 +13,14 @@ void *backend_open(const char *path, backend_api *api, char *why, size_t why_len
     int i;
     if (!lib) {
         snprintf(why, why_len, "cannot open backend library '%s'", path);
-        return NULL;
+        return nullptr;
     }
     for (i = 0; i < BACKEND_ENTRY_COUNT; i ++) {
         slots[i] = os_lib_sym(lib, names[i]);
         if (!slots[i]) {
             snprintf(why, why_len, "backend library '%s' has no entry '%s'", path, names[i]);
             os_lib_close(lib);
-            return NULL;
+            return nullptr;
         }
     }
     return lib;

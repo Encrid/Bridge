@@ -12,12 +12,6 @@
 
 #define PAGE 65536u
 
-#ifdef _MSC_VER
-#define THREAD_LOCAL __declspec(thread)
-#else
-#define THREAD_LOCAL _Thread_local
-#endif
-
 typedef struct module module;
 typedef struct pool pool;
 
@@ -53,10 +47,10 @@ typedef struct {
     char         *name;
     char         *full;             /* how [order] names it: the module's stem, then the name */
     uint32_t      phase;
-    ecs_query_t  *query;            /* NULL for a system with no terms, and for an observer */
+    ecs_query_t  *query;            /* nullptr for a system with no terms, and for an observer */
     uint32_t      terms;
     uint32_t      sizes[BRIDGE_TERMS_MAX];
-    component    *touches[BRIDGE_TERMS_MAX];    /* NULL where a term reads nothing */
+    component    *touches[BRIDGE_TERMS_MAX];    /* nullptr where a term reads nothing */
     uint8_t       writes[BRIDGE_TERMS_MAX];
     backend_func *fn;
     uint32_t      level;            /* within its phase: a level runs before the next */
@@ -154,7 +148,7 @@ struct bridge {
     /* the address space every block is allocated with: the largest any backend stated */
     uint64_t       reservation, guard;
     char          *stopped_by;      /* why nothing runs any more */
-    char          *stopped_stem;    /* the module whose return lifts it, or NULL if nothing can */
+    char          *stopped_stem;    /* the module whose return lifts it, or nullptr if nothing can */
 
     char   **phases;
     uint32_t phase_count;
@@ -241,7 +235,7 @@ void     store_apply(bridge *b, module *m);                       /* what it que
 void     store_drain(bridge *b, module *m);                       /* its log ring, to the sink */
 void     store_barrier(bridge *b);
 void     store_header(bridge *b, module *m);                      /* what a module reads at offset 0 */
-uint32_t store_offset(bridge *b, const void *p);                  /* into the shared memory, 0 for NULL */
+uint32_t store_offset(bridge *b, const void *p);                  /* into the shared memory, 0 for nullptr */
 
 /* abi.c */
 int abi_define(module *m, backend_err *err);                      /* the eight imports */

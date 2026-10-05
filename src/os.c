@@ -10,10 +10,10 @@
 
 void *os_reserve(size_t reserve, size_t commit)
 {
-    void *base = VirtualAlloc(NULL, reserve, MEM_RESERVE, PAGE_NOACCESS);
+    void *base = VirtualAlloc(nullptr, reserve, MEM_RESERVE, PAGE_NOACCESS);
     if (base && commit && !VirtualAlloc(base, commit, MEM_COMMIT, PAGE_READWRITE)) {
         VirtualFree(base, 0, MEM_RELEASE);
-        return NULL;
+        return nullptr;
     }
     return base;
 }
@@ -38,9 +38,9 @@ void *os_lib_open(const char *path)
     char full[MAX_PATH];
     DWORD len;
     if (!strpbrk(path, "/\\")) return (void *)LoadLibraryA(path);
-    len = GetFullPathNameA(path, sizeof full, full, NULL);
-    if (!len || len >= sizeof full) return NULL;
-    return (void *)LoadLibraryExA(full, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+    len = GetFullPathNameA(path, sizeof full, full, nullptr);
+    if (!len || len >= sizeof full) return nullptr;
+    return (void *)LoadLibraryExA(full, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
 }
 void *os_lib_sym(void *lib, const char *name) { return (void *)GetProcAddress((HMODULE)lib, name); }
 void  os_lib_close(void *lib) { if (lib) FreeLibrary((HMODULE)lib); }
@@ -59,7 +59,7 @@ os_thread *os_thread_start(void (*fn)(void *), void *arg)
     os_thread *t = malloc(sizeof *t);
     t->fn = fn;
     t->arg = arg;
-    t->handle = CreateThread(NULL, 0, thread_main, t, 0, NULL);
+    t->handle = CreateThread(nullptr, 0, thread_main, t, 0, nullptr);
     return t;
 }
 
@@ -72,10 +72,10 @@ void os_thread_join(os_thread *t)
 
 struct os_event { HANDLE handle; };
 
-os_event *os_event_new(void)
+os_event *os_event_new()
 {
     os_event *e = malloc(sizeof *e);
-    e->handle = CreateEventA(NULL, FALSE, FALSE, NULL);     /* auto-reset */
+    e->handle = CreateEventA(nullptr, FALSE, FALSE, nullptr);     /* auto-reset */
     return e;
 }
 
@@ -98,11 +98,11 @@ int os_event_wait(os_event *e, uint64_t nanos)
 
 void *os_reserve(size_t reserve, size_t commit)
 {
-    void *base = mmap(NULL, reserve, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
-    if (base == MAP_FAILED) return NULL;
+    void *base = mmap(nullptr, reserve, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
+    if (base == MAP_FAILED) return nullptr;
     if (commit && mprotect(base, commit, PROT_READ | PROT_WRITE)) {
         munmap(base, reserve);
-        return NULL;
+        return nullptr;
     }
     return base;
 }
@@ -120,7 +120,7 @@ static void *thread_main(void *p)
 {
     os_thread *t = p;
     t->fn(t->arg);
-    return NULL;
+    return nullptr;
 }
 
 os_thread *os_thread_start(void (*fn)(void *), void *arg)
@@ -128,23 +128,23 @@ os_thread *os_thread_start(void (*fn)(void *), void *arg)
     os_thread *t = malloc(sizeof *t);
     t->fn = fn;
     t->arg = arg;
-    pthread_create(&t->handle, NULL, thread_main, t);
+    pthread_create(&t->handle, nullptr, thread_main, t);
     return t;
 }
 
 void os_thread_join(os_thread *t)
 {
-    pthread_join(t->handle, NULL);
+    pthread_join(t->handle, nullptr);
     free(t);
 }
 
 struct os_event { pthread_mutex_t lock; pthread_cond_t cond; int set; };
 
-os_event *os_event_new(void)
+os_event *os_event_new()
 {
     os_event *e = malloc(sizeof *e);
-    pthread_mutex_init(&e->lock, NULL);
-    pthread_cond_init(&e->cond, NULL);
+    pthread_mutex_init(&e->lock, nullptr);
+    pthread_cond_init(&e->cond, nullptr);
     e->set = 0;
     return e;
 }
@@ -188,9 +188,9 @@ int os_event_wait(os_event *e, uint64_t nanos)
 
 #ifdef _WIN32
 
-uint64_t os_thread_id(void) { return GetCurrentThreadId(); }
+uint64_t os_thread_id() { return GetCurrentThreadId(); }
 
-uint64_t os_now(void)
+uint64_t os_now()
 {
     LARGE_INTEGER frequency, count;
     QueryPerformanceFrequency(&frequency);
@@ -200,12 +200,12 @@ uint64_t os_now(void)
 }
 
 static SRWLOCK global_lock = SRWLOCK_INIT;
-void os_global_lock(void) { AcquireSRWLockExclusive(&global_lock); }
-void os_global_unlock(void) { ReleaseSRWLockExclusive(&global_lock); }
+void os_global_lock() { AcquireSRWLockExclusive(&global_lock); }
+void os_global_unlock() { ReleaseSRWLockExclusive(&global_lock); }
 
 struct os_mutex { CRITICAL_SECTION section; };
 
-os_mutex *os_mutex_new(void)
+os_mutex *os_mutex_new()
 {
     os_mutex *m = malloc(sizeof *m);
     InitializeCriticalSection(&m->section);
@@ -218,9 +218,9 @@ void os_mutex_unlock(os_mutex *m) { LeaveCriticalSection(&m->section); }
 
 #else
 
-uint64_t os_thread_id(void) { return (uint64_t)(uintptr_t)pthread_self(); }
+uint64_t os_thread_id() { return (uint64_t)(uintptr_t)pthread_self(); }
 
-uint64_t os_now(void)
+uint64_t os_now()
 {
     struct timespec t;
     clock_gettime(CLOCK_MONOTONIC, &t);
@@ -228,15 +228,15 @@ uint64_t os_now(void)
 }
 
 static pthread_mutex_t global_lock = PTHREAD_MUTEX_INITIALIZER;
-void os_global_lock(void) { pthread_mutex_lock(&global_lock); }
-void os_global_unlock(void) { pthread_mutex_unlock(&global_lock); }
+void os_global_lock() { pthread_mutex_lock(&global_lock); }
+void os_global_unlock() { pthread_mutex_unlock(&global_lock); }
 
 struct os_mutex { pthread_mutex_t mutex; };
 
-os_mutex *os_mutex_new(void)
+os_mutex *os_mutex_new()
 {
     os_mutex *m = malloc(sizeof *m);
-    pthread_mutex_init(&m->mutex, NULL);
+    pthread_mutex_init(&m->mutex, nullptr);
     return m;
 }
 

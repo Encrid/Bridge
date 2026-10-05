@@ -9,12 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef _MSC_VER
-#define THREAD_LOCAL __declspec(thread)
-#else
-#define THREAD_LOCAL _Thread_local
-#endif
-
 enum { DECLARE, SYSTEM, OBSERVE, SPAWN, DESTROY, ATTACH, DETACH, ALLOC, ENTRIES };
 static const char *const entry_names[ENTRIES] = {
     "declare", "system", "observe", "spawn", "destroy", "attach", "detach", "alloc"
@@ -23,7 +17,7 @@ static const char *const entry_names[ENTRIES] = {
 struct backend { int unused; };
 struct backend_memory { void *ptr; uint64_t len; };
 struct backend_module { void *lib; };
-struct backend_func { backend_instance *instance; int (*fn)(void); backend_func *next; };
+struct backend_func { backend_instance *instance; int (*fn)(); backend_func *next; };
 
 struct backend_instance {
     backend_module *m;
@@ -38,7 +32,7 @@ struct backend_instance {
 /* A C function pointer carries no context, so an entry finds its module by who is running:
  * native code runs only inside a call this backend made - native.md, *The invariant*. A call
  * from anywhere else, a foreign thread's callback say, finds nobody and answers zero. */
-static THREAD_LOCAL backend_instance *running;
+static thread_local backend_instance *running;
 
 /* A refusal cannot unwind native code, so the entry answers zero and the call returns:
  * Bridge-ASM700 fails the invocation then - signatures.md. Until it does return, every entry
@@ -73,9 +67,9 @@ static uint32_t t_observe(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32
     return (uint32_t)enter(OBSERVE, args);
 }
 
-static uint64_t t_spawn(void)
+static uint64_t t_spawn()
 {
-    uint64_t args[1] = { 0 };
+    uint64_t args[1] = {};
     return enter(SPAWN, args);
 }
 
@@ -111,7 +105,7 @@ BACKEND_EXPORT backend *backend_create(const backend_setting *settings, uint32_t
     if (count) {
         snprintf(err->text, sizeof err->text, "it knows no setting '%.100s'",
                  settings[0].key ? settings[0].key : "");
-        return NULL;
+        return nullptr;
     }
     return calloc(1, sizeof(backend));
 }
@@ -161,12 +155,12 @@ BACKEND_EXPORT backend_module *module_compile(backend *b, const void *bytes, siz
     if (!path || !*path) {
         snprintf(err->text, sizeof err->text, "this backend opens a module's library by its "
             "path, and was handed none");
-        return NULL;
+        return nullptr;
     }
     lib = os_lib_open(path);
     if (!lib) {
         snprintf(err->text, sizeof err->text, "cannot open the library '%.180s'", path);
-        return NULL;
+        return nullptr;
     }
     m = calloc(1, sizeof *m);
     m->lib = lib;
@@ -257,22 +251,22 @@ BACKEND_EXPORT backend_func *instance_func(backend_instance *i, const char *name
 {
     char symbol[160];
     backend_func *f;
-    int (*fn)(void);
+    int (*fn)();
     if (!i->bound) {
         /* a library has no imports to fill, so the same things are handed over in one call */
         void (*bind)(const bridge_api *) = (void (*)(const bridge_api *))os_lib_sym(i->m->lib, "bridge_bind");
         if (!bind) {
             snprintf(err->text, sizeof err->text, "no exported function 'bridge_bind'");
-            return NULL;
+            return nullptr;
         }
         bind(&i->api);
         i->bound = 1;
     }
     snprintf(symbol, sizeof symbol, "bridge_%.150s", name);
-    fn = (int (*)(void))os_lib_sym(i->m->lib, symbol);
+    fn = (int (*)())os_lib_sym(i->m->lib, symbol);
     if (!fn) {
         snprintf(err->text, sizeof err->text, "no exported function '%s'", symbol);
-        return NULL;
+        return nullptr;
     }
     *arity = *results = -1;         /* a symbol carries no type: there is nothing to check */
     f = calloc(1, sizeof *f);

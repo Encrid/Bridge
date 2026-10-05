@@ -40,7 +40,7 @@ static void *read_file(const char *name, size_t *len)
 static bridge_artifact artifact(const char *name)
 {
     static char identity[64];
-    bridge_artifact a = {0};
+    bridge_artifact a = {};
     snprintf(identity, sizeof identity, "test:%s@0.1.0", name);
     a.cfg.identity = identity;
     a.cfg.abi = BRIDGE_ABI;
@@ -75,19 +75,19 @@ int main(int argc, char **argv)
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[1] = {{ "wasm", BACKEND_PATH }};
     const char *phases[1] = { "update" };
-    bridge_config cfg = { backends, 1, phases, 1, NULL, 0, 1, { 4096, 4096, 1 << 20, 8 } };
+    bridge_config cfg = { backends, 1, phases, 1, nullptr, 0, 1, { 4096, 4096, 1 << 20, 8 } };
     bridge_artifact a;
     bridge *b;
-    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stdout, nullptr, _IONBF, 0);
 
     if (!strcmp(what, "nosink")) {
-        printf("%s\n", bridge_create(&cfg, NULL, NULL) ? "created" : "refused: no sink");
+        printf("%s\n", bridge_create(&cfg, nullptr, nullptr) ? "created" : "refused: no sink");
         printf("alive\n");
         return 0;
     }
     if (!strcmp(what, "nolib")) backends[0].library = "no-such-backend-library";
 
-    b = bridge_create(&cfg, sink, NULL);
+    b = bridge_create(&cfg, sink, nullptr);
     if (!b) {
         printf("bridge_create refused\nalive\n");
         return 0;

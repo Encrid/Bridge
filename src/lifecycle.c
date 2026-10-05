@@ -45,7 +45,7 @@ static void component_delete(bridge *b, component *c)
 /* lifetime.md, *What unload leaves behind*: what becomes of the entities that carried it */
 static void drop_rows(bridge *b, component *c, uint32_t policy)
 {
-    ecs_entity_t *carried = NULL;
+    ecs_entity_t *carried = nullptr;
     uint32_t count = 0, room = 0, i;
     if (policy == BRIDGE_DELETE) {
         ecs_delete_with(b->world, c->id);
@@ -68,7 +68,7 @@ static void drop_rows(bridge *b, component *c, uint32_t policy)
     /* sweep: an entity left with nothing could never be found again, so it goes too */
     for (i = 0; i < count; i ++) {
         const ecs_type_t *type = ecs_is_alive(b->world, carried[i])
-                               ? ecs_get_type(b->world, carried[i]) : NULL;
+                               ? ecs_get_type(b->world, carried[i]) : nullptr;
         if (type && !type->count) ecs_delete(b->world, carried[i]);
     }
     free(carried);
@@ -157,7 +157,7 @@ static void undo(bridge *b, module *m)
 static int unset(bridge *b, const char *identity, const char *key, int64_t value)
 {
     if (value) return 0;
-    say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: %s is unset", identity, key);
+    say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: %s is unset", identity, key);
     return 1;
 }
 
@@ -166,7 +166,7 @@ static int lacks(bridge *b, const char *identity, open_backend *o, uint32_t flag
                  const char *key, const char *capability)
 {
     if (o->capabilities & flag) return 0;
-    say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: %s needs '%s', which backend '%s' "
+    say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: %s needs '%s', which backend '%s' "
         "lacks", identity, key, capability, o->name);
     return 1;
 }
@@ -176,28 +176,28 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on, uint32
 {
     const bridge_module_config *cfg = &a->cfg;
     const char *id = cfg->identity;
-    open_backend *o = NULL;
+    open_backend *o = nullptr;
     uint32_t i;
 
     if (!id || !*id) {
-        say(b, NULL, NULL, BRIDGE_ERR, "a module with no identity is refused");
+        say(b, nullptr, nullptr, BRIDGE_ERR, "a module with no identity is refused");
         return 1;
     }
     for (i = 0; i < b->backend_count && a->backend; i ++) {
         if (!strcmp(b->backends[i].name, a->backend)) o = &b->backends[i];
     }
     if (!o) {
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: no backend named '%s'", id,
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: no backend named '%s'", id,
             a->backend ? a->backend : "");
         return 1;
     }
     if (cfg->abi != BRIDGE_ABI) {
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: it wants ABI %u and this is "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: it wants ABI %u and this is "
             "ABI %u", id, cfg->abi, (unsigned)BRIDGE_ABI);
         return 1;
     }
     if (cfg->on_error != BRIDGE_FAIL && cfg->on_error != BRIDGE_SKIP) {
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: on_error is unset", id);
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: on_error is unset", id);
         return 1;
     }
     if (unset(b, id, "max_system_failures", cfg->max_system_failures)
@@ -211,18 +211,18 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on, uint32
         return 1;
     }
     if (!cfg->config || !*cfg->config) {
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: config is unset", id);
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: config is unset", id);
         return 1;
     }
     if (cfg->spawns > (int64_t)b->entities) {
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: its spawns of %lld is more "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its spawns of %lld is more "
             "than [budget] entities of %u", id, (long long)cfg->spawns, b->entities);
         return 1;
     }
     /* budgets.md: the one floor with an argument. A module that can report nothing is the one
      * legal number that makes a deployment incoherent. */
     if (cfg->log_ring < sizeof(bridge_log_record)) {
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: a log_ring of %u bytes holds "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: a log_ring of %u bytes holds "
             "no record, and one is %u", id, cfg->log_ring, (unsigned)sizeof(bridge_log_record));
         return 1;
     }
@@ -239,7 +239,7 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on, uint32
     /* wasm.md, *Exports*: the author says "cannot" and the deployment "may not", each with a
      * key. A deployment allowing what the author says cannot be done is config against config. */
     if (cfg->hot_reload && !cfg->reloadable) {
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: hot_reload is stated, and its "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: hot_reload is stated, and its "
             "author states it is not reloadable", id);
         return 1;
     }
@@ -266,7 +266,7 @@ static module *loaded(bridge *b, const char *identity)
     for (m = b->modules; m; m = m->next) {
         if (strlen(m->stem) == stem && !memcmp(m->stem, identity, stem)) return m;
     }
-    return NULL;
+    return nullptr;
 }
 
 static module *record(bridge *b, const bridge_artifact *a, open_backend *o)
@@ -329,10 +329,10 @@ static backend_func *export_of(module *m, const char *name, backend_err *err)
 {
     int32_t arity = 0, results = 0;
     backend_func *f = m->on->api.instance_func(m->instance, name, &arity, &results, err);
-    if (!f) return NULL;
+    if (!f) return nullptr;
     if ((arity != -1 && arity != 0) || (results != -1 && results != 1)) {
         snprintf(err->text, sizeof err->text, "its export '%.100s' is not () -> i32", name);
-        return NULL;
+        return nullptr;
     }
     return f;
 }
@@ -430,8 +430,8 @@ int bridge_load(bridge *b, const bridge_artifact *a)
 {
     const bridge_module_config *cfg = &a->cfg;
     const char *id = cfg->identity;
-    open_backend *o = NULL;
-    backend_err err = {0};
+    open_backend *o = nullptr;
+    backend_err err = {};
     uint32_t demands = 0;
     module *m, *other;
 
@@ -439,17 +439,17 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     if (bridge_stopped(b, id) || checks(b, a, &o, &demands)) return 1;
     other = loaded(b, id);
     if (other) {
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: '%s' is loaded already", id,
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: '%s' is loaded already", id,
             other->identity);
         return 1;
     }
     if (b->module_count >= b->max_modules) {
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: [budget] max_modules of %u is "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: [budget] max_modules of %u is "
             "reached", id, b->max_modules);
         return 1;
     }
     if (cfg->persistent > 0 && (uint64_t)cfg->persistent > b->arena_len - b->arena_used) {
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is refused: its persistent of %lld bytes "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its persistent of %lld bytes "
             "does not fit in the %u left of [budget] persistent", id, (long long)cfg->persistent,
             b->arena_len - b->arena_used);
         return 1;
@@ -491,7 +491,7 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     return b->stopped_by ? 1 : 0;
 
 failed:
-    say(b, NULL, NULL, BRIDGE_ERR, "module '%s' did not load: %s", id, err.text);
+    say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' did not load: %s", id, err.text);
     if (cfg->on_error == BRIDGE_FAIL) bridge_stop(b, id, "failed");
     undo(b, m);
     module_discard(b, m);
@@ -505,10 +505,10 @@ failed:
  * coherent, and it is not tried again. */
 void module_shut_down(bridge *b, module *m)
 {
-    backend_err err = {0};
+    backend_err err = {};
     /* a module whose reload failed after its old instance went has no code left to call */
     if (m->instance && lifecycle_call(m, m->shutdown, "shutdown", m->shutdown_timeout, &err)) {
-        say(b, m, NULL, BRIDGE_ERR, "module '%s': %s; its teardown continues", m->identity, err.text);
+        say(b, m, nullptr, BRIDGE_ERR, "module '%s': %s; its teardown continues", m->identity, err.text);
     }
     store_apply(b, m);          /* what it had asked for, shutdown's requests included */
     store_drain(b, m);          /* and what it said: its ring is about to go with it */
@@ -538,10 +538,10 @@ int bridge_unload(bridge *b, const char *identity)
     char why[256];
     module *m;
     store_enter(b);
-    if (bridge_stopped(b, NULL)) return 1;
+    if (bridge_stopped(b, nullptr)) return 1;
     for (m = b->modules; m && (!identity || strcmp(m->identity, identity)); m = m->next) {}
     if (!m) {
-        say(b, NULL, NULL, BRIDGE_ERR, "no module '%s' is loaded, so none is unloaded",
+        say(b, nullptr, nullptr, BRIDGE_ERR, "no module '%s' is loaded, so none is unloaded",
             identity ? identity : "");
         return 1;
     }
@@ -560,8 +560,8 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
 {
     const bridge_module_config *cfg = &a->cfg;
     const char *id = cfg->identity;
-    open_backend *o = NULL;
-    backend_err err = {0};
+    open_backend *o = nullptr;
+    backend_err err = {};
     uint32_t demands = 0, i, extra = 0;
     int64_t had, wants;
     module *old, *n, **link;
@@ -571,18 +571,18 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     if (bridge_stopped(b, id) || checks(b, a, &o, &demands)) return 1;
     old = loaded(b, id);
     if (!old) {
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is not reloaded: nothing of that name is "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is not reloaded: nothing of that name is "
             "loaded", id);
         return 1;
     }
     /* wasm.md, *Exports*: hot_reload only ever forbids */
     if (!old->hot_reload) {
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is not reloaded: its hot_reload is false",
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is not reloaded: its hot_reload is false",
             old->identity);
         return 1;
     }
     if (o != old->on) {
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is not reloaded: it runs on backend '%s' "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is not reloaded: it runs on backend '%s' "
             "and a reload does not move it to '%s'", old->identity, old->on->name, o->name);
         return 1;
     }
@@ -591,14 +591,14 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     had = old->persistent > 0 ? old->persistent : 0;
     wants = cfg->persistent > 0 ? cfg->persistent : 0;
     if (wants < had) {
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is not reloaded: its persistent is %lld "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is not reloaded: its persistent is %lld "
             "and a reload states less, which nothing can give back", old->identity, (long long)had);
         return 1;
     }
     if (wants > had) {
         extra = (((uint32_t)wants + 7u) & ~7u) - old->arena_share;
         if (extra > b->arena_len - b->arena_used) {
-            say(b, NULL, NULL, BRIDGE_ERR, "module '%s' is not reloaded: its persistent of %lld "
+            say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is not reloaded: its persistent of %lld "
                 "bytes does not fit in the %u left of [budget] persistent", old->identity,
                 (long long)wants, b->arena_len - b->arena_used + old->arena_share);
             return 1;
@@ -648,16 +648,16 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
         module_shut_down(b, old);
         if (old->instance) o->api.instance_destroy(old->instance);
         if (old->image) o->api.module_destroy(old->image);
-        old->instance = NULL;
-        old->image = NULL;
+        old->instance = nullptr;
+        old->image = nullptr;
     }
 
     if (start(b, n, a, demands, "reload", &err) || schedule_build(b, err.text, sizeof err.text)) {
-        say(b, NULL, NULL, BRIDGE_ERR, "module '%s' was not reloaded: %s", id, err.text);
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' was not reloaded: %s", id, err.text);
         drop_systems(b, n);
         for (i = n->declared_count; i --;) component_release(b, n->declared[i], 0);
         n->declared_count = 0;
-        n->ids = NULL;              /* they are the old record's */
+        n->ids = nullptr;              /* they are the old record's */
         n->config_entity = 0;
         b->arena_used -= extra;     /* the last thing carved, so it can go back */
         module_discard(b, n);
@@ -672,7 +672,7 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
          * lifetime.md. An artifact that works brings it back; an unload is what ends it. */
         drop_systems(b, old);
         old->stopped = 1;
-        say(b, old, NULL, BRIDGE_ERR, "module '%s' is stopped: its reload failed after its old "
+        say(b, old, nullptr, BRIDGE_ERR, "module '%s' is stopped: its reload failed after its old "
             "instance had been shut down. What it declared is kept", old->identity);
         if (old->on_error == BRIDGE_FAIL) bridge_stop(b, old->identity, "could not be reloaded");
         schedule_build(b, err.text, sizeof err.text);
@@ -684,12 +684,12 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     drop_systems(b, old);
     for (i = old->declared_count; i --;) component_release(b, old->declared[i], old->policy[i]);
     old->declared_count = 0;
-    old->ids = NULL;                /* the new record's now */
+    old->ids = nullptr;                /* the new record's now */
     /* the settings component among them: its row was Bridge-ASM700's own, and goes too */
     for (i = 0; i < n->declared_count && n->declared[i] != n->config; i ++) {}
     if (n->config && i == n->declared_count) {
         if (ecs_is_alive(b->world, n->config_entity)) ecs_delete(b->world, n->config_entity);
-        n->config = NULL;
+        n->config = nullptr;
         n->config_entity = 0;
     }
     for (link = &b->modules; *link != old; link = &(*link)->next) {}

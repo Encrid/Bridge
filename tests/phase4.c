@@ -22,7 +22,7 @@ static void sink(void *ud, const bridge_record *r)
 /* a native module as a deployment must state it: trusted, and every limit said to be none */
 static bridge_artifact native(const char *identity, const char *path)
 {
-    bridge_artifact a = {0};
+    bridge_artifact a = {};
     a.cfg.identity = identity;
     a.cfg.abi = BRIDGE_ABI;
     a.cfg.trusted = true;
@@ -45,10 +45,10 @@ static bridge_artifact native(const char *identity, const char *path)
 }
 
 /* the reader of phase 3, on the wasm backend, with the limits that backend can keep */
-static bridge_artifact wasm_reader(void)
+static bridge_artifact wasm_reader()
 {
     static const char *const grants[] = { "game:Position", "game:Marked" };
-    bridge_artifact a = native("view:reader@0.1.0", NULL);
+    bridge_artifact a = native("view:reader@0.1.0", nullptr);
     FILE *f = fopen(MODULE_DIR "/reader.wasm", "rb");
     void *data;
     if (!f) { printf("cannot read reader.wasm\n"); exit(2); }
@@ -82,19 +82,19 @@ int main(int argc, char **argv)
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
     const char *phases[2] = { "update", "present" };
-    bridge_config cfg = { backends, 2, phases, 2, NULL, 0, 1, { 4096, 4096, 1 << 20, 8 } };
+    bridge_config cfg = { backends, 2, phases, 2, nullptr, 0, 1, { 4096, 4096, 1 << 20, 8 } };
     bridge_setting cache = { "cache", BRIDGE_STRING, { .s = "somewhere" } };
     bridge_artifact a;
     bridge *b;
     int i;
-    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stdout, nullptr, _IONBF, 0);
 
     if (!strcmp(what, "setting")) {             /* a key the backend does not know */
         backends[1].settings = &cache;
         backends[1].setting_count = 1;
     }
 
-    b = bridge_create(&cfg, sink, NULL);
+    b = bridge_create(&cfg, sink, nullptr);
     if (!b) {
         printf("bridge_create refused\nalive\n");
         return 0;
@@ -120,11 +120,11 @@ int main(int argc, char **argv)
         a.cfg.fuel = 1000;
         load(b, &a);
     } else if (!strcmp(what, "nopath")) {       /* a native module, and nowhere to find it */
-        a = native("game:mover@0.1.0", NULL);
+        a = native("game:mover@0.1.0", nullptr);
         load(b, &a);
     } else if (!strcmp(what, "nobytes")) {      /* a wasm module, and nothing to compile */
         a = wasm_reader();
-        a.bytes = NULL;
+        a.bytes = nullptr;
         a.len = 0;
         load(b, &a);
     } else if (!strcmp(what, "nolib")) {

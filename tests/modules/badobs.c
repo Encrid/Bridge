@@ -2,7 +2,7 @@
 #include "bridge-wasm.h"
 #include "game.h"
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }};
     terms[0].slot = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP);
@@ -10,5 +10,5 @@ BRIDGE_EXPORT(init) int init(void)
     return 0;
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }
-BRIDGE_EXPORT(reload) int reload(void) { return 0; }
+BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
+BRIDGE_EXPORT(reload) int reload() { return 0; }

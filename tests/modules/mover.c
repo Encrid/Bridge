@@ -6,7 +6,7 @@
 
 static uint32_t position, marked, moving, counting;
 
-BRIDGE_EXPORT(move) int move(void)
+BRIDGE_EXPORT(move) int move()
 {
     uint32_t spans = bridge_spans(moving), s, r;
     for (s = 0; s < spans; s ++) {
@@ -21,7 +21,7 @@ BRIDGE_EXPORT(move) int move(void)
 }
 
 /* what its own query matched: every table holding a Position, marked or not */
-BRIDGE_EXPORT(count) int count(void)
+BRIDGE_EXPORT(count) int count()
 {
     uint32_t spans = bridge_spans(counting), rows = 0, s;
     for (s = 0; s < spans; s ++) rows += bridge_rows(bridge_span(counting, s, 1));
@@ -29,7 +29,7 @@ BRIDGE_EXPORT(count) int count(void)
     return 0;
 }
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_INOUT, BRIDGE_AND, 0 }};
     uint32_t i;
@@ -51,5 +51,5 @@ BRIDGE_EXPORT(init) int init(void)
     return 0;
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }
-BRIDGE_EXPORT(reload) int reload(void) { return 0; }
+BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
+BRIDGE_EXPORT(reload) int reload() { return 0; }

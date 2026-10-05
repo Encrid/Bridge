@@ -19,12 +19,6 @@
 /* a deadline no call reaches: every store needs one once epochs are on */
 #define FAR         ((uint64_t)1 << 62)
 
-#ifdef _MSC_VER
-#define THREAD_LOCAL __declspec(thread)
-#else
-#define THREAD_LOCAL _Thread_local
-#endif
-
 /* Fuel and epoch interruption are an engine's settings and put code in every loop, so there
  * is an engine per combination a module can demand, made at its first use. */
 enum { METERED = 1, INTERRUPTIBLE = 2, ENGINES = 4 };
@@ -69,7 +63,7 @@ struct backend_instance {
     backend_func *funcs;
 };
 
-/* wasmtime_error_delete takes ownership of a real error: it must not be handed NULL */
+/* wasmtime_error_delete takes ownership of a real error: it must not be handed nullptr */
 static void drop(wasmtime_error_t *error)
 {
     if (error) wasmtime_error_delete(error);
@@ -77,7 +71,7 @@ static void drop(wasmtime_error_t *error)
 
 static void fail(backend_err *err, const char *what, wasmtime_error_t *error, wasm_trap_t *trap)
 {
-    wasm_byte_vec_t msg = {0};
+    wasm_byte_vec_t msg = {};
     if (error) wasmtime_error_message(error, &msg);
     else if (trap) wasm_trap_message(trap, &msg);
     if (err) {
@@ -89,7 +83,7 @@ static void fail(backend_err *err, const char *what, wasmtime_error_t *error, wa
         for (p = text; p && p + sizeof marker - 1 <= end; p ++) {
             if (!memcmp(p, marker, sizeof marker - 1)) text = p + sizeof marker - 1;
         }
-        line = text ? memchr(text, '\n', (size_t)(end - text)) : NULL;
+        line = text ? memchr(text, '\n', (size_t)(end - text)) : nullptr;
         n = text ? (size_t)((line ? line : end) - text) : 0;
         snprintf(err->text, sizeof err->text, "%s%s%.*s", what, n ? ": " : "",
                  (int)(n > 200 ? 200 : n), text ? text : "");
@@ -102,7 +96,7 @@ static void fail(backend_err *err, const char *what, wasmtime_error_t *error, wa
 /* ---- memory: wasmtime asks this for every linear memory, and is not told which ---- */
 
 /* set around wasmtime_memory_new: the creator is being asked for a block Bridge-ASM700 owns */
-static THREAD_LOCAL backend_memory *adopting;
+static thread_local backend_memory *adopting;
 
 typedef struct { uint8_t *base; size_t size, reserve; } own_memory;
 
@@ -116,7 +110,7 @@ static uint8_t *adopted_get(void *env, size_t *size, size_t *capacity)
 static wasmtime_error_t *adopted_grow(void *env, size_t new_size)
 {
     backend_memory *m = env;
-    return new_size == m->len ? NULL : wasmtime_error_new("an adopted memory does not grow");
+    return new_size == m->len ? nullptr : wasmtime_error_new("an adopted memory does not grow");
 }
 
 static uint8_t *own_get(void *env, size_t *size, size_t *capacity)
@@ -134,7 +128,7 @@ static wasmtime_error_t *own_grow(void *env, size_t new_size)
         return wasmtime_error_new("out of address space for a module's own memory");
     }
     m->size = new_size;
-    return NULL;
+    return nullptr;
 }
 
 static void own_free(void *env)
@@ -159,8 +153,8 @@ static wasmtime_error_t *new_memory(void *env, const wasm_memorytype_t *ty, size
         ret->env = adopting;
         ret->get_memory = adopted_get;
         ret->grow_memory = adopted_grow;
-        ret->finalizer = NULL;              /* the block is Bridge-ASM700's to free */
-        return NULL;
+        ret->finalizer = nullptr;              /* the block is Bridge-ASM700's to free */
+        return nullptr;
     }
     own_memory *m = malloc(sizeof *m);
     m->reserve = (size_t)RESERVATION;
@@ -174,7 +168,7 @@ static wasmtime_error_t *new_memory(void *env, const wasm_memorytype_t *ty, size
     ret->get_memory = own_get;
     ret->grow_memory = own_grow;
     ret->finalizer = own_free;
-    return NULL;
+    return nullptr;
 }
 
 /* ---- the clock: one armed deadline at a time, and no tick period ---- */
@@ -216,7 +210,7 @@ static wasm_engine_t *engine_for(backend *b, int kind)
 {
     if (!b->engines[kind]) {
         wasm_config_t *config = wasm_config_new();
-        wasmtime_memory_creator_t creator = { NULL, new_memory, NULL };
+        wasmtime_memory_creator_t creator = { nullptr, new_memory, nullptr };
         wasmtime_config_wasm_multi_memory_set(config, true);
         wasmtime_config_consume_fuel_set(config, (kind & METERED) != 0);
         wasmtime_config_epoch_interruption_set(config, (kind & INTERRUPTIBLE) != 0);
@@ -242,7 +236,7 @@ BACKEND_EXPORT backend *backend_create(const backend_setting *settings, uint32_t
     if (count) {
         snprintf(err->text, sizeof err->text, "it knows no setting '%.100s'",
                  settings[0].key ? settings[0].key : "");
-        return NULL;
+        return nullptr;
     }
     backend *b = calloc(1, sizeof *b);
     b->wake = os_event_new();
@@ -284,8 +278,8 @@ BACKEND_EXPORT backend_memory *memory_adopt(backend *b, void *ptr, uint64_t len,
 {
     (void)b;
     if (!ptr || !len || len % PAGE) {
-        fail(err, "an adopted block must be a whole number of 64 KiB pages", NULL, NULL);
-        return NULL;
+        fail(err, "an adopted block must be a whole number of 64 KiB pages", nullptr, nullptr);
+        return nullptr;
     }
     backend_memory *m = malloc(sizeof *m);
     m->ptr = ptr;
@@ -304,16 +298,16 @@ BACKEND_EXPORT backend_module *module_compile(backend *b, const void *bytes, siz
 {
     (void)path;                 /* a wasm module is its bytes */
     if (!bytes || !len) {
-        fail(err, "this backend compiles a module from its bytes, and was handed none", NULL, NULL);
-        return NULL;
+        fail(err, "this backend compiles a module from its bytes, and was handed none", nullptr, nullptr);
+        return nullptr;
     }
     int kind = (demands & BACKEND_METER ? METERED : 0)
              | (demands & BACKEND_DEADLINE ? INTERRUPTIBLE : 0);
-    wasmtime_module_t *module = NULL;
+    wasmtime_module_t *module = nullptr;
     wasmtime_error_t *error = wasmtime_module_new(engine_for(b, kind), bytes, len, &module);
     if (error) {
-        fail(err, "not a module this backend can compile", error, NULL);
-        return NULL;
+        fail(err, "not a module this backend can compile", error, nullptr);
+        return nullptr;
     }
     backend_module *m = calloc(1, sizeof *m);
     m->b = b;
@@ -377,7 +371,7 @@ static wasmtime_error_t *adopt_into(backend_instance *i, backend_memory *mem,
     uint8_t wasm[64], limits[24];
     uint64_t pages = mem->len / PAGE;
     size_t n = 8, l = 0;
-    wasmtime_module_t *holder = NULL;
+    wasmtime_module_t *holder = nullptr;
     wasmtime_instance_t instance;
     wasmtime_error_t *error;
 
@@ -396,14 +390,14 @@ static wasmtime_error_t *adopt_into(backend_instance *i, backend_memory *mem,
     error = wasmtime_module_new(i->engine, wasm, n, &holder);
     if (error) return error;
     adopting = mem;
-    error = wasmtime_instance_new(i->ctx, holder, NULL, 0, &instance, trap);
-    adopting = NULL;
+    error = wasmtime_instance_new(i->ctx, holder, nullptr, 0, &instance, trap);
+    adopting = nullptr;
     wasmtime_module_delete(holder);
     if (error || *trap) return error;
     if (!wasmtime_instance_export_get(i->ctx, &instance, "m", 1, item)) {
         return wasmtime_error_new("the holder module exports no memory");
     }
-    return NULL;
+    return nullptr;
 }
 
 BACKEND_EXPORT backend_instance *instance_create(backend *b, backend_module *m,
@@ -415,7 +409,7 @@ BACKEND_EXPORT backend_instance *instance_create(backend *b, backend_module *m,
     i->b = b;
     i->m = m;
     i->engine = engine_for(b, m->kind);
-    i->store = wasmtime_store_new(i->engine, NULL, NULL);
+    i->store = wasmtime_store_new(i->engine, nullptr, nullptr);
     i->ctx = wasmtime_store_context(i->store);
     i->linker = wasmtime_linker_new(i->engine);
     /* a metered store with no fuel traps at its first instruction */
@@ -427,21 +421,21 @@ BACKEND_EXPORT backend_instance *instance_create(backend *b, backend_module *m,
     for (k = 0; k < count; k ++) {
         const backend_memory_import *mi = &memories[k];
         wasmtime_extern_t item;
-        wasm_trap_t *trap = NULL;
+        wasm_trap_t *trap = nullptr;
         wasmtime_error_t *error = adopt_into(i, mi->memory, &item, &trap);
         if (trap) {
-            fail(err, "cannot give a module the memory it imports", NULL, trap);
+            fail(err, "cannot give a module the memory it imports", nullptr, trap);
             instance_destroy(i);
-            return NULL;
+            return nullptr;
         }
         if (!error) {
             error = wasmtime_linker_define(i->linker, i->ctx, mi->ns, strlen(mi->ns),
                                            mi->field, strlen(mi->field), &item);
         }
         if (error) {
-            fail(err, "cannot give a module the memory it imports", error, NULL);
+            fail(err, "cannot give a module the memory it imports", error, nullptr);
             instance_destroy(i);
-            return NULL;
+            return nullptr;
         }
     }
     return i;
@@ -470,7 +464,7 @@ static wasm_trap_t *host_call(void *env, wasmtime_caller_t *caller, const wasmti
                               size_t nargs, wasmtime_val_t *results, size_t nresults)
 {
     host_fn *h = env;
-    uint64_t in[16] = {0}, out[4] = {0};
+    uint64_t in[16] = {0}, out[4] = {};
     size_t k;
     (void)caller;
     for (k = 0; k < nargs && k < 16; k ++) {
@@ -490,7 +484,7 @@ static wasm_trap_t *host_call(void *env, wasmtime_caller_t *caller, const wasmti
             results[k].of.i64 = (int64_t)out[k];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 static void types(wasm_valtype_vec_t *vec, const uint8_t *kinds, uint32_t count)
@@ -508,7 +502,7 @@ BACKEND_EXPORT int define_func(backend_instance *i, const char *ns, const char *
     wasm_valtype_vec_t params, results;
     host_fn *h;
     if (i->instantiated || sig->param_count > 16 || sig->result_count > 4) {
-        fail(err, "define_func: after the module's first function, or too wide", NULL, NULL);
+        fail(err, "define_func: after the module's first function, or too wide", nullptr, nullptr);
         return -1;
     }
     h = calloc(1, sizeof *h);
@@ -522,7 +516,7 @@ BACKEND_EXPORT int define_func(backend_instance *i, const char *ns, const char *
                                                           strlen(field), ty, host_call, h, free);
     wasm_functype_delete(ty);
     if (error) {
-        fail(err, "cannot define a function", error, NULL);
+        fail(err, "cannot define a function", error, nullptr);
         return -1;
     }
     return 0;
@@ -531,7 +525,7 @@ BACKEND_EXPORT int define_func(backend_instance *i, const char *ns, const char *
 /* a module is instantiated at its first function: every import has to exist by then */
 static int instantiate(backend_instance *i, backend_err *err)
 {
-    wasm_trap_t *trap = NULL;
+    wasm_trap_t *trap = nullptr;
     wasmtime_error_t *error;
     if (i->instantiated) return 0;
     error = wasmtime_linker_instantiate(i->linker, i->ctx, i->m->module, &i->instance, &trap);
@@ -549,11 +543,11 @@ BACKEND_EXPORT backend_func *instance_func(backend_instance *i, const char *name
     wasmtime_extern_t item;
     wasm_functype_t *ty;
     backend_func *f;
-    if (instantiate(i, err)) return NULL;
+    if (instantiate(i, err)) return nullptr;
     if (!wasmtime_instance_export_get(i->ctx, &i->instance, name, strlen(name), &item)
         || item.kind != WASMTIME_EXTERN_FUNC) {
         if (err) snprintf(err->text, sizeof err->text, "no exported function '%s'", name);
-        return NULL;
+        return nullptr;
     }
     ty = wasmtime_func_type(i->ctx, &item.of.func);
     *arity = (int32_t)wasm_functype_params(ty)->size;
@@ -577,7 +571,7 @@ BACKEND_EXPORT int call(backend_func *f, int32_t *status, backend_err *err)
     backend_instance *i = f->instance;
     backend *b = i->b;
     wasmtime_val_t result;
-    wasm_trap_t *trap = NULL;
+    wasm_trap_t *trap = nullptr;
     wasmtime_error_t *error;
     uint64_t nanos = i->deadline;
     i->deadline = 0;
@@ -595,7 +589,7 @@ BACKEND_EXPORT int call(backend_func *f, int32_t *status, backend_err *err)
     } else if (i->m->kind & INTERRUPTIBLE) {
         wasmtime_context_set_epoch_deadline(i->ctx, FAR);
     }
-    error = wasmtime_func_call(i->ctx, &f->func, NULL, 0, &result, 1, &trap);
+    error = wasmtime_func_call(i->ctx, &f->func, nullptr, 0, &result, 1, &trap);
     if (nanos) {
         os_mutex_lock(b->lock);
         b->active = 0;

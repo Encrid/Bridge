@@ -4,7 +4,7 @@
 
 ECS_STRUCT(Retyped, { uint32_t a; uint32_t b; uint32_t c; });
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
 #if WHICH == 1
     BRIDGE_COMPONENT("game:Private", Retyped, BRIDGE_STRIP);
@@ -18,5 +18,5 @@ BRIDGE_EXPORT(init) int init(void)
     return 0;
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }
-BRIDGE_EXPORT(reload) int reload(void) { return 0; }
+BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
+BRIDGE_EXPORT(reload) int reload() { return 0; }

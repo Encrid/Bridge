@@ -4,7 +4,6 @@
 #ifndef BRIDGE_H
 #define BRIDGE_H
 
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -106,7 +105,7 @@ enum { BRIDGE_WARN = -2, BRIDGE_ERR = -3 };
 
 typedef void (*bridge_sink_fn)(void *ud, const bridge_record *r);
 
-/* NULL if the deployment cannot start; which reason, the sink was told. */
+/* nullptr if the deployment cannot start; which reason, the sink was told. */
 bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud);
 /* Every loaded module's shutdown, then everything else. 0 if the bridge is gone. With a pinned
  * module loaded it answers 1 from any thread but the one that loaded it, with a record, and

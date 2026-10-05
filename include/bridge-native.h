@@ -28,7 +28,7 @@ typedef struct bridge_api {
                        uint32_t terms, uint32_t term_count);
     uint32_t (*observe)(uint32_t name, uint32_t name_len, uint32_t events, uint32_t terms,
                         uint32_t term_count);
-    uint64_t (*spawn)(void);
+    uint64_t (*spawn)();
     void     (*destroy)(uint64_t id);
     void     (*attach)(uint64_t id, uint32_t slot, uint32_t ptr, uint32_t len);
     void     (*detach)(uint64_t id, uint32_t slot);
@@ -39,7 +39,7 @@ typedef struct bridge_api {
 
 /* What a native module exports. bridge_bind is the backend's, once, before bridge_init. A
  * system called "move" is the export bridge_move. */
-#define BRIDGE_NATIVE(name) BRIDGE_NATIVE_EXPORT int bridge_##name(void)
+#define BRIDGE_NATIVE(name) BRIDGE_NATIVE_EXPORT int bridge_##name()
 #define BRIDGE_NATIVE_BIND(api_variable) \
     BRIDGE_NATIVE_EXPORT void bridge_bind(const bridge_api *bound_) { api_variable = bound_; }
 
@@ -74,7 +74,7 @@ static inline uint32_t bridge_native_put(const bridge_api *api, const void *byte
 
 #define BRIDGE_NATIVE_DECLARE(api, kind, name, T, on_unload) \
     (api)->declare(bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, kind, \
-                   sizeof(T), _Alignof(T), bridge_native_put(api, T##_desc, sizeof T##_desc - 1), \
+                   sizeof(T), alignof(T), bridge_native_put(api, T##_desc, sizeof T##_desc - 1), \
                    sizeof T##_desc - 1, on_unload)
 #define BRIDGE_NATIVE_COMPONENT(api, name, T, on_unload) \
     BRIDGE_NATIVE_DECLARE(api, BRIDGE_STRUCT, name, T, on_unload)

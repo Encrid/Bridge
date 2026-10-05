@@ -30,7 +30,7 @@ static void sink(void *ud, const bridge_record *r)
 
 static bridge_artifact native(const char *identity, const char *path)
 {
-    bridge_artifact a = {0};
+    bridge_artifact a = {};
     a.cfg.identity = identity;
     a.cfg.abi = BRIDGE_ABI;
     a.cfg.trusted = true;
@@ -54,7 +54,7 @@ static bridge_artifact native(const char *identity, const char *path)
 
 static bridge_artifact wasm(const char *identity, const char *file)
 {
-    bridge_artifact a = native(identity, NULL);
+    bridge_artifact a = native(identity, nullptr);
     char path[1024];
     FILE *f;
     void *data;
@@ -116,7 +116,7 @@ static void modules(bridge *b)
 
 static const char *const position[] = { "game:Position", "game:Roster" };
 
-static bridge_artifact counter(void)
+static bridge_artifact counter()
 {
     bridge_artifact a = wasm("view:counter@0.1.0", "counter");
     a.cfg.read = position;
@@ -137,7 +137,7 @@ static bridge_setting everything[11] = {
     { "flags", BRIDGE_INT,    { .i = 3 } },             /* a bitmask, by its bits */
     { "ratio", BRIDGE_INT,    { .i = 3 } },             /* an integer into a float field */
     { "big",   BRIDGE_INT,    { .i = 8589934592ll } },  /* more than 32 bits */
-    { NULL, 0, { 0 } },
+    { nullptr, 0, { 0 } },
 };
 
 static bridge_artifact configured(const char *identity)
@@ -155,16 +155,16 @@ int main(int argc, char **argv)
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
     const char *phases[2] = { "update", "present" };
-    bridge_config cfg = { backends, 2, phases, 2, NULL, 0, 1, { 4096, 4096, 1 << 20, 8 } };
+    bridge_config cfg = { backends, 2, phases, 2, nullptr, 0, 1, { 4096, 4096, 1 << 20, 8 } };
     bridge_artifact a;
     bridge *b;
-    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stdout, nullptr, _IONBF, 0);
 
     if (!strcmp(what, "slots")) cfg.budget.max_modules = 1;
     /* every load carves a share of the arena that is never given back: room for 200 of them */
     if (!strcmp(what, "churn")) cfg.budget.persistent = 1 << 16;
     if (!strcmp(what, "configceiling")) cfg.budget.entities = (uint64_t)atoi(argc > 2 ? argv[2] : "0");
-    b = bridge_create(&cfg, sink, NULL);
+    b = bridge_create(&cfg, sink, nullptr);
     if (!b) {
         printf("bridge_create refused\nalive\n");
         return 0;
@@ -403,7 +403,7 @@ int main(int argc, char **argv)
         if (!strcmp(what, "configrange")) everything[6].v.i = 300;
         if (!strcmp(what, "configenum")) everything[3].v.s = "Sometimes";
         if (!strcmp(what, "confignone")) a.cfg.config = BRIDGE_NO_CONFIG;
-        if (!strcmp(what, "configunset")) a.cfg.config = NULL;
+        if (!strcmp(what, "configunset")) a.cfg.config = nullptr;
         if (!strcmp(what, "configmissing")) a.cfg.config = "game:Nope";
         if (!strcmp(what, "configarena")) a.cfg.persistent = 8;
         /* the row its settings go on is an entity like any other, under the same ceiling */

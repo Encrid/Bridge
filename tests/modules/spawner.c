@@ -2,7 +2,7 @@
  * several threads, must be given the same ids every run. */
 #include "bridge-wasm.h"
 
-BRIDGE_EXPORT(make) int make(void)
+BRIDGE_EXPORT(make) int make()
 {
     uint32_t a = (uint32_t)bridge_spawn(), b = (uint32_t)bridge_spawn();
     BRIDGE_LOG(BRIDGE_LOG_INFO, "ids", a, b);
@@ -10,12 +10,12 @@ BRIDGE_EXPORT(make) int make(void)
     return 0;
 }
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
     int none = 0;
     BRIDGE_SYSTEM("make", "update", &none, 0);
     return 0;
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }
-BRIDGE_EXPORT(reload) int reload(void) { return 0; }
+BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
+BRIDGE_EXPORT(reload) int reload() { return 0; }

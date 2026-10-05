@@ -27,7 +27,7 @@ static int refuse(module *m, const char *fmt, ...)
 static const void *scratch(module *m, uint64_t at, uint64_t len)
 {
     if (at < m->scratch || len > m->scratch_len || at - m->scratch > m->scratch_len - len) {
-        return NULL;
+        return nullptr;
     }
     return m->priv + at;
 }
@@ -70,7 +70,7 @@ static const char *outside_type_set(ecs_world_t *world, ecs_entity_t type)
     case EcsPrimitiveType: {
         ecs_primitive_kind_t kind = ecs_get(world, type, EcsPrimitive)->kind;
         return kind == EcsString || kind == EcsUPtr || kind == EcsIPtr
-            ? "a pointer-sized type" : NULL;
+            ? "a pointer-sized type" : nullptr;
     }
     case EcsStructType: {
         const EcsStruct *s = ecs_get(world, type, EcsStruct);
@@ -80,13 +80,13 @@ static const char *outside_type_set(ecs_world_t *world, ecs_entity_t type)
             const char *why = outside_type_set(world, members[i].type);
             if (why) return why;
         }
-        return NULL;
+        return nullptr;
     }
     case EcsArrayType:
         return outside_type_set(world, ecs_get(world, type, EcsArray)->type);
     case EcsEnumType:
     case EcsBitmaskType:
-        return NULL;
+        return nullptr;
     default:
         return "a vector or an opaque type";
     }
@@ -102,7 +102,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     const char *name_at = scratch(m, a[0], a[1]), *desc_at = scratch(m, a[5], a[6]);
     uint32_t kind = (uint32_t)a[2], size = (uint32_t)a[3], align = (uint32_t)a[4];
     uint32_t on_unload = (uint32_t)a[7], i;
-    component *c = NULL;
+    component *c = nullptr;
     char name[128], *bare;
     uint64_t print;
 
@@ -139,7 +139,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         /* flecs parses the descriptor and computes the layout: Bridge-ASM700 parses no C */
         char *desc = copy(desc_at, a[6]);
         const EcsComponent *layout;
-        const char *why = NULL;
+        const char *why = nullptr;
         ecs_entity_t id, scope, before;
         int parsed;
 
@@ -160,7 +160,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         before = ecs_set_scope(b->world, scope);
         parsed = id && !ecs_meta_from_desc(b->world, id, kinds[kind], desc);
         ecs_set_scope(b->world, before);
-        layout = parsed ? ecs_get(b->world, id, EcsComponent) : NULL;
+        layout = parsed ? ecs_get(b->world, id, EcsComponent) : nullptr;
         if (layout) why = outside_type_set(b->world, id);
         free(desc);
         if (!layout || why || (uint32_t)layout->size != size || (uint32_t)layout->alignment != align) {
@@ -255,7 +255,7 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
     const char *name_at = scratch(m, name_off, name_len);
     const bridge_term *terms = scratch(m, terms_off, term_count * sizeof(bridge_term));
     uint32_t count = (uint32_t)term_count, i;
-    ecs_query_desc_t desc = {0};
+    ecs_query_desc_t desc = {};
     bridge_system *s;
     char name[128], full[256];
 
@@ -314,12 +314,12 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         desc.terms[i].oper = oper[t.oper];
         s->sizes[i] = c->size;
         /* what the conflict graph reads: a term that must not match touches nothing */
-        s->touches[i] = t.oper == BRIDGE_NOT ? NULL : c;
+        s->touches[i] = t.oper == BRIDGE_NOT ? nullptr : c;
         s->writes[i] = t.access != BRIDGE_IN;
     }
 
     if (events) {
-        ecs_observer_desc_t od = {0};
+        ecs_observer_desc_t od = {};
         uint32_t k = 0;
         memcpy(od.query.terms, desc.terms, sizeof desc.terms);
         if (events & BRIDGE_ON_ADD) od.events[k ++] = EcsOnAdd;
@@ -335,7 +335,7 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         s->query = ecs_query_init(b->world, &desc);
         if (s->query && s->query->row_fields) {
             ecs_query_fini(s->query);
-            s->query = NULL;
+            s->query = nullptr;
         }
     }
     if (events ? !s->observing : count && !s->query) {
@@ -439,7 +439,7 @@ static int abi_spawn(void *ud, const uint64_t *a, uint64_t *r)
 static int abi_destroy(void *ud, const uint64_t *a, uint64_t *r)
 {
     (void)r;
-    queue(ud, CHANGE_DESTROY, a[0], NULL, NULL);
+    queue(ud, CHANGE_DESTROY, a[0], nullptr, nullptr);
     return 0;
 }
 
@@ -447,11 +447,11 @@ static component *written(module *m, uint64_t slot, const char *entry)
 {
     if (slot >= m->declared_count) {
         refuse(m, "%s names slot %llu, which it never declared", entry, (unsigned long long)slot);
-        return NULL;
+        return nullptr;
     }
     if (!may_write(m, m->declared[slot])) {
         refuse(m, "it may not %s '%s': no grant says so", entry, m->declared[slot]->name);
-        return NULL;
+        return nullptr;
     }
     return m->declared[slot];
 }
@@ -481,7 +481,7 @@ static int abi_detach(void *ud, const uint64_t *a, uint64_t *r)
     component *c = written(m, a[1], "detach");
     (void)r;
     if (!c) return 1;
-    queue(m, CHANGE_DETACH, a[0], c, NULL);
+    queue(m, CHANGE_DETACH, a[0], c, nullptr);
     return 0;
 }
 

@@ -23,7 +23,7 @@ BRIDGE_IMPORT(system)  uint32_t bridge_system(uint32_t name, uint32_t name_len, 
     uint32_t phase_len, uint32_t terms, uint32_t term_count);
 BRIDGE_IMPORT(observe) uint32_t bridge_observe(uint32_t name, uint32_t name_len, uint32_t events,
     uint32_t terms, uint32_t term_count);
-BRIDGE_IMPORT(spawn)   uint64_t bridge_spawn(void);
+BRIDGE_IMPORT(spawn)   uint64_t bridge_spawn();
 BRIDGE_IMPORT(destroy) void     bridge_destroy(uint64_t id);
 BRIDGE_IMPORT(attach)  void     bridge_attach(uint64_t id, uint32_t slot, uint32_t ptr, uint32_t len);
 BRIDGE_IMPORT(detach)  void     bridge_detach(uint64_t id, uint32_t slot);
@@ -90,7 +90,7 @@ static inline uint32_t bridge_put(const void *bytes, uint32_t len)
 /* a type another declaration's fields use is declared before it, in the same namespace */
 #define BRIDGE_DECLARE(kind, name, T, on_unload) \
     bridge_declare(bridge_put(name, sizeof name - 1), sizeof name - 1, kind, sizeof(T), \
-                   _Alignof(T), bridge_put(T##_desc, sizeof T##_desc - 1), sizeof T##_desc - 1, \
+                   alignof(T), bridge_put(T##_desc, sizeof T##_desc - 1), sizeof T##_desc - 1, \
                    on_unload)
 #define BRIDGE_COMPONENT(name, T, on_unload) BRIDGE_DECLARE(BRIDGE_STRUCT, name, T, on_unload)
 
@@ -163,12 +163,12 @@ static inline uint32_t bridge_trigger_events(uint32_t trigger) { return acc_own_
 #define BRIDGE_ROW(T, base, row, count) acc_row(base, row, count, sizeof(T))
 
 #define BRIDGE_LD_(v) _Generic((v), \
-    _Bool: acc_ld_u8, char: acc_ld_i8, signed char: acc_ld_i8, unsigned char: acc_ld_u8, \
+    bool: acc_ld_u8, char: acc_ld_i8, signed char: acc_ld_i8, unsigned char: acc_ld_u8, \
     short: acc_ld_i16, unsigned short: acc_ld_u16, \
     int: acc_ld_32, unsigned: acc_ld_32, long: acc_ld_32, unsigned long: acc_ld_32, \
     long long: acc_ld_64, unsigned long long: acc_ld_64, float: acc_ld_f32, double: acc_ld_f64)
 #define BRIDGE_ST_(v) _Generic((v), \
-    _Bool: acc_st_8, char: acc_st_8, signed char: acc_st_8, unsigned char: acc_st_8, \
+    bool: acc_st_8, char: acc_st_8, signed char: acc_st_8, unsigned char: acc_st_8, \
     short: acc_st_16, unsigned short: acc_st_16, \
     int: acc_st_32, unsigned: acc_st_32, long: acc_st_32, unsigned long: acc_st_32, \
     long long: acc_st_64, unsigned long long: acc_st_64, float: acc_st_f32, double: acc_st_f64)

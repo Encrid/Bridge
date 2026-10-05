@@ -12,13 +12,13 @@
 void say(bridge *b, const module *m, const bridge_system *s, int8_t level, const char *fmt, ...)
 {
     char text[512];
-    bridge_record r = {0};
+    bridge_record r = {};
     va_list args;
     va_start(args, fmt);
     vsnprintf(text, sizeof text, fmt, args);
     va_end(args);
-    r.identity = m ? m->identity : NULL;
-    r.system = s ? s->name : NULL;
+    r.identity = m ? m->identity : nullptr;
+    r.system = s ? s->name : nullptr;
     r.text = text;
     r.len = (uint32_t)strlen(text);
     r.when = b->barriers << 16;
@@ -44,7 +44,7 @@ int bridge_destroy(bridge *b)
      * all. Refused before anything is touched, so the bridge is whole for the call that can. */
     for (m = b->modules; m; m = m->next) {
         if (m->pinned && m->thread != os_thread_id()) {
-            say(b, NULL, NULL, BRIDGE_ERR, "bridge_destroy is refused: module '%s' is pinned to "
+            say(b, nullptr, nullptr, BRIDGE_ERR, "bridge_destroy is refused: module '%s' is pinned to "
                 "the thread that loaded it, and this call comes from another", m->identity);
             return 1;
         }
@@ -86,7 +86,7 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
     bridge *b;
     uint32_t i, k;
     /* the one failure no record can explain, and a host that passed null already knows */
-    if (!sink || !cfg) return NULL;
+    if (!sink || !cfg) return nullptr;
 
     b = calloc(1, sizeof *b);
     b->sink = sink;
@@ -98,17 +98,17 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
         const bridge_backend *want = &cfg->backends[i];
         open_backend *o = &b->backends[i];
         char why[400];
-        backend_err err = {0};
+        backend_err err = {};
         uint64_t reservation = 0, guard = 0;
 
         if (!want->name || !want->library) {
-            say(b, NULL, NULL, BRIDGE_ERR, "backend %u has no %s", i,
+            say(b, nullptr, nullptr, BRIDGE_ERR, "backend %u has no %s", i,
                 want->name ? "library" : "name");
             goto refuse;
         }
         for (k = 0; k < i; k ++) {
             if (!strcmp(b->backends[k].name, want->name)) {
-                say(b, NULL, NULL, BRIDGE_ERR, "backend '%s' is named twice", want->name);
+                say(b, nullptr, nullptr, BRIDGE_ERR, "backend '%s' is named twice", want->name);
                 goto refuse;
             }
         }
@@ -116,7 +116,7 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
         b->backend_count = i + 1;
         o->lib = backend_open(want->library, &o->api, why, sizeof why);
         if (!o->lib) {
-            say(b, NULL, NULL, BRIDGE_ERR, "backend '%s': %s", want->name, why);
+            say(b, nullptr, nullptr, BRIDGE_ERR, "backend '%s': %s", want->name, why);
             goto refuse;
         }
         {
@@ -137,7 +137,7 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
             free(settings);
         }
         if (!o->be) {
-            say(b, NULL, NULL, BRIDGE_ERR, "backend '%s' would not start: %s", want->name, err.text);
+            say(b, nullptr, nullptr, BRIDGE_ERR, "backend '%s' would not start: %s", want->name, err.text);
             goto refuse;
         }
         o->capabilities = o->api.backend_capabilities(o->be);
@@ -148,19 +148,19 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
 
     /* schedule.md, *Bridge-ASM700 ships no phase names*: a deployment declares its own */
     if (!cfg->phase_count) {
-        say(b, NULL, NULL, BRIDGE_ERR, "the deployment declares no phase, and there is none "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "the deployment declares no phase, and there is none "
             "of Bridge-ASM700's to run");
         goto refuse;
     }
     for (i = 0; i < cfg->phase_count; i ++) {
         const char *name = cfg->phases[i];
         if (!name || !*name) {
-            say(b, NULL, NULL, BRIDGE_ERR, "phase %u has no name", i);
+            say(b, nullptr, nullptr, BRIDGE_ERR, "phase %u has no name", i);
             goto refuse;
         }
         for (k = 0; k < i; k ++) {
             if (!strcmp(b->phases[k], name)) {
-                say(b, NULL, NULL, BRIDGE_ERR, "phase '%s' is named twice", name);
+                say(b, nullptr, nullptr, BRIDGE_ERR, "phase '%s' is named twice", name);
                 goto refuse;
             }
         }
@@ -171,7 +171,7 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
     if (schedule_order(b, cfg->order, cfg->order_count)) goto refuse;
     /* config.md, *No unaccountable values*: how many threads is not ours to guess */
     if (!cfg->threads) {
-        say(b, NULL, NULL, BRIDGE_ERR, "threads is unset");
+        say(b, nullptr, nullptr, BRIDGE_ERR, "threads is unset");
         goto refuse;
     }
     b->pool = pool_create(cfg->threads - 1);
@@ -181,7 +181,7 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
 
 refuse:
     bridge_destroy(b);
-    return NULL;
+    return nullptr;
 }
 
 static size_t stem_length(const char *identity)
@@ -198,7 +198,7 @@ void bridge_stop(bridge *b, const char *identity, const char *what)
     snprintf(why, sizeof why, "module '%s' %s and its on_error is fail", identity, what);
     b->stopped_by = copy(why, strlen(why));
     b->stopped_stem = copy(identity, stem_length(identity));
-    say(b, NULL, NULL, BRIDGE_ERR, "the bridge has stopped: %s", why);
+    say(b, nullptr, nullptr, BRIDGE_ERR, "the bridge has stopped: %s", why);
 }
 
 void bridge_resume(bridge *b, const module *m)
@@ -206,8 +206,8 @@ void bridge_resume(bridge *b, const module *m)
     if (!b->stopped_stem || strcmp(b->stopped_stem, m->stem)) return;
     free(b->stopped_by);
     free(b->stopped_stem);
-    b->stopped_by = b->stopped_stem = NULL;
-    say(b, m, NULL, 0, "the bridge runs again: module '%s' is back", m->identity);
+    b->stopped_by = b->stopped_stem = nullptr;
+    say(b, m, nullptr, 0, "the bridge runs again: module '%s' is back", m->identity);
 }
 
 int bridge_stopped(bridge *b, const char *repairing)
@@ -219,7 +219,7 @@ int bridge_stopped(bridge *b, const char *repairing)
         size_t n = repairing ? stem_length(repairing) : 0;
         if (!repairing || !b->stopped_stem || strlen(b->stopped_stem) != n
             || memcmp(b->stopped_stem, repairing, n)) {
-            say(b, NULL, NULL, BRIDGE_ERR, "the bridge has stopped: %s", b->stopped_by);
+            say(b, nullptr, nullptr, BRIDGE_ERR, "the bridge has stopped: %s", b->stopped_by);
             return 1;
         }
     }
@@ -227,7 +227,7 @@ int bridge_stopped(bridge *b, const char *repairing)
      * other to run it on. Both calls that run module code come through here. */
     for (m = b->modules; m; m = m->next) {
         if (m->pinned && m->thread != os_thread_id()) {
-            say(b, NULL, NULL, BRIDGE_ERR, "refused: module '%s' is pinned to the thread that "
+            say(b, nullptr, nullptr, BRIDGE_ERR, "refused: module '%s' is pinned to the thread that "
                 "loaded it, and this call comes from another", m->identity);
             return 1;
         }
@@ -239,12 +239,12 @@ int bridge_phase(bridge *b, const char *name)
 {
     uint32_t phase;
     store_enter(b);
-    if (bridge_stopped(b, NULL)) return 1;
+    if (bridge_stopped(b, nullptr)) return 1;
     for (phase = 0; phase < b->phase_count; phase ++) {
         if (name && !strcmp(b->phases[phase], name)) break;
     }
     if (phase == b->phase_count) {
-        say(b, NULL, NULL, BRIDGE_ERR, "phase '%s' is not one the deployment declared",
+        say(b, nullptr, nullptr, BRIDGE_ERR, "phase '%s' is not one the deployment declared",
             name ? name : "");
         return 1;
     }

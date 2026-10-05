@@ -126,18 +126,18 @@ static int run(int32_t count)
     block_used = 0;
     own_live = column_live = 0;
     workload_t w = { .world = ecs_init() };
-    workload_run(&w, count, NULL);
+    workload_run(&w, count, nullptr);
     int escaped = check(&w);
     ecs_fini(w.world);
     free(w.e);
     return escaped;
 }
 
-int main(void)
+int main()
 {
     block_size = (size_t)512 << 20;
     block = malloc(block_size);
-    flecs_confine = (flecs_confine_t){ block_alloc, block_realloc, block_free, NULL };
+    flecs_confine = (flecs_confine_t){ block_alloc, block_realloc, block_free, nullptr };
     ecs_os_set_api_defaults();
     ecs_os_api_t os = ecs_os_get_api();
     os.malloc_ = own_malloc;

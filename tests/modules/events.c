@@ -6,7 +6,7 @@
 static uint32_t marked, watching, runs;
 static uint64_t entity;
 
-BRIDGE_EXPORT(poke) int poke(void)
+BRIDGE_EXPORT(poke) int poke()
 {
     Marked m = { runs + 1 };
     if (runs < 2) BRIDGE_ATTACH(entity, marked, m);
@@ -16,7 +16,7 @@ BRIDGE_EXPORT(poke) int poke(void)
 }
 
 /* which events, and the value the id leads to: an id that leads nowhere was removed */
-BRIDGE_EXPORT(any) int any(void)
+BRIDGE_EXPORT(any) int any()
 {
     uint32_t count = bridge_triggers(watching), i;
     for (i = 0; i < count; i ++) {
@@ -28,7 +28,7 @@ BRIDGE_EXPORT(any) int any(void)
     return 0;
 }
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }};
     int none = 0;
@@ -40,5 +40,5 @@ BRIDGE_EXPORT(init) int init(void)
     return 0;
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }
-BRIDGE_EXPORT(reload) int reload(void) { return 0; }
+BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
+BRIDGE_EXPORT(reload) int reload() { return 0; }

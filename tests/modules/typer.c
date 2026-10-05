@@ -3,11 +3,11 @@
 
 ECS_STRUCT(Vec2, { float x; float y; });
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
     BRIDGE_COMPONENT("game:Vec2", Vec2, BRIDGE_STRIP);
     return 0;
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }
-BRIDGE_EXPORT(reload) int reload(void) { return 0; }
+BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
+BRIDGE_EXPORT(reload) int reload() { return 0; }

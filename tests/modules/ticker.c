@@ -15,7 +15,7 @@ ECS_STRUCT(Extra, { uint32_t unused; });
 
 static uint32_t tick, ticking;
 
-BRIDGE_EXPORT(advance) int advance(void)
+BRIDGE_EXPORT(advance) int advance()
 {
     uint32_t span = bridge_span(ticking, 0, 1);
     uint32_t at = BRIDGE_ROW(Tick, bridge_base(span, 0), 0, bridge_rows(span));
@@ -29,7 +29,7 @@ BRIDGE_EXPORT(advance) int advance(void)
 }
 
 /* what init and reload both do: the same components, the same systems */
-static void registration(void)
+static void registration()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_INOUT, BRIDGE_AND, 0 }};
     tick = BRIDGE_COMPONENT("game:Tick", Tick, BRIDGE_DELETE);
@@ -37,10 +37,10 @@ static void registration(void)
     ticking = BRIDGE_SYSTEM("advance", "update", terms, 1);
 }
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
     Tick t = { 100 };
-    Extra e = { 0 };
+    Extra e = {};
     uint32_t extra;
     registration();
     BRIDGE_ATTACH(bridge_spawn(), tick, t);
@@ -49,7 +49,7 @@ BRIDGE_EXPORT(init) int init(void)
     return 0;
 }
 
-BRIDGE_EXPORT(reload) int reload(void)
+BRIDGE_EXPORT(reload) int reload()
 {
     registration();
 #ifndef NO_EXTRA
@@ -65,7 +65,7 @@ BRIDGE_EXPORT(reload) int reload(void)
 #endif
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void)
+BRIDGE_EXPORT(shutdown) int shutdown()
 {
     BRIDGE_LOG(BRIDGE_LOG_INFO, "shutdown", STEP, 0);
     return 0;

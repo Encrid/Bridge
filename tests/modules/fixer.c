@@ -5,7 +5,7 @@
 
 static uint32_t marked, fixing;
 
-BRIDGE_EXPORT(fix) int fix(void)
+BRIDGE_EXPORT(fix) int fix()
 {
     uint32_t count = bridge_triggers(fixing), i;
     for (i = 0; i < count; i ++) {
@@ -16,7 +16,7 @@ BRIDGE_EXPORT(fix) int fix(void)
     return 0;
 }
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_INOUT, BRIDGE_AND, 0 }};
     marked = BRIDGE_COMPONENT("game:Marked", Marked, BRIDGE_STRIP);
@@ -25,5 +25,5 @@ BRIDGE_EXPORT(init) int init(void)
     return 0;
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }
-BRIDGE_EXPORT(reload) int reload(void) { return 0; }
+BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
+BRIDGE_EXPORT(reload) int reload() { return 0; }

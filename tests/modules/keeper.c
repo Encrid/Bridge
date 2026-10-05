@@ -9,7 +9,7 @@
 static uint32_t position, private_, roster;
 static uint64_t first;
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
     Roster r = {{ 0 }};
     uint32_t i;
@@ -32,9 +32,9 @@ BRIDGE_EXPORT(init) int init(void)
     return 0;
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void)
+BRIDGE_EXPORT(shutdown) int shutdown()
 {
     bridge_destroy(first);
     return 0;
 }
-BRIDGE_EXPORT(reload) int reload(void) { return 0; }
+BRIDGE_EXPORT(reload) int reload() { return 0; }

@@ -59,7 +59,7 @@ static void sink(void *ud, const bridge_record *r)
         r->arg[0], r->arg[1]);
 }
 
-static uint32_t distinct_threads(void)
+static uint32_t distinct_threads()
 {
     uint32_t i, k, n = 0;
     for (i = 0; i < seen; i ++) {
@@ -71,7 +71,7 @@ static uint32_t distinct_threads(void)
 
 static bridge_artifact native(const char *identity, const char *path)
 {
-    bridge_artifact a = {0};
+    bridge_artifact a = {};
     a.cfg.identity = identity;
     a.cfg.abi = BRIDGE_ABI;
     a.cfg.trusted = true;
@@ -98,7 +98,7 @@ static const char *const game[] = { "game:Position", "game:Marked" };
 /* a wasm module of tests/modules, with the limits that backend can keep */
 static bridge_artifact wasm(const char *identity, const char *file)
 {
-    bridge_artifact a = native(identity, NULL);
+    bridge_artifact a = native(identity, nullptr);
     char path[1024];
     FILE *f;
     void *data;
@@ -153,7 +153,7 @@ static double phase_ms(bridge *b, const char *phase)
 static bridge *elsewhere_bridge;
 static int elsewhere_result, elsewhere_frames;
 
-static void elsewhere_work(void)
+static void elsewhere_work()
 {
     int i;
     if (elsewhere_frames < 0) elsewhere_result = bridge_destroy(elsewhere_bridge);
@@ -178,10 +178,10 @@ static void start_elsewhere(bridge *b, int count)
 {
     elsewhere_bridge = b;
     elsewhere_frames = count;
-    elsewhere_thread = CreateThread(NULL, 0, elsewhere, NULL, 0, NULL);
+    elsewhere_thread = CreateThread(nullptr, 0, elsewhere, nullptr, 0, nullptr);
 }
 
-static void join_elsewhere(void)
+static void join_elsewhere()
 {
     WaitForSingleObject(elsewhere_thread, INFINITE);
     CloseHandle(elsewhere_thread);
@@ -191,7 +191,7 @@ static void *elsewhere(void *arg)
 {
     (void)arg;
     elsewhere_work();
-    return NULL;
+    return nullptr;
 }
 
 static pthread_t elsewhere_thread;
@@ -200,12 +200,12 @@ static void start_elsewhere(bridge *b, int count)
 {
     elsewhere_bridge = b;
     elsewhere_frames = count;
-    pthread_create(&elsewhere_thread, NULL, elsewhere, NULL);
+    pthread_create(&elsewhere_thread, nullptr, elsewhere, nullptr);
 }
 
-static void join_elsewhere(void)
+static void join_elsewhere()
 {
-    pthread_join(elsewhere_thread, NULL);
+    pthread_join(elsewhere_thread, nullptr);
 }
 #endif
 
@@ -218,10 +218,10 @@ int main(int argc, char **argv)
                              { "view:halver:halve", "game:mover:move" }};
     bridge_order seen_first = { "view:watcher:seen", "view:fixer:fix" };
     bridge_order fix_first = { "view:fixer:fix", "view:watcher:seen" };
-    bridge_config cfg = { backends, 2, phases, 2, NULL, 0, 1, { 4096, 4096, 1 << 20, 8 } };
+    bridge_config cfg = { backends, 2, phases, 2, nullptr, 0, 1, { 4096, 4096, 1 << 20, 8 } };
     bridge_artifact a;
     bridge *b;
-    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stdout, nullptr, _IONBF, 0);
 
     if (!strcmp(what, "order")) { cfg.order = &pairs[0]; cfg.order_count = 1; }
     if (!strcmp(what, "reorder")) { cfg.order = &pairs[1]; cfg.order_count = 1; }
@@ -242,7 +242,7 @@ int main(int argc, char **argv)
         for (run = 0; run < 3; run ++) {
             int f;
             cfg.threads = threads[run];
-            b = bridge_create(&cfg, sink, NULL);
+            b = bridge_create(&cfg, sink, nullptr);
             if (!b) { printf("bridge_create refused\n"); return 0; }
             minting = run;
             a = wasm("test:spawn1@0.1.0", "spawner");
@@ -291,7 +291,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    b = bridge_create(&cfg, sink, NULL);
+    b = bridge_create(&cfg, sink, nullptr);
     if (!b) {
         printf("bridge_create refused\nalive\n");
         return 0;

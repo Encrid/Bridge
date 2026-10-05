@@ -59,7 +59,7 @@ int schedule_order(bridge *b, const bridge_order *order, uint32_t count)
         const char *pair[2] = { order[i].before, order[i].after };
         uint32_t at[2];
         if (!pair[0] || !pair[1] || !*pair[0] || !*pair[1] || !strcmp(pair[0], pair[1])) {
-            say(b, NULL, NULL, BRIDGE_ERR, "[order] pair %u does not name two systems", i);
+            say(b, nullptr, nullptr, BRIDGE_ERR, "[order] pair %u does not name two systems", i);
             refused = 1;
             break;
         }
@@ -76,7 +76,7 @@ int schedule_order(bridge *b, const bridge_order *order, uint32_t count)
         close_over(&reach);
         for (i = 0; i < n && !refused; i ++) {
             if (!reaches(&reach, i, i)) continue;
-            say(b, NULL, NULL, BRIDGE_ERR, "[order] contradicts itself: '%s' would run before "
+            say(b, nullptr, nullptr, BRIDGE_ERR, "[order] contradicts itself: '%s' would run before "
                 "itself", names[i]);
             refused = 1;
         }
@@ -86,7 +86,7 @@ int schedule_order(bridge *b, const bridge_order *order, uint32_t count)
     return (int)refused;
 }
 
-/* the component both touch with one of them writing it, or NULL */
+/* the component both touch with one of them writing it, or nullptr */
 static const char *conflict(const bridge_system *a, const bridge_system *b)
 {
     uint32_t i, j;
@@ -97,7 +97,7 @@ static const char *conflict(const bridge_system *a, const bridge_system *b)
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 /* Every phase, and the barrier after them as one more: edges, the refusal, then levels. */
@@ -107,7 +107,7 @@ int schedule_build(bridge *b, char *why, size_t why_len)
     uint32_t phase, i, j, k, refused = 0;
 
     for (phase = 0; phase <= b->phase_count && !refused; phase ++) {
-        const char *where = phase < b->phase_count ? b->phases[phase] : NULL;
+        const char *where = phase < b->phase_count ? b->phases[phase] : nullptr;
         uint32_t n = 0;
         matrix reach;
         for (i = 0; i < b->system_count; i ++) {
@@ -182,7 +182,7 @@ static void run_job(void *arg)
     for (i = 0; i < j->count; i ++) {
         bridge_system *s = j->list[i];
         bridge_system **slots = s->observer ? m->observers : m->systems;
-        backend_err err = {0};
+        backend_err err = {};
         int32_t status = 0;
         uint32_t slot = 0;
         while (slots[slot] != s) slot ++;
@@ -283,7 +283,7 @@ void schedule_account(bridge *b)
         m->ran_now = m->failed_now = 0;
         if (m->stopped || m->max_failures <= 0 || m->failures < m->max_failures) continue;
         m->stopped = 1;
-        say(b, m, NULL, BRIDGE_ERR, "module '%s' is stopped: it reached its max_system_failures "
+        say(b, m, nullptr, BRIDGE_ERR, "module '%s' is stopped: it reached its max_system_failures "
             "of %lld", m->identity, (long long)m->max_failures);
         /* fail covers a stop as it covers a load: the deployment does not run without it */
         if (m->on_error == BRIDGE_FAIL) bridge_stop(b, m->identity, "was stopped");

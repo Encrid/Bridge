@@ -11,7 +11,7 @@
  * have no world in scope. So which bridge a column is for is whichever this thread is working
  * for: every way into Bridge-ASM700 says so before it reaches flecs. Two bridges in a process
  * are then two worlds that never see each other's block. */
-static THREAD_LOCAL bridge *live;
+static thread_local bridge *live;
 
 void store_enter(bridge *b)
 {
@@ -104,7 +104,7 @@ static void *column_alloc(ecs_size_t size)
 {
     bridge *b = live;
     uint32_t at;
-    if (size <= 0) return NULL;
+    if (size <= 0) return nullptr;
     b->layout_moved = 1;
     if (take(b, grain(size), &at)) return b->shared + b->columns + at;
     /* flecs cannot be unwound from the middle of a change, so it is given what it asked for
@@ -133,7 +133,7 @@ static void *column_realloc(void *ptr, ecs_size_t old_size, ecs_size_t new_size)
     if (!ptr) return column_alloc(new_size);
     if (new_size <= 0) {
         column_free(ptr, old_size);
-        return NULL;
+        return nullptr;
     }
     if (in_columns(b, ptr)) {
         uint32_t at = (uint32_t)((uint8_t *)ptr - b->shared) - b->columns;
@@ -217,7 +217,7 @@ static void on_table_gone(ecs_iter_t *it)
     uint32_t id;
     for (id = 1; id < b->table_count && b->tables[id].table != it->table; id ++) {}
     if (id >= b->table_count) return;
-    b->tables[id].table = NULL;
+    b->tables[id].table = nullptr;
     b->tables[id].rows = 0;
     if (b->dead_count == b->dead_room) {
         b->dead_room = b->dead_room ? b->dead_room * 2 : 16;
@@ -225,7 +225,7 @@ static void on_table_gone(ecs_iter_t *it)
     }
     b->dead_tables[b->dead_count ++] = id;
     free(b->table_hash);            /* rebuilt without it at the next lookup */
-    b->table_hash = NULL;
+    b->table_hash = nullptr;
     b->layout_moved = 1;
 }
 
@@ -412,7 +412,7 @@ static int publish(bridge *b, module *m)
             }
             /* validation.md, *Always on*: what this catches is our own patch failing */
             if (b->tables[id].rows != it.count) {
-                say(b, NULL, NULL, BRIDGE_ERR, "the entity index is out of step with flecs: "
+                say(b, nullptr, nullptr, BRIDGE_ERR, "the entity index is out of step with flecs: "
                     "table %u has %d rows and the index counts %d", id, it.count, b->tables[id].rows);
             }
             memset(span, 0, size);
@@ -460,12 +460,12 @@ void store_drain(bridge *b, module *m)
 
     for (i = 0; i < kept; i ++) {
         bridge_log_record rec;
-        bridge_record r = {0};
+        bridge_record r = {};
         memcpy(&rec, m->priv + m->ring + ((m->ring_tail + i) % m->ring_len) * sizeof rec, sizeof rec);
         r.identity = m->identity;
         r.system = rec.system < m->system_count ? m->systems[rec.system]->name
                  : rec.system >= 0x8000u && rec.system - 0x8000u < m->observer_count
-                 ? m->observers[rec.system - 0x8000u]->name : NULL;
+                 ? m->observers[rec.system - 0x8000u]->name : nullptr;
         if (rec.text >= m->scratch && rec.len <= m->scratch_len
             && rec.text - m->scratch <= m->scratch_len - rec.len) {
             r.text = (const char *)m->priv + rec.text;
@@ -481,7 +481,7 @@ void store_drain(bridge *b, module *m)
         b->sink(b->ud, &r);
     }
     if (written > kept) {
-        say(b, m, NULL, BRIDGE_WARN, "%u log lines were dropped: its ring holds %u",
+        say(b, m, nullptr, BRIDGE_WARN, "%u log lines were dropped: its ring holds %u",
             written - kept, m->ring_len);
     }
     m->ring_tail = head;
@@ -504,7 +504,7 @@ void store_barrier(bridge *b)
         for (m = b->modules; m; m = m->next) {
             if (m->stopped || !publish(b, m)) continue;
             m->stopped = 1;
-            say(b, m, NULL, BRIDGE_ERR, "module '%s' is stopped: what its queries match no "
+            say(b, m, nullptr, BRIDGE_ERR, "module '%s' is stopped: what its queries match no "
                 "longer fits in its spans of %u bytes", m->identity, m->spans_len);
         }
     } while (tables != b->table_count);
@@ -519,7 +519,7 @@ void store_barrier(bridge *b)
     b->barriers ++;
 
     if (b->columns_out && !b->stopped_by) {
-        say(b, NULL, NULL, BRIDGE_ERR, "the bridge has stopped: [budget] columns of %u bytes "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "the bridge has stopped: [budget] columns of %u bytes "
             "ran out", b->columns_len);
         b->stopped_by = copy("[budget] columns ran out", 24);
     }
@@ -530,13 +530,13 @@ void store_barrier(bridge *b)
 static void flecs_says(int32_t level, const char *file, int32_t line, const char *msg)
 {
     (void)file; (void)line;
-    if (live && level <= BRIDGE_WARN) say(live, NULL, NULL, (int8_t)level, "flecs: %s", msg);
+    if (live && level <= BRIDGE_WARN) say(live, nullptr, nullptr, (int8_t)level, "flecs: %s", msg);
 }
 
 static int unset(bridge *b, const char *key, uint64_t value)
 {
     if (value) return 0;
-    say(b, NULL, NULL, BRIDGE_ERR, "[budget] %s is unset", key);
+    say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] %s is unset", key);
     return 1;
 }
 
@@ -556,14 +556,14 @@ int store_create(bridge *b, const bridge_budget *budget)
     /* an offset is 32 bits, so the shared memory is never more than it can reach */
     if (budget->entities > UINT32_MAX || budget->persistent > UINT32_MAX
         || budget->columns > UINT32_MAX || len > (uint64_t)1 << 32) {
-        say(b, NULL, NULL, BRIDGE_ERR, "[budget] cannot be satisfied: the shared memory would "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: the shared memory would "
             "be %llu bytes and an offset into it is 32 bits", (unsigned long long)len);
         return 1;
     }
     reserve = (len > b->reservation ? len : b->reservation) + b->guard;
     b->shared = os_reserve((size_t)reserve, (size_t)len);
     if (!b->shared) {
-        say(b, NULL, NULL, BRIDGE_ERR, "[budget] cannot be satisfied: the system would not "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: the system would not "
             "give %llu bytes", (unsigned long long)len);
         return 1;
     }
@@ -613,17 +613,17 @@ int store_create(bridge *b, const bridge_budget *budget)
                     { .name = "len", .type = ecs_id(ecs_u32_t) }}
     });
     if (b->columns_out) {
-        say(b, NULL, NULL, BRIDGE_ERR, "[budget] columns of %u bytes does not hold flecs' own "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] columns of %u bytes does not hold flecs' own "
             "tables, before any module's", b->columns_len);
         return 1;
     }
 
     for (i = 0; i < b->backend_count; i ++) {
         open_backend *o = &b->backends[i];
-        backend_err err = {0};
+        backend_err err = {};
         o->shared = o->api.memory_adopt(o->be, b->shared, len, &err);
         if (!o->shared) {
-            say(b, NULL, NULL, BRIDGE_ERR, "backend '%s' cannot adopt the shared memory: %s",
+            say(b, nullptr, nullptr, BRIDGE_ERR, "backend '%s' cannot adopt the shared memory: %s",
                 o->name, err.text);
             return 1;
         }
@@ -661,5 +661,5 @@ void store_destroy(bridge *b)
     free(b->table_hash);
     free(b->dirty);
     free(b->is_dirty);
-    live = NULL;
+    live = nullptr;
 }

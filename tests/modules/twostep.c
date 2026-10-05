@@ -11,27 +11,27 @@ static uint32_t first_row(uint32_t query)
     return BRIDGE_ROW(Position, bridge_base(span, 0), 0, bridge_rows(span));
 }
 
-BRIDGE_EXPORT(twice) int twice(void)
+BRIDGE_EXPORT(twice) int twice()
 {
     uint32_t at = first_row(doubling);
     BRIDGE_SET(Position, x, at, BRIDGE_GET(Position, x, at) * 2.0f);
     return 0;
 }
 
-BRIDGE_EXPORT(more) int more(void)
+BRIDGE_EXPORT(more) int more()
 {
     uint32_t at = first_row(adding);
     BRIDGE_SET(Position, x, at, BRIDGE_GET(Position, x, at) + 1.0f);
     return 0;
 }
 
-BRIDGE_EXPORT(show) int show(void)
+BRIDGE_EXPORT(show) int show()
 {
     BRIDGE_LOG(BRIDGE_LOG_INFO, "x", (uint32_t)BRIDGE_GET(Position, x, first_row(showing)), 0);
     return 0;
 }
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_INOUT, BRIDGE_AND, 0 }};
     Position p = { 1.0f, 0.0f };
@@ -45,5 +45,5 @@ BRIDGE_EXPORT(init) int init(void)
     return 0;
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }
-BRIDGE_EXPORT(reload) int reload(void) { return 0; }
+BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
+BRIDGE_EXPORT(reload) int reload() { return 0; }

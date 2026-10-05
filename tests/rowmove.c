@@ -47,8 +47,8 @@ static void sync(workload_t *w)
     for (i = 0; i < dirty_count; i ++) {
         ecs_entity_t e = dirty[i];
         uint32_t idx = index_of(e);
-        const ecs_record_t *r = ecs_is_alive(w->world, e) ? ecs_record_find(w->world, e) : NULL;
-        shadow[idx].table = r ? r->table : NULL;
+        const ecs_record_t *r = ecs_is_alive(w->world, e) ? ecs_record_find(w->world, e) : nullptr;
+        shadow[idx].table = r ? r->table : nullptr;
         shadow[idx].row = r ? ECS_RECORD_TO_ROW(r->row) : -1;
         is_dirty[idx] = 0;
     }
@@ -59,7 +59,7 @@ static void* os_alloc(ecs_size_t size) { return malloc((size_t)size); }
 static void* os_realloc(void *p, ecs_size_t o, ecs_size_t n) { (void)o; return realloc(p, (size_t)n); }
 static void os_free(void *p, ecs_size_t size) { (void)size; free(p); }
 
-int main(void)
+int main()
 {
     int32_t count = 20000, i, wrong = 0, live = 0;
     capacity = count * 2 + 100000;

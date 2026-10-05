@@ -42,7 +42,7 @@ static void *read_file(const char *name, size_t *len)
 /* a module as a deployment would state it: every key said, nothing left at zero */
 static bridge_artifact artifact(const char *identity, const char *file)
 {
-    bridge_artifact a = {0};
+    bridge_artifact a = {};
     a.cfg.identity = identity;
     a.cfg.abi = BRIDGE_ABI;
     a.cfg.trusted = false;
@@ -85,7 +85,7 @@ static void frames(bridge *b, int count)
 
 static const char *const grants[] = { "game:Position", "game:Marked" };
 
-static bridge_artifact reader(void)
+static bridge_artifact reader()
 {
     bridge_artifact a = artifact("view:reader@0.1.0", "reader");
     a.cfg.read = grants;
@@ -103,7 +103,7 @@ static void bench(bridge_config *cfg)
     cfg->budget.columns = 64 << 20;
     for (build = 0; build < 2; build ++) {
         for (metered = 1; metered >= 0; metered --) {
-            bridge *b = bridge_create(cfg, sink, NULL);
+            bridge *b = bridge_create(cfg, sink, nullptr);
             bridge_artifact a = artifact("game:rows@0.1.0", builds[build]);
             double best = 1e30;
             a.cfg.fuel = metered ? 1000000000 : BRIDGE_NO_LIMIT;
@@ -133,10 +133,10 @@ int main(int argc, char **argv)
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[1] = {{ "wasm", BACKEND_PATH }};
     const char *phases[2] = { "update", "present" };
-    bridge_config cfg = { backends, 1, phases, 2, NULL, 0, 1, { 4096, 4096, 1 << 20, 8 } };
+    bridge_config cfg = { backends, 1, phases, 2, nullptr, 0, 1, { 4096, 4096, 1 << 20, 8 } };
     bridge_artifact a;
     bridge *b;
-    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stdout, nullptr, _IONBF, 0);
 
     if (!strcmp(what, "bench")) {
         bench(&cfg);
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
     if (!strcmp(what, "nobudget")) cfg.budget.columns = 0;
     if (!strcmp(what, "nocolumns")) cfg.budget.columns = (uint64_t)atoi(argc > 2 ? argv[2] : "0");
 
-    b = bridge_create(&cfg, sink, NULL);
+    b = bridge_create(&cfg, sink, nullptr);
     if (!b) {
         printf("bridge_create refused\nalive\n");
         return 0;

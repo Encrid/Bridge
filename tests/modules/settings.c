@@ -1,7 +1,6 @@
 /* A module whose settings are a component: one row, written by Bridge-ASM700 after init, which
  * a system reads back. docs/seam/host-api/config.md, *A module's own settings are a component*. */
 #include "bridge-wasm.h"
-#include <stdbool.h>
 
 ECS_ENUM(Mode, { Off, On, Adaptive });
 ECS_BITMASK(Flags, { Loud = 1, Wide = 2 });
@@ -20,7 +19,7 @@ ECS_STRUCT(Settings, {
 
 static uint32_t settings, showing;
 
-BRIDGE_EXPORT(show) int show(void)
+BRIDGE_EXPORT(show) int show()
 {
     char text[64];
     uint32_t span, at, len, i;
@@ -48,7 +47,7 @@ BRIDGE_EXPORT(show) int show(void)
     return 0;
 }
 
-BRIDGE_EXPORT(init) int init(void)
+BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }};
     BRIDGE_DECLARE(BRIDGE_ENUM, "game:Mode", Mode, BRIDGE_STRIP);
@@ -60,7 +59,7 @@ BRIDGE_EXPORT(init) int init(void)
 }
 
 /* over the row that is there: the same registration, or with DROP none of it */
-BRIDGE_EXPORT(reload) int reload(void)
+BRIDGE_EXPORT(reload) int reload()
 {
 #ifdef DROP
     return 0;
@@ -69,4 +68,4 @@ BRIDGE_EXPORT(reload) int reload(void)
 #endif
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown(void) { return 0; }
+BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }

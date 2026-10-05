@@ -14,7 +14,7 @@ static const bridge_api *api;
 
 BRIDGE_NATIVE_BIND(api)
 
-static int pin(void)
+static int pin()
 {
     bridge_native_log(api, 0, "pin", 3, thread_id(), 0);
     return 0;

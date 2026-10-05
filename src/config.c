@@ -99,7 +99,7 @@ static int seed_one(bridge *b, module *m, uint8_t *row, const ecs_member_t *memb
             /* by the name of a constant: the one thing a deployment can be expected to know */
             ecs_entity_t constant = s->v.s ? ecs_lookup_child(world, member->type, s->v.s) : 0;
             const int32_t *v = constant
-                ? ecs_get_id(world, constant, ecs_pair(EcsConstant, ecs_id(ecs_i32_t))) : NULL;
+                ? ecs_get_id(world, constant, ecs_pair(EcsConstant, ecs_id(ecs_i32_t))) : nullptr;
             if (!v) {
                 snprintf(why, len, "its setting '%.80s' is '%.60s', which the enum of the field "
                     "it names has no constant for", s->key, s->v.s ? s->v.s : "");
@@ -133,7 +133,7 @@ static int seed_one(bridge *b, module *m, uint8_t *row, const ecs_member_t *memb
 int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why, size_t len)
 {
     ecs_world_t *world = b->world;
-    component *c = NULL;
+    component *c = nullptr;
     const EcsStruct *layout;
     ecs_member_t *members;
     int32_t member_count, k;
@@ -151,7 +151,7 @@ int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why
     for (i = 0; i < m->declared_count; i ++) {
         if (!strcmp(m->declared[i]->name, cfg->config)) c = m->declared[i];
     }
-    layout = c ? ecs_get(world, c->id, EcsStruct) : NULL;
+    layout = c ? ecs_get(world, c->id, EcsStruct) : nullptr;
     if (!layout) {
         snprintf(why, len, "its config is '%.100s', which is not a struct its init declared",
             cfg->config);
