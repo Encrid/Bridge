@@ -1,5 +1,8 @@
 # Modules on the wasm backend
 
+What was weighed here and refused is `wasm-refused.md`, *What was refused: Modules on the wasm
+backend*.
+
 On the wasm backend a module is a core wasm binary with a `bridge:manifest` section. What it can *do* is
 `module.md`; this file is how a wasm module is written against it: the wasm backend's SDK.
 
@@ -67,20 +70,10 @@ exports by their common prefix, `acc_`, and with them the bodies nothing calls a
 
 Load does not check that it happened. Only a module can name one of its exports to the scheduler,
 through `system`, and every accessor takes a parameter, so the `() -> i32` check refuses each of
-them already - `signatures.md`, *Imports are declared, exports are checked*. Refused: refusing every
-export `init` did not register, which would refuse the `memory` and `__heap_base` a compiler emits
-unasked and make every toolchain strip to be loaded at all. The condition that brings it back is an
-export becoming callable by something other than its own module.
+them already - `signatures.md`, *Imports are declared, exports are checked*.
 
 The compiler sees those accessors as opaque calls until the merge, so it cannot vectorise across
 them. That is the cost, and the measurement in `PLAN.md` stage 3 is where it shows if it matters.
-
-Refused: a rewriter of our own doing the same substitution, which is Binaryen's job done twice. The
-condition that brings it back is Binaryen being unable to inline or strip something this needs.
-Refused: one memory per module with the shared and private blocks mapped into it, which makes a C
-pointer enough and costs the TLB aliasing `costs.md`, *What we give up*, already declines. The
-condition that brings it back is the opaque calls measurably costing the loop, or LLVM learning to
-address a second memory, which retires the accessor module altogether.
 
 ## Exports
 
@@ -122,14 +115,6 @@ synthesises it (`capabilities.md`, *Capabilities, so the swap is honest*). `hot_
 against `reloadable = false` is config contradicting config, and it is refused at load, by name -
 `failure.md`, *When something fails*.
 
-Refused: leaving `reload` out to say "cannot", which is what these documents first had. It is a
-statement made by an absence, and nothing can tell an export left out on purpose from one
-forgotten; `capabilities.md` already holds that the absence of a guarantee is written down by
-somebody rather than arrived at. Refused: a `reload` that answers "no" when asked, which says it
-only by being tried - and on a backend that cannot hold two instances the old one is shut down
-before the new one can answer. The condition that brings that back is no backend taking that
-order.
-
 ## Reaching a component
 
 Through its system's query. Bridge-ASM700 publishes the matched spans into the private memory at
@@ -153,20 +138,9 @@ member named `pad`, so that every offset is one the header states and asserts. I
 whoever writes the struct writes zero, and nobody reads it. There are three, in a term, in an
 observer's record and in a log record.
 
-Refused: calling them `reserved`, which is what they were called. That is the word for bytes kept
-for a later use, and none is planned. Refused with it: Bridge-ASM700 refusing a module that left
-something other than zero there, which is what an interface does when it means to give such bytes
-a meaning later to programs already built. Here a changed ABI layout is a changed `BRIDGE_ABI`, and
-a module built against another is refused whole. The condition that brings the check back is an
-ABI layout changed under the same number.
-
 **An enum has the width of where it goes.** One that is an argument of an entry is four bytes, as
-every argument that is not an id is: `kind`, `on_unload`, `events`. One that is a member of a
-struct is one byte, which holds every value these have: a term's access and operator, a log
-record's level. Refused: widening those to two bytes so that a term and a log record need no
-`pad`. An observer's record would keep its own, so the rule above would still be needed, and a
-value of 1 to 3 in sixteen bits is the same empty bits without a name. The condition that brings
-it back is that no struct is then left with a `pad`.
+every argument that is not an id is: `kind`, `on_unload`, `events`. One that is a member of a struct
+is one byte, which holds every value these have: a term's access and operator, a log record's level.
 
 **One header, `bridge-abi.h`, compiled by Bridge-ASM700 and by every module, on either backend.** Nothing
 re-derives anything, so there is nothing to disagree about - the same argument that made the schema

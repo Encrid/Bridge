@@ -1,5 +1,7 @@
 # Schema
 
+What was weighed here and refused is `schema-refused.md`, *What was refused: Schema*.
+
 ## There is no schema format
 
 The schema is a C header, written with three macros of a backend's SDK:
@@ -16,9 +18,8 @@ The module's compiler lays the struct out; the string is handed over at `declare
 `BRIDGE_SCHEMA_ENUM` and `BRIDGE_SCHEMA_BITMASK` do the same for the other two kinds.
 
 The shape is flecs' `ECS_STRUCT`, and until stage 10 so was the name. It is ours now because the
-name was a promise: a reader expected flecs behind it, and a native module that links flecs for
-its own use would have had the macro defined twice. Refused: `BRIDGE_STRUCT`, which is already the
-kind a `declare` states.
+name was a promise: a reader expected flecs behind it, and a native module that links flecs for its
+own use would have had the macro defined twice.
 
 **Bridge-ASM700 reads the string, and only the string.** `src/schema.c` lays the same struct out
 from its text, by the rule C states - each field at the next multiple of its alignment, the whole a
@@ -59,15 +60,14 @@ reading stopped at: `unsigned`, `const`, `*`, a second dimension, a name nothing
 `tests/schema.c` reads every accepted spelling against what the compiler lays the same struct out
 as, and has every other refused by its word.
 
-Refused: the wider grammar of the parser this replaced, which took `_Bool`, qualifiers, pointers
-and C++ spellings. No descriptor in the tree used one, and each is a second way to say something or
-a thing no column holds. The condition that brings one back is a module header that cannot be
-written without it.
-
-**A field whose type is another declared type names it bare, and it is found in the component's
-own namespace.** `Vec3 at;` in `game:Body` is `game:Vec3`, which a module declares first: a struct,
-an enum or a bitmask, each by its own macro and each with its type kind stated at `declare`. A type that
-was not declared there is refused at the declaration that uses it, by its name.
+**A field whose type is another declared type names it bare, and it is found in the component's own
+namespace.** `Vec3 at;` in `game:Body` is `game:Vec3`, which a module declares first: a struct, an
+enum or a bitmask, each by its own macro and each with its type kind stated at `declare`. A type
+that was not declared there is refused at the declaration that uses it, by its name. A module that
+wants another namespace's struct in a component of its own declares one of its own with the same
+body. That copy does not drift: a mod that reads the game's components includes the game's schema
+header, and declares its own type from the descriptor that header already holds, so the two are one
+text with one fingerprint. What it costs is one more of `[budget] types`.
 
 **An enum and a bitmask are the integer their author states.** `BRIDGE_SCHEMA_ENUM(Mode, int8_t,
 { Off, On, Adaptive })`: the type is the width a row gives the field, it is what the module's
@@ -77,22 +77,9 @@ Bridge-ASM700 reads it. An enum is any of `int8_t` to `uint32_t`; a bitmask is u
 setting given by number is held to the same range. `tests/schema.c` has each width and each
 refusal.
 
-It is stated because nothing here is taken by default, and because it is paid a row: a state
-of three values in four bytes is three bytes of every row of `[budget] columns` and of every
-pass over the column. Refused: four bytes always, which is what this was, for the reason that
-the macros said four. They said four because C does, and nobody had chosen it. The condition
-that brings one width back is that width being worth more than the bytes. Refused: the smallest
-integer that holds the constants, found by Bridge-ASM700. A module's compiler lays the field out
-from the type it is given, and cannot be given one that is worked out later; and a constant
-added would move every field after it. No condition brings it back.
-
-Refused: reaching across namespaces for a field's type, which
-would need the descriptor to carry a namespace C has no syntax for. The condition that brings it
-back is a mod that must embed one of the game's structs in its own component and finds the copy
-a burden; until then it declares a struct of its own with the same body. That copy does not
-drift: a mod that reads the game's components includes the game's schema header, and declares
-its own type from the descriptor that header already holds, so the two are one text with one
-fingerprint. What it costs is one more of `[budget] types`.
+It is stated because nothing here is taken by default, and because it is paid a row: a state of
+three values in four bytes is three bytes of every row of `[budget] columns` and of every pass over
+the column.
 
 **The fingerprint of a component covers its own body, not the bodies of the types it names.** Those
 are declared, so each has a fingerprint of its own, checked where it is declared: a module built

@@ -1,5 +1,8 @@
 # Modules on the native backend
 
+What was weighed here and refused is `native-refused.md`, *What was refused: Modules on the native
+backend*.
+
 A native module is a **module** like any other - same ABI, same rules, three guarantees fewer,
 `module.md`. What it can *do* is there; this file is how a shared library is written against it: the
 native backend's SDK.
@@ -78,12 +81,6 @@ call a function, and every function **Bridge-ASM700** calls takes no arguments a
 status - `signatures.md`, *A call takes nothing and answers a status*. What a backend passes to
 what it runs is the backend's SDK.
 
-Refused: one export, `bridge_bind`, that is handed the table once and keeps it in a variable of the
-module's, which is what this was. It left every module a global to declare and the backend a
-second way to know who was calling. It had been preferred over an argument to `init` on the
-ground that Bridge-ASM700 would then need a native case, which it would not: the call is the
-backend's. The condition that brings it back is a module that cannot take an argument.
-
 **Exports are named `bridge_<name>`.** Bridge-ASM700 asks the backend for `init`, or for a system called
 `movement`, and the native backend looks up `bridge_init` and `bridge_movement`. A C process has one
 flat symbol namespace, so `init` is not a name a library can safely export; the prefix is the
@@ -133,11 +130,6 @@ instance, so `api->spawn(api)` says which module is asking, and nothing is found
 happens to be running. *The invariant* is then checked and not implied: the backend notes the
 thread it calls a module on, and an entry reached on any other thread, or outside a call, answers
 zero. `tests/stage5.c`, case `foreign`, reaches one from a thread the module started.
-
-Refused: no argument, and a thread-local variable in the backend to say who is running, which is
-what this was. It read like a wasm module's calls, and that was the reason given: "a second ABI
-for one backend". It is not an ABI of Bridge-ASM700's at all, only this backend's SDK. The
-condition that brings it back is native modules that must be source-compatible with wasm ones.
 
 **A refused entry answers zero, and so does every entry after it until the call returns.** Nothing
 can unwind native code - `budgets.md`, *What running out does* - so the backend does the nearest

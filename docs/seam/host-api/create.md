@@ -1,5 +1,7 @@
 # Create
 
+What was weighed here and refused is `create-refused.md`, *What was refused: Create*.
+
 `bridge_create` is `Com_Init` minus the filesystem: take the config, open the backends it names,
 size the shared block, and build the phase table. It loads no module - the host does that.
 
@@ -33,12 +35,6 @@ from another thread with a pinned module loaded, `bridge_destroy` answers non-ze
 naming the module, and has torn nothing down: the bridge is whole, to be destroyed from the thread
 that can. It is the refusal `bridge_phase` makes, made before anything is touched.
 
-Refused: skipping that one `shutdown` and saying so, which always finishes and leaves a device
-unreleased by the only code that knew how. Refused: calling it anyway, which breaks the one promise
-`pinned` makes at the moment a device is being torn down. What this costs is a destroy that can
-fail, so a host that ignores the answer leaks the bridge; the condition that brings the first
-refusal back is hosts that cannot get back to the right thread at exit.
-
 **A backend's library is closed only if the backend says it can be** - `capabilities.md`,
 *Capabilities, so the swap is honest*. The wasm backend does not: it brought wasmtime into the
 process, which keeps threads of its own and a handler registered with the operating system, and
@@ -47,10 +43,6 @@ offers no call that stops either. Taken out from under them and loaded again by 
 and only on a busy machine. So its library stays for the life of the process, and the next bridge
 finds it there. A native module's library is another matter: it is closed at unload and at
 reload, which is what reload is.
-
-Refused: never closing any backend's library, which is one rule and makes a statement on behalf
-of backends that could have made their own. Refused: the wasm backend pinning wasmtime itself,
-which is operating-system code on three platforms for the same result.
 
 ## The sink
 

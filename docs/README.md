@@ -23,6 +23,10 @@ diagram to keep in step with. One concern per document, in reading order:
     DESIGN.md            why, and what the design is
     PLAN.md              the eighteen stages, each with a done-when that can fail
 
+    refused/             what was weighed and not chosen, in the same tree as what was:
+                         `refused/bridge/data/lifetime-refused.md` is the record of
+                         `bridge/data/lifetime.md`
+
     design/
         no-builtins.md       the rule, and its universality test
         split.md             which side owns what
@@ -85,6 +89,14 @@ diagram to keep in step with. One concern per document, in reading order:
 
     backends/native/         the native backend, and how a module is written for it
         native.md            a native module: the table of entries, the invariant
+
+**A document says what the design is, and its record says what it is not.** What was weighed
+and refused, with why and with the condition that would bring it back, is in `refused/`, in a
+file of the same name with `-refused` after it, under the same headings. A document names its
+record once, at its head; a record names the section each of its entries belongs to, and the
+citation check reads both, so a section renamed leaves no entry behind without saying so. It is
+two files and not one because they are two concerns: a reader who wants to know what happens
+reads the first, and one who wants to know why not otherwise reads the second.
 
 The seams are host to Bridge-ASM700, Bridge-ASM700 to a backend, and Bridge-ASM700 to modules. The
 first two have a directory of their own under `seam/`: a separate build target sits on the far side,

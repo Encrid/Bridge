@@ -1,0 +1,31 @@
+# What was refused: Schema
+
+The record of `schema.md`: `README.md`, *Three layers, three seams*.
+
+## There is no schema format
+
+Of `schema.md`, *There is no schema format*.
+
+Refused: `BRIDGE_STRUCT`, which is already the kind a `declare` states. No condition brings it back.
+
+## The type set
+
+Of `schema.md`, *The type set*.
+
+Refused: the wider grammar of the parser this replaced, which took `_Bool`, qualifiers, pointers and
+C++ spellings. No descriptor in the tree used one, and each is a second way to say something or a
+thing no column holds. The condition that brings one back is a module header that cannot be written
+without it.
+
+Refused: four bytes always, which is what this was, for the reason that the macros said four. They
+said four because C does, and nobody had chosen it. The condition that brings one width back is that
+width being worth more than the bytes.
+
+Refused: the smallest integer that holds the constants, found by Bridge-ASM700. A module's compiler
+lays the field out from the type it is given, and cannot be given one that is worked out later; and
+a constant added would move every field after it. No condition brings it back.
+
+Refused: reaching across namespaces for a field's type, which would need the descriptor to carry a
+namespace C has no syntax for. The condition that brings it back is a mod that must embed one of the
+game's structs in its own component and finds the copy a burden; until then it declares a struct of
+its own with the same body.

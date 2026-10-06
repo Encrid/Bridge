@@ -1,5 +1,7 @@
 # The ABI
 
+What was weighed here and refused is `abi-refused.md`, *What was refused: The ABI*.
+
 At init, which runs each time a module is loaded - `lifecycle.md`, *The runtime lifecycle*. All
 three may take names, because registration is not a hot path.
 
@@ -44,14 +46,6 @@ the barrier, since it is read there: `log.md`, *The log*. `tests/stage3.c`, case
 
 What the second copy costs was measured, since it was called a cost on the native backend: an
 attach with a value of four bytes put through scratch took 19.9 ns against 19.6 to 20.0 without.
-
-Refused: a pointer type the backend translates, which would have the backend reading a module's own
-memory and pairing each pointer with its length. The condition that brings it back is a value too
-large for a scratch arena. Refused: a real pointer on the native backend alone, which is one copy
-fewer there and two meanings of an entry. Refused: `attach` answering a place to write, with the
-queue in the module's private memory, which is one copy fewer everywhere and the queue, its
-checks and its budget made again. The condition that brings either back is the second copy of a
-large value measured as a cost that matters.
 
 **`attach` carries the initial value.** `ptr` and `len` say where it is, and Bridge-ASM700 takes a
 copy of the bytes at the call, bounds-checking them the way it checks a log record's text. Zero
@@ -109,10 +103,7 @@ nothing was removed or destroyed, which is how `ON_LEAVE` of a destroyed entity 
 Ids and not a span, because an observer runs after the barrier has restructured and republished -
 `schedule.md`, *An observer runs at the barrier, one hop per barrier*. What an observer is owed is
 worked out before rows are placed - `storage.md`, *A barrier is worked an entity at a time* - so a
-row would be one the entity is no longer in. An id does not move. Refused: the observer's whole
-query as spans, which is what a system gets and cannot say which entity changed - an event would be
-found by scanning every event. The condition that brings it back is an observer that wants the shape
-and not the change, and such a thing is a system.
+row would be one the entity is no longer in. An id does not move.
 
 **Why it is an entry of its own, and not a system people write.** A system whose query matches a
 signal's component does the same job by polling, and that is the alternative it has to beat: a poll
@@ -137,13 +128,6 @@ it wins whatever ran before or after it, and what it may be asked of is `grants.
 module may destroy*. `init`, `shutdown` and `reload` state nothing either: a
 lifecycle call runs alone. What the list is for is `schedule.md`, *Order within a phase is never
 implicit*.
-
-Refused: a fourth operator on a term, meaning "not matched, and changed by this system", which
-takes no new argument. It gives "term" two meanings, and each such term would hold four unused
-bytes in every span. The condition that brings it back is entries that can take no more
-arguments. Refused: a flag at `declare`, for the whole module. Every system of the module would
-then conflict over the component, and pairs be refused that change nothing. The condition that
-brings it back is modules of one system each.
 
 A system declares its phase and **nothing about order**, and never names another module's system.
 So no independently shipped module depends on another's internals, and no ordering cycle can span

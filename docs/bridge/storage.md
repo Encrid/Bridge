@@ -1,5 +1,7 @@
 # Storage
 
+What was weighed here and refused is `storage-refused.md`, *What was refused: Storage*.
+
 Who keeps the rows, and how. The model a module sees is `data.md`; what it reads is `query.md` and
 `reference.md`; which block each thing is in is `memory.md`.
 
@@ -53,12 +55,6 @@ there first, and the other lasts until its rows have left.
 block and id, at the barrier its last one leaves. Table ids are dense, from 1; 0 is no table, which
 is where an entity with nothing on it is. A released id is used again by the next table made.
 
-Refused: keeping an emptied table for the next entity of that set, as flecs does. It would save
-making the table again, and it costs what makes the count unbounded: every set ever seen stays,
-and a quiet barrier pays for all of them. `STAGE10.md`, *What it costs*, measures the case this
-could lose - ten thousand sets filled at one barrier and emptied at the next - and it does not.
-The condition that brings it back is a workload where that line does lose.
-
 ## A barrier is worked an entity at a time
 
 The queues are read in their stated order - module by module as they loaded, and within one as it
@@ -81,10 +77,6 @@ asked - and nothing in that order is changed. What is changed is what the order 
 An entity given five components in one barrier is placed once, in the table of all five, and the
 four tables between never exist. Applied a change at a time it moves five times and leaves four
 tables behind it.
-
-Refused: applying each change as it is read, which is what a storage that may be called at any
-time must do. Changes reach storage only at a barrier; outside one it is asked for two things, a
-module's settings row at load and its components at unload.
 
 ## What a barrier writes for a module
 
@@ -165,7 +157,4 @@ library that checks a load - `schema.md`, *There is no schema format*.
 are: declare a type of a size, hand over a system's terms or an observer's, apply every queue,
 set ids aside, write what a module reads, drop a component by its policy. Nothing there says how.
 
-It is internal: one implementation, and no host or backend sees it. Refused: making storage
-swappable as a backend is. A backend abstracts a behaviour, and storage would have to abstract a
-memory layout - a span's `base[]` *are* offsets into its columns - so a second implementation
-would be shaped by the first.
+It is internal: one implementation, and no host or backend sees it.

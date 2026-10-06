@@ -1,5 +1,7 @@
 # The log
 
+What was weighed here and refused is `log-refused.md`, *What was refused: The log*.
+
 The log is Bridge-ASM700's, not a module's, and it passes the test in `no-builtins.md`, *No builtins*:
 anything can fail, so every deployment needs it, and a failure nobody can report is worse than a
 missing feature.
@@ -21,12 +23,9 @@ in the original Bridge. Bridge-ASM700 drains every ring at each barrier.
 here is an ABI layout* - so the shape above is the module seam's alone and its stride is free to
 change.
 
-**Two numbers, and no more.** One lets a line say "something is N" with no text formatted in
-the module; the second lets it say what N is set beside - what was wanted, which one, out of how
-many - which is what most lines in the tests do. Refused: one, which is four bytes a record
-fewer and sends the second number into text a module would have to build. The condition that
-brings it back is records measured as what logging costs. Refused: three, which is a record of
-28 bytes for what text can already carry.
+**Two numbers, and no more.** One lets a line say "something is N" with no text formatted in the
+module; the second lets it say what N is set beside - what was wanted, which one, out of how many -
+which is what most lines in the tests do.
 
 Fixed stride, so the ring is an array: head and tail are counters, record `i` is `base + i*24`, and
 the number dropped is a subtraction. Variable-length records would need scanning, which is why
@@ -61,11 +60,6 @@ detail. Four are named, in `bridge.h` for a host and in `bridge-abi.h` for a mod
 A module may write any of the eight, and a module's `log_level` is one of them: a number past 7 is
 refused at load. Filtering is at the writer, which begins `if (level > threshold) return` against
 a threshold in the private-memory header, so a line that is switched off costs a load and a branch.
-
-Refused: a signed scale with warn at -2 and err at -3, which is what this was. Those were flecs'
-numbers, taken when its output shared the sink, and nothing was at -1 for no reason anyone here
-could give. Refused: the same scale with the hole closed. The condition that brings a scale of
-our own back is a need for more than eight levels.
 
 **Drop and count, never block.** A log may lose lines, and that is exactly what separates it from a
 signal: a signal is an entity, so the entity ceiling governs it and running out is a failure where it

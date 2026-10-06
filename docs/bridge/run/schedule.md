@@ -1,5 +1,7 @@
 # The schedule
 
+What was weighed here and refused is `schedule-refused.md`, *What was refused: The schedule*.
+
 What Bridge-ASM700 does between a module's systems and observers: when they run, and what is visible
 while they do. What bounds a run is `limits.md`; what happens when one fails is `failure.md`; which
 systems run at once is `threads.md`. The data they run over is `data.md`; what a module can ask
@@ -48,11 +50,7 @@ phase the deployment did not declare, refuses the load, by the name. `tests/stag
 `phaseunmapped`, `phasemapped` and `phasebadmap`, are one module that says `tick`.
 
 It is the deployment that resolves it, as it resolves an order between two systems and a grant
-between two namespaces: the only party that has seen both sides. Refused: nothing, which is what
-this had, so that a module fitted only a deployment that spoke its words. The condition that
-brings it back is none. Refused: names shipped by the library, for the reason this section
-opens with. Whether deployments come to share a list of names is still stage 17's question; the
-table is what makes the answer not matter to whether a module can be used.
+between two namespaces: the only party that has seen both sides.
 
 **flecs does ship eight, and where it ships them is the point.** `EcsOnLoad` through `EcsOnStore`
 are bootstrapped by the **pipeline addon** (`src/addons/pipeline/pipeline.c:968`), not by the core,
@@ -152,17 +150,7 @@ system of the phase has read what was there before it.
 **Every attach and every detach is stated, with no exception.** So two modules that send the same
 signal in one phase - each attaching the same component to entities only it holds - are refused
 until the deployment orders them, though they could not have collided. That is the price of one
-rule. Refused: leaving out an entity the module spawned since the last barrier, which no other
-module can reach. It costs four bytes an entity to know who spawned what, and makes the rule
-two. The condition that brings it back is deployments ordering emitters that have no reason to
-be ordered, often enough to be named a burden.
-
-Refused: the order the modules were loaded in, which is what a barrier used. It contradicted the
-paragraph above, and made what one module left on an entity depend on which the host loaded
-first. No condition brings it back. Refused: finding the collision at the barrier, by noting who
-changed each component of each entity. It costs every barrier a note for every change, and is
-found only when the data collides. The condition that brings it back is stating proving too
-coarse. Refused: another fixed order, by a module's name, which is as arbitrary as the first.
+rule.
 
 There is no moment called start to refuse at, since the host loads modules one at a time -
 `lifecycle.md`, *The runtime lifecycle*. Conflicts are already computed for
@@ -179,21 +167,16 @@ one that chose to deploy them. Either move one into a new phase, or state the pa
 **A system is named by its module and then itself**: the module's identity without its version, and
 the name it registered. Two modules may both have a `movement`, so the system's own name is not
 enough; and the version is left out so that upgrading a module does not edit every deployment that
-orders it. Refused: namespace and system alone, which reads like a component's name and forbids two
-modules of one namespace from sharing a system name. The condition that brings it back is
-namespaces proving to be one module each. It follows that two modules differing only in version
-cannot be loaded together, since nothing could tell their systems apart.
+orders it. It follows that two modules differing only in version cannot be loaded together, since
+nothing could tell their systems apart.
 
 The cost: a deployment combining two conflicting modules has work to do. That work was previously
 done by luck, so making it explicit is the point rather than a regression.
 
 **A module orders its own systems by registering them.** The refusal above exists because two
-parties who never met cannot have agreed on an order. Two conflicting systems of one module have
-one author, who wrote both registrations in some order and meant it - so that order stands, with
-nothing for a deployment to state. `[order]` may still say otherwise, since it can name any system.
-Refused: refusing those pairs as well, which would have a deployment ordering the inside of a
-module it did not write. The condition that brings it back is a module whose registration order
-turns out to be an accident.
+parties who never met cannot have agreed on an order. Two conflicting systems of one module have one
+author, who wrote both registrations in some order and meant it - so that order stands, with nothing
+for a deployment to state. `[order]` may still say otherwise, since it can name any system.
 
 An `[order]` pair is not required to name anything loaded: a deployment orders modules it may or
 may not load. Pairs that contradict each other are refused at create, and a module whose own order
@@ -249,8 +232,3 @@ split*. It may not drop a record, which is why it is not the log's path - `log.m
 
 What is Bridge-ASM700's is what makes a recording mean anything: the rule above, the case that
 holds it, and the checksums a played-back run is judged by.
-
-Refused: two calls at the host seam, to be handed what native modules wrote and to supply it in
-their place, which is what this said for a day. A host has no such call and needs none. The
-condition that brings one in is a recorder built as a module finding something a module cannot
-reach.

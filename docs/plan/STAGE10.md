@@ -664,7 +664,12 @@ middle of a paragraph in `config.md`.
 
 **4. Refusals with no condition**: each with its subject above, and the rest in one pass.
 
-    open    about twenty, in thirteen documents
+    closed  about twenty, in thirteen documents: forty-four, counted. Each has its condition
+            now, or says that none brings it back, shown before it was written. Two were
+            withdrawn, which a later decision had overtaken and contradicted
+    closed  and every refusal left the design documents for a record beside them, in
+            `refused/`, laid out as they are: a document says what the design is, and its
+            record what it is not. `README.md`
 
 **5. Found while building**
 

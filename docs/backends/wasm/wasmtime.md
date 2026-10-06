@@ -1,5 +1,7 @@
 # The wasm backend
 
+What was weighed here and refused is `wasmtime-refused.md`, *What was refused: The wasm backend*.
+
 The backend that runs a core wasm module in a sandbox, over wasmtime. What a backend is asked for is
 `backend.md`; how a module is written for this one is `wasm.md`. This document is what is particular to
 wasmtime and would be different under another engine.
@@ -79,10 +81,6 @@ An increment reaches every store of the engine, and a store with no deadline set
 every other call on that engine runs under a deadline too far away to be reached. That is this
 backend's business and invisible at the surface: a system still has no deadline as far as
 Bridge-ASM700 is concerned.
-
-Refused: a thread incrementing every tick period, which is wasmtime's usual pattern. It needs a
-period somebody must choose, wakes forever with nothing armed, and rounds every timeout to a tick.
-The condition that brings it back is several deadlines running at once.
 
 ## One engine per demand
 

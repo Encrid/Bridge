@@ -1,5 +1,7 @@
 # Variable length
 
+What was weighed here and refused is `strings-refused.md`, *What was refused: Variable length*.
+
 A component cannot hold a `string` or a `list`: a column is an array at a fixed stride. So the bytes
 live in an arena and the component holds `(offset, length)`, which is fixed size and therefore an
 ordinary field.
@@ -101,19 +103,6 @@ one this holds, and that one is what the record is there to show.
 could not, once: the arena was a high-water mark for the life of the process, and unbounded churn
 meant restarting. That was decided before a module's share was its own and before text was a type
 the library could see, and it was not read again when both became true.
-
-Refused: giving the share back always, and setting every text that pointed into it to empty.
-It is one rule with no condition, and it has the library write into rows of a component the
-leaving module did not own, where another module then reads nothing. The condition that brings
-it back is a string that must never outlive the module that allocated it. Refused: keeping a
-share without saying so, which is what this did.
-
-Refused: never giving anything back, which was the rule. The condition that brings it back is the
-reading at unload proving too slow for a deployment that unloads often. Refused: `mark` and
-`reset` in the ABI. The condition is a module that must free strings in mid-life and can show
-nobody else holds them. Refused: giving back each string a row no longer holds, and not only whole
-shares, which is a general allocator inside the arena. The condition is shares kept for one
-surviving string being seen to pile up.
 
 The discipline while a module runs is still idTech3's: allocation for a lifetime, with no
 per-object bookkeeping. The lifetime is the module's, where theirs was a level's.

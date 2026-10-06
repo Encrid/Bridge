@@ -1,5 +1,7 @@
 # The data model
 
+What was weighed here and refused is `data-refused.md`, *What was refused: The data model*.
+
 What a component is and when the world changes. How a module reaches one is `query.md` and
 `reference.md`; what survives a reload is `lifetime.md`. Where the bytes live is `memory.md`; who
 keeps the rows, and how, is `storage.md`.
@@ -32,11 +34,6 @@ following*.
 Query terms carry it, and it is one of two: **read** or **write**. It is a **scheduling input and
 nothing else** - Bridge-ASM700 uses it to know which modules may run at once, and storage is never
 told.
-
-Refused: three, `in`, `out` and `inout`, which is what flecs has and what this had. flecs tells a
-write that reads from one that does not because it tracks what was read; nothing here does, and
-the scheduler asked one thing of the three, whether the term is written. The condition that brings
-a third back is something that treats a term written and never read differently.
 
 It is not enforced, which is how every ECS works. A module that writes a term it declared read is
 a bug in that module, no different from one writing nonsense into a term it owns. The second is
@@ -107,24 +104,6 @@ to an id that is dead, is nothing. `tests/storage.c`, case `changes`, says each 
 
 **Every event is about something the observer can read**, which is what running after the
 republish is for - `schedule.md`, *An observer runs at the barrier, one hop per barrier*.
-
-Refused: the names other ECS use, `ON_ADD`, `ON_SET` and `ON_REMOVE`, which is what these were
-called. In flecs each is a fact about one component: it was added, `ecs_set` was called, it was
-removed. Here each is a fact about an observer's terms, so an "add" could arrive at a detach, and
-a "set" never arrived for a value written in place. The condition that brings the names back is
-events that are raised for each component, as flecs raises them.
-
-Refused: two events, enter and leave, and no third. A module could then announce a new value only
-by a detach and an attach across two barriers. The condition that brings it back is that no module
-asks for `ON_ATTACH`.
-
-Refused: an event for every change as it was asked, which is what this did while flecs kept the
-rows and what storage of our own first copied. It told an observer of all three events
-at once, for an entity it could not then find, and it cost a second reading of every queue. It
-was never flecs' design either: when flecs folds an entity's queued commands itself it commits
-once, with the difference (`flecs.c:6262`), and what we had was the way we drove it, a call for
-each change. The condition that brings it back is a module that must hear of a change that left
-nothing behind, and cannot say it with an entity that carries the event.
 
 **This is how a signal crosses.** A native module with something to tell spawns an entity that
 carries a component for it; the change applies at the barrier and the subscriber's observer runs

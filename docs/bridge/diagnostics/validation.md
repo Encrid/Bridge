@@ -1,5 +1,8 @@
 # What a bad write costs, and what finds it
 
+What was weighed here and refused is `validation-refused.md`, *What was refused: What a bad write
+costs, and what finds it*.
+
 A diagnostic says what occurred. None of it is a second way to read the design, and state is
 pulled: `introspection.md`, *Introspection*. The log is `log.md`; the counters are `profile.md`.
 
@@ -51,14 +54,6 @@ system can have, one float read, changed and written back per row of 200,000:
 Under a work limit it costs more than itself, because the branch it adds is a block and the wasm
 backend counts work by the block - `limits.md`, *What a bound costs*. `tests/stage3.c`'s `bench`
 case is the measurement: one module, built both ways.
-
-Refused: the test always, which is what this was, "at that price". The price is a sixth to a
-third of the loop this design exists to keep fast, paid by every wasm module, to catch a mistake
-that only its author can make and only its author can weigh. The condition that brings it back
-is the test costing nothing, as it would if a compiler hoisted it. Refused: a second family of
-accessors that tests once a span, beside the first: two to keep equal, alike to read and
-different in what they catch. The condition that brings it back is one module that needs both
-in one build.
 
 **The entity index needs no check of its own.** It did while flecs kept the rows: flecs moved a
 row and Bridge-ASM700 had to be told, by a patch whose failure would have been silent, so every

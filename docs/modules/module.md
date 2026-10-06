@@ -1,5 +1,7 @@
 # The module model
 
+What was weighed here and refused is `module-refused.md`, *What was refused: The module model*.
+
 A **module** is code Bridge-ASM700 runs through a backend. There is one model, whatever the backend, and
 Bridge-ASM700 has no opinion about which backend you build for - choosing is the deployment's, because the
 trade is about guarantees rather than about where code belongs.
@@ -39,11 +41,8 @@ how long its init takes. Any per-module key of `config.md`, *The keys*, may be s
 those values; combining them with a deployment's
 own is the host's business, and Bridge-ASM700 sees one flat struct either way.
 
-It is the shape of a Linux kernel module's `.modinfo`, for the reason `native.md`, *Identity*, gives:
-the values have to be readable before any of the code runs. Refused: carrying the identity alone and
-leaving the rest to each host, which would give `pinned` - a key a deployment cannot guess, and whose
-wrong value is a race - no carrier anybody agreed on. The condition that brings it back is hosts that
-ignore the section in favour of a sidecar.
+It is the shape of a Linux kernel module's `.modinfo`, for the reason `native.md`, *Identity*,
+gives: the values have to be readable before any of the code runs.
 
 ## What no module may do
 

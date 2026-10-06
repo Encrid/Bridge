@@ -1,5 +1,7 @@
 # Config
 
+What was weighed here and refused is `config-refused.md`, *What was refused: Config*.
+
 Bridge-ASM700 reads no file. A host hands it values as structs - `host-api.md`, *The data* - and
 where those values came from is the host's business: a file, a database, compiled-in constants. This
 document is what Bridge-ASM700 requires of them.
@@ -27,22 +29,11 @@ reservation stated as none is `BRIDGE_NONE`, -2: `spawns`, `persistent`, `change
 module with no limit may use all there is; one with no reservation gets nothing. Each key takes
 its own, and the other, like any other negative number, is refused at load by the key's name.
 
-Refused: one value for both, which is what this had, under two names. `spawns` given the name of
-"no limit" compiled and meant "none", and every negative number was taken for -1. The condition
-that brings one value back is a key that takes both senses.
-
 **A key that is yes or no is stated as either, and left alone it is refused.** It is not a
 boolean, which has no third state to be found in: it is `enum bridge_flag`, `BRIDGE_TRUE` or
 `BRIDGE_FALSE`, and its zero is `BRIDGE_UNSET`, the one place the unset state has a name, since
 here it sits beside the two answers. The keys are `trusted`, `reloadable`, `hot_reload` and
 `pinned`, and `validate` and `profile` when they exist. `tests/stage2.c`, case `unsetflag`.
-
-Refused: a boolean, left alone meaning false, which is what these were, on the ground that
-false was "the off or the safe side for all six". It is not for `pinned`: a module that needs
-the thread that loaded it, and was not said to, runs on any. And it was the one kind of key that
-meant something when nobody had stated it, against the paragraph above. No condition brings it
-back. Refused: an enum for each key, eight names for four answers. The condition that brings it
-back is a key that gains a third answer.
 
 What that protects against is not a missing key but a value nobody can account for. A host may layer
 its sources however it likes - a module author's stated values under a deployment's, say - as long
@@ -92,15 +83,11 @@ name, where the original Bridge silently ignores a typo.
 
 **Which component is the author's to say**, as `config`, a key of the manifest like `pinned`: only
 the author knows which of a module's structs holds its settings, which is the reason a Linux module
-marks its own parameters. A module with no settings component says that too: `config = none`,
-which no component is called, since every component's name has a namespace. Left out, `config` is
-unset and refused like any other key, so that an author who forgot it is told rather than taken to
-have meant none. Settings handed to a module that stated none, or a `config` that `init` never
-declared, are refused by name. Refused: a component named by convention, which is a name
-Bridge-ASM700 would be inventing - `no-builtins.md`, *No builtins*. Refused: marking it at
-`declare`, which would have `kind` say two things. Refused: keys that name their component, so that
-any could be seeded - more than seeding is for, since a module can fill any row itself in `init`.
-The condition that brings that back is a module with two settings structs that do not belong in one.
+marks its own parameters. A module with no settings component says that too: `config = none`, which
+no component is called, since every component's name has a namespace. Left out, `config` is unset
+and refused like any other key, so that an author who forgot it is told rather than taken to have
+meant none. Settings handed to a module that stated none, or a `config` that `init` never declared,
+are refused by name.
 
 **The row is on an entity of Bridge-ASM700's own**, spawned for it and destroyed with the module. The
 module finds it the way it finds anything: a query on the component, one span, one row. It counts
@@ -117,8 +104,7 @@ field it fits, a float into a float. Text has three places to go, and the field'
 
 That is `strings.md`'s own split, bounded text in the column and unbounded text in the arena, left
 to the author to choose by declaring the field. Anything else - text into a float, a number too
-large for its field, a name the enum lacks - is refused naming the key. Refused: taking any struct
-of two integers for text, which would write an offset into somebody's width and height.
+large for its field, a name the enum lacks - is refused naming the key.
 
 **After init the component is the live state.** Changing `vsync` while running is a component write
 by whoever holds the grant - not a call, not a reload, not a call to reconfigure. Config is the initial

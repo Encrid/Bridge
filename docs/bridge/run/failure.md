@@ -1,5 +1,7 @@
 # When something fails
 
+What was weighed here and refused is `failure-refused.md`, *What was refused: When something fails*.
+
 `result` is an i32. Zero for success; anything else is failure, and which value it was is not
 read. Any detail is written to the log - see `log.md`, *The log*.
 
@@ -29,25 +31,16 @@ not take the deployment down" needs.
 **`fail` stops the bridge, since Bridge-ASM700 cannot stop the program.** The host owns the process,
 so the most the library can do is refuse to go on: after a `fail` module fails, every `bridge_phase`
 is refused, and every load, unload and reload but one. `skip` refuses that one load and carries on.
-Refused: answering a return code and nothing else, which would let a host that ignores it run a
-deployment without the module its config called essential.
 
-**A stopped bridge accepts two things, both about the module that stopped it.** One brings it
-back: a load of it, if it never loaded, or a reload of it. If that succeeds the bridge runs
-again, and says so. The reason for stopping was running without the module, and with the module
-back there is nothing left of it. The other gives it up: an unload of it, by its name. That is
-the host saying the deployment goes on without it, which only the host can say; its components
-go by the policies they were declared with, as at any unload, and the bridge runs again. After
-it the host may load anything, a module of another name in its place among them.
-`tests/stage6.c`, case `failgiveup`. A module that never loaded has nothing to unload, and for
-it the ways on are a load that succeeds, or `bridge_destroy`.
-Refused: stopped until `bridge_destroy`, which is what this first said - the original Bridge's
-`fail` ends its process, which it owns; ours would have ended every module's storage to mend one
-module, and made reload useless for exactly the modules a deployment calls essential. Refused:
-accepting the unload of any other module, which has no job once `bridge_destroy` shuts every
-module down. The condition that brings it back is a host that must take several modules out
-before it can run again. Refused: accepting no unload at all, which is what this had: to go on
-without one module, or to put one of another name in its place, cost every module its storage.
+**A stopped bridge accepts two things, both about the module that stopped it.** One brings it back:
+a load of it, if it never loaded, or a reload of it. If that succeeds the bridge runs again, and
+says so. The reason for stopping was running without the module, and with the module back there is
+nothing left of it. The other gives it up: an unload of it, by its name. That is the host saying the
+deployment goes on without it, which only the host can say; its components go by the policies they
+were declared with, as at any unload, and the bridge runs again. After it the host may load
+anything, a module of another name in its place among them. `tests/stage6.c`, case `failgiveup`. A
+module that never loaded has nothing to unload, and for it the ways on are a load that succeeds, or
+`bridge_destroy`.
 
 Storage running out does not stop a bridge. A barrier that cannot place an entity, for want of a
 table or of columns, leaves it as it was and counts as a barrier the module that asked failed in,
@@ -58,12 +51,6 @@ stops the bridge too, because the reason does not change with the frame number: 
 called it essential, and nothing else here would notice it gone - no module calls another, so none
 gets an error back. The key is `on_error`, and a reader who wrote `fail` expects it to mean every
 error that takes the module away. `bridge_modules` says which module it was.
-
-Refused: `on_error` as a key about loading only, which is what the original Bridge has and could
-afford: it owns its process, and a crashed module there fails the calls made to it. The condition
-that brings it back is a host that must keep presenting while an essential module is down. Refused:
-a second key for being lost later, which answers the same question twice. The condition that brings
-it back is a module that must load and need not stay.
 
 ## The budget
 
@@ -89,18 +76,6 @@ run, *"not one that has a bad day twice a year"*. One count that falls as slowly
 that with a single number, and stops any system that fails more often than not.
 
 `-1`, `BRIDGE_NO_LIMIT`, means never stop it, as for every limit.
-
-Refused: one count for a module, raised by a barrier in which anything of its failed and
-lowered by one in which it ran clean, which is what this was. There is a barrier after every
-phase, so a module with a system that always failed in one phase and a system that ran clean in
-the next went up one and down one for ever, and was never stopped: the fault the next refusal
-names. `tests/stage6.c`, case `notmasked`, is that module. No condition brings it back.
-
-Refused: a count that one clean barrier resets, which is easier to say and never stops a module
-failing every other pass. The condition that brings it back is deployments finding this one hard to
-reason about. Refused: a total since load, which stops a module for failures it recovered from.
-Refused: a count within a window, which is two keys. The condition that brings it back is a
-deployment that needs a burst and a rate told apart.
 
 **A stopped module keeps its components.** Stopping is something Bridge-ASM700 does on its own
 initiative, and unloading discards data, so the two are kept apart: Bridge-ASM700 never discards data

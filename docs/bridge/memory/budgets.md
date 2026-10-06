@@ -1,5 +1,7 @@
 # Budgets
 
+What was weighed here and refused is `budgets-refused.md`, *What was refused: Budgets*.
+
 Two tiers, because two things are being sized.
 
 **Shared, when Bridge-ASM700 starts, from `bridge_config`:**
@@ -41,28 +43,9 @@ created, and it allocates nothing after - `storage.md`, *What bounds it*. A `dec
 `system` past its key is refused there, by name, which fails that module's `init`.
 
 **`terms` is the most one system or observer may ask for**, and it is a key for the same reason:
-storage keeps a system's terms in a record made when the bridge is, so the record has a length.
-It was a constant, 32, and the number was flecs' default with nothing of ours behind it. Refused:
-keeping a constant and saying it is arbitrary. Refused: no most, with storage allocating a
-system's record of its terms when the system registers. A load allocates as it is - *Nothing is
-allocated in a phase* - so that alone is no reason; the reason is that storage would then
-allocate somewhere other than at create, and what storage holds would no longer be known from
-the config. It costs room for `systems` times `terms` whether used or not, and a module that
-asks more than the deployment stated is refused, as for `types` and `systems`. The condition
-that brings it back is that room measured as a cost, or a host that cannot state a ceiling for
-modules it has not seen. No module compiles against the number, so it is one number and the
-deployment's.
-
-Refused: counting both instances' systems for the length of a reload, which is what this did.
-A deployment that stated exactly the systems it had could reload nothing, and the room it had
-to add was the largest module's, a number it never states, times a place for every table.
-The condition that brings it back is the putting back being shown able to fail.
-
-Refused: allocating at load for however many types and systems a module turns out to have, which
-is what this first did: memory that is a stated budget times a number nobody stated. Refused: a
-module stating its own counts, which `init` already says by declaring. The condition that brings
-either back is a host that cannot state a ceiling for modules it has not seen - and it states one
-for `modules` already.
+storage keeps a system's terms in a record made when the bridge is, so the record has a length. It
+was a constant, 32, and the number was flecs' default with nothing of ours behind it. No module
+compiles against the number, so it is one number and the deployment's.
 
 **Per module, when that module registers:** its scratch arena, its log ring and its spans - which
 is to say, this tier sizes that module's private memory. And what is set aside for it in the shared
@@ -86,8 +69,7 @@ grows in place, and otherwise it gains a further range, which `alloc` moves to o
 longer fits in the one before. What was left of that one is dead space, the cost `strings.md`,
 *Changing one, and the cost of growing*, already names. Offsets handed out stay good, which is the
 rule flecs' own stack allocator keeps when it chains a page. Stating less is refused: what the
-module allocated is in its share, and it is still loaded. Refused: accepting less and keeping the
-share as it was, a stated number that would not be true.
+module allocated is in its share, and it is still loaded.
 
 A module that spawns nothing, keeps no string, or queues no change, says so: `BRIDGE_NONE`, which
 is -2 and not the -1 of a limit stated as none - `config.md`, *No unaccountable values*.
@@ -116,12 +98,6 @@ moved: cases `alloc-changes`, `alloc-tables`, `alloc-strip`.
 **Loading, reloading and unloading a module do allocate**, and creating and destroying a bridge:
 a record for the module, for each of its systems and types, and the rooms above. None is the
 hot path.
-
-Refused: growing on demand, which is what the queue, an observer's list and the block of ids
-did, and allocating a dispatch's lists and freeing them on every phase, which is what the
-scheduler did. A queue that grew had no bound: a module that asked for changes in a loop took
-memory until the process had none, and it was every module's process. The condition that brings
-growing back is a phase shown never to be where time matters.
 
 Because modules come and go, `modules` bounds **how many module records exist at once**, not
 how the private memory is divided. A record is taken at load and freed at unload, and exhaustion refuses the
@@ -187,36 +163,17 @@ worked in the order their first change was asked, which is the order the calls r
 `threads.md`, *Threads* - so which are placed is the same every run. `tests/storage.c`, case
 `nocolumns`, has room for five rows of six and places five.
 
-Refused: stopping at the first half that fits, which is what this did. A hundred rows arriving
-with room for ninety placed fifty, and forty changes were lost for no reason a module could
-name. No condition brings it back. Refused: working the number out from the free gaps and the
-table's layout, without trying. It states how a block is laid out a second time, and again for
-every storage layout of stage 11. The condition that brings it back is this search being shown
-to leave room that matters.
-
-**It is a failure of every module that asked a change of it**, each for the changes that were
-its own. A record names the module, the key, and how many of its changes were not applied; and
-the barrier counts as one it failed in, toward its `max_system_failures` - `failure.md`, *The
-budget*. Two modules that changed one entity are both told, since both lost what they asked.
-
-Refused: telling one module, the last to have changed the entity, which is what this did. A
-module whose own change needed no room answered for another's, and that other was told nothing
-of a change it had lost. No condition brings it back. Refused: telling only the module whose
-change needed the room. Storage would have to work out which change that was, and a module that
-lost a change with the entity would still not be told. The condition that brings it back is a
-module that must not answer for an entity another module made unplaceable. So a module that outgrows
-the deployment is stopped as any failing module is, by its own `on_error`, and one that asked once
-too often loses one barrier's changes and runs on.
+**It is a failure of every module that asked a change of it**, each for the changes that were its
+own. A record names the module, the key, and how many of its changes were not applied; and the
+barrier counts as one it failed in, toward its `max_system_failures` - `failure.md`, *The budget*.
+Two modules that changed one entity are both told, since both lost what they asked. So a module that
+outgrows the deployment is stopped as any failing module is, by its own `on_error`, and one that
+asked once too often loses one barrier's changes and runs on.
 
 Nothing is taken from outside the block, ever. Until stage 10 a column that did not fit was served
 from the operating system and the bridge stopped for good, for two reasons that no longer hold:
 nobody could be named, and the storage of the time could not be unwound from the middle of a
 change. Here nothing has begun when the shortage is found.
-
-Refused: stopping the bridge for every exhaustion, which is one rule and lets one module's `spawn`
-take the deployment down - and the entity ceiling recovers by itself when something is destroyed.
-Refused: an entry answering zero for the module to check, which is the error code the ABI chose not
-to have.
 
 ## Bridge-ASM700 defaults none of them
 

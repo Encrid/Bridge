@@ -1,5 +1,7 @@
 # Whose component it is
 
+What was weighed here and refused is `grants-refused.md`, *What was refused: Whose component it is*.
+
 A component name is namespaced - `mymod:Explosion`. **A module may always declare a component in
 its own namespace, and reaching another namespace's needs a grant from the deployment.** Refused at
 init, by name: one check per declaration and nothing per frame.
@@ -35,10 +37,3 @@ grants.
 This is the sentence `lifetime.md`, *What unload leaves behind*, already had - a module may
 destroy an entity "it only partly populates" - enforced where it had been wider: any module could
 destroy any entity.
-
-Refused: a write grant over everything the entity carries. A module that decorates an entity
-with a component of its own would then stop every other module destroying it, until the
-deployment granted each pair. The condition that brings it back is a component that must never
-be removed by a module the deployment did not name for it. Refused: any entity, which is what
-this was. The condition that brings it back is grants no longer being the deployment's
-statement of who may touch what.

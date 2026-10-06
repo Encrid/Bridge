@@ -1,5 +1,8 @@
 # Capabilities, so the swap is honest
 
+What was weighed here and refused is `capabilities-refused.md`, *What was refused: Capabilities, so
+the swap is honest*.
+
 `backend_capabilities` is not decoration. A backend says what it can actually do, and these flags
 are how it states the guarantees in `module.md`, *Three guarantees differ* - the limits are three flags,
 `work_limit`, `timeout` and `memory_limit`, and reload is two. The last is about the backend itself:
@@ -25,13 +28,6 @@ the backend hands back has been checked to be one it can call - `signatures.md`,
 nothing and answers a status*. A backend that does not answer `untrusted` promises neither: the
 native backend has a symbol from the loader, which carries no type, and checks nothing, and the
 deployment that loads a module there has stated `trusted = true`.
-
-Refused: `sandbox` as the capability's name, which is what it was. It named one backend's way of
-keeping the guarantee, and gave one thing two words, one where it was asked and one where it was
-answered. No condition brings it back. Refused: a capability of its own for checking exports,
-with a key to demand it. `trusted` already states that nothing contains a module's code, and a
-wrong signature is one more thing nothing contains. The condition that brings it back is a
-deployment that must have exports checked on a backend that does not contain its modules.
 
 The guarantee is about the **host boundary and nothing else**. It does not mean one module cannot
 corrupt another's components: they share a memory by design - see `costs.md`, *What we give up*.
@@ -59,11 +55,9 @@ deployment chose both. It is therefore one of Bridge-ASM700's own refusals and t
 under `on_error`, exactly as a denied grant or an ambiguous order does: `failure.md`, *When
 something fails*.
 
-**A key stated as "no limit" demands nothing.** `work_limit`, a timeout and `memory_limit` each take `-1`
-for that, which is how a module on the native backend states them at all. It is the same move as
-`trusted = true`: the absence of a guarantee is written down by somebody rather than arrived at.
-Refused: letting zero mean "not applicable" on a backend that cannot keep a work limit, which would give one
-field two readings. `config.md`, *No unaccountable values*.
+**A key stated as "no limit" demands nothing.** `work_limit`, a timeout and `memory_limit` each take
+`-1` for that, which is how a module on the native backend states them at all. It is the same move
+as `trusted = true`: the absence of a guarantee is written down by somebody rather than arrived at.
 
 ## Nothing is downgraded
 

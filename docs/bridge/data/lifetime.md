@@ -1,5 +1,7 @@
 # Lifetime
 
+What was weighed here and refused is `lifetime-refused.md`, *What was refused: Lifetime*.
+
 Storage is the bridge's and outlives the module that declared a component, so a reloaded module finds its
 components still there - which the original Bridge does not do. What happens when a component layout
 has changed is *When a component layout changed*, below.
@@ -60,17 +62,6 @@ a module sees a span for each, which is no more than it could ever rely on - `mo
 no module may do*. An entity given that set afterwards goes to the one that was there first, and
 an entity already in either stays where it is for as long as its archetype does not change.
 
-Refused: leaving a second table without saying so, which is what this did: a deployment saw
-more tables than archetypes and no line told it why.
-
-Refused: destroying what cannot be placed, which is what this first did. `strip` says the entity
-stays, and a reload that stops declaring a component is a strip too, on a call that means "keep
-running". Refused: never joining, and leaving every stripped table where it stands, which is one
-path and no row moved: it doubles the tables and spans of every set that already had one, for as
-long as their entities live. The condition that brings it back is the join costing more than the
-second table does. Refused: moving every block of the column region so that a join always fits.
-The condition that brings that back is second tables seen to pile up in a deployment.
-
 **The policy applied is the unloading module's own**, and only when it is the last to declare the
 component. Two declarers need not agree, because the first to leave drops nothing.
 
@@ -81,12 +72,6 @@ A stored id to an entity that `sweep` or `delete` destroyed is refused as stale,
 check - `reference.md`, *Reference following*. A module that keeps an entity as a bare handle, with
 no component of its own on it, loses it to another module's `sweep`: an entity that must outlive
 somebody else's unload carries a component of its holder's.
-
-Refused: one rule for every component, which is right for an event and wrong for a handle, or the
-reverse. Refused: destroying what a module spawned, which needs an owner per entity. Refused: a
-fourth value that makes the unload itself fail while entities still carry the component - a new
-failure path nothing has asked for. The condition that brings it back is data that must not be lost
-by an unload somebody else requested.
 
 ## When a component layout changed
 
@@ -104,13 +89,6 @@ that one, which is now the only declarer, so its rows are moved, as the next par
 the others, built against the new struct. The component's rows are kept throughout; what is lost
 is whatever else the unloaded modules held, as at any unload. The refusal lists the modules to
 unload, so nobody has to find them.
-
-Refused: one call that reloads several modules as one and moves the rows once all of them present
-the new struct. It keeps every declarer's own state, at the price of a new call at the host seam
-that swaps several modules together and puts them all back if one fails. The condition that
-brings it back is a deployment that must change a shared struct and keep what each declarer
-holds. This paragraph called the refusal "forced rather than chosen", and it was neither weighed
-nor given a condition.
 
 **Exclusive: its rows are moved to the new component layout, field by field, by name.**
 Bridge-ASM700 keeps the fields of every type, and a `declare` hands it the new descriptor, so it has
@@ -148,26 +126,12 @@ It is for the rename: an author who renamed a field meant to drop nothing, and i
 anything is gone and not by a record after. How the acceptance is stated is this stage's to
 decide when it is built - `PLAN.md`, stage 11 - and it is a stated value, not a flag left off.
 
-Refused: moving the rows at once and saying what went, which is what was first decided here. It
-fails nobody who removed a field, and for a rename it loses every value of the field on a call
-that means "keep running". The condition that brings it back is a rename that can be told from
-a removal. Refused: refusing every such change, so that a struct which loses a field is had only
-by unloading, which loses every row. The condition that brings it back is moving rows proving
-unsound.
-
 **A removal is the author's, and that is why it migrates.** This document said that
 Bridge-ASM700 never discards data on a call that means "keep running", and refused every change
 for it. The rule stands for what Bridge-ASM700 would drop on its own account. A field the new
 struct no longer has was dropped by whoever edited the struct; refusing the reload does not keep
 the field, it keeps the author from running the code they wrote. What they are owed is to be told
 exactly what went, which the record does.
-
-Refused: refusing every reload that would lose a byte. It keeps one promise literal and makes
-tidying a struct, or renaming a field, cost the module's state. The condition that brings it back
-is a field lost to a rename that nobody saw in time. Refused: a flag to waive the refusal, which
-is a flag whose job is disabling a check. Refused: a way for a module to state "this field was
-that one", which is one more thing in the ABI for a case two reloads or a new name already cover.
-The condition is renames being common enough that losing their values is a daily cost.
 
 **A converter the module supplies is still not possible**: it would have to read a component
 layout its new build does not contain. For a change no rule above covers there is the ECS's own

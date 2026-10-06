@@ -1,5 +1,7 @@
 # The backend surface
 
+What was weighed here and refused is `backend-refused.md`, *What was refused: The backend surface*.
+
 The surface a backend implements. Bridge-ASM700 defines it; a shared library provides it. Two exist: the
 **wasm** backend, which wraps wasmtime, and the **native** backend, which opens a shared library and
 calls it directly, for code the deployment trusts. A module names the one that runs it -
@@ -52,10 +54,6 @@ needs.
 module hands none; nothing behaves differently for it, which is what separates this from a key left
 out. The backend that needs the one it was not handed refuses by name - *"this backend compiles a
 module from its bytes, and was handed none"* - and that is the module's failure, on `init`'s path.
-Refused: the backend stating which it needs so that Bridge-ASM700 could refuse first, which has
-Bridge-ASM700 inspect what it is built not to and answers once more a question the backend already
-answers. The condition that brings it back is a backend for which "which one" is not obvious.
-Refused: one tagged source, which makes a host that has both choose for a backend it does not know.
 
 **It also takes the capabilities this module's config demands**, as the flags of `capabilities.md`,
 *Capabilities, so the swap is honest*. A guarantee can cost something on every instruction, and a
@@ -85,22 +83,10 @@ them all. A module's private block is mapped by that module's backend and no oth
 that backend's. A backend with no requirement answers zero for both, and a native module's
 private block reserves what it uses and no more. `tests/storage.c`, case `shape`.
 
-The length follows the same rule: the shared block is a whole number of every backend's
-granule, and a module's private block of its own backend's. Refused: 65,536 written into
-Bridge-ASM700, to which it rounded every block, which is what this had: one backend's number in
-the library, applied to another backend's modules, with no reason written. No condition brings
-it back.
+The length follows the same rule: the shared block is a whole number of every backend's granule, and
+a module's private block of its own backend's.
 
-Refused: the largest shape for every block, which is what this had. The wasm backend asks for
-four gigabytes and a guard, and beside it every native module's private block reserved that
-much address space for nobody: nothing committed, and a load refused all the same where a
-process's address space is capped. The condition that brings it back is a module's private
-block mapped by a backend other than its own.
-
-That is what keeps the block one answer for any number of backends. Refused: one backend creating
-the block and the others adopting it, which works for exactly one backend that insists on allocating
-and makes "who owns the memory" depend on which backends a deployment has. The condition that brings
-it back is a backend that cannot run over memory it did not allocate, whatever its shape.
+That is what keeps the block one answer for any number of backends.
 
 There is no read-only variant and no verification pass, because access mode is not enforced - see
 `data.md`, *Access mode*.
@@ -113,18 +99,6 @@ backend's. A module's private block is adopted when it loads and released when i
 handle without a counterpart would leak once per unload. The order is Bridge-ASM700's to keep:
 **a memory is released after the last instance it was handed to is destroyed**, never before, since
 an instance may hold the handle for as long as it runs.
-
-Refused: no handle at all, with `instance_create` taking a pointer and a length. It is two
-entries fewer, and that is all it is. A backend owns what a memory is to it, which a pointer and
-a length at the seam would decide for every backend; a handle with a counterpart states a
-lifetime, where "the block outlives the instance" would be held by nothing; and the wasm backend
-has something to keep a block: the module that holds it for wasmtime, built once and not for
-every instance - `wasmtime.md`, *Memory*. On the native backend the handle is the two numbers.
-The condition that brings it back is every backend keeping nothing in it but the two numbers.
-This paragraph said the handle was "kept for the backend" that did not exist yet, when one that
-did had a use for it nobody had looked for. Refused: the handle dying with the instance that used it,
-which is wrong for the shared memory - every instance uses it - and hides a count inside each
-backend.
 
 ## The backend owns its clock
 

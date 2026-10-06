@@ -1,5 +1,7 @@
 # Host API
 
+What was weighed here and refused is `host-api-refused.md`, *What was refused: Host API*.
+
 The surface any host links against. What Bridge-ASM700 requires of the values a host hands over is
 `config.md`.
 
@@ -51,10 +53,6 @@ that is not this project's, all three parse; a C++ host that links and runs is s
 parser at all. That is `PLAN.md`, stage 15, which describes all three seams and not only the
 module's.
 
-Refused: a shared library only. It fails nothing, and it is one file fewer; it was not chosen,
-because a host that must be a single file with nothing beside it has no other way. Refused: a
-static library only, which a language that can only load a shared library cannot use at all.
-
 ## A seam has a number
 
 **Each of the three seams has a number, and a side that states another is refused before
@@ -79,11 +77,6 @@ repository that is tagged and handed to something that is not rebuilt with it. N
 until one does a layout changes freely and no number moves. From the first release on, a change
 to what a seam lays out or means raises that seam's number, and only that seam's.
 
-Refused: one number for the three. A change to what a module reads would then refuse every
-host and every backend, which it does not concern. The condition that brings it back is seams
-that can no longer change apart. Refused: a number for the module seam alone, which is what
-this had: a host or a backend built at another time was read as it lay.
-
 ## Bridge-ASM700 parses nothing
 
 Which side owns what is `split.md`, *The split*. At this seam it comes to one thing: **Bridge-ASM700
@@ -94,9 +87,7 @@ backend without inspecting either - `lifecycle.md`, *The runtime lifecycle*.
 **The one kind of file Bridge-ASM700 opens is a backend library.** Config names each backend and its
 library, and `bridge_create` opens them - `create.md`, *Create*. A backend is Bridge-ASM700's own
 machinery rather than content, and a deployment that names one it cannot open has not got an
-orchestrator to start. Refused: the host opening the library and handing over a table of functions,
-which keeps Bridge-ASM700 away from every file and costs every host the same loader. The condition that
-brings it back is an embedder that must link a backend statically.
+orchestrator to start.
 
 So an embedder with its own config system - a database, compiled-in constants, another format -
 hands over data rather than being made to write a file for Bridge-ASM700 to read. And the three platform
@@ -226,15 +217,11 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
 phase is a name and nothing else* - which also disposes of a collision: a typedef and a function
 share one namespace in C, and `bridge_phase` is the call.
 
-**And `bridge_phase` takes that name, every time.** It is looked for among the deployment's
-phases by comparing, which is a few nanoseconds for the handful there are, in a call that takes
-about a hundred with nothing to do, made once a phase and never once a row. What that buys: a
-name is what any language hands to C with no binding, the call says which phase it runs, and a
-wrong one is refused by its name. Refused: the phase's index in the declared list, which saves
-the comparing and runs the wrong phase without a word when the list is reordered. Refused: a
-handle answered once for a name, which is one more call and one more thing a host holds. The
-condition that brings a handle back is the lookup measured as a cost, in a deployment with
-enough phases or enough calls for it to show.
+**And `bridge_phase` takes that name, every time.** It is looked for among the deployment's phases
+by comparing, which is a few nanoseconds for the handful there are, in a call that takes about a
+hundred with nothing to do, made once a phase and never once a row. What that buys: a name is what
+any language hands to C with no binding, the call says which phase it runs, and a wrong one is
+refused by its name.
 
 **The host resolves its own sources** - a manifest, a deployment's file, whatever it has - and
 hands one flat struct per module. Bridge-ASM700 has no notion of where a value came from, which is why

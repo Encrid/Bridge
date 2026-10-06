@@ -1,5 +1,7 @@
 # The profile
 
+What was weighed here and refused is `profile-refused.md`, *What was refused: The profile*.
+
 It reports **per system rather than per module** - `wasm.md`, *Exports* - and an observer
 cycle is visible in it, `schedule.md`, *An observer runs at the barrier, one hop per barrier*.
 
@@ -39,10 +41,6 @@ by adding the rows up, though, which is what this said: systems of different mod
 once, so four of a millisecond on four threads are a millisecond, and the barrier was in none
 of them.
 
-Refused: the barrier in parts, a row each for applying, republishing and draining. It is six
-more reads of a clock a barrier, and nothing yet asks which part. The condition that brings it
-back is a barrier's row seen to be most of a phase, with nothing to say why.
-
 **And an observer cycle needs no counter of its own.** A cycle means A adds, B's observer fires, B
 adds, A's fires - so both show a call count that never drops to zero, in the rows that already
 exist.
@@ -62,9 +60,3 @@ mark kept where it kept only the present value. `PLAN.md`, stage 14.
 
 It is a pull for the reason the profile is. What to do with the numbers - print them, and when -
 is the host's.
-
-Refused: the module's own memory only, which is what the original Bridge's profile had: its
-modules' memories grew, and ours are sized once. The condition that brings it back is nothing,
-since it is inside what is planned. Refused: a record when a budget passes some fraction, which
-arrives by a route that may drop and needs a fraction nobody stated. The condition is a host that
-cannot poll.

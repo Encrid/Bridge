@@ -1,5 +1,8 @@
 # The interface is a query
 
+What was weighed here and refused is `query-refused.md`, *What was refused: The interface is a
+query*.
+
 You do not get storage. You get your query's results, which is how an ECS is used:
 
     declare(...)   registers a component type
@@ -45,13 +48,11 @@ may have is the deployment's to state: `[budget] terms` - `budgets.md`, *Budgets
 `entities` is there because a system that wants to destroy the row it is on, attach a component to
 it, or store a reference to it needs the id and has no other route to one.
 
-**Every term is a component the matched entity itself carries.** flecs' iterator has a third case,
-a `source` for each field: the entity a value was found on when that is not the matched one, by
-inheritance or a fixed source. The span had the field for it until stage 10, always zero: nothing
-a module can ask for finds a term on another entity, and pairs, which inheritance is made of, are
-refused. Refused, then: publishing a field nothing can fill. The condition that brings it back is a
-term that may be matched on another entity, and it returns with that. Until then one entity's
-value is reached from another by `reference.md`, *Reference following*.
+**Every term is a component the matched entity itself carries.** flecs' iterator has a third case, a
+`source` for each field: the entity a value was found on when that is not the matched one, by
+inheritance or a fixed source. The span had the field for it until stage 10, always zero: nothing a
+module can ask for finds a term on another entity, and pairs, which inheritance is made of, are
+refused.
 
 ## What a query may not ask for
 
@@ -65,10 +66,6 @@ So there is no way to say either. A term is one declared type, and it must match
 may: three operators, and a value that is none of them is refused at `system` and `observe`, by
 the number of the term. A table carries a type or does not, so every term that matches has a base
 and a stride.
-
-Refused: values in the ABI for both, kept so that the refusal could name them, which is what this
-had. A seam that lists what it refuses has to be carried by everything that speaks it. The
-condition that brings them back is authors who try one and cannot tell from the refusal why.
 
 Many tables per query is the normal case: that is what archetypes mean. And publishing costs
 **O(tables touched)**, not O(data) and not O(tables), which is the property that makes this scale.
