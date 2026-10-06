@@ -28,7 +28,8 @@ void storage_destroy(storage *r);
  * is its declarer's to know: schema.h. There is room for [budget] types of them, and of those
  * for [budget] sparse_sets kept in a sparse set and [budget] direct_indexed kept that way:
  * whoever declares counts, and asks first how many of those are left. nullptr for one thing:
- * a direct-indexed type whose cells [budget] columns has no room for. */
+ * a direct-indexed type whose cells, or a singleton whose value, [budget] columns has no room
+ * for. */
 [[nodiscard]] storage_type *storage_declare(storage *r, uint32_t size, uint32_t align,
                                             enum bridge_storage kept);
 uint32_t storage_sets_free(const storage *r);
@@ -71,10 +72,10 @@ uint32_t storage_tables(storage *r);
 /* the rows of a component nobody declares any more, by the policy its last declarer stated -
  * lifetime.md, *What unload leaves behind* */
 void storage_drop(storage *r, storage_type *type, enum bridge_on_unload policy);
-/* ids that were set aside and never handed out, or a settings row: gone, with what is on them */
+/* ids that were set aside and never handed out: gone, with what is on them */
 void storage_release(storage *r, const uint64_t *ids, uint32_t count);
-/* one entity carrying one row of `type`: its id, or 0 if the entity ceiling is reached */
-[[nodiscard]] uint64_t storage_row(storage *r, storage_type *type, const void *bytes, uint32_t size);
+/* a singleton given its value, outside any barrier, and told to whoever observes it */
+void storage_single(storage *r, storage_type *type, const void *bytes, uint32_t size);
 bool storage_alive(storage *r, uint64_t id);
 /* whether `is` answers true for any row of `type`, handed the row's bytes */
 bool storage_any(storage *r, storage_type *type, bool (*is)(void *ctx, const uint8_t *row), void *ctx);

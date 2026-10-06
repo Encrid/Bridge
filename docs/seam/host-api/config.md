@@ -77,9 +77,9 @@ inside one phase.
 ## A module's own settings are a component
 
 `[.config]` - the `settings` a host hands over for a module - **seeds a singleton component.** The
-module declares the struct in its schema header like any other. Bridge-ASM700 writes one row at
-init, matching the keys to the field names its descriptor states - `schema.md`, *There is no
-schema format*. A key the deployment set that the module never declared is an error at init, by
+module declares the struct in its schema header like any other, and states it a singleton -
+`storage.md`, *A singleton*. Bridge-ASM700 gives it its value at init, matching the keys to the
+field names its descriptor states - `schema.md`, *There is no schema format*. A key the deployment set that the module never declared is an error at init, by
 name, where the original Bridge silently ignores a typo.
 
 **Which component is the author's to say**, as `config`, a key of the manifest like `pinned`: only
@@ -90,10 +90,11 @@ and refused like any other key, so that an author who forgot it is told rather t
 meant none. Settings handed to a module that stated none, or a `config` that `init` never declared,
 are refused by name.
 
-**The row is on an entity of Bridge-ASM700's own**, spawned for it and destroyed with the module. The
-module finds it the way it finds anything: a query on the component, one span, one row. It counts
-against `[budget] entities` like any other. And a component is the settings of one loaded
-module at a time, or it would not be a singleton.
+**The component `config` names is a singleton, or the load is refused by name.** It is one
+value on no entity, so there cannot be a second, which a row on an entity could not promise: a
+module that declared the component could attach it to another. The module reads it where it
+is, through the cell its header has for each type it declared, and it goes by its `on_unload`
+when the module does. And a component is the settings of one loaded module at a time.
 
 **A setting is written by what its field is.** A bool into a bool, an integer into any integer
 field it fits, a float into a float. Text has three places to go, and the field's type says which:

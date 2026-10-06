@@ -155,7 +155,6 @@ struct module {
     uint32_t barred;
     /* config.md: the component its settings seeded, the row, and where their text is */
     declared_type   *config;
-    uint64_t     config_entity;
     uint32_t     text_at, text_room;
     int   in_init, stopped;
     /* threads.md: what is running in it now, or nullptr for a lifecycle call, and its turn.

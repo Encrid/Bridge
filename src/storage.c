@@ -36,7 +36,9 @@ struct storage_type {
     uint32_t slot;                  /* which sparse set it is, when it is one; or which of
                                      * the direct-indexed */
     uint32_t cells, cells_len;      /* direct-indexed: its block, the sixteen bytes that say
-                                     * where its bits are and then a cell an entity */
+                                     * where its bits are and then a cell an entity. A
+                                     * singleton: its block, which is its one value */
+    bool     set;                   /* a singleton: it has a value */
 };
 
 struct storage_terms {
@@ -168,6 +170,10 @@ static void carried(const storage *r, uint32_t index, uint64_t *set)
     }
     for (uint32_t slot = 0; slot < r->direct_room; slot ++) {
         if (r->direct_type[slot] && has(given_of(r, slot), index)) put(set, r->direct_type[slot]->id);
+    }
+    /* and index 0, which is no entity, is what a singleton that has a value is on */
+    for (uint32_t id = 0; !index && id < r->type_room; id ++) {
+        if (r->types[id] && r->types[id]->set) put(set, id);
     }
 }
 
@@ -576,8 +582,18 @@ static uint32_t value_of(const storage *r, uint32_t index, const storage_type *t
     if (type->kept == BRIDGE_DIRECT_INDEXED) {
         return has(given_of(r, type->slot), index) ? type->cells + (uint32_t)COLUMN + index * type->size : 0;
     }
+    if (type->kept == BRIDGE_SINGLETON) return type->set ? type->cells : 0;
     column = t ? columns_of(r, t)[type->id] : 0;
     return column ? column + r->places[index].row * type->size : 0;
+}
+
+/* a singleton comes to have a value, of zero until one is written, or to have none: and
+ * every module is written for again, since where it is reached says which */
+static void single_set(storage *r, storage_type *type, bool set)
+{
+    type->set = set;
+    memset(r->b->shared + type->cells, 0, type->size);
+    r->b->layout_moved = 1;
 }
 
 /* the entity at `index` is given, or loses, the direct-indexed component of `slot`: its bit,
@@ -781,7 +797,10 @@ void storage_apply(storage *r)
             memcpy(&ch, m->queue + at, sizeof ch);
             at += (uint32_t)sizeof ch + ((ch.size + 7u) & ~7u);
             index = (uint32_t)ch.id;
-            if (!alive(r, ch.id) || r->folded[index] & DESTROYED) continue;
+            /* a singleton is given and taken with the id 0, which is no entity: it is folded
+             * as the one thing index 0 carries - storage.md, *A singleton* */
+            if (ch.op != CHANGE_DESTROY && ch.c->type->kept == BRIDGE_SINGLETON ? ch.id != 0
+                : !alive(r, ch.id) || r->folded[index] & DESTROYED) continue;
             if (!(r->folded[index] & TOUCHED)) {
                 r->folded[index] = TOUCHED;
                 r->changed[r->changed_count ++] = index;
@@ -877,6 +896,11 @@ void storage_apply(storage *r)
             was = has(given_of(r, slot), index);
             is = has(work_of(r, index), r->direct_type[slot]->id);
             if (was != is) cell_given(r, slot, index, is);
+        }
+        for (uint32_t id = 0; !index && id < r->type_room; id ++) {
+            storage_type *type = r->types[id];
+            if (!type || type->kept != BRIDGE_SINGLETON || type->set == has(work_of(r, 0), id)) continue;
+            single_set(r, type, !type->set);
         }
     }
 
@@ -1005,7 +1029,8 @@ int storage_publish(storage *r, module *m)
             const storage_type *type = m->declared[s]->type;
             kept[s] = type->kept == BRIDGE_SPARSE_SET
                     ? b->sparse + (uint32_t)(4ull * type->slot * b->entities)
-                    : type->kept == BRIDGE_DIRECT_INDEXED ? type->cells + (uint32_t)COLUMN : 0;
+                    : type->kept == BRIDGE_DIRECT_INDEXED ? type->cells + (uint32_t)COLUMN
+                    : type->kept == BRIDGE_SINGLETON && type->set ? type->cells : 0;
         }
         for (uint32_t t = 1; t < r->table_high; t ++) {
             if (!r->tables[t].live) continue;
@@ -1123,11 +1148,20 @@ storage_type *storage_declare(storage *r, uint32_t size, uint32_t align, enum br
         memset(given_of(r, slot), 0, 8u * r->bit_words);
         memset(shown_of(r, slot), 0, 8u * r->bit_words);
     }
+    if (kept == BRIDGE_SINGLETON) {
+        /* its one value, in a block of its own */
+        uint64_t want = padded(size ? size : 1);
+        uint8_t *block = want > INT32_MAX ? nullptr : block_column_regrow(r->b, nullptr, 0, (uint32_t)want);
+        if (!block) return nullptr;
+        memset(block, 0, (size_t)want);
+        cells = (uint32_t)(block - r->b->shared);
+        len = (uint32_t)want;
+    }
     r->types[id] = &r->type_pool[id];
     *r->types[id] = (storage_type){ id, size, align, kept, slot, cells, len };
     if (kept == BRIDGE_SPARSE_SET) r->set_type[slot] = r->types[id];
     else if (kept == BRIDGE_DIRECT_INDEXED) r->direct_type[slot] = r->types[id];
-    else put(r->in_table, id);
+    else if (kept != BRIDGE_SINGLETON) put(r->in_table, id);
     return r->types[id];
 }
 
@@ -1138,6 +1172,9 @@ void storage_undeclare(storage *r, storage_type *type)
     } else if (type->kept == BRIDGE_DIRECT_INDEXED) {
         block_column_free(r->b, r->b->shared + type->cells, type->cells_len);
         r->direct_type[type->slot] = nullptr;
+    } else if (type->kept == BRIDGE_SINGLETON) {
+        block_column_free(r->b, r->b->shared + type->cells, type->cells_len);
+        type->set = false;
     } else {
         take(r->in_table, type->id);
     }
@@ -1202,30 +1239,6 @@ void storage_forget(storage *r, storage_terms *terms)
 }
 
 /* ---- at unload, and for settings: one entity at a time, outside any barrier ---- */
-
-/* the entity at `index` comes to carry `set`, told to whoever observes it. false, with a
- * record, if there is no table or no room for it: it is then as it was. */
-static bool became(storage *r, uint32_t index, const uint64_t *set)
-{
-    uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
-    uint32_t from = r->places[index].table, t = 0;
-    if (!empty(r, set)) {
-        t = table_for(r, set);
-        if (!t) {
-            say(r->b, nullptr, nullptr, BRIDGE_ERR, "[budget] tables of %u is used up", r->b->tables);
-            return false;
-        }
-        if (t != from && !grow(r, t, r->tables[t].rows + 1)) {
-            say(r->b, nullptr, nullptr, BRIDGE_ERR, "[budget] columns of %u bytes is used up", r->b->columns_len);
-            if (!r->tables[t].rows) table_gone(r, t);
-            return false;
-        }
-    }
-    told(r, id, from ? set_of(r, from) : nullptr, set, set);
-    moved(r, index, t);
-    if (from && r->tables[from].live && !r->tables[from].rows) table_gone(r, from);
-    return true;
-}
 
 static void destroyed(storage *r, uint32_t index)
 {
@@ -1308,6 +1321,16 @@ void storage_drop(storage *r, storage_type *type, enum bridge_on_unload policy)
         cells_dropped(r, type, policy);
         return;
     }
+    if (type->kept == BRIDGE_SINGLETON) {
+        /* it is on no entity, so the three policies say one thing: it has no value */
+        if (!type->set) return;
+        carried(r, 0, r->before);
+        memcpy(set, r->before, 8u * r->words);
+        take(set, type->id);
+        told(r, 0, r->before, set, nullptr);
+        single_set(r, type, false);
+        return;
+    }
     for (uint32_t t = 1; t < r->table_high; t ++) {
         table *tab = &r->tables[t];
         uint32_t to;
@@ -1367,21 +1390,15 @@ void storage_release(storage *r, const uint64_t *ids, uint32_t count)
     sets_swept(r);
 }
 
-uint64_t storage_row(storage *r, storage_type *type, const void *bytes, uint32_t size)
+void storage_single(storage *r, storage_type *type, const void *bytes, uint32_t size)
 {
-    uint64_t id, *set = r->scratch;
-    uint32_t index;
-    if (!storage_reserve(r, &id, 1)) return 0;
-    index = (uint32_t)id;
-    memset(set, 0, 8u * r->words);
+    uint64_t *set = r->scratch;
+    carried(r, 0, r->before);
+    memcpy(set, r->before, 8u * r->words);
     put(set, type->id);
-    if (!became(r, index, set)) {
-        killed(r, index);
-        return 0;
-    }
-    memcpy(r->b->shared + columns_of(r, r->places[index].table)[type->id]
-           + (size_t)r->places[index].row * type->size, bytes, size);
-    return id;
+    told(r, 0, r->before, set, set);
+    single_set(r, type, true);
+    memcpy(r->b->shared + type->cells, bytes, size);
 }
 
 bool storage_alive(storage *r, uint64_t id)
@@ -1391,6 +1408,7 @@ bool storage_alive(storage *r, uint64_t id)
 
 bool storage_any(storage *r, storage_type *type, bool (*is)(void *ctx, const uint8_t *row), void *ctx)
 {
+    if (type->kept == BRIDGE_SINGLETON) return type->set && is(ctx, r->b->shared + type->cells);
     for (uint32_t index = 1; type->kept == BRIDGE_DIRECT_INDEXED && index < r->high; index ++) {
         if (has(given_of(r, type->slot), index)
             && is(ctx, r->b->shared + type->cells + COLUMN + (size_t)index * type->size)) return true;

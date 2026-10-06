@@ -28,7 +28,7 @@ way.
 **`unload`** - drop its systems and observers from the schedule; call `shutdown`, under its
 timeout; apply what it had asked for and not yet been given, `shutdown`'s requests included; drop
 its exclusive components, each by its `on_unload` policy - `lifetime.md`, *What unload leaves
-behind*; destroy the ids held ready for it and the row its settings were on; free its module
+behind*; destroy the ids held ready for it; free its module
 record; destroy the instance and its loaded image, which on the native backend closes the library.
 
 **Its share of the persistent arena goes back, unless a row that is staying holds a string in

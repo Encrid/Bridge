@@ -174,7 +174,7 @@ int main(int argc, char **argv)
     /* room for one module's share and no more: every load of the two hundred takes it, and
      * every unload gives it back - strings.md, *It is given back when nothing points into it* */
     if (!strcmp(what, "churn") || !strncmp(what, "arena", 5)) cfg.budget.persistent = 64;
-    if (!strcmp(what, "configceiling")) cfg.budget.entities = (uint64_t)atoi(argc > 2 ? argv[2] : "0");
+    if (!strcmp(what, "confignoroom")) cfg.budget.columns = 16;
     b = bridge_create(&cfg, sink, nullptr);
     if (!b) {
         printf("bridge_create refused\nalive\n");
@@ -425,7 +425,8 @@ int main(int argc, char **argv)
                || !strcmp(what, "configrange") || !strcmp(what, "configenum")
                || !strcmp(what, "confignone") || !strcmp(what, "configmissing")
                || !strcmp(what, "configunset")
-               || !strcmp(what, "configarena") || !strcmp(what, "configceiling")
+               || !strcmp(what, "configarena") || !strcmp(what, "confignoroom")
+               || !strcmp(what, "configtable")
                || !strcmp(what, "configwide")) {
         a = configured("game:settings@0.1.0");
         if (!strcmp(what, "configkey")) everything[0].key = "vsynk";
@@ -439,8 +440,12 @@ int main(int argc, char **argv)
         if (!strcmp(what, "configunset")) a.cfg.config = nullptr;
         if (!strcmp(what, "configmissing")) a.cfg.config = "game:Nope";
         if (!strcmp(what, "configarena")) a.cfg.persistent = 8;
-        /* the row its settings go on is an entity like any other, under the same ceiling */
-        if (!strcmp(what, "configceiling")) a.cfg.spawns = BRIDGE_NONE;
+        /* config.md: the component it names is a singleton, and one that is not is refused */
+        if (!strcmp(what, "configtable")) {
+            bridge_artifact other = wasm("game:settings@0.1.0", "settings-table");
+            a.bytes = other.bytes;
+            a.len = other.len;
+        }
         load(b, &a);
         modules(b);
     } else if (!strcmp(what, "configreload") || !strcmp(what, "configdrop")) {

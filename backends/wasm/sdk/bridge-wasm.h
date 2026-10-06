@@ -168,6 +168,14 @@ static inline uint32_t bridge_set_value(uint32_t index, uint64_t id)
     return acc_ld_32(acc_row(index, (uint32_t)id, BRIDGE_HEADER(entities), 4u));
 }
 
+/* ---- a singleton: one value, on no entity. docs/bridge/storage.md, *A singleton* ---- */
+
+/* where the singleton `slot` has its value, from the shared base: zero while it has none */
+static inline uint32_t bridge_single(uint32_t slot)
+{
+    return acc_own_32(BRIDGE_HEADER(kept) + 4u * slot);
+}
+
 /* ---- direct-indexed: a cell for every entity. docs/bridge/storage.md, *Direct-indexed* ---- */
 
 /* where the cells of the direct-indexed component `slot` begin */

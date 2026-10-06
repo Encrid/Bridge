@@ -149,7 +149,6 @@ int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why
     uint32_t i, text_total = 0, text_used = 0;
     uint8_t *row;
     module *other;
-    uint64_t e;
 
     if (!strcmp(cfg->config, BRIDGE_NO_CONFIG)) {
         if (!cfg->setting_count) return 0;
@@ -165,7 +164,11 @@ int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why
             cfg->config);
         return 1;
     }
-    /* one row, so one module: two would be two rows of a singleton */
+    if (c->storage != BRIDGE_SINGLETON) {
+        snprintf(why, len, "its config is '%.100s', which is not declared a singleton", c->name);
+        return 1;
+    }
+    /* one value, so one module's settings */
     for (other = b->modules; other; other = other->next) {
         if (other->config == c) {
             snprintf(why, len, "its config is '%.100s', which is already the settings of module "
@@ -224,15 +227,9 @@ int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why
         }
     }
 
-    e = storage_row(b->storage, c->type, row, c->size);
+    storage_single(b->storage, c->type, row, c->size);
     free(row);
-    if (!e) {
-        snprintf(why, len, "the row its settings go on does not fit under [budget] entities of %u",
-            b->entities);
-        return 1;
-    }
     m->config = c;
-    m->config_entity = e;
     return 0;
 }
 

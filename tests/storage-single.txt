@@ -1,0 +1,27 @@
+look
+  look: it has no value 0 0
+attach_a
+  heard_g: heard of it: the id, events 0 3
+look
+  look: it has a value: gravity, wind 10 1
+value_a
+  heard_g: heard of it: the id, events 0 2
+look
+  look: it has a value: gravity, wind 20 2
+work
+look
+  look: it has a value: gravity, wind 20 77
+detach_b
+  heard_g: heard of it: the id, events 0 4
+look
+  look: it has no value 0 0
+attach_a
+  heard_g: heard of it: the id, events 0 3
+look
+  look: it has a value: gravity, wind 10 1
+delete st:G
+never
+  heard_g: heard of it: the id, events 0 4
+look
+  look: it has no value 0 0
+alive

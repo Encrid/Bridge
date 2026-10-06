@@ -397,6 +397,27 @@ int main(int argc, char **argv)
         run(b, "look");
         run(b, "destroy");          /* and both tables go when they empty */
         run(b, "look");
+    } else if (!strncmp(what, "single", 6)) {
+        /* storage.md, *A singleton* */
+        const char *path = !strcmp(what, "singlebad1") ? NSINGLEBAD1_PATH
+                         : !strcmp(what, "singlebad2") ? NSINGLEBAD2_PATH
+                         : !strcmp(what, "singlebad3") ? NSINGLEBAD3_PATH : NSINGLE_PATH;
+        a = store_module(path, 8, 1 << 20, 4096);
+        if (bridge_load(b, &a)) { printf("not loaded\nalive\n"); return 0; }
+        run(b, "look");             /* declared, and with no value */
+        run(b, "attach_a");         /* given one: heard, with the id 0 */
+        run(b, "look");
+        if (strcmp(what, "single")) { printf("alive\n"); return 0; }
+        run(b, "value_a");          /* another value: heard as an attach */
+        run(b, "look");
+        run(b, "work");             /* a field written where it is: nothing is heard */
+        run(b, "look");
+        run(b, "detach_b");         /* taken */
+        run(b, "look");
+        run(b, "attach_a");         /* and given again: zero but for what the attach wrote */
+        run(b, "look");
+        drop(b, "st:G", BRIDGE_DELETE);     /* lifetime.md: unloaded, it has no value */
+        run(b, "look");
     } else if (!strncmp(what, "direct", 6)) {
         a = store_module(!strcmp(what, "directbad") ? NDIRECTBAD_PATH : NDIRECT_PATH, 8, 1 << 20, 4096);
         if (bridge_load(b, &a)) { printf("not loaded\nalive\n"); return 0; }

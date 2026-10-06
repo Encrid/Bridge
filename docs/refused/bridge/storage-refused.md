@@ -36,6 +36,11 @@ and a component that is walked belongs in a table. The condition that brings it 
 component nearly every entity has, walked as often as it is reached, measured as losing by
 being in a table.
 
+## A singleton
+
+Of `storage.md`, *A singleton*. How it is given its value, whether a module's settings must be
+one, and what else was weighed, is in the record of `STAGE11.md`, *The questions*.
+
 ## What a query walks
 
 Of `storage.md`, *What a query walks*. What was weighed against it is in the record of

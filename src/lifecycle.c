@@ -122,7 +122,6 @@ static void undo(bridge *b, module *m)
     drop_systems(b, m);         /* first: a query must not outlive a component it names */
     storage_release(b->storage, m->ids, m->id_count);
     m->id_count = m->id_next = 0;
-    if (m->config_entity) storage_release(b->storage, &m->config_entity, 1);
     /* nothing of it was applied, so nothing points into its share */
     for (i = 0; i < m->own_count; i ++) {
         region_give(&b->arena_space, m->owned[i].at - b->arena, m->owned[i].len);
@@ -724,7 +723,6 @@ static void take_out(bridge *b, module *m)
     module **link = &b->modules;
     uint32_t i;
     drop_systems(b, m);
-    if (m->config_entity) storage_release(b->storage, &m->config_entity, 1);
     /* last declared first: a type is used by what was declared after it */
     for (i = m->declared_count; i --;) type_release(b, m->declared[i], m->policy[i]);
     m->declared_count = 0;
@@ -878,7 +876,6 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
         }
     }
     n->config = old->config;
-    n->config_entity = old->config_entity;
     n->text_at = old->text_at;
     n->text_room = old->text_room;
 
@@ -903,7 +900,6 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
         for (i = n->declared_count; i --;) type_release(b, n->declared[i], 0);
         n->declared_count = 0;
         n->id_count = n->id_next = 0;  /* the entities are the old record's still */
-        n->config_entity = 0;
         /* what the reload added goes back: nothing was allocated from it that lived */
         if (in_place) region_give(&b->arena_space, last.at - b->arena + last.len, extra);
         else if (extra) {
@@ -936,13 +932,9 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     for (i = old->declared_count; i --;) type_release(b, old->declared[i], old->policy[i]);
     old->declared_count = 0;
     old->id_count = old->id_next = 0;  /* the entities are the new record's now */
-    /* the settings component among them: its row was Bridge-ASM700's own, and goes too */
+    /* the settings component among them: its value went by its policy, just above */
     for (i = 0; i < n->declared_count && n->declared[i] != n->config; i ++) {}
-    if (n->config && i == n->declared_count) {
-        if (storage_alive(b->storage, n->config_entity)) storage_release(b->storage, &n->config_entity, 1);
-        n->config = nullptr;
-        n->config_entity = 0;
-    }
+    if (n->config && i == n->declared_count) n->config = nullptr;
     for (link = &b->modules; *link != old; link = &(*link)->next) {}
     n->next = old->next;
     *link = n;                      /* in its place: the order modules loaded in is kept */

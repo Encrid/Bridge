@@ -116,6 +116,17 @@ static inline const uint32_t *bridge_native_span(const bridge_api *api, const br
     return (const uint32_t *)(api->private_base + q->at + i * BRIDGE_SPAN_SIZE(terms));
 }
 
+/* ---- a singleton: one value, on no entity. storage.md, *A singleton* ---- */
+
+/* The value of the singleton `slot`, or nullptr while it has none. It is given by an attach
+ * with the id 0, taken by a detach with it, and written where it is by a system that stated
+ * the term BRIDGE_WRITE. */
+static inline void *bridge_native_single(const bridge_api *api, uint32_t slot)
+{
+    uint32_t at = ((const uint32_t *)(api->private_base + bridge_native_header(api)->kept))[slot];
+    return at ? api->shared_base + at : nullptr;
+}
+
 /* ---- direct-indexed: a cell for every entity. storage.md, *Direct-indexed* ---- */
 
 /* The cells of the direct-indexed component `slot`, from the shared base: the value of the

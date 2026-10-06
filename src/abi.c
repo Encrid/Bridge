@@ -146,11 +146,6 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     if (kept < BRIDGE_TABLE || kept > BRIDGE_SINGLETON) {
         return refuse(m, "type '%s': its storage layout is unset", name);
     }
-    /* ponytail: the singleton is decided and not built - docs/plan/STAGE11.md. This goes
-     * when it is */
-    if (kept == BRIDGE_SINGLETON) {
-        return refuse(m, "type '%s': %s is not built yet", name, storage_names[kept]);
-    }
     print = fingerprint(desc_at, a[6]) ^ kind;
 
     for (i = 0; i < b->type_count; i ++) {
@@ -239,6 +234,10 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
             free(deps);
             schema_free(&s);
             c = nullptr;
+            if (kept == BRIDGE_SINGLETON) {
+                return refuse(m, "type '%s' is a singleton, and [budget] columns of %u bytes has "
+                    "no room for its %u bytes", name, b->columns_len, size);
+            }
             return refuse(m, "type '%s' is direct-indexed, and [budget] columns of %u bytes has no "
                 "room for a cell of %u bytes for each of %u entities", name, b->columns_len, size,
                 b->entities);
@@ -422,6 +421,13 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         c = m->declared[t.slot];
         /* storage.md, *What a query walks*: a system walks tables, or one sparse set alone,
          * and what is kept elsewhere it reaches from the row. An observer walks nothing */
+        if (!events && c->storage == BRIDGE_SINGLETON && t.oper != BRIDGE_OPTIONAL) {
+            refuse(m, "term %u of %s '%s': '%s' is a singleton, and is on no entity a system "
+                "walks. It is stated optional and read where it is", i, what, name, c->name);
+            free(asked);
+            free(s);
+            return 1;
+        }
         if (!events && c->storage == BRIDGE_DIRECT_INDEXED && t.oper != BRIDGE_OPTIONAL) {
             refuse(m, "term %u of %s '%s': '%s' is direct-indexed, and does not select what a "
                 "system walks. It is stated optional and reached by the entity's id", i, what, name,
@@ -627,6 +633,19 @@ static declared_type *written(module *m, uint64_t slot, const char *entry)
 }
 
 /* attach(id, slot, ptr, len). The value travels with it; zero length means zeroed. */
+/* storage.md, *A singleton*: it is on no entity, so it is given and taken with the id 0,
+ * which is no entity; and nothing else is. 1 and a refusal if `id` is the wrong one of the two. */
+static int unowned(module *m, const char *entry, uint64_t id, const declared_type *c)
+{
+    if (c->storage == BRIDGE_SINGLETON && id) {
+        return refuse(m, "%s: '%s' is a singleton, and its id is 0", entry, c->name);
+    }
+    if (c->storage != BRIDGE_SINGLETON && !id) {
+        return refuse(m, "%s: the id 0 is no entity, and '%s' is not a singleton", entry, c->name);
+    }
+    return 0;
+}
+
 static int abi_attach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 {
     module *m = ud;
@@ -639,6 +658,7 @@ static int abi_attach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
             (unsigned long long)a[3], c->size);
     }
     if (!value) return refuse(m, "attach: the value lies outside the scratch arena");
+    if (unowned(m, "attach", a[0], c)) return 1;
     return queue(m, CHANGE_ATTACH, a[0], c, value);
 }
 
@@ -647,7 +667,7 @@ static int abi_detach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 {
     module *m = ud;
     declared_type *c = written(m, a[1], "detach");
-    if (!c) return 1;
+    if (!c || unowned(m, "detach", a[0], c)) return 1;
     return queue(m, CHANGE_DETACH, a[0], c, nullptr);
 }
 

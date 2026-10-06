@@ -54,8 +54,7 @@ declare the component already, as for a component layout that differs - `lifetim
 component layout changed*.
 
 What each was weighed on, measured, and what a module is handed for each, is `STAGE11.md`, *The
-gate* and *The questions*. All but the singleton are built; a `declare` that states that one is
-refused, saying so, until `PLAN.md`, stage 11, has built it.
+gate* and *The questions*.
 
 ## A table
 
@@ -194,6 +193,30 @@ that is held, its generation tested:
 And it is given in 25 ns and taken in 24, whatever the entity carries. **What it costs is its
 size for every entity, carried or not**: sixty-four bytes at four hundred thousand entities is
 25.6 MB of `[budget] columns`.
+
+## A singleton
+
+**A singleton is one value for the deployment, on no entity.** It is a block of the column
+region of the component's size, taken when it is declared, which a `declare` that finds no room
+for it is refused for. It has a value or it has none; there cannot be two.
+
+**It is given and taken with the id 0.** Every entry that gives or takes a component names an
+entity, and 0 is no entity - `reference.md`, *Reference following*. So `attach` and `detach` of
+a singleton take the id 0 and are refused any other, by name; and are refused 0 for a component
+that is not one. The change is queued and applied at the barrier with the rest, in the order it
+was asked, and told to observers, whose record carries the id 0. A singleton that is given a
+value is zero but for what the attach wrote. After that a field of it is changed by a write
+where it is, by a system that states the term `BRIDGE_WRITE`, and nothing is told.
+
+**A module reads it where it is**: the cell its header has for each type it declared holds
+where the value is from the shared base, and zero while it has none. A system cannot walk it,
+since it is on no entity: a term of it is stated `BRIDGE_OPTIONAL`, which is how the system
+says what it reads and writes, and one that selects is refused at `system`. Unloaded by its
+last declarer it has no value, whichever policy was stated, and that is told as a leave.
+
+**It is what a module's settings are** - `config.md`, *A module's own settings are a
+component*. Nothing was measured for it: read through a query of one span, a value on one
+entity cost 0.6 ns, so there was no time to gain, and what it gives is that there is one.
 
 ## What a query walks
 

@@ -502,3 +502,14 @@ held id with the generation and the bit tested, 0.74 ns in the order they lie an
 order, where through the table it is 1.1 and 2.5; and given in 25 ns, taken in 24. The gate's
 scratch figures were 0.98 and 1.6.
 
+**The singleton**, as `storage.md`, *A singleton*, has it. It is folded as the one thing index
+0 carries, so a barrier applies and tells it by the code that does so for an entity. A module's
+settings are one, and the entity Bridge-ASM700 kept for them is gone with the code that kept
+it. Cases `storage-single` and the three beside it, `stage6-configtable` and
+`stage6-confignoroom`, and every settings case of stage 6 on the wasm backend.
+
+**An attach or a detach with the id 0 of a component that is not a singleton is refused.** It
+was ignored, as a change of an entity that is gone is. The decision said it was refused
+already, which was not so, and it is built as the decision has it: 0 is not an entity that
+went, it is no entity.
+

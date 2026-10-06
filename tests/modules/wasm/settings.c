@@ -1,5 +1,5 @@
-/* A module whose settings are a component: one row, written by Bridge-ASM700 after init, which
- * a system reads back. docs/seam/host-api/config.md, *A module's own settings are a component*. */
+/* A module whose settings are a component: a singleton, given its value by Bridge-ASM700 after
+ * init, which a system reads back. docs/seam/host-api/config.md, *A module's own settings are a component*. */
 #include "bridge-wasm.h"
 
 BRIDGE_SCHEMA_ENUM(Mode, int8_t, { Off, On, Adaptive });
@@ -17,18 +17,21 @@ BRIDGE_SCHEMA_STRUCT(Settings, {
     int64_t big;
 });
 
-static uint32_t settings, showing;
+/* a singleton, as the settings a module names must be; and a build that states otherwise */
+#ifndef KEPT
+#define KEPT BRIDGE_SINGLETON
+#endif
+
+static uint32_t settings;
 
 BRIDGE_EXPORT(show) int show()
 {
     char text[64];
-    uint32_t span, at, len, i;
-    if (!bridge_spans(showing)) {
+    uint32_t at = bridge_single(settings), len, i;
+    if (!at) {
         BRIDGE_LOG(BRIDGE_LOG_INFO, "no settings row", 0, 0);
         return 0;
     }
-    span = bridge_span(showing, 0, 1);
-    at = BRIDGE_ROW(Settings, bridge_base(span, 0), 0, bridge_rows(span));
     BRIDGE_LOG(BRIDGE_LOG_INFO, "vsync width", BRIDGE_GET(Settings, vsync, at),
                (uint32_t)BRIDGE_GET(Settings, width, at));
     BRIDGE_LOG(BRIDGE_LOG_INFO, "scale mode", (uint32_t)(BRIDGE_GET(Settings, scale, at) * 100.0f),
@@ -49,12 +52,12 @@ BRIDGE_EXPORT(show) int show()
 
 BRIDGE_EXPORT(init) int init()
 {
-    bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
+    bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_OPTIONAL, 0 }};
     BRIDGE_DECLARE(BRIDGE_ENUM, "game:Mode", Mode, BRIDGE_STRIP, BRIDGE_TABLE);
     BRIDGE_DECLARE(BRIDGE_BITMASK, "game:Flags", Flags, BRIDGE_STRIP, BRIDGE_TABLE);
-    settings = BRIDGE_COMPONENT("game:Settings", Settings, BRIDGE_DELETE, BRIDGE_TABLE);
+    settings = BRIDGE_COMPONENT("game:Settings", Settings, BRIDGE_DELETE, KEPT);
     terms[0].slot = settings;
-    showing = BRIDGE_SYSTEM("show", "update", terms, 1, nullptr, 0);
+    BRIDGE_SYSTEM("show", "update", terms, 1, nullptr, 0);
     return 0;
 }
 
