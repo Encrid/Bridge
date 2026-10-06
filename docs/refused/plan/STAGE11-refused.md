@@ -82,3 +82,8 @@ KB of columns for each marker 204,800 entities carry. The condition that brings 
 case of no size costing more to keep right in five storage layouts than the bytes it saves,
 shown by defects found in it.
 
+Refused: a row that is off losing the component when it leaves a toggle; and no move out of a
+toggle while a row is off. The first drops a value the module's `reload` could have dropped
+itself; the second can be met only by code in the build that is being replaced. No condition
+brings either back.
+

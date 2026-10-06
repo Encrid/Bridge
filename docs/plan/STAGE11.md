@@ -407,3 +407,40 @@ value's place. It is what a tag term's base is in a span, what its cell of `colu
 what a sparse set's index holds for an entity that carries it, and what a singleton's cell
 holds when it is set.
 
+**5. A component is moved to another storage layout at a reload whose `declare` states
+another.** What follows from what is decided: a shared component is refused, naming the other
+modules that declare it, since every declarer states the same storage layout, and the way
+through is `lifetime.md`'s, *When a component layout changed*. **It is all or nothing**: every
+block the new storage layout needs is taken first, and if one cannot be had those taken are
+given back, the reload is refused with a record naming the component and what ran out, and the
+old instance runs on. A move into a sparse set or direct-indexed counts against its key. And
+observers are told nothing, since no entity gained or lost the component.
+
+    from, to                                 what happens to the values
+    table, sparse set, direct-indexed:       every entity that carries it keeps its value
+    any to any
+    any of those three, to toggle            every one keeps its value, and is on
+    any, to singleton                        no entity carries it: no value. One does: its
+                                             value is the singleton's. More than one: refused,
+                                             naming how many, since nothing says which
+    singleton, to any                        refused: there is no entity to carry it
+    toggle, to any other                     a row that is on keeps its value; and so does
+                                             one that is off, which is then carried like the
+                                             rest
+
+**Leaving a toggle, a row that is off is carried, with its value.** No other storage layout
+has carried and off, so something goes: here it is that the row was off, and not its value. It
+is a loss, so the reload is refused the first time, naming how many rows are off, and done once
+it states that it accepts that - question 6. The module's `reload`, which runs next, is where it
+detaches what it does not want.
+
+    need          carried, value kept        no longer carried           refused while one
+                                                                         is off
+    minimal       serves: the move does      fails in part: a detach     serves
+                  not read the bits          for each such row
+    explicit      serves: a reload drops     serves, once stated         fails: only the
+                  no value                                               build being replaced
+                                                                         could turn them on
+
+The other four needs do not apply to any of the three.
+
