@@ -389,7 +389,12 @@ this deployment's own here. Whether either becomes content that deployments shar
 a name and a version, a list of phase names - is this stage's question to put, by the method of
 `STAGE0.md`, with what the port actually needed in hand.
 
+And it is the first workload on which the execution model can be judged - `threads.md`,
+*Threads*: how much of a phase its heaviest system takes while other threads have nothing to
+run, which is the condition under which one system on several cores is weighed again.
+
 *Done when 189 of the probe's checks pass, the two that cannot are the two named, and the GDExample
 frame is an order of magnitude under 42 us: if it is not, the architecture did not deliver and we
-find out here. And when what the port needed of a clock and of phases is written down, with the
-answer to whether it is shared.*
+find out here. And when the heaviest system's share of each phase is measured, with how many threads
+were idle beside it. And when what the port needed of a clock and of phases is written down, with
+the answer to whether it is shared.*

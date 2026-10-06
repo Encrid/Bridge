@@ -149,6 +149,10 @@ where two things could be meant the qualified form is the only form.
 
 **Running**
 
+    execution model   how work is arranged in time. Here: task parallelism between modules,
+                      and sequential within one. `threads.md`. "Parallel" is two things
+                      running at the same instant; "concurrent" is two in progress at once,
+                      which one core can do by switching. Not the same word
     system            a function of a module, run in a phase over what its query matches
     observer          a function of a module, run at a barrier for what changed. `data.md`
     phase             a named step a host asks for: its systems run. `schedule.md`

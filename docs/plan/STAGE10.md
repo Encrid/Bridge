@@ -607,7 +607,9 @@ Of earlier stages:
     closed  a boolean cannot be unset, and false is called the safe side for all six: it was
             not for `pinned`. A key that is yes or no is `enum bridge_flag`, stated as
             BRIDGE_TRUE or BRIDGE_FALSE, and refused at BRIDGE_UNSET. `config.md`
-    open    a module is the unit of parallelism, with instance grouping refused on minimal
+    closed  a module is the unit of parallelism: it is, said as an execution model, with
+            what it gives up, three refusals with one condition, and stage 17 measuring it.
+            "Instance grouping" was another matter, and holds. `threads.md`
     open    a system is bounded by fuel and never by a deadline, on every deployment
     open    a field's type is found in its own namespace only
     open    no phase names shipped, and a module writes its phase's name into its code
