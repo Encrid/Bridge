@@ -18,7 +18,7 @@ a bool per comparison, now. So `Callable` round trips and `scripts.attach` behav
 synchronous half. The two probe checks that assert it - *"a Callable the adapter owns reaches a
 module and answers"* and *"a plain Node3D answers get_speed, because a module is behind it"* - are
 the two the Godot adapter does not get back. Everything an engine asks that is **state** rather than a
-question is served from storage with no crossing: `engine-callbacks.md`, *An engine callback answers from
+question is served from storage with no crossing: `engine_callbacks.md`, *An engine callback answers from
 storage*.
 
 Column isolation is the ECS bargain, and it is **partly** recovered. Read and write declarations

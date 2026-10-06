@@ -163,7 +163,7 @@ question is put again with the figures.
 
 `tests/storage.c` drives a native module, `tests/modules/native/nstore.c`, that makes one kind of
 change in a phase of its own and says what a system and an observer then see. The host prints
-it. What it prints is kept in `tests/storage-changes.txt` and `tests/storage-tables.txt`, and
+it. What it prints is kept in `tests/storage_changes.txt` and `tests/storage_tables.txt`, and
 the two cases pass only by saying the same, word for word. Nothing in a transcript depends on
 how ids are numbered, so the same two files will judge storage of our own.
 
@@ -236,7 +236,7 @@ a few components, one destroyed, a component attached, set or detached. Eight mi
 Each module keeps its own account of what every one of its entities ought to carry and with what
 value, and at every pass checks storage against it twice over: every entity through the index
 and `column_base`, and every component through its spans. What it prints is how many disagreed,
-which is none, and a digest of its own account, kept in `tests/storage-stress.txt`. The digest
+which is none, and a digest of its own account, kept in `tests/storage_stress.txt`. The digest
 does not depend on what keeps the rows or on how many threads ran, so the same file judges ours;
 and the two times above are what ours is measured against on a mixed load, where the lines
 before them each measure one kind of change alone.
@@ -295,7 +295,7 @@ since a table asks for twice what it had.
 Every case passes on storage of our own on Windows, in release and in debug, on Linux and on
 macOS, and four runs of the whole suite at once on one machine pass too. Before flecs was removed
 both storages were built from one tree and run against the same cases by the same script, and the
-three transcripts - `storage-changes.txt`, `storage-tables.txt`, `storage-stress.txt` - were the
+three transcripts - `storage_changes.txt`, `storage_tables.txt`, `storage_stress.txt` - were the
 same files for both, word for word.
 
 Three cases are new and are of what only this storage does. Each is a transcript.
@@ -351,7 +351,7 @@ answer had been copied: an event for each change, so that a component given and 
 phase was an add, a set and a remove at once, for an entity nobody could find. That was not even
 flecs' design, only how it behaved driven one call a change. An observer is owed the difference
 between what an entity carried before the barrier and after: `data.md`, *Observers*. The second
-reading of every queue went with it, and `storage-changes.txt` changed in the two lines that
+reading of every queue went with it, and `storage_changes.txt` changed in the two lines that
 showed it.
 
 **The names of the three schema macros: decided.** They were `ECS_STRUCT`, `ECS_ENUM` and
@@ -544,7 +544,7 @@ at least five things, none defined, and none of them the one that was meant.
     closed  "change a layout, bump the version", before anything is released: the condition
             is written, with what a release is. And there were three seams and one number:
             the host seam and the backend seam have one each now, checked where the two
-            sides meet. `host-api.md`, *A seam has a number*
+            sides meet. `host_api.md`, *A seam has a number*
 
 **3b. Decisions that do not hold on every need.** Found by the reading above. Where the code
 was named it was read. Each is decided again with all six shown, or shown to hold.
@@ -616,7 +616,7 @@ Of earlier stages:
             The question was the wrong one: a host links a built library and may be in any
             language that can call C. Four parts, each weighed:
     closed    the library is built, shared and static, and the hosts of the tests link it.
-              `host-api.md`, *A host links a built library*
+              `host_api.md`, *A host links a built library*
     closed    the host seam's and the backend seam's layouts are asserted, with no padding
               left to a compiler; described for a language that is not C in stage 15,
               which is widened to all three seams
@@ -652,7 +652,7 @@ Of earlier stages:
     closed  every block is allocated to the largest shape any backend asks for: the shared
             block is; a module's private block has its own backend's. `backend.md`
     closed  a phase is a string at `bridge_phase`: it holds, with what it costs and what it
-            buys written. `host-api.md`, *The data*
+            buys written. `host_api.md`, *The data*
 
 Statements false against the tree, in one pass with no decision: `bridge_manifest_parse`,
 `bridge_profile`, `validate` and `profile` in the present tense; `terms` for `types` in

@@ -1,6 +1,6 @@
 # Signatures
 
-What was weighed here and refused is `signatures-refused.md`, *What was refused: Signatures*.
+What was weighed here and refused is `signatures_refused.md`, *What was refused: Signatures*.
 
 What crosses the backend seam as a function: the eight imports Bridge-ASM700 defines, and the one shape it
 calls.

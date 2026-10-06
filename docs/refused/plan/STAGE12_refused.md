@@ -94,7 +94,7 @@ Of `STAGE12.md`, *How a file of many functions is cut*.
 Refused: optimisation at link time, which would inline across `.c` files. Probed with zig
 0.16: the link fails for `x86_64-windows-gnu` on symbols of the C runtime, `aarch64-macos`
 answers that it requires another linker, and an object becomes LLVM bitcode, so the static
-library could not be linked by a host's own linker - `host-api.md`, *A host links a built
+library could not be linked by a host's own linker - `host_api.md`, *A host links a built
 library*. The condition that brings it back is all three ceasing to be so.
 
 Refused: the pieces as `.c` files that one `.c` includes, which alone is compiled. The unit is

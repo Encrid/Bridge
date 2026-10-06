@@ -1,6 +1,6 @@
 # The ABI
 
-What was weighed here and refused is `abi-refused.md`, *What was refused: The ABI*.
+What was weighed here and refused is `abi_refused.md`, *What was refused: The ABI*.
 
 At init, which runs each time a module is loaded - `lifecycle.md`, *The runtime lifecycle*. All
 three may take names, because registration is not a hot path.

@@ -47,7 +47,7 @@ for f in sorted(paths):
         bad += 1
 
     # cross-document: `other.md`, *Section*   (backticked or not)
-    for m in re.finditer(r'`?([a-z-]+\.md)`?[^.\n]{0,30}?\*([^*\n]+)\*', text):
+    for m in re.finditer(r'`?([A-Za-z0-9_]+\.md)`?[^.\n]{0,30}?\*([^*\n]+)\*', text):
         doc, sec = m.group(1), m.group(2).strip().lower()
         if doc not in heads:
             print('%-14s -> missing file %s' % (f, doc))
@@ -72,7 +72,7 @@ for full in sorted(glob.glob('../**/*.[ch]', recursive=True)):
     if '/build/' in full or '/wasmtime/' in full:
         continue
     text = re.sub(r'\n[ \t]*(?:\*\*?|//)[ \t]?', ' ', open(full, encoding='utf-8').read())
-    for m in re.finditer(r'`?([a-z-]+\.md)`?[^.\n]{0,30}?\*([^*\n]+)\*', text):
+    for m in re.finditer(r'`?([A-Za-z0-9_]+\.md)`?[^.\n]{0,30}?\*([^*\n]+)\*', text):
         doc, sec = m.group(1), m.group(2).strip().lower()
         if doc not in heads:
             print('%-14s -> missing file %s' % (full[3:], doc))

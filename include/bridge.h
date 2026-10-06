@@ -1,5 +1,5 @@
 /* The host seam: the only header a host includes.
- * docs/seam/host-api/host-api.md is the contract. This is as much of it as exists so far:
+ * docs/seam/host_api/host_api.md is the contract. This is as much of it as exists so far:
  * everything but `validate` and the profile, which arrive with the diagnostics they switch on. */
 #ifndef BRIDGE_H
 #define BRIDGE_H
@@ -16,7 +16,7 @@ typedef struct bridge bridge_t;
 
 /* The host seam's number: what this header says. A host states the one it was built or bound
  * against, first in bridge_config_t, and a library that says another refuses to be created -
- * docs/seam/host-api/host-api.md, *A seam has a number*. */
+ * docs/seam/host_api/host_api.md, *A seam has a number*. */
 constexpr uint32_t BRIDGE_HOST_ABI = 1;
 
 /* A host may be in any language that can call C, so every struct here is laid out where it is
@@ -112,7 +112,7 @@ static_assert(offsetof(bridge_phase_name_t, from) == 0 && offsetof(bridge_phase_
 
 enum bridge_on_error : uint8_t { BRIDGE_FAIL = 1, BRIDGE_SKIP = 2 };    /* zero is unset */
 /* A key that is yes or no. It is stated like any other: left at BRIDGE_UNSET it is refused, by
- * its name, and is not taken for false - docs/seam/host-api/config.md. */
+ * its name, and is not taken for false - docs/seam/host_api/config.md. */
 enum bridge_flag : uint8_t { BRIDGE_UNSET = 0, BRIDGE_TRUE = 1, BRIDGE_FALSE = 2 };
 /* Two values and not one, because they say opposite things: a module with no limit may use
  * all there is, and a module with no reservation gets nothing. Each field below takes one of
@@ -154,7 +154,7 @@ typedef struct {
     const char *const *write; uint32_t write_count;
     uint32_t pad3;
 
-    /* its own settings, and the component of its that they seed - docs/seam/host-api/config.md.
+    /* its own settings, and the component of its that they seed - docs/seam/host_api/config.md.
      * `config` is a component's name or BRIDGE_NO_CONFIG; null is unset */
     const char *config;
     const bridge_setting_t *settings; uint32_t setting_count;
@@ -224,8 +224,8 @@ constexpr uint8_t BRIDGE_LEVEL_MOST = 7;
 typedef void (*bridge_sink_fn_t)(void *ud, const bridge_record_t *r);
 
 /* The functions below are the whole of what the library exports: a host links it built, as
- * a shared library or a static one, and reaches nothing else of it - docs/seam/host-api/
- * host-api.md, *A host links a built library*. BRIDGE_BUILDING is the library's own build. */
+ * a shared library or a static one, and reaches nothing else of it - docs/seam/host_api/
+ * host_api.md, *A host links a built library*. BRIDGE_BUILDING is the library's own build. */
 #if defined(BRIDGE_BUILDING) && defined(_WIN32)
 #define BRIDGE_API [[gnu::dllexport]]
 #elif defined(BRIDGE_BUILDING)

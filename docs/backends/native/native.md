@@ -1,6 +1,6 @@
 # Modules on the native backend
 
-What was weighed here and refused is `native-refused.md`, *What was refused: Modules on the native
+What was weighed here and refused is `native_refused.md`, *What was refused: Modules on the native
 backend*.
 
 A native module is a **module** like any other - same ABI, same rules, three guarantees fewer,
@@ -54,7 +54,7 @@ has run the library's static initialisers. So you would be checking whether a mo
 after executing it, and a library cannot be cleanly unloaded. Read, then decide, then load.
 
 **The section is a convention the host reads, not something Bridge-ASM700 parses.** Bridge-ASM700 is
-handed the identity as data - `host-api.md`, *The data* - so the section tables are to be walked
+handed the identity as data - `host_api.md`, *The data* - so the section tables are to be walked
 by `bridge_manifest_parse`, a helper beside the library rather than inside it, which `PLAN.md`,
 stage 13, writes: ELF's `shdr` and
 `shstrtab`, PE's section table after the optional header, Mach-O's load commands. One implementation

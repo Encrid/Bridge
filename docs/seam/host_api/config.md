@@ -1,8 +1,8 @@
 # Config
 
-What was weighed here and refused is `config-refused.md`, *What was refused: Config*.
+What was weighed here and refused is `config_refused.md`, *What was refused: Config*.
 
-Bridge-ASM700 reads no file. A host hands it values as structs - `host-api.md`, *The data* - and
+Bridge-ASM700 reads no file. A host hands it values as structs - `host_api.md`, *The data* - and
 where those values came from is the host's business: a file, a database, compiled-in constants. This
 document is what Bridge-ASM700 requires of them.
 
@@ -56,7 +56,7 @@ as what it hands over is one stated value per key. The original Bridge had the s
                                                read / write
                                                [.config]
 
-Each becomes a field in `host-api.md`, *The data*, and Bridge-ASM700's behaviour turns on it.
+Each becomes a field in `host_api.md`, *The data*, and Bridge-ASM700's behaviour turns on it.
 Anything else a host configures - where modules are found, where records go, when a report is
 printed - is the host's and has no key here: `split.md`, *The split*.
 

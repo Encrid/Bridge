@@ -1,4 +1,4 @@
-/* The runtime lifecycle: load, unload, reload. docs/seam/host-api/lifecycle.md is the order of
+/* The runtime lifecycle: load, unload, reload. docs/seam/host_api/lifecycle.md is the order of
  * each; docs/bridge/data/lifetime.md is what becomes of storage; docs/bridge/run/failure.md is
  * what a failure costs. All three are legal only between phases. */
 #include "inside.h"

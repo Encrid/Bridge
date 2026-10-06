@@ -79,7 +79,7 @@ in-process.
 **8. Choose, and record what was refused.** A refusal with no condition attached reads
 identically to an oversight a year later. Write the condition that would change the answer, or
 that none would. It goes in the record of the document the decision is in - `refused/`, the file
-of the same name with `-refused` after it, under the same heading - and not in the document,
+of the same name with `_refused` after it, under the same heading - and not in the document,
 which says what the design is.
 
 **9. Apply to the documents.** The decision goes in the document it belongs to, never in a list of

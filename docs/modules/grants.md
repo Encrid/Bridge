@@ -1,6 +1,6 @@
 # Whose component it is
 
-What was weighed here and refused is `grants-refused.md`, *What was refused: Whose component it is*.
+What was weighed here and refused is `grants_refused.md`, *What was refused: Whose component it is*.
 
 A component name is namespaced - `mymod:Explosion`. **A module may always declare a component in
 its own namespace, and reaching another namespace's needs a grant from the deployment.** Refused at

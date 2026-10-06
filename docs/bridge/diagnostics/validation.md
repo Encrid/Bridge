@@ -1,6 +1,6 @@
 # What a bad write costs, and what finds it
 
-What was weighed here and refused is `validation-refused.md`, *What was refused: What a bad write
+What was weighed here and refused is `validation_refused.md`, *What was refused: What a bad write
 costs, and what finds it*.
 
 A diagnostic says what occurred. None of it is a second way to read the design, and state is

@@ -1,6 +1,6 @@
 # Create
 
-What was weighed here and refused is `create-refused.md`, *What was refused: Create*.
+What was weighed here and refused is `create_refused.md`, *What was refused: Create*.
 
 `bridge_create` is `Com_Init` minus the filesystem: take the config, open the backends it names,
 size the shared block, and build the phase table. It loads no module - the host does that.

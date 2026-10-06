@@ -1,6 +1,6 @@
 # Threads
 
-What was weighed here and refused is `threads-refused.md`, *What was refused: Threads*.
+What was weighed here and refused is `threads_refused.md`, *What was refused: Threads*.
 
 **The execution model is task parallelism between modules, and sequential within one.** Systems
 of different modules that do not conflict run at the same instant, each on a thread of its own.

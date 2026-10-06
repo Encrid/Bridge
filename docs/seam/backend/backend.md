@@ -1,11 +1,11 @@
 # The backend surface
 
-What was weighed here and refused is `backend-refused.md`, *What was refused: The backend surface*.
+What was weighed here and refused is `backend_refused.md`, *What was refused: The backend surface*.
 
 The surface a backend implements. Bridge-ASM700 defines it; a shared library provides it. Two exist: the
 **wasm** backend, which wraps wasmtime, and the **native** backend, which opens a shared library and
 calls it directly, for code the deployment trusts. A module names the one that runs it -
-`host-api.md`, *The data*.
+`host_api.md`, *The data*.
 
 Bridge-ASM700 keeps everything that is not the engine's business - `split.md`, *The split* - so a backend
 does not reimplement a scheduler to swap an interpreter.
@@ -42,7 +42,7 @@ name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
     call(func, status)                         -> err
 
 Eighteen entries. The first says which backend seam the library was built against, and one of
-another is asked for nothing more - `host-api.md`, *A seam has a number*. The original Bridge's
+another is asked for nothing more - `host_api.md`, *A seam has a number*. The original Bridge's
 `ModuleRuntime` trait had fourteen, four of which were filesystem and timer work that has moved out.
 
 **`module` at this seam is a module's loaded image**: compiled bytes on the wasm backend, an opened

@@ -1,5 +1,5 @@
 /* Counts up in a component, and can be reloaded. init registers and makes the row; reload only
- * registers, over the row that is already there - docs/seam/host-api/lifecycle.md.
+ * registers, over the row that is already there - docs/seam/host_api/lifecycle.md.
  *
  * Built several ways: STEP is what a pass adds; WIDE changes the struct's body; FAIL_RELOAD
  * makes reload answer 5; NO_EXTRA stops declaring a second component; TRIP fails every pass;

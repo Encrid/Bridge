@@ -25,11 +25,11 @@ diagram to keep in step with. One concern per document, in reading order:
     STYLE.md             how the C is written: the rules, and the exceptions to them
 
     refused/             what was weighed and not chosen, in the same tree as what was:
-                         `refused/bridge/data/lifetime-refused.md` is the record of
+                         `refused/bridge/data/lifetime_refused.md` is the record of
                          `bridge/data/lifetime.md`
 
     design/
-        no-builtins.md       the rule, and its universality test
+        no_builtins.md       the rule, and its universality test
         split.md             which side owns what
         costs.md             what we give up
         build.md             the compiler, the platforms, the standard, the C library
@@ -38,8 +38,8 @@ diagram to keep in step with. One concern per document, in reading order:
         STAGE0.md            how we decide things. method, not design
         STAGEN.md            one per stage, written before that stage starts
 
-    seam/host-api/           host to Bridge-ASM700
-        host-api.md          the surface and its structs
+    seam/host_api/           host to Bridge-ASM700
+        host_api.md          the surface and its structs
         create.md            bridge_create, and the sink
         loop.md              who advances, and who decides when it ends
         lifecycle.md         load, unload, reload
@@ -81,7 +81,7 @@ diagram to keep in step with. One concern per document, in reading order:
         abi.md               the eight entries
         grants.md            whose component it is
         pinned.md            one thread for one module
-        engine-callbacks.md  answering an engine from storage
+        engine_callbacks.md  answering an engine from storage
         schema.md            how a module declares its data
 
     backends/wasm/           the wasm backend, and how a module is written for it
@@ -93,7 +93,7 @@ diagram to keep in step with. One concern per document, in reading order:
 
 **A document says what the design is, and its record says what it is not.** What was weighed
 and refused, with why and with the condition that would bring it back, is in `refused/`, in a
-file of the same name with `-refused` after it, under the same headings. A document names its
+file of the same name with `_refused` after it, under the same headings. A document names its
 record once, at its head; a record names the section each of its entries belongs to, and the
 citation check reads both, so a section renamed leaves no entry behind without saying so. It is
 two files and not one because they are two concerns: a reader who wants to know what happens
@@ -154,7 +154,7 @@ where two things could be meant the qualified form is the only form.
 
 **Who is who**
 
-    host              the program that links Bridge-ASM700 and drives it. `host-api.md`
+    host              the program that links Bridge-ASM700 and drives it. `host_api.md`
     backend           a shared library Bridge-ASM700 opens, which runs modules. `backend.md`
     module            what a backend runs: a wasm binary or a native library. `module.md`
     deployment        one host's choice of backends, modules and config

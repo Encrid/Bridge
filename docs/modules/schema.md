@@ -1,6 +1,6 @@
 # Schema
 
-What was weighed here and refused is `schema-refused.md`, *What was refused: Schema*.
+What was weighed here and refused is `schema_refused.md`, *What was refused: Schema*.
 
 ## There is no schema format
 

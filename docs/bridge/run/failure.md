@@ -1,6 +1,6 @@
 # When something fails
 
-What was weighed here and refused is `failure-refused.md`, *What was refused: When something fails*.
+What was weighed here and refused is `failure_refused.md`, *What was refused: When something fails*.
 
 `result` is an i32. Zero for success; anything else is failure, and which value it was is not
 read. Any detail is written to the log - see `log.md`, *The log*.

@@ -1,6 +1,6 @@
 # The runtime lifecycle
 
-What was weighed here and refused is `lifecycle-refused.md`, *What was refused: The runtime
+What was weighed here and refused is `lifecycle_refused.md`, *What was refused: The runtime
 lifecycle*.
 
 **Legal only between phases**, never while `bridge_phase` is executing. All three restructure

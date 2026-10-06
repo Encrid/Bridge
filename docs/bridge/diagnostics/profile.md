@@ -1,6 +1,6 @@
 # The profile
 
-What was weighed here and refused is `profile-refused.md`, *What was refused: The profile*.
+What was weighed here and refused is `profile_refused.md`, *What was refused: The profile*.
 
 It reports **per system rather than per module** - `wasm.md`, *Exports* - and an observer
 cycle is visible in it, `schedule.md`, *An observer runs at the barrier, one hop per barrier*.
@@ -45,7 +45,7 @@ of them.
 adds, A's fires - so both show a call count that never drops to zero, in the rows that already
 exist.
 
-**Opt-in, and nothing when off.** `no-builtins.md`, *No builtins*, uses a clock as its example of
+**Opt-in, and nothing when off.** `no_builtins.md`, *No builtins*, uses a clock as its example of
 something not universal to every deployment, and a profile needs one: a shipped game does not
 measure itself. So `[checks] profile` beside `validate`, as the two things Bridge-ASM700 does only when
 asked, with two clock reads per dispatch as the cost when on.

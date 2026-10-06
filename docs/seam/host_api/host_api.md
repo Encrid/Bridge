@@ -1,6 +1,6 @@
 # Host API
 
-What was weighed here and refused is `host-api-refused.md`, *What was refused: Host API*.
+What was weighed here and refused is `host_api_refused.md`, *What was refused: Host API*.
 
 The surface any host links against. What Bridge-ASM700 requires of the values a host hands over is
 `config.md`.

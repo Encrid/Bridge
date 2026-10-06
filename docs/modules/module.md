@@ -1,6 +1,6 @@
 # The module model
 
-What was weighed here and refused is `module-refused.md`, *What was refused: The module model*.
+What was weighed here and refused is `module_refused.md`, *What was refused: The module model*.
 
 A **module** is code Bridge-ASM700 runs through a backend. There is one model, whatever the backend, and
 Bridge-ASM700 has no opinion about which backend you build for - choosing is the deployment's, because the

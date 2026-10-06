@@ -1,6 +1,6 @@
 # Threads
 
-What was weighed here and refused is `pinned-refused.md`, *What was refused: Threads*.
+What was weighed here and refused is `pinned_refused.md`, *What was refused: Threads*.
 
 A module's systems run on whichever thread Bridge-ASM700 schedules it on, and different modules run at
 once - `threads.md`, *Threads*. For most modules that is the end of it.

@@ -1,6 +1,6 @@
 # The wasm backend
 
-What was weighed here and refused is `wasmtime-refused.md`, *What was refused: The wasm backend*.
+What was weighed here and refused is `wasmtime_refused.md`, *What was refused: The wasm backend*.
 
 The backend that runs a core wasm module in a sandbox, over wasmtime. What a backend is asked for is
 `backend.md`; how a module is written for this one is `wasm.md`. This document is what is particular to

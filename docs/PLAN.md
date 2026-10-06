@@ -323,13 +323,13 @@ fails on one that is not.*
 ## 13. A host, from outside
 
 A standalone host, in its own repository, that links the library built and nothing else of it, which
-is what tests the host seam - `host-api.md`, *A host links a built library*. It is handed the two
+is what tests the host seam - `host_api.md`, *A host links a built library*. It is handed the two
 library files and the headers, not the source tree: a host does not compile Bridge-ASM700. And a
 host may be in any language that can call C, so the seam is to be shown from more than C. Which
 languages, and whether one host or several, is this stage's first question, by the method of
 `STAGE0.md`; a host in C++ that links and runs is one of them, since the seam headers already say
 they are C to a C++ compiler and nothing has linked them as such. Whatever it reads - files, layers,
-a manifest - it resolves into the structs of `host-api.md`, *The data*. `bridge_manifest_parse`
+a manifest - it resolves into the structs of `host_api.md`, *The data*. `bridge_manifest_parse`
 ships beside the library, not inside it, for a host that wants it - `native.md`, *Identity*.
 
 *Done when a host that was handed only the built library and its headers drives a real deployment
@@ -416,7 +416,7 @@ them ask another module a question synchronously - `costs.md`, *What we give up*
 189 is the number that can pass.
 
 It is also the first deployment that needs a clock and a set of phases, and nothing ships either:
-`no-builtins.md`, *No builtins*, and `schedule.md`, *Bridge-ASM700 ships no phase names*. Both are
+`no_builtins.md`, *No builtins*, and `schedule.md`, *Bridge-ASM700 ships no phase names*. Both are
 this deployment's own here. Whether either becomes content that deployments share - a module with
 a name and a version, a list of phase names - is this stage's question to put, by the method of
 `STAGE0.md`, with what the port actually needed in hand.

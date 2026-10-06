@@ -1,6 +1,6 @@
 # The data model
 
-What was weighed here and refused is `data-refused.md`, *What was refused: The data model*.
+What was weighed here and refused is `data_refused.md`, *What was refused: The data model*.
 
 What a component is and when the world changes. How a module reaches one is `query.md` and
 `reference.md`; what survives a reload is `lifetime.md`. Where the bytes live is `memory.md`; who

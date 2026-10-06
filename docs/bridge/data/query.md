@@ -1,6 +1,6 @@
 # The interface is a query
 
-What was weighed here and refused is `query-refused.md`, *What was refused: The interface is a
+What was weighed here and refused is `query_refused.md`, *What was refused: The interface is a
 query*.
 
 You do not get storage. You get your query's results, which is how an ECS is used:

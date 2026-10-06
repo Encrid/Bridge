@@ -1,6 +1,6 @@
 # Variable length
 
-What was weighed here and refused is `strings-refused.md`, *What was refused: Variable length*.
+What was weighed here and refused is `strings_refused.md`, *What was refused: Variable length*.
 
 A component cannot hold a `string` or a `list`: a column is an array at a fixed stride. So the bytes
 live in an arena and the component holds `(offset, length)`, which is fixed size and therefore an

@@ -1,5 +1,5 @@
 /* A module's own settings: one row of the component its author named, written after init by
- * what each field is. docs/seam/host-api/config.md, *A module's own settings are a component*. */
+ * what each field is. docs/seam/host_api/config.md, *A module's own settings are a component*. */
 #include "inside.h"
 
 #include <stdio.h>

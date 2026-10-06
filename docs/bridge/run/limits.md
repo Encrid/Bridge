@@ -1,6 +1,6 @@
 # What bounds a run
 
-What was weighed here and refused is `limits-refused.md`, *What was refused: What bounds a run*.
+What was weighed here and refused is `limits_refused.md`, *What was refused: What bounds a run*.
 
 Five numbers bound a module, in **three kinds**. What each one bounds, and over what *period*,
 decides whether a number means anything:

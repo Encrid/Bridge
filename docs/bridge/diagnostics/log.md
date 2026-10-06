@@ -1,8 +1,8 @@
 # The log
 
-What was weighed here and refused is `log-refused.md`, *What was refused: The log*.
+What was weighed here and refused is `log_refused.md`, *What was refused: The log*.
 
-The log is Bridge-ASM700's, not a module's, and it passes the test in `no-builtins.md`, *No builtins*:
+The log is Bridge-ASM700's, not a module's, and it passes the test in `no_builtins.md`, *No builtins*:
 anything can fail, so every deployment needs it, and a failure nobody can report is worse than a
 missing feature.
 
@@ -19,7 +19,7 @@ in the original Bridge. Bridge-ASM700 drains every ring at each barrier.
     u32 len
     u32 arg[2]    two inline numbers: a value, and what it is set beside
 
-**This record never leaves Bridge-ASM700.** What the host sees is resolved - `host-api.md`, *Nothing
+**This record never leaves Bridge-ASM700.** What the host sees is resolved - `host_api.md`, *Nothing
 here is an ABI layout* - so the shape above is the module seam's alone and its stride is free to
 change.
 

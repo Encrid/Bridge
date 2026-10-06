@@ -1,6 +1,6 @@
 # Modules on the wasm backend
 
-What was weighed here and refused is `wasm-refused.md`, *What was refused: Modules on the wasm
+What was weighed here and refused is `wasm_refused.md`, *What was refused: Modules on the wasm
 backend*.
 
 On the wasm backend a module is a core wasm binary with a `bridge:manifest` section. What it can *do* is
@@ -149,7 +149,7 @@ a header rather than a format. idTech3 did this with `g_public.h`, and its enfor
 in capitals: *"DO NOT MODIFY ANYTHING ABOVE THIS, THE SERVER EXPECTS THE FIELDS IN THAT ORDER!"*.
 Ours is the ABI version in `bridge:manifest`: a module built against another is refused by name.
 The number is 1 and stays 1 until there is a release; from then on a change to an ABI layout
-raises it - `host-api.md`, *A seam has a number*, which is the rule for all three seams.
+raises it - `host_api.md`, *A seam has a number*, which is the rule for all three seams.
 
 A module that is not C cannot include the header, and so far cannot be written from it either:
 the header is C23, and the one translator tried on it, the project's own compiler's, stops at its
@@ -171,7 +171,7 @@ game engine and knows what an entity is. **Bridge-ASM700 orchestrates and knows 
 says how to find data and never what data there is: no component, no field, and no prefix a module
 must start its struct with.
 
-**Bridge-ASM700 declares no components at all**, not even about itself - see `no-builtins.md`, *No
+**Bridge-ASM700 declares no components at all**, not even about itself - see `no_builtins.md`, *No
 builtins*. The line it does draw is the log record's: Bridge-ASM700 owns the record's shape, the module
 owns the message. No field name of a component is in the header either, even though Bridge-ASM700 has
 them - `schema.md`, *There is no schema format*.

@@ -1,6 +1,6 @@
 # The build
 
-What was weighed here and refused is `build-refused.md`, *What was refused: The build*.
+What was weighed here and refused is `build_refused.md`, *What was refused: The build*.
 
 What Bridge-ASM700 is compiled with, for what, in which C, and against which C library. None of it
 is the design of the library. All of it decides whether the library can be built the same way on
@@ -44,7 +44,7 @@ What this gives up: the rebuild check, the parallelism and the choice of tests a
 right, and an editor that reads CMake finds nothing to read.
 
 **What it makes of the library is two files**: a shared library and a static one, from the same
-objects - `host-api.md`, *A host links a built library*. The library's objects are compiled with
+objects - `host_api.md`, *A host links a built library*. The library's objects are compiled with
 everything hidden but what `bridge.h` marks, so the shared library exports the host seam and
 nothing more.
 
@@ -79,7 +79,7 @@ A file in a later standard reads a header in an earlier one, which is the direct
 nothing. **A standard binds only at a boundary someone else compiles**, and ours is stated here:
 a host or a backend written in C, and a module in C that uses a backend's SDK, is compiled as
 C23. A host need not be in C at all: it links the library built, from any language that can call
-C, and for one in C++ the seam headers say they are C - `host-api.md`, *A host links a built
+C, and for one in C++ the seam headers say they are C - `host_api.md`, *A host links a built
 library*. zig is the compiler that builds all of it - *One compiler* - and a module in another
 language needs none of these headers: *What an author is not bound by*.
 

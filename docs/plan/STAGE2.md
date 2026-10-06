@@ -8,7 +8,7 @@ part of the host seam needed to load one module through them, and the tests that
 running, failing and being refused. No storage, no systems, no phases: those are stage 3.
 
 What each piece is and why is in the documents it belongs to: `backend.md`, `wasmtime.md`,
-`host-api.md`, `create.md`, `lifecycle.md`, `limits.md`. This document is what the stage built and
+`host_api.md`, `create.md`, `lifecycle.md`, `limits.md`. This document is what the stage built and
 what it found on the way.
 
 ## What it produced

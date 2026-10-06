@@ -1,6 +1,6 @@
 # The schedule
 
-What was weighed here and refused is `schedule-refused.md`, *What was refused: The schedule*.
+What was weighed here and refused is `schedule_refused.md`, *What was refused: The schedule*.
 
 What Bridge-ASM700 does between a module's systems and observers: when they run, and what is visible
 while they do. What bounds a run is `limits.md`; what happens when one fails is `failure.md`; which
@@ -26,7 +26,7 @@ is forced.
 
 Not one, and not a default set. **A phase name is a name somebody has to invent**, and inventing one
 here would turn Bridge-ASM700's guess about the shape of a frame into something every module references.
-That is the last clause of `no-builtins.md`, *No builtins*, and it fails that rule's universality test: a
+That is the last clause of `no_builtins.md`, *No builtins*, and it fails that rule's universality test: a
 one-run tool and a game do not want the same phases.
 
 So a deployment declares its own, and `bridge_create` refuses a config with none, exactly as it
@@ -57,7 +57,7 @@ are bootstrapped by the **pipeline addon** (`src/addons/pipeline/pipeline.c:968`
 and `ecs_pipeline_init` lets a world define its own instead. So they are an optional default made of
 replaceable data, not names the library imposes. Here nothing ships one at all: not the library,
 and not a host, which hands over the phases its deployment stated. Whether a set of names ever
-becomes something deployments share is the question `no-builtins.md`, *No builtins*, puts for a
+becomes something deployments share is the question `no_builtins.md`, *No builtins*, puts for a
 clock, and it is asked where the first real deployment is built: `PLAN.md`, stage 17.
 
 flecs' phases carry `DependsOn` relationships, and `:942` records the care that needs -
@@ -226,7 +226,7 @@ on something nobody can see, and nothing later could recover that.
 it.** Nothing is missing from Bridge-ASM700 for it. A host loads native modules of its own, and a
 native module reads the columns of the components it declares through real pointers, and writes
 them: so a module that copies what the input modules wrote, and another that writes it back in
-their place, are two modules like any other - `no-builtins.md`, *No builtins*: a new capability
+their place, are two modules like any other - `no_builtins.md`, *No builtins*: a new capability
 is a new module. The journal they feed is a file, and a file is the host's - `split.md`, *The
 split*. It may not drop a record, which is why it is not the log's path - `log.md`, *The log*.
 

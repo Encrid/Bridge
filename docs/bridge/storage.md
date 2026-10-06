@@ -1,6 +1,6 @@
 # Storage
 
-What was weighed here and refused is `storage-refused.md`, *What was refused: Storage*.
+What was weighed here and refused is `storage_refused.md`, *What was refused: Storage*.
 
 Who keeps the rows, and how. The model a module sees is `data.md`; what it reads is `query.md` and
 `reference.md`; which block each thing is in is `memory.md`.

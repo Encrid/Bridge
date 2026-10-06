@@ -1,6 +1,6 @@
 /* Bridge-ASM700: open the backends, build storage, run a phase, and say what is loaded. Loading,
  * unloading and reloading a module are lifecycle.c.
- * docs/seam/host-api/create.md, loop.md and introspection.md. */
+ * docs/seam/host_api/create.md, loop.md and introspection.md. */
 #include "inside.h"
 
 #include <stdarg.h>
@@ -122,7 +122,7 @@ bridge_t *bridge_create(const bridge_config_t *cfg, bridge_sink_fn_t sink, void 
     b->granule = 1;
     b->sink = sink;
     b->ud = ud;
-    /* host-api.md, *A seam has a number*: read before anything else of the struct is */
+    /* host_api.md, *A seam has a number*: read before anything else of the struct is */
     if (cfg->abi != BRIDGE_HOST_ABI) {
         if (!cfg->abi) say(b, nullptr, nullptr, BRIDGE_ERR, "abi is unset");
         else say(b, nullptr, nullptr, BRIDGE_ERR, "the host is of host ABI %u, and this is %u",

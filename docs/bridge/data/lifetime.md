@@ -1,6 +1,6 @@
 # Lifetime
 
-What was weighed here and refused is `lifetime-refused.md`, *What was refused: Lifetime*.
+What was weighed here and refused is `lifetime_refused.md`, *What was refused: Lifetime*.
 
 Storage is the bridge's and outlives the module that declared a component, so a reloaded module finds its
 components still there - which the original Bridge does not do. What happens when a component layout
