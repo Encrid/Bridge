@@ -6,10 +6,14 @@ cycle is visible in it, `schedule.md`, *An observer runs at the barrier, one hop
     int bridge_profile(bridge *b, bridge_profile_row *out, int max);
 
     typedef struct {
-        const char *name;     /* a system or an observer */
+        const char *name;     /* a system's, an observer's, or a phase's for its barrier */
         uint64_t    calls;
         uint64_t    nanos;
+        uint8_t     kind;     /* a system, an observer or a barrier: zero is none of them */
+        uint8_t     pad[7];
     } bridge_profile_row;
+
+It is not built: `PLAN.md`, stage 14. What is here is what that stage builds.
 
 **A pull, not records**, for the reason `log.md`, *The log* gives against itself: that ring is *"Drop and
 count, never block"*. A dropped log line is a missing line; a dropped profile record is a **biased
@@ -22,8 +26,22 @@ and a time are different facts there. flecs keeps **one** metric per system -
 `ecs_system_stats_t.time_spent`, `flecs.h:14813` - against sixty-one at the world level, and the
 discipline is the part worth copying.
 
-**No per-phase row**, because a phase is the sum of its systems and the host can add. The same rule
-keeps `bridge_module_info` at two fields: do not report what the caller can derive.
+**A row for each phase's barrier, and none for the phase.** What a barrier does is in no
+system's row: it applies the changes that were queued, tops up ids, republishes spans, counts
+failures and drains every module's log. An attach costs 30 to 40 ns there, so a phase that
+queues a hundred thousand spends three or four milliseconds in a place the other rows do not
+show. So each phase has one more row, for its barrier: how many ran, and how long they took. A
+row says which of the three it is.
+
+The phase itself has none, because a host can time the call it makes; the same rule keeps
+`bridge_module_info` at two fields: do not report what the caller can derive. It cannot be had
+by adding the rows up, though, which is what this said: systems of different modules run at
+once, so four of a millisecond on four threads are a millisecond, and the barrier was in none
+of them.
+
+Refused: the barrier in parts, a row each for applying, republishing and draining. It is six
+more reads of a clock a barrier, and nothing yet asks which part. The condition that brings it
+back is a barrier's row seen to be most of a phase, with nothing to say why.
 
 **And an observer cycle needs no counter of its own.** A cycle means A adds, B's observer fires, B
 adds, A's fires - so both show a call count that never drops to zero, in the rows that already

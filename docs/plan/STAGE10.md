@@ -619,7 +619,9 @@ Of earlier stages:
     closed  no phase names shipped, and a module writes its phase's name into its code: a
             deployment maps a module's phase names to its own, in that module's config.
             `schedule.md`, *A module's phase names are mapped by the deployment*
-    open    no row for a barrier in the profile
+    closed  no row for a barrier in the profile: each phase has one, and a row says what it
+            is. "A phase is the sum of its systems" was false. `profile.md`; built in
+            stage 14
     open    a stopped bridge takes only the load or reload of the module that stopped it
     open    all pinned modules share the host's thread
     open    native entry arguments are scratch offsets, copied

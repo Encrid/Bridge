@@ -316,7 +316,8 @@ that ever was, for the bridge and for each module - the reading a deployment siz
 What a host does with it is the host's, in its own repository.
 
 *Done when a deliberate stray write is reported with the module that made it, a system made slow on
-purpose is the one the profile names, an observer cycle shows as call counts that never fall to
+purpose is the one the profile names, a barrier made slow on purpose by what was queued is the
+row the profile names, an observer cycle shows as call counts that never fall to
 zero, every budget of the bridge and of a module reads as what a test made it use and as the
 most it ever used, and one deployment run twice, and on one thread and on four, gives the same checksum of
 every column at every barrier - `schedule.md`, *What a pass depends on*.*
