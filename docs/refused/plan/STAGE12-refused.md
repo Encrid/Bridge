@@ -86,3 +86,21 @@ tag is written in one place. No condition brings it back.
 
 Refused: what is built keeping its hyphen. Rule O4 is about what is tracked and does not ask
 for it. A backend would then be spelled two ways. No condition brings it back.
+
+## How a file of many functions is cut
+
+Of `STAGE12.md`, *How a file of many functions is cut*.
+
+Refused: optimisation at link time, which would inline across `.c` files. Probed with zig
+0.16: the link fails for `x86_64-windows-gnu` on symbols of the C runtime, `aarch64-macos`
+answers that it requires another linker, and an object becomes LLVM bitcode, so the static
+library could not be linked by a host's own linker - `host-api.md`, *A host links a built
+library*. The condition that brings it back is all three ceasing to be so.
+
+Refused: the pieces as `.c` files that one `.c` includes, which alone is compiled. The unit is
+the same and no code is in a header. A piece does not compile alone, and the build and a reader
+must both know which `.c` is a piece. No condition brings it back.
+
+Refused: an exception to rule O3 for the files a barrier runs through. The least work, and the
+same speed. The rule would then not hold where the code is hardest to read. The condition that
+brings it back is a line that stays slower after the cut and cannot be explained.

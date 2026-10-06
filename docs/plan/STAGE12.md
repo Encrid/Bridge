@@ -242,3 +242,39 @@ adds `_t`**: `typedef struct module module_t;`. One stem and one suffix.
 `bridge_backend.h`, `bridge_schema.h`, `bridge_native.h`, `bridge_wasm.h`. **What is built
 follows**, `bridge_wasm.dll` and `bridge_native.dll`, so that a backend is spelled one way in
 its header, its library and a host's configuration.
+
+### How a file of many functions is cut
+
+`storage.c` had 97 functions, `abi.c` 35 and `lifecycle.c` 29, and rule O3 allows five a file.
+
+The compiler puts a `static` function inside its caller only when both are in one translation
+unit. `storage.c` was one: nine helpers are forced inline by an attribute, and the rest are
+inlined as the compiler judges. Cut into `.c` files, a call from one to another is a real call.
+
+Measured, with `storage.c`, `abi.c` and `block.c` compiled so that only the nine forced helpers
+are inline, which is the worst a cut can do. Three runs of each, in ns:
+
+                                        before          only the nine inline
+    attach, the first component         26.6 to 27.7    37.3 to 37.8
+    attach, a component it has          12.1 to 12.3    18.6 to 18.9
+    attach, a second component          29.6 to 30.4    48.0 to 48.7
+    detach                              27.5 to 28.2    42.3 to 44.2
+    destroy                             14.9 to 15.7    20.5 to 21.3
+    a sparse set given                  27.4 to 29.3    44.6 to 46.6
+    direct-indexed given                17.5 to 18.0    32.7 to 33.4
+    the stress run, 4 threads, ms       1457 to 1546    1767 to 1896
+
+The nine are not enough: most of what is inlined, the compiler chose.
+
+**What runs once for a change or for a row is `static inline` in a header, five a header, and
+what runs once for a barrier or more rarely is in a `.c`.** Rule H1 allows a header exactly
+that. The `.c` that holds a barrier's loop includes those headers, so the compiler has the same
+code in one unit as before. Every commit of the cut is measured beside the tree before the
+stage, and a slower line stops it.
+
+    fast          the unit the compiler sees is the one it saw; held at every commit
+    scalable      a new function has its place by how often it runs
+    modular       every file compiles alone
+    extensible    a test or a backend can include one header of it
+    minimal       the build does not change
+    explicit      where a function is says how often it runs

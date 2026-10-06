@@ -124,6 +124,15 @@ create by which thread is running, because that callback of wasmtime's carries n
 others are gone: flecs' allocator callbacks could not say which bridge they worked for, and the
 native backend used one to know which module had called, where it now passes the table.
 
+## Where a function is
+
+**What runs once for a change or for a row is `static inline` in a header, and what runs once
+for a barrier or more rarely is in a `.c`.** A file holds five functions at most - `STYLE.md`,
+rule O3 - and the compiler inlines a `static` function only into a caller of the same
+translation unit, so the functions a barrier's loop goes through are where every unit that
+loops over them can see them. Cut into `.c` files alone, every change was measured 35 to 85
+percent slower - `STAGE12.md`, *How a file of many functions is cut*.
+
 ## The C library
 
 A C library is three things under one name:
