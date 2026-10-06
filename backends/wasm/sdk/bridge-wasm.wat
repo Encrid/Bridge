@@ -10,11 +10,16 @@
   (import "bridge" "private" (memory $private 1))
   (import "main" "memory" (memory $own 0))
 
-  ;; Where a row is, carrying the test that it is one of the span's rows. Always: a load past
-  ;; them is still inside the shared memory, which wasm permits.
+  ;; Where a row is, twice: carrying the test that it is one of the span's rows, and not. A
+  ;; load past them is still inside the shared memory, which wasm permits, so the test is the
+  ;; only thing that catches one. Which of the two a module is built with is its author's to
+  ;; state: bridge-wasm.h, BRIDGE_ROWS_CHECKED and BRIDGE_ROWS_UNCHECKED.
   (func (export "acc_row") (param $base i32) (param $row i32) (param $count i32) (param $stride i32)
         (result i32)
     (if (i32.ge_u (local.get $row) (local.get $count)) (then (unreachable)))
+    (i32.add (local.get $base) (i32.mul (local.get $row) (local.get $stride))))
+  (func (export "acc_row_unchecked") (param $base i32) (param $row i32) (param $count i32)
+        (param $stride i32) (result i32)
     (i32.add (local.get $base) (i32.mul (local.get $row) (local.get $stride))))
 
   ;; the shared memory, by width

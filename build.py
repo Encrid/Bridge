@@ -50,7 +50,6 @@ BINARYEN_URL = ('https://github.com/WebAssembly/binaryen/releases/download/versi
 BINARYEN_SHA256 = '17a2cbeac6b5693c5fbafab3838d3c65fd9c1eb38b05f5baec6c657e8c84995b'
 FEATURES = ['--enable-multimemory', '--enable-bulk-memory', '--enable-sign-ext',
             '--enable-nontrapping-float-to-int', '--enable-mutable-globals']
-ROW_TEST = '(if (i32.ge_u (local.get $row) (local.get $count)) (then (unreachable)))'
 TIMEOUT = 120
 
 BRIDGE = ['bridge', 'lifecycle', 'config', 'block', 'storage', 'schema', 'abi', 'schedule', 'pool',
@@ -74,8 +73,8 @@ NATIVE = [
     ('nstress3', 'nstress', ['SEED=3u', 'SPACE="s3"']), ('nstress4', 'nstress', ['SEED=4u', 'SPACE="s4"']),
 ]
 
-# a module in C: the name, its source, which accessors it is merged with, what it is compiled
-# with. `unchecked` is the accessors without the row < count test: only the measurement uses it.
+# a module in C: the name, its source, whether its rows are tested, what it is compiled with.
+# `checked` or `unchecked` is stated for each, as the SDK asks: BRIDGE_ROWS_CHECKED, or not.
 PLAIN = ('mover reader refs fp badterm spin3 flood chatty rows halver twostep watcher chain '
          'badobs events fixer nested nested2 namer spawner counter typer user settings hang')
 WASM = [(name, name, 'checked', []) for name in PLAIN.split()] + [
@@ -266,31 +265,22 @@ def build(target, debug, out):
 
     # ---- wasm modules: text assembled, C compiled and merged with the accessors ----
     accessors = ROOT / 'backends/wasm/sdk/bridge-wasm.wat'
-    unchecked = out / 'bridge-wasm-unchecked.wat'
-
-    def without_row_test():
-        text = accessors.read_text(encoding='utf-8')
-        if ROW_TEST not in text:
-            die('bridge-wasm.wat: the row < count test is not where the build expects it')
-        unchecked.write_text(text.replace(ROW_TEST, ''), encoding='utf-8')
-    step('accessors without the row test', [unchecked], [accessors, Path(__file__)],
-         [without_row_test])
+    acc = modules / 'acc.wasm'
     assembled = [('assembling %s' % wat.name, [modules / (wat.stem + '.wasm')], [wat],
                   [[wasm_tools, 'parse', wat, '-o', modules / (wat.stem + '.wasm')]])
                  for wat in sorted((ROOT / 'tests/modules/wasm').glob('*.wat'))]
-    assembled += [('assembling the %s accessors' % kind, [modules / ('acc-%s.wasm' % kind)], [wat],
-                   [[wasm_tools, 'parse', wat, '-o', modules / ('acc-%s.wasm' % kind)]])
-                  for kind, wat in (('checked', accessors), ('unchecked', unchecked))]
+    assembled += [('assembling the accessors', [acc], [accessors],
+                   [[wasm_tools, 'parse', accessors, '-o', acc]])]
     together(assembled)
     compiled = []
     for name, source, kind, flags in WASM:
         raw, merged, final = (modules / (name + s) for s in ('.raw.wasm', '.merged.wasm', '.wasm'))
-        acc = modules / ('acc-%s.wasm' % kind)
         c = ROOT / 'tests/modules/wasm' / (source + '.c')
         compiled.append(('building module %s' % name, [final], [c, acc] + headers, [
             [zig, 'cc', '-target', 'wasm32-freestanding', '-std=c23', '-pedantic-errors', '-Wall',
              '-Wextra', '-Werror', '-Wno-missing-field-initializers', '-O2', '-nostdlib'] +
-            ['-D' + d for d in flags] + [include, sdk['wasm'], '-Wl,--no-entry', '-o', raw, c],
+            ['-D' + d for d in flags + ['BRIDGE_ROWS_' + kind.upper()]] +
+            [include, sdk['wasm'], '-Wl,--no-entry', '-o', raw, c],
             [merge, raw, 'main', acc, 'acc'] + FEATURES + ['-o', merged],
             [opt, merged] + FEATURES + ['-O3', '--remove-exports=acc_*',
                                          '--remove-unused-module-elements', '-o', final]]))

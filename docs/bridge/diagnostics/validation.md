@@ -23,14 +23,24 @@ and always paid for; what we check always and what we check when asked are two d
 
 ## Always on
 
-**The `row < count` test the accessors carry.** Not a policy: that code is compiled into the
-module's own artifact, which Bridge-ASM700 only ever sees as bytes, so no Bridge-ASM700 setting
-could remove it and the accessors offer none. An author who wants it gone writes their own
-accessor, at which point it is their code. It is not redundant with wasm's bounds check either: wasm
-catches a load outside the *memory*, and this catches one past the span's rows and still inside
-the shared memory, which wasm permits.
+Nothing of Bridge-ASM700's is on this list any more: what follows is the wasm backend's SDK, and
+it is stated where it had been always on.
 
-**It is a compare and branch per row, and nothing removes it.** The loop bound is the same `count`
+### The row test
+
+**The wasm SDK's accessors can test `row < count` before every load, and a module's author
+states whether they do.** A module is compiled with `BRIDGE_ROWS_CHECKED` or with
+`BRIDGE_ROWS_UNCHECKED`, and with neither, or both, it does not compile. It is not Bridge-ASM700's
+to state: that code is in the module's own artifact, which Bridge-ASM700 only ever sees as bytes.
+And it is not redundant with wasm's bounds check: wasm catches a load outside the *memory*, and
+this catches one past the span's rows and still inside the shared memory, which wasm permits.
+
+**What it protects is the author, from an index of their own that is wrong.** It is no part of
+the sandbox: a wasm module reads and writes every byte of the shared memory with a plain load,
+and access is not enforced - `data.md`, *Access mode*. The native SDK hands out real pointers and
+tests nothing.
+
+**It is a compare and branch per row.** The loop bound is the same `count`
 and the test could be hoisted, but neither Binaryen nor wasmtime does. Over the tightest loop a
 system can have, one float read, changed and written back per row of 200,000:
 
@@ -39,12 +49,16 @@ system can have, one float read, changed and written back per row of 200,000:
     fuel                 0.65             0.44      x1.5
 
 Under fuel it costs more than itself, because the branch it adds is a block and fuel is counted by
-the block - `limits.md`, *What a bound costs*. `tests/stage3.c`'s `bench` case is the measurement,
-and the build without the test exists only for it.
+the block - `limits.md`, *What a bound costs*. `tests/stage3.c`'s `bench` case is the measurement:
+one module, built both ways.
 
-It stays, at that price: a sixth of a tight loop buys the one check that catches a module reading
-rows that are not its span's. The condition that reopens it is a workload where that sixth is the
-difference, and the answer then is an accessor that tests once per span rather than once per row.
+Refused: the test always, which is what this was, "at that price". The price is a sixth to a
+third of the loop this design exists to keep fast, paid by every wasm module, to catch a mistake
+that only its author can make and only its author can weigh. The condition that brings it back
+is the test costing nothing, as it would if a compiler hoisted it. Refused: a second family of
+accessors that tests once a span, beside the first: two to keep equal, alike to read and
+different in what they catch. The condition that brings it back is one module that needs both
+in one build.
 
 **The entity index needs no check of its own.** It did while flecs kept the rows: flecs moved a
 row and Bridge-ASM700 had to be told, by a patch whose failure would have been silent, so every

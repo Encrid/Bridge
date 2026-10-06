@@ -56,6 +56,11 @@ into the compiled module and inlines it, with Binaryen's `wasm-merge` and `wasm-
 has plain loads and stores on the shared memory in the loop and no call left: checked on a C loop
 before this was written down.
 
+**A module is compiled with `BRIDGE_ROWS_CHECKED` or with `BRIDGE_ROWS_UNCHECKED`.** The file holds
+the accessor that finds a row twice, with and without the test that the row is one of the span's,
+and `bridge-wasm.h` takes the one stated and refuses to compile with neither. What the test is
+for and what it costs is `validation.md`, *The row test*.
+
 **The build then strips them.** The merge leaves every accessor exported, so the build removes the
 exports by their common prefix, `acc_`, and with them the bodies nothing calls any more:
 `wasm-opt --remove-exports=acc_* --remove-unused-module-elements`.

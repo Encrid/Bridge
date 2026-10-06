@@ -34,7 +34,18 @@ BRIDGE_IMPORT(alloc)   uint32_t bridge_alloc(uint32_t len);
 
 /* ---- the accessors: bridge-wasm.wat ---- */
 
+/* Where a row is. Whether it is tested to be one of the span's rows, each time, is stated
+ * by whoever builds the module: docs/bridge/diagnostics/validation.md, *The row test*. */
+#if defined(BRIDGE_ROWS_CHECKED) == defined(BRIDGE_ROWS_UNCHECKED)
+#error "a module is built with BRIDGE_ROWS_CHECKED or with BRIDGE_ROWS_UNCHECKED: one of them, stated"
+#endif
+#ifdef BRIDGE_ROWS_CHECKED
 BRIDGE_ACC(acc_row)    uint32_t acc_row(uint32_t base, uint32_t row, uint32_t count, uint32_t stride);
+#else
+BRIDGE_ACC(acc_row_unchecked) uint32_t acc_row_unchecked(uint32_t base, uint32_t row, uint32_t count,
+                                                         uint32_t stride);
+#define acc_row acc_row_unchecked
+#endif
 BRIDGE_ACC(acc_ld_i8)  int32_t  acc_ld_i8(uint32_t at);
 BRIDGE_ACC(acc_ld_u8)  uint32_t acc_ld_u8(uint32_t at);
 BRIDGE_ACC(acc_ld_i16) int32_t  acc_ld_i16(uint32_t at);

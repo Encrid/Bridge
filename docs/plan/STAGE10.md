@@ -551,8 +551,10 @@ The chosen option contradicts its own reason, or a document:
             count its calls to the allocator holds it. What grows at unload - the arena's
             list of gaps, the kept settings - is with "an allocation that fails at load",
             below. `budgets.md`, *Nothing is allocated in a phase*
-    open    the test of a row against its count, a row at a time: x1.2 on the tightest loop,
-            where one test a span was written down and not weighed. `validation.md`
+    closed  the test of a row against its count, a row at a time: x1.2 on the tightest loop,
+            where one test a span was written down and not weighed. It is the wasm SDK's,
+            and a module's author states it: BRIDGE_ROWS_CHECKED or BRIDGE_ROWS_UNCHECKED,
+            and neither does not compile. `validation.md`, *The row test*
 
 Of this repair:
 
