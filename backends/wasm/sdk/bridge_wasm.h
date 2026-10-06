@@ -283,7 +283,15 @@ static inline int bridge_is_alive(uint64_t id)
 
 /* ---- the log: stores, and no call. docs/bridge/diagnostics/log.md ---- */
 
-static inline void bridge_log(uint32_t level, const char *text, uint32_t len, uint32_t a0, uint32_t a1)
+/* What a line of the log holds: its text, how long that is, and two numbers. */
+typedef struct {
+    const char *text;
+    uint32_t    len;
+    uint32_t    a0;
+    uint32_t    a1;
+} bridge_line_t;
+
+static inline void bridge_log(uint32_t level, const bridge_line_t *line)
 {
     uint32_t head, at;
     if (level > BRIDGE_HEADER(log_level)) return;
@@ -294,12 +302,13 @@ static inline void bridge_log(uint32_t level, const char *text, uint32_t len, ui
     at = BRIDGE_HEADER(ring) + (head % BRIDGE_HEADER(ring_len)) * (uint32_t)sizeof(bridge_log_record_t);
     acc_own_st(at, BRIDGE_HEADER(when));
     acc_own_st(at + 4u, (level & 0xffu) << 8 | BRIDGE_HEADER(system) << 16);
-    acc_own_st(at + 8u, bridge_put(text, len));
-    acc_own_st(at + 12u, len);
-    acc_own_st(at + 16u, a0);
-    acc_own_st(at + 20u, a1);
+    acc_own_st(at + 8u, bridge_put(line->text, line->len));
+    acc_own_st(at + 12u, line->len);
+    acc_own_st(at + 16u, line->a0);
+    acc_own_st(at + 20u, line->a1);
 }
 
-#define BRIDGE_LOG(level, text, a0, a1) bridge_log(level, text, sizeof text - 1, a0, a1)
+#define BRIDGE_LOG(level, text, a0, a1) \
+    bridge_log(level, &(bridge_line_t){ text, sizeof text - 1, a0, a1 })
 
 #endif

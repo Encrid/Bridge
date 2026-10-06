@@ -19,7 +19,7 @@ BRIDGE_EXPORT(say) int say()
     char text[32];
     if (len > sizeof text) len = sizeof text;
     acc_from_shared(text, BRIDGE_GET(Name, text.at, at), len);
-    bridge_log(BRIDGE_LOG_INFO, text, len, 0, 0);
+    bridge_log(BRIDGE_LOG_INFO, &(bridge_line_t){ text, len, 0, 0 });
     return 0;
 }
 

@@ -19,7 +19,7 @@ static uint64_t ids[COUNT];
 
 static void say(const bridge_api_t *api, const char *text, uint32_t n, uint32_t sum)
 {
-    bridge_native_log(api, BRIDGE_LOG_INFO, text, (uint32_t)strlen(text), n, sum);
+    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ text, (uint32_t)strlen(text), n, sum });
 }
 
 BRIDGE_NATIVE(spawn)

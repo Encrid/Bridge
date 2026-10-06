@@ -61,7 +61,7 @@ BRIDGE_NATIVE(walk)
         auto column = (const V *)(api->shared_base + span[2]);
         for (uint32_t r = 0; r < span[0]; r ++) total += column[r].v;
     }
-    bridge_native_log(api, BRIDGE_LOG_INFO, "read", 4, total, q->spans);
+    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ "read", 4, total, q->spans });
     return 0;
 }
 
@@ -76,7 +76,7 @@ BRIDGE_NATIVE(flag)
             if (column[r].on) total += column[r].v;
         }
     }
-    bridge_native_log(api, BRIDGE_LOG_INFO, "read", 4, total, q->spans);
+    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ "read", 4, total, q->spans });
     return 0;
 }
 
@@ -100,7 +100,7 @@ static int follow(const bridge_api_t *api, bool far)
             if (at) total += ((const V *)(api->shared_base + at))[e->row].v;
         }
     }
-    bridge_native_log(api, BRIDGE_LOG_INFO, "read", 4, total, q->spans);
+    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ "read", 4, total, q->spans });
     return 0;
 }
 
@@ -117,7 +117,7 @@ BRIDGE_NATIVE(one)
         total += ((const S *)(api->shared_base + span[2]))->v;
         spans = q->spans;
     }
-    bridge_native_log(api, BRIDGE_LOG_INFO, "read", 4, total, spans);
+    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ "read", 4, total, spans });
     return 0;
 }
 

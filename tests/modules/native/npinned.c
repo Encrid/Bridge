@@ -14,7 +14,7 @@
 
 static int pin(const bridge_api_t *api)
 {
-    bridge_native_log(api, BRIDGE_LOG_INFO, "pin", 3, thread_id(), 0);
+    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ "pin", 3, thread_id(), 0 });
     return 0;
 }
 

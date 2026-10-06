@@ -178,8 +178,16 @@ static inline const bridge_list_t *bridge_native_get_list(const bridge_api_t *ap
 
 /* ---- the log ---- */
 
-static inline void bridge_native_log(const bridge_api_t *api, uint32_t level, const char *text,
-                                     uint32_t len, uint32_t a0, uint32_t a1)
+/* What a line of the log holds: its text, how long that is, and two numbers. */
+typedef struct {
+    const char *text;
+    uint32_t    len;
+    uint32_t    a0;
+    uint32_t    a1;
+} bridge_line_t;
+
+static inline void bridge_native_log(const bridge_api_t *api, uint32_t level,
+                                     const bridge_line_t *line)
 {
     bridge_header_t *h = bridge_native_get_header(api);
     bridge_log_record_t *r;
@@ -192,10 +200,10 @@ static inline void bridge_native_log(const bridge_api_t *api, uint32_t level, co
     r->pad = 0;
     r->level = (uint8_t)level;
     r->system = (uint16_t)h->system;
-    r->text = bridge_native_put(api, text, len);
-    r->len = len;
-    r->arg[0] = a0;
-    r->arg[1] = a1;
+    r->text = bridge_native_put(api, line->text, line->len);
+    r->len = line->len;
+    r->arg[0] = line->a0;
+    r->arg[1] = line->a1;
 }
 
 #endif

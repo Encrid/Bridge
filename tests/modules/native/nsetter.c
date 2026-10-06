@@ -11,7 +11,7 @@ BRIDGE_NATIVE(mark)
     Marked m = { 77 };
     if (runs ++) return 0;
     BRIDGE_NATIVE_ATTACH(api, ids[1], marked, m);
-    bridge_native_log(api, BRIDGE_LOG_INFO, "marked", 6, 0, 0);
+    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ "marked", 6, 0, 0 });
     return 0;
 }
 

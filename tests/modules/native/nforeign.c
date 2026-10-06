@@ -43,8 +43,8 @@ BRIDGE_NATIVE(reach)
     kept = api;
     on_another_thread();
     here = api->spawn(api);
-    bridge_native_log(api, BRIDGE_LOG_INFO, "an id from another thread, and from this one", 44,
-        from_elsewhere != 0, here != 0);
+    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ "an id from another thread, and from this one", 44,
+        from_elsewhere != 0, here != 0 });
     return 0;
 }
 

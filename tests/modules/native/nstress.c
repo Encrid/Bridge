@@ -84,8 +84,8 @@ static void by_reference(const bridge_api_t *api)
     }
     passes ++;
     if (passes % 25 == 0) {
-        bridge_native_log(api, BRIDGE_LOG_INFO, "live, digest", 12, live, digest);
-        bridge_native_log(api, BRIDGE_LOG_INFO, "disagreements so far", 20, wrong, 0);
+        bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ "live, digest", 12, live, digest });
+        bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ "disagreements so far", 20, wrong, 0 });
     }
 }
 

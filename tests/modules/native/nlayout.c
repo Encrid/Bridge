@@ -65,7 +65,7 @@ static uint32_t x, reading;
 
 static void say(const bridge_api_t *api, const char *text, uint32_t first, uint32_t second)
 {
-    bridge_native_log(api, BRIDGE_LOG_INFO, text, (uint32_t)strlen(text), first, second);
+    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ text, (uint32_t)strlen(text), first, second });
 }
 
 #if V == 0

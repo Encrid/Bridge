@@ -20,7 +20,7 @@ static uint32_t g, a, on_g;
 
 static void say(const bridge_api_t *api, const char *text, uint32_t x, uint32_t y)
 {
-    bridge_native_log(api, BRIDGE_LOG_INFO, text, (uint32_t)strlen(text), x, y);
+    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ text, (uint32_t)strlen(text), x, y });
 }
 
 BRIDGE_NATIVE(attach_a)

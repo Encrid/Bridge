@@ -38,11 +38,11 @@ BRIDGE_EXPORT(show) int show()
                (uint32_t)BRIDGE_GET(Settings, mode, at));
     for (i = 0; i < 16; i ++) text[i] = (char)acc_ld_u8(at + (uint32_t)offsetof(Settings, title) + i);
     for (len = 0; len < 16 && text[len]; len ++) {}
-    bridge_log(BRIDGE_LOG_INFO, text, len, BRIDGE_GET(Settings, small, at), 0);
+    bridge_log(BRIDGE_LOG_INFO, &(bridge_line_t){ text, len, BRIDGE_GET(Settings, small, at), 0 });
     len = BRIDGE_GET(Settings, path.len, at);
     if (len > sizeof text) len = sizeof text;
     acc_from_shared(text, BRIDGE_GET(Settings, path.at, at), len);
-    bridge_log(BRIDGE_LOG_INFO, text, len, 0, 0);
+    bridge_log(BRIDGE_LOG_INFO, &(bridge_line_t){ text, len, 0, 0 });
     BRIDGE_LOG(BRIDGE_LOG_INFO, "flags ratio", (uint32_t)BRIDGE_GET(Settings, flags, at),
                (uint32_t)BRIDGE_GET(Settings, ratio, at));
     BRIDGE_LOG(BRIDGE_LOG_INFO, "big", (uint32_t)(BRIDGE_GET(Settings, big, at) >> 32), 0);

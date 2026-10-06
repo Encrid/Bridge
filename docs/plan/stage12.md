@@ -361,6 +361,10 @@ built by the same script.
     the backend seam              `module_compile(b, source, err)`, `instance_create(m,
                                   memories, count, err)`, `define_func(i, entry, err)`, with
                                   `backend_source_t` and `backend_entry_t`
+    a line of the log             `bridge_log(level, line)` and `bridge_native_log(api, level,
+                                  line)`, with `bridge_line_t` in each SDK
+
+With these, no entry of a seam and no function of an SDK takes more than four arguments.
 
 **What two builds differ by when their code is the same.** After the two renames the call of
 `spawn` measured 4.8 to 4.9 ns where the tree before measured 4.5 to 4.7, in whichever order

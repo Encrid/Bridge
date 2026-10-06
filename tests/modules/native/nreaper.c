@@ -16,7 +16,7 @@ BRIDGE_NATIVE(reap)
         for (uint32_t row = 0; row < span[0]; row ++) api->destroy(api, who[row]);
         rows += span[0];
     }
-    bridge_native_log(api, BRIDGE_LOG_INFO, "rows", 4, rows, 0);
+    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ "rows", 4, rows, 0 });
     return 0;
 }
 

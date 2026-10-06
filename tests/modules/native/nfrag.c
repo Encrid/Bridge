@@ -40,7 +40,7 @@ BRIDGE_NATIVE(sum)
         rows += span[0];
     }
     /* said once a call: what was read, and over how many spans */
-    bridge_native_log(api, BRIDGE_LOG_INFO, "rows, spans", 11, rows + total, q->spans);
+    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ "rows, spans", 11, rows + total, q->spans });
     return 0;
 }
 

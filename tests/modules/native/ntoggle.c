@@ -30,7 +30,7 @@ static uint64_t ids[2 * COUNT];
 
 static void say(const bridge_api_t *api, const char *text, uint32_t x, uint32_t y)
 {
-    bridge_native_log(api, BRIDGE_LOG_INFO, text, (uint32_t)strlen(text), x, y);
+    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ text, (uint32_t)strlen(text), x, y });
 }
 
 static void make(const bridge_api_t *api, uint32_t from)
