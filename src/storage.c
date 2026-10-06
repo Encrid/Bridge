@@ -117,6 +117,7 @@ struct storage {
     uint64_t  *in_table;            /* one set: the types that are kept in tables */
     uint64_t  *before, *masked;     /* two sets more */
     uint32_t   table_count;         /* how many tables of archetypes there are */
+    uint32_t   tags;                /* how many declared types have no bytes */
     uint32_t   apart;               /* how many declared types are not kept in a table. While
                                      * there is none, an entity carries what its table holds
                                      * and nothing else, and a barrier looks no further */
@@ -164,9 +165,11 @@ static uint64_t *shown_of(const storage *r, uint32_t slot)
 /* storage.md, *A tag*: what a module is handed for where a column is. A tag has none, and is
  * handed that it is carried; but a toggled tag has its bits ahead of where its column would
  * be, and is handed that. */
-static uint32_t handed(const storage *r, uint32_t type, uint32_t column)
+static inline uint32_t handed(const storage *r, uint32_t type, uint32_t column)
 {
-    return column && !r->types[type]->size && r->types[type]->kept != BRIDGE_TOGGLE ? BRIDGE_CARRIED : column;
+    /* while no tag is declared, a column is where it is, and no type is looked at */
+    if (!r->tags || !column) return column;
+    return !r->types[type]->size && r->types[type]->kept != BRIDGE_TOGGLE ? BRIDGE_CARRIED : column;
 }
 
 /* and for where the value of row `row` of a sparse set is */
@@ -1207,12 +1210,14 @@ storage_type *storage_declare(storage *r, uint32_t size, uint32_t align, enum br
     else if (kept == BRIDGE_DIRECT_INDEXED) r->direct_type[slot] = r->types[id];
     else if (kept != BRIDGE_SINGLETON) put(r->in_table, id);
     r->apart += kept != BRIDGE_TABLE && kept != BRIDGE_TOGGLE;
+    r->tags += !size;
     return r->types[id];
 }
 
 void storage_undeclare(storage *r, storage_type *type)
 {
     r->apart -= type->kept != BRIDGE_TABLE && type->kept != BRIDGE_TOGGLE;
+    r->tags -= !type->size;
     if (type->kept == BRIDGE_SPARSE_SET) {
         r->set_type[type->slot] = nullptr;
     } else if (type->kept == BRIDGE_DIRECT_INDEXED) {

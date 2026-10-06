@@ -551,10 +551,15 @@ effect before:
     detach                                      36.2 ns          34.8 ns
     destroy                                     16.1 ns          15.6 ns
     attach, two components in one barrier       37.8 ns          39.0 ns
-    the stress run, on four threads             1597 ms          1616 ms
-    the stress run, on one thread               3364 ms          3323 ms
+    the stress run, on four threads             1599 to 1618 ms  1590 to 1670 ms
+    the stress run, on one thread               3271 to 3368 ms  3290 to 3304 ms
 
 And a barrier looks no further than tables while nothing is declared that is kept elsewhere.
+
+The stress run was measured again when the stage closed, and stood 4% over what it had been
+on four threads. That was the tag: what is written for a module looked at each cell's type to
+know whether it has bytes. It does so now only while a tag is declared, and the last line of
+the table is that run, three times over, beside the tree before the stage.
 
 **A changed component layout**, as `lifetime.md`, *When a component layout changed*, has it.
 `declare` works out, field by field and by name, which bytes of a value as it was are which
