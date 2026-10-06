@@ -168,6 +168,25 @@ static inline uint32_t bridge_set_value(uint32_t index, uint64_t id)
     return acc_ld_32(acc_row(index, (uint32_t)id, BRIDGE_HEADER(entities), 4u));
 }
 
+/* ---- a toggled component: a bit a row. docs/bridge/storage.md, *A toggle* ---- */
+
+/* where the bits of the toggled column at `base` are: row r is bit r & 63 of word r >> 6 */
+static inline uint32_t bridge_bits(uint32_t base) { return acc_ld_32(base - 16u); }
+
+/* whether row `row` of `count` is on */
+static inline bool bridge_on(uint32_t bits, uint32_t row, uint32_t count)
+{
+    return acc_ld_64(acc_row(bits, row >> 6, (count + 63u) >> 6, 8u)) >> (row & 63u) & 1u;
+}
+
+/* a row turned on or off, by a system that stated the term BRIDGE_WRITE */
+static inline void bridge_turn(uint32_t bits, uint32_t row, uint32_t count, bool on)
+{
+    uint32_t at = acc_row(bits, row >> 6, (count + 63u) >> 6, 8u);
+    uint64_t word = (uint64_t)acc_ld_64(at), bit = (uint64_t)1 << (row & 63u);
+    acc_st_64(at, on ? word | bit : word & ~bit);
+}
+
 /* ---- an observer's list: who triggered it at this barrier, and how ---- */
 
 static inline uint32_t bridge_triggers(uint32_t observer)

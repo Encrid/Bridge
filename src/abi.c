@@ -146,9 +146,9 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     if (kept < BRIDGE_TABLE || kept > BRIDGE_SINGLETON) {
         return refuse(m, "type '%s': its storage layout is unset", name);
     }
-    /* ponytail: the other three are decided and not built - docs/plan/STAGE11.md. This goes
+    /* ponytail: the other two are decided and not built - docs/plan/STAGE11.md. This goes
      * as each is */
-    if (kept != BRIDGE_TABLE && kept != BRIDGE_SPARSE_SET) {
+    if (kept == BRIDGE_DIRECT_INDEXED || kept == BRIDGE_SINGLETON) {
         return refuse(m, "type '%s': %s is not built yet", name, storage_names[kept]);
     }
     print = fingerprint(desc_at, a[6]) ^ kind;

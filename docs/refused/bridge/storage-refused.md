@@ -16,6 +16,15 @@ Refused: a sparse set written as a second thing beside tables, with its own bloc
 spans and publishing. It is kept as a table of one type, and those are the table's. The
 condition that brings it back is a sparse set that needs a shape a table's block cannot have.
 
+## A toggle
+
+Of `storage.md`, *A toggle*. How a row is switched, where its bits are found, and what else was
+weighed, is in the record of `STAGE11.md`, *The questions*.
+
+Refused: a helper in each SDK that walks the rows that are on. A module is handed the bits, and
+which loop reads them best depends on how many are on, which only its author knows. The
+condition that brings it back is the same loop written out in three modules.
+
 ## What a query walks
 
 Of `storage.md`, *What a query walks*. What was weighed against it is in the record of

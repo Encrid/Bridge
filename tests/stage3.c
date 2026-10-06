@@ -201,6 +201,12 @@ int main(int argc, char **argv)
         load(b, &a);
         a = artifact("game:kept@0.1.0", "kept-sparse");     /* and another than the mover's */
         load(b, &a);
+    } else if (!strcmp(what, "toggle")) {       /* a toggle: counted before any is turned off, */
+        a = artifact("game:shield@0.1.0", "shield");    /* and after */
+        a.cfg.spawns = 16;
+        load(b, &a);
+        (void)bridge_phase(b, "present");
+        frames(b, 1);
     } else if (!strcmp(what, "sparse")) {       /* a sparse set, walked and reached */
         a = artifact("game:hit@0.1.0", "hit");
         a.cfg.spawns = 16;

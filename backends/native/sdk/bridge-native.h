@@ -127,6 +127,18 @@ static inline const uint32_t *bridge_native_set_index(const bridge_api *api, uin
     return (const uint32_t *)(api->shared_base + kept[slot]);
 }
 
+/* ---- a toggled component: a bit a row. storage.md, *A toggle* ---- */
+
+/* The bits of the toggled column that begins at `base`, which a span or column_base gave: row
+ * r is bit r & 63 of word r >> 6, and a row whose bit is 0 is off. A system that stated the
+ * term BRIDGE_WRITE turns a row on or off by writing its bit. */
+static inline uint64_t *bridge_native_bits(const bridge_api *api, uint32_t base)
+{
+    uint32_t at;
+    memcpy(&at, api->shared_base + base - 16, 4);
+    return (uint64_t *)(api->shared_base + at);
+}
+
 /* an observer's list: `count` bridge_trigger records, at private_base + `at` */
 static inline const bridge_list *bridge_native_list(const bridge_api *api, uint32_t observer)
 {

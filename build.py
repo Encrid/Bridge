@@ -72,6 +72,8 @@ NATIVE = [
     ('nfrag256', 'nfrag', ['SPLIT=256']), ('nfrag4096', 'nfrag', ['SPLIT=4096']),
     ('nsparse', 'nsparse', []), ('nsparsebig', 'nsparse', ['BIG']), ('nsparsefat', 'nsparse', ['FAT']),
     ('nsparsebad1', 'nsparse', ['BAD=1']), ('nsparsebad2', 'nsparse', ['BAD=2']),
+    ('ntoggle', 'ntoggle', []), ('ntoggle1', 'ntoggle', ['BIG', 'ON=1']),
+    ('ntoggle2', 'ntoggle', ['BIG', 'ON=2']), ('ntoggle16', 'ntoggle', ['BIG', 'ON=16']),
     ('nweigh1', 'nweigh', ['ON=1']), ('nweigh2', 'nweigh', ['ON=2']), ('nweigh16', 'nweigh', ['ON=16']),
     ('nstress1', 'nstress', ['SEED=1u', 'SPACE="s1"']), ('nstress2', 'nstress', ['SEED=2u', 'SPACE="s2"']),
     ('nstress3', 'nstress', ['SEED=3u', 'SPACE="s3"']), ('nstress4', 'nstress', ['SEED=4u', 'SPACE="s4"']),
@@ -80,7 +82,8 @@ NATIVE = [
 # a module in C: the name, its source, whether its rows are tested, what it is compiled with.
 # `checked` or `unchecked` is stated for each, as the SDK asks: BRIDGE_ROWS_CHECKED, or not.
 PLAIN = ('mover reader refs fp badterm spin3 flood chatty rows halver twostep watcher chain '
-         'badobs events fixer nested nested2 namer spawner counter typer user settings hang hit')
+         'badobs events fixer nested nested2 namer spawner counter typer user settings hang hit '
+         'shield')
 WASM = [(name, name, 'checked', []) for name in PLAIN.split()] + [
     ('rows-unchecked', 'rows', 'unchecked', []),
     ('kept-unset', 'kept', 'checked', ['KEPT=0']), ('kept-none', 'kept', 'checked', ['KEPT=9']),
@@ -410,7 +413,8 @@ CASES = [
     ('storage-stripfull', ['storage', 'stripfull'],
      '@tests/storage-stripfull.txt', None),
     ('storage-weigh', ['storage', 'weigh'],
-     r"an entity of 4096 bytes.*in    1 table.*in 4096 tables.*a sparse set.*of 4096 bytes.*alive", r"FAIL"),
+     r"an entity of 4096 bytes.*in    1 table.*in 4096 tables.*a sparse set.*of 4096 bytes.*a toggle, one row in 16 on.*alive", r"FAIL"),
+    ('storage-toggle', ['storage', 'toggle'], '@tests/storage-toggle.txt', None),
     ('storage-sparse', ['storage', 'sparse'], '@tests/storage-sparse.txt', None),
     ('storage-sparsefull', ['storage', 'sparsefull'], '@tests/storage-sparsefull.txt', None),
     ('storage-sparsestrip', ['storage', 'sparsestrip'], '@tests/storage-sparsestrip.txt', None),
@@ -489,6 +493,9 @@ CASES = [
      r"module 'game:kept@0.1.0' did not load: type 'game:Position': its storage layout is unset.*"
      r"module 'game:kept@0.1.0' did not load: type 'game:Position' is stated as a sparse set here, and it "
      r"was declared as a table. It is also declared by 'game:mover@0.1.0'.*alive", None),
+    ('stage3-toggle', ['stage3', 'toggle'],
+     r"game:shield@0.1.0/count: shields 10 10.*game:shield@0.1.0/count: strength 45 0.*"
+     r"game:shield@0.1.0/count: shields 10 6.*game:shield@0.1.0/count: strength 27 0.*alive", r"did not load"),
     ('stage3-sparse', ['stage3', 'sparse'],
      r"game:hit@0.1.0/walked: hits 4 18.*game:hit@0.1.0/reached: bodies 10 4.*"
      r"game:hit@0.1.0/reached: reached 18 0.*alive", r"did not load"),

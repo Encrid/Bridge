@@ -484,3 +484,15 @@ carries: under the table's 40 and 37 for four bytes carried, and its 505 and 500
 difference from the estimate is the fold looking at every sparse set for every changed entity.
 The read through the index is 0.44 ns a row, under the 0.59 to 0.76 measured in scratch.
 
+**The toggle**, as `storage.md`, *A toggle*, has it. Its bits and the sixteen bytes that say
+where they are are laid out with its column, so a table that grows, a column that is stripped
+from before it, and a row that moves each carry them. Cases `storage-toggle`, and
+`stage3-toggle` on the wasm backend.
+
+Measured in the library, the read is slower than the gate's scratch figures: 13, 67 and 8.5
+us for all, half and one in sixteen on, found a word at a time, where scratch had 47, 32 and
+5.5; and 78 us tested at every row, where scratch had 16.5. The first is quicker for reading
+whole words of rows as a column; the others are what the compiler made of the same loops inside
+a module, which is what a module gets. It is under a field tested by a branch at every share,
+55, 515 and 87 us, and over a field tested by a mask, 12 us, except where few rows are on.
+

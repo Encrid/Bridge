@@ -169,6 +169,33 @@ constexpr uint64_t COLUMN = 16;
 
 static uint64_t padded(uint64_t bytes) { return (bytes + COLUMN - 1) & ~(COLUMN - 1); }
 
+/* storage.md, *A toggle*: a toggled column has a bit a row, a 64-bit word for each 64 rows,
+ * ahead of it in the block; and between the two, sixteen bytes that say where the bits begin,
+ * which is where a module that has the column finds them. */
+static uint64_t bits_len(uint32_t room) { return padded(8ull * ((room + 63) / 64)); }
+
+/* where the bits of the toggled column at `column` are, in a block of `room` rows */
+static uint32_t bits_of(uint32_t column, uint32_t room)
+{
+    return column - (uint32_t)COLUMN - (uint32_t)bits_len(room);
+}
+
+static bool on_at(const storage *r, uint32_t column, uint32_t room, uint32_t row)
+{
+    uint64_t word;
+    memcpy(&word, r->b->shared + bits_of(column, room) + 8u * (row >> 6), 8);
+    return word >> (row & 63) & 1;
+}
+
+static void turned(storage *r, uint32_t column, uint32_t room, uint32_t row, bool on)
+{
+    uint8_t *at = r->b->shared + bits_of(column, room) + 8u * (row >> 6);
+    uint64_t word;
+    memcpy(&word, at, 8);
+    word = on ? word | (uint64_t)1 << (row & 63) : word & ~((uint64_t)1 << (row & 63));
+    memcpy(at, &word, 8);
+}
+
 /* How long a block of `room` rows of `set` is, and into r->at where each of its columns
  * begins in it: the ids, then every type in the order of its number, each at the next
  * multiple of sixteen. The whole is a multiple of sixteen too, for the block after it. */
@@ -179,6 +206,7 @@ static uint64_t laid_out(const storage *r, const uint64_t *set, uint32_t room)
         for (uint64_t bits = set[w]; bits; bits &= bits - 1) {
             const storage_type *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
             at = padded(at);
+            if (type->kept == BRIDGE_TOGGLE) at += bits_len(room) + COLUMN;
             r->at[type->id] = at;
             at += (uint64_t)type->size * room;
         }
@@ -205,7 +233,7 @@ static bool grow(storage *r, uint32_t t, uint32_t room)
     table *tab = &r->tables[t];
     bridge *b = r->b;
     const uint64_t *set = set_of(r, t);
-    uint32_t *columns = columns_of(r, t), was = tab->block, asked = room;
+    uint32_t *columns = columns_of(r, t), was = tab->block, asked = room, had = tab->room;
     uint64_t len, to;
     uint8_t *block;
 
@@ -237,6 +265,15 @@ static bool grow(storage *r, uint32_t t, uint32_t room)
             bits &= ~((uint64_t)1 << (id & 63));
             to = r->at[id];
             if (was) memmove(block + to, block + (columns[id] - was), (size_t)type->size * tab->rows);
+            if (type->kept == BRIDGE_TOGGLE) {
+                /* its bits after its values, since both move out; and where they are now */
+                uint32_t bits = tab->block + bits_of((uint32_t)to, room);
+                if (was) {
+                    memmove(b->shared + bits, block + (bits_of(columns[id], had) - was),
+                        8u * ((tab->rows + 63) / 64));
+                }
+                memcpy(block + to - COLUMN, &bits, 4);
+            }
             columns[id] = tab->block + (uint32_t)to;
         }
     }
@@ -409,6 +446,13 @@ static void stripped(storage *r, uint32_t t, const storage_type *type, bool name
         for (uint64_t bits = set[w]; bits; bits &= bits - 1) {
             const storage_type *after = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
             if (after->id < type->id) continue;
+            if (after->kept == BRIDGE_TOGGLE) {
+                /* its bits before its values, since both move down */
+                uint32_t bits = bits_of(tab->block + (uint32_t)r->at[after->id], tab->room);
+                memmove(b->shared + bits, b->shared + bits_of(columns[after->id], tab->room),
+                    8u * ((tab->rows + 63) / 64));
+                memcpy(b->shared + tab->block + r->at[after->id] - COLUMN, &bits, 4);
+            }
             memmove(b->shared + tab->block + r->at[after->id], b->shared + columns[after->id],
                 (size_t)after->size * tab->rows);
             columns[after->id] = tab->block + (uint32_t)r->at[after->id];
@@ -467,6 +511,9 @@ static void removed(storage *r, uint32_t t, uint32_t row)
             const storage_type *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
             uint8_t *column = r->b->shared + columns[type->id];
             memcpy(column + (size_t)row * type->size, column + (size_t)last * type->size, type->size);
+            if (type->kept == BRIDGE_TOGGLE) {
+                turned(r, columns[type->id], tab->room, row, on_at(r, columns[type->id], tab->room, last));
+            }
         }
     }
     who_of(r, tab)[row] = who_of(r, tab)[last];
@@ -524,6 +571,11 @@ static void moved(storage *r, uint32_t index, uint32_t to)
                     memcpy(cell, r->b->shared + out[type->id] + (size_t)row * type->size, type->size);
                 } else {
                     memset(cell, 0, type->size);
+                }
+                /* a toggled component is on when it is given, and as it was when it moves */
+                if (type->kept == BRIDGE_TOGGLE) {
+                    turned(r, into[type->id], r->tables[to].room, at, !out || !out[type->id]
+                        || on_at(r, out[type->id], r->tables[from].room, row));
                 }
             }
         }

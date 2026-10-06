@@ -54,8 +54,8 @@ declare the component already, as for a component layout that differs - `lifetim
 component layout changed*.
 
 What each was weighed on, measured, and what a module is handed for each, is `STAGE11.md`, *The
-gate* and *The questions*. The table and the sparse set are built; a `declare` that states one
-of the other three is refused, saying so, until `PLAN.md`, stage 11, has built it.
+gate* and *The questions*. The table, the sparse set and the toggle are built; a `declare` that
+states one of the other two is refused, saying so, until `PLAN.md`, stage 11, has built it.
 
 ## A table
 
@@ -123,6 +123,44 @@ more is stripped, swept or deleted by its policy - `lifetime.md`, *What unload l
 and for a sweep an entity carries nothing else when it is in no table and in no other set. An
 observer's terms are matched against everything an entity carries, in tables and in sets alike,
 since an observer walks nothing.
+
+## A toggle
+
+**A toggled component is a column of its table, and a bit a row that says whether it is on.**
+It is part of the entity's archetype, as a component kept in a table is, and a query that
+states it matches its table: every row carries it, on or off. Whether a row is on is tested by
+the module's own code, and the value of a row that is off stays where it is.
+
+**The bits are in the table's block, ahead of the column**: a 64-bit word for each 64 rows, row
+r being bit `r & 63` of word `r >> 6`; then sixteen bytes that hold where those bits begin, from
+the shared base; then the values. So a module that has the column, from a span or from
+`column_base`, has the bits by one load, at the column less sixteen, and neither of those two
+has another shape for it. Bits past the table's last row are nobody's.
+
+**A row is turned on or off by writing its bit**, by a system that states the term
+`BRIDGE_WRITE`, as it would write a value. The scheduler keeps a system that writes a component
+from running beside one that reads or writes it - `data.md`, *Access mode* - so two never write
+one word at once. It is no call and waits for no barrier, and no observer is told: a write in
+place raises none. A component is on when it is given; an attach of one an entity has writes
+its value and leaves the bit; and a row that moves, to another table or within one, takes its
+bit with it.
+
+**It is for what an entity always has and sometimes does not use.** Measured in the library,
+`storage weigh`, 204,800 rows with a share of them on, in no order:
+
+                                                all on      half on     1 in 16 on
+    the rows that are on, found a word of
+    bits at a time                              13 us       67 us        8.5 us
+    the bit tested at every row                 78 us       78 us       78 us
+    a field of the struct tested instead,
+    as `storage baseline` has it                55 us      515 us       87 us
+    the column read with no test                 5.7 us
+
+Sixty-four rows that are all on are read as a column is, which is the first figure. And a row
+is switched by one store, where a detach and an attach to say the same are 77 ns, and 1,005
+for an entity that carries 4 KB. What it does not beat is a field tested by a mask, which a
+compiler makes of a small enough loop: 12 us at any share, measured in scratch - `STAGE11.md`,
+*The gate*.
 
 ## What a query walks
 

@@ -1,0 +1,59 @@
+spawn
+look
+  look: by words: rows, and of them on 6 6
+  look: by words: the sum of those on, and spans 75 1
+flicker
+look
+  look: by words: rows, and of them on 6 3
+  look: by words: the sum of those on, and spans 39 1
+look_b
+  look_b: by rows: on, and their sum 3 39
+find
+  find: by id: alive, and of them on 6 3
+  find: by id: the sum of those on 39 0
+attach_b
+look
+  look: by words: rows, and of them on 6 3
+  look: by words: the sum of those on, and spans 39 2
+find
+  find: by id: alive, and of them on 6 3
+  find: by id: the sum of those on 39 0
+value_a
+look
+  look: by words: rows, and of them on 6 3
+  look: by words: the sum of those on, and spans 39 2
+find
+  find: by id: alive, and of them on 6 3
+  find: by id: the sum of those on 39 0
+destroy_half
+look
+  look: by words: rows, and of them on 4 2
+  look: by words: the sum of those on, and spans 24 2
+find
+  find: by id: alive, and of them on 4 2
+  find: by id: the sum of those on 24 0
+respawn_half
+look
+  look: by words: rows, and of them on 10 8
+  look: by words: the sum of those on, and spans 135 2
+find
+  find: by id: alive, and of them on 10 8
+  find: by id: the sum of those on 135 0
+strip st:A
+never
+look
+  look: by words: rows, and of them on 10 8
+  look: by words: the sum of those on, and spans 135 2
+find
+  find: by id: alive, and of them on 10 8
+  find: by id: the sum of those on 135 0
+combine
+look
+  look: by words: rows, and of them on 10 10
+  look: by words: the sum of those on, and spans 649 2
+strip st:T
+never
+look
+  look: by words: rows, and of them on 0 0
+  look: by words: the sum of those on, and spans 0 0
+alive

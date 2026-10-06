@@ -394,6 +394,35 @@ int main(int argc, char **argv)
         run(b, "look");
         run(b, "destroy");          /* and both tables go when they empty */
         run(b, "look");
+    } else if (!strcmp(what, "toggle")) {
+        /* storage.md, *A toggle* */
+        a = store_module(NTOGGLE_PATH, 16, 1 << 20, 4096);
+        if (bridge_load(b, &a)) { printf("not loaded\nalive\n"); return 0; }
+        run(b, "spawn");            /* six, each on when it is given */
+        run(b, "look");
+        run(b, "flicker");          /* the even ones off: a write, and nothing is heard */
+        run(b, "look");
+        run(b, "look_b");
+        run(b, "find");
+        run(b, "attach_b");         /* three move to another table, on or off as they were */
+        run(b, "look");
+        run(b, "find");
+        run(b, "value_a");          /* a value for one that is off: it has it, and stays off */
+        run(b, "look");
+        run(b, "find");
+        run(b, "destroy_half");     /* the last row of each table takes the place, bit and all */
+        run(b, "look");
+        run(b, "find");
+        run(b, "respawn_half");     /* six more, on: the table moves to grow, bits and all */
+        run(b, "look");
+        run(b, "find");
+        strip(b, "st:A");           /* the column before it goes, and T and its bits close up */
+        run(b, "look");
+        run(b, "find");
+        run(b, "combine");          /* every one on */
+        run(b, "look");
+        strip(b, "st:T");
+        run(b, "look");
     } else if (!strncmp(what, "sparse", 6)) {
         const char *path = !strcmp(what, "sparsebad1") ? NSPARSEBAD1_PATH
                          : !strcmp(what, "sparsebad2") ? NSPARSEBAD2_PATH : NSPARSE_PATH;
@@ -534,6 +563,29 @@ int main(int argc, char **argv)
                     (double)reach / set[k].count);
             }
             if (k + 1 < sizeof set / sizeof *set) (void)bridge_destroy(b);
+        }
+        /* storage.md, *A toggle*: rows read through their bits, by the share that is on */
+        static const struct { const char *path; uint32_t on; } toggled[] = {
+            { NTOGGLE1_PATH, 1 }, { NTOGGLE2_PATH, 2 }, { NTOGGLE16_PATH, 16 },
+        };
+        (void)bridge_destroy(b);
+        for (uint32_t k = 0; k < sizeof toggled / sizeof *toggled; k ++) {
+            uint64_t words = 0, rows = 0, t;
+            b = bridge_create(&cfg, counted, nullptr);
+            a = store_module(toggled[k].path, 204'800, 8 << 20, 128 << 20);
+            if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
+            (void)barrier(b, "spawn");
+            (void)ran(b, "flicker");
+            for (uint32_t round = 0; round < ROUNDS * 4; round ++) {
+                t = ran(b, "look_b");
+                if (!round || t < rows) rows = t;
+                t = ran(b, "look");
+                if (!round || t < words) words = t;
+            }
+            printf("a toggle, one row in %2u on: tested at every row %6.1f us, the rows that are on "
+                "found a word at a time %6.1f us\n", toggled[k].on, (double)rows / 1000.0,
+                (double)words / 1000.0);
+            if (k + 1 < sizeof toggled / sizeof *toggled) (void)bridge_destroy(b);
         }
     } else if (!strcmp(what, "baseline")) {
         static const struct { const char *path; uint32_t on; } built[] = {
