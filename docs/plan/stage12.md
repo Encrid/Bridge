@@ -388,3 +388,11 @@ no instruction differs, only the names and paths in the debugging records. So 0.
 a line that times a call is what two builds of the same code differ by, in two directories, and
 a line is called slower only beyond that. The call of `detach` that measured 0.5 ns slower
 when `attach` lost its length is inside it.
+
+**What is held so far**, by `tools/style.py` with the tests: `include/bridge_schema.h` and
+`include/bridge_abi.h`. In the second every layout keeps its asserts, one a line, and what a
+member is for is said above the struct, since a line holds 80 columns.
+
+**The workflows have not run since the commit that gave the seams their verb.** GitHub answers
+that the job was not started for a reason of billing on the account. Every commit since was
+built for Linux and macOS here and run on Windows only, in release and in debug.
