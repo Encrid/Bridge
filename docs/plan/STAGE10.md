@@ -508,7 +508,9 @@ at least five things, none defined, and none of them the one that was meant.
             named `pad`, zero when written and never read; an enum is four bytes as an
             argument and one as a member. Both rules are in `bridge-abi.h` and in
             `wasm.md`, *The ABI layouts*
-    open    a signature the native backend cannot check
+    closed  a signature the native backend cannot check: the backend checks, since it is
+            who can see an export. `instance_func` answers a function or refuses, and
+            the arity, the count of results and the -1 left the seam. `signatures.md`
     open    a memory handle kept for a backend that does not exist
     open    why an enum is four bytes
     open    a reload counting both instances toward [budget] systems

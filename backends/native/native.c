@@ -247,8 +247,8 @@ BACKEND_EXPORT int define_func(backend_instance *i, const char *ns, const char *
 }
 
 /* Exports are named bridge_<name>: a C process has one flat symbol namespace. */
-BACKEND_EXPORT backend_func *instance_func(backend_instance *i, const char *name,
-                                           int32_t *arity, int32_t *results, backend_err *err)
+/* A symbol carries no type, so there is no shape to see: what it must be is native.md's. */
+BACKEND_EXPORT backend_func *instance_func(backend_instance *i, const char *name, backend_err *err)
 {
     char symbol[160];
     backend_func *f;
@@ -259,7 +259,6 @@ BACKEND_EXPORT backend_func *instance_func(backend_instance *i, const char *name
         snprintf(err->text, sizeof err->text, "no exported function '%s'", symbol);
         return nullptr;
     }
-    *arity = *results = -1;         /* a symbol carries no type: there is nothing to check */
     f = calloc(1, sizeof *f);
     f->instance = i;
     f->fn = fn;

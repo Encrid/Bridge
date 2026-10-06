@@ -35,7 +35,7 @@ name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
     instance_set_memory_limit(instance, bytes)
 
     define_func(instance, namespace, field, fn, sig)
-    instance_func(instance, name, &arity, &results) -> func
+    instance_func(instance, name)              -> func
     call(func, status)                         -> err
 
 Seventeen entries. The original Bridge's `ModuleRuntime` trait had fourteen, four of which were

@@ -397,6 +397,8 @@ CASES = [
      r"module 'test:big@0.1.0' did not load: cannot instantiate.*alive", None),
     ('stage2-shape', ['stage2', 'shape'],
      r"module 'test:shape@0.1.0' did not load: its export 'init' is not .. -> i32.*alive", None),
+    ('stage2-shape64', ['stage2', 'shape64'],
+     r"module 'test:shape64@0.1.0' did not load: its export 'init' is not .. -> i32.*alive", None),
     ('stage2-noinit', ['stage2', 'noinit'],
      r"module 'test:noinit@0.1.0' did not load: no exported function 'init'.*alive", None),
     ('stage2-abi', ['stage2', 'abi'],

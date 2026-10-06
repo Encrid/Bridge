@@ -64,8 +64,16 @@ outcome - a module that reads out of bounds, exhausts a system's fuel, or runs p
 call's timeout produces one, and the process keeps running - and `failure.md`, *When something
 fails*, treats the two alike on purpose.
 
-`instance_func` still answers arity and result count beside the handle, and that is a **check rather
-than a contract** - the other half of *Imports are declared, exports are checked*: Bridge-ASM700 refuses
-an export whose shape is not `() -> i32` at init instead of discovering it on the first frame. A
-backend that cannot tell - the native one, where the symbol came from `dlsym` and carries no type -
-answers -1, and Bridge-ASM700 skips the check rather than refusing to load.
+**The backend is who checks an export, because it is who can see one** - the other half of
+*Imports are declared, exports are checked*. `instance_func` answers a function `call` can run, or
+refuses and says why. The wasm backend reads the export's type and refuses one that is not
+`() -> i32`, at init and not on the first frame: `tests/stage2.c`, case `shape`. The native
+backend has a symbol from the loader, which carries no type, and checks nothing. What it calls is
+not `() -> i32` either: it passes its table - `native.md`, *Lifecycle*. "Takes nothing" is what
+Bridge-ASM700 hands a backend to pass on, not the shape of the function a backend runs.
+
+Refused: `instance_func` answering an arity and a count of results for Bridge-ASM700 to check,
+which is what this had. A backend that could not tell answered -1 and the check was skipped, so
+the seam carried a value for "this does not apply". And two numbers could not say "one result,
+and it is an i64", so the wasm backend answered 2. The condition that brings it back is exports
+of more than one shape that Bridge-ASM700 must tell apart.

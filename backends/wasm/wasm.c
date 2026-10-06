@@ -536,9 +536,9 @@ static int instantiate(backend_instance *i, backend_err *err)
     return 0;
 }
 
-BACKEND_EXPORT backend_func *instance_func(backend_instance *i, const char *name,
-                                           int32_t *arity, int32_t *results, backend_err *err)
+BACKEND_EXPORT backend_func *instance_func(backend_instance *i, const char *name, backend_err *err)
 {
+    bool shaped;
     wasmtime_extern_t item;
     wasm_functype_t *ty;
     backend_func *f;
@@ -549,13 +549,14 @@ BACKEND_EXPORT backend_func *instance_func(backend_instance *i, const char *name
         return nullptr;
     }
     ty = wasmtime_func_type(i->ctx, &item.of.func);
-    *arity = (int32_t)wasm_functype_params(ty)->size;
-    *results = (int32_t)wasm_functype_results(ty)->size;
-    /* a result that is not an i32 is as wrong a shape as a second one */
-    if (*results == 1 && wasm_valtype_kind(wasm_functype_results(ty)->data[0]) != WASM_I32) {
-        *results = 2;
-    }
+    /* what `call` runs: found out here, at init, and not by the first frame */
+    shaped = !wasm_functype_params(ty)->size && wasm_functype_results(ty)->size == 1
+        && wasm_valtype_kind(wasm_functype_results(ty)->data[0]) == WASM_I32;
     wasm_functype_delete(ty);
+    if (!shaped) {
+        if (err) snprintf(err->text, sizeof err->text, "its export '%.100s' is not () -> i32", name);
+        return nullptr;
+    }
 
     f = calloc(1, sizeof *f);
     f->instance = i;

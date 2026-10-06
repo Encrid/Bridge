@@ -108,9 +108,10 @@ typedef struct backend_api {
 
     int (*define_func)(backend_instance *i, const char *ns, const char *field,
                        backend_fn fn, void *ud, const backend_sig *sig, backend_err *err);
-    /* `arity` and `results` are -1 if the backend cannot tell. nullptr if there is no such export. */
-    backend_func *(*instance_func)(backend_instance *i, const char *name,
-                                   int32_t *arity, int32_t *results, backend_err *err);
+    /* An export that `call` can run: one that takes nothing of Bridge-ASM700's and answers a
+     * status. nullptr, and why, if there is none of that name, or if the backend can see that
+     * its shape is another. */
+    backend_func *(*instance_func)(backend_instance *i, const char *name, backend_err *err);
     /* 0 if the function returned, and then `status` is what it returned. */
     int (*call)(backend_func *f, int32_t *status, backend_err *err);
 } backend_api;

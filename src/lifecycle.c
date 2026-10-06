@@ -345,18 +345,11 @@ static int private_memory(bridge *b, module *m, const bridge_module_config *cfg,
     return !m->memory;
 }
 
-/* An export Bridge-ASM700 calls: found once, and checked to be () -> i32 where the backend
- * can tell - signatures.md. */
+/* An export Bridge-ASM700 calls: found once. Whether it has the shape `call` runs is the
+ * backend's to see and to refuse - signatures.md. */
 static backend_func *export_of(module *m, const char *name, backend_err *err)
 {
-    int32_t arity = 0, results = 0;
-    backend_func *f = m->on->api.instance_func(m->instance, name, &arity, &results, err);
-    if (!f) return nullptr;
-    if ((arity != -1 && arity != 0) || (results != -1 && results != 1)) {
-        snprintf(err->text, sizeof err->text, "its export '%.100s' is not () -> i32", name);
-        return nullptr;
-    }
-    return f;
+    return m->on->api.instance_func(m->instance, name, err);
 }
 
 /* One call of a lifecycle export, under its timeout. 0 if it returned 0. */

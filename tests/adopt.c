@@ -43,8 +43,7 @@ static backend_instance *instance()
 /* 0 and the function's result, or -1 and why */
 static int run(backend_instance *i, const char *name, int32_t *status, backend_err *err)
 {
-    int32_t arity, results;
-    backend_func *f = api.instance_func(i, name, &arity, &results, err);
+    backend_func *f = api.instance_func(i, name, err);
     if (!f) return -1;
     return api.call(f, status, err);
 }
@@ -156,10 +155,9 @@ int main()
         backend_module *timed = api.module_compile(be, host_bytes, len, nullptr, BACKEND_DEADLINE, &err);
         backend_instance *ti = timed ? api.instance_create(be, timed, nullptr, 0, &err) : nullptr;
         backend_func *f;
-        int32_t arity, count;
         int k;
         if (!ti || api.define_func(ti, "bridge", "ping", ping, nullptr, &sig, &err)
-            || !(f = api.instance_func(ti, "init", &arity, &count, &err))) {
+            || !(f = api.instance_func(ti, "init", &err))) {
             printf("FAIL: timed calls: %s\n", err.text);
             return 1;
         }
