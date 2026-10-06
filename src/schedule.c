@@ -285,7 +285,7 @@ void schedule_run(bridge_t *b, uint32_t phase)
             callers[count] = (uint8_t)j->m->pinned;
             count ++;
         }
-        pool_run(b->pool, run_job, handed, callers, count);
+        pool_run(b->pool, &(pool_batch_t){ run_job, handed, callers, count });
         /* failure.md: the invocation is abandoned, and logged - here, so that the sink is
          * only ever called on the thread that asked for the phase */
         for (k = 0; k < count; k ++) {

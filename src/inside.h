@@ -6,12 +6,12 @@
 #include "bridge_abi.h"
 #include "backend.h"
 #include "os.h"
+#include "pool.h"
 #include "storage.h"
 #include "schema.h"
 
 
 typedef struct module module_t;
-typedef struct pool pool_t;
 
 typedef struct {
     char            *name;
@@ -305,12 +305,6 @@ void config_forget(bridge_t *b, const module_t *m);
 void schedule_run(bridge_t *b, uint32_t phase);
 void schedule_account(bridge_t *b);       /* at each barrier: the failure budgets, and the stops */
 
-/* pool.c */
-typedef void (*pool_fn_t)(void *job);
-[[nodiscard]] pool_t *pool_create(uint32_t workers, uint32_t most_jobs);
-void  pool_destroy(pool_t *p);
-/* fn(jobs[i]) for every i, on the workers and the caller; a job marked is the caller's alone */
-void  pool_run(pool_t *p, pool_fn_t fn, void **jobs, const uint8_t *caller_only, uint32_t count);
 
 /* block.c */
 [[nodiscard]] int block_create(bridge_t *b, const bridge_budget_t *budget);    /* 0, or a record was emitted */

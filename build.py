@@ -54,7 +54,7 @@ TIMEOUT = 120
 
 OS = ['memory', 'library', 'thread', 'mutex', 'event']
 BRIDGE = ['bridge', 'lifecycle', 'config', 'block', 'storage', 'schema', 'abi', 'schedule', 'pool',
-          'backend']
+          'pool_job', 'pool_run', 'backend']
 # a native module is a shared library: the name, its source, what it is compiled with. The same
 # library twice is one module to the loader, so one source is built under several names.
 NATIVE = [
