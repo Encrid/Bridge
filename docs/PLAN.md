@@ -248,9 +248,8 @@ each backend's binding, and what a query may ask across two of them; what each c
 budget; whether a component may have no bytes at all, a tag; and what it takes to move a
 component from one storage layout to another, which is what "layout migration" meant.
 
-Before everything that reads storage or describes it: the readings of how full a budget is, what a
-recording is made of, and the module seam in a second language would each be made twice
-otherwise.
+Before everything that reads storage or describes it: the readings of how full a budget is, and
+the module seam in a second language, would each be made twice otherwise.
 
 *Done when a component can be declared in each of the five and a module reads it as that layout
 is read; each has a case for what it is for and a measurement beside the table's for the same
@@ -298,32 +297,7 @@ zero, every budget of the bridge and of a module reads as what a test made it us
 most it ever used, and one deployment run twice, and on one thread and on four, gives the same checksum of
 every column at every barrier - `schedule.md`, *What a pass depends on*.*
 
-## 15. Record and replay
-
-A pass depends on storage, the phase asked for, and what native modules wrote, and on nothing
-else - `schedule.md`, *What a pass depends on*. The design has paid for that since phase 0: one
-path in, no deadline on a system. This phase is what it was paid for. It was listed as not in this
-plan, with no condition and no phase, which is a deferral; it is planned now.
-
-**The library's half, here.** What a recording is made of, and the two things a host needs to
-make one and to play one: to be handed what native modules wrote at a barrier, and to supply a
-recorded set in place of running them. No file, no format, no clock: `split.md`, *The split*. What
-exactly the set is, and what a played-back run does with a native module's code, are this phase's
-questions, each by the method of `PHASE0.md`.
-
-**The host's half, in the host's repository.** The journal: its file, its format, when a run is
-recorded and how one is played back. It is listed there, and it is not this repository's to build.
-
-After diagnostics, because the checksum pass is how a replay is judged; before the tests by
-capability, so that their list is whole.
-
-*Done when a run is recorded and played back inside this repository's own tests, with a native
-module that writes something different every run, and the checksum of every column at every
-barrier is the same in both; a played-back run that is handed a set recorded from another
-deployment is refused by name; and the standalone host records a run to a file and plays it back
-from one, in its own repository.*
-
-## 16. A module that is not C
+## 15. A module that is not C
 
 What a module needs to be written falls in two parts, and they have two owners - `README.md`,
 *Three layers, three seams*.
@@ -345,14 +319,13 @@ with no language in it from which the header is written, or something less - is 
 first question, by the method of `PHASE0.md`; which language, and what a backend's binding in it
 consists of, are the next two.
 
-After record and replay, which may add to what a module reads; and before the tests by
-capability, whose list this adds to.
+After diagnostics; and before the tests by capability, whose list this adds to.
 
 *Done when a native module in a language that is not C runs as a case; what it was written with
 came from Bridge-ASM700 for the layouts and from the native backend for the rest, and neither was
 copied out of the other; and a layout changed in one place changes what both languages read.*
 
-## 17. Tests, by capability
+## 16. Tests, by capability
 
 Every test so far was written to meet one phase's claim, and is named for the phase: `phase2`
 to `phase6`. That says when a thing was built and not what is covered. This phase turns the
@@ -373,7 +346,7 @@ one that has none; no case is named for a phase; every case passes on Windows, L
 alone and with several copies running at once; and the standalone host's capabilities are covered
 the same way in its own repository.*
 
-## 18. Prove it
+## 17. Prove it
 
 Port the original Bridge's Godot adapter to this design, as a native module. It is a real workload
 with a measured baseline, which is why it is the proof. Its probe asserts 191 checks, and two of

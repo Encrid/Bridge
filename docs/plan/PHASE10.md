@@ -421,11 +421,13 @@ section is gone, since a plan holds work and the documents hold what is refused.
 were weighed as features first - is it relevant, does it serve what the project is for - which
 the first five were not, and should have been.
 
-    closed  the journal, record and replay: a phase of its own, `PLAN.md` 15, with the
-            library's half and the host's half named apart; and a case, now, that a run says
-            the same on one thread as on four                                         7e6eadf
+    closed  the journal, record and replay: a host's, all of it. It was planned for a day as
+            a phase with a library half, on the claim that a host cannot read what a native
+            module wrote; a host loads native modules of its own, and they can. What is the
+            library's is the rule, a case that a run says the same on one thread as on four,
+            and the checksums of `PLAN.md` 14
     closed  a default phase set, and bridge:clock@1 and its kind: one question. Nothing ships
-            either; the first real deployment, `PLAN.md` 18, states its own and asks whether
+            either; the first real deployment, `PLAN.md` 17, states its own and asks whether
             they are shared                                                           5c4e577
     closed  per-component page mapping: refused, for what can be counted, and no longer for
             a cost that was never measured. `costs.md`
@@ -445,7 +447,7 @@ the first five were not, and should have been.
             then each kind on its own: accepted, all five, as `PLAN.md` 11
     open    a struct changed at reload: a question the misreading raised and nobody had
             asked. `lifetime.md` says the library "cannot" tell what changed, which is false
-    closed  bindings for a non-C module: a phase of its own, `PLAN.md` 16, with two owners.
+    closed  bindings for a non-C module: a phase of its own, `PLAN.md` 15, with two owners.
             What Bridge-ASM700 writes is its own to state; how a module reaches it is the
             backend's. Tried first: the project's compiler cannot translate the header
     closed  the tree itself, which had said otherwise: a folder for each owner. A backend has

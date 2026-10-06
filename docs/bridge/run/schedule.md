@@ -36,7 +36,7 @@ and `ecs_pipeline_init` lets a world define its own instead. So they are an opti
 replaceable data, not names the library imposes. Here nothing ships one at all: not the library,
 and not a host, which hands over the phases its deployment stated. Whether a set of names ever
 becomes something deployments share is the question `no-builtins.md`, *No builtins*, puts for a
-clock, and it is asked where the first real deployment is built: `PLAN.md`, phase 18.
+clock, and it is asked where the first real deployment is built: `PLAN.md`, phase 17.
 
 flecs' phases carry `DependsOn` relationships, and `:942` records the care that needs -
 *"EcsOnUpdate doesn't have a direct DependsOn relationship on EcsPreUpdate, which ensures that when
@@ -182,13 +182,18 @@ barrier: `PLAN.md`, phase 14.
 It is stated here because an input path that bypassed a column would quietly make a pass depend
 on something nobody can see, and nothing later could recover that.
 
-**Recording a run and playing it back is what this is for**, and it is `PLAN.md`, phase 15. The
-work is in two halves, and `split.md`, *The split*, is what divides it:
+**Recording a run and playing it back is what this is for, and it is a host's to build, all of
+it.** Nothing is missing from Bridge-ASM700 for it. A host loads native modules of its own, and a
+native module reads the columns of the components it declares through real pointers, and writes
+them: so a module that copies what the input modules wrote, and another that writes it back in
+their place, are two modules like any other - `no-builtins.md`, *No builtins*: a new capability
+is a new module. The journal they feed is a file, and a file is the host's - `split.md`, *The
+split*. It may not drop a record, which is why it is not the log's path - `log.md`, *The log*.
 
-    Bridge-ASM700     what a recording is made of, and nothing on disk: handing a host what
-                      native modules wrote at a barrier, and taking a recorded set in place of
-                      running them; and the promise that a run played back is the run recorded
-    the host          the journal: its file and its format, when a run is recorded, and driving
-                      one that is played back
+What is Bridge-ASM700's is what makes a recording mean anything: the rule above, the case that
+holds it, and the checksums a played-back run is judged by.
 
-A journal may not drop a record, which is why it is not the log's path - `log.md`, *The log*.
+Refused: two calls at the host seam, to be handed what native modules wrote and to supply it in
+their place, which is what this said for a day. A host has no such call and needs none. The
+condition that brings one in is a recorder built as a module finding something a module cannot
+reach.
