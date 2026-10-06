@@ -576,7 +576,8 @@ Of this repair:
             be the one that used them up; and its changes are applied in part
     closed  a strip that cannot join leaves two tables of one archetype: it does, and it is
             said, with the rows that stay apart and the budget that had no room. `lifetime.md`
-    open    `[budget] terms` is the deployment's, and a module cannot state what it needs
+    closed  `[budget] terms` is the deployment's, and a module cannot state what it needs: it
+            holds, as `types` and `systems` do, and what it costs is written. `budgets.md`
     open    the export shape: a backend that cannot check says so by doing nothing
     open    the memory handle: the wasm backend compiles a holder module for a block at every
             `instance_create`, which is work a handle could keep once. To be weighed with it

@@ -38,9 +38,15 @@ created, and it allocates nothing after - `storage.md`, *What bounds it*. A `dec
 **`terms` is the most one system or observer may ask for**, and it is a key for the same reason:
 storage keeps a system's terms in a record made when the bridge is, so the record has a length.
 It was a constant, 32, and the number was flecs' default with nothing of ours behind it. Refused:
-keeping a constant and saying it is arbitrary. Refused: no most, which is a record of any length
-and so an allocation at load. No module compiles against the number, so it is one number and
-the deployment's.
+keeping a constant and saying it is arbitrary. Refused: no most, with storage allocating a
+system's record of its terms when the system registers. A load allocates as it is - *Nothing is
+allocated in a phase* - so that alone is no reason; the reason is that storage would then
+allocate somewhere other than at create, and what storage holds would no longer be known from
+the config. It costs room for `systems` times `terms` whether used or not, and a module that
+asks more than the deployment stated is refused, as for `types` and `systems`. The condition
+that brings it back is that room measured as a cost, or a host that cannot state a ceiling for
+modules it has not seen. No module compiles against the number, so it is one number and the
+deployment's.
 
 Refused: allocating at load for however many types and systems a module turns out to have, which
 is what this first did: memory that is a stated budget times a number nobody stated. Refused: a
