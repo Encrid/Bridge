@@ -263,7 +263,7 @@ BACKEND_EXPORT void backend_destroy(backend *b)
 
 BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] backend *b)
 {
-    return BACKEND_UNTRUSTED | BACKEND_METER | BACKEND_DEADLINE | BACKEND_LIMIT | BACKEND_RELOAD
+    return BACKEND_UNTRUSTED | BACKEND_METER | BACKEND_TIMEOUT | BACKEND_MEMORY_LIMIT | BACKEND_RELOAD
          | BACKEND_SIDE_BY_SIDE;
 }
 
@@ -301,7 +301,7 @@ BACKEND_EXPORT backend_module *module_compile(
         return nullptr;
     }
     enum engine_kind kind = (demands & BACKEND_METER ? METERED : 0)
-             | (demands & BACKEND_DEADLINE ? INTERRUPTIBLE : 0);
+             | (demands & BACKEND_TIMEOUT ? INTERRUPTIBLE : 0);
     wasmtime_module_t *module = nullptr;
     wasmtime_error_t *error = wasmtime_module_new(engine_for(b, kind), bytes, len, &module);
     if (error) {
@@ -445,7 +445,7 @@ BACKEND_EXPORT void instance_set_fuel(backend_instance *i, uint64_t units)
     if (i->m->kind & METERED) drop(wasmtime_context_set_fuel(i->ctx, units));
 }
 
-BACKEND_EXPORT void instance_set_deadline(backend_instance *i, uint64_t nanos)
+BACKEND_EXPORT void instance_set_timeout(backend_instance *i, uint64_t nanos)
 {
     i->deadline = nanos;
 }

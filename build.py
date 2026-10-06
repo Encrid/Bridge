@@ -672,7 +672,7 @@ CASES = [
     ('stage6-nreloadfailstop', ['stage6', 'nreloadfailstop'],
      r"the bridge has stopped: module 'game:ticker@0.1.0' could not be reloaded and its on_error is fail.*update refused.*the bridge runs again: module 'game:ticker@0.3.0' is back.*tick 112 10.*game:ticker@0.3.0=RUNNING.*alive", None),
     ('stage6-ntimeout', ['stage6', 'ntimeout'],
-     r"module 'game:ticker@0.1.0' is refused: shutdown_timeout needs 'deadline', which backend 'native' lacks.*alive", r"cannot open"),
+     r"module 'game:ticker@0.1.0' is refused: it states shutdown_timeout, and backend 'native' keeps none.*alive", r"cannot open"),
     ('stage6-configceiling', ['stage6', 'configceiling', '1'],
      r"the row its settings go on does not fit under .budget. entities of 1 .*alive", None),
     ('stage4-nopath', ['stage4', 'nopath'],

@@ -150,8 +150,14 @@ static int lacks(bridge *b, const char *identity, open_backend *o, uint32_t flag
                  const char *key, const char *capability)
 {
     if (o->capabilities & flag) return 0;
-    say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: %s needs '%s', which backend '%s' "
-        "lacks", identity, key, capability, o->name);
+    /* a guarantee has one name, for the key that asks it and the capability that answers */
+    if (!strcmp(key, capability) || strstr(key, capability)) {
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: it states %s, and backend '%s' "
+            "keeps none", identity, key, o->name);
+    } else {
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: %s needs '%s', which backend "
+            "'%s' lacks", identity, key, capability, o->name);
+    }
     return 1;
 }
 
@@ -262,11 +268,11 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
         return 1;
     }
     if ((cfg->fuel > 0 && lacks(b, id, o, BACKEND_METER, "fuel", "meter"))
-        || (cfg->memory_limit > 0 && lacks(b, id, o, BACKEND_LIMIT, "memory_limit", "limit"))
-        || (cfg->init_timeout > 0 && lacks(b, id, o, BACKEND_DEADLINE, "init_timeout", "deadline"))
-        || (cfg->reload_timeout > 0 && lacks(b, id, o, BACKEND_DEADLINE, "reload_timeout", "deadline"))
+        || (cfg->memory_limit > 0 && lacks(b, id, o, BACKEND_MEMORY_LIMIT, "memory_limit", "memory_limit"))
+        || (cfg->init_timeout > 0 && lacks(b, id, o, BACKEND_TIMEOUT, "init_timeout", "timeout"))
+        || (cfg->reload_timeout > 0 && lacks(b, id, o, BACKEND_TIMEOUT, "reload_timeout", "timeout"))
         || (cfg->shutdown_timeout > 0
-            && lacks(b, id, o, BACKEND_DEADLINE, "shutdown_timeout", "deadline"))
+            && lacks(b, id, o, BACKEND_TIMEOUT, "shutdown_timeout", "timeout"))
         || (cfg->hot_reload && lacks(b, id, o, BACKEND_RELOAD, "hot_reload", "reload"))) {
         return 1;
     }
@@ -279,9 +285,9 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
     }
     *on = o;
     *demands = (cfg->trusted ? 0 : BACKEND_UNTRUSTED) | (cfg->fuel > 0 ? BACKEND_METER : 0)
-             | (cfg->memory_limit > 0 ? BACKEND_LIMIT : 0)
+             | (cfg->memory_limit > 0 ? BACKEND_MEMORY_LIMIT : 0)
              | (cfg->init_timeout > 0 || cfg->reload_timeout > 0 || cfg->shutdown_timeout > 0
-                ? BACKEND_DEADLINE : 0);
+                ? BACKEND_TIMEOUT : 0);
     return 0;
 }
 
@@ -382,7 +388,7 @@ static int lifecycle_call(module *m, backend_func *f, const char *name, int64_t 
 {
     int32_t status = 0;
     int trapped;
-    if (timeout > 0) m->on->api.instance_set_deadline(m->instance, (uint64_t)timeout);
+    if (timeout > 0) m->on->api.instance_set_timeout(m->instance, (uint64_t)timeout);
     m->refused = 0;
     /* threads.md: what it changes is applied after the last barrier's observers and before
      * the next phase's systems, in the order the calls were made */

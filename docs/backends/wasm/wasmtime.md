@@ -54,7 +54,7 @@ knows because it asks: an adoption is in progress, or it is not.
 wasmtime interrupts by **epoch**: compiled code checks a counter the embedder increments, and traps
 once it passes a store's deadline. A tick has no duration; whoever increments decides what time is.
 
-So the backend keeps **one watchdog thread and no tick period**. `instance_set_deadline` arms it:
+So the backend keeps **one watchdog thread and no tick period**. `instance_set_timeout` arms it:
 the store's deadline is one epoch ahead, the thread sleeps for the timeout, and increments once if
 the call has not returned. Lifecycle calls never overlap - `lifecycle.md`, *The runtime lifecycle* -
 so one armed deadline is all there ever is.
@@ -81,7 +81,7 @@ The condition that brings it back is several deadlines running at once.
 
 Fuel and epoch interruption are settings of a wasmtime **engine**, fixed before anything is
 compiled, and each puts code in every loop - `limits.md`, *What a bound costs*, has the numbers. So
-the backend keeps up to four engines, one per combination of `meter` and `deadline`, each made the
+the backend keeps up to four engines, one per combination of `meter` and `timeout`, each made the
 first time a module demanding that combination is compiled. A deployment where every module agrees
 has one.
 
@@ -90,7 +90,7 @@ watchdog increments only the engine of the call it was armed for.
 
 ## What it answers
 
-    untrusted, meter, deadline, limit, reload      yes
+    untrusted, meter, timeout, memory_limit, reload    yes
     side by side                                   yes: two instances of a module at once
     unload                                         no: its library stays in the process
 

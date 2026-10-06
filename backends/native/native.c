@@ -226,7 +226,7 @@ BACKEND_EXPORT void instance_destroy(backend_instance *i)
 /* this backend answered no to all three, so Bridge-ASM700 never has a number to hand them */
 BACKEND_EXPORT void instance_set_fuel([[maybe_unused]] backend_instance *i,
                                       [[maybe_unused]] uint64_t units) { }
-BACKEND_EXPORT void instance_set_deadline(
+BACKEND_EXPORT void instance_set_timeout(
     [[maybe_unused]] backend_instance *i, [[maybe_unused]] uint64_t nanos) { }
 BACKEND_EXPORT void instance_set_memory_limit(
     [[maybe_unused]] backend_instance *i, [[maybe_unused]] uint64_t bytes) { }

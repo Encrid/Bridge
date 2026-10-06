@@ -2,13 +2,13 @@
 
 `backend_capabilities` is not decoration. A backend says what it can actually do, and these flags
 are how it states the guarantees in `module.md`, *Three guarantees differ* - metering is three flags,
-`meter`, `deadline` and `limit`, and reload is two. The last is about the backend itself:
+`meter`, `timeout` and `memory_limit`, and reload is two. The last is about the backend itself:
 
                    wasm   native
     untrusted      yes    no      a module that is not trusted can be run here
     meter          yes    no      fuel, or an equivalent
-    deadline       yes    no      a running module can be interrupted
-    limit          yes    no      a module's own memory has a ceiling
+    timeout        yes    no      a call can be given a timeout, and is abandoned past it
+    memory_limit   yes    no      a module's own memory can be given a ceiling
     reload         yes    yes     an instance can be replaced while the process runs -
                                   cleanly on wasm, fragile on native
     side by side   yes    no      two instances of one module can exist at once
@@ -40,7 +40,11 @@ set to the safe one. It got isolation between its VMs only because the three had
 shared no data.
 
 Each flag is demanded by a **config key**, not by a module: `untrusted` by `trusted = false`,
-`meter` by `fuel`, `deadline` by a timeout, `limit` by `memory_limit`, `reload` by `hot_reload`.
+`meter` by `fuel`, `timeout` by any of the three timeouts, `memory_limit` by the key of that
+name, `reload` by `hot_reload`. **A guarantee has one name**, for the key that asks it and the
+capability that answers: `timeout` was `deadline` at this seam and `memory_limit` was `limit`,
+two words for one thing each, and a deadline is a moment where what the entry takes is a length
+of time.
 `side by side` is demanded by nothing: it is how Bridge-ASM700 learns which order a reload takes -
 `lifecycle.md`, *The runtime lifecycle*. `unload` is demanded by nothing either: it is how
 Bridge-ASM700 learns what to do with a backend's library at `bridge_destroy` - `create.md`,

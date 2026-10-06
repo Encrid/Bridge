@@ -152,7 +152,7 @@ int main()
         static const uint8_t params[2] = { BACKEND_I32, BACKEND_I64 }, results[1] = { BACKEND_I32 };
         backend_sig sig = { params, 2, results, 1 };
         void *host_bytes = read_file(MODULE_DIR "/host.wasm", &len);
-        backend_module *timed = api.module_compile(be, host_bytes, len, nullptr, BACKEND_DEADLINE, &err);
+        backend_module *timed = api.module_compile(be, host_bytes, len, nullptr, BACKEND_TIMEOUT, &err);
         backend_instance *ti = timed ? api.instance_create(be, timed, nullptr, 0, &err) : nullptr;
         backend_func *f;
         int k;
@@ -162,7 +162,7 @@ int main()
             return 1;
         }
         for (k = 0; k < 20'000; k ++) {
-            api.instance_set_deadline(ti, 1'000'000'000ull);
+            api.instance_set_timeout(ti, 1'000'000'000ull);
             if (api.call(f, &status, &err) || status != 16) {
                 printf("FAIL: timed call %d: %d: %s\n", k, status, err.text);
                 return 1;

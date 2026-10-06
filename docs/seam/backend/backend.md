@@ -31,7 +31,7 @@ name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
     instance_create(backend, module, memories, count) -> instance
     instance_destroy(instance)
     instance_set_fuel(instance, units)
-    instance_set_deadline(instance, nanos)
+    instance_set_timeout(instance, nanos)
     instance_set_memory_limit(instance, bytes)
 
     define_func(instance, namespace, field, fn, sig)
@@ -105,14 +105,14 @@ backend.
 
 ## The backend owns its clock
 
-`instance_set_deadline` takes **nanoseconds**, and the backend converts to whatever its engine
+`instance_set_timeout` takes **nanoseconds**, and the backend converts to whatever its engine
 counts in. Bridge-ASM700 asks in real time because that is the only unit every backend can mean the
 same thing by.
 
 It is the backend rather than the host, even though `split.md`, *The split*, sends a policy about
 time the other way. The host has no handle on an engine's internals, and a host that forgot to drive
 a clock would silently disable every deadline in the deployment. A backend that cannot interrupt
-says so through `deadline` in `capabilities.md`, *Capabilities, so the swap is honest*, instead of
+says so through `timeout` in `capabilities.md`, *Capabilities, so the swap is honest*, instead of
 accepting a number it will ignore. How the wasm backend keeps time is `wasmtime.md`, *Deadlines*.
 
 What is asked for is a **lifecycle call's** timeout; a system is bounded by fuel alone, for the

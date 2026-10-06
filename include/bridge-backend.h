@@ -30,8 +30,8 @@ enum backend_capability : uint32_t {
      * whose every export it has checked. How it does that is its own */
     BACKEND_UNTRUSTED = 1 << 0,
     BACKEND_METER    = 1 << 1,
-    BACKEND_DEADLINE = 1 << 2,
-    BACKEND_LIMIT    = 1 << 3,
+    BACKEND_TIMEOUT  = 1 << 2,     /* a call can be given a timeout, and is abandoned past it */
+    BACKEND_MEMORY_LIMIT = 1 << 3,  /* a module's own memory can be given a ceiling */
     BACKEND_RELOAD   = 1 << 4,
     /* two instances of one module can exist at once: which order a reload takes */
     BACKEND_SIDE_BY_SIDE = 1 << 5,
@@ -105,7 +105,7 @@ typedef struct backend_api {
                                          backend_err *err);
     void (*instance_destroy)(backend_instance *i);
     void (*instance_set_fuel)(backend_instance *i, uint64_t units);
-    void (*instance_set_deadline)(backend_instance *i, uint64_t nanos);     /* the next call only */
+    void (*instance_set_timeout)(backend_instance *i, uint64_t nanos);     /* the next call only */
     void (*instance_set_memory_limit)(backend_instance *i, uint64_t bytes);
 
     int (*define_func)(backend_instance *i, const char *ns, const char *field,
@@ -124,7 +124,7 @@ typedef struct backend_api {
     "memory_shape", "memory_adopt", "memory_release", \
     "module_compile", "module_imports", "module_destroy", \
     "instance_create", "instance_destroy", \
-    "instance_set_fuel", "instance_set_deadline", "instance_set_memory_limit", \
+    "instance_set_fuel", "instance_set_timeout", "instance_set_memory_limit", \
     "define_func", "instance_func", "call"
 constexpr uint32_t BACKEND_ENTRY_COUNT = 17;
 static_assert(sizeof(backend_api) == BACKEND_ENTRY_COUNT * sizeof(void (*)()));

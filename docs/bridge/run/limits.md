@@ -34,11 +34,11 @@ does not contain.
 
 **A lifecycle call is the one that needs wall time**, and gets a timeout and no fuel: `init` may
 legitimately do a great deal of work, so an instruction count is the wrong proxy for "took too long
-once". Those three timeouts are what demands `deadline` of a backend - `capabilities.md`,
-*Capabilities, so the swap is honest* - and `instance_set_deadline` is how they are enforced.
+once". Those three timeouts are what demands `timeout` of a backend - `capabilities.md`,
+*Capabilities, so the swap is honest* - and `instance_set_timeout` is how they are enforced.
 
-`memory_limit` is not a budget at all. Nothing resets a ceiling. It is what demands `limit` of a
-backend, as `fuel` demands `meter`.
+`memory_limit` is not a budget at all. Nothing resets a ceiling. It demands the capability of
+the same name of a backend, as `fuel` demands `meter`.
 
 All five are stated, and "no limit" is a value like any other: `-1`. `capabilities.md`,
 *Capabilities, so the swap is honest*.
