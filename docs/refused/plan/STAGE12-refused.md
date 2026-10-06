@@ -37,3 +37,11 @@ explicit. No condition brings it back.
 
 Refused: an exception for the three in `STYLE.md`. It was proposed with no reason: the seams
 are where a rule about arguments is read by the most people. No condition brings it back.
+
+## The three entries of the backend seam over four
+
+Of `STAGE12.md`, *The three entries of the backend seam over four*.
+
+Refused: `instance_create` keeping its backend, with the memories and their count in a struct
+of their own. It is a struct for a pointer and a count, and it keeps an argument neither backend
+reads. The condition that brings it back is a backend whose module cannot hold what it is of.

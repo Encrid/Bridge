@@ -139,3 +139,24 @@ that `declare` refuses for a kind, for what happens at unload and for a storage 
     extensible    any language writes bytes at stated offsets
     minimal       three structs and three readers
     explicit      every field is named where it is written, and its place is asserted
+
+### The three entries of the backend seam over four
+
+`module_compile` took six arguments, `instance_create` five and `define_func` seven. All three
+run at load.
+
+**What states one thing is one struct, as for a module's entries.** What is compiled is a
+`backend_source_t`: the bytes, their length, the path and what is demanded of the backend. What
+is defined is a `backend_entry_t`: the namespace, the field, the function, what it is handed
+and its signature. Each is passed by pointer, with where a failure is written.
+
+**`instance_create` loses its backend.** It is handed the module, and a module is of one
+backend: the wasm backend's module held it already, and the native backend never read the
+argument. A backend that needs it keeps it in its module.
+
+    fast          at load only, and the same
+    scalable      a new field is a field
+    modular       a module holds what it is of, as the wasm backend's did
+    extensible    a third backend stores its own in its module, if it needs it
+    minimal       two structs, and one argument fewer
+    explicit      one way to the backend from an instance, where an unused second stood
