@@ -47,13 +47,13 @@ written for.* Met.
 
 Done. `STAGE2.md` is what it built and found.
 
-`bridge-backend.h` with all sixteen entries, and the wasm backend as a shared library behind it,
-which Bridge-ASM700 opens by the name config gives - `backend.md`, *What a backend is asked for*. A core
-wasm module importing a Bridge-ASM700 memory, which means `wasm_multi_memory` on since the module has its
-own. `bridge-abi.h` begins here, because a module reading the shared memory with plain loads needs to know
-what a span holds. `define_func` with a real signature
-and `instance_func`'s `() -> i32` check - `signatures.md`, *Imports are declared, exports are
-checked*.
+`bridge-backend.h` with all sixteen entries it then had - seventeen now, `backend.md` - and the wasm
+backend as a shared library behind it, which Bridge-ASM700 opens by the name config gives -
+`backend.md`, *What a backend is asked for*. A core wasm module importing a Bridge-ASM700 memory,
+which means `wasm_multi_memory` on since the module has its own. `bridge-abi.h` begins here, because
+a module reading the shared memory with plain loads needs to know what a span holds. `define_func`
+with a real signature and `instance_func`'s `() -> i32` check - `signatures.md`, *Imports are
+declared, exports are checked*.
 
 `bridge.h` begins here too, as far as this stage's claim needs: `bridge_create`, `bridge_destroy`
 and `bridge_load`, with **the sink and Bridge-ASM700's own records**, so every refusal from here on has a
@@ -102,7 +102,8 @@ overflowing ring reports how many it dropped.* Met.
 Done. `STAGE4.md` is what it built and found.
 
 The second backend: a shared library that opens a module's library and calls it directly -
-`native.md`. `bridge-native.h`, `bridge_bind`, and exports found by name as `bridge_<name>`. Nothing
+`native.md`. `bridge-native.h`, `bridge_bind` - gone since, for a table that is passed - and
+exports found by name as `bridge_<name>`. Nothing
 changes above the backend seam: a native module's systems are scheduled like any other, it reads
 the same spans through `private` and `shared`, and its log ring is reached through a pointer.
 

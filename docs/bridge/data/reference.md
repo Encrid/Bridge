@@ -8,7 +8,7 @@ It is arithmetic, not a call. Bridge-ASM700 publishes two flat arrays and the wh
 
     record = entity_index[id & 0xffffffff]     // u32 table, u32 row, u32 generation
     if record.generation != id >> 32           -> stale id, refuse
-    base   = column_base[record.table * terms + slot]
+    base   = column_base[record.table * types + slot]
     if base == 0                               -> entity lacks this component
     ptr    = base + record.row * sizeof(T)
 
@@ -16,7 +16,7 @@ Two dependent loads and a multiply. No crossing, which is the point: a crossing 
 reintroduce the per-operation cost this design exists to remove.
 
 `column_base` is needed because a component sits at a different offset in every table, so the table
-alone is not enough. It is indexed by table and by the terms *this* module declared, and it has a
+alone is not enough. It is indexed by table and by the types *this* module declared, and it has a
 cell for every table there may be - `[budget] tables` - so that a table made at any barrier has
 its place: ten components at a thousand tables is forty kilobytes of the module's `spans`.
 

@@ -85,7 +85,7 @@ flecs has the equivalent and says what it is for: `ecs_system_desc_t.immediate`,
 have access to the actual world. Cannot be true at the same time as multi_threaded"* -
 `flecs.h:14371`. So running alone is the **consequence** of wanting undeclared access to the real
 world, not the goal. **Here there is no way to ask for the actual world**: every read goes through a
-declared term, and even `get` by id is indexed by the terms *this* module declared.
+declared term, and even `get` by id is indexed by the types *this* module declared.
 
 The three cases for it each live somewhere else. A system driving something that is not thread-safe
 is `pinned`, and every pinned module is on one thread already - `pinned.md`, *Threads*. A
@@ -106,7 +106,9 @@ a span be a snapshot. **Every phase, without exception**: `data.md`, *Structural
 
 **A barrier after every phase, not once per frame.** So a spawn in `update` is visible in `present`,
 the same frame rather than the next one. It costs one barrier a phase, and a barrier costs what
-changed and nothing for what did not - `query.md`, *The interface is a query*. It is what makes
+changed - `query.md`, *The interface is a query* - and, beside that, a visit to each module to
+top up its ids, count its failures and drain its log: about a hundred nanoseconds in all with
+one module and nothing to do, measured. `STAGE10.md`, *What it costs*. It is what makes
 ordering worth having.
 
 ### An observer runs at the barrier, one hop per barrier

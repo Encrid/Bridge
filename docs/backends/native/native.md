@@ -51,8 +51,9 @@ has run the library's static initialisers. So you would be checking whether a mo
 after executing it, and a library cannot be cleanly unloaded. Read, then decide, then load.
 
 **The section is a convention the host reads, not something Bridge-ASM700 parses.** Bridge-ASM700 is
-handed the identity as data - `host-api.md`, *The data* - so the section tables are walked by
-`bridge_manifest_parse`, a helper beside the library rather than inside it: ELF's `shdr` and
+handed the identity as data - `host-api.md`, *The data* - so the section tables are to be walked
+by `bridge_manifest_parse`, a helper beside the library rather than inside it, which `PLAN.md`,
+stage 13, writes: ELF's `shdr` and
 `shstrtab`, PE's section table after the optional header, Mach-O's load commands. One implementation
 for every host that wants it, and none for a host whose module metadata comes from elsewhere.
 

@@ -71,8 +71,8 @@ brings it back is an embedder that must link a backend statically.
 
 So an embedder with its own config system - a database, compiled-in constants, another format -
 hands over data rather than being made to write a file for Bridge-ASM700 to read. And the three platform
-parsers that would otherwise sit in the library do not: `bridge_manifest_parse` ships **beside** it
-as a helper - `native.md`, *Identity*.
+parsers that would otherwise sit in the library do not: `bridge_manifest_parse` is to ship
+**beside** it as a helper - `native.md`, *Identity*. It is not written yet: `PLAN.md`, stage 13.
 
 **No discovery either.** Finding modules is filesystem work, so the host finds them and calls
 `bridge_load` for each.
@@ -93,7 +93,10 @@ as a helper - `native.md`, *Identity*.
 
     /* introspection */
     int bridge_modules(bridge *b, bridge_module_info *out, int max);
-    int bridge_profile (bridge *b, bridge_profile_row *out, int max);
+    int bridge_profile (bridge *b, bridge_profile_row *out, int max);   /* stage 14 */
+
+**`bridge_profile`, and `validate` and `profile` below, are not built**: they are the surface as
+it is designed, and `bridge.h` has everything else. `PLAN.md`, stage 14.
 
 Every answer above the two pulls is `[[nodiscard]]`: a status a host drops is one the compiler
 points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - `create.md`,
@@ -134,7 +137,7 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
         const bridge_order *order;   uint32_t order_count;
         uint32_t            threads;                         /* counting the caller's */
         bridge_budget       budget;
-        bool                validate, profile;               /* [checks] */
+        enum bridge_flag    validate, profile;               /* [checks]: stage 14 */
     } bridge_config;
 
     typedef struct {
@@ -210,7 +213,7 @@ nothing here records a source.
 **Every limit here carries its period, because a number without one means nothing** - `limits.md`,
 *What bounds a run*. One is per invocation, three are per call, and one is a ceiling.
 
-**`validate` and `profile` are the two diagnostic switches here**, and both are deployment-wide: one
+**`validate` and `profile` are to be the two diagnostic switches here**, and both are deployment-wide: one
 pass walks every column - `validation.md`, *The checksum pass, when asked* - and the other times
 every dispatch, `profile.md`, *The profile*. Nothing else Bridge-ASM700 does is optional.
 

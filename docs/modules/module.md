@@ -35,7 +35,8 @@ NUL-separated `key=value`.
 **It carries what only the author knows**, so that it travels with the artifact: the ABI version the
 module was built against, whether it must stay on one thread, how much scratch space its code uses,
 how long its init takes. Any per-module key of `config.md`, *The keys*, may be stated there.
-`bridge_manifest_parse` answers the identity and those values; combining them with a deployment's
+`bridge_manifest_parse`, once it is written - `PLAN.md`, stage 13 - answers the identity and
+those values; combining them with a deployment's
 own is the host's business, and Bridge-ASM700 sees one flat struct either way.
 
 It is the shape of a Linux kernel module's `.modinfo`, for the reason `native.md`, *Identity*, gives:

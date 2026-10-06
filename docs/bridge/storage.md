@@ -126,7 +126,8 @@ that writes a term it has is doing what it is for - `data.md`, *Access mode*.
 
 Carved to what a table asks for, to sixteen bytes. A freed range is a gap, kept in order and
 joined to its neighbours, and a request takes the smallest gap that holds it before fresh space.
-What says which ranges are free is kept outside the block.
+What says which ranges are free is kept outside the block: a list as long as there may be
+tables, made with the bridge, which never grows.
 
 **Nothing is ever taken from outside it.** A request the region cannot meet is refused, and the
 barrier's second step is where that is found out, before anything has moved.

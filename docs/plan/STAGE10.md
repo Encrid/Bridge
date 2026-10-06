@@ -177,8 +177,8 @@ What was not known until it ran:
                                 it matches, is a set. Losing either is a remove
     a destroy                   is a remove to each observer the entity matched, once, however
                                 many times it was asked for
-    there and gone in one       is one record with all three events: add, set, remove
-    barrier
+    there and gone in one       was one record with all three events: add, set, remove. Not
+    barrier                     since the net change was decided, below: it is not heard
     a detach of what is not     nothing, and no event
     there; a change to a dead
     id
@@ -343,7 +343,7 @@ stripfull` are its cases, each run with its rule taken out and failing.
 a set's width and each system's list of tables were sized by how many types and systems there
 were, which no budget stated, and allocated when a module loaded; and the plan's sentence had been
 reworded to fit. There are two more keys now, `[budget] types` and `[budget] systems`, and
-storage allocates in `rows_create` and nowhere else: `budgets.md`, *Budgets*. A type's fields
+storage allocates in `storage_create` and nowhere else: `budgets.md`, *Budgets*. A type's fields
 left storage for the component's record on the way, since storage only ever needed its size.
 
 **What an observer is told: decided, and it is what the barrier made of the entity.** flecs'
@@ -641,7 +641,8 @@ systems"; "per adopted block" in `wasmtime.md`; "seventeenth"; stages "7 to 11" 
 `bridge_bind` and "sixteen" in `PLAN.md`; `rows_create` here; and a refusal spliced into the
 middle of a paragraph in `config.md`.
 
-    open    the false statements above
+    closed  the false statements above, each corrected where it stood. What is designed
+            and not built says so, with its stage
 
 **4. Refusals with no condition**: each with its subject above, and the rest in one pass.
 

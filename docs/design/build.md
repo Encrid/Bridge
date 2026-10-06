@@ -4,7 +4,7 @@ What Bridge-ASM700 is compiled with, for what, in which C, and against which C l
 is the design of the library. All of it decides whether the library can be built the same way on
 three systems by somebody who installed two tools.
 
-`PLAN.md` stages 7 to 11 build what this file states, one part each, and say which. Until a stage
+`PLAN.md` stages 7, 8, 9 and 12 build what this file states, one part each, and say which. Until a stage
 is done, its part here is the decision and not yet the tree.
 
 ## One compiler
