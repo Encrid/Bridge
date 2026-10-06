@@ -664,7 +664,7 @@ Windows, the least of the rounds, two runs in turn. **A change of ours is two fi
 change of theirs is one**: the call a module makes to ask for it, and the barrier that applies
 it. The first time this was written only the barrier was counted for ours, against all of
 theirs, which flattered ours on every line below by the 10 ns of a call. Both are counted here,
-and they are the figures after *Where ours was slower*, below.
+and they are the figures after *Where ours was slower, and what was done*, below.
 
 A four-byte component given to an entity, and taken from it:
 
