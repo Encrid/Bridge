@@ -106,11 +106,12 @@ What each change will do:
     fields in another order      each goes to its new offset
     an array made longer         what it held is kept, and the rest is zero
     a field removed              it is gone from every row, and a record names it and how many
-                                 rows held it
-    an array made shorter        the first of it is kept, and a record says how much went
+                                 rows held it: once the loss is stated, below
+    an array made shorter        the first of it is kept, and a record says how much went: once
+                                 the loss is stated
     a field renamed              is a field removed and a field added, since two descriptors
                                  cannot say otherwise: the old values go and the new field is
-                                 zero, and the record shows both
+                                 zero, and the record shows both: once the loss is stated
     a field of another type      the reload is refused, naming the field: bytes of one type are
                                  not a value of another
     a struct a field names,      the same rules, one level down
@@ -118,6 +119,21 @@ What each change will do:
     an enum whose constants      refused if a constant now has another number, since every
     changed                      stored value would silently mean something else; a constant
                                  added is nothing
+
+**A reload that would drop values is refused until the loss is stated.** The first one is
+refused, and the refusal names every field that would go and how many rows hold it. A reload
+that states it accepts the loss then moves the rows, with the same record. A change that drops
+nothing - a field added, fields in another order, an array made longer - needs no statement.
+It is for the rename: an author who renamed a field meant to drop nothing, and is told before
+anything is gone and not by a record after. How the acceptance is stated is this stage's to
+decide when it is built - `PLAN.md`, stage 11 - and it is a stated value, not a flag left off.
+
+Refused: moving the rows at once and saying what went, which is what was first decided here. It
+fails nobody who removed a field, and for a rename it loses every value of the field on a call
+that means "keep running". The condition that brings it back is a rename that can be told from
+a removal. Refused: refusing every such change, so that a struct which loses a field is had only
+by unloading, which loses every row. The condition that brings it back is moving rows proving
+unsound.
 
 **A removal is the author's, and that is why it migrates.** This document said that
 Bridge-ASM700 never discards data on a call that means "keep running", and refused every change

@@ -564,8 +564,9 @@ Of this repair:
     closed  five storage layouts, where only the table's weakness was measured: five still,
             and each of the four to come is weighed on every need, with a measurement of
             what it answers, before it is built. `PLAN.md`, stage 11
-    open    a removed or renamed field migrates at reload, and its values are lost on a call
-            that means "keep running"
+    closed  a removed or renamed field migrated at reload, and its values were lost on a call
+            that means "keep running": refused first, naming what would go, and moved once
+            the reload states that it accepts the loss. `lifetime.md`; built in stage 11
     open    a shared component whose layout changed is refused always, called forced
     open    out of tables or columns: the module that asked last is charged, which may not
             be the one that used them up; and its changes are applied in part

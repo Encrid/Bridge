@@ -260,7 +260,8 @@ component from one storage layout to another, which is what "layout migration" m
 
 **And a type's rows are moved to a new component layout here too**, because it is the same work:
 writing every row of a type again somewhere else. The rules are decided - `lifetime.md`, *When a
-component layout changed* - and until this stage a changed component layout is refused.
+component layout changed* - and until this stage a changed component layout is refused. One
+question is left to this stage: how a reload states that it accepts a loss of values.
 
 Before everything that reads storage or describes it: the readings of how full a budget is, and
 the module seam in a second language, would each be made twice otherwise.
@@ -272,8 +273,9 @@ work, and none is slower than the table at what it was chosen for; a query acros
 layouts either works as written or is refused by name; running out, strip at unload and what an
 observer is told each hold in every storage layout; a component is moved from one storage layout to
 another with its values; and a module reloaded with a field added, removed, renamed or moved keeps
-every value its new component layout still has a place for, in each storage layout, and is told by a
-record what went.*
+every value its new component layout still has a place for, in each storage layout; and a reload
+that would drop values is refused, naming them, until it states that it accepts the loss, and is
+then told by a record what went.*
 
 ## 12. Self contained
 
