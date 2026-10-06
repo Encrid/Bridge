@@ -1526,7 +1526,7 @@ bool storage_convert(storage *r, const storage_move *moves, uint32_t count)
     for (i = 0; i < r->changed_count; i ++) {
         uint32_t index = r->changed[i], at = 0, had[64] = {};
         for (k = 0; k < count && k < 64; k ++) {
-            had[k] = index ? value_of(r, index, moves[k].from) : 0;
+            had[k] = value_of(r, index, moves[k].from);
             if (had[k]) memcpy(was + at, r->b->shared + had[k], moves[k].from->size);
             at += moves[k].from->size;
         }

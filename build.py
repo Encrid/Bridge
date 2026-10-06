@@ -74,6 +74,9 @@ NATIVE = [
     ('nsparsebad1', 'nsparse', ['BAD=1']), ('nsparsebad2', 'nsparse', ['BAD=2']),
     ('nmove1', 'nmove', ['KEPT=1']), ('nmove2', 'nmove', ['KEPT=2']), ('nmove3', 'nmove', ['KEPT=3']),
     ('nmove4', 'nmove', ['KEPT=4']), ('nmove5', 'nmove', ['KEPT=5']),
+    ('nholder', 'nholder', []),
+] + [('nlayout%d' % v, 'nlayout', ['V=%d' % v, 'KEPT=1']) for v in range(14)] + [
+    ('nlayout%dk%d' % (v, k), 'nlayout', ['V=%d' % v, 'KEPT=%d' % k]) for k in (2, 3, 4, 5) for v in (0, 1)] + [
     ('ntag', 'ntag', []), ('ntagbad', 'ntag', ['BAD']), ('nfragtag4096', 'nfrag', ['SPLIT=4096', 'TAGS']),
     ('nsingle', 'nsingle', []), ('nsinglebad1', 'nsingle', ['BAD=1']),
     ('nsinglebad2', 'nsingle', ['BAD=2']), ('nsinglebad3', 'nsingle', ['BAD=3']),
@@ -423,6 +426,7 @@ CASES = [
      r"an entity of 4096 bytes.*in    1 table.*in 4096 tables.*a sparse set.*of 4096 bytes.*a toggle, one row in 16 on.*direct-indexed.*in no order.*as tags.*alive", r"FAIL"),
     ('storage-toggle', ['storage', 'toggle'], '@tests/storage-toggle.txt', None),
     ('storage-move', ['storage', 'move'], '@tests/storage-move.txt', None),
+    ('storage-layout', ['storage', 'layout'], '@tests/storage-layout.txt', None),
     ('storage-tag', ['storage', 'tag'], '@tests/storage-tag.txt', None),
     ('storage-tagbad', ['storage', 'tagbad'],
      r"attach hands 'st:M' 4 bytes and it is 0.*alive", None),
@@ -721,7 +725,7 @@ CASES = [
     ('stage6-reloadspawns', ['stage6', 'reloadspawns'],
      r"tick 102 1.*game:ticker@0.2.0: reloaded.*tick 112 10.*tick 122 10.*alive", None),
     ('stage6-reloadlayout', ['stage6', 'reloadlayout'],
-     r"was not reloaded: type 'game:Tick' has another component layout here: fingerprint [0-9a-f]+, and it was declared with [0-9a-f]+.*tick 103 1.*tick 104 1.*alive", None),
+     r"tick 102 1.*game:ticker@0.2.0: reloaded.*tick 112 10.*tick 122 10.*alive", r"was not reloaded"),
     ('stage6-reloadfail', ['stage6', 'reloadfail'],
      r"was not reloaded: its reload answered 5.*tick 103 1.*tick 104 1.*game:ticker@0.1.0=RUNNING.*alive", None),
     ('stage6-sharegrow', ['stage6', 'sharegrow'],

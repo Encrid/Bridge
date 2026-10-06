@@ -72,6 +72,7 @@ static bool find(void *ctx, const char *bare, schema_named *named)
         declared_type *c = l->b->types[i];
         if (strncmp(c->name, l->ns, ns) || c->name[ns] != ':' || strcmp(c->name + ns + 1, bare)) continue;
         if (c->kind == BRIDGE_TAG) continue;        /* it has no bytes for a field to be */
+        if (c->superseded) continue;                /* a reload has made the one that is meant */
         *named = (schema_named){ c->kind, c->size, c->align, c };
         return true;
     }
@@ -100,15 +101,188 @@ static const char *const storage_names[] = {
     "", "a table", "a sparse set", "a toggle", "direct-indexed", "a singleton"
 };
 
-/* Whether this reload accepts the loss named `name`, which it is now known to make. */
-static bool accepted(module *m, const char *name)
+/* Whether this reload accepts the loss named `name`, which it is now known to make, of
+ * something `rows` rows hold. */
+static bool accepted(module *m, const char *name, uint32_t rows)
 {
     for (uint32_t i = 0; i < m->loss_count; i ++) {
         if (strcmp(m->losses[i], name)) continue;
-        m->loss_used[i] = true;
+        m->loss_rows[i] = rows + 1;
         return true;
     }
     return false;
+}
+
+/* ---- lifetime.md, *When a component layout changed*: what a value of a type becomes ---- */
+
+/* how many bytes one of a field's elements is */
+static uint32_t element(const schema_field *f)
+{
+    switch (f->kind) {
+    case SCHEMA_BOOL: case SCHEMA_CHAR: case SCHEMA_I8: case SCHEMA_U8: return 1;
+    case SCHEMA_I16: case SCHEMA_U16: return 2;
+    case SCHEMA_I32: case SCHEMA_U32: case SCHEMA_F32: return 4;
+    case SCHEMA_I64: case SCHEMA_U64: case SCHEMA_F64: case SCHEMA_TEXT: return 8;
+    default: return ((const declared_type *)f->type)->size;
+    }
+}
+
+typedef struct {
+    module      *m;
+    uint32_t     rows;              /* how many hold a value of the type that is changing */
+    storage_run *runs;
+    uint32_t     run_count;
+    char         lost[240];         /* what goes that this reload does not accept, by name */
+    size_t       lost_len;
+    bool         short_of;          /* there was no memory for a run */
+} relaying;
+
+static void run_added(relaying *l, uint32_t from, uint32_t to, uint32_t len)
+{
+    storage_run *runs = realloc(l->runs, (l->run_count + 1) * sizeof *runs);
+    if (!runs) {
+        l->short_of = true;
+        return;
+    }
+    l->runs = runs;
+    l->runs[l->run_count ++] = (storage_run){ from, to, len };
+}
+
+/* a field, or the end of an array, has no place in what the type becomes */
+static void lost(relaying *l, const char *name)
+{
+    if (!l->rows || accepted(l->m, name, l->rows) || l->lost_len >= sizeof l->lost) return;
+    l->lost_len += (size_t)snprintf(l->lost + l->lost_len, sizeof l->lost - l->lost_len, "%s'%s'",
+        l->lost_len ? ", " : "", name);
+}
+
+/* The fields of `was`, at `from` in a value, matched by name to those of `is`, at `to`: each
+ * goes to its new offset, and what is new stays zero. 1 and a refusal for a field that is of
+ * another type than it was. */
+static int relaid(relaying *l, const schema *was, const schema *is, uint32_t from, uint32_t to,
+                  const char *path)
+{
+    for (uint32_t i = 0; i < was->field_count; i ++) {
+        const schema_field *old = &was->fields[i], *new = nullptr;
+        const declared_type *held = old->type, *holds;
+        char name[200];
+        uint32_t count, k;
+        snprintf(name, sizeof name, "%s.%s", path, old->name);
+        for (k = 0; k < is->field_count; k ++) {
+            if (!strcmp(is->fields[k].name, old->name)) new = &is->fields[k];
+        }
+        if (!new) {
+            lost(l, name);
+            continue;
+        }
+        holds = new->type;
+        /* the same kind; and where it names a declared type, that one, or what this reload
+         * has made of it */
+        if (old->kind != new->kind || (held && holds != held && holds->replaces != held)
+            || (held && holds->size != held->size && old->kind != SCHEMA_STRUCT)) {
+            return refuse(l->m, "field '%s' is of another type than it was, and bytes of one type "
+                "are not a value of another", name);
+        }
+        count = old->count < new->count ? old->count : new->count;
+        if (new->count < old->count) lost(l, name);
+        if (old->kind == SCHEMA_STRUCT && holds != held) {
+            /* a struct a field names, changed: the same rules, one level down */
+            for (k = 0; k < count; k ++) {
+                if (relaid(l, &held->s, &holds->s, from + old->offset + k * held->size,
+                        to + new->offset + k * holds->size, name)) return 1;
+            }
+        } else {
+            run_added(l, from + old->offset, to + new->offset, count * element(new));
+        }
+    }
+    return 0;
+}
+
+/* An enum or a bitmask whose constants changed: every value a row may hold must still mean
+ * what it meant. A constant added is nothing. */
+static int renumbered(module *m, const declared_type *was, const schema *is)
+{
+    if (was->s.size != is->size) {
+        return refuse(m, "type '%s' is an integer of %u bytes here and was one of %u: every value "
+            "kept of it would be read as another", was->name, is->size, was->s.size);
+    }
+    for (uint32_t i = 0; i < was->s.constant_count; i ++) {
+        const schema_constant *old = &was->s.constants[i], *new = nullptr;
+        for (uint32_t k = 0; k < is->constant_count; k ++) {
+            if (!strcmp(is->constants[k].name, old->name)) new = &is->constants[k];
+        }
+        if (!new) {
+            return refuse(m, "type '%s' has no constant '%s' here, which it had: a value kept of it "
+                "would mean nothing", was->name, old->name);
+        }
+        if (new->value != old->value) {
+            return refuse(m, "type '%s': its constant '%s' is %lld here and was %lld, and every "
+                "value kept of it would mean something else", was->name, old->name,
+                (long long)new->value, (long long)old->value);
+        }
+    }
+    return 0;
+}
+
+/* `was` becomes a type laid out as `is`: how its values are carried over is left on `was`, for
+ * the reload to use if it holds. 1 and a refusal if it cannot be, or would lose what this
+ * reload does not accept. */
+static int relay(module *m, declared_type *was, enum bridge_kind kind, const schema *is)
+{
+    static const char *const kinds[] = { "", "a struct", "an enum", "a bitmask", "a tag" };
+    relaying l = { .m = m, .rows = storage_count(m->b->storage, was->type) };
+    if (was->kind != kind) {
+        return refuse(m, "type '%s' is %s here and was %s: a reload does not change what kind of "
+            "type one is", was->name, kinds[kind], kinds[was->kind]);
+    }
+    if (kind != BRIDGE_STRUCT) return kind == BRIDGE_TAG ? 0 : renumbered(m, was, is);
+    if (relaid(&l, &was->s, is, 0, 0, was->name)) {
+        free(l.runs);
+        return 1;
+    }
+    if (l.short_of) {
+        free(l.runs);
+        return refuse(m, "out of memory: there was none to work out how '%s' is laid out again",
+            was->name);
+    }
+    if (l.lost_len) {
+        free(l.runs);
+        return refuse(m, "type '%s' has another component layout here, and %u rows would lose %s. "
+            "A reload that accepts that states each among its losses", was->name, l.rows, l.lost);
+    }
+    was->runs = l.runs ? l.runs : calloc(1, sizeof *was->runs);
+    was->run_count = l.run_count;
+    return was->runs ? 0 : refuse(m, "out of memory: there was none to work out how '%s' is laid "
+        "out again", was->name);
+}
+
+/* whether a field of `c` names a type this reload has made anew */
+static bool names_superseded(const declared_type *c)
+{
+    for (uint32_t k = 0; k < c->dep_count; k ++) if (c->deps[k]->superseded) return true;
+    return false;
+}
+
+/* A loaded module other than the one reloading that declares a type with a field of type
+ * `c`: its rows hold values of `c` as it is, which no reload of somebody else may change. */
+static const declared_type *held_elsewhere(const bridge *b, const module *m, const declared_type *c,
+                                           const module **by)
+{
+    for (uint32_t i = 0; i < b->type_count; i ++) {
+        const declared_type *other = b->types[i];
+        uint32_t k, d;
+        for (k = 0; k < other->dep_count && other->deps[k] != c; k ++) {}
+        if (k == other->dep_count) continue;
+        for (const module *o = b->modules; o; o = o->next) {
+            if (o == m || o == m->reloads) continue;
+            for (d = 0; d < o->declared_count && o->declared[d] != other; d ++) {}
+            if (d < o->declared_count) {
+                *by = o;
+                return other;
+            }
+        }
+    }
+    return nullptr;
 }
 
 /* lifetime.md, *When a component is moved*: `c` is to be kept as `kept` from this reload on.
@@ -124,7 +298,7 @@ static int moved_storage(module *m, const declared_type *c, enum bridge_storage 
         return refuse(m, "type '%s' is carried by %u entities, and is not moved to a singleton: "
             "nothing says which of them has its value", c->name, carriers);
     }
-    if (off && !accepted(m, c->name)) {
+    if (off && !accepted(m, c->name, off)) {
         return refuse(m, "type '%s' is a toggle that is off for %u rows, and as %s they are "
             "carried like the rest. That is a loss this reload does not accept: '%s'", c->name, off,
             storage_names[kept], c->name);
@@ -187,14 +361,29 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     for (i = 0; i < b->type_count; i ++) {
         if (!strcmp(b->types[i]->name, name) && !b->types[i]->superseded) c = b->types[i];
     }
-    if (c && c->fingerprint != print) {
+    if (c && (c->fingerprint != print || names_superseded(c))) {
+        /* lifetime.md, *When a component layout changed*: shared, it is refused, naming who
+         * else declares it. Exclusive, and at a reload of the module that declares it, a type
+         * is made for what it becomes, which takes the rows if the reload holds */
         char others[160];
+        const module *by = nullptr;
+        const declared_type *holder;
         also_declared(b, m, c, others, sizeof others);
-        return refuse(m, "type '%s' has another component layout here: fingerprint %016llx, and it "
-            "was declared with %016llx%s", name, (unsigned long long)print,
-            (unsigned long long)c->fingerprint, others);
-    }
-    if (c && c->storage != kept) {
+        for (i = 0; m->reloads && i < m->reloads->declared_count && m->reloads->declared[i] != c; i ++) {}
+        if (others[0] || !m->reloads || i == m->reloads->declared_count) {
+            return refuse(m, "type '%s' has another component layout here: fingerprint %016llx, and it "
+                "was declared with %016llx%s", name, (unsigned long long)print,
+                (unsigned long long)c->fingerprint, others);
+        }
+        holder = held_elsewhere(b, m, c, &by);
+        if (holder) {
+            return refuse(m, "type '%s' has another component layout here, and '%s', which module "
+                "'%s' declares, has a field of it", name, holder->name, by->identity);
+        }
+        if (c->storage != kept && moved_storage(m, c, kept)) return 1;
+        was = c;
+        c = nullptr;
+    } else if (c && c->storage != kept) {
         /* a module reads a component by code compiled for one storage layout, so every
          * declarer states the same - storage.md, *Storage layouts* */
         char others[160];
@@ -210,6 +399,12 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         if (moved_storage(m, c, kept)) return 1;
         was = c;
         c = nullptr;
+    }
+    if (was) {
+        /* whatever an earlier reload that failed worked out for it is not this one's */
+        free(was->runs);
+        was->runs = nullptr;
+        was->run_count = 0;
     }
     if (!c) {
         /* The descriptor is read and laid out. A field's type is a bare C name, looked for in
@@ -241,6 +436,10 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
             schema_free(&s);
             return refuse(m, "type '%s' is %u bytes aligned to %u in the module and %u "
                 "aligned to %u by its descriptor", name, size, align, laid, aligned);
+        }
+        if (was && (was->fingerprint != print || names_superseded(was)) && relay(m, was, kind, &s)) {
+            schema_free(&s);
+            return 1;
         }
         if (b->type_count >= b->max_types) {
             schema_free(&s);

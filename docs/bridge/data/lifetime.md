@@ -126,12 +126,12 @@ unload, so nobody has to find them.
 
 **Exclusive: its rows are moved to the new component layout, field by field, by name.**
 Bridge-ASM700 keeps the fields of every type, and a `declare` hands it the new descriptor, so it has
-both. That is decided and not yet built: it is `PLAN.md`, stage 11, since moving a type's rows to
-another size is done once for every storage layout. **Until then a changed component layout is
-refused**, naming the type and both fingerprints, and an author who accepts the loss unloads and
-loads.
+both. It is done as a move to another storage layout is, and by the same code, in whichever
+storage layout the component is kept - *When a component is moved*, above: a type is made for
+what the component becomes, and it takes every row or none when the reload holds. A component
+may change its component layout and its storage layout in one reload.
 
-What each change will do:
+What each change does:
 
     a field added                its bytes are zero, and the module's `reload`, which runs next,
                                  is where it is given a value
@@ -148,17 +148,34 @@ What each change will do:
                                  not a value of another
     a struct a field names,      the same rules, one level down
     changed
-    an enum whose constants      refused if a constant now has another number, since every
-    changed                      stored value would silently mean something else; a constant
+    an enum whose constants      refused if a constant now has another number, or is gone, or
+    changed                      if the enum is an integer of another width: every stored value
+                                 would silently mean something else, or nothing. A constant
                                  added is nothing
+    a component whose own text   it is laid out again all the same, since its field is: what a
+    is as it was, with a field   reload makes anew of a type, it makes of every type that has
+    of a type that changed       a field of it
+    a type another module's      refused, naming that component and that module: its rows
+    component has a field of     hold the type as it is
+    a struct declared as an      refused: a reload does not change what kind of type one is
+    enum, or as a tag
 
 **A reload that would drop values is refused until the loss is stated.** The first one is
 refused, and the refusal names every field that would go and how many rows hold it. A reload
 that states it accepts the loss then moves the rows, with the same record. A change that drops
 nothing - a field added, fields in another order, an array made longer - needs no statement.
 It is for the rename: an author who renamed a field meant to drop nothing, and is told before
-anything is gone and not by a record after. How the acceptance is stated is this stage's to
-decide when it is built - `PLAN.md`, stage 11 - and it is a stated value, not a flag left off.
+anything is gone and not by a record after.
+
+**The loss is stated by name, in the module's configuration**: `losses`, with `loss_count` of
+them, or `BRIDGE_NONE` for none - `config.md`, *The keys*. A field that goes, or
+an array made shorter, is its component's name and its own, `game:Position.z`; one level down,
+`game:Body.at.z`; and the rows of a toggle that are off, for a component that leaves the toggle,
+are the component's name alone. A loss that is not there is refused, naming it and how many
+rows hold it. A name that is there and that this reload does not lose is refused too, so that a
+list is not left where it is from one reload to the next, and a load, which loses nothing,
+states none. It is a list and not a yes or no because the rule is for the rename: a yes would
+let that through.
 
 **A removal is the author's, and that is why it migrates.** This document said that
 Bridge-ASM700 never discards data on a call that means "keep running", and refused every change

@@ -44,6 +44,10 @@ struct declared_type {
      * become this one's when the reload holds; and that the other has such a successor */
     declared_type   *replaces;
     bool         superseded;
+    /* and, on the one that is superseded, which bytes of a value of it are which bytes of a
+     * value of its successor: nullptr if they are the same bytes */
+    storage_run *runs;
+    uint32_t     run_count;
 };
 
 typedef struct { uint64_t id; enum bridge_event events; } pending;
@@ -172,7 +176,8 @@ struct module {
     module *reloads;
     const char *const *losses;
     uint32_t loss_count;
-    bool    *loss_used;             /* by loss: something was lost under that name */
+    uint32_t *loss_rows;            /* by loss: how many rows lost something under that name,
+                                     * plus one. Zero: nothing was */
     int   refused;                  /* an entry refused during the call in progress */
     char  why[256];                 /* and this is why */
     module *next;

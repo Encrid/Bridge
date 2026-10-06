@@ -99,6 +99,7 @@ a toggle to a table, after flicker
   storage: st:X is a toggle, carried by 3
 a toggle to a table, after flicker
   look: X, a toggle: carried by, sum 3 306
+  -: module 'st:store@0.1.0' is reloaded, and 'st:X' is lost from 1 rows, as it accepted 0 0
   reload: done
   look: X, in tables: carried by, sum 3 306
   storage: st:X is a table, carried by 3

@@ -50,7 +50,7 @@ as what it hands over is one stated value per key. The original Bridge had the s
                systems, terms, modules,        init/reload/shutdown timeouts
                persistent, columns,            log_level, scratch, log_ring,
                sparse_sets, direct_indexed     spans, spawns, persistent
-    [checks]   validate, profile               pinned, config
+    [checks]   validate, profile               pinned, config, losses
     [backend]  a name, a library and its
                settings, each
                                                read / write

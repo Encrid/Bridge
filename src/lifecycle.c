@@ -45,6 +45,7 @@ static void type_delete(bridge *b, declared_type *c)
         if (!-- named->users && !named->declarers) type_delete(b, named);
     }
     schema_free(&c->s);
+    free(c->runs);
     free(c->deps);
     free(c->name);
     free(c->zero);
@@ -103,7 +104,7 @@ void module_discard(bridge *b, module *m)
     free(m->queue);
     free(m->marks);
     free(m->writable);
-    free(m->loss_used);
+    free(m->loss_rows);
     free(m->systems);
     free(m->observers);
     free(m->declared);
@@ -386,10 +387,10 @@ static module *record(bridge *b, const bridge_artifact *a, open_backend *o)
     m->persistent = cfg->persistent;
     m->losses = cfg->losses;
     m->loss_count = cfg->loss_count > 0 ? (uint32_t)cfg->loss_count : 0;
-    m->loss_used = calloc(m->loss_count ? m->loss_count : 1, sizeof *m->loss_used);
+    m->loss_rows = calloc(m->loss_count ? m->loss_count : 1, sizeof *m->loss_rows);
     /* budgets.md, *Nothing is allocated in a phase*: its ids and its queue, as long as it
      * stated, now */
-    whole = m->identity && m->stem && m->ns && m->loss_used;
+    whole = m->identity && m->stem && m->ns && m->loss_rows;
     if (cfg->spawns > 0) {
         m->ids = calloc((size_t)cfg->spawns, sizeof *m->ids);
         m->id_room = m->ids ? (uint32_t)cfg->spawns : 0;
@@ -546,7 +547,7 @@ static int start(bridge *b, module *m, const bridge_artifact *a, enum backend_ca
     /* lifetime.md: a loss that is accepted is one that is made. A name nothing was lost under
      * is refused, so that a list is not left where it is from one reload to the next */
     for (i = 0; i < m->loss_count; i ++) {
-        if (m->loss_used[i]) continue;
+        if (m->loss_rows[i]) continue;
         snprintf(err->text, sizeof err->text, "it accepts the loss of '%.100s', and loses nothing "
             "of that name", m->losses[i]);
         return 1;
@@ -799,10 +800,20 @@ static int moved_rows(bridge *b, module *n, backend_err *err)
         if (!c->replaces) continue;
         whole[count] = (storage_run){ 0, 0, c->size < c->replaces->size ? c->size : c->replaces->size };
         moves[count] = (storage_move){ c->replaces->type, c->type, &whole[count], 1 };
+        /* a component layout that changed: field by field, as declare worked it out */
+        if (c->replaces->runs) {
+            moves[count].runs = c->replaces->runs;
+            moves[count].run_count = c->replaces->run_count;
+        }
         count ++;
     }
     if (!count || storage_convert(b->storage, moves, count)) {
         for (i = 0; i < n->declared_count; i ++) n->declared[i]->replaces = nullptr;
+        /* lifetime.md: what went, by the names it was accepted under */
+        for (i = 0; i < n->loss_count; i ++) {
+            say(b, n, nullptr, BRIDGE_WARN, "module '%s' is reloaded, and '%s' is lost from %u rows, "
+                "as it accepted", n->identity, n->losses[i], n->loss_rows[i] - 1);
+        }
         return 0;
     }
     snprintf(err->text, sizeof err->text, "what it keeps another way, %u of its components, "

@@ -555,3 +555,19 @@ effect before:
 
 And a barrier looks no further than tables while nothing is declared that is kept elsewhere.
 
+**A changed component layout**, as `lifetime.md`, *When a component layout changed*, has it.
+`declare` works out, field by field and by name, which bytes of a value as it was are which
+bytes of the value as it will be, and leaves that with the type that is superseded; the reload
+then hands storage the same move it hands it for a storage layout, with those runs in the place
+of the whole value. So it holds in every storage layout by being one code path. Case
+`storage-layout`: each line of the table, the losses refused and then accepted, and a field
+added in each of the five storage layouts; and `stage6-reloadlayout` on the wasm backend, which
+was the case of the refusal and is now a reload that keeps counting.
+
+Four things the rules did not say, settled as their reasons have it and written into the
+table: an enum constant that is gone is refused, as one renumbered is; an enum of another width
+is refused; a component that has a field of a type that changed is laid out again though its
+own text is what it was; and a type another module's component has a field of is not changed
+by somebody else's reload. And one the decision on the storage layouts had wrong: a singleton
+whose struct changed lost its value, found by its case and fixed before this was written.
+

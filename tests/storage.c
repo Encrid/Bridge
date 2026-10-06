@@ -209,6 +209,26 @@ static void moved_case(bridge_config cfg, uint32_t from, uint32_t to, const char
     (void)bridge_destroy(b);
 }
 
+/* lifetime.md, *When a component layout changed*: a module that states st:X one way, reloaded
+ * as a build that states it another. */
+static void relaid_case(bridge_config cfg, const char *from, const char *to, const char *what,
+                        const char *const *losses, int64_t loss_count)
+{
+    bridge *b = bridge_create(&cfg, sink, nullptr);
+    bridge_artifact a = store_module(from, 8, 1 << 20, 4096);
+    printf("%s\n", what);
+    a.cfg.reloadable = a.cfg.hot_reload = BRIDGE_TRUE;
+    if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); exit(1); }
+    (void)bridge_phase(b, "spawn");
+    (void)bridge_phase(b, "look");
+    a.path = to;
+    a.cfg.losses = losses;
+    a.cfg.loss_count = loss_count;
+    printf("  reload: %s\n", bridge_reload(b, &a) ? "refused" : "done");
+    (void)bridge_phase(b, "look");
+    (void)bridge_destroy(b);
+}
+
 /* Four of nstress, each in its own namespace, a hundred rounds of work and check. */
 constexpr uint32_t STRESSED = 4, ROUNDS = 100;
 
@@ -429,6 +449,47 @@ int main(int argc, char **argv)
         run(b, "look");
         run(b, "destroy");          /* and both tables go when they empty */
         run(b, "look");
+    } else if (!strcmp(what, "layout")) {
+        static const char *const b_gone[1] = { "st:X.b" }, *const arr_cut[1] = { "st:X.arr" };
+        static const char *const y_gone[1] = { "st:X.at.y" };
+        (void)bridge_destroy(b);
+        cfg.budget.sparse_sets = cfg.budget.direct_indexed = 2;
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT1_PATH, "a field added", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT2_PATH, "the fields in another order", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT3_PATH, "an array made longer", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT4_PATH, "a field removed", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT4_PATH, "a field removed, and that accepted", b_gone, 1);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT5_PATH, "an array made shorter", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT5_PATH, "an array made shorter, and that accepted", arr_cut, 1);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT6_PATH, "a field renamed", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT6_PATH, "a field renamed, and the old one's loss accepted", b_gone, 1);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT7_PATH, "a field of another type", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT8_PATH, "a struct a field names, changed", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT11_PATH, "a struct a field names, with a field removed", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT11_PATH, "a struct a field names, with a field removed, and that accepted", y_gone, 1);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT9_PATH, "an enum whose constants have other numbers", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT10_PATH, "an enum with a constant added", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT12_PATH, "an enum with a constant removed", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT13_PATH, "a struct declared as a tag", nullptr, BRIDGE_NONE);
+        {
+            /* a struct another module's component has a field of: that module's rows hold it */
+            bridge_artifact holder = store_module(NHOLDER_PATH, BRIDGE_NONE, 1 << 20, BRIDGE_NONE);
+            b = bridge_create(&cfg, sink, nullptr);
+            a = store_module(NLAYOUT0_PATH, 8, 1 << 20, 4096);
+            a.cfg.reloadable = a.cfg.hot_reload = BRIDGE_TRUE;
+            holder.cfg.identity = "st:holder@0.1.0";
+            printf("a struct a field of another module's component names\n");
+            if (!b || bridge_load(b, &a) || bridge_load(b, &holder)) { printf("FAIL: not loaded\n"); return 1; }
+            a.path = NLAYOUT8_PATH;
+            printf("  reload: %s\n", bridge_reload(b, &a) ? "refused" : "done");
+            (void)bridge_destroy(b);
+        }
+        /* and in each of the other storage layouts, a field added */
+        relaid_case(cfg, NLAYOUT0K2_PATH, NLAYOUT1K2_PATH, "a field added, in a sparse set", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0K3_PATH, NLAYOUT1K3_PATH, "a field added, in a toggle", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0K4_PATH, NLAYOUT1K4_PATH, "a field added, direct-indexed", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0K5_PATH, NLAYOUT1K5_PATH, "a field added, in a singleton", nullptr, BRIDGE_NONE);
+        b = bridge_create(&cfg, sink, nullptr);
     } else if (!strcmp(what, "move")) {
         static const char *const x[1] = { "st:X" };
         (void)bridge_destroy(b);
