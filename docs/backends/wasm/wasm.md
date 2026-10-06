@@ -140,7 +140,8 @@ observer's record and in a log record.
 
 **An enum has the width of where it goes.** One that is an argument of an entry is four bytes, as
 every argument that is not an id is: `kind`, `on_unload`, `storage`, `events`. One that is a member
-of a struct is one byte, which holds every value these have: a term's access and operator, a log record's level.
+of a struct is one byte, which holds every value these have: a term's access and operator, a log
+record's level.
 
 **One header, `bridge-abi.h`, compiled by Bridge-ASM700 and by every module, on either backend.** Nothing
 re-derives anything, so there is nothing to disagree about - the same argument that made the schema
