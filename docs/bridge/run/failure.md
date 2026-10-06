@@ -52,6 +52,33 @@ called it essential, and nothing else here would notice it gone - no module call
 gets an error back. The key is `on_error`, and a reader who wrote `fail` expects it to mean every
 error that takes the module away. `bridge_modules` says which module it was.
 
+## Out of memory
+
+**An allocation that fails is a refusal like any other: the call that needed it answers that it
+failed, a record says "out of memory" and what for, and the bridge is as it was.** Bridge-ASM700
+asks the allocator for memory when a bridge is created and when a module is loaded, reloaded or
+unloaded, and never in a phase or at a barrier - `budgets.md`, *Nothing is allocated in a phase*.
+So it is `bridge_create`, `bridge_load` or `bridge_reload` that fails, by the path each already
+has: a bridge that is not made, a module that is not loaded, a reload after which the old
+instance runs on where the backend could keep it.
+
+**Whatever a call needs is had before any of it is kept.** A type, a system and a module's
+record each ask for everything they are made of first, and keep none of it if one piece is
+missing, so that nothing half made is left to unmake.
+
+**An unload does not fail for want of memory, because it asks for none that it cannot do
+without.** The schedule is worked out again in room made at create. A range of the arena given
+back is recorded in a list that was made long enough when the range was taken. The one thing an
+unload may go without is remembering where a module's settings text was, so that its next load
+writes there again: without it that load takes fresh room, and a record says so.
+
+**It is held by answering every allocation null in turn.** `tests/storage.c` is built against a
+library whose calls to the allocator are counted - *Nothing is allocated in a phase* has the
+same build - and the case `alloc-nomemory` makes a bridge, loads a module, runs it, reloads it,
+unloads it and destroys the bridge, once for each of the four hundred and some allocations all
+of that makes, with that one answered null. Each time, something is refused, a record says "out
+of memory", and nothing is written through a null pointer.
+
 ## The budget
 
 `max_system_failures` is a number that **each system and each observer of a module is counted

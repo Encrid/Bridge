@@ -330,7 +330,7 @@ int main(int argc, char **argv)
         modules(b);
     } else if (!strcmp(what, "reload") || !strcmp(what, "reloadlayout") || !strcmp(what, "reloadfail")
                || !strcmp(what, "reloadmove") || !strcmp(what, "reloadexact")
-               || !strcmp(what, "reloadexactfail")
+               || !strcmp(what, "reloadexactfail") || !strcmp(what, "reloadspawns")
                || !strcmp(what, "reloaddrop") || !strcmp(what, "maynot")) {
         a = wasm("game:ticker@0.1.0", "ticker");
         a.cfg.reloadable = BRIDGE_TRUE;
@@ -342,6 +342,9 @@ int main(int argc, char **argv)
                                       ? "ticker-fail"
                                     : !strcmp(what, "reloaddrop") ? "ticker-noextra" : "ticker-ten");
         a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
+        /* the new instance states more ids than the old held ready: its own block of them is
+         * as long as it states, and takes the old one's in */
+        if (!strcmp(what, "reloadspawns")) a.cfg.spawns = 4000;
         if (!strcmp(what, "reloadmove")) {
             a = native("game:ticker@0.2.0", NTICKER1_PATH);
             a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;

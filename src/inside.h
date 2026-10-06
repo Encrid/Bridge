@@ -200,18 +200,28 @@ struct bridge {
     uint32_t       backend_count;
     /* the address space every block is allocated with: the largest any backend stated */
     uint64_t       reservation, guard, granule;    /* of the shared block: backend.md */
-    char          *stopped_by;      /* why nothing runs any more */
-    char          *stopped_stem;    /* the module whose return lifts it, or nullptr if nothing can */
+    /* why nothing runs any more, and the module whose return lifts it: nullptr while the
+     * bridge runs. They point at the two arrays below, since a bridge is stopped at a barrier,
+     * where nothing is allocated - budgets.md, *Nothing is allocated in a phase* */
+    char          *stopped_by, *stopped_stem;
+    char           stopped_why[256], stopped_name[256];
 
     char   **phases;
     uint32_t phase_count;
     uint32_t barriers;
     uint32_t turns;                 /* lifecycle calls since the last barrier: threads.md */
     uint32_t parked;                /* systems out of storage while their module reloads */
+    /* how many ranges of the arena modules hold: its list of gaps has room for one more than
+     * that, found when a range is taken, so that giving one back never asks for memory */
+    uint32_t arena_ranges;
     /* what a phase's dispatch works in, [budget] systems long: budgets.md, *Nothing is
      * allocated in a phase* */
     void *run_jobs, **run_handed, **run_lists;
     uint8_t *run_callers;
+    /* and what the schedule is worked out in, when a module comes or goes: a load, a reload
+     * and an unload ask for no memory to do it, so none of them can fail there */
+    void **build_in;
+    uint64_t *build_bits;
     char   **before, **after;       /* [order], pair by pair */
     uint32_t order_count;
     pool    *pool;
@@ -245,7 +255,7 @@ struct bridge {
 /* bridge.c */
 void say(bridge *b, const module *m, const bridge_system *s, uint8_t level, const char *fmt, ...);
 void bridge_given_up(bridge *b, const module *m);     /* an unload of what stopped the bridge */
-void abi_marks(module *m);
+[[nodiscard]] bool abi_marks(module *m, uint32_t more);    /* false if there is no memory for it */
 void abi_park(bridge *b, bridge_system *s);         /* out of storage, for a reload */
 void abi_unpark(bridge *b, bridge_system *s);       /* and back, as it was */          /* room for a mark from every call it may yet take */
 [[nodiscard]] char *copy(const char *s, size_t n);
@@ -267,7 +277,9 @@ void config_forget(bridge *b, const module *m);
 /* schedule.c */
 [[nodiscard]] int schedule_order(bridge *b, const bridge_order *order, uint32_t count);  /* at create */
 [[nodiscard]] int schedule_build(bridge *b, char *why, size_t why_len);     /* 0, or why it cannot be */
-void schedule_room(bridge *b);          /* at create: what a dispatch works in */
+[[nodiscard]] int schedule_room(bridge *b);     /* at create: what a dispatch works in */
+/* failure.md, *Out of memory*: 1, with a record that says what for, if `got` is nullptr */
+[[nodiscard]] int bridge_short(bridge *b, const void *got, const char *what);
 void schedule_run(bridge *b, uint32_t phase);
 void schedule_account(bridge *b);       /* at each barrier: the failure budgets, and the stops */
 
@@ -289,6 +301,7 @@ uint32_t block_offset(bridge *b, const void *p);                  /* into the sh
 /* a piece of a region: 0 if it has none that long; and a piece given back */
 [[nodiscard]] int region_take(region *r, uint32_t len, uint32_t *at);
 void     region_give(region *r, uint32_t at, uint32_t len);
+[[nodiscard]] bool region_room(region *r, uint32_t ranges);     /* false if there is no memory */
 /* the piece at `at` made longer where it stands: false, and nothing changed, if what follows it
  * is not free */
 [[nodiscard]] bool region_grow(region *r, uint32_t at, uint32_t had, uint32_t want);

@@ -13,7 +13,13 @@ static char **copy_list(const char *const *list, uint32_t count)
 {
     char **out = calloc(count ? count : 1, sizeof *out);
     uint32_t i;
-    for (i = 0; i < count; i ++) out[i] = copy(list[i], strlen(list[i]));
+    for (i = 0; out && i < count; i ++) {
+        out[i] = copy(list[i], strlen(list[i]));
+        if (out[i]) continue;
+        while (i --) free(out[i]);
+        free(out);
+        return nullptr;
+    }
     return out;
 }
 
@@ -121,6 +127,7 @@ static void undo(bridge *b, module *m)
     for (i = 0; i < m->own_count; i ++) {
         region_give(&b->arena_space, m->owned[i].at - b->arena, m->owned[i].len);
     }
+    b->arena_ranges -= m->own_count;
     m->own_count = 0;
     /* last declared first: a type is used by what was declared after it */
     for (i = m->declared_count; i --;) type_release(b, m->declared[i], 0);
@@ -355,6 +362,8 @@ static module *record(bridge *b, const bridge_artifact *a, open_backend *o)
     const bridge_module_config *cfg = &a->cfg;
     const char *id = cfg->identity, *colon = strchr(id, ':');
     module *m = calloc(1, sizeof *m);
+    bool whole;
+    if (bridge_short(b, m, "a module's record")) return nullptr;
     m->b = b;
     m->on = o;
     m->identity = copy(id, strlen(id));
@@ -371,27 +380,39 @@ static module *record(bridge *b, const bridge_artifact *a, open_backend *o)
     m->persistent = cfg->persistent;
     /* budgets.md, *Nothing is allocated in a phase*: its ids and its queue, as long as it
      * stated, now */
+    whole = m->identity && m->stem && m->ns;
     if (cfg->spawns > 0) {
         m->ids = calloc((size_t)cfg->spawns, sizeof *m->ids);
-        m->id_room = (uint32_t)cfg->spawns;
+        m->id_room = m->ids ? (uint32_t)cfg->spawns : 0;
+        whole = whole && m->ids;
     }
     if (cfg->changes > 0) {
         m->queue = malloc((size_t)cfg->changes);
-        m->queue_room = (uint32_t)cfg->changes;
+        m->queue_room = m->queue ? (uint32_t)cfg->changes : 0;
+        whole = whole && m->queue;
     }
     m->phase_from = calloc(cfg->phase_count ? cfg->phase_count : 1, sizeof *m->phase_from);
     m->phase_to = calloc(cfg->phase_count ? cfg->phase_count : 1, sizeof *m->phase_to);
-    for (m->phase_names = 0; m->phase_names < cfg->phase_count; m->phase_names ++) {
+    whole = whole && m->phase_from && m->phase_to;
+    for (m->phase_names = 0; whole && m->phase_names < cfg->phase_count; m->phase_names ++) {
         const bridge_phase_name *n = &cfg->phases[m->phase_names];
         uint32_t phase = 0;
         while (strcmp(b->phases[phase], n->to)) phase ++;       /* checks() found it */
         m->phase_from[m->phase_names] = copy(n->from, strlen(n->from));
         m->phase_to[m->phase_names] = phase;
+        if (!m->phase_from[m->phase_names]) whole = false;
     }
+    if (!m->phase_from) m->phase_names = 0;
     m->read = copy_list(cfg->read, cfg->read_count);
-    m->read_count = cfg->read_count;
+    m->read_count = m->read ? cfg->read_count : 0;
     m->write = copy_list(cfg->write, cfg->write_count);
-    m->write_count = cfg->write_count;
+    m->write_count = m->write ? cfg->write_count : 0;
+    /* failure.md, *Out of memory*: all of a module's record, or none of it */
+    if (!whole || !m->read || !m->write) {
+        (void)bridge_short(b, nullptr, "a module's record");
+        module_discard(b, m);
+        return nullptr;
+    }
     return m;
 }
 
@@ -444,7 +465,10 @@ static int lifecycle_call(module *m, backend_func *f, const char *name, int64_t 
     /* threads.md: what it changes is applied after the last barrier's observers and before
      * the next phase's systems, in the order the calls were made */
     m->turn = TURN_LIFECYCLE | (m->b->turns ++ & 0xffffu);
-    abi_marks(m);
+    if (!abi_marks(m, 0)) {
+        snprintf(err->text, sizeof err->text, "out of memory: there was none to call its %s with", name);
+        return 1;
+    }
     trapped = m->on->api.call(f, &status, err);
     if (m->refused) {
         /* an entry refused, and Bridge-ASM700 knows why better than the trap does */
@@ -567,12 +591,19 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     }
 
     m = record(b, a, o);
+    if (!m) return 1;
     if (cfg->persistent > 0) {
         /* its share of the arena, for as long as it is loaded: nobody else allocates from it */
         uint32_t share = ((uint32_t)cfg->persistent + 7u) & ~7u, at;
+        m->owned = calloc(1, sizeof *m->owned);
+        if (!m->owned || !region_room(&b->arena_space, b->arena_ranges + 1)) {
+            (void)bridge_short(b, nullptr, "a module's share of the persistent arena");
+            module_discard(b, m);
+            return 1;
+        }
         if (share > region_most(&b->arena_space)) share = region_most(&b->arena_space);
         if (!region_take(&b->arena_space, share, &at)) unreachable();
-        m->owned = calloc(1, sizeof *m->owned);
+        b->arena_ranges ++;
         m->owned[0] = (range){ b->arena + at, share };
         m->own_count = m->own_next = 1;
         m->arena_share = share;
@@ -610,7 +641,8 @@ failed:
     undo(b, m);
     module_discard(b, m);
     /* a schedule with this module's systems taken back out is one that was built before, and
-     * so is every rebuild below whose answer is dropped: none of them can be refused */
+     * so is every rebuild below whose answer is dropped: none of them can be refused, and none
+     * asks for memory, which was had at create */
     (void)schedule_build(b, err.text, sizeof err.text);
     return 1;
 }
@@ -703,6 +735,7 @@ static void take_out(bridge *b, module *m)
         for (i = 0; i < m->own_count; i ++) {
             region_give(&b->arena_space, m->owned[i].at - b->arena, m->owned[i].len);
         }
+        b->arena_ranges -= m->own_count;
         config_forget(b, m);
     } else {
         config_keep(b, m);
@@ -786,25 +819,50 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
             last = old->owned[old->own_count - 1];
             in_place = region_grow(&b->arena_space, last.at - b->arena, last.len, last.len + extra);
         }
+        if (!in_place && !region_room(&b->arena_space, b->arena_ranges + 1)) {
+            return bridge_short(b, nullptr, "one more range of the persistent arena");
+        }
         if (!in_place && !region_take(&b->arena_space, extra, &extra_at)) {
             say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is not reloaded: its persistent of %lld "
                 "bytes does not fit in the %u left of [budget] persistent", old->identity,
                 (long long)wants, region_most(&b->arena_space) + old->arena_share);
             return 1;
         }
+        if (!in_place) b->arena_ranges ++;
     }
 
     /* The new instance takes over what was set aside for the module. Until the swap these
      * are copies: a reload that fails leaves the old record's own as they were. */
     n = record(b, a, o);
-    n->ids = old->ids;
+    if (n) n->owned = calloc(old->own_count + 1, sizeof *n->owned);
+    /* the ids held ready for the old instance are the new one's from the swap on: a copy of
+     * them, in an array of its own that holds them all, whatever `spawns` it now states */
+    if (n && n->id_room < old->id_count) {
+        uint64_t *ids = realloc(n->ids, old->id_count * sizeof *ids);
+        if (ids) {
+            n->ids = ids;
+            n->id_room = old->id_count;
+        }
+    }
+    if (!n || !n->owned || n->id_room < old->id_count) {
+        /* failure.md, *Out of memory*: nothing of the old instance was touched */
+        if (n) {
+            (void)bridge_short(b, nullptr, "a reloaded module's record");
+            module_discard(b, n);
+        }
+        if (in_place) region_give(&b->arena_space, last.at - b->arena + last.len, extra);
+        else if (extra) {
+            region_give(&b->arena_space, extra_at, extra);
+            b->arena_ranges --;
+        }
+        return 1;
+    }
+    if (old->id_count) memcpy(n->ids, old->ids, old->id_count * sizeof *n->ids);
     n->id_count = old->id_count;
     n->id_next = old->id_next;
-    n->id_room = old->id_room;
     n->arena_share = old->arena_share + extra;
     n->arena_at = old->arena_at;
     n->arena_left = old->arena_left;
-    n->owned = calloc(old->own_count + 1, sizeof *n->owned);
     if (old->own_count) memcpy(n->owned, old->owned, old->own_count * sizeof *n->owned);
     n->own_count = old->own_count;
     n->own_next = old->own_next;
@@ -844,11 +902,14 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
         drop_systems(b, n);
         for (i = n->declared_count; i --;) type_release(b, n->declared[i], 0);
         n->declared_count = 0;
-        n->ids = nullptr;              /* they are the old record's */
+        n->id_count = n->id_next = 0;  /* the entities are the old record's still */
         n->config_entity = 0;
         /* what the reload added goes back: nothing was allocated from it that lived */
         if (in_place) region_give(&b->arena_space, last.at - b->arena + last.len, extra);
-        else if (extra) region_give(&b->arena_space, extra_at, extra);
+        else if (extra) {
+            region_give(&b->arena_space, extra_at, extra);
+            b->arena_ranges --;
+        }
         module_discard(b, n);
         if (side_by_side) {
             /* failure.md: the old instance is kept, and its systems are put back as they
@@ -874,7 +935,7 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     drop_systems(b, old);
     for (i = old->declared_count; i --;) type_release(b, old->declared[i], old->policy[i]);
     old->declared_count = 0;
-    old->ids = nullptr;                /* the new record's now */
+    old->id_count = old->id_next = 0;  /* the entities are the new record's now */
     /* the settings component among them: its row was Bridge-ASM700's own, and goes too */
     for (i = 0; i < n->declared_count && n->declared[i] != n->config; i ++) {}
     if (n->config && i == n->declared_count) {

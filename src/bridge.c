@@ -26,12 +26,21 @@ void say(bridge *b, const module *m, const bridge_system *s, uint8_t level, cons
     b->sink(b->ud, &r);
 }
 
+/* nullptr if there was not the memory for it: whoever asked says so */
 char *copy(const char *s, size_t n)
 {
     char *c = malloc(n + 1);
+    if (!c) return nullptr;
     memcpy(c, s, n);
     c[n] = 0;
     return c;
+}
+
+int bridge_short(bridge *b, const void *got, const char *what)
+{
+    if (got) return 0;
+    say(b, nullptr, nullptr, BRIDGE_ERR, "out of memory: there was none for %s", what);
+    return 1;
 }
 
 int bridge_destroy(bridge *b)
@@ -61,6 +70,8 @@ int bridge_destroy(bridge *b)
     free(b->run_handed);
     free(b->run_lists);
     free(b->run_callers);
+    free(b->build_in);
+    free(b->build_bits);
     block_destroy(b);
     pool_destroy(b->pool);
     for (i = 0; i < b->order_count; i ++) {
@@ -81,8 +92,6 @@ int bridge_destroy(bridge *b)
     for (i = 0; i < b->phase_count; i ++) free(b->phases[i]);
     free(b->phases);
     free(b->backends);
-    free(b->stopped_by);
-    free(b->stopped_stem);
     free(b);
     return 0;
 }
@@ -103,6 +112,13 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
     if (!sink || !cfg) return nullptr;
 
     b = calloc(1, sizeof *b);
+    if (!b) {
+        /* no bridge to say it through: the record is made here */
+        static const char none[] = "out of memory: there was none for the bridge";
+        bridge_record r = { .text = none, .len = sizeof none - 1, .level = BRIDGE_ERR };
+        sink(ud, &r);
+        return nullptr;
+    }
     b->granule = 1;
     b->sink = sink;
     b->ud = ud;
@@ -115,6 +131,7 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
     }
     b->backends = calloc(cfg->backend_count ? cfg->backend_count : 1, sizeof *b->backends);
     b->phases = calloc(cfg->phase_count ? cfg->phase_count : 1, sizeof *b->phases);
+    if (bridge_short(b, b->backends && b->phases ? b : nullptr, "its backends and its phases")) goto refuse;
 
     for (i = 0; i < cfg->backend_count; i ++) {
         const bridge_backend *want = &cfg->backends[i];
@@ -135,6 +152,7 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
             }
         }
         o->name = copy(want->name, strlen(want->name));
+        if (bridge_short(b, o->name, "a backend's name")) goto refuse;
         b->backend_count = i + 1;
         o->lib = backend_open(want->library, &o->api, why, sizeof why);
         if (!o->lib) {
@@ -152,6 +170,7 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
                 && sizeof(((bridge_setting *)nullptr)->v.b) == sizeof(((backend_setting *)nullptr)->v.b));
             backend_setting *settings = calloc(want->setting_count ? want->setting_count : 1,
                                                sizeof *settings);
+            if (bridge_short(b, settings, "a backend's settings")) goto refuse;
             for (k = 0; k < want->setting_count; k ++) {
                 const bridge_setting *from = &want->settings[k];
                 settings[k].key = from->key;
@@ -199,6 +218,7 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
             }
         }
         b->phases[i] = copy(name, strlen(name));
+        if (bridge_short(b, b->phases[i], "a phase's name")) goto refuse;
         b->phase_count = i + 1;
     }
 
@@ -210,9 +230,9 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
     }
     /* a job is a module's systems of one level, so there are never more than systems */
     b->pool = pool_create(cfg->threads - 1, cfg->budget.systems);
+    if (bridge_short(b, b->pool, "the threads that run a phase")) goto refuse;
 
-    if (block_create(b, &cfg->budget)) goto refuse;
-    schedule_room(b);
+    if (block_create(b, &cfg->budget) || schedule_room(b)) goto refuse;
     return b;
 
 refuse:
@@ -232,16 +252,16 @@ void bridge_stop(bridge *b, const char *identity, const char *what)
     char why[256];
     if (b->stopped_by) return;
     snprintf(why, sizeof why, "module '%s' %s and its on_error is fail", identity, what);
-    b->stopped_by = copy(why, strlen(why));
-    b->stopped_stem = copy(identity, stem_length(identity));
+    snprintf(b->stopped_why, sizeof b->stopped_why, "%s", why);
+    snprintf(b->stopped_name, sizeof b->stopped_name, "%.*s", (int)stem_length(identity), identity);
+    b->stopped_by = b->stopped_why;
+    b->stopped_stem = b->stopped_name;
     say(b, nullptr, nullptr, BRIDGE_ERR, "the bridge has stopped: %s", why);
 }
 
 void bridge_resume(bridge *b, const module *m)
 {
     if (!b->stopped_stem || strcmp(b->stopped_stem, m->stem)) return;
-    free(b->stopped_by);
-    free(b->stopped_stem);
     b->stopped_by = b->stopped_stem = nullptr;
     say(b, m, nullptr, 0, "the bridge runs again: module '%s' is back", m->identity);
 }
@@ -251,8 +271,6 @@ void bridge_resume(bridge *b, const module *m)
 void bridge_given_up(bridge *b, const module *m)
 {
     if (!b->stopped_stem || strcmp(b->stopped_stem, m->stem)) return;
-    free(b->stopped_by);
-    free(b->stopped_stem);
     b->stopped_by = b->stopped_stem = nullptr;
     say(b, m, nullptr, 0, "the bridge runs again: module '%s' is unloaded, and it goes on without it",
         m->identity);

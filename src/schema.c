@@ -114,7 +114,7 @@ static char *kept(const char *s)
 {
     size_t n = strlen(s) + 1;
     char *c = malloc(n);
-    memcpy(c, s, n);
+    if (c) memcpy(c, s, n);
     return c;
 }
 
@@ -149,10 +149,13 @@ static int a_struct(reader *r, schema_find find, void *ctx, schema *out)
         next(r);
         if (!names(r)) return refuse(r, "says '%s' where a field's name belongs");
         if (out->field_count == room) {
+            schema_field *more = realloc(out->fields, (room ? room * 2 : 8) * sizeof *out->fields);
+            if (!more) return refuse(r, "ran out of memory at '%s'");
+            out->fields = more;
             room = room ? room * 2 : 8;
-            out->fields = realloc(out->fields, room * sizeof *out->fields);
         }
         f.name = kept(r->word);
+        if (!f.name) return refuse(r, "ran out of memory at '%s'");
         out->fields[out->field_count ++] = f;
 
         next(r);
@@ -204,10 +207,13 @@ static int constants(reader *r, bool bits, schema *out)
     while (!is(r, "}")) {
         if (!names(r)) return refuse(r, "says '%s' where a constant's name belongs");
         if (out->constant_count == room) {
+            schema_constant *more = realloc(out->constants, (room ? room * 2 : 8) * sizeof *out->constants);
+            if (!more) return refuse(r, "ran out of memory at '%s'");
+            out->constants = more;
             room = room ? room * 2 : 8;
-            out->constants = realloc(out->constants, room * sizeof *out->constants);
         }
         out->constants[out->constant_count ++].name = kept(r->word);
+        if (!out->constants[out->constant_count - 1].name) return refuse(r, "ran out of memory at '%s'");
         next(r);
         if (is(r, "=")) {
             next(r);

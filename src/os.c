@@ -51,6 +51,7 @@ static DWORD WINAPI thread_main(LPVOID p)
 os_thread *os_thread_start(void (*fn)(void *), void *arg)
 {
     os_thread *t = malloc(sizeof *t);
+    if (!t) return nullptr;
     t->fn = fn;
     t->arg = arg;
     t->handle = CreateThread(nullptr, 0, thread_main, t, 0, nullptr);
@@ -69,11 +70,12 @@ struct os_event { HANDLE handle; };
 os_event *os_event_new()
 {
     os_event *e = malloc(sizeof *e);
+    if (!e) return nullptr;
     e->handle = CreateEventA(nullptr, FALSE, FALSE, nullptr);     /* auto-reset */
     return e;
 }
 
-void os_event_free(os_event *e) { CloseHandle(e->handle); free(e); }
+void os_event_free(os_event *e) { if (e) { CloseHandle(e->handle); free(e); } }
 void os_event_set(os_event *e) { SetEvent(e->handle); }
 
 int os_event_wait(os_event *e, uint64_t nanos)
@@ -119,6 +121,7 @@ static void *thread_main(void *p)
 os_thread *os_thread_start(void (*fn)(void *), void *arg)
 {
     os_thread *t = malloc(sizeof *t);
+    if (!t) return nullptr;
     t->fn = fn;
     t->arg = arg;
     pthread_create(&t->handle, nullptr, thread_main, t);
@@ -136,6 +139,7 @@ struct os_event { pthread_mutex_t lock; pthread_cond_t cond; int set; };
 os_event *os_event_new()
 {
     os_event *e = malloc(sizeof *e);
+    if (!e) return nullptr;
     pthread_mutex_init(&e->lock, nullptr);
     pthread_cond_init(&e->cond, nullptr);
     e->set = 0;
@@ -144,6 +148,7 @@ os_event *os_event_new()
 
 void os_event_free(os_event *e)
 {
+    if (!e) return;
     pthread_cond_destroy(&e->cond);
     pthread_mutex_destroy(&e->lock);
     free(e);
@@ -198,11 +203,12 @@ struct os_mutex { CRITICAL_SECTION section; };
 os_mutex *os_mutex_new()
 {
     os_mutex *m = malloc(sizeof *m);
+    if (!m) return nullptr;
     InitializeCriticalSection(&m->section);
     return m;
 }
 
-void os_mutex_free(os_mutex *m) { DeleteCriticalSection(&m->section); free(m); }
+void os_mutex_free(os_mutex *m) { if (m) { DeleteCriticalSection(&m->section); free(m); } }
 void os_mutex_lock(os_mutex *m) { EnterCriticalSection(&m->section); }
 void os_mutex_unlock(os_mutex *m) { LeaveCriticalSection(&m->section); }
 
@@ -222,11 +228,12 @@ struct os_mutex { pthread_mutex_t mutex; };
 os_mutex *os_mutex_new()
 {
     os_mutex *m = malloc(sizeof *m);
+    if (!m) return nullptr;
     pthread_mutex_init(&m->mutex, nullptr);
     return m;
 }
 
-void os_mutex_free(os_mutex *m) { pthread_mutex_destroy(&m->mutex); free(m); }
+void os_mutex_free(os_mutex *m) { if (m) { pthread_mutex_destroy(&m->mutex); free(m); } }
 void os_mutex_lock(os_mutex *m) { pthread_mutex_lock(&m->mutex); }
 void os_mutex_unlock(os_mutex *m) { pthread_mutex_unlock(&m->mutex); }
 

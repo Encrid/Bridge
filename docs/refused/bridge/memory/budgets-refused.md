@@ -33,6 +33,11 @@ condition brings it back.
 
 Of `budgets.md`, *Nothing is allocated in a phase*.
 
+Refused: a bound on the list of where unloaded modules' settings text was. Nothing has unloaded
+enough different modules to need one, and a bound would be a key that says how many module names
+a deployment may ever have used. The condition that brings it back is a deployment that unloads
+different modules without end, each leaving a string in a row that stays.
+
 Refused: growing on demand, which is what the queue, an observer's list and the block of ids did,
 and allocating a dispatch's lists and freeing them on every phase, which is what the scheduler did.
 A queue that grew had no bound: a module that asked for changes in a loop took memory until the

@@ -12,11 +12,13 @@
 
 typedef struct { uint64_t *bits; uint32_t n, words; } matrix;
 
-static void matrix_init(matrix *m, uint32_t n)
+/* false if there was not the memory for it */
+static bool matrix_init(matrix *m, uint32_t n)
 {
     m->n = n;
     m->words = (n + 63) / 64;
     m->bits = calloc((size_t)n * m->words + 1, sizeof *m->bits);
+    return m->bits != nullptr;
 }
 
 static int reaches(const matrix *m, uint32_t i, uint32_t j)
@@ -51,10 +53,11 @@ int schedule_order(bridge *b, const bridge_order *order, uint32_t count)
     matrix reach;
     uint32_t n = 0, i, k, refused = 0;
 
-    matrix_init(&reach, count * 2);
-
     b->before = calloc(count ? count : 1, sizeof *b->before);
     b->after = calloc(count ? count : 1, sizeof *b->after);
+    if (!matrix_init(&reach, count * 2) || !names || !b->before || !b->after) {
+        refused = (uint32_t)bridge_short(b, nullptr, "the order a deployment states");
+    }
     for (i = 0; i < count && !refused; i ++) {
         const char *pair[2] = { order[i].before, order[i].after };
         uint32_t at[2];
@@ -66,6 +69,10 @@ int schedule_order(bridge *b, const bridge_order *order, uint32_t count)
         b->before[i] = copy(pair[0], strlen(pair[0]));
         b->after[i] = copy(pair[1], strlen(pair[1]));
         b->order_count = i + 1;
+        if (!b->before[i] || !b->after[i]) {
+            refused = (uint32_t)bridge_short(b, nullptr, "the order a deployment states");
+            break;
+        }
         for (k = 0; k < 2; k ++) {
             for (at[k] = 0; at[k] < n && strcmp(names[at[k]], pair[k]); at[k] ++) {}
             if (at[k] == n) names[n ++] = pair[k];
@@ -112,7 +119,8 @@ static const char *conflict(const bridge_system *a, const bridge_system *b, bool
 /* Every phase, and the barrier after them as one more: edges, the refusal, then levels. */
 int schedule_build(bridge *b, char *why, size_t why_len)
 {
-    bridge_system **in = calloc(b->system_count ? b->system_count : 1, sizeof *in);
+    /* in room made at create, [budget] systems wide: schedule_room */
+    auto in = (bridge_system **)b->build_in;
     uint32_t phase, i, j, k, refused = 0;
     bool changing;
 
@@ -123,7 +131,10 @@ int schedule_build(bridge *b, char *why, size_t why_len)
         for (i = 0; i < b->system_count; i ++) {
             if (b->systems[i]->phase == phase && !b->systems[i]->parked) in[n ++] = b->systems[i];
         }
-        matrix_init(&reach, n);
+        reach.n = n;
+        reach.words = (n + 63) / 64;
+        reach.bits = b->build_bits;
+        memset(reach.bits, 0, ((size_t)n * reach.words + 1) * sizeof *reach.bits);
 
         for (k = 0; k < b->order_count; k ++) {
             for (i = 0; i < n && strcmp(in[i]->full, b->before[k]); i ++) {}
@@ -170,9 +181,7 @@ int schedule_build(bridge *b, char *why, size_t why_len)
                 }
             }
         }
-        free(reach.bits);
     }
-    free(in);
     return (int)refused;
 }
 
@@ -220,13 +229,17 @@ static void run_job(void *arg)
 }
 
 /* budgets.md, *Nothing is allocated in a phase*: what a dispatch works in, once. */
-void schedule_room(bridge *b)
+int schedule_room(bridge *b)
 {
     uint32_t n = b->max_systems ? b->max_systems : 1;
     b->run_jobs = calloc(n, sizeof(job));
     b->run_handed = calloc(n, sizeof *b->run_handed);
     b->run_lists = calloc(n, sizeof *b->run_lists);
     b->run_callers = calloc(n, 1);
+    b->build_in = calloc(n, sizeof *b->build_in);
+    b->build_bits = calloc((size_t)n * ((n + 63) / 64) + 1, sizeof *b->build_bits);
+    return bridge_short(b, b->run_jobs && b->run_handed && b->run_lists && b->run_callers
+        && b->build_in && b->build_bits ? b : nullptr, "what a dispatch and a schedule are worked out in");
 }
 
 void schedule_run(bridge *b, uint32_t phase)

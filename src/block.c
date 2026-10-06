@@ -25,6 +25,19 @@ static void gap_drop(region *r, uint32_t i)
     r->count --;
 }
 
+/* Room in the list for the gaps that `ranges` ranges handed out can leave: one after each,
+ * and one before the first. false if there is not the memory. */
+bool region_room(region *r, uint32_t ranges)
+{
+    range *gaps;
+    if (ranges + 1 <= r->room) return true;
+    gaps = realloc(r->gaps, ((size_t)ranges + 1) * sizeof *gaps);
+    if (!gaps) return false;
+    r->gaps = gaps;
+    r->room = ranges + 1;
+    return true;
+}
+
 void region_give(region *r, uint32_t at, uint32_t len)
 {
     uint32_t i = 0;
@@ -32,12 +45,10 @@ void region_give(region *r, uint32_t at, uint32_t len)
     if (i && r->gaps[i - 1].at + r->gaps[i - 1].len == at) {
         r->gaps[-- i].len += len;
     } else {
-        /* the column region's list is as long as there may be tables, and never grows: a gap
-         * lies between two blocks. The arena's grows here, which is never at a barrier */
-        if (r->count == r->room) {
-            r->room = r->room ? r->room * 2 : 16;
-            r->gaps = realloc(r->gaps, r->room * sizeof *r->gaps);
-        }
+        /* the column region's list is as long as there may be tables, and the arena's as long
+         * as the ranges modules hold, plus one: region_room saw to it when each was taken. So
+         * there is room; were there not, the gap would go unrecorded and its bytes unused */
+        if (r->count == r->room) return;
         memmove(&r->gaps[i + 1], &r->gaps[i], (r->count - i) * sizeof *r->gaps);
         r->gaps[i] = (range){ at, len };
         r->count ++;
@@ -321,6 +332,7 @@ int block_create(bridge *b, const bridge_budget *budget)
     b->column_space = (region){ .room = b->tables + 1, .len = b->columns_len };
     b->column_space.gaps = malloc(b->column_space.room * sizeof(range));
     b->arena_space = (region){ .len = b->arena_len };
+    if (bridge_short(b, b->column_space.gaps, "the list of what is free in [budget] columns")) return 1;
     b->storage = storage_create(b);
     if (!b->storage) return 1;
 

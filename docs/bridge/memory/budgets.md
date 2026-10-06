@@ -85,6 +85,7 @@ its room when the bridge was created or when a module loaded, from a number some
     a module's queue of changes           at load, `changes` bytes
     an observer's list of who it heard    at load, as many as the module's `spans` can publish
     the marks that order the queues       at load, one for each of the module's systems
+    what a schedule is worked out in      at create: `systems` squared, in bits
 
 `changes` is a key every module states, beside `spawns`: the bytes of `attach`, `detach` and
 `destroy` it may queue between two barriers, at 24 a change and an attach's value with it, to a
@@ -97,7 +98,12 @@ moved: cases `alloc-changes`, `alloc-tables`, `alloc-strip`.
 
 **Loading, reloading and unloading a module do allocate**, and creating and destroying a bridge:
 a record for the module, for each of its systems and types, and the rooms above. None is the
-hot path.
+hot path. What happens when one of those allocations fails is `failure.md`, *Out of memory*.
+
+**One thing among them has no bound.** The place of an unloaded module's settings text is
+remembered for its next load, where its share of the arena stayed, and the list of those places
+grows by one for every different module so unloaded and is never shortened. A bridge has to
+unload a great many different modules, each leaving a string behind, for that to matter.
 
 Because modules come and go, `modules` bounds **how many module records exist at once**, not
 how the private memory is divided. A record is taken at load and freed at unload, and exhaustion refuses the

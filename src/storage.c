@@ -474,9 +474,16 @@ static void dropped(storage *r, uint32_t index, bool for_columns)
     r->folded[index] |= for_columns ? DROPPED | SHORT : DROPPED;
 }
 
-void storage_writes(storage *r, module *m, storage_type *type)
+/* false if there was not the memory for the set: asked before a type is made, so that
+ * storage_writes cannot fail */
+bool storage_writable(storage *r, module *m)
 {
     if (!m->writable) m->writable = calloc(r->words, sizeof *m->writable);
+    return m->writable != nullptr;
+}
+
+void storage_writes([[maybe_unused]] storage *r, module *m, storage_type *type)
+{
     put(m->writable, type->id);
 }
 
@@ -992,6 +999,7 @@ storage *storage_create(bridge *b)
 {
     storage *r = calloc(1, sizeof *r);
     size_t tables = (size_t)b->tables + 1;
+    if (bridge_short(b, r, "storage")) return nullptr;
     r->b = b;
     r->table_room = b->tables;
     r->table_high = 1;                  /* table 0 is no table */
@@ -1026,6 +1034,15 @@ storage *storage_create(bridge *b)
     r->term_opers = calloc((size_t)r->terms_room * b->max_terms, sizeof *r->term_opers);
     r->systems = calloc(r->terms_room, sizeof *r->systems);
     r->observers = calloc(r->terms_room, sizeof *r->observers);
+    /* failure.md, *Out of memory*: all of it, or none */
+    if (!r->places || !r->tables || !r->table_next || !r->dirty || !r->hash || !r->sets || !r->columns
+        || !r->work || !r->changed || !r->folded || !r->dest || !r->attached || !r->at || !r->scratch
+        || !r->types || !r->type_pool || !r->terms_pool || !r->lists || !r->term_types
+        || !r->term_opers || !r->systems || !r->observers) {
+        (void)bridge_short(b, nullptr, "storage, as [budget] sizes it");
+        storage_destroy(r);
+        return nullptr;
+    }
     if (!r->who) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: the operating system would not "
             "give storage %u bytes of its own for the columns it keeps", b->columns_len);

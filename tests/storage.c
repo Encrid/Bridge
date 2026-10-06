@@ -54,6 +54,13 @@ static void sink([[maybe_unused]] void *ud, const bridge_record *r)
 
 static void quiet([[maybe_unused]] void *ud, [[maybe_unused]] const bridge_record *r) { }
 
+/* how many records said that memory ran out */
+static uint32_t said_memory;
+[[maybe_unused]] static void listening([[maybe_unused]] void *ud, const bridge_record *r)
+{
+    for (uint32_t i = 0; i + 13 <= r->len; i ++) said_memory += !memcmp(r->text + i, "out of memory", 13);
+}
+
 /* what a system said it read: kept, so that a timing is of a loop that ran */
 static uint32_t said[2];
 static void counted([[maybe_unused]] void *ud, const bridge_record *r)
@@ -105,9 +112,14 @@ constexpr uint32_t PHASES = sizeof phases / sizeof *phases;
  * to the allocator are these, and a phase with its barrier is to make none. */
 #ifdef COUNTED
 static size_t allocations;
-void *counted_malloc(size_t n) { allocations ++; return malloc(n); }
-void *counted_calloc(size_t n, size_t each) { allocations ++; return calloc(n, each); }
-void *counted_realloc(void *p, size_t n) { allocations ++; return realloc(p, n); }
+/* failure.md, *Out of memory*: and one of them can be made to answer that there is none.
+ * `asked` counts the calls that ask for memory; the one numbered `fail_at` is answered null. */
+static size_t asked, fail_at;
+static bool failed;
+static bool none_left() { asked ++; allocations ++; return asked == fail_at ? (failed = true) : false; }
+void *counted_malloc(size_t n) { return none_left() ? nullptr : malloc(n); }
+void *counted_calloc(size_t n, size_t each) { return none_left() ? nullptr : calloc(n, each); }
+void *counted_realloc(void *p, size_t n) { return none_left() ? nullptr : realloc(p, n); }
 void counted_free(void *p) { allocations ++; free(p); }
 #else
 constexpr size_t allocations = 0;
@@ -212,6 +224,45 @@ int main(int argc, char **argv)
     setvbuf(stdout, nullptr, _IONBF, 0);
     if (!b) { printf("FAIL: bridge_create\n"); return 1; }
 
+#ifdef COUNTED
+    if (!strcmp(what, "nomemory")) {
+        /* failure.md, *Out of memory*: a bridge made, a module loaded, run, reloaded and
+         * unloaded, and the bridge destroyed - once for every allocation all of that makes,
+         * with that one answered null. Each time something is refused and says why, and
+         * nothing is written through a null pointer. */
+        size_t k, silent = 0;
+        (void)bridge_destroy(b);
+        for (k = 1;; k ++) {
+            if (argc > 2) fprintf(stderr, "allocation %u\n", (unsigned)k);  /* which one, to find a crash */
+            asked = 0;
+            fail_at = k;
+            failed = false;
+            said_memory = 0;
+            b = bridge_create(&cfg, listening, nullptr);
+            if (b) {
+                a = store_module(NSTORE_PATH, 6, 1 << 20, 1 << 20);
+                a.cfg.reloadable = a.cfg.hot_reload = BRIDGE_TRUE;
+                if (!bridge_load(b, &a)) {
+                    (void)bridge_phase(b, "spawn");
+                    (void)bridge_phase(b, "attach_a");
+                    (void)bridge_phase(b, "attach_b_half");
+                    (void)bridge_reload(b, &a);
+                    (void)bridge_phase(b, "look");
+                    (void)bridge_unload(b, a.cfg.identity);
+                }
+                (void)bridge_destroy(b);
+            }
+            if (!failed) break;
+            silent += !said_memory;
+            if (argc > 2 && !said_memory) fprintf(stderr, "unsaid\n");
+        }
+        fail_at = 0;
+        printf("%s allocations were each answered null in turn\n", k > 40 ? "more than forty" : "TOO FEW");
+        if (silent) printf("FAIL: %u of them were not said\n", (unsigned)silent);
+        printf("alive\n");
+        return 0;
+    }
+#endif
     if (!strcmp(what, "shape")) {
         /* backend.md, *Memory is adopted, not created*: a native module's private block
          * reserves what it uses, though the wasm backend is there and wants four gigabytes */

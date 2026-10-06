@@ -678,7 +678,12 @@ middle of a paragraph in `config.md`.
             finds room for, where it stopped at that half. `budgets.md`
     closed  a test that a barrier allocates nothing: cases `alloc-changes`, `alloc-tables`
             and `alloc-strip`, against a library whose calls to the allocator are counted
-    open    an allocation that fails at load
+    closed  an allocation that fails at load: at create, load, reload or unload it is a
+            refusal with a record, and the bridge is as it was. Held by answering every
+            allocation null in turn, case `alloc-nomemory`. Found by it: a reload that
+            stated more `spawns` wrote past the old instance's block of ids, since the
+            block had stopped growing in a phase; a reload has a block of its own now.
+            `failure.md`, *Out of memory*
     closed  a log_level nobody stated: zero is unset for it as for every key, and refused.
             `log.md`, *The log*
     closed  the schema macros defined twice, once in each backend's SDK: once now, in

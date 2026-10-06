@@ -247,10 +247,22 @@ void config_keep(bridge *b, module *m)
         b->kept[i].room = m->text_room;
         return;
     }
-    b->kept = realloc(b->kept, (b->kept_count + 1) * sizeof *b->kept);
-    b->kept[b->kept_count].stem = copy(m->stem, strlen(m->stem));
-    b->kept[b->kept_count].at = m->text_at;
-    b->kept[b->kept_count ++].room = m->text_room;
+    {
+        /* failure.md, *Out of memory*: an unload does not fail. What is lost is the reuse of
+         * that range by the module's next load, and it is said */
+        kept_text *more = realloc(b->kept, (b->kept_count + 1) * sizeof *b->kept);
+        char *stem = copy(m->stem, strlen(m->stem));
+        if (more) b->kept = more;
+        if (!more || !stem) {
+            free(stem);
+            (void)bridge_short(b, nullptr, "the place of an unloaded module's settings text, which "
+                "its next load will not write over");
+            return;
+        }
+        b->kept[b->kept_count].stem = stem;
+        b->kept[b->kept_count].at = m->text_at;
+        b->kept[b->kept_count ++].room = m->text_room;
+    }
 }
 
 

@@ -45,3 +45,20 @@ brings it back is a deployment that must stop a module after so many failures, h
 
 Refused: a count within a window, which is two keys. The condition that brings it back is a
 deployment that needs a burst and a rate told apart.
+
+## Out of memory
+
+Of `failure.md`, *Out of memory*.
+
+Refused: an allocation whose answer nobody looked at, which is what all but one of them were. A
+null answer was written through, and the host's process ended with no record. No condition
+brings it back.
+
+Refused: one place that stops the process with a message. It is a few lines where this is a
+check at every allocation; and it has the library end a process it does not own, which is the
+one thing *When something fails* says it cannot do. No condition brings it back.
+
+Refused: nothing allocated after create, every record a load needs taken from a pool that
+`[budget]` sizes. Then a load cannot run out of memory at all; and every record of a module is
+made again as a pool, sized for the most there may ever be, by keys nobody states today. The
+condition that brings it back is a host that cannot bear a load failing for memory.

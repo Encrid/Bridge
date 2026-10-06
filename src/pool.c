@@ -59,19 +59,31 @@ static void work(void *arg)
     }
 }
 
+/* nullptr if there was not the memory for it: failure.md, *Out of memory*. What was made of
+ * it by then is unmade, a worker at a time, since each is counted only once it runs. */
 pool *pool_create(uint32_t workers, uint32_t most_jobs)
 {
     pool *p = calloc(1, sizeof *p);
     uint32_t i;
+    if (!p) return nullptr;
     p->taken = calloc(most_jobs ? most_jobs : 1, 1);
     p->lock = os_mutex_new();
     p->done = os_event_new();
     p->workers = calloc(workers ? workers : 1, sizeof *p->workers);
-    p->worker_count = workers;
+    if (!p->taken || !p->lock || !p->done || !p->workers) {
+        pool_destroy(p);
+        return nullptr;
+    }
     for (i = 0; i < workers; i ++) {
         p->workers[i].p = p;
         p->workers[i].wake = os_event_new();
-        p->workers[i].thread = os_thread_start(work, &p->workers[i]);
+        p->workers[i].thread = p->workers[i].wake ? os_thread_start(work, &p->workers[i]) : nullptr;
+        if (!p->workers[i].thread) {
+            os_event_free(p->workers[i].wake);
+            pool_destroy(p);
+            return nullptr;
+        }
+        p->worker_count = i + 1;
     }
     return p;
 }

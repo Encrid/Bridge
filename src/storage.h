@@ -49,6 +49,7 @@ void storage_forget(storage *r, storage_terms *terms);
  * it asked - threads.md, *Threads* */
 void storage_apply(storage *r);
 /* `m` may write `type`: what gives it a stake in an entity that carries it - grants.md */
+[[nodiscard]] bool storage_writable(storage *r, module *m);    /* its set, made: false if it cannot be */
 void storage_writes(storage *r, module *m, storage_type *type);
 /* up to `want` ids with nothing on them, for a module to hand out: how many there were */
 uint32_t storage_reserve(storage *r, uint64_t *ids, uint32_t want);

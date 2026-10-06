@@ -96,6 +96,17 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     }
     memcpy(name, name_at, a[1]);
     name[a[1]] = 0;
+    {
+        /* room for one more of what it declares, and the set of what it may write, before
+         * anything is made that would have to be unmade: failure.md, *Out of memory* */
+        void *declared = realloc(m->declared, (m->declared_count + 1) * sizeof *m->declared);
+        void *policy = realloc(m->policy, (m->declared_count + 1) * sizeof *m->policy);
+        if (declared) m->declared = declared;
+        if (policy) m->policy = policy;
+        if (!declared || !policy || !storage_writable(b->storage, m)) {
+            return refuse(m, "out of memory: there was none for what it declares");
+        }
+    }
     bare = strchr(name, ':');
     if (!bare) return refuse(m, "type '%s' has no namespace", name);
     if (kind < BRIDGE_STRUCT || kind > BRIDGE_BITMASK) {
@@ -138,8 +149,12 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         looking l = { b, name };
         schema s;
         int refused;
-        uint32_t k;
+        uint32_t k, held_count = 0;
+        declared_type **types, **deps;
+        char *named;
+        void *zero;
 
+        if (!desc) return refuse(m, "out of memory: there was none for the descriptor of '%s'", name);
         *bare = 0;
         refused = schema_parse(kind, desc, find, &l, &s, why, sizeof why);
         *bare = ':';
@@ -157,22 +172,37 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
                 b->max_types);
         }
 
+        /* everything it needs is had before any of it is kept: failure.md, *Out of memory* */
+        for (k = 0; k < s.field_count; k ++) held_count += s.fields[k].type != nullptr;
         c = calloc(1, sizeof *c);
-        c->name = copy(name, strlen(name));
+        named = copy(name, strlen(name));
+        zero = calloc(1, size);
+        deps = calloc(held_count ? held_count : 1, sizeof *deps);
+        types = realloc(b->types, (b->type_count + 1) * sizeof *b->types);
+        if (types) b->types = types;
+        if (!c || !named || !zero || !deps || !types) {
+            free(c);
+            free(named);
+            free(zero);
+            free(deps);
+            schema_free(&s);
+            c = nullptr;
+            return refuse(m, "out of memory: there was none for type '%s'", name);
+        }
+        c->name = named;
         c->type = storage_declare(b->storage, size, align);
         c->s = s;
         c->kind = kind;
         c->size = size;
         c->align = align;
         c->fingerprint = print;
-        c->zero = calloc(1, size);
-        b->types = realloc(b->types, (b->type_count + 1) * sizeof *b->types);
+        c->zero = zero;
+        c->deps = deps;
         b->types[b->type_count ++] = c;
         /* a declared type a field of this one names is held for as long as this one is */
         for (k = 0; k < s.field_count; k ++) {
             declared_type *held = s.fields[k].type;
             if (!held) continue;
-            c->deps = realloc(c->deps, (c->dep_count + 1) * sizeof *c->deps);
             c->deps[c->dep_count ++] = held;
             held->users ++;
         }
@@ -184,8 +214,6 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
             return 0;
         }
     }
-    m->declared = realloc(m->declared, (m->declared_count + 1) * sizeof *m->declared);
-    m->policy = realloc(m->policy, (m->declared_count + 1) * sizeof *m->policy);
     m->policy[m->declared_count] = on_unload;
     m->declared[m->declared_count] = c;
     if (may_write(m, c)) storage_writes(b->storage, m, c->type);
@@ -260,9 +288,38 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         return refuse(m, "observer '%s' has no term, and so nothing to observe", name);
     }
 
+    /* everything a system needs is had before any of it is kept: failure.md, *Out of memory* */
+    snprintf(full, sizeof full, "%s:%s", m->stem, name);
     s = calloc(1, sizeof *s + count * sizeof *s->term + change_count * sizeof *s->changes);
-    s->changes = (declared_type **)(void *)&s->term[count];
     asked = calloc(count + 1, sizeof *asked);
+    {
+        bridge_system **all = realloc(b->systems, (b->system_count + 1) * sizeof *b->systems);
+        bridge_system ***mine = events ? &m->observers : &m->systems;
+        uint32_t have = events ? m->observer_count : m->system_count;
+        bridge_system **own = realloc(*mine, (have + 1) * sizeof **mine);
+        if (all) b->systems = all;
+        if (own) *mine = own;
+        if (s) {
+            s->name = copy(name, strlen(name));
+            s->full = copy(full, strlen(full));
+            if (events) {
+                s->pending_room = m->spans_len / (uint32_t)sizeof(bridge_trigger);
+                s->pending = calloc(s->pending_room ? s->pending_room : 1, sizeof *s->pending);
+            }
+        }
+        if (!s || !asked || !all || !own || !s->name || !s->full || (events && !s->pending)
+            || !abi_marks(m, 1)) {
+            if (s) {
+                free(s->name);
+                free(s->full);
+                free(s->pending);
+            }
+            free(s);
+            free(asked);
+            return refuse(m, "out of memory: there was none for %s '%s'", what, name);
+        }
+    }
+    s->changes = (declared_type **)(void *)&s->term[count];
     /* what it attaches or detaches: a write, so it wants the grant a write wants */
     for (i = 0; i < change_count; i ++) {
         uint32_t slot;
@@ -316,34 +373,23 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         s->term[i].writes = t.access == BRIDGE_WRITE;
     }
 
-    if (events) {
-        s->pending_room = m->spans_len / (uint32_t)sizeof(bridge_trigger);
-        s->pending = calloc(s->pending_room ? s->pending_room : 1, sizeof *s->pending);
-    }
     s->matched = events ? storage_observer(b->storage, asked, count, events, heard, s)
                : count ? storage_system(b->storage, asked, count) : nullptr;
     s->asked = asked;
     s->events = events;
 
-    snprintf(full, sizeof full, "%s:%s", m->stem, name);
     s->m = m;
-    s->name = copy(name, strlen(name));
-    s->full = copy(full, strlen(full));
     s->phase = phase;
     s->terms = count;
     s->observer = events != 0;
-    b->systems = realloc(b->systems, (b->system_count + 1) * sizeof *b->systems);
     b->systems[b->system_count ++] = s;
     if (events) {
-        m->observers = realloc(m->observers, (m->observer_count + 1) * sizeof *m->observers);
         m->observers[m->observer_count] = s;
         r[0] = m->observer_count ++;
     } else {
-        m->systems = realloc(m->systems, (m->system_count + 1) * sizeof *m->systems);
         m->systems[m->system_count] = s;
         r[0] = m->system_count ++;
     }
-    abi_marks(m);
     return 0;
 }
 
@@ -415,12 +461,16 @@ void abi_unpark(bridge *b, bridge_system *s)
 /* Room for a mark from each of its systems and observers, and from the lifecycle call in
  * progress, beyond those it has: asked for where a module gains a system and before a
  * lifecycle call, so that `queue` never has to. */
-void abi_marks(module *m)
+bool abi_marks(module *m, uint32_t more)
 {
-    uint32_t want = m->mark_count + m->system_count + m->observer_count + 1;
-    if (want <= m->mark_room) return;
-    m->marks = realloc(m->marks, want * sizeof *m->marks);
+    uint32_t want = m->mark_count + m->system_count + m->observer_count + 1 + more;
+    void *marks;
+    if (want <= m->mark_room) return true;
+    marks = realloc(m->marks, want * sizeof *m->marks);
+    if (!marks) return false;
+    m->marks = marks;
     m->mark_room = want;
+    return true;
 }
 
 static int queue(module *m, enum change_op op, uint64_t id, declared_type *c, const void *value)
@@ -433,7 +483,7 @@ static int queue(module *m, enum change_op op, uint64_t id, declared_type *c, co
         return refuse(m, "its changes of %u bytes are used up", m->queue_room);
     }
     if (!m->mark_count || m->marks[m->mark_count - 1].turn != m->turn) {
-        if (m->mark_count == m->mark_room) abi_marks(m);
+        if (m->mark_count == m->mark_room) return refuse(m, "out of memory: there was none for a mark in its queue");
         m->marks[m->mark_count].turn = m->turn;
         m->marks[m->mark_count ++].at = m->queue_len;
     }
