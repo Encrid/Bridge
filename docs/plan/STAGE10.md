@@ -624,7 +624,8 @@ Of earlier stages:
             stage 14
     closed  a stopped bridge takes only the load or reload of the module that stopped it:
             and an unload of it, by which a host goes on without it. `failure.md`
-    open    all pinned modules share the host's thread
+    closed  all pinned modules share the host's thread: it holds. What it does not serve is
+            written, and each refusal has a condition. `pinned.md`
     open    native entry arguments are scratch offsets, copied
     open    every block is allocated to the largest shape any backend asks for
     open    a phase is a string at `bridge_phase`
