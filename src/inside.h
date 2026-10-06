@@ -291,11 +291,6 @@ void bridge_resume(bridge_t *b, const module_t *m);     /* if `m` is what it was
 void module_discard(bridge_t *b, module_t *m);
 void module_shut_down(bridge_t *b, module_t *m);    /* its shutdown, what it asked for, what it said */
 
-/* config.c */
-[[nodiscard]] int config_seed(bridge_t *b, module_t *m, const bridge_module_config_t *cfg, char *why, size_t len);
-void config_keep(bridge_t *b, module_t *m);
-void config_forget(bridge_t *b, const module_t *m);
-
 /* schedule.c */
 [[nodiscard]] int schedule_order(bridge_t *b, const bridge_order_t *order, uint32_t count);  /* at create */
 [[nodiscard]] int schedule_build(bridge_t *b, char *why, size_t why_len);     /* 0, or why it cannot be */

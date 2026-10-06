@@ -407,3 +407,23 @@ folder, `windows/` or `posix/`, that the build takes by its target, so the layer
 macro: with both halves in one file a file held ten functions, and rule O3 allows five.
 Seventeen files, none over five functions. The wait of an event on POSIX was one loop with two
 branches inside, and is two loops, one for a wait with an end and one for a wait without.
+
+**The small files of `src/`, so far.** Each was cut by what it does, a function of twenty
+lines at most and a file of five functions at most, and what several files of one unit share
+is a header of that unit:
+
+    backend.c       three functions. `backend_open` writes its reason in a `backend_err_t`,
+                    where it took a buffer and its length
+    pool.c          three files: the pool made and unmade, a job taken and run, one run. A
+                    run is handed one `pool_batch_t`, where `pool_run` took five arguments
+    schema.c        seven files and `schema_reader.h`: tokens, what a token is, a value, a
+                    field's type, a struct, constants, the whole. `schema_parse` is handed
+                    one `schema_source_t`, where it took seven arguments. Every refusal
+                    keeps its words
+    config.c        eight files and `config.h`. What writes a setting into a field is found
+                    in a table by the field's kind, where it was a switch of eight arms in
+                    a function of ninety lines, and the range of each integer kind is a
+                    table too
+
+A chain of `if` and `else if` over the kinds of a thing became, each time, a table indexed by
+the kind, which is what rule C1 asks for.

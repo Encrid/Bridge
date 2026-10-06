@@ -2,6 +2,7 @@
  * each; docs/bridge/data/lifetime.md is what becomes of storage; docs/bridge/run/failure.md is
  * what a failure costs. All three are legal only between phases. */
 #include "inside.h"
+#include "config.h"
 
 #include <stdckdint.h>
 
@@ -556,7 +557,7 @@ static int start(bridge_t *b, module_t *m, const bridge_artifact_t *a, enum back
     }
 
     /* config.md: one row, written after init has declared the struct it is a row of */
-    if (!reloading && config_seed(b, m, cfg, err->text, sizeof err->text)) return 1;
+    if (!reloading && config_seed(b, m, cfg, err)) return 1;
 
     /* a system is an export, found once and checked here rather than on its first frame */
     for (i = 0; i < m->system_count + m->observer_count; i ++) {

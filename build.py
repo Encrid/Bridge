@@ -53,10 +53,12 @@ FEATURES = ['--enable-multimemory', '--enable-bulk-memory', '--enable-sign-ext',
 TIMEOUT = 120
 
 OS = ['memory', 'library', 'thread', 'mutex', 'event']
+CONFIG = ['config_say', 'config_scalar', 'config_enum', 'config_text', 'config_field',
+          'config_room', 'config_kept']
 SCHEMA = ['schema_reader', 'schema_token', 'schema_value', 'schema_type', 'schema_struct',
           'schema_constants']
 BRIDGE = ['bridge', 'lifecycle', 'config', 'block', 'storage', 'schema', 'abi', 'schedule', 'pool',
-          'pool_job', 'pool_run', 'backend'] + SCHEMA
+          'pool_job', 'pool_run', 'backend'] + SCHEMA + CONFIG
 # a native module is a shared library: the name, its source, what it is compiled with. The same
 # library twice is one module to the loader, so one source is built under several names.
 NATIVE = [
