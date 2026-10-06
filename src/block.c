@@ -141,10 +141,6 @@ int block_refill(bridge *b, module *m)
 {
     uint32_t want = m->spawns > 0 ? (uint32_t)m->spawns : 0, kept = m->id_count - m->id_next;
     if (!want) return 0;
-    if (want > m->id_room) {
-        m->ids = realloc(m->ids, want * sizeof *m->ids);
-        m->id_room = want;
-    }
     /* nothing used since the last barrier is nothing to move: the block is as long as its
      * `spawns`, and moving it onto itself was most of a quiet barrier's cost */
     if (m->id_next) memmove(m->ids, m->ids + m->id_next, kept * sizeof *m->ids);

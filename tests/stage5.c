@@ -95,6 +95,7 @@ static bridge_artifact native(const char *identity, const char *path)
     a.cfg.log_level = BRIDGE_INFO;
     a.cfg.spawns = BRIDGE_NONE;
     a.cfg.persistent = BRIDGE_NONE;
+    a.cfg.changes = 1 << 20;
     a.cfg.config = BRIDGE_NO_CONFIG;
     a.backend = "native";
     a.path = path;
@@ -374,6 +375,12 @@ int main(int argc, char **argv)
         else { a.cfg.write = game; a.cfg.write_count = 1; }
         load(b, &a);
         frames(b, 2);
+    } else if (!strcmp(what, "fewchanges") || !strcmp(what, "nochanges")) {
+        /* its init attaches once, which is 32 bytes of queue: stated as 16, and as none */
+        a = native("game:stamp5@0.1.0", NSTAMP5_PATH);
+        a.cfg.spawns = 8;
+        a.cfg.changes = !strcmp(what, "fewchanges") ? 16 : BRIDGE_NONE;
+        load(b, &a);
     } else if (!strcmp(what, "unstated")) {
         /* a system attaches what it did not state among its changes: that invocation fails */
         a = native("game:stamp@0.1.0", NSTAMPUNSTATED_PATH);

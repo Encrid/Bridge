@@ -544,9 +544,13 @@ The chosen option contradicts its own reason, or a document:
     closed  `destroy` checked no grant: a module removed any entity, and every component on
             it. It may destroy one that carries something it may write, or nothing; any
             other stays, and is its failure. `grants.md`, *What a module may destroy*
-    open    "nothing is allocated after create" is storage's and not the library's: a
-            module's change queue grows in a phase with no budget, an observer's list grows
-            at a barrier, and the arena's list of gaps and the kept settings grow at unload
+    closed  "nothing is allocated after create" was storage's and not the library's: a
+            module's change queue grew in a phase with no budget, an observer's list at a
+            barrier, and the scheduler allocated and freed on every phase. A phase and its
+            barrier allocate nothing now; a module states `changes`; and a library built to
+            count its calls to the allocator holds it. What grows at unload - the arena's
+            list of gaps, the kept settings - is with "an allocation that fails at load",
+            below. `budgets.md`, *Nothing is allocated in a phase*
     open    the test of a row against its count, a row at a time: x1.2 on the tightest loop,
             where one test a span was written down and not weighed. `validation.md`
 
@@ -597,7 +601,8 @@ middle of a paragraph in `config.md`.
 **5. Found while building**
 
     open    which entities are placed when columns run short
-    open    a test that a barrier allocates nothing
+    closed  a test that a barrier allocates nothing: cases `alloc-changes`, `alloc-tables`
+            and `alloc-strip`, against a library whose calls to the allocator are counted
     open    an allocation that fails at load
     open    a log_level nobody stated
     open    the schema macros defined twice

@@ -23,6 +23,7 @@
 #include "inside.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* What the process holds, in KB: the block's touched pages and everything outside it. Asked of
@@ -61,7 +62,8 @@ static void counted([[maybe_unused]] void *ud, const bridge_record *r)
     else if (r->level <= BRIDGE_WARN) printf("  -: %.*s\n", (int)r->len, r->text);
 }
 
-static bridge_artifact store_module(const char *path, int64_t spawns, uint32_t spans)
+static bridge_artifact store_module(const char *path, int64_t spawns, uint32_t spans,
+                                    int64_t changes)
 {
     bridge_artifact a = {};
     a.cfg.identity = "st:store@0.1.0";
@@ -80,6 +82,7 @@ static bridge_artifact store_module(const char *path, int64_t spawns, uint32_t s
     a.cfg.log_level = BRIDGE_INFO;
     a.cfg.spawns = spawns;
     a.cfg.persistent = BRIDGE_NONE;
+    a.cfg.changes = changes;
     a.cfg.config = BRIDGE_NO_CONFIG;
     a.backend = "native";
     a.path = path;
@@ -95,10 +98,26 @@ static const char *const phases[] = {
 constexpr uint32_t PHASES = sizeof phases / sizeof *phases;
 
 /* one phase and its barrier, named in the transcript */
+/* budgets.md, *Nothing is allocated in a phase*. Built with COUNTED, the library's own calls
+ * to the allocator are these, and a phase with its barrier is to make none. */
+#ifdef COUNTED
+static size_t allocations;
+void *counted_malloc(size_t n) { allocations ++; return malloc(n); }
+void *counted_calloc(size_t n, size_t each) { allocations ++; return calloc(n, each); }
+void *counted_realloc(void *p, size_t n) { allocations ++; return realloc(p, n); }
+void counted_free(void *p) { allocations ++; free(p); }
+#else
+constexpr size_t allocations = 0;
+#endif
+
 static void run(bridge *b, const char *phase)
 {
+    size_t before = allocations;
     printf("%s\n", phase);
     if (bridge_phase(b, phase)) printf("  REFUSED\n");
+    if (allocations != before) {
+        printf("  FAIL: the allocator was called %u times in a phase\n", (unsigned)(allocations - before));
+    }
 }
 
 /* the systems of one phase, then the barrier alone, timed */
@@ -150,7 +169,7 @@ static int stress_load(bridge *b)
         NSTRESS1_PATH, NSTRESS2_PATH, NSTRESS3_PATH, NSTRESS4_PATH
     };
     for (uint32_t i = 0; i < STRESSED; i ++) {
-        bridge_artifact a = store_module(paths[i], 20'000, 2 << 20);
+        bridge_artifact a = store_module(paths[i], 20'000, 2 << 20, 16 << 20);
         a.cfg.identity = identities[i];
         a.cfg.scratch = 1 << 20;
         if (bridge_load(b, &a)) return 1;
@@ -187,7 +206,7 @@ int main(int argc, char **argv)
     if (!b) { printf("FAIL: bridge_create\n"); return 1; }
 
     if (!strcmp(what, "changes")) {
-        a = store_module(NSTORE_PATH, 6, 1 << 20);
+        a = store_module(NSTORE_PATH, 6, 1 << 20, 1 << 20);
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         run(b, "spawn");
         run(b, "attach_a");         /* six entities gain A */
@@ -219,7 +238,7 @@ int main(int argc, char **argv)
         run(b, "destroy");          /* and all six go, with both on them */
         run(b, "look");
     } else if (!strcmp(what, "tables")) {
-        a = store_module(NSTORETAB_PATH, 10'000, 8 << 20);
+        a = store_module(NSTORETAB_PATH, 10'000, 8 << 20, 32 << 20);
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         run(b, "spawn");
         run(b, "combine");          /* ten thousand entities, no two with the same set */
@@ -229,7 +248,7 @@ int main(int argc, char **argv)
         run(b, "destroy");
         run(b, "look");
     } else if (!strcmp(what, "notables")) {
-        a = store_module(NSTORE_PATH, 6, 1 << 20);
+        a = store_module(NSTORE_PATH, 6, 1 << 20, 1 << 20);
         a.cfg.max_system_failures = 2;
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         run(b, "spawn");
@@ -240,7 +259,7 @@ int main(int argc, char **argv)
         run(b, "attach_b_half");    /* and it is stopped */
         run(b, "look");
     } else if (!strcmp(what, "nocolumns")) {
-        a = store_module(NSTORE_PATH, 6, 1 << 20);
+        a = store_module(NSTORE_PATH, 6, 1 << 20, 1 << 20);
         a.cfg.max_system_failures = 4;
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         run(b, "spawn");
@@ -253,7 +272,7 @@ int main(int argc, char **argv)
         run(b, "attach_a");         /* and the sixth is never to be had: the fourth barrier that */
         run(b, "attach_a");         /* left one out was its budget of four, and it is stopped */
     } else if (!strcmp(what, "scribble")) {
-        a = store_module(NSTORE_PATH, 6, 1 << 20);
+        a = store_module(NSTORE_PATH, 6, 1 << 20, 1 << 20);
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         run(b, "spawn");
         run(b, "attach_a");
@@ -264,7 +283,7 @@ int main(int argc, char **argv)
         run(b, "look");
         run(b, "find");             /* and each is where the index says, under its own id */
     } else if (!strcmp(what, "strip")) {
-        a = store_module(NSTORE_PATH, 6, 1 << 20);
+        a = store_module(NSTORE_PATH, 6, 1 << 20, 1 << 20);
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         run(b, "spawn");
         run(b, "attach_a");
@@ -279,7 +298,7 @@ int main(int argc, char **argv)
         run(b, "look_b");           /* the column of B is where the index and the span say */
         run(b, "find");
     } else if (!strcmp(what, "stripfull")) {
-        a = store_module(NSTORE_PATH, 6, 1 << 20);
+        a = store_module(NSTORE_PATH, 6, 1 << 20, 1 << 20);
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         run(b, "spawn");
         run(b, "value_b");          /* B first, so that the table of A alone is made with */
@@ -313,7 +332,7 @@ int main(int argc, char **argv)
         for (uint32_t k = 0; k < sizeof fat / sizeof *fat; k ++) {
             uint64_t on = 0, off = 0, t;
             b = bridge_create(&cfg, sink, nullptr);
-            a = store_module(fat[k].path, fat[k].count, 1 << 20);
+            a = store_module(fat[k].path, fat[k].count, 1 << 20, (int64_t)fat[k].count * 4200);
             if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
             (void)barrier(b, "spawn");
             (void)barrier(b, "attach_a");
@@ -332,7 +351,7 @@ int main(int argc, char **argv)
         for (uint32_t k = 0; k < sizeof split / sizeof *split; k ++) {
             uint64_t best = 0, t;
             b = bridge_create(&cfg, counted, nullptr);
-            a = store_module(split[k].path, ROWS, 8 << 20);
+            a = store_module(split[k].path, ROWS, 8 << 20, 128 << 20);
             if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
             (void)barrier(b, "spawn");
             for (uint32_t round = 0; round < ROUNDS * 4; round ++) {
@@ -363,7 +382,7 @@ int main(int argc, char **argv)
         };
         constexpr uint32_t OPS = sizeof ops / sizeof *ops, ROUNDS = 6, COUNT = 100'000;
         uint64_t first[OPS], best[OPS], t;
-        a = store_module(NSTOREBIG_PATH, COUNT, 1 << 20);
+        a = store_module(NSTOREBIG_PATH, COUNT, 1 << 20, 64 << 20);
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         for (uint32_t round = 0; round < ROUNDS; round ++) {
             for (uint32_t i = 0; i < OPS; i ++) {
@@ -386,7 +405,7 @@ int main(int argc, char **argv)
 
         /* and with ten thousand tables standing */
         b = bridge_create(&cfg, sink, nullptr);
-        a = store_module(NSTORETAB_PATH, 10'000, 8 << 20);
+        a = store_module(NSTORETAB_PATH, 10'000, 8 << 20, 32 << 20);
         if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         (void)barrier(b, "spawn");
         t = barrier(b, "combine");

@@ -226,6 +226,12 @@ def build(target, debug, out):
     phase_o = {name: compile_(name, ROOT / 'tests' / (name + '.c'), ours + [include] + defines)
                for name in ('stage2', 'stage3', 'stage4', 'stage5', 'stage6')}
     storage_o = compile_('storage-test', ROOT / 'tests/storage.c', ours + [include, src] + defines)
+    # the library again, with its calls to the allocator sent to the test that counts them
+    counting = ['-D%s=counted_%s' % (f, f) for f in ('malloc', 'calloc', 'realloc', 'free')]
+    counted_o = [compile_('counted-' + name, ROOT / 'src' / (name + '.c'), ours + [include, src] + counting)
+                 for name in BRIDGE + ['os']]
+    counted_test_o = compile_('storage-counted-test', ROOT / 'tests/storage.c',
+                              ours + [include, src] + defines + ['-DCOUNTED'])
     module_o = {name: compile_(name, ROOT / 'tests/modules/native' / (source + '.c'),
                                ours + [include, sdk['native']] + ['-D' + d for d in flags])
                 for name, source, flags in NATIVE}
@@ -255,6 +261,7 @@ def build(target, debug, out):
     for name, o in phase_o.items():
         link(name, [o] + whole, system)
     link('storage', [storage_o] + whole, system)
+    link('storage-counted', [counted_test_o] + counted_o, system)
     together(links)
 
     # ---- wasm modules: text assembled, C compiled and merged with the accessors ----
@@ -362,6 +369,12 @@ CASES = [
      r"every descriptor read as it should, and every other refused by its word.*alive", None),
     ('storage-changes', ['storage', 'changes'],
      '@tests/storage-changes.txt', None),
+    ('alloc-changes', ['storage-counted', 'changes'],
+     '@tests/storage-changes.txt', None),
+    ('alloc-tables', ['storage-counted', 'tables'],
+     '@tests/storage-tables.txt', None),
+    ('alloc-strip', ['storage-counted', 'strip'],
+     '@tests/storage-strip.txt', None),
     ('storage-tables', ['storage', 'tables'],
      '@tests/storage-tables.txt', None),
     ('storage-stress', ['storage', 'stress'],
@@ -526,6 +539,10 @@ CASES = [
      r"any: event 3 1.*any: event 2 2.*any: event 4 57005.*alive", None),
     ('stage5-obsconflict', ['stage5', 'obsconflict'],
      r"module 'view:fixer@0.1.0' did not load: 'view:watcher:seen' and 'view:fixer:fix' both touch 'game:Marked' at the barrier, one of them writing it, and nothing orders them.*seen 1 77.*alive", None),
+    ('stage5-fewchanges', ['stage5', 'fewchanges'],
+     r"module 'game:stamp5@0.1.0' did not load: its changes of 16 bytes are used up.*not loaded.*alive", None),
+    ('stage5-nochanges', ['stage5', 'nochanges'],
+     r"module 'game:stamp5@0.1.0' did not load: it stated that it queues no change.*not loaded.*alive", None),
     ('stage5-unstated', ['stage5', 'unstated'],
      r"system 'stamp' failed: system 'stamp' may not attach 'game:Marked': it is not among the changes it stated.*alive", 'seen'),
     ('stage5-changeconflict', ['stage5', 'changeconflict'],

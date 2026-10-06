@@ -188,13 +188,16 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
 static void heard(void *ctx, uint64_t id, enum bridge_event event)
 {
     bridge_system *s = ctx;
+    /* its list is as long as what its module's spans could publish of it, and one past
+     * that is all that needs knowing: storage_publish finds it does not fit, and says so */
+    if (s->pending_count > s->pending_room) return;
     if (s->pending_count && s->pending[s->pending_count - 1].id == id) {
         s->pending[s->pending_count - 1].events |= event;
         return;
     }
     if (s->pending_count == s->pending_room) {
-        s->pending_room = s->pending_room ? s->pending_room * 2 : 16;
-        s->pending = realloc(s->pending, s->pending_room * sizeof *s->pending);
+        s->pending_count ++;
+        return;
     }
     s->pending[s->pending_count].id = id;
     s->pending[s->pending_count ++].events = event;
@@ -302,6 +305,10 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         s->term[i].writes = t.access == BRIDGE_WRITE;
     }
 
+    if (events) {
+        s->pending_room = m->spans_len / (uint32_t)sizeof(bridge_trigger);
+        s->pending = calloc(s->pending_room ? s->pending_room : 1, sizeof *s->pending);
+    }
     s->matched = events ? storage_observer(b->storage, asked, count, events, heard, s)
                : count ? storage_system(b->storage, asked, count) : nullptr;
     free(asked);
@@ -377,23 +384,25 @@ void abi_marks(module *m)
     m->mark_room = want;
 }
 
-static void queue(module *m, enum change_op op, uint64_t id, declared_type *c, const void *value)
+static int queue(module *m, enum change_op op, uint64_t id, declared_type *c, const void *value)
 {
     change ch = { id, c, value ? c->size : 0, op };
     uint32_t need = (uint32_t)sizeof ch + ((ch.size + 7u) & ~7u);
+    /* budgets.md, *Nothing is allocated in a phase*: its queue is as long as it stated */
+    if (!m->queue_room) return refuse(m, "it stated that it queues no change");
+    if (need > m->queue_room - m->queue_len) {
+        return refuse(m, "its changes of %u bytes are used up", m->queue_room);
+    }
     if (!m->mark_count || m->marks[m->mark_count - 1].turn != m->turn) {
         if (m->mark_count == m->mark_room) abi_marks(m);
         m->marks[m->mark_count].turn = m->turn;
         m->marks[m->mark_count ++].at = m->queue_len;
     }
-    if (m->queue_len + need > m->queue_room) {
-        m->queue_room = (m->queue_room + need) * 2;
-        m->queue = realloc(m->queue, m->queue_room);
-    }
     memcpy(m->queue + m->queue_len, &ch, sizeof ch);
     /* the value is copied now: the scratch arena it is in is reset before it is applied */
     if (value) memcpy(m->queue + m->queue_len + sizeof ch, value, ch.size);
     m->queue_len += need;
+    return 0;
 }
 
 /* spawn() -> id */
@@ -417,8 +426,7 @@ static int abi_spawn(void *ud, [[maybe_unused]] const uint64_t *a, uint64_t *r)
  * gone, and which of them is told at the barrier, where it is looked at. */
 static int abi_destroy(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 {
-    queue(ud, CHANGE_DESTROY, a[0], nullptr, nullptr);
-    return 0;
+    return queue(ud, CHANGE_DESTROY, a[0], nullptr, nullptr);
 }
 
 static declared_type *written(module *m, uint64_t slot, const char *entry)
@@ -458,8 +466,7 @@ static int abi_attach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
             (unsigned long long)a[3], c->size);
     }
     if (!value) return refuse(m, "attach: the value lies outside the scratch arena");
-    queue(m, CHANGE_ATTACH, a[0], c, value);
-    return 0;
+    return queue(m, CHANGE_ATTACH, a[0], c, value);
 }
 
 /* detach(id, slot) */
@@ -468,8 +475,7 @@ static int abi_detach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
     module *m = ud;
     declared_type *c = written(m, a[1], "detach");
     if (!c) return 1;
-    queue(m, CHANGE_DETACH, a[0], c, nullptr);
-    return 0;
+    return queue(m, CHANGE_DETACH, a[0], c, nullptr);
 }
 
 /* alloc(len) -> offset into the persistent arena. Nothing frees it while its module is

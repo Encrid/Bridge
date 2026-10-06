@@ -218,13 +218,23 @@ static void run_job(void *arg)
     }
 }
 
+/* budgets.md, *Nothing is allocated in a phase*: what a dispatch works in, once. */
+void schedule_room(bridge *b)
+{
+    uint32_t n = b->max_systems ? b->max_systems : 1;
+    b->run_jobs = calloc(n, sizeof(job));
+    b->run_handed = calloc(n, sizeof *b->run_handed);
+    b->run_lists = calloc(n, sizeof *b->run_lists);
+    b->run_callers = calloc(n, 1);
+}
+
 void schedule_run(bridge *b, uint32_t phase)
 {
     uint32_t n = b->system_count, level, levels = 0, i, k, ordinal = 0;
-    job *jobs;
-    void **handed;
-    uint8_t *callers;
-    bridge_system **lists;
+    job *jobs = b->run_jobs;
+    void **handed = b->run_handed;
+    uint8_t *callers = b->run_callers;
+    auto lists = (bridge_system **)b->run_lists;
     if (!n) return;
     for (i = 0; i < n; i ++) {
         if (b->systems[i]->phase == phase && b->systems[i]->level >= levels) {
@@ -232,10 +242,6 @@ void schedule_run(bridge *b, uint32_t phase)
         }
     }
     if (!levels) return;
-    jobs = calloc(n, sizeof *jobs);
-    handed = calloc(n, sizeof *handed);
-    callers = calloc(n, 1);
-    lists = calloc(n, sizeof *lists);
 
     for (level = 0; level < levels; level ++) {
         uint32_t count = 0, listed = 0;
@@ -286,10 +292,6 @@ void schedule_run(bridge *b, uint32_t phase)
             }
         }
     }
-    free(jobs);
-    free(handed);
-    free(callers);
-    free(lists);
 }
 
 /* failure.md, *The budget*: a module is stopped at the barrier after one of its systems

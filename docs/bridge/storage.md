@@ -144,7 +144,8 @@ barrier's second step is where that is found out, before anything has moved.
 
 **All of it is allocated when the bridge is created, and nothing after**: not at a barrier, not
 when a module loads. What a module declares takes a place that is already there, and a `declare`
-or a `system` past its key is refused - `budgets.md`, *Budgets*.
+or a `system` past its key is refused - `budgets.md`, *Budgets*. That is storage. What the rest
+of the library allocates, and when, is `budgets.md`, *Nothing is allocated in a phase*.
 
 A type is a size to storage, and nothing else. Its fields, their names and an enum's constants
 are read from its text by `src/schema.c` and kept with the component's record, by the part of the

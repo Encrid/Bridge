@@ -207,7 +207,8 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
         || unset(b, id, "shutdown_timeout", cfg->shutdown_timeout)
         || unset(b, id, "scratch", cfg->scratch) || unset(b, id, "log_ring", cfg->log_ring)
         || unset(b, id, "spans", cfg->spans) || unset(b, id, "spawns", cfg->spawns)
-        || unset(b, id, "persistent", cfg->persistent)) {
+        || unset(b, id, "persistent", cfg->persistent)
+        || unset(b, id, "changes", cfg->changes)) {
         return 1;
     }
     if (neither(b, id, "max_system_failures", cfg->max_system_failures, BRIDGE_NO_LIMIT)
@@ -217,7 +218,13 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
         || neither(b, id, "reload_timeout", cfg->reload_timeout, BRIDGE_NO_LIMIT)
         || neither(b, id, "shutdown_timeout", cfg->shutdown_timeout, BRIDGE_NO_LIMIT)
         || neither(b, id, "spawns", cfg->spawns, BRIDGE_NONE)
-        || neither(b, id, "persistent", cfg->persistent, BRIDGE_NONE)) {
+        || neither(b, id, "persistent", cfg->persistent, BRIDGE_NONE)
+        || neither(b, id, "changes", cfg->changes, BRIDGE_NONE)) {
+        return 1;
+    }
+    if (cfg->changes > (int64_t)UINT32_MAX) {
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its changes of %lld bytes is "
+            "more than an offset of 32 bits can reach", id, (long long)cfg->changes);
         return 1;
     }
     if (cfg->log_level > BRIDGE_LEVEL_MOST) {
@@ -310,6 +317,16 @@ static module *record(bridge *b, const bridge_artifact *a, open_backend *o)
     m->fuel = cfg->fuel;
     m->spawns = cfg->spawns;
     m->persistent = cfg->persistent;
+    /* budgets.md, *Nothing is allocated in a phase*: its ids and its queue, as long as it
+     * stated, now */
+    if (cfg->spawns > 0) {
+        m->ids = calloc((size_t)cfg->spawns, sizeof *m->ids);
+        m->id_room = (uint32_t)cfg->spawns;
+    }
+    if (cfg->changes > 0) {
+        m->queue = malloc((size_t)cfg->changes);
+        m->queue_room = (uint32_t)cfg->changes;
+    }
     m->read = copy_list(cfg->read, cfg->read_count);
     m->read_count = cfg->read_count;
     m->write = copy_list(cfg->write, cfg->write_count);

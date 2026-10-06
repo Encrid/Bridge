@@ -57,6 +57,7 @@ static bridge_artifact artifact(const char *name)
     a.cfg.log_level = BRIDGE_INFO;
     a.cfg.spawns = BRIDGE_NONE;
     a.cfg.persistent = BRIDGE_NONE;
+    a.cfg.changes = 4096;
     a.cfg.config = BRIDGE_NO_CONFIG;
     a.backend = "wasm";
     a.bytes = read_file(name, &a.len);

@@ -81,9 +81,11 @@ typedef struct {
     uint8_t  log_level;          /* a line above it is not written: enum bridge_level */
     uint32_t scratch, log_ring, spans;   /* its private memory, each in bytes */
     /* what is set aside for it alone, so that what it mints does not depend on who ran
-     * beside it. each: zero is unset, BRIDGE_NONE is "it mints none" */
+     * beside it. each of the three: zero is unset, BRIDGE_NONE is "none" */
     int64_t  spawns;             /* entity ids it may take between two barriers */
     int64_t  persistent;         /* its share of the persistent arena, in bytes, for its life */
+    int64_t  changes;            /* bytes of attach, detach and destroy it may queue between
+                                  * two barriers: 24 for each, and an attach's value with it */
 
     const char *const *read;  uint32_t read_count;       /* grants */
     const char *const *write; uint32_t write_count;

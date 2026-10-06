@@ -57,6 +57,10 @@ int bridge_destroy(bridge *b)
         module_discard(b, m);
     }
     free(b->systems);
+    free(b->run_jobs);
+    free(b->run_handed);
+    free(b->run_lists);
+    free(b->run_callers);
     block_destroy(b);
     pool_destroy(b->pool);
     for (i = 0; i < b->order_count; i ++) {
@@ -183,9 +187,11 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
         say(b, nullptr, nullptr, BRIDGE_ERR, "threads is unset");
         goto refuse;
     }
-    b->pool = pool_create(cfg->threads - 1);
+    /* a job is a module's systems of one level, so there are never more than systems */
+    b->pool = pool_create(cfg->threads - 1, cfg->budget.systems);
 
     if (block_create(b, &cfg->budget)) goto refuse;
+    schedule_room(b);
     return b;
 
 refuse:

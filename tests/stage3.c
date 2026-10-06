@@ -60,6 +60,8 @@ static bridge_artifact artifact(const char *identity, const char *file)
     a.cfg.spawns = !strcmp(file, "mover") ? 1024 : !strcmp(file, "refs") ? 128
                  : !strcmp(file, "namer") ? 8 : BRIDGE_NONE;
     a.cfg.persistent = BRIDGE_NONE;
+    /* 200,000 rows are attached in one init, at 32 bytes a change */
+    a.cfg.changes = !strncmp(file, "rows", 4) ? 16 << 20 : 1 << 20;
     a.cfg.config = BRIDGE_NO_CONFIG;
     a.backend = "wasm";
     a.bytes = read_file(file, &a.len);

@@ -59,10 +59,11 @@ static void work(void *arg)
     }
 }
 
-pool *pool_create(uint32_t workers)
+pool *pool_create(uint32_t workers, uint32_t most_jobs)
 {
     pool *p = calloc(1, sizeof *p);
     uint32_t i;
+    p->taken = calloc(most_jobs ? most_jobs : 1, 1);
     p->lock = os_mutex_new();
     p->done = os_event_new();
     p->workers = calloc(workers ? workers : 1, sizeof *p->workers);
@@ -102,10 +103,6 @@ void pool_run(pool *p, pool_fn fn, void **jobs, const uint8_t *caller_only, uint
         return;
     }
     os_mutex_lock(p->lock);
-    if (count > p->taken_room) {
-        p->taken = realloc(p->taken, count);
-        p->taken_room = count;
-    }
     memset(p->taken, 0, count);
     p->fn = fn;
     p->jobs = jobs;

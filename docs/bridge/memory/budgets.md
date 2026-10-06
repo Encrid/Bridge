@@ -73,8 +73,39 @@ rule flecs' own stack allocator keeps when it chains a page. Stating less is ref
 module allocated is in its share, and it is still loaded. Refused: accepting less and keeping the
 share as it was, a stated number that would not be true.
 
-A module that spawns nothing, or keeps no string, says so: `BRIDGE_NONE`, which is -2 and not the
--1 of a limit stated as none - `config.md`, *No unaccountable values*.
+A module that spawns nothing, keeps no string, or queues no change, says so: `BRIDGE_NONE`, which
+is -2 and not the -1 of a limit stated as none - `config.md`, *No unaccountable values*.
+
+## Nothing is allocated in a phase
+
+**A phase and the barrier after it call the allocator not once.** Everything they use was given
+its room when the bridge was created or when a module loaded, from a number somebody stated:
+
+    storage's rows, tables and indexes    at create, from `[budget]`: `storage.md`
+    what a dispatch works in              at create, `[budget] systems` long
+    a module's block of ids               at load, `spawns` long
+    a module's queue of changes           at load, `changes` bytes
+    an observer's list of who it heard    at load, as many as the module's `spans` can publish
+    the marks that order the queues       at load, one for each of the module's systems
+
+`changes` is a key every module states, beside `spawns`: the bytes of `attach`, `detach` and
+`destroy` it may queue between two barriers, at 24 a change and an attach's value with it, to a
+multiple of eight. A change that does not fit is refused and that invocation fails, as an
+allocation past `persistent` does. A module that queues none states `BRIDGE_NONE`.
+
+`tests/storage.c` is built a second time against a library whose every call to the allocator is
+counted, and runs the cases `changes`, `tables` and `strip` with a phase failing if the count
+moved: cases `alloc-changes`, `alloc-tables`, `alloc-strip`.
+
+**Loading, reloading and unloading a module do allocate**, and creating and destroying a bridge:
+a record for the module, for each of its systems and types, and the rooms above. None is the
+hot path.
+
+Refused: growing on demand, which is what the queue, an observer's list and the block of ids
+did, and allocating a dispatch's lists and freeing them on every phase, which is what the
+scheduler did. A queue that grew had no bound: a module that asked for changes in a loop took
+memory until the process had none, and it was every module's process. The condition that brings
+growing back is a phase shown never to be where time matters.
 
 Because modules come and go, `modules` bounds **how many module records exist at once**, not
 how the private memory is divided. A record is taken at load and freed at unload, and exhaustion refuses the

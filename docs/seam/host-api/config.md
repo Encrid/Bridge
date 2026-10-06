@@ -22,7 +22,8 @@ repair*. Where "none"
 is a real answer it is a value of its own, never the field left alone, and there are two because
 they say opposite things. A limit stated as none is `BRIDGE_NO_LIMIT`, -1: `fuel`, a timeout,
 `memory_limit`, `max_system_failures` - `capabilities.md`, *Capabilities, so the swap is honest*. A
-reservation stated as none is `BRIDGE_NONE`, -2: `spawns`, `persistent` - `budgets.md`, *Budgets*. A
+reservation stated as none is `BRIDGE_NONE`, -2: `spawns`, `persistent`, `changes` - `budgets.md`,
+*Budgets*. A
 module with no limit may use all there is; one with no reservation gets nothing. Each key takes
 its own, and the other, like any other negative number, is refused at load by the key's name.
 

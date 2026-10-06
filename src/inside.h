@@ -196,6 +196,10 @@ struct bridge {
     uint32_t phase_count;
     uint32_t barriers;
     uint32_t turns;                 /* lifecycle calls since the last barrier: threads.md */
+    /* what a phase's dispatch works in, [budget] systems long: budgets.md, *Nothing is
+     * allocated in a phase* */
+    void *run_jobs, **run_handed, **run_lists;
+    uint8_t *run_callers;
     char   **before, **after;       /* [order], pair by pair */
     uint32_t order_count;
     pool    *pool;
@@ -247,12 +251,13 @@ void config_forget(bridge *b, const module *m);
 /* schedule.c */
 [[nodiscard]] int schedule_order(bridge *b, const bridge_order *order, uint32_t count);  /* at create */
 [[nodiscard]] int schedule_build(bridge *b, char *why, size_t why_len);     /* 0, or why it cannot be */
+void schedule_room(bridge *b);          /* at create: what a dispatch works in */
 void schedule_run(bridge *b, uint32_t phase);
 void schedule_account(bridge *b);       /* at each barrier: the failure budgets, and the stops */
 
 /* pool.c */
 typedef void (*pool_fn)(void *job);
-[[nodiscard]] pool *pool_create(uint32_t workers);
+[[nodiscard]] pool *pool_create(uint32_t workers, uint32_t most_jobs);
 void  pool_destroy(pool *p);
 /* fn(jobs[i]) for every i, on the workers and the caller; a job marked is the caller's alone */
 void  pool_run(pool *p, pool_fn fn, void **jobs, const uint8_t *caller_only, uint32_t count);
