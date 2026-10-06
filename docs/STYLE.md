@@ -278,6 +278,13 @@ function is a short one: a comment above it is enough to explain it.
 That comment has the form of the file's header: the function's name, an empty line, and then
 what it does, what it answers and what it answers when it cannot.
 
+**A function that is not `static` always has its comment.** A `static` one has it when its
+name and its arguments do not say what it does.
+
+**A document is cited the way the documents cite each other**, the file and then the heading
+between asterisks, on the last lines of the comment after an empty one. `tools/xref.py` reads
+them, so a heading that is renamed does not leave a function pointing at nothing.
+
 ```c
 /*
 ** storage_apply

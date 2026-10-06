@@ -4,8 +4,8 @@
  *
  *     flag      a component an entity always has and sometimes does not use: a field says
  *               whether, and the loop tests it at every row. One row in ON has it set
- *     near      a value reached by entity id and not walked: reference.md, *Reference
- *     far       following*. The ids in the order their entities lie, and in no order
+ *     near      a value reached by entity id and not walked, as a reference is followed.
+ *     far       The ids in the order their entities lie, and in no order
  *     one       one value for the whole deployment: a component on one entity, found through
  *               a query of one span, a million times
  *     walk      the same number of rows read in order, which is what the others are beside

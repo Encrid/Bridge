@@ -104,7 +104,7 @@ static_assert(offsetof(backend_memory_import, memory) == 16);
 
 /* The backend seam's number: what this header says. A backend answers the one it was built
  * against, and Bridge-ASM700 refuses a library that answers another, before it asks it for
- * anything else - docs/seam/backend/backend.md, *A seam has a number*. */
+ * anything else - docs/seam/backend/backend.md, *What a backend is asked for*. */
 constexpr uint32_t BACKEND_ABI = 1;
 
 typedef struct backend_api {

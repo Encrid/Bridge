@@ -298,3 +298,27 @@ cases `build.py` lists and every transcript stay as they are.
     extensible    a new program is a directory
     minimal       nothing of `build.py`'s cases changes
     explicit      the table says every case a program has
+
+### Comments
+
+468 comments were inside a function or beside a line of it, which rule F6 does not allow, and
+215 above a function were not in the form the rule gives. 136 cited a document, and nothing
+checked them: `tools/xref.py` read the documents only.
+
+What becomes of a comment inside a function is not a choice. One that names a step: rule F4
+makes the step a function, and the comment is above it. One that says why: it joins the comment
+above the function it was in. One that repeats the code is deleted.
+
+**Code cites a document in the documents' own form, on the last lines of the function's
+comment, and `tools/xref.py` reads `.c` and `.h` too.** A dead citation in code fails the scan
+as one in a document does.
+
+    fast          nothing
+    scalable      holds as the documents move
+    modular       one form of citation, in code and in documents
+    extensible    nothing
+    minimal       a few lines of `tools/xref.py`
+    explicit      the reason for a function can be reached, and that is held
+
+**A function that is not `static` always has its comment, and `tools/style.py` holds that. A
+`static` one has it when its name and arguments do not say it.**

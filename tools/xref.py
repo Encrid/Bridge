@@ -65,5 +65,21 @@ for f in sorted(paths):
         print('%-14s -> dangling "%s"' % (f, m.group(1)))
         bad += 1
 
+# what the code cites, in a comment, in the same form: a heading that was renamed must not leave
+# a function pointing at nothing. A comment's lines are joined first, as a paragraph's are.
+for full in sorted(glob.glob('../**/*.[ch]', recursive=True)):
+    full = full.replace(os.sep, '/')
+    if '/build/' in full or '/wasmtime/' in full:
+        continue
+    text = re.sub(r'\n[ \t]*(?:\*\*?|//)[ \t]?', ' ', open(full, encoding='utf-8').read())
+    for m in re.finditer(r'`?([a-z-]+\.md)`?[^.\n]{0,30}?\*([^*\n]+)\*', text):
+        doc, sec = m.group(1), m.group(2).strip().lower()
+        if doc not in heads:
+            print('%-14s -> missing file %s' % (full[3:], doc))
+            bad += 1
+        elif sec not in heads[doc]:
+            print('%-14s -> %s has no heading "%s"' % (full[3:], doc, sec))
+            bad += 1
+
 print('%d broken' % bad)
 sys.exit(1 if bad else 0)

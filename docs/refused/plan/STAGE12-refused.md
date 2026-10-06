@@ -114,3 +114,20 @@ then links every case, the cases `build.py` lists are all renamed, and the progr
 process of their own, the one that counts allocations and the one linked statically, stay apart
 anyway, which makes two kinds. The condition that brings it back is link time of the test
 programs becoming what a change waits for.
+
+## Comments
+
+Of `STAGE12.md`, *Comments*.
+
+Refused: citations in code that nothing checks, as they were. A heading is renamed and the code
+points at nothing, silently. No condition brings it back.
+
+Refused: code citing nothing. 136 ways from a function to its reason are lost. The condition
+that brings it back is the documents naming every function they are the reason for.
+
+Refused: a comment above every function. After the cut there are about six hundred, and many
+would say again what the name says. The condition that brings it back is a reader finding
+`static` functions whose name did not say it, often enough.
+
+Refused: no function bound to have one. Nothing is held, and the functions another file calls
+are the ones read without their body. No condition brings it back.

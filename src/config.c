@@ -190,7 +190,7 @@ int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why
         }
     }
     if (text_total) {
-        /* strings.md, *Bridge-ASM700 reuses its own range*: where this module's text went the
+        /* strings.md, *Changing one, and the cost of growing*: where this module's text went the
          * last time it was loaded, when it still fits there */
         for (i = 0; i < b->kept_count; i ++) {
             if (!strcmp(b->kept[i].stem, m->stem) && b->kept[i].room >= text_total) {
