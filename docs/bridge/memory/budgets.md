@@ -133,7 +133,9 @@ will carry before it moves a row - `storage.md`, *A barrier is worked an entity 
 it knows there what cannot be had: a table past `tables`, or rows past `columns`. Every change
 asked of that entity at that barrier is then dropped, all of them and not some: it keeps the
 components and the values it had, and no observer hears of it. Other entities are placed as usual.
-When a table cannot take all the rows arriving, it takes as many as the region still holds.
+When a table cannot take all the rows arriving, it takes some: it asks for half as many until the
+region gives them, which may be fewer than would have fitted. Which ones is an open question -
+`STAGE10.md`, *The repair*.
 
 **It is a failure of the module that asked**, the one whose change of that entity came last. A
 record names it, the key, and how many of its entities were left; and the barrier counts as one it

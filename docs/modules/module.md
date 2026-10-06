@@ -56,7 +56,8 @@ Four rules, and they hold on every backend:
 
 **Two of them are about not keeping anything**, and both follow from the barrier - `schedule.md`,
 *Phases*. Rows move there, so a reference outlives its meaning the moment one passes. The fourth is
-different: iteration order is archetype order, which changes as entities come and go, so there was
+different: iteration order is the order of tables and of rows in them, which changes as entities
+come and go, so there was
 never an order to keep.
 
 **None of the four is enforced**, on either backend. Access mode is a scheduling input and nothing

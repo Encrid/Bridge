@@ -17,8 +17,8 @@ Three things narrow it, none of them costing anything per frame:
 instant one system can be writing a given component, and Bridge-ASM700 dispatched it. One store per
 dispatch, into the log - the `system` field of its record.
 
-**The barrier is a validation point.** Nothing runs during one and Bridge-ASM700 is already walking the
-matched tables, so checking there is natural. idTech3 validated at its protocol boundary, always on
+**The barrier is a validation point.** Nothing runs during one, so what is checked there is checked
+against a world that is not moving. idTech3 validated at its protocol boundary, always on
 and always paid for; what we check always and what we check when asked are two different lists.
 
 ## Always on
@@ -63,7 +63,7 @@ produces a culprit.
 
 That matters because the person reading the log is usually not the author of the module that broke
 it, so narrowing is not enough. It is also **the only thing that finds a native module's stray write**:
-it has no sandbox and need not use the generated accessor, so the `row < count` test does not reach
+it has no sandbox and need not use the accessor, so the `row < count` test does not reach
 it.
 
 O(data) per barrier, which is why it is off. A runtime key rather than a build flag costs one branch
@@ -71,10 +71,11 @@ per barrier. flecs compiles its expensive tier out (`FLECS_SANITIZE`, *"will sev
 code"*) because its checks are scattered through hot code where a branch each would be the cost;
 ours is one pass at one site, so that force does not act on us.
 
-**Columns only, of the shared memory's three regions.** The entity index has its own check above,
-cheaper and always on. The persistent arena is deliberately left out: a corrupt string is visible to
-whoever reads it, where a corrupt float is not, so hashing it would double the pass's cost to find
-the one kind of damage that announces itself.
+**Columns only, of the shared memory's three regions.** The entity index is written where a row is
+placed and never read back, so there is no second account of it to compare. The persistent arena is
+deliberately left out: a corrupt string is visible to whoever reads it, where a corrupt float is
+not, so hashing it would double the pass's cost to find the one kind of damage that announces
+itself.
 
 **What Bridge-ASM700 does not check is a component's own invariants.** It knows no content -
 `wasm.md`, *It holds no content* - so a module that wants its invariants checked writes a

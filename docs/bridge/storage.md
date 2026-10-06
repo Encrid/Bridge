@@ -77,7 +77,8 @@ four tables between never exist. Applied a change at a time it moves five times 
 tables behind it.
 
 Refused: applying each change as it is read, which is what a storage that may be called at any
-time must do. Nothing here calls storage at any other time.
+time must do. Changes reach storage only at a barrier; outside one it is asked for two things, a
+module's settings row at load and its components at unload.
 
 ## What a barrier writes for a module
 
@@ -152,7 +153,7 @@ library that checks a load - `schema.md`, *There is no schema format*.
 ## What is asked of it
 
 `src/storage.h` is the whole of it, and each entry is named for the request, as the backend seam's
-are: declare a type from its text, hand over a system's terms or an observer's, apply every queue,
+are: declare a type of a size, hand over a system's terms or an observer's, apply every queue,
 set ids aside, write what a module reads, drop a component by its policy. Nothing there says how.
 
 It is internal: one implementation, and no host or backend sees it. Refused: making storage

@@ -24,7 +24,8 @@ shared storage is one crossing.
 ## What the design is
 
 **Data is declared once and addressed directly.** At registration a module declares the components
-it needs and gets a slot, and Bridge-ASM700 republishes where they are at every barrier. Reading and
+it needs and gets a slot, and Bridge-ASM700 writes where they are, at a barrier, whenever that
+changed. Reading and
 writing is then address arithmetic. No handle, no lookup, no crossing.
 
 **Bridge-ASM700 owns the memory.** It is the orchestrator, so it owns the region, the schema and the
@@ -43,9 +44,9 @@ passing things. What a module calls *into* still carries scalars, and only two k
 `signatures.md`, *Imports are declared, exports are checked*.
 
 **No general allocation on the per-frame path.** Anything per-frame comes from a bump region or a
-fixed ring, reset or drained at a barrier. Budgets are declared at startup, and exhaustion is fatal
-where it happens rather than degrading quietly later. That is idTech3's discipline: "data does not
-cross" applied to memory instead of calls.
+fixed ring, reset or drained at a barrier. Budgets are declared at startup, and running out is
+refused where it happens, by name, rather than degrading quietly later. That is idTech3's
+discipline: "data does not cross" applied to memory instead of calls.
 
 **ECS shape, with storage of its own.** Components are data stored per type, entities are ids,
 systems are declared by modules. The native backend is for what cannot be reached from inside wasm;

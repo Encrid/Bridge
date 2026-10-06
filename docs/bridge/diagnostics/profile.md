@@ -1,7 +1,7 @@
 # The profile
 
 It reports **per system rather than per module** - `wasm.md`, *Exports* - and an observer
-cycle is visible in it, `data.md`, *Observers*.
+cycle is visible in it, `schedule.md`, *An observer runs at the barrier, one hop per barrier*.
 
     int bridge_profile(bridge *b, bridge_profile_row *out, int max);
 

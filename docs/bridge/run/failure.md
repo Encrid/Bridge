@@ -1,7 +1,7 @@
 # When something fails
 
-`result` is an i32. Zero for success; otherwise a code, with any detail written to the log - see
-`log.md`, *The log*.
+`result` is an i32. Zero for success; anything else is failure, and which value it was is not
+read. Any detail is written to the log - see `log.md`, *The log*.
 
 A non-zero `result` and a trap are **the same failure**. They differ only in how the backend classified
 it. Treating them alike keeps an `init` that returns an error and an `init` that reads out of bounds
@@ -60,8 +60,9 @@ it back is a module that must load and need not stay.
 
 `max_system_failures` is a count that **a failed barrier raises by one and a clean barrier lowers
 by one**, never below zero. A module that reaches the number is stopped. A barrier is failed for a
-module when any of its systems or observers failed since the one before; it is clean when the
-module ran and none did.
+module when any of its systems or observers failed since the one before, or when an entity it
+changed could not be placed - `budgets.md`, *What running out does*; it is clean when the module
+ran and neither happened.
 
 The unit is the barrier and not the invocation, so that a module is not punished for being made of
 many systems. And it is not wall time, which is the one thing a pass cannot reproduce -

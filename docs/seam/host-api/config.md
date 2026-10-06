@@ -16,7 +16,9 @@ at load for a module's. `budgets.md`, *Bridge-ASM700 defaults none of them*, for
 a budget.
 
 **Unset is zero.** Bridge-ASM700 sees a struct, so a numeric or enum field left at zero is the unset
-one, and zero is never a legal value for it: a budget, `fuel`, a timeout, `on_error`. Where "none"
+one, and zero is never a legal value for it: a budget, `fuel`, a timeout, `on_error`. One key
+breaks that and is an open question: `log_level`, where zero is a severity - `STAGE10.md`, *The
+repair*. Where "none"
 is a real answer - `fuel`, a timeout, `memory_limit` - it is stated as `-1`, never by leaving the
 field alone: `capabilities.md`, *Capabilities, so the swap is honest*. A boolean
 cannot be unset. Left alone it is `false`, which is the off or the safe side for all six: `trusted`,
@@ -64,7 +66,7 @@ inside one phase.
 
 `[.config]` - the `settings` a host hands over for a module - **seeds a singleton component.** The
 module declares the struct in its schema header like any other. Bridge-ASM700 writes one row at
-init, matching the keys to field names from the reflection it registered - `schema.md`, *There is no
+init, matching the keys to the field names its descriptor states - `schema.md`, *There is no
 schema format*. A key the deployment set that the module never declared is an error at init, by
 name, where the original Bridge silently ignores a typo.
 

@@ -82,9 +82,10 @@ The shared memory's three regions and each module's private memory: the header, 
 `detach`, and `alloc`. Fuel, re-set before every dispatch. `bridge_phase` and the barrier, serial
 for now: queued changes applied, spans republished, rings drained, scratch reset. The entity index
 mirror, driven off the patched hook and flecs' events, and `get` over it - `reference.md`,
-*Reference following*. The row-count check - `validation.md`, *Always on*. What a module compiles
-against, and the module build that merges it: the `BRIDGE_SCHEMA_STRUCT` shim and accessors carrying the
-`row < count` test - `schema.md`, *What a module compiles against*.
+*Reference following*. The row-count check, which stage 10 made needless - `validation.md`, *Always
+on*. What a module compiles against, and the module build that merges it: the `ECS_STRUCT` shim, as
+it was then named, and accessors carrying the `row < count` test - `schema.md`, *What a module
+compiles against*.
 
 Access mode and queries are part of declaration from the start, not retrofitted.
 

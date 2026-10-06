@@ -107,9 +107,9 @@ what is needed:
 `tools/c23.py` runs with the tests and fails on an older spelling, which is what makes "fully" a
 claim that can be false.
 
-**Not used, each for a reason.** `<stdbit.h>` is the C library's and three of the four targets
-have none; *The C library* is where that could change. `_BitInt`, `#embed` and `char8_t` have
-nothing here to do.
+**Not used, each for a reason.** `<stdbit.h>` is the C library's, and with this compiler none of the
+four targets has it, the three platforms and wasm; *The C library* is where that could change.
+`_BitInt`, `#embed` and `char8_t` have nothing here to do.
 
 The build was C11 before anyone chose, and then C99 was chosen for the whole tree, for the sake
 of one number that matched flecs. Compiling it showed the price. wasmtime's headers are not C99,

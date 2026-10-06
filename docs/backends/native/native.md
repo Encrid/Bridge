@@ -162,10 +162,11 @@ module adds `shared`, which does not move.
 reason `query.md` gives: both sides compile the same declaration, so the compiler already knows it.
 
 One form of span for every backend rather than a resolved copy for native code: two forms would be
-two rewrites at every barrier, and two things to disagree.
+two things to write at a barrier, and two things to disagree.
 
 A pointer computed this way is good for the phase it was computed in, for the same reason a row
-number is: storage may be compacted or migrated at a barrier.
+number is: rows move at a barrier, when an entity is placed in another table or into the place
+of one that left.
 
 ## What a native module must not do
 

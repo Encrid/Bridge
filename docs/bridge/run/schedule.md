@@ -74,14 +74,16 @@ that is wrong whether or not anything ran beside it. **The condition that brings
 module that can share an external resource without being pinnable; nothing like that exists
 today.
 
-Rows move when storage is compacted or migrated, so **nothing moves while any phase is in flight.**
+Rows move when an entity is placed in another table, or into the place of one that left, so
+**nothing moves while any phase is in flight.**
 That is the whole reason for the shape. Every phase defers its structural change, so Bridge-ASM700 has one
 safe moment to restructure, and it is the same moment it republishes the spans - which is what lets
 a span be a snapshot. **Every phase, without exception**: `data.md`, *Structural change*.
 
 **A barrier after every phase, not once per frame.** So a spawn in `update` is visible in `present`,
-the same frame rather than the next one. It costs one republish per phase, each O(matched tables),
-and it is what makes ordering worth having.
+the same frame rather than the next one. It costs one barrier a phase, and a barrier costs what
+changed and nothing for what did not - `query.md`, *The interface is a query*. It is what makes
+ordering worth having.
 
 ### An observer runs at the barrier, one hop per barrier
 

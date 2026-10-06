@@ -90,6 +90,8 @@ watchdog increments only the engine of the call it was armed for.
 
 ## What it answers
 
-    sandbox, meter, deadline, limit, reload        yes to all five
+    sandbox, meter, deadline, limit, reload        yes
+    side by side                                   yes: two instances of a module at once
+    unload                                         no: its library stays in the process
 
 `capabilities.md`, *Capabilities, so the swap is honest*.

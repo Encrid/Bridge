@@ -1,6 +1,6 @@
 /* The host seam: the only header a host includes.
  * docs/seam/host-api/host-api.md is the contract. This is as much of it as exists so far:
- * everything but the profile, which arrives with what it measures. */
+ * everything but `validate` and the profile, which arrive with the diagnostics they switch on. */
 #ifndef BRIDGE_H
 #define BRIDGE_H
 

@@ -101,9 +101,12 @@ An author who accepts the loss unloads and loads. Same outcome, through a verb t
 the data goes - which is where the consent belongs, rather than in a boolean nobody can read at a
 call site.
 
-**Migration is not Bridge-ASM700's.** It cannot be: a fingerprint is a hash, so it detects difference and
-cannot describe it, and a converter the module supplied would have to read a component layout its new build
-does not contain.
+**Bridge-ASM700 does not migrate.** It was written here that it cannot, a fingerprint being a
+hash that detects a difference and cannot describe it. That is no longer so: it keeps the fields
+of every type by name, and is handed the new descriptor, so it has both component layouts. Whether
+it should move rows from one to the other at a reload - a field added, removed, renamed - is an
+open question: `STAGE10.md`, *The repair*. A converter the module supplied is still not possible:
+it would have to read a component layout its new build does not contain.
 
 The ECS already offers migration in its own terms. **Declare a new name**: run a system that reads
 `game:Position` and writes `game:Position2`, then stop declaring the old one. Two components, both

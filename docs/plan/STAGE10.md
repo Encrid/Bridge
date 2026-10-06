@@ -383,7 +383,7 @@ every other key.
 caught as unset the way every other key is. It meant info before and means emergencies only now.
 
 **Open: a test that a barrier allocates nothing.** It holds by reading: `src/storage.c` calls no
-allocator outside `rows_create`. Nothing checks it.
+allocator outside `storage_create`. Nothing checks it.
 
 **Open: an allocation that fails at load.** Older than this stage and found in it: of the
 library's allocations when a module loads, one checks what it was given.
@@ -466,7 +466,12 @@ at least five things, none defined, and none of them the one that was meant.
 
 **2. Statements that are false now**: one commit, no decision.
 
-    open    "at every barrier", "compacted or migrated", "archetype order", and the rest
+    closed  twenty-five of them, in fifteen documents and one header: "at every barrier",
+            "compacted or migrated", a check that is gone, five capabilities where there
+            are seven, three citations of the wrong section, "it cannot" where it can.
+            Three were counted before they were touched: seventeen backend entries and
+            fifteen C library functions are right; `<stdbit.h>` is on none of the four
+            targets with this compiler, where three was written
 
 **3. Decided without the steps, or inherited**: one at a time.
 

@@ -164,7 +164,7 @@ nobody reads is a typo nobody would find, the argument `config.md`, *A module's 
 component*, makes for a module's. Neither backend built so far has a setting, so each refuses any.
 
 **A backend's `settings` are its own** - the cache directory, the pooling limits -
-and Bridge-ASM700 passes them to `backend_create` unread: `backend.md`, *The backend owns its clock*.
+and Bridge-ASM700 passes them to `backend_create` unread: `backend.md`, *What a backend is asked for*.
 
 **A module's `settings` seed a component, and nothing more** - `config.md`, *A module's own
 settings are a component*, for why that means there is no call to reconfigure here.

@@ -13,8 +13,8 @@ The two directions are not symmetric, and the asymmetry is the design rather tha
 So **a signature is declared going in and verified coming out.** `define_func` carries one:
 
     typedef struct {
-        const uint8_t *params;  uint32_t param_count;   /* I32 | I64 */
-        const uint8_t *results; uint32_t result_count;
+        const enum backend_type *params;  uint32_t param_count;   /* I32 | I64 */
+        const enum backend_type *results; uint32_t result_count;
     } backend_sig;
 
 **A function Bridge-ASM700 provides answers a status beside its results.** Non-zero says the call
