@@ -511,10 +511,13 @@ at least five things, none defined, and none of them the one that was meant.
     closed  a signature the native backend cannot check: the backend checks, since it is
             who can see an export. `instance_func` answers a function or refuses, and
             the arity, the count of results and the -1 left the seam. `signatures.md`
-    open    a memory handle kept for a backend that does not exist
+    open    a memory handle kept for a backend that does not exist: kept, for the moment.
+            Removing it was recommended on one need, minimal, and it loses on three of
+            the six. To be weighed again with every decision here, against every need
     open    why an enum is four bytes
     open    a reload counting both instances toward [budget] systems
-    open    numbers with no reason: the grain, the doubling, the first four rows, two arguments
+    open    numbers with no reason: the grain, the doubling, the first four rows, two arguments,
+            and 65,536, a wasm page, to which the library rounds every block it makes
     open    "change a layout, bump the version", before anything is released
 
 **4. Refusals with no condition**: each with its subject above, and the rest in one pass.
