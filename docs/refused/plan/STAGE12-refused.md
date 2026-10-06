@@ -104,3 +104,13 @@ must both know which `.c` is a piece. No condition brings it back.
 Refused: an exception to rule O3 for the files a barrier runs through. The least work, and the
 same speed. The rule would then not hold where the code is hardest to read. The condition that
 brings it back is a line that stays slower after the cut and cannot be explained.
+
+## The test programs
+
+Of `STAGE12.md`, *The test programs*.
+
+Refused: one program holding every case in one table. One `main` and one fixture. Every change
+then links every case, the cases `build.py` lists are all renamed, and the programs that need a
+process of their own, the one that counts allocations and the one linked statically, stay apart
+anyway, which makes two kinds. The condition that brings it back is link time of the test
+programs becoming what a change waits for.

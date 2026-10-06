@@ -278,3 +278,23 @@ stage, and a slower line stops it.
     extensible    a test or a backend can include one header of it
     minimal       the build does not change
     explicit      where a function is says how often it runs
+
+### The test programs
+
+Six programs each had one `main` that was a chain of `if` and `else if` on its argument, of 11
+to 73 arms and 91 to 742 lines. The arms shared what `main` had built, `sink`, `load`, `frames`
+and the two that describe an artifact were written again in four to six programs, and what a
+sink counted was in variables of the file, which rule G4 does not allow.
+
+**A case is a function, and a program is a table of them.** `main` builds a fixture, finds the
+name in a constant table and calls. The fixture holds what `main` built and what the sink
+counts, and it is what the sink is handed. **A program is a directory**, `tests/stage5/`, with
+its cases five a file, and what the programs share is `tests/support/`, compiled once. The
+cases `build.py` lists and every transcript stay as they are.
+
+    fast          the same
+    scalable      a new case is a function and a row
+    modular       a stage's cases stay together, and what is shared is in one place
+    extensible    a new program is a directory
+    minimal       nothing of `build.py`'s cases changes
+    explicit      the table says every case a program has
