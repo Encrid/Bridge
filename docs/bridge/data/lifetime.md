@@ -94,7 +94,7 @@ other module's data; migrating leaves it reading new bytes with old code.
 
 **It is a choice, and a host has a way through it with the calls it has.** Unload every other
 module that declares the type: the component stays, since one module still declares it. Reload
-that one, which is now the only declarer, so its rows are moved - *Exclusive*, below. Then load
+that one, which is now the only declarer, so its rows are moved, as the next paragraph has it. Then load
 the others, built against the new struct. The component's rows are kept throughout; what is lost
 is whatever else the unloaded modules held, as at any unload. The refusal lists the modules to
 unload, so nobody has to find them.
