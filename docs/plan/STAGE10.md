@@ -493,7 +493,9 @@ at least five things, none defined, and none of them the one that was meant.
             on purpose, a seam's header being whole alone, and identical now. The library
             asserts the two shapes equal where it copies one to the other
     open    `terms` in a module's header, which is not [budget] terms
-    open    three events, now that an observer is told the net change
+    closed  three events, now that an observer is told the net change: three still, named
+            for what they are. BRIDGE_ON_ENTER and BRIDGE_ON_LEAVE are about the
+            observer's terms, BRIDGE_ON_ATTACH about the entry. `data.md`, *Observers*
     open    BRIDGE_NO_LIMIT and BRIDGE_NONE, one value
     open    the reserved fields, and the widths of the enums
     open    a signature the native backend cannot check

@@ -361,7 +361,7 @@ int main(int argc, char **argv)
         a = wasm("game:nested@0.1.0", what);
         load(b, &a);
         frames(b, 1);
-    } else if (!strcmp(what, "events")) {       /* add and set, then set, then remove */
+    } else if (!strcmp(what, "events")) {       /* enter and attach, then attach, then leave */
         a = wasm("game:events@0.1.0", "events");
         load(b, &a);
         frames(b, 3);

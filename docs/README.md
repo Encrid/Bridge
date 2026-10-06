@@ -173,7 +173,8 @@ where two things could be meant the qualified form is the only form.
     term              one component a query asks for, and how
     slot              the number `declare`, `system` or `observe` answers a module. A position
                       in an array is a "place"
-    event             what an observer is told of an entity: add, set, remove
+    event             what an observer is told of an entity against its terms: enter, leave,
+                      attach. `data.md`, *Observers*
     signal            something a module tells the others, sent as an entity that carries a
                       component for it. Not an "event"
 

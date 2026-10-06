@@ -295,7 +295,7 @@ BRIDGE_NATIVE(look_b)
 
 /* ---- what an observer hears: who, and how ---- */
 
-static uint32_t on_a, on_b, on_both;
+static uint32_t on_a, on_b, on_both, on_alone;
 
 static int heard(const bridge_api *api, const char *what, uint32_t observer)
 {
@@ -308,6 +308,7 @@ static int heard(const bridge_api *api, const char *what, uint32_t observer)
 BRIDGE_NATIVE(heard_a) { return heard(api, "A: who, events", on_a); }
 BRIDGE_NATIVE(heard_b) { return heard(api, "B: who, events", on_b); }
 BRIDGE_NATIVE(heard_both) { return heard(api, "A and B: who, events", on_both); }
+BRIDGE_NATIVE(heard_alone) { return heard(api, "A and not B: who, events", on_alone); }
 #endif
 
 BRIDGE_NATIVE(init)
@@ -357,14 +358,18 @@ BRIDGE_NATIVE(init)
     two[1].oper = BRIDGE_OPTIONAL;
     maybe_b = BRIDGE_NATIVE_SYSTEM(api, "look_maybe", "never", two, 2);
     on_a = BRIDGE_NATIVE_OBSERVER(api, "heard_a",
-        BRIDGE_ON_ADD | BRIDGE_ON_SET | BRIDGE_ON_REMOVE, one, 1);
+        BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, one, 1);
     one[0].slot = b;
     with_b = BRIDGE_NATIVE_SYSTEM(api, "look_b", "look_b", one, 1);
     on_b = BRIDGE_NATIVE_OBSERVER(api, "heard_b",
-        BRIDGE_ON_ADD | BRIDGE_ON_SET | BRIDGE_ON_REMOVE, one, 1);
+        BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, one, 1);
     two[1].oper = BRIDGE_AND;
     on_both = BRIDGE_NATIVE_OBSERVER(api, "heard_both",
-        BRIDGE_ON_ADD | BRIDGE_ON_SET | BRIDGE_ON_REMOVE, two, 2);
+        BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, two, 2);
+    /* an event is about the terms and not about the change: this one enters at a detach */
+    two[1].oper = BRIDGE_NOT;
+    on_alone = BRIDGE_NATIVE_OBSERVER(api, "heard_alone",
+        BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, two, 2);
 #endif
     return 0;
 }

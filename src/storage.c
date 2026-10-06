@@ -433,13 +433,13 @@ static void told(const storage *r, uint64_t id, const uint64_t *before, const ui
         const storage_terms *o = r->observers[i];
         /* an entity that carries nothing is in no table, and matches nothing */
         bool was = before && !empty(r, before) && matches(o, before);
-        bool is = after && !empty(r, after) && matches(o, after), set = false;
+        bool is = after && !empty(r, after) && matches(o, after), given = false;
         uint32_t owed;
         if (!was && !is) continue;
         for (uint32_t k = 0; attached && k < o->count; k ++) {
-            set |= o->oper[k] != BRIDGE_NOT && has(attached, o->type[k]);
+            given |= o->oper[k] != BRIDGE_NOT && has(attached, o->type[k]);
         }
-        owed = !is ? BRIDGE_ON_REMOVE : (was ? 0 : BRIDGE_ON_ADD) | (set ? BRIDGE_ON_SET : 0);
+        owed = !is ? BRIDGE_ON_LEAVE : (was ? 0 : BRIDGE_ON_ENTER) | (given ? BRIDGE_ON_ATTACH : 0);
         owed &= o->events;
         if (owed) o->heard(o->ctx, id, (enum bridge_event)owed);
     }

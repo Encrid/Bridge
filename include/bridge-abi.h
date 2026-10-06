@@ -45,8 +45,11 @@ static_assert(sizeof(bridge_term) == 8 && alignof(bridge_term) == 4);
 static_assert(offsetof(bridge_term, slot) == 0 && offsetof(bridge_term, access) == 4);
 static_assert(offsetof(bridge_term, oper) == 5 && offsetof(bridge_term, reserved) == 6);
 
-/* observe's events, as a mask of these, and what an observer reads: who triggered it, and how. */
-enum bridge_event : uint32_t { BRIDGE_ON_ADD = 1, BRIDGE_ON_SET = 2, BRIDGE_ON_REMOVE = 4 };
+/* observe's events, as a mask of these, and what an observer reads: who triggered it, and how.
+ * Each is what a barrier made of an entity, against the observer's terms. ENTER: it did not
+ * match them and now does. LEAVE: it matched and no longer does, or was destroyed. ATTACH: it
+ * matches, and an attach of one of them was applied. A write in place raises none. */
+enum bridge_event : uint32_t { BRIDGE_ON_ENTER = 1, BRIDGE_ON_ATTACH = 2, BRIDGE_ON_LEAVE = 4 };
 
 typedef struct {
     uint64_t          id;

@@ -6,6 +6,12 @@ attach_a
   heard_a: A: who, events 3 3
   heard_a: A: who, events 4 3
   heard_a: A: who, events 5 3
+  heard_alone: A and not B: who, events 0 3
+  heard_alone: A and not B: who, events 1 3
+  heard_alone: A and not B: who, events 2 3
+  heard_alone: A and not B: who, events 3 3
+  heard_alone: A and not B: who, events 4 3
+  heard_alone: A and not B: who, events 5 3
 look
   look: with A: spans, rows 1 6
   look: first A 0 0
@@ -14,6 +20,7 @@ look
   look: of them with B: rows 0 0
 value_a
   heard_a: A: who, events 0 2
+  heard_alone: A and not B: who, events 0 2
 look
   look: with A: spans, rows 1 6
   look: first A 41 0
@@ -27,6 +34,9 @@ attach_b_half
   heard_both: A and B: who, events 0 3
   heard_both: A and B: who, events 1 3
   heard_both: A and B: who, events 2 3
+  heard_alone: A and not B: who, events 0 4
+  heard_alone: A and not B: who, events 1 4
+  heard_alone: A and not B: who, events 2 4
 look
   look: with A: spans, rows 2 6
   look: first A 0 0
@@ -43,6 +53,9 @@ attach_a
   heard_both: A and B: who, events 0 2
   heard_both: A and B: who, events 1 2
   heard_both: A and B: who, events 2 2
+  heard_alone: A and not B: who, events 3 2
+  heard_alone: A and not B: who, events 4 2
+  heard_alone: A and not B: who, events 5 2
 detach_b_absent
 flicker
   heard_a: A: who, events 0 2
@@ -60,6 +73,9 @@ detach_b_half
   heard_both: A and B: who, events 0 4
   heard_both: A and B: who, events 1 4
   heard_both: A and B: who, events 2 4
+  heard_alone: A and not B: who, events 0 1
+  heard_alone: A and not B: who, events 1 1
+  heard_alone: A and not B: who, events 2 1
 look
   look: with A: spans, rows 1 6
   look: first A 0 0
@@ -70,6 +86,9 @@ destroy_half
   heard_a: A: who, events 3 4
   heard_a: A: who, events 4 4
   heard_a: A: who, events 5 4
+  heard_alone: A and not B: who, events 3 4
+  heard_alone: A and not B: who, events 4 4
+  heard_alone: A and not B: who, events 5 4
 look
   look: with A: spans, rows 1 3
   look: first A 0 0
@@ -104,6 +123,9 @@ attach_a_half
   heard_a: A: who, events 3 3
   heard_a: A: who, events 4 3
   heard_a: A: who, events 5 3
+  heard_alone: A and not B: who, events 3 3
+  heard_alone: A and not B: who, events 4 3
+  heard_alone: A and not B: who, events 5 3
 attach_b
   heard_b: B: who, events 0 3
   heard_b: B: who, events 1 3
@@ -117,6 +139,12 @@ attach_b
   heard_both: A and B: who, events 3 3
   heard_both: A and B: who, events 4 3
   heard_both: A and B: who, events 5 3
+  heard_alone: A and not B: who, events 0 4
+  heard_alone: A and not B: who, events 1 4
+  heard_alone: A and not B: who, events 2 4
+  heard_alone: A and not B: who, events 3 4
+  heard_alone: A and not B: who, events 4 4
+  heard_alone: A and not B: who, events 5 4
 look
   look: with A: spans, rows 1 6
   look: first A 0 0

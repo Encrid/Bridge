@@ -72,7 +72,8 @@ reload needs no flag to choose - `lifetime.md`, *Lifetime*.
 ## Observers
 
 A system runs every pass. An **observer** runs when what its terms describe changes for some
-entity, with `ON_ADD`, `ON_SET` and `ON_REMOVE` as the triggers.
+entity. There are three events, `ON_ENTER`, `ON_LEAVE` and `ON_ATTACH`, and an observer asks for
+some of them.
 
 It runs **at the barrier where the change applied**, which is why it takes no phase. Every
 structural change is deferred - `abi.md`, *The ABI* - so there is no change to hear of anywhere
@@ -84,24 +85,41 @@ barrier folds an entity's changes into what it will carry before it places it - 
 barrier is worked an entity at a time* - and an observer is owed the difference between what the
 entity carried before that barrier and what it carries after:
 
-    it did not match, and now does      add
-    it matched, and no longer does,     remove
+    it did not match, and now does      enter
+    it matched, and no longer does,     leave
     or was destroyed
-    it matches now, and an attach of    set, with the add if it has only now come to match
+    it matches now, and an attach of    attach, with the enter if it has only now come to match
     one of its terms is still on it
+
+**Enter and leave are about the observer's terms, and not about what was done to the entity.** An
+observer of "A and not B" hears an entity that carries A enter when B is detached from it, and
+leave when B is attached. **Attach is about the entry `attach`, and not about a value.** A system
+that writes a component in place, through its column, raises nothing: storage is not told of a
+write - *Access mode* - so there is nothing to raise it from. A module that wants a new value
+heard attaches it.
 
 So an observer of two terms hears an entity when it comes to carry both, by whichever attach
 completed the pair. An entity made and destroyed inside one phase, or given a component and
 stripped of it, is not heard at all: nothing of it is there to read. One that loses a component
-and is given it back in the same phase is heard as a set, since it carries a new value. One record
+and is given it back in the same phase is heard as an attach, since it carries a new value. One record
 an entity at a barrier, with the events that hold. A detach of what is not there, and any change
 to an id that is dead, is nothing. `tests/storage.c`, case `changes`, says each of these out loud.
 
 **Every event is about something the observer can read**, which is what running after the
 republish is for - `schedule.md`, *An observer runs at the barrier, one hop per barrier*.
 
+Refused: the names other ECS use, `ON_ADD`, `ON_SET` and `ON_REMOVE`, which is what these were
+called. In flecs each is a fact about one component: it was added, `ecs_set` was called, it was
+removed. Here each is a fact about an observer's terms, so an "add" could arrive at a detach, and
+a "set" never arrived for a value written in place. The condition that brings the names back is
+events that are raised for each component, as flecs raises them.
+
+Refused: two events, enter and leave, and no third. A module could then announce a new value only
+by a detach and an attach across two barriers. The condition that brings it back is that no module
+asks for `ON_ATTACH`.
+
 Refused: an event for every change as it was asked, which is what this did while flecs kept the
-rows and what storage of our own first copied. It told an observer of an add, a set and a remove
+rows and what storage of our own first copied. It told an observer of all three events
 at once, for an entity it could not then find, and it cost a second reading of every queue. It
 was never flecs' design either: when flecs folds an entity's queued commands itself it commits
 once, with the difference (`flecs.c:6262`), and what we had was the way we drove it, a call for

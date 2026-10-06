@@ -21,7 +21,7 @@ BRIDGE_EXPORT(init) int init()
     bridge_term terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
     marked = BRIDGE_COMPONENT("game:Marked", Marked, BRIDGE_STRIP);
     terms[0].slot = marked;
-    fixing = BRIDGE_OBSERVER("fix", BRIDGE_ON_ADD, terms, 1);
+    fixing = BRIDGE_OBSERVER("fix", BRIDGE_ON_ENTER, terms, 1);
     return 0;
 }
 

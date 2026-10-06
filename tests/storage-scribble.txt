@@ -6,11 +6,20 @@ attach_a
   heard_a: A: who, events 3 3
   heard_a: A: who, events 4 3
   heard_a: A: who, events 5 3
+  heard_alone: A and not B: who, events 0 3
+  heard_alone: A and not B: who, events 1 3
+  heard_alone: A and not B: who, events 2 3
+  heard_alone: A and not B: who, events 3 3
+  heard_alone: A and not B: who, events 4 3
+  heard_alone: A and not B: who, events 5 3
 scribble
 destroy_half
   heard_a: A: who, events 3 4
   heard_a: A: who, events 4 4
   heard_a: A: who, events 5 4
+  heard_alone: A and not B: who, events 3 4
+  heard_alone: A and not B: who, events 4 4
+  heard_alone: A and not B: who, events 5 4
 look
   look: with A: spans, rows 1 3
   look: first A 0 0
@@ -24,6 +33,9 @@ attach_b_half
   heard_both: A and B: who, events 0 3
   heard_both: A and B: who, events 1 3
   heard_both: A and B: who, events 2 3
+  heard_alone: A and not B: who, events 0 4
+  heard_alone: A and not B: who, events 1 4
+  heard_alone: A and not B: who, events 2 4
 look
   look: with A: spans, rows 1 3
   look: first A 0 0

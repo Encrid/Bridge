@@ -52,11 +52,11 @@ BRIDGE_EXPORT(init) int init()
     c = BRIDGE_COMPONENT("game:LinkC", Link, BRIDGE_STRIP);
     BRIDGE_SYSTEM("start", "update", &none, 0);
     terms[0].slot = a;
-    on_a = BRIDGE_OBSERVER("got_a", BRIDGE_ON_ADD, terms, 1);
+    on_a = BRIDGE_OBSERVER("got_a", BRIDGE_ON_ENTER, terms, 1);
     terms[0].slot = b;
-    on_b = BRIDGE_OBSERVER("got_b", BRIDGE_ON_ADD, terms, 1);
+    on_b = BRIDGE_OBSERVER("got_b", BRIDGE_ON_ENTER, terms, 1);
     terms[0].slot = c;
-    on_c = BRIDGE_OBSERVER("got_c", BRIDGE_ON_ADD, terms, 1);
+    on_c = BRIDGE_OBSERVER("got_c", BRIDGE_ON_ENTER, terms, 1);
     entity = bridge_spawn();
     return 0;
 }

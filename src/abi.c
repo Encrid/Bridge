@@ -325,7 +325,7 @@ static int abi_observe(void *ud, const uint64_t *a, uint64_t *r)
 {
     module *m = ud;
     if (!m->in_init) return refuse(m, "observe is called outside init");
-    if (!a[2] || a[2] & ~(uint64_t)(BRIDGE_ON_ADD | BRIDGE_ON_SET | BRIDGE_ON_REMOVE)) {
+    if (!a[2] || a[2] & ~(uint64_t)(BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE)) {
         return refuse(m, "observe: its events are unset, or name one there is not");
     }
     return subscribe(m, a[0], a[1], m->b->phase_count, (uint32_t)a[2], a[3], a[4], r);
