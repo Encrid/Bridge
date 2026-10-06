@@ -53,3 +53,18 @@ Of `STAGE12.md`, *A line of the log*.
 Refused: one number a line where there are two. The native SDK's function is still over four,
 and the layout of a record in the ring changes for it. The condition that brings it back is
 that no line anywhere uses the second number.
+
+## attach, which runs in a phase
+
+Of `STAGE12.md`, *attach, which runs in a phase*.
+
+Refused: `len` kept, and the id and the slot passed as one struct by its offset. It is a write
+in the module and a checked read in the library at every attach. The condition that brings it
+back is a component whose size is not known at `declare`.
+
+Refused: the table of a native module found by the thread, so that no entry is handed it. Stage
+7 removed exactly that - `build.md`, *The standard*. No condition brings it back.
+
+Refused: an exception in `STYLE.md` for the native entry and its SDK function. The length it
+would keep states what the declaration states. The condition that brings it back is the line
+of `detach` not being explained and not being undone.

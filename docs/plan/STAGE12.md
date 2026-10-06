@@ -178,3 +178,40 @@ and the compiler sees the struct made and read in one place.
     extensible    not an entry: another language writes the record itself, as before
     minimal       one struct
     explicit      what a line holds is named, where it was the third to fifth arguments
+
+### attach, which runs in a phase
+
+The wasm entry took four arguments, `attach(id, slot, ptr, len)`, and the native one five, since
+a native entry is handed its table first. `len` did two things: zero asked for a zeroed value,
+and anything else had to be the declared size or the attach was refused. The library knows the
+size, and `declare` already refuses a declarer whose size differs.
+
+**`attach` loses `len`.** `attach(id, slot, ptr)`: the library reads the declared size at `ptr`,
+checked against the scratch arena as before, and a zeroed value is asked for by name, with
+`BRIDGE_ZEROED` as `ptr`. The SDK copies the value above what the scratch arena has in use and
+does not count it as used, since the library takes its copy during the call: what it saved
+before the call and put back after is no longer written.
+
+Measured before it was decided, in a worktree, on the native path, three runs of each tree in
+turn, in ns:
+
+                                            before          without len
+    attach, first component: the call       9.5 to 10.2     9.6 to 10.3
+    attach, first component: the barrier    26.6 to 27.6    26.3 to 26.5
+    attach, a second: the barrier           29.6 to 30.6    29.1 to 29.2
+    attach of 4 bytes, the whole            30.3 to 30.4    29.3 to 29.9
+    a sparse set given: the call            10.4 to 10.7    10.3 to 10.5
+    direct-indexed given: the call          10.4 to 10.7    10.0 to 10.6
+    detach: the call                        7.7 to 8.1      8.4 to 8.8
+
+It buys the rule and one refusal fewer, and no speed: the two stores saved do not show. The
+call of `detach` was slower in all six runs though nothing of it was changed, which points at
+where its code was placed and was not confirmed. The commit that builds this explains that line
+or undoes it.
+
+    fast          the same on attach; detach to be held at the commit
+    scalable      the same
+    modular       a size has one owner, the declaration
+    extensible    another language passes three values
+    minimal       code is removed on both sides
+    explicit      a zeroed value is asked for by a name, where it was a length of zero
