@@ -1,7 +1,7 @@
 #ifndef BRIDGE_SRC_BACKEND_H
 #define BRIDGE_SRC_BACKEND_H
 
-#include "bridge-backend.h"
+#include "bridge_backend.h"
 
 /* Open a backend library and find its seventeen entries by name. Returns the library, or nullptr
  * with `why` saying which name was missing or that the library would not open. */

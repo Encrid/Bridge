@@ -9,7 +9,7 @@
  *
  * Built several times, each under its own namespace, so that they run at once.
  * docs/plan/STAGE10.md. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 BRIDGE_SCHEMA_STRUCT(V, { uint32_t v; });
 

@@ -3,7 +3,7 @@
  *
  * Ten entities carry Position and Private; five carry Private alone. Its shutdown destroys the
  * first of the ten: what a shutdown asks for is applied. docs/bridge/data/lifetime.md. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 #include "../roster.h"
 
 static uint32_t position, private_, roster;

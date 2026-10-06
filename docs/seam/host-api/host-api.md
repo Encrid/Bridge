@@ -8,7 +8,7 @@ The surface any host links against. What Bridge-ASM700 requires of the values a 
 The arrangement is idTech3's: the engine is `qcommon/`, and `win32/win_main.c:1212` calls `Com_Init`
 then loops on `Com_Frame`.
 
-This is the third seam. `module.md` and `bridge-abi.h` are Bridge-ASM700 to modules, with each
+This is the third seam. `module.md` and `bridge_abi.h` are Bridge-ASM700 to modules, with each
 backend's SDK beside that backend - `README.md`, *Three layers, three seams*;
 `backend.md` is Bridge-ASM700 to a backend; this is **host to Bridge-ASM700**. Everything in this
 folder is `bridge.h`, which is the only header a host includes - one per seam, `README.md`, *Three
@@ -37,7 +37,7 @@ one of its cases again.
 language is written against numbers and checked by them. `bridge.h` asserts the size of each
 struct and the offset of every member, and leaves no padding to a compiler: a gap is a member
 named `pad`, numbered where a struct has several, written as zero and never read. It is the rule
-`bridge-abi.h` has for what a module reads - `wasm.md`, *The ABI layouts* - and `bridge-backend.h`
+`bridge_abi.h` has for what a module reads - `wasm.md`, *The ABI layouts* - and `bridge_backend.h`
 has it too, for a backend that is not in C. A pointer and a `size_t` are eight bytes: no build of
 the library exists for any other. A host in C writes these structs by member name, and never
 sees a `pad`.

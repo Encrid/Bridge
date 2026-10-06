@@ -3,7 +3,7 @@
 #define BRIDGE_INSIDE_H
 
 #include "bridge.h"
-#include "bridge-abi.h"
+#include "bridge_abi.h"
 #include "backend.h"
 #include "os.h"
 #include "storage.h"

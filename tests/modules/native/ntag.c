@@ -9,7 +9,7 @@
  *     look         what a module is handed for each
  *
  * BAD is a system that hands a tag a value, and fails for it. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });
 

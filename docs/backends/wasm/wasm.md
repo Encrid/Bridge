@@ -44,7 +44,7 @@ there is no WASI alongside and nothing to disambiguate from. The memories are fi
 `shared` and `private`, because the memory layout and the function semantics are one contract:
 change how a span is laid out and `declare`'s meaning changes with it.
 
-`bridge-wasm.h` declares the imports, so declaration is static before it is dynamic: `declare` at
+`bridge_wasm.h` declares the imports, so declaration is static before it is dynamic: `declare` at
 init discovers nothing, it binds names to what the binary already expects.
 
 ### A compiled module reaches them through accessors
@@ -54,14 +54,14 @@ C has the syntax for it, but LLVM's WebAssembly backend - which C, C++, Rust and
 only carries a feature flag for multiple memories: a pointer always means the module's own.
 
 So the accessors - `schema.md`, *What a module compiles against* - are a small module in wasm's
-text format, `bridge-wasm.wat`, where a load names its memory directly. The module build merges it
+text format, `bridge_wasm.wat`, where a load names its memory directly. The module build merges it
 into the compiled module and inlines it, with Binaryen's `wasm-merge` and `wasm-opt`. What comes out
 has plain loads and stores on the shared memory in the loop and no call left: checked on a C loop
 before this was written down.
 
 **A module is compiled with `BRIDGE_ROWS_CHECKED` or with `BRIDGE_ROWS_UNCHECKED`.** The file holds
 the accessor that finds a row twice, with and without the test that the row is one of the span's,
-and `bridge-wasm.h` takes the one stated and refuses to compile with neither. What the test is
+and `bridge_wasm.h` takes the one stated and refuses to compile with neither. What the test is
 for and what it costs is `validation.md`, *The row test*.
 
 **The build then strips them.** The merge leaves every accessor exported, so the build removes the
@@ -143,7 +143,7 @@ every argument that is not an id is: `kind`, `on_unload`, `storage`, `events`. O
 of a struct is one byte, which holds every value these have: a term's access and operator, a log
 record's level.
 
-**One header, `bridge-abi.h`, compiled by Bridge-ASM700 and by every module, on either backend.** Nothing
+**One header, `bridge_abi.h`, compiled by Bridge-ASM700 and by every module, on either backend.** Nothing
 re-derives anything, so there is nothing to disagree about - the same argument that made the schema
 a header rather than a format. idTech3 did this with `g_public.h`, and its enforcement was a comment
 in capitals: *"DO NOT MODIFY ANYTHING ABOVE THIS, THE SERVER EXPECTS THE FIELDS IN THAT ORDER!"*.
@@ -160,14 +160,14 @@ provide - `README.md`, *Three layers, three seams*. `PLAN.md`, stage 15.
 
 **The native backend's `bridge_api_t` is not in it.** A struct of C function pointers has nothing a
 wasm module could derive, since it gets imports rather than pointers. It lives in
-`bridge-native.h`, which only a native module and the native backend compile - `native.md`, *What
+`bridge_native.h`, which only a native module and the native backend compile - `native.md`, *What
 the backend provides*.
 
 ### It holds no content
 
 This is where we part from idTech3. Its `g_public.h` declares `entityState_t` - origin, angles,
 modelindex, solid - and asks the game to begin its own struct with that prefix, because idTech3 is a
-game engine and knows what an entity is. **Bridge-ASM700 orchestrates and knows nothing.** `bridge-abi.h`
+game engine and knows what an entity is. **Bridge-ASM700 orchestrates and knows nothing.** `bridge_abi.h`
 says how to find data and never what data there is: no component, no field, and no prefix a module
 must start its struct with.
 

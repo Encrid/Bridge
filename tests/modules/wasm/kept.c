@@ -1,6 +1,6 @@
 /* Declares game:Position as the mover does, and states a storage layout for it that is unset,
  * or one that is no storage layout. storage.md, *Storage layouts*. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 #include "../game.h"
 
 BRIDGE_EXPORT(init) int init()

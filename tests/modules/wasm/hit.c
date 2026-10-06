@@ -1,6 +1,6 @@
 /* A component kept in a sparse set, on the wasm backend: walked alone, and reached from the
  * rows of a table. docs/bridge/storage.md, *A sparse set*. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 #include "../game.h"
 
 BRIDGE_SCHEMA_STRUCT(Hit, { uint32_t by; });

@@ -6,7 +6,7 @@
  * many entities and no observer, for what it costs. TABLES: ten thousand tables. And BIG again
  * with A made larger, FAT64 to FAT4K.
  * docs/plan/STAGE10.md. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 /* A is as big as the build says: for what a change costs an entity that carries more. The
  * length is written out each time, since a descriptor is the text as it was typed. */

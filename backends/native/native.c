@@ -1,8 +1,8 @@
-/* The native backend: the seventeen entries of bridge-backend.h, over a shared library.
+/* The native backend: the seventeen entries of bridge_backend.h, over a shared library.
  * docs/backends/native/native.md is its SDK; docs/seam/backend/capabilities.md is what this
  * backend truthfully cannot do. */
-#include "bridge-backend.h"
-#include "bridge-native.h"
+#include "bridge_backend.h"
+#include "bridge_native.h"
 #include "os.h"
 
 #include <stdio.h>
@@ -239,7 +239,7 @@ BACKEND_EXPORT void instance_set_timeout(
 BACKEND_EXPORT void instance_set_memory_limit(
     [[maybe_unused]] backend_instance_t *i, [[maybe_unused]] uint64_t bytes) { }
 
-/* The signature is the one bridge-native.h already declares, so only the pointer is kept. */
+/* The signature is the one bridge_native.h already declares, so only the pointer is kept. */
 BACKEND_EXPORT int define_func(backend_instance_t *i, const char *ns, const char *field,
                                backend_fn_t fn, void *ud, [[maybe_unused]] const backend_sig_t *sig,
                                backend_err_t *err)

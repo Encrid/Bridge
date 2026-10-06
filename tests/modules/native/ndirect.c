@@ -17,7 +17,7 @@
  *
  * BIG is 204,800 entities and no observer, for a measurement. BAD is a system the load is
  * refused for: it selects by D. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });
 BRIDGE_SCHEMA_STRUCT(D, { uint32_t v; });

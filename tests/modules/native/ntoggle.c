@@ -13,7 +13,7 @@
  *     value_a          a value for one that is off: it stays off
  *
  * BIG is 204,800 entities with one in ON of them on, in no order, for a measurement. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });
 BRIDGE_SCHEMA_STRUCT(B, { uint32_t v; });

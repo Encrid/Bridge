@@ -19,7 +19,7 @@
  *
  *     spawn    three entities with X: a 1000.., b 20.., arr 1 2 3 4 and up, at 5 6 and up, On
  *     look     every field this build has, summed over the values there are */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 #if V == 9
 BRIDGE_SCHEMA_ENUM(Mode, int8_t, { Off, Auto, On });

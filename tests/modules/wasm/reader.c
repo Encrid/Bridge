@@ -1,5 +1,5 @@
 /* Reads game:Position under a grant, over the marked entities only, and says what it saw. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 #include "../game.h"
 
 static uint32_t position, marked, summing;

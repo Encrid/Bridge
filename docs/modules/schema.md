@@ -4,7 +4,7 @@ What was weighed here and refused is `schema-refused.md`, *What was refused: Sch
 
 ## There is no schema format
 
-The schema is a C header, written with three macros of `bridge-schema.h`:
+The schema is a C header, written with three macros of `bridge_schema.h`:
 
     BRIDGE_SCHEMA_STRUCT(Position, { float x; float y; })
 
@@ -18,7 +18,7 @@ The module's compiler lays the struct out; the string is handed over at `declare
 `BRIDGE_SCHEMA_ENUM` and `BRIDGE_SCHEMA_BITMASK` do the same for the other two kinds.
 
 **The three macros are Bridge-ASM700's, and are written once.** The descriptor is a text
-Bridge-ASM700 parses, so how it is spelled in C is the library's to state, in `bridge-schema.h`,
+Bridge-ASM700 parses, so how it is spelled in C is the library's to state, in `bridge_schema.h`,
 which each backend's SDK includes. A schema header is included by modules of either backend,
 and has to mean one thing in both. What is a backend's is how a module reaches a component once
 it is declared; what a type is, is not.
@@ -36,7 +36,7 @@ to is refused with both.
 
 **None of that crosses.** A module is held to three numbers: size, alignment, and a hash of that
 string and its type kind. The field table stays on Bridge-ASM700's side. No field name is in
-`bridge-abi.h` and none reaches a module: `wasm.md`, *It holds no content*.
+`bridge_abi.h` and none reaches a module: `wasm.md`, *It holds no content*.
 
 ## Why a header and not a format
 
@@ -96,7 +96,7 @@ are declared, so each has a fingerprint of its own, checked where it is declared
 against an older `Vec3` is refused at `Vec3`, before `Body`.
 
 **One type is given and not declared: `bridge_text_t`**, the `(offset, length)` pair of
-`strings.md`, *Variable length*. It is an ABI layout of `bridge-abi.h` and a field may be of it under any
+`strings.md`, *Variable length*. It is an ABI layout of `bridge_abi.h` and a field may be of it under any
 namespace. It exists so that text can be told from two integers: by a deployment's settings -
 `config.md`, *A module's own settings are a component* - and by an unload, which gives a module's
 share of the arena back only if no `bridge_text_t` left in any row lies in it - `strings.md`, *It is
@@ -136,8 +136,8 @@ component model needed a type system.
 
 ## What a module compiles against
 
-Two files, and **nothing is generated**. `bridge-wasm.h` holds the imports, the `BRIDGE_SCHEMA_STRUCT` shim
-above, and the span, the header and the log ring read through accessors. `bridge-wasm.wat` holds
+Two files, and **nothing is generated**. `bridge_wasm.h` holds the imports, the `BRIDGE_SCHEMA_STRUCT` shim
+above, and the span, the header and the log ring read through accessors. `bridge_wasm.wat` holds
 the accessors themselves: a load or a store per width, and the row address carrying the
 `row < count` test - **always, with no switch to remove it**: `validation.md`, *Always on*. They are
 wasm text merged into the compiled module, because no C compiler can address the shared memory
@@ -149,7 +149,7 @@ picks the load by the field's type, `offsetof` and `sizeof` supply the rest. So 
 a macro over the struct the schema header already declares, and a second description of that struct
 for a tool to read would be the format *Why a header and not a format* refuses.
 
-The ABI layouts are not here either. Those are `bridge-abi.h`: `wasm.md`, *The ABI
+The ABI layouts are not here either. Those are `bridge_abi.h`: `wasm.md`, *The ABI
 layouts*.
 
 ## Not WIT

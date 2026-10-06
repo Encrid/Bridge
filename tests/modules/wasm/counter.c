@@ -1,6 +1,6 @@
 /* Counts the rows of the shared component, and how many of the roster's ids are still alive:
  * what an unload left behind, seen by a module that stayed. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 #include "../roster.h"
 
 static uint32_t position, roster, positions, rosters;

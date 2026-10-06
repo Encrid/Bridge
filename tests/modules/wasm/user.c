@@ -1,6 +1,6 @@
 /* Declares a component with a field of a type another module declared, and does not declare
  * that type itself. The type must outlive its declarer for as long as this is loaded. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 
 typedef struct Vec2 { float x; float y; } Vec2;
 BRIDGE_SCHEMA_STRUCT(Body, { Vec2 at; float mass; });

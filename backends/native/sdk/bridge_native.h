@@ -1,12 +1,12 @@
-/* What a native module compiles against, beside bridge-abi.h: the table its backend hands it,
+/* What a native module compiles against, beside bridge_abi.h: the table its backend hands it,
  * and the same ABI layouts read through real pointers. docs/backends/native/native.md.
  *
  * Only a native module and the native backend compile this header. */
 #ifndef BRIDGE_NATIVE_H
 #define BRIDGE_NATIVE_H
 
-#include "bridge-abi.h"
-#include "bridge-schema.h"       /* how a type is stated: the same on every backend */
+#include "bridge_abi.h"
+#include "bridge_schema.h"       /* how a type is stated: the same on every backend */
 #include <stddef.h>
 #include <string.h>
 

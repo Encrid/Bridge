@@ -102,7 +102,7 @@ field it fits, a float into a float. Text has three places to go, and the field'
 
     char name[N]      the bytes, inline, and a zero after them. text that does not fit is refused
     bridge_text_t       `(offset, length)` into the persistent arena - `strings.md`, *Variable
-                      length*. the pair is an ABI layout `bridge-abi.h` gives, usable as a field's type
+                      length*. the pair is an ABI layout `bridge_abi.h` gives, usable as a field's type
     an enum           the constant of that name
 
 That is `strings.md`'s own split, bounded text in the column and unbounded text in the arena, left

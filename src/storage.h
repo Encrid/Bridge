@@ -9,7 +9,7 @@
 #ifndef BRIDGE_STORAGE_H
 #define BRIDGE_STORAGE_H
 
-#include "bridge-abi.h"
+#include "bridge_abi.h"
 
 typedef struct bridge bridge_t;
 typedef struct module module_t;

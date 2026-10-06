@@ -1,7 +1,7 @@
 /* A system that fails FAILS passes out of every OF. Built four ways: always, one in three,
  * two in three, and always beside a system of the next phase that never fails -
  * docs/bridge/run/failure.md, *The budget*. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 
 static uint32_t passes;
 

@@ -1,5 +1,5 @@
 /* Spawns until the entity ceiling, and past it. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 
 BRIDGE_EXPORT(flood) int flood()
 {

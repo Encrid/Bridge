@@ -1,6 +1,6 @@
-/* The wasm backend: the seventeen entries of bridge-backend.h, over wasmtime.
+/* The wasm backend: the seventeen entries of bridge_backend.h, over wasmtime.
  * docs/backends/wasm/wasmtime.md is why it is shaped this way. */
-#include "bridge-backend.h"
+#include "bridge_backend.h"
 #include "os.h"
 
 #include <wasm.h>

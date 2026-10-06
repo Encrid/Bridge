@@ -1,5 +1,5 @@
 /* Names an observer init, which is an export that already means something. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 #include "../game.h"
 
 BRIDGE_EXPORT(init) int init()

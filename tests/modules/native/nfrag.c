@@ -4,7 +4,7 @@
  * time it and know the loop ran. docs/plan/STAGE10.md, *The repair*.
  *
  * Built once for each SPLIT: 1, 16, 256, 4096. The entities are the same number every time. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 BRIDGE_SCHEMA_STRUCT(V, { uint32_t v; });
 #ifndef TAGS                                    /* built with TAGS, the markers are tags */

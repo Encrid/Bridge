@@ -3,7 +3,7 @@
  *
  * Its one system keeps the table it was handed, asks another thread to spawn through it, waits
  * for that thread, and then spawns itself. It says whether each got an id. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 static const bridge_api_t *kept;
 static uint64_t from_elsewhere;

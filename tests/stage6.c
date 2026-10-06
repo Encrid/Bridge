@@ -6,7 +6,7 @@
  * Each case is one clause of docs/PLAN.md stage 6 or one refusal the phase added, checked by
  * the records it emits and by what bridge_modules answers. */
 #include "bridge.h"
-#include "bridge-abi.h"
+#include "bridge_abi.h"
 
 #include <stdio.h>
 #include <stdlib.h>

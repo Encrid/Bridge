@@ -1,6 +1,6 @@
 /* Spawns three entities a pass and says which ids it was given. Two of these in one level, on
  * several threads, must be given the same ids every run. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 
 BRIDGE_EXPORT(make) int make()
 {

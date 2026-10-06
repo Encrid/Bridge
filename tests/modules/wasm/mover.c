@@ -1,5 +1,5 @@
 /* Writes game:Position. It owns the namespace, spawns the entities, and marks half of them. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 #include "../game.h"
 
 constexpr uint32_t ENTITIES = 1000;

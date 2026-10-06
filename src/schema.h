@@ -4,7 +4,7 @@
 #ifndef BRIDGE_INSIDE_SCHEMA_H
 #define BRIDGE_INSIDE_SCHEMA_H
 
-#include "bridge-abi.h"
+#include "bridge_abi.h"
 
 #include <stddef.h>
 

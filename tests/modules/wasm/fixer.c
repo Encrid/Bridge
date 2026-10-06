@@ -1,6 +1,6 @@
 /* Observes game:Marked being added and overwrites it, under a write grant. Beside the watcher,
  * which reads it at the same barrier, that is a conflict only the deployment can order. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 #include "../game.h"
 
 static uint32_t marked, fixing;

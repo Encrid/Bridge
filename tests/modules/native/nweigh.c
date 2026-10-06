@@ -11,7 +11,7 @@
  *     walk      the same number of rows read in order, which is what the others are beside
  *
  * Built once for each ON: 1, 2, 16. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 BRIDGE_SCHEMA_STRUCT(V, { uint32_t v; });
 BRIDGE_SCHEMA_STRUCT(F, { uint32_t on; uint32_t v; });

@@ -5,7 +5,7 @@
  * Each case is one claim of docs/PLAN.md stage 2. build.py checks a refusal by the record it
  * emits, not by a return code alone, and every case ends by printing "alive". */
 #include "bridge.h"
-#include "bridge-abi.h"
+#include "bridge_abi.h"
 
 #include <stdio.h>
 #include <stdlib.h>

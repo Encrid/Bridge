@@ -1,6 +1,6 @@
 /* A system that takes a tenth of a second or more, and says which thread it was on, when it
  * began and when it ended. Two of these whose times overlap ran at once. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN

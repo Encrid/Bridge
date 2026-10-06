@@ -1,5 +1,5 @@
 /* Writes more lines in one phase than its ring holds. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 
 BRIDGE_EXPORT(talk) int talk()
 {

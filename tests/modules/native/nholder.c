@@ -1,7 +1,7 @@
 /* Declares a struct with a field of st:Vec, a type another module declares: its rows hold a
  * Vec as it is, so no reload of that other module may lay Vec out again.
  * docs/bridge/data/lifetime.md, *When a component layout changed*. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 /* declared by the module loaded before this one: here it is only what Y is made of */
 typedef struct { uint16_t x, y; } Vec;

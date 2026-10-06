@@ -1,7 +1,7 @@
 /* A system that destroys every entity with a position, and says how many it found. Whether it
  * may is the deployment's: docs/modules/grants.md. With a read grant it has no stake in them
  * and they stay; with a write grant they go. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 #include "../game.h"
 
 static uint32_t position, reaping;

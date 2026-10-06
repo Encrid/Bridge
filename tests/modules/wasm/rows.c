@@ -1,5 +1,5 @@
 /* A column long enough to time: the loop of mover.c, over 200,000 rows. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 #include "../game.h"
 
 constexpr uint32_t ENTITIES = 200'000;

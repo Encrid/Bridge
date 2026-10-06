@@ -1,5 +1,5 @@
 /* Declares game:Position with another struct body: built against an older header, say. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 
 BRIDGE_SCHEMA_STRUCT(Position, { float x; float y; float z; });
 

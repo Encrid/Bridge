@@ -1,5 +1,5 @@
 /* A module whose shutdown never returns: its timeout ends it, and the teardown goes on. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 
 static volatile int going = 1;
 

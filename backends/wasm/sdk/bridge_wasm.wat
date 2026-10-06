@@ -4,7 +4,7 @@
 ;; No C compiler can emit a load from a memory other than the module's own, so these are
 ;; written where a load names its memory. The module build merges this file into the compiled
 ;; module as "acc", inlines every function here into its callers, and strips the exports.
-;; bridge-wasm.h declares them.
+;; bridge_wasm.h declares them.
 (module
   (import "bridge" "shared" (memory $shared 1))
   (import "bridge" "private" (memory $private 1))
@@ -13,7 +13,7 @@
   ;; Where a row is, twice: carrying the test that it is one of the span's rows, and not. A
   ;; load past them is still inside the shared memory, which wasm permits, so the test is the
   ;; only thing that catches one. Which of the two a module is built with is its author's to
-  ;; state: bridge-wasm.h, BRIDGE_ROWS_CHECKED and BRIDGE_ROWS_UNCHECKED.
+  ;; state: bridge_wasm.h, BRIDGE_ROWS_CHECKED and BRIDGE_ROWS_UNCHECKED.
   (func (export "acc_row") (param $base i32) (param $row i32) (param $count i32) (param $stride i32)
         (result i32)
     (if (i32.ge_u (local.get $row) (local.get $count)) (then (unreachable)))

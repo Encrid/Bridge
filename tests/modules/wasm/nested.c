@@ -1,6 +1,6 @@
 /* A component whose fields are other declared types: a struct, an enum and a bitmask. Each is
  * declared first, in the namespace the component is in. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 
 BRIDGE_SCHEMA_STRUCT(Vec2, { float x; float y; });
 BRIDGE_SCHEMA_ENUM(Team, uint8_t, { Red, Green, Blue });

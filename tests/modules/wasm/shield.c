@@ -1,6 +1,6 @@
 /* A toggled component on the wasm backend: its bits found ahead of its column, read, and
  * written. docs/bridge/storage.md, *A toggle*. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 
 BRIDGE_SCHEMA_STRUCT(Shield, { uint32_t strength; });
 

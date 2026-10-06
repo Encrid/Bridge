@@ -1,5 +1,5 @@
 /* A native module that sets a component in a system: the event a wasm observer subscribes to. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 #include "../game.h"
 
 static uint32_t position, marked, runs;

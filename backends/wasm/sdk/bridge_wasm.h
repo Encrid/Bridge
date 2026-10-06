@@ -1,5 +1,5 @@
 /* What a wasm module written in C compiles against: the eight imports, the accessors of
- * bridge-wasm.wat, the schema shim, and the layouts of bridge-abi.h read through them.
+ * bridge_wasm.wat, the schema shim, and the layouts of bridge_abi.h read through them.
  * docs/backends/wasm/wasm.md and docs/modules/schema.md.
  *
  * Nothing here is generated: sizeof, offsetof and _Generic compute at a module's build what a
@@ -8,8 +8,8 @@
 #ifndef BRIDGE_WASM_H
 #define BRIDGE_WASM_H
 
-#include "bridge-abi.h"
-#include "bridge-schema.h"       /* how a type is stated: the same on every backend */
+#include "bridge_abi.h"
+#include "bridge_schema.h"       /* how a type is stated: the same on every backend */
 #include <stddef.h>
 
 #define BRIDGE_IMPORT(name) [[clang::import_module(BRIDGE_NAMESPACE), clang::import_name(#name)]]
@@ -33,7 +33,7 @@ BRIDGE_IMPORT(attach)  void     bridge_attach(uint64_t id, uint32_t slot, uint32
 BRIDGE_IMPORT(detach)  void     bridge_detach(uint64_t id, uint32_t slot);
 BRIDGE_IMPORT(alloc)   uint32_t bridge_alloc(uint32_t len);
 
-/* ---- the accessors: bridge-wasm.wat ---- */
+/* ---- the accessors: bridge_wasm.wat ---- */
 
 /* Where a row is. Whether it is tested to be one of the span's rows, each time, is stated
  * by whoever builds the module: docs/bridge/diagnostics/validation.md, *The row test*. */

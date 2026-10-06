@@ -89,4 +89,4 @@ itself.
 **What Bridge-ASM700 does not check is a component's own invariants.** It knows no content -
 `wasm.md`, *It holds no content* - so a module that wants its invariants checked writes a
 system that checks them. That is not a missing feature; it is the same rule that keeps
-`bridge-abi.h` empty of components.
+`bridge_abi.h` empty of components.

@@ -1,6 +1,6 @@
 /* A system adds A; an observer of A adds B; an observer of B adds C; an observer of C says so.
  * One hop per barrier: three barriers, and no fixpoint. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 
 BRIDGE_SCHEMA_STRUCT(Link, { uint32_t n; });
 

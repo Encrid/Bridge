@@ -11,7 +11,7 @@
  * BAD is a build the bridge refuses something of: 1 a system that selects by it, at load; 2 an
  * attach of it with the id of an entity, when that system runs; 3 an attach of a component
  * that is no singleton with the id 0. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 BRIDGE_SCHEMA_STRUCT(G, { uint32_t gravity; uint32_t wind; });
 BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });

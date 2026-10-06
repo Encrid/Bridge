@@ -3,7 +3,7 @@
  *
  * Built a second way, READER: it declares the same component and says what it finds there, and
  * keeps nothing of its own. For a string that outlives the module that wrote it. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 
 BRIDGE_SCHEMA_STRUCT(Name, { bridge_text_t text; });
 

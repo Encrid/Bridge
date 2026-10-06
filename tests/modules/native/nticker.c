@@ -1,6 +1,6 @@
 /* ticker.c as a shared library. A process cannot hold two copies of one library, so a reload
  * of this one shuts the old instance down before the new one is opened. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 BRIDGE_SCHEMA_STRUCT(Tick, { uint32_t n; });
 

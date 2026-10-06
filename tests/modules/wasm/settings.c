@@ -1,6 +1,6 @@
 /* A module whose settings are a component: a singleton, given its value by Bridge-ASM700 after
  * init, which a system reads back. docs/seam/host-api/config.md, *A module's own settings are a component*. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 
 BRIDGE_SCHEMA_ENUM(Mode, int8_t, { Off, On, Adaptive });
 BRIDGE_SCHEMA_BITMASK(Flags, uint32_t, { Loud = 1, Wide = 2 });

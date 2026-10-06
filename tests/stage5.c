@@ -6,7 +6,7 @@
  * printed with the barrier count it was written under, since two of the claims are about which
  * barrier something happened at. */
 #include "bridge.h"
-#include "bridge-abi.h"
+#include "bridge_abi.h"
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -7,7 +7,7 @@
  *     detach_b_half  and from all three, so that none does
  *     flicker      a toggle: the row whose value is 102 turned off
  *     look         who carries X and what the values come to, read as this build keeps it */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });
 BRIDGE_SCHEMA_STRUCT(X, { uint32_t v; });

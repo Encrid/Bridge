@@ -1,5 +1,5 @@
 /* Observes game:Marked being added, under a read grant, and says who it was added to. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 #include "../game.h"
 
 static uint32_t marked, seeing;

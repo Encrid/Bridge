@@ -1,5 +1,5 @@
 /* One system never returns, and another must still run after it was stopped. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 
 static volatile int going = 1;
 

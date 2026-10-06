@@ -1,6 +1,6 @@
 /* A direct-indexed component on the wasm backend, reached from the rows of a table by each
  * entity's id. docs/bridge/storage.md, *Direct-indexed*. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 #include "../game.h"
 
 BRIDGE_SCHEMA_STRUCT(Aim, { uint32_t at; });

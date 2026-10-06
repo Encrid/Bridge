@@ -2,7 +2,7 @@
  * Two of these in one phase change one component of the same entities, which is what
  * docs/bridge/run/schedule.md, *Order within a phase is never implicit*, is about. Built with
  * UNSTATED, it attaches without having said so. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 #include "../game.h"
 
 /* the phase it names: its author's word, which a deployment may call otherwise */

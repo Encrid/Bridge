@@ -53,11 +53,11 @@ arena and the barrier does both. And **Bridge-ASM700 bounds-checks `text + len`*
 block, which is what makes the check writable at all. One compare per record is the price.
 
 **A level is a severity of syslog, RFC 5424, by its number**: 0 is the worst and 7 the most
-detail. Four are named, in `bridge.h` for a host and in `bridge-abi.h` for a module:
+detail. Four are named, in `bridge.h` for a host and in `bridge_abi.h` for a module:
 
     3  err      4  warn      6  info      7  debug
 
-The four that are named have two sets of names, `BRIDGE_LOG_ERR` and its like in `bridge-abi.h` for
+The four that are named have two sets of names, `BRIDGE_LOG_ERR` and its like in `bridge_abi.h` for
 a module that writes a line, and `BRIDGE_ERR` and its like in `bridge.h` for a host that reads one:
 the same numbers, in two headers that are each whole without the other, held equal by an assertion
 where a module's level becomes a host's. A module may write any of the eight. A module's `log_level`

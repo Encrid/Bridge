@@ -1,5 +1,5 @@
 /* mover.c as a shared library: it reads and writes the column through a raw pointer. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 #include "../game.h"
 
 constexpr uint32_t ENTITIES = 1000;

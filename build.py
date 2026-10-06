@@ -220,9 +220,9 @@ def build(target, debug, out):
 
     # ---- objects ----
     defines = ['-D%s="%s"' % (key, path.as_posix()) for key, path in
-               [('BACKEND_PATH', backends / ('bridge-wasm' + lib)),
-                ('NATIVE_PATH', backends / ('bridge-native' + lib)),
-                ('NATIVE_OTHER_PATH', backends / ('bridge-native-other' + lib)), ('MODULE_DIR', modules)] +
+               [('BACKEND_PATH', backends / ('bridge_wasm' + lib)),
+                ('NATIVE_PATH', backends / ('bridge_native' + lib)),
+                ('NATIVE_OTHER_PATH', backends / ('bridge_native_other' + lib)), ('MODULE_DIR', modules)] +
                [('%s_PATH' % name.upper(), out / (name + lib)) for name, _, _ in NATIVE]]
     compiles = []
 
@@ -274,10 +274,10 @@ def build(target, debug, out):
     # not where its backends are, and the tests would not notice if they were
     step('copying wasmtime', [backends / runtime.name], [runtime],
          [lambda: shutil.copyfile(runtime, backends / runtime.name)])
-    link('backends/bridge-wasm', wasm_o, [link_wasmtime] + system + here, shared=True)
-    link('backends/bridge-native', native_o, system, shared=True)
+    link('backends/bridge_wasm', wasm_o, [link_wasmtime] + system + here, shared=True)
+    link('backends/bridge_native', native_o, system, shared=True)
     # the same backend, saying it is of another backend seam: for the case that refuses it
-    link('backends/bridge-native-other', [native_other_o, native_o[1]], system, shared=True)
+    link('backends/bridge_native_other', [native_other_o, native_o[1]], system, shared=True)
     for name, _, _ in NATIVE:
         link(name, [module_o[name]], shared=True)
     link('adopt', [adopt_o, obj / 'backend.o', os_o], system)
@@ -301,7 +301,7 @@ def build(target, debug, out):
     together(links)
 
     # ---- wasm modules: text assembled, C compiled and merged with the accessors ----
-    accessors = ROOT / 'backends/wasm/sdk/bridge-wasm.wat'
+    accessors = ROOT / 'backends/wasm/sdk/bridge_wasm.wat'
     acc = modules / 'acc.wasm'
     assembled = [('assembling %s' % wat.name, [modules / (wat.stem + '.wasm')], [wat],
                   [[wasm_tools, 'parse', wat, '-o', modules / (wat.stem + '.wasm')]])
@@ -600,7 +600,7 @@ CASES = [
     ('stage4-libraries', ['stage4', 'libraries'],
      r"the wasm backend's library is still loaded, the native backend's is gone.*alive", None),
     ('stage4-backendabi', ['stage4', 'backendabi'],
-     r"backend 'native': backend library '[^']*bridge-native-other[^']*' is of backend ABI 2, and this is 1.*bridge_create refused.*alive", None),
+     r"backend 'native': backend library '[^']*bridge_native_other[^']*' is of backend ABI 2, and this is 1.*bridge_create refused.*alive", None),
     ('stage4-nolib', ['stage4', 'nolib'],
      r"module 'game:mover@0.1.0' did not load: cannot open the library 'no-such-library'.*alive", None),
     ('stage4-refuse', ['stage4', 'refuse'],

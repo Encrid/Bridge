@@ -4,7 +4,7 @@
  * Built several ways: STEP is what a pass adds; WIDE changes the struct's body; FAIL_RELOAD
  * makes reload answer 5; NO_EXTRA stops declaring a second component; TRIP fails every pass;
  * ALLOC has reload take forty bytes of the persistent arena, which a share of sixteen lacks. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 
 #ifdef WIDE
 BRIDGE_SCHEMA_STRUCT(Tick, { uint32_t n; uint32_t more; });

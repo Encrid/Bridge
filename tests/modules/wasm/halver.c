@@ -1,5 +1,5 @@
 /* Halves every game:Position.x, under a write grant, in the phase the mover adds to it. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 #include "../game.h"
 
 static uint32_t position, halving;

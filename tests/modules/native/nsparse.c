@@ -14,7 +14,7 @@
  *
  * BIG is 204,800 entities and no observer, for a measurement; FAT is 10,000 that carry 4 KB.
  * BAD is a system the load is refused for: 1 selects by A and by S, 2 by not having S. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 #ifdef FAT
 BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; uint8_t rest[4092]; });

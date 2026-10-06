@@ -1,5 +1,5 @@
 /* Declares a struct other modules' components use as a field's type, and nothing else. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 
 BRIDGE_SCHEMA_STRUCT(Vec2, { float x; float y; });
 

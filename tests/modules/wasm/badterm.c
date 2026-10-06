@@ -1,5 +1,5 @@
 /* Hands over a term whose operator is none of the three there are: its load is refused. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 #include "../game.h"
 
 BRIDGE_EXPORT(any) int any() { return 0; }

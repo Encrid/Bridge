@@ -1,6 +1,6 @@
 /* Follows ids it kept, across two batches of destroys. Every destroy moves the last row into
  * the hole, which no event names: the survivors must still be found, and the dead refused. */
-#include "bridge-wasm.h"
+#include "bridge_wasm.h"
 #include "../game.h"
 
 constexpr uint32_t ENTITIES = 100;

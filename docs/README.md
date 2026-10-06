@@ -113,18 +113,18 @@ period: `backend.md`, *The backend owns its clock*.
 
     include/                 the three seams Bridge-ASM700 defines, and nothing else
         bridge.h                 host seam: the functions and their structs
-        bridge-backend.h         backend seam: the eighteen entries in `backend.md`
-        bridge-schema.h          module seam: how a type is stated in C, for a module on any
+        bridge_backend.h         backend seam: the eighteen entries in `backend.md`
+        bridge_schema.h          module seam: how a type is stated in C, for a module on any
                                  backend
-        bridge-abi.h             module seam: what Bridge-ASM700 writes for a module to read,
+        bridge_abi.h             module seam: what Bridge-ASM700 writes for a module to read,
                                  the same on every backend - `wasm.md`, *The ABI layouts*
     src/                     the library. Nothing outside it is compiled against it
     backends/wasm/           the wasm backend: its source, and what it needs of the operating system
-        sdk/                     how a wasm module is written: `bridge-wasm.h`, and the
-                                 accessors of `bridge-wasm.wat` that are merged into one
+        sdk/                     how a wasm module is written: `bridge_wasm.h`, and the
+                                 accessors of `bridge_wasm.wat` that are merged into one
         wasmtime/                the engine it is linked against
     backends/native/         the native backend: its source, and what it needs of the operating system
-        sdk/                     how a native module is written: `bridge-native.h`
+        sdk/                     how a native module is written: `bridge_native.h`
     tests/                   the hosts that drive the cases
         modules/wasm/            the modules they load, by the backend that runs each
         modules/native/
@@ -132,14 +132,14 @@ period: `backend.md`, *The backend owns its clock*.
                              layouts beside flecs and EnTT
     build.py                 the build - `build.md`, *One script*
 
-A backend is compiled against `include/bridge-backend.h` and its own folder. It shares no code
+A backend is compiled against `include/bridge_backend.h` and its own folder. It shares no code
 with the library, not even the few calls each makes to the operating system: a backend that
 somebody else writes has only the seam, and ours are held to the same.
 
 **How a module is written is its backend's, and not Bridge-ASM700's.** A backend is handed bytes,
 memories and functions to offer a module, and asked to run a function - `backend.md`, *What the
 backend does not do* - so Bridge-ASM700 never learns what a module is made of, and cannot say how
-one is written. What it can say is what it puts in memory, and that is `bridge-abi.h`. Everything
+one is written. What it can say is what it puts in memory, and that is `bridge_abi.h`. Everything
 about reaching it - imports or a table of pointers, accessors, the macros an author types, and the
 same for a language that is not C - belongs to the backend that runs the module, and lives with it.
 
@@ -232,7 +232,7 @@ where two things could be meant the qualified form is the only form.
     region            a named part of a memory. `memory.md` has the seven
     arena             a region handed out by advancing an offset: scratch, persistent
     memory layout     the regions of a memory and where each begins
-    ABI layout        the bytes of a struct `bridge-abi.h` states. `wasm.md`
+    ABI layout        the bytes of a struct `bridge_abi.h` states. `wasm.md`
     shared memory     the one every module sees
     shared component  one that more than one module declares
     share             a module's own part of the persistent arena, and nothing else

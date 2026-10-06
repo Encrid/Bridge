@@ -1,6 +1,6 @@
 /* Spawns past the entity ceiling. Nothing can unwind native code, so the system runs to its
  * end and the invocation is failed when it returns. */
-#include "bridge-native.h"
+#include "bridge_native.h"
 
 
 

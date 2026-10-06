@@ -47,10 +47,10 @@ written for.* Met.
 
 Done. `STAGE2.md` is what it built and found.
 
-`bridge-backend.h` with all sixteen entries it then had - eighteen now, `backend.md` - and the wasm
+`bridge_backend.h` with all sixteen entries it then had - eighteen now, `backend.md` - and the wasm
 backend as a shared library behind it, which Bridge-ASM700 opens by the name config gives -
 `backend.md`, *What a backend is asked for*. A core wasm module importing a Bridge-ASM700 memory,
-which means `wasm_multi_memory` on since the module has its own. `bridge-abi.h` begins here, because
+which means `wasm_multi_memory` on since the module has its own. `bridge_abi.h` begins here, because
 a module reading the shared memory with plain loads needs to know what a span holds. `define_func`
 with a real signature and `instance_func`'s `() -> i32` check - `signatures.md`, *Imports are
 declared, exports are checked*.
@@ -102,7 +102,7 @@ overflowing ring reports how many it dropped.* Met.
 Done. `STAGE4.md` is what it built and found.
 
 The second backend: a shared library that opens a module's library and calls it directly -
-`native.md`. `bridge-native.h`, `bridge_bind` - gone since, for a table that is passed - and
+`native.md`. `bridge_native.h`, `bridge_bind` - gone since, for a table that is passed - and
 exports found by name as `bridge_<name>`. Nothing
 changes above the backend seam: a native module's systems are scheduled like any other, it reads
 the same spans through `private` and `shared`, and its log ring is reached through a pointer.
@@ -256,7 +256,7 @@ exist; then all six needs of `STAGE0.md`, step 6, scored and shown. That comes b
 stage's other questions.
 
 This stage's questions, each by the method of `STAGE0.md`, and in this order: who states a
-component's storage layout, and where; what a module is handed for each, in `bridge-abi.h` and in
+component's storage layout, and where; what a module is handed for each, in `bridge_abi.h` and in
 each backend's SDK, and what a query may ask across two of them; what each costs of which
 budget; whether a component may have no bytes at all, a tag; and what it takes to move a
 component from one storage layout to another, which is what "layout migration" meant.
@@ -357,7 +357,7 @@ every column at every barrier - `schedule.md`, *What a pass depends on*.*
 
 **All three seams, where this stage was the module's alone.** A host and a backend may be in
 any language that can call C, as a module may be in any that makes a wasm module or a shared
-library. `bridge.h` and `bridge-backend.h` assert every layout as `bridge-abi.h` does, which is
+library. `bridge.h` and `bridge_backend.h` assert every layout as `bridge_abi.h` does, which is
 what a binding is checked against; what none of the three has is a form that needs no C parser.
 So this stage's first question, below, is asked of the three headers together.
 
@@ -365,12 +365,12 @@ What a module needs to be written falls in two parts, and they have two owners -
 *Three layers, three seams*.
 
     Bridge-ASM700     what it writes for a module to read, the same on every backend:
-                      `bridge-abi.h`
+                      `bridge_abi.h`
     a backend         how a module it runs reaches that: its SDK, in its own `sdk/`
 
 Both are C23 today, and `wasm.md`, *The ABI layouts*, said a module in another language
 derives what it needs from the header. That was never tried, and the first try failed: the
-project's own compiler cannot translate `bridge-abi.h`, which stops at its first `constexpr`. So
+project's own compiler cannot translate `bridge_abi.h`, which stops at its first `constexpr`. So
 a module in any language but C is a claim. It was listed as not in this plan, with no condition
 and no stage.
 

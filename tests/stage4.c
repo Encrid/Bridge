@@ -4,7 +4,7 @@
  *
  * Each case is one clause of docs/PLAN.md stage 4, checked by the records it emits. */
 #include "bridge.h"
-#include "bridge-abi.h"
+#include "bridge_abi.h"
 
 #include <stdio.h>
 #include <stdlib.h>
