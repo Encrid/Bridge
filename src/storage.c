@@ -117,6 +117,9 @@ struct storage {
     uint64_t  *in_table;            /* one set: the types that are kept in tables */
     uint64_t  *before, *masked;     /* two sets more */
     uint32_t   table_count;         /* how many tables of archetypes there are */
+    uint32_t   apart;               /* how many declared types are not kept in a table. While
+                                     * there is none, an entity carries what its table holds
+                                     * and nothing else, and a barrier looks no further */
     /* direct-indexed: [budget] direct_indexed of them - storage.md, *Direct-indexed*. A cell
      * for every entity, in a block of the column region taken at declare; and a bit for every
      * entity that says it has a value there, kept here, with a copy for modules */
@@ -174,11 +177,12 @@ static uint32_t cell_of(const storage_type *type, uint32_t column, uint32_t row)
 
 /* everything the entity at `index` carries: what its table holds, every sparse set it is in,
  * and every direct-indexed component it has been given */
-static void carried(const storage *r, uint32_t index, uint64_t *set)
+[[gnu::always_inline]] static inline void carried(const storage *r, uint32_t index, uint64_t *set)
 {
     uint32_t t = r->places[index].table;
     if (t) memcpy(set, set_of(r, t), 8u * r->words);
     else memset(set, 0, 8u * r->words);
+    if (!r->apart) return;
     for (uint32_t slot = 0; slot < r->set_room; slot ++) {
         if (r->set_type[slot] && where_of(r, slot)[index]) put(set, r->set_type[slot]->id);
     }
@@ -544,7 +548,7 @@ static uint32_t appended(storage *r, uint32_t t, uint32_t index)
 }
 
 /* a row leaves `t`: the last one is moved into its place, and the entity that was in it is told */
-static void removed(storage *r, uint32_t t, uint32_t row)
+[[gnu::always_inline]] static inline void removed(storage *r, uint32_t t, uint32_t row)
 {
     table *tab = &r->tables[t];
     uint32_t last = -- tab->rows, *columns = columns_of(r, t);
@@ -586,7 +590,7 @@ static void left(storage *r, uint32_t slot, uint32_t index)
 }
 
 /* where the entity at `index` has its value of `type`, from the shared base: 0 if it has none */
-static uint32_t value_of(const storage *r, uint32_t index, const storage_type *type)
+[[gnu::always_inline]] static inline uint32_t value_of(const storage *r, uint32_t index, const storage_type *type)
 {
     uint32_t t = r->places[index].table, column;
     if (type->kept == BRIDGE_SPARSE_SET) {
@@ -622,7 +626,7 @@ static void cell_given(storage *r, uint32_t slot, uint32_t index, bool on)
 
 /* the entity at `index` goes to `to`, which has room: what it carried that `to` also holds
  * goes with it, and what `to` holds that it did not is zero */
-static void moved(storage *r, uint32_t index, uint32_t to)
+[[gnu::always_inline]] static inline void moved(storage *r, uint32_t index, uint32_t to)
 {
     place *p = &r->places[index];
     uint32_t from = p->table, row = p->row, at = 0;
@@ -659,13 +663,13 @@ static bool alive(const storage *r, uint64_t id)
 }
 
 /* gone: its row, and its index, which comes back under another generation */
-static void killed(storage *r, uint32_t index)
+[[gnu::always_inline]] static inline void killed(storage *r, uint32_t index)
 {
     place *p = &r->places[index];
-    for (uint32_t slot = 0; slot < r->set_room; slot ++) {
+    for (uint32_t slot = 0; r->apart && slot < r->set_room; slot ++) {
         if (r->set_type[slot] && where_of(r, slot)[index]) left(r, slot, index);
     }
-    for (uint32_t slot = 0; slot < r->direct_room; slot ++) {
+    for (uint32_t slot = 0; r->apart && slot < r->direct_room; slot ++) {
         if (r->direct_type[slot] && has(given_of(r, slot), index)) cell_given(r, slot, index, false);
     }
     if (p->table) removed(r, p->table, p->row);
@@ -731,13 +735,14 @@ void storage_writes([[maybe_unused]] storage *r, module *m, storage_type *type)
 
 /* grants.md, *What a module may destroy*: an entity that carries something it may write, or
  * that carries nothing. Read from where the entity is, before this barrier moves it. */
-static bool stake(const storage *r, const module *m, uint32_t index)
+[[gnu::always_inline]] static inline bool stake(const storage *r, const module *m, uint32_t index)
 {
     uint32_t t = r->places[index].table;
     bool any = t != 0;
     for (uint32_t w = 0; t && m->writable && w < r->words; w ++) {
         if (set_of(r, t)[w] & m->writable[w]) return true;
     }
+    if (!r->apart) return !any;
     for (uint32_t slot = 0; slot < r->set_room; slot ++) {
         if (!r->set_type[slot] || !where_of(r, slot)[index]) continue;
         if (m->writable && has(m->writable, r->set_type[slot]->id)) return true;
@@ -755,7 +760,7 @@ static bool stake(const storage *r, const module *m, uint32_t index)
  * asked of a table, room is found for all of them, or for as many as the column region is
  * found to hold: by halves down to a number that fits, and from there back up between it and
  * the last that did not. budgets.md, *What running out does* */
-static bool roomed(storage *r, uint32_t t)
+[[gnu::always_inline]] static inline bool roomed(storage *r, uint32_t t)
 {
     table *tab = &r->tables[t];
     if (!tab->sized) {
@@ -783,7 +788,7 @@ static bool joins(const storage *r, uint32_t slot, uint32_t index)
 /* A barrier's second step, and a move's: a table for each changed entity, and room in it and
  * in each sparse set it is to join, before anything moves. What cannot be had is known here,
  * while every entity is still where it was. */
-static void reserve_all(storage *r)
+[[gnu::always_inline]] static inline void reserve_all(storage *r)
 {
     uint32_t i;
     for (i = 0; i < r->changed_count; i ++) {
@@ -793,11 +798,15 @@ static void reserve_all(storage *r)
          * and no move, in whichever table of that set it happens to be */
         uint32_t from = r->places[index].table;
         /* its table is of what it carries that is kept in tables, and no more */
-        for (uint32_t w = 0; w < r->words; w ++) r->masked[w] = work_of(r, index)[w] & r->in_table[w];
-        if (from && !memcmp(r->masked, set_of(r, from), 8u * r->words)) {
+        const uint64_t *want = r->work + (size_t)index * r->words;
+        if (r->apart) {
+            for (uint32_t w = 0; w < r->words; w ++) r->masked[w] = want[w] & r->in_table[w];
+            want = r->masked;
+        }
+        if (from && !memcmp(want, set_of(r, from), 8u * r->words)) {
             t = from;
-        } else if (!empty(r, r->masked)) {
-            t = table_for(r, r->masked);
+        } else if (!empty(r, want)) {
+            t = table_for(r, want);
             if (!t) {
                 dropped(r, index, false);
                 continue;
@@ -806,7 +815,7 @@ static void reserve_all(storage *r)
         r->dest[index] = t;
         if (t && t != r->places[index].table) r->tables[t].incoming ++;
         /* and a row in each sparse set it is to join */
-        for (uint32_t slot = 0; slot < r->set_room; slot ++) {
+        for (uint32_t slot = 0; r->apart && slot < r->set_room; slot ++) {
             if (!joins(r, slot, index)) continue;
             if (!r->set_table[slot]) {
                 memset(r->scratch, 0, 8u * r->words);
@@ -823,7 +832,7 @@ static void reserve_all(storage *r)
             dropped(r, index, true);
             continue;
         }
-        for (uint32_t slot = 0; slot < r->set_room; slot ++) {
+        for (uint32_t slot = 0; r->apart && slot < r->set_room; slot ++) {
             if (!joins(r, slot, index) || roomed(r, r->set_table[slot])) continue;
             dropped(r, index, true);
             break;
@@ -832,13 +841,14 @@ static void reserve_all(storage *r)
 }
 
 /* the entity at `index` put where the fold has it: its table, its sparse sets, its cells */
-static void place_one(storage *r, uint32_t index)
+[[gnu::always_inline]] static inline void place_one(storage *r, uint32_t index)
 {
     if (r->folded[index] & DESTROYED) {
         killed(r, index);
         return;
     }
     moved(r, index, r->dest[index]);
+    if (!r->apart) return;
     for (uint32_t slot = 0; slot < r->set_room; slot ++) {
         if (joins(r, slot, index)) joined(r, slot, index);
         else if (r->set_type[slot] && where_of(r, slot)[index]
@@ -1196,11 +1206,13 @@ storage_type *storage_declare(storage *r, uint32_t size, uint32_t align, enum br
     if (kept == BRIDGE_SPARSE_SET) r->set_type[slot] = r->types[id];
     else if (kept == BRIDGE_DIRECT_INDEXED) r->direct_type[slot] = r->types[id];
     else if (kept != BRIDGE_SINGLETON) put(r->in_table, id);
+    r->apart += kept != BRIDGE_TABLE && kept != BRIDGE_TOGGLE;
     return r->types[id];
 }
 
 void storage_undeclare(storage *r, storage_type *type)
 {
+    r->apart -= type->kept != BRIDGE_TABLE && type->kept != BRIDGE_TOGGLE;
     if (type->kept == BRIDGE_SPARSE_SET) {
         r->set_type[type->slot] = nullptr;
     } else if (type->kept == BRIDGE_DIRECT_INDEXED) {

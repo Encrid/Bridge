@@ -530,3 +530,28 @@ accepted, a loss accepted and not made, and no room.
 A module's configuration has the losses a reload accepts, `losses` and `loss_count`, stated as
 none by every load.
 
+## Found on the way: a barrier that stopped being inlined
+
+Measured beside the tree before this stage, every change of a component kept in a table had
+become 4 to 6 ns slower, with no sparse set and nothing direct-indexed declared: a destroy 22
+ns where it was 16. It came in a little with each storage layout and was not looked for until
+the move was built, which is the mistake: `storage measure` was to be run at every commit that
+touched storage, and was not.
+
+It was not the storage layouts' work. With that work skipped wholly while no type is kept
+outside a table, the figures did not move. The functions a barrier calls once for each entity
+had grown, and the compiler had stopped putting them inline. Stated inline, as they were in
+effect before:
+
+                                             before the stage     now
+    attach, the entity's first component        31.3 ns          30.4 ns
+    attach, a component it has                  19.0 ns          18.8 ns
+    attach, a second component                  40.2 ns          39.1 ns
+    detach                                      36.2 ns          34.8 ns
+    destroy                                     16.1 ns          15.6 ns
+    attach, two components in one barrier       37.8 ns          39.0 ns
+    the stress run, on four threads             1597 ms          1616 ms
+    the stress run, on one thread               3364 ms          3323 ms
+
+And a barrier looks no further than tables while nothing is declared that is kept elsewhere.
+
