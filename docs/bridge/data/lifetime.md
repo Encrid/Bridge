@@ -87,10 +87,24 @@ by an unload somebody else requested.
 The fingerprint catches it - `schema.md`, *Fingerprints* - and what happens next depends on who else
 holds the component.
 
-**Shared: refused, always.** If two modules declare `game:Position` and one is rebuilt with a
-different `Position`, the other is still running with the old struct compiled in, and a column can
-only have one component layout. Dropping takes the other module's data; migrating leaves it reading
-new bytes with old code. Nothing reconciles it, so this is forced rather than chosen.
+**Shared: refused, and the refusal names who else declares it.** If two modules declare
+`game:Position` and one is rebuilt with a different `Position`, the other is still running with
+the old struct compiled in, and a column can only have one component layout. Dropping takes the
+other module's data; migrating leaves it reading new bytes with old code.
+
+**It is a choice, and a host has a way through it with the calls it has.** Unload every other
+module that declares the type: the component stays, since one module still declares it. Reload
+that one, which is now the only declarer, so its rows are moved - *Exclusive*, below. Then load
+the others, built against the new struct. The component's rows are kept throughout; what is lost
+is whatever else the unloaded modules held, as at any unload. The refusal lists the modules to
+unload, so nobody has to find them.
+
+Refused: one call that reloads several modules as one and moves the rows once all of them present
+the new struct. It keeps every declarer's own state, at the price of a new call at the host seam
+that swaps several modules together and puts them all back if one fails. The condition that
+brings it back is a deployment that must change a shared struct and keep what each declarer
+holds. This paragraph called the refusal "forced rather than chosen", and it was neither weighed
+nor given a condition.
 
 **Exclusive: its rows are moved to the new component layout, field by field, by name.**
 Bridge-ASM700 keeps the fields of every type, and a `declare` hands it the new descriptor, so it has

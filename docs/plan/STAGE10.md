@@ -567,7 +567,9 @@ Of this repair:
     closed  a removed or renamed field migrated at reload, and its values were lost on a call
             that means "keep running": refused first, naming what would go, and moved once
             the reload states that it accepts the loss. `lifetime.md`; built in stage 11
-    open    a shared component whose layout changed is refused always, called forced
+    closed  a shared component whose layout changed is refused always, called forced: still
+            refused, as a choice with a condition; the refusal names the other declarers,
+            and the sequence of calls that changes it is written. `lifetime.md`
     open    out of tables or columns: the module that asked last is charged, which may not
             be the one that used them up; and its changes are applied in part
     open    a strip that cannot join leaves two tables of one archetype

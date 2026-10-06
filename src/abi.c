@@ -115,9 +115,20 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         if (!strcmp(b->types[i]->name, name)) c = b->types[i];
     }
     if (c && c->fingerprint != print) {
+        /* lifetime.md, *When a component layout changed*: who else declares it is what a host
+         * needs to know, since unloading them is what lets the layout change */
+        char others[160] = "";
+        size_t used = 0;
+        for (module *o = b->modules; o; o = o->next) {
+            if (o == m || !strcmp(o->identity, m->identity)) continue;
+            for (i = 0; i < o->declared_count && o->declared[i] != c; i ++) {}
+            if (i == o->declared_count || used >= sizeof others) continue;
+            used += (size_t)snprintf(others + used, sizeof others - used, "%s'%s'",
+                used ? ", " : ". It is also declared by ", o->identity);
+        }
         return refuse(m, "type '%s' has another component layout here: fingerprint %016llx, and it "
-            "was declared with %016llx", name, (unsigned long long)print,
-            (unsigned long long)c->fingerprint);
+            "was declared with %016llx%s", name, (unsigned long long)print,
+            (unsigned long long)c->fingerprint, others);
     }
     if (!c) {
         /* The descriptor is read and laid out. A field's type is a bare C name, looked for in

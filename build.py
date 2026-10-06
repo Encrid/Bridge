@@ -434,7 +434,7 @@ CASES = [
     ('stage3-mirror', ['stage3', 'mirror'],
      r"mirror 100 0.*mirror 100 0.*mirror 100 0.*alive", None),
     ('stage3-fingerprint', ['stage3', 'fingerprint'],
-     r"module 'game:fp@0.1.0' did not load: type 'game:Position' has another component layout here: fingerprint [0-9a-f]+, and it was declared with [0-9a-f]+.*alive", None),
+     r"module 'game:fp@0.1.0' did not load: type 'game:Position' has another component layout here: fingerprint [0-9a-f]+, and it was declared with [0-9a-f]+. It is also declared by 'game:mover@0.1.0'.*alive", None),
     ('stage3-grant', ['stage3', 'grant'],
      r"module 'view:reader@0.1.0' did not load: it may not declare 'game:Position': that is another namespace's, and no grant names it.*alive", None),
     ('stage3-badterm', ['stage3', 'badterm'],
