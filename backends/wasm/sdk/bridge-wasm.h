@@ -9,6 +9,7 @@
 #define BRIDGE_WASM_H
 
 #include "bridge-abi.h"
+#include "bridge-schema.h"       /* how a type is stated: the same on every backend */
 #include <stddef.h>
 
 #define BRIDGE_IMPORT(name) [[clang::import_module(BRIDGE_NAMESPACE), clang::import_name(#name)]]
@@ -66,21 +67,6 @@ BRIDGE_ACC(acc_own_st) void     acc_own_st(uint32_t at, uint32_t v);
 BRIDGE_ACC(acc_to_private)  void acc_to_private(uint32_t to, const void *from, uint32_t len);
 BRIDGE_ACC(acc_to_shared)   void acc_to_shared(uint32_t to, const void *from, uint32_t len);
 BRIDGE_ACC(acc_from_shared) void acc_from_shared(void *to, uint32_t from, uint32_t len);
-
-/* ---- the schema: a struct, and the string both sides hash ---- */
-
-#define BRIDGE_SCHEMA_STRUCT(name, ...) \
-    typedef struct name __VA_ARGS__ name; \
-    static const char name##_desc[] = #__VA_ARGS__
-/* An enum and a bitmask are the integer their author states: the width a row gives one. It
- * goes into the descriptor ahead of the brace, where Bridge-ASM700 reads it and checks that
- * every constant fits - docs/modules/schema.md, *The type set* */
-#define BRIDGE_SCHEMA_ENUM(name, type, ...) \
-    typedef enum name : type __VA_ARGS__ name; \
-    static const char name##_desc[] = #type " " #__VA_ARGS__
-#define BRIDGE_SCHEMA_BITMASK(name, type, ...) \
-    typedef enum name : type __VA_ARGS__ name; \
-    static const char name##_desc[] = #type " " #__VA_ARGS__
 
 /* ---- the header and the scratch arena ---- */
 

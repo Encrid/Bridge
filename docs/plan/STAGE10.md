@@ -681,8 +681,11 @@ middle of a paragraph in `config.md`.
     open    an allocation that fails at load
     closed  a log_level nobody stated: zero is unset for it as for every key, and refused.
             `log.md`, *The log*
-    open    the schema macros defined twice
-    open    the log levels named twice
+    closed  the schema macros defined twice, once in each backend's SDK: once now, in
+            `bridge-schema.h`, the library's, since the descriptor they emit is a text
+            the library parses. `schema.md`
+    closed  the log levels named twice: twice on purpose, a seam's header being whole
+            alone, and asserted equal where a module's level becomes a host's. `log.md`
 
 **6. Close**: both sets of figures measured again side by side, `PLAN.md` stage 10 marked done
 by its done-when as first written, and every line above closed.

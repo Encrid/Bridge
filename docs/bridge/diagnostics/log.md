@@ -57,12 +57,15 @@ detail. Four are named, in `bridge.h` for a host and in `bridge-abi.h` for a mod
 
     3  err      4  warn      6  info      7  debug
 
-A module may write any of the eight. A module's `log_level` is any of them but the first: zero is
-unset for it, as for every key, and refused; so is a number past 7. Nothing is lost that anyone
-states: a line of severity 0 passes every threshold from 1 up, and the least severe of the named
-ones is 3. `tests/stage2.c`, case `unsetlevel`. Filtering is at the writer, which begins `if (level
-> threshold) return` against a threshold in the private-memory header, so a line that is switched
-off costs a load and a branch.
+The four that are named have two sets of names, `BRIDGE_LOG_ERR` and its like in `bridge-abi.h` for
+a module that writes a line, and `BRIDGE_ERR` and its like in `bridge.h` for a host that reads one:
+the same numbers, in two headers that are each whole without the other, held equal by an assertion
+where a module's level becomes a host's. A module may write any of the eight. A module's `log_level`
+is any of them but the first: zero is unset for it, as for every key, and refused; so is a number
+past 7. Nothing is lost that anyone states: a line of severity 0 passes every threshold from 1 up,
+and the least severe of the named ones is 3. `tests/stage2.c`, case `unsetlevel`. Filtering is at
+the writer, which begins `if (level > threshold) return` against a threshold in the private-memory
+header, so a line that is switched off costs a load and a branch.
 
 **Drop and count, never block.** A log may lose lines, and that is exactly what separates it from a
 signal: a signal is an entity, so the entity ceiling governs it and running out is a failure where it

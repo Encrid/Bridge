@@ -6,6 +6,12 @@ The record of `schema.md`: `README.md`, *Three layers, three seams*.
 
 Of `schema.md`, *There is no schema format*.
 
+Refused: the three macros in each backend's SDK, which is where they were: the same text twice,
+alike by care, for a grammar neither backend owns. No condition brings it back. Refused: twice
+on purpose, with a check in the build that they match, which is a third thing to keep for a
+second copy nobody needs. The condition that brings it back is a backend whose C SDK must spell
+a type otherwise.
+
 Refused: `BRIDGE_STRUCT`, which is already the kind a `declare` states. No condition brings it back.
 
 ## The type set

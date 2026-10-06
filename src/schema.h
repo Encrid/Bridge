@@ -1,8 +1,8 @@
 /* A type from its text: what a descriptor may say, and what it lays out to.
  * docs/modules/schema.md, *The type set*. It reads text and answers a layout: who keeps the rows
  * is not its business, and storage never sees a field. */
-#ifndef BRIDGE_SCHEMA_H
-#define BRIDGE_SCHEMA_H
+#ifndef BRIDGE_INSIDE_SCHEMA_H
+#define BRIDGE_INSIDE_SCHEMA_H
 
 #include "bridge-abi.h"
 

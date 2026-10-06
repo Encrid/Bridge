@@ -113,6 +113,8 @@ period: `backend.md`, *The backend owns its clock*.
     include/                 the three seams Bridge-ASM700 defines, and nothing else
         bridge.h                 host seam: the functions and their structs
         bridge-backend.h         backend seam: the eighteen entries in `backend.md`
+        bridge-schema.h          module seam: how a type is stated in C, for a module on any
+                                 backend
         bridge-abi.h             module seam: what Bridge-ASM700 writes for a module to read,
                                  the same on every backend - `wasm.md`, *The ABI layouts*
     src/                     the library. Nothing outside it is compiled against it

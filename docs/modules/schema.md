@@ -4,11 +4,11 @@ What was weighed here and refused is `schema-refused.md`, *What was refused: Sch
 
 ## There is no schema format
 
-The schema is a C header, written with three macros of a backend's SDK:
+The schema is a C header, written with three macros of `bridge-schema.h`:
 
     BRIDGE_SCHEMA_STRUCT(Position, { float x; float y; })
 
-It expands to the type and a descriptor string, on either backend:
+It expands to the type and a descriptor string:
 
     #define BRIDGE_SCHEMA_STRUCT(name, ...) \
         typedef struct name __VA_ARGS__ name; \
@@ -16,6 +16,12 @@ It expands to the type and a descriptor string, on either backend:
 
 The module's compiler lays the struct out; the string is handed over at `declare`.
 `BRIDGE_SCHEMA_ENUM` and `BRIDGE_SCHEMA_BITMASK` do the same for the other two kinds.
+
+**The three macros are Bridge-ASM700's, and are written once.** The descriptor is a text
+Bridge-ASM700 parses, so how it is spelled in C is the library's to state, in `bridge-schema.h`,
+which each backend's SDK includes. A schema header is included by modules of either backend,
+and has to mean one thing in both. What is a backend's is how a module reaches a component once
+it is declared; what a type is, is not.
 
 The shape is flecs' `ECS_STRUCT`, and until stage 10 so was the name. It is ours now because the
 name was a promise: a reader expected flecs behind it, and a native module that links flecs for its

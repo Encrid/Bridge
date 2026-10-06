@@ -203,6 +203,11 @@ void block_drain(bridge *b, module *m)
         r.when = rec.when;
         r.arg[0] = rec.arg[0];
         r.arg[1] = rec.arg[1];
+        /* a module's four names for a level and a host's are two seams' names for the same
+         * numbers, each header being whole without the other: held equal here, where one
+         * becomes the other */
+        static_assert((int)BRIDGE_LOG_ERR == (int)BRIDGE_ERR && (int)BRIDGE_LOG_WARN == (int)BRIDGE_WARN
+            && (int)BRIDGE_LOG_INFO == (int)BRIDGE_INFO && (int)BRIDGE_LOG_DEBUG == (int)BRIDGE_DEBUG);
         r.level = rec.level;
         b->sink(b->ud, &r);
     }
