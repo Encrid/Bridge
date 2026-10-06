@@ -626,7 +626,9 @@ Of earlier stages:
             and an unload of it, by which a host goes on without it. `failure.md`
     closed  all pinned modules share the host's thread: it holds. What it does not serve is
             written, and each refusal has a condition. `pinned.md`
-    open    native entry arguments are scratch offsets, copied
+    closed  native entry arguments are scratch offsets, copied: the copy measures as nothing
+            for a small value. What it did cost was scratch, which held every value of a
+            phase beside `changes`: an SDK's attach gives it back now. `abi.md`
     open    every block is allocated to the largest shape any backend asks for
     open    a phase is a string at `bridge_phase`
 

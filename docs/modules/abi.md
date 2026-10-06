@@ -32,9 +32,26 @@ and for the same reason: the scratch arena is the one memory a module can write 
 can read and bounds-check. So one signature serves both backends, and every argument is 32 or 64
 bits wide - `signatures.md`, *Imports are declared, exports are checked*.
 
+**What an entry was handed is read during the call, and the scratch it was in is then free.**
+The scratch arena is reset at a barrier, so a value left there would stay for the rest of the
+phase, and a module's `scratch` would have to hold every value it attaches in one, beside its
+`changes`, which hold the same bytes: two sizes for one thing. So an SDK's attach puts the value,
+makes the call, and puts the scratch back where it was. A module's scratch then holds one value
+at a time. Each backend's SDK does it, in its own attach - `bridge_attach_value` and
+`bridge_native_attach` - and a log line's text is the one thing put in scratch that stays until
+the barrier, since it is read there: `log.md`, *The log*. `tests/stage3.c`, case
+`smallscratch`, attaches eight kilobytes of values through 512 bytes of scratch.
+
+What the second copy costs was measured, since it was called a cost on the native backend: an
+attach with a value of four bytes put through scratch took 19.9 ns against 19.6 to 20.0 without.
+
 Refused: a pointer type the backend translates, which would have the backend reading a module's own
 memory and pairing each pointer with its length. The condition that brings it back is a value too
-large for a scratch arena.
+large for a scratch arena. Refused: a real pointer on the native backend alone, which is one copy
+fewer there and two meanings of an entry. Refused: `attach` answering a place to write, with the
+queue in the module's private memory, which is one copy fewer everywhere and the queue, its
+checks and its budget made again. The condition that brings either back is the second copy of a
+large value measured as a cost that matters.
 
 **`attach` carries the initial value.** `ptr` and `len` say where it is, and Bridge-ASM700 takes a
 copy of the bytes at the call, bounds-checking them the way it checks a log record's text. Zero

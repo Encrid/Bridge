@@ -273,7 +273,7 @@ BRIDGE_NATIVE(value_b)
 {
     for (uint32_t i = 0; i < COUNT / 2; i ++) {
         B value = { 70 + i };
-        api->attach(api, ids[i], b, bridge_native_put(api, &value, sizeof value), sizeof value);
+        bridge_native_attach(api, ids[i], b, &value, sizeof value);
     }
     return 0;
 }

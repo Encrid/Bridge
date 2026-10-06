@@ -31,7 +31,7 @@ static uint32_t next()
 static void set(const bridge_api *api, uint32_t slot, uint32_t kind)
 {
     V value = { next() };
-    api->attach(api, ids[slot], kinds[kind], bridge_native_put(api, &value, sizeof value), sizeof value);
+    bridge_native_attach(api, ids[slot], kinds[kind], &value, sizeof value);
     has[slot] |= (uint8_t)(1u << kind);
     values[slot][kind] = value.v;
 }

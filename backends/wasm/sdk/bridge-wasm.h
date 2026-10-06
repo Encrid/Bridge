@@ -127,9 +127,16 @@ static inline uint32_t bridge_put(const void *bytes, uint32_t len)
                    (change_count) ? bridge_put(changes, (change_count) * sizeof(uint32_t)) : 0, \
                    change_count)
 
-/* an initial value travels with the attach - abi.md, *The ABI* */
-#define BRIDGE_ATTACH(id, slot, value) \
-    bridge_attach(id, slot, bridge_put(&(value), sizeof(value)), sizeof(value))
+/* An initial value travels with the attach - abi.md, *The ABI*. Bridge-ASM700 takes its copy
+ * during the call, so the scratch the value was put in is given back when the call returns:
+ * a module's scratch holds one such value at a time, and not a phase's worth. */
+static inline void bridge_attach_value(uint64_t id, uint32_t slot, const void *value, uint32_t len)
+{
+    uint32_t was = BRIDGE_HEADER(scratch_used);
+    bridge_attach(id, slot, bridge_put(value, len), len);
+    acc_own_st(offsetof(bridge_header, scratch_used), was);
+}
+#define BRIDGE_ATTACH(id, slot, value) bridge_attach_value(id, slot, &(value), sizeof(value))
 
 /* ---- a query's spans: two loops and no call. docs/bridge/data/query.md ---- */
 

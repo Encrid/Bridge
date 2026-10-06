@@ -81,6 +81,18 @@ static inline uint32_t bridge_native_put(const bridge_api *api, const void *byte
     return h->scratch + used;
 }
 
+/* An attach with its value. Bridge-ASM700 takes its copy during the call, so the scratch the
+ * value was put in is given back when the call returns: a module's scratch holds one such
+ * value at a time, and not a phase's worth. */
+static inline void bridge_native_attach(const bridge_api *api, uint64_t id, uint32_t slot,
+                                        const void *value, uint32_t len)
+{
+    bridge_header *h = bridge_native_header(api);
+    uint32_t was = h->scratch_used;
+    api->attach(api, id, slot, bridge_native_put(api, value, len), len);
+    h->scratch_used = was;
+}
+
 #define BRIDGE_NATIVE_DECLARE(api, kind, name, T, on_unload) \
     (api)->declare(api, bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, kind, \
                    sizeof(T), alignof(T), bridge_native_put(api, T##_desc, sizeof T##_desc - 1), \

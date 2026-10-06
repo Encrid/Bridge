@@ -196,6 +196,13 @@ int main(int argc, char **argv)
     } else if (!strcmp(what, "badterm")) {
         a = artifact("game:badterm@0.1.0", "badterm");
         load(b, &a);
+    } else if (!strcmp(what, "smallscratch")) {
+        /* its init attaches 1,024 positions, eight kilobytes of values, with a scratch of 512
+         * bytes: a value's scratch is given back when the attach returns */
+        a = artifact("game:mover@0.1.0", "mover");
+        a.cfg.scratch = 512;
+        load(b, &a);
+        frames(b, 2);
     } else if (!strcmp(what, "worklimit")) {
         a = artifact("test:spin@0.1.0", "spin3");
         load(b, &a);

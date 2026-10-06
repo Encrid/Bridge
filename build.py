@@ -455,6 +455,8 @@ CASES = [
      r"module 'view:reader@0.1.0' did not load: it may not declare 'game:Position': that is another namespace's, and no grant names it.*alive", None),
     ('stage3-badterm', ['stage3', 'badterm'],
      r"module 'game:badterm@0.1.0' did not load: term 0 of system 'any': its operator is 4, and there are three.*alive", None),
+    ('stage3-smallscratch', ['stage3', 'smallscratch'],
+     r"game:mover@0.1.0: loaded.*moved.*alive", 'not loaded'),
     ('stage3-worklimit', ['stage3', 'worklimit'],
      r"test:spin@0.1.0/forever: system 'forever' failed: trapped: all fuel consumed.*still here.*all fuel consumed.*still here.*alive", None),
     ('stage3-ceiling', ['stage3', 'ceiling'],

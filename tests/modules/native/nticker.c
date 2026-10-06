@@ -28,7 +28,7 @@ BRIDGE_NATIVE(init)
 {
     Tick t = { 100 };
     registration(api);
-    api->attach(api, api->spawn(api), tick, bridge_native_put(api, &t, sizeof t), sizeof t);
+    bridge_native_attach(api, api->spawn(api), tick, &t, sizeof t);
     return 0;
 }
 
