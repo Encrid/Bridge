@@ -154,3 +154,27 @@ design is for, over a rule on a component kept in a table.
 
 **So all five stand**, and every question below is asked of five.
 
+## The questions
+
+Each is decided here and built in step 4, where it goes into the document it belongs to.
+
+**1. The author states a component's storage layout, at `declare`.** One more argument beside
+`on_unload`, an `enum bridge_storage`, where zero is unset and refused. Every module that
+declares a shared component states the same one, or its load is refused naming the others and
+both storage layouts, as a component layout that differs is. The reason is what decides it: a
+table's column, a sparse set's array and a cell by entity are read by different code, and that
+code is fixed when the module is compiled, as `sizeof(T)` is - `query.md`, *The interface is a
+query*.
+
+    need          at declare           in the manifest         the deployment, or both
+    fast          serves               serves                  fails: a module carries code
+                                                               for all five, or reads by a call
+    scalable      does not apply       does not apply          serves: it knows the population
+    modular       serves: checked      serves                  fails: it must know each
+                  between declarers                            module's reading code
+    extensible    serves               serves                  serves
+    minimal       serves: one more     fails: a second place   fails: a table of
+                  argument             that names components   configuration, or two places
+    explicit      serves: unset is     fails: code and         fails: what runs is not what
+                  refused              manifest can disagree   the code reads as
+
