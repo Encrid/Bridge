@@ -95,7 +95,7 @@ static bridge_artifact reader()
 }
 
 /* validation.md, *Always on*: the accessor's test, against a build without it, with the
- * count that fuel adds and without. Nanoseconds a row, the best of twenty. */
+ * count that a work limit adds and without. Nanoseconds a row, the best of twenty. */
 static void bench(bridge_config *cfg)
 {
     static const char *const builds[2] = { "rows", "rows-unchecked" };
@@ -192,7 +192,7 @@ int main(int argc, char **argv)
     } else if (!strcmp(what, "badterm")) {
         a = artifact("game:badterm@0.1.0", "badterm");
         load(b, &a);
-    } else if (!strcmp(what, "fuel")) {
+    } else if (!strcmp(what, "worklimit")) {
         a = artifact("test:spin@0.1.0", "spin3");
         load(b, &a);
         frames(b, 2);
