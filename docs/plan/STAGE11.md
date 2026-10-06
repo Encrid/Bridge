@@ -324,3 +324,10 @@ measured: it happens a few times in a run.
     explicit      serves: a wrong id is     serves only where zero may    serves
                   refused by name           mean none
 
+**2.6 The component a module names as `config` is a singleton, or the load is refused by
+name.** Bridge-ASM700 gives it its value with the id 0 at init, where it spawned an entity of
+its own for it; that entity and the code that keeps it go. It closes what the gate found: a
+module could attach its settings component to a second entity, and `config.md` called it a
+singleton with nothing holding it to one. Allowing either was scored as failing minimal, two
+paths for one thing; leaving it as it is as failing explicit.
+

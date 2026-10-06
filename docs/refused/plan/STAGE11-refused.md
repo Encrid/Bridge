@@ -63,3 +63,7 @@ two entries of its own to set and to remove one. The first is a second kind of c
 nothing the chosen way does not allow; the second is two entries in each backend and each SDK
 for what `attach` and `detach` already say. No condition brings either back.
 
+Refused: a settings component kept in a table on an entity of Bridge-ASM700's own, as it was,
+alone or beside the singleton. A second row of it can exist, and with both there are two paths
+for one thing. No condition brings it back.
+
