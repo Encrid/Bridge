@@ -511,11 +511,12 @@ at least five things, none defined, and none of them the one that was meant.
     closed  a signature the native backend cannot check: the backend checks, since it is
             who can see an export. `instance_func` answers a function or refuses, and
             the arity, the count of results and the -1 left the seam. `signatures.md`
-    open    every decision against every need. `STAGE0.md`, step 6, asked for the one need
-            that decides, and a decision weighed that way was never scored on the other
-            five. The step is corrected. Every decision in the documents is listed, scored
-            on all six, and one whose verdict changes is decided again, one at a time.
-            This comes before the lines below it
+    closed  every decision against every need, read. `STAGE0.md`, step 6, asked for the one
+            need that decides, and a decision weighed that way was never scored on the other
+            five. The step is corrected. Every document was read a line at a time: about
+            280 decisions, of which about 250 hold on all six or fail one the text names
+            and prices. The rest are the lines of part 3b, decided again one at a time,
+            before the lines below it
     open    a memory handle kept for a backend that does not exist: kept, for the moment.
             Removing it was recommended on one need, minimal, and it loses on three of
             the six. To be weighed again with every decision here, against every need
@@ -524,6 +525,62 @@ at least five things, none defined, and none of them the one that was meant.
     open    numbers with no reason: the grain, the doubling, the first four rows, two arguments,
             and 65,536, a wasm page, to which the library rounds every block it makes
     open    "change a layout, bump the version", before anything is released
+
+**3b. Decisions that do not hold on every need.** Found by the reading above. Where the code
+was named it was read. Each is decided again with all six shown, or shown to hold.
+
+The chosen option contradicts its own reason, or a document:
+
+    open    the failure count rises and falls by the barrier: a module whose system fails in
+            one phase and runs clean in the next, every pass, is never stopped. `failure.md`
+    open    attach and detach are in no conflict graph: two modules attaching one component
+            to one entity are settled by load order, which `schedule.md` says never decides
+    open    `destroy` checks no grant: a module removes any entity, and every component on it
+    open    "nothing is allocated after create" is storage's and not the library's: a
+            module's change queue grows in a phase with no budget, an observer's list grows
+            at a barrier, and the arena's list of gaps and the kept settings grow at unload
+    open    the test of a row against its count, a row at a time: x1.2 on the tightest loop,
+            where one test a span was written down and not weighed. `validation.md`
+
+Of this repair:
+
+    open    the arena share given back at unload unless a row points into it: what an unload
+            does depends on other data, which is the failure step 6 names
+    open    five storage layouts, where only the table's weakness was measured
+    open    a removed or renamed field migrates at reload, and its values are lost on a call
+            that means "keep running"
+    open    a shared component whose layout changed is refused always, called forced
+    open    out of tables or columns: the module that asked last is charged, which may not
+            be the one that used them up; and its changes are applied in part
+    open    a strip that cannot join leaves two tables of one archetype
+    open    `[budget] terms` is the deployment's, and a module cannot state what it needs
+    open    the export shape: a backend that cannot check says so by doing nothing
+    open    the memory handle: the wasm backend compiles a holder module for a block at every
+            `instance_create`, which is work a handle could keep once. To be weighed with it
+
+Of earlier stages:
+
+    open    every header is C23, so a host or a backend is compiled as C23 or not at all
+    open    a boolean cannot be unset, and false is called the safe side for all six
+    open    a module is the unit of parallelism, with instance grouping refused on minimal
+    open    a system is bounded by fuel and never by a deadline, on every deployment
+    open    a field's type is found in its own namespace only
+    open    no phase names shipped, and a module writes its phase's name into its code
+    open    no row for a barrier in the profile
+    open    a stopped bridge takes only the load or reload of the module that stopped it
+    open    all pinned modules share the host's thread
+    open    native entry arguments are scratch offsets, copied
+    open    every block is allocated to the largest shape any backend asks for
+    open    a phase is a string at `bridge_phase`
+
+Statements false against the tree, in one pass with no decision: `bridge_manifest_parse`,
+`bridge_profile`, `validate` and `profile` in the present tense; `terms` for `types` in
+`reference.md` and `schedule.md`; "a barrier costs what changed"; "a phase is the sum of its
+systems"; "per adopted block" in `wasmtime.md`; "seventeenth"; stages "7 to 11" in `build.md`;
+`bridge_bind` and "sixteen" in `PLAN.md`; `rows_create` here; and a refusal spliced into the
+middle of a paragraph in `config.md`.
+
+    open    the false statements above
 
 **4. Refusals with no condition**: each with its subject above, and the rest in one pass.
 
