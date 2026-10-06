@@ -53,8 +53,10 @@ FEATURES = ['--enable-multimemory', '--enable-bulk-memory', '--enable-sign-ext',
 TIMEOUT = 120
 
 OS = ['memory', 'library', 'thread', 'mutex', 'event']
+SCHEMA = ['schema_reader', 'schema_token', 'schema_value', 'schema_type', 'schema_struct',
+          'schema_constants']
 BRIDGE = ['bridge', 'lifecycle', 'config', 'block', 'storage', 'schema', 'abi', 'schedule', 'pool',
-          'pool_job', 'pool_run', 'backend']
+          'pool_job', 'pool_run', 'backend'] + SCHEMA
 # a native module is a shared library: the name, its source, what it is compiled with. The same
 # library twice is one module to the loader, so one source is built under several names.
 NATIVE = [
@@ -291,7 +293,7 @@ def build(target, debug, out):
     for name, _, _ in NATIVE:
         link(name, [module_o[name]], shared=True)
     link('adopt', [adopt_o, obj / 'backend.o'] + os_o, system)
-    link('schema', [schema_test_o, obj / 'schema.o'], system)
+    link('schema', [schema_test_o] + [obj / (name + '.o') for name in ['schema'] + SCHEMA], system)
     whole = bridge_o + os_o
     # the library, built: shared and static. What a host links - host_api.md
     shared_lib, static_lib = out / ('bridge' + lib), out / 'bridge.a'

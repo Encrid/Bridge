@@ -428,7 +428,7 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
         } else {
             if (!desc) return refuse(m, "out of memory: there was none for the descriptor of '%s'", name);
             *bare = 0;
-            refused = schema_parse(kind, desc, find, &l, &s, why, sizeof why);
+            refused = schema_parse(&(schema_source_t){ kind, desc, find, &l, why, sizeof why }, &s);
             *bare = ':';
             free(desc);
             if (refused) return refuse(m, "type '%s': its descriptor %s", name, why);

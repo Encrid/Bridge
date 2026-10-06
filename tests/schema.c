@@ -43,7 +43,7 @@ static void a_struct(const char *text, uint32_t size, uint32_t align, const want
 {
     schema_t s;
     char why[160];
-    if (schema_parse(BRIDGE_STRUCT, text, find, nullptr, &s, why, sizeof why)) { fail(text, why); return; }
+    if (schema_parse(&(schema_source_t){ BRIDGE_STRUCT, text, find, nullptr, why, sizeof why }, &s)) { fail(text, why); return; }
     if (s.size != size || s.align != align || s.field_count != count) fail(text, "its size, alignment or field count");
     for (uint32_t i = 0; i < count && i < s.field_count; i ++) {
         if (strcmp(s.fields[i].name, want[i].name) || s.fields[i].offset != want[i].offset
@@ -59,7 +59,7 @@ static void constants(enum bridge_kind kind, const char *text, uint32_t size, co
 {
     schema_t s;
     char why[160];
-    if (schema_parse(kind, text, find, nullptr, &s, why, sizeof why)) { fail(text, why); return; }
+    if (schema_parse(&(schema_source_t){ kind, text, find, nullptr, why, sizeof why }, &s)) { fail(text, why); return; }
     if (s.size != size || s.align != size || s.constant_count != count) fail(text, "its size or how many constants");
     for (uint32_t i = 0; i < count && i < s.constant_count; i ++) {
         if (s.constants[i].value != want[i]) fail(text, s.constants[i].name);
@@ -72,7 +72,7 @@ static void refused(enum bridge_kind kind, const char *text, const char *word)
 {
     schema_t s;
     char why[160] = "";
-    if (!schema_parse(kind, text, find, nullptr, &s, why, sizeof why)) {
+    if (!schema_parse(&(schema_source_t){ kind, text, find, nullptr, why, sizeof why }, &s)) {
         schema_free(&s);
         fail(text, "was accepted");
         return;
