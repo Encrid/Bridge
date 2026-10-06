@@ -117,3 +117,25 @@ in `BRIDGE_SHARED` and throughout storage, and a word has one meaning here.
     extensible    a backend somebody else writes may take the folder, or write its own
     minimal       about 250 lines once, where it was about 490
     explicit      one place, named in `build.md`, *The C library*
+
+### The three entries a module calls at load
+
+`declare` took nine arguments, `system` eight and `observe` seven, and rule F5 allows four. All
+three run when a module loads and never in a phase.
+
+What a module passes today is already mostly not values. A name, a descriptor and the terms of
+a query are offsets into the module's memory, which the library checks and reads; and the terms
+are structs, `bridge_term`, whose layout `bridge-abi.h` asserts.
+
+**Each of the three takes one struct, by its offset.** The module writes it in its memory and
+passes where it is, as it passes its terms; the library checks the range and reads the fields.
+The three layouts are stated in `bridge-abi.h` with their sizes and offsets asserted, as every
+ABI layout is. A field a C initializer leaves out is zero, and zero is already the unset value
+that `declare` refuses for a kind, for what happens at unload and for a storage layout.
+
+    fast          at load only: one check and one read more
+    scalable      a new field is a field, and no entry changes its arguments
+    modular       the layouts are in `bridge-abi.h` with the others
+    extensible    any language writes bytes at stated offsets
+    minimal       three structs and three readers
+    explicit      every field is named where it is written, and its place is asserted
