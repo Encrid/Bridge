@@ -191,6 +191,8 @@ int main(int argc, char **argv)
 {
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[1] = {{ "native", NATIVE_PATH }};
+    /* the wasm backend beside it, which asks for address space around a block it maps */
+    bridge_backend both[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
     bridge_config cfg = { .backends = backends, .backend_count = 1, .phases = phases,
         .phase_count = PHASES, .threads = 1, .budget =
         { .entities = 400'000, .tables = 32'768, .types = 64, .systems = 64, .terms = 4, .modules = 4,
@@ -200,6 +202,7 @@ int main(int argc, char **argv)
     /* the stress run is the one thing here that is run on more than one thread */
     if (!strcmp(what, "stress")) cfg.threads = 4;
     if (!strcmp(what, "stress1")) what = "stress";      /* the same, on the caller's thread alone */
+    if (!strcmp(what, "shape")) { cfg.backends = both; cfg.backend_count = 2; }
     if (!strcmp(what, "notables")) cfg.budget.tables = 1;
     if (!strcmp(what, "nocolumns")) cfg.budget.columns = 64;
     if (!strcmp(what, "stripfull")) cfg.budget.columns = 160;
@@ -209,7 +212,16 @@ int main(int argc, char **argv)
     setvbuf(stdout, nullptr, _IONBF, 0);
     if (!b) { printf("FAIL: bridge_create\n"); return 1; }
 
-    if (!strcmp(what, "changes")) {
+    if (!strcmp(what, "shape")) {
+        /* backend.md, *Memory is adopted, not created*: a native module's private block
+         * reserves what it uses, though the wasm backend is there and wants four gigabytes */
+        a = store_module(NSTORE_PATH, 6, 1 << 20, 1 << 20);
+        if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
+        printf("the shared block reserves more than it uses: %s\n",
+            b->shared_reserve > b->shared_len ? "yes" : "NO");
+        printf("a native module's private block reserves what it uses: %s\n",
+            b->modules->priv_reserve == b->modules->priv_len ? "yes" : "NO");
+    } else if (!strcmp(what, "changes")) {
         a = store_module(NSTORE_PATH, 6, 1 << 20, 1 << 20);
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         run(b, "spawn");

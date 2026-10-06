@@ -155,6 +155,8 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
         }
         o->capabilities = o->api.backend_capabilities(o->be);
         o->api.memory_shape(o->be, &reservation, &guard);
+        o->reservation = reservation;
+        o->guard = guard;
         if (reservation > b->reservation) b->reservation = reservation;
         if (guard > b->guard) b->guard = guard;
     }

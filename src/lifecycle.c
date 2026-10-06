@@ -391,7 +391,7 @@ static module *record(bridge *b, const bridge_artifact *a, open_backend *o)
 }
 
 /* The private block: the header at 0, then the three regions its config sized. */
-static int private_memory(bridge *b, module *m, const bridge_module_config *cfg, backend_err *err)
+static int private_memory(module *m, const bridge_module_config *cfg, backend_err *err)
 {
     constexpr uint32_t scratch = 128;
     uint32_t ring, spans, end;
@@ -399,7 +399,8 @@ static int private_memory(bridge *b, module *m, const bridge_module_config *cfg,
     /* checks() refused a config this could not lay out, so it cannot fail here */
     if (private_layout(cfg, &ring, &spans, &end)) unreachable();
     len = ((uint64_t)end + PAGE - 1) & ~(uint64_t)(PAGE - 1);
-    reserve = (len > b->reservation ? len : b->reservation) + b->guard;
+    /* only its own backend maps a module's private block, so it has that backend's shape */
+    reserve = (len > m->on->reservation ? len : m->on->reservation) + m->on->guard;
     m->priv = os_reserve((size_t)reserve, (size_t)len);
     if (!m->priv) {
         snprintf(err->text, sizeof err->text, "the operating system would not give its private memory "
@@ -474,7 +475,7 @@ static int start(bridge *b, module *m, const bridge_artifact *a, enum backend_ca
 
     m->image = o->api.module_compile(o->be, a->bytes, a->len, a->path, demands, err);
     if (!m->image) return 1;
-    if (private_memory(b, m, cfg, err)) return 1;
+    if (private_memory(m, cfg, err)) return 1;
     block_header(b, m);
 
     /* a module is handed the memories it imports, and no other - backend.md */

@@ -629,7 +629,8 @@ Of earlier stages:
     closed  native entry arguments are scratch offsets, copied: the copy measures as nothing
             for a small value. What it did cost was scratch, which held every value of a
             phase beside `changes`: an SDK's attach gives it back now. `abi.md`
-    open    every block is allocated to the largest shape any backend asks for
+    closed  every block is allocated to the largest shape any backend asks for: the shared
+            block is; a module's private block has its own backend's. `backend.md`
     open    a phase is a string at `bridge_phase`
 
 Statements false against the tree, in one pass with no decision: `bridge_manifest_parse`,

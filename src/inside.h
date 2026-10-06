@@ -21,6 +21,9 @@ typedef struct {
     backend         *be;
     enum backend_capability capabilities;
     backend_memory  *shared;        /* the shared block, as this backend sees it */
+    /* backend.md, *Memory is adopted, not created*: the address space it needs around a
+     * block it maps. A module's private block has this; the shared block the largest */
+    uint64_t         reservation, guard;
 } open_backend;
 
 /* A component, by its namespaced name. Storage holds the rows; this is what load checks. */

@@ -75,9 +75,17 @@ and a wasm module as an import.
 **A backend states the shape it needs, and Bridge-ASM700 allocates to it.** An engine does not care
 who allocated a block; it cares what surrounds it. One that enforces bounds by faulting needs
 address space reserved after the block and left unmapped, so that a stray access lands on nothing.
-`memory_shape` answers the reservation and the guard a backend needs; Bridge-ASM700 takes the largest
-of every backend's and allocates each block once, to that. A backend with no requirement answers
-zero for both.
+`memory_shape` answers the reservation and the guard a backend needs, and **a block has the shape
+of whoever maps it**. The shared block is mapped by every backend, so it has the largest of
+them all. A module's private block is mapped by that module's backend and no other, so it has
+that backend's. A backend with no requirement answers zero for both, and a native module's
+private block reserves what it uses and no more. `tests/storage.c`, case `shape`.
+
+Refused: the largest shape for every block, which is what this had. The wasm backend asks for
+four gigabytes and a guard, and beside it every native module's private block reserved that
+much address space for nobody: nothing committed, and a load refused all the same where a
+process's address space is capped. The condition that brings it back is a module's private
+block mapped by a backend other than its own.
 
 That is what keeps the block one answer for any number of backends. Refused: one backend creating
 the block and the others adopting it, which works for exactly one backend that insists on allocating

@@ -379,6 +379,8 @@ CASES = [
      '@tests/storage-tables.txt', None),
     ('alloc-strip', ['storage-counted', 'strip'],
      '@tests/storage-strip.txt', None),
+    ('storage-shape', ['storage', 'shape'],
+     r"the shared block reserves more than it uses: yes.*a native module's private block reserves what it uses: yes.*alive", None),
     ('storage-tables', ['storage', 'tables'],
      '@tests/storage-tables.txt', None),
     ('storage-stress', ['storage', 'stress'],
