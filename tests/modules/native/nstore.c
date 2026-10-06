@@ -53,8 +53,8 @@ BRIDGE_NATIVE(spawn)
 }
 
 /* zero bytes, so that a hundred thousand of them need no scratch arena */
-BRIDGE_NATIVE(attach_a) { for (uint32_t i = 0; i < COUNT; i ++) api->attach(api, ids[i], a, 0, 0); return 0; }
-BRIDGE_NATIVE(attach_b) { for (uint32_t i = 0; i < COUNT; i ++) api->attach(api, ids[i], b, 0, 0); return 0; }
+BRIDGE_NATIVE(attach_a) { for (uint32_t i = 0; i < COUNT; i ++) api->attach(api, ids[i], a, BRIDGE_ZEROED); return 0; }
+BRIDGE_NATIVE(attach_b) { for (uint32_t i = 0; i < COUNT; i ++) api->attach(api, ids[i], b, BRIDGE_ZEROED); return 0; }
 BRIDGE_NATIVE(detach_b) { for (uint32_t i = 0; i < COUNT; i ++) api->detach(api, ids[i], b); return 0; }
 BRIDGE_NATIVE(destroy) { for (uint32_t i = 0; i < COUNT; i ++) api->destroy(api, ids[i]); return 0; }
 
@@ -62,8 +62,8 @@ BRIDGE_NATIVE(destroy) { for (uint32_t i = 0; i < COUNT; i ++) api->destroy(api,
 BRIDGE_NATIVE(attach_both)
 {
     for (uint32_t i = 0; i < COUNT; i ++) {
-        api->attach(api, ids[i], a, 0, 0);
-        api->attach(api, ids[i], b, 0, 0);
+        api->attach(api, ids[i], a, BRIDGE_ZEROED);
+        api->attach(api, ids[i], b, BRIDGE_ZEROED);
     }
     return 0;
 }
@@ -76,7 +76,7 @@ BRIDGE_NATIVE(combine)
 {
     for (uint32_t i = 0; i < COUNT; i ++) {
         for (uint32_t k = 0; k < KINDS; k ++) {
-            if ((i + 1) >> k & 1) api->attach(api, ids[i], kinds[k], 0, 0);
+            if ((i + 1) >> k & 1) api->attach(api, ids[i], kinds[k], BRIDGE_ZEROED);
         }
     }
     return 0;
@@ -114,7 +114,7 @@ static bool alive(const bridge_api_t *api, uint64_t id)
 }
 
 /* half of them, and one of them */
-BRIDGE_NATIVE(attach_b_half) { for (uint32_t i = 0; i < COUNT / 2; i ++) api->attach(api, ids[i], b, 0, 0); return 0; }
+BRIDGE_NATIVE(attach_b_half) { for (uint32_t i = 0; i < COUNT / 2; i ++) api->attach(api, ids[i], b, BRIDGE_ZEROED); return 0; }
 BRIDGE_NATIVE(detach_b_half) { for (uint32_t i = 0; i < COUNT / 2; i ++) api->detach(api, ids[i], b); return 0; }
 BRIDGE_NATIVE(detach_b_absent) { api->detach(api, ids[COUNT - 1], b); return 0; }
 
@@ -123,7 +123,7 @@ BRIDGE_NATIVE(value_a)
 {
     A value = { 41 };
     uint32_t at = bridge_native_put(api, &value, sizeof value);
-    api->attach(api, ids[0], a, at, sizeof value);
+    api->attach(api, ids[0], a, at);
     ((A *)(api->private_base + at))->v = 99;        /* after the call: must not be seen */
     return 0;
 }
@@ -131,10 +131,10 @@ BRIDGE_NATIVE(value_a)
 /* on one entity inside one barrier: there and gone, and gone and back */
 BRIDGE_NATIVE(flicker)
 {
-    api->attach(api, ids[COUNT - 1], b, 0, 0);
+    api->attach(api, ids[COUNT - 1], b, BRIDGE_ZEROED);
     api->detach(api, ids[COUNT - 1], b);
     api->detach(api, ids[0], a);
-    api->attach(api, ids[0], a, 0, 0);
+    api->attach(api, ids[0], a, BRIDGE_ZEROED);
     return 0;
 }
 
@@ -178,13 +178,13 @@ BRIDGE_NATIVE(recycled)
 /* a change asked of an id that is gone is passed over */
 BRIDGE_NATIVE(touch_dead)
 {
-    api->attach(api, old[COUNT - 1], a, 0, 0);
+    api->attach(api, old[COUNT - 1], a, BRIDGE_ZEROED);
     api->detach(api, old[COUNT - 1], a);
     api->destroy(api, old[COUNT - 1]);
     return 0;
 }
 
-BRIDGE_NATIVE(attach_a_half) { for (uint32_t i = COUNT / 2; i < COUNT; i ++) api->attach(api, ids[i], a, 0, 0); return 0; }
+BRIDGE_NATIVE(attach_a_half) { for (uint32_t i = COUNT / 2; i < COUNT; i ++) api->attach(api, ids[i], a, BRIDGE_ZEROED); return 0; }
 
 /* ---- what a system sees ---- */
 
@@ -273,7 +273,7 @@ BRIDGE_NATIVE(value_b)
 {
     for (uint32_t i = 0; i < COUNT / 2; i ++) {
         B value = { 70 + i };
-        bridge_native_attach(api, ids[i], b, &value, sizeof value);
+        BRIDGE_NATIVE_ATTACH(api, ids[i], b, value);
     }
     return 0;
 }
@@ -331,9 +331,10 @@ BRIDGE_NATIVE(init)
     };
     bridge_term_t first[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     for (uint32_t k = 0; k < KINDS; k ++) {
-        kinds[k] = api->declare(api, bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
+        kinds[k] = api->declare(api, BRIDGE_NATIVE_STATE(api, bridge_declaration_t,
+            bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
             (uint32_t)strlen(names[k]), BRIDGE_STRUCT, sizeof(T), alignof(T),
-            bridge_native_put(api, T_desc, sizeof T_desc - 1), sizeof T_desc - 1, BRIDGE_DELETE, BRIDGE_TABLE);
+            bridge_native_put(api, T_desc, sizeof T_desc - 1), sizeof T_desc - 1, BRIDGE_DELETE, BRIDGE_TABLE));
     }
     first[0].slot = kinds[0];
     BRIDGE_NATIVE_ADD_SYSTEM(api, "combine", "combine", &none, 0, kinds, 14);

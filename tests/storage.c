@@ -528,9 +528,9 @@ int main(int argc, char **argv)
         cfg.budget.columns = 112;
         moved_case(cfg, 1, 2, "", nullptr, BRIDGE_NONE);
         b = bridge_create(&cfg, sink, nullptr);
-    } else if (!strcmp(what, "tag") || !strcmp(what, "tagbad")) {
+    } else if (!strcmp(what, "tag")) {
         /* storage.md, *A tag*: one in each storage layout */
-        a = store_module(!strcmp(what, "tag") ? NTAG_PATH : NTAGBAD_PATH, 8, 1 << 20, 4096);
+        a = store_module(NTAG_PATH, 8, 1 << 20, 4096);
         if (bridge_load(b, &a)) { printf("not loaded\nalive\n"); return 0; }
         run(b, "spawn");
         run(b, "look");

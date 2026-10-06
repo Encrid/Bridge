@@ -26,18 +26,12 @@
  * it. */
 typedef struct bridge_api bridge_api_t;
 struct bridge_api {
-    uint32_t (*declare)(const bridge_api_t *api, uint32_t name, uint32_t name_len, enum bridge_kind kind,
-                        uint32_t size, uint32_t align, uint32_t desc, uint32_t desc_len,
-                        enum bridge_on_unload on_unload, enum bridge_storage storage);
-    uint32_t (*add_system)(const bridge_api_t *api, uint32_t name, uint32_t name_len, uint32_t phase,
-                       uint32_t phase_len, uint32_t terms, uint32_t term_count, uint32_t changes,
-                       uint32_t change_count);
-    uint32_t (*observe)(const bridge_api_t *api, uint32_t name, uint32_t name_len,
-                        enum bridge_event events, uint32_t terms, uint32_t term_count,
-                        uint32_t changes, uint32_t change_count);
+    uint32_t (*declare)(const bridge_api_t *api, uint32_t at);
+    uint32_t (*add_system)(const bridge_api_t *api, uint32_t at);
+    uint32_t (*observe)(const bridge_api_t *api, uint32_t at);
     uint64_t (*spawn)(const bridge_api_t *api);
     void     (*destroy)(const bridge_api_t *api, uint64_t id);
-    void     (*attach)(const bridge_api_t *api, uint64_t id, uint32_t slot, uint32_t ptr, uint32_t len);
+    void     (*attach)(const bridge_api_t *api, uint64_t id, uint32_t slot, uint32_t ptr);
     void     (*detach)(const bridge_api_t *api, uint64_t id, uint32_t slot);
     uint32_t (*alloc)(const bridge_api_t *api, uint32_t len);
     uint8_t  *shared_base;          /* the shared memory. it does not move */
@@ -68,44 +62,55 @@ static inline uint32_t bridge_native_put(const bridge_api_t *api, const void *by
     return h->scratch + used;
 }
 
-/* An attach with its value. Bridge-ASM700 takes its copy during the call, so the scratch the
- * value was put in is given back when the call returns: a module's scratch holds one such
- * value at a time, and not a phase's worth. */
-static inline void bridge_native_attach(const bridge_api_t *api, uint64_t id, uint32_t slot,
-                                        const void *value, uint32_t len)
+/* `len` bytes copied above what the scratch arena has in use, and not counted as used: where
+ * they are, or 0 if they do not fit. For a value an entry copies during the call, as attach
+ * does, so that a module's scratch holds one such value at a time and not a phase's worth. */
+static inline uint32_t bridge_native_lend(const bridge_api_t *api, const void *bytes, uint32_t len)
 {
     bridge_header_t *h = bridge_native_get_header(api);
-    uint32_t was = h->scratch_used;
-    api->attach(api, id, slot, bridge_native_put(api, value, len), len);
-    h->scratch_used = was;
+    uint32_t used = (h->scratch_used + 7u) & ~7u;
+    if (used > h->scratch_len || len > h->scratch_len - used) return 0;
+    memcpy(api->private_base + h->scratch + used, bytes, len);
+    return h->scratch + used;
 }
 
+/* An attach with its value, which is as long as the type was declared. */
+#define BRIDGE_NATIVE_ATTACH(api, id, slot, value) \
+    (api)->attach(api, id, slot, bridge_native_lend(api, &(value), sizeof(value)))
+
+#define BRIDGE_NATIVE_STATE(api, T, ...) \
+    bridge_native_put(api, &(T){ __VA_ARGS__ }, sizeof(T))
+
 #define BRIDGE_NATIVE_DECLARE(api, kind, name, T, on_unload, storage) \
-    (api)->declare(api, bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, kind, \
-                   sizeof(T), alignof(T), bridge_native_put(api, T##_desc, sizeof T##_desc - 1), \
-                   sizeof T##_desc - 1, on_unload, storage)
+    (api)->declare(api, BRIDGE_NATIVE_STATE(api, bridge_declaration_t, \
+        bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, kind, sizeof(T), \
+        alignof(T), bridge_native_put(api, T##_desc, sizeof T##_desc - 1), \
+        sizeof T##_desc - 1, on_unload, storage))
 #define BRIDGE_NATIVE_COMPONENT(api, name, T, on_unload, storage) \
     BRIDGE_NATIVE_DECLARE(api, BRIDGE_STRUCT, name, T, on_unload, storage)
 
 /* a tag: a component with no bytes, so no type to take them from - storage.md, *A tag* */
 #define BRIDGE_NATIVE_DECLARE_TAG(api, name, on_unload, storage) \
-    (api)->declare(api, bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, BRIDGE_TAG, \
-                   0, 1, 0, 0, on_unload, storage)
+    (api)->declare(api, BRIDGE_NATIVE_STATE(api, bridge_declaration_t, \
+        bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, BRIDGE_TAG, 0, 1, 0, 0, \
+        on_unload, storage))
 
 /* `changes` is the slots of the components it attaches or detaches, `change_count` of them:
  * a system that does neither hands nullptr and 0 */
 #define BRIDGE_NATIVE_ADD_SYSTEM(api, name, phase, terms, count, changes, change_count) \
-    (api)->add_system(api, bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, \
-                  bridge_native_put(api, phase, sizeof phase - 1), sizeof phase - 1, \
-                  bridge_native_put(api, terms, (count) * sizeof(bridge_term_t)), count, \
-                  (change_count) ? bridge_native_put(api, changes, \
-                      (change_count) * sizeof(uint32_t)) : 0, change_count)
+    (api)->add_system(api, BRIDGE_NATIVE_STATE(api, bridge_system_statement_t, \
+        bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, \
+        bridge_native_put(api, phase, sizeof phase - 1), sizeof phase - 1, \
+        bridge_native_put(api, terms, (count) * sizeof(bridge_term_t)), count, \
+        (change_count) ? bridge_native_put(api, changes, (change_count) * sizeof(uint32_t)) : 0, \
+        change_count))
 
 #define BRIDGE_NATIVE_OBSERVER(api, name, events, terms, count, changes, change_count) \
-    (api)->observe(api, bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, events, \
-                   bridge_native_put(api, terms, (count) * sizeof(bridge_term_t)), count, \
-                   (change_count) ? bridge_native_put(api, changes, \
-                       (change_count) * sizeof(uint32_t)) : 0, change_count)
+    (api)->observe(api, BRIDGE_NATIVE_STATE(api, bridge_observer_statement_t, \
+        bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, events, \
+        bridge_native_put(api, terms, (count) * sizeof(bridge_term_t)), count, \
+        (change_count) ? bridge_native_put(api, changes, (change_count) * sizeof(uint32_t)) : 0, \
+        change_count))
 
 /* ---- a query's spans, through real pointers. native.md, *Reaching a component* ---- */
 

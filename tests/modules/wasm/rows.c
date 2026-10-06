@@ -28,7 +28,7 @@ BRIDGE_EXPORT(init) int init()
     terms[0].slot = position;
     moving = BRIDGE_ADD_SYSTEM("move", "update", terms, 1, nullptr, 0);
     /* zeroed: a value each would need a scratch arena of their sum */
-    for (i = 0; i < ENTITIES; i ++) bridge_attach(bridge_spawn(), position, 0, 0);
+    for (i = 0; i < ENTITIES; i ++) bridge_attach(bridge_spawn(), position, BRIDGE_ZEROED);
     return 0;
 }
 

@@ -20,7 +20,7 @@ BRIDGE_NATIVE(stamp)
         const uint32_t *span = bridge_native_get_span(api, q, s, 1);
         auto who = (const uint64_t *)(api->shared_base + span[1]);
         for (uint32_t row = 0; row < span[0]; row ++) {
-            bridge_native_attach(api, who[row], marked, &m, sizeof m);
+            BRIDGE_NATIVE_ATTACH(api, who[row], marked, m);
         }
     }
     return 0;
@@ -37,7 +37,7 @@ BRIDGE_NATIVE(init)
 #else
     stamping = BRIDGE_NATIVE_ADD_SYSTEM(api, "stamp", PHASE, terms, 1, &marked, 1);
 #endif
-    bridge_native_attach(api, api->spawn(api), position, &p, sizeof p);
+    BRIDGE_NATIVE_ATTACH(api, api->spawn(api), position, p);
     return 0;
 }
 

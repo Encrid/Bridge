@@ -44,11 +44,11 @@ BRIDGE_NATIVE(fill)
         V v = { 1 };
         F f = { random32() % ON == 0, 1 };
         L l = { ids[i], ids[random32() % COUNT] };
-        bridge_native_attach(api, ids[i], value, &v, sizeof v);
-        bridge_native_attach(api, ids[i], flag, &f, sizeof f);
-        bridge_native_attach(api, ids[i], link, &l, sizeof l);
+        BRIDGE_NATIVE_ATTACH(api, ids[i], value, v);
+        BRIDGE_NATIVE_ATTACH(api, ids[i], flag, f);
+        BRIDGE_NATIVE_ATTACH(api, ids[i], link, l);
     }
-    bridge_native_attach(api, holder, single, &s, sizeof s);
+    BRIDGE_NATIVE_ATTACH(api, holder, single, s);
     return 0;
 }
 

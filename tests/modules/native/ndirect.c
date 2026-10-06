@@ -42,7 +42,7 @@ BRIDGE_NATIVE(spawn)
     for (uint32_t i = 0; i < COUNT; i ++) {
         A value = { .v = i };
         ids[i] = api->spawn(api);
-        bridge_native_attach(api, ids[i], a, &value, sizeof value);
+        BRIDGE_NATIVE_ATTACH(api, ids[i], a, value);
     }
     for (uint32_t i = 0; i < COUNT; i ++) {
         state ^= state << 13;
@@ -57,7 +57,7 @@ BRIDGE_NATIVE(attach_b)
 {
     for (uint32_t i = 0; i < COUNT; i += STEP) {
         D value = { 100 + i };
-        bridge_native_attach(api, ids[i], d, &value, sizeof value);
+        BRIDGE_NATIVE_ATTACH(api, ids[i], d, value);
     }
     return 0;
 }
@@ -77,7 +77,7 @@ BRIDGE_NATIVE(detach_b_half)
 BRIDGE_NATIVE(value_b)
 {
     D value = { 900 };
-    bridge_native_attach(api, ids[2 % COUNT], d, &value, sizeof value);
+    BRIDGE_NATIVE_ATTACH(api, ids[2 % COUNT], d, value);
     return 0;
 }
 
@@ -93,7 +93,7 @@ BRIDGE_NATIVE(respawn_half)
     for (uint32_t i = COUNT; i < COUNT + 2; i ++) {
         A value = { .v = i };
         ids[i] = api->spawn(api);
-        bridge_native_attach(api, ids[i], a, &value, sizeof value);
+        BRIDGE_NATIVE_ATTACH(api, ids[i], a, value);
     }
     return 0;
 }

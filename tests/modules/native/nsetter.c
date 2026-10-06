@@ -10,7 +10,7 @@ BRIDGE_NATIVE(mark)
 {
     Marked m = { 77 };
     if (runs ++) return 0;
-    bridge_native_attach(api, ids[1], marked, &m, sizeof m);
+    BRIDGE_NATIVE_ATTACH(api, ids[1], marked, m);
     bridge_native_log(api, BRIDGE_LOG_INFO, "marked", 6, 0, 0);
     return 0;
 }
@@ -24,7 +24,7 @@ BRIDGE_NATIVE(init)
     for (i = 0; i < 3; i ++) {
         Position p = { (float)i, 0.0f };
         ids[i] = api->spawn(api);
-        bridge_native_attach(api, ids[i], position, &p, sizeof p);
+        BRIDGE_NATIVE_ATTACH(api, ids[i], position, p);
     }
     return 0;
 }

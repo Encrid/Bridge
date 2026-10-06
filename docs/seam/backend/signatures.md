@@ -26,7 +26,7 @@ return, and Bridge-ASM700 fails the invocation when it does.
 
 **An arity would not do, and not as a matter of taste.** Five of the eight entries answer a value -
 `declare`, `add_system` and `observe` a slot, `spawn` an id, `alloc` an offset - and a count of
-arguments cannot say so. Nor can it say how wide they are: `attach(id, slot, ptr, len)` has four
+arguments cannot say so. Nor can it say how wide they are: `attach(id, slot, ptr)` has three
 parameters of which the first is a 64-bit entity id and the rest are 32-bit, `ptr` being an offset
 into the scratch arena on every backend. And wasmtime's own
 entry settles it - `wasmtime_linker_define_func` takes `const wasm_functype_t *ty` (`linker.h:137`),

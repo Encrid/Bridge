@@ -39,8 +39,8 @@ static void make(const bridge_api_t *api, uint32_t from)
         A first = { i };
         T second = { 10 + i };
         ids[i] = api->spawn(api);
-        bridge_native_attach(api, ids[i], a, &first, sizeof first);
-        bridge_native_attach(api, ids[i], t, &second, sizeof second);
+        BRIDGE_NATIVE_ATTACH(api, ids[i], a, first);
+        BRIDGE_NATIVE_ATTACH(api, ids[i], t, second);
     }
 }
 
@@ -173,7 +173,7 @@ BRIDGE_NATIVE(attach_b)
 {
     for (uint32_t i = 0; i < COUNT / 2; i ++) {
         B value = { i };
-        bridge_native_attach(api, ids[i], b, &value, sizeof value);
+        BRIDGE_NATIVE_ATTACH(api, ids[i], b, value);
     }
     return 0;
 }
@@ -188,7 +188,7 @@ BRIDGE_NATIVE(destroy_half)
 BRIDGE_NATIVE(value_a)
 {
     T value = { 500 };
-    bridge_native_attach(api, ids[2 % COUNT], t, &value, sizeof value);
+    BRIDGE_NATIVE_ATTACH(api, ids[2 % COUNT], t, value);
     return 0;
 }
 

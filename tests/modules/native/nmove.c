@@ -28,11 +28,11 @@ BRIDGE_NATIVE(spawn)
         A first = { i };
         X second = { 100 + i };
         ids[i] = api->spawn(api);
-        bridge_native_attach(api, ids[i], a, &first, sizeof first);
+        BRIDGE_NATIVE_ATTACH(api, ids[i], a, first);
 #if KEPT == 5
-        if (i == 4) bridge_native_attach(api, 0, x, &second, sizeof second);
+        if (i == 4) BRIDGE_NATIVE_ATTACH(api, 0, x, second);
 #else
-        if (i % 2 == 0) bridge_native_attach(api, ids[i], x, &second, sizeof second);
+        if (i % 2 == 0) BRIDGE_NATIVE_ATTACH(api, ids[i], x, second);
 #endif
     }
     return 0;

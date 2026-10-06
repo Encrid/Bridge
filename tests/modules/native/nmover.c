@@ -41,10 +41,10 @@ BRIDGE_NATIVE(init)
     for (i = 0; i < ENTITIES; i ++) {
         uint64_t id = api->spawn(api);
         Position p = { (float)i, 0.0f };
-        bridge_native_attach(api, id, position, &p, sizeof p);
+        BRIDGE_NATIVE_ATTACH(api, id, position, p);
         if (i % 2) {
             Marked m = { i };
-            bridge_native_attach(api, id, marked, &m, sizeof m);
+            BRIDGE_NATIVE_ATTACH(api, id, marked, m);
         }
     }
     return 0;

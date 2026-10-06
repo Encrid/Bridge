@@ -350,6 +350,14 @@ built by the same script.
                                   a verb: `bridge_get_sparse_index`. The entry `system` is
                                   `add_system`, in the ABI, both SDKs and the two messages
                                   that name it
+    the entries at load           `declare`, `add_system` and `observe` take one struct by its
+                                  offset: `bridge_declaration_t`, `bridge_system_statement_t`,
+                                  `bridge_observer_statement_t`, asserted in `bridge_abi.h`
+    attach without its length     `attach(id, slot, ptr)`, `BRIDGE_ZEROED`, and the SDKs lend
+                                  the value: `bridge_lend`, `bridge_native_lend`. The case
+                                  `storage-tagbad` went with the refusal it was for: a tag
+                                  cannot be handed a length any more. Every line within what
+                                  two builds differ by, `detach` included
 
 **What two builds differ by when their code is the same.** After the two renames the call of
 `spawn` measured 4.8 to 4.9 ns where the tree before measured 4.5 to 4.7, in whichever order

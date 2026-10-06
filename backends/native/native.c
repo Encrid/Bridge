@@ -49,24 +49,21 @@ static uint64_t enter(const bridge_api_t *api, int entry, const uint64_t *args)
     return result;
 }
 
-static uint32_t t_declare(const bridge_api_t *api, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f,
-                          uint32_t g, uint32_t h, uint32_t i)
+static uint32_t t_declare(const bridge_api_t *api, uint32_t at)
 {
-    uint64_t args[9] = { a, b, c, d, e, f, g, h, i };
+    uint64_t args[1] = { at };
     return (uint32_t)enter(api, DECLARE, args);
 }
 
-static uint32_t t_system(const bridge_api_t *api, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f,
-                         uint32_t g, uint32_t h)
+static uint32_t t_system(const bridge_api_t *api, uint32_t at)
 {
-    uint64_t args[8] = { a, b, c, d, e, f, g, h };
+    uint64_t args[1] = { at };
     return (uint32_t)enter(api, SYSTEM, args);
 }
 
-static uint32_t t_observe(const bridge_api_t *api, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e,
-                          uint32_t f, uint32_t g)
+static uint32_t t_observe(const bridge_api_t *api, uint32_t at)
 {
-    uint64_t args[7] = { a, b, c, d, e, f, g };
+    uint64_t args[1] = { at };
     return (uint32_t)enter(api, OBSERVE, args);
 }
 
@@ -81,9 +78,9 @@ static void t_destroy(const bridge_api_t *api, uint64_t id)
     enter(api, DESTROY, &id);
 }
 
-static void t_attach(const bridge_api_t *api, uint64_t id, uint32_t slot, uint32_t ptr, uint32_t len)
+static void t_attach(const bridge_api_t *api, uint64_t id, uint32_t slot, uint32_t ptr)
 {
-    uint64_t args[4] = { id, slot, ptr, len };
+    uint64_t args[3] = { id, slot, ptr };
     enter(api, ATTACH, args);
 }
 

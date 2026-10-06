@@ -21,9 +21,9 @@ BRIDGE_NATIVE(fill)
 {
     for (uint32_t i = 0; i < COUNT; i ++) {
         uint64_t id = api->spawn(api);
-        api->attach(api, id, value, 0, 0);
+        api->attach(api, id, value, BRIDGE_ZEROED);
         for (uint32_t k = 0; k < MARKERS; k ++) {
-            if ((i % SPLIT) >> k & 1) api->attach(api, id, markers[k], 0, 0);
+            if ((i % SPLIT) >> k & 1) api->attach(api, id, markers[k], BRIDGE_ZEROED);
         }
     }
     return 0;
@@ -55,12 +55,14 @@ BRIDGE_NATIVE(init)
     value = BRIDGE_NATIVE_COMPONENT(api, "st:V", V, BRIDGE_DELETE, BRIDGE_TABLE);
     for (uint32_t k = 0; k < MARKERS; k ++) {
 #ifdef TAGS
-        markers[k] = api->declare(api, bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
-            (uint32_t)strlen(names[k]), BRIDGE_TAG, 0, 1, 0, 0, BRIDGE_DELETE, BRIDGE_TABLE);
+        markers[k] = api->declare(api, BRIDGE_NATIVE_STATE(api, bridge_declaration_t,
+            bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
+            (uint32_t)strlen(names[k]), BRIDGE_TAG, 0, 1, 0, 0, BRIDGE_DELETE, BRIDGE_TABLE));
 #else
-        markers[k] = api->declare(api, bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
+        markers[k] = api->declare(api, BRIDGE_NATIVE_STATE(api, bridge_declaration_t,
+            bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
             (uint32_t)strlen(names[k]), BRIDGE_STRUCT, sizeof(M), alignof(M),
-            bridge_native_put(api, M_desc, sizeof M_desc - 1), sizeof M_desc - 1, BRIDGE_DELETE, BRIDGE_TABLE);
+            bridge_native_put(api, M_desc, sizeof M_desc - 1), sizeof M_desc - 1, BRIDGE_DELETE, BRIDGE_TABLE));
 #endif
     }
     one[0].slot = value;

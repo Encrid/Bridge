@@ -8,7 +8,7 @@
  *     detach_b     M taken from every one that has it: one table again
  *     look         what a module is handed for each
  *
- * BAD is a system that hands a tag a value, and fails for it. */
+ */
 #include "bridge_native.h"
 
 BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });
@@ -28,15 +28,12 @@ BRIDGE_NATIVE(spawn)
     for (uint32_t i = 0; i < COUNT; i ++) {
         A value = { i };
         ids[i] = api->spawn(api);
-        bridge_native_attach(api, ids[i], a, &value, sizeof value);
-        if (i % 2 == 0) api->attach(api, ids[i], m, 0, 0);
-        if (i < 2) api->attach(api, ids[i], p, 0, 0);
-        api->attach(api, ids[i], o, 0, 0);
-        if (i % 2) api->attach(api, ids[i], r, 0, 0);
+        BRIDGE_NATIVE_ATTACH(api, ids[i], a, value);
+        if (i % 2 == 0) api->attach(api, ids[i], m, BRIDGE_ZEROED);
+        if (i < 2) api->attach(api, ids[i], p, BRIDGE_ZEROED);
+        api->attach(api, ids[i], o, BRIDGE_ZEROED);
+        if (i % 2) api->attach(api, ids[i], r, BRIDGE_ZEROED);
     }
-#ifdef BAD
-    bridge_native_attach(api, ids[0], m, &a, sizeof a);
-#endif
     return 0;
 }
 
@@ -56,7 +53,7 @@ BRIDGE_NATIVE(flicker)
 
 BRIDGE_NATIVE(attach_a)
 {
-    api->attach(api, 0, w, 0, 0);
+    api->attach(api, 0, w, BRIDGE_ZEROED);
     return 0;
 }
 

@@ -18,18 +18,12 @@
 
 /* ---- the ABI: docs/modules/abi.md. Every pointer is an offset into the scratch arena ---- */
 
-BRIDGE_IMPORT(declare) uint32_t bridge_declare(uint32_t name, uint32_t name_len,
-    enum bridge_kind kind, uint32_t size, uint32_t align, uint32_t desc, uint32_t desc_len,
-    enum bridge_on_unload on_unload, enum bridge_storage storage);
-BRIDGE_IMPORT(add_system) uint32_t bridge_add_system(uint32_t name, uint32_t name_len, uint32_t phase,
-    uint32_t phase_len, uint32_t terms, uint32_t term_count, uint32_t changes,
-    uint32_t change_count);
-BRIDGE_IMPORT(observe) uint32_t bridge_observe(uint32_t name, uint32_t name_len,
-    enum bridge_event events, uint32_t terms, uint32_t term_count, uint32_t changes,
-    uint32_t change_count);
+BRIDGE_IMPORT(declare) uint32_t bridge_declare(uint32_t at);
+BRIDGE_IMPORT(add_system) uint32_t bridge_add_system(uint32_t at);
+BRIDGE_IMPORT(observe) uint32_t bridge_observe(uint32_t at);
 BRIDGE_IMPORT(spawn)   uint64_t bridge_spawn();
 BRIDGE_IMPORT(destroy) void     bridge_destroy(uint64_t id);
-BRIDGE_IMPORT(attach)  void     bridge_attach(uint64_t id, uint32_t slot, uint32_t ptr, uint32_t len);
+BRIDGE_IMPORT(attach)  void     bridge_attach(uint64_t id, uint32_t slot, uint32_t ptr);
 BRIDGE_IMPORT(detach)  void     bridge_detach(uint64_t id, uint32_t slot);
 BRIDGE_IMPORT(alloc)   uint32_t bridge_alloc(uint32_t len);
 
@@ -90,46 +84,56 @@ static inline uint32_t bridge_put(const void *bytes, uint32_t len)
     return at;
 }
 
+/* `len` bytes copied above what the scratch arena has in use, and not counted as used. For a
+ * value an entry copies during the call, as attach does, so that a module's scratch holds one
+ * such value at a time and not a phase's worth. */
+static inline uint32_t bridge_lend(const void *bytes, uint32_t len)
+{
+    uint32_t used = (BRIDGE_HEADER(scratch_used) + 7u) & ~7u;
+    uint32_t room = BRIDGE_HEADER(scratch_len);
+    if (used > room || len > room - used) __builtin_trap();
+    acc_to_private(BRIDGE_HEADER(scratch) + used, bytes, len);
+    return BRIDGE_HEADER(scratch) + used;
+}
+
 /* ---- registration, with names as literals ---- */
+
+#define BRIDGE_STATE(T, ...) bridge_put(&(T){ __VA_ARGS__ }, sizeof(T))
 
 /* a type another declaration's fields use is declared before it, in the same namespace */
 #define BRIDGE_DECLARE(kind, name, T, on_unload, storage) \
-    bridge_declare(bridge_put(name, sizeof name - 1), sizeof name - 1, kind, sizeof(T), \
-                   alignof(T), bridge_put(T##_desc, sizeof T##_desc - 1), sizeof T##_desc - 1, \
-                   on_unload, storage)
+    bridge_declare(BRIDGE_STATE(bridge_declaration_t, \
+        bridge_put(name, sizeof name - 1), sizeof name - 1, kind, sizeof(T), alignof(T), \
+        bridge_put(T##_desc, sizeof T##_desc - 1), sizeof T##_desc - 1, on_unload, storage))
 #define BRIDGE_COMPONENT(name, T, on_unload, storage) \
     BRIDGE_DECLARE(BRIDGE_STRUCT, name, T, on_unload, storage)
 
 /* a tag: a component with no bytes, so no type to take them from - storage.md, *A tag* */
 #define BRIDGE_DECLARE_TAG(name, on_unload, storage) \
-    bridge_declare(bridge_put(name, sizeof name - 1), sizeof name - 1, BRIDGE_TAG, 0, 1, 0, 0, \
-                   on_unload, storage)
+    bridge_declare(BRIDGE_STATE(bridge_declaration_t, \
+        bridge_put(name, sizeof name - 1), sizeof name - 1, BRIDGE_TAG, 0, 1, 0, 0, \
+        on_unload, storage))
 
 /* `changes` is the slots of the components it attaches or detaches, `change_count` of them:
  * a system that does neither hands nullptr and 0 */
 #define BRIDGE_ADD_SYSTEM(name, phase, terms, count, changes, change_count) \
-    bridge_add_system(bridge_put(name, sizeof name - 1), sizeof name - 1, \
-                  bridge_put(phase, sizeof phase - 1), sizeof phase - 1, \
-                  bridge_put(terms, (count) * sizeof(bridge_term_t)), count, \
-                  (change_count) ? bridge_put(changes, (change_count) * sizeof(uint32_t)) : 0, \
-                  change_count)
+    bridge_add_system(BRIDGE_STATE(bridge_system_statement_t, \
+        bridge_put(name, sizeof name - 1), sizeof name - 1, \
+        bridge_put(phase, sizeof phase - 1), sizeof phase - 1, \
+        bridge_put(terms, (count) * sizeof(bridge_term_t)), count, \
+        (change_count) ? bridge_put(changes, (change_count) * sizeof(uint32_t)) : 0, \
+        change_count))
 
 #define BRIDGE_OBSERVER(name, events, terms, count, changes, change_count) \
-    bridge_observe(bridge_put(name, sizeof name - 1), sizeof name - 1, events, \
-                   bridge_put(terms, (count) * sizeof(bridge_term_t)), count, \
-                   (change_count) ? bridge_put(changes, (change_count) * sizeof(uint32_t)) : 0, \
-                   change_count)
+    bridge_observe(BRIDGE_STATE(bridge_observer_statement_t, \
+        bridge_put(name, sizeof name - 1), sizeof name - 1, events, \
+        bridge_put(terms, (count) * sizeof(bridge_term_t)), count, \
+        (change_count) ? bridge_put(changes, (change_count) * sizeof(uint32_t)) : 0, \
+        change_count))
 
-/* An initial value travels with the attach - abi.md, *The ABI*. Bridge-ASM700 takes its copy
- * during the call, so the scratch the value was put in is given back when the call returns:
- * a module's scratch holds one such value at a time, and not a phase's worth. */
-static inline void bridge_attach_value(uint64_t id, uint32_t slot, const void *value, uint32_t len)
-{
-    uint32_t was = BRIDGE_HEADER(scratch_used);
-    bridge_attach(id, slot, bridge_put(value, len), len);
-    acc_own_st(offsetof(bridge_header_t, scratch_used), was);
-}
-#define BRIDGE_ATTACH(id, slot, value) bridge_attach_value(id, slot, &(value), sizeof(value))
+/* An initial value travels with the attach - abi.md, *The ABI* - and is as long as the type
+ * was declared. Bridge-ASM700 takes its copy during the call. */
+#define BRIDGE_ATTACH(id, slot, value) bridge_attach(id, slot, bridge_lend(&(value), sizeof(value)))
 
 /* ---- a query's spans: two loops and no call. docs/bridge/data/query.md ---- */
 

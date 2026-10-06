@@ -31,7 +31,7 @@ static uint32_t next()
 static void set(const bridge_api_t *api, uint32_t slot, uint32_t kind)
 {
     V value = { next() };
-    bridge_native_attach(api, ids[slot], kinds[kind], &value, sizeof value);
+    BRIDGE_NATIVE_ATTACH(api, ids[slot], kinds[kind], value);
     has[slot] |= (uint8_t)(1u << kind);
     values[slot][kind] = value.v;
 }
@@ -131,13 +131,15 @@ BRIDGE_NATIVE(init)
     int none = 0;
     for (uint32_t k = 0; k < KINDS; k ++) {
         bridge_term_t term[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
-        kinds[k] = api->declare(api, bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
+        kinds[k] = api->declare(api, BRIDGE_NATIVE_STATE(api, bridge_declaration_t,
+            bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
             (uint32_t)strlen(names[k]), BRIDGE_STRUCT, sizeof(V), alignof(V),
-            bridge_native_put(api, V_desc, sizeof V_desc - 1), sizeof V_desc - 1, BRIDGE_DELETE, BRIDGE_TABLE);
+            bridge_native_put(api, V_desc, sizeof V_desc - 1), sizeof V_desc - 1, BRIDGE_DELETE, BRIDGE_TABLE));
         term[0].slot = kinds[k];
-        seeing[k] = api->add_system(api, bridge_native_put(api, systems[k], 4), 4,
+        seeing[k] = api->add_system(api, BRIDGE_NATIVE_STATE(api, bridge_system_statement_t,
+            bridge_native_put(api, systems[k], 4), 4,
             bridge_native_put(api, "check", 5), 5,
-            bridge_native_put(api, term, sizeof term), 1, 0, 0);
+            bridge_native_put(api, term, sizeof term), 1, 0, 0));
     }
     BRIDGE_NATIVE_ADD_SYSTEM(api, "work", "work", &none, 0, kinds, KINDS);
     return 0;

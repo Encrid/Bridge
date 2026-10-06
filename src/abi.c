@@ -307,7 +307,7 @@ static int moved_storage(module_t *m, const declared_type_t *c, enum bridge_stor
 }
 
 /* declare(name, name_len, kind, size, align, desc, desc_len, on_unload, storage) -> slot */
-static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
+static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
 {
     module_t *m = ud;
     bridge_t *b = m->b;
@@ -740,7 +740,7 @@ static int subscribe(module_t *m, uint64_t name_off, uint64_t name_len, uint32_t
 
 /* system(name, name_len, phase, phase_len, terms, term_count, changes, change_count) -> slot.
  * `changes` is the slots of what it attaches or detaches, each a u32. */
-static int abi_system(void *ud, const uint64_t *a, uint64_t *r)
+static int system_stated(void *ud, const uint64_t *a, uint64_t *r)
 {
     module_t *m = ud;
     bridge_t *b = m->b;
@@ -765,7 +765,7 @@ static int abi_system(void *ud, const uint64_t *a, uint64_t *r)
 
 /* observe(name, name_len, events, terms, term_count, changes, change_count) -> slot. It takes
  * no phase: it has one already, the barrier that applied its trigger. */
-static int abi_observe(void *ud, const uint64_t *a, uint64_t *r)
+static int observer_stated(void *ud, const uint64_t *a, uint64_t *r)
 {
     module_t *m = ud;
     if (!m->in_init) return refuse(m, "observe is called outside init");
@@ -773,6 +773,39 @@ static int abi_observe(void *ud, const uint64_t *a, uint64_t *r)
         return refuse(m, "observe: its events are unset, or name one there is not");
     }
     return subscribe(m, a[0], a[1], m->b->phase_count, (uint32_t)a[2], a[3], a[4], a[5], a[6], r);
+}
+
+/* declare(at) -> slot, add_system(at) -> slot, observe(at) -> slot. Each is handed where one
+ * struct is in the scratch arena - abi.md, *The ABI* - which is copied out before it is read,
+ * since a module may have put it at any offset. */
+static int abi_declare(void *ud, const uint64_t *at, uint64_t *r)
+{
+    bridge_declaration_t d;
+    const void *stated = scratch(ud, at[0], sizeof d);
+    if (!stated) return refuse(ud, "declare: what it states lies outside the scratch arena");
+    memcpy(&d, stated, sizeof d);
+    return declare_stated(ud, (uint64_t[9]){ d.name, d.name_len, d.kind, d.size, d.align, d.desc,
+        d.desc_len, d.on_unload, d.storage }, r);
+}
+
+static int abi_system(void *ud, const uint64_t *at, uint64_t *r)
+{
+    bridge_system_statement_t s;
+    const void *stated = scratch(ud, at[0], sizeof s);
+    if (!stated) return refuse(ud, "add_system: what it states lies outside the scratch arena");
+    memcpy(&s, stated, sizeof s);
+    return system_stated(ud, (uint64_t[8]){ s.name, s.name_len, s.phase, s.phase_len, s.terms,
+        s.term_count, s.changes, s.change_count }, r);
+}
+
+static int abi_observe(void *ud, const uint64_t *at, uint64_t *r)
+{
+    bridge_observer_statement_t o;
+    const void *stated = scratch(ud, at[0], sizeof o);
+    if (!stated) return refuse(ud, "observe: what it states lies outside the scratch arena");
+    memcpy(&o, stated, sizeof o);
+    return observer_stated(ud, (uint64_t[7]){ o.name, o.name_len, o.events, o.terms, o.term_count,
+        o.changes, o.change_count }, r);
 }
 
 /* Nothing below touches storage. Modules run at once, and what one asks for must not depend on
@@ -887,7 +920,8 @@ static declared_type_t *written(module_t *m, uint64_t slot, const char *entry)
     return m->declared[slot];
 }
 
-/* attach(id, slot, ptr, len). The value travels with it; zero length means zeroed. */
+/* attach(id, slot, ptr). The value travels with it, and is as long as the type was declared;
+ * BRIDGE_ZEROED as `ptr` asks for a zeroed one. */
 /* storage.md, *A singleton*: it is on no entity, so it is given and taken with the id 0,
  * which is no entity; and nothing else is. 1 and a refusal if `id` is the wrong one of the two. */
 static int unowned(module_t *m, const char *entry, uint64_t id, const declared_type_t *c)
@@ -907,11 +941,7 @@ static int abi_attach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
     declared_type_t *c = written(m, a[1], "attach");
     const void *value;
     if (!c) return 1;
-    value = a[3] ? scratch(m, a[2], a[3]) : c->zero;
-    if (a[3] && a[3] != c->size) {
-        return refuse(m, "attach hands '%s' %llu bytes and it is %u", c->name,
-            (unsigned long long)a[3], c->size);
-    }
+    value = a[2] != BRIDGE_ZEROED ? scratch(m, a[2], c->size) : c->zero;
     if (!value) return refuse(m, "attach: the value lies outside the scratch arena");
     if (unowned(m, "attach", a[0], c)) return 1;
     return queue(m, CHANGE_ATTACH, a[0], c, value);
@@ -961,12 +991,12 @@ int abi_define(module_t *m, backend_err_t *err)
         enum backend_type results[1];
         uint32_t    result_count;
     } entries[] = {
-        { "declare", abi_declare, { I, I, I, I, I, I, I, I, I }, 9, { I }, 1 },
-        { "add_system", abi_system,  { I, I, I, I, I, I, I, I }, 8, { I }, 1 },
-        { "observe", abi_observe, { I, I, I, I, I, I, I }, 7, { I }, 1 },
+        { "declare", abi_declare, { I },                   1, { I }, 1 },
+        { "add_system", abi_system, { I },                 1, { I }, 1 },
+        { "observe", abi_observe, { I },                   1, { I }, 1 },
         { "spawn",   abi_spawn,   {},                      0, { L }, 1 },
         { "destroy", abi_destroy, { L },                   1, {}, 0 },
-        { "attach",  abi_attach,  { L, I, I, I },          4, {}, 0 },
+        { "attach",  abi_attach,  { L, I, I },             3, {}, 0 },
         { "detach",  abi_detach,  { L, I },                2, {}, 0 },
         { "alloc",   abi_alloc,   { I },                   1, { I }, 1 },
     };

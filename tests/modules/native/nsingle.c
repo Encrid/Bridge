@@ -27,19 +27,19 @@ BRIDGE_NATIVE(attach_a)
 {
     G value = { 10, 1 };
 #if defined BAD && BAD == 2
-    bridge_native_attach(api, api->spawn(api), g, &value, sizeof value);
+    BRIDGE_NATIVE_ATTACH(api, api->spawn(api), g, value);
 #elif defined BAD && BAD == 3
     A other = { 1 };
-    bridge_native_attach(api, 0, a, &other, sizeof other);
+    BRIDGE_NATIVE_ATTACH(api, 0, a, other);
 #endif
-    bridge_native_attach(api, 0, g, &value, sizeof value);
+    BRIDGE_NATIVE_ATTACH(api, 0, g, value);
     return 0;
 }
 
 BRIDGE_NATIVE(value_a)
 {
     G value = { 20, 2 };
-    bridge_native_attach(api, 0, g, &value, sizeof value);
+    BRIDGE_NATIVE_ATTACH(api, 0, g, value);
     return 0;
 }
 

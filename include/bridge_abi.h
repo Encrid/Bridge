@@ -86,6 +86,71 @@ static_assert(sizeof(bridge_trigger_t) == 16 && alignof(bridge_trigger_t) == 8);
 static_assert(offsetof(bridge_trigger_t, id) == 0 && offsetof(bridge_trigger_t, events) == 8);
 static_assert(offsetof(bridge_trigger_t, pad) == 12);
 
+/* What declare is handed: where the name and the descriptor are in the scratch arena, and what
+ * the type is. Zero in `kind`, `on_unload` or `storage` is unset, and refused. */
+typedef struct {
+    uint32_t              name;
+    uint32_t              name_len;
+    enum bridge_kind      kind;
+    uint32_t              size;
+    uint32_t              align;
+    uint32_t              desc;
+    uint32_t              desc_len;
+    enum bridge_on_unload on_unload;
+    enum bridge_storage   storage;
+} bridge_declaration_t;
+static_assert(sizeof(bridge_declaration_t) == 36 && alignof(bridge_declaration_t) == 4);
+static_assert(offsetof(bridge_declaration_t, name) == 0 && offsetof(bridge_declaration_t, name_len) == 4);
+static_assert(offsetof(bridge_declaration_t, kind) == 8 && offsetof(bridge_declaration_t, size) == 12);
+static_assert(offsetof(bridge_declaration_t, align) == 16 && offsetof(bridge_declaration_t, desc) == 20);
+static_assert(offsetof(bridge_declaration_t, desc_len) == 24);
+static_assert(offsetof(bridge_declaration_t, on_unload) == 28 && offsetof(bridge_declaration_t, storage) == 32);
+
+/* What add_system is handed. `changes` is the slots of what it attaches or detaches, each a
+ * u32, `change_count` of them. */
+typedef struct {
+    uint32_t name;
+    uint32_t name_len;
+    uint32_t phase;
+    uint32_t phase_len;
+    uint32_t terms;
+    uint32_t term_count;
+    uint32_t changes;
+    uint32_t change_count;
+} bridge_system_statement_t;
+static_assert(sizeof(bridge_system_statement_t) == 32 && alignof(bridge_system_statement_t) == 4);
+static_assert(offsetof(bridge_system_statement_t, name) == 0);
+static_assert(offsetof(bridge_system_statement_t, name_len) == 4);
+static_assert(offsetof(bridge_system_statement_t, phase) == 8);
+static_assert(offsetof(bridge_system_statement_t, phase_len) == 12);
+static_assert(offsetof(bridge_system_statement_t, terms) == 16);
+static_assert(offsetof(bridge_system_statement_t, term_count) == 20);
+static_assert(offsetof(bridge_system_statement_t, changes) == 24);
+static_assert(offsetof(bridge_system_statement_t, change_count) == 28);
+
+/* What observe is handed. It states no phase: an observer has one already, the barrier that
+ * applied its trigger. */
+typedef struct {
+    uint32_t          name;
+    uint32_t          name_len;
+    enum bridge_event events;
+    uint32_t          terms;
+    uint32_t          term_count;
+    uint32_t          changes;
+    uint32_t          change_count;
+} bridge_observer_statement_t;
+static_assert(sizeof(bridge_observer_statement_t) == 28 && alignof(bridge_observer_statement_t) == 4);
+static_assert(offsetof(bridge_observer_statement_t, name) == 0);
+static_assert(offsetof(bridge_observer_statement_t, name_len) == 4);
+static_assert(offsetof(bridge_observer_statement_t, events) == 8);
+static_assert(offsetof(bridge_observer_statement_t, terms) == 12);
+static_assert(offsetof(bridge_observer_statement_t, term_count) == 16);
+static_assert(offsetof(bridge_observer_statement_t, changes) == 20);
+static_assert(offsetof(bridge_observer_statement_t, change_count) == 24);
+
+/* What attach is handed as `ptr` when the value asked for is a zeroed one. */
+constexpr uint32_t BRIDGE_ZEROED = UINT32_MAX;
+
 /* Offset 0 of the private memory: where each of this module's regions begins. Bridge-ASM700
  * writes all of it; a module writes `scratch_used` and `ring_head` and nothing else. */
 typedef struct {

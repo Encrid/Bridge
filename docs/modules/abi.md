@@ -3,17 +3,25 @@
 What was weighed here and refused is `abi_refused.md`, *What was refused: The ABI*.
 
 At init, which runs each time a module is loaded - `lifecycle.md`, *The runtime lifecycle*. All
-three may take names, because registration is not a hot path.
+three may take names, because registration is not a hot path. **Each takes one struct, by where it
+is in the scratch arena**, and `bridge_abi.h` states the three layouts with their sizes and offsets:
 
-    declare(name, name_len, kind, size, align, desc, desc_len, on_unload, storage) -> slot
-    add_system(name, name_len, phase, phase_len, terms, term_count, changes, change_count) -> slot
-    observe(name, name_len, events, terms, term_count, changes, change_count)         -> slot
+    declare(at)        -> slot      name, name_len, kind, size, align, desc, desc_len,
+                                    on_unload, storage
+    add_system(at)     -> slot      name, name_len, phase, phase_len, terms, term_count,
+                                    changes, change_count
+    observe(at)        -> slot      name, name_len, events, terms, term_count, changes,
+                                    change_count
+
+No entry takes more than four arguments - `style.md`, rule F5 - and a field is named where it is
+written. A field left at zero is unset, and `declare` refuses that for `kind`, `on_unload` and
+`storage`.
 
 Any time, queued and applied at the next barrier:
 
     spawn()                        -> id
     destroy(id)
-    attach(id, slot, ptr, len)
+    attach(id, slot, ptr)
     detach(id, slot)
     alloc(len)                     -> offset into the persistent arena
 
@@ -42,20 +50,23 @@ bits wide - `signatures.md`, *Imports are declared, exports are checked*.
 **What an entry was handed is read during the call, and the scratch it was in is then free.**
 The scratch arena is reset at a barrier, so a value left there would stay for the rest of the
 phase, and a module's `scratch` would have to hold every value it attaches in one, beside its
-`changes`, which hold the same bytes: two sizes for one thing. So an SDK's attach puts the value,
-makes the call, and puts the scratch back where it was. A module's scratch then holds one value
-at a time. Each backend's SDK does it, in its own attach - `bridge_attach_value` and
-`bridge_native_attach` - and a log line's text is the one thing put in scratch that stays until
-the barrier, since it is read there: `log.md`, *The log*. `tests/stage3.c`, case
+`changes`, which hold the same bytes: two sizes for one thing. So an SDK's attach copies the value
+above what the arena has in use, without counting it as used, and makes the call. A module's
+scratch then holds one value at a time. Each backend's SDK does it, in `bridge_lend` and
+`bridge_native_lend`, which `BRIDGE_ATTACH` and `BRIDGE_NATIVE_ATTACH` use - and a log line's
+text is the one thing put in scratch that stays until the barrier, since it is read there:
+`log.md`, *The log*. `tests/stage3.c`, case
 `smallscratch`, attaches eight kilobytes of values through 512 bytes of scratch.
 
 What the second copy costs was measured, since it was called a cost on the native backend: an
 attach with a value of four bytes put through scratch took 19.9 ns against 19.6 to 20.0 without.
 
-**`attach` carries the initial value.** `ptr` and `len` say where it is, and Bridge-ASM700 takes a
-copy of the bytes at the call, bounds-checking them the way it checks a log record's text. Zero
-means zeroed. The copy is what reaches the row at the barrier, so the scratch arena may be reset in
-between - which it is, when the call was an observer's.
+**`attach` carries the initial value.** `ptr` says where it is, and it is as long as the type was
+declared: Bridge-ASM700 takes a copy of that many bytes at the call, bounds-checking them the way
+it checks a log record's text. `BRIDGE_ZEROED` as `ptr` asks for a zeroed value. The copy is what
+reaches the row at the barrier, so the scratch arena may be reset in between - which it is, when
+the call was an observer's. Since the copy is taken during the call, the SDKs put the value above
+what the arena has in use and do not count it as used.
 
 That is there because **nothing applies immediately.** Every structural change is queued, so a row
 exists at the next barrier and not before, and the only thing a module could have wanted sooner

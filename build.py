@@ -77,7 +77,7 @@ NATIVE = [
     ('nholder', 'nholder', []),
 ] + [('nlayout%d' % v, 'nlayout', ['V=%d' % v, 'KEPT=1']) for v in range(14)] + [
     ('nlayout%dk%d' % (v, k), 'nlayout', ['V=%d' % v, 'KEPT=%d' % k]) for k in (2, 3, 4, 5) for v in (0, 1, 2)] + [
-    ('ntag', 'ntag', []), ('ntagbad', 'ntag', ['BAD']), ('nfragtag4096', 'nfrag', ['SPLIT=4096', 'TAGS']),
+    ('ntag', 'ntag', []), ('nfragtag4096', 'nfrag', ['SPLIT=4096', 'TAGS']),
     ('nsingle', 'nsingle', []), ('nsinglebad1', 'nsingle', ['BAD=1']),
     ('nsinglebad2', 'nsingle', ['BAD=2']), ('nsinglebad3', 'nsingle', ['BAD=3']),
     ('ndirect', 'ndirect', []), ('ndirectbig', 'ndirect', ['BIG']), ('ndirectbad', 'ndirect', ['BAD']),
@@ -431,8 +431,6 @@ CASES = [
     ('storage-move', ['storage', 'move'], '@tests/storage_move.txt', None),
     ('storage-layout', ['storage', 'layout'], '@tests/storage_layout.txt', None),
     ('storage-tag', ['storage', 'tag'], '@tests/storage_tag.txt', None),
-    ('storage-tagbad', ['storage', 'tagbad'],
-     r"attach hands 'st:M' 4 bytes and it is 0.*alive", None),
     ('storage-single', ['storage', 'single'], '@tests/storage_single.txt', None),
     ('storage-singlebad1', ['storage', 'singlebad1'],
      r"did not load: term 0 of system 'by': 'st:G' is a singleton, and is on no entity a system "

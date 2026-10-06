@@ -75,7 +75,7 @@ BRIDGE_NATIVE(spawn)
         X value = { .a = 1000 + i, .b = (uint16_t)(20 + i), .at = { (uint16_t)(5 + i), (uint16_t)(6 + i) },
                     .mode = On };
         for (uint32_t k = 0; k < 4; k ++) value.arr[k] = (uint8_t)(1 + k + i);
-        bridge_native_attach(api, KEPT == 5 ? 0 : api->spawn(api), x, &value, sizeof value);
+        BRIDGE_NATIVE_ATTACH(api, KEPT == 5 ? 0 : api->spawn(api), x, value);
     }
     return 0;
 }
