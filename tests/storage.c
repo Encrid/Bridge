@@ -217,7 +217,7 @@ int main(int argc, char **argv)
     if (!strcmp(what, "shape")) { cfg.backends = both; cfg.backend_count = 2; }
     if (!strcmp(what, "notables")) cfg.budget.tables = 1;
     if (!strcmp(what, "nocolumns")) cfg.budget.columns = 64;
-    if (!strcmp(what, "stripfull")) cfg.budget.columns = 128;
+    if (!strcmp(what, "stripfull")) cfg.budget.columns = 160;
     b = bridge_create(&cfg, sink, nullptr);
     bridge_artifact a;
 
@@ -335,14 +335,14 @@ int main(int argc, char **argv)
         a.cfg.max_system_failures = 4;
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         run(b, "spawn");
-        run(b, "attach_a");         /* sixty-four bytes hold five rows of it and not six: three */
-        run(b, "look");             /* fit by halves, and five by going back up. It runs on */
-        run(b, "attach_a");         /* a value for those five, and the sixth is left again */
+        run(b, "attach_a");         /* sixty-four bytes hold four rows of it and not six: three */
+        run(b, "look");             /* fit by halves, and four by going back up. It runs on */
+        run(b, "attach_a");         /* a value for those four, and the other two are left again */
         run(b, "look");
         run(b, "attach_a");
         run(b, "look");
-        run(b, "attach_a");         /* and the sixth is never to be had: the fourth barrier that */
-        run(b, "attach_a");         /* left one out was its budget of four, and it is stopped */
+        run(b, "attach_a");         /* and the other two are never to be had: the fourth barrier */
+        run(b, "attach_a");         /* that left them out was its budget of four, and it is stopped */
     } else if (!strcmp(what, "scribble")) {
         a = store_module(NSTORE_PATH, 6, 1 << 20, 1 << 20);
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }

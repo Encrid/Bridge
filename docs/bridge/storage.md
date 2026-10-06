@@ -37,15 +37,18 @@ component leads to, because nothing walks from table to table: an entity's final
 before it is placed.
 
 Its rows are **one block of the column region**: the entity ids, then a column for each type, in the
-order the types were declared, each at the next multiple of its own type's alignment - a column of
-`uint8_t` follows the one before it with no gap, and one of `double` begins at a multiple of eight.
-A table's first room is the rows it was asked for, and no more. A table that needs more rows asks
-for half as much again as it had, in place when what follows it is free, and otherwise elsewhere
-with its rows copied; and for what it needs and no more where that is not to be had. Half as much
-again was measured against twice and against only what is needed, on a table of 64-byte rows grown a
-thousand at a time to a hundred thousand: 55 to 61 ns a row and 15% of its block idle; 54 to 62 ns
-and 28% idle; 97 to 105 ns and none idle. So growing by a share is worth it, and the smaller share
-costs no time. A row that leaves is filled by the table's last row.
+order the types were declared, **each beginning at a multiple of sixteen bytes**, as the block does.
+That number is measured. A system's loop over a column is compiled to loads of sixteen bytes, and
+where the column begins at a multiple of sixteen none of them lies across two cache lines: 204,800
+rows are read in 5.6 to 6.4 us from a column that begins there, and in 8.3 us from one that begins
+eight bytes past it. It costs up to fifteen bytes a column a table. A table's first room is the rows
+it was asked for, and no more. A table that needs more rows asks for half as much again as it had,
+in place when what follows it is free, and otherwise elsewhere with its rows copied; and for what it
+needs and no more where that is not to be had. Half as much again was measured against twice and
+against only what is needed, on a table of 64-byte rows grown a thousand at a time to a hundred
+thousand: 55 to 61 ns a row and 15% of its block idle; 54 to 62 ns and 28% idle; 97 to 105 ns and
+none idle. So growing by a share is worth it, and the smaller share costs no time. A row that leaves
+is filled by the table's last row.
 
 **One table for each set, with one exception**: a strip at unload that had no room to join two
 tables leaves both - `lifetime.md`, *What unload leaves behind*. The set finds the one that was
@@ -122,11 +125,10 @@ that writes a term it has is doing what it is for - `data.md`, *Access mode*.
 
 ## The column region
 
-Carved to what a table asks for, to eight bytes: the widest alignment a field has, and an
-entity id's, so that every block begins where its ids may. A freed range is a gap, kept in order and
-joined to its neighbours, and a request takes the smallest gap that holds it before fresh space.
-What says which ranges are free is kept outside the block: a list as long as there may be
-tables, made with the bridge, which never grows.
+Carved to what a table asks for, to sixteen bytes, so that every block begins where a column may -
+*A table*. A freed range is a gap, kept in order and joined to its neighbours, and a request takes
+the smallest gap that holds it before fresh space. What says which ranges are free is kept outside
+the block: a list as long as there may be tables, made with the bridge, which never grows.
 
 **Nothing is ever taken from outside it.** A request the region cannot meet is refused, and the
 barrier's second step is where that is found out, before anything has moved.

@@ -111,9 +111,9 @@ uint32_t region_most(const region *r)
 
 /* ---- columns: what storage asks for is what it gets, to sixteen bytes ---- */
 
-/* the widest alignment a field can have, which is an entity id's too: storage.md, *What
- * bounds it* */
-constexpr uint32_t GRAIN = 8;
+/* sixteen bytes, which is where a column has to begin to be read at full speed: storage.md,
+ * *A table*. A block begins with its entity ids, and they begin where a column may */
+constexpr uint32_t GRAIN = 16;
 
 static uint32_t grain(uint32_t size)
 {
@@ -299,7 +299,7 @@ int block_create(bridge *b, const bridge_budget *budget)
     }
     /* each is under 2^32 now, so none of these sums can leave 64 bits */
     arena = (index + sizeof(bridge_entity) * budget->entities + 7u) & ~7ull;
-    columns = (arena + budget->persistent + 7u) & ~7ull;
+    columns = (arena + budget->persistent + 15u) & ~15ull;      /* storage.md, *A table* */
     /* a whole number of what every backend that maps it needs - backend.md */
     len = (columns + budget->columns + b->granule - 1) / b->granule * b->granule;
     /* and together they are never more than an offset can reach */

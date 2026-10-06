@@ -122,20 +122,25 @@ static uint32_t hashed(const storage *r, const uint64_t *set)
     return (uint32_t)(h ^ h >> 32) & (r->hash_room - 1);
 }
 
-/* ---- a table's block: its entity ids, then a column a type, each where its type aligns ---- */
+/* ---- a table's block: its entity ids, then a column a type, each at a multiple of sixteen ---- */
 
-static uint64_t padded(uint64_t bytes) { return (bytes + 7u) & ~7ull; }
+/* storage.md, *A table*: a column that begins at a multiple of sixteen is read by a compiler's
+ * loop of 16-byte loads with none of them across two cache lines. Measured: one that begins
+ * eight past it takes 8.3 us for 204,800 rows where this takes 5.6 to 6.4. */
+constexpr uint64_t COLUMN = 16;
+
+static uint64_t padded(uint64_t bytes) { return (bytes + COLUMN - 1) & ~(COLUMN - 1); }
 
 /* How long a block of `room` rows of `set` is, and into r->at where each of its columns
  * begins in it: the ids, then every type in the order of its number, each at the next
- * multiple of its own alignment. The whole is a multiple of eight, for the ids of the next. */
+ * multiple of sixteen. The whole is a multiple of sixteen too, for the block after it. */
 static uint64_t laid_out(const storage *r, const uint64_t *set, uint32_t room)
 {
     uint64_t at = 8ull * room;
     for (uint32_t w = 0; w < r->words; w ++) {
         for (uint64_t bits = set[w]; bits; bits &= bits - 1) {
             const storage_type *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
-            at = (at + type->align - 1) & ~(uint64_t)(type->align - 1);
+            at = padded(at);
             r->at[type->id] = at;
             at += (uint64_t)type->size * room;
         }

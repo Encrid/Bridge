@@ -529,10 +529,12 @@ at least five things, none defined, and none of them the one that was meant.
     closed  numbers with no reason: the grain, the doubling, the first four rows, two arguments,
             and 65,536, a wasm page, to which the library rounded every block it made. Each
             below
-    closed    the grain is eight, the widest alignment there is; it was sixteen for nothing
+    closed    the grain is sixteen, and every column begins at a multiple of sixteen. It was
+              made eight, and a column put at its own type's alignment, on measurements that
+              did not include a read: the last measuring of this stage found a read taking
+              half as long again from a column eight past a multiple of sixteen. So sixteen
+              had a reason nobody had written, and it is written. `storage.md`, *A table*
     closed    a table's first room is what was asked; it was four rows for nothing measured
-    closed    a column begins at its own type's alignment; every one began at a multiple of
-              eight. `storage.md`, *A table*
     closed    a growing table asks for half as much again, measured against twice: as fast,
               with half the idle room. `storage.md`, *A table*
     closed    two numbers in a log record: a value and what it is set beside. `log.md`

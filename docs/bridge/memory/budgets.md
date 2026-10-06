@@ -167,7 +167,7 @@ first asked are the ones placed.** It asks the column region for half as many un
 fits, and then searches back up between that number and the last that did not. Entities are
 worked in the order their first change was asked, which is the order the calls ran -
 `threads.md`, *Threads* - so which are placed is the same every run. `tests/storage.c`, case
-`nocolumns`, has room for five rows of six and places five.
+`nocolumns`, has room for four rows of six and places four, where halving alone finds three.
 
 **It is a failure of every module that asked a change of it**, each for the changes that were its
 own. A record names the module, the key, and how many of its changes were not applied; and the
