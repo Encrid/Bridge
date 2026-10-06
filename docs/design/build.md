@@ -47,6 +47,11 @@ right, and an editor that reads CMake finds nothing to read. Refused: `build.zig
 cache and the targets built in, and is written in a language whose build interface changes between
 releases. The condition that brings it back is zig at 1.0.
 
+**What it makes of the library is two files**: a shared library and a static one, from the same
+objects - `host-api.md`, *A host links a built library*. The library's objects are compiled with
+everything hidden but what `bridge.h` marks, so the shared library exports the host seam and
+nothing more.
+
 ## Platforms
 
     Windows    x86-64    x86_64-windows-gnu     run where the code is written

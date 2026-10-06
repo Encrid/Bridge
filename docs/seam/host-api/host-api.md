@@ -12,6 +12,29 @@ backend's SDK beside that backend - `README.md`, *Three layers, three seams*;
 folder is `bridge.h`, which is the only header a host includes - one per seam, `README.md`, *Three
 layers, three seams*.
 
+## A host links a built library
+
+**A host does not compile Bridge-ASM700. It links what the build made, and it may be written in
+any language that can call C.** So the seam is judged by that and not by which compiler reads
+`bridge.h`: the header is the binding for a host in C, and one binding among however many.
+
+The build makes two files, and they are the same objects:
+
+    bridge.dll, bridge.so, bridge.dylib    a shared library: the seven functions of *The
+                                           surface* are what it exports, and nothing else of
+                                           the library can be reached through it
+    bridge.a                               a static library, for a host that is to be one file
+
+**The shared one is what makes the seam a fact.** A host that links it cannot name anything of
+the library's inside, because the linker has nothing to give it. The five hosts under `tests/`
+that are compiled against `include/` alone are linked with it, so every run of the tests goes
+through it; and the first of them is linked a second time with the static one, and runs every
+one of its cases again.
+
+Refused: a shared library only. It fails nothing, and it is one file fewer; it was not chosen,
+because a host that must be a single file with nothing beside it has no other way. Refused: a
+static library only, which a language that can only load a shared library cannot use at all.
+
 ## Bridge-ASM700 parses nothing
 
 Which side owns what is `split.md`, *The split*. At this seam it comes to one thing: **Bridge-ASM700

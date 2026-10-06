@@ -592,7 +592,14 @@ Of this repair:
 
 Of earlier stages:
 
-    open    every header is C23, so a host or a backend is compiled as C23 or not at all
+    open    every header is C23, so a host or a backend is compiled as C23 or not at all.
+            The question was the wrong one: a host links a built library and may be in any
+            language that can call C. Four parts, each weighed:
+    closed    the library is built, shared and static, and the hosts of the tests link it.
+              `host-api.md`, *A host links a built library*
+    open      the host seam's layouts asserted, and described for a language that is not C
+    open      `bridge.h` says it is C to a C++ compiler
+    open      stage 13's host links the built library
     open    a boolean cannot be unset, and false is called the safe side for all six
     open    a module is the unit of parallelism, with instance grouping refused on minimal
     open    a system is bounded by fuel and never by a deadline, on every deployment

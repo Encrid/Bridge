@@ -122,27 +122,38 @@ constexpr uint8_t BRIDGE_LEVEL_MOST = 7;
 
 typedef void (*bridge_sink_fn)(void *ud, const bridge_record *r);
 
+/* The functions below are the whole of what the library exports: a host links it built, as
+ * a shared library or a static one, and reaches nothing else of it - docs/seam/host-api/
+ * host-api.md, *A host links a built library*. BRIDGE_BUILDING is the library's own build. */
+#if defined(BRIDGE_BUILDING) && defined(_WIN32)
+#define BRIDGE_API [[gnu::dllexport]]
+#elif defined(BRIDGE_BUILDING)
+#define BRIDGE_API [[gnu::visibility("default")]]
+#else
+#define BRIDGE_API
+#endif
+
 /* nullptr if the deployment cannot start; which reason, the sink was told. */
-[[nodiscard]] bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud);
+BRIDGE_API [[nodiscard]] bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud);
 /* Every loaded module's shutdown, then everything else. 0 if the bridge is gone. With a pinned
  * module loaded it answers 1 from any thread but the one that loaded it, with a record, and
  * nothing has been torn down: the bridge is still there to be destroyed from the right one. */
-[[nodiscard]] int bridge_destroy(bridge *b);
+BRIDGE_API [[nodiscard]] int bridge_destroy(bridge *b);
 
 /* 0 if the module is loaded, its init answered 0, and the bridge can still run it. Otherwise
  * the load was refused or failed, or stopped the bridge, and a record says why. Between phases
  * only. */
-[[nodiscard]] int bridge_load(bridge *b, const bridge_artifact *a);
+BRIDGE_API [[nodiscard]] int bridge_load(bridge *b, const bridge_artifact *a);
 
 /* Take a module out, by its identity: its shutdown, then the components nobody else declared,
  * each by the policy it was declared with. 0 if it was loaded. Between phases only. */
-[[nodiscard]] int bridge_unload(bridge *b, const char *identity);
+BRIDGE_API [[nodiscard]] int bridge_unload(bridge *b, const char *identity);
 
 /* Replace a loaded module's instance and keep its storage. 0 if the new instance is running;
  * otherwise a record says why. The old instance still runs where its backend can hold two at
  * once; where it cannot, the module is stopped, with everything it declared, until it is
  * reloaded again or unloaded. Between phases only. */
-[[nodiscard]] int bridge_reload(bridge *b, const bridge_artifact *a);
+BRIDGE_API [[nodiscard]] int bridge_reload(bridge *b, const bridge_artifact *a);
 
 /* What is loaded, and whether it still runs: a module at its failure budget is stopped long
  * after any return code. Answers how many there are; fills at most `max`. */
@@ -151,11 +162,11 @@ typedef struct {
     const char       *identity;     /* until the next load, unload or reload */
     enum bridge_state state;
 } bridge_module_info;
-int bridge_modules(bridge *b, bridge_module_info *out, int max);
+BRIDGE_API int bridge_modules(bridge *b, bridge_module_info *out, int max);
 
 /* Run the systems registered to one phase, then its barrier. 0 if the phase ran, whatever
  * its systems did: a system that failed is a record, not a return code. With a pinned module
  * loaded, from the thread that loaded it. */
-[[nodiscard]] int bridge_phase(bridge *b, const char *name);
+BRIDGE_API [[nodiscard]] int bridge_phase(bridge *b, const char *name);
 
 #endif

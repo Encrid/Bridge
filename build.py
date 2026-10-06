@@ -31,17 +31,17 @@ ROOT = Path(__file__).resolve().parent
 TARGETS = {
     'x86_64-windows-gnu': {
         'runs on': ('Windows', 'AMD64'), 'program': '.exe', 'library': '.dll',
-        'compile': [], 'link': ['-lws2_32', '-ldbghelp'], 'beside': [],
+        'compile': [], 'link': ['-lws2_32', '-ldbghelp'], 'beside': [], 'named': [],
         'wasmtime': ('windows/libwasmtime.dll.a', 'windows/wasmtime.dll')},
     'x86_64-linux-gnu': {
         'runs on': ('Linux', 'x86_64'), 'program': '', 'library': '.so',
         'compile': ['-fPIC', '-D_DEFAULT_SOURCE'], 'link': ['-lm', '-lpthread', '-ldl'],
-        'beside': ['-Wl,-rpath,$ORIGIN'],
+        'beside': ['-Wl,-rpath,$ORIGIN'], 'named': ['-Wl,-soname,bridge.so'],
         'wasmtime': ('linux/libwasmtime.so', 'linux/libwasmtime.so')},
     'aarch64-macos': {
         'runs on': ('Darwin', 'arm64'), 'program': '', 'library': '.dylib',
         'compile': ['-fPIC', '-D_DARWIN_C_SOURCE'], 'link': [],
-        'beside': ['-Wl,-rpath,@loader_path'],
+        'beside': ['-Wl,-rpath,@loader_path'], 'named': ['-Wl,-install_name,@rpath/bridge.dylib'],
         'wasmtime': ('macos/libwasmtime.dylib', 'macos/libwasmtime.dylib')},
 }
 BINARYEN = 'binaryen-version_133'
@@ -212,8 +212,10 @@ def build(target, debug, out):
                          [flags + ['-c', source, '-o', obj / (name + '.o')]]))
         return obj / (name + '.o')
 
-    os_o = compile_('os', ROOT / 'src/os.c', ours + [src])
-    bridge_o = [compile_(name, ROOT / 'src' / (name + '.c'), ours + [include, src]) for name in BRIDGE]
+    # the library's own objects: what bridge.h marks is exported, and nothing else is
+    inside = ours + ['-DBRIDGE_BUILDING', '-fvisibility=hidden']
+    os_o = compile_('os', ROOT / 'src/os.c', inside + [src])
+    bridge_o = [compile_(name, ROOT / 'src' / (name + '.c'), inside + [include, src]) for name in BRIDGE]
     # a backend is compiled against the backend seam and what is its own: nothing of src/
     wasm_o = [compile_('wasm', ROOT / 'backends/wasm/wasm.c',
                        ours + [include, '-I%s' % (wasmtime / 'include')]),
@@ -257,8 +259,19 @@ def build(target, debug, out):
     link('adopt', [adopt_o, obj / 'backend.o', os_o], system)
     link('schema', [schema_test_o, obj / 'schema.o'], system)
     whole = bridge_o + [os_o]
+    # the library, built: shared and static. What a host links - host-api.md
+    shared_lib, static_lib = out / ('bridge' + lib), out / 'bridge.a'
+    link('bridge', whole, system + row['named'], shared=True)
+    links.append(('archiving bridge.a', [static_lib], whole,
+                  [lambda: static_lib.unlink(missing_ok=True), [zig, 'ar', 'rcs', static_lib] + whole]))
+    together(links)
+    del links[:]
+    # a host is compiled against include/ alone and linked with the library as a host would be:
+    # the shared one, and one of them the static one as well
     for name, o in phase_o.items():
-        link(name, [o] + whole, system)
+        link(name, [o, shared_lib], system + here)
+    link('stage2-static', [phase_o['stage2'], static_lib], system)
+    # these three reach inside, to test it, and so are linked with its objects
     link('storage', [storage_o] + whole, system)
     link('storage-counted', [counted_test_o] + counted_o, system)
     together(links)
@@ -688,6 +701,11 @@ CASES = [
     ('stage6-destroy', ['stage6', 'destroy'],
      r"tick 101 1.*game:ticker@0.1.0/-: shutdown 1 0.*module 'test:hang@0.1.0': its shutdown trapped: interrupt. its teardown continues.*alive", None),
 ]
+
+# every case of the first host again, through the static library
+CASES += [('static-' + name[len('stage2-'):], ['stage2-static'] + argv[1:], match, never)
+          for name, argv, match, never in CASES if argv[0] == 'stage2']
+
 
 if __name__ == '__main__':
     main()
