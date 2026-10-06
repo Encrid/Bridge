@@ -164,9 +164,19 @@ will carry before it moves a row - `storage.md`, *A barrier is worked an entity 
 it knows there what cannot be had: a table past `tables`, or rows past `columns`. Every change
 asked of that entity at that barrier is then dropped, all of them and not some: it keeps the
 components and the values it had, and no observer hears of it. Other entities are placed as usual.
-When a table cannot take all the rows arriving, it takes some: it asks for half as many until the
-region gives them, which may be fewer than would have fitted. Which ones is an open question -
-`STAGE10.md`, *The repair*.
+**When a table cannot take all the rows arriving, it takes as many as it finds room for, and the
+first asked are the ones placed.** It asks the column region for half as many until a number
+fits, and then searches back up between that number and the last that did not. Entities are
+worked in the order their first change was asked, which is the order the calls ran -
+`threads.md`, *Threads* - so which are placed is the same every run. `tests/storage.c`, case
+`nocolumns`, has room for five rows of six and places five.
+
+Refused: stopping at the first half that fits, which is what this did. A hundred rows arriving
+with room for ninety placed fifty, and forty changes were lost for no reason a module could
+name. No condition brings it back. Refused: working the number out from the free gaps and the
+table's layout, without trying. It states how a block is laid out a second time, and again for
+every storage layout of stage 11. The condition that brings it back is this search being shown
+to leave room that matters.
 
 **It is a failure of every module that asked a change of it**, each for the changes that were
 its own. A record names the module, the key, and how many of its changes were not applied; and

@@ -263,11 +263,11 @@ int main(int argc, char **argv)
         a.cfg.max_system_failures = 4;
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         run(b, "spawn");
-        run(b, "attach_a");         /* sixty-four bytes do not hold six rows of it: by halves, three */
-        run(b, "look");             /* and the bridge runs on */
-        run(b, "attach_a");         /* a set for those three, and the fourth row for one more */
+        run(b, "attach_a");         /* sixty-four bytes hold five rows of it and not six: three */
+        run(b, "look");             /* fit by halves, and five by going back up. It runs on */
+        run(b, "attach_a");         /* a value for those five, and the sixth is left again */
         run(b, "look");
-        run(b, "attach_a");         /* five rows are sixty-four bytes exactly */
+        run(b, "attach_a");
         run(b, "look");
         run(b, "attach_a");         /* and the sixth is never to be had: the fourth barrier that */
         run(b, "attach_a");         /* left one out was its budget of four, and it is stopped */

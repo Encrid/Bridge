@@ -315,7 +315,7 @@ flecs before it left: its observers heard the first entity removed three times o
 nobody had made.
 
 Three cases changed their answer, as the decisions said they would. `stage3-nospans` is refused
-at load where it was stopped at a barrier. `stage3-nocolumns` leaves 747 of 1,000 entities as they
+at load where it was stopped at a barrier. `stage3-nocolumns` leaves 744 of 1,000 entities as they
 were and runs on, where the bridge stopped. `stage6-configceiling` runs out at `entities` of 1,
 where 440 was flecs' own entities and one more. And `stage5-nested2` is refused by the word the
 reading stopped at.
@@ -610,7 +610,9 @@ middle of a paragraph in `config.md`.
 
 **5. Found while building**
 
-    open    which entities are placed when columns run short
+    closed  which entities are placed when columns run short: the first asked, in the order
+            the calls ran; and as many as a search back up from the first half that fits
+            finds room for, where it stopped at that half. `budgets.md`
     closed  a test that a barrier allocates nothing: cases `alloc-changes`, `alloc-tables`
             and `alloc-strip`, against a library whose calls to the allocator are counted
     open    an allocation that fails at load

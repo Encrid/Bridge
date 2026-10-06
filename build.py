@@ -448,7 +448,7 @@ CASES = [
     ('stage3-nospans', ['stage3', 'nospans'],
      r"module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \d+ tables.*moved 2 1000.*alive", None),
     ('stage3-nocolumns', ['stage3', 'nocolumns', '4096'],
-     r"module 'game:mover@0.1.0': .budget. columns of 4096 bytes is used up. Not applied, of the changes it asked: 1244 .*moved 2 253.*alive", r"has stopped"),
+     r"module 'game:mover@0.1.0': .budget. columns of 4096 bytes is used up. Not applied, of the changes it asked: 1244 .*moved 1 256.*alive", r"has stopped"),
     ('stage3-nophase', ['stage3', 'nophase'],
      r"phase 'render' is not one the deployment declared.*alive", None),
     ('stage3-nophases', ['stage3', 'nophases'],

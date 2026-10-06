@@ -558,8 +558,16 @@ void storage_apply(storage *r)
         table *tab = &r->tables[t];
         if (r->folded[index] & (DESTROYED | DROPPED) || !t || t == r->places[index].table) continue;
         if (!tab->sized) {
-            /* all of them, or as many as the column region still holds, by halves */
+            /* all of them, or as many as the column region is found to hold: by halves down
+             * to a number that fits, and from there back up between it and the last that did
+             * not. budgets.md, *What running out does* */
+            uint32_t most = tab->incoming;
             while (tab->incoming && !grow(r, t, tab->rows + tab->incoming)) tab->incoming /= 2;
+            while (most - tab->incoming > 1) {
+                uint32_t between = tab->incoming + (most - tab->incoming) / 2;
+                if (grow(r, t, tab->rows + between)) tab->incoming = between;
+                else most = between;
+            }
             tab->sized = true;
         }
         if (tab->incoming) tab->incoming --;
