@@ -1,10 +1,26 @@
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** src/backend.h -- a backend's library, opened.
+*/
+
 #ifndef BRIDGE_SRC_BACKEND_H
-#define BRIDGE_SRC_BACKEND_H
+    #define BRIDGE_SRC_BACKEND_H
 
-#include "bridge_backend.h"
+    #include "bridge_backend.h"
 
-/* Open a backend library and find its seventeen entries by name. Returns the library, or nullptr
- * with `why` saying which name was missing or that the library would not open. */
-void *backend_open(const char *path, backend_api_t *api, char *why, size_t why_len);
+/*
+** backend_open
+**
+** Opens a backend's library and finds its eighteen entries by name. Answers
+** the library, or nullptr with `err` saying that it would not open, which
+** entry it lacks, or that it is of another backend seam.
+*/
+[[nodiscard]] void *backend_open(const char *path, backend_api_t *api,
+    backend_err_t *err);
 
 #endif

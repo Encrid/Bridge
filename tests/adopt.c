@@ -72,7 +72,6 @@ static void worker(void *arg)
 
 int main()
 {
-    char why[256];
     backend_err_t err = {};
     uint64_t reservation, guard, granule;
     size_t len, k;
@@ -80,7 +79,7 @@ int main()
     int bad = 0;
 
     setvbuf(stdout, nullptr, _IONBF, 0);       /* a crash must not swallow what was said */
-    if (!backend_open(BACKEND_PATH, &api, why, sizeof why)) { printf("FAIL: %s\n", why); return 1; }
+    if (!backend_open(BACKEND_PATH, &api, &err)) { printf("FAIL: %s\n", err.text); return 1; }
     be = api.backend_create(nullptr, 0, &err);
     api.memory_get_shape(be, &reservation, &guard, &granule);
     printf("shape: reservation %llu MiB, guard %llu MiB\n",

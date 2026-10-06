@@ -136,7 +136,7 @@ bridge_t *bridge_create(const bridge_config_t *cfg, bridge_sink_fn_t sink, void 
     for (i = 0; i < cfg->backend_count; i ++) {
         const bridge_backend_t *want = &cfg->backends[i];
         open_backend_t *o = &b->backends[i];
-        char why[400];
+        backend_err_t opened;
         backend_err_t err = {};
         uint64_t reservation = 0, guard = 0, granule = 0;
 
@@ -154,9 +154,9 @@ bridge_t *bridge_create(const bridge_config_t *cfg, bridge_sink_fn_t sink, void 
         o->name = copy(want->name, strlen(want->name));
         if (bridge_short(b, o->name, "a backend's name")) goto refuse;
         b->backend_count = i + 1;
-        o->lib = backend_open(want->library, &o->api, why, sizeof why);
+        o->lib = backend_open(want->library, &o->api, &opened);
         if (!o->lib) {
-            say(b, nullptr, nullptr, BRIDGE_ERR, "backend '%s': %s", want->name, why);
+            say(b, nullptr, nullptr, BRIDGE_ERR, "backend '%s': %s", want->name, opened.text);
             goto refuse;
         }
         {
