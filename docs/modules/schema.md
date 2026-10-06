@@ -2,7 +2,7 @@
 
 ## There is no schema format
 
-The schema is a C header, written with three macros of the binding headers:
+The schema is a C header, written with three macros of a backend's SDK:
 
     BRIDGE_SCHEMA_STRUCT(Position, { float x; float y; })
 
@@ -28,7 +28,7 @@ settings are a component*. A `declare` whose stated size or alignment is not wha
 to is refused with both.
 
 **None of that crosses.** A module is held to three numbers: size, alignment, and a hash of that
-string and its kind. The field table stays on Bridge-ASM700's side. No field name is in
+string and its type kind. The field table stays on Bridge-ASM700's side. No field name is in
 `bridge-abi.h` and none reaches a module: `wasm.md`, *It holds no content*.
 
 ## Why a header and not a format
@@ -38,7 +38,7 @@ A header does that directly. A format would describe the struct so a generator c
 longer path to the same bytes, and a second thing to keep in step.
 
 **The header is part of what a module publishes**, alongside its wasm. A mod needs the base
-game's. Both references ship a mod API this way: Q3 mods compile against `g_local.h` and
+game's. Both engines ship a mod API this way: Q3 mods compile against `g_local.h` and
 `q_shared.h`; QuakeC mods include the game's `defs.qc`.
 
 ## The type set
@@ -66,11 +66,11 @@ written without it.
 
 **A field whose type is another declared type names it bare, and it is found in the component's
 own namespace.** `Vec3 at;` in `game:Body` is `game:Vec3`, which a module declares first: a struct,
-an enum or a bitmask, each by its own macro and each with its kind stated at `declare`. A type that
+an enum or a bitmask, each by its own macro and each with its type kind stated at `declare`. A type that
 was not declared there is refused at the declaration that uses it, by its name.
 
 An enum is four bytes signed and a bitmask four unsigned, which is what `BRIDGE_SCHEMA_ENUM` and
-`BRIDGE_SCHEMA_BITMASK` state of them in the binding headers and so what a module's compiler lays out.
+`BRIDGE_SCHEMA_BITMASK` state of them in each backend's SDK and so what a module's compiler lays out.
 Refused: reaching across namespaces for a field's type, which
 would need the descriptor to carry a namespace C has no syntax for. The condition that brings it
 back is a mod that must embed one of the game's structs in its own component, and until then it
@@ -88,7 +88,7 @@ share of the arena back only if no `bridge_text` left in any row lies in it - `s
 given back when nothing points into it*. It is no component: nothing carries it but a field.
 
 **Rejected: pointer-sized or pointer-holding.** A pointer, `size_t`, `intptr_t`. A wasm32 pointer
-is four bytes and the host's is eight, so one text would lay out to two structs. A host pointer is
+is four bytes and a native one is eight, so one text would lay out to two structs. A native pointer is
 not addressable from wasm anyway. Same reason `string` and `list` are not components: `strings.md`,
 *Variable length*.
 

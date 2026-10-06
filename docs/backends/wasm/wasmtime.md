@@ -1,7 +1,7 @@
 # The wasm backend
 
 The backend that runs a core wasm module in a sandbox, over wasmtime. What a backend is asked for is
-`backend.md`; how a module binds to this one is `wasm.md`. This document is what is particular to
+`backend.md`; how a module is written for this one is `wasm.md`. This document is what is particular to
 wasmtime and would be different under another engine.
 
 ## The pin

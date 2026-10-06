@@ -52,10 +52,10 @@ more bytes. For each table that carries the component:
     one without room, and the        it becomes a second table of that set, where it stands
     column region cannot give it
 
-The last is the one case with a trace. Two tables then carry the same set until either empties;
+The last is the one case with a trace. Two tables then hold the same archetype until either empties;
 a module sees a span for each, which is no more than it could ever rely on - `module.md`, *What
 no module may do*. An entity given that set afterwards goes to the one that was there first, and
-an entity already in either stays where it is for as long as its set does not change.
+an entity already in either stays where it is for as long as its archetype does not change.
 
 Refused: destroying what cannot be placed, which is what this first did. `strip` says the entity
 stays, and a reload that stops declaring a component is a strip too, on a call that means "keep

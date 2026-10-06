@@ -99,7 +99,7 @@ large for its field, a name the enum lacks - is refused naming the key. Refused:
 of two integers for text, which would write an offset into somebody's width and height.
 
 **After init the component is the live state.** Changing `vsync` while running is a component write
-by whoever holds the grant - not a call, not a reload, not a reconfigure entry. Config is the initial
+by whoever holds the grant - not a call, not a reload, not a call to reconfigure. Config is the initial
 value; the component is the running state.
 
 That is why nothing needs a mechanism for runtime settings: **the settings that change constantly in

@@ -6,8 +6,8 @@ missing feature.
 
 A module says things by appending to **one ring in its private memory**, with a single writer by
 construction: a module's systems are serialised - `threads.md`, *Threads* - so no line needs an
-atomic. No call either, so a line costs stores rather than the 500 ns a host call cost in the
-original Bridge. Bridge-ASM700 drains every ring at each barrier.
+atomic. No call either, so a line costs stores rather than the 500 ns a call out of a module cost
+in the original Bridge. Bridge-ASM700 drains every ring at each barrier.
 
     u32 when      barrier count, and offset within the phase
     u8  -         reserved, to keep the stride at 24
@@ -26,7 +26,7 @@ the number dropped is a subtraction. Variable-length records would need scanning
 idTech3's journal is a sequential file and not a ring.
 
 **The text is in the scratch arena, and that is not a default but the whole rule.** An offset means
-nothing without a memory, and we have three - so one of them is fixed by the binding rather than
+nothing without a memory, and we have three - so one of them is fixed by the SDK rather than
 carried in the datum. That is the component model's own answer to the same problem: its canonical
 ABI takes a `memory` **option**, an index decided where the function is declared, so no value has to
 say which address space it came from. idTech3 and flecs never faced it, because `VM_ArgPtr` resolves
@@ -60,8 +60,8 @@ numbers, taken when its output shared the sink, and nothing was at -1 for no rea
 could give. Refused: the same scale with the hole closed. The condition that brings a scale of
 our own back is a need for more than eight levels.
 
-**Drop and count, never block.** A log may lose lines, and that is exactly what separates it from an
-event: an event is an entity, so the entity ceiling governs it and running out is a failure where it
+**Drop and count, never block.** A log may lose lines, and that is exactly what separates it from a
+signal: a signal is an entity, so the entity ceiling governs it and running out is a failure where it
 happens rather than a silent drop - `data.md`, *Observers*, and `budgets.md`, *Budgets*.
 
 Where drained records go - a file, a console, another process - is the host's business, and

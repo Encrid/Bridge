@@ -3,7 +3,7 @@
 An orchestrator, written in C, that runs modules over shared ECS storage. The name is temporary:
 this replaces the original Bridge when it is ready.
 
-**It is its own design, not a rewrite.** The original Bridge is a reference here - cited where it
+**It is its own design, not a rewrite.** The original Bridge is prior art here - cited where it
 gives a reason, as idTech3, flecs and Godot are - and never the specification.
 
 **Bridge-ASM700 is a library.** A host links it and owns `main`, the loop and every file. Hosts are
@@ -121,14 +121,101 @@ with the library, not even the few calls each makes to the operating system: a b
 somebody else writes has only the seam, and ours are held to the same.
 
 **How a module is written is its backend's, and not Bridge-ASM700's.** A backend is handed bytes,
-memories and host functions and asked to run a function - `backend.md`, *What the backend does not
-do* - so Bridge-ASM700 never learns what a module is made of, and cannot say how one is written.
-What it can say is what it puts in memory, and that is `bridge-abi.h`. Everything about reaching
-it - imports or a table of pointers, accessors, the macros an author types, and the same for a
-language that is not C - belongs to the backend that runs the module, and lives with it.
+memories and functions to offer a module, and asked to run a function - `backend.md`, *What the
+backend does not do* - so Bridge-ASM700 never learns what a module is made of, and cannot say how
+one is written. What it can say is what it puts in memory, and that is `bridge-abi.h`. Everything
+about reaching it - imports or a table of pointers, accessors, the macros an author types, and the
+same for a language that is not C - belongs to the backend that runs the module, and lives with it.
 
 **Prose cites a document by name, never by path** - `data.md`, not `bridge/data/data.md` - because a
 reader wants the document and not its location, and `tools/xref.py` resolves the name.
+
+## Words
+
+One word, one thing. Each is defined here once and treated where the document named says. A
+word that has more than one sense in English is used in these documents in the one given, and
+where two things could be meant the qualified form is the only form.
+
+**Who is who**
+
+    host              the program that links Bridge-ASM700 and drives it. `host-api.md`
+    backend           a shared library Bridge-ASM700 opens, which runs modules. `backend.md`
+    module            what a backend runs: a wasm binary or a native library. `module.md`
+    deployment        one host's choice of backends, modules and config
+    seam              where two of them meet: host, backend, module. Each has one header
+    SDK               the files a module is written with. It is its backend's, in `sdk/`
+    the operating     always in full. "system" alone is a module's
+    system
+
+**Running**
+
+    system            a function of a module, run in a phase over what its query matches
+    observer          a function of a module, run at a barrier for what changed. `data.md`
+    phase             a named step a host asks for: its systems run. `schedule.md`
+    barrier           what follows every phase: changes applied, then observers
+    pass              one walk of a deployment's phases, in the host's order
+    stage             a step of `PLAN.md`. Never "phase"
+    ABI entry         one of the eight things a module may call. `abi.md`
+    backend entry     one of the things a backend offers Bridge-ASM700. `backend.md`
+    export            a function a module offers: `init`, `reload`, `shutdown`, a system
+    call              what a host makes of `bridge.h`. Not an "entry"
+
+**Data**
+
+    type              anything `declare` registers: a struct, an enum, a bitmask. `schema.md`
+    component         a type that entities carry
+    type kind         struct, enum or bitmask. Also "setting kind", "field kind": never bare
+    component layout  the fields of a component: names, types, offsets, size
+    descriptor        the text of a type's body, as the module's compiler stringified it
+    schema            the header a module publishes, which declares its types
+    entity            an id: an index and a generation. `data.md`
+    reference         an entity id kept in a component and followed. `reference.md`
+    term              one component a query asks for, and how
+    slot              the number `declare`, `system` or `observe` answers a module. A position
+                      in an array is a "place"
+    event             what an observer is told of an entity: add, set, remove
+    signal            something a module tells the others, sent as an entity that carries a
+                      component for it. Not an "event"
+
+**Storage**
+
+    storage           what keeps the rows: `src/storage.c`. `storage.md`. Never "store",
+                      which is wasmtime's word for one of its own things
+    archetype         a set of components
+    table             the storage of one archetype: a column a component
+    storage layout    how a component is kept: table, sparse set, toggle, direct-indexed,
+                      singleton. `PLAN.md`, stage 11
+    sparse set        a component's own packed array, and a lookup by entity
+    toggle            a bit a row that turns a component on or off where it is
+    direct-indexed    the value of entity i at place i
+    singleton         one value for the deployment
+    tag               a component with no bytes
+    the entity index  the array a module reads to find an entity. "an id's index" is the
+                      number in the low half of an id
+    span              what a system is handed for one table: a count, and a base a term
+
+**Memory**
+
+    memory            what a module addresses: the shared memory, its private memory
+    block             the allocation behind a memory
+    region            a named part of a memory. `memory.md` has the seven
+    arena             a region handed out by advancing an offset: scratch, persistent
+    memory layout     the regions of a memory and where each begins
+    ABI layout        the bytes of a struct `bridge-abi.h` states. `wasm.md`
+    shared memory     the one every module sees
+    shared component  one that more than one module declares
+    share             a module's own part of the persistent arena, and nothing else
+
+**Saying things**
+
+    record            what reaches the host's sink. Any other is qualified: an "index
+                      record", a "ring record", a "trigger record", a "module record"
+    key               a name in a deployment's config. `config.md`
+    setting           a value a host hands over, for a module's config component or a backend
+    budget            a key that sizes something, stated before it is needed. `budgets.md`
+    prior art         a project read for its reasoning: idTech3, flecs, Godot. Not "reference"
+    citation          a document's name and one of its headings, as prose points at them.
+                      `tools/xref.py` checks that each resolves
 
 ## Where to start
 

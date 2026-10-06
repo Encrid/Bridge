@@ -76,7 +76,7 @@ are no immediate forms either: `abi.md`, *The ABI*.
 
 **At unload its share goes back to the arena, unless a row that is staying holds a string in
 it.** Bridge-ASM700 can know what the module could not. A string a component keeps is a
-`bridge_text` field - `schema.md`, *The type set* - so every reference there is can be found:
+`bridge_text` field - `schema.md`, *The type set* - so every place one is held can be found:
 after the module's own components are dropped, every `bridge_text` of every row left is read,
 in a field, in an array of them, or in a struct a field holds. If none lies in the leaving
 module's share, the share is free for the next load. If one does, the share stays whole, and so

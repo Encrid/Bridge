@@ -457,13 +457,13 @@ BACKEND_EXPORT void instance_set_memory_limit(backend_instance *i, uint64_t byte
 
 /* ---- functions in both directions ---- */
 
-typedef struct { backend_fn fn; void *ud; uint32_t params, results; uint8_t result_kind[4]; } host_fn;
+typedef struct { backend_fn fn; void *ud; uint32_t params, results; uint8_t result_kind[4]; } offered_fn;
 
-static wasm_trap_t *host_call(void *env, [[maybe_unused]] wasmtime_caller_t *caller,
+static wasm_trap_t *offered_call(void *env, [[maybe_unused]] wasmtime_caller_t *caller,
                               const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results,
                               size_t nresults)
 {
-    host_fn *h = env;
+    offered_fn *h = env;
     uint64_t in[16] = {0}, out[4] = {};
     size_t k;
     for (k = 0; k < nargs && k < 16; k ++) {
@@ -499,7 +499,7 @@ BACKEND_EXPORT int define_func(backend_instance *i, const char *ns, const char *
                                backend_fn fn, void *ud, const backend_sig *sig, backend_err *err)
 {
     wasm_valtype_vec_t params, results;
-    host_fn *h;
+    offered_fn *h;
     if (i->instantiated || sig->param_count > 16 || sig->result_count > 4) {
         fail(err, "define_func: after the module's first function, or too wide", nullptr, nullptr);
         return -1;
@@ -512,7 +512,7 @@ BACKEND_EXPORT int define_func(backend_instance *i, const char *ns, const char *
     types(&results, sig->results, sig->result_count);
     wasm_functype_t *ty = wasm_functype_new(&params, &results);
     wasmtime_error_t *error = wasmtime_linker_define_func(i->linker, ns, strlen(ns), field,
-                                                          strlen(field), ty, host_call, h, free);
+                                                          strlen(field), ty, offered_call, h, free);
     wasm_functype_delete(ty);
     if (error) {
         fail(err, "cannot define a function", error, nullptr);

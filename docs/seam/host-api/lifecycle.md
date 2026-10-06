@@ -6,7 +6,7 @@ pointer could break this; nothing contains native code, so it is a contract rath
 
 **`load`** takes an artifact rather than a path, because Bridge-ASM700 decides on `cfg` and never finds
 or reads a module's file. In order: find the backend the artifact names, check the ABI version,
-check `trusted` against that backend's `sandbox`, check the grants, take a per-module budget slot,
+check `trusted` against that backend's `sandbox`, check the grants, take one of `[budget] modules`,
 hand `bytes` and `path` to the backend, call `init` - which calls `declare`, `system` and
 `observe` - recompute the conflict graph and **refuse-and-unwind if a new system or observer
 conflicts unordered with an existing one**, then publish spans.
@@ -57,7 +57,7 @@ touched, so a reload that fails anywhere before it leaves the module running as 
 
 **`reload` is not `init` run again.** `init` starts from nothing: it registers and it populates.
 `reload` starts over what exists. Kept apart so that no `init` has to ask whether this is the first
-time, which is Erlang's reason for giving new code an entry of its own. Refused: the original
+time, which is Erlang's reason for giving new code an export of its own. Refused: the original
 Bridge's arrangement, where the old instance's `reload` consents and the new one runs `init` - right
 there, where nothing survived a reload, and wrong here, where `init` would populate storage that is
 already populated. Its veto has no job left either: a reload is between phases, so no module is in

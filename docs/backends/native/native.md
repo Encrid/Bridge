@@ -1,7 +1,8 @@
 # Modules on the native backend
 
 A native module is a **module** like any other - same ABI, same rules, three guarantees fewer,
-`module.md`. What it can *do* is there; this file is how a shared library binds to it.
+`module.md`. What it can *do* is there; this file is how a shared library is written against it: the
+native backend's SDK.
 
 The native backend exists for one reason: **something that cannot be reached from inside wasm.** A
 GPU, an audio device, input, the clock, a filesystem, a socket - and an engine that owns

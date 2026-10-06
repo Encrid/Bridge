@@ -5,7 +5,8 @@ is `README.md`; the build order is `PLAN.md`.
 
 ## Why
 
-The original Bridge's costs were measured, not guessed. One machine, release build:
+The original Bridge's costs were measured, not guessed. One machine, release build, in its own
+words for each:
 
     empty tick                      300 ns
     built-in host call              500 ns
@@ -67,7 +68,7 @@ what an ECS already is - `abi.md`, *The ABI*. So there is no call machinery: no 
 `find_func` or `call`, no service registry, no signature fingerprint, no affinity propagating along
 a call graph.
 
-How a module binds differs by backend, and nothing differs in capability: `wasm.md` and
+How a module is written differs by backend, and nothing differs in capability: `wasm.md` and
 `native.md`. `declare` carries a fingerprint - `schema.md`, *Fingerprints*, for why a hash is
 enough.
 

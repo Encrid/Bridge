@@ -32,7 +32,7 @@ typedef struct {
  * there may be at once of each thing, and then how many bytes. */
 typedef struct {
     uint64_t entities;        /* entity indices: index 0 is none, so one fewer entities */
-    uint32_t tables;          /* sets of components entities carry */
+    uint32_t tables;          /* archetypes: the sets of components entities carry */
     uint32_t types;           /* declared types: components, and the structs, enums and
                                * bitmasks their fields name */
     uint32_t systems;         /* systems and observers registered */

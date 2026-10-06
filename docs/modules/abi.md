@@ -26,7 +26,7 @@ other value: there is no default.
 
 **Every pointer here is an offset into the module's scratch arena**, on every backend: `name`,
 `desc`, `phase`, `terms`, and `attach`'s `ptr`. A module writes the bytes there first and passes
-where they are. An offset means nothing without a memory, so the memory is fixed by the binding
+where they are. An offset means nothing without a memory, so the memory is fixed by the SDK
 rather than carried in the value - the rule `log.md`, *The log*, already set for a record's text,
 and for the same reason: the scratch arena is the one memory a module can write that Bridge-ASM700
 can read and bounds-check. So one signature serves both backends, and every argument is 32 or 64
@@ -96,8 +96,8 @@ query as spans, which is what a system gets and cannot say which entity changed 
 found by scanning every event. The condition that brings it back is an observer that wants the shape
 and not the change, and such a thing is a system.
 
-**Why it is an entry of its own, and not a system people write.** A system whose query matches an
-event component does the same job by polling, and that is the alternative it has to beat: a poll
+**Why it is an entry of its own, and not a system people write.** A system whose query matches a
+signal's component does the same job by polling, and that is the alternative it has to beat: a poll
 costs a dispatch and a zero-span walk **every pass, per subscriber, whether or not anything
 happened**. Ten subscribers to a rare event cost ten calls a pass forever. An observer costs nothing
 when nothing changed - a saving on the hot path proportional to how many modules are listening, and

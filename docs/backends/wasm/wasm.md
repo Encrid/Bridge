@@ -1,7 +1,7 @@
 # Modules on the wasm backend
 
 On the wasm backend a module is a core wasm binary with a `bridge:manifest` section. What it can *do* is
-`module.md`; this file is how wasm binds to it.
+`module.md`; this file is how a wasm module is written against it: the wasm backend's SDK.
 
 Read `module.md` first, then `data.md` and `memory.md`.
 
@@ -154,7 +154,7 @@ A module that is not C cannot include the header, and so far cannot be written f
 the header is C23, and the one translator tried on it, the project's own compiler's, stops at its
 first `constexpr`. A module in another language needs two things in that language. What
 Bridge-ASM700 writes, which is this header's content and Bridge-ASM700's to make readable. And
-how a module on this backend reaches it, which is this backend's binding and this backend's to
+how a module on this backend reaches it, which is this backend's SDK and this backend's to
 provide - `README.md`, *Three layers, three seams*. `PLAN.md`, stage 15.
 
 **The native backend's `bridge_api` is not in it.** A struct of C function pointers has nothing a

@@ -77,7 +77,7 @@ as it asked, until stage 10 removed it.
 
 A file in a later standard reads a header in an earlier one, which is the direction that costs
 nothing. **A standard binds only at a boundary someone else compiles**, and ours is stated here:
-a host or a backend written in C, and a module in C that uses the binding headers, is compiled as
+a host or a backend written in C, and a module in C that uses a backend's SDK, is compiled as
 C23. zig is the compiler that builds all of it - *One compiler* - and a module in another
 language needs none of these headers: *What an author is not bound by*.
 
@@ -123,7 +123,7 @@ brings an earlier standard back for the headers is a host or a backend that has 
 compiler without C23.
 
 **Thread-local storage stays.** Two variables are found by which thread is running: the native
-module whose entry was called, and the memory wasmtime is being asked to create. A third went with
+module whose export was called, and the memory wasmtime is being asked to create. A third went with
 flecs, whose allocator callbacks could not say which bridge they were working for. Each is there
 because a callback Bridge-ASM700 does not own carries no context. Stage 12 has one thing to verify
 about them: on Windows the compiler reaches a thread-local variable through a runtime helper, and
@@ -173,7 +173,7 @@ That includes a C library: it has to be installed like anything else, so it coun
 All of the above is how Bridge-ASM700 is built. **A module is built with whatever its author has**,
 in any language that can produce a wasm module or a shared library. What binds it is the ABI: the
 ABI layouts of `bridge-abi.h`, the exported names, and the section its manifest sits in - `abi.md`,
-*The ABI*, and `module.md`, *The manifest*. `bridge-wasm.h` and `bridge-native.h` are C's binding
-of that, not the contract itself, and each is its backend's: it sits in that backend's `sdk/`,
-beside the backend that runs what is written with it. They are C23, and so is whatever includes them: *The
-standard*.
+*The ABI*, and `module.md`, *The manifest*. `bridge-wasm.h` and `bridge-native.h` are the two
+backends' SDKs for C of that, not the contract itself, and each is its backend's: it sits in that
+backend's `sdk/`, beside the backend that runs what is written with it. They are C23, and so is
+whatever includes them: *The standard*.

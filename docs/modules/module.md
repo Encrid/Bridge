@@ -10,7 +10,7 @@ say which backend runs it and nothing more. They are not two kinds: the ABI, the
 scheduler are the same for both.
 
 This file is what every module shares. The calls are `abi.md`; who may name a component is
-`grants.md`. `wasm.md` and `native.md` describe only how a module binds on each backend.
+`grants.md`. `wasm.md` and `native.md` describe only how a module is written for each backend: its SDK.
 
 ## Identity
 
@@ -67,7 +67,7 @@ costs, and what finds it*.
 
 Nothing on this list is a wall. The one refusal that is lives in `wasm.md`, *What a wasm module
 cannot do*, and it is not a shared rule: it is the sandbox guarantee below, stated as a rule. Each
-backend adds exactly one refusal of its own, in its own binding file.
+backend adds exactly one refusal of its own, in its own SDK.
 
 ## Three guarantees differ
 
@@ -96,5 +96,5 @@ penalty and gets bounds checks, fuel, a trap instead of a crash and a clean relo
 backend it runs native and gets none of that. **That is a trade, not a rule**, and the deployment
 makes it.
 
-How a module binds is the backend's business and nobody else's: `wasm.md` and `native.md`. The
+How a module is written is the backend's business and nobody else's: `wasm.md` and `native.md`. The
 scheduler cannot tell which backend a module is on, which is the property worth having.

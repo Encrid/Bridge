@@ -25,7 +25,7 @@ name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
     memory_adopt(backend, ptr, len)            -> memory
     memory_release(memory)
     module_compile(backend, bytes, len, path, demands) -> module
-    module_imports(module)                     -> names and kinds
+    module_imports(module)                     -> names, and what each is
     module_destroy(module)
 
     instance_create(backend, module, memories, count) -> instance
@@ -151,6 +151,7 @@ So **meaningful-but-unavailable is not meaningless** - that is `instance_set_fue
 Meaningless to one backend is a different thing, and that is `store_create`: not "cannot do it" but
 "the word names nothing here", which no capability flag could rescue.
 
-Bridge-ASM700 hands it bytes, memories and host functions, and asks it to run a function. That is the
+Bridge-ASM700 hands it bytes, memories and functions to offer a module, and asks it to run a
+function. That is the
 entire relationship, and it is why the surface is seventeen entries rather than a second copy of
 Bridge-ASM700.

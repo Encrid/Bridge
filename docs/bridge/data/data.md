@@ -102,10 +102,11 @@ once, with the difference (`flecs.c:6262`), and what we had was the way we drove
 each change. The condition that brings it back is a module that must hear of a change that left
 nothing behind, and cannot say it with an entity that carries the event.
 
-**This is how an event crosses.** A native module with a fired signal spawns an entity carrying an event
-component; the change applies at the barrier and the subscriber's observer runs there. Same latency
-a dedicated ring would have given, since there is a barrier after every phase. And the entity
-ceiling already budgets it, so there is no second size to pick and no overflow policy to invent.
+**This is how a signal crosses.** A native module with something to tell spawns an entity that
+carries a component for it; the change applies at the barrier and the subscriber's observer runs
+there. Same latency a dedicated ring would have given, since there is a barrier after every phase.
+And the entity ceiling already budgets it, so there is no second size to pick and no overflow policy
+to invent.
 
 **A module never asks another module for anything.** It writes, and whoever subscribed to that
 shape acts. A system subscribes to a shape; an observer subscribes to a change.

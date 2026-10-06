@@ -7,7 +7,7 @@ The arrangement is idTech3's: the engine is `qcommon/`, and `win32/win_main.c:12
 then loops on `Com_Frame`.
 
 This is the third seam. `module.md` and `bridge-abi.h` are Bridge-ASM700 to modules, with each
-backend's binding beside that backend - `README.md`, *Three layers, three seams*;
+backend's SDK beside that backend - `README.md`, *Three layers, three seams*;
 `backend.md` is Bridge-ASM700 to a backend; this is **host to Bridge-ASM700**. Everything in this
 folder is `bridge.h`, which is the only header a host includes - one per seam, `README.md`, *Three
 layers, three seams*.
@@ -64,7 +64,7 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
 
     typedef struct {
         uint64_t entities;        /* how many there may be at once: entity indices */
-        uint32_t tables;          /* sets of components */
+        uint32_t tables;          /* archetypes */
         uint32_t types;           /* declared types */
         uint32_t systems;         /* systems and observers */
         uint32_t terms;           /* terms one of them may have */
@@ -167,7 +167,7 @@ component*, makes for a module's. Neither backend built so far has a setting, so
 and Bridge-ASM700 passes them to `backend_create` unread: `backend.md`, *The backend owns its clock*.
 
 **A module's `settings` seed a component, and nothing more** - `config.md`, *A module's own
-settings are a component*, for why that means there is no reconfigure entry here.
+settings are a component*, for why that means there is no call to reconfigure here.
 
 ### Nothing here is an ABI layout
 

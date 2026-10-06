@@ -8,7 +8,7 @@ storage, so the native module that wraps the engine answers from it with no call
     _get, _set            a property is a component; the engine's module reads it
     _get_property_list    the descriptors are a component array
     _has_point            the shape is a component; the engine's module does the test
-    a signal firing       an entity carrying an event component; whoever subscribed runs
+    a signal firing       an entity carrying a component for it; whoever subscribed runs
                           at the barrier - `data.md`, *Observers*
 
 Godot's own documented example needs none of it: a position computed from elapsed time is a system

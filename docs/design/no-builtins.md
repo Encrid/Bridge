@@ -1,16 +1,16 @@
 # No builtins
 
-The original Bridge shipped `log`, `ctl`, `config` and `profile` as host-implemented interfaces -
-the measured "built-in host call, 500 ns". Bridge-ASM700 has none. The rule is **no builtin
-surface**: nothing a module imports, no component Bridge-ASM700 declares, and **no name
-Bridge-ASM700 invents for a deployment's own structure**. It still takes config as structs, drains
-log rings and keeps a clock for its own records; none of that is reachable from a module.
+The original Bridge shipped `log`, `ctl`, `config` and `profile` as interfaces it implemented itself
+- what its own measurements call the "built-in host call", 500 ns. Bridge-ASM700 has none. The rule
+is **no builtin surface**: nothing a module imports, no component Bridge-ASM700 declares, and **no
+name Bridge-ASM700 invents for a deployment's own structure**. It still takes config as structs,
+drains log rings and keeps a clock for its own records; none of that is reachable from a module.
 
 The last clause is about structure, not the calling convention. `init`, `shutdown` and `reload`
 **are** three names Bridge-ASM700 chose, and they stay: something has to be called first, and no
-deployment decision hides behind that - every loader has an entry name, from `main` to `vmMain`. A
+deployment decision hides behind that - every loader has a name it calls first, from `main` to `vmMain`. A
 phase name is different: a guess about the shape of a frame that every module would then have to
-reference. `schedule.md`, *Bridge-ASM700 ships no phase names*.
+name. `schedule.md`, *Bridge-ASM700 ships no phase names*.
 
 Why: a builtin is a door that stays open. Each one is defensible alone and the set only grows, which
 ends up contradicting the minimality the rest rests on. With none, the ABI is eight entries and has

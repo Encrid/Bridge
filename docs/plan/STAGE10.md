@@ -447,18 +447,22 @@ the first five were not, and should have been.
             then each kind on its own: accepted, all five, as `PLAN.md` 11
     open    a struct changed at reload: a question the misreading raised and nobody had
             asked. `lifetime.md` says the library "cannot" tell what changed, which is false
-    closed  bindings for a non-C module: a stage of its own, `PLAN.md` 15, with two owners.
+    closed  an SDK for a module that is not C: a stage of its own, `PLAN.md` 15, with two owners.
             What Bridge-ASM700 writes is its own to state; how a module reaches it is the
             backend's. Tried first: the project's compiler cannot translate the header
     closed  the tree itself, which had said otherwise: a folder for each owner. A backend has
-            its binding, its dependency and its own calls to the operating system, and compiles nothing
+            its SDK, its dependency and its own calls to the operating system, and compiles nothing
             of the library's inside; test modules are filed by the backend that runs them
 
 **1b. Words**: found by the item above. "layout" is used sixty-two times in the documents for
 at least five things, none defined, and none of them the one that was meant.
 
-    open    every term of art defined once, and a word used for several things split:
-            "layout" first, then "terms", "type", "table", "share", "slot", "kind"
+    closed  every term of art defined once, in `README.md`, *Words*, and a word used for
+            several things split: a stage of the plan and a phase of a pass; a component
+            layout, a storage layout, an ABI layout, a memory layout; a type and a
+            component; an archetype and its table; the operating system and a system;
+            prior art, a citation and a reference; an SDK; a signal and an event. The
+            files and identifiers follow: `src/block.c`, `src/storage.c`, `declared_type`
 
 **2. Statements that are false now**: one commit, no decision.
 

@@ -27,7 +27,7 @@ That is Quake's model: `pr_exec.c:382` sets `runaway = 100000` at the top of `PR
 no way to interrupt.
 
 **Counting is enough for a system, which is why there is no per-invocation deadline.** Fuel counts
-only wasm instructions, so it would miss a module blocked inside a host call - except that a module
+only wasm instructions, so it would miss a module blocked inside a call it made out - except that a module
 has no such call. Its only imports are Bridge-ASM700's eight ABI entries (`wasm.md`, *Memories*),
 and none of them waits on anything. A wall-clock bound beside fuel would guard a case the design
 does not contain.

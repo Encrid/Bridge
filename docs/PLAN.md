@@ -232,7 +232,7 @@ that have them use:
                       goes, what few entities carry, what sits on entities that carry a lot
     toggle            a bit a row that turns a component on or off where it is. What an entity
                       always has and sometimes does not use
-    direct-indexed    the value of entity i at slot i. What nearly every entity carries and is
+    direct-indexed    the value of entity i at place i. What nearly every entity carries and is
                       reached by id far more than it is walked
     singleton         one value for the deployment, at one place. Settings, and what there is
                       one of
@@ -244,7 +244,7 @@ same rows read from 4,096 tables take three times as long as from one.
 
 This stage's questions, each by the method of `STAGE0.md`, and in this order: who states a
 component's storage layout, and where; what a module is handed for each, in `bridge-abi.h` and in
-each backend's binding, and what a query may ask across two of them; what each costs of which
+each backend's SDK, and what a query may ask across two of them; what each costs of which
 budget; whether a component may have no bytes at all, a tag; and what it takes to move a
 component from one storage layout to another, which is what "layout migration" meant.
 
@@ -304,19 +304,19 @@ What a module needs to be written falls in two parts, and they have two owners -
 
     Bridge-ASM700     what it writes for a module to read, the same on every backend:
                       `bridge-abi.h`
-    a backend         how a module it runs reaches that: the binding in its own `sdk/`
+    a backend         how a module it runs reaches that: its SDK, in its own `sdk/`
 
 Both are C23 today, and `wasm.md`, *The ABI layouts*, said a module in another language
-derives its binding from the header. That was never tried, and the first try failed: the
+derives what it needs from the header. That was never tried, and the first try failed: the
 project's own compiler cannot translate `bridge-abi.h`, which stops at its first `constexpr`. So
 a module in any language but C is a claim. It was listed as not in this plan, with no condition
 and no stage.
 
 This stage makes it true once, for one language that is not C, on the native backend: the ABI
-layouts in a form that language can read, and that backend's binding in that language, each made by its
+layouts in a form that language can read, and that backend's SDK in that language, each made by its
 owner. How Bridge-ASM700 states its ABI layouts so that more than C can read them - a description
 with no language in it from which the header is written, or something less - is this stage's
-first question, by the method of `STAGE0.md`; which language, and what a backend's binding in it
+first question, by the method of `STAGE0.md`; which language, and what a backend's SDK in it
 consists of, are the next two.
 
 After diagnostics; and before the tests by capability, whose list this adds to.

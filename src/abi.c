@@ -97,9 +97,9 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     memcpy(name, name_at, a[1]);
     name[a[1]] = 0;
     bare = strchr(name, ':');
-    if (!bare) return refuse(m, "component '%s' has no namespace", name);
+    if (!bare) return refuse(m, "type '%s' has no namespace", name);
     if (kind < BRIDGE_STRUCT || kind > BRIDGE_BITMASK) {
-        return refuse(m, "component '%s': its kind is unset", name);
+        return refuse(m, "type '%s': its kind is unset", name);
     }
     if (foreign(m, name) && !listed(m->read, m->read_count, name)
         && !listed(m->write, m->write_count, name)) {
@@ -107,7 +107,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
             "names it", name);
     }
     if (on_unload < BRIDGE_STRIP || on_unload > BRIDGE_DELETE) {
-        return refuse(m, "component '%s': on_unload is unset", name);
+        return refuse(m, "type '%s': on_unload is unset", name);
     }
     print = fingerprint(desc_at, a[6]) ^ kind;
 
@@ -115,7 +115,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         if (!strcmp(b->types[i]->name, name)) c = b->types[i];
     }
     if (c && c->fingerprint != print) {
-        return refuse(m, "component '%s' has another layout here: fingerprint %016llx, and it "
+        return refuse(m, "type '%s' has another component layout here: fingerprint %016llx, and it "
             "was declared with %016llx", name, (unsigned long long)print,
             (unsigned long long)c->fingerprint);
     }
@@ -133,16 +133,16 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         refused = schema_parse(kind, desc, find, &l, &s, why, sizeof why);
         *bare = ':';
         free(desc);
-        if (refused) return refuse(m, "component '%s': its descriptor %s", name, why);
+        if (refused) return refuse(m, "type '%s': its descriptor %s", name, why);
         if (s.size != size || s.align != align) {
             uint32_t laid = s.size, aligned = s.align;
             schema_free(&s);
-            return refuse(m, "component '%s' is %u bytes aligned to %u in the module and %u "
+            return refuse(m, "type '%s' is %u bytes aligned to %u in the module and %u "
                 "aligned to %u by its descriptor", name, size, align, laid, aligned);
         }
         if (b->type_count >= b->max_types) {
             schema_free(&s);
-            return refuse(m, "component '%s' is one type more than [budget] types of %u", name,
+            return refuse(m, "type '%s' is one more than [budget] types of %u", name,
                 b->max_types);
         }
 

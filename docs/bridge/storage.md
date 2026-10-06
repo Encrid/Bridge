@@ -28,7 +28,8 @@ than any program does, and storage is made of what each promise allows:
 
 ## A table
 
-One set of types, and the entities that carry exactly that set. It is found **by its set**: a
+An **archetype** is a set of components. A **table** is the storage of one archetype: the entities
+that carry exactly that set, and their values. A table is found **by its archetype**: a
 bit for each declared type, hashed. There is no graph of which table an added or removed
 component leads to, because nothing walks from table to table: an entity's final set is known
 before it is placed.
@@ -132,7 +133,7 @@ barrier's second step is where that is found out, before anything has moved.
 ## What bounds it
 
     [budget] entities    the index, and everything storage keeps an entity
-    [budget] tables      every table's record, its set, the hash that finds it
+    [budget] tables      every table's record, its archetype, the hash that finds it
     [budget] columns     the rows, and the list of which entity is in which
     [budget] types       how wide a set is, and with `tables`, an offset for each type in
                          each table

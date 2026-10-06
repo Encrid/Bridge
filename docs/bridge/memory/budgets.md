@@ -6,7 +6,7 @@ Two tiers, because two things are being sized.
 
     how many there may be at once
     entities      entity indices. Index 0 is no entity
-    tables        sets of components entities carry
+    tables        archetypes: the sets of components entities carry
     types         declared types: components, and the structs, enums and bitmasks their
                   fields name
     systems       systems and observers registered
@@ -21,7 +21,7 @@ One block serves everyone, so no single module could size it. It arrives as a st
 file, because Bridge-ASM700 reads none: `host-api.md`, *Bridge-ASM700 parses nothing*.
 
 **`tables` is a count of what exists, not of what was ever seen.** A table lives while it has rows
-- `storage.md`, *A table* - so the number to state is how many different sets of components
+- `storage.md`, *A table* - so the number to state is how many different archetypes
 entities carry at one time. It sizes everything storage keeps a table, and one more thing that
 is a module's: `column_base` has a cell for each of the module's components in every table there
 may be, inside its `spans`. A module whose `spans` cannot hold that is refused at load, by the

@@ -21,12 +21,12 @@ Bridge-ASM700's own refusals take init's path and lists examples. Checking the d
 capabilities found nothing, because the answer was in the document that says what happens when
 anything is refused.
 
-**3. Look for references, for their reasoning and not their answer.** Check what is on disk before
+**3. Look for prior art, for its reasoning and not its answer.** Check what is on disk before
 describing it, and say which claims are checkable here and which are from memory; nobody can weigh
-evidence they cannot reach. Reading the reference beats reasoning about it - flecs' own iterator
+evidence they cannot reach. Reading the prior art beats reasoning about it - flecs' own iterator
 serialiser answered in nine lines what an hour of argument had not.
 
-**A reference is evidence, not an oracle.** What you want from it is the *why*: which options its
+**Prior art is evidence, not an oracle.** What you want from it is the *why*: which options its
 authors faced, what they were trading against, and which of those forces act on us. That is how you
 learn possibilities you had not thought of - including the ones they rejected, which are often the
 more useful half.
@@ -63,8 +63,8 @@ condition depends on what somebody else's module declared. Item 40 was decided w
 exactly that - the chosen option made a module's arena cleanup depend on whether another module
 had happened to declare the same component.
 
-**7. Tailor rather than adopt.** Take placement from one reference and naming from another if
-that is the fit, and state every departure with its reason. A reference's constraint is often
+**7. Tailor rather than adopt.** Take placement from one project and naming from another if
+that is the fit, and state every departure with its reason. Their constraint is often
 not ours: idTech3 copies a payload inline because its record goes to a file, and ours is read
 in-process.
 
@@ -82,13 +82,13 @@ was emptied and deleted when the stage closed, because a standing list outlives 
 **10. Scan.** Every time, and in order - see below.
 
 **11. Report what closed, what opened, what sharpened.** Including defects of your own found
-on the way. Two of the worst were redundant fields added while claiming to copy a reference,
+on the way. Two of the worst were redundant fields added while claiming to copy prior art,
 and the scan found both where thinking had not.
 
 ## What no script can do
 
 Steps 1 to 8 here, and steps 4 to 7 of the scan, are reading and judgement. The three checks exist so
-that the **mechanical** checks are never what gets skipped - a count, a reference, a duplicated run, a
+that the **mechanical** checks are never what gets skipped - a count, a citation, a duplicated run, a
 ragged line. They cannot weigh an option, re-read an open question against a decision just made, or
 notice that an edit left `"Create or Call a module"` behind.
 
@@ -106,16 +106,16 @@ it.
 Steps 1 to 3 are scripts because a listed check gets skipped and a script gets run. Steps 4 to 7 are
 reading, in this order, because each one has caught something the one before it could not.
 
-**1. Cross-references resolve.**
+**1. Citations resolve.**
 
     python ../tools/xref.py
 
 Every `doc.md`, *Section* pointing at a heading that exists, and no "item N" left: the numbers
-belonged to stage 0's register, which is gone. This has caught six references that resolved to
+belonged to stage 0's register, which is gone. This has caught six citations that resolved to
 nothing, every one in text written minutes earlier.
 
 The script reads unwrapped text, because a citation wraps onto the next line as often as not and a
-line-at-a-time grep never sees its two halves together. Two dangling references survived several
+line-at-a-time grep never sees its two halves together. Two dangling citations survived several
 clean scans that way.
 
 **2. Duplication.**
