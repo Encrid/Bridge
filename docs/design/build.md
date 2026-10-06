@@ -145,9 +145,10 @@ backends: four that allocate, `memcpy`, `memmove`, `memset`, `memcmp`, `memchr`,
 No file, no stream, no `printf`, no floating point, no `qsort`. `PLAN.md`, stage 12, lists
 them as a dependency and shortens the list where it can.
 
-**The door is one layer**: mapping, threads, loading a library and the clock are reached
-through the operating system's layer and nowhere else, and that is the only code that differs
-by platform.
+**The door is one layer**, `utils/os/`: mapping, threads, loading a library and the clock are
+reached through it and nowhere else, and that is the only code that differs by platform. It
+depends on nothing of ours, and it is compiled into the library and into each backend, which
+are separate binaries - `STAGE12.md`, *One operating-system layer*.
 
 ## Dependencies
 

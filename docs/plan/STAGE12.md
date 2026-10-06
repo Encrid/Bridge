@@ -89,3 +89,31 @@ Four readings the rules left open, each put to Enkrid and decided:
                         tracked, and a library somebody else published is tracked as
                         published, in a folder that holds its licence. The exception first
                         entered for it is withdrawn
+
+## The decisions
+
+What shapes files, each decided before any file is rewritten. What each refused is in this
+stage's record of refusals, under the same heading.
+
+### One operating-system layer
+
+The same code was in three places: `src/os.c`, `backends/wasm/os.c` and
+`backends/native/os.c`. A backend is a shared library of its own, so the linker finds
+`os_mutex_lock` in each binary from that binary's own objects, and each had been given its own
+source for it since stage 10, where a backend stopped compiling anything of `src/`. None of the
+three reads a type of the library: they are calls to the operating system and nothing else.
+
+**One source, in `utils/os/`, compiled into the library and into each backend.** Each binary
+still holds its own machine code, and a call to it is the direct call it was. The rule of
+stage 10 stands as it is written in `build.py`: a backend compiles nothing of `src/`. `utils/`
+depends on nothing of ours, which is what lets both sides take it.
+
+The folder is `utils/` and not `shared/`: `shared` already names the memory every module reads,
+in `BRIDGE_SHARED` and throughout storage, and a word has one meaning here.
+
+    fast          the same direct calls as before
+    scalable      a new platform is written in one place, where it was three
+    modular       the layer is a unit with no dependency, taken whole by whoever needs it
+    extensible    a backend somebody else writes may take the folder, or write its own
+    minimal       about 250 lines once, where it was about 490
+    explicit      one place, named in `build.md`, *The C library*
