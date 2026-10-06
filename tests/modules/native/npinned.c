@@ -25,9 +25,9 @@ BRIDGE_NATIVE(three) { return pin(api); }
 BRIDGE_NATIVE(init)
 {
     int none = 0;
-    BRIDGE_NATIVE_SYSTEM(api, "one", "update", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "two", "update", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "three", "present", &none, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "one", "update", &none, 0, nullptr, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "two", "update", &none, 0, nullptr, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "three", "present", &none, 0, nullptr, 0);
     return 0;
 }
 

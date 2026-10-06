@@ -202,12 +202,15 @@ static void heard(void *ctx, uint64_t id, enum bridge_event event)
 /* A system or an observer is a query plus a function, so one registration serves both.
  * `events` is zero for a system, and then `phase` is the phase it named. */
 static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t phase,
-                     enum bridge_event events, uint64_t terms_off, uint64_t term_count, uint64_t *r)
+                     enum bridge_event events, uint64_t terms_off, uint64_t term_count,
+                     uint64_t changes_off, uint64_t change_count, uint64_t *r)
 {
     bridge *b = m->b;
     const char *what = events ? "observer" : "system";
     const char *name_at = scratch(m, name_off, name_len);
     const bridge_term *terms = scratch(m, terms_off, term_count * sizeof(bridge_term));
+    const void *changes = change_count ? scratch(m, changes_off, change_count * sizeof(uint32_t))
+                                       : "";
     uint32_t count = (uint32_t)term_count, i;
     storage_term *asked;
     bridge_system *s;
@@ -220,8 +223,12 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         return refuse(m, "a%s %s asks for %llu terms, which is more than [budget] terms of %u",
             events ? "n" : "", what, (unsigned long long)term_count, b->max_terms);
     }
-    if (!name_at || !terms || !name_len || name_len >= sizeof name) {
-        return refuse(m, "%s: a name or a term lies outside the scratch arena", what);
+    if (!name_at || !terms || !changes || !name_len || name_len >= sizeof name) {
+        return refuse(m, "%s: a name, a term or a change lies outside the scratch arena", what);
+    }
+    if (change_count > m->declared_count) {
+        return refuse(m, "a%s %s states %llu changes, and the module declared %u types",
+            events ? "n" : "", what, (unsigned long long)change_count, m->declared_count);
     }
     memcpy(name, name_at, name_len);
     name[name_len] = 0;
@@ -238,8 +245,27 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         return refuse(m, "observer '%s' has no term, and so nothing to observe", name);
     }
 
-    s = calloc(1, sizeof *s + count * sizeof *s->term);
+    s = calloc(1, sizeof *s + count * sizeof *s->term + change_count * sizeof *s->changes);
+    s->changes = (declared_type **)(void *)&s->term[count];
     asked = calloc(count + 1, sizeof *asked);
+    /* what it attaches or detaches: a write, so it wants the grant a write wants */
+    for (i = 0; i < change_count; i ++) {
+        uint32_t slot;
+        memcpy(&slot, (const char *)changes + i * sizeof slot, sizeof slot);
+        if (slot >= m->declared_count) {
+            refuse(m, "change %u of %s '%s' names slot %u, which it never declared", i, what, name,
+                slot);
+        } else if (!may_write(m, m->declared[slot])) {
+            refuse(m, "%s '%s' may not attach or detach '%s': no grant says so", what, name,
+                m->declared[slot]->name);
+        }
+        if (m->refused) {
+            free(asked);
+            free(s);
+            return 1;
+        }
+        s->changes[s->change_count ++] = m->declared[slot];
+    }
     /* query.md, *What a query may not ask for* */
     for (i = 0; i < count; i ++) {
         bridge_term t;
@@ -297,10 +323,12 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         m->systems[m->system_count] = s;
         r[0] = m->system_count ++;
     }
+    abi_marks(m);
     return 0;
 }
 
-/* system(name, name_len, phase, phase_len, terms, term_count) -> slot */
+/* system(name, name_len, phase, phase_len, terms, term_count, changes, change_count) -> slot.
+ * `changes` is the slots of what it attaches or detaches, each a u32. */
 static int abi_system(void *ud, const uint64_t *a, uint64_t *r)
 {
     module *m = ud;
@@ -316,11 +344,11 @@ static int abi_system(void *ud, const uint64_t *a, uint64_t *r)
         return refuse(m, "a system names phase '%.*s', which the deployment did not declare",
             (int)a[3], phase_at);
     }
-    return subscribe(m, a[0], a[1], phase, 0, a[4], a[5], r);
+    return subscribe(m, a[0], a[1], phase, 0, a[4], a[5], a[6], a[7], r);
 }
 
-/* observe(name, name_len, events, terms, term_count) -> slot. It takes no phase: it has one
- * already, the barrier that applied its trigger. */
+/* observe(name, name_len, events, terms, term_count, changes, change_count) -> slot. It takes
+ * no phase: it has one already, the barrier that applied its trigger. */
 static int abi_observe(void *ud, const uint64_t *a, uint64_t *r)
 {
     module *m = ud;
@@ -328,7 +356,7 @@ static int abi_observe(void *ud, const uint64_t *a, uint64_t *r)
     if (!a[2] || a[2] & ~(uint64_t)(BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE)) {
         return refuse(m, "observe: its events are unset, or name one there is not");
     }
-    return subscribe(m, a[0], a[1], m->b->phase_count, (uint32_t)a[2], a[3], a[4], r);
+    return subscribe(m, a[0], a[1], m->b->phase_count, (uint32_t)a[2], a[3], a[4], a[5], a[6], r);
 }
 
 /* Nothing below touches storage. Modules run at once, and what one asks for must not depend on
@@ -337,10 +365,26 @@ static int abi_observe(void *ud, const uint64_t *a, uint64_t *r)
  * which the barrier applies in an order that never varies. No lock: a module's systems are
  * serialised, so each of the three has one writer. */
 
+/* Room for a mark from each of its systems and observers, and from the lifecycle call in
+ * progress, beyond those it has: asked for where a module gains a system and before a
+ * lifecycle call, so that `queue` never has to. */
+void abi_marks(module *m)
+{
+    uint32_t want = m->mark_count + m->system_count + m->observer_count + 1;
+    if (want <= m->mark_room) return;
+    m->marks = realloc(m->marks, want * sizeof *m->marks);
+    m->mark_room = want;
+}
+
 static void queue(module *m, enum change_op op, uint64_t id, declared_type *c, const void *value)
 {
     change ch = { id, c, value ? c->size : 0, op };
     uint32_t need = (uint32_t)sizeof ch + ((ch.size + 7u) & ~7u);
+    if (!m->mark_count || m->marks[m->mark_count - 1].turn != m->turn) {
+        if (m->mark_count == m->mark_room) abi_marks(m);
+        m->marks[m->mark_count].turn = m->turn;
+        m->marks[m->mark_count ++].at = m->queue_len;
+    }
     if (m->queue_len + need > m->queue_room) {
         m->queue_room = (m->queue_room + need) * 2;
         m->queue = realloc(m->queue, m->queue_room);
@@ -378,12 +422,23 @@ static int abi_destroy(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r
 
 static declared_type *written(module *m, uint64_t slot, const char *entry)
 {
+    const bridge_system *s = m->running;
+    uint32_t i;
     if (slot >= m->declared_count) {
         refuse(m, "%s names slot %llu, which it never declared", entry, (unsigned long long)slot);
         return nullptr;
     }
     if (!may_write(m, m->declared[slot])) {
         refuse(m, "it may not %s '%s': no grant says so", entry, m->declared[slot]->name);
+        return nullptr;
+    }
+    /* schedule.md, *Order within a phase is never implicit*: what a system changes is what
+     * it stated, so that two that change one component were ordered when they loaded. A
+     * lifecycle call runs alone, and states nothing */
+    for (i = 0; s && i < s->change_count && s->changes[i] != m->declared[slot]; i ++) {}
+    if (s && i == s->change_count) {
+        refuse(m, "%s '%s' may not %s '%s': it is not among the changes it stated",
+            s->observer ? "observer" : "system", s->name, entry, m->declared[slot]->name);
         return nullptr;
     }
     return m->declared[slot];
@@ -452,8 +507,8 @@ int abi_define(module *m, backend_err *err)
         uint32_t    result_count;
     } entries[] = {
         { "declare", abi_declare, { I, I, I, I, I, I, I, I }, 8, { I }, 1 },
-        { "system",  abi_system,  { I, I, I, I, I, I },    6, { I }, 1 },
-        { "observe", abi_observe, { I, I, I, I, I },       5, { I }, 1 },
+        { "system",  abi_system,  { I, I, I, I, I, I, I, I }, 8, { I }, 1 },
+        { "observe", abi_observe, { I, I, I, I, I, I, I }, 7, { I }, 1 },
         { "spawn",   abi_spawn,   {},                      0, { L }, 1 },
         { "destroy", abi_destroy, { L },                   1, {}, 0 },
         { "attach",  abi_attach,  { L, I, I, I },          4, {}, 0 },

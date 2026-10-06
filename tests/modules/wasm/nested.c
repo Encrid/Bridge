@@ -31,7 +31,7 @@ BRIDGE_EXPORT(init) int init()
     BRIDGE_DECLARE(BRIDGE_BITMASK, "game:Flags", Flags, BRIDGE_STRIP);
     body = BRIDGE_COMPONENT("game:Body", Body, BRIDGE_DELETE);
     terms[0].slot = body;
-    reading = BRIDGE_SYSTEM("read", "update", terms, 1);
+    reading = BRIDGE_SYSTEM("read", "update", terms, 1, nullptr, 0);
     BRIDGE_ATTACH(bridge_spawn(), body, b);
     return 0;
 }

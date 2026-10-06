@@ -106,9 +106,38 @@ modules and only the deployment knows both are there.
 
 ### Order within a phase is never implicit
 
-If two systems in the same phase conflict - one writes what the other reads or writes - and nothing
-orders them, **Bridge-ASM700 refuses the load that introduces the conflict** and names both. Never
+If two systems in the same phase conflict and nothing orders them, **Bridge-ASM700 refuses the
+load that introduces the conflict** and names both. Never
 declaration order or load order: nothing is decided by which module happened to be found first.
+
+Two systems conflict in one of two ways:
+
+    through a column    one writes a component the other reads or writes: their terms say so
+    through a change    both attach or detach the same component: their changes say so,
+                        the list each stated beside its terms - `abi.md`, *The ABI*
+
+**A change is in the graph because a barrier applies changes in the order the systems ran.** Two
+modules that attach one component to one entity in one phase leave the value of whichever ran
+last, so which ran last has to be something the deployment stated. `tests/stage5.c`, cases
+`changeorder` and `changeloaded`, load the same two modules in both orders and read the same
+value. A change does not conflict with a term: a change is applied at the barrier, after every
+system of the phase has read what was there before it.
+
+**Every attach and every detach is stated, with no exception.** So two modules that send the same
+signal in one phase - each attaching the same component to entities only it holds - are refused
+until the deployment orders them, though they could not have collided. That is the price of one
+rule. Refused: leaving out an entity the module spawned since the last barrier, which no other
+module can reach. It costs four bytes an entity to know who spawned what, and makes the rule
+two. The condition that brings it back is deployments ordering emitters that have no reason to
+be ordered, often enough to be named a burden.
+
+Refused: the order the modules were loaded in, which is what a barrier used. It contradicted the
+paragraph above, and made what one module left on an entity depend on which the host loaded
+first. No condition brings it back. Refused: finding the collision at the barrier, by noting who
+changed each component of each entity. It costs every barrier a note for every change, and is
+found only when the data collides. The condition that brings it back is stating proving too
+coarse. Refused: another fixed order, by a module's name, which is as arbitrary as the first.
+
 There is no moment called start to refuse at, since the host loads modules one at a time -
 `lifecycle.md`, *The runtime lifecycle*. Conflicts are already computed for
 parallelism, so detecting this costs nothing.

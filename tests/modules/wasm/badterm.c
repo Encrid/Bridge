@@ -8,7 +8,7 @@ BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_READ, (enum bridge_oper)4, 0 }};
     terms[0].slot = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP);
-    BRIDGE_SYSTEM("any", "update", terms, 1);
+    BRIDGE_SYSTEM("any", "update", terms, 1, nullptr, 0);
     return 0;
 }
 

@@ -4,8 +4,8 @@ At init, which runs each time a module is loaded - `lifecycle.md`, *The runtime 
 three may take names, because registration is not a hot path.
 
     declare(name, name_len, kind, size, align, desc, desc_len, on_unload) -> slot
-    system (name, name_len, phase, phase_len, terms, term_count)    -> slot
-    observe(name, name_len, events, terms, term_count)              -> slot
+    system (name, name_len, phase, phase_len, terms, term_count, changes, change_count) -> slot
+    observe(name, name_len, events, terms, term_count, changes, change_count)         -> slot
 
 Any time, queued and applied at the next barrier:
 
@@ -25,7 +25,7 @@ stated, like every other value.
 other value: there is no default.
 
 **Every pointer here is an offset into the module's scratch arena**, on every backend: `name`,
-`desc`, `phase`, `terms`, and `attach`'s `ptr`. A module writes the bytes there first and passes
+`desc`, `phase`, `terms`, `changes`, and `attach`'s `ptr`. A module writes the bytes there first and passes
 where they are. An offset means nothing without a memory, so the memory is fixed by the SDK
 rather than carried in the value - the rule `log.md`, *The log*, already set for a record's text,
 and for the same reason: the scratch arena is the one memory a module can write that Bridge-ASM700
@@ -110,6 +110,22 @@ of term structs rather than a string, so there is no parser in Bridge-ASM700 and
 over at init. A term is three things: the
 slot `declare` answered, the access, and whether the term must match, must not, or may. What a
 query may not ask for is `query.md`, *What a query may not ask for*.
+
+**`changes` is what the system attaches or detaches**: the slots of those components, each a
+`u32`, and how many. It is a second list and not a kind of term, because a term is one component
+a query asks for, and a system attaches a component to entities that do not carry it. A system
+that attaches or detaches nothing states that: no changes. An `attach` or a `detach` of what the
+running system did not state is refused, and that invocation fails. `destroy` is stated nowhere:
+it wins whatever ran before or after it. `init`, `shutdown` and `reload` state nothing either: a
+lifecycle call runs alone. What the list is for is `schedule.md`, *Order within a phase is never
+implicit*.
+
+Refused: a fourth operator on a term, meaning "not matched, and changed by this system", which
+takes no new argument. It gives "term" two meanings, and each such term would hold four unused
+bytes in every span. The condition that brings it back is entries that can take no more
+arguments. Refused: a flag at `declare`, for the whole module. Every system of the module would
+then conflict over the component, and pairs be refused that change nothing. The condition that
+brings it back is modules of one system each.
 
 A system declares its phase and **nothing about order**, and never names another module's system.
 So no independently shipped module depends on another's internals, and no ordering cycle can span

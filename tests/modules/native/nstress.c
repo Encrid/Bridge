@@ -137,9 +137,9 @@ BRIDGE_NATIVE(init)
         term[0].slot = kinds[k];
         seeing[k] = api->system(api, bridge_native_put(api, systems[k], 4), 4,
             bridge_native_put(api, "check", 5), 5,
-            bridge_native_put(api, term, sizeof term), 1);
+            bridge_native_put(api, term, sizeof term), 1, 0, 0);
     }
-    BRIDGE_NATIVE_SYSTEM(api, "work", "work", &none, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "work", "work", &none, 0, kinds, KINDS);
     return 0;
 }
 

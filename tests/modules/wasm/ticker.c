@@ -34,7 +34,7 @@ static void registration()
     bridge_term terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
     tick = BRIDGE_COMPONENT("game:Tick", Tick, BRIDGE_DELETE);
     terms[0].slot = tick;
-    ticking = BRIDGE_SYSTEM("advance", "update", terms, 1);
+    ticking = BRIDGE_SYSTEM("advance", "update", terms, 1, nullptr, 0);
 }
 
 BRIDGE_EXPORT(init) int init()

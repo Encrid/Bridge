@@ -54,7 +54,7 @@ BRIDGE_EXPORT(init) int init()
     BRIDGE_DECLARE(BRIDGE_BITMASK, "game:Flags", Flags, BRIDGE_STRIP);
     settings = BRIDGE_COMPONENT("game:Settings", Settings, BRIDGE_DELETE);
     terms[0].slot = settings;
-    showing = BRIDGE_SYSTEM("show", "update", terms, 1);
+    showing = BRIDGE_SYSTEM("show", "update", terms, 1, nullptr, 0);
     return 0;
 }
 

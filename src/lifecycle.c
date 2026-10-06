@@ -91,6 +91,7 @@ void module_discard(bridge *b, module *m)
     free(m->ids);
     free(m->owned);
     free(m->queue);
+    free(m->marks);
     free(m->systems);
     free(m->observers);
     free(m->declared);
@@ -360,6 +361,10 @@ static int lifecycle_call(module *m, backend_func *f, const char *name, int64_t 
     int trapped;
     if (timeout > 0) m->on->api.instance_set_deadline(m->instance, (uint64_t)timeout);
     m->refused = 0;
+    /* threads.md: what it changes is applied after the last barrier's observers and before
+     * the next phase's systems, in the order the calls were made */
+    m->turn = TURN_LIFECYCLE | (m->b->turns ++ & 0xffffu);
+    abi_marks(m);
     trapped = m->on->api.call(f, &status, err);
     if (m->refused) {
         /* an entry refused, and Bridge-ASM700 knows why better than the trap does */

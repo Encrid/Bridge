@@ -21,9 +21,11 @@ BRIDGE_IMPORT(declare) uint32_t bridge_declare(uint32_t name, uint32_t name_len,
     enum bridge_kind kind, uint32_t size, uint32_t align, uint32_t desc, uint32_t desc_len,
     enum bridge_on_unload on_unload);
 BRIDGE_IMPORT(system)  uint32_t bridge_system(uint32_t name, uint32_t name_len, uint32_t phase,
-    uint32_t phase_len, uint32_t terms, uint32_t term_count);
+    uint32_t phase_len, uint32_t terms, uint32_t term_count, uint32_t changes,
+    uint32_t change_count);
 BRIDGE_IMPORT(observe) uint32_t bridge_observe(uint32_t name, uint32_t name_len,
-    enum bridge_event events, uint32_t terms, uint32_t term_count);
+    enum bridge_event events, uint32_t terms, uint32_t term_count, uint32_t changes,
+    uint32_t change_count);
 BRIDGE_IMPORT(spawn)   uint64_t bridge_spawn();
 BRIDGE_IMPORT(destroy) void     bridge_destroy(uint64_t id);
 BRIDGE_IMPORT(attach)  void     bridge_attach(uint64_t id, uint32_t slot, uint32_t ptr, uint32_t len);
@@ -99,14 +101,20 @@ static inline uint32_t bridge_put(const void *bytes, uint32_t len)
                    on_unload)
 #define BRIDGE_COMPONENT(name, T, on_unload) BRIDGE_DECLARE(BRIDGE_STRUCT, name, T, on_unload)
 
-#define BRIDGE_SYSTEM(name, phase, terms, count) \
+/* `changes` is the slots of the components it attaches or detaches, `change_count` of them:
+ * a system that does neither hands nullptr and 0 */
+#define BRIDGE_SYSTEM(name, phase, terms, count, changes, change_count) \
     bridge_system(bridge_put(name, sizeof name - 1), sizeof name - 1, \
                   bridge_put(phase, sizeof phase - 1), sizeof phase - 1, \
-                  bridge_put(terms, (count) * sizeof(bridge_term)), count)
+                  bridge_put(terms, (count) * sizeof(bridge_term)), count, \
+                  (change_count) ? bridge_put(changes, (change_count) * sizeof(uint32_t)) : 0, \
+                  change_count)
 
-#define BRIDGE_OBSERVER(name, events, terms, count) \
+#define BRIDGE_OBSERVER(name, events, terms, count, changes, change_count) \
     bridge_observe(bridge_put(name, sizeof name - 1), sizeof name - 1, events, \
-                   bridge_put(terms, (count) * sizeof(bridge_term)), count)
+                   bridge_put(terms, (count) * sizeof(bridge_term)), count, \
+                   (change_count) ? bridge_put(changes, (change_count) * sizeof(uint32_t)) : 0, \
+                   change_count)
 
 /* an initial value travels with the attach - abi.md, *The ABI* */
 #define BRIDGE_ATTACH(id, slot, value) \

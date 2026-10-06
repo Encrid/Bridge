@@ -30,7 +30,7 @@ BRIDGE_EXPORT(init) int init()
     [[maybe_unused]] Name n = {{ 0, sizeof hello - 1 }};
     name = BRIDGE_COMPONENT("game:Name", Name, BRIDGE_DELETE);
     terms[0].slot = name;
-    saying = BRIDGE_SYSTEM("say", "update", terms, 1);
+    saying = BRIDGE_SYSTEM("say", "update", terms, 1, nullptr, 0);
 #ifndef READER
     n.text.at = bridge_alloc(n.text.len);
     acc_to_shared(n.text.at, hello, n.text.len);

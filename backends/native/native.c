@@ -56,15 +56,17 @@ static uint32_t t_declare(const bridge_api *api, uint32_t a, uint32_t b, uint32_
     return (uint32_t)enter(api, DECLARE, args);
 }
 
-static uint32_t t_system(const bridge_api *api, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f)
+static uint32_t t_system(const bridge_api *api, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f,
+                         uint32_t g, uint32_t h)
 {
-    uint64_t args[6] = { a, b, c, d, e, f };
+    uint64_t args[8] = { a, b, c, d, e, f, g, h };
     return (uint32_t)enter(api, SYSTEM, args);
 }
 
-static uint32_t t_observe(const bridge_api *api, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e)
+static uint32_t t_observe(const bridge_api *api, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e,
+                          uint32_t f, uint32_t g)
 {
-    uint64_t args[5] = { a, b, c, d, e };
+    uint64_t args[7] = { a, b, c, d, e, f, g };
     return (uint32_t)enter(api, OBSERVE, args);
 }
 

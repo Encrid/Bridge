@@ -19,9 +19,9 @@ BRIDGE_EXPORT(calm) int calm() { return 0; }
 BRIDGE_EXPORT(init) int init()
 {
     int none = 0;
-    BRIDGE_SYSTEM("trip", "update", &none, 0);
+    BRIDGE_SYSTEM("trip", "update", &none, 0, nullptr, 0);
 #ifdef CALM
-    BRIDGE_SYSTEM("calm", "present", &none, 0);
+    BRIDGE_SYSTEM("calm", "present", &none, 0, nullptr, 0);
 #endif
     return 0;
 }

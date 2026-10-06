@@ -22,7 +22,7 @@ BRIDGE_EXPORT(init) int init()
     Body b = {{ 1.0f, 2.0f }, 3.0f };
     body = BRIDGE_COMPONENT("game:Body", Body, BRIDGE_DELETE);
     terms[0].slot = body;
-    reading = BRIDGE_SYSTEM("read", "update", terms, 1);
+    reading = BRIDGE_SYSTEM("read", "update", terms, 1, nullptr, 0);
     BRIDGE_ATTACH(bridge_spawn(), body, b);
     return 0;
 }

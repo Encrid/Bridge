@@ -316,12 +316,14 @@ BRIDGE_NATIVE(init)
     int none = 0;
     a = BRIDGE_NATIVE_COMPONENT(api, "st:A", A, BRIDGE_DELETE);
     b = BRIDGE_NATIVE_COMPONENT(api, "st:B", B, BRIDGE_DELETE);
-    BRIDGE_NATIVE_SYSTEM(api, "spawn", "spawn", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "attach_a", "attach_a", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "attach_b", "attach_b", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "detach_b", "detach_b", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "destroy", "destroy", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "attach_both", "attach_both", &none, 0);
+    /* what a system attaches or detaches is stated with it */
+    uint32_t both[2] = { a, b };
+    BRIDGE_NATIVE_SYSTEM(api, "spawn", "spawn", &none, 0, nullptr, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "attach_a", "attach_a", &none, 0, &a, 1);
+    BRIDGE_NATIVE_SYSTEM(api, "attach_b", "attach_b", &none, 0, &b, 1);
+    BRIDGE_NATIVE_SYSTEM(api, "detach_b", "detach_b", &none, 0, &b, 1);
+    BRIDGE_NATIVE_SYSTEM(api, "destroy", "destroy", &none, 0, nullptr, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "attach_both", "attach_both", &none, 0, both, 2);
 #ifdef TABLES
     static const char *const names[KINDS] = {
         "st:T0", "st:T1", "st:T2", "st:T3", "st:T4", "st:T5", "st:T6",
@@ -334,42 +336,42 @@ BRIDGE_NATIVE(init)
             bridge_native_put(api, T_desc, sizeof T_desc - 1), sizeof T_desc - 1, BRIDGE_DELETE);
     }
     first[0].slot = kinds[0];
-    BRIDGE_NATIVE_SYSTEM(api, "combine", "combine", &none, 0);
-    seeing = BRIDGE_NATIVE_SYSTEM(api, "see", "look", first, 1);
+    BRIDGE_NATIVE_SYSTEM(api, "combine", "combine", &none, 0, kinds, 14);
+    seeing = BRIDGE_NATIVE_SYSTEM(api, "see", "look", first, 1, nullptr, 0);
 #endif
 #if !defined(BIG) && !defined(TABLES)
     bridge_term one[1] = {{ a, BRIDGE_READ, BRIDGE_AND, 0 }};
     bridge_term two[2] = {{ a, BRIDGE_READ, BRIDGE_AND, 0 }, { b, BRIDGE_READ, BRIDGE_NOT, 0 }};
-    BRIDGE_NATIVE_SYSTEM(api, "attach_b_half", "attach_b_half", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "detach_b_half", "detach_b_half", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "detach_b_absent", "detach_b_absent", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "value_a", "value_a", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "flicker", "flicker", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "destroy_half", "destroy_half", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "respawn_half", "respawn_half", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "touch_dead", "touch_dead", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "recycled", "recycled", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "attach_a_half", "attach_a_half", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "scribble", "scribble", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "find", "find", &none, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "value_b", "value_b", &none, 0);
-    with_a = BRIDGE_NATIVE_SYSTEM(api, "look", "look", one, 1);
-    without_b = BRIDGE_NATIVE_SYSTEM(api, "look_not", "never", two, 2);
+    BRIDGE_NATIVE_SYSTEM(api, "attach_b_half", "attach_b_half", &none, 0, &b, 1);
+    BRIDGE_NATIVE_SYSTEM(api, "detach_b_half", "detach_b_half", &none, 0, &b, 1);
+    BRIDGE_NATIVE_SYSTEM(api, "detach_b_absent", "detach_b_absent", &none, 0, &b, 1);
+    BRIDGE_NATIVE_SYSTEM(api, "value_a", "value_a", &none, 0, &a, 1);
+    BRIDGE_NATIVE_SYSTEM(api, "flicker", "flicker", &none, 0, both, 2);
+    BRIDGE_NATIVE_SYSTEM(api, "destroy_half", "destroy_half", &none, 0, nullptr, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "respawn_half", "respawn_half", &none, 0, nullptr, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "touch_dead", "touch_dead", &none, 0, &a, 1);
+    BRIDGE_NATIVE_SYSTEM(api, "recycled", "recycled", &none, 0, nullptr, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "attach_a_half", "attach_a_half", &none, 0, &a, 1);
+    BRIDGE_NATIVE_SYSTEM(api, "scribble", "scribble", &none, 0, nullptr, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "find", "find", &none, 0, nullptr, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "value_b", "value_b", &none, 0, &b, 1);
+    with_a = BRIDGE_NATIVE_SYSTEM(api, "look", "look", one, 1, nullptr, 0);
+    without_b = BRIDGE_NATIVE_SYSTEM(api, "look_not", "never", two, 2, nullptr, 0);
     two[1].oper = BRIDGE_OPTIONAL;
-    maybe_b = BRIDGE_NATIVE_SYSTEM(api, "look_maybe", "never", two, 2);
+    maybe_b = BRIDGE_NATIVE_SYSTEM(api, "look_maybe", "never", two, 2, nullptr, 0);
     on_a = BRIDGE_NATIVE_OBSERVER(api, "heard_a",
-        BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, one, 1);
+        BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, one, 1, nullptr, 0);
     one[0].slot = b;
-    with_b = BRIDGE_NATIVE_SYSTEM(api, "look_b", "look_b", one, 1);
+    with_b = BRIDGE_NATIVE_SYSTEM(api, "look_b", "look_b", one, 1, nullptr, 0);
     on_b = BRIDGE_NATIVE_OBSERVER(api, "heard_b",
-        BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, one, 1);
+        BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, one, 1, nullptr, 0);
     two[1].oper = BRIDGE_AND;
     on_both = BRIDGE_NATIVE_OBSERVER(api, "heard_both",
-        BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, two, 2);
+        BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, two, 2, nullptr, 0);
     /* an event is about the terms and not about the change: this one enters at a detach */
     two[1].oper = BRIDGE_NOT;
     on_alone = BRIDGE_NATIVE_OBSERVER(api, "heard_alone",
-        BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, two, 2);
+        BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, two, 2, nullptr, 0);
 #endif
     return 0;
 }

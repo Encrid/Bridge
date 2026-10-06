@@ -21,10 +21,18 @@ each has one writer:
     alloc                    space from the module's own share of the persistent arena
     destroy, attach, detach  onto the module's own queue, with the value attach carries
 
-The barrier, where one thread has the world, applies the queues: module by module in the order
-they loaded, and within one in the order it asked. Then it tops each block up. That order is the
-same every run, so the ids a module is given and the rows its changes land in are too, on one
-thread or on eight.
+The barrier, where one thread has the world, applies the queues **in the order the calls that
+filled them ran**: the observers of the barrier before, then any lifecycle call made since, then
+the phase's systems, a level at a time. Within one call, in the order it asked. Two systems of
+one level are in no order, and need none: had they changed the same component they would have
+been ordered when they loaded - `schedule.md`, *Order within a phase is never implicit*. Then the
+barrier tops each block up. That order is the same every run, so the ids a module is given and
+the rows its changes land in are too, on one thread or on eight.
+
+A module's queue is already in that order, so each keeps one mark for every call that queued
+something, and the barrier takes the earliest mark any module has next. A mark costs a compare
+for each change queued, and the room for them is found when a module gains a system and before
+a lifecycle call, never in a phase.
 
 Refused: one lock around every entry, which is what this replaced. It serialised modules that had no
 reason to wait for each other, and it made the ids two modules were given in one level a matter of

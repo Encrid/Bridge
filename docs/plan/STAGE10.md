@@ -535,8 +535,12 @@ The chosen option contradicts its own reason, or a document:
             one phase and ran clean in the next, every pass, was never stopped. Each system
             is counted alone now, and what is nobody's system on the module, lowered only
             by a barrier that placed what it changed. `failure.md`, *The budget*
-    open    attach and detach are in no conflict graph: two modules attaching one component
-            to one entity are settled by load order, which `schedule.md` says never decides
+    closed  attach and detach were in no conflict graph: two modules attaching one component
+            to one entity were settled by load order, which `schedule.md` says never
+            decides. A system states its changes in a second list, every one and with no
+            exception; two that state one component are ordered at load or refused; and a
+            barrier applies in the order the calls ran. Measured against the tree before
+            it: an attach and a detach within 1 ns. `schedule.md`, `abi.md`, `threads.md`
     open    `destroy` checks no grant: a module removes any entity, and every component on it
     open    "nothing is allocated after create" is storage's and not the library's: a
             module's change queue grows in a phase with no budget, an observer's list grows

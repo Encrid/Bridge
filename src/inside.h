@@ -60,9 +60,14 @@ typedef struct {
     uint32_t      pending_count, pending_room;
 
     uint32_t      when;             /* of the dispatch in progress */
+    uint32_t      turn;             /* and where it comes among all that ran before the barrier */
     int           failed;           /* and how it ended, said after the join */
     char          why[256];
     int64_t       failures;         /* failure.md, *The budget*: its own count */
+    /* schedule.md, *Order within a phase is never implicit*: the components it stated that it
+     * attaches or detaches. They lie after the terms, in the same block */
+    declared_type **changes;
+    uint32_t      change_count;
     /* what the conflict graph reads of each term: the component, or nullptr where the term reads
      * nothing, and whether it is written. `terms` of them */
     struct { declared_type *touches; bool writes; } term[];
@@ -137,6 +142,13 @@ struct module {
     uint64_t     config_entity;
     uint32_t     text_at, text_room;
     int   in_init, stopped;
+    /* threads.md: what is running in it now, or nullptr for a lifecycle call, and its turn.
+     * `marks` is where in the queue each turn's changes begin: one for every call that
+     * queued something, so the barrier can apply the queues in the order the calls ran */
+    const void *running;
+    uint32_t turn;
+    struct { uint32_t turn, at; } *marks;
+    uint32_t mark_count, mark_room, mark_at;
     int   refused;                  /* an entry refused during the call in progress */
     char  why[256];                 /* and this is why */
     module *next;
@@ -150,6 +162,10 @@ typedef struct {
     uint32_t     size;
     enum change_op op;
 } change;
+
+/* A turn: observers of the last barrier, then lifecycle calls, then the phase's systems, each
+ * in the order it ran. */
+constexpr uint32_t TURN_LIFECYCLE = 1u << 16, TURN_SYSTEM = 2u << 16;
 
 typedef struct { char *stem; uint32_t at, room; } kept_text;
 /* A stretch of the shared block handed out in pieces and taken back: the column region, and
@@ -175,6 +191,7 @@ struct bridge {
     char   **phases;
     uint32_t phase_count;
     uint32_t barriers;
+    uint32_t turns;                 /* lifecycle calls since the last barrier: threads.md */
     char   **before, **after;       /* [order], pair by pair */
     uint32_t order_count;
     pool    *pool;
@@ -206,6 +223,7 @@ struct bridge {
 
 /* bridge.c */
 void say(bridge *b, const module *m, const bridge_system *s, uint8_t level, const char *fmt, ...);
+void abi_marks(module *m);          /* room for a mark from every call it may yet take */
 [[nodiscard]] char *copy(const char *s, size_t n);
 /* 1, with a record, if nothing may run. `repairing` names a module being loaded or reloaded:
  * the one call a stopped bridge accepts is one that brings back the module that stopped it. */

@@ -37,10 +37,10 @@ BRIDGE_EXPORT(init) int init()
     Position p = { 1.0f, 0.0f };
     position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE);
     terms[0].slot = position;
-    doubling = BRIDGE_SYSTEM("twice", "update", terms, 1);
-    adding = BRIDGE_SYSTEM("more", "update", terms, 1);
+    doubling = BRIDGE_SYSTEM("twice", "update", terms, 1, nullptr, 0);
+    adding = BRIDGE_SYSTEM("more", "update", terms, 1, nullptr, 0);
     terms[0].access = BRIDGE_READ;
-    showing = BRIDGE_SYSTEM("show", "present", terms, 1);
+    showing = BRIDGE_SYSTEM("show", "present", terms, 1, nullptr, 0);
     BRIDGE_ATTACH(bridge_spawn(), position, p);
     return 0;
 }

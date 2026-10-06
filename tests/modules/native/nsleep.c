@@ -39,7 +39,7 @@ BRIDGE_NATIVE(nap)
 BRIDGE_NATIVE(init)
 {
     int none = 0;
-    BRIDGE_NATIVE_SYSTEM(api, "nap", "update", &none, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "nap", "update", &none, 0, nullptr, 0);
     return 0;
 }
 

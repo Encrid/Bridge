@@ -11,7 +11,7 @@ BRIDGE_EXPORT(flood) int flood()
 BRIDGE_EXPORT(init) int init()
 {
     int none = 0;
-    BRIDGE_SYSTEM("flood", "update", &none, 0);
+    BRIDGE_SYSTEM("flood", "update", &none, 0, nullptr, 0);
     return 0;
 }
 

@@ -29,9 +29,11 @@ struct bridge_api {
                         uint32_t size, uint32_t align, uint32_t desc, uint32_t desc_len,
                         enum bridge_on_unload on_unload);
     uint32_t (*system)(const bridge_api *api, uint32_t name, uint32_t name_len, uint32_t phase,
-                       uint32_t phase_len, uint32_t terms, uint32_t term_count);
+                       uint32_t phase_len, uint32_t terms, uint32_t term_count, uint32_t changes,
+                       uint32_t change_count);
     uint32_t (*observe)(const bridge_api *api, uint32_t name, uint32_t name_len,
-                        enum bridge_event events, uint32_t terms, uint32_t term_count);
+                        enum bridge_event events, uint32_t terms, uint32_t term_count,
+                        uint32_t changes, uint32_t change_count);
     uint64_t (*spawn)(const bridge_api *api);
     void     (*destroy)(const bridge_api *api, uint64_t id);
     void     (*attach)(const bridge_api *api, uint64_t id, uint32_t slot, uint32_t ptr, uint32_t len);
@@ -86,14 +88,20 @@ static inline uint32_t bridge_native_put(const bridge_api *api, const void *byte
 #define BRIDGE_NATIVE_COMPONENT(api, name, T, on_unload) \
     BRIDGE_NATIVE_DECLARE(api, BRIDGE_STRUCT, name, T, on_unload)
 
-#define BRIDGE_NATIVE_SYSTEM(api, name, phase, terms, count) \
+/* `changes` is the slots of the components it attaches or detaches, `change_count` of them:
+ * a system that does neither hands nullptr and 0 */
+#define BRIDGE_NATIVE_SYSTEM(api, name, phase, terms, count, changes, change_count) \
     (api)->system(api, bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, \
                   bridge_native_put(api, phase, sizeof phase - 1), sizeof phase - 1, \
-                  bridge_native_put(api, terms, (count) * sizeof(bridge_term)), count)
+                  bridge_native_put(api, terms, (count) * sizeof(bridge_term)), count, \
+                  (change_count) ? bridge_native_put(api, changes, \
+                      (change_count) * sizeof(uint32_t)) : 0, change_count)
 
-#define BRIDGE_NATIVE_OBSERVER(api, name, events, terms, count) \
+#define BRIDGE_NATIVE_OBSERVER(api, name, events, terms, count, changes, change_count) \
     (api)->observe(api, bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, events, \
-                   bridge_native_put(api, terms, (count) * sizeof(bridge_term)), count)
+                   bridge_native_put(api, terms, (count) * sizeof(bridge_term)), count, \
+                   (change_count) ? bridge_native_put(api, changes, \
+                       (change_count) * sizeof(uint32_t)) : 0, change_count)
 
 /* ---- a query's spans, through real pointers. native.md, *Reaching a component* ---- */
 

@@ -224,6 +224,7 @@ int main(int argc, char **argv)
                              { "view:halver:halve", "game:mover:move" }};
     bridge_order seen_first = { "view:watcher:seen", "view:fixer:fix" };
     bridge_order fix_first = { "view:fixer:fix", "view:watcher:seen" };
+    bridge_order five_first = { "game:stamp5:stamp", "game:stamp9:stamp" };
     bridge_config cfg = { backends, 2, phases, 2, nullptr, 0, 1, 
         { .entities = 4096, .tables = 64, .types = 64, .systems = 128, .terms = 8, .modules = 8,
           .persistent = 4096, .columns = 1 << 20 } };
@@ -236,6 +237,10 @@ int main(int argc, char **argv)
     if (!strcmp(what, "cycle")) { cfg.order = pairs; cfg.order_count = 2; }
     if (!strcmp(what, "obsorder")) { cfg.order = &seen_first; cfg.order_count = 1; }
     if (!strcmp(what, "obsreorder")) { cfg.order = &fix_first; cfg.order_count = 1; }
+    if (!strcmp(what, "changeorder") || !strcmp(what, "changeloaded")) {
+        cfg.order = &five_first;
+        cfg.order_count = 1;
+    }
     if (!strcmp(what, "parallel")) cfg.threads = 2;
     if (!strcmp(what, "pinned") || !strcmp(what, "wrongthread")) cfg.threads = 4;
     if (!strcmp(what, "hop")) cfg.threads = 4;
@@ -357,6 +362,35 @@ int main(int argc, char **argv)
         a.cfg.write_count = 1;
         load(b, &a);
         frames(b, 1);
+    } else if (!strcmp(what, "unstated")) {
+        /* a system attaches what it did not state among its changes: that invocation fails */
+        a = native("game:stamp@0.1.0", NSTAMPUNSTATED_PATH);
+        a.cfg.spawns = 8;
+        load(b, &a);
+        a = wasm("view:watcher@0.1.0", "watcher");
+        a.cfg.read = game;
+        a.cfg.read_count = 2;
+        load(b, &a);
+        frames(b, 2);
+    } else if (!strcmp(what, "changeconflict") || !strcmp(what, "changeorder")
+               || !strcmp(what, "changeloaded")) {
+        /* two systems of one phase, in two modules, that attach one component to the same
+         * entities. Unordered, the second does not load. Ordered, the one stated to run last
+         * is the one whose value stays, whichever of them was loaded first */
+        bool nine_first = !strcmp(what, "changeloaded");
+        a = native(nine_first ? "game:stamp9@0.1.0" : "game:stamp5@0.1.0",
+            nine_first ? NSTAMP9_PATH : NSTAMP5_PATH);
+        a.cfg.spawns = 8;
+        load(b, &a);
+        a = native(nine_first ? "game:stamp5@0.1.0" : "game:stamp9@0.1.0",
+            nine_first ? NSTAMP5_PATH : NSTAMP9_PATH);
+        a.cfg.spawns = 8;
+        load(b, &a);
+        a = wasm("view:watcher@0.1.0", "watcher");
+        a.cfg.read = game;
+        a.cfg.read_count = 2;
+        load(b, &a);
+        frames(b, 2);
     } else if (!strcmp(what, "nested") || !strcmp(what, "nested2")) {
         a = wasm("game:nested@0.1.0", what);
         load(b, &a);

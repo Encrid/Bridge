@@ -242,6 +242,7 @@ void block_barrier(bridge *b)
      * is the next barrier's - schedule.md, *An observer runs at the barrier, one hop per
      * barrier* */
     schedule_run(b, b->phase_count);
+    b->turns = 0;
     for (i = 0; i < b->system_count; i ++) b->systems[i]->pending_count = 0;
     schedule_account(b);                /* failure.md, *The budget* */
     for (m = b->modules; m; m = m->next) block_drain(b, m);

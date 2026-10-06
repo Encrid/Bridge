@@ -57,8 +57,11 @@ BRIDGE_NATIVE(init)
             bridge_native_put(api, M_desc, sizeof M_desc - 1), sizeof M_desc - 1, BRIDGE_DELETE);
     }
     one[0].slot = value;
-    BRIDGE_NATIVE_SYSTEM(api, "fill", "spawn", &none, 0);
-    reading = BRIDGE_NATIVE_SYSTEM(api, "sum", "look", one, 1);
+    /* what `fill` attaches: the value, and every marker */
+    uint32_t filled[1 + MARKERS] = { value };
+    for (uint32_t k = 0; k < MARKERS; k ++) filled[1 + k] = markers[k];
+    BRIDGE_NATIVE_SYSTEM(api, "fill", "spawn", &none, 0, filled, 1 + MARKERS);
+    reading = BRIDGE_NATIVE_SYSTEM(api, "sum", "look", one, 1, nullptr, 0);
     return 0;
 }
 

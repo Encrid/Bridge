@@ -35,9 +35,9 @@ BRIDGE_NATIVE(init)
     position = BRIDGE_NATIVE_COMPONENT(api, "game:Position", Position, BRIDGE_DELETE);
     marked = BRIDGE_NATIVE_COMPONENT(api, "game:Marked", Marked, BRIDGE_STRIP);
     terms[0].slot = position;
-    moving = BRIDGE_NATIVE_SYSTEM(api, "move", "update", terms, 1);
+    moving = BRIDGE_NATIVE_SYSTEM(api, "move", "update", terms, 1, nullptr, 0);
     terms[0].access = BRIDGE_READ;
-    tallying = BRIDGE_NATIVE_SYSTEM(api, "tally", "present", terms, 1);
+    tallying = BRIDGE_NATIVE_SYSTEM(api, "tally", "present", terms, 1, nullptr, 0);
     for (i = 0; i < ENTITIES; i ++) {
         uint64_t id = api->spawn(api);
         Position p = { (float)i, 0.0f };

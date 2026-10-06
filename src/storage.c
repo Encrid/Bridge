@@ -465,15 +465,32 @@ static void dropped(storage *r, uint32_t index, bool for_columns)
     r->asker[index]->left[for_columns] ++;
 }
 
+/* threads.md: the queues are applied in the order the calls that filled them ran, and not a
+ * module at a time. The next run of changes: one module's, of one turn. A module's own queue
+ * is in that order already, so this takes the earliest of what each has next. */
+static module *next_run(bridge *b, uint32_t *from, uint32_t *to)
+{
+    module *m, *first = nullptr;
+    for (m = b->modules; m; m = m->next) {
+        if (m->mark_at == m->mark_count) continue;
+        if (!first || m->marks[m->mark_at].turn < first->marks[first->mark_at].turn) first = m;
+    }
+    if (!first) return nullptr;
+    *from = first->marks[first->mark_at ++].at;
+    *to = first->mark_at < first->mark_count ? first->marks[first->mark_at].at : first->queue_len;
+    return first;
+}
+
 void storage_apply(storage *r)
 {
     bridge *b = r->b;
     module *m;
-    uint32_t i;
+    uint32_t i, at, end;
 
     /* 1. the fold: what each changed entity will carry, and nothing moved */
-    for (m = b->modules; m; m = m->next) {
-        for (uint32_t at = 0; at < m->queue_len;) {
+    for (m = b->modules; m; m = m->next) m->mark_at = 0;
+    while ((m = next_run(b, &at, &end))) {
+        while (at < end) {
             change ch;
             uint32_t index;
             memcpy(&ch, m->queue + at, sizeof ch);
@@ -549,8 +566,9 @@ void storage_apply(storage *r)
     }
 
     /* 5. the values, in the order they were asked: the last one written is the one that stays */
-    for (m = b->modules; m; m = m->next) {
-        for (uint32_t at = 0; at < m->queue_len;) {
+    for (m = b->modules; m; m = m->next) m->mark_at = 0;
+    while ((m = next_run(b, &at, &end))) {
+        while (at < end) {
             change ch;
             const void *value = m->queue + at + sizeof ch;
             uint32_t index, column;
@@ -565,8 +583,10 @@ void storage_apply(storage *r)
                 memcpy(b->shared + column + (size_t)r->places[index].row * ch.c->size, value, ch.size);
             }
         }
+    }
+    for (m = b->modules; m; m = m->next) {
         m->changed_now = m->queue_len != 0;
-        m->queue_len = 0;
+        m->queue_len = m->mark_count = 0;
     }
 
     /* 6. a table nothing is left in is gone, and the fold is forgotten */

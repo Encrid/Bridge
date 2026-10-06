@@ -86,10 +86,18 @@ int schedule_order(bridge *b, const bridge_order *order, uint32_t count)
     return (int)refused;
 }
 
-/* the component both touch with one of them writing it, or nullptr */
-static const char *conflict(const bridge_system *a, const bridge_system *b)
+/* the component both touch with one of them writing it, or that both attach or detach, or
+ * nullptr. `changing` says which */
+static const char *conflict(const bridge_system *a, const bridge_system *b, bool *changing)
 {
     uint32_t i, j;
+    *changing = true;
+    for (i = 0; i < a->change_count; i ++) {
+        for (j = 0; j < b->change_count; j ++) {
+            if (a->changes[i] == b->changes[j]) return a->changes[i]->name;
+        }
+    }
+    *changing = false;
     for (i = 0; i < a->terms; i ++) {
         for (j = 0; j < b->terms; j ++) {
             if (a->term[i].touches && a->term[i].touches == b->term[j].touches
@@ -106,6 +114,7 @@ int schedule_build(bridge *b, char *why, size_t why_len)
 {
     bridge_system **in = calloc(b->system_count ? b->system_count : 1, sizeof *in);
     uint32_t phase, i, j, k, refused = 0;
+    bool changing;
 
     for (phase = 0; phase <= b->phase_count && !refused; phase ++) {
         const char *where = phase < b->phase_count ? b->phases[phase] : nullptr;
@@ -125,7 +134,8 @@ int schedule_build(bridge *b, char *why, size_t why_len)
         /* a module orders its own systems by registering them, unless [order] says otherwise */
         for (i = 0; i < n; i ++) {
             for (j = i + 1; j < n; j ++) {
-                if (in[i]->m == in[j]->m && conflict(in[i], in[j]) && !reaches(&reach, j, i)) {
+                if (in[i]->m == in[j]->m && conflict(in[i], in[j], &changing)
+                    && !reaches(&reach, j, i)) {
                     edge(&reach, i, j);
                 }
             }
@@ -138,12 +148,13 @@ int schedule_build(bridge *b, char *why, size_t why_len)
                 refused = 1;
             }
             for (j = i + 1; j < n && !refused; j ++) {
-                const char *shared = conflict(in[i], in[j]);
+                const char *shared = conflict(in[i], in[j], &changing);
                 if (!shared || in[i]->m == in[j]->m || reaches(&reach, i, j)
                     || reaches(&reach, j, i)) continue;
-                snprintf(why, why_len, "'%.80s' and '%.80s' both touch '%.60s' %s%.40s%s, one of them "
-                    "writing it, and nothing orders them", in[i]->full, in[j]->full, shared,
-                    where ? "in phase '" : "at the barrier", where ? where : "", where ? "'" : "");
+                snprintf(why, why_len, "'%.80s' and '%.80s' both %s '%.60s' %s%.40s%s%s, and nothing "
+                    "orders them", in[i]->full, in[j]->full, changing ? "attach or detach" : "touch",
+                    shared, where ? "in phase '" : "at the barrier", where ? where : "",
+                    where ? "'" : "", changing ? "" : ", one of them writing it");
                 refused = 1;
             }
         }
@@ -189,6 +200,8 @@ static void run_job(void *arg)
         while (slots[slot] != s) slot ++;
         /* validation.md: the culprit is the system that was running. One store per dispatch. */
         h->when = s->when;
+        m->running = s;
+        m->turn = s->turn;
         h->system = s->observer ? slot | 0x8000u : slot;
         /* fuel only depletes, so it is set again before every dispatch - limits.md */
         if (m->fuel > 0) m->on->api.instance_set_fuel(m->instance, (uint64_t)m->fuel);
@@ -201,6 +214,7 @@ static void run_job(void *arg)
             s->failed = 1;
         }
         h->system = UINT32_MAX;
+        m->running = nullptr;
     }
 }
 
@@ -239,6 +253,8 @@ void schedule_run(bridge *b, uint32_t phase)
                 bridge_system *s = b->systems[k];
                 if (s->m != j->m || s->phase != phase || s->level != level || s->m->stopped
                     || s->parked || (s->observer && !s->pending_count)) continue;
+                /* threads.md: an observer ran at the last barrier, before anything since */
+                s->turn = (phase == b->phase_count ? 0 : TURN_SYSTEM) | (ordinal & 0xffffu);
                 s->when = b->barriers << 16 | (ordinal ++ & 0xffffu);
                 s->failed = 0;
                 j->list[j->count ++] = s;

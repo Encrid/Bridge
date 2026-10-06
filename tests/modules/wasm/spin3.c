@@ -18,8 +18,8 @@ BRIDGE_EXPORT(after) int after()
 BRIDGE_EXPORT(init) int init()
 {
     int none = 0;
-    BRIDGE_SYSTEM("forever", "update", &none, 0);
-    BRIDGE_SYSTEM("after", "present", &none, 0);
+    BRIDGE_SYSTEM("forever", "update", &none, 0, nullptr, 0);
+    BRIDGE_SYSTEM("after", "present", &none, 0, nullptr, 0);
     return 0;
 }
 
