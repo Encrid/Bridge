@@ -272,9 +272,11 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
             "more than an offset of 32 bits can reach", id, (long long)cfg->changes);
         return 1;
     }
+    /* log.md: zero is unset for it as for every key, so the least it can be is 1 */
+    if (unset(b, id, "log_level", cfg->log_level)) return 1;
     if (cfg->log_level > BRIDGE_LEVEL_MOST) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its log_level of %u is not "
-            "a severity, which is 0 to %u", id, cfg->log_level, BRIDGE_LEVEL_MOST);
+            "one it can be, which is 1 to %u", id, cfg->log_level, BRIDGE_LEVEL_MOST);
         return 1;
     }
     if (!cfg->config || !*cfg->config) {

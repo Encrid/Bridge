@@ -16,3 +16,11 @@ could give. No condition brings it back.
 
 Refused: the same scale with the hole closed. The condition that brings a scale of our own back is a
 need for more than eight levels.
+
+Refused: a `log_level` of zero taken as a severity, which is what this did, and was the one key
+that meant something when nobody had stated it. No condition brings it back.
+
+Refused: the key in other numbers than a record's level, shifted by one so that zero is free. Two
+scales for one thing. Refused: a second field saying the level was stated, a field whose job is
+another field's. The condition that brings either back is "emergencies only" having to be stated,
+which 1 does not quite say.

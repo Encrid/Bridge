@@ -18,9 +18,9 @@ at load for a module's. `budgets.md`, *Bridge-ASM700 defaults none of them*, for
 a budget.
 
 **Unset is zero.** Bridge-ASM700 sees a struct, so a numeric or enum field left at zero is the unset
-one, and zero is never a legal value for it: a budget, `work_limit`, a timeout, `on_error`. One key
-breaks that and is an open question: `log_level`, where zero is a severity - `STAGE10.md`, *The
-repair*. Where "none"
+one, and zero is never a legal value for it: a budget, `work_limit`, a timeout, `on_error`. `log_level` is
+no exception, though its numbers are syslog's and zero is one of them: zero is unset there too,
+and the least it can be stated as is 1 - `log.md`, *The log*. Where "none"
 is a real answer it is a value of its own, never the field left alone, and there are two because
 they say opposite things. A limit stated as none is `BRIDGE_NO_LIMIT`, -1: `work_limit`, a timeout,
 `memory_limit`, `max_system_failures` - `capabilities.md`, *Capabilities, so the swap is honest*. A

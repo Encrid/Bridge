@@ -679,7 +679,8 @@ middle of a paragraph in `config.md`.
     closed  a test that a barrier allocates nothing: cases `alloc-changes`, `alloc-tables`
             and `alloc-strip`, against a library whose calls to the allocator are counted
     open    an allocation that fails at load
-    open    a log_level nobody stated
+    closed  a log_level nobody stated: zero is unset for it as for every key, and refused.
+            `log.md`, *The log*
     open    the schema macros defined twice
     open    the log levels named twice
 

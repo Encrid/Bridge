@@ -115,6 +115,10 @@ int main(int argc, char **argv)
         a = artifact("ok");
         a.cfg.memory_limit = 0;
         load(b, &a);
+    } else if (!strcmp(what, "unsetlevel")) {   /* zero is a severity, and is unset all the same */
+        a = artifact("ok");
+        a.cfg.log_level = 0;
+        load(b, &a);
     } else if (!strcmp(what, "nolimit")) {      /* "none" is a value, and it loads */
         a = artifact("ok");
         a.cfg.work_limit = BRIDGE_NO_LIMIT;

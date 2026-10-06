@@ -133,7 +133,8 @@ typedef struct {
     int64_t  work_limit;         /* work one system invocation may do, in the backend's units */
     int64_t  memory_limit;       /* bytes. a ceiling, never re-set */
     int64_t  init_timeout, reload_timeout, shutdown_timeout;    /* nanoseconds, per call */
-    uint8_t  log_level;          /* a line above it is not written: enum bridge_level */
+    uint8_t  log_level;          /* a line above it is not written: enum bridge_level, or any
+                                  * of 1 to 7. zero is unset */
     uint8_t  pad1[3];
     uint32_t scratch, log_ring, spans;   /* its private memory, each in bytes */
     /* what is set aside for it alone, so that what it mints does not depend on who ran
