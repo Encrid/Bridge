@@ -630,3 +630,104 @@ weigh` and `storage baseline`, on Windows:
 **And the table is what it was**: *Found on the way: a barrier that stopped being inlined*,
 above, has both sets of figures.
 
+## Beside the best there is
+
+Stage 10 measured the table beside flecs before flecs left. The same was asked for every
+storage layout: the best implementation of each there is, doing the work `storage measure` and
+`storage weigh` time, on the same machine, run in turn.
+
+**What each is measured beside**, looked for among the projects themselves at their latest
+releases:
+
+    table             flecs v4.1.6, as stage 10 had it: the reference archetype ECS in C
+    sparse set        EnTT v4.0.0, which keeps everything in sparse sets and is what the
+                      storage layout is known by; and flecs' `Sparse` with `DontFragment`,
+                      which is our model, a sparse component beside tables
+    toggle            flecs' `CanToggle`, the one implementation a mainstream ECS has
+    direct-indexed    no ECS has one. So: what the two charge to reach a value by id,
+                      `ecs_get_id` and `try_get`; and a C array by entity, with the
+                      generation and a bit tested, as the least it could cost
+    singleton         flecs' `Singleton`, and EnTT's `registry.ctx()`
+    tag               flecs' tags, and EnTT's types with no bytes
+
+bevy_ecs and shipyard were looked at and left out: they are Rust, and what measures this
+library is built by the one compiler that builds it. `tools/reference.py` fetches the two at
+those tags into `build/reference/`, builds `tests/reference/` against them with zig and runs
+them in turn with ours; nothing of either is in the tree.
+
+**flecs applies a change at once, or deferred until `ecs_defer_end`; EnTT only at once; ours
+only queued, and applied at a barrier.** So a change is given three ways below, and the one to
+read ours beside is flecs deferred, which does what a barrier does. At once is a different
+thing: nothing is queued, nothing is ordered among modules, and no observer is told later.
+
+Windows, the least of the rounds, two runs in turn. A four-byte component given to an entity,
+and taken from it:
+
+                                  the entity carries 4 bytes     and 4 KB
+    ours, in tables                    39 ns     35 ns         519 ns    508 ns
+    flecs, in tables, deferred         67 ns     44 ns         541 ns    520 ns
+    flecs, in tables, at once          49 ns     35 ns         512 ns    498 ns
+    ours, in a sparse set              35 ns     31 ns          33 ns     28 ns
+    flecs, sparse, deferred           113 ns     69 ns         106 ns     65 ns
+    flecs, sparse, at once             86 ns     60 ns          81 ns     56 ns
+    EnTT, at once                     9.9 ns    8.7 ns         9.5 ns    8.3 ns
+    ours, direct-indexed               25 ns     23 ns
+
+An entity's first component, one it has, and its end:
+
+    ours                               30 ns    18.5 ns    15.6 ns
+    flecs, deferred                    99 ns    26 ns      29 ns
+    flecs, at once                     49 ns    10 ns      20 ns
+    EnTT, at once                    12.6 ns     5.7 ns    34 ns
+
+Read, 204,800 rows:
+
+                                       walked alone     beside a table's column, a row
+    ours, a table's column                6.3 us        0.031 ns
+    flecs, a table's column               6.6 to 7 us
+    ours, a sparse set                    6.7 us        0.44 ns
+    flecs, sparse and not fragmenting     4,800 us      26 ns
+    EnTT                                  57 us         1.33 ns
+
+A value reached by a held id, in the order they lie and in no order:
+
+    ours, through the table               1.10 ns       2.51 ns
+    ours, direct-indexed                  0.76 ns       1.42 ns
+    a C array by entity                   0.65 ns       1.27 ns
+    EnTT, `try_get`                       2.06 ns       4.16 ns
+    flecs, `ecs_get_id`, in tables        2.93 ns       5.32 ns
+    flecs, `ecs_get_id`, sparse           5.2 ns        7.4 ns
+
+A toggle, the rows that are on read, and a row switched:
+
+                                       all on      half on      1 in 16 on     switched
+    ours                               13.8 us     69 us         8.9 us        3 ns
+    flecs                              77 us       1,260 us      260 us        22 ns
+
+A singleton read: ours 0.32 ns, EnTT 1.0 ns, flecs 2.8 ns.
+
+Six markers on each of 204,800 entities, with bytes and without. These two columns are not
+the same measure: ours is what the columns hold, which a budget bounds, and theirs is what the
+process came to hold, which is all they offer:
+
+                                       of four bytes        with no bytes
+    ours, columns in use                  7,424 KB            2,432 KB
+    flecs, the process holds more        49,700 KB           18,000 KB
+    EnTT, the process holds more         25,500 KB           19,300 KB
+
+**Where ours is behind, and why.** EnTT gives and takes a component in 10 and 9 ns, and gives
+an entity its first in 13, where ours takes 35 and 31, and 30. That is the queue and the
+barrier: ours copies the change into a module's queue, folds every change of the barrier,
+orders them among modules and places each entity once, and EnTT writes into one array at the
+call. flecs made to do the same, deferred, is 113 and 69. It is the price of what
+`data.md`, *Structural change*, promises, and not of how a sparse set is kept; and it is the
+one place a reference is ahead. A destroy is the other way about: 15.6 ns against EnTT's 34.
+
+**Everywhere else ours is ahead of both**: every read, every reach by id, the toggle on every
+line, the singleton, and what a marker costs. Direct-indexed is within a fifth of the C array
+that is the least it could be. Two of flecs' figures are far enough behind to say what they
+are: a sparse component that does not fragment is walked an entity at a time through
+`ecs_field_at`, as its documentation has it, which is the 26 ns a row; and a toggled
+component is read in runs of rows that are on, which is the 1,260 us when on and off alternate,
+the form the gate measured in scratch at 432.
+

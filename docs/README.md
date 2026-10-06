@@ -127,7 +127,8 @@ period: `backend.md`, *The backend owns its clock*.
     tests/                   the hosts that drive the cases
         modules/wasm/            the modules they load, by the backend that runs each
         modules/native/
-    tools/                   the scans
+    tools/                   the scans, and `reference.py`, which measures the storage
+                             layouts beside flecs and EnTT
     build.py                 the build - `build.md`, *One script*
 
 A backend is compiled against `include/bridge-backend.h` and its own folder. It shares no code
