@@ -56,21 +56,21 @@ int schedule_order(bridge_t *b, const bridge_order_t *order, uint32_t count)
     b->before = calloc(count ? count : 1, sizeof *b->before);
     b->after = calloc(count ? count : 1, sizeof *b->after);
     if (!matrix_init(&reach, count * 2) || !names || !b->before || !b->after) {
-        refused = (uint32_t)bridge_short(b, nullptr, "the order a deployment states");
+        refused = (uint32_t)bridge_lacks(b, nullptr, "the order a deployment states");
     }
     for (i = 0; i < count && !refused; i ++) {
         const char *pair[2] = { order[i].before, order[i].after };
         uint32_t at[2];
         if (!pair[0] || !pair[1] || !*pair[0] || !*pair[1] || !strcmp(pair[0], pair[1])) {
-            say(b, nullptr, nullptr, BRIDGE_ERR, "[order] pair %u does not name two systems", i);
+            say_error(b, "[order] pair %u does not name two systems", i);
             refused = 1;
             break;
         }
-        b->before[i] = copy(pair[0], strlen(pair[0]));
-        b->after[i] = copy(pair[1], strlen(pair[1]));
+        b->before[i] = copy_text(pair[0], strlen(pair[0]));
+        b->after[i] = copy_text(pair[1], strlen(pair[1]));
         b->order_count = i + 1;
         if (!b->before[i] || !b->after[i]) {
-            refused = (uint32_t)bridge_short(b, nullptr, "the order a deployment states");
+            refused = (uint32_t)bridge_lacks(b, nullptr, "the order a deployment states");
             break;
         }
         for (k = 0; k < 2; k ++) {
@@ -83,7 +83,7 @@ int schedule_order(bridge_t *b, const bridge_order_t *order, uint32_t count)
         close_over(&reach);
         for (i = 0; i < n && !refused; i ++) {
             if (!reaches(&reach, i, i)) continue;
-            say(b, nullptr, nullptr, BRIDGE_ERR, "[order] contradicts itself: '%s' would run before "
+            say_error(b, "[order] contradicts itself: '%s' would run before "
                 "itself", names[i]);
             refused = 1;
         }
@@ -238,7 +238,7 @@ int schedule_room(bridge_t *b)
     b->run_callers = calloc(n, 1);
     b->build_in = calloc(n, sizeof *b->build_in);
     b->build_bits = calloc((size_t)n * ((n + 63) / 64) + 1, sizeof *b->build_bits);
-    return bridge_short(b, b->run_jobs && b->run_handed && b->run_lists && b->run_callers
+    return bridge_lacks(b, b->run_jobs && b->run_handed && b->run_lists && b->run_callers
         && b->build_in && b->build_bits ? b : nullptr, "what a dispatch and a schedule are worked out in");
 }
 
@@ -301,7 +301,7 @@ void schedule_run(bridge_t *b, uint32_t phase)
                 if (s->m->max_failures > 0 && s->failures >= s->m->max_failures && !s->m->reached) {
                     s->m->reached = s;
                 }
-                say(b, s->m, s, BRIDGE_ERR, "%s '%s' failed: %s",
+                say_about(b, &(say_t){ s->m, s, BRIDGE_ERR }, "%s '%s' failed: %s",
                     s->observer ? "observer" : "system", s->name, s->why);
             }
         }
@@ -324,11 +324,11 @@ void schedule_account(bridge_t *b)
         if (m->stopped || m->max_failures <= 0 || (!s && m->failures < m->max_failures)) continue;
         m->stopped = 1;
         if (s) {
-            say(b, m, nullptr, BRIDGE_ERR, "module '%s' is stopped: its %s '%s' reached its "
+            say_about(b, &(say_t){ m, nullptr, BRIDGE_ERR }, "module '%s' is stopped: its %s '%s' reached its "
                 "max_system_failures of %lld", m->identity, s->observer ? "observer" : "system",
                 s->name, (long long)m->max_failures);
         } else {
-            say(b, m, nullptr, BRIDGE_ERR, "module '%s' is stopped: it reached its "
+            say_about(b, &(say_t){ m, nullptr, BRIDGE_ERR }, "module '%s' is stopped: it reached its "
                 "max_system_failures of %lld, by entities it changed that could not be placed",
                 m->identity, (long long)m->max_failures);
         }

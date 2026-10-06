@@ -275,17 +275,9 @@ struct bridge {
 };
 
 /* bridge.c */
-void say(bridge_t *b, const module_t *m, const bridge_system_t *s, uint8_t level, const char *fmt, ...);
-void bridge_given_up(bridge_t *b, const module_t *m);     /* an unload of what stopped the bridge */
 [[nodiscard]] bool abi_marks(module_t *m, uint32_t more);    /* false if there is no memory for it */
 void abi_park(bridge_t *b, bridge_system_t *s);         /* out of storage, for a reload */
 void abi_unpark(bridge_t *b, bridge_system_t *s);       /* and back, as it was */          /* room for a mark from every call it may yet take */
-[[nodiscard]] char *copy(const char *s, size_t n);
-/* 1, with a record, if nothing may run. `repairing` names a module being loaded or reloaded:
- * the one call a stopped bridge accepts is one that brings back the module that stopped it. */
-[[nodiscard]] int bridge_stopped(bridge_t *b, const char *repairing);
-void bridge_stop(bridge_t *b, const char *identity, const char *what);
-void bridge_resume(bridge_t *b, const module_t *m);     /* if `m` is what it was waiting for */
 
 /* lifecycle.c */
 void module_discard(bridge_t *b, module_t *m);
@@ -295,8 +287,6 @@ void module_shut_down(bridge_t *b, module_t *m);    /* its shutdown, what it ask
 [[nodiscard]] int schedule_order(bridge_t *b, const bridge_order_t *order, uint32_t count);  /* at create */
 [[nodiscard]] int schedule_build(bridge_t *b, char *why, size_t why_len);     /* 0, or why it cannot be */
 [[nodiscard]] int schedule_room(bridge_t *b);     /* at create: what a dispatch works in */
-/* failure.md, *Out of memory*: 1, with a record that says what for, if `got` is nullptr */
-[[nodiscard]] int bridge_short(bridge_t *b, const void *got, const char *what);
 void schedule_run(bridge_t *b, uint32_t phase);
 void schedule_account(bridge_t *b);       /* at each barrier: the failure budgets, and the stops */
 
@@ -325,5 +315,8 @@ void     block_column_free(bridge_t *b, void *ptr, uint32_t size);
 
 /* abi.c */
 [[nodiscard]] int abi_define(module_t *m, backend_err_t *err);                      /* the eight imports */
+
+#include "say.h"
+#include "bridge_inside.h"
 
 #endif

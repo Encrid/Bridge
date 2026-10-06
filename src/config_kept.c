@@ -44,13 +44,13 @@ static kept_text_t *add_kept(bridge_t *b, const char *stem)
 {
     size_t room = (b->kept_count + 1) * sizeof(*b->kept);
     kept_text_t *more = realloc(b->kept, room);
-    char *named = copy(stem, strlen(stem));
+    char *named = copy_text(stem, strlen(stem));
 
     if (more)
         b->kept = more;
     if (!more || !named) {
         free(named);
-        (void)bridge_short(b, nullptr, "the place of an unloaded module's "
+        (void)bridge_lacks(b, nullptr, "the place of an unloaded module's "
             "settings text, which its next load will not write over");
         return (nullptr);
     }

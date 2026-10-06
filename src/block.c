@@ -224,7 +224,7 @@ void block_drain(bridge_t *b, module_t *m)
         b->sink(b->ud, &r);
     }
     if (written > kept) {
-        say(b, m, nullptr, BRIDGE_WARN, "%u log lines were dropped: its ring holds %u",
+        say_about(b, &(say_t){ m, nullptr, BRIDGE_WARN }, "%u log lines were dropped: its ring holds %u",
             written - kept, m->ring_len);
     }
     m->ring_tail = head;
@@ -247,7 +247,7 @@ void block_barrier(bridge_t *b)
             if (m->stopped) m->published = false;       /* and all of it again, if it returns */
             if (m->stopped || !storage_publish(b->storage, m)) continue;
             m->stopped = 1;
-            say(b, m, nullptr, BRIDGE_ERR, "module '%s' is stopped: what its queries match no "
+            say_about(b, &(say_t){ m, nullptr, BRIDGE_ERR }, "module '%s' is stopped: what its queries match no "
                 "longer fits in its spans of %u bytes", m->identity, m->spans_len);
         }
     } while (tables != storage_tables(b->storage));
@@ -269,7 +269,7 @@ void block_barrier(bridge_t *b)
 static int unset(bridge_t *b, const char *key, uint64_t value)
 {
     if (value) return 0;
-    say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] %s is unset", key);
+    say_error(b, "[budget] %s is unset", key);
     return 1;
 }
 
@@ -278,8 +278,8 @@ static int unset(bridge_t *b, const char *key, uint64_t value)
 static int counted(bridge_t *b, const char *key, int64_t value)
 {
     if (value == BRIDGE_NONE || (value > 0 && value <= UINT32_MAX)) return 0;
-    if (!value) say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] %s is unset", key);
-    else say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] %s is %lld, which is neither a count nor "
+    if (!value) say_error(b, "[budget] %s is unset", key);
+    else say_error(b, "[budget] %s is %lld, which is neither a count nor "
         "none", key, (long long)value);
     return 1;
 }
@@ -288,7 +288,7 @@ static int counted(bridge_t *b, const char *key, int64_t value)
 static int beyond(bridge_t *b, const char *key, uint64_t value)
 {
     if (value <= UINT32_MAX) return 0;
-    say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] %s of %llu is more than an offset of 32 bits can "
+    say_error(b, "[budget] %s of %llu is more than an offset of 32 bits can "
         "reach", key, (unsigned long long)value);
     return 1;
 }
@@ -318,7 +318,7 @@ int block_create(bridge_t *b, const bridge_budget_t *budget)
      * is a u32 for every entity, and there is one for each there may be - storage.md */
     sparse = (index + sizeof(bridge_entity_t) * budget->entities + 7u) & ~7ull;
     if (sets > UINT32_MAX / (4 * budget->entities)) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: sparse_sets of %llu, with "
+        say_error(b, "[budget] cannot be satisfied: sparse_sets of %llu, with "
             "four bytes for each of %llu entities, is more than an offset of 32 bits can reach",
             (unsigned long long)sets, (unsigned long long)budget->entities);
         return 1;
@@ -327,7 +327,7 @@ int block_create(bridge_t *b, const bridge_budget_t *budget)
     cells = budget->direct_indexed == BRIDGE_NONE ? 0 : (uint64_t)budget->direct_indexed;
     direct = (sparse + 4 * budget->entities * sets + 7u) & ~7ull;
     if (cells > UINT32_MAX / (budget->entities / 8 + 8)) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: direct_indexed of %llu, "
+        say_error(b, "[budget] cannot be satisfied: direct_indexed of %llu, "
             "with a bit for each of %llu entities, is more than an offset of 32 bits can reach",
             (unsigned long long)cells, (unsigned long long)budget->entities);
         return 1;
@@ -338,14 +338,14 @@ int block_create(bridge_t *b, const bridge_budget_t *budget)
     len = (columns + budget->columns + b->granule - 1) / b->granule * b->granule;
     /* and together they are never more than an offset can reach */
     if (len > (uint64_t)1 << 32) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: the shared memory would "
+        say_error(b, "[budget] cannot be satisfied: the shared memory would "
             "be %llu bytes and an offset into it is 32 bits", (unsigned long long)len);
         return 1;
     }
     reserve = (len > b->reservation ? len : b->reservation) + b->guard;
     b->shared = os_reserve((size_t)reserve, (size_t)len);
     if (!b->shared) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: the operating system would not "
+        say_error(b, "[budget] cannot be satisfied: the operating system would not "
             "give %llu bytes", (unsigned long long)len);
         return 1;
     }
@@ -371,7 +371,7 @@ int block_create(bridge_t *b, const bridge_budget_t *budget)
                                 .len = b->columns_len };
     b->column_space.gaps = malloc(b->column_space.room * sizeof(range_t));
     b->arena_space = (region_t){ .len = b->arena_len };
-    if (bridge_short(b, b->column_space.gaps, "the list of what is free in [budget] columns")) return 1;
+    if (bridge_lacks(b, b->column_space.gaps, "the list of what is free in [budget] columns")) return 1;
     b->storage = storage_create(b);
     if (!b->storage) return 1;
 
@@ -380,7 +380,7 @@ int block_create(bridge_t *b, const bridge_budget_t *budget)
         backend_err_t err = {};
         o->shared = o->api.memory_adopt(o->be, b->shared, len, &err);
         if (!o->shared) {
-            say(b, nullptr, nullptr, BRIDGE_ERR, "backend '%s' cannot adopt the shared memory: %s",
+            say_error(b, "backend '%s' cannot adopt the shared memory: %s",
                 o->name, err.text);
             return 1;
         }

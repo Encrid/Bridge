@@ -57,8 +57,9 @@ CONFIG = ['config_say', 'config_scalar', 'config_enum', 'config_text', 'config_f
           'config_room', 'config_kept']
 SCHEMA = ['schema_reader', 'schema_token', 'schema_value', 'schema_type', 'schema_struct',
           'schema_constants']
-BRIDGE = ['bridge', 'lifecycle', 'config', 'block', 'storage', 'schema', 'abi', 'schedule', 'pool',
-          'pool_job', 'pool_run', 'backend'] + SCHEMA + CONFIG
+BRIDGE = ['say', 'bridge_create', 'bridge_backend', 'bridge_backends', 'bridge_phases',
+          'bridge_destroy', 'bridge_stop', 'bridge_run', 'lifecycle', 'config', 'block', 'storage',
+          'schema', 'abi', 'schedule', 'pool', 'pool_job', 'pool_run', 'backend'] + SCHEMA + CONFIG
 # a native module is a shared library: the name, its source, what it is compiled with. The same
 # library twice is one module to the loader, so one source is built under several names.
 NATIVE = [

@@ -15,7 +15,7 @@ static char **copy_list(const char *const *list, uint32_t count)
     char **out = calloc(count ? count : 1, sizeof *out);
     uint32_t i;
     for (i = 0; out && i < count; i ++) {
-        out[i] = copy(list[i], strlen(list[i]));
+        out[i] = copy_text(list[i], strlen(list[i]));
         if (out[i]) continue;
         while (i --) free(out[i]);
         free(out);
@@ -144,7 +144,7 @@ static void undo(bridge_t *b, module_t *m)
 static int unset(bridge_t *b, const char *identity, const char *key, int64_t value)
 {
     if (value) return 0;
-    say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: %s is unset", identity, key);
+    say_error(b, "module '%s' is refused: %s is unset", identity, key);
     return 1;
 }
 
@@ -153,7 +153,7 @@ static int unset(bridge_t *b, const char *identity, const char *key, int64_t val
 static int neither(bridge_t *b, const char *identity, const char *key, int64_t value, int64_t none)
 {
     if (value > 0 || value == none) return 0;
-    say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: %s is %lld, which is neither %s",
+    say_error(b, "module '%s' is refused: %s is %lld, which is neither %s",
         identity, key, (long long)value, none == BRIDGE_NO_LIMIT
             ? "a limit nor BRIDGE_NO_LIMIT" : "an amount nor BRIDGE_NONE");
     return 1;
@@ -164,9 +164,9 @@ static int unflagged(bridge_t *b, const char *identity, const char *key, enum br
 {
     if (value == BRIDGE_TRUE || value == BRIDGE_FALSE) return 0;
     if (value == BRIDGE_UNSET) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: %s is unset", identity, key);
+        say_error(b, "module '%s' is refused: %s is unset", identity, key);
     } else {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: %s is %u, which is neither "
+        say_error(b, "module '%s' is refused: %s is %u, which is neither "
             "BRIDGE_TRUE nor BRIDGE_FALSE", identity, key, value);
     }
     return 1;
@@ -177,7 +177,7 @@ static int lacks(bridge_t *b, const char *identity, open_backend_t *o, uint32_t 
 {
     if (o->capabilities & flag) return 0;
     /* a guarantee has one name, for the key that asks it and the capability that answers */
-    say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: it states %s, which backend '%s' "
+    say_error(b, "module '%s' is refused: it states %s, which backend '%s' "
         "cannot keep", identity, key, o->name);
     return 1;
 }
@@ -208,19 +208,19 @@ static int checks(bridge_t *b, const bridge_artifact_t *a, open_backend_t **on,
     uint32_t i;
 
     if (!id || !*id) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "a module with no identity is refused");
+        say_error(b, "a module with no identity is refused");
         return 1;
     }
     for (i = 0; i < b->backend_count && a->backend; i ++) {
         if (!strcmp(b->backends[i].name, a->backend)) o = &b->backends[i];
     }
     if (!o) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: no backend named '%s'", id,
+        say_error(b, "module '%s' is refused: no backend named '%s'", id,
             a->backend ? a->backend : "");
         return 1;
     }
     if (cfg->abi != BRIDGE_ABI) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: it wants ABI %u and this is "
+        say_error(b, "module '%s' is refused: it wants ABI %u and this is "
             "ABI %u", id, cfg->abi, (unsigned)BRIDGE_ABI);
         return 1;
     }
@@ -234,25 +234,25 @@ static int checks(bridge_t *b, const bridge_artifact_t *a, open_backend_t **on,
         const bridge_phase_name_t *n = &cfg->phases[i];
         uint32_t k, phase;
         if (!n->from || !*n->from || !n->to || !*n->to) {
-            say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: phase name %u of its "
+            say_error(b, "module '%s' is refused: phase name %u of its "
                 "config is unset", id, i);
             return 1;
         }
         for (k = 0; k < i && strcmp(cfg->phases[k].from, n->from); k ++) {}
         if (k < i) {
-            say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its config maps phase "
+            say_error(b, "module '%s' is refused: its config maps phase "
                 "'%s' twice", id, n->from);
             return 1;
         }
         for (phase = 0; phase < b->phase_count && strcmp(b->phases[phase], n->to); phase ++) {}
         if (phase == b->phase_count) {
-            say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its config maps phase "
+            say_error(b, "module '%s' is refused: its config maps phase "
                 "'%s' to '%s', which the deployment did not declare", id, n->from, n->to);
             return 1;
         }
     }
     if (cfg->on_error != BRIDGE_FAIL && cfg->on_error != BRIDGE_SKIP) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: on_error is unset", id);
+        say_error(b, "module '%s' is refused: on_error is unset", id);
         return 1;
     }
     if (unset(b, id, "max_system_failures", cfg->max_system_failures)
@@ -267,7 +267,7 @@ static int checks(bridge_t *b, const bridge_artifact_t *a, open_backend_t **on,
         return 1;
     }
     if (cfg->loss_count > 0 && !cfg->losses) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: it states %lld losses, and "
+        say_error(b, "module '%s' is refused: it states %lld losses, and "
             "losses is unset", id, (long long)cfg->loss_count);
         return 1;
     }
@@ -284,29 +284,29 @@ static int checks(bridge_t *b, const bridge_artifact_t *a, open_backend_t **on,
         return 1;
     }
     if (cfg->changes > (int64_t)UINT32_MAX) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its changes of %lld bytes is "
+        say_error(b, "module '%s' is refused: its changes of %lld bytes is "
             "more than an offset of 32 bits can reach", id, (long long)cfg->changes);
         return 1;
     }
     /* log.md: zero is unset for it as for every key, so the least it can be is 1 */
     if (unset(b, id, "log_level", cfg->log_level)) return 1;
     if (cfg->log_level > BRIDGE_LEVEL_MOST) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its log_level of %u is not "
+        say_error(b, "module '%s' is refused: its log_level of %u is not "
             "one it can be, which is 1 to %u", id, cfg->log_level, BRIDGE_LEVEL_MOST);
         return 1;
     }
     if (!cfg->config || !*cfg->config) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: config is unset", id);
+        say_error(b, "module '%s' is refused: config is unset", id);
         return 1;
     }
     if (cfg->spawns > (int64_t)b->entities) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its spawns of %lld is more "
+        say_error(b, "module '%s' is refused: its spawns of %lld is more "
             "than [budget] entities of %u", id, (long long)cfg->spawns, b->entities);
         return 1;
     }
     uint32_t ring, spans, end;
     if (private_layout(cfg, o->granule, &ring, &spans, &end)) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its scratch of %u, log_ring of "
+        say_error(b, "module '%s' is refused: its scratch of %u, log_ring of "
             "%u and spans of %u bytes come to more than an offset of 32 bits can reach", id,
             cfg->scratch, cfg->log_ring, cfg->spans);
         return 1;
@@ -314,13 +314,13 @@ static int checks(bridge_t *b, const bridge_artifact_t *a, open_backend_t **on,
     /* budgets.md: the one floor with an argument. A module that can report nothing is the one
      * legal number that makes a deployment incoherent. */
     if (cfg->log_ring < sizeof(bridge_log_record_t)) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: a log_ring of %u bytes holds "
+        say_error(b, "module '%s' is refused: a log_ring of %u bytes holds "
             "no record, and one is %u", id, cfg->log_ring, (unsigned)sizeof(bridge_log_record_t));
         return 1;
     }
     /* capabilities.md: one guarantee, asked by `trusted` and answered by the backend */
     if (cfg->trusted == BRIDGE_FALSE && !(o->capabilities & BACKEND_UNTRUSTED)) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: it is not trusted, and backend "
+        say_error(b, "module '%s' is refused: it is not trusted, and backend "
             "'%s' runs only modules that are", id, o->name);
         return 1;
     }
@@ -336,7 +336,7 @@ static int checks(bridge_t *b, const bridge_artifact_t *a, open_backend_t **on,
     /* wasm.md, *Exports*: the author says "cannot" and the deployment "may not", each with a
      * key. A deployment allowing what the author says cannot be done is config against config. */
     if (cfg->hot_reload == BRIDGE_TRUE && cfg->reloadable == BRIDGE_FALSE) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: hot_reload is stated, and its "
+        say_error(b, "module '%s' is refused: hot_reload is stated, and its "
             "author states it is not reloadable", id);
         return 1;
     }
@@ -372,12 +372,12 @@ static module_t *record(bridge_t *b, const bridge_artifact_t *a, open_backend_t 
     const char *id = cfg->identity, *colon = strchr(id, ':');
     module_t *m = calloc(1, sizeof *m);
     bool whole;
-    if (bridge_short(b, m, "a module's record")) return nullptr;
+    if (bridge_lacks(b, m, "a module's record")) return nullptr;
     m->b = b;
     m->on = o;
-    m->identity = copy(id, strlen(id));
-    m->stem = copy(id, stem_of(id));
-    m->ns = copy(id, colon ? (size_t)(colon - id) : strlen(id));
+    m->identity = copy_text(id, strlen(id));
+    m->stem = copy_text(id, stem_of(id));
+    m->ns = copy_text(id, colon ? (size_t)(colon - id) : strlen(id));
     m->pinned = cfg->pinned == BRIDGE_TRUE;
     m->thread = os_get_thread_id();
     m->on_error = cfg->on_error;
@@ -410,7 +410,7 @@ static module_t *record(bridge_t *b, const bridge_artifact_t *a, open_backend_t 
         const bridge_phase_name_t *n = &cfg->phases[m->phase_names];
         uint32_t phase = 0;
         while (strcmp(b->phases[phase], n->to)) phase ++;       /* checks() found it */
-        m->phase_from[m->phase_names] = copy(n->from, strlen(n->from));
+        m->phase_from[m->phase_names] = copy_text(n->from, strlen(n->from));
         m->phase_to[m->phase_names] = phase;
         if (!m->phase_from[m->phase_names]) whole = false;
     }
@@ -421,7 +421,7 @@ static module_t *record(bridge_t *b, const bridge_artifact_t *a, open_backend_t 
     m->write_count = m->write ? cfg->write_count : 0;
     /* failure.md, *Out of memory*: all of a module's record, or none of it */
     if (!whole || !m->read || !m->write) {
-        (void)bridge_short(b, nullptr, "a module's record");
+        (void)bridge_lacks(b, nullptr, "a module's record");
         module_discard(b, m);
         return nullptr;
     }
@@ -593,20 +593,20 @@ int bridge_load(bridge_t *b, const bridge_artifact_t *a)
     enum backend_capability demands = 0;
     module_t *m, *other;
 
-    if (bridge_stopped(b, id) || checks(b, a, &o, &demands)) return 1;
+    if (bridge_check_call(b, id) || checks(b, a, &o, &demands)) return 1;
     other = loaded(b, id);
     if (other) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: '%s' is loaded already", id,
+        say_error(b, "module '%s' is refused: '%s' is loaded already", id,
             other->identity);
         return 1;
     }
     if (b->module_count >= b->max_modules) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: [budget] modules of %u is "
+        say_error(b, "module '%s' is refused: [budget] modules of %u is "
             "reached", id, b->max_modules);
         return 1;
     }
     if (cfg->persistent > 0 && (uint64_t)cfg->persistent > region_most(&b->arena_space)) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its persistent of %lld bytes "
+        say_error(b, "module '%s' is refused: its persistent of %lld bytes "
             "does not fit in the %u left of [budget] persistent", id, (long long)cfg->persistent,
             region_most(&b->arena_space));
         return 1;
@@ -619,7 +619,7 @@ int bridge_load(bridge_t *b, const bridge_artifact_t *a)
         uint32_t share = ((uint32_t)cfg->persistent + 7u) & ~7u, at;
         m->owned = calloc(1, sizeof *m->owned);
         if (!m->owned || !region_room(&b->arena_space, b->arena_ranges + 1)) {
-            (void)bridge_short(b, nullptr, "a module's share of the persistent arena");
+            (void)bridge_lacks(b, nullptr, "a module's share of the persistent arena");
             module_discard(b, m);
             return 1;
         }
@@ -658,7 +658,7 @@ int bridge_load(bridge_t *b, const bridge_artifact_t *a)
     return b->stopped_by ? 1 : 0;
 
 failed:
-    say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' did not load: %s", id, err.text);
+    say_error(b, "module '%s' did not load: %s", id, err.text);
     if (cfg->on_error == BRIDGE_FAIL) bridge_stop(b, id, "failed");
     undo(b, m);
     module_discard(b, m);
@@ -678,7 +678,7 @@ void module_shut_down(bridge_t *b, module_t *m)
     backend_err_t err = {};
     /* a module whose reload failed after its old instance went has no code left to call */
     if (m->instance && lifecycle_call(m, m->shutdown, "shutdown", m->shutdown_timeout, &err)) {
-        say(b, m, nullptr, BRIDGE_ERR, "module '%s': %s; its teardown continues", m->identity, err.text);
+        say_about(b, &(say_t){ m, nullptr, BRIDGE_ERR }, "module '%s': %s; its teardown continues", m->identity, err.text);
     }
     storage_apply(b->storage);        /* what it had asked for, shutdown's requests included */
     block_drain(b, m);          /* and what it said: its ring is about to go with it */
@@ -733,7 +733,7 @@ static bool share_is_pointed_into(bridge_t *b, const module_t *m)
         if (p.c->kind == BRIDGE_STRUCT) (void)storage_any(b->storage, p.c->type, row_points_in, &p);
         if (!p.rows) continue;
         held = true;
-        say(b, nullptr, nullptr, BRIDGE_WARN, "module '%s' is unloaded and its share of the "
+        say_about(b, &(say_t){ nullptr, nullptr, BRIDGE_WARN }, "module '%s' is unloaded and its share of the "
             "persistent arena, %llu bytes, stays: '%s' holds a string in it, in this many rows: %u",
             m->identity, (unsigned long long)bytes, p.c->name, p.rows);
     }
@@ -772,14 +772,14 @@ int bridge_unload(bridge_t *b, const char *identity)
     char why[256];
     module_t *m;
     /* a stopped bridge takes an unload of the module that stopped it, and of no other */
-    if (bridge_stopped(b, identity)) return 1;
+    if (bridge_check_call(b, identity)) return 1;
     for (m = b->modules; m && (!identity || strcmp(m->identity, identity)); m = m->next) {}
     if (!m) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "no module '%s' is loaded, so none is unloaded",
+        say_error(b, "no module '%s' is loaded, so none is unloaded",
             identity ? identity : "");
         return 1;
     }
-    bridge_given_up(b, m);
+    bridge_give_up(b, m);
     drop_systems(b, m);         /* out of the schedule before its last call */
     module_shut_down(b, m);
     take_out(b, m);
@@ -814,7 +814,7 @@ static int moved_rows(bridge_t *b, module_t *n, backend_err_t *err)
         for (i = 0; i < n->declared_count; i ++) n->declared[i]->replaces = nullptr;
         /* lifetime.md: what went, by the names it was accepted under */
         for (i = 0; i < n->loss_count; i ++) {
-            say(b, n, nullptr, BRIDGE_WARN, "module '%s' is reloaded, and '%s' is lost from %u rows, "
+            say_about(b, &(say_t){ n, nullptr, BRIDGE_WARN }, "module '%s' is reloaded, and '%s' is lost from %u rows, "
                 "as it accepted", n->identity, n->losses[i], n->loss_rows[i] - 1);
         }
         return 0;
@@ -840,21 +840,21 @@ int bridge_reload(bridge_t *b, const bridge_artifact_t *a)
     module_t *old, *n, **link;
     int side_by_side;
 
-    if (bridge_stopped(b, id) || checks(b, a, &o, &demands)) return 1;
+    if (bridge_check_call(b, id) || checks(b, a, &o, &demands)) return 1;
     old = loaded(b, id);
     if (!old) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is not reloaded: nothing of that name is "
+        say_error(b, "module '%s' is not reloaded: nothing of that name is "
             "loaded", id);
         return 1;
     }
     /* wasm.md, *Exports*: hot_reload only ever forbids */
     if (!old->hot_reload) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is not reloaded: its hot_reload is false",
+        say_error(b, "module '%s' is not reloaded: its hot_reload is false",
             old->identity);
         return 1;
     }
     if (o != old->on) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is not reloaded: it runs on backend '%s' "
+        say_error(b, "module '%s' is not reloaded: it runs on backend '%s' "
             "and a reload does not move it to '%s'", old->identity, old->on->name, o->name);
         return 1;
     }
@@ -863,7 +863,7 @@ int bridge_reload(bridge_t *b, const bridge_artifact_t *a)
     had = old->persistent > 0 ? old->persistent : 0;
     wants = cfg->persistent > 0 ? cfg->persistent : 0;
     if (wants < had) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is not reloaded: its persistent is %lld "
+        say_error(b, "module '%s' is not reloaded: its persistent is %lld "
             "and a reload states less, which a loaded module's share cannot become", old->identity, (long long)had);
         return 1;
     }
@@ -876,10 +876,10 @@ int bridge_reload(bridge_t *b, const bridge_artifact_t *a)
             in_place = region_grow(&b->arena_space, last.at - b->arena, last.len, last.len + extra);
         }
         if (!in_place && !region_room(&b->arena_space, b->arena_ranges + 1)) {
-            return bridge_short(b, nullptr, "one more range of the persistent arena");
+            return bridge_lacks(b, nullptr, "one more range of the persistent arena");
         }
         if (!in_place && !region_take(&b->arena_space, extra, &extra_at)) {
-            say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is not reloaded: its persistent of %lld "
+            say_error(b, "module '%s' is not reloaded: its persistent of %lld "
                 "bytes does not fit in the %u left of [budget] persistent", old->identity,
                 (long long)wants, region_most(&b->arena_space) + old->arena_share);
             return 1;
@@ -903,7 +903,7 @@ int bridge_reload(bridge_t *b, const bridge_artifact_t *a)
     if (!n || !n->owned || n->id_room < old->id_count) {
         /* failure.md, *Out of memory*: nothing of the old instance was touched */
         if (n) {
-            (void)bridge_short(b, nullptr, "a reloaded module's record");
+            (void)bridge_lacks(b, nullptr, "a reloaded module's record");
             module_discard(b, n);
         }
         if (in_place) region_give(&b->arena_space, last.at - b->arena + last.len, extra);
@@ -955,7 +955,7 @@ int bridge_reload(bridge_t *b, const bridge_artifact_t *a)
     n->reloads = old;
     if (start(b, n, a, demands, "reload", &err) || schedule_build(b, err.text, sizeof err.text)
         || moved_rows(b, n, &err)) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' was not reloaded: %s", id, err.text);
+        say_error(b, "module '%s' was not reloaded: %s", id, err.text);
         drop_systems(b, n);
         /* what it would have moved stays as it is, under the type it has */
         for (i = 0; i < n->declared_count; i ++) {
@@ -983,7 +983,7 @@ int bridge_reload(bridge_t *b, const bridge_artifact_t *a)
          * lifetime.md. An artifact that works brings it back; an unload is what ends it. */
         drop_systems(b, old);
         old->stopped = 1;
-        say(b, old, nullptr, BRIDGE_ERR, "module '%s' is stopped: its reload failed after its old "
+        say_about(b, &(say_t){ old, nullptr, BRIDGE_ERR }, "module '%s' is stopped: its reload failed after its old "
             "instance had been shut down. What it declared is kept", old->identity);
         if (old->on_error == BRIDGE_FAIL) bridge_stop(b, old->identity, "could not be reloaded");
         (void)schedule_build(b, err.text, sizeof err.text);

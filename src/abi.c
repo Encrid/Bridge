@@ -411,7 +411,7 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
     if (!c) {
         /* The descriptor is read and laid out. A field's type is a bare C name, looked for in
          * the declarer's namespace: `Vec3` in game:Body is game:Vec3 - schema.md. */
-        char *desc = kind == BRIDGE_TAG ? nullptr : copy(desc_at, a[6]);
+        char *desc = kind == BRIDGE_TAG ? nullptr : copy_text(desc_at, a[6]);
         char why[200];
         looking_t l = { b, name };
         schema_t s;
@@ -464,7 +464,7 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
         /* everything it needs is had before any of it is kept: failure.md, *Out of memory* */
         for (k = 0; k < s.field_count; k ++) held_count += s.fields[k].type != nullptr;
         c = calloc(1, sizeof *c);
-        named = copy(name, strlen(name));
+        named = copy_text(name, strlen(name));
         zero = calloc(1, size ? size : 1);
         deps = calloc(held_count ? held_count : 1, sizeof *deps);
         types = realloc(b->types, (b->type_count + 1) * sizeof *b->types);
@@ -608,8 +608,8 @@ static int subscribe(module_t *m, uint64_t name_off, uint64_t name_len, uint32_t
         if (all) b->systems = all;
         if (own) *mine = own;
         if (s) {
-            s->name = copy(name, strlen(name));
-            s->full = copy(full, strlen(full));
+            s->name = copy_text(name, strlen(name));
+            s->full = copy_text(full, strlen(full));
             if (events) {
                 s->pending_room = m->spans_len / (uint32_t)sizeof(bridge_trigger_t);
                 s->pending = calloc(s->pending_room ? s->pending_room : 1, sizeof *s->pending);

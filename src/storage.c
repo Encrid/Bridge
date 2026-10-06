@@ -1042,13 +1042,13 @@ void storage_apply(storage_t *r)
             "it asked: %u" };
         for (i = 0; i < 2; i ++) {
             if (!m->left[i]) continue;
-            say(b, m, nullptr, BRIDGE_ERR, text[i], m->identity, i ? b->columns_len : b->tables,
+            say_about(b, &(say_t){ m, nullptr, BRIDGE_ERR }, text[i], m->identity, i ? b->columns_len : b->tables,
                 m->left[i]);
             m->left[i] = 0;
             m->unplaced_now = 1;                /* failure.md, *The budget* */
         }
         if (m->barred) {
-            say(b, m, nullptr, BRIDGE_ERR, "module '%s' asked to destroy entities that carry "
+            say_about(b, &(say_t){ m, nullptr, BRIDGE_ERR }, "module '%s' asked to destroy entities that carry "
                 "nothing it may write. Left as they were: %u", m->identity, m->barred);
             m->barred = 0;
             m->unplaced_now = 1;
@@ -1472,7 +1472,7 @@ void storage_drop(storage_t *r, storage_type_t *type, enum bridge_on_unload poli
     /* lifetime.md, *What unload leaves behind*: the one case of a strip with a trace */
     for (uint32_t i = 0; apart && i < r->b->type_count; i ++) {
         if (r->b->types[i]->type != type) continue;
-        say(r->b, nullptr, nullptr, BRIDGE_WARN, "'%s' is stripped, and %u rows stay in a second "
+        say_about(r->b, &(say_t){ nullptr, nullptr, BRIDGE_WARN }, "'%s' is stripped, and %u rows stay in a second "
             "table of their archetype: [budget] columns of %u bytes has no room to join them to "
             "the first", r->b->types[i]->name, apart, r->b->columns_len);
     }
@@ -1640,7 +1640,7 @@ storage_t *storage_create(bridge_t *b)
 {
     storage_t *r = calloc(1, sizeof *r);
     size_t tables = (size_t)b->tables + b->sparse_sets + 1;
-    if (bridge_short(b, r, "storage")) return nullptr;
+    if (bridge_lacks(b, r, "storage")) return nullptr;
     r->b = b;
     /* a table for each archetype there may be, and one for each sparse set */
     r->table_room = b->tables + b->sparse_sets;
@@ -1694,12 +1694,12 @@ storage_t *storage_create(bridge_t *b)
         || !r->term_opers || !r->systems || !r->observers || !r->before || !r->masked
         || !r->in_table || !r->set_type || !r->set_table || !r->where || !r->direct_type
         || !r->given) {
-        (void)bridge_short(b, nullptr, "storage, as [budget] sizes it");
+        (void)bridge_lacks(b, nullptr, "storage, as [budget] sizes it");
         storage_destroy(r);
         return nullptr;
     }
     if (!r->who) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: the operating system would not "
+        say_error(b, "[budget] cannot be satisfied: the operating system would not "
             "give storage %u bytes of its own for the columns it keeps", b->columns_len);
         storage_destroy(r);
         return nullptr;
