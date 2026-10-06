@@ -160,3 +160,21 @@ argument. A backend that needs it keeps it in its module.
     extensible    a third backend stores its own in its module, if it needs it
     minimal       two structs, and one argument fewer
     explicit      one way to the backend from an instance, where an unused second stood
+
+### A line of the log
+
+`bridge_log` took five arguments, and six in the native SDK: the level, the text, its length
+and two numbers. It is a function of the SDK and no entry of the ABI: it writes a record in the
+ring.
+
+**What is logged is one struct, `bridge_line_t`**: the text, its length and the two numbers.
+`bridge_log(level, line)`, and `(api, level, line)` in the native SDK. `BRIDGE_LOG(level, text,
+a0, a1)` builds the line, so an author writes what was written before. The function is inline,
+and the compiler sees the struct made and read in one place.
+
+    fast          the same record written; the struct does not outlive the inlining
+    scalable      a third number is a field
+    modular       the same form in both SDKs
+    extensible    not an entry: another language writes the record itself, as before
+    minimal       one struct
+    explicit      what a line holds is named, where it was the third to fifth arguments

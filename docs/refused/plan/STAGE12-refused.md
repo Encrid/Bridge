@@ -45,3 +45,11 @@ Of `STAGE12.md`, *The three entries of the backend seam over four*.
 Refused: `instance_create` keeping its backend, with the memories and their count in a struct
 of their own. It is a struct for a pointer and a count, and it keeps an argument neither backend
 reads. The condition that brings it back is a backend whose module cannot hold what it is of.
+
+## A line of the log
+
+Of `STAGE12.md`, *A line of the log*.
+
+Refused: one number a line where there are two. The native SDK's function is still over four,
+and the layout of a record in the ring changes for it. The condition that brings it back is
+that no line anywhere uses the second number.
