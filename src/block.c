@@ -1,12 +1,12 @@
 /* The shared block, the column region carved out of it, the log ring, and the barrier. Who
- * keeps the rows is behind rows.h. docs/bridge/memory/memory.md, docs/bridge/diagnostics/log.md. */
+ * keeps the rows is behind storage.h. docs/bridge/memory/memory.md, docs/bridge/diagnostics/log.md. */
 #include "inside.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-uint32_t store_offset(bridge *b, const void *p)
+uint32_t block_offset(bridge *b, const void *p)
 {
     const uint8_t *c = p;
     if (!c || c < b->shared || c >= b->shared + b->shared_len) return 0;
@@ -107,12 +107,12 @@ static uint32_t grain(uint32_t size)
     return (size + GRAIN - 1) & ~(GRAIN - 1);
 }
 
-void store_column_free(bridge *b, void *ptr, uint32_t size)
+void block_column_free(bridge *b, void *ptr, uint32_t size)
 {
     region_give(&b->column_space, (uint32_t)((uint8_t *)ptr - b->shared) - b->columns, grain(size));
 }
 
-void *store_column_regrow(bridge *b, void *ptr, uint32_t old_size, uint32_t new_size)
+void *block_column_regrow(bridge *b, void *ptr, uint32_t old_size, uint32_t new_size)
 {
     uint8_t *base = b->shared + b->columns;
     uint32_t had = grain(old_size), want = grain(new_size), at = 0, to;
@@ -137,7 +137,7 @@ void *store_column_regrow(bridge *b, void *ptr, uint32_t old_size, uint32_t new_
 
 /* A module's ids for the time until the next barrier: what it did not use, topped up to what
  * its config stated. They are real entities with nothing on them, which no query matches. */
-int store_refill(bridge *b, module *m)
+int block_refill(bridge *b, module *m)
 {
     uint32_t want = m->spawns > 0 ? (uint32_t)m->spawns : 0, kept = m->id_count - m->id_next;
     if (!want) return 0;
@@ -151,7 +151,7 @@ int store_refill(bridge *b, module *m)
     m->id_next = 0;
     m->id_count = kept;
     m->ids_short = 0;
-    m->id_count += rows_reserve(b->rows, m->ids + kept, want - kept);
+    m->id_count += storage_reserve(b->storage, m->ids + kept, want - kept);
     /* the index is twelve bytes times the highest id, and that is what was budgeted */
     m->ids_short = m->id_count < want;
     return m->ids_short;
@@ -159,7 +159,7 @@ int store_refill(bridge *b, module *m)
 
 /* ---- publishing: the header, column_base, and one span per matched table ---- */
 
-void store_header(bridge *b, module *m)
+void block_header(bridge *b, module *m)
 {
     auto h = (bridge_header *)m->priv;
     h->abi = BRIDGE_ABI;
@@ -171,15 +171,15 @@ void store_header(bridge *b, module *m)
     h->queries = m->spans;
     h->observers = m->spans + (uint32_t)sizeof(bridge_query) * m->system_count;
     h->column_base = h->observers + (uint32_t)sizeof(bridge_list) * m->observer_count;
-    h->terms = m->declared_count;
-    h->tables = rows_tables(b->rows);
-    h->entity_index = store_offset(b, b->index);
+    h->types = m->declared_count;
+    h->tables = storage_tables(b->storage);
+    h->entity_index = block_offset(b, b->index);
     h->entities = b->entities;
 }
 
 /* ---- the log ring ---- */
 
-void store_drain(bridge *b, module *m)
+void block_drain(bridge *b, module *m)
 {
     static const char outside[] = "(a log line whose text lies outside the scratch arena)";
     auto h = (bridge_header *)m->priv;
@@ -219,24 +219,24 @@ void store_drain(bridge *b, module *m)
 
 /* ---- the barrier - docs/bridge/run/schedule.md, *Phases* ---- */
 
-void store_barrier(bridge *b)
+void block_barrier(bridge *b)
 {
     module *m;
     uint32_t tables, i;
 
-    rows_apply(b->rows);                /* queued changes applied */
-    for (m = b->modules; m; m = m->next) store_refill(b, m);
+    storage_apply(b->storage);                /* queued changes applied */
+    for (m = b->modules; m; m = m->next) block_refill(b, m);
     do {                                /* spans republished */
-        tables = rows_tables(b->rows);
+        tables = storage_tables(b->storage);
         for (m = b->modules; m; m = m->next) {
             if (m->stopped) m->published = false;       /* and all of it again, if it returns */
-            if (m->stopped || !rows_publish(b->rows, m)) continue;
+            if (m->stopped || !storage_publish(b->storage, m)) continue;
             m->stopped = 1;
             say(b, m, nullptr, BRIDGE_ERR, "module '%s' is stopped: what its queries match no "
                 "longer fits in its spans of %u bytes", m->identity, m->spans_len);
         }
-    } while (tables != rows_tables(b->rows));
-    rows_written(b->rows);
+    } while (tables != storage_tables(b->storage));
+    storage_written(b->storage);
     b->layout_moved = 0;
     /* then the observers of what changed. What they ask for goes on their queues, and so
      * is the next barrier's - schedule.md, *An observer runs at the barrier, one hop per
@@ -244,7 +244,7 @@ void store_barrier(bridge *b)
     schedule_run(b, b->phase_count);
     for (i = 0; i < b->system_count; i ++) b->systems[i]->pending_count = 0;
     schedule_account(b);                /* failure.md, *The budget* */
-    for (m = b->modules; m; m = m->next) store_drain(b, m);
+    for (m = b->modules; m; m = m->next) block_drain(b, m);
     b->barriers ++;
 }
 
@@ -266,7 +266,7 @@ static int beyond(bridge *b, const char *key, uint64_t value)
     return 1;
 }
 
-int store_create(bridge *b, const bridge_budget *budget)
+int block_create(bridge *b, const bridge_budget *budget)
 {
     uint64_t index = PAGE, arena, columns, len, reserve;
     uint32_t i;
@@ -315,8 +315,8 @@ int store_create(bridge *b, const bridge_budget *budget)
     b->column_space = (region){ .room = b->tables + 1, .len = b->columns_len };
     b->column_space.gaps = malloc(b->column_space.room * sizeof(range));
     b->arena_space = (region){ .len = b->arena_len };
-    b->rows = rows_create(b);
-    if (!b->rows) return 1;
+    b->storage = storage_create(b);
+    if (!b->storage) return 1;
 
     for (i = 0; i < b->backend_count; i ++) {
         open_backend *o = &b->backends[i];
@@ -331,10 +331,10 @@ int store_create(bridge *b, const bridge_budget *budget)
     return 0;
 }
 
-void store_destroy(bridge *b)
+void block_destroy(bridge *b)
 {
     uint32_t i;
-    if (b->rows) rows_destroy(b->rows);
+    if (b->storage) storage_destroy(b->storage);
     for (i = 0; i < b->backend_count; i ++) {
         open_backend *o = &b->backends[i];
         if (o->shared) o->api.memory_release(o->shared);
@@ -342,14 +342,14 @@ void store_destroy(bridge *b)
     if (b->shared) os_release(b->shared, b->shared_reserve);
     free(b->column_space.gaps);
     free(b->arena_space.gaps);
-    for (i = 0; i < b->component_count; i ++) {
-        schema_free(&b->components[i]->s);
-        free(b->components[i]->deps);
-        free(b->components[i]->name);
-        free(b->components[i]->zero);
-        free(b->components[i]);
+    for (i = 0; i < b->type_count; i ++) {
+        schema_free(&b->types[i]->s);
+        free(b->types[i]->deps);
+        free(b->types[i]->name);
+        free(b->types[i]->zero);
+        free(b->types[i]);
     }
     for (i = 0; i < b->kept_count; i ++) free(b->kept[i].stem);
     free(b->kept);
-    free(b->components);
+    free(b->types);
 }

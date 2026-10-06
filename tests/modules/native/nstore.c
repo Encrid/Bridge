@@ -258,7 +258,7 @@ BRIDGE_NATIVE(find)
         const bridge_entity *e = &index[(uint32_t)ids[i]];
         const bridge_query *q = bridge_native_query(api, with_a);
         if (e->generation != (uint32_t)(ids[i] >> 32)) continue;
-        found += base[e->table * h->terms + a] != 0;
+        found += base[e->table * h->types + a] != 0;
         for (uint32_t s = 0; s < q->spans; s ++) {
             const uint32_t *span = bridge_native_span(api, q, s, 1);
             auto who = (const uint64_t *)(api->shared_base + span[1]);

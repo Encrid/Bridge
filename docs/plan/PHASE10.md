@@ -382,7 +382,7 @@ every other key.
 **Open: a `log_level` nobody stated.** Zero is a severity, so a config that leaves it out is not
 caught as unset the way every other key is. It meant info before and means emergencies only now.
 
-**Open: a test that a barrier allocates nothing.** It holds by reading: `src/rows.c` calls no
+**Open: a test that a barrier allocates nothing.** It holds by reading: `src/storage.c` calls no
 allocator outside `rows_create`. Nothing checks it.
 
 **Open: an allocation that fails at load.** Older than this phase and found in it: of the

@@ -28,15 +28,15 @@ static void free_list_of(char **list, uint32_t count)
 
 /* A component's record goes: what storage knows of it, and its hold on the types its fields
  * name, which go with it when nothing else declares or names them. */
-static void component_delete(bridge *b, component *c)
+static void type_delete(bridge *b, declared_type *c)
 {
     uint32_t k;
-    rows_undeclare(b->rows, c->type);
-    for (k = 0; b->components[k] != c; k ++) {}
-    b->components[k] = b->components[-- b->component_count];
+    storage_undeclare(b->storage, c->type);
+    for (k = 0; b->types[k] != c; k ++) {}
+    b->types[k] = b->types[-- b->type_count];
     for (k = 0; k < c->dep_count; k ++) {
-        component *named = c->deps[k];
-        if (!-- named->users && !named->declarers) component_delete(b, named);
+        declared_type *named = c->deps[k];
+        if (!-- named->users && !named->declarers) type_delete(b, named);
     }
     schema_free(&c->s);
     free(c->deps);
@@ -47,12 +47,12 @@ static void component_delete(bridge *b, component *c)
 
 /* A module stops declaring `c`. Shared, it stays; the last to leave applies its own policy.
  * Policy zero is a load that failed: nothing can carry what was never applied. */
-static void component_release(bridge *b, component *c, enum bridge_on_unload policy)
+static void type_release(bridge *b, declared_type *c, enum bridge_on_unload policy)
 {
     if (-- c->declarers) return;
-    if (policy) rows_drop(b->rows, c->type, policy);
+    if (policy) storage_drop(b->storage, c->type, policy);
     /* a type some other component's field still names is kept as a type, with no rows */
-    if (!c->users) component_delete(b, c);
+    if (!c->users) type_delete(b, c);
     b->layout_moved = 1;
 }
 
@@ -67,7 +67,7 @@ static void drop_systems(bridge *b, module *m)
             b->systems[kept ++] = s;
             continue;
         }
-        if (s->matched) rows_forget(b->rows, s->matched);
+        if (s->matched) storage_forget(b->storage, s->matched);
         free(s->pending);
         free(s->name);
         free(s->full);
@@ -108,16 +108,16 @@ static void undo(bridge *b, module *m)
 {
     uint32_t i;
     drop_systems(b, m);         /* first: a query must not outlive a component it names */
-    rows_release(b->rows, m->ids, m->id_count);
+    storage_release(b->storage, m->ids, m->id_count);
     m->id_count = m->id_next = 0;
-    if (m->config_entity) rows_release(b->rows, &m->config_entity, 1);
+    if (m->config_entity) storage_release(b->storage, &m->config_entity, 1);
     /* nothing of it was applied, so nothing points into its share */
     for (i = 0; i < m->own_count; i ++) {
         region_give(&b->arena_space, m->owned[i].at - b->arena, m->owned[i].len);
     }
     m->own_count = 0;
     /* last declared first: a type is used by what was declared after it */
-    for (i = m->declared_count; i --;) component_release(b, m->declared[i], 0);
+    for (i = m->declared_count; i --;) type_release(b, m->declared[i], 0);
     m->declared_count = 0;
     b->layout_moved = 1;
 }
@@ -382,7 +382,7 @@ static int start(bridge *b, module *m, const bridge_artifact *a, enum backend_ca
     m->image = o->api.module_compile(o->be, a->bytes, a->len, a->path, demands, err);
     if (!m->image) return 1;
     if (private_memory(b, m, cfg, err)) return 1;
-    store_header(b, m);
+    block_header(b, m);
 
     /* a module is handed the memories it imports, and no other - backend.md */
     import_count = o->api.module_imports(m->image, imports, 64);
@@ -427,11 +427,11 @@ static int start(bridge *b, module *m, const bridge_artifact *a, enum backend_ca
     /* budgets.md: column_base has a cell for each of its components in every table there may
      * be, so whether its spans hold it is known here, and not at some barrier */
     need = sizeof(bridge_query) * m->system_count + sizeof(bridge_list) * m->observer_count
-         + 4ull * m->declared_count * rows_tables(b->rows);
+         + 4ull * m->declared_count * storage_tables(b->storage);
     if (need > m->spans_len) {
         snprintf(err->text, sizeof err->text, "its spans of %u bytes do not hold a column_base of "
             "%u components by %u tables, which with its queries is %llu bytes", m->spans_len,
-            m->declared_count, rows_tables(b->rows), (unsigned long long)need);
+            m->declared_count, storage_tables(b->storage), (unsigned long long)need);
         return 1;
     }
     return 0;
@@ -483,7 +483,7 @@ int bridge_load(bridge *b, const bridge_artifact *a)
 
     /* from here a failure is the module's, and its on_error decides what it costs. init may
      * spawn, so its ids are set aside before it runs. */
-    if (store_refill(b, m)) {
+    if (block_refill(b, m)) {
         snprintf(err.text, sizeof err.text, "its spawns of %lld do not fit under [budget] "
             "entities of %u", (long long)cfg->spawns, b->entities);
         goto failed;
@@ -501,7 +501,7 @@ int bridge_load(bridge *b, const bridge_artifact *a)
     b->module_count ++;
     b->layout_moved = 1;
     bridge_resume(b, m);
-    store_barrier(b);           /* what init queued is applied, and its spans are published */
+    block_barrier(b);           /* what init queued is applied, and its spans are published */
     /* the module is in, and nothing will ever run it: that is not a load that succeeded */
     return b->stopped_by ? 1 : 0;
 
@@ -527,20 +527,20 @@ void module_shut_down(bridge *b, module *m)
     if (m->instance && lifecycle_call(m, m->shutdown, "shutdown", m->shutdown_timeout, &err)) {
         say(b, m, nullptr, BRIDGE_ERR, "module '%s': %s; its teardown continues", m->identity, err.text);
     }
-    rows_apply(b->rows);        /* what it had asked for, shutdown's requests included */
-    store_drain(b, m);          /* and what it said: its ring is about to go with it */
+    storage_apply(b->storage);        /* what it had asked for, shutdown's requests included */
+    block_drain(b, m);          /* and what it said: its ring is about to go with it */
 }
 
 /* strings.md, *It is given back when nothing points into it*. A string a component keeps is a
  * bridge_text field, so every reference there is can be found: in a field, in an array of
  * them, or in a struct a field holds. */
-typedef struct { const bridge *b; const module *m; const component *c; } pointing;
+typedef struct { const bridge *b; const module *m; const declared_type *c; } pointing;
 
-static bool points_in(const pointing *p, const component *c, const uint8_t *bytes)
+static bool points_in(const pointing *p, const declared_type *c, const uint8_t *bytes)
 {
     for (uint32_t k = 0; k < c->s.field_count; k ++) {
         const schema_field *f = &c->s.fields[k];
-        const component *held = f->type;
+        const declared_type *held = f->type;
         if (f->kind != SCHEMA_TEXT && f->kind != SCHEMA_STRUCT) continue;
         for (uint32_t i = 0; i < f->count; i ++) {
             bridge_text text;
@@ -567,9 +567,9 @@ static bool row_points_in(void *ctx, const uint8_t *row)
 static bool share_is_pointed_into(bridge *b, const module *m)
 {
     pointing p = { b, m, nullptr };
-    for (uint32_t i = 0; i < b->component_count; i ++) {
-        p.c = b->components[i];
-        if (p.c->kind == BRIDGE_STRUCT && rows_any(b->rows, p.c->type, row_points_in, &p)) return true;
+    for (uint32_t i = 0; i < b->type_count; i ++) {
+        p.c = b->types[i];
+        if (p.c->kind == BRIDGE_STRUCT && storage_any(b->storage, p.c->type, row_points_in, &p)) return true;
     }
     return false;
 }
@@ -580,12 +580,12 @@ static void take_out(bridge *b, module *m)
     module **link = &b->modules;
     uint32_t i;
     drop_systems(b, m);
-    if (m->config_entity) rows_release(b->rows, &m->config_entity, 1);
+    if (m->config_entity) storage_release(b->storage, &m->config_entity, 1);
     /* last declared first: a type is used by what was declared after it */
-    for (i = m->declared_count; i --;) component_release(b, m->declared[i], m->policy[i]);
+    for (i = m->declared_count; i --;) type_release(b, m->declared[i], m->policy[i]);
     m->declared_count = 0;
     /* the ids held ready for it are entities nobody will ever spawn */
-    rows_release(b->rows, m->ids + m->id_next, m->id_count - m->id_next);
+    storage_release(b->storage, m->ids + m->id_next, m->id_count - m->id_next);
     /* its share of the arena: back to it, unless a row that is staying holds a string there */
     if (m->own_count && !share_is_pointed_into(b, m)) {
         for (i = 0; i < m->own_count; i ++) {
@@ -617,7 +617,7 @@ int bridge_unload(bridge *b, const char *identity)
     take_out(b, m);
     (void)schedule_build(b, why, sizeof why);
     b->layout_moved = 1;
-    store_barrier(b);           /* what left is out of every module's spans, and observed */
+    block_barrier(b);           /* what left is out of every module's spans, and observed */
     return 0;
 }
 
@@ -727,7 +727,7 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     if (start(b, n, a, demands, "reload", &err) || schedule_build(b, err.text, sizeof err.text)) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' was not reloaded: %s", id, err.text);
         drop_systems(b, n);
-        for (i = n->declared_count; i --;) component_release(b, n->declared[i], 0);
+        for (i = n->declared_count; i --;) type_release(b, n->declared[i], 0);
         n->declared_count = 0;
         n->ids = nullptr;              /* they are the old record's */
         n->config_entity = 0;
@@ -756,13 +756,13 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     if (side_by_side) module_shut_down(b, old);
     /* what the new instance no longer declares is treated as an unload treats it */
     drop_systems(b, old);
-    for (i = old->declared_count; i --;) component_release(b, old->declared[i], old->policy[i]);
+    for (i = old->declared_count; i --;) type_release(b, old->declared[i], old->policy[i]);
     old->declared_count = 0;
     old->ids = nullptr;                /* the new record's now */
     /* the settings component among them: its row was Bridge-ASM700's own, and goes too */
     for (i = 0; i < n->declared_count && n->declared[i] != n->config; i ++) {}
     if (n->config && i == n->declared_count) {
-        if (rows_alive(b->rows, n->config_entity)) rows_release(b->rows, &n->config_entity, 1);
+        if (storage_alive(b->storage, n->config_entity)) storage_release(b->storage, &n->config_entity, 1);
         n->config = nullptr;
         n->config_entity = 0;
     }
@@ -773,6 +773,6 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     (void)schedule_build(b, err.text, sizeof err.text);
     b->layout_moved = 1;
     bridge_resume(b, n);
-    store_barrier(b);
+    block_barrier(b);
     return b->stopped_by ? 1 : 0;
 }

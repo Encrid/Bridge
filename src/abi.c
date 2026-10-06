@@ -56,7 +56,7 @@ static int foreign(module *m, const char *name)
     return strncmp(name, m->ns, n) || name[n] != ':';
 }
 
-static int may_write(module *m, const component *c)
+static int may_write(module *m, const declared_type *c)
 {
     return !foreign(m, c->name) || listed(m->write, m->write_count, c->name);
 }
@@ -68,8 +68,8 @@ static bool find(void *ctx, const char *bare, schema_named *named)
 {
     const looking *l = ctx;
     size_t ns = strlen(l->ns);
-    for (uint32_t i = 0; i < l->b->component_count; i ++) {
-        component *c = l->b->components[i];
+    for (uint32_t i = 0; i < l->b->type_count; i ++) {
+        declared_type *c = l->b->types[i];
         if (strncmp(c->name, l->ns, ns) || c->name[ns] != ':' || strcmp(c->name + ns + 1, bare)) continue;
         *named = (schema_named){ c->kind, c->size, c->align, c };
         return true;
@@ -86,7 +86,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     enum bridge_kind kind = (enum bridge_kind)a[2];
     enum bridge_on_unload on_unload = (enum bridge_on_unload)a[7];
     uint32_t size = (uint32_t)a[3], align = (uint32_t)a[4], i;
-    component *c = nullptr;
+    declared_type *c = nullptr;
     char name[128], *bare;
     uint64_t print;
 
@@ -111,8 +111,8 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     }
     print = fingerprint(desc_at, a[6]) ^ kind;
 
-    for (i = 0; i < b->component_count; i ++) {
-        if (!strcmp(b->components[i]->name, name)) c = b->components[i];
+    for (i = 0; i < b->type_count; i ++) {
+        if (!strcmp(b->types[i]->name, name)) c = b->types[i];
     }
     if (c && c->fingerprint != print) {
         return refuse(m, "component '%s' has another layout here: fingerprint %016llx, and it "
@@ -140,7 +140,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
             return refuse(m, "component '%s' is %u bytes aligned to %u in the module and %u "
                 "aligned to %u by its descriptor", name, size, align, laid, aligned);
         }
-        if (b->component_count >= b->max_types) {
+        if (b->type_count >= b->max_types) {
             schema_free(&s);
             return refuse(m, "component '%s' is one type more than [budget] types of %u", name,
                 b->max_types);
@@ -148,18 +148,18 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
 
         c = calloc(1, sizeof *c);
         c->name = copy(name, strlen(name));
-        c->type = rows_declare(b->rows, size);
+        c->type = storage_declare(b->storage, size);
         c->s = s;
         c->kind = kind;
         c->size = size;
         c->align = align;
         c->fingerprint = print;
         c->zero = calloc(1, size);
-        b->components = realloc(b->components, (b->component_count + 1) * sizeof *b->components);
-        b->components[b->component_count ++] = c;
+        b->types = realloc(b->types, (b->type_count + 1) * sizeof *b->types);
+        b->types[b->type_count ++] = c;
         /* a declared type a field of this one names is held for as long as this one is */
         for (k = 0; k < s.field_count; k ++) {
-            component *held = s.fields[k].type;
+            declared_type *held = s.fields[k].type;
             if (!held) continue;
             c->deps = realloc(c->deps, (c->dep_count + 1) * sizeof *c->deps);
             c->deps[c->dep_count ++] = held;
@@ -209,7 +209,7 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
     const char *name_at = scratch(m, name_off, name_len);
     const bridge_term *terms = scratch(m, terms_off, term_count * sizeof(bridge_term));
     uint32_t count = (uint32_t)term_count, i;
-    rows_term *asked;
+    storage_term *asked;
     bridge_system *s;
     char name[128], full[256];
 
@@ -243,7 +243,7 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
     /* query.md, *What a query may not ask for* */
     for (i = 0; i < count; i ++) {
         bridge_term t;
-        component *c;
+        declared_type *c;
         memcpy(&t, &terms[i], sizeof t);
         if (t.slot == BRIDGE_WILDCARD) {
             refuse(m, "term %u of %s '%s' is a wildcard", i, what, name);
@@ -273,8 +273,8 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         s->term[i].writes = t.access != BRIDGE_IN;
     }
 
-    s->matched = events ? rows_observer(b->rows, asked, count, events, heard, s)
-               : count ? rows_system(b->rows, asked, count) : nullptr;
+    s->matched = events ? storage_observer(b->storage, asked, count, events, heard, s)
+               : count ? storage_system(b->storage, asked, count) : nullptr;
     free(asked);
 
     snprintf(full, sizeof full, "%s:%s", m->stem, name);
@@ -335,7 +335,7 @@ static int abi_observe(void *ud, const uint64_t *a, uint64_t *r)
  * which the barrier applies in an order that never varies. No lock: a module's systems are
  * serialised, so each of the three has one writer. */
 
-static void queue(module *m, enum change_op op, uint64_t id, component *c, const void *value)
+static void queue(module *m, enum change_op op, uint64_t id, declared_type *c, const void *value)
 {
     change ch = { id, c, value ? c->size : 0, op };
     uint32_t need = (uint32_t)sizeof ch + ((ch.size + 7u) & ~7u);
@@ -374,7 +374,7 @@ static int abi_destroy(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r
     return 0;
 }
 
-static component *written(module *m, uint64_t slot, const char *entry)
+static declared_type *written(module *m, uint64_t slot, const char *entry)
 {
     if (slot >= m->declared_count) {
         refuse(m, "%s names slot %llu, which it never declared", entry, (unsigned long long)slot);
@@ -391,7 +391,7 @@ static component *written(module *m, uint64_t slot, const char *entry)
 static int abi_attach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 {
     module *m = ud;
-    component *c = written(m, a[1], "attach");
+    declared_type *c = written(m, a[1], "attach");
     const void *value;
     if (!c) return 1;
     value = a[3] ? scratch(m, a[2], a[3]) : c->zero;
@@ -408,7 +408,7 @@ static int abi_attach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 static int abi_detach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 {
     module *m = ud;
-    component *c = written(m, a[1], "detach");
+    declared_type *c = written(m, a[1], "detach");
     if (!c) return 1;
     queue(m, CHANGE_DETACH, a[0], c, nullptr);
     return 0;

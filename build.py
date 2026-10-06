@@ -53,7 +53,7 @@ FEATURES = ['--enable-multimemory', '--enable-bulk-memory', '--enable-sign-ext',
 ROW_TEST = '(if (i32.ge_u (local.get $row) (local.get $count)) (then (unreachable)))'
 TIMEOUT = 120
 
-BRIDGE = ['bridge', 'lifecycle', 'config', 'store', 'rows', 'schema', 'abi', 'schedule', 'pool',
+BRIDGE = ['bridge', 'lifecycle', 'config', 'block', 'storage', 'schema', 'abi', 'schedule', 'pool',
           'backend']
 # a native module is a shared library: the name, its source, what it is compiled with. The same
 # library twice is one module to the loader, so one source is built under several names.
@@ -221,7 +221,7 @@ def build(target, debug, out):
     adopt_o = compile_('adopt', ROOT / 'tests/adopt.c', ours + [include, src] + defines)
     phase_o = {name: compile_(name, ROOT / 'tests' / (name + '.c'), ours + [include] + defines)
                for name in ('phase2', 'phase3', 'phase4', 'phase5', 'phase6')}
-    storage_o = compile_('storage', ROOT / 'tests/storage.c', ours + [include, src] + defines)
+    storage_o = compile_('storage-test', ROOT / 'tests/storage.c', ours + [include, src] + defines)
     module_o = {name: compile_(name, ROOT / 'tests/modules/native' / (source + '.c'),
                                ours + [include, sdk['native']] + ['-D' + d for d in flags])
                 for name, source, flags in NATIVE}

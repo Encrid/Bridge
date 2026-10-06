@@ -188,7 +188,7 @@ static inline uint32_t bridge_ref(uint64_t id, uint32_t slot, uint32_t stride)
     record = BRIDGE_HEADER(entity_index) + index * (uint32_t)sizeof(bridge_entity);
     if (acc_ld_32(record + 8u) != (uint32_t)(id >> 32)) return 0;
     base = acc_own_32(BRIDGE_HEADER(column_base)
-                      + (acc_ld_32(record) * BRIDGE_HEADER(terms) + slot) * 4u);
+                      + (acc_ld_32(record) * BRIDGE_HEADER(types) + slot) * 4u);
     return base ? base + acc_ld_32(record + 4u) * stride : 0;
 }
 

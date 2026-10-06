@@ -41,7 +41,7 @@ static uint32_t put_text(bridge *b, module *m, uint32_t *used, const char *text,
 }
 
 /* the value of an enum's constant, by its name */
-static bool constant(const component *of, const char *name, int32_t *value)
+static bool constant(const declared_type *of, const char *name, int32_t *value)
 {
     for (uint32_t i = 0; i < of->s.constant_count; i ++) {
         if (strcmp(of->s.constants[i].name, name)) continue;
@@ -131,7 +131,7 @@ static int seed_one(bridge *b, module *m, uint8_t *row, const schema_field *fiel
 /* 0, or `why` says which setting or which name was refused. */
 int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why, size_t len)
 {
-    component *c = nullptr;
+    declared_type *c = nullptr;
     const schema_field *fields = nullptr;
     uint32_t field_count, k;
     uint32_t i, text_total = 0, text_used = 0;
@@ -212,7 +212,7 @@ int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why
         }
     }
 
-    e = rows_row(b->rows, c->type, row, c->size);
+    e = storage_row(b->storage, c->type, row, c->size);
     free(row);
     if (!e) {
         snprintf(why, len, "the row its settings go on does not fit under [budget] entities of %u",

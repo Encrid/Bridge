@@ -57,7 +57,7 @@ int bridge_destroy(bridge *b)
         module_discard(b, m);
     }
     free(b->systems);
-    store_destroy(b);
+    block_destroy(b);
     pool_destroy(b->pool);
     for (i = 0; i < b->order_count; i ++) {
         free(b->before[i]);
@@ -179,7 +179,7 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
     }
     b->pool = pool_create(cfg->threads - 1);
 
-    if (store_create(b, &cfg->budget)) goto refuse;
+    if (block_create(b, &cfg->budget)) goto refuse;
     return b;
 
 refuse:
@@ -252,7 +252,7 @@ int bridge_phase(bridge *b, const char *name)
     }
 
     schedule_run(b, phase);
-    store_barrier(b);
+    block_barrier(b);
     return 0;
 }
 

@@ -109,7 +109,7 @@ static uint64_t barrier(bridge *b, const char *phase)
     for (i = 0; i < PHASES && strcmp(phases[i], phase); i ++) { }
     schedule_run(b, i);
     t = os_now();
-    store_barrier(b);
+    block_barrier(b);
     return os_now() - t;
 }
 
@@ -118,8 +118,8 @@ static uint64_t barrier(bridge *b, const char *phase)
 static void strip(bridge *b, const char *name)
 {
     printf("strip %s\n", name);
-    for (uint32_t i = 0; i < b->component_count; i ++) {
-        if (!strcmp(b->components[i]->name, name)) rows_drop(b->rows, b->components[i]->type, BRIDGE_STRIP);
+    for (uint32_t i = 0; i < b->type_count; i ++) {
+        if (!strcmp(b->types[i]->name, name)) storage_drop(b->storage, b->types[i]->type, BRIDGE_STRIP);
     }
     /* a barrier, for what was heard and for what a module reads */
     run(b, "never");
@@ -134,7 +134,7 @@ static uint64_t ran(bridge *b, const char *phase)
     t = os_now();
     schedule_run(b, i);
     t = os_now() - t;
-    store_barrier(b);
+    block_barrier(b);
     return t;
 }
 

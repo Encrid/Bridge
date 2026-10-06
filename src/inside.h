@@ -1,4 +1,4 @@
-/* Bridge-ASM700's inside: what bridge.c, store.c and abi.c share. Nothing here crosses a seam. */
+/* Bridge-ASM700's inside: what bridge.c, block.c and abi.c share. Nothing here crosses a seam. */
 #ifndef BRIDGE_INSIDE_H
 #define BRIDGE_INSIDE_H
 
@@ -6,7 +6,7 @@
 #include "bridge-abi.h"
 #include "backend.h"
 #include "os.h"
-#include "rows.h"
+#include "storage.h"
 #include "schema.h"
 
 constexpr uint32_t PAGE = 65'536;
@@ -24,17 +24,17 @@ typedef struct {
 } open_backend;
 
 /* A component, by its namespaced name. Storage holds the rows; this is what load checks. */
-typedef struct component component;
-struct component {
+typedef struct declared_type declared_type;
+struct declared_type {
     char        *name;
-    rows_type   *type;              /* as storage knows it: a size */
+    storage_type   *type;              /* as storage knows it: a size */
     schema       s;                 /* its fields or its constants, read from its text */
     enum bridge_kind kind;
     uint32_t     size, align;
     uint64_t     fingerprint;       /* of the descriptor string - schema.md, *Fingerprints* */
     uint32_t     declarers;         /* how many loaded modules declared it */
     uint32_t     users;             /* how many components name it as a field's type */
-    component  **deps;              /* the declared types its own fields name */
+    declared_type  **deps;              /* the declared types its own fields name */
     uint32_t     dep_count;
     void        *zero;              /* `size` zero bytes: what an attach with no value copies */
 };
@@ -49,7 +49,7 @@ typedef struct {
     char         *name;
     char         *full;             /* how [order] names it: the module's stem, then the name */
     uint32_t      phase;
-    rows_terms   *matched;          /* its terms, as storage holds them. nullptr with no terms */
+    storage_terms   *matched;          /* its terms, as storage holds them. nullptr with no terms */
     uint32_t      terms;
     backend_func *fn;
     uint32_t      level;            /* within its phase: a level runs before the next */
@@ -64,7 +64,7 @@ typedef struct {
     char          why[256];
     /* what the conflict graph reads of each term: the component, or nullptr where the term reads
      * nothing, and whether it is written. `terms` of them */
-    struct { component *touches; bool writes; } term[];
+    struct { declared_type *touches; bool writes; } term[];
 } bridge_system;
 
 struct module {
@@ -88,7 +88,7 @@ struct module {
     bool      published, had_triggers;
     uint32_t  spans_end;
 
-    component    **declared;        /* by slot */
+    declared_type    **declared;        /* by slot */
     enum bridge_on_unload *policy;  /* by slot: what it stated */
     uint32_t       declared_count;
     bridge_system **systems;        /* by slot */
@@ -129,7 +129,7 @@ struct module {
      * at this barrier, for want of a table and for want of columns */
     uint32_t left[2];
     /* config.md: the component its settings seeded, the row, and where their text is */
-    component   *config;
+    declared_type   *config;
     uint64_t     config_entity;
     uint32_t     text_at, text_room;
     int   in_init, stopped;
@@ -142,7 +142,7 @@ struct module {
 enum change_op : uint32_t { CHANGE_DESTROY = 1, CHANGE_ATTACH = 2, CHANGE_DETACH = 3 };
 typedef struct {
     uint64_t     id;
-    component   *c;
+    declared_type   *c;
     uint32_t     size;
     enum change_op op;
 } change;
@@ -188,10 +188,10 @@ struct bridge {
     uint32_t       max_types, max_systems;      /* [budget] types, [budget] systems */
     uint32_t       max_terms;                   /* [budget] terms */
 
-    rows          *rows;            /* who keeps the rows: rows.h */
+    storage          *storage;            /* who keeps the rows: storage.h */
 
-    component    **components;
-    uint32_t       component_count;
+    declared_type    **types;
+    uint32_t       type_count;
     kept_text     *kept;            /* where an unloaded module's settings text was */
     uint32_t       kept_count;
     bridge_system **systems;        /* every module's, in registration order */
@@ -231,14 +231,14 @@ void  pool_destroy(pool *p);
 /* fn(jobs[i]) for every i, on the workers and the caller; a job marked is the caller's alone */
 void  pool_run(pool *p, pool_fn fn, void **jobs, const uint8_t *caller_only, uint32_t count);
 
-/* store.c */
-[[nodiscard]] int store_create(bridge *b, const bridge_budget *budget);    /* 0, or a record was emitted */
-void     store_destroy(bridge *b);
-int      store_refill(bridge *b, module *m);                      /* 1 if the ceiling cut its ids short */
-void     store_drain(bridge *b, module *m);                       /* its log ring, to the sink */
-void     store_barrier(bridge *b);
-void     store_header(bridge *b, module *m);                      /* what a module reads at offset 0 */
-uint32_t store_offset(bridge *b, const void *p);                  /* into the shared memory, 0 for null */
+/* block.c */
+[[nodiscard]] int block_create(bridge *b, const bridge_budget *budget);    /* 0, or a record was emitted */
+void     block_destroy(bridge *b);
+int      block_refill(bridge *b, module *m);                      /* 1 if the ceiling cut its ids short */
+void     block_drain(bridge *b, module *m);                       /* its log ring, to the sink */
+void     block_barrier(bridge *b);
+void     block_header(bridge *b, module *m);                      /* what a module reads at offset 0 */
+uint32_t block_offset(bridge *b, const void *p);                  /* into the shared memory, 0 for null */
 /* a piece of a region: 0 if it has none that long; and a piece given back */
 [[nodiscard]] int region_take(region *r, uint32_t len, uint32_t *at);
 void     region_give(region *r, uint32_t at, uint32_t len);
@@ -249,8 +249,8 @@ uint32_t region_most(const region *r);          /* the longest piece it could gi
 /* the column region, carved: what storage asks for is what it gets, to sixteen bytes.
  * `new_size` bytes holding what the `old_size` at `ptr` held, or fresh if `ptr` is null. Null,
  * and nothing changed, if the region cannot give them: nothing comes from outside it */
-[[nodiscard]] void *store_column_regrow(bridge *b, void *ptr, uint32_t old_size, uint32_t new_size);
-void     store_column_free(bridge *b, void *ptr, uint32_t size);
+[[nodiscard]] void *block_column_regrow(bridge *b, void *ptr, uint32_t old_size, uint32_t new_size);
+void     block_column_free(bridge *b, void *ptr, uint32_t size);
 
 /* abi.c */
 [[nodiscard]] int abi_define(module *m, backend_err *err);                      /* the eight imports */

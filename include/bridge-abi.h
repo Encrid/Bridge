@@ -64,8 +64,8 @@ typedef struct {
     uint32_t ring_head;                 /* records ever written, by the module */
     uint32_t ring_tail;                 /* records ever drained, by Bridge-ASM700 */
     uint32_t queries;                   /* bridge_query, one per slot `system` answered */
-    uint32_t column_base;               /* u32 [tables][terms] of shared-memory offsets */
-    uint32_t terms, tables;
+    uint32_t column_base;               /* u32 [tables][types] of shared-memory offsets */
+    uint32_t types, tables;             /* how many types this module declared, and tables */
     uint32_t entity_index;              /* in the shared memory: bridge_entity [entities] */
     uint32_t entities;
     uint32_t when;                      /* set before every dispatch */
@@ -79,7 +79,7 @@ static_assert(offsetof(bridge_header, scratch_len) == 8 && offsetof(bridge_heade
 static_assert(offsetof(bridge_header, ring) == 16 && offsetof(bridge_header, ring_len) == 20);
 static_assert(offsetof(bridge_header, ring_head) == 24 && offsetof(bridge_header, ring_tail) == 28);
 static_assert(offsetof(bridge_header, queries) == 32 && offsetof(bridge_header, column_base) == 36);
-static_assert(offsetof(bridge_header, terms) == 40 && offsetof(bridge_header, tables) == 44);
+static_assert(offsetof(bridge_header, types) == 40 && offsetof(bridge_header, tables) == 44);
 static_assert(offsetof(bridge_header, entity_index) == 48 && offsetof(bridge_header, entities) == 52);
 static_assert(offsetof(bridge_header, when) == 56 && offsetof(bridge_header, system) == 60);
 static_assert(offsetof(bridge_header, log_level) == 64 && offsetof(bridge_header, observers) == 68);

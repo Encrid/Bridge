@@ -1,4 +1,4 @@
-/* rows.h, kept by Bridge-ASM700 itself. docs/plan/PHASE10.md.
+/* storage.h, kept by Bridge-ASM700 itself. docs/plan/PHASE10.md.
  *
  * It is made for what the bridge promises and a general store cannot assume: rows are touched
  * only at a barrier, by one thread, with every change of that barrier already queued; systems
@@ -28,12 +28,12 @@ enum folded : uint8_t {
     TOUCHED = 1, DESTROYED = 2, DROPPED = 4
 };
 
-struct rows_type {
+struct storage_type {
     uint32_t id;                    /* its bit in a set, and its column in the layout */
     uint32_t size;
 };
 
-struct rows_terms {
+struct storage_terms {
     uint32_t          count;
     uint32_t         *type;         /* [budget] terms of each, of which `count` are its own */
     enum bridge_oper *oper;
@@ -44,7 +44,7 @@ struct rows_terms {
     bool              used;         /* of the [budget] systems there are, this one is taken */
     /* an observer's */
     enum bridge_event events;
-    rows_heard        heard;
+    storage_heard        heard;
     void             *ctx;
 };
 
@@ -60,7 +60,7 @@ typedef struct {
                                      * unload leaves behind*, for when one is not */
 } table;
 
-struct rows {
+struct storage {
     bridge    *b;
     /* entities: where each is. Never the copy in the block */
     place     *places;
@@ -79,13 +79,13 @@ struct rows {
     uint32_t  *dirty;               /* tables touched since what modules read was last written */
     uint32_t   dirty_count;
     /* types and terms: [budget] types and [budget] systems of them, and no more */
-    rows_type **types;              /* by id: nullptr where none is declared */
-    rows_type  *type_pool;
-    rows_terms *terms_pool;
+    storage_type **types;              /* by id: nullptr where none is declared */
+    storage_type  *type_pool;
+    storage_terms *terms_pool;
     uint32_t   *lists;              /* every system's `list` and `pos`, one after another */
     uint32_t   *term_types;         /* and every one's terms */
     enum bridge_oper *term_opers;
-    rows_terms **systems, **observers;
+    storage_terms **systems, **observers;
     uint32_t   system_count, observer_count;
     /* the fold */
     uint64_t  *work;                /* [entity][words]: what a changed entity is becoming */
@@ -105,16 +105,16 @@ static bool has(const uint64_t *set, uint32_t type) { return set[type >> 6] >> (
 static void put(uint64_t *set, uint32_t type) { set[type >> 6] |= (uint64_t)1 << (type & 63); }
 static void take(uint64_t *set, uint32_t type) { set[type >> 6] &= ~((uint64_t)1 << (type & 63)); }
 
-static const uint64_t *set_of(const rows *r, uint32_t t) { return r->sets + (size_t)t * r->words; }
-static uint32_t *columns_of(const rows *r, uint32_t t) { return r->columns + (size_t)t * r->type_room; }
+static const uint64_t *set_of(const storage *r, uint32_t t) { return r->sets + (size_t)t * r->words; }
+static uint32_t *columns_of(const storage *r, uint32_t t) { return r->columns + (size_t)t * r->type_room; }
 
-static bool empty(const rows *r, const uint64_t *set)
+static bool empty(const storage *r, const uint64_t *set)
 {
     for (uint32_t w = 0; w < r->words; w ++) if (set[w]) return false;
     return true;
 }
 
-static uint32_t hashed(const rows *r, const uint64_t *set)
+static uint32_t hashed(const storage *r, const uint64_t *set)
 {
     uint64_t h = 1'469'598'103'934'665'603ull;
     for (uint32_t w = 0; w < r->words; w ++) h = (h ^ set[w]) * 1'099'511'628'211ull;
@@ -125,7 +125,7 @@ static uint32_t hashed(const rows *r, const uint64_t *set)
 
 static uint64_t padded(uint64_t bytes) { return (bytes + 7u) & ~7ull; }
 
-static uint64_t laid_out(const rows *r, const uint64_t *set, uint32_t room)
+static uint64_t laid_out(const storage *r, const uint64_t *set, uint32_t room)
 {
     uint64_t len = 8ull * room;
     for (uint32_t w = 0; w < r->words; w ++) {
@@ -136,21 +136,21 @@ static uint64_t laid_out(const rows *r, const uint64_t *set, uint32_t room)
     return len;
 }
 
-static void touch(rows *r, uint32_t t)
+static void touch(storage *r, uint32_t t)
 {
     if (r->tables[t].touched) return;
     r->tables[t].touched = true;
     r->dirty[r->dirty_count ++] = t;
 }
 
-static uint64_t *who_of(const rows *r, const table *tab)
+static uint64_t *who_of(const storage *r, const table *tab)
 {
     return r->who + (tab->block - r->b->columns) / 8;
 }
 
 /* room for `room` rows, where they are and in the layout that goes with it. false if the
  * column region cannot give it, and then nothing has changed. */
-static bool grow(rows *r, uint32_t t, uint32_t room)
+static bool grow(storage *r, uint32_t t, uint32_t room)
 {
     table *tab = &r->tables[t];
     bridge *b = r->b;
@@ -167,7 +167,7 @@ static bool grow(rows *r, uint32_t t, uint32_t room)
     for (;; room = asked) {
         len = laid_out(r, set, room);
         block = len > INT32_MAX ? nullptr
-              : store_column_regrow(b, was ? b->shared + was : nullptr, tab->block_len, (uint32_t)len);
+              : block_column_regrow(b, was ? b->shared + was : nullptr, tab->block_len, (uint32_t)len);
         if (block) break;
         if (room == asked) return false;
     }
@@ -183,7 +183,7 @@ static bool grow(rows *r, uint32_t t, uint32_t room)
     for (uint32_t w = r->words; w --;) {
         for (uint64_t bits = set[w]; bits;) {
             uint32_t id = w * 64 + 63 - (uint32_t)__builtin_clzll(bits);
-            const rows_type *type = r->types[id];
+            const storage_type *type = r->types[id];
             bits &= ~((uint64_t)1 << (id & 63));
             to -= padded((uint64_t)type->size * room);
             if (was) memmove(block + to, block + (columns[id] - was), (size_t)type->size * tab->rows);
@@ -196,7 +196,7 @@ static bool grow(rows *r, uint32_t t, uint32_t room)
 
 /* ---- tables, by their set ---- */
 
-static uint32_t table_of(const rows *r, const uint64_t *set)
+static uint32_t table_of(const storage *r, const uint64_t *set)
 {
     uint32_t i = hashed(r, set);
     while (r->hash[i]) {
@@ -206,7 +206,7 @@ static uint32_t table_of(const rows *r, const uint64_t *set)
     return 0;
 }
 
-static bool matches(const rows_terms *t, const uint64_t *set)
+static bool matches(const storage_terms *t, const uint64_t *set)
 {
     for (uint32_t i = 0; i < t->count; i ++) {
         if (t->oper[i] == BRIDGE_AND && !has(set, t->type[i])) return false;
@@ -217,7 +217,7 @@ static bool matches(const rows_terms *t, const uint64_t *set)
 
 /* The table a set is found as, and no longer. What followed it in its run of the hash is put
  * back where it is still found. */
-static void named(rows *r, uint32_t t)
+static void named(storage *r, uint32_t t)
 {
     uint32_t i;
     for (i = hashed(r, set_of(r, t)); r->hash[i]; i = (i + 1) & (r->hash_room - 1)) {}
@@ -225,7 +225,7 @@ static void named(rows *r, uint32_t t)
     r->tables[t].named = true;
 }
 
-static void unnamed(rows *r, uint32_t t)
+static void unnamed(storage *r, uint32_t t)
 {
     uint32_t i = hashed(r, set_of(r, t)), k;
     while (r->hash[i] != t) i = (i + 1) & (r->hash_room - 1);
@@ -241,10 +241,10 @@ static void unnamed(rows *r, uint32_t t)
 
 /* Systems are fixed at load, so a table is matched against them when it is made, and again only
  * if its set changes: in each list it belongs in, and out of every one. */
-static void listed(rows *r, uint32_t t)
+static void listed(storage *r, uint32_t t)
 {
     for (uint32_t i = 0; i < r->system_count; i ++) {
-        rows_terms *s = r->systems[i];
+        storage_terms *s = r->systems[i];
         if (!matches(s, set_of(r, t))) continue;
         s->list[s->matched] = t;
         s->pos[t] = ++ s->matched;
@@ -252,10 +252,10 @@ static void listed(rows *r, uint32_t t)
     }
 }
 
-static void unlisted(rows *r, uint32_t t)
+static void unlisted(storage *r, uint32_t t)
 {
     for (uint32_t i = 0; i < r->system_count; i ++) {
-        rows_terms *s = r->systems[i];
+        storage_terms *s = r->systems[i];
         uint32_t at = s->pos[t];
         if (!at) continue;
         s->list[at - 1] = s->list[-- s->matched];
@@ -266,7 +266,7 @@ static void unlisted(rows *r, uint32_t t)
 }
 
 /* the table of this set, made if there is none. 0 if there is no room for another. */
-static uint32_t table_for(rows *r, const uint64_t *set)
+static uint32_t table_for(storage *r, const uint64_t *set)
 {
     uint32_t t = table_of(r, set);
     if (t) return t;
@@ -289,10 +289,10 @@ static uint32_t table_for(rows *r, const uint64_t *set)
 }
 
 /* its last row has left: its block, its id and its place in every system's list are given back */
-static void table_gone(rows *r, uint32_t t)
+static void table_gone(storage *r, uint32_t t)
 {
     table *tab = &r->tables[t];
-    if (tab->block) store_column_free(r->b, r->b->shared + tab->block, tab->block_len);
+    if (tab->block) block_column_free(r->b, r->b->shared + tab->block, tab->block_len);
     if (tab->named) unnamed(r, t);
     unlisted(r, t);
     memset(columns_of(r, t), 0, 4u * r->type_room);
@@ -306,7 +306,7 @@ static void table_gone(rows *r, uint32_t t)
 /* A table stops carrying `type`, where it stands: the column goes, the ones after it close up,
  * and what the block no longer needs is given back. No row moves and nothing is asked of the
  * column region, so this cannot fail. `name` if no other table is found as what is left. */
-static void stripped(rows *r, uint32_t t, const rows_type *type, bool name)
+static void stripped(storage *r, uint32_t t, const storage_type *type, bool name)
 {
     table *tab = &r->tables[t];
     bridge *b = r->b;
@@ -318,7 +318,7 @@ static void stripped(rows *r, uint32_t t, const rows_type *type, bool name)
     unlisted(r, t);
     for (uint32_t w = type->id >> 6; w < r->words; w ++) {
         for (uint64_t bits = set[w]; bits; bits &= bits - 1) {
-            const rows_type *after = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
+            const storage_type *after = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
             if (after->id <= type->id) continue;
             memmove(b->shared + columns[after->id] - gone, b->shared + columns[after->id],
                 (size_t)after->size * tab->rows);
@@ -328,7 +328,7 @@ static void stripped(rows *r, uint32_t t, const rows_type *type, bool name)
     columns[type->id] = 0;
     take(set, type->id);
     /* the same block, shorter: what a smaller size is answered with is where it already is */
-    if (store_column_regrow(b, b->shared + tab->block, tab->block_len, tab->block_len - gone)
+    if (block_column_regrow(b, b->shared + tab->block, tab->block_len, tab->block_len - gone)
         != b->shared + tab->block) unreachable();
     tab->block_len -= gone;
     if (name) named(r, t);
@@ -338,7 +338,7 @@ static void stripped(rows *r, uint32_t t, const rows_type *type, bool name)
 
 /* ---- rows ---- */
 
-static void placed(rows *r, uint32_t index, uint32_t t, uint32_t row)
+static void placed(storage *r, uint32_t index, uint32_t t, uint32_t row)
 {
     place *p = &r->places[index];
     p->table = t;
@@ -347,7 +347,7 @@ static void placed(rows *r, uint32_t index, uint32_t t, uint32_t row)
 }
 
 /* a row at the end of `t`, which has room for it, for the entity at `index` */
-static uint32_t appended(rows *r, uint32_t t, uint32_t index)
+static uint32_t appended(storage *r, uint32_t t, uint32_t index)
 {
     table *tab = &r->tables[t];
     uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
@@ -359,7 +359,7 @@ static uint32_t appended(rows *r, uint32_t t, uint32_t index)
 }
 
 /* a row leaves `t`: the last one is moved into its place, and the entity that was in it is told */
-static void removed(rows *r, uint32_t t, uint32_t row)
+static void removed(storage *r, uint32_t t, uint32_t row)
 {
     table *tab = &r->tables[t];
     uint32_t last = -- tab->rows, *columns = columns_of(r, t);
@@ -367,7 +367,7 @@ static void removed(rows *r, uint32_t t, uint32_t row)
     if (row == last) return;
     for (uint32_t w = 0; w < r->words; w ++) {
         for (uint64_t bits = set_of(r, t)[w]; bits; bits &= bits - 1) {
-            const rows_type *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
+            const storage_type *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
             uint8_t *column = r->b->shared + columns[type->id];
             memcpy(column + (size_t)row * type->size, column + (size_t)last * type->size, type->size);
         }
@@ -379,7 +379,7 @@ static void removed(rows *r, uint32_t t, uint32_t row)
 
 /* the entity at `index` goes to `to`, which has room: what it carried that `to` also holds
  * goes with it, and what `to` holds that it did not is zero */
-static void moved(rows *r, uint32_t index, uint32_t to)
+static void moved(storage *r, uint32_t index, uint32_t to)
 {
     place *p = &r->places[index];
     uint32_t from = p->table, row = p->row, at = 0;
@@ -389,7 +389,7 @@ static void moved(rows *r, uint32_t index, uint32_t to)
         at = appended(r, to, index);
         for (uint32_t w = 0; w < r->words; w ++) {
             for (uint64_t bits = set_of(r, to)[w]; bits; bits &= bits - 1) {
-                const rows_type *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
+                const storage_type *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
                 uint8_t *cell = r->b->shared + into[type->id] + (size_t)at * type->size;
                 if (out && out[type->id]) {
                     memcpy(cell, r->b->shared + out[type->id] + (size_t)row * type->size, type->size);
@@ -403,7 +403,7 @@ static void moved(rows *r, uint32_t index, uint32_t to)
     placed(r, index, to, at);
 }
 
-static bool alive(const rows *r, uint64_t id)
+static bool alive(const storage *r, uint64_t id)
 {
     uint32_t index = (uint32_t)id;
     return index && index < r->high && r->places[index].table != DEAD
@@ -411,7 +411,7 @@ static bool alive(const rows *r, uint64_t id)
 }
 
 /* gone: its row, and its index, which comes back under another generation */
-static void killed(rows *r, uint32_t index)
+static void killed(storage *r, uint32_t index)
 {
     place *p = &r->places[index];
     if (p->table) removed(r, p->table, p->row);
@@ -426,11 +426,11 @@ static void killed(rows *r, uint32_t index)
 
 /* data.md, *Observers*. `before` and `after` are null for an entity that carried nothing, or is
  * gone; `attached` is what an attach wrote a value of, and is still carried. */
-static void told(const rows *r, uint64_t id, const uint64_t *before, const uint64_t *after,
+static void told(const storage *r, uint64_t id, const uint64_t *before, const uint64_t *after,
                  const uint64_t *attached)
 {
     for (uint32_t i = 0; i < r->observer_count; i ++) {
-        const rows_terms *o = r->observers[i];
+        const storage_terms *o = r->observers[i];
         /* an entity that carries nothing is in no table, and matches nothing */
         bool was = before && !empty(r, before) && matches(o, before);
         bool is = after && !empty(r, after) && matches(o, after), set = false;
@@ -447,10 +447,10 @@ static void told(const rows *r, uint64_t id, const uint64_t *before, const uint6
 
 /* ---- at a barrier ---- */
 
-static uint64_t *work_of(const rows *r, uint32_t index) { return r->work + (size_t)index * r->words; }
-static uint64_t *attached_of(const rows *r, uint32_t index) { return r->attached + (size_t)index * r->words; }
+static uint64_t *work_of(const storage *r, uint32_t index) { return r->work + (size_t)index * r->words; }
+static uint64_t *attached_of(const storage *r, uint32_t index) { return r->attached + (size_t)index * r->words; }
 
-static void start_from(rows *r, uint32_t index)
+static void start_from(storage *r, uint32_t index)
 {
     uint32_t t = r->places[index].table;
     if (t) memcpy(work_of(r, index), set_of(r, t), 8u * r->words);
@@ -459,13 +459,13 @@ static void start_from(rows *r, uint32_t index)
 
 /* budgets.md, *What running out does*: the entity is left as it was, and it is a failure of
  * the module that asked the last change of it, toward that module's own budget */
-static void dropped(rows *r, uint32_t index, bool for_columns)
+static void dropped(storage *r, uint32_t index, bool for_columns)
 {
     r->folded[index] |= DROPPED;
     r->asker[index]->left[for_columns] ++;
 }
 
-void rows_apply(rows *r)
+void storage_apply(storage *r)
 {
     bridge *b = r->b;
     module *m;
@@ -597,7 +597,7 @@ void rows_apply(rows *r)
     }
 }
 
-uint32_t rows_reserve(rows *r, uint64_t *ids, uint32_t want)
+uint32_t storage_reserve(storage *r, uint64_t *ids, uint32_t want)
 {
     uint32_t count = 0;
     while (count < want) {
@@ -613,13 +613,13 @@ uint32_t rows_reserve(rows *r, uint64_t *ids, uint32_t want)
     return count;
 }
 
-uint32_t rows_tables(rows *r)
+uint32_t storage_tables(storage *r)
 {
     return r->table_room + 1;
 }
 
 /* one span: how many rows, where their ids are, and a base for each term */
-static void span(const rows *r, const rows_terms *s, uint32_t t, uint8_t *at)
+static void span(const storage *r, const storage_terms *s, uint32_t t, uint8_t *at)
 {
     const table *tab = &r->tables[t];
     const uint32_t *columns = columns_of(r, t);
@@ -633,7 +633,7 @@ static void span(const rows *r, const rows_terms *s, uint32_t t, uint8_t *at)
     }
 }
 
-int rows_publish(rows *r, module *m)
+int storage_publish(storage *r, module *m)
 {
     bridge *b = r->b;
     auto h = (bridge_header *)m->priv;
@@ -648,7 +648,7 @@ int rows_publish(rows *r, module *m)
 
     /* column_base: every table when a declaration changed, and otherwise the ones touched */
     if (all) {
-        store_header(b, m);
+        block_header(b, m);
         memset(cell, 0, 4u * m->declared_count * tables);
         for (uint32_t t = 1; t < r->table_high; t ++) {
             if (!r->tables[t].live) continue;
@@ -672,7 +672,7 @@ int rows_publish(rows *r, module *m)
     }
     if (again) {
         for (q = 0; q < m->system_count; q ++) {
-            rows_terms *s = m->systems[q]->matched;
+            storage_terms *s = m->systems[q]->matched;
             auto slot = (bridge_query *)(m->priv + m->spans) + q;
             slot->spans = 0;
             slot->at = (uint32_t)at;
@@ -690,7 +690,7 @@ int rows_publish(rows *r, module *m)
         m->spans_end = (uint32_t)at;
     } else {
         for (q = 0; q < m->system_count; q ++) {
-            const rows_terms *s = m->systems[q]->matched;
+            const storage_terms *s = m->systems[q]->matched;
             auto slot = (const bridge_query *)(m->priv + m->spans) + q;
             if (!s) continue;
             for (i = 0; i < r->dirty_count; i ++) {
@@ -723,7 +723,7 @@ int rows_publish(rows *r, module *m)
 }
 
 /* Once every module has been written for: what was touched is touched no longer. */
-void rows_written(rows *r)
+void storage_written(storage *r)
 {
     for (uint32_t i = 0; i < r->dirty_count; i ++) r->tables[r->dirty[i]].touched = false;
     r->dirty_count = 0;
@@ -731,27 +731,27 @@ void rows_written(rows *r)
 
 /* ---- at load: a type, and terms ---- */
 
-rows_type *rows_declare(rows *r, uint32_t size)
+storage_type *storage_declare(storage *r, uint32_t size)
 {
     uint32_t id;
     for (id = 0; r->types[id]; id ++) {}        /* its declarer counted: there is one */
     r->types[id] = &r->type_pool[id];
-    *r->types[id] = (rows_type){ id, size };
+    *r->types[id] = (storage_type){ id, size };
     return r->types[id];
 }
 
-void rows_undeclare(rows *r, rows_type *type)
+void storage_undeclare(storage *r, storage_type *type)
 {
     r->types[type->id] = nullptr;
 }
 
-static rows_terms *terms_of(rows *r, const rows_term *terms, uint32_t count)
+static storage_terms *terms_of(storage *r, const storage_term *terms, uint32_t count)
 {
-    rows_terms *t;
+    storage_terms *t;
     uint32_t k;
     for (k = 0; r->terms_pool[k].used; k ++) {}     /* whoever registers counted: there is one */
     t = &r->terms_pool[k];
-    *t = (rows_terms){ .count = count, .used = true };
+    *t = (storage_terms){ .count = count, .used = true };
     t->type = r->term_types + (size_t)k * r->b->max_terms;
     t->oper = r->term_opers + (size_t)k * r->b->max_terms;
     t->list = r->lists + (size_t)k * 2 * (r->table_room + 2);
@@ -764,9 +764,9 @@ static rows_terms *terms_of(rows *r, const rows_term *terms, uint32_t count)
     return t;
 }
 
-rows_terms *rows_system(rows *r, const rows_term *terms, uint32_t count)
+storage_terms *storage_system(storage *r, const storage_term *terms, uint32_t count)
 {
-    rows_terms *s = terms_of(r, terms, count);
+    storage_terms *s = terms_of(r, terms, count);
     for (uint32_t t = 1; t < r->table_high; t ++) {
         if (!r->tables[t].live || !matches(s, set_of(r, t))) continue;
         s->list[s->matched] = t;
@@ -777,10 +777,10 @@ rows_terms *rows_system(rows *r, const rows_term *terms, uint32_t count)
     return s;
 }
 
-rows_terms *rows_observer(rows *r, const rows_term *terms, uint32_t count,
-                          enum bridge_event events, rows_heard heard, void *ctx)
+storage_terms *storage_observer(storage *r, const storage_term *terms, uint32_t count,
+                          enum bridge_event events, storage_heard heard, void *ctx)
 {
-    rows_terms *o = terms_of(r, terms, count);
+    storage_terms *o = terms_of(r, terms, count);
     o->events = events;
     o->heard = heard;
     o->ctx = ctx;
@@ -788,7 +788,7 @@ rows_terms *rows_observer(rows *r, const rows_term *terms, uint32_t count,
     return o;
 }
 
-void rows_forget(rows *r, rows_terms *terms)
+void storage_forget(storage *r, storage_terms *terms)
 {
     uint32_t i;
     for (i = 0; i < r->system_count && r->systems[i] != terms; i ++) {}
@@ -806,7 +806,7 @@ void rows_forget(rows *r, rows_terms *terms)
 
 /* the entity at `index` comes to carry `set`, told to whoever observes it. false, with a
  * record, if there is no table or no room for it: it is then as it was. */
-static bool became(rows *r, uint32_t index, const uint64_t *set)
+static bool became(storage *r, uint32_t index, const uint64_t *set)
 {
     uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
     uint32_t from = r->places[index].table, t = 0;
@@ -828,7 +828,7 @@ static bool became(rows *r, uint32_t index, const uint64_t *set)
     return true;
 }
 
-static void destroyed(rows *r, uint32_t index)
+static void destroyed(storage *r, uint32_t index)
 {
     uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
     uint32_t from = r->places[index].table;
@@ -838,7 +838,7 @@ static void destroyed(rows *r, uint32_t index)
 }
 
 /* lifetime.md, *What unload leaves behind*. A table at a time. */
-void rows_drop(rows *r, rows_type *type, enum bridge_on_unload policy)
+void storage_drop(storage *r, storage_type *type, enum bridge_on_unload policy)
 {
     uint64_t *set = r->scratch;
     for (uint32_t t = 1; t < r->table_high; t ++) {
@@ -870,16 +870,16 @@ void rows_drop(rows *r, rows_type *type, enum bridge_on_unload policy)
     }
 }
 
-void rows_release(rows *r, const uint64_t *ids, uint32_t count)
+void storage_release(storage *r, const uint64_t *ids, uint32_t count)
 {
     for (uint32_t i = 0; i < count; i ++) if (alive(r, ids[i])) destroyed(r, (uint32_t)ids[i]);
 }
 
-uint64_t rows_row(rows *r, rows_type *type, const void *bytes, uint32_t size)
+uint64_t storage_row(storage *r, storage_type *type, const void *bytes, uint32_t size)
 {
     uint64_t id, *set = r->scratch;
     uint32_t index;
-    if (!rows_reserve(r, &id, 1)) return 0;
+    if (!storage_reserve(r, &id, 1)) return 0;
     index = (uint32_t)id;
     memset(set, 0, 8u * r->words);
     put(set, type->id);
@@ -892,12 +892,12 @@ uint64_t rows_row(rows *r, rows_type *type, const void *bytes, uint32_t size)
     return id;
 }
 
-bool rows_alive(rows *r, uint64_t id)
+bool storage_alive(storage *r, uint64_t id)
 {
     return alive(r, id);
 }
 
-bool rows_any(rows *r, rows_type *type, bool (*is)(void *ctx, const uint8_t *row), void *ctx)
+bool storage_any(storage *r, storage_type *type, bool (*is)(void *ctx, const uint8_t *row), void *ctx)
 {
     for (uint32_t t = 1; t < r->table_high; t ++) {
         const uint8_t *column;
@@ -912,9 +912,9 @@ bool rows_any(rows *r, rows_type *type, bool (*is)(void *ctx, const uint8_t *row
 
 /* ---- create and destroy ---- */
 
-rows *rows_create(bridge *b)
+storage *storage_create(bridge *b)
 {
-    rows *r = calloc(1, sizeof *r);
+    storage *r = calloc(1, sizeof *r);
     size_t tables = (size_t)b->tables + 1;
     r->b = b;
     r->table_room = b->tables;
@@ -953,13 +953,13 @@ rows *rows_create(bridge *b)
     if (!r->who) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: the system would not "
             "give storage %u bytes of its own for the columns it keeps", b->columns_len);
-        rows_destroy(r);
+        storage_destroy(r);
         return nullptr;
     }
     return r;
 }
 
-void rows_destroy(rows *r)
+void storage_destroy(storage *r)
 {
     if (r->who) os_release(r->who, r->b->columns_len);
     free(r->types);

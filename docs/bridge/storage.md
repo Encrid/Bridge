@@ -3,7 +3,7 @@
 Who keeps the rows, and how. The model a module sees is `data.md`; what it reads is `query.md` and
 `reference.md`; which block each thing is in is `memory.md`.
 
-Storage is Bridge-ASM700's own: `src/rows.c`, behind the one internal header `src/rows.h`. Until
+Storage is Bridge-ASM700's own: `src/storage.c`, behind the one internal header `src/storage.h`. Until
 phase 10 it was flecs, patched. Why that changed, and the figures it changed on, are `PHASE10.md`;
 what flecs was while it was carried is kept as `flecs.md`, a record and no longer a description.
 
@@ -150,7 +150,7 @@ library that checks a load - `schema.md`, *There is no schema format*.
 
 ## What is asked of it
 
-`src/rows.h` is the whole of it, and each entry is named for the request, as the backend seam's
+`src/storage.h` is the whole of it, and each entry is named for the request, as the backend seam's
 are: declare a type from its text, hand over a system's terms or an observer's, apply every queue,
 set ids aside, write what a module reads, drop a component by its policy. Nothing there says how.
 

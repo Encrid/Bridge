@@ -76,7 +76,7 @@ static void by_reference()
             continue;
         }
         for (uint32_t k = 0; k < KINDS; k ++) {
-            uint32_t base = column_base[record->table * h->terms + kinds[k]];
+            uint32_t base = column_base[record->table * h->types + kinds[k]];
             if (!base != !(has[slot] >> k & 1)) wrong ++;
             else if (base) {
                 wrong += ((const V *)(api->shared_base + base))[record->row].v != values[slot][k];
