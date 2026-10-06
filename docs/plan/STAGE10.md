@@ -526,12 +526,19 @@ at least five things, none defined, and none of them the one that was meant.
     closed  a reload counting both instances toward [budget] systems: the old instance's
             leave storage first and are put back if the reload fails, so the budget is
             the number a deployment has. `budgets.md`, *Budgets*
-    open    numbers with no reason: the grain, the doubling, the first four rows, two arguments,
-            and 65,536, a wasm page, to which the library rounds every block it makes
+    closed  numbers with no reason: the grain, the doubling, the first four rows, two arguments,
+            and 65,536, a wasm page, to which the library rounded every block it made. Each
+            below
     closed    the grain is eight, the widest alignment there is; it was sixteen for nothing
     closed    a table's first room is what was asked; it was four rows for nothing measured
     closed    a column begins at its own type's alignment; every one began at a multiple of
               eight. `storage.md`, *A table*
+    closed    a growing table asks for half as much again, measured against twice: as fast,
+              with half the idle room. `storage.md`, *A table*
+    closed    two numbers in a log record: a value and what it is set beside. `log.md`
+    closed    65,536 is the wasm backend's, stated in `memory_shape`; the shared block is a
+              whole number of every backend's granule, a private block of its own's
+    closed    the first eight bytes of the shared block hold nothing, where 65,536 did
     open    "change a layout, bump the version", before anything is released
 
 **3b. Decisions that do not hold on every need.** Found by the reading above. Where the code

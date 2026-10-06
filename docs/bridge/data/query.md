@@ -23,11 +23,11 @@ writes for a module*. A barrier at which nothing changed writes nothing.
         u32 entities   where the entity-id array for these rows begins
         u32 base[n]    one offset per term, in declared order. zero = absent here
 
-**Absent is a zero base, and nothing carries a flag.** flecs hands an iterator to an outside
-reader the same way: its JSON serialiser tells a field that is not there by a null pointer
-(`serialize_iter_result_query.c:177-186`). **Offset 0 of the shared memory is reserved** so that
-zero is never a valid base, which also makes the same sentinel sound in `reference.md`, *Reference
-following*.
+**Absent is a zero base, and nothing carries a flag.** flecs hands an iterator to an outside reader
+the same way: its JSON serialiser tells a field that is not there by a null pointer
+(`serialize_iter_result_query.c:177-186`). **Offset 0 of the shared memory is reserved** - its first
+eight bytes hold nothing - so that zero is never a valid base, which also makes the same sentinel
+sound in `reference.md`, *Reference following*.
 
 Iterating is two loops and no call, with the branch outside the row loop:
 

@@ -167,9 +167,10 @@ static bool grow(storage *r, uint32_t t, uint32_t room)
     uint8_t *block;
 
     if (room <= tab->room) return true;
-    /* twice what it had, so that a table that grows a row at a time is not moved each time;
-     * and what was asked and no more, where twice is not to be had */
-    if (room < tab->room * 2) room = tab->room * 2;
+    /* half as much again as it had, so that a table that grows a row at a time is not moved
+     * each time, and what was asked and no more where that is not to be had. Measured against
+     * twice: as fast, with half the idle room - storage.md, *A table* */
+    if (room < tab->room + tab->room / 2) room = tab->room + tab->room / 2;
     for (;; room = asked) {
         len = laid_out(r, set, room);
         block = len > INT32_MAX ? nullptr

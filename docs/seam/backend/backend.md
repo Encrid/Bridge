@@ -21,7 +21,7 @@ name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
     backend_destroy(backend)
     backend_capabilities(backend)              -> flags
 
-    memory_shape(backend)                      -> reservation, guard
+    memory_shape(backend)                      -> reservation, guard, granule
     memory_adopt(backend, ptr, len)            -> memory
     memory_release(memory)
     module_compile(backend, bytes, len, path, demands) -> module
@@ -75,11 +75,19 @@ and a wasm module as an import.
 **A backend states the shape it needs, and Bridge-ASM700 allocates to it.** An engine does not care
 who allocated a block; it cares what surrounds it. One that enforces bounds by faulting needs
 address space reserved after the block and left unmapped, so that a stray access lands on nothing.
-`memory_shape` answers the reservation and the guard a backend needs, and **a block has the shape
-of whoever maps it**. The shared block is mapped by every backend, so it has the largest of
+`memory_shape` answers the reservation and the guard a backend needs, and the granule: the number
+of bytes a block's length must be a whole number of. The wasm backend's is 65,536, a wasm page,
+since a wasm memory is a whole number of them; the native backend has none. **A block has the
+shape of whoever maps it**. The shared block is mapped by every backend, so it has the largest of
 them all. A module's private block is mapped by that module's backend and no other, so it has
 that backend's. A backend with no requirement answers zero for both, and a native module's
 private block reserves what it uses and no more. `tests/storage.c`, case `shape`.
+
+The length follows the same rule: the shared block is a whole number of every backend's
+granule, and a module's private block of its own backend's. Refused: 65,536 written into
+Bridge-ASM700, to which it rounded every block, which is what this had: one backend's number in
+the library, applied to another backend's modules, with no reason written. No condition brings
+it back.
 
 Refused: the largest shape for every block, which is what this had. The wasm backend asks for
 four gigabytes and a guard, and beside it every native module's private block reserved that

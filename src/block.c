@@ -267,7 +267,8 @@ static int beyond(bridge *b, const char *key, uint64_t value)
 
 int block_create(bridge *b, const bridge_budget *budget)
 {
-    uint64_t index = PAGE, arena, columns, len, reserve;
+    /* query.md: offset 0 is none, so nothing is there. Eight bytes keep the index aligned */
+    uint64_t index = 8, arena, columns, len, reserve;
     uint32_t i;
 
     if (unset(b, "entities", budget->entities) || unset(b, "persistent", budget->persistent)
@@ -281,9 +282,10 @@ int block_create(bridge *b, const bridge_budget *budget)
         return 1;
     }
     /* each is under 2^32 now, so none of these sums can leave 64 bits */
-    arena = (index + sizeof(bridge_entity) * budget->entities + 15u) & ~15ull;
-    columns = (arena + budget->persistent + 15u) & ~15ull;
-    len = (columns + budget->columns + PAGE - 1) & ~(uint64_t)(PAGE - 1);
+    arena = (index + sizeof(bridge_entity) * budget->entities + 7u) & ~7ull;
+    columns = (arena + budget->persistent + 7u) & ~7ull;
+    /* a whole number of what every backend that maps it needs - backend.md */
+    len = (columns + budget->columns + b->granule - 1) / b->granule * b->granule;
     /* and together they are never more than an offset can reach */
     if (len > (uint64_t)1 << 32) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: the shared memory would "

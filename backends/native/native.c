@@ -126,10 +126,12 @@ BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] bac
     return BACKEND_RELOAD | BACKEND_UNLOAD;
 }
 
-BACKEND_EXPORT void memory_shape([[maybe_unused]] backend *b, uint64_t *reservation, uint64_t *guard)
+BACKEND_EXPORT void memory_shape([[maybe_unused]] backend *b, uint64_t *reservation, uint64_t *guard,
+                                 uint64_t *granule)
 {
     *reservation = 0;
     *guard = 0;
+    *granule = 0;
 }
 
 /* almost nothing: the pointer is already addressable */

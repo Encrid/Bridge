@@ -107,9 +107,11 @@ typedef struct backend_api {
     void     (*backend_destroy)(backend *b);
     enum backend_capability (*backend_capabilities)(backend *b);
 
-    /* The address space this backend needs around a block: `reservation` bytes from its
-     * start, then `guard` bytes nothing is mapped into. Zero for both if it needs none. */
-    void            (*memory_shape)(backend *b, uint64_t *reservation, uint64_t *guard);
+    /* What this backend needs of a block it maps. The address space around it: `reservation`
+     * bytes from its start, then `guard` bytes nothing is mapped into. And its length: a
+     * whole number of `granule` bytes. Zero for any it does not need. */
+    void            (*memory_shape)(backend *b, uint64_t *reservation, uint64_t *guard,
+                                    uint64_t *granule);
     backend_memory *(*memory_adopt)(backend *b, void *ptr, uint64_t len, backend_err *err);
     /* After the last instance the memory was handed to is destroyed, never before. */
     void            (*memory_release)(backend_memory *m);

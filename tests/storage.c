@@ -221,6 +221,11 @@ int main(int argc, char **argv)
             b->shared_reserve > b->shared_len ? "yes" : "NO");
         printf("a native module's private block reserves what it uses: %s\n",
             b->modules->priv_reserve == b->modules->priv_len ? "yes" : "NO");
+        /* and each is as long as who maps it needs: the shared block whole wasm pages, since
+         * the wasm backend maps it, and a native module's private block not */
+        printf("the shared block is whole wasm pages: %s\n", b->shared_len % 65'536 ? "NO" : "yes");
+        printf("a native module's private block is not rounded to one: %s\n",
+            b->modules->priv_len % 65'536 ? "yes" : "NO");
     } else if (!strcmp(what, "changes")) {
         a = store_module(NSTORE_PATH, 6, 1 << 20, 1 << 20);
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }

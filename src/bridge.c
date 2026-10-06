@@ -87,6 +87,14 @@ int bridge_destroy(bridge *b)
     return 0;
 }
 
+/* the least length that is a whole number of both */
+static uint64_t common(uint64_t a, uint64_t b)
+{
+    uint64_t x = a, y = b;
+    while (y) { uint64_t r = x % y; x = y; y = r; }
+    return a / x * b;
+}
+
 bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
 {
     bridge *b;
@@ -95,6 +103,7 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
     if (!sink || !cfg) return nullptr;
 
     b = calloc(1, sizeof *b);
+    b->granule = 1;
     b->sink = sink;
     b->ud = ud;
     b->backends = calloc(cfg->backend_count ? cfg->backend_count : 1, sizeof *b->backends);
@@ -105,7 +114,7 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
         open_backend *o = &b->backends[i];
         char why[400];
         backend_err err = {};
-        uint64_t reservation = 0, guard = 0;
+        uint64_t reservation = 0, guard = 0, granule = 0;
 
         if (!want->name || !want->library) {
             say(b, nullptr, nullptr, BRIDGE_ERR, "backend %u has no %s", i,
@@ -154,11 +163,14 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
             goto refuse;
         }
         o->capabilities = o->api.backend_capabilities(o->be);
-        o->api.memory_shape(o->be, &reservation, &guard);
+        o->api.memory_shape(o->be, &reservation, &guard, &granule);
         o->reservation = reservation;
         o->guard = guard;
+        o->granule = granule ? granule : 1;
         if (reservation > b->reservation) b->reservation = reservation;
         if (guard > b->guard) b->guard = guard;
+        /* every backend maps the shared block, so its length is a multiple of each one's */
+        b->granule = common(b->granule, o->granule);
     }
 
     /* schedule.md, *Bridge-ASM700 ships no phase names*: a deployment declares its own */

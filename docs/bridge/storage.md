@@ -34,13 +34,16 @@ bit for each declared type, hashed. There is no graph of which table an added or
 component leads to, because nothing walks from table to table: an entity's final set is known
 before it is placed.
 
-Its rows are **one block of the column region**: the entity ids, then a column for each type, in
-the order the types were declared, each at the next multiple of its own type's alignment - a
-column of `uint8_t` follows the one before it with no gap, and one of `double` begins at a
-multiple of eight. A table's first room is the rows it was asked for, and no more. A table that
-needs more rows asks for twice what it had, in place when what
-follows it is free, and otherwise elsewhere with its rows copied. A row that leaves is filled by
-the table's last row.
+Its rows are **one block of the column region**: the entity ids, then a column for each type, in the
+order the types were declared, each at the next multiple of its own type's alignment - a column of
+`uint8_t` follows the one before it with no gap, and one of `double` begins at a multiple of eight.
+A table's first room is the rows it was asked for, and no more. A table that needs more rows asks
+for half as much again as it had, in place when what follows it is free, and otherwise elsewhere
+with its rows copied; and for what it needs and no more where that is not to be had. Half as much
+again was measured against twice and against only what is needed, on a table of 64-byte rows grown a
+thousand at a time to a hundred thousand: 55 to 61 ns a row and 15% of its block idle; 54 to 62 ns
+and 28% idle; 97 to 105 ns and none idle. So growing by a share is worth it, and the smaller share
+costs no time. A row that leaves is filled by the table's last row.
 
 **One table for each set, with one exception**: a strip at unload that had no room to join two
 tables leaves both - `lifetime.md`, *What unload leaves behind*. The set finds the one that was

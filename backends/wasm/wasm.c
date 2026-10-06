@@ -269,10 +269,12 @@ BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] bac
          | BACKEND_SIDE_BY_SIDE;
 }
 
-BACKEND_EXPORT void memory_shape([[maybe_unused]] backend *b, uint64_t *reservation, uint64_t *guard)
+BACKEND_EXPORT void memory_shape([[maybe_unused]] backend *b, uint64_t *reservation, uint64_t *guard,
+                                 uint64_t *granule)
 {
     *reservation = RESERVATION;
     *guard = GUARD;
+    *granule = PAGE;                /* a wasm memory is a whole number of pages */
 }
 
 BACKEND_EXPORT backend_memory *memory_adopt(

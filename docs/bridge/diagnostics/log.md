@@ -15,11 +15,18 @@ in the original Bridge. Bridge-ASM700 drains every ring at each barrier.
     u16 system    which system was running
     u32 text      offset into this module's scratch arena, always
     u32 len
-    u32 arg[2]    two inline scalars, for "something is N"
+    u32 arg[2]    two inline numbers: a value, and what it is set beside
 
 **This record never leaves Bridge-ASM700.** What the host sees is resolved - `host-api.md`, *Nothing
 here is an ABI layout* - so the shape above is the module seam's alone and its stride is free to
 change.
+
+**Two numbers, and no more.** One lets a line say "something is N" with no text formatted in
+the module; the second lets it say what N is set beside - what was wanted, which one, out of how
+many - which is what most lines in the tests do. Refused: one, which is four bytes a record
+fewer and sends the second number into text a module would have to build. The condition that
+brings it back is records measured as what logging costs. Refused: three, which is a record of
+28 bytes for what text can already carry.
 
 Fixed stride, so the ring is an array: head and tail are counters, record `i` is `base + i*24`, and
 the number dropped is a subtraction. Variable-length records would need scanning, which is why

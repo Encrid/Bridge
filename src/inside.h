@@ -9,7 +9,6 @@
 #include "storage.h"
 #include "schema.h"
 
-constexpr uint32_t PAGE = 65'536;
 
 typedef struct module module;
 typedef struct pool pool;
@@ -23,7 +22,7 @@ typedef struct {
     backend_memory  *shared;        /* the shared block, as this backend sees it */
     /* backend.md, *Memory is adopted, not created*: the address space it needs around a
      * block it maps. A module's private block has this; the shared block the largest */
-    uint64_t         reservation, guard;
+    uint64_t         reservation, guard, granule;
 } open_backend;
 
 /* A component, by its namespaced name. Storage holds the rows; this is what load checks. */
@@ -200,7 +199,7 @@ struct bridge {
     open_backend  *backends;
     uint32_t       backend_count;
     /* the address space every block is allocated with: the largest any backend stated */
-    uint64_t       reservation, guard;
+    uint64_t       reservation, guard, granule;    /* of the shared block: backend.md */
     char          *stopped_by;      /* why nothing runs any more */
     char          *stopped_stem;    /* the module whose return lifts it, or nullptr if nothing can */
 
@@ -217,7 +216,8 @@ struct bridge {
     uint32_t order_count;
     pool    *pool;
 
-    /* the shared block: a reserved page, the entity index, the persistent arena, the columns */
+    /* the shared block: eight bytes nothing is at, so that offset 0 is none; the entity index,
+     * the persistent arena, the columns */
     uint8_t       *shared;
     size_t         shared_len, shared_reserve;
     bridge_entity *index;

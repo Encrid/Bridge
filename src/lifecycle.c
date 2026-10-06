@@ -176,8 +176,8 @@ static int lacks(bridge *b, const char *identity, open_backend *o, uint32_t flag
 /* Where a module's regions sit in its private memory: the header, then scratch, the log ring
  * and the spans, each at a multiple of 8. 1 if what it stated cannot be laid out in 32 bits,
  * which is what every offset into that memory is. */
-static int private_layout(const bridge_module_config *cfg, uint32_t *ring, uint32_t *spans,
-                          uint32_t *end)
+static int private_layout(const bridge_module_config *cfg, uint64_t granule, uint32_t *ring,
+                          uint32_t *spans, uint32_t *end)
 {
     constexpr uint32_t scratch = 128;
     uint32_t at;
@@ -185,7 +185,8 @@ static int private_layout(const bridge_module_config *cfg, uint32_t *ring, uint3
     *ring = at & ~7u;
     if (ckd_add(&at, *ring, cfg->log_ring) || ckd_add(&at, at, 7u)) return 1;
     *spans = at & ~7u;
-    return ckd_add(end, *spans, cfg->spans) || ckd_add(&at, *end, PAGE - 1);
+    /* and rounded up to its backend's granule it is still an offset of 32 bits */
+    return ckd_add(end, *spans, cfg->spans) || (uint64_t)*end + granule - 1 > UINT32_MAX;
 }
 
 static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
@@ -286,7 +287,7 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
         return 1;
     }
     uint32_t ring, spans, end;
-    if (private_layout(cfg, &ring, &spans, &end)) {
+    if (private_layout(cfg, o->granule, &ring, &spans, &end)) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its scratch of %u, log_ring of "
             "%u and spans of %u bytes come to more than an offset of 32 bits can reach", id,
             cfg->scratch, cfg->log_ring, cfg->spans);
@@ -399,8 +400,8 @@ static int private_memory(module *m, const bridge_module_config *cfg, backend_er
     uint32_t ring, spans, end;
     uint64_t len, reserve;
     /* checks() refused a config this could not lay out, so it cannot fail here */
-    if (private_layout(cfg, &ring, &spans, &end)) unreachable();
-    len = ((uint64_t)end + PAGE - 1) & ~(uint64_t)(PAGE - 1);
+    if (private_layout(cfg, m->on->granule, &ring, &spans, &end)) unreachable();
+    len = ((uint64_t)end + m->on->granule - 1) / m->on->granule * m->on->granule;
     /* only its own backend maps a module's private block, so it has that backend's shape */
     reserve = (len > m->on->reservation ? len : m->on->reservation) + m->on->guard;
     m->priv = os_reserve((size_t)reserve, (size_t)len);
