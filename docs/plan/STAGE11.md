@@ -304,3 +304,23 @@ Measured in scratch, a value reached by id with its generation tested:
                   detach and strip for it
     explicit      serves: has or has not               serves only where zero may mean none
 
+**2.5 A singleton is one value at one place, given by `attach` with the id 0.** A module finds
+the place through the cell for each declared type, zero there meaning no value, and reads it by
+one load. Every entry that gives or takes a component names an entity, and a singleton is on
+none: so the id is 0, which is no entity - `reference.md`, *Reference following* - and any other
+is refused by name, as 0 is for a component kept any other way. It is queued, applied at the
+barrier and told to observers, whose record carries the id 0; it can be without a value; and
+its fields are changed afterwards by a write in place, as any value's are. Nothing was
+measured: it happens a few times in a run.
+
+    need          attach with id 0          in place only                 two new entries
+    fast          does not apply            does not apply                does not apply
+    scalable      does not apply            does not apply                does not apply
+    modular       serves: heard             fails: given cannot be told   serves
+                                            from never given
+    extensible    serves: one kind of       fails in part: a second kind  serves
+                  component
+    minimal       serves: no entry added    serves                        fails
+    explicit      serves: a wrong id is     serves only where zero may    serves
+                  refused by name           mean none
+

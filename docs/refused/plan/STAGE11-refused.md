@@ -58,3 +58,8 @@ kind of component, one no module can be told of and whose given value cannot be 
 The condition that brings it back is a component every entity has by definition, and for that a
 reader may already leave the bit untested.
 
+Refused: a singleton that exists from `declare`, zeroed, and is only ever written in place; and
+two entries of its own to set and to remove one. The first is a second kind of component, for
+nothing the chosen way does not allow; the second is two entries in each backend and each SDK
+for what `attach` and `detach` already say. No condition brings either back.
+
