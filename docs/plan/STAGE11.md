@@ -234,3 +234,45 @@ four hundred thousand. That is where it was scored as failing scalable, by an am
 deployment states. When the set's arrays move to grow, each carrier's cell is written again,
 once for a value that is copied then anyway.
 
+**2.3 A toggled component is a column and a bit a row, and a module is handed the bits.** A
+query that states the component matches its table, since every row carries it, on or off;
+whether a row is on is tested by the module's code, as 2.1 has it. The bits are 64-bit words:
+row r is bit `r & 63` of word `r >> 6`. Testing every row, finding the rows that are on a word
+at a time, and taking runs of them are three loops over those words, and none is chosen for the
+module.
+
+**A row is switched by a write in place.** The system states the term `BRIDGE_WRITE` and sets
+or clears the bit, as it writes a value in the column. The scheduler already keeps a system
+that writes a component from running beside another that reads or writes it - `data.md`,
+*Access mode* - so two never write one word at once. No entry is added, and no observer is
+told: a write in place raises none. One store, where a queued change that moves nothing is 18.9
+ns and the detach and attach it stands in for are 77.
+
+    need          a write in place          a queued change            both
+    fast          serves                    fails beside it            serves
+    scalable      does not apply            does not apply             does not apply
+    modular       fails in part: another    serves                     serves
+                  module is not told
+    extensible    does not apply            does not apply             does not apply
+    minimal       serves                    fails: two entries in      fails most
+                                            each backend and SDK
+    explicit      serves: it is a write     serves                     fails: two ways, and
+                                                                       one of them heard
+
+A module that must be told of a change has the sparse set, whose changes are queued and heard.
+
+**The bits are found ahead of the column.** The sixteen bytes before a toggled column's first
+value hold where its bits begin, so a reader that has the column, from a span or from
+`column_base`, has the bits by one more load, and neither published shape changes. Measured in
+scratch, a toggled value reached by entity id with its bit tested, 256 tables:
+
+                                      204,800           204,800          8,000,000
+                                      in order          in no order      in no order
+    no bit, as today                  1.47 ns           2.29 ns          16.5 to 16.7 ns
+    a second cell for the bits        2.17 ns           3.07 ns          18.2 to 18.6 ns
+    ahead of the column               2.17 ns           3.10 ns          18.6 to 18.8 ns
+
+Testing the bit costs 0.7 ns, and where the bits are found costs nothing that shows. Not
+measured: many thousands of tables reached in no order, where the cell ahead of each column
+may miss the cache and a denser array of cells might not.
+

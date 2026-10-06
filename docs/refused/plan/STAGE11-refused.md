@@ -37,3 +37,18 @@ most of them; and a pool of pages is a budget nobody states today. The condition
 back is a deployment where eight bytes for every entity, for every such component, is a measured
 share of its memory.
 
+Refused: a toggled row switched by a queued change, applied at the barrier and told to
+observers. It is two entries at the module seam, in each backend and each SDK, for a change
+that costs 18.9 ns where a write costs a store. The condition that brings it back is a module
+that must act on a switch at the barrier it happens, and cannot read the bit each time it
+runs. Both ways at once is refused with it, and no condition brings that back.
+
+Refused: a second cell for a toggled term's bits, in every span and in a second array beside
+`column_base`. Measured no quicker, and two published shapes change for it. The condition that
+brings it back is a toggled component reached by id across thousands of tables, measured as
+losing by the cell ahead of the column.
+
+Refused: the bits as a term of their own, stated by the author. A reader that forgets the term
+is handed no bits and told nothing; and a reach by id needs one of the other two beside it. No
+condition brings it back.
+
