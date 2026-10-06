@@ -9,9 +9,13 @@ created it.** So a module says so, with one key in its manifest:
     pinned = true     every system and observer of this module runs on the thread
                       its init ran on
 
-**That thread is the host's.** `init` runs inside `bridge_load`, on whichever thread called it, and
-Bridge-ASM700 has no thread of its own that existed then. So a pinned module's systems run on the
-thread that calls `bridge_phase`, and a host with a pinned module loaded calls both from one thread.
+**That thread is the host's, because only a host can choose it.** What pins a module is what it
+drives, and some of that demands one particular thread and not merely the same one each time: a
+window and its input on macOS belong to the first thread of the process, the one `main` runs on.
+A thread Bridge-ASM700 made could never be that one. So `init` runs inside `bridge_load` on
+whichever thread called it, a pinned module's systems run on the thread that calls `bridge_phase`,
+and a host with a pinned module loaded calls both from one thread, which it is free to make the
+first.
 A phase asked for from another is refused by name, before anything runs, and so is
 `bridge_destroy`, whose `shutdown` calls are that module's code too - `create.md`, *Destroy*.
 
@@ -27,6 +31,12 @@ ones with a reason to set it, because they are the ones that hold something outs
 **The cost is that pinned modules serialise with each other.** They are all on one thread by
 construction. That is not a flaw - modules all driving one thing that is not thread-safe **must**
 serialise - and it is visible at load rather than as a race.
+
+Refused: a thread of Bridge-ASM700's own for pinned modules, which would let a host call from
+anywhere. It can never be the first thread of the process, and every call into a pinned module
+would cross to it and wait. The condition that brings it back is no platform here demanding a
+particular thread, and hosts found fighting the rule. Refused: a thread for each pinned module,
+which gives up their running one at a time, the thing modules driving one device need.
 
 **Nothing is proxied and nothing is deferred.** Godot's answer to a wrong-thread call is
 `call_deferred`, a queue it drains itself. Ours is that the wrong thread never happens, because the

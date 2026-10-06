@@ -482,7 +482,9 @@ at least five things, none defined, and none of them the one that was meant.
             calling is the backend's: the table is passed to every export and every entry
             takes it, so `bridge_bind`, a global in every module and a thread-local are
             gone, and the invariant is checked where it was implied
-    open    a pinned module runs on the thread that calls bridge_phase
+    closed  a pinned module runs on the thread that calls bridge_phase: kept, and no longer
+            "forced". The host's thread is the only one that can be the first thread of the
+            process, which a window on one of the three platforms requires. `pinned.md`
     open    BRIDGE_OR and BRIDGE_WILDCARD, which exist to be refused
     open    BRIDGE_IN, BRIDGE_OUT, BRIDGE_INOUT, of which the scheduler reads one bit
     open    a setting defined twice, and differently, for a host and for a backend
