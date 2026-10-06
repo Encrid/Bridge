@@ -20,7 +20,8 @@ Any time, queued and applied at the next barrier:
 `desc` is the descriptor string `BRIDGE_SCHEMA_STRUCT` already emits beside the typedef -
 `schema.md`, *There is no schema format*, for what Bridge-ASM700 does with it and what it does not.
 `kind` says what it describes: a struct, an enum or a bitmask - `schema.md`, *The type set*. It is
-stated, like every other value.
+stated, like every other value. A fourth kind is a tag, a component with no bytes, which has no
+descriptor: `storage.md`, *A tag*.
 
 `on_unload` is what becomes of the entities carrying the component when this module is unloaded:
 `strip`, `sweep` or `delete` - `lifetime.md`, *What unload leaves behind*. It is stated, like every

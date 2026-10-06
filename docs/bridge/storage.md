@@ -218,6 +218,29 @@ last declarer it has no value, whichever policy was stated, and that is told as 
 component*. Nothing was measured for it: read through a query of one span, a value on one
 entity cost 0.6 ns, so there was no time to gain, and what it gives is that there is one.
 
+## A tag
+
+**A tag is a component with no bytes.** It says that an entity is one of something, and carries
+no value. Standard C has no struct without a member, so it is not declared as one: it is a
+fourth kind at `declare`, `BRIDGE_TAG`, whose size is 0 and which has no descriptor, and an
+attach that hands it a value is refused. It may be kept in any of the five storage layouts,
+and is given, taken, matched and told as a component that has bytes is.
+
+**It has no column, no values and no cell.** In a table it adds nothing to the block; in a
+sparse set the set is the ids of the entities in it; direct-indexed, it is the bits alone; a
+singleton, it is that it is set. Measured in the library, `storage weigh`: 204,800 entities
+that carry a four-byte value and six markers each, over 4,096 tables, use 7,424 KB of columns
+with the markers as components of four bytes, 3,968 KB as components of one, and 2,432 KB as
+tags.
+
+**Where a module would be handed where a value is, it is handed `BRIDGE_CARRIED`**, which is 1.
+Offset 0 of the shared memory is reserved and its first eight bytes hold nothing - `query.md`,
+*The interface is a query* - so 1 is not zero, which says absent, and is no value's place. It
+is the base of a tag's term in a span, its cell of `column_base`, what a sparse set's index
+holds for an entity in it, and what a singleton's cell holds when it is set. Two are handed an
+offset all the same, because their bits are found from it: a toggled tag, where its column
+would begin, and a direct-indexed one, where its cells would.
+
 ## What a query walks
 
 **A system walks tables, or one sparse set alone.** A table's rows are in the table's order and

@@ -1,0 +1,27 @@
+spawn
+look
+  look: M, in tables: rows that carry it, and spans whose base says carried 3 1
+  look: P, in a sparse set: rows, and spans whose base says carried 2 1
+  look: P, by its index: entities whose cell says carried 2 0
+  look: O, a toggle: rows, and of them on 6 6
+  look: R, direct-indexed: entities given it 3 0
+  look: W, a singleton: what its cell holds 0 0
+flicker
+attach_a
+look
+  look: M, in tables: rows that carry it, and spans whose base says carried 3 1
+  look: P, in a sparse set: rows, and spans whose base says carried 2 1
+  look: P, by its index: entities whose cell says carried 2 0
+  look: O, a toggle: rows, and of them on 6 3
+  look: R, direct-indexed: entities given it 3 0
+  look: W, a singleton: what its cell holds 1 0
+detach_b
+look
+  look: M, in tables: rows that carry it, and spans whose base says carried 0 0
+  look: P, in a sparse set: rows, and spans whose base says carried 2 1
+  look: P, by its index: entities whose cell says carried 2 0
+  look: O, a toggle: rows, and of them on 6 3
+  look: R, direct-indexed: entities given it 3 0
+  look: W, a singleton: what its cell holds 1 0
+columns in use 240 bytes
+alive

@@ -513,3 +513,9 @@ was ignored, as a change of an entity that is gone is. The decision said it was 
 already, which was not so, and it is built as the decision has it: 0 is not an entity that
 went, it is no entity.
 
+**The tag**, as `storage.md`, *A tag*, has it, in each of the five storage layouts. Cases
+`storage-tag` and `storage-tagbad`. Measured in the library as the scratch had it: 2,432 KB of
+columns against 7,424 KB for markers of four bytes. One thing was settled in building it that
+the decision had not seen: a toggled tag and a direct-indexed one are handed an offset, and
+not `BRIDGE_CARRIED`, since their bits are found from it.
+

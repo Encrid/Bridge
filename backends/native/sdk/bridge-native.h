@@ -87,6 +87,11 @@ static inline void bridge_native_attach(const bridge_api *api, uint64_t id, uint
 #define BRIDGE_NATIVE_COMPONENT(api, name, T, on_unload, storage) \
     BRIDGE_NATIVE_DECLARE(api, BRIDGE_STRUCT, name, T, on_unload, storage)
 
+/* a tag: a component with no bytes, so no type to take them from - storage.md, *A tag* */
+#define BRIDGE_NATIVE_DECLARE_TAG(api, name, on_unload, storage) \
+    (api)->declare(api, bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, BRIDGE_TAG, \
+                   0, 1, 0, 0, on_unload, storage)
+
 /* `changes` is the slots of the components it attaches or detaches, `change_count` of them:
  * a system that does neither hands nullptr and 0 */
 #define BRIDGE_NATIVE_SYSTEM(api, name, phase, terms, count, changes, change_count) \

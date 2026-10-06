@@ -32,8 +32,14 @@ constexpr uint32_t BRIDGE_ABI = 1;
 #define BRIDGE_PRIVATE   "private"
 
 /* declare's kind: what the descriptor describes - docs/modules/schema.md, *The type set*.
- * Zero is unset, and refused. */
-enum bridge_kind : uint32_t { BRIDGE_STRUCT = 1, BRIDGE_ENUM = 2, BRIDGE_BITMASK = 3 };
+ * Zero is unset, and refused. A tag is a component with no bytes: its size is 0 and it has no
+ * descriptor - docs/bridge/storage.md, *A tag*. */
+enum bridge_kind : uint32_t { BRIDGE_STRUCT = 1, BRIDGE_ENUM = 2, BRIDGE_BITMASK = 3, BRIDGE_TAG = 4 };
+
+/* What a module is handed where it would be handed where a value is, for a tag, which has
+ * none: that it is carried. Offset 0 of the shared memory is reserved and its first eight
+ * bytes hold nothing, so this is not zero, which says absent, and is no value's place. */
+constexpr uint32_t BRIDGE_CARRIED = 1;
 
 /* declare's on_unload - docs/bridge/data/lifetime.md. Zero is unset, and refused. */
 enum bridge_on_unload : uint32_t { BRIDGE_STRIP = 1, BRIDGE_SWEEP = 2, BRIDGE_DELETE = 3 };

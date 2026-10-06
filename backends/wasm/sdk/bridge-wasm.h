@@ -100,6 +100,11 @@ static inline uint32_t bridge_put(const void *bytes, uint32_t len)
 #define BRIDGE_COMPONENT(name, T, on_unload, storage) \
     BRIDGE_DECLARE(BRIDGE_STRUCT, name, T, on_unload, storage)
 
+/* a tag: a component with no bytes, so no type to take them from - storage.md, *A tag* */
+#define BRIDGE_DECLARE_TAG(name, on_unload, storage) \
+    bridge_declare(bridge_put(name, sizeof name - 1), sizeof name - 1, BRIDGE_TAG, 0, 1, 0, 0, \
+                   on_unload, storage)
+
 /* `changes` is the slots of the components it attaches or detaches, `change_count` of them:
  * a system that does neither hands nullptr and 0 */
 #define BRIDGE_SYSTEM(name, phase, terms, count, changes, change_count) \

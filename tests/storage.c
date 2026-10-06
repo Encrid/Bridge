@@ -230,6 +230,7 @@ int main(int argc, char **argv)
     if (!strcmp(what, "weigh")) cfg.budget.sparse_sets = cfg.budget.direct_indexed = 1;
     /* storage.md, *Direct-indexed*. `directnone` is the one that states there are none */
     if (!strncmp(what, "direct", 6) && strcmp(what, "directnone")) cfg.budget.direct_indexed = 1;
+    if (!strncmp(what, "tag", 3)) cfg.budget.sparse_sets = cfg.budget.direct_indexed = 1;
     if (!strcmp(what, "directfull")) cfg.budget.columns = 1024;
     if (!strcmp(what, "sparsefull")) cfg.budget.columns = argc > 2 ? (uint64_t)atoi(argv[2]) : 112;
     b = bridge_create(&cfg, sink, nullptr);
@@ -397,6 +398,18 @@ int main(int argc, char **argv)
         run(b, "look");
         run(b, "destroy");          /* and both tables go when they empty */
         run(b, "look");
+    } else if (!strcmp(what, "tag") || !strcmp(what, "tagbad")) {
+        /* storage.md, *A tag*: one in each storage layout */
+        a = store_module(!strcmp(what, "tag") ? NTAG_PATH : NTAGBAD_PATH, 8, 1 << 20, 4096);
+        if (bridge_load(b, &a)) { printf("not loaded\nalive\n"); return 0; }
+        run(b, "spawn");
+        run(b, "look");
+        run(b, "flicker");          /* the toggled tag turned off for three */
+        run(b, "attach_a");         /* the singleton given */
+        run(b, "look");
+        run(b, "detach_b");         /* the tag kept in tables taken: one table of them again */
+        run(b, "look");
+        printf("columns in use %u bytes\n", b->column_space.used);
     } else if (!strncmp(what, "single", 6)) {
         /* storage.md, *A singleton* */
         const char *path = !strcmp(what, "singlebad1") ? NSINGLEBAD1_PATH
@@ -669,6 +682,22 @@ int main(int argc, char **argv)
                 (double)off / 204'800);
             printf("    204800 values reached by id, in the order they lie %6.3f ns each, in no order "
                 "%6.3f ns each\n", (double)near / 204'800, (double)far / 204'800);
+        }
+        /* storage.md, *A tag*: what a marker costs of [budget] columns, with bytes and with none */
+        (void)bridge_destroy(b);
+        {
+            static const char *const built[2] = { NFRAG4096_PATH, NFRAGTAG4096_PATH };
+            uint32_t used[2];
+            for (uint32_t k = 0; k < 2; k ++) {
+                b = bridge_create(&cfg, counted, nullptr);
+                a = store_module(built[k], ROWS, 8 << 20, 128 << 20);
+                if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
+                (void)barrier(b, "spawn");
+                used[k] = b->column_space.used >> 10;
+                if (!k) (void)bridge_destroy(b);
+            }
+            printf("204800 entities with six markers each: columns in use %u KB as components of four "
+                "bytes, %u KB as tags\n", used[0], used[1]);
         }
     } else if (!strcmp(what, "baseline")) {
         static const struct { const char *path; uint32_t on; } built[] = {

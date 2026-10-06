@@ -158,6 +158,20 @@ static uint64_t *shown_of(const storage *r, uint32_t slot)
     return (uint64_t *)(r->b->shared + r->b->direct) + (size_t)slot * r->bit_words;
 }
 
+/* storage.md, *A tag*: what a module is handed for where a column is. A tag has none, and is
+ * handed that it is carried; but a toggled tag has its bits ahead of where its column would
+ * be, and is handed that. */
+static uint32_t handed(const storage *r, uint32_t type, uint32_t column)
+{
+    return column && !r->types[type]->size && r->types[type]->kept != BRIDGE_TOGGLE ? BRIDGE_CARRIED : column;
+}
+
+/* and for where the value of row `row` of a sparse set is */
+static uint32_t cell_of(const storage_type *type, uint32_t column, uint32_t row)
+{
+    return type->size ? column + row * type->size : BRIDGE_CARRIED;
+}
+
 /* everything the entity at `index` carries: what its table holds, every sparse set it is in,
  * and every direct-indexed component it has been given */
 static void carried(const storage *r, uint32_t index, uint64_t *set)
@@ -235,7 +249,8 @@ static uint64_t laid_out(const storage *r, const uint64_t *set, uint32_t room)
     for (uint32_t w = 0; w < r->words; w ++) {
         for (uint64_t bits = set[w]; bits; bits &= bits - 1) {
             const storage_type *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
-            at = padded(at);
+            /* a tag has no column to begin anywhere */
+            if (type->size || type->kept == BRIDGE_TOGGLE) at = padded(at);
             if (type->kept == BRIDGE_TOGGLE) at += bits_len(room) + COLUMN;
             r->at[type->id] = at;
             at += (uint64_t)type->size * room;
@@ -312,7 +327,7 @@ static bool grow(storage *r, uint32_t t, uint32_t room)
         const storage_type *type = r->set_type[tab->set - 1];
         uint32_t *cells = cells_of(r, tab->set - 1);
         for (uint32_t row = 0; row < tab->rows; row ++) {
-            cells[(uint32_t)who_of(r, tab)[row]] = columns[type->id] + row * type->size;
+            cells[(uint32_t)who_of(r, tab)[row]] = cell_of(type, columns[type->id], row);
         }
     }
     touch(r, t);
@@ -513,8 +528,7 @@ static void seated(storage *r, const table *tab, uint32_t index, uint32_t row)
 {
     const storage_type *type = r->set_type[tab->set - 1];
     where_of(r, tab->set - 1)[index] = row + 1;
-    cells_of(r, tab->set - 1)[index] = columns_of(r, (uint32_t)(tab - r->tables))[type->id]
-                                     + row * type->size;
+    cells_of(r, tab->set - 1)[index] = cell_of(type, columns_of(r, (uint32_t)(tab - r->tables))[type->id], row);
 }
 
 /* a row at the end of `t`, which has room for it, for the entity at `index` */
@@ -1000,7 +1014,7 @@ static void span(const storage *r, const storage_terms *s, uint32_t t, uint8_t *
     memcpy(at, &value, 4);
     memcpy(at + 4, &tab->block, 4);
     for (uint32_t i = 0; i < s->count; i ++) {
-        value = s->oper[i] == BRIDGE_NOT ? 0 : columns[s->type[i]];
+        value = s->oper[i] == BRIDGE_NOT ? 0 : handed(r, s->type[i], columns[s->type[i]]);
         memcpy(at + BRIDGE_SPAN_BASE + 4u * i, &value, 4);
     }
 }
@@ -1025,24 +1039,27 @@ int storage_publish(storage *r, module *m)
     if (all) {
         block_header(b, m);
         memset(cell, 0, 4u * m->declared_count * tables);
+        for (uint32_t t = 1; t < r->table_high; t ++) {
+            if (!r->tables[t].live) continue;
+            for (uint32_t s = 0; s < m->declared_count; s ++) {
+                uint32_t id = m->declared[s]->type->id;
+                cell[t * m->declared_count + s] = handed(r, id, columns_of(r, t)[id]);
+            }
+        }
         for (uint32_t s = 0; s < m->declared_count; s ++) {
             const storage_type *type = m->declared[s]->type;
             kept[s] = type->kept == BRIDGE_SPARSE_SET
                     ? b->sparse + (uint32_t)(4ull * type->slot * b->entities)
                     : type->kept == BRIDGE_DIRECT_INDEXED ? type->cells + (uint32_t)COLUMN
-                    : type->kept == BRIDGE_SINGLETON && type->set ? type->cells : 0;
-        }
-        for (uint32_t t = 1; t < r->table_high; t ++) {
-            if (!r->tables[t].live) continue;
-            for (uint32_t s = 0; s < m->declared_count; s ++) {
-                cell[t * m->declared_count + s] = columns_of(r, t)[m->declared[s]->type->id];
-            }
+                    : type->kept == BRIDGE_SINGLETON && type->set
+                        ? type->size ? type->cells : BRIDGE_CARRIED : 0;
         }
     } else {
         for (i = 0; i < r->dirty_count; i ++) {
             uint32_t t = r->dirty[i];
             for (uint32_t s = 0; s < m->declared_count; s ++) {
-                cell[t * m->declared_count + s] = columns_of(r, t)[m->declared[s]->type->id];
+                uint32_t id = m->declared[s]->type->id;
+                cell[t * m->declared_count + s] = handed(r, id, columns_of(r, t)[id]);
             }
         }
     }

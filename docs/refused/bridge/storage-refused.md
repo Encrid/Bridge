@@ -41,6 +41,14 @@ being in a table.
 Of `storage.md`, *A singleton*. How it is given its value, whether a module's settings must be
 one, and what else was weighed, is in the record of `STAGE11.md`, *The questions*.
 
+## A tag
+
+Of `storage.md`, *A tag*. Whether there is one at all is in the record of `STAGE11.md`, *The
+questions*.
+
+Refused: a tag as a field's type. It has no bytes for a field to be, and a struct that names
+one is refused as naming a type nobody declared. No condition brings it back.
+
 ## What a query walks
 
 Of `storage.md`, *What a query walks*. What was weighed against it is in the record of

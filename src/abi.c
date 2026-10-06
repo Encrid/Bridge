@@ -71,6 +71,7 @@ static bool find(void *ctx, const char *bare, schema_named *named)
     for (uint32_t i = 0; i < l->b->type_count; i ++) {
         declared_type *c = l->b->types[i];
         if (strncmp(c->name, l->ns, ns) || c->name[ns] != ':' || strcmp(c->name + ns + 1, bare)) continue;
+        if (c->kind == BRIDGE_TAG) continue;        /* it has no bytes for a field to be */
         *named = (schema_named){ c->kind, c->size, c->align, c };
         return true;
     }
@@ -114,7 +115,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     uint64_t print;
 
     if (!m->in_init) return refuse(m, "declare is called outside init");
-    if (!name_at || !desc_at || !a[1] || a[1] >= sizeof name) {
+    if (!name_at || (!desc_at && kind != BRIDGE_TAG) || !a[1] || a[1] >= sizeof name) {
         return refuse(m, "declare: a name or a descriptor lies outside the scratch arena");
     }
     memcpy(name, name_at, a[1]);
@@ -132,8 +133,11 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     }
     bare = strchr(name, ':');
     if (!bare) return refuse(m, "type '%s' has no namespace", name);
-    if (kind < BRIDGE_STRUCT || kind > BRIDGE_BITMASK) {
+    if (kind < BRIDGE_STRUCT || kind > BRIDGE_TAG) {
         return refuse(m, "type '%s': its kind is unset", name);
+    }
+    if (kind == BRIDGE_TAG && (size || a[6])) {
+        return refuse(m, "type '%s' is a tag, and a tag has no bytes and no descriptor", name);
     }
     if (foreign(m, name) && !listed(m->read, m->read_count, name)
         && !listed(m->write, m->write_count, name)) {
@@ -146,7 +150,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     if (kept < BRIDGE_TABLE || kept > BRIDGE_SINGLETON) {
         return refuse(m, "type '%s': its storage layout is unset", name);
     }
-    print = fingerprint(desc_at, a[6]) ^ kind;
+    print = fingerprint(kind == BRIDGE_TAG ? "" : desc_at, a[6]) ^ kind;
 
     for (i = 0; i < b->type_count; i ++) {
         if (!strcmp(b->types[i]->name, name)) c = b->types[i];
@@ -169,7 +173,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     if (!c) {
         /* The descriptor is read and laid out. A field's type is a bare C name, looked for in
          * the declarer's namespace: `Vec3` in game:Body is game:Vec3 - schema.md. */
-        char *desc = copy(desc_at, a[6]);
+        char *desc = kind == BRIDGE_TAG ? nullptr : copy(desc_at, a[6]);
         char why[200];
         looking l = { b, name };
         schema s;
@@ -179,12 +183,18 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         char *named;
         void *zero;
 
-        if (!desc) return refuse(m, "out of memory: there was none for the descriptor of '%s'", name);
-        *bare = 0;
-        refused = schema_parse(kind, desc, find, &l, &s, why, sizeof why);
-        *bare = ':';
-        free(desc);
-        if (refused) return refuse(m, "type '%s': its descriptor %s", name, why);
+        if (kind == BRIDGE_TAG) {
+            /* nothing to read: it is what it was stated to be, which is nothing */
+            memset(&s, 0, sizeof s);
+            s.align = align;
+        } else {
+            if (!desc) return refuse(m, "out of memory: there was none for the descriptor of '%s'", name);
+            *bare = 0;
+            refused = schema_parse(kind, desc, find, &l, &s, why, sizeof why);
+            *bare = ':';
+            free(desc);
+            if (refused) return refuse(m, "type '%s': its descriptor %s", name, why);
+        }
         if (s.size != size || s.align != align) {
             uint32_t laid = s.size, aligned = s.align;
             schema_free(&s);
@@ -213,7 +223,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         for (k = 0; k < s.field_count; k ++) held_count += s.fields[k].type != nullptr;
         c = calloc(1, sizeof *c);
         named = copy(name, strlen(name));
-        zero = calloc(1, size);
+        zero = calloc(1, size ? size : 1);
         deps = calloc(held_count ? held_count : 1, sizeof *deps);
         types = realloc(b->types, (b->type_count + 1) * sizeof *b->types);
         if (types) b->types = types;

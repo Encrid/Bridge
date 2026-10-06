@@ -26,6 +26,9 @@ writes for a module*. A barrier at which nothing changed writes nothing.
         u32 entities   where the entity-id array for these rows begins
         u32 base[n]    one offset per term, in declared order. zero = absent here
 
+**A tag has no column, and its base is `BRIDGE_CARRIED`**, which is 1 and no value's place -
+`storage.md`, *A tag*.
+
 **Absent is a zero base, and nothing carries a flag.** flecs hands an iterator to an outside reader
 the same way: its JSON serialiser tells a field that is not there by a null pointer
 (`serialize_iter_result_query.c:177-186`). **Offset 0 of the shared memory is reserved** - its first
