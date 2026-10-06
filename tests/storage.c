@@ -227,7 +227,10 @@ int main(int argc, char **argv)
     if (!strcmp(what, "stripfull")) cfg.budget.columns = 160;
     /* storage.md, *A sparse set*. `sparsenone` is the one that states there are none */
     if (!strncmp(what, "sparse", 6) && strcmp(what, "sparsenone")) cfg.budget.sparse_sets = 1;
-    if (!strcmp(what, "weigh")) cfg.budget.sparse_sets = 1;
+    if (!strcmp(what, "weigh")) cfg.budget.sparse_sets = cfg.budget.direct_indexed = 1;
+    /* storage.md, *Direct-indexed*. `directnone` is the one that states there are none */
+    if (!strncmp(what, "direct", 6) && strcmp(what, "directnone")) cfg.budget.direct_indexed = 1;
+    if (!strcmp(what, "directfull")) cfg.budget.columns = 1024;
     if (!strcmp(what, "sparsefull")) cfg.budget.columns = argc > 2 ? (uint64_t)atoi(argv[2]) : 112;
     b = bridge_create(&cfg, sink, nullptr);
     bridge_artifact a;
@@ -394,6 +397,38 @@ int main(int argc, char **argv)
         run(b, "look");
         run(b, "destroy");          /* and both tables go when they empty */
         run(b, "look");
+    } else if (!strncmp(what, "direct", 6)) {
+        a = store_module(!strcmp(what, "directbad") ? NDIRECTBAD_PATH : NDIRECT_PATH, 8, 1 << 20, 4096);
+        if (bridge_load(b, &a)) { printf("not loaded\nalive\n"); return 0; }
+        run(b, "spawn");
+        run(b, "attach_b");         /* three of six are given one, and are heard */
+        run(b, "look_b");
+        run(b, "near");
+        if (!strcmp(what, "direct")) {
+            run(b, "value_b");          /* a value for one that has it: heard as an attach */
+            run(b, "near");
+            run(b, "detach_b_half");    /* one loses it */
+            run(b, "look_b");
+            run(b, "destroy_half");     /* one that has it, and one that has not */
+            run(b, "look_b");
+            run(b, "near");
+            run(b, "respawn_half");     /* two more, in the places of those two: with no D */
+            run(b, "look_b");
+            run(b, "near");
+            run(b, "detach_b");
+            run(b, "look_b");
+            run(b, "destroy");
+            run(b, "look_b");
+        } else {
+            /* lifetime.md, *What unload leaves behind*, of a direct-indexed component */
+            drop(b, "st:A", BRIDGE_STRIP);      /* so that some carry D and nothing else */
+            drop(b, "st:D", !strcmp(what, "directstrip") ? BRIDGE_STRIP
+                          : !strcmp(what, "directsweep") ? BRIDGE_SWEEP : BRIDGE_DELETE);
+            for (uint32_t e = 1; e <= 6; e ++) {
+                printf("entity %u is %s\n", e, storage_alive(b->storage, (uint64_t)1 << 32 | e) ? "alive" : "gone");
+            }
+            run(b, "near");
+        }
     } else if (!strcmp(what, "toggle")) {
         /* storage.md, *A toggle* */
         a = store_module(NTOGGLE_PATH, 16, 1 << 20, 4096);
@@ -586,6 +621,33 @@ int main(int argc, char **argv)
                 "found a word at a time %6.1f us\n", toggled[k].on, (double)rows / 1000.0,
                 (double)words / 1000.0);
             if (k + 1 < sizeof toggled / sizeof *toggled) (void)bridge_destroy(b);
+        }
+        /* storage.md, *Direct-indexed*: a value reached by an id that is held */
+        (void)bridge_destroy(b);
+        {
+            uint64_t on = 0, off = 0, near = 0, far = 0, t;
+            b = bridge_create(&cfg, counted, nullptr);
+            a = store_module(NDIRECTBIG_PATH, 204'802, 8 << 20, 128 << 20);
+            if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
+            (void)barrier(b, "spawn");
+            for (uint32_t round = 0; round < ROUNDS; round ++) {
+                t = barrier(b, "attach_b");
+                if (!round || t < on) on = t;
+                if (round + 1 < ROUNDS) {
+                    t = barrier(b, "detach_b");
+                    if (round < 1 || t < off) off = t;
+                }
+            }
+            for (uint32_t round = 0; round < ROUNDS * 4; round ++) {
+                t = ran(b, "near");
+                if (!round || t < near) near = t;
+                t = ran(b, "far");
+                if (!round || t < far) far = t;
+            }
+            printf("direct-indexed: a component given %6.1f ns, taken %6.1f ns\n", (double)on / 204'800,
+                (double)off / 204'800);
+            printf("    204800 values reached by id, in the order they lie %6.3f ns each, in no order "
+                "%6.3f ns each\n", (double)near / 204'800, (double)far / 204'800);
         }
     } else if (!strcmp(what, "baseline")) {
         static const struct { const char *path; uint32_t on; } built[] = {

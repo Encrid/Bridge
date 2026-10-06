@@ -25,6 +25,17 @@ Refused: a helper in each SDK that walks the rows that are on. A module is hande
 which loop reads them best depends on how many are on, which only its author knows. The
 condition that brings it back is the same loop written out in three modules.
 
+## Direct-indexed
+
+Of `storage.md`, *Direct-indexed*. Whether a cell with no value can be told from one that has
+one, and what else was weighed, is in the record of `STAGE11.md`, *The questions*.
+
+Refused: a system that walks a direct-indexed component, every cell in turn. It would walk the
+cells of entities that were given nothing and of places no entity has, testing a bit at each,
+and a component that is walked belongs in a table. The condition that brings it back is a
+component nearly every entity has, walked as often as it is reached, measured as losing by
+being in a table.
+
 ## What a query walks
 
 Of `storage.md`, *What a query walks*. What was weighed against it is in the record of

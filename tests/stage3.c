@@ -154,6 +154,7 @@ int main(int argc, char **argv)
     if (!strcmp(what, "nophases")) cfg.phase_count = 0;
     if (!strcmp(what, "nobudget")) cfg.budget.columns = 0;
     if (!strcmp(what, "sparse")) cfg.budget.sparse_sets = 1;
+    if (!strcmp(what, "direct")) cfg.budget.direct_indexed = 1;
     /* the three keys storage of our own brought: each unset, and the two counts used up */
     if (!strcmp(what, "unsettables")) cfg.budget.tables = 0;
     if (!strcmp(what, "unsettypes")) cfg.budget.types = 0;
@@ -201,6 +202,11 @@ int main(int argc, char **argv)
         load(b, &a);
         a = artifact("game:kept@0.1.0", "kept-sparse");     /* and another than the mover's */
         load(b, &a);
+    } else if (!strcmp(what, "direct")) {       /* direct-indexed, reached from a table's rows */
+        a = artifact("game:aim@0.1.0", "aim");
+        a.cfg.spawns = 16;
+        load(b, &a);
+        frames(b, 1);
     } else if (!strcmp(what, "toggle")) {       /* a toggle: counted before any is turned off, */
         a = artifact("game:shield@0.1.0", "shield");    /* and after */
         a.cfg.spawns = 16;

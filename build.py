@@ -72,6 +72,7 @@ NATIVE = [
     ('nfrag256', 'nfrag', ['SPLIT=256']), ('nfrag4096', 'nfrag', ['SPLIT=4096']),
     ('nsparse', 'nsparse', []), ('nsparsebig', 'nsparse', ['BIG']), ('nsparsefat', 'nsparse', ['FAT']),
     ('nsparsebad1', 'nsparse', ['BAD=1']), ('nsparsebad2', 'nsparse', ['BAD=2']),
+    ('ndirect', 'ndirect', []), ('ndirectbig', 'ndirect', ['BIG']), ('ndirectbad', 'ndirect', ['BAD']),
     ('ntoggle', 'ntoggle', []), ('ntoggle1', 'ntoggle', ['BIG', 'ON=1']),
     ('ntoggle2', 'ntoggle', ['BIG', 'ON=2']), ('ntoggle16', 'ntoggle', ['BIG', 'ON=16']),
     ('nweigh1', 'nweigh', ['ON=1']), ('nweigh2', 'nweigh', ['ON=2']), ('nweigh16', 'nweigh', ['ON=16']),
@@ -83,7 +84,7 @@ NATIVE = [
 # `checked` or `unchecked` is stated for each, as the SDK asks: BRIDGE_ROWS_CHECKED, or not.
 PLAIN = ('mover reader refs fp badterm spin3 flood chatty rows halver twostep watcher chain '
          'badobs events fixer nested nested2 namer spawner counter typer user settings hang hit '
-         'shield')
+         'shield aim')
 WASM = [(name, name, 'checked', []) for name in PLAIN.split()] + [
     ('rows-unchecked', 'rows', 'unchecked', []),
     ('kept-unset', 'kept', 'checked', ['KEPT=0']), ('kept-none', 'kept', 'checked', ['KEPT=9']),
@@ -413,8 +414,20 @@ CASES = [
     ('storage-stripfull', ['storage', 'stripfull'],
      '@tests/storage-stripfull.txt', None),
     ('storage-weigh', ['storage', 'weigh'],
-     r"an entity of 4096 bytes.*in    1 table.*in 4096 tables.*a sparse set.*of 4096 bytes.*a toggle, one row in 16 on.*alive", r"FAIL"),
+     r"an entity of 4096 bytes.*in    1 table.*in 4096 tables.*a sparse set.*of 4096 bytes.*a toggle, one row in 16 on.*direct-indexed.*in no order.*alive", r"FAIL"),
     ('storage-toggle', ['storage', 'toggle'], '@tests/storage-toggle.txt', None),
+    ('storage-direct', ['storage', 'direct'], '@tests/storage-direct.txt', None),
+    ('storage-directstrip', ['storage', 'directstrip'], '@tests/storage-directstrip.txt', None),
+    ('storage-directsweep', ['storage', 'directsweep'], '@tests/storage-directsweep.txt', None),
+    ('storage-directdelete', ['storage', 'directdelete'], '@tests/storage-directdelete.txt', None),
+    ('storage-directnone', ['storage', 'directnone'],
+     r"did not load: type 'st:D' is one more than .budget. direct_indexed of 0.*alive", None),
+    ('storage-directfull', ['storage', 'directfull'],
+     r"did not load: type 'st:D' is direct-indexed, and .budget. columns of 1024 bytes has no room for "
+     r"a cell of 4 bytes for each of 400000 entities.*alive", None),
+    ('storage-directbad', ['storage', 'directbad'],
+     r"did not load: term 1 of system 'both': 'st:D' is direct-indexed, and does not select what a "
+     r"system walks.*alive", None),
     ('storage-sparse', ['storage', 'sparse'], '@tests/storage-sparse.txt', None),
     ('storage-sparsefull', ['storage', 'sparsefull'], '@tests/storage-sparsefull.txt', None),
     ('storage-sparsestrip', ['storage', 'sparsestrip'], '@tests/storage-sparsestrip.txt', None),
@@ -493,6 +506,8 @@ CASES = [
      r"module 'game:kept@0.1.0' did not load: type 'game:Position': its storage layout is unset.*"
      r"module 'game:kept@0.1.0' did not load: type 'game:Position' is stated as a sparse set here, and it "
      r"was declared as a table. It is also declared by 'game:mover@0.1.0'.*alive", None),
+    ('stage3-direct', ['stage3', 'direct'],
+     r"game:aim@0.1.0/reached: aims 10 5.*game:aim@0.1.0/reached: aimed 20 0.*alive", r"did not load"),
     ('stage3-toggle', ['stage3', 'toggle'],
      r"game:shield@0.1.0/count: shields 10 10.*game:shield@0.1.0/count: strength 45 0.*"
      r"game:shield@0.1.0/count: shields 10 6.*game:shield@0.1.0/count: strength 27 0.*alive", r"did not load"),

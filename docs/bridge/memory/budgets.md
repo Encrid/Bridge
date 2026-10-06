@@ -30,7 +30,9 @@ component's bits. How many such components there will be is not known when the b
 and storage allocates nothing after - `storage.md`, *What bounds it*. So the deployment says how
 many, and their room is had at create: eight bytes an entity for each sparse set. Either may be
 none, which is stated as `BRIDGE_NONE`; zero is unset, and refused. A `declare` past either is
-refused, by name. `direct_indexed` is stated and not yet used: `PLAN.md`, stage 11.
+refused, by name. A direct-indexed component's cells are its size for every entity, which is
+not known until it is declared: they are taken from `columns` then, and a `declare` they do not
+fit is refused - `storage.md`, *Direct-indexed*.
 
 **`tables` is a count of what exists, not of what was ever seen.** A table lives while it has rows
 - `storage.md`, *A table* - so the number to state is how many different archetypes

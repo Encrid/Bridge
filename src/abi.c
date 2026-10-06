@@ -146,9 +146,9 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     if (kept < BRIDGE_TABLE || kept > BRIDGE_SINGLETON) {
         return refuse(m, "type '%s': its storage layout is unset", name);
     }
-    /* ponytail: the other two are decided and not built - docs/plan/STAGE11.md. This goes
-     * as each is */
-    if (kept == BRIDGE_DIRECT_INDEXED || kept == BRIDGE_SINGLETON) {
+    /* ponytail: the singleton is decided and not built - docs/plan/STAGE11.md. This goes
+     * when it is */
+    if (kept == BRIDGE_SINGLETON) {
         return refuse(m, "type '%s': %s is not built yet", name, storage_names[kept]);
     }
     print = fingerprint(desc_at, a[6]) ^ kind;
@@ -208,6 +208,12 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
                 b->sparse_sets);
         }
 
+        if (kept == BRIDGE_DIRECT_INDEXED && !storage_direct_free(b->storage)) {
+            schema_free(&s);
+            return refuse(m, "type '%s' is one more than [budget] direct_indexed of %u", name,
+                b->direct_indexed);
+        }
+
         /* everything it needs is had before any of it is kept: failure.md, *Out of memory* */
         for (k = 0; k < s.field_count; k ++) held_count += s.fields[k].type != nullptr;
         c = calloc(1, sizeof *c);
@@ -225,8 +231,19 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
             c = nullptr;
             return refuse(m, "out of memory: there was none for type '%s'", name);
         }
-        c->name = named;
         c->type = storage_declare(b->storage, size, align, kept);
+        if (!c->type) {
+            free(c);
+            free(named);
+            free(zero);
+            free(deps);
+            schema_free(&s);
+            c = nullptr;
+            return refuse(m, "type '%s' is direct-indexed, and [budget] columns of %u bytes has no "
+                "room for a cell of %u bytes for each of %u entities", name, b->columns_len, size,
+                b->entities);
+        }
+        c->name = named;
         c->s = s;
         c->kind = kind;
         c->storage = kept;
@@ -405,6 +422,14 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         c = m->declared[t.slot];
         /* storage.md, *What a query walks*: a system walks tables, or one sparse set alone,
          * and what is kept elsewhere it reaches from the row. An observer walks nothing */
+        if (!events && c->storage == BRIDGE_DIRECT_INDEXED && t.oper != BRIDGE_OPTIONAL) {
+            refuse(m, "term %u of %s '%s': '%s' is direct-indexed, and does not select what a "
+                "system walks. It is stated optional and reached by the entity's id", i, what, name,
+                c->name);
+            free(asked);
+            free(s);
+            return 1;
+        }
         if (!events && c->storage == BRIDGE_SPARSE_SET && t.oper != BRIDGE_OPTIONAL) {
             for (uint32_t k = 0; k < count; k ++) {
                 bridge_term other;

@@ -6,12 +6,13 @@ data *is* is `data.md`.
 
 ## Where the regions live
 
-Eight things must be addressable with no call, and they do not have the same readers:
+Nine things must be addressable with no call, and they do not have the same readers:
 
     region              memory    who reads it
     component columns   shared    every module that declared the component
     entity index        shared    every module that follows a reference
     sparse-set indexes  shared    every module that declared a component kept in one
+    direct-indexed bits shared    every module that declared a direct-indexed component
     persistent arena    shared    every module holding a string in a component
     query spans         private   only the module they belong to
     column_base         private   only the module they belong to

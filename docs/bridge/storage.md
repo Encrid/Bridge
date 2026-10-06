@@ -54,8 +54,8 @@ declare the component already, as for a component layout that differs - `lifetim
 component layout changed*.
 
 What each was weighed on, measured, and what a module is handed for each, is `STAGE11.md`, *The
-gate* and *The questions*. The table, the sparse set and the toggle are built; a `declare` that
-states one of the other two is refused, saying so, until `PLAN.md`, stage 11, has built it.
+gate* and *The questions*. All but the singleton are built; a `declare` that states that one is
+refused, saying so, until `PLAN.md`, stage 11, has built it.
 
 ## A table
 
@@ -161,6 +161,39 @@ is switched by one store, where a detach and an attach to say the same are 77 ns
 for an entity that carries 4 KB. What it does not beat is a field tested by a mask, which a
 compiler makes of a small enough loop: 12 us at any share, measured in scratch - `STAGE11.md`,
 *The gate*.
+
+## Direct-indexed
+
+**A direct-indexed component has a cell for every entity there may be**, and the value of the
+entity whose id's low 32 bits are e is cell e. It is in no archetype, as a component in a sparse
+set is in none, and giving or taking it moves no row. The cells are one block of the column
+region, the component's size for each of `[budget] entities`, taken when the component is
+declared: a `declare` they do not fit is refused, by the arithmetic, and that is the one way it
+can be short of room. After that an entity given one always has its cell.
+
+**A cell exists for an entity that was given nothing, so a bit an entity says whether it
+has a value.** It is set by `attach` and cleared by `detach`, queued and applied at the barrier
+and told to observers, as for a component kept any other way; and cleared when the entity is
+destroyed, so that the entity which next has its place has none of what was there. Storage
+keeps those bits for itself and writes another copy for modules, found as a toggle's are: the
+sixteen bytes ahead of the cells hold where the bits begin. A module finds the cells through
+the cell its header has for each type it declared, tests the bit where it needs to know, and
+does not where it knows by its own design. `[budget] direct_indexed` says how many such
+components there may be, and their bits are had when the bridge is created.
+
+**It is for what is reached by id far more than it is walked.** A system cannot walk it: a
+term of it is stated `BRIDGE_OPTIONAL`, and one that selects is refused at `system`. Measured
+in the library, `storage weigh` and `storage baseline`, 204,800 values each reached by an id
+that is held, its generation tested:
+
+                                       in the order they lie     in no order
+    through the table, as              1.1 ns                    2.5 ns
+    `reference.md` has it
+    direct-indexed, the bit tested     0.74 ns                   1.4 ns
+
+And it is given in 25 ns and taken in 24, whatever the entity carries. **What it costs is its
+size for every entity, carried or not**: sixty-four bytes at four hundred thousand entities is
+25.6 MB of `[budget] columns`.
 
 ## What a query walks
 
@@ -275,10 +308,14 @@ barrier's second step is where that is found out, before anything has moved.
     [budget] terms       how long a system's record of its terms is
     [budget] sparse_sets how many sparse sets: an index for each, a cell an entity, twice; and
                          a table's record for each, beside `tables`
+    [budget] direct_indexed
+                         how many direct-indexed: a bit an entity for each, twice
 
 **All of it is allocated when the bridge is created, and nothing after**: not at a barrier, not
 when a module loads. What a module declares takes a place that is already there, and a `declare`
-or a `system` past its key is refused - `budgets.md`, *Budgets*. That is storage. What the rest
+or a `system` past its key is refused - `budgets.md`, *Budgets*. A direct-indexed component's
+cells are the one thing taken at a `declare`, and they are taken from `[budget] columns`, which
+is there already. That is storage. What the rest
 of the library allocates, and when, is `budgets.md`, *Nothing is allocated in a phase*.
 
 A type is a size to storage, and nothing else. Its fields, their names and an enum's constants

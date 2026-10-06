@@ -296,7 +296,7 @@ static int beyond(bridge *b, const char *key, uint64_t value)
 int block_create(bridge *b, const bridge_budget *budget)
 {
     /* query.md: offset 0 is none, so nothing is there. Eight bytes keep the index aligned */
-    uint64_t index = 8, sparse, sets, arena, columns, len, reserve;
+    uint64_t index = 8, sparse, sets, direct, cells, arena, columns, len, reserve;
     uint32_t i;
 
     if (unset(b, "entities", budget->entities) || unset(b, "persistent", budget->persistent)
@@ -323,7 +323,16 @@ int block_create(bridge *b, const bridge_budget *budget)
             (unsigned long long)sets, (unsigned long long)budget->entities);
         return 1;
     }
-    arena = (sparse + 4 * budget->entities * sets + 7u) & ~7ull;
+    /* and a direct-indexed component's bits are one for every entity, in 64-bit words */
+    cells = budget->direct_indexed == BRIDGE_NONE ? 0 : (uint64_t)budget->direct_indexed;
+    direct = (sparse + 4 * budget->entities * sets + 7u) & ~7ull;
+    if (cells > UINT32_MAX / (budget->entities / 8 + 8)) {
+        say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: direct_indexed of %llu, "
+            "with a bit for each of %llu entities, is more than an offset of 32 bits can reach",
+            (unsigned long long)cells, (unsigned long long)budget->entities);
+        return 1;
+    }
+    arena = (direct + 8 * ((budget->entities + 63) / 64) * cells + 7u) & ~7ull;
     columns = (arena + budget->persistent + 15u) & ~15ull;      /* storage.md, *A table* */
     /* a whole number of what every backend that maps it needs - backend.md */
     len = (columns + budget->columns + b->granule - 1) / b->granule * b->granule;
@@ -346,6 +355,8 @@ int block_create(bridge *b, const bridge_budget *budget)
     b->entities = (uint32_t)budget->entities;
     b->sparse = (uint32_t)sparse;
     b->sparse_sets = (uint32_t)sets;
+    b->direct = (uint32_t)direct;
+    b->direct_indexed = (uint32_t)cells;
     b->arena = (uint32_t)arena;
     b->arena_len = (uint32_t)budget->persistent;
     b->columns = (uint32_t)columns;
@@ -356,7 +367,8 @@ int block_create(bridge *b, const bridge_budget *budget)
     b->max_systems = budget->systems;
     b->max_terms = budget->terms;
     /* a gap lies between two blocks, and a table has one block: never more gaps than tables */
-    b->column_space = (region){ .room = b->tables + b->sparse_sets + 1, .len = b->columns_len };
+    b->column_space = (region){ .room = b->tables + b->sparse_sets + b->direct_indexed + 1,
+                                .len = b->columns_len };
     b->column_space.gaps = malloc(b->column_space.room * sizeof(range));
     b->arena_space = (region){ .len = b->arena_len };
     if (bridge_short(b, b->column_space.gaps, "the list of what is free in [budget] columns")) return 1;

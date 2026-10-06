@@ -33,7 +33,10 @@ struct storage_type {
     uint32_t size;
     uint32_t align;                 /* where a column of it may begin: a power of two */
     enum bridge_storage kept;       /* the storage layout it is kept in */
-    uint32_t slot;                  /* which sparse set it is, when it is one */
+    uint32_t slot;                  /* which sparse set it is, when it is one; or which of
+                                     * the direct-indexed */
+    uint32_t cells, cells_len;      /* direct-indexed: its block, the sixteen bytes that say
+                                     * where its bits are and then a cell an entity */
 };
 
 struct storage_terms {
@@ -112,6 +115,12 @@ struct storage {
     uint64_t  *in_table;            /* one set: the types that are kept in tables */
     uint64_t  *before, *masked;     /* two sets more */
     uint32_t   table_count;         /* how many tables of archetypes there are */
+    /* direct-indexed: [budget] direct_indexed of them - storage.md, *Direct-indexed*. A cell
+     * for every entity, in a block of the column region taken at declare; and a bit for every
+     * entity that says it has a value there, kept here, with a copy for modules */
+    uint32_t   direct_room, bit_words;
+    storage_type **direct_type;     /* by slot: nullptr where none is declared */
+    uint64_t  *given;               /* [slot][bit_words]: which entities have one */
 };
 
 /* ---- sets ---- */
@@ -135,8 +144,20 @@ static uint32_t *cells_of(const storage *r, uint32_t slot)
     return (uint32_t *)(r->b->shared + r->b->sparse) + (size_t)slot * r->b->entities;
 }
 
-/* everything the entity at `index` carries: what its table holds, and every sparse set it
- * is in */
+static uint64_t *given_of(const storage *r, uint32_t slot)
+{
+    return r->given + (size_t)slot * r->bit_words;
+}
+
+/* what a module reads of the same: a bit an entity, where the sixteen bytes ahead of the
+ * cells say */
+static uint64_t *shown_of(const storage *r, uint32_t slot)
+{
+    return (uint64_t *)(r->b->shared + r->b->direct) + (size_t)slot * r->bit_words;
+}
+
+/* everything the entity at `index` carries: what its table holds, every sparse set it is in,
+ * and every direct-indexed component it has been given */
 static void carried(const storage *r, uint32_t index, uint64_t *set)
 {
     uint32_t t = r->places[index].table;
@@ -144,6 +165,9 @@ static void carried(const storage *r, uint32_t index, uint64_t *set)
     else memset(set, 0, 8u * r->words);
     for (uint32_t slot = 0; slot < r->set_room; slot ++) {
         if (r->set_type[slot] && where_of(r, slot)[index]) put(set, r->set_type[slot]->id);
+    }
+    for (uint32_t slot = 0; slot < r->direct_room; slot ++) {
+        if (r->direct_type[slot] && has(given_of(r, slot), index)) put(set, r->direct_type[slot]->id);
     }
 }
 
@@ -549,8 +573,21 @@ static uint32_t value_of(const storage *r, uint32_t index, const storage_type *t
         uint32_t row = where_of(r, type->slot)[index];
         return row ? columns_of(r, r->set_table[type->slot])[type->id] + (row - 1) * type->size : 0;
     }
+    if (type->kept == BRIDGE_DIRECT_INDEXED) {
+        return has(given_of(r, type->slot), index) ? type->cells + (uint32_t)COLUMN + index * type->size : 0;
+    }
     column = t ? columns_of(r, t)[type->id] : 0;
     return column ? column + r->places[index].row * type->size : 0;
+}
+
+/* the entity at `index` is given, or loses, the direct-indexed component of `slot`: its bit,
+ * here and where modules read it, and its cell made zero either way */
+static void cell_given(storage *r, uint32_t slot, uint32_t index, bool on)
+{
+    const storage_type *type = r->direct_type[slot];
+    if (on) put(given_of(r, slot), index), put(shown_of(r, slot), index);
+    else take(given_of(r, slot), index), take(shown_of(r, slot), index);
+    memset(r->b->shared + type->cells + COLUMN + (size_t)index * type->size, 0, type->size);
 }
 
 /* the entity at `index` goes to `to`, which has room: what it carried that `to` also holds
@@ -597,6 +634,9 @@ static void killed(storage *r, uint32_t index)
     place *p = &r->places[index];
     for (uint32_t slot = 0; slot < r->set_room; slot ++) {
         if (r->set_type[slot] && where_of(r, slot)[index]) left(r, slot, index);
+    }
+    for (uint32_t slot = 0; slot < r->direct_room; slot ++) {
+        if (r->direct_type[slot] && has(given_of(r, slot), index)) cell_given(r, slot, index, false);
     }
     if (p->table) removed(r, p->table, p->row);
     r->b->index[index] = (bridge_entity){ 0, 0, DEAD };
@@ -671,6 +711,11 @@ static bool stake(const storage *r, const module *m, uint32_t index)
     for (uint32_t slot = 0; slot < r->set_room; slot ++) {
         if (!r->set_type[slot] || !where_of(r, slot)[index]) continue;
         if (m->writable && has(m->writable, r->set_type[slot]->id)) return true;
+        any = true;
+    }
+    for (uint32_t slot = 0; slot < r->direct_room; slot ++) {
+        if (!r->direct_type[slot] || !has(given_of(r, slot), index)) continue;
+        if (m->writable && has(m->writable, r->direct_type[slot]->id)) return true;
         any = true;
     }
     return !any;
@@ -825,6 +870,14 @@ void storage_apply(storage *r)
             else if (r->set_type[slot] && where_of(r, slot)[index]
                      && !has(work_of(r, index), r->set_type[slot]->id)) left(r, slot, index);
         }
+        /* a direct-indexed component has its cell already, so it cannot be short of room */
+        for (uint32_t slot = 0; slot < r->direct_room; slot ++) {
+            bool was, is;
+            if (!r->direct_type[slot]) continue;
+            was = has(given_of(r, slot), index);
+            is = has(work_of(r, index), r->direct_type[slot]->id);
+            if (was != is) cell_given(r, slot, index, is);
+        }
     }
 
     /* 5. the values, in the order they were asked: the last one written is the one that stays */
@@ -951,7 +1004,8 @@ int storage_publish(storage *r, module *m)
         for (uint32_t s = 0; s < m->declared_count; s ++) {
             const storage_type *type = m->declared[s]->type;
             kept[s] = type->kept == BRIDGE_SPARSE_SET
-                    ? b->sparse + (uint32_t)(4ull * type->slot * b->entities) : 0;
+                    ? b->sparse + (uint32_t)(4ull * type->slot * b->entities)
+                    : type->kept == BRIDGE_DIRECT_INDEXED ? type->cells + (uint32_t)COLUMN : 0;
         }
         for (uint32_t t = 1; t < r->table_high; t ++) {
             if (!r->tables[t].live) continue;
@@ -1041,23 +1095,52 @@ uint32_t storage_sets_free(const storage *r)
     return n;
 }
 
+uint32_t storage_direct_free(const storage *r)
+{
+    uint32_t n = 0;
+    for (uint32_t slot = 0; slot < r->direct_room; slot ++) n += !r->direct_type[slot];
+    return n;
+}
+
 storage_type *storage_declare(storage *r, uint32_t size, uint32_t align, enum bridge_storage kept)
 {
-    uint32_t id, slot = 0;
+    uint32_t id, slot = 0, cells = 0, len = 0;
     for (id = 0; r->types[id]; id ++) {}        /* its declarer counted: there is one */
-    /* and asked storage_sets_free first, so there is one of these too */
+    /* and asked storage_sets_free or storage_direct_free first, so there is one of these too */
     for (; kept == BRIDGE_SPARSE_SET && r->set_type[slot]; slot ++) {}
+    for (; kept == BRIDGE_DIRECT_INDEXED && r->direct_type[slot]; slot ++) {}
+    if (kept == BRIDGE_DIRECT_INDEXED) {
+        /* a cell for every entity there may be, behind the sixteen bytes that say where its
+         * bits are: the one thing a declare asks of [budget] columns */
+        uint64_t want = padded(COLUMN + (uint64_t)size * r->b->entities);
+        uint32_t bits = r->b->direct + (uint32_t)(8ull * slot * r->bit_words);
+        uint8_t *block = want > INT32_MAX ? nullptr : block_column_regrow(r->b, nullptr, 0, (uint32_t)want);
+        if (!block) return nullptr;
+        memset(block, 0, (size_t)want);
+        memcpy(block, &bits, 4);
+        cells = (uint32_t)(block - r->b->shared);
+        len = (uint32_t)want;
+        memset(given_of(r, slot), 0, 8u * r->bit_words);
+        memset(shown_of(r, slot), 0, 8u * r->bit_words);
+    }
     r->types[id] = &r->type_pool[id];
-    *r->types[id] = (storage_type){ id, size, align, kept, slot };
+    *r->types[id] = (storage_type){ id, size, align, kept, slot, cells, len };
     if (kept == BRIDGE_SPARSE_SET) r->set_type[slot] = r->types[id];
+    else if (kept == BRIDGE_DIRECT_INDEXED) r->direct_type[slot] = r->types[id];
     else put(r->in_table, id);
     return r->types[id];
 }
 
 void storage_undeclare(storage *r, storage_type *type)
 {
-    if (type->kept == BRIDGE_SPARSE_SET) r->set_type[type->slot] = nullptr;
-    else take(r->in_table, type->id);
+    if (type->kept == BRIDGE_SPARSE_SET) {
+        r->set_type[type->slot] = nullptr;
+    } else if (type->kept == BRIDGE_DIRECT_INDEXED) {
+        block_column_free(r->b, r->b->shared + type->cells, type->cells_len);
+        r->direct_type[type->slot] = nullptr;
+    } else {
+        take(r->in_table, type->id);
+    }
     r->types[type->id] = nullptr;
 }
 
@@ -1162,13 +1245,35 @@ static void sets_swept(storage *r)
     }
 }
 
-/* whether the entity at `index` is in any sparse set */
+/* whether the entity at `index` carries something that is not kept in a table */
 static bool in_a_set(const storage *r, uint32_t index)
 {
     for (uint32_t slot = 0; slot < r->set_room; slot ++) {
         if (r->set_type[slot] && where_of(r, slot)[index]) return true;
     }
+    for (uint32_t slot = 0; slot < r->direct_room; slot ++) {
+        if (r->direct_type[slot] && has(given_of(r, slot), index)) return true;
+    }
     return false;
+}
+
+/* storage_drop, of a direct-indexed component: every entity that has been given one */
+static void cells_dropped(storage *r, const storage_type *type, enum bridge_on_unload policy)
+{
+    for (uint32_t index = 1; index < r->high; index ++) {
+        uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
+        if (!has(given_of(r, type->slot), index)) continue;
+        carried(r, index, r->before);
+        memcpy(r->scratch, r->before, 8u * r->words);
+        take(r->scratch, type->id);
+        if (policy == BRIDGE_DELETE || (policy == BRIDGE_SWEEP && empty(r, r->scratch))) {
+            destroyed(r, index);
+        } else {
+            told(r, id, r->before, r->scratch, nullptr);
+            cell_given(r, type->slot, index, false);
+        }
+    }
+    sets_swept(r);
 }
 
 /* storage_drop, of a component kept in a sparse set: an entity at a time, from the last */
@@ -1197,6 +1302,10 @@ void storage_drop(storage *r, storage_type *type, enum bridge_on_unload policy)
     uint32_t apart = 0;
     if (type->kept == BRIDGE_SPARSE_SET) {
         set_dropped(r, type, policy);
+        return;
+    }
+    if (type->kept == BRIDGE_DIRECT_INDEXED) {
+        cells_dropped(r, type, policy);
         return;
     }
     for (uint32_t t = 1; t < r->table_high; t ++) {
@@ -1282,6 +1391,10 @@ bool storage_alive(storage *r, uint64_t id)
 
 bool storage_any(storage *r, storage_type *type, bool (*is)(void *ctx, const uint8_t *row), void *ctx)
 {
+    for (uint32_t index = 1; type->kept == BRIDGE_DIRECT_INDEXED && index < r->high; index ++) {
+        if (has(given_of(r, type->slot), index)
+            && is(ctx, r->b->shared + type->cells + COLUMN + (size_t)index * type->size)) return true;
+    }
     for (uint32_t t = 1; t < r->table_high; t ++) {
         const uint8_t *column;
         if (!r->tables[t].live || !has(set_of(r, t), type->id)) continue;
@@ -1304,6 +1417,8 @@ storage *storage_create(bridge *b)
     /* a table for each archetype there may be, and one for each sparse set */
     r->table_room = b->tables + b->sparse_sets;
     r->set_room = b->sparse_sets;
+    r->direct_room = b->direct_indexed;
+    r->bit_words = (b->entities + 63) / 64;
     r->table_high = 1;                  /* table 0 is no table */
     r->high = 1;                        /* and index 0 is no entity */
     r->words = (b->max_types + 63) / 64;
@@ -1333,6 +1448,8 @@ storage *storage_create(bridge *b)
     r->set_type = calloc((size_t)r->set_room + 1, sizeof *r->set_type);
     r->set_table = calloc((size_t)r->set_room + 1, sizeof *r->set_table);
     r->where = calloc((size_t)(r->set_room ? r->set_room : 1) * b->entities, sizeof *r->where);
+    r->direct_type = calloc((size_t)r->direct_room + 1, sizeof *r->direct_type);
+    r->given = calloc((size_t)(r->direct_room ? r->direct_room : 1) * r->bit_words, 8);
     /* one more than there may be, so that looking for a free one always ends */
     r->types = calloc((size_t)r->type_room + 1, sizeof *r->types);
     r->type_pool = calloc(r->type_room, sizeof *r->type_pool);
@@ -1347,7 +1464,8 @@ storage *storage_create(bridge *b)
         || !r->work || !r->changed || !r->folded || !r->dest || !r->attached || !r->at || !r->scratch
         || !r->types || !r->type_pool || !r->terms_pool || !r->lists || !r->term_types
         || !r->term_opers || !r->systems || !r->observers || !r->before || !r->masked
-        || !r->in_table || !r->set_type || !r->set_table || !r->where) {
+        || !r->in_table || !r->set_type || !r->set_table || !r->where || !r->direct_type
+        || !r->given) {
         (void)bridge_short(b, nullptr, "storage, as [budget] sizes it");
         storage_destroy(r);
         return nullptr;
@@ -1392,5 +1510,7 @@ void storage_destroy(storage *r)
     free(r->set_type);
     free(r->set_table);
     free(r->where);
+    free(r->direct_type);
+    free(r->given);
     free(r);
 }

@@ -116,6 +116,16 @@ static inline const uint32_t *bridge_native_span(const bridge_api *api, const br
     return (const uint32_t *)(api->private_base + q->at + i * BRIDGE_SPAN_SIZE(terms));
 }
 
+/* ---- direct-indexed: a cell for every entity. storage.md, *Direct-indexed* ---- */
+
+/* The cells of the direct-indexed component `slot`, from the shared base: the value of the
+ * entity whose id's low 32 bits are e is cell e. Whether that entity has been given one is its
+ * bit, bit e & 63 of word e >> 6 of bridge_native_bits of the same offset. */
+static inline uint32_t bridge_native_cells(const bridge_api *api, uint32_t slot)
+{
+    return ((const uint32_t *)(api->private_base + bridge_native_header(api)->kept))[slot];
+}
+
 /* ---- a sparse set, reached from a row. storage.md, *A sparse set* ---- */
 
 /* The index of the sparse set that keeps component `slot`: a cell for each entity, by the low

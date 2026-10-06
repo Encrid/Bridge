@@ -168,6 +168,22 @@ static inline uint32_t bridge_set_value(uint32_t index, uint64_t id)
     return acc_ld_32(acc_row(index, (uint32_t)id, BRIDGE_HEADER(entities), 4u));
 }
 
+/* ---- direct-indexed: a cell for every entity. docs/bridge/storage.md, *Direct-indexed* ---- */
+
+/* where the cells of the direct-indexed component `slot` begin */
+static inline uint32_t bridge_cells(uint32_t slot)
+{
+    return acc_own_32(BRIDGE_HEADER(kept) + 4u * slot);
+}
+
+/* where entity `id` has its value of `stride` bytes among them, or zero: it was given none */
+static inline uint32_t bridge_cell(uint32_t cells, uint64_t id, uint32_t stride)
+{
+    uint32_t entities = BRIDGE_HEADER(entities), e = (uint32_t)id;
+    uint32_t word = acc_row(acc_ld_32(cells - 16u), e >> 6, (entities + 63u) >> 6, 8u);
+    return acc_ld_64(word) >> (e & 63u) & 1u ? acc_row(cells, e, entities, stride) : 0;
+}
+
 /* ---- a toggled component: a bit a row. docs/bridge/storage.md, *A toggle* ---- */
 
 /* where the bits of the toggled column at `base` are: row r is bit r & 63 of word r >> 6 */

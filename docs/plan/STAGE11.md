@@ -496,3 +496,9 @@ whole words of rows as a column; the others are what the compiler made of the sa
 a module, which is what a module gets. It is under a field tested by a branch at every share,
 55, 515 and 87 us, and over a field tested by a mask, 12 us, except where few rows are on.
 
+**Direct-indexed**, as `storage.md`, *Direct-indexed*, has it. Cases `storage-direct` and the
+six beside it, and `stage3-direct` on the wasm backend. Measured in the library: reached by a
+held id with the generation and the bit tested, 0.74 ns in the order they lie and 1.4 ns in no
+order, where through the table it is 1.1 and 2.5; and given in 25 ns, taken in 24. The gate's
+scratch figures were 0.98 and 1.6.
+

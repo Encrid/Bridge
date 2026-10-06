@@ -238,6 +238,9 @@ struct bridge {
     /* [budget] sparse_sets, and where their indexes begin in the shared memory: one after
      * another, each a u32 for every entity there may be */
     uint32_t       sparse_sets, sparse;
+    /* [budget] direct_indexed, and where their bits begin: one after another, each a bit for
+     * every entity there may be, in 64-bit words */
+    uint32_t       direct_indexed, direct;
     region         arena_space, column_space;   /* what of each is handed out */
     int            layout_moved;    /* a module came or went, or a declaration changed */
     uint32_t       tables;          /* [budget] tables: how many may exist at once */

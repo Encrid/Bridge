@@ -1,0 +1,34 @@
+spawn
+attach_b
+  heard_d: heard of D: entity, events 1 3
+  heard_d: heard of D: entity, events 3 3
+  heard_d: heard of D: entity, events 5 3
+  heard_both: heard of A and D: entity, events 1 3
+  heard_both: heard of A and D: entity, events 3 3
+  heard_both: heard of A and D: entity, events 5 3
+look_b
+  look_b: the table walked: rows, and of them given D 6 3
+  look_b: the table walked: the sum of A and D where both 312 0
+near
+  near: by id: alive, and of them given D 6 3
+  near: by id: the sum of D 306 0
+strip st:A
+never
+  heard_both: heard of A and D: entity, events 5 4
+  heard_both: heard of A and D: entity, events 3 4
+  heard_both: heard of A and D: entity, events 1 4
+delete st:D
+never
+  heard_d: heard of D: entity, events 1 4
+  heard_d: heard of D: entity, events 3 4
+  heard_d: heard of D: entity, events 5 4
+entity 1 is gone
+entity 2 is alive
+entity 3 is gone
+entity 4 is alive
+entity 5 is gone
+entity 6 is alive
+near
+  near: by id: alive, and of them given D 3 0
+  near: by id: the sum of D 0 0
+alive

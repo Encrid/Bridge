@@ -26,11 +26,13 @@ void storage_destroy(storage *r);
 
 /* A type whose rows are `size` bytes, kept in the storage layout `kept`. What it is made of
  * is its declarer's to know: schema.h. There is room for [budget] types of them, and of those
- * for [budget] sparse_sets kept in a sparse set: whoever declares counts, and asks first how
- * many of the second are left. */
+ * for [budget] sparse_sets kept in a sparse set and [budget] direct_indexed kept that way:
+ * whoever declares counts, and asks first how many of those are left. nullptr for one thing:
+ * a direct-indexed type whose cells [budget] columns has no room for. */
 [[nodiscard]] storage_type *storage_declare(storage *r, uint32_t size, uint32_t align,
                                             enum bridge_storage kept);
 uint32_t storage_sets_free(const storage *r);
+uint32_t storage_direct_free(const storage *r);
 void storage_undeclare(storage *r, storage_type *type);
 
 typedef struct {
