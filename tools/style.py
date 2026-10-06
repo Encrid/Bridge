@@ -389,6 +389,9 @@ def check_function(src, f):
         elif end == first - 1 and not re.match(r'/\*\n\*\* %s\n\*\*\n(?:\*\*(?: [^\n]+)?\n)+\*/\Z' % re.escape(f.name), text):
             say('F6', start, "the comment above '%s' is not: its name, an empty line, what it does" % f.name)
 
+    if not re.search(r'\bstatic\b', f.prefix) and not any(end == first - 1 for _, end, _ in src.comments):
+        say('F6', first, "'%s' is not static, and has no comment above it" % f.name)
+
     tokens = tokens_of(code, f.open_at + 1, f.close_at)
     blocks = [{'level': 1, 'case': 0, 'opened': 0, 'control': 0, 'do': False}]
     state = {'extra': 0, 'chain': {}, 'declared': [], 'coded': False, 'ended': 0}
