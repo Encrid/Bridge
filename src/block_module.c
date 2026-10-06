@@ -74,7 +74,7 @@ void block_write_header(bridge_t *b, module_t *m)
     h->observers = m->spans + queries;
     h->column_base = h->observers + lists;
     h->types = m->declared_count;
-    h->tables = storage_tables(b->storage);
+    h->tables = storage_count_tables(b->storage);
     h->kept = h->column_base + 4u * h->types * h->tables;
     h->entity_index = block_get_offset(b, b->index);
     h->entities = b->entities;

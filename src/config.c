@@ -93,7 +93,7 @@ static int seed_all(config_seed_t *seed)
         i++;
     }
     if (!refused) {
-        storage_single(seed->b->storage, c->type, seed->row, c->size);
+        storage_give_single(seed->b->storage, c->type, seed->row, c->size);
         seed->m->config = c;
     }
     free(seed->row);

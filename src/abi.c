@@ -230,7 +230,7 @@ static int renumbered(module_t *m, const declared_type_t *was, const schema_t *i
 static int relay(module_t *m, declared_type_t *was, enum bridge_kind kind, const schema_t *is)
 {
     static const char *const kinds[] = { "", "a struct", "an enum", "a bitmask", "a tag" };
-    relaying_t l = { .m = m, .rows = storage_count(m->b->storage, was->type) };
+    relaying_t l = { .m = m, .rows = storage_count_carriers(m->b->storage, was->type) };
     if (was->kind != kind) {
         return refuse(m, "type '%s' is %s here and was %s: a reload does not change what kind of "
             "type one is", was->name, kinds[kind], kinds[was->kind]);
@@ -289,7 +289,7 @@ static const declared_type_t *held_elsewhere(const bridge_t *b, const module_t *
  * 1 and a refusal for a move that cannot be made, or that loses what was not accepted. */
 static int moved_storage(module_t *m, const declared_type_t *c, enum bridge_storage kept)
 {
-    uint32_t carriers = storage_count(m->b->storage, c->type), off = storage_off(m->b->storage, c->type);
+    uint32_t carriers = storage_count_carriers(m->b->storage, c->type), off = storage_count_off(m->b->storage, c->type);
     if (c->storage == BRIDGE_SINGLETON) {
         return refuse(m, "type '%s' is a singleton, and is not moved to %s: there is no entity to "
             "carry it", c->name, storage_names[kept]);
@@ -335,7 +335,7 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
         if (declared) m->declared = declared;
         if (policy) m->policy = policy;
         if (writes) m->may_write = writes;
-        if (!declared || !policy || !writes || !storage_writable(b->storage, m)) {
+        if (!declared || !policy || !writes || !storage_make_writable(b->storage, m)) {
             return refuse(m, "out of memory: there was none for what it declares");
         }
     }
@@ -449,13 +449,13 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
                 b->max_types);
         }
 
-        if (kept == BRIDGE_SPARSE_SET && !storage_sets_free(b->storage)) {
+        if (kept == BRIDGE_SPARSE_SET && !storage_count_free_sets(b->storage)) {
             schema_free(&s);
             return refuse(m, "type '%s' is one more than [budget] sparse_sets of %u", name,
                 b->sparse_sets);
         }
 
-        if (kept == BRIDGE_DIRECT_INDEXED && !storage_direct_free(b->storage)) {
+        if (kept == BRIDGE_DIRECT_INDEXED && !storage_count_free_direct(b->storage)) {
             schema_free(&s);
             return refuse(m, "type '%s' is one more than [budget] direct_indexed of %u", name,
                 b->direct_indexed);
@@ -524,7 +524,7 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
     m->policy[m->declared_count] = on_unload;
     m->declared[m->declared_count] = c;
     m->may_write[m->declared_count] = may_write(m, c);
-    if (m->may_write[m->declared_count]) storage_writes(b->storage, m, c->type);
+    if (m->may_write[m->declared_count]) storage_let_write(b->storage, m, c->type);
     c->declarers ++;
     b->layout_moved = 1;
     r[0] = m->declared_count ++;
@@ -718,8 +718,8 @@ static int subscribe(module_t *m, uint64_t name_off, uint64_t name_len, uint32_t
         s->term[i].writes = t.access == BRIDGE_WRITE;
     }
 
-    s->matched = events ? storage_observer(b->storage, asked, count, events, heard, s)
-               : count ? storage_system(b->storage, asked, count) : nullptr;
+    s->matched = events ? storage_add_observer(b->storage, asked, count, events, heard, s)
+               : count ? storage_add_system(b->storage, asked, count) : nullptr;
     s->asked = asked;
     s->events = events;
 
@@ -830,8 +830,8 @@ void abi_park(bridge_t *b, bridge_system_t *s)
 void abi_unpark(bridge_t *b, bridge_system_t *s)
 {
     if (!s->parked) return;
-    s->matched = s->events ? storage_observer(b->storage, s->asked, s->terms, s->events, heard, s)
-               : s->terms ? storage_system(b->storage, s->asked, s->terms) : nullptr;
+    s->matched = s->events ? storage_add_observer(b->storage, s->asked, s->terms, s->events, heard, s)
+               : s->terms ? storage_add_system(b->storage, s->asked, s->terms) : nullptr;
     s->parked = 0;
     b->parked --;
 }

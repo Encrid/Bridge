@@ -132,12 +132,12 @@ struct storage {
 
 /* ---- sets ---- */
 
-static bool has(const uint64_t *set, uint32_t type) { return set[type >> 6] >> (type & 63) & 1; }
-static void put(uint64_t *set, uint32_t type) { set[type >> 6] |= (uint64_t)1 << (type & 63); }
-static void take(uint64_t *set, uint32_t type) { set[type >> 6] &= ~((uint64_t)1 << (type & 63)); }
+static bool set_has(const uint64_t *set, uint32_t type) { return set[type >> 6] >> (type & 63) & 1; }
+static void set_put(uint64_t *set, uint32_t type) { set[type >> 6] |= (uint64_t)1 << (type & 63); }
+static void set_take(uint64_t *set, uint32_t type) { set[type >> 6] &= ~((uint64_t)1 << (type & 63)); }
 
-static const uint64_t *set_of(const storage_t *r, uint32_t t) { return r->sets + (size_t)t * r->words; }
-static uint32_t *columns_of(const storage_t *r, uint32_t t) { return r->columns + (size_t)t * r->type_room; }
+static const uint64_t *get_set(const storage_t *r, uint32_t t) { return r->sets + (size_t)t * r->words; }
+static uint32_t *get_columns(const storage_t *r, uint32_t t) { return r->columns + (size_t)t * r->type_room; }
 
 /* A set is a 64-bit word for each 64 types there may be: one, in most deployments. Copied
  * and compared a word at a time here, since memcpy and memcmp of a length the compiler cannot
@@ -147,12 +147,12 @@ static inline void set_copy(const storage_t *r, uint64_t *to, const uint64_t *fr
     for (uint32_t w = 0; w < r->words; w ++) to[w] = from[w];
 }
 
-static inline void set_none(const storage_t *r, uint64_t *set)
+static inline void set_clear(const storage_t *r, uint64_t *set)
 {
     for (uint32_t w = 0; w < r->words; w ++) set[w] = 0;
 }
 
-static inline bool set_same(const storage_t *r, const uint64_t *a, const uint64_t *b)
+static inline bool set_is_same(const storage_t *r, const uint64_t *a, const uint64_t *b)
 {
     for (uint32_t w = 0; w < r->words; w ++) if (a[w] != b[w]) return false;
     return true;
@@ -161,40 +161,40 @@ static inline bool set_same(const storage_t *r, const uint64_t *a, const uint64_
 /* A value is a word or two more often than not, and a copy or a clearing of a length the
  * compiler cannot see is a call. The two commonest sizes are done here, for every row that
  * moves. */
-static inline void bytes_copy(uint8_t *to, const uint8_t *from, uint32_t size)
+static inline void copy_bytes(uint8_t *to, const uint8_t *from, uint32_t size)
 {
     if (size == 4) memcpy(to, from, 4);
     else if (size == 8) memcpy(to, from, 8);
     else memcpy(to, from, size);
 }
 
-static inline void bytes_none(uint8_t *at, uint32_t size)
+static inline void clear_bytes(uint8_t *at, uint32_t size)
 {
     if (size == 4) memset(at, 0, 4);
     else if (size == 8) memset(at, 0, 8);
     else memset(at, 0, size);
 }
 
-static uint32_t *where_of(const storage_t *r, uint32_t slot)
+static uint32_t *get_where(const storage_t *r, uint32_t slot)
 {
     return r->where + (size_t)slot * r->b->entities;
 }
 
 /* what a module reads of a sparse set: for each entity where its value is, from the shared
  * base, and 0 where it has none - storage.md, *A sparse set* */
-static uint32_t *cells_of(const storage_t *r, uint32_t slot)
+static uint32_t *get_cells(const storage_t *r, uint32_t slot)
 {
     return (uint32_t *)(r->b->shared + r->b->sparse) + (size_t)slot * r->b->entities;
 }
 
-static uint64_t *given_of(const storage_t *r, uint32_t slot)
+static uint64_t *get_given(const storage_t *r, uint32_t slot)
 {
     return r->given + (size_t)slot * r->bit_words;
 }
 
 /* what a module reads of the same: a bit an entity, where the sixteen bytes ahead of the
  * cells say */
-static uint64_t *shown_of(const storage_t *r, uint32_t slot)
+static uint64_t *get_shown(const storage_t *r, uint32_t slot)
 {
     return (uint64_t *)(r->b->shared + r->b->direct) + (size_t)slot * r->bit_words;
 }
@@ -202,7 +202,7 @@ static uint64_t *shown_of(const storage_t *r, uint32_t slot)
 /* storage.md, *A tag*: what a module is handed for where a column is. A tag has none, and is
  * handed that it is carried; but a toggled tag has its bits ahead of where its column would
  * be, and is handed that. */
-static inline uint32_t handed(const storage_t *r, uint32_t type, uint32_t column)
+static inline uint32_t get_handed(const storage_t *r, uint32_t type, uint32_t column)
 {
     /* while no tag is declared, a column is where it is, and no type is looked at */
     if (!r->tags || !column) return column;
@@ -210,38 +210,38 @@ static inline uint32_t handed(const storage_t *r, uint32_t type, uint32_t column
 }
 
 /* and for where the value of row `row` of a sparse set is */
-static uint32_t cell_of(const storage_type_t *type, uint32_t column, uint32_t row)
+static uint32_t get_cell(const storage_type_t *type, uint32_t column, uint32_t row)
 {
     return type->size ? column + row * type->size : BRIDGE_CARRIED;
 }
 
 /* everything the entity at `index` carries: what its table holds, every sparse set it is in,
  * and every direct-indexed component it has been given */
-[[gnu::always_inline]] static inline void carried(const storage_t *r, uint32_t index, uint64_t *set)
+[[gnu::always_inline]] static inline void get_carried(const storage_t *r, uint32_t index, uint64_t *set)
 {
     uint32_t t = r->places[index].table;
-    if (t) set_copy(r, set, set_of(r, t));
-    else set_none(r, set);
+    if (t) set_copy(r, set, get_set(r, t));
+    else set_clear(r, set);
     if (!r->apart) return;
     for (uint32_t slot = 0; slot < r->set_room; slot ++) {
-        if (r->set_type[slot] && where_of(r, slot)[index]) put(set, r->set_type[slot]->id);
+        if (r->set_type[slot] && get_where(r, slot)[index]) set_put(set, r->set_type[slot]->id);
     }
     for (uint32_t slot = 0; slot < r->direct_room; slot ++) {
-        if (r->direct_type[slot] && has(given_of(r, slot), index)) put(set, r->direct_type[slot]->id);
+        if (r->direct_type[slot] && set_has(get_given(r, slot), index)) set_put(set, r->direct_type[slot]->id);
     }
     /* and index 0, which is no entity, is what a singleton that has a value is on */
     for (uint32_t id = 0; !index && id < r->type_room; id ++) {
-        if (r->types[id] && r->types[id]->set) put(set, id);
+        if (r->types[id] && r->types[id]->set) set_put(set, id);
     }
 }
 
-static bool empty(const storage_t *r, const uint64_t *set)
+static bool set_is_empty(const storage_t *r, const uint64_t *set)
 {
     for (uint32_t w = 0; w < r->words; w ++) if (set[w]) return false;
     return true;
 }
 
-static uint32_t hashed(const storage_t *r, const uint64_t *set)
+static uint32_t hash_set(const storage_t *r, const uint64_t *set)
 {
     uint64_t h = 1'469'598'103'934'665'603ull;
     for (uint32_t w = 0; w < r->words; w ++) h = (h ^ set[w]) * 1'099'511'628'211ull;
@@ -255,29 +255,29 @@ static uint32_t hashed(const storage_t *r, const uint64_t *set)
  * eight past it takes 8.3 us for 204,800 rows where this takes 5.6 to 6.4. */
 constexpr uint64_t COLUMN = 16;
 
-static uint64_t padded(uint64_t bytes) { return (bytes + COLUMN - 1) & ~(COLUMN - 1); }
+static uint64_t pad_column(uint64_t bytes) { return (bytes + COLUMN - 1) & ~(COLUMN - 1); }
 
 /* storage.md, *A toggle*: a toggled column has a bit a row, a 64-bit word for each 64 rows,
  * ahead of it in the block; and between the two, sixteen bytes that say where the bits begin,
  * which is where a module that has the column finds them. */
-static uint64_t bits_len(uint32_t room) { return padded(8ull * ((room + 63) / 64)); }
+static uint64_t get_bits_len(uint32_t room) { return pad_column(8ull * ((room + 63) / 64)); }
 
 /* where the bits of the toggled column at `column` are, in a block of `room` rows */
-static uint32_t bits_of(uint32_t column, uint32_t room)
+static uint32_t get_bits(uint32_t column, uint32_t room)
 {
-    return column - (uint32_t)COLUMN - (uint32_t)bits_len(room);
+    return column - (uint32_t)COLUMN - (uint32_t)get_bits_len(room);
 }
 
-static bool on_at(const storage_t *r, uint32_t column, uint32_t room, uint32_t row)
+static bool is_on(const storage_t *r, uint32_t column, uint32_t room, uint32_t row)
 {
     uint64_t word;
-    memcpy(&word, r->b->shared + bits_of(column, room) + 8u * (row >> 6), 8);
+    memcpy(&word, r->b->shared + get_bits(column, room) + 8u * (row >> 6), 8);
     return word >> (row & 63) & 1;
 }
 
-static void turned(storage_t *r, uint32_t column, uint32_t room, uint32_t row, bool on)
+static void turn_row(storage_t *r, uint32_t column, uint32_t room, uint32_t row, bool on)
 {
-    uint8_t *at = r->b->shared + bits_of(column, room) + 8u * (row >> 6);
+    uint8_t *at = r->b->shared + get_bits(column, room) + 8u * (row >> 6);
     uint64_t word;
     memcpy(&word, at, 8);
     word = on ? word | (uint64_t)1 << (row & 63) : word & ~((uint64_t)1 << (row & 63));
@@ -287,20 +287,20 @@ static void turned(storage_t *r, uint32_t column, uint32_t room, uint32_t row, b
 /* How long a block of `room` rows of `set` is, and into r->at where each of its columns
  * begins in it: the ids, then every type in the order of its number, each at the next
  * multiple of sixteen. The whole is a multiple of sixteen too, for the block after it. */
-static uint64_t laid_out(const storage_t *r, const uint64_t *set, uint32_t room)
+static uint64_t lay_out(const storage_t *r, const uint64_t *set, uint32_t room)
 {
     uint64_t at = 8ull * room;
     for (uint32_t w = 0; w < r->words; w ++) {
         for (uint64_t bits = set[w]; bits; bits &= bits - 1) {
             const storage_type_t *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
             /* a tag has no column to begin anywhere */
-            if (type->size || type->kept == BRIDGE_TOGGLE) at = padded(at);
-            if (type->kept == BRIDGE_TOGGLE) at += bits_len(room) + COLUMN;
+            if (type->size || type->kept == BRIDGE_TOGGLE) at = pad_column(at);
+            if (type->kept == BRIDGE_TOGGLE) at += get_bits_len(room) + COLUMN;
             r->at[type->id] = at;
             at += (uint64_t)type->size * room;
         }
     }
-    return padded(at);
+    return pad_column(at);
 }
 
 static void touch(storage_t *r, uint32_t t)
@@ -310,7 +310,7 @@ static void touch(storage_t *r, uint32_t t)
     r->dirty[r->dirty_count ++] = t;
 }
 
-static uint64_t *who_of(const storage_t *r, const table_t *tab)
+static uint64_t *get_who(const storage_t *r, const table_t *tab)
 {
     return r->who + (tab->block - r->b->columns) / 8;
 }
@@ -321,8 +321,8 @@ static bool grow(storage_t *r, uint32_t t, uint32_t room)
 {
     table_t *tab = &r->tables[t];
     bridge_t *b = r->b;
-    const uint64_t *set = set_of(r, t);
-    uint32_t *columns = columns_of(r, t), was = tab->block, asked = room, had = tab->room;
+    const uint64_t *set = get_set(r, t);
+    uint32_t *columns = get_columns(r, t), was = tab->block, asked = room, had = tab->room;
     uint64_t len, to;
     uint8_t *block;
 
@@ -332,7 +332,7 @@ static bool grow(storage_t *r, uint32_t t, uint32_t room)
      * twice: as fast, with half the idle room - storage.md, *A table* */
     if (room < tab->room + tab->room / 2) room = tab->room + tab->room / 2;
     for (;; room = asked) {
-        len = laid_out(r, set, room);
+        len = lay_out(r, set, room);
         block = len > INT32_MAX ? nullptr
               : block_column_regrow(b, was ? b->shared + was : nullptr, tab->block_len, (uint32_t)len);
         if (block) break;
@@ -340,7 +340,7 @@ static bool grow(storage_t *r, uint32_t t, uint32_t room)
     }
     tab->block = (uint32_t)(block - b->shared);
     if (was && tab->block != was) {
-        memcpy(who_of(r, tab), r->who + (was - b->columns) / 8, 8ull * tab->rows);
+        memcpy(get_who(r, tab), r->who + (was - b->columns) / 8, 8ull * tab->rows);
     }
     tab->block_len = (uint32_t)len;
     tab->room = room;
@@ -356,9 +356,9 @@ static bool grow(storage_t *r, uint32_t t, uint32_t room)
             if (was) memmove(block + to, block + (columns[id] - was), (size_t)type->size * tab->rows);
             if (type->kept == BRIDGE_TOGGLE) {
                 /* its bits after its values, since both move out; and where they are now */
-                uint32_t bits = tab->block + bits_of((uint32_t)to, room);
+                uint32_t bits = tab->block + get_bits((uint32_t)to, room);
                 if (was) {
-                    memmove(b->shared + bits, block + (bits_of(columns[id], had) - was),
+                    memmove(b->shared + bits, block + (get_bits(columns[id], had) - was),
                         8u * ((tab->rows + 63) / 64));
                 }
                 memcpy(block + to - COLUMN, &bits, 4);
@@ -369,9 +369,9 @@ static bool grow(storage_t *r, uint32_t t, uint32_t room)
     /* a sparse set's values have moved, and each entity's cell says where its own is */
     if (tab->set) {
         const storage_type_t *type = r->set_type[tab->set - 1];
-        uint32_t *cells = cells_of(r, tab->set - 1);
+        uint32_t *cells = get_cells(r, tab->set - 1);
         for (uint32_t row = 0; row < tab->rows; row ++) {
-            cells[(uint32_t)who_of(r, tab)[row]] = cell_of(type, columns[type->id], row);
+            cells[(uint32_t)get_who(r, tab)[row]] = get_cell(type, columns[type->id], row);
         }
     }
     touch(r, t);
@@ -380,30 +380,30 @@ static bool grow(storage_t *r, uint32_t t, uint32_t room)
 
 /* ---- tables, by their set ---- */
 
-static uint32_t table_of(const storage_t *r, const uint64_t *set)
+static uint32_t find_table(const storage_t *r, const uint64_t *set)
 {
-    uint32_t i = hashed(r, set);
+    uint32_t i = hash_set(r, set);
     while (r->hash[i]) {
-        if (set_same(r, set_of(r, r->hash[i]), set)) return r->hash[i];
+        if (set_is_same(r, get_set(r, r->hash[i]), set)) return r->hash[i];
         i = (i + 1) & (r->hash_room - 1);
     }
     return 0;
 }
 
-static bool matches(const storage_terms_t *t, const uint64_t *set)
+static bool terms_match(const storage_terms_t *t, const uint64_t *set)
 {
     for (uint32_t i = 0; i < t->count; i ++) {
-        if (t->oper[i] == BRIDGE_AND && !has(set, t->type[i])) return false;
-        if (t->oper[i] == BRIDGE_NOT && has(set, t->type[i])) return false;
+        if (t->oper[i] == BRIDGE_AND && !set_has(set, t->type[i])) return false;
+        if (t->oper[i] == BRIDGE_NOT && set_has(set, t->type[i])) return false;
     }
     return true;
 }
 
 /* Whether a system's spans include table `t`: its set matches, and a sparse set's table is
  * walked only by a system that must have its type - storage.md, *What a query walks* */
-static bool reads(const storage_t *r, const storage_terms_t *s, uint32_t t)
+static bool terms_read(const storage_t *r, const storage_terms_t *s, uint32_t t)
 {
-    if (!matches(s, set_of(r, t))) return false;
+    if (!terms_match(s, get_set(r, t))) return false;
     if (!r->tables[t].set) return true;
     for (uint32_t i = 0; i < s->count; i ++) {
         if (s->oper[i] == BRIDGE_AND && s->type[i] == r->set_type[r->tables[t].set - 1]->id) return true;
@@ -413,21 +413,21 @@ static bool reads(const storage_t *r, const storage_terms_t *s, uint32_t t)
 
 /* The table a set is found as, and no longer. What followed it in its run of the hash is put
  * back where it is still found. */
-static void named(storage_t *r, uint32_t t)
+static void name_table(storage_t *r, uint32_t t)
 {
     uint32_t i;
-    for (i = hashed(r, set_of(r, t)); r->hash[i]; i = (i + 1) & (r->hash_room - 1)) {}
+    for (i = hash_set(r, get_set(r, t)); r->hash[i]; i = (i + 1) & (r->hash_room - 1)) {}
     r->hash[i] = t;
     r->tables[t].named = true;
 }
 
-static void unnamed(storage_t *r, uint32_t t)
+static void unname_table(storage_t *r, uint32_t t)
 {
-    uint32_t i = hashed(r, set_of(r, t)), k;
+    uint32_t i = hash_set(r, get_set(r, t)), k;
     while (r->hash[i] != t) i = (i + 1) & (r->hash_room - 1);
     r->hash[i] = 0;
     for (k = (i + 1) & (r->hash_room - 1); r->hash[k]; k = (k + 1) & (r->hash_room - 1)) {
-        uint32_t other = r->hash[k], home = hashed(r, set_of(r, other));
+        uint32_t other = r->hash[k], home = hash_set(r, get_set(r, other));
         r->hash[k] = 0;
         while (r->hash[home]) home = (home + 1) & (r->hash_room - 1);
         r->hash[home] = other;
@@ -437,18 +437,18 @@ static void unnamed(storage_t *r, uint32_t t)
 
 /* Systems are fixed at load, so a table is matched against them when it is made, and again only
  * if its set changes: in each list it belongs in, and out of every one. */
-static void listed(storage_t *r, uint32_t t)
+static void list_table(storage_t *r, uint32_t t)
 {
     for (uint32_t i = 0; i < r->system_count; i ++) {
         storage_terms_t *s = r->systems[i];
-        if (!reads(r, s, t)) continue;
+        if (!terms_read(r, s, t)) continue;
         s->list[s->matched] = t;
         s->pos[t] = ++ s->matched;
         s->changed = true;
     }
 }
 
-static void unlisted(storage_t *r, uint32_t t)
+static void unlist_table(storage_t *r, uint32_t t)
 {
     for (uint32_t i = 0; i < r->system_count; i ++) {
         storage_terms_t *s = r->systems[i];
@@ -462,14 +462,14 @@ static void unlisted(storage_t *r, uint32_t t)
 }
 
 /* the table of this set, made if there is none. 0 if there is no room for another. */
-static uint32_t table_for(storage_t *r, const uint64_t *set)
+static uint32_t make_table(storage_t *r, const uint64_t *set)
 {
-    uint32_t t = table_of(r, set), slot;
+    uint32_t t = find_table(r, set), slot;
     if (t) return t;
     /* a set that holds a type kept in a sparse set is that sparse set's table: there is
      * room for one each beside [budget] tables, so it is never refused */
     for (slot = 0; slot < r->set_room; slot ++) {
-        if (r->set_type[slot] && has(set, r->set_type[slot]->id)) break;
+        if (r->set_type[slot] && set_has(set, r->set_type[slot]->id)) break;
     }
     if (slot == r->set_room && r->table_count >= r->b->tables) return 0;
     if (r->table_free) {
@@ -489,21 +489,21 @@ static uint32_t table_for(storage_t *r, const uint64_t *set)
         r->table_count ++;
     }
     memcpy(r->sets + (size_t)t * r->words, set, 8u * r->words);
-    memset(columns_of(r, t), 0, 4u * r->type_room);
-    named(r, t);
-    listed(r, t);
+    memset(get_columns(r, t), 0, 4u * r->type_room);
+    name_table(r, t);
+    list_table(r, t);
     touch(r, t);
     return t;
 }
 
 /* its last row has left: its block, its id and its place in every system's list are given back */
-static void table_gone(storage_t *r, uint32_t t)
+static void free_table(storage_t *r, uint32_t t)
 {
     table_t *tab = &r->tables[t];
     if (tab->block) block_column_free(r->b, r->b->shared + tab->block, tab->block_len);
-    if (tab->named) unnamed(r, t);
-    unlisted(r, t);
-    memset(columns_of(r, t), 0, 4u * r->type_room);
+    if (tab->named) unname_table(r, t);
+    unlist_table(r, t);
+    memset(get_columns(r, t), 0, 4u * r->type_room);
     touch(r, t);
     if (tab->set) r->set_table[tab->set - 1] = 0;
     else r->table_count --;
@@ -516,29 +516,29 @@ static void table_gone(storage_t *r, uint32_t t)
 /* A table stops carrying `type`, where it stands: the column goes, the ones after it close up,
  * and what the block no longer needs is given back. No row moves and nothing is asked of the
  * column region, so this cannot fail. `name` if no other table is found as what is left. */
-static void stripped(storage_t *r, uint32_t t, const storage_type_t *type, bool name)
+static void strip_table(storage_t *r, uint32_t t, const storage_type_t *type, bool name)
 {
     table_t *tab = &r->tables[t];
     bridge_t *b = r->b;
     uint64_t *set = r->sets + (size_t)t * r->words;
-    uint32_t *columns = columns_of(r, t);
+    uint32_t *columns = get_columns(r, t);
     uint64_t len;
 
-    if (tab->named) unnamed(r, t);
-    unlisted(r, t);
+    if (tab->named) unname_table(r, t);
+    unlist_table(r, t);
     columns[type->id] = 0;
-    take(set, type->id);
+    set_take(set, type->id);
     /* what is left, laid out again: the columns before the one that went are where they were,
      * and each after it moves down to its new place, the first first */
-    len = laid_out(r, set, tab->room);
+    len = lay_out(r, set, tab->room);
     for (uint32_t w = type->id >> 6; w < r->words; w ++) {
         for (uint64_t bits = set[w]; bits; bits &= bits - 1) {
             const storage_type_t *after = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
             if (after->id < type->id) continue;
             if (after->kept == BRIDGE_TOGGLE) {
                 /* its bits before its values, since both move down */
-                uint32_t bits = bits_of(tab->block + (uint32_t)r->at[after->id], tab->room);
-                memmove(b->shared + bits, b->shared + bits_of(columns[after->id], tab->room),
+                uint32_t bits = get_bits(tab->block + (uint32_t)r->at[after->id], tab->room);
+                memmove(b->shared + bits, b->shared + get_bits(columns[after->id], tab->room),
                     8u * ((tab->rows + 63) / 64));
                 memcpy(b->shared + tab->block + r->at[after->id] - COLUMN, &bits, 4);
             }
@@ -551,14 +551,14 @@ static void stripped(storage_t *r, uint32_t t, const storage_type_t *type, bool 
     if (block_column_regrow(b, b->shared + tab->block, tab->block_len, (uint32_t)len)
         != b->shared + tab->block) unreachable();
     tab->block_len = (uint32_t)len;
-    if (name) named(r, t);
-    listed(r, t);
+    if (name) name_table(r, t);
+    list_table(r, t);
     touch(r, t);
 }
 
 /* ---- rows ---- */
 
-static void placed(storage_t *r, uint32_t index, uint32_t t, uint32_t row)
+static void place_row(storage_t *r, uint32_t index, uint32_t t, uint32_t row)
 {
     place_t *p = &r->places[index];
     p->table = t;
@@ -568,86 +568,86 @@ static void placed(storage_t *r, uint32_t index, uint32_t t, uint32_t row)
 
 /* the entity at `index` has row `row` of a sparse set's table: kept here, and written where
  * modules read it */
-static void seated(storage_t *r, const table_t *tab, uint32_t index, uint32_t row)
+static void seat_row(storage_t *r, const table_t *tab, uint32_t index, uint32_t row)
 {
     const storage_type_t *type = r->set_type[tab->set - 1];
-    where_of(r, tab->set - 1)[index] = row + 1;
-    cells_of(r, tab->set - 1)[index] = cell_of(type, columns_of(r, (uint32_t)(tab - r->tables))[type->id], row);
+    get_where(r, tab->set - 1)[index] = row + 1;
+    get_cells(r, tab->set - 1)[index] = get_cell(type, get_columns(r, (uint32_t)(tab - r->tables))[type->id], row);
 }
 
 /* a row at the end of `t`, which has room for it, for the entity at `index` */
-static uint32_t appended(storage_t *r, uint32_t t, uint32_t index)
+static uint32_t append_row(storage_t *r, uint32_t t, uint32_t index)
 {
     table_t *tab = &r->tables[t];
     uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
     uint32_t row = tab->rows ++;
-    who_of(r, tab)[row] = id;
+    get_who(r, tab)[row] = id;
     memcpy(r->b->shared + tab->block + 8ull * row, &id, 8);
     touch(r, t);
     return row;
 }
 
 /* a row leaves `t`: the last one is moved into its place, and the entity that was in it is told */
-[[gnu::always_inline]] static inline void removed(storage_t *r, uint32_t t, uint32_t row)
+[[gnu::always_inline]] static inline void remove_row(storage_t *r, uint32_t t, uint32_t row)
 {
     table_t *tab = &r->tables[t];
-    uint32_t last = -- tab->rows, *columns = columns_of(r, t);
+    uint32_t last = -- tab->rows, *columns = get_columns(r, t);
     touch(r, t);
     if (row == last) return;
     for (uint32_t w = 0; w < r->words; w ++) {
-        for (uint64_t bits = set_of(r, t)[w]; bits; bits &= bits - 1) {
+        for (uint64_t bits = get_set(r, t)[w]; bits; bits &= bits - 1) {
             const storage_type_t *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
             uint8_t *column = r->b->shared + columns[type->id];
-            bytes_copy(column + (size_t)row * type->size, column + (size_t)last * type->size, type->size);
+            copy_bytes(column + (size_t)row * type->size, column + (size_t)last * type->size, type->size);
             if (type->kept == BRIDGE_TOGGLE) {
-                turned(r, columns[type->id], tab->room, row, on_at(r, columns[type->id], tab->room, last));
+                turn_row(r, columns[type->id], tab->room, row, is_on(r, columns[type->id], tab->room, last));
             }
         }
     }
-    who_of(r, tab)[row] = who_of(r, tab)[last];
-    memcpy(r->b->shared + tab->block + 8ull * row, &who_of(r, tab)[row], 8);
-    if (tab->set) seated(r, tab, (uint32_t)who_of(r, tab)[row], row);
-    else placed(r, (uint32_t)who_of(r, tab)[row], t, row);
+    get_who(r, tab)[row] = get_who(r, tab)[last];
+    memcpy(r->b->shared + tab->block + 8ull * row, &get_who(r, tab)[row], 8);
+    if (tab->set) seat_row(r, tab, (uint32_t)get_who(r, tab)[row], row);
+    else place_row(r, (uint32_t)get_who(r, tab)[row], t, row);
 }
 
 /* the entity at `index` joins the sparse set of `slot`, whose table has room for it: with a
  * value of zero, until an attach's is written */
-static void joined(storage_t *r, uint32_t slot, uint32_t index)
+static void join_set(storage_t *r, uint32_t slot, uint32_t index)
 {
     const storage_type_t *type = r->set_type[slot];
-    uint32_t t = r->set_table[slot], row = appended(r, t, index);
-    bytes_none(r->b->shared + columns_of(r, t)[type->id] + (size_t)row * type->size, type->size);
-    seated(r, &r->tables[t], index, row);
+    uint32_t t = r->set_table[slot], row = append_row(r, t, index);
+    clear_bytes(r->b->shared + get_columns(r, t)[type->id] + (size_t)row * type->size, type->size);
+    seat_row(r, &r->tables[t], index, row);
 }
 
 /* and leaves it: the set's last row takes its place */
-static void left(storage_t *r, uint32_t slot, uint32_t index)
+static void leave_set(storage_t *r, uint32_t slot, uint32_t index)
 {
-    uint32_t row = where_of(r, slot)[index] - 1;
-    where_of(r, slot)[index] = 0;
-    cells_of(r, slot)[index] = 0;
-    removed(r, r->set_table[slot], row);
+    uint32_t row = get_where(r, slot)[index] - 1;
+    get_where(r, slot)[index] = 0;
+    get_cells(r, slot)[index] = 0;
+    remove_row(r, r->set_table[slot], row);
 }
 
 /* where the entity at `index` has its value of `type`, from the shared base: 0 if it has none */
-[[gnu::always_inline]] static inline uint32_t value_of(const storage_t *r, uint32_t index, const storage_type_t *type)
+[[gnu::always_inline]] static inline uint32_t get_value(const storage_t *r, uint32_t index, const storage_type_t *type)
 {
     uint32_t t = r->places[index].table, column;
     if (type->kept == BRIDGE_SPARSE_SET) {
-        uint32_t row = where_of(r, type->slot)[index];
-        return row ? columns_of(r, r->set_table[type->slot])[type->id] + (row - 1) * type->size : 0;
+        uint32_t row = get_where(r, type->slot)[index];
+        return row ? get_columns(r, r->set_table[type->slot])[type->id] + (row - 1) * type->size : 0;
     }
     if (type->kept == BRIDGE_DIRECT_INDEXED) {
-        return has(given_of(r, type->slot), index) ? type->cells + (uint32_t)COLUMN + index * type->size : 0;
+        return set_has(get_given(r, type->slot), index) ? type->cells + (uint32_t)COLUMN + index * type->size : 0;
     }
     if (type->kept == BRIDGE_SINGLETON) return type->set ? type->cells : 0;
-    column = t ? columns_of(r, t)[type->id] : 0;
+    column = t ? get_columns(r, t)[type->id] : 0;
     return column ? column + r->places[index].row * type->size : 0;
 }
 
 /* a singleton comes to have a value, of zero until one is written, or to have none: and
  * every module is written for again, since where it is reached says which */
-static void single_set(storage_t *r, storage_type_t *type, bool set)
+static void set_single(storage_t *r, storage_type_t *type, bool set)
 {
     type->set = set;
     memset(r->b->shared + type->cells, 0, type->size);
@@ -656,46 +656,46 @@ static void single_set(storage_t *r, storage_type_t *type, bool set)
 
 /* the entity at `index` is given, or loses, the direct-indexed component of `slot`: its bit,
  * here and where modules read it, and its cell made zero either way */
-static void cell_given(storage_t *r, uint32_t slot, uint32_t index, bool on)
+static void give_cell(storage_t *r, uint32_t slot, uint32_t index, bool on)
 {
     const storage_type_t *type = r->direct_type[slot];
-    if (on) put(given_of(r, slot), index), put(shown_of(r, slot), index);
-    else take(given_of(r, slot), index), take(shown_of(r, slot), index);
-    bytes_none(r->b->shared + type->cells + COLUMN + (size_t)index * type->size, type->size);
+    if (on) set_put(get_given(r, slot), index), set_put(get_shown(r, slot), index);
+    else set_take(get_given(r, slot), index), set_take(get_shown(r, slot), index);
+    clear_bytes(r->b->shared + type->cells + COLUMN + (size_t)index * type->size, type->size);
 }
 
 /* the entity at `index` goes to `to`, which has room: what it carried that `to` also holds
  * goes with it, and what `to` holds that it did not is zero */
-[[gnu::always_inline]] static inline void moved(storage_t *r, uint32_t index, uint32_t to)
+[[gnu::always_inline]] static inline void move_row(storage_t *r, uint32_t index, uint32_t to)
 {
     place_t *p = &r->places[index];
     uint32_t from = p->table, row = p->row, at = 0;
     if (from == to) return;
     if (to) {
-        uint32_t *into = columns_of(r, to), *out = from ? columns_of(r, from) : nullptr;
-        at = appended(r, to, index);
+        uint32_t *into = get_columns(r, to), *out = from ? get_columns(r, from) : nullptr;
+        at = append_row(r, to, index);
         for (uint32_t w = 0; w < r->words; w ++) {
-            for (uint64_t bits = set_of(r, to)[w]; bits; bits &= bits - 1) {
+            for (uint64_t bits = get_set(r, to)[w]; bits; bits &= bits - 1) {
                 const storage_type_t *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
                 uint8_t *cell = r->b->shared + into[type->id] + (size_t)at * type->size;
                 if (out && out[type->id]) {
-                    bytes_copy(cell, r->b->shared + out[type->id] + (size_t)row * type->size, type->size);
+                    copy_bytes(cell, r->b->shared + out[type->id] + (size_t)row * type->size, type->size);
                 } else {
-                    bytes_none(cell, type->size);
+                    clear_bytes(cell, type->size);
                 }
                 /* a toggled component is on when it is given, and as it was when it moves */
                 if (type->kept == BRIDGE_TOGGLE) {
-                    turned(r, into[type->id], r->tables[to].room, at, !out || !out[type->id]
-                        || on_at(r, out[type->id], r->tables[from].room, row));
+                    turn_row(r, into[type->id], r->tables[to].room, at, !out || !out[type->id]
+                        || is_on(r, out[type->id], r->tables[from].room, row));
                 }
             }
         }
     }
-    if (from) removed(r, from, row);
-    placed(r, index, to, at);
+    if (from) remove_row(r, from, row);
+    place_row(r, index, to, at);
 }
 
-static bool alive(const storage_t *r, uint64_t id)
+static bool is_alive(const storage_t *r, uint64_t id)
 {
     uint32_t index = (uint32_t)id;
     return index && index < r->high && r->places[index].table != DEAD
@@ -703,16 +703,16 @@ static bool alive(const storage_t *r, uint64_t id)
 }
 
 /* gone: its row, and its index, which comes back under another generation */
-[[gnu::always_inline]] static inline void killed(storage_t *r, uint32_t index)
+[[gnu::always_inline]] static inline void kill_entity(storage_t *r, uint32_t index)
 {
     place_t *p = &r->places[index];
     for (uint32_t slot = 0; r->apart && slot < r->set_room; slot ++) {
-        if (r->set_type[slot] && where_of(r, slot)[index]) left(r, slot, index);
+        if (r->set_type[slot] && get_where(r, slot)[index]) leave_set(r, slot, index);
     }
     for (uint32_t slot = 0; r->apart && slot < r->direct_room; slot ++) {
-        if (r->direct_type[slot] && has(given_of(r, slot), index)) cell_given(r, slot, index, false);
+        if (r->direct_type[slot] && set_has(get_given(r, slot), index)) give_cell(r, slot, index, false);
     }
-    if (p->table) removed(r, p->table, p->row);
+    if (p->table) remove_row(r, p->table, p->row);
     r->b->index[index] = (bridge_entity_t){ 0, 0, DEAD };
     p->table = DEAD;
     p->generation = p->generation + 1 >= DEAD ? 1 : p->generation + 1;
@@ -724,18 +724,18 @@ static bool alive(const storage_t *r, uint64_t id)
 
 /* data.md, *Observers*. `before` and `after` are null for an entity that carried nothing, or is
  * gone; `attached` is what an attach wrote a value of, and is still carried. */
-static void told(const storage_t *r, uint64_t id, const uint64_t *before, const uint64_t *after,
+static void tell_observers(const storage_t *r, uint64_t id, const uint64_t *before, const uint64_t *after,
                  const uint64_t *attached)
 {
     for (uint32_t i = 0; i < r->observer_count; i ++) {
         const storage_terms_t *o = r->observers[i];
         /* an entity that carries nothing is in no table, and matches nothing */
-        bool was = before && !empty(r, before) && matches(o, before);
-        bool is = after && !empty(r, after) && matches(o, after), given = false;
+        bool was = before && !set_is_empty(r, before) && terms_match(o, before);
+        bool is = after && !set_is_empty(r, after) && terms_match(o, after), given = false;
         uint32_t owed;
         if (!was && !is) continue;
         for (uint32_t k = 0; attached && k < o->count; k ++) {
-            given |= o->oper[k] != BRIDGE_NOT && has(attached, o->type[k]);
+            given |= o->oper[k] != BRIDGE_NOT && set_has(attached, o->type[k]);
         }
         owed = !is ? BRIDGE_ON_LEAVE : (was ? 0 : BRIDGE_ON_ENTER) | (given ? BRIDGE_ON_ATTACH : 0);
         owed &= o->events;
@@ -745,52 +745,52 @@ static void told(const storage_t *r, uint64_t id, const uint64_t *before, const 
 
 /* ---- at a barrier ---- */
 
-static uint64_t *work_of(const storage_t *r, uint32_t index) { return r->work + (size_t)index * r->words; }
-static uint64_t *attached_of(const storage_t *r, uint32_t index) { return r->attached + (size_t)index * r->words; }
+static uint64_t *get_work(const storage_t *r, uint32_t index) { return r->work + (size_t)index * r->words; }
+static uint64_t *get_attached(const storage_t *r, uint32_t index) { return r->attached + (size_t)index * r->words; }
 
-static void start_from(storage_t *r, uint32_t index)
+static void start_fold(storage_t *r, uint32_t index)
 {
-    carried(r, index, work_of(r, index));
+    get_carried(r, index, get_work(r, index));
 }
 
 /* budgets.md, *What running out does*: the entity is left as it was, and it is a failure of
  * the module that asked the last change of it, toward that module's own budget */
-static void dropped(storage_t *r, uint32_t index, bool for_columns)
+static void drop_change(storage_t *r, uint32_t index, bool for_columns)
 {
     r->folded[index] |= for_columns ? DROPPED | SHORT : DROPPED;
 }
 
 /* false if there was not the memory for the set: asked before a type is made, so that
- * storage_writes cannot fail */
-bool storage_writable(storage_t *r, module_t *m)
+ * storage_let_write cannot fail */
+bool storage_make_writable(storage_t *r, module_t *m)
 {
     if (!m->writable) m->writable = calloc(r->words, sizeof *m->writable);
     return m->writable != nullptr;
 }
 
-void storage_writes([[maybe_unused]] storage_t *r, module_t *m, storage_type_t *type)
+void storage_let_write([[maybe_unused]] storage_t *r, module_t *m, storage_type_t *type)
 {
-    put(m->writable, type->id);
+    set_put(m->writable, type->id);
 }
 
 /* grants.md, *What a module may destroy*: an entity that carries something it may write, or
  * that carries nothing. Read from where the entity is, before this barrier moves it. */
-[[gnu::always_inline]] static inline bool stake(const storage_t *r, const module_t *m, uint32_t index)
+[[gnu::always_inline]] static inline bool has_stake(const storage_t *r, const module_t *m, uint32_t index)
 {
     uint32_t t = r->places[index].table;
     bool any = t != 0;
     for (uint32_t w = 0; t && m->writable && w < r->words; w ++) {
-        if (set_of(r, t)[w] & m->writable[w]) return true;
+        if (get_set(r, t)[w] & m->writable[w]) return true;
     }
     if (!r->apart) return !any;
     for (uint32_t slot = 0; slot < r->set_room; slot ++) {
-        if (!r->set_type[slot] || !where_of(r, slot)[index]) continue;
-        if (m->writable && has(m->writable, r->set_type[slot]->id)) return true;
+        if (!r->set_type[slot] || !get_where(r, slot)[index]) continue;
+        if (m->writable && set_has(m->writable, r->set_type[slot]->id)) return true;
         any = true;
     }
     for (uint32_t slot = 0; slot < r->direct_room; slot ++) {
-        if (!r->direct_type[slot] || !has(given_of(r, slot), index)) continue;
-        if (m->writable && has(m->writable, r->direct_type[slot]->id)) return true;
+        if (!r->direct_type[slot] || !set_has(get_given(r, slot), index)) continue;
+        if (m->writable && set_has(m->writable, r->direct_type[slot]->id)) return true;
         any = true;
     }
     return !any;
@@ -800,7 +800,7 @@ void storage_writes([[maybe_unused]] storage_t *r, module_t *m, storage_type_t *
  * asked of a table, room is found for all of them, or for as many as the column region is
  * found to hold: by halves down to a number that fits, and from there back up between it and
  * the last that did not. budgets.md, *What running out does* */
-[[gnu::always_inline]] static inline bool roomed(storage_t *r, uint32_t t)
+[[gnu::always_inline]] static inline bool make_room(storage_t *r, uint32_t t)
 {
     table_t *tab = &r->tables[t];
     if (!tab->sized) {
@@ -819,10 +819,10 @@ void storage_writes([[maybe_unused]] storage_t *r, module_t *m, storage_type_t *
 }
 
 /* whether the entity at `index`, as the fold has it, is to join the sparse set of `slot` */
-static bool joins(const storage_t *r, uint32_t slot, uint32_t index)
+static bool is_joining(const storage_t *r, uint32_t slot, uint32_t index)
 {
-    return r->set_type[slot] && !where_of(r, slot)[index]
-        && has(r->work + (size_t)index * r->words, r->set_type[slot]->id);
+    return r->set_type[slot] && !get_where(r, slot)[index]
+        && set_has(r->work + (size_t)index * r->words, r->set_type[slot]->id);
 }
 
 /* A barrier's second step, and a move's: a table for each changed entity, and room in it and
@@ -843,12 +843,12 @@ static bool joins(const storage_t *r, uint32_t slot, uint32_t index)
             for (uint32_t w = 0; w < r->words; w ++) r->masked[w] = want[w] & r->in_table[w];
             want = r->masked;
         }
-        if (from && set_same(r, want, set_of(r, from))) {
+        if (from && set_is_same(r, want, get_set(r, from))) {
             t = from;
-        } else if (!empty(r, want)) {
-            t = table_for(r, want);
+        } else if (!set_is_empty(r, want)) {
+            t = make_table(r, want);
             if (!t) {
-                dropped(r, index, false);
+                drop_change(r, index, false);
                 continue;
             }
         }
@@ -859,11 +859,11 @@ static bool joins(const storage_t *r, uint32_t slot, uint32_t index)
         }
         /* and a row in each sparse set it is to join */
         for (uint32_t slot = 0; r->apart && slot < r->set_room; slot ++) {
-            if (!joins(r, slot, index)) continue;
+            if (!is_joining(r, slot, index)) continue;
             if (!r->set_table[slot]) {
-                set_none(r, r->scratch);
-                put(r->scratch, r->set_type[slot]->id);
-                if (!table_for(r, r->scratch)) unreachable();
+                set_clear(r, r->scratch);
+                set_put(r->scratch, r->set_type[slot]->id);
+                if (!make_table(r, r->scratch)) unreachable();
             }
             r->tables[r->set_table[slot]].incoming ++;
             r->folded[index] |= MOVES;
@@ -874,13 +874,13 @@ static bool joins(const storage_t *r, uint32_t slot, uint32_t index)
         /* one that is to have no row it has not is asked nothing: an attach of what an
          * entity carries is most of what a barrier sees */
         if ((r->folded[index] & (DESTROYED | DROPPED | MOVES)) != MOVES) continue;
-        if (t && t != r->places[index].table && !roomed(r, t)) {
-            dropped(r, index, true);
+        if (t && t != r->places[index].table && !make_room(r, t)) {
+            drop_change(r, index, true);
             continue;
         }
         for (uint32_t slot = 0; r->apart && slot < r->set_room; slot ++) {
-            if (!joins(r, slot, index) || roomed(r, r->set_table[slot])) continue;
-            dropped(r, index, true);
+            if (!is_joining(r, slot, index) || make_room(r, r->set_table[slot])) continue;
+            drop_change(r, index, true);
             break;
         }
     }
@@ -890,28 +890,28 @@ static bool joins(const storage_t *r, uint32_t slot, uint32_t index)
 [[gnu::always_inline]] static inline void place_one(storage_t *r, uint32_t index)
 {
     if (r->folded[index] & DESTROYED) {
-        killed(r, index);
+        kill_entity(r, index);
         return;
     }
-    moved(r, index, r->dest[index]);
+    move_row(r, index, r->dest[index]);
     if (!r->apart) return;
     for (uint32_t slot = 0; slot < r->set_room; slot ++) {
-        if (joins(r, slot, index)) joined(r, slot, index);
-        else if (r->set_type[slot] && where_of(r, slot)[index]
-                 && !has(r->work + (size_t)index * r->words, r->set_type[slot]->id)) left(r, slot, index);
+        if (is_joining(r, slot, index)) join_set(r, slot, index);
+        else if (r->set_type[slot] && get_where(r, slot)[index]
+                 && !set_has(r->work + (size_t)index * r->words, r->set_type[slot]->id)) leave_set(r, slot, index);
     }
     /* a direct-indexed component has its cell already, so it cannot be short of room */
     for (uint32_t slot = 0; slot < r->direct_room; slot ++) {
         bool was, is;
         if (!r->direct_type[slot]) continue;
-        was = has(given_of(r, slot), index);
-        is = has(r->work + (size_t)index * r->words, r->direct_type[slot]->id);
-        if (was != is) cell_given(r, slot, index, is);
+        was = set_has(get_given(r, slot), index);
+        is = set_has(r->work + (size_t)index * r->words, r->direct_type[slot]->id);
+        if (was != is) give_cell(r, slot, index, is);
     }
     for (uint32_t id = 0; !index && id < r->type_room; id ++) {
         storage_type_t *type = r->types[id];
-        if (!type || type->kept != BRIDGE_SINGLETON || type->set == has(r->work, id)) continue;
-        single_set(r, type, !type->set);
+        if (!type || type->kept != BRIDGE_SINGLETON || type->set == set_has(r->work, id)) continue;
+        set_single(r, type, !type->set);
     }
 }
 
@@ -931,14 +931,14 @@ static void forget_all(storage_t *r)
     r->changed_count = 0;
     for (i = 0; i < r->dirty_count; i ++) {
         uint32_t t = r->dirty[i];
-        if (r->tables[t].live && !r->tables[t].rows) table_gone(r, t);
+        if (r->tables[t].live && !r->tables[t].rows) free_table(r, t);
     }
 }
 
 /* threads.md: the queues are applied in the order the calls that filled them ran, and not a
  * module at a time. The next run of changes: one module's, of one turn. A module's own queue
  * is in that order already, so this takes the earliest of what each has next. */
-static module_t *next_run(bridge_t *b, uint32_t *from, uint32_t *to)
+static module_t *take_next_run(bridge_t *b, uint32_t *from, uint32_t *to)
 {
     module_t *m, *first = nullptr;
     for (m = b->modules; m; m = m->next) {
@@ -959,7 +959,7 @@ void storage_apply(storage_t *r)
 
     /* 1. the fold: what each changed entity will carry, and nothing moved */
     for (m = b->modules; m; m = m->next) m->mark_at = 0;
-    while ((m = next_run(b, &at, &end))) {
+    while ((m = take_next_run(b, &at, &end))) {
         while (at < end) {
             change_t ch;
             uint32_t index;
@@ -969,22 +969,22 @@ void storage_apply(storage_t *r)
             /* a singleton is given and taken with the id 0, which is no entity: it is folded
              * as the one thing index 0 carries - storage.md, *A singleton* */
             if (ch.op != CHANGE_DESTROY && ch.c->type->kept == BRIDGE_SINGLETON ? ch.id != 0
-                : !alive(r, ch.id) || r->folded[index] & DESTROYED) continue;
+                : !is_alive(r, ch.id) || r->folded[index] & DESTROYED) continue;
             if (!(r->folded[index] & TOUCHED)) {
                 r->folded[index] = TOUCHED;
                 r->changed[r->changed_count ++] = index;
-                start_from(r, index);
-                if (r->observer_count) set_none(r, attached_of(r, index));
+                start_fold(r, index);
+                if (r->observer_count) set_clear(r, get_attached(r, index));
             }
             if (ch.op == CHANGE_DESTROY) {
-                if (stake(r, m, index)) r->folded[index] |= DESTROYED;
+                if (has_stake(r, m, index)) r->folded[index] |= DESTROYED;
                 else m->barred ++;
             } else if (ch.op == CHANGE_ATTACH) {
-                put(work_of(r, index), ch.c->type->id);
-                if (r->observer_count) put(attached_of(r, index), ch.c->type->id);
+                set_put(get_work(r, index), ch.c->type->id);
+                if (r->observer_count) set_put(get_attached(r, index), ch.c->type->id);
             } else {
-                take(work_of(r, index), ch.c->type->id);
-                if (r->observer_count) take(attached_of(r, index), ch.c->type->id);
+                set_take(get_work(r, index), ch.c->type->id);
+                if (r->observer_count) set_take(get_attached(r, index), ch.c->type->id);
             }
         }
     }
@@ -995,9 +995,9 @@ void storage_apply(storage_t *r)
     for (i = 0; r->observer_count && i < r->changed_count; i ++) {
         uint32_t index = r->changed[i];
         if (r->folded[index] & DROPPED) continue;
-        carried(r, index, r->before);
-        told(r, (uint64_t)r->places[index].generation << 32 | index, r->before,
-            r->folded[index] & DESTROYED ? nullptr : work_of(r, index), attached_of(r, index));
+        get_carried(r, index, r->before);
+        tell_observers(r, (uint64_t)r->places[index].generation << 32 | index, r->before,
+            r->folded[index] & DESTROYED ? nullptr : get_work(r, index), get_attached(r, index));
     }
 
     /* 4. each entity placed, once */
@@ -1007,7 +1007,7 @@ void storage_apply(storage_t *r)
 
     /* 5. the values, in the order they were asked: the last one written is the one that stays */
     for (m = b->modules; m; m = m->next) m->mark_at = 0;
-    while ((m = next_run(b, &at, &end))) {
+    while ((m = take_next_run(b, &at, &end))) {
         while (at < end) {
             change_t ch;
             const void *value = m->queue + at + sizeof ch;
@@ -1024,8 +1024,8 @@ void storage_apply(storage_t *r)
             if (ch.op != CHANGE_ATTACH || index >= r->high || !(r->folded[index] & TOUCHED)
                 || r->folded[index] & (DESTROYED | DROPPED)
                 || r->places[index].generation != (uint32_t)(ch.id >> 32)) continue;
-            to = value_of(r, index, ch.c->type);
-            if (to) bytes_copy(b->shared + to, value, ch.size);
+            to = get_value(r, index, ch.c->type);
+            if (to) copy_bytes(b->shared + to, value, ch.size);
         }
     }
     for (m = b->modules; m; m = m->next) {
@@ -1072,22 +1072,22 @@ uint32_t storage_reserve(storage_t *r, uint64_t *ids, uint32_t want)
     return count;
 }
 
-uint32_t storage_tables(storage_t *r)
+uint32_t storage_count_tables(storage_t *r)
 {
     return r->table_room + 1;
 }
 
 /* one span: how many rows, where their ids are, and a base for each term */
-static void span(const storage_t *r, const storage_terms_t *s, uint32_t t, uint8_t *at)
+static void write_span(const storage_t *r, const storage_terms_t *s, uint32_t t, uint8_t *at)
 {
     const table_t *tab = &r->tables[t];
-    const uint32_t *columns = columns_of(r, t);
+    const uint32_t *columns = get_columns(r, t);
     uint32_t value = tab->rows;
     memset(at, 0, BRIDGE_SPAN_SIZE(s->count));
     memcpy(at, &value, 4);
     memcpy(at + 4, &tab->block, 4);
     for (uint32_t i = 0; i < s->count; i ++) {
-        value = s->oper[i] == BRIDGE_NOT ? 0 : handed(r, s->type[i], columns[s->type[i]]);
+        value = s->oper[i] == BRIDGE_NOT ? 0 : get_handed(r, s->type[i], columns[s->type[i]]);
         memcpy(at + BRIDGE_SPAN_BASE + 4u * i, &value, 4);
     }
 }
@@ -1116,7 +1116,7 @@ int storage_publish(storage_t *r, module_t *m)
             if (!r->tables[t].live) continue;
             for (uint32_t s = 0; s < m->declared_count; s ++) {
                 uint32_t id = m->declared[s]->type->id;
-                cell[t * m->declared_count + s] = handed(r, id, columns_of(r, t)[id]);
+                cell[t * m->declared_count + s] = get_handed(r, id, get_columns(r, t)[id]);
             }
         }
         for (uint32_t s = 0; s < m->declared_count; s ++) {
@@ -1132,7 +1132,7 @@ int storage_publish(storage_t *r, module_t *m)
             uint32_t t = r->dirty[i];
             for (uint32_t s = 0; s < m->declared_count; s ++) {
                 uint32_t id = m->declared[s]->type->id;
-                cell[t * m->declared_count + s] = handed(r, id, columns_of(r, t)[id]);
+                cell[t * m->declared_count + s] = get_handed(r, id, get_columns(r, t)[id]);
             }
         }
     }
@@ -1151,7 +1151,7 @@ int storage_publish(storage_t *r, module_t *m)
             if (!s) continue;
             if (at + (uint64_t)s->matched * BRIDGE_SPAN_SIZE(s->count) > end) return 1;
             for (i = 0; i < s->matched; i ++, at += BRIDGE_SPAN_SIZE(s->count)) {
-                span(r, s, s->list[i], m->priv + at);
+                write_span(r, s, s->list[i], m->priv + at);
             }
             slot->spans = s->matched;
             s->changed = false;
@@ -1167,7 +1167,7 @@ int storage_publish(storage_t *r, module_t *m)
             if (!s) continue;
             for (i = 0; i < r->dirty_count; i ++) {
                 uint32_t where = s->pos[r->dirty[i]];
-                if (where) span(r, s, r->dirty[i], m->priv + slot->at + (where - 1) * BRIDGE_SPAN_SIZE(s->count));
+                if (where) write_span(r, s, r->dirty[i], m->priv + slot->at + (where - 1) * BRIDGE_SPAN_SIZE(s->count));
             }
         }
         at = m->spans_end;
@@ -1195,7 +1195,7 @@ int storage_publish(storage_t *r, module_t *m)
 }
 
 /* Once every module has been written for: what was touched is touched no longer. */
-void storage_written(storage_t *r)
+void storage_end_publish(storage_t *r)
 {
     for (uint32_t i = 0; i < r->dirty_count; i ++) r->tables[r->dirty[i]].touched = false;
     r->dirty_count = 0;
@@ -1203,14 +1203,14 @@ void storage_written(storage_t *r)
 
 /* ---- at load: a type, and terms ---- */
 
-uint32_t storage_sets_free(const storage_t *r)
+uint32_t storage_count_free_sets(const storage_t *r)
 {
     uint32_t n = 0;
     for (uint32_t slot = 0; slot < r->set_room; slot ++) n += !r->set_type[slot];
     return n;
 }
 
-uint32_t storage_direct_free(const storage_t *r)
+uint32_t storage_count_free_direct(const storage_t *r)
 {
     uint32_t n = 0;
     for (uint32_t slot = 0; slot < r->direct_room; slot ++) n += !r->direct_type[slot];
@@ -1221,13 +1221,13 @@ storage_type_t *storage_declare(storage_t *r, uint32_t size, uint32_t align, enu
 {
     uint32_t id, slot = 0, cells = 0, len = 0;
     for (id = 0; r->types[id]; id ++) {}        /* its declarer counted: there is one */
-    /* and asked storage_sets_free or storage_direct_free first, so there is one of these too */
+    /* and asked storage_count_free_sets or storage_count_free_direct first, so there is one of these too */
     for (; kept == BRIDGE_SPARSE_SET && r->set_type[slot]; slot ++) {}
     for (; kept == BRIDGE_DIRECT_INDEXED && r->direct_type[slot]; slot ++) {}
     if (kept == BRIDGE_DIRECT_INDEXED) {
         /* a cell for every entity there may be, behind the sixteen bytes that say where its
          * bits are: the one thing a declare asks of [budget] columns */
-        uint64_t want = padded(COLUMN + (uint64_t)size * r->b->entities);
+        uint64_t want = pad_column(COLUMN + (uint64_t)size * r->b->entities);
         uint32_t bits = r->b->direct + (uint32_t)(8ull * slot * r->bit_words);
         uint8_t *block = want > INT32_MAX ? nullptr : block_column_regrow(r->b, nullptr, 0, (uint32_t)want);
         if (!block) return nullptr;
@@ -1235,12 +1235,12 @@ storage_type_t *storage_declare(storage_t *r, uint32_t size, uint32_t align, enu
         memcpy(block, &bits, 4);
         cells = (uint32_t)(block - r->b->shared);
         len = (uint32_t)want;
-        memset(given_of(r, slot), 0, 8u * r->bit_words);
-        memset(shown_of(r, slot), 0, 8u * r->bit_words);
+        memset(get_given(r, slot), 0, 8u * r->bit_words);
+        memset(get_shown(r, slot), 0, 8u * r->bit_words);
     }
     if (kept == BRIDGE_SINGLETON) {
         /* its one value, in a block of its own */
-        uint64_t want = padded(size ? size : 1);
+        uint64_t want = pad_column(size ? size : 1);
         uint8_t *block = want > INT32_MAX ? nullptr : block_column_regrow(r->b, nullptr, 0, (uint32_t)want);
         if (!block) return nullptr;
         memset(block, 0, (size_t)want);
@@ -1251,7 +1251,7 @@ storage_type_t *storage_declare(storage_t *r, uint32_t size, uint32_t align, enu
     *r->types[id] = (storage_type_t){ id, size, align, kept, slot, cells, len };
     if (kept == BRIDGE_SPARSE_SET) r->set_type[slot] = r->types[id];
     else if (kept == BRIDGE_DIRECT_INDEXED) r->direct_type[slot] = r->types[id];
-    else if (kept != BRIDGE_SINGLETON) put(r->in_table, id);
+    else if (kept != BRIDGE_SINGLETON) set_put(r->in_table, id);
     r->apart += kept != BRIDGE_TABLE && kept != BRIDGE_TOGGLE;
     r->tags += !size;
     return r->types[id];
@@ -1270,12 +1270,12 @@ void storage_undeclare(storage_t *r, storage_type_t *type)
         block_column_free(r->b, r->b->shared + type->cells, type->cells_len);
         type->set = false;
     } else {
-        take(r->in_table, type->id);
+        set_take(r->in_table, type->id);
     }
     r->types[type->id] = nullptr;
 }
 
-static storage_terms_t *terms_of(storage_t *r, const storage_term_t *terms, uint32_t count)
+static storage_terms_t *take_terms(storage_t *r, const storage_term_t *terms, uint32_t count)
 {
     storage_terms_t *t;
     uint32_t k;
@@ -1294,11 +1294,11 @@ static storage_terms_t *terms_of(storage_t *r, const storage_term_t *terms, uint
     return t;
 }
 
-storage_terms_t *storage_system(storage_t *r, const storage_term_t *terms, uint32_t count)
+storage_terms_t *storage_add_system(storage_t *r, const storage_term_t *terms, uint32_t count)
 {
-    storage_terms_t *s = terms_of(r, terms, count);
+    storage_terms_t *s = take_terms(r, terms, count);
     for (uint32_t t = 1; t < r->table_high; t ++) {
-        if (!r->tables[t].live || !reads(r, s, t)) continue;
+        if (!r->tables[t].live || !terms_read(r, s, t)) continue;
         s->list[s->matched] = t;
         s->pos[t] = ++ s->matched;
     }
@@ -1307,10 +1307,10 @@ storage_terms_t *storage_system(storage_t *r, const storage_term_t *terms, uint3
     return s;
 }
 
-storage_terms_t *storage_observer(storage_t *r, const storage_term_t *terms, uint32_t count,
+storage_terms_t *storage_add_observer(storage_t *r, const storage_term_t *terms, uint32_t count,
                           enum bridge_event events, storage_heard_t heard, void *ctx)
 {
-    storage_terms_t *o = terms_of(r, terms, count);
+    storage_terms_t *o = take_terms(r, terms, count);
     o->events = events;
     o->heard = heard;
     o->ctx = ctx;
@@ -1334,72 +1334,72 @@ void storage_forget(storage_t *r, storage_terms_t *terms)
 
 /* ---- at unload, and for settings: one entity at a time, outside any barrier ---- */
 
-static void destroyed(storage_t *r, uint32_t index)
+static void destroy_entity(storage_t *r, uint32_t index)
 {
     uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
     uint32_t from = r->places[index].table;
-    carried(r, index, r->before);
-    told(r, id, r->before, nullptr, nullptr);
-    killed(r, index);
-    if (from && r->tables[from].live && !r->tables[from].rows) table_gone(r, from);
+    get_carried(r, index, r->before);
+    tell_observers(r, id, r->before, nullptr, nullptr);
+    kill_entity(r, index);
+    if (from && r->tables[from].live && !r->tables[from].rows) free_table(r, from);
 }
 
 /* a sparse set nothing is left in gives its table back, as a barrier's end does */
-static void sets_swept(storage_t *r)
+static void sweep_sets(storage_t *r)
 {
     for (uint32_t slot = 0; slot < r->set_room; slot ++) {
-        if (r->set_table[slot] && !r->tables[r->set_table[slot]].rows) table_gone(r, r->set_table[slot]);
+        if (r->set_table[slot] && !r->tables[r->set_table[slot]].rows) free_table(r, r->set_table[slot]);
     }
 }
 
 /* whether the entity at `index` carries something that is not kept in a table */
-static bool in_a_set(const storage_t *r, uint32_t index)
+static bool is_in_a_set(const storage_t *r, uint32_t index)
 {
     for (uint32_t slot = 0; slot < r->set_room; slot ++) {
-        if (r->set_type[slot] && where_of(r, slot)[index]) return true;
+        if (r->set_type[slot] && get_where(r, slot)[index]) return true;
     }
     for (uint32_t slot = 0; slot < r->direct_room; slot ++) {
-        if (r->direct_type[slot] && has(given_of(r, slot), index)) return true;
+        if (r->direct_type[slot] && set_has(get_given(r, slot), index)) return true;
     }
     return false;
 }
 
 /* storage_drop, of a direct-indexed component: every entity that has been given one */
-static void cells_dropped(storage_t *r, const storage_type_t *type, enum bridge_on_unload policy)
+static void drop_cells(storage_t *r, const storage_type_t *type, enum bridge_on_unload policy)
 {
     for (uint32_t index = 1; index < r->high; index ++) {
         uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
-        if (!has(given_of(r, type->slot), index)) continue;
-        carried(r, index, r->before);
+        if (!set_has(get_given(r, type->slot), index)) continue;
+        get_carried(r, index, r->before);
         memcpy(r->scratch, r->before, 8u * r->words);
-        take(r->scratch, type->id);
-        if (policy == BRIDGE_DELETE || (policy == BRIDGE_SWEEP && empty(r, r->scratch))) {
-            destroyed(r, index);
+        set_take(r->scratch, type->id);
+        if (policy == BRIDGE_DELETE || (policy == BRIDGE_SWEEP && set_is_empty(r, r->scratch))) {
+            destroy_entity(r, index);
         } else {
-            told(r, id, r->before, r->scratch, nullptr);
-            cell_given(r, type->slot, index, false);
+            tell_observers(r, id, r->before, r->scratch, nullptr);
+            give_cell(r, type->slot, index, false);
         }
     }
-    sets_swept(r);
+    sweep_sets(r);
 }
 
 /* storage_drop, of a component kept in a sparse set: an entity at a time, from the last */
-static void set_dropped(storage_t *r, const storage_type_t *type, enum bridge_on_unload policy)
+static void drop_set(storage_t *r, const storage_type_t *type, enum bridge_on_unload policy)
 {
     uint32_t t;
     while ((t = r->set_table[type->slot]) && r->tables[t].rows) {
-        uint64_t id = who_of(r, &r->tables[t])[r->tables[t].rows - 1];
-        carried(r, (uint32_t)id, r->before);
+        uint64_t id = get_who(r, &r->tables[t])[r->tables[t].rows - 1];
+        get_carried(r, (uint32_t)id, r->before);
         memcpy(r->scratch, r->before, 8u * r->words);
-        take(r->scratch, type->id);
-        if (policy == BRIDGE_DELETE || (policy == BRIDGE_SWEEP && empty(r, r->scratch))) {
-            destroyed(r, (uint32_t)id);
+        set_take(r->scratch, type->id);
+        if (policy == BRIDGE_DELETE || (policy == BRIDGE_SWEEP && set_is_empty(r, r->scratch))) {
+            destroy_entity(r, (uint32_t)id);
         } else {
-            told(r, id, r->before, r->scratch, nullptr);
-            left(r, type->slot, (uint32_t)id);
+            tell_observers(r, id, r->before, r->scratch, nullptr);
+            leave_set(r, type->slot, (uint32_t)id);
         }
     }
-    sets_swept(r);
+    sweep_sets(r);
 }
 
 /* lifetime.md, *What unload leaves behind*. A table at a time. */
@@ -1408,65 +1408,65 @@ void storage_drop(storage_t *r, storage_type_t *type, enum bridge_on_unload poli
     uint64_t *set = r->scratch;
     uint32_t apart = 0;
     if (type->kept == BRIDGE_SPARSE_SET) {
-        set_dropped(r, type, policy);
+        drop_set(r, type, policy);
         return;
     }
     if (type->kept == BRIDGE_DIRECT_INDEXED) {
-        cells_dropped(r, type, policy);
+        drop_cells(r, type, policy);
         return;
     }
     if (type->kept == BRIDGE_SINGLETON) {
         /* it is on no entity, so the three policies say one thing: it has no value */
         if (!type->set) return;
-        carried(r, 0, r->before);
+        get_carried(r, 0, r->before);
         memcpy(set, r->before, 8u * r->words);
-        take(set, type->id);
-        told(r, 0, r->before, set, nullptr);
-        single_set(r, type, false);
+        set_take(set, type->id);
+        tell_observers(r, 0, r->before, set, nullptr);
+        set_single(r, type, false);
         return;
     }
     for (uint32_t t = 1; t < r->table_high; t ++) {
         table_t *tab = &r->tables[t];
         uint32_t to;
         bool none;
-        if (!tab->live || !has(set_of(r, t), type->id)) continue;
-        memcpy(set, set_of(r, t), 8u * r->words);
-        take(set, type->id);
-        none = empty(r, set);
+        if (!tab->live || !set_has(get_set(r, t), type->id)) continue;
+        memcpy(set, get_set(r, t), 8u * r->words);
+        set_take(set, type->id);
+        none = set_is_empty(r, set);
         if (policy == BRIDGE_DELETE || (policy == BRIDGE_SWEEP && none)) {
             /* from the last row, so that none is moved into the place of one already seen.
              * An entity that is in a sparse set carries something still, and is not swept */
             while (tab->live) {
-                uint64_t id = who_of(r, tab)[tab->rows - 1];
-                if (policy == BRIDGE_DELETE || !in_a_set(r, (uint32_t)id)) {
-                    destroyed(r, (uint32_t)id);
+                uint64_t id = get_who(r, tab)[tab->rows - 1];
+                if (policy == BRIDGE_DELETE || !is_in_a_set(r, (uint32_t)id)) {
+                    destroy_entity(r, (uint32_t)id);
                     continue;
                 }
-                carried(r, (uint32_t)id, r->before);
+                get_carried(r, (uint32_t)id, r->before);
                 memcpy(r->masked, r->before, 8u * r->words);
-                take(r->masked, type->id);
-                told(r, id, r->before, r->masked, nullptr);
-                moved(r, (uint32_t)id, 0);
-                if (!tab->rows) table_gone(r, t);
+                set_take(r->masked, type->id);
+                tell_observers(r, id, r->before, r->masked, nullptr);
+                move_row(r, (uint32_t)id, 0);
+                if (!tab->rows) free_table(r, t);
             }
             continue;
         }
         for (uint32_t row = tab->rows; row --;) {
-            carried(r, (uint32_t)who_of(r, tab)[row], r->before);
+            get_carried(r, (uint32_t)get_who(r, tab)[row], r->before);
             memcpy(r->masked, r->before, 8u * r->words);
-            take(r->masked, type->id);
-            told(r, who_of(r, tab)[row], r->before, r->masked, nullptr);
+            set_take(r->masked, type->id);
+            tell_observers(r, get_who(r, tab)[row], r->before, r->masked, nullptr);
         }
-        to = none ? 0 : table_of(r, set);
+        to = none ? 0 : find_table(r, set);
         if (none || (to && grow(r, to, r->tables[to].rows + tab->rows))) {
             /* nothing left to carry, or a table of what is left with room for them all */
-            while (tab->rows) moved(r, (uint32_t)who_of(r, tab)[tab->rows - 1], to);
-            table_gone(r, t);
+            while (tab->rows) move_row(r, (uint32_t)get_who(r, tab)[tab->rows - 1], to);
+            free_table(r, t);
         } else {
             /* no table of what is left, and this one becomes it; or one that has no room,
              * and until either empties there are two */
             if (to) apart += tab->rows;
-            stripped(r, t, type, !to);
+            strip_table(r, t, type, !to);
         }
     }
     /* lifetime.md, *What unload leaves behind*: the one case of a strip with a trace */
@@ -1481,69 +1481,69 @@ void storage_drop(storage_t *r, storage_type_t *type, enum bridge_on_unload poli
 /* ---- at a reload ---- */
 
 /* `visit` for every entity that carries `type`, whichever way it is kept */
-static void each_carrier(storage_t *r, const storage_type_t *type, void (*visit)(storage_t *r, uint32_t index, void *ctx),
+static void visit_carriers(storage_t *r, const storage_type_t *type, void (*visit)(storage_t *r, uint32_t index, void *ctx),
                          void *ctx)
 {
     if (type->kept == BRIDGE_SINGLETON) {
         if (type->set) visit(r, 0, ctx);
     } else if (type->kept == BRIDGE_DIRECT_INDEXED) {
         for (uint32_t index = 1; index < r->high; index ++) {
-            if (has(given_of(r, type->slot), index)) visit(r, index, ctx);
+            if (set_has(get_given(r, type->slot), index)) visit(r, index, ctx);
         }
     } else {
         for (uint32_t t = 1; t < r->table_high; t ++) {
             const table_t *tab = &r->tables[t];
-            if (!tab->live || !has(set_of(r, t), type->id)) continue;
-            for (uint32_t row = 0; row < tab->rows; row ++) visit(r, (uint32_t)who_of(r, tab)[row], ctx);
+            if (!tab->live || !set_has(get_set(r, t), type->id)) continue;
+            for (uint32_t row = 0; row < tab->rows; row ++) visit(r, (uint32_t)get_who(r, tab)[row], ctx);
         }
     }
 }
 
-static void counted_one([[maybe_unused]] storage_t *r, [[maybe_unused]] uint32_t index, void *ctx)
+static void count_one([[maybe_unused]] storage_t *r, [[maybe_unused]] uint32_t index, void *ctx)
 {
     ++ *(uint32_t *)ctx;
 }
 
-uint32_t storage_count(storage_t *r, const storage_type_t *type)
+uint32_t storage_count_carriers(storage_t *r, const storage_type_t *type)
 {
     uint32_t n = 0;
-    each_carrier(r, type, counted_one, &n);
+    visit_carriers(r, type, count_one, &n);
     return n;
 }
 
-uint32_t storage_off(storage_t *r, const storage_type_t *type)
+uint32_t storage_count_off(storage_t *r, const storage_type_t *type)
 {
     uint32_t n = 0;
     for (uint32_t t = 1; type->kept == BRIDGE_TOGGLE && t < r->table_high; t ++) {
         const table_t *tab = &r->tables[t];
-        if (!tab->live || !has(set_of(r, t), type->id)) continue;
+        if (!tab->live || !set_has(get_set(r, t), type->id)) continue;
         for (uint32_t row = 0; row < tab->rows; row ++) {
-            n += !on_at(r, columns_of(r, t)[type->id], tab->room, row);
+            n += !is_on(r, get_columns(r, t)[type->id], tab->room, row);
         }
     }
     return n;
 }
 
 /* the entity at `index` is among those this move changes: folded from what it carries */
-static void folded_in(storage_t *r, uint32_t index)
+static void fold_in(storage_t *r, uint32_t index)
 {
     if (r->folded[index] & TOUCHED) return;
     r->folded[index] = TOUCHED;
     r->changed[r->changed_count ++] = index;
-    carried(r, index, r->work + (size_t)index * r->words);
+    get_carried(r, index, r->work + (size_t)index * r->words);
 }
 
-static void retyped(storage_t *r, uint32_t index, void *ctx)
+static void retype(storage_t *r, uint32_t index, void *ctx)
 {
     const storage_move_t *move = ctx;
-    folded_in(r, index);
-    take(r->work + (size_t)index * r->words, move->from->id);
+    fold_in(r, index);
+    set_take(r->work + (size_t)index * r->words, move->from->id);
     /* a singleton is on no entity: what the one that carried it had becomes index 0's */
     if (move->to->kept == BRIDGE_SINGLETON) {
-        folded_in(r, 0);
-        put(r->work, move->to->id);
+        fold_in(r, 0);
+        set_put(r->work, move->to->id);
     } else {
-        put(r->work + (size_t)index * r->words, move->to->id);
+        set_put(r->work + (size_t)index * r->words, move->to->id);
     }
 }
 
@@ -1559,9 +1559,9 @@ bool storage_convert(storage_t *r, const storage_move_t *moves, uint32_t count)
     /* what each entity that carries one of them will carry, and nothing moved */
     for (k = 0; k < count; k ++) {
         /* index 0 first, so that a singleton has its place before the value that goes to it */
-        if (moves[k].to->kept == BRIDGE_SINGLETON && storage_count(r, moves[k].from)) folded_in(r, 0);
+        if (moves[k].to->kept == BRIDGE_SINGLETON && storage_count_carriers(r, moves[k].from)) fold_in(r, 0);
     }
-    for (k = 0; k < count; k ++) each_carrier(r, moves[k].from, retyped, (void *)(uintptr_t)&moves[k]);
+    for (k = 0; k < count; k ++) visit_carriers(r, moves[k].from, retype, (void *)(uintptr_t)&moves[k]);
     reserve_all(r);
     for (i = 0; i < r->changed_count; i ++) short_of |= (r->folded[r->changed[i]] & DROPPED) != 0;
     if (short_of) {
@@ -1574,7 +1574,7 @@ bool storage_convert(storage_t *r, const storage_move_t *moves, uint32_t count)
     for (i = 0; i < r->changed_count; i ++) {
         uint32_t index = r->changed[i], at = 0, had[64] = {};
         for (k = 0; k < count && k < 64; k ++) {
-            had[k] = value_of(r, index, moves[k].from);
+            had[k] = get_value(r, index, moves[k].from);
             if (had[k]) memcpy(was + at, r->b->shared + had[k], moves[k].from->size);
             at += moves[k].from->size;
         }
@@ -1582,7 +1582,7 @@ bool storage_convert(storage_t *r, const storage_move_t *moves, uint32_t count)
         for (k = 0, at = 0; k < count && k < 64; at += moves[k].from->size, k ++) {
             uint32_t to;
             if (!had[k]) continue;
-            to = value_of(r, moves[k].to->kept == BRIDGE_SINGLETON ? 0 : index, moves[k].to);
+            to = get_value(r, moves[k].to->kept == BRIDGE_SINGLETON ? 0 : index, moves[k].to);
             for (uint32_t run = 0; run < moves[k].run_count; run ++) {
                 memcpy(r->b->shared + to + moves[k].runs[run].to, was + at + moves[k].runs[run].from,
                     moves[k].runs[run].len);
@@ -1596,37 +1596,37 @@ bool storage_convert(storage_t *r, const storage_move_t *moves, uint32_t count)
 
 void storage_release(storage_t *r, const uint64_t *ids, uint32_t count)
 {
-    for (uint32_t i = 0; i < count; i ++) if (alive(r, ids[i])) destroyed(r, (uint32_t)ids[i]);
-    sets_swept(r);
+    for (uint32_t i = 0; i < count; i ++) if (is_alive(r, ids[i])) destroy_entity(r, (uint32_t)ids[i]);
+    sweep_sets(r);
 }
 
-void storage_single(storage_t *r, storage_type_t *type, const void *bytes, uint32_t size)
+void storage_give_single(storage_t *r, storage_type_t *type, const void *bytes, uint32_t size)
 {
     uint64_t *set = r->scratch;
-    carried(r, 0, r->before);
+    get_carried(r, 0, r->before);
     memcpy(set, r->before, 8u * r->words);
-    put(set, type->id);
-    told(r, 0, r->before, set, set);
-    single_set(r, type, true);
+    set_put(set, type->id);
+    tell_observers(r, 0, r->before, set, set);
+    set_single(r, type, true);
     memcpy(r->b->shared + type->cells, bytes, size);
 }
 
-bool storage_alive(storage_t *r, uint64_t id)
+bool storage_is_alive(storage_t *r, uint64_t id)
 {
-    return alive(r, id);
+    return is_alive(r, id);
 }
 
-bool storage_any(storage_t *r, storage_type_t *type, bool (*is)(void *ctx, const uint8_t *row), void *ctx)
+bool storage_has_any(storage_t *r, storage_type_t *type, bool (*is)(void *ctx, const uint8_t *row), void *ctx)
 {
     if (type->kept == BRIDGE_SINGLETON) return type->set && is(ctx, r->b->shared + type->cells);
     for (uint32_t index = 1; type->kept == BRIDGE_DIRECT_INDEXED && index < r->high; index ++) {
-        if (has(given_of(r, type->slot), index)
+        if (set_has(get_given(r, type->slot), index)
             && is(ctx, r->b->shared + type->cells + COLUMN + (size_t)index * type->size)) return true;
     }
     for (uint32_t t = 1; t < r->table_high; t ++) {
         const uint8_t *column;
-        if (!r->tables[t].live || !has(set_of(r, t), type->id)) continue;
-        column = r->b->shared + columns_of(r, t)[type->id];
+        if (!r->tables[t].live || !set_has(get_set(r, t), type->id)) continue;
+        column = r->b->shared + get_columns(r, t)[type->id];
         for (uint32_t row = 0; row < r->tables[t].rows; row ++) {
             if (is(ctx, column + (size_t)row * type->size)) return true;
         }

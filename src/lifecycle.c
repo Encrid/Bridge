@@ -572,11 +572,11 @@ static int start(bridge_t *b, module_t *m, const bridge_artifact_t *a, enum back
     /* budgets.md: column_base has a cell for each of its components in every table there may
      * be, so whether its spans hold it is known here, and not at some barrier */
     need = sizeof(bridge_query_t) * m->system_count + sizeof(bridge_list_t) * m->observer_count
-         + 4ull * m->declared_count * storage_tables(b->storage) + 4ull * m->declared_count;
+         + 4ull * m->declared_count * storage_count_tables(b->storage) + 4ull * m->declared_count;
     if (need > m->spans_len) {
         snprintf(err->text, sizeof err->text, "its spans of %u bytes do not hold a column_base of "
             "%u components by %u tables, which with its queries is %llu bytes", m->spans_len,
-            m->declared_count, storage_tables(b->storage), (unsigned long long)need);
+            m->declared_count, storage_count_tables(b->storage), (unsigned long long)need);
         return 1;
     }
     return 0;
@@ -730,7 +730,7 @@ static bool share_is_pointed_into(bridge_t *b, const module_t *m)
     for (uint32_t i = 0; i < b->type_count; i ++) {
         p.c = b->types[i];
         p.rows = 0;
-        if (p.c->kind == BRIDGE_STRUCT) (void)storage_any(b->storage, p.c->type, row_points_in, &p);
+        if (p.c->kind == BRIDGE_STRUCT) (void)storage_has_any(b->storage, p.c->type, row_points_in, &p);
         if (!p.rows) continue;
         held = true;
         say_about(b, &(say_t){ nullptr, nullptr, BRIDGE_WARN }, "module '%s' is unloaded and its share of the "

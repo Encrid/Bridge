@@ -210,7 +210,7 @@ static void moved_case(bridge_config_t cfg, uint32_t from, uint32_t to, const ch
     for (uint32_t i = 0; i < b->type_count; i ++) {
         const declared_type_t *c = b->types[i];
         if (strcmp(c->name, "st:X")) continue;
-        printf("  storage: st:X is %s, carried by %u\n", kept_as[c->storage], storage_count(b->storage, c->type));
+        printf("  storage: st:X is %s, carried by %u\n", kept_as[c->storage], storage_count_carriers(b->storage, c->type));
     }
     (void)bridge_destroy(b);
 }
@@ -589,7 +589,7 @@ int main(int argc, char **argv)
             drop(b, "st:D", !strcmp(what, "directstrip") ? BRIDGE_STRIP
                           : !strcmp(what, "directsweep") ? BRIDGE_SWEEP : BRIDGE_DELETE);
             for (uint32_t e = 1; e <= 6; e ++) {
-                printf("entity %u is %s\n", e, storage_alive(b->storage, (uint64_t)1 << 32 | e) ? "alive" : "gone");
+                printf("entity %u is %s\n", e, storage_is_alive(b->storage, (uint64_t)1 << 32 | e) ? "alive" : "gone");
             }
             run(b, "near");
         }
@@ -675,7 +675,7 @@ int main(int argc, char **argv)
                           : !strcmp(what, "sparsesweep") ? BRIDGE_SWEEP : BRIDGE_DELETE);
             /* the seventh entity made is the one that carried S and nothing else */
             printf("the entity that was in the set alone is %s\n",
-                storage_alive(b->storage, (uint64_t)1 << 32 | 7) ? "alive" : "gone");
+                storage_is_alive(b->storage, (uint64_t)1 << 32 | 7) ? "alive" : "gone");
             run(b, "look");
             run(b, "look_b");
             run(b, "attach_b");         /* and it is a set that can be joined again */

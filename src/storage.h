@@ -32,8 +32,8 @@ void storage_destroy(storage_t *r);
  * for. */
 [[nodiscard]] storage_type_t *storage_declare(storage_t *r, uint32_t size, uint32_t align,
                                             enum bridge_storage kept);
-uint32_t storage_sets_free(const storage_t *r);
-uint32_t storage_direct_free(const storage_t *r);
+uint32_t storage_count_free_sets(const storage_t *r);
+uint32_t storage_count_free_direct(const storage_t *r);
 void storage_undeclare(storage_t *r, storage_type_t *type);
 
 typedef struct {
@@ -45,8 +45,8 @@ typedef struct {
 typedef void (*storage_heard_t)(void *ctx, uint64_t id, enum bridge_event event);
 
 /* There is room for [budget] systems of the two together, and whoever registers counts. */
-[[nodiscard]] storage_terms_t *storage_system(storage_t *r, const storage_term_t *terms, uint32_t count);
-[[nodiscard]] storage_terms_t *storage_observer(storage_t *r, const storage_term_t *terms, uint32_t count,
+[[nodiscard]] storage_terms_t *storage_add_system(storage_t *r, const storage_term_t *terms, uint32_t count);
+[[nodiscard]] storage_terms_t *storage_add_observer(storage_t *r, const storage_term_t *terms, uint32_t count,
                                         enum bridge_event events, storage_heard_t heard, void *ctx);
 void storage_forget(storage_t *r, storage_terms_t *terms);
 
@@ -56,16 +56,16 @@ void storage_forget(storage_t *r, storage_terms_t *terms);
  * it asked - threads.md, *Threads* */
 void storage_apply(storage_t *r);
 /* `m` may write `type`: what gives it a stake in an entity that carries it - grants.md */
-[[nodiscard]] bool storage_writable(storage_t *r, module_t *m);    /* its set, made: false if it cannot be */
-void storage_writes(storage_t *r, module_t *m, storage_type_t *type);
+[[nodiscard]] bool storage_make_writable(storage_t *r, module_t *m);    /* its set, made: false if it cannot be */
+void storage_let_write(storage_t *r, module_t *m, storage_type_t *type);
 /* up to `want` ids with nothing on them, for a module to hand out: how many there were */
 uint32_t storage_reserve(storage_t *r, uint64_t *ids, uint32_t want);
 /* what a module reads: its spans, its column_base, its observers' lists. 1 if they do not fit */
 [[nodiscard]] int storage_publish(storage_t *r, module_t *m);
 /* once every module has been written for: what changed since the last time is forgotten */
-void storage_written(storage_t *r);
+void storage_end_publish(storage_t *r);
 /* how many table ids there are, counting 0, which is no table */
-uint32_t storage_tables(storage_t *r);
+uint32_t storage_count_tables(storage_t *r);
 
 /* ---- at a reload: a component's rows written again, as another type ---- */
 
@@ -79,8 +79,8 @@ typedef struct {
 } storage_move_t;
 
 /* how many entities carry `type`; and of a toggled one, how many of those are off */
-uint32_t storage_count(storage_t *r, const storage_type_t *type);
-uint32_t storage_off(storage_t *r, const storage_type_t *type);
+uint32_t storage_count_carriers(storage_t *r, const storage_type_t *type);
+uint32_t storage_count_off(storage_t *r, const storage_type_t *type);
 /* lifetime.md, *When a component is moved*. All of them or none: every table and every row
  * the new types need is had before a value moves, and false, with nothing changed, if one
  * cannot be, or if there is not the memory to carry the values across. Observers are told
@@ -95,9 +95,9 @@ void storage_drop(storage_t *r, storage_type_t *type, enum bridge_on_unload poli
 /* ids that were set aside and never handed out: gone, with what is on them */
 void storage_release(storage_t *r, const uint64_t *ids, uint32_t count);
 /* a singleton given its value, outside any barrier, and told to whoever observes it */
-void storage_single(storage_t *r, storage_type_t *type, const void *bytes, uint32_t size);
-bool storage_alive(storage_t *r, uint64_t id);
+void storage_give_single(storage_t *r, storage_type_t *type, const void *bytes, uint32_t size);
+bool storage_is_alive(storage_t *r, uint64_t id);
 /* whether `is` answers true for any row of `type`, handed the row's bytes */
-bool storage_any(storage_t *r, storage_type_t *type, bool (*is)(void *ctx, const uint8_t *row), void *ctx);
+bool storage_has_any(storage_t *r, storage_type_t *type, bool (*is)(void *ctx, const uint8_t *row), void *ctx);
 
 #endif
