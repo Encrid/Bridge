@@ -631,7 +631,8 @@ Of earlier stages:
             phase beside `changes`: an SDK's attach gives it back now. `abi.md`
     closed  every block is allocated to the largest shape any backend asks for: the shared
             block is; a module's private block has its own backend's. `backend.md`
-    open    a phase is a string at `bridge_phase`
+    closed  a phase is a string at `bridge_phase`: it holds, with what it costs and what it
+            buys written. `host-api.md`, *The data*
 
 Statements false against the tree, in one pass with no decision: `bridge_manifest_parse`,
 `bridge_profile`, `validate` and `profile` in the present tense; `terms` for `types` in

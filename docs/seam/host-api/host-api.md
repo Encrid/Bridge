@@ -193,6 +193,16 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
 phase is a name and nothing else* - which also disposes of a collision: a typedef and a function
 share one namespace in C, and `bridge_phase` is the call.
 
+**And `bridge_phase` takes that name, every time.** It is looked for among the deployment's
+phases by comparing, which is a few nanoseconds for the handful there are, in a call that takes
+about a hundred with nothing to do, made once a phase and never once a row. What that buys: a
+name is what any language hands to C with no binding, the call says which phase it runs, and a
+wrong one is refused by its name. Refused: the phase's index in the declared list, which saves
+the comparing and runs the wrong phase without a word when the list is reordered. Refused: a
+handle answered once for a name, which is one more call and one more thing a host holds. The
+condition that brings a handle back is the lookup measured as a cost, in a deployment with
+enough phases or enough calls for it to show.
+
 **The host resolves its own sources** - a manifest, a deployment's file, whatever it has - and
 hands one flat struct per module. Bridge-ASM700 has no notion of where a value came from, which is why
 nothing here records a source.
