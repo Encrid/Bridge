@@ -18,7 +18,7 @@ BRIDGE_NATIVE(advance)
 
 static void registration(const bridge_api *api)
 {
-    bridge_term terms[1] = {{ 0, BRIDGE_INOUT, BRIDGE_AND, 0 }};
+    bridge_term terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
     tick = BRIDGE_NATIVE_COMPONENT(api, "game:Tick", Tick, BRIDGE_DELETE);
     terms[0].slot = tick;
     ticking = BRIDGE_NATIVE_SYSTEM(api, "advance", "update", terms, 1);

@@ -30,13 +30,13 @@ BRIDGE_NATIVE(tally)
 
 BRIDGE_NATIVE(init)
 {
-    bridge_term terms[1] = {{ 0, BRIDGE_INOUT, BRIDGE_AND, 0 }};
+    bridge_term terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
     uint32_t i;
     position = BRIDGE_NATIVE_COMPONENT(api, "game:Position", Position, BRIDGE_DELETE);
     marked = BRIDGE_NATIVE_COMPONENT(api, "game:Marked", Marked, BRIDGE_STRIP);
     terms[0].slot = position;
     moving = BRIDGE_NATIVE_SYSTEM(api, "move", "update", terms, 1);
-    terms[0].access = BRIDGE_IN;
+    terms[0].access = BRIDGE_READ;
     tallying = BRIDGE_NATIVE_SYSTEM(api, "tally", "present", terms, 1);
     for (i = 0; i < ENTITIES; i ++) {
         uint64_t id = api->spawn(api);

@@ -26,11 +26,14 @@ enum bridge_kind : uint32_t { BRIDGE_STRUCT = 1, BRIDGE_ENUM = 2, BRIDGE_BITMASK
 /* declare's on_unload - docs/bridge/data/lifetime.md. Zero is unset, and refused. */
 enum bridge_on_unload : uint32_t { BRIDGE_STRIP = 1, BRIDGE_SWEEP = 2, BRIDGE_DELETE = 3 };
 
-/* A query term: which component, how the system touches it, and how it must match.
- * `slot` is what declare answered. Zero is unset for `access` and `oper`, and refused. */
-enum bridge_access : uint8_t { BRIDGE_IN = 1, BRIDGE_OUT = 2, BRIDGE_INOUT = 3 };
-enum bridge_oper : uint8_t { BRIDGE_AND = 1, BRIDGE_NOT = 2, BRIDGE_OPTIONAL = 3, BRIDGE_OR = 4 };
-constexpr uint32_t BRIDGE_WILDCARD = 0xffffffffu;
+/* A query term: which component, whether the system writes it, and how it must match. `slot`
+ * is what declare answered. Zero is unset for `access` and `oper`, and refused; so is any value
+ * that is not one of these.
+ *
+ * `access` is what the scheduler reads to know what may run at once, and it reads one thing:
+ * whether the term is written. `oper`: the entity must carry it, must not, or may. */
+enum bridge_access : uint8_t { BRIDGE_READ = 1, BRIDGE_WRITE = 2 };
+enum bridge_oper : uint8_t { BRIDGE_AND = 1, BRIDGE_NOT = 2, BRIDGE_OPTIONAL = 3 };
 
 typedef struct {
     uint32_t           slot;

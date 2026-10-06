@@ -49,7 +49,7 @@ BRIDGE_EXPORT(show) int show()
 
 BRIDGE_EXPORT(init) int init()
 {
-    bridge_term terms[1] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }};
+    bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     BRIDGE_DECLARE(BRIDGE_ENUM, "game:Mode", Mode, BRIDGE_STRIP);
     BRIDGE_DECLARE(BRIDGE_BITMASK, "game:Flags", Flags, BRIDGE_STRIP);
     settings = BRIDGE_COMPONENT("game:Settings", Settings, BRIDGE_DELETE);

@@ -245,18 +245,20 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         bridge_term t;
         declared_type *c;
         memcpy(&t, &terms[i], sizeof t);
-        if (t.slot == BRIDGE_WILDCARD) {
-            refuse(m, "term %u of %s '%s' is a wildcard", i, what, name);
-        } else if (t.oper == BRIDGE_OR) {
-            refuse(m, "term %u of %s '%s' is an or-term", i, what, name);
-        } else if (t.slot >= m->declared_count) {
+        if (t.slot >= m->declared_count) {
             refuse(m, "term %u of %s '%s' names slot %u, which it never declared", i, what, name,
                 t.slot);
-        } else if (t.access < BRIDGE_IN || t.access > BRIDGE_INOUT) {
+        } else if (!t.access) {
             refuse(m, "term %u of %s '%s': its access is unset", i, what, name);
-        } else if (t.oper < BRIDGE_AND || t.oper > BRIDGE_OPTIONAL) {
+        } else if (t.access > BRIDGE_WRITE) {
+            refuse(m, "term %u of %s '%s': its access is %u, and there is read and write", i, what,
+                name, t.access);
+        } else if (!t.oper) {
             refuse(m, "term %u of %s '%s': its operator is unset", i, what, name);
-        } else if (t.access != BRIDGE_IN && !may_write(m, m->declared[t.slot])) {
+        } else if (t.oper > BRIDGE_OPTIONAL) {
+            refuse(m, "term %u of %s '%s': its operator is %u, and there are three", i, what, name,
+                t.oper);
+        } else if (t.access == BRIDGE_WRITE && !may_write(m, m->declared[t.slot])) {
             refuse(m, "%s '%s' may not write '%s': no grant says so", what, name,
                 m->declared[t.slot]->name);
         }
@@ -270,7 +272,7 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         asked[i].oper = t.oper;
         /* a term that must not match touches nothing */
         s->term[i].touches = t.oper == BRIDGE_NOT ? nullptr : c;
-        s->term[i].writes = t.access != BRIDGE_IN;
+        s->term[i].writes = t.access == BRIDGE_WRITE;
     }
 
     s->matched = events ? storage_observer(b->storage, asked, count, events, heard, s)

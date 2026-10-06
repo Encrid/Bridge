@@ -19,7 +19,7 @@ BRIDGE_EXPORT(seen) int seen()
 
 BRIDGE_EXPORT(init) int init()
 {
-    bridge_term terms[1] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }};
+    bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     marked = BRIDGE_COMPONENT("game:Marked", Marked, BRIDGE_STRIP);
     terms[0].slot = marked;
     seeing = BRIDGE_OBSERVER("seen", BRIDGE_ON_ADD, terms, 1);

@@ -181,7 +181,7 @@ int main(int argc, char **argv)
         frames(b, 1);
         modules(b);
     } else if (!strcmp(what, "refusedload")) {  /* nothing of a refused load is left */
-        a = wasm("game:wildcard@0.1.0", "wildcard");
+        a = wasm("game:badterm@0.1.0", "badterm");
         load(b, &a);
         a = wasm("game:fp@0.1.0", "fp");
         load(b, &a);

@@ -74,7 +74,7 @@ NATIVE = [
 
 # a module in C: the name, its source, which accessors it is merged with, what it is compiled
 # with. `unchecked` is the accessors without the row < count test: only the measurement uses it.
-PLAIN = ('mover reader refs fp wildcard spin3 flood chatty rows halver twostep watcher chain '
+PLAIN = ('mover reader refs fp badterm spin3 flood chatty rows halver twostep watcher chain '
          'badobs events fixer nested nested2 namer spawner counter typer user settings hang')
 WASM = [(name, name, 'checked', []) for name in PLAIN.split()] + [
     ('rows-unchecked', 'rows', 'unchecked', []),
@@ -425,8 +425,8 @@ CASES = [
      r"module 'game:fp@0.1.0' did not load: type 'game:Position' has another component layout here: fingerprint [0-9a-f]+, and it was declared with [0-9a-f]+.*alive", None),
     ('stage3-grant', ['stage3', 'grant'],
      r"module 'view:reader@0.1.0' did not load: it may not declare 'game:Position': that is another namespace's, and no grant names it.*alive", None),
-    ('stage3-wildcard', ['stage3', 'wildcard'],
-     r"module 'game:wildcard@0.1.0' did not load: term 0 of system 'any' is a wildcard.*alive", None),
+    ('stage3-badterm', ['stage3', 'badterm'],
+     r"module 'game:badterm@0.1.0' did not load: term 0 of system 'any': its operator is 4, and there are three.*alive", None),
     ('stage3-fuel', ['stage3', 'fuel'],
      r"test:spin@0.1.0/forever: system 'forever' failed: trapped: all fuel consumed.*still here.*all fuel consumed.*still here.*alive", None),
     ('stage3-ceiling', ['stage3', 'ceiling'],
@@ -538,13 +538,13 @@ CASES = [
     ('stage3-nospawns', ['stage3', 'nospawns'],
      r"module 'game:mover@0.1.0' did not load: spawn: it stated that it spawns nothing.*alive", None),
     ('stage3-undo', ['stage3', 'undo'],
-     r"game:wildcard@0.1.0: not loaded.*game:fp@0.1.0: loaded.*alive", None),
+     r"game:badterm@0.1.0: not loaded.*game:fp@0.1.0: loaded.*alive", None),
     ('stage5-minted', ['stage5', 'minted'],
      r"minted 160 ids a run. on four threads the same, and again the same.*alive", None),
     ('stage6-skipinit', ['stage6', 'skipinit'],
      r"game:badobs@0.1.0: not loaded.*show: x 3 0.*modules: game:twostep@0.1.0=RUNNING .1..*alive", None),
     ('stage6-refusedload', ['stage6', 'refusedload'],
-     r"game:wildcard@0.1.0: not loaded.*game:fp@0.1.0: loaded.*alive", None),
+     r"game:badterm@0.1.0: not loaded.*game:fp@0.1.0: loaded.*alive", None),
     ('stage6-budget', ['stage6', 'budget'],
      r"module 'test:flaky@0.1.0' is stopped: it reached its max_system_failures of 3.*show: x 63 0.*game:twostep@0.1.0=RUNNING test:flaky@0.1.0=STOPPED.*alive", None),
     ('stage6-forgiven', ['stage6', 'forgiven'],

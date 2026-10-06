@@ -49,7 +49,7 @@ BRIDGE_NATIVE(init)
         "st:M6", "st:M7", "st:M8", "st:M9", "st:M10", "st:M11"
     };
     int none = 0;
-    bridge_term one[1] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }};
+    bridge_term one[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     value = BRIDGE_NATIVE_COMPONENT(api, "st:V", V, BRIDGE_DELETE);
     for (uint32_t k = 0; k < MARKERS; k ++) {
         markers[k] = api->declare(api, bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),

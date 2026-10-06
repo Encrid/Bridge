@@ -187,8 +187,8 @@ int main(int argc, char **argv)
     } else if (!strcmp(what, "grant")) {        /* the reader, with no grant */
         a = artifact("view:reader@0.1.0", "reader");
         load(b, &a);
-    } else if (!strcmp(what, "wildcard")) {
-        a = artifact("game:wildcard@0.1.0", "wildcard");
+    } else if (!strcmp(what, "badterm")) {
+        a = artifact("game:badterm@0.1.0", "badterm");
         load(b, &a);
     } else if (!strcmp(what, "fuel")) {
         a = artifact("test:spin@0.1.0", "spin3");
@@ -248,7 +248,7 @@ int main(int argc, char **argv)
     } else if (!strcmp(what, "undo")) {
         /* a load that fails after declaring and spawning leaves nothing: the same component
          * name with another layout then loads, which a ghost of the first would refuse */
-        a = artifact("game:wildcard@0.1.0", "wildcard");
+        a = artifact("game:badterm@0.1.0", "badterm");
         load(b, &a);
         a = artifact("game:fp@0.1.0", "fp");
         load(b, &a);

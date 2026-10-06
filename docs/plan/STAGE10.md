@@ -485,8 +485,10 @@ at least five things, none defined, and none of them the one that was meant.
     closed  a pinned module runs on the thread that calls bridge_phase: kept, and no longer
             "forced". The host's thread is the only one that can be the first thread of the
             process, which a window on one of the three platforms requires. `pinned.md`
-    open    BRIDGE_OR and BRIDGE_WILDCARD, which exist to be refused
-    open    BRIDGE_IN, BRIDGE_OUT, BRIDGE_INOUT, of which the scheduler reads one bit
+    closed  BRIDGE_OR and BRIDGE_WILDCARD, which existed to be refused: removed. An operator
+            is one of three, and any other value is refused by its number. `query.md`
+    closed  BRIDGE_IN, BRIDGE_OUT, BRIDGE_INOUT, of which the scheduler read one bit: two,
+            BRIDGE_READ and BRIDGE_WRITE. `data.md`, *Access mode*
     open    a setting defined twice, and differently, for a host and for a backend
     open    `terms` in a module's header, which is not [budget] terms
     open    three events, now that an observer is told the net change

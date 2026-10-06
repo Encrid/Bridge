@@ -326,7 +326,7 @@ BRIDGE_NATIVE(init)
         "st:T0", "st:T1", "st:T2", "st:T3", "st:T4", "st:T5", "st:T6",
         "st:T7", "st:T8", "st:T9", "st:T10", "st:T11", "st:T12", "st:T13"
     };
-    bridge_term first[1] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }};
+    bridge_term first[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     for (uint32_t k = 0; k < KINDS; k ++) {
         kinds[k] = api->declare(api, bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
             (uint32_t)strlen(names[k]), BRIDGE_STRUCT, sizeof(T), alignof(T),
@@ -337,8 +337,8 @@ BRIDGE_NATIVE(init)
     seeing = BRIDGE_NATIVE_SYSTEM(api, "see", "look", first, 1);
 #endif
 #if !defined(BIG) && !defined(TABLES)
-    bridge_term one[1] = {{ a, BRIDGE_IN, BRIDGE_AND, 0 }};
-    bridge_term two[2] = {{ a, BRIDGE_IN, BRIDGE_AND, 0 }, { b, BRIDGE_IN, BRIDGE_NOT, 0 }};
+    bridge_term one[1] = {{ a, BRIDGE_READ, BRIDGE_AND, 0 }};
+    bridge_term two[2] = {{ a, BRIDGE_READ, BRIDGE_AND, 0 }, { b, BRIDGE_READ, BRIDGE_NOT, 0 }};
     BRIDGE_NATIVE_SYSTEM(api, "attach_b_half", "attach_b_half", &none, 0);
     BRIDGE_NATIVE_SYSTEM(api, "detach_b_half", "detach_b_half", &none, 0);
     BRIDGE_NATIVE_SYSTEM(api, "detach_b_absent", "detach_b_absent", &none, 0);

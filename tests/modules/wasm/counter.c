@@ -22,7 +22,7 @@ BRIDGE_EXPORT(count) int count()
 
 BRIDGE_EXPORT(init) int init()
 {
-    bridge_term terms[1] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }};
+    bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP);
     roster = BRIDGE_COMPONENT("game:Roster", Roster, BRIDGE_STRIP);
     terms[0].slot = position;

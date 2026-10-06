@@ -18,7 +18,7 @@ BRIDGE_EXPORT(read) int read()
 
 BRIDGE_EXPORT(init) int init()
 {
-    bridge_term terms[1] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }};
+    bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     Body b = {{ 1.0f, 2.0f }, 3.0f };
     body = BRIDGE_COMPONENT("game:Body", Body, BRIDGE_DELETE);
     terms[0].slot = body;

@@ -22,7 +22,7 @@ BRIDGE_EXPORT(move) int move()
 
 BRIDGE_EXPORT(init) int init()
 {
-    bridge_term terms[1] = {{ 0, BRIDGE_INOUT, BRIDGE_AND, 0 }};
+    bridge_term terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
     uint32_t i;
     position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE);
     terms[0].slot = position;

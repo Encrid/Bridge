@@ -29,10 +29,16 @@ following*.
 
 ## Access mode
 
-Query terms carry it: `in`, `out`, `inout`. It is a **scheduling input and nothing else** -
-Bridge-ASM700 uses it to know which modules may run at once, and storage is never told.
+Query terms carry it, and it is one of two: **read** or **write**. It is a **scheduling input and
+nothing else** - Bridge-ASM700 uses it to know which modules may run at once, and storage is never
+told.
 
-It is not enforced, which is how every ECS works. A module that writes a term it declared `in` is
+Refused: three, `in`, `out` and `inout`, which is what flecs has and what this had. flecs tells a
+write that reads from one that does not because it tracks what was read; nothing here does, and
+the scheduler asked one thing of the three, whether the term is written. The condition that brings
+a third back is something that treats a term written and never read differently.
+
+It is not enforced, which is how every ECS works. A module that writes a term it declared read is
 a bug in that module, no different from one writing nonsense into a term it owns. The second is
 indistinguishable from corruption anyway, so policing the first would narrow the blast radius
 without closing it. wasm has no read-only memory import in any case.

@@ -11,7 +11,7 @@ the shared memory cannot prevent that.
 Three things narrow it, none of them costing anything per frame:
 
 **The suspects are the declared writers.** If a component is corrupt, the modules that declared it
-`out` or `inout` are the list and the rest are cleared - from data the scheduler keeps anyway.
+written are the list and the rest are cleared - from data the scheduler keeps anyway.
 
 **The culprit is the system that was running.** Conflicting systems never run at once, so at any
 instant one system can be writing a given component, and Bridge-ASM700 dispatched it. One store per
@@ -57,7 +57,7 @@ index, and every component through its spans, at every pass.
 ## The checksum pass, when asked
 
 One check, behind `[checks] validate`. Hash each column at every barrier and compare with the last.
-**If a column changed and no system that ran declared it `out`, the log names the module** - which
+**If a column changed and no system that ran declared it written, the log names the module** - which
 is what the three narrowing facts above stop short of: they produce a suspect list, and this
 produces a culprit.
 

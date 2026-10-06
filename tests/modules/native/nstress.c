@@ -130,7 +130,7 @@ BRIDGE_NATIVE(init)
     };
     int none = 0;
     for (uint32_t k = 0; k < KINDS; k ++) {
-        bridge_term term[1] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }};
+        bridge_term term[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
         kinds[k] = api->declare(api, bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
             (uint32_t)strlen(names[k]), BRIDGE_STRUCT, sizeof(V), alignof(V),
             bridge_native_put(api, V_desc, sizeof V_desc - 1), sizeof V_desc - 1, BRIDGE_DELETE);

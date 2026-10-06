@@ -157,8 +157,8 @@ side.
 ## What a pass depends on
 
 Storage, the phase the host asked for, and **what native modules wrote**. Nothing else crosses in:
-everything a deployment learns from outside reaches the rest as a column some native module declared `out`,
-applied at a barrier.
+everything a deployment learns from outside reaches the rest as a column some native module declared
+written, applied at a barrier.
 
 That is one place, because of three decisions taken elsewhere for their own reasons. **No module
 can call another**, so no value ever arrives as a return - `abi.md`, *The ABI*. **A native

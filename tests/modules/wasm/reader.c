@@ -23,7 +23,7 @@ BRIDGE_EXPORT(sum) int sum()
 
 BRIDGE_EXPORT(init) int init()
 {
-    bridge_term terms[2] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }, { 0, BRIDGE_IN, BRIDGE_AND, 0 }};
+    bridge_term terms[2] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }, { 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP);
     marked = BRIDGE_COMPONENT("game:Marked", Marked, BRIDGE_STRIP);
     terms[0].slot = position;

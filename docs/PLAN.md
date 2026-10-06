@@ -93,7 +93,7 @@ Access mode and queries are part of declaration from the start, not retrofitted.
 other's spans, a mirror lookup survives a batch of swap-removes, and the accessor's test is measured
 against a build without it* - `validation.md`, *Always on*, states that cost as reasoning, and this
 is where it becomes a measurement. *And when a fingerprint mismatch, an ungranted declare and a
-wildcard term are each refused by name; a system that never returns is stopped by its fuel; a
+term with no such operator are each refused by name; a system that never returns is stopped by its fuel; a
 `spawn` past the entity ceiling fails where it happens; a log line reaches the sink; and an
 overflowing ring reports how many it dropped.* Met.
 

@@ -55,15 +55,20 @@ value is reached from another by `reference.md`, *Reference following*.
 
 ## What a query may not ask for
 
-**Or-terms and wildcards.** The component such a term matched would vary from table to table. A
+**A term that is "this type or that one", and a term that is "any type".** Other ECS call them
+or-terms and wildcards. The component such a term matched would vary from table to table. A
 module reads a field through a **typed** accessor chosen at its build, and a term whose type
 changes per table has no type to choose. So they are incompatible with the accessors, not merely
 awkward in the span.
 
-Both are refused at `system` and `observe`, by name and by the number of the term - that is where
-terms are handed over, not `declare`, which only registers a type. What is left is a term that is
-one declared type and must match, must not, or may; a table carries a type or does not, so every
-term that matches has a base and a stride. Every refusal has a diagnostic and none costs a frame.
+So there is no way to say either. A term is one declared type, and it must match, must not, or
+may: three operators, and a value that is none of them is refused at `system` and `observe`, by
+the number of the term. A table carries a type or does not, so every term that matches has a base
+and a stride.
+
+Refused: values in the ABI for both, kept so that the refusal could name them, which is what this
+had. A seam that lists what it refuses has to be carried by everything that speaks it. The
+condition that brings them back is authors who try one and cannot tell from the refusal why.
 
 Many tables per query is the normal case: that is what archetypes mean. And publishing costs
 **O(tables touched)**, not O(data) and not O(tables), which is the property that makes this scale.

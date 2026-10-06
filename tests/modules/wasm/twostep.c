@@ -33,13 +33,13 @@ BRIDGE_EXPORT(show) int show()
 
 BRIDGE_EXPORT(init) int init()
 {
-    bridge_term terms[1] = {{ 0, BRIDGE_INOUT, BRIDGE_AND, 0 }};
+    bridge_term terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
     Position p = { 1.0f, 0.0f };
     position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE);
     terms[0].slot = position;
     doubling = BRIDGE_SYSTEM("twice", "update", terms, 1);
     adding = BRIDGE_SYSTEM("more", "update", terms, 1);
-    terms[0].access = BRIDGE_IN;
+    terms[0].access = BRIDGE_READ;
     showing = BRIDGE_SYSTEM("show", "present", terms, 1);
     BRIDGE_ATTACH(bridge_spawn(), position, p);
     return 0;
