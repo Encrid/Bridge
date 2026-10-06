@@ -322,3 +322,23 @@ as one in a document does.
 
 **A function that is not `static` always has its comment, and `tools/style.py` holds that. A
 `static` one has it when its name and arguments do not say it.**
+
+## The refactor, as it goes
+
+Every commit is measured beside a worktree of the tree before the stage, `dev` at `40c921b`,
+built by the same script.
+
+    every type ends in _t         72 typedefs of the library, the backends and the SDKs, and
+                                  every use. The descriptor's word for text follows the type:
+                                  `bridge_text_t`. The types a test module declares wait for
+                                  their directory
+    files in snake_case           the five headers, the SDK's `bridge_wasm.wat`, and what is
+                                  built: `bridge_wasm`, `bridge_native`
+
+**What two builds differ by when their code is the same.** After the two renames the call of
+`spawn` measured 4.8 to 4.9 ns where the tree before measured 4.5 to 4.7, in whichever order
+the two were run. The four files a change goes through were compiled to assembly in both trees:
+no instruction differs, only the names and paths in the debugging records. So 0.3 to 0.5 ns on
+a line that times a call is what two builds of the same code differ by, in two directories, and
+a line is called slower only beyond that. The call of `detach` that measured 0.5 ns slower
+when `attach` lost its length is inside it.
