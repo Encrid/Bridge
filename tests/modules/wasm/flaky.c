@@ -1,5 +1,6 @@
-/* A system that fails FAILS passes out of every OF. Built three ways: always, one in three,
- * two in three - docs/bridge/run/failure.md, *The budget*. */
+/* A system that fails FAILS passes out of every OF. Built four ways: always, one in three,
+ * two in three, and always beside a system of the next phase that never fails -
+ * docs/bridge/run/failure.md, *The budget*. */
 #include "bridge-wasm.h"
 
 static uint32_t passes;
@@ -11,10 +12,17 @@ BRIDGE_EXPORT(trip) int trip()
     return n < FAILS ? 7 : 0;
 }
 
+#ifdef CALM
+BRIDGE_EXPORT(calm) int calm() { return 0; }
+#endif
+
 BRIDGE_EXPORT(init) int init()
 {
     int none = 0;
     BRIDGE_SYSTEM("trip", "update", &none, 0);
+#ifdef CALM
+    BRIDGE_SYSTEM("calm", "present", &none, 0);
+#endif
     return 0;
 }
 

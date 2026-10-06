@@ -74,7 +74,7 @@ typedef struct {
     bool     pinned;             /* its systems run on the thread that loaded it, and no other */
     enum bridge_on_error on_error;   /* what losing it costs the deployment */
     /* each of the next six: zero is unset, BRIDGE_NO_LIMIT is "no limit" */
-    int64_t  max_system_failures;    /* raised by a failed barrier, lowered by a clean one */
+    int64_t  max_system_failures;    /* each system is counted against it, alone */
     int64_t  fuel;               /* units per system invocation */
     int64_t  memory_limit;       /* bytes. a ceiling, never re-set */
     int64_t  init_timeout, reload_timeout, shutdown_timeout;    /* nanoseconds, per call */

@@ -204,6 +204,14 @@ int main(int argc, char **argv)
         load(b, &a);
         frames(b, 12);
         modules(b);
+    } else if (!strcmp(what, "notmasked")) {
+        /* a system that always fails, and one in the next phase that never does: the clean
+         * one does not forgive the other */
+        a = wasm("test:flaky@0.1.0", "flaky-calm");
+        a.cfg.spawns = BRIDGE_NONE;
+        load(b, &a);
+        frames(b, 5);
+        modules(b);
     } else if (!strcmp(what, "neverstop")) {    /* -1: it fails every pass and is never stopped */
         a = wasm("test:flaky@0.1.0", "flaky-always");
         a.cfg.spawns = BRIDGE_NONE;

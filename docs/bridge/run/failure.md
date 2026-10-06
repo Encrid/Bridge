@@ -58,22 +58,33 @@ it back is a module that must load and need not stay.
 
 ## The budget
 
-`max_system_failures` is a count that **a failed barrier raises by one and a clean barrier lowers
-by one**, never below zero. A module that reaches the number is stopped. A barrier is failed for a
-module when any of its systems or observers failed since the one before, or when an entity it
-changed could not be placed - `budgets.md`, *What running out does*; it is clean when the module
-ran and neither happened.
+`max_system_failures` is a number that **each system and each observer of a module is counted
+against, alone**. An invocation that fails raises that system's count by one, and one that runs
+clean lowers it by one, never below zero. When any of them reaches the number its module is
+stopped, at the barrier that follows, and the log names the system.
 
-The unit is the barrier and not the invocation, so that a module is not punished for being made of
-many systems. And it is not wall time, which is the one thing a pass cannot reproduce -
-`schedule.md`, *What a pass depends on*.
+**A system is counted alone so that another cannot forgive it.** A module is not punished for
+being made of many systems, since none adds to another's count; and a system that fails every
+time it runs is stopped however many of its module's others run clean. The unit is not wall time
+either, which is the one thing a pass cannot reproduce - `schedule.md`, *What a pass depends on*.
+
+**What is nobody's system is counted on the module, against the same number.** An entity a module
+changed that could not be placed - `budgets.md`, *What running out does* - raises the module's
+own count by one for that barrier. A barrier that placed everything the module changed lowers
+it. One in which it changed nothing does neither.
 
 **What forgives is sustained health, not one good pass.** The original Bridge forgives its retry
 budget after a minute of running, and says why: the budget is there to catch a module that cannot
 run, *"not one that has a bad day twice a year"*. One count that falls as slowly as it rises does
-that with a single number, and stops any module that fails more often than not.
+that with a single number, and stops any system that fails more often than not.
 
 `-1`, `BRIDGE_NO_LIMIT`, means never stop it, as for every limit.
+
+Refused: one count for a module, raised by a barrier in which anything of its failed and
+lowered by one in which it ran clean, which is what this was. There is a barrier after every
+phase, so a module with a system that always failed in one phase and a system that ran clean in
+the next went up one and down one for ever, and was never stopped: the fault the next refusal
+names. `tests/stage6.c`, case `notmasked`, is that module. No condition brings it back.
 
 Refused: a count that one clean barrier resets, which is easier to say and never stops a module
 failing every other pass. The condition that brings it back is deployments finding this one hard to

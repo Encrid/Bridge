@@ -253,14 +253,20 @@ void schedule_run(bridge *b, uint32_t phase)
         /* failure.md: the invocation is abandoned, and logged - here, so that the sink is
          * only ever called on the thread that asked for the phase */
         for (k = 0; k < count; k ++) {
-            jobs[k].m->ran_now = 1;
             for (i = 0; i < jobs[k].count; i ++) {
                 bridge_system *s = jobs[k].list[i];
-                if (s->failed) {
-                    s->m->failed_now = 1;
-                    say(b, s->m, s, BRIDGE_ERR, "%s '%s' failed: %s",
-                        s->observer ? "observer" : "system", s->name, s->why);
+                /* failure.md, *The budget*: counted a system at a time, so that one that
+                 * always fails is not forgiven by another of its module's that never does */
+                if (!s->failed) {
+                    if (s->failures) s->failures --;
+                    continue;
                 }
+                s->failures ++;
+                if (s->m->max_failures > 0 && s->failures >= s->m->max_failures && !s->m->reached) {
+                    s->m->reached = s;
+                }
+                say(b, s->m, s, BRIDGE_ERR, "%s '%s' failed: %s",
+                    s->observer ? "observer" : "system", s->name, s->why);
             }
         }
     }
@@ -270,22 +276,30 @@ void schedule_run(bridge *b, uint32_t phase)
     free(lists);
 }
 
-/* failure.md, *The budget*: a barrier in which a module failed raises its count, one in which
- * it ran clean lowers it, and at its number it is stopped. Counted in barriers, so that the
- * same history stops the same module at the same place every run. */
+/* failure.md, *The budget*: a module is stopped at the barrier after one of its systems
+ * reached its number, or after it did itself, by entities it changed that could not be
+ * placed. Counted in invocations and in barriers and never in time, so that the same history
+ * stops the same module at the same place every run. */
 void schedule_account(bridge *b)
 {
     module *m;
     for (m = b->modules; m; m = m->next) {
-        if (m->ran_now) {
-            if (m->failed_now) m->failures ++;
-            else if (m->failures) m->failures --;
-        }
-        m->ran_now = m->failed_now = 0;
-        if (m->stopped || m->max_failures <= 0 || m->failures < m->max_failures) continue;
+        const bridge_system *s = m->reached;
+        if (m->unplaced_now) m->failures ++;
+        else if (m->changed_now && m->failures) m->failures --;
+        m->changed_now = m->unplaced_now = 0;
+        m->reached = nullptr;
+        if (m->stopped || m->max_failures <= 0 || (!s && m->failures < m->max_failures)) continue;
         m->stopped = 1;
-        say(b, m, nullptr, BRIDGE_ERR, "module '%s' is stopped: it reached its max_system_failures "
-            "of %lld", m->identity, (long long)m->max_failures);
+        if (s) {
+            say(b, m, nullptr, BRIDGE_ERR, "module '%s' is stopped: its %s '%s' reached its "
+                "max_system_failures of %lld", m->identity, s->observer ? "observer" : "system",
+                s->name, (long long)m->max_failures);
+        } else {
+            say(b, m, nullptr, BRIDGE_ERR, "module '%s' is stopped: it reached its "
+                "max_system_failures of %lld, by entities it changed that could not be placed",
+                m->identity, (long long)m->max_failures);
+        }
         /* fail covers a stop as it covers a load: the deployment does not run without it */
         if (m->on_error == BRIDGE_FAIL) bridge_stop(b, m->identity, "was stopped");
     }

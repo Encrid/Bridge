@@ -62,6 +62,7 @@ typedef struct {
     uint32_t      when;             /* of the dispatch in progress */
     int           failed;           /* and how it ended, said after the join */
     char          why[256];
+    int64_t       failures;         /* failure.md, *The budget*: its own count */
     /* what the conflict graph reads of each term: the component, or nullptr where the term reads
      * nothing, and whether it is written. `terms` of them */
     struct { declared_type *touches; bool writes; } term[];
@@ -122,9 +123,12 @@ struct module {
     enum bridge_on_error on_error;
     backend_func *shutdown;
     int64_t  shutdown_timeout;
-    /* failure.md, *The budget*: raised by a failed barrier, lowered by a clean one */
+    /* failure.md, *The budget*. Each system has a count of its own. `failures` is the
+     * module's, for what is nobody's system: a barrier that could not place an entity it
+     * changed raises it, and one that placed all it changed lowers it */
     int64_t  max_failures, failures;
-    int      ran_now, failed_now;   /* since the last barrier */
+    int      changed_now, unplaced_now;     /* at this barrier */
+    const void *reached;            /* the system whose count reached the number, if one did */
     /* budgets.md, *What running out does*: how many entities it changed were left as they were
      * at this barrier, for want of a table and for want of columns */
     uint32_t left[2];

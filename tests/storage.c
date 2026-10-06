@@ -235,13 +235,13 @@ int main(int argc, char **argv)
         run(b, "spawn");
         run(b, "attach_a");         /* the one table there may be */
         run(b, "attach_b_half");    /* a second: three entities stay as they were, and are not heard */
-        run(b, "look");             /* a barrier it ran clean in */
-        run(b, "attach_b_half");
-        run(b, "attach_b_half");    /* the second in a row: its budget of two */
+        run(b, "look");             /* a barrier it changed nothing in forgives nothing */
+        run(b, "attach_b_half");    /* the second: its budget of two */
+        run(b, "attach_b_half");    /* and it is stopped */
         run(b, "look");
     } else if (!strcmp(what, "nocolumns")) {
         a = store_module(NSTORE_PATH, 6, 1 << 20);
-        a.cfg.max_system_failures = 2;
+        a.cfg.max_system_failures = 4;
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         run(b, "spawn");
         run(b, "attach_a");         /* sixty-four bytes do not hold six rows of it: by halves, three */
@@ -250,8 +250,8 @@ int main(int argc, char **argv)
         run(b, "look");
         run(b, "attach_a");         /* five rows are sixty-four bytes exactly */
         run(b, "look");
-        run(b, "attach_a");         /* and the sixth is never to be had: */
-        run(b, "attach_a");         /* twice in a row is its budget of two */
+        run(b, "attach_a");         /* and the sixth is never to be had: the fourth barrier that */
+        run(b, "attach_a");         /* left one out was its budget of four, and it is stopped */
     } else if (!strcmp(what, "scribble")) {
         a = store_module(NSTORE_PATH, 6, 1 << 20);
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }

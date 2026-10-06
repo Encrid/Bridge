@@ -565,6 +565,7 @@ void storage_apply(storage *r)
                 memcpy(b->shared + column + (size_t)r->places[index].row * ch.c->size, value, ch.size);
             }
         }
+        m->changed_now = m->queue_len != 0;
         m->queue_len = 0;
     }
 
@@ -592,7 +593,7 @@ void storage_apply(storage *r)
             say(b, m, nullptr, BRIDGE_ERR, text[i], m->identity, i ? b->columns_len : r->table_room,
                 m->left[i]);
             m->left[i] = 0;
-            m->ran_now = m->failed_now = 1;     /* failure.md, *The budget* */
+            m->unplaced_now = 1;                /* failure.md, *The budget* */
         }
     }
 }

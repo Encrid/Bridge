@@ -531,8 +531,10 @@ was named it was read. Each is decided again with all six shown, or shown to hol
 
 The chosen option contradicts its own reason, or a document:
 
-    open    the failure count rises and falls by the barrier: a module whose system fails in
-            one phase and runs clean in the next, every pass, is never stopped. `failure.md`
+    closed  the failure count rose and fell by the barrier: a module whose system failed in
+            one phase and ran clean in the next, every pass, was never stopped. Each system
+            is counted alone now, and what is nobody's system on the module, lowered only
+            by a barrier that placed what it changed. `failure.md`, *The budget*
     open    attach and detach are in no conflict graph: two modules attaching one component
             to one entity are settled by load order, which `schedule.md` says never decides
     open    `destroy` checks no grant: a module removes any entity, and every component on it
