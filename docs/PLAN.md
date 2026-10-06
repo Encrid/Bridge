@@ -265,15 +265,15 @@ component layout changed* - and until this stage a changed component layout is r
 Before everything that reads storage or describes it: the readings of how full a budget is, and
 the module seam in a second language, would each be made twice otherwise.
 
-*Done when each of the five has been weighed on every need and either passed or left the plan
-with its condition; a component can be declared in each that passed and a module reads it as
-that storage layout is read; each has a case for what it is for and a measurement beside the table's for the same
+*Done when each of the five has been weighed on every need and either passed or left the plan with
+its condition; a component can be declared in each that passed and a module reads it as that storage
+layout is read; each has a case for what it is for and a measurement beside the table's for the same
 work, and none is slower than the table at what it was chosen for; a query across two storage
 layouts either works as written or is refused by name; running out, strip at unload and what an
-observer is told each hold in every storage layout; a component is moved from one storage layout
-to another with its values; and a module reloaded with a field added, removed, renamed or moved
-keeps every value its new component layout still has a place for, in each storage layout, and is
-told by a record what went.*
+observer is told each hold in every storage layout; a component is moved from one storage layout to
+another with its values; and a module reloaded with a field added, removed, renamed or moved keeps
+every value its new component layout still has a place for, in each storage layout, and is told by a
+record what went.*
 
 ## 12. Self contained
 
