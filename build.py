@@ -333,8 +333,8 @@ def test(out, built, only):
     failed = []
     for name, command, match, never in cases:
         argv = [str(out / (command[0] + built['exe']))] + command[1:]
-        if command[0] == 'c23':
-            argv = [str(built['python']), str(ROOT / 'tools/c23.py')]
+        if command[0] in ('c23', 'style'):
+            argv = [str(built['python']), str(ROOT / ('tools/%s.py' % command[0]))]
         elif command[0] == 'nocall':
             argv = [str(built[k]) for k in ('python', 'nocall', 'wasm-tools')] + \
                    [str(built['modules'] / command[1]), command[2]]
@@ -391,6 +391,8 @@ def main():
 # A match that begins with @ names a file the output must equal, word for word: a transcript.
 CASES = [
     ('c23', ['c23'],
+     None, None),
+    ('style', ['style'],
      None, None),
     ('schema', ['schema'],
      r"every descriptor read as it should, and every other refused by its word.*alive", None),

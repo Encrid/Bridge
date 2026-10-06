@@ -55,3 +55,31 @@ was made, and then it was dropped for this. What the experiment found is in the 
     C3  no `goto`              20
     C1  3 branches             every test program is one chain on its argument, up to 28 arms
     G1  the header             no file has it
+
+## The checker, as built
+
+`tools/style.py` reads C as text, with no compiler: comments and literals are set aside, a
+function is found by its braces, and its body is cut into statements. Before anything else it
+checks itself, on C that infringes each rule and on C that infringes none.
+
+    held          O1 to O4, G1 to G5, F2 to F6, L1 to L6, V1, V3, C1 to C3, H1 to H3
+    not held      F1 and whether a file is coherent, the verb in a name, V2, A1, A2, and
+                  whether a ternary is simple. A reader holds those
+    the paths     the list `HELD` in the script, which is empty until the first directory is
+                  made clean, and only grows. `--all` counts the whole tree instead
+    as a case     `style`, beside `c23`
+
+What the whole tree holds before any of it is rewritten, 95 files:
+
+    F3  2656    L1   973    L3   861    F6   681    L5   647    L4   628
+    L6   502    F5   242    C1   234    G3   159    G2   132    V1   117
+    H1   102    G4    97    F4    95    G1    94    L2    80    O3    38
+    C2    30    C3    20    O4     5    H3     5    G5     4    O2     1
+
+Three readings the rules leave open, and what the checker takes until one is decided:
+
+    a `case`            one level inside its `switch`, and its statements one more
+    `i ++`              a space between a unary operator and its operand, so L3
+    a macro for text    H3, as for a number: `#define BRIDGE_NAMESPACE "bridge"`. Five of
+                        them, and a name that is joined to another literal cannot be a
+                        `constexpr`

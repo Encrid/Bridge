@@ -625,4 +625,11 @@ A rule that is infringed, with the justification the introduction asks for. Each
 what is excepted, and why. `tools/style.py` reads this section, and reports anything that is
 not in it.
 
-None.
+An exception is one line indented by four spaces: the rule, the path it is for, and the reason.
+The path may hold `*`, and may end in `:` and a function's name when one function is what is
+excepted. A reason that needs more lines continues on lines indented further. An exception that
+excuses nothing is reported, so that none outlives what it was for.
+
+    O1  backends/wasm/wasmtime/*  wasmtime's library, as its authors built and published it.
+            The wasm backend links it, the build does not make it, and where it came from
+            and its hash are beside it - `build.md`, *Dependencies*.

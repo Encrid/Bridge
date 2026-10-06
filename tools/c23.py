@@ -32,7 +32,6 @@ OLDER = [
     (r'\benum\s*\{', 'a named enum with its width: enum name : uint32_t {'),
     (r'\benum\s+\w+\s*\{', 'the enum with its width stated: enum name : uint32_t {'),
     (r'\(void\)\s*[A-Za-z_]\w*\s*;', '[[maybe_unused]] where the parameter is declared'),
-    (r'\w\s*\(\s*void\s*\)', 'f() for a function that takes nothing'),
     (r'=\s*\{\s*0\s*\}\s*;', '= {}'),
     (r'^[ \t]*#[ \t]*define[ \t]+\w+[ \t]+[-+(]*(?:0[xX][0-9a-fA-F]|[0-9])', 'a typed constexpr'),
 ]

@@ -101,13 +101,13 @@ what is needed:
                    states it, so a module and the library cannot disagree and both compile
     checked sums   <stdckdint.h> wherever a size is computed from stated numbers. An overflow is
                    a refusal naming the key, like any other budget that cannot be met
-    the rest       = {} for zero; f() for a function that takes nothing; digit separators in a
-                   large number; typeof where a macro derives a type; auto only where the
-                   initialiser already names the type; unreachable() after a switch that
-                   covered every case
+    the rest       = {} for zero; digit separators in a large number; typeof where a macro
+                   derives a type; auto only where the initialiser already names the type;
+                   unreachable() after a switch that covered every case
 
 `tools/c23.py` runs with the tests and fails on an older spelling, which is what makes "fully" a
-claim that can be false.
+claim that can be false. One spelling of C23 is not used: a function that takes nothing is
+`f(void)`, as `STYLE.md` rule F5 asks, and not `f()`.
 
 **Not used, each for a reason.** `<stdbit.h>` is the C library's, and with this compiler none of the
 four targets has it, the three platforms and wasm. `_BitInt`, `#embed` and `char8_t` have nothing
