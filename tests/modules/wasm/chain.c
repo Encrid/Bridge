@@ -2,7 +2,9 @@
  * One hop per barrier: three barriers, and no fixpoint. */
 #include "bridge_wasm.h"
 
-BRIDGE_SCHEMA_STRUCT(Link, { uint32_t n; });
+#define LINK_FIELDS { uint32_t n; }
+BRIDGE_SCHEMA_STRUCT_TYPE(Link, LINK_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Link, LINK_FIELDS);
 
 constexpr uint32_t NONE = 0xffffffffu;
 

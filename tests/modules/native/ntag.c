@@ -11,7 +11,9 @@
  */
 #include "bridge_native.h"
 
-BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });
+#define A_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(A, A_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(A, A_FIELDS);
 
 constexpr uint32_t COUNT = 6;
 

@@ -6,9 +6,13 @@
  * Built once for each SPLIT: 1, 16, 256, 4096. The entities are the same number every time. */
 #include "bridge_native.h"
 
-BRIDGE_SCHEMA_STRUCT(V, { uint32_t v; });
+#define V_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(V, V_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(V, V_FIELDS);
 #ifndef TAGS                                    /* built with TAGS, the markers are tags */
-BRIDGE_SCHEMA_STRUCT(M, { uint32_t on; });
+#define M_FIELDS { uint32_t on; }
+BRIDGE_SCHEMA_STRUCT_TYPE(M, M_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(M, M_FIELDS);
 #endif
 
 constexpr uint32_t COUNT = 204'800, MARKERS = 12;     /* 2^12 sets at the most */

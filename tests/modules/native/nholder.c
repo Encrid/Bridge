@@ -5,7 +5,9 @@
 
 /* declared by the module loaded before this one: here it is only what Y is made of */
 typedef struct { uint16_t x, y; } Vec;
-BRIDGE_SCHEMA_STRUCT(Y, { Vec at; });
+#define Y_FIELDS { Vec at; }
+BRIDGE_SCHEMA_STRUCT_TYPE(Y, Y_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Y, Y_FIELDS);
 
 BRIDGE_NATIVE(init)
 {

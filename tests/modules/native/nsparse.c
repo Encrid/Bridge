@@ -17,16 +17,24 @@
 #include "bridge_native.h"
 
 #ifdef FAT
-BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; uint8_t rest[4092]; });
+#define A_FIELDS { uint32_t v; uint8_t rest[4092]; }
+BRIDGE_SCHEMA_STRUCT_TYPE(A, A_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(A, A_FIELDS);
 constexpr uint32_t COUNT = 10'000, STEP = 1;
 #elifdef BIG
-BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });
+#define A_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(A, A_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(A, A_FIELDS);
 constexpr uint32_t COUNT = 204'800, STEP = 1;
 #else
-BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });
+#define A_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(A, A_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(A, A_FIELDS);
 constexpr uint32_t COUNT = 6, STEP = 2;
 #endif
-BRIDGE_SCHEMA_STRUCT(S, { uint32_t v; });
+#define S_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(S, S_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(S, S_FIELDS);
 
 static uint32_t a, s, in_set, in_table;
 static uint64_t ids[COUNT], lone;

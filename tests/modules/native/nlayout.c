@@ -22,43 +22,75 @@
 #include "bridge_native.h"
 
 #if V == 9
-BRIDGE_SCHEMA_ENUM(Mode, int8_t, { Off, Auto, On });
+#define MODE_VALUES { Off, Auto, On }
+BRIDGE_SCHEMA_ENUM_TYPE(Mode, int8_t, MODE_VALUES);
+BRIDGE_SCHEMA_ENUM_DESC(Mode, int8_t, MODE_VALUES);
 #elif V == 10
-BRIDGE_SCHEMA_ENUM(Mode, int8_t, { Off, On, Auto, Max });
+#define MODE_VALUES { Off, On, Auto, Max }
+BRIDGE_SCHEMA_ENUM_TYPE(Mode, int8_t, MODE_VALUES);
+BRIDGE_SCHEMA_ENUM_DESC(Mode, int8_t, MODE_VALUES);
 #elif V == 12
-BRIDGE_SCHEMA_ENUM(Mode, int8_t, { Off, On });
+#define MODE_VALUES { Off, On }
+BRIDGE_SCHEMA_ENUM_TYPE(Mode, int8_t, MODE_VALUES);
+BRIDGE_SCHEMA_ENUM_DESC(Mode, int8_t, MODE_VALUES);
 #else
-BRIDGE_SCHEMA_ENUM(Mode, int8_t, { Off, On, Auto });
+#define MODE_VALUES { Off, On, Auto }
+BRIDGE_SCHEMA_ENUM_TYPE(Mode, int8_t, MODE_VALUES);
+BRIDGE_SCHEMA_ENUM_DESC(Mode, int8_t, MODE_VALUES);
 #endif
 
 #if V == 13
 typedef struct { uint16_t x, y; } Vec;
 #elif V == 8
-BRIDGE_SCHEMA_STRUCT(Vec, { uint16_t y; uint16_t x; uint16_t z; });
+#define VEC_FIELDS { uint16_t y; uint16_t x; uint16_t z; }
+BRIDGE_SCHEMA_STRUCT_TYPE(Vec, VEC_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Vec, VEC_FIELDS);
 #elif V == 11
-BRIDGE_SCHEMA_STRUCT(Vec, { uint16_t x; });
+#define VEC_FIELDS { uint16_t x; }
+BRIDGE_SCHEMA_STRUCT_TYPE(Vec, VEC_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Vec, VEC_FIELDS);
 #else
-BRIDGE_SCHEMA_STRUCT(Vec, { uint16_t x; uint16_t y; });
+#define VEC_FIELDS { uint16_t x; uint16_t y; }
+BRIDGE_SCHEMA_STRUCT_TYPE(Vec, VEC_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Vec, VEC_FIELDS);
 #endif
 
 #if V == 1
-BRIDGE_SCHEMA_STRUCT(X, { uint32_t a; uint16_t b; uint8_t arr[4]; Vec at; Mode mode; uint32_t added; });
+#define X_FIELDS { uint32_t a; uint16_t b; uint8_t arr[4]; Vec at; Mode mode; uint32_t added; }
+BRIDGE_SCHEMA_STRUCT_TYPE(X, X_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(X, X_FIELDS);
 #elif V == 2
-BRIDGE_SCHEMA_STRUCT(X, { Mode mode; Vec at; uint8_t arr[4]; uint16_t b; uint32_t a; });
+#define X_FIELDS { Mode mode; Vec at; uint8_t arr[4]; uint16_t b; uint32_t a; }
+BRIDGE_SCHEMA_STRUCT_TYPE(X, X_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(X, X_FIELDS);
 #elif V == 3
-BRIDGE_SCHEMA_STRUCT(X, { uint32_t a; uint16_t b; uint8_t arr[6]; Vec at; Mode mode; });
+#define X_FIELDS { uint32_t a; uint16_t b; uint8_t arr[6]; Vec at; Mode mode; }
+BRIDGE_SCHEMA_STRUCT_TYPE(X, X_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(X, X_FIELDS);
 #elif V == 4
-BRIDGE_SCHEMA_STRUCT(X, { uint32_t a; uint8_t arr[4]; Vec at; Mode mode; });
+#define X_FIELDS { uint32_t a; uint8_t arr[4]; Vec at; Mode mode; }
+BRIDGE_SCHEMA_STRUCT_TYPE(X, X_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(X, X_FIELDS);
 #elif V == 5
-BRIDGE_SCHEMA_STRUCT(X, { uint32_t a; uint16_t b; uint8_t arr[2]; Vec at; Mode mode; });
+#define X_FIELDS { uint32_t a; uint16_t b; uint8_t arr[2]; Vec at; Mode mode; }
+BRIDGE_SCHEMA_STRUCT_TYPE(X, X_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(X, X_FIELDS);
 #elif V == 6
-BRIDGE_SCHEMA_STRUCT(X, { uint32_t a; uint16_t bee; uint8_t arr[4]; Vec at; Mode mode; });
+#define X_FIELDS { uint32_t a; uint16_t bee; uint8_t arr[4]; Vec at; Mode mode; }
+BRIDGE_SCHEMA_STRUCT_TYPE(X, X_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(X, X_FIELDS);
 #elif V == 7
-BRIDGE_SCHEMA_STRUCT(X, { uint32_t a; uint32_t b; uint8_t arr[4]; Vec at; Mode mode; });
+#define X_FIELDS { uint32_t a; uint32_t b; uint8_t arr[4]; Vec at; Mode mode; }
+BRIDGE_SCHEMA_STRUCT_TYPE(X, X_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(X, X_FIELDS);
 #elif V == 13
-BRIDGE_SCHEMA_STRUCT(X, { uint32_t a; uint16_t b; uint8_t arr[4]; Mode mode; Vec at; });
+#define X_FIELDS { uint32_t a; uint16_t b; uint8_t arr[4]; Mode mode; Vec at; }
+BRIDGE_SCHEMA_STRUCT_TYPE(X, X_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(X, X_FIELDS);
 #else
-BRIDGE_SCHEMA_STRUCT(X, { uint32_t a; uint16_t b; uint8_t arr[4]; Vec at; Mode mode; });
+#define X_FIELDS { uint32_t a; uint16_t b; uint8_t arr[4]; Vec at; Mode mode; }
+BRIDGE_SCHEMA_STRUCT_TYPE(X, X_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(X, X_FIELDS);
 #endif
 
 static uint32_t x, reading;

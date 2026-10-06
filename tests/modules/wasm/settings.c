@@ -2,20 +2,26 @@
  * init, which a system reads back. docs/seam/host_api/config.md, *A module's own settings are a component*. */
 #include "bridge_wasm.h"
 
-BRIDGE_SCHEMA_ENUM(Mode, int8_t, { Off, On, Adaptive });
-BRIDGE_SCHEMA_BITMASK(Flags, uint32_t, { Loud = 1, Wide = 2 });
-BRIDGE_SCHEMA_STRUCT(Settings, {
-    bool vsync;
-    int32_t width;
-    float scale;
-    Mode mode;
-    char title[16];
-    bridge_text_t path;
-    uint8_t small;
-    Flags flags;
-    double ratio;
-    int64_t big;
-});
+#define MODE_VALUES { Off, On, Adaptive }
+BRIDGE_SCHEMA_ENUM_TYPE(Mode, int8_t, MODE_VALUES);
+BRIDGE_SCHEMA_ENUM_DESC(Mode, int8_t, MODE_VALUES);
+#define FLAGS_VALUES { Loud = 1, Wide = 2 }
+BRIDGE_SCHEMA_BITMASK_TYPE(Flags, uint32_t, FLAGS_VALUES);
+BRIDGE_SCHEMA_BITMASK_DESC(Flags, uint32_t, FLAGS_VALUES);
+#define SETTINGS_FIELDS { \
+    bool vsync; \
+    int32_t width; \
+    float scale; \
+    Mode mode; \
+    char title[16]; \
+    bridge_text_t path; \
+    uint8_t small; \
+    Flags flags; \
+    double ratio; \
+    int64_t big; \
+}
+BRIDGE_SCHEMA_STRUCT_TYPE(Settings, SETTINGS_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Settings, SETTINGS_FIELDS);
 
 /* a singleton, as the settings a module names must be; and a build that states otherwise */
 #ifndef KEPT

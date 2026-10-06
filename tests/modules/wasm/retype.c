@@ -2,7 +2,9 @@
  * that name is left: how a test sees that a component is gone. Built once per name. */
 #include "bridge_wasm.h"
 
-BRIDGE_SCHEMA_STRUCT(Retyped, { uint32_t a; uint32_t b; uint32_t c; });
+#define RETYPED_FIELDS { uint32_t a; uint32_t b; uint32_t c; }
+BRIDGE_SCHEMA_STRUCT_TYPE(Retyped, RETYPED_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Retyped, RETYPED_FIELDS);
 
 BRIDGE_EXPORT(init) int init()
 {

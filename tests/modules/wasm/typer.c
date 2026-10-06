@@ -1,7 +1,9 @@
 /* Declares a struct other modules' components use as a field's type, and nothing else. */
 #include "bridge_wasm.h"
 
-BRIDGE_SCHEMA_STRUCT(Vec2, { float x; float y; });
+#define VEC2_FIELDS { float x; float y; }
+BRIDGE_SCHEMA_STRUCT_TYPE(Vec2, VEC2_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Vec2, VEC2_FIELDS);
 
 BRIDGE_EXPORT(init) int init()
 {

@@ -9,8 +9,12 @@
  *     look         who carries X and what the values come to, read as this build keeps it */
 #include "bridge_native.h"
 
-BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });
-BRIDGE_SCHEMA_STRUCT(X, { uint32_t v; });
+#define A_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(A, A_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(A, A_FIELDS);
+#define X_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(X, X_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(X, X_FIELDS);
 
 constexpr uint32_t COUNT = 6;
 

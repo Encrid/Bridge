@@ -637,12 +637,17 @@ A macro is not used for a constant.
 
 A macro matches one statement only.
 
+A macro that takes nothing may name what stands between the braces of a type, its fields or its
+values, so that a type and the text that describes it are made of the same text -
+`schema.md`, *There is no schema format*.
+
 ```c
 #define PI 3.14159265358979323846                           /* H3 violation */
 const float PI = 3.14159265358979323846;                    /* OK */
 #define LOOP_COUNTER 0                                      /* H3 violation */
 #define DELTA(a, b, c) ((b) * (b) - 4 * (a) * (c))          /* OK */
 #define PRINT_NEXT(num) {num++; printf("%d", num);}         /* H3 violation */
+#define POSITION_FIELDS { float x; float y; }               /* OK */
 ```
 
 ## What C23 adds

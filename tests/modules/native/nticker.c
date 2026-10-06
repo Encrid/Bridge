@@ -2,7 +2,9 @@
  * of this one shuts the old instance down before the new one is opened. */
 #include "bridge_native.h"
 
-BRIDGE_SCHEMA_STRUCT(Tick, { uint32_t n; });
+#define TICK_FIELDS { uint32_t n; }
+BRIDGE_SCHEMA_STRUCT_TYPE(Tick, TICK_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Tick, TICK_FIELDS);
 
 static uint32_t tick, ticking;
 

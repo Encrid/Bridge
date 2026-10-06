@@ -3,7 +3,9 @@
 #include "bridge_wasm.h"
 #include "../game.h"
 
-BRIDGE_SCHEMA_STRUCT(Aim, { uint32_t at; });
+#define AIM_FIELDS { uint32_t at; }
+BRIDGE_SCHEMA_STRUCT_TYPE(Aim, AIM_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Aim, AIM_FIELDS);
 
 constexpr uint32_t ENTITIES = 10;
 

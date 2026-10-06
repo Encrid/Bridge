@@ -13,10 +13,18 @@
  * Built once for each ON: 1, 2, 16. */
 #include "bridge_native.h"
 
-BRIDGE_SCHEMA_STRUCT(V, { uint32_t v; });
-BRIDGE_SCHEMA_STRUCT(F, { uint32_t on; uint32_t v; });
-BRIDGE_SCHEMA_STRUCT(L, { uint64_t near; uint64_t far; });
-BRIDGE_SCHEMA_STRUCT(S, { uint32_t v; });
+#define V_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(V, V_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(V, V_FIELDS);
+#define F_FIELDS { uint32_t on; uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(F, F_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(F, F_FIELDS);
+#define L_FIELDS { uint64_t near; uint64_t far; }
+BRIDGE_SCHEMA_STRUCT_TYPE(L, L_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(L, L_FIELDS);
+#define S_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(S, S_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(S, S_FIELDS);
 
 constexpr uint32_t COUNT = 204'800, ASKED = 1'000'000;
 

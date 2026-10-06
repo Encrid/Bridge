@@ -4,20 +4,25 @@ What was weighed here and refused is `schema_refused.md`, *What was refused: Sch
 
 ## There is no schema format
 
-The schema is a C header, written with three macros of `bridge_schema.h`:
+The schema is a C header, written with the macros of `bridge_schema.h`. The body of a type is
+named once, and handed to the two that make the type and its descriptor string:
 
-    BRIDGE_SCHEMA_STRUCT(Position, { float x; float y; })
+    #define POSITION_FIELDS { float x; float y; }
+    BRIDGE_SCHEMA_STRUCT_TYPE(position_t, POSITION_FIELDS);
+    BRIDGE_SCHEMA_STRUCT_DESC(position_t, POSITION_FIELDS);
 
-It expands to the type and a descriptor string:
+    #define BRIDGE_SCHEMA_STRUCT_TYPE(name, ...) \
+        typedef struct name __VA_ARGS__ name
+    #define BRIDGE_SCHEMA_STRUCT_DESC(name, ...) \
+        static const char name##_desc[] = BRIDGE_SCHEMA_TEXT(__VA_ARGS__)
 
-    #define BRIDGE_SCHEMA_STRUCT(name, ...) \
-        typedef struct name __VA_ARGS__ name; \
-        static const char name##_desc[] = #__VA_ARGS__
+The module's compiler lays the struct out; the string is handed over at `declare`. Both are made
+of one text, so they cannot differ. They are two macros and not one because a macro is one
+statement - `style.md`, rule H3 - and no declaration is both a type and the text that describes
+it. `BRIDGE_SCHEMA_ENUM_TYPE` and `BRIDGE_SCHEMA_ENUM_DESC`, and the pair for a bitmask, do the
+same for the other two kinds.
 
-The module's compiler lays the struct out; the string is handed over at `declare`.
-`BRIDGE_SCHEMA_ENUM` and `BRIDGE_SCHEMA_BITMASK` do the same for the other two kinds.
-
-**The three macros are Bridge-ASM700's, and are written once.** The descriptor is a text
+**The macros are Bridge-ASM700's, and are written once.** The descriptor is a text
 Bridge-ASM700 parses, so how it is spelled in C is the library's to state, in `bridge_schema.h`,
 which each backend's SDK includes. A schema header is included by modules of either backend,
 and has to mean one thing in both. What is a backend's is how a module reaches a component once
@@ -79,8 +84,9 @@ body. That copy does not drift: a mod that reads the game's components includes 
 header, and declares its own type from the descriptor that header already holds, so the two are one
 text with one fingerprint. What it costs is one more of `[budget] types`.
 
-**An enum and a bitmask are the integer their author states.** `BRIDGE_SCHEMA_ENUM(Mode, int8_t,
-{ Off, On, Adaptive })`: the type is the width a row gives the field, it is what the module's
+**An enum and a bitmask are the integer their author states.** `BRIDGE_SCHEMA_ENUM_TYPE(mode_t,
+int8_t, MODE_VALUES)`, with `{ Off, On, Adaptive }` as the values: the type is the width a row
+gives the field, it is what the module's
 compiler lays the enum out as, and it goes into the descriptor ahead of the brace, where
 Bridge-ASM700 reads it. An enum is any of `int8_t` to `uint32_t`; a bitmask is unsigned, to
 `uint64_t`. Every constant is checked to fit, a counted one as well as a stated one, and a
@@ -136,8 +142,9 @@ component model needed a type system.
 
 ## What a module compiles against
 
-Two files, and **nothing is generated**. `bridge_wasm.h` holds the imports, the `BRIDGE_SCHEMA_STRUCT` shim
-above, and the span, the header and the log ring read through accessors. `bridge_wasm.wat` holds
+Two files, and **nothing is generated**. `bridge_wasm.h` holds the imports, the macros of
+`bridge_schema.h` above, and the span, the header and the log ring read through accessors.
+`bridge_wasm.wat` holds
 the accessors themselves: a load or a store per width, and the row address carrying the
 `row < count` test - **always, with no switch to remove it**: `validation.md`, *Always on*. They are
 wasm text merged into the compiled module, because no C compiler can address the shared memory

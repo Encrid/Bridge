@@ -1,7 +1,7 @@
 /* A type from its text. docs/modules/schema.md, *The type set*.
  *
- * The text is what a module's compiler made of the body of its BRIDGE_SCHEMA_STRUCT, BRIDGE_SCHEMA_ENUM or
- * BRIDGE_SCHEMA_BITMASK: tokens with one space between them. What it may say is written out here in
+ * The text is what a module's compiler made of the body of a type, through a macro of
+ * bridge_schema.h: tokens with one space between them. What it may say is written out here in
  * full, and nothing else is accepted:
  *
  *     a struct      { field field ... }

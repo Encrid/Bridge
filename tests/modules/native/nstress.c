@@ -11,7 +11,9 @@
  * docs/plan/stage10.md. */
 #include "bridge_native.h"
 
-BRIDGE_SCHEMA_STRUCT(V, { uint32_t v; });
+#define V_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(V, V_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(V, V_FIELDS);
 
 constexpr uint32_t KINDS = 8, SLOTS = 50'000, CHANGES = 20'000;
 

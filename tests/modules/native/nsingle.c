@@ -13,8 +13,12 @@
  * that is no singleton with the id 0. */
 #include "bridge_native.h"
 
-BRIDGE_SCHEMA_STRUCT(G, { uint32_t gravity; uint32_t wind; });
-BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });
+#define G_FIELDS { uint32_t gravity; uint32_t wind; }
+BRIDGE_SCHEMA_STRUCT_TYPE(G, G_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(G, G_FIELDS);
+#define A_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(A, A_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(A, A_FIELDS);
 
 static uint32_t g, a, on_g;
 

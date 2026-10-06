@@ -366,6 +366,15 @@ built by the same script.
 
 With these, no entry of a seam and no function of an SDK takes more than four arguments.
 
+**A schema macro was two statements.** `tools/style.py` had read only the first line of a
+macro; reading all of it, `BRIDGE_SCHEMA_STRUCT` and the two beside it infringed rule H3: each
+made a typedef and the string that describes it. An exception was proposed, since a type and
+its descriptor must be one text, and Enkrid chose the rule: **two macros, `_TYPE` and `_DESC`,
+and the author names the body once**, in a macro of their own that is handed to both. Rule H3
+says that a macro which takes nothing may name what stands between a type's braces. 70 types
+of the test modules were rewritten, and the descriptors they yield are the same bytes: every
+case passes unchanged.
+
 **What two builds differ by when their code is the same.** After the two renames the call of
 `spawn` measured 4.8 to 4.9 ns where the tree before measured 4.5 to 4.7, in whichever order
 the two were run. The four files a change goes through were compiled to assembly in both trees:

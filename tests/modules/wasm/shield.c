@@ -2,7 +2,9 @@
  * written. docs/bridge/storage.md, *A toggle*. */
 #include "bridge_wasm.h"
 
-BRIDGE_SCHEMA_STRUCT(Shield, { uint32_t strength; });
+#define SHIELD_FIELDS { uint32_t strength; }
+BRIDGE_SCHEMA_STRUCT_TYPE(Shield, SHIELD_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Shield, SHIELD_FIELDS);
 
 constexpr uint32_t ENTITIES = 10;
 

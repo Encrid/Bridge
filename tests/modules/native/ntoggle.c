@@ -15,9 +15,15 @@
  * BIG is 204,800 entities with one in ON of them on, in no order, for a measurement. */
 #include "bridge_native.h"
 
-BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });
-BRIDGE_SCHEMA_STRUCT(B, { uint32_t v; });
-BRIDGE_SCHEMA_STRUCT(T, { uint32_t v; });
+#define A_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(A, A_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(A, A_FIELDS);
+#define B_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(B, B_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(B, B_FIELDS);
+#define T_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(T, T_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(T, T_FIELDS);
 
 #ifdef BIG
 constexpr uint32_t COUNT = 204'800;

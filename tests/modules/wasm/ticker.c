@@ -7,11 +7,17 @@
 #include "bridge_wasm.h"
 
 #ifdef WIDE
-BRIDGE_SCHEMA_STRUCT(Tick, { uint32_t n; uint32_t more; });
+#define TICK_FIELDS { uint32_t n; uint32_t more; }
+BRIDGE_SCHEMA_STRUCT_TYPE(Tick, TICK_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Tick, TICK_FIELDS);
 #else
-BRIDGE_SCHEMA_STRUCT(Tick, { uint32_t n; });
+#define TICK_FIELDS { uint32_t n; }
+BRIDGE_SCHEMA_STRUCT_TYPE(Tick, TICK_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Tick, TICK_FIELDS);
 #endif
-BRIDGE_SCHEMA_STRUCT(Extra, { uint32_t unused; });
+#define EXTRA_FIELDS { uint32_t unused; }
+BRIDGE_SCHEMA_STRUCT_TYPE(Extra, EXTRA_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Extra, EXTRA_FIELDS);
 
 static uint32_t tick, ticking;
 

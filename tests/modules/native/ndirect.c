@@ -19,8 +19,12 @@
  * refused for: it selects by D. */
 #include "bridge_native.h"
 
-BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });
-BRIDGE_SCHEMA_STRUCT(D, { uint32_t v; });
+#define A_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(A, A_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(A, A_FIELDS);
+#define D_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(D, D_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(D, D_FIELDS);
 
 #ifdef BIG
 constexpr uint32_t COUNT = 204'800, STEP = 1;

@@ -5,7 +5,9 @@
  * keeps nothing of its own. For a string that outlives the module that wrote it. */
 #include "bridge_wasm.h"
 
-BRIDGE_SCHEMA_STRUCT(Name, { bridge_text_t text; });
+#define NAME_FIELDS { bridge_text_t text; }
+BRIDGE_SCHEMA_STRUCT_TYPE(Name, NAME_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Name, NAME_FIELDS);
 
 static uint32_t name, saying;
 

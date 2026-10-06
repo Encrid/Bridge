@@ -11,17 +11,29 @@
 /* A is as big as the build says: for what a change costs an entity that carries more. The
  * length is written out each time, since a descriptor is the text as it was typed. */
 #if defined(FAT64)
-BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; char rest[60]; });
+#define A_FIELDS { uint32_t v; char rest[60]; }
+BRIDGE_SCHEMA_STRUCT_TYPE(A, A_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(A, A_FIELDS);
 #elif defined(FAT256)
-BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; char rest[252]; });
+#define A_FIELDS { uint32_t v; char rest[252]; }
+BRIDGE_SCHEMA_STRUCT_TYPE(A, A_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(A, A_FIELDS);
 #elif defined(FAT1K)
-BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; char rest[1020]; });
+#define A_FIELDS { uint32_t v; char rest[1020]; }
+BRIDGE_SCHEMA_STRUCT_TYPE(A, A_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(A, A_FIELDS);
 #elif defined(FAT4K)
-BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; char rest[4092]; });
+#define A_FIELDS { uint32_t v; char rest[4092]; }
+BRIDGE_SCHEMA_STRUCT_TYPE(A, A_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(A, A_FIELDS);
 #else
-BRIDGE_SCHEMA_STRUCT(A, { uint32_t v; });
+#define A_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(A, A_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(A, A_FIELDS);
 #endif
-BRIDGE_SCHEMA_STRUCT(B, { uint32_t v; });
+#define B_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(B, B_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(B, B_FIELDS);
 
 #if defined(FAT1K) || defined(FAT4K)
 constexpr uint32_t COUNT = 10'000;
@@ -30,7 +42,9 @@ constexpr uint32_t COUNT = 100'000;
 #elifdef TABLES
 constexpr uint32_t COUNT = 10'000;
 constexpr uint32_t KINDS = 14;                  /* 2^14 sets of them, each a table */
-BRIDGE_SCHEMA_STRUCT(T, { uint32_t v; });
+#define T_FIELDS { uint32_t v; }
+BRIDGE_SCHEMA_STRUCT_TYPE(T, T_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(T, T_FIELDS);
 #else
 constexpr uint32_t COUNT = 6;
 #endif

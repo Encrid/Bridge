@@ -3,7 +3,9 @@
 #include "bridge_wasm.h"
 #include "../game.h"
 
-BRIDGE_SCHEMA_STRUCT(Hit, { uint32_t by; });
+#define HIT_FIELDS { uint32_t by; }
+BRIDGE_SCHEMA_STRUCT_TYPE(Hit, HIT_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(Hit, HIT_FIELDS);
 
 constexpr uint32_t ENTITIES = 10;
 

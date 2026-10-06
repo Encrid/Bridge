@@ -273,7 +273,7 @@ def check_file(src, functions):
     for n in sorted(src.directives):
         line = src.directives[n]
         word = re.match(r'\s*#\s*(\w+)', line)
-        if not word:
+        if not word or src.directives.get(n - 1, '').rstrip().endswith('\\'):
             continue
         if word.group(1) in ('endif', 'else', 'elif', 'elifdef', 'elifndef'):
             depth -= 1
@@ -284,11 +284,17 @@ def check_file(src, functions):
         define = re.match(r'\s*#\s*define\s+(\w+)(\(?)\s*(.*)', line)
         if define:
             name, takes, body = define.groups()
+            more = n
+            while src.directives[more].rstrip().endswith('\\') and more + 1 in src.directives:
+                more += 1
+                body += ' ' + src.directives[more]
             if not UPPER.match(name):
                 src.say('V1', n, "the macro '%s' is not in UPPER_CASE" % name)
             if not takes and re.match(r'[-+(]*(?:\d|"|\')', body.strip()):
                 src.say('H3', n, "the macro '%s' is a constant" % name)
-            if ';' in re.sub(r'"[^"]*"', '', body):
+            whole = ' '.join(body.replace('\\', ' ').split())
+            fields = not takes and whole.startswith('{') and whole.endswith('}')
+            if ';' in re.sub(r'"[^"]*"', '', body) and not fields:
                 src.say('H3', n, "the macro '%s' is more than one statement" % name)
             if path.suffix == '.c':
                 src.say('H1', n, "the macro '%s' is defined in a source file" % name)
@@ -311,7 +317,8 @@ def check_outside(src, statements, functions, declared):
             continue
         bare = re.sub(r'\[\[[^\]]*\]\]\s*', '', text)
         if bare.startswith('typedef'):
-            name = re.search(r'\(\s*\*\s*(\w+)\s*\)\s*\(', bare) or re.search(r'(\w+)\s*(?:\[[^\]]*\])?\Z', bare)
+            last = re.search(r'(\w+)\s*(?:\[[^\]]*\])?\Z', bare)
+            name = last if '{' in bare else re.search(r'\(\s*\*\s*(\w+)\s*\)\s*\(', bare) or last
             if name and not name.group(1).endswith('_t'):
                 src.say('V1', line, "the type '%s' does not end with _t" % name.group(1))
             if not in_header:
