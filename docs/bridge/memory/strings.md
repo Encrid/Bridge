@@ -87,14 +87,26 @@ has to know: **what a component keeps stays good for as long as the component's 
 offset kept anywhere else - in a module's own memory, or in a field that is two integers and not
 a `bridge_text` - is good only for as long as the module that allocated it is loaded.
 
+**A share that stays is said.** One record for each component that holds a string in it: the
+module, the bytes that stay, the component and in how many rows. A later load can be refused for
+want of that room, and the reason is then in the log and not for anybody to work out.
+`tests/stage6.c`, case `arenakept`, reads it.
+
 **What it costs.** An unload reads every text field of every surviving row, once. Never at a
-barrier. And a share with one surviving string in it stays dead whole.
+barrier. And a share with one surviving string in it stays dead whole: on every need but that
+one this holds, and that one is what the record is there to show.
 
 **What it buys.** Loading and unloading modules can go on for as long as a deployment runs:
 `tests/stage6.c`, case `churn`, does two hundred cycles in an arena with room for one share. It
 could not, once: the arena was a high-water mark for the life of the process, and unbounded churn
 meant restarting. That was decided before a module's share was its own and before text was a type
 the library could see, and it was not read again when both became true.
+
+Refused: giving the share back always, and setting every text that pointed into it to empty.
+It is one rule with no condition, and it has the library write into rows of a component the
+leaving module did not own, where another module then reads nothing. The condition that brings
+it back is a string that must never outlive the module that allocated it. Refused: keeping a
+share without saying so, which is what this did.
 
 Refused: never giving anything back, which was the rule. The condition that brings it back is the
 reading at unload proving too slow for a deployment that unloads often. Refused: `mark` and

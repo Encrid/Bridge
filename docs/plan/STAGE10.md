@@ -558,8 +558,9 @@ The chosen option contradicts its own reason, or a document:
 
 Of this repair:
 
-    open    the arena share given back at unload unless a row points into it: what an unload
-            does depends on other data, which is the failure step 6 names
+    closed  the arena share given back at unload unless a row points into it: it depends on
+            what the leaving module itself wrote, and what was unsaid was that a share had
+            stayed. It is said now, with the component that holds it. `strings.md`
     open    five storage layouts, where only the table's weakness was measured
     open    a removed or renamed field migrates at reload, and its values are lost on a call
             that means "keep running"

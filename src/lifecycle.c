@@ -571,7 +571,7 @@ void module_shut_down(bridge *b, module *m)
 /* strings.md, *It is given back when nothing points into it*. A string a component keeps is a
  * bridge_text field, so every reference there is can be found: in a field, in an array of
  * them, or in a struct a field holds. */
-typedef struct { const bridge *b; const module *m; const declared_type *c; } pointing;
+typedef struct { const bridge *b; const module *m; const declared_type *c; uint32_t rows; } pointing;
 
 static bool points_in(const pointing *p, const declared_type *c, const uint8_t *bytes)
 {
@@ -595,20 +595,33 @@ static bool points_in(const pointing *p, const declared_type *c, const uint8_t *
     return false;
 }
 
+/* counts, and never answers that it found one: every row is to be read */
 static bool row_points_in(void *ctx, const uint8_t *row)
 {
-    const pointing *p = ctx;
-    return points_in(p, p->c, row);
+    pointing *p = ctx;
+    p->rows += points_in(p, p->c, row);
+    return false;
 }
 
+/* strings.md, *It is given back when nothing points into it*. A share that stays is said,
+ * with what holds it: a later load may be refused for the room it keeps. */
 static bool share_is_pointed_into(bridge *b, const module *m)
 {
-    pointing p = { b, m, nullptr };
+    pointing p = { b, m, nullptr, 0 };
+    uint64_t bytes = 0;
+    bool held = false;
+    for (uint32_t i = 0; i < m->own_count; i ++) bytes += m->owned[i].len;
     for (uint32_t i = 0; i < b->type_count; i ++) {
         p.c = b->types[i];
-        if (p.c->kind == BRIDGE_STRUCT && storage_any(b->storage, p.c->type, row_points_in, &p)) return true;
+        p.rows = 0;
+        if (p.c->kind == BRIDGE_STRUCT) (void)storage_any(b->storage, p.c->type, row_points_in, &p);
+        if (!p.rows) continue;
+        held = true;
+        say(b, nullptr, nullptr, BRIDGE_WARN, "module '%s' is unloaded and its share of the "
+            "persistent arena, %llu bytes, stays: '%s' holds a string in it, in this many rows: %u",
+            m->identity, (unsigned long long)bytes, p.c->name, p.rows);
     }
-    return false;
+    return held;
 }
 
 /* The rest of an unload, once the module's code has run for the last time. */
