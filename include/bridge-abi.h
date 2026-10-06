@@ -38,6 +38,14 @@ enum bridge_kind : uint32_t { BRIDGE_STRUCT = 1, BRIDGE_ENUM = 2, BRIDGE_BITMASK
 /* declare's on_unload - docs/bridge/data/lifetime.md. Zero is unset, and refused. */
 enum bridge_on_unload : uint32_t { BRIDGE_STRIP = 1, BRIDGE_SWEEP = 2, BRIDGE_DELETE = 3 };
 
+/* declare's storage: the storage layout the component is kept in - docs/bridge/storage.md,
+ * *Storage layouts*. Zero is unset, and refused. Every module that declares a component states
+ * the same one. */
+enum bridge_storage : uint32_t {
+    BRIDGE_TABLE = 1, BRIDGE_SPARSE_SET = 2, BRIDGE_TOGGLE = 3, BRIDGE_DIRECT_INDEXED = 4,
+    BRIDGE_SINGLETON = 5
+};
+
 /* A query term: which component, whether the system writes it, and how it must match. `slot`
  * is what declare answered. Zero is unset for `access` and `oper`, and refused; so is any value
  * that is not one of these.

@@ -32,7 +32,7 @@ BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     int none = 0;
-    marked = BRIDGE_COMPONENT("game:Marked", Marked, BRIDGE_STRIP);
+    marked = BRIDGE_COMPONENT("game:Marked", Marked, BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = marked;
     BRIDGE_SYSTEM("poke", "update", &none, 0, &marked, 1);
     watching = BRIDGE_OBSERVER("any", BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, terms, 1, nullptr, 0);

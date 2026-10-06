@@ -5,7 +5,7 @@ BRIDGE_SCHEMA_STRUCT(Vec2, { float x; float y; });
 
 BRIDGE_EXPORT(init) int init()
 {
-    BRIDGE_COMPONENT("game:Vec2", Vec2, BRIDGE_STRIP);
+    BRIDGE_COMPONENT("game:Vec2", Vec2, BRIDGE_STRIP, BRIDGE_TABLE);
     return 0;
 }
 

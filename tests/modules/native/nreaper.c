@@ -22,7 +22,7 @@ BRIDGE_NATIVE(reap)
 
 BRIDGE_NATIVE(init)
 {
-    position = BRIDGE_NATIVE_COMPONENT(api, "game:Position", Position, BRIDGE_DELETE);
+    position = BRIDGE_NATIVE_COMPONENT(api, "game:Position", Position, BRIDGE_DELETE, BRIDGE_TABLE);
     bridge_term terms[1] = {{ position, BRIDGE_READ, BRIDGE_AND, 0 }};
     reaping = BRIDGE_NATIVE_SYSTEM(api, "reap", "update", terms, 1, nullptr, 0);
     return 0;

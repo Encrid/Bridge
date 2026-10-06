@@ -32,6 +32,7 @@ struct declared_type {
     storage_type   *type;              /* as storage knows it: a size */
     schema       s;                 /* its fields or its constants, read from its text */
     enum bridge_kind kind;
+    enum bridge_storage storage;    /* the storage layout every declarer stated */
     uint32_t     size, align;
     uint64_t     fingerprint;       /* of the descriptor string - schema.md, *Fingerprints* */
     uint32_t     declarers;         /* how many loaded modules declared it */

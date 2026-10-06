@@ -314,8 +314,8 @@ BRIDGE_NATIVE(heard_alone) { return heard(api, "A and not B: who, events", on_al
 BRIDGE_NATIVE(init)
 {
     int none = 0;
-    a = BRIDGE_NATIVE_COMPONENT(api, "st:A", A, BRIDGE_DELETE);
-    b = BRIDGE_NATIVE_COMPONENT(api, "st:B", B, BRIDGE_DELETE);
+    a = BRIDGE_NATIVE_COMPONENT(api, "st:A", A, BRIDGE_DELETE, BRIDGE_TABLE);
+    b = BRIDGE_NATIVE_COMPONENT(api, "st:B", B, BRIDGE_DELETE, BRIDGE_TABLE);
     /* what a system attaches or detaches is stated with it */
     uint32_t both[2] = { a, b };
     BRIDGE_NATIVE_SYSTEM(api, "spawn", "spawn", &none, 0, nullptr, 0);
@@ -333,7 +333,7 @@ BRIDGE_NATIVE(init)
     for (uint32_t k = 0; k < KINDS; k ++) {
         kinds[k] = api->declare(api, bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
             (uint32_t)strlen(names[k]), BRIDGE_STRUCT, sizeof(T), alignof(T),
-            bridge_native_put(api, T_desc, sizeof T_desc - 1), sizeof T_desc - 1, BRIDGE_DELETE);
+            bridge_native_put(api, T_desc, sizeof T_desc - 1), sizeof T_desc - 1, BRIDGE_DELETE, BRIDGE_TABLE);
     }
     first[0].slot = kinds[0];
     BRIDGE_NATIVE_SYSTEM(api, "combine", "combine", &none, 0, kinds, 14);

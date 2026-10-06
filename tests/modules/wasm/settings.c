@@ -50,9 +50,9 @@ BRIDGE_EXPORT(show) int show()
 BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
-    BRIDGE_DECLARE(BRIDGE_ENUM, "game:Mode", Mode, BRIDGE_STRIP);
-    BRIDGE_DECLARE(BRIDGE_BITMASK, "game:Flags", Flags, BRIDGE_STRIP);
-    settings = BRIDGE_COMPONENT("game:Settings", Settings, BRIDGE_DELETE);
+    BRIDGE_DECLARE(BRIDGE_ENUM, "game:Mode", Mode, BRIDGE_STRIP, BRIDGE_TABLE);
+    BRIDGE_DECLARE(BRIDGE_BITMASK, "game:Flags", Flags, BRIDGE_STRIP, BRIDGE_TABLE);
+    settings = BRIDGE_COMPONENT("game:Settings", Settings, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = settings;
     showing = BRIDGE_SYSTEM("show", "update", terms, 1, nullptr, 0);
     return 0;

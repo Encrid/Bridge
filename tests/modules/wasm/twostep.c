@@ -35,7 +35,7 @@ BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
     Position p = { 1.0f, 0.0f };
-    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE);
+    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = position;
     doubling = BRIDGE_SYSTEM("twice", "update", terms, 1, nullptr, 0);
     adding = BRIDGE_SYSTEM("more", "update", terms, 1, nullptr, 0);

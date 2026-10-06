@@ -77,7 +77,29 @@ static bool find(void *ctx, const char *bare, schema_named *named)
     return false;
 }
 
-/* declare(name, name_len, kind, size, align, desc, desc_len, on_unload) -> slot */
+/* The other loaded modules that declare `c`, as the end of a refusal: who they are is what a
+ * host needs to know, since unloading them is what lets a component's layout change -
+ * lifetime.md, *When a component layout changed*. */
+static void also_declared(const bridge *b, const module *m, const declared_type *c, char *others,
+                          size_t size)
+{
+    size_t used = 0;
+    uint32_t i;
+    others[0] = 0;
+    for (module *o = b->modules; o; o = o->next) {
+        if (o == m || !strcmp(o->identity, m->identity)) continue;
+        for (i = 0; i < o->declared_count && o->declared[i] != c; i ++) {}
+        if (i == o->declared_count || used >= size) continue;
+        used += (size_t)snprintf(others + used, size - used, "%s'%s'",
+            used ? ", " : ". It is also declared by ", o->identity);
+    }
+}
+
+static const char *const storage_names[] = {
+    "", "a table", "a sparse set", "a toggle", "direct-indexed", "a singleton"
+};
+
+/* declare(name, name_len, kind, size, align, desc, desc_len, on_unload, storage) -> slot */
 static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
 {
     module *m = ud;
@@ -85,6 +107,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     const char *name_at = scratch(m, a[0], a[1]), *desc_at = scratch(m, a[5], a[6]);
     enum bridge_kind kind = (enum bridge_kind)a[2];
     enum bridge_on_unload on_unload = (enum bridge_on_unload)a[7];
+    enum bridge_storage kept = (enum bridge_storage)a[8];
     uint32_t size = (uint32_t)a[3], align = (uint32_t)a[4], i;
     declared_type *c = nullptr;
     char name[128], *bare;
@@ -120,26 +143,33 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     if (on_unload < BRIDGE_STRIP || on_unload > BRIDGE_DELETE) {
         return refuse(m, "type '%s': on_unload is unset", name);
     }
+    if (kept < BRIDGE_TABLE || kept > BRIDGE_SINGLETON) {
+        return refuse(m, "type '%s': its storage layout is unset", name);
+    }
+    /* ponytail: the other four are decided and not built - docs/plan/STAGE11.md. This goes
+     * as each is */
+    if (kept != BRIDGE_TABLE) {
+        return refuse(m, "type '%s': %s is not built yet", name, storage_names[kept]);
+    }
     print = fingerprint(desc_at, a[6]) ^ kind;
 
     for (i = 0; i < b->type_count; i ++) {
         if (!strcmp(b->types[i]->name, name)) c = b->types[i];
     }
     if (c && c->fingerprint != print) {
-        /* lifetime.md, *When a component layout changed*: who else declares it is what a host
-         * needs to know, since unloading them is what lets the layout change */
-        char others[160] = "";
-        size_t used = 0;
-        for (module *o = b->modules; o; o = o->next) {
-            if (o == m || !strcmp(o->identity, m->identity)) continue;
-            for (i = 0; i < o->declared_count && o->declared[i] != c; i ++) {}
-            if (i == o->declared_count || used >= sizeof others) continue;
-            used += (size_t)snprintf(others + used, sizeof others - used, "%s'%s'",
-                used ? ", " : ". It is also declared by ", o->identity);
-        }
+        char others[160];
+        also_declared(b, m, c, others, sizeof others);
         return refuse(m, "type '%s' has another component layout here: fingerprint %016llx, and it "
             "was declared with %016llx%s", name, (unsigned long long)print,
             (unsigned long long)c->fingerprint, others);
+    }
+    if (c && c->storage != kept) {
+        /* a module reads a component by code compiled for one storage layout, so every
+         * declarer states the same - storage.md, *Storage layouts* */
+        char others[160];
+        also_declared(b, m, c, others, sizeof others);
+        return refuse(m, "type '%s' is stated as %s here, and it was declared as %s%s", name,
+            storage_names[kept], storage_names[c->storage], others);
     }
     if (!c) {
         /* The descriptor is read and laid out. A field's type is a bare C name, looked for in
@@ -193,6 +223,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         c->type = storage_declare(b->storage, size, align);
         c->s = s;
         c->kind = kind;
+        c->storage = kept;
         c->size = size;
         c->align = align;
         c->fingerprint = print;
@@ -597,12 +628,12 @@ int abi_define(module *m, backend_err *err)
     static const struct {
         const char *name;
         backend_fn  fn;
-        enum backend_type params[8];
+        enum backend_type params[9];
         uint32_t    param_count;
         enum backend_type results[1];
         uint32_t    result_count;
     } entries[] = {
-        { "declare", abi_declare, { I, I, I, I, I, I, I, I }, 8, { I }, 1 },
+        { "declare", abi_declare, { I, I, I, I, I, I, I, I, I }, 9, { I }, 1 },
         { "system",  abi_system,  { I, I, I, I, I, I, I, I }, 8, { I }, 1 },
         { "observe", abi_observe, { I, I, I, I, I, I, I }, 7, { I }, 1 },
         { "spawn",   abi_spawn,   {},                      0, { L }, 1 },

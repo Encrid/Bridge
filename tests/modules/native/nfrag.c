@@ -50,11 +50,11 @@ BRIDGE_NATIVE(init)
     };
     int none = 0;
     bridge_term one[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
-    value = BRIDGE_NATIVE_COMPONENT(api, "st:V", V, BRIDGE_DELETE);
+    value = BRIDGE_NATIVE_COMPONENT(api, "st:V", V, BRIDGE_DELETE, BRIDGE_TABLE);
     for (uint32_t k = 0; k < MARKERS; k ++) {
         markers[k] = api->declare(api, bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
             (uint32_t)strlen(names[k]), BRIDGE_STRUCT, sizeof(M), alignof(M),
-            bridge_native_put(api, M_desc, sizeof M_desc - 1), sizeof M_desc - 1, BRIDGE_DELETE);
+            bridge_native_put(api, M_desc, sizeof M_desc - 1), sizeof M_desc - 1, BRIDGE_DELETE, BRIDGE_TABLE);
     }
     one[0].slot = value;
     /* what `fill` attaches: the value, and every marker */

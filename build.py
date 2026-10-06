@@ -81,6 +81,7 @@ PLAIN = ('mover reader refs fp badterm spin3 flood chatty rows halver twostep wa
          'badobs events fixer nested nested2 namer spawner counter typer user settings hang')
 WASM = [(name, name, 'checked', []) for name in PLAIN.split()] + [
     ('rows-unchecked', 'rows', 'unchecked', []),
+    ('kept-unset', 'kept', 'checked', ['KEPT=0']), ('kept-none', 'kept', 'checked', ['KEPT=9']),
     ('namer-reader', 'namer', 'checked', ['READER']),
     ('flaky-always', 'flaky', 'checked', ['OF=1', 'FAILS=1']),
     ('flaky-third', 'flaky', 'checked', ['OF=3', 'FAILS=1']),
@@ -467,6 +468,9 @@ CASES = [
      r"record.6. view:reader@0.1.0/sum: sum 250500 0.*alive", None),
     ('stage3-mirror', ['stage3', 'mirror'],
      r"mirror 100 0.*mirror 100 0.*mirror 100 0.*alive", None),
+    ('stage3-keptunset', ['stage3', 'keptunset'],
+     r"module 'game:kept@0.1.0' did not load: type 'game:Position': its storage layout is unset.*"
+     r"module 'game:kept@0.1.0' did not load: type 'game:Position': its storage layout is unset.*alive", None),
     ('stage3-fingerprint', ['stage3', 'fingerprint'],
      r"module 'game:fp@0.1.0' did not load: type 'game:Position' has another component layout here: fingerprint [0-9a-f]+, and it was declared with [0-9a-f]+. It is also declared by 'game:mover@0.1.0'.*alive", None),
     ('stage3-grant', ['stage3', 'grant'],

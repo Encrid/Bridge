@@ -32,7 +32,7 @@ BRIDGE_EXPORT(check) int check()
 BRIDGE_EXPORT(init) int init()
 {
     uint32_t i;
-    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE);
+    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE, BRIDGE_TABLE);
     BRIDGE_SYSTEM("cull", "update", nullptr, 0, nullptr, 0);
     BRIDGE_SYSTEM("check", "present", nullptr, 0, nullptr, 0);
     for (i = 0; i < ENTITIES; i ++) {

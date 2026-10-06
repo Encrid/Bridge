@@ -19,7 +19,7 @@ BRIDGE_EXPORT(fix) int fix()
 BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
-    marked = BRIDGE_COMPONENT("game:Marked", Marked, BRIDGE_STRIP);
+    marked = BRIDGE_COMPONENT("game:Marked", Marked, BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = marked;
     fixing = BRIDGE_OBSERVER("fix", BRIDGE_ON_ENTER, terms, 1, nullptr, 0);
     return 0;

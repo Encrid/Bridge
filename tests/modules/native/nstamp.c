@@ -29,8 +29,8 @@ BRIDGE_NATIVE(stamp)
 BRIDGE_NATIVE(init)
 {
     Position p = { 1.0f, 0.0f };
-    position = BRIDGE_NATIVE_COMPONENT(api, "game:Position", Position, BRIDGE_DELETE);
-    marked = BRIDGE_NATIVE_COMPONENT(api, "game:Marked", Marked, BRIDGE_STRIP);
+    position = BRIDGE_NATIVE_COMPONENT(api, "game:Position", Position, BRIDGE_DELETE, BRIDGE_TABLE);
+    marked = BRIDGE_NATIVE_COMPONENT(api, "game:Marked", Marked, BRIDGE_STRIP, BRIDGE_TABLE);
     bridge_term terms[1] = {{ position, BRIDGE_READ, BRIDGE_AND, 0 }};
 #ifdef UNSTATED
     stamping = BRIDGE_NATIVE_SYSTEM(api, "stamp", PHASE, terms, 1, nullptr, 0);

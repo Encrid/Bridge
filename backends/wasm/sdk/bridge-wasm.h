@@ -20,7 +20,7 @@
 
 BRIDGE_IMPORT(declare) uint32_t bridge_declare(uint32_t name, uint32_t name_len,
     enum bridge_kind kind, uint32_t size, uint32_t align, uint32_t desc, uint32_t desc_len,
-    enum bridge_on_unload on_unload);
+    enum bridge_on_unload on_unload, enum bridge_storage storage);
 BRIDGE_IMPORT(system)  uint32_t bridge_system(uint32_t name, uint32_t name_len, uint32_t phase,
     uint32_t phase_len, uint32_t terms, uint32_t term_count, uint32_t changes,
     uint32_t change_count);
@@ -93,11 +93,12 @@ static inline uint32_t bridge_put(const void *bytes, uint32_t len)
 /* ---- registration, with names as literals ---- */
 
 /* a type another declaration's fields use is declared before it, in the same namespace */
-#define BRIDGE_DECLARE(kind, name, T, on_unload) \
+#define BRIDGE_DECLARE(kind, name, T, on_unload, storage) \
     bridge_declare(bridge_put(name, sizeof name - 1), sizeof name - 1, kind, sizeof(T), \
                    alignof(T), bridge_put(T##_desc, sizeof T##_desc - 1), sizeof T##_desc - 1, \
-                   on_unload)
-#define BRIDGE_COMPONENT(name, T, on_unload) BRIDGE_DECLARE(BRIDGE_STRUCT, name, T, on_unload)
+                   on_unload, storage)
+#define BRIDGE_COMPONENT(name, T, on_unload, storage) \
+    BRIDGE_DECLARE(BRIDGE_STRUCT, name, T, on_unload, storage)
 
 /* `changes` is the slots of the components it attaches or detaches, `change_count` of them:
  * a system that does neither hands nullptr and 0 */

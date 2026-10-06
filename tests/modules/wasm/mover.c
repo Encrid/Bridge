@@ -33,8 +33,8 @@ BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
     uint32_t i;
-    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE);
-    marked = BRIDGE_COMPONENT("game:Marked", Marked, BRIDGE_STRIP);
+    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE, BRIDGE_TABLE);
+    marked = BRIDGE_COMPONENT("game:Marked", Marked, BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = position;
     moving = BRIDGE_SYSTEM("move", "update", terms, 1, nullptr, 0);
     terms[0].access = BRIDGE_READ;

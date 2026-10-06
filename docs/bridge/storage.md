@@ -28,6 +28,35 @@ than any program does, and storage is made of what each promise allows:
     among them                              no hook - `schema.md`, *The type set*
     no pairs, no wildcards, no or-terms     a term is one type, so a table matches or it does not
 
+## Storage layouts
+
+**A component is kept in the storage layout its author states for it**, at `declare` -
+`abi.md`, *The ABI*. There are five, each named for what keeps the component:
+
+    table             the table of its entity's archetype, a column beside the entity's
+                      other components. What systems read together, row by row
+    sparse set        the component's own packed array, and an index by entity. What comes
+                      and goes, and what few entities carry
+    toggle            a column of a table, and a bit a row that says whether it is on. What
+                      an entity always has and sometimes does not use
+    direct-indexed    a cell for every entity, the value of entity i at cell i. What is
+                      reached by id far more than it is walked
+    singleton         one value for the deployment, on no entity
+
+**The author states it because the code that reads it depends on it.** A table's column, a
+sparse set's array and a cell by entity are read by different code, fixed when the module is
+compiled, as `sizeof(T)` is - `query.md`, *The interface is a query*. Unset is refused, like any
+other value nobody stated.
+
+**Every module that declares a component states the same storage layout.** One that states
+another is refused at its load, and the refusal names both storage layouts and the modules that
+declare the component already, as for a component layout that differs - `lifetime.md`, *When a
+component layout changed*.
+
+What each was weighed on, measured, and what a module is handed for each, is `STAGE11.md`, *The
+gate* and *The questions*. The table is the one that is built; a `declare` that states one of
+the other four is refused, saying so, until `PLAN.md`, stage 11, has built it.
+
 ## A table
 
 An **archetype** is a set of components. A **table** is the storage of one archetype: the entities

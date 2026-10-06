@@ -13,9 +13,9 @@ BRIDGE_EXPORT(init) int init()
 {
     Roster r = {{ 0 }};
     uint32_t i;
-    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP);
-    private_ = BRIDGE_COMPONENT("game:Private", Private, PRIVATE_POLICY);
-    roster = BRIDGE_COMPONENT("game:Roster", Roster, BRIDGE_STRIP);
+    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP, BRIDGE_TABLE);
+    private_ = BRIDGE_COMPONENT("game:Private", Private, PRIVATE_POLICY, BRIDGE_TABLE);
+    roster = BRIDGE_COMPONENT("game:Roster", Roster, BRIDGE_STRIP, BRIDGE_TABLE);
     for (i = 0; i < 15; i ++) {
         uint64_t id = bridge_spawn();
         Private secret = { i };

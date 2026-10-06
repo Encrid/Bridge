@@ -5,7 +5,7 @@ What was weighed here and refused is `abi-refused.md`, *What was refused: The AB
 At init, which runs each time a module is loaded - `lifecycle.md`, *The runtime lifecycle*. All
 three may take names, because registration is not a hot path.
 
-    declare(name, name_len, kind, size, align, desc, desc_len, on_unload) -> slot
+    declare(name, name_len, kind, size, align, desc, desc_len, on_unload, storage) -> slot
     system (name, name_len, phase, phase_len, terms, term_count, changes, change_count) -> slot
     observe(name, name_len, events, terms, term_count, changes, change_count)         -> slot
 
@@ -25,6 +25,10 @@ stated, like every other value.
 `on_unload` is what becomes of the entities carrying the component when this module is unloaded:
 `strip`, `sweep` or `delete` - `lifetime.md`, *What unload leaves behind*. It is stated, like every
 other value: there is no default.
+
+`storage` is the storage layout the component is kept in: a table, a sparse set, a toggle,
+direct-indexed or a singleton - `storage.md`, *Storage layouts*. It is stated, and every module
+that declares the component states the same one.
 
 **Every pointer here is an offset into the module's scratch arena**, on every backend: `name`,
 `desc`, `phase`, `terms`, `changes`, and `attach`'s `ptr`. A module writes the bytes there first and passes

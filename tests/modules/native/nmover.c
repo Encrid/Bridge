@@ -32,8 +32,8 @@ BRIDGE_NATIVE(init)
 {
     bridge_term terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
     uint32_t i;
-    position = BRIDGE_NATIVE_COMPONENT(api, "game:Position", Position, BRIDGE_DELETE);
-    marked = BRIDGE_NATIVE_COMPONENT(api, "game:Marked", Marked, BRIDGE_STRIP);
+    position = BRIDGE_NATIVE_COMPONENT(api, "game:Position", Position, BRIDGE_DELETE, BRIDGE_TABLE);
+    marked = BRIDGE_NATIVE_COMPONENT(api, "game:Marked", Marked, BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = position;
     moving = BRIDGE_NATIVE_SYSTEM(api, "move", "update", terms, 1, nullptr, 0);
     terms[0].access = BRIDGE_READ;

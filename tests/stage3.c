@@ -190,6 +190,13 @@ int main(int argc, char **argv)
         load(b, &a);
         a = artifact("game:fp@0.1.0", "fp");
         load(b, &a);
+    } else if (!strcmp(what, "keptunset")) {    /* a storage layout nobody stated, and one */
+        a = artifact("game:mover@0.1.0", "mover");      /* that is none of the five */
+        load(b, &a);
+        a = artifact("game:kept@0.1.0", "kept-unset");
+        load(b, &a);
+        a = artifact("game:kept@0.1.0", "kept-none");
+        load(b, &a);
     } else if (!strcmp(what, "grant")) {        /* the reader, with no grant */
         a = artifact("view:reader@0.1.0", "reader");
         load(b, &a);

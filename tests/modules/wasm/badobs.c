@@ -5,7 +5,7 @@
 BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
-    terms[0].slot = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP);
+    terms[0].slot = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP, BRIDGE_TABLE);
     BRIDGE_OBSERVER("init", BRIDGE_ON_ENTER, terms, 1, nullptr, 0);
     return 0;
 }

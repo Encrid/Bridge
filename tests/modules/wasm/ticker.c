@@ -32,7 +32,7 @@ BRIDGE_EXPORT(advance) int advance()
 static void registration()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
-    tick = BRIDGE_COMPONENT("game:Tick", Tick, BRIDGE_DELETE);
+    tick = BRIDGE_COMPONENT("game:Tick", Tick, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = tick;
     ticking = BRIDGE_SYSTEM("advance", "update", terms, 1, nullptr, 0);
 }
@@ -44,7 +44,7 @@ BRIDGE_EXPORT(init) int init()
     uint32_t extra;
     registration();
     BRIDGE_ATTACH(bridge_spawn(), tick, t);
-    extra = BRIDGE_COMPONENT("game:Extra", Extra, BRIDGE_DELETE);
+    extra = BRIDGE_COMPONENT("game:Extra", Extra, BRIDGE_DELETE, BRIDGE_TABLE);
     BRIDGE_ATTACH(bridge_spawn(), extra, e);
     return 0;
 }
@@ -53,7 +53,7 @@ BRIDGE_EXPORT(reload) int reload()
 {
     registration();
 #ifndef NO_EXTRA
-    BRIDGE_COMPONENT("game:Extra", Extra, BRIDGE_DELETE);
+    BRIDGE_COMPONENT("game:Extra", Extra, BRIDGE_DELETE, BRIDGE_TABLE);
 #endif
 #ifdef ALLOC
     bridge_alloc(40);

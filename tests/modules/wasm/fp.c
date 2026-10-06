@@ -5,7 +5,7 @@ BRIDGE_SCHEMA_STRUCT(Position, { float x; float y; float z; });
 
 BRIDGE_EXPORT(init) int init()
 {
-    BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP);
+    BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP, BRIDGE_TABLE);
     return 0;
 }
 

@@ -21,7 +21,7 @@ BRIDGE_EXPORT(halve) int halve()
 BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
-    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP);
+    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = position;
     halving = BRIDGE_SYSTEM("halve", "update", terms, 1, nullptr, 0);
     return 0;

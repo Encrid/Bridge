@@ -47,9 +47,9 @@ BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     int none = 0;
-    a = BRIDGE_COMPONENT("game:LinkA", Link, BRIDGE_STRIP);
-    b = BRIDGE_COMPONENT("game:LinkB", Link, BRIDGE_STRIP);
-    c = BRIDGE_COMPONENT("game:LinkC", Link, BRIDGE_STRIP);
+    a = BRIDGE_COMPONENT("game:LinkA", Link, BRIDGE_STRIP, BRIDGE_TABLE);
+    b = BRIDGE_COMPONENT("game:LinkB", Link, BRIDGE_STRIP, BRIDGE_TABLE);
+    c = BRIDGE_COMPONENT("game:LinkC", Link, BRIDGE_STRIP, BRIDGE_TABLE);
     BRIDGE_SYSTEM("start", "update", &none, 0, &a, 1);
     terms[0].slot = a;
     on_a = BRIDGE_OBSERVER("got_a", BRIDGE_ON_ENTER, terms, 1, &b, 1);

@@ -2,6 +2,11 @@
 
 The record of `storage.md`: `README.md`, *Three layers, three seams*.
 
+## Storage layouts
+
+Of `storage.md`, *Storage layouts*. Who states a component's storage layout, and what else was
+weighed for each of the five, is in the record of `STAGE11.md`, *The questions*.
+
 ## A table
 
 Of `storage.md`, *A table*.

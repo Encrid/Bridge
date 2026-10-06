@@ -25,11 +25,11 @@ BRIDGE_EXPORT(init) int init()
     bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     Body b = {{ 1.0f, 2.0f }, Blue, Solid | Hidden, 4.0f };
 #ifndef LEAVE_OUT_VEC2
-    BRIDGE_DECLARE(BRIDGE_STRUCT, "game:Vec2", Vec2, BRIDGE_STRIP);
+    BRIDGE_DECLARE(BRIDGE_STRUCT, "game:Vec2", Vec2, BRIDGE_STRIP, BRIDGE_TABLE);
 #endif
-    BRIDGE_DECLARE(BRIDGE_ENUM, "game:Team", Team, BRIDGE_STRIP);
-    BRIDGE_DECLARE(BRIDGE_BITMASK, "game:Flags", Flags, BRIDGE_STRIP);
-    body = BRIDGE_COMPONENT("game:Body", Body, BRIDGE_DELETE);
+    BRIDGE_DECLARE(BRIDGE_ENUM, "game:Team", Team, BRIDGE_STRIP, BRIDGE_TABLE);
+    BRIDGE_DECLARE(BRIDGE_BITMASK, "game:Flags", Flags, BRIDGE_STRIP, BRIDGE_TABLE);
+    body = BRIDGE_COMPONENT("game:Body", Body, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = body;
     reading = BRIDGE_SYSTEM("read", "update", terms, 1, nullptr, 0);
     BRIDGE_ATTACH(bridge_spawn(), body, b);

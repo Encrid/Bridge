@@ -24,7 +24,7 @@ BRIDGE_EXPORT(init) int init()
 {
     bridge_term terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
     uint32_t i;
-    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE);
+    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = position;
     moving = BRIDGE_SYSTEM("move", "update", terms, 1, nullptr, 0);
     /* zeroed: a value each would need a scratch arena of their sum */

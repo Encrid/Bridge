@@ -50,9 +50,9 @@ static uint64_t enter(const bridge_api *api, int entry, const uint64_t *args)
 }
 
 static uint32_t t_declare(const bridge_api *api, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f,
-                          uint32_t g, uint32_t h)
+                          uint32_t g, uint32_t h, uint32_t i)
 {
-    uint64_t args[8] = { a, b, c, d, e, f, g, h };
+    uint64_t args[9] = { a, b, c, d, e, f, g, h, i };
     return (uint32_t)enter(api, DECLARE, args);
 }
 

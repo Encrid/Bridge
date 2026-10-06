@@ -126,10 +126,10 @@ BRIDGE_NATIVE(init)
     int none = 0;
     bridge_term one[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     uint32_t filled[4];
-    value = filled[0] = BRIDGE_NATIVE_COMPONENT(api, "st:V", V, BRIDGE_DELETE);
-    flag = filled[1] = BRIDGE_NATIVE_COMPONENT(api, "st:F", F, BRIDGE_DELETE);
-    link = filled[2] = BRIDGE_NATIVE_COMPONENT(api, "st:L", L, BRIDGE_DELETE);
-    single = filled[3] = BRIDGE_NATIVE_COMPONENT(api, "st:S", S, BRIDGE_DELETE);
+    value = filled[0] = BRIDGE_NATIVE_COMPONENT(api, "st:V", V, BRIDGE_DELETE, BRIDGE_TABLE);
+    flag = filled[1] = BRIDGE_NATIVE_COMPONENT(api, "st:F", F, BRIDGE_DELETE, BRIDGE_TABLE);
+    link = filled[2] = BRIDGE_NATIVE_COMPONENT(api, "st:L", L, BRIDGE_DELETE, BRIDGE_TABLE);
+    single = filled[3] = BRIDGE_NATIVE_COMPONENT(api, "st:S", S, BRIDGE_DELETE, BRIDGE_TABLE);
     BRIDGE_NATIVE_SYSTEM(api, "fill", "spawn", &none, 0, filled, 4);
     one[0].slot = value;
     walking = BRIDGE_NATIVE_SYSTEM(api, "walk", "walk", one, 1, nullptr, 0);

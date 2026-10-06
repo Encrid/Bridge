@@ -28,7 +28,7 @@ BRIDGE_EXPORT(init) int init()
     [[maybe_unused]] static const char hello[] = "kept in the arena";
     bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     [[maybe_unused]] Name n = {{ 0, sizeof hello - 1 }};
-    name = BRIDGE_COMPONENT("game:Name", Name, BRIDGE_DELETE);
+    name = BRIDGE_COMPONENT("game:Name", Name, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = name;
     saying = BRIDGE_SYSTEM("say", "update", terms, 1, nullptr, 0);
 #ifndef READER
