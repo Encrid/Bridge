@@ -1,288 +1,13 @@
-/* storage.h, kept by Bridge-ASM700 itself. docs/plan/stage10.md.
- *
- * It is made for what the bridge promises and a general store cannot assume: rows are touched
- * only at a barrier, by one thread, with every change of that barrier already queued; systems
- * are fixed at load; nobody iterates through it; and no order of rows is anybody's to keep.
- *
- *   - A barrier is worked an entity at a time. The queues are folded, in their stated order,
- *     into what each changed entity will be, and it is then placed once. No table is made that
- *     nothing stays in.
- *   - A table is one set of types, found by that set, and lives while it has rows. Its rows
- *     are one block of the column region: the entity ids, then a column for each type.
- *   - Nothing in the shared block is read back. Where an entity is, and which entity is in
- *     which row, are kept here; what the block holds of either is a copy for modules to read.
- *   - Everything it holds is sized by a budget and allocated when the bridge is created:
- *     entities, tables, columns, types, systems. Nothing is allocated after.
- *   - What a module reads is rewritten where a table was touched, and nowhere else. */
-#include "inside.h"
+#include "storage_bytes.h"
+#include "storage_carried.h"
+#include "storage_reach.h"
+#include "storage_set.h"
+#include "storage_sets.h"
+#include "storage_view.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-constexpr uint32_t DEAD = 0xffffffffu;          /* a place whose entity is gone */
-
-/* what the fold has decided of an entity, for the length of one barrier */
-enum folded : uint8_t {
-    TOUCHED = 1, DESTROYED = 2, DROPPED = 4,
-    SHORT = 8,                      /* dropped for want of columns, and not of a table */
-    MOVES = 16                      /* it is to have a row it has not: room is found for it */
-};
-
-struct storage_type {
-    uint32_t id;                    /* its bit in a set, and its column in the layout */
-    uint32_t size;
-    uint32_t align;                 /* where a column of it may begin: a power of two */
-    enum bridge_storage kept;       /* the storage layout it is kept in */
-    uint32_t slot;                  /* which sparse set it is, when it is one; or which of
-                                     * the direct-indexed */
-    uint32_t cells, cells_len;      /* direct-indexed: its block, the sixteen bytes that say
-                                     * where its bits are and then a cell an entity. A
-                                     * singleton: its block, which is its one value */
-    bool     set;                   /* a singleton: it has a value */
-};
-
-struct storage_terms {
-    uint32_t          count;
-    uint32_t         *type;         /* [budget] terms of each, of which `count` are its own */
-    enum bridge_oper *oper;
-    /* a system's: the tables it matches, and where each is in that list, less one */
-    uint32_t         *list, *pos;
-    uint32_t          matched;
-    bool              changed;      /* which tables it matches is not what was last written */
-    bool              used;         /* of the [budget] systems there are, this one is taken */
-    /* an observer's */
-    enum bridge_event events;
-    storage_heard_t        heard;
-    void             *ctx;
-};
-
-typedef struct { uint32_t table, row, generation; } place_t;      /* or `row` is the next free index */
-
-typedef struct {
-    uint32_t rows, room;
-    uint32_t block, block_len;      /* its block of the column region, from the shared base */
-    uint32_t incoming;              /* rows this barrier will add: room is found for them first */
-    bool     live, touched;
-    bool     sized;                 /* and it has been: `incoming` is how many it has room for */
-    bool     named;                 /* it is the table its set is found as: lifetime.md, *What
-                                     * unload leaves behind*, for when one is not */
-    uint32_t set;                   /* the sparse set this is the table of, plus one: 0 for
-                                     * the table of an archetype */
-} table_t;
-
-struct storage {
-    bridge_t    *b;
-    /* entities: where each is. Never the copy in the block */
-    place_t     *places;
-    uint32_t   high, free_head;     /* indices never used begin at `high`; freed ones are a list */
-    /* tables: 0 is no table */
-    table_t     *tables;
-    uint32_t   table_room, table_free, table_high;
-    uint32_t  *table_next;          /* the free list of table ids */
-    uint32_t  *hash;                /* a set to its table: open addressing, twice the room */
-    uint32_t   hash_room;
-    uint64_t  *sets;                /* [table][words]: which types a table's entities carry */
-    uint32_t  *columns;             /* [table][types]: where a type's column is, 0 if absent */
-    uint32_t   words, type_room;    /* how wide a set is, in 64-bit words and in types */
-    uint32_t   terms_room;
-    uint64_t  *who;                 /* which entity is in which row: the column region's twin */
-    uint32_t  *dirty;               /* tables touched since what modules read was last written */
-    uint32_t   dirty_count;
-    /* types and terms: [budget] types and [budget] systems of them, and no more */
-    storage_type_t **types;              /* by id: nullptr where none is declared */
-    storage_type_t  *type_pool;
-    storage_terms_t *terms_pool;
-    uint32_t   *lists;              /* every system's `list` and `pos`, one after another */
-    uint32_t   *term_types;         /* and every one's terms */
-    enum bridge_oper *term_opers;
-    storage_terms_t **systems, **observers;
-    uint32_t   system_count, observer_count;
-    /* the fold */
-    uint64_t  *work;                /* [entity][words]: what a changed entity is becoming */
-    uint32_t  *changed;             /* the entities this barrier changes, in the order met */
-    uint32_t   changed_count;
-    uint8_t   *folded;
-    uint32_t  *dest;                /* the table each will be in */
-    uint64_t  *at;                  /* where laid_out last put each type's column: a type each */
-    uint64_t  *attached;            /* and of that, what an attach wrote a value of: kept
-                                     * only while there is an observer to be told */
-    uint64_t  *scratch;             /* one set */
-    /* sparse sets: [budget] sparse_sets of them - storage.md, *A sparse set*. Each is kept as
-     * a table of its one type, whose rows are found by entity, here, and not by where the
-     * entity is */
-    uint32_t   set_room;
-    storage_type_t **set_type;        /* by slot: nullptr where none is declared */
-    uint32_t  *set_table;           /* by slot: its table, 0 while no entity is in it */
-    uint32_t  *where;               /* [slot][entity]: its row there plus one, 0 for none */
-    uint64_t  *in_table;            /* one set: the types that are kept in tables */
-    uint64_t  *before, *masked;     /* two sets more */
-    uint32_t   table_count;         /* how many tables of archetypes there are */
-    uint32_t   tags;                /* how many declared types have no bytes */
-    uint32_t   apart;               /* how many declared types are not kept in a table. While
-                                     * there is none, an entity carries what its table holds
-                                     * and nothing else, and a barrier looks no further */
-    /* direct-indexed: [budget] direct_indexed of them - storage.md, *Direct-indexed*. A cell
-     * for every entity, in a block of the column region taken at declare; and a bit for every
-     * entity that says it has a value there, kept here, with a copy for modules */
-    uint32_t   direct_room, bit_words;
-    storage_type_t **direct_type;     /* by slot: nullptr where none is declared */
-    uint64_t  *given;               /* [slot][bit_words]: which entities have one */
-};
-
-/* ---- sets ---- */
-
-static bool set_has(const uint64_t *set, uint32_t type) { return set[type >> 6] >> (type & 63) & 1; }
-static void set_put(uint64_t *set, uint32_t type) { set[type >> 6] |= (uint64_t)1 << (type & 63); }
-static void set_take(uint64_t *set, uint32_t type) { set[type >> 6] &= ~((uint64_t)1 << (type & 63)); }
-
-static const uint64_t *get_set(const storage_t *r, uint32_t t) { return r->sets + (size_t)t * r->words; }
-static uint32_t *get_columns(const storage_t *r, uint32_t t) { return r->columns + (size_t)t * r->type_room; }
-
-/* A set is a 64-bit word for each 64 types there may be: one, in most deployments. Copied
- * and compared a word at a time here, since memcpy and memcmp of a length the compiler cannot
- * see are calls, and these are made for every entity a barrier changes. */
-static inline void set_copy(const storage_t *r, uint64_t *to, const uint64_t *from)
-{
-    for (uint32_t w = 0; w < r->words; w ++) to[w] = from[w];
-}
-
-static inline void set_clear(const storage_t *r, uint64_t *set)
-{
-    for (uint32_t w = 0; w < r->words; w ++) set[w] = 0;
-}
-
-static inline bool set_is_same(const storage_t *r, const uint64_t *a, const uint64_t *b)
-{
-    for (uint32_t w = 0; w < r->words; w ++) if (a[w] != b[w]) return false;
-    return true;
-}
-
-/* A value is a word or two more often than not, and a copy or a clearing of a length the
- * compiler cannot see is a call. The two commonest sizes are done here, for every row that
- * moves. */
-static inline void copy_bytes(uint8_t *to, const uint8_t *from, uint32_t size)
-{
-    if (size == 4) memcpy(to, from, 4);
-    else if (size == 8) memcpy(to, from, 8);
-    else memcpy(to, from, size);
-}
-
-static inline void clear_bytes(uint8_t *at, uint32_t size)
-{
-    if (size == 4) memset(at, 0, 4);
-    else if (size == 8) memset(at, 0, 8);
-    else memset(at, 0, size);
-}
-
-static uint32_t *get_where(const storage_t *r, uint32_t slot)
-{
-    return r->where + (size_t)slot * r->b->entities;
-}
-
-/* what a module reads of a sparse set: for each entity where its value is, from the shared
- * base, and 0 where it has none - storage.md, *A sparse set* */
-static uint32_t *get_cells(const storage_t *r, uint32_t slot)
-{
-    return (uint32_t *)(r->b->shared + r->b->sparse) + (size_t)slot * r->b->entities;
-}
-
-static uint64_t *get_given(const storage_t *r, uint32_t slot)
-{
-    return r->given + (size_t)slot * r->bit_words;
-}
-
-/* what a module reads of the same: a bit an entity, where the sixteen bytes ahead of the
- * cells say */
-static uint64_t *get_shown(const storage_t *r, uint32_t slot)
-{
-    return (uint64_t *)(r->b->shared + r->b->direct) + (size_t)slot * r->bit_words;
-}
-
-/* storage.md, *A tag*: what a module is handed for where a column is. A tag has none, and is
- * handed that it is carried; but a toggled tag has its bits ahead of where its column would
- * be, and is handed that. */
-static inline uint32_t get_handed(const storage_t *r, uint32_t type, uint32_t column)
-{
-    /* while no tag is declared, a column is where it is, and no type is looked at */
-    if (!r->tags || !column) return column;
-    return !r->types[type]->size && r->types[type]->kept != BRIDGE_TOGGLE ? BRIDGE_CARRIED : column;
-}
-
-/* and for where the value of row `row` of a sparse set is */
-static uint32_t get_cell(const storage_type_t *type, uint32_t column, uint32_t row)
-{
-    return type->size ? column + row * type->size : BRIDGE_CARRIED;
-}
-
-/* everything the entity at `index` carries: what its table holds, every sparse set it is in,
- * and every direct-indexed component it has been given */
-[[gnu::always_inline]] static inline void get_carried(const storage_t *r, uint32_t index, uint64_t *set)
-{
-    uint32_t t = r->places[index].table;
-    if (t) set_copy(r, set, get_set(r, t));
-    else set_clear(r, set);
-    if (!r->apart) return;
-    for (uint32_t slot = 0; slot < r->set_room; slot ++) {
-        if (r->set_type[slot] && get_where(r, slot)[index]) set_put(set, r->set_type[slot]->id);
-    }
-    for (uint32_t slot = 0; slot < r->direct_room; slot ++) {
-        if (r->direct_type[slot] && set_has(get_given(r, slot), index)) set_put(set, r->direct_type[slot]->id);
-    }
-    /* and index 0, which is no entity, is what a singleton that has a value is on */
-    for (uint32_t id = 0; !index && id < r->type_room; id ++) {
-        if (r->types[id] && r->types[id]->set) set_put(set, id);
-    }
-}
-
-static bool set_is_empty(const storage_t *r, const uint64_t *set)
-{
-    for (uint32_t w = 0; w < r->words; w ++) if (set[w]) return false;
-    return true;
-}
-
-static uint32_t hash_set(const storage_t *r, const uint64_t *set)
-{
-    uint64_t h = 1'469'598'103'934'665'603ull;
-    for (uint32_t w = 0; w < r->words; w ++) h = (h ^ set[w]) * 1'099'511'628'211ull;
-    return (uint32_t)(h ^ h >> 32) & (r->hash_room - 1);
-}
-
-/* ---- a table's block: its entity ids, then a column a type, each at a multiple of sixteen ---- */
-
-/* storage.md, *A table*: a column that begins at a multiple of sixteen is read by a compiler's
- * loop of 16-byte loads with none of them across two cache lines. Measured: one that begins
- * eight past it takes 8.3 us for 204,800 rows where this takes 5.6 to 6.4. */
-constexpr uint64_t COLUMN = 16;
-
-static uint64_t pad_column(uint64_t bytes) { return (bytes + COLUMN - 1) & ~(COLUMN - 1); }
-
-/* storage.md, *A toggle*: a toggled column has a bit a row, a 64-bit word for each 64 rows,
- * ahead of it in the block; and between the two, sixteen bytes that say where the bits begin,
- * which is where a module that has the column finds them. */
-static uint64_t get_bits_len(uint32_t room) { return pad_column(8ull * ((room + 63) / 64)); }
-
-/* where the bits of the toggled column at `column` are, in a block of `room` rows */
-static uint32_t get_bits(uint32_t column, uint32_t room)
-{
-    return column - (uint32_t)COLUMN - (uint32_t)get_bits_len(room);
-}
-
-static bool is_on(const storage_t *r, uint32_t column, uint32_t room, uint32_t row)
-{
-    uint64_t word;
-    memcpy(&word, r->b->shared + get_bits(column, room) + 8u * (row >> 6), 8);
-    return word >> (row & 63) & 1;
-}
-
-static void turn_row(storage_t *r, uint32_t column, uint32_t room, uint32_t row, bool on)
-{
-    uint8_t *at = r->b->shared + get_bits(column, room) + 8u * (row >> 6);
-    uint64_t word;
-    memcpy(&word, at, 8);
-    word = on ? word | (uint64_t)1 << (row & 63) : word & ~((uint64_t)1 << (row & 63));
-    memcpy(at, &word, 8);
-}
 
 /* How long a block of `room` rows of `set` is, and into r->at where each of its columns
  * begins in it: the ids, then every type in the order of its number, each at the next
@@ -308,11 +33,6 @@ static void touch(storage_t *r, uint32_t t)
     if (r->tables[t].touched) return;
     r->tables[t].touched = true;
     r->dirty[r->dirty_count ++] = t;
-}
-
-static uint64_t *get_who(const storage_t *r, const table_t *tab)
-{
-    return r->who + (tab->block - r->b->columns) / 8;
 }
 
 /* room for `room` rows, where they are and in the layout that goes with it. false if the
@@ -600,7 +320,7 @@ static uint32_t append_row(storage_t *r, uint32_t t, uint32_t index)
             uint8_t *column = r->b->shared + columns[type->id];
             copy_bytes(column + (size_t)row * type->size, column + (size_t)last * type->size, type->size);
             if (type->kept == BRIDGE_TOGGLE) {
-                turn_row(r, columns[type->id], tab->room, row, is_on(r, columns[type->id], tab->room, last));
+                turn_row(r, get_bits(columns[type->id], tab->room), row, is_on(r, columns[type->id], tab->room, last));
             }
         }
     }
@@ -685,7 +405,7 @@ static void give_cell(storage_t *r, uint32_t slot, uint32_t index, bool on)
                 }
                 /* a toggled component is on when it is given, and as it was when it moves */
                 if (type->kept == BRIDGE_TOGGLE) {
-                    turn_row(r, into[type->id], r->tables[to].room, at, !out || !out[type->id]
+                    turn_row(r, get_bits(into[type->id], r->tables[to].room), at, !out || !out[type->id]
                         || is_on(r, out[type->id], r->tables[from].room, row));
                 }
             }
