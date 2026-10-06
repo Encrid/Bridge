@@ -428,6 +428,8 @@ CASES = [
      r"module 'test:ok@0.1.0' is refused: memory_limit is unset.*alive", None),
     ('stage2-nonelimit', ['stage2', 'nonelimit'],
      r"module 'test:ok@0.1.0' is refused: spawns is -1, which is neither an amount nor BRIDGE_NONE.*module 'test:ok@0.1.0' is refused: work_limit is -2, which is neither a limit nor BRIDGE_NO_LIMIT.*alive", ': loaded'),
+    ('stage2-unsetflag', ['stage2', 'unsetflag'],
+     r"module 'test:ok@0.1.0' is refused: pinned is unset.*module 'test:ok@0.1.0' is refused: trusted is 3, which is neither BRIDGE_TRUE nor BRIDGE_FALSE.*alive", ': loaded'),
     ('stage2-negative', ['stage2', 'negative'],
      r"module 'test:ok@0.1.0' is refused: memory_limit is -7, which is neither a limit nor BRIDGE_NO_LIMIT.*alive", ': loaded'),
     ('stage2-stop', ['stage2', 'stop'],

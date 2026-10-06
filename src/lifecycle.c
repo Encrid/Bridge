@@ -145,6 +145,19 @@ static int neither(bridge *b, const char *identity, const char *key, int64_t val
     return 1;
 }
 
+/* A key that is yes or no is stated as either: config.md, *No unaccountable values*. */
+static int unflagged(bridge *b, const char *identity, const char *key, enum bridge_flag value)
+{
+    if (value == BRIDGE_TRUE || value == BRIDGE_FALSE) return 0;
+    if (value == BRIDGE_UNSET) {
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: %s is unset", identity, key);
+    } else {
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: %s is %u, which is neither "
+            "BRIDGE_TRUE nor BRIDGE_FALSE", identity, key, value);
+    }
+    return 1;
+}
+
 /* A stated limit demands that the backend can enforce it - capabilities.md. */
 static int lacks(bridge *b, const char *identity, open_backend *o, uint32_t flag, const char *key)
 {
@@ -194,6 +207,11 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
     if (cfg->abi != BRIDGE_ABI) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: it wants ABI %u and this is "
             "ABI %u", id, cfg->abi, (unsigned)BRIDGE_ABI);
+        return 1;
+    }
+    if (unflagged(b, id, "trusted", cfg->trusted) || unflagged(b, id, "reloadable", cfg->reloadable)
+        || unflagged(b, id, "hot_reload", cfg->hot_reload)
+        || unflagged(b, id, "pinned", cfg->pinned)) {
         return 1;
     }
     if (cfg->on_error != BRIDGE_FAIL && cfg->on_error != BRIDGE_SKIP) {
@@ -256,7 +274,7 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
         return 1;
     }
     /* capabilities.md: one guarantee, asked by `trusted` and answered by the backend */
-    if (!cfg->trusted && !(o->capabilities & BACKEND_UNTRUSTED)) {
+    if (cfg->trusted == BRIDGE_FALSE && !(o->capabilities & BACKEND_UNTRUSTED)) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: it is not trusted, and backend "
             "'%s' runs only modules that are", id, o->name);
         return 1;
@@ -267,18 +285,18 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
         || (cfg->reload_timeout > 0 && lacks(b, id, o, BACKEND_TIMEOUT, "reload_timeout"))
         || (cfg->shutdown_timeout > 0
             && lacks(b, id, o, BACKEND_TIMEOUT, "shutdown_timeout"))
-        || (cfg->hot_reload && lacks(b, id, o, BACKEND_RELOAD, "hot_reload"))) {
+        || (cfg->hot_reload == BRIDGE_TRUE && lacks(b, id, o, BACKEND_RELOAD, "hot_reload"))) {
         return 1;
     }
     /* wasm.md, *Exports*: the author says "cannot" and the deployment "may not", each with a
      * key. A deployment allowing what the author says cannot be done is config against config. */
-    if (cfg->hot_reload && !cfg->reloadable) {
+    if (cfg->hot_reload == BRIDGE_TRUE && cfg->reloadable == BRIDGE_FALSE) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: hot_reload is stated, and its "
             "author states it is not reloadable", id);
         return 1;
     }
     *on = o;
-    *demands = (cfg->trusted ? 0 : BACKEND_UNTRUSTED) | (cfg->work_limit > 0 ? BACKEND_WORK_LIMIT : 0)
+    *demands = (cfg->trusted == BRIDGE_TRUE ? 0 : BACKEND_UNTRUSTED) | (cfg->work_limit > 0 ? BACKEND_WORK_LIMIT : 0)
              | (cfg->memory_limit > 0 ? BACKEND_MEMORY_LIMIT : 0)
              | (cfg->init_timeout > 0 || cfg->reload_timeout > 0 || cfg->shutdown_timeout > 0
                 ? BACKEND_TIMEOUT : 0);
@@ -313,10 +331,10 @@ static module *record(bridge *b, const bridge_artifact *a, open_backend *o)
     m->identity = copy(id, strlen(id));
     m->stem = copy(id, stem_of(id));
     m->ns = copy(id, colon ? (size_t)(colon - id) : strlen(id));
-    m->pinned = cfg->pinned;
+    m->pinned = cfg->pinned == BRIDGE_TRUE;
     m->thread = os_thread_id();
     m->on_error = cfg->on_error;
-    m->hot_reload = cfg->hot_reload;
+    m->hot_reload = cfg->hot_reload == BRIDGE_TRUE;
     m->max_failures = cfg->max_system_failures;
     m->shutdown_timeout = cfg->shutdown_timeout;
     m->work_limit = cfg->work_limit;

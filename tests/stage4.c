@@ -44,7 +44,10 @@ static bridge_artifact native(const char *identity, const char *path)
     bridge_artifact a = {};
     a.cfg.identity = identity;
     a.cfg.abi = BRIDGE_ABI;
-    a.cfg.trusted = true;
+    a.cfg.trusted = BRIDGE_TRUE;
+    a.cfg.reloadable = BRIDGE_FALSE;
+    a.cfg.hot_reload = BRIDGE_FALSE;
+    a.cfg.pinned = BRIDGE_FALSE;
     a.cfg.on_error = BRIDGE_SKIP;
     a.cfg.max_system_failures = 3;
     a.cfg.work_limit = BRIDGE_NO_LIMIT;
@@ -81,7 +84,7 @@ static bridge_artifact wasm_reader()
     fclose(f);
     a.bytes = data;
     a.backend = "wasm";
-    a.cfg.trusted = false;
+    a.cfg.trusted = BRIDGE_FALSE;
     a.cfg.work_limit = 10'000'000;
     a.cfg.memory_limit = 16 << 20;
     a.cfg.init_timeout = 2000 * MS;
@@ -158,7 +161,7 @@ int main(int argc, char **argv)
         }
     } else if (!strcmp(what, "untrusted")) {    /* refused before any library is looked for */
         a = native("game:mover@0.1.0", "no-such-library");
-        a.cfg.trusted = false;
+        a.cfg.trusted = BRIDGE_FALSE;
         load(b, &a);
     } else if (!strcmp(what, "limit")) {
         a = native("game:mover@0.1.0", "no-such-library");

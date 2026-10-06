@@ -92,6 +92,9 @@ static_assert(offsetof(bridge_config, order) == 32 && offsetof(bridge_config, or
 static_assert(offsetof(bridge_config, threads) == 44 && offsetof(bridge_config, budget) == 48);
 
 enum bridge_on_error : uint8_t { BRIDGE_FAIL = 1, BRIDGE_SKIP = 2 };    /* zero is unset */
+/* A key that is yes or no. It is stated like any other: left at BRIDGE_UNSET it is refused, by
+ * its name, and is not taken for false - docs/seam/host-api/config.md. */
+enum bridge_flag : uint8_t { BRIDGE_UNSET = 0, BRIDGE_TRUE = 1, BRIDGE_FALSE = 2 };
 /* Two values and not one, because they say opposite things: a module with no limit may use
  * all there is, and a module with no reservation gets nothing. Each field below takes one of
  * them, and the other, like any other negative number, is refused at load. */
@@ -105,10 +108,10 @@ typedef struct {
     const char *identity;        /* "tri:triangle@0.1.0" */
     uint32_t    abi;
 
-    bool     trusted;
-    bool     reloadable;         /* its author says it can be reloaded: from the manifest */
-    bool     hot_reload;         /* the deployment allows bridge_reload. it only ever forbids */
-    bool     pinned;             /* its systems run on the thread that loaded it, and no other */
+    enum bridge_flag trusted;    /* its code needs no containing */
+    enum bridge_flag reloadable; /* its author says it can be reloaded: from the manifest */
+    enum bridge_flag hot_reload; /* the deployment allows bridge_reload. it only ever forbids */
+    enum bridge_flag pinned;     /* its systems run on the thread that loaded it, and no other */
     enum bridge_on_error on_error;   /* what losing it costs the deployment */
     uint8_t  pad0[7];
     /* each of the next six: zero is unset, BRIDGE_NO_LIMIT is "no limit" */

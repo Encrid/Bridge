@@ -69,7 +69,10 @@ static bridge_artifact store_module(const char *path, int64_t spawns, uint32_t s
     a.cfg.identity = "st:store@0.1.0";
     a.cfg.scratch = 64 << 10;
     a.cfg.abi = BRIDGE_ABI;
-    a.cfg.trusted = true;
+    a.cfg.trusted = BRIDGE_TRUE;
+    a.cfg.reloadable = BRIDGE_FALSE;
+    a.cfg.hot_reload = BRIDGE_FALSE;
+    a.cfg.pinned = BRIDGE_FALSE;
     a.cfg.on_error = BRIDGE_FAIL;
     a.cfg.max_system_failures = 1;
     a.cfg.work_limit = BRIDGE_NO_LIMIT;

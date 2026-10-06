@@ -604,7 +604,9 @@ Of earlier stages:
               MSVC; a C++ host that links and runs is stage 13's done-when
     closed    stage 13's host links the built library and is not handed the source; which
               languages the seam is shown from is that stage's first question
-    open    a boolean cannot be unset, and false is called the safe side for all six
+    closed  a boolean cannot be unset, and false is called the safe side for all six: it was
+            not for `pinned`. A key that is yes or no is `enum bridge_flag`, stated as
+            BRIDGE_TRUE or BRIDGE_FALSE, and refused at BRIDGE_UNSET. `config.md`
     open    a module is the unit of parallelism, with instance grouping refused on minimal
     open    a system is bounded by fuel and never by a deadline, on every deployment
     open    a field's type is found in its own namespace only

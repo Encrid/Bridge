@@ -44,7 +44,10 @@ static bridge_artifact artifact(const char *identity, const char *file)
     bridge_artifact a = {};
     a.cfg.identity = identity;
     a.cfg.abi = BRIDGE_ABI;
-    a.cfg.trusted = false;
+    a.cfg.trusted = BRIDGE_FALSE;
+    a.cfg.reloadable = BRIDGE_FALSE;
+    a.cfg.hot_reload = BRIDGE_FALSE;
+    a.cfg.pinned = BRIDGE_FALSE;
     a.cfg.on_error = BRIDGE_SKIP;
     a.cfg.max_system_failures = 3;
     a.cfg.work_limit = 10'000'000;

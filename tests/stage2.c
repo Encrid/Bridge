@@ -43,7 +43,10 @@ static bridge_artifact artifact(const char *name)
     snprintf(identity, sizeof identity, "test:%s@0.1.0", name);
     a.cfg.identity = identity;
     a.cfg.abi = BRIDGE_ABI;
-    a.cfg.trusted = false;
+    a.cfg.trusted = BRIDGE_FALSE;
+    a.cfg.reloadable = BRIDGE_FALSE;
+    a.cfg.hot_reload = BRIDGE_FALSE;
+    a.cfg.pinned = BRIDGE_FALSE;
     a.cfg.on_error = BRIDGE_SKIP;
     a.cfg.max_system_failures = 3;
     a.cfg.work_limit = 1'000'000;
@@ -123,6 +126,13 @@ int main(int argc, char **argv)
         load(b, &a);
         a = artifact("ok");
         a.cfg.work_limit = BRIDGE_NONE;
+        load(b, &a);
+    } else if (!strcmp(what, "unsetflag")) {    /* a yes or no nobody stated is not a no */
+        a = artifact("ok");
+        a.cfg.pinned = BRIDGE_UNSET;
+        load(b, &a);
+        a = artifact("ok");
+        a.cfg.trusted = (enum bridge_flag)3;
         load(b, &a);
     } else if (!strcmp(what, "negative")) {     /* and a negative number that is no "none" at all */
         a = artifact("ok");

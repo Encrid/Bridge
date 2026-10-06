@@ -32,7 +32,10 @@ static bridge_artifact native(const char *identity, const char *path)
     bridge_artifact a = {};
     a.cfg.identity = identity;
     a.cfg.abi = BRIDGE_ABI;
-    a.cfg.trusted = true;
+    a.cfg.trusted = BRIDGE_TRUE;
+    a.cfg.reloadable = BRIDGE_FALSE;
+    a.cfg.hot_reload = BRIDGE_FALSE;
+    a.cfg.pinned = BRIDGE_FALSE;
     a.cfg.on_error = BRIDGE_SKIP;
     a.cfg.max_system_failures = 3;
     a.cfg.work_limit = BRIDGE_NO_LIMIT;
@@ -70,7 +73,7 @@ static bridge_artifact wasm(const char *identity, const char *file)
     fclose(f);
     a.bytes = data;
     a.backend = "wasm";
-    a.cfg.trusted = false;
+    a.cfg.trusted = BRIDGE_FALSE;
     a.cfg.work_limit = 10'000'000;
     a.cfg.memory_limit = 16 << 20;
     a.cfg.init_timeout = 2000 * MS;
@@ -272,7 +275,7 @@ int main(int argc, char **argv)
          * forty. Stating more gives it more; the same leaves it short; less is refused. With
          * another module's share carved after its own, the more is a second range. */
         a = wasm("game:ticker@0.1.0", "ticker");
-        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
         a.cfg.persistent = 16;
         load(b, &a);
         if (!strcmp(what, "sharechain")) {
@@ -282,7 +285,7 @@ int main(int argc, char **argv)
         }
         frames(b, 2);
         a = wasm("game:ticker@0.2.0", "ticker-alloc");
-        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
         a.cfg.persistent = !strcmp(what, "sharesame") ? 16 : !strcmp(what, "shareless") ? 8
                          : !strcmp(what, "sharebig") ? 1 << 20 : 64;
         reload(b, &a);
@@ -292,14 +295,14 @@ int main(int argc, char **argv)
         /* an essential module stopped at its budget stops the bridge; reloading it into one
          * that works is the one thing a stopped bridge accepts, and it runs again */
         a = wasm("game:ticker@0.1.0", "ticker-trip");
-        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
         a.cfg.on_error = BRIDGE_FAIL;
         load(b, &a);
         frames(b, 4);
         a = wasm("game:twostep@0.1.0", "twostep");
         load(b, &a);                            /* another module: refused */
         a = wasm("game:ticker@0.2.0", "ticker-ten");
-        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
         a.cfg.on_error = BRIDGE_FAIL;
         reload(b, &a);
         frames(b, 2);
@@ -321,17 +324,17 @@ int main(int argc, char **argv)
                || !strcmp(what, "reloadmove")
                || !strcmp(what, "reloaddrop") || !strcmp(what, "maynot")) {
         a = wasm("game:ticker@0.1.0", "ticker");
-        a.cfg.reloadable = true;
-        a.cfg.hot_reload = strcmp(what, "maynot") != 0;
+        a.cfg.reloadable = BRIDGE_TRUE;
+        a.cfg.hot_reload = strcmp(what, "maynot") ? BRIDGE_TRUE : BRIDGE_FALSE;
         load(b, &a);
         frames(b, 2);
         a = wasm("game:ticker@0.2.0", !strcmp(what, "reloadlayout") ? "ticker-wide"
                                     : !strcmp(what, "reloadfail") ? "ticker-fail"
                                     : !strcmp(what, "reloaddrop") ? "ticker-noextra" : "ticker-ten");
-        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
         if (!strcmp(what, "reloadmove")) {
             a = native("game:ticker@0.2.0", NTICKER1_PATH);
-            a.cfg.hot_reload = a.cfg.reloadable = true;
+            a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
         }
         reload(b, &a);
         frames(b, 2);
@@ -344,19 +347,19 @@ int main(int argc, char **argv)
         modules(b);
     } else if (!strcmp(what, "revive")) {       /* a stopped module, reloaded into one that works */
         a = wasm("game:ticker@0.1.0", "ticker-trip");
-        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
         load(b, &a);
         frames(b, 4);
         modules(b);
         a = wasm("game:ticker@0.2.0", "ticker-ten");
-        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
         reload(b, &a);
         frames(b, 2);
         modules(b);
     } else if (!strcmp(what, "notreloadable")) {
         /* the deployment allows what the author says cannot be done */
         a = wasm("game:twostep@0.1.0", "twostep");
-        a.cfg.hot_reload = true;
+        a.cfg.hot_reload = BRIDGE_TRUE;
         load(b, &a);
     } else if (!strcmp(what, "noreload")) {     /* one of the three exports is missing */
         a = wasm("test:noreload@0.1.0", "noreload");
@@ -364,7 +367,7 @@ int main(int argc, char **argv)
         load(b, &a);
     } else if (!strcmp(what, "reloadnothing")) {
         a = wasm("game:ticker@0.2.0", "ticker-ten");
-        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
         reload(b, &a);
     } else if (!strcmp(what, "ntimeout")) {     /* a timeout is a deadline, which native lacks */
         a = native("game:ticker@0.1.0", "no-such-library");
@@ -377,12 +380,12 @@ int main(int argc, char **argv)
         a = wasm("game:twostep@0.1.0", "twostep");
         load(b, &a);
         a = native("game:ticker@0.1.0", NTICKER1_PATH);
-        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
         if (essential) a.cfg.on_error = BRIDGE_FAIL;
         load(b, &a);
         frames(b, 2);
         a = native("game:ticker@0.2.0", !strcmp(what, "nreload") ? NTICKER2_PATH : NTICKER3_PATH);
-        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
         if (essential) a.cfg.on_error = BRIDGE_FAIL;
         reload(b, &a);
         frames(b, 2);
@@ -394,7 +397,7 @@ int main(int argc, char **argv)
         } else if (strcmp(what, "nreload")) {
             /* its rows were kept: an artifact that works picks up where the count was */
             a = native("game:ticker@0.3.0", NTICKER2_PATH);
-            a.cfg.hot_reload = a.cfg.reloadable = true;
+            a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
             if (essential) a.cfg.on_error = BRIDGE_FAIL;
             reload(b, &a);
             frames(b, 2);
@@ -428,15 +431,15 @@ int main(int argc, char **argv)
          * component is the state. With DROP the new instance declares nothing, and the row
          * goes with the component. */
         a = configured("game:settings@0.1.0");
-        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
         load(b, &a);
         frames(b, 1);
         everything[1].v.i = 640;
         a = configured("game:settings@0.2.0");
-        a.cfg.hot_reload = a.cfg.reloadable = true;
+        a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
         if (!strcmp(what, "configdrop")) {
             a = wasm("game:settings@0.2.0", "settings-drop");
-            a.cfg.hot_reload = a.cfg.reloadable = true;
+            a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
             a.cfg.persistent = 64;
         }
         reload(b, &a);

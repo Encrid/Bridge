@@ -81,7 +81,10 @@ static bridge_artifact native(const char *identity, const char *path)
     bridge_artifact a = {};
     a.cfg.identity = identity;
     a.cfg.abi = BRIDGE_ABI;
-    a.cfg.trusted = true;
+    a.cfg.trusted = BRIDGE_TRUE;
+    a.cfg.reloadable = BRIDGE_FALSE;
+    a.cfg.hot_reload = BRIDGE_FALSE;
+    a.cfg.pinned = BRIDGE_FALSE;
     a.cfg.on_error = BRIDGE_SKIP;
     a.cfg.max_system_failures = 3;
     a.cfg.work_limit = BRIDGE_NO_LIMIT;
@@ -122,7 +125,7 @@ static bridge_artifact wasm(const char *identity, const char *file)
     fclose(f);
     a.bytes = data;
     a.backend = "wasm";
-    a.cfg.trusted = false;
+    a.cfg.trusted = BRIDGE_FALSE;
     a.cfg.work_limit = 10'000'000;
     a.cfg.memory_limit = 16 << 20;
     a.cfg.init_timeout = 2000 * MS;
@@ -459,7 +462,7 @@ int main(int argc, char **argv)
         a = native("test:sleep2@0.1.0", NSLEEP2_PATH);
         load(b, &a);
         a = native("test:pinned@0.1.0", NPINNED_PATH);
-        a.cfg.pinned = true;
+        a.cfg.pinned = BRIDGE_TRUE;
         load(b, &a);
         frames(b, 3);
         /* the naps run beside it, on whichever threads: its own lines are the ones counted */
@@ -467,7 +470,7 @@ int main(int argc, char **argv)
         printf("pinned: %u of its %u calls were on the thread that loaded it\n", pins_here, pins);
     } else if (!strcmp(what, "wrongthread")) {
         a = native("test:pinned@0.1.0", NPINNED_PATH);
-        a.cfg.pinned = true;
+        a.cfg.pinned = BRIDGE_TRUE;
         load(b, &a);
         start_elsewhere(b, 0);
         join_elsewhere();

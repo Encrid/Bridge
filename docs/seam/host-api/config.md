@@ -29,9 +29,20 @@ its own, and the other, like any other negative number, is refused at load by th
 
 Refused: one value for both, which is what this had, under two names. `spawns` given the name of
 "no limit" compiled and meant "none", and every negative number was taken for -1. The condition
-that brings one value back is a key that takes both senses. A boolean
-cannot be unset. Left alone it is `false`, which is the off or the safe side for all six: `trusted`,
-`reloadable`, `hot_reload`, `pinned`, `validate`, `profile`.
+that brings one value back is a key that takes both senses.
+
+**A key that is yes or no is stated as either, and left alone it is refused.** It is not a
+boolean, which has no third state to be found in: it is `enum bridge_flag`, `BRIDGE_TRUE` or
+`BRIDGE_FALSE`, and its zero is `BRIDGE_UNSET`, the one place the unset state has a name, since
+here it sits beside the two answers. The keys are `trusted`, `reloadable`, `hot_reload` and
+`pinned`, and `validate` and `profile` when they exist. `tests/stage2.c`, case `unsetflag`.
+
+Refused: a boolean, left alone meaning false, which is what these were, on the ground that
+false was "the off or the safe side for all six". It is not for `pinned`: a module that needs
+the thread that loaded it, and was not said to, runs on any. And it was the one kind of key that
+meant something when nobody had stated it, against the paragraph above. No condition brings it
+back. Refused: an enum for each key, eight names for four answers. The condition that brings it
+back is a key that gains a third answer.
 
 What that protects against is not a missing key but a value nobody can account for. A host may layer
 its sources however it likes - a module author's stated values under a deployment's, say - as long
