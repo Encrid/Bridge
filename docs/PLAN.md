@@ -390,11 +390,3 @@ a name and a version, a list of phase names - is this phase's question to put, b
 frame is an order of magnitude under 42 us: if it is not, the architecture did not deliver and we
 find out here. And when what the port needed of a clock and of phases is written down, with the
 answer to whether it is shared.*
-
-## Not in this plan
-
-Each is refused or deferred in the document named, with the condition that would bring it in.
-
-    per-component page mapping       `costs.md`, *What we give up*
-    a phase exclusivity flag         `schedule.md`, *A phase is a name and nothing else*
-    an instance-grouping entry       `backend.md`, *What the backend does not do*

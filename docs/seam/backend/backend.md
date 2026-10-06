@@ -136,9 +136,12 @@ ceilings - so scoping them to one backend's concept would be wrong twice over.
 
 **What this gives up: a backend cannot be told to group instances.** It may group them internally -
 wasmtime could put several in one store - but Bridge-ASM700 has no way to ask and no reason to, since the
-grouping policy would be a decision shaped by one engine. The condition that would change the answer
-is a backend where instances **must** share state to be viable at all - one global heap for all of
-them, say - at which point a grouping entry belongs here and the instance is the wrong unit.
+grouping policy would be a decision shaped by one engine. A backend whose instances **must**
+share state to be viable at all - one interpreter for all of them, say - groups them itself, and
+if a deployment has to say which go together it says so in that backend's own settings, which
+Bridge-ASM700 passes through unread. The condition that would change the answer is such a backend
+for which that is not enough: one where what Bridge-ASM700 asks of an instance - its fuel, its
+timeout, its memory limit - cannot be honoured without Bridge-ASM700 knowing the group.
 
 The test each entry passes is that it means something to **every** backend. `module_compile` is
 compile-or-dlopen; `instance_set_fuel` is set-fuel-or-say-you-cannot, which is what `meter` in

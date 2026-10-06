@@ -32,10 +32,16 @@ its scratch arena and its log ring sit in a private memory no other module impor
 and `count` its arithmetic reads cannot be corrupted from outside - `memory.md`, *Where the seven
 regions live*. What stays exposed is the columns and the entity index. One thing would change that,
 and we decline it: reserve address space per component and map only a module's own columns into its
-memory, which `wasmtime_config_host_memory_creator_set` makes possible. It costs a per-component
-budget, platform-specific mapping code in Bridge-ASM700, and - the actual reason - TLB aliasing: one
-physical page mapped for N modules is N entries where one would do, on the inner loop this design
-exists to protect.
+memory, which `wasmtime_config_host_memory_creator_set` makes possible. What it costs can be
+counted. A mapping is made of whole pages, and on Windows a view begins on a boundary of 64 KB,
+where a table today is one packed block with its columns at multiples of eight bytes: every column
+of every table would need pages of its own, which for twenty thousand tables is gigabytes of
+address space around megabytes of data. A column that grows or moves would be unmapped and mapped
+again in every module that sees it, by system calls, at a barrier that otherwise costs tens of
+nanoseconds a change. It is one more rule for each storage layout, it helps only the wasm
+backend, and it is not the one block a backend adopts - `backend.md`, *Memory is adopted, not
+created*. It was first refused for the entries one page mapped N times takes in the TLB; that was
+never measured, and is not the reason.
 
 **The condition that would change the answer: Bridge-ASM700 being asked to run code the operator did not
 choose.** Modding is not that - a player installing a mod chose it - and no engine we looked at

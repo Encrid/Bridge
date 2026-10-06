@@ -415,8 +415,11 @@ A line is open until the commit that closes it is named beside it.
     terms a query                      [budget] terms                             81c347d
     bridge_budget                      counts then bytes; modules                 34e20cd
 
-**1. `PLAN.md`, *Not in this plan***: ten things "refused or deferred", not said which. Each is
-read in its document and becomes a phase, a refusal with its condition, or nothing.
+**1. `PLAN.md`'s "Not in this plan"**: ten things "refused or deferred", not said which. Each
+was read in its document and became a phase, a refusal with its condition, or nothing; and the
+section is gone, since a plan holds work and the documents hold what is refused. The last four
+were weighed as features first - is it relevant, does it serve what the project is for - which
+the first five were not, and should have been.
 
     closed  the journal, record and replay: a phase of its own, `PLAN.md` 15, with the
             library's half and the host's half named apart; and a case, now, that a run says
@@ -424,11 +427,14 @@ read in its document and becomes a phase, a refusal with its condition, or nothi
     closed  a default phase set, and bridge:clock@1 and its kind: one question. Nothing ships
             either; the first real deployment, `PLAN.md` 18, states its own and asks whether
             they are shared                                                           5c4e577
-    open    per-component page mapping
-    open    a phase exclusivity flag
+    closed  per-component page mapping: refused, for what can be counted, and no longer for
+            a cost that was never measured. `costs.md`
+    closed  a phase exclusivity flag: refused as it was. Everything it could be for has an
+            answer already: pinned, the conflict graph, one thread. `schedule.md`
     closed  memory high-water per module: wider than it said. How full every budget is, for
             the bridge and for each module, as a pull, in `PLAN.md` 14 and its done-when 1183284
-    open    an instance-grouping entry
+    closed  an instance-grouping entry: refused. A backend that must group does it itself,
+            and is told which by its own settings. `backend.md`
     closed  arena mark and reset: still refused, with its condition. What was behind it is
             not: a share goes back to the arena at unload unless a row still holds a string
             in it, so loading and unloading no longer ends in a restart              f3d7480
