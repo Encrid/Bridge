@@ -513,7 +513,8 @@ static int start(bridge_t *b, module_t *m, const bridge_artifact_t *a, enum back
     uint64_t need;
     int reloading = !strcmp(entry, "reload");
 
-    m->image = o->api.module_compile(o->be, a->bytes, a->len, a->path, demands, err);
+    m->image = o->api.module_compile(o->be, &(backend_source_t){ a->bytes, a->len, a->path, demands },
+        err);
     if (!m->image) return 1;
     if (private_memory(m, cfg, err)) return 1;
     block_header(b, m);
@@ -531,7 +532,7 @@ static int start(bridge_t *b, module_t *m, const bridge_artifact_t *a, enum back
             memories[memory_count ++] = (backend_memory_import_t){ BRIDGE_NAMESPACE, BRIDGE_PRIVATE, m->memory };
         }
     }
-    m->instance = o->api.instance_create(o->be, m->image, memories, memory_count, err);
+    m->instance = o->api.instance_create(m->image, memories, memory_count, err);
     if (!m->instance) return 1;
     if (abi_define(m, err)) return 1;
     if (cfg->memory_limit > 0) {

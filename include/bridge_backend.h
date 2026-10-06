@@ -107,6 +107,25 @@ static_assert(offsetof(backend_memory_import_t, memory) == 16);
  * anything else - docs/seam/backend/backend.md, *What a backend is asked for*. */
 constexpr uint32_t BACKEND_ABI = 1;
 
+/* What module_compile is handed. `demands` is the capability flags this module's config asks
+ * for: a backend need not compile in a guarantee nobody demanded, and may never enforce less
+ * than was. */
+typedef struct {
+    const void              *bytes;
+    size_t                   len;
+    const char              *path;
+    enum backend_capability  demands;
+} backend_source_t;
+
+/* What define_func is handed: an import a module may make, and what answers it. */
+typedef struct {
+    const char          *ns;
+    const char          *field;
+    backend_fn_t         fn;
+    void                *ud;
+    const backend_sig_t *sig;
+} backend_entry_t;
+
 typedef struct backend_api {
     uint32_t (*backend_get_abi)(void);          /* BACKEND_ABI. first, and always first */
     backend_t *(*backend_create)(const backend_setting_t *settings, uint32_t count, backend_err_t *err);
@@ -122,24 +141,21 @@ typedef struct backend_api {
     /* After the last instance the memory was handed to is destroyed, never before. */
     void            (*memory_release)(backend_memory_t *m);
 
-    /* `demands` is the capability flags this module's config asks for: a backend need not
-     * compile in a guarantee nobody demanded, and may never enforce less than was. */
-    backend_module_t *(*module_compile)(backend_t *b, const void *bytes, size_t len,
-                                      const char *path, enum backend_capability demands,
-                                      backend_err_t *err);
+    backend_module_t *(*module_compile)(backend_t *b, const backend_source_t *source,
+                                        backend_err_t *err);
     uint32_t        (*module_list_imports)(backend_module_t *m, backend_import_t *out, uint32_t max);
     void            (*module_destroy)(backend_module_t *m);
 
-    backend_instance_t *(*instance_create)(backend_t *b, backend_module_t *m,
-                                         const backend_memory_import_t *memories, uint32_t count,
-                                         backend_err_t *err);
+    /* An instance is of its module's backend. */
+    backend_instance_t *(*instance_create)(backend_module_t *m,
+                                           const backend_memory_import_t *memories,
+                                           uint32_t count, backend_err_t *err);
     void (*instance_destroy)(backend_instance_t *i);
     void (*instance_set_work_limit)(backend_instance_t *i, uint64_t units);
     void (*instance_set_timeout)(backend_instance_t *i, uint64_t nanos);     /* the next call only */
     void (*instance_set_memory_limit)(backend_instance_t *i, uint64_t bytes);
 
-    int (*define_func)(backend_instance_t *i, const char *ns, const char *field,
-                       backend_fn_t fn, void *ud, const backend_sig_t *sig, backend_err_t *err);
+    int (*define_func)(backend_instance_t *i, const backend_entry_t *entry, backend_err_t *err);
     /* An export that `call` can run: one that takes nothing of Bridge-ASM700's and answers a
      * status. nullptr, and why, if there is none of that name, or if the backend can see that
      * its shape is another. */

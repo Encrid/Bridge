@@ -302,9 +302,11 @@ BACKEND_EXPORT void memory_release(backend_memory_t *m)
 }
 
 BACKEND_EXPORT backend_module_t *module_compile(
-    backend_t *b, const void *bytes, size_t len, [[maybe_unused]] const char *path,
-    enum backend_capability demands, backend_err_t *err)
+    backend_t *b, const backend_source_t *source, backend_err_t *err)
 {
+    const void *bytes = source->bytes;
+    size_t len = source->len;
+    enum backend_capability demands = source->demands;
     /* a wasm module is its bytes */
     if (!bytes || !len) {
         fail(err, "this backend compiles a module from its bytes, and was handed none", nullptr, nullptr);
@@ -410,10 +412,11 @@ held:
     return nullptr;
 }
 
-BACKEND_EXPORT backend_instance_t *instance_create(backend_t *b, backend_module_t *m,
-                                                 const backend_memory_import_t *memories,
-                                                 uint32_t count, backend_err_t *err)
+BACKEND_EXPORT backend_instance_t *instance_create(backend_module_t *m,
+                                                   const backend_memory_import_t *memories,
+                                                   uint32_t count, backend_err_t *err)
 {
+    backend_t *b = m->b;
     backend_instance_t *i = calloc(1, sizeof *i);
     uint32_t k;
     i->b = b;
@@ -506,9 +509,12 @@ static void types(wasm_valtype_vec_t *vec, const uint8_t *kinds, uint32_t count)
     }
 }
 
-BACKEND_EXPORT int define_func(backend_instance_t *i, const char *ns, const char *field,
-                               backend_fn_t fn, void *ud, const backend_sig_t *sig, backend_err_t *err)
+BACKEND_EXPORT int define_func(backend_instance_t *i, const backend_entry_t *entry, backend_err_t *err)
 {
+    const char *ns = entry->ns, *field = entry->field;
+    backend_fn_t fn = entry->fn;
+    void *ud = entry->ud;
+    const backend_sig_t *sig = entry->sig;
     wasm_valtype_vec_t params, results;
     offered_fn_t *h;
     if (i->instantiated || sig->param_count > 16 || sig->result_count > 4) {

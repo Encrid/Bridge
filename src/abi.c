@@ -1005,8 +1005,8 @@ int abi_define(module_t *m, backend_err_t *err)
         backend_sig_t sig = { .params = entries[i].params, .param_count = entries[i].param_count,
                             .results = entries[i].results,
                             .result_count = entries[i].result_count };
-        if (m->on->api.define_func(m->instance, BRIDGE_NAMESPACE, entries[i].name, entries[i].fn,
-                                   m, &sig, err)) return 1;
+        if (m->on->api.define_func(m->instance, &(backend_entry_t){ BRIDGE_NAMESPACE, entries[i].name,
+                                   entries[i].fn, m, &sig }, err)) return 1;
     }
     return 0;
 }

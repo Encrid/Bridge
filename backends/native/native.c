@@ -152,9 +152,9 @@ BACKEND_EXPORT void memory_release(backend_memory_t *m)
 }
 
 BACKEND_EXPORT backend_module_t *module_compile(
-    [[maybe_unused]] backend_t *b, [[maybe_unused]] const void *bytes, [[maybe_unused]] size_t len,
-    const char *path, [[maybe_unused]] enum backend_capability demands, backend_err_t *err)
+    [[maybe_unused]] backend_t *b, const backend_source_t *source, backend_err_t *err)
 {
+    const char *path = source->path;
     backend_module_t *m;
     void *lib;
     /* a native module is its library */
@@ -196,9 +196,9 @@ BACKEND_EXPORT void module_destroy(backend_module_t *m)
     free(m);
 }
 
-BACKEND_EXPORT backend_instance_t *instance_create([[maybe_unused]] backend_t *b, backend_module_t *m,
-                                                 const backend_memory_import_t *memories,
-                                                 uint32_t count, [[maybe_unused]] backend_err_t *err)
+BACKEND_EXPORT backend_instance_t *instance_create(backend_module_t *m,
+                                                   const backend_memory_import_t *memories,
+                                                   uint32_t count, [[maybe_unused]] backend_err_t *err)
 {
     backend_instance_t *i = calloc(1, sizeof *i);
     uint32_t k;
@@ -237,10 +237,12 @@ BACKEND_EXPORT void instance_set_memory_limit(
     [[maybe_unused]] backend_instance_t *i, [[maybe_unused]] uint64_t bytes) { }
 
 /* The signature is the one bridge_native.h already declares, so only the pointer is kept. */
-BACKEND_EXPORT int define_func(backend_instance_t *i, const char *ns, const char *field,
-                               backend_fn_t fn, void *ud, [[maybe_unused]] const backend_sig_t *sig,
-                               backend_err_t *err)
+BACKEND_EXPORT int define_func(backend_instance_t *i, const backend_entry_t *entry, backend_err_t *err)
 {
+    [[maybe_unused]] const char *ns = entry->ns;
+    const char *field = entry->field;
+    backend_fn_t fn = entry->fn;
+    void *ud = entry->ud;
     uint32_t k;
     for (k = 0; k < ENTRIES; k ++) {
         if (!strcmp(ns, BRIDGE_NAMESPACE) && !strcmp(field, entry_names[k])) {

@@ -19,27 +19,27 @@ name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
 
 ## What a backend is asked for
 
-    backend_get_abi()                              -> the backend seam's number
-    backend_create(settings)                   -> backend
+    backend_get_abi()                           -> the backend seam's number
+    backend_create(settings)                    -> backend
     backend_destroy(backend)
-    backend_get_capabilities(backend)              -> flags
+    backend_get_capabilities(backend)           -> flags
 
-    memory_get_shape(backend)                      -> reservation, guard, granule
-    memory_adopt(backend, ptr, len)            -> memory
+    memory_get_shape(backend)                   -> reservation, guard, granule
+    memory_adopt(backend, ptr, len)             -> memory
     memory_release(memory)
-    module_compile(backend, bytes, len, path, demands) -> module
-    module_list_imports(module)                     -> names, and what each is
+    module_compile(backend, source)             -> module, from bytes, len, path, demands
+    module_list_imports(module)                 -> names, and what each is
     module_destroy(module)
 
-    instance_create(backend, module, memories, count) -> instance
+    instance_create(module, memories, count)    -> instance
     instance_destroy(instance)
     instance_set_work_limit(instance, units)
     instance_set_timeout(instance, nanos)
     instance_set_memory_limit(instance, bytes)
 
-    define_func(instance, namespace, field, fn, sig)
-    instance_get_func(instance, name)              -> func
-    call(func, status)                         -> err
+    define_func(instance, entry)                an entry: namespace, field, fn, ud, sig
+    instance_get_func(instance, name)           -> func
+    call(func, status)                          -> err
 
 Eighteen entries. The first says which backend seam the library was built against, and one of
 another is asked for nothing more - `host_api.md`, *A seam has a number*. The original Bridge's

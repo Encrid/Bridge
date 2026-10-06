@@ -358,6 +358,9 @@ built by the same script.
                                   `storage-tagbad` went with the refusal it was for: a tag
                                   cannot be handed a length any more. Every line within what
                                   two builds differ by, `detach` included
+    the backend seam              `module_compile(b, source, err)`, `instance_create(m,
+                                  memories, count, err)`, `define_func(i, entry, err)`, with
+                                  `backend_source_t` and `backend_entry_t`
 
 **What two builds differ by when their code is the same.** After the two renames the call of
 `spawn` measured 4.8 to 4.9 ns where the tree before measured 4.5 to 4.7, in whichever order

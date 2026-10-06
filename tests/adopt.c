@@ -35,7 +35,7 @@ static backend_instance_t *instance()
 {
     backend_err_t err = {};
     backend_memory_import_t imports[1] = {{ "bridge", "shared", memory }};
-    backend_instance_t *i = api.instance_create(be, module, imports, 1, &err);
+    backend_instance_t *i = api.instance_create(module, imports, 1, &err);
     if (!i) { printf("FAIL: instance_create: %s\n", err.text); exit(1); }
     return i;
 }
@@ -92,7 +92,7 @@ int main()
     memory = api.memory_adopt(be, block, 2 * PAGE, &err);
 
     void *bytes = read_file(MODULE_DIR "/adopt.wasm", &len);
-    module = api.module_compile(be, bytes, len, nullptr, 0, &err);
+    module = api.module_compile(be, &(backend_source_t){ bytes, len, nullptr, 0 }, &err);
     if (!module) { printf("FAIL: module_compile: %s\n", err.text); return 1; }
 
     /* 1. a module writes, the host reads the same bytes */
@@ -134,9 +134,9 @@ int main()
         backend_sig_t sig = { .params = params, .param_count = 2, .results = results,
             .result_count = 1 };
         void *host_bytes = read_file(MODULE_DIR "/host.wasm", &len);
-        backend_module_t *host = api.module_compile(be, host_bytes, len, nullptr, 0, &err);
-        backend_instance_t *hi = host ? api.instance_create(be, host, nullptr, 0, &err) : nullptr;
-        if (!hi || api.define_func(hi, "bridge", "ping", ping, nullptr, &sig, &err)
+        backend_module_t *host = api.module_compile(be, &(backend_source_t){ host_bytes, len, nullptr, 0 }, &err);
+        backend_instance_t *hi = host ? api.instance_create(host, nullptr, 0, &err) : nullptr;
+        if (!hi || api.define_func(hi, &(backend_entry_t){ "bridge", "ping", ping, nullptr, &sig }, &err)
             || run(hi, "init", &status, &err) || status != 16) {
             printf("FAIL: a host function: %d: %s\n", status, err.text);
             return 1;
@@ -154,11 +154,11 @@ int main()
         backend_sig_t sig = { .params = params, .param_count = 2, .results = results,
             .result_count = 1 };
         void *host_bytes = read_file(MODULE_DIR "/host.wasm", &len);
-        backend_module_t *timed = api.module_compile(be, host_bytes, len, nullptr, BACKEND_TIMEOUT, &err);
-        backend_instance_t *ti = timed ? api.instance_create(be, timed, nullptr, 0, &err) : nullptr;
+        backend_module_t *timed = api.module_compile(be, &(backend_source_t){ host_bytes, len, nullptr, BACKEND_TIMEOUT }, &err);
+        backend_instance_t *ti = timed ? api.instance_create(timed, nullptr, 0, &err) : nullptr;
         backend_func_t *f;
         int k;
-        if (!ti || api.define_func(ti, "bridge", "ping", ping, nullptr, &sig, &err)
+        if (!ti || api.define_func(ti, &(backend_entry_t){ "bridge", "ping", ping, nullptr, &sig }, &err)
             || !(f = api.instance_get_func(ti, "init", &err))) {
             printf("FAIL: timed calls: %s\n", err.text);
             return 1;
