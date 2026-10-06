@@ -73,8 +73,11 @@ An enum is four bytes signed and a bitmask four unsigned, which is what `BRIDGE_
 `BRIDGE_SCHEMA_BITMASK` state of them in each backend's SDK and so what a module's compiler lays out.
 Refused: reaching across namespaces for a field's type, which
 would need the descriptor to carry a namespace C has no syntax for. The condition that brings it
-back is a mod that must embed one of the game's structs in its own component, and until then it
-declares a struct of its own with the same body.
+back is a mod that must embed one of the game's structs in its own component and finds the copy
+a burden; until then it declares a struct of its own with the same body. That copy does not
+drift: a mod that reads the game's components includes the game's schema header, and declares
+its own type from the descriptor that header already holds, so the two are one text with one
+fingerprint. What it costs is one more of `[budget] types`.
 
 **The fingerprint of a component covers its own body, not the bodies of the types it names.** Those
 are declared, so each has a fingerprint of its own, checked where it is declared: a module built

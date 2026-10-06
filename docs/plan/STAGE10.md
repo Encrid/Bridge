@@ -614,7 +614,8 @@ Of earlier stages:
             work limit only, which is a net no module has to have and only its own module
             pays for. The refusal has a condition that is true now, and stage 17 measures
             the cost on real systems. `limits.md`, *What a bound costs*
-    open    a field's type is found in its own namespace only
+    closed  a field's type is found in its own namespace only: it holds, and why a copy
+            cannot drift is written. `schema.md`, *The type set*
     open    no phase names shipped, and a module writes its phase's name into its code
     open    no row for a barrier in the profile
     open    a stopped bridge takes only the load or reload of the module that stopped it
