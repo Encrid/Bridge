@@ -82,6 +82,7 @@ a list in its private memory, one record per entity that triggered it and the ev
 
     u64 id
     u32 events    ON_ENTER | ON_ATTACH | ON_LEAVE
+    u32 -         padding: zero, and not read
 
 It is called once per barrier, and only when the list is not empty. So an observer has at least
 one term: with none there is no change to subscribe to, and `observe` refuses it. It follows an id

@@ -495,7 +495,8 @@ at least five things, none defined, and none of them the one that was meant.
     closed  a setting defined twice, and differently, for a host and for a backend: twice
             on purpose, a seam's header being whole alone, and identical now. The library
             asserts the two shapes equal where it copies one to the other
-    open    `terms` in a module's header, which is not [budget] terms
+    closed  `terms` in a module's header, which is not [budget] terms: it is `types`, since
+            the pass over the words
     closed  three events, now that an observer is told the net change: three still, named
             for what they are. BRIDGE_ON_ENTER and BRIDGE_ON_LEAVE are about the
             observer's terms, BRIDGE_ON_ATTACH about the entry. `data.md`, *Observers*
@@ -503,7 +504,10 @@ at least five things, none defined, and none of them the one that was meant.
             opposite things. A key takes its own, and the other, like any negative that
             is neither, is refused at load: every negative had been taken for -1.
             `config.md`, *No unaccountable values*
-    open    the reserved fields, and the widths of the enums
+    closed  the reserved fields, and the widths of the enums: they are padding and are
+            named `pad`, zero when written and never read; an enum is four bytes as an
+            argument and one as a member. Both rules are in `bridge-abi.h` and in
+            `wasm.md`, *The ABI layouts*
     open    a signature the native backend cannot check
     open    a memory handle kept for a backend that does not exist
     open    why an enum is four bytes

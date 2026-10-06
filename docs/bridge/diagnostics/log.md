@@ -10,7 +10,7 @@ atomic. No call either, so a line costs stores rather than the 500 ns a call out
 in the original Bridge. Bridge-ASM700 drains every ring at each barrier.
 
     u32 when      barrier count, and offset within the phase
-    u8  -         reserved, to keep the stride at 24
+    u8  -         padding: zero, and not read
     u8  level     a severity: lower is worse
     u16 system    which system was running
     u32 text      offset into this module's scratch arena, always

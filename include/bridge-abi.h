@@ -1,10 +1,17 @@
 /* The module seam: what Bridge-ASM700 and every module both compile.
- * docs/modules/impl/wasm.md, *The published layouts*.
+ * docs/backends/wasm/wasm.md, *The ABI layouts*.
  *
  * It says how to find data and never what data there is: no component, no field. Everything
  * here is read by a module with plain loads, so every member is a fixed width and the structs
  * have no padding a compiler could place differently: each layout is asserted where it is
- * stated, and a module and Bridge-ASM700 that disagreed about one would not both compile. */
+ * stated, and a module and Bridge-ASM700 that disagreed about one would not both compile.
+ *
+ * A member named `pad` is that padding, written out so that every offset is stated. It means
+ * nothing: whoever writes the struct writes zero there, and nobody reads it.
+ *
+ * An enum has the width of where it goes. One that is an argument of an entry is four bytes,
+ * as every argument that is not an id is. One that is a member of a struct is one byte, which
+ * holds every value these have. `bridge_event` is both, and is four. */
 #ifndef BRIDGE_ABI_H
 #define BRIDGE_ABI_H
 
@@ -39,11 +46,11 @@ typedef struct {
     uint32_t           slot;
     enum bridge_access access;
     enum bridge_oper   oper;
-    uint16_t           reserved;
+    uint16_t           pad;
 } bridge_term;
 static_assert(sizeof(bridge_term) == 8 && alignof(bridge_term) == 4);
 static_assert(offsetof(bridge_term, slot) == 0 && offsetof(bridge_term, access) == 4);
-static_assert(offsetof(bridge_term, oper) == 5 && offsetof(bridge_term, reserved) == 6);
+static_assert(offsetof(bridge_term, oper) == 5 && offsetof(bridge_term, pad) == 6);
 
 /* observe's events, as a mask of these, and what an observer reads: who triggered it, and how.
  * Each is what a barrier made of an entity, against the observer's terms. ENTER: it did not
@@ -54,11 +61,11 @@ enum bridge_event : uint32_t { BRIDGE_ON_ENTER = 1, BRIDGE_ON_ATTACH = 2, BRIDGE
 typedef struct {
     uint64_t          id;
     enum bridge_event events;
-    uint32_t          reserved;
+    uint32_t          pad;
 } bridge_trigger;
 static_assert(sizeof(bridge_trigger) == 16 && alignof(bridge_trigger) == 8);
 static_assert(offsetof(bridge_trigger, id) == 0 && offsetof(bridge_trigger, events) == 8);
-static_assert(offsetof(bridge_trigger, reserved) == 12);
+static_assert(offsetof(bridge_trigger, pad) == 12);
 
 /* Offset 0 of the private memory: where each of this module's regions begins. Bridge-ASM700
  * writes all of it; a module writes `scratch_used` and `ring_head` and nothing else. */
@@ -125,14 +132,14 @@ enum bridge_log : uint8_t {
 /* A log record. `text` is an offset into the writer's scratch arena, always. */
 typedef struct {
     uint32_t when;
-    uint8_t  reserved;
+    uint8_t  pad;
     uint8_t  level;                     /* enum bridge_log: lower is worse */
     uint16_t system;
     uint32_t text, len;
     uint32_t arg[2];
 } bridge_log_record;
 static_assert(sizeof(bridge_log_record) == 24 && alignof(bridge_log_record) == 4);
-static_assert(offsetof(bridge_log_record, when) == 0 && offsetof(bridge_log_record, reserved) == 4);
+static_assert(offsetof(bridge_log_record, when) == 0 && offsetof(bridge_log_record, pad) == 4);
 static_assert(offsetof(bridge_log_record, level) == 5 && offsetof(bridge_log_record, system) == 6);
 static_assert(offsetof(bridge_log_record, text) == 8 && offsetof(bridge_log_record, len) == 12);
 static_assert(offsetof(bridge_log_record, arg) == 16);

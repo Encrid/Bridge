@@ -128,7 +128,7 @@ static inline void bridge_native_log(const bridge_api *api, uint32_t level, cons
     if (head - h->ring_tail >= h->ring_len) return;     /* full: dropped, and counted */
     r = (bridge_log_record *)(api->private_base + h->ring) + head % h->ring_len;
     r->when = h->when;
-    r->reserved = 0;
+    r->pad = 0;
     r->level = (uint8_t)level;
     r->system = (uint16_t)h->system;
     r->text = bridge_native_put(api, text, len);

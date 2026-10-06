@@ -1,5 +1,5 @@
 /* The wasm backend: the seventeen entries of bridge-backend.h, over wasmtime.
- * docs/seam/backend/impl/wasmtime.md is why it is shaped this way. */
+ * docs/backends/wasm/wasmtime.md is why it is shaped this way. */
 #include "bridge-backend.h"
 #include "os.h"
 

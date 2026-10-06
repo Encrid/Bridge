@@ -1,6 +1,6 @@
 /* What a wasm module written in C compiles against: the eight imports, the accessors of
  * bridge-wasm.wat, the schema shim, and the layouts of bridge-abi.h read through them.
- * docs/modules/impl/wasm.md and docs/modules/schema.md.
+ * docs/backends/wasm/wasm.md and docs/modules/schema.md.
  *
  * Nothing here is generated: sizeof, offsetof and _Generic compute at a module's build what a
  * generator would have had to be told. Every function is inline, so a module pays for what it

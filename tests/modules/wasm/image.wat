@@ -1,6 +1,6 @@
 ;; A module whose own memory starts with data: init answers 0 only if the first byte is the
 ;; "s" of the segment. wasmtime would lay such a segment down as a copy-on-write image, which
-;; a memory it did not map itself cannot take: docs/seam/backend/impl/wasmtime.md, *Memory*.
+;; a memory it did not map itself cannot take: docs/backends/wasm/wasmtime.md, *Memory*.
 (module
   (memory 1)
   (data (i32.const 0) "static")

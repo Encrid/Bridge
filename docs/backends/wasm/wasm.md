@@ -143,6 +143,26 @@ A module reads Bridge-ASM700's structures with plain loads, so both sides have t
 identically: the span, the private memory's header, the log record, the entity-index record,
 `column_base`'s indexing, an observer's list, and the pair a field holds for text.
 
+**No struct in it has padding a compiler places.** Where alignment leaves a gap, the gap is a
+member named `pad`, so that every offset is one the header states and asserts. It means nothing:
+whoever writes the struct writes zero, and nobody reads it. There are three, in a term, in an
+observer's record and in a log record.
+
+Refused: calling them `reserved`, which is what they were called. That is the word for bytes kept
+for a later use, and none is planned. Refused with it: Bridge-ASM700 refusing a module that left
+something other than zero there, which is what an interface does when it means to give such bytes
+a meaning later to programs already built. Here a changed ABI layout is a changed `BRIDGE_ABI`, and
+a module built against another is refused whole. The condition that brings the check back is an
+ABI layout changed under the same number.
+
+**An enum has the width of where it goes.** One that is an argument of an entry is four bytes, as
+every argument that is not an id is: `kind`, `on_unload`, `events`. One that is a member of a
+struct is one byte, which holds every value these have: a term's access and operator, a log
+record's level. Refused: widening those to two bytes so that a term and a log record need no
+`pad`. An observer's record would keep its own, so the rule above would still be needed, and a
+value of 1 to 3 in sixteen bits is the same empty bits without a name. The condition that brings
+it back is that no struct is then left with a `pad`.
+
 **One header, `bridge-abi.h`, compiled by Bridge-ASM700 and by every module, on either backend.** Nothing
 re-derives anything, so there is nothing to disagree about - the same argument that made the schema
 a header rather than a format. idTech3 did this with `g_public.h`, and its enforcement was a comment
