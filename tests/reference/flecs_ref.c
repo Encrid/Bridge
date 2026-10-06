@@ -1,5 +1,5 @@
 /* The work `storage measure` and `storage weigh` time, done by flecs: the reference each
- * storage layout is measured beside. docs/plan/STAGE11.md, *Beside the best there is*.
+ * storage layout is measured beside. docs/plan/stage11.md, *Beside the best there is*.
  *
  * Built and run by tools/reference.py against flecs at a pinned tag, which it fetches. Not
  * part of the library, and not built by build.py.

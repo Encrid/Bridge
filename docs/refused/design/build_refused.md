@@ -1,6 +1,6 @@
 # What was refused: The build
 
-The record of `build.md`: `README.md`, *Three layers, three seams*.
+The record of `build.md`: `readme.md`, *Three layers, three seams*.
 
 ## One compiler
 

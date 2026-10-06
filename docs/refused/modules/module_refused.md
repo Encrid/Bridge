@@ -1,6 +1,6 @@
 # What was refused: The module model
 
-The record of `module.md`: `README.md`, *Three layers, three seams*.
+The record of `module.md`: `readme.md`, *Three layers, three seams*.
 
 ## The manifest
 

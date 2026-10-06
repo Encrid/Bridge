@@ -1,6 +1,6 @@
 # What was refused: The runtime lifecycle
 
-The record of `lifecycle.md`: `README.md`, *Three layers, three seams*.
+The record of `lifecycle.md`: `readme.md`, *Three layers, three seams*.
 
 ## The runtime lifecycle
 

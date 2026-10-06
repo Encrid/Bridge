@@ -4,7 +4,7 @@ Done, on Windows, on Linux and on macOS.
 
 A third platform, arm64, straight after the build: with one compiler that takes its target as an
 argument it is one more target, and every stage after it is met on a second processor instead of
-finding out last. `PLAN.md` stage 8 is the claim.
+finding out last. `plan.md` stage 8 is the claim.
 
 ## What was settled first
 

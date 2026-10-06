@@ -1,6 +1,6 @@
 # What was refused: The log
 
-The record of `log.md`: `README.md`, *Three layers, three seams*.
+The record of `log.md`: `readme.md`, *Three layers, three seams*.
 
 ## The log
 

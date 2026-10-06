@@ -1,6 +1,6 @@
 # What was refused: When something fails
 
-The record of `failure.md`: `README.md`, *Three layers, three seams*.
+The record of `failure.md`: `readme.md`, *Three layers, three seams*.
 
 ## When something fails
 

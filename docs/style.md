@@ -1,6 +1,6 @@
 # Coding style
 
-How Bridge-ASM700's C is written. Why the tree has the shape it has is `DESIGN.md`; which C it is
+How Bridge-ASM700's C is written. Why the tree has the shape it has is `design.md`; which C it is
 written in is `build.md`, *The standard*.
 
 The coding style is a set of rules and conventions for:
@@ -86,6 +86,11 @@ For example, `string.c` and `algo.c` are probably badly named. `string_toolbox.c
 
 Every file name and folder name is in English and in snake_case: lowercase letters, digits and
 underscores, and nothing else.
+
+**That is every file and folder that is tracked**, a document and a transcript as much as a
+source: `host_api.md`, `stage12.md`, `storage_sparse.txt`. Two kinds of name are not ours to
+choose: one a tool asks for, which begins with a dot, and what is inside a folder somebody else
+published.
 
 Abbreviations are tolerated where they shorten the name by much and lose none of its meaning.
 

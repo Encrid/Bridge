@@ -1,6 +1,6 @@
 # What was refused: Signatures
 
-The record of `signatures.md`: `README.md`, *Three layers, three seams*.
+The record of `signatures.md`: `readme.md`, *Three layers, three seams*.
 
 ## A call takes nothing and answers a status
 

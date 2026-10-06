@@ -1,6 +1,6 @@
 # What was refused: Host API
 
-The record of `host_api.md`: `README.md`, *Three layers, three seams*.
+The record of `host_api.md`: `readme.md`, *Three layers, three seams*.
 
 ## A host links a built library
 
@@ -8,7 +8,7 @@ Of `host_api.md`, *A host links a built library*.
 
 Refused: a shared library only. It fails nothing, and it is one file fewer; it was not chosen,
 because a host that must be a single file with nothing beside it has no other way. The condition
-that brings it back is `PLAN.md`, stage 13, finding no host that needs a single file.
+that brings it back is `plan.md`, stage 13, finding no host that needs a single file.
 
 Refused: a static library only, which a language that can only load a shared library cannot use at
 all. No condition brings it back.

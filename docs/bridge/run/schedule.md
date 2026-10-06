@@ -58,7 +58,7 @@ and `ecs_pipeline_init` lets a world define its own instead. So they are an opti
 replaceable data, not names the library imposes. Here nothing ships one at all: not the library,
 and not a host, which hands over the phases its deployment stated. Whether a set of names ever
 becomes something deployments share is the question `no_builtins.md`, *No builtins*, puts for a
-clock, and it is asked where the first real deployment is built: `PLAN.md`, stage 17.
+clock, and it is asked where the first real deployment is built: `plan.md`, stage 17.
 
 flecs' phases carry `DependsOn` relationships, and `:942` records the care that needs -
 *"EcsOnUpdate doesn't have a direct DependsOn relationship on EcsPreUpdate, which ensures that when
@@ -106,7 +106,7 @@ a span be a snapshot. **Every phase, without exception**: `data.md`, *Structural
 the same frame rather than the next one. It costs one barrier a phase, and a barrier costs what
 changed - `query.md`, *The interface is a query* - and, beside that, a visit to each module to
 top up its ids, count its failures and drain its log: about a hundred nanoseconds in all with
-one module and nothing to do, measured. `STAGE10.md`, *What it costs*. It is what makes
+one module and nothing to do, measured. `stage10.md`, *What it costs*. It is what makes
 ordering worth having.
 
 ### An observer runs at the barrier, one hop per barrier
@@ -217,7 +217,7 @@ timeout are not interchangeable.
 changes on four threads and again on one, and what they say of their own account has to be the
 same file, word for word, on every run. `[checks] validate` hashes every column at every barrier
 - `validation.md`, *The checksum pass, when asked* - and with it the same is held barrier by
-barrier: `PLAN.md`, stage 14.
+barrier: `plan.md`, stage 14.
 
 It is stated here because an input path that bypassed a column would quietly make a pass depend
 on something nobody can see, and nothing later could recover that.

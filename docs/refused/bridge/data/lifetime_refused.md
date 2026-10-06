@@ -1,6 +1,6 @@
 # What was refused: Lifetime
 
-The record of `lifetime.md`: `README.md`, *Three layers, three seams*.
+The record of `lifetime.md`: `readme.md`, *Three layers, three seams*.
 
 ## What unload leaves behind
 
@@ -35,7 +35,7 @@ lost by an unload somebody else requested.
 ## When a component is moved
 
 Of `lifetime.md`, *When a component is moved*. What becomes of a row that is off, and what else
-was weighed, is in the record of `STAGE11.md`, *The questions*.
+was weighed, is in the record of `stage11.md`, *The questions*.
 
 Refused: moving a component where it stands, a table at a time, so that it never needs room for
 both. It is less memory for the length of a reload; and a move that fails half way has moved

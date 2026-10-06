@@ -1,6 +1,6 @@
 # What was refused: Schema
 
-The record of `schema.md`: `README.md`, *Three layers, three seams*.
+The record of `schema.md`: `readme.md`, *Three layers, three seams*.
 
 ## There is no schema format
 

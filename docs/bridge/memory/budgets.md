@@ -209,7 +209,7 @@ exists to refuse.
 **One floor has an argument and the rest do not.** A `log_ring` must hold at least one record: a
 module that cannot report anything is the one legal number that produces an incoherent deployment -
 `log.md`, *The log*, for why. `work_limit` and `memory_limit` have floors too, but they are measurements
-rather than arguments: `PLAN.md` stages 2 and 3 enforce them, and are where a number becomes
+rather than arguments: `plan.md` stages 2 and 3 enforce them, and are where a number becomes
 knowable.
 
 No budget has a floor that is storage's own: nothing of it is in the block before a module asks.

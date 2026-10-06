@@ -1,6 +1,6 @@
 # What was refused: The data model
 
-The record of `data.md`: `README.md`, *Three layers, three seams*.
+The record of `data.md`: `readme.md`, *Three layers, three seams*.
 
 ## Access mode
 

@@ -6,7 +6,7 @@ What Bridge-ASM700 is compiled with, for what, in which C, and against which C l
 is the design of the library. All of it decides whether the library can be built the same way on
 three systems by somebody who installed two tools.
 
-`PLAN.md` stages 7, 8, 9 and 12 build what this file states, one part each, and say which. Until a stage
+`plan.md` stages 7, 8, 9 and 12 build what this file states, one part each, and say which. Until a stage
 is done, its part here is the decision and not yet the tree.
 
 ## One compiler
@@ -38,7 +38,7 @@ CMake's work was to find and drive three compilers. With one compiler that takes
 argument, what is left is running commands in order, and `tools/` was Python already.
 
 It takes every path from where it is and from the output directory it is given, so that a host
-with this repository as a submodule builds it by calling the same script - `PLAN.md` stage 13.
+with this repository as a submodule builds it by calling the same script - `plan.md` stage 13.
 
 What this gives up: the rebuild check, the parallelism and the choice of tests are ours to get
 right, and an editor that reads CMake finds nothing to read.
@@ -107,7 +107,7 @@ what is needed:
 
 `tools/c23.py` runs with the tests and fails on an older spelling, which is what makes "fully" a
 claim that can be false. One spelling of C23 is not used: a function that takes nothing is
-`f(void)`, as `STYLE.md` rule F5 asks, and not `f()`.
+`f(void)`, as `style.md` rule F5 asks, and not `f()`.
 
 **Not used, each for a reason.** `<stdbit.h>` is the C library's, and with this compiler none of the
 four targets has it, the three platforms and wasm. `_BitInt`, `#embed` and `char8_t` have nothing
@@ -127,11 +127,11 @@ native backend used one to know which module had called, where it now passes the
 ## Where a function is
 
 **What runs once for a change or for a row is `static inline` in a header, and what runs once
-for a barrier or more rarely is in a `.c`.** A file holds five functions at most - `STYLE.md`,
+for a barrier or more rarely is in a `.c`.** A file holds five functions at most - `style.md`,
 rule O3 - and the compiler inlines a `static` function only into a caller of the same
 translation unit, so the functions a barrier's loop goes through are where every unit that
 loops over them can see them. Cut into `.c` files alone, every change was measured 35 to 85
-percent slower - `STAGE12.md`, *How a file of many functions is cut*.
+percent slower - `stage12.md`, *How a file of many functions is cut*.
 
 ## The C library
 
@@ -151,13 +151,13 @@ the C runtime zig carries.
 **What our source calls of it is eighteen functions**, counted in the library and the two
 backends: four that allocate, `memcpy`, `memmove`, `memset`, `memcmp`, `memchr`, `strlen`,
 `strcmp`, `strncmp`, `strchr`, `strpbrk`, `snprintf`, `vsnprintf`, `strtoll` and `strtoull`.
-No file, no stream, no `printf`, no floating point, no `qsort`. `PLAN.md`, stage 12, lists
+No file, no stream, no `printf`, no floating point, no `qsort`. `plan.md`, stage 12, lists
 them as a dependency and shortens the list where it can.
 
 **The door is one layer**, `utils/os/`: mapping, threads, loading a library and the clock are
 reached through it and nowhere else, and that is the only code that differs by platform. It
 depends on nothing of ours, and it is compiled into the library and into each backend, which
-are separate binaries - `STAGE12.md`, *One operating-system layer*.
+are separate binaries - `stage12.md`, *One operating-system layer*.
 
 ## Dependencies
 
@@ -167,7 +167,7 @@ SDK's accessors into a module and puts them inline - `wasm.md`, *Memories*. **Wh
 is linked against is the system's C library, and the wasm backend against wasmtime**, which is
 in the tree with where it came from and its hash beside it.
 
-Third-party code is not refused. A dependency nobody wrote down is: `PLAN.md`, stage 12, lists
+Third-party code is not refused. A dependency nobody wrote down is: `plan.md`, stage 12, lists
 every one with why it is there, and holds the list by a case.
 
 ## What an author is not bound by

@@ -1,6 +1,6 @@
 # What was refused: Modules on the wasm backend
 
-The record of `wasm.md`: `README.md`, *Three layers, three seams*.
+The record of `wasm.md`: `readme.md`, *Three layers, three seams*.
 
 ## A compiled module reaches them through accessors
 

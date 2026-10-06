@@ -3,7 +3,7 @@
  *
  *     stage6 <case>
  *
- * Each case is one clause of docs/PLAN.md stage 6 or one refusal the phase added, checked by
+ * Each case is one clause of docs/plan.md stage 6 or one refusal the phase added, checked by
  * the records it emits and by what bridge_list_modules answers. */
 #include "bridge.h"
 #include "bridge_abi.h"

@@ -1,6 +1,6 @@
 # What was refused: What bounds a run
 
-The record of `limits.md`: `README.md`, *Three layers, three seams*.
+The record of `limits.md`: `readme.md`, *Three layers, three seams*.
 
 ## What a bound costs
 
@@ -14,7 +14,7 @@ running at once do not fit. Against that: the factors above are the worst there 
 addition, and nothing has measured the work limit on a system that does real work; and a module that
 finds it too dear states none. The condition that brings a system's timeout back is a deployment
 that wants a net on a module, has measured the work limit as too dear on that module's own systems,
-and accepts a stop that is not reproduced. `PLAN.md`, stage 17, measures the first half. This
+and accepts a stop that is not reproduced. `plan.md`, stage 17, measures the first half. This
 refusal's condition was "record and replay being given up for good", and record and replay had
 become a host's.
 

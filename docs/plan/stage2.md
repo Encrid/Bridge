@@ -78,7 +78,7 @@ ends with the reason, so the backend reports the part after "wasm trap: ".
 
 ## Open questions
 
-None for this stage. Three were raised for the next and wait in `STAGE3.md`.
+None for this stage. Three were raised for the next and wait in `stage3.md`.
 
 ## What would make us stop
 

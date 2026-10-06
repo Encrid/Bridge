@@ -1,16 +1,16 @@
 # What was refused: Storage
 
-The record of `storage.md`: `README.md`, *Three layers, three seams*.
+The record of `storage.md`: `readme.md`, *Three layers, three seams*.
 
 ## Storage layouts
 
 Of `storage.md`, *Storage layouts*. Who states a component's storage layout, and what else was
-weighed for each of the five, is in the record of `STAGE11.md`, *The questions*.
+weighed for each of the five, is in the record of `stage11.md`, *The questions*.
 
 ## A sparse set
 
 Of `storage.md`, *A sparse set*. What form its index has, and what else was weighed, is in the
-record of `STAGE11.md`, *The questions*.
+record of `stage11.md`, *The questions*.
 
 Refused: a sparse set written as a second thing beside tables, with its own block, growth,
 spans and publishing. It is kept as a table of one type, and those are the table's. The
@@ -19,7 +19,7 @@ condition that brings it back is a sparse set that needs a shape a table's block
 ## A toggle
 
 Of `storage.md`, *A toggle*. How a row is switched, where its bits are found, and what else was
-weighed, is in the record of `STAGE11.md`, *The questions*.
+weighed, is in the record of `stage11.md`, *The questions*.
 
 Refused: a helper in each SDK that walks the rows that are on. A module is handed the bits, and
 which loop reads them best depends on how many are on, which only its author knows. The
@@ -28,7 +28,7 @@ condition that brings it back is the same loop written out in three modules.
 ## Direct-indexed
 
 Of `storage.md`, *Direct-indexed*. Whether a cell with no value can be told from one that has
-one, and what else was weighed, is in the record of `STAGE11.md`, *The questions*.
+one, and what else was weighed, is in the record of `stage11.md`, *The questions*.
 
 Refused: a system that walks a direct-indexed component, every cell in turn. It would walk the
 cells of entities that were given nothing and of places no entity has, testing a bit at each,
@@ -39,11 +39,11 @@ being in a table.
 ## A singleton
 
 Of `storage.md`, *A singleton*. How it is given its value, whether a module's settings must be
-one, and what else was weighed, is in the record of `STAGE11.md`, *The questions*.
+one, and what else was weighed, is in the record of `stage11.md`, *The questions*.
 
 ## A tag
 
-Of `storage.md`, *A tag*. Whether there is one at all is in the record of `STAGE11.md`, *The
+Of `storage.md`, *A tag*. Whether there is one at all is in the record of `stage11.md`, *The
 questions*.
 
 Refused: a tag as a field's type. It has no bytes for a field to be, and a struct that names
@@ -52,7 +52,7 @@ one is refused as naming a type nobody declared. No condition brings it back.
 ## What a query walks
 
 Of `storage.md`, *What a query walks*. What was weighed against it is in the record of
-`STAGE11.md`, *The questions*.
+`stage11.md`, *The questions*.
 
 ## A table
 
@@ -71,7 +71,7 @@ sixteen bytes at once, measured as losing by it.
 
 Refused: keeping an emptied table for the next entity of that set, as flecs does. It would save
 making the table again, and it costs what makes the count unbounded: every set ever seen stays, and
-a quiet barrier pays for all of them. `STAGE10.md`, *What it costs*, measures the case this could
+a quiet barrier pays for all of them. `stage10.md`, *What it costs*, measures the case this could
 lose - ten thousand sets filled at one barrier and emptied at the next - and it does not. The
 condition that brings it back is a workload where that line does lose.
 
@@ -91,4 +91,4 @@ Of `storage.md`, *What is asked of it*.
 Refused: making storage swappable as a backend is. A backend abstracts a behaviour, and storage
 would have to abstract a memory layout - a span's `base[]` *are* offsets into its columns - so a
 second implementation would be shaped by the first. The condition that brings it back is the storage
-layouts of `PLAN.md`, stage 11, not fitting inside one implementation.
+layouts of `plan.md`, stage 11, not fitting inside one implementation.

@@ -6,7 +6,7 @@ Who keeps the rows, and how. The model a module sees is `data.md`; what it reads
 `reference.md`; which block each thing is in is `memory.md`.
 
 Storage is Bridge-ASM700's own: `src/storage.c`, behind the one internal header `src/storage.h`. Until
-stage 10 it was flecs, patched. Why that changed, and the figures it changed on, are `STAGE10.md`;
+stage 10 it was flecs, patched. Why that changed, and the figures it changed on, are `stage10.md`;
 what flecs was while it was carried is kept as `flecs.md`, a record and no longer a description.
 
 ## Made for what the bridge promises
@@ -53,7 +53,7 @@ another is refused at its load, and the refusal names both storage layouts and t
 declare the component already, as for a component layout that differs - `lifetime.md`, *When a
 component layout changed*.
 
-What each was weighed on, measured, and what a module is handed for each, is `STAGE11.md`, *The
+What each was weighed on, measured, and what a module is handed for each, is `stage11.md`, *The
 gate* and *The questions*.
 
 ## A table
@@ -163,7 +163,7 @@ is switched by one store: 3 ns a row measured, with the draw that says which way
 and an attach to say the same are 58 ns at the barrier and 18 more in the two calls, and 1,013
 at the barrier for an entity that carries 4 KB. What it does
 not beat is a field tested by a mask, which a compiler makes of a small enough loop: 12 us at
-any share, measured in scratch - `STAGE11.md`, *The gate*.
+any share, measured in scratch - `stage11.md`, *The gate*.
 
 ## Direct-indexed
 
@@ -270,7 +270,7 @@ the entities in the set, whose `entities` are their ids and whose base is their 
 three things a table's span is, read by the same loop. Its other terms are optional, and are
 reached by id - `reference.md`, *Reference following*.
 
-What was weighed against this is the record of `STAGE11.md`, *The questions*.
+What was weighed against this is the record of `stage11.md`, *The questions*.
 
 ## A barrier is worked an entity at a time
 
@@ -332,7 +332,7 @@ itself and whoever reads them after; it does not change what storage does next.
 array, and then moves and destroys rows.
 
 That was not so under flecs. Its table read the id of the row it had moved from the array the
-patch had put in the block, and acted on it - `STAGE10.md`, *Not a freestanding flecs*.
+patch had put in the block, and acted on it - `stage10.md`, *Not a freestanding flecs*.
 
 Component bytes are different, and stay so: a column in the block *is* the data, and a module
 that writes a term it has is doing what it is for - `data.md`, *Access mode*.

@@ -3,12 +3,12 @@
 Done, on Windows and on Linux.
 
 A module could load, run, and fail one invocation at a time. Now it can be stopped, unloaded,
-reloaded and configured, and a host can ask what is running. `PLAN.md` stage 6 is the claim. This
+reloaded and configured, and a host can ask what is running. `plan.md` stage 6 is the claim. This
 document is what the stage built and what it found on the way.
 
 ## What was settled first
 
-Thirteen questions, each by every step of `STAGE0.md`, and each applied to the document it belongs
+Thirteen questions, each by every step of `stage0.md`, and each applied to the document it belongs
 to.
 
     what a reload runs            the new instance's reload, then the old one's shutdown:
@@ -52,7 +52,7 @@ A share could not change at all, where every other budget changes by reload. A s
 terminal, which made reload useless for the modules a deployment calls essential. And table ids
 were retired on Bridge-ASM700's decision to delete a component rather than on flecs freeing the
 table, which missed two ways a table is freed. "Forced by the documents" was the same mistake four
-times: a choice with a justification bolted on, which is what `STAGE0.md` step 4 warns of.
+times: a choice with a justification bolted on, which is what `stage0.md` step 4 warns of.
 
 The thirteenth came out of reading for one of those. `bridge_destroy` had been discarding modules
 without calling their `shutdown`, against what `wasm.md` says of that export; it calls every one

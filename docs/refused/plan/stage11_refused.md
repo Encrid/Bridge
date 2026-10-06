@@ -1,10 +1,10 @@
 # What was refused: Stage 11
 
-What was weighed in `STAGE11.md` and refused, each with the condition that would bring it back.
+What was weighed in `stage11.md` and refused, each with the condition that would bring it back.
 
 ## The questions
 
-Of `STAGE11.md`, *The questions*.
+Of `stage11.md`, *The questions*.
 
 Refused: a component's storage layout stated in the manifest. It is the same statement moved
 away from the code that depends on it, with nothing to hold the two together. No condition

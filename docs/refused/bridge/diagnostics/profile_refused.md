@@ -1,6 +1,6 @@
 # What was refused: The profile
 
-The record of `profile.md`: `README.md`, *Three layers, three seams*.
+The record of `profile.md`: `readme.md`, *Three layers, three seams*.
 
 ## The profile
 

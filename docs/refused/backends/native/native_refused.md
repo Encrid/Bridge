@@ -1,6 +1,6 @@
 # What was refused: Modules on the native backend
 
-The record of `native.md`: `README.md`, *Three layers, three seams*.
+The record of `native.md`: `readme.md`, *Three layers, three seams*.
 
 ## Lifecycle
 

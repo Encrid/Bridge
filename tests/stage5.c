@@ -2,7 +2,7 @@
  *
  *     stage5 <case>
  *
- * Each case is one clause of docs/PLAN.md stage 5, checked by the records it emits. A record is
+ * Each case is one clause of docs/plan.md stage 5, checked by the records it emits. A record is
  * printed with the barrier count it was written under, since two of the claims are about which
  * barrier something happened at. */
 #include "bridge.h"

@@ -15,13 +15,13 @@
  *     storage measure     nanoseconds for each kind of change, at a barrier
  *     storage weigh       what the one storage layout there is costs where it is weakest: a
  *                         change to an entity that carries a lot, and a system whose rows are
- *                         spread over many tables. docs/plan/STAGE10.md, *The repair*
+ *                         spread over many tables. docs/plan/stage10.md, *The repair*
  *     storage baseline    what it costs at the work no storage layout exists for yet: a
  *                         component switched off by a field, a value reached by id, one
- *                         value for everything. docs/plan/STAGE11.md, *The baseline*
+ *                         value for everything. docs/plan/stage11.md, *The baseline*
  *
  * The first two are a transcript and decide nothing themselves: build.py holds what it must
- * say. It is the same whatever stores the rows, which is the point - docs/plan/STAGE10.md.
+ * say. It is the same whatever stores the rows, which is the point - docs/plan/stage10.md.
  * The third is a measurement, and passes by running. From inside, for the barrier alone. */
 #include "inside.h"
 
@@ -31,7 +31,7 @@
 
 /* What the process holds, in KB: the block's touched pages and everything outside it. Asked of
  * the operating system, so that it is the same question whatever keeps the rows. The figures of
- * docs/plan/STAGE10.md are taken on Windows, and elsewhere this says nothing. */
+ * docs/plan/stage10.md are taken on Windows, and elsewhere this says nothing. */
 #ifdef _WIN32
 typedef struct {
     uint32_t cb, faults;

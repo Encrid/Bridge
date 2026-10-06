@@ -1,6 +1,6 @@
 # Stage 12: one style, every platform, few dependencies
 
-In progress. `PLAN.md`, stage 12, is what it is for and when it is done. This document is the
+In progress. `plan.md`, stage 12, is what it is for and when it is done. This document is the
 order it is done in, what is measured, and each decision as it is taken.
 
 ## What it replaced
@@ -12,8 +12,8 @@ was made, and then it was dropped for this. What the experiment found is in the 
 
 ## The order
 
-    1  the style         `STYLE.md`: the Epitech C Coding Style 3.1, made the project's own
-    2  the stage         this document and `PLAN.md`
+    1  the style         `style.md`: the Epitech C Coding Style 3.1, made the project's own
+    2  the stage         this document and `plan.md`
     3  the checker       `tools/style.py`, from scratch, run with the tests over the paths
                          that are clean, a list that only grows
     4  the decisions     what shapes files, before any is rewritten: one operating-system
@@ -30,7 +30,7 @@ was made, and then it was dropped for this. What the experiment found is in the 
 
     what the style covers     all C of ours, the tests and their modules included. Not Python
     its numbers               hard: a breach fails, and an exception is an entry of
-                              `STYLE.md`, *Exceptions*, with its reason
+                              `style.md`, *Exceptions*, with its reason
     the seams                 not excepted: `_t` on the public types, four arguments an entry.
                               Excepting the module ABI's arguments was proposed and had no
                               reason: the entries over four run at load, and the ones a phase
@@ -225,7 +225,7 @@ were a participle (`moved`, `killed`, `carried`), an adjective (`alive`, `empty`
 (`set_of`, `value_of`, `fingerprint`). **A fixed set, everywhere**: `is_` or `has_` for what
 answers yes or no, `get_` for what answers something held and changes nothing, and the verb of
 what it does for everything else. The seams follow, keeping what they belong to first:
-`bridge_get_rows`, `os_get_now`, `storage_is_alive`. It is written in `STYLE.md`, rule F2, since
+`bridge_get_rows`, `os_get_now`, `storage_is_alive`. It is written in `style.md`, rule F2, since
 a reader holds it and no program can.
 
     fast          nothing
@@ -338,8 +338,11 @@ built by the same script.
                                   of ours, at Enkrid's word: 63 documents and transcripts lose
                                   their hyphen, `host_api.md`, `build_refused.md`,
                                   `storage_sparse.txt`. `tools/xref.py` had matched only names
-                                  in lower case, so a citation of `PLAN.md` or of a stage's
+                                  in lower case, so a citation of `plan.md` or of a stage's
                                   document was never checked: it reads every name now
+    and in lower case             19 documents whose names had capitals: `readme.md`, `plan.md`,
+                                  `style.md`, `design.md`, and every stage's. `tools/style.py`
+                                  holds rule O4 for every tracked file and folder of ours
     the verb, at the seams        43 names: `bridge_run_phase`, `bridge_list_modules`,
                                   `bridge_get_span`, `bridge_count_rows`, `bridge_is_alive`,
                                   `backend_get_abi`, `os_get_now`, and the rest of the table

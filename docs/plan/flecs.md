@@ -1,7 +1,7 @@
 # flecs
 
 **A record, not a description.** flecs was removed in stage 10, and nothing below is true of the
-tree any more: `STAGE10.md` is why, and `storage.md` is what keeps the rows now. This is kept
+tree any more: `stage10.md` is why, and `storage.md` is what keeps the rows now. This is kept
 because the phases before that one cite it, and because the reasoning it holds is what stage 10
 was weighed against.
 
@@ -28,8 +28,8 @@ which is a copy or a call per access - the cost we are here to remove.
 
 ## Why flecs rather than our own
 
-**This is the decision `PLAN.md` stage 10 reverses**, and what follows is the reasoning it was
-made on. `STAGE10.md` is what changed: flecs turned out not to be on the path that repeats, and
+**This is the decision `plan.md` stage 10 reverses**, and what follows is the reasoning it was
+made on. `stage10.md` is what changed: flecs turned out not to be on the path that repeats, and
 to cost a hundred thousand lines and fifty C library functions for forty-one calls. This document
 describes flecs as it is carried until that phase's gate is passed.
 

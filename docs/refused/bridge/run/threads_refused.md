@@ -1,6 +1,6 @@
 # What was refused: Threads
 
-The record of `threads.md`: `README.md`, *Three layers, three seams*.
+The record of `threads.md`: `readme.md`, *Three layers, three seams*.
 
 ## Threads
 
@@ -9,7 +9,7 @@ is the one model that would speed up a single loop, and it needs an instance of 
 thread, so that spans, the queue of changes and the count of failures all become an instance's, and
 a system that keeps anything between rows breaks. Nothing measured asks for it. The condition that
 brings it back is a deployment, measured, in which one system takes most of a phase while other
-threads have nothing to run: `PLAN.md`, stage 17, measures that.
+threads have nothing to run: `plan.md`, stage 17, measures that.
 
 Refused: task parallelism inside a module, its systems that do not conflict run at once. Each would
 need an instance of its own for the same reason, and it helps a module of many small systems and not

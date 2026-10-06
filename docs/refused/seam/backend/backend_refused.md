@@ -1,6 +1,6 @@
 # What was refused: The backend surface
 
-The record of `backend.md`: `README.md`, *Three layers, three seams*.
+The record of `backend.md`: `readme.md`, *Three layers, three seams*.
 
 ## What a backend is asked for
 

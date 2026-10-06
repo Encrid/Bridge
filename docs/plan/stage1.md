@@ -14,7 +14,7 @@ not tell you which*. This document is what the stage built and what it found on 
 
     third_party/flecs/flecs.c     pristine: the v4.1.6 release, as published
     third_party/flecs/flecs.h     pristine
-    third_party/flecs/README.md   version, commit, hashes, licence, and that we patch a copy
+    third_party/flecs/readme.md   version, commit, hashes, licence, and that we patch a copy
     tools/patch-flecs.py          the edits, gated on the version and on a hash
     tests/workload.h              what both tests run
     tests/confined.c              no pointer a module reads lands outside the block

@@ -1,6 +1,6 @@
 # What was refused: Threads
 
-The record of `pinned.md`: `README.md`, *Three layers, three seams*.
+The record of `pinned.md`: `readme.md`, *Three layers, three seams*.
 
 ## Threads
 

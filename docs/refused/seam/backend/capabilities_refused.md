@@ -1,6 +1,6 @@
 # What was refused: Capabilities, so the swap is honest
 
-The record of `capabilities.md`: `README.md`, *Three layers, three seams*.
+The record of `capabilities.md`: `readme.md`, *Three layers, three seams*.
 
 ## Capabilities, so the swap is honest
 

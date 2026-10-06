@@ -1,6 +1,6 @@
 # What was refused: Create
 
-The record of `create.md`: `README.md`, *Three layers, three seams*.
+The record of `create.md`: `readme.md`, *Three layers, three seams*.
 
 ## Destroy
 

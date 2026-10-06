@@ -15,7 +15,7 @@ cycle is visible in it, `schedule.md`, *An observer runs at the barrier, one hop
         uint8_t     pad[7];
     } bridge_profile_row;
 
-It is not built: `PLAN.md`, stage 14. What is here is what that stage builds.
+It is not built: `plan.md`, stage 14. What is here is what that stage builds.
 
 **A pull, not records**, for the reason `log.md`, *The log* gives against itself: that ring is *"Drop and
 count, never block"*. A dropped log line is a missing line; a dropped profile record is a **biased
@@ -56,7 +56,7 @@ regions live*, calls `spans` a key "a deployment is expected to correct", and no
 what to correct it to but the refusal when it runs out. So a second pull, beside this one: for
 the bridge, what is in use and the most that ever was against each `[budget]` key; for each
 module, the same against each of its own. They are numbers the library keeps already, with a
-mark kept where it kept only the present value. `PLAN.md`, stage 14.
+mark kept where it kept only the present value. `plan.md`, stage 14.
 
 It is a pull for the reason the profile is. What to do with the numbers - print them, and when -
 is the host's.

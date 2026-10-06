@@ -1,6 +1,6 @@
 # What was refused: The interface is a query
 
-The record of `query.md`: `README.md`, *Three layers, three seams*.
+The record of `query.md`: `readme.md`, *Three layers, three seams*.
 
 ## The interface is a query
 

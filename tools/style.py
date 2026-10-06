@@ -1,4 +1,4 @@
-"""The coding style, held: docs/STYLE.md, rule by rule, for every rule a program can hold.
+"""The coding style, held: docs/style.md, rule by rule, for every rule a program can hold.
 
     python tools/style.py              the paths that are held clean, and the self-test
     python tools/style.py --all        every C file of ours, with a count for each rule
@@ -10,7 +10,7 @@ a function's body is cut into statements. It is no compiler, and it does not nee
 Not held, since no program reading text can: F1 and O3's coherence, the verb F2 asks a name
 for, V2, A1, A2, and whether a ternary is simple (C2). A reader holds those.
 
-An infringement that docs/STYLE.md, *Exceptions*, lists is not reported, and an exception that
+An infringement that docs/style.md, *Exceptions*, lists is not reported, and an exception that
 excuses nothing is. The paths in HELD only ever grow: a file that was made clean stays clean.
 """
 import fnmatch
@@ -562,9 +562,9 @@ def check(path, text, declared):
 
 
 def exceptions():
-    """docs/STYLE.md, *Exceptions*: a rule, a path that may hold wildcards and may end in
+    """docs/style.md, *Exceptions*: a rule, a path that may hold wildcards and may end in
     :function, and the reason, on a line indented by four."""
-    text = (ROOT / 'docs/STYLE.md').read_text(encoding='utf-8')
+    text = (ROOT / 'docs/style.md').read_text(encoding='utf-8')
     listed = []
     for line in text.split('## Exceptions', 1)[1].split('\n'):
         m = re.match(r'    ([A-Z]\d)\s+(\S+)\s+\S', line)
@@ -591,13 +591,20 @@ def prototypes():
 
 def tracked():
     """O1: nothing a build makes is in the repository. What somebody else built and published
-    is told apart by the licence its folder holds."""
+    is told apart by the licence its folder holds. O4: every file and folder of ours that is
+    tracked is named in snake_case, but one a tool names, which begins with a dot."""
     listed = subprocess.run(['git', 'ls-files'], cwd=ROOT, capture_output=True, text=True).stdout.split('\n')
     theirs = tuple(path.rsplit('/', 1)[0] + '/' for path in listed
                    if re.search(r'/(?:LICENSE|LICENCE|COPYING)[^/]*\Z', path))
     unwanted = re.compile(r'\.(?:o|obj|a|so|dll|dylib|exe|gch|d|pyc)\Z|~\Z|(?:\A|/)#[^/]*#\Z|(?:\A|/)a\.out\Z')
-    return [(path, 1, 'O1', 'a compiled, temporary or unnecessary file is tracked', None)
-            for path in listed if unwanted.search(path) and not path.startswith(theirs)]
+    ours_only = [path for path in listed if path and not path.startswith(theirs + ('.',))]
+    found = [(path, 1, 'O1', 'a compiled, temporary or unnecessary file is tracked', None)
+             for path in ours_only if unwanted.search(path)]
+    for path in ours_only:
+        for part in path.split('/'):
+            if not re.match(r'[a-z0-9_]+(?:\.[a-z0-9]+)*\Z', part):
+                found.append((path, 1, 'O4', "'%s' is not in snake_case" % part, None))
+    return found
 
 
 # a rule, and C that infringes it and nothing else of what a line shows
@@ -672,7 +679,7 @@ def main():
             kept.append((path, line, rule, what))
     for entry in listed:
         if not entry[3] and any(fnmatch.fnmatch(p, entry[1]) for p in paths + [f[0] for f in found]):
-            kept.append(('docs/STYLE.md', 1, entry[0], "the exception for '%s' excuses nothing" % entry[1]))
+            kept.append(('docs/style.md', 1, entry[0], "the exception for '%s' excuses nothing" % entry[1]))
     if everything:
         counts = {}
         for _, _, rule, _ in kept:

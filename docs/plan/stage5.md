@@ -3,12 +3,12 @@
 Done. The `linux` preset was first run after stage 5, and passed as written.
 
 The stage replaced "registration order, one at a time" with the schedule `schedule.md` describes: a
-conflict graph, `[order]`, observers at the barrier, threads, and `pinned`. `PLAN.md` stage 5 is
+conflict graph, `[order]`, observers at the barrier, threads, and `pinned`. `plan.md` stage 5 is
 the claim. This document is what the stage built and what it found on the way.
 
 ## What was settled first
 
-Four questions, each by the method of `STAGE0.md`, and each applied to the document it belongs to.
+Four questions, each by the method of `stage0.md`, and each applied to the document it belongs to.
 
     what an observer reads            the ids that triggered it, and the events:
                                       `abi.md`, *The ABI*
@@ -110,7 +110,7 @@ enum had no layout until the next barrier. It ends it now, for the length of the
 **Linux.** Five stages had been met on Windows alone. Every source was cross-compiled and linked
 for Linux with zig, clean under `-Wall -Wextra`; then `.github/workflows/linux.yml` ran the `linux`
 preset on a real one, and all sixty-three tests passed on the first run. It runs on every push now -
-`PLAN.md`, at its head.
+`plan.md`, at its head.
 
 **Every shortcut that was marked in the code**, since a shortcut with a note beside it is deferred
 work, and deferred work and its documents drift apart:
@@ -156,7 +156,7 @@ gone with it: nothing reaches flecs outside a barrier or a load.
 
 `undo` is the other thing this closed. A failed load now takes back the ids it was given, its
 share of the arena and every component nobody else declared, and what it queued goes with its
-queue. That was `PLAN.md` stage 6's clause, and stage 6 now only has to keep it true for unload.
+queue. That was `plan.md` stage 6's clause, and stage 6 now only has to keep it true for unload.
 
 ## Nothing left
 

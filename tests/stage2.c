@@ -2,7 +2,7 @@
  *
  *     stage2 <case>
  *
- * Each case is one claim of docs/PLAN.md stage 2. build.py checks a refusal by the record it
+ * Each case is one claim of docs/plan.md stage 2. build.py checks a refusal by the record it
  * emits, not by a return code alone, and every case ends by printing "alive". */
 #include "bridge.h"
 #include "bridge_abi.h"

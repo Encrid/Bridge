@@ -1,6 +1,6 @@
 /* What the one storage layout there is costs at three kinds of work it was not chosen for, so
  * that a storage layout made for one of them has a figure to be weighed beside. Each is done
- * the way a module does it today. docs/plan/STAGE11.md, *The baseline*.
+ * the way a module does it today. docs/plan/stage11.md, *The baseline*.
  *
  *     flag      a component an entity always has and sometimes does not use: a field says
  *               whether, and the loop tests it at every row. One row in ON has it set

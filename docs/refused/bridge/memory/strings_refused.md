@@ -1,6 +1,6 @@
 # What was refused: Variable length
 
-The record of `strings.md`: `README.md`, *Three layers, three seams*.
+The record of `strings.md`: `readme.md`, *Three layers, three seams*.
 
 ## It is given back when nothing points into it
 

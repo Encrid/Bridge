@@ -1,7 +1,7 @@
 /* What reaching a value by entity id costs with nothing in the way: a C array with a cell for
  * every entity, the id's generation tested and a bit that says the entity has a value. No ECS
  * ships a direct-indexed storage layout to measure ours beside, so this is the least it could
- * cost. docs/plan/STAGE11.md, *Beside the best there is*.
+ * cost. docs/plan/stage11.md, *Beside the best there is*.
  *
  * Built and run by tools/reference.py. Not part of the library, and not built by build.py. */
 #include <stdint.h>

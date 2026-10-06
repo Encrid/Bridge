@@ -66,7 +66,7 @@ parameter in a header every native module compiles.
 process with it, which is what `sandbox = no` says.
 
 **`bridge_reload` and `bridge_shutdown` are not called yet.** Neither is a wasm module's; both
-arrive with unload and reload in `PLAN.md` stage 6.
+arrive with unload and reload in `plan.md` stage 6.
 
 **The manifest section is not read.** `bridge_manifest_parse` is the host stage's, beside the library.
 

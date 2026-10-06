@@ -1,6 +1,6 @@
 # What was refused: Budgets
 
-The record of `budgets.md`: `README.md`, *Three layers, three seams*.
+The record of `budgets.md`: `readme.md`, *Three layers, three seams*.
 
 ## Budgets
 

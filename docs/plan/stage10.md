@@ -38,7 +38,7 @@ Refused for now: a fork, a trimmed copy that is ours. It is what this falls back
 The first plan for this stage drew the line between the library and its storage at flecs'
 primitives under other names: make an id, attach, detach, match, watch. Behind a line of that
 shape the best ours could be is a smaller flecs, and it was put back to be done again, from what
-the documents say and by every step of `STAGE0.md`.
+the documents say and by every step of `stage0.md`.
 
 flecs has to serve any program. Bridge-ASM700 promises much more than any program does, and each
 promise is something a design made for it can spend:
@@ -207,7 +207,7 @@ of it: macOS gathers timers together to save power, and a virtual machine adds i
 The case had been deciding "at once" from "took under 180 ms", which holds only where a sleep
 takes what it was asked for. It decides now from what it claims: each system says when it began
 and ended, and two ran at once if one began before the other ended. No length is asked of
-anything. Widening the bound was refused, as `STAGE8.md` said a bound would be.
+anything. Widening the bound was refused, as `stage8.md` said a bound would be.
 
 ## What flecs cost
 
@@ -329,7 +329,7 @@ the ways flecs could.
 ## What was not in the plan
 
 Five things were built as whatever was nearest to hand and written up as settled. None had been
-through the steps of `STAGE0.md`. Each is put back as a question, and this section says where
+through the steps of `stage0.md`. Each is put back as a question, and this section says where
 each stands.
 
 **A strip at unload: decided.** As first built it moved an entity at a time to the table of what
@@ -415,7 +415,7 @@ A line is open until the commit that closes it is named beside it.
     terms a query                      [budget] terms                             81c347d
     bridge_budget                      counts then bytes; modules                 34e20cd
 
-**1. `PLAN.md`'s "Not in this plan"**: ten things "refused or deferred", not said which. Each
+**1. `plan.md`'s "Not in this plan"**: ten things "refused or deferred", not said which. Each
 was read in its document and became a stage, a refusal with its condition, or nothing; and the
 section is gone, since a plan holds work and the documents hold what is refused. The last four
 were weighed as features first - is it relevant, does it serve what the project is for - which
@@ -425,16 +425,16 @@ the first five were not, and should have been.
             a stage with a library half, on the claim that a host cannot read what a native
             module wrote; a host loads native modules of its own, and they can. What is the
             library's is the rule, a case that a run says the same on one thread as on four,
-            and the checksums of `PLAN.md` 14
+            and the checksums of `plan.md` 14
     closed  a default phase set, and bridge:clock@1 and its kind: one question. Nothing ships
-            either; the first real deployment, `PLAN.md` 17, states its own and asks whether
+            either; the first real deployment, `plan.md` 17, states its own and asks whether
             they are shared                                                           5c4e577
     closed  per-component page mapping: refused, for what can be counted, and no longer for
             a cost that was never measured. `costs.md`
     closed  a phase exclusivity flag: refused as it was. Everything it could be for has an
             answer already: pinned, the conflict graph, one thread. `schedule.md`
     closed  memory high-water per module: wider than it said. How full every budget is, for
-            the bridge and for each module, as a pull, in `PLAN.md` 14 and its done-when 1183284
+            the bridge and for each module, as a pull, in `plan.md` 14 and its done-when 1183284
     closed  an instance-grouping entry: refused. A backend that must group does it itself,
             and is told which by its own settings. `backend.md`
     closed  arena mark and reset: still refused, with its condition. What was behind it is
@@ -444,12 +444,12 @@ the first five were not, and should have been.
             more than one way to store a component, chosen as the right tool for the task,
             and it points at a section about a struct's fields changing at a reload. The
             first is the item. Weighed on `storage weigh`, whose figures are below, and
-            then each kind on its own: accepted, all five, as `PLAN.md` 11
+            then each kind on its own: accepted, all five, as `plan.md` 11
     closed  a struct changed at reload: a question the misreading raised, and worth
             asking. A component only its module declares has its rows moved to the new
             component layout by field name; a field removed or renamed goes, and a record
-            says so. Decided here, built in `PLAN.md` 11. `lifetime.md`
-    closed  an SDK for a module that is not C: a stage of its own, `PLAN.md` 15, with two owners.
+            says so. Decided here, built in `plan.md` 11. `lifetime.md`
+    closed  an SDK for a module that is not C: a stage of its own, `plan.md` 15, with two owners.
             What Bridge-ASM700 writes is its own to state; how a module reaches it is the
             backend's. Tried first: the project's compiler cannot translate the header
     closed  the tree itself, which had said otherwise: a folder for each owner. A backend has
@@ -459,7 +459,7 @@ the first five were not, and should have been.
 **1b. Words**: found by the item above. "layout" is used sixty-two times in the documents for
 at least five things, none defined, and none of them the one that was meant.
 
-    closed  every term of art defined once, in `README.md`, *Words*, and a word used for
+    closed  every term of art defined once, in `readme.md`, *Words*, and a word used for
             several things split: a stage of the plan and a phase of a pass; a component
             layout, a storage layout, an ABI layout, a memory layout; a type and a
             component; an archetype and its table; the operating system and a system;
@@ -482,7 +482,7 @@ at least five things, none defined, and none of them the one that was meant.
             calling is the backend's: the table is passed to every export and every entry
             takes it, so `bridge_bind`, a global in every module and a thread-local are
             gone, and the invariant is checked where it was implied. With the thread-local
-            gone macOS unmaps the backend's library at destroy, which `STAGE9.md` had as that
+            gone macOS unmaps the backend's library at destroy, which `stage9.md` had as that
             loader's known habit and not as something measured: case `libraries` now expects
             "gone" on every system. It failed on macOS for four commits before it was read
     closed  a pinned module runs on the thread that calls bridge_phase: kept, and no longer
@@ -511,7 +511,7 @@ at least five things, none defined, and none of them the one that was meant.
     closed  a signature the native backend cannot check: the backend checks, since it is
             who can see an export. `instance_func` answers a function or refuses, and
             the arity, the count of results and the -1 left the seam. `signatures.md`
-    closed  every decision against every need, read. `STAGE0.md`, step 6, asked for the one
+    closed  every decision against every need, read. `stage0.md`, step 6, asked for the one
             need that decides, and a decision weighed that way was never scored on the other
             five. The step is corrected. Every document was read a line at a time: about
             280 decisions, of which about 250 hold on all six or fail one the text names
@@ -583,7 +583,7 @@ Of this repair:
             stayed. It is said now, with the component that holds it. `strings.md`
     closed  five storage layouts, where only the table's weakness was measured: five still,
             and each of the four to come is weighed on every need, with a measurement of
-            what it answers, before it is built. `PLAN.md`, stage 11
+            what it answers, before it is built. `plan.md`, stage 11
     closed  a removed or renamed field migrated at reload, and its values were lost on a call
             that means "keep running": refused first, naming what would go, and moved once
             the reload states that it accepts the loss. `lifetime.md`; built in stage 11
@@ -658,7 +658,7 @@ Statements false against the tree, in one pass with no decision: `bridge_manifes
 `bridge_profile`, `validate` and `profile` in the present tense; `terms` for `types` in
 `reference.md` and `schedule.md`; "a barrier costs what changed"; "a phase is the sum of its
 systems"; "per adopted block" in `wasmtime.md`; "seventeenth"; stages "7 to 11" in `build.md`;
-`bridge_bind` and "sixteen" in `PLAN.md`; `rows_create` here; and a refusal spliced into the
+`bridge_bind` and "sixteen" in `plan.md`; `rows_create` here; and a refusal spliced into the
 middle of a paragraph in `config.md`.
 
     closed  the false statements above, each corrected where it stood. What is designed
@@ -671,7 +671,7 @@ middle of a paragraph in `config.md`.
             withdrawn, which a later decision had overtaken and contradicted
     closed  and every refusal left the design documents for a record beside them, in
             `refused/`, laid out as they are: a document says what the design is, and its
-            record what it is not. `README.md`
+            record what it is not. `readme.md`
 
 **5. Found while building**
 
@@ -696,7 +696,7 @@ middle of a paragraph in `config.md`.
     closed  the log levels named twice: twice on purpose, a seam's header being whole
             alone, and asserted equal where a module's level becomes a host's. `log.md`
 
-**6. Close**: every line above is closed, and `PLAN.md` marks stage 10 done by its done-when as
+**6. Close**: every line above is closed, and `plan.md` marks stage 10 done by its done-when as
 first written. Both sets of figures were measured again, the tree before the repair built beside
 the tree after it and run in turn, twice, on Windows. flecs is the column of *What it costs*,
 which is a record of the gate and is not measured again, flecs being gone.

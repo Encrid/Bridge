@@ -2,7 +2,7 @@
 
 Done, on Windows, on Linux and on macOS.
 
-`PLAN.md` stage 9 was "C99, and the context passed". This document is why it is not, and what the
+`plan.md` stage 9 was "C99, and the context passed". This document is why it is not, and what the
 stage builds in its place.
 
 ## What compiling it showed

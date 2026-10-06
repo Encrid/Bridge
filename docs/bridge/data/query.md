@@ -78,4 +78,4 @@ and a stride.
 Many tables per query is the normal case: that is what archetypes mean. And publishing costs
 **O(tables touched)**, not O(data) and not O(tables), which is the property that makes this scale.
 A query over ten million entities costs the same to publish as one over a thousand, and one over
-ten thousand tables that did not change costs nothing - `STAGE10.md`, *What it costs*.
+ten thousand tables that did not change costs nothing - `stage10.md`, *What it costs*.

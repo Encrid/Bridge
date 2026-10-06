@@ -1,6 +1,6 @@
 # Stage 11: storage layouts
 
-Done, on Windows, on Linux and on macOS. `PLAN.md`, stage 11, is what it is for and when it is
+Done, on Windows, on Linux and on macOS. `plan.md`, stage 11, is what it is for and when it is
 done. This document is the order it was done in, what was measured, what was decided and why,
 and what building it found.
 

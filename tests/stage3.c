@@ -3,7 +3,7 @@
  *
  *     stage3 <case>
  *
- * Each case is one clause of docs/PLAN.md stage 3. build.py checks a case by the records it
+ * Each case is one clause of docs/plan.md stage 3. build.py checks a case by the records it
  * emits, and every case ends by printing "alive". */
 #include "bridge.h"
 #include "bridge_abi.h"

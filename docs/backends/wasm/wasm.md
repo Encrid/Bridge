@@ -73,7 +73,7 @@ through `add_system`, and every accessor takes a parameter, so the `() -> i32` c
 them already - `signatures.md`, *Imports are declared, exports are checked*.
 
 The compiler sees those accessors as opaque calls until the merge, so it cannot vectorise across
-them. That is the cost, and the measurement in `PLAN.md` stage 3 is where it shows if it matters.
+them. That is the cost, and the measurement in `plan.md` stage 3 is where it shows if it matters.
 
 ## Exports
 
@@ -156,7 +156,7 @@ the header is C23, and the one translator tried on it, the project's own compile
 first `constexpr`. A module in another language needs two things in that language. What
 Bridge-ASM700 writes, which is this header's content and Bridge-ASM700's to make readable. And
 how a module on this backend reaches it, which is this backend's SDK and this backend's to
-provide - `README.md`, *Three layers, three seams*. `PLAN.md`, stage 15.
+provide - `readme.md`, *Three layers, three seams*. `plan.md`, stage 15.
 
 **The native backend's `bridge_api_t` is not in it.** A struct of C function pointers has nothing a
 wasm module could derive, since it gets imports rather than pointers. It lives in

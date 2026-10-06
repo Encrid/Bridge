@@ -1,6 +1,6 @@
 # What was refused: The schedule
 
-The record of `schedule.md`: `README.md`, *Three layers, three seams*.
+The record of `schedule.md`: `readme.md`, *Three layers, three seams*.
 
 ## A module's phase names are mapped by the deployment
 
@@ -11,7 +11,7 @@ words. The condition that brings it back is none.
 
 Refused: names shipped by the library, for the reason this section opens with. Whether deployments
 come to share a list of names is still stage 17's question; the table is what makes the answer not
-matter to whether a module can be used. The condition that brings it back is `PLAN.md`, stage 17,
+matter to whether a module can be used. The condition that brings it back is `plan.md`, stage 17,
 finding deployments that share one list.
 
 ## Order within a phase is never implicit

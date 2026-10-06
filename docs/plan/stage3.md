@@ -3,7 +3,7 @@
 Done. The `linux` preset was first run after stage 5, and passed as written.
 
 The stage gave a module storage: the shared memory and its private one, the ABI entries that fill
-them, a phase that runs systems and the barrier after it. `PLAN.md` stage 3 is the claim.
+them, a phase that runs systems and the barrier after it. `plan.md` stage 3 is the claim.
 
 What each piece is and why is in the documents it belongs to: `memory.md`, `budgets.md`, `abi.md`,
 `query.md`, `reference.md`, `schema.md`, `wasm.md`, `flecs.md`. This document is what the stage
@@ -11,7 +11,7 @@ built and what it found on the way.
 
 ## What was settled first
 
-Five questions, each by the method of `STAGE0.md`, and each applied to the document it belongs to.
+Five questions, each by the method of `stage0.md`, and each applied to the document it belongs to.
 Three were waiting here from stage 2; two turned up while planning.
 
     what fuel costs                   a bound is paid for by the module that states it:
@@ -106,7 +106,7 @@ trapping in `init`.
 ## What it left
 
 Nothing, any more. The stage closed with a failed load leaving what its `init` had done, an
-allocator in power-of-two classes, one bridge to a process, and `observe` refusing - `STAGE5.md`,
+allocator in power-of-two classes, one bridge to a process, and `observe` refusing - `stage5.md`,
 *Closed after the stage*, for each.
 
 ## Open questions

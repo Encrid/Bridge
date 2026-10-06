@@ -16,11 +16,11 @@ import sys
 # keyed by basename: prose cites `data.md`, not `bridge/data.md`, because a
 # reader wants the document's name and not where it sits in the tree.
 heads, paths = {}, {}
-# STAGE0.md is the method, not the design: it cites closed items on purpose,
+# stage0.md is the method, not the design: it cites closed items on purpose,
 # as the worked examples that make each step concrete, and it carries a literal
 # `doc.md`, *Section* template.
 for full in glob.glob('**/*.md', recursive=True):
-    if os.path.basename(full) == 'STAGE0.md':
+    if os.path.basename(full) == 'stage0.md':
         continue
     f = os.path.basename(full)
     paths[f] = full

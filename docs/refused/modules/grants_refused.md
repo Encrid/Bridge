@@ -1,6 +1,6 @@
 # What was refused: Whose component it is
 
-The record of `grants.md`: `README.md`, *Three layers, three seams*.
+The record of `grants.md`: `readme.md`, *Three layers, three seams*.
 
 ## What a module may destroy
 

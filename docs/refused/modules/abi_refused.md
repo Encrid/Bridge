@@ -1,6 +1,6 @@
 # What was refused: The ABI
 
-The record of `abi.md`: `README.md`, *Three layers, three seams*.
+The record of `abi.md`: `readme.md`, *Three layers, three seams*.
 
 ## The ABI
 

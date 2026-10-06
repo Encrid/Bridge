@@ -62,7 +62,7 @@ project cannot spend, and it is what refused per-module page mapping.
 **This step once said "say which need decides", and no more.** So an option was weighed against
 the one need that favoured it. The memory handle of the backend seam was recommended away as
 "minimal" when it loses on modular, extensible and explicit; nothing in the step asked for the
-other five. Every decision taken that way was scored again - `STAGE10.md`, *The repair*.
+other five. Every decision taken that way was scored again - `stage10.md`, *The repair*.
 
 **Explicit is the one that gets forgotten**, and it is the one that costs most when it is. Nothing
 may behave differently from what the person reading it expected, which rules out more than it looks:
@@ -86,7 +86,7 @@ which says what the design is.
 open questions. Such a list holds what is undecided and nothing else, or it becomes a second place
 to read the design and a second place for it to be wrong.
 
-**An open question waits in the plan of the stage it blocks** - `STAGEN.md`, in a section of its
+**An open question waits in the plan of the stage it blocks** - `stagen.md`, in a section of its
 own - and the stage is not done while one stands. Stage 0 kept a single register for all of them; it
 was emptied and deleted when the stage closed, because a standing list outlives its questions.
 

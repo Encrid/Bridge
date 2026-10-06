@@ -9,9 +9,9 @@ The arrangement is idTech3's: the engine is `qcommon/`, and `win32/win_main.c:12
 then loops on `Com_Frame`.
 
 This is the third seam. `module.md` and `bridge_abi.h` are Bridge-ASM700 to modules, with each
-backend's SDK beside that backend - `README.md`, *Three layers, three seams*;
+backend's SDK beside that backend - `readme.md`, *Three layers, three seams*;
 `backend.md` is Bridge-ASM700 to a backend; this is **host to Bridge-ASM700**. Everything in this
-folder is `bridge.h`, which is the only header a host includes - one per seam, `README.md`, *Three
+folder is `bridge.h`, which is the only header a host includes - one per seam, `readme.md`, *Three
 layers, three seams*.
 
 ## A host links a built library
@@ -46,11 +46,11 @@ sees a `pad`.
 backend in C++ links the names as they are exported. They are C23 otherwise, and what they use
 of it C++ has too: an enum of a stated width, a typed constant, `static_assert`. The two SDK
 headers are not for C++: they choose an accessor by `_Generic`, which C++ does not have, and a
-module in another language has its own SDK - `PLAN.md`, stage 15. Read as C++20 by a compiler
+module in another language has its own SDK - `plan.md`, stage 15. Read as C++20 by a compiler
 that is not this project's, all three parse; a C++ host that links and runs is stage 13's.
 
 **What is not yet stated for a language that is not C** is the seam in a form that needs no C
-parser at all. That is `PLAN.md`, stage 15, which describes all three seams and not only the
+parser at all. That is `plan.md`, stage 15, which describes all three seams and not only the
 module's.
 
 ## A seam has a number
@@ -92,7 +92,7 @@ orchestrator to start.
 So an embedder with its own config system - a database, compiled-in constants, another format -
 hands over data rather than being made to write a file for Bridge-ASM700 to read. And the three platform
 parsers that would otherwise sit in the library do not: `bridge_manifest_parse` is to ship
-**beside** it as a helper - `native.md`, *Identity*. It is not written yet: `PLAN.md`, stage 13.
+**beside** it as a helper - `native.md`, *Identity*. It is not written yet: `plan.md`, stage 13.
 
 **No discovery either.** Finding modules is filesystem work, so the host finds them and calls
 `bridge_load` for each.
@@ -116,7 +116,7 @@ parsers that would otherwise sit in the library do not: `bridge_manifest_parse` 
     int bridge_profile (bridge *b, bridge_profile_row *out, int max);   /* stage 14 */
 
 **`bridge_profile`, and `validate` and `profile` below, are not built**: they are the surface as
-it is designed, and `bridge.h` has everything else. `PLAN.md`, stage 14.
+it is designed, and `bridge.h` has everything else. `plan.md`, stage 14.
 
 Every answer above the two pulls is `[[nodiscard]]`: a status a host drops is one the compiler
 points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - `create.md`,

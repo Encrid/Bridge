@@ -5,7 +5,7 @@
 flecs and EnTT are fetched at the tags pinned below into build/reference/, built with zig, and
 run in turn with the library's own `storage measure`, `storage weigh` and `storage baseline`,
 which `python build.py` must have built. Nothing of either is kept in the tree: the library is
-self contained, and these are what it is measured beside - docs/plan/STAGE11.md, *Beside the
+self contained, and these are what it is measured beside - docs/plan/stage11.md, *Beside the
 best there is*.
 """
 import argparse

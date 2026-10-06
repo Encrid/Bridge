@@ -1,6 +1,6 @@
 # What was refused: The wasm backend
 
-The record of `wasmtime.md`: `README.md`, *Three layers, three seams*.
+The record of `wasmtime.md`: `readme.md`, *Three layers, three seams*.
 
 ## Deadlines
 

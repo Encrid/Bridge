@@ -1,6 +1,6 @@
 # What was refused: What a bad write costs, and what finds it
 
-The record of `validation.md`: `README.md`, *Three layers, three seams*.
+The record of `validation.md`: `readme.md`, *Three layers, three seams*.
 
 ## The row test
 

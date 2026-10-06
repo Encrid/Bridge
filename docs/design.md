@@ -1,7 +1,7 @@
 # Design
 
 Why Bridge-ASM700 has this shape, which side owns what, and what the shape costs. What the documents are
-is `README.md`; the build order is `PLAN.md`.
+is `readme.md`; the build order is `plan.md`.
 
 ## Why
 

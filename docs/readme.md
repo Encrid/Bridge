@@ -9,8 +9,8 @@ gives a reason, as idTech3, flecs and Godot are - and never the specification.
 **Bridge-ASM700 is a library.** A host links it and owns `main`, the loop and every file. Hosts are
 separate projects, and none is part of this one.
 
-Three documents go with this one. `DESIGN.md` is why the shape is what it is and what it costs.
-`PLAN.md` is the build order. `STAGE0.md` is how a decision gets made here at all, which is method
+Three documents go with this one. `design.md` is why the shape is what it is and what it costs.
+`plan.md` is the build order. `stage0.md` is how a decision gets made here at all, which is method
 rather than design.
 
 ## Three layers, three seams
@@ -19,10 +19,10 @@ The three layers are a host, Bridge-ASM700 and the modules. A host is somebody e
 it has no directory here: only its seam does. **The tree is the structure** otherwise, rather than a
 diagram to keep in step with. One concern per document, in reading order:
 
-    README.md            this file
-    DESIGN.md            why, and what the design is
-    PLAN.md              the eighteen stages, each with a done-when that can fail
-    STYLE.md             how the C is written: the rules, and the exceptions to them
+    readme.md            this file
+    design.md            why, and what the design is
+    plan.md              the eighteen stages, each with a done-when that can fail
+    style.md             how the C is written: the rules, and the exceptions to them
 
     refused/             what was weighed and not chosen, in the same tree as what was:
                          `refused/bridge/data/lifetime_refused.md` is the record of
@@ -35,8 +35,8 @@ diagram to keep in step with. One concern per document, in reading order:
         build.md             the compiler, the platforms, the standard, the C library
 
     plan/
-        STAGE0.md            how we decide things. method, not design
-        STAGEN.md            one per stage, written before that stage starts
+        stage0.md            how we decide things. method, not design
+        stagen.md            one per stage, written before that stage starts
 
     seam/host_api/           host to Bridge-ASM700
         host_api.md          the surface and its structs
@@ -174,7 +174,7 @@ where two things could be meant the qualified form is the only form.
     phase             a named step a host asks for: its systems run. `schedule.md`
     barrier           what follows every phase: changes applied, then observers
     pass              one walk of a deployment's phases, in the host's order
-    stage             a step of `PLAN.md`. Never "phase"
+    stage             a step of `plan.md`. Never "phase"
     ABI entry         one of the eight things a module may call. `abi.md`
     backend entry     one of the things a backend offers Bridge-ASM700. `backend.md`
     export            a function a module offers: `init`, `reload`, `shutdown`, a system
@@ -250,5 +250,5 @@ where two things could be meant the qualified form is the only form.
 
 ## Where to start
 
-`DESIGN.md`, *Why*, is three paragraphs and explains the whole shape. Then `module.md` for what a
+`design.md`, *Why*, is three paragraphs and explains the whole shape. Then `module.md` for what a
 module is, and `data.md` for what it works on. Everything else answers a question those raise.

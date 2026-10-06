@@ -1,6 +1,6 @@
 # What was refused: Config
 
-The record of `config.md`: `README.md`, *Three layers, three seams*.
+The record of `config.md`: `readme.md`, *Three layers, three seams*.
 
 ## No unaccountable values
 
