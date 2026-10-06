@@ -55,8 +55,10 @@ rows:
     tested, half of them on, in no order  515 us       2.5 ns a row
     switched by a detach and an attach     77 ns a switch, and 1,005 ns for 4 KB carried
 
-The test stops the compiler from reading sixteen bytes at a time, which is the first factor of
-ten; and where the processor cannot guess the answer, that is the second.
+**Those three are the test as the compiler happened to write it, a branch, and not what a field
+costs.** The same test written as a mask, `v & -(on != 0)`, was measured in scratch at 12 us
+whatever share of the rows is on. That is the figure a toggle is weighed beside. A loop that
+does too much at a row to be masked pays the branch, with a field or with anything else.
 
 **A value reached by entity id and not walked**, which is what direct-indexed is for. Today it
 is `reference.md`, *Reference following*: the entity's record, then the table's cell of
@@ -75,3 +77,54 @@ component on one entity, found through a query of one span:
     found and read                          0.6 ns each time
 
 So a singleton has nothing to gain in time, and is to be weighed on the other five needs alone.
+
+## The gate
+
+Each measured in scratch, outside the library, beside what exists; and scored on every need.
+
+**The sparse set passes.** The set alone, 204,800 entities: a component given in 2.3 to 2.6 ns
+and taken in 2.6 to 3.3 ns, on top of a queued change that moves nothing, which the library does
+in 18.9 ns. So about 22 ns whatever the entity carries, where the table takes 40 ns for four
+bytes carried and 505 ns for 4 KB. Its values read alone cost what a column does, 5.6 to 6.6 us.
+Read beside a table's column, a row of the table at a time through the set's index, they cost
+0.59 to 0.76 ns a row, where the table costs 0.028 ns from one table and 0.094 ns from 4,096.
+And the index is four bytes for every entity there may be, for each such component.
+
+    need          built, stated for a component          the table alone
+    fast          serves: a change costs the same        fails: 505 ns at 4 KB carried, three
+                  whatever is carried. A joined read     times as long to read 4,096 tables
+                  is dearer, for that component only
+    scalable      serves: such a component no longer     fails: a table for every combination
+                  doubles the tables. An index of
+                  `entities` for each
+    modular       serves: one module's marker no         fails: it splits their spans and
+                  longer splits another's spans          moves their rows
+    extensible    serves: storage has a second layout    does not apply
+    minimal       fails: placing, strip, running out,    serves
+                  what is heard and what is written,
+                  each a second time
+    explicit      serves, stated by the author and       serves
+                  never picked by the library
+
+Each fails one need, so the conflict was the question, and it was decided for the three that
+are measured.
+
+**The toggle passes.** A bit a row, 204,800 rows, a share of them on in no order:
+
+                                              all on     half on    1 in 16 on
+    a field tested by a mask, as today        12 us      12 us      12 us
+    the bit tested at every row               16.5 us    16.5 us    16.6 us
+    the rows that are on, found a word of
+    bits at a time                            47 us      32 us       5.5 us
+    runs of rows that are on, each read as
+    a column                                  13.4 us    432 us     60 us
+
+It is quicker than a field where fewer than about one row in eight is on, read a word of bits at
+a time, and slower elsewhere. It was scored as failing three needs: fast, since every reader of
+the component leaves the plain loop over a column; minimal, since it is a new shape of span in
+`bridge-abi.h` and in each SDK, and two things more for an observer to be told; explicit, since a
+row that is off is still in the span and a reader that forgets the bits reads it. It was passed
+all the same, by the decision of whoever the design is for. Which of the three ways above a
+reader is handed is one of this stage's questions, and what it must answer is in those three
+failures.
+
