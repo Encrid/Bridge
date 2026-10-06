@@ -27,3 +27,13 @@ Refused: an archetype that counts the components kept in sparse sets, with a lis
 for each, as Bevy has. It brings back a list for every combination of components, which is what
 the sparse set was passed to end. No condition brings it back.
 
+Refused: a sparse set's index holding the value's place in the array, with a marker for none
+and the array's address published beside it. The same time and the same memory, for one more
+thing published and a second way to say none. No condition brings it back.
+
+Refused: the index in pages, made where an entity that carries the component is. Measured at
+one and a half times the lookup; ids are handed out from the low end, so the pages touched are
+most of them; and a pool of pages is a budget nobody states today. The condition that brings it
+back is a deployment where eight bytes for every entity, for every such component, is a measured
+share of its memory.
+

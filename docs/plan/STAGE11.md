@@ -211,3 +211,26 @@ index, 0.59 to 0.76 ns a row of the table; a set's entries with a table's value 
 What it gives up: a query cannot say "must carry" of a component in a table and of one in a
 sparse set, and be handed those rows alone.
 
+**2.2 For a sparse set a module is handed a span when it walks it, and a cell for each entity
+when it reaches into it.** Walked, a query on the component alone has one span: the count, the
+ids of the entities that carry it, and the values, which is what a table's span is, read by the
+same loop. Reached from a table's row, the module reads the component's index, in the shared
+memory: **one cell an entity, holding where that entity's value is, and zero where it has
+none**. So `at = index[e]`, and the value is at `at` if `at` is not zero, which is the rule
+every base of a span already follows - `query.md`, *The interface is a query*. A module finds
+each index through a cell for each type it declared, in its private memory beside
+`column_base`.
+
+Measured in scratch, a table's 204,800 rows walked and the value reached at each:
+
+                                      every row carries it     one in sixteen
+    the cell holds where it is        0.76 ns a row            0.58 ns
+    the cell holds its place          0.77 ns                  0.60 ns
+    the index in pages of 4,096       1.17 ns                  0.95 ns
+
+It is four bytes for every entity there may be, for each such component, and as much again for
+the copy storage keeps - `storage.md`, *Nothing in the shared block is read back*: 3.2 MB at
+four hundred thousand. That is where it was scored as failing scalable, by an amount the
+deployment states. When the set's arrays move to grow, each carrier's cell is written again,
+once for a value that is copied then anyway.
+
