@@ -4,10 +4,8 @@
 
 constexpr uint32_t ENTITIES = 1000;
 
-static const bridge_api *api;
 static uint32_t position, marked, moving, tallying;
 
-BRIDGE_NATIVE_BIND(api)
 
 BRIDGE_NATIVE(move)
 {
@@ -41,12 +39,12 @@ BRIDGE_NATIVE(init)
     terms[0].access = BRIDGE_IN;
     tallying = BRIDGE_NATIVE_SYSTEM(api, "tally", "present", terms, 1);
     for (i = 0; i < ENTITIES; i ++) {
-        uint64_t id = api->spawn();
+        uint64_t id = api->spawn(api);
         Position p = { (float)i, 0.0f };
-        api->attach(id, position, bridge_native_put(api, &p, sizeof p), sizeof p);
+        api->attach(api, id, position, bridge_native_put(api, &p, sizeof p), sizeof p);
         if (i % 2) {
             Marked m = { i };
-            api->attach(id, marked, bridge_native_put(api, &m, sizeof m), sizeof m);
+            api->attach(api, id, marked, bridge_native_put(api, &m, sizeof m), sizeof m);
         }
     }
     return 0;

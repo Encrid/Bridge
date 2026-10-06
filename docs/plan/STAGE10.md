@@ -477,7 +477,11 @@ at least five things, none defined, and none of them the one that was meant.
 
 **3. Decided without the steps, or inherited**: one at a time.
 
-    open    the native ABI held to the wasm one: offsets, a thread-local, no argument to init
+    closed  the native SDK held to the wasm one. Three things, two owners. Offsets into the
+            scratch arena are Bridge-ASM700's, for a reason of its own, and stay. Who is
+            calling is the backend's: the table is passed to every export and every entry
+            takes it, so `bridge_bind`, a global in every module and a thread-local are
+            gone, and the invariant is checked where it was implied
     open    a pinned module runs on the thread that calls bridge_phase
     open    BRIDGE_OR and BRIDGE_WILDCARD, which exist to be refused
     open    BRIDGE_IN, BRIDGE_OUT, BRIDGE_INOUT, of which the scheduler reads one bit

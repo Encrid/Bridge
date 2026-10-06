@@ -63,22 +63,25 @@ host's trade to make.
 
 ## Lifecycle
 
-Four exported symbols. Three are the lifecycle every module has, and one is this backend's own:
+Three exported symbols, the lifecycle every module has, and each is handed the table of
+*What the backend provides*:
 
-    void bridge_bind(const bridge_api *api);   /* the backend's, once, before bridge_init */
-    int  bridge_init();
-    int  bridge_shutdown();
-    int  bridge_reload();
+    int  bridge_init(const bridge_api *api);
+    int  bridge_shutdown(const bridge_api *api);
+    int  bridge_reload(const bridge_api *api);
 
-**`bridge_bind` is the native backend's, not Bridge-ASM700's.** A wasm module gets its imports when it is
-linked; a shared library has no import section Bridge-ASM700 could fill, so the native backend hands the
-same things over in one call before `init`. Bridge-ASM700 never calls it and never sees it: it calls
-`define_func` once per entry, as it does on every backend, and what the backend does with them is
-the backend's convention. So every function **Bridge-ASM700** calls still takes no arguments and answers a
-status - `signatures.md`, *A call takes nothing and answers a status*.
+**The argument is the native backend's, not Bridge-ASM700's.** A wasm module gets its imports when
+it is linked; a shared library has no import section to fill, so this backend hands the same things
+over with every call it makes into the module. Bridge-ASM700 never sees it: it asks a backend to
+call a function, and every function **Bridge-ASM700** calls takes no arguments and answers a
+status - `signatures.md`, *A call takes nothing and answers a status*. What a backend passes to
+what it runs is the backend's SDK.
 
-Refused: handing the table to `bridge_init` as an argument, which would make `init` differ by
-backend and need a native case in Bridge-ASM700.
+Refused: one export, `bridge_bind`, that is handed the table once and keeps it in a variable of the
+module's, which is what this was. It left every module a global to declare and the backend a
+second way to know who was calling. It had been preferred over an argument to `init` on the
+ground that Bridge-ASM700 would then need a native case, which it would not: the call is the
+backend's. The condition that brings it back is a module that cannot take an argument.
 
 **Exports are named `bridge_<name>`.** Bridge-ASM700 asks the backend for `init`, or for a system called
 `movement`, and the native backend looks up `bridge_init` and `bridge_movement`. A C process has one
@@ -107,30 +110,33 @@ does not, having crashed.
 
 ## What the backend provides
 
-`bridge_api`, declared in **`bridge-native.h`** - a native module compiles that and `bridge-abi.h`,
-where a wasm module compiles only the second:
+`bridge_api`, declared in **`bridge-native.h`**, in this backend's `sdk/` - a native module compiles
+that and `bridge-abi.h`:
 
-    the eight entries     `abi.md`, *The ABI*, as function pointers, unchanged
+    the eight entries     `abi.md`, *The ABI*, as function pointers, each taking the table first
     shared_base           where the shared memory begins
     private_base          where this module's private memory begins
 
-That is the `bridge` import namespace of `wasm.md`, *Memories*, as a C struct: the same eight
-functions and the same two memories, because the memory layout and the function semantics are one
-contract on every backend.
+The same eight functions and the same two memories a wasm module has, because what an ABI entry
+does and what is in memory are Bridge-ASM700's and the same on every backend. How a module
+reaches them is this backend's: a table, passed.
 
 **`system` and `observe` take a name, as they do everywhere.** The backend resolves it to an
 exported symbol, so the phase, the events, the terms and the slot are identical on both backends and
-the scheduler cannot tell them apart. Its arguments are
-offsets into the scratch arena, as on the wasm backend - `abi.md`, *The ABI*.
+the scheduler cannot tell them apart. An entry's arguments are offsets into the scratch arena, on
+this backend as on any: Bridge-ASM700 reads them, and the scratch arena is the one memory of a
+module it can bounds-check - `abi.md`, *The ABI*. The SDK does the copy: `bridge_native_put`.
 
-**An entry knows whose it is by who is running.** A C function pointer carries no context, and the
-entries are unchanged, so none takes one. *The invariant* supplies it: native code runs only inside
-a call the backend made, so the backend notes the instance it is calling, per thread, and an entry
-reads that. An entry called from anywhere else - a foreign thread's callback - finds nobody and
-answers zero, which is the invariant enforced at the one place it can be.
+**An entry is told whose it is by the table it is given.** A module's table is part of its
+instance, so `api->spawn(api)` says which module is asking, and nothing is found by which thread
+happens to be running. *The invariant* is then checked and not implied: the backend notes the
+thread it calls a module on, and an entry reached on any other thread, or outside a call, answers
+zero. `tests/stage5.c`, case `foreign`, reaches one from a thread the module started.
 
-Refused: a context argument on every entry, which is a second ABI for one backend. The condition
-that brings it back is native code that must reach an entry from outside a call.
+Refused: no argument, and a thread-local variable in the backend to say who is running, which is
+what this was. It read like a wasm module's calls, and that was the reason given: "a second ABI
+for one backend". It is not an ABI of Bridge-ASM700's at all, only this backend's SDK. The
+condition that brings it back is native modules that must be source-compatible with wasm ones.
 
 **A refused entry answers zero, and so does every entry after it until the call returns.** Nothing
 can unwind native code - `budgets.md`, *What running out does* - so the backend does the nearest

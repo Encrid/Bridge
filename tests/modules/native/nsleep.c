@@ -22,9 +22,7 @@ static uint32_t now_ms()
 }
 #endif
 
-static const bridge_api *api;
 
-BRIDGE_NATIVE_BIND(api)
 
 BRIDGE_NATIVE(nap)
 {

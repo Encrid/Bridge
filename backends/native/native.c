@@ -1,5 +1,5 @@
 /* The native backend: the seventeen entries of bridge-backend.h, over a shared library.
- * docs/modules/impl/native.md is the binding; docs/seam/backend/capabilities.md is what this
+ * docs/backends/native/native.md is its SDK; docs/seam/backend/capabilities.md is what this
  * backend truthfully cannot do. */
 #include "bridge-backend.h"
 #include "bridge-native.h"
@@ -17,83 +17,84 @@ static const char *const entry_names[ENTRIES] = {
 struct backend { int unused; };
 struct backend_memory { void *ptr; uint64_t len; };
 struct backend_module { void *lib; };
-struct backend_func { backend_instance *instance; int (*fn)(); backend_func *next; };
+struct backend_func { backend_instance *instance; int (*fn)(const bridge_api *); backend_func *next; };
 
 struct backend_instance {
     backend_module *m;
     bridge_api      api;
     backend_fn      fns[ENTRIES];
     void           *uds[ENTRIES];
-    int             bound;
+    uint64_t        calling;        /* the thread a call into it is in progress on, or 0 */
     int             refused;        /* an entry refused during the call in progress */
     backend_func   *funcs;
 };
 
-/* A C function pointer carries no context, so an entry finds its module by who is running:
- * native code runs only inside a call this backend made - native.md, *The invariant*. A call
- * from anywhere else, a foreign thread's callback say, finds nobody and answers zero. */
-static thread_local backend_instance *running;
-
-/* A refusal cannot unwind native code, so the entry answers zero and the call returns:
+/* The table a module was handed is part of its instance, so an entry is told whose it is by
+ * the table it is given. Native code runs only inside a call this backend made - native.md,
+ * *The invariant* - and that is checked here: an entry reached from any other thread, a foreign
+ * thread's callback say, or outside a call, answers zero.
+ *
+ * A refusal cannot unwind native code, so the entry answers zero and the call returns:
  * Bridge-ASM700 fails the invocation then - signatures.md. Until it does return, every entry
  * answers zero and reaches nothing, which is as near to stopped as native code can be put. */
-static uint64_t enter(int entry, const uint64_t *args)
+static uint64_t enter(const bridge_api *api, int entry, const uint64_t *args)
 {
+    auto i = (backend_instance *)((char *)api - offsetof(backend_instance, api));
     uint64_t result = 0;
-    if (!running || running->refused || !running->fns[entry]) return 0;
-    if (running->fns[entry](running->uds[entry], args, &result)) {
-        running->refused = 1;
+    if (!i->calling || i->calling != os_thread_id() || i->refused || !i->fns[entry]) return 0;
+    if (i->fns[entry](i->uds[entry], args, &result)) {
+        i->refused = 1;
         return 0;
     }
     return result;
 }
 
-static uint32_t t_declare(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f,
+static uint32_t t_declare(const bridge_api *api, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f,
                           uint32_t g, uint32_t h)
 {
     uint64_t args[8] = { a, b, c, d, e, f, g, h };
-    return (uint32_t)enter(DECLARE, args);
+    return (uint32_t)enter(api, DECLARE, args);
 }
 
-static uint32_t t_system(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f)
+static uint32_t t_system(const bridge_api *api, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f)
 {
     uint64_t args[6] = { a, b, c, d, e, f };
-    return (uint32_t)enter(SYSTEM, args);
+    return (uint32_t)enter(api, SYSTEM, args);
 }
 
-static uint32_t t_observe(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e)
+static uint32_t t_observe(const bridge_api *api, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e)
 {
     uint64_t args[5] = { a, b, c, d, e };
-    return (uint32_t)enter(OBSERVE, args);
+    return (uint32_t)enter(api, OBSERVE, args);
 }
 
-static uint64_t t_spawn()
+static uint64_t t_spawn(const bridge_api *api)
 {
     uint64_t args[1] = {};
-    return enter(SPAWN, args);
+    return enter(api, SPAWN, args);
 }
 
-static void t_destroy(uint64_t id)
+static void t_destroy(const bridge_api *api, uint64_t id)
 {
-    enter(DESTROY, &id);
+    enter(api, DESTROY, &id);
 }
 
-static void t_attach(uint64_t id, uint32_t slot, uint32_t ptr, uint32_t len)
+static void t_attach(const bridge_api *api, uint64_t id, uint32_t slot, uint32_t ptr, uint32_t len)
 {
     uint64_t args[4] = { id, slot, ptr, len };
-    enter(ATTACH, args);
+    enter(api, ATTACH, args);
 }
 
-static void t_detach(uint64_t id, uint32_t slot)
+static void t_detach(const bridge_api *api, uint64_t id, uint32_t slot)
 {
     uint64_t args[2] = { id, slot };
-    enter(DETACH, args);
+    enter(api, DETACH, args);
 }
 
-static uint32_t t_alloc(uint32_t len)
+static uint32_t t_alloc(const bridge_api *api, uint32_t len)
 {
     uint64_t args[1] = { len };
-    return (uint32_t)enter(ALLOC, args);
+    return (uint32_t)enter(api, ALLOC, args);
 }
 
 /* ---- the seventeen ---- */
@@ -241,7 +242,7 @@ BACKEND_EXPORT int define_func(backend_instance *i, const char *ns, const char *
             return 0;
         }
     }
-    snprintf(err->text, sizeof err->text, "the native binding has no entry '%.100s'", field);
+    snprintf(err->text, sizeof err->text, "the native SDK has no entry '%.100s'", field);
     return -1;
 }
 
@@ -251,19 +252,9 @@ BACKEND_EXPORT backend_func *instance_func(backend_instance *i, const char *name
 {
     char symbol[160];
     backend_func *f;
-    int (*fn)();
-    if (!i->bound) {
-        /* a library has no imports to fill, so the same things are handed over in one call */
-        auto bind = (void (*)(const bridge_api *))os_lib_sym(i->m->lib, "bridge_bind");
-        if (!bind) {
-            snprintf(err->text, sizeof err->text, "no exported function 'bridge_bind'");
-            return nullptr;
-        }
-        bind(&i->api);
-        i->bound = 1;
-    }
+    int (*fn)(const bridge_api *);
     snprintf(symbol, sizeof symbol, "bridge_%.150s", name);
-    fn = (int (*)())os_lib_sym(i->m->lib, symbol);
+    fn = (int (*)(const bridge_api *))os_lib_sym(i->m->lib, symbol);
     if (!fn) {
         snprintf(err->text, sizeof err->text, "no exported function '%s'", symbol);
         return nullptr;
@@ -280,10 +271,11 @@ BACKEND_EXPORT backend_func *instance_func(backend_instance *i, const char *name
 /* Nothing is caught: a native module that faults takes the process with it. */
 BACKEND_EXPORT int call(backend_func *f, int32_t *status, [[maybe_unused]] backend_err *err)
 {
-    backend_instance *before = running;
-    running = f->instance;
-    running->refused = 0;
-    *status = f->fn();
-    running = before;
+    backend_instance *i = f->instance;
+    uint64_t before = i->calling;       /* a call made from inside a call returns to it */
+    i->calling = os_thread_id();
+    i->refused = 0;
+    *status = f->fn(&i->api);
+    i->calling = before;
     return 0;
 }

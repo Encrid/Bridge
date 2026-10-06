@@ -122,12 +122,12 @@ ABI header is where a stated width and an asserted ABI layout are worth most. Th
 brings an earlier standard back for the headers is a host or a backend that has to be built by a
 compiler without C23.
 
-**Thread-local storage stays.** Two variables are found by which thread is running: the native
-module whose export was called, and the memory wasmtime is being asked to create. A third went with
-flecs, whose allocator callbacks could not say which bridge they were working for. Each is there
-because a callback Bridge-ASM700 does not own carries no context. Stage 12 has one thing to verify
-about them: on Windows the compiler reaches a thread-local variable through a runtime helper, and
-that stage links no C runtime.
+**One thread-local variable is left.** The wasm backend finds the memory wasmtime is asking it to
+create by which thread is running, because that callback of wasmtime's carries no context. Two
+others are gone: flecs' allocator callbacks could not say which bridge they worked for, and the
+native backend used one to know which module had called, where it now passes the table. Stage 12
+has one thing to verify about the one that is left: on Windows the compiler reaches a
+thread-local variable through a runtime helper, and that stage links no C runtime.
 
 ## The C library
 

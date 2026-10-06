@@ -21,13 +21,16 @@ void *os_lib_open(const char *path)
 }
 void *os_lib_sym(void *lib, const char *name) { return (void *)GetProcAddress((HMODULE)lib, name); }
 void  os_lib_close(void *lib) { if (lib) FreeLibrary((HMODULE)lib); }
+uint64_t os_thread_id() { return GetCurrentThreadId(); }
 
 #else
 
 #include <dlfcn.h>
+#include <pthread.h>
 
 void *os_lib_open(const char *path) { return dlopen(path, RTLD_NOW | RTLD_LOCAL); }
 void *os_lib_sym(void *lib, const char *name) { return dlsym(lib, name); }
 void  os_lib_close(void *lib) { if (lib) dlclose(lib); }
+uint64_t os_thread_id() { return (uint64_t)(uintptr_t)pthread_self(); }
 
 #endif

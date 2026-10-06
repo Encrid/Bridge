@@ -11,19 +11,17 @@ BRIDGE_SCHEMA_STRUCT(M, { uint32_t on; });
 
 constexpr uint32_t COUNT = 204'800, MARKERS = 12;     /* 2^12 sets at the most */
 
-static const bridge_api *api;
 static uint32_t value, markers[MARKERS], reading;
 
-BRIDGE_NATIVE_BIND(api)
 
 /* every entity is made with all it will carry, so each is placed once */
 BRIDGE_NATIVE(fill)
 {
     for (uint32_t i = 0; i < COUNT; i ++) {
-        uint64_t id = api->spawn();
-        api->attach(id, value, 0, 0);
+        uint64_t id = api->spawn(api);
+        api->attach(api, id, value, 0, 0);
         for (uint32_t k = 0; k < MARKERS; k ++) {
-            if ((i % SPLIT) >> k & 1) api->attach(id, markers[k], 0, 0);
+            if ((i % SPLIT) >> k & 1) api->attach(api, id, markers[k], 0, 0);
         }
     }
     return 0;
@@ -54,7 +52,7 @@ BRIDGE_NATIVE(init)
     bridge_term one[1] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }};
     value = BRIDGE_NATIVE_COMPONENT(api, "st:V", V, BRIDGE_DELETE);
     for (uint32_t k = 0; k < MARKERS; k ++) {
-        markers[k] = api->declare(bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
+        markers[k] = api->declare(api, bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
             (uint32_t)strlen(names[k]), BRIDGE_STRUCT, sizeof(M), alignof(M),
             bridge_native_put(api, M_desc, sizeof M_desc - 1), sizeof M_desc - 1, BRIDGE_DELETE);
     }

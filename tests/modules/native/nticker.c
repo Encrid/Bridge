@@ -4,10 +4,8 @@
 
 BRIDGE_SCHEMA_STRUCT(Tick, { uint32_t n; });
 
-static const bridge_api *api;
 static uint32_t tick, ticking;
 
-BRIDGE_NATIVE_BIND(api)
 
 BRIDGE_NATIVE(advance)
 {
@@ -18,7 +16,7 @@ BRIDGE_NATIVE(advance)
     return 0;
 }
 
-static void registration()
+static void registration(const bridge_api *api)
 {
     bridge_term terms[1] = {{ 0, BRIDGE_INOUT, BRIDGE_AND, 0 }};
     tick = BRIDGE_NATIVE_COMPONENT(api, "game:Tick", Tick, BRIDGE_DELETE);
@@ -29,14 +27,14 @@ static void registration()
 BRIDGE_NATIVE(init)
 {
     Tick t = { 100 };
-    registration();
-    api->attach(api->spawn(), tick, bridge_native_put(api, &t, sizeof t), sizeof t);
+    registration(api);
+    api->attach(api, api->spawn(api), tick, bridge_native_put(api, &t, sizeof t), sizeof t);
     return 0;
 }
 
 BRIDGE_NATIVE(reload)
 {
-    registration();
+    registration(api);
 #ifdef FAIL_RELOAD
     return 5;
 #else

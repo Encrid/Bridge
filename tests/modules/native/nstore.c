@@ -35,13 +35,11 @@ BRIDGE_SCHEMA_STRUCT(T, { uint32_t v; });
 constexpr uint32_t COUNT = 6;
 #endif
 
-static const bridge_api *api;
 static uint32_t a, b;
 static uint64_t ids[COUNT];
 
-BRIDGE_NATIVE_BIND(api)
 
-[[maybe_unused]] static void say(const char *text, uint32_t x, uint32_t y)
+[[maybe_unused]] static void say(const bridge_api *api, const char *text, uint32_t x, uint32_t y)
 {
     bridge_native_log(api, BRIDGE_LOG_INFO, text, (uint32_t)strlen(text), x, y);
 }
@@ -50,22 +48,22 @@ BRIDGE_NATIVE_BIND(api)
 
 BRIDGE_NATIVE(spawn)
 {
-    for (uint32_t i = 0; i < COUNT; i ++) ids[i] = api->spawn();
+    for (uint32_t i = 0; i < COUNT; i ++) ids[i] = api->spawn(api);
     return 0;
 }
 
 /* zero bytes, so that a hundred thousand of them need no scratch arena */
-BRIDGE_NATIVE(attach_a) { for (uint32_t i = 0; i < COUNT; i ++) api->attach(ids[i], a, 0, 0); return 0; }
-BRIDGE_NATIVE(attach_b) { for (uint32_t i = 0; i < COUNT; i ++) api->attach(ids[i], b, 0, 0); return 0; }
-BRIDGE_NATIVE(detach_b) { for (uint32_t i = 0; i < COUNT; i ++) api->detach(ids[i], b); return 0; }
-BRIDGE_NATIVE(destroy) { for (uint32_t i = 0; i < COUNT; i ++) api->destroy(ids[i]); return 0; }
+BRIDGE_NATIVE(attach_a) { for (uint32_t i = 0; i < COUNT; i ++) api->attach(api, ids[i], a, 0, 0); return 0; }
+BRIDGE_NATIVE(attach_b) { for (uint32_t i = 0; i < COUNT; i ++) api->attach(api, ids[i], b, 0, 0); return 0; }
+BRIDGE_NATIVE(detach_b) { for (uint32_t i = 0; i < COUNT; i ++) api->detach(api, ids[i], b); return 0; }
+BRIDGE_NATIVE(destroy) { for (uint32_t i = 0; i < COUNT; i ++) api->destroy(api, ids[i]); return 0; }
 
 /* two components in one barrier, on entities that carry neither */
 BRIDGE_NATIVE(attach_both)
 {
     for (uint32_t i = 0; i < COUNT; i ++) {
-        api->attach(ids[i], a, 0, 0);
-        api->attach(ids[i], b, 0, 0);
+        api->attach(api, ids[i], a, 0, 0);
+        api->attach(api, ids[i], b, 0, 0);
     }
     return 0;
 }
@@ -78,7 +76,7 @@ BRIDGE_NATIVE(combine)
 {
     for (uint32_t i = 0; i < COUNT; i ++) {
         for (uint32_t k = 0; k < KINDS; k ++) {
-            if ((i + 1) >> k & 1) api->attach(ids[i], kinds[k], 0, 0);
+            if ((i + 1) >> k & 1) api->attach(api, ids[i], kinds[k], 0, 0);
         }
     }
     return 0;
@@ -89,7 +87,7 @@ BRIDGE_NATIVE(see)
     const bridge_query *q = bridge_native_query(api, seeing);
     uint32_t rows = 0;
     for (uint32_t s = 0; s < q->spans; s ++) rows += bridge_native_span(api, q, s, 1)[0];
-    say("the first kind: spans, rows", q->spans, rows);
+    say(api, "the first kind: spans, rows", q->spans, rows);
     return 0;
 }
 #endif
@@ -108,7 +106,7 @@ static uint32_t which(uint64_t id)
     return 999;     /* one destroyed longer ago, or never this module's */
 }
 
-static bool alive(uint64_t id)
+static bool alive(const bridge_api *api, uint64_t id)
 {
     const bridge_header *h = bridge_native_header(api);
     auto index = (const bridge_entity *)(api->shared_base + h->entity_index);
@@ -116,16 +114,16 @@ static bool alive(uint64_t id)
 }
 
 /* half of them, and one of them */
-BRIDGE_NATIVE(attach_b_half) { for (uint32_t i = 0; i < COUNT / 2; i ++) api->attach(ids[i], b, 0, 0); return 0; }
-BRIDGE_NATIVE(detach_b_half) { for (uint32_t i = 0; i < COUNT / 2; i ++) api->detach(ids[i], b); return 0; }
-BRIDGE_NATIVE(detach_b_absent) { api->detach(ids[COUNT - 1], b); return 0; }
+BRIDGE_NATIVE(attach_b_half) { for (uint32_t i = 0; i < COUNT / 2; i ++) api->attach(api, ids[i], b, 0, 0); return 0; }
+BRIDGE_NATIVE(detach_b_half) { for (uint32_t i = 0; i < COUNT / 2; i ++) api->detach(api, ids[i], b); return 0; }
+BRIDGE_NATIVE(detach_b_absent) { api->detach(api, ids[COUNT - 1], b); return 0; }
 
 /* a value, to see that it is the bytes at the call that are kept */
 BRIDGE_NATIVE(value_a)
 {
     A value = { 41 };
     uint32_t at = bridge_native_put(api, &value, sizeof value);
-    api->attach(ids[0], a, at, sizeof value);
+    api->attach(api, ids[0], a, at, sizeof value);
     ((A *)(api->private_base + at))->v = 99;        /* after the call: must not be seen */
     return 0;
 }
@@ -133,10 +131,10 @@ BRIDGE_NATIVE(value_a)
 /* on one entity inside one barrier: there and gone, and gone and back */
 BRIDGE_NATIVE(flicker)
 {
-    api->attach(ids[COUNT - 1], b, 0, 0);
-    api->detach(ids[COUNT - 1], b);
-    api->detach(ids[0], a);
-    api->attach(ids[0], a, 0, 0);
+    api->attach(api, ids[COUNT - 1], b, 0, 0);
+    api->detach(api, ids[COUNT - 1], b);
+    api->detach(api, ids[0], a);
+    api->attach(api, ids[0], a, 0, 0);
     return 0;
 }
 
@@ -146,8 +144,8 @@ BRIDGE_NATIVE(destroy_half)
     for (uint32_t i = COUNT / 2; i < COUNT; i ++) {
         old[i] = ids[i];
         if (gone_count < 64) gone[gone_count ++] = ids[i];
-        api->destroy(ids[i]);
-        api->destroy(ids[i]);
+        api->destroy(api, ids[i]);
+        api->destroy(api, ids[i]);
     }
     return 0;
 }
@@ -156,7 +154,7 @@ BRIDGE_NATIVE(respawn_half)
 {
     uint32_t same = 0, dead = 0;
     for (uint32_t i = COUNT / 2; i < COUNT; i ++) {
-        ids[i] = api->spawn();
+        ids[i] = api->spawn(api);
         /* an index a destroyed id had is one of ours again: never under the same generation */
         for (uint32_t k = 0; k < gone_count; k ++) {
             if ((uint32_t)ids[i] != (uint32_t)gone[k]) continue;
@@ -164,29 +162,29 @@ BRIDGE_NATIVE(respawn_half)
             if (ids[i] == gone[k]) same ++;
         }
     }
-    for (uint32_t k = 0; k < gone_count; k ++) dead += !alive(gone[k]);
-    say("destroyed ids that read as dead, of", dead, gone_count);
-    say("ids that came back whole", same, 0);
+    for (uint32_t k = 0; k < gone_count; k ++) dead += !alive(api, gone[k]);
+    say(api, "destroyed ids that read as dead, of", dead, gone_count);
+    say(api, "ids that came back whole", same, 0);
     return 0;
 }
 
 /* when a freed index comes back is storage's own business; that one does, in the end, is not */
 BRIDGE_NATIVE(recycled)
 {
-    say("an index was used again", reused, 0);
+    say(api, "an index was used again", reused, 0);
     return 0;
 }
 
 /* a change asked of an id that is gone is passed over */
 BRIDGE_NATIVE(touch_dead)
 {
-    api->attach(old[COUNT - 1], a, 0, 0);
-    api->detach(old[COUNT - 1], a);
-    api->destroy(old[COUNT - 1]);
+    api->attach(api, old[COUNT - 1], a, 0, 0);
+    api->detach(api, old[COUNT - 1], a);
+    api->destroy(api, old[COUNT - 1]);
     return 0;
 }
 
-BRIDGE_NATIVE(attach_a_half) { for (uint32_t i = COUNT / 2; i < COUNT; i ++) api->attach(ids[i], a, 0, 0); return 0; }
+BRIDGE_NATIVE(attach_a_half) { for (uint32_t i = COUNT / 2; i < COUNT; i ++) api->attach(api, ids[i], a, 0, 0); return 0; }
 
 /* ---- what a system sees ---- */
 
@@ -198,23 +196,23 @@ BRIDGE_NATIVE(look)
         const uint32_t *span = bridge_native_span(api, q, s, 1);
         rows += span[0];
         empty += !span[0];
-        if (!span[2]) say("FAIL: a matched term with no base", s, 0);
+        if (!span[2]) say(api, "FAIL: a matched term with no base", s, 0);
     }
-    say("with A: spans, rows", q->spans, rows);
-    if (empty) say("with A: spans of no rows", empty, 0);
+    say(api, "with A: spans, rows", q->spans, rows);
+    if (empty) say(api, "with A: spans of no rows", empty, 0);
     if (rows) {
         const uint32_t *span = bridge_native_span(api, q, 0, 1);
         for (s = 0; !span[0]; s ++) span = bridge_native_span(api, q, s + 1, 1);
-        say("first A", ((const A *)(api->shared_base + span[2]))->v, 0);
+        say(api, "first A", ((const A *)(api->shared_base + span[2]))->v, 0);
     }
 
     q = bridge_native_query(api, without_b);
     for (rows = 0, s = 0; s < q->spans; s ++) {
         const uint32_t *span = bridge_native_span(api, q, s, 2);
         rows += span[0];
-        if (span[3]) say("FAIL: a NOT term with a base", s, 0);
+        if (span[3]) say(api, "FAIL: a NOT term with a base", s, 0);
     }
-    say("with A and not B: spans, rows", q->spans, rows);
+    say(api, "with A and not B: spans, rows", q->spans, rows);
 
     q = bridge_native_query(api, maybe_b);
     uint32_t have = 0;
@@ -223,8 +221,8 @@ BRIDGE_NATIVE(look)
         rows += span[0];
         if (span[3]) have += span[0];
     }
-    say("with A and maybe B: spans, rows", q->spans, rows);
-    say("of them with B: rows", have, 0);
+    say(api, "with A and maybe B: spans, rows", q->spans, rows);
+    say(api, "of them with B: rows", have, 0);
     return 0;
 }
 
@@ -265,7 +263,7 @@ BRIDGE_NATIVE(find)
             for (uint32_t row = 0; row < span[0]; row ++) named += who[row] == ids[i];
         }
     }
-    say("alive and found through the index with A, and named in a span", found, named);
+    say(api, "alive and found through the index with A, and named in a span", found, named);
     return 0;
 }
 
@@ -275,7 +273,7 @@ BRIDGE_NATIVE(value_b)
 {
     for (uint32_t i = 0; i < COUNT / 2; i ++) {
         B value = { 70 + i };
-        api->attach(ids[i], b, bridge_native_put(api, &value, sizeof value), sizeof value);
+        api->attach(api, ids[i], b, bridge_native_put(api, &value, sizeof value), sizeof value);
     }
     return 0;
 }
@@ -290,8 +288,8 @@ BRIDGE_NATIVE(look_b)
         rows += span[0];
         for (uint32_t row = 0; row < span[0]; row ++) sum += values[row].v;
     }
-    say("with B: spans, rows", q->spans, rows);
-    say("with B: the sum of them", sum, 0);
+    say(api, "with B: spans, rows", q->spans, rows);
+    say(api, "with B: the sum of them", sum, 0);
     return 0;
 }
 
@@ -299,17 +297,17 @@ BRIDGE_NATIVE(look_b)
 
 static uint32_t on_a, on_b, on_both;
 
-static int heard(const char *what, uint32_t observer)
+static int heard(const bridge_api *api, const char *what, uint32_t observer)
 {
     const bridge_list *list = bridge_native_list(api, observer);
     auto t = (const bridge_trigger *)(api->private_base + list->at);
-    for (uint32_t i = 0; i < list->count; i ++) say(what, which(t[i].id), t[i].events);
+    for (uint32_t i = 0; i < list->count; i ++) say(api, what, which(t[i].id), t[i].events);
     return 0;
 }
 
-BRIDGE_NATIVE(heard_a) { return heard("A: who, events", on_a); }
-BRIDGE_NATIVE(heard_b) { return heard("B: who, events", on_b); }
-BRIDGE_NATIVE(heard_both) { return heard("A and B: who, events", on_both); }
+BRIDGE_NATIVE(heard_a) { return heard(api, "A: who, events", on_a); }
+BRIDGE_NATIVE(heard_b) { return heard(api, "B: who, events", on_b); }
+BRIDGE_NATIVE(heard_both) { return heard(api, "A and B: who, events", on_both); }
 #endif
 
 BRIDGE_NATIVE(init)
@@ -330,7 +328,7 @@ BRIDGE_NATIVE(init)
     };
     bridge_term first[1] = {{ 0, BRIDGE_IN, BRIDGE_AND, 0 }};
     for (uint32_t k = 0; k < KINDS; k ++) {
-        kinds[k] = api->declare(bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
+        kinds[k] = api->declare(api, bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
             (uint32_t)strlen(names[k]), BRIDGE_STRUCT, sizeof(T), alignof(T),
             bridge_native_put(api, T_desc, sizeof T_desc - 1), sizeof T_desc - 1, BRIDGE_DELETE);
     }

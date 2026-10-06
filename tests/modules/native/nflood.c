@@ -2,14 +2,12 @@
  * end and the invocation is failed when it returns. */
 #include "bridge-native.h"
 
-static const bridge_api *api;
 
-BRIDGE_NATIVE_BIND(api)
 
 BRIDGE_NATIVE(flood)
 {
     uint32_t i;
-    for (i = 0; i < 100'000; i ++) api->spawn();
+    for (i = 0; i < 100'000; i ++) api->spawn(api);
     return 0;
 }
 

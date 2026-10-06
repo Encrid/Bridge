@@ -10,19 +10,17 @@
 #define thread_id() ((uint32_t)(uintptr_t)pthread_self())
 #endif
 
-static const bridge_api *api;
 
-BRIDGE_NATIVE_BIND(api)
 
-static int pin()
+static int pin(const bridge_api *api)
 {
     bridge_native_log(api, BRIDGE_LOG_INFO, "pin", 3, thread_id(), 0);
     return 0;
 }
 
-BRIDGE_NATIVE(one)   { return pin(); }
-BRIDGE_NATIVE(two)   { return pin(); }
-BRIDGE_NATIVE(three) { return pin(); }
+BRIDGE_NATIVE(one)   { return pin(api); }
+BRIDGE_NATIVE(two)   { return pin(api); }
+BRIDGE_NATIVE(three) { return pin(api); }
 
 BRIDGE_NATIVE(init)
 {

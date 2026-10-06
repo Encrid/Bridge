@@ -392,6 +392,11 @@ int main(int argc, char **argv)
             printf("one from %u to %u ms, the other from %u to %u\n", 0, ended_seen[0] - began_seen[0],
                 began_seen[1] - began_seen[0], ended_seen[1] - began_seen[0]);
         }
+    } else if (!strcmp(what, "foreign")) {      /* an entry reached from a thread nobody called on */
+        a = native("test:foreign@0.1.0", NFOREIGN_PATH);
+        a.cfg.spawns = 8;
+        load(b, &a);
+        frames(b, 1);
     } else if (!strcmp(what, "pinned")) {       /* three systems, pinned, among others */
         a = native("test:sleep1@0.1.0", NSLEEP1_PATH);
         load(b, &a);
