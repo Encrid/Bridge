@@ -68,3 +68,21 @@ Refused: the table of a native module found by the thread, so that no entry is h
 Refused: an exception in `STYLE.md` for the native entry and its SDK function. The length it
 would keep states what the declaration states. The condition that brings it back is the line
 of `detach` not being explained and not being undone.
+
+## Names
+
+Of `STAGE12.md`, *Names*.
+
+Refused: the verb for what is inside only, with the seams' names left. Two conventions, and the
+seams are what the most people read. No condition brings it back before a release; after one,
+a rename at a seam is weighed against who it breaks.
+
+Refused: a participle counting as the verb, so that `moved` and `killed` stay. About
+twenty-five renames where there are sixty. `moved(e)` reads as "has it moved" and as "it is
+moved now", which is two meanings for one word. No condition brings it back.
+
+Refused: a tag ending in `_s` beside the typedef ending in `_t`. Two suffixes to know, and the
+tag is written in one place. No condition brings it back.
+
+Refused: what is built keeping its hyphen. Rule O4 is about what is tracked and does not ask
+for it. A backend would then be spelled two ways. No condition brings it back.

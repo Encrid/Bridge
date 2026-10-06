@@ -215,3 +215,30 @@ or undoes it.
     extensible    another language passes three values
     minimal       code is removed on both sides
     explicit      a zeroed value is asked for by a name, where it was a length of zero
+
+### Names
+
+Three rules ask for renames, and each got one scheme.
+
+**The verb, rule F2.** Of 323 functions in the library, the backends and the SDKs, about sixty
+were a participle (`moved`, `killed`, `carried`), an adjective (`alive`, `empty`) or a noun
+(`set_of`, `value_of`, `fingerprint`). **A fixed set, everywhere**: `is_` or `has_` for what
+answers yes or no, `get_` for what answers something held and changes nothing, and the verb of
+what it does for everything else. The seams follow, keeping what they belong to first:
+`bridge_get_rows`, `os_get_now`, `storage_is_alive`. It is written in `STYLE.md`, rule F2, since
+a reader holds it and no program can.
+
+    fast          nothing
+    scalable      a new function has its form before it has its name
+    modular       one form in the library, the backends and the SDKs
+    extensible    a host's author and a module's learn one form
+    minimal       about sixty renames inside and about twenty-five at the seams
+    explicit      the first word says whether the call reads or changes
+
+**`_t`, rule V1.** None of the 65 typedefs had it. **The tag keeps the bare name and the typedef
+adds `_t`**: `typedef struct module module_t;`. One stem and one suffix.
+
+**Files, rule O4.** The five headers with a hyphen take an underscore: `bridge_abi.h`,
+`bridge_backend.h`, `bridge_schema.h`, `bridge_native.h`, `bridge_wasm.h`. **What is built
+follows**, `bridge_wasm.dll` and `bridge_native.dll`, so that a backend is spelled one way in
+its header, its library and a host's configuration.

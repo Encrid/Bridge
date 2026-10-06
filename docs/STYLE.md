@@ -200,6 +200,20 @@ For example, `voyals_nb()` and `dijkstra()` are badly named. `get_voyals_number(
 Every function name is in English and in snake_case: lowercase letters, digits and
 underscores, and nothing else.
 
+**The verb says whether the call changes anything.** A function that answers yes or no begins
+with `is_` or `has_`. A function that answers something it holds, and changes nothing, begins
+with `get_`. Every other function is named by the verb of what it does. A name that begins with
+what it belongs to keeps that first: `storage_is_alive()`, `bridge_get_rows()`.
+
+```c
+bool has_moved(const storage_t *r, uint64_t id);            /* OK */
+bool moved(const storage_t *r, uint64_t id);                /* F2 violation */
+set_t *get_set(storage_t *r, uint32_t slot);                /* OK */
+set_t *set_of(storage_t *r, uint32_t slot);                 /* F2 violation */
+uint64_t hash_type(const type_t *type);                     /* OK */
+uint64_t fingerprint(const type_t *type);                   /* F2 violation */
+```
+
 Abbreviations are tolerated where they shorten the name by much and lose none of its meaning.
 
 ### F3 - Number of columns
