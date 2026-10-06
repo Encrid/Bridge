@@ -36,7 +36,9 @@ struct backend {
     int        quit;
 };
 
-struct backend_memory { void *ptr; uint64_t len; };
+/* An adopted block, and the module that holds it for each engine that has used it: built
+ * once, where it was built for every instance - wasmtime.md, *Memory* */
+struct backend_memory { void *ptr; uint64_t len; wasmtime_module_t *holder[ENGINES]; };
 
 struct backend_module {
     backend *b;
@@ -280,7 +282,7 @@ BACKEND_EXPORT backend_memory *memory_adopt(
         fail(err, "an adopted block must be a whole number of 64 KiB pages", nullptr, nullptr);
         return nullptr;
     }
-    backend_memory *m = malloc(sizeof *m);
+    backend_memory *m = calloc(1, sizeof *m);
     m->ptr = ptr;
     m->len = len;
     return m;
@@ -288,6 +290,7 @@ BACKEND_EXPORT backend_memory *memory_adopt(
 
 BACKEND_EXPORT void memory_release(backend_memory *m)
 {
+    for (int k = 0; k < ENGINES; k ++) if (m->holder[k]) wasmtime_module_delete(m->holder[k]);
     free(m);
 }
 
@@ -370,10 +373,11 @@ static wasmtime_error_t *adopt_into(backend_instance *i, backend_memory *mem,
     uint8_t wasm[64], limits[24];
     uint64_t pages = mem->len / PAGE;
     size_t n = 8, l = 0;
-    wasmtime_module_t *holder = nullptr;
+    wasmtime_module_t **holder = &mem->holder[i->m->kind];
     wasmtime_instance_t instance;
-    wasmtime_error_t *error;
+    wasmtime_error_t *error = nullptr;
 
+    if (*holder) goto held;
     limits[l ++] = 1;                               /* one memory */
     limits[l ++] = 1;                               /* with a maximum, which is its minimum */
     l += leb(limits + l, pages);
@@ -386,12 +390,12 @@ static wasmtime_error_t *adopt_into(backend_instance *i, backend_memory *mem,
     memcpy(wasm + n, "\7\5\1\1m\2\0", 7);           /* the export section: "m", memory 0 */
     n += 7;
 
-    error = wasmtime_module_new(i->engine, wasm, n, &holder);
+    error = wasmtime_module_new(i->engine, wasm, n, holder);
     if (error) return error;
+held:
     adopting = mem;
-    error = wasmtime_instance_new(i->ctx, holder, nullptr, 0, &instance, trap);
+    error = wasmtime_instance_new(i->ctx, *holder, nullptr, 0, &instance, trap);
     adopting = nullptr;
-    wasmtime_module_delete(holder);
     if (error || *trap) return error;
     if (!wasmtime_instance_export_get(i->ctx, &instance, "m", 1, item)) {
         return wasmtime_error_new("the holder module exports no memory");

@@ -517,9 +517,9 @@ at least five things, none defined, and none of them the one that was meant.
             280 decisions, of which about 250 hold on all six or fail one the text names
             and prices. The rest are the lines of part 3b, decided again one at a time,
             before the lines below it
-    open    a memory handle kept for a backend that does not exist: kept, for the moment.
-            Removing it was recommended on one need, minimal, and it loses on three of
-            the six. To be weighed again with every decision here, against every need
+    closed  a memory handle kept for a backend that does not exist: kept, on three needs
+            and with a use in a backend that does exist. Removing it was recommended on
+            one need, minimal, and it lost on three of the six. `backend.md`
     open    why an enum is four bytes
     open    a reload counting both instances toward [budget] systems
     open    numbers with no reason: the grain, the doubling, the first four rows, two arguments,
@@ -585,7 +585,9 @@ Of this repair:
     closed  three more guarantees with two names each: `fuel` and `meter`, a timeout and
             `deadline`, `memory_limit` and `limit`. Each has one now: `work_limit`,
             `timeout`, `memory_limit`. `capabilities.md`
-    open    the memory handle: the wasm backend compiles a holder module for a block at every
+    closed  the memory handle keeps the holder module now, built once a block and engine.
+            `wasmtime.md`, *Memory*. It was:
+            the memory handle: the wasm backend compiles a holder module for a block at every
             `instance_create`, which is work a handle could keep once. To be weighed with it
 
 Of earlier stages:

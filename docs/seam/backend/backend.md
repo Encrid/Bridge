@@ -96,10 +96,15 @@ handle without a counterpart would leak once per unload. The order is Bridge-ASM
 **a memory is released after the last instance it was handed to is destroyed**, never before, since
 an instance may hold the handle for as long as it runs.
 
-Refused: no handle at all, with `instance_create` taking a pointer and a length. On the two backends
-that exist the handle is those two numbers and nothing more, so it would cost nothing today. It is
-kept for the backend whose engine separates a block's backing from the object an instance sees, and
-must build the first once per block. Refused: the handle dying with the instance that used it,
+Refused: no handle at all, with `instance_create` taking a pointer and a length. It is two
+entries fewer, and that is all it is. A backend owns what a memory is to it, which a pointer and
+a length at the seam would decide for every backend; a handle with a counterpart states a
+lifetime, where "the block outlives the instance" would be held by nothing; and the wasm backend
+has something to keep a block: the module that holds it for wasmtime, built once and not for
+every instance - `wasmtime.md`, *Memory*. On the native backend the handle is the two numbers.
+The condition that brings it back is every backend keeping nothing in it but the two numbers.
+This paragraph said the handle was "kept for the backend" that did not exist yet, when one that
+did had a use for it nobody had looked for. Refused: the handle dying with the instance that used it,
 which is wrong for the shared memory - every instance uses it - and hides a count inside each
 backend.
 

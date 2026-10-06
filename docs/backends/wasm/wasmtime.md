@@ -30,6 +30,13 @@ the host creates is allocated by wasmtime's own default. The creator is asked on
 one memory of that size and exports it, instantiates it in the store, and hands the export to the
 module that imports it. Nothing in it runs.
 
+**That module is built once for a block, and kept in the block's handle.** `memory_adopt`
+answers the handle, the first instance to import the block under an engine compiles the holder
+module, and every later one instantiates what is there; `memory_release` deletes it. It was
+compiled again for every instance: 14.5 us each, measured, twice a load. A module is compiled by
+an engine, and this backend has up to four - *One engine per demand* - so the handle keeps one for
+each that has used the block.
+
 That rests on behaviour wasmtime does not document, so it is what an upgrade must re-prove, and the
 test above is how.
 
