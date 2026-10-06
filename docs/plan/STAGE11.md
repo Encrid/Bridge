@@ -178,3 +178,36 @@ query*.
     explicit      serves: unset is     fails: code and         fails: what runs is not what
                   refused              manifest can disagree   the code reads as
 
+**2.1 A query walks one thing, and what is kept elsewhere is reached from its row.** A table's
+rows are in the table's order and a sparse set's entries in the set's, so row 0 of one and entry
+0 of the other are different entities, and one loop cannot step through both side by side. So
+the terms that select, `BRIDGE_AND` and `BRIDGE_NOT`, are all of components kept in tables, or
+are one sparse set alone; that is what is walked, as its storage layout is walked. A term of a
+component kept elsewhere is stated `BRIDGE_OPTIONAL` and reached by entity id through an index
+storage publishes, as `column_base` is; whether this row has one is tested by the module's own
+code. A query that states anything else is refused at `system`, naming the term. Which side is
+walked is the author's, by how the query is written.
+
+Measured in scratch, the walk alone: a table's rows with a sparse value reached through its
+index, 0.59 to 0.76 ns a row of the table; a set's entries with a table's value followed by id,
+1.1 to 2.5 ns a carrier; a table's columns alone, 0.028 ns a row.
+
+    need          one walked, the rest     the matching rows listed      an archetype counts
+                  reached                  at each barrier               every component
+    fast          serves: a query of       fails: barrier work for       fails: a query that
+                  tables is untouched      every change of such a        names one leaves the
+                                           component, in each query      column loop wholly
+    scalable      serves                   fails: a list a query         fails: archetypes
+                                                                         multiply again
+    modular       serves                   serves                        serves
+    extensible    serves: direct-indexed   does not apply                fails
+                  and singleton are
+                  reached the same way
+    minimal       serves: an index a       fails                         fails: a second
+                  component, a refusal                                   structure
+    explicit      serves: the test is in   serves                        serves
+                  the reader's code
+
+What it gives up: a query cannot say "must carry" of a component in a table and of one in a
+sparse set, and be handed those rows alone.
+

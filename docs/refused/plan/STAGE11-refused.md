@@ -15,3 +15,15 @@ entities carry a component; and the module's reading code is compiled for one st
 another at run time means code for all five in every module, or a read through a call. The
 condition that brings it back is reads that go through a call, which `query.md`, *The interface
 is a query*, refuses.
+
+Refused: storage working out, at each barrier, the rows that match a query over two storage
+layouts, and publishing them as a list. The answer is then exactly the entities that match; and
+it is work at every barrier for every change of such a component, in every query that names it,
+and a list a query sized for the most there may be. The condition that brings it back is a
+deployment where the test at each row of such a query is a measured share of a tick, on a
+component that changes seldom.
+
+Refused: an archetype that counts the components kept in sparse sets, with a list of entities
+for each, as Bevy has. It brings back a list for every combination of components, which is what
+the sparse set was passed to end. No condition brings it back.
+
