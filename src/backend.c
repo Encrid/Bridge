@@ -4,10 +4,9 @@
 #include <stdio.h>
 
 /* A backend is a library exporting eighteen names. Every member of backend_api_t is a function
- * pointer, so the struct is filled as an array of them, in the order BACKEND_ENTRIES gives. */
+ * pointer, so the struct is filled as an array of them, in the order BACKEND_ENTRY_NAMES gives. */
 void *backend_open(const char *path, backend_api_t *api, char *why, size_t why_len)
 {
-    static const char *const names[BACKEND_ENTRY_COUNT] = { BACKEND_ENTRIES };
     auto slots = (void **)api;
     void *lib = os_lib_open(path);
     uint32_t i;
@@ -16,9 +15,9 @@ void *backend_open(const char *path, backend_api_t *api, char *why, size_t why_l
         return nullptr;
     }
     for (i = 0; i < BACKEND_ENTRY_COUNT; i ++) {
-        slots[i] = os_lib_get_symbol(lib, names[i]);
+        slots[i] = os_lib_get_symbol(lib, BACKEND_ENTRY_NAMES[i]);
         if (!slots[i]) {
-            snprintf(why, why_len, "backend library '%s' has no entry '%s'", path, names[i]);
+            snprintf(why, why_len, "backend library '%s' has no entry '%s'", path, BACKEND_ENTRY_NAMES[i]);
             os_lib_close(lib);
             return nullptr;
         }
