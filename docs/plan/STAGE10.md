@@ -528,6 +528,10 @@ at least five things, none defined, and none of them the one that was meant.
             the number a deployment has. `budgets.md`, *Budgets*
     open    numbers with no reason: the grain, the doubling, the first four rows, two arguments,
             and 65,536, a wasm page, to which the library rounds every block it makes
+    closed    the grain is eight, the widest alignment there is; it was sixteen for nothing
+    closed    a table's first room is what was asked; it was four rows for nothing measured
+    closed    a column begins at its own type's alignment; every one began at a multiple of
+              eight. `storage.md`, *A table*
     open    "change a layout, bump the version", before anything is released
 
 **3b. Decisions that do not hold on every need.** Found by the reading above. Where the code

@@ -34,7 +34,7 @@ so the `base` and `count` its arithmetic reads cannot be corrupted from outside 
 would change that, and we decline it: reserve address space per component and map only a module's
 own columns into its memory, which `wasmtime_config_host_memory_creator_set` makes possible. What it
 costs can be counted. A mapping is made of whole pages, and on Windows a view begins on a boundary
-of 64 KB, where a table today is one packed block with its columns at multiples of eight bytes:
+of 64 KB, where a table today is one packed block with each column at its own type's alignment:
 every column of every table would need pages of its own, which for twenty thousand tables is
 gigabytes of address space around megabytes of data. A column that grows or moves would be unmapped
 and mapped again in every module that sees it, by calls to the operating system, at a barrier that

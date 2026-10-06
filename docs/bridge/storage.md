@@ -34,8 +34,11 @@ bit for each declared type, hashed. There is no graph of which table an added or
 component leads to, because nothing walks from table to table: an entity's final set is known
 before it is placed.
 
-Its rows are **one block of the column region**: the entity ids, then a column for each type, each
-at a multiple of eight. A table that needs more rows asks for twice what it had, in place when what
+Its rows are **one block of the column region**: the entity ids, then a column for each type, in
+the order the types were declared, each at the next multiple of its own type's alignment - a
+column of `uint8_t` follows the one before it with no gap, and one of `double` begins at a
+multiple of eight. A table's first room is the rows it was asked for, and no more. A table that
+needs more rows asks for twice what it had, in place when what
 follows it is free, and otherwise elsewhere with its rows copied. A row that leaves is filled by
 the table's last row.
 
@@ -124,7 +127,8 @@ that writes a term it has is doing what it is for - `data.md`, *Access mode*.
 
 ## The column region
 
-Carved to what a table asks for, to sixteen bytes. A freed range is a gap, kept in order and
+Carved to what a table asks for, to eight bytes: the widest alignment a field has, and an
+entity id's, so that every block begins where its ids may. A freed range is a gap, kept in order and
 joined to its neighbours, and a request takes the smallest gap that holds it before fresh space.
 What says which ranges are free is kept outside the block: a list as long as there may be
 tables, made with the bridge, which never grows.

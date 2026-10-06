@@ -100,7 +100,9 @@ uint32_t region_most(const region *r)
 
 /* ---- columns: what storage asks for is what it gets, to sixteen bytes ---- */
 
-constexpr uint32_t GRAIN = 16;
+/* the widest alignment a field can have, which is an entity id's too: storage.md, *What
+ * bounds it* */
+constexpr uint32_t GRAIN = 8;
 
 static uint32_t grain(uint32_t size)
 {

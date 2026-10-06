@@ -21,7 +21,6 @@
 #include <string.h>
 
 constexpr uint32_t DEAD = 0xffffffffu;          /* a place whose entity is gone */
-constexpr uint32_t ROWS_AT_FIRST = 4;
 
 /* what the fold has decided of an entity, for the length of one barrier */
 enum folded : uint8_t {
@@ -32,6 +31,7 @@ enum folded : uint8_t {
 struct storage_type {
     uint32_t id;                    /* its bit in a set, and its column in the layout */
     uint32_t size;
+    uint32_t align;                 /* where a column of it may begin: a power of two */
 };
 
 struct storage_terms {
@@ -94,6 +94,7 @@ struct storage {
     uint32_t   changed_count;
     uint8_t   *folded;
     uint32_t  *dest;                /* the table each will be in */
+    uint64_t  *at;                  /* where laid_out last put each type's column: a type each */
     uint64_t  *attached;            /* and of that, what an attach wrote a value of: kept
                                      * only while there is an observer to be told */
     uint64_t  *scratch;             /* one set */
@@ -121,19 +122,25 @@ static uint32_t hashed(const storage *r, const uint64_t *set)
     return (uint32_t)(h ^ h >> 32) & (r->hash_room - 1);
 }
 
-/* ---- a table's block: its entity ids, then a column a type, each at a multiple of eight ---- */
+/* ---- a table's block: its entity ids, then a column a type, each where its type aligns ---- */
 
 static uint64_t padded(uint64_t bytes) { return (bytes + 7u) & ~7ull; }
 
+/* How long a block of `room` rows of `set` is, and into r->at where each of its columns
+ * begins in it: the ids, then every type in the order of its number, each at the next
+ * multiple of its own alignment. The whole is a multiple of eight, for the ids of the next. */
 static uint64_t laid_out(const storage *r, const uint64_t *set, uint32_t room)
 {
-    uint64_t len = 8ull * room;
+    uint64_t at = 8ull * room;
     for (uint32_t w = 0; w < r->words; w ++) {
         for (uint64_t bits = set[w]; bits; bits &= bits - 1) {
-            len += padded((uint64_t)r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)]->size * room);
+            const storage_type *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
+            at = (at + type->align - 1) & ~(uint64_t)(type->align - 1);
+            r->at[type->id] = at;
+            at += (uint64_t)type->size * room;
         }
     }
-    return len;
+    return padded(at);
 }
 
 static void touch(storage *r, uint32_t t)
@@ -163,7 +170,6 @@ static bool grow(storage *r, uint32_t t, uint32_t room)
     /* twice what it had, so that a table that grows a row at a time is not moved each time;
      * and what was asked and no more, where twice is not to be had */
     if (room < tab->room * 2) room = tab->room * 2;
-    if (room < ROWS_AT_FIRST) room = ROWS_AT_FIRST;
     for (;; room = asked) {
         len = laid_out(r, set, room);
         block = len > INT32_MAX ? nullptr
@@ -178,14 +184,14 @@ static bool grow(storage *r, uint32_t t, uint32_t room)
     tab->block_len = (uint32_t)len;
     tab->room = room;
     /* the columns are where the old room put them, in the new block: each moves out to where
-     * the new room puts it, the last first, so that none is written over before it is read */
-    to = len;
+     * the new room puts it, which laid_out has just said, the last first, so that none is
+     * written over before it is read */
     for (uint32_t w = r->words; w --;) {
         for (uint64_t bits = set[w]; bits;) {
             uint32_t id = w * 64 + 63 - (uint32_t)__builtin_clzll(bits);
             const storage_type *type = r->types[id];
             bits &= ~((uint64_t)1 << (id & 63));
-            to -= padded((uint64_t)type->size * room);
+            to = r->at[id];
             if (was) memmove(block + to, block + (columns[id] - was), (size_t)type->size * tab->rows);
             columns[id] = tab->block + (uint32_t)to;
         }
@@ -312,25 +318,28 @@ static void stripped(storage *r, uint32_t t, const storage_type *type, bool name
     bridge *b = r->b;
     uint64_t *set = r->sets + (size_t)t * r->words;
     uint32_t *columns = columns_of(r, t);
-    uint32_t gone = (uint32_t)padded((uint64_t)type->size * tab->room);
+    uint64_t len;
 
     if (tab->named) unnamed(r, t);
     unlisted(r, t);
+    columns[type->id] = 0;
+    take(set, type->id);
+    /* what is left, laid out again: the columns before the one that went are where they were,
+     * and each after it moves down to its new place, the first first */
+    len = laid_out(r, set, tab->room);
     for (uint32_t w = type->id >> 6; w < r->words; w ++) {
         for (uint64_t bits = set[w]; bits; bits &= bits - 1) {
             const storage_type *after = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
-            if (after->id <= type->id) continue;
-            memmove(b->shared + columns[after->id] - gone, b->shared + columns[after->id],
+            if (after->id < type->id) continue;
+            memmove(b->shared + tab->block + r->at[after->id], b->shared + columns[after->id],
                 (size_t)after->size * tab->rows);
-            columns[after->id] -= gone;
+            columns[after->id] = tab->block + (uint32_t)r->at[after->id];
         }
     }
-    columns[type->id] = 0;
-    take(set, type->id);
     /* the same block, shorter: what a smaller size is answered with is where it already is */
-    if (block_column_regrow(b, b->shared + tab->block, tab->block_len, tab->block_len - gone)
+    if (block_column_regrow(b, b->shared + tab->block, tab->block_len, (uint32_t)len)
         != b->shared + tab->block) unreachable();
-    tab->block_len -= gone;
+    tab->block_len = (uint32_t)len;
     if (name) named(r, t);
     listed(r, t);
     touch(r, t);
@@ -788,12 +797,12 @@ void storage_written(storage *r)
 
 /* ---- at load: a type, and terms ---- */
 
-storage_type *storage_declare(storage *r, uint32_t size)
+storage_type *storage_declare(storage *r, uint32_t size, uint32_t align)
 {
     uint32_t id;
     for (id = 0; r->types[id]; id ++) {}        /* its declarer counted: there is one */
     r->types[id] = &r->type_pool[id];
-    *r->types[id] = (storage_type){ id, size };
+    *r->types[id] = (storage_type){ id, size, align };
     return r->types[id];
 }
 
@@ -1005,6 +1014,7 @@ storage *storage_create(bridge *b)
     r->folded = calloc(b->entities, 1);
     r->dest = calloc(b->entities, sizeof *r->dest);
     r->attached = calloc((size_t)b->entities * r->words, 8);
+    r->at = calloc(r->type_room ? r->type_room : 1, sizeof *r->at);
     r->scratch = calloc(r->words, 8);
     /* one more than there may be, so that looking for a free one always ends */
     r->types = calloc((size_t)r->type_room + 1, sizeof *r->types);
@@ -1047,6 +1057,7 @@ void storage_destroy(storage *r)
     free(r->folded);
     free(r->dest);
     free(r->attached);
+    free(r->at);
     free(r->scratch);
     free(r);
 }

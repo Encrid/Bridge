@@ -26,7 +26,7 @@ void storage_destroy(storage *r);
 
 /* A type whose rows are `size` bytes. What it is made of is its declarer's to know: schema.h.
  * There is room for [budget] types of them, and whoever declares counts. */
-[[nodiscard]] storage_type *storage_declare(storage *r, uint32_t size);
+[[nodiscard]] storage_type *storage_declare(storage *r, uint32_t size, uint32_t align);
 void storage_undeclare(storage *r, storage_type *type);
 
 typedef struct {

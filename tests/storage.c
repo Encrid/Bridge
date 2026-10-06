@@ -205,7 +205,7 @@ int main(int argc, char **argv)
     if (!strcmp(what, "shape")) { cfg.backends = both; cfg.backend_count = 2; }
     if (!strcmp(what, "notables")) cfg.budget.tables = 1;
     if (!strcmp(what, "nocolumns")) cfg.budget.columns = 64;
-    if (!strcmp(what, "stripfull")) cfg.budget.columns = 160;
+    if (!strcmp(what, "stripfull")) cfg.budget.columns = 128;
     b = bridge_create(&cfg, sink, nullptr);
     bridge_artifact a;
 

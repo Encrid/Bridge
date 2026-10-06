@@ -159,7 +159,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
 
         c = calloc(1, sizeof *c);
         c->name = copy(name, strlen(name));
-        c->type = storage_declare(b->storage, size);
+        c->type = storage_declare(b->storage, size, align);
         c->s = s;
         c->kind = kind;
         c->size = size;
