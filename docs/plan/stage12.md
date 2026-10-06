@@ -437,5 +437,13 @@ is a header of that unit:
                     through all of it, is where it was: 1382 to 1422 ms on four threads
                     beside 1378 to 1429
 
+    block.c         ten files, `block.h` and `region.h`: a region's gaps, a piece taken,
+                    the column region, what a module is given, the log ring, the barrier,
+                    the budget's checks, the layout of the shared block, the block made,
+                    the block unmade. `block_create` was 95 lines
+    inside.h        what a bridge, a module, a system and a declared type are. Every member
+                    has a line, and what each is for is said above its struct. The two
+                    structs with no name have one: `system_term_t`, `module_mark_t`
+
 A chain of `if` and `else if` over the kinds of a thing became, each time, a table indexed by
 the kind, which is what rule C1 asks for.

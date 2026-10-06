@@ -518,7 +518,7 @@ static int start(bridge_t *b, module_t *m, const bridge_artifact_t *a, enum back
         err);
     if (!m->image) return 1;
     if (private_memory(m, cfg, err)) return 1;
-    block_header(b, m);
+    block_write_header(b, m);
 
     /* a module is handed the memories it imports, and no other - backend.md */
     import_count = o->api.module_list_imports(m->image, imports, 64);
@@ -605,10 +605,10 @@ int bridge_load(bridge_t *b, const bridge_artifact_t *a)
             "reached", id, b->max_modules);
         return 1;
     }
-    if (cfg->persistent > 0 && (uint64_t)cfg->persistent > region_most(&b->arena_space)) {
+    if (cfg->persistent > 0 && (uint64_t)cfg->persistent > region_get_most(&b->arena_space)) {
         say_error(b, "module '%s' is refused: its persistent of %lld bytes "
             "does not fit in the %u left of [budget] persistent", id, (long long)cfg->persistent,
-            region_most(&b->arena_space));
+            region_get_most(&b->arena_space));
         return 1;
     }
 
@@ -618,12 +618,12 @@ int bridge_load(bridge_t *b, const bridge_artifact_t *a)
         /* its share of the arena, for as long as it is loaded: nobody else allocates from it */
         uint32_t share = ((uint32_t)cfg->persistent + 7u) & ~7u, at;
         m->owned = calloc(1, sizeof *m->owned);
-        if (!m->owned || !region_room(&b->arena_space, b->arena_ranges + 1)) {
+        if (!m->owned || !region_make_room(&b->arena_space, b->arena_ranges + 1)) {
             (void)bridge_lacks(b, nullptr, "a module's share of the persistent arena");
             module_discard(b, m);
             return 1;
         }
-        if (share > region_most(&b->arena_space)) share = region_most(&b->arena_space);
+        if (share > region_get_most(&b->arena_space)) share = region_get_most(&b->arena_space);
         if (!region_take(&b->arena_space, share, &at)) unreachable();
         b->arena_ranges ++;
         m->owned[0] = (range_t){ b->arena + at, share };
@@ -875,13 +875,13 @@ int bridge_reload(bridge_t *b, const bridge_artifact_t *a)
             last = old->owned[old->own_count - 1];
             in_place = region_grow(&b->arena_space, last.at - b->arena, last.len, last.len + extra);
         }
-        if (!in_place && !region_room(&b->arena_space, b->arena_ranges + 1)) {
+        if (!in_place && !region_make_room(&b->arena_space, b->arena_ranges + 1)) {
             return bridge_lacks(b, nullptr, "one more range of the persistent arena");
         }
         if (!in_place && !region_take(&b->arena_space, extra, &extra_at)) {
             say_error(b, "module '%s' is not reloaded: its persistent of %lld "
                 "bytes does not fit in the %u left of [budget] persistent", old->identity,
-                (long long)wants, region_most(&b->arena_space) + old->arena_share);
+                (long long)wants, region_get_most(&b->arena_space) + old->arena_share);
             return 1;
         }
         if (!in_place) b->arena_ranges ++;

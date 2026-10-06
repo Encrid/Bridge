@@ -1110,7 +1110,7 @@ int storage_publish(storage_t *r, module_t *m)
 
     /* column_base: every table when a declaration changed, and otherwise the ones touched */
     if (all) {
-        block_header(b, m);
+        block_write_header(b, m);
         memset(cell, 0, 4u * m->declared_count * tables);
         for (uint32_t t = 1; t < r->table_high; t ++) {
             if (!r->tables[t].live) continue;
