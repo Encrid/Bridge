@@ -46,7 +46,8 @@ is not named here is still not welcome: it is an implicit rule.
 This document is the Epitech C Coding Style, version 3.1, taken as it is and made this
 project's own. That style is inspired by the Linux Kernel Coding Style and freely adapted from
 Robert C. Martin's book Clean Code. What differs here from the original is the file header of
-rule G1, and the two sections at the end, which the original does not have.
+rule G1, the form rule F6 gives the comment above a function, and the two sections at the end,
+which the original does not have.
 
 `tools/style.py` holds every rule here that a program can hold, and runs with the tests.
 
@@ -93,15 +94,47 @@ Every source file (`.c`, `.h`) starts with the project's standard header.
 
 ```c
 /*
-** BRIDGE-ASM700, $YEAR
-** $PATH_OF_THE_FILE
-** File description:
-** What the file is, in a line or a few
+** Copyright (C) $YEAR Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** $PATH_OF_THE_FILE -- what the file is
 */
 ```
 
 `$YEAR` is the year the file was first written. `$PATH_OF_THE_FILE` is its path from the root
-of the repository, such as `src/storage.c`.
+of the repository, and what follows it says what the file is, in as many lines as are relevant
+and no more.
+
+```c
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** src/storage.c -- what keeps the rows: tables, and a barrier's work
+*/
+```
+
+**A file that carries somebody else's code names them**, each on a line of its own under ours,
+with where the code is from and its licence:
+
+```c
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+** Copyright (C) 2005-2020 Rich Felker, et al. (musl, MIT)
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** src/text.c -- strtoll and strtoull, after musl's
+*/
+```
 
 ### G2 - Separation of functions
 
@@ -224,6 +257,22 @@ A function is readable and explains itself, with no need for more.
 
 The length of a function being inversely proportional to its complexity, a complicated
 function is a short one: a comment above it is enough to explain it.
+
+That comment has the form of the file's header: the function's name, an empty line, and then
+what it does, what it answers and what it answers when it cannot.
+
+```c
+/*
+** storage_apply
+**
+** Applies every module's queue, in the order the calls that filled them ran.
+** An entity that cannot be placed is left as it was.
+*/
+void storage_apply(storage_t *r)
+{
+    ...
+}
+```
 
 ## L - Layout inside a function scope
 
