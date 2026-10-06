@@ -511,6 +511,11 @@ at least five things, none defined, and none of them the one that was meant.
     closed  a signature the native backend cannot check: the backend checks, since it is
             who can see an export. `instance_func` answers a function or refuses, and
             the arity, the count of results and the -1 left the seam. `signatures.md`
+    open    every decision against every need. `STAGE0.md`, step 6, asked for the one need
+            that decides, and a decision weighed that way was never scored on the other
+            five. The step is corrected. Every decision in the documents is listed, scored
+            on all six, and one whose verdict changes is decided again, one at a time.
+            This comes before the lines below it
     open    a memory handle kept for a backend that does not exist: kept, for the moment.
             Removing it was recommended on one need, minimal, and it loses on three of
             the six. To be weighed again with every decision here, against every need

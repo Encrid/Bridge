@@ -52,9 +52,17 @@ schemas is not. When an option's appeal is "we keep ours and also use theirs", c
 has a job - the schema format's only remaining job turned out to be one flecs' own macro did directly.
 This applies to open questions too: one that overlaps another is a bad cut, not two problems.
 
-**6. Weigh against named needs.** Fast, scalable, modular, extensible, minimal, **explicit**. Say
-which need decides. Check whether a cost lands on the hot path - that is the one budget this project
-cannot spend, and it is what refused per-module page mapping.
+**6. Weigh against every named need.** Fast, scalable, modular, extensible, minimal, **explicit**.
+Every option is scored on all six, and the scores are shown: it serves the need, it fails it, or
+the need does not apply, each with the reason. An option that fails one is refused, or the
+conflict between two needs is itself the question to put. Which need decides is said only between
+options that fail none. Check whether a cost lands on the hot path - that is the one budget this
+project cannot spend, and it is what refused per-module page mapping.
+
+**This step once said "say which need decides", and no more.** So an option was weighed against
+the one need that favoured it. The memory handle of the backend seam was recommended away as
+"minimal" when it loses on modular, extensible and explicit; nothing in the step asked for the
+other five. Every decision taken that way was scored again - `STAGE10.md`, *The repair*.
 
 **Explicit is the one that gets forgotten**, and it is the one that costs most when it is. Nothing
 may behave differently from what the person reading it expected, which rules out more than it looks:
