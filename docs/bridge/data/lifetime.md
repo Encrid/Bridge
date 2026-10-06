@@ -92,26 +92,52 @@ different `Position`, the other is still running with the old struct compiled in
 only have one component layout. Dropping takes the other module's data; migrating leaves it reading
 new bytes with old code. Nothing reconciles it, so this is forced rather than chosen.
 
-**Exclusive: refused as well, and the refusal cannot be waived.** Dropping would harm only this
-module, so it looks viable - but **Bridge-ASM700 never discards data on a call that means "keep
-running"**, and a flag to switch that off would be a flag whose job is disabling a check. The
-refusal names the component and both fingerprints, so the author knows what they changed.
+**Exclusive: its rows are moved to the new component layout, field by field, by name.**
+Bridge-ASM700 keeps the fields of every type, and a `declare` hands it the new descriptor, so it has
+both. That is decided and not yet built: it is `PLAN.md`, stage 11, since moving a type's rows to
+another size is done once for every storage layout. **Until then a changed component layout is
+refused**, naming the type and both fingerprints, and an author who accepts the loss unloads and
+loads.
 
-An author who accepts the loss unloads and loads. Same outcome, through a verb that already means
-the data goes - which is where the consent belongs, rather than in a boolean nobody can read at a
-call site.
+What each change will do:
 
-**Bridge-ASM700 does not migrate.** It was written here that it cannot, a fingerprint being a
-hash that detects a difference and cannot describe it. That is no longer so: it keeps the fields
-of every type by name, and is handed the new descriptor, so it has both component layouts. Whether
-it should move rows from one to the other at a reload - a field added, removed, renamed - is an
-open question: `STAGE10.md`, *The repair*. A converter the module supplied is still not possible:
-it would have to read a component layout its new build does not contain.
+    a field added                its bytes are zero, and the module's `reload`, which runs next,
+                                 is where it is given a value
+    fields in another order      each goes to its new offset
+    an array made longer         what it held is kept, and the rest is zero
+    a field removed              it is gone from every row, and a record names it and how many
+                                 rows held it
+    an array made shorter        the first of it is kept, and a record says how much went
+    a field renamed              is a field removed and a field added, since two descriptors
+                                 cannot say otherwise: the old values go and the new field is
+                                 zero, and the record shows both
+    a field of another type      the reload is refused, naming the field: bytes of one type are
+                                 not a value of another
+    a struct a field names,      the same rules, one level down
+    changed
+    an enum whose constants      refused if a constant now has another number, since every
+    changed                      stored value would silently mean something else; a constant
+                                 added is nothing
 
-The ECS already offers migration in its own terms. **Declare a new name**: run a system that reads
-`game:Position` and writes `game:Position2`, then stop declaring the old one. Two components, both
-valid, no component layout changing under anyone. So the rule is **change the bytes, change the name** - a
-component layout change to an existing name cannot work, and a new name is free.
+**A removal is the author's, and that is why it migrates.** This document said that
+Bridge-ASM700 never discards data on a call that means "keep running", and refused every change
+for it. The rule stands for what Bridge-ASM700 would drop on its own account. A field the new
+struct no longer has was dropped by whoever edited the struct; refusing the reload does not keep
+the field, it keeps the author from running the code they wrote. What they are owed is to be told
+exactly what went, which the record does.
+
+Refused: refusing every reload that would lose a byte. It keeps one promise literal and makes
+tidying a struct, or renaming a field, cost the module's state. The condition that brings it back
+is a field lost to a rename that nobody saw in time. Refused: a flag to waive the refusal, which
+is a flag whose job is disabling a check. Refused: a way for a module to state "this field was
+that one", which is one more thing in the ABI for a case two reloads or a new name already cover.
+The condition is renames being common enough that losing their values is a daily cost.
+
+**A converter the module supplies is still not possible**: it would have to read a component
+layout its new build does not contain. For a change no rule above covers there is the ECS's own
+way. **Declare a new name**: run a system that reads `game:Position` and writes `game:Position2`,
+then stop declaring the old one. Two components, both valid, no component layout changing under
+anyone.
 
 Quake avoided this rather than answering it: `pr_edict_size` comes from the loaded progs
 (`pr_edict.c:1021`), so reloading re-strides every edict - and progs is only loaded at

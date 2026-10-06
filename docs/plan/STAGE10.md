@@ -445,8 +445,10 @@ the first five were not, and should have been.
             and it points at a section about a struct's fields changing at a reload. The
             first is the item. Weighed on `storage weigh`, whose figures are below, and
             then each kind on its own: accepted, all five, as `PLAN.md` 11
-    open    a struct changed at reload: a question the misreading raised and nobody had
-            asked. `lifetime.md` says the library "cannot" tell what changed, which is false
+    closed  a struct changed at reload: a question the misreading raised, and worth
+            asking. A component only its module declares has its rows moved to the new
+            component layout by field name; a field removed or renamed goes, and a record
+            says so. Decided here, built in `PLAN.md` 11. `lifetime.md`
     closed  an SDK for a module that is not C: a stage of its own, `PLAN.md` 15, with two owners.
             What Bridge-ASM700 writes is its own to state; how a module reaches it is the
             backend's. Tried first: the project's compiler cannot translate the header

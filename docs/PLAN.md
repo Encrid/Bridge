@@ -249,6 +249,10 @@ each backend's SDK, and what a query may ask across two of them; what each costs
 budget; whether a component may have no bytes at all, a tag; and what it takes to move a
 component from one storage layout to another, which is what "layout migration" meant.
 
+**And a type's rows are moved to a new component layout here too**, because it is the same work:
+writing every row of a type again somewhere else. The rules are decided - `lifetime.md`, *When a
+component layout changed* - and until this stage a changed component layout is refused.
+
 Before everything that reads storage or describes it: the readings of how full a budget is, and
 the module seam in a second language, would each be made twice otherwise.
 
@@ -256,8 +260,10 @@ the module seam in a second language, would each be made twice otherwise.
 layout is read; each has a case for what it is for and a measurement beside the table's for the same
 work, and none is slower than the table at what it was chosen for; a query across two storage
 layouts either works as written or is refused by name; running out, strip at unload and what an
-observer is told each hold in every storage layout; and a component is moved from one storage layout
-to another with its values.*
+observer is told each hold in every storage layout; a component is moved from one storage layout
+to another with its values; and a module reloaded with a field added, removed, renamed or moved
+keeps every value its new component layout still has a place for, in each storage layout, and is
+told by a record what went.*
 
 ## 12. Self contained
 
