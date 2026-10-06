@@ -255,8 +255,13 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
             "no record, and one is %u", id, cfg->log_ring, (unsigned)sizeof(bridge_log_record));
         return 1;
     }
-    if ((!cfg->trusted && lacks(b, id, o, BACKEND_SANDBOX, "trusted = false", "sandbox"))
-        || (cfg->fuel > 0 && lacks(b, id, o, BACKEND_METER, "fuel", "meter"))
+    /* capabilities.md: one guarantee, asked by `trusted` and answered by the backend */
+    if (!cfg->trusted && !(o->capabilities & BACKEND_UNTRUSTED)) {
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: it is not trusted, and backend "
+            "'%s' runs only modules that are", id, o->name);
+        return 1;
+    }
+    if ((cfg->fuel > 0 && lacks(b, id, o, BACKEND_METER, "fuel", "meter"))
         || (cfg->memory_limit > 0 && lacks(b, id, o, BACKEND_LIMIT, "memory_limit", "limit"))
         || (cfg->init_timeout > 0 && lacks(b, id, o, BACKEND_DEADLINE, "init_timeout", "deadline"))
         || (cfg->reload_timeout > 0 && lacks(b, id, o, BACKEND_DEADLINE, "reload_timeout", "deadline"))
@@ -273,7 +278,7 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
         return 1;
     }
     *on = o;
-    *demands = (cfg->trusted ? 0 : BACKEND_SANDBOX) | (cfg->fuel > 0 ? BACKEND_METER : 0)
+    *demands = (cfg->trusted ? 0 : BACKEND_UNTRUSTED) | (cfg->fuel > 0 ? BACKEND_METER : 0)
              | (cfg->memory_limit > 0 ? BACKEND_LIMIT : 0)
              | (cfg->init_timeout > 0 || cfg->reload_timeout > 0 || cfg->shutdown_timeout > 0
                 ? BACKEND_DEADLINE : 0);

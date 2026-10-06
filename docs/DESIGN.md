@@ -78,7 +78,7 @@ freely in its own namespace and needs a grant to reach another's. That makes a g
 explicit instead of defaulting to every component present, and it is one check at init.
 
 **A backend is a shared library** behind a surface Bridge-ASM700 defines. One wraps wasmtime; the other
-is native, for code that does not need sandboxing. A module names the one that runs it.
+is native, for code the deployment trusts. A module names the one that runs it.
 
 **Parallelism is derived; order is declared.** Declared read and write sets say which systems may
 run at once - two writers of the same component may not - which makes the hot path lock-free by

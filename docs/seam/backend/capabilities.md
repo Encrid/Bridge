@@ -5,7 +5,7 @@ are how it states the guarantees in `module.md`, *Three guarantees differ* - met
 `meter`, `deadline` and `limit`, and reload is two. The last is about the backend itself:
 
                    wasm   native
-    sandbox        yes    no      a module cannot reach memory it was not given
+    untrusted      yes    no      a module that is not trusted can be run here
     meter          yes    no      fuel, or an equivalent
     deadline       yes    no      a running module can be interrupted
     limit          yes    no      a module's own memory has a ceiling
@@ -14,13 +14,32 @@ are how it states the guarantees in `module.md`, *Three guarantees differ* - met
     side by side   yes    no      two instances of one module can exist at once
     unload         no     yes     its library can be taken out of the process
 
-`sandbox` is about the **host boundary and nothing else**. It does not mean one module cannot
+**`untrusted` is the deployment's `trusted`, answered.** They are one guarantee and so one word:
+a deployment states whether a module is trusted, and a backend states whether it runs one that
+is not. A module that is not trusted loads only on a backend that says so. How a backend keeps
+that is its own, and is named in its own document and not at this seam: the wasm backend does it
+with a sandbox, and another might with a process, or with nothing a sandbox describes.
+
+What it promises is two things. A module cannot reach memory it was not given. And every export
+the backend hands back has been checked to be one it can call - `signatures.md`, *A call takes
+nothing and answers a status*. A backend that does not answer `untrusted` promises neither: the
+native backend has a symbol from the loader, which carries no type, and checks nothing, and the
+deployment that loads a module there has stated `trusted = true`.
+
+Refused: `sandbox` as the capability's name, which is what it was. It named one backend's way of
+keeping the guarantee, and gave one thing two words, one where it was asked and one where it was
+answered. No condition brings it back. Refused: a capability of its own for checking exports,
+with a key to demand it. `trusted` already states that nothing contains a module's code, and a
+wrong signature is one more thing nothing contains. The condition that brings it back is a
+deployment that must have exports checked on a backend that does not contain its modules.
+
+The guarantee is about the **host boundary and nothing else**. It does not mean one module cannot
 corrupt another's components: they share a memory by design - see `costs.md`, *What we give up*.
 idTech3 drew the same line, `VMI_NATIVE` against `VMI_BYTECODE` per VM with a cvar each and shipped
 set to the safe one. It got isolation between its VMs only because the three had three blocks and
 shared no data.
 
-Each flag is demanded by a **config key**, not by a module: `sandbox` by `trusted = false`,
+Each flag is demanded by a **config key**, not by a module: `untrusted` by `trusted = false`,
 `meter` by `fuel`, `deadline` by a timeout, `limit` by `memory_limit`, `reload` by `hot_reload`.
 `side by side` is demanded by nothing: it is how Bridge-ASM700 learns which order a reload takes -
 `lifecycle.md`, *The runtime lifecycle*. `unload` is demanded by nothing either: it is how
@@ -51,7 +70,7 @@ than quietly given something else.
 The override is explicit instead: a developer who wants untrusted code on the native backend writes
 `trusted = true` - a statement in a file somebody can read, rather than a warning nobody does.
 
-The native backend answers no to `sandbox`, truthfully, and Bridge-ASM700 then refuses to load anything
+The native backend answers no to `untrusted`, truthfully, and Bridge-ASM700 then refuses to load anything
 marked untrusted onto it, before the library is opened. That makes the native backend a deliberate
 choice for code you wrote rather than a hole you discover.
 

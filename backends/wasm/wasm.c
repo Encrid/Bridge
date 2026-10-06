@@ -263,7 +263,7 @@ BACKEND_EXPORT void backend_destroy(backend *b)
 
 BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] backend *b)
 {
-    return BACKEND_SANDBOX | BACKEND_METER | BACKEND_DEADLINE | BACKEND_LIMIT | BACKEND_RELOAD
+    return BACKEND_UNTRUSTED | BACKEND_METER | BACKEND_DEADLINE | BACKEND_LIMIT | BACKEND_RELOAD
          | BACKEND_SIDE_BY_SIDE;
 }
 

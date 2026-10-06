@@ -2,7 +2,7 @@
 
 The surface a backend implements. Bridge-ASM700 defines it; a shared library provides it. Two exist: the
 **wasm** backend, which wraps wasmtime, and the **native** backend, which opens a shared library and
-calls it directly, for code that does not need sandboxing. A module names the one that runs it -
+calls it directly, for code the deployment trusts. A module names the one that runs it -
 `host-api.md`, *The data*.
 
 Bridge-ASM700 keeps everything that is not the engine's business - `split.md`, *The split* - so a backend

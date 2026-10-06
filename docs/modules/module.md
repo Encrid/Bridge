@@ -67,14 +67,14 @@ answers rather than a diagnostic, and what finds it afterwards is `validation.md
 costs, and what finds it*.
 
 Nothing on this list is a wall. The one refusal that is lives in `wasm.md`, *What a wasm module
-cannot do*, and it is not a shared rule: it is the sandbox guarantee below, stated as a rule. Each
+cannot do*, and it is not a shared rule: it is the first guarantee below, stated as a rule. Each
 backend adds exactly one refusal of its own, in its own SDK.
 
 ## Three guarantees differ
 
-    sandbox          on the wasm backend a module cannot reach memory it was not
-                     given. on the native backend it is code in Bridge-ASM700's process,
-                     and nothing contains it
+    untrusted        on the wasm backend a module cannot reach memory it was not
+                     given, so one that is not trusted can be run. on the native backend
+                     it is code in Bridge-ASM700's process, and nothing contains it
     metering         fuel, timeouts and memory limits apply on the wasm backend -
                      `limits.md`, *What bounds a run*. native code is not meterable
     clean reload     on the wasm backend a reload is a fresh instance over surviving

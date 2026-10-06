@@ -578,7 +578,12 @@ Of this repair:
             said, with the rows that stay apart and the budget that had no room. `lifetime.md`
     closed  `[budget] terms` is the deployment's, and a module cannot state what it needs: it
             holds, as `types` and `systems` do, and what it costs is written. `budgets.md`
-    open    the export shape: a backend that cannot check says so by doing nothing
+    closed  the export shape: a backend that cannot check said so by doing nothing. The check
+            is part of one guarantee, which had two names: `trusted` where a deployment
+            asked and `sandbox` where a backend answered. The capability is `untrusted`,
+            and how a backend keeps it is its own. `capabilities.md`
+    open    three more guarantees with two names each: `fuel` and `meter`, a timeout and
+            `deadline`, `memory_limit` and `limit`. Each weighed before it is renamed
     open    the memory handle: the wasm backend compiles a holder module for a block at every
             `instance_create`, which is work a handle could keep once. To be weighed with it
 

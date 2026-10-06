@@ -6,7 +6,7 @@ pointer could break this; nothing contains native code, so it is a contract rath
 
 **`load`** takes an artifact rather than a path, because Bridge-ASM700 decides on `cfg` and never finds
 or reads a module's file. In order: find the backend the artifact names, check the ABI version,
-check `trusted` against that backend's `sandbox`, check the grants, take one of `[budget] modules`,
+check `trusted` against what that backend says it runs, check the grants, take one of `[budget] modules`,
 hand `bytes` and `path` to the backend, call `init` - which calls `declare`, `system` and
 `observe` - recompute the conflict graph and **refuse-and-unwind if a new system or observer
 conflicts unordered with an existing one**, then publish spans.

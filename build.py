@@ -486,7 +486,7 @@ CASES = [
     ('stage4-mixed', ['stage4', 'mixed'],
      r"view:reader@0.1.0/sum: sum 250500 0.*native tally 2 1000.*sum 251000 0.*alive", None),
     ('stage4-untrusted', ['stage4', 'untrusted'],
-     r"module 'game:mover@0.1.0' is refused: trusted = false needs 'sandbox', which backend 'native' lacks.*alive", r"cannot open"),
+     r"module 'game:mover@0.1.0' is refused: it is not trusted, and backend 'native' runs only modules that are.*alive", r"cannot open"),
     ('stage4-limit', ['stage4', 'limit'],
      r"module 'game:mover@0.1.0' is refused: fuel needs 'meter', which backend 'native' lacks.*alive", r"cannot open"),
     ('stage4-libraries', ['stage4', 'libraries'],

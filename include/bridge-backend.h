@@ -26,7 +26,9 @@ typedef struct { char text[256]; } backend_err;
 
 /* What a backend can actually do - capabilities.md. */
 enum backend_capability : uint32_t {
-    BACKEND_SANDBOX  = 1 << 0,
+    /* it runs a module that is not trusted: one that cannot reach what it was not given, and
+     * whose every export it has checked. How it does that is its own */
+    BACKEND_UNTRUSTED = 1 << 0,
     BACKEND_METER    = 1 << 1,
     BACKEND_DEADLINE = 1 << 2,
     BACKEND_LIMIT    = 1 << 3,
