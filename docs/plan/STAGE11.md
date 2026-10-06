@@ -331,3 +331,43 @@ module could attach its settings component to a second entity, and `config.md` c
 singleton with nothing holding it to one. Allowing either was scored as failing minimal, two
 paths for one thing; leaving it as it is as failing explicit.
 
+**3. What grows with rows is paid from `[budget] columns`, and what is kept for every entity is
+bounded by two keys.** A toggle's bits and the sixteen bytes ahead of its column are part of its
+table's block. A sparse set's values and the ids beside them are a block of the column region,
+grown by half as a table's is. A singleton's value is a block of its size, taken at `declare`.
+Running out of `columns` is what it is today: the entity is left as it was and the module that
+asked has failed.
+
+A sparse set's index and a direct-indexed component's cells and bits are kept for every entity
+there may be, carried or not, and how many such components there will be is not known when the
+bridge is created. So the deployment states it:
+
+    [budget] sparse_sets       how many components may be kept in a sparse set. Storage
+                               reserves their indexes whole at create: eight bytes an entity
+                               for each, the published one and its own
+    [budget] direct_indexed    how many may be direct-indexed. Storage reserves their bits at
+                               create. Their cells are the component's size an entity, which
+                               is not known at create, so they are taken from `columns` at
+                               `declare`
+
+A `declare` past either key is refused, and one whose cells do not fit `columns`. So storage
+still allocates nothing after `bridge_create` - `storage.md`, *What bounds it*.
+
+    need          two keys                    from `columns` at declare     the most there
+                                                                            may be
+    fast          does not apply              does not apply                does not apply
+    scalable      serves                      serves                        fails: by `types`
+                                                                            times `entities`
+    modular       serves                      serves                        serves
+    extensible    fails in part: a key a      serves                        serves
+                  storage layout
+    minimal       fails: two keys, and        serves                        serves
+                  cells from `columns` still
+    explicit      serves: stated by who       fails in part: `columns`      fails: a number
+                  knows the modules           pays for three kinds of       nobody stated
+                                              thing, and storage
+                                              allocates at load
+
+Scored as failing minimal, and chosen: a load cannot fail for an index that create would have
+reserved, and storage's rule holds as written.
+

@@ -67,3 +67,13 @@ Refused: a settings component kept in a table on an entity of Bridge-ASM700's ow
 alone or beside the singleton. A second row of it can exist, and with both there are two paths
 for one thing. No condition brings it back.
 
+Refused: a sparse set's index taken from `[budget] columns` when its component is declared,
+with storage's own copy allocated then. No key; and storage would allocate when a module loads,
+which `storage.md`, *What bounds it*, says it does not, and one budget would pay for rows, for
+indexes and for cells. The condition that brings it back is the two keys being stated wrongly
+more often than they help.
+
+Refused: reserving for every declared type being a sparse set. Two hundred megabytes at
+sixty-four types and four hundred thousand entities, decided by a number nobody stated for
+that. No condition brings it back.
+
