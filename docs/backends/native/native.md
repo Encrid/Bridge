@@ -4,7 +4,7 @@ A native module is a **module** like any other - same ABI, same rules, three gua
 `module.md`. What it can *do* is there; this file is how a shared library binds to it.
 
 The native backend exists for one reason: **something that cannot be reached from inside wasm.** A
-GPU, an audio device, input, the system clock, a filesystem, a socket - and an engine that owns
+GPU, an audio device, input, the clock, a filesystem, a socket - and an engine that owns
 those, which is what Godot is. Hardware, and the native code that is its only door.
 
 So the test is **could this run on the wasm backend?** A physics library, a codec, a bytecode
@@ -160,7 +160,7 @@ module adds `shared`, which does not move.
 **`sizeof(T)` comes from the schema header, not from the span.** Stride is never published, for the
 reason `query.md` gives: both sides compile the same declaration, so the compiler already knows it.
 
-One span layout for every backend rather than a resolved copy for native code: two layouts would be
+One form of span for every backend rather than a resolved copy for native code: two forms would be
 two rewrites at every barrier, and two things to disagree.
 
 A pointer computed this way is good for the phase it was computed in, for the same reason a row
@@ -177,8 +177,8 @@ given them to stay honest, not because anything could stop it reading what it wa
 **Put a native handle in a component.** That is this backend's only addition to the list in
 `module.md`, and it is the subtle one.
 
-A `VkDevice` or a GL context would fit in a `u64` and the layout would even be sound, but **storage
-survives an unload by design**, so the handle outlives the module that made it and the next reader
-uses it happily. Two native modules that must share a device share it the way two native libraries
-in one process always have - by being built to - and that is not Bridge-ASM700's business. Bridge-ASM700's
-storage is for data a component describes, and a pointer is not that.
+A `VkDevice` or a GL context would fit in a `u64` and the component layout would even be sound, but
+**storage survives an unload by design**, so the handle outlives the module that made it and the
+next reader uses it happily. Two native modules that must share a device share it the way two native
+libraries in one process always have - by being built to - and that is not Bridge-ASM700's business.
+Bridge-ASM700's storage is for data a component describes, and a pointer is not that.

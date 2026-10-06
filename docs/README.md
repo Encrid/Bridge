@@ -57,7 +57,7 @@ diagram to keep in step with. One concern per document, in reading order:
                                observers
         query.md             spans: how a system reads its data
         reference.md         following one entity by id
-        lifetime.md          reload, unload, and a changed layout
+        lifetime.md          reload, unload, and a changed component layout
 
     bridge/memory/
         memory.md            the seven regions
@@ -102,13 +102,13 @@ period: `backend.md`, *The backend owns its clock*.
         bridge.h                 host seam: the functions and their structs
         bridge-backend.h         backend seam: the seventeen entries in `backend.md`
         bridge-abi.h             module seam: what Bridge-ASM700 writes for a module to read,
-                                 the same on every backend - `wasm.md`, *The published layouts*
+                                 the same on every backend - `wasm.md`, *The ABI layouts*
     src/                     the library. Nothing outside it is compiled against it
-    backends/wasm/           the wasm backend: its source, and what it needs of the system
+    backends/wasm/           the wasm backend: its source, and what it needs of the operating system
         sdk/                     how a wasm module is written: `bridge-wasm.h`, and the
                                  accessors of `bridge-wasm.wat` that are merged into one
         wasmtime/                the engine it is linked against
-    backends/native/         the native backend: its source, and what it needs of the system
+    backends/native/         the native backend: its source, and what it needs of the operating system
         sdk/                     how a native module is written: `bridge-native.h`
     tests/                   the hosts that drive the cases
         modules/wasm/            the modules they load, by the backend that runs each

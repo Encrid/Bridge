@@ -26,7 +26,7 @@ void os_release(void *base, [[maybe_unused]] size_t reserve)
 /* A library named by a path is looked for there, and so is what it needs: a backend brings its
  * runtime beside itself, wherever the host's own executable is. Windows looks beside the
  * library only when asked, and only for a full path written its own way. A bare name is left to
- * the system's search, as on every platform. */
+ * the operating system's search, as on every platform. */
 void *os_lib_open(const char *path)
 {
     char full[MAX_PATH];

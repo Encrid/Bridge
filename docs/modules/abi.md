@@ -66,7 +66,7 @@ on it because there is nothing left for a call to do.
 
 **No `access` on `declare`.** Access mode is how a *system* uses a component, not a property of the
 type, so it rides on the query term - `data.md`, *Access mode*. Two modules declaring
-`game:Position` must agree on its layout and need not agree on how they touch it.
+`game:Position` must agree on its component layout and need not agree on how they touch it.
 
 **No `find`.** `declare` is idempotent - the first caller creates a component and later callers get
 the same slot - and both sides already have `sizeof` from the schema header, so a second call has

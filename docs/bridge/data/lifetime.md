@@ -1,8 +1,8 @@
 # Lifetime
 
 Storage is the bridge's and outlives the module that declared a component, so a reloaded module finds its
-components still there - which the original Bridge does not do. What happens when the layout has
-changed is *When the layout changed*, below.
+components still there - which the original Bridge does not do. What happens when a component layout
+has changed is *When a component layout changed*, below.
 
 **Reload has one mode and it keeps the components**, which is the whole point of it. There is no
 drop-and-restart variant, because `bridge_unload` followed by `bridge_load` already is one and its
@@ -82,15 +82,15 @@ fourth value that makes the unload itself fail while entities still carry the co
 failure path nothing has asked for. The condition that brings it back is data that must not be lost
 by an unload somebody else requested.
 
-## When the layout changed
+## When a component layout changed
 
 The fingerprint catches it - `schema.md`, *Fingerprints* - and what happens next depends on who else
 holds the component.
 
 **Shared: refused, always.** If two modules declare `game:Position` and one is rebuilt with a
 different `Position`, the other is still running with the old struct compiled in, and a column can
-only have one layout. Dropping takes the other module's data; migrating leaves it reading new bytes
-with old code. Nothing reconciles it, so this is forced rather than chosen.
+only have one component layout. Dropping takes the other module's data; migrating leaves it reading
+new bytes with old code. Nothing reconciles it, so this is forced rather than chosen.
 
 **Exclusive: refused as well, and the refusal cannot be waived.** Dropping would harm only this
 module, so it looks viable - but **Bridge-ASM700 never discards data on a call that means "keep
@@ -102,13 +102,13 @@ the data goes - which is where the consent belongs, rather than in a boolean nob
 call site.
 
 **Migration is not Bridge-ASM700's.** It cannot be: a fingerprint is a hash, so it detects difference and
-cannot describe it, and a converter the module supplied would have to read a layout its new build
+cannot describe it, and a converter the module supplied would have to read a component layout its new build
 does not contain.
 
 The ECS already offers migration in its own terms. **Declare a new name**: run a system that reads
 `game:Position` and writes `game:Position2`, then stop declaring the old one. Two components, both
-valid, no layout changing under anyone. So the rule is **change the bytes, change the name** - a
-layout change to an existing name cannot work, and a new name is free.
+valid, no component layout changing under anyone. So the rule is **change the bytes, change the name** - a
+component layout change to an existing name cannot work, and a new name is free.
 
 Quake avoided this rather than answering it: `pr_edict_size` comes from the loaded progs
 (`pr_edict.c:1021`), so reloading re-strides every edict - and progs is only loaded at

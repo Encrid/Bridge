@@ -95,7 +95,7 @@ what is needed:
     attributes     [[nodiscard]] on every function whose answer is a status or something owned;
                    [[maybe_unused]] where a parameter is not read; a compiler's own in the same
                    brackets, [[clang::export_name("init")]]
-    layout         static_assert of every size and offset the ABI states, in the header that
+    ABI layouts    static_assert of every size and offset the ABI states, in the header that
                    states it, so a module and the library cannot disagree and both compile
     checked sums   <stdckdint.h> wherever a size is computed from stated numbers. An overflow is
                    a refusal naming the key, like any other budget that cannot be met
@@ -118,7 +118,7 @@ thread-local storage, so the context would have been passed: a native module's A
 it, and the flecs patch reached into two functions that have no world to pass. Refused, then:
 C99 for everything. Refused: C11, which is what the code already was and takes nothing more.
 Refused: C23 for the source with the headers held to C99, which was the first recommendation: the
-ABI header is where a stated width and an asserted layout are worth most. The condition that
+ABI header is where a stated width and an asserted ABI layout are worth most. The condition that
 brings an earlier standard back for the headers is a host or a backend that has to be built by a
 compiler without C23.
 
@@ -146,7 +146,7 @@ else in the library calls any.
 library the host's executable chose, and it loads native modules that somebody else built. On Linux
 a process has one C library, and a module built against another will not load into it. On macOS the
 system's is the only supported way to reach the kernel. So `src/os.c` stays the one door, and on
-those two systems the door is the system's library, for mapping, threads and `dlopen` and nothing
+those two systems the door is the operating system's library, for mapping, threads and `dlopen` and nothing
 else. On Windows the door is `kernel32`, which is not a C library at all, and **a Windows build
 links no C runtime**: a program's entry point comes from `os.c`.
 
@@ -172,7 +172,7 @@ That includes a C library: it has to be installed like anything else, so it coun
 
 All of the above is how Bridge-ASM700 is built. **A module is built with whatever its author has**,
 in any language that can produce a wasm module or a shared library. What binds it is the ABI: the
-layouts of `bridge-abi.h`, the exported names, and the section its manifest sits in - `abi.md`,
+ABI layouts of `bridge-abi.h`, the exported names, and the section its manifest sits in - `abi.md`,
 *The ABI*, and `module.md`, *The manifest*. `bridge-wasm.h` and `bridge-native.h` are C's binding
 of that, not the contract itself, and each is its backend's: it sits in that backend's `sdk/`,
 beside the backend that runs what is written with it. They are C23, and so is whatever includes them: *The

@@ -128,7 +128,7 @@ order.
 ## Reaching a component
 
 Through its system's query. Bridge-ASM700 publishes the matched spans into the private memory at
-every barrier, and iterating them is two loops and no call. The layout is in `query.md`, *The
+every barrier, and iterating them is two loops and no call. What a span holds is in `query.md`, *The
 interface is a query*; following a single reference by id is in `reference.md`, *Reference
 following*.
 
@@ -137,7 +137,7 @@ Bridge-ASM700 owns that memory outright, so there is nothing to negotiate and no
 module to declare - see `memory.md`, *Where the seven regions live*, for what the header holds and
 why no module could have sized it.
 
-## The published layouts
+## The ABI layouts
 
 A module reads Bridge-ASM700's structures with plain loads, so both sides have to lay them out
 identically: the span, the private memory's header, the log record, the entity-index record,
@@ -147,7 +147,7 @@ identically: the span, the private memory's header, the log record, the entity-i
 re-derives anything, so there is nothing to disagree about - the same argument that made the schema
 a header rather than a format. idTech3 did this with `g_public.h`, and its enforcement was a comment
 in capitals: *"DO NOT MODIFY ANYTHING ABOVE THIS, THE SERVER EXPECTS THE FIELDS IN THAT ORDER!"*.
-Ours is the ABI version in `bridge:manifest` - change a layout, bump the version, and a module
+Ours is the ABI version in `bridge:manifest` - change an ABI layout, bump the version, and a module
 built against the old header is refused by name.
 
 A module that is not C cannot include the header, and so far cannot be written from it either:

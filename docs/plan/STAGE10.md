@@ -277,7 +277,7 @@ flecs keeps the emptied tables and only moves rows into them again, where ours m
 ten thousand tables at every barrier, and still it is the quicker.
 
 **Memory is not ahead on every line, and it is a budget that decides.** What the process holds, as
-the system counts it, at the end of each of the three runs:
+the operating system counts it, at the end of each of the three runs:
 
                                     flecs        ours
     a hundred thousand entities     30.3 MB      27.8 MB
@@ -394,7 +394,7 @@ all the rows arriving takes as many as fit, found by halving what it asks for.
 **`source[]` in a span: decided, and it is gone.** It was always zero, under flecs as under
 storage of our own: nothing a module can ask for finds a term on another entity. A span is count,
 entities and a base for each term - `query.md`, *The interface is a query*. No version moved for
-it: nothing outside this tree is built against the layout yet.
+it: nothing outside this tree is built against the ABI layout yet.
 
 ## The repair
 
@@ -451,7 +451,7 @@ the first five were not, and should have been.
             What Bridge-ASM700 writes is its own to state; how a module reaches it is the
             backend's. Tried first: the project's compiler cannot translate the header
     closed  the tree itself, which had said otherwise: a folder for each owner. A backend has
-            its binding, its dependency and its own calls to the system, and compiles nothing
+            its binding, its dependency and its own calls to the operating system, and compiles nothing
             of the library's inside; test modules are filed by the backend that runs them
 
 **1b. Words**: found by the item above. "layout" is used sixty-two times in the documents for

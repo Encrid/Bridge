@@ -7,7 +7,7 @@ that cannot be worked around, since a module has one heap and two instances woul
 
 **How many threads is stated**, as `threads`, and it counts the one that called `bridge_phase`:
 that thread works too, and at `threads = 1` it does everything, in an order that never varies.
-Bridge-ASM700 keeps the others for as long as it exists. Refused: asking the system how many cores
+Bridge-ASM700 keeps the others for as long as it exists. Refused: asking the operating system how many cores
 it has, which is a value nobody stated and the wrong one inside a host with a thread pool of its
 own. Refused: borrowing the host's threads through a callback, a new seam nothing asks for yet. The
 condition that brings it back is a host whose job system Bridge-ASM700 has to run on.

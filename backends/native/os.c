@@ -9,7 +9,7 @@
 
 /* A module named by a path is looked for there, and so is what it needs beside it. Windows
  * looks beside a library only when asked, and only for a full path written its own way. A bare
- * name is left to the system's search, as on every platform. */
+ * name is left to the operating system's search, as on every platform. */
 void *os_lib_open(const char *path)
 {
     char full[MAX_PATH];

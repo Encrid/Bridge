@@ -45,7 +45,7 @@ has no dangling anything to chase.
 that is also how a setting changes: hand over the new `cfg`. **Storage survives, which is the entire
 point, and it is the one outcome nothing else here produces.** The fingerprint decides whether it
 can: a changed struct body hashes differently and is refused by name, shared or exclusive alike -
-`lifetime.md`, *When the layout changed*.
+`lifetime.md`, *When a component layout changed*.
 
 **A reload is the new instance's `reload`, and then the old one's `shutdown`.** In order: the
 checks a load makes, and that the deployment allows it; a new image,
@@ -75,7 +75,7 @@ shows as STOPPED and runs nothing; and `on_error` decides what that costs the de
 any stop. A reload with an artifact that works brings it back over the same rows, and an unload is
 what ends it.
 
-That is `lifetime.md`, *When the layout changed*, applied here: Bridge-ASM700 never discards data on
+That is `lifetime.md`, *When a component layout changed*, applied here: Bridge-ASM700 never discards data on
 a call that means "keep running", and `bridge_reload` is such a call. Refused: taking the module
 out as an unload would, which is what this first did - whether a failed reload cost a module its
 data then depended on which backend it ran on, a cleanup whose condition nobody calling it was

@@ -27,21 +27,21 @@ memories could express it instead: `wasm.md`, *Memories*. A module that writes a
 it declared read is a bug in that module, and `validation.md`, *What a bad write costs, and what
 finds it*, is how it gets a name.
 
-What is recovered is everything that is not a shared column. A wasm module's spans, its `column_base`,
-its scratch arena and its log ring sit in a private memory no other module imports, so the `base`
-and `count` its arithmetic reads cannot be corrupted from outside - `memory.md`, *Where the seven
-regions live*. What stays exposed is the columns and the entity index. One thing would change that,
-and we decline it: reserve address space per component and map only a module's own columns into its
-memory, which `wasmtime_config_host_memory_creator_set` makes possible. What it costs can be
-counted. A mapping is made of whole pages, and on Windows a view begins on a boundary of 64 KB,
-where a table today is one packed block with its columns at multiples of eight bytes: every column
-of every table would need pages of its own, which for twenty thousand tables is gigabytes of
-address space around megabytes of data. A column that grows or moves would be unmapped and mapped
-again in every module that sees it, by system calls, at a barrier that otherwise costs tens of
-nanoseconds a change. It is one more rule for each storage layout, it helps only the wasm
-backend, and it is not the one block a backend adopts - `backend.md`, *Memory is adopted, not
-created*. It was first refused for the entries one page mapped N times takes in the TLB; that was
-never measured, and is not the reason.
+What is recovered is everything that is not a shared column. A wasm module's spans, its
+`column_base`, its scratch arena and its log ring sit in a private memory no other module imports,
+so the `base` and `count` its arithmetic reads cannot be corrupted from outside - `memory.md`,
+*Where the seven regions live*. What stays exposed is the columns and the entity index. One thing
+would change that, and we decline it: reserve address space per component and map only a module's
+own columns into its memory, which `wasmtime_config_host_memory_creator_set` makes possible. What it
+costs can be counted. A mapping is made of whole pages, and on Windows a view begins on a boundary
+of 64 KB, where a table today is one packed block with its columns at multiples of eight bytes:
+every column of every table would need pages of its own, which for twenty thousand tables is
+gigabytes of address space around megabytes of data. A column that grows or moves would be unmapped
+and mapped again in every module that sees it, by calls to the operating system, at a barrier that
+otherwise costs tens of nanoseconds a change. It is one more rule for each storage layout, it helps
+only the wasm backend, and it is not the one block a backend adopts - `backend.md`, *Memory is
+adopted, not created*. It was first refused for the entries one page mapped N times takes in the
+TLB; that was never measured, and is not the reason.
 
 **The condition that would change the answer: Bridge-ASM700 being asked to run code the operator did not
 choose.** Modding is not that - a player installing a mod chose it - and no engine we looked at
@@ -59,6 +59,6 @@ the manifest section, threading.
 
 Hot reload improves in one direction and gains a refusal. In the original Bridge a reloaded module loses
 its state; with storage in Bridge-ASM700's region **the data survives the swap**, which is what idTech3's
-`VM_Restart` was for too. A layout change is caught by the fingerprint and refused by name rather
+`VM_Restart` was for too. A component layout change is caught by the fingerprint and refused by name rather
 than silently reinterpreted, and the refusal cannot be waived: starting a module over with its
 data gone is `unload` then `load`. See `lifetime.md`, *Lifetime*.

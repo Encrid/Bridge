@@ -81,7 +81,7 @@ are declared, so each has a fingerprint of its own, checked where it is declared
 against an older `Vec3` is refused at `Vec3`, before `Body`.
 
 **One type is given and not declared: `bridge_text`**, the `(offset, length)` pair of
-`strings.md`, *Variable length*. It is a layout of `bridge-abi.h` and a field may be of it under any
+`strings.md`, *Variable length*. It is an ABI layout of `bridge-abi.h` and a field may be of it under any
 namespace. It exists so that text can be told from two integers: by a deployment's settings -
 `config.md`, *A module's own settings are a component* - and by an unload, which gives a module's
 share of the arena back only if no `bridge_text` left in any row lies in it - `strings.md`, *It is
@@ -106,7 +106,7 @@ because both expanded the same macro over the same tokens. No generator.
 `#` stringification normalises whitespace to single spaces and strips comments. So the hash survives
 reformatting and a new comment, and changes when a field is added, removed, retyped or reordered.
 
-A module built against an older layout gets an error at init instead of reading the wrong bytes.
+A module built against an older component layout gets an error at init instead of reading the wrong bytes.
 
 **Nothing else is fingerprinted: nothing else has two parties.** A query has one: the module
 declares it and only that module walks it. A system has none: every function Bridge-ASM700 calls is
@@ -134,13 +134,13 @@ picks the load by the field's type, `offsetof` and `sizeof` supply the rest. So 
 a macro over the struct the schema header already declares, and a second description of that struct
 for a tool to read would be the format *Why a header and not a format* refuses.
 
-The published layouts are not here either. Those are `bridge-abi.h`: `wasm.md`, *The published
+The ABI layouts are not here either. Those are `bridge-abi.h`: `wasm.md`, *The ABI
 layouts*.
 
 ## Not WIT
 
 WIT serves the canonical ABI, which this design does not use. It cannot express what the design
-needs - layout, alignment, access mode, capacity - and it expresses what the design rejects:
+needs - a component layout, alignment, access mode, capacity - and it expresses what the design rejects:
 `string`, `list`, resources, worlds.
 
 What survives is the identity convention, `namespace:name`, already in the manifest section.

@@ -37,7 +37,7 @@ entity id is 64 - and **no ABI entry takes or returns a float.**
 and the native backend wants only the pointers, so handing over arrays lets each do its own thing, and
 passing wasmtime's type would leak the engine into the seam. It also keeps **one copy of the fact**:
 a backend told the signature cannot drift from it, where a backend compiling our ABI's signatures
-itself would re-derive what Bridge-ASM700 already holds - the thing `wasm.md`, *The published
+itself would re-derive what Bridge-ASM700 already holds - the thing `wasm.md`, *The ABI
 layouts*, refuses for that header.
 
 **What it buys beyond being implementable.** Core wasm checks an import's shape at link time -

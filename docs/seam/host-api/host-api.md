@@ -169,11 +169,11 @@ and Bridge-ASM700 passes them to `backend_create` unread: `backend.md`, *The bac
 **A module's `settings` seed a component, and nothing more** - `config.md`, *A module's own
 settings are a component*, for why that means there is no reconfigure entry here.
 
-### Nothing here is a Bridge-ASM700 layout
+### Nothing here is an ABI layout
 
 The structs coming back out carry **resolved values**, never the shapes Bridge-ASM700 keeps
 internally. That is *Bridge-ASM700 parses nothing* pointing the other way: no formats in, no internal
-layouts out, and a host that can be replaced without touching the library.
+structs out, and a host that can be replaced without touching the library.
 
 It is not a preference. The record a module writes into its ring - `log.md`, *The log* -
 stores `text` as an offset into a wasm memory a host cannot address, `system` as a slot number, and

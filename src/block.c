@@ -294,7 +294,7 @@ int block_create(bridge *b, const bridge_budget *budget)
     reserve = (len > b->reservation ? len : b->reservation) + b->guard;
     b->shared = os_reserve((size_t)reserve, (size_t)len);
     if (!b->shared) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: the system would not "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: the operating system would not "
             "give %llu bytes", (unsigned long long)len);
         return 1;
     }

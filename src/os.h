@@ -1,6 +1,6 @@
 /* The operating system, as far as Bridge-ASM700 needs it: address space, shared libraries,
  * threads, an event and a mutex. It is the library's own: a backend carries what it needs of
- * the system itself, beside it, and compiles nothing from here. */
+ * the operating system itself, beside it, and compiles nothing from here. */
 #ifndef BRIDGE_OS_H
 #define BRIDGE_OS_H
 

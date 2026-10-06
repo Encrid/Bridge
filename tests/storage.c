@@ -26,7 +26,7 @@
 #include <string.h>
 
 /* What the process holds, in KB: the block's touched pages and everything outside it. Asked of
- * the system, so that it is the same question whatever keeps the rows. The figures of
+ * the operating system, so that it is the same question whatever keeps the rows. The figures of
  * docs/plan/STAGE10.md are taken on Windows, and elsewhere this says nothing. */
 #ifdef _WIN32
 typedef struct {

@@ -12,10 +12,10 @@ eight entries of `abi.md`, *The ABI*.
 ## Components
 
 A component is a C type, declared by its text. Its size and alignment come from the type; which
-types the schema can express, and how two modules are held to the same layout, is `schema.md`.
+types the schema can express, and how two modules are held to the same component layout, is `schema.md`.
 
 Its name is namespaced - `game:Position` - and who may name it is `grants.md`, *Whose component it
-is*. No version in the name: the fingerprint in `schema.md` detects a layout change, so a version
+is*. No version in the name: the fingerprint in `schema.md` detects a component layout change, so a version
 would be a second answer to the same question.
 
 `string` and `list` are not components. See `strings.md`, *Variable length*.

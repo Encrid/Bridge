@@ -306,7 +306,7 @@ static int private_memory(bridge *b, module *m, const bridge_module_config *cfg,
     reserve = (len > b->reservation ? len : b->reservation) + b->guard;
     m->priv = os_reserve((size_t)reserve, (size_t)len);
     if (!m->priv) {
-        snprintf(err->text, sizeof err->text, "the system would not give its private memory "
+        snprintf(err->text, sizeof err->text, "the operating system would not give its private memory "
             "of %llu bytes", (unsigned long long)len);
         return 1;
     }

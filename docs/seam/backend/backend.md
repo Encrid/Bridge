@@ -121,8 +121,8 @@ dispatch**, not once at load, because fuel only depletes.
 
 ## What the backend does not do
 
-Decide when anything runs. Find a file. Know what a component, an entity or a barrier is. Own the
-span layout. Choose a storage strategy. Parse a manifest.
+Decide when anything runs. Find a file. Know what a component, an entity or a barrier is. Own what
+a span holds. Choose a storage strategy. Parse a manifest.
 
 **There is no store.** A store is wasmtime's unit of "one thread at a time" - its own header says a
 store *"generally cannot be concurrently used"* while being *"cheap to create and cheap to

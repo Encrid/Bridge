@@ -951,7 +951,7 @@ storage *storage_create(bridge *b)
     r->systems = calloc(r->terms_room, sizeof *r->systems);
     r->observers = calloc(r->terms_room, sizeof *r->observers);
     if (!r->who) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: the system would not "
+        say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: the operating system would not "
             "give storage %u bytes of its own for the columns it keeps", b->columns_len);
         storage_destroy(r);
         return nullptr;

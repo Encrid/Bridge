@@ -17,8 +17,8 @@ original Bridge. Bridge-ASM700 drains every ring at each barrier.
     u32 len
     u32 arg[2]    two inline scalars, for "something is N"
 
-**This record never leaves Bridge-ASM700.** What the host sees is resolved - `host-api.md`, *Nothing here
-is a Bridge-ASM700 layout* - so the shape above is the module seam's alone and its stride is free to
+**This record never leaves Bridge-ASM700.** What the host sees is resolved - `host-api.md`, *Nothing
+here is an ABI layout* - so the shape above is the module seam's alone and its stride is free to
 change.
 
 Fixed stride, so the ring is an array: head and tail are counters, record `i` is `base + i*24`, and

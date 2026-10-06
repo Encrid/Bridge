@@ -50,8 +50,8 @@ Done. `STAGE2.md` is what it built and found.
 `bridge-backend.h` with all sixteen entries, and the wasm backend as a shared library behind it,
 which Bridge-ASM700 opens by the name config gives - `backend.md`, *What a backend is asked for*. A core
 wasm module importing a Bridge-ASM700 memory, which means `wasm_multi_memory` on since the module has its
-own. `bridge-abi.h` begins here, because a module reading the shared memory with plain loads needs the span
-layout. `define_func` with a real signature
+own. `bridge-abi.h` begins here, because a module reading the shared memory with plain loads needs to know
+what a span holds. `define_func` with a real signature
 and `instance_func`'s `() -> i32` check - `signatures.md`, *Imports are declared, exports are
 checked*.
 
@@ -137,7 +137,7 @@ state it exists to report - `introspection.md`, *Introspection*.
 
 *Done when a skipped `init` leaves the other modules running; a refused load leaves the schedule and
 storage as they were; a module past its failure budget
-shows as STOPPED; a reload keeps a row's bytes; a changed layout is refused naming both
+shows as STOPPED; a reload keeps a row's bytes; a changed component layout is refused naming both
 fingerprints; an unload drops an exclusive component and keeps a shared one; and a `[.config]` key
 the module never declared is an error naming it.* Met.
 
@@ -173,14 +173,14 @@ Done. `STAGE9.md` is what it built and found.
 
 Everything of Bridge-ASM700's own becomes C23 - the source, the tests, the test modules and all
 five headers - and uses it: named enums with stated widths, typed constants, `nullptr`,
-attributes, every layout of the ABI asserted where it is stated, and sums of stated sizes checked.
+attributes, every ABI layout asserted where it is stated, and sums of stated sizes checked.
 flecs stays C99 and wasmtime's headers C11. `build.md`, *The standard*, is the rule and why.
 
 This stage was to be C99 with the context passed in place of thread-local storage. Compiling that
 before planning it showed what it cost, and the standard was chosen again: `STAGE9.md`.
 
 *Done when everything of ours compiles as C23 with `-pedantic-errors` and warnings as errors on
-every platform, and flecs as C99; `tools/c23.py` finds no older spelling; every layout the ABI
+every platform, and flecs as C99; `tools/c23.py` finds no older spelling; every ABI layout the header
 states is asserted in the header that states it; a stated size that overflows is refused by its
 key; the row loop is the same code and reads the same; and every test passes on Windows, Linux
 and macOS.* Met.
@@ -238,7 +238,7 @@ that have them use:
                       one of
 
 They do not overlap: each is weak where another is strong, and a component stored the wrong way
-pays that layout's price. `storage weigh` measures the price of the one there is: a component
+pays that storage layout's price. `storage weigh` measures the price of the one there is: a component
 given to an entity that carries 4 KB costs thirteen times what it costs a small one, and the
 same rows read from 4,096 tables take three times as long as from one.
 
@@ -251,12 +251,12 @@ component from one storage layout to another, which is what "layout migration" m
 Before everything that reads storage or describes it: the readings of how full a budget is, and
 the module seam in a second language, would each be made twice otherwise.
 
-*Done when a component can be declared in each of the five and a module reads it as that layout
-is read; each has a case for what it is for and a measurement beside the table's for the same
-work, and none is slower than the table at what it was chosen for; a query across two layouts
-either works as written or is refused by name; running out, strip at unload and what an observer
-is told each hold in every layout; and a component is moved from one layout to another with its
-values.*
+*Done when a component can be declared in each of the five and a module reads it as that storage
+layout is read; each has a case for what it is for and a measurement beside the table's for the same
+work, and none is slower than the table at what it was chosen for; a query across two storage
+layouts either works as written or is refused by name; running out, strip at unload and what an
+observer is told each hold in every storage layout; and a component is moved from one storage layout
+to another with its values.*
 
 ## 12. Self contained
 
@@ -306,15 +306,15 @@ What a module needs to be written falls in two parts, and they have two owners -
                       `bridge-abi.h`
     a backend         how a module it runs reaches that: the binding in its own `sdk/`
 
-Both are C23 today, and `wasm.md`, *The published layouts*, said a module in another language
+Both are C23 today, and `wasm.md`, *The ABI layouts*, said a module in another language
 derives its binding from the header. That was never tried, and the first try failed: the
 project's own compiler cannot translate `bridge-abi.h`, which stops at its first `constexpr`. So
 a module in any language but C is a claim. It was listed as not in this plan, with no condition
 and no stage.
 
-This stage makes it true once, for one language that is not C, on the native backend: the layouts
-in a form that language can read, and that backend's binding in that language, each made by its
-owner. How Bridge-ASM700 states its layouts so that more than C can read them - a description
+This stage makes it true once, for one language that is not C, on the native backend: the ABI
+layouts in a form that language can read, and that backend's binding in that language, each made by its
+owner. How Bridge-ASM700 states its ABI layouts so that more than C can read them - a description
 with no language in it from which the header is written, or something less - is this stage's
 first question, by the method of `STAGE0.md`; which language, and what a backend's binding in it
 consists of, are the next two.
@@ -322,8 +322,8 @@ consists of, are the next two.
 After diagnostics; and before the tests by capability, whose list this adds to.
 
 *Done when a native module in a language that is not C runs as a case; what it was written with
-came from Bridge-ASM700 for the layouts and from the native backend for the rest, and neither was
-copied out of the other; and a layout changed in one place changes what both languages read.*
+came from Bridge-ASM700 for the ABI layouts and from the native backend for the rest, and neither was
+copied out of the other; and an ABI layout changed in one place changes what both languages read.*
 
 ## 16. Tests, by capability
 
