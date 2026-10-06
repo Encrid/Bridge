@@ -68,6 +68,8 @@ static void drop_systems(bridge *b, module *m)
             continue;
         }
         if (s->matched) storage_forget(b->storage, s->matched);
+        if (s->parked) b->parked --;
+        free(s->asked);
         free(s->pending);
         free(s->name);
         free(s->full);
@@ -819,9 +821,10 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
     n->text_at = old->text_at;
     n->text_room = old->text_room;
 
-    /* the old instance's systems stand aside: the new one registers the same names */
+    /* the old instance's systems stand aside, and out of storage: the new one registers the
+     * same names, in the places these had - budgets.md, *Budgets* */
     for (i = 0; i < b->system_count; i ++) {
-        if (b->systems[i]->m == old) b->systems[i]->parked = 1;
+        if (b->systems[i]->m == old) abi_park(b, b->systems[i]);
     }
     side_by_side = (o->capabilities & BACKEND_SIDE_BY_SIDE) != 0;
     if (!side_by_side) {
@@ -845,8 +848,9 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
         else if (extra) region_give(&b->arena_space, extra_at, extra);
         module_discard(b, n);
         if (side_by_side) {
-            /* failure.md: the old instance is kept, and it was never touched */
-            for (i = 0; i < b->system_count; i ++) b->systems[i]->parked = 0;
+            /* failure.md: the old instance is kept, and its systems are put back as they
+             * were. The new one's were dropped above, so the places are there */
+            for (i = 0; i < b->system_count; i ++) abi_unpark(b, b->systems[i]);
             (void)schedule_build(b, err.text, sizeof err.text);
             return 1;
         }

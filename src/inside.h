@@ -53,6 +53,10 @@ typedef struct {
     char         *full;             /* how [order] names it: the module's stem, then the name */
     uint32_t      phase;
     storage_terms   *matched;          /* its terms, as storage holds them. nullptr with no terms */
+    /* budgets.md: what it asked storage for, kept so that a system taken out of storage for
+     * the length of a reload can be put back as it was */
+    storage_term    *asked;
+    enum bridge_event events;
     uint32_t      terms;
     backend_func *fn;
     uint32_t      level;            /* within its phase: a level runs before the next */
@@ -204,6 +208,7 @@ struct bridge {
     uint32_t phase_count;
     uint32_t barriers;
     uint32_t turns;                 /* lifecycle calls since the last barrier: threads.md */
+    uint32_t parked;                /* systems out of storage while their module reloads */
     /* what a phase's dispatch works in, [budget] systems long: budgets.md, *Nothing is
      * allocated in a phase* */
     void *run_jobs, **run_handed, **run_lists;
@@ -240,7 +245,9 @@ struct bridge {
 /* bridge.c */
 void say(bridge *b, const module *m, const bridge_system *s, uint8_t level, const char *fmt, ...);
 void bridge_given_up(bridge *b, const module *m);     /* an unload of what stopped the bridge */
-void abi_marks(module *m);          /* room for a mark from every call it may yet take */
+void abi_marks(module *m);
+void abi_park(bridge *b, bridge_system *s);         /* out of storage, for a reload */
+void abi_unpark(bridge *b, bridge_system *s);       /* and back, as it was */          /* room for a mark from every call it may yet take */
 [[nodiscard]] char *copy(const char *s, size_t n);
 /* 1, with a record, if nothing may run. `repairing` names a module being loaded or reloaded:
  * the one call a stopped bridge accepts is one that brings back the module that stopped it. */

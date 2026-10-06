@@ -168,6 +168,8 @@ int main(int argc, char **argv)
     setvbuf(stdout, nullptr, _IONBF, 0);
 
     if (!strcmp(what, "slots")) cfg.budget.modules = 1;
+    /* the ticker has one system: room for it once, and a reload still has room */
+    if (!strcmp(what, "reloadexact") || !strcmp(what, "reloadexactfail")) cfg.budget.systems = 1;
     /* room for one module's share and no more: every load of the two hundred takes it, and
      * every unload gives it back - strings.md, *It is given back when nothing points into it* */
     if (!strcmp(what, "churn") || !strncmp(what, "arena", 5)) cfg.budget.persistent = 64;
@@ -327,7 +329,8 @@ int main(int argc, char **argv)
         frames(b, 1);
         modules(b);
     } else if (!strcmp(what, "reload") || !strcmp(what, "reloadlayout") || !strcmp(what, "reloadfail")
-               || !strcmp(what, "reloadmove")
+               || !strcmp(what, "reloadmove") || !strcmp(what, "reloadexact")
+               || !strcmp(what, "reloadexactfail")
                || !strcmp(what, "reloaddrop") || !strcmp(what, "maynot")) {
         a = wasm("game:ticker@0.1.0", "ticker");
         a.cfg.reloadable = BRIDGE_TRUE;
@@ -335,7 +338,8 @@ int main(int argc, char **argv)
         load(b, &a);
         frames(b, 2);
         a = wasm("game:ticker@0.2.0", !strcmp(what, "reloadlayout") ? "ticker-wide"
-                                    : !strcmp(what, "reloadfail") ? "ticker-fail"
+                                    : !strcmp(what, "reloadfail") || !strcmp(what, "reloadexactfail")
+                                      ? "ticker-fail"
                                     : !strcmp(what, "reloaddrop") ? "ticker-noextra" : "ticker-ten");
         a.cfg.hot_reload = a.cfg.reloadable = BRIDGE_TRUE;
         if (!strcmp(what, "reloadmove")) {

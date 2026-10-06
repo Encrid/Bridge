@@ -231,7 +231,7 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
     bridge_system *s;
     char name[128], full[256];
 
-    if (b->system_count >= b->max_systems) {
+    if (b->system_count - b->parked >= b->max_systems) {
         return refuse(m, "it registers one more than [budget] systems of %u", b->max_systems);
     }
     if (term_count > b->max_terms) {
@@ -322,7 +322,8 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
     }
     s->matched = events ? storage_observer(b->storage, asked, count, events, heard, s)
                : count ? storage_system(b->storage, asked, count) : nullptr;
-    free(asked);
+    s->asked = asked;
+    s->events = events;
 
     snprintf(full, sizeof full, "%s:%s", m->stem, name);
     s->m = m;
@@ -388,6 +389,28 @@ static int abi_observe(void *ud, const uint64_t *a, uint64_t *r)
  * aside for the module, arena space from its own share, and a change goes on its own queue,
  * which the barrier applies in an order that never varies. No lock: a module's systems are
  * serialised, so each of the three has one writer. */
+
+/* budgets.md, *Budgets*: a reload does not need room for a module's systems twice. The old
+ * instance's leave storage before the new one's are registered, and count for nothing until
+ * they are back or gone. */
+void abi_park(bridge *b, bridge_system *s)
+{
+    if (s->parked) return;
+    if (s->matched) storage_forget(b->storage, s->matched);
+    s->matched = nullptr;
+    s->parked = 1;
+    b->parked ++;
+}
+
+/* As it was: the places it had are free again, since whatever took them has been dropped. */
+void abi_unpark(bridge *b, bridge_system *s)
+{
+    if (!s->parked) return;
+    s->matched = s->events ? storage_observer(b->storage, s->asked, s->terms, s->events, heard, s)
+               : s->terms ? storage_system(b->storage, s->asked, s->terms) : nullptr;
+    s->parked = 0;
+    b->parked --;
+}
 
 /* Room for a mark from each of its systems and observers, and from the lifecycle call in
  * progress, beyond those it has: asked for where a module gains a system and before a

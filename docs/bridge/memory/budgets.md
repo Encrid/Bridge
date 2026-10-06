@@ -28,8 +28,13 @@ may be, inside its `spans`. A module whose `spans` cannot hold that is refused a
 arithmetic, and not stopped at whichever barrier made one table too many.
 
 **`types` and `systems` are counts of what is there at once, across every module.** A type two
-modules declare is one. A reload registers the new instance's systems before the old one's are
-dropped, so for its length both count. They exist because storage's memory is a product: a table
+modules declare is one. **A reload needs no room for a module's systems twice.** The old
+instance's systems leave storage before the new instance registers its own, in the places those
+had; if the reload fails, the new ones are dropped and the old put back as they were, which
+cannot fail, since the places are free again. So `systems` is the number a deployment has, and
+not that number and a module more. `tests/stage6.c`, cases `reloadexact` and
+`reloadexactfail`, reload a module of one system with `systems` at one, and fail to. The two
+keys exist because storage's memory is a product: a table
 keeps an offset for every type there may be, and a system keeps a place for every table there may
 be. With the two stated, everything storage holds is known and allocated when the bridge is
 created, and it allocates nothing after - `storage.md`, *What bounds it*. A `declare` or a
@@ -47,6 +52,11 @@ asks more than the deployment stated is refused, as for `types` and `systems`. T
 that brings it back is that room measured as a cost, or a host that cannot state a ceiling for
 modules it has not seen. No module compiles against the number, so it is one number and the
 deployment's.
+
+Refused: counting both instances' systems for the length of a reload, which is what this did.
+A deployment that stated exactly the systems it had could reload nothing, and the room it had
+to add was the largest module's, a number it never states, times a place for every table.
+The condition that brings it back is the putting back being shown able to fail.
 
 Refused: allocating at load for however many types and systems a module turns out to have, which
 is what this first did: memory that is a stated budget times a number nobody stated. Refused: a
