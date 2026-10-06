@@ -478,7 +478,7 @@ CASES = [
     ('stage4-limit', ['stage4', 'limit'],
      r"module 'game:mover@0.1.0' is refused: fuel needs 'meter', which backend 'native' lacks.*alive", r"cannot open"),
     ('stage4-libraries', ['stage4', 'libraries'],
-     r"the wasm backend's library is still loaded, the native backend's is (gone|kept by the loader).*alive", None),
+     r"the wasm backend's library is still loaded, the native backend's is gone.*alive", None),
     ('stage4-nolib', ['stage4', 'nolib'],
      r"module 'game:mover@0.1.0' did not load: cannot open the library 'no-such-library'.*alive", None),
     ('stage4-refuse', ['stage4', 'refuse'],

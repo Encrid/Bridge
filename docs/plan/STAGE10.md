@@ -481,7 +481,10 @@ at least five things, none defined, and none of them the one that was meant.
             scratch arena are Bridge-ASM700's, for a reason of its own, and stay. Who is
             calling is the backend's: the table is passed to every export and every entry
             takes it, so `bridge_bind`, a global in every module and a thread-local are
-            gone, and the invariant is checked where it was implied
+            gone, and the invariant is checked where it was implied. With the thread-local
+            gone macOS unmaps the backend's library at destroy, which `STAGE9.md` had as that
+            loader's known habit and not as something measured: case `libraries` now expects
+            "gone" on every system. It failed on macOS for four commits before it was read
     closed  a pinned module runs on the thread that calls bridge_phase: kept, and no longer
             "forced". The host's thread is the only one that can be the first thread of the
             process, which a window on one of the three platforms requires. `pinned.md`
