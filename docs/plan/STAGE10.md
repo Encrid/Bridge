@@ -489,7 +489,9 @@ at least five things, none defined, and none of them the one that was meant.
             is one of three, and any other value is refused by its number. `query.md`
     closed  BRIDGE_IN, BRIDGE_OUT, BRIDGE_INOUT, of which the scheduler read one bit: two,
             BRIDGE_READ and BRIDGE_WRITE. `data.md`, *Access mode*
-    open    a setting defined twice, and differently, for a host and for a backend
+    closed  a setting defined twice, and differently, for a host and for a backend: twice
+            on purpose, a seam's header being whole alone, and identical now. The library
+            asserts the two shapes equal where it copies one to the other
     open    `terms` in a module's header, which is not [budget] terms
     open    three events, now that an observer is told the net change
     open    BRIDGE_NO_LIMIT and BRIDGE_NONE, one value

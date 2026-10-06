@@ -39,14 +39,17 @@ enum backend_capability : uint32_t {
 };
 
 /* A setting is the backend's own: Bridge-ASM700 passes each through unread. A backend refuses a
- * key it does not know, by name, as Bridge-ASM700 refuses one of its own it does not. */
+ * key it does not know, by name, as Bridge-ASM700 refuses one of its own it does not.
+ *
+ * It is the host seam's bridge_setting again, on purpose: a seam's header is whole without the
+ * other's. Bridge-ASM700 holds the two to one shape, where it copies one to the other. */
 enum backend_setting_kind : uint8_t {
     BACKEND_BOOL = 1, BACKEND_INT = 2, BACKEND_FLOAT = 3, BACKEND_STRING = 4
 };
 typedef struct {
     const char *key;
     enum backend_setting_kind kind;
-    union { int b; int64_t i; double f; const char *s; } v;
+    union { bool b; int64_t i; double f; const char *s; } v;
 } backend_setting;
 
 /* A signature is declared going in and checked coming out - signatures.md. */

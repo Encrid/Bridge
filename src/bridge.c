@@ -122,8 +122,14 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
             goto refuse;
         }
         {
-            /* two structs for one fact, one per seam: copied member by member, so neither
-             * header has to know the other's layout */
+            /* two structs for one fact, one per seam, so that neither header needs the
+             * other: held to one shape here, where one is copied to the other */
+            static_assert((int)BRIDGE_BOOL == (int)BACKEND_BOOL && (int)BRIDGE_INT == (int)BACKEND_INT
+                && (int)BRIDGE_FLOAT == (int)BACKEND_FLOAT && (int)BRIDGE_STRING == (int)BACKEND_STRING);
+            static_assert(sizeof(bridge_setting) == sizeof(backend_setting)
+                && offsetof(bridge_setting, kind) == offsetof(backend_setting, kind)
+                && offsetof(bridge_setting, v) == offsetof(backend_setting, v)
+                && sizeof(((bridge_setting *)nullptr)->v.b) == sizeof(((backend_setting *)nullptr)->v.b));
             backend_setting *settings = calloc(want->setting_count ? want->setting_count : 1,
                                                sizeof *settings);
             for (k = 0; k < want->setting_count; k ++) {
