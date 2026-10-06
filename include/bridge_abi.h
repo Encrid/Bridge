@@ -27,9 +27,9 @@ extern "C" {
 constexpr uint32_t BRIDGE_ABI = 1;
 
 /* Everything a module imports comes from one namespace; the two memories go by name. */
-#define BRIDGE_NAMESPACE "bridge"
-#define BRIDGE_SHARED    "shared"
-#define BRIDGE_PRIVATE   "private"
+constexpr char BRIDGE_NAMESPACE[] = "bridge";
+constexpr char BRIDGE_SHARED[] = "shared";
+constexpr char BRIDGE_PRIVATE[] = "private";
 
 /* declare's kind: what the descriptor describes - docs/modules/schema.md, *The type set*.
  * Zero is unset, and refused. A tag is a component with no bytes: its size is 0 and it has no

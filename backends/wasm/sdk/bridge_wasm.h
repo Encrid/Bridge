@@ -12,7 +12,8 @@
 #include "bridge_schema.h"       /* how a type is stated: the same on every backend */
 #include <stddef.h>
 
-#define BRIDGE_IMPORT(name) [[clang::import_module(BRIDGE_NAMESPACE), clang::import_name(#name)]]
+/* an attribute takes a literal, so the namespace is spelled here: it is BRIDGE_NAMESPACE */
+#define BRIDGE_IMPORT(name) [[clang::import_module("bridge"), clang::import_name(#name)]]
 #define BRIDGE_ACC(name)    [[clang::import_module("acc"), clang::import_name(#name)]]
 #define BRIDGE_EXPORT(name) [[clang::export_name(#name)]]
 

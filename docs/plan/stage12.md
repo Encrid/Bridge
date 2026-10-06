@@ -375,6 +375,12 @@ says that a macro which takes nothing may name what stands between a type's brac
 of the test modules were rewritten, and the descriptors they yield are the same bytes: every
 case passes unchanged.
 
+**The four macros for a text are typed constants**: `BRIDGE_NAMESPACE`, `BRIDGE_SHARED`,
+`BRIDGE_PRIVATE` and `BRIDGE_NO_CONFIG`, each a `constexpr char []`. One length had been taken
+with `sizeof` from a copy of one of them, and became the size of a pointer when the copy became
+one: 69 cases said so at once, and the length is taken from the constant now. The wasm SDK's
+import attribute takes a literal, and spells the namespace.
+
 **What two builds differ by when their code is the same.** After the two renames the call of
 `spawn` measured 4.8 to 4.9 ns where the tree before measured 4.5 to 4.7, in whichever order
 the two were run. The four files a change goes through were compiled to assembly in both trees:

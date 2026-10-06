@@ -121,7 +121,7 @@ constexpr int64_t BRIDGE_NO_LIMIT = -1;         /* a limit stated as none */
 constexpr int64_t BRIDGE_NONE = -2;             /* a reservation stated as none */
 /* A module with no settings component says so. No component is named without a colon, so
  * this names none of them; a config left null is unset, and refused. */
-#define BRIDGE_NO_CONFIG "none"
+constexpr char BRIDGE_NO_CONFIG[] = "none";
 
 typedef struct {
     const char *identity;        /* "tri:triangle@0.1.0" */

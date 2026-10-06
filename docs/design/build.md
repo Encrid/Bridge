@@ -84,16 +84,17 @@ library*. zig is the compiler that builds all of it - *One compiler* - and a mod
 language needs none of these headers: *What an author is not bound by*.
 
 **The language is used fully, or C23 was not worth choosing over C11.** Every older spelling that
-C23 replaces is replaced, and a macro stays only where the preprocessor or a string literal is
-what is needed:
+C23 replaces is replaced, and a macro stays only where the preprocessor is what is needed:
 
     keywords       bool, true and false with no header; nullptr; static_assert; alignof;
                    thread_local
     enums          every one named, with its width stated: enum bridge_kind : uint32_t. A field
                    or a parameter that holds one has that type
-    constants      a number with a name is a typed constexpr. Still macros: include guards, a
-                   name used as a string literal or in an attribute, a macro that takes
-                   arguments, a list other macros expand
+    constants      a number or a text with a name is a typed constexpr - `style.md`, rule H3.
+                   Still macros: include guards, a macro that takes arguments, and what
+                   names the body of a type. An attribute takes a literal, so the one that
+                   needs the namespace spells it, beside a comment that says which
+                   constant it is
     attributes     [[nodiscard]] on every function whose answer is a status or something owned;
                    [[maybe_unused]] where a parameter is not read; a compiler's own in the same
                    brackets, [[clang::export_name("init")]]

@@ -177,12 +177,11 @@ BACKEND_EXPORT backend_module_t *module_compile(
 BACKEND_EXPORT uint32_t module_list_imports([[maybe_unused]] backend_module_t *m, backend_import_t *out,
                                        uint32_t max)
 {
-    static const char ns[] = BRIDGE_NAMESPACE;
     static const char *const fields[2] = { BRIDGE_SHARED, BRIDGE_PRIVATE };
     uint32_t i;
     for (i = 0; i < 2 && i < max; i ++) {
-        out[i].ns = ns;
-        out[i].ns_len = sizeof ns - 1;
+        out[i].ns = BRIDGE_NAMESPACE;
+        out[i].ns_len = sizeof BRIDGE_NAMESPACE - 1;
         out[i].field = fields[i];
         out[i].field_len = strlen(fields[i]);
         out[i].kind = BACKEND_IMPORT_MEMORY;

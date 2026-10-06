@@ -23,7 +23,7 @@ from c23 import OURS
 
 ROOT = Path(__file__).resolve().parent.parent
 # what has been made to follow the style, and is held to it by the tests
-HELD = ()
+HELD = ('include/bridge_schema.h',)
 
 COLUMNS, LINES, FUNCTIONS, ARGUMENTS, BRANCHES, DEPTH = 80, 20, 5, 4, 3, 2
 SNAKE = re.compile(r'[a-z_][a-z0-9_]*\Z')
