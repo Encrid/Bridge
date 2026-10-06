@@ -1,10 +1,10 @@
-# Phase 8: macOS
+# Stage 8: macOS
 
 Done, on Windows, on Linux and on macOS.
 
 A third platform, arm64, straight after the build: with one compiler that takes its target as an
-argument it is one more target, and every phase after it is met on a second processor instead of
-finding out last. `PLAN.md` phase 8 is the claim.
+argument it is one more target, and every stage after it is met on a second processor instead of
+finding out last. `PLAN.md` stage 8 is the claim.
 
 ## What was settled first
 
@@ -12,7 +12,7 @@ finding out last. `PLAN.md` phase 8 is the claim.
     when its job runs       on every push and pull request, as the Linux one does
 
 The second was asked with its cost: the repository is private, and a macOS minute counts as ten
-against what a private repository is given. Running it only when a phase is brought to merge was
+against what a private repository is given. Running it only when a stage is brought to merge was
 the recommendation, and it lost to the rule as written: a platform is one that is run, at the
 commit that could break it. So the work is ordered to push seldom, and what can be found by
 compiling for macOS on Windows is found there.
@@ -36,7 +36,7 @@ Nothing in `src/`, `backends/`, `include/` or `tests/` changed.
 ## What it found
 
 **Nothing, and that is the finding.** All one hundred and twenty-eight tests passed on the first
-run on macOS arm64, as they had on Linux at its first run after phase 5. The POSIX half of
+run on macOS arm64, as they had on Linux at its first run after stage 5. The POSIX half of
 `src/os.c` was written against Linux and never against this system. Three things were expected to
 be able to stop it and none did: wasmtime delivers a trap and an interrupt there under the
 watchdog and the pool's threads, with nothing set; the timing tests hold on the runner's three

@@ -15,7 +15,7 @@ It expands to the type and a descriptor string, on either backend:
 The module's compiler lays the struct out; the string is handed over at `declare`.
 `BRIDGE_SCHEMA_ENUM` and `BRIDGE_SCHEMA_BITMASK` do the same for the other two kinds.
 
-The shape is flecs' `ECS_STRUCT`, and until phase 10 so was the name. It is ours now because the
+The shape is flecs' `ECS_STRUCT`, and until stage 10 so was the name. It is ours now because the
 name was a promise: a reader expected flecs behind it, and a native module that links flecs for
 its own use would have had the macro defined twice. Refused: `BRIDGE_STRUCT`, which is already the
 kind a `declare` states.

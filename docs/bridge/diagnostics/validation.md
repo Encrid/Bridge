@@ -39,7 +39,7 @@ system can have, one float read, changed and written back per row of 200,000:
     fuel                 0.65             0.44      x1.5
 
 Under fuel it costs more than itself, because the branch it adds is a block and fuel is counted by
-the block - `limits.md`, *What a bound costs*. `tests/phase3.c`'s `bench` case is the measurement,
+the block - `limits.md`, *What a bound costs*. `tests/stage3.c`'s `bench` case is the measurement,
 and the build without the test exists only for it.
 
 It stays, at that price: a sixth of a tight loop buys the one check that catches a module reading

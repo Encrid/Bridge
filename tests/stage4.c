@@ -1,8 +1,8 @@
-/* A host, as far as phase 4: two backends, and modules on both.
+/* A host, as far as stage 4: two backends, and modules on both.
  *
- *     phase4 <case>
+ *     stage4 <case>
  *
- * Each case is one clause of docs/PLAN.md phase 4, checked by the records it emits. */
+ * Each case is one clause of docs/PLAN.md stage 4, checked by the records it emits. */
 #include "bridge.h"
 #include "bridge-abi.h"
 
@@ -64,7 +64,7 @@ static bridge_artifact native(const char *identity, const char *path)
     return a;
 }
 
-/* the reader of phase 3, on the wasm backend, with the limits that backend can keep */
+/* the reader of stage 3, on the wasm backend, with the limits that backend can keep */
 static bridge_artifact wasm_reader()
 {
     static const char *const grants[] = { "game:Position", "game:Marked" };

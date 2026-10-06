@@ -1,6 +1,6 @@
 /* One block, adopted by the wasm backend, backing a memory in two stores at once.
  *
- * This is the question phase 2 opens with: Bridge-ASM700 allocates the shared memory and
+ * This is the question stage 2 opens with: Bridge-ASM700 allocates the shared memory and
  * every module imports it, each from a store of its own. wasmtime does not promise that
  * one block may back a memory twice, so it is tried here before anything is built on it. */
 #include "backend.h"

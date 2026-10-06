@@ -4,7 +4,7 @@ What Bridge-ASM700 is compiled with, for what, in which C, and against which C l
 is the design of the library. All of it decides whether the library can be built the same way on
 three systems by somebody who installed two tools.
 
-`PLAN.md` phases 7 to 11 build what this file states, one part each, and say which. Until a phase
+`PLAN.md` stages 7 to 11 build what this file states, one part each, and say which. Until a stage
 is done, its part here is the decision and not yet the tree.
 
 ## One compiler
@@ -40,7 +40,7 @@ CMake's work was to find and drive three compilers. With one compiler that takes
 argument, what is left is running commands in order, and `tools/` was Python already.
 
 It takes every path from where it is and from the output directory it is given, so that a host
-with this repository as a submodule builds it by calling the same script - `PLAN.md` phase 13.
+with this repository as a submodule builds it by calling the same script - `PLAN.md` stage 13.
 
 What this gives up: the rebuild check, the parallelism and the choice of tests are ours to get
 right, and an editor that reads CMake finds nothing to read. Refused: `build.zig`, which has the
@@ -70,7 +70,7 @@ for a platform that is leaving. The condition that brings it back is a deploymen
 
 **Each piece at its own.** wasmtime's headers are C11. Everything of Bridge-ASM700's own is C23:
 the source, the tests, the test modules and all five headers. flecs was C99, built by its own flags
-as it asked, until phase 10 removed it.
+as it asked, until stage 10 removed it.
 
     backends/wasm/wasmtime        C11    read by backends/wasm/wasm.c and nothing else
     everything else               C23
@@ -125,9 +125,9 @@ compiler without C23.
 **Thread-local storage stays.** Two variables are found by which thread is running: the native
 module whose entry was called, and the memory wasmtime is being asked to create. A third went with
 flecs, whose allocator callbacks could not say which bridge they were working for. Each is there
-because a callback Bridge-ASM700 does not own carries no context. Phase 12 has one thing to verify
+because a callback Bridge-ASM700 does not own carries no context. Stage 12 has one thing to verify
 about them: on Windows the compiler reaches a thread-local variable through a runtime helper, and
-that phase links no C runtime.
+that stage links no C runtime.
 
 ## The C library
 
@@ -139,7 +139,7 @@ A C library is three things under one name, and they do not go the same way:
                       loading a library            Linux and macOS
 
 **The first two are carried**: source in `third_party`, built by the build, linked privately into
-the library. What Bridge-ASM700's own source calls is fifteen functions, and since phase 10 nothing
+the library. What Bridge-ASM700's own source calls is fifteen functions, and since stage 10 nothing
 else in the library calls any.
 
 **The third is not ours to carry.** Bridge-ASM700 is a library: it is loaded into a process whose C
@@ -163,7 +163,7 @@ platform, where three C runtimes formatted three ways.
 
 **Nothing is fetched, and nothing is installed but zig and Python.** What Bridge-ASM700 depends on
 is in the tree, with where it came from and its hash beside it: wasmtime today, the C
-routines and the tools the build runs from phase 12.
+routines and the tools the build runs from stage 12.
 
 Third-party code is not refused. Code that arrives from somewhere the tree does not record is.
 That includes a C library: it has to be installed like anything else, so it counts.

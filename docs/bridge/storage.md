@@ -4,7 +4,7 @@ Who keeps the rows, and how. The model a module sees is `data.md`; what it reads
 `reference.md`; which block each thing is in is `memory.md`.
 
 Storage is Bridge-ASM700's own: `src/storage.c`, behind the one internal header `src/storage.h`. Until
-phase 10 it was flecs, patched. Why that changed, and the figures it changed on, are `PHASE10.md`;
+stage 10 it was flecs, patched. Why that changed, and the figures it changed on, are `STAGE10.md`;
 what flecs was while it was carried is kept as `flecs.md`, a record and no longer a description.
 
 ## Made for what the bridge promises
@@ -48,7 +48,7 @@ is where an entity with nothing on it is. A released id is used again by the nex
 
 Refused: keeping an emptied table for the next entity of that set, as flecs does. It would save
 making the table again, and it costs what makes the count unbounded: every set ever seen stays,
-and a quiet barrier pays for all of them. `PHASE10.md`, *What it costs*, measures the case this
+and a quiet barrier pays for all of them. `STAGE10.md`, *What it costs*, measures the case this
 could lose - ten thousand sets filled at one barrier and emptied at the next - and it does not.
 The condition that brings it back is a workload where that line does lose.
 
@@ -115,7 +115,7 @@ itself and whoever reads them after; it does not change what storage does next.
 array, and then moves and destroys rows.
 
 That was not so under flecs. Its table read the id of the row it had moved from the array the
-patch had put in the block, and acted on it - `PHASE10.md`, *Not a freestanding flecs*.
+patch had put in the block, and acted on it - `STAGE10.md`, *Not a freestanding flecs*.
 
 Component bytes are different, and stay so: a column in the block *is* the data, and a module
 that writes a term it has is doing what it is for - `data.md`, *Access mode*.

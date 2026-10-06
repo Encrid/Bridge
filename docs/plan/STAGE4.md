@@ -1,9 +1,9 @@
-# Phase 4: the native backend
+# Stage 4: the native backend
 
-Done. The `linux` preset was first run after phase 5, and passed as written.
+Done. The `linux` preset was first run after stage 5, and passed as written.
 
 The second backend: a shared library that opens a module's library and calls it directly. What it
-is and why is `native.md` and `capabilities.md`. This document is what the phase built and what it
+is and why is `native.md` and `capabilities.md`. This document is what the stage built and what it
 found on the way.
 
 ## What was settled first
@@ -17,9 +17,9 @@ and what a refused entry does when nothing can unwind its caller.
     include/bridge-native.h           bridge_api, the export macros, and the layouts of
                                       bridge-abi.h read through real pointers
     backends/native/native.c          the seventeen entries, over a shared library
-    tests/modules/native/nmover.c     phase 3's mover, as a library
+    tests/modules/native/nmover.c     stage 3's mover, as a library
     tests/modules/native/nflood.c     a system that spawns past the ceiling
-    tests/phase4.c                    a host with both backends configured
+    tests/stage4.c                    a host with both backends configured
 
 Above the backend seam one line moved: the first refusal of a call is kept as its reason, since on
 this backend a module runs on after one.
@@ -27,7 +27,7 @@ this backend a module runs on after one.
 ## The tests
 
 Six new ones, forty-three in all, in a release build and a debug one. A seventh, `setting`, came
-after phase 5.
+after stage 5.
 
     raw          a native system adds to every row through a `Position *`, and another counts
                  two tables and 1,000 rows
@@ -41,14 +41,14 @@ after phase 5.
 `untrusted` and `limit` name a library that does not exist, and must not say so: that is "before
 its library is opened".
 
-## What the phase found
+## What the stage found
 
 **The seam held.** Bridge-ASM700 gained no native case. The scheduler, the barrier, the entries and
-the load path are the code phase 3 wrote; the native backend is under 300 lines beside them. That is the
+the load path are the code stage 3 wrote; the native backend is under 300 lines beside them. That is the
 claim `backend.md` makes for the surface, and this is the first time it was tested by a second
 backend.
 
-**The capability refusal ran false for the first time.** Phase 2 wrote the check and could not
+**The capability refusal ran false for the first time.** Stage 2 wrote the check and could not
 test it, having only a backend that answers yes to everything.
 
 **A refusal has to be sticky on a backend that cannot unwind.** The first version let a native loop
@@ -66,10 +66,10 @@ parameter in a header every native module compiles.
 process with it, which is what `sandbox = no` says.
 
 **`bridge_reload` and `bridge_shutdown` are not called yet.** Neither is a wasm module's; both
-arrive with unload and reload in `PLAN.md` phase 6.
+arrive with unload and reload in `PLAN.md` stage 6.
 
-**The manifest section is not read.** `bridge_manifest_parse` is the host phase's, beside the library.
+**The manifest section is not read.** `bridge_manifest_parse` is the host stage's, beside the library.
 
 ## Open questions
 
-None for the next phase.
+None for the next stage.

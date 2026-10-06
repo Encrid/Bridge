@@ -1,14 +1,14 @@
-# Phase 5: scheduling
+# Stage 5: scheduling
 
-Done. The `linux` preset was first run after phase 5, and passed as written.
+Done. The `linux` preset was first run after stage 5, and passed as written.
 
-The phase replaced "registration order, one at a time" with the schedule `schedule.md` describes: a
-conflict graph, `[order]`, observers at the barrier, threads, and `pinned`. `PLAN.md` phase 5 is
-the claim. This document is what the phase built and what it found on the way.
+The stage replaced "registration order, one at a time" with the schedule `schedule.md` describes: a
+conflict graph, `[order]`, observers at the barrier, threads, and `pinned`. `PLAN.md` stage 5 is
+the claim. This document is what the stage built and what it found on the way.
 
 ## What was settled first
 
-Four questions, each by the method of `PHASE0.md`, and each applied to the document it belongs to.
+Four questions, each by the method of `STAGE0.md`, and each applied to the document it belongs to.
 
     what an observer reads            the ids that triggered it, and the events:
                                       `abi.md`, *The ABI*
@@ -32,7 +32,7 @@ which has to be the one that loaded it - `pinned.md`, *Threads*.
     src/abi.c                     observe; system and observe share one registration; the lock
     src/store.c                   an observer's list published; observers run at the barrier
     src/os.c                      a mutex, and the calling thread's id
-    tests/phase5.c                a host with both backends, order, and threads
+    tests/stage5.c                a host with both backends, order, and threads
     tests/modules/                five wasm modules and three native ones
 
 ## The tests
@@ -66,7 +66,7 @@ timing were run six times over.
     nothreads    `threads` left at zero: create refuses, naming the key
     hop          two wasm modules on four threads for fifty frames: the last sum is exact
 
-## What the phase found
+## What the stage found
 
 **flecs' observers fire where `data.md` said.** A deferred attach reaches the observer at the flush
 and not before, on the release pinned here and not only on the snapshot the spike measured. The
@@ -78,7 +78,7 @@ thread that made it, so `threads.md` holds and `pinned` stays the exception.
 
 **The barrier has to go back to deferring before an observer runs, not after.** Otherwise what an
 observer attaches applies at once, and a chain settles inside one barrier - which is the fixpoint
-`schedule.md` refuses. The first arrangement had it at the end, where phase 3 left it.
+`schedule.md` refuses. The first arrangement had it at the end, where stage 3 left it.
 
 **An observer and a system are the same registration.** Name, terms, the refusals, the export
 check and the conflict graph are shared; an observer differs by having events instead of a phase
@@ -88,16 +88,16 @@ and a list instead of spans. `abi.md` had said so, and the code agrees in one fu
 is noted where it happens and said after the join, so the sink keeps the property `create.md`
 gives it.
 
-## Closed after the phase
+## Closed after the stage
 
-Everything earlier phases had built without testing, listed and not built, never run, or marked as
-a shortcut, found by asking what "left" meant in a phase report.
+Everything earlier stages had built without testing, listed and not built, never run, or marked as
+a shortcut, found by asking what "left" meant in a stage report.
 
 **The set and remove events, and observers that conflict across modules**, had no test. They have
 `events`, `obsconflict`, `obsorder` and `obsreorder` above.
 
 **A field whose type is another declared type** was in `schema.md`'s type set from the start and
-refused by phase 3's code: a nested struct, an enum, a bitmask. `declare` gained a kind, and a
+refused by stage 3's code: a nested struct, an enum, a bitmask. `declare` gained a kind, and a
 declared type is named in flecs under its namespace - `schema.md`, *The type set*. Two tests:
 
     nested       a component of a struct, an enum, a bitmask and a float: all four read back
@@ -107,7 +107,7 @@ Found on the way: flecs finishes an enum's layout in observers of its own, and w
 only applied when a deferral ends. `declare` had suspended deferral, which is not ending it, so an
 enum had no layout until the next barrier. It ends it now, for the length of the declaration.
 
-**Linux.** Five phases had been met on Windows alone. Every source was cross-compiled and linked
+**Linux.** Five stages had been met on Windows alone. Every source was cross-compiled and linked
 for Linux with zig, clean under `-Wall -Wextra`; then `.github/workflows/linux.yml` ran the `linux`
 preset on a real one, and all sixty-three tests passed on the first run. It runs on every push now -
 `PLAN.md`, at its head.
@@ -156,7 +156,7 @@ gone with it: nothing reaches flecs outside a barrier or a load.
 
 `undo` is the other thing this closed. A failed load now takes back the ids it was given, its
 share of the arena and every component nobody else declared, and what it queued goes with its
-queue. That was `PLAN.md` phase 6's clause, and phase 6 now only has to keep it true for unload.
+queue. That was `PLAN.md` stage 6's clause, and stage 6 now only has to keep it true for unload.
 
 ## Nothing left
 
@@ -164,4 +164,4 @@ No shortcut is marked in the code, and no report lists one.
 
 ## Open questions
 
-None for the next phase.
+None for the next stage.

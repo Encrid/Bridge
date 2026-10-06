@@ -3,24 +3,24 @@
 The build order, and nothing else. What the design is and why is `DESIGN.md`; what the documents are
 is `README.md`.
 
-**Every phase ends in a claim that can be false.** A phase is not done because its code exists. It
-is done when the stated thing is observably true. A phase whose done-when cannot fail will be
+**Every stage ends in a claim that can be false.** A stage is not done because its code exists. It
+is done when the stated thing is observably true. A stage whose done-when cannot fail will be
 declared finished while broken.
 
-**No done-when names something a later phase builds.** A phase is tested with what exists when it
+**No done-when names something a later stage builds.** A stage is tested with what exists when it
 ends, so each one carries the part of the host seam, the sink and the scheduler its own claim needs.
 
-**Met means on every platform the phase has.** Through phase 7 that is Windows and Linux, and from
-phase 8 macOS as well - `build.md`, *Platforms*. Windows is run where the code is written, and the
-others by the workflows under `.github/workflows/` on every push. Phases 1 to 5 were first met on
-Windows alone and said so; the Linux run caught up with them after phase 5, and passed as written.
+**Met means on every platform the stage has.** Through stage 7 that is Windows and Linux, and from
+stage 8 macOS as well - `build.md`, *Platforms*. Windows is run where the code is written, and the
+others by the workflows under `.github/workflows/` on every push. Stages 1 to 5 were first met on
+Windows alone and said so; the Linux run caught up with them after stage 5, and passed as written.
 
 ## 0. Documents, and the spikes they need
 
 Done. The design documents `README.md` lists were written, the register of open items was emptied
 and deleted, and the documents left draft.
 
-Two questions could not be settled by argument, so a throwaway spike settled them inside this phase:
+Two questions could not be settled by argument, so a throwaway spike settled them inside this stage:
 whether flecs can be confined to our block, and whether its events are enough to keep the entity
 mirror in step. Both answered with numbers, and the second answered *no* - `flecs.md`, *It can be
 confined*, and *flecs will not tell you which*.
@@ -32,9 +32,9 @@ confined*, and *flecs will not tell you which*.
 Done. flecs v4.1.6, vendored pristine as the amalgamation and patched by a script: the
 allocator argument at the twenty-three calls that allocate a column or an entity array, and one
 row-move hook - `flecs.md`, *It can be confined*, *flecs will not tell you which*, and *How it is
-carried* for the shape. The build starts in this phase. It was CMake with Ninja presets, until
-phase 7 replaced it.
-`PHASE1.md` is what it built and found.
+carried* for the shape. The build starts in this stage. It was CMake with Ninja presets, until
+stage 7 replaced it.
+`STAGE1.md` is what it built and found.
 
 **First, because everything else needs it.** Columns cannot be in the shared memory without the allocator,
 and the mirror cannot be correct without the hook.
@@ -45,7 +45,7 @@ written for.* Met.
 
 ## 2. One module runs
 
-Done. `PHASE2.md` is what it built and found.
+Done. `STAGE2.md` is what it built and found.
 
 `bridge-backend.h` with all sixteen entries, and the wasm backend as a shared library behind it,
 which Bridge-ASM700 opens by the name config gives - `backend.md`, *What a backend is asked for*. A core
@@ -55,7 +55,7 @@ layout. `define_func` with a real signature
 and `instance_func`'s `() -> i32` check - `signatures.md`, *Imports are declared, exports are
 checked*.
 
-`bridge.h` begins here too, as far as this phase's claim needs: `bridge_create`, `bridge_destroy`
+`bridge.h` begins here too, as far as this stage's claim needs: `bridge_create`, `bridge_destroy`
 and `bridge_load`, with **the sink and Bridge-ASM700's own records**, so every refusal from here on has a
 route - `create.md`, *The sink*. Load checks the identity and the ABI version, and each capability a
 config key demands - `capabilities.md`, *Capabilities, so the swap is honest*.
@@ -67,11 +67,11 @@ init timeout - `limits.md`, *What bounds a run*.
 loop and growth past the limit each return an error with the process alive; and an export whose
 shape is not `() -> i32`, a wrong ABI version, a backend that cannot be
 opened and a null sink are each refused with a record naming the cause.* Met; the shared memory is
-read by a test of the backend alone, since storage is phase 3's.
+read by a test of the backend alone, since storage is stage 3's.
 
 ## 3. Storage
 
-Done. `PHASE3.md` is what it built and found.
+Done. `STAGE3.md` is what it built and found.
 
 The shared memory's three regions and each module's private memory: the header, the spans,
 `column_base`, the scratch arena and the log ring - `memory.md`, *Where the seven regions live*.
@@ -98,7 +98,7 @@ overflowing ring reports how many it dropped.* Met.
 
 ## 4. The native backend
 
-Done. `PHASE4.md` is what it built and found.
+Done. `STAGE4.md` is what it built and found.
 
 The second backend: a shared library that opens a module's library and calls it directly -
 `native.md`. `bridge-native.h`, `bridge_bind`, and exports found by name as `bridge_<name>`. Nothing
@@ -112,7 +112,7 @@ lacks, before its library is opened.* Met.
 
 ## 5. Scheduling
 
-Done. `PHASE5.md` is what it built and found.
+Done. `STAGE5.md` is what it built and found.
 
 The conflict graph, and the refusal when two conflicting systems in one phase are left unordered.
 `[order]`. `observe`, with observers at the barrier, one hop
@@ -127,7 +127,7 @@ Met.
 
 ## 6. Failure and lifecycle
 
-Done. `PHASE6.md` is what it built and found.
+Done. `STAGE6.md` is what it built and found.
 
 `on_error`, `max_system_failures` and the stop, and the two escalation guards - `failure.md`, *When
 something fails*. `bridge_unload` and `bridge_reload` with their rules, `hot_reload`, and the reload
@@ -145,11 +145,11 @@ the module never declared is an error naming it.* Met.
 
 Done. One compiler and one script. zig compiles everything on every platform, and `build.py` does what
 CMake did: patches flecs, compiles, links, builds the test modules and runs the tests - `build.md`,
-*One compiler* and *One script*. Windows becomes `x86_64-windows-gnu`, and until phase 12 it links
+*One compiler* and *One script*. Windows becomes `x86_64-windows-gnu`, and until stage 12 it links
 the C runtime zig carries.
 
 **Nothing about the library changes**, which is the claim: the same tests, saying the same things,
-by another route. `PHASE7.md` is what it built and found.
+by another route. `STAGE7.md` is what it built and found.
 
 *Done when `python build.py test` passes every test on Windows, in a release build and a debug one,
 and on Linux; the Linux build compiles and links on Windows; the two tests that must fail still
@@ -157,11 +157,11 @@ fail for their stated reason; and CMake is gone from the tree.* Met.
 
 ## 8. macOS
 
-Done. `PHASE8.md` is what it built and found.
+Done. `STAGE8.md` is what it built and found.
 
 arm64, as a third platform: a target, the POSIX half of `src/os.c` on a second system, wasmtime's
 library for it and a workflow - `build.md`, *Platforms*. It comes straight after the build because
-it is then one more target, and because every later phase is met on a second processor instead of
+it is then one more target, and because every later stage is met on a second processor instead of
 finding out last.
 
 *Done when every test passes on macOS arm64 on every push, and that build compiles and links on
@@ -169,15 +169,15 @@ Windows.* Met.
 
 ## 9. C23, used fully
 
-Done. `PHASE9.md` is what it built and found.
+Done. `STAGE9.md` is what it built and found.
 
 Everything of Bridge-ASM700's own becomes C23 - the source, the tests, the test modules and all
 five headers - and uses it: named enums with stated widths, typed constants, `nullptr`,
 attributes, every layout of the ABI asserted where it is stated, and sums of stated sizes checked.
 flecs stays C99 and wasmtime's headers C11. `build.md`, *The standard*, is the rule and why.
 
-This phase was to be C99 with the context passed in place of thread-local storage. Compiling that
-before planning it showed what it cost, and the standard was chosen again: `PHASE9.md`.
+This stage was to be C99 with the context passed in place of thread-local storage. Compiling that
+before planning it showed what it cost, and the standard was chosen again: `STAGE9.md`.
 
 *Done when everything of ours compiles as C23 with `-pedantic-errors` and warnings as errors on
 every platform, and flecs as C99; `tools/c23.py` finds no older spelling; every layout the ABI
@@ -187,10 +187,10 @@ and macOS.* Met.
 
 ## 10. Storage of our own
 
-In progress: `PHASE10.md`, *What was not in the plan*. flecs leaves, and what Bridge-ASM700 used it
+In progress: `STAGE10.md`, *What was not in the plan*. flecs leaves, and what Bridge-ASM700 used it
 for becomes its own: the entity index, tables and their columns, moving a row between them, matching
 a system's terms to tables, the events an observer hears, and reading a struct's fields out of its
-text. It is the reversal of a decision this plan began with, and `PHASE10.md` is why.
+text. It is the reversal of a decision this plan began with, and `STAGE10.md` is why.
 
 **flecs was never on the path that repeats.** A system reads its columns through the spans
 Bridge-ASM700 publishes, and no row loop calls flecs. What flecs did, it did at a barrier and at
@@ -206,13 +206,13 @@ nothing a module can write, and allocates nothing after it is created.
 **Nothing of flecs is deleted until numbers say it may be.** flecs is measured first, as it is.
 Ours is built beside it, behind one internal header, and both run the same cases. flecs goes only
 when ours passes all of them and is not slower on any measured operation. If it is, flecs stays
-and this phase has failed its claim.
+and this stage has failed its claim.
 
 *Done when every case passes on storage that is Bridge-ASM700's own, on Windows, Linux and macOS,
 alone and under load; on every measured operation it is not slower than flecs was, with both sets
 of figures recorded; storage allocates nothing after `bridge_create` and reads nothing back from
 the shared block; no line of flecs is left in the tree; and the behaviours no test covered before
-this phase each have one.*
+this stage each have one.*
 
 ## 11. Storage layouts
 
@@ -220,8 +220,8 @@ Storage keeps every component one way: in the table of its entity's archetype, a
 the entity's other components. That is the right way for what systems read together, and one
 way for everything is one trade made for everything. It was never chosen: it was what flecs did
 by default, and what was meant from the start was the right tool for each task. The line that
-carried the intent, "layout migration", was read for six phases as something else -
-`PHASE10.md`, *The repair*.
+carried the intent, "layout migration", was read for six stages as something else -
+`STAGE10.md`, *The repair*.
 
 **A component is kept in the storage layout stated for it.** Five, by the names the projects
 that have them use:
@@ -242,7 +242,7 @@ pays that layout's price. `storage weigh` measures the price of the one there is
 given to an entity that carries 4 KB costs thirteen times what it costs a small one, and the
 same rows read from 4,096 tables take three times as long as from one.
 
-This phase's questions, each by the method of `PHASE0.md`, and in this order: who states a
+This stage's questions, each by the method of `STAGE0.md`, and in this order: who states a
 component's storage layout, and where; what a module is handed for each, in `bridge-abi.h` and in
 each backend's binding, and what a query may ask across two of them; what each costs of which
 budget; whether a component may have no bytes at all, a tag; and what it takes to move a
@@ -264,7 +264,7 @@ Nothing fetched and nothing installed but the toolchain - `build.md`, *Self cont
 of a C library that can be carried are carried: the routines our source calls, and an
 allocator, in `third_party` and linked privately - `build.md`, *The C library*. On Windows no
 C runtime is linked at all. Where each routine comes from, and what "in the tree" means for the
-tools the build runs, are settled in this phase's own plan, with the sources read first.
+tools the build runs, are settled in this stage's own plan, with the sources read first.
 
 *Done when a Windows build of the library, both backends and a test program imports the operating
 system's libraries and wasmtime and nothing else; the build fetches nothing; one formatted record
@@ -310,13 +310,13 @@ Both are C23 today, and `wasm.md`, *The published layouts*, said a module in ano
 derives its binding from the header. That was never tried, and the first try failed: the
 project's own compiler cannot translate `bridge-abi.h`, which stops at its first `constexpr`. So
 a module in any language but C is a claim. It was listed as not in this plan, with no condition
-and no phase.
+and no stage.
 
-This phase makes it true once, for one language that is not C, on the native backend: the layouts
+This stage makes it true once, for one language that is not C, on the native backend: the layouts
 in a form that language can read, and that backend's binding in that language, each made by its
 owner. How Bridge-ASM700 states its layouts so that more than C can read them - a description
-with no language in it from which the header is written, or something less - is this phase's
-first question, by the method of `PHASE0.md`; which language, and what a backend's binding in it
+with no language in it from which the header is written, or something less - is this stage's
+first question, by the method of `STAGE0.md`; which language, and what a backend's binding in it
 consists of, are the next two.
 
 After diagnostics; and before the tests by capability, whose list this adds to.
@@ -327,22 +327,22 @@ copied out of the other; and a layout changed in one place changes what both lan
 
 ## 16. Tests, by capability
 
-Every test so far was written to meet one phase's claim, and is named for the phase: `phase2`
-to `phase6`. That says when a thing was built and not what is covered. This phase turns the
+Every test so far was written to meet one stage's claim, and is named for the stage: `stage2`
+to `stage6`. That says when a thing was built and not what is covered. This stage turns the
 tests around: **one case for each capability the documents state**, named for the capability, for
 the library and for the standalone host both, and a list that maps each capability to the case
 that proves it. The host's half lives in the host's repository.
 
-It comes after the last phase that adds a capability, so that the list is whole, and before the
+It comes after the last stage that adds a capability, so that the list is whole, and before the
 proof, which is a workload and not a test of anything in particular.
 
-Three things the phases did not test, and this one does. **Everything under load**: a hundred and
-twenty-eight passing cases never showed the crash phase 9 found, and six copies at once showed it
-in a minute - `PHASE9.md`. **Everything a document claims**: a claim with no case is found by the
-list and not by reading. **Every refusal**: one, at least, existed for five phases with no test.
+Three things the stages did not test, and this one does. **Everything under load**: a hundred and
+twenty-eight passing cases never showed the crash stage 9 found, and six copies at once showed it
+in a minute - `STAGE9.md`. **Everything a document claims**: a claim with no case is found by the
+list and not by reading. **Every refusal**: one, at least, existed for five stages with no test.
 
 *Done when every capability the documents state has a case named for it, and the build fails on
-one that has none; no case is named for a phase; every case passes on Windows, Linux and macOS,
+one that has none; no case is named for a stage; every case passes on Windows, Linux and macOS,
 alone and with several copies running at once; and the standalone host's capabilities are covered
 the same way in its own repository.*
 
@@ -356,8 +356,8 @@ them ask another module a question synchronously - `costs.md`, *What we give up*
 It is also the first deployment that needs a clock and a set of phases, and nothing ships either:
 `no-builtins.md`, *No builtins*, and `schedule.md`, *Bridge-ASM700 ships no phase names*. Both are
 this deployment's own here. Whether either becomes content that deployments share - a module with
-a name and a version, a list of phase names - is this phase's question to put, by the method of
-`PHASE0.md`, with what the port actually needed in hand.
+a name and a version, a list of phase names - is this stage's question to put, by the method of
+`STAGE0.md`, with what the port actually needed in hand.
 
 *Done when 189 of the probe's checks pass, the two that cannot are the two named, and the GDExample
 frame is an order of magnitude under 42 us: if it is not, the architecture did not deliver and we

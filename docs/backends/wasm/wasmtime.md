@@ -64,7 +64,7 @@ is running, and the moment it is out of time. An event only tells it to look aga
 version had two events, one for a call starting and one for it ending, and waited for each in
 turn - which is counting them, and an event set twice before it is waited for once is one event.
 Two timed calls back to back, a `reload` and then a `shutdown`, lost one: the thread sat waiting
-for an end that had already been said, and the backend could not be destroyed. It took phase 6 to
+for an end that had already been said, and the backend could not be destroyed. It took stage 6 to
 make two such calls in a row, and one run in some hundreds to lose the race. `tests/adopt.c` makes
 twenty thousand.
 

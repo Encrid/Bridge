@@ -1,14 +1,14 @@
-# Phase 1: vendor and patch flecs
+# Stage 1: vendor and patch flecs
 
-Done. The `linux` preset was first run after phase 5, and passed as written.
+Done. The `linux` preset was first run after stage 5, and passed as written.
 
-This phase wrote no Bridge-ASM700. It produced **a flecs that allocates component columns and entity
+This stage wrote no Bridge-ASM700. It produced **a flecs that allocates component columns and entity
 arrays from a block we hand it, and says so when a row moves**; a script that produces that flecs
 from a pristine copy; two tests that prove both rather than asserting them; and the build they run
 in.
 
 What the patch is and why is `flecs.md`, *It can be confined*, *How it is carried* and *flecs will
-not tell you which*. This document is what the phase built and what it found on the way.
+not tell you which*. This document is what the stage built and what it found on the way.
 
 ## What it produced
 
@@ -53,12 +53,12 @@ The two middle ones are what makes the first two mean something. **A test that c
 nothing**, and both of these were seen failing for the stated reason - 225,974 escaped, 5,374
 mismatched - rather than by crashing.
 
-## What the phase found
+## What the stage found
 
 **The pin was wrong, and the version number could not have said so.** The copy the plan meant to
 vendor, Bridge-Ironwail's, reports 4.1.6 and is byte-identical to an upstream `master` commit of
 September 2026. The v4.1.6 tag is from June and its table storage is different code: no
-`flecs_table_resize_column` at all. The phase 0 spike had run against the snapshot. The release was
+`flecs_table_resize_column` at all. The stage 0 spike had run against the snapshot. The release was
 chosen, so the script checks a SHA-256 of both files as well as the version.
 
 **So the site list was re-derived, and it is not thirteen.** In the release a column and an entity
@@ -77,8 +77,8 @@ understands. "NULL means ours" stays refused; other callers pass `NULL` and mean
 thing that moves rows - `flecs.md`, *flecs will not tell you which*, for which sites are silent and
 why two of them are not hooked.
 
-**What confinement is worth was not measured in this phase.** The spike's figures, from the
-snapshot, stood in `flecs.md` until phase 5 closed, when `tests/confined.c` took them on the
+**What confinement is worth was not measured in this stage.** The spike's figures, from the
+snapshot, stood in `flecs.md` until stage 5 closed, when `tests/confined.c` took them on the
 release: `flecs.md`, *It can be confined*.
 
 ## Open questions

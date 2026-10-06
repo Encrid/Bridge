@@ -1,18 +1,18 @@
-# Phase 3: storage
+# Stage 3: storage
 
-Done. The `linux` preset was first run after phase 5, and passed as written.
+Done. The `linux` preset was first run after stage 5, and passed as written.
 
-The phase gave a module storage: the shared memory and its private one, the ABI entries that fill
-them, a phase that runs systems and the barrier after it. `PLAN.md` phase 3 is the claim.
+The stage gave a module storage: the shared memory and its private one, the ABI entries that fill
+them, a phase that runs systems and the barrier after it. `PLAN.md` stage 3 is the claim.
 
 What each piece is and why is in the documents it belongs to: `memory.md`, `budgets.md`, `abi.md`,
-`query.md`, `reference.md`, `schema.md`, `wasm.md`, `flecs.md`. This document is what the phase
+`query.md`, `reference.md`, `schema.md`, `wasm.md`, `flecs.md`. This document is what the stage
 built and what it found on the way.
 
 ## What was settled first
 
-Five questions, each by the method of `PHASE0.md`, and each applied to the document it belongs to.
-Three were waiting here from phase 2; two turned up while planning.
+Five questions, each by the method of `STAGE0.md`, and each applied to the document it belongs to.
+Three were waiting here from stage 2; two turned up while planning.
 
     what fuel costs                   a bound is paid for by the module that states it:
                                       `limits.md`, *What a bound costs*
@@ -41,7 +41,7 @@ Three were waiting here from phase 2; two turned up while planning.
     src/abi.c                     the eight entries
     src/bridge.c                  create, load, phase
     tests/modules/*.c             one module per case, compiled by zig and merged by Binaryen
-    tests/phase3.c                a host that links the library and nothing else
+    tests/stage3.c                a host that links the library and nothing else
     tools/nocall.py               reads a built module: its system loads, stores, and calls nothing
 
 zig and Binaryen joined the tools the test build needs. Binaryen is fetched at its pin, with its
@@ -49,7 +49,7 @@ hash, when the machine has none.
 
 ## The tests
 
-Seventeen new ones, beside the twenty of phases 1 and 2. All thirty-seven pass in a release build
+Seventeen new ones, beside the twenty of stages 1 and 2. All thirty-seven pass in a release build
 and in a debug one, where flecs' own assertions are on.
 
     share        two modules, one column: the reader's sum moves by what the writer added
@@ -71,7 +71,7 @@ and in a debug one, where flecs' own assertions are on.
     nobudget     a budget left unset: create refuses, naming the key
     bench        the accessor's test, against a build without it
 
-## What the phase found
+## What the stage found
 
 **Nothing needed generating.** The plan had a schema generator emitting typed accessors. An
 accessor needs a field's type, offset and struct size, and a module's own compiler has all three:
@@ -105,13 +105,13 @@ trapping in `init`.
 
 ## What it left
 
-Nothing, any more. The phase closed with a failed load leaving what its `init` had done, an
-allocator in power-of-two classes, one bridge to a process, and `observe` refusing - `PHASE5.md`,
-*Closed after the phase*, for each.
+Nothing, any more. The stage closed with a failed load leaving what its `init` had done, an
+allocator in power-of-two classes, one bridge to a process, and `observe` refusing - `STAGE5.md`,
+*Closed after the stage*, for each.
 
 ## Open questions
 
-None for the next phase. The native backend will meet one this phase named and did not build: an
+None for the next stage. The native backend will meet one this stage named and did not build: an
 entry that refuses cannot unwind native code, so there the call returns and the invocation is failed
 afterwards - `signatures.md`, *Imports are declared, exports are checked*.
 

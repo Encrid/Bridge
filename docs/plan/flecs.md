@@ -1,8 +1,8 @@
 # flecs
 
-**A record, not a description.** flecs was removed in phase 10, and nothing below is true of the
-tree any more: `PHASE10.md` is why, and `storage.md` is what keeps the rows now. This is kept
-because the phases before that one cite it, and because the reasoning it holds is what phase 10
+**A record, not a description.** flecs was removed in stage 10, and nothing below is true of the
+tree any more: `STAGE10.md` is why, and `storage.md` is what keeps the rows now. This is kept
+because the phases before that one cite it, and because the reasoning it holds is what stage 10
 was weighed against.
 
 Why flecs was embedded rather than swappable, where its memory lived, and the fork that confined
@@ -28,8 +28,8 @@ which is a copy or a call per access - the cost we are here to remove.
 
 ## Why flecs rather than our own
 
-**This is the decision `PLAN.md` phase 10 reverses**, and what follows is the reasoning it was
-made on. `PHASE10.md` is what changed: flecs turned out not to be on the path that repeats, and
+**This is the decision `PLAN.md` stage 10 reverses**, and what follows is the reasoning it was
+made on. `STAGE10.md` is what changed: flecs turned out not to be on the path that repeats, and
 to cost a hundred thousand lines and fifty C library functions for forty-one calls. This document
 describes flecs as it is carried until that phase's gate is passed.
 
@@ -116,7 +116,7 @@ file does not.
 
 **It checks the version and a hash of both files before touching anything.** The version alone does
 not identify the source: upstream's `master` kept saying 4.1.6 for months after the tag, with
-different table storage. The phase 0 spike ran against such a snapshot, and its site list did not
+different table storage. The stage 0 spike ran against such a snapshot, and its site list did not
 survive the move to the release. Pinned: **the v4.1.6 tag**.
 
 **An upgrade is a new site list, not a version bump.** The storage this patch touches has already

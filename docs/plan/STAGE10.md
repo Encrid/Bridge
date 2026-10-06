@@ -1,10 +1,10 @@
-# Phase 10: storage of our own
+# Stage 10: storage of our own
 
 In progress: flecs is out and the gate is passed, and *What was not in the plan* lists what was
 built without being decided and is being decided now, one at a time.
 
 `flecs.md`, *Why flecs rather than our own*, said that writing our own would have produced a
-worse flecs. This phase did it anyway, and this document is why that was no longer the same bet,
+worse flecs. This stage did it anyway, and this document is why that was no longer the same bet,
 and what came of it. What keeps the rows now is `storage.md`.
 
 ## What changed
@@ -15,7 +15,7 @@ columns through them with no call into anything. flecs runs at a barrier, where 
 queued change, and at load. The parts that made it a framework - its systems, its pipeline, its
 deferral, its threads - were never used, because each had to be ours for a reason of its own.
 
-**What it costs was measured in phase 9's wake.** A hundred thousand lines, of which forty-one
+**What it costs was measured in stage 9's wake.** A hundred thousand lines, of which forty-one
 calls are used. About fifty C library functions even built with one addon, file input and number
 parsing among them, which is what stood in the way of `build.md`, *Self contained*. Between
 three quarters and nine tenths of its memory outside the shared block. A patch at twenty-eight
@@ -35,10 +35,10 @@ Refused for now: a fork, a trimmed copy that is ours. It is what this falls back
 
 ## Not a freestanding flecs
 
-The first plan for this phase drew the line between the library and its storage at flecs'
+The first plan for this stage drew the line between the library and its storage at flecs'
 primitives under other names: make an id, attach, detach, match, watch. Behind a line of that
 shape the best ours could be is a smaller flecs, and it was put back to be done again, from what
-the documents say and by every step of `PHASE0.md`.
+the documents say and by every step of `STAGE0.md`.
 
 flecs has to serve any program. Bridge-ASM700 promises much more than any program does, and each
 promise is something a design made for it can spend:
@@ -85,7 +85,7 @@ as, and has every other refused by the word it stopped at.
 
 **The fourth closes something that is open today.** When a row is removed, flecs reads from the
 table's array of entity ids which entity filled the hole, and updates that entity's record in
-its own index. The patch of phase 1 moved that array into the shared block, so that modules could
+its own index. The patch of stage 1 moved that array into the shared block, so that modules could
 read it. A module can therefore write it, and what it writes is then an id flecs acts on. Nothing
 had asked what storage believes of memory a sandboxed module can reach; the answer now is nothing.
 
@@ -197,7 +197,7 @@ how many tables there are, which counted flecs' own.
 
 ## Found on the way: a sleep is a least time
 
-`phase5-parallel` failed on macOS twice in four runs of one commit, with two systems on two
+`stage5-parallel` failed on macOS twice in four runs of one commit, with two systems on two
 threads taking 203 ms where two sleeps of 100 ms at once should take 100. Each system was made to
 say when it began, and four more runs showed both beginning in the same millisecond every time:
 the pool had woken its worker at once. What was late was the sleep. `usleep` for a tenth of a
@@ -207,7 +207,7 @@ of it: macOS gathers timers together to save power, and a virtual machine adds i
 The case had been deciding "at once" from "took under 180 ms", which holds only where a sleep
 takes what it was asked for. It decides now from what it claims: each system says when it began
 and ended, and two ran at once if one began before the other ended. No length is asked of
-anything. Widening the bound was refused, as `PHASE8.md` said a bound would be.
+anything. Widening the bound was refused, as `STAGE8.md` said a bound would be.
 
 ## What flecs cost
 
@@ -314,10 +314,10 @@ The first two were each run with the rule they test taken out, and failed. The t
 flecs before it left: its observers heard the first entity removed three times over, and an entity
 nobody had made.
 
-Three cases changed their answer, as the decisions said they would. `phase3-nospans` is refused
-at load where it was stopped at a barrier. `phase3-nocolumns` leaves 747 of 1,000 entities as they
-were and runs on, where the bridge stopped. `phase6-configceiling` runs out at `entities` of 1,
-where 440 was flecs' own entities and one more. And `phase5-nested2` is refused by the word the
+Three cases changed their answer, as the decisions said they would. `stage3-nospans` is refused
+at load where it was stopped at a barrier. `stage3-nocolumns` leaves 747 of 1,000 entities as they
+were and runs on, where the bridge stopped. `stage6-configceiling` runs out at `entities` of 1,
+where 440 was flecs' own entities and one more. And `stage5-nested2` is refused by the word the
 reading stopped at.
 
 Two more came with the decision on strip: `storage strip` and `storage stripfull`.
@@ -329,7 +329,7 @@ the ways flecs could.
 ## What was not in the plan
 
 Five things were built as whatever was nearest to hand and written up as settled. None had been
-through the steps of `PHASE0.md`. Each is put back as a question, and this section says where
+through the steps of `STAGE0.md`. Each is put back as a question, and this section says where
 each stands.
 
 **A strip at unload: decided.** As first built it moved an entity at a time to the table of what
@@ -371,11 +371,11 @@ module used it, and the refusal has the case it never had.
 
 **What else was listed as inherited, and is not.** The texts of records are ours: nothing in
 the tree names flecs or forwards it. The shape of an id and of an index record is `reference.md`'s
-since phase 0, argued there on its own terms. A freed index comes back from a last-in-first-out
+since stage 0, argued there on its own terms. A freed index comes back from a last-in-first-out
 list at the next refill, which already differs from flecs and which no module can see.
 
 **The order of `bridge_budget`, and `max_modules`: decided.** The fields had been appended one
-phase at a time so that the tests' initializers needed no rewriting. They are in the order
+stage at a time so that the tests' initializers needed no rewriting. They are in the order
 `budgets.md` gives them, counts and then bytes, and `max_modules` is `modules`, a bare noun like
 every other key.
 
@@ -385,7 +385,7 @@ caught as unset the way every other key is. It meant info before and means emerg
 **Open: a test that a barrier allocates nothing.** It holds by reading: `src/storage.c` calls no
 allocator outside `rows_create`. Nothing checks it.
 
-**Open: an allocation that fails at load.** Older than this phase and found in it: of the
+**Open: an allocation that fails at load.** Older than this stage and found in it: of the
 library's allocations when a module loads, one checks what it was given.
 
 **Open: which entities are placed when columns run short.** As built, a table that cannot take
@@ -399,7 +399,7 @@ it: nothing outside this tree is built against the layout yet.
 ## The repair
 
 What the section above began became a track of its own. A full reading of the documents and of
-the three public headers, line by line, found the same error in earlier phases: decisions that
+the three public headers, line by line, found the same error in earlier stages: decisions that
 were called forced and never weighed, things kept because something else had them, statements
 no longer true, refusals with no condition. This is the list, and it is closed in this order.
 A line is open until the commit that closes it is named beside it.
@@ -416,13 +416,13 @@ A line is open until the commit that closes it is named beside it.
     bridge_budget                      counts then bytes; modules                 34e20cd
 
 **1. `PLAN.md`'s "Not in this plan"**: ten things "refused or deferred", not said which. Each
-was read in its document and became a phase, a refusal with its condition, or nothing; and the
+was read in its document and became a stage, a refusal with its condition, or nothing; and the
 section is gone, since a plan holds work and the documents hold what is refused. The last four
 were weighed as features first - is it relevant, does it serve what the project is for - which
 the first five were not, and should have been.
 
     closed  the journal, record and replay: a host's, all of it. It was planned for a day as
-            a phase with a library half, on the claim that a host cannot read what a native
+            a stage with a library half, on the claim that a host cannot read what a native
             module wrote; a host loads native modules of its own, and they can. What is the
             library's is the rule, a case that a run says the same on one thread as on four,
             and the checksums of `PLAN.md` 14
@@ -440,14 +440,14 @@ the first five were not, and should have been.
     closed  arena mark and reset: still refused, with its condition. What was behind it is
             not: a share goes back to the arena at unload unless a row still holds a string
             in it, so loading and unloading no longer ends in a restart              f3d7480
-    closed  layout migration. It was read wrong, and had been since phase 0: the line means
+    closed  layout migration. It was read wrong, and had been since stage 0: the line means
             more than one way to store a component, chosen as the right tool for the task,
             and it points at a section about a struct's fields changing at a reload. The
             first is the item. Weighed on `storage weigh`, whose figures are below, and
             then each kind on its own: accepted, all five, as `PLAN.md` 11
     open    a struct changed at reload: a question the misreading raised and nobody had
             asked. `lifetime.md` says the library "cannot" tell what changed, which is false
-    closed  bindings for a non-C module: a phase of its own, `PLAN.md` 15, with two owners.
+    closed  bindings for a non-C module: a stage of its own, `PLAN.md` 15, with two owners.
             What Bridge-ASM700 writes is its own to state; how a module reaches it is the
             backend's. Tried first: the project's compiler cannot translate the header
     closed  the tree itself, which had said otherwise: a folder for each owner. A backend has
@@ -495,7 +495,7 @@ at least five things, none defined, and none of them the one that was meant.
     open    the schema macros defined twice
     open    the log levels named twice
 
-**6. Close**: both sets of figures measured again side by side, `PLAN.md` phase 10 marked done
+**6. Close**: both sets of figures measured again side by side, `PLAN.md` stage 10 marked done
 by its done-when as first written, and every line above closed.
 
 **What one storage layout costs where it is weakest**, measured so that more than one can be

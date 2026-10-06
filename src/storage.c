@@ -1,4 +1,4 @@
-/* storage.h, kept by Bridge-ASM700 itself. docs/plan/PHASE10.md.
+/* storage.h, kept by Bridge-ASM700 itself. docs/plan/STAGE10.md.
  *
  * It is made for what the bridge promises and a general store cannot assume: rows are touched
  * only at a barrier, by one thread, with every change of that barrier already queued; systems

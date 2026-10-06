@@ -8,7 +8,7 @@
  * account, which is the same whatever keeps the rows and on however many threads.
  *
  * Built several times, each under its own namespace, so that they run at once.
- * docs/plan/PHASE10.md. */
+ * docs/plan/STAGE10.md. */
 #include "bridge-native.h"
 
 BRIDGE_SCHEMA_STRUCT(V, { uint32_t v; });

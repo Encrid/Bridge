@@ -70,7 +70,7 @@ entity, with `ON_ADD`, `ON_SET` and `ON_REMOVE` as the triggers.
 
 It runs **at the barrier where the change applied**, which is why it takes no phase. Every
 structural change is deferred - `abi.md`, *The ABI* - so there is no change to hear of anywhere
-else. `tests/phase5.c` holds that on every build: an attach made in a phase reaches its observer
+else. `tests/stage5.c` holds that on every build: an attach made in a phase reaches its observer
 under that phase's barrier count, and a chain of three takes three barriers.
 
 **It is told what the barrier made of an entity, and not each thing that was asked of it.** A

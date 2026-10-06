@@ -1,14 +1,14 @@
-# Phase 6: failure and lifecycle
+# Stage 6: failure and lifecycle
 
 Done, on Windows and on Linux.
 
 A module could load, run, and fail one invocation at a time. Now it can be stopped, unloaded,
-reloaded and configured, and a host can ask what is running. `PLAN.md` phase 6 is the claim. This
-document is what the phase built and what it found on the way.
+reloaded and configured, and a host can ask what is running. `PLAN.md` stage 6 is the claim. This
+document is what the stage built and what it found on the way.
 
 ## What was settled first
 
-Thirteen questions, each by every step of `PHASE0.md`, and each applied to the document it belongs
+Thirteen questions, each by every step of `STAGE0.md`, and each applied to the document it belongs
 to.
 
     what a reload runs            the new instance's reload, then the old one's shutdown:
@@ -38,12 +38,12 @@ to.
 
 Three of them were first put with steps missing, and were put again. Reading the original Bridge's
 source for the second pass gave reload a fourth option and changed the recommendation for the
-budget. The sixth was asked after the phase was reported: its report called `reload` optional, which
+budget. The sixth was asked after the stage was reported: its report called `reload` optional, which
 is how these documents had it from the start, and a statement made by leaving something out is what
 this project refuses everywhere else. The seventh is the same defect found by looking for it: a
 null `config` meant "no settings". The eighth looked like it and was not: an artifact's bytes or
 path may be null, and the answer was to keep that and make the two refusals exact, `nopath` and
-`nobytes` among phase 4's cases.
+`nobytes` among stage 4's cases.
 
 The last four were decided while building and reported afterwards as "forced by the documents".
 Put through the method, every one came out differently from what had been built. A failed native
@@ -52,7 +52,7 @@ A share could not change at all, where every other budget changes by reload. A s
 terminal, which made reload useless for the modules a deployment calls essential. And table ids
 were retired on Bridge-ASM700's decision to delete a component rather than on flecs freeing the
 table, which missed two ways a table is freed. "Forced by the documents" was the same mistake four
-times: a choice with a justification bolted on, which is what `PHASE0.md` step 4 warns of.
+times: a choice with a justification bolted on, which is what `STAGE0.md` step 4 warns of.
 
 The thirteenth came out of reading for one of those. `bridge_destroy` had been discarding modules
 without calling their `shutdown`, against what `wasm.md` says of that export; it calls every one
@@ -69,7 +69,7 @@ now, and answers a status, because a pinned module's is code that only its own t
     src/schedule.c                the budget, counted at each barrier, and the stop
     src/store.c                   table ids retired and reused; a ring drained at shutdown
     src/bridge.c                  bridge_modules
-    tests/phase6.c                a host with both backends
+    tests/stage6.c                a host with both backends
     tests/modules/                ten modules, most built several ways
 
 `src/bridge.c` lost what `lifecycle.c` gained: a load is now the same steps a reload takes, with
@@ -78,7 +78,7 @@ another first call.
 ## The tests
 
 Fifty-seven new ones, one hundred and twenty-eight in all, in a release build and a debug one. Most
-are cases of `tests/phase6.c`; two are among phase 4's, one among phase 2's, and one reads the
+are cases of `tests/stage6.c`; two are among stage 4's, one among stage 2's, and one reads the
 library from inside.
 
     skipinit         a failed init, skipped: the other module runs on and is the one listed
@@ -147,9 +147,9 @@ library from inside.
     image            a module whose own memory begins with data loads, on a system where
                      wasmtime would have mapped that data
 
-## What the phase found
+## What the stage found
 
-**flecs does say when a table is gone, to an observer that asks the right way.** The phase first
+**flecs does say when a table is gone, to an observer that asks the right way.** The stage first
 retired ids itself, just before deleting a component, and called the plan's `EcsOnTableDelete`
 unnecessary. It was the other way round: flecs frees tables that hold no component of ours, and
 keeps ones a query still holds, so only flecs knows. An observer on `EcsAny` hears all of them; one
@@ -173,18 +173,18 @@ goes with it, and the barrier that would have drained it comes after. It is drai
 `shutdown` beside `init` without a word, and called `reload` optional. Every test module has all
 three now, and what an absent `reload` used to say is a key - `wasm.md`, *Exports*.
 
-**The wasm backend's watchdog could hang, since phase 2.** It waited for a call to start and then
+**The wasm backend's watchdog could hang, since stage 2.** It waited for a call to start and then
 for it to end, one event each, and two timed calls back to back could set an event twice before it
 was waited for once. The thread then waited for an end already said, and destroying the backend
-waited for the thread. Nothing before this phase made two timed calls in a row; a reload is exactly
+waited for the thread. Nothing before this stage made two timed calls in a row; a reload is exactly
 that, and one test run in some hundreds stuck. It reads what is running under a lock now, and the
 event only says to look - `wasmtime.md`, *Deadlines*. Twenty thousand timed calls back to back are
 part of `tests/adopt.c`, and every test has a timeout, so one that hangs fails.
 
-**On Linux the wasm backend could abort the process, since phase 2.** wasmtime initialises a
+**On Linux the wasm backend could abort the process, since stage 2.** wasmtime initialises a
 memory from a copy-on-write image there, and asserts the memory is one it mapped; every memory of
 ours comes from the host memory creator. Whether a module tripped it depended on the shape of its
-data segments, and for five phases none did. The Linux job caught the first that does. That
+data segments, and for five stages none did. The Linux job caught the first that does. That
 initialisation is off now - `wasmtime.md`, *Memory* - and a module built to trip it is part of the
 suite.
 
@@ -194,9 +194,9 @@ with what it declared, until an artifact that works is reloaded over it or it is
 
 ## Nothing is left behind it
 
-No shortcut is marked in the code. Every refusal and every path the phase added has a case above.
+No shortcut is marked in the code. Every refusal and every path the stage added has a case above.
 The `linux` preset ran it.
 
 ## Open questions
 
-None for the next phase.
+None for the next stage.

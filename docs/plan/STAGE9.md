@@ -1,13 +1,13 @@
-# Phase 9: C23, used fully
+# Stage 9: C23, used fully
 
 Done, on Windows, on Linux and on macOS.
 
-`PLAN.md` phase 9 was "C99, and the context passed". This document is why it is not, and what the
-phase builds in its place.
+`PLAN.md` stage 9 was "C99, and the context passed". This document is why it is not, and what the
+stage builds in its place.
 
 ## What compiling it showed
 
-The decisions of phase 7 were made by argument: C99 for the whole tree, and with it no
+The decisions of stage 7 were made by argument: C99 for the whole tree, and with it no
 thread-local storage, flecs' log to every bridge, and typed accessors without `_Generic`. Before
 planning them, each was built in a scratch directory, and four things came out that the argument
 had not seen.
@@ -29,7 +29,7 @@ inside `offsetof` is C23.
 of `_Generic`, forty-two of them to the same code, the row loop included. Three reads in two
 modules became a load and a reinterpret. This one would have held.
 
-Three of the four were stated as facts in phase 7 and were wrong until compiled.
+Three of the four were stated as facts in stage 7 and were wrong until compiled.
 
 ## What was settled
 
@@ -67,7 +67,7 @@ cannot be refused, and say so now where the answer is dropped. Two functions los
 again: what they answer is information, not a status.
 
 Nothing compiled differently. Of the fifty-five test modules, fifty-four are the same code byte
-for byte as before the phase with their debug sections stripped, and the other had a line of its
+for byte as before the stage with their debug sections stripped, and the other had a line of its
 source changed. The row loop reads 0.39 ns a row, as it did.
 
 ## What changed that a host can see
@@ -86,10 +86,10 @@ by a check already made, and cannot overflow: they are left as they were.
 
 ## What it found
 
-**Unloading wasmtime crashed, and had since phase 2.** `[[nodiscard]]` was being applied when one
+**Unloading wasmtime crashed, and had since stage 2.** `[[nodiscard]]` was being applied when one
 test failed once with no output. Run alone it passed a hundred and fifty times. Six copies at
 once made it fail about one run in sixty, by a segmentation fault or by never ending, and the
-tree before this phase did the same, so it was not the phase's.
+tree before this stage did the same, so it was not the stage's.
 
 `bridge_destroy` closed every backend's library. The wasm backend's took wasmtime out of the
 process with it, and wasmtime keeps threads of its own for compiling and a handler registered
@@ -119,10 +119,10 @@ from its output.
 One hundred and thirty-three: the hundred and twenty-eight, and
 
     c23                 no older spelling in what is ours
-    phase4-libraries    what a destroyed bridge leaves in the process, by backend and by system
-    phase3-beyond       a budget no offset reaches: refused by its key
-    phase3-toobig       budgets each in reach and together not: refused. This refusal existed
+    stage4-libraries    what a destroyed bridge leaves in the process, by backend and by system
+    stage3-beyond       a budget no offset reaches: refused by its key
+    stage3-toobig       budgets each in reach and together not: refused. This refusal existed
                         and had no test
-    phase3-bigprivate   a module's regions past 32 bits: refused at load
+    stage3-bigprivate   a module's regions past 32 bits: refused at load
 
 In a release build and a debug one on Windows, and in a release build on Linux and on macOS.

@@ -1,4 +1,4 @@
-# Phase 0: how we decide things
+# Stage 0: how we decide things
 
 A sequence, not advice. Written down because it works when nobody is thinking clearly,
 which is when it matters.
@@ -75,9 +75,9 @@ identically to an oversight a year later. Write the condition that would change 
 open questions. Such a list holds what is undecided and nothing else, or it becomes a second place
 to read the design and a second place for it to be wrong.
 
-**An open question waits in the plan of the phase it blocks** - `PHASEN.md`, in a section of its
-own - and the phase is not done while one stands. Phase 0 kept a single register for all of them; it
-was emptied and deleted when the phase closed, because a standing list outlives its questions.
+**An open question waits in the plan of the stage it blocks** - `STAGEN.md`, in a section of its
+own - and the stage is not done while one stands. Stage 0 kept a single register for all of them; it
+was emptied and deleted when the stage closed, because a standing list outlives its questions.
 
 **10. Scan.** Every time, and in order - see below.
 
@@ -98,7 +98,7 @@ weighed.
 ## The scan
 
 Run from `docs/`. The paths below are relative to that, not to this file -
-`plan/` is where a phase's own document lives, and the scan is run over the
+`plan/` is where a stage's own document lives, and the scan is run over the
 whole tree from one place. The two scripts walk subdirectories; the
 shell one-liner takes its list from git, so a document in a new folder is covered without editing
 it.
@@ -111,7 +111,7 @@ reading, in this order, because each one has caught something the one before it 
     python ../tools/xref.py
 
 Every `doc.md`, *Section* pointing at a heading that exists, and no "item N" left: the numbers
-belonged to phase 0's register, which is gone. This has caught six references that resolved to
+belonged to stage 0's register, which is gone. This has caught six references that resolved to
 nothing, every one in text written minutes earlier.
 
 The script reads unwrapped text, because a citation wraps onto the next line as often as not and a
@@ -143,7 +143,7 @@ absorb a case that would otherwise be a new one, some lose a sub-question. This 
 movement comes from - more than from closing things.
 
 **6. New questions the decision raises.** A decision that answers one thing usually asks
-another. Write it into the phase plan rather than leaving it in the margin, and prefer sharpening an
+another. Write it into the stage plan rather than leaving it in the margin, and prefer sharpening an
 existing question to adding one.
 
 **7. Read the sections the greps pointed at.** A grep finds a stale word, not mangled grammar.

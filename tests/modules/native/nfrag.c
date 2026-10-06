@@ -1,7 +1,7 @@
 /* What it costs a system when the entities it reads are spread over many tables: one component
  * every entity carries, and markers that split them into SPLIT sets of the same size. The system
  * reads the one component of every row and says how many rows there were, so that a host can
- * time it and know the loop ran. docs/plan/PHASE10.md, *The repair*.
+ * time it and know the loop ran. docs/plan/STAGE10.md, *The repair*.
  *
  * Built once for each SPLIT: 1, 16, 256, 4096. The entities are the same number every time. */
 #include "bridge-native.h"

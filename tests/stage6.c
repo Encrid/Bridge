@@ -1,9 +1,9 @@
-/* A host, as far as phase 6: modules that fail, stop, leave, come back changed, and are
+/* A host, as far as stage 6: modules that fail, stop, leave, come back changed, and are
  * configured.
  *
- *     phase6 <case>
+ *     stage6 <case>
  *
- * Each case is one clause of docs/PLAN.md phase 6 or one refusal the phase added, checked by
+ * Each case is one clause of docs/PLAN.md stage 6 or one refusal the phase added, checked by
  * the records it emits and by what bridge_modules answers. */
 #include "bridge.h"
 #include "bridge-abi.h"

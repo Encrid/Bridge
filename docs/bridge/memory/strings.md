@@ -91,7 +91,7 @@ a `bridge_text` - is good only for as long as the module that allocated it is lo
 barrier. And a share with one surviving string in it stays dead whole.
 
 **What it buys.** Loading and unloading modules can go on for as long as a deployment runs:
-`tests/phase6.c`, case `churn`, does two hundred cycles in an arena with room for one share. It
+`tests/stage6.c`, case `churn`, does two hundred cycles in an arena with room for one share. It
 could not, once: the arena was a high-water mark for the life of the process, and unbounded churn
 meant restarting. That was decided before a module's share was its own and before text was a type
 the library could see, and it was not read again when both became true.

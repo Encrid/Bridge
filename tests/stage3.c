@@ -1,9 +1,9 @@
-/* A host, as far as phase 3: it creates a bridge with storage, loads modules compiled from C,
+/* A host, as far as stage 3: it creates a bridge with storage, loads modules compiled from C,
  * runs phases, and prints every record.
  *
- *     phase3 <case>
+ *     stage3 <case>
  *
- * Each case is one clause of docs/PLAN.md phase 3. build.py checks a case by the records it
+ * Each case is one clause of docs/PLAN.md stage 3. build.py checks a case by the records it
  * emits, and every case ends by printing "alive". */
 #include "bridge.h"
 #include "bridge-abi.h"

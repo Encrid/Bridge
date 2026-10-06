@@ -10,7 +10,7 @@ gives a reason, as idTech3, flecs and Godot are - and never the specification.
 separate projects, and none is part of this one.
 
 Three documents go with this one. `DESIGN.md` is why the shape is what it is and what it costs.
-`PLAN.md` is the build order. `PHASE0.md` is how a decision gets made here at all, which is method
+`PLAN.md` is the build order. `STAGE0.md` is how a decision gets made here at all, which is method
 rather than design.
 
 ## Three layers, three seams
@@ -21,7 +21,7 @@ diagram to keep in step with. One concern per document, in reading order:
 
     README.md            this file
     DESIGN.md            why, and what the design is
-    PLAN.md              the eighteen phases, each with a done-when that can fail
+    PLAN.md              the eighteen stages, each with a done-when that can fail
 
     design/
         no-builtins.md       the rule, and its universality test
@@ -30,8 +30,8 @@ diagram to keep in step with. One concern per document, in reading order:
         build.md             the compiler, the platforms, the standard, the C library
 
     plan/
-        PHASE0.md            how we decide things. method, not design
-        PHASEN.md            one per phase, written before that phase starts
+        STAGE0.md            how we decide things. method, not design
+        STAGEN.md            one per stage, written before that stage starts
 
     seam/host-api/           host to Bridge-ASM700
         host-api.md          the surface and its structs

@@ -47,7 +47,7 @@ it, or store a reference to it needs the id and has no other route to one.
 
 **Every term is a component the matched entity itself carries.** flecs' iterator has a third case,
 a `source` for each field: the entity a value was found on when that is not the matched one, by
-inheritance or a fixed source. The span had the field for it until phase 10, always zero: nothing
+inheritance or a fixed source. The span had the field for it until stage 10, always zero: nothing
 a module can ask for finds a term on another entity, and pairs, which inheritance is made of, are
 refused. Refused, then: publishing a field nothing can fill. The condition that brings it back is a
 term that may be matched on another entity, and it returns with that. Until then one entity's
@@ -68,4 +68,4 @@ term that matches has a base and a stride. Every refusal has a diagnostic and no
 Many tables per query is the normal case: that is what archetypes mean. And publishing costs
 **O(tables touched)**, not O(data) and not O(tables), which is the property that makes this scale.
 A query over ten million entities costs the same to publish as one over a thousand, and one over
-ten thousand tables that did not change costs nothing - `PHASE10.md`, *What it costs*.
+ten thousand tables that did not change costs nothing - `STAGE10.md`, *What it costs*.

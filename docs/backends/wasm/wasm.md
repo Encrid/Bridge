@@ -68,7 +68,7 @@ unasked and make every toolchain strip to be loaded at all. The condition that b
 export becoming callable by something other than its own module.
 
 The compiler sees those accessors as opaque calls until the merge, so it cannot vectorise across
-them. That is the cost, and the measurement in `PLAN.md` phase 3 is where it shows if it matters.
+them. That is the cost, and the measurement in `PLAN.md` stage 3 is where it shows if it matters.
 
 Refused: a rewriter of our own doing the same substitution, which is Binaryen's job done twice. The
 condition that brings it back is Binaryen being unable to inline or strip something this needs.
@@ -155,7 +155,7 @@ the header is C23, and the one translator tried on it, the project's own compile
 first `constexpr`. A module in another language needs two things in that language. What
 Bridge-ASM700 writes, which is this header's content and Bridge-ASM700's to make readable. And
 how a module on this backend reaches it, which is this backend's binding and this backend's to
-provide - `README.md`, *Three layers, three seams*. `PLAN.md`, phase 15.
+provide - `README.md`, *Three layers, three seams*. `PLAN.md`, stage 15.
 
 **The native backend's `bridge_api` is not in it.** A struct of C function pointers has nothing a
 wasm module could derive, since it gets imports rather than pointers. It lives in

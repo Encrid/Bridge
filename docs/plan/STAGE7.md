@@ -1,29 +1,29 @@
-# Phase 7: the build
+# Stage 7: the build
 
 Done, on Windows and on Linux.
 
 Planning a host asked what the host would be built with, and the answer had never been chosen:
 three compilers, a C standard nobody decided, a C library taken from wherever the machine had one.
-Eleven questions were settled before this phase, and they are four phases of work. This is the
-first: the build. `PLAN.md` phase 7 is the claim.
+Eleven questions were settled before this stage, and they are four stages of work. This is the
+first: the build. `PLAN.md` stage 7 is the claim.
 
 ## What was settled first
 
-Each by every step of `PHASE0.md`, one at a time. Most belong to later phases and are recorded
+Each by every step of `STAGE0.md`, one at a time. Most belong to later stages and are recorded
 here because this is where they were asked.
 
-    how a host gets the library   as a submodule, built by `build.py`: `PLAN.md` phase 12
+    how a host gets the library   as a submodule, built by `build.py`: `PLAN.md` stage 12
     the manifest's section        `.bridge`, on every format: `native.md`, *Identity*
     macOS                         a platform, arm64: `build.md`, *Platforms*
-    the standard                  C99, for everything. Withdrawn in phase 9: `PHASE9.md`
+    the standard                  C99, for everything. Withdrawn in stage 9: `STAGE9.md`
     the C library                 the parts that can be carried, carried: `build.md`, *The C
                                   library*
-    thread-local storage          none; the context is passed. Withdrawn in phase 9
-    flecs' log callback           to every live bridge's sink. Withdrawn in phase 9
-    a typed accessor              through a temporary of the struct's type. Withdrawn in phase 9
+    thread-local storage          none; the context is passed. Withdrawn in stage 9
+    flecs' log callback           to every live bridge's sink. Withdrawn in stage 9
+    a typed accessor              through a temporary of the struct's type. Withdrawn in stage 9
     Windows                       the `gnu` target, and no C runtime: `build.md`, *Platforms* and
                                   *The C library*
-    where all this sits           a phase each, 7 to 10, before the host: `PLAN.md`
+    where all this sits           a stage each, 7 to 10, before the host: `PLAN.md`
 
 Three were not questions. The compiler is zig, everywhere; the build is a Python script; and what
 all of it binds is Bridge-ASM700's own development, not a module's: `build.md`, *One compiler*,
@@ -45,9 +45,9 @@ does what they did, as commands in order:
 
 Nothing in `src/`, `backends/` or `include/` changed for it. One line of `src/store.c` and one
 function of `src/os.c` did for what it found, below. They are still compiled as C11, since C99
-needs the changes that are phase 9.
+needs the changes that are stage 9.
 
-On Windows the target is `x86_64-windows-gnu` with the C runtime zig carries, which phase 11 takes
+On Windows the target is `x86_64-windows-gnu` with the C runtime zig carries, which stage 11 takes
 away, and the vendored wasmtime is the one built for that target:
 `third_party/wasmtime/README.md`.
 
@@ -101,9 +101,9 @@ could have sent the Windows target back to be asked again. Nothing trapped in a 
 
 ## What is not done here, and where it is
 
-Each is a later phase's claim in `PLAN.md`, not something left behind this one.
+Each is a later stage's claim in `PLAN.md`, not something left behind this one.
 
-    macOS                             phase 8
-    the standard                      phase 9
-    no C runtime on Windows; nothing  phase 11
+    macOS                             stage 8
+    the standard                      stage 9
+    no C runtime on Windows; nothing  stage 11
       fetched; the C routines carried

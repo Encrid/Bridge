@@ -3,7 +3,7 @@
 "item N" is left behind.
 
 Catches the failure the restructure makes likely: a pointer that looks right and
-resolves to nothing. The item half exists because the register went when phase 0
+resolves to nothing. The item half exists because the register went when stage 0
 ended, so a document citing an item points at text nobody can read - and the
 number wraps onto the next line often enough that a line-at-a-time grep misses
 it. Run from docs/.
@@ -16,11 +16,11 @@ import sys
 # keyed by basename: prose cites `data.md`, not `bridge/data.md`, because a
 # reader wants the document's name and not where it sits in the tree.
 heads, paths = {}, {}
-# PHASE0.md is the method, not the design: it cites closed items on purpose,
+# STAGE0.md is the method, not the design: it cites closed items on purpose,
 # as the worked examples that make each step concrete, and it carries a literal
 # `doc.md`, *Section* template.
 for full in glob.glob('**/*.md', recursive=True):
-    if os.path.basename(full) == 'PHASE0.md':
+    if os.path.basename(full) == 'STAGE0.md':
         continue
     f = os.path.basename(full)
     paths[f] = full

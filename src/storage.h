@@ -1,4 +1,4 @@
-/* What Bridge-ASM700 asks of the thing that keeps its rows. docs/plan/PHASE10.md.
+/* What Bridge-ASM700 asks of the thing that keeps its rows. docs/plan/STAGE10.md.
  *
  * Each entry is named for the request, as the backend seam's are, and not for how any storage
  * goes about it: at load a type is declared and a system's terms are handed over, at a barrier

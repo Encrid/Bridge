@@ -141,7 +141,7 @@ failed in, toward its `max_system_failures` - `failure.md`, *The budget*. So a m
 the deployment is stopped as any failing module is, by its own `on_error`, and one that asked once
 too often loses one barrier's changes and runs on.
 
-Nothing is taken from outside the block, ever. Until phase 10 a column that did not fit was served
+Nothing is taken from outside the block, ever. Until stage 10 a column that did not fit was served
 from the operating system and the bridge stopped for good, for two reasons that no longer hold:
 nobody could be named, and the storage of the time could not be unwound from the middle of a
 change. Here nothing has begun when the shortage is found.
@@ -167,7 +167,7 @@ exists to refuse.
 **One floor has an argument and the rest do not.** A `log_ring` must hold at least one record: a
 module that cannot report anything is the one legal number that produces an incoherent deployment -
 `log.md`, *The log*, for why. `fuel` and `memory_limit` have floors too, but they are measurements
-rather than arguments: `PLAN.md` phases 2 and 3 enforce them, and are where a number becomes
+rather than arguments: `PLAN.md` stages 2 and 3 enforce them, and are where a number becomes
 knowable.
 
 No budget has a floor that is storage's own: nothing of it is in the block before a module asks.
