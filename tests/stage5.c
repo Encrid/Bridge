@@ -387,6 +387,20 @@ int main(int argc, char **argv)
         a.cfg.spawns = 8;
         a.cfg.changes = !strcmp(what, "fewchanges") ? 16 : BRIDGE_NONE;
         load(b, &a);
+    } else if (!strncmp(what, "phase", 5)) {
+        /* a module that says "tick" for what this deployment calls "update": refused as it
+         * is, loaded once the deployment says which of its phases that is, and refused when
+         * it names one it does not have */
+        bridge_phase_name tick = { "tick", !strcmp(what, "phasebadmap") ? "nowhere" : "update" };
+        a = native("game:stamp@0.1.0", NSTAMPTICK_PATH);
+        a.cfg.spawns = 8;
+        if (strcmp(what, "phaseunmapped")) { a.cfg.phases = &tick; a.cfg.phase_count = 1; }
+        load(b, &a);
+        a = wasm("view:watcher@0.1.0", "watcher");
+        a.cfg.read = game;
+        a.cfg.read_count = 2;
+        load(b, &a);
+        frames(b, 2);
     } else if (!strcmp(what, "unstated")) {
         /* a system attaches what it did not state among its changes: that invocation fails */
         a = native("game:stamp@0.1.0", NSTAMPUNSTATED_PATH);

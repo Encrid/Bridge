@@ -87,6 +87,8 @@ void module_discard(bridge *b, module *m)
     if (m->memory) m->on->api.memory_release(m->memory);
     if (m->priv) os_release(m->priv, m->priv_reserve);
     free_list_of(m->read, m->read_count);
+    free_list_of(m->phase_from, m->phase_names);
+    free(m->phase_to);
     free_list_of(m->write, m->write_count);
     free(m->ids);
     free(m->owned);
@@ -213,6 +215,28 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
         || unflagged(b, id, "hot_reload", cfg->hot_reload)
         || unflagged(b, id, "pinned", cfg->pinned)) {
         return 1;
+    }
+    /* schedule.md, *A module's phase names are mapped by the deployment* */
+    for (i = 0; i < cfg->phase_count; i ++) {
+        const bridge_phase_name *n = &cfg->phases[i];
+        uint32_t k, phase;
+        if (!n->from || !*n->from || !n->to || !*n->to) {
+            say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: phase name %u of its "
+                "config is unset", id, i);
+            return 1;
+        }
+        for (k = 0; k < i && strcmp(cfg->phases[k].from, n->from); k ++) {}
+        if (k < i) {
+            say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its config maps phase "
+                "'%s' twice", id, n->from);
+            return 1;
+        }
+        for (phase = 0; phase < b->phase_count && strcmp(b->phases[phase], n->to); phase ++) {}
+        if (phase == b->phase_count) {
+            say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: its config maps phase "
+                "'%s' to '%s', which the deployment did not declare", id, n->from, n->to);
+            return 1;
+        }
     }
     if (cfg->on_error != BRIDGE_FAIL && cfg->on_error != BRIDGE_SKIP) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: on_error is unset", id);
@@ -349,6 +373,15 @@ static module *record(bridge *b, const bridge_artifact *a, open_backend *o)
     if (cfg->changes > 0) {
         m->queue = malloc((size_t)cfg->changes);
         m->queue_room = (uint32_t)cfg->changes;
+    }
+    m->phase_from = calloc(cfg->phase_count ? cfg->phase_count : 1, sizeof *m->phase_from);
+    m->phase_to = calloc(cfg->phase_count ? cfg->phase_count : 1, sizeof *m->phase_to);
+    for (m->phase_names = 0; m->phase_names < cfg->phase_count; m->phase_names ++) {
+        const bridge_phase_name *n = &cfg->phases[m->phase_names];
+        uint32_t phase = 0;
+        while (strcmp(b->phases[phase], n->to)) phase ++;       /* checks() found it */
+        m->phase_from[m->phase_names] = copy(n->from, strlen(n->from));
+        m->phase_to[m->phase_names] = phase;
     }
     m->read = copy_list(cfg->read, cfg->read_count);
     m->read_count = cfg->read_count;

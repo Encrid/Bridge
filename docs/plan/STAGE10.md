@@ -616,7 +616,9 @@ Of earlier stages:
             the cost on real systems. `limits.md`, *What a bound costs*
     closed  a field's type is found in its own namespace only: it holds, and why a copy
             cannot drift is written. `schema.md`, *The type set*
-    open    no phase names shipped, and a module writes its phase's name into its code
+    closed  no phase names shipped, and a module writes its phase's name into its code: a
+            deployment maps a module's phase names to its own, in that module's config.
+            `schedule.md`, *A module's phase names are mapped by the deployment*
     open    no row for a barrier in the profile
     open    a stopped bridge takes only the load or reload of the module that stopped it
     open    all pinned modules share the host's thread

@@ -142,6 +142,7 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
         uint32_t    abi;
 
         enum bridge_flag trusted, reloadable, hot_reload, pinned;   /* TRUE | FALSE. zero is unset */
+        const bridge_phase_name *phases; uint32_t phase_count;      /* its phase names, mapped */
         enum bridge_on_error on_error;   /* FAIL | SKIP. zero is unset */
         /* each of the next six: zero is unset, BRIDGE_NO_LIMIT (-1) is "no limit" */
         int64_t  max_system_failures;    /* each system is counted against it, alone */

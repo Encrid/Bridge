@@ -121,6 +121,11 @@ struct module {
     uint32_t  queue_len, queue_room;
     char    **read, **write;        /* grants */
     uint32_t  read_count, write_count;
+    /* schedule.md: the phases it names that the deployment calls otherwise, and which of the
+     * deployment's each is */
+    char    **phase_from;
+    uint32_t *phase_to;
+    uint32_t  phase_names;
 
     int      pinned;
     uint64_t thread;                /* the one that loaded it */

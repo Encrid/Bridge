@@ -30,6 +30,30 @@ one-run tool and a game do not want the same phases.
 So a deployment declares its own, and `bridge_create` refuses a config with none, exactly as it
 refuses one with a phase named twice.
 
+### A module's phase names are mapped by the deployment
+
+**A module names its phases in its own words, and the deployment says which of its phases each
+one is.** A module's code has a phase name in it, written by somebody who never saw the
+deployment. With no names shipped, two authors share none: one writes `update` and another
+`tick`. A deployment that declared both would have two phases, run one after the other with a
+barrier between, which neither author meant. So a module's config carries a table, from a name
+the module uses to a phase the deployment declared:
+
+    [module."mods:physics".phases]
+    tick = "update"
+
+A name that is not in the table is looked for among the deployment's phases as it is written, so
+a module that already says `update` needs no entry. A table that maps a name twice, or to a
+phase the deployment did not declare, refuses the load, by the name. `tests/stage5.c`, cases
+`phaseunmapped`, `phasemapped` and `phasebadmap`, are one module that says `tick`.
+
+It is the deployment that resolves it, as it resolves an order between two systems and a grant
+between two namespaces: the only party that has seen both sides. Refused: nothing, which is what
+this had, so that a module fitted only a deployment that spoke its words. The condition that
+brings it back is none. Refused: names shipped by the library, for the reason this section
+opens with. Whether deployments come to share a list of names is still stage 17's question; the
+table is what makes the answer not matter to whether a module can be used.
+
 **flecs does ship eight, and where it ships them is the point.** `EcsOnLoad` through `EcsOnStore`
 are bootstrapped by the **pipeline addon** (`src/addons/pipeline/pipeline.c:968`), not by the core,
 and `ecs_pipeline_init` lets a world define its own instead. So they are an optional default made of

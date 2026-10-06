@@ -5,6 +5,11 @@
 #include "bridge-native.h"
 #include "../game.h"
 
+/* the phase it names: its author's word, which a deployment may call otherwise */
+#ifndef PHASE
+#define PHASE "update"
+#endif
+
 static uint32_t position, marked, stamping;
 
 BRIDGE_NATIVE(stamp)
@@ -28,9 +33,9 @@ BRIDGE_NATIVE(init)
     marked = BRIDGE_NATIVE_COMPONENT(api, "game:Marked", Marked, BRIDGE_STRIP);
     bridge_term terms[1] = {{ position, BRIDGE_READ, BRIDGE_AND, 0 }};
 #ifdef UNSTATED
-    stamping = BRIDGE_NATIVE_SYSTEM(api, "stamp", "update", terms, 1, nullptr, 0);
+    stamping = BRIDGE_NATIVE_SYSTEM(api, "stamp", PHASE, terms, 1, nullptr, 0);
 #else
-    stamping = BRIDGE_NATIVE_SYSTEM(api, "stamp", "update", terms, 1, &marked, 1);
+    stamping = BRIDGE_NATIVE_SYSTEM(api, "stamp", PHASE, terms, 1, &marked, 1);
 #endif
     api->attach(api, api->spawn(api), position, bridge_native_put(api, &p, sizeof p), sizeof p);
     return 0;

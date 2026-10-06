@@ -91,6 +91,12 @@ static_assert(offsetof(bridge_config, phase_count) == 24 && offsetof(bridge_conf
 static_assert(offsetof(bridge_config, order) == 32 && offsetof(bridge_config, order_count) == 40);
 static_assert(offsetof(bridge_config, threads) == 44 && offsetof(bridge_config, budget) == 48);
 
+/* A phase a module names in its code, and the phase of this deployment that it is: a module
+ * is written by somebody who never saw the deployment - docs/bridge/run/schedule.md. */
+typedef struct { const char *from, *to; } bridge_phase_name;
+static_assert(sizeof(bridge_phase_name) == 16 && alignof(bridge_phase_name) == 8);
+static_assert(offsetof(bridge_phase_name, from) == 0 && offsetof(bridge_phase_name, to) == 8);
+
 enum bridge_on_error : uint8_t { BRIDGE_FAIL = 1, BRIDGE_SKIP = 2 };    /* zero is unset */
 /* A key that is yes or no. It is stated like any other: left at BRIDGE_UNSET it is refused, by
  * its name, and is not taken for false - docs/seam/host-api/config.md. */
@@ -139,9 +145,13 @@ typedef struct {
     const char *config;
     const bridge_setting *settings; uint32_t setting_count;
     uint32_t pad4;
+    /* the phases it names that this deployment calls otherwise. A name that is not here is
+     * looked for among the deployment's own, as it is written */
+    const bridge_phase_name *phases; uint32_t phase_count;
+    uint32_t pad5;
 } bridge_module_config;
 #define BRIDGE_AT(member, at) static_assert(offsetof(bridge_module_config, member) == at)
-static_assert(sizeof(bridge_module_config) == 168 && alignof(bridge_module_config) == 8);
+static_assert(sizeof(bridge_module_config) == 184 && alignof(bridge_module_config) == 8);
 BRIDGE_AT(identity, 0);    BRIDGE_AT(abi, 8);            BRIDGE_AT(trusted, 12);
 BRIDGE_AT(reloadable, 13); BRIDGE_AT(hot_reload, 14);    BRIDGE_AT(pinned, 15);
 BRIDGE_AT(on_error, 16);   BRIDGE_AT(pad0, 17);          BRIDGE_AT(max_system_failures, 24);
@@ -152,7 +162,8 @@ BRIDGE_AT(spans, 84);      BRIDGE_AT(spawns, 88);        BRIDGE_AT(persistent, 9
 BRIDGE_AT(changes, 104);   BRIDGE_AT(read, 112);         BRIDGE_AT(read_count, 120);
 BRIDGE_AT(pad2, 124);      BRIDGE_AT(write, 128);        BRIDGE_AT(write_count, 136);
 BRIDGE_AT(pad3, 140);      BRIDGE_AT(config, 144);       BRIDGE_AT(settings, 152);
-BRIDGE_AT(setting_count, 160); BRIDGE_AT(pad4, 164);
+BRIDGE_AT(setting_count, 160); BRIDGE_AT(pad4, 164);     BRIDGE_AT(phases, 168);
+BRIDGE_AT(phase_count, 176); BRIDGE_AT(pad5, 180);
 #undef BRIDGE_AT
 
 typedef struct {
@@ -161,10 +172,10 @@ typedef struct {
     const void *bytes; size_t len;   /* the image, or null */
     const char *path;                /* where it is, or null. both go to the backend */
 } bridge_artifact;
-static_assert(sizeof(bridge_artifact) == 200 && alignof(bridge_artifact) == 8);
-static_assert(offsetof(bridge_artifact, cfg) == 0 && offsetof(bridge_artifact, backend) == 168);
-static_assert(offsetof(bridge_artifact, bytes) == 176 && offsetof(bridge_artifact, len) == 184);
-static_assert(offsetof(bridge_artifact, path) == 192);
+static_assert(sizeof(bridge_artifact) == 216 && alignof(bridge_artifact) == 8);
+static_assert(offsetof(bridge_artifact, cfg) == 0 && offsetof(bridge_artifact, backend) == 184);
+static_assert(offsetof(bridge_artifact, bytes) == 192 && offsetof(bridge_artifact, len) == 200);
+static_assert(offsetof(bridge_artifact, path) == 208);
 
 /* what comes back out */
 typedef struct {

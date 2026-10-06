@@ -356,6 +356,11 @@ static int abi_system(void *ud, const uint64_t *a, uint64_t *r)
     uint32_t phase;
     if (!m->in_init) return refuse(m, "system is called outside init");
     if (!phase_at) return refuse(m, "system: a phase lies outside the scratch arena");
+    /* what the deployment says this module's name for a phase is, and otherwise the name */
+    for (phase = 0; phase < m->phase_names; phase ++) {
+        if (strlen(m->phase_from[phase]) == a[3] && !memcmp(m->phase_from[phase], phase_at, a[3])) break;
+    }
+    if (phase < m->phase_names) return subscribe(m, a[0], a[1], m->phase_to[phase], 0, a[4], a[5], a[6], a[7], r);
     for (phase = 0; phase < b->phase_count; phase ++) {
         if (strlen(b->phases[phase]) == a[3] && !memcmp(b->phases[phase], phase_at, a[3])) break;
     }
