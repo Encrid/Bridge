@@ -67,10 +67,10 @@ static uint32_t random32()
 /* a row is turned on or off by writing its bit, as a value is written: no call, and no barrier */
 BRIDGE_NATIVE(flicker)
 {
-    const bridge_query_t *q = bridge_native_query(api, writing);
+    const bridge_query_t *q = bridge_native_get_query(api, writing);
     for (uint32_t i = 0; i < q->spans; i ++) {
-        const uint32_t *span = bridge_native_span(api, q, i, 1);
-        uint64_t *bits = bridge_native_bits(api, span[2]);
+        const uint32_t *span = bridge_native_get_span(api, q, i, 1);
+        uint64_t *bits = bridge_native_get_bits(api, span[2]);
         for (uint32_t r = 0; r < span[0]; r ++) {
 #ifdef BIG
             bool on = random32() % ON == 0;
@@ -86,10 +86,10 @@ BRIDGE_NATIVE(flicker)
 
 BRIDGE_NATIVE(combine)
 {
-    const bridge_query_t *q = bridge_native_query(api, writing);
+    const bridge_query_t *q = bridge_native_get_query(api, writing);
     for (uint32_t i = 0; i < q->spans; i ++) {
-        const uint32_t *span = bridge_native_span(api, q, i, 1);
-        uint64_t *bits = bridge_native_bits(api, span[2]);
+        const uint32_t *span = bridge_native_get_span(api, q, i, 1);
+        uint64_t *bits = bridge_native_get_bits(api, span[2]);
         for (uint32_t r = 0; r < span[0]; r ++) bits[r >> 6] |= (uint64_t)1 << (r & 63);
     }
     return 0;
@@ -98,12 +98,12 @@ BRIDGE_NATIVE(combine)
 /* the rows that are on, found a word of bits at a time */
 BRIDGE_NATIVE(look)
 {
-    const bridge_query_t *q = bridge_native_query(api, reading);
+    const bridge_query_t *q = bridge_native_get_query(api, reading);
     uint32_t rows = 0, on = 0, total = 0;
     for (uint32_t i = 0; i < q->spans; i ++) {
-        const uint32_t *span = bridge_native_span(api, q, i, 1);
+        const uint32_t *span = bridge_native_get_span(api, q, i, 1);
         auto column = (const T *)(api->shared_base + span[2]);
-        const uint64_t *bits = bridge_native_bits(api, span[2]);
+        const uint64_t *bits = bridge_native_get_bits(api, span[2]);
         const uint32_t count = span[0], whole = count / 64;
         for (uint32_t w = 0; w <= whole; w ++) {
             uint64_t word = bits[w];
@@ -130,12 +130,12 @@ BRIDGE_NATIVE(look)
 /* and tested at every row */
 BRIDGE_NATIVE(look_b)
 {
-    const bridge_query_t *q = bridge_native_query(api, reading);
+    const bridge_query_t *q = bridge_native_get_query(api, reading);
     uint32_t on = 0, total = 0;
     for (uint32_t i = 0; i < q->spans; i ++) {
-        const uint32_t *span = bridge_native_span(api, q, i, 1);
+        const uint32_t *span = bridge_native_get_span(api, q, i, 1);
         const T *restrict column = (const T *)(api->shared_base + span[2]);
-        const uint64_t *restrict bits = bridge_native_bits(api, span[2]);
+        const uint64_t *restrict bits = bridge_native_get_bits(api, span[2]);
         const uint32_t count = span[0];
         for (uint32_t r = 0; r < count; r ++) {
             uint32_t is = (uint32_t)(bits[r >> 6] >> (r & 63)) & 1;
@@ -150,7 +150,7 @@ BRIDGE_NATIVE(look_b)
 /* each entity reached by its id: the column through column_base, and the bits ahead of it */
 BRIDGE_NATIVE(find)
 {
-    const bridge_header_t *h = bridge_native_header(api);
+    const bridge_header_t *h = bridge_native_get_header(api);
     auto index = (const bridge_entity_t *)(api->shared_base + h->entity_index);
     auto base = (const uint32_t *)(api->private_base + h->column_base);
     uint32_t alive = 0, on = 0, total = 0;
@@ -160,7 +160,7 @@ BRIDGE_NATIVE(find)
         if (e->generation != (uint32_t)(ids[i] >> 32)) continue;
         alive ++;
         column = base[e->table * h->types + t];
-        if (!column || !(bridge_native_bits(api, column)[e->row >> 6] >> (e->row & 63) & 1)) continue;
+        if (!column || !(bridge_native_get_bits(api, column)[e->row >> 6] >> (e->row & 63) & 1)) continue;
         total += ((const T *)(api->shared_base + column))[e->row].v;
         on ++;
     }
@@ -198,7 +198,7 @@ static uint32_t on_t;
 /* what an observer of T hears: an entity given it, and never a row turned on or off */
 BRIDGE_NATIVE(heard_t)
 {
-    const bridge_list_t *list = bridge_native_list(api, on_t);
+    const bridge_list_t *list = bridge_native_get_list(api, on_t);
     auto trigger = (const bridge_trigger_t *)(api->private_base + list->at);
     if (list->count) say(api, "heard of T: how many, and the events of the first", list->count, trigger[0].events);
     return 0;
@@ -213,22 +213,22 @@ BRIDGE_NATIVE(init)
     a = made[0] = BRIDGE_NATIVE_COMPONENT(api, "st:A", A, BRIDGE_DELETE, BRIDGE_TABLE);
     b = BRIDGE_NATIVE_COMPONENT(api, "st:B", B, BRIDGE_DELETE, BRIDGE_TABLE);
     t = made[1] = BRIDGE_NATIVE_COMPONENT(api, "st:T", T, BRIDGE_DELETE, BRIDGE_TOGGLE);
-    BRIDGE_NATIVE_SYSTEM(api, "spawn", "spawn", &none, 0, made, 2);
-    BRIDGE_NATIVE_SYSTEM(api, "respawn_half", "respawn_half", &none, 0, made, 2);
-    BRIDGE_NATIVE_SYSTEM(api, "attach_b", "attach_b", &none, 0, &b, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "destroy_half", "destroy_half", &none, 0, nullptr, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "value_a", "value_a", &none, 0, &t, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "find", "find", &none, 0, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, made, 2);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "respawn_half", "respawn_half", &none, 0, made, 2);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "attach_b", "attach_b", &none, 0, &b, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "destroy_half", "destroy_half", &none, 0, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "value_a", "value_a", &none, 0, &t, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "find", "find", &none, 0, nullptr, 0);
     one[0].slot = t;
 #ifndef BIG
     on_t = BRIDGE_NATIVE_OBSERVER(api, "heard_t",
         BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, one, 1, nullptr, 0);
 #endif
-    reading = BRIDGE_NATIVE_SYSTEM(api, "look", "look", one, 1, nullptr, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "look_b", "look_b", one, 1, nullptr, 0);
+    reading = BRIDGE_NATIVE_ADD_SYSTEM(api, "look", "look", one, 1, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "look_b", "look_b", one, 1, nullptr, 0);
     one[0].access = BRIDGE_WRITE;
-    writing = BRIDGE_NATIVE_SYSTEM(api, "flicker", "flicker", one, 1, nullptr, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "combine", "combine", one, 1, nullptr, 0);
+    writing = BRIDGE_NATIVE_ADD_SYSTEM(api, "flicker", "flicker", one, 1, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "combine", "combine", one, 1, nullptr, 0);
     return 0;
 }
 

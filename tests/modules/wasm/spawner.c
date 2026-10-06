@@ -13,7 +13,7 @@ BRIDGE_EXPORT(make) int make()
 BRIDGE_EXPORT(init) int init()
 {
     int none = 0;
-    BRIDGE_SYSTEM("make", "update", &none, 0, nullptr, 0);
+    BRIDGE_ADD_SYSTEM("make", "update", &none, 0, nullptr, 0);
     return 0;
 }
 

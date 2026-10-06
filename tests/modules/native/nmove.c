@@ -58,11 +58,11 @@ BRIDGE_NATIVE(detach_b_half)
 BRIDGE_NATIVE(flicker)
 {
 #if KEPT == 3
-    const bridge_query_t *q = bridge_native_query(api, reading);
+    const bridge_query_t *q = bridge_native_get_query(api, reading);
     for (uint32_t i = 0; i < q->spans; i ++) {
-        const uint32_t *span = bridge_native_span(api, q, i, 1);
+        const uint32_t *span = bridge_native_get_span(api, q, i, 1);
         auto column = (const X *)(api->shared_base + span[2]);
-        uint64_t *bits = bridge_native_bits(api, span[2]);
+        uint64_t *bits = bridge_native_get_bits(api, span[2]);
         for (uint32_t r = 0; r < span[0]; r ++) {
             if (column[r].v == 102) bits[r >> 6] &= ~((uint64_t)1 << (r & 63));
         }
@@ -75,8 +75,8 @@ BRIDGE_NATIVE(look)
 {
     uint32_t n = 0, sum = 0;
 #if KEPT == 4
-    uint32_t cells = bridge_native_cells(api, x);
-    const uint64_t *given = bridge_native_bits(api, cells);
+    uint32_t cells = bridge_native_get_cells(api, x);
+    const uint64_t *given = bridge_native_get_bits(api, cells);
     for (uint32_t e = 1; e < 16; e ++) {
         if (!(given[0] >> e & 1)) continue;
         sum += ((const X *)(api->shared_base + cells))[e].v;
@@ -84,13 +84,13 @@ BRIDGE_NATIVE(look)
     }
     say(api, "X, direct-indexed: carried by, sum", n, sum);
 #elif KEPT == 5
-    const X *value = bridge_native_single(api, x);
+    const X *value = bridge_native_get_single(api, x);
     if (value) n = 1, sum = value->v;
     say(api, "X, a singleton: has a value, which is", n, sum);
 #else
-    const bridge_query_t *q = bridge_native_query(api, reading);
+    const bridge_query_t *q = bridge_native_get_query(api, reading);
     for (uint32_t i = 0; i < q->spans; i ++) {
-        const uint32_t *span = bridge_native_span(api, q, i, 1);
+        const uint32_t *span = bridge_native_get_span(api, q, i, 1);
         auto column = (const X *)(api->shared_base + span[2]);
         for (uint32_t r = 0; r < span[0]; r ++) sum += column[r].v;
         n += span[0];
@@ -108,12 +108,12 @@ BRIDGE_NATIVE(init)
     uint32_t both[2];
     a = both[0] = BRIDGE_NATIVE_COMPONENT(api, "st:A", A, BRIDGE_DELETE, BRIDGE_TABLE);
     x = both[1] = BRIDGE_NATIVE_COMPONENT(api, "st:X", X, BRIDGE_DELETE, (enum bridge_storage)KEPT);
-    BRIDGE_NATIVE_SYSTEM(api, "spawn", "spawn", &none, 0, both, 2);
-    BRIDGE_NATIVE_SYSTEM(api, "detach_b", "detach_b", &none, 0, &x, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "detach_b_half", "detach_b_half", &none, 0, &x, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, both, 2);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "detach_b", "detach_b", &none, 0, &x, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "detach_b_half", "detach_b_half", &none, 0, &x, 1);
     one[0].slot = x;
-    reading = BRIDGE_NATIVE_SYSTEM(api, "look", "look", one, 1, nullptr, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "flicker", "flicker", one, 1, nullptr, 0);
+    reading = BRIDGE_NATIVE_ADD_SYSTEM(api, "look", "look", one, 1, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "flicker", "flicker", one, 1, nullptr, 0);
     return 0;
 }
 

@@ -20,7 +20,7 @@ BRIDGE_NATIVE(init)
     int none = 0, i;
     position = BRIDGE_NATIVE_COMPONENT(api, "game:Position", Position, BRIDGE_DELETE, BRIDGE_TABLE);
     marked = BRIDGE_NATIVE_COMPONENT(api, "game:Marked", Marked, BRIDGE_STRIP, BRIDGE_TABLE);
-    BRIDGE_NATIVE_SYSTEM(api, "mark", "update", &none, 0, &marked, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "mark", "update", &none, 0, &marked, 1);
     for (i = 0; i < 3; i ++) {
         Position p = { (float)i, 0.0f };
         ids[i] = api->spawn(api);

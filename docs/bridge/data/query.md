@@ -61,7 +61,7 @@ refused.
 
 **Two components that are kept in different storage layouts, both required.** A system walks
 tables, or one sparse set alone, and a term of what is kept elsewhere is stated optional and
-reached from the row - `storage.md`, *What a query walks*. Anything else is refused at `system`,
+reached from the row - `storage.md`, *What a query walks*. Anything else is refused at `add_system`,
 naming the term.
 
 **A term that is "this type or that one", and a term that is "any type".** Other ECS call them
@@ -71,7 +71,7 @@ changes per table has no type to choose. So they are incompatible with the acces
 awkward in the span.
 
 So there is no way to say either. A term is one declared type, and it must match, must not, or
-may: three operators, and a value that is none of them is refused at `system` and `observe`, by
+may: three operators, and a value that is none of them is refused at `add_system` and `observe`, by
 the number of the term. A table carries a type or does not, so every term that matches has a base
 and a stride.
 

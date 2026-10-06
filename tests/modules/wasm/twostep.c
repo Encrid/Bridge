@@ -7,8 +7,8 @@ static uint32_t position, doubling, adding, showing;
 
 static uint32_t first_row(uint32_t query)
 {
-    uint32_t span = bridge_span(query, 0, 1);
-    return BRIDGE_ROW(Position, bridge_base(span, 0), 0, bridge_rows(span));
+    uint32_t span = bridge_get_span(query, 0, 1);
+    return BRIDGE_ROW(Position, bridge_get_base(span, 0), 0, bridge_count_rows(span));
 }
 
 BRIDGE_EXPORT(twice) int twice()
@@ -37,10 +37,10 @@ BRIDGE_EXPORT(init) int init()
     Position p = { 1.0f, 0.0f };
     position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = position;
-    doubling = BRIDGE_SYSTEM("twice", "update", terms, 1, nullptr, 0);
-    adding = BRIDGE_SYSTEM("more", "update", terms, 1, nullptr, 0);
+    doubling = BRIDGE_ADD_SYSTEM("twice", "update", terms, 1, nullptr, 0);
+    adding = BRIDGE_ADD_SYSTEM("more", "update", terms, 1, nullptr, 0);
     terms[0].access = BRIDGE_READ;
-    showing = BRIDGE_SYSTEM("show", "present", terms, 1, nullptr, 0);
+    showing = BRIDGE_ADD_SYSTEM("show", "present", terms, 1, nullptr, 0);
     BRIDGE_ATTACH(bridge_spawn(), position, p);
     return 0;
 }

@@ -7,9 +7,9 @@ static uint32_t marked, fixing;
 
 BRIDGE_EXPORT(fix) int fix()
 {
-    uint32_t count = bridge_triggers(fixing), i;
+    uint32_t count = bridge_count_triggers(fixing), i;
     for (i = 0; i < count; i ++) {
-        uint32_t at = bridge_ref(bridge_trigger_id(bridge_trigger_at(fixing, i)), marked,
+        uint32_t at = bridge_get_ref(bridge_get_trigger_id(bridge_get_trigger(fixing, i)), marked,
                                  sizeof(Marked));
         if (at) BRIDGE_SET(Marked, by, at, 5u);
     }

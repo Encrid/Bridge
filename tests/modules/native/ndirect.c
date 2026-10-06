@@ -108,12 +108,12 @@ BRIDGE_NATIVE(destroy)
  * was given one */
 BRIDGE_NATIVE(look_b)
 {
-    const bridge_query_t *q = bridge_native_query(api, in_table);
-    uint32_t cells = bridge_native_cells(api, d), rows = 0, found = 0, total = 0;
-    const uint64_t *given = bridge_native_bits(api, cells);
+    const bridge_query_t *q = bridge_native_get_query(api, in_table);
+    uint32_t cells = bridge_native_get_cells(api, d), rows = 0, found = 0, total = 0;
+    const uint64_t *given = bridge_native_get_bits(api, cells);
     auto cell = (const D *)(api->shared_base + cells);
     for (uint32_t i = 0; i < q->spans; i ++) {
-        const uint32_t *span = bridge_native_span(api, q, i, 2);
+        const uint32_t *span = bridge_native_get_span(api, q, i, 2);
         auto who = (const uint64_t *)(api->shared_base + span[1]);
         auto column = (const A *)(api->shared_base + span[2]);
         for (uint32_t r = 0; r < span[0]; r ++) {
@@ -133,10 +133,10 @@ BRIDGE_NATIVE(look_b)
 /* by ids that are held: the generation, the bit, the cell */
 static int reach(const bridge_api_t *api, const uint64_t *held, uint32_t count)
 {
-    const bridge_header_t *h = bridge_native_header(api);
+    const bridge_header_t *h = bridge_native_get_header(api);
     auto index = (const bridge_entity_t *)(api->shared_base + h->entity_index);
-    uint32_t cells = bridge_native_cells(api, d), alive = 0, found = 0, total = 0;
-    const uint64_t *given = bridge_native_bits(api, cells);
+    uint32_t cells = bridge_native_get_cells(api, d), alive = 0, found = 0, total = 0;
+    const uint64_t *given = bridge_native_get_bits(api, cells);
     auto cell = (const D *)(api->shared_base + cells);
     for (uint32_t i = 0; i < count; i ++) {
         uint32_t e = (uint32_t)held[i];
@@ -159,7 +159,7 @@ static uint32_t on_d, on_both;
 
 static void heard(const bridge_api_t *api, uint32_t observer, const char *text)
 {
-    const bridge_list_t *list = bridge_native_list(api, observer);
+    const bridge_list_t *list = bridge_native_get_list(api, observer);
     auto trigger = (const bridge_trigger_t *)(api->private_base + list->at);
     for (uint32_t i = 0; i < list->count; i ++) say(api, text, (uint32_t)trigger[i].id, trigger[i].events);
 }
@@ -174,20 +174,20 @@ BRIDGE_NATIVE(init)
     bridge_term_t two[2] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }, { 0, BRIDGE_READ, BRIDGE_OPTIONAL, 0 }};
     a = BRIDGE_NATIVE_COMPONENT(api, "st:A", A, BRIDGE_DELETE, BRIDGE_TABLE);
     d = BRIDGE_NATIVE_COMPONENT(api, "st:D", D, BRIDGE_DELETE, BRIDGE_DIRECT_INDEXED);
-    BRIDGE_NATIVE_SYSTEM(api, "spawn", "spawn", &none, 0, &a, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "respawn_half", "respawn_half", &none, 0, &a, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "attach_b", "attach_b", &none, 0, &d, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "detach_b", "detach_b", &none, 0, &d, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "detach_b_half", "detach_b_half", &none, 0, &d, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "value_b", "value_b", &none, 0, &d, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "destroy_half", "destroy_half", &none, 0, nullptr, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "destroy", "destroy", &none, 0, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, &a, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "respawn_half", "respawn_half", &none, 0, &a, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "attach_b", "attach_b", &none, 0, &d, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "detach_b", "detach_b", &none, 0, &d, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "detach_b_half", "detach_b_half", &none, 0, &d, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "value_b", "value_b", &none, 0, &d, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "destroy_half", "destroy_half", &none, 0, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "destroy", "destroy", &none, 0, nullptr, 0);
     two[0].slot = a;
     two[1].slot = d;
-    in_table = BRIDGE_NATIVE_SYSTEM(api, "look_b", "look_b", two, 2, nullptr, 0);
+    in_table = BRIDGE_NATIVE_ADD_SYSTEM(api, "look_b", "look_b", two, 2, nullptr, 0);
     /* these two walk nothing: the term is how they say what they read */
-    BRIDGE_NATIVE_SYSTEM(api, "near", "near", &two[1], 1, nullptr, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "far", "far", &two[1], 1, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "near", "near", &two[1], 1, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "far", "far", &two[1], 1, nullptr, 0);
 #ifndef BIG
     two[0].slot = d;
     on_d = BRIDGE_NATIVE_OBSERVER(api, "heard_d",
@@ -199,7 +199,7 @@ BRIDGE_NATIVE(init)
 #endif
 #ifdef BAD
     two[1].oper = BRIDGE_AND;
-    BRIDGE_NATIVE_SYSTEM(api, "both", "never", two, 2, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "both", "never", two, 2, nullptr, 0);
 #endif
     return 0;
 }

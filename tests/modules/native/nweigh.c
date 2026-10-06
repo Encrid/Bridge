@@ -54,10 +54,10 @@ BRIDGE_NATIVE(fill)
 
 BRIDGE_NATIVE(walk)
 {
-    const bridge_query_t *q = bridge_native_query(api, walking);
+    const bridge_query_t *q = bridge_native_get_query(api, walking);
     uint32_t total = 0;
     for (uint32_t s = 0; s < q->spans; s ++) {
-        const uint32_t *span = bridge_native_span(api, q, s, 1);
+        const uint32_t *span = bridge_native_get_span(api, q, s, 1);
         auto column = (const V *)(api->shared_base + span[2]);
         for (uint32_t r = 0; r < span[0]; r ++) total += column[r].v;
     }
@@ -67,10 +67,10 @@ BRIDGE_NATIVE(walk)
 
 BRIDGE_NATIVE(flag)
 {
-    const bridge_query_t *q = bridge_native_query(api, flagged);
+    const bridge_query_t *q = bridge_native_get_query(api, flagged);
     uint32_t total = 0;
     for (uint32_t s = 0; s < q->spans; s ++) {
-        const uint32_t *span = bridge_native_span(api, q, s, 1);
+        const uint32_t *span = bridge_native_get_span(api, q, s, 1);
         auto column = (const F *)(api->shared_base + span[2]);
         for (uint32_t r = 0; r < span[0]; r ++) {
             if (column[r].on) total += column[r].v;
@@ -83,13 +83,13 @@ BRIDGE_NATIVE(flag)
 /* every row's link followed to the value of the entity it names */
 static int follow(const bridge_api_t *api, bool far)
 {
-    const bridge_header_t *h = bridge_native_header(api);
-    const bridge_query_t *q = bridge_native_query(api, linked);
+    const bridge_header_t *h = bridge_native_get_header(api);
+    const bridge_query_t *q = bridge_native_get_query(api, linked);
     auto index = (const bridge_entity_t *)(api->shared_base + h->entity_index);
     auto base = (const uint32_t *)(api->private_base + h->column_base);
     uint32_t total = 0;
     for (uint32_t s = 0; s < q->spans; s ++) {
-        const uint32_t *span = bridge_native_span(api, q, s, 1);
+        const uint32_t *span = bridge_native_get_span(api, q, s, 1);
         auto column = (const L *)(api->shared_base + span[2]);
         for (uint32_t r = 0; r < span[0]; r ++) {
             uint64_t id = far ? column[r].far : column[r].near;
@@ -111,8 +111,8 @@ BRIDGE_NATIVE(one)
 {
     uint32_t total = 0, spans = 0;
     for (uint32_t i = 0; i < ASKED; i ++) {
-        const bridge_query_t *q = bridge_native_query(api, which);
-        const uint32_t *span = bridge_native_span(api, q, 0, 1);
+        const bridge_query_t *q = bridge_native_get_query(api, which);
+        const uint32_t *span = bridge_native_get_span(api, q, 0, 1);
         if (!q->spans || !span[0]) continue;
         total += ((const S *)(api->shared_base + span[2]))->v;
         spans = q->spans;
@@ -130,16 +130,16 @@ BRIDGE_NATIVE(init)
     flag = filled[1] = BRIDGE_NATIVE_COMPONENT(api, "st:F", F, BRIDGE_DELETE, BRIDGE_TABLE);
     link = filled[2] = BRIDGE_NATIVE_COMPONENT(api, "st:L", L, BRIDGE_DELETE, BRIDGE_TABLE);
     single = filled[3] = BRIDGE_NATIVE_COMPONENT(api, "st:S", S, BRIDGE_DELETE, BRIDGE_TABLE);
-    BRIDGE_NATIVE_SYSTEM(api, "fill", "spawn", &none, 0, filled, 4);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "fill", "spawn", &none, 0, filled, 4);
     one[0].slot = value;
-    walking = BRIDGE_NATIVE_SYSTEM(api, "walk", "walk", one, 1, nullptr, 0);
+    walking = BRIDGE_NATIVE_ADD_SYSTEM(api, "walk", "walk", one, 1, nullptr, 0);
     one[0].slot = flag;
-    flagged = BRIDGE_NATIVE_SYSTEM(api, "flag", "flag", one, 1, nullptr, 0);
+    flagged = BRIDGE_NATIVE_ADD_SYSTEM(api, "flag", "flag", one, 1, nullptr, 0);
     one[0].slot = link;
-    linked = BRIDGE_NATIVE_SYSTEM(api, "near", "near", one, 1, nullptr, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "far", "far", one, 1, nullptr, 0);
+    linked = BRIDGE_NATIVE_ADD_SYSTEM(api, "near", "near", one, 1, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "far", "far", one, 1, nullptr, 0);
     one[0].slot = single;
-    alone = BRIDGE_NATIVE_SYSTEM(api, "one", "one", one, 1, nullptr, 0);
+    alone = BRIDGE_NATIVE_ADD_SYSTEM(api, "one", "one", one, 1, nullptr, 0);
     which = alone;
     return 0;
 }

@@ -21,7 +21,7 @@
 BRIDGE_IMPORT(declare) uint32_t bridge_declare(uint32_t name, uint32_t name_len,
     enum bridge_kind kind, uint32_t size, uint32_t align, uint32_t desc, uint32_t desc_len,
     enum bridge_on_unload on_unload, enum bridge_storage storage);
-BRIDGE_IMPORT(system)  uint32_t bridge_system(uint32_t name, uint32_t name_len, uint32_t phase,
+BRIDGE_IMPORT(add_system) uint32_t bridge_add_system(uint32_t name, uint32_t name_len, uint32_t phase,
     uint32_t phase_len, uint32_t terms, uint32_t term_count, uint32_t changes,
     uint32_t change_count);
 BRIDGE_IMPORT(observe) uint32_t bridge_observe(uint32_t name, uint32_t name_len,
@@ -74,7 +74,7 @@ BRIDGE_ACC(acc_from_shared) void acc_from_shared(void *to, uint32_t from, uint32
 
 /* `len` bytes of the scratch arena, good until the next barrier. A module that asks for more
  * than it was given stops there. */
-static inline uint32_t bridge_scratch(uint32_t len)
+static inline uint32_t bridge_take_scratch(uint32_t len)
 {
     uint32_t used = (BRIDGE_HEADER(scratch_used) + 7u) & ~7u;
     uint32_t room = BRIDGE_HEADER(scratch_len);
@@ -85,7 +85,7 @@ static inline uint32_t bridge_scratch(uint32_t len)
 
 static inline uint32_t bridge_put(const void *bytes, uint32_t len)
 {
-    uint32_t at = bridge_scratch(len);
+    uint32_t at = bridge_take_scratch(len);
     acc_to_private(at, bytes, len);
     return at;
 }
@@ -107,8 +107,8 @@ static inline uint32_t bridge_put(const void *bytes, uint32_t len)
 
 /* `changes` is the slots of the components it attaches or detaches, `change_count` of them:
  * a system that does neither hands nullptr and 0 */
-#define BRIDGE_SYSTEM(name, phase, terms, count, changes, change_count) \
-    bridge_system(bridge_put(name, sizeof name - 1), sizeof name - 1, \
+#define BRIDGE_ADD_SYSTEM(name, phase, terms, count, changes, change_count) \
+    bridge_add_system(bridge_put(name, sizeof name - 1), sizeof name - 1, \
                   bridge_put(phase, sizeof phase - 1), sizeof phase - 1, \
                   bridge_put(terms, (count) * sizeof(bridge_term_t)), count, \
                   (change_count) ? bridge_put(changes, (change_count) * sizeof(uint32_t)) : 0, \
@@ -133,28 +133,28 @@ static inline void bridge_attach_value(uint64_t id, uint32_t slot, const void *v
 
 /* ---- a query's spans: two loops and no call. docs/bridge/data/query.md ---- */
 
-static inline uint32_t bridge_spans(uint32_t query)
+static inline uint32_t bridge_count_spans(uint32_t query)
 {
     return acc_own_32(BRIDGE_HEADER(queries) + query * sizeof(bridge_query_t));
 }
 
 /* span `i` of a query that declared `terms` terms */
-static inline uint32_t bridge_span(uint32_t query, uint32_t i, uint32_t terms)
+static inline uint32_t bridge_get_span(uint32_t query, uint32_t i, uint32_t terms)
 {
     uint32_t at = acc_own_32(BRIDGE_HEADER(queries) + query * sizeof(bridge_query_t) + 4u);
     return at + i * BRIDGE_SPAN_SIZE(terms);
 }
 
-static inline uint32_t bridge_rows(uint32_t span)     { return acc_own_32(span); }
-static inline uint32_t bridge_entities(uint32_t span) { return acc_own_32(span + 4u); }
+static inline uint32_t bridge_count_rows(uint32_t span)     { return acc_own_32(span); }
+static inline uint32_t bridge_get_entities(uint32_t span) { return acc_own_32(span + 4u); }
 
 /* zero: the term is absent in this table */
-static inline uint32_t bridge_base(uint32_t span, uint32_t term)
+static inline uint32_t bridge_get_base(uint32_t span, uint32_t term)
 {
     return acc_own_32(span + BRIDGE_SPAN_BASE + 4u * term);
 }
 
-static inline uint64_t bridge_entity_at(uint32_t entities, uint32_t row, uint32_t count)
+static inline uint64_t bridge_get_entity(uint32_t entities, uint32_t row, uint32_t count)
 {
     return acc_ld_64(acc_row(entities, row, count, 8u));
 }
@@ -162,13 +162,13 @@ static inline uint64_t bridge_entity_at(uint32_t entities, uint32_t row, uint32_
 /* ---- a sparse set, reached from a row. docs/bridge/storage.md, *A sparse set* ---- */
 
 /* where the sparse set that keeps component `slot` has its index: a cell for each entity */
-static inline uint32_t bridge_set_index(uint32_t slot)
+static inline uint32_t bridge_get_sparse_index(uint32_t slot)
 {
     return acc_own_32(BRIDGE_HEADER(kept) + 4u * slot);
 }
 
 /* where entity `id` has its value in that set, from the shared base: zero if it has none */
-static inline uint32_t bridge_set_value(uint32_t index, uint64_t id)
+static inline uint32_t bridge_get_sparse_value(uint32_t index, uint64_t id)
 {
     return acc_ld_32(acc_row(index, (uint32_t)id, BRIDGE_HEADER(entities), 4u));
 }
@@ -176,7 +176,7 @@ static inline uint32_t bridge_set_value(uint32_t index, uint64_t id)
 /* ---- a singleton: one value, on no entity. docs/bridge/storage.md, *A singleton* ---- */
 
 /* where the singleton `slot` has its value, from the shared base: zero while it has none */
-static inline uint32_t bridge_single(uint32_t slot)
+static inline uint32_t bridge_get_single(uint32_t slot)
 {
     return acc_own_32(BRIDGE_HEADER(kept) + 4u * slot);
 }
@@ -184,13 +184,13 @@ static inline uint32_t bridge_single(uint32_t slot)
 /* ---- direct-indexed: a cell for every entity. docs/bridge/storage.md, *Direct-indexed* ---- */
 
 /* where the cells of the direct-indexed component `slot` begin */
-static inline uint32_t bridge_cells(uint32_t slot)
+static inline uint32_t bridge_get_cells(uint32_t slot)
 {
     return acc_own_32(BRIDGE_HEADER(kept) + 4u * slot);
 }
 
 /* where entity `id` has its value of `stride` bytes among them, or zero: it was given none */
-static inline uint32_t bridge_cell(uint32_t cells, uint64_t id, uint32_t stride)
+static inline uint32_t bridge_get_cell(uint32_t cells, uint64_t id, uint32_t stride)
 {
     uint32_t entities = BRIDGE_HEADER(entities), e = (uint32_t)id;
     uint32_t word = acc_row(acc_ld_32(cells - 16u), e >> 6, (entities + 63u) >> 6, 8u);
@@ -200,10 +200,10 @@ static inline uint32_t bridge_cell(uint32_t cells, uint64_t id, uint32_t stride)
 /* ---- a toggled component: a bit a row. docs/bridge/storage.md, *A toggle* ---- */
 
 /* where the bits of the toggled column at `base` are: row r is bit r & 63 of word r >> 6 */
-static inline uint32_t bridge_bits(uint32_t base) { return acc_ld_32(base - 16u); }
+static inline uint32_t bridge_get_bits(uint32_t base) { return acc_ld_32(base - 16u); }
 
 /* whether row `row` of `count` is on */
-static inline bool bridge_on(uint32_t bits, uint32_t row, uint32_t count)
+static inline bool bridge_is_on(uint32_t bits, uint32_t row, uint32_t count)
 {
     return acc_ld_64(acc_row(bits, row >> 6, (count + 63u) >> 6, 8u)) >> (row & 63u) & 1u;
 }
@@ -218,19 +218,19 @@ static inline void bridge_turn(uint32_t bits, uint32_t row, uint32_t count, bool
 
 /* ---- an observer's list: who triggered it at this barrier, and how ---- */
 
-static inline uint32_t bridge_triggers(uint32_t observer)
+static inline uint32_t bridge_count_triggers(uint32_t observer)
 {
     return acc_own_32(BRIDGE_HEADER(observers) + observer * sizeof(bridge_list_t));
 }
 
-static inline uint32_t bridge_trigger_at(uint32_t observer, uint32_t i)
+static inline uint32_t bridge_get_trigger(uint32_t observer, uint32_t i)
 {
     uint32_t at = acc_own_32(BRIDGE_HEADER(observers) + observer * sizeof(bridge_list_t) + 4u);
     return at + i * (uint32_t)sizeof(bridge_trigger_t);
 }
 
-static inline uint64_t bridge_trigger_id(uint32_t trigger)     { return acc_own_64(trigger); }
-static inline uint32_t bridge_trigger_events(uint32_t trigger) { return acc_own_32(trigger + 8u); }
+static inline uint64_t bridge_get_trigger_id(uint32_t trigger)     { return acc_own_64(trigger); }
+static inline uint32_t bridge_get_trigger_events(uint32_t trigger) { return acc_own_32(trigger + 8u); }
 
 /* ---- a component's fields ---- */
 
@@ -248,7 +248,7 @@ static inline uint32_t bridge_trigger_events(uint32_t trigger) { return acc_own_
     int: acc_st_32, unsigned: acc_st_32, long: acc_st_32, unsigned long: acc_st_32, \
     long long: acc_st_64, unsigned long long: acc_st_64, float: acc_st_f32, double: acc_st_f64)
 
-/* `at` is what BRIDGE_ROW or bridge_ref answered */
+/* `at` is what BRIDGE_ROW or bridge_get_ref answered */
 #define BRIDGE_GET(T, field, at) \
     BRIDGE_LD_(((T *)0)->field)((at) + (uint32_t)offsetof(T, field))
 #define BRIDGE_SET(T, field, at, value) \
@@ -257,7 +257,7 @@ static inline uint32_t bridge_trigger_events(uint32_t trigger) { return acc_own_
 /* ---- following a reference: arithmetic, not a call. docs/bridge/data/reference.md ---- */
 
 /* Where component `slot` of entity `id` is, or zero: a stale id, or an entity without it. */
-static inline uint32_t bridge_ref(uint64_t id, uint32_t slot, uint32_t stride)
+static inline uint32_t bridge_get_ref(uint64_t id, uint32_t slot, uint32_t stride)
 {
     uint32_t index = (uint32_t)id, record, base;
     if (index >= BRIDGE_HEADER(entities)) return 0;
@@ -269,7 +269,7 @@ static inline uint32_t bridge_ref(uint64_t id, uint32_t slot, uint32_t stride)
 }
 
 /* Whether `id` still names an entity: one that was destroyed, or never spawned, does not. */
-static inline int bridge_alive(uint64_t id)
+static inline int bridge_is_alive(uint64_t id)
 {
     uint32_t index = (uint32_t)id;
     if (!id || index >= BRIDGE_HEADER(entities)) return 0;

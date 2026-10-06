@@ -4,7 +4,7 @@
  *     stage6 <case>
  *
  * Each case is one clause of docs/PLAN.md stage 6 or one refusal the phase added, checked by
- * the records it emits and by what bridge_modules answers. */
+ * the records it emits and by what bridge_list_modules answers. */
 #include "bridge.h"
 #include "bridge_abi.h"
 
@@ -102,8 +102,8 @@ static void frames(bridge_t *b, int count)
 {
     int i;
     for (i = 0; i < count; i ++) {
-        if (bridge_phase(b, "update")) printf("update refused\n");
-        if (bridge_phase(b, "present")) printf("present refused\n");
+        if (bridge_run_phase(b, "update")) printf("update refused\n");
+        if (bridge_run_phase(b, "present")) printf("present refused\n");
     }
 }
 
@@ -111,7 +111,7 @@ static void frames(bridge_t *b, int count)
 static void modules(bridge_t *b)
 {
     bridge_module_info_t info[8];
-    int n = bridge_modules(b, info, 8), i;
+    int n = bridge_list_modules(b, info, 8), i;
     printf("modules:");
     for (i = 0; i < n && i < 8; i ++) {
         printf(" %s=%s", info[i].identity, info[i].state == BRIDGE_STOPPED ? "STOPPED" : "RUNNING");

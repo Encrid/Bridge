@@ -20,7 +20,7 @@ It is not built: `PLAN.md`, stage 14. What is here is what that stage builds.
 **A pull, not records**, for the reason `log.md`, *The log* gives against itself: that ring is *"Drop and
 count, never block"*. A dropped log line is a missing line; a dropped profile record is a **biased
 number with nothing marking it biased**. State must not arrive by a route that can drop, which is
-the same argument `introspection.md`, *Introspection*, makes for `bridge_modules`.
+the same argument `introspection.md`, *Introspection*, makes for `bridge_list_modules`.
 
 **Two counters, and `calls` is earned by observers.** A system runs once per pass by construction, so
 counting its calls says nothing; an observer runs once per barrier that triggered it, so a count

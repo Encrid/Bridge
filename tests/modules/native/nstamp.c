@@ -14,10 +14,10 @@ static uint32_t position, marked, stamping;
 
 BRIDGE_NATIVE(stamp)
 {
-    const bridge_query_t *q = bridge_native_query(api, stamping);
+    const bridge_query_t *q = bridge_native_get_query(api, stamping);
     Marked m = { VALUE };
     for (uint32_t s = 0; s < q->spans; s ++) {
-        const uint32_t *span = bridge_native_span(api, q, s, 1);
+        const uint32_t *span = bridge_native_get_span(api, q, s, 1);
         auto who = (const uint64_t *)(api->shared_base + span[1]);
         for (uint32_t row = 0; row < span[0]; row ++) {
             bridge_native_attach(api, who[row], marked, &m, sizeof m);
@@ -33,9 +33,9 @@ BRIDGE_NATIVE(init)
     marked = BRIDGE_NATIVE_COMPONENT(api, "game:Marked", Marked, BRIDGE_STRIP, BRIDGE_TABLE);
     bridge_term_t terms[1] = {{ position, BRIDGE_READ, BRIDGE_AND, 0 }};
 #ifdef UNSTATED
-    stamping = BRIDGE_NATIVE_SYSTEM(api, "stamp", PHASE, terms, 1, nullptr, 0);
+    stamping = BRIDGE_NATIVE_ADD_SYSTEM(api, "stamp", PHASE, terms, 1, nullptr, 0);
 #else
-    stamping = BRIDGE_NATIVE_SYSTEM(api, "stamp", PHASE, terms, 1, &marked, 1);
+    stamping = BRIDGE_NATIVE_ADD_SYSTEM(api, "stamp", PHASE, terms, 1, &marked, 1);
 #endif
     bridge_native_attach(api, api->spawn(api), position, &p, sizeof p);
     return 0;

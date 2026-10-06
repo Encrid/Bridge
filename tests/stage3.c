@@ -83,8 +83,8 @@ static void frames(bridge_t *b, int count)
 {
     int i;
     for (i = 0; i < count; i ++) {
-        if (bridge_phase(b, "update")) printf("update refused\n");
-        if (bridge_phase(b, "present")) printf("present refused\n");
+        if (bridge_run_phase(b, "update")) printf("update refused\n");
+        if (bridge_run_phase(b, "present")) printf("present refused\n");
     }
 }
 
@@ -121,7 +121,7 @@ static void bench(bridge_config_t *cfg)
                 struct timespec t0, t1;
                 double ns;
                 timespec_get(&t0, TIME_UTC);
-                for (pass = 0; pass < 50; pass ++) (void)bridge_phase(b, "update");
+                for (pass = 0; pass < 50; pass ++) (void)bridge_run_phase(b, "update");
                 timespec_get(&t1, TIME_UTC);
                 ns = (double)(t1.tv_sec - t0.tv_sec) * 1e9 + (double)(t1.tv_nsec - t0.tv_nsec);
                 if (ns < best) best = ns;
@@ -212,7 +212,7 @@ int main(int argc, char **argv)
         a = artifact("game:shield@0.1.0", "shield");    /* and after */
         a.cfg.spawns = 16;
         load(b, &a);
-        (void)bridge_phase(b, "present");
+        (void)bridge_run_phase(b, "present");
         frames(b, 1);
     } else if (!strcmp(what, "sparse")) {       /* a sparse set, walked and reached */
         a = artifact("game:hit@0.1.0", "hit");
@@ -295,7 +295,7 @@ int main(int argc, char **argv)
         a = artifact("game:fp@0.1.0", "fp");
         load(b, &a);
     } else if (!strcmp(what, "nophase")) {
-        if (bridge_phase(b, "render")) printf("render refused\n");
+        if (bridge_run_phase(b, "render")) printf("render refused\n");
     }
 
     (void)bridge_destroy(b);

@@ -48,7 +48,7 @@ All five are stated, and "no limit" is a value like any other: `-1`. `capabiliti
 ## What a bound costs
 
 **A bound is a safety net, and no module has to have one.** A system that never returns holds
-`bridge_phase` for ever, and running code can be stopped in three ways only: it counts for
+`bridge_run_phase` for ever, and running code can be stopped in three ways only: it counts for
 itself, which is a work limit; it checks a flag another thread sets, which is a timeout; or the
 operating system kills its thread, which the host does not survive. To stop it and keep the
 process, a check is compiled into its loops, and neither kind of check is free. So whether a
@@ -66,7 +66,7 @@ and written back per row - that measured as:
     both                0.65            x2.2
 
 That is the worst case: the heavier a row's work, the smaller the share. A system dispatched by
-`bridge_phase` over the same loop measures the same way, 0.39 ns a row without a work limit and 0.65
+`bridge_run_phase` over the same loop measures the same way, 0.39 ns a row without a work limit and 0.65
 with one. It is still a factor and not a rounding error, so `-1` has to mean the cost is gone and
 not merely that the budget is large. A module stating `work_limit = -1` is compiled without the
 count, and one stating `-1` for all three timeouts without the interrupt check - `backend.md`, *What

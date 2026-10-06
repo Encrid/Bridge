@@ -267,12 +267,12 @@ typedef struct {
 static_assert(sizeof(bridge_module_info_t) == 16 && alignof(bridge_module_info_t) == 8);
 static_assert(offsetof(bridge_module_info_t, identity) == 0 && offsetof(bridge_module_info_t, state) == 8);
 static_assert(offsetof(bridge_module_info_t, pad) == 9);
-BRIDGE_API int bridge_modules(bridge_t *b, bridge_module_info_t *out, int max);
+BRIDGE_API int bridge_list_modules(bridge_t *b, bridge_module_info_t *out, int max);
 
 /* Run the systems registered to one phase, then its barrier. 0 if the phase ran, whatever
  * its systems did: a system that failed is a record, not a return code. With a pinned module
  * loaded, from the thread that loaded it. */
-BRIDGE_API [[nodiscard]] int bridge_phase(bridge_t *b, const char *name);
+BRIDGE_API [[nodiscard]] int bridge_run_phase(bridge_t *b, const char *name);
 
 #ifdef __cplusplus
 }

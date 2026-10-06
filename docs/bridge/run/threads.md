@@ -19,7 +19,7 @@ by having more modules whose systems do not conflict, not by declaring more syst
 over one component cannot be split across two modules either, since both would write it, conflict,
 and be ordered.
 
-**How many threads is stated**, as `threads`, and it counts the one that called `bridge_phase`: that
+**How many threads is stated**, as `threads`, and it counts the one that called `bridge_run_phase`: that
 thread works too, and at `threads = 1` it does everything, in an order that never varies.
 Bridge-ASM700 keeps the others for as long as it exists.
 

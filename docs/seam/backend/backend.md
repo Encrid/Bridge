@@ -19,16 +19,16 @@ name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
 
 ## What a backend is asked for
 
-    backend_abi()                              -> the backend seam's number
+    backend_get_abi()                              -> the backend seam's number
     backend_create(settings)                   -> backend
     backend_destroy(backend)
-    backend_capabilities(backend)              -> flags
+    backend_get_capabilities(backend)              -> flags
 
-    memory_shape(backend)                      -> reservation, guard, granule
+    memory_get_shape(backend)                      -> reservation, guard, granule
     memory_adopt(backend, ptr, len)            -> memory
     memory_release(memory)
     module_compile(backend, bytes, len, path, demands) -> module
-    module_imports(module)                     -> names, and what each is
+    module_list_imports(module)                     -> names, and what each is
     module_destroy(module)
 
     instance_create(backend, module, memories, count) -> instance
@@ -38,7 +38,7 @@ name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
     instance_set_memory_limit(instance, bytes)
 
     define_func(instance, namespace, field, fn, sig)
-    instance_func(instance, name)              -> func
+    instance_get_func(instance, name)              -> func
     call(func, status)                         -> err
 
 Eighteen entries. The first says which backend seam the library was built against, and one of
@@ -61,7 +61,7 @@ backend that knows a module declined one need not compile it in - `limits.md`, *
 costs*. A backend is free to ignore them and enforce more than was asked; it is never free to
 enforce less, which the load check has already settled before this is called.
 
-`module_imports` is there for one decision: **which memories to hand `instance_create`.** Not every
+`module_list_imports` is there for one decision: **which memories to hand `instance_create`.** Not every
 module imports both - `wasm.md`, *Memories* - so Bridge-ASM700 reads the list rather than supplying
 memories nobody asked for and letting the link fail.
 
@@ -75,7 +75,7 @@ and a wasm module as an import.
 **A backend states the shape it needs, and Bridge-ASM700 allocates to it.** An engine does not care
 who allocated a block; it cares what surrounds it. One that enforces bounds by faulting needs
 address space reserved after the block and left unmapped, so that a stray access lands on nothing.
-`memory_shape` answers the reservation and the guard a backend needs, and the granule: the number
+`memory_get_shape` answers the reservation and the guard a backend needs, and the granule: the number
 of bytes a block's length must be a whole number of. The wasm backend's is 65,536, a wasm page,
 since a wasm memory is a whole number of them; the native backend has none. **A block has the
 shape of whoever maps it**. The shared block is mapped by every backend, so it has the largest of

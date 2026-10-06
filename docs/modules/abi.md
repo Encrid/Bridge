@@ -6,7 +6,7 @@ At init, which runs each time a module is loaded - `lifecycle.md`, *The runtime 
 three may take names, because registration is not a hot path.
 
     declare(name, name_len, kind, size, align, desc, desc_len, on_unload, storage) -> slot
-    system (name, name_len, phase, phase_len, terms, term_count, changes, change_count) -> slot
+    add_system(name, name_len, phase, phase_len, terms, term_count, changes, change_count) -> slot
     observe(name, name_len, events, terms, term_count, changes, change_count)         -> slot
 
 Any time, queued and applied at the next barrier:
@@ -118,7 +118,7 @@ when nothing changed - a saving on the hot path proportional to how many modules
 the hot path is the one budget this design exists to protect.
 
 A system or an observer **is** a query plus a function, so one call registers the pair. `init`,
-`shutdown` and `reload` are reserved names that `system` and `observe` refuse. `terms` is an array
+`shutdown` and `reload` are reserved names that `add_system` and `observe` refuse. `terms` is an array
 of term structs rather than a string, so there is no parser in Bridge-ASM700 and no string handed
 over at init. A term is three things: the
 slot `declare` answered, the access, and whether the term must match, must not, or may. What a
@@ -140,7 +140,7 @@ authors who have never met. Among a module's own systems the order it registered
 order: `schedule.md`, *Order within a phase is never implicit*.
 
 **A system takes no arguments.** Its spans are already in its memory, found through the slot
-`system` answered. Frame time is not an argument and not a component Bridge-ASM700 declares: the system
+`add_system` answered. Frame time is not an argument and not a component Bridge-ASM700 declares: the system
 clock is hardware, so a native module reads it - usually the one already talking to the OS for input or a
 window - and writes the interval into a component of its own, which anything needing it reads under
 a grant.

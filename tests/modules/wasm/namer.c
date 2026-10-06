@@ -12,9 +12,9 @@ static uint32_t name, saying;
 BRIDGE_EXPORT(say) int say()
 {
     uint32_t span;
-    if (!bridge_spans(saying)) return 0;
-    span = bridge_span(saying, 0, 1);
-    uint32_t at = BRIDGE_ROW(Name, bridge_base(span, 0), 0, bridge_rows(span));
+    if (!bridge_count_spans(saying)) return 0;
+    span = bridge_get_span(saying, 0, 1);
+    uint32_t at = BRIDGE_ROW(Name, bridge_get_base(span, 0), 0, bridge_count_rows(span));
     uint32_t len = BRIDGE_GET(Name, text.len, at);
     char text[32];
     if (len > sizeof text) len = sizeof text;
@@ -30,7 +30,7 @@ BRIDGE_EXPORT(init) int init()
     [[maybe_unused]] Name n = {{ 0, sizeof hello - 1 }};
     name = BRIDGE_COMPONENT("game:Name", Name, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = name;
-    saying = BRIDGE_SYSTEM("say", "update", terms, 1, nullptr, 0);
+    saying = BRIDGE_ADD_SYSTEM("say", "update", terms, 1, nullptr, 0);
 #ifndef READER
     n.text.at = bridge_alloc(n.text.len);
     acc_to_shared(n.text.at, hello, n.text.len);

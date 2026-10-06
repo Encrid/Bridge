@@ -25,7 +25,7 @@ unwind a module does so there: the wasm backend raises a trap. One that cannot l
 return, and Bridge-ASM700 fails the invocation when it does.
 
 **An arity would not do, and not as a matter of taste.** Five of the eight entries answer a value -
-`declare`, `system` and `observe` a slot, `spawn` an id, `alloc` an offset - and a count of
+`declare`, `add_system` and `observe` a slot, `spawn` an id, `alloc` an offset - and a count of
 arguments cannot say so. Nor can it say how wide they are: `attach(id, slot, ptr, len)` has four
 parameters of which the first is a 64-bit entity id and the rest are 32-bit, `ptr` being an offset
 into the scratch arena on every backend. And wasmtime's own
@@ -48,7 +48,7 @@ layouts*, refuses for that header.
 instead and the same module links happily and passes garbage - a load-time refusal traded for
 runtime corruption.
 
-`module_imports` is not a second source for this: it answers *which memories to supply*, and nothing
+`module_list_imports` is not a second source for this: it answers *which memories to supply*, and nothing
 about what shape a function has.
 
 ## A call takes nothing and answers a status
@@ -67,7 +67,7 @@ call's timeout produces one, and the process keeps running - and `failure.md`, *
 fails*, treats the two alike on purpose.
 
 **The backend is who checks an export, because it is who can see one** - the other half of
-*Imports are declared, exports are checked*. `instance_func` answers a function `call` can run, or
+*Imports are declared, exports are checked*. `instance_get_func` answers a function `call` can run, or
 refuses and says why. The wasm backend reads the export's type and refuses one that is not
 `() -> i32`, at init and not on the first frame: `tests/stage2.c`, case `shape`. The native
 backend has a symbol from the loader, which carries no type, and checks nothing: it does not

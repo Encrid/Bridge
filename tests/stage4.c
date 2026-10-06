@@ -160,8 +160,8 @@ int main(int argc, char **argv)
             load(b, &a);
         }
         for (i = 0; i < 2; i ++) {
-            (void)bridge_phase(b, "update");
-            (void)bridge_phase(b, "present");
+            (void)bridge_run_phase(b, "update");
+            (void)bridge_run_phase(b, "present");
         }
     } else if (!strcmp(what, "untrusted")) {    /* refused before any library is looked for */
         a = native("game:mover@0.1.0", "no-such-library");
@@ -185,7 +185,7 @@ int main(int argc, char **argv)
     } else if (!strcmp(what, "refuse")) {
         a = native("test:flood@0.1.0", NFLOOD_PATH);
         load(b, &a);
-        (void)bridge_phase(b, "update");
+        (void)bridge_run_phase(b, "update");
     }
 
     (void)bridge_destroy(b);

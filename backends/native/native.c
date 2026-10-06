@@ -11,7 +11,7 @@
 
 enum entry : uint32_t { DECLARE, SYSTEM, OBSERVE, SPAWN, DESTROY, ATTACH, DETACH, ALLOC, ENTRIES };
 static const char *const entry_names[ENTRIES] = {
-    "declare", "system", "observe", "spawn", "destroy", "attach", "detach", "alloc"
+    "declare", "add_system", "observe", "spawn", "destroy", "attach", "detach", "alloc"
 };
 
 struct backend { int unused; };
@@ -41,7 +41,7 @@ static uint64_t enter(const bridge_api_t *api, int entry, const uint64_t *args)
 {
     auto i = (backend_instance_t *)((char *)api - offsetof(backend_instance_t, api));
     uint64_t result = 0;
-    if (!i->calling || i->calling != os_thread_id() || i->refused || !i->fns[entry]) return 0;
+    if (!i->calling || i->calling != os_get_thread_id() || i->refused || !i->fns[entry]) return 0;
     if (i->fns[entry](i->uds[entry], args, &result)) {
         i->refused = 1;
         return 0;
@@ -121,7 +121,7 @@ BACKEND_EXPORT void backend_destroy(backend_t *b)
 /* It runs only what is trusted, and keeps no work limit, no timeout and no memory limit:
  * nothing contains code in this process. And not
  * side by side: a process cannot hold two copies of one library. */
-BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] backend_t *b)
+BACKEND_EXPORT enum backend_capability backend_get_capabilities([[maybe_unused]] backend_t *b)
 {
     return BACKEND_RELOAD | BACKEND_UNLOAD;
 }
@@ -129,9 +129,9 @@ BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] bac
 #ifndef SAYS_ABI
 #define SAYS_ABI BACKEND_ABI
 #endif
-BACKEND_EXPORT uint32_t backend_abi() { return SAYS_ABI; }
+BACKEND_EXPORT uint32_t backend_get_abi() { return SAYS_ABI; }
 
-BACKEND_EXPORT void memory_shape([[maybe_unused]] backend_t *b, uint64_t *reservation, uint64_t *guard,
+BACKEND_EXPORT void memory_get_shape([[maybe_unused]] backend_t *b, uint64_t *reservation, uint64_t *guard,
                                  uint64_t *granule)
 {
     *reservation = 0;
@@ -177,7 +177,7 @@ BACKEND_EXPORT backend_module_t *module_compile(
 }
 
 /* A library has no import section to read, so it is taken to want both memories. */
-BACKEND_EXPORT uint32_t module_imports([[maybe_unused]] backend_module_t *m, backend_import_t *out,
+BACKEND_EXPORT uint32_t module_list_imports([[maybe_unused]] backend_module_t *m, backend_import_t *out,
                                        uint32_t max)
 {
     static const char ns[] = BRIDGE_NAMESPACE;
@@ -207,7 +207,7 @@ BACKEND_EXPORT backend_instance_t *instance_create([[maybe_unused]] backend_t *b
     uint32_t k;
     i->m = m;
     i->api.declare = t_declare;
-    i->api.system = t_system;
+    i->api.add_system = t_system;
     i->api.observe = t_observe;
     i->api.spawn = t_spawn;
     i->api.destroy = t_destroy;
@@ -258,13 +258,13 @@ BACKEND_EXPORT int define_func(backend_instance_t *i, const char *ns, const char
 
 /* Exports are named bridge_<name>: a C process has one flat symbol namespace. */
 /* A symbol carries no type, so there is no shape to see: what it must be is native.md's. */
-BACKEND_EXPORT backend_func_t *instance_func(backend_instance_t *i, const char *name, backend_err_t *err)
+BACKEND_EXPORT backend_func_t *instance_get_func(backend_instance_t *i, const char *name, backend_err_t *err)
 {
     char symbol[160];
     backend_func_t *f;
     int (*fn)(const bridge_api_t *);
     snprintf(symbol, sizeof symbol, "bridge_%.150s", name);
-    fn = (int (*)(const bridge_api_t *))os_lib_sym(i->m->lib, symbol);
+    fn = (int (*)(const bridge_api_t *))os_lib_get_symbol(i->m->lib, symbol);
     if (!fn) {
         snprintf(err->text, sizeof err->text, "no exported function '%s'", symbol);
         return nullptr;
@@ -282,7 +282,7 @@ BACKEND_EXPORT int call(backend_func_t *f, int32_t *status, [[maybe_unused]] bac
 {
     backend_instance_t *i = f->instance;
     uint64_t before = i->calling;       /* a call made from inside a call returns to it */
-    i->calling = os_thread_id();
+    i->calling = os_get_thread_id();
     i->refused = 0;
     *status = f->fn(&i->api);
     i->calling = before;

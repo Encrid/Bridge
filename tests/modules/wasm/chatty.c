@@ -11,7 +11,7 @@ BRIDGE_EXPORT(talk) int talk()
 BRIDGE_EXPORT(init) int init()
 {
     int none = 0;
-    BRIDGE_SYSTEM("talk", "update", &none, 0, nullptr, 0);
+    BRIDGE_ADD_SYSTEM("talk", "update", &none, 0, nullptr, 0);
     return 0;
 }
 

@@ -52,7 +52,7 @@ backend as a shared library behind it, which Bridge-ASM700 opens by the name con
 `backend.md`, *What a backend is asked for*. A core wasm module importing a Bridge-ASM700 memory,
 which means `wasm_multi_memory` on since the module has its own. `bridge_abi.h` begins here, because
 a module reading the shared memory with plain loads needs to know what a span holds. `define_func`
-with a real signature and `instance_func`'s `() -> i32` check - `signatures.md`, *Imports are
+with a real signature and `instance_get_func`'s `() -> i32` check - `signatures.md`, *Imports are
 declared, exports are checked*.
 
 `bridge.h` begins here too, as far as this stage's claim needs: `bridge_create`, `bridge_destroy`
@@ -77,10 +77,10 @@ The shared memory's three regions and each module's private memory: the header, 
 `column_base`, the scratch arena and the log ring - `memory.md`, *Where the regions live*.
 `[budget]`, with exhaustion fatal where it happens - `budgets.md`, *What running out does*.
 
-`declare`, with the fingerprint, type-set and grant checks. `system`, with the query refusals -
+`declare`, with the fingerprint, type-set and grant checks. `add_system`, with the query refusals -
 `query.md`, *What a query may not ask for*. The structural entries `spawn`, `destroy`, `attach` and
-`detach`, and `alloc`. The work limit, re-set before every dispatch. `bridge_phase` and the barrier, serial
-for now: queued changes applied, spans republished, rings drained, scratch reset. The entity index
+`detach`, and `alloc`. The work limit, re-set before every dispatch. `bridge_run_phase` and the barrier,
+serial for now: queued changes applied, spans republished, rings drained, scratch reset. The entity index
 mirror, driven off the patched hook and flecs' events, and `get` over it - `reference.md`,
 *Reference following*. The row-count check, which stage 10 made needless - `validation.md`, *Always
 on*. What a module compiles against, and the module build that merges it: the `ECS_STRUCT` shim, as
@@ -134,7 +134,7 @@ Done. `STAGE6.md` is what it built and found.
 `on_error`, `max_system_failures` and the stop, and the two escalation guards - `failure.md`, *When
 something fails*. `bridge_unload` and `bridge_reload` with their rules, `hot_reload`, and the reload
 and shutdown timeouts - `lifetime.md`, *Lifetime*. `[.config]` seeding a singleton component -
-`config.md`, *A module's own settings are a component*. `bridge_modules`, because a stop is the
+`config.md`, *A module's own settings are a component*. `bridge_list_modules`, because a stop is the
 state it exists to report - `introspection.md`, *Introspection*.
 
 *Done when a skipped `init` leaves the other modules running; a refused load leaves the schedule and

@@ -4,7 +4,7 @@ Who advances Bridge-ASM700, and who decides when the program ends. Both are the 
 
 ## The host owns the loop, and the order within it
 
-`bridge_phase` runs one named phase and its barrier. **There is no `bridge_step`.** The host calls
+`bridge_run_phase` runs one named phase and its barrier. **There is no `bridge_step`.** The host calls
 the phases it wants, as often as it wants.
 
 **No phase is Bridge-ASM700's**, so every name here is one the deployment declared - `schedule.md`,

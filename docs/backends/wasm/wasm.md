@@ -69,7 +69,7 @@ exports by their common prefix, `acc_`, and with them the bodies nothing calls a
 `wasm-opt --remove-exports=acc_* --remove-unused-module-elements`.
 
 Load does not check that it happened. Only a module can name one of its exports to the scheduler,
-through `system`, and every accessor takes a parameter, so the `() -> i32` check refuses each of
+through `add_system`, and every accessor takes a parameter, so the `() -> i32` check refuses each of
 them already - `signatures.md`, *Imports are declared, exports are checked*.
 
 The compiler sees those accessors as opaque calls until the merge, so it cannot vectorise across

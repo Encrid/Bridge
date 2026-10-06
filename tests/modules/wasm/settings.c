@@ -27,7 +27,7 @@ static uint32_t settings;
 BRIDGE_EXPORT(show) int show()
 {
     char text[64];
-    uint32_t at = bridge_single(settings), len, i;
+    uint32_t at = bridge_get_single(settings), len, i;
     if (!at) {
         BRIDGE_LOG(BRIDGE_LOG_INFO, "no settings row", 0, 0);
         return 0;
@@ -57,7 +57,7 @@ BRIDGE_EXPORT(init) int init()
     BRIDGE_DECLARE(BRIDGE_BITMASK, "game:Flags", Flags, BRIDGE_STRIP, BRIDGE_TABLE);
     settings = BRIDGE_COMPONENT("game:Settings", Settings, BRIDGE_DELETE, KEPT);
     terms[0].slot = settings;
-    BRIDGE_SYSTEM("show", "update", terms, 1, nullptr, 0);
+    BRIDGE_ADD_SYSTEM("show", "update", terms, 1, nullptr, 0);
     return 0;
 }
 

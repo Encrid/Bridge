@@ -60,7 +60,7 @@ BRIDGE_NATIVE(work)
 /* every entity, by its id: where the index says it is, and what column_base says is there */
 static void by_reference(const bridge_api_t *api)
 {
-    const bridge_header_t *h = bridge_native_header(api);
+    const bridge_header_t *h = bridge_native_get_header(api);
     auto index = (const bridge_entity_t *)(api->shared_base + h->entity_index);
     auto column_base = (const uint32_t *)(api->private_base + h->column_base);
     uint32_t live = 0, digest = 0;
@@ -92,10 +92,10 @@ static void by_reference(const bridge_api_t *api)
 /* and every component, by its spans: as many rows as carry it, holding what they should */
 static int by_spans(const bridge_api_t *api, uint32_t kind)
 {
-    const bridge_query_t *q = bridge_native_query(api, seeing[kind]);
+    const bridge_query_t *q = bridge_native_get_query(api, seeing[kind]);
     uint32_t rows = 0, sum = 0, want_rows = 0, want_sum = 0;
     for (uint32_t s = 0; s < q->spans; s ++) {
-        const uint32_t *span = bridge_native_span(api, q, s, 1);
+        const uint32_t *span = bridge_native_get_span(api, q, s, 1);
         auto column = (const V *)(api->shared_base + span[2]);
         rows += span[0];
         for (uint32_t r = 0; r < span[0]; r ++) sum += column[r].v;
@@ -135,11 +135,11 @@ BRIDGE_NATIVE(init)
             (uint32_t)strlen(names[k]), BRIDGE_STRUCT, sizeof(V), alignof(V),
             bridge_native_put(api, V_desc, sizeof V_desc - 1), sizeof V_desc - 1, BRIDGE_DELETE, BRIDGE_TABLE);
         term[0].slot = kinds[k];
-        seeing[k] = api->system(api, bridge_native_put(api, systems[k], 4), 4,
+        seeing[k] = api->add_system(api, bridge_native_put(api, systems[k], 4), 4,
             bridge_native_put(api, "check", 5), 5,
             bridge_native_put(api, term, sizeof term), 1, 0, 0);
     }
-    BRIDGE_NATIVE_SYSTEM(api, "work", "work", &none, 0, kinds, KINDS);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "work", "work", &none, 0, kinds, KINDS);
     return 0;
 }
 

@@ -3,7 +3,7 @@
 What was weighed here and refused is `capabilities_refused.md`, *What was refused: Capabilities, so
 the swap is honest*.
 
-`backend_capabilities` is not decoration. A backend says what it can actually do, and these flags
+`backend_get_capabilities` is not decoration. A backend says what it can actually do, and these flags
 are how it states the guarantees in `module.md`, *Three guarantees differ* - the limits are three flags,
 `work_limit`, `timeout` and `memory_limit`, and reload is two. The last is about the backend itself:
 

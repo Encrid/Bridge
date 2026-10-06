@@ -133,7 +133,7 @@ static void run(bridge_t *b, const char *phase)
 {
     size_t before = allocations;
     printf("%s\n", phase);
-    if (bridge_phase(b, phase)) printf("  REFUSED\n");
+    if (bridge_run_phase(b, phase)) printf("  REFUSED\n");
     if (allocations != before) {
         printf("  FAIL: the allocator was called %u times in a phase\n", (unsigned)(allocations - before));
     }
@@ -149,12 +149,12 @@ static uint64_t barrier(bridge_t *b, const char *phase)
     uint32_t i;
     uint64_t t;
     for (i = 0; i < PHASES && strcmp(phases[i], phase); i ++) { }
-    t = os_now();
+    t = os_get_now();
     schedule_run(b, i);
-    called = os_now() - t;
-    t = os_now();
+    called = os_get_now() - t;
+    t = os_get_now();
     block_barrier(b);
-    return os_now() - t;
+    return os_get_now() - t;
 }
 
 /* What unload does to a component with the policy `strip`, asked of storage directly so that the
@@ -178,9 +178,9 @@ static uint64_t ran(bridge_t *b, const char *phase)
     uint32_t i;
     uint64_t t;
     for (i = 0; i < PHASES && strcmp(phases[i], phase); i ++) { }
-    t = os_now();
+    t = os_get_now();
     schedule_run(b, i);
-    t = os_now() - t;
+    t = os_get_now() - t;
     block_barrier(b);
     return t;
 }
@@ -199,14 +199,14 @@ static void moved_case(bridge_config_t cfg, uint32_t from, uint32_t to, const ch
     printf("%s to %s%s%s\n", kept_as[from], kept_as[to], *prepare ? ", after " : "", prepare);
     a.cfg.reloadable = a.cfg.hot_reload = BRIDGE_TRUE;
     if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); exit(1); }
-    (void)bridge_phase(b, "spawn");
-    if (*prepare) (void)bridge_phase(b, prepare);
-    (void)bridge_phase(b, "look");
+    (void)bridge_run_phase(b, "spawn");
+    if (*prepare) (void)bridge_run_phase(b, prepare);
+    (void)bridge_run_phase(b, "look");
     a.path = built[to];
     a.cfg.losses = losses;
     a.cfg.loss_count = loss_count;
     printf("  reload: %s\n", bridge_reload(b, &a) ? "refused" : "done");
-    (void)bridge_phase(b, "look");
+    (void)bridge_run_phase(b, "look");
     for (uint32_t i = 0; i < b->type_count; i ++) {
         const declared_type_t *c = b->types[i];
         if (strcmp(c->name, "st:X")) continue;
@@ -225,13 +225,13 @@ static void relaid_case(bridge_config_t cfg, const char *from, const char *to, c
     printf("%s\n", what);
     a.cfg.reloadable = a.cfg.hot_reload = BRIDGE_TRUE;
     if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); exit(1); }
-    (void)bridge_phase(b, "spawn");
-    (void)bridge_phase(b, "look");
+    (void)bridge_run_phase(b, "spawn");
+    (void)bridge_run_phase(b, "look");
     a.path = to;
     a.cfg.losses = losses;
     a.cfg.loss_count = loss_count;
     printf("  reload: %s\n", bridge_reload(b, &a) ? "refused" : "done");
-    (void)bridge_phase(b, "look");
+    (void)bridge_run_phase(b, "look");
     (void)bridge_destroy(b);
 }
 
@@ -258,7 +258,7 @@ static int stress_load(bridge_t *b)
 static void stress_run(bridge_t *b)
 {
     for (uint32_t round = 0; round < ROUNDS; round ++) {
-        if (bridge_phase(b, "work") || bridge_phase(b, "check")) printf("  REFUSED\n");
+        if (bridge_run_phase(b, "work") || bridge_run_phase(b, "check")) printf("  REFUSED\n");
     }
 }
 
@@ -316,11 +316,11 @@ int main(int argc, char **argv)
                 a = store_module(NSTORE_PATH, 6, 1 << 20, 1 << 20);
                 a.cfg.reloadable = a.cfg.hot_reload = BRIDGE_TRUE;
                 if (!bridge_load(b, &a)) {
-                    (void)bridge_phase(b, "spawn");
-                    (void)bridge_phase(b, "attach_a");
-                    (void)bridge_phase(b, "attach_b_half");
+                    (void)bridge_run_phase(b, "spawn");
+                    (void)bridge_run_phase(b, "attach_a");
+                    (void)bridge_run_phase(b, "attach_b_half");
                     (void)bridge_reload(b, &a);
-                    (void)bridge_phase(b, "look");
+                    (void)bridge_run_phase(b, "look");
                     (void)bridge_unload(b, a.cfg.identity);
                 }
                 (void)bridge_destroy(b);
@@ -989,10 +989,10 @@ int main(int argc, char **argv)
             cfg.threads = threads;
             b = bridge_create(&cfg, quiet, nullptr);
             if (!b || stress_load(b)) { printf("FAIL: not loaded\n"); return 1; }
-            t = os_now();
+            t = os_get_now();
             stress_run(b);
             printf("the stress run, on %u thread%s            %7.0f ms\n", threads, threads > 1 ? "s" : " ",
-                (double)(os_now() - t) / 1e6);
+                (double)(os_get_now() - t) / 1e6);
             held(b);
             if (threads > 1) (void)bridge_destroy(b);
         }

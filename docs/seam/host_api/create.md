@@ -33,7 +33,7 @@ called each other.
 module's code, and runs on the thread that loaded it or not at all - `pinned.md`, *Threads*. Called
 from another thread with a pinned module loaded, `bridge_destroy` answers non-zero with a record
 naming the module, and has torn nothing down: the bridge is whole, to be destroyed from the thread
-that can. It is the refusal `bridge_phase` makes, made before anything is touched.
+that can. It is the refusal `bridge_run_phase` makes, made before anything is touched.
 
 **A backend's library is closed only if the backend says it can be** - `capabilities.md`,
 *Capabilities, so the swap is honest*. The wasm backend does not: it brought wasmtime into the
@@ -58,7 +58,7 @@ Four properties, all of which fall out of where the drain happens rather than be
 
     one call per record    the call is native to native, so batching saves no
                            crossing and an array would need a lifetime rule
-    on the calling thread  the drain is at a barrier, inside bridge_phase, after
+    on the calling thread  the drain is at a barrier, inside bridge_run_phase, after
                            parallel systems have joined. a sink needs no lock
     text for this call     the scratch arena resets right after the drain, so a
                            formatted message is gone when the call returns. a host
@@ -69,4 +69,4 @@ Four properties, all of which fall out of where the drain happens rather than be
 **And there is no `bridge_error`.** A second route to the same answer is a second thing to keep
 true, and it would hand back a string where `introspection.md`, *Introspection*, refuses to let a
 host learn state from diagnostics. A failed call answers with its return code; what is running answers with
-`bridge_modules`; why is a record.
+`bridge_list_modules`; why is a record.

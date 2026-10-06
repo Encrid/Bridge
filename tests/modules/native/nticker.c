@@ -9,8 +9,8 @@ static uint32_t tick, ticking;
 
 BRIDGE_NATIVE(advance)
 {
-    const bridge_query_t *q = bridge_native_query(api, ticking);
-    auto t = (Tick *)(api->shared_base + bridge_native_span(api, q, 0, 1)[2]);
+    const bridge_query_t *q = bridge_native_get_query(api, ticking);
+    auto t = (Tick *)(api->shared_base + bridge_native_get_span(api, q, 0, 1)[2]);
     t->n += STEP;
     bridge_native_log(api, BRIDGE_LOG_INFO, "tick", 4, t->n, STEP);
     return 0;
@@ -21,7 +21,7 @@ static void registration(const bridge_api_t *api)
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
     tick = BRIDGE_NATIVE_COMPONENT(api, "game:Tick", Tick, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = tick;
-    ticking = BRIDGE_NATIVE_SYSTEM(api, "advance", "update", terms, 1, nullptr, 0);
+    ticking = BRIDGE_NATIVE_ADD_SYSTEM(api, "advance", "update", terms, 1, nullptr, 0);
 }
 
 BRIDGE_NATIVE(init)

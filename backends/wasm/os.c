@@ -56,7 +56,7 @@ void os_thread_join(os_thread_t *t)
 
 struct os_event { HANDLE handle; };
 
-os_event_t *os_event_new()
+os_event_t *os_event_create()
 {
     os_event_t *e = malloc(sizeof *e);
     e->handle = CreateEventA(nullptr, FALSE, FALSE, nullptr);     /* auto-reset */
@@ -119,7 +119,7 @@ void os_thread_join(os_thread_t *t)
 
 struct os_event { pthread_mutex_t lock; pthread_cond_t cond; int set; };
 
-os_event_t *os_event_new()
+os_event_t *os_event_create()
 {
     os_event_t *e = malloc(sizeof *e);
     pthread_mutex_init(&e->lock, nullptr);
@@ -167,7 +167,7 @@ int os_event_wait(os_event_t *e, uint64_t nanos)
 
 #ifdef _WIN32
 
-uint64_t os_now()
+uint64_t os_get_now()
 {
     LARGE_INTEGER frequency, count;
     QueryPerformanceFrequency(&frequency);
@@ -179,7 +179,7 @@ uint64_t os_now()
 
 struct os_mutex { CRITICAL_SECTION section; };
 
-os_mutex_t *os_mutex_new()
+os_mutex_t *os_mutex_create()
 {
     os_mutex_t *m = malloc(sizeof *m);
     InitializeCriticalSection(&m->section);
@@ -192,7 +192,7 @@ void os_mutex_unlock(os_mutex_t *m) { LeaveCriticalSection(&m->section); }
 
 #else
 
-uint64_t os_now()
+uint64_t os_get_now()
 {
     struct timespec t;
     clock_gettime(CLOCK_MONOTONIC, &t);
@@ -201,7 +201,7 @@ uint64_t os_now()
 
 struct os_mutex { pthread_mutex_t mutex; };
 
-os_mutex_t *os_mutex_new()
+os_mutex_t *os_mutex_create()
 {
     os_mutex_t *m = malloc(sizeof *m);
     pthread_mutex_init(&m->mutex, nullptr);

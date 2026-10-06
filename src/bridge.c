@@ -51,7 +51,7 @@ int bridge_destroy(bridge_t *b)
     /* pinned.md: a pinned module's shutdown is its code, and runs on its thread or not at
      * all. Refused before anything is touched, so the bridge is whole for the call that can. */
     for (m = b->modules; m; m = m->next) {
-        if (m->pinned && m->thread != os_thread_id()) {
+        if (m->pinned && m->thread != os_get_thread_id()) {
             say(b, nullptr, nullptr, BRIDGE_ERR, "bridge_destroy is refused: module '%s' is pinned to "
                 "the thread that loaded it, and this call comes from another", m->identity);
             return 1;
@@ -188,8 +188,8 @@ bridge_t *bridge_create(const bridge_config_t *cfg, bridge_sink_fn_t sink, void 
             say(b, nullptr, nullptr, BRIDGE_ERR, "backend '%s' would not start: %s", want->name, err.text);
             goto refuse;
         }
-        o->capabilities = o->api.backend_capabilities(o->be);
-        o->api.memory_shape(o->be, &reservation, &guard, &granule);
+        o->capabilities = o->api.backend_get_capabilities(o->be);
+        o->api.memory_get_shape(o->be, &reservation, &guard, &granule);
         o->reservation = reservation;
         o->guard = guard;
         o->granule = granule ? granule : 1;
@@ -292,7 +292,7 @@ int bridge_stopped(bridge_t *b, const char *repairing)
     /* pinned.md: a pinned module's thread is the one that loaded it, and Bridge-ASM700 has no
      * other to run it on. Both calls that run module code come through here. */
     for (m = b->modules; m; m = m->next) {
-        if (m->pinned && m->thread != os_thread_id()) {
+        if (m->pinned && m->thread != os_get_thread_id()) {
             say(b, nullptr, nullptr, BRIDGE_ERR, "refused: module '%s' is pinned to the thread that "
                 "loaded it, and this call comes from another", m->identity);
             return 1;
@@ -301,7 +301,7 @@ int bridge_stopped(bridge_t *b, const char *repairing)
     return 0;
 }
 
-int bridge_phase(bridge_t *b, const char *name)
+int bridge_run_phase(bridge_t *b, const char *name)
 {
     uint32_t phase;
     if (bridge_stopped(b, nullptr)) return 1;
@@ -320,7 +320,7 @@ int bridge_phase(bridge_t *b, const char *name)
 }
 
 /* introspection.md: a pull, because a stop must not arrive by a route that may drop it */
-int bridge_modules(bridge_t *b, bridge_module_info_t *out, int max)
+int bridge_list_modules(bridge_t *b, bridge_module_info_t *out, int max)
 {
     module_t *m;
     int count = 0;

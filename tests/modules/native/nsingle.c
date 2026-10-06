@@ -45,7 +45,7 @@ BRIDGE_NATIVE(value_a)
 
 BRIDGE_NATIVE(work)
 {
-    G *value = bridge_native_single(api, g);
+    G *value = bridge_native_get_single(api, g);
     if (value) value->wind = 77;
     return 0;
 }
@@ -58,7 +58,7 @@ BRIDGE_NATIVE(detach_b)
 
 BRIDGE_NATIVE(look)
 {
-    const G *value = bridge_native_single(api, g);
+    const G *value = bridge_native_get_single(api, g);
     if (value) say(api, "it has a value: gravity, wind", value->gravity, value->wind);
     else say(api, "it has no value", 0, 0);
     return 0;
@@ -71,7 +71,7 @@ BRIDGE_NATIVE(one)
 {
     uint32_t total = 0;
     for (uint32_t i = 0; i < 1'000'000; i ++) {
-        const G *value = bridge_native_single(api, which);
+        const G *value = bridge_native_get_single(api, which);
         if (value) total += value->gravity;
     }
     say(api, "read a million times: the sum", total, 0);
@@ -80,7 +80,7 @@ BRIDGE_NATIVE(one)
 
 BRIDGE_NATIVE(heard_g)
 {
-    const bridge_list_t *list = bridge_native_list(api, on_g);
+    const bridge_list_t *list = bridge_native_get_list(api, on_g);
     auto trigger = (const bridge_trigger_t *)(api->private_base + list->at);
     for (uint32_t i = 0; i < list->count; i ++) {
         say(api, "heard of it: the id, events", (uint32_t)trigger[i].id, trigger[i].events);
@@ -95,21 +95,21 @@ BRIDGE_NATIVE(init)
     uint32_t both[2];
     g = both[0] = BRIDGE_NATIVE_COMPONENT(api, "st:G", G, BRIDGE_DELETE, BRIDGE_SINGLETON);
     a = both[1] = BRIDGE_NATIVE_COMPONENT(api, "st:A", A, BRIDGE_DELETE, BRIDGE_TABLE);
-    BRIDGE_NATIVE_SYSTEM(api, "attach_a", "attach_a", &none, 0, both, 2);
-    BRIDGE_NATIVE_SYSTEM(api, "value_a", "value_a", &none, 0, &g, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "detach_b", "detach_b", &none, 0, &g, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "attach_a", "attach_a", &none, 0, both, 2);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "value_a", "value_a", &none, 0, &g, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "detach_b", "detach_b", &none, 0, &g, 1);
     one[0].slot = g;
-    BRIDGE_NATIVE_SYSTEM(api, "look", "look", one, 1, nullptr, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "one", "one", one, 1, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "look", "look", one, 1, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "one", "one", one, 1, nullptr, 0);
     which = g;
     one[0].access = BRIDGE_WRITE;
-    BRIDGE_NATIVE_SYSTEM(api, "work", "work", one, 1, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "work", "work", one, 1, nullptr, 0);
     one[0].access = BRIDGE_READ;
     one[0].oper = BRIDGE_AND;
     on_g = BRIDGE_NATIVE_OBSERVER(api, "heard_g",
         BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, one, 1, nullptr, 0);
 #if defined BAD && BAD == 1
-    BRIDGE_NATIVE_SYSTEM(api, "by", "never", one, 1, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "by", "never", one, 1, nullptr, 0);
 #endif
     return 0;
 }

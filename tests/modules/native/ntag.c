@@ -42,11 +42,11 @@ BRIDGE_NATIVE(spawn)
 
 BRIDGE_NATIVE(flicker)
 {
-    const bridge_query_t *q = bridge_native_query(api, toggled);
+    const bridge_query_t *q = bridge_native_get_query(api, toggled);
     for (uint32_t i = 0; i < q->spans; i ++) {
-        const uint32_t *span = bridge_native_span(api, q, i, 2);
+        const uint32_t *span = bridge_native_get_span(api, q, i, 2);
         auto column = (const A *)(api->shared_base + span[2]);
-        uint64_t *bits = bridge_native_bits(api, span[3]);
+        uint64_t *bits = bridge_native_get_bits(api, span[3]);
         for (uint32_t row = 0; row < span[0]; row ++) {
             if (column[row].v < 3) bits[row >> 6] &= ~((uint64_t)1 << (row & 63));
         }
@@ -68,25 +68,25 @@ BRIDGE_NATIVE(detach_b)
 
 BRIDGE_NATIVE(look)
 {
-    const bridge_header_t *h = bridge_native_header(api);
-    const bridge_query_t *q = bridge_native_query(api, marked);
-    const uint32_t *index = bridge_native_set_index(api, p);
-    uint32_t cells = bridge_native_cells(api, r), rows = 0, carried = 0, on = 0, given = 0;
-    const uint64_t *has = bridge_native_bits(api, cells);
+    const bridge_header_t *h = bridge_native_get_header(api);
+    const bridge_query_t *q = bridge_native_get_query(api, marked);
+    const uint32_t *index = bridge_native_get_sparse_index(api, p);
+    uint32_t cells = bridge_native_get_cells(api, r), rows = 0, carried = 0, on = 0, given = 0;
+    const uint64_t *has = bridge_native_get_bits(api, cells);
 
     /* in a table: its base says it is carried, and there is nothing at it */
     for (uint32_t i = 0; i < q->spans; i ++) {
-        const uint32_t *span = bridge_native_span(api, q, i, 2);
+        const uint32_t *span = bridge_native_get_span(api, q, i, 2);
         rows += span[0];
         carried += span[3] == BRIDGE_CARRIED;
     }
     say(api, "M, in tables: rows that carry it, and spans whose base says carried", rows, carried);
 
     /* in a sparse set: walked, its base says the same; and so does each cell of its index */
-    q = bridge_native_query(api, in_set);
+    q = bridge_native_get_query(api, in_set);
     rows = carried = 0;
     for (uint32_t i = 0; i < q->spans; i ++) {
-        const uint32_t *span = bridge_native_span(api, q, i, 1);
+        const uint32_t *span = bridge_native_get_span(api, q, i, 1);
         rows += span[0];
         carried += span[2] == BRIDGE_CARRIED;
     }
@@ -96,11 +96,11 @@ BRIDGE_NATIVE(look)
     say(api, "P, by its index: entities whose cell says carried", carried, 0);
 
     /* a toggle: its bits are ahead of where its column would be, so it is handed that */
-    q = bridge_native_query(api, toggled);
+    q = bridge_native_get_query(api, toggled);
     rows = 0;
     for (uint32_t i = 0; i < q->spans; i ++) {
-        const uint32_t *span = bridge_native_span(api, q, i, 2);
-        const uint64_t *bits = bridge_native_bits(api, span[3]);
+        const uint32_t *span = bridge_native_get_span(api, q, i, 2);
+        const uint64_t *bits = bridge_native_get_bits(api, span[3]);
         for (uint32_t row = 0; row < span[0]; row ++) on += (uint32_t)(bits[row >> 6] >> (row & 63)) & 1;
         rows += span[0];
     }
@@ -129,18 +129,18 @@ BRIDGE_NATIVE(init)
     o = made[3] = BRIDGE_NATIVE_DECLARE_TAG(api, "st:O", BRIDGE_DELETE, BRIDGE_TOGGLE);
     r = made[4] = BRIDGE_NATIVE_DECLARE_TAG(api, "st:R", BRIDGE_DELETE, BRIDGE_DIRECT_INDEXED);
     w = BRIDGE_NATIVE_DECLARE_TAG(api, "st:W", BRIDGE_DELETE, BRIDGE_SINGLETON);
-    BRIDGE_NATIVE_SYSTEM(api, "spawn", "spawn", &none, 0, made, 5);
-    BRIDGE_NATIVE_SYSTEM(api, "attach_a", "attach_a", &none, 0, &w, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "detach_b", "detach_b", &none, 0, &m, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, made, 5);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "attach_a", "attach_a", &none, 0, &w, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "detach_b", "detach_b", &none, 0, &m, 1);
     two[0].slot = a;
     two[1].slot = m;
-    marked = BRIDGE_NATIVE_SYSTEM(api, "look", "look", two, 2, nullptr, 0);
+    marked = BRIDGE_NATIVE_ADD_SYSTEM(api, "look", "look", two, 2, nullptr, 0);
     two[0].slot = p;
-    in_set = BRIDGE_NATIVE_SYSTEM(api, "in_set", "never", two, 1, nullptr, 0);
+    in_set = BRIDGE_NATIVE_ADD_SYSTEM(api, "in_set", "never", two, 1, nullptr, 0);
     two[0].slot = a;
     two[1].slot = o;
     two[1].access = BRIDGE_WRITE;
-    toggled = BRIDGE_NATIVE_SYSTEM(api, "flicker", "flicker", two, 2, nullptr, 0);
+    toggled = BRIDGE_NATIVE_ADD_SYSTEM(api, "flicker", "flicker", two, 2, nullptr, 0);
     return 0;
 }
 

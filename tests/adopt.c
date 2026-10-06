@@ -43,7 +43,7 @@ static backend_instance_t *instance()
 /* 0 and the function's result, or -1 and why */
 static int run(backend_instance_t *i, const char *name, int32_t *status, backend_err_t *err)
 {
-    backend_func_t *f = api.instance_func(i, name, err);
+    backend_func_t *f = api.instance_get_func(i, name, err);
     if (!f) return -1;
     return api.call(f, status, err);
 }
@@ -82,7 +82,7 @@ int main()
     setvbuf(stdout, nullptr, _IONBF, 0);       /* a crash must not swallow what was said */
     if (!backend_open(BACKEND_PATH, &api, why, sizeof why)) { printf("FAIL: %s\n", why); return 1; }
     be = api.backend_create(nullptr, 0, &err);
-    api.memory_shape(be, &reservation, &guard, &granule);
+    api.memory_get_shape(be, &reservation, &guard, &granule);
     printf("shape: reservation %llu MiB, guard %llu MiB\n",
         (unsigned long long)(reservation >> 20), (unsigned long long)(guard >> 20));
 
@@ -159,7 +159,7 @@ int main()
         backend_func_t *f;
         int k;
         if (!ti || api.define_func(ti, "bridge", "ping", ping, nullptr, &sig, &err)
-            || !(f = api.instance_func(ti, "init", &err))) {
+            || !(f = api.instance_get_func(ti, "init", &err))) {
             printf("FAIL: timed calls: %s\n", err.text);
             return 1;
         }

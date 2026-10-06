@@ -185,7 +185,7 @@ does not where it knows by its own design. `[budget] direct_indexed` says how ma
 components there may be, and their bits are had when the bridge is created.
 
 **It is for what is reached by id far more than it is walked.** A system cannot walk it: a
-term of it is stated `BRIDGE_OPTIONAL`, and one that selects is refused at `system`. Measured
+term of it is stated `BRIDGE_OPTIONAL`, and one that selects is refused at `add_system`. Measured
 in the library, `storage weigh` and `storage baseline`, 204,800 values each reached by an id
 that is held, its generation tested:
 
@@ -215,7 +215,7 @@ where it is, by a system that states the term `BRIDGE_WRITE`, and nothing is tol
 **A module reads it where it is**: the cell its header has for each type it declared holds
 where the value is from the shared base, and zero while it has none. A system cannot walk it,
 since it is on no entity: a term of it is stated `BRIDGE_OPTIONAL`, which is how the system
-says what it reads and writes, and one that selects is refused at `system`. Unloaded by its
+says what it reads and writes, and one that selects is refused at `add_system`. Unloaded by its
 last declarer it has no value, whichever policy was stated, and that is told as a leave.
 
 **It is what a module's settings are** - `config.md`, *A module's own settings are a
@@ -252,7 +252,7 @@ would begin, and a direct-indexed one, where its cells would.
 a set's entries in the set's, so row 0 of one and entry 0 of the other are different entities,
 and one loop cannot step through both side by side. So the terms that select, `BRIDGE_AND` and
 `BRIDGE_NOT`, are all of components kept in tables; or there is one, `BRIDGE_AND`, of a component
-kept in a sparse set. Anything else is refused at `system`, naming the term. Which is walked is
+kept in a sparse set. Anything else is refused at `add_system`, naming the term. Which is walked is
 the author's, by how the query is written.
 
 **What is kept elsewhere is stated optional, and reached from the row.** In a query that walks
@@ -364,7 +364,7 @@ barrier's second step is where that is found out, before anything has moved.
 
 **All of it is allocated when the bridge is created, and nothing after**: not at a barrier, not
 when a module loads. What a module declares takes a place that is already there, and a `declare`
-or a `system` past its key is refused - `budgets.md`, *Budgets*. A direct-indexed component's
+or an `add_system` past its key is refused - `budgets.md`, *Budgets*. A direct-indexed component's
 cells are the one thing taken at a `declare`, and they are taken from `[budget] columns`, which
 is there already. That is storage. What the rest
 of the library allocates, and when, is `budgets.md`, *Nothing is allocated in a phase*.

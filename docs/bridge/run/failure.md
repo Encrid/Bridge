@@ -29,7 +29,7 @@ A mod ships `on_error = "skip"` and the base game `"fail"`, which is the whole o
 not take the deployment down" needs.
 
 **`fail` stops the bridge, since Bridge-ASM700 cannot stop the program.** The host owns the process,
-so the most the library can do is refuse to go on: after a `fail` module fails, every `bridge_phase`
+so the most the library can do is refuse to go on: after a `fail` module fails, every `bridge_run_phase`
 is refused, and every load, unload and reload but one. `skip` refuses that one load and carries on.
 
 **A stopped bridge accepts two things, both about the module that stopped it.** One brings it back:
@@ -50,7 +50,7 @@ beside whatever its systems did - `budgets.md`, *What running out does*.
 stops the bridge too, because the reason does not change with the frame number: the deployment
 called it essential, and nothing else here would notice it gone - no module calls another, so none
 gets an error back. The key is `on_error`, and a reader who wrote `fail` expects it to mean every
-error that takes the module away. `bridge_modules` says which module it was.
+error that takes the module away. `bridge_list_modules` says which module it was.
 
 ## Out of memory
 

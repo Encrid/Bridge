@@ -334,6 +334,19 @@ built by the same script.
                                   their directory
     files in snake_case           the five headers, the SDK's `bridge_wasm.wat`, and what is
                                   built: `bridge_wasm`, `bridge_native`
+    every tracked name            rule O4 was read as reaching every tracked file and folder
+                                  of ours, at Enkrid's word: 63 documents and transcripts lose
+                                  their hyphen, `host_api.md`, `build_refused.md`,
+                                  `storage_sparse.txt`. `tools/xref.py` had matched only names
+                                  in lower case, so a citation of `PLAN.md` or of a stage's
+                                  document was never checked: it reads every name now
+    the verb, at the seams        43 names: `bridge_run_phase`, `bridge_list_modules`,
+                                  `bridge_get_span`, `bridge_count_rows`, `bridge_is_alive`,
+                                  `backend_get_abi`, `os_get_now`, and the rest of the table
+                                  Enkrid was shown. The sparse set is spelled out where it meets
+                                  a verb: `bridge_get_sparse_index`. The entry `system` is
+                                  `add_system`, in the ABI, both SDKs and the two messages
+                                  that name it
 
 **What two builds differ by when their code is the same.** After the two renames the call of
 `spawn` measured 4.8 to 4.9 ns where the tree before measured 4.5 to 4.7, in whichever order

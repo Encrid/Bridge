@@ -6,12 +6,12 @@ static uint32_t marked, seeing;
 
 BRIDGE_EXPORT(seen) int seen()
 {
-    uint32_t count = bridge_triggers(seeing), i;
+    uint32_t count = bridge_count_triggers(seeing), i;
     for (i = 0; i < count; i ++) {
-        uint32_t trigger = bridge_trigger_at(seeing, i);
-        uint32_t at = bridge_ref(bridge_trigger_id(trigger), marked, sizeof(Marked));
+        uint32_t trigger = bridge_get_trigger(seeing, i);
+        uint32_t at = bridge_get_ref(bridge_get_trigger_id(trigger), marked, sizeof(Marked));
         /* the value the other module attached, followed from the id */
-        BRIDGE_LOG(BRIDGE_LOG_INFO, "seen", bridge_trigger_events(trigger),
+        BRIDGE_LOG(BRIDGE_LOG_INFO, "seen", bridge_get_trigger_events(trigger),
                    at ? BRIDGE_GET(Marked, by, at) : 0xdead);
     }
     return 0;

@@ -12,7 +12,7 @@
 
 /* wasmtime enforces a 32-bit memory's bounds by faulting: the whole 4 GiB an index can
  * reach is reserved, then a guard, and loads are emitted with no check. Stated here and
- * to wasmtime both, so that what memory_shape answers is what the engine assumes. */
+ * to wasmtime both, so that what memory_get_shape answers is what the engine assumes. */
 constexpr uint64_t RESERVATION = (uint64_t)1 << 32;
 constexpr uint64_t GUARD = (uint64_t)32 << 20;
 constexpr uint32_t PAGE = 65'536;
@@ -31,7 +31,7 @@ struct backend {
     os_mutex_t  *lock;                /* over the four below */
     uint64_t   active;              /* which timed call is running: 0 for none */
     uint64_t   calls;               /* how many there have been, to tell one from the next */
-    uint64_t   until;               /* when the running one is out of time, by os_now */
+    uint64_t   until;               /* when the running one is out of time, by os_get_now */
     wasm_engine_t *ticking;         /* and the engine it runs on */
     int        quit;
 };
@@ -147,7 +147,7 @@ static wasmtime_error_t *new_memory([[maybe_unused]] void *env,
                                     wasmtime_linear_memory_t *ret)
 {
     if (reserved > RESERVATION || guard > GUARD) {
-        return wasmtime_error_new("wasmtime asked for more address space than memory_shape states");
+        return wasmtime_error_new("wasmtime asked for more address space than memory_get_shape states");
     }
     if (adopting) {
         if (minimum != adopting->len) {
@@ -198,7 +198,7 @@ static void watchdog(void *arg)
             os_event_wait(b->wake, OS_FOREVER);     /* nothing to time, or it is on its way out */
             continue;
         }
-        now = os_now();
+        now = os_get_now();
         if (now < until) {
             os_event_wait(b->wake, until - now);
             continue;
@@ -242,8 +242,8 @@ BACKEND_EXPORT backend_t *backend_create(const backend_setting_t *settings, uint
         return nullptr;
     }
     backend_t *b = calloc(1, sizeof *b);
-    b->wake = os_event_new();
-    b->lock = os_mutex_new();
+    b->wake = os_event_create();
+    b->lock = os_mutex_create();
     b->watchdog = os_thread_start(watchdog, b);
     return b;
 }
@@ -263,7 +263,7 @@ BACKEND_EXPORT void backend_destroy(backend_t *b)
     free(b);
 }
 
-BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] backend_t *b)
+BACKEND_EXPORT enum backend_capability backend_get_capabilities([[maybe_unused]] backend_t *b)
 {
     return BACKEND_UNTRUSTED | BACKEND_WORK_LIMIT | BACKEND_TIMEOUT | BACKEND_MEMORY_LIMIT | BACKEND_RELOAD
          | BACKEND_SIDE_BY_SIDE;
@@ -272,9 +272,9 @@ BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] bac
 #ifndef SAYS_ABI
 #define SAYS_ABI BACKEND_ABI
 #endif
-BACKEND_EXPORT uint32_t backend_abi() { return SAYS_ABI; }
+BACKEND_EXPORT uint32_t backend_get_abi() { return SAYS_ABI; }
 
-BACKEND_EXPORT void memory_shape([[maybe_unused]] backend_t *b, uint64_t *reservation, uint64_t *guard,
+BACKEND_EXPORT void memory_get_shape([[maybe_unused]] backend_t *b, uint64_t *reservation, uint64_t *guard,
                                  uint64_t *granule)
 {
     *reservation = RESERVATION;
@@ -326,7 +326,7 @@ BACKEND_EXPORT backend_module_t *module_compile(
     return m;
 }
 
-BACKEND_EXPORT uint32_t module_imports(backend_module_t *m, backend_import_t *out, uint32_t max)
+BACKEND_EXPORT uint32_t module_list_imports(backend_module_t *m, backend_import_t *out, uint32_t max)
 {
     uint32_t i, n = (uint32_t)m->imports.size;
     for (i = 0; i < n && i < max; i ++) {
@@ -547,7 +547,7 @@ static int instantiate(backend_instance_t *i, backend_err_t *err)
     return 0;
 }
 
-BACKEND_EXPORT backend_func_t *instance_func(backend_instance_t *i, const char *name, backend_err_t *err)
+BACKEND_EXPORT backend_func_t *instance_get_func(backend_instance_t *i, const char *name, backend_err_t *err)
 {
     bool shaped;
     wasmtime_extern_t item;
@@ -593,7 +593,7 @@ BACKEND_EXPORT int call(backend_func_t *f, int32_t *status, backend_err_t *err)
         wasmtime_context_set_epoch_deadline(i->ctx, 1);
         os_mutex_lock(b->lock);
         b->active = ++ b->calls;
-        b->until = os_now() + nanos;
+        b->until = os_get_now() + nanos;
         b->ticking = i->engine;
         os_mutex_unlock(b->lock);
         os_event_set(b->wake);

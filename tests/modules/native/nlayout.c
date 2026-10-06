@@ -88,18 +88,18 @@ static uint32_t values(const bridge_api_t *api, const X **out, uint32_t room)
 {
     uint32_t n = 0;
 #if KEPT == 4
-    uint32_t cells = bridge_native_cells(api, x);
-    const uint64_t *given = bridge_native_bits(api, cells);
+    uint32_t cells = bridge_native_get_cells(api, x);
+    const uint64_t *given = bridge_native_get_bits(api, cells);
     for (uint32_t e = 1; e < 16 && n < room; e ++) {
         if (given[0] >> e & 1) out[n ++] = (const X *)(api->shared_base + cells) + e;
     }
 #elif KEPT == 5
-    const X *value = bridge_native_single(api, x);
+    const X *value = bridge_native_get_single(api, x);
     if (value && room) out[n ++] = value;
 #else
-    const bridge_query_t *q = bridge_native_query(api, reading);
+    const bridge_query_t *q = bridge_native_get_query(api, reading);
     for (uint32_t i = 0; i < q->spans; i ++) {
-        const uint32_t *span = bridge_native_span(api, q, i, 1);
+        const uint32_t *span = bridge_native_get_span(api, q, i, 1);
         for (uint32_t r = 0; r < span[0] && n < room; r ++) {
             out[n ++] = (const X *)(api->shared_base + span[2]) + r;
         }
@@ -149,9 +149,9 @@ BRIDGE_NATIVE(init)
     BRIDGE_NATIVE_DECLARE(api, BRIDGE_STRUCT, "st:Vec", Vec, BRIDGE_STRIP, BRIDGE_TABLE);
 #endif
     x = BRIDGE_NATIVE_COMPONENT(api, "st:X", X, BRIDGE_DELETE, (enum bridge_storage)KEPT);
-    BRIDGE_NATIVE_SYSTEM(api, "spawn", "spawn", &none, 0, &x, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, &x, 1);
     one[0].slot = x;
-    reading = BRIDGE_NATIVE_SYSTEM(api, "look", "look", one, 1, nullptr, 0);
+    reading = BRIDGE_NATIVE_ADD_SYSTEM(api, "look", "look", one, 1, nullptr, 0);
     return 0;
 }
 

@@ -104,7 +104,7 @@ parsers that would otherwise sit in the library do not: `bridge_manifest_parse` 
     int     bridge_destroy(bridge *b);
 
     /* advance */
-    int bridge_phase(bridge *b, const char *name);
+    int bridge_run_phase(bridge *b, const char *name);
 
     /* runtime lifecycle - between phases only */
     int bridge_load  (bridge *b, const bridge_artifact_t *a);
@@ -112,7 +112,7 @@ parsers that would otherwise sit in the library do not: `bridge_manifest_parse` 
     int bridge_reload(bridge *b, const bridge_artifact_t *a);
 
     /* introspection */
-    int bridge_modules(bridge *b, bridge_module_info_t *out, int max);
+    int bridge_list_modules(bridge *b, bridge_module_info_t *out, int max);
     int bridge_profile (bridge *b, bridge_profile_row *out, int max);   /* stage 14 */
 
 **`bridge_profile`, and `validate` and `profile` below, are not built**: they are the surface as
@@ -215,9 +215,9 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
 
 **A phase is a string, not a struct.** It has one property and that is its name - `schedule.md`, *A
 phase is a name and nothing else* - which also disposes of a collision: a typedef and a function
-share one namespace in C, and `bridge_phase` is the call.
+share one namespace in C, and `bridge_run_phase` is the call.
 
-**And `bridge_phase` takes that name, every time.** It is looked for among the deployment's phases
+**And `bridge_run_phase` takes that name, every time.** It is looked for among the deployment's phases
 by comparing, which is a few nanoseconds for the handful there are, in a call that takes about a
 hundred with nothing to do, made once a phase and never once a row. What that buys: a name is what
 any language hands to C with no binding, the call says which phase it runs, and a wrong one is

@@ -119,7 +119,7 @@ The same eight functions and the same two memories a wasm module has, because wh
 does and what is in memory are Bridge-ASM700's and the same on every backend. How a module
 reaches them is this backend's: a table, passed.
 
-**`system` and `observe` take a name, as they do everywhere.** The backend resolves it to an
+**`add_system` and `observe` take a name, as they do everywhere.** The backend resolves it to an
 exported symbol, so the phase, the events, the terms and the slot are identical on both backends and
 the scheduler cannot tell them apart. An entry's arguments are offsets into the scratch arena, on
 this backend as on any: Bridge-ASM700 reads them, and the scratch arena is the one memory of a
@@ -138,7 +138,7 @@ returns. Without the second half a loop of `spawn` past the entity ceiling would
 for as long as the loop ran.
 
 **A library is taken to import both memories.** It has no import section to read, so
-`module_imports` answers `shared` and `private` for every native module.
+`module_list_imports` answers `shared` and `private` for every native module.
 
 And nothing else. No value marshalling, no call context, no buffer interface, no service registry,
 and **no way to call another module** - `abi.md`, *The ABI*. The first two have nothing to do

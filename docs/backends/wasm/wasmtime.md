@@ -16,7 +16,7 @@ getting security fixes outweighs matching the 47 the original Bridge runs.
 
 **Its shape.** wasmtime enforces a memory's bounds by faulting: it reserves address space for the
 whole of a 32-bit memory and a guard region after it, and then emits loads with no check at all.
-So `memory_shape` answers that reservation and that guard. A block without them would make wasmtime
+So `memory_get_shape` answers that reservation and that guard. A block without them would make wasmtime
 check every load, on the path this design exists to keep free.
 
 **Adoption** goes through wasmtime's host memory creator, the hook by which an embedder supplies the

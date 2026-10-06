@@ -16,7 +16,7 @@ void *backend_open(const char *path, backend_api_t *api, char *why, size_t why_l
         return nullptr;
     }
     for (i = 0; i < BACKEND_ENTRY_COUNT; i ++) {
-        slots[i] = os_lib_sym(lib, names[i]);
+        slots[i] = os_lib_get_symbol(lib, names[i]);
         if (!slots[i]) {
             snprintf(why, why_len, "backend library '%s' has no entry '%s'", path, names[i]);
             os_lib_close(lib);
@@ -24,9 +24,9 @@ void *backend_open(const char *path, backend_api_t *api, char *why, size_t why_l
         }
         /* the first entry says which backend seam the rest are of: another is not asked
          * for them */
-        if (!i && api->backend_abi() != BACKEND_ABI) {
+        if (!i && api->backend_get_abi() != BACKEND_ABI) {
             snprintf(why, why_len, "backend library '%s' is of backend ABI %u, and this is %u", path,
-                api->backend_abi(), (unsigned)BACKEND_ABI);
+                api->backend_get_abi(), (unsigned)BACKEND_ABI);
             os_lib_close(lib);
             return nullptr;
         }

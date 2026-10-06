@@ -11,8 +11,8 @@ static uint32_t body, reading;
 
 BRIDGE_EXPORT(read) int read()
 {
-    uint32_t span = bridge_span(reading, 0, 1);
-    uint32_t at = BRIDGE_ROW(Body, bridge_base(span, 0), 0, bridge_rows(span));
+    uint32_t span = bridge_get_span(reading, 0, 1);
+    uint32_t at = BRIDGE_ROW(Body, bridge_get_base(span, 0), 0, bridge_count_rows(span));
     BRIDGE_LOG(BRIDGE_LOG_INFO, "body", (uint32_t)BRIDGE_GET(Body, at.y, at),
                (uint32_t)BRIDGE_GET(Body, team, at));
     BRIDGE_LOG(BRIDGE_LOG_INFO, "more", (uint32_t)BRIDGE_GET(Body, flags, at),
@@ -31,7 +31,7 @@ BRIDGE_EXPORT(init) int init()
     BRIDGE_DECLARE(BRIDGE_BITMASK, "game:Flags", Flags, BRIDGE_STRIP, BRIDGE_TABLE);
     body = BRIDGE_COMPONENT("game:Body", Body, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = body;
-    reading = BRIDGE_SYSTEM("read", "update", terms, 1, nullptr, 0);
+    reading = BRIDGE_ADD_SYSTEM("read", "update", terms, 1, nullptr, 0);
     BRIDGE_ATTACH(bridge_spawn(), body, b);
     return 0;
 }

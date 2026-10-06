@@ -52,7 +52,7 @@ keys exist because storage's memory is a product: a table
 keeps an offset for every type there may be, and a system keeps a place for every table there may
 be. With the two stated, everything storage holds is known and allocated when the bridge is
 created, and it allocates nothing after - `storage.md`, *What bounds it*. A `declare` or a
-`system` past its key is refused there, by name, which fails that module's `init`.
+`add_system` past its key is refused there, by name, which fails that module's `init`.
 
 **`terms` is the most one system or observer may ask for**, and it is a key for the same reason:
 storage keeps a system's terms in a record made when the bridge is, so the record has a length. It
@@ -153,7 +153,7 @@ runs out:
     log_ring               at a write           the line is dropped and counted
     modules                at a load            the load is refused
     types, systems,        at a `declare` or    the module's `init` fails
-      terms                a `system`
+      terms                an `add_system`
 
 **An entry that cannot be honoured abandons the invocation that made it.** `spawn` answers an id and
 no status, so a module has nothing to test - `abi.md`, *The ABI* - and the failure cannot be a value.

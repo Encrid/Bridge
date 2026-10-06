@@ -3,14 +3,14 @@
 What was weighed here and refused is `lifecycle_refused.md`, *What was refused: The runtime
 lifecycle*.
 
-**Legal only between phases**, never while `bridge_phase` is executing. All three restructure
+**Legal only between phases**, never while `bridge_run_phase` is executing. All three restructure
 storage and the schedule, which is what a barrier makes safe. A native module holding the
 pointer could break this; nothing contains native code, so it is a contract rather than a guarantee.
 
 **`load`** takes an artifact rather than a path, because Bridge-ASM700 decides on `cfg` and never finds
 or reads a module's file. In order: find the backend the artifact names, check the ABI version,
 check `trusted` against what that backend says it runs, check the grants, take one of `[budget] modules`,
-hand `bytes` and `path` to the backend, call `init` - which calls `declare`, `system` and
+hand `bytes` and `path` to the backend, call `init` - which calls `declare`, `add_system` and
 `observe` - recompute the conflict graph and **refuse-and-unwind if a new system or observer
 conflicts unordered with an existing one**, then publish spans.
 

@@ -378,7 +378,7 @@ static module_t *record(bridge_t *b, const bridge_artifact_t *a, open_backend_t 
     m->stem = copy(id, stem_of(id));
     m->ns = copy(id, colon ? (size_t)(colon - id) : strlen(id));
     m->pinned = cfg->pinned == BRIDGE_TRUE;
-    m->thread = os_thread_id();
+    m->thread = os_get_thread_id();
     m->on_error = cfg->on_error;
     m->hot_reload = cfg->hot_reload == BRIDGE_TRUE;
     m->max_failures = cfg->max_system_failures;
@@ -462,7 +462,7 @@ static int private_memory(module_t *m, const bridge_module_config_t *cfg, backen
  * backend's to see and to refuse - signatures.md. */
 static backend_func_t *export_of(module_t *m, const char *name, backend_err_t *err)
 {
-    return m->on->api.instance_func(m->instance, name, err);
+    return m->on->api.instance_get_func(m->instance, name, err);
 }
 
 /* One call of a lifecycle export, under its timeout. 0 if it returned 0. */
@@ -519,7 +519,7 @@ static int start(bridge_t *b, module_t *m, const bridge_artifact_t *a, enum back
     block_header(b, m);
 
     /* a module is handed the memories it imports, and no other - backend.md */
-    import_count = o->api.module_imports(m->image, imports, 64);
+    import_count = o->api.module_list_imports(m->image, imports, 64);
     for (i = 0; i < import_count && i < 64; i ++) {
         const backend_import_t *im = &imports[i];
         if (im->kind != BACKEND_IMPORT_MEMORY || im->ns_len != strlen(BRIDGE_NAMESPACE)

@@ -108,15 +108,15 @@ static_assert(offsetof(backend_memory_import_t, memory) == 16);
 constexpr uint32_t BACKEND_ABI = 1;
 
 typedef struct backend_api {
-    uint32_t (*backend_abi)(void);          /* BACKEND_ABI. first, and always first */
+    uint32_t (*backend_get_abi)(void);          /* BACKEND_ABI. first, and always first */
     backend_t *(*backend_create)(const backend_setting_t *settings, uint32_t count, backend_err_t *err);
     void     (*backend_destroy)(backend_t *b);
-    enum backend_capability (*backend_capabilities)(backend_t *b);
+    enum backend_capability (*backend_get_capabilities)(backend_t *b);
 
     /* What this backend needs of a block it maps. The address space around it: `reservation`
      * bytes from its start, then `guard` bytes nothing is mapped into. And its length: a
      * whole number of `granule` bytes. Zero for any it does not need. */
-    void            (*memory_shape)(backend_t *b, uint64_t *reservation, uint64_t *guard,
+    void            (*memory_get_shape)(backend_t *b, uint64_t *reservation, uint64_t *guard,
                                     uint64_t *granule);
     backend_memory_t *(*memory_adopt)(backend_t *b, void *ptr, uint64_t len, backend_err_t *err);
     /* After the last instance the memory was handed to is destroyed, never before. */
@@ -127,7 +127,7 @@ typedef struct backend_api {
     backend_module_t *(*module_compile)(backend_t *b, const void *bytes, size_t len,
                                       const char *path, enum backend_capability demands,
                                       backend_err_t *err);
-    uint32_t        (*module_imports)(backend_module_t *m, backend_import_t *out, uint32_t max);
+    uint32_t        (*module_list_imports)(backend_module_t *m, backend_import_t *out, uint32_t max);
     void            (*module_destroy)(backend_module_t *m);
 
     backend_instance_t *(*instance_create)(backend_t *b, backend_module_t *m,
@@ -143,19 +143,19 @@ typedef struct backend_api {
     /* An export that `call` can run: one that takes nothing of Bridge-ASM700's and answers a
      * status. nullptr, and why, if there is none of that name, or if the backend can see that
      * its shape is another. */
-    backend_func_t *(*instance_func)(backend_instance_t *i, const char *name, backend_err_t *err);
+    backend_func_t *(*instance_get_func)(backend_instance_t *i, const char *name, backend_err_t *err);
     /* 0 if the function returned, and then `status` is what it returned. */
     int (*call)(backend_func_t *f, int32_t *status, backend_err_t *err);
 } backend_api_t;
 
 /* The names a backend exports, in the order of backend_api_t's members. */
 #define BACKEND_ENTRIES \
-    "backend_abi", "backend_create", "backend_destroy", "backend_capabilities", \
-    "memory_shape", "memory_adopt", "memory_release", \
-    "module_compile", "module_imports", "module_destroy", \
+    "backend_get_abi", "backend_create", "backend_destroy", "backend_get_capabilities", \
+    "memory_get_shape", "memory_adopt", "memory_release", \
+    "module_compile", "module_list_imports", "module_destroy", \
     "instance_create", "instance_destroy", \
     "instance_set_work_limit", "instance_set_timeout", "instance_set_memory_limit", \
-    "define_func", "instance_func", "call"
+    "define_func", "instance_get_func", "call"
 constexpr uint32_t BACKEND_ENTRY_COUNT = 18;
 static_assert(sizeof(backend_api_t) == BACKEND_ENTRY_COUNT * sizeof(void (*)()));
 

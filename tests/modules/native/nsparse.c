@@ -99,10 +99,10 @@ BRIDGE_NATIVE(destroy)
 /* the set, walked: one span, its rows the entities that are in it */
 BRIDGE_NATIVE(look)
 {
-    const bridge_query_t *q = bridge_native_query(api, in_set);
+    const bridge_query_t *q = bridge_native_get_query(api, in_set);
     uint32_t rows = 0, total = 0;
     for (uint32_t i = 0; i < q->spans; i ++) {
-        const uint32_t *span = bridge_native_span(api, q, i, 1);
+        const uint32_t *span = bridge_native_get_span(api, q, i, 1);
         auto column = (const S *)(api->shared_base + span[2]);
         for (uint32_t r = 0; r < span[0]; r ++) total += column[r].v;
         rows += span[0];
@@ -116,11 +116,11 @@ BRIDGE_NATIVE(look)
  * value is, or zero */
 BRIDGE_NATIVE(look_b)
 {
-    const bridge_query_t *q = bridge_native_query(api, in_table);
-    const uint32_t *index = bridge_native_set_index(api, s);
+    const bridge_query_t *q = bridge_native_get_query(api, in_table);
+    const uint32_t *index = bridge_native_get_sparse_index(api, s);
     uint32_t rows = 0, found = 0, total = 0;
     for (uint32_t i = 0; i < q->spans; i ++) {
-        const uint32_t *span = bridge_native_span(api, q, i, 2);
+        const uint32_t *span = bridge_native_get_span(api, q, i, 2);
         auto who = (const uint64_t *)(api->shared_base + span[1]);
         auto column = (const A *)(api->shared_base + span[2]);
         for (uint32_t r = 0; r < span[0]; r ++) {
@@ -143,7 +143,7 @@ static uint32_t on_s, on_both;
 
 static void heard(const bridge_api_t *api, uint32_t observer, const char *text)
 {
-    const bridge_list_t *list = bridge_native_list(api, observer);
+    const bridge_list_t *list = bridge_native_get_list(api, observer);
     auto trigger = (const bridge_trigger_t *)(api->private_base + list->at);
     for (uint32_t i = 0; i < list->count; i ++) say(api, text, (uint32_t)trigger[i].id, trigger[i].events);
 }
@@ -159,19 +159,19 @@ BRIDGE_NATIVE(init)
     bridge_term_t two[2] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }, { 0, BRIDGE_READ, BRIDGE_OPTIONAL, 0 }};
     a = BRIDGE_NATIVE_COMPONENT(api, "st:A", A, BRIDGE_DELETE, BRIDGE_TABLE);
     s = BRIDGE_NATIVE_COMPONENT(api, "st:S", S, BRIDGE_DELETE, BRIDGE_SPARSE_SET);
-    BRIDGE_NATIVE_SYSTEM(api, "spawn", "spawn", &none, 0, &a, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "attach_b", "attach_b", &none, 0, &s, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "detach_b", "detach_b", &none, 0, &s, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "detach_b_half", "detach_b_half", &none, 0, &s, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "value_b", "value_b", &none, 0, &s, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "attach_b_half", "attach_b_half", &none, 0, &s, 1);
-    BRIDGE_NATIVE_SYSTEM(api, "destroy_half", "destroy_half", &none, 0, nullptr, 0);
-    BRIDGE_NATIVE_SYSTEM(api, "destroy", "destroy", &none, 0, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, &a, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "attach_b", "attach_b", &none, 0, &s, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "detach_b", "detach_b", &none, 0, &s, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "detach_b_half", "detach_b_half", &none, 0, &s, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "value_b", "value_b", &none, 0, &s, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "attach_b_half", "attach_b_half", &none, 0, &s, 1);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "destroy_half", "destroy_half", &none, 0, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "destroy", "destroy", &none, 0, nullptr, 0);
     one[0].slot = s;
-    in_set = BRIDGE_NATIVE_SYSTEM(api, "look", "look", one, 1, nullptr, 0);
+    in_set = BRIDGE_NATIVE_ADD_SYSTEM(api, "look", "look", one, 1, nullptr, 0);
     two[0].slot = a;
     two[1].slot = s;
-    in_table = BRIDGE_NATIVE_SYSTEM(api, "look_b", "look_b", two, 2, nullptr, 0);
+    in_table = BRIDGE_NATIVE_ADD_SYSTEM(api, "look_b", "look_b", two, 2, nullptr, 0);
 #if !defined BIG && !defined FAT
     on_s = BRIDGE_NATIVE_OBSERVER(api, "heard_s",
         BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, one, 1, nullptr, 0);
@@ -183,8 +183,8 @@ BRIDGE_NATIVE(init)
 #ifdef BAD
     two[1].oper = BAD == 1 ? BRIDGE_AND : BRIDGE_OPTIONAL;
     one[0].oper = BRIDGE_NOT;
-    if (BAD == 1) BRIDGE_NATIVE_SYSTEM(api, "both", "never", two, 2, nullptr, 0);
-    else BRIDGE_NATIVE_SYSTEM(api, "without", "never", one, 1, nullptr, 0);
+    if (BAD == 1) BRIDGE_NATIVE_ADD_SYSTEM(api, "both", "never", two, 2, nullptr, 0);
+    else BRIDGE_NATIVE_ADD_SYSTEM(api, "without", "never", one, 1, nullptr, 0);
 #endif
     return 0;
 }

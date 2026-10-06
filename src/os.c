@@ -36,7 +36,7 @@ void *os_lib_open(const char *path)
     if (!len || len >= sizeof full) return nullptr;
     return (void *)LoadLibraryExA(full, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
 }
-void *os_lib_sym(void *lib, const char *name) { return (void *)GetProcAddress((HMODULE)lib, name); }
+void *os_lib_get_symbol(void *lib, const char *name) { return (void *)GetProcAddress((HMODULE)lib, name); }
 void  os_lib_close(void *lib) { if (lib) FreeLibrary((HMODULE)lib); }
 
 struct os_thread { HANDLE handle; void (*fn)(void *); void *arg; };
@@ -67,7 +67,7 @@ void os_thread_join(os_thread_t *t)
 
 struct os_event { HANDLE handle; };
 
-os_event_t *os_event_new()
+os_event_t *os_event_create()
 {
     os_event_t *e = malloc(sizeof *e);
     if (!e) return nullptr;
@@ -106,7 +106,7 @@ void *os_reserve(size_t reserve, size_t commit)
 void os_release(void *base, size_t reserve) { if (base) munmap(base, reserve); }
 
 void *os_lib_open(const char *path) { return dlopen(path, RTLD_NOW | RTLD_LOCAL); }
-void *os_lib_sym(void *lib, const char *name) { return dlsym(lib, name); }
+void *os_lib_get_symbol(void *lib, const char *name) { return dlsym(lib, name); }
 void  os_lib_close(void *lib) { if (lib) dlclose(lib); }
 
 struct os_thread { pthread_t handle; void (*fn)(void *); void *arg; };
@@ -136,7 +136,7 @@ void os_thread_join(os_thread_t *t)
 
 struct os_event { pthread_mutex_t lock; pthread_cond_t cond; int set; };
 
-os_event_t *os_event_new()
+os_event_t *os_event_create()
 {
     os_event_t *e = malloc(sizeof *e);
     if (!e) return nullptr;
@@ -186,9 +186,9 @@ int os_event_wait(os_event_t *e, uint64_t nanos)
 
 #ifdef _WIN32
 
-uint64_t os_thread_id() { return GetCurrentThreadId(); }
+uint64_t os_get_thread_id() { return GetCurrentThreadId(); }
 
-uint64_t os_now()
+uint64_t os_get_now()
 {
     LARGE_INTEGER frequency, count;
     QueryPerformanceFrequency(&frequency);
@@ -200,7 +200,7 @@ uint64_t os_now()
 
 struct os_mutex { CRITICAL_SECTION section; };
 
-os_mutex_t *os_mutex_new()
+os_mutex_t *os_mutex_create()
 {
     os_mutex_t *m = malloc(sizeof *m);
     if (!m) return nullptr;
@@ -214,9 +214,9 @@ void os_mutex_unlock(os_mutex_t *m) { LeaveCriticalSection(&m->section); }
 
 #else
 
-uint64_t os_thread_id() { return (uint64_t)(uintptr_t)pthread_self(); }
+uint64_t os_get_thread_id() { return (uint64_t)(uintptr_t)pthread_self(); }
 
-uint64_t os_now()
+uint64_t os_get_now()
 {
     struct timespec t;
     clock_gettime(CLOCK_MONOTONIC, &t);
@@ -225,7 +225,7 @@ uint64_t os_now()
 
 struct os_mutex { pthread_mutex_t mutex; };
 
-os_mutex_t *os_mutex_new()
+os_mutex_t *os_mutex_create()
 {
     os_mutex_t *m = malloc(sizeof *m);
     if (!m) return nullptr;

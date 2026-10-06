@@ -67,8 +67,8 @@ pool_t *pool_create(uint32_t workers, uint32_t most_jobs)
     uint32_t i;
     if (!p) return nullptr;
     p->taken = calloc(most_jobs ? most_jobs : 1, 1);
-    p->lock = os_mutex_new();
-    p->done = os_event_new();
+    p->lock = os_mutex_create();
+    p->done = os_event_create();
     p->workers = calloc(workers ? workers : 1, sizeof *p->workers);
     if (!p->taken || !p->lock || !p->done || !p->workers) {
         pool_destroy(p);
@@ -76,7 +76,7 @@ pool_t *pool_create(uint32_t workers, uint32_t most_jobs)
     }
     for (i = 0; i < workers; i ++) {
         p->workers[i].p = p;
-        p->workers[i].wake = os_event_new();
+        p->workers[i].wake = os_event_create();
         p->workers[i].thread = p->workers[i].wake ? os_thread_start(work, &p->workers[i]) : nullptr;
         if (!p->workers[i].thread) {
             os_event_free(p->workers[i].wake);

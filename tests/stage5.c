@@ -148,8 +148,8 @@ static void frames(bridge_t *b, int count)
 {
     int i;
     for (i = 0; i < count; i ++) {
-        (void)bridge_phase(b, "update");
-        (void)bridge_phase(b, "present");
+        (void)bridge_run_phase(b, "update");
+        (void)bridge_run_phase(b, "present");
     }
 }
 
@@ -157,12 +157,12 @@ static double phase_ms(bridge_t *b, const char *phase)
 {
     struct timespec t0, t1;
     timespec_get(&t0, TIME_UTC);
-    (void)bridge_phase(b, phase);
+    (void)bridge_run_phase(b, phase);
     timespec_get(&t1, TIME_UTC);
     return (double)(t1.tv_sec - t0.tv_sec) * 1e3 + (double)(t1.tv_nsec - t0.tv_nsec) / 1e6;
 }
 
-/* bridge_phase from a thread that loaded nothing: once, or for many frames */
+/* bridge_run_phase from a thread that loaded nothing: once, or for many frames */
 static bridge_t *elsewhere_bridge;
 static int elsewhere_result, elsewhere_frames;
 
@@ -170,10 +170,10 @@ static void elsewhere_work()
 {
     int i;
     if (elsewhere_frames < 0) elsewhere_result = bridge_destroy(elsewhere_bridge);
-    else if (!elsewhere_frames) elsewhere_result = bridge_phase(elsewhere_bridge, "update");
+    else if (!elsewhere_frames) elsewhere_result = bridge_run_phase(elsewhere_bridge, "update");
     for (i = 0; i < elsewhere_frames; i ++) {
-        (void)bridge_phase(elsewhere_bridge, "update");
-        (void)bridge_phase(elsewhere_bridge, "present");
+        (void)bridge_run_phase(elsewhere_bridge, "update");
+        (void)bridge_run_phase(elsewhere_bridge, "present");
     }
 }
 
@@ -273,7 +273,7 @@ int main(int argc, char **argv)
             a = wasm("test:spawn2@0.1.0", "spawner");
             a.cfg.spawns = 16;
             (void)bridge_load(b, &a);
-            for (f = 0; f < 20; f ++) (void)bridge_phase(b, "update");
+            for (f = 0; f < 20; f ++) (void)bridge_run_phase(b, "update");
             (void)bridge_destroy(b);
         }
         printf("minted %u ids a run; on four threads %s, and again %s\n", minted_count[0],

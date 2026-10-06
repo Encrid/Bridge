@@ -29,7 +29,7 @@ struct bridge_api {
     uint32_t (*declare)(const bridge_api_t *api, uint32_t name, uint32_t name_len, enum bridge_kind kind,
                         uint32_t size, uint32_t align, uint32_t desc, uint32_t desc_len,
                         enum bridge_on_unload on_unload, enum bridge_storage storage);
-    uint32_t (*system)(const bridge_api_t *api, uint32_t name, uint32_t name_len, uint32_t phase,
+    uint32_t (*add_system)(const bridge_api_t *api, uint32_t name, uint32_t name_len, uint32_t phase,
                        uint32_t phase_len, uint32_t terms, uint32_t term_count, uint32_t changes,
                        uint32_t change_count);
     uint32_t (*observe)(const bridge_api_t *api, uint32_t name, uint32_t name_len,
@@ -51,7 +51,7 @@ struct bridge_api {
 
 /* ---- the scratch arena ---- */
 
-static inline bridge_header_t *bridge_native_header(const bridge_api_t *api)
+static inline bridge_header_t *bridge_native_get_header(const bridge_api_t *api)
 {
     return (bridge_header_t *)api->private_base;
 }
@@ -60,7 +60,7 @@ static inline bridge_header_t *bridge_native_header(const bridge_api_t *api)
  * every entry refuses */
 static inline uint32_t bridge_native_put(const bridge_api_t *api, const void *bytes, uint32_t len)
 {
-    bridge_header_t *h = bridge_native_header(api);
+    bridge_header_t *h = bridge_native_get_header(api);
     uint32_t used = (h->scratch_used + 7u) & ~7u;
     if (used > h->scratch_len || len > h->scratch_len - used) return 0;
     memcpy(api->private_base + h->scratch + used, bytes, len);
@@ -74,7 +74,7 @@ static inline uint32_t bridge_native_put(const bridge_api_t *api, const void *by
 static inline void bridge_native_attach(const bridge_api_t *api, uint64_t id, uint32_t slot,
                                         const void *value, uint32_t len)
 {
-    bridge_header_t *h = bridge_native_header(api);
+    bridge_header_t *h = bridge_native_get_header(api);
     uint32_t was = h->scratch_used;
     api->attach(api, id, slot, bridge_native_put(api, value, len), len);
     h->scratch_used = was;
@@ -94,8 +94,8 @@ static inline void bridge_native_attach(const bridge_api_t *api, uint64_t id, ui
 
 /* `changes` is the slots of the components it attaches or detaches, `change_count` of them:
  * a system that does neither hands nullptr and 0 */
-#define BRIDGE_NATIVE_SYSTEM(api, name, phase, terms, count, changes, change_count) \
-    (api)->system(api, bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, \
+#define BRIDGE_NATIVE_ADD_SYSTEM(api, name, phase, terms, count, changes, change_count) \
+    (api)->add_system(api, bridge_native_put(api, name, sizeof name - 1), sizeof name - 1, \
                   bridge_native_put(api, phase, sizeof phase - 1), sizeof phase - 1, \
                   bridge_native_put(api, terms, (count) * sizeof(bridge_term_t)), count, \
                   (change_count) ? bridge_native_put(api, changes, \
@@ -109,13 +109,13 @@ static inline void bridge_native_attach(const bridge_api_t *api, uint64_t id, ui
 
 /* ---- a query's spans, through real pointers. native.md, *Reaching a component* ---- */
 
-static inline const bridge_query_t *bridge_native_query(const bridge_api_t *api, uint32_t query)
+static inline const bridge_query_t *bridge_native_get_query(const bridge_api_t *api, uint32_t query)
 {
-    return (const bridge_query_t *)(api->private_base + bridge_native_header(api)->queries) + query;
+    return (const bridge_query_t *)(api->private_base + bridge_native_get_header(api)->queries) + query;
 }
 
 /* span `i` of a query that declared `terms` terms: u32 count, u32 entities, u32 base[terms] */
-static inline const uint32_t *bridge_native_span(const bridge_api_t *api, const bridge_query_t *q,
+static inline const uint32_t *bridge_native_get_span(const bridge_api_t *api, const bridge_query_t *q,
                                                  uint32_t i, uint32_t terms)
 {
     return (const uint32_t *)(api->private_base + q->at + i * BRIDGE_SPAN_SIZE(terms));
@@ -126,9 +126,9 @@ static inline const uint32_t *bridge_native_span(const bridge_api_t *api, const 
 /* The value of the singleton `slot`, or nullptr while it has none. It is given by an attach
  * with the id 0, taken by a detach with it, and written where it is by a system that stated
  * the term BRIDGE_WRITE. */
-static inline void *bridge_native_single(const bridge_api_t *api, uint32_t slot)
+static inline void *bridge_native_get_single(const bridge_api_t *api, uint32_t slot)
 {
-    uint32_t at = ((const uint32_t *)(api->private_base + bridge_native_header(api)->kept))[slot];
+    uint32_t at = ((const uint32_t *)(api->private_base + bridge_native_get_header(api)->kept))[slot];
     return at ? api->shared_base + at : nullptr;
 }
 
@@ -136,10 +136,10 @@ static inline void *bridge_native_single(const bridge_api_t *api, uint32_t slot)
 
 /* The cells of the direct-indexed component `slot`, from the shared base: the value of the
  * entity whose id's low 32 bits are e is cell e. Whether that entity has been given one is its
- * bit, bit e & 63 of word e >> 6 of bridge_native_bits of the same offset. */
-static inline uint32_t bridge_native_cells(const bridge_api_t *api, uint32_t slot)
+ * bit, bit e & 63 of word e >> 6 of bridge_native_get_bits of the same offset. */
+static inline uint32_t bridge_native_get_cells(const bridge_api_t *api, uint32_t slot)
 {
-    return ((const uint32_t *)(api->private_base + bridge_native_header(api)->kept))[slot];
+    return ((const uint32_t *)(api->private_base + bridge_native_get_header(api)->kept))[slot];
 }
 
 /* ---- a sparse set, reached from a row. storage.md, *A sparse set* ---- */
@@ -147,9 +147,9 @@ static inline uint32_t bridge_native_cells(const bridge_api_t *api, uint32_t slo
 /* The index of the sparse set that keeps component `slot`: a cell for each entity, by the low
  * 32 bits of its id, holding where that entity's value is from the shared base, and zero
  * where it has none. */
-static inline const uint32_t *bridge_native_set_index(const bridge_api_t *api, uint32_t slot)
+static inline const uint32_t *bridge_native_get_sparse_index(const bridge_api_t *api, uint32_t slot)
 {
-    auto kept = (const uint32_t *)(api->private_base + bridge_native_header(api)->kept);
+    auto kept = (const uint32_t *)(api->private_base + bridge_native_get_header(api)->kept);
     return (const uint32_t *)(api->shared_base + kept[slot]);
 }
 
@@ -158,7 +158,7 @@ static inline const uint32_t *bridge_native_set_index(const bridge_api_t *api, u
 /* The bits of the toggled column that begins at `base`, which a span or column_base gave: row
  * r is bit r & 63 of word r >> 6, and a row whose bit is 0 is off. A system that stated the
  * term BRIDGE_WRITE turns a row on or off by writing its bit. */
-static inline uint64_t *bridge_native_bits(const bridge_api_t *api, uint32_t base)
+static inline uint64_t *bridge_native_get_bits(const bridge_api_t *api, uint32_t base)
 {
     uint32_t at;
     memcpy(&at, api->shared_base + base - 16, 4);
@@ -166,9 +166,9 @@ static inline uint64_t *bridge_native_bits(const bridge_api_t *api, uint32_t bas
 }
 
 /* an observer's list: `count` bridge_trigger_t records, at private_base + `at` */
-static inline const bridge_list_t *bridge_native_list(const bridge_api_t *api, uint32_t observer)
+static inline const bridge_list_t *bridge_native_get_list(const bridge_api_t *api, uint32_t observer)
 {
-    return (const bridge_list_t *)(api->private_base + bridge_native_header(api)->observers) + observer;
+    return (const bridge_list_t *)(api->private_base + bridge_native_get_header(api)->observers) + observer;
 }
 
 /* ---- the log ---- */
@@ -176,7 +176,7 @@ static inline const bridge_list_t *bridge_native_list(const bridge_api_t *api, u
 static inline void bridge_native_log(const bridge_api_t *api, uint32_t level, const char *text,
                                      uint32_t len, uint32_t a0, uint32_t a1)
 {
-    bridge_header_t *h = bridge_native_header(api);
+    bridge_header_t *h = bridge_native_get_header(api);
     bridge_log_record_t *r;
     uint32_t head = h->ring_head;
     if (level > h->log_level) return;

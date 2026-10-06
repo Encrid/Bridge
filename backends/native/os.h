@@ -7,9 +7,9 @@
 #include <stdint.h>
 
 [[nodiscard]] void *os_lib_open(const char *path);                /* nullptr on failure */
-[[nodiscard]] void *os_lib_sym(void *lib, const char *name);
+[[nodiscard]] void *os_lib_get_symbol(void *lib, const char *name);
 void  os_lib_close(void *lib);
 
-uint64_t os_thread_id();                    /* of the calling thread: never 0 */
+uint64_t os_get_thread_id();                    /* of the calling thread: never 0 */
 
 #endif

@@ -746,8 +746,8 @@ static int abi_system(void *ud, const uint64_t *a, uint64_t *r)
     bridge_t *b = m->b;
     const char *phase_at = scratch(m, a[2], a[3]);
     uint32_t phase;
-    if (!m->in_init) return refuse(m, "system is called outside init");
-    if (!phase_at) return refuse(m, "system: a phase lies outside the scratch arena");
+    if (!m->in_init) return refuse(m, "add_system is called outside init");
+    if (!phase_at) return refuse(m, "add_system: a phase lies outside the scratch arena");
     /* what the deployment says this module's name for a phase is, and otherwise the name */
     for (phase = 0; phase < m->phase_names; phase ++) {
         if (strlen(m->phase_from[phase]) == a[3] && !memcmp(m->phase_from[phase], phase_at, a[3])) break;
@@ -962,7 +962,7 @@ int abi_define(module_t *m, backend_err_t *err)
         uint32_t    result_count;
     } entries[] = {
         { "declare", abi_declare, { I, I, I, I, I, I, I, I, I }, 9, { I }, 1 },
-        { "system",  abi_system,  { I, I, I, I, I, I, I, I }, 8, { I }, 1 },
+        { "add_system", abi_system,  { I, I, I, I, I, I, I, I }, 8, { I }, 1 },
         { "observe", abi_observe, { I, I, I, I, I, I, I }, 7, { I }, 1 },
         { "spawn",   abi_spawn,   {},                      0, { L }, 1 },
         { "destroy", abi_destroy, { L },                   1, {}, 0 },

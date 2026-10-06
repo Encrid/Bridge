@@ -31,10 +31,10 @@ BRIDGE_NATIVE(fill)
 
 BRIDGE_NATIVE(sum)
 {
-    const bridge_query_t *q = bridge_native_query(api, reading);
+    const bridge_query_t *q = bridge_native_get_query(api, reading);
     uint32_t rows = 0, total = 0;
     for (uint32_t s = 0; s < q->spans; s ++) {
-        const uint32_t *span = bridge_native_span(api, q, s, 1);
+        const uint32_t *span = bridge_native_get_span(api, q, s, 1);
         auto column = (const V *)(api->shared_base + span[2]);
         for (uint32_t r = 0; r < span[0]; r ++) total += column[r].v;
         rows += span[0];
@@ -67,8 +67,8 @@ BRIDGE_NATIVE(init)
     /* what `fill` attaches: the value, and every marker */
     uint32_t filled[1 + MARKERS] = { value };
     for (uint32_t k = 0; k < MARKERS; k ++) filled[1 + k] = markers[k];
-    BRIDGE_NATIVE_SYSTEM(api, "fill", "spawn", &none, 0, filled, 1 + MARKERS);
-    reading = BRIDGE_NATIVE_SYSTEM(api, "sum", "look", one, 1, nullptr, 0);
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "fill", "spawn", &none, 0, filled, 1 + MARKERS);
+    reading = BRIDGE_NATIVE_ADD_SYSTEM(api, "sum", "look", one, 1, nullptr, 0);
     return 0;
 }
 

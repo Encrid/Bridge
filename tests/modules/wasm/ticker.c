@@ -17,8 +17,8 @@ static uint32_t tick, ticking;
 
 BRIDGE_EXPORT(advance) int advance()
 {
-    uint32_t span = bridge_span(ticking, 0, 1);
-    uint32_t at = BRIDGE_ROW(Tick, bridge_base(span, 0), 0, bridge_rows(span));
+    uint32_t span = bridge_get_span(ticking, 0, 1);
+    uint32_t at = BRIDGE_ROW(Tick, bridge_get_base(span, 0), 0, bridge_count_rows(span));
     BRIDGE_SET(Tick, n, at, BRIDGE_GET(Tick, n, at) + STEP);
     BRIDGE_LOG(BRIDGE_LOG_INFO, "tick", BRIDGE_GET(Tick, n, at), STEP);
 #ifdef TRIP
@@ -34,7 +34,7 @@ static void registration()
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
     tick = BRIDGE_COMPONENT("game:Tick", Tick, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = tick;
-    ticking = BRIDGE_SYSTEM("advance", "update", terms, 1, nullptr, 0);
+    ticking = BRIDGE_ADD_SYSTEM("advance", "update", terms, 1, nullptr, 0);
 }
 
 BRIDGE_EXPORT(init) int init()

@@ -200,7 +200,7 @@ where two things could be meant the qualified form is the only form.
     change            an attach, a detach or a destroy asked of an entity, applied at the next
                       barrier. A system's "changes" are the components it stated that it
                       attaches or detaches
-    slot              the number `declare`, `system` or `observe` answers a module. A position
+    slot              the number `declare`, `add_system` or `observe` answers a module. A position
                       in an array is a "place"
     event             what an observer is told of an entity against its terms: enter, leave,
                       attach. `data.md`, *Observers*

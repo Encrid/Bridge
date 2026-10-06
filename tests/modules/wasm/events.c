@@ -18,11 +18,11 @@ BRIDGE_EXPORT(poke) int poke()
 /* which events, and the value the id leads to: an id that leads nowhere was removed */
 BRIDGE_EXPORT(any) int any()
 {
-    uint32_t count = bridge_triggers(watching), i;
+    uint32_t count = bridge_count_triggers(watching), i;
     for (i = 0; i < count; i ++) {
-        uint32_t trigger = bridge_trigger_at(watching, i);
-        uint32_t at = bridge_ref(bridge_trigger_id(trigger), marked, sizeof(Marked));
-        BRIDGE_LOG(BRIDGE_LOG_INFO, "event", bridge_trigger_events(trigger),
+        uint32_t trigger = bridge_get_trigger(watching, i);
+        uint32_t at = bridge_get_ref(bridge_get_trigger_id(trigger), marked, sizeof(Marked));
+        BRIDGE_LOG(BRIDGE_LOG_INFO, "event", bridge_get_trigger_events(trigger),
                    at ? BRIDGE_GET(Marked, by, at) : 0xdead);
     }
     return 0;
@@ -34,7 +34,7 @@ BRIDGE_EXPORT(init) int init()
     int none = 0;
     marked = BRIDGE_COMPONENT("game:Marked", Marked, BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = marked;
-    BRIDGE_SYSTEM("poke", "update", &none, 0, &marked, 1);
+    BRIDGE_ADD_SYSTEM("poke", "update", &none, 0, &marked, 1);
     watching = BRIDGE_OBSERVER("any", BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, terms, 1, nullptr, 0);
     entity = bridge_spawn();
     return 0;

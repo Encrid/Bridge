@@ -15,7 +15,7 @@ created it.** So a module says so, with one key in its manifest:
 drives, and some of that demands one particular thread and not merely the same one each time: a
 window and its input on macOS belong to the first thread of the process, the one `main` runs on.
 A thread Bridge-ASM700 made could never be that one. So `init` runs inside `bridge_load` on
-whichever thread called it, a pinned module's systems run on the thread that calls `bridge_phase`,
+whichever thread called it, a pinned module's systems run on the thread that calls `bridge_run_phase`,
 and a host with a pinned module loaded calls both from one thread, which it is free to make the
 first.
 A phase asked for from another is refused by name, before anything runs, and so is

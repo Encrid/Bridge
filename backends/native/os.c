@@ -19,9 +19,9 @@ void *os_lib_open(const char *path)
     if (!len || len >= sizeof full) return nullptr;
     return (void *)LoadLibraryExA(full, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
 }
-void *os_lib_sym(void *lib, const char *name) { return (void *)GetProcAddress((HMODULE)lib, name); }
+void *os_lib_get_symbol(void *lib, const char *name) { return (void *)GetProcAddress((HMODULE)lib, name); }
 void  os_lib_close(void *lib) { if (lib) FreeLibrary((HMODULE)lib); }
-uint64_t os_thread_id() { return GetCurrentThreadId(); }
+uint64_t os_get_thread_id() { return GetCurrentThreadId(); }
 
 #else
 
@@ -29,8 +29,8 @@ uint64_t os_thread_id() { return GetCurrentThreadId(); }
 #include <pthread.h>
 
 void *os_lib_open(const char *path) { return dlopen(path, RTLD_NOW | RTLD_LOCAL); }
-void *os_lib_sym(void *lib, const char *name) { return dlsym(lib, name); }
+void *os_lib_get_symbol(void *lib, const char *name) { return dlsym(lib, name); }
 void  os_lib_close(void *lib) { if (lib) dlclose(lib); }
-uint64_t os_thread_id() { return (uint64_t)(uintptr_t)pthread_self(); }
+uint64_t os_get_thread_id() { return (uint64_t)(uintptr_t)pthread_self(); }
 
 #endif
