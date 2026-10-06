@@ -17,25 +17,25 @@ void  os_release(void *base, size_t reserve);
 [[nodiscard]] void *os_lib_sym(void *lib, const char *name);
 void  os_lib_close(void *lib);
 
-typedef struct os_thread os_thread;
-[[nodiscard]] os_thread *os_thread_start(void (*fn)(void *), void *arg);
-void       os_thread_join(os_thread *t);
+typedef struct os_thread os_thread_t;
+[[nodiscard]] os_thread_t *os_thread_start(void (*fn)(void *), void *arg);
+void       os_thread_join(os_thread_t *t);
 uint64_t   os_thread_id();                      /* of the calling thread */
 uint64_t   os_now();                            /* nanoseconds, from a clock that only rises */
 
-typedef struct os_mutex os_mutex;
-[[nodiscard]] os_mutex *os_mutex_new();
-void      os_mutex_free(os_mutex *m);
-void      os_mutex_lock(os_mutex *m);
-void      os_mutex_unlock(os_mutex *m);
+typedef struct os_mutex os_mutex_t;
+[[nodiscard]] os_mutex_t *os_mutex_new();
+void      os_mutex_free(os_mutex_t *m);
+void      os_mutex_lock(os_mutex_t *m);
+void      os_mutex_unlock(os_mutex_t *m);
 
 /* An event one thread sets and another waits for. Setting it before the wait
  * is not lost; a wait consumes it. */
-typedef struct os_event os_event;
+typedef struct os_event os_event_t;
 constexpr uint64_t OS_FOREVER = UINT64_MAX;
-[[nodiscard]] os_event *os_event_new();
-void      os_event_free(os_event *e);
-void      os_event_set(os_event *e);
-int       os_event_wait(os_event *e, uint64_t nanos);   /* 1 if set, 0 if it timed out */
+[[nodiscard]] os_event_t *os_event_new();
+void      os_event_free(os_event_t *e);
+void      os_event_set(os_event_t *e);
+int       os_event_wait(os_event_t *e, uint64_t nanos);   /* 1 if set, 0 if it timed out */
 
 #endif

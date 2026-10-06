@@ -10,7 +10,7 @@ BRIDGE_SCHEMA_STRUCT(Settings, {
     float scale;
     Mode mode;
     char title[16];
-    bridge_text path;
+    bridge_text_t path;
     uint8_t small;
     Flags flags;
     double ratio;
@@ -52,7 +52,7 @@ BRIDGE_EXPORT(show) int show()
 
 BRIDGE_EXPORT(init) int init()
 {
-    bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_OPTIONAL, 0 }};
+    bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_OPTIONAL, 0 }};
     BRIDGE_DECLARE(BRIDGE_ENUM, "game:Mode", Mode, BRIDGE_STRIP, BRIDGE_TABLE);
     BRIDGE_DECLARE(BRIDGE_BITMASK, "game:Flags", Flags, BRIDGE_STRIP, BRIDGE_TABLE);
     settings = BRIDGE_COMPONENT("game:Settings", Settings, BRIDGE_DELETE, KEPT);

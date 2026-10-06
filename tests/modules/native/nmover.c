@@ -9,7 +9,7 @@ static uint32_t position, marked, moving, tallying;
 
 BRIDGE_NATIVE(move)
 {
-    const bridge_query *q = bridge_native_query(api, moving);
+    const bridge_query_t *q = bridge_native_query(api, moving);
     uint32_t s, r;
     for (s = 0; s < q->spans; s ++) {
         const uint32_t *span = bridge_native_span(api, q, s, 1);
@@ -21,7 +21,7 @@ BRIDGE_NATIVE(move)
 
 BRIDGE_NATIVE(tally)
 {
-    const bridge_query *q = bridge_native_query(api, tallying);
+    const bridge_query_t *q = bridge_native_query(api, tallying);
     uint32_t s, rows = 0;
     for (s = 0; s < q->spans; s ++) rows += bridge_native_span(api, q, s, 1)[0];
     bridge_native_log(api, BRIDGE_LOG_INFO, "native tally", 12, q->spans, rows);
@@ -30,7 +30,7 @@ BRIDGE_NATIVE(tally)
 
 BRIDGE_NATIVE(init)
 {
-    bridge_term terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
+    bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
     uint32_t i;
     position = BRIDGE_NATIVE_COMPONENT(api, "game:Position", Position, BRIDGE_DELETE, BRIDGE_TABLE);
     marked = BRIDGE_NATIVE_COMPONENT(api, "game:Marked", Marked, BRIDGE_STRIP, BRIDGE_TABLE);

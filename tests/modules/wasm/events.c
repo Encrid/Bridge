@@ -30,7 +30,7 @@ BRIDGE_EXPORT(any) int any()
 
 BRIDGE_EXPORT(init) int init()
 {
-    bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
+    bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     int none = 0;
     marked = BRIDGE_COMPONENT("game:Marked", Marked, BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = marked;

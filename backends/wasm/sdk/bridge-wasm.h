@@ -70,7 +70,7 @@ BRIDGE_ACC(acc_from_shared) void acc_from_shared(void *to, uint32_t from, uint32
 
 /* ---- the header and the scratch arena ---- */
 
-#define BRIDGE_HEADER(field) acc_own_32(offsetof(bridge_header, field))
+#define BRIDGE_HEADER(field) acc_own_32(offsetof(bridge_header_t, field))
 
 /* `len` bytes of the scratch arena, good until the next barrier. A module that asks for more
  * than it was given stops there. */
@@ -79,7 +79,7 @@ static inline uint32_t bridge_scratch(uint32_t len)
     uint32_t used = (BRIDGE_HEADER(scratch_used) + 7u) & ~7u;
     uint32_t room = BRIDGE_HEADER(scratch_len);
     if (used > room || len > room - used) __builtin_trap();
-    acc_own_st(offsetof(bridge_header, scratch_used), used + len);
+    acc_own_st(offsetof(bridge_header_t, scratch_used), used + len);
     return BRIDGE_HEADER(scratch) + used;
 }
 
@@ -110,13 +110,13 @@ static inline uint32_t bridge_put(const void *bytes, uint32_t len)
 #define BRIDGE_SYSTEM(name, phase, terms, count, changes, change_count) \
     bridge_system(bridge_put(name, sizeof name - 1), sizeof name - 1, \
                   bridge_put(phase, sizeof phase - 1), sizeof phase - 1, \
-                  bridge_put(terms, (count) * sizeof(bridge_term)), count, \
+                  bridge_put(terms, (count) * sizeof(bridge_term_t)), count, \
                   (change_count) ? bridge_put(changes, (change_count) * sizeof(uint32_t)) : 0, \
                   change_count)
 
 #define BRIDGE_OBSERVER(name, events, terms, count, changes, change_count) \
     bridge_observe(bridge_put(name, sizeof name - 1), sizeof name - 1, events, \
-                   bridge_put(terms, (count) * sizeof(bridge_term)), count, \
+                   bridge_put(terms, (count) * sizeof(bridge_term_t)), count, \
                    (change_count) ? bridge_put(changes, (change_count) * sizeof(uint32_t)) : 0, \
                    change_count)
 
@@ -127,7 +127,7 @@ static inline void bridge_attach_value(uint64_t id, uint32_t slot, const void *v
 {
     uint32_t was = BRIDGE_HEADER(scratch_used);
     bridge_attach(id, slot, bridge_put(value, len), len);
-    acc_own_st(offsetof(bridge_header, scratch_used), was);
+    acc_own_st(offsetof(bridge_header_t, scratch_used), was);
 }
 #define BRIDGE_ATTACH(id, slot, value) bridge_attach_value(id, slot, &(value), sizeof(value))
 
@@ -135,13 +135,13 @@ static inline void bridge_attach_value(uint64_t id, uint32_t slot, const void *v
 
 static inline uint32_t bridge_spans(uint32_t query)
 {
-    return acc_own_32(BRIDGE_HEADER(queries) + query * sizeof(bridge_query));
+    return acc_own_32(BRIDGE_HEADER(queries) + query * sizeof(bridge_query_t));
 }
 
 /* span `i` of a query that declared `terms` terms */
 static inline uint32_t bridge_span(uint32_t query, uint32_t i, uint32_t terms)
 {
-    uint32_t at = acc_own_32(BRIDGE_HEADER(queries) + query * sizeof(bridge_query) + 4u);
+    uint32_t at = acc_own_32(BRIDGE_HEADER(queries) + query * sizeof(bridge_query_t) + 4u);
     return at + i * BRIDGE_SPAN_SIZE(terms);
 }
 
@@ -220,13 +220,13 @@ static inline void bridge_turn(uint32_t bits, uint32_t row, uint32_t count, bool
 
 static inline uint32_t bridge_triggers(uint32_t observer)
 {
-    return acc_own_32(BRIDGE_HEADER(observers) + observer * sizeof(bridge_list));
+    return acc_own_32(BRIDGE_HEADER(observers) + observer * sizeof(bridge_list_t));
 }
 
 static inline uint32_t bridge_trigger_at(uint32_t observer, uint32_t i)
 {
-    uint32_t at = acc_own_32(BRIDGE_HEADER(observers) + observer * sizeof(bridge_list) + 4u);
-    return at + i * (uint32_t)sizeof(bridge_trigger);
+    uint32_t at = acc_own_32(BRIDGE_HEADER(observers) + observer * sizeof(bridge_list_t) + 4u);
+    return at + i * (uint32_t)sizeof(bridge_trigger_t);
 }
 
 static inline uint64_t bridge_trigger_id(uint32_t trigger)     { return acc_own_64(trigger); }
@@ -261,7 +261,7 @@ static inline uint32_t bridge_ref(uint64_t id, uint32_t slot, uint32_t stride)
 {
     uint32_t index = (uint32_t)id, record, base;
     if (index >= BRIDGE_HEADER(entities)) return 0;
-    record = BRIDGE_HEADER(entity_index) + index * (uint32_t)sizeof(bridge_entity);
+    record = BRIDGE_HEADER(entity_index) + index * (uint32_t)sizeof(bridge_entity_t);
     if (acc_ld_32(record + 8u) != (uint32_t)(id >> 32)) return 0;
     base = acc_own_32(BRIDGE_HEADER(column_base)
                       + (acc_ld_32(record) * BRIDGE_HEADER(types) + slot) * 4u);
@@ -273,7 +273,7 @@ static inline int bridge_alive(uint64_t id)
 {
     uint32_t index = (uint32_t)id;
     if (!id || index >= BRIDGE_HEADER(entities)) return 0;
-    return acc_ld_32(BRIDGE_HEADER(entity_index) + index * (uint32_t)sizeof(bridge_entity) + 8u)
+    return acc_ld_32(BRIDGE_HEADER(entity_index) + index * (uint32_t)sizeof(bridge_entity_t) + 8u)
            == (uint32_t)(id >> 32);
 }
 
@@ -284,10 +284,10 @@ static inline void bridge_log(uint32_t level, const char *text, uint32_t len, ui
     uint32_t head, at;
     if (level > BRIDGE_HEADER(log_level)) return;
     head = BRIDGE_HEADER(ring_head);
-    acc_own_st(offsetof(bridge_header, ring_head), head + 1u);
+    acc_own_st(offsetof(bridge_header_t, ring_head), head + 1u);
     /* full: the line is dropped, and counted by the head having moved */
     if (head - BRIDGE_HEADER(ring_tail) >= BRIDGE_HEADER(ring_len)) return;
-    at = BRIDGE_HEADER(ring) + (head % BRIDGE_HEADER(ring_len)) * (uint32_t)sizeof(bridge_log_record);
+    at = BRIDGE_HEADER(ring) + (head % BRIDGE_HEADER(ring_len)) * (uint32_t)sizeof(bridge_log_record_t);
     acc_own_st(at, BRIDGE_HEADER(when));
     acc_own_st(at + 4u, (level & 0xffu) << 8 | BRIDGE_HEADER(system) << 16);
     acc_own_st(at + 8u, bridge_put(text, len));

@@ -25,7 +25,7 @@ A phase asked for from another is refused by name, before anything runs, and so 
 knowledge. An author knows their library must be driven from one thread; a
 deployment author has no access to that fact, so declaring it there would be the deployment
 guessing, and a wrong guess is a race nobody will find quickly. It travels in the manifest -
-`module.md`, *The manifest* - and reaches Bridge-ASM700 as a field in `bridge_module_config`.
+`module.md`, *The manifest* - and reaches Bridge-ASM700 as a field in `bridge_module_config_t`.
 
 The key is not the native backend's: it is a module's, on any backend. Native modules are the
 ones with a reason to set it, because they are the ones that hold something outside storage.

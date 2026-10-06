@@ -70,9 +70,9 @@ host's trade to make.
 Three exported symbols, the lifecycle every module has, and each is handed the table of
 *What the backend provides*:
 
-    int  bridge_init(const bridge_api *api);
-    int  bridge_shutdown(const bridge_api *api);
-    int  bridge_reload(const bridge_api *api);
+    int  bridge_init(const bridge_api_t *api);
+    int  bridge_shutdown(const bridge_api_t *api);
+    int  bridge_reload(const bridge_api_t *api);
 
 **The argument is the native backend's, not Bridge-ASM700's.** A wasm module gets its imports when
 it is linked; a shared library has no import section to fill, so this backend hands the same things
@@ -108,7 +108,7 @@ does not, having crashed.
 
 ## What the backend provides
 
-`bridge_api`, declared in **`bridge-native.h`**, in this backend's `sdk/` - a native module compiles
+`bridge_api_t`, declared in **`bridge-native.h`**, in this backend's `sdk/` - a native module compiles
 that and `bridge-abi.h`:
 
     the eight entries     `abi.md`, *The ABI*, as function pointers, each taking the table first

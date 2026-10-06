@@ -18,7 +18,7 @@ static uint32_t path_at[4], path_count;
 static uint32_t out_of_step;
 static int quiet;
 
-static void sink([[maybe_unused]] void *ud, const bridge_record *r)
+static void sink([[maybe_unused]] void *ud, const bridge_record_t *r)
 {
     if (r->len == 7 && !memcmp(r->text, "path at", 7) && path_count < 4) path_at[path_count ++] = r->arg[0];
     if (r->len > 40 && !memcmp(r->text, "the entity index is out of step", 31)) out_of_step ++;
@@ -27,9 +27,9 @@ static void sink([[maybe_unused]] void *ud, const bridge_record *r)
         r->system ? r->system : "-", (int)r->len, r->text, r->arg[0], r->arg[1]);
 }
 
-static bridge_artifact native(const char *identity, const char *path)
+static bridge_artifact_t native(const char *identity, const char *path)
 {
-    bridge_artifact a = {};
+    bridge_artifact_t a = {};
     a.cfg.identity = identity;
     a.cfg.abi = BRIDGE_ABI;
     a.cfg.trusted = BRIDGE_TRUE;
@@ -57,9 +57,9 @@ static bridge_artifact native(const char *identity, const char *path)
     return a;
 }
 
-static bridge_artifact wasm(const char *identity, const char *file)
+static bridge_artifact_t wasm(const char *identity, const char *file)
 {
-    bridge_artifact a = native(identity, nullptr);
+    bridge_artifact_t a = native(identity, nullptr);
     char path[1024];
     FILE *f;
     void *data;
@@ -83,22 +83,22 @@ static bridge_artifact wasm(const char *identity, const char *file)
     return a;
 }
 
-static void load(bridge *b, const bridge_artifact *a)
+static void load(bridge_t *b, const bridge_artifact_t *a)
 {
     printf("%s: %s\n", a->cfg.identity, bridge_load(b, a) ? "not loaded" : "loaded");
 }
 
-static void reload(bridge *b, const bridge_artifact *a)
+static void reload(bridge_t *b, const bridge_artifact_t *a)
 {
     printf("%s: %s\n", a->cfg.identity, bridge_reload(b, a) ? "not reloaded" : "reloaded");
 }
 
-static void unload(bridge *b, const char *identity)
+static void unload(bridge_t *b, const char *identity)
 {
     printf("%s: %s\n", identity, bridge_unload(b, identity) ? "not unloaded" : "unloaded");
 }
 
-static void frames(bridge *b, int count)
+static void frames(bridge_t *b, int count)
 {
     int i;
     for (i = 0; i < count; i ++) {
@@ -108,9 +108,9 @@ static void frames(bridge *b, int count)
 }
 
 /* the pull: what is loaded, and whether it still runs */
-static void modules(bridge *b)
+static void modules(bridge_t *b)
 {
-    bridge_module_info info[8];
+    bridge_module_info_t info[8];
     int n = bridge_modules(b, info, 8), i;
     printf("modules:");
     for (i = 0; i < n && i < 8; i ++) {
@@ -121,9 +121,9 @@ static void modules(bridge *b)
 
 static const char *const position[] = { "game:Position", "game:Roster" };
 
-static bridge_artifact counter()
+static bridge_artifact_t counter()
 {
-    bridge_artifact a = wasm("view:counter@0.1.0", "counter");
+    bridge_artifact_t a = wasm("view:counter@0.1.0", "counter");
     a.cfg.read = position;
     a.cfg.read_count = 2;
     a.cfg.spawns = BRIDGE_NONE;
@@ -131,7 +131,7 @@ static bridge_artifact counter()
 }
 
 /* a module with every kind of setting, as a deployment would hand them over */
-static bridge_setting everything[11] = {
+static bridge_setting_t everything[11] = {
     { .key = "vsync", .kind = BRIDGE_BOOL, .v = { .b = true } },
     { .key = "width", .kind = BRIDGE_INT, .v = { .i = 1280 } },
     { .key = "scale", .kind = BRIDGE_FLOAT, .v = { .f = 1.5 } },
@@ -145,9 +145,9 @@ static bridge_setting everything[11] = {
     { nullptr, 0, { 0 } },
 };
 
-static bridge_artifact configured(const char *identity)
+static bridge_artifact_t configured(const char *identity)
 {
-    bridge_artifact a = wasm(identity, "settings");
+    bridge_artifact_t a = wasm(identity, "settings");
     a.cfg.config = "game:Settings";
     a.cfg.settings = everything;
     a.cfg.setting_count = 10;
@@ -158,15 +158,15 @@ static bridge_artifact configured(const char *identity)
 int main(int argc, char **argv)
 {
     const char *what = argc > 1 ? argv[1] : "";
-    bridge_backend backends[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
+    bridge_backend_t backends[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
     const char *phases[2] = { "update", "present" };
-    bridge_config cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 2, .phases = phases,
+    bridge_config_t cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 2, .phases = phases,
         .phase_count = 2, .threads = 1, .budget =
         { .entities = 4096, .tables = 64, .types = 64, .systems = 128, .terms = 8, .modules = 8,
           .persistent = 4096, .columns = 1 << 20,
           .sparse_sets = BRIDGE_NONE, .direct_indexed = BRIDGE_NONE } };
-    bridge_artifact a;
-    bridge *b;
+    bridge_artifact_t a;
+    bridge_t *b;
     setvbuf(stdout, nullptr, _IONBF, 0);
 
     if (!strcmp(what, "slots")) cfg.budget.modules = 1;
@@ -443,7 +443,7 @@ int main(int argc, char **argv)
         if (!strcmp(what, "configarena")) a.cfg.persistent = 8;
         /* config.md: the component it names is a singleton, and one that is not is refused */
         if (!strcmp(what, "configtable")) {
-            bridge_artifact other = wasm("game:settings@0.1.0", "settings-table");
+            bridge_artifact_t other = wasm("game:settings@0.1.0", "settings-table");
             a.bytes = other.bytes;
             a.len = other.len;
         }

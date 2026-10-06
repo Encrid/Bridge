@@ -31,7 +31,7 @@ BRIDGE_NATIVE(fill)
 
 BRIDGE_NATIVE(sum)
 {
-    const bridge_query *q = bridge_native_query(api, reading);
+    const bridge_query_t *q = bridge_native_query(api, reading);
     uint32_t rows = 0, total = 0;
     for (uint32_t s = 0; s < q->spans; s ++) {
         const uint32_t *span = bridge_native_span(api, q, s, 1);
@@ -51,7 +51,7 @@ BRIDGE_NATIVE(init)
         "st:M6", "st:M7", "st:M8", "st:M9", "st:M10", "st:M11"
     };
     int none = 0;
-    bridge_term one[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
+    bridge_term_t one[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     value = BRIDGE_NATIVE_COMPONENT(api, "st:V", V, BRIDGE_DELETE, BRIDGE_TABLE);
     for (uint32_t k = 0; k < MARKERS; k ++) {
 #ifdef TAGS

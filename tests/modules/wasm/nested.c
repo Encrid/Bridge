@@ -22,7 +22,7 @@ BRIDGE_EXPORT(read) int read()
 
 BRIDGE_EXPORT(init) int init()
 {
-    bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
+    bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     Body b = {{ 1.0f, 2.0f }, Blue, Solid | Hidden, 4.0f };
 #ifndef LEAVE_OUT_VEC2
     BRIDGE_DECLARE(BRIDGE_STRUCT, "game:Vec2", Vec2, BRIDGE_STRIP, BRIDGE_TABLE);

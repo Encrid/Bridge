@@ -32,16 +32,16 @@ static bool loaded(const char *path)
 
 constexpr int64_t MS = 1'000'000;
 
-static void sink([[maybe_unused]] void *ud, const bridge_record *r)
+static void sink([[maybe_unused]] void *ud, const bridge_record_t *r)
 {
     printf("record[%d] %s/%s: %.*s %u %u\n", r->level, r->identity ? r->identity : "-",
         r->system ? r->system : "-", (int)r->len, r->text, r->arg[0], r->arg[1]);
 }
 
 /* a native module as a deployment must state it: trusted, and every limit said to be none */
-static bridge_artifact native(const char *identity, const char *path)
+static bridge_artifact_t native(const char *identity, const char *path)
 {
-    bridge_artifact a = {};
+    bridge_artifact_t a = {};
     a.cfg.identity = identity;
     a.cfg.abi = BRIDGE_ABI;
     a.cfg.trusted = BRIDGE_TRUE;
@@ -70,10 +70,10 @@ static bridge_artifact native(const char *identity, const char *path)
 }
 
 /* the reader of stage 3, on the wasm backend, with the limits that backend can keep */
-static bridge_artifact wasm_reader()
+static bridge_artifact_t wasm_reader()
 {
     static const char *const grants[] = { "game:Position", "game:Marked" };
-    bridge_artifact a = native("view:reader@0.1.0", nullptr);
+    bridge_artifact_t a = native("view:reader@0.1.0", nullptr);
     FILE *f = fopen(MODULE_DIR "/reader.wasm", "rb");
     void *data;
     if (!f) { printf("cannot read reader.wasm\n"); exit(2); }
@@ -97,7 +97,7 @@ static bridge_artifact wasm_reader()
     return a;
 }
 
-static void load(bridge *b, const bridge_artifact *a)
+static void load(bridge_t *b, const bridge_artifact_t *a)
 {
     printf("%s: %s\n", a->cfg.identity, bridge_load(b, a) ? "not loaded" : "loaded");
 }
@@ -105,16 +105,16 @@ static void load(bridge *b, const bridge_artifact *a)
 int main(int argc, char **argv)
 {
     const char *what = argc > 1 ? argv[1] : "";
-    bridge_backend backends[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
+    bridge_backend_t backends[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
     const char *phases[2] = { "update", "present" };
-    bridge_config cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 2, .phases = phases,
+    bridge_config_t cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 2, .phases = phases,
         .phase_count = 2, .threads = 1, .budget =
         { .entities = 4096, .tables = 64, .types = 64, .systems = 128, .terms = 8, .modules = 8,
           .persistent = 4096, .columns = 1 << 20,
           .sparse_sets = BRIDGE_NONE, .direct_indexed = BRIDGE_NONE } };
-    bridge_setting cache = { .key = "cache", .kind = BRIDGE_STRING, .v = { .s = "somewhere" } };
-    bridge_artifact a;
-    bridge *b;
+    bridge_setting_t cache = { .key = "cache", .kind = BRIDGE_STRING, .v = { .s = "somewhere" } };
+    bridge_artifact_t a;
+    bridge_t *b;
     int i;
     setvbuf(stdout, nullptr, _IONBF, 0);
 

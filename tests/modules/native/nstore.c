@@ -39,7 +39,7 @@ static uint32_t a, b;
 static uint64_t ids[COUNT];
 
 
-[[maybe_unused]] static void say(const bridge_api *api, const char *text, uint32_t x, uint32_t y)
+[[maybe_unused]] static void say(const bridge_api_t *api, const char *text, uint32_t x, uint32_t y)
 {
     bridge_native_log(api, BRIDGE_LOG_INFO, text, (uint32_t)strlen(text), x, y);
 }
@@ -84,7 +84,7 @@ BRIDGE_NATIVE(combine)
 
 BRIDGE_NATIVE(see)
 {
-    const bridge_query *q = bridge_native_query(api, seeing);
+    const bridge_query_t *q = bridge_native_query(api, seeing);
     uint32_t rows = 0;
     for (uint32_t s = 0; s < q->spans; s ++) rows += bridge_native_span(api, q, s, 1)[0];
     say(api, "the first kind: spans, rows", q->spans, rows);
@@ -106,10 +106,10 @@ static uint32_t which(uint64_t id)
     return 999;     /* one destroyed longer ago, or never this module's */
 }
 
-static bool alive(const bridge_api *api, uint64_t id)
+static bool alive(const bridge_api_t *api, uint64_t id)
 {
-    const bridge_header *h = bridge_native_header(api);
-    auto index = (const bridge_entity *)(api->shared_base + h->entity_index);
+    const bridge_header_t *h = bridge_native_header(api);
+    auto index = (const bridge_entity_t *)(api->shared_base + h->entity_index);
     return (uint32_t)id < h->entities && index[(uint32_t)id].generation == (uint32_t)(id >> 32);
 }
 
@@ -190,7 +190,7 @@ BRIDGE_NATIVE(attach_a_half) { for (uint32_t i = COUNT / 2; i < COUNT; i ++) api
 
 BRIDGE_NATIVE(look)
 {
-    const bridge_query *q = bridge_native_query(api, with_a);
+    const bridge_query_t *q = bridge_native_query(api, with_a);
     uint32_t rows = 0, empty = 0, s;
     for (s = 0; s < q->spans; s ++) {
         const uint32_t *span = bridge_native_span(api, q, s, 1);
@@ -232,10 +232,10 @@ BRIDGE_NATIVE(look)
  * on it. */
 BRIDGE_NATIVE(scribble)
 {
-    const bridge_header *h = bridge_native_header(api);
-    auto index = (bridge_entity *)(api->shared_base + h->entity_index);
-    const bridge_query *q = bridge_native_query(api, with_a);
-    bridge_entity first = index[(uint32_t)ids[0]];
+    const bridge_header_t *h = bridge_native_header(api);
+    auto index = (bridge_entity_t *)(api->shared_base + h->entity_index);
+    const bridge_query_t *q = bridge_native_query(api, with_a);
+    bridge_entity_t first = index[(uint32_t)ids[0]];
     for (uint32_t i = 0; i < COUNT; i ++) index[(uint32_t)ids[i]] = first;
     for (uint32_t s = 0; s < q->spans; s ++) {
         const uint32_t *span = bridge_native_span(api, q, s, 1);
@@ -248,13 +248,13 @@ BRIDGE_NATIVE(scribble)
 /* each entity that is left, by its own id: where the index says it is, and what is there */
 BRIDGE_NATIVE(find)
 {
-    const bridge_header *h = bridge_native_header(api);
-    auto index = (const bridge_entity *)(api->shared_base + h->entity_index);
+    const bridge_header_t *h = bridge_native_header(api);
+    auto index = (const bridge_entity_t *)(api->shared_base + h->entity_index);
     auto base = (const uint32_t *)(api->private_base + h->column_base);
     uint32_t found = 0, named = 0;
     for (uint32_t i = 0; i < COUNT; i ++) {
-        const bridge_entity *e = &index[(uint32_t)ids[i]];
-        const bridge_query *q = bridge_native_query(api, with_a);
+        const bridge_entity_t *e = &index[(uint32_t)ids[i]];
+        const bridge_query_t *q = bridge_native_query(api, with_a);
         if (e->generation != (uint32_t)(ids[i] >> 32)) continue;
         found += base[e->table * h->types + a] != 0;
         for (uint32_t s = 0; s < q->spans; s ++) {
@@ -280,7 +280,7 @@ BRIDGE_NATIVE(value_b)
 
 BRIDGE_NATIVE(look_b)
 {
-    const bridge_query *q = bridge_native_query(api, with_b);
+    const bridge_query_t *q = bridge_native_query(api, with_b);
     uint32_t rows = 0, sum = 0;
     for (uint32_t s = 0; s < q->spans; s ++) {
         const uint32_t *span = bridge_native_span(api, q, s, 1);
@@ -297,10 +297,10 @@ BRIDGE_NATIVE(look_b)
 
 static uint32_t on_a, on_b, on_both, on_alone;
 
-static int heard(const bridge_api *api, const char *what, uint32_t observer)
+static int heard(const bridge_api_t *api, const char *what, uint32_t observer)
 {
-    const bridge_list *list = bridge_native_list(api, observer);
-    auto t = (const bridge_trigger *)(api->private_base + list->at);
+    const bridge_list_t *list = bridge_native_list(api, observer);
+    auto t = (const bridge_trigger_t *)(api->private_base + list->at);
     for (uint32_t i = 0; i < list->count; i ++) say(api, what, which(t[i].id), t[i].events);
     return 0;
 }
@@ -329,7 +329,7 @@ BRIDGE_NATIVE(init)
         "st:T0", "st:T1", "st:T2", "st:T3", "st:T4", "st:T5", "st:T6",
         "st:T7", "st:T8", "st:T9", "st:T10", "st:T11", "st:T12", "st:T13"
     };
-    bridge_term first[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
+    bridge_term_t first[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     for (uint32_t k = 0; k < KINDS; k ++) {
         kinds[k] = api->declare(api, bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
             (uint32_t)strlen(names[k]), BRIDGE_STRUCT, sizeof(T), alignof(T),
@@ -340,8 +340,8 @@ BRIDGE_NATIVE(init)
     seeing = BRIDGE_NATIVE_SYSTEM(api, "see", "look", first, 1, nullptr, 0);
 #endif
 #if !defined(BIG) && !defined(TABLES)
-    bridge_term one[1] = {{ a, BRIDGE_READ, BRIDGE_AND, 0 }};
-    bridge_term two[2] = {{ a, BRIDGE_READ, BRIDGE_AND, 0 }, { b, BRIDGE_READ, BRIDGE_NOT, 0 }};
+    bridge_term_t one[1] = {{ a, BRIDGE_READ, BRIDGE_AND, 0 }};
+    bridge_term_t two[2] = {{ a, BRIDGE_READ, BRIDGE_AND, 0 }, { b, BRIDGE_READ, BRIDGE_NOT, 0 }};
     BRIDGE_NATIVE_SYSTEM(api, "attach_b_half", "attach_b_half", &none, 0, &b, 1);
     BRIDGE_NATIVE_SYSTEM(api, "detach_b_half", "detach_b_half", &none, 0, &b, 1);
     BRIDGE_NATIVE_SYSTEM(api, "detach_b_absent", "detach_b_absent", &none, 0, &b, 1);

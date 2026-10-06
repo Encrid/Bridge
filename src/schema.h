@@ -22,34 +22,34 @@ typedef struct {
     enum schema_kind kind;
     void            *type;      /* the declared type an enum, a bitmask or a struct field names:
                                  * whatever `find` answered for it */
-} schema_field;
+} schema_field_t;
 
 /* a type declared before this one, in the same namespace, as a field may name it */
 typedef struct {
     enum bridge_kind kind;
     uint32_t         size, align;
     void            *type;
-} schema_named;
+} schema_named_t;
 
 /* false if the namespace has declared nothing of that name */
-typedef bool (*schema_find)(void *ctx, const char *name, schema_named *named);
+typedef bool (*schema_find_t)(void *ctx, const char *name, schema_named_t *named);
 
 /* a bitmask of 64 bits has a constant past INT64_MAX: its bits are kept, as they are */
-typedef struct { char *name; int64_t value; } schema_constant;
+typedef struct { char *name; int64_t value; } schema_constant_t;
 
 typedef struct {
     uint32_t         size, align;
     enum schema_kind base;              /* the integer an enum or a bitmask is: its author's */
-    schema_field    *fields;            /* a struct's, in the order it states them */
+    schema_field_t    *fields;            /* a struct's, in the order it states them */
     uint32_t         field_count;
-    schema_constant *constants;         /* an enum's or a bitmask's */
+    schema_constant_t *constants;         /* an enum's or a bitmask's */
     uint32_t         constant_count;
-} schema;
+} schema_t;
 
 /* 0 and `out`, or 1 and `why`: what the text says that a descriptor may not, as the rest of a
  * sentence that begins "its descriptor". Nothing is left allocated when it is refused. */
-[[nodiscard]] int schema_parse(enum bridge_kind kind, const char *text, schema_find find, void *ctx,
-                               schema *out, char *why, size_t why_len);
-void schema_free(schema *s);
+[[nodiscard]] int schema_parse(enum bridge_kind kind, const char *text, schema_find_t find, void *ctx,
+                               schema_t *out, char *why, size_t why_len);
+void schema_free(schema_t *s);
 
 #endif

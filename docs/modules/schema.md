@@ -56,7 +56,7 @@ is accepted:
     a struct      { field field ... }
     a field       type name ;   or   type name [ count ] ;
     a type        bool char int8_t int16_t int32_t int64_t uint8_t uint16_t uint32_t
-                  uint64_t float double bridge_text, or a type its namespace declared
+                  uint64_t float double bridge_text_t, or a type its namespace declared
     an enum       integer { name , name = integer , ... }   counted from zero, or from
                                                             the last
     a bitmask     unsigned { name = integer , ... }         every bit stated
@@ -95,11 +95,11 @@ the column.
 are declared, so each has a fingerprint of its own, checked where it is declared: a module built
 against an older `Vec3` is refused at `Vec3`, before `Body`.
 
-**One type is given and not declared: `bridge_text`**, the `(offset, length)` pair of
+**One type is given and not declared: `bridge_text_t`**, the `(offset, length)` pair of
 `strings.md`, *Variable length*. It is an ABI layout of `bridge-abi.h` and a field may be of it under any
 namespace. It exists so that text can be told from two integers: by a deployment's settings -
 `config.md`, *A module's own settings are a component* - and by an unload, which gives a module's
-share of the arena back only if no `bridge_text` left in any row lies in it - `strings.md`, *It is
+share of the arena back only if no `bridge_text_t` left in any row lies in it - `strings.md`, *It is
 given back when nothing points into it*. It is no component: nothing carries it but a field.
 
 **Rejected: pointer-sized or pointer-holding.** A pointer, `size_t`, `intptr_t`. A wasm32 pointer

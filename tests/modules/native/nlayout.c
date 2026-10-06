@@ -63,7 +63,7 @@ BRIDGE_SCHEMA_STRUCT(X, { uint32_t a; uint16_t b; uint8_t arr[4]; Vec at; Mode m
 
 static uint32_t x, reading;
 
-static void say(const bridge_api *api, const char *text, uint32_t first, uint32_t second)
+static void say(const bridge_api_t *api, const char *text, uint32_t first, uint32_t second)
 {
     bridge_native_log(api, BRIDGE_LOG_INFO, text, (uint32_t)strlen(text), first, second);
 }
@@ -84,7 +84,7 @@ BRIDGE_NATIVE(spawn) { return 0; }
 #endif
 
 /* the values of X there are, however this build keeps it: how many, up to `room` */
-static uint32_t values(const bridge_api *api, const X **out, uint32_t room)
+static uint32_t values(const bridge_api_t *api, const X **out, uint32_t room)
 {
     uint32_t n = 0;
 #if KEPT == 4
@@ -97,7 +97,7 @@ static uint32_t values(const bridge_api *api, const X **out, uint32_t room)
     const X *value = bridge_native_single(api, x);
     if (value && room) out[n ++] = value;
 #else
-    const bridge_query *q = bridge_native_query(api, reading);
+    const bridge_query_t *q = bridge_native_query(api, reading);
     for (uint32_t i = 0; i < q->spans; i ++) {
         const uint32_t *span = bridge_native_span(api, q, i, 1);
         for (uint32_t r = 0; r < span[0] && n < room; r ++) {
@@ -141,7 +141,7 @@ BRIDGE_NATIVE(look)
 BRIDGE_NATIVE(init)
 {
     int none = 0;
-    bridge_term one[1] = {{ 0, BRIDGE_READ, KEPT >= 4 ? BRIDGE_OPTIONAL : BRIDGE_AND, 0 }};
+    bridge_term_t one[1] = {{ 0, BRIDGE_READ, KEPT >= 4 ? BRIDGE_OPTIONAL : BRIDGE_AND, 0 }};
     BRIDGE_NATIVE_DECLARE(api, BRIDGE_ENUM, "st:Mode", Mode, BRIDGE_STRIP, BRIDGE_TABLE);
 #if V == 13
     BRIDGE_NATIVE_DECLARE_TAG(api, "st:Vec", BRIDGE_STRIP, BRIDGE_TABLE);

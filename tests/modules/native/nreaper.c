@@ -8,7 +8,7 @@ static uint32_t position, reaping;
 
 BRIDGE_NATIVE(reap)
 {
-    const bridge_query *q = bridge_native_query(api, reaping);
+    const bridge_query_t *q = bridge_native_query(api, reaping);
     uint32_t rows = 0;
     for (uint32_t s = 0; s < q->spans; s ++) {
         const uint32_t *span = bridge_native_span(api, q, s, 1);
@@ -23,7 +23,7 @@ BRIDGE_NATIVE(reap)
 BRIDGE_NATIVE(init)
 {
     position = BRIDGE_NATIVE_COMPONENT(api, "game:Position", Position, BRIDGE_DELETE, BRIDGE_TABLE);
-    bridge_term terms[1] = {{ position, BRIDGE_READ, BRIDGE_AND, 0 }};
+    bridge_term_t terms[1] = {{ position, BRIDGE_READ, BRIDGE_AND, 0 }};
     reaping = BRIDGE_NATIVE_SYSTEM(api, "reap", "update", terms, 1, nullptr, 0);
     return 0;
 }

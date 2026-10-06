@@ -20,14 +20,14 @@ extern "C" {
 #define BACKEND_EXPORT [[gnu::visibility("default")]]
 #endif
 
-typedef struct backend          backend;
-typedef struct backend_memory   backend_memory;
-typedef struct backend_module   backend_module;
-typedef struct backend_instance backend_instance;
-typedef struct backend_func     backend_func;
+typedef struct backend          backend_t;
+typedef struct backend_memory   backend_memory_t;
+typedef struct backend_module   backend_module_t;
+typedef struct backend_instance backend_instance_t;
+typedef struct backend_func     backend_func_t;
 
 /* Why an entry failed. The caller owns the buffer, so there is no lifetime to get wrong. */
-typedef struct { char text[256]; } backend_err;
+typedef struct { char text[256]; } backend_err_t;
 
 /* What a backend can actually do - capabilities.md. */
 enum backend_capability : uint32_t {
@@ -48,7 +48,7 @@ enum backend_capability : uint32_t {
 /* A setting is the backend's own: Bridge-ASM700 passes each through unread. A backend refuses a
  * key it does not know, by name, as Bridge-ASM700 refuses one of its own it does not.
  *
- * It is the host seam's bridge_setting again, on purpose: a seam's header is whole without the
+ * It is the host seam's bridge_setting_t again, on purpose: a seam's header is whole without the
  * other's. Bridge-ASM700 holds the two to one shape, where it copies one to the other. */
 enum backend_setting_kind : uint8_t {
     BACKEND_BOOL = 1, BACKEND_INT = 2, BACKEND_FLOAT = 3, BACKEND_STRING = 4
@@ -58,26 +58,26 @@ typedef struct {
     enum backend_setting_kind kind;
     uint8_t pad[7];
     union { bool b; int64_t i; double f; const char *s; } v;
-} backend_setting;
+} backend_setting_t;
 static_assert(sizeof(void *) == 8 && sizeof(size_t) == 8);
-static_assert(sizeof(backend_setting) == 24 && alignof(backend_setting) == 8);
-static_assert(offsetof(backend_setting, key) == 0 && offsetof(backend_setting, kind) == 8);
-static_assert(offsetof(backend_setting, pad) == 9 && offsetof(backend_setting, v) == 16);
+static_assert(sizeof(backend_setting_t) == 24 && alignof(backend_setting_t) == 8);
+static_assert(offsetof(backend_setting_t, key) == 0 && offsetof(backend_setting_t, kind) == 8);
+static_assert(offsetof(backend_setting_t, pad) == 9 && offsetof(backend_setting_t, v) == 16);
 
 /* A signature is declared going in and checked coming out - signatures.md. */
 enum backend_type : uint8_t { BACKEND_I32 = 1, BACKEND_I64 = 2 };
 typedef struct {
     const enum backend_type *params;  uint32_t param_count;  uint32_t pad0;
     const enum backend_type *results; uint32_t result_count; uint32_t pad1;
-} backend_sig;
-static_assert(sizeof(backend_sig) == 32 && alignof(backend_sig) == 8);
-static_assert(offsetof(backend_sig, params) == 0 && offsetof(backend_sig, param_count) == 8);
-static_assert(offsetof(backend_sig, pad0) == 12 && offsetof(backend_sig, results) == 16);
-static_assert(offsetof(backend_sig, result_count) == 24 && offsetof(backend_sig, pad1) == 28);
+} backend_sig_t;
+static_assert(sizeof(backend_sig_t) == 32 && alignof(backend_sig_t) == 8);
+static_assert(offsetof(backend_sig_t, params) == 0 && offsetof(backend_sig_t, param_count) == 8);
+static_assert(offsetof(backend_sig_t, pad0) == 12 && offsetof(backend_sig_t, results) == 16);
+static_assert(offsetof(backend_sig_t, result_count) == 24 && offsetof(backend_sig_t, pad1) == 28);
 
 /* A function Bridge-ASM700 provides to a module. Every value travels as 64 bits. Non-zero says
  * the call that reached it must not go on: a backend that can unwind a module does so there. */
-typedef int (*backend_fn)(void *ud, const uint64_t *args, uint64_t *results);
+typedef int (*backend_fn_t)(void *ud, const uint64_t *args, uint64_t *results);
 
 enum backend_import_kind : uint8_t {
     BACKEND_IMPORT_FUNC = 1, BACKEND_IMPORT_MEMORY = 2, BACKEND_IMPORT_OTHER = 3
@@ -87,20 +87,20 @@ typedef struct {
     const char *field; size_t field_len;
     enum backend_import_kind kind;
     uint8_t pad[7];
-} backend_import;
-static_assert(sizeof(backend_import) == 40 && alignof(backend_import) == 8);
-static_assert(offsetof(backend_import, ns) == 0 && offsetof(backend_import, ns_len) == 8);
-static_assert(offsetof(backend_import, field) == 16 && offsetof(backend_import, field_len) == 24);
-static_assert(offsetof(backend_import, kind) == 32 && offsetof(backend_import, pad) == 33);
+} backend_import_t;
+static_assert(sizeof(backend_import_t) == 40 && alignof(backend_import_t) == 8);
+static_assert(offsetof(backend_import_t, ns) == 0 && offsetof(backend_import_t, ns_len) == 8);
+static_assert(offsetof(backend_import_t, field) == 16 && offsetof(backend_import_t, field_len) == 24);
+static_assert(offsetof(backend_import_t, kind) == 32 && offsetof(backend_import_t, pad) == 33);
 
 /* Which adopted memory answers which of a module's imports. */
 typedef struct {
     const char     *ns, *field;
-    backend_memory *memory;
-} backend_memory_import;
-static_assert(sizeof(backend_memory_import) == 24 && alignof(backend_memory_import) == 8);
-static_assert(offsetof(backend_memory_import, ns) == 0 && offsetof(backend_memory_import, field) == 8);
-static_assert(offsetof(backend_memory_import, memory) == 16);
+    backend_memory_t *memory;
+} backend_memory_import_t;
+static_assert(sizeof(backend_memory_import_t) == 24 && alignof(backend_memory_import_t) == 8);
+static_assert(offsetof(backend_memory_import_t, ns) == 0 && offsetof(backend_memory_import_t, field) == 8);
+static_assert(offsetof(backend_memory_import_t, memory) == 16);
 
 /* The backend seam's number: what this header says. A backend answers the one it was built
  * against, and Bridge-ASM700 refuses a library that answers another, before it asks it for
@@ -109,46 +109,46 @@ constexpr uint32_t BACKEND_ABI = 1;
 
 typedef struct backend_api {
     uint32_t (*backend_abi)(void);          /* BACKEND_ABI. first, and always first */
-    backend *(*backend_create)(const backend_setting *settings, uint32_t count, backend_err *err);
-    void     (*backend_destroy)(backend *b);
-    enum backend_capability (*backend_capabilities)(backend *b);
+    backend_t *(*backend_create)(const backend_setting_t *settings, uint32_t count, backend_err_t *err);
+    void     (*backend_destroy)(backend_t *b);
+    enum backend_capability (*backend_capabilities)(backend_t *b);
 
     /* What this backend needs of a block it maps. The address space around it: `reservation`
      * bytes from its start, then `guard` bytes nothing is mapped into. And its length: a
      * whole number of `granule` bytes. Zero for any it does not need. */
-    void            (*memory_shape)(backend *b, uint64_t *reservation, uint64_t *guard,
+    void            (*memory_shape)(backend_t *b, uint64_t *reservation, uint64_t *guard,
                                     uint64_t *granule);
-    backend_memory *(*memory_adopt)(backend *b, void *ptr, uint64_t len, backend_err *err);
+    backend_memory_t *(*memory_adopt)(backend_t *b, void *ptr, uint64_t len, backend_err_t *err);
     /* After the last instance the memory was handed to is destroyed, never before. */
-    void            (*memory_release)(backend_memory *m);
+    void            (*memory_release)(backend_memory_t *m);
 
     /* `demands` is the capability flags this module's config asks for: a backend need not
      * compile in a guarantee nobody demanded, and may never enforce less than was. */
-    backend_module *(*module_compile)(backend *b, const void *bytes, size_t len,
+    backend_module_t *(*module_compile)(backend_t *b, const void *bytes, size_t len,
                                       const char *path, enum backend_capability demands,
-                                      backend_err *err);
-    uint32_t        (*module_imports)(backend_module *m, backend_import *out, uint32_t max);
-    void            (*module_destroy)(backend_module *m);
+                                      backend_err_t *err);
+    uint32_t        (*module_imports)(backend_module_t *m, backend_import_t *out, uint32_t max);
+    void            (*module_destroy)(backend_module_t *m);
 
-    backend_instance *(*instance_create)(backend *b, backend_module *m,
-                                         const backend_memory_import *memories, uint32_t count,
-                                         backend_err *err);
-    void (*instance_destroy)(backend_instance *i);
-    void (*instance_set_work_limit)(backend_instance *i, uint64_t units);
-    void (*instance_set_timeout)(backend_instance *i, uint64_t nanos);     /* the next call only */
-    void (*instance_set_memory_limit)(backend_instance *i, uint64_t bytes);
+    backend_instance_t *(*instance_create)(backend_t *b, backend_module_t *m,
+                                         const backend_memory_import_t *memories, uint32_t count,
+                                         backend_err_t *err);
+    void (*instance_destroy)(backend_instance_t *i);
+    void (*instance_set_work_limit)(backend_instance_t *i, uint64_t units);
+    void (*instance_set_timeout)(backend_instance_t *i, uint64_t nanos);     /* the next call only */
+    void (*instance_set_memory_limit)(backend_instance_t *i, uint64_t bytes);
 
-    int (*define_func)(backend_instance *i, const char *ns, const char *field,
-                       backend_fn fn, void *ud, const backend_sig *sig, backend_err *err);
+    int (*define_func)(backend_instance_t *i, const char *ns, const char *field,
+                       backend_fn_t fn, void *ud, const backend_sig_t *sig, backend_err_t *err);
     /* An export that `call` can run: one that takes nothing of Bridge-ASM700's and answers a
      * status. nullptr, and why, if there is none of that name, or if the backend can see that
      * its shape is another. */
-    backend_func *(*instance_func)(backend_instance *i, const char *name, backend_err *err);
+    backend_func_t *(*instance_func)(backend_instance_t *i, const char *name, backend_err_t *err);
     /* 0 if the function returned, and then `status` is what it returned. */
-    int (*call)(backend_func *f, int32_t *status, backend_err *err);
-} backend_api;
+    int (*call)(backend_func_t *f, int32_t *status, backend_err_t *err);
+} backend_api_t;
 
-/* The names a backend exports, in the order of backend_api's members. */
+/* The names a backend exports, in the order of backend_api_t's members. */
 #define BACKEND_ENTRIES \
     "backend_abi", "backend_create", "backend_destroy", "backend_capabilities", \
     "memory_shape", "memory_adopt", "memory_release", \
@@ -157,7 +157,7 @@ typedef struct backend_api {
     "instance_set_work_limit", "instance_set_timeout", "instance_set_memory_limit", \
     "define_func", "instance_func", "call"
 constexpr uint32_t BACKEND_ENTRY_COUNT = 18;
-static_assert(sizeof(backend_api) == BACKEND_ENTRY_COUNT * sizeof(void (*)()));
+static_assert(sizeof(backend_api_t) == BACKEND_ENTRY_COUNT * sizeof(void (*)()));
 
 #ifdef __cplusplus
 }

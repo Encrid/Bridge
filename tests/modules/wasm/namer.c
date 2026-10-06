@@ -5,7 +5,7 @@
  * keeps nothing of its own. For a string that outlives the module that wrote it. */
 #include "bridge-wasm.h"
 
-BRIDGE_SCHEMA_STRUCT(Name, { bridge_text text; });
+BRIDGE_SCHEMA_STRUCT(Name, { bridge_text_t text; });
 
 static uint32_t name, saying;
 
@@ -26,7 +26,7 @@ BRIDGE_EXPORT(say) int say()
 BRIDGE_EXPORT(init) int init()
 {
     [[maybe_unused]] static const char hello[] = "kept in the arena";
-    bridge_term terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
+    bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     [[maybe_unused]] Name n = {{ 0, sizeof hello - 1 }};
     name = BRIDGE_COMPONENT("game:Name", Name, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = name;

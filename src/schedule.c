@@ -10,10 +10,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct { uint64_t *bits; uint32_t n, words; } matrix;
+typedef struct { uint64_t *bits; uint32_t n, words; } matrix_t;
 
 /* false if there was not the memory for it */
-static bool matrix_init(matrix *m, uint32_t n)
+static bool matrix_init(matrix_t *m, uint32_t n)
 {
     m->n = n;
     m->words = (n + 63) / 64;
@@ -21,18 +21,18 @@ static bool matrix_init(matrix *m, uint32_t n)
     return m->bits != nullptr;
 }
 
-static int reaches(const matrix *m, uint32_t i, uint32_t j)
+static int reaches(const matrix_t *m, uint32_t i, uint32_t j)
 {
     return (int)(m->bits[(size_t)i * m->words + j / 64] >> (j % 64) & 1);
 }
 
-static void edge(matrix *m, uint32_t i, uint32_t j)
+static void edge(matrix_t *m, uint32_t i, uint32_t j)
 {
     m->bits[(size_t)i * m->words + j / 64] |= (uint64_t)1 << (j % 64);
 }
 
 /* Warshall: whatever reaches k reaches all that k does */
-static void close_over(matrix *m)
+static void close_over(matrix_t *m)
 {
     uint32_t i, k, w;
     for (k = 0; k < m->n; k ++) {
@@ -47,10 +47,10 @@ static void close_over(matrix *m)
 
 /* The pairs a deployment states. A pair need not name anything loaded; what is refused here
  * is a pair that says nothing, and pairs that contradict each other. */
-int schedule_order(bridge *b, const bridge_order *order, uint32_t count)
+int schedule_order(bridge_t *b, const bridge_order_t *order, uint32_t count)
 {
     const char **names = calloc(count ? count * 2 : 1, sizeof *names);
-    matrix reach;
+    matrix_t reach;
     uint32_t n = 0, i, k, refused = 0;
 
     b->before = calloc(count ? count : 1, sizeof *b->before);
@@ -95,7 +95,7 @@ int schedule_order(bridge *b, const bridge_order *order, uint32_t count)
 
 /* the component both touch with one of them writing it, or that both attach or detach, or
  * nullptr. `changing` says which */
-static const char *conflict(const bridge_system *a, const bridge_system *b, bool *changing)
+static const char *conflict(const bridge_system_t *a, const bridge_system_t *b, bool *changing)
 {
     uint32_t i, j;
     *changing = true;
@@ -117,17 +117,17 @@ static const char *conflict(const bridge_system *a, const bridge_system *b, bool
 }
 
 /* Every phase, and the barrier after them as one more: edges, the refusal, then levels. */
-int schedule_build(bridge *b, char *why, size_t why_len)
+int schedule_build(bridge_t *b, char *why, size_t why_len)
 {
     /* in room made at create, [budget] systems wide: schedule_room */
-    auto in = (bridge_system **)b->build_in;
+    auto in = (bridge_system_t **)b->build_in;
     uint32_t phase, i, j, k, refused = 0;
     bool changing;
 
     for (phase = 0; phase <= b->phase_count && !refused; phase ++) {
         const char *where = phase < b->phase_count ? b->phases[phase] : nullptr;
         uint32_t n = 0;
-        matrix reach;
+        matrix_t reach;
         for (i = 0; i < b->system_count; i ++) {
             if (b->systems[i]->phase == phase && !b->systems[i]->parked) in[n ++] = b->systems[i];
         }
@@ -188,22 +188,22 @@ int schedule_build(bridge *b, char *why, size_t why_len)
 /* ---- running: a level at a time, one job per module ---- */
 
 typedef struct {
-    module         *m;
-    bridge_system **list;
+    module_t         *m;
+    bridge_system_t **list;
     uint32_t        count;
-} job;
+} job_t;
 
 /* A module's systems of one level, in the order it registered them, on one thread. */
 static void run_job(void *arg)
 {
-    job *j = arg;
-    module *m = j->m;
-    auto h = (bridge_header *)m->priv;
+    job_t *j = arg;
+    module_t *m = j->m;
+    auto h = (bridge_header_t *)m->priv;
     uint32_t i;
     for (i = 0; i < j->count; i ++) {
-        bridge_system *s = j->list[i];
-        bridge_system **slots = s->observer ? m->observers : m->systems;
-        backend_err err = {};
+        bridge_system_t *s = j->list[i];
+        bridge_system_t **slots = s->observer ? m->observers : m->systems;
+        backend_err_t err = {};
         int32_t status = 0;
         uint32_t slot = 0;
         while (slots[slot] != s) slot ++;
@@ -229,10 +229,10 @@ static void run_job(void *arg)
 }
 
 /* budgets.md, *Nothing is allocated in a phase*: what a dispatch works in, once. */
-int schedule_room(bridge *b)
+int schedule_room(bridge_t *b)
 {
     uint32_t n = b->max_systems ? b->max_systems : 1;
-    b->run_jobs = calloc(n, sizeof(job));
+    b->run_jobs = calloc(n, sizeof(job_t));
     b->run_handed = calloc(n, sizeof *b->run_handed);
     b->run_lists = calloc(n, sizeof *b->run_lists);
     b->run_callers = calloc(n, 1);
@@ -242,13 +242,13 @@ int schedule_room(bridge *b)
         && b->build_in && b->build_bits ? b : nullptr, "what a dispatch and a schedule are worked out in");
 }
 
-void schedule_run(bridge *b, uint32_t phase)
+void schedule_run(bridge_t *b, uint32_t phase)
 {
     uint32_t n = b->system_count, level, levels = 0, i, k, ordinal = 0;
-    job *jobs = b->run_jobs;
+    job_t *jobs = b->run_jobs;
     void **handed = b->run_handed;
     uint8_t *callers = b->run_callers;
-    auto lists = (bridge_system **)b->run_lists;
+    auto lists = (bridge_system_t **)b->run_lists;
     if (!n) return;
     for (i = 0; i < n; i ++) {
         if (b->systems[i]->phase == phase && b->systems[i]->level >= levels) {
@@ -261,8 +261,8 @@ void schedule_run(bridge *b, uint32_t phase)
         uint32_t count = 0, listed = 0;
         /* a module's systems are gathered together, so that its job's list is one run */
         for (i = 0; i < n; i ++) {
-            bridge_system *first = b->systems[i];
-            job *j;
+            bridge_system_t *first = b->systems[i];
+            job_t *j;
             for (k = 0; k < count && jobs[k].m != first->m; k ++) {}
             if (k < count) continue;
             j = &jobs[count];
@@ -270,7 +270,7 @@ void schedule_run(bridge *b, uint32_t phase)
             j->list = &lists[listed];
             j->count = 0;
             for (k = i; k < n; k ++) {
-                bridge_system *s = b->systems[k];
+                bridge_system_t *s = b->systems[k];
                 if (s->m != j->m || s->phase != phase || s->level != level || s->m->stopped
                     || s->parked || (s->observer && !s->pending_count)) continue;
                 /* threads.md: an observer ran at the last barrier, before anything since */
@@ -290,7 +290,7 @@ void schedule_run(bridge *b, uint32_t phase)
          * only ever called on the thread that asked for the phase */
         for (k = 0; k < count; k ++) {
             for (i = 0; i < jobs[k].count; i ++) {
-                bridge_system *s = jobs[k].list[i];
+                bridge_system_t *s = jobs[k].list[i];
                 /* failure.md, *The budget*: counted a system at a time, so that one that
                  * always fails is not forgiven by another of its module's that never does */
                 if (!s->failed) {
@@ -312,11 +312,11 @@ void schedule_run(bridge *b, uint32_t phase)
  * reached its number, or after it did itself, by entities it changed that could not be
  * placed. Counted in invocations and in barriers and never in time, so that the same history
  * stops the same module at the same place every run. */
-void schedule_account(bridge *b)
+void schedule_account(bridge_t *b)
 {
-    module *m;
+    module_t *m;
     for (m = b->modules; m; m = m->next) {
-        const bridge_system *s = m->reached;
+        const bridge_system_t *s = m->reached;
         if (m->unplaced_now) m->failures ++;
         else if (m->changed_now && m->failures) m->failures --;
         m->changed_now = m->unplaced_now = 0;

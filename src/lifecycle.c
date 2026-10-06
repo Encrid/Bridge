@@ -34,14 +34,14 @@ static void free_list_of(char **list, uint32_t count)
 
 /* A component's record goes: what storage knows of it, and its hold on the types its fields
  * name, which go with it when nothing else declares or names them. */
-static void type_delete(bridge *b, declared_type *c)
+static void type_delete(bridge_t *b, declared_type_t *c)
 {
     uint32_t k;
     storage_undeclare(b->storage, c->type);
     for (k = 0; b->types[k] != c; k ++) {}
     b->types[k] = b->types[-- b->type_count];
     for (k = 0; k < c->dep_count; k ++) {
-        declared_type *named = c->deps[k];
+        declared_type_t *named = c->deps[k];
         if (!-- named->users && !named->declarers) type_delete(b, named);
     }
     schema_free(&c->s);
@@ -54,7 +54,7 @@ static void type_delete(bridge *b, declared_type *c)
 
 /* A module stops declaring `c`. Shared, it stays; the last to leave applies its own policy.
  * Policy zero is a load that failed: nothing can carry what was never applied. */
-static void type_release(bridge *b, declared_type *c, enum bridge_on_unload policy)
+static void type_release(bridge_t *b, declared_type_t *c, enum bridge_on_unload policy)
 {
     if (-- c->declarers) return;
     if (policy) storage_drop(b->storage, c->type, policy);
@@ -65,11 +65,11 @@ static void type_release(bridge *b, declared_type *c, enum bridge_on_unload poli
 
 /* ---- a module's record ---- */
 
-static void drop_systems(bridge *b, module *m)
+static void drop_systems(bridge_t *b, module_t *m)
 {
     uint32_t i, kept = 0;
     for (i = 0; i < b->system_count; i ++) {
-        bridge_system *s = b->systems[i];
+        bridge_system_t *s = b->systems[i];
         if (s->m != m) {
             b->systems[kept ++] = s;
             continue;
@@ -88,7 +88,7 @@ static void drop_systems(bridge *b, module *m)
 
 /* Its systems, its instance, its image, its private memory, and the record. The order is the
  * backend seam's: a memory is released after the last instance it was handed to. */
-void module_discard(bridge *b, module *m)
+void module_discard(bridge_t *b, module_t *m)
 {
     drop_systems(b, m);
     if (m->instance) m->on->api.instance_destroy(m->instance);
@@ -119,7 +119,7 @@ void module_discard(bridge *b, module *m)
 /* A load that failed leaves storage as it was: the ids set aside for it, the row its settings
  * were on, what it took of the arena, and every component nobody else declared. What it
  * queued goes with its queue. */
-static void undo(bridge *b, module *m)
+static void undo(bridge_t *b, module_t *m)
 {
     uint32_t i;
     drop_systems(b, m);         /* first: a query must not outlive a component it names */
@@ -140,7 +140,7 @@ static void undo(bridge *b, module *m)
 /* ---- what can be decided from a config alone ---- */
 
 /* A key whose zero means nobody stated it - config.md, *No unaccountable values*. */
-static int unset(bridge *b, const char *identity, const char *key, int64_t value)
+static int unset(bridge_t *b, const char *identity, const char *key, int64_t value)
 {
     if (value) return 0;
     say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: %s is unset", identity, key);
@@ -149,7 +149,7 @@ static int unset(bridge *b, const char *identity, const char *key, int64_t value
 
 /* A key that has a "none" has one, and a negative number that is not it is nobody's:
  * config.md, *No unaccountable values*. `none` is BRIDGE_NO_LIMIT or BRIDGE_NONE. */
-static int neither(bridge *b, const char *identity, const char *key, int64_t value, int64_t none)
+static int neither(bridge_t *b, const char *identity, const char *key, int64_t value, int64_t none)
 {
     if (value > 0 || value == none) return 0;
     say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: %s is %lld, which is neither %s",
@@ -159,7 +159,7 @@ static int neither(bridge *b, const char *identity, const char *key, int64_t val
 }
 
 /* A key that is yes or no is stated as either: config.md, *No unaccountable values*. */
-static int unflagged(bridge *b, const char *identity, const char *key, enum bridge_flag value)
+static int unflagged(bridge_t *b, const char *identity, const char *key, enum bridge_flag value)
 {
     if (value == BRIDGE_TRUE || value == BRIDGE_FALSE) return 0;
     if (value == BRIDGE_UNSET) {
@@ -172,7 +172,7 @@ static int unflagged(bridge *b, const char *identity, const char *key, enum brid
 }
 
 /* A stated limit demands that the backend can enforce it - capabilities.md. */
-static int lacks(bridge *b, const char *identity, open_backend *o, uint32_t flag, const char *key)
+static int lacks(bridge_t *b, const char *identity, open_backend_t *o, uint32_t flag, const char *key)
 {
     if (o->capabilities & flag) return 0;
     /* a guarantee has one name, for the key that asks it and the capability that answers */
@@ -185,7 +185,7 @@ static int lacks(bridge *b, const char *identity, open_backend *o, uint32_t flag
 /* Where a module's regions sit in its private memory: the header, then scratch, the log ring
  * and the spans, each at a multiple of 8. 1 if what it stated cannot be laid out in 32 bits,
  * which is what every offset into that memory is. */
-static int private_layout(const bridge_module_config *cfg, uint64_t granule, uint32_t *ring,
+static int private_layout(const bridge_module_config_t *cfg, uint64_t granule, uint32_t *ring,
                           uint32_t *spans, uint32_t *end)
 {
     constexpr uint32_t scratch = 128;
@@ -198,12 +198,12 @@ static int private_layout(const bridge_module_config *cfg, uint64_t granule, uin
     return ckd_add(end, *spans, cfg->spans) || (uint64_t)*end + granule - 1 > UINT32_MAX;
 }
 
-static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
+static int checks(bridge_t *b, const bridge_artifact_t *a, open_backend_t **on,
                   enum backend_capability *demands)
 {
-    const bridge_module_config *cfg = &a->cfg;
+    const bridge_module_config_t *cfg = &a->cfg;
     const char *id = cfg->identity;
-    open_backend *o = nullptr;
+    open_backend_t *o = nullptr;
     uint32_t i;
 
     if (!id || !*id) {
@@ -230,7 +230,7 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
     }
     /* schedule.md, *A module's phase names are mapped by the deployment* */
     for (i = 0; i < cfg->phase_count; i ++) {
-        const bridge_phase_name *n = &cfg->phases[i];
+        const bridge_phase_name_t *n = &cfg->phases[i];
         uint32_t k, phase;
         if (!n->from || !*n->from || !n->to || !*n->to) {
             say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: phase name %u of its "
@@ -312,9 +312,9 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
     }
     /* budgets.md: the one floor with an argument. A module that can report nothing is the one
      * legal number that makes a deployment incoherent. */
-    if (cfg->log_ring < sizeof(bridge_log_record)) {
+    if (cfg->log_ring < sizeof(bridge_log_record_t)) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: a log_ring of %u bytes holds "
-            "no record, and one is %u", id, cfg->log_ring, (unsigned)sizeof(bridge_log_record));
+            "no record, and one is %u", id, cfg->log_ring, (unsigned)sizeof(bridge_log_record_t));
         return 1;
     }
     /* capabilities.md: one guarantee, asked by `trusted` and answered by the backend */
@@ -355,21 +355,21 @@ static size_t stem_of(const char *identity)
 
 /* a system is named by its module without the version, so that is what tells modules apart -
  * schedule.md, *Order within a phase is never implicit* */
-static module *loaded(bridge *b, const char *identity)
+static module_t *loaded(bridge_t *b, const char *identity)
 {
     size_t stem = stem_of(identity);
-    module *m;
+    module_t *m;
     for (m = b->modules; m; m = m->next) {
         if (strlen(m->stem) == stem && !memcmp(m->stem, identity, stem)) return m;
     }
     return nullptr;
 }
 
-static module *record(bridge *b, const bridge_artifact *a, open_backend *o)
+static module_t *record(bridge_t *b, const bridge_artifact_t *a, open_backend_t *o)
 {
-    const bridge_module_config *cfg = &a->cfg;
+    const bridge_module_config_t *cfg = &a->cfg;
     const char *id = cfg->identity, *colon = strchr(id, ':');
-    module *m = calloc(1, sizeof *m);
+    module_t *m = calloc(1, sizeof *m);
     bool whole;
     if (bridge_short(b, m, "a module's record")) return nullptr;
     m->b = b;
@@ -406,7 +406,7 @@ static module *record(bridge *b, const bridge_artifact *a, open_backend *o)
     m->phase_to = calloc(cfg->phase_count ? cfg->phase_count : 1, sizeof *m->phase_to);
     whole = whole && m->phase_from && m->phase_to;
     for (m->phase_names = 0; whole && m->phase_names < cfg->phase_count; m->phase_names ++) {
-        const bridge_phase_name *n = &cfg->phases[m->phase_names];
+        const bridge_phase_name_t *n = &cfg->phases[m->phase_names];
         uint32_t phase = 0;
         while (strcmp(b->phases[phase], n->to)) phase ++;       /* checks() found it */
         m->phase_from[m->phase_names] = copy(n->from, strlen(n->from));
@@ -428,7 +428,7 @@ static module *record(bridge *b, const bridge_artifact *a, open_backend *o)
 }
 
 /* The private block: the header at 0, then the three regions its config sized. */
-static int private_memory(module *m, const bridge_module_config *cfg, backend_err *err)
+static int private_memory(module_t *m, const bridge_module_config_t *cfg, backend_err_t *err)
 {
     constexpr uint32_t scratch = 128;
     uint32_t ring, spans, end;
@@ -449,25 +449,25 @@ static int private_memory(module *m, const bridge_module_config *cfg, backend_er
     m->scratch = scratch;
     m->scratch_len = cfg->scratch;
     m->ring = ring;
-    m->ring_len = cfg->log_ring / (uint32_t)sizeof(bridge_log_record);
+    m->ring_len = cfg->log_ring / (uint32_t)sizeof(bridge_log_record_t);
     m->spans = spans;
     m->spans_len = cfg->spans;
-    ((bridge_header *)m->priv)->log_level = cfg->log_level;
-    ((bridge_header *)m->priv)->system = UINT32_MAX;        /* no system is running */
+    ((bridge_header_t *)m->priv)->log_level = cfg->log_level;
+    ((bridge_header_t *)m->priv)->system = UINT32_MAX;        /* no system is running */
     m->memory = m->on->api.memory_adopt(m->on->be, m->priv, len, err);
     return !m->memory;
 }
 
 /* An export Bridge-ASM700 calls: found once. Whether it has the shape `call` runs is the
  * backend's to see and to refuse - signatures.md. */
-static backend_func *export_of(module *m, const char *name, backend_err *err)
+static backend_func_t *export_of(module_t *m, const char *name, backend_err_t *err)
 {
     return m->on->api.instance_func(m->instance, name, err);
 }
 
 /* One call of a lifecycle export, under its timeout. 0 if it returned 0. */
-static int lifecycle_call(module *m, backend_func *f, const char *name, int64_t timeout,
-                          backend_err *err)
+static int lifecycle_call(module_t *m, backend_func_t *f, const char *name, int64_t timeout,
+                          backend_err_t *err)
 {
     int32_t status = 0;
     int trapped;
@@ -501,15 +501,15 @@ static int lifecycle_call(module *m, backend_func *f, const char *name, int64_t 
 
 /* An image, an instance, a private memory, and the first call into it: `init` for a load,
  * `reload` for a reload. 0 if the module registered and every export it named is there. */
-static int start(bridge *b, module *m, const bridge_artifact *a, enum backend_capability demands,
-                 const char *entry, backend_err *err)
+static int start(bridge_t *b, module_t *m, const bridge_artifact_t *a, enum backend_capability demands,
+                 const char *entry, backend_err_t *err)
 {
-    const bridge_module_config *cfg = &a->cfg;
-    open_backend *o = m->on;
-    backend_import imports[64];
-    backend_memory_import memories[2];
+    const bridge_module_config_t *cfg = &a->cfg;
+    open_backend_t *o = m->on;
+    backend_import_t imports[64];
+    backend_memory_import_t memories[2];
     uint32_t i, import_count, memory_count = 0;
-    backend_func *first;
+    backend_func_t *first;
     uint64_t need;
     int reloading = !strcmp(entry, "reload");
 
@@ -521,14 +521,14 @@ static int start(bridge *b, module *m, const bridge_artifact *a, enum backend_ca
     /* a module is handed the memories it imports, and no other - backend.md */
     import_count = o->api.module_imports(m->image, imports, 64);
     for (i = 0; i < import_count && i < 64; i ++) {
-        const backend_import *im = &imports[i];
+        const backend_import_t *im = &imports[i];
         if (im->kind != BACKEND_IMPORT_MEMORY || im->ns_len != strlen(BRIDGE_NAMESPACE)
             || memcmp(im->ns, BRIDGE_NAMESPACE, im->ns_len) || memory_count == 2) continue;
         if (im->field_len == strlen(BRIDGE_SHARED) && !memcmp(im->field, BRIDGE_SHARED, im->field_len)) {
-            memories[memory_count ++] = (backend_memory_import){ BRIDGE_NAMESPACE, BRIDGE_SHARED, o->shared };
+            memories[memory_count ++] = (backend_memory_import_t){ BRIDGE_NAMESPACE, BRIDGE_SHARED, o->shared };
         } else if (im->field_len == strlen(BRIDGE_PRIVATE)
                    && !memcmp(im->field, BRIDGE_PRIVATE, im->field_len)) {
-            memories[memory_count ++] = (backend_memory_import){ BRIDGE_NAMESPACE, BRIDGE_PRIVATE, m->memory };
+            memories[memory_count ++] = (backend_memory_import_t){ BRIDGE_NAMESPACE, BRIDGE_PRIVATE, m->memory };
         }
     }
     m->instance = o->api.instance_create(o->be, m->image, memories, memory_count, err);
@@ -559,7 +559,7 @@ static int start(bridge *b, module *m, const bridge_artifact *a, enum backend_ca
 
     /* a system is an export, found once and checked here rather than on its first frame */
     for (i = 0; i < m->system_count + m->observer_count; i ++) {
-        bridge_system *s = i < m->system_count ? m->systems[i] : m->observers[i - m->system_count];
+        bridge_system_t *s = i < m->system_count ? m->systems[i] : m->observers[i - m->system_count];
         s->fn = export_of(m, s->name, err);
         if (!s->fn) return 1;
     }
@@ -569,7 +569,7 @@ static int start(bridge *b, module *m, const bridge_artifact *a, enum backend_ca
 
     /* budgets.md: column_base has a cell for each of its components in every table there may
      * be, so whether its spans hold it is known here, and not at some barrier */
-    need = sizeof(bridge_query) * m->system_count + sizeof(bridge_list) * m->observer_count
+    need = sizeof(bridge_query_t) * m->system_count + sizeof(bridge_list_t) * m->observer_count
          + 4ull * m->declared_count * storage_tables(b->storage) + 4ull * m->declared_count;
     if (need > m->spans_len) {
         snprintf(err->text, sizeof err->text, "its spans of %u bytes do not hold a column_base of "
@@ -582,14 +582,14 @@ static int start(bridge *b, module *m, const bridge_artifact *a, enum backend_ca
 
 /* ---- load ---- */
 
-int bridge_load(bridge *b, const bridge_artifact *a)
+int bridge_load(bridge_t *b, const bridge_artifact_t *a)
 {
-    const bridge_module_config *cfg = &a->cfg;
+    const bridge_module_config_t *cfg = &a->cfg;
     const char *id = cfg->identity;
-    open_backend *o = nullptr;
-    backend_err err = {};
+    open_backend_t *o = nullptr;
+    backend_err_t err = {};
     enum backend_capability demands = 0;
-    module *m, *other;
+    module_t *m, *other;
 
     if (bridge_stopped(b, id) || checks(b, a, &o, &demands)) return 1;
     other = loaded(b, id);
@@ -624,7 +624,7 @@ int bridge_load(bridge *b, const bridge_artifact *a)
         if (share > region_most(&b->arena_space)) share = region_most(&b->arena_space);
         if (!region_take(&b->arena_space, share, &at)) unreachable();
         b->arena_ranges ++;
-        m->owned[0] = (range){ b->arena + at, share };
+        m->owned[0] = (range_t){ b->arena + at, share };
         m->own_count = m->own_next = 1;
         m->arena_share = share;
         m->arena_at = b->arena + at;
@@ -644,7 +644,7 @@ int bridge_load(bridge *b, const bridge_artifact *a)
 
     /* at the end: the order modules loaded in is the order their changes are applied in */
     {
-        module **last = &b->modules;
+        module_t **last = &b->modules;
         while (*last) last = &(*last)->next;
         *last = m;
     }
@@ -671,9 +671,9 @@ failed:
 
 /* failure.md: a shutdown that fails is logged, and the teardown continues. Nothing else is
  * coherent, and it is not tried again. */
-void module_shut_down(bridge *b, module *m)
+void module_shut_down(bridge_t *b, module_t *m)
 {
-    backend_err err = {};
+    backend_err_t err = {};
     /* a module whose reload failed after its old instance went has no code left to call */
     if (m->instance && lifecycle_call(m, m->shutdown, "shutdown", m->shutdown_timeout, &err)) {
         say(b, m, nullptr, BRIDGE_ERR, "module '%s': %s; its teardown continues", m->identity, err.text);
@@ -683,25 +683,25 @@ void module_shut_down(bridge *b, module *m)
 }
 
 /* strings.md, *It is given back when nothing points into it*. A string a component keeps is a
- * bridge_text field, so every reference there is can be found: in a field, in an array of
+ * bridge_text_t field, so every reference there is can be found: in a field, in an array of
  * them, or in a struct a field holds. */
-typedef struct { const bridge *b; const module *m; const declared_type *c; uint32_t rows; } pointing;
+typedef struct { const bridge_t *b; const module_t *m; const declared_type_t *c; uint32_t rows; } pointing_t;
 
-static bool points_in(const pointing *p, const declared_type *c, const uint8_t *bytes)
+static bool points_in(const pointing_t *p, const declared_type_t *c, const uint8_t *bytes)
 {
     for (uint32_t k = 0; k < c->s.field_count; k ++) {
-        const schema_field *f = &c->s.fields[k];
-        const declared_type *held = f->type;
+        const schema_field_t *f = &c->s.fields[k];
+        const declared_type_t *held = f->type;
         if (f->kind != SCHEMA_TEXT && f->kind != SCHEMA_STRUCT) continue;
         for (uint32_t i = 0; i < f->count; i ++) {
-            bridge_text text;
+            bridge_text_t text;
             if (f->kind == SCHEMA_STRUCT) {
                 if (points_in(p, held, bytes + f->offset + (size_t)i * held->size)) return true;
                 continue;
             }
             memcpy(&text, bytes + f->offset + (size_t)i * sizeof text, sizeof text);
             for (uint32_t o = 0; text.len && o < p->m->own_count; o ++) {
-                const range *own = &p->m->owned[o];
+                const range_t *own = &p->m->owned[o];
                 if (text.at < own->at + own->len && own->at < (uint64_t)text.at + text.len) return true;
             }
         }
@@ -712,16 +712,16 @@ static bool points_in(const pointing *p, const declared_type *c, const uint8_t *
 /* counts, and never answers that it found one: every row is to be read */
 static bool row_points_in(void *ctx, const uint8_t *row)
 {
-    pointing *p = ctx;
+    pointing_t *p = ctx;
     p->rows += points_in(p, p->c, row);
     return false;
 }
 
 /* strings.md, *It is given back when nothing points into it*. A share that stays is said,
  * with what holds it: a later load may be refused for the room it keeps. */
-static bool share_is_pointed_into(bridge *b, const module *m)
+static bool share_is_pointed_into(bridge_t *b, const module_t *m)
 {
-    pointing p = { b, m, nullptr, 0 };
+    pointing_t p = { b, m, nullptr, 0 };
     uint64_t bytes = 0;
     bool held = false;
     for (uint32_t i = 0; i < m->own_count; i ++) bytes += m->owned[i].len;
@@ -739,9 +739,9 @@ static bool share_is_pointed_into(bridge *b, const module *m)
 }
 
 /* The rest of an unload, once the module's code has run for the last time. */
-static void take_out(bridge *b, module *m)
+static void take_out(bridge_t *b, module_t *m)
 {
-    module **link = &b->modules;
+    module_t **link = &b->modules;
     uint32_t i;
     drop_systems(b, m);
     /* last declared first: a type is used by what was declared after it */
@@ -765,10 +765,10 @@ static void take_out(bridge *b, module *m)
     module_discard(b, m);
 }
 
-int bridge_unload(bridge *b, const char *identity)
+int bridge_unload(bridge_t *b, const char *identity)
 {
     char why[256];
-    module *m;
+    module_t *m;
     /* a stopped bridge takes an unload of the module that stopped it, and of no other */
     if (bridge_stopped(b, identity)) return 1;
     for (m = b->modules; m && (!identity || strcmp(m->identity, identity)); m = m->next) {}
@@ -791,16 +791,16 @@ int bridge_unload(bridge *b, const char *identity)
 
 /* lifetime.md, *When a component is moved*: every type this reload made in the place of
  * another takes that one's rows, all of them or none. 1 and why if there is no room. */
-static int moved_rows(bridge *b, module *n, backend_err *err)
+static int moved_rows(bridge_t *b, module_t *n, backend_err_t *err)
 {
-    storage_move moves[64];
-    storage_run whole[64];
+    storage_move_t moves[64];
+    storage_run_t whole[64];
     uint32_t count = 0, i;
     for (i = 0; i < n->declared_count && count < 64; i ++) {
-        declared_type *c = n->declared[i];
+        declared_type_t *c = n->declared[i];
         if (!c->replaces) continue;
-        whole[count] = (storage_run){ 0, 0, c->size < c->replaces->size ? c->size : c->replaces->size };
-        moves[count] = (storage_move){ c->replaces->type, c->type, &whole[count], 1 };
+        whole[count] = (storage_run_t){ 0, 0, c->size < c->replaces->size ? c->size : c->replaces->size };
+        moves[count] = (storage_move_t){ c->replaces->type, c->type, &whole[count], 1 };
         /* a component layout that changed: field by field, as declare worked it out */
         if (c->replaces->runs) {
             moves[count].runs = c->replaces->runs;
@@ -824,18 +824,18 @@ static int moved_rows(bridge *b, module *n, backend_err *err)
     return 1;
 }
 
-int bridge_reload(bridge *b, const bridge_artifact *a)
+int bridge_reload(bridge_t *b, const bridge_artifact_t *a)
 {
-    const bridge_module_config *cfg = &a->cfg;
+    const bridge_module_config_t *cfg = &a->cfg;
     const char *id = cfg->identity;
-    open_backend *o = nullptr;
-    backend_err err = {};
+    open_backend_t *o = nullptr;
+    backend_err_t err = {};
     enum backend_capability demands = 0;
     uint32_t i, extra = 0, extra_at = 0;
-    range last = {};
+    range_t last = {};
     bool in_place = false;
     int64_t had, wants;
-    module *old, *n, **link;
+    module_t *old, *n, **link;
     int side_by_side;
 
     if (bridge_stopped(b, id) || checks(b, a, &o, &demands)) return 1;
@@ -924,7 +924,7 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
         n->owned[n->own_count - 1].len += extra;
         n->arena_left += extra;
     } else if (extra) {
-        n->owned[n->own_count ++] = (range){ b->arena + extra_at, extra };
+        n->owned[n->own_count ++] = (range_t){ b->arena + extra_at, extra };
         if (!old->own_count) {              /* it had none: this is where it starts */
             n->arena_at = b->arena + extra_at;
             n->arena_left = extra;

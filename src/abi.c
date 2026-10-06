@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int refuse(module *m, const char *fmt, ...)
+static int refuse(module_t *m, const char *fmt, ...)
 {
     va_list args;
     /* the first refusal of a call is the reason: a backend that cannot unwind lets the
@@ -24,7 +24,7 @@ static int refuse(module *m, const char *fmt, ...)
 }
 
 /* the one memory a module can write that Bridge-ASM700 can read and bounds-check */
-static const void *scratch(module *m, uint64_t at, uint64_t len)
+static const void *scratch(module_t *m, uint64_t at, uint64_t len)
 {
     if (at < m->scratch || len > m->scratch_len || at - m->scratch > m->scratch_len - len) {
         return nullptr;
@@ -50,30 +50,30 @@ static int listed(char **list, uint32_t count, const char *name)
 }
 
 /* grants.md: a module's own namespace is its own, and another's needs a grant */
-static int foreign(module *m, const char *name)
+static int foreign(module_t *m, const char *name)
 {
     size_t n = strlen(m->ns);
     return strncmp(name, m->ns, n) || name[n] != ':';
 }
 
-static int may_write(module *m, const declared_type *c)
+static int may_write(module_t *m, const declared_type_t *c)
 {
     return !foreign(m, c->name) || listed(m->write, m->write_count, c->name);
 }
 
 /* a type a field names bare is looked for in the namespace of the component it is a field of */
-typedef struct { bridge *b; const char *ns; } looking;
+typedef struct { bridge_t *b; const char *ns; } looking_t;
 
-static bool find(void *ctx, const char *bare, schema_named *named)
+static bool find(void *ctx, const char *bare, schema_named_t *named)
 {
-    const looking *l = ctx;
+    const looking_t *l = ctx;
     size_t ns = strlen(l->ns);
     for (uint32_t i = 0; i < l->b->type_count; i ++) {
-        declared_type *c = l->b->types[i];
+        declared_type_t *c = l->b->types[i];
         if (strncmp(c->name, l->ns, ns) || c->name[ns] != ':' || strcmp(c->name + ns + 1, bare)) continue;
         if (c->kind == BRIDGE_TAG) continue;        /* it has no bytes for a field to be */
         if (c->superseded) continue;                /* a reload has made the one that is meant */
-        *named = (schema_named){ c->kind, c->size, c->align, c };
+        *named = (schema_named_t){ c->kind, c->size, c->align, c };
         return true;
     }
     return false;
@@ -82,13 +82,13 @@ static bool find(void *ctx, const char *bare, schema_named *named)
 /* The other loaded modules that declare `c`, as the end of a refusal: who they are is what a
  * host needs to know, since unloading them is what lets a component's layout change -
  * lifetime.md, *When a component layout changed*. */
-static void also_declared(const bridge *b, const module *m, const declared_type *c, char *others,
+static void also_declared(const bridge_t *b, const module_t *m, const declared_type_t *c, char *others,
                           size_t size)
 {
     size_t used = 0;
     uint32_t i;
     others[0] = 0;
-    for (module *o = b->modules; o; o = o->next) {
+    for (module_t *o = b->modules; o; o = o->next) {
         if (o == m || o == m->reloads || !strcmp(o->identity, m->identity)) continue;
         for (i = 0; i < o->declared_count && o->declared[i] != c; i ++) {}
         if (i == o->declared_count || used >= size) continue;
@@ -103,7 +103,7 @@ static const char *const storage_names[] = {
 
 /* Whether this reload accepts the loss named `name`, which it is now known to make, of
  * something `rows` rows hold. */
-static bool accepted(module *m, const char *name, uint32_t rows)
+static bool accepted(module_t *m, const char *name, uint32_t rows)
 {
     for (uint32_t i = 0; i < m->loss_count; i ++) {
         if (strcmp(m->losses[i], name)) continue;
@@ -116,40 +116,40 @@ static bool accepted(module *m, const char *name, uint32_t rows)
 /* ---- lifetime.md, *When a component layout changed*: what a value of a type becomes ---- */
 
 /* how many bytes one of a field's elements is */
-static uint32_t element(const schema_field *f)
+static uint32_t element(const schema_field_t *f)
 {
     switch (f->kind) {
     case SCHEMA_BOOL: case SCHEMA_CHAR: case SCHEMA_I8: case SCHEMA_U8: return 1;
     case SCHEMA_I16: case SCHEMA_U16: return 2;
     case SCHEMA_I32: case SCHEMA_U32: case SCHEMA_F32: return 4;
     case SCHEMA_I64: case SCHEMA_U64: case SCHEMA_F64: case SCHEMA_TEXT: return 8;
-    default: return ((const declared_type *)f->type)->size;
+    default: return ((const declared_type_t *)f->type)->size;
     }
 }
 
 typedef struct {
-    module      *m;
+    module_t      *m;
     uint32_t     rows;              /* how many hold a value of the type that is changing */
-    storage_run *runs;
+    storage_run_t *runs;
     uint32_t     run_count;
     char         lost[240];         /* what goes that this reload does not accept, by name */
     size_t       lost_len;
     bool         short_of;          /* there was no memory for a run */
-} relaying;
+} relaying_t;
 
-static void run_added(relaying *l, uint32_t from, uint32_t to, uint32_t len)
+static void run_added(relaying_t *l, uint32_t from, uint32_t to, uint32_t len)
 {
-    storage_run *runs = realloc(l->runs, (l->run_count + 1) * sizeof *runs);
+    storage_run_t *runs = realloc(l->runs, (l->run_count + 1) * sizeof *runs);
     if (!runs) {
         l->short_of = true;
         return;
     }
     l->runs = runs;
-    l->runs[l->run_count ++] = (storage_run){ from, to, len };
+    l->runs[l->run_count ++] = (storage_run_t){ from, to, len };
 }
 
 /* a field, or the end of an array, has no place in what the type becomes */
-static void lost(relaying *l, const char *name)
+static void lost(relaying_t *l, const char *name)
 {
     if (!l->rows || accepted(l->m, name, l->rows) || l->lost_len >= sizeof l->lost) return;
     l->lost_len += (size_t)snprintf(l->lost + l->lost_len, sizeof l->lost - l->lost_len, "%s'%s'",
@@ -159,12 +159,12 @@ static void lost(relaying *l, const char *name)
 /* The fields of `was`, at `from` in a value, matched by name to those of `is`, at `to`: each
  * goes to its new offset, and what is new stays zero. 1 and a refusal for a field that is of
  * another type than it was. */
-static int relaid(relaying *l, const schema *was, const schema *is, uint32_t from, uint32_t to,
+static int relaid(relaying_t *l, const schema_t *was, const schema_t *is, uint32_t from, uint32_t to,
                   const char *path)
 {
     for (uint32_t i = 0; i < was->field_count; i ++) {
-        const schema_field *old = &was->fields[i], *new = nullptr;
-        const declared_type *held = old->type, *holds;
+        const schema_field_t *old = &was->fields[i], *new = nullptr;
+        const declared_type_t *held = old->type, *holds;
         char name[200];
         uint32_t count, k;
         snprintf(name, sizeof name, "%s.%s", path, old->name);
@@ -200,14 +200,14 @@ static int relaid(relaying *l, const schema *was, const schema *is, uint32_t fro
 
 /* An enum or a bitmask whose constants changed: every value a row may hold must still mean
  * what it meant. A constant added is nothing. */
-static int renumbered(module *m, const declared_type *was, const schema *is)
+static int renumbered(module_t *m, const declared_type_t *was, const schema_t *is)
 {
     if (was->s.size != is->size) {
         return refuse(m, "type '%s' is an integer of %u bytes here and was one of %u: every value "
             "kept of it would be read as another", was->name, is->size, was->s.size);
     }
     for (uint32_t i = 0; i < was->s.constant_count; i ++) {
-        const schema_constant *old = &was->s.constants[i], *new = nullptr;
+        const schema_constant_t *old = &was->s.constants[i], *new = nullptr;
         for (uint32_t k = 0; k < is->constant_count; k ++) {
             if (!strcmp(is->constants[k].name, old->name)) new = &is->constants[k];
         }
@@ -227,10 +227,10 @@ static int renumbered(module *m, const declared_type *was, const schema *is)
 /* `was` becomes a type laid out as `is`: how its values are carried over is left on `was`, for
  * the reload to use if it holds. 1 and a refusal if it cannot be, or would lose what this
  * reload does not accept. */
-static int relay(module *m, declared_type *was, enum bridge_kind kind, const schema *is)
+static int relay(module_t *m, declared_type_t *was, enum bridge_kind kind, const schema_t *is)
 {
     static const char *const kinds[] = { "", "a struct", "an enum", "a bitmask", "a tag" };
-    relaying l = { .m = m, .rows = storage_count(m->b->storage, was->type) };
+    relaying_t l = { .m = m, .rows = storage_count(m->b->storage, was->type) };
     if (was->kind != kind) {
         return refuse(m, "type '%s' is %s here and was %s: a reload does not change what kind of "
             "type one is", was->name, kinds[kind], kinds[was->kind]);
@@ -257,7 +257,7 @@ static int relay(module *m, declared_type *was, enum bridge_kind kind, const sch
 }
 
 /* whether a field of `c` names a type this reload has made anew */
-static bool names_superseded(const declared_type *c)
+static bool names_superseded(const declared_type_t *c)
 {
     for (uint32_t k = 0; k < c->dep_count; k ++) if (c->deps[k]->superseded) return true;
     return false;
@@ -265,15 +265,15 @@ static bool names_superseded(const declared_type *c)
 
 /* A loaded module other than the one reloading that declares a type with a field of type
  * `c`: its rows hold values of `c` as it is, which no reload of somebody else may change. */
-static const declared_type *held_elsewhere(const bridge *b, const module *m, const declared_type *c,
-                                           const module **by)
+static const declared_type_t *held_elsewhere(const bridge_t *b, const module_t *m, const declared_type_t *c,
+                                           const module_t **by)
 {
     for (uint32_t i = 0; i < b->type_count; i ++) {
-        const declared_type *other = b->types[i];
+        const declared_type_t *other = b->types[i];
         uint32_t k, d;
         for (k = 0; k < other->dep_count && other->deps[k] != c; k ++) {}
         if (k == other->dep_count) continue;
-        for (const module *o = b->modules; o; o = o->next) {
+        for (const module_t *o = b->modules; o; o = o->next) {
             if (o == m || o == m->reloads) continue;
             for (d = 0; d < o->declared_count && o->declared[d] != other; d ++) {}
             if (d < o->declared_count) {
@@ -287,7 +287,7 @@ static const declared_type *held_elsewhere(const bridge *b, const module *m, con
 
 /* lifetime.md, *When a component is moved*: `c` is to be kept as `kept` from this reload on.
  * 1 and a refusal for a move that cannot be made, or that loses what was not accepted. */
-static int moved_storage(module *m, const declared_type *c, enum bridge_storage kept)
+static int moved_storage(module_t *m, const declared_type_t *c, enum bridge_storage kept)
 {
     uint32_t carriers = storage_count(m->b->storage, c->type), off = storage_off(m->b->storage, c->type);
     if (c->storage == BRIDGE_SINGLETON) {
@@ -309,14 +309,14 @@ static int moved_storage(module *m, const declared_type *c, enum bridge_storage 
 /* declare(name, name_len, kind, size, align, desc, desc_len, on_unload, storage) -> slot */
 static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
 {
-    module *m = ud;
-    bridge *b = m->b;
+    module_t *m = ud;
+    bridge_t *b = m->b;
     const char *name_at = scratch(m, a[0], a[1]), *desc_at = scratch(m, a[5], a[6]);
     enum bridge_kind kind = (enum bridge_kind)a[2];
     enum bridge_on_unload on_unload = (enum bridge_on_unload)a[7];
     enum bridge_storage kept = (enum bridge_storage)a[8];
     uint32_t size = (uint32_t)a[3], align = (uint32_t)a[4], i;
-    declared_type *c = nullptr, *was = nullptr;
+    declared_type_t *c = nullptr, *was = nullptr;
     char name[128], *bare;
     uint64_t print;
 
@@ -368,8 +368,8 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
          * else declares it. Exclusive, and at a reload of the module that declares it, a type
          * is made for what it becomes, which takes the rows if the reload holds */
         char others[160];
-        const module *by = nullptr;
-        const declared_type *holder;
+        const module_t *by = nullptr;
+        const declared_type_t *holder;
         also_declared(b, m, c, others, sizeof others);
         for (i = 0; m->reloads && i < m->reloads->declared_count && m->reloads->declared[i] != c; i ++) {}
         if (others[0] || !m->reloads || i == m->reloads->declared_count) {
@@ -413,11 +413,11 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
          * the declarer's namespace: `Vec3` in game:Body is game:Vec3 - schema.md. */
         char *desc = kind == BRIDGE_TAG ? nullptr : copy(desc_at, a[6]);
         char why[200];
-        looking l = { b, name };
-        schema s;
+        looking_t l = { b, name };
+        schema_t s;
         int refused;
         uint32_t k, held_count = 0;
-        declared_type **types, **deps;
+        declared_type_t **types, **deps;
         char *named;
         void *zero;
 
@@ -508,7 +508,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         b->types[b->type_count ++] = c;
         /* a declared type a field of this one names is held for as long as this one is */
         for (k = 0; k < s.field_count; k ++) {
-            declared_type *held = s.fields[k].type;
+            declared_type_t *held = s.fields[k].type;
             if (!held) continue;
             c->deps[c->dep_count ++] = held;
             held->users ++;
@@ -534,7 +534,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
 /* storage says who and what; the observer itself runs at the barrier, after the republish */
 static void heard(void *ctx, uint64_t id, enum bridge_event event)
 {
-    bridge_system *s = ctx;
+    bridge_system_t *s = ctx;
     /* its list is as long as what its module's spans could publish of it, and one past
      * that is all that needs knowing: storage_publish finds it does not fit, and says so */
     if (s->pending_count > s->pending_room) return;
@@ -552,19 +552,19 @@ static void heard(void *ctx, uint64_t id, enum bridge_event event)
 
 /* A system or an observer is a query plus a function, so one registration serves both.
  * `events` is zero for a system, and then `phase` is the phase it named. */
-static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t phase,
+static int subscribe(module_t *m, uint64_t name_off, uint64_t name_len, uint32_t phase,
                      enum bridge_event events, uint64_t terms_off, uint64_t term_count,
                      uint64_t changes_off, uint64_t change_count, uint64_t *r)
 {
-    bridge *b = m->b;
+    bridge_t *b = m->b;
     const char *what = events ? "observer" : "system";
     const char *name_at = scratch(m, name_off, name_len);
-    const bridge_term *terms = scratch(m, terms_off, term_count * sizeof(bridge_term));
+    const bridge_term_t *terms = scratch(m, terms_off, term_count * sizeof(bridge_term_t));
     const void *changes = change_count ? scratch(m, changes_off, change_count * sizeof(uint32_t))
                                        : "";
     uint32_t count = (uint32_t)term_count, i;
-    storage_term *asked;
-    bridge_system *s;
+    storage_term_t *asked;
+    bridge_system_t *s;
     char name[128], full[256];
 
     if (b->system_count - b->parked >= b->max_systems) {
@@ -588,7 +588,7 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
     }
     /* a system and an observer are both exports, and an export has one name */
     for (i = 0; i < m->system_count + m->observer_count; i ++) {
-        bridge_system *other = i < m->system_count ? m->systems[i]
+        bridge_system_t *other = i < m->system_count ? m->systems[i]
                                                    : m->observers[i - m->system_count];
         if (!strcmp(other->name, name)) return refuse(m, "'%s' is registered twice", name);
     }
@@ -601,17 +601,17 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
     s = calloc(1, sizeof *s + count * sizeof *s->term + change_count * sizeof *s->changes);
     asked = calloc(count + 1, sizeof *asked);
     {
-        bridge_system **all = realloc(b->systems, (b->system_count + 1) * sizeof *b->systems);
-        bridge_system ***mine = events ? &m->observers : &m->systems;
+        bridge_system_t **all = realloc(b->systems, (b->system_count + 1) * sizeof *b->systems);
+        bridge_system_t ***mine = events ? &m->observers : &m->systems;
         uint32_t have = events ? m->observer_count : m->system_count;
-        bridge_system **own = realloc(*mine, (have + 1) * sizeof **mine);
+        bridge_system_t **own = realloc(*mine, (have + 1) * sizeof **mine);
         if (all) b->systems = all;
         if (own) *mine = own;
         if (s) {
             s->name = copy(name, strlen(name));
             s->full = copy(full, strlen(full));
             if (events) {
-                s->pending_room = m->spans_len / (uint32_t)sizeof(bridge_trigger);
+                s->pending_room = m->spans_len / (uint32_t)sizeof(bridge_trigger_t);
                 s->pending = calloc(s->pending_room ? s->pending_room : 1, sizeof *s->pending);
             }
         }
@@ -627,7 +627,7 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
             return refuse(m, "out of memory: there was none for %s '%s'", what, name);
         }
     }
-    s->changes = (declared_type **)(void *)&s->term[count];
+    s->changes = (declared_type_t **)(void *)&s->term[count];
     /* what it attaches or detaches: a write, so it wants the grant a write wants */
     for (i = 0; i < change_count; i ++) {
         uint32_t slot;
@@ -648,8 +648,8 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
     }
     /* query.md, *What a query may not ask for* */
     for (i = 0; i < count; i ++) {
-        bridge_term t;
-        declared_type *c;
+        bridge_term_t t;
+        declared_type_t *c;
         memcpy(&t, &terms[i], sizeof t);
         if (t.slot >= m->declared_count) {
             refuse(m, "term %u of %s '%s' names slot %u, which it never declared", i, what, name,
@@ -693,7 +693,7 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
         }
         if (!events && c->storage == BRIDGE_SPARSE_SET && t.oper != BRIDGE_OPTIONAL) {
             for (uint32_t k = 0; k < count; k ++) {
-                bridge_term other;
+                bridge_term_t other;
                 memcpy(&other, &terms[k], sizeof other);
                 if (k == i || other.oper == BRIDGE_OPTIONAL) continue;
                 refuse(m, "term %u of %s '%s': '%s' is kept in a sparse set, and does not "
@@ -742,8 +742,8 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
  * `changes` is the slots of what it attaches or detaches, each a u32. */
 static int abi_system(void *ud, const uint64_t *a, uint64_t *r)
 {
-    module *m = ud;
-    bridge *b = m->b;
+    module_t *m = ud;
+    bridge_t *b = m->b;
     const char *phase_at = scratch(m, a[2], a[3]);
     uint32_t phase;
     if (!m->in_init) return refuse(m, "system is called outside init");
@@ -767,7 +767,7 @@ static int abi_system(void *ud, const uint64_t *a, uint64_t *r)
  * no phase: it has one already, the barrier that applied its trigger. */
 static int abi_observe(void *ud, const uint64_t *a, uint64_t *r)
 {
-    module *m = ud;
+    module_t *m = ud;
     if (!m->in_init) return refuse(m, "observe is called outside init");
     if (!a[2] || a[2] & ~(uint64_t)(BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE)) {
         return refuse(m, "observe: its events are unset, or name one there is not");
@@ -784,7 +784,7 @@ static int abi_observe(void *ud, const uint64_t *a, uint64_t *r)
 /* budgets.md, *Budgets*: a reload does not need room for a module's systems twice. The old
  * instance's leave storage before the new one's are registered, and count for nothing until
  * they are back or gone. */
-void abi_park(bridge *b, bridge_system *s)
+void abi_park(bridge_t *b, bridge_system_t *s)
 {
     if (s->parked) return;
     if (s->matched) storage_forget(b->storage, s->matched);
@@ -794,7 +794,7 @@ void abi_park(bridge *b, bridge_system *s)
 }
 
 /* As it was: the places it had are free again, since whatever took them has been dropped. */
-void abi_unpark(bridge *b, bridge_system *s)
+void abi_unpark(bridge_t *b, bridge_system_t *s)
 {
     if (!s->parked) return;
     s->matched = s->events ? storage_observer(b->storage, s->asked, s->terms, s->events, heard, s)
@@ -806,7 +806,7 @@ void abi_unpark(bridge *b, bridge_system *s)
 /* Room for a mark from each of its systems and observers, and from the lifecycle call in
  * progress, beyond those it has: asked for where a module gains a system and before a
  * lifecycle call, so that `queue` never has to. */
-bool abi_marks(module *m, uint32_t more)
+bool abi_marks(module_t *m, uint32_t more)
 {
     uint32_t want = m->mark_count + m->system_count + m->observer_count + 1 + more;
     void *marks;
@@ -818,9 +818,9 @@ bool abi_marks(module *m, uint32_t more)
     return true;
 }
 
-static int queue(module *m, enum change_op op, uint64_t id, declared_type *c, const void *value)
+static int queue(module_t *m, enum change_op op, uint64_t id, declared_type_t *c, const void *value)
 {
-    change ch = { id, c, value ? c->size : 0, op };
+    change_t ch = { id, c, value ? c->size : 0, op };
     uint32_t need = (uint32_t)sizeof ch + ((ch.size + 7u) & ~7u);
     /* budgets.md, *Nothing is allocated in a phase*: its queue is as long as it stated */
     if (!m->queue_room) return refuse(m, "it stated that it queues no change");
@@ -842,7 +842,7 @@ static int queue(module *m, enum change_op op, uint64_t id, declared_type *c, co
 /* spawn() -> id */
 static int abi_spawn(void *ud, [[maybe_unused]] const uint64_t *a, uint64_t *r)
 {
-    module *m = ud;
+    module_t *m = ud;
     if (m->id_next == m->id_count) {
         if (m->spawns <= 0) return refuse(m, "spawn: it stated that it spawns nothing");
         if (m->ids_short) {
@@ -863,9 +863,9 @@ static int abi_destroy(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r
     return queue(ud, CHANGE_DESTROY, a[0], nullptr, nullptr);
 }
 
-static declared_type *written(module *m, uint64_t slot, const char *entry)
+static declared_type_t *written(module_t *m, uint64_t slot, const char *entry)
 {
-    const bridge_system *s = m->running;
+    const bridge_system_t *s = m->running;
     uint32_t i;
     if (slot >= m->declared_count) {
         refuse(m, "%s names slot %llu, which it never declared", entry, (unsigned long long)slot);
@@ -890,7 +890,7 @@ static declared_type *written(module *m, uint64_t slot, const char *entry)
 /* attach(id, slot, ptr, len). The value travels with it; zero length means zeroed. */
 /* storage.md, *A singleton*: it is on no entity, so it is given and taken with the id 0,
  * which is no entity; and nothing else is. 1 and a refusal if `id` is the wrong one of the two. */
-static int unowned(module *m, const char *entry, uint64_t id, const declared_type *c)
+static int unowned(module_t *m, const char *entry, uint64_t id, const declared_type_t *c)
 {
     if (c->storage == BRIDGE_SINGLETON && id) {
         return refuse(m, "%s: '%s' is a singleton, and its id is 0", entry, c->name);
@@ -903,8 +903,8 @@ static int unowned(module *m, const char *entry, uint64_t id, const declared_typ
 
 static int abi_attach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 {
-    module *m = ud;
-    declared_type *c = written(m, a[1], "attach");
+    module_t *m = ud;
+    declared_type_t *c = written(m, a[1], "attach");
     const void *value;
     if (!c) return 1;
     value = a[3] ? scratch(m, a[2], a[3]) : c->zero;
@@ -920,8 +920,8 @@ static int abi_attach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 /* detach(id, slot) */
 static int abi_detach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 {
-    module *m = ud;
-    declared_type *c = written(m, a[1], "detach");
+    module_t *m = ud;
+    declared_type_t *c = written(m, a[1], "detach");
     if (!c || unowned(m, "detach", a[0], c)) return 1;
     return queue(m, CHANGE_DETACH, a[0], c, nullptr);
 }
@@ -930,7 +930,7 @@ static int abi_detach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
  * loaded - strings.md. */
 static int abi_alloc(void *ud, const uint64_t *a, uint64_t *r)
 {
-    module *m = ud;
+    module_t *m = ud;
     uint64_t len = (a[0] + 7u) & ~7ull;
     if (m->persistent <= 0) {
         return refuse(m, "alloc: it stated that it keeps nothing in the persistent arena");
@@ -950,12 +950,12 @@ static int abi_alloc(void *ud, const uint64_t *a, uint64_t *r)
     return 0;
 }
 
-int abi_define(module *m, backend_err *err)
+int abi_define(module_t *m, backend_err_t *err)
 {
     constexpr enum backend_type I = BACKEND_I32, L = BACKEND_I64;
     static const struct {
         const char *name;
-        backend_fn  fn;
+        backend_fn_t  fn;
         enum backend_type params[9];
         uint32_t    param_count;
         enum backend_type results[1];
@@ -972,7 +972,7 @@ int abi_define(module *m, backend_err *err)
     };
     size_t i;
     for (i = 0; i < sizeof entries / sizeof *entries; i ++) {
-        backend_sig sig = { .params = entries[i].params, .param_count = entries[i].param_count,
+        backend_sig_t sig = { .params = entries[i].params, .param_count = entries[i].param_count,
                             .results = entries[i].results,
                             .result_count = entries[i].result_count };
         if (m->on->api.define_func(m->instance, BRIDGE_NAMESPACE, entries[i].name, entries[i].fn,

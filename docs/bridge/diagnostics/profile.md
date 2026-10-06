@@ -36,7 +36,7 @@ show. So each phase has one more row, for its barrier: how many ran, and how lon
 row says which of the three it is.
 
 The phase itself has none, because a host can time the call it makes; the same rule keeps
-`bridge_module_info` at two fields: do not report what the caller can derive. It cannot be had
+`bridge_module_info_t` at two fields: do not report what the caller can derive. It cannot be had
 by adding the rows up, though, which is what this said: systems of different modules run at
 once, so four of a millisecond on four threads are a millisecond, and the barrier was in none
 of them.

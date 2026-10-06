@@ -18,7 +18,7 @@ constexpr uint32_t COUNT = 6;
 static uint32_t a, m, p, o, r, w, marked, in_set, toggled;
 static uint64_t ids[COUNT];
 
-static void say(const bridge_api *api, const char *text, uint32_t x, uint32_t y)
+static void say(const bridge_api_t *api, const char *text, uint32_t x, uint32_t y)
 {
     bridge_native_log(api, BRIDGE_LOG_INFO, text, (uint32_t)strlen(text), x, y);
 }
@@ -42,7 +42,7 @@ BRIDGE_NATIVE(spawn)
 
 BRIDGE_NATIVE(flicker)
 {
-    const bridge_query *q = bridge_native_query(api, toggled);
+    const bridge_query_t *q = bridge_native_query(api, toggled);
     for (uint32_t i = 0; i < q->spans; i ++) {
         const uint32_t *span = bridge_native_span(api, q, i, 2);
         auto column = (const A *)(api->shared_base + span[2]);
@@ -68,8 +68,8 @@ BRIDGE_NATIVE(detach_b)
 
 BRIDGE_NATIVE(look)
 {
-    const bridge_header *h = bridge_native_header(api);
-    const bridge_query *q = bridge_native_query(api, marked);
+    const bridge_header_t *h = bridge_native_header(api);
+    const bridge_query_t *q = bridge_native_query(api, marked);
     const uint32_t *index = bridge_native_set_index(api, p);
     uint32_t cells = bridge_native_cells(api, r), rows = 0, carried = 0, on = 0, given = 0;
     const uint64_t *has = bridge_native_bits(api, cells);
@@ -121,7 +121,7 @@ BRIDGE_NATIVE(look)
 BRIDGE_NATIVE(init)
 {
     int none = 0;
-    bridge_term two[2] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }, { 0, BRIDGE_READ, BRIDGE_AND, 0 }};
+    bridge_term_t two[2] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }, { 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     uint32_t made[5];
     a = made[0] = BRIDGE_NATIVE_COMPONENT(api, "st:A", A, BRIDGE_DELETE, BRIDGE_TABLE);
     m = made[1] = BRIDGE_NATIVE_DECLARE_TAG(api, "st:M", BRIDGE_DELETE, BRIDGE_TABLE);

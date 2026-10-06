@@ -60,7 +60,7 @@ anything else of it is read.** A host, a backend and a module are each built at 
 and since the library is a file a host links, at a time other than the library's. A struct read
 at offsets the other side does not use is not an error anybody is told of; so it is made one.
 
-    the host seam       BRIDGE_HOST_ABI   a host states it first in `bridge_config`, and
+    the host seam       BRIDGE_HOST_ABI   a host states it first in `bridge_config_t`, and
                                           `bridge_create` refuses another, by both numbers
     the backend seam    BACKEND_ABI       a backend's library answers it from its first
                                           entry, and one that answers another is not asked
@@ -100,19 +100,19 @@ parsers that would otherwise sit in the library do not: `bridge_manifest_parse` 
 ## The surface
 
     /* instance */
-    bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud);
+    bridge *bridge_create(const bridge_config_t *cfg, bridge_sink_fn_t sink, void *ud);
     int     bridge_destroy(bridge *b);
 
     /* advance */
     int bridge_phase(bridge *b, const char *name);
 
     /* runtime lifecycle - between phases only */
-    int bridge_load  (bridge *b, const bridge_artifact *a);
+    int bridge_load  (bridge *b, const bridge_artifact_t *a);
     int bridge_unload(bridge *b, const char *identity);
-    int bridge_reload(bridge *b, const bridge_artifact *a);
+    int bridge_reload(bridge *b, const bridge_artifact_t *a);
 
     /* introspection */
-    int bridge_modules(bridge *b, bridge_module_info *out, int max);
+    int bridge_modules(bridge *b, bridge_module_info_t *out, int max);
     int bridge_profile (bridge *b, bridge_profile_row *out, int max);   /* stage 14 */
 
 **`bridge_profile`, and `validate` and `profile` below, are not built**: they are the surface as
@@ -126,7 +126,7 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
 
 ## The data
 
-    typedef struct { const char *before, *after; } bridge_order;
+    typedef struct { const char *before, *after; } bridge_order_t;
 
     typedef struct {
         uint64_t entities;        /* how many there may be at once: entity indices */
@@ -137,36 +137,36 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
         uint32_t modules;         /* modules loaded */
         uint64_t persistent;      /* how many bytes: the persistent arena */
         uint64_t columns;         /* component columns and entity arrays */
-    } bridge_budget;
+    } bridge_budget_t;
 
     typedef struct {
         const char *key;
         enum bridge_setting_kind kind;                       /* bool | i64 | f64 | string */
         union { bool b; int64_t i; double f; const char *s; } v;
-    } bridge_setting;
+    } bridge_setting_t;
 
     typedef struct {
         const char *name;            /* what an artifact names: "wasm", "native" */
         const char *library;         /* the shared library Bridge-ASM700 opens */
-        const bridge_setting *settings; uint32_t setting_count;  /* for backend_create */
-    } bridge_backend;
+        const bridge_setting_t *settings; uint32_t setting_count;  /* for backend_create */
+    } bridge_backend_t;
 
     typedef struct {
-        const bridge_backend *backends; uint32_t backend_count;
+        const bridge_backend_t *backends; uint32_t backend_count;
         const char *const *phases;   uint32_t phase_count;   /* array order IS the order */
-        const bridge_order *order;   uint32_t order_count;
+        const bridge_order_t *order;   uint32_t order_count;
         /* and before all of it: uint32_t abi, BRIDGE_HOST_ABI */
         uint32_t            threads;                         /* counting the caller's */
-        bridge_budget       budget;
+        bridge_budget_t       budget;
         enum bridge_flag    validate, profile;               /* [checks]: stage 14 */
-    } bridge_config;
+    } bridge_config_t;
 
     typedef struct {
         const char *identity;        /* "tri:triangle@0.1.0" */
         uint32_t    abi;
 
         enum bridge_flag trusted, reloadable, hot_reload, pinned;   /* TRUE | FALSE. zero is unset */
-        const bridge_phase_name *phases; uint32_t phase_count;      /* its phase names, mapped */
+        const bridge_phase_name_t *phases; uint32_t phase_count;      /* its phase names, mapped */
         enum bridge_on_error on_error;   /* FAIL | SKIP. zero is unset */
         /* each of the next six: zero is unset, BRIDGE_NO_LIMIT (-1) is "no limit" */
         int64_t  max_system_failures;    /* each system is counted against it, alone */
@@ -184,16 +184,16 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
         const char *const *write; uint32_t write_count;
 
         const char *config;          /* the component its settings seed, or "none" */
-        const bridge_setting *settings; uint32_t setting_count;  /* its own [.config] */
-    } bridge_module_config;
+        const bridge_setting_t *settings; uint32_t setting_count;  /* its own [.config] */
+    } bridge_module_config_t;
 
     typedef struct {
-        bridge_module_config cfg;
+        bridge_module_config_t cfg;
         const char *backend;             /* which backend runs it, by name */
         const void *bytes; size_t len;   /* the image, if the host has it */
         const char *path;                /* where it is, if it is anywhere. both go to the
                                             backend, which refuses if the one it needs is null */
-    } bridge_artifact;
+    } bridge_artifact_t;
 
     /* what comes back out */
     typedef struct {
@@ -204,14 +204,14 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
         uint32_t    when;                /* barrier count, then offset in the phase */
         uint32_t    arg[2];
         uint8_t     level;               /* lower is worse */
-    } bridge_record;
+    } bridge_record_t;
 
-    typedef void (*bridge_sink_fn)(void *ud, const bridge_record *r);
+    typedef void (*bridge_sink_fn_t)(void *ud, const bridge_record_t *r);
 
     typedef struct {
         const char *identity;
         enum bridge_state state;         /* RUNNING | STOPPED */
-    } bridge_module_info;
+    } bridge_module_info_t;
 
 **A phase is a string, not a struct.** It has one property and that is its name - `schedule.md`, *A
 phase is a name and nothing else* - which also disposes of a collision: a typedef and a function

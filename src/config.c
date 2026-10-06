@@ -8,7 +8,7 @@
 
 static const char *const kinds[] = { "unset", "a bool", "an integer", "a float", "text" };
 
-static int misfit(char *why, size_t len, const bridge_setting *s, const char *field)
+static int misfit(char *why, size_t len, const bridge_setting_t *s, const char *field)
 {
     snprintf(why, len, "its setting '%.80s' is %s, and the field it names is %s", s->key,
         s->kind <= BRIDGE_STRING ? kinds[s->kind] : kinds[0], field);
@@ -32,7 +32,7 @@ static int put_integer(uint8_t *at, enum schema_kind kind, int64_t v)
 }
 
 /* the bytes of a text setting, in this module's block of the arena */
-static uint32_t put_text(bridge *b, module *m, uint32_t *used, const char *text, uint32_t len)
+static uint32_t put_text(bridge_t *b, module_t *m, uint32_t *used, const char *text, uint32_t len)
 {
     uint32_t at = m->text_at + *used;
     memcpy(b->shared + at, text, len);
@@ -41,7 +41,7 @@ static uint32_t put_text(bridge *b, module *m, uint32_t *used, const char *text,
 }
 
 /* the value of an enum's constant, by its name */
-static bool constant(const declared_type *of, const char *name, int64_t *value)
+static bool constant(const declared_type_t *of, const char *name, int64_t *value)
 {
     for (uint32_t i = 0; i < of->s.constant_count; i ++) {
         if (strcmp(of->s.constants[i].name, name)) continue;
@@ -51,8 +51,8 @@ static bool constant(const declared_type *of, const char *name, int64_t *value)
     return false;
 }
 
-static int seed_one(bridge *b, module *m, uint8_t *row, const schema_field *field,
-                    const bridge_setting *s, uint32_t *text_used, char *why, size_t len)
+static int seed_one(bridge_t *b, module_t *m, uint8_t *row, const schema_field_t *field,
+                    const bridge_setting_t *s, uint32_t *text_used, char *why, size_t len)
 {
     uint8_t *at = row + field->offset;
     uint32_t text_len = s->kind == BRIDGE_STRING && s->v.s ? (uint32_t)strlen(s->v.s) : 0;
@@ -95,7 +95,7 @@ static int seed_one(bridge *b, module *m, uint8_t *row, const schema_field *fiel
         }
         return 0;
     case SCHEMA_ENUM: {
-        const declared_type *of = field->type;
+        const declared_type_t *of = field->type;
         int64_t value = s->v.i, most = INT64_MAX >> (64 - 8 * of->s.size);
         /* an enum is the integer its author stated: as many bytes, signed or not */
         bool is_signed = of->s.base == SCHEMA_I8 || of->s.base == SCHEMA_I16 || of->s.base == SCHEMA_I32;
@@ -119,36 +119,36 @@ static int seed_one(bridge *b, module *m, uint8_t *row, const schema_field *fiel
         return 0;
     }
     case SCHEMA_BITMASK: {
-        const declared_type *of = field->type;
+        const declared_type_t *of = field->type;
         uint64_t most = UINT64_MAX >> (64 - 8 * of->s.size);
         if (s->kind != BRIDGE_INT || s->v.i < 0 || (uint64_t)s->v.i > most) return misfit(why, len, s, "a bitmask");
         memcpy(at, &s->v.i, of->s.size);
         return 0;
     }
     case SCHEMA_TEXT:
-        /* bridge_text: (offset, length) into the persistent arena - strings.md */
+        /* bridge_text_t: (offset, length) into the persistent arena - strings.md */
         if (s->kind == BRIDGE_STRING) {
-            bridge_text text = { put_text(b, m, text_used, s->v.s, text_len), text_len };
+            bridge_text_t text = { put_text(b, m, text_used, s->v.s, text_len), text_len };
             memcpy(at, &text, sizeof text);
             return 0;
         }
-        return misfit(why, len, s, "a struct, which only text into a bridge_text fills");
+        return misfit(why, len, s, "a struct, which only text into a bridge_text_t fills");
     case SCHEMA_STRUCT:
-        return misfit(why, len, s, "a struct, which only text into a bridge_text fills");
+        return misfit(why, len, s, "a struct, which only text into a bridge_text_t fills");
     default:
         return misfit(why, len, s, "of a type no setting fills");
     }
 }
 
 /* 0, or `why` says which setting or which name was refused. */
-int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why, size_t len)
+int config_seed(bridge_t *b, module_t *m, const bridge_module_config_t *cfg, char *why, size_t len)
 {
-    declared_type *c = nullptr;
-    const schema_field *fields = nullptr;
+    declared_type_t *c = nullptr;
+    const schema_field_t *fields = nullptr;
     uint32_t field_count, k;
     uint32_t i, text_total = 0, text_used = 0;
     uint8_t *row;
-    module *other;
+    module_t *other;
 
     if (!strcmp(cfg->config, BRIDGE_NO_CONFIG)) {
         if (!cfg->setting_count) return 0;
@@ -179,9 +179,9 @@ int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why
     fields = c->s.fields;
     field_count = c->s.field_count;
 
-    /* the text bridge_text fields will hold, to know where it goes before any is written */
+    /* the text bridge_text_t fields will hold, to know where it goes before any is written */
     for (i = 0; i < cfg->setting_count; i ++) {
-        const bridge_setting *s = &cfg->settings[i];
+        const bridge_setting_t *s = &cfg->settings[i];
         for (k = 0; k < field_count; k ++) {
             if (s->key && !strcmp(fields[k].name, s->key) && fields[k].kind == SCHEMA_TEXT
                 && fields[k].count == 1 && s->kind == BRIDGE_STRING && s->v.s) {
@@ -213,7 +213,7 @@ int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why
 
     row = calloc(1, c->size);
     for (i = 0; i < cfg->setting_count; i ++) {
-        const bridge_setting *s = &cfg->settings[i];
+        const bridge_setting_t *s = &cfg->settings[i];
         for (k = 0; k < field_count && (!s->key || strcmp(fields[k].name, s->key)); k ++) {}
         if (k == field_count) {
             snprintf(why, len, "its settings have a key '%.80s', and '%.100s' has no field of "
@@ -234,7 +234,7 @@ int config_seed(bridge *b, module *m, const bridge_module_config *cfg, char *why
 }
 
 /* The block a module's settings text is in outlives the module: its next load writes there. */
-void config_keep(bridge *b, module *m)
+void config_keep(bridge_t *b, module_t *m)
 {
     uint32_t i;
     if (!m->text_room) return;
@@ -247,7 +247,7 @@ void config_keep(bridge *b, module *m)
     {
         /* failure.md, *Out of memory*: an unload does not fail. What is lost is the reuse of
          * that range by the module's next load, and it is said */
-        kept_text *more = realloc(b->kept, (b->kept_count + 1) * sizeof *b->kept);
+        kept_text_t *more = realloc(b->kept, (b->kept_count + 1) * sizeof *b->kept);
         char *stem = copy(m->stem, strlen(m->stem));
         if (more) b->kept = more;
         if (!more || !stem) {
@@ -264,7 +264,7 @@ void config_keep(bridge *b, module *m)
 
 
 /* Its share has gone back to the arena, and the block its settings text was in with it. */
-void config_forget(bridge *b, const module *m)
+void config_forget(bridge_t *b, const module_t *m)
 {
     for (uint32_t i = 0; i < b->kept_count; i ++) {
         if (strcmp(b->kept[i].stem, m->stem)) continue;

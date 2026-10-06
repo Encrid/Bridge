@@ -4,7 +4,7 @@ What was weighed here and refused is `budgets-refused.md`, *What was refused: Bu
 
 Two tiers, because two things are being sized.
 
-**Shared, when Bridge-ASM700 starts, from `bridge_config`:**
+**Shared, when Bridge-ASM700 starts, from `bridge_config_t`:**
 
     how many there may be at once
     entities      entity indices. Index 0 is no entity

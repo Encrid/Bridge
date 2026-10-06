@@ -17,7 +17,7 @@ constexpr uint32_t COUNT = 6;
 static uint32_t a, x, reading;
 static uint64_t ids[COUNT];
 
-static void say(const bridge_api *api, const char *text, uint32_t n, uint32_t sum)
+static void say(const bridge_api_t *api, const char *text, uint32_t n, uint32_t sum)
 {
     bridge_native_log(api, BRIDGE_LOG_INFO, text, (uint32_t)strlen(text), n, sum);
 }
@@ -58,7 +58,7 @@ BRIDGE_NATIVE(detach_b_half)
 BRIDGE_NATIVE(flicker)
 {
 #if KEPT == 3
-    const bridge_query *q = bridge_native_query(api, reading);
+    const bridge_query_t *q = bridge_native_query(api, reading);
     for (uint32_t i = 0; i < q->spans; i ++) {
         const uint32_t *span = bridge_native_span(api, q, i, 1);
         auto column = (const X *)(api->shared_base + span[2]);
@@ -88,7 +88,7 @@ BRIDGE_NATIVE(look)
     if (value) n = 1, sum = value->v;
     say(api, "X, a singleton: has a value, which is", n, sum);
 #else
-    const bridge_query *q = bridge_native_query(api, reading);
+    const bridge_query_t *q = bridge_native_query(api, reading);
     for (uint32_t i = 0; i < q->spans; i ++) {
         const uint32_t *span = bridge_native_span(api, q, i, 1);
         auto column = (const X *)(api->shared_base + span[2]);
@@ -104,7 +104,7 @@ BRIDGE_NATIVE(look)
 BRIDGE_NATIVE(init)
 {
     int none = 0;
-    bridge_term one[1] = {{ 0, BRIDGE_WRITE, KEPT >= 4 ? BRIDGE_OPTIONAL : BRIDGE_AND, 0 }};
+    bridge_term_t one[1] = {{ 0, BRIDGE_WRITE, KEPT >= 4 ? BRIDGE_OPTIONAL : BRIDGE_AND, 0 }};
     uint32_t both[2];
     a = both[0] = BRIDGE_NATIVE_COMPONENT(api, "st:A", A, BRIDGE_DELETE, BRIDGE_TABLE);
     x = both[1] = BRIDGE_NATIVE_COMPONENT(api, "st:X", X, BRIDGE_DELETE, (enum bridge_storage)KEPT);

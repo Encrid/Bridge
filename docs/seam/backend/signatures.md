@@ -17,7 +17,7 @@ So **a signature is declared going in and verified coming out.** `define_func` c
     typedef struct {
         const enum backend_type *params;  uint32_t param_count;   /* I32 | I64 */
         const enum backend_type *results; uint32_t result_count;
-    } backend_sig;
+    } backend_sig_t;
 
 **A function Bridge-ASM700 provides answers a status beside its results.** Non-zero says the call
 that reached it must not go on - `budgets.md`, *What running out does* - and a backend that can

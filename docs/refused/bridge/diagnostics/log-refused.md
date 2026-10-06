@@ -27,5 +27,5 @@ which 1 does not quite say.
 
 Refused: one definition of the four names in a header both seams include. A host would then be
 handed a piece of the module seam, and a seam's header is whole without the other's: the rule
-`bridge_setting` and `backend_setting` already follow. The condition that brings it back is the
+`bridge_setting_t` and `backend_setting_t` already follow. The condition that brings it back is the
 two sets found to have drifted in spite of the assertion.

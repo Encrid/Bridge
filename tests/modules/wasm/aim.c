@@ -31,7 +31,7 @@ BRIDGE_EXPORT(reached) int reached()
 
 BRIDGE_EXPORT(init) int init()
 {
-    bridge_term two[2] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }, { 0, BRIDGE_READ, BRIDGE_OPTIONAL, 0 }};
+    bridge_term_t two[2] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }, { 0, BRIDGE_READ, BRIDGE_OPTIONAL, 0 }};
     uint32_t i;
     position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE, BRIDGE_TABLE);
     aim = BRIDGE_COMPONENT("game:Aim", Aim, BRIDGE_DELETE, BRIDGE_DIRECT_INDEXED);

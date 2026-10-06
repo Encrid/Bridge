@@ -31,7 +31,7 @@ constexpr uint32_t COUNT = 6, STEP = 2;
 static uint32_t a, d, in_table;
 static uint64_t ids[COUNT + 2], mixed[COUNT];
 
-static void say(const bridge_api *api, const char *text, uint32_t x, uint32_t y)
+static void say(const bridge_api_t *api, const char *text, uint32_t x, uint32_t y)
 {
     bridge_native_log(api, BRIDGE_LOG_INFO, text, (uint32_t)strlen(text), x, y);
 }
@@ -108,7 +108,7 @@ BRIDGE_NATIVE(destroy)
  * was given one */
 BRIDGE_NATIVE(look_b)
 {
-    const bridge_query *q = bridge_native_query(api, in_table);
+    const bridge_query_t *q = bridge_native_query(api, in_table);
     uint32_t cells = bridge_native_cells(api, d), rows = 0, found = 0, total = 0;
     const uint64_t *given = bridge_native_bits(api, cells);
     auto cell = (const D *)(api->shared_base + cells);
@@ -131,10 +131,10 @@ BRIDGE_NATIVE(look_b)
 }
 
 /* by ids that are held: the generation, the bit, the cell */
-static int reach(const bridge_api *api, const uint64_t *held, uint32_t count)
+static int reach(const bridge_api_t *api, const uint64_t *held, uint32_t count)
 {
-    const bridge_header *h = bridge_native_header(api);
-    auto index = (const bridge_entity *)(api->shared_base + h->entity_index);
+    const bridge_header_t *h = bridge_native_header(api);
+    auto index = (const bridge_entity_t *)(api->shared_base + h->entity_index);
     uint32_t cells = bridge_native_cells(api, d), alive = 0, found = 0, total = 0;
     const uint64_t *given = bridge_native_bits(api, cells);
     auto cell = (const D *)(api->shared_base + cells);
@@ -157,10 +157,10 @@ BRIDGE_NATIVE(far) { return reach(api, mixed, COUNT); }
 #ifndef BIG
 static uint32_t on_d, on_both;
 
-static void heard(const bridge_api *api, uint32_t observer, const char *text)
+static void heard(const bridge_api_t *api, uint32_t observer, const char *text)
 {
-    const bridge_list *list = bridge_native_list(api, observer);
-    auto trigger = (const bridge_trigger *)(api->private_base + list->at);
+    const bridge_list_t *list = bridge_native_list(api, observer);
+    auto trigger = (const bridge_trigger_t *)(api->private_base + list->at);
     for (uint32_t i = 0; i < list->count; i ++) say(api, text, (uint32_t)trigger[i].id, trigger[i].events);
 }
 
@@ -171,7 +171,7 @@ BRIDGE_NATIVE(heard_both) { heard(api, on_both, "heard of A and D: entity, event
 BRIDGE_NATIVE(init)
 {
     int none = 0;
-    bridge_term two[2] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }, { 0, BRIDGE_READ, BRIDGE_OPTIONAL, 0 }};
+    bridge_term_t two[2] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }, { 0, BRIDGE_READ, BRIDGE_OPTIONAL, 0 }};
     a = BRIDGE_NATIVE_COMPONENT(api, "st:A", A, BRIDGE_DELETE, BRIDGE_TABLE);
     d = BRIDGE_NATIVE_COMPONENT(api, "st:D", D, BRIDGE_DELETE, BRIDGE_DIRECT_INDEXED);
     BRIDGE_NATIVE_SYSTEM(api, "spawn", "spawn", &none, 0, &a, 1);

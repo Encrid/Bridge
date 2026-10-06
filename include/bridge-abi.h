@@ -66,10 +66,10 @@ typedef struct {
     enum bridge_access access;
     enum bridge_oper   oper;
     uint16_t           pad;
-} bridge_term;
-static_assert(sizeof(bridge_term) == 8 && alignof(bridge_term) == 4);
-static_assert(offsetof(bridge_term, slot) == 0 && offsetof(bridge_term, access) == 4);
-static_assert(offsetof(bridge_term, oper) == 5 && offsetof(bridge_term, pad) == 6);
+} bridge_term_t;
+static_assert(sizeof(bridge_term_t) == 8 && alignof(bridge_term_t) == 4);
+static_assert(offsetof(bridge_term_t, slot) == 0 && offsetof(bridge_term_t, access) == 4);
+static_assert(offsetof(bridge_term_t, oper) == 5 && offsetof(bridge_term_t, pad) == 6);
 
 /* observe's events, as a mask of these, and what an observer reads: who triggered it, and how.
  * Each is what a barrier made of an entity, against the observer's terms. ENTER: it did not
@@ -81,10 +81,10 @@ typedef struct {
     uint64_t          id;
     enum bridge_event events;
     uint32_t          pad;
-} bridge_trigger;
-static_assert(sizeof(bridge_trigger) == 16 && alignof(bridge_trigger) == 8);
-static_assert(offsetof(bridge_trigger, id) == 0 && offsetof(bridge_trigger, events) == 8);
-static_assert(offsetof(bridge_trigger, pad) == 12);
+} bridge_trigger_t;
+static_assert(sizeof(bridge_trigger_t) == 16 && alignof(bridge_trigger_t) == 8);
+static_assert(offsetof(bridge_trigger_t, id) == 0 && offsetof(bridge_trigger_t, events) == 8);
+static_assert(offsetof(bridge_trigger_t, pad) == 12);
 
 /* Offset 0 of the private memory: where each of this module's regions begins. Bridge-ASM700
  * writes all of it; a module writes `scratch_used` and `ring_head` and nothing else. */
@@ -95,45 +95,45 @@ typedef struct {
     uint32_t ring, ring_len;            /* the log ring, in records */
     uint32_t ring_head;                 /* records ever written, by the module */
     uint32_t ring_tail;                 /* records ever drained, by Bridge-ASM700 */
-    uint32_t queries;                   /* bridge_query, one per slot `system` answered */
+    uint32_t queries;                   /* bridge_query_t, one per slot `system` answered */
     uint32_t column_base;               /* u32 [tables][types] of shared-memory offsets */
     uint32_t types, tables;             /* how many types this module declared, and tables */
-    uint32_t entity_index;              /* in the shared memory: bridge_entity [entities] */
+    uint32_t entity_index;              /* in the shared memory: bridge_entity_t [entities] */
     uint32_t entities;
     uint32_t when;                      /* set before every dispatch */
     uint32_t system;                    /* the slot of the system running */
     uint32_t log_level;                 /* a line above it is not written */
-    uint32_t observers;                 /* bridge_list, one per slot `observe` answered */
+    uint32_t observers;                 /* bridge_list_t, one per slot `observe` answered */
     uint32_t kept;                      /* u32 [types]: for a type that is not kept in a table,
                                          * where in the shared memory it is reached. A sparse
                                          * set: its index, a u32 for each entity */
-} bridge_header;
-static_assert(sizeof(bridge_header) == 76 && alignof(bridge_header) == 4);
-static_assert(offsetof(bridge_header, abi) == 0 && offsetof(bridge_header, scratch) == 4);
-static_assert(offsetof(bridge_header, scratch_len) == 8 && offsetof(bridge_header, scratch_used) == 12);
-static_assert(offsetof(bridge_header, ring) == 16 && offsetof(bridge_header, ring_len) == 20);
-static_assert(offsetof(bridge_header, ring_head) == 24 && offsetof(bridge_header, ring_tail) == 28);
-static_assert(offsetof(bridge_header, queries) == 32 && offsetof(bridge_header, column_base) == 36);
-static_assert(offsetof(bridge_header, types) == 40 && offsetof(bridge_header, tables) == 44);
-static_assert(offsetof(bridge_header, entity_index) == 48 && offsetof(bridge_header, entities) == 52);
-static_assert(offsetof(bridge_header, when) == 56 && offsetof(bridge_header, system) == 60);
-static_assert(offsetof(bridge_header, log_level) == 64 && offsetof(bridge_header, observers) == 68);
-static_assert(offsetof(bridge_header, kept) == 72);
+} bridge_header_t;
+static_assert(sizeof(bridge_header_t) == 76 && alignof(bridge_header_t) == 4);
+static_assert(offsetof(bridge_header_t, abi) == 0 && offsetof(bridge_header_t, scratch) == 4);
+static_assert(offsetof(bridge_header_t, scratch_len) == 8 && offsetof(bridge_header_t, scratch_used) == 12);
+static_assert(offsetof(bridge_header_t, ring) == 16 && offsetof(bridge_header_t, ring_len) == 20);
+static_assert(offsetof(bridge_header_t, ring_head) == 24 && offsetof(bridge_header_t, ring_tail) == 28);
+static_assert(offsetof(bridge_header_t, queries) == 32 && offsetof(bridge_header_t, column_base) == 36);
+static_assert(offsetof(bridge_header_t, types) == 40 && offsetof(bridge_header_t, tables) == 44);
+static_assert(offsetof(bridge_header_t, entity_index) == 48 && offsetof(bridge_header_t, entities) == 52);
+static_assert(offsetof(bridge_header_t, when) == 56 && offsetof(bridge_header_t, system) == 60);
+static_assert(offsetof(bridge_header_t, log_level) == 64 && offsetof(bridge_header_t, observers) == 68);
+static_assert(offsetof(bridge_header_t, kept) == 72);
 
-typedef struct { uint32_t spans, at; } bridge_query;
-static_assert(sizeof(bridge_query) == 8 && alignof(bridge_query) == 4);
-static_assert(offsetof(bridge_query, spans) == 0 && offsetof(bridge_query, at) == 4);
+typedef struct { uint32_t spans, at; } bridge_query_t;
+static_assert(sizeof(bridge_query_t) == 8 && alignof(bridge_query_t) == 4);
+static_assert(offsetof(bridge_query_t, spans) == 0 && offsetof(bridge_query_t, at) == 4);
 
 /* Text a component keeps: where its bytes are in the persistent arena, and how many. A field
  * may be of this type under any namespace - docs/modules/schema.md, *The type set*. */
-typedef struct { uint32_t at, len; } bridge_text;
-static_assert(sizeof(bridge_text) == 8 && alignof(bridge_text) == 4);
-static_assert(offsetof(bridge_text, at) == 0 && offsetof(bridge_text, len) == 4);
+typedef struct { uint32_t at, len; } bridge_text_t;
+static_assert(sizeof(bridge_text_t) == 8 && alignof(bridge_text_t) == 4);
+static_assert(offsetof(bridge_text_t, at) == 0 && offsetof(bridge_text_t, len) == 4);
 
-/* An observer's slot: how many bridge_trigger records this barrier, and where they begin. */
-typedef struct { uint32_t count, at; } bridge_list;
-static_assert(sizeof(bridge_list) == 8 && alignof(bridge_list) == 4);
-static_assert(offsetof(bridge_list, count) == 0 && offsetof(bridge_list, at) == 4);
+/* An observer's slot: how many bridge_trigger_t records this barrier, and where they begin. */
+typedef struct { uint32_t count, at; } bridge_list_t;
+static_assert(sizeof(bridge_list_t) == 8 && alignof(bridge_list_t) == 4);
+static_assert(offsetof(bridge_list_t, count) == 0 && offsetof(bridge_list_t, at) == 4);
 
 /* A span, one per matched table - docs/bridge/data/query.md:
  *     u32 count, u32 entities, u32 base[terms] */
@@ -141,10 +141,10 @@ constexpr uint32_t BRIDGE_SPAN_BASE = 8;
 #define BRIDGE_SPAN_SIZE(n)    (8u + 4u * (n))
 
 /* The entity index, by the low 32 bits of an id. Table 0 is no table. */
-typedef struct { uint32_t table, row, generation; } bridge_entity;
-static_assert(sizeof(bridge_entity) == 12 && alignof(bridge_entity) == 4);
-static_assert(offsetof(bridge_entity, table) == 0 && offsetof(bridge_entity, row) == 4);
-static_assert(offsetof(bridge_entity, generation) == 8);
+typedef struct { uint32_t table, row, generation; } bridge_entity_t;
+static_assert(sizeof(bridge_entity_t) == 12 && alignof(bridge_entity_t) == 4);
+static_assert(offsetof(bridge_entity_t, table) == 0 && offsetof(bridge_entity_t, row) == 4);
+static_assert(offsetof(bridge_entity_t, generation) == 8);
 
 /* What a log line is: the severities of syslog, RFC 5424, by its numbers. 0 is the worst and 7
  * the most detail; these are the four the bindings name. docs/bridge/diagnostics/log.md. */
@@ -160,12 +160,12 @@ typedef struct {
     uint16_t system;
     uint32_t text, len;
     uint32_t arg[2];
-} bridge_log_record;
-static_assert(sizeof(bridge_log_record) == 24 && alignof(bridge_log_record) == 4);
-static_assert(offsetof(bridge_log_record, when) == 0 && offsetof(bridge_log_record, pad) == 4);
-static_assert(offsetof(bridge_log_record, level) == 5 && offsetof(bridge_log_record, system) == 6);
-static_assert(offsetof(bridge_log_record, text) == 8 && offsetof(bridge_log_record, len) == 12);
-static_assert(offsetof(bridge_log_record, arg) == 16);
+} bridge_log_record_t;
+static_assert(sizeof(bridge_log_record_t) == 24 && alignof(bridge_log_record_t) == 4);
+static_assert(offsetof(bridge_log_record_t, when) == 0 && offsetof(bridge_log_record_t, pad) == 4);
+static_assert(offsetof(bridge_log_record_t, level) == 5 && offsetof(bridge_log_record_t, system) == 6);
+static_assert(offsetof(bridge_log_record_t, text) == 8 && offsetof(bridge_log_record_t, len) == 12);
+static_assert(offsetof(bridge_log_record_t, arg) == 16);
 
 #ifdef __cplusplus
 }

@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-uint32_t block_offset(bridge *b, const void *p)
+uint32_t block_offset(bridge_t *b, const void *p)
 {
     const uint8_t *c = p;
     if (!c || c < b->shared || c >= b->shared + b->shared_len) return 0;
@@ -19,7 +19,7 @@ uint32_t block_offset(bridge *b, const void *p)
  * takes the smallest gap that holds it before it takes fresh space. Nothing is ever taken from
  * outside the region: a request it cannot meet is refused - budgets.md, *What running out
  * does*. */
-static void gap_drop(region *r, uint32_t i)
+static void gap_drop(region_t *r, uint32_t i)
 {
     memmove(&r->gaps[i], &r->gaps[i + 1], (r->count - i - 1) * sizeof *r->gaps);
     r->count --;
@@ -27,9 +27,9 @@ static void gap_drop(region *r, uint32_t i)
 
 /* Room in the list for the gaps that `ranges` ranges handed out can leave: one after each,
  * and one before the first. false if there is not the memory. */
-bool region_room(region *r, uint32_t ranges)
+bool region_room(region_t *r, uint32_t ranges)
 {
-    range *gaps;
+    range_t *gaps;
     if (ranges + 1 <= r->room) return true;
     gaps = realloc(r->gaps, ((size_t)ranges + 1) * sizeof *gaps);
     if (!gaps) return false;
@@ -38,7 +38,7 @@ bool region_room(region *r, uint32_t ranges)
     return true;
 }
 
-void region_give(region *r, uint32_t at, uint32_t len)
+void region_give(region_t *r, uint32_t at, uint32_t len)
 {
     uint32_t i = 0;
     while (i < r->count && r->gaps[i].at < at) i ++;
@@ -50,7 +50,7 @@ void region_give(region *r, uint32_t at, uint32_t len)
          * there is room; were there not, the gap would go unrecorded and its bytes unused */
         if (r->count == r->room) return;
         memmove(&r->gaps[i + 1], &r->gaps[i], (r->count - i) * sizeof *r->gaps);
-        r->gaps[i] = (range){ at, len };
+        r->gaps[i] = (range_t){ at, len };
         r->count ++;
     }
     if (i + 1 < r->count && r->gaps[i].at + r->gaps[i].len == r->gaps[i + 1].at) {
@@ -64,7 +64,7 @@ void region_give(region *r, uint32_t at, uint32_t len)
     }
 }
 
-int region_take(region *r, uint32_t len, uint32_t *at)
+int region_take(region_t *r, uint32_t len, uint32_t *at)
 {
     uint32_t i, best = UINT32_MAX;
     for (i = 0; i < r->count; i ++) {
@@ -85,7 +85,7 @@ int region_take(region *r, uint32_t len, uint32_t *at)
     return 1;
 }
 
-bool region_grow(region *r, uint32_t at, uint32_t had, uint32_t want)
+bool region_grow(region_t *r, uint32_t at, uint32_t had, uint32_t want)
 {
     /* mostly it is the last piece handed out, and what follows it has never been used */
     if (at + had == r->used && want - had <= r->len - r->used) {
@@ -102,7 +102,7 @@ bool region_grow(region *r, uint32_t at, uint32_t had, uint32_t want)
     return false;
 }
 
-uint32_t region_most(const region *r)
+uint32_t region_most(const region_t *r)
 {
     uint32_t most = r->len - r->used;
     for (uint32_t i = 0; i < r->count; i ++) if (r->gaps[i].len > most) most = r->gaps[i].len;
@@ -120,12 +120,12 @@ static uint32_t grain(uint32_t size)
     return (size + GRAIN - 1) & ~(GRAIN - 1);
 }
 
-void block_column_free(bridge *b, void *ptr, uint32_t size)
+void block_column_free(bridge_t *b, void *ptr, uint32_t size)
 {
     region_give(&b->column_space, (uint32_t)((uint8_t *)ptr - b->shared) - b->columns, grain(size));
 }
 
-void *block_column_regrow(bridge *b, void *ptr, uint32_t old_size, uint32_t new_size)
+void *block_column_regrow(bridge_t *b, void *ptr, uint32_t old_size, uint32_t new_size)
 {
     uint8_t *base = b->shared + b->columns;
     uint32_t had = grain(old_size), want = grain(new_size), at = 0, to;
@@ -150,7 +150,7 @@ void *block_column_regrow(bridge *b, void *ptr, uint32_t old_size, uint32_t new_
 
 /* A module's ids for the time until the next barrier: what it did not use, topped up to what
  * its config stated. They are real entities with nothing on them, which no query matches. */
-int block_refill(bridge *b, module *m)
+int block_refill(bridge_t *b, module_t *m)
 {
     uint32_t want = m->spawns > 0 ? (uint32_t)m->spawns : 0, kept = m->id_count - m->id_next;
     if (!want) return 0;
@@ -168,9 +168,9 @@ int block_refill(bridge *b, module *m)
 
 /* ---- publishing: the header, column_base, and one span per matched table ---- */
 
-void block_header(bridge *b, module *m)
+void block_header(bridge_t *b, module_t *m)
 {
-    auto h = (bridge_header *)m->priv;
+    auto h = (bridge_header_t *)m->priv;
     h->abi = BRIDGE_ABI;
     h->scratch = m->scratch;
     h->scratch_len = m->scratch_len;
@@ -178,8 +178,8 @@ void block_header(bridge *b, module *m)
     h->ring_len = m->ring_len;
     h->ring_tail = m->ring_tail;
     h->queries = m->spans;
-    h->observers = m->spans + (uint32_t)sizeof(bridge_query) * m->system_count;
-    h->column_base = h->observers + (uint32_t)sizeof(bridge_list) * m->observer_count;
+    h->observers = m->spans + (uint32_t)sizeof(bridge_query_t) * m->system_count;
+    h->column_base = h->observers + (uint32_t)sizeof(bridge_list_t) * m->observer_count;
     h->types = m->declared_count;
     h->tables = storage_tables(b->storage);
     h->kept = h->column_base + 4u * h->types * h->tables;
@@ -189,16 +189,16 @@ void block_header(bridge *b, module *m)
 
 /* ---- the log ring ---- */
 
-void block_drain(bridge *b, module *m)
+void block_drain(bridge_t *b, module_t *m)
 {
     static const char outside[] = "(a log line whose text lies outside the scratch arena)";
-    auto h = (bridge_header *)m->priv;
+    auto h = (bridge_header_t *)m->priv;
     uint32_t head = h->ring_head, written = head - m->ring_tail;
     uint32_t kept = written < m->ring_len ? written : m->ring_len, i;
 
     for (i = 0; i < kept; i ++) {
-        bridge_log_record rec;
-        bridge_record r = {};
+        bridge_log_record_t rec;
+        bridge_record_t r = {};
         memcpy(&rec, m->priv + m->ring + ((m->ring_tail + i) % m->ring_len) * sizeof rec, sizeof rec);
         r.identity = m->identity;
         r.system = rec.system < m->system_count ? m->systems[rec.system]->name
@@ -234,9 +234,9 @@ void block_drain(bridge *b, module *m)
 
 /* ---- the barrier - docs/bridge/run/schedule.md, *Phases* ---- */
 
-void block_barrier(bridge *b)
+void block_barrier(bridge_t *b)
 {
-    module *m;
+    module_t *m;
     uint32_t tables, i;
 
     storage_apply(b->storage);                /* queued changes applied */
@@ -266,7 +266,7 @@ void block_barrier(bridge *b)
 
 /* ---- create and destroy ---- */
 
-static int unset(bridge *b, const char *key, uint64_t value)
+static int unset(bridge_t *b, const char *key, uint64_t value)
 {
     if (value) return 0;
     say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] %s is unset", key);
@@ -275,7 +275,7 @@ static int unset(bridge *b, const char *key, uint64_t value)
 
 /* a count that may be none: zero is unset, BRIDGE_NONE is none, and nothing else below one
  * is anything */
-static int counted(bridge *b, const char *key, int64_t value)
+static int counted(bridge_t *b, const char *key, int64_t value)
 {
     if (value == BRIDGE_NONE || (value > 0 && value <= UINT32_MAX)) return 0;
     if (!value) say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] %s is unset", key);
@@ -285,7 +285,7 @@ static int counted(bridge *b, const char *key, int64_t value)
 }
 
 /* an offset is 32 bits: a size it cannot reach is refused by name, before any sum is made of it */
-static int beyond(bridge *b, const char *key, uint64_t value)
+static int beyond(bridge_t *b, const char *key, uint64_t value)
 {
     if (value <= UINT32_MAX) return 0;
     say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] %s of %llu is more than an offset of 32 bits can "
@@ -293,7 +293,7 @@ static int beyond(bridge *b, const char *key, uint64_t value)
     return 1;
 }
 
-int block_create(bridge *b, const bridge_budget *budget)
+int block_create(bridge_t *b, const bridge_budget_t *budget)
 {
     /* query.md: offset 0 is none, so nothing is there. Eight bytes keep the index aligned */
     uint64_t index = 8, sparse, sets, direct, cells, arena, columns, len, reserve;
@@ -316,7 +316,7 @@ int block_create(bridge *b, const bridge_budget *budget)
     sets = budget->sparse_sets == BRIDGE_NONE ? 0 : (uint64_t)budget->sparse_sets;
     /* each is under 2^32 now, so none of these sums can leave 64 bits. A sparse set's index
      * is a u32 for every entity, and there is one for each there may be - storage.md */
-    sparse = (index + sizeof(bridge_entity) * budget->entities + 7u) & ~7ull;
+    sparse = (index + sizeof(bridge_entity_t) * budget->entities + 7u) & ~7ull;
     if (sets > UINT32_MAX / (4 * budget->entities)) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: sparse_sets of %llu, with "
             "four bytes for each of %llu entities, is more than an offset of 32 bits can reach",
@@ -351,7 +351,7 @@ int block_create(bridge *b, const bridge_budget *budget)
     }
     b->shared_len = (size_t)len;
     b->shared_reserve = (size_t)reserve;
-    b->index = (bridge_entity *)(b->shared + index);
+    b->index = (bridge_entity_t *)(b->shared + index);
     b->entities = (uint32_t)budget->entities;
     b->sparse = (uint32_t)sparse;
     b->sparse_sets = (uint32_t)sets;
@@ -367,17 +367,17 @@ int block_create(bridge *b, const bridge_budget *budget)
     b->max_systems = budget->systems;
     b->max_terms = budget->terms;
     /* a gap lies between two blocks, and a table has one block: never more gaps than tables */
-    b->column_space = (region){ .room = b->tables + b->sparse_sets + b->direct_indexed + 1,
+    b->column_space = (region_t){ .room = b->tables + b->sparse_sets + b->direct_indexed + 1,
                                 .len = b->columns_len };
-    b->column_space.gaps = malloc(b->column_space.room * sizeof(range));
-    b->arena_space = (region){ .len = b->arena_len };
+    b->column_space.gaps = malloc(b->column_space.room * sizeof(range_t));
+    b->arena_space = (region_t){ .len = b->arena_len };
     if (bridge_short(b, b->column_space.gaps, "the list of what is free in [budget] columns")) return 1;
     b->storage = storage_create(b);
     if (!b->storage) return 1;
 
     for (i = 0; i < b->backend_count; i ++) {
-        open_backend *o = &b->backends[i];
-        backend_err err = {};
+        open_backend_t *o = &b->backends[i];
+        backend_err_t err = {};
         o->shared = o->api.memory_adopt(o->be, b->shared, len, &err);
         if (!o->shared) {
             say(b, nullptr, nullptr, BRIDGE_ERR, "backend '%s' cannot adopt the shared memory: %s",
@@ -388,12 +388,12 @@ int block_create(bridge *b, const bridge_budget *budget)
     return 0;
 }
 
-void block_destroy(bridge *b)
+void block_destroy(bridge_t *b)
 {
     uint32_t i;
     if (b->storage) storage_destroy(b->storage);
     for (i = 0; i < b->backend_count; i ++) {
-        open_backend *o = &b->backends[i];
+        open_backend_t *o = &b->backends[i];
         if (o->shared) o->api.memory_release(o->shared);
     }
     if (b->shared) os_release(b->shared, b->shared_reserve);

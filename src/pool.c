@@ -5,16 +5,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct { pool *p; os_event *wake; os_thread *thread; } worker;
+typedef struct { pool_t *p; os_event_t *wake; os_thread_t *thread; } worker_t;
 
 struct pool {
-    worker    *workers;
+    worker_t    *workers;
     uint32_t   worker_count;
-    os_mutex  *lock;
-    os_event  *done;
+    os_mutex_t  *lock;
+    os_event_t  *done;
     int        quit;
     /* the run in progress: all of it is read and written under the lock */
-    pool_fn        fn;
+    pool_fn_t        fn;
     void         **jobs;
     const uint8_t *caller_only;
     uint8_t       *taken;
@@ -22,7 +22,7 @@ struct pool {
 };
 
 /* the next job nobody took, or -1. A job marked for the caller is the caller's alone. */
-static int take(pool *p, int caller)
+static int take(pool_t *p, int caller)
 {
     uint32_t i;
     int found = -1;
@@ -37,7 +37,7 @@ static int take(pool *p, int caller)
     return found;
 }
 
-static void finished(pool *p)
+static void finished(pool_t *p)
 {
     os_mutex_lock(p->lock);
     if (!-- p->left) os_event_set(p->done);
@@ -46,8 +46,8 @@ static void finished(pool *p)
 
 static void work(void *arg)
 {
-    worker *w = arg;
-    pool *p = w->p;
+    worker_t *w = arg;
+    pool_t *p = w->p;
     for (;;) {
         int job;
         os_event_wait(w->wake, OS_FOREVER);
@@ -61,9 +61,9 @@ static void work(void *arg)
 
 /* nullptr if there was not the memory for it: failure.md, *Out of memory*. What was made of
  * it by then is unmade, a worker at a time, since each is counted only once it runs. */
-pool *pool_create(uint32_t workers, uint32_t most_jobs)
+pool_t *pool_create(uint32_t workers, uint32_t most_jobs)
 {
-    pool *p = calloc(1, sizeof *p);
+    pool_t *p = calloc(1, sizeof *p);
     uint32_t i;
     if (!p) return nullptr;
     p->taken = calloc(most_jobs ? most_jobs : 1, 1);
@@ -88,7 +88,7 @@ pool *pool_create(uint32_t workers, uint32_t most_jobs)
     return p;
 }
 
-void pool_destroy(pool *p)
+void pool_destroy(pool_t *p)
 {
     uint32_t i;
     if (!p) return;
@@ -105,7 +105,7 @@ void pool_destroy(pool *p)
     free(p);
 }
 
-void pool_run(pool *p, pool_fn fn, void **jobs, const uint8_t *caller_only, uint32_t count)
+void pool_run(pool_t *p, pool_fn_t fn, void **jobs, const uint8_t *caller_only, uint32_t count)
 {
     uint32_t i;
     int job, left;

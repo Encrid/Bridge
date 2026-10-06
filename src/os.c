@@ -43,14 +43,14 @@ struct os_thread { HANDLE handle; void (*fn)(void *); void *arg; };
 
 static DWORD WINAPI thread_main(LPVOID p)
 {
-    os_thread *t = p;
+    os_thread_t *t = p;
     t->fn(t->arg);
     return 0;
 }
 
-os_thread *os_thread_start(void (*fn)(void *), void *arg)
+os_thread_t *os_thread_start(void (*fn)(void *), void *arg)
 {
-    os_thread *t = malloc(sizeof *t);
+    os_thread_t *t = malloc(sizeof *t);
     if (!t) return nullptr;
     t->fn = fn;
     t->arg = arg;
@@ -58,7 +58,7 @@ os_thread *os_thread_start(void (*fn)(void *), void *arg)
     return t;
 }
 
-void os_thread_join(os_thread *t)
+void os_thread_join(os_thread_t *t)
 {
     WaitForSingleObject(t->handle, INFINITE);
     CloseHandle(t->handle);
@@ -67,18 +67,18 @@ void os_thread_join(os_thread *t)
 
 struct os_event { HANDLE handle; };
 
-os_event *os_event_new()
+os_event_t *os_event_new()
 {
-    os_event *e = malloc(sizeof *e);
+    os_event_t *e = malloc(sizeof *e);
     if (!e) return nullptr;
     e->handle = CreateEventA(nullptr, FALSE, FALSE, nullptr);     /* auto-reset */
     return e;
 }
 
-void os_event_free(os_event *e) { if (e) { CloseHandle(e->handle); free(e); } }
-void os_event_set(os_event *e) { SetEvent(e->handle); }
+void os_event_free(os_event_t *e) { if (e) { CloseHandle(e->handle); free(e); } }
+void os_event_set(os_event_t *e) { SetEvent(e->handle); }
 
-int os_event_wait(os_event *e, uint64_t nanos)
+int os_event_wait(os_event_t *e, uint64_t nanos)
 {
     DWORD ms = nanos == OS_FOREVER ? INFINITE : (DWORD)((nanos + 999'999) / 1'000'000);
     return WaitForSingleObject(e->handle, ms) == WAIT_OBJECT_0;
@@ -113,14 +113,14 @@ struct os_thread { pthread_t handle; void (*fn)(void *); void *arg; };
 
 static void *thread_main(void *p)
 {
-    os_thread *t = p;
+    os_thread_t *t = p;
     t->fn(t->arg);
     return nullptr;
 }
 
-os_thread *os_thread_start(void (*fn)(void *), void *arg)
+os_thread_t *os_thread_start(void (*fn)(void *), void *arg)
 {
-    os_thread *t = malloc(sizeof *t);
+    os_thread_t *t = malloc(sizeof *t);
     if (!t) return nullptr;
     t->fn = fn;
     t->arg = arg;
@@ -128,7 +128,7 @@ os_thread *os_thread_start(void (*fn)(void *), void *arg)
     return t;
 }
 
-void os_thread_join(os_thread *t)
+void os_thread_join(os_thread_t *t)
 {
     pthread_join(t->handle, nullptr);
     free(t);
@@ -136,9 +136,9 @@ void os_thread_join(os_thread *t)
 
 struct os_event { pthread_mutex_t lock; pthread_cond_t cond; int set; };
 
-os_event *os_event_new()
+os_event_t *os_event_new()
 {
-    os_event *e = malloc(sizeof *e);
+    os_event_t *e = malloc(sizeof *e);
     if (!e) return nullptr;
     pthread_mutex_init(&e->lock, nullptr);
     pthread_cond_init(&e->cond, nullptr);
@@ -146,7 +146,7 @@ os_event *os_event_new()
     return e;
 }
 
-void os_event_free(os_event *e)
+void os_event_free(os_event_t *e)
 {
     if (!e) return;
     pthread_cond_destroy(&e->cond);
@@ -154,7 +154,7 @@ void os_event_free(os_event *e)
     free(e);
 }
 
-void os_event_set(os_event *e)
+void os_event_set(os_event_t *e)
 {
     pthread_mutex_lock(&e->lock);
     e->set = 1;
@@ -162,7 +162,7 @@ void os_event_set(os_event *e)
     pthread_mutex_unlock(&e->lock);
 }
 
-int os_event_wait(os_event *e, uint64_t nanos)
+int os_event_wait(os_event_t *e, uint64_t nanos)
 {
     struct timespec until;
     int got;
@@ -200,17 +200,17 @@ uint64_t os_now()
 
 struct os_mutex { CRITICAL_SECTION section; };
 
-os_mutex *os_mutex_new()
+os_mutex_t *os_mutex_new()
 {
-    os_mutex *m = malloc(sizeof *m);
+    os_mutex_t *m = malloc(sizeof *m);
     if (!m) return nullptr;
     InitializeCriticalSection(&m->section);
     return m;
 }
 
-void os_mutex_free(os_mutex *m) { if (m) { DeleteCriticalSection(&m->section); free(m); } }
-void os_mutex_lock(os_mutex *m) { EnterCriticalSection(&m->section); }
-void os_mutex_unlock(os_mutex *m) { LeaveCriticalSection(&m->section); }
+void os_mutex_free(os_mutex_t *m) { if (m) { DeleteCriticalSection(&m->section); free(m); } }
+void os_mutex_lock(os_mutex_t *m) { EnterCriticalSection(&m->section); }
+void os_mutex_unlock(os_mutex_t *m) { LeaveCriticalSection(&m->section); }
 
 #else
 
@@ -225,16 +225,16 @@ uint64_t os_now()
 
 struct os_mutex { pthread_mutex_t mutex; };
 
-os_mutex *os_mutex_new()
+os_mutex_t *os_mutex_new()
 {
-    os_mutex *m = malloc(sizeof *m);
+    os_mutex_t *m = malloc(sizeof *m);
     if (!m) return nullptr;
     pthread_mutex_init(&m->mutex, nullptr);
     return m;
 }
 
-void os_mutex_free(os_mutex *m) { if (m) { pthread_mutex_destroy(&m->mutex); free(m); } }
-void os_mutex_lock(os_mutex *m) { pthread_mutex_lock(&m->mutex); }
-void os_mutex_unlock(os_mutex *m) { pthread_mutex_unlock(&m->mutex); }
+void os_mutex_free(os_mutex_t *m) { if (m) { pthread_mutex_destroy(&m->mutex); free(m); } }
+void os_mutex_lock(os_mutex_t *m) { pthread_mutex_lock(&m->mutex); }
+void os_mutex_unlock(os_mutex_t *m) { pthread_mutex_unlock(&m->mutex); }
 
 #endif

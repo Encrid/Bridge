@@ -5,7 +5,7 @@
  * for that thread, and then spawns itself. It says whether each got an id. */
 #include "bridge-native.h"
 
-static const bridge_api *kept;
+static const bridge_api_t *kept;
 static uint64_t from_elsewhere;
 
 #ifdef _WIN32

@@ -9,10 +9,10 @@
 #include <string.h>
 
 /* A record of Bridge-ASM700's own. `m` and `s` say whose it is about, when it is anybody's. */
-void say(bridge *b, const module *m, const bridge_system *s, uint8_t level, const char *fmt, ...)
+void say(bridge_t *b, const module_t *m, const bridge_system_t *s, uint8_t level, const char *fmt, ...)
 {
     char text[512];
-    bridge_record r = {};
+    bridge_record_t r = {};
     va_list args;
     va_start(args, fmt);
     vsnprintf(text, sizeof text, fmt, args);
@@ -36,17 +36,17 @@ char *copy(const char *s, size_t n)
     return c;
 }
 
-int bridge_short(bridge *b, const void *got, const char *what)
+int bridge_short(bridge_t *b, const void *got, const char *what)
 {
     if (got) return 0;
     say(b, nullptr, nullptr, BRIDGE_ERR, "out of memory: there was none for %s", what);
     return 1;
 }
 
-int bridge_destroy(bridge *b)
+int bridge_destroy(bridge_t *b)
 {
     uint32_t i;
-    module *m;
+    module_t *m;
     if (!b) return 0;
     /* pinned.md: a pinned module's shutdown is its code, and runs on its thread or not at
      * all. Refused before anything is touched, so the bridge is whole for the call that can. */
@@ -81,7 +81,7 @@ int bridge_destroy(bridge *b)
     free(b->before);
     free(b->after);
     for (i = 0; i < b->backend_count; i ++) {
-        open_backend *o = &b->backends[i];
+        open_backend_t *o = &b->backends[i];
         if (o->be) o->api.backend_destroy(o->be);
         /* capabilities.md: only a backend that says its library can go. One that brought a
          * runtime in is left in the process, where the next bridge finds it again. A library
@@ -104,9 +104,9 @@ static uint64_t common(uint64_t a, uint64_t b)
     return a / x * b;
 }
 
-bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
+bridge_t *bridge_create(const bridge_config_t *cfg, bridge_sink_fn_t sink, void *ud)
 {
-    bridge *b;
+    bridge_t *b;
     uint32_t i, k;
     /* the one failure no record can explain, and a host that passed null already knows */
     if (!sink || !cfg) return nullptr;
@@ -115,7 +115,7 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
     if (!b) {
         /* no bridge to say it through: the record is made here */
         static const char none[] = "out of memory: there was none for the bridge";
-        bridge_record r = { .text = none, .len = sizeof none - 1, .level = BRIDGE_ERR };
+        bridge_record_t r = { .text = none, .len = sizeof none - 1, .level = BRIDGE_ERR };
         sink(ud, &r);
         return nullptr;
     }
@@ -134,10 +134,10 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
     if (bridge_short(b, b->backends && b->phases ? b : nullptr, "its backends and its phases")) goto refuse;
 
     for (i = 0; i < cfg->backend_count; i ++) {
-        const bridge_backend *want = &cfg->backends[i];
-        open_backend *o = &b->backends[i];
+        const bridge_backend_t *want = &cfg->backends[i];
+        open_backend_t *o = &b->backends[i];
         char why[400];
-        backend_err err = {};
+        backend_err_t err = {};
         uint64_t reservation = 0, guard = 0, granule = 0;
 
         if (!want->name || !want->library) {
@@ -164,15 +164,15 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
              * other: held to one shape here, where one is copied to the other */
             static_assert((int)BRIDGE_BOOL == (int)BACKEND_BOOL && (int)BRIDGE_INT == (int)BACKEND_INT
                 && (int)BRIDGE_FLOAT == (int)BACKEND_FLOAT && (int)BRIDGE_STRING == (int)BACKEND_STRING);
-            static_assert(sizeof(bridge_setting) == sizeof(backend_setting)
-                && offsetof(bridge_setting, kind) == offsetof(backend_setting, kind)
-                && offsetof(bridge_setting, v) == offsetof(backend_setting, v)
-                && sizeof(((bridge_setting *)nullptr)->v.b) == sizeof(((backend_setting *)nullptr)->v.b));
-            backend_setting *settings = calloc(want->setting_count ? want->setting_count : 1,
+            static_assert(sizeof(bridge_setting_t) == sizeof(backend_setting_t)
+                && offsetof(bridge_setting_t, kind) == offsetof(backend_setting_t, kind)
+                && offsetof(bridge_setting_t, v) == offsetof(backend_setting_t, v)
+                && sizeof(((bridge_setting_t *)nullptr)->v.b) == sizeof(((backend_setting_t *)nullptr)->v.b));
+            backend_setting_t *settings = calloc(want->setting_count ? want->setting_count : 1,
                                                sizeof *settings);
             if (bridge_short(b, settings, "a backend's settings")) goto refuse;
             for (k = 0; k < want->setting_count; k ++) {
-                const bridge_setting *from = &want->settings[k];
+                const bridge_setting_t *from = &want->settings[k];
                 settings[k].key = from->key;
                 /* the same four kinds under the two seams' names, and the same numbers */
                 settings[k].kind = (enum backend_setting_kind)from->kind;
@@ -247,7 +247,7 @@ static size_t stem_length(const char *identity)
 }
 
 /* failure.md: a module stated `fail` is lost, and nothing runs until it is back. */
-void bridge_stop(bridge *b, const char *identity, const char *what)
+void bridge_stop(bridge_t *b, const char *identity, const char *what)
 {
     char why[256];
     if (b->stopped_by) return;
@@ -259,7 +259,7 @@ void bridge_stop(bridge *b, const char *identity, const char *what)
     say(b, nullptr, nullptr, BRIDGE_ERR, "the bridge has stopped: %s", why);
 }
 
-void bridge_resume(bridge *b, const module *m)
+void bridge_resume(bridge_t *b, const module_t *m)
 {
     if (!b->stopped_stem || strcmp(b->stopped_stem, m->stem)) return;
     b->stopped_by = b->stopped_stem = nullptr;
@@ -268,7 +268,7 @@ void bridge_resume(bridge *b, const module *m)
 
 /* failure.md: the host unloads the module that stopped the bridge, by name, and so says the
  * deployment goes on without it. */
-void bridge_given_up(bridge *b, const module *m)
+void bridge_given_up(bridge_t *b, const module_t *m)
 {
     if (!b->stopped_stem || strcmp(b->stopped_stem, m->stem)) return;
     b->stopped_by = b->stopped_stem = nullptr;
@@ -276,9 +276,9 @@ void bridge_given_up(bridge *b, const module *m)
         m->identity);
 }
 
-int bridge_stopped(bridge *b, const char *repairing)
+int bridge_stopped(bridge_t *b, const char *repairing)
 {
-    module *m;
+    module_t *m;
     if (b->stopped_by) {
         /* what stopped it can be brought back, or given up by an unload of it, and those
          * are the calls it accepts */
@@ -301,7 +301,7 @@ int bridge_stopped(bridge *b, const char *repairing)
     return 0;
 }
 
-int bridge_phase(bridge *b, const char *name)
+int bridge_phase(bridge_t *b, const char *name)
 {
     uint32_t phase;
     if (bridge_stopped(b, nullptr)) return 1;
@@ -320,9 +320,9 @@ int bridge_phase(bridge *b, const char *name)
 }
 
 /* introspection.md: a pull, because a stop must not arrive by a route that may drop it */
-int bridge_modules(bridge *b, bridge_module_info *out, int max)
+int bridge_modules(bridge_t *b, bridge_module_info_t *out, int max)
 {
-    module *m;
+    module_t *m;
     int count = 0;
     for (m = b->modules; m; m = m->next) {
         if (out && count < max) {

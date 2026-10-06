@@ -158,7 +158,7 @@ Bridge-ASM700 writes, which is this header's content and Bridge-ASM700's to make
 how a module on this backend reaches it, which is this backend's SDK and this backend's to
 provide - `README.md`, *Three layers, three seams*. `PLAN.md`, stage 15.
 
-**The native backend's `bridge_api` is not in it.** A struct of C function pointers has nothing a
+**The native backend's `bridge_api_t` is not in it.** A struct of C function pointers has nothing a
 wasm module could derive, since it gets imports rather than pointers. It lives in
 `bridge-native.h`, which only a native module and the native backend compile - `native.md`, *What
 the backend provides*.

@@ -9,11 +9,11 @@
 #include <string.h>
 
 /* a namespace that has declared three types already */
-static bool find([[maybe_unused]] void *ctx, const char *name, schema_named *named)
+static bool find([[maybe_unused]] void *ctx, const char *name, schema_named_t *named)
 {
-    if (!strcmp(name, "Vec2")) *named = (schema_named){ BRIDGE_STRUCT, 8, 4, nullptr };
-    else if (!strcmp(name, "Team")) *named = (schema_named){ BRIDGE_ENUM, 4, 4, nullptr };
-    else if (!strcmp(name, "Flags")) *named = (schema_named){ BRIDGE_BITMASK, 4, 4, nullptr };
+    if (!strcmp(name, "Vec2")) *named = (schema_named_t){ BRIDGE_STRUCT, 8, 4, nullptr };
+    else if (!strcmp(name, "Team")) *named = (schema_named_t){ BRIDGE_ENUM, 4, 4, nullptr };
+    else if (!strcmp(name, "Flags")) *named = (schema_named_t){ BRIDGE_BITMASK, 4, 4, nullptr };
     else return false;
     return true;
 }
@@ -30,18 +30,18 @@ static void fail(const char *text, const char *what)
 typedef struct { float x; float y; } Vec2;
 typedef enum Team : int32_t { Red } Team;
 typedef enum Flags : uint32_t { Solid = 1 } Flags;
-typedef struct { bool vsync; int32_t width; float scale; Team mode; char title[16]; bridge_text path;
+typedef struct { bool vsync; int32_t width; float scale; Team mode; char title[16]; bridge_text_t path;
                  uint8_t small; Flags flags; double ratio; int64_t big; } Settings;
 typedef struct { uint64_t ids[5]; } Roster;
 typedef struct { Vec2 at; Team team; Flags flags; float mass; } Body;
 typedef struct { uint8_t a; uint16_t b; uint8_t c; uint64_t d; int8_t e; int16_t f; uint32_t g; } Mixed;
 
 #define FIELD(T, f, k, n) { #f, (uint32_t)offsetof(T, f), n, k }
-typedef struct { const char *name; uint32_t offset, count; enum schema_kind kind; } want_field;
+typedef struct { const char *name; uint32_t offset, count; enum schema_kind kind; } want_field_t;
 
-static void a_struct(const char *text, uint32_t size, uint32_t align, const want_field *want, uint32_t count)
+static void a_struct(const char *text, uint32_t size, uint32_t align, const want_field_t *want, uint32_t count)
 {
-    schema s;
+    schema_t s;
     char why[160];
     if (schema_parse(BRIDGE_STRUCT, text, find, nullptr, &s, why, sizeof why)) { fail(text, why); return; }
     if (s.size != size || s.align != align || s.field_count != count) fail(text, "its size, alignment or field count");
@@ -57,7 +57,7 @@ static void a_struct(const char *text, uint32_t size, uint32_t align, const want
 static void constants(enum bridge_kind kind, const char *text, uint32_t size, const int64_t *want,
                       uint32_t count)
 {
-    schema s;
+    schema_t s;
     char why[160];
     if (schema_parse(kind, text, find, nullptr, &s, why, sizeof why)) { fail(text, why); return; }
     if (s.size != size || s.align != size || s.constant_count != count) fail(text, "its size or how many constants");
@@ -70,7 +70,7 @@ static void constants(enum bridge_kind kind, const char *text, uint32_t size, co
 /* refused, and the refusal says the word it stopped at */
 static void refused(enum bridge_kind kind, const char *text, const char *word)
 {
-    schema s;
+    schema_t s;
     char why[160] = "";
     if (!schema_parse(kind, text, find, nullptr, &s, why, sizeof why)) {
         schema_free(&s);
@@ -85,27 +85,27 @@ static void refused(enum bridge_kind kind, const char *text, const char *word)
 
 int main()
 {
-    static const want_field vec2[] = { FIELD(Vec2, x, SCHEMA_F32, 1), FIELD(Vec2, y, SCHEMA_F32, 1) };
-    static const want_field settings[] = {
+    static const want_field_t vec2[] = { FIELD(Vec2, x, SCHEMA_F32, 1), FIELD(Vec2, y, SCHEMA_F32, 1) };
+    static const want_field_t settings[] = {
         FIELD(Settings, vsync, SCHEMA_BOOL, 1), FIELD(Settings, width, SCHEMA_I32, 1),
         FIELD(Settings, scale, SCHEMA_F32, 1), FIELD(Settings, mode, SCHEMA_ENUM, 1),
         FIELD(Settings, title, SCHEMA_CHAR, 16), FIELD(Settings, path, SCHEMA_TEXT, 1),
         FIELD(Settings, small, SCHEMA_U8, 1), FIELD(Settings, flags, SCHEMA_BITMASK, 1),
         FIELD(Settings, ratio, SCHEMA_F64, 1), FIELD(Settings, big, SCHEMA_I64, 1),
     };
-    static const want_field roster[] = { FIELD(Roster, ids, SCHEMA_U64, 5) };
-    static const want_field body[] = {
+    static const want_field_t roster[] = { FIELD(Roster, ids, SCHEMA_U64, 5) };
+    static const want_field_t body[] = {
         FIELD(Body, at, SCHEMA_STRUCT, 1), FIELD(Body, team, SCHEMA_ENUM, 1),
         FIELD(Body, flags, SCHEMA_BITMASK, 1), FIELD(Body, mass, SCHEMA_F32, 1),
     };
-    static const want_field mixed[] = {
+    static const want_field_t mixed[] = {
         FIELD(Mixed, a, SCHEMA_U8, 1), FIELD(Mixed, b, SCHEMA_U16, 1), FIELD(Mixed, c, SCHEMA_U8, 1),
         FIELD(Mixed, d, SCHEMA_U64, 1), FIELD(Mixed, e, SCHEMA_I8, 1), FIELD(Mixed, f, SCHEMA_I16, 1),
         FIELD(Mixed, g, SCHEMA_U32, 1),
     };
 
     a_struct("{ float x; float y; }", sizeof(Vec2), alignof(Vec2), vec2, 2);
-    a_struct("{ bool vsync; int32_t width; float scale; Team mode; char title[16]; bridge_text path; "
+    a_struct("{ bool vsync; int32_t width; float scale; Team mode; char title[16]; bridge_text_t path; "
              "uint8_t small; Flags flags; double ratio; int64_t big; }",
              sizeof(Settings), alignof(Settings), settings, 10);
     a_struct("{ uint64_t ids[5]; }", sizeof(Roster), alignof(Roster), roster, 1);

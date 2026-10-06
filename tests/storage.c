@@ -36,46 +36,46 @@
 typedef struct {
     uint32_t cb, faults;
     size_t peak, now, paged_peak, paged, nonpaged_peak, nonpaged, pagefile, pagefile_peak;
-} held_counters;
+} held_counters_t;
 [[gnu::dllimport]] void *GetCurrentProcess();
-[[gnu::dllimport]] int K32GetProcessMemoryInfo(void *process, held_counters *counters, uint32_t size);
+[[gnu::dllimport]] int K32GetProcessMemoryInfo(void *process, held_counters_t *counters, uint32_t size);
 
-static void held(const bridge *b)
+static void held(const bridge_t *b)
 {
-    held_counters c = { .cb = sizeof c };
+    held_counters_t c = { .cb = sizeof c };
     if (!K32GetProcessMemoryInfo(GetCurrentProcess(), &c, sizeof c)) return;
     printf("columns in use %u KB, and the process holds %zu KB\n", b->column_space.used >> 10, c.now >> 10);
 }
 #else
-static void held(const bridge *b) { printf("columns in use %u KB\n", b->column_space.used >> 10); }
+static void held(const bridge_t *b) { printf("columns in use %u KB\n", b->column_space.used >> 10); }
 #endif
 
-static void sink([[maybe_unused]] void *ud, const bridge_record *r)
+static void sink([[maybe_unused]] void *ud, const bridge_record_t *r)
 {
     printf("  %s: %.*s %u %u\n", r->system ? r->system : "-", (int)r->len, r->text, r->arg[0], r->arg[1]);
 }
 
-static void quiet([[maybe_unused]] void *ud, [[maybe_unused]] const bridge_record *r) { }
+static void quiet([[maybe_unused]] void *ud, [[maybe_unused]] const bridge_record_t *r) { }
 
 /* how many records said that memory ran out */
 static uint32_t said_memory;
-[[maybe_unused]] static void listening([[maybe_unused]] void *ud, const bridge_record *r)
+[[maybe_unused]] static void listening([[maybe_unused]] void *ud, const bridge_record_t *r)
 {
     for (uint32_t i = 0; i + 13 <= r->len; i ++) said_memory += !memcmp(r->text + i, "out of memory", 13);
 }
 
 /* what a system said it read: kept, so that a timing is of a loop that ran */
 static uint32_t said[2];
-static void counted([[maybe_unused]] void *ud, const bridge_record *r)
+static void counted([[maybe_unused]] void *ud, const bridge_record_t *r)
 {
     if (r->system) said[0] = r->arg[0], said[1] = r->arg[1];
     else if (r->level <= BRIDGE_WARN) printf("  -: %.*s\n", (int)r->len, r->text);
 }
 
-static bridge_artifact store_module(const char *path, int64_t spawns, uint32_t spans,
+static bridge_artifact_t store_module(const char *path, int64_t spawns, uint32_t spans,
                                     int64_t changes)
 {
-    bridge_artifact a = {};
+    bridge_artifact_t a = {};
     a.cfg.identity = "st:store@0.1.0";
     a.cfg.scratch = 64 << 10;
     a.cfg.abi = BRIDGE_ABI;
@@ -129,7 +129,7 @@ void counted_free(void *p) { allocations ++; free(p); }
 constexpr size_t allocations = 0;
 #endif
 
-static void run(bridge *b, const char *phase)
+static void run(bridge_t *b, const char *phase)
 {
     size_t before = allocations;
     printf("%s\n", phase);
@@ -144,7 +144,7 @@ static void run(bridge *b, const char *phase)
  * figure where this has two. `called` is the first, of the phase last run. */
 static uint64_t called;
 
-static uint64_t barrier(bridge *b, const char *phase)
+static uint64_t barrier(bridge_t *b, const char *phase)
 {
     uint32_t i;
     uint64_t t;
@@ -159,7 +159,7 @@ static uint64_t barrier(bridge *b, const char *phase)
 
 /* What unload does to a component with the policy `strip`, asked of storage directly so that the
  * module is still there to look: lifetime.md, *What unload leaves behind*. */
-static void drop(bridge *b, const char *name, enum bridge_on_unload policy)
+static void drop(bridge_t *b, const char *name, enum bridge_on_unload policy)
 {
     static const char *const said[] = { "", "strip", "sweep", "delete" };
     printf("%s %s\n", said[policy], name);
@@ -170,10 +170,10 @@ static void drop(bridge *b, const char *name, enum bridge_on_unload policy)
     run(b, "never");
 }
 
-static void strip(bridge *b, const char *name) { drop(b, name, BRIDGE_STRIP); }
+static void strip(bridge_t *b, const char *name) { drop(b, name, BRIDGE_STRIP); }
 
 /* the systems of one phase, timed, and then its barrier */
-static uint64_t ran(bridge *b, const char *phase)
+static uint64_t ran(bridge_t *b, const char *phase)
 {
     uint32_t i;
     uint64_t t;
@@ -190,12 +190,12 @@ static uint64_t ran(bridge *b, const char *phase)
  * became of the module. */
 static const char *const kept_as[] = { "", "a table", "a sparse set", "a toggle", "direct-indexed", "a singleton" };
 
-static void moved_case(bridge_config cfg, uint32_t from, uint32_t to, const char *prepare,
+static void moved_case(bridge_config_t cfg, uint32_t from, uint32_t to, const char *prepare,
                        const char *const *losses, int64_t loss_count)
 {
     static const char *const built[] = { "", NMOVE1_PATH, NMOVE2_PATH, NMOVE3_PATH, NMOVE4_PATH, NMOVE5_PATH };
-    bridge *b = bridge_create(&cfg, sink, nullptr);
-    bridge_artifact a = store_module(built[from], 8, 1 << 20, 4096);
+    bridge_t *b = bridge_create(&cfg, sink, nullptr);
+    bridge_artifact_t a = store_module(built[from], 8, 1 << 20, 4096);
     printf("%s to %s%s%s\n", kept_as[from], kept_as[to], *prepare ? ", after " : "", prepare);
     a.cfg.reloadable = a.cfg.hot_reload = BRIDGE_TRUE;
     if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); exit(1); }
@@ -208,7 +208,7 @@ static void moved_case(bridge_config cfg, uint32_t from, uint32_t to, const char
     printf("  reload: %s\n", bridge_reload(b, &a) ? "refused" : "done");
     (void)bridge_phase(b, "look");
     for (uint32_t i = 0; i < b->type_count; i ++) {
-        const declared_type *c = b->types[i];
+        const declared_type_t *c = b->types[i];
         if (strcmp(c->name, "st:X")) continue;
         printf("  storage: st:X is %s, carried by %u\n", kept_as[c->storage], storage_count(b->storage, c->type));
     }
@@ -217,11 +217,11 @@ static void moved_case(bridge_config cfg, uint32_t from, uint32_t to, const char
 
 /* lifetime.md, *When a component layout changed*: a module that states st:X one way, reloaded
  * as a build that states it another. */
-static void relaid_case(bridge_config cfg, const char *from, const char *to, const char *what,
+static void relaid_case(bridge_config_t cfg, const char *from, const char *to, const char *what,
                         const char *const *losses, int64_t loss_count)
 {
-    bridge *b = bridge_create(&cfg, sink, nullptr);
-    bridge_artifact a = store_module(from, 8, 1 << 20, 4096);
+    bridge_t *b = bridge_create(&cfg, sink, nullptr);
+    bridge_artifact_t a = store_module(from, 8, 1 << 20, 4096);
     printf("%s\n", what);
     a.cfg.reloadable = a.cfg.hot_reload = BRIDGE_TRUE;
     if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); exit(1); }
@@ -238,7 +238,7 @@ static void relaid_case(bridge_config cfg, const char *from, const char *to, con
 /* Four of nstress, each in its own namespace, a hundred rounds of work and check. */
 constexpr uint32_t STRESSED = 4, ROUNDS = 100;
 
-static int stress_load(bridge *b)
+static int stress_load(bridge_t *b)
 {
     static const char *const identities[STRESSED] = {
         "s1:stress@0.1.0", "s2:stress@0.1.0", "s3:stress@0.1.0", "s4:stress@0.1.0"
@@ -247,7 +247,7 @@ static int stress_load(bridge *b)
         NSTRESS1_PATH, NSTRESS2_PATH, NSTRESS3_PATH, NSTRESS4_PATH
     };
     for (uint32_t i = 0; i < STRESSED; i ++) {
-        bridge_artifact a = store_module(paths[i], 20'000, 2 << 20, 16 << 20);
+        bridge_artifact_t a = store_module(paths[i], 20'000, 2 << 20, 16 << 20);
         a.cfg.identity = identities[i];
         a.cfg.scratch = 1 << 20;
         if (bridge_load(b, &a)) return 1;
@@ -255,7 +255,7 @@ static int stress_load(bridge *b)
     return 0;
 }
 
-static void stress_run(bridge *b)
+static void stress_run(bridge_t *b)
 {
     for (uint32_t round = 0; round < ROUNDS; round ++) {
         if (bridge_phase(b, "work") || bridge_phase(b, "check")) printf("  REFUSED\n");
@@ -265,15 +265,15 @@ static void stress_run(bridge *b)
 int main(int argc, char **argv)
 {
     const char *what = argc > 1 ? argv[1] : "";
-    bridge_backend backends[1] = {{ "native", NATIVE_PATH }};
+    bridge_backend_t backends[1] = {{ "native", NATIVE_PATH }};
     /* the wasm backend beside it, which asks for address space around a block it maps */
-    bridge_backend both[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
-    bridge_config cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 1, .phases = phases,
+    bridge_backend_t both[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
+    bridge_config_t cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 1, .phases = phases,
         .phase_count = PHASES, .threads = 1, .budget =
         { .entities = 400'000, .tables = 32'768, .types = 64, .systems = 64, .terms = 4, .modules = 4,
           .persistent = 4096, .columns = 64 << 20,
           .sparse_sets = BRIDGE_NONE, .direct_indexed = BRIDGE_NONE } };
-    bridge *b;
+    bridge_t *b;
 
     /* the stress run is the one thing here that is run on more than one thread */
     if (!strcmp(what, "stress")) cfg.threads = 4;
@@ -292,7 +292,7 @@ int main(int argc, char **argv)
     if (!strcmp(what, "directfull")) cfg.budget.columns = 1024;
     if (!strcmp(what, "sparsefull")) cfg.budget.columns = argc > 2 ? (uint64_t)atoi(argv[2]) : 112;
     b = bridge_create(&cfg, sink, nullptr);
-    bridge_artifact a;
+    bridge_artifact_t a;
 
     setvbuf(stdout, nullptr, _IONBF, 0);
     if (!b) { printf("FAIL: bridge_create\n"); return 1; }
@@ -480,7 +480,7 @@ int main(int argc, char **argv)
         relaid_case(cfg, NLAYOUT0_PATH, NLAYOUT13_PATH, "a struct declared as a tag", nullptr, BRIDGE_NONE);
         {
             /* a struct another module's component has a field of: that module's rows hold it */
-            bridge_artifact holder = store_module(NHOLDER_PATH, BRIDGE_NONE, 1 << 20, BRIDGE_NONE);
+            bridge_artifact_t holder = store_module(NHOLDER_PATH, BRIDGE_NONE, 1 << 20, BRIDGE_NONE);
             b = bridge_create(&cfg, sink, nullptr);
             a = store_module(NLAYOUT0_PATH, 8, 1 << 20, 4096);
             a.cfg.reloadable = a.cfg.hot_reload = BRIDGE_TRUE;

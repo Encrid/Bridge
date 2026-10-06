@@ -12,10 +12,10 @@
 
 constexpr uint32_t PAGE = 65'536;
 
-static backend_api api;
-static backend *be;
-static backend_module *module;
-static backend_memory *memory;
+static backend_api_t api;
+static backend_t *be;
+static backend_module_t *module;
+static backend_memory_t *memory;
 
 static void *read_file(const char *path, size_t *len)
 {
@@ -31,19 +31,19 @@ static void *read_file(const char *path, size_t *len)
     return data;
 }
 
-static backend_instance *instance()
+static backend_instance_t *instance()
 {
-    backend_err err = {};
-    backend_memory_import imports[1] = {{ "bridge", "shared", memory }};
-    backend_instance *i = api.instance_create(be, module, imports, 1, &err);
+    backend_err_t err = {};
+    backend_memory_import_t imports[1] = {{ "bridge", "shared", memory }};
+    backend_instance_t *i = api.instance_create(be, module, imports, 1, &err);
     if (!i) { printf("FAIL: instance_create: %s\n", err.text); exit(1); }
     return i;
 }
 
 /* 0 and the function's result, or -1 and why */
-static int run(backend_instance *i, const char *name, int32_t *status, backend_err *err)
+static int run(backend_instance_t *i, const char *name, int32_t *status, backend_err_t *err)
 {
-    backend_func *f = api.instance_func(i, name, err);
+    backend_func_t *f = api.instance_func(i, name, err);
     if (!f) return -1;
     return api.call(f, status, err);
 }
@@ -55,13 +55,13 @@ static int ping([[maybe_unused]] void *ud, const uint64_t *args, uint64_t *resul
     return 0;
 }
 
-typedef struct { const char *name; int rounds, failed; } job;
+typedef struct { const char *name; int rounds, failed; } job_t;
 
 static void worker(void *arg)
 {
-    job *j = arg;
-    backend_instance *i = instance();       /* a store of this thread's own */
-    backend_err err = {};
+    job_t *j = arg;
+    backend_instance_t *i = instance();       /* a store of this thread's own */
+    backend_err_t err = {};
     int32_t status;
     int r;
     for (r = 0; r < j->rounds; r ++) {
@@ -73,7 +73,7 @@ static void worker(void *arg)
 int main()
 {
     char why[256];
-    backend_err err = {};
+    backend_err_t err = {};
     uint64_t reservation, guard, granule;
     size_t len, k;
     int32_t status = -1;
@@ -96,14 +96,14 @@ int main()
     if (!module) { printf("FAIL: module_compile: %s\n", err.text); return 1; }
 
     /* 1. a module writes, the host reads the same bytes */
-    backend_instance *one = instance();
+    backend_instance_t *one = instance();
     if (run(one, "write", &status, &err) || status) { printf("FAIL: write: %s\n", err.text); return 1; }
     if (memcmp(block + 16, "\x0D\xF0\x0D\x60", 4)) { printf("FAIL: the host does not see the write\n"); return 1; }
     printf("one store: the host reads what the module wrote\n");
 
     /* 2. two stores on two threads, the same block, disjoint halves */
-    job low = { "fill_low", 200, 0 }, high = { "fill_high", 200, 0 };
-    os_thread *a = os_thread_start(worker, &low), *b = os_thread_start(worker, &high);
+    job_t low = { "fill_low", 200, 0 }, high = { "fill_high", 200, 0 };
+    os_thread_t *a = os_thread_start(worker, &low), *b = os_thread_start(worker, &high);
     os_thread_join(a);
     os_thread_join(b);
     for (k = 0; k < PAGE; k ++) bad += block[k] != 0xAA;
@@ -131,11 +131,11 @@ int main()
     /* 4. a function the host defines, with the signature it declared */
     {
         static const uint8_t params[2] = { BACKEND_I32, BACKEND_I64 }, results[1] = { BACKEND_I32 };
-        backend_sig sig = { .params = params, .param_count = 2, .results = results,
+        backend_sig_t sig = { .params = params, .param_count = 2, .results = results,
             .result_count = 1 };
         void *host_bytes = read_file(MODULE_DIR "/host.wasm", &len);
-        backend_module *host = api.module_compile(be, host_bytes, len, nullptr, 0, &err);
-        backend_instance *hi = host ? api.instance_create(be, host, nullptr, 0, &err) : nullptr;
+        backend_module_t *host = api.module_compile(be, host_bytes, len, nullptr, 0, &err);
+        backend_instance_t *hi = host ? api.instance_create(be, host, nullptr, 0, &err) : nullptr;
         if (!hi || api.define_func(hi, "bridge", "ping", ping, nullptr, &sig, &err)
             || run(hi, "init", &status, &err) || status != 16) {
             printf("FAIL: a host function: %d: %s\n", status, err.text);
@@ -151,12 +151,12 @@ int main()
      * watchdog that counted wake-ups instead of looking would lose one here and wait forever. */
     {
         static const uint8_t params[2] = { BACKEND_I32, BACKEND_I64 }, results[1] = { BACKEND_I32 };
-        backend_sig sig = { .params = params, .param_count = 2, .results = results,
+        backend_sig_t sig = { .params = params, .param_count = 2, .results = results,
             .result_count = 1 };
         void *host_bytes = read_file(MODULE_DIR "/host.wasm", &len);
-        backend_module *timed = api.module_compile(be, host_bytes, len, nullptr, BACKEND_TIMEOUT, &err);
-        backend_instance *ti = timed ? api.instance_create(be, timed, nullptr, 0, &err) : nullptr;
-        backend_func *f;
+        backend_module_t *timed = api.module_compile(be, host_bytes, len, nullptr, BACKEND_TIMEOUT, &err);
+        backend_instance_t *ti = timed ? api.instance_create(be, timed, nullptr, 0, &err) : nullptr;
+        backend_func_t *f;
         int k;
         if (!ti || api.define_func(ti, "bridge", "ping", ping, nullptr, &sig, &err)
             || !(f = api.instance_func(ti, "init", &err))) {

@@ -34,7 +34,7 @@ static uint32_t last_sum[2];
 static uint32_t minted[3][256], minted_count[3];
 static int minting = -1;
 
-static void sink(void *ud, const bridge_record *r)
+static void sink(void *ud, const bridge_record_t *r)
 {
     if (ud) {
         if (r->len == 3 && !memcmp(r->text, "sum", 3)) last_sum[*(int *)ud] = r->arg[0];
@@ -76,9 +76,9 @@ static uint32_t distinct_threads()
     return n;
 }
 
-static bridge_artifact native(const char *identity, const char *path)
+static bridge_artifact_t native(const char *identity, const char *path)
 {
-    bridge_artifact a = {};
+    bridge_artifact_t a = {};
     a.cfg.identity = identity;
     a.cfg.abi = BRIDGE_ABI;
     a.cfg.trusted = BRIDGE_TRUE;
@@ -109,9 +109,9 @@ static bridge_artifact native(const char *identity, const char *path)
 static const char *const game[] = { "game:Position", "game:Marked" };
 
 /* a wasm module of tests/modules, with the limits that backend can keep */
-static bridge_artifact wasm(const char *identity, const char *file)
+static bridge_artifact_t wasm(const char *identity, const char *file)
 {
-    bridge_artifact a = native(identity, nullptr);
+    bridge_artifact_t a = native(identity, nullptr);
     char path[1024];
     FILE *f;
     void *data;
@@ -139,12 +139,12 @@ static bridge_artifact wasm(const char *identity, const char *file)
     return a;
 }
 
-static void load(bridge *b, const bridge_artifact *a)
+static void load(bridge_t *b, const bridge_artifact_t *a)
 {
     printf("%s: %s\n", a->cfg.identity, bridge_load(b, a) ? "not loaded" : "loaded");
 }
 
-static void frames(bridge *b, int count)
+static void frames(bridge_t *b, int count)
 {
     int i;
     for (i = 0; i < count; i ++) {
@@ -153,7 +153,7 @@ static void frames(bridge *b, int count)
     }
 }
 
-static double phase_ms(bridge *b, const char *phase)
+static double phase_ms(bridge_t *b, const char *phase)
 {
     struct timespec t0, t1;
     timespec_get(&t0, TIME_UTC);
@@ -163,7 +163,7 @@ static double phase_ms(bridge *b, const char *phase)
 }
 
 /* bridge_phase from a thread that loaded nothing: once, or for many frames */
-static bridge *elsewhere_bridge;
+static bridge_t *elsewhere_bridge;
 static int elsewhere_result, elsewhere_frames;
 
 static void elsewhere_work()
@@ -186,7 +186,7 @@ static DWORD WINAPI elsewhere([[maybe_unused]] LPVOID arg)
 
 static HANDLE elsewhere_thread;
 
-static void start_elsewhere(bridge *b, int count)
+static void start_elsewhere(bridge_t *b, int count)
 {
     elsewhere_bridge = b;
     elsewhere_frames = count;
@@ -207,7 +207,7 @@ static void *elsewhere([[maybe_unused]] void *arg)
 
 static pthread_t elsewhere_thread;
 
-static void start_elsewhere(bridge *b, int count)
+static void start_elsewhere(bridge_t *b, int count)
 {
     elsewhere_bridge = b;
     elsewhere_frames = count;
@@ -223,20 +223,20 @@ static void join_elsewhere()
 int main(int argc, char **argv)
 {
     const char *what = argc > 1 ? argv[1] : "";
-    bridge_backend backends[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
+    bridge_backend_t backends[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
     const char *phases[2] = { "update", "present" };
-    bridge_order pairs[2] = {{ "game:mover:move", "view:halver:halve" },
+    bridge_order_t pairs[2] = {{ "game:mover:move", "view:halver:halve" },
                              { "view:halver:halve", "game:mover:move" }};
-    bridge_order seen_first = { "view:watcher:seen", "view:fixer:fix" };
-    bridge_order fix_first = { "view:fixer:fix", "view:watcher:seen" };
-    bridge_order five_first = { "game:stamp5:stamp", "game:stamp9:stamp" };
-    bridge_config cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 2, .phases = phases,
+    bridge_order_t seen_first = { "view:watcher:seen", "view:fixer:fix" };
+    bridge_order_t fix_first = { "view:fixer:fix", "view:watcher:seen" };
+    bridge_order_t five_first = { "game:stamp5:stamp", "game:stamp9:stamp" };
+    bridge_config_t cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 2, .phases = phases,
         .phase_count = 2, .threads = 1, .budget =
         { .entities = 4096, .tables = 64, .types = 64, .systems = 128, .terms = 8, .modules = 8,
           .persistent = 4096, .columns = 1 << 20,
           .sparse_sets = BRIDGE_NONE, .direct_indexed = BRIDGE_NONE } };
-    bridge_artifact a;
-    bridge *b;
+    bridge_artifact_t a;
+    bridge_t *b;
     setvbuf(stdout, nullptr, _IONBF, 0);
 
     if (!strcmp(what, "order")) { cfg.order = &pairs[0]; cfg.order_count = 1; }
@@ -290,7 +290,7 @@ int main(int argc, char **argv)
          * threads. The same modules in both, a different number of frames in each: the
          * sums are exact, and each is its own. */
         static int which[2] = { 0, 1 };
-        bridge *both[2];
+        bridge_t *both[2];
         int k;
         cfg.threads = 2;
         for (k = 0; k < 2; k ++) {
@@ -393,7 +393,7 @@ int main(int argc, char **argv)
         /* a module that says "tick" for what this deployment calls "update": refused as it
          * is, loaded once the deployment says which of its phases that is, and refused when
          * it names one it does not have */
-        bridge_phase_name tick = { "tick", !strcmp(what, "phasebadmap") ? "nowhere" : "update" };
+        bridge_phase_name_t tick = { "tick", !strcmp(what, "phasebadmap") ? "nowhere" : "update" };
         a = native("game:stamp@0.1.0", NSTAMPTICK_PATH);
         a.cfg.spawns = 8;
         if (strcmp(what, "phaseunmapped")) { a.cfg.phases = &tick; a.cfg.phase_count = 1; }

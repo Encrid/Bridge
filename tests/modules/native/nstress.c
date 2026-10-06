@@ -28,7 +28,7 @@ static uint32_t next()
     return state >> 8;
 }
 
-static void set(const bridge_api *api, uint32_t slot, uint32_t kind)
+static void set(const bridge_api_t *api, uint32_t slot, uint32_t kind)
 {
     V value = { next() };
     bridge_native_attach(api, ids[slot], kinds[kind], &value, sizeof value);
@@ -58,15 +58,15 @@ BRIDGE_NATIVE(work)
 }
 
 /* every entity, by its id: where the index says it is, and what column_base says is there */
-static void by_reference(const bridge_api *api)
+static void by_reference(const bridge_api_t *api)
 {
-    const bridge_header *h = bridge_native_header(api);
-    auto index = (const bridge_entity *)(api->shared_base + h->entity_index);
+    const bridge_header_t *h = bridge_native_header(api);
+    auto index = (const bridge_entity_t *)(api->shared_base + h->entity_index);
     auto column_base = (const uint32_t *)(api->private_base + h->column_base);
     uint32_t live = 0, digest = 0;
     for (uint32_t slot = 0; slot < SLOTS; slot ++) {
         if (!ids[slot]) continue;
-        const bridge_entity *record = &index[(uint32_t)ids[slot]];
+        const bridge_entity_t *record = &index[(uint32_t)ids[slot]];
         live ++;
         digest = digest * 31 + has[slot];
         if (record->generation != (uint32_t)(ids[slot] >> 32)) {
@@ -90,9 +90,9 @@ static void by_reference(const bridge_api *api)
 }
 
 /* and every component, by its spans: as many rows as carry it, holding what they should */
-static int by_spans(const bridge_api *api, uint32_t kind)
+static int by_spans(const bridge_api_t *api, uint32_t kind)
 {
-    const bridge_query *q = bridge_native_query(api, seeing[kind]);
+    const bridge_query_t *q = bridge_native_query(api, seeing[kind]);
     uint32_t rows = 0, sum = 0, want_rows = 0, want_sum = 0;
     for (uint32_t s = 0; s < q->spans; s ++) {
         const uint32_t *span = bridge_native_span(api, q, s, 1);
@@ -130,7 +130,7 @@ BRIDGE_NATIVE(init)
     };
     int none = 0;
     for (uint32_t k = 0; k < KINDS; k ++) {
-        bridge_term term[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
+        bridge_term_t term[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
         kinds[k] = api->declare(api, bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
             (uint32_t)strlen(names[k]), BRIDGE_STRUCT, sizeof(V), alignof(V),
             bridge_native_put(api, V_desc, sizeof V_desc - 1), sizeof V_desc - 1, BRIDGE_DELETE, BRIDGE_TABLE);

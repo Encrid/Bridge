@@ -13,7 +13,7 @@
 
 constexpr int64_t MS = 1'000'000;
 
-static void sink([[maybe_unused]] void *ud, const bridge_record *r)
+static void sink([[maybe_unused]] void *ud, const bridge_record_t *r)
 {
     printf("record[%d]: %.*s\n", r->level, (int)r->len, r->text);
 }
@@ -36,10 +36,10 @@ static void *read_file(const char *name, size_t *len)
 }
 
 /* a module as a deployment would state it: every key said, nothing left at zero */
-static bridge_artifact artifact(const char *name)
+static bridge_artifact_t artifact(const char *name)
 {
     static char identity[64];
-    bridge_artifact a = {};
+    bridge_artifact_t a = {};
     snprintf(identity, sizeof identity, "test:%s@0.1.0", name);
     a.cfg.identity = identity;
     a.cfg.abi = BRIDGE_ABI;
@@ -68,7 +68,7 @@ static bridge_artifact artifact(const char *name)
     return a;
 }
 
-static int load(bridge *b, const bridge_artifact *a)
+static int load(bridge_t *b, const bridge_artifact_t *a)
 {
     int r = bridge_load(b, a);
     printf("%s: %s\n", a->cfg.identity, r ? "not loaded" : "loaded");
@@ -78,15 +78,15 @@ static int load(bridge *b, const bridge_artifact *a)
 int main(int argc, char **argv)
 {
     const char *what = argc > 1 ? argv[1] : "";
-    bridge_backend backends[1] = {{ "wasm", BACKEND_PATH }};
+    bridge_backend_t backends[1] = {{ "wasm", BACKEND_PATH }};
     const char *phases[1] = { "update" };
-    bridge_config cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 1, .phases = phases,
+    bridge_config_t cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 1, .phases = phases,
         .phase_count = 1, .threads = 1, .budget =
         { .entities = 4096, .tables = 64, .types = 64, .systems = 128, .terms = 8, .modules = 8,
           .persistent = 4096, .columns = 1 << 20,
           .sparse_sets = BRIDGE_NONE, .direct_indexed = BRIDGE_NONE } };
-    bridge_artifact a;
-    bridge *b;
+    bridge_artifact_t a;
+    bridge_t *b;
     setvbuf(stdout, nullptr, _IONBF, 0);
 
     if (!strcmp(what, "nosink")) {

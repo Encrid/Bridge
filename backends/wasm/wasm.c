@@ -26,9 +26,9 @@ constexpr int ENGINES = 4;
 
 struct backend {
     wasm_engine_t *engines[ENGINES];
-    os_thread *watchdog;
-    os_event  *wake;                /* something below changed */
-    os_mutex  *lock;                /* over the four below */
+    os_thread_t *watchdog;
+    os_event_t  *wake;                /* something below changed */
+    os_mutex_t  *lock;                /* over the four below */
     uint64_t   active;              /* which timed call is running: 0 for none */
     uint64_t   calls;               /* how many there have been, to tell one from the next */
     uint64_t   until;               /* when the running one is out of time, by os_now */
@@ -41,21 +41,21 @@ struct backend {
 struct backend_memory { void *ptr; uint64_t len; wasmtime_module_t *holder[ENGINES]; };
 
 struct backend_module {
-    backend *b;
+    backend_t *b;
     enum engine_kind kind;
     wasmtime_module_t *module;
     wasm_importtype_vec_t imports;
 };
 
 struct backend_func {
-    backend_instance *instance;
+    backend_instance_t *instance;
     wasmtime_func_t   func;
-    backend_func     *next;
+    backend_func_t     *next;
 };
 
 struct backend_instance {
-    backend *b;
-    backend_module *m;
+    backend_t *b;
+    backend_module_t *m;
     wasm_engine_t *engine;
     wasmtime_store_t   *store;
     wasmtime_context_t *ctx;
@@ -63,7 +63,7 @@ struct backend_instance {
     wasmtime_instance_t instance;
     int      instantiated;
     uint64_t deadline;          /* nanoseconds, for the next call only */
-    backend_func *funcs;
+    backend_func_t *funcs;
 };
 
 /* wasmtime_error_delete takes ownership of a real error: it must not be handed nullptr */
@@ -72,7 +72,7 @@ static void drop(wasmtime_error_t *error)
     if (error) wasmtime_error_delete(error);
 }
 
-static void fail(backend_err *err, const char *what, wasmtime_error_t *error, wasm_trap_t *trap)
+static void fail(backend_err_t *err, const char *what, wasmtime_error_t *error, wasm_trap_t *trap)
 {
     wasm_byte_vec_t msg = {};
     if (error) wasmtime_error_message(error, &msg);
@@ -99,26 +99,26 @@ static void fail(backend_err *err, const char *what, wasmtime_error_t *error, wa
 /* ---- memory: wasmtime asks this for every linear memory, and is not told which ---- */
 
 /* set around wasmtime_memory_new: the creator is being asked for a block Bridge-ASM700 owns */
-static thread_local backend_memory *adopting;
+static thread_local backend_memory_t *adopting;
 
-typedef struct { uint8_t *base; size_t size, reserve; } own_memory;
+typedef struct { uint8_t *base; size_t size, reserve; } own_memory_t;
 
 static uint8_t *adopted_get(void *env, size_t *size, size_t *capacity)
 {
-    backend_memory *m = env;
+    backend_memory_t *m = env;
     *size = *capacity = (size_t)m->len;
     return m->ptr;
 }
 
 static wasmtime_error_t *adopted_grow(void *env, size_t new_size)
 {
-    backend_memory *m = env;
+    backend_memory_t *m = env;
     return new_size == m->len ? nullptr : wasmtime_error_new("an adopted memory does not grow");
 }
 
 static uint8_t *own_get(void *env, size_t *size, size_t *capacity)
 {
-    own_memory *m = env;
+    own_memory_t *m = env;
     *size = m->size;
     *capacity = m->reserve;
     return m->base;
@@ -126,7 +126,7 @@ static uint8_t *own_get(void *env, size_t *size, size_t *capacity)
 
 static wasmtime_error_t *own_grow(void *env, size_t new_size)
 {
-    own_memory *m = env;
+    own_memory_t *m = env;
     if (new_size > m->reserve || os_commit(m->base, new_size)) {
         return wasmtime_error_new("out of address space for a module's own memory");
     }
@@ -136,7 +136,7 @@ static wasmtime_error_t *own_grow(void *env, size_t new_size)
 
 static void own_free(void *env)
 {
-    own_memory *m = env;
+    own_memory_t *m = env;
     os_release(m->base, m->reserve + (size_t)GUARD);
     free(m);
 }
@@ -159,7 +159,7 @@ static wasmtime_error_t *new_memory([[maybe_unused]] void *env,
         ret->finalizer = nullptr;              /* the block is Bridge-ASM700's to free */
         return nullptr;
     }
-    own_memory *m = malloc(sizeof *m);
+    own_memory_t *m = malloc(sizeof *m);
     m->reserve = (size_t)RESERVATION;
     m->size = minimum;
     m->base = os_reserve((size_t)(RESERVATION + GUARD), minimum);
@@ -181,7 +181,7 @@ static wasmtime_error_t *new_memory([[maybe_unused]] void *env,
  * two lifecycle calls back to back, a reload and then a shutdown, are exactly that. */
 static void watchdog(void *arg)
 {
-    backend *b = arg;
+    backend_t *b = arg;
     uint64_t interrupted = 0;
     for (;;) {
         uint64_t active, until, now;
@@ -209,7 +209,7 @@ static void watchdog(void *arg)
     }
 }
 
-static wasm_engine_t *engine_for(backend *b, enum engine_kind kind)
+static wasm_engine_t *engine_for(backend_t *b, enum engine_kind kind)
 {
     if (!b->engines[kind]) {
         wasm_config_t *config = wasm_config_new();
@@ -232,8 +232,8 @@ static wasm_engine_t *engine_for(backend *b, enum engine_kind kind)
 
 /* ---- the seventeen ---- */
 
-BACKEND_EXPORT backend *backend_create(const backend_setting *settings, uint32_t count,
-                                       backend_err *err)
+BACKEND_EXPORT backend_t *backend_create(const backend_setting_t *settings, uint32_t count,
+                                       backend_err_t *err)
 {
     /* this backend has no setting of its own, so any key is one it does not know */
     if (count) {
@@ -241,14 +241,14 @@ BACKEND_EXPORT backend *backend_create(const backend_setting *settings, uint32_t
                  settings[0].key ? settings[0].key : "");
         return nullptr;
     }
-    backend *b = calloc(1, sizeof *b);
+    backend_t *b = calloc(1, sizeof *b);
     b->wake = os_event_new();
     b->lock = os_mutex_new();
     b->watchdog = os_thread_start(watchdog, b);
     return b;
 }
 
-BACKEND_EXPORT void backend_destroy(backend *b)
+BACKEND_EXPORT void backend_destroy(backend_t *b)
 {
     os_mutex_lock(b->lock);
     b->quit = 1;
@@ -263,7 +263,7 @@ BACKEND_EXPORT void backend_destroy(backend *b)
     free(b);
 }
 
-BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] backend *b)
+BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] backend_t *b)
 {
     return BACKEND_UNTRUSTED | BACKEND_WORK_LIMIT | BACKEND_TIMEOUT | BACKEND_MEMORY_LIMIT | BACKEND_RELOAD
          | BACKEND_SIDE_BY_SIDE;
@@ -274,7 +274,7 @@ BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] bac
 #endif
 BACKEND_EXPORT uint32_t backend_abi() { return SAYS_ABI; }
 
-BACKEND_EXPORT void memory_shape([[maybe_unused]] backend *b, uint64_t *reservation, uint64_t *guard,
+BACKEND_EXPORT void memory_shape([[maybe_unused]] backend_t *b, uint64_t *reservation, uint64_t *guard,
                                  uint64_t *granule)
 {
     *reservation = RESERVATION;
@@ -282,28 +282,28 @@ BACKEND_EXPORT void memory_shape([[maybe_unused]] backend *b, uint64_t *reservat
     *granule = PAGE;                /* a wasm memory is a whole number of pages */
 }
 
-BACKEND_EXPORT backend_memory *memory_adopt(
-    [[maybe_unused]] backend *b, void *ptr, uint64_t len, backend_err *err)
+BACKEND_EXPORT backend_memory_t *memory_adopt(
+    [[maybe_unused]] backend_t *b, void *ptr, uint64_t len, backend_err_t *err)
 {
     if (!ptr || !len || len % PAGE) {
         fail(err, "an adopted block must be a whole number of 64 KiB pages", nullptr, nullptr);
         return nullptr;
     }
-    backend_memory *m = calloc(1, sizeof *m);
+    backend_memory_t *m = calloc(1, sizeof *m);
     m->ptr = ptr;
     m->len = len;
     return m;
 }
 
-BACKEND_EXPORT void memory_release(backend_memory *m)
+BACKEND_EXPORT void memory_release(backend_memory_t *m)
 {
     for (int k = 0; k < ENGINES; k ++) if (m->holder[k]) wasmtime_module_delete(m->holder[k]);
     free(m);
 }
 
-BACKEND_EXPORT backend_module *module_compile(
-    backend *b, const void *bytes, size_t len, [[maybe_unused]] const char *path,
-    enum backend_capability demands, backend_err *err)
+BACKEND_EXPORT backend_module_t *module_compile(
+    backend_t *b, const void *bytes, size_t len, [[maybe_unused]] const char *path,
+    enum backend_capability demands, backend_err_t *err)
 {
     /* a wasm module is its bytes */
     if (!bytes || !len) {
@@ -318,7 +318,7 @@ BACKEND_EXPORT backend_module *module_compile(
         fail(err, "not a module this backend can compile", error, nullptr);
         return nullptr;
     }
-    backend_module *m = calloc(1, sizeof *m);
+    backend_module_t *m = calloc(1, sizeof *m);
     m->b = b;
     m->kind = kind;
     m->module = module;
@@ -326,7 +326,7 @@ BACKEND_EXPORT backend_module *module_compile(
     return m;
 }
 
-BACKEND_EXPORT uint32_t module_imports(backend_module *m, backend_import *out, uint32_t max)
+BACKEND_EXPORT uint32_t module_imports(backend_module_t *m, backend_import_t *out, uint32_t max)
 {
     uint32_t i, n = (uint32_t)m->imports.size;
     for (i = 0; i < n && i < max; i ++) {
@@ -341,17 +341,17 @@ BACKEND_EXPORT uint32_t module_imports(backend_module *m, backend_import *out, u
     return n;
 }
 
-BACKEND_EXPORT void module_destroy(backend_module *m)
+BACKEND_EXPORT void module_destroy(backend_module_t *m)
 {
     wasm_importtype_vec_delete(&m->imports);
     wasmtime_module_delete(m->module);
     free(m);
 }
 
-BACKEND_EXPORT void instance_destroy(backend_instance *i)
+BACKEND_EXPORT void instance_destroy(backend_instance_t *i)
 {
     while (i->funcs) {
-        backend_func *f = i->funcs;
+        backend_func_t *f = i->funcs;
         i->funcs = f->next;
         free(f);
     }
@@ -374,7 +374,7 @@ static size_t leb(uint8_t *out, uint64_t v)
 /* wasmtime asks the creator only for a memory an instance defines, never for one the host
  * creates. So an adopted block enters a store as the memory of a module that does nothing
  * but define one and export it, and the creator answers for that with the block. */
-static wasmtime_error_t *adopt_into(backend_instance *i, backend_memory *mem,
+static wasmtime_error_t *adopt_into(backend_instance_t *i, backend_memory_t *mem,
                                     wasmtime_extern_t *item, wasm_trap_t **trap)
 {
     uint8_t wasm[64], limits[24];
@@ -410,11 +410,11 @@ held:
     return nullptr;
 }
 
-BACKEND_EXPORT backend_instance *instance_create(backend *b, backend_module *m,
-                                                 const backend_memory_import *memories,
-                                                 uint32_t count, backend_err *err)
+BACKEND_EXPORT backend_instance_t *instance_create(backend_t *b, backend_module_t *m,
+                                                 const backend_memory_import_t *memories,
+                                                 uint32_t count, backend_err_t *err)
 {
-    backend_instance *i = calloc(1, sizeof *i);
+    backend_instance_t *i = calloc(1, sizeof *i);
     uint32_t k;
     i->b = b;
     i->m = m;
@@ -429,7 +429,7 @@ BACKEND_EXPORT backend_instance *instance_create(backend *b, backend_module *m,
     if (m->kind & INTERRUPTIBLE) wasmtime_context_set_epoch_deadline(i->ctx, FAR);
 
     for (k = 0; k < count; k ++) {
-        const backend_memory_import *mi = &memories[k];
+        const backend_memory_import_t *mi = &memories[k];
         wasmtime_extern_t item;
         wasm_trap_t *trap = nullptr;
         wasmtime_error_t *error = adopt_into(i, mi->memory, &item, &trap);
@@ -451,30 +451,30 @@ BACKEND_EXPORT backend_instance *instance_create(backend *b, backend_module *m,
     return i;
 }
 
-BACKEND_EXPORT void instance_set_work_limit(backend_instance *i, uint64_t units)
+BACKEND_EXPORT void instance_set_work_limit(backend_instance_t *i, uint64_t units)
 {
     if (i->m->kind & METERED) drop(wasmtime_context_set_fuel(i->ctx, units));
 }
 
-BACKEND_EXPORT void instance_set_timeout(backend_instance *i, uint64_t nanos)
+BACKEND_EXPORT void instance_set_timeout(backend_instance_t *i, uint64_t nanos)
 {
     i->deadline = nanos;
 }
 
-BACKEND_EXPORT void instance_set_memory_limit(backend_instance *i, uint64_t bytes)
+BACKEND_EXPORT void instance_set_memory_limit(backend_instance_t *i, uint64_t bytes)
 {
     wasmtime_store_limiter(i->store, (int64_t)bytes, -1, -1, -1, -1);
 }
 
 /* ---- functions in both directions ---- */
 
-typedef struct { backend_fn fn; void *ud; uint32_t params, results; uint8_t result_kind[4]; } offered_fn;
+typedef struct { backend_fn_t fn; void *ud; uint32_t params, results; uint8_t result_kind[4]; } offered_fn_t;
 
 static wasm_trap_t *offered_call(void *env, [[maybe_unused]] wasmtime_caller_t *caller,
                               const wasmtime_val_t *args, size_t nargs, wasmtime_val_t *results,
                               size_t nresults)
 {
-    offered_fn *h = env;
+    offered_fn_t *h = env;
     uint64_t in[16] = {0}, out[4] = {};
     size_t k;
     for (k = 0; k < nargs && k < 16; k ++) {
@@ -506,11 +506,11 @@ static void types(wasm_valtype_vec_t *vec, const uint8_t *kinds, uint32_t count)
     }
 }
 
-BACKEND_EXPORT int define_func(backend_instance *i, const char *ns, const char *field,
-                               backend_fn fn, void *ud, const backend_sig *sig, backend_err *err)
+BACKEND_EXPORT int define_func(backend_instance_t *i, const char *ns, const char *field,
+                               backend_fn_t fn, void *ud, const backend_sig_t *sig, backend_err_t *err)
 {
     wasm_valtype_vec_t params, results;
-    offered_fn *h;
+    offered_fn_t *h;
     if (i->instantiated || sig->param_count > 16 || sig->result_count > 4) {
         fail(err, "define_func: after the module's first function, or too wide", nullptr, nullptr);
         return -1;
@@ -533,7 +533,7 @@ BACKEND_EXPORT int define_func(backend_instance *i, const char *ns, const char *
 }
 
 /* a module is instantiated at its first function: every import has to exist by then */
-static int instantiate(backend_instance *i, backend_err *err)
+static int instantiate(backend_instance_t *i, backend_err_t *err)
 {
     wasm_trap_t *trap = nullptr;
     wasmtime_error_t *error;
@@ -547,12 +547,12 @@ static int instantiate(backend_instance *i, backend_err *err)
     return 0;
 }
 
-BACKEND_EXPORT backend_func *instance_func(backend_instance *i, const char *name, backend_err *err)
+BACKEND_EXPORT backend_func_t *instance_func(backend_instance_t *i, const char *name, backend_err_t *err)
 {
     bool shaped;
     wasmtime_extern_t item;
     wasm_functype_t *ty;
-    backend_func *f;
+    backend_func_t *f;
     if (instantiate(i, err)) return nullptr;
     if (!wasmtime_instance_export_get(i->ctx, &i->instance, name, strlen(name), &item)
         || item.kind != WASMTIME_EXTERN_FUNC) {
@@ -577,10 +577,10 @@ BACKEND_EXPORT backend_func *instance_func(backend_instance *i, const char *name
     return f;
 }
 
-BACKEND_EXPORT int call(backend_func *f, int32_t *status, backend_err *err)
+BACKEND_EXPORT int call(backend_func_t *f, int32_t *status, backend_err_t *err)
 {
-    backend_instance *i = f->instance;
-    backend *b = i->b;
+    backend_instance_t *i = f->instance;
+    backend_t *b = i->b;
     wasmtime_val_t result;
     wasm_trap_t *trap = nullptr;
     wasmtime_error_t *error;

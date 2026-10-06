@@ -54,7 +54,7 @@ BRIDGE_NATIVE(fill)
 
 BRIDGE_NATIVE(walk)
 {
-    const bridge_query *q = bridge_native_query(api, walking);
+    const bridge_query_t *q = bridge_native_query(api, walking);
     uint32_t total = 0;
     for (uint32_t s = 0; s < q->spans; s ++) {
         const uint32_t *span = bridge_native_span(api, q, s, 1);
@@ -67,7 +67,7 @@ BRIDGE_NATIVE(walk)
 
 BRIDGE_NATIVE(flag)
 {
-    const bridge_query *q = bridge_native_query(api, flagged);
+    const bridge_query_t *q = bridge_native_query(api, flagged);
     uint32_t total = 0;
     for (uint32_t s = 0; s < q->spans; s ++) {
         const uint32_t *span = bridge_native_span(api, q, s, 1);
@@ -81,11 +81,11 @@ BRIDGE_NATIVE(flag)
 }
 
 /* every row's link followed to the value of the entity it names */
-static int follow(const bridge_api *api, bool far)
+static int follow(const bridge_api_t *api, bool far)
 {
-    const bridge_header *h = bridge_native_header(api);
-    const bridge_query *q = bridge_native_query(api, linked);
-    auto index = (const bridge_entity *)(api->shared_base + h->entity_index);
+    const bridge_header_t *h = bridge_native_header(api);
+    const bridge_query_t *q = bridge_native_query(api, linked);
+    auto index = (const bridge_entity_t *)(api->shared_base + h->entity_index);
     auto base = (const uint32_t *)(api->private_base + h->column_base);
     uint32_t total = 0;
     for (uint32_t s = 0; s < q->spans; s ++) {
@@ -93,7 +93,7 @@ static int follow(const bridge_api *api, bool far)
         auto column = (const L *)(api->shared_base + span[2]);
         for (uint32_t r = 0; r < span[0]; r ++) {
             uint64_t id = far ? column[r].far : column[r].near;
-            const bridge_entity *e = &index[(uint32_t)id];
+            const bridge_entity_t *e = &index[(uint32_t)id];
             uint32_t at;
             if (e->generation != (uint32_t)(id >> 32)) continue;
             at = base[e->table * h->types + value];
@@ -111,7 +111,7 @@ BRIDGE_NATIVE(one)
 {
     uint32_t total = 0, spans = 0;
     for (uint32_t i = 0; i < ASKED; i ++) {
-        const bridge_query *q = bridge_native_query(api, which);
+        const bridge_query_t *q = bridge_native_query(api, which);
         const uint32_t *span = bridge_native_span(api, q, 0, 1);
         if (!q->spans || !span[0]) continue;
         total += ((const S *)(api->shared_base + span[2]))->v;
@@ -124,7 +124,7 @@ BRIDGE_NATIVE(one)
 BRIDGE_NATIVE(init)
 {
     int none = 0;
-    bridge_term one[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
+    bridge_term_t one[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     uint32_t filled[4];
     value = filled[0] = BRIDGE_NATIVE_COMPONENT(api, "st:V", V, BRIDGE_DELETE, BRIDGE_TABLE);
     flag = filled[1] = BRIDGE_NATIVE_COMPONENT(api, "st:F", F, BRIDGE_DELETE, BRIDGE_TABLE);

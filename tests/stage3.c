@@ -15,7 +15,7 @@
 
 constexpr int64_t MS = 1'000'000;
 
-static void sink([[maybe_unused]] void *ud, const bridge_record *r)
+static void sink([[maybe_unused]] void *ud, const bridge_record_t *r)
 {
     printf("record[%d] %s/%s: %.*s %u %u\n", r->level, r->identity ? r->identity : "-",
         r->system ? r->system : "-", (int)r->len, r->text, r->arg[0], r->arg[1]);
@@ -39,9 +39,9 @@ static void *read_file(const char *name, size_t *len)
 }
 
 /* a module as a deployment would state it: every key said, nothing left at zero */
-static bridge_artifact artifact(const char *identity, const char *file)
+static bridge_artifact_t artifact(const char *identity, const char *file)
 {
-    bridge_artifact a = {};
+    bridge_artifact_t a = {};
     a.cfg.identity = identity;
     a.cfg.abi = BRIDGE_ABI;
     a.cfg.trusted = BRIDGE_FALSE;
@@ -72,14 +72,14 @@ static bridge_artifact artifact(const char *identity, const char *file)
     return a;
 }
 
-static int load(bridge *b, const bridge_artifact *a)
+static int load(bridge_t *b, const bridge_artifact_t *a)
 {
     int r = bridge_load(b, a);
     printf("%s: %s\n", a->cfg.identity, r ? "not loaded" : "loaded");
     return r;
 }
 
-static void frames(bridge *b, int count)
+static void frames(bridge_t *b, int count)
 {
     int i;
     for (i = 0; i < count; i ++) {
@@ -90,9 +90,9 @@ static void frames(bridge *b, int count)
 
 static const char *const grants[] = { "game:Position", "game:Marked" };
 
-static bridge_artifact reader()
+static bridge_artifact_t reader()
 {
-    bridge_artifact a = artifact("view:reader@0.1.0", "reader");
+    bridge_artifact_t a = artifact("view:reader@0.1.0", "reader");
     a.cfg.read = grants;
     a.cfg.read_count = 2;
     return a;
@@ -100,7 +100,7 @@ static bridge_artifact reader()
 
 /* validation.md, *Always on*: the accessor's test, against a build without it, with the
  * count that a work limit adds and without. Nanoseconds a row, the best of twenty. */
-static void bench(bridge_config *cfg)
+static void bench(bridge_config_t *cfg)
 {
     static const char *const builds[2] = { "rows", "rows-unchecked" };
     int build, metered, round, pass;
@@ -108,8 +108,8 @@ static void bench(bridge_config *cfg)
     cfg->budget.columns = 64 << 20;
     for (build = 0; build < 2; build ++) {
         for (metered = 1; metered >= 0; metered --) {
-            bridge *b = bridge_create(cfg, sink, nullptr);
-            bridge_artifact a = artifact("game:rows@0.1.0", builds[build]);
+            bridge_t *b = bridge_create(cfg, sink, nullptr);
+            bridge_artifact_t a = artifact("game:rows@0.1.0", builds[build]);
             double best = 1e30;
             a.cfg.work_limit = metered ? 1'000'000'000 : BRIDGE_NO_LIMIT;
             a.cfg.init_timeout = BRIDGE_NO_LIMIT;
@@ -136,15 +136,15 @@ static void bench(bridge_config *cfg)
 int main(int argc, char **argv)
 {
     const char *what = argc > 1 ? argv[1] : "";
-    bridge_backend backends[1] = {{ "wasm", BACKEND_PATH }};
+    bridge_backend_t backends[1] = {{ "wasm", BACKEND_PATH }};
     const char *phases[2] = { "update", "present" };
-    bridge_config cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 1, .phases = phases,
+    bridge_config_t cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 1, .phases = phases,
         .phase_count = 2, .threads = 1, .budget =
         { .entities = 4096, .tables = 64, .types = 64, .systems = 128, .terms = 8, .modules = 8,
           .persistent = 4096, .columns = 1 << 20,
           .sparse_sets = BRIDGE_NONE, .direct_indexed = BRIDGE_NONE } };
-    bridge_artifact a;
-    bridge *b;
+    bridge_artifact_t a;
+    bridge_t *b;
     setvbuf(stdout, nullptr, _IONBF, 0);
 
     if (!strcmp(what, "bench")) {

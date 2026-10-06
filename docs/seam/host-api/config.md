@@ -101,7 +101,7 @@ when the module does. And a component is the settings of one loaded module at a 
 field it fits, a float into a float. Text has three places to go, and the field's type says which:
 
     char name[N]      the bytes, inline, and a zero after them. text that does not fit is refused
-    bridge_text       `(offset, length)` into the persistent arena - `strings.md`, *Variable
+    bridge_text_t       `(offset, length)` into the persistent arena - `strings.md`, *Variable
                       length*. the pair is an ABI layout `bridge-abi.h` gives, usable as a field's type
     an enum           the constant of that name
 
