@@ -111,6 +111,8 @@ struct module {
 
     declared_type    **declared;        /* by slot */
     enum bridge_on_unload *policy;  /* by slot: what it stated */
+    bool          *may_write;       /* by slot: its grants let it write the component. Worked
+                                     * out once, at declare: an attach asks it every time */
     uint32_t       declared_count;
     bridge_system **systems;        /* by slot */
     uint32_t       system_count;

@@ -105,8 +105,11 @@ moves to grow, every cell of an entity in it is written again.
 `storage weigh`: a four-byte component given to an entity and taken from it again.
 
     the entity carries     in a table: given, taken     in a sparse set: given, taken
-        4 bytes               40 ns      37 ns              33 ns      29 ns
-     4096 bytes              505 ns     500 ns              32 ns      28 ns
+        4 bytes               30 ns      28 ns              29 ns      24 ns
+     4096 bytes              507 ns     506 ns              28 ns      23 ns
+
+That is the barrier. The call that asks for the change is 10 ns more for a give and 8 for a
+take, whichever way the component is kept.
 
 And the entities that carry it are not split off into a table of their own. **What it costs is
 the read beside a table's column.** Its 204,800 values walked alone take 6.6 us, as a column's
@@ -157,7 +160,8 @@ bit with it.
 
 Sixty-four rows that are all on are read as a column is, which is the first figure. And a row
 is switched by one store: 3 ns a row measured, with the draw that says which way, where a detach
-and an attach to say the same are 77 ns, and 1,005 for an entity that carries 4 KB. What it does
+and an attach to say the same are 58 ns at the barrier and 18 more in the two calls, and 1,013
+at the barrier for an entity that carries 4 KB. What it does
 not beat is a field tested by a mask, which a compiler makes of a small enough loop: 12 us at
 any share, measured in scratch - `STAGE11.md`, *The gate*.
 
@@ -190,7 +194,7 @@ that is held, its generation tested:
     `reference.md` has it
     direct-indexed, the bit tested     0.74 ns                   1.4 ns
 
-And it is given in 25 ns and taken in 24, whatever the entity carries. **What it costs is its
+And it is given in 17 ns and taken in 17 at the barrier, whatever the entity carries. **What it costs is its
 size for every entity, carried or not**: sixty-four bytes at four hundred thousand entities is
 25.6 MB of `[budget] columns`.
 

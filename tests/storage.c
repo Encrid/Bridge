@@ -139,13 +139,19 @@ static void run(bridge *b, const char *phase)
     }
 }
 
-/* the systems of one phase, then the barrier alone, timed */
+/* The systems of one phase, then the barrier, each timed: a change is the call that asks for
+ * it and the barrier that applies it, and a library that applies a change at the call has one
+ * figure where this has two. `called` is the first, of the phase last run. */
+static uint64_t called;
+
 static uint64_t barrier(bridge *b, const char *phase)
 {
     uint32_t i;
     uint64_t t;
     for (i = 0; i < PHASES && strcmp(phases[i], phase); i ++) { }
+    t = os_now();
     schedule_run(b, i);
+    called = os_now() - t;
     t = os_now();
     block_barrier(b);
     return os_now() - t;
@@ -737,7 +743,7 @@ int main(int argc, char **argv)
         };
         (void)bridge_destroy(b);
         for (uint32_t k = 0; k < sizeof set / sizeof *set; k ++) {
-            uint64_t on = 0, off = 0, walk = 0, reach = 0, t;
+            uint64_t on = 0, off = 0, walk = 0, reach = 0, on_call = 0, off_call = 0, t;
             b = bridge_create(&cfg, counted, nullptr);
             a = store_module(set[k].path, set[k].count, 8 << 20, (int64_t)set[k].count * 4200);
             if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
@@ -745,13 +751,16 @@ int main(int argc, char **argv)
             for (uint32_t round = 0; round < ROUNDS; round ++) {
                 t = barrier(b, "attach_b");
                 if (!round || t < on) on = t;
+                if (!round || called < on_call) on_call = called;
                 if (round + 1 < ROUNDS) {
                     t = barrier(b, "detach_b");
                     if (round < 1 || t < off) off = t;
+                    if (round < 1 || called < off_call) off_call = called;
                 }
             }
-            printf("a sparse set, an entity of %4u bytes: a component given %6.1f ns, taken %6.1f ns\n",
-                set[k].bytes, (double)on / set[k].count, (double)off / set[k].count);
+            printf("a sparse set, an entity of %4u bytes: a component given %6.1f ns, taken %6.1f ns; "
+                "and the calls %5.1f and %5.1f\n", set[k].bytes, (double)on / set[k].count,
+                (double)off / set[k].count, (double)on_call / set[k].count, (double)off_call / set[k].count);
             /* read, where the table's own rows are small: a row of 4 KB is a cache miss by
              * itself, and that is the table's and says nothing of the set */
             for (uint32_t round = 0; !k && round < ROUNDS * 4; round ++) {
@@ -793,7 +802,7 @@ int main(int argc, char **argv)
         /* storage.md, *Direct-indexed*: a value reached by an id that is held */
         (void)bridge_destroy(b);
         {
-            uint64_t on = 0, off = 0, near = 0, far = 0, t;
+            uint64_t on = 0, off = 0, near = 0, far = 0, on_call = 0, off_call = 0, t;
             b = bridge_create(&cfg, counted, nullptr);
             a = store_module(NDIRECTBIG_PATH, 204'802, 8 << 20, 128 << 20);
             if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
@@ -801,9 +810,11 @@ int main(int argc, char **argv)
             for (uint32_t round = 0; round < ROUNDS; round ++) {
                 t = barrier(b, "attach_b");
                 if (!round || t < on) on = t;
+                if (!round || called < on_call) on_call = called;
                 if (round + 1 < ROUNDS) {
                     t = barrier(b, "detach_b");
                     if (round < 1 || t < off) off = t;
+                    if (round < 1 || called < off_call) off_call = called;
                 }
             }
             for (uint32_t round = 0; round < ROUNDS * 4; round ++) {
@@ -812,8 +823,9 @@ int main(int argc, char **argv)
                 t = ran(b, "far");
                 if (!round || t < far) far = t;
             }
-            printf("direct-indexed: a component given %6.1f ns, taken %6.1f ns\n", (double)on / 204'800,
-                (double)off / 204'800);
+            printf("direct-indexed: a component given %6.1f ns, taken %6.1f ns; and the calls %5.1f "
+                "and %5.1f\n", (double)on / 204'800, (double)off / 204'800, (double)on_call / 204'800,
+                (double)off_call / 204'800);
             printf("    204800 values reached by id, in the order they lie %6.3f ns each, in no order "
                 "%6.3f ns each\n", (double)near / 204'800, (double)far / 204'800);
         }
@@ -918,7 +930,7 @@ int main(int argc, char **argv)
             { "never",    "a barrier with nothing to do" },
         };
         constexpr uint32_t OPS = sizeof ops / sizeof *ops, ROUNDS = 6, COUNT = 100'000;
-        uint64_t first[OPS], best[OPS], t;
+        uint64_t first[OPS], best[OPS], calls[OPS], t;
         a = store_module(NSTOREBIG_PATH, COUNT, 1 << 20, 64 << 20);
         if (bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         for (uint32_t round = 0; round < ROUNDS; round ++) {
@@ -926,12 +938,14 @@ int main(int argc, char **argv)
                 t = barrier(b, ops[i].phase);
                 if (!round) first[i] = best[i] = t;
                 else if (t < best[i]) best[i] = t;
+                if (!round || called < calls[i]) calls[i] = called;
             }
         }
-        printf("%u entities, the best of %u rounds, and the first, where tables are new\n", COUNT, ROUNDS);
+        printf("%u entities, the best of %u rounds, and the first, where tables are new; and what the "
+            "module's own call cost\n", COUNT, ROUNDS);
         for (uint32_t i = 0; i < OPS - 1; i ++) {
-            if (ops[i].what) printf("%-38s %7.1f ns each   first %7.1f\n", ops[i].what,
-                (double)best[i] / COUNT, (double)first[i] / COUNT);
+            if (ops[i].what) printf("%-38s %7.1f ns each   first %7.1f   call %5.1f\n", ops[i].what,
+                (double)best[i] / COUNT, (double)first[i] / COUNT, (double)calls[i] / COUNT);
         }
         printf("%-38s %7.0f ns\n", ops[OPS - 1].what, (double)best[OPS - 1]);
         /* with every entity carrying both again: a destroyed one holds nothing in either */

@@ -25,7 +25,8 @@ constexpr uint32_t DEAD = 0xffffffffu;          /* a place whose entity is gone 
 /* what the fold has decided of an entity, for the length of one barrier */
 enum folded : uint8_t {
     TOUCHED = 1, DESTROYED = 2, DROPPED = 4,
-    SHORT = 8                       /* dropped for want of columns, and not of a table */
+    SHORT = 8,                      /* dropped for want of columns, and not of a table */
+    MOVES = 16                      /* it is to have a row it has not: room is found for it */
 };
 
 struct storage_type {
@@ -138,6 +139,42 @@ static void take(uint64_t *set, uint32_t type) { set[type >> 6] &= ~((uint64_t)1
 static const uint64_t *set_of(const storage *r, uint32_t t) { return r->sets + (size_t)t * r->words; }
 static uint32_t *columns_of(const storage *r, uint32_t t) { return r->columns + (size_t)t * r->type_room; }
 
+/* A set is a 64-bit word for each 64 types there may be: one, in most deployments. Copied
+ * and compared a word at a time here, since memcpy and memcmp of a length the compiler cannot
+ * see are calls, and these are made for every entity a barrier changes. */
+static inline void set_copy(const storage *r, uint64_t *to, const uint64_t *from)
+{
+    for (uint32_t w = 0; w < r->words; w ++) to[w] = from[w];
+}
+
+static inline void set_none(const storage *r, uint64_t *set)
+{
+    for (uint32_t w = 0; w < r->words; w ++) set[w] = 0;
+}
+
+static inline bool set_same(const storage *r, const uint64_t *a, const uint64_t *b)
+{
+    for (uint32_t w = 0; w < r->words; w ++) if (a[w] != b[w]) return false;
+    return true;
+}
+
+/* A value is a word or two more often than not, and a copy or a clearing of a length the
+ * compiler cannot see is a call. The two commonest sizes are done here, for every row that
+ * moves. */
+static inline void bytes_copy(uint8_t *to, const uint8_t *from, uint32_t size)
+{
+    if (size == 4) memcpy(to, from, 4);
+    else if (size == 8) memcpy(to, from, 8);
+    else memcpy(to, from, size);
+}
+
+static inline void bytes_none(uint8_t *at, uint32_t size)
+{
+    if (size == 4) memset(at, 0, 4);
+    else if (size == 8) memset(at, 0, 8);
+    else memset(at, 0, size);
+}
+
 static uint32_t *where_of(const storage *r, uint32_t slot)
 {
     return r->where + (size_t)slot * r->b->entities;
@@ -183,8 +220,8 @@ static uint32_t cell_of(const storage_type *type, uint32_t column, uint32_t row)
 [[gnu::always_inline]] static inline void carried(const storage *r, uint32_t index, uint64_t *set)
 {
     uint32_t t = r->places[index].table;
-    if (t) memcpy(set, set_of(r, t), 8u * r->words);
-    else memset(set, 0, 8u * r->words);
+    if (t) set_copy(r, set, set_of(r, t));
+    else set_none(r, set);
     if (!r->apart) return;
     for (uint32_t slot = 0; slot < r->set_room; slot ++) {
         if (r->set_type[slot] && where_of(r, slot)[index]) put(set, r->set_type[slot]->id);
@@ -347,7 +384,7 @@ static uint32_t table_of(const storage *r, const uint64_t *set)
 {
     uint32_t i = hashed(r, set);
     while (r->hash[i]) {
-        if (!memcmp(set_of(r, r->hash[i]), set, 8u * r->words)) return r->hash[i];
+        if (set_same(r, set_of(r, r->hash[i]), set)) return r->hash[i];
         i = (i + 1) & (r->hash_room - 1);
     }
     return 0;
@@ -561,7 +598,7 @@ static uint32_t appended(storage *r, uint32_t t, uint32_t index)
         for (uint64_t bits = set_of(r, t)[w]; bits; bits &= bits - 1) {
             const storage_type *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
             uint8_t *column = r->b->shared + columns[type->id];
-            memcpy(column + (size_t)row * type->size, column + (size_t)last * type->size, type->size);
+            bytes_copy(column + (size_t)row * type->size, column + (size_t)last * type->size, type->size);
             if (type->kept == BRIDGE_TOGGLE) {
                 turned(r, columns[type->id], tab->room, row, on_at(r, columns[type->id], tab->room, last));
             }
@@ -579,7 +616,7 @@ static void joined(storage *r, uint32_t slot, uint32_t index)
 {
     const storage_type *type = r->set_type[slot];
     uint32_t t = r->set_table[slot], row = appended(r, t, index);
-    memset(r->b->shared + columns_of(r, t)[type->id] + (size_t)row * type->size, 0, type->size);
+    bytes_none(r->b->shared + columns_of(r, t)[type->id] + (size_t)row * type->size, type->size);
     seated(r, &r->tables[t], index, row);
 }
 
@@ -624,7 +661,7 @@ static void cell_given(storage *r, uint32_t slot, uint32_t index, bool on)
     const storage_type *type = r->direct_type[slot];
     if (on) put(given_of(r, slot), index), put(shown_of(r, slot), index);
     else take(given_of(r, slot), index), take(shown_of(r, slot), index);
-    memset(r->b->shared + type->cells + COLUMN + (size_t)index * type->size, 0, type->size);
+    bytes_none(r->b->shared + type->cells + COLUMN + (size_t)index * type->size, type->size);
 }
 
 /* the entity at `index` goes to `to`, which has room: what it carried that `to` also holds
@@ -642,9 +679,9 @@ static void cell_given(storage *r, uint32_t slot, uint32_t index, bool on)
                 const storage_type *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
                 uint8_t *cell = r->b->shared + into[type->id] + (size_t)at * type->size;
                 if (out && out[type->id]) {
-                    memcpy(cell, r->b->shared + out[type->id] + (size_t)row * type->size, type->size);
+                    bytes_copy(cell, r->b->shared + out[type->id] + (size_t)row * type->size, type->size);
                 } else {
-                    memset(cell, 0, type->size);
+                    bytes_none(cell, type->size);
                 }
                 /* a toggled component is on when it is given, and as it was when it moves */
                 if (type->kept == BRIDGE_TOGGLE) {
@@ -806,7 +843,7 @@ static bool joins(const storage *r, uint32_t slot, uint32_t index)
             for (uint32_t w = 0; w < r->words; w ++) r->masked[w] = want[w] & r->in_table[w];
             want = r->masked;
         }
-        if (from && !memcmp(want, set_of(r, from), 8u * r->words)) {
+        if (from && set_same(r, want, set_of(r, from))) {
             t = from;
         } else if (!empty(r, want)) {
             t = table_for(r, want);
@@ -816,21 +853,27 @@ static bool joins(const storage *r, uint32_t slot, uint32_t index)
             }
         }
         r->dest[index] = t;
-        if (t && t != r->places[index].table) r->tables[t].incoming ++;
+        if (t && t != from) {
+            r->tables[t].incoming ++;
+            r->folded[index] |= MOVES;
+        }
         /* and a row in each sparse set it is to join */
         for (uint32_t slot = 0; r->apart && slot < r->set_room; slot ++) {
             if (!joins(r, slot, index)) continue;
             if (!r->set_table[slot]) {
-                memset(r->scratch, 0, 8u * r->words);
+                set_none(r, r->scratch);
                 put(r->scratch, r->set_type[slot]->id);
                 if (!table_for(r, r->scratch)) unreachable();
             }
             r->tables[r->set_table[slot]].incoming ++;
+            r->folded[index] |= MOVES;
         }
     }
     for (i = 0; i < r->changed_count; i ++) {
         uint32_t index = r->changed[i], t = r->dest[index];
-        if (r->folded[index] & (DESTROYED | DROPPED)) continue;
+        /* one that is to have no row it has not is asked nothing: an attach of what an
+         * entity carries is most of what a barrier sees */
+        if ((r->folded[index] & (DESTROYED | DROPPED | MOVES)) != MOVES) continue;
         if (t && t != r->places[index].table && !roomed(r, t)) {
             dropped(r, index, true);
             continue;
@@ -931,7 +974,7 @@ void storage_apply(storage *r)
                 r->folded[index] = TOUCHED;
                 r->changed[r->changed_count ++] = index;
                 start_from(r, index);
-                if (r->observer_count) memset(attached_of(r, index), 0, 8u * r->words);
+                if (r->observer_count) set_none(r, attached_of(r, index));
             }
             if (ch.op == CHANGE_DESTROY) {
                 if (stake(r, m, index)) r->folded[index] |= DESTROYED;
@@ -982,7 +1025,7 @@ void storage_apply(storage *r)
                 || r->folded[index] & (DESTROYED | DROPPED)
                 || r->places[index].generation != (uint32_t)(ch.id >> 32)) continue;
             to = value_of(r, index, ch.c->type);
-            if (to) memcpy(b->shared + to, value, ch.size);
+            if (to) bytes_copy(b->shared + to, value, ch.size);
         }
     }
     for (m = b->modules; m; m = m->next) {

@@ -109,6 +109,7 @@ void module_discard(bridge *b, module *m)
     free(m->observers);
     free(m->declared);
     free(m->policy);
+    free(m->may_write);
     free(m->identity);
     free(m->stem);
     free(m->ns);

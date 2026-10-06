@@ -660,22 +660,27 @@ only queued, and applied at a barrier.** So a change is given three ways below, 
 read ours beside is flecs deferred, which does what a barrier does. At once is a different
 thing: nothing is queued, nothing is ordered among modules, and no observer is told later.
 
-Windows, the least of the rounds, two runs in turn. A four-byte component given to an entity,
-and taken from it:
+Windows, the least of the rounds, two runs in turn. **A change of ours is two figures and a
+change of theirs is one**: the call a module makes to ask for it, and the barrier that applies
+it. The first time this was written only the barrier was counted for ours, against all of
+theirs, which flattered ours on every line below by the 10 ns of a call. Both are counted here,
+and they are the figures after *Where ours was slower*, below.
+
+A four-byte component given to an entity, and taken from it:
 
                                   the entity carries 4 bytes     and 4 KB
-    ours, in tables                    39 ns     35 ns         519 ns    508 ns
+    ours, in tables                    39 ns     36 ns         517 ns    514 ns
     flecs, in tables, deferred         67 ns     44 ns         541 ns    520 ns
     flecs, in tables, at once          49 ns     35 ns         512 ns    498 ns
-    ours, in a sparse set              35 ns     31 ns          33 ns     28 ns
+    ours, in a sparse set              40 ns     32 ns          38 ns     31 ns
     flecs, sparse, deferred           113 ns     69 ns         106 ns     65 ns
     flecs, sparse, at once             86 ns     60 ns          81 ns     56 ns
     EnTT, at once                     9.9 ns    8.7 ns         9.5 ns    8.3 ns
-    ours, direct-indexed               25 ns     23 ns
+    ours, direct-indexed               28 ns     25 ns
 
 An entity's first component, one it has, and its end:
 
-    ours                               30 ns    18.5 ns    15.6 ns
+    ours                               37 ns    22 ns      21 ns
     flecs, deferred                    99 ns    26 ns      29 ns
     flecs, at once                     49 ns    10 ns      20 ns
     EnTT, at once                    12.6 ns     5.7 ns    34 ns
@@ -716,12 +721,13 @@ process came to hold, which is all they offer:
     EnTT, the process holds more         25,500 KB           19,300 KB
 
 **Where ours is behind, and why.** EnTT gives and takes a component in 10 and 9 ns, and gives
-an entity its first in 13, where ours takes 35 and 31, and 30. That is the queue and the
+an entity its first in 13, where ours takes 40 and 32, and 37; and flecs writes a value for a
+component an entity has in 10 ns at once, where ours takes 22. That is the queue and the
 barrier: ours copies the change into a module's queue, folds every change of the barrier,
-orders them among modules and places each entity once, and EnTT writes into one array at the
-call. flecs made to do the same, deferred, is 113 and 69. It is the price of what
-`data.md`, *Structural change*, promises, and not of how a sparse set is kept; and it is the
-one place a reference is ahead. A destroy is the other way about: 15.6 ns against EnTT's 34.
+orders them among modules and places each entity once, and they write at the call. flecs made
+to do the same, deferred, is 113 and 69, and 26. It is the price of what `data.md`, *Structural
+change*, promises, and not of how anything is kept. A destroy is the other way about: 21 ns
+against EnTT's 34.
 
 **Everywhere else ours is ahead of both**: every read, every reach by id, the toggle on every
 line, the singleton, and what a marker costs. Direct-indexed is within a fifth of the C array
@@ -731,3 +737,75 @@ are: a sparse component that does not fragment is walked an entity at a time thr
 component is read in runs of rows that are on, which is the 1,260 us when on and off alternate,
 the form the gate measured in scratch at 432.
 
+## Where ours was slower, and what was done
+
+Two lines of the comparison had ours behind: a sparse set's give and take against EnTT, and a
+value for a component an entity has against flecs at once. Each step of a barrier was timed,
+and the module's call beside it.
+
+**The comparison itself was wrong first.** Ours had been timed at the barrier alone, and the
+call that asks for a change was not in it: 12.5 ns for an attach. The test reports both now,
+on every line.
+
+**Then three things that were waste, and are gone**:
+
+    a set copied and compared     an entity's set is one 64-bit word, and it was copied,
+    by a call                     cleared and compared by `memcpy`, `memset` and `memcmp`
+                                  of a length the compiler cannot see, which are calls, for
+                                  every entity a barrier changes. A word at a time, inline
+    a value copied by a call      the same, of a value of four or eight bytes, for every row
+                                  that moves and every value an attach writes
+    room asked for what does      an entity that is to have no row it has not was asked,
+    not move                      at the second pass over the changed, whether it had room
+    a grant read as text          every attach and detach compared the component's name
+                                  with the module's namespace to know that it may write it.
+                                  Worked out once, at `declare`
+
+                                              before                  after
+                                           call    barrier        call    barrier
+    attach, the entity's first component   12.6     30.7           9.5     27.3
+    attach, a component it has             12.5     18.9           9.6     12.3
+    attach, a second component             12.4     40.0           9.4     29.3
+    detach                                 11.3     35.6           8.0     27.8
+    destroy                                 6.1     15.7           6.0     15.0
+    a sparse set: given, taken        13.3, 11.3   34, 30     10.7, 8.3    29, 24
+    direct-indexed: given, taken      13.4, 11.2   25, 23     10.5, 8.2    17, 17
+    the stress run, on four threads              1590 to 1670 ms        1400 to 1452 ms
+    the stress run, on one thread                3290 to 3304 ms        2908 to 3045 ms
+
+**What is left is what a barrier is.** A change of a component an entity has is 22 ns in all:
+10 in the call, which checks the thread, the grant, the stated changes and the scratch arena
+and copies the change into the queue; 4.6 in the fold; 2.3 in finding that nothing moves; 4.1
+in the second pass over the queue that writes the values, in the order they were asked; and
+the rest in forgetting the fold. The second pass was looked at and kept: writing a value at the
+fold would write it for an entity that the barrier then leaves as it was for want of room,
+which `budgets.md`, *What running out does*, says does not happen.
+
+## What their implementations have that ours could
+
+Read for what each does where it is ahead, and for what it does at all where it is behind.
+
+    EnTT, a change at       it writes into one array at the call. Ours cannot and keep
+    the call                what a barrier is for. What a module has in its place: a value
+                            of a component an entity carries is written where it is, by a
+                            system that states the term as written, with no call and no
+                            barrier, which is what flecs' 10 ns and EnTT's 6 are doing
+    EnTT, its index in      weighed and refused at the gate on a measurement: one and a
+    pages                   half times the lookup
+    EnTT, groups            two sets kept in one order, so that both are walked side by
+                            side with no lookup. It would take the 0.44 ns a row of a
+                            sparse set read beside a column to what a column costs, for
+                            one pair stated ahead; and it is a rule about the order of
+                            rows, where no order of rows is anybody's to rely on. Not
+                            taken: the condition is a pair read together every tick,
+                            measured as a share of it
+    flecs, commands of      the fold, which is the same idea: each entity moved once
+    one entity batched
+    flecs, a toggle read    measured at the gate and again here: the slowest of the three
+    in runs                 ways when on and off alternate. A module is handed the bits
+    flecs, sparse without   walked an entity at a time through a call. Ours is one span
+    fragmenting
+    either, a singleton     a lookup by type at each read, 1.0 and 2.8 ns. Ours is a place
+
+Nothing of theirs was found that ours lacks and should have. What came of reading them is
+the three wastes above, which were ours alone, and the figures being counted as theirs are.

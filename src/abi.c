@@ -331,9 +331,11 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
          * anything is made that would have to be unmade: failure.md, *Out of memory* */
         void *declared = realloc(m->declared, (m->declared_count + 1) * sizeof *m->declared);
         void *policy = realloc(m->policy, (m->declared_count + 1) * sizeof *m->policy);
+        void *writes = realloc(m->may_write, (m->declared_count + 1) * sizeof *m->may_write);
         if (declared) m->declared = declared;
         if (policy) m->policy = policy;
-        if (!declared || !policy || !storage_writable(b->storage, m)) {
+        if (writes) m->may_write = writes;
+        if (!declared || !policy || !writes || !storage_writable(b->storage, m)) {
             return refuse(m, "out of memory: there was none for what it declares");
         }
     }
@@ -521,7 +523,8 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     }
     m->policy[m->declared_count] = on_unload;
     m->declared[m->declared_count] = c;
-    if (may_write(m, c)) storage_writes(b->storage, m, c->type);
+    m->may_write[m->declared_count] = may_write(m, c);
+    if (m->may_write[m->declared_count]) storage_writes(b->storage, m, c->type);
     c->declarers ++;
     b->layout_moved = 1;
     r[0] = m->declared_count ++;
@@ -868,7 +871,7 @@ static declared_type *written(module *m, uint64_t slot, const char *entry)
         refuse(m, "%s names slot %llu, which it never declared", entry, (unsigned long long)slot);
         return nullptr;
     }
-    if (!may_write(m, m->declared[slot])) {
+    if (!m->may_write[slot]) {
         refuse(m, "it may not %s '%s': no grant says so", entry, m->declared[slot]->name);
         return nullptr;
     }
