@@ -1,7 +1,7 @@
 # Stage 10: storage of our own
 
-In progress: flecs is out and the gate is passed, and *What was not in the plan* lists what was
-built without being decided and is being decided now, one at a time.
+Done: flecs is out and the gate is passed, and what was built without being decided has been
+decided, one at a time - *The repair*, which ends in the figures of the tree as it is now.
 
 `flecs.md`, *Why flecs rather than our own*, said that writing our own would have produced a
 worse flecs. This stage did it anyway, and this document is why that was no longer the same bet,
@@ -696,8 +696,45 @@ middle of a paragraph in `config.md`.
     closed  the log levels named twice: twice on purpose, a seam's header being whole
             alone, and asserted equal where a module's level becomes a host's. `log.md`
 
-**6. Close**: both sets of figures measured again side by side, `PLAN.md` stage 10 marked done
-by its done-when as first written, and every line above closed.
+**6. Close**: every line above is closed, and `PLAN.md` marks stage 10 done by its done-when as
+first written. Both sets of figures were measured again, the tree before the repair built beside
+the tree after it and run in turn, twice, on Windows. flecs is the column of *What it costs*,
+which is a record of the gate and is not measured again, flecs being gone.
+
+                                              flecs      before        now
+    an id handed out                          17.0 ns     1.5 ns      1.5 ns
+    attach, the entity's first component     123.9 ns    30.8 ns     31.4 ns
+    attach, a component it has                27.4 ns    21.6 ns     18.9 ns
+    attach, a second component               128.1 ns    38.5 ns     39.6 ns
+    detach                                   100.5 ns    34.8 ns     36.0 ns
+    destroy                                   66.1 ns    15.6 ns     16.2 ns
+    attach, two components in one barrier    241.3 ns    37.5 ns     37.9 ns
+
+    the stress run, on four threads          3647 ms     1687 ms     1611 ms
+    the stress run, on one thread            5531 ms     3400 ms     3300 ms
+
+**Not slower than flecs on any line, which is the done-when; and five lines are slower than
+before the repair, by 1.2 ns at the most.** That is what the repair added to a change: a stake
+looked at before a destroy, and a queue applied in the order its calls ran. One line is quicker,
+and the stress run is, which reads more than it changes.
+
+Columns in use, and what the process holds as the operating system counts it:
+
+                                    flecs       before                 now
+    a hundred thousand entities     30.3 MB     1,562 KB, 27.9 MB      1,562 KB, 26.4 MB
+    ten thousand tables             86.6 MB     2,800 KB, 22.9 MB      2,487 KB, 22.3 MB
+    the stress run                  46.4 MB     9,052 KB, 61.2 MB      7,521 KB, 56.1 MB
+
+A table grows by half where it doubled, and begins with the room it was asked for. The stress
+run still holds more than flecs did, for the reason *What it costs* gives: `[budget] tables` is
+stated at 32,768 there, and the run has about a thousand.
+
+**The last measuring found one thing wrong, and it was put right before this was written.** The
+repair had put each column at its own type's alignment, on measurements that did not include a
+read. A read of 204,800 rows took 8.3 us from a column that began eight bytes past a multiple of
+sixteen, and takes 5.6 to 6.4 us from one that begins at one. Every column begins at a multiple
+of sixteen now - `storage.md`, *A table* - and ten thousand tables use 2,487 KB of columns for
+it, where the type's alignment used 739 KB.
 
 **What one storage layout costs where it is weakest**, measured so that more than one can be
 weighed on numbers. `storage weigh`, on Windows.
@@ -706,19 +743,19 @@ A four-byte component given to and taken from an entity that already carries mor
 moves to another table, and everything it carries moves with it:
 
     the entity carries     attached     detached
-        4 bytes              40 ns        36 ns
-       64 bytes              42 ns        38 ns
-      256 bytes              56 ns        55 ns
+        4 bytes              40 ns        37 ns
+       64 bytes              43 ns        38 ns
+      256 bytes              52 ns        55 ns
      1024 bytes             150 ns       145 ns
-     4096 bytes             530 ns       510 ns
+     4096 bytes             505 ns       500 ns
 
 One system reading one component of 204,800 rows, the same rows spread over more tables. The
 loop does nothing but add, so this is the dearest the spread can look beside the work:
 
-       1 table           6.6 us     0.032 ns a row
-      16 tables         11.4 us     0.056 ns a row
-     256 tables         12.4 us     0.061 ns a row
-    4096 tables         19.9 us     0.097 ns a row
+       1 table           6.0 us     0.029 ns a row
+      16 tables         11.3 us     0.055 ns a row
+     256 tables         12.3 us     0.060 ns a row
+    4096 tables         19.3 us     0.094 ns a row
 
 Found while measuring: a component's array cannot be as long as a named constant says. The
 descriptor is the struct's text before the preprocessor has replaced the name, so `char

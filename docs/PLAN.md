@@ -189,7 +189,7 @@ and macOS.* Met.
 
 ## 10. Storage of our own
 
-In progress: `STAGE10.md`, *What was not in the plan*. flecs leaves, and what Bridge-ASM700 used it
+Done. `STAGE10.md` is what it built and found. flecs leaves, and what Bridge-ASM700 used it
 for becomes its own: the entity index, tables and their columns, moving a row between them, matching
 a system's terms to tables, the events an observer hears, and reading a struct's fields out of its
 text. It is the reversal of a decision this plan began with, and `STAGE10.md` is why.
@@ -214,7 +214,7 @@ and this stage has failed its claim.
 alone and under load; on every measured operation it is not slower than flecs was, with both sets
 of figures recorded; storage allocates nothing after `bridge_create` and reads nothing back from
 the shared block; no line of flecs is left in the tree; and the behaviours no test covered before
-this stage each have one.*
+this stage each have one.* Met.
 
 ## 11. Storage layouts
 
