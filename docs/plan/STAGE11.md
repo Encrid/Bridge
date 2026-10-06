@@ -276,3 +276,31 @@ Testing the bit costs 0.7 ns, and where the bits are found costs nothing that sh
 measured: many thousands of tables reached in no order, where the cell ahead of each column
 may miss the cache and a denser array of cells might not.
 
+**2.4 A direct-indexed component is a cell for every entity and a bit for every entity that
+says it has one.** The cells are found through the same cell for each declared type as a sparse
+set's index, and entity i's value is cell i. A cell exists for an entity nobody gave the
+component to, so the bit is what tells a value from bytes: set by `attach` and cleared by
+`detach`, queued and applied at the barrier and told to observers, as for a component kept any
+other way. The bits are found ahead of the cells, as a toggle's are ahead of its column. A
+reader that needs to know tests the bit, and one that knows by its own design does not.
+
+Measured in scratch, a value reached by id with its generation tested:
+
+                                      204,800           204,800          8,000,000
+                                      in order          in no order      in no order
+    as today, through the table       1.45 ns           2.22 ns          16.5 ns
+    direct-indexed, no bit tested     0.62 ns           1.19 ns          10.9 ns
+    direct-indexed, the bit tested    0.98 ns           1.61 ns          13.3 ns
+
+    need          a bit an entity                      every entity has it, zero until written
+    fast          serves: under the table tested       serves
+                  or not
+    scalable      does not apply                       does not apply
+    modular       serves: heard as any component is    fails: a given value cannot be told
+                                                       from none, nor heard
+    extensible    serves: one kind of component        fails in part: a component nobody
+                                                       attaches is a second kind
+    minimal       fails in part: bits, and attach,     serves
+                  detach and strip for it
+    explicit      serves: has or has not               serves only where zero may mean none
+

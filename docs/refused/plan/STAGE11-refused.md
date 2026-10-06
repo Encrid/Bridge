@@ -52,3 +52,9 @@ Refused: the bits as a term of their own, stated by the author. A reader that fo
 is handed no bits and told nothing; and a reach by id needs one of the other two beside it. No
 condition brings it back.
 
+Refused: a direct-indexed component that every entity has, zero from its spawn until a system
+writes it, with `attach` and `detach` of it refused. It is less to build; and it is a second
+kind of component, one no module can be told of and whose given value cannot be told from none.
+The condition that brings it back is a component every entity has by definition, and for that a
+reader may already leave the bit untested.
+
