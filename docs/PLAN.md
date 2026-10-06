@@ -218,7 +218,7 @@ this stage each have one.* Met.
 
 ## 11. Storage layouts
 
-In progress: `STAGE11.md`.
+Done. `STAGE11.md` is what it weighed, decided, built and found.
 
 Storage keeps every component one way: in the table of its entity's archetype, a column beside
 the entity's other components. That is the right way for what systems read together, and one
@@ -278,7 +278,7 @@ observer is told each hold in every storage layout; a component is moved from on
 another with its values; and a module reloaded with a field added, removed, renamed or moved keeps
 every value its new component layout still has a place for, in each storage layout; and a reload
 that would drop values is refused, naming them, until it states that it accepts the loss, and is
-then told by a record what went.*
+then told by a record what went.* Met.
 
 ## 12. Self contained
 

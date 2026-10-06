@@ -276,6 +276,7 @@ int main(int argc, char **argv)
     if (!strcmp(what, "notables")) cfg.budget.tables = 1;
     if (!strcmp(what, "nocolumns")) cfg.budget.columns = 64;
     if (!strcmp(what, "stripfull")) cfg.budget.columns = 160;
+    if (!strcmp(what, "togglefull")) cfg.budget.columns = 112;
     /* storage.md, *A sparse set*. `sparsenone` is the one that states there are none */
     if (!strncmp(what, "sparse", 6) && strcmp(what, "sparsenone")) cfg.budget.sparse_sets = 1;
     if (!strcmp(what, "weigh")) cfg.budget.sparse_sets = cfg.budget.direct_indexed = 1;
@@ -489,6 +490,11 @@ int main(int argc, char **argv)
         relaid_case(cfg, NLAYOUT0K3_PATH, NLAYOUT1K3_PATH, "a field added, in a toggle", nullptr, BRIDGE_NONE);
         relaid_case(cfg, NLAYOUT0K4_PATH, NLAYOUT1K4_PATH, "a field added, direct-indexed", nullptr, BRIDGE_NONE);
         relaid_case(cfg, NLAYOUT0K5_PATH, NLAYOUT1K5_PATH, "a field added, in a singleton", nullptr, BRIDGE_NONE);
+        /* and the fields in another order */
+        relaid_case(cfg, NLAYOUT0K2_PATH, NLAYOUT2K2_PATH, "the fields in another order, in a sparse set", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0K3_PATH, NLAYOUT2K3_PATH, "the fields in another order, in a toggle", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0K4_PATH, NLAYOUT2K4_PATH, "the fields in another order, direct-indexed", nullptr, BRIDGE_NONE);
+        relaid_case(cfg, NLAYOUT0K5_PATH, NLAYOUT2K5_PATH, "the fields in another order, in a singleton", nullptr, BRIDGE_NONE);
         b = bridge_create(&cfg, sink, nullptr);
     } else if (!strcmp(what, "move")) {
         static const char *const x[1] = { "st:X" };
@@ -581,6 +587,16 @@ int main(int argc, char **argv)
             }
             run(b, "near");
         }
+    } else if (!strcmp(what, "togglefull")) {
+        /* budgets.md, *What running out does*, of a table with a toggled column: its bits and
+         * the bytes that say where they are need room too, and four of six fit */
+        a = store_module(NTOGGLE_PATH, 16, 1 << 20, 4096);
+        a.cfg.max_system_failures = 4;
+        if (bridge_load(b, &a)) { printf("not loaded\nalive\n"); return 0; }
+        run(b, "spawn");
+        run(b, "look");
+        run(b, "flicker");
+        run(b, "look");
     } else if (!strcmp(what, "toggle")) {
         /* storage.md, *A toggle* */
         a = store_module(NTOGGLE_PATH, 16, 1 << 20, 4096);
@@ -816,6 +832,32 @@ int main(int argc, char **argv)
             }
             printf("204800 entities with six markers each: columns in use %u KB as components of four "
                 "bytes, %u KB as tags\n", used[0], used[1]);
+        }
+        /* storage.md, *A singleton* and *A toggle*: read where it is; and a row switched */
+        (void)bridge_destroy(b);
+        {
+            uint64_t best = 0, t;
+            b = bridge_create(&cfg, counted, nullptr);
+            a = store_module(NSINGLE_PATH, 8, 1 << 20, 4096);
+            if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
+            (void)barrier(b, "attach_a");
+            for (uint32_t round = 0; round < ROUNDS * 4; round ++) {
+                t = ran(b, "one");
+                if (!round || t < best) best = t;
+            }
+            if (said[0] != 10'000'000) { printf("FAIL: it read %u\n", said[0]); return 1; }
+            printf("a singleton read where it is: %6.3f ns each time\n", (double)best / 1'000'000);
+            (void)bridge_destroy(b);
+            b = bridge_create(&cfg, counted, nullptr);
+            a = store_module(NTOGGLE2_PATH, 204'800, 8 << 20, 128 << 20);
+            if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
+            (void)barrier(b, "spawn");
+            for (uint32_t round = 0; round < ROUNDS * 4; round ++) {
+                t = ran(b, "flicker");
+                if (!round || t < best) best = t;
+            }
+            printf("a toggled row switched by a write, with the draw that says which way: %6.2f ns a "
+                "row\n", (double)best / 204'800);
         }
     } else if (!strcmp(what, "baseline")) {
         static const struct { const char *path; uint32_t on; } built[] = {

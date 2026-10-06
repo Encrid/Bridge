@@ -217,4 +217,44 @@ a field added, in a singleton
   look: the sums of b, and of arr 20 10
   look: the sums of at.x, and of at.y 5 6
   look: the sums of mode, and of what was added 1 0
+the fields in another order, in a sparse set
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+  reload: done
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+the fields in another order, in a toggle
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+  reload: done
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+the fields in another order, direct-indexed
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+  reload: done
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+the fields in another order, in a singleton
+  look: values, and the sum of a 1 1000
+  look: the sums of b, and of arr 20 10
+  look: the sums of at.x, and of at.y 5 6
+  look: the sums of mode, and of what was added 1 0
+  reload: done
+  look: values, and the sum of a 1 1000
+  look: the sums of b, and of arr 20 10
+  look: the sums of at.x, and of at.y 5 6
+  look: the sums of mode, and of what was added 1 0
 alive

@@ -212,8 +212,8 @@ where two things could be meant the qualified form is the only form.
     archetype         a set of components
     table             the storage of one archetype: a column a component
     storage layout    how a component is kept: table, sparse set, toggle, direct-indexed,
-                      singleton. Each is named for what keeps the component. `PLAN.md`,
-                      stage 11
+                      singleton. Each is named for what keeps the component.
+                      `storage.md`, *Storage layouts*
     sparse set        a component's own packed array, and a lookup by entity
     toggle            a bit a row that turns a component on or off where it is
     direct-indexed    the value of entity i at place i

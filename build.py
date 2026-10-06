@@ -76,7 +76,7 @@ NATIVE = [
     ('nmove4', 'nmove', ['KEPT=4']), ('nmove5', 'nmove', ['KEPT=5']),
     ('nholder', 'nholder', []),
 ] + [('nlayout%d' % v, 'nlayout', ['V=%d' % v, 'KEPT=1']) for v in range(14)] + [
-    ('nlayout%dk%d' % (v, k), 'nlayout', ['V=%d' % v, 'KEPT=%d' % k]) for k in (2, 3, 4, 5) for v in (0, 1)] + [
+    ('nlayout%dk%d' % (v, k), 'nlayout', ['V=%d' % v, 'KEPT=%d' % k]) for k in (2, 3, 4, 5) for v in (0, 1, 2)] + [
     ('ntag', 'ntag', []), ('ntagbad', 'ntag', ['BAD']), ('nfragtag4096', 'nfrag', ['SPLIT=4096', 'TAGS']),
     ('nsingle', 'nsingle', []), ('nsinglebad1', 'nsingle', ['BAD=1']),
     ('nsinglebad2', 'nsingle', ['BAD=2']), ('nsinglebad3', 'nsingle', ['BAD=3']),
@@ -423,8 +423,9 @@ CASES = [
     ('storage-stripfull', ['storage', 'stripfull'],
      '@tests/storage-stripfull.txt', None),
     ('storage-weigh', ['storage', 'weigh'],
-     r"an entity of 4096 bytes.*in    1 table.*in 4096 tables.*a sparse set.*of 4096 bytes.*a toggle, one row in 16 on.*direct-indexed.*in no order.*as tags.*alive", r"FAIL"),
+     r"an entity of 4096 bytes.*in    1 table.*in 4096 tables.*a sparse set.*of 4096 bytes.*a toggle, one row in 16 on.*direct-indexed.*in no order.*as tags.*a singleton read.*a toggled row switched.*alive", r"FAIL"),
     ('storage-toggle', ['storage', 'toggle'], '@tests/storage-toggle.txt', None),
+    ('storage-togglefull', ['storage', 'togglefull'], '@tests/storage-togglefull.txt', None),
     ('storage-move', ['storage', 'move'], '@tests/storage-move.txt', None),
     ('storage-layout', ['storage', 'layout'], '@tests/storage-layout.txt', None),
     ('storage-tag', ['storage', 'tag'], '@tests/storage-tag.txt', None),

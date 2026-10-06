@@ -1,0 +1,11 @@
+spawn
+  -: module 'st:store@0.1.0': [budget] columns of 112 bytes is used up. Not applied, of the changes it asked: 4 0 0
+  heard_t: heard of T: how many, and the events of the first 4 3
+look
+  look: by words: rows, and of them on 4 4
+  look: by words: the sum of those on, and spans 46 1
+flicker
+look
+  look: by words: rows, and of them on 4 2
+  look: by words: the sum of those on, and spans 24 1
+alive

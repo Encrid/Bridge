@@ -6,6 +6,7 @@
  *     work             a field of it written where it is: no call, and nothing is heard
  *     detach_b         it is taken: it has no value
  *     look             what a system reads of it: whether it has a value, and the value
+ *     one              it read a million times, found again each time, for a measurement
  *
  * BAD is a build the bridge refuses something of: 1 a system that selects by it, at load; 2 an
  * attach of it with the id of an entity, when that system runs; 3 an attach of a component
@@ -63,6 +64,20 @@ BRIDGE_NATIVE(look)
     return 0;
 }
 
+/* which singleton `one` reads, behind a load the compiler cannot see through */
+static volatile uint32_t which;
+
+BRIDGE_NATIVE(one)
+{
+    uint32_t total = 0;
+    for (uint32_t i = 0; i < 1'000'000; i ++) {
+        const G *value = bridge_native_single(api, which);
+        if (value) total += value->gravity;
+    }
+    say(api, "read a million times: the sum", total, 0);
+    return 0;
+}
+
 BRIDGE_NATIVE(heard_g)
 {
     const bridge_list *list = bridge_native_list(api, on_g);
@@ -85,6 +100,8 @@ BRIDGE_NATIVE(init)
     BRIDGE_NATIVE_SYSTEM(api, "detach_b", "detach_b", &none, 0, &g, 1);
     one[0].slot = g;
     BRIDGE_NATIVE_SYSTEM(api, "look", "look", one, 1, nullptr, 0);
+    BRIDGE_NATIVE_SYSTEM(api, "one", "one", one, 1, nullptr, 0);
+    which = g;
     one[0].access = BRIDGE_WRITE;
     BRIDGE_NATIVE_SYSTEM(api, "work", "work", one, 1, nullptr, 0);
     one[0].access = BRIDGE_READ;

@@ -1,4 +1,5 @@
 spawn
+  heard_t: heard of T: how many, and the events of the first 6 3
 look
   look: by words: rows, and of them on 6 6
   look: by words: the sum of those on, and spans 75 1
@@ -19,6 +20,7 @@ find
   find: by id: alive, and of them on 6 3
   find: by id: the sum of those on 39 0
 value_a
+  heard_t: heard of T: how many, and the events of the first 1 2
 look
   look: by words: rows, and of them on 6 3
   look: by words: the sum of those on, and spans 39 2
@@ -26,6 +28,7 @@ find
   find: by id: alive, and of them on 6 3
   find: by id: the sum of those on 39 0
 destroy_half
+  heard_t: heard of T: how many, and the events of the first 2 4
 look
   look: by words: rows, and of them on 4 2
   look: by words: the sum of those on, and spans 24 2
@@ -33,6 +36,7 @@ find
   find: by id: alive, and of them on 4 2
   find: by id: the sum of those on 24 0
 respawn_half
+  heard_t: heard of T: how many, and the events of the first 6 3
 look
   look: by words: rows, and of them on 10 8
   look: by words: the sum of those on, and spans 135 2
@@ -53,6 +57,7 @@ look
   look: by words: the sum of those on, and spans 649 2
 strip st:T
 never
+  heard_t: heard of T: how many, and the events of the first 10 4
 look
   look: by words: rows, and of them on 0 0
   look: by words: the sum of those on, and spans 0 0

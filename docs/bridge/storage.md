@@ -156,10 +156,10 @@ bit with it.
     the column read with no test                 5.7 us
 
 Sixty-four rows that are all on are read as a column is, which is the first figure. And a row
-is switched by one store, where a detach and an attach to say the same are 77 ns, and 1,005
-for an entity that carries 4 KB. What it does not beat is a field tested by a mask, which a
-compiler makes of a small enough loop: 12 us at any share, measured in scratch - `STAGE11.md`,
-*The gate*.
+is switched by one store: 3 ns a row measured, with the draw that says which way, where a detach
+and an attach to say the same are 77 ns, and 1,005 for an entity that carries 4 KB. What it does
+not beat is a field tested by a mask, which a compiler makes of a small enough loop: 12 us at
+any share, measured in scratch - `STAGE11.md`, *The gate*.
 
 ## Direct-indexed
 
@@ -215,8 +215,9 @@ says what it reads and writes, and one that selects is refused at `system`. Unlo
 last declarer it has no value, whichever policy was stated, and that is told as a leave.
 
 **It is what a module's settings are** - `config.md`, *A module's own settings are a
-component*. Nothing was measured for it: read through a query of one span, a value on one
-entity cost 0.6 ns, so there was no time to gain, and what it gives is that there is one.
+component*. It was not passed for its speed: read through a query of one span, a value on one
+entity cost 0.6 ns. Read where it is, it is 0.33 ns, measured in the library; and what it gives
+is that there is one.
 
 ## A tag
 

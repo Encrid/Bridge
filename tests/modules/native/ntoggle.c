@@ -192,6 +192,19 @@ BRIDGE_NATIVE(value_a)
     return 0;
 }
 
+#ifndef BIG
+static uint32_t on_t;
+
+/* what an observer of T hears: an entity given it, and never a row turned on or off */
+BRIDGE_NATIVE(heard_t)
+{
+    const bridge_list *list = bridge_native_list(api, on_t);
+    auto trigger = (const bridge_trigger *)(api->private_base + list->at);
+    if (list->count) say(api, "heard of T: how many, and the events of the first", list->count, trigger[0].events);
+    return 0;
+}
+#endif
+
 BRIDGE_NATIVE(init)
 {
     int none = 0;
@@ -207,6 +220,10 @@ BRIDGE_NATIVE(init)
     BRIDGE_NATIVE_SYSTEM(api, "value_a", "value_a", &none, 0, &t, 1);
     BRIDGE_NATIVE_SYSTEM(api, "find", "find", &none, 0, nullptr, 0);
     one[0].slot = t;
+#ifndef BIG
+    on_t = BRIDGE_NATIVE_OBSERVER(api, "heard_t",
+        BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, one, 1, nullptr, 0);
+#endif
     reading = BRIDGE_NATIVE_SYSTEM(api, "look", "look", one, 1, nullptr, 0);
     BRIDGE_NATIVE_SYSTEM(api, "look_b", "look_b", one, 1, nullptr, 0);
     one[0].access = BRIDGE_WRITE;

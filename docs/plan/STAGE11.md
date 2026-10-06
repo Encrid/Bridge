@@ -1,7 +1,8 @@
 # Stage 11: storage layouts
 
-In progress. `PLAN.md`, stage 11, is what it is for and when it is done. This document is the
-order it is done in, what was measured, and each question while it is open.
+Done, on Windows, on Linux and on macOS. `PLAN.md`, stage 11, is what it is for and when it is
+done. This document is the order it was done in, what was measured, what was decided and why,
+and what building it found.
 
 ## The order
 
@@ -570,4 +571,57 @@ is refused; a component that has a field of a type that changed is laid out agai
 own text is what it was; and a type another module's component has a field of is not changed
 by somebody else's reload. And one the decision on the storage layouts had wrong: a singleton
 whose struct changed lost its value, found by its case and fixed before this was written.
+
+## The done-when, line by line
+
+    each of the five weighed on every need, and         *The gate*: all five passed
+    passed or left the plan
+    a component declared in each, and read as that      `storage-sparse`, `-toggle`, `-direct`,
+    storage layout is read                              `-single`, and `stage3-sparse`,
+                                                        `-toggle`, `-direct` and the settings
+                                                        cases of stage 6 on the wasm backend
+    a case for what each is for, and a measurement      below
+    beside the table's, none slower at what it was
+    chosen for
+    a query across two storage layouts works as         `storage-sparse`, `-direct`, `-single`
+    written or is refused by name                       work; `-sparsebad1`, `-sparsebad2`,
+                                                        `-directbad`, `-singlebad1` are refused
+    running out, strip at unload and what an            `-sparsefull`, `-togglefull`,
+    observer is told, in every storage layout           `-directfull`, `stage6-confignoroom`;
+                                                        `-sparsestrip`, `-sweep`, `-sweepa`,
+                                                        `-delete`, the three of `-direct`, the
+                                                        ends of `-toggle` and `-single`; and
+                                                        the observers in each transcript
+    a component moved from one storage layout to        `storage-move`
+    another with its values
+    a field added, removed, renamed or moved keeps      `storage-layout`; added and moved in
+    every value that still has a place, in each         each of the five, and the rest in a
+    storage layout                                      table, by the one code that does it
+    a reload that would drop values refused, naming     `storage-layout`, `storage-move`
+    them, until it accepts the loss, and then told
+    what went
+
+**What each is for, measured in the library beside the table doing the same work.** `storage
+weigh` and `storage baseline`, on Windows:
+
+    a sparse set       a four-byte component given and taken: 33 and 29 ns whatever the
+                       entity carries, where the table takes 40 and 37 for four bytes
+                       carried and 505 and 500 for 4 KB. What it costs: read beside a
+                       table's column, 0.44 ns a row where a column is 0.03
+    a toggle           a row switched by a store, 3 ns with the draw that says which way,
+                       where a detach and an attach are 77 ns. The rows that are on, read
+                       a word of bits at a time: 13, 67 and 8.5 us for all, half and one
+                       in sixteen of 204,800, where a field tested by a branch is 55, 515
+                       and 87. What it does not beat: a field tested by a mask, 12 us in
+                       scratch, except where few rows are on
+    direct-indexed     a value reached by a held id: 0.74 ns in order and 1.4 in no order,
+                       where through the table it is 1.1 and 2.5. What it costs: its size
+                       for every entity there may be
+    a singleton        read where it is: 0.33 ns, where one row found through a query is
+                       0.6. It was passed for there being one, and not for that
+    a tag              six markers on each of 204,800 entities: 2,432 KB of columns, where
+                       components of four bytes take 7,424 and of one byte 3,968
+
+**And the table is what it was**: *Found on the way: a barrier that stopped being inlined*,
+above, has both sets of figures.
 
