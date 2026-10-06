@@ -52,10 +52,16 @@ more bytes. For each table that carries the component:
     one without room, and the        it becomes a second table of that set, where it stands
     column region cannot give it
 
-The last is the one case with a trace. Two tables then hold the same archetype until either empties;
+The last is the one case with a trace, **and it is said**: one record names the component
+stripped, how many rows stay apart, and `[budget] columns`, which had no room to join them. It is
+a sign that budget is nearly spent as much as it is a fact about tables. `tests/storage.c`, case
+`stripfull`, reads it. Two tables then hold the same archetype until either empties;
 a module sees a span for each, which is no more than it could ever rely on - `module.md`, *What
 no module may do*. An entity given that set afterwards goes to the one that was there first, and
 an entity already in either stays where it is for as long as its archetype does not change.
+
+Refused: leaving a second table without saying so, which is what this did: a deployment saw
+more tables than archetypes and no line told it why.
 
 Refused: destroying what cannot be placed, which is what this first did. `strip` says the entity
 stays, and a reload that stops declaring a component is a strip too, on a call that means "keep

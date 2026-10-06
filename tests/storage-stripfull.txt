@@ -23,6 +23,7 @@ look
   look: with A and maybe B: spans, rows 2 6
   look: of them with B: rows 3 0
 strip st:B
+  -: 'st:B' is stripped, and 3 rows stay in a second table of their archetype: [budget] columns of 160 bytes has no room to join them to the first 0 0
 never
   heard_b: B: who, events 2 4
   heard_b: B: who, events 1 4

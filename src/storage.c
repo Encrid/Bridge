@@ -898,6 +898,7 @@ static void destroyed(storage *r, uint32_t index)
 void storage_drop(storage *r, storage_type *type, enum bridge_on_unload policy)
 {
     uint64_t *set = r->scratch;
+    uint32_t apart = 0;
     for (uint32_t t = 1; t < r->table_high; t ++) {
         table *tab = &r->tables[t];
         uint32_t to;
@@ -922,8 +923,16 @@ void storage_drop(storage *r, storage_type *type, enum bridge_on_unload policy)
         } else {
             /* no table of what is left, and this one becomes it; or one that has no room,
              * and until either empties there are two */
+            if (to) apart += tab->rows;
             stripped(r, t, type, !to);
         }
+    }
+    /* lifetime.md, *What unload leaves behind*: the one case of a strip with a trace */
+    for (uint32_t i = 0; apart && i < r->b->type_count; i ++) {
+        if (r->b->types[i]->type != type) continue;
+        say(r->b, nullptr, nullptr, BRIDGE_WARN, "'%s' is stripped, and %u rows stay in a second "
+            "table of their archetype: [budget] columns of %u bytes has no room to join them to "
+            "the first", r->b->types[i]->name, apart, r->b->columns_len);
     }
 }
 
