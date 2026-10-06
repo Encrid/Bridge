@@ -225,12 +225,24 @@ void bridge_resume(bridge *b, const module *m)
     say(b, m, nullptr, 0, "the bridge runs again: module '%s' is back", m->identity);
 }
 
+/* failure.md: the host unloads the module that stopped the bridge, by name, and so says the
+ * deployment goes on without it. */
+void bridge_given_up(bridge *b, const module *m)
+{
+    if (!b->stopped_stem || strcmp(b->stopped_stem, m->stem)) return;
+    free(b->stopped_by);
+    free(b->stopped_stem);
+    b->stopped_by = b->stopped_stem = nullptr;
+    say(b, m, nullptr, 0, "the bridge runs again: module '%s' is unloaded, and it goes on without it",
+        m->identity);
+}
+
 int bridge_stopped(bridge *b, const char *repairing)
 {
     module *m;
     if (b->stopped_by) {
-        /* what stopped it can be brought back, and that is the one call it accepts. Storage
-         * that ran out cannot be: then nothing lifts it. */
+        /* what stopped it can be brought back, or given up by an unload of it, and those
+         * are the calls it accepts */
         size_t n = repairing ? stem_length(repairing) : 0;
         if (!repairing || !b->stopped_stem || strlen(b->stopped_stem) != n
             || memcmp(b->stopped_stem, repairing, n)) {

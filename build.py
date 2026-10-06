@@ -609,6 +609,8 @@ CASES = [
      r"modules: test:flaky@0.1.0=RUNNING.*alive", None),
     ('stage6-failstop', ['stage6', 'failstop'],
      r"the bridge has stopped: module 'test:flaky@0.1.0' was stopped and its on_error is fail.*update refused.*test:flaky@0.1.0=STOPPED.*game:twostep@0.1.0: not unloaded.*alive", None),
+    ('stage6-failgiveup', ['stage6', 'failgiveup'],
+     r"the bridge has stopped.*game:twostep@0.1.0: not unloaded.*the bridge runs again: module 'test:flaky@0.1.0' is unloaded, and it goes on without it.*test:flaky@0.1.0: unloaded.*modules: game:twostep@0.1.0=RUNNING.*alive", None),
     ('stage6-strip', ['stage6', 'strip'],
      r"left 10 5.*game:keeper@0.1.0: unloaded.*left 9 5.*game:retype@0.1.0: loaded.*alive", None),
     ('stage6-sweep', ['stage6', 'sweep'],

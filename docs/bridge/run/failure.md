@@ -32,13 +32,22 @@ is refused, and every load, unload and reload but one. `skip` refuses that one l
 Refused: answering a return code and nothing else, which would let a host that ignores it run a
 deployment without the module its config called essential.
 
-**The one call a stopped bridge accepts is the one that brings that module back**: a load of it, if
-it never loaded, or a reload of it. If that succeeds the bridge runs again, and says so. The reason
-for stopping was running without the module, and with the module back there is nothing left of it.
+**A stopped bridge accepts two things, both about the module that stopped it.** One brings it
+back: a load of it, if it never loaded, or a reload of it. If that succeeds the bridge runs
+again, and says so. The reason for stopping was running without the module, and with the module
+back there is nothing left of it. The other gives it up: an unload of it, by its name. That is
+the host saying the deployment goes on without it, which only the host can say; its components
+go by the policies they were declared with, as at any unload, and the bridge runs again. After
+it the host may load anything, a module of another name in its place among them.
+`tests/stage6.c`, case `failgiveup`. A module that never loaded has nothing to unload, and for
+it the ways on are a load that succeeds, or `bridge_destroy`.
 Refused: stopped until `bridge_destroy`, which is what this first said - the original Bridge's
 `fail` ends its process, which it owns; ours would have ended every module's storage to mend one
 module, and made reload useless for exactly the modules a deployment calls essential. Refused:
-accepting unloads as well, which has no job once `bridge_destroy` shuts every module down.
+accepting the unload of any other module, which has no job once `bridge_destroy` shuts every
+module down. The condition that brings it back is a host that must take several modules out
+before it can run again. Refused: accepting no unload at all, which is what this had: to go on
+without one module, or to put one of another name in its place, cost every module its storage.
 
 Storage running out does not stop a bridge. A barrier that cannot place an entity, for want of a
 table or of columns, leaves it as it was and counts as a barrier the module that asked failed in,

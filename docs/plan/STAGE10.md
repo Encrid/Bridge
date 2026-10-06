@@ -622,7 +622,8 @@ Of earlier stages:
     closed  no row for a barrier in the profile: each phase has one, and a row says what it
             is. "A phase is the sum of its systems" was false. `profile.md`; built in
             stage 14
-    open    a stopped bridge takes only the load or reload of the module that stopped it
+    closed  a stopped bridge takes only the load or reload of the module that stopped it:
+            and an unload of it, by which a host goes on without it. `failure.md`
     open    all pinned modules share the host's thread
     open    native entry arguments are scratch offsets, copied
     open    every block is allocated to the largest shape any backend asks for

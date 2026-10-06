@@ -191,17 +191,23 @@ int main(int argc, char **argv)
         a = wasm("game:fp@0.1.0", "fp");
         load(b, &a);
         modules(b);
-    } else if (!strcmp(what, "budget") || !strcmp(what, "failstop")) {
+    } else if (!strcmp(what, "budget") || !strcmp(what, "failstop") || !strcmp(what, "failgiveup")) {
         a = wasm("game:twostep@0.1.0", "twostep");
         load(b, &a);
         a = wasm("test:flaky@0.1.0", "flaky-always");
         a.cfg.spawns = BRIDGE_NONE;
-        if (!strcmp(what, "failstop")) a.cfg.on_error = BRIDGE_FAIL;
+        if (strcmp(what, "budget")) a.cfg.on_error = BRIDGE_FAIL;
         load(b, &a);
         frames(b, 5);
         modules(b);
         /* a stopped bridge refuses an unload as it refuses a phase and a load */
-        if (!strcmp(what, "failstop")) unload(b, "game:twostep@0.1.0");
+        if (strcmp(what, "budget")) unload(b, "game:twostep@0.1.0");
+        /* and takes an unload of the one that stopped it: the host goes on without it */
+        if (!strcmp(what, "failgiveup")) {
+            unload(b, "test:flaky@0.1.0");
+            frames(b, 1);
+            modules(b);
+        }
     } else if (!strcmp(what, "forgiven") || !strcmp(what, "notforgiven")) {
         /* one pass in three fails, or two in three: the count falls as fast as it rises */
         a = wasm("test:flaky@0.1.0", !strcmp(what, "forgiven") ? "flaky-third" : "flaky-twothirds");

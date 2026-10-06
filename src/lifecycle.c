@@ -711,13 +711,15 @@ int bridge_unload(bridge *b, const char *identity)
 {
     char why[256];
     module *m;
-    if (bridge_stopped(b, nullptr)) return 1;
+    /* a stopped bridge takes an unload of the module that stopped it, and of no other */
+    if (bridge_stopped(b, identity)) return 1;
     for (m = b->modules; m && (!identity || strcmp(m->identity, identity)); m = m->next) {}
     if (!m) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "no module '%s' is loaded, so none is unloaded",
             identity ? identity : "");
         return 1;
     }
+    bridge_given_up(b, m);
     drop_systems(b, m);         /* out of the schedule before its last call */
     module_shut_down(b, m);
     take_out(b, m);
