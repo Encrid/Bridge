@@ -389,10 +389,21 @@ a line that times a call is what two builds of the same code differ by, in two d
 a line is called slower only beyond that. The call of `detach` that measured 0.5 ns slower
 when `attach` lost its length is inside it.
 
-**What is held so far**, by `tools/style.py` with the tests: `include/bridge_schema.h` and
+**What was held first**, by `tools/style.py` with the tests: `include/bridge_schema.h` and
 `include/bridge_abi.h`. In the second every layout keeps its asserts, one a line, and what a
 member is for is said above the struct, since a line holds 80 columns.
 
 **The workflows have not run since the commit that gave the seams their verb.** GitHub answers
 that the job was not started for a reason of billing on the account. Every commit since was
 built for Linux and macOS here and run on Windows only, in release and in debug.
+
+**`include/` is held**, all four headers. `BACKEND_ENTRIES`, a macro that was a list of names,
+is a table, `BACKEND_ENTRY_NAMES`, and the macro that stated the offsets of a module's
+configuration is the asserts it expanded to, one a line.
+
+**The operating system's layer is one**, `utils/os/`, and is held. The three copies are gone:
+`src/os.c`, `backends/wasm/os.c`, `backends/native/os.c` and their headers. A platform is a
+folder, `windows/` or `posix/`, that the build takes by its target, so the layer tests no
+macro: with both halves in one file a file held ten functions, and rule O3 allows five.
+Seventeen files, none over five functions. The wait of an event on POSIX was one loop with two
+branches inside, and is two loops, one for a wait with an end and one for a wait without.

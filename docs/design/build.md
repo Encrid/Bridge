@@ -156,7 +156,10 @@ No file, no stream, no `printf`, no floating point, no `qsort`. `plan.md`, stage
 them as a dependency and shortens the list where it can.
 
 **The door is one layer**, `utils/os/`: mapping, threads, loading a library and the clock are
-reached through it and nowhere else, and that is the only code that differs by platform. It
+reached through it and nowhere else, and that is the only code that differs by platform.
+`os.h` states it once, and a folder for each kind of platform holds the same functions:
+`windows/` and `posix/`. The build takes the folder its target names, so no file of the layer
+asks which platform it is compiled for. It
 depends on nothing of ours, and it is compiled into the library and into each backend, which
 are separate binaries - `stage12.md`, *One operating-system layer*.
 

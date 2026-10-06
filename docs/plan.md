@@ -161,7 +161,7 @@ fail for their stated reason; and CMake is gone from the tree.* Met.
 
 Done. `stage8.md` is what it built and found.
 
-arm64, as a third platform: a target, the POSIX half of `src/os.c` on a second system, wasmtime's
+arm64, as a third platform: a target, the POSIX half of the operating system's layer on a second system, wasmtime's
 library for it and a workflow - `build.md`, *Platforms*. It comes straight after the build because
 it is then one more target, and because every later stage is met on a second processor instead of
 finding out last.

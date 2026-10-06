@@ -24,22 +24,22 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 # What differs by target, and nothing else does: where it runs, how a program and a library are
-# named, which of the system's declarations are asked for by name (the language is ISO C, and a
+# named, which folder of utils/os is its operating system's, which of the system's declarations are asked for by name (the language is ISO C, and a
 # compiler's gnu mode would have shown them unasked), what a link names, how a library finds what
 # sits beside it, and wasmtime's files under backends/wasm/wasmtime: the one that backend is linked
 # against, and the one it loads.
 TARGETS = {
     'x86_64-windows-gnu': {
-        'runs on': ('Windows', 'AMD64'), 'program': '.exe', 'library': '.dll',
+        'runs on': ('Windows', 'AMD64'), 'program': '.exe', 'library': '.dll', 'os': 'windows',
         'compile': [], 'link': ['-lws2_32', '-ldbghelp'], 'beside': [], 'named': [],
         'wasmtime': ('windows/libwasmtime.dll.a', 'windows/wasmtime.dll')},
     'x86_64-linux-gnu': {
-        'runs on': ('Linux', 'x86_64'), 'program': '', 'library': '.so',
+        'runs on': ('Linux', 'x86_64'), 'program': '', 'library': '.so', 'os': 'posix',
         'compile': ['-fPIC', '-D_DEFAULT_SOURCE'], 'link': ['-lm', '-lpthread', '-ldl'],
         'beside': ['-Wl,-rpath,$ORIGIN'], 'named': ['-Wl,-soname,bridge.so'],
         'wasmtime': ('linux/libwasmtime.so', 'linux/libwasmtime.so')},
     'aarch64-macos': {
-        'runs on': ('Darwin', 'arm64'), 'program': '', 'library': '.dylib',
+        'runs on': ('Darwin', 'arm64'), 'program': '', 'library': '.dylib', 'os': 'posix',
         'compile': ['-fPIC', '-D_DARWIN_C_SOURCE'], 'link': [],
         'beside': ['-Wl,-rpath,@loader_path'], 'named': ['-Wl,-install_name,@rpath/bridge.dylib'],
         'wasmtime': ('macos/libwasmtime.dylib', 'macos/libwasmtime.dylib')},
@@ -52,6 +52,7 @@ FEATURES = ['--enable-multimemory', '--enable-bulk-memory', '--enable-sign-ext',
             '--enable-nontrapping-float-to-int', '--enable-mutable-globals']
 TIMEOUT = 120
 
+OS = ['memory', 'library', 'thread', 'mutex', 'event']
 BRIDGE = ['bridge', 'lifecycle', 'config', 'block', 'storage', 'schema', 'abi', 'schedule', 'pool',
           'backend']
 # a native module is a shared library: the name, its source, what it is compiled with. The same
@@ -211,11 +212,16 @@ def build(target, debug, out):
                  '-Wno-missing-field-initializers']
     system, here = row['link'], row['beside']
     include, src = '-I%s' % (ROOT / 'include'), '-I%s' % (ROOT / 'src')
+    # the operating system's layer: one source for the library and for each backend, which are
+    # separate binaries and each compile it - build.md, *The C library*
+    os_dir = ROOT / 'utils/os' / row['os']
+    utils = '-I%s' % (ROOT / 'utils/os')
     # how a module is written is its backend's: each backend's binding sits beside the backend
     sdk = {b: '-I%s' % (ROOT / 'backends' / b / 'sdk') for b in ('wasm', 'native')}
     headers = [Path(__file__)] + [h for d in ('include', 'src', 'tests', 'tests/modules',
                                               'backends/wasm', 'backends/wasm/sdk',
-                                              'backends/native', 'backends/native/sdk')
+                                              'backends/native', 'backends/native/sdk',
+                                              'utils/os', 'utils/os/' + row['os'])
                                   for h in (ROOT / d).glob('*.h')]
 
     # ---- objects ----
@@ -234,27 +240,31 @@ def build(target, debug, out):
 
     # the library's own objects: what bridge.h marks is exported, and nothing else is
     inside = ours + ['-DBRIDGE_BUILDING', '-fvisibility=hidden']
-    os_o = compile_('os', ROOT / 'src/os.c', inside + [src])
-    bridge_o = [compile_(name, ROOT / 'src' / (name + '.c'), inside + [include, src]) for name in BRIDGE]
-    # a backend is compiled against the backend seam and what is its own: nothing of src/
+    os_o = [compile_('os-' + name, os_dir / (name + '.c'), inside + [utils]) for name in OS]
+    bridge_o = [compile_(name, ROOT / 'src' / (name + '.c'), inside + [include, src, utils])
+                for name in BRIDGE]
+    # a backend is compiled against the backend seam, the operating system's layer and what is
+    # its own: nothing of src/
+    backend_os_o = [compile_('backend-os-' + name, os_dir / (name + '.c'), ours + [utils]) for name in OS]
     wasm_o = [compile_('wasm', ROOT / 'backends/wasm/wasm.c',
-                       ours + [include, '-I%s' % (wasmtime / 'include')]),
-              compile_('wasm-os', ROOT / 'backends/wasm/os.c', ours)]
-    native_o = [compile_('native', ROOT / 'backends/native/native.c', ours + [include, sdk['native']]),
-                compile_('native-os', ROOT / 'backends/native/os.c', ours)]
+                       ours + [include, utils, '-I%s' % (wasmtime / 'include')])] + backend_os_o
+    native_o = [compile_('native', ROOT / 'backends/native/native.c',
+                         ours + [include, utils, sdk['native']])] + backend_os_o
     native_other_o = compile_('native-other', ROOT / 'backends/native/native.c',
-                              ours + [include, sdk['native'], '-DSAYS_ABI=(BACKEND_ABI+1)'])
+                              ours + [include, utils, sdk['native'], '-DSAYS_ABI=(BACKEND_ABI+1)'])
     schema_test_o = compile_('schema-test', ROOT / 'tests/schema.c', ours + [include, src])
-    adopt_o = compile_('adopt', ROOT / 'tests/adopt.c', ours + [include, src] + defines)
+    adopt_o = compile_('adopt', ROOT / 'tests/adopt.c', ours + [include, src, utils] + defines)
     phase_o = {name: compile_(name, ROOT / 'tests' / (name + '.c'), ours + [include] + defines)
                for name in ('stage2', 'stage3', 'stage4', 'stage5', 'stage6')}
-    storage_o = compile_('storage-test', ROOT / 'tests/storage.c', ours + [include, src] + defines)
+    storage_o = compile_('storage-test', ROOT / 'tests/storage.c', ours + [include, src, utils] + defines)
     # the library again, with its calls to the allocator sent to the test that counts them
     counting = ['-D%s=counted_%s' % (f, f) for f in ('malloc', 'calloc', 'realloc', 'free')]
-    counted_o = [compile_('counted-' + name, ROOT / 'src' / (name + '.c'), ours + [include, src] + counting)
-                 for name in BRIDGE + ['os']]
+    counted_o = [compile_('counted-' + name, ROOT / 'src' / (name + '.c'),
+                          ours + [include, src, utils] + counting) for name in BRIDGE] + \
+                [compile_('counted-os-' + name, os_dir / (name + '.c'), ours + [utils] + counting)
+                 for name in OS]
     counted_test_o = compile_('storage-counted-test', ROOT / 'tests/storage.c',
-                              ours + [include, src] + defines + ['-DCOUNTED'])
+                              ours + [include, src, utils] + defines + ['-DCOUNTED'])
     module_o = {name: compile_(name, ROOT / 'tests/modules/native' / (source + '.c'),
                                ours + [include, sdk['native']] + ['-D' + d for d in flags])
                 for name, source, flags in NATIVE}
@@ -277,12 +287,12 @@ def build(target, debug, out):
     link('backends/bridge_wasm', wasm_o, [link_wasmtime] + system + here, shared=True)
     link('backends/bridge_native', native_o, system, shared=True)
     # the same backend, saying it is of another backend seam: for the case that refuses it
-    link('backends/bridge_native_other', [native_other_o, native_o[1]], system, shared=True)
+    link('backends/bridge_native_other', [native_other_o] + backend_os_o, system, shared=True)
     for name, _, _ in NATIVE:
         link(name, [module_o[name]], shared=True)
-    link('adopt', [adopt_o, obj / 'backend.o', os_o], system)
+    link('adopt', [adopt_o, obj / 'backend.o'] + os_o, system)
     link('schema', [schema_test_o, obj / 'schema.o'], system)
-    whole = bridge_o + [os_o]
+    whole = bridge_o + os_o
     # the library, built: shared and static. What a host links - host_api.md
     shared_lib, static_lib = out / ('bridge' + lib), out / 'bridge.a'
     link('bridge', whole, system + row['named'], shared=True)

@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OURS = ('src/*.c', 'src/*.h', 'backends/*/*.c', 'backends/*/*.h', 'backends/*/sdk/*.h', 'include/*.h',
         'tests/*.c', 'tests/*.h', 'tests/modules/*.h', 'tests/modules/wasm/*.c',
-        'tests/modules/native/*.c')
+        'tests/modules/native/*.c', 'utils/*/*.h', 'utils/*/*/*.c', 'utils/*/*/*.h')
 
 # what is found, and what C23 writes in its place
 OLDER = [
