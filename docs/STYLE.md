@@ -57,9 +57,12 @@ which the original does not have.
 
 The repository holds only the files that are needed to build it, test it and understand it.
 
-That means no compiled file (`.o`, `.gch`, `.a`, `.so`, `.dll`, ...), and no temporary or
-unnecessary file (`*~`, `#*#`, `*.d`, `a.out`, ...). What a build makes goes under `build/`,
-which is not tracked.
+Nothing a build makes is tracked: no compiled file (`.o`, `.gch`, `.a`, `.so`, `.dll`, ...),
+and no temporary or unnecessary file (`*~`, `#*#`, `*.d`, `a.out`, ...). What a build makes
+goes under `build/`, which is not tracked.
+
+A library somebody else built and published is not something a build of ours makes. It is
+tracked as it was published, in a folder of its own that holds its licence.
 
 ### O2 - File extension
 
@@ -300,6 +303,17 @@ Each level of indentation is 4 spaces.
 
 No tabulation is used for indentation.
 
+A `case` is one level inside its `switch`, and what it runs is one level inside the `case`.
+
+```c
+switch (kind) {
+    case SCHEMA_BOOL:           /* OK */
+        return (1);
+    default:
+        return (0);
+}
+```
+
 ### L3 - Spaces
 
 Always place a space after a comma, and after a keyword if it has arguments.
@@ -317,6 +331,8 @@ return(1);                      /* L3 violation */
 break;                          /* OK */
 sum = term1 + 2 * term2;        /* OK */
 s = sizeof(struct file);        /* OK */
+i++;                            /* OK */
+i ++;                           /* L3 violation */
 ```
 
 ### L4 - Curly brackets
@@ -630,6 +646,4 @@ The path may hold `*`, and may end in `:` and a function's name when one functio
 excepted. A reason that needs more lines continues on lines indented further. An exception that
 excuses nothing is reported, so that none outlives what it was for.
 
-    O1  backends/wasm/wasmtime/*  wasmtime's library, as its authors built and published it.
-            The wasm backend links it, the build does not make it, and where it came from
-            and its hash are beside it - `build.md`, *Dependencies*.
+None.

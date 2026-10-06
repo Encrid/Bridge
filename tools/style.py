@@ -587,11 +587,14 @@ def prototypes():
 
 
 def tracked():
-    """O1: nothing compiled, temporary or unnecessary is in the repository."""
+    """O1: nothing a build makes is in the repository. What somebody else built and published
+    is told apart by the licence its folder holds."""
     listed = subprocess.run(['git', 'ls-files'], cwd=ROOT, capture_output=True, text=True).stdout.split('\n')
+    theirs = tuple(path.rsplit('/', 1)[0] + '/' for path in listed
+                   if re.search(r'/(?:LICENSE|LICENCE|COPYING)[^/]*\Z', path))
     unwanted = re.compile(r'\.(?:o|obj|a|so|dll|dylib|exe|gch|d|pyc)\Z|~\Z|(?:\A|/)#[^/]*#\Z|(?:\A|/)a\.out\Z')
     return [(path, 1, 'O1', 'a compiled, temporary or unnecessary file is tracked', None)
-            for path in listed if unwanted.search(path)]
+            for path in listed if unwanted.search(path) and not path.startswith(theirs)]
 
 
 # a rule, and C that infringes it and nothing else of what a line shows

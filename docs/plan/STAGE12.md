@@ -76,10 +76,16 @@ What the whole tree holds before any of it is rewritten, 95 files:
     H1   102    G4    97    F4    95    G1    94    L2    80    O3    38
     C2    30    C3    20    O4     5    H3     5    G5     4    O2     1
 
-Three readings the rules leave open, and what the checker takes until one is decided:
+Four readings the rules left open, each put to Enkrid and decided:
 
-    a `case`            one level inside its `switch`, and its statements one more
-    `i ++`              a space between a unary operator and its operand, so L3
-    a macro for text    H3, as for a number: `#define BRIDGE_NAMESPACE "bridge"`. Five of
-                        them, and a name that is joined to another literal cannot be a
-                        `constexpr`
+    a `case`            one level inside its `switch`, and what it runs one more. The tree
+                        wrote it at the level of the `switch`
+    `i ++`              infringes L3, as a space after any unary operator does. About 620
+    a macro for text    infringes H3 as a macro for a number does. The five there are, such
+                        as `#define BRIDGE_NAMESPACE "bridge"`, are removed with the
+                        directory each is in, and what joined one to another literal is
+                        rewritten
+    wasmtime's library  no infringement of O1, which is reworded: nothing a build makes is
+                        tracked, and a library somebody else published is tracked as
+                        published, in a folder that holds its licence. The exception first
+                        entered for it is withdrawn
