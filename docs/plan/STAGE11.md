@@ -519,3 +519,14 @@ columns against 7,424 KB for markers of four bytes. One thing was settled in bui
 the decision had not seen: a toggled tag and a direct-indexed one are handed an offset, and
 not `BRIDGE_CARRIED`, since their bits are found from it.
 
+**The move**, as `lifetime.md`, *When a component is moved*, has it. The reload makes a second
+type for what the component becomes, and one call to storage takes every moved component's rows
+across as one barrier does: the fold, then room for all of it, then each entity placed once. So
+none or all of several components is one reservation, and a barrier's code is the move's. Case
+`storage-move`: each of the four an entity carries to each other, to a singleton from one
+entity, from none and from three, from a singleton, a toggle with a row off refused and then
+accepted, a loss accepted and not made, and no room.
+
+A module's configuration has the losses a reload accepts, `losses` and `loss_count`, stated as
+none by every load.
+

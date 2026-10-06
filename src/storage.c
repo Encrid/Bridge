@@ -780,6 +780,105 @@ static bool joins(const storage *r, uint32_t slot, uint32_t index)
         && has(r->work + (size_t)index * r->words, r->set_type[slot]->id);
 }
 
+/* A barrier's second step, and a move's: a table for each changed entity, and room in it and
+ * in each sparse set it is to join, before anything moves. What cannot be had is known here,
+ * while every entity is still where it was. */
+static void reserve_all(storage *r)
+{
+    uint32_t i;
+    for (i = 0; i < r->changed_count; i ++) {
+        uint32_t index = r->changed[i], t = 0;
+        if (r->folded[index] & DESTROYED) continue;
+        /* what it carries already, it carries where it is: an attach of what it has is a value
+         * and no move, in whichever table of that set it happens to be */
+        uint32_t from = r->places[index].table;
+        /* its table is of what it carries that is kept in tables, and no more */
+        for (uint32_t w = 0; w < r->words; w ++) r->masked[w] = work_of(r, index)[w] & r->in_table[w];
+        if (from && !memcmp(r->masked, set_of(r, from), 8u * r->words)) {
+            t = from;
+        } else if (!empty(r, r->masked)) {
+            t = table_for(r, r->masked);
+            if (!t) {
+                dropped(r, index, false);
+                continue;
+            }
+        }
+        r->dest[index] = t;
+        if (t && t != r->places[index].table) r->tables[t].incoming ++;
+        /* and a row in each sparse set it is to join */
+        for (uint32_t slot = 0; slot < r->set_room; slot ++) {
+            if (!joins(r, slot, index)) continue;
+            if (!r->set_table[slot]) {
+                memset(r->scratch, 0, 8u * r->words);
+                put(r->scratch, r->set_type[slot]->id);
+                if (!table_for(r, r->scratch)) unreachable();
+            }
+            r->tables[r->set_table[slot]].incoming ++;
+        }
+    }
+    for (i = 0; i < r->changed_count; i ++) {
+        uint32_t index = r->changed[i], t = r->dest[index];
+        if (r->folded[index] & (DESTROYED | DROPPED)) continue;
+        if (t && t != r->places[index].table && !roomed(r, t)) {
+            dropped(r, index, true);
+            continue;
+        }
+        for (uint32_t slot = 0; slot < r->set_room; slot ++) {
+            if (!joins(r, slot, index) || roomed(r, r->set_table[slot])) continue;
+            dropped(r, index, true);
+            break;
+        }
+    }
+}
+
+/* the entity at `index` put where the fold has it: its table, its sparse sets, its cells */
+static void place_one(storage *r, uint32_t index)
+{
+    if (r->folded[index] & DESTROYED) {
+        killed(r, index);
+        return;
+    }
+    moved(r, index, r->dest[index]);
+    for (uint32_t slot = 0; slot < r->set_room; slot ++) {
+        if (joins(r, slot, index)) joined(r, slot, index);
+        else if (r->set_type[slot] && where_of(r, slot)[index]
+                 && !has(r->work + (size_t)index * r->words, r->set_type[slot]->id)) left(r, slot, index);
+    }
+    /* a direct-indexed component has its cell already, so it cannot be short of room */
+    for (uint32_t slot = 0; slot < r->direct_room; slot ++) {
+        bool was, is;
+        if (!r->direct_type[slot]) continue;
+        was = has(given_of(r, slot), index);
+        is = has(r->work + (size_t)index * r->words, r->direct_type[slot]->id);
+        if (was != is) cell_given(r, slot, index, is);
+    }
+    for (uint32_t id = 0; !index && id < r->type_room; id ++) {
+        storage_type *type = r->types[id];
+        if (!type || type->kept != BRIDGE_SINGLETON || type->set == has(r->work, id)) continue;
+        single_set(r, type, !type->set);
+    }
+}
+
+/* a table nothing is left in is gone, and the fold is forgotten */
+static void forget_all(storage *r)
+{
+    uint32_t i;
+    for (i = 0; i < r->changed_count; i ++) {
+        uint32_t index = r->changed[i], t = r->dest[index];
+        if (t) r->tables[t].incoming = 0, r->tables[t].sized = false;
+        r->folded[index] = 0;
+        r->dest[index] = 0;
+    }
+    for (i = 0; i < r->set_room; i ++) {
+        if (r->set_table[i]) r->tables[r->set_table[i]].incoming = 0, r->tables[r->set_table[i]].sized = false;
+    }
+    r->changed_count = 0;
+    for (i = 0; i < r->dirty_count; i ++) {
+        uint32_t t = r->dirty[i];
+        if (r->tables[t].live && !r->tables[t].rows) table_gone(r, t);
+    }
+}
+
 /* threads.md: the queues are applied in the order the calls that filled them ran, and not a
  * module at a time. The next run of changes: one module's, of one turn. A module's own queue
  * is in that order already, so this takes the earliest of what each has next. */
@@ -834,51 +933,7 @@ void storage_apply(storage *r)
         }
     }
 
-    /* 2. a table for each, and room in it, before anything moves: what cannot be had is known
-     * here, while every entity is still where it was */
-    for (i = 0; i < r->changed_count; i ++) {
-        uint32_t index = r->changed[i], t = 0;
-        if (r->folded[index] & DESTROYED) continue;
-        /* what it carries already, it carries where it is: an attach of what it has is a value
-         * and no move, in whichever table of that set it happens to be */
-        uint32_t from = r->places[index].table;
-        /* its table is of what it carries that is kept in tables, and no more */
-        for (uint32_t w = 0; w < r->words; w ++) r->masked[w] = work_of(r, index)[w] & r->in_table[w];
-        if (from && !memcmp(r->masked, set_of(r, from), 8u * r->words)) {
-            t = from;
-        } else if (!empty(r, r->masked)) {
-            t = table_for(r, r->masked);
-            if (!t) {
-                dropped(r, index, false);
-                continue;
-            }
-        }
-        r->dest[index] = t;
-        if (t && t != r->places[index].table) r->tables[t].incoming ++;
-        /* and a row in each sparse set it is to join */
-        for (uint32_t slot = 0; slot < r->set_room; slot ++) {
-            if (!joins(r, slot, index)) continue;
-            if (!r->set_table[slot]) {
-                memset(r->scratch, 0, 8u * r->words);
-                put(r->scratch, r->set_type[slot]->id);
-                if (!table_for(r, r->scratch)) unreachable();
-            }
-            r->tables[r->set_table[slot]].incoming ++;
-        }
-    }
-    for (i = 0; i < r->changed_count; i ++) {
-        uint32_t index = r->changed[i], t = r->dest[index];
-        if (r->folded[index] & (DESTROYED | DROPPED)) continue;
-        if (t && t != r->places[index].table && !roomed(r, t)) {
-            dropped(r, index, true);
-            continue;
-        }
-        for (uint32_t slot = 0; slot < r->set_room; slot ++) {
-            if (!joins(r, slot, index) || roomed(r, r->set_table[slot])) continue;
-            dropped(r, index, true);
-            break;
-        }
-    }
+    reserve_all(r);
 
     /* 3. what observers are owed: for each entity, what it carried against what it will */
     for (i = 0; r->observer_count && i < r->changed_count; i ++) {
@@ -891,31 +946,7 @@ void storage_apply(storage *r)
 
     /* 4. each entity placed, once */
     for (i = 0; i < r->changed_count; i ++) {
-        uint32_t index = r->changed[i];
-        if (r->folded[index] & DROPPED) continue;
-        if (r->folded[index] & DESTROYED) {
-            killed(r, index);
-            continue;
-        }
-        moved(r, index, r->dest[index]);
-        for (uint32_t slot = 0; slot < r->set_room; slot ++) {
-            if (joins(r, slot, index)) joined(r, slot, index);
-            else if (r->set_type[slot] && where_of(r, slot)[index]
-                     && !has(work_of(r, index), r->set_type[slot]->id)) left(r, slot, index);
-        }
-        /* a direct-indexed component has its cell already, so it cannot be short of room */
-        for (uint32_t slot = 0; slot < r->direct_room; slot ++) {
-            bool was, is;
-            if (!r->direct_type[slot]) continue;
-            was = has(given_of(r, slot), index);
-            is = has(work_of(r, index), r->direct_type[slot]->id);
-            if (was != is) cell_given(r, slot, index, is);
-        }
-        for (uint32_t id = 0; !index && id < r->type_room; id ++) {
-            storage_type *type = r->types[id];
-            if (!type || type->kept != BRIDGE_SINGLETON || type->set == has(work_of(r, 0), id)) continue;
-            single_set(r, type, !type->set);
-        }
+        if (!(r->folded[r->changed[i]] & DROPPED)) place_one(r, r->changed[i]);
     }
 
     /* 5. the values, in the order they were asked: the last one written is the one that stays */
@@ -946,21 +977,7 @@ void storage_apply(storage *r)
         m->queue_len = m->mark_count = 0;
     }
 
-    /* 6. a table nothing is left in is gone, and the fold is forgotten */
-    for (i = 0; i < r->changed_count; i ++) {
-        uint32_t index = r->changed[i], t = r->dest[index];
-        if (t) r->tables[t].incoming = 0, r->tables[t].sized = false;
-        r->folded[index] = 0;
-        r->dest[index] = 0;
-    }
-    for (i = 0; i < r->set_room; i ++) {
-        if (r->set_table[i]) r->tables[r->set_table[i]].incoming = 0, r->tables[r->set_table[i]].sized = false;
-    }
-    r->changed_count = 0;
-    for (i = 0; i < r->dirty_count; i ++) {
-        uint32_t t = r->dirty[i];
-        if (r->tables[t].live && !r->tables[t].rows) table_gone(r, t);
-    }
+    forget_all(r);
     for (m = b->modules; m; m = m->next) {
         static const char *const text[2] = {
             "module '%s': [budget] tables of %u is used up. Not applied, of the changes it "
@@ -1399,6 +1416,122 @@ void storage_drop(storage *r, storage_type *type, enum bridge_on_unload policy)
             "table of their archetype: [budget] columns of %u bytes has no room to join them to "
             "the first", r->b->types[i]->name, apart, r->b->columns_len);
     }
+}
+
+/* ---- at a reload ---- */
+
+/* `visit` for every entity that carries `type`, whichever way it is kept */
+static void each_carrier(storage *r, const storage_type *type, void (*visit)(storage *r, uint32_t index, void *ctx),
+                         void *ctx)
+{
+    if (type->kept == BRIDGE_SINGLETON) {
+        if (type->set) visit(r, 0, ctx);
+    } else if (type->kept == BRIDGE_DIRECT_INDEXED) {
+        for (uint32_t index = 1; index < r->high; index ++) {
+            if (has(given_of(r, type->slot), index)) visit(r, index, ctx);
+        }
+    } else {
+        for (uint32_t t = 1; t < r->table_high; t ++) {
+            const table *tab = &r->tables[t];
+            if (!tab->live || !has(set_of(r, t), type->id)) continue;
+            for (uint32_t row = 0; row < tab->rows; row ++) visit(r, (uint32_t)who_of(r, tab)[row], ctx);
+        }
+    }
+}
+
+static void counted_one([[maybe_unused]] storage *r, [[maybe_unused]] uint32_t index, void *ctx)
+{
+    ++ *(uint32_t *)ctx;
+}
+
+uint32_t storage_count(storage *r, const storage_type *type)
+{
+    uint32_t n = 0;
+    each_carrier(r, type, counted_one, &n);
+    return n;
+}
+
+uint32_t storage_off(storage *r, const storage_type *type)
+{
+    uint32_t n = 0;
+    for (uint32_t t = 1; type->kept == BRIDGE_TOGGLE && t < r->table_high; t ++) {
+        const table *tab = &r->tables[t];
+        if (!tab->live || !has(set_of(r, t), type->id)) continue;
+        for (uint32_t row = 0; row < tab->rows; row ++) {
+            n += !on_at(r, columns_of(r, t)[type->id], tab->room, row);
+        }
+    }
+    return n;
+}
+
+/* the entity at `index` is among those this move changes: folded from what it carries */
+static void folded_in(storage *r, uint32_t index)
+{
+    if (r->folded[index] & TOUCHED) return;
+    r->folded[index] = TOUCHED;
+    r->changed[r->changed_count ++] = index;
+    carried(r, index, r->work + (size_t)index * r->words);
+}
+
+static void retyped(storage *r, uint32_t index, void *ctx)
+{
+    const storage_move *move = ctx;
+    folded_in(r, index);
+    take(r->work + (size_t)index * r->words, move->from->id);
+    /* a singleton is on no entity: what the one that carried it had becomes index 0's */
+    if (move->to->kept == BRIDGE_SINGLETON) {
+        folded_in(r, 0);
+        put(r->work, move->to->id);
+    } else {
+        put(r->work + (size_t)index * r->words, move->to->id);
+    }
+}
+
+bool storage_convert(storage *r, const storage_move *moves, uint32_t count)
+{
+    uint32_t total = 0, i, k;
+    uint8_t *was;
+    bool short_of = false;
+    for (k = 0; k < count; k ++) total += moves[k].from->size;
+    was = malloc(total ? total : 1);
+    if (!was) return false;
+
+    /* what each entity that carries one of them will carry, and nothing moved */
+    for (k = 0; k < count; k ++) {
+        /* index 0 first, so that a singleton has its place before the value that goes to it */
+        if (moves[k].to->kept == BRIDGE_SINGLETON && storage_count(r, moves[k].from)) folded_in(r, 0);
+    }
+    for (k = 0; k < count; k ++) each_carrier(r, moves[k].from, retyped, (void *)(uintptr_t)&moves[k]);
+    reserve_all(r);
+    for (i = 0; i < r->changed_count; i ++) short_of |= (r->folded[r->changed[i]] & DROPPED) != 0;
+    if (short_of) {
+        forget_all(r);
+        free(was);
+        return false;
+    }
+
+    /* each placed once, its values taken before it leaves where they were */
+    for (i = 0; i < r->changed_count; i ++) {
+        uint32_t index = r->changed[i], at = 0, had[64] = {};
+        for (k = 0; k < count && k < 64; k ++) {
+            had[k] = index ? value_of(r, index, moves[k].from) : 0;
+            if (had[k]) memcpy(was + at, r->b->shared + had[k], moves[k].from->size);
+            at += moves[k].from->size;
+        }
+        place_one(r, index);
+        for (k = 0, at = 0; k < count && k < 64; at += moves[k].from->size, k ++) {
+            uint32_t to;
+            if (!had[k]) continue;
+            to = value_of(r, moves[k].to->kept == BRIDGE_SINGLETON ? 0 : index, moves[k].to);
+            for (uint32_t run = 0; run < moves[k].run_count; run ++) {
+                memcpy(r->b->shared + to + moves[k].runs[run].to, was + at + moves[k].runs[run].from,
+                    moves[k].runs[run].len);
+            }
+        }
+    }
+    forget_all(r);
+    free(was);
+    return true;
 }
 
 void storage_release(storage *r, const uint64_t *ids, uint32_t count)

@@ -73,6 +73,40 @@ check - `reference.md`, *Reference following*. A module that keeps an entity as 
 no component of its own on it, loses it to another module's `sweep`: an entity that must outlive
 somebody else's unload carries a component of its holder's.
 
+## When a component is moved
+
+**A component is moved to another storage layout by a reload whose `declare` states another** -
+`storage.md`, *Storage layouts*. It is the one module that declares it that may: every declarer
+states the same storage layout, so while another module declares the component the reload is
+refused, naming them, and the way through is the one a changed component layout has, below.
+
+**It is all of the rows or none.** The reload makes a type for what the component becomes,
+beside the one it is. When the new instance's `reload` has answered, every table and every row
+the new type needs is had first, while every value is still where it was; then each entity is
+placed once and its value written across; then the type it was is gone. If the room cannot be
+had, nothing has moved, the reload is refused saying so, and what follows is what follows any
+reload that fails - `lifecycle.md`, *The runtime lifecycle*. So for the length of a reload the
+component is two types: it counts twice against `[budget] types`, and against `sparse_sets` or
+`direct_indexed` if both are that, and its rows need room where they are going while they are
+still where they were. Observers are told nothing, since no entity gains or loses a component.
+
+    from, to                                 what happens to the values
+    table, sparse set, direct-indexed,       every entity that carries it keeps its value. As a
+    toggle: any to any                       toggle, each is on
+    any, to singleton                        no entity carries it: the singleton has no value.
+                                             One does: its value is the singleton's. More than
+                                             one: refused, naming how many, since nothing says
+                                             which
+    singleton, to any                        refused: there is no entity to carry it
+    toggle, to any other                     a row that is off is carried like the rest, with
+                                             its value
+
+**Leaving a toggle, that a row was off is lost, and it is a loss the reload has to accept.**
+The reload is refused, naming the component and how many rows are off, unless the component's
+name is among the losses it states - *When a component layout changed*, below, for how. The
+value is kept, and the module's `reload`, which runs next, is where it detaches what it does
+not want.
+
 ## When a component layout changed
 
 The fingerprint catches it - `schema.md`, *Fingerprints* - and what happens next depends on who else

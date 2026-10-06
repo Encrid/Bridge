@@ -103,6 +103,7 @@ void module_discard(bridge *b, module *m)
     free(m->queue);
     free(m->marks);
     free(m->writable);
+    free(m->loss_used);
     free(m->systems);
     free(m->observers);
     free(m->declared);
@@ -259,7 +260,12 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
         || unset(b, id, "scratch", cfg->scratch) || unset(b, id, "log_ring", cfg->log_ring)
         || unset(b, id, "spans", cfg->spans) || unset(b, id, "spawns", cfg->spawns)
         || unset(b, id, "persistent", cfg->persistent)
-        || unset(b, id, "changes", cfg->changes)) {
+        || unset(b, id, "changes", cfg->changes) || unset(b, id, "loss_count", cfg->loss_count)) {
+        return 1;
+    }
+    if (cfg->loss_count > 0 && !cfg->losses) {
+        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: it states %lld losses, and "
+            "losses is unset", id, (long long)cfg->loss_count);
         return 1;
     }
     if (neither(b, id, "max_system_failures", cfg->max_system_failures, BRIDGE_NO_LIMIT)
@@ -270,7 +276,8 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
         || neither(b, id, "shutdown_timeout", cfg->shutdown_timeout, BRIDGE_NO_LIMIT)
         || neither(b, id, "spawns", cfg->spawns, BRIDGE_NONE)
         || neither(b, id, "persistent", cfg->persistent, BRIDGE_NONE)
-        || neither(b, id, "changes", cfg->changes, BRIDGE_NONE)) {
+        || neither(b, id, "changes", cfg->changes, BRIDGE_NONE)
+        || neither(b, id, "loss_count", cfg->loss_count, BRIDGE_NONE)) {
         return 1;
     }
     if (cfg->changes > (int64_t)UINT32_MAX) {
@@ -377,9 +384,12 @@ static module *record(bridge *b, const bridge_artifact *a, open_backend *o)
     m->work_limit = cfg->work_limit;
     m->spawns = cfg->spawns;
     m->persistent = cfg->persistent;
+    m->losses = cfg->losses;
+    m->loss_count = cfg->loss_count > 0 ? (uint32_t)cfg->loss_count : 0;
+    m->loss_used = calloc(m->loss_count ? m->loss_count : 1, sizeof *m->loss_used);
     /* budgets.md, *Nothing is allocated in a phase*: its ids and its queue, as long as it
      * stated, now */
-    whole = m->identity && m->stem && m->ns;
+    whole = m->identity && m->stem && m->ns && m->loss_used;
     if (cfg->spawns > 0) {
         m->ids = calloc((size_t)cfg->spawns, sizeof *m->ids);
         m->id_room = m->ids ? (uint32_t)cfg->spawns : 0;
@@ -532,6 +542,15 @@ static int start(bridge *b, module *m, const bridge_artifact *a, enum backend_ca
     i = (uint32_t)lifecycle_call(m, first, entry, reloading ? cfg->reload_timeout : cfg->init_timeout, err);
     m->in_init = 0;
     if (i) return 1;
+
+    /* lifetime.md: a loss that is accepted is one that is made. A name nothing was lost under
+     * is refused, so that a list is not left where it is from one reload to the next */
+    for (i = 0; i < m->loss_count; i ++) {
+        if (m->loss_used[i]) continue;
+        snprintf(err->text, sizeof err->text, "it accepts the loss of '%.100s', and loses nothing "
+            "of that name", m->losses[i]);
+        return 1;
+    }
 
     /* config.md: one row, written after init has declared the struct it is a row of */
     if (!reloading && config_seed(b, m, cfg, err->text, sizeof err->text)) return 1;
@@ -768,6 +787,31 @@ int bridge_unload(bridge *b, const char *identity)
 
 /* ---- reload ---- */
 
+/* lifetime.md, *When a component is moved*: every type this reload made in the place of
+ * another takes that one's rows, all of them or none. 1 and why if there is no room. */
+static int moved_rows(bridge *b, module *n, backend_err *err)
+{
+    storage_move moves[64];
+    storage_run whole[64];
+    uint32_t count = 0, i;
+    for (i = 0; i < n->declared_count && count < 64; i ++) {
+        declared_type *c = n->declared[i];
+        if (!c->replaces) continue;
+        whole[count] = (storage_run){ 0, 0, c->size < c->replaces->size ? c->size : c->replaces->size };
+        moves[count] = (storage_move){ c->replaces->type, c->type, &whole[count], 1 };
+        count ++;
+    }
+    if (!count || storage_convert(b->storage, moves, count)) {
+        for (i = 0; i < n->declared_count; i ++) n->declared[i]->replaces = nullptr;
+        return 0;
+    }
+    snprintf(err->text, sizeof err->text, "what it keeps another way, %u of its components, "
+        "could not be moved: [budget] tables of %u or [budget] columns of %u bytes has no room for "
+        "the rows where they are to go, while they are still where they were", count, b->tables,
+        b->columns_len);
+    return 1;
+}
+
 int bridge_reload(bridge *b, const bridge_artifact *a)
 {
     const bridge_module_config *cfg = &a->cfg;
@@ -894,9 +938,15 @@ int bridge_reload(bridge *b, const bridge_artifact *a)
         old->image = nullptr;
     }
 
-    if (start(b, n, a, demands, "reload", &err) || schedule_build(b, err.text, sizeof err.text)) {
+    n->reloads = old;
+    if (start(b, n, a, demands, "reload", &err) || schedule_build(b, err.text, sizeof err.text)
+        || moved_rows(b, n, &err)) {
         say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' was not reloaded: %s", id, err.text);
         drop_systems(b, n);
+        /* what it would have moved stays as it is, under the type it has */
+        for (i = 0; i < n->declared_count; i ++) {
+            if (n->declared[i]->replaces) n->declared[i]->replaces->superseded = false;
+        }
         for (i = n->declared_count; i --;) type_release(b, n->declared[i], 0);
         n->declared_count = 0;
         n->id_count = n->id_next = 0;  /* the entities are the old record's still */

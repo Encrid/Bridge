@@ -40,6 +40,10 @@ struct declared_type {
     declared_type  **deps;              /* the declared types its own fields name */
     uint32_t     dep_count;
     void        *zero;              /* `size` zero bytes: what an attach with no value copies */
+    /* lifetime.md, *When a component is moved*: at a reload, the type of this name whose rows
+     * become this one's when the reload holds; and that the other has such a successor */
+    declared_type   *replaces;
+    bool         superseded;
 };
 
 typedef struct { uint64_t id; enum bridge_event events; } pending;
@@ -164,6 +168,11 @@ struct module {
     uint32_t turn;
     struct { uint32_t turn, at; } *marks;
     uint32_t mark_count, mark_room, mark_at;
+    /* a reload: the instance this one is to take the place of, and what it accepts to lose */
+    module *reloads;
+    const char *const *losses;
+    uint32_t loss_count;
+    bool    *loss_used;             /* by loss: something was lost under that name */
     int   refused;                  /* an entry refused during the call in progress */
     char  why[256];                 /* and this is why */
     module *next;

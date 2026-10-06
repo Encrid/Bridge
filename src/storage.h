@@ -67,6 +67,26 @@ void storage_written(storage *r);
 /* how many table ids there are, counting 0, which is no table */
 uint32_t storage_tables(storage *r);
 
+/* ---- at a reload: a component's rows written again, as another type ---- */
+
+/* bytes `from` of a value as it was, which are bytes `to` of the value as it will be */
+typedef struct { uint32_t from, to, len; } storage_run;
+/* every value of `from` becomes a value of `to`: zero, but for the runs copied across */
+typedef struct {
+    storage_type      *from, *to;
+    const storage_run *runs;
+    uint32_t           run_count;
+} storage_move;
+
+/* how many entities carry `type`; and of a toggled one, how many of those are off */
+uint32_t storage_count(storage *r, const storage_type *type);
+uint32_t storage_off(storage *r, const storage_type *type);
+/* lifetime.md, *When a component is moved*. All of them or none: every table and every row
+ * the new types need is had before a value moves, and false, with nothing changed, if one
+ * cannot be, or if there is not the memory to carry the values across. Observers are told
+ * nothing, since no entity gains or loses a component by it. */
+[[nodiscard]] bool storage_convert(storage *r, const storage_move *moves, uint32_t count);
+
 /* ---- at unload, and for settings ---- */
 
 /* the rows of a component nobody declares any more, by the policy its last declarer stated -

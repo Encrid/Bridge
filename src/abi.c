@@ -88,7 +88,7 @@ static void also_declared(const bridge *b, const module *m, const declared_type 
     uint32_t i;
     others[0] = 0;
     for (module *o = b->modules; o; o = o->next) {
-        if (o == m || !strcmp(o->identity, m->identity)) continue;
+        if (o == m || o == m->reloads || !strcmp(o->identity, m->identity)) continue;
         for (i = 0; i < o->declared_count && o->declared[i] != c; i ++) {}
         if (i == o->declared_count || used >= size) continue;
         used += (size_t)snprintf(others + used, size - used, "%s'%s'",
@@ -100,6 +100,38 @@ static const char *const storage_names[] = {
     "", "a table", "a sparse set", "a toggle", "direct-indexed", "a singleton"
 };
 
+/* Whether this reload accepts the loss named `name`, which it is now known to make. */
+static bool accepted(module *m, const char *name)
+{
+    for (uint32_t i = 0; i < m->loss_count; i ++) {
+        if (strcmp(m->losses[i], name)) continue;
+        m->loss_used[i] = true;
+        return true;
+    }
+    return false;
+}
+
+/* lifetime.md, *When a component is moved*: `c` is to be kept as `kept` from this reload on.
+ * 1 and a refusal for a move that cannot be made, or that loses what was not accepted. */
+static int moved_storage(module *m, const declared_type *c, enum bridge_storage kept)
+{
+    uint32_t carriers = storage_count(m->b->storage, c->type), off = storage_off(m->b->storage, c->type);
+    if (c->storage == BRIDGE_SINGLETON) {
+        return refuse(m, "type '%s' is a singleton, and is not moved to %s: there is no entity to "
+            "carry it", c->name, storage_names[kept]);
+    }
+    if (kept == BRIDGE_SINGLETON && carriers > 1) {
+        return refuse(m, "type '%s' is carried by %u entities, and is not moved to a singleton: "
+            "nothing says which of them has its value", c->name, carriers);
+    }
+    if (off && !accepted(m, c->name)) {
+        return refuse(m, "type '%s' is a toggle that is off for %u rows, and as %s they are "
+            "carried like the rest. That is a loss this reload does not accept: '%s'", c->name, off,
+            storage_names[kept], c->name);
+    }
+    return 0;
+}
+
 /* declare(name, name_len, kind, size, align, desc, desc_len, on_unload, storage) -> slot */
 static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
 {
@@ -110,7 +142,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     enum bridge_on_unload on_unload = (enum bridge_on_unload)a[7];
     enum bridge_storage kept = (enum bridge_storage)a[8];
     uint32_t size = (uint32_t)a[3], align = (uint32_t)a[4], i;
-    declared_type *c = nullptr;
+    declared_type *c = nullptr, *was = nullptr;
     char name[128], *bare;
     uint64_t print;
 
@@ -153,7 +185,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     print = fingerprint(kind == BRIDGE_TAG ? "" : desc_at, a[6]) ^ kind;
 
     for (i = 0; i < b->type_count; i ++) {
-        if (!strcmp(b->types[i]->name, name)) c = b->types[i];
+        if (!strcmp(b->types[i]->name, name) && !b->types[i]->superseded) c = b->types[i];
     }
     if (c && c->fingerprint != print) {
         char others[160];
@@ -167,8 +199,17 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
          * declarer states the same - storage.md, *Storage layouts* */
         char others[160];
         also_declared(b, m, c, others, sizeof others);
-        return refuse(m, "type '%s' is stated as %s here, and it was declared as %s%s", name,
-            storage_names[kept], storage_names[c->storage], others);
+        /* lifetime.md, *When a component is moved*: it is, at a reload of the one module that
+         * declares it. A type is made for what it becomes, and takes the rows if the reload
+         * holds */
+        for (i = 0; m->reloads && i < m->reloads->declared_count && m->reloads->declared[i] != c; i ++) {}
+        if (others[0] || !m->reloads || i == m->reloads->declared_count) {
+            return refuse(m, "type '%s' is stated as %s here, and it was declared as %s%s", name,
+                storage_names[kept], storage_names[c->storage], others);
+        }
+        if (moved_storage(m, c, kept)) return 1;
+        was = c;
+        c = nullptr;
     }
     if (!c) {
         /* The descriptor is read and laid out. A field's type is a bare C name, looked for in
@@ -261,6 +302,8 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
         c->fingerprint = print;
         c->zero = zero;
         c->deps = deps;
+        c->replaces = was;
+        if (was) was->superseded = true;
         b->types[b->type_count ++] = c;
         /* a declared type a field of this one names is held for as long as this one is */
         for (k = 0; k < s.field_count; k ++) {

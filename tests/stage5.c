@@ -99,6 +99,7 @@ static bridge_artifact native(const char *identity, const char *path)
     a.cfg.spawns = BRIDGE_NONE;
     a.cfg.persistent = BRIDGE_NONE;
     a.cfg.changes = 1 << 20;
+    a.cfg.loss_count = BRIDGE_NONE;
     a.cfg.config = BRIDGE_NO_CONFIG;
     a.backend = "native";
     a.path = path;

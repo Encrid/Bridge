@@ -96,6 +96,7 @@ static bridge_artifact store_module(const char *path, int64_t spawns, uint32_t s
     a.cfg.spawns = spawns;
     a.cfg.persistent = BRIDGE_NONE;
     a.cfg.changes = changes;
+    a.cfg.loss_count = BRIDGE_NONE;
     a.cfg.config = BRIDGE_NO_CONFIG;
     a.backend = "native";
     a.path = path;
@@ -176,6 +177,36 @@ static uint64_t ran(bridge *b, const char *phase)
     t = os_now() - t;
     block_barrier(b);
     return t;
+}
+
+/* lifetime.md, *When a component is moved*: a module that keeps st:X one way, reloaded as a
+ * build that keeps it another. What storage has of it after is said from in here, whatever
+ * became of the module. */
+static const char *const kept_as[] = { "", "a table", "a sparse set", "a toggle", "direct-indexed", "a singleton" };
+
+static void moved_case(bridge_config cfg, uint32_t from, uint32_t to, const char *prepare,
+                       const char *const *losses, int64_t loss_count)
+{
+    static const char *const built[] = { "", NMOVE1_PATH, NMOVE2_PATH, NMOVE3_PATH, NMOVE4_PATH, NMOVE5_PATH };
+    bridge *b = bridge_create(&cfg, sink, nullptr);
+    bridge_artifact a = store_module(built[from], 8, 1 << 20, 4096);
+    printf("%s to %s%s%s\n", kept_as[from], kept_as[to], *prepare ? ", after " : "", prepare);
+    a.cfg.reloadable = a.cfg.hot_reload = BRIDGE_TRUE;
+    if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); exit(1); }
+    (void)bridge_phase(b, "spawn");
+    if (*prepare) (void)bridge_phase(b, prepare);
+    (void)bridge_phase(b, "look");
+    a.path = built[to];
+    a.cfg.losses = losses;
+    a.cfg.loss_count = loss_count;
+    printf("  reload: %s\n", bridge_reload(b, &a) ? "refused" : "done");
+    (void)bridge_phase(b, "look");
+    for (uint32_t i = 0; i < b->type_count; i ++) {
+        const declared_type *c = b->types[i];
+        if (strcmp(c->name, "st:X")) continue;
+        printf("  storage: st:X is %s, carried by %u\n", kept_as[c->storage], storage_count(b->storage, c->type));
+    }
+    (void)bridge_destroy(b);
 }
 
 /* Four of nstress, each in its own namespace, a hundred rounds of work and check. */
@@ -398,6 +429,32 @@ int main(int argc, char **argv)
         run(b, "look");
         run(b, "destroy");          /* and both tables go when they empty */
         run(b, "look");
+    } else if (!strcmp(what, "move")) {
+        static const char *const x[1] = { "st:X" };
+        (void)bridge_destroy(b);
+        cfg.budget.sparse_sets = cfg.budget.direct_indexed = 1;
+        /* every one of the four that an entity carries, to every other */
+        for (uint32_t from = 1; from <= 4; from ++) {
+            for (uint32_t to = 1; to <= 4; to ++) {
+                if (from != to) moved_case(cfg, from, to, "", nullptr, BRIDGE_NONE);
+            }
+        }
+        /* to a singleton: from one entity; from none; and from three, which nothing chooses among */
+        moved_case(cfg, 1, 5, "detach_b", nullptr, BRIDGE_NONE);
+        moved_case(cfg, 2, 5, "detach_b", nullptr, BRIDGE_NONE);
+        moved_case(cfg, 3, 5, "detach_b_half", nullptr, BRIDGE_NONE);
+        moved_case(cfg, 4, 5, "", nullptr, BRIDGE_NONE);
+        /* and from one, which no entity is there to carry */
+        moved_case(cfg, 5, 1, "", nullptr, BRIDGE_NONE);
+        /* a toggle with a row that is off: refused, naming the loss, until it is accepted */
+        moved_case(cfg, 3, 1, "flicker", nullptr, BRIDGE_NONE);
+        moved_case(cfg, 3, 1, "flicker", x, 1);
+        /* a loss that is accepted and not made */
+        moved_case(cfg, 1, 2, "", x, 1);
+        /* no room for the rows where they are to go: nothing has moved */
+        cfg.budget.columns = 112;
+        moved_case(cfg, 1, 2, "", nullptr, BRIDGE_NONE);
+        b = bridge_create(&cfg, sink, nullptr);
     } else if (!strcmp(what, "tag") || !strcmp(what, "tagbad")) {
         /* storage.md, *A tag*: one in each storage layout */
         a = store_module(!strcmp(what, "tag") ? NTAG_PATH : NTAGBAD_PATH, 8, 1 << 20, 4096);

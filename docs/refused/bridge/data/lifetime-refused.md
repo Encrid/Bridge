@@ -32,6 +32,16 @@ Refused: a fourth value that makes the unload itself fail while entities still c
 a new failure path nothing has asked for. The condition that brings it back is data that must not be
 lost by an unload somebody else requested.
 
+## When a component is moved
+
+Of `lifetime.md`, *When a component is moved*. What becomes of a row that is off, and what else
+was weighed, is in the record of `STAGE11.md`, *The questions*.
+
+Refused: moving a component where it stands, a table at a time, so that it never needs room for
+both. It is less memory for the length of a reload; and a move that fails half way has moved
+half, where this one has moved nothing. The condition that brings it back is a deployment that
+cannot give a reload the room, measured.
+
 ## When a component layout changed
 
 Of `lifetime.md`, *When a component layout changed*.

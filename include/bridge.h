@@ -163,9 +163,15 @@ typedef struct {
      * looked for among the deployment's own, as it is written */
     const bridge_phase_name *phases; uint32_t phase_count;
     uint32_t pad5;
+    /* what a reload accepts to lose, each by its name: 'game:Position.z' for a field that goes,
+     * 'game:Shield' for the rows of a toggle that are off - docs/bridge/data/lifetime.md.
+     * `loss_count` is how many, or BRIDGE_NONE for none: zero is unset. A name that is here
+     * and is not lost is refused, as one that is lost and is not here */
+    const char *const *losses;
+    int64_t  loss_count;
 } bridge_module_config;
 #define BRIDGE_AT(member, at) static_assert(offsetof(bridge_module_config, member) == at)
-static_assert(sizeof(bridge_module_config) == 184 && alignof(bridge_module_config) == 8);
+static_assert(sizeof(bridge_module_config) == 200 && alignof(bridge_module_config) == 8);
 BRIDGE_AT(identity, 0);    BRIDGE_AT(abi, 8);            BRIDGE_AT(trusted, 12);
 BRIDGE_AT(reloadable, 13); BRIDGE_AT(hot_reload, 14);    BRIDGE_AT(pinned, 15);
 BRIDGE_AT(on_error, 16);   BRIDGE_AT(pad0, 17);          BRIDGE_AT(max_system_failures, 24);
@@ -177,7 +183,8 @@ BRIDGE_AT(changes, 104);   BRIDGE_AT(read, 112);         BRIDGE_AT(read_count, 1
 BRIDGE_AT(pad2, 124);      BRIDGE_AT(write, 128);        BRIDGE_AT(write_count, 136);
 BRIDGE_AT(pad3, 140);      BRIDGE_AT(config, 144);       BRIDGE_AT(settings, 152);
 BRIDGE_AT(setting_count, 160); BRIDGE_AT(pad4, 164);     BRIDGE_AT(phases, 168);
-BRIDGE_AT(phase_count, 176); BRIDGE_AT(pad5, 180);
+BRIDGE_AT(phase_count, 176); BRIDGE_AT(pad5, 180);       BRIDGE_AT(losses, 184);
+BRIDGE_AT(loss_count, 192);
 #undef BRIDGE_AT
 
 typedef struct {
@@ -186,10 +193,10 @@ typedef struct {
     const void *bytes; size_t len;   /* the image, or null */
     const char *path;                /* where it is, or null. both go to the backend */
 } bridge_artifact;
-static_assert(sizeof(bridge_artifact) == 216 && alignof(bridge_artifact) == 8);
-static_assert(offsetof(bridge_artifact, cfg) == 0 && offsetof(bridge_artifact, backend) == 184);
-static_assert(offsetof(bridge_artifact, bytes) == 192 && offsetof(bridge_artifact, len) == 200);
-static_assert(offsetof(bridge_artifact, path) == 208);
+static_assert(sizeof(bridge_artifact) == 232 && alignof(bridge_artifact) == 8);
+static_assert(offsetof(bridge_artifact, cfg) == 0 && offsetof(bridge_artifact, backend) == 200);
+static_assert(offsetof(bridge_artifact, bytes) == 208 && offsetof(bridge_artifact, len) == 216);
+static_assert(offsetof(bridge_artifact, path) == 224);
 
 /* what comes back out */
 typedef struct {
