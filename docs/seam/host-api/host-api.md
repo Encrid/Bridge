@@ -31,6 +31,26 @@ that are compiled against `include/` alone are linked with it, so every run of t
 through it; and the first of them is linked a second time with the static one, and runs every
 one of its cases again.
 
+**Every struct of the seam is laid out where it is stated**, so that a binding in another
+language is written against numbers and checked by them. `bridge.h` asserts the size of each
+struct and the offset of every member, and leaves no padding to a compiler: a gap is a member
+named `pad`, numbered where a struct has several, written as zero and never read. It is the rule
+`bridge-abi.h` has for what a module reads - `wasm.md`, *The ABI layouts* - and `bridge-backend.h`
+has it too, for a backend that is not in C. A pointer and a `size_t` are eight bytes: no build of
+the library exists for any other. A host in C writes these structs by member name, and never
+sees a `pad`.
+
+**To a C++ compiler the three seam headers are C.** They open `extern "C"`, so a host or a
+backend in C++ links the names as they are exported. They are C23 otherwise, and what they use
+of it C++ has too: an enum of a stated width, a typed constant, `static_assert`. The two SDK
+headers are not for C++: they choose an accessor by `_Generic`, which C++ does not have, and a
+module in another language has its own SDK - `PLAN.md`, stage 15. Read as C++20 by a compiler
+that is not this project's, all three parse; a C++ host that links and runs is stage 13's.
+
+**What is not yet stated for a language that is not C** is the seam in a form that needs no C
+parser at all. That is `PLAN.md`, stage 15, which describes all three seams and not only the
+module's.
+
 Refused: a shared library only. It fails nothing, and it is one file fewer; it was not chosen,
 because a host that must be a single file with nothing beside it has no other way. Refused: a
 static library only, which a language that can only load a shared library cannot use at all.

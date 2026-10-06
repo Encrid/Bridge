@@ -18,6 +18,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/* To a C++ compiler these are C: the names are not mangled, and a host in C++ links them. */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* A module states the version it was built against; one built against another is refused. */
 constexpr uint32_t BRIDGE_ABI = 1;
 
@@ -143,5 +148,9 @@ static_assert(offsetof(bridge_log_record, when) == 0 && offsetof(bridge_log_reco
 static_assert(offsetof(bridge_log_record, level) == 5 && offsetof(bridge_log_record, system) == 6);
 static_assert(offsetof(bridge_log_record, text) == 8 && offsetof(bridge_log_record, len) == 12);
 static_assert(offsetof(bridge_log_record, arg) == 16);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

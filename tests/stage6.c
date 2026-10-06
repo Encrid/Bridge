@@ -128,16 +128,16 @@ static bridge_artifact counter()
 
 /* a module with every kind of setting, as a deployment would hand them over */
 static bridge_setting everything[11] = {
-    { "vsync", BRIDGE_BOOL,   { .b = true } },
-    { "width", BRIDGE_INT,    { .i = 1280 } },
-    { "scale", BRIDGE_FLOAT,  { .f = 1.5 } },
-    { "mode",  BRIDGE_STRING, { .s = "Adaptive" } },
-    { "title", BRIDGE_STRING, { .s = "hello" } },
-    { "path",  BRIDGE_STRING, { .s = "some/long/path.cfg" } },
-    { "small", BRIDGE_INT,    { .i = 7 } },
-    { "flags", BRIDGE_INT,    { .i = 3 } },             /* a bitmask, by its bits */
-    { "ratio", BRIDGE_INT,    { .i = 3 } },             /* an integer into a float field */
-    { "big",   BRIDGE_INT,    { .i = 8'589'934'592ll } },  /* more than 32 bits */
+    { .key = "vsync", .kind = BRIDGE_BOOL, .v = { .b = true } },
+    { .key = "width", .kind = BRIDGE_INT, .v = { .i = 1280 } },
+    { .key = "scale", .kind = BRIDGE_FLOAT, .v = { .f = 1.5 } },
+    { .key = "mode", .kind = BRIDGE_STRING, .v = { .s = "Adaptive" } },
+    { .key = "title", .kind = BRIDGE_STRING, .v = { .s = "hello" } },
+    { .key = "path", .kind = BRIDGE_STRING, .v = { .s = "some/long/path.cfg" } },
+    { .key = "small", .kind = BRIDGE_INT, .v = { .i = 7 } },
+    { .key = "flags", .kind = BRIDGE_INT, .v = { .i = 3 } },             /* a bitmask, by its bits */
+    { .key = "ratio", .kind = BRIDGE_INT, .v = { .i = 3 } },             /* an integer into a float field */
+    { .key = "big", .kind = BRIDGE_INT, .v = { .i = 8'589'934'592ll } },  /* more than 32 bits */
     { nullptr, 0, { 0 } },
 };
 
@@ -156,7 +156,8 @@ int main(int argc, char **argv)
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
     const char *phases[2] = { "update", "present" };
-    bridge_config cfg = { backends, 2, phases, 2, nullptr, 0, 1, 
+    bridge_config cfg = { .backends = backends, .backend_count = 2, .phases = phases,
+        .phase_count = 2, .threads = 1, .budget =
         { .entities = 4096, .tables = 64, .types = 64, .systems = 128, .terms = 8, .modules = 8,
           .persistent = 4096, .columns = 1 << 20 } };
     bridge_artifact a;

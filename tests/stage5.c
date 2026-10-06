@@ -226,7 +226,8 @@ int main(int argc, char **argv)
     bridge_order seen_first = { "view:watcher:seen", "view:fixer:fix" };
     bridge_order fix_first = { "view:fixer:fix", "view:watcher:seen" };
     bridge_order five_first = { "game:stamp5:stamp", "game:stamp9:stamp" };
-    bridge_config cfg = { backends, 2, phases, 2, nullptr, 0, 1, 
+    bridge_config cfg = { .backends = backends, .backend_count = 2, .phases = phases,
+        .phase_count = 2, .threads = 1, .budget =
         { .entities = 4096, .tables = 64, .types = 64, .systems = 128, .terms = 8, .modules = 8,
           .persistent = 4096, .columns = 1 << 20 } };
     bridge_artifact a;

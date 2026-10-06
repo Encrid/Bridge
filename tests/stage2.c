@@ -76,7 +76,8 @@ int main(int argc, char **argv)
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[1] = {{ "wasm", BACKEND_PATH }};
     const char *phases[1] = { "update" };
-    bridge_config cfg = { backends, 1, phases, 1, nullptr, 0, 1, 
+    bridge_config cfg = { .backends = backends, .backend_count = 1, .phases = phases,
+        .phase_count = 1, .threads = 1, .budget =
         { .entities = 4096, .tables = 64, .types = 64, .systems = 128, .terms = 8, .modules = 8,
           .persistent = 4096, .columns = 1 << 20 } };
     bridge_artifact a;

@@ -535,8 +535,9 @@ int abi_define(module *m, backend_err *err)
     };
     size_t i;
     for (i = 0; i < sizeof entries / sizeof *entries; i ++) {
-        backend_sig sig = { entries[i].params, entries[i].param_count,
-                            entries[i].results, entries[i].result_count };
+        backend_sig sig = { .params = entries[i].params, .param_count = entries[i].param_count,
+                            .results = entries[i].results,
+                            .result_count = entries[i].result_count };
         if (m->on->api.define_func(m->instance, BRIDGE_NAMESPACE, entries[i].name, entries[i].fn,
                                    m, &sig, err)) return 1;
     }

@@ -83,7 +83,9 @@ as it asked, until stage 10 removed it.
 A file in a later standard reads a header in an earlier one, which is the direction that costs
 nothing. **A standard binds only at a boundary someone else compiles**, and ours is stated here:
 a host or a backend written in C, and a module in C that uses a backend's SDK, is compiled as
-C23. zig is the compiler that builds all of it - *One compiler* - and a module in another
+C23. A host need not be in C at all: it links the library built, from any language that can call
+C, and for one in C++ the seam headers say they are C - `host-api.md`, *A host links a built
+library*. zig is the compiler that builds all of it - *One compiler* - and a module in another
 language needs none of these headers: *What an author is not bound by*.
 
 **The language is used fully, or C23 was not worth choosing over C11.** Every older spelling that

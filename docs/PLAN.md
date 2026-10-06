@@ -291,16 +291,21 @@ is the same bytes on every platform; and every test passes.*
 
 ## 13. A host, from outside
 
-A standalone host, built in its own repository against the library and nothing else, which is what
-tests the host seam: if it needs no part of Bridge-ASM700's inside, the seam is real. It has this
-repository as a submodule and builds it with `build.py`. Whatever it reads - files, layers, a
-manifest - it resolves into the structs of `host-api.md`, *The data*. `bridge_manifest_parse` ships
-beside the library, not inside it, for a host that wants it - `native.md`, *Identity*.
+A standalone host, in its own repository, that links the library built and nothing else of it, which
+is what tests the host seam - `host-api.md`, *A host links a built library*. It is handed the two
+library files and the headers, not the source tree: a host does not compile Bridge-ASM700. And a
+host may be in any language that can call C, so the seam is to be shown from more than C. Which
+languages, and whether one host or several, is this stage's first question, by the method of
+`STAGE0.md`; a host in C++ that links and runs is one of them, since the seam headers already say
+they are C to a C++ compiler and nothing has linked them as such. Whatever it reads - files, layers,
+a manifest - it resolves into the structs of `host-api.md`, *The data*. `bridge_manifest_parse`
+ships beside the library, not inside it, for a host that wants it - `native.md`, *Identity*.
 
-*Done when that host drives a real deployment for one pass and for many; it reloads a changed module
-and reports one that failed to load; a key it left unset is an error naming the key; and
-`bridge_manifest_parse` reads an identity out of a wasm binary and out of a native library in each
-of the three platforms' formats.*
+*Done when a host that was handed only the built library and its headers drives a real deployment
+for one pass and for many, in C and in each other language this stage chose, C++ among them; it
+reloads a changed module and reports one that failed to load; a key it left unset is an error naming
+the key; and `bridge_manifest_parse` reads an identity out of a wasm binary and out of a native
+library in each of the three platforms' formats.*
 
 ## 14. Diagnostics
 
@@ -316,7 +321,13 @@ zero, every budget of the bridge and of a module reads as what a test made it us
 most it ever used, and one deployment run twice, and on one thread and on four, gives the same checksum of
 every column at every barrier - `schedule.md`, *What a pass depends on*.*
 
-## 15. A module that is not C
+## 15. A seam, for a language that is not C
+
+**All three seams, where this stage was the module's alone.** A host and a backend may be in
+any language that can call C, as a module may be in any that makes a wasm module or a shared
+library. `bridge.h` and `bridge-backend.h` assert every layout as `bridge-abi.h` does, which is
+what a binding is checked against; what none of the three has is a form that needs no C parser.
+So this stage's first question, below, is asked of the three headers together.
 
 What a module needs to be written falls in two parts, and they have two owners - `README.md`,
 *Three layers, three seams*.

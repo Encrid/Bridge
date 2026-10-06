@@ -9,6 +9,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/* To a C++ compiler these are C: the names are not mangled, and a host in C++ links them. */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef _WIN32
 #define BACKEND_EXPORT [[gnu::dllexport]]
 #else
@@ -51,15 +56,24 @@ enum backend_setting_kind : uint8_t {
 typedef struct {
     const char *key;
     enum backend_setting_kind kind;
+    uint8_t pad[7];
     union { bool b; int64_t i; double f; const char *s; } v;
 } backend_setting;
+static_assert(sizeof(void *) == 8 && sizeof(size_t) == 8);
+static_assert(sizeof(backend_setting) == 24 && alignof(backend_setting) == 8);
+static_assert(offsetof(backend_setting, key) == 0 && offsetof(backend_setting, kind) == 8);
+static_assert(offsetof(backend_setting, pad) == 9 && offsetof(backend_setting, v) == 16);
 
 /* A signature is declared going in and checked coming out - signatures.md. */
 enum backend_type : uint8_t { BACKEND_I32 = 1, BACKEND_I64 = 2 };
 typedef struct {
-    const enum backend_type *params;  uint32_t param_count;
-    const enum backend_type *results; uint32_t result_count;
+    const enum backend_type *params;  uint32_t param_count;  uint32_t pad0;
+    const enum backend_type *results; uint32_t result_count; uint32_t pad1;
 } backend_sig;
+static_assert(sizeof(backend_sig) == 32 && alignof(backend_sig) == 8);
+static_assert(offsetof(backend_sig, params) == 0 && offsetof(backend_sig, param_count) == 8);
+static_assert(offsetof(backend_sig, pad0) == 12 && offsetof(backend_sig, results) == 16);
+static_assert(offsetof(backend_sig, result_count) == 24 && offsetof(backend_sig, pad1) == 28);
 
 /* A function Bridge-ASM700 provides to a module. Every value travels as 64 bits. Non-zero says
  * the call that reached it must not go on: a backend that can unwind a module does so there. */
@@ -72,13 +86,21 @@ typedef struct {
     const char *ns;    size_t ns_len;       /* not NUL-terminated */
     const char *field; size_t field_len;
     enum backend_import_kind kind;
+    uint8_t pad[7];
 } backend_import;
+static_assert(sizeof(backend_import) == 40 && alignof(backend_import) == 8);
+static_assert(offsetof(backend_import, ns) == 0 && offsetof(backend_import, ns_len) == 8);
+static_assert(offsetof(backend_import, field) == 16 && offsetof(backend_import, field_len) == 24);
+static_assert(offsetof(backend_import, kind) == 32 && offsetof(backend_import, pad) == 33);
 
 /* Which adopted memory answers which of a module's imports. */
 typedef struct {
     const char     *ns, *field;
     backend_memory *memory;
 } backend_memory_import;
+static_assert(sizeof(backend_memory_import) == 24 && alignof(backend_memory_import) == 8);
+static_assert(offsetof(backend_memory_import, ns) == 0 && offsetof(backend_memory_import, field) == 8);
+static_assert(offsetof(backend_memory_import, memory) == 16);
 
 typedef struct backend_api {
     backend *(*backend_create)(const backend_setting *settings, uint32_t count, backend_err *err);
@@ -128,5 +150,9 @@ typedef struct backend_api {
     "define_func", "instance_func", "call"
 constexpr uint32_t BACKEND_ENTRY_COUNT = 17;
 static_assert(sizeof(backend_api) == BACKEND_ENTRY_COUNT * sizeof(void (*)()));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

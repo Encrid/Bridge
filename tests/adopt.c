@@ -131,7 +131,8 @@ int main()
     /* 4. a function the host defines, with the signature it declared */
     {
         static const uint8_t params[2] = { BACKEND_I32, BACKEND_I64 }, results[1] = { BACKEND_I32 };
-        backend_sig sig = { params, 2, results, 1 };
+        backend_sig sig = { .params = params, .param_count = 2, .results = results,
+            .result_count = 1 };
         void *host_bytes = read_file(MODULE_DIR "/host.wasm", &len);
         backend_module *host = api.module_compile(be, host_bytes, len, nullptr, 0, &err);
         backend_instance *hi = host ? api.instance_create(be, host, nullptr, 0, &err) : nullptr;
@@ -150,7 +151,8 @@ int main()
      * watchdog that counted wake-ups instead of looking would lose one here and wait forever. */
     {
         static const uint8_t params[2] = { BACKEND_I32, BACKEND_I64 }, results[1] = { BACKEND_I32 };
-        backend_sig sig = { params, 2, results, 1 };
+        backend_sig sig = { .params = params, .param_count = 2, .results = results,
+            .result_count = 1 };
         void *host_bytes = read_file(MODULE_DIR "/host.wasm", &len);
         backend_module *timed = api.module_compile(be, host_bytes, len, nullptr, BACKEND_TIMEOUT, &err);
         backend_instance *ti = timed ? api.instance_create(be, timed, nullptr, 0, &err) : nullptr;

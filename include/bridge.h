@@ -7,7 +7,19 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/* To a C++ compiler these are C: the names are not mangled, and a host in C++ links them. */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct bridge bridge;
+
+/* A host may be in any language that can call C, so every struct here is laid out where it is
+ * stated: its size and each member's offset are asserted, and no padding is left to a
+ * compiler. Where alignment leaves a gap the gap is a member named `pad`, numbered where a
+ * struct has several: whoever writes the struct writes zero there, and nobody reads it. A
+ * pointer and a size_t are eight bytes: there is no build of this for any other. */
+static_assert(sizeof(void *) == 8 && sizeof(size_t) == 8);
 
 /* A backend the deployment configures: Bridge-ASM700 opens the library, and a module names
  * the backend that runs it. */
@@ -18,15 +30,24 @@ enum bridge_setting_kind : uint8_t {
 typedef struct {
     const char *key;
     enum bridge_setting_kind kind;              /* zero is unset */
+    uint8_t pad[7];
     union { bool b; int64_t i; double f; const char *s; } v;
 } bridge_setting;
+static_assert(sizeof(bridge_setting) == 24 && alignof(bridge_setting) == 8);
+static_assert(offsetof(bridge_setting, key) == 0 && offsetof(bridge_setting, kind) == 8);
+static_assert(offsetof(bridge_setting, pad) == 9 && offsetof(bridge_setting, v) == 16);
 
 typedef struct {
     const char *name;
     const char *library;
     /* the backend's own, passed to it unread: it refuses a key it does not know */
     const bridge_setting *settings; uint32_t setting_count;
+    uint32_t pad;
 } bridge_backend;
+static_assert(sizeof(bridge_backend) == 32 && alignof(bridge_backend) == 8);
+static_assert(offsetof(bridge_backend, name) == 0 && offsetof(bridge_backend, library) == 8);
+static_assert(offsetof(bridge_backend, settings) == 16 && offsetof(bridge_backend, setting_count) == 24);
+static_assert(offsetof(bridge_backend, pad) == 28);
 
 /* Every one is stated: zero is unset, and refused. docs/bridge/memory/budgets.md. How many
  * there may be at once of each thing, and then how many bytes. */
@@ -38,21 +59,37 @@ typedef struct {
     uint32_t systems;         /* systems and observers registered */
     uint32_t terms;           /* terms one of them may have */
     uint32_t modules;         /* modules loaded */
+    uint32_t pad;
     uint64_t persistent;      /* the persistent arena */
     uint64_t columns;         /* component columns and entity arrays */
 } bridge_budget;
+static_assert(sizeof(bridge_budget) == 48 && alignof(bridge_budget) == 8);
+static_assert(offsetof(bridge_budget, entities) == 0 && offsetof(bridge_budget, tables) == 8);
+static_assert(offsetof(bridge_budget, types) == 12 && offsetof(bridge_budget, systems) == 16);
+static_assert(offsetof(bridge_budget, terms) == 20 && offsetof(bridge_budget, modules) == 24);
+static_assert(offsetof(bridge_budget, pad) == 28 && offsetof(bridge_budget, persistent) == 32);
+static_assert(offsetof(bridge_budget, columns) == 40);
 
 /* Two systems that conflict in one phase, in the order they are to run. A system is named by
  * its module's identity without the version, then itself: "game:actors:movement". */
 typedef struct { const char *before, *after; } bridge_order;
+static_assert(sizeof(bridge_order) == 16 && alignof(bridge_order) == 8);
+static_assert(offsetof(bridge_order, before) == 0 && offsetof(bridge_order, after) == 8);
 
 typedef struct {
-    const bridge_backend *backends; uint32_t backend_count;
+    const bridge_backend *backends; uint32_t backend_count; uint32_t pad0;
     const char *const *phases;      uint32_t phase_count;   /* a phase is a name, and no more */
+    uint32_t pad1;
     const bridge_order *order;      uint32_t order_count;
     uint32_t threads;               /* how many run a phase, counting the caller's. zero is unset */
     bridge_budget budget;
 } bridge_config;
+static_assert(sizeof(bridge_config) == 96 && alignof(bridge_config) == 8);
+static_assert(offsetof(bridge_config, backends) == 0 && offsetof(bridge_config, backend_count) == 8);
+static_assert(offsetof(bridge_config, pad0) == 12 && offsetof(bridge_config, phases) == 16);
+static_assert(offsetof(bridge_config, phase_count) == 24 && offsetof(bridge_config, pad1) == 28);
+static_assert(offsetof(bridge_config, order) == 32 && offsetof(bridge_config, order_count) == 40);
+static_assert(offsetof(bridge_config, threads) == 44 && offsetof(bridge_config, budget) == 48);
 
 enum bridge_on_error : uint8_t { BRIDGE_FAIL = 1, BRIDGE_SKIP = 2 };    /* zero is unset */
 /* Two values and not one, because they say opposite things: a module with no limit may use
@@ -73,12 +110,14 @@ typedef struct {
     bool     hot_reload;         /* the deployment allows bridge_reload. it only ever forbids */
     bool     pinned;             /* its systems run on the thread that loaded it, and no other */
     enum bridge_on_error on_error;   /* what losing it costs the deployment */
+    uint8_t  pad0[7];
     /* each of the next six: zero is unset, BRIDGE_NO_LIMIT is "no limit" */
     int64_t  max_system_failures;    /* each system is counted against it, alone */
     int64_t  work_limit;         /* work one system invocation may do, in the backend's units */
     int64_t  memory_limit;       /* bytes. a ceiling, never re-set */
     int64_t  init_timeout, reload_timeout, shutdown_timeout;    /* nanoseconds, per call */
     uint8_t  log_level;          /* a line above it is not written: enum bridge_level */
+    uint8_t  pad1[3];
     uint32_t scratch, log_ring, spans;   /* its private memory, each in bytes */
     /* what is set aside for it alone, so that what it mints does not depend on who ran
      * beside it. each of the three: zero is unset, BRIDGE_NONE is "none" */
@@ -88,13 +127,30 @@ typedef struct {
                                   * two barriers: 24 for each, and an attach's value with it */
 
     const char *const *read;  uint32_t read_count;       /* grants */
+    uint32_t pad2;
     const char *const *write; uint32_t write_count;
+    uint32_t pad3;
 
     /* its own settings, and the component of its that they seed - docs/seam/host-api/config.md.
      * `config` is a component's name or BRIDGE_NO_CONFIG; null is unset */
     const char *config;
     const bridge_setting *settings; uint32_t setting_count;
+    uint32_t pad4;
 } bridge_module_config;
+#define BRIDGE_AT(member, at) static_assert(offsetof(bridge_module_config, member) == at)
+static_assert(sizeof(bridge_module_config) == 168 && alignof(bridge_module_config) == 8);
+BRIDGE_AT(identity, 0);    BRIDGE_AT(abi, 8);            BRIDGE_AT(trusted, 12);
+BRIDGE_AT(reloadable, 13); BRIDGE_AT(hot_reload, 14);    BRIDGE_AT(pinned, 15);
+BRIDGE_AT(on_error, 16);   BRIDGE_AT(pad0, 17);          BRIDGE_AT(max_system_failures, 24);
+BRIDGE_AT(work_limit, 32); BRIDGE_AT(memory_limit, 40);  BRIDGE_AT(init_timeout, 48);
+BRIDGE_AT(reload_timeout, 56); BRIDGE_AT(shutdown_timeout, 64); BRIDGE_AT(log_level, 72);
+BRIDGE_AT(pad1, 73);       BRIDGE_AT(scratch, 76);       BRIDGE_AT(log_ring, 80);
+BRIDGE_AT(spans, 84);      BRIDGE_AT(spawns, 88);        BRIDGE_AT(persistent, 96);
+BRIDGE_AT(changes, 104);   BRIDGE_AT(read, 112);         BRIDGE_AT(read_count, 120);
+BRIDGE_AT(pad2, 124);      BRIDGE_AT(write, 128);        BRIDGE_AT(write_count, 136);
+BRIDGE_AT(pad3, 140);      BRIDGE_AT(config, 144);       BRIDGE_AT(settings, 152);
+BRIDGE_AT(setting_count, 160); BRIDGE_AT(pad4, 164);
+#undef BRIDGE_AT
 
 typedef struct {
     bridge_module_config cfg;
@@ -102,6 +158,10 @@ typedef struct {
     const void *bytes; size_t len;   /* the image, or null */
     const char *path;                /* where it is, or null. both go to the backend */
 } bridge_artifact;
+static_assert(sizeof(bridge_artifact) == 200 && alignof(bridge_artifact) == 8);
+static_assert(offsetof(bridge_artifact, cfg) == 0 && offsetof(bridge_artifact, backend) == 168);
+static_assert(offsetof(bridge_artifact, bytes) == 176 && offsetof(bridge_artifact, len) == 184);
+static_assert(offsetof(bridge_artifact, path) == 192);
 
 /* what comes back out */
 typedef struct {
@@ -112,7 +172,13 @@ typedef struct {
     uint32_t    when;                /* barrier count, then offset in the phase */
     uint32_t    arg[2];
     uint8_t     level;               /* lower is worse: enum bridge_level */
+    uint8_t     pad[7];
 } bridge_record;
+static_assert(sizeof(bridge_record) == 48 && alignof(bridge_record) == 8);
+static_assert(offsetof(bridge_record, identity) == 0 && offsetof(bridge_record, system) == 8);
+static_assert(offsetof(bridge_record, text) == 16 && offsetof(bridge_record, len) == 24);
+static_assert(offsetof(bridge_record, when) == 28 && offsetof(bridge_record, arg) == 32);
+static_assert(offsetof(bridge_record, level) == 40 && offsetof(bridge_record, pad) == 41);
 
 /* The severities of syslog, RFC 5424, by its numbers: 0 is the worst and 7 the most detail.
  * These four are the ones Bridge-ASM700 and its bindings name; a module may write any of the
@@ -161,12 +227,20 @@ enum bridge_state : uint8_t { BRIDGE_RUNNING = 1, BRIDGE_STOPPED = 2 };
 typedef struct {
     const char       *identity;     /* until the next load, unload or reload */
     enum bridge_state state;
+    uint8_t           pad[7];
 } bridge_module_info;
+static_assert(sizeof(bridge_module_info) == 16 && alignof(bridge_module_info) == 8);
+static_assert(offsetof(bridge_module_info, identity) == 0 && offsetof(bridge_module_info, state) == 8);
+static_assert(offsetof(bridge_module_info, pad) == 9);
 BRIDGE_API int bridge_modules(bridge *b, bridge_module_info *out, int max);
 
 /* Run the systems registered to one phase, then its barrier. 0 if the phase ran, whatever
  * its systems did: a system that failed is a record, not a return code. With a pinned module
  * loaded, from the thread that loaded it. */
 BRIDGE_API [[nodiscard]] int bridge_phase(bridge *b, const char *name);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
