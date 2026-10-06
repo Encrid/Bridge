@@ -102,7 +102,13 @@ static_assert(sizeof(backend_memory_import) == 24 && alignof(backend_memory_impo
 static_assert(offsetof(backend_memory_import, ns) == 0 && offsetof(backend_memory_import, field) == 8);
 static_assert(offsetof(backend_memory_import, memory) == 16);
 
+/* The backend seam's number: what this header says. A backend answers the one it was built
+ * against, and Bridge-ASM700 refuses a library that answers another, before it asks it for
+ * anything else - docs/seam/backend/backend.md, *A seam has a number*. */
+constexpr uint32_t BACKEND_ABI = 1;
+
 typedef struct backend_api {
+    uint32_t (*backend_abi)(void);          /* BACKEND_ABI. first, and always first */
     backend *(*backend_create)(const backend_setting *settings, uint32_t count, backend_err *err);
     void     (*backend_destroy)(backend *b);
     enum backend_capability (*backend_capabilities)(backend *b);
@@ -144,13 +150,13 @@ typedef struct backend_api {
 
 /* The names a backend exports, in the order of backend_api's members. */
 #define BACKEND_ENTRIES \
-    "backend_create", "backend_destroy", "backend_capabilities", \
+    "backend_abi", "backend_create", "backend_destroy", "backend_capabilities", \
     "memory_shape", "memory_adopt", "memory_release", \
     "module_compile", "module_imports", "module_destroy", \
     "instance_create", "instance_destroy", \
     "instance_set_work_limit", "instance_set_timeout", "instance_set_memory_limit", \
     "define_func", "instance_func", "call"
-constexpr uint32_t BACKEND_ENTRY_COUNT = 17;
+constexpr uint32_t BACKEND_ENTRY_COUNT = 18;
 static_assert(sizeof(backend_api) == BACKEND_ENTRY_COUNT * sizeof(void (*)()));
 
 #ifdef __cplusplus

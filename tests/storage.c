@@ -193,7 +193,7 @@ int main(int argc, char **argv)
     bridge_backend backends[1] = {{ "native", NATIVE_PATH }};
     /* the wasm backend beside it, which asks for address space around a block it maps */
     bridge_backend both[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
-    bridge_config cfg = { .backends = backends, .backend_count = 1, .phases = phases,
+    bridge_config cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 1, .phases = phases,
         .phase_count = PHASES, .threads = 1, .budget =
         { .entities = 400'000, .tables = 32'768, .types = 64, .systems = 64, .terms = 4, .modules = 4,
           .persistent = 4096, .columns = 64 << 20 } };

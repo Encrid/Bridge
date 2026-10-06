@@ -106,6 +106,13 @@ bridge *bridge_create(const bridge_config *cfg, bridge_sink_fn sink, void *ud)
     b->granule = 1;
     b->sink = sink;
     b->ud = ud;
+    /* host-api.md, *A seam has a number*: read before anything else of the struct is */
+    if (cfg->abi != BRIDGE_HOST_ABI) {
+        if (!cfg->abi) say(b, nullptr, nullptr, BRIDGE_ERR, "abi is unset");
+        else say(b, nullptr, nullptr, BRIDGE_ERR, "the host is of host ABI %u, and this is %u",
+            cfg->abi, (unsigned)BRIDGE_HOST_ABI);
+        goto refuse;
+    }
     b->backends = calloc(cfg->backend_count ? cfg->backend_count : 1, sizeof *b->backends);
     b->phases = calloc(cfg->phase_count ? cfg->phase_count : 1, sizeof *b->phases);
 

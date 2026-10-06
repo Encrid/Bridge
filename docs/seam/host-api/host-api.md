@@ -55,6 +55,35 @@ Refused: a shared library only. It fails nothing, and it is one file fewer; it w
 because a host that must be a single file with nothing beside it has no other way. Refused: a
 static library only, which a language that can only load a shared library cannot use at all.
 
+## A seam has a number
+
+**Each of the three seams has a number, and a side that states another is refused before
+anything else of it is read.** A host, a backend and a module are each built at their own time,
+and since the library is a file a host links, at a time other than the library's. A struct read
+at offsets the other side does not use is not an error anybody is told of; so it is made one.
+
+    the host seam       BRIDGE_HOST_ABI   a host states it first in `bridge_config`, and
+                                          `bridge_create` refuses another, by both numbers
+    the backend seam    BACKEND_ABI       a backend's library answers it from its first
+                                          entry, and one that answers another is not asked
+                                          for the rest - `backend.md`, *What a backend is
+                                          asked for*
+    the module seam     BRIDGE_ABI        a module states it in its manifest, and a load
+                                          refuses another - `wasm.md`, *The ABI layouts*
+
+`tests/stage2.c`, cases `hostabi` and `hostabiunset`, and `tests/stage4.c`, case `backendabi`.
+Each number is where it can always be found: first in the struct, the first entry.
+
+**All three are 1, and stay 1 until there is a release.** A release is a version of this
+repository that is tagged and handed to something that is not rebuilt with it. None exists, so
+until one does a layout changes freely and no number moves. From the first release on, a change
+to what a seam lays out or means raises that seam's number, and only that seam's.
+
+Refused: one number for the three. A change to what a module reads would then refuse every
+host and every backend, which it does not concern. The condition that brings it back is seams
+that can no longer change apart. Refused: a number for the module seam alone, which is what
+this had: a host or a backend built at another time was read as it lay.
+
 ## Bridge-ASM700 parses nothing
 
 Which side owns what is `split.md`, *The split*. At this seam it comes to one thing: **Bridge-ASM700
@@ -135,6 +164,7 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
         const bridge_backend *backends; uint32_t backend_count;
         const char *const *phases;   uint32_t phase_count;   /* array order IS the order */
         const bridge_order *order;   uint32_t order_count;
+        /* and before all of it: uint32_t abi, BRIDGE_HOST_ABI */
         uint32_t            threads;                         /* counting the caller's */
         bridge_budget       budget;
         enum bridge_flag    validate, profile;               /* [checks]: stage 14 */

@@ -269,6 +269,11 @@ BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] bac
          | BACKEND_SIDE_BY_SIDE;
 }
 
+#ifndef SAYS_ABI
+#define SAYS_ABI BACKEND_ABI
+#endif
+BACKEND_EXPORT uint32_t backend_abi() { return SAYS_ABI; }
+
 BACKEND_EXPORT void memory_shape([[maybe_unused]] backend *b, uint64_t *reservation, uint64_t *guard,
                                  uint64_t *granule)
 {

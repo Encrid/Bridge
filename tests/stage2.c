@@ -79,7 +79,7 @@ int main(int argc, char **argv)
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[1] = {{ "wasm", BACKEND_PATH }};
     const char *phases[1] = { "update" };
-    bridge_config cfg = { .backends = backends, .backend_count = 1, .phases = phases,
+    bridge_config cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 1, .phases = phases,
         .phase_count = 1, .threads = 1, .budget =
         { .entities = 4096, .tables = 64, .types = 64, .systems = 128, .terms = 8, .modules = 8,
           .persistent = 4096, .columns = 1 << 20 } };
@@ -93,6 +93,9 @@ int main(int argc, char **argv)
         return 0;
     }
     if (!strcmp(what, "nolib")) backends[0].library = "no-such-backend-library";
+    /* a host built against another bridge.h, or that stated none: nothing else is read */
+    if (!strcmp(what, "hostabi")) cfg.abi = BRIDGE_HOST_ABI + 1;
+    if (!strcmp(what, "hostabiunset")) cfg.abi = 0;
 
     b = bridge_create(&cfg, sink, nullptr);
     if (!b) {

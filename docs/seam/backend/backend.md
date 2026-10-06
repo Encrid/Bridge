@@ -12,11 +12,12 @@ What matters at this seam is the far side of that list: config, discovery and th
 host's, so **a backend never has a file to find**. It is handed a module's bytes and its path,
 uninspected, and the settings that are its own.
 
-**Bridge-ASM700 opens the backend libraries its config names**, and finds the seventeen entries in each by
+**Bridge-ASM700 opens the backend libraries its config names**, and finds the eighteen entries in each by
 name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
 
 ## What a backend is asked for
 
+    backend_abi()                              -> the backend seam's number
     backend_create(settings)                   -> backend
     backend_destroy(backend)
     backend_capabilities(backend)              -> flags
@@ -38,8 +39,9 @@ name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
     instance_func(instance, name)              -> func
     call(func, status)                         -> err
 
-Seventeen entries. The original Bridge's `ModuleRuntime` trait had fourteen, four of which were
-filesystem and timer work that has moved out.
+Eighteen entries. The first says which backend seam the library was built against, and one of
+another is asked for nothing more - `host-api.md`, *A seam has a number*. The original Bridge's
+`ModuleRuntime` trait had fourteen, four of which were filesystem and timer work that has moved out.
 
 **`module` at this seam is a module's loaded image**: compiled bytes on the wasm backend, an opened
 library on the native one. `module_compile` takes
@@ -174,5 +176,5 @@ Meaningless to one backend is a different thing, and that is `store_create`: not
 
 Bridge-ASM700 hands it bytes, memories and functions to offer a module, and asks it to run a
 function. That is the
-entire relationship, and it is why the surface is seventeen entries rather than a second copy of
+entire relationship, and it is why the surface is eighteen entries rather than a second copy of
 Bridge-ASM700.

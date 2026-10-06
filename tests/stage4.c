@@ -106,7 +106,7 @@ int main(int argc, char **argv)
     const char *what = argc > 1 ? argv[1] : "";
     bridge_backend backends[2] = {{ "wasm", BACKEND_PATH }, { "native", NATIVE_PATH }};
     const char *phases[2] = { "update", "present" };
-    bridge_config cfg = { .backends = backends, .backend_count = 2, .phases = phases,
+    bridge_config cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 2, .phases = phases,
         .phase_count = 2, .threads = 1, .budget =
         { .entities = 4096, .tables = 64, .types = 64, .systems = 128, .terms = 8, .modules = 8,
           .persistent = 4096, .columns = 1 << 20 } };
@@ -116,6 +116,8 @@ int main(int argc, char **argv)
     int i;
     setvbuf(stdout, nullptr, _IONBF, 0);
 
+    /* a backend library that says it is of another backend seam */
+    if (!strcmp(what, "backendabi")) backends[1].library = NATIVE_OTHER_PATH;
     if (!strcmp(what, "setting")) {             /* a key the backend does not know */
         backends[1].settings = &cache;
         backends[1].setting_count = 1;

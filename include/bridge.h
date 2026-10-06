@@ -14,6 +14,11 @@ extern "C" {
 
 typedef struct bridge bridge;
 
+/* The host seam's number: what this header says. A host states the one it was built or bound
+ * against, first in bridge_config, and a library that says another refuses to be created -
+ * docs/seam/host-api/host-api.md, *A seam has a number*. */
+constexpr uint32_t BRIDGE_HOST_ABI = 1;
+
 /* A host may be in any language that can call C, so every struct here is laid out where it is
  * stated: its size and each member's offset are asserted, and no padding is left to a
  * compiler. Where alignment leaves a gap the gap is a member named `pad`, numbered where a
@@ -77,6 +82,8 @@ static_assert(sizeof(bridge_order) == 16 && alignof(bridge_order) == 8);
 static_assert(offsetof(bridge_order, before) == 0 && offsetof(bridge_order, after) == 8);
 
 typedef struct {
+    uint32_t abi;                   /* BRIDGE_HOST_ABI. first, and always first */
+    uint32_t pad2;
     const bridge_backend *backends; uint32_t backend_count; uint32_t pad0;
     const char *const *phases;      uint32_t phase_count;   /* a phase is a name, and no more */
     uint32_t pad1;
@@ -84,12 +91,13 @@ typedef struct {
     uint32_t threads;               /* how many run a phase, counting the caller's. zero is unset */
     bridge_budget budget;
 } bridge_config;
-static_assert(sizeof(bridge_config) == 96 && alignof(bridge_config) == 8);
-static_assert(offsetof(bridge_config, backends) == 0 && offsetof(bridge_config, backend_count) == 8);
-static_assert(offsetof(bridge_config, pad0) == 12 && offsetof(bridge_config, phases) == 16);
-static_assert(offsetof(bridge_config, phase_count) == 24 && offsetof(bridge_config, pad1) == 28);
-static_assert(offsetof(bridge_config, order) == 32 && offsetof(bridge_config, order_count) == 40);
-static_assert(offsetof(bridge_config, threads) == 44 && offsetof(bridge_config, budget) == 48);
+static_assert(sizeof(bridge_config) == 104 && alignof(bridge_config) == 8);
+static_assert(offsetof(bridge_config, abi) == 0 && offsetof(bridge_config, pad2) == 4);
+static_assert(offsetof(bridge_config, backends) == 8 && offsetof(bridge_config, backend_count) == 16);
+static_assert(offsetof(bridge_config, pad0) == 20 && offsetof(bridge_config, phases) == 24);
+static_assert(offsetof(bridge_config, phase_count) == 32 && offsetof(bridge_config, pad1) == 36);
+static_assert(offsetof(bridge_config, order) == 40 && offsetof(bridge_config, order_count) == 48);
+static_assert(offsetof(bridge_config, threads) == 52 && offsetof(bridge_config, budget) == 56);
 
 /* A phase a module names in its code, and the phase of this deployment that it is: a module
  * is written by somebody who never saw the deployment - docs/bridge/run/schedule.md. */

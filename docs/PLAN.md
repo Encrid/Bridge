@@ -47,7 +47,7 @@ written for.* Met.
 
 Done. `STAGE2.md` is what it built and found.
 
-`bridge-backend.h` with all sixteen entries it then had - seventeen now, `backend.md` - and the wasm
+`bridge-backend.h` with all sixteen entries it then had - eighteen now, `backend.md` - and the wasm
 backend as a shared library behind it, which Bridge-ASM700 opens by the name config gives -
 `backend.md`, *What a backend is asked for*. A core wasm module importing a Bridge-ASM700 memory,
 which means `wasm_multi_memory` on since the module has its own. `bridge-abi.h` begins here, because

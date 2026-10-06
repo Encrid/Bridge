@@ -203,7 +203,8 @@ def build(target, debug, out):
     # ---- objects ----
     defines = ['-D%s="%s"' % (key, path.as_posix()) for key, path in
                [('BACKEND_PATH', backends / ('bridge-wasm' + lib)),
-                ('NATIVE_PATH', backends / ('bridge-native' + lib)), ('MODULE_DIR', modules)] +
+                ('NATIVE_PATH', backends / ('bridge-native' + lib)),
+                ('NATIVE_OTHER_PATH', backends / ('bridge-native-other' + lib)), ('MODULE_DIR', modules)] +
                [('%s_PATH' % name.upper(), out / (name + lib)) for name, _, _ in NATIVE]]
     compiles = []
 
@@ -223,6 +224,8 @@ def build(target, debug, out):
               compile_('wasm-os', ROOT / 'backends/wasm/os.c', ours)]
     native_o = [compile_('native', ROOT / 'backends/native/native.c', ours + [include, sdk['native']]),
                 compile_('native-os', ROOT / 'backends/native/os.c', ours)]
+    native_other_o = compile_('native-other', ROOT / 'backends/native/native.c',
+                              ours + [include, sdk['native'], '-DSAYS_ABI=(BACKEND_ABI+1)'])
     schema_test_o = compile_('schema-test', ROOT / 'tests/schema.c', ours + [include, src])
     adopt_o = compile_('adopt', ROOT / 'tests/adopt.c', ours + [include, src] + defines)
     phase_o = {name: compile_(name, ROOT / 'tests' / (name + '.c'), ours + [include] + defines)
@@ -255,6 +258,8 @@ def build(target, debug, out):
          [lambda: shutil.copyfile(runtime, backends / runtime.name)])
     link('backends/bridge-wasm', wasm_o, [link_wasmtime] + system + here, shared=True)
     link('backends/bridge-native', native_o, system, shared=True)
+    # the same backend, saying it is of another backend seam: for the case that refuses it
+    link('backends/bridge-native-other', [native_other_o, native_o[1]], system, shared=True)
     for name, _, _ in NATIVE:
         link(name, [module_o[name]], shared=True)
     link('adopt', [adopt_o, obj / 'backend.o', os_o], system)
@@ -431,6 +436,10 @@ CASES = [
      r"module 'test:ok@0.1.0' is refused: memory_limit is unset.*alive", None),
     ('stage2-nonelimit', ['stage2', 'nonelimit'],
      r"module 'test:ok@0.1.0' is refused: spawns is -1, which is neither an amount nor BRIDGE_NONE.*module 'test:ok@0.1.0' is refused: work_limit is -2, which is neither a limit nor BRIDGE_NO_LIMIT.*alive", ': loaded'),
+    ('stage2-hostabi', ['stage2', 'hostabi'],
+     r"the host is of host ABI 2, and this is 1.*bridge_create refused.*alive", None),
+    ('stage2-hostabiunset', ['stage2', 'hostabiunset'],
+     r"abi is unset.*bridge_create refused.*alive", None),
     ('stage2-unsetflag', ['stage2', 'unsetflag'],
      r"module 'test:ok@0.1.0' is refused: pinned is unset.*module 'test:ok@0.1.0' is refused: trusted is 3, which is neither BRIDGE_TRUE nor BRIDGE_FALSE.*alive", ': loaded'),
     ('stage2-negative', ['stage2', 'negative'],
@@ -511,6 +520,8 @@ CASES = [
      r"module 'game:mover@0.1.0' is refused: it states work_limit, which backend 'native' cannot keep.*alive", r"cannot open"),
     ('stage4-libraries', ['stage4', 'libraries'],
      r"the wasm backend's library is still loaded, the native backend's is gone.*alive", None),
+    ('stage4-backendabi', ['stage4', 'backendabi'],
+     r"backend 'native': backend library '[^']*bridge-native-other[^']*' is of backend ABI 2, and this is 1.*bridge_create refused.*alive", None),
     ('stage4-nolib', ['stage4', 'nolib'],
      r"module 'game:mover@0.1.0' did not load: cannot open the library 'no-such-library'.*alive", None),
     ('stage4-refuse', ['stage4', 'refuse'],

@@ -539,7 +539,10 @@ at least five things, none defined, and none of them the one that was meant.
     closed    65,536 is the wasm backend's, stated in `memory_shape`; the shared block is a
               whole number of every backend's granule, a private block of its own's
     closed    the first eight bytes of the shared block hold nothing, where 65,536 did
-    open    "change a layout, bump the version", before anything is released
+    closed  "change a layout, bump the version", before anything is released: the condition
+            is written, with what a release is. And there were three seams and one number:
+            the host seam and the backend seam have one each now, checked where the two
+            sides meet. `host-api.md`, *A seam has a number*
 
 **3b. Decisions that do not hold on every need.** Found by the reading above. Where the code
 was named it was read. Each is decided again with all six shown, or shown to hold.

@@ -3,7 +3,7 @@
 `bridge_create` is `Com_Init` minus the filesystem: take the config, open the backends it names,
 size the shared block, and build the phase table. It loads no module - the host does that.
 
-**Opening a backend** is opening its library, finding the seventeen entries of `backend.md`, *What a
+**Opening a backend** is opening its library, finding the eighteen entries of `backend.md`, *What a
 backend is asked for*, by name, and calling `backend_create` with that backend's settings.
 
 **A library named by a path is looked for there, and so is what it needs.** A backend brings its
