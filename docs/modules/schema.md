@@ -69,8 +69,23 @@ own namespace.** `Vec3 at;` in `game:Body` is `game:Vec3`, which a module declar
 an enum or a bitmask, each by its own macro and each with its type kind stated at `declare`. A type that
 was not declared there is refused at the declaration that uses it, by its name.
 
-An enum is four bytes signed and a bitmask four unsigned, which is what `BRIDGE_SCHEMA_ENUM` and
-`BRIDGE_SCHEMA_BITMASK` state of them in each backend's SDK and so what a module's compiler lays out.
+**An enum and a bitmask are the integer their author states.** `BRIDGE_SCHEMA_ENUM(Mode, int8_t,
+{ Off, On, Adaptive })`: the type is the width a row gives the field, it is what the module's
+compiler lays the enum out as, and it goes into the descriptor ahead of the brace, where
+Bridge-ASM700 reads it. An enum is any of `int8_t` to `uint32_t`; a bitmask is unsigned, to
+`uint64_t`. Every constant is checked to fit, a counted one as well as a stated one, and a
+setting given by number is held to the same range. `tests/schema.c` has each width and each
+refusal.
+
+It is stated because nothing here is taken by default, and because it is paid a row: a state
+of three values in four bytes is three bytes of every row of `[budget] columns` and of every
+pass over the column. Refused: four bytes always, which is what this was, for the reason that
+the macros said four. They said four because C does, and nobody had chosen it. The condition
+that brings one width back is that width being worth more than the bytes. Refused: the smallest
+integer that holds the constants, found by Bridge-ASM700. A module's compiler lays the field out
+from the type it is given, and cannot be given one that is worked out later; and a constant
+added would move every field after it. No condition brings it back.
+
 Refused: reaching across namespaces for a field's type, which
 would need the descriptor to carry a namespace C has no syntax for. The condition that brings it
 back is a mod that must embed one of the game's structs in its own component and finds the copy

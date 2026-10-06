@@ -3,8 +3,8 @@
 #include "bridge-wasm.h"
 
 BRIDGE_SCHEMA_STRUCT(Vec2, { float x; float y; });
-BRIDGE_SCHEMA_ENUM(Team, { Red, Green, Blue });
-BRIDGE_SCHEMA_BITMASK(Flags, { Solid = 1, Hidden = 2 });
+BRIDGE_SCHEMA_ENUM(Team, uint8_t, { Red, Green, Blue });
+BRIDGE_SCHEMA_BITMASK(Flags, uint16_t, { Solid = 1, Hidden = 2 });
 BRIDGE_SCHEMA_STRUCT(Body, { Vec2 at; Team team; Flags flags; float mass; });
 
 static uint32_t body, reading;

@@ -679,6 +679,8 @@ CASES = [
      r"its setting 'title' is 20 bytes of text, and the field it names holds 16 with the zero that ends it.*alive", None),
     ('stage6-configrange', ['stage6', 'configrange'],
      r"its setting 'small' is 300, which the field it names cannot hold.*alive", None),
+    ('stage6-configwide', ['stage6', 'configwide'],
+     r"its setting 'mode' is 200, which the enum of the field it names cannot hold.*alive", None),
     ('stage6-configenum', ['stage6', 'configenum'],
      r"its setting 'mode' is 'Sometimes', which the enum of the field it names has no constant for.*alive", None),
     ('stage6-confignone', ['stage6', 'confignone'],

@@ -41,7 +41,7 @@ static uint32_t put_text(bridge *b, module *m, uint32_t *used, const char *text,
 }
 
 /* the value of an enum's constant, by its name */
-static bool constant(const declared_type *of, const char *name, int32_t *value)
+static bool constant(const declared_type *of, const char *name, int64_t *value)
 {
     for (uint32_t i = 0; i < of->s.constant_count; i ++) {
         if (strcmp(of->s.constants[i].name, name)) continue;
@@ -95,7 +95,16 @@ static int seed_one(bridge *b, module *m, uint8_t *row, const schema_field *fiel
         }
         return 0;
     case SCHEMA_ENUM: {
-        int32_t value = (int32_t)s->v.i;
+        const declared_type *of = field->type;
+        int64_t value = s->v.i, most = INT64_MAX >> (64 - 8 * of->s.size);
+        /* an enum is the integer its author stated: as many bytes, signed or not */
+        bool is_signed = of->s.base == SCHEMA_I8 || of->s.base == SCHEMA_I16 || of->s.base == SCHEMA_I32;
+        if (s->kind == BRIDGE_INT && (is_signed ? value < -most - 1 || value > most
+                                                : value < 0 || value > most * 2 + 1)) {
+            snprintf(why, len, "its setting '%.80s' is %lld, which the enum of the field it names "
+                "cannot hold", s->key, (long long)value);
+            return 1;
+        }
         if (s->kind == BRIDGE_STRING) {
             /* by the name of a constant: the one thing a deployment can be expected to know */
             if (!s->v.s || !field->type || !constant(field->type, s->v.s, &value)) {
@@ -106,13 +115,16 @@ static int seed_one(bridge *b, module *m, uint8_t *row, const schema_field *fiel
         } else if (s->kind != BRIDGE_INT) {
             return misfit(why, len, s, "an enum");
         }
-        memcpy(at, &value, 4);
+        memcpy(at, &value, of->s.size);         /* the low bytes: every target is little-endian */
         return 0;
     }
-    case SCHEMA_BITMASK:
-        if (s->kind != BRIDGE_INT || s->v.i < 0 || s->v.i > UINT32_MAX) return misfit(why, len, s, "a bitmask");
-        { uint32_t x = (uint32_t)s->v.i; memcpy(at, &x, 4); }
+    case SCHEMA_BITMASK: {
+        const declared_type *of = field->type;
+        uint64_t most = UINT64_MAX >> (64 - 8 * of->s.size);
+        if (s->kind != BRIDGE_INT || s->v.i < 0 || (uint64_t)s->v.i > most) return misfit(why, len, s, "a bitmask");
+        memcpy(at, &s->v.i, of->s.size);
         return 0;
+    }
     case SCHEMA_TEXT:
         /* bridge_text: (offset, length) into the persistent arena - strings.md */
         if (s->kind == BRIDGE_STRING) {

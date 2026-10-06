@@ -53,14 +53,15 @@ struct bridge_api {
 #define BRIDGE_SCHEMA_STRUCT(name, ...) \
     typedef struct name __VA_ARGS__ name; \
     static const char name##_desc[] = #__VA_ARGS__
-/* an enum is four bytes signed and a bitmask four unsigned, and the type says so: it is what
- * Bridge-ASM700 lays the field out as, whatever a compiler would have chosen */
-#define BRIDGE_SCHEMA_ENUM(name, ...) \
-    typedef enum name : int32_t __VA_ARGS__ name; \
-    static const char name##_desc[] = #__VA_ARGS__
-#define BRIDGE_SCHEMA_BITMASK(name, ...) \
-    typedef enum name : uint32_t __VA_ARGS__ name; \
-    static const char name##_desc[] = #__VA_ARGS__
+/* An enum and a bitmask are the integer their author states: the width a row gives one. It
+ * goes into the descriptor ahead of the brace, where Bridge-ASM700 reads it and checks that
+ * every constant fits - docs/modules/schema.md, *The type set* */
+#define BRIDGE_SCHEMA_ENUM(name, type, ...) \
+    typedef enum name : type __VA_ARGS__ name; \
+    static const char name##_desc[] = #type " " #__VA_ARGS__
+#define BRIDGE_SCHEMA_BITMASK(name, type, ...) \
+    typedef enum name : type __VA_ARGS__ name; \
+    static const char name##_desc[] = #type " " #__VA_ARGS__
 
 /* ---- the scratch arena ---- */
 

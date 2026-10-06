@@ -417,13 +417,16 @@ int main(int argc, char **argv)
                || !strcmp(what, "configrange") || !strcmp(what, "configenum")
                || !strcmp(what, "confignone") || !strcmp(what, "configmissing")
                || !strcmp(what, "configunset")
-               || !strcmp(what, "configarena") || !strcmp(what, "configceiling")) {
+               || !strcmp(what, "configarena") || !strcmp(what, "configceiling")
+               || !strcmp(what, "configwide")) {
         a = configured("game:settings@0.1.0");
         if (!strcmp(what, "configkey")) everything[0].key = "vsynk";
         if (!strcmp(what, "configkind")) { everything[2].kind = BRIDGE_STRING; everything[2].v.s = "fast"; }
         if (!strcmp(what, "configlong")) everything[4].v.s = "twenty characters...";
         if (!strcmp(what, "configrange")) everything[6].v.i = 300;
         if (!strcmp(what, "configenum")) everything[3].v.s = "Sometimes";
+        /* the enum is an int8_t, as its author stated: a number past it is refused */
+        if (!strcmp(what, "configwide")) { everything[3].kind = BRIDGE_INT; everything[3].v.i = 200; }
         if (!strcmp(what, "confignone")) a.cfg.config = BRIDGE_NO_CONFIG;
         if (!strcmp(what, "configunset")) a.cfg.config = nullptr;
         if (!strcmp(what, "configmissing")) a.cfg.config = "game:Nope";

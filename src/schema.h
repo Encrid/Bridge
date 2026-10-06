@@ -34,10 +34,12 @@ typedef struct {
 /* false if the namespace has declared nothing of that name */
 typedef bool (*schema_find)(void *ctx, const char *name, schema_named *named);
 
-typedef struct { char *name; int32_t value; } schema_constant;
+/* a bitmask of 64 bits has a constant past INT64_MAX: its bits are kept, as they are */
+typedef struct { char *name; int64_t value; } schema_constant;
 
 typedef struct {
     uint32_t         size, align;
+    enum schema_kind base;              /* the integer an enum or a bitmask is: its author's */
     schema_field    *fields;            /* a struct's, in the order it states them */
     uint32_t         field_count;
     schema_constant *constants;         /* an enum's or a bitmask's */

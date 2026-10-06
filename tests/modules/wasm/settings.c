@@ -2,8 +2,8 @@
  * a system reads back. docs/seam/host-api/config.md, *A module's own settings are a component*. */
 #include "bridge-wasm.h"
 
-BRIDGE_SCHEMA_ENUM(Mode, { Off, On, Adaptive });
-BRIDGE_SCHEMA_BITMASK(Flags, { Loud = 1, Wide = 2 });
+BRIDGE_SCHEMA_ENUM(Mode, int8_t, { Off, On, Adaptive });
+BRIDGE_SCHEMA_BITMASK(Flags, uint32_t, { Loud = 1, Wide = 2 });
 BRIDGE_SCHEMA_STRUCT(Settings, {
     bool vsync;
     int32_t width;

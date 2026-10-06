@@ -520,7 +520,9 @@ at least five things, none defined, and none of them the one that was meant.
     closed  a memory handle kept for a backend that does not exist: kept, on three needs
             and with a use in a backend that does exist. Removing it was recommended on
             one need, minimal, and it lost on three of the six. `backend.md`
-    open    why an enum is four bytes
+    closed  why an enum is four bytes: for no reason. Its author states the integer it is,
+            which is its width in a row, and every constant is checked to fit.
+            `schema.md`, *The type set*
     open    a reload counting both instances toward [budget] systems
     open    numbers with no reason: the grain, the doubling, the first four rows, two arguments,
             and 65,536, a wasm page, to which the library rounds every block it makes

@@ -54,12 +54,13 @@ static void a_struct(const char *text, uint32_t size, uint32_t align, const want
     schema_free(&s);
 }
 
-static void constants(enum bridge_kind kind, const char *text, const int32_t *want, uint32_t count)
+static void constants(enum bridge_kind kind, const char *text, uint32_t size, const int64_t *want,
+                      uint32_t count)
 {
     schema s;
     char why[160];
     if (schema_parse(kind, text, find, nullptr, &s, why, sizeof why)) { fail(text, why); return; }
-    if (s.size != 4 || s.align != 4 || s.constant_count != count) fail(text, "its size or how many constants");
+    if (s.size != size || s.align != size || s.constant_count != count) fail(text, "its size or how many constants");
     for (uint32_t i = 0; i < count && i < s.constant_count; i ++) {
         if (s.constants[i].value != want[i]) fail(text, s.constants[i].name);
     }
@@ -113,11 +114,17 @@ int main()
              sizeof(Mixed), alignof(Mixed), mixed, 7);
     a_struct("{float x;float y;}", sizeof(Vec2), alignof(Vec2), vec2, 2);    /* no spaces at all */
 
-    constants(BRIDGE_ENUM, "{ Off, On, Adaptive }", (int32_t[]){ 0, 1, 2 }, 3);
-    constants(BRIDGE_ENUM, "{ A = 5, B, C = -1, D, }", (int32_t[]){ 5, 6, -1, 0 }, 4);
-    constants(BRIDGE_ENUM, "{ X = 0x10 }", (int32_t[]){ 16 }, 1);
-    constants(BRIDGE_BITMASK, "{ Loud = 1, Wide = 2 }", (int32_t[]){ 1, 2 }, 2);
-    constants(BRIDGE_BITMASK, "{ Top = 0x80000000 }", (int32_t[]){ INT32_MIN }, 1);
+    constants(BRIDGE_ENUM, "int32_t { Off, On, Adaptive }", 4, (int64_t[]){ 0, 1, 2 }, 3);
+    constants(BRIDGE_ENUM, "int32_t { A = 5, B, C = -1, D, }", 4, (int64_t[]){ 5, 6, -1, 0 }, 4);
+    constants(BRIDGE_ENUM, "int32_t { X = 0x10 }", 4, (int64_t[]){ 16 }, 1);
+    constants(BRIDGE_BITMASK, "uint32_t { Loud = 1, Wide = 2 }", 4, (int64_t[]){ 1, 2 }, 2);
+    constants(BRIDGE_BITMASK, "uint32_t { Top = 0x80000000 }", 4, (int64_t[]){ 2147483648 }, 1);
+    /* the integer its author stated is its width, and its range */
+    constants(BRIDGE_ENUM, "int8_t { Low = -128, High = 127 }", 1, (int64_t[]){ -128, 127 }, 2);
+    constants(BRIDGE_ENUM, "uint8_t { A = 254, B }", 1, (int64_t[]){ 254, 255 }, 2);
+    constants(BRIDGE_ENUM, "uint16_t { A = 65535 }", 2, (int64_t[]){ 65535 }, 1);
+    constants(BRIDGE_BITMASK, "uint8_t { Top = 0x80 }", 1, (int64_t[]){ 128 }, 1);
+    constants(BRIDGE_BITMASK, "uint64_t { Top = 0x8000000000000000 }", 8, (int64_t[]){ INT64_MIN }, 1);
 
     /* what a looser parser would take and this one does not, and what was never C */
     refused(BRIDGE_STRUCT, "{ unsigned x; }", "'unsigned'");
@@ -140,13 +147,23 @@ int main()
     refused(BRIDGE_STRUCT, "{ float x; } junk", "'junk'");
     refused(BRIDGE_STRUCT, "{ float x;", "the end of it");
     refused(BRIDGE_STRUCT, "{ float a_name_that_goes_on_for_longer_than_any_field_of_a_struct_is_called; }", "'a_name");
-    refused(BRIDGE_ENUM, "{ }", "no constant");
-    refused(BRIDGE_ENUM, "{ A = }", "'}'");
-    refused(BRIDGE_ENUM, "{ A B }", "'B'");
-    refused(BRIDGE_ENUM, "{ A = 1 << 2 }", "'<'");
-    refused(BRIDGE_ENUM, "{ A = 4294967296 }", "'4294967296'");
-    refused(BRIDGE_BITMASK, "{ A }", "'}'");
-    refused(BRIDGE_BITMASK, "{ A = -1 }", "'-1'");
+    refused(BRIDGE_ENUM, "int32_t { }", "no constant");
+    refused(BRIDGE_ENUM, "int32_t { A = }", "'}'");
+    refused(BRIDGE_ENUM, "int32_t { A B }", "'B'");
+    refused(BRIDGE_ENUM, "int32_t { A = 1 << 2 }", "'<'");
+    refused(BRIDGE_ENUM, "int32_t { A = 4294967296 }", "'4294967296'");
+    refused(BRIDGE_BITMASK, "uint32_t { A }", "'}'");
+    refused(BRIDGE_BITMASK, "uint32_t { A = -1 }", "'-1'");
+    /* and with no integer stated, or one it cannot be, or a constant past it */
+    refused(BRIDGE_ENUM, "{ A }", "'{'");
+    refused(BRIDGE_ENUM, "float { A }", "'float'");
+    refused(BRIDGE_ENUM, "int64_t { A }", "'int64_t'");
+    refused(BRIDGE_ENUM, "uint64_t { A }", "'uint64_t'");
+    refused(BRIDGE_BITMASK, "int8_t { A = 1 }", "'int8_t'");
+    refused(BRIDGE_ENUM, "int8_t { A = 128 }", "'128'");
+    refused(BRIDGE_ENUM, "uint8_t { A = -1 }", "'-1'");
+    refused(BRIDGE_ENUM, "uint8_t { A = 255, B }", "'}'");
+    refused(BRIDGE_BITMASK, "uint8_t { A = 256 }", "'256'");
 
     printf("%s\n", failed ? "FAIL" : "every descriptor read as it should, and every other refused by its word");
     printf("alive\n");
