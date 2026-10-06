@@ -109,7 +109,8 @@ int main(int argc, char **argv)
     bridge_config cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 2, .phases = phases,
         .phase_count = 2, .threads = 1, .budget =
         { .entities = 4096, .tables = 64, .types = 64, .systems = 128, .terms = 8, .modules = 8,
-          .persistent = 4096, .columns = 1 << 20 } };
+          .persistent = 4096, .columns = 1 << 20,
+          .sparse_sets = BRIDGE_NONE, .direct_indexed = BRIDGE_NONE } };
     bridge_setting cache = { .key = "cache", .kind = BRIDGE_STRING, .v = { .s = "somewhere" } };
     bridge_artifact a;
     bridge *b;

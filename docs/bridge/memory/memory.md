@@ -4,13 +4,14 @@ Which block each thing lives in, and who may read it. What it costs when one run
 `budgets.md`; where a string goes is `strings.md`; who keeps the rows is `storage.md`. What the
 data *is* is `data.md`.
 
-## Where the seven regions live
+## Where the regions live
 
-Seven things must be addressable with no call, and they do not have the same readers:
+Eight things must be addressable with no call, and they do not have the same readers:
 
     region              memory    who reads it
     component columns   shared    every module that declared the component
     entity index        shared    every module that follows a reference
+    sparse-set indexes  shared    every module that declared a component kept in one
     persistent arena    shared    every module holding a string in a component
     query spans         private   only the module they belong to
     column_base         private   only the module they belong to
@@ -20,11 +21,13 @@ Seven things must be addressable with no call, and they do not have the same rea
 The private memory is Bridge-ASM700's alone, so it is laid out from offset 0 with nothing to
 negotiate. A fixed header says where this module's spans, `column_base`, arena and log ring begin,
 the log level it is filtering at, and where the entity index begins in the shared memory - the one
-thing it reads there that it cannot derive. Every other shared-memory offset is relative to the
-shared memory itself, including the `(offset, length)` a component holds into the persistent arena,
-so nothing else needs a base.
+thing it reads there that it cannot derive - and, for each type it declared that is not kept in a
+table, where that is reached: `storage.md`, *A sparse set*. Every other shared-memory offset is
+relative to the shared memory itself, including the `(offset, length)` a component holds into the
+persistent arena, so nothing else needs a base.
 
-The span region holds the query slots, the spans, `column_base`, and each observer's list of what
+The span region holds the query slots, the spans, `column_base`, a cell for each declared type
+that says where a component not kept in a table is reached, and each observer's list of what
 triggered it. Its size is the module's `spans` budget, in bytes - `budgets.md`, *Budgets* - and how
 it is divided is Bridge-ASM700's, redone at a barrier, where nothing holds an offset into it. That
 is the memory layout of Quake's progs - fixed offsets at the bottom, everything else found through

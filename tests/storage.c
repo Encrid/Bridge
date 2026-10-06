@@ -152,15 +152,18 @@ static uint64_t barrier(bridge *b, const char *phase)
 
 /* What unload does to a component with the policy `strip`, asked of storage directly so that the
  * module is still there to look: lifetime.md, *What unload leaves behind*. */
-static void strip(bridge *b, const char *name)
+static void drop(bridge *b, const char *name, enum bridge_on_unload policy)
 {
-    printf("strip %s\n", name);
+    static const char *const said[] = { "", "strip", "sweep", "delete" };
+    printf("%s %s\n", said[policy], name);
     for (uint32_t i = 0; i < b->type_count; i ++) {
-        if (!strcmp(b->types[i]->name, name)) storage_drop(b->storage, b->types[i]->type, BRIDGE_STRIP);
+        if (!strcmp(b->types[i]->name, name)) storage_drop(b->storage, b->types[i]->type, policy);
     }
     /* a barrier, for what was heard and for what a module reads */
     run(b, "never");
 }
+
+static void strip(bridge *b, const char *name) { drop(b, name, BRIDGE_STRIP); }
 
 /* the systems of one phase, timed, and then its barrier */
 static uint64_t ran(bridge *b, const char *phase)
@@ -211,7 +214,8 @@ int main(int argc, char **argv)
     bridge_config cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 1, .phases = phases,
         .phase_count = PHASES, .threads = 1, .budget =
         { .entities = 400'000, .tables = 32'768, .types = 64, .systems = 64, .terms = 4, .modules = 4,
-          .persistent = 4096, .columns = 64 << 20 } };
+          .persistent = 4096, .columns = 64 << 20,
+          .sparse_sets = BRIDGE_NONE, .direct_indexed = BRIDGE_NONE } };
     bridge *b;
 
     /* the stress run is the one thing here that is run on more than one thread */
@@ -221,6 +225,10 @@ int main(int argc, char **argv)
     if (!strcmp(what, "notables")) cfg.budget.tables = 1;
     if (!strcmp(what, "nocolumns")) cfg.budget.columns = 64;
     if (!strcmp(what, "stripfull")) cfg.budget.columns = 160;
+    /* storage.md, *A sparse set*. `sparsenone` is the one that states there are none */
+    if (!strncmp(what, "sparse", 6) && strcmp(what, "sparsenone")) cfg.budget.sparse_sets = 1;
+    if (!strcmp(what, "weigh")) cfg.budget.sparse_sets = 1;
+    if (!strcmp(what, "sparsefull")) cfg.budget.columns = argc > 2 ? (uint64_t)atoi(argv[2]) : 112;
     b = bridge_create(&cfg, sink, nullptr);
     bridge_artifact a;
 
@@ -386,6 +394,55 @@ int main(int argc, char **argv)
         run(b, "look");
         run(b, "destroy");          /* and both tables go when they empty */
         run(b, "look");
+    } else if (!strncmp(what, "sparse", 6)) {
+        const char *path = !strcmp(what, "sparsebad1") ? NSPARSEBAD1_PATH
+                         : !strcmp(what, "sparsebad2") ? NSPARSEBAD2_PATH : NSPARSE_PATH;
+        a = store_module(path, 8, 1 << 20, 4096);
+        /* one barrier may leave an entity out, and the module is looked at after it */
+        if (!strcmp(what, "sparsefull")) a.cfg.max_system_failures = 4;
+        if (bridge_load(b, &a)) { printf("not loaded\nalive\n"); return 0; }
+        run(b, "spawn");
+        run(b, "attach_b");         /* three of six join the set, and are heard */
+        run(b, "look");
+        run(b, "look_b");
+        if (!strcmp(what, "sparsefull")) {
+            /* budgets.md, *What running out does*: the set had room for two of the three */
+        } else if (!strcmp(what, "sparse")) {
+            run(b, "value_b");          /* a value for one that is in it: heard as an attach */
+            run(b, "look");
+            run(b, "detach_b_half");    /* one leaves, and the set's last row takes its place */
+            run(b, "look");
+            run(b, "look_b");
+            run(b, "attach_b_half");    /* an entity in the set and in no table */
+            run(b, "look");
+            run(b, "look_b");
+            run(b, "destroy_half");     /* one that is in the set, and one that is not */
+            run(b, "look");
+            run(b, "look_b");
+            run(b, "detach_b");         /* the rest leave, and the lone one stays */
+            run(b, "look");
+            run(b, "destroy");
+            run(b, "look");
+            run(b, "look_b");
+        } else if (!strcmp(what, "sparsesweepa")) {
+            /* a sweep of a component in a table: an entity that is in a sparse set carries
+             * something still, and stays, in no table */
+            drop(b, "st:A", BRIDGE_SWEEP);
+            run(b, "look");
+            run(b, "look_b");
+        } else {
+            /* lifetime.md, *What unload leaves behind*, of a component in a sparse set */
+            run(b, "attach_b_half");
+            drop(b, "st:S", !strcmp(what, "sparsestrip") ? BRIDGE_STRIP
+                          : !strcmp(what, "sparsesweep") ? BRIDGE_SWEEP : BRIDGE_DELETE);
+            /* the seventh entity made is the one that carried S and nothing else */
+            printf("the entity that was in the set alone is %s\n",
+                storage_alive(b->storage, (uint64_t)1 << 32 | 7) ? "alive" : "gone");
+            run(b, "look");
+            run(b, "look_b");
+            run(b, "attach_b");         /* and it is a set that can be joined again */
+            run(b, "look");
+        }
     } else if (!strcmp(what, "stress")) {
         if (stress_load(b)) { printf("FAIL: not loaded\n"); return 1; }
         stress_run(b);
@@ -441,6 +498,42 @@ int main(int argc, char **argv)
                 split[k].tables, split[k].tables > 1 ? "s" : " ", (double)best / 1000.0,
                 (double)best / ROWS);
             if (k + 1 < sizeof split / sizeof *split) (void)bridge_destroy(b);
+        }
+        /* storage.md, *A sparse set*: the same change, of a component kept in a sparse set */
+        static const struct { const char *path; uint32_t bytes, count; } set[] = {
+            { NSPARSEBIG_PATH, 4, 204'800 }, { NSPARSEFAT_PATH, 4096, 10'000 },
+        };
+        (void)bridge_destroy(b);
+        for (uint32_t k = 0; k < sizeof set / sizeof *set; k ++) {
+            uint64_t on = 0, off = 0, walk = 0, reach = 0, t;
+            b = bridge_create(&cfg, counted, nullptr);
+            a = store_module(set[k].path, set[k].count, 8 << 20, (int64_t)set[k].count * 4200);
+            if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
+            (void)barrier(b, "spawn");
+            for (uint32_t round = 0; round < ROUNDS; round ++) {
+                t = barrier(b, "attach_b");
+                if (!round || t < on) on = t;
+                if (round + 1 < ROUNDS) {
+                    t = barrier(b, "detach_b");
+                    if (round < 1 || t < off) off = t;
+                }
+            }
+            printf("a sparse set, an entity of %4u bytes: a component given %6.1f ns, taken %6.1f ns\n",
+                set[k].bytes, (double)on / set[k].count, (double)off / set[k].count);
+            /* read, where the table's own rows are small: a row of 4 KB is a cache miss by
+             * itself, and that is the table's and says nothing of the set */
+            for (uint32_t round = 0; !k && round < ROUNDS * 4; round ++) {
+                t = ran(b, "look");
+                if (!round || t < walk) walk = t;
+                t = ran(b, "look_b");
+                if (!round || t < reach) reach = t;
+            }
+            if (!k) {
+                printf("    %u of its values walked %6.1f us; reached from a table's rows %6.1f us, "
+                    "%.3f ns a row\n", set[k].count, (double)walk / 1000.0, (double)reach / 1000.0,
+                    (double)reach / set[k].count);
+            }
+            if (k + 1 < sizeof set / sizeof *set) (void)bridge_destroy(b);
         }
     } else if (!strcmp(what, "baseline")) {
         static const struct { const char *path; uint32_t on; } built[] = {

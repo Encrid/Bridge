@@ -74,7 +74,7 @@ read by a test of the backend alone, since storage is stage 3's.
 Done. `STAGE3.md` is what it built and found.
 
 The shared memory's three regions and each module's private memory: the header, the spans,
-`column_base`, the scratch arena and the log ring - `memory.md`, *Where the seven regions live*.
+`column_base`, the scratch arena and the log ring - `memory.md`, *Where the regions live*.
 `[budget]`, with exhaustion fatal where it happens - `budgets.md`, *What running out does*.
 
 `declare`, with the fingerprint, type-set and grant checks. `system`, with the query refusals -

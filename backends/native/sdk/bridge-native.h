@@ -116,6 +116,17 @@ static inline const uint32_t *bridge_native_span(const bridge_api *api, const br
     return (const uint32_t *)(api->private_base + q->at + i * BRIDGE_SPAN_SIZE(terms));
 }
 
+/* ---- a sparse set, reached from a row. storage.md, *A sparse set* ---- */
+
+/* The index of the sparse set that keeps component `slot`: a cell for each entity, by the low
+ * 32 bits of its id, holding where that entity's value is from the shared base, and zero
+ * where it has none. */
+static inline const uint32_t *bridge_native_set_index(const bridge_api *api, uint32_t slot)
+{
+    auto kept = (const uint32_t *)(api->private_base + bridge_native_header(api)->kept);
+    return (const uint32_t *)(api->shared_base + kept[slot]);
+}
+
 /* an observer's list: `count` bridge_trigger records, at private_base + `at` */
 static inline const bridge_list *bridge_native_list(const bridge_api *api, uint32_t observer)
 {

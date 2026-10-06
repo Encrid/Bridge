@@ -182,6 +182,7 @@ void block_header(bridge *b, module *m)
     h->column_base = h->observers + (uint32_t)sizeof(bridge_list) * m->observer_count;
     h->types = m->declared_count;
     h->tables = storage_tables(b->storage);
+    h->kept = h->column_base + 4u * h->types * h->tables;
     h->entity_index = block_offset(b, b->index);
     h->entities = b->entities;
 }
@@ -272,6 +273,17 @@ static int unset(bridge *b, const char *key, uint64_t value)
     return 1;
 }
 
+/* a count that may be none: zero is unset, BRIDGE_NONE is none, and nothing else below one
+ * is anything */
+static int counted(bridge *b, const char *key, int64_t value)
+{
+    if (value == BRIDGE_NONE || (value > 0 && value <= UINT32_MAX)) return 0;
+    if (!value) say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] %s is unset", key);
+    else say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] %s is %lld, which is neither a count nor "
+        "none", key, (long long)value);
+    return 1;
+}
+
 /* an offset is 32 bits: a size it cannot reach is refused by name, before any sum is made of it */
 static int beyond(bridge *b, const char *key, uint64_t value)
 {
@@ -284,7 +296,7 @@ static int beyond(bridge *b, const char *key, uint64_t value)
 int block_create(bridge *b, const bridge_budget *budget)
 {
     /* query.md: offset 0 is none, so nothing is there. Eight bytes keep the index aligned */
-    uint64_t index = 8, arena, columns, len, reserve;
+    uint64_t index = 8, sparse, sets, arena, columns, len, reserve;
     uint32_t i;
 
     if (unset(b, "entities", budget->entities) || unset(b, "persistent", budget->persistent)
@@ -297,8 +309,21 @@ int block_create(bridge *b, const bridge_budget *budget)
         || beyond(b, "columns", budget->columns)) {
         return 1;
     }
-    /* each is under 2^32 now, so none of these sums can leave 64 bits */
-    arena = (index + sizeof(bridge_entity) * budget->entities + 7u) & ~7ull;
+    if (counted(b, "sparse_sets", budget->sparse_sets)
+        || counted(b, "direct_indexed", budget->direct_indexed)) {
+        return 1;
+    }
+    sets = budget->sparse_sets == BRIDGE_NONE ? 0 : (uint64_t)budget->sparse_sets;
+    /* each is under 2^32 now, so none of these sums can leave 64 bits. A sparse set's index
+     * is a u32 for every entity, and there is one for each there may be - storage.md */
+    sparse = (index + sizeof(bridge_entity) * budget->entities + 7u) & ~7ull;
+    if (sets > UINT32_MAX / (4 * budget->entities)) {
+        say(b, nullptr, nullptr, BRIDGE_ERR, "[budget] cannot be satisfied: sparse_sets of %llu, with "
+            "four bytes for each of %llu entities, is more than an offset of 32 bits can reach",
+            (unsigned long long)sets, (unsigned long long)budget->entities);
+        return 1;
+    }
+    arena = (sparse + 4 * budget->entities * sets + 7u) & ~7ull;
     columns = (arena + budget->persistent + 15u) & ~15ull;      /* storage.md, *A table* */
     /* a whole number of what every backend that maps it needs - backend.md */
     len = (columns + budget->columns + b->granule - 1) / b->granule * b->granule;
@@ -319,6 +344,8 @@ int block_create(bridge *b, const bridge_budget *budget)
     b->shared_reserve = (size_t)reserve;
     b->index = (bridge_entity *)(b->shared + index);
     b->entities = (uint32_t)budget->entities;
+    b->sparse = (uint32_t)sparse;
+    b->sparse_sets = (uint32_t)sets;
     b->arena = (uint32_t)arena;
     b->arena_len = (uint32_t)budget->persistent;
     b->columns = (uint32_t)columns;
@@ -329,7 +356,7 @@ int block_create(bridge *b, const bridge_budget *budget)
     b->max_systems = budget->systems;
     b->max_terms = budget->terms;
     /* a gap lies between two blocks, and a table has one block: never more gaps than tables */
-    b->column_space = (region){ .room = b->tables + 1, .len = b->columns_len };
+    b->column_space = (region){ .room = b->tables + b->sparse_sets + 1, .len = b->columns_len };
     b->column_space.gaps = malloc(b->column_space.room * sizeof(range));
     b->arena_space = (region){ .len = b->arena_len };
     if (bridge_short(b, b->column_space.gaps, "the list of what is free in [budget] columns")) return 1;

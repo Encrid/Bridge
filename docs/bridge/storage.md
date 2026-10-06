@@ -54,8 +54,8 @@ declare the component already, as for a component layout that differs - `lifetim
 component layout changed*.
 
 What each was weighed on, measured, and what a module is handed for each, is `STAGE11.md`, *The
-gate* and *The questions*. The table is the one that is built; a `declare` that states one of
-the other four is refused, saying so, until `PLAN.md`, stage 11, has built it.
+gate* and *The questions*. The table and the sparse set are built; a `declare` that states one
+of the other three is refused, saying so, until `PLAN.md`, stage 11, has built it.
 
 ## A table
 
@@ -87,6 +87,69 @@ there first, and the other lasts until its rows have left.
 block and id, at the barrier its last one leaves. Table ids are dense, from 1; 0 is no table, which
 is where an entity with nothing on it is. A released id is used again by the next table made.
 
+## A sparse set
+
+**A component kept in a sparse set is in no archetype.** An entity's archetype is the components
+it carries that are kept in tables, and its table is that archetype's. Giving it a component kept
+in a sparse set, or taking one from it, moves no row of any table. An entity that carries only
+such components is in no table.
+
+**The set is kept as a table of its one type**: a block of the column region that holds the ids
+of the entities in it and then their values, packed, grown by half as a table's is, and given
+back when the last entity leaves it. Where a table's rows are found by where the entity is, the
+set's are found by an index, a cell for every entity there may be. Storage keeps that index for
+itself, and writes another for modules, in the shared memory: **a cell an entity, holding where
+that entity's value is from the shared base, and zero where it has none**. When the set's block
+moves to grow, every cell of an entity in it is written again.
+
+**It is for what comes and goes, and for what few entities carry.** Measured in the library,
+`storage weigh`: a four-byte component given to an entity and taken from it again.
+
+    the entity carries     in a table: given, taken     in a sparse set: given, taken
+        4 bytes               40 ns      37 ns              33 ns      29 ns
+     4096 bytes              505 ns     500 ns              32 ns      28 ns
+
+And the entities that carry it are not split off into a table of their own. **What it costs is
+the read beside a table's column.** Its 204,800 values walked alone take 6.6 us, as a column's
+do. Reached from a table's rows through the index they take 89 us, 0.44 ns a row, where two
+columns of one table take 0.03. And it is eight bytes for every entity there may be, for each
+such component, the two indexes: `[budget] sparse_sets` says how many there may be, and their
+indexes are had when the bridge is created - `budgets.md`, *Budgets*.
+
+**Running out, unload and observers are what they are for a table.** An entity the set has no
+room for is left as it was, with everything else that barrier asked of it, and that is a failure
+of the module that asked - `budgets.md`, *What running out does*. A component nobody declares any
+more is stripped, swept or deleted by its policy - `lifetime.md`, *What unload leaves behind* -
+and for a sweep an entity carries nothing else when it is in no table and in no other set. An
+observer's terms are matched against everything an entity carries, in tables and in sets alike,
+since an observer walks nothing.
+
+## What a query walks
+
+**A system walks tables, or one sparse set alone.** A table's rows are in the table's order and
+a set's entries in the set's, so row 0 of one and entry 0 of the other are different entities,
+and one loop cannot step through both side by side. So the terms that select, `BRIDGE_AND` and
+`BRIDGE_NOT`, are all of components kept in tables; or there is one, `BRIDGE_AND`, of a component
+kept in a sparse set. Anything else is refused at `system`, naming the term. Which is walked is
+the author's, by how the query is written.
+
+**What is kept elsewhere is stated optional, and reached from the row.** In a query that walks
+tables, a term of a component kept in a sparse set has a base of zero in every span, since it is
+in no table. The module reads the set's index, which it finds through the cell its header has
+for each type it declared - `memory.md`, *Where the regions live*:
+
+    for each span, for each row r:
+        at = index[the low 32 bits of entities[r]]
+        if at == 0      this entity is not in the set
+        else            its value is at `at`, from the shared base
+
+**A query whose one selecting term is of a sparse set walks the set**: one span, whose rows are
+the entities in the set, whose `entities` are their ids and whose base is their values - the
+three things a table's span is, read by the same loop. Its other terms are optional, and are
+reached by id - `reference.md`, *Reference following*.
+
+What was weighed against this is the record of `STAGE11.md`, *The questions*.
+
 ## A barrier is worked an entity at a time
 
 The queues are read in their stated order - module by module as they loaded, and within one as it
@@ -113,7 +176,7 @@ tables behind it.
 ## What a barrier writes for a module
 
 A module reads three things storage writes into its private memory: its spans, its `column_base`,
-and its observers' lists - `memory.md`, *Where the seven regions live*. **Only what changed is
+and its observers' lists - `memory.md`, *Where the regions live*. **Only what changed is
 written.** Storage keeps a list of the tables touched since it last wrote: grown, moved, gained or
 lost a row, made or released. For each module:
 
@@ -172,6 +235,8 @@ barrier's second step is where that is found out, before anything has moved.
     [budget] systems     with `terms`, each one's terms; and with `tables`, its list of the
                          tables it matches
     [budget] terms       how long a system's record of its terms is
+    [budget] sparse_sets how many sparse sets: an index for each, a cell an entity, twice; and
+                         a table's record for each, beside `tables`
 
 **All of it is allocated when the bridge is created, and nothing after**: not at a barrier, not
 when a module loads. What a module declares takes a place that is already there, and a `declare`

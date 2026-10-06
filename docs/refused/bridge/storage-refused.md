@@ -7,6 +7,20 @@ The record of `storage.md`: `README.md`, *Three layers, three seams*.
 Of `storage.md`, *Storage layouts*. Who states a component's storage layout, and what else was
 weighed for each of the five, is in the record of `STAGE11.md`, *The questions*.
 
+## A sparse set
+
+Of `storage.md`, *A sparse set*. What form its index has, and what else was weighed, is in the
+record of `STAGE11.md`, *The questions*.
+
+Refused: a sparse set written as a second thing beside tables, with its own block, growth,
+spans and publishing. It is kept as a table of one type, and those are the table's. The
+condition that brings it back is a sparse set that needs a shape a table's block cannot have.
+
+## What a query walks
+
+Of `storage.md`, *What a query walks*. What was weighed against it is in the record of
+`STAGE11.md`, *The questions*.
+
 ## A table
 
 Of `storage.md`, *A table*.

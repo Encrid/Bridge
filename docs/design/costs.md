@@ -30,7 +30,7 @@ finds it*, is how it gets a name.
 What is recovered is everything that is not a shared column. A wasm module's spans, its
 `column_base`, its scratch arena and its log ring sit in a private memory no other module imports,
 so the `base` and `count` its arithmetic reads cannot be corrupted from outside - `memory.md`,
-*Where the seven regions live*. What stays exposed is the columns and the entity index. One thing
+*Where the regions live*. What stays exposed is the columns and the entity index. One thing
 would change that, and we decline it: reserve address space per component and map only a module's
 own columns into its memory, which `wasmtime_config_host_memory_creator_set` makes possible. What it
 costs can be counted. A mapping is made of whole pages, and on Windows a view begins on a boundary

@@ -468,3 +468,19 @@ layout; the cell for each declared type, `BRIDGE_CARRIED` and the two keys; then
 the toggle, direct-indexed, the singleton with a module's settings, and the tag; then the move;
 then a changed component layout and what a reload accepts to lose.
 
+## What was built
+
+**`declare` states the storage layout**, and a module that states another than the component
+has is refused, naming the others. Cases `stage3-keptunset`.
+
+**The sparse set**, as `storage.md`, *A sparse set* and *What a query walks*, have it. It is
+kept as a table of its one type, so its block, its growth, its span and what is written for a
+module are the table's code, and what is its own is the index and the fold's part. Cases
+`storage-sparse` and the eight beside it, and `stage3-sparse` on the wasm backend.
+
+The gate reckoned a change at about 22 ns, from a queued change that moves nothing and the set
+alone in scratch. Measured in the library it is 33 ns given and 29 taken, whatever the entity
+carries: under the table's 40 and 37 for four bytes carried, and its 505 and 500 for 4 KB. The
+difference from the estimate is the fold looking at every sparse set for every changed entity.
+The read through the index is 0.44 ns a row, under the 0.59 to 0.76 measured in scratch.
+

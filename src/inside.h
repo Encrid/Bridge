@@ -235,6 +235,9 @@ struct bridge {
     uint32_t       entities;
     uint32_t       arena, arena_len;
     uint32_t       columns, columns_len;
+    /* [budget] sparse_sets, and where their indexes begin in the shared memory: one after
+     * another, each a u32 for every entity there may be */
+    uint32_t       sparse_sets, sparse;
     region         arena_space, column_space;   /* what of each is handed out */
     int            layout_moved;    /* a module came or went, or a declaration changed */
     uint32_t       tables;          /* [budget] tables: how many may exist at once */

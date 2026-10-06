@@ -56,6 +56,11 @@ refused.
 
 ## What a query may not ask for
 
+**Two components that are kept in different storage layouts, both required.** A system walks
+tables, or one sparse set alone, and a term of what is kept elsewhere is stated optional and
+reached from the row - `storage.md`, *What a query walks*. Anything else is refused at `system`,
+naming the term.
+
 **A term that is "this type or that one", and a term that is "any type".** Other ECS call them
 or-terms and wildcards. The component such a term matched would vary from table to table. A
 module reads a field through a **typed** accessor chosen at its build, and a term whose type

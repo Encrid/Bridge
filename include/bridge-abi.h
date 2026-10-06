@@ -98,8 +98,11 @@ typedef struct {
     uint32_t system;                    /* the slot of the system running */
     uint32_t log_level;                 /* a line above it is not written */
     uint32_t observers;                 /* bridge_list, one per slot `observe` answered */
+    uint32_t kept;                      /* u32 [types]: for a type that is not kept in a table,
+                                         * where in the shared memory it is reached. A sparse
+                                         * set: its index, a u32 for each entity */
 } bridge_header;
-static_assert(sizeof(bridge_header) == 72 && alignof(bridge_header) == 4);
+static_assert(sizeof(bridge_header) == 76 && alignof(bridge_header) == 4);
 static_assert(offsetof(bridge_header, abi) == 0 && offsetof(bridge_header, scratch) == 4);
 static_assert(offsetof(bridge_header, scratch_len) == 8 && offsetof(bridge_header, scratch_used) == 12);
 static_assert(offsetof(bridge_header, ring) == 16 && offsetof(bridge_header, ring_len) == 20);
@@ -109,6 +112,7 @@ static_assert(offsetof(bridge_header, types) == 40 && offsetof(bridge_header, ta
 static_assert(offsetof(bridge_header, entity_index) == 48 && offsetof(bridge_header, entities) == 52);
 static_assert(offsetof(bridge_header, when) == 56 && offsetof(bridge_header, system) == 60);
 static_assert(offsetof(bridge_header, log_level) == 64 && offsetof(bridge_header, observers) == 68);
+static_assert(offsetof(bridge_header, kept) == 72);
 
 typedef struct { uint32_t spans, at; } bridge_query;
 static_assert(sizeof(bridge_query) == 8 && alignof(bridge_query) == 4);

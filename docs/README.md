@@ -64,7 +64,7 @@ diagram to keep in step with. One concern per document, in reading order:
         lifetime.md          reload, unload, and a changed component layout
 
     bridge/memory/
-        memory.md            the seven regions
+        memory.md            the regions
         strings.md           the two arenas, and which one a string belongs in
         budgets.md           what is sized, and by whom
 

@@ -550,7 +550,7 @@ static int start(bridge *b, module *m, const bridge_artifact *a, enum backend_ca
     /* budgets.md: column_base has a cell for each of its components in every table there may
      * be, so whether its spans hold it is known here, and not at some barrier */
     need = sizeof(bridge_query) * m->system_count + sizeof(bridge_list) * m->observer_count
-         + 4ull * m->declared_count * storage_tables(b->storage);
+         + 4ull * m->declared_count * storage_tables(b->storage) + 4ull * m->declared_count;
     if (need > m->spans_len) {
         snprintf(err->text, sizeof err->text, "its spans of %u bytes do not hold a column_base of "
             "%u components by %u tables, which with its queries is %llu bytes", m->spans_len,

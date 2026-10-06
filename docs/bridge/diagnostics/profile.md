@@ -51,7 +51,7 @@ measure itself. So `[checks] profile` beside `validate`, as the two things Bridg
 asked, with two clock reads per dispatch as the cost when on.
 
 **How full each budget is, is asked for the same way, and is not built yet.** Every size a
-deployment states is a guess until something says how near it came: `memory.md`, *Where the seven
+deployment states is a guess until something says how near it came: `memory.md`, *Where the
 regions live*, calls `spans` a key "a deployment is expected to correct", and nothing tells it
 what to correct it to but the refusal when it runs out. So a second pull, beside this one: for
 the bridge, what is in use and the most that ever was against each `[budget]` key; for each

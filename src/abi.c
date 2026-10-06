@@ -146,9 +146,9 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     if (kept < BRIDGE_TABLE || kept > BRIDGE_SINGLETON) {
         return refuse(m, "type '%s': its storage layout is unset", name);
     }
-    /* ponytail: the other four are decided and not built - docs/plan/STAGE11.md. This goes
+    /* ponytail: the other three are decided and not built - docs/plan/STAGE11.md. This goes
      * as each is */
-    if (kept != BRIDGE_TABLE) {
+    if (kept != BRIDGE_TABLE && kept != BRIDGE_SPARSE_SET) {
         return refuse(m, "type '%s': %s is not built yet", name, storage_names[kept]);
     }
     print = fingerprint(desc_at, a[6]) ^ kind;
@@ -202,6 +202,12 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
                 b->max_types);
         }
 
+        if (kept == BRIDGE_SPARSE_SET && !storage_sets_free(b->storage)) {
+            schema_free(&s);
+            return refuse(m, "type '%s' is one more than [budget] sparse_sets of %u", name,
+                b->sparse_sets);
+        }
+
         /* everything it needs is had before any of it is kept: failure.md, *Out of memory* */
         for (k = 0; k < s.field_count; k ++) held_count += s.fields[k].type != nullptr;
         c = calloc(1, sizeof *c);
@@ -220,7 +226,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
             return refuse(m, "out of memory: there was none for type '%s'", name);
         }
         c->name = named;
-        c->type = storage_declare(b->storage, size, align);
+        c->type = storage_declare(b->storage, size, align, kept);
         c->s = s;
         c->kind = kind;
         c->storage = kept;
@@ -397,6 +403,28 @@ static int subscribe(module *m, uint64_t name_off, uint64_t name_len, uint32_t p
             return 1;
         }
         c = m->declared[t.slot];
+        /* storage.md, *What a query walks*: a system walks tables, or one sparse set alone,
+         * and what is kept elsewhere it reaches from the row. An observer walks nothing */
+        if (!events && c->storage == BRIDGE_SPARSE_SET && t.oper != BRIDGE_OPTIONAL) {
+            for (uint32_t k = 0; k < count; k ++) {
+                bridge_term other;
+                memcpy(&other, &terms[k], sizeof other);
+                if (k == i || other.oper == BRIDGE_OPTIONAL) continue;
+                refuse(m, "term %u of %s '%s': '%s' is kept in a sparse set, and does not "
+                    "select the rows of a table. It is stated optional and looked for at each "
+                    "row, or it is the one term that selects", i, what, name, c->name);
+                break;
+            }
+            if (!m->refused && t.oper == BRIDGE_NOT) {
+                refuse(m, "term %u of %s '%s': '%s' is kept in a sparse set, and a system "
+                    "cannot walk the entities that are not in it", i, what, name, c->name);
+            }
+            if (m->refused) {
+                free(asked);
+                free(s);
+                return 1;
+            }
+        }
         asked[i].type = c->type;
         asked[i].oper = t.oper;
         /* a term that must not match touches nothing */

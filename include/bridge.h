@@ -67,13 +67,18 @@ typedef struct {
     uint32_t pad;
     uint64_t persistent;      /* the persistent arena */
     uint64_t columns;         /* component columns and entity arrays */
+    /* how many components may be kept in each of the two storage layouts that hold something
+     * for every entity there may be. Each is a count, or BRIDGE_NONE: zero is unset */
+    int64_t  sparse_sets;
+    int64_t  direct_indexed;
 } bridge_budget;
-static_assert(sizeof(bridge_budget) == 48 && alignof(bridge_budget) == 8);
+static_assert(sizeof(bridge_budget) == 64 && alignof(bridge_budget) == 8);
 static_assert(offsetof(bridge_budget, entities) == 0 && offsetof(bridge_budget, tables) == 8);
 static_assert(offsetof(bridge_budget, types) == 12 && offsetof(bridge_budget, systems) == 16);
 static_assert(offsetof(bridge_budget, terms) == 20 && offsetof(bridge_budget, modules) == 24);
 static_assert(offsetof(bridge_budget, pad) == 28 && offsetof(bridge_budget, persistent) == 32);
-static_assert(offsetof(bridge_budget, columns) == 40);
+static_assert(offsetof(bridge_budget, columns) == 40 && offsetof(bridge_budget, sparse_sets) == 48);
+static_assert(offsetof(bridge_budget, direct_indexed) == 56);
 
 /* Two systems that conflict in one phase, in the order they are to run. A system is named by
  * its module's identity without the version, then itself: "game:actors:movement". */
@@ -91,7 +96,7 @@ typedef struct {
     uint32_t threads;               /* how many run a phase, counting the caller's. zero is unset */
     bridge_budget budget;
 } bridge_config;
-static_assert(sizeof(bridge_config) == 104 && alignof(bridge_config) == 8);
+static_assert(sizeof(bridge_config) == 120 && alignof(bridge_config) == 8);
 static_assert(offsetof(bridge_config, abi) == 0 && offsetof(bridge_config, pad2) == 4);
 static_assert(offsetof(bridge_config, backends) == 8 && offsetof(bridge_config, backend_count) == 16);
 static_assert(offsetof(bridge_config, pad0) == 20 && offsetof(bridge_config, phases) == 24);

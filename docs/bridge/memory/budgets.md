@@ -14,6 +14,8 @@ Two tiers, because two things are being sized.
     systems       systems and observers registered
     terms         terms one of them may have
     modules       modules loaded
+    sparse_sets       components kept in a sparse set, or none
+    direct_indexed    components kept direct-indexed, or none
 
     how many bytes
     persistent    the persistent arena
@@ -21,6 +23,14 @@ Two tiers, because two things are being sized.
 
 One block serves everyone, so no single module could size it. It arrives as a struct rather than a
 file, because Bridge-ASM700 reads none: `host-api.md`, *Bridge-ASM700 parses nothing*.
+
+**`sparse_sets` and `direct_indexed` are stated because of what those two storage layouts
+keep for every entity there may be**, carried or not: a sparse set's index, and a direct-indexed
+component's bits. How many such components there will be is not known when the bridge is created,
+and storage allocates nothing after - `storage.md`, *What bounds it*. So the deployment says how
+many, and their room is had at create: eight bytes an entity for each sparse set. Either may be
+none, which is stated as `BRIDGE_NONE`; zero is unset, and refused. A `declare` past either is
+refused, by name. `direct_indexed` is stated and not yet used: `PLAN.md`, stage 11.
 
 **`tables` is a count of what exists, not of what was ever seen.** A table lives while it has rows
 - `storage.md`, *A table* - so the number to state is how many different archetypes

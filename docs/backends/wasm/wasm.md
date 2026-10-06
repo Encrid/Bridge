@@ -124,7 +124,7 @@ following*.
 
 A fixed header at offset 0 of the private memory says where each of this module's regions begins.
 Bridge-ASM700 owns that memory outright, so there is nothing to negotiate and no capacity for the
-module to declare - see `memory.md`, *Where the seven regions live*, for what the header holds and
+module to declare - see `memory.md`, *Where the regions live*, for what the header holds and
 why no module could have sized it.
 
 ## The ABI layouts

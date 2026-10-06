@@ -154,6 +154,20 @@ static inline uint64_t bridge_entity_at(uint32_t entities, uint32_t row, uint32_
     return acc_ld_64(acc_row(entities, row, count, 8u));
 }
 
+/* ---- a sparse set, reached from a row. docs/bridge/storage.md, *A sparse set* ---- */
+
+/* where the sparse set that keeps component `slot` has its index: a cell for each entity */
+static inline uint32_t bridge_set_index(uint32_t slot)
+{
+    return acc_own_32(BRIDGE_HEADER(kept) + 4u * slot);
+}
+
+/* where entity `id` has its value in that set, from the shared base: zero if it has none */
+static inline uint32_t bridge_set_value(uint32_t index, uint64_t id)
+{
+    return acc_ld_32(acc_row(index, (uint32_t)id, BRIDGE_HEADER(entities), 4u));
+}
+
 /* ---- an observer's list: who triggered it at this barrier, and how ---- */
 
 static inline uint32_t bridge_triggers(uint32_t observer)

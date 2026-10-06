@@ -140,7 +140,8 @@ int main(int argc, char **argv)
     bridge_config cfg = { .abi = BRIDGE_HOST_ABI, .backends = backends, .backend_count = 1, .phases = phases,
         .phase_count = 2, .threads = 1, .budget =
         { .entities = 4096, .tables = 64, .types = 64, .systems = 128, .terms = 8, .modules = 8,
-          .persistent = 4096, .columns = 1 << 20 } };
+          .persistent = 4096, .columns = 1 << 20,
+          .sparse_sets = BRIDGE_NONE, .direct_indexed = BRIDGE_NONE } };
     bridge_artifact a;
     bridge *b;
     setvbuf(stdout, nullptr, _IONBF, 0);
@@ -152,6 +153,7 @@ int main(int argc, char **argv)
     }
     if (!strcmp(what, "nophases")) cfg.phase_count = 0;
     if (!strcmp(what, "nobudget")) cfg.budget.columns = 0;
+    if (!strcmp(what, "sparse")) cfg.budget.sparse_sets = 1;
     /* the three keys storage of our own brought: each unset, and the two counts used up */
     if (!strcmp(what, "unsettables")) cfg.budget.tables = 0;
     if (!strcmp(what, "unsettypes")) cfg.budget.types = 0;
@@ -197,6 +199,13 @@ int main(int argc, char **argv)
         load(b, &a);
         a = artifact("game:kept@0.1.0", "kept-none");
         load(b, &a);
+        a = artifact("game:kept@0.1.0", "kept-sparse");     /* and another than the mover's */
+        load(b, &a);
+    } else if (!strcmp(what, "sparse")) {       /* a sparse set, walked and reached */
+        a = artifact("game:hit@0.1.0", "hit");
+        a.cfg.spawns = 16;
+        load(b, &a);
+        frames(b, 2);
     } else if (!strcmp(what, "grant")) {        /* the reader, with no grant */
         a = artifact("view:reader@0.1.0", "reader");
         load(b, &a);

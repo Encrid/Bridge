@@ -1,0 +1,14 @@
+spawn
+attach_b
+  -: module 'st:store@0.1.0': [budget] columns of 112 bytes is used up. Not applied, of the changes it asked: 1 0 0
+  heard_s: heard of S: entity, events 1 3
+  heard_s: heard of S: entity, events 3 3
+  heard_both: heard of A and S: entity, events 1 3
+  heard_both: heard of A and S: entity, events 3 3
+look
+  look: the set walked: spans, rows 1 2
+  look: the set walked: the sum of its values 202 0
+look_b
+  look_b: the table walked: rows, and of them in the set 6 2
+  look_b: the table walked: the sum of A and S where both 204 0
+alive

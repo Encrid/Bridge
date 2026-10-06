@@ -70,6 +70,8 @@ NATIVE = [
     ('nstamptick', 'nstamp', ['VALUE=7', 'PHASE="tick"']),
     ('nfrag1', 'nfrag', ['SPLIT=1']), ('nfrag16', 'nfrag', ['SPLIT=16']),
     ('nfrag256', 'nfrag', ['SPLIT=256']), ('nfrag4096', 'nfrag', ['SPLIT=4096']),
+    ('nsparse', 'nsparse', []), ('nsparsebig', 'nsparse', ['BIG']), ('nsparsefat', 'nsparse', ['FAT']),
+    ('nsparsebad1', 'nsparse', ['BAD=1']), ('nsparsebad2', 'nsparse', ['BAD=2']),
     ('nweigh1', 'nweigh', ['ON=1']), ('nweigh2', 'nweigh', ['ON=2']), ('nweigh16', 'nweigh', ['ON=16']),
     ('nstress1', 'nstress', ['SEED=1u', 'SPACE="s1"']), ('nstress2', 'nstress', ['SEED=2u', 'SPACE="s2"']),
     ('nstress3', 'nstress', ['SEED=3u', 'SPACE="s3"']), ('nstress4', 'nstress', ['SEED=4u', 'SPACE="s4"']),
@@ -78,10 +80,11 @@ NATIVE = [
 # a module in C: the name, its source, whether its rows are tested, what it is compiled with.
 # `checked` or `unchecked` is stated for each, as the SDK asks: BRIDGE_ROWS_CHECKED, or not.
 PLAIN = ('mover reader refs fp badterm spin3 flood chatty rows halver twostep watcher chain '
-         'badobs events fixer nested nested2 namer spawner counter typer user settings hang')
+         'badobs events fixer nested nested2 namer spawner counter typer user settings hang hit')
 WASM = [(name, name, 'checked', []) for name in PLAIN.split()] + [
     ('rows-unchecked', 'rows', 'unchecked', []),
     ('kept-unset', 'kept', 'checked', ['KEPT=0']), ('kept-none', 'kept', 'checked', ['KEPT=9']),
+    ('kept-sparse', 'kept', 'checked', ['KEPT=BRIDGE_SPARSE_SET']),
     ('namer-reader', 'namer', 'checked', ['READER']),
     ('flaky-always', 'flaky', 'checked', ['OF=1', 'FAILS=1']),
     ('flaky-third', 'flaky', 'checked', ['OF=3', 'FAILS=1']),
@@ -407,7 +410,21 @@ CASES = [
     ('storage-stripfull', ['storage', 'stripfull'],
      '@tests/storage-stripfull.txt', None),
     ('storage-weigh', ['storage', 'weigh'],
-     r"an entity of 4096 bytes.*in    1 table.*in 4096 tables.*alive", r"FAIL"),
+     r"an entity of 4096 bytes.*in    1 table.*in 4096 tables.*a sparse set.*of 4096 bytes.*alive", r"FAIL"),
+    ('storage-sparse', ['storage', 'sparse'], '@tests/storage-sparse.txt', None),
+    ('storage-sparsefull', ['storage', 'sparsefull'], '@tests/storage-sparsefull.txt', None),
+    ('storage-sparsestrip', ['storage', 'sparsestrip'], '@tests/storage-sparsestrip.txt', None),
+    ('storage-sparsesweep', ['storage', 'sparsesweep'], '@tests/storage-sparsesweep.txt', None),
+    ('storage-sparsesweepa', ['storage', 'sparsesweepa'], '@tests/storage-sparsesweepa.txt', None),
+    ('storage-sparsedelete', ['storage', 'sparsedelete'], '@tests/storage-sparsedelete.txt', None),
+    ('storage-sparsenone', ['storage', 'sparsenone'],
+     r"did not load: type 'st:S' is one more than .budget. sparse_sets of 0.*alive", None),
+    ('storage-sparsebad1', ['storage', 'sparsebad1'],
+     r"did not load: term 1 of system 'both': 'st:S' is kept in a sparse set, and does not select the "
+     r"rows of a table.*alive", None),
+    ('storage-sparsebad2', ['storage', 'sparsebad2'],
+     r"did not load: term 0 of system 'without': 'st:S' is kept in a sparse set, and a system cannot "
+     r"walk the entities that are not in it.*alive", None),
     ('storage-baseline', ['storage', 'baseline'],
      r"read in order.*in no order.*204800 of them on.*found through its query.*alive", r"FAIL"),
     ('storage-measure', ['storage', 'measure'],
@@ -470,7 +487,11 @@ CASES = [
      r"mirror 100 0.*mirror 100 0.*mirror 100 0.*alive", None),
     ('stage3-keptunset', ['stage3', 'keptunset'],
      r"module 'game:kept@0.1.0' did not load: type 'game:Position': its storage layout is unset.*"
-     r"module 'game:kept@0.1.0' did not load: type 'game:Position': its storage layout is unset.*alive", None),
+     r"module 'game:kept@0.1.0' did not load: type 'game:Position' is stated as a sparse set here, and it "
+     r"was declared as a table. It is also declared by 'game:mover@0.1.0'.*alive", None),
+    ('stage3-sparse', ['stage3', 'sparse'],
+     r"game:hit@0.1.0/walked: hits 4 18.*game:hit@0.1.0/reached: bodies 10 4.*"
+     r"game:hit@0.1.0/reached: reached 18 0.*alive", r"did not load"),
     ('stage3-fingerprint', ['stage3', 'fingerprint'],
      r"module 'game:fp@0.1.0' did not load: type 'game:Position' has another component layout here: fingerprint [0-9a-f]+, and it was declared with [0-9a-f]+. It is also declared by 'game:mover@0.1.0'.*alive", None),
     ('stage3-grant', ['stage3', 'grant'],

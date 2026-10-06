@@ -48,9 +48,10 @@ as what it hands over is one stated value per key. The original Bridge had the s
     [order]    before
     [budget]   entities, tables, types,        work_limit, memory_limit
                systems, terms, modules,        init/reload/shutdown timeouts
-               persistent, columns             log_level, scratch, log_ring,
-    [checks]   validate, profile               spans, spawns, persistent
-    [backend]  a name, a library and its       pinned, config
+               persistent, columns,            log_level, scratch, log_ring,
+               sparse_sets, direct_indexed     spans, spawns, persistent
+    [checks]   validate, profile               pinned, config
+    [backend]  a name, a library and its
                settings, each
                                                read / write
                                                [.config]

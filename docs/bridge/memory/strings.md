@@ -7,7 +7,7 @@ live in an arena and the component holds `(offset, length)`, which is fixed size
 ordinary field.
 
 **Two arenas, because there are two lifetimes** - and they sit in two different memories, because
-the lifetimes come with different readerships: `memory.md`, *Where the seven regions live*. Both are **hunks
+the lifetimes come with different readerships: `memory.md`, *Where the regions live*. Both are **hunks
 rather than a hunk and a zone**, since neither has a free; what idTech3 split between those two, we
 split by who can see it.
 

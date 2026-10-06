@@ -1,0 +1,43 @@
+spawn
+attach_b
+  heard_s: heard of S: entity, events 1 3
+  heard_s: heard of S: entity, events 3 3
+  heard_s: heard of S: entity, events 5 3
+  heard_both: heard of A and S: entity, events 1 3
+  heard_both: heard of A and S: entity, events 3 3
+  heard_both: heard of A and S: entity, events 5 3
+look
+  look: the set walked: spans, rows 1 3
+  look: the set walked: the sum of its values 306 0
+look_b
+  look_b: the table walked: rows, and of them in the set 6 3
+  look_b: the table walked: the sum of A and S where both 312 0
+attach_b_half
+  heard_s: heard of S: entity, events 7 3
+strip st:S
+never
+  heard_s: heard of S: entity, events 7 4
+  heard_s: heard of S: entity, events 5 4
+  heard_s: heard of S: entity, events 3 4
+  heard_s: heard of S: entity, events 1 4
+  heard_both: heard of A and S: entity, events 5 4
+  heard_both: heard of A and S: entity, events 3 4
+  heard_both: heard of A and S: entity, events 1 4
+the entity that was in the set alone is alive
+look
+  look: the set walked: spans, rows 0 0
+  look: the set walked: the sum of its values 0 0
+look_b
+  look_b: the table walked: rows, and of them in the set 6 0
+  look_b: the table walked: the sum of A and S where both 0 0
+attach_b
+  heard_s: heard of S: entity, events 1 3
+  heard_s: heard of S: entity, events 3 3
+  heard_s: heard of S: entity, events 5 3
+  heard_both: heard of A and S: entity, events 1 3
+  heard_both: heard of A and S: entity, events 3 3
+  heard_both: heard of A and S: entity, events 5 3
+look
+  look: the set walked: spans, rows 1 3
+  look: the set walked: the sum of its values 306 0
+alive
