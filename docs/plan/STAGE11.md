@@ -371,3 +371,39 @@ still allocates nothing after `bridge_create` - `storage.md`, *What bounds it*.
 Scored as failing minimal, and chosen: a load cannot fail for an index that create would have
 reserved, and storage's rule holds as written.
 
+**4. A component may have no bytes: a tag.** It says that an entity is one of something and
+carries no value. Standard C has no struct without a member, so it is not a struct with nothing
+in it: it is a fourth kind at `declare`, `BRIDGE_TAG`, of size 0 and with no descriptor. It has
+no column in a table and no values in a sparse set, and it may be kept in any of the five
+storage layouts.
+
+Measured in the library, with storage told in scratch that a one-byte type has no size:
+204,800 entities carrying one four-byte value, and markers that split them over more tables.
+
+    tables    markers an entity    of four bytes    of one byte    of no bytes
+       1             0               2,400 KB        2,400 KB       2,400 KB
+      16             2               4,000 KB        2,800 KB       2,400 KB
+     256             4               5,600 KB        3,200 KB       2,400 KB
+    4096             6               7,424 KB        3,968 KB       2,432 KB
+
+A marker of one byte is 200 KB for each one every entity carries, and at six of them 63% on top
+of the columns. A read takes the same time whatever a marker's size. It was first recommended
+against, on arithmetic that called the cost slight, and the measurement changed that.
+
+    need          a tag                                    the smallest component is a byte
+    fast          does not apply: measured equal           does not apply
+    scalable      serves                                   fails: a byte a row a marker
+    modular       does not apply                           does not apply
+    extensible    does not apply                           does not apply
+    minimal       fails: a kind with no descriptor, and    serves
+                  the case of no size in five layouts
+    explicit      serves: carried, and no value            fails in part: a field that means
+                                                           nothing
+
+**Where a module is handed where a value is, a tag has none, and is handed `BRIDGE_CARRIED`.**
+That is 1: offset 0 of the shared memory is reserved and its first eight bytes hold nothing -
+`query.md`, *The interface is a query* - so 1 is not zero, which would say absent, and is no
+value's place. It is what a tag term's base is in a span, what its cell of `column_base` holds,
+what a sparse set's index holds for an entity that carries it, and what a singleton's cell
+holds when it is set.
+

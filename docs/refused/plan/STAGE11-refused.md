@@ -77,3 +77,8 @@ Refused: reserving for every declared type being a sparse set. Two hundred megab
 sixty-four types and four hundred thousand entities, decided by a number nobody stated for
 that. No condition brings it back.
 
+Refused: no tag, the smallest component being one byte. Nothing to build; and measured at 200
+KB of columns for each marker 204,800 entities carry. The condition that brings it back is the
+case of no size costing more to keep right in five storage layouts than the bytes it saves,
+shown by defects found in it.
+
