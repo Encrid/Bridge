@@ -45,13 +45,21 @@ All five are stated, and "no limit" is a value like any other: `-1`. `capabiliti
 
 ## What a bound costs
 
+**A bound is a safety net, and no module has to have one.** A system that never returns holds
+`bridge_phase` for ever, and running code can be stopped in three ways only: it counts for
+itself, which is a work limit; it checks a flag another thread sets, which is a timeout; or the
+operating system kills its thread, which the host does not survive. To stop it and keep the
+process, a check is compiled into its loops, and neither kind of check is free. So whether a
+module carries one is the deployment's to state for that module, and one that states
+`BRIDGE_NO_LIMIT` carries none.
+
 **A bound is paid for by the module that states it, and by no other.** A work limit is counted in the
-compiled code, on the path this design exists to keep free, and so is the check that lets a deadline
+compiled code, on the path this design exists to keep free, and so is the check that lets a timeout
 interrupt. On the wasm backend, over the tightest loop a system can have - one float read, changed
 and written back per row - that measured as:
 
     neither             0.29 ns a row
-    a deadline          0.43            x1.5
+    a timeout           0.43            x1.5
     a work limit        0.64            x2.2
     both                0.65            x2.2
 
@@ -68,10 +76,17 @@ while `work_limit = -1` everywhere was the common deployment, "and it was paying
 What a module gives up with `work_limit = -1` is exactly what it says: a system of its that never returns
 is never stopped, and the pass hangs with it, as it would for a native module.
 
-Refused: bounding a system by a deadline instead, which is the cheaper of the two. A timeout firing
-is the one thing a pass cannot reproduce - `schedule.md`, *What a pass depends on* - and it would
-have to be armed on every dispatch and for several systems at once. The condition that brings it
-back is record and replay being given up for good.
+Refused: a timeout as a second net for a system, which is the cheaper check of the two. Where it
+fires is wherever the code happened to be, so a stop by it is the one thing a pass cannot
+reproduce - `schedule.md`, *What a pass depends on* - though only in a pass where a module was
+being stopped anyway. And the wasm backend arms one timeout at a time, which a lifecycle call
+needs and systems running at once do not fit. Against that: the factors above are the worst
+there is, a loop of one addition, and nothing has measured the work limit on a system that does
+real work; and a module that finds it too dear states none. The condition that brings a
+system's timeout back is a deployment that wants a net on a module, has measured the work limit
+as too dear on that module's own systems, and accepts a stop that is not reproduced.
+`PLAN.md`, stage 17, measures the first half. This refusal's condition was "record and replay
+being given up for good", and record and replay had become a host's.
 
 Refused: counting in the module's own code at loop back-edges, by a rewriter of ours. That is an
 instrumenting compiler inside the library, for a gain nobody has measured. The condition that

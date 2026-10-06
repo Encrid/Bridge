@@ -396,5 +396,6 @@ run, which is the condition under which one system on several cores is weighed a
 *Done when 189 of the probe's checks pass, the two that cannot are the two named, and the GDExample
 frame is an order of magnitude under 42 us: if it is not, the architecture did not deliver and we
 find out here. And when the heaviest system's share of each phase is measured, with how many threads
-were idle beside it. And when what the port needed of a clock and of phases is written down, with
-the answer to whether it is shared.*
+were idle beside it; and what a work limit costs the port's own systems, where the only figure so
+far is for a loop of one addition - `limits.md`, *What a bound costs*. And when what the port needed
+of a clock and of phases is written down, with the answer to whether it is shared.*

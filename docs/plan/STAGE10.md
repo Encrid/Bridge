@@ -610,7 +610,10 @@ Of earlier stages:
     closed  a module is the unit of parallelism: it is, said as an execution model, with
             what it gives up, three refusals with one condition, and stage 17 measuring it.
             "Instance grouping" was another matter, and holds. `threads.md`
-    open    a system is bounded by fuel and never by a deadline, on every deployment
+    closed  a system is bounded by fuel and never by a deadline, on every deployment: by a
+            work limit only, which is a net no module has to have and only its own module
+            pays for. The refusal has a condition that is true now, and stage 17 measures
+            the cost on real systems. `limits.md`, *What a bound costs*
     open    a field's type is found in its own namespace only
     open    no phase names shipped, and a module writes its phase's name into its code
     open    no row for a barrier in the profile
