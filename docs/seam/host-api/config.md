@@ -79,8 +79,9 @@ inside one phase.
 `[.config]` - the `settings` a host hands over for a module - **seeds a singleton component.** The
 module declares the struct in its schema header like any other, and states it a singleton -
 `storage.md`, *A singleton*. Bridge-ASM700 gives it its value at init, matching the keys to the
-field names its descriptor states - `schema.md`, *There is no schema format*. A key the deployment set that the module never declared is an error at init, by
-name, where the original Bridge silently ignores a typo.
+field names its descriptor states - `schema.md`, *There is no schema format*. A key the
+deployment set that the module never declared is an error at init, by name, where the original
+Bridge silently ignores a typo.
 
 **Which component is the author's to say**, as `config`, a key of the manifest like `pinned`: only
 the author knows which of a module's structs holds its settings, which is the reason a Linux module
