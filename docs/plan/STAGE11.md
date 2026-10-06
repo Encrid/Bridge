@@ -128,3 +128,29 @@ all the same, by the decision of whoever the design is for. Which of the three w
 reader is handed is one of this stage's questions, and what it must answer is in those three
 failures.
 
+**Direct-indexed passes.** A value reached by entity id, the id's generation tested each time:
+
+                                    204,800           204,800          8,000,000
+                                    in order          in no order      in no order
+    as today, through the table     1.5 ns            2.2 to 4.7 ns    17 ns
+    a sparse set                    1.0 ns            2.0 to 4.0 ns    17 ns
+    direct-indexed                  0.63 ns           1.2 ns           11 ns
+
+One and a half to four times as quick as what exists, at the one thing it is for, and a sparse
+set gives nothing there. It costs the component's size for every entity there may be, carried or
+not: 25.6 MB for sixty-four bytes at four hundred thousand. Scored as failing scalable for that,
+and minimal as the least of the three, having no index, no row to move and nothing to run out
+of; where not building it fails fast. The need is argued and not measured in a deployment:
+`reference.md` calls a reach by id something done a few times. Whether a cell nobody gave a
+value to can be told from one that has one is a question that follows from it.
+
+**The singleton passes.** Found through its query and read, a value on one entity costs 0.6 ns
+each time, so there is no time to gain. What was found is that nothing holds there to be one: a
+module that declares its settings component can attach it to a second entity, and its query
+then answers two rows. As a storage layout, one place and no entity, it holds that by being what
+it is; and it is a fourth way to keep a component and something a module is handed that is not
+a query, which is how it was scored as failing minimal. Passed by the decision of whoever the
+design is for, over a rule on a component kept in a table.
+
+**So all five stand**, and every question below is asked of five.
+
