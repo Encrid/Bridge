@@ -19,8 +19,16 @@ a budget.
 one, and zero is never a legal value for it: a budget, `fuel`, a timeout, `on_error`. One key
 breaks that and is an open question: `log_level`, where zero is a severity - `STAGE10.md`, *The
 repair*. Where "none"
-is a real answer - `fuel`, a timeout, `memory_limit` - it is stated as `-1`, never by leaving the
-field alone: `capabilities.md`, *Capabilities, so the swap is honest*. A boolean
+is a real answer it is a value of its own, never the field left alone, and there are two because
+they say opposite things. A limit stated as none is `BRIDGE_NO_LIMIT`, -1: `fuel`, a timeout,
+`memory_limit`, `max_system_failures` - `capabilities.md`, *Capabilities, so the swap is honest*. A
+reservation stated as none is `BRIDGE_NONE`, -2: `spawns`, `persistent` - `budgets.md`, *Budgets*. A
+module with no limit may use all there is; one with no reservation gets nothing. Each key takes
+its own, and the other, like any other negative number, is refused at load by the key's name.
+
+Refused: one value for both, which is what this had, under two names. `spawns` given the name of
+"no limit" compiled and meant "none", and every negative number was taken for -1. The condition
+that brings one value back is a key that takes both senses. A boolean
 cannot be unset. Left alone it is `false`, which is the off or the safe side for all six: `trusted`,
 `reloadable`, `hot_reload`, `pinned`, `validate`, `profile`.
 

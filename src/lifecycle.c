@@ -132,6 +132,17 @@ static int unset(bridge *b, const char *identity, const char *key, int64_t value
     return 1;
 }
 
+/* A key that has a "none" has one, and a negative number that is not it is nobody's:
+ * config.md, *No unaccountable values*. `none` is BRIDGE_NO_LIMIT or BRIDGE_NONE. */
+static int neither(bridge *b, const char *identity, const char *key, int64_t value, int64_t none)
+{
+    if (value > 0 || value == none) return 0;
+    say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: %s is %lld, which is neither %s",
+        identity, key, (long long)value, none == BRIDGE_NO_LIMIT
+            ? "a limit nor BRIDGE_NO_LIMIT" : "an amount nor BRIDGE_NONE");
+    return 1;
+}
+
 /* A stated limit demands that the backend can enforce it - capabilities.md. */
 static int lacks(bridge *b, const char *identity, open_backend *o, uint32_t flag,
                  const char *key, const char *capability)
@@ -195,6 +206,16 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
         || unset(b, id, "scratch", cfg->scratch) || unset(b, id, "log_ring", cfg->log_ring)
         || unset(b, id, "spans", cfg->spans) || unset(b, id, "spawns", cfg->spawns)
         || unset(b, id, "persistent", cfg->persistent)) {
+        return 1;
+    }
+    if (neither(b, id, "max_system_failures", cfg->max_system_failures, BRIDGE_NO_LIMIT)
+        || neither(b, id, "fuel", cfg->fuel, BRIDGE_NO_LIMIT)
+        || neither(b, id, "memory_limit", cfg->memory_limit, BRIDGE_NO_LIMIT)
+        || neither(b, id, "init_timeout", cfg->init_timeout, BRIDGE_NO_LIMIT)
+        || neither(b, id, "reload_timeout", cfg->reload_timeout, BRIDGE_NO_LIMIT)
+        || neither(b, id, "shutdown_timeout", cfg->shutdown_timeout, BRIDGE_NO_LIMIT)
+        || neither(b, id, "spawns", cfg->spawns, BRIDGE_NONE)
+        || neither(b, id, "persistent", cfg->persistent, BRIDGE_NONE)) {
         return 1;
     }
     if (cfg->log_level > BRIDGE_LEVEL_MOST) {

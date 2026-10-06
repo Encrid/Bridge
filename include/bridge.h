@@ -55,8 +55,11 @@ typedef struct {
 } bridge_config;
 
 enum bridge_on_error : uint8_t { BRIDGE_FAIL = 1, BRIDGE_SKIP = 2 };    /* zero is unset */
+/* Two values and not one, because they say opposite things: a module with no limit may use
+ * all there is, and a module with no reservation gets nothing. Each field below takes one of
+ * them, and the other, like any other negative number, is refused at load. */
 constexpr int64_t BRIDGE_NO_LIMIT = -1;         /* a limit stated as none */
-constexpr int64_t BRIDGE_NONE = -1;             /* a reservation stated as none */
+constexpr int64_t BRIDGE_NONE = -2;             /* a reservation stated as none */
 /* A module with no settings component says so. No component is named without a colon, so
  * this names none of them; a config left null is unset, and refused. */
 #define BRIDGE_NO_CONFIG "none"

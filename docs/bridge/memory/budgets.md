@@ -73,8 +73,8 @@ rule flecs' own stack allocator keeps when it chains a page. Stating less is ref
 module allocated is in its share, and it is still loaded. Refused: accepting less and keeping the
 share as it was, a stated number that would not be true.
 
-A module that spawns nothing, or keeps no string, says so: `-1`, as for any key where none is a
-real answer.
+A module that spawns nothing, or keeps no string, says so: `BRIDGE_NONE`, which is -2 and not the
+-1 of a limit stated as none - `config.md`, *No unaccountable values*.
 
 Because modules come and go, `modules` bounds **how many module records exist at once**, not
 how the private memory is divided. A record is taken at load and freed at unload, and exhaustion refuses the

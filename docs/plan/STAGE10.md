@@ -499,7 +499,10 @@ at least five things, none defined, and none of them the one that was meant.
     closed  three events, now that an observer is told the net change: three still, named
             for what they are. BRIDGE_ON_ENTER and BRIDGE_ON_LEAVE are about the
             observer's terms, BRIDGE_ON_ATTACH about the entry. `data.md`, *Observers*
-    open    BRIDGE_NO_LIMIT and BRIDGE_NONE, one value
+    closed  BRIDGE_NO_LIMIT and BRIDGE_NONE, one value: two, -1 and -2, since they say
+            opposite things. A key takes its own, and the other, like any negative that
+            is neither, is refused at load: every negative had been taken for -1.
+            `config.md`, *No unaccountable values*
     open    the reserved fields, and the widths of the enums
     open    a signature the native backend cannot check
     open    a memory handle kept for a backend that does not exist

@@ -73,7 +73,7 @@ budget after a minute of running, and says why: the budget is there to catch a m
 run, *"not one that has a bad day twice a year"*. One count that falls as slowly as it rises does
 that with a single number, and stops any module that fails more often than not.
 
-`-1` means never stop it, as for every key where none is a real answer.
+`-1`, `BRIDGE_NO_LIMIT`, means never stop it, as for every limit.
 
 Refused: a count that one clean barrier resets, which is easier to say and never stops a module
 failing every other pass. The condition that brings it back is deployments finding this one hard to

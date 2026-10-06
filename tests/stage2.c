@@ -115,6 +115,17 @@ int main(int argc, char **argv)
         a.cfg.reload_timeout = BRIDGE_NO_LIMIT;
         a.cfg.shutdown_timeout = BRIDGE_NO_LIMIT;
         load(b, &a);
+    } else if (!strcmp(what, "nonelimit")) {    /* the "none" of another key is not this one's */
+        a = artifact("ok");
+        a.cfg.spawns = BRIDGE_NO_LIMIT;
+        load(b, &a);
+        a = artifact("ok");
+        a.cfg.fuel = BRIDGE_NONE;
+        load(b, &a);
+    } else if (!strcmp(what, "negative")) {     /* and a negative number that is no "none" at all */
+        a = artifact("ok");
+        a.cfg.memory_limit = -7;
+        load(b, &a);
     } else if (!strcmp(what, "stop")) {         /* fail stops the bridge; skip does not */
         a = artifact("oob");
         load(b, &a);
