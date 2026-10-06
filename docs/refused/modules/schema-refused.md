@@ -35,3 +35,9 @@ Refused: reaching across namespaces for a field's type, which would need the des
 namespace C has no syntax for. The condition that brings it back is a mod that must embed one of the
 game's structs in its own component and finds the copy a burden; until then it declares a struct of
 its own with the same body.
+
+Refused: turning the body into text after its macros are expanded, so that a length given by a
+`#define` arrives as its number. It would work for a macro and not for a typed constant, which
+is what a named number is in this code - `build.md`, *The standard* - and nothing would say why
+one is taken and the other refused. The condition that brings it back is schema headers that
+must share a length with code that cannot take it from the field.

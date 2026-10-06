@@ -678,6 +678,8 @@ middle of a paragraph in `config.md`.
             finds room for, where it stopped at that half. `budgets.md`
     closed  a test that a barrier allocates nothing: cases `alloc-changes`, `alloc-tables`
             and `alloc-strip`, against a library whose calls to the allocator are counted
+    closed  a component's array length cannot be a named constant: it holds. The number is
+            written once, in the struct, and taken from the field elsewhere. `schema.md`
     closed  an allocation that fails at load: at create, load, reload or unload it is a
             refusal with a record, and the bridge is as it was. Held by answering every
             allocation null in turn, case `alloc-nomemory`. Found by it: a reload that

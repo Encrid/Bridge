@@ -57,14 +57,18 @@ is accepted:
     a field       type name ;   or   type name [ count ] ;
     a type        bool char int8_t int16_t int32_t int64_t uint8_t uint16_t uint32_t
                   uint64_t float double bridge_text, or a type its namespace declared
-    an enum       { name , name = integer , ... }     counted from zero, or from the last
-    a bitmask     { name = integer , ... }            every bit stated
+    an enum       integer { name , name = integer , ... }   counted from zero, or from
+                                                            the last
+    a bitmask     unsigned { name = integer , ... }         every bit stated
 
 An entity id is a `uint64_t` - `reference.md`, *Reference following*, is built on it. An inline
-array has one length. Anything else is refused at `declare`, and the refusal quotes the word the
-reading stopped at: `unsigned`, `const`, `*`, a second dimension, a name nothing declared.
-`tests/schema.c` reads every accepted spelling against what the compiler lays the same struct out
-as, and has every other refused by its word.
+array has one length, and it is written as a number: the descriptor is the struct's text before the
+preprocessor has replaced any name, so `char title[N]` reaches Bridge-ASM700 as the letter and is
+refused at it. The number is written once, in the struct, and code that needs it takes it from the
+field - `sizeof` of the field over `sizeof` of one of it. Anything else is refused at `declare`, and
+the refusal quotes the word the reading stopped at: `unsigned`, `const`, `*`, a second dimension, a
+name nothing declared. `tests/schema.c` reads every accepted spelling against what the compiler lays
+the same struct out as, and has every other refused by its word.
 
 **A field whose type is another declared type names it bare, and it is found in the component's own
 namespace.** `Vec3 at;` in `game:Body` is `game:Vec3`, which a module declares first: a struct, an
