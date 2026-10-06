@@ -79,7 +79,7 @@ The shared memory's three regions and each module's private memory: the header, 
 
 `declare`, with the fingerprint, type-set and grant checks. `system`, with the query refusals -
 `query.md`, *What a query may not ask for*. The structural entries `spawn`, `destroy`, `attach` and
-`detach`, and `alloc`. Fuel, re-set before every dispatch. `bridge_phase` and the barrier, serial
+`detach`, and `alloc`. The work limit, re-set before every dispatch. `bridge_phase` and the barrier, serial
 for now: queued changes applied, spans republished, rings drained, scratch reset. The entity index
 mirror, driven off the patched hook and flecs' events, and `get` over it - `reference.md`,
 *Reference following*. The row-count check, which stage 10 made needless - `validation.md`, *Always
@@ -92,9 +92,9 @@ Access mode and queries are part of declaration from the start, not retrofitted.
 *Done when two modules share a component array with no crossing per access, neither can reach the
 other's spans, a mirror lookup survives a batch of swap-removes, and the accessor's test is measured
 against a build without it* - `validation.md`, *Always on*, states that cost as reasoning, and this
-is where it becomes a measurement. *And when a fingerprint mismatch, an ungranted declare and a
-term with no such operator are each refused by name; a system that never returns is stopped by its fuel; a
-`spawn` past the entity ceiling fails where it happens; a log line reaches the sink; and an
+is where it becomes a measurement. *And when a fingerprint mismatch, an ungranted declare and a term
+with no such operator are each refused by name; a system that never returns is stopped by its work
+limit; a `spawn` past the entity ceiling fails where it happens; a log line reaches the sink; and an
 overflowing ring reports how many it dropped.* Met.
 
 ## 4. The native backend

@@ -582,8 +582,9 @@ Of this repair:
             is part of one guarantee, which had two names: `trusted` where a deployment
             asked and `sandbox` where a backend answered. The capability is `untrusted`,
             and how a backend keeps it is its own. `capabilities.md`
-    open    three more guarantees with two names each: `fuel` and `meter`, a timeout and
-            `deadline`, `memory_limit` and `limit`. Each weighed before it is renamed
+    closed  three more guarantees with two names each: `fuel` and `meter`, a timeout and
+            `deadline`, `memory_limit` and `limit`. Each has one now: `work_limit`,
+            `timeout`, `memory_limit`. `capabilities.md`
     open    the memory handle: the wasm backend compiles a holder module for a block at every
             `instance_create`, which is work a handle could keep once. To be weighed with it
 

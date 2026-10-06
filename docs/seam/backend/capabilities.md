@@ -1,12 +1,12 @@
 # Capabilities, so the swap is honest
 
 `backend_capabilities` is not decoration. A backend says what it can actually do, and these flags
-are how it states the guarantees in `module.md`, *Three guarantees differ* - metering is three flags,
-`meter`, `timeout` and `memory_limit`, and reload is two. The last is about the backend itself:
+are how it states the guarantees in `module.md`, *Three guarantees differ* - the limits are three flags,
+`work_limit`, `timeout` and `memory_limit`, and reload is two. The last is about the backend itself:
 
                    wasm   native
     untrusted      yes    no      a module that is not trusted can be run here
-    meter          yes    no      fuel, or an equivalent
+    work_limit     yes    no      an invocation's work can be counted, and bounded
     timeout        yes    no      a call can be given a timeout, and is abandoned past it
     memory_limit   yes    no      a module's own memory can be given a ceiling
     reload         yes    yes     an instance can be replaced while the process runs -
@@ -40,11 +40,13 @@ set to the safe one. It got isolation between its VMs only because the three had
 shared no data.
 
 Each flag is demanded by a **config key**, not by a module: `untrusted` by `trusted = false`,
-`meter` by `fuel`, `timeout` by any of the three timeouts, `memory_limit` by the key of that
-name, `reload` by `hot_reload`. **A guarantee has one name**, for the key that asks it and the
+`work_limit` and `memory_limit` each by the key of its name, `timeout` by any of the three
+timeouts, `reload` by `hot_reload`. **A guarantee has one name**, for the key that asks it and the
 capability that answers: `timeout` was `deadline` at this seam and `memory_limit` was `limit`,
 two words for one thing each, and a deadline is a moment where what the entry takes is a length
-of time.
+of time. And `work_limit` was `fuel` where a deployment stated it and `meter` where a backend
+answered: fuel is what wasmtime calls the count it keeps, and belongs in the wasm backend's
+document as `sandbox` does.
 `side by side` is demanded by nothing: it is how Bridge-ASM700 learns which order a reload takes -
 `lifecycle.md`, *The runtime lifecycle*. `unload` is demanded by nothing either: it is how
 Bridge-ASM700 learns what to do with a backend's library at `bridge_destroy` - `create.md`,
@@ -57,10 +59,10 @@ deployment chose both. It is therefore one of Bridge-ASM700's own refusals and t
 under `on_error`, exactly as a denied grant or an ambiguous order does: `failure.md`, *When
 something fails*.
 
-**A key stated as "no limit" demands nothing.** `fuel`, a timeout and `memory_limit` each take `-1`
+**A key stated as "no limit" demands nothing.** `work_limit`, a timeout and `memory_limit` each take `-1`
 for that, which is how a module on the native backend states them at all. It is the same move as
 `trusted = true`: the absence of a guarantee is written down by somebody rather than arrived at.
-Refused: letting zero mean "not applicable" on a backend that cannot meter, which would give one
+Refused: letting zero mean "not applicable" on a backend that cannot keep a work limit, which would give one
 field two readings. `config.md`, *No unaccountable values*.
 
 ## Nothing is downgraded

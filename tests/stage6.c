@@ -35,7 +35,7 @@ static bridge_artifact native(const char *identity, const char *path)
     a.cfg.trusted = true;
     a.cfg.on_error = BRIDGE_SKIP;
     a.cfg.max_system_failures = 3;
-    a.cfg.fuel = BRIDGE_NO_LIMIT;
+    a.cfg.work_limit = BRIDGE_NO_LIMIT;
     a.cfg.memory_limit = BRIDGE_NO_LIMIT;
     a.cfg.init_timeout = BRIDGE_NO_LIMIT;
     a.cfg.reload_timeout = BRIDGE_NO_LIMIT;
@@ -71,7 +71,7 @@ static bridge_artifact wasm(const char *identity, const char *file)
     a.bytes = data;
     a.backend = "wasm";
     a.cfg.trusted = false;
-    a.cfg.fuel = 10'000'000;
+    a.cfg.work_limit = 10'000'000;
     a.cfg.memory_limit = 16 << 20;
     a.cfg.init_timeout = 2000 * MS;
     a.cfg.reload_timeout = 2000 * MS;

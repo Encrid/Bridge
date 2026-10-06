@@ -263,7 +263,7 @@ BACKEND_EXPORT void backend_destroy(backend *b)
 
 BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] backend *b)
 {
-    return BACKEND_UNTRUSTED | BACKEND_METER | BACKEND_TIMEOUT | BACKEND_MEMORY_LIMIT | BACKEND_RELOAD
+    return BACKEND_UNTRUSTED | BACKEND_WORK_LIMIT | BACKEND_TIMEOUT | BACKEND_MEMORY_LIMIT | BACKEND_RELOAD
          | BACKEND_SIDE_BY_SIDE;
 }
 
@@ -300,7 +300,7 @@ BACKEND_EXPORT backend_module *module_compile(
         fail(err, "this backend compiles a module from its bytes, and was handed none", nullptr, nullptr);
         return nullptr;
     }
-    enum engine_kind kind = (demands & BACKEND_METER ? METERED : 0)
+    enum engine_kind kind = (demands & BACKEND_WORK_LIMIT ? METERED : 0)
              | (demands & BACKEND_TIMEOUT ? INTERRUPTIBLE : 0);
     wasmtime_module_t *module = nullptr;
     wasmtime_error_t *error = wasmtime_module_new(engine_for(b, kind), bytes, len, &module);
@@ -440,7 +440,7 @@ BACKEND_EXPORT backend_instance *instance_create(backend *b, backend_module *m,
     return i;
 }
 
-BACKEND_EXPORT void instance_set_fuel(backend_instance *i, uint64_t units)
+BACKEND_EXPORT void instance_set_work_limit(backend_instance *i, uint64_t units)
 {
     if (i->m->kind & METERED) drop(wasmtime_context_set_fuel(i->ctx, units));
 }

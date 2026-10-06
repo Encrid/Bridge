@@ -197,11 +197,11 @@ so the order the rest happen to run in cannot change the result - the conflict g
 parallelism and hands this over for nothing.
 
 So a pass is reproducible from its storage and that one column set. Entity ids and arena offsets are
-Bridge-ASM700's to mint in order, iteration order follows from the same history, and fuel is deterministic
-by period - `limits.md`, *What bounds a run*.
+Bridge-ASM700's to mint in order, iteration order follows from the same history, and a work limit is
+deterministic by period - `limits.md`, *What bounds a run*.
 
 **The one thing that is not reproducible is a timeout firing.** The same `init` may finish on a
-quiet machine and be killed on a busy one. That is the cost of wall time, and it is why fuel and a
+quiet machine and be killed on a busy one. That is the cost of wall time, and it is why a work limit and a
 timeout are not interchangeable.
 
 **That is a claim, and it has a case.** `tests/storage.c` runs four modules through eight million

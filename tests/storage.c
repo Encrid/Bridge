@@ -72,7 +72,7 @@ static bridge_artifact store_module(const char *path, int64_t spawns, uint32_t s
     a.cfg.trusted = true;
     a.cfg.on_error = BRIDGE_FAIL;
     a.cfg.max_system_failures = 1;
-    a.cfg.fuel = BRIDGE_NO_LIMIT;
+    a.cfg.work_limit = BRIDGE_NO_LIMIT;
     a.cfg.memory_limit = BRIDGE_NO_LIMIT;
     a.cfg.init_timeout = BRIDGE_NO_LIMIT;
     a.cfg.reload_timeout = BRIDGE_NO_LIMIT;

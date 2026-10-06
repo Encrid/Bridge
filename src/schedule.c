@@ -203,8 +203,9 @@ static void run_job(void *arg)
         m->running = s;
         m->turn = s->turn;
         h->system = s->observer ? slot | 0x8000u : slot;
-        /* fuel only depletes, so it is set again before every dispatch - limits.md */
-        if (m->fuel > 0) m->on->api.instance_set_fuel(m->instance, (uint64_t)m->fuel);
+        /* what is left of it only goes down, so it is set again before every dispatch -
+         * limits.md */
+        if (m->work_limit > 0) m->on->api.instance_set_work_limit(m->instance, (uint64_t)m->work_limit);
         m->refused = 0;
         if (m->on->api.call(s->fn, &status, &err) || m->refused) {
             snprintf(s->why, sizeof s->why, "%s", m->refused ? m->why : err.text);

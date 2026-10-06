@@ -16,11 +16,11 @@ at load for a module's. `budgets.md`, *Bridge-ASM700 defaults none of them*, for
 a budget.
 
 **Unset is zero.** Bridge-ASM700 sees a struct, so a numeric or enum field left at zero is the unset
-one, and zero is never a legal value for it: a budget, `fuel`, a timeout, `on_error`. One key
+one, and zero is never a legal value for it: a budget, `work_limit`, a timeout, `on_error`. One key
 breaks that and is an open question: `log_level`, where zero is a severity - `STAGE10.md`, *The
 repair*. Where "none"
 is a real answer it is a value of its own, never the field left alone, and there are two because
-they say opposite things. A limit stated as none is `BRIDGE_NO_LIMIT`, -1: `fuel`, a timeout,
+they say opposite things. A limit stated as none is `BRIDGE_NO_LIMIT`, -1: `work_limit`, a timeout,
 `memory_limit`, `max_system_failures` - `capabilities.md`, *Capabilities, so the swap is honest*. A
 reservation stated as none is `BRIDGE_NONE`, -2: `spawns`, `persistent`, `changes` - `budgets.md`,
 *Budgets*. A
@@ -44,7 +44,7 @@ as what it hands over is one stated value per key. The original Bridge had the s
     phases     an ordered list of names        trusted, reloadable, hot_reload
     threads    how many run a phase            on_error, max_system_failures
     [order]    before
-    [budget]   entities, tables, types,        fuel, memory_limit
+    [budget]   entities, tables, types,        work_limit, memory_limit
                systems, terms, modules,        init/reload/shutdown timeouts
                persistent, columns             log_level, scratch, log_ring,
     [checks]   validate, profile               spans, spawns, persistent
@@ -115,7 +115,7 @@ value; the component is the running state.
 
 That is why nothing needs a mechanism for runtime settings: **the settings that change constantly in
 a running program were never Bridge-ASM700's.** The ones that are Bridge-ASM700's are administrative
-- a fuel budget, a log level - and change by reload, which is cheap because storage survives it.
+- a work limit, a log level - and change by reload, which is cheap because storage survives it.
 
 Keeping a changed setting across a restart is between a native module, which can write a file, and
 the host, which reads it back. Bridge-ASM700 never sees it.

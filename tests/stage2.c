@@ -46,7 +46,7 @@ static bridge_artifact artifact(const char *name)
     a.cfg.trusted = false;
     a.cfg.on_error = BRIDGE_SKIP;
     a.cfg.max_system_failures = 3;
-    a.cfg.fuel = 1'000'000;
+    a.cfg.work_limit = 1'000'000;
     a.cfg.memory_limit = 1 << 20;
     a.cfg.init_timeout = 200 * MS;
     a.cfg.reload_timeout = 200 * MS;
@@ -110,7 +110,7 @@ int main(int argc, char **argv)
         load(b, &a);
     } else if (!strcmp(what, "nolimit")) {      /* "none" is a value, and it loads */
         a = artifact("ok");
-        a.cfg.fuel = BRIDGE_NO_LIMIT;
+        a.cfg.work_limit = BRIDGE_NO_LIMIT;
         a.cfg.memory_limit = BRIDGE_NO_LIMIT;
         a.cfg.init_timeout = BRIDGE_NO_LIMIT;
         a.cfg.reload_timeout = BRIDGE_NO_LIMIT;
@@ -121,7 +121,7 @@ int main(int argc, char **argv)
         a.cfg.spawns = BRIDGE_NO_LIMIT;
         load(b, &a);
         a = artifact("ok");
-        a.cfg.fuel = BRIDGE_NONE;
+        a.cfg.work_limit = BRIDGE_NONE;
         load(b, &a);
     } else if (!strcmp(what, "negative")) {     /* and a negative number that is no "none" at all */
         a = artifact("ok");

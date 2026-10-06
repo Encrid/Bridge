@@ -75,8 +75,8 @@ backend adds exactly one refusal of its own, in its own SDK.
     untrusted        on the wasm backend a module cannot reach memory it was not
                      given, so one that is not trusted can be run. on the native backend
                      it is code in Bridge-ASM700's process, and nothing contains it
-    metering         fuel, timeouts and memory limits apply on the wasm backend -
-                     `limits.md`, *What bounds a run*. native code is not meterable
+    limits           a work limit, timeouts and a memory limit apply on the wasm backend -
+                     `limits.md`, *What bounds a run*. native code keeps none of them
     clean reload     on the wasm backend a reload is a fresh instance over surviving
                      storage. on the native backend a module can be unloaded and
                      reloaded, but static state and held pointers make it fragile
@@ -93,7 +93,7 @@ The native backend is for what cannot be reached from inside wasm - `native.md` 
 covers. The wasm backend is for when the three guarantees above are worth having.
 
 Pure computation can run on either. A physics solver on the wasm backend pays the wasm execution
-penalty and gets bounds checks, fuel, a trap instead of a crash and a clean reload; on the native
+penalty and gets bounds checks, a work limit, a trap instead of a crash and a clean reload; on the native
 backend it runs native and gets none of that. **That is a trade, not a rule**, and the deployment
 makes it.
 

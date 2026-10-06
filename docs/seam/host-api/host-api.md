@@ -102,7 +102,7 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
         enum bridge_on_error on_error;   /* FAIL | SKIP. zero is unset */
         /* each of the next six: zero is unset, BRIDGE_NO_LIMIT (-1) is "no limit" */
         int64_t  max_system_failures;    /* each system is counted against it, alone */
-        int64_t  fuel;               /* units per system invocation */
+        int64_t  work_limit;         /* work one system invocation may do */
         int64_t  memory_limit;       /* bytes. a ceiling, never re-set */
         int64_t  init_timeout, reload_timeout, shutdown_timeout;   /* nanoseconds, per call */
         uint8_t  log_level;

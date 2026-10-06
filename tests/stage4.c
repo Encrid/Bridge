@@ -47,7 +47,7 @@ static bridge_artifact native(const char *identity, const char *path)
     a.cfg.trusted = true;
     a.cfg.on_error = BRIDGE_SKIP;
     a.cfg.max_system_failures = 3;
-    a.cfg.fuel = BRIDGE_NO_LIMIT;
+    a.cfg.work_limit = BRIDGE_NO_LIMIT;
     a.cfg.memory_limit = BRIDGE_NO_LIMIT;
     a.cfg.init_timeout = BRIDGE_NO_LIMIT;
     a.cfg.reload_timeout = BRIDGE_NO_LIMIT;
@@ -82,7 +82,7 @@ static bridge_artifact wasm_reader()
     a.bytes = data;
     a.backend = "wasm";
     a.cfg.trusted = false;
-    a.cfg.fuel = 10'000'000;
+    a.cfg.work_limit = 10'000'000;
     a.cfg.memory_limit = 16 << 20;
     a.cfg.init_timeout = 2000 * MS;
     a.cfg.reload_timeout = 2000 * MS;
@@ -161,7 +161,7 @@ int main(int argc, char **argv)
         load(b, &a);
     } else if (!strcmp(what, "limit")) {
         a = native("game:mover@0.1.0", "no-such-library");
-        a.cfg.fuel = 1000;
+        a.cfg.work_limit = 1000;
         load(b, &a);
     } else if (!strcmp(what, "nopath")) {       /* a native module, and nowhere to find it */
         a = native("game:mover@0.1.0", nullptr);

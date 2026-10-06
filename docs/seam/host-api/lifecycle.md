@@ -84,13 +84,13 @@ by an operator, for the reason that holds here: what failed was the new artifact
 must be able to follow. Refused: no reload at all on such a backend, which gives up what
 `capabilities.md` lists.
 
-**What a reload may change is what is the instance's.** Fuel, limits, timeouts, the log level and
-the three sizes of the private memory all arrive with the new `cfg`, as do `spawns` and the grants.
-`persistent` too, upwards only: a reload that states more is given more, and one that states less
-is refused by name, since what it allocated is in that share - `budgets.md`, *Budgets*. A
-component the new instance
-no longer declares is treated as an unload treats it. And **settings are not seeded again** -
-`config.md`, *A module's own settings are a component*: after init the component is the state.
+**What a reload may change is what is the instance's.** The work limit, the memory limit, timeouts,
+the log level and the three sizes of the private memory all arrive with the new `cfg`, as do
+`spawns` and the grants. `persistent` too, upwards only: a reload that states more is given more,
+and one that states less is refused by name, since what it allocated is in that share -
+`budgets.md`, *Budgets*. A component the new instance no longer declares is treated as an unload
+treats it. And **settings are not seeded again** - `config.md`, *A module's own settings are a
+component*: after init the component is the state.
 
 **There is no `reset` flag** - `lifetime.md`, *Lifetime*, for why. That makes `hot_reload` mean
 something: it gates reload-in-place, the only thing with no alternative, rather than an outcome a

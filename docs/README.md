@@ -49,7 +49,7 @@ diagram to keep in step with. One concern per document, in reading order:
     bridge/run/
         schedule.md          phases, barriers, observers, the ordering refusal
         threads.md           what runs at once
-        limits.md            fuel, timeouts, the memory ceiling
+        limits.md            the work limit, timeouts, the memory ceiling
         failure.md           what happens when something fails
 
     bridge/data/
@@ -171,6 +171,9 @@ where two things could be meant the qualified form is the only form.
     entity            an id: an index and a generation. `data.md`
     reference         an entity id kept in a component and followed. `reference.md`
     term              one component a query asks for, and how
+    work limit        the most work one invocation of a system may do, counted by the backend
+                      in its own units: the key `work_limit` and the capability of that name.
+                      Not "fuel", which is what wasmtime calls its count, nor "meter"
     trusted           what a deployment states of a module: that its code needs no containing.
                       The backend's side of it is the capability "untrusted". Not "sandbox",
                       which is how one backend keeps it

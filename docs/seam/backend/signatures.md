@@ -60,7 +60,7 @@ columns, so there is nothing to pass. No marshalling at this seam, no arity to a
 a backend could get wrong about either.
 
 `status` is what the function returned; `err` is whether it returned at all. A trap is an ordinary
-outcome - a module that reads out of bounds, exhausts a system's fuel, or runs past a lifecycle
+outcome - a module that reads out of bounds, exhausts a system's work limit, or runs past a lifecycle
 call's timeout produces one, and the process keeps running - and `failure.md`, *When something
 fails*, treats the two alike on purpose.
 

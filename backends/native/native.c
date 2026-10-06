@@ -118,7 +118,8 @@ BACKEND_EXPORT void backend_destroy(backend *b)
     free(b);
 }
 
-/* No sandbox, no meter, no deadline, no limit: nothing contains code in this process. And not
+/* It runs only what is trusted, and keeps no work limit, no timeout and no memory limit:
+ * nothing contains code in this process. And not
  * side by side: a process cannot hold two copies of one library. */
 BACKEND_EXPORT enum backend_capability backend_capabilities([[maybe_unused]] backend *b)
 {
@@ -224,7 +225,7 @@ BACKEND_EXPORT void instance_destroy(backend_instance *i)
 }
 
 /* this backend answered no to all three, so Bridge-ASM700 never has a number to hand them */
-BACKEND_EXPORT void instance_set_fuel([[maybe_unused]] backend_instance *i,
+BACKEND_EXPORT void instance_set_work_limit([[maybe_unused]] backend_instance *i,
                                       [[maybe_unused]] uint64_t units) { }
 BACKEND_EXPORT void instance_set_timeout(
     [[maybe_unused]] backend_instance *i, [[maybe_unused]] uint64_t nanos) { }

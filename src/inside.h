@@ -102,7 +102,7 @@ struct module {
     bridge_system **observers;      /* by slot */
     uint32_t       observer_count;
 
-    int64_t   fuel;
+    int64_t   work_limit;
     /* What is set aside for it alone - threads.md. Ids it may hand out, taken from storage at a
      * barrier; its share of the persistent arena; and what it asked to have changed, applied
      * at the next barrier in the order it asked. Only its own thread touches any of them. */

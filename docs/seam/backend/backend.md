@@ -30,7 +30,7 @@ name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
 
     instance_create(backend, module, memories, count) -> instance
     instance_destroy(instance)
-    instance_set_fuel(instance, units)
+    instance_set_work_limit(instance, units)
     instance_set_timeout(instance, nanos)
     instance_set_memory_limit(instance, bytes)
 
@@ -115,9 +115,9 @@ a clock would silently disable every deadline in the deployment. A backend that 
 says so through `timeout` in `capabilities.md`, *Capabilities, so the swap is honest*, instead of
 accepting a number it will ignore. How the wasm backend keeps time is `wasmtime.md`, *Deadlines*.
 
-What is asked for is a **lifecycle call's** timeout; a system is bounded by fuel alone, for the
-reason in `limits.md`, *What bounds a run*. And `instance_set_fuel` is called **before every
-dispatch**, not once at load, because fuel only depletes.
+What is asked for is a **lifecycle call's** timeout; a system is bounded by a work limit alone, for the
+reason in `limits.md`, *What bounds a run*. And `instance_set_work_limit` is called **before every
+dispatch**, not once at load, because what is left of one only goes down.
 
 ## What the backend does not do
 
@@ -130,7 +130,7 @@ dispose"*, so one per instance is both idiomatic and what Bridge-ASM700 wants. T
 therefore the **instance**, and how a backend groups instances internally is its business: wasmtime
 gives each a store, the native backend gives each nothing.
 
-Fuel, a lifecycle call's timeout and the memory limit all move with it. They are per module in
+The work limit, a lifecycle call's timeout and the memory limit all move with it. They are per module in
 config, and a limiter that knows which module is executing can hold co-tenants to their own
 ceilings - so scoping them to one backend's concept would be wrong twice over.
 
@@ -140,14 +140,14 @@ grouping policy would be a decision shaped by one engine. A backend whose instan
 share state to be viable at all - one interpreter for all of them, say - groups them itself, and
 if a deployment has to say which go together it says so in that backend's own settings, which
 Bridge-ASM700 passes through unread. The condition that would change the answer is such a backend
-for which that is not enough: one where what Bridge-ASM700 asks of an instance - its fuel, its
+for which that is not enough: one where what Bridge-ASM700 asks of an instance - its work limit, its
 timeout, its memory limit - cannot be honoured without Bridge-ASM700 knowing the group.
 
 The test each entry passes is that it means something to **every** backend. `module_compile` is
-compile-or-dlopen; `instance_set_fuel` is set-fuel-or-say-you-cannot, which is what `meter` in
-`capabilities.md`, *Capabilities, so the swap is honest*, exists to say.
+compile-or-dlopen; `instance_set_work_limit` is set-the-work-limit-or-say-you-cannot, which is what
+`work_limit` in `capabilities.md`, *Capabilities, so the swap is honest*, exists to say.
 
-So **meaningful-but-unavailable is not meaningless** - that is `instance_set_fuel`, kept.
+So **meaningful-but-unavailable is not meaningless** - that is `instance_set_work_limit`, kept.
 Meaningless to one backend is a different thing, and that is `store_create`: not "cannot do it" but
 "the word names nothing here", which no capability flag could rescue.
 

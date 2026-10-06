@@ -81,7 +81,7 @@ The condition that brings it back is several deadlines running at once.
 
 Fuel and epoch interruption are settings of a wasmtime **engine**, fixed before anything is
 compiled, and each puts code in every loop - `limits.md`, *What a bound costs*, has the numbers. So
-the backend keeps up to four engines, one per combination of `meter` and `timeout`, each made the
+the backend keeps up to four engines, one per combination of `work_limit` and `timeout`, each made the
 first time a module demanding that combination is compiled. A deployment where every module agrees
 has one.
 
@@ -90,7 +90,7 @@ watchdog increments only the engine of the call it was armed for.
 
 ## What it answers
 
-    untrusted, meter, timeout, memory_limit, reload    yes
+    untrusted, work_limit, timeout, memory_limit, reload    yes
     side by side                                   yes: two instances of a module at once
     unload                                         no: its library stays in the process
 

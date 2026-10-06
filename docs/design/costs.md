@@ -54,7 +54,7 @@ impossible. The ECS is what buys it.
 
 The boundary that matters is untouched either way - `data.md`, *Access mode*.
 
-Kept: sandboxing from the host, traps caught, fuel, lifecycle timeouts, memory limits, hot reload,
+Kept: sandboxing from the host, traps caught, a work limit, lifecycle timeouts, memory limits, hot reload,
 the manifest section, threading.
 
 Hot reload improves in one direction and gains a refusal. In the original Bridge a reloaded module loses

@@ -146,18 +146,12 @@ static int neither(bridge *b, const char *identity, const char *key, int64_t val
 }
 
 /* A stated limit demands that the backend can enforce it - capabilities.md. */
-static int lacks(bridge *b, const char *identity, open_backend *o, uint32_t flag,
-                 const char *key, const char *capability)
+static int lacks(bridge *b, const char *identity, open_backend *o, uint32_t flag, const char *key)
 {
     if (o->capabilities & flag) return 0;
     /* a guarantee has one name, for the key that asks it and the capability that answers */
-    if (!strcmp(key, capability) || strstr(key, capability)) {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: it states %s, and backend '%s' "
-            "keeps none", identity, key, o->name);
-    } else {
-        say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: %s needs '%s', which backend "
-            "'%s' lacks", identity, key, capability, o->name);
-    }
+    say(b, nullptr, nullptr, BRIDGE_ERR, "module '%s' is refused: it states %s, which backend '%s' "
+        "cannot keep", identity, key, o->name);
     return 1;
 }
 
@@ -207,7 +201,7 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
         return 1;
     }
     if (unset(b, id, "max_system_failures", cfg->max_system_failures)
-        || unset(b, id, "fuel", cfg->fuel) || unset(b, id, "memory_limit", cfg->memory_limit)
+        || unset(b, id, "work_limit", cfg->work_limit) || unset(b, id, "memory_limit", cfg->memory_limit)
         || unset(b, id, "init_timeout", cfg->init_timeout)
         || unset(b, id, "reload_timeout", cfg->reload_timeout)
         || unset(b, id, "shutdown_timeout", cfg->shutdown_timeout)
@@ -218,7 +212,7 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
         return 1;
     }
     if (neither(b, id, "max_system_failures", cfg->max_system_failures, BRIDGE_NO_LIMIT)
-        || neither(b, id, "fuel", cfg->fuel, BRIDGE_NO_LIMIT)
+        || neither(b, id, "work_limit", cfg->work_limit, BRIDGE_NO_LIMIT)
         || neither(b, id, "memory_limit", cfg->memory_limit, BRIDGE_NO_LIMIT)
         || neither(b, id, "init_timeout", cfg->init_timeout, BRIDGE_NO_LIMIT)
         || neither(b, id, "reload_timeout", cfg->reload_timeout, BRIDGE_NO_LIMIT)
@@ -267,13 +261,13 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
             "'%s' runs only modules that are", id, o->name);
         return 1;
     }
-    if ((cfg->fuel > 0 && lacks(b, id, o, BACKEND_METER, "fuel", "meter"))
-        || (cfg->memory_limit > 0 && lacks(b, id, o, BACKEND_MEMORY_LIMIT, "memory_limit", "memory_limit"))
-        || (cfg->init_timeout > 0 && lacks(b, id, o, BACKEND_TIMEOUT, "init_timeout", "timeout"))
-        || (cfg->reload_timeout > 0 && lacks(b, id, o, BACKEND_TIMEOUT, "reload_timeout", "timeout"))
+    if ((cfg->work_limit > 0 && lacks(b, id, o, BACKEND_WORK_LIMIT, "work_limit"))
+        || (cfg->memory_limit > 0 && lacks(b, id, o, BACKEND_MEMORY_LIMIT, "memory_limit"))
+        || (cfg->init_timeout > 0 && lacks(b, id, o, BACKEND_TIMEOUT, "init_timeout"))
+        || (cfg->reload_timeout > 0 && lacks(b, id, o, BACKEND_TIMEOUT, "reload_timeout"))
         || (cfg->shutdown_timeout > 0
-            && lacks(b, id, o, BACKEND_TIMEOUT, "shutdown_timeout", "timeout"))
-        || (cfg->hot_reload && lacks(b, id, o, BACKEND_RELOAD, "hot_reload", "reload"))) {
+            && lacks(b, id, o, BACKEND_TIMEOUT, "shutdown_timeout"))
+        || (cfg->hot_reload && lacks(b, id, o, BACKEND_RELOAD, "hot_reload"))) {
         return 1;
     }
     /* wasm.md, *Exports*: the author says "cannot" and the deployment "may not", each with a
@@ -284,7 +278,7 @@ static int checks(bridge *b, const bridge_artifact *a, open_backend **on,
         return 1;
     }
     *on = o;
-    *demands = (cfg->trusted ? 0 : BACKEND_UNTRUSTED) | (cfg->fuel > 0 ? BACKEND_METER : 0)
+    *demands = (cfg->trusted ? 0 : BACKEND_UNTRUSTED) | (cfg->work_limit > 0 ? BACKEND_WORK_LIMIT : 0)
              | (cfg->memory_limit > 0 ? BACKEND_MEMORY_LIMIT : 0)
              | (cfg->init_timeout > 0 || cfg->reload_timeout > 0 || cfg->shutdown_timeout > 0
                 ? BACKEND_TIMEOUT : 0);
@@ -325,7 +319,7 @@ static module *record(bridge *b, const bridge_artifact *a, open_backend *o)
     m->hot_reload = cfg->hot_reload;
     m->max_failures = cfg->max_system_failures;
     m->shutdown_timeout = cfg->shutdown_timeout;
-    m->fuel = cfg->fuel;
+    m->work_limit = cfg->work_limit;
     m->spawns = cfg->spawns;
     m->persistent = cfg->persistent;
     /* budgets.md, *Nothing is allocated in a phase*: its ids and its queue, as long as it

@@ -47,7 +47,7 @@ static bridge_artifact artifact(const char *identity, const char *file)
     a.cfg.trusted = false;
     a.cfg.on_error = BRIDGE_SKIP;
     a.cfg.max_system_failures = 3;
-    a.cfg.fuel = 10'000'000;
+    a.cfg.work_limit = 10'000'000;
     a.cfg.memory_limit = 16 << 20;
     a.cfg.init_timeout = 2000 * MS;
     a.cfg.reload_timeout = 2000 * MS;
@@ -107,7 +107,7 @@ static void bench(bridge_config *cfg)
             bridge *b = bridge_create(cfg, sink, nullptr);
             bridge_artifact a = artifact("game:rows@0.1.0", builds[build]);
             double best = 1e30;
-            a.cfg.fuel = metered ? 1'000'000'000 : BRIDGE_NO_LIMIT;
+            a.cfg.work_limit = metered ? 1'000'000'000 : BRIDGE_NO_LIMIT;
             a.cfg.init_timeout = BRIDGE_NO_LIMIT;
             a.cfg.reload_timeout = BRIDGE_NO_LIMIT;
             a.cfg.shutdown_timeout = BRIDGE_NO_LIMIT;
@@ -122,7 +122,7 @@ static void bench(bridge_config *cfg)
                 ns = (double)(t1.tv_sec - t0.tv_sec) * 1e9 + (double)(t1.tv_nsec - t0.tv_nsec);
                 if (ns < best) best = ns;
             }
-            printf("%-15s %-9s %.3f ns a row\n", builds[build], metered ? "fuel" : "no fuel",
+            printf("%-15s %-9s %.3f ns a row\n", builds[build], metered ? "limit" : "no limit",
                 best / (50.0 * 200'000.0));
             (void)bridge_destroy(b);
         }

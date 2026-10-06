@@ -45,12 +45,12 @@ and the test could be hoisted, but neither Binaryen nor wasmtime does. Over the 
 system can have, one float read, changed and written back per row of 200,000:
 
                          with the test    without
-    no fuel              0.39 ns a row    0.33      x1.2
-    fuel                 0.65             0.44      x1.5
+    no work limit        0.39 ns a row    0.33      x1.2
+    a work limit         0.65             0.44      x1.5
 
-Under fuel it costs more than itself, because the branch it adds is a block and fuel is counted by
-the block - `limits.md`, *What a bound costs*. `tests/stage3.c`'s `bench` case is the measurement:
-one module, built both ways.
+Under a work limit it costs more than itself, because the branch it adds is a block and the wasm
+backend counts work by the block - `limits.md`, *What a bound costs*. `tests/stage3.c`'s `bench`
+case is the measurement: one module, built both ways.
 
 Refused: the test always, which is what this was, "at that price". The price is a sixth to a
 third of the loop this design exists to keep fast, paid by every wasm module, to catch a mistake
