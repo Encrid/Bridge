@@ -87,3 +87,6 @@ toggle while a row is off. The first drops a value the module's `reload` could h
 itself; the second can be met only by code in the build that is being replaced. No condition
 brings either back.
 
+Refused: one key that says yes or no to whatever a reload would lose. It lets through the
+rename the refusal exists to catch. No condition brings it back.
+

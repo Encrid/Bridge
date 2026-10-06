@@ -444,3 +444,27 @@ detaches what it does not want.
 
 The other four needs do not apply to any of the three.
 
+**6. A reload states what it accepts to lose, by name.** A key of the module's configuration
+lists what may go: `game:Position.z` for a field removed or an array made shorter, `game:Shield`
+for the rows of a toggle that are off; or it states that nothing may. A loss that is not listed
+is refused, naming it and how many rows hold it. A name that is listed and that this reload
+does not lose is refused too, so that a list cannot be left where it is from one reload to the
+next. The rule is for the rename - `lifetime.md`, *When a component layout changed* - and a yes
+or no was scored as failing explicit by that: once it says yes the rename goes through, and a
+yes left in place accepts the next loss as well.
+
+    need          by name                                  a yes or no
+    extensible    serves: a new kind of loss is a new      serves
+                  form of name
+    minimal       fails in part: a list, matched against   serves: one key
+                  what would go
+    explicit      serves: only what was named goes         fails: it accepts what nobody
+                                                           looked at
+
+The other four needs do not apply to either.
+
+**So every question is decided**, and what is left is to build it: `declare` and its storage
+layout; the cell for each declared type, `BRIDGE_CARRIED` and the two keys; then the sparse set,
+the toggle, direct-indexed, the singleton with a module's settings, and the tag; then the move;
+then a changed component layout and what a reload accepts to lose.
+
