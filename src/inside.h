@@ -134,8 +134,8 @@ struct module {
     int64_t  max_failures, failures;
     int      changed_now, unplaced_now;     /* at this barrier */
     const void *reached;            /* the system whose count reached the number, if one did */
-    /* budgets.md, *What running out does*: how many entities it changed were left as they were
-     * at this barrier, for want of a table and for want of columns */
+    /* budgets.md, *What running out does*: how many changes it asked were not applied at this
+     * barrier, for want of a table and for want of columns */
     uint32_t left[2];
     /* grants.md: the types it may write, as storage numbers them, and how many entities it
      * asked to destroy at this barrier that carry none of them */

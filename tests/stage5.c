@@ -238,10 +238,12 @@ int main(int argc, char **argv)
     if (!strcmp(what, "cycle")) { cfg.order = pairs; cfg.order_count = 2; }
     if (!strcmp(what, "obsorder")) { cfg.order = &seen_first; cfg.order_count = 1; }
     if (!strcmp(what, "obsreorder")) { cfg.order = &fix_first; cfg.order_count = 1; }
-    if (!strcmp(what, "changeorder") || !strcmp(what, "changeloaded")) {
+    if (!strcmp(what, "changeorder") || !strcmp(what, "changeloaded") || !strcmp(what, "bothtold")) {
         cfg.order = &five_first;
         cfg.order_count = 1;
     }
+    /* one table, which the entities with a position take: one with a mark as well has none */
+    if (!strcmp(what, "bothtold")) cfg.budget.tables = 1;
     if (!strcmp(what, "parallel")) cfg.threads = 2;
     if (!strcmp(what, "pinned") || !strcmp(what, "wrongthread")) cfg.threads = 4;
     if (!strcmp(what, "hop")) cfg.threads = 4;
@@ -392,7 +394,7 @@ int main(int argc, char **argv)
         load(b, &a);
         frames(b, 2);
     } else if (!strcmp(what, "changeconflict") || !strcmp(what, "changeorder")
-               || !strcmp(what, "changeloaded")) {
+               || !strcmp(what, "changeloaded") || !strcmp(what, "bothtold")) {
         /* two systems of one phase, in two modules, that attach one component to the same
          * entities. Unordered, the second does not load. Ordered, the one stated to run last
          * is the one whose value stays, whichever of them was loaded first */

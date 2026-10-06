@@ -570,7 +570,9 @@ Of this repair:
     closed  a shared component whose layout changed is refused always, called forced: still
             refused, as a choice with a condition; the refusal names the other declarers,
             and the sequence of calls that changes it is written. `lifetime.md`
-    open    out of tables or columns: the module that asked last is charged, which may not
+    closed  out of tables or columns: every module whose change was not applied is told, and
+            how many of its own. `budgets.md`, *What running out does*. It was:
+            the module that asked last is charged, which may not
             be the one that used them up; and its changes are applied in part
     open    a strip that cannot join leaves two tables of one archetype
     open    `[budget] terms` is the deployment's, and a module cannot state what it needs

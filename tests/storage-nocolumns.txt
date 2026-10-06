@@ -1,6 +1,6 @@
 spawn
 attach_a
-  -: module 'st:store@0.1.0': [budget] columns of 64 bytes is used up. Left as they were, of the entities it changed: 3 0 0
+  -: module 'st:store@0.1.0': [budget] columns of 64 bytes is used up. Not applied, of the changes it asked: 3 0 0
   heard_a: A: who, events 0 3
   heard_a: A: who, events 1 3
   heard_a: A: who, events 2 3
@@ -14,7 +14,7 @@ look
   look: with A and maybe B: spans, rows 1 3
   look: of them with B: rows 0 0
 attach_a
-  -: module 'st:store@0.1.0': [budget] columns of 64 bytes is used up. Left as they were, of the entities it changed: 2 0 0
+  -: module 'st:store@0.1.0': [budget] columns of 64 bytes is used up. Not applied, of the changes it asked: 2 0 0
   heard_a: A: who, events 0 2
   heard_a: A: who, events 1 2
   heard_a: A: who, events 2 2
@@ -30,7 +30,7 @@ look
   look: with A and maybe B: spans, rows 1 4
   look: of them with B: rows 0 0
 attach_a
-  -: module 'st:store@0.1.0': [budget] columns of 64 bytes is used up. Left as they were, of the entities it changed: 1 0 0
+  -: module 'st:store@0.1.0': [budget] columns of 64 bytes is used up. Not applied, of the changes it asked: 1 0 0
   heard_a: A: who, events 0 2
   heard_a: A: who, events 1 2
   heard_a: A: who, events 2 2
@@ -48,7 +48,7 @@ look
   look: with A and maybe B: spans, rows 1 5
   look: of them with B: rows 0 0
 attach_a
-  -: module 'st:store@0.1.0': [budget] columns of 64 bytes is used up. Left as they were, of the entities it changed: 1 0 0
+  -: module 'st:store@0.1.0': [budget] columns of 64 bytes is used up. Not applied, of the changes it asked: 1 0 0
   -: module 'st:store@0.1.0' is stopped: it reached its max_system_failures of 4, by entities it changed that could not be placed 0 0
   -: the bridge has stopped: module 'st:store@0.1.0' was stopped and its on_error is fail 0 0
   heard_a: A: who, events 0 2

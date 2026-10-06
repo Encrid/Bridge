@@ -25,7 +25,8 @@ constexpr uint32_t ROWS_AT_FIRST = 4;
 
 /* what the fold has decided of an entity, for the length of one barrier */
 enum folded : uint8_t {
-    TOUCHED = 1, DESTROYED = 2, DROPPED = 4
+    TOUCHED = 1, DESTROYED = 2, DROPPED = 4,
+    SHORT = 8                       /* dropped for want of columns, and not of a table */
 };
 
 struct storage_type {
@@ -93,7 +94,6 @@ struct storage {
     uint32_t   changed_count;
     uint8_t   *folded;
     uint32_t  *dest;                /* the table each will be in */
-    module   **asker;               /* who asked the last change of each */
     uint64_t  *attached;            /* and of that, what an attach wrote a value of: kept
                                      * only while there is an observer to be told */
     uint64_t  *scratch;             /* one set */
@@ -461,8 +461,7 @@ static void start_from(storage *r, uint32_t index)
  * the module that asked the last change of it, toward that module's own budget */
 static void dropped(storage *r, uint32_t index, bool for_columns)
 {
-    r->folded[index] |= DROPPED;
-    r->asker[index]->left[for_columns] ++;
+    r->folded[index] |= for_columns ? DROPPED | SHORT : DROPPED;
 }
 
 void storage_writes(storage *r, module *m, storage_type *type)
@@ -521,7 +520,6 @@ void storage_apply(storage *r)
                 start_from(r, index);
                 if (r->observer_count) memset(attached_of(r, index), 0, 8u * r->words);
             }
-            r->asker[index] = m;
             if (ch.op == CHANGE_DESTROY) {
                 if (stake(r, m, index)) r->folded[index] |= DESTROYED;
                 else m->barred ++;
@@ -594,6 +592,12 @@ void storage_apply(storage *r)
             memcpy(&ch, m->queue + at, sizeof ch);
             at += (uint32_t)sizeof ch + ((ch.size + 7u) & ~7u);
             index = (uint32_t)ch.id;
+            /* budgets.md, *What running out does*: a change of an entity that was left as it
+             * was is a change that was not applied, and it is told to who asked it */
+            if (index < r->high && r->folded[index] & DROPPED
+                && r->places[index].generation == (uint32_t)(ch.id >> 32)) {
+                m->left[(r->folded[index] & SHORT) != 0] ++;
+            }
             if (ch.op != CHANGE_ATTACH || index >= r->high || !(r->folded[index] & TOUCHED)
                 || r->folded[index] & (DESTROYED | DROPPED)
                 || r->places[index].generation != (uint32_t)(ch.id >> 32)) continue;
@@ -614,7 +618,6 @@ void storage_apply(storage *r)
         if (t) r->tables[t].incoming = 0, r->tables[t].sized = false;
         r->folded[index] = 0;
         r->dest[index] = 0;
-        r->asker[index] = nullptr;
     }
     r->changed_count = 0;
     for (i = 0; i < r->dirty_count; i ++) {
@@ -623,10 +626,10 @@ void storage_apply(storage *r)
     }
     for (m = b->modules; m; m = m->next) {
         static const char *const text[2] = {
-            "module '%s': [budget] tables of %u is used up. Left as they were, of the entities it "
-            "changed: %u",
-            "module '%s': [budget] columns of %u bytes is used up. Left as they were, of the "
-            "entities it changed: %u" };
+            "module '%s': [budget] tables of %u is used up. Not applied, of the changes it "
+            "asked: %u",
+            "module '%s': [budget] columns of %u bytes is used up. Not applied, of the changes "
+            "it asked: %u" };
         for (i = 0; i < 2; i ++) {
             if (!m->left[i]) continue;
             say(b, m, nullptr, BRIDGE_ERR, text[i], m->identity, i ? b->columns_len : r->table_room,
@@ -984,7 +987,6 @@ storage *storage_create(bridge *b)
     r->changed = calloc(b->entities, sizeof *r->changed);
     r->folded = calloc(b->entities, 1);
     r->dest = calloc(b->entities, sizeof *r->dest);
-    r->asker = calloc(b->entities, sizeof *r->asker);
     r->attached = calloc((size_t)b->entities * r->words, 8);
     r->scratch = calloc(r->words, 8);
     /* one more than there may be, so that looking for a free one always ends */
@@ -1027,7 +1029,6 @@ void storage_destroy(storage *r)
     free(r->changed);
     free(r->folded);
     free(r->dest);
-    free(r->asker);
     free(r->attached);
     free(r->scratch);
     free(r);

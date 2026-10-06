@@ -139,7 +139,7 @@ runs out:
                                                 does not fit
                            at a barrier         that module is stopped, by name
     tables, columns        at a barrier         the entity is left as it was, and it is a
-                                                failure of the module that asked
+                                                failure of every module that asked a change of it
     log_ring               at a write           the line is dropped and counted
     modules                at a load            the load is refused
     types, systems,        at a `declare` or    the module's `init` fails
@@ -168,9 +168,17 @@ When a table cannot take all the rows arriving, it takes some: it asks for half 
 region gives them, which may be fewer than would have fitted. Which ones is an open question -
 `STAGE10.md`, *The repair*.
 
-**It is a failure of the module that asked**, the one whose change of that entity came last. A
-record names it, the key, and how many of its entities were left; and the barrier counts as one it
-failed in, toward its `max_system_failures` - `failure.md`, *The budget*. So a module that outgrows
+**It is a failure of every module that asked a change of it**, each for the changes that were
+its own. A record names the module, the key, and how many of its changes were not applied; and
+the barrier counts as one it failed in, toward its `max_system_failures` - `failure.md`, *The
+budget*. Two modules that changed one entity are both told, since both lost what they asked.
+
+Refused: telling one module, the last to have changed the entity, which is what this did. A
+module whose own change needed no room answered for another's, and that other was told nothing
+of a change it had lost. No condition brings it back. Refused: telling only the module whose
+change needed the room. Storage would have to work out which change that was, and a module that
+lost a change with the entity would still not be told. The condition that brings it back is a
+module that must not answer for an entity another module made unplaceable. So a module that outgrows
 the deployment is stopped as any failing module is, by its own `on_error`, and one that asked once
 too often loses one barrier's changes and runs on.
 
