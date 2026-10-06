@@ -48,6 +48,8 @@ void storage_forget(storage *r, storage_terms *terms);
 /* every module's queue, module by module in the order they loaded and within one in the order
  * it asked - threads.md, *Threads* */
 void storage_apply(storage *r);
+/* `m` may write `type`: what gives it a stake in an entity that carries it - grants.md */
+void storage_writes(storage *r, module *m, storage_type *type);
 /* up to `want` ids with nothing on them, for a module to hand out: how many there were */
 uint32_t storage_reserve(storage *r, uint64_t *ids, uint32_t want);
 /* what a module reads: its spans, its column_base, its observers' lists. 1 if they do not fit */

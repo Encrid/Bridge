@@ -116,7 +116,8 @@ query may not ask for is `query.md`, *What a query may not ask for*.
 a query asks for, and a system attaches a component to entities that do not carry it. A system
 that attaches or detaches nothing states that: no changes. An `attach` or a `detach` of what the
 running system did not state is refused, and that invocation fails. `destroy` is stated nowhere:
-it wins whatever ran before or after it. `init`, `shutdown` and `reload` state nothing either: a
+it wins whatever ran before or after it, and what it may be asked of is `grants.md`, *What a
+module may destroy*. `init`, `shutdown` and `reload` state nothing either: a
 lifecycle call runs alone. What the list is for is `schedule.md`, *Order within a phase is never
 implicit*.
 

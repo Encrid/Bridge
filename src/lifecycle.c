@@ -92,6 +92,7 @@ void module_discard(bridge *b, module *m)
     free(m->owned);
     free(m->queue);
     free(m->marks);
+    free(m->writable);
     free(m->systems);
     free(m->observers);
     free(m->declared);

@@ -69,8 +69,9 @@ time it runs is stopped however many of its module's others run clean. The unit 
 either, which is the one thing a pass cannot reproduce - `schedule.md`, *What a pass depends on*.
 
 **What is nobody's system is counted on the module, against the same number.** An entity a module
-changed that could not be placed - `budgets.md`, *What running out does* - raises the module's
-own count by one for that barrier. A barrier that placed everything the module changed lowers
+changed that could not be placed - `budgets.md`, *What running out does* - or that it asked to
+destroy and may not - `grants.md`, *What a module may destroy* - raises the module's own count
+by one for that barrier. A barrier that placed everything the module changed lowers
 it. One in which it changed nothing does neither.
 
 **What forgives is sustained health, not one good pass.** The original Bridge forgives its retry

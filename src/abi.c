@@ -177,6 +177,7 @@ static int abi_declare(void *ud, const uint64_t *a, uint64_t *r)
     m->policy = realloc(m->policy, (m->declared_count + 1) * sizeof *m->policy);
     m->policy[m->declared_count] = on_unload;
     m->declared[m->declared_count] = c;
+    if (may_write(m, c)) storage_writes(b->storage, m, c->type);
     c->declarers ++;
     b->layout_moved = 1;
     r[0] = m->declared_count ++;

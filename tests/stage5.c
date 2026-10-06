@@ -362,6 +362,18 @@ int main(int argc, char **argv)
         a.cfg.write_count = 1;
         load(b, &a);
         frames(b, 1);
+    } else if (!strcmp(what, "reapread") || !strcmp(what, "reapwrite")) {
+        /* a module of another namespace destroys what it finds: with a read grant it has no
+         * stake in the entity, which stays; with a write grant it has, and the entity goes */
+        a = native("game:stamp5@0.1.0", NSTAMP5_PATH);
+        a.cfg.spawns = 8;
+        load(b, &a);
+        a = native("view:reaper@0.1.0", NREAPER_PATH);
+        a.cfg.spawns = BRIDGE_NONE;
+        if (!strcmp(what, "reapread")) { a.cfg.read = game; a.cfg.read_count = 1; }
+        else { a.cfg.write = game; a.cfg.write_count = 1; }
+        load(b, &a);
+        frames(b, 2);
     } else if (!strcmp(what, "unstated")) {
         /* a system attaches what it did not state among its changes: that invocation fails */
         a = native("game:stamp@0.1.0", NSTAMPUNSTATED_PATH);

@@ -465,6 +465,24 @@ static void dropped(storage *r, uint32_t index, bool for_columns)
     r->asker[index]->left[for_columns] ++;
 }
 
+void storage_writes(storage *r, module *m, storage_type *type)
+{
+    if (!m->writable) m->writable = calloc(r->words, sizeof *m->writable);
+    put(m->writable, type->id);
+}
+
+/* grants.md, *What a module may destroy*: an entity that carries something it may write, or
+ * that carries nothing. Read from where the entity is, before this barrier moves it. */
+static bool stake(const storage *r, const module *m, uint32_t index)
+{
+    uint32_t t = r->places[index].table;
+    if (!t) return true;
+    for (uint32_t w = 0; m->writable && w < r->words; w ++) {
+        if (set_of(r, t)[w] & m->writable[w]) return true;
+    }
+    return false;
+}
+
 /* threads.md: the queues are applied in the order the calls that filled them ran, and not a
  * module at a time. The next run of changes: one module's, of one turn. A module's own queue
  * is in that order already, so this takes the earliest of what each has next. */
@@ -505,7 +523,8 @@ void storage_apply(storage *r)
             }
             r->asker[index] = m;
             if (ch.op == CHANGE_DESTROY) {
-                r->folded[index] |= DESTROYED;
+                if (stake(r, m, index)) r->folded[index] |= DESTROYED;
+                else m->barred ++;
             } else if (ch.op == CHANGE_ATTACH) {
                 put(work_of(r, index), ch.c->type->id);
                 if (r->observer_count) put(attached_of(r, index), ch.c->type->id);
@@ -614,6 +633,12 @@ void storage_apply(storage *r)
                 m->left[i]);
             m->left[i] = 0;
             m->unplaced_now = 1;                /* failure.md, *The budget* */
+        }
+        if (m->barred) {
+            say(b, m, nullptr, BRIDGE_ERR, "module '%s' asked to destroy entities that carry "
+                "nothing it may write. Left as they were: %u", m->identity, m->barred);
+            m->barred = 0;
+            m->unplaced_now = 1;
         }
     }
 }

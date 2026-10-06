@@ -137,6 +137,10 @@ struct module {
     /* budgets.md, *What running out does*: how many entities it changed were left as they were
      * at this barrier, for want of a table and for want of columns */
     uint32_t left[2];
+    /* grants.md: the types it may write, as storage numbers them, and how many entities it
+     * asked to destroy at this barrier that carry none of them */
+    uint64_t *writable;
+    uint32_t barred;
     /* config.md: the component its settings seeded, the row, and where their text is */
     declared_type   *config;
     uint64_t     config_entity;

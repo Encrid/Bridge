@@ -541,7 +541,9 @@ The chosen option contradicts its own reason, or a document:
             exception; two that state one component are ordered at load or refused; and a
             barrier applies in the order the calls ran. Measured against the tree before
             it: an attach and a detach within 1 ns. `schedule.md`, `abi.md`, `threads.md`
-    open    `destroy` checks no grant: a module removes any entity, and every component on it
+    closed  `destroy` checked no grant: a module removed any entity, and every component on
+            it. It may destroy one that carries something it may write, or nothing; any
+            other stays, and is its failure. `grants.md`, *What a module may destroy*
     open    "nothing is allocated after create" is storage's and not the library's: a
             module's change queue grows in a phase with no budget, an observer's list grows
             at a barrier, and the arena's list of gaps and the kept settings grow at unload
