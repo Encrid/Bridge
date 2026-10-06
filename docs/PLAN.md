@@ -243,6 +243,15 @@ pays that storage layout's price. `storage weigh` measures the price of the one 
 given to an entity that carries 4 KB costs thirteen times what it costs a small one, and the
 same rows read from 4,096 tables take three times as long as from one.
 
+**Each of the four that do not exist is weighed before it is built, and one that fails is not
+built.** Only the sparse set answers something measured. The other three were accepted on an
+argument: what a toggle saves over a move between tables, what direct-indexed saves over a sparse
+set's index and what it costs in room for entities that do not carry the component, and what a
+singleton is that a component on one entity is not, which is how a module's settings are kept
+today. So for each, first: the weakness it answers, measured in scratch beside the layouts that
+exist; then all six needs of `STAGE0.md`, step 6, scored and shown. That comes before this
+stage's other questions.
+
 This stage's questions, each by the method of `STAGE0.md`, and in this order: who states a
 component's storage layout, and where; what a module is handed for each, in `bridge-abi.h` and in
 each backend's SDK, and what a query may ask across two of them; what each costs of which
@@ -256,8 +265,9 @@ component layout changed* - and until this stage a changed component layout is r
 Before everything that reads storage or describes it: the readings of how full a budget is, and
 the module seam in a second language, would each be made twice otherwise.
 
-*Done when a component can be declared in each of the five and a module reads it as that storage
-layout is read; each has a case for what it is for and a measurement beside the table's for the same
+*Done when each of the five has been weighed on every need and either passed or left the plan
+with its condition; a component can be declared in each that passed and a module reads it as
+that storage layout is read; each has a case for what it is for and a measurement beside the table's for the same
 work, and none is slower than the table at what it was chosen for; a query across two storage
 layouts either works as written or is refused by name; running out, strip at unload and what an
 observer is told each hold in every storage layout; a component is moved from one storage layout

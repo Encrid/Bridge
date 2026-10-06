@@ -561,7 +561,9 @@ Of this repair:
     closed  the arena share given back at unload unless a row points into it: it depends on
             what the leaving module itself wrote, and what was unsaid was that a share had
             stayed. It is said now, with the component that holds it. `strings.md`
-    open    five storage layouts, where only the table's weakness was measured
+    closed  five storage layouts, where only the table's weakness was measured: five still,
+            and each of the four to come is weighed on every need, with a measurement of
+            what it answers, before it is built. `PLAN.md`, stage 11
     open    a removed or renamed field migrates at reload, and its values are lost on a call
             that means "keep running"
     open    a shared component whose layout changed is refused always, called forced
