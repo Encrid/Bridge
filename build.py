@@ -70,6 +70,7 @@ NATIVE = [
     ('nstamptick', 'nstamp', ['VALUE=7', 'PHASE="tick"']),
     ('nfrag1', 'nfrag', ['SPLIT=1']), ('nfrag16', 'nfrag', ['SPLIT=16']),
     ('nfrag256', 'nfrag', ['SPLIT=256']), ('nfrag4096', 'nfrag', ['SPLIT=4096']),
+    ('nweigh1', 'nweigh', ['ON=1']), ('nweigh2', 'nweigh', ['ON=2']), ('nweigh16', 'nweigh', ['ON=16']),
     ('nstress1', 'nstress', ['SEED=1u', 'SPACE="s1"']), ('nstress2', 'nstress', ['SEED=2u', 'SPACE="s2"']),
     ('nstress3', 'nstress', ['SEED=3u', 'SPACE="s3"']), ('nstress4', 'nstress', ['SEED=4u', 'SPACE="s4"']),
 ]
@@ -406,6 +407,8 @@ CASES = [
      '@tests/storage-stripfull.txt', None),
     ('storage-weigh', ['storage', 'weigh'],
      r"an entity of 4096 bytes.*in    1 table.*in 4096 tables.*alive", r"FAIL"),
+    ('storage-baseline', ['storage', 'baseline'],
+     r"read in order.*in no order.*204800 of them on.*found through its query.*alive", r"FAIL"),
     ('storage-measure', ['storage', 'measure'],
      r"an id handed out +[0-9.]+ ns each.*ten thousand tables made.*the stress run, on 1 thread.*alive", None),
     ('adopt', ['adopt'],

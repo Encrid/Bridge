@@ -218,6 +218,8 @@ this stage each have one.* Met.
 
 ## 11. Storage layouts
 
+In progress: `STAGE11.md`.
+
 Storage keeps every component one way: in the table of its entity's archetype, a column beside
 the entity's other components. That is the right way for what systems read together, and one
 way for everything is one trade made for everything. It was never chosen: it was what flecs did

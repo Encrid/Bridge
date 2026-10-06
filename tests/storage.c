@@ -16,6 +16,9 @@
  *     storage weigh       what the one storage layout there is costs where it is weakest: a
  *                         change to an entity that carries a lot, and a system whose rows are
  *                         spread over many tables. docs/plan/STAGE10.md, *The repair*
+ *     storage baseline    what it costs at the work no storage layout exists for yet: a
+ *                         component switched off by a field, a value reached by id, one
+ *                         value for everything. docs/plan/STAGE11.md, *The baseline*
  *
  * The first two are a transcript and decide nothing themselves: build.py holds what it must
  * say. It is the same whatever stores the rows, which is the point - docs/plan/STAGE10.md.
@@ -103,7 +106,7 @@ static const char *const phases[] = {
     "spawn", "attach_a", "attach_b", "detach_b", "destroy", "attach_b_half", "detach_b_half",
     "detach_b_absent", "value_a", "flicker", "destroy_half", "respawn_half", "touch_dead",
     "attach_a_half", "recycled", "combine", "look", "never", "work", "check", "attach_both",
-    "scribble", "find", "value_b", "look_b"
+    "scribble", "find", "value_b", "look_b", "walk", "flag", "near", "far", "one"
 };
 constexpr uint32_t PHASES = sizeof phases / sizeof *phases;
 
@@ -438,6 +441,51 @@ int main(int argc, char **argv)
                 split[k].tables, split[k].tables > 1 ? "s" : " ", (double)best / 1000.0,
                 (double)best / ROWS);
             if (k + 1 < sizeof split / sizeof *split) (void)bridge_destroy(b);
+        }
+    } else if (!strcmp(what, "baseline")) {
+        static const struct { const char *path; uint32_t on; } built[] = {
+            { NWEIGH1_PATH, 1 }, { NWEIGH2_PATH, 2 }, { NWEIGH16_PATH, 16 },
+        };
+        static const struct { const char *phase, *what; } work[] = {
+            { "walk", "read in order" },
+            { "near", "reached by id, in the order they lie" },
+            { "far",  "reached by id, in no order" },
+        };
+        constexpr uint32_t ROUNDS = 32, ROWS = 204'800, ASKED = 1'000'000;
+        (void)bridge_destroy(b);
+        cfg.budget.columns = 256 << 20;
+        for (uint32_t k = 0; k < sizeof built / sizeof *built; k ++) {
+            uint64_t best = 0, t;
+            b = bridge_create(&cfg, counted, nullptr);
+            a = store_module(built[k].path, ROWS + 1, 8 << 20, 128 << 20);
+            if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
+            (void)barrier(b, "spawn");
+            /* the three that do not depend on how many rows are switched on, once */
+            for (uint32_t w = 0; !k && w < sizeof work / sizeof *work; w ++) {
+                for (uint32_t round = 0; round < ROUNDS; round ++) {
+                    t = ran(b, work[w].phase);
+                    if (!round || t < best) best = t;
+                }
+                if (said[0] != ROWS) { printf("FAIL: it read %u\n", said[0]); return 1; }
+                printf("%u values %-38s %7.1f us, %6.3f ns each\n", ROWS, work[w].what,
+                    (double)best / 1000.0, (double)best / ROWS);
+            }
+            for (uint32_t round = 0; round < ROUNDS; round ++) {
+                t = ran(b, "flag");
+                if (!round || t < best) best = t;
+            }
+            printf("%u rows tested by a field, %6u of them on  %7.1f us, %6.3f ns a row\n", ROWS,
+                said[0], (double)best / 1000.0, (double)best / ROWS);
+            if (!k) {
+                for (uint32_t round = 0; round < ROUNDS; round ++) {
+                    t = ran(b, "one");
+                    if (!round || t < best) best = t;
+                }
+                if (said[0] != ASKED) { printf("FAIL: it read %u\n", said[0]); return 1; }
+                printf("one value on one entity, found through its query  %6.3f ns each time\n",
+                    (double)best / ASKED);
+            }
+            if (k + 1 < sizeof built / sizeof *built) (void)bridge_destroy(b);
         }
     } else if (!strcmp(what, "measure")) {
         static const struct { const char *phase, *what; } ops[] = {
