@@ -283,12 +283,6 @@ void abi_unpark(bridge_t *b, bridge_system_t *s);       /* and back, as it was *
 void module_discard(bridge_t *b, module_t *m);
 void module_shut_down(bridge_t *b, module_t *m);    /* its shutdown, what it asked for, what it said */
 
-/* schedule.c */
-[[nodiscard]] int schedule_order(bridge_t *b, const bridge_order_t *order, uint32_t count);  /* at create */
-[[nodiscard]] int schedule_build(bridge_t *b, char *why, size_t why_len);     /* 0, or why it cannot be */
-[[nodiscard]] int schedule_room(bridge_t *b);     /* at create: what a dispatch works in */
-void schedule_run(bridge_t *b, uint32_t phase);
-void schedule_account(bridge_t *b);       /* at each barrier: the failure budgets, and the stops */
 
 
 /* block.c */
@@ -317,6 +311,7 @@ void     block_column_free(bridge_t *b, void *ptr, uint32_t size);
 [[nodiscard]] int abi_define(module_t *m, backend_err_t *err);                      /* the eight imports */
 
 #include "say.h"
+#include "schedule.h"
 #include "bridge_inside.h"
 
 #endif

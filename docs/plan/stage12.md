@@ -425,5 +425,17 @@ is a header of that unit:
                     a function of ninety lines, and the range of each integer kind is a
                     table too
 
+    bridge.c        eight files, `say.h` and `bridge_inside.h`. `bridge_create` was 135
+                    lines with twenty `goto refuse`: it is a list of parts, each answering
+                    whether it was refused, and one place that destroys what was made. A
+                    record of the library's own is `say_error(b, ...)`, or
+                    `say_about(b, about, ...)` with a `say_t`, where `say` took five
+                    arguments and more
+    schedule.c      ten files and `schedule.h`: the matrix, the deployment's pairs, a
+                    conflict, a phase's edges, its refusals, its levels, a dispatch, a
+                    level's jobs, a run, the budgets. The stress run, which dispatches
+                    through all of it, is where it was: 1382 to 1422 ms on four threads
+                    beside 1378 to 1429
+
 A chain of `if` and `else if` over the kinds of a thing became, each time, a table indexed by
 the kind, which is what rule C1 asks for.
