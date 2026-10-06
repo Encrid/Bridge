@@ -147,8 +147,8 @@ the module never declared is an error naming it.* Met.
 
 Done. One compiler and one script. zig compiles everything on every platform, and `build.py` does what
 CMake did: patches flecs, compiles, links, builds the test modules and runs the tests - `build.md`,
-*One compiler* and *One script*. Windows becomes `x86_64-windows-gnu`, and until stage 12 it links
-the C runtime zig carries.
+*One compiler* and *One script*. Windows becomes `x86_64-windows-gnu`, and it links the C
+runtime zig carries.
 
 **Nothing about the library changes**, which is the claim: the same tests, saying the same things,
 by another route. `STAGE7.md` is what it built and found.
@@ -280,17 +280,45 @@ every value its new component layout still has a place for, in each storage layo
 that would drop values is refused, naming them, until it states that it accepts the loss, and is
 then told by a record what went.* Met.
 
-## 12. Self contained
+## 12. One style, every platform, few dependencies
 
-Nothing fetched and nothing installed but the toolchain - `build.md`, *Self contained*. The parts
-of a C library that can be carried are carried: the routines our source calls, and an
-allocator, in `third_party` and linked privately - `build.md`, *The C library*. On Windows no
-C runtime is linked at all. Where each routine comes from, and what "in the tree" means for the
-tools the build runs, are settled in this stage's own plan, with the sources read first.
+In progress: `STAGE12.md`. Three things that are about the whole tree and not about what it
+does, done before a host is written against it - stage 13 - so that it is written against names
+that stay.
 
-*Done when a Windows build of the library, both backends and a test program imports the operating
-system's libraries and wasmtime and nothing else; the build fetches nothing; one formatted record
-is the same bytes on every platform; and every test passes.*
+**One coding style, and a program that holds it.** `STYLE.md` is how the C is written, and
+every C file of ours follows it: the library, the seam headers, the backends and their SDKs,
+the test programs and the test modules. Its numbers are hard: 80 columns, 20 lines a function,
+5 functions a file, 4 arguments. An infringement is an entry of its *Exceptions*, with its
+reason, or it is a defect, and `tools/style.py` runs with the tests and says which. The seams
+follow it as everything else does: a type's name ends in `_t` in the public headers too, and
+an entry takes four arguments. And where the style asks for a logical entity a file, the tree
+is cut that way: storage by what keeps a component, the operating system once and not three
+times, a test program as a table of its cases.
+
+**Every platform run, and more of them.** A platform is one that a workflow runs on every
+push - `build.md`, *Platforms* - and Windows had none. Linux on arm64, macOS on x86-64 and
+Windows on arm64 are added, each with a target, wasmtime's library for it and a runner.
+
+**Few dependencies, and every one written down.** What a build needs installed and what the
+library is linked against are listed in one place with why each is there, and a case fails on
+one that is not listed. Then the list is shortened where it can be: the tools the test modules
+are built with, and the C library's functions the library calls.
+
+**No refactor commit goes unmeasured.** A style of short functions in many files is the shape
+that cost a barrier 4 to 6 ns in stage 11, when the compiler stopped putting its helpers
+inline. `storage measure`, `storage weigh` and the stress run are run beside the tree before
+this stage at every commit that rewrites code, and a slower line stops the commit.
+
+This stage was to be "self contained": the C library's routines and an allocator carried in the
+tree, and no C runtime linked on Windows. That is not built, and why is the record of
+`build.md`, *The C library*.
+
+*Done when `tools/style.py` finds no breach in any C file of ours outside the exceptions
+`STYLE.md` lists; every case passes on every platform the stage has, each run by a workflow on
+every push; no line of `storage measure`, `storage weigh` or the measurements beside flecs and
+EnTT is slower than before the stage; and every dependency is in the list, with a case that
+fails on one that is not.*
 
 ## 13. A host, from outside
 

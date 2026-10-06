@@ -46,8 +46,20 @@ Of `build.md`, *The C library*.
 
 Refused: a whole C library in the tree. musl is one for Linux only, and would make every native
 module a musl module. Cosmopolitan covers three systems by being a way to build programs, with its
-own compiler and file format. The condition that brings it back is `PLAN.md`, stage 12, finding
-routines that cannot be carried one at a time.
+own compiler and file format. The condition that brings it back is the routines being carried
+after all, below, and found not to be carriable one at a time.
 
 Refused: writing the routines here, a `printf` and an allocator that C already has. The condition
 that brings a whole library back is native modules being required to be built against it anyway.
+
+Refused: carrying the pure routines and an allocator in the tree, linked privately, and linking
+no C runtime on Windows. It was this document's decision from stage 7, and the whole of stage 12
+as first planned; it was dropped before it was built, by the decision of whoever the design is
+for, in favour of a coding style, more platforms and a list of dependencies. What had been found
+by then is kept, since it is what bringing it back starts from: zig links `bridge.dll` for
+`x86_64-windows-gnu` importing `kernel32.dll` alone, given `-nostdlib -rtlib=compiler-rt`, an
+entry `_DllMainCRTStartup` and thirteen routines; its own runtime supplies `memcpy`, `memmove`,
+`memset`, `memcmp` and `strlen`; the one thread-local variable of the wasm backend then needs
+`_tls_index`; and zig carries no C source for any of the routines, so they come from elsewhere.
+The condition that brings it back is a host that cannot have the C runtime in its process, or a
+record found to be formatted differently by two platforms' C libraries.

@@ -17,7 +17,7 @@ deferral, its threads - were never used, because each had to be ours for a reaso
 
 **What it costs was measured in stage 9's wake.** A hundred thousand lines, of which forty-one
 calls are used. About fifty C library functions even built with one addon, file input and number
-parsing among them, which is what stood in the way of `build.md`, *Self contained*. Between
+parsing among them, which is what stood in the way of carrying them - `build.md`, *The C library*. Between
 three quarters and nine tenths of its memory outside the shared block. A patch at twenty-eight
 sites that the next release of flecs has already invalidated, since it rewrote the storage the
 patch touches. A thread-local variable, because its allocator callbacks carry no context.

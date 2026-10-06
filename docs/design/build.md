@@ -59,7 +59,7 @@ compiles for all of them, so a fourth is a target name, an archive and a runner.
 runner, no document claims it.
 
 **Windows is the `gnu` target, not `msvc`.** The `msvc` target takes its headers and libraries from
-an installed Visual Studio, which is the installation *Self contained* refuses. Both use the same
+an installed Visual Studio, which is an installation *Dependencies* does not have. Both use the same
 calling convention for C, so a module or a host built by either loads into the other.
 
 **macOS is arm64**, the processor those machines have had since 2020 and the one the workflow
@@ -110,8 +110,8 @@ what is needed:
 claim that can be false.
 
 **Not used, each for a reason.** `<stdbit.h>` is the C library's, and with this compiler none of the
-four targets has it, the three platforms and wasm; *The C library* is where that could change.
-`_BitInt`, `#embed` and `char8_t` have nothing here to do.
+four targets has it, the three platforms and wasm. `_BitInt`, `#embed` and `char8_t` have nothing
+here to do.
 
 The build was C11 before anyone chose, and then C99 was chosen for the whole tree, for the sake of
 one number that matched flecs. Compiling it showed the price. wasmtime's headers are not C99, so one
@@ -122,42 +122,43 @@ patch reached into two functions that have no world to pass.
 **One thread-local variable is left.** The wasm backend finds the memory wasmtime is asking it to
 create by which thread is running, because that callback of wasmtime's carries no context. Two
 others are gone: flecs' allocator callbacks could not say which bridge they worked for, and the
-native backend used one to know which module had called, where it now passes the table. Stage 12
-has one thing to verify about the one that is left: on Windows the compiler reaches a
-thread-local variable through a runtime helper, and that stage links no C runtime.
+native backend used one to know which module had called, where it now passes the table.
 
 ## The C library
 
-A C library is three things under one name, and they do not go the same way:
+A C library is three things under one name:
 
     pure routines     memcpy, strlen, snprintf     nothing underneath them
     allocation        malloc, free                 memory from the operating system
     the door          threads, mapping memory,     the operating system itself, on
                       loading a library            Linux and macOS
 
-**The first two are carried**: source in `third_party`, built by the build, linked privately into
-the library. What Bridge-ASM700's own source calls is fifteen functions, and since stage 10 nothing
-else in the library calls any.
+**All three are the system's.** Bridge-ASM700 is a library: it is loaded into a process whose C
+library the host's executable chose, and it loads native modules that somebody else built. On
+Linux a process has one C library, and a module built against another will not load into it. On
+macOS the system's is the only supported way to reach the kernel. On Windows the build links
+the C runtime zig carries.
 
-**The third is not ours to carry.** Bridge-ASM700 is a library: it is loaded into a process whose C
-library the host's executable chose, and it loads native modules that somebody else built. On Linux
-a process has one C library, and a module built against another will not load into it. On macOS the
-system's is the only supported way to reach the kernel. So `src/os.c` stays the one door, and on
-those two systems the door is the operating system's library, for mapping, threads and `dlopen` and nothing
-else. On Windows the door is `kernel32`, which is not a C library at all, and **a Windows build
-links no C runtime**: a program's entry point comes from `os.c`.
+**What our source calls of it is eighteen functions**, counted in the library and the two
+backends: four that allocate, `memcpy`, `memmove`, `memset`, `memcmp`, `memchr`, `strlen`,
+`strcmp`, `strncmp`, `strchr`, `strpbrk`, `snprintf`, `vsnprintf`, `strtoll` and `strtoull`.
+No file, no stream, no `printf`, no floating point, no `qsort`. `PLAN.md`, stage 12, lists
+them as a dependency and shortens the list where it can.
 
-One thing this buys beyond not installing anything: a record is formatted by the same code on every
-platform, where three C runtimes formatted three ways.
+**The door is one layer**: mapping, threads, loading a library and the clock are reached
+through the operating system's layer and nowhere else, and that is the only code that differs
+by platform.
 
-## Self contained
+## Dependencies
 
-**Nothing is fetched, and nothing is installed but zig and Python.** What Bridge-ASM700 depends on
-is in the tree, with where it came from and its hash beside it: wasmtime today, the C
-routines and the tools the build runs from stage 12.
+**What a build needs installed is zig and Python, and two tools for the wasm test modules**:
+`wasm-tools`, which assembles the modules written as text, and Binaryen, which merges the
+SDK's accessors into a module and puts them inline - `wasm.md`, *Memories*. **What the library
+is linked against is the system's C library, and the wasm backend against wasmtime**, which is
+in the tree with where it came from and its hash beside it.
 
-Third-party code is not refused. Code that arrives from somewhere the tree does not record is.
-That includes a C library: it has to be installed like anything else, so it counts.
+Third-party code is not refused. A dependency nobody wrote down is: `PLAN.md`, stage 12, lists
+every one with why it is there, and holds the list by a case.
 
 ## What an author is not bound by
 
