@@ -59,7 +59,7 @@ static const want_refusal_t SCHEMA_REFUSALS[] = {
 ** check_refusal
 **
 ** Reads a descriptor that is to be refused, and checks that the refusal
-** says the word it stopped at.
+** says the word it stopped at. What it said is printed, whole.
 */
 static int check_refusal(const want_refusal_t *w)
 {
@@ -72,6 +72,7 @@ static int check_refusal(const want_refusal_t *w)
         schema_free(&s);
         return (schema_say_failed(w->text, "was accepted"));
     }
+    printf("%s: its descriptor %s\n", w->text, why);
     if (strstr(why, w->word))
         return (0);
     printf("FAIL: %s: refused without naming '%s': its descriptor %s\n",

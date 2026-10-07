@@ -419,6 +419,10 @@ def test(out, built, only):
     not: several cases are a refusal that ends the program. Without one, the exit code does."""
     cases = [c for c in CASES if not only or only in c[0]]
     failed = []
+    # what every case said is kept, a file a case: tools/said.py holds each message of the
+    # source against it
+    kept = out / 'said'
+    kept.mkdir(exist_ok=True)
     for name, command, match, never in cases:
         argv = [str(out / (command[0] + built['exe']))] + command[1:]
         if command[0] in ('c23', 'style'):
@@ -434,6 +438,7 @@ def test(out, built, only):
             said, code = done.stdout.decode('utf-8', 'replace'), done.returncode
         except subprocess.TimeoutExpired as late:
             said, code = (late.stdout or b'').decode('utf-8', 'replace'), 'timeout'
+        (kept / (name + '.txt')).write_text(said, encoding='utf-8')
         if code == 'timeout':
             why = 'did not end in %d seconds' % TIMEOUT
         elif never and re.search(never, said, re.S):
