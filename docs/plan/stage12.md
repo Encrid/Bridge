@@ -508,3 +508,12 @@ changed.
 same code differ by, and are not explained beyond that: an attach of a component the entity
 has, a direct-indexed component given, and a table made or emptied, by 7 to 9 ns of 250. The
 done-when asks that no line be slower, so they are looked at again before the stage closes.
+
+**The entries a module calls in a phase** are out of `abi.c`: `abi_calls.c` for spawn, destroy,
+attach and detach, `abi_alloc.c`, `abi_define.c` with the eight imports as a table, and
+`abi_entry.h` for what they share, a change put on the queue and the check that the module may
+make it. A change is handed to the queue as one `change_t`, where `queue` took five arguments.
+The call itself got faster, the least of five rounds, in ns: attach 9.5 to 8.2, detach 7.8 to
+6.3, destroy 5.9 to 5.1, a sparse set given 10.3 to 8.7. Nothing was done for it but the cut:
+the entries are a translation unit of their own now, and the compiler puts the queueing
+inside each.

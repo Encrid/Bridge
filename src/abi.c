@@ -3,34 +3,12 @@
  * Every pointer argument is an offset into the caller's scratch arena. An entry that cannot be
  * honoured says why in the module's record and answers non-zero, which abandons the
  * invocation that made it - docs/bridge/memory/budgets.md, *What running out does*. */
-#include "inside.h"
+#include "abi_entry.h"
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-static int refuse(module_t *m, const char *fmt, ...)
-{
-    va_list args;
-    /* the first refusal of a call is the reason: a backend that cannot unwind lets the
-     * module run on, and what it meets afterwards is consequence */
-    if (m->refused) return 1;
-    va_start(args, fmt);
-    vsnprintf(m->why, sizeof m->why, fmt, args);
-    va_end(args);
-    m->refused = 1;
-    return 1;
-}
-
-/* the one memory a module can write that Bridge-ASM700 can read and bounds-check */
-static const void *scratch(module_t *m, uint64_t at, uint64_t len)
-{
-    if (at < m->scratch || len > m->scratch_len || at - m->scratch > m->scratch_len - len) {
-        return nullptr;
-    }
-    return m->priv + at;
-}
 
 static uint64_t fingerprint(const char *s, size_t n)
 {
@@ -180,7 +158,7 @@ static int relaid(relaying_t *l, const schema_t *was, const schema_t *is, uint32
          * has made of it */
         if (old->kind != new->kind || (held && holds != held && holds->replaces != held)
             || (held && holds->size != held->size && old->kind != SCHEMA_STRUCT)) {
-            return refuse(l->m, "field '%s' is of another type than it was, and bytes of one type "
+            return abi_refuse(l->m, "field '%s' is of another type than it was, and bytes of one type "
                 "are not a value of another", name);
         }
         count = old->count < new->count ? old->count : new->count;
@@ -203,7 +181,7 @@ static int relaid(relaying_t *l, const schema_t *was, const schema_t *is, uint32
 static int renumbered(module_t *m, const declared_type_t *was, const schema_t *is)
 {
     if (was->s.size != is->size) {
-        return refuse(m, "type '%s' is an integer of %u bytes here and was one of %u: every value "
+        return abi_refuse(m, "type '%s' is an integer of %u bytes here and was one of %u: every value "
             "kept of it would be read as another", was->name, is->size, was->s.size);
     }
     for (uint32_t i = 0; i < was->s.constant_count; i ++) {
@@ -212,11 +190,11 @@ static int renumbered(module_t *m, const declared_type_t *was, const schema_t *i
             if (!strcmp(is->constants[k].name, old->name)) new = &is->constants[k];
         }
         if (!new) {
-            return refuse(m, "type '%s' has no constant '%s' here, which it had: a value kept of it "
+            return abi_refuse(m, "type '%s' has no constant '%s' here, which it had: a value kept of it "
                 "would mean nothing", was->name, old->name);
         }
         if (new->value != old->value) {
-            return refuse(m, "type '%s': its constant '%s' is %lld here and was %lld, and every "
+            return abi_refuse(m, "type '%s': its constant '%s' is %lld here and was %lld, and every "
                 "value kept of it would mean something else", was->name, old->name,
                 (long long)new->value, (long long)old->value);
         }
@@ -232,7 +210,7 @@ static int relay(module_t *m, declared_type_t *was, enum bridge_kind kind, const
     static const char *const kinds[] = { "", "a struct", "an enum", "a bitmask", "a tag" };
     relaying_t l = { .m = m, .rows = storage_count_carriers(m->b->storage, was->type) };
     if (was->kind != kind) {
-        return refuse(m, "type '%s' is %s here and was %s: a reload does not change what kind of "
+        return abi_refuse(m, "type '%s' is %s here and was %s: a reload does not change what kind of "
             "type one is", was->name, kinds[kind], kinds[was->kind]);
     }
     if (kind != BRIDGE_STRUCT) return kind == BRIDGE_TAG ? 0 : renumbered(m, was, is);
@@ -242,17 +220,17 @@ static int relay(module_t *m, declared_type_t *was, enum bridge_kind kind, const
     }
     if (l.short_of) {
         free(l.runs);
-        return refuse(m, "out of memory: there was none to work out how '%s' is laid out again",
+        return abi_refuse(m, "out of memory: there was none to work out how '%s' is laid out again",
             was->name);
     }
     if (l.lost_len) {
         free(l.runs);
-        return refuse(m, "type '%s' has another component layout here, and %u rows would lose %s. "
+        return abi_refuse(m, "type '%s' has another component layout here, and %u rows would lose %s. "
             "A reload that accepts that states each among its losses", was->name, l.rows, l.lost);
     }
     was->runs = l.runs ? l.runs : calloc(1, sizeof *was->runs);
     was->run_count = l.run_count;
-    return was->runs ? 0 : refuse(m, "out of memory: there was none to work out how '%s' is laid "
+    return was->runs ? 0 : abi_refuse(m, "out of memory: there was none to work out how '%s' is laid "
         "out again", was->name);
 }
 
@@ -291,15 +269,15 @@ static int moved_storage(module_t *m, const declared_type_t *c, enum bridge_stor
 {
     uint32_t carriers = storage_count_carriers(m->b->storage, c->type), off = storage_count_off(m->b->storage, c->type);
     if (c->storage == BRIDGE_SINGLETON) {
-        return refuse(m, "type '%s' is a singleton, and is not moved to %s: there is no entity to "
+        return abi_refuse(m, "type '%s' is a singleton, and is not moved to %s: there is no entity to "
             "carry it", c->name, storage_names[kept]);
     }
     if (kept == BRIDGE_SINGLETON && carriers > 1) {
-        return refuse(m, "type '%s' is carried by %u entities, and is not moved to a singleton: "
+        return abi_refuse(m, "type '%s' is carried by %u entities, and is not moved to a singleton: "
             "nothing says which of them has its value", c->name, carriers);
     }
     if (off && !accepted(m, c->name, off)) {
-        return refuse(m, "type '%s' is a toggle that is off for %u rows, and as %s they are "
+        return abi_refuse(m, "type '%s' is a toggle that is off for %u rows, and as %s they are "
             "carried like the rest. That is a loss this reload does not accept: '%s'", c->name, off,
             storage_names[kept], c->name);
     }
@@ -311,7 +289,7 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
 {
     module_t *m = ud;
     bridge_t *b = m->b;
-    const char *name_at = scratch(m, a[0], a[1]), *desc_at = scratch(m, a[5], a[6]);
+    const char *name_at = get_scratch(m, a[0], a[1]), *desc_at = get_scratch(m, a[5], a[6]);
     enum bridge_kind kind = (enum bridge_kind)a[2];
     enum bridge_on_unload on_unload = (enum bridge_on_unload)a[7];
     enum bridge_storage kept = (enum bridge_storage)a[8];
@@ -320,9 +298,9 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
     char name[128], *bare;
     uint64_t print;
 
-    if (!m->in_init) return refuse(m, "declare is called outside init");
+    if (!m->in_init) return abi_refuse(m, "declare is called outside init");
     if (!name_at || (!desc_at && kind != BRIDGE_TAG) || !a[1] || a[1] >= sizeof name) {
-        return refuse(m, "declare: a name or a descriptor lies outside the scratch arena");
+        return abi_refuse(m, "declare: a name or a descriptor lies outside the scratch arena");
     }
     memcpy(name, name_at, a[1]);
     name[a[1]] = 0;
@@ -336,27 +314,27 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
         if (policy) m->policy = policy;
         if (writes) m->may_write = writes;
         if (!declared || !policy || !writes || !storage_make_writable(b->storage, m)) {
-            return refuse(m, "out of memory: there was none for what it declares");
+            return abi_refuse(m, "out of memory: there was none for what it declares");
         }
     }
     bare = strchr(name, ':');
-    if (!bare) return refuse(m, "type '%s' has no namespace", name);
+    if (!bare) return abi_refuse(m, "type '%s' has no namespace", name);
     if (kind < BRIDGE_STRUCT || kind > BRIDGE_TAG) {
-        return refuse(m, "type '%s': its kind is unset", name);
+        return abi_refuse(m, "type '%s': its kind is unset", name);
     }
     if (kind == BRIDGE_TAG && (size || a[6])) {
-        return refuse(m, "type '%s' is a tag, and a tag has no bytes and no descriptor", name);
+        return abi_refuse(m, "type '%s' is a tag, and a tag has no bytes and no descriptor", name);
     }
     if (foreign(m, name) && !listed(m->read, m->read_count, name)
         && !listed(m->write, m->write_count, name)) {
-        return refuse(m, "it may not declare '%s': that is another namespace's, and no grant "
+        return abi_refuse(m, "it may not declare '%s': that is another namespace's, and no grant "
             "names it", name);
     }
     if (on_unload < BRIDGE_STRIP || on_unload > BRIDGE_DELETE) {
-        return refuse(m, "type '%s': on_unload is unset", name);
+        return abi_refuse(m, "type '%s': on_unload is unset", name);
     }
     if (kept < BRIDGE_TABLE || kept > BRIDGE_SINGLETON) {
-        return refuse(m, "type '%s': its storage layout is unset", name);
+        return abi_refuse(m, "type '%s': its storage layout is unset", name);
     }
     print = fingerprint(kind == BRIDGE_TAG ? "" : desc_at, a[6]) ^ kind;
 
@@ -373,13 +351,13 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
         also_declared(b, m, c, others, sizeof others);
         for (i = 0; m->reloads && i < m->reloads->declared_count && m->reloads->declared[i] != c; i ++) {}
         if (others[0] || !m->reloads || i == m->reloads->declared_count) {
-            return refuse(m, "type '%s' has another component layout here: fingerprint %016llx, and it "
+            return abi_refuse(m, "type '%s' has another component layout here: fingerprint %016llx, and it "
                 "was declared with %016llx%s", name, (unsigned long long)print,
                 (unsigned long long)c->fingerprint, others);
         }
         holder = held_elsewhere(b, m, c, &by);
         if (holder) {
-            return refuse(m, "type '%s' has another component layout here, and '%s', which module "
+            return abi_refuse(m, "type '%s' has another component layout here, and '%s', which module "
                 "'%s' declares, has a field of it", name, holder->name, by->identity);
         }
         if (c->storage != kept && moved_storage(m, c, kept)) return 1;
@@ -395,7 +373,7 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
          * holds */
         for (i = 0; m->reloads && i < m->reloads->declared_count && m->reloads->declared[i] != c; i ++) {}
         if (others[0] || !m->reloads || i == m->reloads->declared_count) {
-            return refuse(m, "type '%s' is stated as %s here, and it was declared as %s%s", name,
+            return abi_refuse(m, "type '%s' is stated as %s here, and it was declared as %s%s", name,
                 storage_names[kept], storage_names[c->storage], others);
         }
         if (moved_storage(m, c, kept)) return 1;
@@ -426,17 +404,17 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
             memset(&s, 0, sizeof s);
             s.align = align;
         } else {
-            if (!desc) return refuse(m, "out of memory: there was none for the descriptor of '%s'", name);
+            if (!desc) return abi_refuse(m, "out of memory: there was none for the descriptor of '%s'", name);
             *bare = 0;
             refused = schema_parse(&(schema_source_t){ kind, desc, find, &l, why, sizeof why }, &s);
             *bare = ':';
             free(desc);
-            if (refused) return refuse(m, "type '%s': its descriptor %s", name, why);
+            if (refused) return abi_refuse(m, "type '%s': its descriptor %s", name, why);
         }
         if (s.size != size || s.align != align) {
             uint32_t laid = s.size, aligned = s.align;
             schema_free(&s);
-            return refuse(m, "type '%s' is %u bytes aligned to %u in the module and %u "
+            return abi_refuse(m, "type '%s' is %u bytes aligned to %u in the module and %u "
                 "aligned to %u by its descriptor", name, size, align, laid, aligned);
         }
         if (was && (was->fingerprint != print || names_superseded(was)) && relay(m, was, kind, &s)) {
@@ -445,19 +423,19 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
         }
         if (b->type_count >= b->max_types) {
             schema_free(&s);
-            return refuse(m, "type '%s' is one more than [budget] types of %u", name,
+            return abi_refuse(m, "type '%s' is one more than [budget] types of %u", name,
                 b->max_types);
         }
 
         if (kept == BRIDGE_SPARSE_SET && !storage_count_free_sets(b->storage)) {
             schema_free(&s);
-            return refuse(m, "type '%s' is one more than [budget] sparse_sets of %u", name,
+            return abi_refuse(m, "type '%s' is one more than [budget] sparse_sets of %u", name,
                 b->sparse_sets);
         }
 
         if (kept == BRIDGE_DIRECT_INDEXED && !storage_count_free_direct(b->storage)) {
             schema_free(&s);
-            return refuse(m, "type '%s' is one more than [budget] direct_indexed of %u", name,
+            return abi_refuse(m, "type '%s' is one more than [budget] direct_indexed of %u", name,
                 b->direct_indexed);
         }
 
@@ -476,7 +454,7 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
             free(deps);
             schema_free(&s);
             c = nullptr;
-            return refuse(m, "out of memory: there was none for type '%s'", name);
+            return abi_refuse(m, "out of memory: there was none for type '%s'", name);
         }
         c->type = storage_declare(b->storage, size, align, kept);
         if (!c->type) {
@@ -487,10 +465,10 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
             schema_free(&s);
             c = nullptr;
             if (kept == BRIDGE_SINGLETON) {
-                return refuse(m, "type '%s' is a singleton, and [budget] columns of %u bytes has "
+                return abi_refuse(m, "type '%s' is a singleton, and [budget] columns of %u bytes has "
                     "no room for its %u bytes", name, b->columns_len, size);
             }
-            return refuse(m, "type '%s' is direct-indexed, and [budget] columns of %u bytes has no "
+            return abi_refuse(m, "type '%s' is direct-indexed, and [budget] columns of %u bytes has no "
                 "room for a cell of %u bytes for each of %u entities", name, b->columns_len, size,
                 b->entities);
         }
@@ -532,7 +510,7 @@ static int declare_stated(void *ud, const uint64_t *a, uint64_t *r)
 }
 
 /* storage says who and what; the observer itself runs at the barrier, after the republish */
-static void heard(void *ctx, uint64_t id, enum bridge_event event)
+void abi_hear(void *ctx, uint64_t id, enum bridge_event event)
 {
     bridge_system_t *s = ctx;
     /* its list is as long as what its module's spans could publish of it, and one past
@@ -558,9 +536,9 @@ static int subscribe(module_t *m, uint64_t name_off, uint64_t name_len, uint32_t
 {
     bridge_t *b = m->b;
     const char *what = events ? "observer" : "system";
-    const char *name_at = scratch(m, name_off, name_len);
-    const bridge_term_t *terms = scratch(m, terms_off, term_count * sizeof(bridge_term_t));
-    const void *changes = change_count ? scratch(m, changes_off, change_count * sizeof(uint32_t))
+    const char *name_at = get_scratch(m, name_off, name_len);
+    const bridge_term_t *terms = get_scratch(m, terms_off, term_count * sizeof(bridge_term_t));
+    const void *changes = change_count ? get_scratch(m, changes_off, change_count * sizeof(uint32_t))
                                        : "";
     uint32_t count = (uint32_t)term_count, i;
     storage_term_t *asked;
@@ -568,32 +546,32 @@ static int subscribe(module_t *m, uint64_t name_off, uint64_t name_len, uint32_t
     char name[128], full[256];
 
     if (b->system_count - b->parked >= b->max_systems) {
-        return refuse(m, "it registers one more than [budget] systems of %u", b->max_systems);
+        return abi_refuse(m, "it registers one more than [budget] systems of %u", b->max_systems);
     }
     if (term_count > b->max_terms) {
-        return refuse(m, "a%s %s asks for %llu terms, which is more than [budget] terms of %u",
+        return abi_refuse(m, "a%s %s asks for %llu terms, which is more than [budget] terms of %u",
             events ? "n" : "", what, (unsigned long long)term_count, b->max_terms);
     }
     if (!name_at || !terms || !changes || !name_len || name_len >= sizeof name) {
-        return refuse(m, "%s: a name, a term or a change lies outside the scratch arena", what);
+        return abi_refuse(m, "%s: a name, a term or a change lies outside the scratch arena", what);
     }
     if (change_count > m->declared_count) {
-        return refuse(m, "a%s %s states %llu changes, and the module declared %u types",
+        return abi_refuse(m, "a%s %s states %llu changes, and the module declared %u types",
             events ? "n" : "", what, (unsigned long long)change_count, m->declared_count);
     }
     memcpy(name, name_at, name_len);
     name[name_len] = 0;
     if (!strcmp(name, "init") || !strcmp(name, "shutdown") || !strcmp(name, "reload")) {
-        return refuse(m, "'%s' is a reserved name, and no %s may take it", name, what);
+        return abi_refuse(m, "'%s' is a reserved name, and no %s may take it", name, what);
     }
     /* a system and an observer are both exports, and an export has one name */
     for (i = 0; i < m->system_count + m->observer_count; i ++) {
         bridge_system_t *other = i < m->system_count ? m->systems[i]
                                                    : m->observers[i - m->system_count];
-        if (!strcmp(other->name, name)) return refuse(m, "'%s' is registered twice", name);
+        if (!strcmp(other->name, name)) return abi_refuse(m, "'%s' is registered twice", name);
     }
     if (events && !count) {
-        return refuse(m, "observer '%s' has no term, and so nothing to observe", name);
+        return abi_refuse(m, "observer '%s' has no term, and so nothing to observe", name);
     }
 
     /* everything a system needs is had before any of it is kept: failure.md, *Out of memory* */
@@ -624,7 +602,7 @@ static int subscribe(module_t *m, uint64_t name_off, uint64_t name_len, uint32_t
             }
             free(s);
             free(asked);
-            return refuse(m, "out of memory: there was none for %s '%s'", what, name);
+            return abi_refuse(m, "out of memory: there was none for %s '%s'", what, name);
         }
     }
     s->changes = (declared_type_t **)(void *)&s->term[count];
@@ -633,10 +611,10 @@ static int subscribe(module_t *m, uint64_t name_off, uint64_t name_len, uint32_t
         uint32_t slot;
         memcpy(&slot, (const char *)changes + i * sizeof slot, sizeof slot);
         if (slot >= m->declared_count) {
-            refuse(m, "change %u of %s '%s' names slot %u, which it never declared", i, what, name,
+            abi_refuse(m, "change %u of %s '%s' names slot %u, which it never declared", i, what, name,
                 slot);
         } else if (!may_write(m, m->declared[slot])) {
-            refuse(m, "%s '%s' may not attach or detach '%s': no grant says so", what, name,
+            abi_refuse(m, "%s '%s' may not attach or detach '%s': no grant says so", what, name,
                 m->declared[slot]->name);
         }
         if (m->refused) {
@@ -652,20 +630,20 @@ static int subscribe(module_t *m, uint64_t name_off, uint64_t name_len, uint32_t
         declared_type_t *c;
         memcpy(&t, &terms[i], sizeof t);
         if (t.slot >= m->declared_count) {
-            refuse(m, "term %u of %s '%s' names slot %u, which it never declared", i, what, name,
+            abi_refuse(m, "term %u of %s '%s' names slot %u, which it never declared", i, what, name,
                 t.slot);
         } else if (!t.access) {
-            refuse(m, "term %u of %s '%s': its access is unset", i, what, name);
+            abi_refuse(m, "term %u of %s '%s': its access is unset", i, what, name);
         } else if (t.access > BRIDGE_WRITE) {
-            refuse(m, "term %u of %s '%s': its access is %u, and there is read and write", i, what,
+            abi_refuse(m, "term %u of %s '%s': its access is %u, and there is read and write", i, what,
                 name, t.access);
         } else if (!t.oper) {
-            refuse(m, "term %u of %s '%s': its operator is unset", i, what, name);
+            abi_refuse(m, "term %u of %s '%s': its operator is unset", i, what, name);
         } else if (t.oper > BRIDGE_OPTIONAL) {
-            refuse(m, "term %u of %s '%s': its operator is %u, and there are three", i, what, name,
+            abi_refuse(m, "term %u of %s '%s': its operator is %u, and there are three", i, what, name,
                 t.oper);
         } else if (t.access == BRIDGE_WRITE && !may_write(m, m->declared[t.slot])) {
-            refuse(m, "%s '%s' may not write '%s': no grant says so", what, name,
+            abi_refuse(m, "%s '%s' may not write '%s': no grant says so", what, name,
                 m->declared[t.slot]->name);
         }
         if (m->refused) {
@@ -677,14 +655,14 @@ static int subscribe(module_t *m, uint64_t name_off, uint64_t name_len, uint32_t
         /* storage.md, *What a query walks*: a system walks tables, or one sparse set alone,
          * and what is kept elsewhere it reaches from the row. An observer walks nothing */
         if (!events && c->storage == BRIDGE_SINGLETON && t.oper != BRIDGE_OPTIONAL) {
-            refuse(m, "term %u of %s '%s': '%s' is a singleton, and is on no entity a system "
+            abi_refuse(m, "term %u of %s '%s': '%s' is a singleton, and is on no entity a system "
                 "walks. It is stated optional and read where it is", i, what, name, c->name);
             free(asked);
             free(s);
             return 1;
         }
         if (!events && c->storage == BRIDGE_DIRECT_INDEXED && t.oper != BRIDGE_OPTIONAL) {
-            refuse(m, "term %u of %s '%s': '%s' is direct-indexed, and does not select what a "
+            abi_refuse(m, "term %u of %s '%s': '%s' is direct-indexed, and does not select what a "
                 "system walks. It is stated optional and reached by the entity's id", i, what, name,
                 c->name);
             free(asked);
@@ -696,13 +674,13 @@ static int subscribe(module_t *m, uint64_t name_off, uint64_t name_len, uint32_t
                 bridge_term_t other;
                 memcpy(&other, &terms[k], sizeof other);
                 if (k == i || other.oper == BRIDGE_OPTIONAL) continue;
-                refuse(m, "term %u of %s '%s': '%s' is kept in a sparse set, and does not "
+                abi_refuse(m, "term %u of %s '%s': '%s' is kept in a sparse set, and does not "
                     "select the rows of a table. It is stated optional and looked for at each "
                     "row, or it is the one term that selects", i, what, name, c->name);
                 break;
             }
             if (!m->refused && t.oper == BRIDGE_NOT) {
-                refuse(m, "term %u of %s '%s': '%s' is kept in a sparse set, and a system "
+                abi_refuse(m, "term %u of %s '%s': '%s' is kept in a sparse set, and a system "
                     "cannot walk the entities that are not in it", i, what, name, c->name);
             }
             if (m->refused) {
@@ -718,7 +696,7 @@ static int subscribe(module_t *m, uint64_t name_off, uint64_t name_len, uint32_t
         s->term[i].writes = t.access == BRIDGE_WRITE;
     }
 
-    s->matched = events ? storage_add_observer(b->storage, asked, count, &(storage_listener_t){ events, heard, s })
+    s->matched = events ? storage_add_observer(b->storage, asked, count, &(storage_listener_t){ events, abi_hear, s })
                : count ? storage_add_system(b->storage, asked, count) : nullptr;
     s->asked = asked;
     s->events = events;
@@ -744,10 +722,10 @@ static int system_stated(void *ud, const uint64_t *a, uint64_t *r)
 {
     module_t *m = ud;
     bridge_t *b = m->b;
-    const char *phase_at = scratch(m, a[2], a[3]);
+    const char *phase_at = get_scratch(m, a[2], a[3]);
     uint32_t phase;
-    if (!m->in_init) return refuse(m, "add_system is called outside init");
-    if (!phase_at) return refuse(m, "add_system: a phase lies outside the scratch arena");
+    if (!m->in_init) return abi_refuse(m, "add_system is called outside init");
+    if (!phase_at) return abi_refuse(m, "add_system: a phase lies outside the scratch arena");
     /* what the deployment says this module's name for a phase is, and otherwise the name */
     for (phase = 0; phase < m->phase_names; phase ++) {
         if (strlen(m->phase_from[phase]) == a[3] && !memcmp(m->phase_from[phase], phase_at, a[3])) break;
@@ -757,7 +735,7 @@ static int system_stated(void *ud, const uint64_t *a, uint64_t *r)
         if (strlen(b->phases[phase]) == a[3] && !memcmp(b->phases[phase], phase_at, a[3])) break;
     }
     if (phase == b->phase_count) {
-        return refuse(m, "a system names phase '%.*s', which the deployment did not declare",
+        return abi_refuse(m, "a system names phase '%.*s', which the deployment did not declare",
             (int)a[3], phase_at);
     }
     return subscribe(m, a[0], a[1], phase, 0, a[4], a[5], a[6], a[7], r);
@@ -768,9 +746,9 @@ static int system_stated(void *ud, const uint64_t *a, uint64_t *r)
 static int observer_stated(void *ud, const uint64_t *a, uint64_t *r)
 {
     module_t *m = ud;
-    if (!m->in_init) return refuse(m, "observe is called outside init");
+    if (!m->in_init) return abi_refuse(m, "observe is called outside init");
     if (!a[2] || a[2] & ~(uint64_t)(BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE)) {
-        return refuse(m, "observe: its events are unset, or name one there is not");
+        return abi_refuse(m, "observe: its events are unset, or name one there is not");
     }
     return subscribe(m, a[0], a[1], m->b->phase_count, (uint32_t)a[2], a[3], a[4], a[5], a[6], r);
 }
@@ -778,31 +756,31 @@ static int observer_stated(void *ud, const uint64_t *a, uint64_t *r)
 /* declare(at) -> slot, add_system(at) -> slot, observe(at) -> slot. Each is handed where one
  * struct is in the scratch arena - abi.md, *The ABI* - which is copied out before it is read,
  * since a module may have put it at any offset. */
-static int abi_declare(void *ud, const uint64_t *at, uint64_t *r)
+int abi_declare(void *ud, const uint64_t *at, uint64_t *r)
 {
     bridge_declaration_t d;
-    const void *stated = scratch(ud, at[0], sizeof d);
-    if (!stated) return refuse(ud, "declare: what it states lies outside the scratch arena");
+    const void *stated = get_scratch(ud, at[0], sizeof d);
+    if (!stated) return abi_refuse(ud, "declare: what it states lies outside the scratch arena");
     memcpy(&d, stated, sizeof d);
     return declare_stated(ud, (uint64_t[9]){ d.name, d.name_len, d.kind, d.size, d.align, d.desc,
         d.desc_len, d.on_unload, d.storage }, r);
 }
 
-static int abi_system(void *ud, const uint64_t *at, uint64_t *r)
+int abi_system(void *ud, const uint64_t *at, uint64_t *r)
 {
     bridge_system_statement_t s;
-    const void *stated = scratch(ud, at[0], sizeof s);
-    if (!stated) return refuse(ud, "add_system: what it states lies outside the scratch arena");
+    const void *stated = get_scratch(ud, at[0], sizeof s);
+    if (!stated) return abi_refuse(ud, "add_system: what it states lies outside the scratch arena");
     memcpy(&s, stated, sizeof s);
     return system_stated(ud, (uint64_t[8]){ s.name, s.name_len, s.phase, s.phase_len, s.terms,
         s.term_count, s.changes, s.change_count }, r);
 }
 
-static int abi_observe(void *ud, const uint64_t *at, uint64_t *r)
+int abi_observe(void *ud, const uint64_t *at, uint64_t *r)
 {
     bridge_observer_statement_t o;
-    const void *stated = scratch(ud, at[0], sizeof o);
-    if (!stated) return refuse(ud, "observe: what it states lies outside the scratch arena");
+    const void *stated = get_scratch(ud, at[0], sizeof o);
+    if (!stated) return abi_refuse(ud, "observe: what it states lies outside the scratch arena");
     memcpy(&o, stated, sizeof o);
     return observer_stated(ud, (uint64_t[7]){ o.name, o.name_len, o.events, o.terms, o.term_count,
         o.changes, o.change_count }, r);
@@ -814,199 +792,6 @@ static int abi_observe(void *ud, const uint64_t *at, uint64_t *r)
  * which the barrier applies in an order that never varies. No lock: a module's systems are
  * serialised, so each of the three has one writer. */
 
-/* budgets.md, *Budgets*: a reload does not need room for a module's systems twice. The old
- * instance's leave storage before the new one's are registered, and count for nothing until
- * they are back or gone. */
-void abi_park(bridge_t *b, bridge_system_t *s)
-{
-    if (s->parked) return;
-    if (s->matched) storage_forget(b->storage, s->matched);
-    s->matched = nullptr;
-    s->parked = 1;
-    b->parked ++;
-}
-
-/* As it was: the places it had are free again, since whatever took them has been dropped. */
-void abi_unpark(bridge_t *b, bridge_system_t *s)
-{
-    if (!s->parked) return;
-    s->matched = s->events ? storage_add_observer(b->storage, s->asked, s->terms, &(storage_listener_t){ s->events, heard, s })
-               : s->terms ? storage_add_system(b->storage, s->asked, s->terms) : nullptr;
-    s->parked = 0;
-    b->parked --;
-}
-
-/* Room for a mark from each of its systems and observers, and from the lifecycle call in
- * progress, beyond those it has: asked for where a module gains a system and before a
- * lifecycle call, so that `queue` never has to. */
-bool abi_marks(module_t *m, uint32_t more)
-{
-    uint32_t want = m->mark_count + m->system_count + m->observer_count + 1 + more;
-    void *marks;
-    if (want <= m->mark_room) return true;
-    marks = realloc(m->marks, want * sizeof *m->marks);
-    if (!marks) return false;
-    m->marks = marks;
-    m->mark_room = want;
-    return true;
-}
-
-static int queue(module_t *m, enum change_op op, uint64_t id, declared_type_t *c, const void *value)
-{
-    change_t ch = { id, c, value ? c->size : 0, op };
-    uint32_t need = (uint32_t)sizeof ch + ((ch.size + 7u) & ~7u);
-    /* budgets.md, *Nothing is allocated in a phase*: its queue is as long as it stated */
-    if (!m->queue_room) return refuse(m, "it stated that it queues no change");
-    if (need > m->queue_room - m->queue_len) {
-        return refuse(m, "its changes of %u bytes are used up", m->queue_room);
-    }
-    if (!m->mark_count || m->marks[m->mark_count - 1].turn != m->turn) {
-        if (m->mark_count == m->mark_room) return refuse(m, "out of memory: there was none for a mark in its queue");
-        m->marks[m->mark_count].turn = m->turn;
-        m->marks[m->mark_count ++].at = m->queue_len;
-    }
-    memcpy(m->queue + m->queue_len, &ch, sizeof ch);
-    /* the value is copied now: the scratch arena it is in is reset before it is applied */
-    if (value) memcpy(m->queue + m->queue_len + sizeof ch, value, ch.size);
-    m->queue_len += need;
-    return 0;
-}
-
-/* spawn() -> id */
-static int abi_spawn(void *ud, [[maybe_unused]] const uint64_t *a, uint64_t *r)
-{
-    module_t *m = ud;
-    if (m->id_next == m->id_count) {
-        if (m->spawns <= 0) return refuse(m, "spawn: it stated that it spawns nothing");
-        if (m->ids_short) {
-            /* the index is twelve bytes times the highest id, and that is what was budgeted */
-            return refuse(m, "spawn: [budget] entities of %u is reached", m->b->entities);
-        }
-        return refuse(m, "spawn: its spawns of %lld between two barriers are used up",
-            (long long)m->spawns);
-    }
-    r[0] = m->ids[m->id_next ++];
-    return 0;
-}
-
-/* destroy(id). An id that has already died is nobody's mistake: two modules may both want it
- * gone, and which of them is told at the barrier, where it is looked at. */
-static int abi_destroy(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
-{
-    return queue(ud, CHANGE_DESTROY, a[0], nullptr, nullptr);
-}
-
-static declared_type_t *written(module_t *m, uint64_t slot, const char *entry)
-{
-    const bridge_system_t *s = m->running;
-    uint32_t i;
-    if (slot >= m->declared_count) {
-        refuse(m, "%s names slot %llu, which it never declared", entry, (unsigned long long)slot);
-        return nullptr;
-    }
-    if (!m->may_write[slot]) {
-        refuse(m, "it may not %s '%s': no grant says so", entry, m->declared[slot]->name);
-        return nullptr;
-    }
-    /* schedule.md, *Order within a phase is never implicit*: what a system changes is what
-     * it stated, so that two that change one component were ordered when they loaded. A
-     * lifecycle call runs alone, and states nothing */
-    for (i = 0; s && i < s->change_count && s->changes[i] != m->declared[slot]; i ++) {}
-    if (s && i == s->change_count) {
-        refuse(m, "%s '%s' may not %s '%s': it is not among the changes it stated",
-            s->observer ? "observer" : "system", s->name, entry, m->declared[slot]->name);
-        return nullptr;
-    }
-    return m->declared[slot];
-}
-
 /* attach(id, slot, ptr). The value travels with it, and is as long as the type was declared;
  * BRIDGE_ZEROED as `ptr` asks for a zeroed one. */
-/* storage.md, *A singleton*: it is on no entity, so it is given and taken with the id 0,
- * which is no entity; and nothing else is. 1 and a refusal if `id` is the wrong one of the two. */
-static int unowned(module_t *m, const char *entry, uint64_t id, const declared_type_t *c)
-{
-    if (c->storage == BRIDGE_SINGLETON && id) {
-        return refuse(m, "%s: '%s' is a singleton, and its id is 0", entry, c->name);
-    }
-    if (c->storage != BRIDGE_SINGLETON && !id) {
-        return refuse(m, "%s: the id 0 is no entity, and '%s' is not a singleton", entry, c->name);
-    }
-    return 0;
-}
 
-static int abi_attach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
-{
-    module_t *m = ud;
-    declared_type_t *c = written(m, a[1], "attach");
-    const void *value;
-    if (!c) return 1;
-    value = a[2] != BRIDGE_ZEROED ? scratch(m, a[2], c->size) : c->zero;
-    if (!value) return refuse(m, "attach: the value lies outside the scratch arena");
-    if (unowned(m, "attach", a[0], c)) return 1;
-    return queue(m, CHANGE_ATTACH, a[0], c, value);
-}
-
-/* detach(id, slot) */
-static int abi_detach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
-{
-    module_t *m = ud;
-    declared_type_t *c = written(m, a[1], "detach");
-    if (!c || unowned(m, "detach", a[0], c)) return 1;
-    return queue(m, CHANGE_DETACH, a[0], c, nullptr);
-}
-
-/* alloc(len) -> offset into the persistent arena. Nothing frees it while its module is
- * loaded - strings.md. */
-static int abi_alloc(void *ud, const uint64_t *a, uint64_t *r)
-{
-    module_t *m = ud;
-    uint64_t len = (a[0] + 7u) & ~7ull;
-    if (m->persistent <= 0) {
-        return refuse(m, "alloc: it stated that it keeps nothing in the persistent arena");
-    }
-    /* what is left of a range too small for this is dead space, as a string that outgrew
-     * its place leaves - strings.md */
-    while (len > m->arena_left && m->own_next < m->own_count) {
-        m->arena_at = m->owned[m->own_next].at;
-        m->arena_left = m->owned[m->own_next ++].len;
-    }
-    if (len > m->arena_left) {
-        return refuse(m, "alloc: its persistent of %lld bytes is exhausted", (long long)m->persistent);
-    }
-    r[0] = m->arena_at;
-    m->arena_at += (uint32_t)len;
-    m->arena_left -= (uint32_t)len;
-    return 0;
-}
-
-int abi_define(module_t *m, backend_err_t *err)
-{
-    constexpr enum backend_type I = BACKEND_I32, L = BACKEND_I64;
-    static const struct {
-        const char *name;
-        backend_fn_t  fn;
-        enum backend_type params[9];
-        uint32_t    param_count;
-        enum backend_type results[1];
-        uint32_t    result_count;
-    } entries[] = {
-        { "declare", abi_declare, { I },                   1, { I }, 1 },
-        { "add_system", abi_system, { I },                 1, { I }, 1 },
-        { "observe", abi_observe, { I },                   1, { I }, 1 },
-        { "spawn",   abi_spawn,   {},                      0, { L }, 1 },
-        { "destroy", abi_destroy, { L },                   1, {}, 0 },
-        { "attach",  abi_attach,  { L, I, I },             3, {}, 0 },
-        { "detach",  abi_detach,  { L, I },                2, {}, 0 },
-        { "alloc",   abi_alloc,   { I },                   1, { I }, 1 },
-    };
-    size_t i;
-    for (i = 0; i < sizeof entries / sizeof *entries; i ++) {
-        backend_sig_t sig = { .params = entries[i].params, .param_count = entries[i].param_count,
-                            .results = entries[i].results,
-                            .result_count = entries[i].result_count };
-        if (m->on->api.define_func(m->instance, &(backend_entry_t){ BRIDGE_NAMESPACE, entries[i].name,
-                                   entries[i].fn, m, &sig }, err)) return 1;
-    }
-    return 0;
-}

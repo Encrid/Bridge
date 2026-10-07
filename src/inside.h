@@ -457,35 +457,6 @@ struct bridge {
 };
 
 /*
-** abi_marks
-**
-** Makes room for a mark from every call a module may yet take. false if
-** there is no memory for it.
-*/
-[[nodiscard]] bool abi_marks(module_t *m, uint32_t more);
-
-/*
-** abi_park
-**
-** Takes a system out of storage, for a reload.
-*/
-void abi_park(bridge_t *b, bridge_system_t *s);
-
-/*
-** abi_unpark
-**
-** Puts a parked system back in storage, as it was.
-*/
-void abi_unpark(bridge_t *b, bridge_system_t *s);
-
-/*
-** abi_define
-**
-** Defines the eight imports of the ABI for a module's instance.
-*/
-[[nodiscard]] int abi_define(module_t *m, backend_err_t *err);
-
-/*
 ** module_discard
 **
 ** Frees a module and what it held.
@@ -503,5 +474,6 @@ void module_shut_down(bridge_t *b, module_t *m);
     #include "schedule.h"
     #include "bridge_inside.h"
     #include "block.h"
+    #include "abi.h"
 
 #endif
