@@ -416,13 +416,11 @@ before it had one that was its own: the GNU General Public License, with an exce
 what it loads is not a derivative of it, and an agreement that lets the whole be offered where
 that licence cannot go. That text was written for a program nothing linked. This is a library
 that a host links, whose seam headers are compiled into other people's work, and none of the
-paths it names is here. What is meant is the same; what the text has to say to mean it is this
+paths it names is here. What is wanted of it, and what the text has to say to mean that, is this
 stage's questions, by the method of `contributing.md`. Nobody working on it is a lawyer, and it
 says where that matters.
 
-*Done when the licence, and the exception as ruled, are in the tree, and the licence is the
-published text, byte for byte; no file of ours says all rights are reserved, and `style` fails
-on one that does; every path or name the exception gives for an interface is there, and a case
-fails on one that is not; each thing in the tree that is somebody else's is named with its
-licence; a document says, once, what a host, a module and a backend may be under; and every
-case passes.*
+*Done when the licence is in the tree, and is the published text, byte for byte; no file of
+ours says all rights are reserved, and `style` fails on one that does; each thing in the tree
+that is somebody else's is named with its licence; a document says, once, what a host, a module
+and a backend may be under, and where other terms are had; and every case passes.*

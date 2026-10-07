@@ -73,3 +73,31 @@ is for somebody qualified to read, and each decision says where that matters.
     7  close            put to Enkrid by the done-when
 
 ## The decisions
+
+### What must be open
+
+**Everything built with Bridge: a host, a module, a backend. The GNU Affero General Public
+License, version 3, with no exception; and other terms are bought from the holder.** Enkrid:
+"I want things built with Bridge to be free and open source. If they want it closed they buy a
+License." It is not what `legacy/rust-components` had, where what Bridge loaded could be closed
+at no cost.
+
+What that licence does with nothing added to it: a host links Bridge, so the two are one work,
+and the host is published under it or under a licence compatible with it; a module compiles
+the seam headers and its SDK into itself, so the same holds for a module, and for a backend.
+The Affero licence was chosen over the plain one for one case the plain one leaves: a host
+that is never handed to anybody and only runs as a service, a company's servers, which under
+the plain one could stay closed and pay nothing.
+
+**Three of this stage's questions go with it.** There is no exception, so there is nothing to
+say of seam code compiled into other work, of how an exception names an interface, or of what
+a static link owes: the licence answers each the same way for everything.
+
+**What it asks for.** Selling other terms takes holding the rights to all of Bridge, which one
+author does today and which only a contributor's agreement keeps true after the first
+contribution from outside; and it takes a holder who can sign a contract. Both are questions
+below. What is somebody else's in the tree, wasmtime and two functions after musl's, is under
+terms that allow either.
+
+Where a qualified reader matters: that a module is one work with what it compiles in and is
+loaded by is how these licences are generally read, and is not something this stage can show.
