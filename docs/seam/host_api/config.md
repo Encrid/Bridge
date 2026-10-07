@@ -37,7 +37,7 @@ here it sits beside the two answers. The keys are `trusted`, `reloadable`, `hot_
 
 What that protects against is not a missing key but a value nobody can account for. A host may layer
 its sources however it likes - a module author's stated values under a deployment's, say - as long
-as what it hands over is one stated value per key. `legacy/rust-components` had the same rule.
+as what it hands over is one stated value per key.
 
 ## The keys
 
@@ -79,8 +79,7 @@ inside one phase.
 module declares the struct in its schema header like any other, and states it a singleton -
 `storage.md`, *A singleton*. Bridge gives it its value at init, matching the keys to the field names
 its descriptor states - `schema.md`, *There is no schema format*. A key the deployment set that the
-module never declared is an error at init, by name, where `legacy/rust-components` silently ignores
-a typo.
+module never declared is an error at init, by name: a typo is not silently ignored.
 
 Text that does not fit in what is left of the module's share of the persistent arena refuses
 the load, by the key.

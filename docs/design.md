@@ -5,8 +5,9 @@ is `readme.md`; the build order is `plan.md`.
 
 ## Why
 
-The costs of `legacy/rust-components` were measured, not guessed. One machine, release build, in its own
-words for each:
+The design before this one is `legacy/rust-components`: a host for modules of the WebAssembly
+Component Model, in Rust. Its costs were measured, not guessed. One machine, release build, in its
+own words for each:
 
     empty tick                      300 ns
     built-in host call              500 ns

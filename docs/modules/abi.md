@@ -166,4 +166,4 @@ Work with no components to iterate is still a system: one with an empty query, w
 pass of its phase.
 
 **There is no `tick` and no `build`.** Everything per-frame is a system, and a system carries a
-phase, so the two per-frame entry points of `legacy/rust-components` are both just systems in a phase.
+phase, so a module exports no entry point that is called per frame.

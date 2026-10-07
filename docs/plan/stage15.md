@@ -123,7 +123,7 @@ is the one that finds it.
 
 A sentence built on the old words is built again where the new name will not carry it: a
 possessive becomes "of", so that no sentence hangs an apostrophe on a name in backticks.
-`readme.md` says once what the branch is.
+`design.md` says once what it was, where its costs are cited: *Where it is still named*.
 
     fast          no part of this runs
     scalable      another design cited later is cited by its name under `legacy/`
@@ -226,8 +226,29 @@ with them. It is not in the tree: it is of one machine.
 
 No identifier of a seam changed: `bridge.h`, `bridge_t`, `bridge_create`, `BRIDGE_ABI`.
 
-`readme.md` says once what a deck is, and what the branch is. `tools/xref.py` fails on any of
+`readme.md` says once what a deck is. `tools/xref.py` fails on any of
 the three old words in a tracked file of ours, and is the case `xref`: 474 cases.
+
+### Where it is still named
+
+**Where it gives a measurement or a reason, as idTech3, flecs and Godot are named, and nowhere
+else.** Enkrid ruled it after the merge. `readme.md` had a paragraph that said the design before
+this one is kept in the same repository, as a branch: a library's documents do not tell of the
+other branches of the repository they are in, and it is gone. Of the 21 sentences elsewhere that
+named `legacy/rust-components`, ten only compared - what it did, and that this does otherwise -
+and are built again to state their reason alone. Eleven stay:
+
+    design.md              its measured costs, twice, and what it was
+    design/costs.md        three: the document is what is given up against it
+    design/no_builtins.md  what a built-in call cost it
+    diagnostics/log.md     what a call out of a module cost it
+    run/failure.md         its reason for forgiving a retry budget, in its words
+    run/limits.md          what it paid for a count nobody had asked for
+    engine_callbacks.md    a defect it had, which the design removes
+    plan.md                the adapter that is ported to prove this one
+
+The tag `v0.1.0` of that design is the branch `legacy/rust-components-v0.1.0`: no tag is kept
+for an earlier design, and the name is free for this library's own first release.
 
 ## Outside the tree, as it was done
 
@@ -250,7 +271,7 @@ And three once this stage was merged, since what is pushed is the merged tree:
     pointed     the remote of each clone on this machine at the one repository; in the clone
                 of the Rust line, its branch renamed to what it is called there
 
-The tag `v0.1.0` of the Rust line is as it was.
+The tag `v0.1.0` of the Rust line was made a branch after it: *Where it is still named*.
 
 ## The close
 

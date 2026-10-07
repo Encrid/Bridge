@@ -30,6 +30,10 @@ Refused, after it had been done: the first four as tags, since none of them move
 wanted them kept as the branches they were, and one kind of name for all six. The condition
 that brings it back is a design that is to be marked at more than one point.
 
+Refused, after it had been done: a paragraph of `readme.md` saying what the branch is and that
+it is in the same repository, and the design before this one named wherever a sentence compared
+with it. Enkrid: a reference is kept when it matters, as one to a third party is.
+
 Refused: `old/` for `legacy/`. Either was offered. Legacy is the word for what is kept and no
 longer worked on, and old says only when. No condition brings it back.
 

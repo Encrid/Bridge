@@ -10,7 +10,7 @@ wasmtime and would be different under another engine.
 
 wasmtime **48.0.5**, its C API, vendored under `backends/wasm/wasmtime/`. 48 is a long-term release,
 supported for 24 months where an ordinary one gets two. This backend exists for its sandbox, so
-getting security fixes outweighs matching the 47 `legacy/rust-components` runs.
+getting security fixes for that long is what decides the pin.
 
 ## Memory
 
