@@ -50,7 +50,7 @@ A header does that directly. A format would describe the struct so a generator c
 longer path to the same bytes, and a second thing to keep in step.
 
 **The header is part of what a module publishes**, alongside its wasm. A mod needs the base
-game's. Both engines ship a mod API this way: Q3 mods compile against `g_local.h` and
+game's. idTech3 and Quake each ship a mod API this way: Q3 mods compile against `g_local.h` and
 `q_shared.h`; QuakeC mods include the game's `defs.qc`.
 
 ## The type set

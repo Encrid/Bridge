@@ -38,11 +38,9 @@ shared no data.
 Each flag is demanded by a **config key**, not by a module: `untrusted` by `trusted = false`,
 `work_limit` and `memory_limit` each by the key of its name, `timeout` by any of the three
 timeouts, `reload` by `hot_reload`. **A guarantee has one name**, for the key that asks it and the
-capability that answers: `timeout` was `deadline` at this seam and `memory_limit` was `limit`,
-two words for one thing each, and a deadline is a moment where what the entry takes is a length
-of time. And `work_limit` was `fuel` where a deployment stated it and `meter` where a backend
-answered: fuel is what wasmtime calls the count it keeps, and belongs in the wasm backend's
-document as `sandbox` does.
+capability that answers. It is `timeout` and not a deadline, which is a moment where what the
+entry takes is a length of time. And it is `work_limit` and not fuel, which is what wasmtime
+calls the count it keeps, and belongs in the wasm backend's document as `sandbox` does.
 `side by side` is demanded by nothing: it is how Bridge-ASM700 learns which order a reload takes -
 `lifecycle.md`, *The runtime lifecycle*. `unload` is demanded by nothing either: it is how
 Bridge-ASM700 learns what to do with a backend's library at `bridge_destroy` - `create.md`,

@@ -13,8 +13,8 @@ those, which is what Godot is. Hardware, and the native code that is its only do
 
 So the test is **could this run on the wasm backend?** A physics library, a codec, a bytecode
 interpreter - anything that is pure computation - compiles to wasm, and whether that is worth the
-three guarantees is `module.md`, *So what decides*. Bridge-Quake's QuakeC interpreter runs on the
-wasm backend.
+three guarantees is `module.md`, *So what decides*. An interpreter of a game's bytecode,
+QuakeC's say, is such a thing.
 
 The test bends in one place: a native library that cannot realistically be built for wasm - threads,
 intrinsics, hand-written assembly, sheer size. The rule is then "cannot reach **or** cannot run",

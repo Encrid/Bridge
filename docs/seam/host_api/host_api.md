@@ -28,10 +28,10 @@ The build makes two files, and they are the same objects:
     bridge.a                               a static library, for a host that is to be one file
 
 **The shared one is what makes the seam a fact.** A host that links it cannot name anything of
-the library's inside, because the linker has nothing to give it. The five hosts under `tests/`
-that are compiled against `include/` alone are linked with it, so every run of the tests goes
-through it; and the first of them is linked a second time with the static one, and runs every
-one of its cases again.
+the library's inside, because the linker has nothing to give it. The host program of the tests,
+`tests/host`, is compiled against `include/` alone and linked with it, so every run of the tests
+goes through it; and it is linked a second time with the static one, and runs again the cases
+of what a host does first.
 
 **Every struct of the seam is laid out where it is stated**, so that a binding in another
 language is written against numbers and checked by them. `bridge.h` asserts the size of each
@@ -44,8 +44,8 @@ sees a `pad`.
 
 **To a C++ compiler the three seam headers are C.** They open `extern "C"`, so a host or a
 backend in C++ links the names as they are exported. They are C23 otherwise, and what they use
-of it C++ has too: an enum of a stated width, a typed constant, `static_assert`. The two SDK
-headers are not for C++: they choose an accessor by `_Generic`, which C++ does not have. Read as
+of it C++ has too: an enum of a stated width, a typed constant, `static_assert`. The wasm SDK
+is not for C++: it chooses an accessor by `_Generic`, which C++ does not have. Read as
 C++20 by a compiler that is not this project's, all three parse. No C++ host has linked and run
 them.
 
@@ -82,12 +82,14 @@ repository that is tagged and handed to something that is not rebuilt with it. N
 until one does a layout changes freely and no number moves. From the first release on, a change
 to what a seam lays out or means raises that seam's number, and only that seam's.
 
-## Bridge-ASM700 parses nothing
+## Nothing a host hands over is parsed
 
-Which side owns what is `split.md`, *The split*. At this seam it comes to one thing: **Bridge-ASM700
-parses nothing** - not TOML, not object files, not wasm sections. `bridge_create` takes a struct;
-`bridge_load` takes a struct plus bytes and a path, and passes those two straight to the module's
-backend without inspecting either - `lifecycle.md`, *The runtime lifecycle*.
+Which side owns what is `split.md`, *The split*. At this seam it comes to one thing: **nothing a
+host hands over is parsed** - not TOML, not object files, not wasm sections. The one text the
+library reads is a module's, the descriptor of a type: `schema.md`, *There is no schema format*.
+`bridge_create` takes a struct; `bridge_load` takes a struct plus bytes and a path, and passes those
+two straight to the module's backend without inspecting either - `lifecycle.md`, *The runtime
+lifecycle*.
 
 **The one kind of file Bridge-ASM700 opens is a backend library.** Config names each backend and its
 library, and `bridge_create` opens them - `create.md`, *Create*. A backend is Bridge-ASM700's own
@@ -103,20 +105,14 @@ parsers that would otherwise sit in the library do not: `module.md`, *The parser
 
 ## The surface
 
-    /* instance */
-    bridge *bridge_create(const bridge_config_t *cfg, bridge_sink_fn_t sink, void *ud);
-    int     bridge_destroy(bridge *b);
+Seven functions, and `include/bridge.h` is the statement of each: what it takes, what it answers
+and when it may be called. A document says why each is as it is.
 
-    /* advance */
-    int bridge_run_phase(bridge *b, const char *name);
-
-    /* runtime lifecycle - between phases only */
-    int bridge_load  (bridge *b, const bridge_artifact_t *a);
-    int bridge_unload(bridge *b, const char *identity);
-    int bridge_reload(bridge *b, const bridge_artifact_t *a);
-
-    /* introspection */
-    int bridge_list_modules(bridge *b, bridge_module_info_t *out, int max);
+    bridge_create, bridge_destroy       a bridge made, and unmade: `create.md`
+    bridge_run_phase                    a phase run, then its barrier: `loop.md`
+    bridge_load, bridge_unload,         a module in, out, and replaced, between phases only:
+    bridge_reload                       `lifecycle.md`
+    bridge_list_modules                 what is loaded, pulled: `introspection.md`
 
 **What is not built is not in this list, nor in the data below**: the pull of `profile.md`, *The
 profile*, and the two keys of `validation.md`, *The checksum pass, when asked*.
@@ -127,91 +123,24 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
 
 ## The data
 
-    typedef struct { const char *before, *after; } bridge_order_t;
+Ten structs, each laid out in `include/bridge.h`, which says what every member is.
 
-    typedef struct {
-        uint64_t entities;        /* how many there may be at once: entity indices */
-        uint32_t tables;          /* archetypes */
-        uint32_t types;           /* declared types */
-        uint32_t systems;         /* systems and observers */
-        uint32_t terms;           /* terms one of them may have */
-        uint32_t modules;         /* modules loaded */
-        uint64_t persistent;      /* how many bytes: the persistent arena */
-        uint64_t columns;         /* component columns and entity arrays */
-    } bridge_budget_t;
+    bridge_config_t           a deployment: the seam's number, its backends, its phases, the
+                              pairs of `[order]`, how many threads, and the budget
+    bridge_backend_t          a backend: its name, its library, and settings of its own
+    bridge_budget_t           how many of each thing there may be at once, and how many bytes
+    bridge_order_t            two systems that conflict, in the order they are to run
+    bridge_setting_t          a key, and a value of one of four kinds
 
-    typedef struct {
-        const char *key;
-        enum bridge_setting_kind kind;                       /* bool | i64 | f64 | string */
-        union { bool b; int64_t i; double f; const char *s; } v;
-    } bridge_setting_t;
+    bridge_module_config_t    what a module is to the deployment: every key of `config.md`,
+                              *The keys*, stated
+    bridge_phase_name_t       a phase a module names, and the deployment's phase that it is
+    bridge_artifact_t         a module to load: its config, the backend that runs it, and
+                              its bytes and its path, both handed to that backend, which
+                              refuses if the one it needs is null
 
-    typedef struct {
-        const char *name;            /* what an artifact names: "wasm", "native" */
-        const char *library;         /* the shared library Bridge-ASM700 opens */
-        const bridge_setting_t *settings; uint32_t setting_count;  /* for backend_create */
-    } bridge_backend_t;
-
-    typedef struct {
-        const bridge_backend_t *backends; uint32_t backend_count;
-        const char *const *phases;   uint32_t phase_count;   /* array order IS the order */
-        const bridge_order_t *order;   uint32_t order_count;
-        /* and before all of it: uint32_t abi, BRIDGE_HOST_ABI */
-        uint32_t            threads;                         /* counting the caller's */
-        bridge_budget_t       budget;
-    } bridge_config_t;
-
-    typedef struct {
-        const char *identity;        /* "tri:triangle@0.1.0" */
-        uint32_t    abi;
-
-        enum bridge_flag trusted, reloadable, hot_reload, pinned;   /* TRUE | FALSE. zero is unset */
-        const bridge_phase_name_t *phases; uint32_t phase_count;      /* its phase names, mapped */
-        enum bridge_on_error on_error;   /* FAIL | SKIP. zero is unset */
-        /* each of the next six: zero is unset, BRIDGE_NO_LIMIT (-1) is "no limit" */
-        int64_t  max_system_failures;    /* each system is counted against it, alone */
-        int64_t  work_limit;         /* work one system invocation may do */
-        int64_t  memory_limit;       /* bytes. a ceiling, never re-set */
-        int64_t  init_timeout, reload_timeout, shutdown_timeout;   /* nanoseconds, per call */
-        uint8_t  log_level;
-        uint32_t scratch, log_ring, spans;   /* bytes, bytes, bytes */
-        /* each of the next three: zero is unset, BRIDGE_NONE (-2) is "it mints none" */
-        int64_t  spawns;             /* entity ids between two barriers */
-        int64_t  persistent;         /* its share of the persistent arena, in bytes */
-        int64_t  changes;            /* bytes of changes it may queue between two barriers */
-
-        const char *const *read;  uint32_t read_count;       /* grants */
-        const char *const *write; uint32_t write_count;
-
-        const char *config;          /* the component its settings seed, or "none" */
-        const bridge_setting_t *settings; uint32_t setting_count;  /* its own [.config] */
-    } bridge_module_config_t;
-
-    typedef struct {
-        bridge_module_config_t cfg;
-        const char *backend;             /* which backend runs it, by name */
-        const void *bytes; size_t len;   /* the image, if the host has it */
-        const char *path;                /* where it is, if it is anywhere. both go to the
-                                            backend, which refuses if the one it needs is null */
-    } bridge_artifact_t;
-
-    /* what comes back out */
-    typedef struct {
-        const char *identity;            /* null for Bridge-ASM700's own records */
-        const char *system;              /* null outside a system */
-        const char *text;                /* THIS CALL ONLY - see `create.md`, *The sink* */
-        uint32_t    len;
-        uint32_t    when;                /* barrier count, then offset in the phase */
-        uint32_t    arg[2];
-        uint8_t     level;               /* lower is worse */
-    } bridge_record_t;
-
-    typedef void (*bridge_sink_fn_t)(void *ud, const bridge_record_t *r);
-
-    typedef struct {
-        const char *identity;
-        enum bridge_state state;         /* RUNNING | STOPPED */
-    } bridge_module_info_t;
+    bridge_record_t           what comes back out, handed to the sink: `create.md`, *The sink*
+    bridge_module_info_t      a loaded module, and whether it still runs
 
 **A phase is a string, not a struct.** It has one property and that is its name - `schedule.md`, *A
 phase is a name and nothing else* - which also disposes of a collision: a typedef and a function
@@ -243,7 +172,7 @@ settings are a component*, for why that means there is no call to reconfigure he
 ### Nothing here is an ABI layout
 
 The structs coming back out carry **resolved values**, never the shapes Bridge-ASM700 keeps
-internally. That is *Bridge-ASM700 parses nothing* pointing the other way: no formats in, no internal
+internally. That is *Nothing a host hands over is parsed* pointing the other way: no formats in, no internal
 structs out, and a host that can be replaced without touching the library.
 
 It is not a preference. The record a module writes into its ring - `log.md`, *The log* -

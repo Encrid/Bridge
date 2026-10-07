@@ -24,9 +24,9 @@ longer change apart.
 Refused: a number for the module seam alone, which is what this had: a host or a backend built at
 another time was read as it lay. No condition brings it back.
 
-## Bridge-ASM700 parses nothing
+## Nothing a host hands over is parsed
 
-Of `host_api.md`, *Bridge-ASM700 parses nothing*.
+Of `host_api.md`, *Nothing a host hands over is parsed*.
 
 Refused: the host opening the library and handing over a table of functions, which keeps
 Bridge-ASM700 away from every file and costs every host the same loader. The condition that brings

@@ -49,8 +49,8 @@ static inline void start_fold(storage_t *r, uint32_t index)
 ** drop_change
 **
 ** Leaves an entity as it was, for want of a table or, `for_columns`, of
-** columns: it is a failure of the module that asked the last change of it,
-** toward that module's own budget.
+** columns: it is a failure of every module that asked a change of it, each
+** toward its own budget, counted where the change's value is written.
 **
 ** budgets.md, *What running out does*
 */

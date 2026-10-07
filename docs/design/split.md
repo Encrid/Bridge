@@ -16,8 +16,8 @@ own corner of it and point here.
     module lifecycle: running          a reload
       init, shutdown, reload         the log sink: what to do with records
     failure policy: on_error,        the compilation cache directory
-      the failure budget, the        the journal file, if there is one
-      escalation guards              the meaning of its own config keys
+      the failure budget, a          the journal file, if there is one
+      bridge that is stopped         the meaning of its own config keys
     the backend seam, and opening
       the backend libraries
     what it counts and checks when

@@ -14,10 +14,8 @@ Against the original Bridge, which is the comparison point because this replaces
 
 **The last one is what dropping calls costs**, and it is a real loss. An engine callback that
 consumes a return value inside its own loop cannot be served from storage: `Array.sort_custom` wants
-a bool per comparison, now. So `Callable` round trips and `scripts.attach` behaviour lose their
-synchronous half. The two probe checks that assert it - *"a Callable the adapter owns reaches a
-module and answers"* and *"a plain Node3D answers get_speed, because a module is behind it"* - are
-the two the Godot adapter does not get back. Everything an engine asks that is **state** rather than a
+a bool per comparison, now. So a `Callable` round trip loses its synchronous half. Everything
+an engine asks that is **state** rather than a
 question is served from storage with no crossing: `engine_callbacks.md`, *An engine callback answers from
 storage*.
 
@@ -41,8 +39,7 @@ gigabytes of address space around megabytes of data. A column that grows or move
 and mapped again in every module that sees it, by calls to the operating system, at a barrier that
 otherwise costs tens of nanoseconds a change. It is one more rule for each storage layout, it helps
 only the wasm backend, and it is not the one block a backend adopts - `backend.md`, *Memory is
-adopted, not created*. It was first refused for the entries one page mapped N times takes in the
-TLB; that was never measured, and is not the reason.
+adopted, not created*.
 
 **The condition that would change the answer: Bridge-ASM700 being asked to run code the operator did not
 choose.** Modding is not that - a player installing a mod chose it - and no engine we looked at

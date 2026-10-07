@@ -43,15 +43,16 @@ as what it hands over is one stated value per key. The original Bridge had the s
 
     the deployment's                           a module's
     ----------------------------------------   ------------------------------
-    phases     an ordered list of names        trusted, reloadable, hot_reload
+    phases     a list of names                 trusted, reloadable, hot_reload
     threads    how many run a phase            on_error, max_system_failures
-    [order]    before
-    [budget]   entities, tables, types,        work_limit, memory_limit
-               systems, terms, modules,        init/reload/shutdown timeouts
-               persistent, columns,            log_level, scratch, log_ring,
-               sparse_sets, direct_indexed     spans, spawns, persistent
+    [order]    before, after                   work_limit, memory_limit
+    [budget]   entities, tables, types,        init/reload/shutdown timeouts
+               systems, terms, modules,        log_level, scratch, log_ring,
+               persistent, columns,            spans, spawns, persistent,
+               sparse_sets, direct_indexed     changes
     [backend]  a name, a library and its       pinned, config, losses
-               settings, each
+               settings, each                  phases, each mapped to one of
+                                               the deployment's
                                                read / write
                                                [.config]
 

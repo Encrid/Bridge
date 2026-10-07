@@ -22,7 +22,7 @@ Two tiers, because two things are being sized.
     columns       every table's rows: its entity ids and its columns
 
 One block serves everyone, so no single module could size it. It arrives as a struct rather than a
-file, because Bridge-ASM700 reads none: `host_api.md`, *Bridge-ASM700 parses nothing*.
+file, because Bridge-ASM700 reads none: `host_api.md`, *Nothing a host hands over is parsed*.
 
 **`sparse_sets` and `direct_indexed` are stated because of what those two storage layouts
 keep for every entity there may be**, carried or not: a sparse set's index, and a direct-indexed
