@@ -101,3 +101,44 @@ terms that allow either.
 
 Where a qualified reader matters: that a module is one work with what it compiles in and is
 loaded by is how these licences are generally read, and is not something this stage can show.
+
+### Who the holder is
+
+**The name in the notices stays, and one document says whose it is.** "Heuretes-Workshop" is in
+all 468 notices. Enkrid: "Heuretes-Workshop is the name of a github organization I created and
+I work under". So it is a name its author works under and not a person in law: the rights are
+the author's, and the document that says what may be done with Bridge says that this is the
+name they are held under, gives where other terms are asked for, and says that an entity formed
+later to hold them takes its place. No file changes for this.
+
+The repository itself was moved the same day from that organisation to its author's own
+account, for reasons of the hosting service and not of this stage; the name is unchanged by
+that.
+
+Where a qualified reader matters: what a notice under a working name is worth as evidence of
+who holds the rights, where the author lives.
+
+### The contributor's agreement
+
+**A licence and not a transfer, signed through a workflow of our own, and nothing by hand.**
+Enkrid ruled each. A contributor keeps the copyright of what they wrote and grants the holder
+a licence that may be passed on under any terms, and the agreement says in so many words that
+Bridge is also offered under terms that are paid for and closed, and that a contribution may be
+part of what is offered so. The agreement of `legacy/rust-components` said a contribution would
+never be taken private, which would be false here, so it is not reused as it is.
+
+The signing is a program of ours that the hosting service runs on a pull request: it reads who
+opened it, looks the name up in a list kept on a branch of the repository, asks in a comment
+for a stated sentence when the name is not there, records the name when that sentence is
+answered by that person, and fails the pull request until then. It never runs anything from
+the pull request, which it treats as data: a workflow that can write to a repository and
+answers to strangers must not.
+
+The program the earlier design used for this was archived by its authors, which is why this
+one is ours.
+
+**It cannot be shown to run today.** On 2026-10-07 every workflow of the organisation the
+repository was in failed before its first step, for a failure of payment on that
+organisation's account. The repository has since moved to another account, and the first push
+after that shows whether one runs there. Until one has, this holds nothing, and the close of
+this stage says which it is.
