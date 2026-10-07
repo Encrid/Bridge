@@ -564,3 +564,31 @@ it said, in the order it was reached: the 237 cases pass unchanged, release and 
 
 Nothing here runs in a phase either. The lines that moved in five rounds are the three that are
 open above, with a table made at 0.263 to 0.275 us among them.
+
+**The two backends.** `backends/wasm/wasm.c` (623 lines) is eleven files and
+`backends/native/native.c` (288) is seven, each with a header of what its files share,
+`wasm_inside.h` and `native_inside.h`. Three things are not as they were:
+
+    a function Bridge-ASM700 offers    wasmtime called it with six arguments: the arguments and
+    a wasm module                      the results, each an array of tagged values with its
+                                       length. It is defined with
+                                       `wasmtime_linker_define_func_unchecked` now, whose callback
+                                       takes four: one array of raw values, the arguments where
+                                       the results go. The kinds are the ones the signature
+                                       stated, kept with the function
+    the adopted block wasmtime is      it was a thread-local variable of the file. It is a member
+    asked for                          of the backend, which wasmtime hands the creator back as
+                                       its `env`: G4 asks for no global that is not constant
+    the native backend built as        it was the same source compiled with a macro. The answer to
+    another backend seam               `backend_get_abi` is a file of its own, and the test links
+                                       `tests/support/native_other_abi.c` in its place
+
+A call from a wasm module into Bridge-ASM700 was timed in scratch, twenty million `alloc(0)` in
+one `init`, beside the tree before the stage: 48 ns a call before, 8.6 ns now. The entry of the
+native backend, which every call from a native module goes through, is `static inline` in
+`native_inside.h`, as decision 4 has it for what runs in a phase; the call columns of `storage
+measure` are where the cut of the ABI left them.
+
+**Open.** `make_memory` in `backends/wasm/wasm_adopted.c` takes seven arguments. Its signature is
+wasmtime's, `wasmtime_new_memory_callback_t`, and wasmtime has no other way to be answered for a
+memory, so there is nothing of ours to reshape. `backends/wasm` is not held until that is decided.

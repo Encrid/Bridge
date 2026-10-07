@@ -70,6 +70,10 @@ MODULE = ['module_say', 'module_check', 'module_check_stated', 'module_check_fit
           'module_check_backend', 'module_record', 'module_discard', 'module_types', 'module_call',
           'module_instance', 'module_start', 'module_pointed', 'module_share', 'reload_check', 'reload_share',
           'reload_record', 'reload_rows', 'reload_fail']
+WASM_BACKEND = ['wasm_fail', 'wasm_own', 'wasm_adopted', 'wasm_holder', 'wasm_engine', 'wasm_backend',
+        'wasm_module', 'wasm_instance', 'wasm_call', 'wasm_offered', 'wasm_func']
+NATIVE_BACKEND = ['native_load', 'native_phase', 'native_backend', 'native_abi', 'native_module',
+                  'native_instance', 'native_func']
 BRIDGE = ['say', 'bridge_create', 'bridge_backend', 'bridge_backends', 'bridge_phases',
           'bridge_destroy', 'bridge_stop', 'bridge_run', 'bridge_load', 'bridge_unload',
           'bridge_reload', 'config',
@@ -268,12 +272,15 @@ def build(target, debug, out):
     # a backend is compiled against the backend seam, the operating system's layer and what is
     # its own: nothing of src/
     backend_os_o = [compile_('backend-os-' + name, os_dir / (name + '.c'), ours + [utils]) for name in OS]
-    wasm_o = [compile_('wasm', ROOT / 'backends/wasm/wasm.c',
-                       ours + [include, utils, '-I%s' % (wasmtime / 'include')])] + backend_os_o
-    native_o = [compile_('native', ROOT / 'backends/native/native.c',
-                         ours + [include, utils, sdk['native']])] + backend_os_o
-    native_other_o = compile_('native-other', ROOT / 'backends/native/native.c',
-                              ours + [include, utils, sdk['native'], '-DSAYS_ABI=(BACKEND_ABI+1)'])
+    wasm_o = [compile_(name, ROOT / 'backends/wasm' / (name + '.c'),
+                       ours + [include, utils, '-I%s' % (wasmtime / 'include')])
+              for name in WASM_BACKEND] + backend_os_o
+    native_o = [compile_(name, ROOT / 'backends/native' / (name + '.c'),
+                         ours + [include, utils, sdk['native']])
+                for name in NATIVE_BACKEND] + backend_os_o
+    # the same backend, with another answer to backend_get_abi in the place of its own
+    native_other_o = [o for o in native_o if o.name != 'native_abi.o'] + [
+        compile_('native_other_abi', ROOT / 'tests/support/native_other_abi.c', ours + [include])]
     schema_test_o = compile_('schema-test', ROOT / 'tests/schema.c', ours + [include, src])
     adopt_o = compile_('adopt', ROOT / 'tests/adopt.c', ours + [include, src, utils] + defines)
     phase_o = {name: compile_(name, ROOT / 'tests' / (name + '.c'), ours + [include] + defines)
@@ -309,7 +316,7 @@ def build(target, debug, out):
     link('backends/bridge_wasm', wasm_o, [link_wasmtime] + system + here, shared=True)
     link('backends/bridge_native', native_o, system, shared=True)
     # the same backend, saying it is of another backend seam: for the case that refuses it
-    link('backends/bridge_native_other', [native_other_o] + backend_os_o, system, shared=True)
+    link('backends/bridge_native_other', native_other_o, system, shared=True)
     for name, _, _ in NATIVE:
         link(name, [module_o[name]], shared=True)
     link('adopt', [adopt_o, obj / 'backend.o'] + os_o, system)
