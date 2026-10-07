@@ -8,6 +8,8 @@
     somebody         each folder that holds a licence of its own, and each file whose header
     else's           names a holder beside ours, is named in docs/licence.md
     the agreement    cla.md is there, and docs/licence.md names it
+    the seams        each file of include/ and of a backend's sdk/ says, where it opens, that
+                     what is compiled with it is a work based on Bridge, under the same licence
 
 The records of the stage that brought the licence say what the files said before, and are not
 read. Run from anywhere; exits non-zero on anything that does not hold.
@@ -66,6 +68,12 @@ for path in listed:
     if path.endswith(('.c', '.h')) and re.search(r'^\*\* Copyright \(C\) (?!\d{4} Heuretes-Workshop)', head, re.M):
         if '`%s`' % path not in said:
             fault('docs/licence.md does not name %s, whose header names another holder' % path)
+
+for path in listed:
+    if re.match(r'include/[^/]+\Z|backends/[^/]+/sdk/[^/]+\Z', path):
+        opens = (ROOT / path).read_text(encoding='utf-8')[:1500]
+        if not re.search(r'is a work based on Bridge and is under\s+(?:\*\* |;; )?the same licence', opens):
+            fault('%s does not say, where it opens, what is compiled with it is under' % path)
 
 print('the licence: %d faults' % bad)
 sys.exit(1 if bad else 0)

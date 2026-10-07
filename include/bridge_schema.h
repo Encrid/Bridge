@@ -9,6 +9,9 @@
 ** its compiler lays out, and the descriptor Bridge reads to lay it out
 ** the same way.
 **
+** What is compiled with this file is a work based on Bridge and is under
+** the same licence. Other terms: docs/licence.md.
+**
 ** It is Bridge's and not a backend's: the descriptor is a text
 ** Bridge parses, so how it is spelled in C is stated once, here, for a
 ** module on any backend. A schema header is written with these and included

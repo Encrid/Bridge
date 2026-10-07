@@ -8,6 +8,9 @@
 ** include/bridge_abi.h -- the module seam: what Bridge and every
 ** module both compile.
 **
+** What is compiled with this file is a work based on Bridge and is under
+** the same licence. Other terms: docs/licence.md.
+**
 ** It says how to find data and never what data there is: no component, no
 ** field. Everything here is read by a module with plain loads, so every
 ** member is a fixed width and the structs have no padding a compiler could

@@ -207,3 +207,26 @@ product, so `cla.md` is version 2.0 and says so before anything else.
 
 **musl's licence asks that its notice be kept with what is taken from it**, and the tree held
 only a line naming it in the header of `src/text.c`. The notice is in `licence.md`.
+
+### A module, and a backend, as a host
+
+**The licence is not worded for them, and what is meant is said in two places.** Enkrid asked
+whether a module and a backend need wording of their own, since they use Bridge as a host
+does. Nothing is added to the licence: it treats every work combined with Bridge alike, and it
+lets a recipient ignore a restriction somebody adds to it. What it reaches is decided by
+copyright and not by what is written beside it.
+
+The firm ground is the same for all three: each compiles Bridge's own headers into itself. The
+soft place is a module written without them, from the documents, and run in a sandbox: whether
+being loaded by a work and sharing its memory makes one work with it has been argued both ways.
+So what is meant is stated, which does not extend the licence and does tell every reader how it
+is read here:
+
+    `licence.md`       a module is under it however it was written, and so is a backend
+    each seam file     the four headers of `include/` and the fourteen files of the two SDKs
+                       say, where they open, that what is compiled with them is a work based
+                       on Bridge, under the same licence. `tools/licence.py` fails on one that
+                       does not
+
+Where a qualified reader matters most in this stage: whether that reading of a sandboxed
+module holds.

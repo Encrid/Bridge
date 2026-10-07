@@ -10,6 +10,9 @@
 ** same ABI layouts read through real pointers. Only a native module and the
 ** native backend compile this header.
 **
+** What is compiled with this file is a work based on Bridge and is under
+** the same licence. Other terms: docs/licence.md.
+**
 ** native.md, *What the backend provides*
 */
 

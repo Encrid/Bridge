@@ -7,6 +7,9 @@
 **
 ** backends/native/sdk/bridge_native_log.h -- the log: stores, and no call.
 **
+** What is compiled with this file is a work based on Bridge and is under
+** the same licence. Other terms: docs/licence.md.
+**
 ** log.md, *The log*
 */
 

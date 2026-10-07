@@ -5,6 +5,10 @@
 ;; written where a load names its memory. The module build merges this file into the compiled
 ;; module as "acc", inlines every function here into its callers, and strips the exports.
 ;; bridge_wasm.h declares them.
+;;
+;; What is merged with this file is a work based on Bridge and is under the same licence,
+;; the GNU Affero General Public License, version 3 only: see license. Other terms:
+;; docs/licence.md.
 (module
   (import "bridge" "shared" (memory $shared 1))
   (import "bridge" "private" (memory $private 1))

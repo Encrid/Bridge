@@ -8,6 +8,9 @@
 ** backends/wasm/sdk/bridge_wasm_observer.h -- an observer's list: who
 ** triggered it at this barrier, and how.
 **
+** What is compiled with this file is a work based on Bridge and is under
+** the same licence. Other terms: docs/licence.md.
+**
 ** query.md, *The interface is a query*
 */
 

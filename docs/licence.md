@@ -29,8 +29,17 @@ it.
     a backend   the same
     a change    to Bridge itself: under this licence
 
+**A module is under it however it was written.** One that compiles the seam headers holds
+Bridge's own code. One written without them, from these documents alone, is still made to be
+loaded by Bridge and to work on Bridge's storage, through the layouts and the entries Bridge
+defines, and does nothing by itself: it is meant here as a part of the work it is loaded into,
+and whoever wants it otherwise asks for other terms. The same is meant of a backend. Each file
+of the three seams and of the two SDKs says so where it opens, since that is where whoever
+writes a module looks.
+
 That a work which links or compiles in another is one work with it is how licences of this
-family are generally read. Nobody who wrote this document is a lawyer.
+family are generally read; whether one that is only loaded is, has been argued both ways. This
+says what is meant. Nobody who wrote this document is a lawyer.
 
 ## Other terms
 

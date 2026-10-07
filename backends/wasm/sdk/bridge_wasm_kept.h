@@ -9,6 +9,9 @@
 ** is reached from a row or by an id: a sparse set, a singleton, a
 ** direct-indexed component.
 **
+** What is compiled with this file is a work based on Bridge and is under
+** the same licence. Other terms: docs/licence.md.
+**
 ** storage.md, *A sparse set*
 ** storage.md, *A singleton*
 ** storage.md, *Direct-indexed*

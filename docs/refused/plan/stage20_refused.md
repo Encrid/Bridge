@@ -115,3 +115,14 @@ condition that brings it back is minutes that are not counted, which is a public
 
 Refused: only when started by hand. It is a check nobody runs. The condition that brings it
 back is none.
+
+## A module, and a backend, as a host
+
+Of `stage20.md`, *A module, and a backend, as a host*.
+
+Refused: a clause added to the licence saying a module and a backend are under it. The licence
+lets a recipient ignore a restriction added to it, so it would say nothing in law. The condition
+that brings it back is none.
+
+Refused: the statement in `licence.md` only, and nothing in the seam files. Whoever writes a
+module reads the header and not that document. The condition that brings it back is none.

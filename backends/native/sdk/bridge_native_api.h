@@ -9,6 +9,9 @@
 ** hands a native module, and the scratch arena, where a module puts what an
 ** entry of the ABI is handed.
 **
+** What is compiled with this file is a work based on Bridge and is under
+** the same licence. Other terms: docs/licence.md.
+**
 ** native.md, *What the backend provides*
 */
 

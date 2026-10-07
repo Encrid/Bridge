@@ -7,6 +7,9 @@
 **
 ** include/bridge.h -- the host seam: the only header a host includes.
 **
+** What is compiled with this file is a work based on Bridge and is under
+** the same licence. Other terms: docs/licence.md.
+**
 ** This is the contract as far as it is built: all of it but the two keys of
 ** validation.md, *The checksum pass, when asked*, and the pull of
 ** profile.md, *The profile*.

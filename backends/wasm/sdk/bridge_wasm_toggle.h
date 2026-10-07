@@ -8,6 +8,9 @@
 ** backends/wasm/sdk/bridge_wasm_toggle.h -- a toggled component: a bit a
 ** row.
 **
+** What is compiled with this file is a work based on Bridge and is under
+** the same licence. Other terms: docs/licence.md.
+**
 ** storage.md, *A toggle*
 */
 

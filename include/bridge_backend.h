@@ -8,6 +8,9 @@
 ** include/bridge_backend.h -- the backend seam: what Bridge asks of
 ** the thing that runs a module.
 **
+** What is compiled with this file is a work based on Bridge and is under
+** the same licence. Other terms: docs/licence.md.
+**
 ** A backend is a shared library exporting the eighteen functions below by
 ** name. Only a backend and Bridge compile this header.
 **

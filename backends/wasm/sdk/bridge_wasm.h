@@ -9,6 +9,9 @@
 ** compiles against: the eight imports, the accessors of bridge_wasm.wat,
 ** the schema shim, and the layouts of bridge_abi.h read through them.
 **
+** What is compiled with this file is a work based on Bridge and is under
+** the same licence. Other terms: docs/licence.md.
+**
 ** Nothing here is generated: sizeof, offsetof and _Generic compute at a
 ** module's build what a generator would have had to be told. Every function
 ** is inline, so a module pays for what it uses and the merge leaves plain

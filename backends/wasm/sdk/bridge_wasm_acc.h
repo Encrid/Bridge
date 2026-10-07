@@ -9,6 +9,9 @@
 ** eight entries of the ABI, and the accessors of bridge_wasm.wat, through
 ** which it reaches the two memories.
 **
+** What is compiled with this file is a work based on Bridge and is under
+** the same licence. Other terms: docs/licence.md.
+**
 ** abi.md, *The ABI*
 ** wasm.md, *A compiled module reaches them through accessors*
 */

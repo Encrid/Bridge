@@ -9,6 +9,9 @@
 ** through real pointers: a singleton, a direct-indexed component, a sparse
 ** set, the bits of a toggle, and an observer's list.
 **
+** What is compiled with this file is a work based on Bridge and is under
+** the same licence. Other terms: docs/licence.md.
+**
 ** native.md, *Reaching a component*
 */
 
