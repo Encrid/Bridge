@@ -1,5 +1,7 @@
 # The profile
 
+It is not built. What is here is its design.
+
 What was weighed here and refused is `profile_refused.md`, *What was refused: The profile*.
 
 It reports **per system rather than per module** - `wasm.md`, *Exports* - and an observer
@@ -14,8 +16,6 @@ cycle is visible in it, `schedule.md`, *An observer runs at the barrier, one hop
         uint8_t     kind;     /* a system, an observer or a barrier: zero is none of them */
         uint8_t     pad[7];
     } bridge_profile_row;
-
-It is not built: `plan.md`, stage 17. What is here is what that stage builds.
 
 **A pull, not records**, for the reason `log.md`, *The log* gives against itself: that ring is *"Drop and
 count, never block"*. A dropped log line is a missing line; a dropped profile record is a **biased
@@ -47,16 +47,17 @@ exist.
 
 **Opt-in, and nothing when off.** `no_builtins.md`, *No builtins*, uses a clock as its example of
 something not universal to every deployment, and a profile needs one: a shipped game does not
-measure itself. So `[checks] profile` beside `validate`, as the two things Bridge-ASM700 does only when
-asked, with two clock reads per dispatch as the cost when on.
+measure itself. So `[checks] profile` beside `validate` - `validation.md`, *The checksum pass,
+when asked* - as the two things Bridge-ASM700 does only when asked, and both for the whole
+deployment, with two clock reads per dispatch as the cost when on.
 
-**How full each budget is, is asked for the same way, and is not built yet.** Every size a
+**How full each budget is, is asked for the same way.** Every size a
 deployment states is a guess until something says how near it came: `memory.md`, *Where the
 regions live*, calls `spans` a key "a deployment is expected to correct", and nothing tells it
 what to correct it to but the refusal when it runs out. So a second pull, beside this one: for
 the bridge, what is in use and the most that ever was against each `[budget]` key; for each
 module, the same against each of its own. They are numbers the library keeps already, with a
-mark kept where it kept only the present value. `plan.md`, stage 17.
+mark kept where it kept only the present value.
 
 It is a pull for the reason the profile is. What to do with the numbers - print them, and when -
 is the host's.

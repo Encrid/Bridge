@@ -32,6 +32,6 @@ What would let two authors agree is content that is neither the library's nor a 
 module with a name and a version - `bridge:clock@1`, say - that a deployment chooses to depend on,
 can fork, and can do without. That is not a hole in the rule: a name baked into the orchestrator
 would be unavoidable and unreplaceable, and this is neither. **It does not exist, and it is not
-built on a guess.** `plan.md`, stage 19, builds the first real deployment, which needs both a clock
-and phases; they are that deployment's own, and whether either becomes shared content is asked
-there. The condition that makes it is a second deployment, by another author, needing the same.
+built on a guess.** A first real deployment needs both a clock and phases, and they are that
+deployment's own. The condition that makes either shared content is a second deployment, by
+another author, needing the same.

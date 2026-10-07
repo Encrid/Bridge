@@ -45,13 +45,17 @@ sees a `pad`.
 **To a C++ compiler the three seam headers are C.** They open `extern "C"`, so a host or a
 backend in C++ links the names as they are exported. They are C23 otherwise, and what they use
 of it C++ has too: an enum of a stated width, a typed constant, `static_assert`. The two SDK
-headers are not for C++: they choose an accessor by `_Generic`, which C++ does not have, and a
-module in another language has its own SDK - `plan.md`, stage 18. Read as C++20 by a compiler
-that is not this project's, all three parse; a C++ host that links and runs is stage 16's.
+headers are not for C++: they choose an accessor by `_Generic`, which C++ does not have. Read as
+C++20 by a compiler that is not this project's, all three parse. No C++ host has linked and run
+them.
 
-**What is not yet stated for a language that is not C** is the seam in a form that needs no C
-parser at all. That is `plan.md`, stage 18, which describes all three seams and not only the
-module's.
+### The seams for a language that is not C
+
+It is not built.
+
+The three seams in a form that needs no C parser at all: what a host, a module or a backend in
+another language reads to know each layout, each constant and each entry. And, for a module, a
+binding in its own language, which is its backend's to provide as the two there are provide C's.
 
 ## A seam has a number
 
@@ -92,8 +96,7 @@ orchestrator to start.
 
 So an embedder with its own config system - a database, compiled-in constants, another format -
 hands over data rather than being made to write a file for Bridge-ASM700 to read. And the three platform
-parsers that would otherwise sit in the library do not: `bridge_manifest_parse` is to ship
-**beside** it as a helper - `native.md`, *Identity*. It is not written yet: `plan.md`, stage 16.
+parsers that would otherwise sit in the library do not: `module.md`, *The parser of a manifest*.
 
 **No discovery either.** Finding modules is filesystem work, so the host finds them and calls
 `bridge_load` for each.
@@ -114,16 +117,13 @@ parsers that would otherwise sit in the library do not: `bridge_manifest_parse` 
 
     /* introspection */
     int bridge_list_modules(bridge *b, bridge_module_info_t *out, int max);
-    int bridge_profile (bridge *b, bridge_profile_row *out, int max);   /* stage 17 */
 
-**`bridge_profile`, and `validate` and `profile` below, are not built**: they are the surface as
-it is designed, and `bridge.h` has everything else. `plan.md`, stage 17.
+**What is not built is not in this list, nor in the data below**: the pull of `profile.md`, *The
+profile*, and the two keys of `validation.md`, *The checksum pass, when asked*.
 
-Every answer above the two pulls is `[[nodiscard]]`: a status a host drops is one the compiler
+Every answer above the pull is `[[nodiscard]]`: a status a host drops is one the compiler
 points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - `create.md`,
 *Destroy*.
-
-`bridge_profile` and its row are `profile.md`, *The profile*.
 
 ## The data
 
@@ -159,7 +159,6 @@ points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - 
         /* and before all of it: uint32_t abi, BRIDGE_HOST_ABI */
         uint32_t            threads;                         /* counting the caller's */
         bridge_budget_t       budget;
-        enum bridge_flag    validate, profile;               /* [checks]: stage 17 */
     } bridge_config_t;
 
     typedef struct {
@@ -230,10 +229,6 @@ nothing here records a source.
 
 **Every limit here carries its period, because a number without one means nothing** - `limits.md`,
 *What bounds a run*. One is per invocation, three are per call, and one is a ceiling.
-
-**`validate` and `profile` are to be the two diagnostic switches here**, and both are deployment-wide: one
-pass walks every column - `validation.md`, *The checksum pass, when asked* - and the other times
-every dispatch, `profile.md`, *The profile*. Nothing else Bridge-ASM700 does is optional.
 
 **A backend refuses a setting it does not know, by name**, and `bridge_create` fails with it: a key
 nobody reads is a typo nobody would find, the argument `config.md`, *A module's own settings are a

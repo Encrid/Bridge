@@ -147,7 +147,9 @@ There were 39 such lines in the 39 documents, of three kinds, and each has anoth
 `readme.md` say that much, and keep it.
 
 **`xref.py` fails on one.** A stage's number, a stage's document, or the plan with a stage
-beside it, in a document that is not under `plan/` or `refused/` and is not `plan.md`. The
+beside it, in a document that is not under `plan/` or `refused/` and is not `plan.md`. Two more
+are not held, and neither says what the library is: `readme.md` is the index of the tree, the
+plan's folder with the rest, and `style.md` gives a stage's file as an example of a name. The
 headers and the source name none today, and are held the same way. The tests, the tools and
 the workflows are not documents of the design: eleven of them say which stage's measurement
 they repeat, and keep it.

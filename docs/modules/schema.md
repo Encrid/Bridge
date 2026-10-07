@@ -28,9 +28,9 @@ which each backend's SDK includes. A schema header is included by modules of eit
 and has to mean one thing in both. What is a backend's is how a module reaches a component once
 it is declared; what a type is, is not.
 
-The shape is flecs' `ECS_STRUCT`, and until stage 10 so was the name. It is ours now because the
-name was a promise: a reader expected flecs behind it, and a native module that links flecs for its
-own use would have had the macro defined twice.
+The shape is flecs' `ECS_STRUCT`, and the name is not. A name is a promise: a reader would
+expect flecs behind it, and a native module that links flecs for its own use would have the
+macro defined twice.
 
 **Bridge-ASM700 reads the string, and only the string.** `src/schema.c` lays the same struct out
 from its text, by the rule C states - each field at the next multiple of its alignment, the whole a

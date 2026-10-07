@@ -188,10 +188,9 @@ Two modules that changed one entity are both told, since both lost what they ask
 outgrows the deployment is stopped as any failing module is, by its own `on_error`, and one that
 asked once too often loses one barrier's changes and runs on.
 
-Nothing is taken from outside the block, ever. Until stage 10 a column that did not fit was served
-from the operating system and the bridge stopped for good, for two reasons that no longer hold:
-nobody could be named, and the storage of the time could not be unwound from the middle of a
-change. Here nothing has begun when the shortage is found.
+Nothing is taken from outside the block, ever. A column that does not fit is not served from
+the operating system, and the bridge is not stopped for it: who asked is named, and nothing has
+begun when the shortage is found, so there is nothing to unwind.
 
 ## Bridge-ASM700 defaults none of them
 
@@ -209,7 +208,6 @@ exists to refuse.
 **One floor has an argument and the rest do not.** A `log_ring` must hold at least one record: a
 module that cannot report anything is the one legal number that produces an incoherent deployment -
 `log.md`, *The log*, for why. `work_limit` and `memory_limit` have floors too, but they are measurements
-rather than arguments: `plan.md` stages 2 and 3 enforce them, and are where a number becomes
-knowable.
+rather than arguments: a number for either becomes knowable where a module is run under it.
 
 No budget has a floor that is storage's own: nothing of it is in the block before a module asks.

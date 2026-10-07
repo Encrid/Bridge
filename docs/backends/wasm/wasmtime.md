@@ -48,8 +48,7 @@ instance, and unsays it. Two threads may each be making an instance of one backe
 unsaid it between the other's saying and wasmtime's asking would leave that other a memory of
 wasmtime's own, whose writes reach nobody. So the lock is held from the holder being found to its
 memory being made. `tests/adopt` makes two stores on two threads at once, and with six copies of
-it running one in some tens lost that race when the lock was not held: `stage13.md`, *What the
-stage found*.
+it running one in some tens lost that race when the lock was not held.
 
 wasmtime's own mechanism for one memory in many stores is a shared memory, and it is refused here:
 it allocates its own pages, so it cannot adopt, and it brings the threads proposal with it, whose
@@ -82,9 +81,9 @@ is running, and the moment it is out of time. An event only tells it to look aga
 version had two events, one for a call starting and one for it ending, and waited for each in
 turn - which is counting them, and an event set twice before it is waited for once is one event.
 Two timed calls back to back, a `reload` and then a `shutdown`, lost one: the thread sat waiting
-for an end that had already been said, and the backend could not be destroyed. It took stage 6 to
-make two such calls in a row, and one run in some hundreds to lose the race. `tests/adopt` makes
-twenty thousand.
+for an end that had already been said, and the backend could not be destroyed. It takes two
+such calls in a row, and one run in some hundreds, to lose that race. `tests/adopt` makes twenty
+thousand.
 
 An increment reaches every store of the engine, and a store with no deadline set traps at once. So
 every other call on that engine runs under a deadline too far away to be reached. That is this

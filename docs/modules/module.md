@@ -21,11 +21,11 @@ the grant key, the namespace components are declared in, and how `[order]` names
 without the version there: `schedule.md`, *Order within a phase is never implicit*. A module without
 one is refused.
 
-Bridge-ASM700 is handed it as data, so **a host that cannot supply an identity cannot load a module**.
-The convention is a named section in the artifact - a wasm custom section on one backend, an
-object-file section on the other - and a helper beside the library reads it. A host sourcing it
-elsewhere is not doing anything wrong. Where the bytes sit and how they are read is the only part
-that differs: `wasm.md` and `native.md`, *Identity*.
+Bridge-ASM700 is handed it as data, so **a host that cannot supply an identity cannot load a
+module**. The convention is a named section in the artifact - a wasm custom section on one backend,
+an object-file section on the other - which a host reads, or has read for it: *The parser of a
+manifest*. A host sourcing it elsewhere is not doing anything wrong. Where the bytes sit and how
+they are read is the only part that differs: `wasm.md` and `native.md`, *Identity*.
 
 ### The manifest
 
@@ -37,12 +37,21 @@ NUL-separated `key=value`.
 **It carries what only the author knows**, so that it travels with the artifact: the ABI version the
 module was built against, whether it must stay on one thread, how much scratch space its code uses,
 how long its init takes. Any per-module key of `config.md`, *The keys*, may be stated there.
-`bridge_manifest_parse`, once it is written - `plan.md`, stage 16 - answers the identity and
-those values; combining them with a deployment's
-own is the host's business, and Bridge-ASM700 sees one flat struct either way.
+Combining those values with a deployment's own is the host's business, and Bridge-ASM700 sees
+one flat struct either way.
 
 It is the shape of a Linux kernel module's `.modinfo`, for the reason `native.md`, *Identity*,
 gives: the values have to be readable before any of the code runs.
+
+### The parser of a manifest
+
+It is not built.
+
+`bridge_manifest_parse` is a helper that ships beside the library and not inside it. Handed a
+module's bytes or its library, it answers the identity and the values the author stated. What
+it walks differs by format: a wasm module's custom section, ELF's `shdr` and `shstrtab`, PE's
+section table after the optional header, Mach-O's load commands. One implementation for every
+host that wants it, and none for a host whose module metadata comes from elsewhere.
 
 ## What no module may do
 

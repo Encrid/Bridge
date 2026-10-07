@@ -7,8 +7,9 @@
 **
 ** include/bridge.h -- the host seam: the only header a host includes.
 **
-** This is as much of the contract as exists so far: everything but `validate`
-** and the profile, which arrive with the diagnostics they switch on.
+** This is the contract as far as it is built: all of it but the two keys of
+** validation.md, *The checksum pass, when asked*, and the pull of
+** profile.md, *The profile*.
 **
 ** A host may be in any language that can call C, so every struct here is laid
 ** out where it is stated: its size and each member's offset are asserted, and

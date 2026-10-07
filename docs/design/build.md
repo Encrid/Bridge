@@ -6,9 +6,6 @@ What Bridge-ASM700 is compiled with, for what, in which C, and against which C l
 is the design of the library. All of it decides whether the library can be built the same way on
 three systems by somebody who installed two tools.
 
-`plan.md` stages 7, 8, 9 and 12 build what this file states, one part each, and say which. Until a stage
-is done, its part here is the decision and not yet the tree.
-
 ## One compiler
 
 **zig, at one pinned version, compiles everything on every platform**: the library, the backends,
@@ -40,7 +37,7 @@ CMake's work was to find and drive three compilers. With one compiler that takes
 argument, what is left is running commands in order, and `tools/` was Python already.
 
 It takes every path from where it is and from the output directory it is given, so that a host
-with this repository as a submodule builds it by calling the same script - `plan.md` stage 16.
+with this repository as a submodule builds it by calling the same script.
 
 What this gives up: the rebuild check, the parallelism and the choice of tests are ours to get
 right, and an editor that reads CMake finds nothing to read.
@@ -62,16 +59,15 @@ nothing more.
 **A platform is one that is run.** A target is a name in `build.py`, wasmtime's library for it in
 the tree, and a row of a workflow. The last three have all of that and have been compiled and
 linked from the first, with what each imports held to `dependencies.md`; none has executed a case,
-because no workflow had run when they were added - `stage12.md`, *Platforms, as built*. Each
-becomes a platform, and this table says so, when its workflow has passed.
+because no workflow has run them. Each becomes a platform, and this table says so, when its
+workflow has passed.
 
 **Windows is the `gnu` target, not `msvc`.** The `msvc` target takes its headers and libraries from
 an installed Visual Studio, which is an installation *Dependencies* does not have. Both use the same
 calling convention for C, so a module or a host built by either loads into the other.
 
 **macOS is arm64 first**, the processor those machines have had since 2020 and the one the
-workflow runners will keep. It was also the first build that is not x86-64, which is the reason it
-came before the stages that rewrite things. x86-64 is a target beside it since stage 12.
+workflow runners will keep. x86-64 is a target beside it.
 
 **Windows on arm64 is the `gnu` target as well**, linked against the one library wasmtime
 publishes for that processor, which is built by `msvc`: its import library names the functions of
@@ -80,8 +76,7 @@ a DLL, which is the same thing whichever compiler wrote it, and zig's linker rea
 ## The standard
 
 **Each piece at its own.** wasmtime's headers are C11. Everything of Bridge-ASM700's own is C23:
-the source, the tests, the test modules and all five headers. flecs was C99, built by its own flags
-as it asked, until stage 10 removed it.
+the source, the tests, the test modules and all five headers.
 
     backends/wasm/wasmtime        C11    read by backends/wasm and nothing else
     everything else               C23
@@ -143,7 +138,7 @@ for a barrier or more rarely is in a `.c`.** A file holds five functions at most
 rule O3 - and the compiler inlines a `static` function only into a caller of the same
 translation unit, so the functions a barrier's loop goes through are where every unit that
 loops over them can see them. Cut into `.c` files alone, every change was measured 35 to 85
-percent slower - `stage12.md`, *How a file of many functions is cut*.
+percent slower.
 
 ## The C library
 
@@ -163,8 +158,8 @@ the C runtime zig carries.
 **What our source calls of it is eighteen functions**, counted in the library and the two
 backends: four that allocate, `memcpy`, `memmove`, `memset`, `memcmp`, `memchr`, `strlen`,
 `strcmp`, `strncmp`, `strchr`, `strpbrk`, `snprintf`, `vsnprintf`, `strtoll` and `strtoull`.
-No file, no stream, no `printf`, no floating point, no `qsort`. `plan.md`, stage 12, lists
-them as a dependency and shortens the list where it can.
+No file, no stream, no `printf`, no floating point, no `qsort`. Each is listed as a dependency:
+`dependencies.md`, *The C library*.
 
 **The door is one layer**, `utils/os/`: mapping, threads, loading a library and the clock are
 reached through it and nowhere else, and that is the only code that differs by platform.
@@ -172,7 +167,7 @@ reached through it and nowhere else, and that is the only code that differs by p
 `windows/` and `posix/`. The build takes the folder its target names, so no file of the layer
 asks which platform it is compiled for. It
 depends on nothing of ours, and it is compiled into the library and into each backend, which
-are separate binaries - `stage12.md`, *One operating-system layer*.
+are separate binaries.
 
 ## Dependencies
 

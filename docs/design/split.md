@@ -7,8 +7,8 @@ own corner of it and point here.
     ------------------------------   ----------------------------------------
     storage: tables, columns, spans  reading files, and every format in them
     the barrier and the republish    its config, in whatever form
-    the scheduler: phases, the       the manifest, via bridge_manifest_parse
-      conflict graph, the refusal      (a helper beside the library)
+    the scheduler: phases, the       the manifest of a module, and reading it
+      conflict graph, the refusal
     the module ABI, all eight        discovery: walking paths, deciding what
     the registry: components,          to load and when
       slots, grants, identities      the loop, and when the program ends

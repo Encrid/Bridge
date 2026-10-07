@@ -65,6 +65,8 @@ index, and every component through its spans, at every pass.
 
 ## The checksum pass, when asked
 
+It is not built.
+
 One check, behind `[checks] validate`. Hash each column at every barrier and compare with the last.
 **If a column changed and no system that ran declared it written, the log names the module** - which
 is what the three narrowing facts above stop short of: they produce a suspect list, and this
@@ -74,6 +76,10 @@ That matters because the person reading the log is usually not the author of the
 it, so narrowing is not enough. It is also **the only thing that finds a native module's stray write**:
 it has no sandbox and need not use the accessor, so the `row < count` test does not reach
 it.
+
+**The key is Bridge-ASM700's and no host's.** The pass runs at a barrier, and no host can reach
+one: a host that put it behind a switch of its own would be silently disabling a check of the
+library's. The same holds for the key that turns the profile on - `profile.md`, *The profile*.
 
 O(data) per barrier, which is why it is off. A runtime key rather than a build flag costs one branch
 per barrier. flecs compiles its expensive tier out (`FLECS_SANITIZE`, *"will severely slow down

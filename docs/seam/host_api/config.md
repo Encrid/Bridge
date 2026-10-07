@@ -7,7 +7,7 @@ where those values came from is the host's business: a file, a database, compile
 document is what Bridge-ASM700 requires of them.
 
 Keys are spelled here, and throughout these documents, the way a TOML file would spell them -
-`[budget] entities`, `[checks] validate` - because a key needs a name and that one is short.
+`[budget] entities`, `[order] before` - because a key needs a name and that one is short.
 Bridge-ASM700 sees only the struct field.
 
 ## No unaccountable values
@@ -33,7 +33,7 @@ its own, and the other, like any other negative number, is refused at load by th
 boolean, which has no third state to be found in: it is `enum bridge_flag`, `BRIDGE_TRUE` or
 `BRIDGE_FALSE`, and its zero is `BRIDGE_UNSET`, the one place the unset state has a name, since
 here it sits beside the two answers. The keys are `trusted`, `reloadable`, `hot_reload` and
-`pinned`, and `validate` and `profile` when they exist. `tests/host`, case `BRIDGE_UNSET-flag-refused`.
+`pinned`. `tests/host`, case `BRIDGE_UNSET-flag-refused`.
 
 What that protects against is not a missing key but a value nobody can account for. A host may layer
 its sources however it likes - a module author's stated values under a deployment's, say - as long
@@ -50,8 +50,7 @@ as what it hands over is one stated value per key. The original Bridge had the s
                systems, terms, modules,        init/reload/shutdown timeouts
                persistent, columns,            log_level, scratch, log_ring,
                sparse_sets, direct_indexed     spans, spawns, persistent
-    [checks]   validate, profile               pinned, config, losses
-    [backend]  a name, a library and its
+    [backend]  a name, a library and its       pinned, config, losses
                settings, each
                                                read / write
                                                [.config]
@@ -65,9 +64,8 @@ What a backend is configured *with* is not: a cache directory, an instantiation 
 period. The host hands those over as that backend's settings and Bridge-ASM700 passes them through
 unread.
 
-`[checks]` is Bridge-ASM700's outright, since both run at a barrier and no host can reach one -
-`validation.md`, *The checksum pass, when asked*. A host that put them behind a switch of its own
-would be silently disabling a Bridge-ASM700 check.
+Two keys are designed and not in the table, since neither is built: `validation.md`, *The
+checksum pass, when asked*, and `profile.md`, *The profile*.
 
 `phases` is **an ordered array of names and nothing more** - the host walks it, so there is no
 `after` relation to declare, and a phase has no other property to carry: `schedule.md`, *A phase is

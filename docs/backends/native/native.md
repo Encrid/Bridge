@@ -54,11 +54,8 @@ has run the library's static initialisers. So you would be checking whether a mo
 after executing it, and a library cannot be cleanly unloaded. Read, then decide, then load.
 
 **The section is a convention the host reads, not something Bridge-ASM700 parses.** Bridge-ASM700 is
-handed the identity as data - `host_api.md`, *The data* - so the section tables are to be walked
-by `bridge_manifest_parse`, a helper beside the library rather than inside it, which `plan.md`,
-stage 16, writes: ELF's `shdr` and
-`shstrtab`, PE's section table after the optional header, Mach-O's load commands. One implementation
-for every host that wants it, and none for a host whose module metadata comes from elsewhere.
+handed the identity as data - `host_api.md`, *The data* - so walking the section tables of an
+object file is no part of the library: `module.md`, *The parser of a manifest*.
 
 So a sidecar is a **host's choice** rather than wrong. Godot's `example.gdextension` carries
 `entry_symbol` and `compatibility_minimum` beside the binary; a host that prefers that shape reads

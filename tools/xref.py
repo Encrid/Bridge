@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Every reference resolves: `doc.md`, *Section* to a real heading, and no
-"item N" is left behind.
+"item N" is left behind. A document of the design names no stage, and names
+what is not built only where it is stated or in a citation of that.
 
 Catches the failure the restructure makes likely: a pointer that looks right and
 resolves to nothing. The item half exists because the register went when stage 0
@@ -79,6 +80,108 @@ for full in sorted(glob.glob('../**/*.[ch]', recursive=True)):
             bad += 1
         elif sec not in heads[doc]:
             print('%-14s -> %s has no heading "%s"' % (full[3:], doc, sec))
+            bad += 1
+
+# A document of the design names no stage, in any form: the plan points at the design, and the
+# design never at the plan - stage14.md, *A stage in a document of the design*. What is held is
+# every document that is not the plan's or a record, and the headers and the source. readme.md
+# is the index of the tree, the plan's folder with the rest, and style.md gives a stage's file
+# as an example of a name: neither says what the library is.
+STAGE = re.compile(r'[Ss]tages? \d|stage\d+\.md')
+APART = ('plan/', 'refused/')
+INDEX = ('plan.md', 'readme.md', 'style.md')
+
+
+def is_design(path):
+    return not path.startswith(APART) and path not in INDEX
+
+
+for f in sorted(paths):
+    full = paths[f].replace(os.sep, '/')
+    if not is_design(full):
+        continue
+    for n, line in enumerate(open(full, encoding='utf-8'), 1):
+        if STAGE.search(line):
+            print('%-14s:%d names a stage' % (f, n))
+            bad += 1
+for full in sorted(glob.glob('../include/*.h') + glob.glob('../src/*.[ch]') +
+                   glob.glob('../backends/*/*.[ch]') + glob.glob('../backends/*/sdk/*') +
+                   glob.glob('../utils/**/*.[ch]', recursive=True)):
+    for n, line in enumerate(open(full, encoding='utf-8'), 1):
+        if STAGE.search(line):
+            print('%s:%d names a stage' % (full[3:].replace(os.sep, '/'), n))
+            bad += 1
+
+# What is designed and not built is named where it is stated, under a heading that opens by
+# saying so, and anywhere else only in a paragraph that cites that heading - stage14.md, *What
+# is said of what is not built*. The stage that builds one takes its row out of here.
+UNBUILT = [
+    (r'bridge_profile\w*|\[checks\] profile', [('profile.md', 'the profile')]),
+    (r'bridge_manifest_parse', [('module.md', 'the parser of a manifest')]),
+    (r'`validate`|\[checks\] validate', [('validation.md', 'the checksum pass, when asked')]),
+    (r'\[checks\]', [('profile.md', 'the profile'),
+                      ('validation.md', 'the checksum pass, when asked')]),
+]
+
+
+def cites(text, here, owners):
+    """Whether a paragraph cites one of the headings that state a thing."""
+    flat = re.sub(r'\s+', ' ', text).lower()
+    for doc, head in owners:
+        if '%s`, *%s*' % (doc, head) in flat or '%s, *%s*' % (doc, head) in flat:
+            return True
+        if here == doc and '*%s*' % head in flat:
+            return True
+    return False
+
+
+def paragraphs(full, is_code):
+    """Each paragraph of a document with the heading it is under, or each comment of a
+    source."""
+    text = open(full, encoding='utf-8').read().replace('\r\n', '\n')
+    if is_code:
+        for m in re.finditer(r'/\*.*?\*/', text, re.S):
+            yield text.count('\n', 0, m.start()) + 1, '', re.sub(r'\n\*\*[ ]?', '\n', m.group(0))
+        return
+    head, line = '', 1
+    for para in text.split('\n\n'):
+        m = re.match(r'\n*#{1,4}\s+(.*?)\s*$', para)
+        if m:
+            head = m.group(1).lower()
+        yield line, head, para
+        line += para.count('\n') + 2
+
+
+def check_unbuilt(full, name, is_code):
+    found = 0
+    for line, head, para in paragraphs(full, is_code):
+        for pattern, owners in UNBUILT:
+            if not re.search(pattern, para):
+                continue
+            if (name, head) in owners or cites(para, name, owners):
+                continue
+            print('%-14s:%d names what is not built, and cites no heading that states it'
+                  % (name, line))
+            found += 1
+            break
+    return found
+
+
+for f in sorted(paths):
+    full = paths[f].replace(os.sep, '/')
+    if is_design(full):
+        bad += check_unbuilt(full, f, False)
+for full in sorted(glob.glob('../include/*.h') + glob.glob('../backends/*/sdk/*.h')):
+    bad += check_unbuilt(full, full[3:].replace(os.sep, '/'), True)
+
+# what is not built opens by saying so
+for pattern, owners in UNBUILT:
+    for doc, head in owners:
+        text = open(paths[doc], encoding='utf-8').read().replace('\r\n', '\n').lower()
+        at = re.search(r'^#{1,4} %s\n\n(.*?)\n' % re.escape(head), text, re.M)
+        if not at or not at.group(1).startswith('it is not built.'):
+            print('%-14s -> "%s" states what is not built, and does not open by saying so'
+                  % (doc, head))
             bad += 1
 
 print('%d broken' % bad)

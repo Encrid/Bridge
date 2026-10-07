@@ -15,7 +15,7 @@ It is itself a case, `cover`, so the build fails with it.
 
 **A capability is added with its case.** A function, an entry, a key, a macro or a layout that a
 header gains has no heading the day it is written, and the build says so until it has one and a
-case under it. That is the rule `plan.md`, stage 13, states for every stage after this one.
+case under it.
 
 **What is read as exposed.** A function, an entry of a table, a macro that takes arguments, a
 constant, and a struct. A struct a host fills is exposed key by key, as `config.threads` or
@@ -29,8 +29,7 @@ argument, judged by the words that are that capability's. A case that only this 
 show has a run of its own.
 
 **Which document states each is not said here.** It is said where the name is: in its header,
-in the comment above it, as `budgets.md`, *Budgets*, is above the budgets. Not every name has
-one yet, and stage 14 writes the rest.
+in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
 
 **A message is not a heading.** Every message the source can write is held another way:
 `tools/said.py` reads each from the source and fails on one no case made appear. It is the case
