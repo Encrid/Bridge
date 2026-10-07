@@ -123,6 +123,14 @@ void host_run_frames(host_t *h, int count);
 void host_run_frames_unsaid(bridge_t *b, int count);
 
 /*
+** host_is_library_loaded
+**
+** Answers whether a library is in this process, asked of the operating
+** system and of nothing of ours.
+*/
+bool host_is_library_loaded(const char *path);
+
+/*
 ** host_read_module
 **
 ** Answers the bytes of the wasm module of a name, from where the build put
