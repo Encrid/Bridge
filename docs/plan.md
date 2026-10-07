@@ -371,7 +371,7 @@ finds no broken citation; and every case passes.*
 
 ## 15. Bridge
 
-In progress: `stage15.md`.
+Built: `stage15.md`.
 
 The library is finished as a library, and takes the name of what it replaces: the name it was
 built under goes. What is renamed - the repository, the name in every document and in the

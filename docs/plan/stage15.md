@@ -1,8 +1,9 @@
 # Stage 15: Bridge
 
-In progress. `plan.md`, stage 15, is what it is for and when it is done. This document is the
-order it is done in, what was counted before it began, and each decision as it is taken. What a
-decision refused is `stage15_refused.md`.
+Built in the tree; three actions outside it wait for this stage to be merged: *The close*.
+`plan.md`, stage 15, is what it is for and when it is done. This document is the order it was
+done in, what was counted before it began, each decision as it was taken, and what the library
+and two other things were called before. What a decision refused is `stage15_refused.md`.
 
 No identifier changes: the code says `bridge.h`, `bridge_create` and `BRIDGE_ABI` already. What
 is renamed is prose, the header every file of ours begins with, and what holds the tree from
@@ -202,3 +203,61 @@ to run it. It is the case `xref` now, and all of them fail the build.
     extensible    a word retired later is a row of its list
     minimal       no script added, and one case
     explicit      a slip fails the build, and says the file and the line
+
+### The folders on this machine
+
+**They are Enkrid's to rename, by a script written for it, when no session runs in them.** The
+clone of `legacy/rust-components` becomes `Bridge-rust-components` and this one becomes `Bridge`.
+The operating system will not rename a folder a process is running in, and the tool this was
+built with keeps a project's memory under the folder's path, so the script renames those two
+with them. It is not in the tree: it is of one machine.
+
+## What was renamed
+
+    the library      Bridge-ASM700, 830 times in 551 files, is Bridge. The line every file of
+                     ours begins with says so, and `tools/style.py` holds it
+    the object a     "the bridge", 284 times in the documents, the comments, four messages,
+    host creates     what eight cases are named and what the test programs print, is a deck.
+                     One constant and one file of the tests were named for it, and are
+    the design       "the original Bridge", 35 times, is `legacy/rust-components`. Eleven
+    before this      sentences that hung a possessive on it were built again
+    the repository   `Heuretes-Workshop/Bridge-ASM700`: its history goes into
+                     `Heuretes-Workshop/Bridge`, and it is archived
+
+No identifier of a seam changed: `bridge.h`, `bridge_t`, `bridge_create`, `BRIDGE_ABI`.
+
+`readme.md` says once what a deck is, and what the branch is. `tools/xref.py` fails on any of
+the three old words in a tracked file of ours, and is the case `xref`: 474 cases.
+
+## Outside the tree, as it was done
+
+In `Heuretes-Workshop/Bridge`, on 2026-10-07, with Enkrid's word for each step:
+
+    made       the branch `legacy/rust-components`, at a commit of the Rust line that had
+               not been pushed; the branch `legacy/rust-web-backend`; and the tags
+               `legacy/cpp-plugins`, `legacy/c-abi`, `legacy/rust-supervisor` and
+               `legacy/rust-backends`, each at the commit its numbered branch was at
+    removed    the branches `0.35`, `0.36`, `0.37`, `0.38` and `dev-web-backend`, once each
+               commit had its new name
+
+And three that wait for this stage to be merged, since what is pushed is the merged tree:
+
+    this history pushed as `main` and `dev`, over the Rust line's, which is forced: what they
+    were stays reachable as `legacy/rust-components`
+    the repository described, and `Heuretes-Workshop/Bridge-ASM700` archived
+    the remote of each clone on this machine pointed at the one repository
+
+## The close
+
+**The done-when, line by line.**
+
+    nothing in the tree says the name the     met: none, but in this document and its
+    library was built under, but the          refused record, and `xref` fails on one
+    record of this stage
+    the design before it has one name         met: `legacy/rust-components`, 35 times, and
+    wherever it is meant                      `xref` fails on what it was called
+    every case passes                         met: 474, optimised and debug, alone and under
+                                              six copies; the five other targets compile and
+                                              link
+
+**Linux and macOS** are as stage 13 left them: no workflow has run, and that holds no stage.
