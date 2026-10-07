@@ -23,10 +23,6 @@ constant, and a struct. A struct a host fills is exposed key by key, as `config.
 counts an array is said with the array, and a member named `pad` is padding. Any other struct is
 a layout, and is one heading. A name that ends in an underscore is the SDK's own.
 
-**A constant may be said with what it is a value of.** `BRIDGE_TABLE` is a value of a
-declaration, and has no behaviour that a declaration's cases do not show. Such a heading has one
-line, `with` and the heading whose cases are its own, and no other kind of name may have one.
-
 **Several cases may be one run.** A run that loads two modules and reads a sum shows a grant, a
 query, an accessor and a log at once, and each of them has its case: the same program and
 argument, judged by the words that are that capability's. A case that only this run could not
@@ -74,6 +70,7 @@ them states which name is the documents' to say, and stage 14 reads them against
 ### backend.settings
 
     backend.settings-handed-to-the-backend
+    backend.settings-each-kind-read-by-the-backend
 
 ### budget.entities
 
@@ -371,7 +368,7 @@ them states which name is the documents' to say, and stage 14 reads them against
 
 ### BRIDGE_BOOL
 
-    with setting.kind
+    BRIDGE_BOOL-seeds-a-bool
 
 ### BRIDGE_INT
 
@@ -380,7 +377,7 @@ them states which name is the documents' to say, and stage 14 reads them against
 
 ### BRIDGE_FLOAT
 
-    with setting.kind
+    BRIDGE_FLOAT-seeds-a-float
 
 ### BRIDGE_STRING
 
@@ -402,11 +399,11 @@ them states which name is the documents' to say, and stage 14 reads them against
 
 ### BRIDGE_TRUE
 
-    with module_config.pinned
+    BRIDGE_TRUE-a-module-pinned
 
 ### BRIDGE_FALSE
 
-    with module_config.hot_reload
+    BRIDGE_FALSE-a-reload-forbidden
 
 ### BRIDGE_ERR
 
@@ -426,15 +423,15 @@ them states which name is the documents' to say, and stage 14 reads them against
 
 ### BRIDGE_RUNNING
 
-    with module_info.state
+    BRIDGE_RUNNING-a-module-that-still-runs
 
 ### BRIDGE_STOPPED
 
-    with module_info.state
+    BRIDGE_STOPPED-a-module-at-its-failures
 
 ### BRIDGE_HOST_ABI
 
-    with config.abi
+    BRIDGE_HOST_ABI-stated-and-created
 
 ### BRIDGE_NO_LIMIT
 
@@ -450,7 +447,7 @@ them states which name is the documents' to say, and stage 14 reads them against
 
 ### BRIDGE_LEVEL_MOST
 
-    with BRIDGE_DEBUG
+    BRIDGE_LEVEL_MOST-every-line-written
 
 ### bridge_create
 
@@ -573,15 +570,15 @@ them states which name is the documents' to say, and stage 14 reads them against
 
 ### BRIDGE_STRUCT
 
-    with BRIDGE_DECLARE
+    BRIDGE_STRUCT-a-struct-a-field-names
 
 ### BRIDGE_ENUM
 
-    with BRIDGE_DECLARE
+    BRIDGE_ENUM-an-enum-a-field-names
 
 ### BRIDGE_BITMASK
 
-    with BRIDGE_DECLARE
+    BRIDGE_BITMASK-a-bitmask-a-field-names
 
 ### BRIDGE_TAG
 
@@ -602,7 +599,7 @@ them states which name is the documents' to say, and stage 14 reads them against
 
 ### BRIDGE_TABLE
 
-    with BRIDGE_COMPONENT
+    BRIDGE_TABLE-walked-by-its-rows
 
 ### BRIDGE_SPARSE_SET
 
@@ -625,7 +622,7 @@ them states which name is the documents' to say, and stage 14 reads them against
 
 ### BRIDGE_READ
 
-    with BRIDGE_ADD_SYSTEM
+    BRIDGE_READ-a-term-that-reads
 
 ### BRIDGE_WRITE
 
@@ -633,7 +630,7 @@ them states which name is the documents' to say, and stage 14 reads them against
 
 ### BRIDGE_AND
 
-    with BRIDGE_ADD_SYSTEM
+    BRIDGE_AND-only-the-entities-that-carry-both
 
 ### BRIDGE_NOT
 
@@ -641,19 +638,19 @@ them states which name is the documents' to say, and stage 14 reads them against
 
 ### BRIDGE_OPTIONAL
 
-    with BRIDGE_DIRECT_INDEXED
+    BRIDGE_OPTIONAL-a-term-an-entity-may-lack
 
 ### BRIDGE_ON_ENTER
 
-    with bridge_get_trigger_events
+    BRIDGE_ON_ENTER-told-with-the-attach-that-made-it
 
 ### BRIDGE_ON_ATTACH
 
-    with bridge_get_trigger_events
+    BRIDGE_ON_ATTACH-told-alone-of-an-attach-again
 
 ### BRIDGE_ON_LEAVE
 
-    with bridge_get_trigger_events
+    BRIDGE_ON_LEAVE-told-of-what-was-destroyed
 
 ### BRIDGE_LOG_ERR
 
@@ -673,31 +670,31 @@ them states which name is the documents' to say, and stage 14 reads them against
 
 ### BRIDGE_ABI
 
-    with module_config.abi
+    BRIDGE_ABI-stated-and-loaded
 
 ### BRIDGE_NAMESPACE
 
-    with module_list_imports
+    BRIDGE_NAMESPACE-where-every-import-is
 
 ### BRIDGE_SHARED
 
-    with module_list_imports
+    BRIDGE_SHARED-the-memory-two-modules-read
 
 ### BRIDGE_PRIVATE
 
-    with module_list_imports
+    BRIDGE_PRIVATE-the-memory-of-one-module
 
 ### BRIDGE_CARRIED
 
-    with BRIDGE_DECLARE_TAG
+    BRIDGE_CARRIED-where-a-tag-would-have-a-value
 
 ### BRIDGE_ZEROED
 
-    with BRIDGE_DECLARE_TAG
+    BRIDGE_ZEROED-attached-with-no-value
 
 ### BRIDGE_SPAN_BASE
 
-    with bridge_get_base
+    BRIDGE_SPAN_BASE-where-a-span-keeps-its-columns
 
 ### BRIDGE_SPAN_SIZE
 
@@ -1172,7 +1169,7 @@ handed.
 
 ### BACKEND_RELOAD
 
-    with bridge_reload
+    BACKEND_RELOAD-a-module-replaced-while-the-bridge-runs
 
 ### BACKEND_SIDE_BY_SIDE
 
@@ -1184,43 +1181,43 @@ handed.
 
 ### BACKEND_BOOL
 
-    with backend_setting_t
+    BACKEND_BOOL-read-as-it-was-stated
 
 ### BACKEND_INT
 
-    with backend_setting_t
+    BACKEND_INT-read-as-it-was-stated
 
 ### BACKEND_FLOAT
 
-    with backend_setting_t
+    BACKEND_FLOAT-read-as-it-was-stated
 
 ### BACKEND_STRING
 
-    with backend_setting_t
+    BACKEND_STRING-read-as-it-was-stated
 
 ### BACKEND_I32
 
-    with backend_sig_t
+    BACKEND_I32-an-argument-of-32-bits
 
 ### BACKEND_I64
 
-    with backend_sig_t
+    BACKEND_I64-an-argument-of-64-bits
 
 ### BACKEND_IMPORT_FUNC
 
-    with backend_import_t
+    BACKEND_IMPORT_FUNC-an-entry-imported-is-no-memory
 
 ### BACKEND_IMPORT_MEMORY
 
-    with backend_import_t
+    BACKEND_IMPORT_MEMORY-the-two-memories-lent
 
 ### BACKEND_IMPORT_OTHER
 
-    with backend_import_t
+    BACKEND_IMPORT_OTHER-a-global-nobody-answers
 
 ### BACKEND_ABI
 
-    with backend_get_abi
+    BACKEND_ABI-answered-and-the-library-opened
 
 ### BACKEND_ENTRY_COUNT
 

@@ -7,13 +7,12 @@
 What is exposed is read from the headers of the three seams and of the two SDKs: a function, an
 entry, a macro that takes arguments, a constant, a layout, and each key of a struct a host fills.
 docs/tests.md lists each under a heading of its name, with the cases that show it; a case is
-named for its heading, then a hyphen, then what it shows. A constant may have, in the place of
-cases, one line: `with` and the heading whose cases are its own.
+named for its heading, then a hyphen, then what it shows.
 
 It fails on an exposed name with no heading, a heading with no case, a heading in a seam's part
 that the headers do not expose, a heading there is twice, a case under no heading or under one
-it is not named for, a case listed that is not run, a `with` that is not a constant's or names
-no heading that has cases, and a document that points at a case that is not run.
+it is not named for, a case listed that is not run, and a document that points at a case that
+is not run.
 """
 import re
 import sys
@@ -68,7 +67,7 @@ def constants(text):
 
 
 def exposed(path):
-    """Every name a header exposes, and which of them are constants."""
+    """Every name a header exposes."""
     text = strip((ROOT / path).read_text(encoding='utf-8'))
     names = []
     for kind, body, name in re.findall(r'typedef (struct|union)\s*\w*\s*\{(.*?)\}\s*(\w+);', text, re.S):
@@ -79,12 +78,12 @@ def exposed(path):
     names += constants(text)
     names += re.findall(r'^\s*#define (\w+)\(', text, re.M)
     names += re.findall(r'^(?:BRIDGE_API|static inline)[^;{]*?(\w+)\(', text, re.S | re.M)
-    return [n for n in names if not n.endswith('_')], constants(text)
+    return [n for n in names if not n.endswith('_')]
 
 
 def surface():
     """What each seam exposes, in the order the headers state it."""
-    return {seam: list(dict.fromkeys(n for h in headers for n in exposed(h)[0]))
+    return {seam: list(dict.fromkeys(n for h in headers for n in exposed(h)))
             for seam, headers in SEAMS.items()}
 
 
@@ -104,7 +103,7 @@ def listed():
         elif line.startswith('### ') and part is not None:
             head = part.setdefault(line[4:].strip(), [])
             head.append(None) if len(head) else None
-        elif head is not None and re.match(r'    \S', line):
+        elif head is not None and re.match(r'    \S+$', line):
             head.append(line.strip())
     return parts
 
@@ -136,19 +135,13 @@ def check_headings(parts, said):
 
 def check_cases(heads, run, said):
     """Holds what is under each heading against the cases that are run."""
-    constant = {n for hs in SEAMS.values() for h in hs for n in exposed(h)[1]}
     for head, under in heads.items():
-        shared = [u[5:] for u in under if u and u.startswith('with ')]
-        mine = [u for u in under if u and not u.startswith('with ')]
-        said += ['%s has no case' % head] if not under else []
-        said += ['%s is said with %s, and is no constant' % (head, s) for s in shared if head not in constant]
-        said += ['%s is said with %s, which has no case of its own' % (head, s) for s in shared
-                 if not [u for u in heads.get(s, []) if u and not u.startswith('with ')]]
-        said += ['%s has cases, and is said with %s as well' % (head, s) for s in shared if mine]
+        mine = [u for u in under if u]
+        said += ['%s has no case' % head] if not mine else []
         said += ['%s is listed under %s, and is not named for it' % (c, head)
                  for c in mine if not c.startswith(head + '-') and c != head]
         said += ['%s is listed, and no case of that name is run' % c for c in mine if c not in run]
-    everywhere = [c for under in heads.values() for c in under if c and not c.startswith('with ')]
+    everywhere = [c for under in heads.values() for c in under if c]
     said += ['%s is run, and is under no heading' % c for c in run if c not in everywhere]
     said += ['%s is listed twice' % c for c in sorted(set(everywhere)) if everywhere.count(c) > 1]
 

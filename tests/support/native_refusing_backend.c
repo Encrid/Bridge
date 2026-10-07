@@ -6,26 +6,59 @@
 ** All rights reserved.
 **
 ** tests/support/native_refusing_backend.c -- the native backend's first
-** entries, as a backend that cannot adopt a block would answer them: for
-** the case in which a backend refuses the shared memory. It stands in the
+** entries, as a backend that refuses would answer them: one that says each
+** setting it was handed and does not start, for the case that reads what
+** crosses the backend seam. With native_refusing_memory.c it stands in the
 ** place of backends/native/native_backend.c.
 */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "bridge_backend.h"
 
 /*
+** say_setting
+**
+** Writes a setting after what `err` holds: its key, and its value as its
+** kind says to read it.
+*/
+static void say_setting(backend_err_t *err, const backend_setting_t *s)
+{
+    size_t at = strlen(err->text);
+    char *to = err->text + at;
+    size_t room = sizeof(err->text) - at;
+
+    if (s->kind == BACKEND_BOOL)
+        snprintf(to, room, " %s=%s", s->key, s->v.b ? "true" : "false");
+    if (s->kind == BACKEND_INT)
+        snprintf(to, room, " %s=%lld", s->key, (long long)s->v.i);
+    if (s->kind == BACKEND_FLOAT)
+        snprintf(to, room, " %s=%.1f", s->key, s->v.f);
+    if (s->kind == BACKEND_STRING)
+        snprintf(to, room, " %s='%s'", s->key, s->v.s);
+}
+
+/*
 ** backend_create
 **
-** Makes the backend, whatever its settings: a byte, since it keeps nothing.
+** Makes the backend if it is handed no setting: a byte, since it keeps
+** nothing. Handed some, it says each and does not start.
 */
-BACKEND_EXPORT backend_t *backend_create(
-    [[maybe_unused]] const backend_setting_t *settings,
-    [[maybe_unused]] uint32_t count, [[maybe_unused]] backend_err_t *err)
+BACKEND_EXPORT backend_t *backend_create(const backend_setting_t *settings,
+    uint32_t count, backend_err_t *err)
 {
-    return (calloc(1, 1));
+    uint32_t i = 0;
+
+    if (!count)
+        return (calloc(1, 1));
+    snprintf(err->text, sizeof(err->text), "it was handed");
+    while (i < count) {
+        say_setting(err, &settings[i]);
+        i++;
+    }
+    return (nullptr);
 }
 
 /*
@@ -36,41 +69,4 @@ BACKEND_EXPORT backend_t *backend_create(
 BACKEND_EXPORT void backend_destroy(backend_t *b)
 {
     free(b);
-}
-
-/*
-** backend_get_capabilities
-**
-** Answers that this backend can keep nothing.
-*/
-BACKEND_EXPORT enum backend_capability backend_get_capabilities(
-    [[maybe_unused]] backend_t *b)
-{
-    return ((enum backend_capability)0);
-}
-
-/*
-** memory_get_shape
-**
-** Answers the shape this backend asks of a memory, which is none.
-*/
-BACKEND_EXPORT void memory_get_shape([[maybe_unused]] backend_t *b,
-    uint64_t *reservation, uint64_t *guard, uint64_t *granule)
-{
-    *reservation = 0;
-    *guard = 0;
-    *granule = 0;
-}
-
-/*
-** memory_adopt
-**
-** Refuses the block, and says why.
-*/
-BACKEND_EXPORT backend_memory_t *memory_adopt([[maybe_unused]] backend_t *b,
-    [[maybe_unused]] void *ptr, [[maybe_unused]] uint64_t len,
-    backend_err_t *err)
-{
-    snprintf(err->text, sizeof(err->text), "this backend adopts no block");
-    return (nullptr);
 }
