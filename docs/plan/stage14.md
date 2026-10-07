@@ -98,8 +98,8 @@ wrongly.
 diagnostics, which are `validate`, the profile and how full a budget is; the parser of a
 manifest; and the seam for a language that is not C. The documents said so four ways: a
 sentence at the top of `profile.md`, a sentence in bold beside the fields in `host_api.md`,
-"when they exist" in `config.md`, and nothing at all over *The checksum pass, when asked* of
-`validation.md`, which reads as built.
+"when they exist" in `config.md`. And one had no mark at all and reads as built:
+`validation.md`, *The checksum pass, when asked*.
 
 **The form is the one `profile.md` has.** A section that states what is not built opens by
 saying so and by naming where it is built. A mention anywhere else cites that section, and says
