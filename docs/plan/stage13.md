@@ -72,3 +72,23 @@ Six, in this order, since each shapes the next.
     4  every refusal: whether the list of them is read from the source
     5  under load: how several copies at once are run
     6  the platforms no workflow runs
+
+### What a capability is
+
+**A capability is a sentence that says the library does or refuses something, and that a host, a
+module or a backend could observe to be false.** The documents hold four kinds of sentence, and
+this is two of them: a behaviour, "what an observer queues applies at the next barrier, not this
+one", and a refusal, "a `declare` past either is refused, by name". A reason and a cost are not
+capabilities: nothing a test does makes "why the type travels as data" false. Neither is what a
+later stage builds.
+
+**A contract is listed apart.** "Legal only between phases" is stated and nothing enforces it, so
+it has no case and cannot have one. It is written down as that, stated and not enforced, with the
+sentence that says so, so that its missing case is not read as a gap.
+
+    fast          no part of this runs
+    scalable      a new sentence is judged by one question
+    modular       the edge of the list is the three seams, which is where the library ends
+    extensible    stages 17 and 18 add theirs by the same question
+    minimal       some hundreds of sentences, each read once
+    explicit      a sentence is a capability, a contract, or neither, and the list says which
