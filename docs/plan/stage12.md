@@ -447,3 +447,33 @@ is a header of that unit:
 
 A chain of `if` and `else if` over the kinds of a thing became, each time, a table indexed by
 the kind, which is what rule C1 asks for.
+
+**Storage, as it is cut.** `storage.c` had 97 functions in one translation unit, and is moved
+out a group at a time, each group measured before the next:
+
+    names             every function took its verb first, with no line of code moved
+    what it holds     `storage_inside.h`, and the helpers for a set, a value, a row and what
+                      an entity carries, in seven headers
+    a table           its layout, its growth, how it is found and listed, made, freed and
+                      stripped, in six headers
+
+**What the cut cost, and what was found.** The lines that time a change of one entity did not
+move. The four lines that time a table did, and `storage measure` printed them to a tenth of
+a microsecond, which hid it: they are printed to a nanosecond now.
+
+    a walk of a set       asking a set for "the next type after this one" each time, where
+                          the old loop kept the word and cleared a bit: 20 ns a table, with
+                          nine types to a table. `storage_walk.h` keeps the word
+    growth                the function was 505 instructions where the old one was 318, by the
+                          compiler's own count. A table's first block has a path of its own,
+                          since nothing moves into it: 373
+    in other .c files     tried first, and no faster than headers: undone, and all of it is
+                          `static inline`
+    not the cause         tried and measured, each alone: the helpers kept out of line, the
+                          old form of the table lookup and of the two term checks, the code
+                          shifted by an unused function, the `inline` keyword left off
+
+**Open.** A table made and released at the next barrier measures 262 to 265 ns where the tree
+before the stage measures 248 to 253, and one emptied 258 to 261 where it was 243 to 251:
+about 10 ns of 250 that are not yet explained. The done-when asks that no line be slower, so
+this is closed before the stage is.

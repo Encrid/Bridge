@@ -3,278 +3,18 @@
 #include "storage_reach.h"
 #include "storage_set.h"
 #include "storage_sets.h"
+#include "storage_grow.h"
+#include "storage_make.h"
+#include "storage_strip.h"
+#include "storage_table.h"
+#include "storage_walk.h"
 #include "storage_view.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* How long a block of `room` rows of `set` is, and into r->at where each of its columns
- * begins in it: the ids, then every type in the order of its number, each at the next
- * multiple of sixteen. The whole is a multiple of sixteen too, for the block after it. */
-static uint64_t lay_out(const storage_t *r, const uint64_t *set, uint32_t room)
-{
-    uint64_t at = 8ull * room;
-    for (uint32_t w = 0; w < r->words; w ++) {
-        for (uint64_t bits = set[w]; bits; bits &= bits - 1) {
-            const storage_type_t *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
-            /* a tag has no column to begin anywhere */
-            if (type->size || type->kept == BRIDGE_TOGGLE) at = pad_column(at);
-            if (type->kept == BRIDGE_TOGGLE) at += get_bits_len(room) + COLUMN;
-            r->at[type->id] = at;
-            at += (uint64_t)type->size * room;
-        }
-    }
-    return pad_column(at);
-}
-
-static void touch(storage_t *r, uint32_t t)
-{
-    if (r->tables[t].touched) return;
-    r->tables[t].touched = true;
-    r->dirty[r->dirty_count ++] = t;
-}
-
-/* room for `room` rows, where they are and in the layout that goes with it. false if the
- * column region cannot give it, and then nothing has changed. */
-static bool grow(storage_t *r, uint32_t t, uint32_t room)
-{
-    table_t *tab = &r->tables[t];
-    bridge_t *b = r->b;
-    const uint64_t *set = get_set(r, t);
-    uint32_t *columns = get_columns(r, t), was = tab->block, asked = room, had = tab->room;
-    uint64_t len, to;
-    uint8_t *block;
-
-    if (room <= tab->room) return true;
-    /* half as much again as it had, so that a table that grows a row at a time is not moved
-     * each time, and what was asked and no more where that is not to be had. Measured against
-     * twice: as fast, with half the idle room - storage.md, *A table* */
-    if (room < tab->room + tab->room / 2) room = tab->room + tab->room / 2;
-    for (;; room = asked) {
-        len = lay_out(r, set, room);
-        block = len > INT32_MAX ? nullptr
-              : block_column_regrow(b, was ? b->shared + was : nullptr, tab->block_len, (uint32_t)len);
-        if (block) break;
-        if (room == asked) return false;
-    }
-    tab->block = (uint32_t)(block - b->shared);
-    if (was && tab->block != was) {
-        memcpy(get_who(r, tab), r->who + (was - b->columns) / 8, 8ull * tab->rows);
-    }
-    tab->block_len = (uint32_t)len;
-    tab->room = room;
-    /* the columns are where the old room put them, in the new block: each moves out to where
-     * the new room puts it, which laid_out has just said, the last first, so that none is
-     * written over before it is read */
-    for (uint32_t w = r->words; w --;) {
-        for (uint64_t bits = set[w]; bits;) {
-            uint32_t id = w * 64 + 63 - (uint32_t)__builtin_clzll(bits);
-            const storage_type_t *type = r->types[id];
-            bits &= ~((uint64_t)1 << (id & 63));
-            to = r->at[id];
-            if (was) memmove(block + to, block + (columns[id] - was), (size_t)type->size * tab->rows);
-            if (type->kept == BRIDGE_TOGGLE) {
-                /* its bits after its values, since both move out; and where they are now */
-                uint32_t bits = tab->block + get_bits((uint32_t)to, room);
-                if (was) {
-                    memmove(b->shared + bits, block + (get_bits(columns[id], had) - was),
-                        8u * ((tab->rows + 63) / 64));
-                }
-                memcpy(block + to - COLUMN, &bits, 4);
-            }
-            columns[id] = tab->block + (uint32_t)to;
-        }
-    }
-    /* a sparse set's values have moved, and each entity's cell says where its own is */
-    if (tab->set) {
-        const storage_type_t *type = r->set_type[tab->set - 1];
-        uint32_t *cells = get_cells(r, tab->set - 1);
-        for (uint32_t row = 0; row < tab->rows; row ++) {
-            cells[(uint32_t)get_who(r, tab)[row]] = get_cell(type, columns[type->id], row);
-        }
-    }
-    touch(r, t);
-    return true;
-}
-
 /* ---- tables, by their set ---- */
-
-static uint32_t find_table(const storage_t *r, const uint64_t *set)
-{
-    uint32_t i = hash_set(r, set);
-    while (r->hash[i]) {
-        if (set_is_same(r, get_set(r, r->hash[i]), set)) return r->hash[i];
-        i = (i + 1) & (r->hash_room - 1);
-    }
-    return 0;
-}
-
-static bool terms_match(const storage_terms_t *t, const uint64_t *set)
-{
-    for (uint32_t i = 0; i < t->count; i ++) {
-        if (t->oper[i] == BRIDGE_AND && !set_has(set, t->type[i])) return false;
-        if (t->oper[i] == BRIDGE_NOT && set_has(set, t->type[i])) return false;
-    }
-    return true;
-}
-
-/* Whether a system's spans include table `t`: its set matches, and a sparse set's table is
- * walked only by a system that must have its type - storage.md, *What a query walks* */
-static bool terms_read(const storage_t *r, const storage_terms_t *s, uint32_t t)
-{
-    if (!terms_match(s, get_set(r, t))) return false;
-    if (!r->tables[t].set) return true;
-    for (uint32_t i = 0; i < s->count; i ++) {
-        if (s->oper[i] == BRIDGE_AND && s->type[i] == r->set_type[r->tables[t].set - 1]->id) return true;
-    }
-    return false;
-}
-
-/* The table a set is found as, and no longer. What followed it in its run of the hash is put
- * back where it is still found. */
-static void name_table(storage_t *r, uint32_t t)
-{
-    uint32_t i;
-    for (i = hash_set(r, get_set(r, t)); r->hash[i]; i = (i + 1) & (r->hash_room - 1)) {}
-    r->hash[i] = t;
-    r->tables[t].named = true;
-}
-
-static void unname_table(storage_t *r, uint32_t t)
-{
-    uint32_t i = hash_set(r, get_set(r, t)), k;
-    while (r->hash[i] != t) i = (i + 1) & (r->hash_room - 1);
-    r->hash[i] = 0;
-    for (k = (i + 1) & (r->hash_room - 1); r->hash[k]; k = (k + 1) & (r->hash_room - 1)) {
-        uint32_t other = r->hash[k], home = hash_set(r, get_set(r, other));
-        r->hash[k] = 0;
-        while (r->hash[home]) home = (home + 1) & (r->hash_room - 1);
-        r->hash[home] = other;
-    }
-    r->tables[t].named = false;
-}
-
-/* Systems are fixed at load, so a table is matched against them when it is made, and again only
- * if its set changes: in each list it belongs in, and out of every one. */
-static void list_table(storage_t *r, uint32_t t)
-{
-    for (uint32_t i = 0; i < r->system_count; i ++) {
-        storage_terms_t *s = r->systems[i];
-        if (!terms_read(r, s, t)) continue;
-        s->list[s->matched] = t;
-        s->pos[t] = ++ s->matched;
-        s->changed = true;
-    }
-}
-
-static void unlist_table(storage_t *r, uint32_t t)
-{
-    for (uint32_t i = 0; i < r->system_count; i ++) {
-        storage_terms_t *s = r->systems[i];
-        uint32_t at = s->pos[t];
-        if (!at) continue;
-        s->list[at - 1] = s->list[-- s->matched];
-        s->pos[s->list[at - 1]] = at;
-        s->pos[t] = 0;
-        s->changed = true;
-    }
-}
-
-/* the table of this set, made if there is none. 0 if there is no room for another. */
-static uint32_t make_table(storage_t *r, const uint64_t *set)
-{
-    uint32_t t = find_table(r, set), slot;
-    if (t) return t;
-    /* a set that holds a type kept in a sparse set is that sparse set's table: there is
-     * room for one each beside [budget] tables, so it is never refused */
-    for (slot = 0; slot < r->set_room; slot ++) {
-        if (r->set_type[slot] && set_has(set, r->set_type[slot]->id)) break;
-    }
-    if (slot == r->set_room && r->table_count >= r->b->tables) return 0;
-    if (r->table_free) {
-        t = r->table_free;
-        r->table_free = r->table_next[t];
-    } else if (r->table_high <= r->table_room) {
-        t = r->table_high ++;
-    } else {
-        return 0;
-    }
-    /* touched or not is kept: an id given back in this barrier is already on the list */
-    r->tables[t] = (table_t){ .live = true, .touched = r->tables[t].touched };
-    if (slot < r->set_room) {
-        r->tables[t].set = slot + 1;
-        r->set_table[slot] = t;
-    } else {
-        r->table_count ++;
-    }
-    memcpy(r->sets + (size_t)t * r->words, set, 8u * r->words);
-    memset(get_columns(r, t), 0, 4u * r->type_room);
-    name_table(r, t);
-    list_table(r, t);
-    touch(r, t);
-    return t;
-}
-
-/* its last row has left: its block, its id and its place in every system's list are given back */
-static void free_table(storage_t *r, uint32_t t)
-{
-    table_t *tab = &r->tables[t];
-    if (tab->block) block_column_free(r->b, r->b->shared + tab->block, tab->block_len);
-    if (tab->named) unname_table(r, t);
-    unlist_table(r, t);
-    memset(get_columns(r, t), 0, 4u * r->type_room);
-    touch(r, t);
-    if (tab->set) r->set_table[tab->set - 1] = 0;
-    else r->table_count --;
-    tab->live = false;
-    tab->rows = tab->room = tab->block = tab->block_len = tab->set = 0;
-    r->table_next[t] = r->table_free;
-    r->table_free = t;
-}
-
-/* A table stops carrying `type`, where it stands: the column goes, the ones after it close up,
- * and what the block no longer needs is given back. No row moves and nothing is asked of the
- * column region, so this cannot fail. `name` if no other table is found as what is left. */
-static void strip_table(storage_t *r, uint32_t t, const storage_type_t *type, bool name)
-{
-    table_t *tab = &r->tables[t];
-    bridge_t *b = r->b;
-    uint64_t *set = r->sets + (size_t)t * r->words;
-    uint32_t *columns = get_columns(r, t);
-    uint64_t len;
-
-    if (tab->named) unname_table(r, t);
-    unlist_table(r, t);
-    columns[type->id] = 0;
-    set_take(set, type->id);
-    /* what is left, laid out again: the columns before the one that went are where they were,
-     * and each after it moves down to its new place, the first first */
-    len = lay_out(r, set, tab->room);
-    for (uint32_t w = type->id >> 6; w < r->words; w ++) {
-        for (uint64_t bits = set[w]; bits; bits &= bits - 1) {
-            const storage_type_t *after = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
-            if (after->id < type->id) continue;
-            if (after->kept == BRIDGE_TOGGLE) {
-                /* its bits before its values, since both move down */
-                uint32_t bits = get_bits(tab->block + (uint32_t)r->at[after->id], tab->room);
-                memmove(b->shared + bits, b->shared + get_bits(columns[after->id], tab->room),
-                    8u * ((tab->rows + 63) / 64));
-                memcpy(b->shared + tab->block + r->at[after->id] - COLUMN, &bits, 4);
-            }
-            memmove(b->shared + tab->block + r->at[after->id], b->shared + columns[after->id],
-                (size_t)after->size * tab->rows);
-            columns[after->id] = tab->block + (uint32_t)r->at[after->id];
-        }
-    }
-    /* the same block, shorter: what a smaller size is answered with is where it already is */
-    if (block_column_regrow(b, b->shared + tab->block, tab->block_len, (uint32_t)len)
-        != b->shared + tab->block) unreachable();
-    tab->block_len = (uint32_t)len;
-    if (name) name_table(r, t);
-    list_table(r, t);
-    touch(r, t);
-}
 
 /* ---- rows ---- */
 
@@ -525,10 +265,10 @@ void storage_let_write([[maybe_unused]] storage_t *r, module_t *m, storage_type_
     table_t *tab = &r->tables[t];
     if (!tab->sized) {
         uint32_t most = tab->incoming;
-        while (tab->incoming && !grow(r, t, tab->rows + tab->incoming)) tab->incoming /= 2;
+        while (tab->incoming && !grow_table(r, t, tab->rows + tab->incoming)) tab->incoming /= 2;
         while (most - tab->incoming > 1) {
             uint32_t between = tab->incoming + (most - tab->incoming) / 2;
-            if (grow(r, t, tab->rows + between)) tab->incoming = between;
+            if (grow_table(r, t, tab->rows + between)) tab->incoming = between;
             else most = between;
         }
         tab->sized = true;
@@ -1178,7 +918,7 @@ void storage_drop(storage_t *r, storage_type_t *type, enum bridge_on_unload poli
             tell_observers(r, get_who(r, tab)[row], r->before, r->masked, nullptr);
         }
         to = none ? 0 : find_table(r, set);
-        if (none || (to && grow(r, to, r->tables[to].rows + tab->rows))) {
+        if (none || (to && grow_table(r, to, r->tables[to].rows + tab->rows))) {
             /* nothing left to carry, or a table of what is left with room for them all */
             while (tab->rows) move_row(r, (uint32_t)get_who(r, tab)[tab->rows - 1], to);
             free_table(r, t);

@@ -960,7 +960,7 @@ int main(int argc, char **argv)
         if (!b || bridge_load(b, &a)) { printf("FAIL: not loaded\n"); return 1; }
         (void)barrier(b, "spawn");
         t = barrier(b, "combine");
-        printf("%-38s %7.1f us a table\n", "ten thousand tables made", (double)t / 1000.0 / 10'000);
+        printf("%-38s %7.3f us a table\n", "ten thousand tables made", (double)t / 1000.0 / 10'000);
         best[0] = barrier(b, "never");
         for (uint32_t round = 0; round < ROUNDS; round ++) {
             t = barrier(b, "never");
@@ -968,7 +968,7 @@ int main(int argc, char **argv)
         }
         printf("%-38s %7.1f us\n", "a barrier with nothing to do, then", (double)best[0] / 1000.0);
         t = barrier(b, "attach_a");
-        printf("%-38s %7.1f us a table\n", "ten thousand more, by one attach each", (double)t / 1000.0 / 10'000);
+        printf("%-38s %7.3f us a table\n", "ten thousand more, by one attach each", (double)t / 1000.0 / 10'000);
         /* every one of ten thousand sets filled at one barrier and emptied at the next: where a
          * table that lives only while it has rows is made and released each time */
         for (uint32_t round = 0; round < ROUNDS; round ++) {
@@ -977,8 +977,8 @@ int main(int argc, char **argv)
             t = barrier(b, "detach_b");
             if (!round || t < best[2]) best[2] = t;
         }
-        printf("%-38s %7.1f us a table\n", "ten thousand sets filled", (double)best[1] / 1000.0 / 10'000);
-        printf("%-38s %7.1f us a table\n", "and emptied again", (double)best[2] / 1000.0 / 10'000);
+        printf("%-38s %7.3f us a table\n", "ten thousand sets filled", (double)best[1] / 1000.0 / 10'000);
+        printf("%-38s %7.3f us a table\n", "and emptied again", (double)best[2] / 1000.0 / 10'000);
         held(b);
         (void)bridge_destroy(b);
 

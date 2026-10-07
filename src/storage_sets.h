@@ -5,7 +5,8 @@
 **
 ** All rights reserved.
 **
-** src/storage_sets.h -- a set of types compared, hashed and walked.
+** src/storage_sets.h -- a set of types compared and hashed, and a table's set
+** found.
 */
 
 #ifndef BRIDGE_SRC_STORAGE_SETS_H
@@ -53,30 +54,6 @@ static inline uint32_t hash_set(const storage_t *r, const uint64_t *set)
         w++;
     }
     return ((uint32_t)(h ^ h >> 32) & (r->hash_room - 1));
-}
-
-/*
-** next_type
-**
-** Answers the lowest type of a set that is `from` or above, or how many
-** types there may be if there is none: how a set's types are walked, in the
-** order of their numbers.
-*/
-[[gnu::always_inline]] static inline uint32_t next_type(const storage_t *r,
-    const uint64_t *set, uint32_t from)
-{
-    uint32_t w = from >> 6;
-    uint64_t bits = 0;
-
-    if (w < r->words)
-        bits = set[w] & (~0ull << (from & 63));
-    while (!bits && w + 1 < r->words) {
-        w++;
-        bits = set[w];
-    }
-    if (!bits)
-        return (r->type_room);
-    return (w * 64 + (uint32_t)__builtin_ctzll(bits));
 }
 
 /*

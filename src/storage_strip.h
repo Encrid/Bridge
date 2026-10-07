@@ -1,0 +1,112 @@
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** src/storage_strip.h -- a table that stops carrying a type, where it
+** stands.
+*/
+
+#ifndef BRIDGE_SRC_STORAGE_STRIP_H
+    #define BRIDGE_SRC_STORAGE_STRIP_H
+
+    #include <string.h>
+
+    #include "storage_bytes.h"
+    #include "storage_layout.h"
+    #include "storage_named.h"
+    #include "storage_reach.h"
+    #include "storage_table.h"
+    #include "storage_walk.h"
+
+/*
+** close_bits
+**
+** Moves the bits of a toggled column down to where the shorter layout puts
+** them, before its values, since both move down; and writes ahead of the
+** column where they are now.
+*/
+static inline void close_bits(storage_t *r, uint32_t t, uint32_t id)
+{
+    const table_t *tab = &r->tables[t];
+    uint8_t *shared = r->b->shared;
+    uint32_t to = tab->block + (uint32_t)r->at[id];
+    uint32_t bits = get_bits(to, tab->room);
+    uint32_t from = get_bits(get_columns(r, t)[id], tab->room);
+
+    memmove(shared + bits, shared + from, 8u * ((tab->rows + 63) / 64));
+    memcpy(shared + to - COLUMN, &bits, 4);
+}
+
+/*
+** close_column
+**
+** Moves one column down to where the shorter layout puts it, which
+** lay_out has just said.
+*/
+static inline void close_column(storage_t *r, uint32_t t, uint32_t id)
+{
+    const table_t *tab = &r->tables[t];
+    const storage_type_t *type = r->types[id];
+    uint8_t *shared = r->b->shared;
+    uint32_t *columns = get_columns(r, t);
+    uint32_t to = tab->block + (uint32_t)r->at[id];
+
+    if (type->kept == BRIDGE_TOGGLE)
+        close_bits(r, t, id);
+    memmove(shared + to, shared + columns[id], (size_t)type->size * tab->rows);
+    columns[id] = to;
+}
+
+/*
+** shorten_block
+**
+** Lays out what is left of a table, closes up the columns after the one that
+** went, the first first, and gives back what the block no longer needs. It
+** is the same block, shorter: what a smaller size is answered with is where
+** it already is.
+*/
+static inline void shorten_block(storage_t *r, uint32_t t, uint32_t gone)
+{
+    table_t *tab = &r->tables[t];
+    const uint64_t *set = get_set(r, t);
+    uint8_t *block = r->b->shared + tab->block;
+    uint64_t len = lay_out(r, set, tab->room);
+    walk_t walk = walk_set(set);
+    uint32_t id = walk_next(r, &walk);
+
+    while (id < r->type_room) {
+        if (id > gone)
+            close_column(r, t, id);
+        id = walk_next(r, &walk);
+    }
+    if (block_column_regrow(r->b, block, tab->block_len, (uint32_t)len)
+        != block)
+        unreachable();
+    tab->block_len = (uint32_t)len;
+}
+
+/*
+** strip_table
+**
+** Makes a table stop carrying a type, where it stands. The columns before
+** the one that went are where they were.
+*/
+static inline void strip_table(storage_t *r, uint32_t t,
+    const storage_type_t *type, bool name)
+{
+    if (r->tables[t].named)
+        unname_table(r, t);
+    unlist_table(r, t);
+    get_columns(r, t)[type->id] = 0;
+    set_take(r->sets + (size_t)t * r->words, type->id);
+    shorten_block(r, t, type->id);
+    if (name)
+        name_table(r, t);
+    list_table(r, t);
+    touch(r, t);
+}
+
+#endif
