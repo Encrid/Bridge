@@ -36,14 +36,14 @@ to.
     destroy, with a pinned        refused from any thread but the module's, with nothing torn
     module loaded                 down: `create.md`, *Destroy*
 
-Three of them were first put with steps missing, and were put again. Reading the original Bridge's
-source for the second pass gave reload a fourth option and changed the recommendation for the
-budget. The sixth was asked after the stage was reported: its report called `reload` optional, which
-is how these documents had it from the start, and a statement made by leaving something out is what
-this project refuses everywhere else. The seventh is the same defect found by looking for it: a
-null `config` meant "no settings". The eighth looked like it and was not: an artifact's bytes or
-path may be null, and the answer was to keep that and make the two refusals exact, `nopath` and
-`nobytes` among stage 4's cases.
+Three of them were first put with steps missing, and were put again. Reading the source of
+`legacy/rust-components` for the second pass gave reload a fourth option and changed the
+recommendation for the budget. The sixth was asked after the stage was reported: its report called
+`reload` optional, which is how these documents had it from the start, and a statement made by
+leaving something out is what this project refuses everywhere else. The seventh is the same defect
+found by looking for it: a null `config` meant "no settings". The eighth looked like it and was not:
+an artifact's bytes or path may be null, and the answer was to keep that and make the two refusals
+exact, `nopath` and `nobytes` among stage 4's cases.
 
 The last four were decided while building and reported afterwards as "forced by the documents".
 Put through the method, every one came out differently from what had been built. A failed native

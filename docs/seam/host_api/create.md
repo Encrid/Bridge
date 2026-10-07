@@ -28,7 +28,7 @@ explain are a null `sink` and a null deployment, and a host that passed null alr
 `bridge_destroy` calls every loaded module's `shutdown`, each under its own timeout, and then takes
 everything down. A `shutdown` that fails is logged and the rest go on - `failure.md`, *When
 something fails*. They run in the order the modules loaded: nothing here depends on anything else,
-so no other order would mean more, and the original Bridge's reverse order served modules that
+so no other order would mean more, and the reverse order of `legacy/rust-components` served modules that
 called each other.
 
 **It answers a status, because one thing can refuse it.** A pinned module's `shutdown` is that

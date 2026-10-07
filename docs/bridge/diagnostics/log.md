@@ -9,7 +9,7 @@ missing feature.
 A module says things by appending to **one ring in its private memory**, with a single writer by
 construction: a module's systems are serialised - `threads.md`, *Threads* - so no line needs an
 atomic. No call either, so a line costs stores rather than the 500 ns a call out of a module cost
-in the original Bridge. Bridge drains every ring at each barrier.
+in `legacy/rust-components`. Bridge drains every ring at each barrier.
 
     u32 when      barrier count, and offset within the phase
     u8  -         padding: zero, and not read

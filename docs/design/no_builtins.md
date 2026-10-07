@@ -1,6 +1,6 @@
 # No builtins
 
-The original Bridge shipped `log`, `ctl`, `config` and `profile` as interfaces it implemented itself
+`legacy/rust-components` shipped `log`, `ctl`, `config` and `profile` as interfaces it implemented itself
 - what its own measurements call the "built-in host call", 500 ns. Bridge has none. The rule
 is **no builtin surface**: nothing a module imports, no component Bridge declares, and **no
 name Bridge invents for a deployment's own structure**. It still takes config as structs

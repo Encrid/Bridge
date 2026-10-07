@@ -72,7 +72,7 @@ not merely that the budget is large. A module stating `work_limit = -1` is compi
 count, and one stating `-1` for all three timeouts without the interrupt check - `backend.md`, *What
 a backend is asked for*, hands the backend what was demanded for that reason.
 
-The original Bridge found the same thing the slow way: its fuel accounting was on for every module
+`legacy/rust-components` found the same thing the slow way: its fuel accounting was on for every module
 while `work_limit = -1` everywhere was the common deployment, "and it was paying anyway".
 
 What a module gives up with `work_limit = -1` is exactly what it says: a system of its that never returns

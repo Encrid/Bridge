@@ -373,13 +373,14 @@ finds no broken citation; and every case passes.*
 
 In progress: `stage15.md`.
 
-Bridge becomes Bridge: the library is finished as a library, and takes the name of what it
-replaces. What is renamed - the repository, the name in every document and in the header every
-file of ours starts with, and what the original Bridge is called from then on in the documents
-that refer to it - is this stage's first question, by the method of `stage0.md`.
+The library is finished as a library, and takes the name of what it replaces: the name it was
+built under goes. What is renamed - the repository, the name in every document and in the
+header every file of ours starts with, and what the design before it is called from then on in
+the documents that refer to it - is this stage's first question, by the method of `stage0.md`.
+`stage15.md` says what each was called.
 
-*Done when nothing in the tree says Bridge; the original Bridge has one name wherever it is
-meant; and every case passes.*
+*Done when nothing in the tree says the name the library was built under, but the record of
+this stage; the design before it has one name wherever it is meant; and every case passes.*
 
 ## 16. A host, from outside
 
@@ -459,7 +460,7 @@ copied out of the other; and an ABI layout changed in one place changes what bot
 
 ## 19. Prove it
 
-Port the original Bridge's Godot adapter to this design, as a native module. It is a real workload
+Port the Godot adapter of `legacy/rust-components` to this design, as a native module. It is a real workload
 with a measured baseline, which is why it is the proof. Its probe asserts 191 checks, and two of
 them ask another module a question synchronously - `costs.md`, *What we give up*, names both - so
 189 is the number that can pass.

@@ -38,7 +38,7 @@ Counted on `e635bf0`, the tree stage 14 left.
     "the bridge"           in lower case, the object a host creates, throughout
     the repository         `Heuretes-Workshop/Bridge-ASM700`
     the original's         `Heuretes-Workshop/Bridge`, in the same organisation: the name is
-                           taken, and is freed by renaming that one first
+                           taken
     on this machine        the folder `Bridge-ASM700`, and beside it `Bridge`, which is the
                            original
     who names the          two files of one other project, by path or by repository

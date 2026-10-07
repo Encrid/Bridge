@@ -3,7 +3,7 @@
 What was weighed here and refused is `lifetime_refused.md`, *What was refused: Lifetime*.
 
 Storage is the deck's and outlives the module that declared a component, so a reloaded module finds its
-components still there - which the original Bridge does not do. What happens when a component layout
+components still there - which `legacy/rust-components` does not do. What happens when a component layout
 has changed is *When a component layout changed*, below.
 
 **Reload has one mode and it keeps the components**, which is the whole point of it. There is no

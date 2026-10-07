@@ -1,10 +1,15 @@
 # Bridge
 
-An orchestrator, written in C, that runs modules over shared ECS storage. The name is temporary:
-this replaces the original Bridge when it is ready.
+An orchestrator, written in C, that runs modules over shared ECS storage.
 
-**It is its own design, not a rewrite.** The original Bridge is prior art here - cited where it
-gives a reason, as idTech3, flecs and Godot are - and never the specification.
+**Bridge is the library, and what it makes is a deck.** A host hands `bridge_create` a
+deployment and is answered a deck: the storage, the modules loaded onto it and the threads that
+run them, until `bridge_destroy`. A process may have several, and each is its own.
+
+**It is its own design, not a rewrite.** The design before it is kept in the same repository,
+as the branch `legacy/rust-components`: a host for modules of the WebAssembly Component Model,
+in Rust. It is prior art here - cited where it gives a reason, as idTech3, flecs and Godot are
+- and never the specification.
 
 **Bridge is a library.** A host links it and owns `main`, the loop and every file. Hosts are
 separate projects, and none is part of this one.

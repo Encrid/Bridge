@@ -1,6 +1,6 @@
 # What we give up
 
-Against the original Bridge, which is the comparison point because this replaces it.
+Against `legacy/rust-components`, which is the comparison point because this replaces it.
 
     wit-bindgen          a header both sides compile, plus a small file of accessors
     resource types       handles by hand, as godot:host/handles already does
@@ -47,7 +47,7 @@ isolates mods from each other. Minecraft has the largest modding ecosystem there
 all. What that ecosystem suffers is unattributable crashes and mod conflicts, which attribution and
 the grants address instead.
 
-This is a regression against the original Bridge, where separate component memories made it
+This is a regression against `legacy/rust-components`, where separate component memories made it
 impossible. The ECS is what buys it.
 
 The boundary that matters is untouched either way - `data.md`, *Access mode*.
@@ -55,9 +55,9 @@ The boundary that matters is untouched either way - `data.md`, *Access mode*.
 Kept: sandboxing from the host, traps caught, a work limit, lifecycle timeouts, memory limits, hot reload,
 the manifest section, threading.
 
-Hot reload improves in one direction and gains a refusal. In the original Bridge a reloaded module loses
-its state; with storage in Bridge's region **the data survives the swap**, which is what idTech3's
-`VM_Restart` was for too. A component layout change is caught by the fingerprint and never
-silently reinterpreted: its values are carried across where they can be, and what would be lost
-is refused unless the deployment accepted that loss by name. See `lifetime.md`, *When a component
-layout changed*.
+Hot reload improves in one direction and gains a refusal. In `legacy/rust-components` a reloaded
+module loses its state; with storage in Bridge's region **the data survives the swap**, which is
+what idTech3's `VM_Restart` was for too. A component layout change is caught by the fingerprint and
+never silently reinterpreted: its values are carried across where they can be, and what would be
+lost is refused unless the deployment accepted that loss by name. See `lifetime.md`, *When a
+component layout changed*.

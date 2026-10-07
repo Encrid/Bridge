@@ -1,18 +1,23 @@
 #!/usr/bin/env python3
 """Every reference resolves: `doc.md`, *Section* to a real heading, and no
 "item N" is left behind. A document of the design names no stage, and names
-what is not built only where it is stated or in a citation of that.
+what is not built only where it is stated or in a citation of that. And no
+tracked file of ours says a name that was retired.
 
 Catches the failure the restructure makes likely: a pointer that looks right and
 resolves to nothing. The item half exists because the register went when stage 0
 ended, so a document citing an item points at text nobody can read - and the
 number wraps onto the next line often enough that a line-at-a-time grep misses
-it. Run from docs/.
+it. Run from anywhere: it reads the documents where they are.
 """
 import glob
 import os
 import re
+import subprocess
 import sys
+
+# it reads the documents by their place under docs/, and is run from anywhere
+os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs'))
 
 # keyed by basename: prose cites `data.md`, not `bridge/data.md`, because a
 # reader wants the document's name and not where it sits in the tree.
@@ -182,6 +187,33 @@ for pattern, owners in UNBUILT:
         if not at or not at.group(1).startswith('it is not built.'):
             print('%-14s -> "%s" states what is not built, and does not open by saying so'
                   % (doc, head))
+            bad += 1
+
+# Three names were retired, and none comes back - stage15.md, *What holds it*: the name the
+# library was built under, what the design before it was called, and the object a host
+# creates called by the library's own word. Read in every tracked file of ours that is text.
+# The record of the stage that retired them says what each was, and is not read.
+RETIRED = [
+    (re.compile('ASM' + '700'), 'the name the library was built under'),
+    (re.compile(r'\b[Oo]riginal\s+Bridge\b'), 'what the design before this one was called'),
+    (re.compile(r"\b(?:[Tt]he|[Aa]|[Aa]n|[Tt]wo|[Nn]o|[Ee]ach|[Ee]very|that|this|its|stopped|"
+                r"host's|fixture's)\s+bridges?\b(?![-_/(]|[.:]\w)"),
+     'what a host creates, which is a deck'),
+]
+RECORD = ('docs/plan/stage15.md', 'docs/refused/plan/stage15_refused.md')
+NOT_OURS = 'backends/wasm/wasmtime/'
+
+listed = subprocess.run(['git', 'ls-files'], cwd='..', stdout=subprocess.PIPE).stdout.decode()
+for path in listed.split('\n'):
+    if not path or path.startswith(NOT_OURS) or path in RECORD:
+        continue
+    raw = open(os.path.join('..', path), 'rb').read()
+    if b'\0' in raw[:4096]:
+        continue
+    text = raw.decode('utf-8', 'replace')
+    for word, what in RETIRED:
+        for m in word.finditer(text):
+            print('%s:%d says %s' % (path, text.count('\n', 0, m.start()) + 1, what))
             bad += 1
 
 print('%d broken' % bad)

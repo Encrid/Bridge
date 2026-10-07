@@ -444,7 +444,7 @@ def sources(where, name, idle):
 
 def command_line(out, built, command, kept):
     """What a case runs: a program of the build, or a tool of ours over the tree."""
-    if command[0] in ('c23', 'style', 'cover'):
+    if command[0] in ('c23', 'style', 'cover', 'xref'):
         return [str(built['python']), str(ROOT / ('tools/%s.py' % command[0]))]
     if command[0] == 'said':
         return [str(built['python']), str(ROOT / 'tools/said.py'), str(kept)]
@@ -1475,13 +1475,14 @@ ALONE = {
     'storage-weigh': MEASURES, 'storage-baseline': MEASURES, 'storage-measure': MEASURES,
     'BRIDGE_ROW-checked-and-unchecked-timed': MEASURES,
     'config.threads-two-run-at-once': CLOCKED, 'config.threads-one-runs-in-turn': CLOCKED,
-    'c23': TREE, 'style': TREE, 'deps': TREE, 'cover': TREE,
+    'c23': TREE, 'style': TREE, 'deps': TREE, 'cover': TREE, 'xref': TREE,
     'said': 'it reads what the cases of this run said',
 }
 
 # and last, what is held against every case before it: the messages of the source against what
 # the cases said, and docs/tests.md against the headers and the cases
-CASES += [('said', ['said'], None, None), ('cover', ['cover'], None, None)]
+CASES += [('said', ['said'], None, None), ('cover', ['cover'], None, None),
+          ('xref', ['xref'], None, None)]
 
 
 if __name__ == '__main__':

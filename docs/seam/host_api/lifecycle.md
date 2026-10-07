@@ -67,7 +67,7 @@ A failure then has no old instance to keep. **The module stays, stopped, with ev
 declared.** Its record, its components and their rows are as they were; it has no code, so it shows
 as STOPPED and runs nothing; and `on_error` decides what that costs the deployment, as for any stop.
 A reload with an artifact that works brings it back over the same rows, and an unload is what ends
-it. The original Bridge marks a module whose reload failed as failed rather than stopped by an
+it. `legacy/rust-components` marks a module whose reload failed as failed rather than stopped by an
 operator, for the reason that holds here: what failed was the new artifact, and a better one must be
 able to follow.
 

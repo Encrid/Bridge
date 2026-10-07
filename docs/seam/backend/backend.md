@@ -42,8 +42,9 @@ name - `create.md`, *Create*. That is the one kind of file Bridge opens.
     call(func, status)                          -> err
 
 Eighteen entries. The first says which backend seam the library was built against, and one of
-another is asked for nothing more - `host_api.md`, *A seam has a number*. The original Bridge's
-`ModuleRuntime` trait had fourteen, four of which were filesystem and timer work that has moved out.
+another is asked for nothing more - `host_api.md`, *A seam has a number*. The `ModuleRuntime` trait
+of `legacy/rust-components` had fourteen, four of which were filesystem and timer work that has
+moved out.
 
 **`module` at this seam is a module's loaded image**: compiled bytes on the wasm backend, an opened
 library on the native one. `module_compile` takes

@@ -12,7 +12,7 @@ Refused: a separate start call validating the whole schedule, which would need a
 complete deployment that Bridge does not have. The condition that brings it back is a host
 that needs all-or-nothing loading and cannot get it by destroying the deck.
 
-Refused: the original Bridge's arrangement, where the old instance's `reload` consents and the new
+Refused: the arrangement of `legacy/rust-components`, where the old instance's `reload` consents and the new
 one runs `init` - right there, where nothing survived a reload, and wrong here, where `init` would
 populate storage that is already populated. Its veto has no job left either: a reload is between
 phases, so no module is in the middle of anything. The condition that brings the veto back is a

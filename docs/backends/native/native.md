@@ -94,12 +94,12 @@ is, the host decides - `lifecycle.md`, *The runtime lifecycle*. Everything the m
 happens there: declaring components, registering its systems and its observers, taking hold of
 whatever device it exists for.
 
-**A native module need not load before a wasm one.** The original Bridge loaded every plugin first
+**A native module need not load before a wasm one.** `legacy/rust-components` loaded every plugin first
 because its modules imported plugin functions. Here nothing calls, so a module loaded before the
 one that feeds it iterates zero spans until that one arrives. The condition that brings an order
 back is a module needing another's code, rather than its data, at init.
 
-`bridge_shutdown` closes a leak the original Bridge has: a module holding a device releases it on
+`bridge_shutdown` closes a leak `legacy/rust-components` has: a module holding a device releases it on
 teardown rather than when whichever other module would have closed it happens to get there - or
 does not, having crashed.
 

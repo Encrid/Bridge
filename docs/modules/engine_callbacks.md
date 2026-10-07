@@ -12,8 +12,8 @@ storage, so the native module that wraps the engine answers from it with no call
                           at the barrier - `data.md`, *Observers*
 
 Godot's own documented example needs none of it: a position computed from elapsed time is a system
-writing a component. It also fixes a defect of the original Bridge, where a module could not set its own
-property because `Object.set` came back as a re-entry.
+writing a component. It also fixes a defect of `legacy/rust-components`, where a module could not
+set its own property because `Object.set` came back as a re-entry.
 
 What is left over is the callback whose return value the engine consumes **inside its own loop**,
 with the engine on the stack waiting - `Array.sort_custom` asking a comparator for a bool N log N

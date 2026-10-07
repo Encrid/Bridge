@@ -161,10 +161,10 @@ brings it back.
 Refused: "Godot's own documented example", in `engine_callbacks.md`. The same sentence says
 what the example is. No condition brings it back.
 
-Refused: the trait of the original Bridge, in `backend.md`, and the crossings of its Godot
-adapter, in `design.md`. The original Bridge is named in `readme.md` as prior art, and is cited
+Refused: the trait of `legacy/rust-components`, in `backend.md`, and the crossings of its Godot
+adapter, in `design.md`. `legacy/rust-components` is named in `readme.md` as prior art, and is cited
 for what it measured and what it had, as flecs is. No condition brings it back.
 
-Refused: the things of the original Bridge in the table of `costs.md`. That document is the
+Refused: the things of `legacy/rust-components` in the table of `costs.md`. That document is the
 comparison against it, and the table is what is compared. The condition that brings it back is
-the original Bridge no longer being what this replaces.
+`legacy/rust-components` no longer being what this replaces.

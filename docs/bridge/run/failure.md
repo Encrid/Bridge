@@ -98,7 +98,7 @@ destroy and may not - `grants.md`, *What a module may destroy* - raises the modu
 by one for that barrier. A barrier that placed everything the module changed lowers
 it. One in which it changed nothing does neither.
 
-**What forgives is sustained health, not one good pass.** The original Bridge forgives its retry
+**What forgives is sustained health, not one good pass.** `legacy/rust-components` forgives its retry
 budget after a minute of running, and says why: the budget is there to catch a module that cannot
 run, *"not one that has a bad day twice a year"*. One count that falls as slowly as it rises does
 that with a single number, and stops any system that fails more often than not.

@@ -5,7 +5,7 @@ is `readme.md`; the build order is `plan.md`.
 
 ## Why
 
-The original Bridge's costs were measured, not guessed. One machine, release build, in its own
+The costs of `legacy/rust-components` were measured, not guessed. One machine, release build, in its own
 words for each:
 
     empty tick                      300 ns
@@ -15,10 +15,11 @@ words for each:
     module to module, across stores 6300 ns
 
 A plain C call is 1 to 2 ns. Nothing closes a 200x gap per crossing, and the gap is wasmtime's, not
-the original Bridge's. Removing every heap allocation from the crossing path bought 10%. So a frame
-costs the *number* of crossings, and the way to cut it is to stop sending data through calls at all.
+that of `legacy/rust-components`. Removing every heap allocation from the crossing path bought 10%.
+So a frame costs the *number* of crossings, and the way to cut it is to stop sending data through
+calls at all.
 
-One example: the original's Godot adapter's per-frame work is 18 crossings, 42 us. The same work over
+One example: the per-frame work of its Godot adapter is 18 crossings, 42 us. The same work over
 shared storage is one crossing.
 
 ## What the design is

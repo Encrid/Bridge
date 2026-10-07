@@ -1352,3 +1352,10 @@ Every message of the source was written by a case: `tools/said.py`.
 This document holds against the headers and the cases: `tools/cover.py`.
 
     cover
+
+### xref
+
+Every citation names a heading that is there, no document of the design names a stage, what
+is not built is said so, and no name that was retired is written: `tools/xref.py`.
+
+    xref
