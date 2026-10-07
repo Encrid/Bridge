@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/reference/flecs_ref_toggle.c -- a toggled component: a row
 ** switched, and the rows that are on read.

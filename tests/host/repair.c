@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/repair.c -- a stopped deck, and the one call it
 ** accepts: the one that brings back the module that stopped it.

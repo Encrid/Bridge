@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test.h -- storage: what it does, said out loud,
 ** and what it costs. From inside, for the barrier alone: the program is

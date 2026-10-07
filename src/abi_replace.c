@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/abi_replace.c -- a declaration of a name there already is a type of:
 ** it is that type, or, at a reload of the one module that declares it, the

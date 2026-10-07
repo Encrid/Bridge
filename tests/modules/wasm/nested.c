@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/nested.c -- a component whose fields are other
 ** declared types: a struct, an enum and a bitmask. Each is declared first,

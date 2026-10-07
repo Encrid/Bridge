@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/schema_type.c -- the type of a field: one that is given, or one its
 ** namespace declared.

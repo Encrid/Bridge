@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/abi_relay_run.c -- what a type laid out again keeps and what it
 ** loses: a run of bytes carried over, and a loss accepted or said.

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/module_check_backend.c -- what a module's config asks of its backend:
 ** a stated limit demands that the backend can enforce it.

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/backend.c -- a backend's library: what a destroyed
 ** deck leaves of it in the process, one built for another backend seam,

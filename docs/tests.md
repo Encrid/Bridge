@@ -1359,3 +1359,23 @@ Every citation names a heading that is there, no document of the design names a 
 is not built is said so, and no name that was retired is written: `tools/xref.py`.
 
     xref
+
+### licence
+
+The licence is its authors' text byte for byte, no file of ours says that all rights are
+reserved, and what is somebody else's is named with its own: `tools/licence.py`.
+
+    licence
+
+### cla
+
+Who is asked to sign the agreement of contributors, and when a pull request passes:
+`tools/cla.py`, as `.github/workflows/cla.yml` runs it. What it decides is shown here; that the
+service runs it is shown by the service.
+
+    cla-the-holder-is-not-asked
+    cla-a-name-on-record-passes
+    cla-anybody-else-is-asked-and-fails
+    cla-the-sentence-by-its-author-is-recorded
+    cla-the-sentence-by-another-is-not-taken
+    cla-other-words-are-not-taken

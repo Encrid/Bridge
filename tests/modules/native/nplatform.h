@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nplatform.h -- what a native test module asks the
 ** operating system and is spelled differently on Windows: a sleep, the

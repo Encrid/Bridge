@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/abi_calls.c -- the entries a module calls in a phase that change an
 ** entity: spawn, destroy, attach, detach.

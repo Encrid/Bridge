@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** utils/os/posix/thread.c -- a thread on Linux and macOS, and the clock.
 */

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_runs.h -- the queues, taken a run at a time in the order the
 ** calls that filled them ran, and the values they carry written.

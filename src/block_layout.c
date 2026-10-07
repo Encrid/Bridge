@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/block_layout.c -- where each part of the shared block begins: the
 ** entity index, the sparse sets' indexes, the direct-indexed bits, the

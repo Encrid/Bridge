@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/twostep.c -- two systems of one module that conflict
 ** in one phase: the order they were registered in is the order they run in.

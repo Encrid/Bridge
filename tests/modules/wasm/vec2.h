@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/vec2.h -- a struct that is a field's type in the
 ** components of other modules: typer.c declares it, user.c and nested.c

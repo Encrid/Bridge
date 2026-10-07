@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/native/sdk/bridge_native_kept.h -- what is not kept in a table,
 ** through real pointers: a singleton, a direct-indexed component, a sparse

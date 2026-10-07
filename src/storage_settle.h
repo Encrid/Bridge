@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_settle.h -- the end of a barrier's work on rows: each module's
 ** queue emptied, and each told what of what it asked was not applied.

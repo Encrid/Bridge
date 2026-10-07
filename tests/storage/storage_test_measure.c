@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_measure.c -- nanoseconds for each kind of
 ** change, at a barrier: a measurement, which passes by running.

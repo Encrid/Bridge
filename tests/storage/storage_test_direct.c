@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_direct.c -- a direct-indexed component: a
 ** value reached by an id that is held, through every change, and what

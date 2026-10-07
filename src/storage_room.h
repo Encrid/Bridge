@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_room.h -- room found, before anything moves, for every row a
 ** barrier adds to a table. What cannot be had is known here, while every

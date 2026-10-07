@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/threads.c -- two systems that nap, in two modules that
 ** share nothing: on two threads they run at once, and on one, in turn.

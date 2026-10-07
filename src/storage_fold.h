@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_fold.h -- the fold: what each entity a barrier changes is
 ** becoming, kept beside where it still is.

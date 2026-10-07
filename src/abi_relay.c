@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/abi_relay.c -- a type that has another component layout at a reload:
 ** how its values are carried over, or why they cannot be.

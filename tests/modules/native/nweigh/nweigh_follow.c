@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nweigh/nweigh_follow.c -- the systems of nweigh that
 ** reach a value by the id of its entity, as a reference is followed.

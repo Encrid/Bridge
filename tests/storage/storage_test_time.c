@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_time.c -- a phase, timed: its systems, and
 ** its barrier. A change is the call that asks for it and the barrier that

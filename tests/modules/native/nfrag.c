@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nfrag.c -- what it costs a system when the entities
 ** it reads are spread over many tables: one component every entity carries,

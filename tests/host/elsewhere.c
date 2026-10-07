@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/elsewhere.c -- the modules several cases load, and a call
 ** made from a thread that loaded nothing.

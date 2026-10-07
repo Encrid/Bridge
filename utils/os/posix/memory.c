@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** utils/os/posix/memory.c -- address space on Linux and macOS: mapped with no
 ** access, opened to reading and writing, and unmapped.

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_slots.c -- what is left of what a budget counts, what a module
 ** may write, and a type forgotten.

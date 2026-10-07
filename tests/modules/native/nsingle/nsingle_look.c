@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nsingle/nsingle_look.c -- what a system reads of the
 ** singleton and what an observer hears of it, said in the log.

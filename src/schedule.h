@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/schedule.h -- the schedule: which systems conflict, what orders them,
 ** and who runs at once.

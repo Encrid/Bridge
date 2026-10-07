@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** include/bridge_schema.h -- a type, as a module in C states it: the typedef
 ** its compiler lays out, and the descriptor Bridge reads to lay it out

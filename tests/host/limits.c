@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/limits.c -- what a module stated it needs, used up:
 ** its scratch, its work, its ids, its log ring, its spans.

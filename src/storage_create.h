@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_create.h -- storage made: everything it holds is sized by a
 ** budget and allocated when the deck is created, and nothing after.

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nthread.h -- a function run on a thread of its own
 ** and waited for, which is spelled differently on Windows.

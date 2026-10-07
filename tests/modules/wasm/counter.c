@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/counter.c -- counts the rows of the shared component,
 ** and how many of the roster's ids are still alive: what an unload left

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/adopt/adopt_refused_more.c -- what a backend refuses of whoever
 ** calls it: a memory handed to the wasm backend twice under one name, and

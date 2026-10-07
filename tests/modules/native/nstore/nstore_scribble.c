@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nstore/nstore_scribble.c -- what storage publishes
 ** in the shared block, written over by a module that should not.

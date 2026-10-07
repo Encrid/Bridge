@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** utils/os/os.h -- the operating system, as far as Bridge and its
 ** backends need it: address space, shared libraries, threads, the clock, a

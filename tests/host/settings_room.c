@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/settings_room.c -- a config whose component is not there, is
 ** not a singleton, or has no room: for its row, or for its text.

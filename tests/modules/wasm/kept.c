@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/kept.c -- declares game:Position as the mover does,
 ** and states a storage layout for it, KEPT, that is unset, or one that is

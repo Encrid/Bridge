@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/reload.c -- the ticker reloaded: into a build that
 ** counts by ten, one with another component layout, one whose reload

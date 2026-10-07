@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/region.h -- a stretch of the shared block handed out in pieces and
 ** taken back: the column region, and the persistent arena.

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nstore/nstore_look.c -- what a system of the plain
 ** build of nstore sees: the spans of a query with A, of one with A and not

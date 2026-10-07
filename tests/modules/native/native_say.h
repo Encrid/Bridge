@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/native_say.h -- a line of the log whose text is not
 ** a literal, for the native test modules that say what they saw.

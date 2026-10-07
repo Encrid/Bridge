@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_reserve.h -- a barrier's second step, and a move's: a table
 ** for each changed entity, before anything moves.

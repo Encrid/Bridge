@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/wasm/wasm_module.c -- a module compiled: a wasm module is its
 ** bytes.

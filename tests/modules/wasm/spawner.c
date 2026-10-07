@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/spawner.c -- spawns three entities a pass and says
 ** which ids it was given. Two of these in one level, on several threads,

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/module_say.c -- how a refused module and a failed load are said, and
 ** the keys of a config that are checked one by one.

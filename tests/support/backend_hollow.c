@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/support/backend_hollow.c -- a library that is of this backend seam
 ** and has no other entry of it: for the case that refuses such a backend

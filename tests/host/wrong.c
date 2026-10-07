@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/wrong.c -- the wrong module, in the build the case's row
 ** names: it does one thing an entry refuses, at init or in its system.

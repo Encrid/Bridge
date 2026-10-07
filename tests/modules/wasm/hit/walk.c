@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/hit/walk.c -- the two systems of the hit module: the
 ** sparse set walked alone, and reached from the rows of a table.

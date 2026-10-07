@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/wasm/wasm_func.c -- functions in both directions: one a module
 ** imports, defined, and one it exports, found.

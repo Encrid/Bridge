@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/native/native_load.c -- the entries a module calls at load, and
 ** the table it is handed.

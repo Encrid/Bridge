@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nweigh/nweigh_read.c -- the systems of nweigh that
 ** read what their own query gave them: in order, by a field tested at every

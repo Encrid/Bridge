@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nstress/nstress_see_first.c -- the systems of nstress
 ** that see its first five components, each through a query of its own.

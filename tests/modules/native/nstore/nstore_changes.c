@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nstore/nstore_changes.c -- the changes every build
 ** of nstore asks for, of every entity, one phase each. A component is

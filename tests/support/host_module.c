@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/support/host_module.c -- a module as a deployment would state it:
 ** every key said, nothing left at zero.

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/flaky.c -- a system that fails FAILS passes out of
 ** every OF. Built four ways: always, one in three, two in three, and always

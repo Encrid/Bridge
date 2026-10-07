@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/wasm/wasm_backend.c -- the backend made and freed, and what it
 ** says of itself.

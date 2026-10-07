@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/abi_moved.c -- what a reload may not change of a type: one somebody
 ** else's rows hold, and a storage layout it cannot be moved to.

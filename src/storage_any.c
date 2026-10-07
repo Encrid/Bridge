@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_any.c -- the values of a type looked through: whether any
 ** answers a question, and how many toggled rows are off.

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_shape.c -- how much address space each block
 ** reserves, and how long each is, beside a backend that maps what it is

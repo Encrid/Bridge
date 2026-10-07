@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/ntoggle/ntoggle_bits.c -- the systems of ntoggle
 ** that write T: a value for one entity, and rows turned on or off by a

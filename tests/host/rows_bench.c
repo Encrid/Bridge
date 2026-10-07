@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/rows_bench.c -- the accessor's row test, against a build
 ** without it, with the count that a work limit adds and without; and a

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/ntoggle/ntoggle_find.c -- the system of ntoggle that
 ** reaches each entity by its id, and reads whether its T is on.

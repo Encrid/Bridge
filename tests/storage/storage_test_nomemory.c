@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_nomemory.c -- the allocator answering that
 ** there is no memory, at every call the library makes in turn. Of the

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_ids.c -- ids set aside for a module to hand out, and given
 ** back; and a singleton given its value outside a barrier.

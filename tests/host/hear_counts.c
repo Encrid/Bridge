@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/hear_counts.c -- the sink of this program: what it keeps of
 ** the records the cases count, and what it prints.

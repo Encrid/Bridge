@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/keeper.c -- declares a component it shares, one only
 ** it declares, and a roster of ids so that another module can ask after its

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/namer.h -- the component of namer.c: a string, by
 ** where its bytes are in the persistent arena and how many they are.

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/ndirect/ndirect_reach.c -- the systems of ndirect
 ** that reach D by ids that are held, and walk nothing.

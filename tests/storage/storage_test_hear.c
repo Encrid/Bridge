@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_hear.c -- the sinks of the program: what is
 ** printed of a record, and what is kept of it in the fixture.

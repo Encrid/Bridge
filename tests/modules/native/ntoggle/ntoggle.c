@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/ntoggle/ntoggle.c -- a toggled component: a column
 ** of a table and a bit a row. A and B are kept in tables and T is a toggle;

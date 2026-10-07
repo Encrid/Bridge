@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/native/sdk/bridge_native_api.h -- the table the native backend
 ** hands a native module, and the scratch arena, where a module puts what an

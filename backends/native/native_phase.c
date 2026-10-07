@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/native/native_phase.c -- the entries a module calls in a phase,
 ** as the table it is handed has them.

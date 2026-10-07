@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_move.h -- an entity moved from one table to another, a
 ** direct-indexed component given and taken, and a singleton set.

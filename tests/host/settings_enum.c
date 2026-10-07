@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/settings_enum.c -- a setting of an enum field, and a config
 ** that names no component, or none there is.

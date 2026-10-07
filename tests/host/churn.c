@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/churn.c -- modules whose types are enums and nested
 ** structs, loaded and unloaded many times; and a configured module that

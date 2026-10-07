@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/order.c -- two systems that conflict in one phase:
 ** the mover adds 1 and the halver halves, and which runs first is the sum.

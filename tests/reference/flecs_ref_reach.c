@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/reference/flecs_ref_reach.c -- a value reached by an id that is
 ** held: kept in a table, and sparse.

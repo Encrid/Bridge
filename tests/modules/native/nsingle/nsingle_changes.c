@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nsingle/nsingle_changes.c -- the systems of nsingle
 ** that give the singleton a value, write it and take it.

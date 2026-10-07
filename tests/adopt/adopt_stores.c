@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/adopt/adopt_stores.c -- the block as a memory: a module writes and
 ** the host reads, two stores on two threads write disjoint halves, and a

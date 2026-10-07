@@ -106,15 +106,16 @@ Every source file (`.c`, `.h`) starts with the project's standard header.
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** $PATH_OF_THE_FILE -- what the file is
 */
 ```
 
-`$YEAR` is the year the file was first written. `$PATH_OF_THE_FILE` is its path from the root
-of the repository, and what follows it says what the file is, in as many lines as are relevant
-and no more.
+The line under the project's name says what the file is under, in the same words in every file:
+`licence.md`, *What Bridge is under*. `$YEAR` is the year the file was first written.
+`$PATH_OF_THE_FILE` is its path from the root of the repository, and what follows it says what the
+file is, in as many lines as are relevant and no more.
 
 ```c
 /*
@@ -122,7 +123,7 @@ and no more.
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage.c -- what keeps the rows: tables, and a barrier's work
 */
@@ -138,7 +139,7 @@ with where the code is from and its licence:
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/text.c -- strtoll and strtoull, after musl's
 */

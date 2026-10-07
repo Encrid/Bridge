@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/reference/flecs_ref_basics.c -- the lines of `storage measure`: an
 ** entity's first component, one it has, and its end.

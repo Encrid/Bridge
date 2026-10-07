@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/abi_alloc.c -- the persistent arena handed out, the marks of a
 ** module's queue, and a system taken out of storage for a reload.

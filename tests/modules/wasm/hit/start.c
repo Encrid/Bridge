@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/hit/start.c -- a component kept in a sparse set, on
 ** the wasm backend: what the hit module declares, and what it spawns.

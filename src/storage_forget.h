@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_forget.h -- the end of a barrier's work on rows: the fold
 ** forgotten, and each table nothing is left in given back.

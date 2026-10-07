@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/idle.c -- a shutdown and a reload that do nothing,
 ** built into every wasm test module that includes wasm_idle.h.

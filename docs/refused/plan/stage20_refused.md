@@ -101,3 +101,6 @@ Of `stage20.md`, *Where other terms are asked for*.
 Refused: an address in the tree, alone or beside the account. It is what a buyer expects, and
 it is harvested from a public file. The condition that brings it back is a buyer who cannot
 use the account.
+
+Refused: the line as first ruled, on two lines. It keeps every word, and every header grows by
+a line. The condition that brings it back is none.

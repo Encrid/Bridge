@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/namer.c -- keeps a string in a component: the bytes
 ** in the persistent arena, the component holding where they are and how

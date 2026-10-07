@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/module_check_fit.c -- the keys of a module's config that have to fit:
 ** in what there is, and with one another.

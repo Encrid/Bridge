@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/reference/floor.c -- what reaching a value by entity id costs with
 ** nothing in the way: a C array with a cell for every entity, the id's

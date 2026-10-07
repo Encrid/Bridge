@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/wasm/sdk/bridge_wasm.h -- what a wasm module written in C
 ** compiles against: the eight imports, the accessors of bridge_wasm.wat,

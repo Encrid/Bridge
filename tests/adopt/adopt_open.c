@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/adopt/adopt_open.c -- the backend opened, a block adopted, and the
 ** module compiled.

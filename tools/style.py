@@ -42,7 +42,8 @@ DECLARES = re.compile(r'(?:\[\[[^\]]*\]\]\s*)*(?:(?:%s)\s+)*(?:%s)\b(?:\s+(?:%s|
                       r'(?:\)\s*\([^)]*\)\s*)?(?:\[[^\]]*\]\s*)*(?:=|,|\Z)'
                       % (QUALIFIER, ANY, BASE))
 HEADER = re.compile(r'/\*\n\*\* Copyright \(C\) \d{4} Heuretes-Workshop\n(?:\*\* Copyright \(C\) [^\n]+\n)*'
-                    r'\*\*\n\*\* This file is part of Bridge\.\n\*\*\n\*\* All rights reserved\.\n'
+                    r'\*\*\n\*\* This file is part of Bridge\.\n\*\*\n'
+                    r'\*\* Under the GNU Affero General Public License, version 3 only: see license\.\n'
                     r'\*\*\n\*\* (?P<path>\S+) -- [^\n]+\n(?:\*\*(?: [^\n]+)?\n)*\*/\n')
 ASSIGNS = re.compile(r'(?<![=!<>+\-*/%&|^])=(?!=)')
 

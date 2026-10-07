@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_bytes.h -- a value copied or made zero, and where a column
 ** and a toggled column's bits begin in a block.

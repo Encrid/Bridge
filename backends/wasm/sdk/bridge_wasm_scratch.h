@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/wasm/sdk/bridge_wasm_scratch.h -- the scratch arena: where a
 ** module puts what an entry of the ABI is handed.

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_weigh_ids.c -- what a direct-indexed
 ** component costs, what a tag saves, and what a singleton and a toggled

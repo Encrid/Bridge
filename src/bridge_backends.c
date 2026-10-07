@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/bridge_backends.c -- the backends of a deployment, opened one after
 ** another, and what all of them together need of a block they map.

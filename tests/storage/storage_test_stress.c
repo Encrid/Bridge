@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_stress.c -- the stress run: four modules at
 ** once, each in its own namespace, a hundred rounds of work and check,

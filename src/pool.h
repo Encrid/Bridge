@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/pool.h -- the threads a phase runs on: `threads - 1` workers kept for
 ** the deck's life, and the caller. Nothing here knows what a job is.

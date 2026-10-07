@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/native/native_inside.h -- the native backend: the seventeen
 ** entries of bridge_backend.h, over a shared library. What its files share.

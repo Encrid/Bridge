@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/schema_struct.c -- a struct read from its descriptor, a field at a
 ** time, and laid out as C lays it out.

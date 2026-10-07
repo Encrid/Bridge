@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/reference/flecs_ref_change.c -- a four-byte component given to, and
 ** taken from, an entity that carries four bytes or 4,096.

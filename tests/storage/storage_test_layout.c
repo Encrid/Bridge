@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_layout.c -- a module that states st:X one
 ** way, reloaded as a build that states it another: what is carried over,

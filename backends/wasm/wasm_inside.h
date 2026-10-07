@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/wasm/wasm_inside.h -- the wasm backend: the seventeen entries of
 ** bridge_backend.h, over wasmtime. What its files share.

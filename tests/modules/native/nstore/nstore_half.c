@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nstore/nstore_half.c -- the changes the plain build
 ** of nstore asks for of half of its entities.

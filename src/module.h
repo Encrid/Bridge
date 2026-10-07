@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/module.h -- the runtime lifecycle: what a load, an unload and a
 ** reload share. All three are legal only between phases.

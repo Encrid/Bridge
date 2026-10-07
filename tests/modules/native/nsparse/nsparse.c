@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nsparse/nsparse.c -- a component kept in a sparse
 ** set, beside one kept in a table. A is in a table and every entity carries

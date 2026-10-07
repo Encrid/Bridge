@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_nomemory_relay.c -- a reload into another
 ** component layout, with each allocation answered null in turn, and what

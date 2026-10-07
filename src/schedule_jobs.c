@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/schedule_jobs.c -- the jobs of one level of a phase: a module's
 ** systems that run in it, gathered into one list.

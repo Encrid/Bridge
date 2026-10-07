@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/keys_deployment.c -- a key of the deployment stated as what
 ** is refused: each a row, the key and the value it is given.

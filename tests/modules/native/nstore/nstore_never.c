@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nstore/nstore_never.c -- the systems of the plain
 ** build of nstore that are registered in a phase no host runs: they exist

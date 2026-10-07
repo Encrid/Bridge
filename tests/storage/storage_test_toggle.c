@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_toggle.c -- a toggled component through every
 ** change of its table, the same with no room for its bits, and a tag in

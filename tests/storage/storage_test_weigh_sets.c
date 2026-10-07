@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_weigh_sets.c -- what a sparse set costs, and
 ** what a toggle costs: the change, and the read.

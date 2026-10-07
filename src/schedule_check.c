@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/schedule_check.c -- what a schedule refuses: a system before itself,
 ** and two that conflict with nothing to order them.

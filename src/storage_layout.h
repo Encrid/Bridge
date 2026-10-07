@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_layout.h -- a table's block: its entity ids, then a column a
 ** type, each at a multiple of sixteen.

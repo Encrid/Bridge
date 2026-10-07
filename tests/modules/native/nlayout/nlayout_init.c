@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nlayout/nlayout_init.c -- one component, X, whose
 ** struct this build states: V says which. A module is loaded as V 0 and

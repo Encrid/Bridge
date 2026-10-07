@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nholder.c -- declares a struct with a field of
 ** st:vec_t, a type another module declares: its rows hold a vec_t as it is,

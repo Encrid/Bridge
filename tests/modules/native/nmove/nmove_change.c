@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nmove/nmove_change.c -- the systems of nmove that
 ** change who carries X: the spawn, the two detaches, and the toggle.

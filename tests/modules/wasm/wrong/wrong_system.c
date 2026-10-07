@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/wrong/wrong_system.c -- the wrong module: a system
 ** whose statement, phase or name is not in the scratch arena, that states

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/wasm/wasm_offered.c -- a function Bridge offers a module,
 ** as wasmtime calls it: with the arguments where the results go, each a raw

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** utils/os/posix/library.c -- a shared library on Linux and macOS: opened,
 ** looked into and closed.

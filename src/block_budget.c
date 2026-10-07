@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/block_budget.c -- a deployment's budget, checked key by key before any
 ** sum is made of it.

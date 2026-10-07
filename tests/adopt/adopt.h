@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/adopt/adopt.h -- one block, adopted by the wasm backend, backing a
 ** memory in two stores at once. This is the question stage 2 opens with:

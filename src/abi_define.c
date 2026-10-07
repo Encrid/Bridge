@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/abi_define.c -- the eight imports of the ABI, defined for a module's
 ** instance with the signature each is declared with.

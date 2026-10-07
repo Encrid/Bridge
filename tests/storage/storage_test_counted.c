@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_counted.c -- the allocator of the build that
 ** counts: the library is compiled with its calls to malloc, calloc, realloc

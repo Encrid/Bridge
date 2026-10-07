@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nstamp.c -- a system that attaches game:Marked, with
 ** VALUE in it, to every entity that has a position. Two of these in one

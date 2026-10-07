@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nstress/nstress_by_id.c -- the account nstress
 ** keeps, and every entity checked against it by its id.

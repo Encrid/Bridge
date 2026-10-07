@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/wasm/sdk/bridge_wasm_kept.h -- what is not kept in a table, and
 ** is reached from a row or by an id: a sparse set, a singleton, a

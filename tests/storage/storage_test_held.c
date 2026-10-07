@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_held.c -- what the process holds, asked of
 ** the operating system. The figures of the plan are taken on Windows, and

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/budget_reach.c -- budgets that no offset reaches, and counts
 ** that are used up by the first module.

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/config.h -- a module's own settings: one value of the component its
 ** author named, written after init by what each field is.

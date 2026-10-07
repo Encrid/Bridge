@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/reload_record.c -- the record of the instance a reload brings in,
 ** which takes over what was set aside for the module.

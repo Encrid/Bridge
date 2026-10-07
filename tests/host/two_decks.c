@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/two_decks.c -- more than one deck: two at once in one
 ** process, and three one after another that mint the same ids.

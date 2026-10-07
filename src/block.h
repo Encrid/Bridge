@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/block.h -- the shared block, the column region carved out of it, the
 ** log ring, and the barrier. Who keeps the rows is behind storage.h.

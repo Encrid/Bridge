@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/support/host_calls.c -- the calls a host makes, each said as it
 ** ended, and the sink that prints a record.

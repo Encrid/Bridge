@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/wasm/wasm_holder.c -- the module that holds an adopted block.
 ** wasmtime asks its creator only for a memory an instance defines, never

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_publish.c -- what a module reads, written at a barrier, and
 ** what was touched forgotten once every module has been written for.

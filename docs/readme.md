@@ -25,6 +25,7 @@ diagram to keep in step with. One concern per document, in reading order:
     contributing.md      how a decision is made, how a stage is run, where each rule is
     style.md             how the C is written: the rules, and the exceptions to them
     tests.md             what is exposed on the three seams, and the cases that show it
+    licence.md           what Bridge is under, what is built with it, and other terms
 
     refused/             what was weighed and not chosen, in the same tree as what was:
                          `refused/bridge/data/lifetime_refused.md` is the record of

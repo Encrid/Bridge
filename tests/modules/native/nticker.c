@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nticker.c -- ticker.c as a shared library. A process
 ** cannot hold two copies of one library, so a reload of this one shuts the

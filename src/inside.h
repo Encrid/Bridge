@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/inside.h -- Bridge's inside: what a deck, a module, a system
 ** and a declared type are. Nothing here crosses a seam.

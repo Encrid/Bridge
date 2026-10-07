@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_value.h -- where an entity has its value of a type, in
 ** whichever storage layout the type is kept; and a sparse set joined and

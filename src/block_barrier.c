@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/block_barrier.c -- the barrier: what happens between two phases, in
 ** an order that never varies.

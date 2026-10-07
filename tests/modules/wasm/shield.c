@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/shield.c -- a toggled component on the wasm backend:
 ** its bits found ahead of its column, read, and written.

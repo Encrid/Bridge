@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nsparse/nsparse_look.c -- the systems of nsparse
 ** that read S: by a walk of the set, and from the rows of the table.

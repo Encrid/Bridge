@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/reload_native.c -- a native module reloaded: the old
 ** instance is shut down before the new library is opened, so a reload that

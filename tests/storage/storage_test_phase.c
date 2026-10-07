@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_phase.c -- one phase and its barrier, named
 ** in the transcript, and the count of the allocator's calls that a phase

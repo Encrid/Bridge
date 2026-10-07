@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/reference/flecs_ref_reads.c -- read: a table's column; a sparse
 ** component alone; and the sparse one beside the column. A query's iterator

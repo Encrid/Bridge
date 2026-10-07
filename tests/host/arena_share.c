@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/arena_share.c -- a module with sixteen bytes of the arena,
 ** reloaded into one whose reload takes forty. Stating more gives it more;

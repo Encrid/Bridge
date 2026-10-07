@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/bridge_inside.h -- a deck made, stopped and run: what the files that
 ** do it share, and what the rest of the library asks of them.

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/bridge_backend.c -- one backend of a deployment: its library opened,
 ** and the backend started with its settings.

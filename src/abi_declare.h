@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/abi_declare.h -- a type declared by a module: what the files that
 ** check it, lay it out again at a reload and make it share.

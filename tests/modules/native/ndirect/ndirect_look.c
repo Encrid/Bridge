@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/ndirect/ndirect_look.c -- the system of ndirect that
 ** walks the table, and reaches D at each row by the entity's id.

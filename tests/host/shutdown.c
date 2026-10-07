@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/shutdown.c -- a module's last call, and the record a
 ** module takes of the budget while it is loaded.

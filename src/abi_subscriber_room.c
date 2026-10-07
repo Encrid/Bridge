@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/abi_subscriber_room.c -- the memory of a system or an observer:
 ** everything it needs is had before any of it is kept.

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/module_stated.c -- what a module's config states of itself:
 ** a log level, the size of its private memory, what it spawns.

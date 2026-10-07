@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/refs.c -- follows ids it kept, across two batches of
 ** destroys. Every destroy moves the last row into the hole, which no event

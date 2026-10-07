@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nstress/nstress_work.c -- the changes nstress asks
 ** for, drawn by a generator it seeds itself, and written into its account.

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/ntag/ntag_look.c -- what a module is handed for a
 ** tag in each storage layout, said in the log.

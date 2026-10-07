@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/ntoggle/ntoggle_look.c -- the systems of ntoggle
 ** that read the rows that are on: found a word of bits at a time, and by a

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** utils/os/posix/os_types.h -- what a thread, a mutex and an event are where
 ** there are POSIX threads: Linux and macOS.

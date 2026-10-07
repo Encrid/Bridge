@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/module_instance.c -- a module's image compiled and instantiated. A
 ** module is handed the memories it imports, and no other.

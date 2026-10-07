@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/tagged.c -- a tag, declared and attached by a wasm
 ** module, and a system that walks the entities that carry it.

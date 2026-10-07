@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/schema_value.c -- the value of a constant, and whether the integer an
 ** enum or a bitmask is can hold it.

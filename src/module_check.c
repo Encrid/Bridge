@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/module_check.c -- what can be decided from a config alone: everything
 ** a load and a reload both refuse before the artifact is touched.

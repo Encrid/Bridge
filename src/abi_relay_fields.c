@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/abi_relay_fields.c -- the fields of a struct as it was, matched by
 ** name to those of what it becomes.

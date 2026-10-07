@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_reach.h -- where storage keeps what it knows of a table, a
 ** sparse set and a direct-indexed component, and what a module reads of

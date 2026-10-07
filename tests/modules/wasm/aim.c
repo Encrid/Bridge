@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/aim.c -- a direct-indexed component on the wasm
 ** backend, reached from the rows of a table by each entity's id.

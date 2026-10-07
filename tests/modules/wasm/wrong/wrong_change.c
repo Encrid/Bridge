@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/wrong/wrong_change.c -- the wrong module: a change
 ** stated of a slot nobody declared or of what no grant lets it write, and

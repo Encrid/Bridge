@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/reference/flecs_ref.h -- the work `storage measure` and `storage
 ** weigh` time, done by flecs: the reference each storage layout is measured

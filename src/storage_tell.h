@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_tell.h -- an entity gone, and what each observer is owed for
 ** an entity, from what it carried and what it carries.

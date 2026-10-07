@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nfrag.h -- the components of nfrag.c: the value
 ** every entity carries, and what a marker holds. Built with TAGS, the

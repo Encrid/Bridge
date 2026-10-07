@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/module_pointed.c -- whether a row holds a string in a module's share
 ** of the persistent arena. A string a component keeps is a bridge_text_t

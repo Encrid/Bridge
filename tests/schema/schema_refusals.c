@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/schema/schema_refusals.c -- what a looser parser would take and
 ** this one does not, and what was never C; an enum with no integer stated,

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/reference/flecs_ref_markers.c -- what the process holds for 204,800
 ** entities with a four-byte value and six markers each of twelve, over

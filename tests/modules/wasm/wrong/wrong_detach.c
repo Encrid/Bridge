@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/wrong/wrong_detach.c -- the wrong module: a detach
 ** an entry refuses, and a tag attached with a value.

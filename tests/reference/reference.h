@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/reference/reference.h -- what the reference programs share: the
 ** clock a region is timed with, and the draw that puts ids in no order.

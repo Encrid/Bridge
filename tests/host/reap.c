@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/reap.c -- a module of another namespace that
 ** destroys what it finds: with a read grant it has no stake in the entity,

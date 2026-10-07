@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/wasm/wasm_adopted.c -- a block Bridge owns, as a memory
 ** of wasmtime's, and the engines, which are made with what answers wasmtime

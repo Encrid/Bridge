@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/native/native_instance.c -- an instance made and freed, and the
 ** three limits this backend keeps none of: it answered no to all three, so

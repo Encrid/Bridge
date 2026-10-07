@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/settings_refused.c -- a setting that does not fit the field
 ** it names: each is refused, and says which.

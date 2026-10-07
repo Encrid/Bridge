@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nsparse/nsparse_heard.c -- what the observers of
 ** nsparse hear, said in the log. A build for a measurement has none.

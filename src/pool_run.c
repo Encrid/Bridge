@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/pool_run.c -- one run of the pool: a batch of jobs shared between the
 ** workers and the caller.

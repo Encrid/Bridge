@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/mover.c -- writes game:Position. It owns the
 ** namespace, spawns the entities, and marks half of them.

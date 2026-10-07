@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/support/native_other_abi.c -- the native backend's answer to
 ** backend_get_abi, as a backend built for another backend seam would give

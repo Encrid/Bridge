@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/halver.c -- halves every game:Position.x, under a
 ** write grant, in the phase the mover adds to it.

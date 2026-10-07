@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nreaper.c -- a system that destroys every entity
 ** with a position, and says how many it found. Whether it may is the

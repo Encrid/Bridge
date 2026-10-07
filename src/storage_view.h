@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_view.h -- who is in a row, what a module is handed for a
 ** column, and a toggled row read and switched.

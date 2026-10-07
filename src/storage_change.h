@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_change.h -- a barrier's first step: each queued change folded
 ** into what its entity will carry, and nothing moved.

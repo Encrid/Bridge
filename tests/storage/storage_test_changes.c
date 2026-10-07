@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_changes.c -- the changes a module can ask
 ** for, in tables: one at a time, ten thousand tables, and the budgets of

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nholder.h -- the one component of nholder.c, and the
 ** type its field is of. That type, st:vec_t, is declared by the module

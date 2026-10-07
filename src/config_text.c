@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/config_text.c -- a setting written into a field that holds text, and
 ** the fields a setting cannot fill.

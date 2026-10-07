@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nforeign.c -- an entry reached from a thread the
 ** backend did not call on answers zero, and one reached on the thread it

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/wrong/wrong_declare_more.c -- the wrong module: a
 ** declaration with no policy, of another size than its descriptor, or made

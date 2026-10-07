@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_measure_tables.c -- what a barrier costs with
 ** ten thousand tables standing, and what making and emptying them costs.

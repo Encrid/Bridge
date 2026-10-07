@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/npinned.c -- three systems that each say which
 ** thread they were on. Loaded pinned, it must be one.

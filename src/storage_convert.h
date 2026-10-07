@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_convert.h -- a component's rows written again as another
 ** type, at a reload: what the two files that do it share.

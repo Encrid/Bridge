@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/changes_order.c -- two systems of one phase, in two
 ** modules, that attach one component to the same entities. Unordered, the

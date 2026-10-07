@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/support/windows/host_os.c -- what a host program asks the
 ** operating system itself, and nothing of ours: on Windows.

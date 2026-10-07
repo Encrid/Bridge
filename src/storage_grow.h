@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_grow.h -- a table given room for more rows: a longer block,
 ** and each column moved out to where the new room puts it.

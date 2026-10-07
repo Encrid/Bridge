@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nmove/nmove_init.c -- one component, X, kept the way
 ** this build states: KEPT is the number of the storage layout. A module is

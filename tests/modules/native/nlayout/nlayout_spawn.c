@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nlayout/nlayout_spawn.c -- the system of nlayout
 ** that gives X its values. The build whose V is 0 is the one a test loads

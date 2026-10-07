@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nmove/nmove_look.c -- the system of nmove that reads
 ** X as this build keeps it: who carries it, and what the values come to.

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_terms.c -- a system's terms, and an observer's, handed over
 ** at load and forgotten at unload.

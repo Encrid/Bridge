@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/refused_essential.c -- a module the deployment calls
 ** essential, refused before it exists: its on_error is a key of the config

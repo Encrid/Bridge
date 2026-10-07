@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/native/native_func.c -- functions in both directions: an entry
 ** of the ABI, kept, and a symbol of a module's library, found and called.

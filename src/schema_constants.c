@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/schema_constants.c -- an enum or a bitmask read from its descriptor:
 ** the integer it is, then its constants.

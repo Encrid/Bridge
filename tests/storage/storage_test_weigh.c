@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_weigh.c -- what keeping a component in tables
 ** costs where that is weakest: a change to an entity that carries a lot,

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_move.c -- a module that keeps st:X in one
 ** storage layout, reloaded as a build that keeps it in another. What

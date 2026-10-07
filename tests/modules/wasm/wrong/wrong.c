@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/wasm/wrong/wrong.c -- the wrong module: what it declares
 ** and registers before it does the one thing that is refused.

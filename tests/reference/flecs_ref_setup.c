@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/reference/flecs_ref_setup.c -- what the measures share to make a
 ** world ready, none of it timed: entities, their values, a query, and what

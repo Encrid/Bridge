@@ -151,9 +151,11 @@ the holder do. It is what `legacy/rust-components` said of its own.
 
 ### The line in every file
 
-**A line of words: "Licensed under the GNU Affero General Public License, version 3 only: see
-license."** Enkrid ruled it, over a recommendation of the registered identifier for these
-terms, which a program can read. It takes the place of "All rights reserved." in rule G1 of
+**A line of words: "Under the GNU Affero General Public License, version 3 only: see
+license."** Enkrid ruled words, over a recommendation of the registered identifier for these
+terms, which a program can read. The words first ruled began "Licensed under", and were 85
+columns in a comment where rule F3 of `style.md` allows 80; they were made one word shorter,
+at his word, and no rule was excepted. It takes the place of "All rights reserved." in rule G1 of
 `style.md`, in the expression of `tools/style.py` that holds the header, and in each file, so no
 file grows. The cost is that no tool outside this tree reads it.
 

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/storage/storage_test_baseline.c -- what tables cost at the work no
 ** storage layout was made for: a component switched off by a field, a

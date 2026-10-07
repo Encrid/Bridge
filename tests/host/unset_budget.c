@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/unset_budget.c -- keys of the deployment nobody stated: a
 ** deck is refused for each.

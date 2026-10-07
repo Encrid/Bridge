@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/spans.c -- a module's spans, outgrown at a barrier: they held
 ** what its queries matched when it was loaded, and do not hold what they

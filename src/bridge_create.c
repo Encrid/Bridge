@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/bridge_create.c -- a deck made of a deployment: its backends opened,
 ** its phases named, its threads started and its storage built.

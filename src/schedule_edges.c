@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/schedule_edges.c -- the systems of one phase, and what orders them:
 ** the deployment's pairs, and the order a module registered its own in.

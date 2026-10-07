@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nlayout/nlayout_values.c -- where the values of X
 ** are, in each of the storage layouts a build of nlayout may keep it in.

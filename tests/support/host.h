@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/support/host.h -- what the host program of the tests is built on.
 ** The program is a table of cases, and a case is a function handed the

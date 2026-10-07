@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/wasm/sdk/bridge_wasm_entity.h -- an entity: its id in a row, and
 ** a reference to it followed, which is arithmetic and not a call.

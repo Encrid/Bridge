@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_carried.h -- everything an entity carries: what its table
 ** holds, every sparse set it is in, and every direct-indexed component it

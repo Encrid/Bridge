@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/storage_convert.c -- the second half of a move: each entity placed
 ** once, its values taken before it leaves where they were and written

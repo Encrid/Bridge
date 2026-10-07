@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/main.c -- host <case>: the cases of the host program, by name.
 ** A case is named for what is exposed and what it shows of it, as

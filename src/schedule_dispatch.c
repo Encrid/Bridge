@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/schedule_dispatch.c -- one system run: its module told which one it
 ** is, the call made, and what the call answered kept.

@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/nsleep.c -- a system that takes a tenth of a second
 ** or more, and says which thread it was on, when it began and when it

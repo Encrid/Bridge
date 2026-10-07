@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** src/module_call.c -- a lifecycle export called, and a module's private
 ** memory, which is what the call is made with.

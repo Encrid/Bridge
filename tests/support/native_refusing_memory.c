@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/support/native_refusing_memory.c -- the native backend's entries
 ** about memory, as a backend that cannot adopt a block would answer them:

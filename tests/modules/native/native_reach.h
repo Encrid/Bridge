@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/native/native_reach.h -- what a native test module reads to
 ** reach an entity by its id and not by a walk: the index of the entities,

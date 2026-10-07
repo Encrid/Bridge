@@ -3,7 +3,7 @@
 **
 ** This file is part of Bridge.
 **
-** All rights reserved.
+** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** backends/native/native_abi.c -- the backend seam this backend was built
 ** for. It is a file of its own so that a test can link the backend with
