@@ -60,6 +60,7 @@ the manifest section, threading.
 
 Hot reload improves in one direction and gains a refusal. In the original Bridge a reloaded module loses
 its state; with storage in Bridge-ASM700's region **the data survives the swap**, which is what idTech3's
-`VM_Restart` was for too. A component layout change is caught by the fingerprint and refused by name rather
-than silently reinterpreted, and the refusal cannot be waived: starting a module over with its
-data gone is `unload` then `load`. See `lifetime.md`, *Lifetime*.
+`VM_Restart` was for too. A component layout change is caught by the fingerprint and never
+silently reinterpreted: its values are carried across where they can be, and what would be lost
+is refused unless the deployment accepted that loss by name. See `lifetime.md`, *When a component
+layout changed*.

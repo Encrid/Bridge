@@ -17,8 +17,9 @@ reintroduce the per-operation cost this design exists to remove.
 
 `column_base` is needed because a component sits at a different offset in every table, so the table
 alone is not enough. It is indexed by table and by the types *this* module declared, and it has a
-cell for every table there may be - `[budget] tables` - so that a table made at any barrier has
-its place: ten components at a thousand tables is forty kilobytes of the module's `spans`.
+row for every table there may be and for every sparse set, which is walked as a table is -
+`[budget] tables` and `sparse_sets` - so that a table made at any barrier has its place: ten
+components at a thousand tables is forty kilobytes of the module's `spans`.
 
 **The stale-id check falls out of it.** The generation is in the record, so refusing an id whose
 entity has died is one load and one compare.

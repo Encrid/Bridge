@@ -34,8 +34,9 @@ allocation policy.
 **Core wasm, not components, and not WIT.** The component model exists to describe and copy values
 across a language boundary. Under declare-at-init nothing is copied, so the canonical ABI has
 nothing to do - and it cannot express a memory import or export, which core modules can. WIT went
-with it: Bridge-ASM700 has no type system, only sizes, alignments and fingerprints, and the schema is a C
-header both sides compile. See `schema.md`.
+with it: a type here is what C lays out - a struct of fixed-width fields, an enum, a bitmask -
+with a size, an alignment and a fingerprint, and the schema is a C header both sides compile.
+See `schema.md`.
 
 **No call carries data at all.** Every function Bridge-ASM700 calls - `init`, `shutdown`, `reload`, a
 system, an observer - takes no arguments and returns an i32 status. Data has nowhere to travel
@@ -61,7 +62,7 @@ queued before the first is applied, systems fixed at load - and not for any prog
 **One ABI, eight entries, and every module gets all of it.**
 
     provides   init, shutdown, reload, and its systems and observers
-    gets       declare, system, observe
+    gets       declare, add_system, observe
                spawn, destroy, attach, detach, alloc
 
 **And nothing else - no module can call another.** Nothing asks; everything subscribes, which is

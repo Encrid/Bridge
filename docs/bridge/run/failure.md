@@ -50,7 +50,8 @@ beside whatever its systems did - `budgets.md`, *What running out does*.
 stops the bridge too, because the reason does not change with the frame number: the deployment
 called it essential, and nothing else here would notice it gone - no module calls another, so none
 gets an error back. The key is `on_error`, and a reader who wrote `fail` expects it to mean every
-error that takes the module away. `bridge_list_modules` says which module it was.
+error that takes the module away. The record that says the bridge has stopped names the
+module, and `bridge_list_modules` shows it stopped.
 
 ## Out of memory
 
@@ -73,9 +74,9 @@ unload may go without is remembering where a module's settings text was, so that
 writes there again: without it that load takes fresh room, and a record says so.
 
 **It is held by answering every allocation null in turn.** `tests/storage` is built against a
-library whose calls to the allocator are counted - *Nothing is allocated in a phase* has the same
-build - and the case `allocation-each-refused-in-turn` makes a bridge, loads a module, runs it,
-reloads it, unloads it and destroys the bridge, once for each of the four hundred and some
+library whose calls to the allocator are counted - `budgets.md`, *Nothing is allocated in a phase*,
+has the same build - and the case `allocation-each-refused-in-turn` makes a bridge, loads a module,
+runs it, reloads it, unloads it and destroys the bridge, once for each of the three hundred and some
 allocations all of that makes, with that one answered null. Each time, something is refused, a
 record says "out of memory", and nothing is written through a null pointer.
 

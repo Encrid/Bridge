@@ -76,7 +76,7 @@ a DLL, which is the same thing whichever compiler wrote it, and zig's linker rea
 ## The standard
 
 **Each piece at its own.** wasmtime's headers are C11. Everything of Bridge-ASM700's own is C23:
-the source, the tests, the test modules and all five headers.
+the source, the tests, the test modules and every header.
 
     backends/wasm/wasmtime        C11    read by backends/wasm and nothing else
     everything else               C23
@@ -116,7 +116,7 @@ claim that can be false. One spelling of C23 is not used: a function that takes 
 `f(void)`, as `style.md` rule F5 asks, and not `f()`.
 
 **Not used, each for a reason.** `<stdbit.h>` is the C library's, and with this compiler none of the
-four targets has it, the three platforms and wasm. `_BitInt`, `#embed` and `char8_t` have nothing
+targets has it, the six of `build.py` and wasm. `_BitInt`, `#embed` and `char8_t` have nothing
 here to do.
 
 **No variable is a thread's own.** `thread_local` is C23's and is not used: nothing in the
@@ -149,9 +149,9 @@ Linux a process has one C library, and a module built against another will not l
 macOS the system's is the only supported way to reach the kernel. On Windows the build links
 the C runtime zig carries.
 
-**What our source calls of it is eighteen functions**, counted in the library and the two
-backends: four that allocate, `memcpy`, `memmove`, `memset`, `memcmp`, `memchr`, `strlen`,
-`strcmp`, `strncmp`, `strchr`, `strpbrk`, `snprintf`, `vsnprintf`, `strtoll` and `strtoull`.
+**What our source calls of it is sixteen functions**, counted in the library and the two
+backends: four that allocate, `memcpy`, `memmove`, `memset`, `memcmp`, `strlen`, `strcmp`,
+`strncmp`, `strchr`, `snprintf`, `vsnprintf`, `strtoll` and `strtoull`.
 No file, no stream, no `printf`, no floating point, no `qsort`. Each is listed as a dependency:
 `dependencies.md`, *The C library*.
 

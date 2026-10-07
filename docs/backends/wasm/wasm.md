@@ -44,7 +44,8 @@ there is no WASI alongside and nothing to disambiguate from. The memories are fi
 `shared` and `private`, because the memory layout and the function semantics are one contract:
 change how a span is laid out and `declare`'s meaning changes with it.
 
-`bridge_wasm.h` declares the imports, so declaration is static before it is dynamic: `declare` at
+`bridge_wasm.h`, through the headers of its folder, declares the imports, so declaration is
+static before it is dynamic: `declare` at
 init discovers nothing, it binds names to what the binary already expects.
 
 ### A compiled module reaches them through accessors
@@ -61,8 +62,8 @@ before this was written down.
 
 **A module is compiled with `BRIDGE_ROWS_CHECKED` or with `BRIDGE_ROWS_UNCHECKED`.** The file holds
 the accessor that finds a row twice, with and without the test that the row is one of the span's,
-and `bridge_wasm.h` takes the one stated and refuses to compile with neither. What the test is
-for and what it costs is `validation.md`, *The row test*.
+and the SDK takes the one stated, and refuses to compile with neither or with both. What the
+test is for and what it costs is `validation.md`, *The row test*.
 
 **The build then strips them.** The merge leaves every accessor exported, so the build removes the
 exports by their common prefix, `acc_`, and with them the bodies nothing calls any more:
@@ -139,10 +140,10 @@ member named `pad`, so that every offset is one the header states and asserts. I
 whoever writes the struct writes zero, and nobody reads it. There are three, in a term, in an
 observer's record and in a log record.
 
-**An enum has the width of where it goes.** One that is an argument of an entry is four bytes, as
-every argument that is not an id is: `kind`, `on_unload`, `storage`, `events`. One that is a member
-of a struct is one byte, which holds every value these have: a term's access and operator, a log
-record's level.
+**An enum has the width of where it goes.** One that is a member of what an entry is handed is
+four bytes, as every such value that is not an id is: `kind`, `on_unload`, `storage`, `events`.
+One that is a member of a term is one byte, which holds every value these have: its access and
+its operator.
 
 **One header, `bridge_abi.h`, compiled by Bridge-ASM700 and by every module, on either backend.** Nothing
 re-derives anything, so there is nothing to disagree about - the same argument that made the schema
@@ -161,9 +162,9 @@ provide - `readme.md`, *Three layers, three seams*. Neither is built: `host_api.
 for a language that is not C*.
 
 **The native backend's `bridge_api_t` is not in it.** A struct of C function pointers has nothing a
-wasm module could derive, since it gets imports rather than pointers. It lives in
-`bridge_native.h`, which only a native module and the native backend compile - `native.md`, *What
-the backend provides*.
+wasm module could derive, since it gets imports rather than pointers. It lives in the native
+SDK, `bridge_native.h` and what that brings in, which only a native module and the native backend
+compile - `native.md`, *What the backend provides*.
 
 ### It holds no content
 

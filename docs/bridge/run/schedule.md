@@ -179,8 +179,8 @@ author, who wrote both registrations in some order and meant it - so that order 
 for a deployment to state. `[order]` may still say otherwise, since it can name any system.
 
 An `[order]` pair is not required to name anything loaded: a deployment orders modules it may or
-may not load. Pairs that contradict each other are refused at create, and a module whose own order
-contradicts them is refused at load.
+may not load. Pairs that contradict each other are refused at create. Where a pair says the
+reverse of the order a module registered two of its systems in, the pair stands.
 
 ## What a phase shows you
 

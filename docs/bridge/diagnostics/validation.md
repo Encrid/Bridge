@@ -18,7 +18,8 @@ written are the list and the rest are cleared - from data the scheduler keeps an
 
 **The culprit is the system that was running.** Conflicting systems never run at once, so at any
 instant one system can be writing a given component, and Bridge-ASM700 dispatched it. One store per
-dispatch, into the log - the `system` field of its record.
+dispatch, into the header of the module's private memory, and every line the module then writes
+carries it: the `system` field of its record.
 
 **The barrier is a validation point.** Nothing runs during one, so what is checked there is checked
 against a world that is not moving. idTech3 validated at its protocol boundary, always on

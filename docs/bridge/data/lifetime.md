@@ -177,9 +177,9 @@ list is not left where it is from one reload to the next, and a load, which lose
 states none. It is a list and not a yes or no because the rule is for the rename: a yes would
 let that through.
 
-**A removal is the author's, and that is why it migrates.** This document said that
-Bridge-ASM700 never discards data on a call that means "keep running", and refused every change
-for it. The rule stands for what Bridge-ASM700 would drop on its own account. A field the new
+**A removal is the author's, and that is why it migrates.** Bridge-ASM700 never discards data
+on a call that means "keep running", and that rule is for what Bridge-ASM700 would drop on its own
+account. A field the new
 struct no longer has was dropped by whoever edited the struct; refusing the reload does not keep
 the field, it keeps the author from running the code they wrote. What they are owed is to be told
 exactly what went, which the record does.

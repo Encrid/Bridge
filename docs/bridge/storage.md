@@ -291,15 +291,16 @@ tables behind it.
 
 ## What a barrier writes for a module
 
-A module reads three things storage writes into its private memory: its spans, its `column_base`,
-and its observers' lists - `memory.md`, *Where the regions live*. **Only what changed is
+A module reads four things storage writes into its private memory: its spans, its `column_base`,
+its observers' lists, and where each type that is not kept in a table is reached - `memory.md`,
+*Where the regions live*. **Only what changed is
 written.** Storage keeps a list of the tables touched since it last wrote: grown, moved, gained or
 lost a row, made or released. For each module:
 
     column_base    the cells of the touched tables
     a span         rewritten where it is, if its table was touched
-    a query's      rewritten whole, with every query's after it, when the set of tables the
-    spans          query matches changed: they sit one after another
+    a query's      rewritten whole, with every other query's of the module, when the set of
+    spans          tables one of them matches changed: they sit one after another
     an observer's  when it has something, or had something last time
     list
 
@@ -333,7 +334,8 @@ that writes a term it has is doing what it is for - `data.md`, *Access mode*.
 Carved to what a table asks for, to sixteen bytes, so that every block begins where a column may -
 *A table*. A freed range is a gap, kept in order and joined to its neighbours, and a request takes
 the smallest gap that holds it before fresh space. What says which ranges are free is kept outside
-the block: a list as long as there may be tables, made with the bridge, which never grows.
+the block: a list with a place for a gap beside every block there may be, a table's, a sparse
+set's and the one of each type kept apart, made with the bridge, which never grows.
 
 **Nothing is ever taken from outside it.** A request the region cannot meet is refused, and the
 barrier's second step is where that is found out, before anything has moved.

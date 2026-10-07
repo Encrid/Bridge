@@ -70,7 +70,7 @@ text fits, and takes from its new share only when it does not.
 ## It is given back when nothing points into it
 
 **While a module is loaded, nothing frees what it allocated.** There is no `mark` and no `reset`,
-and the ABI stays at eight. Every allocator we looked at has them - `zone.c:444`,
+and the ABI stays at eight. Every allocator we looked at has them - idTech3's `zone.c:444` and
 `common.c:1576`, flecs' `flecs_stack_restore_cursor`, Source's `FreeToAllocPoint` - and in all
 four **the region being reset has a single owner**, who knows nobody else holds a pointer into
 it. A module does not know that: a string lives in a component another module may read under a
@@ -101,9 +101,7 @@ one this holds, and that one is what the record is there to show.
 
 **What it buys.** Loading and unloading modules can go on for as long as a deployment runs:
 `tests/host`, case `bridge_unload-two-hundred-rounds`, does two hundred cycles in an arena with room
-for one share. It could not, once: the arena was a high-water mark for the life of the process, and
-unbounded churn meant restarting. That was decided before a module's share was its own and before
-text was a type the library could see, and it was not read again when both became true.
+for one share.
 
 The discipline while a module runs is still idTech3's: allocation for a lifetime, with no
 per-object bookkeeping. The lifetime is the module's, where theirs was a level's.

@@ -7,12 +7,13 @@ lifecycle*.
 storage and the schedule, which is what a barrier makes safe. A native module holding the
 pointer could break this; nothing contains native code, so it is a contract rather than a guarantee.
 
-**`load`** takes an artifact rather than a path, because Bridge-ASM700 decides on `cfg` and never finds
-or reads a module's file. In order: find the backend the artifact names, check the ABI version,
-check `trusted` against what that backend says it runs, check the grants, take one of `[budget] modules`,
+**`load`** takes an artifact rather than a path, because Bridge-ASM700 decides on `cfg` and never
+finds or reads a module's file. In order: find the backend the artifact names, check the ABI
+version, check `trusted` against what that backend says it runs, take one of `[budget] modules`,
 hand `bytes` and `path` to the backend, call `init` - which calls `declare`, `add_system` and
-`observe` - recompute the conflict graph and **refuse-and-unwind if a new system or observer
-conflicts unordered with an existing one**, then publish spans.
+`observe`, each held to the module's grants as it arrives - recompute the conflict graph and
+**refuse-and-unwind if a new system or observer conflicts unordered with an existing one**, then
+publish spans.
 
 **Every module loads through a backend, and the steps are the same on each.** An artifact naming a
 backend the deployment did not configure is refused by name.
@@ -41,9 +42,9 @@ has no dangling anything to chase.
 
 **`reload`** takes an artifact too, because a rebuilt module may carry a changed manifest - and
 that is also how a setting changes: hand over the new `cfg`. **Storage survives, which is the entire
-point, and it is the one outcome nothing else here produces.** The fingerprint decides whether it
-can: a changed struct body hashes differently and is refused by name, shared or exclusive alike -
-`lifetime.md`, *When a component layout changed*.
+point, and it is the one outcome nothing else here produces.** A component whose layout changed
+is laid out again and its values carried across, and what would be lost by it is refused unless
+the deployment accepted that loss by name - `lifetime.md`, *When a component layout changed*.
 
 **A reload is the new instance's `reload`, and then the old one's `shutdown`.** In order: the
 checks a load makes, and that the deployment allows it; a new image,
@@ -68,8 +69,8 @@ it. The original Bridge marks a module whose reload failed as failed rather than
 operator, for the reason that holds here: what failed was the new artifact, and a better one must be
 able to follow.
 
-That is `lifetime.md`, *When a component layout changed*, applied here: Bridge-ASM700 never discards
-data on a call that means "keep running", and `bridge_reload` is such a call.
+That is `lifetime.md`, *When a component layout changed*, applied here: Bridge-ASM700 discards no
+data of its own accord on a call that means "keep running", and `bridge_reload` is such a call.
 
 **What a reload may change is what is the instance's.** The work limit, the memory limit, timeouts,
 the log level and the three sizes of the private memory all arrive with the new `cfg`, as do

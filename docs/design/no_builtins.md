@@ -3,8 +3,8 @@
 The original Bridge shipped `log`, `ctl`, `config` and `profile` as interfaces it implemented itself
 - what its own measurements call the "built-in host call", 500 ns. Bridge-ASM700 has none. The rule
 is **no builtin surface**: nothing a module imports, no component Bridge-ASM700 declares, and **no
-name Bridge-ASM700 invents for a deployment's own structure**. It still takes config as structs,
-drains log rings and keeps a clock for its own records; none of that is reachable from a module.
+name Bridge-ASM700 invents for a deployment's own structure**. It still takes config as structs
+and drains log rings; none of that is reachable from a module.
 
 The last clause is about structure, not the calling convention. `init`, `shutdown` and `reload`
 **are** three names Bridge-ASM700 chose, and they stay: something has to be called first, and no

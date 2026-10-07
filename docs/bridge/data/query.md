@@ -5,8 +5,8 @@ query*.
 
 You do not get storage. You get your query's results, which is how an ECS is used:
 
-    declare(...)   registers a component type
-    system(...)    registers a query, a function and a phase together, and gets a slot
+    declare(...)      registers a component type
+    add_system(...)   registers a query, a function and a phase together, and gets a slot
 
 At each barrier Bridge-ASM700 writes, into the module's private memory, a span for every table its
 query matches. Nothing else reads that memory; see `wasm.md`, *Memories*. One span for each table
@@ -58,7 +58,7 @@ a term on another entity, and pairs, which inheritance is made of, are refused.
 
 ## What a query may not ask for
 
-**Two components that are kept in different storage layouts, both required.** A system walks
+**Two components that are walked in different ways, both required.** A system walks
 tables, or one sparse set alone, and a term of what is kept elsewhere is stated optional and
 reached from the row - `storage.md`, *What a query walks*. Anything else is refused at `add_system`,
 naming the term.

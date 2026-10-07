@@ -37,9 +37,9 @@ fit is refused - `storage.md`, *Direct-indexed*.
 **`tables` is a count of what exists, not of what was ever seen.** A table lives while it has rows
 - `storage.md`, *A table* - so the number to state is how many different archetypes
 entities carry at one time. It sizes everything storage keeps a table, and one more thing that
-is a module's: `column_base` has a cell for each of the module's components in every table there
-may be, inside its `spans`. A module whose `spans` cannot hold that is refused at load, by the
-arithmetic, and not stopped at whichever barrier made one table too many.
+is a module's: `column_base` has a cell for each of the module's components in every table there may
+be, and in every sparse set, inside its `spans`. A module whose `spans` cannot hold that is refused
+at load, by the arithmetic, and not stopped at whichever barrier made one table too many.
 
 **`types` and `systems` are counts of what is there at once, across every module.** A type two
 modules declare is one. **A reload needs no room for a module's systems twice.** The old instance's
@@ -111,10 +111,10 @@ failing if the count moved: cases `allocation-changes`, `allocation-tables`, `al
 a record for the module, for each of its systems and types, and the rooms above. None is the
 hot path. What happens when one of those allocations fails is `failure.md`, *Out of memory*.
 
-**One thing among them has no bound.** The place of an unloaded module's settings text is
-remembered for its next load, where its share of the arena stayed, and the list of those places
-grows by one for every different module so unloaded and is never shortened. A bridge has to
-unload a great many different modules, each leaving a string behind, for that to matter.
+**One thing among them is bounded by the arena, and by no count.** The place of an unloaded
+module's settings text is remembered for its next load, for as long as its share of the arena
+stays: the list of those places grows by one for each module so unloaded, and loses the entry
+when the share is given back. Each entry is a share still held, so `persistent` bounds them.
 
 Because modules come and go, `modules` bounds **how many module records exist at once**, not
 how the private memory is divided. A record is taken at load and freed at unload, and exhaustion refuses the
@@ -206,7 +206,8 @@ exists to refuse.
 
 **One floor has an argument and the rest do not.** A `log_ring` must hold at least one record: a
 module that cannot report anything is the one legal number that produces an incoherent deployment -
-`log.md`, *The log*, for why. `work_limit` and `memory_limit` have floors too, but they are measurements
-rather than arguments: a number for either becomes knowable where a module is run under it.
+`log.md`, *The log*, for why. `work_limit` and `memory_limit` have no floor: what is too little
+for a module is a measurement and no argument, and the number becomes knowable where the module
+is run under it.
 
 No budget has a floor that is storage's own: nothing of it is in the block before a module asks.

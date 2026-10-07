@@ -58,8 +58,8 @@ text is the one thing put in scratch that stays until the barrier, since it is r
 `log.md`, *The log*. `tests/host`, case
 `bridge_lend-scratch-given-back`, attaches eight kilobytes of values through 512 bytes of scratch.
 
-What the second copy costs was measured, since it was called a cost on the native backend: an
-attach with a value of four bytes put through scratch took 19.9 ns against 19.6 to 20.0 without.
+What the second copy costs was measured on the native backend, where a call pays for nothing
+else: an attach with a value of four bytes put through scratch took 19.9 ns against 19.6 to 20.0 without.
 
 **`attach` carries the initial value.** `ptr` says where it is, and it is as long as the type was
 declared: Bridge-ASM700 takes a copy of that many bytes at the call, bounds-checking them the way
@@ -95,9 +95,9 @@ on it because there is nothing left for a call to do.
 type, so it rides on the query term - `data.md`, *Access mode*. Two modules declaring
 `game:Position` must agree on its component layout and need not agree on how they touch it.
 
-**No `find`.** `declare` is idempotent - the first caller creates a component and later callers get
-the same slot - and both sides already have `sizeof` from the schema header, so a second call has
-nothing to do.
+**No `find`.** `declare` is idempotent - the first module to declare a component creates it, and a
+later one is answered a slot of its own for the same component - and both sides already have
+`sizeof` from the schema header, so a second call has nothing to do.
 
 **`observe` is the other half of the same thing**: a system subscribes to a shape, an observer
 subscribes to a change - `data.md`, *Observers*. `events` is a mask of `ON_ENTER`, `ON_ATTACH` and
