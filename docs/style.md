@@ -677,4 +677,6 @@ The path may hold `*`, and may end in `:` and a function's name when one functio
 excepted. A reason that needs more lines continues on lines indented further. An exception that
 excuses nothing is reported, so that none outlives what it was for.
 
-None.
+    F5  backends/wasm/wasm_adopted.c:make_memory  its signature is wasmtime's: it is what
+        `wasmtime_new_memory_callback_t` states, seven arguments, and wasmtime has no other
+        way to be answered for a memory an instance defines

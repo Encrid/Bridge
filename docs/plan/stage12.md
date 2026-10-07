@@ -589,6 +589,10 @@ native backend, which every call from a native module goes through, is `static i
 `native_inside.h`, as decision 4 has it for what runs in a phase; the call columns of `storage
 measure` are where the cut of the ABI left them.
 
-**Open.** `make_memory` in `backends/wasm/wasm_adopted.c` takes seven arguments. Its signature is
-wasmtime's, `wasmtime_new_memory_callback_t`, and wasmtime has no other way to be answered for a
-memory, so there is nothing of ours to reshape. `backends/wasm` is not held until that is decided.
+**The one exception.** `make_memory` in `backends/wasm/wasm_adopted.c` takes seven arguments. Its
+signature is wasmtime's, `wasmtime_new_memory_callback_t`, and wasmtime has no other way to be
+answered for a memory, so there is nothing of ours to reshape. It is the first entry of
+`style.md`, *Exceptions*, named with its function and its reason, and `backends/wasm` is held.
+Refused: rewording F5 for any function handed to a library, since the checker cannot tell which
+those are and the list would only be hidden; and a seven-argument shim in the `wasmtime` folder,
+which O1 excuses, since that is our code where nothing checks it.

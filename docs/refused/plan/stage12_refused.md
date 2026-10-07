@@ -131,3 +131,17 @@ would say again what the name says. The condition that brings it back is a reade
 
 Refused: no function bound to have one. Nothing is held, and the functions another file calls
 are the ones read without their body. No condition brings it back.
+
+## A callback whose signature is a library's
+
+Of `stage12.md`, *The refactor, as it goes*. `make_memory` takes the seven arguments wasmtime
+calls it with, and is the one exception `style.md` lists.
+
+Refused: F5 reworded, so that a function handed to a library we do not own has that library's
+signature. The checker reads text and cannot tell which functions those are, so it would need a
+list all the same, and the list would be out of the document that states the rules. The
+condition that brings it back is a second library whose callbacks are many.
+
+Refused: a shim of seven arguments in `backends/wasm/wasmtime`, calling a function of ours of
+four. O1 excuses that folder because somebody else built what is in it, and this would be ours.
+No condition brings it back.
