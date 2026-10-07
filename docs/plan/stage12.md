@@ -644,3 +644,25 @@ a nap, the thread's id, the time, is `static inline` functions in `nplatform.h` 
 The transcript `tests/storage_layout.txt` changed in four lines, for the same reason as the one
 regex above and nothing else: `st:Mode` is `st:switch_t`, since `mode_t` is POSIX's, with its
 constants `ON` and `AUTO`, and `st:Vec` is `st:vec_t`.
+
+**The larger native test modules** are to the style, and each is a directory: `nstore`, `ndirect`,
+`ntoggle`, `nsparse`, `nstress`, `nweigh`, `nsingle`, `ntag`, 56 files where there were eight.
+No transcript changed, and the exports and the texts of all 31 builds of them are the same sets
+as before. These are the modules `storage measure`, `storage weigh` and `storage baseline` time,
+and cutting them showed three things about a loop of a few instructions:
+
+    a variable of another file      on windows-gnu it is read through `.refptr`, hidden
+                                    visibility or not. What a timed loop reads is defined in the
+                                    file that holds the loop
+    a helper that returns a sum     compiled to other instructions than the loop it was cut from,
+    it started from zero            23% slower in `nweigh`. It is handed the running total and
+                                    answers it
+    where the linker puts the loop  with the same instructions, a function ahead of the loop
+                                    three bytes longer moved a figure from 5.8 to 12 us. The 23
+                                    functions whose loops are timed are `NATIVE_MEASURED`, which
+                                    is `[[gnu::aligned(64)]]`: each begins on a cache line
+
+Beside the tree before the stage, four rounds: the row walks are where they were or faster, and
+one figure of a module's own loop moved both ways. A toggle found a word at a time is 67 to 52 us
+with one row in two on, and 8.6 to 9.2 us with one in sixteen: the mask of the last word compiles
+to two branches where it was two conditional moves. The second is with the open lines above.

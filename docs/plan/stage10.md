@@ -161,7 +161,7 @@ question is put again with the figures.
 
 ## What flecs does, pinned
 
-`tests/storage.c` drives a native module, `tests/modules/native/nstore.c`, that makes one kind of
+`tests/storage.c` drives a native module, `tests/modules/native/nstore`, that makes one kind of
 change in a phase of its own and says what a system and an observer then see. The host prints
 it. What it prints is kept in `tests/storage_changes.txt` and `tests/storage_tables.txt`, and
 the two cases pass only by saying the same, word for word. Nothing in a transcript depends on

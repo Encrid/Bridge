@@ -18,6 +18,7 @@
 */
 
 #include "bridge_native.h"
+#include "native/native_measured.h"
 #include "native_idle.h"
 #include "nfrag.h"
 
@@ -69,7 +70,7 @@ BRIDGE_NATIVE(fill)
 ** Reads the value of every row, and says once a call what was read and
 ** over how many spans.
 */
-BRIDGE_NATIVE(sum)
+NATIVE_MEASURED BRIDGE_NATIVE(sum)
 {
     const bridge_query_t *q = bridge_native_get_query(api, reading);
     bridge_line_t line = { "rows, spans", 11, 0, q->spans };
