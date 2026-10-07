@@ -40,7 +40,7 @@ int main()
 {
     uint64_t *near = malloc(ROWS * 8), *far = malloc(ROWS * 8), a = 0, b = 0, t;
     uint32_t state = 2463534242u;
-    volatile uint32_t sink = 0;
+    [[maybe_unused]] volatile uint32_t sink = 0;
     index_ = malloc((ROWS + 1) * sizeof *index_);
     cells = malloc((ROWS + 1) * 4);
     given = malloc((ROWS / 64 + 2) * 8);
@@ -68,6 +68,5 @@ int main()
     }
     printf("a C array by entity: %u values reached by id, in the order they lie %6.3f ns each, in no "
         "order %6.3f ns each\n", ROWS, (double)a / ROWS, (double)b / ROWS);
-    (void)sink;
     return 0;
 }

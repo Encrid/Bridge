@@ -20,9 +20,9 @@ BRIDGE_EXPORT(check) int check()
 {
     uint32_t i, right = 0, wrong = 0;
     for (i = 0; i < ENTITIES; i ++) {
-        uint32_t at = bridge_get_ref(ids[i], position, sizeof(Position));
+        uint32_t at = bridge_get_ref(ids[i], position, sizeof(position_t));
         int dead = i % 3 < round && i % 3 < 2;
-        if (dead ? at == 0 : at && BRIDGE_GET(Position, x, at) == (float)i) right ++;
+        if (dead ? at == 0 : at && BRIDGE_GET(position_t, x, at) == (float)i) right ++;
         else wrong ++;
     }
     BRIDGE_LOG(BRIDGE_LOG_INFO, "mirror", right, wrong);
@@ -32,11 +32,11 @@ BRIDGE_EXPORT(check) int check()
 BRIDGE_EXPORT(init) int init()
 {
     uint32_t i;
-    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE, BRIDGE_TABLE);
+    position = BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_DELETE, BRIDGE_TABLE);
     BRIDGE_ADD_SYSTEM("cull", "update", nullptr, 0, nullptr, 0);
     BRIDGE_ADD_SYSTEM("check", "present", nullptr, 0, nullptr, 0);
     for (i = 0; i < ENTITIES; i ++) {
-        Position p = { (float)i, 0.0f };
+        position_t p = { (float)i, 0.0f };
         ids[i] = bridge_spawn();
         BRIDGE_ATTACH(ids[i], position, p);
     }

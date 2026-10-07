@@ -5,7 +5,7 @@
 
 BRIDGE_EXPORT(init) int init()
 {
-    BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE, (enum bridge_storage)KEPT);
+    BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_DELETE, (enum bridge_storage)KEPT);
     return 0;
 }
 

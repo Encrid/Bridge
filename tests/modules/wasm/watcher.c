@@ -9,10 +9,10 @@ BRIDGE_EXPORT(seen) int seen()
     uint32_t count = bridge_count_triggers(seeing), i;
     for (i = 0; i < count; i ++) {
         uint32_t trigger = bridge_get_trigger(seeing, i);
-        uint32_t at = bridge_get_ref(bridge_get_trigger_id(trigger), marked, sizeof(Marked));
+        uint32_t at = bridge_get_ref(bridge_get_trigger_id(trigger), marked, sizeof(marked_t));
         /* the value the other module attached, followed from the id */
         BRIDGE_LOG(BRIDGE_LOG_INFO, "seen", bridge_get_trigger_events(trigger),
-                   at ? BRIDGE_GET(Marked, by, at) : 0xdead);
+                   at ? BRIDGE_GET(marked_t, by, at) : 0xdead);
     }
     return 0;
 }
@@ -20,7 +20,7 @@ BRIDGE_EXPORT(seen) int seen()
 BRIDGE_EXPORT(init) int init()
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
-    marked = BRIDGE_COMPONENT("game:Marked", Marked, BRIDGE_STRIP, BRIDGE_TABLE);
+    marked = BRIDGE_COMPONENT("game:Marked", marked_t, BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = marked;
     seeing = BRIDGE_OBSERVER("seen", BRIDGE_ON_ENTER, terms, 1, nullptr, 0);
     return 0;

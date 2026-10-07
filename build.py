@@ -245,10 +245,12 @@ def build(target, debug, out):
     # how a module is written is its backend's: each backend's binding sits beside the backend
     sdk = {b: '-I%s' % (ROOT / 'backends' / b / 'sdk') for b in ('wasm', 'native')}
     headers = [Path(__file__)] + [h for d in ('include', 'src', 'tests', 'tests/modules',
+                                              'tests/modules/native', 'tests/modules/wasm',
+                                              'tests/modules/native/*', 'tests/modules/wasm/*',
                                               'backends/wasm', 'backends/wasm/sdk',
                                               'backends/native', 'backends/native/sdk',
                                               'utils/os', 'utils/os/' + row['os'])
-                                  for h in (ROOT / d).glob('*.h')]
+                                  for h in ROOT.glob(d + '/*.h')]
 
     # ---- objects ----
     defines = ['-D%s="%s"' % (key, path.as_posix()) for key, path in
@@ -294,8 +296,11 @@ def build(target, debug, out):
                  for name in OS]
     counted_test_o = compile_('storage-counted-test', ROOT / 'tests/storage.c',
                               ours + [include, src, utils] + defines + ['-DCOUNTED'])
-    module_o = {name: compile_(name, ROOT / 'tests/modules/native' / (source + '.c'),
-                               ours + [include, sdk['native']] + ['-D' + d for d in flags])
+    shared = '-I%s' % (ROOT / 'tests/modules')
+    module_o = {name: [compile_(name + '-' + c.stem if c.stem != source else name, c,
+                                ours + [include, sdk['native'], shared, '-fvisibility=hidden'] +
+                                ['-D' + d for d in flags])
+                       for c in sources(ROOT / 'tests/modules/native', source, 'nidle')]
                 for name, source, flags in NATIVE}
     together(compiles)
 
@@ -318,7 +323,7 @@ def build(target, debug, out):
     # the same backend, saying it is of another backend seam: for the case that refuses it
     link('backends/bridge_native_other', native_other_o, system, shared=True)
     for name, _, _ in NATIVE:
-        link(name, [module_o[name]], shared=True)
+        link(name, module_o[name], shared=True)
     link('adopt', [adopt_o, obj / 'backend.o'] + os_o, system)
     link('schema', [schema_test_o] + [obj / (name + '.o') for name in ['schema'] + SCHEMA], system)
     whole = bridge_o + os_o
@@ -351,18 +356,29 @@ def build(target, debug, out):
     compiled = []
     for name, source, kind, flags in WASM:
         raw, merged, final = (modules / (name + s) for s in ('.raw.wasm', '.merged.wasm', '.wasm'))
-        c = ROOT / 'tests/modules/wasm' / (source + '.c')
-        compiled.append(('building module %s' % name, [final], [c, acc] + headers, [
+        c = sources(ROOT / 'tests/modules/wasm', source, 'idle')
+        compiled.append(('building module %s' % name, [final], c + [acc] + headers, [
             [zig, 'cc', '-target', 'wasm32-freestanding', '-std=c23', '-pedantic-errors', '-Wall',
              '-Wextra', '-Werror', '-Wno-missing-field-initializers', '-O2', '-nostdlib'] +
             ['-D' + d for d in flags + ['BRIDGE_ROWS_' + kind.upper()]] +
-            [include, sdk['wasm'], '-Wl,--no-entry', '-o', raw, c],
+            [include, sdk['wasm'], shared, '-Wl,--no-entry', '-o', raw] + c,
             [merge, raw, 'main', acc, 'acc'] + FEATURES + ['-o', merged],
             [opt, merged] + FEATURES + ['-O3', '--remove-exports=acc_*',
                                          '--remove-unused-module-elements', '-o', final]]))
     together(compiled)
     return {'python': sys.executable, 'nocall': ROOT / 'tools/nocall.py',
             'wasm-tools': wasm_tools, 'modules': modules, 'exe': exe}
+
+
+def sources(where, name, idle):
+    """A module's sources: the one file of its name, or every C file of the directory of its
+    name - docs/style.md, O3, allows five functions a file, and a module may export more. A
+    module that includes the idle header of its backend states that its shutdown and its reload
+    do nothing, and is built with the source that has them."""
+    one = where / (name + '.c')
+    found = [one] if one.is_file() else sorted((where / name).glob('*.c'))
+    stated = any('_idle.h"' in c.read_text(encoding='utf-8') for c in found)
+    return found + ([where / (idle + '.c')] if stated else [])
 
 
 def test(out, built, only):

@@ -11,9 +11,9 @@ BRIDGE_EXPORT(count) int count()
     for (s = 0; s < spans; s ++) rows += bridge_count_rows(bridge_get_span(positions, s, 1));
     if (bridge_count_spans(rosters)) {
         uint32_t span = bridge_get_span(rosters, 0, 1);
-        uint32_t at = BRIDGE_ROW(Roster, bridge_get_base(span, 0), 0, bridge_count_rows(span));
+        uint32_t at = BRIDGE_ROW(roster_t, bridge_get_base(span, 0), 0, bridge_count_rows(span));
         for (i = 0; i < 5; i ++) {
-            alive += bridge_is_alive(acc_ld_64(at + (uint32_t)offsetof(Roster, ids) + 8u * i));
+            alive += bridge_is_alive(acc_ld_64(at + (uint32_t)offsetof(roster_t, ids) + 8u * i));
         }
     }
     BRIDGE_LOG(BRIDGE_LOG_INFO, "left", rows, alive);
@@ -23,8 +23,8 @@ BRIDGE_EXPORT(count) int count()
 BRIDGE_EXPORT(init) int init()
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
-    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP, BRIDGE_TABLE);
-    roster = BRIDGE_COMPONENT("game:Roster", Roster, BRIDGE_STRIP, BRIDGE_TABLE);
+    position = BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_STRIP, BRIDGE_TABLE);
+    roster = BRIDGE_COMPONENT("game:Roster", roster_t, BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = position;
     positions = BRIDGE_ADD_SYSTEM("count", "update", terms, 1, nullptr, 0);
     terms[0].slot = roster;

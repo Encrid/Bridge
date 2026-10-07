@@ -11,8 +11,8 @@ BRIDGE_EXPORT(halve) int halve()
         uint32_t span = bridge_get_span(halving, s, 1);
         uint32_t count = bridge_count_rows(span), base = bridge_get_base(span, 0);
         for (r = 0; r < count; r ++) {
-            uint32_t at = BRIDGE_ROW(Position, base, r, count);
-            BRIDGE_SET(Position, x, at, BRIDGE_GET(Position, x, at) * 0.5f);
+            uint32_t at = BRIDGE_ROW(position_t, base, r, count);
+            BRIDGE_SET(position_t, x, at, BRIDGE_GET(position_t, x, at) * 0.5f);
         }
     }
     return 0;
@@ -21,7 +21,7 @@ BRIDGE_EXPORT(halve) int halve()
 BRIDGE_EXPORT(init) int init()
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
-    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP, BRIDGE_TABLE);
+    position = BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = position;
     halving = BRIDGE_ADD_SYSTEM("halve", "update", terms, 1, nullptr, 0);
     return 0;

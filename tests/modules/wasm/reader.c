@@ -12,7 +12,7 @@ BRIDGE_EXPORT(sum) int sum()
         uint32_t span = bridge_get_span(summing, s, 2);
         uint32_t count = bridge_count_rows(span), base = bridge_get_base(span, 0);
         for (r = 0; r < count; r ++) {
-            total += BRIDGE_GET(Position, x, BRIDGE_ROW(Position, base, r, count));
+            total += BRIDGE_GET(position_t, x, BRIDGE_ROW(position_t, base, r, count));
         }
         rows += count;
     }
@@ -24,8 +24,8 @@ BRIDGE_EXPORT(sum) int sum()
 BRIDGE_EXPORT(init) int init()
 {
     bridge_term_t terms[2] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }, { 0, BRIDGE_READ, BRIDGE_AND, 0 }};
-    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP, BRIDGE_TABLE);
-    marked = BRIDGE_COMPONENT("game:Marked", Marked, BRIDGE_STRIP, BRIDGE_TABLE);
+    position = BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_STRIP, BRIDGE_TABLE);
+    marked = BRIDGE_COMPONENT("game:Marked", marked_t, BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = position;
     terms[1].slot = marked;
     summing = BRIDGE_ADD_SYSTEM("sum", "present", terms, 2, nullptr, 0);

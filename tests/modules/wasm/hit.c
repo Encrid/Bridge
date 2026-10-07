@@ -51,7 +51,7 @@ BRIDGE_EXPORT(init) int init()
     bridge_term_t one[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     bridge_term_t two[2] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }, { 0, BRIDGE_READ, BRIDGE_OPTIONAL, 0 }};
     uint32_t i;
-    position = BRIDGE_COMPONENT("game:Position", Position, BRIDGE_DELETE, BRIDGE_TABLE);
+    position = BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_DELETE, BRIDGE_TABLE);
     hit = BRIDGE_COMPONENT("game:Hit", Hit, BRIDGE_DELETE, BRIDGE_SPARSE_SET);
     one[0].slot = hit;
     hits = BRIDGE_ADD_SYSTEM("walked", "update", one, 1, nullptr, 0);
@@ -60,7 +60,7 @@ BRIDGE_EXPORT(init) int init()
     bodies = BRIDGE_ADD_SYSTEM("reached", "present", two, 2, nullptr, 0);
     for (i = 0; i < ENTITIES; i ++) {
         uint64_t id = bridge_spawn();
-        Position p = { (float)i, 0.0f };
+        position_t p = { (float)i, 0.0f };
         BRIDGE_ATTACH(id, position, p);
         if (i % 3 == 0) {
             Hit h = { i };

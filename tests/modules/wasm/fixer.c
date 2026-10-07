@@ -10,8 +10,8 @@ BRIDGE_EXPORT(fix) int fix()
     uint32_t count = bridge_count_triggers(fixing), i;
     for (i = 0; i < count; i ++) {
         uint32_t at = bridge_get_ref(bridge_get_trigger_id(bridge_get_trigger(fixing, i)), marked,
-                                 sizeof(Marked));
-        if (at) BRIDGE_SET(Marked, by, at, 5u);
+                                 sizeof(marked_t));
+        if (at) BRIDGE_SET(marked_t, by, at, 5u);
     }
     return 0;
 }
@@ -19,7 +19,7 @@ BRIDGE_EXPORT(fix) int fix()
 BRIDGE_EXPORT(init) int init()
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
-    marked = BRIDGE_COMPONENT("game:Marked", Marked, BRIDGE_STRIP, BRIDGE_TABLE);
+    marked = BRIDGE_COMPONENT("game:Marked", marked_t, BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = marked;
     fixing = BRIDGE_OBSERVER("fix", BRIDGE_ON_ENTER, terms, 1, nullptr, 0);
     return 0;

@@ -612,3 +612,14 @@ allow. An export takes nothing, wasm's `() -> i32` and the native table alike, s
 each barrier, and an offset into the persistent arena would itself have to be kept somewhere. So
 `style.md` excepts G4 under `tests/modules`. A host program keeps none: what its sink counts is in
 the fixture the sink is handed.
+
+**The test modules, how they are cut.** A module's exports are functions, and O3 allows five a
+file. Three of them are every module's, `init`, `shutdown` and `reload`, and in 42 of the 54
+sources the last two did nothing. So a module whose `shutdown` and `reload` do nothing includes
+`wasm_idle.h` or `native_idle.h`, which says so, and `build.py` builds it with the one source that
+has them, `tests/modules/wasm/idle.c` or `tests/modules/native/nidle.c`: the binary has all three
+as before. A module that still has more than five functions is a directory of sources under its
+name, which `build.py` compiles together. The types a module declares are in headers and end in
+`_t`, as V1 has every typedef, and what `build.py` hands a module's compiler is on its command
+line: a module is compiled with `-I tests/modules` and, a native one, `-fvisibility=hidden`, so
+that two modules in one process cannot be bound to each other's variables.
