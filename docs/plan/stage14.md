@@ -101,10 +101,11 @@ sentence at the top of `profile.md`, a sentence in bold beside the fields in `ho
 "when they exist" in `config.md`. And one had no mark at all and reads as built:
 `validation.md`, *The checksum pass, when asked*.
 
-**The form is the one `profile.md` has.** A section that states what is not built opens by
-saying so and by naming where it is built. A mention anywhere else cites that section, and says
-nothing of the thing in the present tense. So a reader meets the mark before the design, and
-one sentence is removed the day the thing is built.
+**The form is the one `profile.md` has, without the stage.** A section that states what is not
+built opens by saying so: "It is not built." Where it is built is the plan's to say, by the
+next decision. A mention anywhere else cites that section, and says nothing of the thing in the
+present tense. So a reader meets the mark before the design, and one sentence is removed the
+day the thing is built.
 
 **A script fails on an unbuilt name anywhere else.** It has the names that are not built, each
 with the section that states it, and reads the documents and the comments of the headers: a
@@ -121,3 +122,39 @@ a decision in the document it belongs to.
     extensible    the stage that builds a thing removes its rows, and is told what else to
     minimal       one sentence a section, and one list
     explicit      nothing unbuilt reads as built, and a slip fails
+
+### A stage in a document of the design
+
+**A document of the design names no stage, in any form.** Enkrid ruled it, over a
+recommendation that would have kept a stage where a thing is not built, cited by its heading.
+Not "stage 17", not `stage10.md`, not "`plan.md`, stage 3". The plan points at the design, and
+the design never at the plan: what the library is does not depend on the order it was built
+in, and that order moved once already, on 2026-10-07, with 29 references renumbered behind it.
+
+There were 39 such lines in the 39 documents, of three kinds, and each has another answer.
+
+    where a thing that is not    15   the mark says that it is not built, and no more. The
+    built is built                    stage's part of `plan.md` cites the section, as it does
+                                      for all else it builds
+    when a thing changed         9    removed. What was there before is the record's: the
+                                      stage's document, and `refused/`. Where the past is the
+                                      reason for what is, the reason stays and the when goes
+    where a measurement or       15   the figure, or the list, is said in the document that
+    a list is                         rests on it, or in `costs.md`, and the stage's document
+                                      keeps how it was measured
+
+`plan.md` named as the build order, with no stage, is not a stage named: `design.md` and
+`readme.md` say that much, and keep it.
+
+**`xref.py` fails on one.** A stage's number, a stage's document, or the plan with a stage
+beside it, in a document that is not under `plan/` or `refused/` and is not `plan.md`. The
+headers and the source name none today, and are held the same way. The tests, the tools and
+the workflows are not documents of the design: eleven of them say which stage's measurement
+they repeat, and keep it.
+
+    fast          no part of this runs
+    scalable      a document written later is held by the scan
+    modular       the plan depends on the design, and the design on nothing of the plan
+    extensible    a stage added, moved or renamed changes no document of the design
+    minimal       one rule with no case of its own
+    explicit      what a document says is what the library is, and a slip fails

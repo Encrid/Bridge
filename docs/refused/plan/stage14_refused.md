@@ -30,3 +30,18 @@ the plan holds design. No condition brings it back.
 
 Refused: the one mark, with no script. A later mention with no mark is found by reading or not
 at all. The condition that brings it back is nothing left that is designed and not built.
+
+## A stage in a document of the design
+
+Of `stage14.md`, *A stage in a document of the design*.
+
+Refused: left as they were. A number nothing checks, history in a document of what is, and
+they moved once already. No condition brings it back.
+
+Refused, though it was recommended: a stage named by its use. A thing not built citing its
+stage by the heading of `plan.md`, history removed, a measurement citing the document that
+holds it, and the scan failing on a bare number. Enkrid ruled for no stage at all: a citation
+of a stage is still the design leaning on the plan. No condition brings it back.
+
+Refused: the same, with history kept and its number taken out. "Before" with nothing to say
+before what is a sentence only somebody who was there can follow. No condition brings it back.
