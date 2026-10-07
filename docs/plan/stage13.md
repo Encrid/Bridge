@@ -132,3 +132,26 @@ and the case's name.
     extensible    a new document is a file of cases
     minimal       one `main`, one row of `build.py`
     explicit      a name says a document and what is shown, and no name says a stage
+
+### Every refusal
+
+**The messages are read from the source, and each is held against what the cases printed.** 209
+places write one, each with a format string. `build.py test` keeps what every case said, which
+it captures already, and after the run a script makes a pattern of each format string and asks
+whether some case printed it. One that no case made appear fails the build, by its file and
+line. So a message is proven printed and not proven expected: many cases expect a fragment only.
+
+What it turns up is one of three things. A message no case reaches has a case written for it in
+step 6, or is code nothing can reach and goes. A message for want of memory appears where every
+allocation is failed in turn, `alloc-nomemory`. A message that is not a refusal, a share that
+stays, a loss that was accepted, is held the same way: the library says it, and a case makes it.
+
+**Printed is this check's, and stated is the list's.** A message that no document has a sentence
+for is reported and does not fail: it is a gap in the documents, and stage 14's.
+
+    fast          some milliseconds after a run
+    scalable      a new message is held the day it is written
+    modular       it reads `src/` and the run's output, and nothing of a case
+    extensible    stages 17 and 18 have nothing to do for it
+    minimal       one script, and output `build.py` has already
+    explicit      a message with no case is named by file and line

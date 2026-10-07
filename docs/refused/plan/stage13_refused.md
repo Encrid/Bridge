@@ -38,3 +38,14 @@ The condition that brings it back is cases of two documents that cannot share a 
 Refused: the five programs kept and renamed for what each stage was about. No case moves, and
 the cases stay grouped by when they were written, under other words. No condition brings it
 back.
+
+## Every refusal
+
+Of `stage13.md`, *Every refusal*.
+
+Refused: the same messages held against the patterns `build.py` expects. A pattern is often a
+fragment, so a message can look covered and never be printed, and comparing one pattern with
+another is a guess. No condition brings it back.
+
+Refused: refusals listed by hand, rows like any other. It is what let one go five stages with no
+case. No condition brings it back.
