@@ -60,3 +60,19 @@ condition brings it back.
 Refused: `dup.py` as a case, with a list of the passages accepted. A second list of what the
 findings say already, and a duplicate reworded passes it. The condition that brings it back is
 a fact found drifting after this stage.
+
+## The citation above an exposed name
+
+Of `stage14.md`, *The citation above an exposed name*.
+
+Refused, though it was recommended: the nearest citation, then the file's. A header whose own
+comment cites one document would have cited for every name in it, and the three headers of the
+seams would have cited name by name. Enkrid ruled for every declaration: two levels are a rule
+to learn, and a name read apart from its file would carry nothing. No condition brings it back.
+
+Refused: the comment of the file alone, for every name in it. One pointer for the whole host
+seam says almost nothing, and a name added passes with no thought given. No condition brings it
+back.
+
+Refused: several declarations under one comment that cites. What a group is has no form a
+script can read, and the style gives each function its comment. No condition brings it back.

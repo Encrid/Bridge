@@ -185,3 +185,27 @@ so none is asked to: `dup.py` stays where it is, in the scan of `stage0.md`, and
     extensible    a fact that changes is changed in one place
     minimal       a rule and the citation there is already
     explicit      which document is right is never a question
+
+### The citation above an exposed name
+
+**Every declaration cites, in its own comment.** Enkrid ruled it, over a recommendation that
+would have let a header of one concern cite once, at its top, for every name in it. 114
+comments stand above the 256 exposed names: a struct's comment covers its keys, and an enum's
+its constants. 24 of them cite a document, and 90 are to be written.
+
+The form is the one in use: the last lines of the comment, a document and a heading, as
+`budgets.md`, *Budgets*, is above the budgets. `xref.py` resolves it already. A name cites the
+document that owns what it does, by the decision before this one; a second citation is allowed
+where a second document adds to it, and is not asked for.
+
+**`cover.py` fails on an exposed name whose declaration has no comment that cites.** So a name
+carries its pointer wherever it is read or copied, and one added later fails the build until it
+says where it is stated. What it costs is one citation said by each small function of an SDK
+header, and a heading renamed touching each of them: `xref.py` names every one.
+
+    fast          no part of this runs
+    scalable      a name carries its own citation
+    modular       a declaration is whole without the top of its file
+    extensible    a new name fails until it cites
+    minimal       one rule, with no second level to it
+    explicit      a name stated in no document is named, and fails
