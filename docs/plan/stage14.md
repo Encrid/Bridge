@@ -235,3 +235,34 @@ stage would have and did not build.
     extensible    a refusal added later fails until it cites
     minimal       the form and the script there are already
     explicit      no rule is enforced that the design does not state
+
+### How a finding is recorded
+
+**By its kind: a kind a script holds by the script's count, and a kind found by reading a row
+each.** The done-when asks that each thing listed be changed or refused on record, so there is
+a list, and it is exact where only reading could make it.
+
+    b  not built, said as built     the script's count before, and none at the close
+    d  a stage named in the design  the same
+    g  stated nowhere               the same, for names and for messages
+    a  false against the tree       a row each, in this document: where, what was false, what
+    c  said twice                   was done
+    e  prior art that describes
+       nothing
+    f  not followable
+
+**Every refusal is by name**, of whatever kind, in `stage14_refused.md` under the heading of
+its kind, with the condition that would bring it back. So nothing that was found and left is
+silent, and several hundred lines that a script counts are not written out by hand to say what
+a diff says.
+
+**A claim that is false because the code is wrong** is a defect of the library and not of the
+document: fixed in the stage, with a case, and said under what the stage found, as the two of
+stage 13 were.
+
+    fast          no part of this runs
+    scalable      hundreds of findings, and a row only for what a script cannot count
+    modular       a kind is recorded by what finds it
+    extensible    a kind that gains a script later moves to its count
+    minimal       no second document, and no row a script prints already
+    explicit      what reading found is by name, and so is all that was refused

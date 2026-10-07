@@ -90,3 +90,18 @@ Refused: read once, and no more. The next message is held by nothing, and stage 
 
 Refused: a document that lists every message, written from the source. The words in two
 places, and the words are not the rule. No condition brings it back.
+
+## How a finding is recorded
+
+Of `stage14.md`, *How a finding is recorded*.
+
+Refused: every finding a row, of every kind. Several hundred rows by hand that restate what
+three scripts print and a diff shows. No condition brings it back.
+
+Refused: a count for each kind and nothing by name. A claim found false and corrected would
+leave no trace of what was false, and the done-when could not be held for what only reading
+finds. No condition brings it back.
+
+Refused: a document of findings of its own, kept after the stage. A second place to read what
+state the documents are in; stage 0 kept such a list and deleted it. No condition brings it
+back.
