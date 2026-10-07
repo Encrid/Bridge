@@ -301,14 +301,14 @@ one was changed, but those named in `stage14_refused.md`.
 ### What a script holds
 
     b  not built, said as built     15 mentions in 9 documents and one header, in four forms.
-                                    Three headings state what is not built now, each opening
+                                    Four headings state what is not built now, each opening
                                     with "It is not built.", and `xref.py` finds no mention
                                     elsewhere without a citation of one
     d  a stage named in the design  39 lines in 14 documents; none, held by `xref.py`
     g  a name with no document      90 of the 114 comments above exposed names cited none;
                                     none, held by `cover.py`
     g  a message with no document   109 of the 125 functions that write a message cited none,
-                                    and 17 rules were stated in no document. Each rule has its
+                                    and some twenty rules were stated in no document. Each has its
                                     sentence and each function its citation, held by `said.py`
 
 ### a: false against the tree
@@ -343,8 +343,8 @@ was right and the code was not, it is under *What the stage found*.
                          tables now, and `bridge.h` states each
     config.md            the phases are a list and not an ordered one; the table lacked
                          `changes`, `after` and a module's phases
-    create.md            twelve causes refuse a deployment, and not seven; a null deployment
-                         is refused with no record, as a null sink is
+    create.md            more causes refuse a deployment than the seven that were listed; a
+                         null deployment is refused with no record, as a null sink is
     lifecycle.md,        a changed component layout is carried across, and refused only for
     costs.md             a loss the deployment did not accept; grants are checked as `init`
                          declares, and not before the module has a record
