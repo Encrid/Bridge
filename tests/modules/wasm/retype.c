@@ -1,24 +1,35 @@
-/* Declares one component name with a layout nobody else gives it. It loads only if nothing of
- * that name is left: how a test sees that a component is gone. Built once per name. */
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** tests/modules/wasm/retype.c -- declares one component name with a layout
+** nobody else gives it. It loads only if nothing of that name is left: how
+** a test sees that a component is gone. Built once per name, which WHICH
+** states.
+*/
+
 #include "bridge_wasm.h"
+#include "retype.h"
+#include "wasm_idle.h"
 
-#define RETYPED_FIELDS { uint32_t a; uint32_t b; uint32_t c; }
-BRIDGE_SCHEMA_STRUCT_TYPE(Retyped, RETYPED_FIELDS);
-BRIDGE_SCHEMA_STRUCT_DESC(Retyped, RETYPED_FIELDS);
-
-BRIDGE_EXPORT(init) int init()
+/*
+** init
+**
+** Declares the name the build states, with the layout of retype.h.
+*/
+BRIDGE_EXPORT(init) int init(void)
 {
 #if WHICH == 1
-    BRIDGE_COMPONENT("game:Private", Retyped, BRIDGE_STRIP, BRIDGE_TABLE);
+    BRIDGE_COMPONENT("game:Private", retyped_t, BRIDGE_STRIP, BRIDGE_TABLE);
 #elif WHICH == 2
-    BRIDGE_COMPONENT("game:Vec2", Retyped, BRIDGE_STRIP, BRIDGE_TABLE);
+    BRIDGE_COMPONENT("game:vec2_t", retyped_t, BRIDGE_STRIP, BRIDGE_TABLE);
 #elif WHICH == 4
-    BRIDGE_COMPONENT("game:Settings", Retyped, BRIDGE_STRIP, BRIDGE_TABLE);
+    BRIDGE_COMPONENT("game:Settings", retyped_t, BRIDGE_STRIP, BRIDGE_TABLE);
 #else
-    BRIDGE_COMPONENT("game:Extra", Retyped, BRIDGE_STRIP, BRIDGE_TABLE);
+    BRIDGE_COMPONENT("game:Extra", retyped_t, BRIDGE_STRIP, BRIDGE_TABLE);
 #endif
-    return 0;
+    return (0);
 }
-
-BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
-BRIDGE_EXPORT(reload) int reload() { return 0; }

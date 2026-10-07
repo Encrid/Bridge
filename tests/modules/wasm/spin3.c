@@ -1,27 +1,52 @@
-/* One system never returns, and another must still run after it was stopped. */
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** tests/modules/wasm/spin3.c -- one system never returns, and another must
+** still run after it was stopped.
+*/
+
 #include "bridge_wasm.h"
+#include "wasm_idle.h"
 
 static volatile int going = 1;
 
-BRIDGE_EXPORT(forever) int forever()
+/*
+** forever
+**
+** Never returns.
+*/
+BRIDGE_EXPORT(forever) int forever(void)
 {
-    while (going) {}
-    return 0;
+    while (going)
+        continue;
+    return (0);
 }
 
-BRIDGE_EXPORT(after) int after()
+/*
+** after
+**
+** Says that it ran.
+*/
+BRIDGE_EXPORT(after) int after(void)
 {
     BRIDGE_LOG(BRIDGE_LOG_INFO, "still here", 0, 0);
-    return 0;
+    return (0);
 }
 
-BRIDGE_EXPORT(init) int init()
+/*
+** init
+**
+** Registers the system that never returns, and the one of the next phase.
+*/
+BRIDGE_EXPORT(init) int init(void)
 {
     int none = 0;
+
     BRIDGE_ADD_SYSTEM("forever", "update", &none, 0, nullptr, 0);
     BRIDGE_ADD_SYSTEM("after", "present", &none, 0, nullptr, 0);
-    return 0;
+    return (0);
 }
-
-BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
-BRIDGE_EXPORT(reload) int reload() { return 0; }

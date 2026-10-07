@@ -1,15 +1,25 @@
-/* Declares game:Position with another struct body: built against an older header, say. */
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** tests/modules/wasm/fp.c -- declares game:Position with another struct
+** body: built against an older header, say.
+*/
+
 #include "bridge_wasm.h"
+#include "fp.h"
+#include "wasm_idle.h"
 
-#define POSITION_FIELDS { float x; float y; float z; }
-BRIDGE_SCHEMA_STRUCT_TYPE(Position, POSITION_FIELDS);
-BRIDGE_SCHEMA_STRUCT_DESC(Position, POSITION_FIELDS);
-
-BRIDGE_EXPORT(init) int init()
+/*
+** init
+**
+** Declares the position, with the body fp.h gives it.
+*/
+BRIDGE_EXPORT(init) int init(void)
 {
-    BRIDGE_COMPONENT("game:Position", Position, BRIDGE_STRIP, BRIDGE_TABLE);
-    return 0;
+    BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_STRIP, BRIDGE_TABLE);
+    return (0);
 }
-
-BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
-BRIDGE_EXPORT(reload) int reload() { return 0; }

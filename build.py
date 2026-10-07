@@ -118,10 +118,12 @@ NATIVE = [
 # a module in C: the name, its source, whether its rows are tested, what it is compiled with.
 # `checked` or `unchecked` is stated for each, as the SDK asks: BRIDGE_ROWS_CHECKED, or not.
 PLAIN = ('mover reader refs fp badterm spin3 flood chatty rows halver twostep watcher chain '
-         'badobs events fixer nested nested2 namer spawner counter typer user settings hang hit '
+         'badobs events fixer nested namer spawner counter typer user hang hit '
          'shield aim')
 WASM = [(name, name, 'checked', []) for name in PLAIN.split()] + [
     ('rows-unchecked', 'rows', 'unchecked', []),
+    ('nested2', 'nested', 'checked', ['LEAVE_OUT_VEC2']),
+    ('settings', 'settings', 'checked', ['KEPT=BRIDGE_SINGLETON']),
     ('kept-unset', 'kept', 'checked', ['KEPT=0']), ('kept-none', 'kept', 'checked', ['KEPT=9']),
     ('kept-sparse', 'kept', 'checked', ['KEPT=BRIDGE_SPARSE_SET']),
     ('namer-reader', 'namer', 'checked', ['READER']),
@@ -136,7 +138,7 @@ WASM = [(name, name, 'checked', []) for name in PLAIN.split()] + [
     ('retype-vec2', 'retype', 'checked', ['WHICH=2']),
     ('retype-extra', 'retype', 'checked', ['WHICH=3']),
     ('retype-settings', 'retype', 'checked', ['WHICH=4']),
-    ('settings-drop', 'settings', 'checked', ['DROP']),
+    ('settings-drop', 'settings', 'checked', ['DROP', 'KEPT=BRIDGE_SINGLETON']),
     ('settings-table', 'settings', 'checked', ['KEPT=BRIDGE_TABLE']),
     ('ticker', 'ticker', 'checked', ['STEP=1']),
     ('ticker-ten', 'ticker', 'checked', ['STEP=10']),
@@ -736,7 +738,7 @@ CASES = [
     ('stage5-nested', ['stage5', 'nested'],
      r"read: body 2 2.*read: more 3 4.*alive", None),
     ('stage5-nested2', ['stage5', 'nested2'],
-     r"module 'game:nested@0.1.0' did not load: type 'game:Body': its descriptor says 'Vec2', which is neither a type a field can be nor one its namespace has declared.*alive", None),
+     r"module 'game:nested@0.1.0' did not load: type 'game:Body': its descriptor says 'vec2_t', which is neither a type a field can be nor one its namespace has declared.*alive", None),
     ('stage4-setting', ['stage4', 'setting'],
      r"backend 'native' would not start: it knows no setting 'cache'.*bridge_create refused.*alive", None),
     ('stage5-two', ['stage5', 'two'],

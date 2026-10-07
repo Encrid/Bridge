@@ -1,78 +1,113 @@
-/* Counts up in a component, and can be reloaded. init registers and makes the row; reload only
- * registers, over the row that is already there - docs/seam/host_api/lifecycle.md.
- *
- * Built several ways: STEP is what a pass adds; WIDE changes the struct's body; FAIL_RELOAD
- * makes reload answer 5; NO_EXTRA stops declaring a second component; TRIP fails every pass;
- * ALLOC has reload take forty bytes of the persistent arena, which a share of sixteen lacks. */
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** tests/modules/wasm/ticker.c -- counts up in a component, and can be
+** reloaded. init registers and makes the row; reload only registers, over
+** the row that is already there.
+**
+** Built several ways: STEP is what a pass adds; WIDE changes the struct's
+** body; FAIL_RELOAD makes reload answer 5; NO_EXTRA stops declaring a
+** second component; TRIP fails every pass; ALLOC has reload take forty
+** bytes of the persistent arena, which a share of sixteen lacks.
+**
+** lifecycle.md, *The runtime lifecycle*
+*/
+
 #include "bridge_wasm.h"
+#include "ticker.h"
 
-#ifdef WIDE
-#define TICK_FIELDS { uint32_t n; uint32_t more; }
-BRIDGE_SCHEMA_STRUCT_TYPE(Tick, TICK_FIELDS);
-BRIDGE_SCHEMA_STRUCT_DESC(Tick, TICK_FIELDS);
-#else
-#define TICK_FIELDS { uint32_t n; }
-BRIDGE_SCHEMA_STRUCT_TYPE(Tick, TICK_FIELDS);
-BRIDGE_SCHEMA_STRUCT_DESC(Tick, TICK_FIELDS);
-#endif
-#define EXTRA_FIELDS { uint32_t unused; }
-BRIDGE_SCHEMA_STRUCT_TYPE(Extra, EXTRA_FIELDS);
-BRIDGE_SCHEMA_STRUCT_DESC(Extra, EXTRA_FIELDS);
+static uint32_t tick;
+static uint32_t ticking;
 
-static uint32_t tick, ticking;
-
-BRIDGE_EXPORT(advance) int advance()
+/*
+** advance
+**
+** Adds STEP to the count of the first row, and says the count and STEP.
+** The build with TRIP then answers 7.
+*/
+BRIDGE_EXPORT(advance) int advance(void)
 {
     uint32_t span = bridge_get_span(ticking, 0, 1);
-    uint32_t at = BRIDGE_ROW(Tick, bridge_get_base(span, 0), 0, bridge_count_rows(span));
-    BRIDGE_SET(Tick, n, at, BRIDGE_GET(Tick, n, at) + STEP);
-    BRIDGE_LOG(BRIDGE_LOG_INFO, "tick", BRIDGE_GET(Tick, n, at), STEP);
+    uint32_t at = BRIDGE_ROW(tick_t, bridge_get_base(span, 0), 0,
+        bridge_count_rows(span));
+
+    BRIDGE_SET(tick_t, n, at, BRIDGE_GET(tick_t, n, at) + STEP);
+    BRIDGE_LOG(BRIDGE_LOG_INFO, "tick", BRIDGE_GET(tick_t, n, at), STEP);
 #ifdef TRIP
-    return 7;
+    return (7);
 #else
-    return 0;
+    return (0);
 #endif
 }
 
-/* what init and reload both do: the same components, the same systems */
-static void registration()
+/*
+** register_tick
+**
+** Does what init and reload both do: the same component, the same system.
+*/
+static void register_tick(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
-    tick = BRIDGE_COMPONENT("game:Tick", Tick, BRIDGE_DELETE, BRIDGE_TABLE);
+
+    tick = BRIDGE_COMPONENT("game:Tick", tick_t, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = tick;
     ticking = BRIDGE_ADD_SYSTEM("advance", "update", terms, 1, nullptr, 0);
 }
 
-BRIDGE_EXPORT(init) int init()
+/*
+** init
+**
+** Registers, spawns the entity that counts, from 100, and declares a
+** second component with an entity of its own.
+*/
+BRIDGE_EXPORT(init) int init(void)
 {
-    Tick t = { 100 };
-    Extra e = {};
+    tick_t t = { 100 };
+    extra_t e = {};
     uint32_t extra;
-    registration();
+
+    register_tick();
     BRIDGE_ATTACH(bridge_spawn(), tick, t);
-    extra = BRIDGE_COMPONENT("game:Extra", Extra, BRIDGE_DELETE, BRIDGE_TABLE);
+    extra = BRIDGE_COMPONENT("game:Extra", extra_t, BRIDGE_DELETE,
+        BRIDGE_TABLE);
     BRIDGE_ATTACH(bridge_spawn(), extra, e);
-    return 0;
+    return (0);
 }
 
-BRIDGE_EXPORT(reload) int reload()
+/*
+** reload
+**
+** Registers, and declares the second component again unless the build is
+** NO_EXTRA. The build with ALLOC takes forty bytes of the persistent arena,
+** and the build with FAIL_RELOAD answers 5.
+*/
+BRIDGE_EXPORT(reload) int reload(void)
 {
-    registration();
+    register_tick();
 #ifndef NO_EXTRA
-    BRIDGE_COMPONENT("game:Extra", Extra, BRIDGE_DELETE, BRIDGE_TABLE);
+    BRIDGE_COMPONENT("game:Extra", extra_t, BRIDGE_DELETE, BRIDGE_TABLE);
 #endif
 #ifdef ALLOC
     bridge_alloc(40);
 #endif
 #ifdef FAIL_RELOAD
-    return 5;
+    return (5);
 #else
-    return 0;
+    return (0);
 #endif
 }
 
-BRIDGE_EXPORT(shutdown) int shutdown()
+/*
+** shutdown
+**
+** Says that it was shut down, and its STEP.
+*/
+BRIDGE_EXPORT(shutdown) int shutdown(void)
 {
     BRIDGE_LOG(BRIDGE_LOG_INFO, "shutdown", STEP, 0);
-    return 0;
+    return (0);
 }

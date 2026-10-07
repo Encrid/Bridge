@@ -1,15 +1,25 @@
-/* Declares a struct other modules' components use as a field's type, and nothing else. */
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** tests/modules/wasm/typer.c -- declares a struct other modules'
+** components use as a field's type, and nothing else.
+*/
+
 #include "bridge_wasm.h"
+#include "vec2.h"
+#include "wasm_idle.h"
 
-#define VEC2_FIELDS { float x; float y; }
-BRIDGE_SCHEMA_STRUCT_TYPE(Vec2, VEC2_FIELDS);
-BRIDGE_SCHEMA_STRUCT_DESC(Vec2, VEC2_FIELDS);
-
-BRIDGE_EXPORT(init) int init()
+/*
+** init
+**
+** Declares the struct, under the name a field of its type looks it up by.
+*/
+BRIDGE_EXPORT(init) int init(void)
 {
-    BRIDGE_COMPONENT("game:Vec2", Vec2, BRIDGE_STRIP, BRIDGE_TABLE);
-    return 0;
+    BRIDGE_COMPONENT("game:vec2_t", vec2_t, BRIDGE_STRIP, BRIDGE_TABLE);
+    return (0);
 }
-
-BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
-BRIDGE_EXPORT(reload) int reload() { return 0; }

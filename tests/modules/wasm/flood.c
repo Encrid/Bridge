@@ -1,19 +1,44 @@
-/* Spawns until the entity ceiling, and past it. */
-#include "bridge_wasm.h"
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** tests/modules/wasm/flood.c -- spawns until the entity ceiling, and past
+** it.
+*/
 
-BRIDGE_EXPORT(flood) int flood()
+#include "bridge_wasm.h"
+#include "wasm_idle.h"
+
+constexpr uint32_t SPAWNS = 1'000'000;
+
+/*
+** flood
+**
+** Spawns a million entities.
+*/
+BRIDGE_EXPORT(flood) int flood(void)
 {
-    uint32_t i;
-    for (i = 0; i < 1'000'000; i ++) bridge_spawn();
-    return 0;
+    uint32_t i = 0;
+
+    while (i < SPAWNS) {
+        bridge_spawn();
+        i++;
+    }
+    return (0);
 }
 
-BRIDGE_EXPORT(init) int init()
+/*
+** init
+**
+** Registers the system.
+*/
+BRIDGE_EXPORT(init) int init(void)
 {
     int none = 0;
-    BRIDGE_ADD_SYSTEM("flood", "update", &none, 0, nullptr, 0);
-    return 0;
-}
 
-BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
-BRIDGE_EXPORT(reload) int reload() { return 0; }
+    BRIDGE_ADD_SYSTEM("flood", "update", &none, 0, nullptr, 0);
+    return (0);
+}

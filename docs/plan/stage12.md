@@ -623,3 +623,15 @@ name, which `build.py` compiles together. The types a module declares are in hea
 `_t`, as V1 has every typedef, and what `build.py` hands a module's compiler is on its command
 line: a module is compiled with `-I tests/modules` and, a native one, `-fvisibility=hidden`, so
 that two modules in one process cannot be bound to each other's variables.
+
+**The wasm test modules** are to the style: 31 sources, two of them directories now (`hit`,
+`settings`), and `nested2.c`, which was a `#define` and an `#include` of `nested.c`, is a row of
+`build.py` that builds `nested` with the flag. A default a source gave a build flag is gone, and
+the rows that leaned on it state the value.
+
+Decision 3 has every typedef end in `_t`, and decision 5 said every transcript stays. They meet in
+one place. A field whose type is another declared type is looked for by its bare C name in the
+declarer's namespace, so a type renamed `vec2_t` is declared as `game:vec2_t`, and an enum's
+constants, in upper case now, are part of its descriptor. One expected text changed with it: the
+refusal of `stage5-nested2` says `'vec2_t'` where it said `'Vec2'`. Nothing else a case prints
+moved.

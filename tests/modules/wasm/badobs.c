@@ -1,14 +1,29 @@
-/* Names an observer init, which is an export that already means something. */
-#include "bridge_wasm.h"
-#include "../game.h"
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** tests/modules/wasm/badobs.c -- names an observer init, which is an
+** export that already means something.
+*/
 
-BRIDGE_EXPORT(init) int init()
+#include "bridge_wasm.h"
+#include "game.h"
+#include "wasm_idle.h"
+
+/*
+** init
+**
+** Declares the position, and an observer of it under the name init.
+*/
+BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
-    terms[0].slot = BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_STRIP, BRIDGE_TABLE);
-    BRIDGE_OBSERVER("init", BRIDGE_ON_ENTER, terms, 1, nullptr, 0);
-    return 0;
-}
 
-BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
-BRIDGE_EXPORT(reload) int reload() { return 0; }
+    terms[0].slot = BRIDGE_COMPONENT("game:Position", position_t,
+        BRIDGE_STRIP, BRIDGE_TABLE);
+    BRIDGE_OBSERVER("init", BRIDGE_ON_ENTER, terms, 1, nullptr, 0);
+    return (0);
+}

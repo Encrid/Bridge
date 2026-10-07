@@ -1,0 +1,21 @@
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** tests/modules/wasm/chain.h -- the type of the three components of chain.c.
+*/
+
+#ifndef TEST_CHAIN_H
+    #define TEST_CHAIN_H
+
+    #include "bridge_schema.h"
+
+    #define LINK_FIELDS { uint32_t n; }
+
+BRIDGE_SCHEMA_STRUCT_TYPE(link_t, LINK_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(link_t, LINK_FIELDS);
+
+#endif

@@ -1,37 +1,100 @@
-/* Counts the rows of the shared component, and how many of the roster's ids are still alive:
- * what an unload left behind, seen by a module that stayed. */
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** tests/modules/wasm/counter.c -- counts the rows of the shared component,
+** and how many of the roster's ids are still alive: what an unload left
+** behind, seen by a module that stayed.
+**
+** lifetime.md, *What unload leaves behind*
+*/
+
 #include "bridge_wasm.h"
-#include "../roster.h"
+#include "roster.h"
+#include "wasm_idle.h"
 
-static uint32_t position, roster, positions, rosters;
+constexpr uint32_t LISTED = 5;
 
-BRIDGE_EXPORT(count) int count()
+static uint32_t position;
+static uint32_t roster;
+static uint32_t counting;
+static uint32_t listing;
+
+/*
+** count_alive
+**
+** Answers how many of the ids of the first roster are alive, and 0 when
+** there is no roster.
+*/
+static uint32_t count_alive(void)
 {
-    uint32_t spans = bridge_count_spans(positions), rows = 0, alive = 0, s, i;
-    for (s = 0; s < spans; s ++) rows += bridge_count_rows(bridge_get_span(positions, s, 1));
-    if (bridge_count_spans(rosters)) {
-        uint32_t span = bridge_get_span(rosters, 0, 1);
-        uint32_t at = BRIDGE_ROW(roster_t, bridge_get_base(span, 0), 0, bridge_count_rows(span));
-        for (i = 0; i < 5; i ++) {
-            alive += bridge_is_alive(acc_ld_64(at + (uint32_t)offsetof(roster_t, ids) + 8u * i));
-        }
+    uint32_t span;
+    uint32_t at;
+    uint32_t alive = 0;
+    uint32_t i = 0;
+
+    if (!bridge_count_spans(listing))
+        return (0);
+    span = bridge_get_span(listing, 0, 1);
+    at = BRIDGE_ROW(roster_t, bridge_get_base(span, 0), 0,
+        bridge_count_rows(span));
+    at += (uint32_t)offsetof(roster_t, ids);
+    while (i < LISTED) {
+        alive += bridge_is_alive(acc_ld_64(at + 8u * i));
+        i++;
     }
-    BRIDGE_LOG(BRIDGE_LOG_INFO, "left", rows, alive);
-    return 0;
+    return (alive);
 }
 
-BRIDGE_EXPORT(init) int init()
+/*
+** count
+**
+** Says how many rows the position has, and how many of the roster's ids
+** are alive.
+*/
+BRIDGE_EXPORT(count) int count(void)
+{
+    uint32_t spans = bridge_count_spans(counting);
+    uint32_t rows = 0;
+    uint32_t s = 0;
+
+    while (s < spans) {
+        rows += bridge_count_rows(bridge_get_span(counting, s, 1));
+        s++;
+    }
+    BRIDGE_LOG(BRIDGE_LOG_INFO, "left", rows, count_alive());
+    return (0);
+}
+
+/*
+** rosters
+**
+** Does nothing: it is a system for the query it states, which count reads.
+*/
+BRIDGE_EXPORT(rosters) int rosters(void)
+{
+    return (0);
+}
+
+/*
+** init
+**
+** Declares the two components, and a system over each.
+*/
+BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
-    position = BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_STRIP, BRIDGE_TABLE);
-    roster = BRIDGE_COMPONENT("game:Roster", roster_t, BRIDGE_STRIP, BRIDGE_TABLE);
-    terms[0].slot = position;
-    positions = BRIDGE_ADD_SYSTEM("count", "update", terms, 1, nullptr, 0);
-    terms[0].slot = roster;
-    rosters = BRIDGE_ADD_SYSTEM("rosters", "present", terms, 1, nullptr, 0);
-    return 0;
-}
 
-BRIDGE_EXPORT(rosters) int rosters_() { return 0; }
-BRIDGE_EXPORT(shutdown) int shutdown() { return 0; }
-BRIDGE_EXPORT(reload) int reload() { return 0; }
+    position = BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_STRIP,
+        BRIDGE_TABLE);
+    roster = BRIDGE_COMPONENT("game:Roster", roster_t, BRIDGE_STRIP,
+        BRIDGE_TABLE);
+    terms[0].slot = position;
+    counting = BRIDGE_ADD_SYSTEM("count", "update", terms, 1, nullptr, 0);
+    terms[0].slot = roster;
+    listing = BRIDGE_ADD_SYSTEM("rosters", "present", terms, 1, nullptr, 0);
+    return (0);
+}
