@@ -761,3 +761,27 @@ what is known is what a compiler and a linker can say.
 
 macOS on x86-64 lifts a refusal on record, `build_refused.md`, *Platforms*, whose condition was a
 deployment on one. There is none. It is lifted because the stage made each platform a goal.
+
+## The lines that were open, measured on a quiet machine
+
+Fifteen rounds beside the tree before the stage, after a restart with nothing else running. The
+lines of a table made, filled and emptied, which had read 3 to 7% slower, are level: that was the
+machine. What is left, the least of fifteen:
+
+    direct-indexed, a component given    16.8 to 17.9 ns
+    attach, a component it has, first    11.9 to 12.4 ns
+    an id handed out, the call           4.4 to 4.8 ns
+    a toggle, one row in 16, by words    8.7 to 8.9 us     the test module's own loop
+    a toggled row switched               2.94 to 3.02 ns   the test module's own loop
+
+**What was tried.** All of storage compiled as one translation unit: no line moved, so the cut into
+files is not what costs. `-O3`: nothing that holds from one run to the next. Every function
+aligned to 64 bytes: the call of an id handed out is level again at 4.5, and other lines move by
+3 to 11% the other way, an entity of 256 bytes detached from 44.4 to 49.3 ns. So where the linker
+puts a loop moves a figure by as much as what is being looked for.
+
+**What is known of the first line.** It came with one commit, `64f7296`, which cut the barrier
+into its five steps: 17.0 ns before it, 17.8 after. The steps are the same statements in the same
+order, and the compiler puts all five into `storage_apply` whole, 12.9 KB of it, with four
+functions left out of line as before. Read side by side, the fold, the placing of a cell and the
+writing of its value are what they were. The instructions differ and the source does not say why.
