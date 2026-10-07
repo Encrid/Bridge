@@ -58,3 +58,36 @@ Seven, in this order, since each shapes the next.
     5  the citations above exposed names: their form
     6  messages and the documents
     7  how a finding is recorded
+
+### What "improved" covers
+
+**Seven kinds of defect, in the 39 documents that state what the library does, and nothing
+else.** "Improved" is made true, single and followable. It is not worded better, and it is not
+new design.
+
+    a  false against the tree       a claim the code or a case contradicts
+    b  not built, said as built     what a later stage builds, in the present tense
+    c  said twice                   a conclusion argued in two documents, which drift
+    d  a stage named in the design  when a thing was built, in a document of what it is
+    e  prior art that describes     a sentence that says what flecs does as what runs here.
+       nothing                      Prior art cited for its reasoning stays: `stage0.md`, step 3
+    f  not followable               a sentence that names what the documents never define: an
+                                    item of a register that is gone, a person, a discussion.
+                                    Not a sentence that could read better
+    g  stated nowhere               an exposed name or a message that no document states
+
+`plan.md` named three of them, c, f and what stage 13 showed claimed and not held. The count
+turned up b, d, e and g, and a is the one no script finds. Each kind is a defect by a rule that
+is written: `stage0.md`, step 9, for where a decision is said, and *One word, one meaning* in
+all but name for c.
+
+**What is outside**: wording for taste; a decision of the design taken again; and the records
+of `plan/` and `refused/`, which say what was decided and when, except where one is cited
+wrongly.
+
+    fast          no part of this runs
+    scalable      a kind with a script is held from here on, and a kind without is read once
+    modular       each kind is found its own way, and one finding is of one kind
+    extensible    a document written later is held by the same scripts
+    minimal       seven kinds, each by a rule that was there
+    explicit      what is looked for is listed, and what is not is said
