@@ -56,3 +56,17 @@ another is a guess. No condition brings it back.
 
 Refused: refusals listed by hand, rows like any other. It is what let one go five stages with no
 case. No condition brings it back.
+
+Refused, after it had been taken: a case named for the document that states its capability. The
+list is grouped by what is exposed, and names in another order would be two orders for one
+thing. No condition brings it back.
+
+## Under load
+
+Of `stage13.md`, *Under load*.
+
+Refused: every run six copies, with no flag. The quick run made while working would pay for it
+each time. The condition that brings it back is a loaded run that costs no more than a plain one.
+
+Refused: a script of its own that starts the copies. A second place that judges a case, to be
+kept in step with the first, and one more thing to remember to run. No condition brings it back.

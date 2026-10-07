@@ -129,14 +129,19 @@ once. After it the rule of `plan.md`, stage 13, holds: a capability is added wit
 
 ### What a case is named, and the host programs
 
-**One host program, `tests/host`, and a case is named for the document that states its capability
-and what it shows**: `schedule-unordered-conflict-refused`. The name is its row in
-`capabilities.md`, word for word, so a capability and its case are called the same, and whoever
-reads a failing case knows which document to open.
+**One host program, `tests/host`, and a case is named for what is exposed and what it shows**:
+`declare-past-types-refused`, `bridge_reload-smaller-share-refused`, `config-trusted-unset`. A
+behaviour of several entries is named for the behaviour: `order-unordered-conflict-refused`. The
+name is its row in `capabilities.md`, word for word, so a capability and its case are called the
+same.
+
+It was first taken as the document that states the capability, then the case. When a capability
+became what is exposed and the list was grouped by seam and by exposed thing, the names followed:
+a list grouped one way and named another would be two orders for one thing.
 
 The five programs named for stages differed in how `main` configures the host, one backend or
 two, one phase or two, which sink: about fifteen lines each since stage 12. They become one
-`main`, with the cases in files by document. `storage`, `schema` and `adopt` are named for what
+`main`, with the cases in files by what is exposed. `storage`, `schema` and `adopt` are named for what
 they test and reach inside the library; they stay. Several names may run one function with
 different expectations, as three do today: one run can show three capabilities, and each has
 its case. The 22 cases run again on the program linked statically stay that, named `static-`
@@ -144,10 +149,10 @@ and the case's name.
 
     fast          one program linked where there were five
     scalable      a new case is a function and a row
-    modular       cases are grouped by the document they prove
-    extensible    a new document is a file of cases
+    modular       cases are grouped by what is exposed, as the list is
+    extensible    a new entry is a file of cases
     minimal       one `main`, one row of `build.py`
-    explicit      a name says a document and what is shown, and no name says a stage
+    explicit      a name says what is exposed and what is shown, and no name says a stage
 
 ### Every refusal
 
@@ -171,3 +176,35 @@ for is reported and does not fail: it is a gap in the documents, and stage 14's.
     extensible    stages 17 and 18 have nothing to do for it
     minimal       one script, and output `build.py` has already
     explicit      a message with no case is named by file and line
+
+### Under load
+
+**`python build.py test --copies 6`: each case is started six times at once, and every copy is
+judged as a case is.** A case is a process, so six of one case compete for the processors, for
+memory, and for what a process shares with its neighbours: the backend's library on disk,
+wasmtime's own threads. Six is the number that found stage 9's crash, which had passed a hundred
+and fifty runs alone and had been there since stage 2. Nothing in a plain run would find the
+next one, since cases run one at a time.
+
+**A case that measures time is run once, and is marked so with its reason**: under load it gives
+another number, and that is no defect. The measurements of storage, the row test timed, and the
+two that decide whether two naps overlapped. A case that only bounds time, a shutdown that has a
+tenth of a second, stays in: if load breaks it, that is found. The mark is a word and a reason
+in `CASES`, and not an absence from a list.
+
+**Six copies once is a sample**, and stage 9's crash was one run in sixty. The workflows run
+plain and then ten loaded rounds; a hundred are run here once, before the stage closes.
+
+    fast          a plain run costs what it did
+    scalable      a new case is under load with no line written for it
+    modular       one judge for a copy as for a case
+    extensible    the number is an argument
+    minimal       one flag, and a mark on the few cases that measure
+    explicit      what is left out of the load is named, with why
+
+### The platforms no workflow runs
+
+Not a decision of this stage: Enkrid ruled for stage 12 that the workflows not starting does not
+hold a stage, and it stands. The done-when says every case passes on Windows, Linux and macOS,
+alone and under load. Windows is run here. The rest is met when the jobs run, and until then the
+close says which half is known.
