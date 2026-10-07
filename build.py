@@ -289,7 +289,9 @@ def build(target, debug, out):
     defines = ['-D%s="%s"' % (key, path.as_posix()) for key, path in
                [('BACKEND_PATH', backends / ('bridge_wasm' + lib)),
                 ('NATIVE_PATH', backends / ('bridge_native' + lib)),
-                ('NATIVE_OTHER_PATH', backends / ('bridge_native_other' + lib)), ('MODULE_DIR', modules)] +
+                ('NATIVE_OTHER_PATH', backends / ('bridge_native_other' + lib)),
+                ('NATIVE_REFUSING_PATH', backends / ('bridge_native_refusing' + lib)),
+                ('HOLLOW_PATH', backends / ('bridge_hollow' + lib)), ('MODULE_DIR', modules)] +
                [('%s_PATH' % name.upper(), out / (name + lib)) for name, _, _ in NATIVE]]
     compiles = []
 
@@ -316,6 +318,12 @@ def build(target, debug, out):
     # the same backend, with another answer to backend_get_abi in the place of its own
     native_other_o = [o for o in native_o if o.name != 'native_abi.o'] + [
         compile_('native_other_abi', ROOT / 'tests/support/native_other_abi.c', ours + [include])]
+    # the same backend again, with first entries that adopt no block; and a library that has
+    # the seam's number and no other entry
+    native_refusing_o = [o for o in native_o if o.name != 'native_backend.o'] + [
+        compile_('native_refusing_backend', ROOT / 'tests/support/native_refusing_backend.c',
+                 ours + [include])]
+    hollow_o = [compile_('backend_hollow', ROOT / 'tests/support/backend_hollow.c', ours + [include])]
     # a host program is a directory of sources, with what the programs share compiled once -
     # stage12.md, *The test programs*. One that has not been cut yet is one source
     support = '-I%s' % (ROOT / 'tests/support')
@@ -372,6 +380,8 @@ def build(target, debug, out):
     link('backends/bridge_native', native_o, system, shared=True)
     # the same backend, saying it is of another backend seam: for the case that refuses it
     link('backends/bridge_native_other', native_other_o, system, shared=True)
+    link('backends/bridge_native_refusing', native_refusing_o, system, shared=True)
+    link('backends/bridge_hollow', hollow_o, system, shared=True)
     for name, _, _ in NATIVE:
         link(name, module_o[name], shared=True)
     link('adopt', adopt_o + [obj / 'backend.o'] + os_o, system)
@@ -436,13 +446,18 @@ def test(out, built, only):
     cases = [c for c in CASES if not only or only in c[0]]
     failed = []
     # what every case said is kept, a file a case: tools/said.py holds each message of the
-    # source against it
+    # source against it. A run of every case begins with none, so that no case that is gone
+    # holds a message
     kept = out / 'said'
+    if not only:
+        shutil.rmtree(kept, ignore_errors=True)
     kept.mkdir(exist_ok=True)
     for name, command, match, never in cases:
         argv = [str(out / (command[0] + built['exe']))] + command[1:]
         if command[0] in ('c23', 'style'):
             argv = [str(built['python']), str(ROOT / ('tools/%s.py' % command[0]))]
+        elif command[0] == 'said':
+            argv = [str(built['python']), str(ROOT / 'tools/said.py'), str(kept)]
         elif command[0] == 'deps':
             argv = [str(built['python']), str(ROOT / 'tools/deps.py'), str(out), '--check']
         elif command[0] == 'nocall':
@@ -1071,6 +1086,14 @@ CASES = [
      r"system 'act' failed: attach: the value lies outside the scratch arena.*alive", None),
     ('detach-undeclared-slot-refused', ['host', 'detach-undeclared-slot-refused'],
      r"system 'act' failed: detach names slot 9, which it never declared.*alive", None),
+    ('BACKEND_ENTRY_COUNT-an-entry-missing-refused', ['host', 'BACKEND_ENTRY_COUNT-an-entry-missing-refused'],
+     r"backend 'native': backend library '[^']*bridge_hollow[^']*' has no entry 'backend_create'.*bridge_create refused.*alive", None),
+    ('memory_adopt-refused-refuses-the-bridge', ['host', 'memory_adopt-refused-refuses-the-bridge'],
+     r"backend 'native' cannot adopt the shared memory: this backend adopts no block.*alive", None),
+    ('module_config.spans-outgrown-at-a-barrier', ['host', 'module_config.spans-outgrown-at-a-barrier'],
+     r"module 'game:mover@0\.1\.0' is stopped: what its queries match no longer fits in its spans of 544 bytes.*alive", None),
+    ('said', ['said'],
+     None, None),
 ]
 
 # these again, through the static library: what a host does first, to create a bridge and to

@@ -516,5 +516,6 @@ void test_load_twice(host_t *h);
 void test_spawn_past_entities(host_t *h);
 void test_edit_phase_names(host_t *h);
 void test_do_wrong(host_t *h);
+void test_outgrow_spans(host_t *h);
 
 #endif

@@ -460,7 +460,13 @@ static const host_case_t TEST_CASES[] = {
     { "attach-value-outside-scratch-refused",
         test_do_wrong, "wrong-attach-outside", test_set_wasm },
     { "detach-undeclared-slot-refused",
-        test_do_wrong, "wrong-detach-undeclared", test_set_wasm }
+        test_do_wrong, "wrong-detach-undeclared", test_set_wasm },
+    { "BACKEND_ENTRY_COUNT-an-entry-missing-refused",
+        test_edit_backend, "hollow", test_set_both },
+    { "memory_adopt-refused-refuses-the-bridge",
+        test_edit_backend, "refusing", test_set_both },
+    { "module_config.spans-outgrown-at-a-barrier",
+        test_outgrow_spans, "", test_set_wasm }
 };
 
 /*
