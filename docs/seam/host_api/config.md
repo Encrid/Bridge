@@ -92,7 +92,7 @@ are refused by name.
 **The component `config` names is a singleton, or the load is refused by name.** It is one
 value on no entity, so there cannot be a second, which a row on an entity could not promise: a
 module that declared the component could attach it to another. The module reads it where it
-is, through the cell its header has for each type it declared, and it goes by its `on_unload`
+is, through its header - `memory.md`, *Where the regions live* - and it goes by its `on_unload`
 when the module does. And a component is the settings of one loaded module at a time.
 
 **A setting is written by what its field is.** A bool into a bool, an integer into any integer

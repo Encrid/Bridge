@@ -162,8 +162,8 @@ One form of span for every backend rather than a resolved copy for native code: 
 two things to write at a barrier, and two things to disagree.
 
 A pointer computed this way is good for the phase it was computed in, for the same reason a row
-number is: rows move at a barrier, when an entity is placed in another table or into the place
-of one that left.
+number is: rows move at a barrier and at no other time - `schedule.md`, *A phase is a name and
+nothing else*.
 
 ## What a native module must not do
 

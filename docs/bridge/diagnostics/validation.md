@@ -32,8 +32,8 @@ it is stated where it had been always on.
 ### The row test
 
 **The wasm SDK's accessors can test `row < count` before every load, and a module's author
-states whether they do.** A module is compiled with `BRIDGE_ROWS_CHECKED` or with
-`BRIDGE_ROWS_UNCHECKED`, and with neither, or both, it does not compile. It is not Bridge-ASM700's
+states whether they do**, where the module is compiled: `wasm.md`, *A compiled module reaches
+them through accessors*. It is not Bridge-ASM700's
 to state: that code is in the module's own artifact, which Bridge-ASM700 only ever sees as bytes.
 And it is not redundant with wasm's bounds check: wasm catches a load outside the *memory*, and
 this catches one past the span's rows and still inside the shared memory, which wasm permits.

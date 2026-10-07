@@ -24,7 +24,8 @@ storage*.
 Column isolation is the ECS bargain, and it is **partly** recovered. Read and write declarations
 exist so the scheduler can keep two writers apart, and they are not policed. Why no arrangement of
 memories could express it instead: `wasm.md`, *Memories*. A module that writes a component
-it declared read is a bug in that module, and `validation.md`, *What a bad write costs, and what
+it declared read is a bug in that module - `data.md`, *Access mode* - and `validation.md`, *What
+a bad write costs, and what
 finds it*, is how it gets a name.
 
 What is recovered is everything that is not a shared column. A wasm module's spans, its
