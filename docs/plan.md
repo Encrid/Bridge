@@ -284,7 +284,7 @@ then told by a record what went.* Met.
 
 Built, with one clause of its done-when waiting on a thing outside the tree: `stage12.md`,
 *The close*. Three things that are about the whole tree and not about what it does, done before
-a host is written against it - stage 16 - so that it is written against names that stay.
+a host is written against it, so that it is written against names that stay.
 
 **One coding style, and a program that holds it.** `style.md` is how the C is written, and
 every C file of ours follows it: the library, the seam headers, the backends and their SDKs,
@@ -325,7 +325,7 @@ with a case that fails on one that is not.*
 first: its tests, its documents, its name. The host comes after, with the two stages that belong
 to it, diagnostics and the seam for a language that is not C. It replaces an order in which the
 host was next, stage 13, because a host from outside is what tests the host seam; that reason
-still holds, and what it costs to wait is said in stage 16.
+still holds, and what it costs to wait is said in *From here, a host's*.
 
 ## 13. Tests, by capability
 
@@ -337,10 +337,10 @@ to `stage6`. That says when a thing was built and not what is covered. This stag
 tests around: **one case for each capability**, named for the capability, and a list that maps
 each capability to the case that proves it. A capability is what the library exposes on one of
 its three seams, a thing somebody outside it can interact with: `stage13.md`, *What a capability
-is*. This is the library's half. The standalone host's is stage 16's, in the host's repository.
+is*. This is the library's half. The standalone host's is the host's, in its own repository.
 
 It was to come after the last stage that adds a capability, so that the list would be whole. It
-comes before two that add some, stages 17 and 18, and so it states the rule that keeps the list
+comes before work that adds some, *From here, a host's*, and so it states the rule that keeps the list
 whole from here on: **a capability is added with its case**, named for the capability and in the
 list, and the build fails on one that has none.
 
@@ -382,102 +382,27 @@ the documents that refer to it - is this stage's first question, by the method o
 *Done when nothing in the tree says the name the library was built under, but the record of
 this stage; the design before it has one name wherever it is meant; and every case passes.*
 
-## 16. A host, from outside
+## From here, a host's
 
-A standalone host, in its own repository, that links the library built and nothing else of it, which
-is what tests the host seam - `host_api.md`, *A host links a built library*. It is handed the two
-library files and the headers, not the source tree: a host does not compile Bridge. And a
-host may be in any language that can call C, so the seam is to be shown from more than C. Which
-languages, and whether one host or several, is this stage's first question, by the method of
-`stage0.md`; a host in C++ that links and runs is one of them, since the seam headers already say
-they are C to a C++ compiler and nothing has linked them as such. Whatever it reads - files, layers,
-a manifest - it resolves into the structs of `host_api.md`, *The data*. `bridge_manifest_parse`
-ships beside the library, not inside it, for a host that wants it - `native.md`, *Identity*.
+**Four stages followed, and on 2026-10-07 Enkrid moved them to the plan of a host, in the host's
+own repository.** The library is done for now, and each of the four is led by what a host needs.
+A record or a refusal in this tree that says one of these numbers means the stage it was:
 
-**It is the first thing that links the library from outside, and it comes after the library is
-tested, documented and named.** So the host seam is called finished before anything but our own
-tests has used it, and what a host finds wrong with it is this stage's to change. Diagnostics and
-the seam for a language that is not C follow it, stages 17 and 18: a host is who reads the first
-and who is written in the second.
+    16  A host, from outside        a standalone host that links the built library and is
+                                    handed nothing else of it, in C and in C++ at least
+    17  Diagnostics                 the checksum pass, the profile, and how full each budget
+                                    is: `validation.md` and `profile.md` say each is not built
+    18  A seam, for a language      the three seam headers in a form that needs no C parser,
+        that is not C               and one module written in a language that is not C
+    19  Prove it                    a real workload ported and measured: what a work limit
+                                    costs it, how idle the other threads are beside its
+                                    heaviest system, and whether deployments share a clock
+                                    and a list of phase names
 
-*Done when a host that was handed only the built library and its headers drives a real deployment
-for one pass and for many, in C and in each other language this stage chose, C++ among them; it
-reloads a changed module and reports one that failed to load; a key it left unset is an error naming
-the key; and `bridge_manifest_parse` reads an identity out of a wasm binary and out of a native
-library in each of the three platforms' formats; and the standalone host's capabilities are covered
-in its own repository the way stage 13 covers the library's.*
+**What one of them asks of the library is built here**, in this tree, when that plan reaches it:
+by the method of `stage0.md`, as a stage of this plan with its own number, and with the case
+that the rule of stage 13 demands for whatever it exposes.
 
-## 17. Diagnostics
-
-`[checks] validate` and `[checks] profile` - the barrier's checksum pass and the per-system
-counters - and `bridge_profile`, a pull. `validation.md`, *The checksum pass, when asked*, and
-`profile.md`, *The profile*. And a second pull: how much of each budget is in use, and the most
-that ever was, for the deck and for each module - the reading a deployment sizes its budgets by.
-What a host does with it is the host's, in its own repository, which is why this stage follows
-the host's: stage 16. Each capability it adds has its case in the list of stage 13.
-
-*Done when a deliberate stray write is reported with the module that made it, a system made slow on
-purpose is the one the profile names, a barrier made slow on purpose by what was queued is the
-row the profile names, an observer cycle shows as call counts that never fall to
-zero, every budget of the deck and of a module reads as what a test made it use and as the
-most it ever used, and one deployment run twice, and on one thread and on four, gives the same checksum of
-every column at every barrier - `schedule.md`, *What a pass depends on*.*
-
-## 18. A seam, for a language that is not C
-
-**All three seams, where this stage was the module's alone.** A host and a backend may be in
-any language that can call C, as a module may be in any that makes a wasm module or a shared
-library. `bridge.h` and `bridge_backend.h` assert every layout as `bridge_abi.h` does, which is
-what a binding is checked against; what none of the three has is a form that needs no C parser.
-So this stage's first question, below, is asked of the three headers together.
-
-What a module needs to be written falls in two parts, and they have two owners - `readme.md`,
-*Three layers, three seams*.
-
-    Bridge     what it writes for a module to read, the same on every backend:
-                      `bridge_abi.h`
-    a backend         how a module it runs reaches that: its SDK, in its own `sdk/`
-
-Both are C23 today, and `wasm.md`, *The ABI layouts*, said a module in another language
-derives what it needs from the header. That was never tried, and the first try failed: the
-project's own compiler cannot translate `bridge_abi.h`, which stops at its first `constexpr`. So
-a module in any language but C is a claim. It was listed as not in this plan, with no condition
-and no stage.
-
-This stage makes it true once, for one language that is not C, on the native backend: the ABI
-layouts in a form that language can read, and that backend's SDK in that language, each made by its
-owner. How Bridge states its ABI layouts so that more than C can read them - a description
-with no language in it from which the header is written, or something less - is this stage's
-first question, by the method of `stage0.md`; which language, and what a backend's SDK in it
-consists of, are the next two.
-
-After diagnostics; and what it adds goes into the list of the tests by capability, stage 13, as
-it is added.
-
-*Done when a native module in a language that is not C runs as a case; what it was written with
-came from Bridge for the ABI layouts and from the native backend for the rest, and neither was
-copied out of the other; and an ABI layout changed in one place changes what both languages read.*
-
-## 19. Prove it
-
-Port the Godot adapter of `legacy/rust-components` to this design, as a native module. It is a real workload
-with a measured baseline, which is why it is the proof. Its probe asserts 191 checks, and two of
-them ask another module a question synchronously - `costs.md`, *What we give up*, names both - so
-189 is the number that can pass.
-
-It is also the first deployment that needs a clock and a set of phases, and nothing ships either:
-`no_builtins.md`, *No builtins*, and `schedule.md`, *Bridge ships no phase names*. Both are
-this deployment's own here. Whether either becomes content that deployments share - a module with
-a name and a version, a list of phase names - is this stage's question to put, by the method of
-`stage0.md`, with what the port actually needed in hand.
-
-And it is the first workload on which the execution model can be judged - `threads.md`,
-*Threads*: how much of a phase its heaviest system takes while other threads have nothing to
-run, which is the condition under which one system on several cores is weighed again.
-
-*Done when 189 of the probe's checks pass, the two that cannot are the two named, and the GDExample
-frame is an order of magnitude under 42 us: if it is not, the architecture did not deliver and we
-find out here. And when the heaviest system's share of each phase is measured, with how many threads
-were idle beside it; and what a work limit costs the port's own systems, where the only figure so
-far is for a loop of one addition - `limits.md`, *What a bound costs*. And when what the port needed
-of a clock and of phases is written down, with the answer to whether it is shared.*
+**What it costs.** The host seam is called finished before anything but our own tests has linked
+it, and a host from outside is what tests it. What the first host finds wrong with the seam is
+changed here.

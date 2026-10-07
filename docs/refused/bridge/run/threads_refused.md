@@ -9,7 +9,8 @@ is the one model that would speed up a single loop, and it needs an instance of 
 thread, so that spans, the queue of changes and the count of failures all become an instance's, and
 a system that keeps anything between rows breaks. Nothing measured asks for it. The condition that
 brings it back is a deployment, measured, in which one system takes most of a phase while other
-threads have nothing to run: `plan.md`, stage 19, measures that.
+threads have nothing to run. The first real workload ported measures that: `plan.md`, *From
+here, a host's*.
 
 Refused: task parallelism inside a module, its systems that do not conflict run at once. Each would
 need an instance of its own for the same reason, and it helps a module of many small systems and not
