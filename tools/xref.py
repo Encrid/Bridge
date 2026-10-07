@@ -189,20 +189,6 @@ for pattern, owners in UNBUILT:
                   % (doc, head))
             bad += 1
 
-# What the project defines for itself is stated - contributing.md, *The needs*: its needs as
-# rows, its prior art in a document of its own, its words in the index.
-needs = re.search(r'^## The needs\n(.*?)(?=^## )', open('contributing.md', encoding='utf-8')
-                  .read().replace('\r\n', '\n'), re.M | re.S)
-if not needs or not re.search(r'^    \S', needs.group(1), re.M):
-    print('contributing.md -> "The needs" states none')
-    bad += 1
-if 'prior_art.md' not in paths:
-    print('prior_art.md   -> is not there')
-    bad += 1
-if 'words' not in heads['readme.md']:
-    print('readme.md      -> has no "Words"')
-    bad += 1
-
 # Three names were retired, and none comes back - stage15.md, *What holds it*: the name the
 # library was built under, what the design before it was called, and the object a host
 # creates called by the library's own word. Read in every tracked file of ours that is text.

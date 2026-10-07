@@ -22,9 +22,7 @@ diagram to keep in step with. One concern per document, in reading order:
     readme.md            this file
     design.md            why, and what the design is
     plan.md              the sixteen stages, each with a done-when that can fail
-    contributing.md      the needs, what always holds, how a decision is made and put, how
-                         a stage is planned, run and closed
-    prior_art.md         what Bridge reads for its reasoning, and what it took from each
+    contributing.md      how a decision is made, how a stage is run, where each rule is
     style.md             how the C is written: the rules, and the exceptions to them
     tests.md             what is exposed on the three seams, and the cases that show it
 
@@ -253,7 +251,7 @@ where two things could be meant the qualified form is the only form.
     key               a name in a deployment's config. `config.md`
     setting           a value a host hands over, for a module's config component or a backend
     budget            a key that sizes something, stated before it is needed. `budgets.md`
-    prior art         a project read for its reasoning, each in `prior_art.md`. Not "reference"
+    prior art         a project read for its reasoning: idTech3, flecs, Godot. Not "reference"
     citation          a document's name and one of its headings, as prose points at them.
                       `tools/xref.py` checks that each resolves
 

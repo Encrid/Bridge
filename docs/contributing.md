@@ -1,81 +1,8 @@
 # Contributing
 
-How work is done on Bridge, by whoever does it: what every decision is weighed against, what
-always holds, how a decision is made and put, how a stage is planned, run and closed, and where
-the rules for the code, the tests and the documents are. Method,
-not design: what the design is, is `design.md`.
-
-## The needs
-
-What every option of every decision is scored on. They are this project's own: another project
-states others. Each is a name, and what serving it means here.
-
-    fast            nothing is added to what runs in a phase - a system over its rows, a
-                    barrier - that a measurement has not paid for
-    scalable        it holds as entities, components, modules, systems and threads grow: no
-                    cost that grows with what a pass did not touch
-    modular         one concern has one owner and one seam, and a part - a backend, a
-                    module, a host - is replaced without the others knowing
-    extensible      a capability is added from outside the library, by a module, a backend
-                    or a host, and not by a change to it
-    minimal         nothing is built that a measured need does not ask for, and one
-                    mechanism does one job
-    explicit        nothing behaves otherwise than its reader expected: nothing is clamped,
-                    defaulted or downgraded in silence, and nothing means something by being
-                    left out
-
-## What always holds
-
-For whoever does the work, at every step. Each has its reason, because a rule without one gets
-bent.
-
-**A stage is planned before it is built.** The plan is shown and agreed before a file changes:
-*Planning a stage*. Reason: a stage begun without one is redone.
-
-**One decision at a time, with the reasoning shown first.** Before a question is put, the need,
-what each option actually does and the table of scores are in front of the owner: *Putting a
-decision*. Reason: a question with no reasoning gets an answer nobody can check.
-
-**Every option is scored on every need.** Never argued from the one need that favours it.
-Reason: a decision taken on one need is wrong on the others without anyone seeing it.
-
-**The feature is weighed before its options.** Is it needed at all, for what, and by what
-measure; only then the variants. Reason: the best variant of a thing nobody needs is still
-waste.
-
-**A label is confirmed before it is acted on.** A short item or an undefined term is read
-aloud, with the reading stated, and confirmed before the steps. Reason: a wrong reading costs
-the whole item.
-
-**Ordinary meaning first.** A term is taken in its plain sense before a new unit is invented
-for it. Reason: an invented meaning has to be taught to every reader.
-
-**One word, one meaning.** A term is defined once, in `readme.md`, *Words*, and never used in a
-second sense. Reason: an ambiguity is a defect that nothing catches.
-
-**Nothing by absence.** Nothing is optional, and nothing means something by being left out: it
-is stated by whoever knows it. Reason: what is not stated is guessed, differently each time.
-
-**No deferred work.** No shortcut, no path that was not run, no list of what is left behind a
-stage: it is finished, or it is put as a decision. Reason: what is left is not come back to.
-
-**Rule over exception.** A breach of a rule is reshaped until it fits, not excepted; the
-reshape is recommended, and still asked. Reason: an exception is the next breach's precedent.
-
-**Real mechanisms, no analogies.** An explanation says what the machine, the tool or the
-program actually does. Reason: an analogy cannot be checked.
-
-**The project is self contained.** Nothing is run from, or cited by path in, another project's
-directory; what is needed of one is copied in. Reason: a project that needs another beside it
-cannot be read or checked alone.
-
-**No tool is needed to work here but an editor, git and Python.** Nothing in the tree is
-written for one assistant or one editor, and the method is these documents: a person follows
-them as they are, and a program that helps is told to read them. Reason: a project that only
-one tool can work on is that tool's.
-
-**What leaves the machine, or cannot be undone, is confirmed first.** A push to a new place, a
-repository made, a branch or a tag deleted, a merge. Reason: the owner answers for it.
+How work is done on Bridge: how a decision is made, how a stage is run, and where the rules for
+the code, the tests and the documents are. Method, not design: what the design is, is
+`design.md`.
 
 ## How a decision is made
 
@@ -100,8 +27,7 @@ Bridge's own refusals take init's path and lists examples. Checking the document
 capabilities found nothing, because the answer was in the document that says what happens when
 anything is refused.
 
-**3. Look for prior art, for its reasoning and not its answer.** `prior_art.md` is what this
-project reads, and what it took from each. Check what is on disk before
+**3. Look for prior art, for its reasoning and not its answer.** Check what is on disk before
 describing it, and say which claims are checkable here and which are from memory; nobody can weigh
 evidence they cannot reach. Reading the prior art beats reasoning about it - flecs' own iterator
 serialiser answered in nine lines what an hour of argument had not.
@@ -132,8 +58,8 @@ schemas is not. When an option's appeal is "we keep ours and also use theirs", c
 has a job - the schema format's only remaining job turned out to be one flecs' own macro did directly.
 This applies to open questions too: one that overlaps another is a bad cut, not two problems.
 
-**6. Weigh against every named need.** They are the six of *The needs*, above. Every option is
-scored on all six, and the scores are shown: it serves the need, it fails it, or
+**6. Weigh against every named need.** Fast, scalable, modular, extensible, minimal, **explicit**.
+Every option is scored on all six, and the scores are shown: it serves the need, it fails it, or
 the need does not apply, each with the reason. An option that fails one is refused, or the
 conflict between two needs is itself the question to put. Which need decides is said only between
 options that fail none. Check whether a cost lands on the hot path - that is the one budget this
@@ -176,41 +102,6 @@ was emptied and deleted when the stage closed, because a standing list outlives 
 on the way. Two of the worst were redundant fields added while claiming to copy prior art,
 and the scan found both where thinking had not.
 
-## Putting a decision
-
-The sequence above, as it is put to the owner. One decision at a time: the next is not raised
-until this one is recorded.
-
-Before the question, and in this order:
-
-    1  the need         is the thing needed at all, for what, by what measure. If not, say so
-                        and stop
-    2  what is written  what the documents already say, with file and line. If a settled
-                        section answers it, say so and stop
-    3  prior art        from `prior_art.md`: what each did and why, and whether that reason
-                        acts here
-    4  the options      what each actually does: which files change, what runs, what a reader
-                        then sees. What there is now is one of them. Each has its cost
-    5  the table        a row for each need of *The needs*, read from the file; a column for
-                        each option; each cell serves, fails or does not apply, with why
-    6  a recommendation and which need decided between the options that fail none. If every
-                        option fails a need, the conflict is the question
-
-Then the question: the options as they were named, the recommended one first.
-
-After the answer:
-
-    a question back     is answered first, and the decision put again. A clarification is not
-                        a choice
-    the decision        goes into the document it belongs to, and into the stage's record
-                        under a heading of its own: what was ruled, by whom, over which
-                        recommendation if it differed, and what it costs
-    each option not     goes into the refused record under the same heading: what it was,
-    chosen              why, and the condition that brings it back, or that none does
-    prior art           what was taken from one, or refused, goes into `prior_art.md`
-    a new word          goes into `readme.md`, *Words*, once
-    then                the check, a commit of one line, a push
-
 ## How a stage is run
 
 `plan.md` is the stages, and each ends in a claim that can be false. This is what is done with
@@ -244,53 +135,6 @@ waits in the stage's record, and the stage is not done while one stands.
 it waits on. Every case passes, optimised and debug, alone and under six copies at once, and
 every other target compiles and links.
 
-## Planning a stage
-
-    1  read the stage   in `plan.md`, with its done-when. If the done-when cannot fail, or
-                        names something a later stage builds, that is the first question
-    2  measure          what there is today, with commands, and write the numbers: files,
-                        mentions, cases, whatever the stage will change. Nothing from memory
-    3  write the plan   with the sections below, and change no file until it is agreed
-    4  once agreed      the stage's branch from `dev`; `plan/stagen.md` with what it is for,
-                        what was counted and the order; its refused record; the stage marked
-                        "In progress" in `plan.md`; a commit and a push
-    5  the decisions    one at a time: *Putting a decision*
-
-A plan's sections, in this order:
-
-    Context                 why the stage exists, the owner's words where there are any, and
-                            the reading of any label in them, to be confirmed
-    What there is today     the counts, each with what it was measured on
-    The order               numbered steps: the record first, the decisions second, the close
-                            last
-    The decisions           the questions only, each with what makes it a question. No
-                            answers: they are the owner's, one at a time
-    What is reused          each tool, document or script already here that the stage uses
-    Files this will touch
-    Verification            a command for each clause of the done-when
-
-## Closing a stage
-
-A stage is not done because its work exists. It is done when each clause of its done-when is
-shown true.
-
-    1  the clauses      read the done-when in `plan.md` again, and split it
-    2  each is run      now, on the tree as it is. A result from earlier in the stage does
-                        not count once anything has changed since
-    3  each can fail    break the thing a check holds, see it fail, put it back
-    4  the scan         whole: the scripts, then the reading
-    5  what was left    an open question in the record, a path not run, a "later". Each is
-                        finished now or put as a decision
-    6  the record       "The close", as a table: each clause, and met with what showed it, or
-                        not met with what it waits on. And what was found false on the way,
-                        and any commit that went in with a check failing
-    7  the plan         the stage marked "Built", naming the record and any clause that waits
-    8  then             the check, a commit of one line, a push, and a report: what is met,
-                        what waits and on whom, what the owner should look at
-    9  the merge        when it is asked for, and not before: the stage's branch into `dev`,
-                        the check on `dev`, the branch deleted here and on the remote, `dev`
-                        into `main`, and back on `dev`
-
 ## Where the other rules are
 
 Each is held by a program where a program can hold it, and each program is a case of
@@ -307,17 +151,13 @@ Each is held by a program where a program can hold it, and each program is a cas
     a document               every citation names a heading that is there; a document of the
                              design names no stage; what is not built says so; a name that
                              was retired is not written: `tools/xref.py`
-    what the project         its needs, above; its prior art, in `prior_art.md`; its words,
-    defines                  in `readme.md`. `tools/xref.py` fails on one that is not there
-
-Nothing in the tree is written for one assistant or one editor: *What always holds*.
 
 ## What no script can do
 
-Steps 1 to 8 of a decision, and steps 4 to 7 of the scan, are reading and judgement. The three
-checks exist so that the **mechanical** checks are never what gets skipped - a count, a citation, a
-duplicated run, a ragged line. They cannot weigh an option, re-read an open question against a
-decision just made, or notice that an edit left `"Create or Call a module"` behind.
+Steps 1 to 8 of a decision, and steps 4 to 7 of the scan, are reading and judgement.
+The three checks exist so that the **mechanical** checks are never what gets skipped - a count, a citation, a duplicated run, a
+ragged line. They cannot weigh an option, re-read an open question against a decision just made, or
+notice that an edit left `"Create or Call a module"` behind.
 
 So the failure to watch for is not a missed grep. It is a decision that looks settled and was never
 weighed.
