@@ -1,8 +1,9 @@
 # Stage 13: tests, by capability
 
-In progress. `plan.md`, stage 13, is what it is for and when it is done. This document is the
-order it is done in, what was counted before it began, and each decision as it is taken. What a
-decision refused is `stage13_refused.md`.
+Built, with one clause of its done-when waiting on a thing outside the tree: *The close*.
+`plan.md`, stage 13, is what it is for and when it is done. This document is the order it was
+done in, what was counted before it began, each decision as it was taken, and what was built.
+What a decision refused is `stage13_refused.md`.
 
 ## The order
 
@@ -14,6 +15,10 @@ decision refused is `stage13_refused.md`.
     6  the gaps         a case written for each capability the list shows has none
     7  the load         every case run with several copies at once
     8  close            by the done-when
+
+It was built in another order: 5, then the refusals of 6, then 3 and 4 together, then the rest
+of 6, then 7. A list whose rows are the names of cases could not be written before the cases had
+their names, and which message has no case is found by running them.
 
 ## What there was, before any of it
 
@@ -208,3 +213,120 @@ Not a decision of this stage: Enkrid ruled for stage 12 that the workflows not s
 hold a stage, and it stands. The done-when says every case passes on Windows, Linux and macOS,
 alone and under load. Windows is run here. The rest is met when the jobs run, and until then the
 close says which half is known.
+
+## What was built
+
+### The list, and what holds it
+
+`tests.md`, and not `capabilities.md` as it was decided: that name is the document of what a
+backend can do, a citation names a document by its file alone, and one word is not to mean two
+things.
+
+`tools/cover.py` reads what is exposed from the headers: a function, an entry of a table, a
+macro that takes arguments, a constant, and a struct. A struct a host fills is read key by key,
+`config.threads`, `module_config.trusted`, since each key is stated and refused in its own
+words; any other struct is a layout and is one name. That is 256 names: 92 on the host seam, 120
+on the module seam, 44 on the backend seam. `tests.md` has a heading for each and eleven more,
+for what is no one name's: the order of two that conflict, the library linked statically, the
+four programs that reach inside, and the five checks of the tree. The script fails on an exposed
+name with no heading, a heading with no case, a heading a seam's headers do not expose, a case
+under no heading, a case listed that is not run, and a document that points at a case that is
+not run. It is the case `cover`.
+
+**Which document states each name is not in the list, and it was decided that it would be.**
+The decision was taken while a capability was a sentence of a document. Found for every name by
+a script, the pointer was wrong more often than right: the documents say what the library does
+in their own words, and `kind` in backticks is under five headings. Written by hand it is 256
+readings of forty documents just before stage 14 reads them all. So the list says so in its own
+words and leaves it to stage 14, whose first question is what of the documents is to be
+improved. That is one part of a decision not built, and Enkrid's to rule on: *The close*.
+
+### One host program
+
+`tests/host`: fifty-two sources, one `main`, a table of 371 rows. A row is a case's name, the
+function that runs it, what the function is handed, and its fixture. The five programs differed
+in what `main` set before a case ran, so those five settings are five fixtures, each a function:
+the wasm backend with one phase and the sink that prints a level; the wasm backend with both
+phases; both backends; and both again with the sink that counts, and with the sink that notes.
+A case that read its own name to know what to load is handed that as its argument.
+
+The 371 rows are 251 runs. A run that loads two modules and reads a sum shows a grant, a query,
+an accessor, a log and a layout at once, and each has its case: the same function and argument,
+judged by the words that are its own. A capability that no run showed has a run of its own.
+
+### Every message
+
+`tools/said.py`: 204 places in `src/` and in the two backends that write a message. The count
+before the stage, 209, was a search for the functions' names and took their declarations for
+calls. Three of the 204 pass on a message written elsewhere, and have no words of their own.
+`build.py test` keeps what every case said, a file a case, and begins a run of every case with
+none, so that a case that is gone holds nothing. The script is the case `said`.
+
+**Eighty-six of them were printed by no case.** Not all for want of a case: the reader of
+descriptors was checked by the word a refusal stops at, and the refusal was never printed; the
+case that answers every allocation null counted the refusals and printed none. Those two print
+now. What was left was written:
+
+    a key of the deployment or of a module     41 cases, most off two tables of a key and
+                                                a value
+    an entry of the ABI, misused                30 cases, off one module built 30 ways
+    a backend, called as the library calls it  5 checks added to `tests/adopt`
+    a library that is no backend                2 cases, off two libraries built for them
+    the operating system refusing memory        the build that counts allocations counts
+                                                what is reserved as well
+    a reload that lays a component out again   a case that refuses each of its allocations
+    the rest                                    a case each
+
+### Under load
+
+`python build.py test --copies 6`, as decided, and `--rounds N` beside it, so that ten loaded
+rounds are one command on each of three systems. Eleven cases are started once whatever the
+flag says, each with why, in `ALONE`: four that measure, two that decide by the clock whether
+two naps overlapped, and five that read the tree or what the run said.
+
+## What the stage found
+
+**A reload that ran out of memory blamed the budget.** A reload that moves a component's rows
+to another storage layout takes memory to carry the values across. With none, it said that
+`[budget] tables` or `[budget] columns` had no room: one answer, false, for two causes. Found by
+the case that refuses each allocation of such a reload in turn, which had one refusal that no
+record said. `storage_convert` answers which of the two it was, and the reload says it.
+
+**The wasm backend lost a block between two threads.** wasmtime asks for every linear memory
+and is not told which, so the backend marks which block the next one is, makes the instance
+that asks, and unmarks it. Until stage 12 the mark was a variable of the thread. Stage 12 held
+that file to the style, which has no variable of a file that is not constant, and moved the
+mark into the backend, where two threads share it: one that unmarked it between the other's
+marking and wasmtime's asking left that other a memory of wasmtime's own. Its module ran, every
+call returned, and nothing it wrote was in the shared block. Bridge-ASM700 makes instances one
+at a time, so no case of the library reached it. `tests/adopt` makes two on two threads, and in
+the first loaded run of the finished tree one copy of six said that a whole page was not what
+was written. The mark is set under the backend's lock now. It is the second defect that six
+copies found and one did not, and the first that this stage's own load found.
+
+**A deployment with no backend is created.** `backend_count` of zero is not refused, where
+`phase_count` of zero is. No module can be loaded into it, and each load is refused by the name
+of the backend it asks for. Left as it is, and not listed as a case: whether a count of zero is
+unset, as it is for every other count, is the host seam's to say, and stage 16 reads that seam
+from outside.
+
+## The close
+
+**The done-when, line by line.**
+
+    every capability has a case named for it,    met: 256 exposed names, each a heading with
+    and the build fails on one that has none     its cases; the case `cover`
+    no case is named for a stage                 met: 470 cases, none
+    every case passes on Windows, Linux and      Windows: met, optimised and debug, alone and
+    macOS, alone and with several copies         under six copies; a hundred loaded rounds
+                                                 run here. Linux and macOS: not met, since no
+                                                 workflow has run
+
+**The workflows.** As for stage 12: GitHub Actions starts no job while the account's billing
+refuses them, and Enkrid ruled that this does not hold a stage. Each of the three workflows
+runs the cases plain and then ten loaded rounds. The five other targets compile and link here.
+When the jobs run, what they find is this stage's to fix.
+
+**What is Enkrid's to rule on.** Two things, neither of which a case waits for: the list
+without the document that states each name, above; and whether a deployment with no backend is
+to be refused.

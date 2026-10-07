@@ -46,6 +46,10 @@ Refused: the five programs kept and renamed for what each stage was about. No ca
 the cases stay grouped by when they were written, under other words. No condition brings it
 back.
 
+Refused, after it had been taken: a case named for the document that states its capability. The
+list is grouped by what is exposed, and names in another order would be two orders for one
+thing. No condition brings it back.
+
 ## Every refusal
 
 Of `stage13.md`, *Every refusal*.
@@ -57,10 +61,6 @@ another is a guess. No condition brings it back.
 Refused: refusals listed by hand, rows like any other. It is what let one go five stages with no
 case. No condition brings it back.
 
-Refused, after it had been taken: a case named for the document that states its capability. The
-list is grouped by what is exposed, and names in another order would be two orders for one
-thing. No condition brings it back.
-
 ## Under load
 
 Of `stage13.md`, *Under load*.
@@ -70,3 +70,25 @@ each time. The condition that brings it back is a loaded run that costs no more 
 
 Refused: a script of its own that starts the copies. A second place that judges a case, to be
 kept in step with the first, and one more thing to remember to run. No condition brings it back.
+
+## What was built
+
+Of `stage13.md`, *What was built*.
+
+Refused: a constant said with the key or the argument it is a value of, a line in the list in
+the place of a case. It was built, for 36 constants, and taken out: it is an exception to "a
+case named for it" that the done-when does not have, and each of the 36 has a run that turns on
+it. No condition brings it back.
+
+Refused: a case's name on the command line and another word in the program's table. One thing
+with two names, and a failing case found in two steps. No condition brings it back.
+
+Refused: the functions of the five programs moved one by one into a file for each exposed name.
+A file is what a set of cases shares, a module they load and how it is stated, and that is not
+one exposed name's. The files are named for what their cases are about, and the list is where a
+name's cases are found. The condition that brings it back is a reader who looks for a case by
+its file and not by its name.
+
+Refused: a backend of the tests' own with all eighteen entries, for the two cases that need a
+backend to refuse. Thirteen entries nobody calls. The native backend is linked again with the
+one object that differs, as it was for the case of another seam.

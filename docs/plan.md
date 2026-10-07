@@ -329,13 +329,15 @@ still holds, and what it costs to wait is said in stage 16.
 
 ## 13. Tests, by capability
 
-In progress: `stage13.md`.
+Built, with one clause of its done-when waiting on a thing outside the tree: `stage13.md`, *The
+close*.
 
 Every test so far was written to meet one stage's claim, and is named for the stage: `stage2`
 to `stage6`. That says when a thing was built and not what is covered. This stage turns the
-tests around: **one case for each capability the documents state**, named for the capability, and
-a list that maps each capability to the case that proves it. This is the library's half. The
-standalone host's is stage 16's, in the host's repository.
+tests around: **one case for each capability**, named for the capability, and a list that maps
+each capability to the case that proves it. A capability is what the library exposes on one of
+its three seams, a thing somebody outside it can interact with: `stage13.md`, *What a capability
+is*. This is the library's half. The standalone host's is stage 16's, in the host's repository.
 
 It was to come after the last stage that adds a capability, so that the list would be whole. It
 comes before two that add some, stages 17 and 18, and so it states the rule that keeps the list
@@ -344,12 +346,12 @@ list, and the build fails on one that has none.
 
 Three things the stages did not test, and this one does. **Everything under load**: a hundred and
 twenty-eight passing cases never showed the crash stage 9 found, and six copies at once showed it
-in a minute - `stage9.md`. **Everything a document claims**: a claim with no case is found by the
+in a minute - `stage9.md`. **Everything that is exposed**: a name with no case is found by the
 list and not by reading. **Every refusal**: one, at least, existed for five stages with no test.
 
-*Done when every capability the documents state has a case named for it, and the build fails on
-one that has none; no case is named for a stage; every case passes on Windows, Linux and macOS,
-alone and with several copies running at once.*
+*Done when every capability has a case named for it, and the build fails on one that has none;
+no case is named for a stage; every case passes on Windows, Linux and macOS, alone and with
+several copies running at once.*
 
 ## 14. The documents
 

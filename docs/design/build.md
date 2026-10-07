@@ -31,6 +31,8 @@ test modules and runs the tests, as a list of commands a reader can follow from 
 
     python build.py                      build, for this machine
     python build.py test [-k NAME]       build, then run the tests
+    python build.py test --copies 6      each case six times at once
+    python build.py test --rounds 10     the tests ten times over
     python build.py --target T ...       build for another platform
     python build.py --debug ...          unoptimised, with debug information
 

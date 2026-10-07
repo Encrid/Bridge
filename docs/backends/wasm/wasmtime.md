@@ -49,7 +49,7 @@ unsaid it between the other's saying and wasmtime's asking would leave that othe
 wasmtime's own, whose writes reach nobody. So the lock is held from the holder being found to its
 memory being made. `tests/adopt` makes two stores on two threads at once, and with six copies of
 it running one in some tens lost that race when the lock was not held: `stage13.md`, *What the
-load found*.
+stage found*.
 
 wasmtime's own mechanism for one memory in many stores is a shared memory, and it is refused here:
 it allocates its own pages, so it cannot adopt, and it brings the threads proposal with it, whose
