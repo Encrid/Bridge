@@ -49,9 +49,8 @@ unmapped is the operating system's. Windows and Linux unmap it. macOS does too, 
 has a thread-local variable, and the native backend's has none.
 `tests/host`, case `BACKEND_UNLOAD-library-gone-or-kept`, asks the operating system on all three. So
 a mismatch is not a module arguing with a backend - it is **config contradicting config**, since the
-deployment chose both. It is therefore one of Bridge-ASM700's own refusals and takes init's path
-under `on_error`, exactly as a denied grant or an ambiguous order does: `failure.md`, *When
-something fails*.
+deployment chose both. It is therefore one of Bridge-ASM700's own refusals, made before the module
+exists, and the load answers it and nothing else does: `failure.md`, *When something fails*.
 
 **A key stated as "no limit" demands nothing.** `work_limit`, a timeout and `memory_limit` each take
 `-1` for that, which is how a module on the native backend states them at all. It is the same move

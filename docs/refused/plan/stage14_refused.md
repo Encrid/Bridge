@@ -105,3 +105,15 @@ finds. No condition brings it back.
 Refused: a document of findings of its own, kept after the stage. A second place to read what
 state the documents are in; stage 0 kept such a list and deleted it. No condition brings it
 back.
+
+## A load refused before the module exists
+
+Of `stage14.md`, *A load refused before the module exists*.
+
+Refused: every refused load going by `on_error`, as the documents said. It cannot be whole: a
+config with `on_error` unset, or with no identity, has nothing to go by, and would need a rule
+of its own. No condition brings it back.
+
+Refused: the capability and the mapped phase alone going by `on_error`, so that the documents'
+list were true as written. A line through the checks of a config with no rule behind it, and
+every check added later argued. No condition brings it back.

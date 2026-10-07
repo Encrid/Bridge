@@ -268,3 +268,27 @@ stage 13 were.
     extensible    a kind that gains a script later moves to its count
     minimal       no second document, and no row a script prints already
     explicit      what reading found is by name, and so is all that was refused
+
+## Decided while the findings were worked
+
+### A load refused before the module exists
+
+**It stops nothing, whatever `on_error` says, and the documents say so.** `failure.md` and
+`capabilities.md` said that every refusal of Bridge-ASM700's own takes init's path, so that a
+module stated as `fail` stops the bridge when a capability its backend lacks refuses it. The
+code has two moments. Before the module has a record, its config is held against the
+deployment and the backend, and a refusal there is answered by `bridge_load` and no more. After,
+a failure goes by `on_error`. The messages had the two phrases already: "is refused", and "did
+not load".
+
+The code is right, and for a reason that makes the other reading impossible to hold whole:
+`on_error` is a key of the config being checked, and one of the checks is that it is set.
+
+    fast          no part of this runs
+    scalable      does not apply
+    modular       a config is checked before anything is made of it
+    extensible    a check added later falls on one side by where it runs
+    minimal       no line of the library changes
+    explicit      two phrases, two outcomes, and a case that shows the first
+
+The case is `BRIDGE_FAIL-refused-before-it-exists-stops-nothing`.

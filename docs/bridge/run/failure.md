@@ -111,9 +111,16 @@ uninvited. Stale-but-readable is the less destructive failure.
 A deployment that wants the data gone unloads the module - the verb that says so: `lifetime.md`,
 *Lifetime*.
 
-Bridge-ASM700's own refusals - a grant denied, a fingerprint mismatch, an undeclared phase, a reserved
-system name, an ambiguous order, a capability the backend cannot honour - take init's path, because
-they are failures to load.
+**Bridge-ASM700's own refusals come at two moments, and `on_error` governs the second.** Before the
+module exists, its config is held against the deployment and against its backend: a key left
+unset, another ABI, a backend the deployment has not, a capability that backend cannot honour, a
+phase mapped to one the deployment did not declare. Nothing has begun. `bridge_load` answers
+that it was refused, and `on_error` does not apply: it is a key of the config that is being
+refused, and may be the one that is wrong. Once the module exists, a grant denied, a
+fingerprint mismatch, an undeclared phase, a reserved system name and an ambiguous order take
+init's path, because they are failures to load. The record says which it was: the first "is
+refused", the second "did not load". `tests/host`, case
+`BRIDGE_FAIL-refused-before-it-exists-stops-nothing`.
 
 An observer failing is a system failing: the same budget, the same count and the same stop, because
 it is the same kind of code reached a different way. The only difference is that the work abandoned

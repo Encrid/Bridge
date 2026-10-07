@@ -522,5 +522,6 @@ void test_tag_entities(host_t *h);
 void test_take_scratch_past(host_t *h);
 void test_list_fewer(host_t *h);
 void test_hand_settings(host_t *h);
+void test_refuse_essential(host_t *h);
 
 #endif

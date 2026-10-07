@@ -1433,6 +1433,8 @@ CASES = [
      r"the deployment configures no backend, and a module is run by one.*bridge_create refused.*alive", None),
     ('attach-tag-with-a-value-refused', ['host', 'attach-tag-with-a-value-refused'],
      r"system 'act' failed: attach: 'game:Flag' is a tag, and is handed a value.*alive", None),
+    ('BRIDGE_FAIL-refused-before-it-exists-stops-nothing', ['host', 'BRIDGE_FAIL-refused-before-it-exists-stops-nothing'],
+     r"module 'test:ok@0\.1\.0' is refused: no backend named 'native'.*test:image@0\.1\.0: loaded.*alive", r"has stopped"),
 ]
 
 # these again, through the static library: what a host does first, to create a bridge and to

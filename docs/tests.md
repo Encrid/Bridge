@@ -386,6 +386,7 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
 
 ### BRIDGE_FAIL
 
+    BRIDGE_FAIL-refused-before-it-exists-stops-nothing
     BRIDGE_FAIL-stopped-module-stops-the-bridge
     BRIDGE_FAIL-failed-reload-stops-the-bridge
 
