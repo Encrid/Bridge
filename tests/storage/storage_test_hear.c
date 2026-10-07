@@ -39,8 +39,9 @@ void storage_test_hear_nothing([[maybe_unused]] void *ud,
 /*
 ** storage_test_hear_memory
 **
-** A sink: counts, in the fixture, the records that say memory ran out,
-** and prints every record, so that what each refusal said can be read.
+** A sink: counts, in the fixture, the records that say memory ran out or
+** that the operating system would not give some, and prints every record,
+** so that what each refusal said can be read.
 */
 void storage_test_hear_memory(void *ud, const bridge_record_t *r)
 {
@@ -50,6 +51,7 @@ void storage_test_hear_memory(void *ud, const bridge_record_t *r)
     printf("%.*s\n", (int)r->len, r->text);
     while (i + 13 <= r->len) {
         t->said_memory += !memcmp(r->text + i, "out of memory", 13);
+        t->said_memory += !memcmp(r->text + i, "would not give", 13);
         i++;
     }
 }

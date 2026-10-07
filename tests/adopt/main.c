@@ -31,7 +31,7 @@ int main(void)
         return (1);
     if (adopt_check_stray(&t, one) || adopt_check_host_function(&t))
         return (1);
-    if (adopt_check_timed_calls(&t))
+    if (adopt_check_timed_calls(&t) || adopt_check_refusals(&t, one))
         return (1);
     t.api.instance_destroy(one);
     t.api.module_destroy(t.module);

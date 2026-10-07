@@ -238,18 +238,28 @@ void storage_visit_carriers(storage_t *r, const storage_type_t *type,
     storage_visit_fn_t visit, void *ctx);
 
 /*
+** How storage_convert ended: the rows are moved, or nothing is changed, for
+** want of room where they were to go or of the memory to carry them.
+*/
+enum storage_moved : uint8_t {
+    STORAGE_MOVED = 1,
+    STORAGE_NO_ROOM = 2,
+    STORAGE_NO_MEMORY = 3
+};
+
+/*
 ** storage_convert
 **
 ** Writes the rows of components again, as other types. All of them or none:
 ** every table and every row the new types need is had before a value moves,
-** and false, with nothing changed, if one cannot be, or if there is not the
-** memory to carry the values across. Observers are told nothing, since no
-** entity gains or loses a component by it.
+** and nothing is changed if one cannot be, or if there is not the memory to
+** carry the values across: it answers which. Observers are told nothing,
+** since no entity gains or loses a component by it.
 **
 ** lifetime.md, *When a component is moved*
 */
-[[nodiscard]] bool storage_convert(storage_t *r, const storage_move_t *moves,
-    uint32_t count);
+[[nodiscard]] enum storage_moved storage_convert(storage_t *r,
+    const storage_move_t *moves, uint32_t count);
 
 /*
 ** storage_drop

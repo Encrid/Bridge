@@ -55,6 +55,8 @@ static const storage_test_relaid_t RELAID[] = {
     { NLAYOUT0_PATH, NLAYOUT12_PATH, "an enum with a constant removed",
         nullptr, BRIDGE_NONE },
     { NLAYOUT0_PATH, NLAYOUT13_PATH, "a struct declared as a tag", nullptr,
+        BRIDGE_NONE },
+    { NLAYOUT0_PATH, NLAYOUT14_PATH, "an enum of a wider integer", nullptr,
         BRIDGE_NONE }
 };
 

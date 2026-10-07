@@ -89,5 +89,17 @@ int adopt_check_two_stores(adopt_t *t, backend_instance_t *one);
 int adopt_check_stray(adopt_t *t, backend_instance_t *one);
 int adopt_check_host_function(adopt_t *t);
 int adopt_check_timed_calls(adopt_t *t);
+int adopt_check_functions(adopt_t *t, backend_instance_t *one);
+int adopt_check_refusals(adopt_t *t, backend_instance_t *one);
+int adopt_check_native_entry(void);
+
+/*
+** adopt_say_refused
+**
+** Says why a call was refused. Answers 1, having said so, if it was
+** accepted.
+*/
+int adopt_say_refused(const char *what, bool refused,
+    const backend_err_t *err);
 
 #endif

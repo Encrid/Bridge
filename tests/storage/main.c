@@ -70,6 +70,7 @@ static const storage_test_room_t ONE_OF_EACH = { BACKENDS + 1, 1, 1, 32'768,
 static const storage_test_case_t CASES[] = {
 #ifdef COUNTED
     { "nomemory", storage_test_refuse_memory, &PLAIN },
+    { "nomemoryrelay", storage_test_refuse_relay, &PLAIN },
 #endif
     { "shape", storage_test_look_at_shape, &BOTH_BACKENDS },
     { "changes", storage_test_change, &PLAIN },

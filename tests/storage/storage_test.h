@@ -259,6 +259,15 @@ void *counted_calloc(size_t n, size_t each);
 void *counted_realloc(void *p, size_t n);
 void counted_free(void *p);
 
+/*
+** counted_os_reserve
+**
+** What the library's calls to os_reserve are, in the build that counts:
+** each is counted among the allocations, and the one that is to fail
+** answers nullptr.
+*/
+void *counted_os_reserve(size_t reserve, size_t commit);
+
     #endif
 
 /*
@@ -446,6 +455,7 @@ enum storage_test_end storage_test_weigh(storage_test_t *t);
 enum storage_test_end storage_test_take_baseline(storage_test_t *t);
     #ifdef COUNTED
 enum storage_test_end storage_test_refuse_memory(storage_test_t *t);
+enum storage_test_end storage_test_refuse_relay(storage_test_t *t);
     #endif
 
 #endif

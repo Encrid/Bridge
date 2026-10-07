@@ -74,6 +74,28 @@ static uint32_t list_moves(const module_t *n, storage_move_t *moves,
 }
 
 /*
+** refuse_move
+**
+** Says why the rows of `count` components were not moved: for want of the
+** memory to carry their values, or of room where they were to go.
+*/
+static int refuse_move(reloading_t *r, enum storage_moved moved,
+    uint32_t count)
+{
+    const bridge_t *b = r->b;
+
+    if (moved == STORAGE_NO_MEMORY)
+        return (module_fail(&r->err, "out of memory: there was none to "
+            "carry across the values of what it keeps another way, %u of "
+            "its components", count));
+    return (module_fail(&r->err, "what it keeps another way, %u of its "
+        "components, could not be moved: [budget] tables of %u or [budget] "
+        "columns of %u bytes has no room for the rows where they are to go, "
+        "while they are still where they were", count, b->tables,
+        b->columns_len));
+}
+
+/*
 ** reload_move_rows
 **
 ** Every type this reload made in the place of another takes that one's
@@ -81,19 +103,16 @@ static uint32_t list_moves(const module_t *n, storage_move_t *moves,
 */
 int reload_move_rows(reloading_t *r)
 {
-    bridge_t *b = r->b;
     const module_t *n = r->n;
     storage_move_t moves[64];
     storage_run_t whole[64];
     uint32_t count = list_moves(n, moves, whole);
+    enum storage_moved moved = STORAGE_MOVED;
 
-    if (!count || storage_convert(b->storage, moves, count)) {
-        settle(b, n);
-        return (0);
-    }
-    return (module_fail(&r->err, "what it keeps another way, %u of its "
-        "components, could not be moved: [budget] tables of %u or [budget] "
-        "columns of %u bytes has no room for the rows where they are to go, "
-        "while they are still where they were", count, b->tables,
-        b->columns_len));
+    if (count)
+        moved = storage_convert(r->b->storage, moves, count);
+    if (moved != STORAGE_MOVED)
+        return (refuse_move(r, moved, count));
+    settle(r->b, n);
+    return (0);
 }

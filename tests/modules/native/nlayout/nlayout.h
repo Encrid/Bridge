@@ -26,6 +26,7 @@
 **       12   a constant removed from the enum
 **       13   the struct `at` named declared as a tag, and X without that
 **            field
+**       14   the enum an integer of sixteen bits
 **
 ** lifetime.md, *When a component layout changed*
 */
@@ -45,8 +46,13 @@
         #define SWITCH_VALUES { OFF, ON, AUTO }
     #endif
 
+    #if V == 14
+BRIDGE_SCHEMA_ENUM_TYPE(switch_t, int16_t, SWITCH_VALUES);
+BRIDGE_SCHEMA_ENUM_DESC(switch_t, int16_t, SWITCH_VALUES);
+    #else
 BRIDGE_SCHEMA_ENUM_TYPE(switch_t, int8_t, SWITCH_VALUES);
 BRIDGE_SCHEMA_ENUM_DESC(switch_t, int8_t, SWITCH_VALUES);
+    #endif
 
     #if V == 8
         #define VEC_FIELDS { uint16_t y; uint16_t x; uint16_t z; }

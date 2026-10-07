@@ -117,7 +117,7 @@ NATIVE = [
     ('nmove1', 'nmove', ['KEPT=1']), ('nmove2', 'nmove', ['KEPT=2']), ('nmove3', 'nmove', ['KEPT=3']),
     ('nmove4', 'nmove', ['KEPT=4']), ('nmove5', 'nmove', ['KEPT=5']),
     ('nholder', 'nholder', []),
-] + [('nlayout%d' % v, 'nlayout', ['V=%d' % v, 'KEPT=1']) for v in range(14)] + [
+] + [('nlayout%d' % v, 'nlayout', ['V=%d' % v, 'KEPT=1']) for v in range(15)] + [
     ('nlayout%dk%d' % (v, k), 'nlayout', ['V=%d' % v, 'KEPT=%d' % k]) for k in (2, 3, 4, 5) for v in (0, 1, 2)] + [
     ('ntag', 'ntag', []), ('nfragtag4096', 'nfrag', ['SPLIT=4096', 'TAGS']),
     ('nsingle', 'nsingle', []), ('nsinglebad1', 'nsingle', ['BAD=1']),
@@ -337,8 +337,10 @@ def build(target, debug, out):
     storage_o = program('storage', ours + [include, src, utils] + defines, [])
     # the library again, with its calls to the allocator sent to the test that counts them
     counting = ['-D%s=counted_%s' % (f, f) for f in ('malloc', 'calloc', 'realloc', 'free')]
+    # and what it asks the operating system to reserve, which the same test refuses in turn
     counted_o = [compile_('counted-' + name, ROOT / 'src' / (name + '.c'),
-                          ours + [include, src, utils] + counting) for name in BRIDGE] + \
+                          ours + [include, src, utils] + counting +
+                          ['-Dos_reserve=counted_os_reserve']) for name in BRIDGE] + \
                 [compile_('counted-os-' + name, os_dir / (name + '.c'), ours + [utils] + counting)
                  for name in OS]
     counted_test_o = [compile_('storage-counted-' + c.stem, c,
@@ -518,6 +520,8 @@ CASES = [
     ('storage-shape', ['storage', 'shape'],
      r"the shared block reserves more than it uses: yes.*a native module's private block reserves what it uses: yes.*the shared block is whole wasm pages: yes.*a native module's private block is not rounded to one: yes.*alive", None),
     ('allocation-each-refused-in-turn', ['storage-counted', 'nomemory'],
+     r"more than forty allocations were each answered null in turn.*alive", 'FAIL'),
+    ('allocation-each-refused-in-turn-laying-out-again', ['storage-counted', 'nomemoryrelay'],
      r"more than forty allocations were each answered null in turn.*alive", 'FAIL'),
     ('storage-tables', ['storage', 'tables'],
      '@tests/storage_tables.txt', None),

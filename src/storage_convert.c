@@ -112,7 +112,8 @@ static void convert_all(const convert_t *c)
 **
 ** Writes the rows of components again, as other types. All of them or none.
 */
-bool storage_convert(storage_t *r, const storage_move_t *moves, uint32_t count)
+enum storage_moved storage_convert(storage_t *r, const storage_move_t *moves,
+    uint32_t count)
 {
     convert_t c = { r, moves, count, nullptr };
     uint32_t total = 0;
@@ -123,12 +124,14 @@ bool storage_convert(storage_t *r, const storage_move_t *moves, uint32_t count)
         k++;
     }
     c.was = malloc(total ? total : 1);
-    if (!c.was || !storage_fold_moves(&c)) {
+    if (!c.was)
+        return (STORAGE_NO_MEMORY);
+    if (!storage_fold_moves(&c)) {
         free(c.was);
-        return (false);
+        return (STORAGE_NO_ROOM);
     }
     convert_all(&c);
     forget_all(r);
     free(c.was);
-    return (true);
+    return (STORAGE_MOVED);
 }
