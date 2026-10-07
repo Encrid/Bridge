@@ -52,7 +52,12 @@ static const want_refusal_t SCHEMA_REFUSALS[] = {
     { BRIDGE_ENUM, "int8_t { A = 128 }", "'128'" },
     { BRIDGE_ENUM, "uint8_t { A = -1 }", "'-1'" },
     { BRIDGE_ENUM, "uint8_t { A = 255, B }", "'}'" },
-    { BRIDGE_BITMASK, "uint8_t { A = 256 }", "'256'" }
+    { BRIDGE_BITMASK, "uint8_t { A = 256 }", "'256'" },
+    { BRIDGE_ENUM, "int32_t { 9 }", "'9'" },
+    { BRIDGE_ENUM, "int32_t A }", "'A'" },
+    { BRIDGE_STRUCT, "{ float x[2; }", "';'" },
+    { BRIDGE_STRUCT, "{ uint64_t a[400000000]; uint64_t b[400000000]; }",
+        "more bytes" }
 };
 
 /*

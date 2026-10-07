@@ -163,6 +163,20 @@ WASM = [(name, name, 'checked', []) for name in PLAIN.split()] + [
     ('ticker-trip', 'ticker', 'checked', ['STEP=1', 'TRIP']),
     ('ticker-alloc', 'ticker', 'checked', ['STEP=10', 'ALLOC']),
 ]
+# the wrong module: each build does one thing an entry refuses, at init or in its system, and
+# states that it does nothing in the other
+WRONG_AT_INIT = ('declare_outside declare_name_outside declare_no_namespace declare_kind_unset '
+                 'declare_tag_with_bytes declare_policy_unset declare_size_other system_outside '
+                 'system_phase_outside system_name_outside system_many_changes system_twice '
+                 'observer_no_term observe_outside observe_events_unset term_access_unset '
+                 'term_access_other term_oper_unset term_slot_undeclared term_write_ungranted '
+                 'change_slot_undeclared change_ungranted alloc_stated_none')
+WRONG_IN_SYSTEM = ('declare_late system_late observe_late attach_undeclared attach_ungranted '
+                   'attach_outside detach_undeclared')
+WASM += [('wrong-' + act.replace('_', '-'), 'wrong', 'checked',
+          ['AT_INIT=wrong_' + act, 'IN_SYSTEM=wrong_do_nothing']) for act in WRONG_AT_INIT.split()]
+WASM += [('wrong-' + act.replace('_', '-'), 'wrong', 'checked',
+          ['AT_INIT=wrong_do_nothing', 'IN_SYSTEM=wrong_' + act]) for act in WRONG_IN_SYSTEM.split()]
 
 
 def die(msg):
@@ -993,6 +1007,66 @@ CASES = [
      r"module 'test:ok@0\.1\.0' is refused: phase name 1 of its config is unset.*alive", None),
     ('module_config.phases-mapped-twice-refused', ['host', 'module_config.phases-mapped-twice-refused'],
      r"module 'test:ok@0\.1\.0' is refused: its config maps phase 'tick' twice.*alive", None),
+    ('declare-statement-outside-scratch-refused', ['host', 'declare-statement-outside-scratch-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: declare: what it states lies outside the scratch arena.*alive", None),
+    ('bridge_declaration_t-name-outside-scratch-refused', ['host', 'bridge_declaration_t-name-outside-scratch-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: declare: a name or a descriptor lies outside the scratch arena.*alive", None),
+    ('declare-name-with-no-namespace-refused', ['host', 'declare-name-with-no-namespace-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: type 'Odd' has no namespace.*alive", None),
+    ('declare-kind-unset-refused', ['host', 'declare-kind-unset-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: type 'game:Odd': its kind is unset.*alive", None),
+    ('BRIDGE_TAG-with-bytes-refused', ['host', 'BRIDGE_TAG-with-bytes-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: type 'game:Odd' is a tag, and a tag has no bytes and no descriptor.*alive", None),
+    ('declare-on-unload-unset-refused', ['host', 'declare-on-unload-unset-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: type 'game:Odd': on_unload is unset.*alive", None),
+    ('declare-size-other-than-descriptor-refused', ['host', 'declare-size-other-than-descriptor-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: type 'game:Odd' is 12 bytes aligned to 4 in the module and 8 aligned to 4 by its descriptor.*alive", None),
+    ('add_system-statement-outside-scratch-refused', ['host', 'add_system-statement-outside-scratch-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: add_system: what it states lies outside the scratch arena.*alive", None),
+    ('bridge_system_statement_t-phase-outside-scratch-refused', ['host', 'bridge_system_statement_t-phase-outside-scratch-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: add_system: a phase lies outside the scratch arena.*alive", None),
+    ('bridge_system_statement_t-name-outside-scratch-refused', ['host', 'bridge_system_statement_t-name-outside-scratch-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: system: a name, a term or a change lies outside the scratch arena.*alive", None),
+    ('add_system-more-changes-than-types-refused', ['host', 'add_system-more-changes-than-types-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: a system states 5 changes, and the module declared 2 types.*alive", None),
+    ('add_system-name-twice-refused', ['host', 'add_system-name-twice-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: 'act' is registered twice.*alive", None),
+    ('observe-no-term-refused', ['host', 'observe-no-term-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: observer 'again' has no term, and so nothing to observe.*alive", None),
+    ('observe-statement-outside-scratch-refused', ['host', 'observe-statement-outside-scratch-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: observe: what it states lies outside the scratch arena.*alive", None),
+    ('bridge_observer_statement_t-events-unset-refused', ['host', 'bridge_observer_statement_t-events-unset-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: observe: its events are unset, or name one there is not.*alive", None),
+    ('bridge_term_t-access-unset-refused', ['host', 'bridge_term_t-access-unset-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: term 0 of system 'again': its access is unset.*alive", None),
+    ('bridge_term_t-access-neither-refused', ['host', 'bridge_term_t-access-neither-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: term 0 of system 'again': its access is 3, and there is read and write.*alive", None),
+    ('bridge_term_t-operator-unset-refused', ['host', 'bridge_term_t-operator-unset-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: term 0 of system 'again': its operator is unset.*alive", None),
+    ('bridge_term_t-slot-undeclared-refused', ['host', 'bridge_term_t-slot-undeclared-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: term 0 of system 'again' names slot 9, which it never declared.*alive", None),
+    ('BRIDGE_WRITE-ungranted-refused', ['host', 'BRIDGE_WRITE-ungranted-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: system 'again' may not write 'other:Thing': no grant says so.*alive", None),
+    ('add_system-change-of-an-undeclared-slot-refused', ['host', 'add_system-change-of-an-undeclared-slot-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: change 0 of system 'again' names slot 9, which it never declared.*alive", None),
+    ('add_system-change-ungranted-refused', ['host', 'add_system-change-ungranted-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: system 'again' may not attach or detach 'other:Thing': no grant says so.*alive", None),
+    ('alloc-stated-as-none-refused', ['host', 'alloc-stated-as-none-refused'],
+     r"module 'game:wrong@0\.1\.0' did not load: alloc: it stated that it keeps nothing in the persistent arena.*alive", None),
+    ('declare-outside-init-refused', ['host', 'declare-outside-init-refused'],
+     r"system 'act' failed: declare is called outside init.*alive", None),
+    ('add_system-outside-init-refused', ['host', 'add_system-outside-init-refused'],
+     r"system 'act' failed: add_system is called outside init.*alive", None),
+    ('observe-outside-init-refused', ['host', 'observe-outside-init-refused'],
+     r"system 'act' failed: observe is called outside init.*alive", None),
+    ('attach-undeclared-slot-refused', ['host', 'attach-undeclared-slot-refused'],
+     r"system 'act' failed: attach names slot 9, which it never declared.*alive", None),
+    ('attach-ungranted-refused', ['host', 'attach-ungranted-refused'],
+     r"system 'act' failed: it may not attach 'other:Thing': no grant says so.*alive", None),
+    ('attach-value-outside-scratch-refused', ['host', 'attach-value-outside-scratch-refused'],
+     r"system 'act' failed: attach: the value lies outside the scratch arena.*alive", None),
+    ('detach-undeclared-slot-refused', ['host', 'detach-undeclared-slot-refused'],
+     r"system 'act' failed: detach names slot 9, which it never declared.*alive", None),
 ]
 
 # these again, through the static library: what a host does first, to create a bridge and to
