@@ -64,6 +64,8 @@ static_assert(sizeof(size_t) == 8);
 
 /*
 ** A setting: a key, and a value of one of four kinds. Zero in `kind` is unset.
+**
+** host_api.md, *The data*
 */
 enum bridge_setting_kind : uint8_t {
     BRIDGE_BOOL = 1,
@@ -96,6 +98,8 @@ static_assert(offsetof(bridge_setting_t, v) == 16);
 ** A backend the deployment configures: Bridge-ASM700 opens the library, and a
 ** module names the backend that runs it. `settings` are the backend's own,
 ** passed to it unread: it refuses a key it does not know.
+**
+** config.md, *The keys*
 */
 typedef struct {
     const char *name;
@@ -163,6 +167,8 @@ static_assert(offsetof(bridge_budget_t, direct_indexed) == 56);
 ** Two systems that conflict in one phase, in the order they are to run. A
 ** system is named by its module's identity without the version, then itself:
 ** "game:actors:movement".
+**
+** schedule.md, *Order within a phase is never implicit*
 */
 typedef struct {
     const char *before;
@@ -180,6 +186,8 @@ static_assert(offsetof(bridge_order_t, after) == 8);
 **     backends   one at least: a module is run by a backend
 **     phases     a phase is a name, and no more
 **     threads    how many run a phase, counting the caller's. Zero is unset
+**
+** config.md, *The keys*
 */
 typedef struct {
     uint32_t abi;
@@ -213,6 +221,8 @@ static_assert(offsetof(bridge_config_t, budget) == 56);
 /*
 ** A phase a module names in its code, and the phase of this deployment that
 ** it is: a module is written by somebody who never saw the deployment.
+**
+** schedule.md, *A module's phase names are mapped by the deployment*
 */
 typedef struct {
     const char *from;
@@ -225,6 +235,8 @@ static_assert(offsetof(bridge_phase_name_t, to) == 8);
 
 /*
 ** What losing a module costs the deployment. Zero is unset.
+**
+** failure.md, *When something fails*
 */
 enum bridge_on_error : uint8_t {
     BRIDGE_FAIL = 1,
@@ -234,6 +246,8 @@ enum bridge_on_error : uint8_t {
 /*
 ** A key that is yes or no. It is stated like any other: left at BRIDGE_UNSET
 ** it is refused, by its name, and is not taken for false.
+**
+** config.md, *No unaccountable values*
 */
 enum bridge_flag : uint8_t {
     BRIDGE_UNSET = 0,
@@ -247,6 +261,8 @@ enum bridge_flag : uint8_t {
 ** all there is, and a module with no reservation gets nothing. Each field of
 ** a module's configuration takes one of them, and the other, like any other
 ** negative number, is refused at load.
+**
+** config.md, *No unaccountable values*
 */
 constexpr int64_t BRIDGE_NO_LIMIT = -1;
 constexpr int64_t BRIDGE_NONE = -2;
@@ -255,6 +271,8 @@ constexpr int64_t BRIDGE_NONE = -2;
 ** A module with no settings component says so. No component is named without
 ** a colon, so this names none of them; a config left null is unset, and
 ** refused.
+**
+** config.md, *A module's own settings are a component*
 */
 constexpr char BRIDGE_NO_CONFIG[] = "none";
 
@@ -392,6 +410,8 @@ static_assert(offsetof(bridge_module_config_t, loss_count) == 192);
 **     backend       which backend runs it, by name
 **     bytes, len    the image, or null
 **     path          where it is, or null. Both go to the backend
+**
+** lifecycle.md, *The runtime lifecycle*
 */
 typedef struct {
     bridge_module_config_t cfg;
@@ -416,6 +436,8 @@ static_assert(offsetof(bridge_artifact_t, path) == 224);
 **     text        this call only
 **     when        barrier count, then offset in the phase
 **     level       lower is worse: enum bridge_level
+**
+** create.md, *The sink*
 */
 typedef struct {
     const char *identity;
@@ -442,6 +464,8 @@ static_assert(offsetof(bridge_record_t, pad) == 41);
 ** The severities of syslog, RFC 5424, by its numbers: 0 is the worst and 7
 ** the most detail. These four are the ones Bridge-ASM700 and its bindings
 ** name; a module may write any of the eight.
+**
+** log.md, *The log*
 */
 enum bridge_level : uint8_t {
     BRIDGE_ERR = 3,
@@ -458,6 +482,8 @@ typedef void (*bridge_sink_fn_t)(void *ud, const bridge_record_t *r);
 ** Whether a loaded module still runs: one at its failure budget is stopped
 ** long after any return code. `identity` holds until the next load, unload or
 ** reload.
+**
+** introspection.md, *Introspection*
 */
 enum bridge_state : uint8_t {
     BRIDGE_RUNNING = 1,
@@ -480,6 +506,8 @@ static_assert(offsetof(bridge_module_info_t, pad) == 9);
 **
 ** Makes a bridge of a deployment. nullptr if the deployment cannot start;
 ** which reason, the sink was told.
+**
+** create.md, *Create*
 */
 BRIDGE_API [[nodiscard]] bridge_t *bridge_create(const bridge_config_t *cfg,
     bridge_sink_fn_t sink, void *ud);
@@ -491,6 +519,8 @@ BRIDGE_API [[nodiscard]] bridge_t *bridge_create(const bridge_config_t *cfg,
 ** gone. With a pinned module loaded it answers 1 from any thread but the one
 ** that loaded it, with a record, and nothing has been torn down: the bridge is
 ** still there to be destroyed from the right one.
+**
+** create.md, *Destroy*
 */
 BRIDGE_API [[nodiscard]] int bridge_destroy(bridge_t *b);
 
@@ -500,6 +530,8 @@ BRIDGE_API [[nodiscard]] int bridge_destroy(bridge_t *b);
 ** 0 if the module is loaded, its init answered 0, and the bridge can still run
 ** it. Otherwise the load was refused or failed, or stopped the bridge, and a
 ** record says why. Between phases only.
+**
+** lifecycle.md, *The runtime lifecycle*
 */
 BRIDGE_API [[nodiscard]] int bridge_load(bridge_t *b,
     const bridge_artifact_t *a);
@@ -510,6 +542,8 @@ BRIDGE_API [[nodiscard]] int bridge_load(bridge_t *b,
 ** Takes a module out, by its identity: its shutdown, then the components
 ** nobody else declared, each by the policy it was declared with. 0 if it was
 ** loaded. Between phases only.
+**
+** lifecycle.md, *The runtime lifecycle*
 */
 BRIDGE_API [[nodiscard]] int bridge_unload(bridge_t *b, const char *identity);
 
@@ -521,6 +555,8 @@ BRIDGE_API [[nodiscard]] int bridge_unload(bridge_t *b, const char *identity);
 ** runs where its backend can hold two at once; where it cannot, the module is
 ** stopped, with everything it declared, until it is reloaded again or
 ** unloaded. Between phases only.
+**
+** lifecycle.md, *The runtime lifecycle*
 */
 BRIDGE_API [[nodiscard]] int bridge_reload(bridge_t *b,
     const bridge_artifact_t *a);
@@ -530,6 +566,8 @@ BRIDGE_API [[nodiscard]] int bridge_reload(bridge_t *b,
 **
 ** What is loaded, and whether it still runs. Answers how many there are;
 ** fills at most `max`.
+**
+** introspection.md, *Introspection*
 */
 BRIDGE_API int bridge_list_modules(bridge_t *b, bridge_module_info_t *out,
     int max);
@@ -540,6 +578,8 @@ BRIDGE_API int bridge_list_modules(bridge_t *b, bridge_module_info_t *out,
 ** Runs the systems registered to one phase, then its barrier. 0 if the phase
 ** ran, whatever its systems did: a system that failed is a record, not a
 ** return code. With a pinned module loaded, from the thread that loaded it.
+**
+** loop.md, *The host owns the loop, and the order within it*
 */
 BRIDGE_API [[nodiscard]] int bridge_run_phase(bridge_t *b, const char *name);
 

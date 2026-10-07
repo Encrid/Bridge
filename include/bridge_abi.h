@@ -43,12 +43,16 @@ extern "C" {
 /*
 ** A module states the version it was built against; one built against another
 ** is refused.
+**
+** host_api.md, *A seam has a number*
 */
 constexpr uint32_t BRIDGE_ABI = 1;
 
 /*
 ** Everything a module imports comes from one namespace; the two memories go
 ** by name.
+**
+** wasm.md, *Memories*
 */
 constexpr char BRIDGE_NAMESPACE[] = "bridge";
 constexpr char BRIDGE_SHARED[] = "shared";
@@ -73,6 +77,8 @@ enum bridge_kind : uint32_t {
 ** tag, which has none: that it is carried. Offset 0 of the shared memory is
 ** reserved and its first eight bytes hold nothing, so this is not zero, which
 ** says absent, and is no value's place.
+**
+** storage.md, *A tag*
 */
 constexpr uint32_t BRIDGE_CARRIED = 1;
 
@@ -110,6 +116,8 @@ enum bridge_storage : uint32_t {
 ** `access` is what the scheduler reads to know what may run at once, and it
 ** reads one thing: whether the term is written. `oper`: the entity must carry
 ** it, must not, or may.
+**
+** query.md, *The interface is a query*
 */
 enum bridge_access : uint8_t {
     BRIDGE_READ = 1,
@@ -141,6 +149,8 @@ static_assert(offsetof(bridge_term_t, pad) == 6);
 ** observer's terms. ENTER: it did not match them and now does. LEAVE: it
 ** matched and no longer does, or was destroyed. ATTACH: it matches, and an
 ** attach of one of them was applied. A write in place raises none.
+**
+** data.md, *Observers*
 */
 enum bridge_event : uint32_t {
     BRIDGE_ON_ENTER = 1,
@@ -192,6 +202,8 @@ static_assert(offsetof(bridge_declaration_t, storage) == 32);
 /*
 ** What add_system is handed. `changes` is the slots of what it attaches or
 ** detaches, each a u32, `change_count` of them.
+**
+** abi.md, *The ABI*
 */
 typedef struct {
     uint32_t name;
@@ -217,6 +229,8 @@ static_assert(offsetof(bridge_system_statement_t, change_count) == 28);
 /*
 ** What observe is handed. It states no phase: an observer has one already,
 ** the barrier that applied its trigger.
+**
+** abi.md, *The ABI*
 */
 typedef struct {
     uint32_t name;
@@ -239,6 +253,8 @@ static_assert(offsetof(bridge_observer_statement_t, change_count) == 24);
 
 /*
 ** What attach is handed as `ptr` when the value asked for is a zeroed one.
+**
+** abi.md, *The ABI*
 */
 constexpr uint32_t BRIDGE_ZEROED = UINT32_MAX;
 
@@ -264,6 +280,8 @@ constexpr uint32_t BRIDGE_ZEROED = UINT32_MAX;
 **                             table, where in the shared memory it is
 **                             reached. A sparse set: its index, a u32 for
 **                             each entity
+**
+** memory.md, *Where the regions live*
 */
 typedef struct {
     uint32_t abi;
@@ -335,6 +353,8 @@ static_assert(offsetof(bridge_text_t, len) == 4);
 /*
 ** An observer's slot: how many bridge_trigger_t records this barrier, and
 ** where they begin.
+**
+** data.md, *Observers*
 */
 typedef struct {
     uint32_t count;
@@ -357,6 +377,8 @@ constexpr uint32_t BRIDGE_SPAN_BASE = 8;
 
 /*
 ** The entity index, by the low 32 bits of an id. Table 0 is no table.
+**
+** reference.md, *Reference following*
 */
 typedef struct {
     uint32_t table;
@@ -385,6 +407,8 @@ enum bridge_log : uint8_t {
 /*
 ** A log record. `text` is an offset into the writer's scratch arena, always.
 ** `level` is an enum bridge_log: lower is worse.
+**
+** log.md, *The log*
 */
 typedef struct {
     uint32_t when;

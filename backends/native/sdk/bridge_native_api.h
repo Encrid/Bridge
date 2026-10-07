@@ -30,6 +30,8 @@
 /*
 ** What a native module exports: a function of this name, handed the table
 ** as `api`. A system called "move" is the export bridge_move.
+**
+** native.md, *What the backend provides*
 */
     #define BRIDGE_NATIVE(name) \
         BRIDGE_NATIVE_EXPORT int bridge_##name( \
@@ -38,6 +40,8 @@
 /*
 ** A struct of type T with these members, put in the scratch arena: where it
 ** is.
+**
+** memory.md, *Where the regions live*
 */
     #define BRIDGE_NATIVE_STATE(api, T, ...) \
         bridge_native_put(api, &(T){ __VA_ARGS__ }, sizeof(T))
@@ -78,6 +82,8 @@ struct bridge_api {
 ** bridge_native_get_header
 **
 ** Answers the header of the module's private memory.
+**
+** memory.md, *Where the regions live*
 */
 static inline bridge_header_t *bridge_native_get_header(const bridge_api_t *api)
 {
@@ -89,6 +95,8 @@ static inline bridge_header_t *bridge_native_get_header(const bridge_api_t *api)
 **
 ** Copies `len` bytes into the scratch arena, and answers where they are, or
 ** 0 if they do not fit, which every entry refuses.
+**
+** memory.md, *Where the regions live*
 */
 static inline uint32_t bridge_native_put(const bridge_api_t *api,
     const void *bytes, uint32_t len)
@@ -110,6 +118,8 @@ static inline uint32_t bridge_native_put(const bridge_api_t *api,
 ** count them as used: where they are, or 0 if they do not fit. For a value
 ** an entry copies during the call, as attach does, so that a module's
 ** scratch holds one such value at a time and not a phase's worth.
+**
+** memory.md, *Where the regions live*
 */
 static inline uint32_t bridge_native_lend(const bridge_api_t *api,
     const void *bytes, uint32_t len)

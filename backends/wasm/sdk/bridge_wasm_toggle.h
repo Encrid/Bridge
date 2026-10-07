@@ -21,6 +21,8 @@
 **
 ** Answers where the bits of the toggled column at `base` are: row r is bit
 ** r & 63 of word r >> 6.
+**
+** storage.md, *A toggle*
 */
 static inline uint32_t bridge_get_bits(uint32_t base)
 {
@@ -31,6 +33,8 @@ static inline uint32_t bridge_get_bits(uint32_t base)
 ** bridge_is_on
 **
 ** Answers whether row `row` of `count` is on.
+**
+** storage.md, *A toggle*
 */
 static inline bool bridge_is_on(uint32_t bits, uint32_t row, uint32_t count)
 {
@@ -43,6 +47,8 @@ static inline bool bridge_is_on(uint32_t bits, uint32_t row, uint32_t count)
 ** bridge_turn
 **
 ** Turns a row on or off, for a system that stated the term BRIDGE_WRITE.
+**
+** storage.md, *A toggle*
 */
 static inline void bridge_turn(uint32_t bits, uint32_t row, uint32_t count,
     bool on)

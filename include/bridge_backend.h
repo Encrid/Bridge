@@ -43,6 +43,8 @@ typedef struct backend_func backend_func_t;
 /*
 ** Why an entry failed. The caller owns the buffer, so there is no lifetime to
 ** get wrong.
+**
+** backend.md, *What a backend is asked for*
 */
 typedef struct {
     char text[256];
@@ -85,6 +87,8 @@ enum backend_capability : uint32_t {
 ** It is the host seam's bridge_setting_t again, on purpose: a seam's header is
 ** whole without the other's. Bridge-ASM700 holds the two to one shape, where
 ** it copies one to the other.
+**
+** backend.md, *What a backend is asked for*
 */
 enum backend_setting_kind : uint8_t {
     BACKEND_BOOL = 1,
@@ -146,6 +150,8 @@ static_assert(offsetof(backend_sig_t, pad1) == 28);
 ** A function Bridge-ASM700 provides to a module. Every value travels as 64
 ** bits. Non-zero says the call that reached it must not go on: a backend that
 ** can unwind a module does so there.
+**
+** signatures.md, *Imports are declared, exports are checked*
 */
 typedef int (*backend_fn_t)(void *ud, const uint64_t *args, uint64_t *results);
 
@@ -157,6 +163,8 @@ enum backend_import_kind : uint8_t {
 
 /*
 ** An import a module makes. Neither `ns` nor `field` is NUL-terminated.
+**
+** signatures.md, *Imports are declared, exports are checked*
 */
 typedef struct {
     const char *ns;
@@ -177,6 +185,8 @@ static_assert(offsetof(backend_import_t, pad) == 33);
 
 /*
 ** Which adopted memory answers which of a module's imports.
+**
+** backend.md, *Memory is adopted, not created*
 */
 typedef struct {
     const char *ns;
@@ -202,6 +212,8 @@ constexpr uint32_t BACKEND_ABI = 1;
 ** What module_compile is handed. `demands` is the capability flags this
 ** module's config asks for: a backend need not compile in a guarantee nobody
 ** demanded, and may never enforce less than was.
+**
+** capabilities.md, *Capabilities, so the swap is honest*
 */
 typedef struct {
     const void *bytes;
@@ -213,6 +225,8 @@ typedef struct {
 /*
 ** What define_func is handed: an import a module may make, and what answers
 ** it.
+**
+** signatures.md, *Imports are declared, exports are checked*
 */
 typedef struct {
     const char *ns;
@@ -242,6 +256,8 @@ typedef struct {
 **                         if the backend can see that its shape is another
 **     call                0 if the function returned, and then `status` is
 **                         what it returned
+**
+** backend.md, *What a backend is asked for*
 */
 typedef struct backend_api {
     uint32_t (*backend_get_abi)(void);
@@ -275,6 +291,8 @@ typedef struct backend_api {
 
 /*
 ** The names a backend exports, in the order of backend_api_t's members.
+**
+** backend.md, *What a backend is asked for*
 */
 constexpr uint32_t BACKEND_ENTRY_COUNT = 18;
 static const char *const BACKEND_ENTRY_NAMES[BACKEND_ENTRY_COUNT] = {

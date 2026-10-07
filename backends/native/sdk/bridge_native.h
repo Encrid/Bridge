@@ -22,6 +22,8 @@
 
 /*
 ** An attach with its value, which is as long as the type was declared.
+**
+** abi.md, *The ABI*
 */
     #define BRIDGE_NATIVE_ATTACH(api, id, slot, value) \
         (api)->attach(api, id, slot, \
@@ -30,6 +32,8 @@
 /*
 ** Registration, with names as literals. A type another declaration's fields
 ** use is declared before it, in the same namespace.
+**
+** schema.md, *What a module compiles against*
 */
     #define BRIDGE_NATIVE_DECLARE(api, kind, name, T, on_unload, storage) \
         (api)->declare(api, BRIDGE_NATIVE_STATE(api, bridge_declaration_t, \
@@ -54,6 +58,8 @@
 ** A system, and an observer. `changes` is the slots of the components it
 ** attaches or detaches, `change_count` of them: one that does neither hands
 ** nullptr and 0.
+**
+** abi.md, *The ABI*
 */
     #define BRIDGE_NATIVE_ADD_SYSTEM(api, name, phase, terms, count, changes, \
         change_count) \
@@ -99,6 +105,8 @@ static inline const bridge_query_t *bridge_native_get_query(
 **
 ** Answers span `i` of a query that declared `terms` terms: u32 count, u32
 ** entities, u32 base[terms].
+**
+** native.md, *Reaching a component*
 */
 static inline const uint32_t *bridge_native_get_span(const bridge_api_t *api,
     const bridge_query_t *q, uint32_t i, uint32_t terms)

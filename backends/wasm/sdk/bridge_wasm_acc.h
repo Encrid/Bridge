@@ -24,6 +24,8 @@
 /*
 ** An attribute takes a literal, so the namespace is spelled here: it is
 ** BRIDGE_NAMESPACE.
+**
+** wasm.md, *A compiled module reaches them through accessors*
 */
     #define BRIDGE_IMPORT(name) \
         [[clang::import_module("bridge"), clang::import_name(#name)]]
@@ -33,11 +35,15 @@
 
 /*
 ** A member of the header of the module's private memory.
+**
+** memory.md, *Where the regions live*
 */
     #define BRIDGE_HEADER(field) acc_own_32(offsetof(bridge_header_t, field))
 
 /*
 ** The ABI. Every pointer is an offset into the scratch arena.
+**
+** abi.md, *The ABI*
 */
 BRIDGE_IMPORT(declare) uint32_t bridge_declare(uint32_t at);
 BRIDGE_IMPORT(add_system) uint32_t bridge_add_system(uint32_t at);
@@ -69,6 +75,8 @@ BRIDGE_ACC(acc_row_unchecked) uint32_t acc_row(uint32_t base, uint32_t row,
 
 /*
 ** Loads from the shared memory and stores to it, by the kind of the value.
+**
+** wasm.md, *A compiled module reaches them through accessors*
 */
 BRIDGE_ACC(acc_ld_i8) int32_t acc_ld_i8(uint32_t at);
 BRIDGE_ACC(acc_ld_u8) uint32_t acc_ld_u8(uint32_t at);
@@ -88,6 +96,8 @@ BRIDGE_ACC(acc_st_f64) void acc_st_f64(uint32_t at, double v);
 /*
 ** Loads from the module's private memory and a store to it, and the copies
 ** between the module's own memory and the two.
+**
+** wasm.md, *A compiled module reaches them through accessors*
 */
 BRIDGE_ACC(acc_own_32) uint32_t acc_own_32(uint32_t at);
 BRIDGE_ACC(acc_own_64) uint64_t acc_own_64(uint32_t at);

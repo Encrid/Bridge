@@ -98,6 +98,8 @@ static inline uint64_t *bridge_native_get_bits(const bridge_api_t *api,
 **
 ** Answers an observer's list: `count` bridge_trigger_t records, at
 ** private_base + `at`.
+**
+** data.md, *Observers*
 */
 static inline const bridge_list_t *bridge_native_get_list(
     const bridge_api_t *api, uint32_t observer)

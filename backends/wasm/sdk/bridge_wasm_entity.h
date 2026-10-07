@@ -20,6 +20,8 @@
 ** bridge_get_entity
 **
 ** Answers the id of row `row` of `count`, of the ids at `entities`.
+**
+** query.md, *The interface is a query*
 */
 static inline uint64_t bridge_get_entity(uint32_t entities, uint32_t row,
     uint32_t count)
@@ -32,6 +34,8 @@ static inline uint64_t bridge_get_entity(uint32_t entities, uint32_t row,
 **
 ** Answers where component `slot` of entity `id` is, or zero: a stale id, or
 ** an entity without it.
+**
+** reference.md, *Reference following*
 */
 static inline uint32_t bridge_get_ref(uint64_t id, uint32_t slot,
     uint32_t stride)
@@ -56,6 +60,8 @@ static inline uint32_t bridge_get_ref(uint64_t id, uint32_t slot,
 **
 ** Answers whether `id` still names an entity: one that was destroyed, or
 ** never spawned, does not.
+**
+** reference.md, *Reference following*
 */
 static inline int bridge_is_alive(uint64_t id)
 {

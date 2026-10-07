@@ -33,6 +33,8 @@
 /*
 ** Registration, with names as literals. A type another declaration's fields
 ** use is declared before it, in the same namespace.
+**
+** schema.md, *What a module compiles against*
 */
     #define BRIDGE_DECLARE(kind, name, T, on_unload, storage) \
         bridge_declare(BRIDGE_STATE(bridge_declaration_t, \
@@ -57,6 +59,8 @@
 ** A system, and an observer. `changes` is the slots of the components it
 ** attaches or detaches, `change_count` of them: one that does neither hands
 ** nullptr and 0.
+**
+** abi.md, *The ABI*
 */
     #define BRIDGE_ADD_SYSTEM(name, phase, terms, count, changes, \
         change_count) \
@@ -87,6 +91,8 @@
 ** A component's fields. BRIDGE_ROW is where row `row` of a column of T is,
 ** and carries the row < count test; `at` is what it or bridge_get_ref
 ** answered.
+**
+** wasm.md, *A compiled module reaches them through accessors*
 */
     #define BRIDGE_ROW(T, base, row, count) acc_row(base, row, count, sizeof(T))
     #define BRIDGE_GET(T, field, at) \

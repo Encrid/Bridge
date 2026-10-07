@@ -18,6 +18,8 @@
 /*
 ** What a line of the log holds: its text, how long that is, and two
 ** numbers.
+**
+** log.md, *The log*
 */
 typedef struct {
     const char *text;
@@ -32,6 +34,8 @@ typedef struct {
 ** Writes a line into the module's ring, if its level is one the module
 ** logs. A ring that is full drops the line, and it is counted by the head
 ** having moved.
+**
+** log.md, *The log*
 */
 static inline void bridge_native_log(const bridge_api_t *api, uint32_t level,
     const bridge_line_t *line)

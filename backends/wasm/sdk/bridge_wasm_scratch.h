@@ -19,6 +19,8 @@
 /*
 ** A struct of type T with these members, put in the scratch arena: where it
 ** is.
+**
+** memory.md, *Where the regions live*
 */
     #define BRIDGE_STATE(T, ...) bridge_put(&(T){ __VA_ARGS__ }, sizeof(T))
 
@@ -27,6 +29,8 @@
 **
 ** Answers `len` bytes of the scratch arena, good until the next barrier. A
 ** module that asks for more than it was given stops there.
+**
+** memory.md, *Where the regions live*
 */
 static inline uint32_t bridge_take_scratch(uint32_t len)
 {
@@ -43,6 +47,8 @@ static inline uint32_t bridge_take_scratch(uint32_t len)
 ** bridge_put
 **
 ** Copies `len` bytes into the scratch arena, and answers where they are.
+**
+** memory.md, *Where the regions live*
 */
 static inline uint32_t bridge_put(const void *bytes, uint32_t len)
 {
@@ -59,6 +65,8 @@ static inline uint32_t bridge_put(const void *bytes, uint32_t len)
 ** count them as used. For a value an entry copies during the call, as
 ** attach does, so that a module's scratch holds one such value at a time
 ** and not a phase's worth.
+**
+** memory.md, *Where the regions live*
 */
 static inline uint32_t bridge_lend(const void *bytes, uint32_t len)
 {

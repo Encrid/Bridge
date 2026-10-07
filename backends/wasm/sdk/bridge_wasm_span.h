@@ -20,6 +20,8 @@
 ** bridge_count_spans
 **
 ** Answers how many spans a query has at this barrier.
+**
+** query.md, *The interface is a query*
 */
 static inline uint32_t bridge_count_spans(uint32_t query)
 {
@@ -32,6 +34,8 @@ static inline uint32_t bridge_count_spans(uint32_t query)
 ** bridge_get_span
 **
 ** Answers span `i` of a query that declared `terms` terms.
+**
+** query.md, *The interface is a query*
 */
 static inline uint32_t bridge_get_span(uint32_t query, uint32_t i,
     uint32_t terms)
@@ -45,6 +49,8 @@ static inline uint32_t bridge_get_span(uint32_t query, uint32_t i,
 ** bridge_count_rows
 **
 ** Answers how many rows a span has.
+**
+** query.md, *The interface is a query*
 */
 static inline uint32_t bridge_count_rows(uint32_t span)
 {
@@ -55,6 +61,8 @@ static inline uint32_t bridge_count_rows(uint32_t span)
 ** bridge_get_entities
 **
 ** Answers where the ids of a span's rows are.
+**
+** query.md, *The interface is a query*
 */
 static inline uint32_t bridge_get_entities(uint32_t span)
 {
@@ -66,6 +74,8 @@ static inline uint32_t bridge_get_entities(uint32_t span)
 **
 ** Answers where a term's column begins in a span. Zero: the term is absent
 ** in this table.
+**
+** query.md, *The interface is a query*
 */
 static inline uint32_t bridge_get_base(uint32_t span, uint32_t term)
 {

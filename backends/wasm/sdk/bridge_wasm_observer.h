@@ -20,6 +20,8 @@
 ** bridge_count_triggers
 **
 ** Answers how many triggered an observer at this barrier.
+**
+** data.md, *Observers*
 */
 static inline uint32_t bridge_count_triggers(uint32_t observer)
 {
@@ -32,6 +34,8 @@ static inline uint32_t bridge_count_triggers(uint32_t observer)
 ** bridge_get_trigger
 **
 ** Answers trigger `i` of an observer.
+**
+** data.md, *Observers*
 */
 static inline uint32_t bridge_get_trigger(uint32_t observer, uint32_t i)
 {
@@ -44,6 +48,8 @@ static inline uint32_t bridge_get_trigger(uint32_t observer, uint32_t i)
 ** bridge_get_trigger_id
 **
 ** Answers the entity a trigger is of.
+**
+** data.md, *Observers*
 */
 static inline uint64_t bridge_get_trigger_id(uint32_t trigger)
 {
@@ -54,6 +60,8 @@ static inline uint64_t bridge_get_trigger_id(uint32_t trigger)
 ** bridge_get_trigger_events
 **
 ** Answers what a trigger's entity became, as a mask of bridge_event.
+**
+** data.md, *Observers*
 */
 static inline uint32_t bridge_get_trigger_events(uint32_t trigger)
 {

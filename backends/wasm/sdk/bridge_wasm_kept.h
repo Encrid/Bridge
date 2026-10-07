@@ -24,6 +24,8 @@
 **
 ** Answers where the sparse set that keeps component `slot` has its index: a
 ** cell for each entity.
+**
+** storage.md, *A sparse set*
 */
 static inline uint32_t bridge_get_sparse_index(uint32_t slot)
 {
@@ -35,6 +37,8 @@ static inline uint32_t bridge_get_sparse_index(uint32_t slot)
 **
 ** Answers where entity `id` has its value in the set of that index, from
 ** the shared base: zero if it has none.
+**
+** storage.md, *A sparse set*
 */
 static inline uint32_t bridge_get_sparse_value(uint32_t index, uint64_t id)
 {
@@ -48,6 +52,8 @@ static inline uint32_t bridge_get_sparse_value(uint32_t index, uint64_t id)
 **
 ** Answers where the singleton `slot` has its value, from the shared base:
 ** zero while it has none.
+**
+** storage.md, *A singleton*
 */
 static inline uint32_t bridge_get_single(uint32_t slot)
 {
@@ -58,6 +64,8 @@ static inline uint32_t bridge_get_single(uint32_t slot)
 ** bridge_get_cells
 **
 ** Answers where the cells of the direct-indexed component `slot` begin.
+**
+** storage.md, *Direct-indexed*
 */
 static inline uint32_t bridge_get_cells(uint32_t slot)
 {
@@ -69,6 +77,8 @@ static inline uint32_t bridge_get_cells(uint32_t slot)
 **
 ** Answers where entity `id` has its value of `stride` bytes among those
 ** cells, or zero: it was given none.
+**
+** storage.md, *Direct-indexed*
 */
 static inline uint32_t bridge_get_cell(uint32_t cells, uint64_t id,
     uint32_t stride)

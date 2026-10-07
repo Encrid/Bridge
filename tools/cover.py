@@ -13,6 +13,10 @@ It fails on an exposed name with no heading, a heading with no case, a heading i
 that the headers do not expose, a heading there is twice, a case under no heading or under one
 it is not named for, a case listed that is not run, and a document that points at a case that
 is not run.
+
+And it fails on a declaration that says nowhere which document states it: every comment of a
+header that stands above an exposed name cites a document and a heading, as `budgets.md`,
+*Budgets*. tools/xref.py holds that the heading is there.
 """
 import re
 import sys
@@ -79,6 +83,23 @@ def exposed(path):
     names += re.findall(r'^\s*#define (\w+)\(', text, re.M)
     names += re.findall(r'^(?:BRIDGE_API|static inline)[^;{]*?(\w+)\(', text, re.S | re.M)
     return [n for n in names if not n.endswith('_')]
+
+
+def uncited(path):
+    """The comments of a header that stand above an exposed name and cite no document, each as
+    its line and the names under it."""
+    text = (ROOT / path).read_text(encoding='utf-8')
+    parts = re.split(r'(/\*.*?\*/)', text, flags=re.S)
+    names = list(dict.fromkeys(n.split('.')[-1] for n in exposed(path)))
+    found, line = [], 1
+    for i in range(1, len(parts) - 1, 2):
+        line += parts[i - 1].count('\n')
+        under = [n for n in names if n in set(re.findall(r'\w+', parts[i + 1]))]
+        cited = re.search(r'\w+\.md,\s+\*[^*]+\*', re.sub(r'\n\*\*\s*', ' ', parts[i]))
+        if under and not cited:
+            found.append((line, under))
+        line += parts[i].count('\n')
+    return found
 
 
 def surface():
@@ -153,6 +174,8 @@ def check():
     check_cases(heads, run, said)
     said += ['%s points at the case %s, and no case of that name is run' % (doc, c)
              for doc, c in pointed() if c not in run]
+    said += ['%s:%d: the comment above %s cites no document' % (h, line, ', '.join(under[:3]))
+             for hs in SEAMS.values() for h in hs for line, under in uncited(h)]
     for line in said:
         print(line)
     print('%d exposed names, %d headings, %d cases: %d faults'

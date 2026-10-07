@@ -17,6 +17,8 @@
 
 /*
 ** A line of the log whose text is a literal, with two numbers.
+**
+** log.md, *The log*
 */
     #define BRIDGE_LOG(level, text, a0, a1) \
         bridge_log(level, &(bridge_line_t){ text, sizeof(text) - 1, a0, a1 })
@@ -24,6 +26,8 @@
 /*
 ** What a line of the log holds: its text, how long that is, and two
 ** numbers.
+**
+** log.md, *The log*
 */
 typedef struct {
     const char *text;
@@ -38,6 +42,8 @@ typedef struct {
 ** Writes a line into the module's ring, if its level is one the module
 ** logs. A ring that is full drops the line, and it is counted by the head
 ** having moved.
+**
+** log.md, *The log*
 */
 static inline void bridge_log(uint32_t level, const bridge_line_t *line)
 {

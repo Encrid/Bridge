@@ -31,11 +31,15 @@
 **
 ** They are two macros because a macro is one statement, and no declaration is
 ** both a type and the text that describes it.
+**
+** schema.md, *There is no schema format*
 */
     #define BRIDGE_SCHEMA_TEXT(...) #__VA_ARGS__
 
 /*
 ** A struct: its body is its descriptor.
+**
+** schema.md, *There is no schema format*
 */
     #define BRIDGE_SCHEMA_STRUCT_TYPE(name, ...) \
         typedef struct name __VA_ARGS__ name
