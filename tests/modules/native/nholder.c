@@ -1,19 +1,28 @@
-/* Declares a struct with a field of st:Vec, a type another module declares: its rows hold a
- * Vec as it is, so no reload of that other module may lay Vec out again.
- * docs/bridge/data/lifetime.md, *When a component layout changed*. */
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** tests/modules/native/nholder.c -- declares a struct with a field of
+** st:vec_t, a type another module declares: its rows hold a vec_t as it is,
+** so no reload of that other module may lay vec_t out again.
+**
+** lifetime.md, *When a component layout changed*
+*/
+
 #include "bridge_native.h"
+#include "native_idle.h"
+#include "nholder.h"
 
-/* declared by the module loaded before this one: here it is only what Y is made of */
-typedef struct { uint16_t x, y; } Vec;
-#define Y_FIELDS { Vec at; }
-BRIDGE_SCHEMA_STRUCT_TYPE(Y, Y_FIELDS);
-BRIDGE_SCHEMA_STRUCT_DESC(Y, Y_FIELDS);
-
+/*
+** init
+**
+** Declares st:Y, whose one field is of the other module's type.
+*/
 BRIDGE_NATIVE(init)
 {
-    BRIDGE_NATIVE_COMPONENT(api, "st:Y", Y, BRIDGE_DELETE, BRIDGE_TABLE);
-    return 0;
+    BRIDGE_NATIVE_COMPONENT(api, "st:Y", y_t, BRIDGE_DELETE, BRIDGE_TABLE);
+    return (0);
 }
-
-BRIDGE_NATIVE(reload) { return 0; }
-BRIDGE_NATIVE(shutdown) { return 0; }

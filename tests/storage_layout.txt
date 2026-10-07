@@ -137,7 +137,7 @@ an enum whose constants have other numbers
   look: the sums of b, and of arr 63 42
   look: the sums of at.x, and of at.y 18 21
   look: the sums of mode, and of what was added 3 0
-  -: module 'st:store@0.1.0' was not reloaded: type 'st:Mode': its constant 'On' is 2 here and was 1, and every value kept of it would mean something else 0 0
+  -: module 'st:store@0.1.0' was not reloaded: type 'st:switch_t': its constant 'ON' is 2 here and was 1, and every value kept of it would mean something else 0 0
   -: module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept 0 0
   -: the bridge has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   reload: refused
@@ -157,7 +157,7 @@ an enum with a constant removed
   look: the sums of b, and of arr 63 42
   look: the sums of at.x, and of at.y 18 21
   look: the sums of mode, and of what was added 3 0
-  -: module 'st:store@0.1.0' was not reloaded: type 'st:Mode' has no constant 'Auto' here, which it had: a value kept of it would mean nothing 0 0
+  -: module 'st:store@0.1.0' was not reloaded: type 'st:switch_t' has no constant 'AUTO' here, which it had: a value kept of it would mean nothing 0 0
   -: module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept 0 0
   -: the bridge has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   reload: refused
@@ -167,13 +167,13 @@ a struct declared as a tag
   look: the sums of b, and of arr 63 42
   look: the sums of at.x, and of at.y 18 21
   look: the sums of mode, and of what was added 3 0
-  -: module 'st:store@0.1.0' was not reloaded: type 'st:Vec' is a tag here and was a struct: a reload does not change what kind of type one is 0 0
+  -: module 'st:store@0.1.0' was not reloaded: type 'st:vec_t' is a tag here and was a struct: a reload does not change what kind of type one is 0 0
   -: module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept 0 0
   -: the bridge has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   reload: refused
   -: the bridge has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
 a struct a field of another module's component names
-  -: module 'st:store@0.1.0' was not reloaded: type 'st:Vec' has another component layout here, and 'st:Y', which module 'st:holder@0.1.0' declares, has a field of it 0 0
+  -: module 'st:store@0.1.0' was not reloaded: type 'st:vec_t' has another component layout here, and 'st:Y', which module 'st:holder@0.1.0' declares, has a field of it 0 0
   -: module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept 0 0
   -: the bridge has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   reload: refused

@@ -1,22 +1,45 @@
-/* Spawns past the entity ceiling. Nothing can unwind native code, so the system runs to its
- * end and the invocation is failed when it returns. */
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** tests/modules/native/nflood.c -- spawns past the entity ceiling. Nothing
+** can unwind native code, so the system runs to its end and the invocation
+** is failed when it returns.
+*/
+
 #include "bridge_native.h"
+#include "native_idle.h"
 
+constexpr uint32_t SPAWNS = 100'000;
 
-
+/*
+** flood
+**
+** Spawns more entities than there may be.
+*/
 BRIDGE_NATIVE(flood)
 {
-    uint32_t i;
-    for (i = 0; i < 100'000; i ++) api->spawn(api);
-    return 0;
+    uint32_t i = 0;
+
+    while (i < SPAWNS) {
+        api->spawn(api);
+        i++;
+    }
+    return (0);
 }
 
+/*
+** init
+**
+** Declares the one system.
+*/
 BRIDGE_NATIVE(init)
 {
     int none = 0;
-    BRIDGE_NATIVE_ADD_SYSTEM(api, "flood", "update", &none, 0, nullptr, 0);
-    return 0;
-}
 
-BRIDGE_NATIVE(shutdown) { return 0; }
-BRIDGE_NATIVE(reload) { return 0; }
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "flood", "update", &none, 0, nullptr, 0);
+    return (0);
+}

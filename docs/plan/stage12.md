@@ -635,3 +635,12 @@ declarer's namespace, so a type renamed `vec2_t` is declared as `game:vec2_t`, a
 constants, in upper case now, are part of its descriptor. One expected text changed with it: the
 refusal of `stage5-nested2` says `'vec2_t'` where it said `'Vec2'`. Nothing else a case prints
 moved.
+
+**The smaller native test modules** are to the style: twelve sources, `nmove` and `nlayout`
+directories now. What three of them asked of the operating system through lower-case macros,
+a nap, the thread's id, the time, is `static inline` functions in `nplatform.h` and `nthread.h`.
+`nstamp` gave `PHASE` a default, and the three rows that leaned on it state `"update"`.
+
+The transcript `tests/storage_layout.txt` changed in four lines, for the same reason as the one
+regex above and nothing else: `st:Mode` is `st:switch_t`, since `mode_t` is POSIX's, with its
+constants `ON` and `AUTO`, and `st:Vec` is `st:vec_t`.

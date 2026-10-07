@@ -1,47 +1,50 @@
-/* A system that takes a tenth of a second or more, and says which thread it was on, when it
- * began and when it ended. Two of these whose times overlap ran at once. */
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** tests/modules/native/nsleep.c -- a system that takes a tenth of a second
+** or more, and says which thread it was on, when it began and when it
+** ended. Two of these whose times overlap ran at once.
+*/
+
 #include "bridge_native.h"
+#include "native_idle.h"
+#include "nplatform.h"
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#define nap() Sleep(100)
-#define thread_id() ((uint32_t)GetCurrentThreadId())
-#define now_ms() ((uint32_t)GetTickCount64())
-#else
-#include <pthread.h>
-#include <time.h>
-#include <unistd.h>
-#define nap() usleep(100'000)
-#define thread_id() ((uint32_t)(uintptr_t)pthread_self())
-static uint32_t now_ms()
-{
-    struct timespec t;
-    clock_gettime(CLOCK_MONOTONIC, &t);
-    return (uint32_t)((uint64_t)t.tv_sec * 1000 + (uint64_t)t.tv_nsec / 1'000'000);
-}
-#endif
-
-
-
+/*
+** nap
+**
+** Sleeps, and says when it began and when it ended, in milliseconds, each
+** with the thread it was on: two ran at once if one began before the other
+** ended. How long a nap takes is not asked: a sleep is a least time, and
+** some systems return from a tenth of a second after two.
+*/
 BRIDGE_NATIVE(nap)
 {
-    /* When it began and when it ended, in milliseconds: two ran at once if one began before
-     * the other ended. How long a nap takes is not asked: a sleep is a least time, and some
-     * systems return from a tenth of a second after two. */
-    uint32_t began = now_ms();
-    nap();
-    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ "nap", 3, thread_id(), began });
-    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ "end", 3, thread_id(), now_ms() });
-    return 0;
+    bridge_line_t line = { "nap", 3, 0, get_now_ms() };
+
+    sleep_tenth();
+    line.a0 = get_thread_id();
+    bridge_native_log(api, BRIDGE_LOG_INFO, &line);
+    line.text = "end";
+    line.a0 = get_thread_id();
+    line.a1 = get_now_ms();
+    bridge_native_log(api, BRIDGE_LOG_INFO, &line);
+    return (0);
 }
 
+/*
+** init
+**
+** Declares the one system.
+*/
 BRIDGE_NATIVE(init)
 {
     int none = 0;
-    BRIDGE_NATIVE_ADD_SYSTEM(api, "nap", "update", &none, 0, nullptr, 0);
-    return 0;
-}
 
-BRIDGE_NATIVE(shutdown) { return 0; }
-BRIDGE_NATIVE(reload) { return 0; }
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "nap", "update", &none, 0, nullptr, 0);
+    return (0);
+}

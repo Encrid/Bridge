@@ -1,82 +1,145 @@
-/* What it costs a system when the entities it reads are spread over many tables: one component
- * every entity carries, and markers that split them into SPLIT sets of the same size. The system
- * reads the one component of every row and says how many rows there were, so that a host can
- * time it and know the loop ran. docs/plan/stage10.md, *The repair*.
- *
- * Built once for each SPLIT: 1, 16, 256, 4096. The entities are the same number every time. */
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** tests/modules/native/nfrag.c -- what it costs a system when the entities
+** it reads are spread over many tables: one component every entity carries,
+** and markers that split them into SPLIT sets of the same size. The system
+** reads the one component of every row and says how many rows there were,
+** so that a host can time it and know the loop ran.
+**
+** Built once for each SPLIT: 1, 16, 256, 4096. The entities are the same
+** number every time. Twelve markers make 2^12 sets at the most.
+**
+** stage10.md, *The repair*
+*/
+
 #include "bridge_native.h"
+#include "native_idle.h"
+#include "nfrag.h"
 
-#define V_FIELDS { uint32_t v; }
-BRIDGE_SCHEMA_STRUCT_TYPE(V, V_FIELDS);
-BRIDGE_SCHEMA_STRUCT_DESC(V, V_FIELDS);
-#ifndef TAGS                                    /* built with TAGS, the markers are tags */
-#define M_FIELDS { uint32_t on; }
-BRIDGE_SCHEMA_STRUCT_TYPE(M, M_FIELDS);
-BRIDGE_SCHEMA_STRUCT_DESC(M, M_FIELDS);
-#endif
+constexpr uint32_t COUNT = 204'800;
+constexpr uint32_t MARKERS = 12;
+static const char *const NAMES[MARKERS] = {
+    "st:M0", "st:M1", "st:M2", "st:M3", "st:M4", "st:M5",
+    "st:M6", "st:M7", "st:M8", "st:M9", "st:M10", "st:M11"
+};
 
-constexpr uint32_t COUNT = 204'800, MARKERS = 12;     /* 2^12 sets at the most */
+static uint32_t value;
+static uint32_t markers[MARKERS];
+static uint32_t reading;
 
-static uint32_t value, markers[MARKERS], reading;
-
-
-/* every entity is made with all it will carry, so each is placed once */
-BRIDGE_NATIVE(fill)
+static void attach_markers(const bridge_api_t *api, uint64_t id, uint32_t set)
 {
-    for (uint32_t i = 0; i < COUNT; i ++) {
-        uint64_t id = api->spawn(api);
-        api->attach(api, id, value, BRIDGE_ZEROED);
-        for (uint32_t k = 0; k < MARKERS; k ++) {
-            if ((i % SPLIT) >> k & 1) api->attach(api, id, markers[k], BRIDGE_ZEROED);
-        }
+    uint32_t k = 0;
+
+    while (k < MARKERS) {
+        if (set >> k & 1)
+            api->attach(api, id, markers[k], BRIDGE_ZEROED);
+        k++;
     }
-    return 0;
 }
 
+/*
+** fill
+**
+** Spawns the entities. Each is made with all it will carry, the value and
+** the markers of its set, so each is placed once.
+*/
+BRIDGE_NATIVE(fill)
+{
+    uint64_t id;
+    uint32_t i = 0;
+
+    while (i < COUNT) {
+        id = api->spawn(api);
+        api->attach(api, id, value, BRIDGE_ZEROED);
+        attach_markers(api, id, i % SPLIT);
+        i++;
+    }
+    return (0);
+}
+
+/*
+** sum
+**
+** Reads the value of every row, and says once a call what was read and
+** over how many spans.
+*/
 BRIDGE_NATIVE(sum)
 {
     const bridge_query_t *q = bridge_native_get_query(api, reading);
-    uint32_t rows = 0, total = 0;
-    for (uint32_t s = 0; s < q->spans; s ++) {
-        const uint32_t *span = bridge_native_get_span(api, q, s, 1);
-        auto column = (const V *)(api->shared_base + span[2]);
-        for (uint32_t r = 0; r < span[0]; r ++) total += column[r].v;
-        rows += span[0];
+    bridge_line_t line = { "rows, spans", 11, 0, q->spans };
+    const uint32_t *span;
+    const v_t *column;
+    uint32_t s = 0;
+    uint32_t r;
+
+    while (s < q->spans) {
+        span = bridge_native_get_span(api, q, s, 1);
+        column = (const v_t *)(api->shared_base + span[2]);
+        r = 0;
+        while (r < span[0]) {
+            line.a0 += column[r].v;
+            r++;
+        }
+        line.a0 += span[0];
+        s++;
     }
-    /* said once a call: what was read, and over how many spans */
-    bridge_native_log(api, BRIDGE_LOG_INFO, &(bridge_line_t){ "rows, spans", 11, rows + total, q->spans });
-    return 0;
+    bridge_native_log(api, BRIDGE_LOG_INFO, &line);
+    return (0);
 }
 
+/*
+** declare_marker
+**
+** Declares one marker by its name, as a struct, or as a tag in a build with
+** TAGS, and answers its slot.
+*/
+static uint32_t declare_marker(const bridge_api_t *api, const char *name)
+{
+    uint32_t len = (uint32_t)strlen(name);
+    uint32_t at = bridge_native_put(api, name, len);
+
+#ifdef TAGS
+    return (api->declare(api, BRIDGE_NATIVE_STATE(api, bridge_declaration_t,
+        at, len, BRIDGE_TAG, 0, 1, 0, 0, BRIDGE_DELETE, BRIDGE_TABLE)));
+#else
+    return (api->declare(api, BRIDGE_NATIVE_STATE(api, bridge_declaration_t,
+        at, len, BRIDGE_STRUCT, sizeof(m_t), alignof(m_t),
+        bridge_native_put(api, m_t_desc, sizeof(m_t_desc) - 1),
+        sizeof(m_t_desc) - 1, BRIDGE_DELETE, BRIDGE_TABLE)));
+#endif
+}
+
+/*
+** init
+**
+** Declares the value and the markers, and the two systems: `fill` states
+** that it attaches the value and every marker.
+*/
 BRIDGE_NATIVE(init)
 {
-    static const char *const names[MARKERS] = {
-        "st:M0", "st:M1", "st:M2", "st:M3", "st:M4", "st:M5",
-        "st:M6", "st:M7", "st:M8", "st:M9", "st:M10", "st:M11"
-    };
     int none = 0;
     bridge_term_t one[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
-    value = BRIDGE_NATIVE_COMPONENT(api, "st:V", V, BRIDGE_DELETE, BRIDGE_TABLE);
-    for (uint32_t k = 0; k < MARKERS; k ++) {
-#ifdef TAGS
-        markers[k] = api->declare(api, BRIDGE_NATIVE_STATE(api, bridge_declaration_t,
-            bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
-            (uint32_t)strlen(names[k]), BRIDGE_TAG, 0, 1, 0, 0, BRIDGE_DELETE, BRIDGE_TABLE));
-#else
-        markers[k] = api->declare(api, BRIDGE_NATIVE_STATE(api, bridge_declaration_t,
-            bridge_native_put(api, names[k], (uint32_t)strlen(names[k])),
-            (uint32_t)strlen(names[k]), BRIDGE_STRUCT, sizeof(M), alignof(M),
-            bridge_native_put(api, M_desc, sizeof M_desc - 1), sizeof M_desc - 1, BRIDGE_DELETE, BRIDGE_TABLE));
-#endif
+    uint32_t filled[1 + MARKERS];
+    uint32_t k = 0;
+
+    value = BRIDGE_NATIVE_COMPONENT(api, "st:V", v_t, BRIDGE_DELETE,
+        BRIDGE_TABLE);
+    filled[0] = value;
+    while (k < MARKERS) {
+        markers[k] = declare_marker(api, NAMES[k]);
+        filled[1 + k] = markers[k];
+        k++;
     }
     one[0].slot = value;
-    /* what `fill` attaches: the value, and every marker */
-    uint32_t filled[1 + MARKERS] = { value };
-    for (uint32_t k = 0; k < MARKERS; k ++) filled[1 + k] = markers[k];
-    BRIDGE_NATIVE_ADD_SYSTEM(api, "fill", "spawn", &none, 0, filled, 1 + MARKERS);
-    reading = BRIDGE_NATIVE_ADD_SYSTEM(api, "sum", "look", one, 1, nullptr, 0);
-    return 0;
+    BRIDGE_NATIVE_ADD_SYSTEM(api, "fill", "spawn", &none, 0, filled,
+        1 + MARKERS);
+    reading = BRIDGE_NATIVE_ADD_SYSTEM(api, "sum", "look", one, 1, nullptr,
+        0);
+    return (0);
 }
-
-BRIDGE_NATIVE(shutdown) { return 0; }
-BRIDGE_NATIVE(reload) { return 0; }
