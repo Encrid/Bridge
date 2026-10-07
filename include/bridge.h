@@ -176,6 +176,7 @@ static_assert(offsetof(bridge_order_t, after) == 8);
 ** What a deployment is.
 **
 **     abi        BRIDGE_HOST_ABI. First, and always first
+**     backends   one at least: a module is run by a backend
 **     phases     a phase is a name, and no more
 **     threads    how many run a phase, counting the caller's. Zero is unset
 */

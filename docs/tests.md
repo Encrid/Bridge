@@ -28,9 +28,9 @@ query, an accessor and a log at once, and each of them has its case: the same pr
 argument, judged by the words that are that capability's. A case that only this run could not
 show has a run of its own.
 
-**Which document states each is not said here.** A heading is a name of a header, and the
-documents state what the library does in their own words and under their own headings: which of
-them states which name is the documents' to say, and stage 14 reads them against this list.
+**Which document states each is not said here.** It is said where the name is: in its header,
+in the comment above it, as `budgets.md`, *Budgets*, is above the budgets. Not every name has
+one yet, and stage 14 writes the rest.
 
 **A message is not a heading.** Every message the source can write is held another way:
 `tools/said.py` reads each from the source and fails on one no case made appear. It is the case
@@ -142,6 +142,7 @@ them states which name is the documents' to say, and stage 14 reads them against
 
 ### config.backends
 
+    config.backends-none-refused
     config.backends-two-in-one-phase
 
 ### config.phases

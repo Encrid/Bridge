@@ -59,12 +59,18 @@ static void take_shape(bridge_t *b, open_backend_t *o)
 ** bridge_open_backends
 **
 ** Opens every backend the deployment configures, in the order it states
-** them.
+** them. It configures one at least: a module is run by a backend, so a
+** bridge with none could load nothing.
 */
 int bridge_open_backends(bridge_t *b, const bridge_config_t *cfg)
 {
     uint32_t i = 0;
 
+    if (!cfg->backend_count) {
+        say_error(b, "the deployment configures no backend, and a module "
+            "is run by one");
+        return (1);
+    }
     while (i < cfg->backend_count) {
         if (bridge_open_backend(b, cfg, i))
             return (1);

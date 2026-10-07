@@ -1429,6 +1429,8 @@ CASES = [
      r"a host function: called with an i32 and an i64, answered 16", None),
     ('BACKEND_I64-an-argument-of-64-bits', ['adopt'],
      r"a host function: called with an i32 and an i64, answered 16", None),
+    ('config.backends-none-refused', ['host', 'config.backends-none-refused'],
+     r"the deployment configures no backend, and a module is run by one.*bridge_create refused.*alive", None),
 ]
 
 # these again, through the static library: what a host does first, to create a bridge and to

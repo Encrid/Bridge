@@ -80,6 +80,8 @@ static const host_case_t TEST_CASES[] = {
         test_state_other_host_abi, "hostabi", test_set_small },
     { "config.abi-unset-refused",
         test_state_no_host_abi, "hostabiunset", test_set_small },
+    { "config.backends-none-refused",
+        test_edit_deployment, "backends=0", test_set_small },
     { "config.backends-two-in-one-phase", test_run_mixed, "", test_set_both },
     { "config.phases-none-refused",
         test_leave_phases_unset, "", test_set_wasm },

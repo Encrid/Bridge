@@ -13,9 +13,10 @@ runtime beside itself, and a host's executable is somewhere else. Windows search
 executable unless told otherwise, so it is told. A bare name, with no directory in it, is left to
 the operating system's own search on every platform. The same holds for a native module's library.
 
-It returns null only when the **deployment** cannot start: **no phases at all**, a phase named
-twice, an `[order]` pair that is malformed or contradicts another, a budget that cannot be satisfied, a
-backend whose library cannot be opened or lacks an entry, or a null `sink`.
+It returns null only when the **deployment** cannot start: **no backend at all**, which leaves
+nothing to run a module, **no phases at all**, a phase named twice, an `[order]` pair that is
+malformed or contradicts another, a budget that cannot be satisfied, a backend whose library cannot
+be opened or lacks an entry, or a null `sink`.
 
 **Which of those, the host learns from the sink** - it was handed over as an argument, so Bridge-ASM700
 emits the record naming the phase or the pair before it returns. The one failure no record can

@@ -16,6 +16,7 @@
 constexpr int64_t BEYOND = 1ll << 24;
 
 static const test_edit_t TEST_DEPLOYMENT_EDITS[] = {
+    { "backends=0", offsetof(bridge_config_t, backend_count), 4, 0 },
     { "entities=0", offsetof(bridge_config_t, budget.entities), 8, 0 },
     { "modules=0", offsetof(bridge_config_t, budget.modules), 4, 0 },
     { "persistent=0", offsetof(bridge_config_t, budget.persistent), 8, 0 },
