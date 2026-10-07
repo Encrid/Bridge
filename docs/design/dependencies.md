@@ -11,10 +11,13 @@ imports any more, so that the list is neither short nor long.
 A line is `tool`, the name `build.py` looks for, and why.
 
     tool      zig          the C compiler, the linker and the archiver, for every target
-    tool      wasm-tools   assembles the test modules and the SDK's accessors, which are written
-                           as wasm text, and prints a module for the case that reads one
+    tool      wasm-as      Binaryen: assembles the test modules and the SDK's accessors, which
+                           are written as wasm text
     tool      wasm-merge   Binaryen: merges the SDK's accessors into a compiled wasm module
     tool      wasm-opt     Binaryen: puts the merged accessors inline - `wasm.md`, *Memories*
+    tool      wasm-dis     Binaryen: prints a module, for the case that reads one
+
+The four of Binaryen come in one archive, so what is installed is zig and Binaryen.
 
 Python runs `build.py` and the scripts of `tools/`, with nothing outside its standard library.
 

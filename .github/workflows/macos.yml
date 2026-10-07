@@ -12,7 +12,6 @@ jobs:
     timeout-minutes: 20
     env:
       ZIG_VERSION: 0.16.0
-      WASM_TOOLS_VERSION: 1.259.0
       BINARYEN_VERSION: 133
     steps:
       - uses: actions/checkout@v4
@@ -23,10 +22,8 @@ jobs:
           mkdir -p "$HOME/tools"
           cd "$HOME/tools"
           curl -fsSL "https://ziglang.org/download/${ZIG_VERSION}/zig-aarch64-macos-${ZIG_VERSION}.tar.xz" | tar -xJ
-          curl -fsSL "https://github.com/bytecodealliance/wasm-tools/releases/download/v${WASM_TOOLS_VERSION}/wasm-tools-${WASM_TOOLS_VERSION}-aarch64-macos.tar.gz" | tar -xz
           curl -fsSL "https://github.com/WebAssembly/binaryen/releases/download/version_${BINARYEN_VERSION}/binaryen-version_${BINARYEN_VERSION}-arm64-macos.tar.gz" | tar -xz
           echo "$HOME/tools/zig-aarch64-macos-${ZIG_VERSION}" >> "$GITHUB_PATH"
-          echo "$HOME/tools/wasm-tools-${WASM_TOOLS_VERSION}-aarch64-macos" >> "$GITHUB_PATH"
           echo "BINARYEN_ROOT=$HOME/tools/binaryen-version_${BINARYEN_VERSION}" >> "$GITHUB_ENV"
 
       - name: Build and test

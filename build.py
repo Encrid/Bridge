@@ -5,8 +5,8 @@
     python build.py --target T ...       x86_64-windows-gnu | x86_64-linux-gnu | aarch64-macos
     python build.py --debug ...          unoptimised, with debug information
 
-Needs zig and wasm-tools on the path. Binaryen is taken from BINARYEN_ROOT or the path, and on
-Windows fetched at its pin when it is in neither. Every path is taken from where this file is
+Needs zig on the path. Binaryen is taken from BINARYEN_ROOT or the path, and on Windows fetched
+at its pin when it is in neither. Every path is taken from where this file is
 and from --out, so a repository that has this one as a submodule builds it by calling this.
 """
 import argparse
@@ -203,7 +203,9 @@ def tool(name, hints=()):
 
 
 def binaryen(build):
-    """wasm-merge and wasm-opt: from BINARYEN_ROOT, the path, or fetched at the pin."""
+    """The four tools of Binaryen a build calls: from BINARYEN_ROOT, the path, or fetched at the
+    pin. wasm-as assembles what is written as wasm text, wasm-merge and wasm-opt put the SDK's
+    accessors into a compiled module, wasm-dis prints one for the case that reads it."""
     hints = [build / BINARYEN / 'bin']
     if os.environ.get('BINARYEN_ROOT'):
         hints.insert(0, Path(os.environ['BINARYEN_ROOT']) / 'bin')
@@ -217,18 +219,18 @@ def binaryen(build):
             die('%s is not the Binaryen this build pins: its hash differs' % archive)
         with tarfile.open(archive) as tar:
             tar.extractall(build)
-    merge, opt = tool('wasm-merge', hints), tool('wasm-opt', hints)
-    if not merge or not opt:
-        die('Binaryen was found without wasm-merge or wasm-opt')
-    return merge, opt
+    found = [tool('wasm-as', hints), tool('wasm-merge', hints), tool('wasm-opt', hints),
+             tool('wasm-dis', hints)]
+    if not all(found):
+        die('Binaryen was found without wasm-as, wasm-merge, wasm-opt or wasm-dis')
+    return found
 
 
 def build(target, debug, out):
     row = TARGETS[target]
     exe, lib = row['program'], row['library']
     zig = tool('zig') or die('zig is not on the path')
-    wasm_tools = tool('wasm-tools') or die('wasm-tools is not on the path')
-    merge, opt = binaryen(out.parent)
+    assemble, merge, opt, disassemble = binaryen(out.parent)
     obj, modules, backends = out / 'obj', out / 'modules', out / 'backends'
     wasmtime = ROOT / 'backends/wasm/wasmtime'
     link_wasmtime, runtime = (wasmtime / f for f in row['wasmtime'])
@@ -366,10 +368,10 @@ def build(target, debug, out):
     accessors = ROOT / 'backends/wasm/sdk/bridge_wasm.wat'
     acc = modules / 'acc.wasm'
     assembled = [('assembling %s' % wat.name, [modules / (wat.stem + '.wasm')], [wat],
-                  [[wasm_tools, 'parse', wat, '-o', modules / (wat.stem + '.wasm')]])
+                  [[assemble, wat] + FEATURES + ['-o', modules / (wat.stem + '.wasm')]])
                  for wat in sorted((ROOT / 'tests/modules/wasm').glob('*.wat'))]
     assembled += [('assembling the accessors', [acc], [accessors],
-                   [[wasm_tools, 'parse', accessors, '-o', acc]])]
+                   [[assemble, accessors] + FEATURES + ['-o', acc]])]
     together(assembled)
     compiled = []
     for name, source, kind, flags in WASM:
@@ -385,7 +387,7 @@ def build(target, debug, out):
                                          '--remove-unused-module-elements', '-o', final]]))
     together(compiled)
     return {'python': sys.executable, 'nocall': ROOT / 'tools/nocall.py',
-            'wasm-tools': wasm_tools, 'modules': modules, 'exe': exe}
+            'wasm-dis': disassemble, 'modules': modules, 'exe': exe}
 
 
 def sources(where, name, idle):
@@ -411,7 +413,7 @@ def test(out, built, only):
         elif command[0] == 'deps':
             argv = [str(built['python']), str(ROOT / 'tools/deps.py'), str(out), '--check']
         elif command[0] == 'nocall':
-            argv = [str(built[k]) for k in ('python', 'nocall', 'wasm-tools')] + \
+            argv = [str(built[k]) for k in ('python', 'nocall', 'wasm-dis')] + FEATURES + \
                    [str(built['modules'] / command[1]), command[2]]
         try:
             done = subprocess.run(argv, cwd=out, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,

@@ -682,3 +682,10 @@ macOS, of which wasmtime's are 49.
 What the count showed that nobody had written down: fifteen of the Windows imports are not ours.
 zig links its startup code into every shared library, and that code imports them. They are
 listed as that.
+
+**wasm-tools is gone.** It did three things: it assembled the twelve test modules and the
+accessors that are written as wasm text, twice in `build.py`, and it printed a module for the
+case `stage3-nocall`. Binaryen, which a build needs already for `wasm-merge` and `wasm-opt`,
+carries `wasm-as` and `wasm-dis` in the same archive. All thirteen files assemble with it, to
+other bytes and the same behaviour: every case passes. So a build needs zig and Binaryen
+installed, and each workflow fetches one archive fewer.

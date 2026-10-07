@@ -165,9 +165,9 @@ are separate binaries - `stage12.md`, *One operating-system layer*.
 
 ## Dependencies
 
-**What a build needs installed is zig and Python, and two tools for the wasm test modules**:
-`wasm-tools`, which assembles the modules written as text, and Binaryen, which merges the
-SDK's accessors into a module and puts them inline - `wasm.md`, *Memories*. **What the library
+**What a build needs installed is zig and Python, and Binaryen for the wasm test modules**:
+it assembles the modules written as text, and merges the SDK's accessors into a module and puts
+them inline - `wasm.md`, *Memories*. **What the library
 is linked against is the system's C library, and the wasm backend against wasmtime**, which is
 in the tree with where it came from and its hash beside it.
 

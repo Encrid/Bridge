@@ -158,3 +158,11 @@ condition that brings it back is a module whose state has to outlive its instanc
 Refused: slots written as constants, in the order they are declared. `abi.md` says a slot is what
 `declare` answered and promises no numbering, and a module that counts has variables all the
 same. The condition that brings it back is the ABI stating the numbering.
+
+## The assembler of the wasm text
+
+Of `stage12.md`, *Dependencies, as built*. Binaryen's `wasm-as` and `wasm-dis` are used.
+
+Refused: `wasm-tools` kept beside Binaryen, as the parser the text format is defined by. It is a
+fourth tool for three calls that a tool already required makes. The condition that brings it back
+is a module written as text that Binaryen does not read.
