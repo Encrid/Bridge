@@ -57,7 +57,7 @@ static const host_case_t STAGE5_CASES[] = {
 int main(int argc, char **argv)
 {
     constexpr size_t count = sizeof(STAGE5_CASES) / sizeof(*STAGE5_CASES);
-    static stage5_counts_t counts = { .minting = -1 };
+    stage5_counts_t counts = { .minting = -1 };
     stage5_listener_t listener = { &counts, -1 };
     host_t h;
 

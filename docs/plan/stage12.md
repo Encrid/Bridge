@@ -704,3 +704,34 @@ those bytes. `strncmp`, `strtoll` and `strtoull` stay: the first needs a length 
 does not need now, and the other two are a reader of integers we would then own, about thirty
 lines whose edges the C library has right. The C library is linked either way, for `malloc` and
 `snprintf`, so what this buys is a shorter list and no dependency less.
+
+**`tests/storage.c` is `tests/storage/`**: 1,006 lines in one file, 26 files now. `main` finds the
+case in a table of 37 names, and each case's phases are a constant list. What the sink counted is
+in the fixture it is handed. Beside the program as it was: every case, on both builds, prints the
+same bytes to both streams and ends with the same code.
+
+Two things are not as they were. A name that began like a case's, `sparsefoo`, ran that family's
+default branch; the table answers the names it holds and no other. And the counted build's
+allocator, which stands in for `malloc` and is handed nothing a fixture could be reached through,
+keeps its counters in a variable local to one function that answers where they are: no file has a
+variable of its own, and the state is still one for the program, which is what an allocator is.
+
+## The refactor, closed
+
+`python tools/style.py --all`: **446 files, 0 infringements**, from 8,846 in 203 files. Every C
+file we own is held by the case `style`. Two exceptions are listed in `style.md`, one function
+whose signature is wasmtime's and the variables of a test module, each put as a decision.
+238 cases pass, optimised and debug, and both other targets compile.
+
+**Open for the close of the stage**, five rounds beside the tree before it. Faster or level
+everywhere but here:
+
+    attach, a component it has          12.0 to 12.3 ns, the first of a table
+    ten thousand tables made            0.270 to 0.281 us a table
+    rows in 4,096 tables                18.5 to 19.2 us
+    direct-indexed, a component given   16.9 to 17.5 ns
+    a toggle, one row in 16, by words   8.5 to 8.9 us: a loop of the test module's own
+    values reached by id                0.720 to 0.754 ns: a loop of the test module's own
+
+The first four are storage's and are what the stage's done-when is about. The last two are the
+test modules' loops, compiled to other instructions since they were cut.

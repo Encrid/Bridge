@@ -307,15 +307,16 @@ def build(target, debug, out):
     # these reach inside, to test it: they are compiled against src/ and share nothing
     schema_test_o = program('schema', ours + [include, src], [])
     adopt_o = program('adopt', ours + [include, src, utils] + defines, [])
-    storage_o = compile_('storage-test', ROOT / 'tests/storage.c', ours + [include, src, utils] + defines)
+    storage_o = program('storage', ours + [include, src, utils] + defines, [])
     # the library again, with its calls to the allocator sent to the test that counts them
     counting = ['-D%s=counted_%s' % (f, f) for f in ('malloc', 'calloc', 'realloc', 'free')]
     counted_o = [compile_('counted-' + name, ROOT / 'src' / (name + '.c'),
                           ours + [include, src, utils] + counting) for name in BRIDGE] + \
                 [compile_('counted-os-' + name, os_dir / (name + '.c'), ours + [utils] + counting)
                  for name in OS]
-    counted_test_o = compile_('storage-counted-test', ROOT / 'tests/storage.c',
-                              ours + [include, src, utils] + defines + ['-DCOUNTED'])
+    counted_test_o = [compile_('storage-counted-' + c.stem, c,
+                               ours + [include, src, utils] + defines + ['-DCOUNTED'])
+                      for c in sorted((ROOT / 'tests/storage').glob('*.c'))]
     shared = '-I%s' % (ROOT / 'tests/modules')
     module_o = {name: [compile_(name + '-' + c.stem if c.stem != source else name, c,
                                 ours + [include, sdk['native'], shared, '-fvisibility=hidden'] +
@@ -360,8 +361,8 @@ def build(target, debug, out):
         link(name, o + [shared_lib], system + here)
     link('stage2-static', phase_o['stage2'] + [static_lib], system)
     # these three reach inside, to test it, and so are linked with its objects
-    link('storage', [storage_o] + whole, system)
-    link('storage-counted', [counted_test_o] + counted_o, system)
+    link('storage', storage_o + whole, system)
+    link('storage-counted', counted_test_o + counted_o, system)
     together(links)
 
     # ---- wasm modules: text assembled, C compiled and merged with the accessors ----
