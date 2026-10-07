@@ -123,6 +123,32 @@ void host_run_frames(host_t *h, int count);
 void host_run_frames_unsaid(bridge_t *b, int count);
 
 /*
+** A thread of the host's own: what it runs, with what, and the operating
+** system's handle of it.
+*/
+typedef struct {
+    void (*run)(void *arg);
+    void *arg;
+    void *handle;
+} host_thread_t;
+
+/*
+** host_get_thread_id
+**
+** Answers which thread this is, as a native test module says it: the low
+** 32 bits of what the operating system calls it.
+*/
+uint32_t host_get_thread_id(void);
+
+/*
+** host_thread_start, host_thread_join
+**
+** Start a thread that calls `t->run` with `t->arg`, and wait for it to end.
+*/
+void host_thread_start(host_thread_t *t);
+void host_thread_join(host_thread_t *t);
+
+/*
 ** host_is_library_loaded
 **
 ** Answers whether a library is in this process, asked of the operating

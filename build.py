@@ -290,8 +290,9 @@ def build(target, debug, out):
     # a host program is a directory of sources, with what the programs share compiled once -
     # stage12.md, *The test programs*. One that has not been cut yet is one source
     support = '-I%s' % (ROOT / 'tests/support')
-    host_o = [compile_('support-' + c.stem, c, ours + [include] + defines)
-              for c in sorted((ROOT / 'tests/support').glob('host*.c'))]
+    host_o = [compile_('support-' + c.stem, c, ours + [include, support] + defines)
+              for c in sorted((ROOT / 'tests/support').glob('host*.c')) +
+              sorted((ROOT / 'tests/support' / row['os']).glob('host*.c'))]
 
     def program(name, flags):
         where = ROOT / 'tests' / name
