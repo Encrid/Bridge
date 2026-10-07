@@ -42,3 +42,25 @@ sentence. Enkrid ruled for the branch's name alone. No condition brings it back.
 
 Refused: "the previous Bridge". True until another follows, and it says nothing of what the
 design was. No condition brings it back.
+
+## The library, and the object a host creates
+
+Of `stage15.md`, *The library, and the object a host creates*.
+
+Refused: the two words as they fall, "Bridge" and "the bridge". A capital and an article part
+them, and at the head of a sentence only the article. No condition brings it back.
+
+Refused, though it was recommended: the same two words under a rule, the library never with
+an article and the object always with one, and a script that fails on a slip. Enkrid ruled for
+another word: a rule to learn, and still one letter between them. No condition brings it back.
+
+Refused: the library never said bare, "the Bridge library" wherever it acts. Some six hundred
+sentences longer, and it reads as if Bridge were something else as well. No condition brings it
+back.
+
+Refused: "instance" for the object. It is a module's. And "context", which says nothing of
+what it is, and "world", which reads as flecs' own. No condition brings either back.
+
+Refused: the new word in the documents alone, or in the documents and the comments. A host
+would read one word of the object in a document and another in its log. No condition brings
+it back.

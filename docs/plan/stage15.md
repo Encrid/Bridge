@@ -49,7 +49,7 @@ Counted on `e635bf0`, the tree stage 14 left.
 Six. The fourth was taken while the stage was planned, and taken again when it was begun.
 
     1  what the design before this one is called, in the documents
-    2  "Bridge" and "the bridge"
+    2  the library and the object a host creates: two words that would differ by a capital
     3  the records
     4  outside the tree: one repository, and what the earlier iterations are called
     5  the folders on this machine
@@ -130,3 +130,29 @@ possessive becomes "of", so that no sentence hangs an apostrophe on a name in ba
     extensible    a design that follows this one changes no sentence
     minimal       one name, and none in prose to keep beside it
     explicit      the name is where it is found
+
+### The library, and the object a host creates
+
+**The object is a session, wherever a person reads of it, and Bridge is the library alone.**
+Once the library is Bridge, "the bridge" is a capital and an article from it, and one sentence
+has both: that `fail` stops the bridge, since the library cannot stop the program. Enkrid
+ruled that the object's word changes, over a recommendation that both stay with a rule on the
+article and a check.
+
+**A session**: what `bridge_create` makes and `bridge_destroy` unmakes, with its storage, its
+modules and its threads. The word is used nowhere in the documents today. "Instance" is not
+free, being a module's, 49 times; nor "deployment", which is what a session is made of; nor
+"runtime", which is wasmtime.
+
+**Everywhere it is read**: 33 places of the documents, 122 comments, the four messages that
+say it and what the cases expect of them, and what the test programs print. A host reads the
+documents and the log, and they are to say one word. No identifier changes: the type is
+`bridge_t` and the functions are `bridge_create` and the rest, named for the library they are
+of.
+
+    fast          no part of this runs
+    scalable      does not apply
+    modular       the library has a name and the object a word, and neither is the other's
+    extensible    a second library that makes sessions would say the same word
+    minimal       one word, where two differed by a letter
+    explicit      a sentence cannot be read of the wrong one
