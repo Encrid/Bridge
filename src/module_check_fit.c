@@ -1,0 +1,135 @@
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** src/module_check_fit.c -- the keys of a module's config that have to fit:
+** in what there is, and with one another.
+*/
+
+#include <stdckdint.h>
+#include <string.h>
+
+#include "module.h"
+
+/*
+** check_phase
+**
+** Refuses a phase name of a config that is unset, that is mapped twice, or
+** that is mapped to a phase the deployment did not declare.
+*/
+static int check_phase(const module_check_t *k, uint32_t i)
+{
+    const bridge_module_config_t *cfg = k->cfg;
+    const bridge_t *b = k->b;
+    const bridge_phase_name_t *n = &cfg->phases[i];
+    uint32_t at = 0;
+
+    if (!n->from || !*n->from || !n->to || !*n->to)
+        return (module_refuse(k->b, k->id, "phase name %u of its config is "
+            "unset", i));
+    while (at < i && strcmp(cfg->phases[at].from, n->from))
+        at++;
+    if (at < i)
+        return (module_refuse(k->b, k->id, "its config maps phase '%s' "
+            "twice", n->from));
+    at = 0;
+    while (at < b->phase_count && strcmp(b->phases[at], n->to))
+        at++;
+    if (at < b->phase_count)
+        return (0);
+    return (module_refuse(k->b, k->id, "its config maps phase '%s' to '%s', "
+        "which the deployment did not declare", n->from, n->to));
+}
+
+/*
+** module_check_phases
+**
+** Refuses a config whose phase names cannot be mapped.
+*/
+int module_check_phases(const module_check_t *k)
+{
+    int refused = 0;
+    uint32_t i = 0;
+
+    while (!refused && i < k->cfg->phase_count) {
+        refused = check_phase(k, i);
+        i++;
+    }
+    return (refused);
+}
+
+/*
+** module_lay_private
+**
+** Works out where a module's regions sit in its private memory. Rounded up
+** to its backend's granule, its end is still an offset of 32 bits.
+*/
+int module_lay_private(const bridge_module_config_t *cfg, uint64_t granule,
+    module_private_t *at)
+{
+    uint32_t end;
+
+    if (ckd_add(&end, MODULE_SCRATCH_AT, cfg->scratch)
+        || ckd_add(&end, end, 7u))
+        return (1);
+    at->ring = end & ~7u;
+    if (ckd_add(&end, at->ring, cfg->log_ring) || ckd_add(&end, end, 7u))
+        return (1);
+    at->spans = end & ~7u;
+    if (ckd_add(&at->end, at->spans, cfg->spans))
+        return (1);
+    return ((uint64_t)at->end + granule - 1 > UINT32_MAX);
+}
+
+/*
+** check_log_level
+**
+** Refuses a log level that is unset, or that is not one there is. Zero is
+** unset for it as for every key, so the least it can be is 1.
+*/
+static int check_log_level(const module_check_t *k)
+{
+    uint32_t level = k->cfg->log_level;
+
+    if (module_check_set(k, "log_level", level))
+        return (1);
+    if (level <= BRIDGE_LEVEL_MOST)
+        return (0);
+    return (module_refuse(k->b, k->id, "its log_level of %u is not one it "
+        "can be, which is 1 to %u", level, BRIDGE_LEVEL_MOST));
+}
+
+/*
+** module_check_fit
+**
+** Refuses a config whose amounts do not fit. A log ring has the one floor
+** with an argument: a module that can report nothing is the one legal
+** number that makes a deployment incoherent.
+**
+** budgets.md, *Budgets*
+*/
+int module_check_fit(const module_check_t *k)
+{
+    const bridge_module_config_t *cfg = k->cfg;
+    constexpr uint32_t record = sizeof(bridge_log_record_t);
+    module_private_t at;
+
+    if (check_log_level(k))
+        return (1);
+    if (!cfg->config || !*cfg->config)
+        return (module_refuse(k->b, k->id, "config is unset"));
+    if (cfg->spawns > (int64_t)k->b->entities)
+        return (module_refuse(k->b, k->id, "its spawns of %lld is more than "
+            "[budget] entities of %u", (long long)cfg->spawns, k->b->entities));
+    if (module_lay_private(cfg, k->on->granule, &at))
+        return (module_refuse(k->b, k->id, "its scratch of %u, log_ring of %u "
+            "and spans of %u bytes come to more than an offset of 32 bits can "
+            "reach", cfg->scratch, cfg->log_ring, cfg->spans));
+    if (cfg->log_ring >= record)
+        return (0);
+    return (module_refuse(k->b, k->id, "a log_ring of %u bytes holds no "
+        "record, and one is %u", cfg->log_ring, record));
+}

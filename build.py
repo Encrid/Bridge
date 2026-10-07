@@ -66,12 +66,17 @@ CONFIG = ['config_say', 'config_scalar', 'config_enum', 'config_text', 'config_f
           'config_room', 'config_kept']
 SCHEMA = ['schema_reader', 'schema_token', 'schema_value', 'schema_type', 'schema_struct',
           'schema_constants']
+MODULE = ['module_say', 'module_check', 'module_check_stated', 'module_check_fit',
+          'module_check_backend', 'module_record', 'module_discard', 'module_types', 'module_call',
+          'module_instance', 'module_start', 'module_pointed', 'module_share', 'reload_check', 'reload_share',
+          'reload_record', 'reload_rows', 'reload_fail']
 BRIDGE = ['say', 'bridge_create', 'bridge_backend', 'bridge_backends', 'bridge_phases',
-          'bridge_destroy', 'bridge_stop', 'bridge_run', 'lifecycle', 'config',
+          'bridge_destroy', 'bridge_stop', 'bridge_run', 'bridge_load', 'bridge_unload',
+          'bridge_reload', 'config',
           'schema', 'abi_calls', 'abi_alloc', 'abi_define', 'abi_names', 'abi_stated', 'abi_relay_run',
           'abi_relay_fields', 'abi_relay', 'abi_moved', 'abi_replace', 'abi_layout', 'abi_make',
           'abi_declare', 'abi_subscriber', 'abi_subscriber_room', 'abi_term', 'abi_subscribe',
-          'abi_system', 'pool', 'pool_job', 'pool_run', 'backend'] + SCHEMA + CONFIG + SCHEDULE + BLOCK + STORAGE
+          'abi_system'] + MODULE + ['pool', 'pool_job', 'pool_run', 'backend'] + SCHEMA + CONFIG + SCHEDULE + BLOCK + STORAGE
 # a native module is a shared library: the name, its source, what it is compiled with. The same
 # library twice is one module to the loader, so one source is built under several names.
 NATIVE = [

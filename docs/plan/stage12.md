@@ -537,3 +537,30 @@ not as they were, and none shows in a transcript:
 
 Nothing here runs in a phase. Measured all the same, five rounds beside the tree before the
 stage: no line moved beyond what the lines it does not touch moved.
+
+**`lifecycle.c` is gone**: 1,011 lines and 29 functions, of which `checks` was 144 lines,
+`bridge_reload` 180 and `bridge_load` 81. It is 24 files now, none of them with a function over
+20 lines:
+
+    module.h, reload.h          what a load, an unload and a reload share: `module_check_t`,
+                                `module_start_t`, `module_call_t`, `reloading_t`
+    module_check*.c, module_say.c
+                                what is refused from a config alone, a group of keys a function
+    module_record.c, module_discard.c, module_types.c
+                                a module's record made and freed, and what it declared let go
+    module_call.c, module_instance.c, module_start.c
+                                its private memory, its instance, and the first call into it
+    module_share.c, module_pointed.c
+                                its share of the persistent arena, and who points into it
+    bridge_load.c, bridge_unload.c, bridge_reload.c
+                                the three entries
+    reload_check.c, reload_share.c, reload_record.c, reload_rows.c, reload_fail.c
+                                the steps of a reload
+
+`checks` took four values out through pointers and `start` took six arguments; each is handed
+one struct. `neither` took five arguments and takes four, since who is refused is in the struct.
+The three `goto failed` of `bridge_load` are one function that is called. Every record says what
+it said, in the order it was reached: the 237 cases pass unchanged, release and debug.
+
+Nothing here runs in a phase either. The lines that moved in five rounds are the three that are
+open above, with a table made at 0.263 to 0.275 us among them.
