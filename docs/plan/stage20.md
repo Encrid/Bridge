@@ -142,3 +142,39 @@ repository was in failed before its first step, for a failure of payment on that
 organisation's account. The repository has since moved to another account, and the first push
 after that shows whether one runs there. Until one has, this holds nothing, and the close of
 this stage says which it is.
+
+### Which versions
+
+**Version 3 only.** Enkrid ruled it, as recommended. The terms are the text in the tree, and a
+later version applies only if the holder chooses it, which the agreement of contributors lets
+the holder do. It is what `legacy/rust-components` said of its own.
+
+### The line in every file
+
+**A line of words: "Licensed under the GNU Affero General Public License, version 3 only: see
+license."** Enkrid ruled it, over a recommendation of the registered identifier for these
+terms, which a program can read. It takes the place of "All rights reserved." in rule G1 of
+`style.md`, in the expression of `tools/style.py` that holds the header, and in each file, so no
+file grows. The cost is that no tool outside this tree reads it.
+
+### What the files are called
+
+**In lower case: `license` at the root, `cla.md` beside it, and `licence.md` among the
+documents for what may be done with Bridge.** Enkrid ruled it, as recommended. Rule O4 of
+`style.md` asks it of every file of ours, and no rule is excepted. The file at the root has the
+spelling the hosting service looks for, and the document the spelling these documents use for
+the noun. If the service does not recognise the name in lower case, this is put again.
+
+### What else is under it
+
+**Everything in the tree that is ours: the library, the backends, their SDKs, the tests, the
+modules of the tests, the tools and the documents.** Enkrid ruled it, as recommended. What is
+somebody else's keeps its own licence, named beside it. A module compiles the seam headers into
+itself and is loaded by the library, so it is under these terms whatever an example it was
+copied from was under, and a second licence for the examples or for the prose would be a
+boundary to find and nothing gained.
+
+### Where other terms are asked for
+
+**Of the author's account on the hosting service, `Encrid`, and nowhere else.** Enkrid ruled
+it. No address and no name of a person is in the tree.

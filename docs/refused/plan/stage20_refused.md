@@ -54,3 +54,50 @@ gets no fixes. The condition that brings it back is none.
 
 Refused: no agreement until there is a contributor. The first one would meet a closed door and
 a text written in a hurry. The condition that brings it back is none.
+
+## Which versions
+
+Of `stage20.md`, *Which versions*.
+
+Refused: version 3 or any later. A user could then take terms that are not written yet, by an
+author who is not the holder. The condition that brings it back is code under a later version
+only that Bridge has to be combined with.
+
+## The line in every file
+
+Of `stage20.md`, *The line in every file*.
+
+Refused: the registered identifier, `AGPL-3.0-only`, on a line of its own. A program reads it
+and nobody words it wrongly; a reader who has not met one looks it up. The condition that
+brings it back is a tool or a service that Bridge has to be read by.
+
+Refused: the licence's own notice of three paragraphs in every file. It is what its authors
+recommend, and nearly six thousand lines that say one thing. The condition that brings it back
+is none.
+
+## What the files are called
+
+Of `stage20.md`, *What the files are called*.
+
+Refused: `LICENSE` and `CLA.md` in capitals, excepted from rule O4. It is the custom; and it is
+an exception where the method reshapes. The condition that brings it back is the hosting
+service not recognising the name in lower case.
+
+## What else is under it
+
+Of `stage20.md`, *What else is under it*.
+
+Refused: the documents under a licence for prose. They hold layouts and code that are the
+library's, and where one licence ends is not clear. The condition that brings it back is none.
+
+Refused: the modules of the tests and the SDKs under a permissive licence. It brings back the
+question of what seam code compiled into a module is under, and changes nothing for a module
+used with Bridge. The condition that brings it back is none.
+
+## Where other terms are asked for
+
+Of `stage20.md`, *Where other terms are asked for*.
+
+Refused: an address in the tree, alone or beside the account. It is what a buyer expects, and
+it is harvested from a public file. The condition that brings it back is a buyer who cannot
+use the account.
