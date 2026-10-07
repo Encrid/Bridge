@@ -45,3 +45,18 @@ of a stage is still the design leaning on the plan. No condition brings it back.
 
 Refused: the same, with history kept and its number taken out. "Before" with nothing to say
 before what is a sentence only somebody who was there can follow. No condition brings it back.
+
+## What is said twice
+
+Of `stage14.md`, *What is said twice*.
+
+Refused: left, and read at each scan. Thirty facts in two places, each free to drift, and which
+copy is right unsaid. No condition brings it back.
+
+Refused: no shared run at all. It forbids a signature shown where it is read and the line
+every document opens its record with, and chases a number the script says not to chase. No
+condition brings it back.
+
+Refused: `dup.py` as a case, with a list of the passages accepted. A second list of what the
+findings say already, and a duplicate reworded passes it. The condition that brings it back is
+a fact found drifting after this stage.

@@ -158,3 +158,30 @@ they repeat, and keep it.
     extensible    a stage added, moved or renamed changes no document of the design
     minimal       one rule with no case of its own
     explicit      what a document says is what the library is, and a slip fails
+
+### What is said twice
+
+**One owner for a fact: the document whose concern it is states it, and another cites that
+heading and says only what is its own.** `readme.md` gives each document one concern, and that
+is what says who owns a fact. `dup.py` finds 48 passages of eight words or more that two
+documents of the design share. Eight are two documents citing one heading, which is what a
+citation is for. Forty are not, and of those about five are the line every document opens its
+record with, about five a signature or an example shown twice, and about thirty one fact stated
+in two places: `query.md` and `storage.md` share five, among them that a system walks tables or
+one sparse set alone.
+
+    a citation shared            stays
+    the line that names the      stays
+    record of a document
+    a signature or an example    shown in the document that owns it, and cited from the other
+    a fact                       stated by its owner, and cited from the other
+
+**Each of the forty is a finding**, changed or refused by name. No script says who owns a fact,
+so none is asked to: `dup.py` stays where it is, in the scan of `stage0.md`, and is read.
+
+    fast          no part of this runs
+    scalable      a document written later is read by the same scan
+    modular       one concern a document, and each held to it
+    extensible    a fact that changes is changed in one place
+    minimal       a rule and the citation there is already
+    explicit      which document is right is never a question
