@@ -28,3 +28,17 @@ brings it back is the count being written down somewhere it can be checked.
 
 Refused: `old/` for `legacy/`. Either was offered. Legacy is the word for what is kept and no
 longer worked on, and old says only when. No condition brings it back.
+
+## What the design before this one is called
+
+Of `stage15.md`, *What the design before this one is called*.
+
+Refused: "the original Bridge", as it was. It is the fourth design and not the first, and an
+adjective away from this library's name. No condition brings it back.
+
+Refused, though it was recommended: "the Rust Bridge", said once in `readme.md` beside its
+branch. A name in prose and a name in the repository for one thing, held together by one
+sentence. Enkrid ruled for the branch's name alone. No condition brings it back.
+
+Refused: "the previous Bridge". True until another follows, and it says nothing of what the
+design was. No condition brings it back.

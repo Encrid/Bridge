@@ -48,7 +48,7 @@ Counted on `e635bf0`, the tree stage 14 left.
 
 Six. The fourth was taken while the stage was planned, and taken again when it was begun.
 
-    1  what the original Bridge is called from now on, in the documents
+    1  what the design before this one is called, in the documents
     2  "Bridge" and "the bridge"
     3  the records
     4  outside the tree: one repository, and what the earlier iterations are called
@@ -110,3 +110,23 @@ and `dev-web-backend` removed, once their tags and branch are there; this histor
 `main` and `dev`, which moves `main` to a commit that is no descendant of what it was and so
 is forced; the repository's default branch and description; this repository archived; and the
 two clones on this machine.
+
+### What the design before this one is called
+
+**By the name of its branch, `legacy/rust-components`, wherever it is meant.** Enkrid ruled
+it, over a recommendation of a name in prose, "the Rust Bridge", said once beside its branch.
+The documents call it "the original Bridge" 33 times, and it is not: three designs came before
+it. It is cited as prior art, for what it measured, what it did and what it got wrong, and a
+reader who wants the source of a claim looks for a name the repository has. One name, and it
+is the one that finds it.
+
+A sentence built on the old words is built again where the new name will not carry it: a
+possessive becomes "of", so that no sentence hangs an apostrophe on a name in backticks.
+`readme.md` says once what the branch is.
+
+    fast          no part of this runs
+    scalable      another design cited later is cited by its name under `legacy/`
+    modular       the documents and the repository have one name for it
+    extensible    a design that follows this one changes no sentence
+    minimal       one name, and none in prose to keep beside it
+    explicit      the name is where it is found
