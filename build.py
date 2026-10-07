@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parent
 TARGETS = {
     'x86_64-windows-gnu': {
         'runs on': ('Windows', 'AMD64'), 'program': '.exe', 'library': '.dll', 'os': 'windows',
-        'compile': [], 'link': ['-lws2_32', '-ldbghelp'], 'beside': [], 'named': [],
+        'compile': [], 'link': [], 'beside': [], 'named': [],
         'wasmtime': ('windows/libwasmtime.dll.a', 'windows/wasmtime.dll')},
     'x86_64-linux-gnu': {
         'runs on': ('Linux', 'x86_64'), 'program': '', 'library': '.so', 'os': 'posix',
@@ -408,6 +408,8 @@ def test(out, built, only):
         argv = [str(out / (command[0] + built['exe']))] + command[1:]
         if command[0] in ('c23', 'style'):
             argv = [str(built['python']), str(ROOT / ('tools/%s.py' % command[0]))]
+        elif command[0] == 'deps':
+            argv = [str(built['python']), str(ROOT / 'tools/deps.py'), str(out), '--check']
         elif command[0] == 'nocall':
             argv = [str(built[k]) for k in ('python', 'nocall', 'wasm-tools')] + \
                    [str(built['modules'] / command[1]), command[2]]
@@ -466,6 +468,8 @@ CASES = [
     ('c23', ['c23'],
      None, None),
     ('style', ['style'],
+     None, None),
+    ('deps', ['deps'],
      None, None),
     ('schema', ['schema'],
      r"every descriptor read as it should, and every other refused by its word.*alive", None),

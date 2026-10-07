@@ -666,3 +666,19 @@ Beside the tree before the stage, four rounds: the row walks are where they were
 one figure of a module's own loop moved both ways. A toggle found a word at a time is 67 to 52 us
 with one row in two on, and 8.6 to 9.2 us with one in sixteen: the mask of the last word compiles
 to two branches where it was two conditional moves. The second is with the open lines above.
+
+## Dependencies, as built
+
+**The list** is `docs/design/dependencies.md`: the four tools `build.py` calls, wasmtime, and every
+function the library and the two backends import, by system, each with why it is there. **The
+check** is `tools/deps.py`, the case `deps`: it reads the import table of each built artifact, a
+PE file's import directory, an ELF file's dynamic symbols, a Mach-O file's undefined symbols,
+and the tools `build.py` looks for, and fails on one that is not listed and on one that is listed
+and no longer asked for. Counted on what is built here: 96 imports on Windows, 86 on Linux, 88 on
+macOS, of which wasmtime's are 49.
+
+`-lws2_32` and `-ldbghelp` are gone from the Windows link: nothing imported from either.
+
+What the count showed that nobody had written down: fifteen of the Windows imports are not ours.
+zig links its startup code into every shared library, and that code imports them. They are
+listed as that.

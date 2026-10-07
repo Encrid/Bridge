@@ -33,6 +33,7 @@ diagram to keep in step with. One concern per document, in reading order:
         split.md             which side owns what
         costs.md             what we give up
         build.md             the compiler, the platforms, the standard, the C library
+        dependencies.md      every tool and every import, with why it is there
 
     plan/
         stage0.md            how we decide things. method, not design

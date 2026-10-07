@@ -171,8 +171,8 @@ SDK's accessors into a module and puts them inline - `wasm.md`, *Memories*. **Wh
 is linked against is the system's C library, and the wasm backend against wasmtime**, which is
 in the tree with where it came from and its hash beside it.
 
-Third-party code is not refused. A dependency nobody wrote down is: `plan.md`, stage 12, lists
-every one with why it is there, and holds the list by a case.
+Third-party code is not refused. A dependency nobody wrote down is: `dependencies.md` lists every
+one with why it is there, and a case holds the list - `dependencies.md`, *Dependencies*.
 
 ## What an author is not bound by
 
