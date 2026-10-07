@@ -174,7 +174,7 @@ WRONG_AT_INIT = ('declare_outside declare_name_outside declare_no_namespace decl
                  'term_access_other term_oper_unset term_slot_undeclared term_write_ungranted '
                  'change_slot_undeclared change_ungranted alloc_stated_none')
 WRONG_IN_SYSTEM = ('declare_late system_late observe_late attach_undeclared attach_ungranted '
-                   'attach_outside detach_undeclared')
+                   'attach_outside detach_undeclared attach_tag_value')
 WASM += [('wrong-' + act.replace('_', '-'), 'wrong', 'checked',
           ['AT_INIT=wrong_' + act, 'IN_SYSTEM=wrong_do_nothing']) for act in WRONG_AT_INIT.split()]
 WASM += [('wrong-' + act.replace('_', '-'), 'wrong', 'checked',
@@ -1074,7 +1074,7 @@ CASES = [
     ('bridge_system_statement_t-name-outside-scratch-refused', ['host', 'bridge_system_statement_t-name-outside-scratch-refused'],
      r"module 'game:wrong@0\.1\.0' did not load: system: a name, a term or a change lies outside the scratch arena.*alive", None),
     ('add_system-more-changes-than-types-refused', ['host', 'add_system-more-changes-than-types-refused'],
-     r"module 'game:wrong@0\.1\.0' did not load: a system states 5 changes, and the module declared 2 types.*alive", None),
+     r"module 'game:wrong@0\.1\.0' did not load: a system states 5 changes, and the module declared 3 types.*alive", None),
     ('add_system-name-twice-refused', ['host', 'add_system-name-twice-refused'],
      r"module 'game:wrong@0\.1\.0' did not load: 'act' is registered twice.*alive", None),
     ('observe-no-term-refused', ['host', 'observe-no-term-refused'],
@@ -1431,6 +1431,8 @@ CASES = [
      r"a host function: called with an i32 and an i64, answered 16", None),
     ('config.backends-none-refused', ['host', 'config.backends-none-refused'],
      r"the deployment configures no backend, and a module is run by one.*bridge_create refused.*alive", None),
+    ('attach-tag-with-a-value-refused', ['host', 'attach-tag-with-a-value-refused'],
+     r"system 'act' failed: attach: 'game:Flag' is a tag, and is handed a value.*alive", None),
 ]
 
 # these again, through the static library: what a host does first, to create a bridge and to

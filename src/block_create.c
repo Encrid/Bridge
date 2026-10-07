@@ -54,12 +54,13 @@ static void set_limits(bridge_t *b, const bridge_budget_t *budget)
 ** make_storage
 **
 ** Makes the two regions' lists of what is free, and storage. A gap lies
-** between two blocks, and a table has one block: never more gaps than
-** tables, sparse sets and direct-indexed components, and one.
+** between two blocks. A table has one block, and so has a sparse set, and
+** so has each type that is direct-indexed or a singleton, of which there
+** are no more than types: never more gaps than those, and one.
 */
 static int make_storage(bridge_t *b)
 {
-    uint32_t room = b->tables + b->sparse_sets + b->direct_indexed + 1;
+    uint32_t room = b->tables + b->sparse_sets + b->max_types + 1;
 
     b->column_space = (region_t){ .room = room, .len = b->columns_len };
     b->column_space.gaps = malloc(room * sizeof(range_t));

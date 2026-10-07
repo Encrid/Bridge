@@ -21,11 +21,12 @@ constexpr uint32_t WRONG_OUTSIDE = 0xFFFFFF00u;
 constexpr uint32_t WRONG_NO_SLOT = 9;
 
 /*
-** The slots init was answered: the position, and the thing of another
-** namespace the module is granted to read.
+** The slots init was answered: the position, the thing of another
+** namespace the module is granted to read, and a tag.
 */
 extern uint32_t wrong_position;
 extern uint32_t wrong_thing;
+extern uint32_t wrong_flag;
 
 /*
 ** wrong_state_type, wrong_state_system, wrong_state_observer
@@ -82,5 +83,6 @@ void wrong_attach_undeclared(void);
 void wrong_attach_ungranted(void);
 void wrong_attach_outside(void);
 void wrong_detach_undeclared(void);
+void wrong_attach_tag_value(void);
 
 #endif

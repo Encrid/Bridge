@@ -978,6 +978,7 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
     attach-singleton-to-an-id-refused
     attach-to-id-zero-refused
     attach-unstated-change-fails
+    attach-tag-with-a-value-refused
     attach-undeclared-slot-refused
     attach-ungranted-refused
     attach-value-outside-scratch-refused

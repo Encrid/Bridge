@@ -51,7 +51,7 @@ void wrong_system_name_outside(void)
 /*
 ** wrong_system_many_changes
 **
-** Registers a system that states five changes: the module declared two
+** Registers a system that states five changes: the module declared three
 ** types.
 */
 void wrong_system_many_changes(void)

@@ -71,7 +71,7 @@ int module_make_instance(module_t *m, const module_start_t *st,
 {
     const bridge_artifact_t *a = st->a;
     open_backend_t *o = m->on;
-    backend_source_t source = { a->bytes, a->len, a->path, st->demands };
+    backend_source_t source = { a->bytes, a->len, a->path, st->demands, 0 };
     backend_memory_import_t memories[2];
     uint32_t count;
 

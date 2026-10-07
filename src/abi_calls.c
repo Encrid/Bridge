@@ -82,7 +82,11 @@ static declared_type_t *check_written(module_t *m, uint64_t slot,
 ** abi_attach
 **
 ** attach(id, slot, ptr). The value travels with it, and is as long as the
-** type was declared; BRIDGE_ZEROED as `ptr` asks for a zeroed one.
+** type was declared; BRIDGE_ZEROED as `ptr` asks for a zeroed one, and is
+** the one `ptr` a tag takes, since a tag has no value.
+**
+** abi.md, *The ABI*
+** storage.md, *A tag*
 */
 int abi_attach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 {
@@ -93,6 +97,9 @@ int abi_attach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 
     if (!c)
         return (1);
+    if (!c->size && a[2] != BRIDGE_ZEROED)
+        return (abi_refuse(m, "attach: '%s' is a tag, and is handed a value",
+            c->name));
     if (a[2] != BRIDGE_ZEROED)
         value = get_scratch(m, a[2], c->size);
     if (!value)

@@ -14,6 +14,7 @@
 
 uint32_t wrong_position;
 uint32_t wrong_thing;
+uint32_t wrong_flag;
 
 /*
 ** wrong_do_nothing
@@ -38,22 +39,24 @@ BRIDGE_EXPORT(act) int act(void)
 /*
 ** init
 **
-** Declares the position and the thing, registers "act", which reads the
-** position and states that it changes it, and does what this build does at
-** init.
+** Declares the position, the thing and the tag, registers "act", which
+** reads the position and states that it changes it and the tag, and does
+** what this build does at init.
 */
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
-    uint32_t changes[1];
+    uint32_t changes[2];
 
     wrong_position = BRIDGE_COMPONENT("game:Position", position_t,
         BRIDGE_STRIP, BRIDGE_TABLE);
     wrong_thing = BRIDGE_COMPONENT("other:Thing", marked_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
+    wrong_flag = BRIDGE_DECLARE_TAG("game:Flag", BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = wrong_position;
     changes[0] = wrong_position;
-    BRIDGE_ADD_SYSTEM("act", "update", terms, 1, changes, 1);
+    changes[1] = wrong_flag;
+    BRIDGE_ADD_SYSTEM("act", "update", terms, 1, changes, 2);
     AT_INIT();
     return (0);
 }

@@ -49,6 +49,8 @@ typedef struct backend_func backend_func_t;
 typedef struct {
     char text[256];
 } backend_err_t;
+static_assert(sizeof(backend_err_t) == 256);
+static_assert(alignof(backend_err_t) == 1);
 
 /*
 ** What a backend can actually do.
@@ -220,7 +222,15 @@ typedef struct {
     size_t len;
     const char *path;
     enum backend_capability demands;
+    uint32_t pad;
 } backend_source_t;
+static_assert(sizeof(backend_source_t) == 32);
+static_assert(alignof(backend_source_t) == 8);
+static_assert(offsetof(backend_source_t, bytes) == 0);
+static_assert(offsetof(backend_source_t, len) == 8);
+static_assert(offsetof(backend_source_t, path) == 16);
+static_assert(offsetof(backend_source_t, demands) == 24);
+static_assert(offsetof(backend_source_t, pad) == 28);
 
 /*
 ** What define_func is handed: an import a module may make, and what answers
@@ -235,6 +245,13 @@ typedef struct {
     void *ud;
     const backend_sig_t *sig;
 } backend_entry_t;
+static_assert(sizeof(backend_entry_t) == 40);
+static_assert(alignof(backend_entry_t) == 8);
+static_assert(offsetof(backend_entry_t, ns) == 0);
+static_assert(offsetof(backend_entry_t, field) == 8);
+static_assert(offsetof(backend_entry_t, fn) == 16);
+static_assert(offsetof(backend_entry_t, ud) == 24);
+static_assert(offsetof(backend_entry_t, sig) == 32);
 
 /*
 ** The entries, in the order a backend's library is asked for them.

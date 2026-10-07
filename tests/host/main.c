@@ -700,7 +700,9 @@ static const host_case_t TEST_CASES[] = {
     { "order-changes-ordered-loaded-first",
         test_order_changes, "", test_set_counting },
     { "order-changes-ordered-loaded-last",
-        test_order_changes_loaded_last, "", test_set_counting }
+        test_order_changes_loaded_last, "", test_set_counting },
+    { "attach-tag-with-a-value-refused",
+        test_do_wrong, "wrong-attach-tag-value", test_set_wasm }
 };
 
 /*
