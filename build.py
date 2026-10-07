@@ -64,7 +64,7 @@ SCHEMA = ['schema_reader', 'schema_token', 'schema_value', 'schema_type', 'schem
           'schema_constants']
 BRIDGE = ['say', 'bridge_create', 'bridge_backend', 'bridge_backends', 'bridge_phases',
           'bridge_destroy', 'bridge_stop', 'bridge_run', 'lifecycle', 'config', 'storage', 'storage_apply', 'storage_cells', 'storage_spans',
-          'storage_publish',
+          'storage_publish', 'storage_drop', 'storage_drop_apart', 'storage_drop_table',
           'schema', 'abi', 'pool', 'pool_job', 'pool_run', 'backend'] + SCHEMA + CONFIG + SCHEDULE + BLOCK
 # a native module is a shared library: the name, its source, what it is compiled with. The same
 # library twice is one module to the loader, so one source is built under several names.
