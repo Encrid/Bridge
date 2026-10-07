@@ -21,7 +21,7 @@ jobs:
             python: arm64
             runner: windows-11-arm
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 30
+    timeout-minutes: 60
     env:
       ZIG_VERSION: 0.16.0
       PROCESSOR: ${{ matrix.processor }}
@@ -45,3 +45,8 @@ jobs:
 
       - name: Build and test
         run: python build.py test
+
+      # each case six times at once, ten times over: what a case alone does not find -
+      # docs/plan/stage13.md, *Under load*
+      - name: Under load
+        run: python build.py test --copies 6 --rounds 10

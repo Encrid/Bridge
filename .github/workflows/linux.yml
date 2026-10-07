@@ -18,7 +18,7 @@ jobs:
           - processor: aarch64
             runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 20
+    timeout-minutes: 60
     env:
       ZIG_VERSION: 0.16.0
       BINARYEN_VERSION: 133
@@ -38,3 +38,8 @@ jobs:
 
       - name: Build and test
         run: python3 build.py test
+
+      # each case six times at once, ten times over: what a case alone does not find -
+      # docs/plan/stage13.md, *Under load*
+      - name: Under load
+        run: python3 build.py test --copies 6 --rounds 10

@@ -2,6 +2,8 @@
 
     python build.py                      build, for this machine
     python build.py test [-k NAME]       build, then run the tests (all, or those matching)
+    python build.py test --copies 6      each case six times at once: under load
+    python build.py test --rounds 10     the tests ten times over
     python build.py --target T ...       one of TARGETS, below: three systems, two processors
     python build.py --debug ...          unoptimised, with debug information
 
@@ -440,9 +442,52 @@ def sources(where, name, idle):
     return found + ([where / (idle + '.c')] if stated else [])
 
 
-def test(out, built, only):
-    """Each case by what it said. With a pattern, the pattern decides and the exit code does
-    not: several cases are a refusal that ends the program. Without one, the exit code does."""
+def command_line(out, built, command, kept):
+    """What a case runs: a program of the build, or a tool of ours over the tree."""
+    if command[0] in ('c23', 'style', 'cover'):
+        return [str(built['python']), str(ROOT / ('tools/%s.py' % command[0]))]
+    if command[0] == 'said':
+        return [str(built['python']), str(ROOT / 'tools/said.py'), str(kept)]
+    if command[0] == 'deps':
+        return [str(built['python']), str(ROOT / 'tools/deps.py'), str(out), '--check']
+    if command[0] == 'nocall':
+        return [str(built[k]) for k in ('python', 'nocall', 'wasm-dis')] + FEATURES + \
+               [str(built['modules'] / command[1]), command[2]]
+    return [str(out / (command[0] + built['exe']))] + command[1:]
+
+
+def run(argv, out):
+    """One copy of a case: what it said, and how it ended."""
+    try:
+        done = subprocess.run(argv, cwd=out, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                              timeout=TIMEOUT)
+        return done.stdout.decode('utf-8', 'replace'), done.returncode
+    except subprocess.TimeoutExpired as late:
+        return (late.stdout or b'').decode('utf-8', 'replace'), 'timeout'
+
+
+def judge(said, code, match, never):
+    """Why a copy of a case failed, or None. With a pattern, the pattern decides and the exit
+    code does not: several cases are a refusal that ends the program. Without one, the exit
+    code does."""
+    if code == 'timeout':
+        return 'did not end in %d seconds' % TIMEOUT
+    if never and re.search(never, said, re.S):
+        return 'said what it must not: %s' % never
+    if match and match.startswith('@') and \
+            said.replace('\r', '') != (ROOT / match[1:]).read_text(encoding='utf-8'):
+        return 'did not say what %s holds, word for word' % match[1:]
+    if match and not match.startswith('@') and not re.search(match, said, re.S):
+        return 'ended with %s and did not say: %s' % (code, match)
+    if not match and code:
+        return 'ended with %s' % code
+    return None
+
+
+def test(out, built, only, copies):
+    """Each case by what it said. With copies, each case is started that many times at once,
+    and every copy is judged as a case is: a case is a process, and the copies compete for the
+    processors, for memory, and for what a process shares with its neighbours."""
     cases = [c for c in CASES if not only or only in c[0]]
     failed = []
     # what every case said is kept, a file a case: tools/said.py holds each message of the
@@ -453,38 +498,16 @@ def test(out, built, only):
         shutil.rmtree(kept, ignore_errors=True)
     kept.mkdir(exist_ok=True)
     for name, command, match, never in cases:
-        argv = [str(out / (command[0] + built['exe']))] + command[1:]
-        if command[0] in ('c23', 'style', 'cover'):
-            argv = [str(built['python']), str(ROOT / ('tools/%s.py' % command[0]))]
-        elif command[0] == 'said':
-            argv = [str(built['python']), str(ROOT / 'tools/said.py'), str(kept)]
-        elif command[0] == 'deps':
-            argv = [str(built['python']), str(ROOT / 'tools/deps.py'), str(out), '--check']
-        elif command[0] == 'nocall':
-            argv = [str(built[k]) for k in ('python', 'nocall', 'wasm-dis')] + FEATURES + \
-                   [str(built['modules'] / command[1]), command[2]]
-        try:
-            done = subprocess.run(argv, cwd=out, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                  timeout=TIMEOUT)
-            said, code = done.stdout.decode('utf-8', 'replace'), done.returncode
-        except subprocess.TimeoutExpired as late:
-            said, code = (late.stdout or b'').decode('utf-8', 'replace'), 'timeout'
-        (kept / (name + '.txt')).write_text(said, encoding='utf-8')
-        if code == 'timeout':
-            why = 'did not end in %d seconds' % TIMEOUT
-        elif never and re.search(never, said, re.S):
-            why = 'said what it must not: %s' % never
-        elif match and match.startswith('@') and \
-                said.replace('\r', '') != (ROOT / match[1:]).read_text(encoding='utf-8'):
-            why = 'did not say what %s holds, word for word' % match[1:]
-        elif match and not match.startswith('@') and not re.search(match, said, re.S):
-            why = 'ended with %s and did not say: %s' % (code, match)
-        elif not match and code:
-            why = 'ended with %s' % code
-        else:
+        argv = command_line(out, built, command, kept)
+        count = 1 if name in ALONE else copies
+        with concurrent.futures.ThreadPoolExecutor(count) as pool:
+            ran = list(pool.map(lambda _: run(argv, out), range(count)))
+        (kept / (name + '.txt')).write_text(ran[0][0], encoding='utf-8')
+        wrong = [(said, why) for said, why in ((s, judge(s, c, match, never)) for s, c in ran) if why]
+        if not wrong:
             print('ok    %s' % name)
             continue
-        print('FAIL  %s: %s\n%s' % (name, why, said))
+        print('FAIL  %s: %s, in %d of %d\n%s' % (name, wrong[0][1], len(wrong), count, wrong[0][0]))
         failed.append(name)
     print('%d of %d passed' % (len(cases) - len(failed), len(cases)))
     if failed:
@@ -500,6 +523,9 @@ def main():
     ap.add_argument('--debug', action='store_true')
     ap.add_argument('--out', type=Path, help='where to build: build/<target> beside this file')
     ap.add_argument('-k', metavar='NAME', help='only the tests whose name has this in it')
+    ap.add_argument('--copies', type=int, default=1, metavar='N',
+                    help='start each case N times at once, and judge every copy')
+    ap.add_argument('--rounds', type=int, default=1, metavar='N', help='run the tests N times')
     args = ap.parse_args()
     machine = (platform.system(), platform.machine())
     mine = next((t for t, row in TARGETS.items() if row['runs on'] == machine), None)
@@ -509,7 +535,8 @@ def main():
     out = (args.out or ROOT / 'build' / (target + ('-debug' if args.debug else ''))).resolve()
     built = build(target, args.debug, out)
     if args.command == 'test':
-        test(out, built, args.k)
+        for _ in range(args.rounds):
+            test(out, built, args.k, args.copies)
 
 
 # Every case: its name, what is run, what its output must match, what it must not. A phase's
@@ -1358,6 +1385,20 @@ STATIC = (
 )
 CASES += [('static-' + name, ['host-static', name], match, never)
           for name, argv, match, never in CASES if name in STATIC]
+# The cases that are started once whatever --copies says, each with why. Under load a case that
+# measures gives another number, and that is no defect; a case that only bounds a time stays in
+# the load, where a bound that load breaks is found.
+MEASURES = 'it measures, and under load it measures the load'
+CLOCKED = 'it decides by the clock whether two naps overlapped'
+TREE = 'it reads the tree, and every copy would read the same'
+ALONE = {
+    'storage-weigh': MEASURES, 'storage-baseline': MEASURES, 'storage-measure': MEASURES,
+    'BRIDGE_ROW-checked-and-unchecked-timed': MEASURES,
+    'config.threads-two-run-at-once': CLOCKED, 'config.threads-one-runs-in-turn': CLOCKED,
+    'c23': TREE, 'style': TREE, 'deps': TREE, 'cover': TREE,
+    'said': 'it reads what the cases of this run said',
+}
+
 # and last, what is held against every case before it: the messages of the source against what
 # the cases said, and docs/tests.md against the headers and the cases
 CASES += [('said', ['said'], None, None), ('cover', ['cover'], None, None)]
