@@ -209,3 +209,29 @@ header, and a heading renamed touching each of them: `xref.py` names every one.
     extensible    a new name fails until it cites
     minimal       one rule, with no second level to it
     explicit      a name stated in no document is named, and fails
+
+### Messages and the documents
+
+**Each message is read against the documents once, and then each function that writes one
+cites the heading that states the rule it enforces.** A message is the one place a host or the
+author of a module meets a rule, so a rule that is enforced and stated nowhere is a defect of
+the documents: kind g. 204 messages, written by about 113 functions, of which 16 sit under a
+citation today. The documents have about 90 sentences that state a refusal, and they state the
+rule and where it is enforced, never the words.
+
+**Read once.** Each message is held against the documents in step 3. One whose rule no document
+states is a finding: its owner gains the sentence, or it is refused on record.
+
+**Then held.** The style allows no comment inside a function, so the pointer is above the
+function: the form and the checker of the citation above an exposed name, again. `tools/said.py`
+reads every call that writes a message already, and fails on one in a function whose comment
+cites no document. A function that refuses under two rules cites both. So a refusal written
+later fails the build until it says where its rule is stated, which is what stage 13 said this
+stage would have and did not build.
+
+    fast          no part of this runs
+    scalable      a message is held by the function it is in
+    modular       the rule is in its document, and the pointer at what enforces it
+    extensible    a refusal added later fails until it cites
+    minimal       the form and the script there are already
+    explicit      no rule is enforced that the design does not state

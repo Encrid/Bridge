@@ -76,3 +76,17 @@ back.
 
 Refused: several declarations under one comment that cites. What a group is has no form a
 script can read, and the style gives each function its comment. No condition brings it back.
+
+## Messages and the documents
+
+Of `stage14.md`, *Messages and the documents*.
+
+Refused: nothing, since a message explains itself. It says what was refused and not that the
+design means it to be; a rule could be enforced that nobody stated. No condition brings it
+back.
+
+Refused: read once, and no more. The next message is held by nothing, and stage 13 found 86 of
+204 with no case for that reason. No condition brings it back.
+
+Refused: a document that lists every message, written from the source. The words in two
+places, and the words are not the rule. No condition brings it back.
