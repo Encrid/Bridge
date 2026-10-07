@@ -19,7 +19,7 @@
     #include "bridge_abi.h"
     #include "bridge_schema.h"
 
-    #define MODE_VALUES { Off, On, Adaptive }
+    #define MODE_VALUES { OFF, ON, ADAPTIVE }
     #define FLAGS_VALUES { LOUD = 1, WIDE = 2 }
     #define SETTINGS_FIELDS { \
         bool vsync; \
