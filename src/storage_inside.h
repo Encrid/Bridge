@@ -259,4 +259,29 @@ struct storage {
     uint64_t *given;
 };
 
+/*
+** A row on its way from one table to another: the entity at `index` leaves
+** row `row` of `from` for row `at` of `to`. Either table may be 0, which is
+** no table.
+*/
+typedef struct {
+    uint32_t index;
+    uint32_t from;
+    uint32_t row;
+    uint32_t to;
+    uint32_t at;
+} row_move_t;
+
+/*
+** What an observer is told of: an entity, what it carried and what it
+** carries now, and of that, what an attach wrote a value of. `before` and
+** `after` are null for an entity that carried nothing, or is gone.
+*/
+typedef struct {
+    uint64_t id;
+    const uint64_t *before;
+    const uint64_t *after;
+    const uint64_t *attached;
+} seen_t;
+
 #endif

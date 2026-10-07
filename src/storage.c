@@ -7,6 +7,7 @@
 #include "storage_make.h"
 #include "storage_strip.h"
 #include "storage_table.h"
+#include "storage_tell.h"
 #include "storage_walk.h"
 #include "storage_view.h"
 
@@ -18,190 +19,7 @@
 
 /* ---- rows ---- */
 
-static void place_row(storage_t *r, uint32_t index, uint32_t t, uint32_t row)
-{
-    place_t *p = &r->places[index];
-    p->table = t;
-    p->row = row;
-    r->b->index[index] = (bridge_entity_t){ t, row, p->generation };
-}
-
-/* the entity at `index` has row `row` of a sparse set's table: kept here, and written where
- * modules read it */
-static void seat_row(storage_t *r, const table_t *tab, uint32_t index, uint32_t row)
-{
-    const storage_type_t *type = r->set_type[tab->set - 1];
-    get_where(r, tab->set - 1)[index] = row + 1;
-    get_cells(r, tab->set - 1)[index] = get_cell(type, get_columns(r, (uint32_t)(tab - r->tables))[type->id], row);
-}
-
-/* a row at the end of `t`, which has room for it, for the entity at `index` */
-static uint32_t append_row(storage_t *r, uint32_t t, uint32_t index)
-{
-    table_t *tab = &r->tables[t];
-    uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
-    uint32_t row = tab->rows ++;
-    get_who(r, tab)[row] = id;
-    memcpy(r->b->shared + tab->block + 8ull * row, &id, 8);
-    touch(r, t);
-    return row;
-}
-
-/* a row leaves `t`: the last one is moved into its place, and the entity that was in it is told */
-[[gnu::always_inline]] static inline void remove_row(storage_t *r, uint32_t t, uint32_t row)
-{
-    table_t *tab = &r->tables[t];
-    uint32_t last = -- tab->rows, *columns = get_columns(r, t);
-    touch(r, t);
-    if (row == last) return;
-    for (uint32_t w = 0; w < r->words; w ++) {
-        for (uint64_t bits = get_set(r, t)[w]; bits; bits &= bits - 1) {
-            const storage_type_t *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
-            uint8_t *column = r->b->shared + columns[type->id];
-            copy_bytes(column + (size_t)row * type->size, column + (size_t)last * type->size, type->size);
-            if (type->kept == BRIDGE_TOGGLE) {
-                turn_row(r, get_bits(columns[type->id], tab->room), row, is_on(r, columns[type->id], tab->room, last));
-            }
-        }
-    }
-    get_who(r, tab)[row] = get_who(r, tab)[last];
-    memcpy(r->b->shared + tab->block + 8ull * row, &get_who(r, tab)[row], 8);
-    if (tab->set) seat_row(r, tab, (uint32_t)get_who(r, tab)[row], row);
-    else place_row(r, (uint32_t)get_who(r, tab)[row], t, row);
-}
-
-/* the entity at `index` joins the sparse set of `slot`, whose table has room for it: with a
- * value of zero, until an attach's is written */
-static void join_set(storage_t *r, uint32_t slot, uint32_t index)
-{
-    const storage_type_t *type = r->set_type[slot];
-    uint32_t t = r->set_table[slot], row = append_row(r, t, index);
-    clear_bytes(r->b->shared + get_columns(r, t)[type->id] + (size_t)row * type->size, type->size);
-    seat_row(r, &r->tables[t], index, row);
-}
-
-/* and leaves it: the set's last row takes its place */
-static void leave_set(storage_t *r, uint32_t slot, uint32_t index)
-{
-    uint32_t row = get_where(r, slot)[index] - 1;
-    get_where(r, slot)[index] = 0;
-    get_cells(r, slot)[index] = 0;
-    remove_row(r, r->set_table[slot], row);
-}
-
-/* where the entity at `index` has its value of `type`, from the shared base: 0 if it has none */
-[[gnu::always_inline]] static inline uint32_t get_value(const storage_t *r, uint32_t index, const storage_type_t *type)
-{
-    uint32_t t = r->places[index].table, column;
-    if (type->kept == BRIDGE_SPARSE_SET) {
-        uint32_t row = get_where(r, type->slot)[index];
-        return row ? get_columns(r, r->set_table[type->slot])[type->id] + (row - 1) * type->size : 0;
-    }
-    if (type->kept == BRIDGE_DIRECT_INDEXED) {
-        return set_has(get_given(r, type->slot), index) ? type->cells + (uint32_t)COLUMN + index * type->size : 0;
-    }
-    if (type->kept == BRIDGE_SINGLETON) return type->set ? type->cells : 0;
-    column = t ? get_columns(r, t)[type->id] : 0;
-    return column ? column + r->places[index].row * type->size : 0;
-}
-
-/* a singleton comes to have a value, of zero until one is written, or to have none: and
- * every module is written for again, since where it is reached says which */
-static void set_single(storage_t *r, storage_type_t *type, bool set)
-{
-    type->set = set;
-    memset(r->b->shared + type->cells, 0, type->size);
-    r->b->layout_moved = 1;
-}
-
-/* the entity at `index` is given, or loses, the direct-indexed component of `slot`: its bit,
- * here and where modules read it, and its cell made zero either way */
-static void give_cell(storage_t *r, uint32_t slot, uint32_t index, bool on)
-{
-    const storage_type_t *type = r->direct_type[slot];
-    if (on) set_put(get_given(r, slot), index), set_put(get_shown(r, slot), index);
-    else set_take(get_given(r, slot), index), set_take(get_shown(r, slot), index);
-    clear_bytes(r->b->shared + type->cells + COLUMN + (size_t)index * type->size, type->size);
-}
-
-/* the entity at `index` goes to `to`, which has room: what it carried that `to` also holds
- * goes with it, and what `to` holds that it did not is zero */
-[[gnu::always_inline]] static inline void move_row(storage_t *r, uint32_t index, uint32_t to)
-{
-    place_t *p = &r->places[index];
-    uint32_t from = p->table, row = p->row, at = 0;
-    if (from == to) return;
-    if (to) {
-        uint32_t *into = get_columns(r, to), *out = from ? get_columns(r, from) : nullptr;
-        at = append_row(r, to, index);
-        for (uint32_t w = 0; w < r->words; w ++) {
-            for (uint64_t bits = get_set(r, to)[w]; bits; bits &= bits - 1) {
-                const storage_type_t *type = r->types[w * 64 + (uint32_t)__builtin_ctzll(bits)];
-                uint8_t *cell = r->b->shared + into[type->id] + (size_t)at * type->size;
-                if (out && out[type->id]) {
-                    copy_bytes(cell, r->b->shared + out[type->id] + (size_t)row * type->size, type->size);
-                } else {
-                    clear_bytes(cell, type->size);
-                }
-                /* a toggled component is on when it is given, and as it was when it moves */
-                if (type->kept == BRIDGE_TOGGLE) {
-                    turn_row(r, get_bits(into[type->id], r->tables[to].room), at, !out || !out[type->id]
-                        || is_on(r, out[type->id], r->tables[from].room, row));
-                }
-            }
-        }
-    }
-    if (from) remove_row(r, from, row);
-    place_row(r, index, to, at);
-}
-
-static bool is_alive(const storage_t *r, uint64_t id)
-{
-    uint32_t index = (uint32_t)id;
-    return index && index < r->high && r->places[index].table != DEAD
-        && r->places[index].generation == (uint32_t)(id >> 32);
-}
-
-/* gone: its row, and its index, which comes back under another generation */
-[[gnu::always_inline]] static inline void kill_entity(storage_t *r, uint32_t index)
-{
-    place_t *p = &r->places[index];
-    for (uint32_t slot = 0; r->apart && slot < r->set_room; slot ++) {
-        if (r->set_type[slot] && get_where(r, slot)[index]) leave_set(r, slot, index);
-    }
-    for (uint32_t slot = 0; r->apart && slot < r->direct_room; slot ++) {
-        if (r->direct_type[slot] && set_has(get_given(r, slot), index)) give_cell(r, slot, index, false);
-    }
-    if (p->table) remove_row(r, p->table, p->row);
-    r->b->index[index] = (bridge_entity_t){ 0, 0, DEAD };
-    p->table = DEAD;
-    p->generation = p->generation + 1 >= DEAD ? 1 : p->generation + 1;
-    p->row = r->free_head;
-    r->free_head = index;
-}
-
 /* ---- observers: what each is owed for an entity, from what it carried and what it carries ---- */
-
-/* data.md, *Observers*. `before` and `after` are null for an entity that carried nothing, or is
- * gone; `attached` is what an attach wrote a value of, and is still carried. */
-static void tell_observers(const storage_t *r, uint64_t id, const uint64_t *before, const uint64_t *after,
-                 const uint64_t *attached)
-{
-    for (uint32_t i = 0; i < r->observer_count; i ++) {
-        const storage_terms_t *o = r->observers[i];
-        /* an entity that carries nothing is in no table, and matches nothing */
-        bool was = before && !set_is_empty(r, before) && terms_match(o, before);
-        bool is = after && !set_is_empty(r, after) && terms_match(o, after), given = false;
-        uint32_t owed;
-        if (!was && !is) continue;
-        for (uint32_t k = 0; attached && k < o->count; k ++) {
-            given |= o->oper[k] != BRIDGE_NOT && set_has(attached, o->type[k]);
-        }
-        owed = !is ? BRIDGE_ON_LEAVE : (was ? 0 : BRIDGE_ON_ENTER) | (given ? BRIDGE_ON_ATTACH : 0);
-        owed &= o->events;
-        if (owed) o->heard(o->ctx, id, (enum bridge_event)owed);
-    }
-}
 
 /* ---- at a barrier ---- */
 
@@ -456,8 +274,8 @@ void storage_apply(storage_t *r)
         uint32_t index = r->changed[i];
         if (r->folded[index] & DROPPED) continue;
         get_carried(r, index, r->before);
-        tell_observers(r, (uint64_t)r->places[index].generation << 32 | index, r->before,
-            r->folded[index] & DESTROYED ? nullptr : get_work(r, index), get_attached(r, index));
+        tell_observers(r, &(seen_t){ (uint64_t)r->places[index].generation << 32 | index, r->before,
+            r->folded[index] & DESTROYED ? nullptr : get_work(r, index), get_attached(r, index) });
     }
 
     /* 4. each entity placed, once */
@@ -799,7 +617,7 @@ static void destroy_entity(storage_t *r, uint32_t index)
     uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
     uint32_t from = r->places[index].table;
     get_carried(r, index, r->before);
-    tell_observers(r, id, r->before, nullptr, nullptr);
+    tell_observers(r, &(seen_t){ id, r->before, nullptr, nullptr });
     kill_entity(r, index);
     if (from && r->tables[from].live && !r->tables[from].rows) free_table(r, from);
 }
@@ -836,7 +654,7 @@ static void drop_cells(storage_t *r, const storage_type_t *type, enum bridge_on_
         if (policy == BRIDGE_DELETE || (policy == BRIDGE_SWEEP && set_is_empty(r, r->scratch))) {
             destroy_entity(r, index);
         } else {
-            tell_observers(r, id, r->before, r->scratch, nullptr);
+            tell_observers(r, &(seen_t){ id, r->before, r->scratch, nullptr });
             give_cell(r, type->slot, index, false);
         }
     }
@@ -855,7 +673,7 @@ static void drop_set(storage_t *r, const storage_type_t *type, enum bridge_on_un
         if (policy == BRIDGE_DELETE || (policy == BRIDGE_SWEEP && set_is_empty(r, r->scratch))) {
             destroy_entity(r, (uint32_t)id);
         } else {
-            tell_observers(r, id, r->before, r->scratch, nullptr);
+            tell_observers(r, &(seen_t){ id, r->before, r->scratch, nullptr });
             leave_set(r, type->slot, (uint32_t)id);
         }
     }
@@ -881,7 +699,7 @@ void storage_drop(storage_t *r, storage_type_t *type, enum bridge_on_unload poli
         get_carried(r, 0, r->before);
         memcpy(set, r->before, 8u * r->words);
         set_take(set, type->id);
-        tell_observers(r, 0, r->before, set, nullptr);
+        tell_observers(r, &(seen_t){ 0, r->before, set, nullptr });
         set_single(r, type, false);
         return;
     }
@@ -905,7 +723,7 @@ void storage_drop(storage_t *r, storage_type_t *type, enum bridge_on_unload poli
                 get_carried(r, (uint32_t)id, r->before);
                 memcpy(r->masked, r->before, 8u * r->words);
                 set_take(r->masked, type->id);
-                tell_observers(r, id, r->before, r->masked, nullptr);
+                tell_observers(r, &(seen_t){ id, r->before, r->masked, nullptr });
                 move_row(r, (uint32_t)id, 0);
                 if (!tab->rows) free_table(r, t);
             }
@@ -915,7 +733,7 @@ void storage_drop(storage_t *r, storage_type_t *type, enum bridge_on_unload poli
             get_carried(r, (uint32_t)get_who(r, tab)[row], r->before);
             memcpy(r->masked, r->before, 8u * r->words);
             set_take(r->masked, type->id);
-            tell_observers(r, get_who(r, tab)[row], r->before, r->masked, nullptr);
+            tell_observers(r, &(seen_t){ get_who(r, tab)[row], r->before, r->masked, nullptr });
         }
         to = none ? 0 : find_table(r, set);
         if (none || (to && grow_table(r, to, r->tables[to].rows + tab->rows))) {
@@ -1066,7 +884,7 @@ void storage_give_single(storage_t *r, storage_type_t *type, const void *bytes, 
     get_carried(r, 0, r->before);
     memcpy(set, r->before, 8u * r->words);
     set_put(set, type->id);
-    tell_observers(r, 0, r->before, set, set);
+    tell_observers(r, &(seen_t){ 0, r->before, set, set });
     set_single(r, type, true);
     memcpy(r->b->shared + type->cells, bytes, size);
 }
