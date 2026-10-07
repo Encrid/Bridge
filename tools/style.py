@@ -23,7 +23,7 @@ from c23 import OURS
 
 ROOT = Path(__file__).resolve().parent.parent
 # what has been made to follow the style, and is held to it by the tests
-HELD = ('include/bridge_schema.h', 'include/bridge_abi.h', 'include/bridge_backend.h', 'include/bridge.h', 'utils/*', 'src/backend.*', 'src/pool*', 'src/schema*', 'src/config*', 'src/say.*', 'src/bridge_*', 'src/schedule*', 'src/region*', 'src/block*', 'src/inside.h', 'src/storage*', 'src/abi_*', 'src/abi.h', 'src/module*', 'src/reload*', 'backends/native/native_*', 'backends/wasm/wasm_*', 'tests/support/*')
+HELD = ('include/bridge_schema.h', 'include/bridge_abi.h', 'include/bridge_backend.h', 'include/bridge.h', 'utils/*', 'src/backend.*', 'src/pool*', 'src/schema*', 'src/config*', 'src/say.*', 'src/bridge_*', 'src/schedule*', 'src/region*', 'src/block*', 'src/inside.h', 'src/storage*', 'src/abi_*', 'src/abi.h', 'src/module*', 'src/reload*', 'backends/native/native_*', 'backends/wasm/wasm_*', 'backends/*/sdk/*', 'tests/support/*')
 
 COLUMNS, LINES, FUNCTIONS, ARGUMENTS, BRANCHES, DEPTH = 80, 20, 5, 4, 3, 2
 SNAKE = re.compile(r'[a-z_][a-z0-9_]*\Z')

@@ -108,8 +108,8 @@ does not, having crashed.
 
 ## What the backend provides
 
-`bridge_api_t`, declared in **`bridge_native.h`**, in this backend's `sdk/` - a native module compiles
-that and `bridge_abi.h`:
+`bridge_api_t`, which **`bridge_native.h`** brings in, in this backend's `sdk/` - a native module
+compiles that and `bridge_abi.h`:
 
     the eight entries     `abi.md`, *The ABI*, as function pointers, each taking the table first
     shared_base           where the shared memory begins

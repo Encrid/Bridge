@@ -596,3 +596,12 @@ answered for a memory, so there is nothing of ours to reshape. It is the first e
 Refused: rewording F5 for any function handed to a library, since the checker cannot tell which
 those are and the list would only be hidden; and a seven-argument shim in the `wasmtime` folder,
 which O1 excuses, since that is our code where nothing checks it.
+
+**The two SDKs.** `bridge_wasm.h` had 24 functions and `bridge_native.h` 11, and O3 allows five a
+file, in a header as anywhere. Each is the header a module includes still, and includes the
+others: `bridge_wasm_acc.h` for the imports, then `_scratch`, `_span`, `_entity`, `_kept`,
+`_toggle`, `_observer` and `_log`; `bridge_native_api.h` for the table, then `_kept` and `_log`.
+Every function is `static inline` as it was, so what a module compiles to is the same loads.
+One macro went: `acc_row` was defined to `acc_row_unchecked` in a module built without the row
+test, lower case, which V1 refuses. The function is declared under the one name either way now,
+and the import it is bound to is the one that was stated.

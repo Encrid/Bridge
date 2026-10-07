@@ -120,11 +120,13 @@ period: `backend.md`, *The backend owns its clock*.
                                  the same on every backend - `wasm.md`, *The ABI layouts*
     src/                     the library. Nothing outside it is compiled against it
     backends/wasm/           the wasm backend: its source
-        sdk/                     how a wasm module is written: `bridge_wasm.h`, and the
-                                 accessors of `bridge_wasm.wat` that are merged into one
+        sdk/                     how a wasm module is written: `bridge_wasm.h`, which
+                                 includes the others, and the accessors of `bridge_wasm.wat`
+                                 that are merged into one
         wasmtime/                the engine it is linked against
     backends/native/         the native backend: its source
-        sdk/                     how a native module is written: `bridge_native.h`
+        sdk/                     how a native module is written: `bridge_native.h`, which
+                                 includes the others
     utils/os/                the operating system's layer: one source, compiled into the
                              library and into each backend - `build.md`, *The C library*
         windows/, posix/         the same functions, for each kind of platform
