@@ -29,7 +29,6 @@ void host_init(host_t *h, int argc, char **argv)
 
     setvbuf(stdout, nullptr, _IONBF, 0);
     *h = (host_t){ .what = argc > 1 ? argv[1] : "" };
-    h->arg = argc > 2 ? argv[2] : "";
     h->backends[0] = (bridge_backend_t){ "wasm", BACKEND_PATH };
     h->backends[1] = (bridge_backend_t){ "native", NATIVE_PATH };
     h->phases[0] = "update";
@@ -40,7 +39,6 @@ void host_init(host_t *h, int argc, char **argv)
     h->cfg.phases = h->phases;
     h->cfg.phase_count = 2;
     h->cfg.budget = budget;
-    h->sink = host_print_record;
 }
 
 /*
@@ -58,6 +56,8 @@ int host_run(host_t *h, const host_case_t *cases, size_t count)
         printf("no case '%s'\n", h->what);
         return (2);
     }
+    h->arg = cases[i].arg;
+    cases[i].set(h);
     cases[i].run(h);
     return (0);
 }

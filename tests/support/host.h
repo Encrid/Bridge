@@ -26,7 +26,9 @@ constexpr int64_t HOST_MS = 1'000'000;
 /*
 ** A host under test.
 **
-**     what, arg     the case that was asked for, and its argument or ""
+**     what          the case that was asked for
+**     arg           what the case's row hands it, or "" if it takes nothing
+**     kept          what the program's fixtures keep beside the host
 **     backends      the two backends there are, of which cfg names some
 **     phases        "update" and "present", of which cfg names some
 **     cfg           what the bridge is created from: a case changes it
@@ -37,6 +39,7 @@ constexpr int64_t HOST_MS = 1'000'000;
 typedef struct host {
     const char *what;
     const char *arg;
+    void *kept;
     bridge_backend_t backends[2];
     const char *phases[2];
     bridge_config_t cfg;
@@ -46,26 +49,32 @@ typedef struct host {
 } host_t;
 
 /*
-** A case of a program: its name on the command line, and what runs it.
+** A case of a program: its name on the command line, what runs it, what it
+** is handed, or "" for a case that takes nothing, and the fixture that sets
+** its host first.
 */
 typedef struct {
     const char *name;
     void (*run)(host_t *h);
+    const char *arg;
+    void (*set)(host_t *h);
 } host_case_t;
 
 /*
 ** host_init
 **
 ** Fills a host from the command line, with the configuration every program
-** starts from: both backends, both phases, one thread, and the budgets.
+** starts from: both backends, both phases, one thread, and the budgets. Its
+** sink is its fixture's to set.
 */
 void host_init(host_t *h, int argc, char **argv);
 
 /*
 ** host_run
 **
-** Runs the case the command line named, of `count` cases. Answers what
-** main returns: 2, with a line, if there is no such case.
+** Runs the case the command line named, of `count` cases, on the host its
+** fixture set. Answers what main returns: 2, with a line, if there is no
+** such case.
 */
 int host_run(host_t *h, const host_case_t *cases, size_t count);
 
