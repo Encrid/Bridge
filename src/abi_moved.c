@@ -89,6 +89,8 @@ const declared_type_t *abi_find_holder(const module_t *m,
 ** from more than one entity, since nothing says which has its value; and of
 ** a toggle that is off for some rows, unless the reload accepts that they
 ** are then carried like the rest.
+**
+** lifetime.md, *When a component is moved*
 */
 int abi_check_move(module_t *m, const declared_type_t *c,
     enum bridge_storage kept)

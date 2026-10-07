@@ -20,6 +20,8 @@
 ** module_refuse
 **
 ** Says that a module is refused, and why. Answers 1.
+**
+** create.md, *The sink*
 */
 int module_refuse(bridge_t *b, const char *identity, const char *format, ...)
 {
@@ -52,6 +54,8 @@ int module_fail(backend_err_t *err, const char *format, ...)
 ** module_check_set
 **
 ** Refuses a key whose zero means nobody stated it.
+**
+** config.md, *No unaccountable values*
 */
 int module_check_set(const module_check_t *k, const char *key, int64_t value)
 {
@@ -64,6 +68,8 @@ int module_check_set(const module_check_t *k, const char *key, int64_t value)
 ** module_check_bound
 **
 ** Refuses a negative number that is not `none`.
+**
+** config.md, *No unaccountable values*
 */
 int module_check_bound(const module_check_t *k, const char *key,
     int64_t value, int64_t none)
@@ -82,6 +88,8 @@ int module_check_bound(const module_check_t *k, const char *key,
 ** module_check_flag
 **
 ** Refuses a key that is yes or no and is stated as neither.
+**
+** config.md, *No unaccountable values*
 */
 int module_check_flag(const module_check_t *k, const char *key,
     enum bridge_flag value)

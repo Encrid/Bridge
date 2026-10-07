@@ -51,6 +51,8 @@ const module_t *bridge_find_pinned(const bridge_t *b)
 ** Stops the bridge for the loss of a module stated `fail`, and keeps why and
 ** the module's name without its version. A bridge that has stopped stays
 ** stopped for its first reason.
+**
+** failure.md, *When something fails*
 */
 void bridge_stop(bridge_t *b, const char *identity, const char *what)
 {
@@ -71,6 +73,8 @@ void bridge_stop(bridge_t *b, const char *identity, const char *what)
 ** bridge_resume
 **
 ** Lets the bridge run again, if `m` is the module it was waiting for.
+**
+** failure.md, *When something fails*
 */
 void bridge_resume(bridge_t *b, const module_t *m)
 {
@@ -88,6 +92,8 @@ void bridge_resume(bridge_t *b, const module_t *m)
 ** bridge_give_up
 **
 ** Lets the bridge run again without the module that stopped it.
+**
+** failure.md, *When something fails*
 */
 void bridge_give_up(bridge_t *b, const module_t *m)
 {

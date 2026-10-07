@@ -18,6 +18,8 @@
 **
 ** Refuses a key that states what the backend cannot keep. A guarantee has
 ** one name, for the key that asks it and the capability that answers.
+**
+** capabilities.md, *Capabilities, so the swap is honest*
 */
 static int check_kept(const module_check_t *k, uint32_t flag, const char *key)
 {

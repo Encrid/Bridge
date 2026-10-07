@@ -42,6 +42,8 @@ int schedule_room(bridge_t *b)
 **
 ** Says that a module is stopped, and by what: the system that reached its
 ** number, or the module itself.
+**
+** failure.md, *The budget*
 */
 static void say_stopped(bridge_t *b, const module_t *m,
     const bridge_system_t *s)

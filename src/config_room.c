@@ -71,6 +71,8 @@ static void reuse_kept(config_seed_t *seed, uint32_t total)
 **
 ** Finds where the text of the settings goes: the block it had, or as much of
 ** the module's persistent share.
+**
+** config.md, *A module's own settings are a component*
 */
 int config_place_text(config_seed_t *seed)
 {

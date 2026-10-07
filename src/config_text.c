@@ -73,6 +73,8 @@ int config_seed_struct(config_seed_t *seed,
 ** config_seed_array
 **
 ** Writes a text into a char array: the bytes, inline, and a zero after them.
+**
+** config.md, *A module's own settings are a component*
 */
 int config_seed_array(config_seed_t *seed, const schema_field_t *field,
     const bridge_setting_t *s)

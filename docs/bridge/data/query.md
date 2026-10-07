@@ -74,6 +74,9 @@ may: three operators, and a value that is none of them is refused at `add_system
 the number of the term. A table carries a type or does not, so every term that matches has a base
 and a stride.
 
+A term's access is read or write - `data.md`, *Access mode* - and one left unset, or stated as
+neither, is refused the same way.
+
 Many tables per query is the normal case: that is what archetypes mean. And publishing costs
 **O(tables touched)**, not O(data) and not O(tables), which is the property that makes this scale.
 A query over ten million entities costs the same to publish as one over a thousand, and one over

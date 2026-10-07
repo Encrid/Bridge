@@ -81,6 +81,8 @@ static void send_line(bridge_t *b, const module_t *m, uint32_t at)
 ** Hands a module's log ring to the sink: the lines it holds, and how many
 ** more were written than it holds. Then the scratch arena is the module's
 ** again, after the drain, since a line's text lives there.
+**
+** log.md, *The log*
 */
 void block_drain(bridge_t *b, module_t *m)
 {

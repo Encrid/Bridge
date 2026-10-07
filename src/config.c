@@ -19,6 +19,8 @@
 **
 ** Refuses settings handed to a module that states it has no config
 ** component.
+**
+** config.md, *A module's own settings are a component*
 */
 static int check_none(config_seed_t *seed)
 {
@@ -33,6 +35,8 @@ static int check_none(config_seed_t *seed)
 **
 ** Refuses a config component that is already another module's settings: it
 ** is one value, so one module's.
+**
+** config.md, *A module's own settings are a component*
 */
 static int check_taken(config_seed_t *seed)
 {
@@ -51,6 +55,8 @@ static int check_taken(config_seed_t *seed)
 **
 ** Finds the component the module's config names, among what its init
 ** declared: a struct, and a singleton, that no other module's settings are.
+**
+** config.md, *A module's own settings are a component*
 */
 static int find_config(config_seed_t *seed)
 {

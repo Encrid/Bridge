@@ -17,6 +17,8 @@
 ** add_field
 **
 ** Adds a field named by the token to the struct, with room made for it.
+**
+** failure.md, *Out of memory*
 */
 static int add_field(schema_reader_t *r, schema_field_t *field)
 {
@@ -44,6 +46,8 @@ static int add_field(schema_reader_t *r, schema_field_t *field)
 **
 ** Reads the length of an inline array, from its opening bracket to past its
 ** closing one, and makes the field just added that many.
+**
+** schema.md, *The type set*
 */
 static int read_length(schema_reader_t *r, schema_laid_t *laid)
 {
@@ -69,6 +73,8 @@ static int read_length(schema_reader_t *r, schema_laid_t *laid)
 **
 ** Places the field just added at the next multiple of its alignment, and
 ** counts it in the struct's size and alignment.
+**
+** schema.md, *The type set*
 */
 static int place_field(schema_reader_t *r, const schema_laid_t *laid)
 {
@@ -90,6 +96,8 @@ static int place_field(schema_reader_t *r, const schema_laid_t *laid)
 ** read_field
 **
 ** Reads one field, from its type to its semicolon, and lays it out.
+**
+** schema.md, *The type set*
 */
 static int read_field(schema_reader_t *r)
 {
@@ -114,6 +122,8 @@ static int read_field(schema_reader_t *r)
 ** schema_parse_struct
 **
 ** Reads a struct's fields, and rounds its size to a multiple of its widest.
+**
+** schema.md, *The type set*
 */
 int schema_parse_struct(schema_reader_t *r)
 {

@@ -60,6 +60,9 @@ static declared_type_t *alloc_type(declaring_t *g)
 ** Frees what was had of a type that is not made, and refuses it: there was
 ** no memory for it, or storage has no room for a singleton's value or a
 ** direct-indexed type's cells.
+**
+** failure.md, *Out of memory*
+** storage.md, *A singleton*
 */
 static int say_unmade(declaring_t *g, declared_type_t *c)
 {

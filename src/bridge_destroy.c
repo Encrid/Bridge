@@ -105,6 +105,8 @@ static void close_backends(bridge_t *b)
 ** gone. A pinned module's shutdown is its code, and runs on its thread or
 ** not at all: it is refused before anything is touched, so the bridge is
 ** whole for the call that can.
+**
+** create.md, *Destroy*
 */
 int bridge_destroy(bridge_t *b)
 {

@@ -55,6 +55,9 @@ module hands none; nothing behaves differently for it, which is what separates t
 out. The backend that needs the one it was not handed refuses by name - *"this backend compiles a
 module from its bytes, and was handed none"* - and that is the module's failure, on `init`'s path.
 
+A module whose library the operating system cannot open is refused the same way, by its
+path.
+
 **It also takes the capabilities this module's config demands**, as the flags of `capabilities.md`,
 *Capabilities, so the swap is honest*. A guarantee can cost something on every instruction, and a
 backend that knows a module declined one need not compile it in - `limits.md`, *What a bound
@@ -82,6 +85,10 @@ shape of whoever maps it**. The shared block is mapped by every backend, so it h
 them all. A module's private block is mapped by that module's backend and no other, so it has
 that backend's. A backend with no requirement answers zero for both, and a native module's
 private block reserves what it uses and no more. `tests/storage`, case `storage-shape`.
+
+**A backend that refuses a block refuses what asked for it.** A block a backend will not adopt
+refuses the bridge, at create, by the backend's name and with its reason. And an instance that
+cannot be given a memory its module imports is not made.
 
 The length follows the same rule: the shared block is a whole number of every backend's granule, and
 a module's private block of its own backend's.

@@ -87,6 +87,8 @@ char *copy_text(const char *s, size_t n)
 ** bridge_lacks
 **
 ** Answers 1, with a record, if `got` is nullptr.
+**
+** failure.md, *Out of memory*
 */
 int bridge_lacks(bridge_t *b, const void *got, const char *what)
 {

@@ -19,6 +19,8 @@
 **
 ** Takes the phase `i` of the deployment. It is counted once it has its name,
 ** so that a bridge that is refused frees it.
+**
+** create.md, *Create*
 */
 static int add_phase(bridge_t *b, const bridge_config_t *cfg, uint32_t i)
 {
@@ -47,6 +49,8 @@ static int add_phase(bridge_t *b, const bridge_config_t *cfg, uint32_t i)
 **
 ** Takes the deployment's phases. It declares its own: there is none of
 ** Bridge-ASM700's to run.
+**
+** schedule.md, *Bridge-ASM700 ships no phase names*
 */
 int bridge_name_phases(bridge_t *b, const bridge_config_t *cfg)
 {

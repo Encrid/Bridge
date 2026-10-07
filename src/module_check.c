@@ -46,6 +46,9 @@ static open_backend_t *find_backend(bridge_t *b, const char *name)
 **
 ** Refuses an artifact with no identity, one that names no backend there is,
 ** and one built for another ABI.
+**
+** module.md, *Identity*
+** lifecycle.md, *The runtime lifecycle*
 */
 static int check_whose(module_check_t *k)
 {
@@ -71,6 +74,9 @@ static int check_whose(module_check_t *k)
 ** Refuses a module that is loaded already, that is one more than the budget
 ** of modules, or whose share does not fit in what is left of the persistent
 ** arena.
+**
+** schedule.md, *Order within a phase is never implicit*
+** budgets.md, *Budgets*
 */
 int module_check_room(const module_check_t *k)
 {

@@ -35,6 +35,9 @@ uint64_t abi_hash_text(const char *s, size_t n)
 **
 ** Refuses a name with no namespace, a kind left unset, and a tag that
 ** states bytes or a descriptor.
+**
+** abi.md, *The ABI*
+** storage.md, *A tag*
 */
 static int check_kind(declaring_t *g)
 {
@@ -56,6 +59,9 @@ static int check_kind(declaring_t *g)
 **
 ** Refuses another namespace's name that no grant names, and a policy or a
 ** storage layout left unset.
+**
+** grants.md, *Whose component it is*
+** abi.md, *The ABI*
 */
 static int check_policy(declaring_t *g)
 {

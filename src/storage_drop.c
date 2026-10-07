@@ -18,6 +18,8 @@
 **
 ** Says the one case of a strip with a trace: rows that stay in a second
 ** table of their archetype.
+**
+** lifetime.md, *What unload leaves behind*
 */
 static void say_apart(storage_t *r, const storage_type_t *type, uint32_t rows)
 {

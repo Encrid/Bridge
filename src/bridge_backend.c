@@ -30,6 +30,8 @@ static_assert(offsetof(bridge_setting_t, v) == offsetof(backend_setting_t, v));
 ** check_backend
 **
 ** Refuses a backend with no name or no library, or named as one before it.
+**
+** create.md, *Create*
 */
 static int check_backend(bridge_t *b, const bridge_config_t *cfg, uint32_t i)
 {
@@ -78,6 +80,8 @@ static backend_setting_t *convert_settings(const bridge_backend_t *want)
 **
 ** Opens a backend's library and finds its entries. The backend is counted
 ** once it has its name, so that a bridge that is refused frees it.
+**
+** create.md, *Create*
 */
 static int open_library(bridge_t *b, const bridge_backend_t *want,
     open_backend_t *o)
@@ -99,6 +103,8 @@ static int open_library(bridge_t *b, const bridge_backend_t *want,
 ** start_backend
 **
 ** Creates the backend, with its settings passed to it unread.
+**
+** host_api.md, *The data*
 */
 static int start_backend(bridge_t *b, const bridge_backend_t *want,
     open_backend_t *o)

@@ -75,6 +75,9 @@ the refusal quotes the word the reading stopped at: `unsigned`, `const`, `*`, a 
 name nothing declared. `tests/schema` reads every accepted spelling against what the compiler lays
 the same struct out as, and has every other refused by its word.
 
+A struct with no field, an enum or a bitmask with no constant, and a struct whose size 32 bits
+cannot count are refused as well, each in its own words.
+
 **A field whose type is another declared type names it bare, and it is found in the component's own
 namespace.** `Vec3 at;` in `game:Body` is `game:Vec3`, which a module declares first: a struct, an
 enum or a bitmask, each by its own macro and each with its type kind stated at `declare`. A type

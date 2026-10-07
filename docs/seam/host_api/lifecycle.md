@@ -18,6 +18,8 @@ publish spans.
 **Every module loads through a backend, and the steps are the same on each.** An artifact naming a
 backend the deployment did not configure is refused by name.
 
+**An unload or a reload of what is not loaded is refused**, by the name it was asked for.
+
 **Read, then decide, then load** survives the host owning the filesystem: the identity arrives as
 data in `cfg`, so the decision is made with the artifact untouched.
 

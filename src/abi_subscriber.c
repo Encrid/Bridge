@@ -14,6 +14,14 @@
 #include "abi_entry.h"
 #include "abi_subscribe.h"
 
+/*
+** check_budget
+**
+** Refuses a system or an observer that is one more than [budget] systems, or
+** that asks for more terms than [budget] terms.
+**
+** budgets.md, *Budgets*
+*/
 static int check_budget(subscribing_t *g)
 {
     const bridge_t *b = g->m->b;
@@ -33,6 +41,8 @@ static int check_budget(subscribing_t *g)
 **
 ** Finds a name, the terms and the changes in the scratch arena, and copies
 ** the name out of it.
+**
+** abi.md, *The ABI*
 */
 static int read_stated(subscribing_t *g)
 {
@@ -78,6 +88,14 @@ static bool is_taken(const module_t *m, const char *name)
     return (i < m->observer_count);
 }
 
+/*
+** check_name
+**
+** Refuses a reserved name, a name the module registered already, and an
+** observer with no term.
+**
+** abi.md, *The ABI*
+*/
 static int check_name(subscribing_t *g)
 {
     const char *name = g->name;

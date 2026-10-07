@@ -60,6 +60,8 @@ static bool is_reloaded(const module_t *m, const declared_type_t *c)
 ** with, unless it is exclusive to the module reloading and no other
 ** module's rows hold a value of it. Shared, it is refused, naming who else
 ** declares it.
+**
+** lifetime.md, *When a component layout changed*
 */
 static int replace_changed(declaring_t *g)
 {

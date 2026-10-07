@@ -135,6 +135,12 @@ over at init. A term is three things: the
 slot `declare` answered, the access, and whether the term must match, must not, or may. What a
 query may not ask for is `query.md`, *What a query may not ask for*.
 
+**What a statement must hold, and when it may be made.** `declare`, `add_system` and `observe`
+are each refused outside `init`. A system or an observer is refused if its name is one the module
+registered already, if a change it states names a slot the module never declared, or if it
+states more changes than the module declared types. And an observer whose `events` are none, or
+name one there is not, is refused.
+
 **`changes` is what the system attaches or detaches**: the slots of those components, each a
 `u32`, and how many. It is a second list and not a kind of term, because a term is one component
 a query asks for, and a system attaches a component to entities that do not carry it. A system

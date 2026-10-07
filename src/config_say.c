@@ -40,6 +40,8 @@ int config_refuse(config_seed_t *seed, const char *format, ...)
 ** config_say_misfit
 **
 ** Refuses a setting whose kind is not one the field it names takes.
+**
+** config.md, *A module's own settings are a component*
 */
 int config_say_misfit(config_seed_t *seed, const bridge_setting_t *s,
     const char *field)

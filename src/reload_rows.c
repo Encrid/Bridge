@@ -39,6 +39,8 @@ static void set_move(const declared_type_t *c, storage_move_t *move,
 **
 ** The rows have moved: no type replaces another any more, and what went is
 ** said, by the names it was accepted under.
+**
+** lifetime.md, *When a component layout changed*
 */
 static void settle(bridge_t *b, const module_t *n)
 {
@@ -78,6 +80,9 @@ static uint32_t list_moves(const module_t *n, storage_move_t *moves,
 **
 ** Says why the rows of `count` components were not moved: for want of the
 ** memory to carry their values, or of room where they were to go.
+**
+** lifetime.md, *When a component is moved*
+** failure.md, *Out of memory*
 */
 static int refuse_move(reloading_t *r, enum storage_moved moved,
     uint32_t count)

@@ -27,6 +27,8 @@ static void refill_all(bridge_t *b)
 ** Publishes every running module's spans, and stops one whose spans no
 ** longer hold what its queries match. A stopped module is published all
 ** over again, if it returns.
+**
+** budgets.md, *What running out does*
 */
 static void publish_all(bridge_t *b)
 {

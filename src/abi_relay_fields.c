@@ -78,6 +78,8 @@ static int relay_structs(relaying_t *l, const relay_at_t *at,
 **
 ** Matches one field of a struct as it was. `at` names the field, by its
 ** path. One that is gone, or an array that got shorter, is a loss.
+**
+** lifetime.md, *When a component layout changed*
 */
 static int relay_field(relaying_t *l, const relay_at_t *at,
     const schema_field_t *old)

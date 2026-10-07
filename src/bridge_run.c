@@ -34,6 +34,9 @@ static bool is_repair(const bridge_t *b, const char *repairing)
 **
 ** Answers 1, with a record, if nothing may run. Both calls that run module
 ** code come through here.
+**
+** failure.md, *When something fails*
+** pinned.md, *Threads*
 */
 int bridge_check_call(bridge_t *b, const char *repairing)
 {
@@ -73,6 +76,8 @@ static uint32_t find_phase(const bridge_t *b, const char *name)
 **
 ** Runs the systems registered to one phase, then its barrier. 0 if the phase
 ** ran, whatever its systems did.
+**
+** host_api.md, *The data*
 */
 int bridge_run_phase(bridge_t *b, const char *name)
 {

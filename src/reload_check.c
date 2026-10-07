@@ -18,6 +18,8 @@
 ** reload_refuse
 **
 ** Says that the loaded module is not reloaded, and why. Answers 1.
+**
+** failure.md, *The budget*
 */
 int reload_refuse(const reloading_t *r, const char *format, ...)
 {

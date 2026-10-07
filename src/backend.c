@@ -43,6 +43,9 @@ static uint32_t find_entries(void *lib, backend_api_t *api)
 **
 ** Writes why find_entries stopped at the entry `at`: the library lacks it, or
 ** it is the first and answered another backend seam's number.
+**
+** create.md, *Create*
+** host_api.md, *A seam has a number*
 */
 static void say_stopped(const char *path, const backend_api_t *api,
     uint32_t at, backend_err_t *err)
@@ -64,6 +67,8 @@ static void say_stopped(const char *path, const backend_api_t *api,
 **
 ** Opens a backend's library and finds its entries. Answers the library, or
 ** nullptr with `err` saying why, and the library closed.
+**
+** create.md, *Create*
 */
 void *backend_open(const char *path, backend_api_t *api, backend_err_t *err)
 {

@@ -21,6 +21,8 @@
 **
 ** Copies what a declaration states out of the scratch arena, since a module
 ** may have put it at any offset, and its name with it.
+**
+** abi.md, *The ABI*
 */
 static int read_stated(declaring_t *g, uint64_t at)
 {

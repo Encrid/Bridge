@@ -16,6 +16,8 @@
 **
 ** spawn() -> id. Hands out one of the ids set aside for the module, or says
 ** which of three things left it with none.
+**
+** budgets.md, *What running out does*
 */
 int abi_spawn(void *ud, [[maybe_unused]] const uint64_t *a, uint64_t *r)
 {
@@ -55,6 +57,9 @@ int abi_destroy(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 ** Answers the component a slot names, if the module may attach or detach
 ** it: it declared the slot, a grant lets it write the component, and what
 ** is running stated that it changes it. nullptr, with a refusal, otherwise.
+**
+** abi.md, *The ABI*
+** grants.md, *Whose component it is*
 */
 static declared_type_t *check_written(module_t *m, uint64_t slot,
     const char *entry)

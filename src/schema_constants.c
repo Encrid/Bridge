@@ -18,6 +18,8 @@
 **
 ** Reads the token as the integer the type is, which its author states: one
 ** of 8 to 32 bits for an enum, and an unsigned one of 8 to 64 for a bitmask.
+**
+** schema.md, *The type set*
 */
 static int set_base(schema_reader_t *r, bool bits)
 {
@@ -42,6 +44,8 @@ static int set_base(schema_reader_t *r, bool bits)
 ** add_constant
 **
 ** Adds a constant named by the token, with room made for it.
+**
+** failure.md, *Out of memory*
 */
 static int add_constant(schema_reader_t *r)
 {
@@ -67,6 +71,8 @@ static int add_constant(schema_reader_t *r)
 ** read_constant
 **
 ** Reads one constant, from its name to the comma or the brace after it.
+**
+** schema.md, *The type set*
 */
 static int read_constant(schema_reader_t *r, bool bits)
 {
@@ -94,6 +100,8 @@ static int read_constant(schema_reader_t *r, bool bits)
 ** schema_parse_constants
 **
 ** Reads an enum's or a bitmask's integer, its brace and its constants.
+**
+** schema.md, *The type set*
 */
 int schema_parse_constants(schema_reader_t *r, bool bits)
 {

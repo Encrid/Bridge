@@ -85,6 +85,8 @@ static void stop_old(bridge_t *b, module_t *old)
 ** Says that a reload failed and takes the new instance back out. A schedule
 ** with its systems taken back out is one that was built before, so the
 ** rebuild cannot be refused.
+**
+** failure.md, *The budget*
 */
 int reload_fail(reloading_t *r)
 {

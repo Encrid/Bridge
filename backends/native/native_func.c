@@ -22,6 +22,8 @@
 **
 ** Keeps what answers an entry of the ABI. The signature is the one
 ** bridge_native.h already declares, so only the pointer is kept.
+**
+** native.md, *What the backend provides*
 */
 BACKEND_EXPORT int define_func(backend_instance_t *i,
     const backend_entry_t *entry, backend_err_t *err)
@@ -46,6 +48,8 @@ BACKEND_EXPORT int define_func(backend_instance_t *i,
 ** Finds a function a module exports, once. Exports are named
 ** bridge_<name>: a C process has one flat symbol namespace. A symbol
 ** carries no type, so there is no shape to see.
+**
+** signatures.md, *A call takes nothing and answers a status*
 */
 BACKEND_EXPORT backend_func_t *instance_get_func(backend_instance_t *i,
     const char *name, backend_err_t *err)

@@ -92,6 +92,8 @@ wasmtime_error_t *wasm_adopt_into(backend_instance_t *i, backend_memory_t *mem,
 ** memory_adopt
 **
 ** Adopts a block Bridge-ASM700 reserved: a whole number of pages.
+**
+** backend.md, *Memory is adopted, not created*
 */
 BACKEND_EXPORT backend_memory_t *memory_adopt([[maybe_unused]] backend_t *b,
     void *ptr, uint64_t len, backend_err_t *err)

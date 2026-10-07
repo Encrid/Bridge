@@ -35,6 +35,8 @@ static void place_regions(module_t *m, const bridge_module_config_t *cfg,
 ** regions its config sized, with no system running. Only its own backend
 ** maps the block, so it has that backend's shape. The checks refused a
 ** config this could not lay out.
+**
+** failure.md, *Out of memory*
 */
 int module_take_private(module_t *m, const bridge_module_config_t *cfg,
     backend_err_t *err)

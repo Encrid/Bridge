@@ -72,6 +72,8 @@ static int seed_field(config_seed_t *seed, const schema_field_t *field,
 ** config_seed_setting
 **
 ** Writes one setting into the field its key names.
+**
+** config.md, *A module's own settings are a component*
 */
 int config_seed_setting(config_seed_t *seed, const bridge_setting_t *s)
 {

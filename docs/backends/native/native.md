@@ -112,6 +112,9 @@ compiles that and `bridge_abi.h`:
     shared_base           where the shared memory begins
     private_base          where this module's private memory begins
 
+An entry the backend is asked to provide that is none of the eight is refused, by its name:
+the table has no place for it.
+
 The same eight functions and the same two memories a wasm module has, because what an ABI entry
 does and what is in memory are Bridge-ASM700's and the same on every backend. How a module
 reaches them is this backend's: a table, passed.

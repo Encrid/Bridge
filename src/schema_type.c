@@ -50,6 +50,8 @@ static bool set_named_type(schema_reader_t *r, schema_laid_t *laid)
 **
 ** Reads the token as a field's type. bridge_text_t is given and not
 ** declared: an offset and a length into the persistent arena.
+**
+** schema.md, *The type set*
 */
 int schema_set_type(schema_reader_t *r, schema_laid_t *laid)
 {

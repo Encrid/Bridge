@@ -82,6 +82,9 @@ field names its descriptor states - `schema.md`, *There is no schema format*. A 
 deployment set that the module never declared is an error at init, by name, where the original
 Bridge silently ignores a typo.
 
+Text that does not fit in what is left of the module's share of the persistent arena refuses
+the load, by the key.
+
 **Which component is the author's to say**, as `config`, a key of the manifest like `pinned`: only
 the author knows which of a module's structs holds its settings, which is the reason a Linux module
 marks its own parameters. A module with no settings component says that too: `config = none`, which

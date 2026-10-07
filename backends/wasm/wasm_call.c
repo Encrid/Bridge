@@ -70,6 +70,8 @@ static void disarm(backend_t *b)
 ** Calls a function of a module, and answers the status it returned. A
 ** module compiled without the check cannot be interrupted, and was not
 ** asked to be.
+**
+** signatures.md, *A call takes nothing and answers a status*
 */
 BACKEND_EXPORT int call(backend_func_t *f, int32_t *status, backend_err_t *err)
 {

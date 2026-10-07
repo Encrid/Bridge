@@ -54,6 +54,14 @@ static void open_store(backend_instance_t *i, backend_module_t *m)
         wasmtime_context_set_epoch_deadline(i->ctx, WASM_FAR);
 }
 
+/*
+** give_memory
+**
+** Gives an instance one of the memories its module imports: the adopted block,
+** defined under the name the import has.
+**
+** backend.md, *Memory is adopted, not created*
+*/
 static wasmtime_error_t *give_memory(backend_instance_t *i,
     const backend_memory_import_t *mi, wasm_trap_t **trap)
 {

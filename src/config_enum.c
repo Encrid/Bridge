@@ -55,6 +55,9 @@ static bool fits_enum(const declared_type_t *of, int64_t value)
 **
 ** Writes an integer into an enum, or the value of the constant a text names:
 ** a constant's name is the one thing a deployment can be expected to know.
+**
+** config.md, *A module's own settings are a component*
+** schema.md, *The type set*
 */
 int config_seed_enum(config_seed_t *seed, const schema_field_t *field,
     const bridge_setting_t *s)

@@ -22,6 +22,9 @@
 ** Reads the descriptor of the type being declared. A field's type is a bare
 ** C name, looked for in the declarer's namespace: `Vec3` in game:Body is
 ** game:Vec3. The name is cut at its namespace while the text is read.
+**
+** schema.md, *The type set*
+** failure.md, *Out of memory*
 */
 static int parse_descriptor(declaring_t *g)
 {
@@ -48,6 +51,8 @@ static int parse_descriptor(declaring_t *g)
 **
 ** Refuses a type that its descriptor lays out as other bytes, or aligned
 ** otherwise, than its module's compiler did.
+**
+** schema.md, *There is no schema format*
 */
 static int check_size(declaring_t *g)
 {
@@ -65,6 +70,8 @@ static int check_size(declaring_t *g)
 **
 ** Carries a replaced type's values over to this one's layout, where it
 ** changed, and refuses a type that is one more than a budget allows.
+**
+** budgets.md, *Budgets*
 */
 static int check_room(declaring_t *g)
 {

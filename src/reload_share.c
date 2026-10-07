@@ -36,6 +36,8 @@ static void grow_in_place(reloading_t *r)
 ** take_range
 **
 ** Takes one more range of the persistent arena for what a share grows by.
+**
+** budgets.md, *Budgets*
 */
 static int take_range(reloading_t *r, int64_t wants)
 {
@@ -57,6 +59,8 @@ static int take_range(reloading_t *r, int64_t wants)
 **
 ** Grows a module's share of the persistent arena to what the reload states:
 ** its last range where it stands, and otherwise a range more.
+**
+** budgets.md, *Budgets*
 */
 int reload_grow_share(reloading_t *r)
 {

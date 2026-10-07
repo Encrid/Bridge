@@ -22,6 +22,8 @@
 **
 ** Places the sparse sets' indexes after the entity index. A sparse set's
 ** index is a u32 for every entity, and there is one for each there may be.
+**
+** budgets.md, *Budgets*
 */
 static int lay_sparse(bridge_t *b, const bridge_budget_t *budget,
     block_layout_t *layout)
@@ -47,6 +49,8 @@ static int lay_sparse(bridge_t *b, const bridge_budget_t *budget,
 **
 ** Places the direct-indexed bits after the sparse sets' indexes. A
 ** direct-indexed component's bits are one for every entity, in 64-bit words.
+**
+** budgets.md, *Budgets*
 */
 static int lay_direct(bridge_t *b, const bridge_budget_t *budget,
     block_layout_t *layout)

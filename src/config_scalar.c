@@ -81,6 +81,8 @@ static int put_integer(uint8_t *at, enum schema_kind kind, int64_t value)
 ** config_seed_integer
 **
 ** Writes an integer into an integer field, if the field holds it.
+**
+** config.md, *A module's own settings are a component*
 */
 int config_seed_integer(config_seed_t *seed, const schema_field_t *field,
     const bridge_setting_t *s)

@@ -50,6 +50,9 @@ deployment did not declare, refuses the load, by the name. `tests/host`, cases
 `module_config.phases-unmapped-refused`, `phase_name.from-mapped-loads` and
 `phase_name.to-undeclared-refused`, are one module that says `tick`.
 
+An entry of that table with no name on either side is refused too, by its place in the
+table.
+
 It is the deployment that resolves it, as it resolves an order between two systems and a grant
 between two namespaces: the only party that has seen both sides.
 

@@ -34,6 +34,8 @@ BACKEND_EXPORT void memory_release(backend_memory_t *m)
 ** module_compile
 **
 ** Opens a module's library by its path.
+**
+** backend.md, *What a backend is asked for*
 */
 BACKEND_EXPORT backend_module_t *module_compile([[maybe_unused]] backend_t *b,
     const backend_source_t *source, backend_err_t *err)

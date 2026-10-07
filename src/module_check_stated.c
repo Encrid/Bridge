@@ -80,6 +80,9 @@ static int check_bounds(const module_check_t *k)
 **
 ** Refuses a config with a policy, a limit or an amount left unset, or
 ** stated as a number that is nobody's.
+**
+** config.md, *No unaccountable values*
+** budgets.md, *Budgets*
 */
 int module_check_stated(const module_check_t *k)
 {

@@ -17,6 +17,8 @@
 **
 ** Reads what the kind of the type says its text holds: constants, or the
 ** fields of a struct between braces.
+**
+** schema.md, *The type set*
 */
 static int parse_body(schema_reader_t *r)
 {
@@ -33,6 +35,8 @@ static int parse_body(schema_reader_t *r)
 ** check_end
 **
 ** Refuses a text that goes on after its closing brace.
+**
+** schema.md, *The type set*
 */
 static int check_end(schema_reader_t *r)
 {

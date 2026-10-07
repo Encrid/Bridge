@@ -14,6 +14,14 @@
 
 #include "abi_subscribe.h"
 
+/*
+** check_values
+**
+** Refuses a term whose access or whose operator is unset, or is none there
+** is.
+**
+** query.md, *What a query may not ask for*
+*/
 static int check_values(subscribing_t *g, const bridge_term_t *t)
 {
     if (!t->access)
@@ -49,6 +57,14 @@ static bool selects_alone(const subscribing_t *g, uint32_t i)
     return (true);
 }
 
+/*
+** check_sparse
+**
+** Refuses a term of a component kept in a sparse set that selects beside
+** another, or that is negated.
+**
+** storage.md, *What a query walks*
+*/
 static int check_sparse(subscribing_t *g, uint32_t i, const bridge_term_t *t,
     const declared_type_t *c)
 {
@@ -96,6 +112,9 @@ static int check_walked(subscribing_t *g, uint32_t i, const bridge_term_t *t,
 **
 ** Refuses term `i` if it asks for what a query may not. A call that was
 ** refused before this term is refused at it.
+**
+** query.md, *What a query may not ask for*
+** grants.md, *Whose component it is*
 */
 int abi_check_term(subscribing_t *g, uint32_t i, const bridge_term_t *t)
 {

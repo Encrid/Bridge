@@ -54,6 +54,11 @@ stated, everything storage holds is known and allocated when the bridge is creat
 nothing after - `storage.md`, *What bounds it*. A `declare` or a `add_system` past its key is
 refused there, by name, which fails that module's `init`.
 
+**An amount no offset can reach is refused, by its key.** An offset is 32 bits, so a budget
+above that is refused at create, and a module's `changes` above it at its load. A module whose
+`spawns` cannot be set aside under what is left of `entities` is refused at its load. And a
+reload that states a larger share than the arena has left is refused as a load would be.
+
 **`terms` is the most one system or observer may ask for**, and it is a key for the same reason:
 storage keeps a system's terms in a record made when the bridge is, so the record has a length.
 No module compiles against the number, so it is one number and the deployment's.

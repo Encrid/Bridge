@@ -13,6 +13,13 @@
 
 #include "block.h"
 
+/*
+** is_unset
+**
+** Refuses a budget left at zero, by its key.
+**
+** budgets.md, *Bridge-ASM700 defaults none of them*
+*/
 static int is_unset(bridge_t *b, const char *key, uint64_t value)
 {
     if (value)
@@ -25,6 +32,8 @@ static int is_unset(bridge_t *b, const char *key, uint64_t value)
 ** is_beyond
 **
 ** Refuses a size an offset cannot reach, by name: an offset is 32 bits.
+**
+** budgets.md, *Budgets*
 */
 static int is_beyond(bridge_t *b, const char *key, uint64_t value)
 {
@@ -40,6 +49,8 @@ static int is_beyond(bridge_t *b, const char *key, uint64_t value)
 **
 ** Refuses a count that may be none and is neither: zero is unset,
 ** BRIDGE_NONE is none, and nothing else below one is anything.
+**
+** budgets.md, *Budgets*
 */
 static int is_miscounted(bridge_t *b, const char *key, int64_t value)
 {

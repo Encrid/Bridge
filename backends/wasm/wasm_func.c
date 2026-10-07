@@ -22,6 +22,8 @@
 **
 ** Defines a function a module may import. Every import has to exist before
 ** the module's first function is found, which is where it is instantiated.
+**
+** signatures.md, *Imports are declared, exports are checked*
 */
 BACKEND_EXPORT int define_func(backend_instance_t *i,
     const backend_entry_t *entry, backend_err_t *err)
@@ -52,6 +54,8 @@ BACKEND_EXPORT int define_func(backend_instance_t *i,
 **
 ** Instantiates a module at its first function: every import has to exist
 ** by then.
+**
+** signatures.md, *Imports are declared, exports are checked*
 */
 static int instantiate(backend_instance_t *i, backend_err_t *err)
 {
@@ -90,6 +94,9 @@ static bool is_shaped(backend_instance_t *i, const wasmtime_func_t *func)
 **
 ** Finds a function a module exports, and checks that it is one `call` runs.
 ** 1 with why.
+**
+** signatures.md, *A call takes nothing and answers a status*
+** wasm.md, *Exports*
 */
 static int find_export(backend_instance_t *i, const char *name,
     wasmtime_extern_t *item, backend_err_t *err)

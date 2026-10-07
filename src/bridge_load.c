@@ -88,6 +88,8 @@ static int fail_load(bridge_t *b, module_t *m, backend_err_t *err)
 ** Runs a module being loaded for the first time. init may spawn, so its ids
 ** are set aside before it runs; and a new system or observer that conflicts
 ** unordered is refused.
+**
+** budgets.md, *Budgets*
 */
 static int start_loaded(const module_check_t *k, module_t *m,
     backend_err_t *err)

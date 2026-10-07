@@ -54,6 +54,8 @@ static void take_out(bridge_t *b, module_t *m)
 ** stopped it, and of no other. Its systems are out of the schedule before
 ** its last call; and after the barrier what left is out of every module's
 ** spans, and observed.
+**
+** lifecycle.md, *The runtime lifecycle*
 */
 int bridge_unload(bridge_t *b, const char *identity)
 {

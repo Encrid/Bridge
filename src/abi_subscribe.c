@@ -19,6 +19,9 @@
 ** Reads what a system or an observer attaches or detaches: a write, so it
 ** wants the grant a write wants. A call that was refused before a change is
 ** refused at it.
+**
+** abi.md, *The ABI*
+** grants.md, *Whose component it is*
 */
 static int read_changes(subscribing_t *g)
 {

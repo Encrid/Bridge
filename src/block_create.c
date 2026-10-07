@@ -17,6 +17,8 @@
 **
 ** Reserves the shared block's address space and commits the block, and
 ** keeps where each of its parts begins.
+**
+** failure.md, *Out of memory*
 */
 static int map_block(bridge_t *b, const block_layout_t *layout)
 {
@@ -77,6 +79,8 @@ static int make_storage(bridge_t *b)
 **
 ** Has every backend adopt the shared block, so that each can hand it to the
 ** modules it runs.
+**
+** backend.md, *Memory is adopted, not created*
 */
 static int adopt_shared(bridge_t *b)
 {

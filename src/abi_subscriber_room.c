@@ -89,6 +89,8 @@ static bool name_system(subscribing_t *g)
 **
 ** Allocates everything a system or an observer needs. Its changes lie after
 ** its terms, in the same block.
+**
+** failure.md, *Out of memory*
 */
 int abi_alloc_subscriber(subscribing_t *g)
 {

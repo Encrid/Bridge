@@ -45,6 +45,8 @@ bool schema_fits(enum schema_kind base, int64_t value, bool below)
 ** read_value
 **
 ** Reads the value stated after an equals sign, and the token after it.
+**
+** schema.md, *The type set*
 */
 static int read_value(schema_reader_t *r)
 {
@@ -62,6 +64,8 @@ static int read_value(schema_reader_t *r)
 **
 ** Gives the constant just named its value: the one stated, or one more than
 ** the last. A bitmask states every one.
+**
+** schema.md, *The type set*
 */
 int schema_set_value(schema_reader_t *r, bool bits)
 {

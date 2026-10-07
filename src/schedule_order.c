@@ -45,6 +45,8 @@ static uint32_t name_system(schedule_pairs_t *pairs, const char *name)
 ** Takes the pair `i`: its two names are kept, and the first runs before the
 ** second. It is counted once it has its names, so that a bridge that is
 ** refused frees them.
+**
+** schedule.md, *Order within a phase is never implicit*
 */
 static int add_pair(bridge_t *b, schedule_pairs_t *pairs,
     const bridge_order_t *pair, uint32_t i)
@@ -72,6 +74,8 @@ static int add_pair(bridge_t *b, schedule_pairs_t *pairs,
 **
 ** Refuses pairs that contradict each other: a system that would run before
 ** itself.
+**
+** schedule.md, *Order within a phase is never implicit*
 */
 static int check_pairs(bridge_t *b, schedule_pairs_t *pairs)
 {

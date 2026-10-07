@@ -48,6 +48,10 @@ layouts*, refuses for that header.
 instead and the same module links happily and passes garbage - a load-time refusal traded for
 runtime corruption.
 
+**Every import is defined before the module's first function is found**, which is where the
+module is instantiated. A function offered after that is refused, and so is one whose signature
+is wider than sixteen parameters or four results.
+
 `module_list_imports` is not a second source for this: it answers *which memories to supply*, and nothing
 about what shape a function has.
 

@@ -19,6 +19,8 @@
 **
 ** Refuses a phase name of a config that is unset, that is mapped twice, or
 ** that is mapped to a phase the deployment did not declare.
+**
+** schedule.md, *A module's phase names are mapped by the deployment*
 */
 static int check_phase(const module_check_t *k, uint32_t i)
 {
@@ -89,6 +91,8 @@ int module_lay_private(const bridge_module_config_t *cfg, uint64_t granule,
 **
 ** Refuses a log level that is unset, or that is not one there is. Zero is
 ** unset for it as for every key, so the least it can be is 1.
+**
+** log.md, *The log*
 */
 static int check_log_level(const module_check_t *k)
 {

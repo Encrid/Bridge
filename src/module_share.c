@@ -48,6 +48,8 @@ static uint64_t get_share_size(const module_t *m)
 ** Answers whether a row that is staying holds a string in a module's share.
 ** A share that stays is said, with what holds it: a later load may be
 ** refused for the room it keeps.
+**
+** strings.md, *It is given back when nothing points into it*
 */
 static bool is_share_held(bridge_t *b, const module_t *m)
 {
