@@ -58,8 +58,19 @@ Refused: the library never said bare, "the Bridge library" wherever it acts. Som
 sentences longer, and it reads as if Bridge were something else as well. No condition brings it
 back.
 
-Refused: "instance" for the object. It is a module's. And "context", which says nothing of
-what it is, and "world", which reads as flecs' own. No condition brings either back.
+Refused: "instance" for the object. It is a module's. No condition brings it back.
+
+Refused, after it had been taken: "session". It is free, and says the object's life, from its
+making to its unmaking; and it reads as somebody logging in. No condition brings it back.
+
+Refused, though it was recommended second time round: "world". It is the word every ECS has
+for storage and what runs over it, and fifteen sentences here mean flecs' by it. The condition
+that brings it back is a reader of the documents who looks for the world and does not find it.
+
+Refused: "context", which says nothing of what it is; "orchestrator", which `readme.md` says
+the library is; "ensemble" and "assembly", which say the modules and not the storage; "run",
+which is a verb in half the sentences it would be in; "realm" and "hub", which mean nothing
+here or mean the design this replaced. No condition brings any back.
 
 Refused: the new word in the documents alone, or in the documents and the comments. A host
 would read one word of the object in a document and another in its log. No condition brings

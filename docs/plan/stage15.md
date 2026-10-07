@@ -133,16 +133,21 @@ possessive becomes "of", so that no sentence hangs an apostrophe on a name in ba
 
 ### The library, and the object a host creates
 
-**The object is a session, wherever a person reads of it, and Bridge is the library alone.**
+**The object is a deck, wherever a person reads of it, and Bridge is the library alone.**
 Once the library is Bridge, "the bridge" is a capital and an article from it, and one sentence
 has both: that `fail` stops the bridge, since the library cannot stop the program. Enkrid
 ruled that the object's word changes, over a recommendation that both stay with a rule on the
 article and a check.
 
-**A session**: what `bridge_create` makes and `bridge_destroy` unmakes, with its storage, its
-modules and its threads. The word is used nowhere in the documents today. "Instance" is not
-free, being a module's, 49 times; nor "deployment", which is what a session is made of; nor
-"runtime", which is wasmtime.
+**A deck**: what `bridge_create` makes and `bridge_destroy` unmakes, with its storage, its
+modules and its threads. It is the part of a bridge that things are on and move over: modules
+are loaded onto a deck, and a deck is what stops. The word is used nowhere in the documents
+today, and it stays with the library's name where every other word on offer left it. It means
+nothing until it is said once what it is, and `readme.md` says it.
+
+"Instance" is not free, being a module's, 49 times; nor "deployment", which is what a deck is
+made of; nor "runtime", which is wasmtime. "Session" was taken first and given up the same
+hour: it reads as somebody logging in.
 
 **Everywhere it is read**: 33 places of the documents, 122 comments, the four messages that
 say it and what the cases expect of them, and what the test programs print. A host reads the
@@ -153,6 +158,6 @@ of.
     fast          no part of this runs
     scalable      does not apply
     modular       the library has a name and the object a word, and neither is the other's
-    extensible    a second library that makes sessions would say the same word
+    extensible    a deck of another deployment in the same process is another deck
     minimal       one word, where two differed by a letter
     explicit      a sentence cannot be read of the wrong one
