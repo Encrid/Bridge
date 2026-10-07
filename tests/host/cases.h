@@ -316,6 +316,32 @@ void test_reload_settings(host_t *h, bool drop);
 void test_say_modules(host_t *h);
 
 /*
+** A key stated as what a case says: its row's name, where the key is in
+** the struct, how many bytes it is, and the value it is given.
+*/
+typedef struct {
+    const char *name;
+    size_t at;
+    size_t size;
+    int64_t value;
+} test_edit_t;
+
+/*
+** The struct a module's keys are in, by a name that leaves a row of edits
+** its line.
+*/
+typedef bridge_module_config_t test_keys_t;
+
+/*
+** test_put_key, test_find_edit
+**
+** Write a value into a key of `size` bytes, and answer the row of a name
+** among rows that hold it.
+*/
+void test_put_key(void *key, size_t size, int64_t value);
+const test_edit_t *test_find_edit(const test_edit_t *rows, const char *name);
+
+/*
 ** What the fixtures keep beside the host, for the sinks that count.
 */
 typedef struct {
@@ -481,5 +507,13 @@ void test_leave_no_room(host_t *h);
 void test_configure_table(host_t *h);
 void test_churn(host_t *h);
 void test_use_arena(host_t *h);
+void test_edit_deployment(host_t *h);
+void test_edit_backend(host_t *h);
+void test_edit_phases(host_t *h);
+void test_order_nobody(host_t *h);
+void test_edit_module(host_t *h);
+void test_load_twice(host_t *h);
+void test_spawn_past_entities(host_t *h);
+void test_edit_phase_names(host_t *h);
 
 #endif
