@@ -154,10 +154,10 @@ Each is held by a program where a program can hold it, and each program is a cas
 
 ## What no script can do
 
-Steps 1 to 8 of a decision, and steps 4 to 7 of the scan, are reading and judgement.
-The three checks exist so that the **mechanical** checks are never what gets skipped - a count, a citation, a duplicated run, a
-ragged line. They cannot weigh an option, re-read an open question against a decision just made, or
-notice that an edit left `"Create or Call a module"` behind.
+Steps 1 to 8 of a decision, and steps 4 to 7 of the scan, are reading and judgement. The three
+checks exist so that the **mechanical** checks are never what gets skipped - a count, a citation, a
+duplicated run, a ragged line. They cannot weigh an option, re-read an open question against a
+decision just made, or notice that an edit left `"Create or Call a module"` behind.
 
 So the failure to watch for is not a missed grep. It is a decision that looks settled and was never
 weighed.
