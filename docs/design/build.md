@@ -50,21 +50,30 @@ nothing more.
 
 ## Platforms
 
-    Windows    x86-64    x86_64-windows-gnu     run where the code is written
+    Windows    x86-64    x86_64-windows-gnu     run where the code is written, and by a workflow
     Linux      x86-64    x86_64-linux-gnu       run by a workflow, on every push
     macOS      arm64     aarch64-macos          run by a workflow, on every push
+    Linux      arm64     aarch64-linux-gnu      a target: compiled and linked, not yet run
+    macOS      x86-64    x86_64-macos           a target: compiled and linked, not yet run
+    Windows    arm64     aarch64-windows-gnu    a target: compiled and linked, not yet run
 
-**A platform is one that is run.** wasmtime publishes its library for more than these, and zig
-compiles for all of them, so a fourth is a target name, an archive and a runner. Until it has the
-runner, no document claims it.
+**A platform is one that is run.** A target is a name in `build.py`, wasmtime's library for it in
+the tree, and a row of a workflow. The last three have all of that and have been compiled and
+linked from the first, with what each imports held to `dependencies.md`; none has executed a case,
+because no workflow had run when they were added - `stage12.md`, *Platforms, as built*. Each
+becomes a platform, and this table says so, when its workflow has passed.
 
 **Windows is the `gnu` target, not `msvc`.** The `msvc` target takes its headers and libraries from
 an installed Visual Studio, which is an installation *Dependencies* does not have. Both use the same
 calling convention for C, so a module or a host built by either loads into the other.
 
-**macOS is arm64**, the processor those machines have had since 2020 and the one the workflow
-runners will keep. It is also the first build that is not x86-64, which is the reason it comes
-before the phases that rewrite things.
+**macOS is arm64 first**, the processor those machines have had since 2020 and the one the
+workflow runners will keep. It was also the first build that is not x86-64, which is the reason it
+came before the stages that rewrite things. x86-64 is a target beside it since stage 12.
+
+**Windows on arm64 is the `gnu` target as well**, linked against the one library wasmtime
+publishes for that processor, which is built by `msvc`: its import library names the functions of
+a DLL, which is the same thing whichever compiler wrote it, and zig's linker reads it.
 
 ## The standard
 

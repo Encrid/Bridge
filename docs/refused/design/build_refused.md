@@ -23,8 +23,13 @@ whose build interface changes between releases. The condition that brings it bac
 
 Of `build.md`, *Platforms*.
 
-Refused: x86-64 as well, a second job and a second library for a platform that is leaving. The
-condition that brings it back is a deployment on one.
+Refused until stage 12, and no longer: x86-64 on macOS as well, a second job and a second library
+for a platform that is leaving. The condition that was to bring it back was a deployment on one.
+It came back without one, with Linux and Windows on arm64, when stage 12 made every platform a
+goal of its own - `stage12.md`, *Platforms, as built*.
+
+Refused: a target with no workflow row. It would be a name nothing is ever going to run. No
+condition brings it back.
 
 ## The standard
 

@@ -20,6 +20,9 @@ ARTIFACTS = ('bridge', 'backends/bridge_wasm', 'backends/bridge_native')
 LISTED = re.compile(r'    (\w+)\s+(\S+)')
 SYSTEMS = {'windows': ('windows', 'every'), 'linux': ('linux', 'posix', 'every'),
            'macos': ('macos', 'posix', 'every')}
+# the processor an artifact is for, by the number its format has for it
+PROCESSORS = {0x8664: 'x86_64', 0xaa64: 'aarch64', 62: 'x86_64', 183: 'aarch64',
+              0x01000007: 'x86_64', 0x0100000c: 'aarch64'}
 
 
 def text(data, at):
@@ -92,12 +95,14 @@ def macho(data):
 
 
 def imports(path):
+    """The system and the processor an artifact is for, and what it imports."""
     data = path.read_bytes()
     if data[:2] == b'MZ':
-        return 'windows', pe(data)
+        machine, = struct.unpack_from('<H', data, struct.unpack_from('<I', data, 0x3c)[0] + 4)
+        return 'windows', PROCESSORS[machine], pe(data)
     if data[:4] == b'\x7fELF':
-        return 'linux', elf(data)
-    return 'macos', macho(data)
+        return 'linux', PROCESSORS[struct.unpack_from('<H', data, 18)[0]], elf(data)
+    return 'macos', PROCESSORS[struct.unpack_from('<I', data, 4)[0]], macho(data)
 
 
 def listed(kinds):
@@ -125,10 +130,10 @@ def main():
         # dependencies.md, *What the built artifacts import*: the list is of what ships
         print('a debug build is not what ships: what it imports is not held to the list')
         return
-    asked, system = set(), None
+    asked, system, processor = set(), None, None
     for name in ARTIFACTS:
         path = next(p for p in built.glob(name + '.*') if p.suffix in ('.dll', '.so', '.dylib'))
-        system, found = imports(path)
+        system, processor, found = imports(path)
         asked |= {function for _, function in found}
         if '--check' not in sys.argv:
             for library, function in sorted(found):
@@ -136,7 +141,8 @@ def main():
     if '--check' not in sys.argv:
         return
     tools = set(re.findall(r"tool\('([\w-]+)'", (ROOT / 'build.py').read_text(encoding='utf-8')))
-    wrong = compare(asked, listed(SYSTEMS[system]), 'an import on ' + system)
+    one = '%s_%s' % (system, processor)
+    wrong = compare(asked, listed(SYSTEMS[system] + (one,)), 'an import on ' + one)
     wrong += compare(tools, listed(('tool',)), 'a tool of build.py')
     if wrong:
         sys.exit('FAIL: %d dependencies out of step with the list' % wrong)

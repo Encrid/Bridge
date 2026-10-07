@@ -1,0 +1,47 @@
+# The Windows build, on every push, on each processor there is a target for. zig is the one tool
+# fetched: build.py fetches Binaryen itself on Windows, at its pin - docs/design/dependencies.md.
+# Python is asked for by processor, since build.py builds for the processor Python says it runs
+# on, and one that ran emulated would have it build the other target.
+name: windows
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - processor: x86_64
+            python: x64
+            runner: windows-latest
+          - processor: aarch64
+            python: arm64
+            runner: windows-11-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      ZIG_VERSION: 0.16.0
+      PROCESSOR: ${{ matrix.processor }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          architecture: ${{ matrix.python }}
+
+      - name: Tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/tools"
+          cd "$HOME/tools"
+          curl -fsSL -o zig.zip "https://ziglang.org/download/${ZIG_VERSION}/zig-${PROCESSOR}-windows-${ZIG_VERSION}.zip"
+          unzip -q zig.zip
+          cygpath -w "$HOME/tools/zig-${PROCESSOR}-windows-${ZIG_VERSION}" >> "$GITHUB_PATH"
+
+      - name: Build and test
+        run: python build.py test

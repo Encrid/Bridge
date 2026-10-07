@@ -36,8 +36,8 @@ imports any:
 
 The library, `bridge`, and the two backends, `bridge_wasm` and `bridge_native`. A line is the
 system it is imported on, the function, and why. `every` is all three systems, and `posix` is
-Linux and macOS. A function the compiler's own runtime provides is linked into the artifact and
-is not an import.
+Linux and macOS; a system with a processor after it, `macos_x86_64`, is that one alone. A
+function the compiler's own runtime provides is linked into the artifact and is not an import.
 
 **The list is of what ships: the optimised build.** A debug build is linked with zig's own
 checks and its stack traces, which import some sixty functions more on Windows, and none of that
@@ -63,7 +63,8 @@ is in a library a host is handed. The case says so when it is run on one, and ho
     linux     memset       a block zeroed. Inline elsewhere
     linux     bcmp         what the compiler makes of a comparison of bytes for equality
     macos     memcmp       the same comparison, as it is on macOS
-    macos     bzero        what the compiler makes of a block zeroed
+    macos_aarch64  bzero   what the compiler makes of a block zeroed
+    macos_x86_64   __bzero the same, as it is on x86-64
     macos     __memcpy_chk what the system's headers make of memcpy
     linux     __errno_location      errno, which strtoll sets
     macos     __error               the same
@@ -136,4 +137,5 @@ new one is a dependency that changed.
     windows   GetLastError
     windows   TlsGetValue               its thread-local storage
     windows   Sleep                     its start, waited for
+    windows_aarch64  _fpreset           the floating-point state set, on arm64
     macos     dyld_stub_binder          the loader's own, which binds an import at its first call

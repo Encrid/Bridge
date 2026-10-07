@@ -735,3 +735,29 @@ everywhere but here:
 
 The first four are storage's and are what the stage's done-when is about. The last two are the
 test modules' loops, compiled to other instructions since they were cut.
+
+## Platforms, as built
+
+**Three targets were added**, each a row of `TARGETS` in `build.py`, wasmtime 48.0.5 for it in the
+tree with its hash, and a row of a workflow: Linux on arm64, macOS on x86-64, Windows on arm64.
+The workflows are one a system now, `linux.yml`, `macos.yml` and the new `windows.yml`, each a
+matrix of the two processors.
+
+    aarch64-linux-gnu       compiles and links here. 85 imports, the same as on x86-64
+    x86_64-macos            compiles and links here. 87 imports; `__bzero` where arm64 has `bzero`
+    aarch64-windows-gnu     compiles and links here, against wasmtime's `msvc` import library,
+                            which was the question the plan left for a scratch test. 95
+                            imports; the startup code's `_fpreset` is the one more
+
+`tools/deps.py` reads the processor of an artifact as well as its system, so the two imports that
+differ by processor are listed for the one they are on.
+
+**None of the three has run a case, and neither has the Windows workflow.** GitHub Actions has
+started no job since `c7e8d22`: the account's billing refuses them. Enkrid chose to add the
+targets all the same, on 2026-10-07, with that known. So `build.md` lists them as targets and not
+as platforms, and the done-when of the stage, every case on every target by a workflow on every
+push, is not met by anything in the tree: it is met when the six jobs have passed. Until then
+what is known is what a compiler and a linker can say.
+
+macOS on x86-64 lifts a refusal on record, `build_refused.md`, *Platforms*, whose condition was a
+deployment on one. There is none. It is lifted because the stage made each platform a goal.

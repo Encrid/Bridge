@@ -2,7 +2,7 @@
 
     python build.py                      build, for this machine
     python build.py test [-k NAME]       build, then run the tests (all, or those matching)
-    python build.py --target T ...       x86_64-windows-gnu | x86_64-linux-gnu | aarch64-macos
+    python build.py --target T ...       one of TARGETS, below: three systems, two processors
     python build.py --debug ...          unoptimised, with debug information
 
 Needs zig on the path. Binaryen is taken from BINARYEN_ROOT or the path, and on Windows fetched
@@ -43,6 +43,20 @@ TARGETS = {
         'compile': ['-fPIC', '-D_DARWIN_C_SOURCE'], 'link': [],
         'beside': ['-Wl,-rpath,@loader_path'], 'named': ['-Wl,-install_name,@rpath/bridge.dylib'],
         'wasmtime': ('macos/libwasmtime.dylib', 'macos/libwasmtime.dylib')},
+    'aarch64-linux-gnu': {
+        'runs on': ('Linux', 'aarch64'), 'program': '', 'library': '.so', 'os': 'posix',
+        'compile': ['-fPIC', '-D_DEFAULT_SOURCE'], 'link': ['-lm', '-lpthread', '-ldl'],
+        'beside': ['-Wl,-rpath,$ORIGIN'], 'named': ['-Wl,-soname,bridge.so'],
+        'wasmtime': ('linux_aarch64/libwasmtime.so', 'linux_aarch64/libwasmtime.so')},
+    'x86_64-macos': {
+        'runs on': ('Darwin', 'x86_64'), 'program': '', 'library': '.dylib', 'os': 'posix',
+        'compile': ['-fPIC', '-D_DARWIN_C_SOURCE'], 'link': [],
+        'beside': ['-Wl,-rpath,@loader_path'], 'named': ['-Wl,-install_name,@rpath/bridge.dylib'],
+        'wasmtime': ('macos_x86_64/libwasmtime.dylib', 'macos_x86_64/libwasmtime.dylib')},
+    'aarch64-windows-gnu': {
+        'runs on': ('Windows', 'ARM64'), 'program': '.exe', 'library': '.dll', 'os': 'windows',
+        'compile': [], 'link': [], 'beside': [], 'named': [],
+        'wasmtime': ('windows_aarch64/wasmtime.dll.lib', 'windows_aarch64/wasmtime.dll')},
 }
 BINARYEN = 'binaryen-version_133'
 BINARYEN_URL = ('https://github.com/WebAssembly/binaryen/releases/download/version_133/'
