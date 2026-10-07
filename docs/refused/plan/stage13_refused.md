@@ -71,6 +71,32 @@ each time. The condition that brings it back is a loaded run that costs no more 
 Refused: a script of its own that starts the copies. A second place that judges a case, to be
 kept in step with the first, and one more thing to remember to run. No condition brings it back.
 
+## Where a name's document is said
+
+Of `stage13.md`, *Where a name's document is said*.
+
+Refused, after it had been taken: the document and the heading under each heading of the list.
+47 comments of the headers say it already, checked, and the list would say it again. No
+condition brings it back.
+
+Refused: nowhere, the list saying only that it is the documents' to say. A name stated in no
+document would be silent, and nothing would fail on it. No condition brings it back.
+
+Refused: the 169 citations that are missing, written in this stage. Stage 14 reads every
+document to say what is to be improved, and would write them again. The condition that brings
+it back is stage 14 leaving the documents' headings as they are.
+
+## A deployment with no backend
+
+Of `stage13.md`, *A deployment with no backend*.
+
+Refused: left as it was, and unstated. Two counts of one kind with two rules, and nothing that
+says why. No condition brings it back.
+
+Refused: left as it was, with a sentence and a case that say such a bridge is created and loads
+nothing. A case and a sentence for a bridge nobody can use, and the two rules still. The
+condition that brings it back is something a host can do with a bridge before it has a backend.
+
 ## What was built
 
 Of `stage13.md`, *What was built*.

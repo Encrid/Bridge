@@ -359,8 +359,10 @@ The documents were written a stage at a time, each to say what that stage decide
 library is named and a host is written against it, they are read as one thing. What of them is to
 be improved - what a reader who was not there cannot follow, what two documents say twice, what a
 case of stage 13 showed to be claimed and not held - is this stage's first question, by the method
-of `stage0.md`. It comes after the tests by capability, whose list is what finds a claim with no
-case, and before the rename, so that what is renamed is settled.
+of `stage0.md`. One thing is its already: each name a header exposes cites, in the comment above
+it, the document that states it, and the build fails on one that cites none - `stage13.md`,
+*Where a name's document is said*. It comes after the tests by capability, whose list is what
+finds a claim with no case, and before the rename, so that what is renamed is settled.
 
 *Done when each thing this stage's first question listed is changed or refused on record; `xref.py`
 finds no broken citation; and every case passes.*

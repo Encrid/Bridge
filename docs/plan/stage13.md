@@ -236,10 +236,8 @@ not run. It is the case `cover`.
 **Which document states each name is not in the list, and it was decided that it would be.**
 The decision was taken while a capability was a sentence of a document. Found for every name by
 a script, the pointer was wrong more often than right: the documents say what the library does
-in their own words, and `kind` in backticks is under five headings. Written by hand it is 256
-readings of forty documents just before stage 14 reads them all. So the list says so in its own
-words and leaves it to stage 14, whose first question is what of the documents is to be
-improved. That is one part of a decision not built, and Enkrid's to rule on: *The close*.
+in their own words, and `kind` in backticks is under five headings. Where it goes was decided
+again: *Where a name's document is said*.
 
 ### One host program
 
@@ -304,11 +302,10 @@ the first loaded run of the finished tree one copy of six said that a whole page
 was written. The mark is set under the backend's lock now. It is the second defect that six
 copies found and one did not, and the first that this stage's own load found.
 
-**A deployment with no backend is created.** `backend_count` of zero is not refused, where
-`phase_count` of zero is. No module can be loaded into it, and each load is refused by the name
-of the backend it asks for. Left as it is, and not listed as a case: whether a count of zero is
-unset, as it is for every other count, is the host seam's to say, and stage 16 reads that seam
-from outside.
+**A deployment with no backend was created.** `backend_count` of zero was not refused, where
+`phase_count` of zero is. No module could be loaded into it, and each load was refused by the
+name of the backend it asked for. Found by the case written for it, which printed nothing but
+that the process was alive. Decided afterwards: *A deployment with no backend*.
 
 ## The close
 
@@ -316,10 +313,11 @@ from outside.
 
     every capability has a case named for it,    met: 256 exposed names, each a heading with
     and the build fails on one that has none     its cases; the case `cover`
-    no case is named for a stage                 met: 470 cases, none
+    no case is named for a stage                 met: 471 cases, none
     every case passes on Windows, Linux and      Windows: met, optimised and debug, alone and
     macOS, alone and with several copies         under six copies; a hundred loaded rounds
-                                                 run here, 47,000 cases, none failed. Linux
+                                                 run here, 47,000 cases, none failed, and
+                                                 ten more with the case added since. Linux
                                                  and macOS: not met, since no workflow has run
 
 **The workflows.** As for stage 12: GitHub Actions starts no job while the account's billing
@@ -327,6 +325,53 @@ refuses them, and Enkrid ruled that this does not hold a stage. Each of the thre
 runs the cases plain and then ten loaded rounds. The five other targets compile and link here.
 When the jobs run, what they find is this stage's to fix.
 
-**What is Enkrid's to rule on.** Two things, neither of which a case waits for: the list
-without the document that states each name, above; and whether a deployment with no backend is
-to be refused.
+**What was Enkrid's to rule on.** Two things, neither of which a case waited for, each decided
+after the cases were done, on 2026-10-07: *Where a name's document is said*, and *A deployment
+with no backend*.
+
+## Decided after the cases
+
+### Where a name's document is said
+
+**In the header, in the comment above the name, and it is written in stage 14.** Decision 2 put
+the document and the heading that state a capability in its row of the list. Two questions were
+one there: where a name's cases are, which is `tests.md`, and where a name is stated, which is
+this.
+
+The headers answer the second already, for some: 47 comments cite a document and a heading,
+`budgets.md`, *Budgets*, above what they describe, and `tools/xref.py` fails on one that names
+no heading. By a count of the nearest comment, 87 of the 256 exposed names sit under such a
+citation and 169 do not. So the pointer has a place and a check, and the list repeating it would
+be a second place for one fact.
+
+**What stage 14 builds of it**: a citation above each exposed name, and `tools/cover.py` failing
+on a name that has none, so that a name added later says where it is stated the day it is
+written. It is stage 14's because that stage reads every document to say what of them is to be
+improved, and a citation written before it would be written twice.
+
+    fast          no part of this runs
+    scalable      a name carries its own citation, wherever it is declared
+    modular       the header says where a name is stated, and the list where it is shown
+    extensible    a new name fails the build until it cites its document
+    minimal       one place, and the check there is already
+    explicit      a name stated in no document is named, and fails
+
+### A deployment with no backend
+
+**It is refused at create, in its own words, as a deployment with no phase is.** The host seam
+reaches storage through modules and through nothing else, and a module is run by a backend. So
+a bridge with no backend can load nothing and run nothing, which is what a bridge with no phase
+is refused for. It was created, and the first sign was a load refused for the name of a backend,
+which says what is missing and not why.
+
+A count of zero is not unset everywhere: no pair of an order, no grant, no setting are each a
+deployment that works, and are accepted. What decides is whether what is left can do anything.
+
+    fast          one test, at create
+    scalable      does not apply
+    modular       the check is where the backends are opened
+    extensible    a count added later is asked the same question
+    minimal       four lines, one message, one case
+    explicit      refused where it is wrong, by the rule a reader of the phases expects
+
+The case is `config.backends-none-refused`.
