@@ -51,8 +51,8 @@ is in a library a host is handed. The case says so when it is run on one, and ho
     every     free
     every     strcmp       names compared: of modules, phases, components, settings
     every     strncmp      a name compared up to its namespace
-    every     strchr       where a namespace or a version ends in a name
-    every     memchr       the wasm backend: where the first line of wasmtime's message ends
+    every     strchr       where a namespace or a version ends in a name, and whether a
+                           library's path has a directory in it
     every     strtoll      a constant of a descriptor, read - `schema.md`, *The type set*
     every     strtoull
     posix     strlen       how long a name is. Inline on Windows
@@ -70,7 +70,6 @@ is in a library a host is handed. The case says so when it is run on one, and ho
     windows   _errno                the same
     windows   __stdio_common_vsprintf
                            snprintf and vsnprintf, as the C runtime has them
-    windows   strpbrk      whether a library's path has a directory in it
 
 ### The operating system, through `utils/os`
 

@@ -215,7 +215,7 @@ where two things could be meant the qualified form is the only form.
 
 **Storage**
 
-    storage           what keeps the rows: `src/storage.c`. `storage.md`. Never "store",
+    storage           what keeps the rows: `src/storage_*.c`. `storage.md`. Never "store",
                       which is wasmtime's word for one of its own things
     archetype         a set of components
     table             the storage of one archetype: a column a component

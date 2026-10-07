@@ -55,7 +55,7 @@ above what the arena has in use, without counting it as used, and makes the call
 scratch then holds one value at a time. Each backend's SDK does it, in `bridge_lend` and
 `bridge_native_lend`, which `BRIDGE_ATTACH` and `BRIDGE_NATIVE_ATTACH` use - and a log line's
 text is the one thing put in scratch that stays until the barrier, since it is read there:
-`log.md`, *The log*. `tests/stage3.c`, case
+`log.md`, *The log*. `tests/stage3`, case
 `smallscratch`, attaches eight kilobytes of values through 512 bytes of scratch.
 
 What the second copy costs was measured, since it was called a cost on the native backend: an

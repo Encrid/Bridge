@@ -166,3 +166,15 @@ Of `stage12.md`, *Dependencies, as built*. Binaryen's `wasm-as` and `wasm-dis` a
 Refused: `wasm-tools` kept beside Binaryen, as the parser the text format is defined by. It is a
 fourth tool for three calls that a tool already required makes. The condition that brings it back
 is a module written as text that Binaryen does not read.
+
+## The C library's calls
+
+Of `stage12.md`, *Dependencies, as built*. `strpbrk` and `memchr` went.
+
+Refused: `strncmp`, `strtoll`, `strtoull` and `errno` replaced by code of ours. Six imports fewer
+for about thirty-five lines more, of which a reader of integers with a base and an overflow rule
+is the kind that is wrong at its edges when it is written again, and no dependency goes: the C
+library stays for what cannot be replaced. The condition that brings it back is a target whose C
+library lacks one of them.
+
+Refused: none removed. Two of them cost nothing to remove.

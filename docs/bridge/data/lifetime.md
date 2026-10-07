@@ -56,7 +56,7 @@ more bytes. For each table that carries the component:
 
 The last is the one case with a trace, **and it is said**: one record names the component
 stripped, how many rows stay apart, and `[budget] columns`, which had no room to join them. It is
-a sign that budget is nearly spent as much as it is a fact about tables. `tests/storage.c`, case
+a sign that budget is nearly spent as much as it is a fact about tables. `tests/storage`, case
 `stripfull`, reads it. Two tables then hold the same archetype until either empties;
 a module sees a span for each, which is no more than it could ever rely on - `module.md`, *What
 no module may do*. An entity given that set afterwards goes to the one that was there first, and

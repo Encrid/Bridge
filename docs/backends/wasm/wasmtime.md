@@ -22,7 +22,7 @@ check every load, on the path this design exists to keep free.
 **Adoption** goes through wasmtime's host memory creator, the hook by which an embedder supplies the
 pages behind a memory. The backend answers it with the block Bridge-ASM700 allocated, and one block
 backs a memory in every store that imports it - each module has its own store, `backend.md`, *What
-the backend does not do*. `tests/adopt.c` is the proof: two stores on two threads write one block
+the backend does not do*. `tests/adopt` is the proof: two stores on two threads write one block
 at once, each sees the other's bytes, and a load past it traps.
 
 **Through a holder module, because the creator is asked less than its header says.** wasmtime's C
@@ -74,7 +74,7 @@ version had two events, one for a call starting and one for it ending, and waite
 turn - which is counting them, and an event set twice before it is waited for once is one event.
 Two timed calls back to back, a `reload` and then a `shutdown`, lost one: the thread sat waiting
 for an end that had already been said, and the backend could not be destroyed. It took stage 6 to
-make two such calls in a row, and one run in some hundreds to lose the race. `tests/adopt.c` makes
+make two such calls in a row, and one run in some hundreds to lose the race. `tests/adopt` makes
 twenty thousand.
 
 An increment reaches every store of the engine, and a store with no deadline set traps at once. So

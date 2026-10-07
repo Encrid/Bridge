@@ -38,7 +38,7 @@ says so. The reason for stopping was running without the module, and with the mo
 nothing left of it. The other gives it up: an unload of it, by its name. That is the host saying the
 deployment goes on without it, which only the host can say; its components go by the policies they
 were declared with, as at any unload, and the bridge runs again. After it the host may load
-anything, a module of another name in its place among them. `tests/stage6.c`, case `failgiveup`. A
+anything, a module of another name in its place among them. `tests/stage6`, case `failgiveup`. A
 module that never loaded has nothing to unload, and for it the ways on are a load that succeeds, or
 `bridge_destroy`.
 
@@ -72,7 +72,7 @@ back is recorded in a list that was made long enough when the range was taken. T
 unload may go without is remembering where a module's settings text was, so that its next load
 writes there again: without it that load takes fresh room, and a record says so.
 
-**It is held by answering every allocation null in turn.** `tests/storage.c` is built against a
+**It is held by answering every allocation null in turn.** `tests/storage` is built against a
 library whose calls to the allocator are counted - *Nothing is allocated in a phase* has the
 same build - and the case `alloc-nomemory` makes a bridge, loads a module, runs it, reloads it,
 unloads it and destroys the bridge, once for each of the four hundred and some allocations all

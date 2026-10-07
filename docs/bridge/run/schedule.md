@@ -46,7 +46,7 @@ the module uses to a phase the deployment declared:
 
 A name that is not in the table is looked for among the deployment's phases as it is written, so
 a module that already says `update` needs no entry. A table that maps a name twice, or to a
-phase the deployment did not declare, refuses the load, by the name. `tests/stage5.c`, cases
+phase the deployment did not declare, refuses the load, by the name. `tests/stage5`, cases
 `phaseunmapped`, `phasemapped` and `phasebadmap`, are one module that says `tick`.
 
 It is the deployment that resolves it, as it resolves an order between two systems and a grant
@@ -142,7 +142,7 @@ Two systems conflict in one of two ways:
 
 **A change is in the graph because a barrier applies changes in the order the systems ran.** Two
 modules that attach one component to one entity in one phase leave the value of whichever ran
-last, so which ran last has to be something the deployment stated. `tests/stage5.c`, cases
+last, so which ran last has to be something the deployment stated. `tests/stage5`, cases
 `changeorder` and `changeloaded`, load the same two modules in both orders and read the same
 value. A change does not conflict with a term: a change is applied at the barrier, after every
 system of the phase has read what was there before it.
@@ -213,7 +213,7 @@ deterministic by period - `limits.md`, *What bounds a run*.
 quiet machine and be killed on a busy one. That is the cost of wall time, and it is why a work limit and a
 timeout are not interchangeable.
 
-**That is a claim, and it has a case.** `tests/storage.c` runs four modules through eight million
+**That is a claim, and it has a case.** `tests/storage` runs four modules through eight million
 changes on four threads and again on one, and what they say of their own account has to be the
 same file, word for word, on every run. `[checks] validate` hashes every column at every barrier
 - `validation.md`, *The checksum pass, when asked* - and with it the same is held barrier by

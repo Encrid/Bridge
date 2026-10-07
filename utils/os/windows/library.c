@@ -26,7 +26,7 @@ void *os_lib_open(const char *path)
     DWORD len;
     DWORD beside = LOAD_WITH_ALTERED_SEARCH_PATH;
 
-    if (!strpbrk(path, "/\\"))
+    if (!strchr(path, '/') && !strchr(path, '\\'))
         return ((void *)LoadLibraryA(path));
     len = GetFullPathNameA(path, sizeof(full), full, nullptr);
     if (!len || len >= sizeof(full))

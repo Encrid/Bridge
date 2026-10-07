@@ -72,7 +72,7 @@ before the phases that rewrite things.
 the source, the tests, the test modules and all five headers. flecs was C99, built by its own flags
 as it asked, until stage 10 removed it.
 
-    backends/wasm/wasmtime        C11    read by backends/wasm/wasm.c and nothing else
+    backends/wasm/wasmtime        C11    read by backends/wasm and nothing else
     everything else               C23
 
 A file in a later standard reads a header in an earlier one, which is the direction that costs

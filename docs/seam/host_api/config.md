@@ -33,7 +33,7 @@ its own, and the other, like any other negative number, is refused at load by th
 boolean, which has no third state to be found in: it is `enum bridge_flag`, `BRIDGE_TRUE` or
 `BRIDGE_FALSE`, and its zero is `BRIDGE_UNSET`, the one place the unset state has a name, since
 here it sits beside the two answers. The keys are `trusted`, `reloadable`, `hot_reload` and
-`pinned`, and `validate` and `profile` when they exist. `tests/stage2.c`, case `unsetflag`.
+`pinned`, and `validate` and `profile` when they exist. `tests/stage2`, case `unsetflag`.
 
 What that protects against is not a missing key but a value nobody can account for. A host may layer
 its sources however it likes - a module author's stated values under a deployment's, say - as long

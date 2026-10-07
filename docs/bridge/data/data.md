@@ -74,7 +74,7 @@ some of them.
 
 It runs **at the barrier where the change applied**, which is why it takes no phase. Every
 structural change is deferred - `abi.md`, *The ABI* - so there is no change to hear of anywhere
-else. `tests/stage5.c` holds that on every build: an attach made in a phase reaches its observer
+else. `tests/stage5` holds that on every build: an attach made in a phase reaches its observer
 under that phase's barrier count, and a chain of three takes three barriers.
 
 **It is told what the barrier made of an entity, and not each thing that was asked of it.** A
@@ -100,7 +100,7 @@ completed the pair. An entity made and destroyed inside one phase, or given a co
 stripped of it, is not heard at all: nothing of it is there to read. One that loses a component
 and is given it back in the same phase is heard as an attach, since it carries a new value. One record
 an entity at a barrier, with the events that hold. A detach of what is not there, and any change
-to an id that is dead, is nothing. `tests/storage.c`, case `changes`, says each of these out loud.
+to an id that is dead, is nothing. `tests/storage`, case `changes`, says each of these out loud.
 
 **Every event is about something the observer can read**, which is what running after the
 republish is for - `schedule.md`, *An observer runs at the barrier, one hop per barrier*.

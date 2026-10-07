@@ -72,7 +72,7 @@ preprocessor has replaced any name, so `char title[N]` reaches Bridge-ASM700 as 
 refused at it. The number is written once, in the struct, and code that needs it takes it from the
 field - `sizeof` of the field over `sizeof` of one of it. Anything else is refused at `declare`, and
 the refusal quotes the word the reading stopped at: `unsigned`, `const`, `*`, a second dimension, a
-name nothing declared. `tests/schema.c` reads every accepted spelling against what the compiler lays
+name nothing declared. `tests/schema` reads every accepted spelling against what the compiler lays
 the same struct out as, and has every other refused by its word.
 
 **A field whose type is another declared type names it bare, and it is found in the component's own
@@ -90,7 +90,7 @@ gives the field, it is what the module's
 compiler lays the enum out as, and it goes into the descriptor ahead of the brace, where
 Bridge-ASM700 reads it. An enum is any of `int8_t` to `uint32_t`; a bitmask is unsigned, to
 `uint64_t`. Every constant is checked to fit, a counted one as well as a stated one, and a
-setting given by number is held to the same range. `tests/schema.c` has each width and each
+setting given by number is held to the same range. `tests/schema` has each width and each
 refusal.
 
 It is stated because nothing here is taken by default, and because it is paid a row: a state of

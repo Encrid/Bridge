@@ -63,7 +63,7 @@ the same numbers, in two headers that are each whole without the other, held equ
 where a module's level becomes a host's. A module may write any of the eight. A module's `log_level`
 is any of them but the first: zero is unset for it, as for every key, and refused; so is a number
 past 7. Nothing is lost that anyone states: a line of severity 0 passes every threshold from 1 up,
-and the least severe of the named ones is 3. `tests/stage2.c`, case `unsetlevel`. Filtering is at
+and the least severe of the named ones is 3. `tests/stage2`, case `unsetlevel`. Filtering is at
 the writer, which begins `if (level > threshold) return` against a threshold in the private-memory
 header, so a line that is switched off costs a load and a branch.
 

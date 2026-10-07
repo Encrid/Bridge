@@ -696,3 +696,11 @@ made, and reads the clock again; what a timed loop uses is copied out of the str
 before the clock is read, since the compiler read it again at every row otherwise. Beside the
 programs as they were, ten rounds alternated: every median within 3.3%. `entt_ref.cpp` is C++,
 and the style is of the C we own: the checker reads the `.c` and `.h` of that folder.
+
+**Two calls of the C library are gone**, of the five that had one site or two. `strpbrk` asked
+whether a library's path holds a `/` or a `\`, and is two `strchr`; `memchr` found the end of the
+first line of wasmtime's message, and is a loop of three lines beside the one that already walks
+those bytes. `strncmp`, `strtoll` and `strtoull` stay: the first needs a length checked that it
+does not need now, and the other two are a reader of integers we would then own, about thirty
+lines whose edges the C library has right. The C library is linked either way, for `malloc` and
+`snprintf`, so what this buys is a shorter list and no dependency less.

@@ -46,7 +46,7 @@ modules declare is one. **A reload needs no room for a module's systems twice.**
 instance's systems leave storage before the new instance registers its own, in the places those
 had; if the reload fails, the new ones are dropped and the old put back as they were, which
 cannot fail, since the places are free again. So `systems` is the number a deployment has, and
-not that number and a module more. `tests/stage6.c`, cases `reloadexact` and
+not that number and a module more. `tests/stage6`, cases `reloadexact` and
 `reloadexactfail`, reload a module of one system with `systems` at one, and fail to. The two
 keys exist because storage's memory is a product: a table
 keeps an offset for every type there may be, and a system keeps a place for every table there may
@@ -104,7 +104,7 @@ its room when the bridge was created or when a module loaded, from a number some
 multiple of eight. A change that does not fit is refused and that invocation fails, as an
 allocation past `persistent` does. A module that queues none states `BRIDGE_NONE`.
 
-`tests/storage.c` is built a second time against a library whose every call to the allocator is
+`tests/storage` is built a second time against a library whose every call to the allocator is
 counted, and runs the cases `changes`, `tables` and `strip` with a phase failing if the count
 moved: cases `alloc-changes`, `alloc-tables`, `alloc-strip`.
 
@@ -178,7 +178,7 @@ components and the values it had, and no observer hears of it. Other entities ar
 first asked are the ones placed.** It asks the column region for half as many until a number
 fits, and then searches back up between that number and the last that did not. Entities are
 worked in the order their first change was asked, which is the order the calls ran -
-`threads.md`, *Threads* - so which are placed is the same every run. `tests/storage.c`, case
+`threads.md`, *Threads* - so which are placed is the same every run. `tests/storage`, case
 `nocolumns`, has room for four rows of six and places four, where halving alone finds three.
 
 **It is a failure of every module that asked a change of it**, each for the changes that were its

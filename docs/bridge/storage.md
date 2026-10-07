@@ -5,7 +5,7 @@ What was weighed here and refused is `storage_refused.md`, *What was refused: St
 Who keeps the rows, and how. The model a module sees is `data.md`; what it reads is `query.md` and
 `reference.md`; which block each thing is in is `memory.md`.
 
-Storage is Bridge-ASM700's own: `src/storage.c`, behind the one internal header `src/storage.h`. Until
+Storage is Bridge-ASM700's own: `src/storage_*.c`, behind the one internal header `src/storage.h`. Until
 stage 10 it was flecs, patched. Why that changed, and the figures it changed on, are `stage10.md`;
 what flecs was while it was carried is kept as `flecs.md`, a record and no longer a description.
 
@@ -328,7 +328,7 @@ Storage keeps, in memory of its own that no module can address:
 What is in the shared block of any of these - the entity index, each table's array of ids - is a
 **copy**, written when a row is placed and never read. A module that writes over them misleads
 itself and whoever reads them after; it does not change what storage does next.
-`tests/storage.c`, case `scribble`, has a module overwrite every index record and every entity
+`tests/storage`, case `scribble`, has a module overwrite every index record and every entity
 array, and then moves and destroys rows.
 
 That was not so under flecs. Its table read the id of the row it had moved from the array the

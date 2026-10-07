@@ -31,7 +31,7 @@ of the game in its spans; it may not remove them.
 It is checked at the barrier, where what the entity carries is known, against what it carried
 before that barrier. A destroy that fails it leaves the entity as it was, the log says how many,
 and it is the module's failure, counted as a change that could not be placed is - `failure.md`,
-*The budget*. `tests/stage5.c`, cases `reapread` and `reapwrite`, are one module under the two
+*The budget*. `tests/stage5`, cases `reapread` and `reapwrite`, are one module under the two
 grants.
 
 This is the sentence `lifetime.md`, *What unload leaves behind*, already had - a module may

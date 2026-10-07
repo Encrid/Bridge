@@ -40,7 +40,6 @@ static const char *find_reason(const wasm_byte_vec_t *msg, int *n)
     const char *text = msg->data;
     const char *end = msg->data + msg->size;
     const char *p = text;
-    const char *line;
 
     while (p && p + marker <= end) {
         if (!memcmp(p, WASM_MARKER, marker))
@@ -50,10 +49,10 @@ static const char *find_reason(const wasm_byte_vec_t *msg, int *n)
     *n = 0;
     if (!text)
         return ("");
-    line = memchr(text, '\n', (size_t)(end - text));
-    if (line)
-        end = line;
-    *n = end - text > 200 ? 200 : (int)(end - text);
+    p = text;
+    while (p < end && *p != '\n')
+        p++;
+    *n = p - text > 200 ? 200 : (int)(p - text);
     return (text);
 }
 
