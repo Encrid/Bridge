@@ -87,3 +87,17 @@ is about. No condition brings it back.
 Refused: the records left in the words of their day. Two vocabularies, by folder, and three
 words that mean two things by where they are read. The condition that brings it back is the
 records leaving the tree for an archive of their own.
+
+## What holds it
+
+Of `stage15.md`, *What holds it*.
+
+Refused: the check in `xref.py`, run as it was, by hand. A slip waits for the next scan, and
+stage 14's two checks waited the same way. No condition brings it back.
+
+Refused: the check in `style.py`, beside the expression that holds the header of a file. That
+script is about how the C is written, and does not read what a document says. No condition
+brings it back.
+
+Refused: a script and a case of its own. A fourth reading the same files for words. No
+condition brings it back.

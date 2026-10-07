@@ -181,3 +181,24 @@ the record of the stage that changed it.
     extensible    a name changed again is changed everywhere, and said in that stage's record
     minimal       one exemption, of two files, by name
     explicit      what a word means does not depend on the folder it is read in
+
+### What holds it
+
+**`tools/xref.py` fails on an old name, and is a case from here on.** Three words are not to
+come back: the old name of the library, "the original Bridge", and the object called a bridge.
+`xref.py` is the script that reads names in text, and it reads for these in every tracked file
+of ours that is text: the documents, the sources, the tests, the tools, `build.py` and the
+workflows. Not what is under `backends/wasm/wasmtime`, which is not ours; and not this document
+and its refused record, by name.
+
+**It was run by hand, in the scan of `stage0.md`, and failed no build.** So a citation of a
+heading that is gone, a stage named in a document of the design and a mention of what is not
+built with no citation, which stage 14 gave it to hold, were each held by whoever remembered
+to run it. It is the case `xref` now, and all of them fail the build.
+
+    fast          one more case, of under a second
+    scalable      a file added to the tree is read with the rest
+    modular       names in text are one script's, whatever the file
+    extensible    a word retired later is a row of its list
+    minimal       no script added, and one case
+    explicit      a slip fails the build, and says the file and the line
