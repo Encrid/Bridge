@@ -319,8 +319,8 @@ from outside.
     no case is named for a stage                 met: 470 cases, none
     every case passes on Windows, Linux and      Windows: met, optimised and debug, alone and
     macOS, alone and with several copies         under six copies; a hundred loaded rounds
-                                                 run here. Linux and macOS: not met, since no
-                                                 workflow has run
+                                                 run here, 47,000 cases, none failed. Linux
+                                                 and macOS: not met, since no workflow has run
 
 **The workflows.** As for stage 12: GitHub Actions starts no job while the account's billing
 refuses them, and Enkrid ruled that this does not hold a stage. Each of the three workflows

@@ -17,7 +17,7 @@
 /*
 ** host_init
 **
-** Fills a host from the command line, with the configuration every program
+** Fills a host from the command line, with the configuration every case
 ** starts from.
 */
 void host_init(host_t *h, int argc, char **argv)

@@ -5,9 +5,9 @@
 **
 ** All rights reserved.
 **
-** tests/support/host.h -- what the host programs of the tests share. A
-** program is a table of cases, and a case is a function handed the host:
-** what main built, and what the program's sink counts.
+** tests/support/host.h -- what the host program of the tests is built on.
+** The program is a table of cases, and a case is a function handed the
+** host: what main built, and what its fixture set.
 **
 ** A host is compiled against include/ alone and linked with the library as
 ** a host would be.
@@ -63,7 +63,7 @@ typedef struct {
 /*
 ** host_init
 **
-** Fills a host from the command line, with the configuration every program
+** Fills a host from the command line, with the configuration every case
 ** starts from: both backends, both phases, one thread, and the budgets. Its
 ** sink is its fixture's to set.
 */
