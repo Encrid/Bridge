@@ -21,6 +21,6 @@ call exists rather than a host reading its own log output back: that is using di
 
 So two fields, and everything else is deliberately absent. The backend, the ABI version, the grants
 and the settings are all things the host handed over. Memory used, systems registered and times
-failed are diagnostics, and go where diagnostics go: `profile.md`, *The profile*, which stage 14
+failed are diagnostics, and go where diagnostics go: `profile.md`, *The profile*, which stage 17
 builds, for how full each budget is. **A module that is not there does not appear** - the list is
 what exists, the host holds what it handed over, and the difference is the answer.

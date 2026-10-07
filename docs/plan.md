@@ -284,7 +284,7 @@ then told by a record what went.* Met.
 
 Built, with one clause of its done-when waiting on a thing outside the tree: `stage12.md`,
 *The close*. Three things that are about the whole tree and not about what it does, done before
-a host is written against it - stage 13 - so that it is written against names that stay.
+a host is written against it - stage 16 - so that it is written against names that stay.
 
 **One coding style, and a program that holds it.** `style.md` is how the C is written, and
 every C file of ours follows it: the library, the seam headers, the backends and their SDKs,
@@ -321,7 +321,57 @@ EnTT is slower than before the stage by more than aligning every function moves 
 that is slower at all is on record with what was tried; and every dependency is in the list,
 with a case that fails on one that is not.*
 
-## 13. A host, from outside
+**The order from here was changed on 2026-10-07, at Enkrid's word.** The library is finished
+first: its tests, its documents, its name. The host comes after, with the two stages that belong
+to it, diagnostics and the seam for a language that is not C. It replaces an order in which the
+host was next, stage 13, because a host from outside is what tests the host seam; that reason
+still holds, and what it costs to wait is said in stage 16.
+
+## 13. Tests, by capability
+
+Every test so far was written to meet one stage's claim, and is named for the stage: `stage2`
+to `stage6`. That says when a thing was built and not what is covered. This stage turns the
+tests around: **one case for each capability the documents state**, named for the capability, and
+a list that maps each capability to the case that proves it. This is the library's half. The
+standalone host's is stage 16's, in the host's repository.
+
+It was to come after the last stage that adds a capability, so that the list would be whole. It
+comes before two that add some, stages 17 and 18, and so it states the rule that keeps the list
+whole from here on: **a capability is added with its case**, named for the capability and in the
+list, and the build fails on one that has none.
+
+Three things the stages did not test, and this one does. **Everything under load**: a hundred and
+twenty-eight passing cases never showed the crash stage 9 found, and six copies at once showed it
+in a minute - `stage9.md`. **Everything a document claims**: a claim with no case is found by the
+list and not by reading. **Every refusal**: one, at least, existed for five stages with no test.
+
+*Done when every capability the documents state has a case named for it, and the build fails on
+one that has none; no case is named for a stage; every case passes on Windows, Linux and macOS,
+alone and with several copies running at once.*
+
+## 14. The documents
+
+The documents were written a stage at a time, each to say what that stage decided. Before the
+library is named and a host is written against it, they are read as one thing. What of them is to
+be improved - what a reader who was not there cannot follow, what two documents say twice, what a
+case of stage 13 showed to be claimed and not held - is this stage's first question, by the method
+of `stage0.md`. It comes after the tests by capability, whose list is what finds a claim with no
+case, and before the rename, so that what is renamed is settled.
+
+*Done when each thing this stage's first question listed is changed or refused on record; `xref.py`
+finds no broken citation; and every case passes.*
+
+## 15. Bridge
+
+Bridge-ASM700 becomes Bridge: the library is finished as a library, and takes the name of what it
+replaces. What is renamed - the repository, the name in every document and in the header every
+file of ours starts with, and what the original Bridge is called from then on in the documents
+that refer to it - is this stage's first question, by the method of `stage0.md`.
+
+*Done when nothing in the tree says Bridge-ASM700; the original Bridge has one name wherever it is
+meant; and every case passes.*
+
+## 16. A host, from outside
 
 A standalone host, in its own repository, that links the library built and nothing else of it, which
 is what tests the host seam - `host_api.md`, *A host links a built library*. It is handed the two
@@ -333,19 +383,27 @@ they are C to a C++ compiler and nothing has linked them as such. Whatever it re
 a manifest - it resolves into the structs of `host_api.md`, *The data*. `bridge_manifest_parse`
 ships beside the library, not inside it, for a host that wants it - `native.md`, *Identity*.
 
+**It is the first thing that links the library from outside, and it comes after the library is
+tested, documented and named.** So the host seam is called finished before anything but our own
+tests has used it, and what a host finds wrong with it is this stage's to change. Diagnostics and
+the seam for a language that is not C follow it, stages 17 and 18: a host is who reads the first
+and who is written in the second.
+
 *Done when a host that was handed only the built library and its headers drives a real deployment
 for one pass and for many, in C and in each other language this stage chose, C++ among them; it
 reloads a changed module and reports one that failed to load; a key it left unset is an error naming
 the key; and `bridge_manifest_parse` reads an identity out of a wasm binary and out of a native
-library in each of the three platforms' formats.*
+library in each of the three platforms' formats; and the standalone host's capabilities are covered
+in its own repository the way stage 13 covers the library's.*
 
-## 14. Diagnostics
+## 17. Diagnostics
 
 `[checks] validate` and `[checks] profile` - the barrier's checksum pass and the per-system
 counters - and `bridge_profile`, a pull. `validation.md`, *The checksum pass, when asked*, and
 `profile.md`, *The profile*. And a second pull: how much of each budget is in use, and the most
 that ever was, for the bridge and for each module - the reading a deployment sizes its budgets by.
-What a host does with it is the host's, in its own repository.
+What a host does with it is the host's, in its own repository, which is why this stage follows
+the host's: stage 16. Each capability it adds has its case in the list of stage 13.
 
 *Done when a deliberate stray write is reported with the module that made it, a system made slow on
 purpose is the one the profile names, a barrier made slow on purpose by what was queued is the
@@ -354,7 +412,7 @@ zero, every budget of the bridge and of a module reads as what a test made it us
 most it ever used, and one deployment run twice, and on one thread and on four, gives the same checksum of
 every column at every barrier - `schedule.md`, *What a pass depends on*.*
 
-## 15. A seam, for a language that is not C
+## 18. A seam, for a language that is not C
 
 **All three seams, where this stage was the module's alone.** A host and a backend may be in
 any language that can call C, as a module may be in any that makes a wasm module or a shared
@@ -382,34 +440,14 @@ with no language in it from which the header is written, or something less - is 
 first question, by the method of `stage0.md`; which language, and what a backend's SDK in it
 consists of, are the next two.
 
-After diagnostics; and before the tests by capability, whose list this adds to.
+After diagnostics; and what it adds goes into the list of the tests by capability, stage 13, as
+it is added.
 
 *Done when a native module in a language that is not C runs as a case; what it was written with
 came from Bridge-ASM700 for the ABI layouts and from the native backend for the rest, and neither was
 copied out of the other; and an ABI layout changed in one place changes what both languages read.*
 
-## 16. Tests, by capability
-
-Every test so far was written to meet one stage's claim, and is named for the stage: `stage2`
-to `stage6`. That says when a thing was built and not what is covered. This stage turns the
-tests around: **one case for each capability the documents state**, named for the capability, for
-the library and for the standalone host both, and a list that maps each capability to the case
-that proves it. The host's half lives in the host's repository.
-
-It comes after the last stage that adds a capability, so that the list is whole, and before the
-proof, which is a workload and not a test of anything in particular.
-
-Three things the stages did not test, and this one does. **Everything under load**: a hundred and
-twenty-eight passing cases never showed the crash stage 9 found, and six copies at once showed it
-in a minute - `stage9.md`. **Everything a document claims**: a claim with no case is found by the
-list and not by reading. **Every refusal**: one, at least, existed for five stages with no test.
-
-*Done when every capability the documents state has a case named for it, and the build fails on
-one that has none; no case is named for a stage; every case passes on Windows, Linux and macOS,
-alone and with several copies running at once; and the standalone host's capabilities are covered
-the same way in its own repository.*
-
-## 17. Prove it
+## 19. Prove it
 
 Port the original Bridge's Godot adapter to this design, as a native module. It is a real workload
 with a measured baseline, which is why it is the proof. Its probe asserts 191 checks, and two of

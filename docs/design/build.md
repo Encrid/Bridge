@@ -38,7 +38,7 @@ CMake's work was to find and drive three compilers. With one compiler that takes
 argument, what is left is running commands in order, and `tools/` was Python already.
 
 It takes every path from where it is and from the output directory it is given, so that a host
-with this repository as a submodule builds it by calling the same script - `plan.md` stage 13.
+with this repository as a submodule builds it by calling the same script - `plan.md` stage 16.
 
 What this gives up: the rebuild check, the parallelism and the choice of tests are ours to get
 right, and an editor that reads CMake finds nothing to read.

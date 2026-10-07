@@ -618,21 +618,21 @@ Of earlier stages:
     closed    the library is built, shared and static, and the hosts of the tests link it.
               `host_api.md`, *A host links a built library*
     closed    the host seam's and the backend seam's layouts are asserted, with no padding
-              left to a compiler; described for a language that is not C in stage 15,
+              left to a compiler; described for a language that is not C in stage 18,
               which is widened to all three seams
     closed    the three seam headers say they are C to a C++ compiler. Parsed as C++20 by
-              MSVC; a C++ host that links and runs is stage 13's done-when
-    closed    stage 13's host links the built library and is not handed the source; which
+              MSVC; a C++ host that links and runs is stage 16's done-when
+    closed    stage 16's host links the built library and is not handed the source; which
               languages the seam is shown from is that stage's first question
     closed  a boolean cannot be unset, and false is called the safe side for all six: it was
             not for `pinned`. A key that is yes or no is `enum bridge_flag`, stated as
             BRIDGE_TRUE or BRIDGE_FALSE, and refused at BRIDGE_UNSET. `config.md`
     closed  a module is the unit of parallelism: it is, said as an execution model, with
-            what it gives up, three refusals with one condition, and stage 17 measuring it.
+            what it gives up, three refusals with one condition, and stage 19 measuring it.
             "Instance grouping" was another matter, and holds. `threads.md`
     closed  a system is bounded by fuel and never by a deadline, on every deployment: by a
             work limit only, which is a net no module has to have and only its own module
-            pays for. The refusal has a condition that is true now, and stage 17 measures
+            pays for. The refusal has a condition that is true now, and stage 19 measures
             the cost on real systems. `limits.md`, *What a bound costs*
     closed  a field's type is found in its own namespace only: it holds, and why a copy
             cannot drift is written. `schema.md`, *The type set*
@@ -641,7 +641,7 @@ Of earlier stages:
             `schedule.md`, *A module's phase names are mapped by the deployment*
     closed  no row for a barrier in the profile: each phase has one, and a row says what it
             is. "A phase is the sum of its systems" was false. `profile.md`; built in
-            stage 14
+            stage 17
     closed  a stopped bridge takes only the load or reload of the module that stopped it:
             and an unload of it, by which a host goes on without it. `failure.md`
     closed  all pinned modules share the host's thread: it holds. What it does not serve is

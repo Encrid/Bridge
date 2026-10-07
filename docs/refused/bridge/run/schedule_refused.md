@@ -10,8 +10,8 @@ Refused: nothing, which is what this had, so that a module fitted only a deploym
 words. The condition that brings it back is none.
 
 Refused: names shipped by the library, for the reason this section opens with. Whether deployments
-come to share a list of names is still stage 17's question; the table is what makes the answer not
-matter to whether a module can be used. The condition that brings it back is `plan.md`, stage 17,
+come to share a list of names is still stage 19's question; the table is what makes the answer not
+matter to whether a module can be used. The condition that brings it back is `plan.md`, stage 19,
 finding deployments that share one list.
 
 ## Order within a phase is never implicit

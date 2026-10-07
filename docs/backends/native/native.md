@@ -56,7 +56,7 @@ after executing it, and a library cannot be cleanly unloaded. Read, then decide,
 **The section is a convention the host reads, not something Bridge-ASM700 parses.** Bridge-ASM700 is
 handed the identity as data - `host_api.md`, *The data* - so the section tables are to be walked
 by `bridge_manifest_parse`, a helper beside the library rather than inside it, which `plan.md`,
-stage 13, writes: ELF's `shdr` and
+stage 16, writes: ELF's `shdr` and
 `shstrtab`, PE's section table after the optional header, Mach-O's load commands. One implementation
 for every host that wants it, and none for a host whose module metadata comes from elsewhere.
 
