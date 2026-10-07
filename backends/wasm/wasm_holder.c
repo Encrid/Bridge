@@ -61,7 +61,9 @@ static wasmtime_error_t *build_holder(wasm_engine_t *engine, uint64_t pages,
 ** wasm_adopt_into
 **
 ** Puts an adopted block into an instance's store, and answers it as an
-** item a linker can define.
+** item a linker can define. Under the backend's lock from the holder being
+** found to its memory being made: two threads may each be making an
+** instance, and wasmtime asks for a memory without saying whose it is.
 */
 wasmtime_error_t *wasm_adopt_into(backend_instance_t *i, backend_memory_t *mem,
     wasmtime_extern_t *item, wasm_trap_t **trap)
@@ -70,13 +72,15 @@ wasmtime_error_t *wasm_adopt_into(backend_instance_t *i, backend_memory_t *mem,
     wasmtime_instance_t instance;
     wasmtime_error_t *error = nullptr;
 
+    os_mutex_lock(i->b->lock);
     if (!*holder)
         error = build_holder(i->engine, mem->len / WASM_PAGE, holder);
-    if (error)
-        return (error);
     i->b->adopting = mem;
-    error = wasmtime_instance_new(i->ctx, *holder, nullptr, 0, &instance, trap);
+    if (!error)
+        error = wasmtime_instance_new(i->ctx, *holder, nullptr, 0, &instance,
+            trap);
     i->b->adopting = nullptr;
+    os_mutex_unlock(i->b->lock);
     if (error || *trap)
         return (error);
     if (wasmtime_instance_export_get(i->ctx, &instance, "m", 1, item))

@@ -42,6 +42,15 @@ each that has used the block.
 That rests on behaviour wasmtime does not document, so it is what an upgrade must re-prove, and the
 test above is how.
 
+**The block is named under the backend's lock.** wasmtime asks its creator for every linear
+memory and is not told which, so the backend says which block the next one is, makes the holder's
+instance, and unsays it. Two threads may each be making an instance of one backend, and one that
+unsaid it between the other's saying and wasmtime's asking would leave that other a memory of
+wasmtime's own, whose writes reach nobody. So the lock is held from the holder being found to its
+memory being made. `tests/adopt` makes two stores on two threads at once, and with six copies of
+it running one in some tens lost that race when the lock was not held: `stage13.md`, *What the
+load found*.
+
 wasmtime's own mechanism for one memory in many stores is a shared memory, and it is refused here:
 it allocates its own pages, so it cannot adopt, and it brings the threads proposal with it, whose
 wait instruction blocks a thread in a way neither fuel nor a deadline can interrupt - `limits.md`,

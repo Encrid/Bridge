@@ -52,7 +52,7 @@ constexpr int WASM_ENGINES = 4;
 ** The backend.
 **
 **     wake          something below changed
-**     lock          over the five below
+**     lock          over the six below
 **     active        which timed call is running: 0 for none
 **     calls         how many there have been, to tell one from the next
 **     until         when the running one is out of time, by os_get_now
@@ -60,7 +60,7 @@ constexpr int WASM_ENGINES = 4;
 **     adopting      the adopted block the next memory wasmtime asks for is,
 **                   or nullptr: wasmtime asks for every linear memory, and
 **                   is not told which. Set around the instantiation that
-**                   asks, which only a load or a reload makes
+**                   asks, with the lock held for as long as it is set
 */
 struct backend {
     wasm_engine_t *engines[WASM_ENGINES];
