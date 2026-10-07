@@ -19,7 +19,7 @@ constexpr enum backend_type L = BACKEND_I64;
 
 static const abi_entry_t ABI_ENTRIES[ABI_ENTRY_COUNT] = {
     { "declare", abi_declare, { I }, 1, { I }, 1 },
-    { "add_system", abi_system, { I }, 1, { I }, 1 },
+    { "add_system", abi_add_system, { I }, 1, { I }, 1 },
     { "observe", abi_observe, { I }, 1, { I }, 1 },
     { "spawn", abi_spawn, {}, 0, { L }, 1 },
     { "destroy", abi_destroy, { L }, 1, {}, 0 },

@@ -68,7 +68,10 @@ SCHEMA = ['schema_reader', 'schema_token', 'schema_value', 'schema_type', 'schem
           'schema_constants']
 BRIDGE = ['say', 'bridge_create', 'bridge_backend', 'bridge_backends', 'bridge_phases',
           'bridge_destroy', 'bridge_stop', 'bridge_run', 'lifecycle', 'config',
-          'schema', 'abi', 'abi_calls', 'abi_alloc', 'abi_define', 'pool', 'pool_job', 'pool_run', 'backend'] + SCHEMA + CONFIG + SCHEDULE + BLOCK + STORAGE
+          'schema', 'abi_calls', 'abi_alloc', 'abi_define', 'abi_names', 'abi_stated', 'abi_relay_run',
+          'abi_relay_fields', 'abi_relay', 'abi_moved', 'abi_replace', 'abi_layout', 'abi_make',
+          'abi_declare', 'abi_subscriber', 'abi_subscriber_room', 'abi_term', 'abi_subscribe',
+          'abi_system', 'pool', 'pool_job', 'pool_run', 'backend'] + SCHEMA + CONFIG + SCHEDULE + BLOCK + STORAGE
 # a native module is a shared library: the name, its source, what it is compiled with. The same
 # library twice is one module to the loader, so one source is built under several names.
 NATIVE = [

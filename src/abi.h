@@ -94,7 +94,7 @@ void abi_hear(void *ctx, uint64_t id, enum bridge_event event);
 ** scratch arena.
 */
 int abi_declare(void *ud, const uint64_t *at, uint64_t *r);
-int abi_system(void *ud, const uint64_t *at, uint64_t *r);
+int abi_add_system(void *ud, const uint64_t *at, uint64_t *r);
 int abi_observe(void *ud, const uint64_t *at, uint64_t *r);
 
 /*

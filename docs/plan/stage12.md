@@ -517,3 +517,23 @@ The call itself got faster, the least of five rounds, in ns: attach 9.5 to 8.2, 
 6.3, destroy 5.9 to 5.1, a sparse set given 10.3 to 8.7. Nothing was done for it but the cut:
 the entries are a translation unit of their own now, and the compiler puts the queueing
 inside each.
+
+**The entries a module calls at load** are out of it too, and `abi.c` is gone. `declare` is nine
+files around one `declaring_t`: what is stated (`abi_stated.c`), names (`abi_names.c`), the type
+of that name there already is (`abi_replace.c`, `abi_moved.c`), a struct laid out again at a
+reload (`abi_relay.c`, `abi_relay_fields.c`, `abi_relay_run.c`), the descriptor read
+(`abi_layout.c`) and the type made (`abi_make.c`), with the entry in `abi_declare.c`.
+`add_system` and `observe` are five around one `subscribing_t`: `abi_subscriber.c`,
+`abi_subscriber_room.c`, `abi_term.c`, `abi_subscribe.c`, and the two entries with `abi_hear` in
+`abi_system.c`. Every refusal says what it said, in the order it was reached. Three things are
+not as they were, and none shows in a transcript:
+
+    a system or an observer refused at   its name, its full name and an observer's list were
+    a change or a term                   left allocated. They are freed
+    the types a field names              room was counted field by field. It is one a field,
+                                         which is never fewer
+    a count over 32 bits in a refusal    the statements carry 32 bits since decision 2, so
+                                         the text is written from 32
+
+Nothing here runs in a phase. Measured all the same, five rounds beside the tree before the
+stage: no line moved beyond what the lines it does not touch moved.
