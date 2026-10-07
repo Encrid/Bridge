@@ -92,3 +92,21 @@ sentence that says so, so that its missing case is not read as a gap.
     extensible    stages 17 and 18 add theirs by the same question
     minimal       some hundreds of sentences, each read once
     explicit      a sentence is a capability, a contract, or neither, and the list says which
+
+### Where the list lives
+
+**One document, `capabilities.md`: a row a capability, with the document and the heading that
+state it, and its case.** A script reads it and fails three ways, each of which is mechanical: a
+row with no case, a case that is in no row, and a pointer anywhere in the documents to a case
+that is no row. The documents point at a case 34 times today, in prose where the claim is made,
+and nothing checks them; they are checked from here on, and one at every claim is not asked for.
+
+**What the script cannot do** is find a capability nobody listed. That is the reading of step 3,
+once. After it the rule of `plan.md`, stage 13, holds: a capability is added with its row.
+
+    fast          no part of this runs
+    scalable      some hundreds of rows in one file
+    modular       the list is one thing, apart from the prose it points into
+    extensible    a new capability is a row
+    minimal       one document and one script
+    explicit      every capability is a row, and a row with no case fails
