@@ -517,5 +517,9 @@ void test_spawn_past_entities(host_t *h);
 void test_edit_phase_names(host_t *h);
 void test_do_wrong(host_t *h);
 void test_outgrow_spans(host_t *h);
+void test_log_levels(host_t *h);
+void test_tag_entities(host_t *h);
+void test_take_scratch_past(host_t *h);
+void test_list_fewer(host_t *h);
 
 #endif

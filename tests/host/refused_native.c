@@ -34,7 +34,8 @@ void test_state_untrusted(host_t *h)
 /*
 ** test_state_limit
 **
-** A work limit, on a backend that keeps none.
+** A work limit or a memory limit, as the case's row says, on a backend that
+** keeps neither.
 */
 void test_state_limit(host_t *h)
 {
@@ -43,7 +44,10 @@ void test_state_limit(host_t *h)
     if (host_open(h))
         return;
     test_state_native(&a, "game:mover@0.1.0", "no-such-library");
-    a.cfg.work_limit = 1000;
+    if (*h->arg == 'w')
+        a.cfg.work_limit = 1000;
+    if (*h->arg == 'm')
+        a.cfg.memory_limit = 1 << 20;
     host_load(h, &a);
     host_close(h);
 }

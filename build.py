@@ -134,7 +134,7 @@ NATIVE = [
 # `checked` or `unchecked` is stated for each, as the SDK asks: BRIDGE_ROWS_CHECKED, or not.
 PLAIN = ('mover reader refs fp badterm spin3 flood chatty rows halver twostep watcher chain '
          'badobs events fixer nested namer spawner counter typer user hang hit '
-         'shield aim')
+         'shield aim levels tagged')
 WASM = [(name, name, 'checked', []) for name in PLAIN.split()] + [
     ('rows-unchecked', 'rows', 'unchecked', []),
     ('nested2', 'nested', 'checked', ['LEAVE_OUT_VEC2']),
@@ -1094,6 +1094,32 @@ CASES = [
      r"module 'game:mover@0\.1\.0' is stopped: what its queries match no longer fits in its spans of 544 bytes.*alive", None),
     ('said', ['said'],
      None, None),
+    ('BRIDGE_ERR-nothing-above-an-error-written', ['host', 'BRIDGE_ERR-nothing-above-an-error-written'],
+     r"record.3.: an error\s+alive", r"a warning"),
+    ('BRIDGE_WARN-a-warning-and-what-is-worse', ['host', 'BRIDGE_WARN-a-warning-and-what-is-worse'],
+     r"an error.*a warning\s+alive", r"some information"),
+    ('BRIDGE_INFO-information-and-what-is-worse', ['host', 'BRIDGE_INFO-information-and-what-is-worse'],
+     r"an error.*a warning.*some information\s+alive", r"a detail"),
+    ('BRIDGE_DEBUG-every-line-written', ['host', 'BRIDGE_DEBUG-every-line-written'],
+     r"an error.*a warning.*some information.*a detail.*alive", None),
+    ('BRIDGE_LOG_ERR-written-as-severity-3', ['host', 'BRIDGE_LOG_ERR-written-as-severity-3'],
+     r"record.3.: an error.*alive", None),
+    ('BRIDGE_LOG_WARN-written-as-severity-4', ['host', 'BRIDGE_LOG_WARN-written-as-severity-4'],
+     r"record.4.: a warning.*alive", None),
+    ('BRIDGE_LOG_INFO-written-as-severity-6', ['host', 'BRIDGE_LOG_INFO-written-as-severity-6'],
+     r"record.6.: some information.*alive", None),
+    ('BRIDGE_LOG_DEBUG-written-as-severity-7', ['host', 'BRIDGE_LOG_DEBUG-written-as-severity-7'],
+     r"record.7.: a detail.*alive", None),
+    ('BRIDGE_DECLARE_TAG-carried-by-two-of-three', ['host', 'BRIDGE_DECLARE_TAG-carried-by-two-of-three'],
+     r"frozen.*alive", None),
+    ('bridge_take_scratch-more-than-given-stops-the-module', ['host', 'bridge_take_scratch-more-than-given-stops-the-module'],
+     r"module 'game:mover@0\.1\.0' did not load: its init trapped: wasm `unreachable` instruction executed.*alive", None),
+    ('bridge_list_modules-fills-no-more-than-asked', ['host', 'bridge_list_modules-fills-no-more-than-asked'],
+     r"2 loaded, and of two rows: test:ok@0\.1\.0, untouched\s+alive", None),
+    ('BACKEND_MEMORY_LIMIT-lacking-memory-limit-refused', ['host', 'BACKEND_MEMORY_LIMIT-lacking-memory-limit-refused'],
+     r"module 'game:mover@0\.1\.0' is refused: it states memory_limit, which backend 'native' cannot keep.*alive", r"cannot open"),
+    ('bridge_load-import-nobody-answers', ['host', 'bridge_load-import-nobody-answers'],
+     r"module 'test:stray@0\.1\.0' did not load: cannot instantiate: unknown import: `elsewhere::nothing` has not been defined.*alive", None),
 ]
 
 # these again, through the static library: what a host does first, to create a bridge and to
