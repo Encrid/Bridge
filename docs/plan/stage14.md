@@ -91,3 +91,33 @@ wrongly.
     extensible    a document written later is held by the same scripts
     minimal       seven kinds, each by a rule that was there
     explicit      what is looked for is listed, and what is not is said
+
+### What is said of what is not built
+
+**One mark, in one form, and a script holds it.** Three things are designed and not built: the
+diagnostics, which are `validate`, the profile and how full a budget is; the parser of a
+manifest; and the seam for a language that is not C. The documents said so four ways: a
+sentence at the top of `profile.md`, a sentence in bold beside the fields in `host_api.md`,
+"when they exist" in `config.md`, and nothing at all over *The checksum pass, when asked* of
+`validation.md`, which reads as built.
+
+**The form is the one `profile.md` has.** A section that states what is not built opens by
+saying so and by naming where it is built. A mention anywhere else cites that section, and says
+nothing of the thing in the present tense. So a reader meets the mark before the design, and
+one sentence is removed the day the thing is built.
+
+**A script fails on an unbuilt name anywhere else.** It has the names that are not built, each
+with the section that states it, and reads the documents and the comments of the headers: a
+name outside its section that is not in a citation of it fails. The stage that builds a thing
+takes its names out of the list, and the mark then fails until it is removed with them. Without
+the script the next unmarked mention is found by nobody, as that of `validation.md` was not.
+
+The design stays in the documents of the design: it is decided, and `stage0.md`, step 9, puts
+a decision in the document it belongs to.
+
+    fast          no part of this runs
+    scalable      a thing designed later is a row of the list
+    modular       the design stays where it belongs, and the plan says when
+    extensible    the stage that builds a thing removes its rows, and is told what else to
+    minimal       one sentence a section, and one list
+    explicit      nothing unbuilt reads as built, and a slip fails
