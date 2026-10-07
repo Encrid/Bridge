@@ -75,23 +75,39 @@ Six, in this order, since each shapes the next.
 
 ### What a capability is
 
-**A capability is a sentence that says the library does or refuses something, and that a host, a
-module or a backend could observe to be false.** The documents hold four kinds of sentence, and
-this is two of them: a behaviour, "what an observer queues applies at the next barrier, not this
-one", and a refusal, "a `declare` past either is refused, by name". A reason and a cost are not
-capabilities: nothing a test does makes "why the type travels as data" false. Neither is what a
-later stage builds.
+**A capability is what Bridge-ASM700 exposes: a thing somebody outside the library can interact
+with, on one of its three seams.** Those are the three there are, and all three count:
 
-**A contract is listed apart.** "Legal only between phases" is stated and nothing enforces it, so
-it has no case and cannot have one. It is written down as that, stated and not enforced, with the
-sentence that says so, so that its missing case is not read as a gap.
+    the host seam       `bridge.h`: what a host calls, and the configuration it hands over
+    the module seam     `bridge_abi.h` and a backend's SDK: the entries a module calls, and
+                        what it reads and writes in the two memories
+    the backend seam    `bridge_backend.h`: the entries a backend answers
+
+So the list begins from the surface and not from the prose: every function, every entry, every
+key of a configuration, every layout a module reads. That is finite, and a script can count it.
+For each, what it does and what it refuses is what a case shows.
+
+**A behaviour that is no one entry's is a capability too, and hangs on the entries it is reached
+through**: the order within a phase, what an unload leaves behind, what running out of a budget
+does, one deployment giving the same result on one thread and on four. Somebody outside
+interacts with each of these, through several entries at once.
+
+It was first decided as a sentence of a document that could be observed to be false, and Enkrid
+corrected it the same day, 2026-10-07: the unit is what is exposed, and a sentence is how a
+document states it. The difference is where the list starts. From the documents it is some
+hundreds of sentences with no end until all are read, and it misses an exposed thing no document
+describes. From the surface it is bounded, and a thing with no case is found by counting.
+
+**What is not one.** A reason and a cost. What a later stage builds. And a contract, which is
+stated and which nothing enforces - "legal only between phases" - so it has no case and cannot
+have one: it is listed apart as that, so that its missing case is not read as a gap.
 
     fast          no part of this runs
-    scalable      a new sentence is judged by one question
+    scalable      a new entry or key is a capability the day it is exposed
     modular       the edge of the list is the three seams, which is where the library ends
-    extensible    stages 17 and 18 add theirs by the same question
-    minimal       some hundreds of sentences, each read once
-    explicit      a sentence is a capability, a contract, or neither, and the list says which
+    extensible    stages 17 and 18 add to the surface, and so to the list
+    minimal       the surface is counted, and not found by reading
+    explicit      a thing is exposed or it is not, and each that is has its cases
 
 ### Where the list lives
 

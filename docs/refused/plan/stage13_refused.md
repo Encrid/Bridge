@@ -6,12 +6,19 @@ What was weighed in `stage13.md` and refused, each with the condition that would
 
 Of `stage13.md`, *What a capability is*.
 
-Refused: every sentence in bold. There are 313, a script finds them, and about a third are reasons
-with nothing to test, while a claim that sits in a table or in the middle of a sentence is missed.
-Bold would mean two things. No condition brings it back.
+Refused, after it had been taken: a capability as a sentence of a document that could be observed
+to be false. The edge is the same, outside the library, and the unit is wrong: it makes the list
+some hundreds of sentences to be read, tests prose, and misses what is exposed and written
+nowhere. No condition brings it back.
 
-Refused: the refusals, and what already points at a case. About 170, the smallest list, and a
-behaviour that is not a refusal would never be listed. No condition brings it back.
+Refused: every sentence in bold. There are 313, a script finds them, and about a third are reasons
+with nothing to test. No condition brings it back.
+
+Refused: the refusals, and what already points at a case. About 170, and a behaviour that is not
+a refusal would never be listed. No condition brings it back.
+
+Refused: the host seam and the module seam, and not the backend's. A backend is written by
+somebody outside as a host and a module are. No condition brings it back.
 
 ## Where the list lives
 
