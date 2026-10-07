@@ -78,8 +78,8 @@ new design.
 
 `plan.md` named three of them, c, f and what stage 13 showed claimed and not held. The count
 turned up b, d, e and g, and a is the one no script finds. Each kind is a defect by a rule that
-is written: `stage0.md`, step 9, for where a decision is said, and *One word, one meaning* in
-all but name for c.
+is written: `stage0.md`, step 9, for where a decision is said, and step 5, which refuses two
+things that answer one question, for c.
 
 **What is outside**: wording for taste; a decision of the design taken again; and the records
 of `plan/` and `refused/`, which say what was decided and when, except where one is cited
