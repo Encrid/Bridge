@@ -55,9 +55,8 @@ nothing after - `storage.md`, *What bounds it*. A `declare` or a `add_system` pa
 refused there, by name, which fails that module's `init`.
 
 **`terms` is the most one system or observer may ask for**, and it is a key for the same reason:
-storage keeps a system's terms in a record made when the bridge is, so the record has a length. It
-was a constant, 32, and the number was flecs' default with nothing of ours behind it. No module
-compiles against the number, so it is one number and the deployment's.
+storage keeps a system's terms in a record made when the bridge is, so the record has a length.
+No module compiles against the number, so it is one number and the deployment's.
 
 **Per module, when that module registers:** its scratch arena, its log ring and its spans - which
 is to say, this tier sizes that module's private memory. And what is set aside for it in the shared

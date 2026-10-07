@@ -48,7 +48,7 @@ document as `sandbox` does.
 Bridge-ASM700 learns what to do with a backend's library at `bridge_destroy` - `create.md`,
 *Destroy*. It says the library **may** go, and Bridge-ASM700 then closes it; whether it is then
 unmapped is the operating system's. Windows and Linux unmap it. macOS does too, unless the image
-has a thread-local variable: the native backend's had one and stayed, has none now and goes, and
+has a thread-local variable, and the native backend's has none.
 `tests/host`, case `BACKEND_UNLOAD-library-gone-or-kept`, asks the operating system on all three. So
 a mismatch is not a module arguing with a backend - it is **config contradicting config**, since the
 deployment chose both. It is therefore one of Bridge-ASM700's own refusals and takes init's path

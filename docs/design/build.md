@@ -92,8 +92,7 @@ language needs none of these headers: *What an author is not bound by*.
 **The language is used fully, or C23 was not worth choosing over C11.** Every older spelling that
 C23 replaces is replaced, and a macro stays only where the preprocessor is what is needed:
 
-    keywords       bool, true and false with no header; nullptr; static_assert; alignof;
-                   thread_local
+    keywords       bool, true and false with no header; nullptr; static_assert; alignof
     enums          every one named, with its width stated: enum bridge_kind : uint32_t. A field
                    or a parameter that holds one has that type
     constants      a number or a text with a name is a typed constexpr - `style.md`, rule H3.
@@ -120,16 +119,11 @@ claim that can be false. One spelling of C23 is not used: a function that takes 
 four targets has it, the three platforms and wasm. `_BitInt`, `#embed` and `char8_t` have nothing
 here to do.
 
-The build was C11 before anyone chose, and then C99 was chosen for the whole tree, for the sake of
-one number that matched flecs. Compiling it showed the price. wasmtime's headers are not C99, so one
-file needed an exception and there was no single number after all. C99 has no word for thread-local
-storage, so the context would have been passed: a native module's ABI changed for it, and the flecs
-patch reached into two functions that have no world to pass.
-
-**One thread-local variable is left.** The wasm backend finds the memory wasmtime is asking it to
-create by which thread is running, because that callback of wasmtime's carries no context. Two
-others are gone: flecs' allocator callbacks could not say which bridge they worked for, and the
-native backend used one to know which module had called, where it now passes the table.
+**No variable is a thread's own.** `thread_local` is C23's and is not used: nothing in the
+library or in a backend is found by which thread is running. The wasm backend finds the memory
+wasmtime is asking it to create by a mark on the backend, set under its lock, because that
+callback of wasmtime's carries no context - `wasmtime.md`, *Memory*. The native backend knows
+which module called by the table it passes - `native.md`, *The invariant*.
 
 ## Where a function is
 
