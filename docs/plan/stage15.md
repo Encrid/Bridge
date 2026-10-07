@@ -16,9 +16,9 @@ outside.
                          every file, and the expression of `tools/style.py` that holds it
     4  the original      one name for the original Bridge wherever it is meant
     5  the check         a script fails on the old name anywhere in the tree
-    6  outside the tree  four actions, in this order, each confirmed before it is made: the
-                         original's repository renamed, with its remote; the original's
-                         folder; this repository renamed, with its remote; this folder, last
+    6  outside the tree  this history into the repository the earlier ones are in, and those
+                         kept under names of their own: *Outside the tree*. Each action
+                         confirmed before it is made
     7  close             by the done-when
 
 ## What there was, before any of it
@@ -46,25 +46,67 @@ Counted on `e635bf0`, the tree stage 14 left.
 
 ## The decisions
 
-Six. The fourth was taken while the stage was planned.
+Six. The fourth was taken while the stage was planned, and taken again when it was begun.
 
     1  what the original Bridge is called from now on, in the documents
     2  "Bridge" and "the bridge"
     3  the records
-    4  outside the tree: what is renamed to what
-    5  what follows the original's rename
+    4  outside the tree: one repository, and what the earlier iterations are called
+    5  the folders on this machine
     6  what holds it
 
 ### Outside the tree
 
-**The original is renamed first, and this one takes the name it leaves.** Enkrid ruled it on
-2026-10-07, when the plan had only asked whether the repository was to be renamed at all. The
-original's repository is in the same organisation under the name this one is to have, so the
-name was not free.
+**One repository: this history becomes `main` and `dev` of `Heuretes-Workshop/Bridge`, and what
+was there is kept beside it under `legacy/`.** Enkrid ruled it on 2026-10-07, over what had
+been decided an hour before, which was to rename the original's repository to free the name.
+Two things were wrong with that. "Legacy" named one thing where there had been many: the
+repository holds four designs, of which the Rust one is the last. And another project has that
+repository as a submodule, which is an address and a commit: under a rename, the address would
+have answered with a repository that has no such commit.
 
-    the original    the repository `Heuretes-Workshop/Bridge-Legacy`, the folder `Bridge-Legacy`
-    this library    the repository `Heuretes-Workshop/Bridge`, the folder `Bridge`
+A repository holds any number of histories that share no commit, and a branch is a name for
+one commit. So the 307 commits of this library go in beside the 681 that are there, and none
+is rewritten. No repository is renamed, no address changes, and the commit the submodule names
+stays reachable.
 
-Four actions, in the order that never leaves two things with one name: the original's
-repository, the original's folder, this repository, this folder. Each is asked before it is
-made, since each is outside the tree and seen by whoever has the old address.
+**What was there, and what each is called.** It was kept as branches numbered 0.35 to 0.38,
+which read as versions of one thing and are neither: the number counted iterations, and the
+package says 0.1.0 throughout. Read one by one, they are four designs, and two of the numbers
+mark the same one on its way:
+
+    0.35          a plugin framework in C++17, of      the tag `legacy/cpp-plugins`
+                  native libraries loaded dynamically
+    0.36          a module system in C17 with a        the tag `legacy/c-abi`
+                  stable C ABI
+    0.37          the first in Rust: a supervisor      the tag `legacy/rust-supervisor`
+                  of WebAssembly components
+    0.38          the same, with backends, plugins     the tag `legacy/rust-backends`
+                  and an SDK
+    main, dev     the same, finished: a host for       the branch `legacy/rust-components`,
+                  modules of the Component Model       at what `dev` was
+    dev-web-      its web backend, kept apart          the branch `legacy/rust-web-backend`
+    backend
+
+A point that never moves is a tag, and the first four are that: three were plain ancestors of
+`main` with nothing of their own. The last Rust line is a branch, since it has four commits
+`main` had not, issues open against it, and the submodule's commit on it. No name has a
+number: the count was not kept, and a name that needs none cannot be wrong. The dates git holds
+say the order.
+
+**`Heuretes-Workshop/Bridge-ASM700` is archived, and not deleted**, once its history is in the
+other. The folder on this machine is decided with the actions, below.
+
+    fast          no part of this runs
+    scalable      another design, if there is one, is one more name under `legacy/`
+    modular       each design is whole under its own name, and shares no commit with another
+    extensible    nothing that points at the repository has to change
+    minimal       one repository, and no rename
+    explicit      a name says what a design was, and no name says a version it never had
+
+**The actions, each asked before it is made**, in the order that loses nothing if one stops:
+the six names made in the repository, at the commits above; the old branches `0.35` to `0.38`
+and `dev-web-backend` removed, once their tags and branch are there; this history pushed as
+`main` and `dev`, which moves `main` to a commit that is no descendant of what it was and so
+is forced; the repository's default branch and description; this repository archived; and the
+two clones on this machine.
