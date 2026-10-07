@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -75,7 +75,7 @@ static int say_trap(const char *name, backend_err_t *err)
 ** Calls a lifecycle export once, under its timeout. What it changes is
 ** applied after the last barrier's observers and before the next phase's
 ** systems, in the order the calls were made. An entry that refused is the
-** reason: Bridge-ASM700 knows why better than the trap does.
+** reason: Bridge knows why better than the trap does.
 **
 ** threads.md, *Threads*
 */

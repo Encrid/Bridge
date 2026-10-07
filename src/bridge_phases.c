@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -18,7 +18,7 @@
 ** add_phase
 **
 ** Takes the phase `i` of the deployment. It is counted once it has its name,
-** so that a bridge that is refused frees it.
+** so that a deck that is refused frees it.
 **
 ** create.md, *Create*
 */
@@ -48,9 +48,9 @@ static int add_phase(bridge_t *b, const bridge_config_t *cfg, uint32_t i)
 ** bridge_name_phases
 **
 ** Takes the deployment's phases. It declares its own: there is none of
-** Bridge-ASM700's to run.
+** Bridge's to run.
 **
-** schedule.md, *Bridge-ASM700 ships no phase names*
+** schedule.md, *Bridge ships no phase names*
 */
 int bridge_name_phases(bridge_t *b, const bridge_config_t *cfg)
 {
@@ -58,7 +58,7 @@ int bridge_name_phases(bridge_t *b, const bridge_config_t *cfg)
 
     if (!cfg->phase_count) {
         say_error(b, "the deployment declares no phase, and there is none "
-            "of Bridge-ASM700's to run");
+            "of Bridge's to run");
         return (1);
     }
     while (i < cfg->phase_count && !add_phase(b, cfg, i))

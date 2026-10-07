@@ -10,7 +10,7 @@ by the conflict graph; what runs at once is a module at a time.
 
 **A module's systems cannot overlap because they share what only one of them may use.** On the
 wasm backend a module is one instance in one store, and a store is entered by one thread. On both
-backends it has one private memory: Bridge-ASM700 writes there which system is running and when,
+backends it has one private memory: Bridge writes there which system is running and when,
 before each call, and the module moves one scratch pointer and one log ring head there. On the
 native backend it has its own globals, which nothing guards.
 
@@ -21,7 +21,7 @@ and be ordered.
 
 **How many threads is stated**, as `threads`, and it counts the one that called `bridge_run_phase`: that
 thread works too, and at `threads = 1` it does everything, in an order that never varies.
-Bridge-ASM700 keeps the others for as long as it exists.
+Bridge keeps the others for as long as it exists.
 
 **No entry takes a lock, and none reaches storage.** Modules run at once, and what one is given must
 not depend on who ran beside it - `schedule.md`, *What a pass depends on*. So everything an entry
@@ -48,7 +48,7 @@ a lifecycle call, never in a phase.
 What it costs is `spawns` and `persistent`, two more values a module states: `budgets.md`,
 *Budgets*.
 
-Across modules, two systems whose terms conflict never run at once. Bridge-ASM700 knows which from the
+Across modules, two systems whose terms conflict never run at once. Bridge knows which from the
 declared terms, so the hot path is lock-free by construction rather than by care.
 
 Those declarations give **parallelism, not order**. Where order comes from, and what happens when

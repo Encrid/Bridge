@@ -1,11 +1,11 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** src/bridge_stop.c -- a bridge stopped by the loss of a module, and let run
+** src/bridge_stop.c -- a deck stopped by the loss of a module, and let run
 ** again.
 */
 
@@ -48,8 +48,8 @@ const module_t *bridge_find_pinned(const bridge_t *b)
 /*
 ** bridge_stop
 **
-** Stops the bridge for the loss of a module stated `fail`, and keeps why and
-** the module's name without its version. A bridge that has stopped stays
+** Stops the deck for the loss of a module stated `fail`, and keeps why and
+** the module's name without its version. A deck that has stopped stays
 ** stopped for its first reason.
 **
 ** failure.md, *When something fails*
@@ -66,13 +66,13 @@ void bridge_stop(bridge_t *b, const char *identity, const char *what)
         identity);
     b->stopped_by = b->stopped_why;
     b->stopped_stem = b->stopped_name;
-    say_error(b, "the bridge has stopped: %s", b->stopped_why);
+    say_error(b, "the deck has stopped: %s", b->stopped_why);
 }
 
 /*
 ** bridge_resume
 **
-** Lets the bridge run again, if `m` is the module it was waiting for.
+** Lets the deck run again, if `m` is the module it was waiting for.
 **
 ** failure.md, *When something fails*
 */
@@ -84,14 +84,14 @@ void bridge_resume(bridge_t *b, const module_t *m)
         return;
     b->stopped_by = nullptr;
     b->stopped_stem = nullptr;
-    say_about(b, &about, "the bridge runs again: module '%s' is back",
+    say_about(b, &about, "the deck runs again: module '%s' is back",
         m->identity);
 }
 
 /*
 ** bridge_give_up
 **
-** Lets the bridge run again without the module that stopped it.
+** Lets the deck run again without the module that stopped it.
 **
 ** failure.md, *When something fails*
 */
@@ -103,6 +103,6 @@ void bridge_give_up(bridge_t *b, const module_t *m)
         return;
     b->stopped_by = nullptr;
     b->stopped_stem = nullptr;
-    say_about(b, &about, "the bridge runs again: module '%s' is unloaded, "
+    say_about(b, &about, "the deck runs again: module '%s' is unloaded, "
         "and it goes on without it", m->identity);
 }

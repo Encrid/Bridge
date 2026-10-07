@@ -1,11 +1,11 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** src/storage.h -- what Bridge-ASM700 asks of the thing that keeps its rows.
+** src/storage.h -- what Bridge asks of the thing that keeps its rows.
 **
 ** Each entry is named for the request, as the backend seam's are, and not
 ** for how any storage goes about it: at load a type is declared and a
@@ -82,7 +82,7 @@ typedef void (*storage_visit_fn_t)(storage_t *r, uint32_t index, void *ctx);
 /*
 ** storage_create
 **
-** Makes a bridge's storage, sized by its budget. nullptr if it cannot be
+** Makes a deck's storage, sized by its budget. nullptr if it cannot be
 ** made, and a record says why.
 */
 [[nodiscard]] storage_t *storage_create(bridge_t *b);
@@ -90,7 +90,7 @@ typedef void (*storage_visit_fn_t)(storage_t *r, uint32_t index, void *ctx);
 /*
 ** storage_destroy
 **
-** Frees a bridge's storage.
+** Frees a deck's storage.
 */
 void storage_destroy(storage_t *r);
 

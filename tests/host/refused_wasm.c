@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -17,7 +17,7 @@
 /*
 ** test_create_no_sink
 **
-** A bridge asked for with no sink is refused.
+** A deck asked for with no sink is refused.
 */
 void test_create_no_sink(host_t *h)
 {
@@ -66,7 +66,7 @@ void test_name_no_backend(host_t *h)
 /*
 ** test_open_no_library
 **
-** A backend whose library cannot be opened refuses the bridge.
+** A backend whose library cannot be opened refuses the deck.
 */
 void test_open_no_library(host_t *h)
 {

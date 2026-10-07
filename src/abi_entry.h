@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -21,7 +21,7 @@
 **
 ** Answers `len` bytes of a module's scratch arena at `at`, or nullptr if
 ** they do not lie in it: the one memory a module can write that
-** Bridge-ASM700 can read and bounds-check.
+** Bridge can read and bounds-check.
 */
 static inline const void *get_scratch(const module_t *m, uint64_t at,
     uint64_t len)

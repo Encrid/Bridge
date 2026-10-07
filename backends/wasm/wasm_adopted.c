@@ -1,11 +1,11 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** backends/wasm/wasm_adopted.c -- a block Bridge-ASM700 owns, as a memory
+** backends/wasm/wasm_adopted.c -- a block Bridge owns, as a memory
 ** of wasmtime's, and the engines, which are made with what answers wasmtime
 ** for a memory.
 **
@@ -38,7 +38,7 @@ static wasmtime_error_t *grow_adopted(void *env, size_t new_size)
 **
 ** What wasmtime calls for every linear memory an instance defines: the
 ** adopted block its backend states, or a memory of the module's own. `env`
-** is the backend. An adopted block has no finalizer: it is Bridge-ASM700's
+** is the backend. An adopted block has no finalizer: it is Bridge's
 ** to free. The signature is wasmtime's.
 */
 static wasmtime_error_t *make_memory(void *env,

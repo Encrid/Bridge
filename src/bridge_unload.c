@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -50,7 +50,7 @@ static void take_out(bridge_t *b, module_t *m)
 /*
 ** bridge_unload
 **
-** Unloads a module. A stopped bridge takes an unload of the module that
+** Unloads a module. A stopped deck takes an unload of the module that
 ** stopped it, and of no other. Its systems are out of the schedule before
 ** its last call; and after the barrier what left is out of every module's
 ** spans, and observed.

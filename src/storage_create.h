@@ -1,12 +1,12 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
 ** src/storage_create.h -- storage made: everything it holds is sized by a
-** budget and allocated when the bridge is created, and nothing after.
+** budget and allocated when the deck is created, and nothing after.
 **
 ** storage.md, *What bounds it*
 */

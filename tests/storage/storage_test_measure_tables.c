@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -67,7 +67,7 @@ static void measure_sets(storage_test_t *t)
 ** storage_test_measure_tables
 **
 ** Ten thousand tables made, a barrier with them standing, ten thousand
-** more, and the sets filled and emptied, in a bridge of its own. Answers 1
+** more, and the sets filled and emptied, in a deck of its own. Answers 1
 ** if the module could not be loaded.
 */
 int storage_test_measure_tables(storage_test_t *t)

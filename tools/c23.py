@@ -2,7 +2,7 @@
 
     c23.py
 
-Reads everything of Bridge-ASM700's own - the source, the backends, the headers, the tests and
+Reads everything of Bridge's own - the source, the backends, the headers, the tests and
 their modules - and fails on a spelling C23 replaced. Comments and string literals are not
 read: a document may say NULL. A backend's dependency is not ours and is not read either.
 

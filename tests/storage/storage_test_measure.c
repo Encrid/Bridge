@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -71,7 +71,7 @@ static void say_ops(const storage_test_times_t *m)
 /*
 ** measure_changes
 **
-** Each kind of change, of a hundred thousand entities in the bridge main
+** Each kind of change, of a hundred thousand entities in the deck main
 ** made. What is held is said with every entity carrying both components
 ** again: a destroyed one holds nothing in either. Answers 1 if the module
 ** could not be loaded.
@@ -99,7 +99,7 @@ static int measure_changes(storage_test_t *t)
 /*
 ** storage_test_measure
 **
-** Each kind of change; then the same bridge with ten thousand tables
+** Each kind of change; then the same deck with ten thousand tables
 ** standing; then the stress run, on four threads and on one: eight million
 ** changes and their checks.
 */

@@ -53,7 +53,7 @@ specific to this backend is **when** it is read.
 has run the library's static initialisers. So you would be checking whether a module is trusted
 after executing it, and a library cannot be cleanly unloaded. Read, then decide, then load.
 
-**The section is a convention the host reads, not something Bridge-ASM700 parses.** Bridge-ASM700 is
+**The section is a convention the host reads, not something Bridge parses.** Bridge is
 handed the identity as data - `host_api.md`, *The data* - so walking the section tables of an
 object file is no part of the library: `module.md`, *The parser of a manifest*.
 
@@ -71,14 +71,14 @@ Three exported symbols, the lifecycle every module has, and each is handed the t
     int  bridge_shutdown(const bridge_api_t *api);
     int  bridge_reload(const bridge_api_t *api);
 
-**The argument is the native backend's, not Bridge-ASM700's.** A wasm module gets its imports when
+**The argument is the native backend's, not Bridge's.** A wasm module gets its imports when
 it is linked; a shared library has no import section to fill, so this backend hands the same things
-over with every call it makes into the module. Bridge-ASM700 never sees it: it asks a backend to
-call a function, and every function **Bridge-ASM700** calls takes no arguments and answers a
+over with every call it makes into the module. Bridge never sees it: it asks a backend to
+call a function, and every function **Bridge** calls takes no arguments and answers a
 status - `signatures.md`, *A call takes nothing and answers a status*. What a backend passes to
 what it runs is the backend's SDK.
 
-**Exports are named `bridge_<name>`.** Bridge-ASM700 asks the backend for `init`, or for a system called
+**Exports are named `bridge_<name>`.** Bridge asks the backend for `init`, or for a system called
 `movement`, and the native backend looks up `bridge_init` and `bridge_movement`. A C process has one
 flat symbol namespace, so `init` is not a name a library can safely export; the prefix is the
 backend's stated rule rather than a rename nobody can see.
@@ -116,13 +116,13 @@ An entry the backend is asked to provide that is none of the eight is refused, b
 the table has no place for it.
 
 The same eight functions and the same two memories a wasm module has, because what an ABI entry
-does and what is in memory are Bridge-ASM700's and the same on every backend. How a module
+does and what is in memory are Bridge's and the same on every backend. How a module
 reaches them is this backend's: a table, passed.
 
 **`add_system` and `observe` take a name, as they do everywhere.** The backend resolves it to an
 exported symbol, so the phase, the events, the terms and the slot are identical on both backends and
 the scheduler cannot tell them apart. An entry's arguments are offsets into the scratch arena, on
-this backend as on any: Bridge-ASM700 reads them, and the scratch arena is the one memory of a
+this backend as on any: Bridge reads them, and the scratch arena is the one memory of a
 module it can bounds-check - `abi.md`, *The ABI*. The SDK does the copy: `bridge_native_put`.
 
 **An entry is told whose it is by the table it is given.** A module's table is part of its instance,
@@ -134,7 +134,7 @@ started.
 
 **A refused entry answers zero, and so does every entry after it until the call returns.** Nothing
 can unwind native code - `budgets.md`, *What running out does* - so the backend does the nearest
-thing: the system runs to its end reaching nothing, and Bridge-ASM700 fails the invocation when it
+thing: the system runs to its end reaching nothing, and Bridge fails the invocation when it
 returns. Without the second half a loop of `spawn` past the entity ceiling would go on minting ids
 for as long as the loop ran.
 
@@ -182,5 +182,5 @@ given them to stay honest, not because anything could stop it reading what it wa
 A `VkDevice` or a GL context would fit in a `u64` and the component layout would even be sound, but
 **storage survives an unload by design**, so the handle outlives the module that made it and the
 next reader uses it happily. Two native modules that must share a device share it the way two native
-libraries in one process always have - by being built to - and that is not Bridge-ASM700's business.
-Bridge-ASM700's storage is for data a component describes, and a pointer is not that.
+libraries in one process always have - by being built to - and that is not Bridge's business.
+Bridge's storage is for data a component describes, and a pointer is not that.

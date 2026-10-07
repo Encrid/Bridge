@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -75,7 +75,7 @@ BACKEND_EXPORT void memory_get_shape([[maybe_unused]] backend_t *b,
 /*
 ** memory_adopt
 **
-** Adopts a block Bridge-ASM700 reserved, which is almost nothing: the
+** Adopts a block Bridge reserved, which is almost nothing: the
 ** pointer is already addressable.
 */
 BACKEND_EXPORT backend_memory_t *memory_adopt([[maybe_unused]] backend_t *b,

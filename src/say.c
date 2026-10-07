@@ -1,11 +1,11 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** src/say.c -- a record of Bridge-ASM700's own, handed to the host's sink.
+** src/say.c -- a record of Bridge's own, handed to the host's sink.
 */
 
 #include <stdarg.h>
@@ -37,7 +37,7 @@ static void send_record(bridge_t *b, const say_t *about, const char *text)
 /*
 ** say_error
 **
-** Hands the sink an error of Bridge-ASM700's own, about no module.
+** Hands the sink an error of Bridge's own, about no module.
 */
 void say_error(bridge_t *b, const char *format, ...)
 {

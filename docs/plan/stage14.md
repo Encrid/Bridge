@@ -274,8 +274,8 @@ stage 13 were.
 ### A load refused before the module exists
 
 **It stops nothing, whatever `on_error` says, and the documents say so.** `failure.md` and
-`capabilities.md` said that every refusal of Bridge-ASM700's own takes init's path, so that a
-module stated as `fail` stops the bridge when a capability its backend lacks refuses it. The
+`capabilities.md` said that every refusal of Bridge's own takes init's path, so that a
+module stated as `fail` stops the deck when a capability its backend lacks refuses it. The
 code has two moments. Before the module has a record, its config is held against the
 deployment and the backend, and a refusal there is answered by `bridge_load` and no more. After,
 a failure goes by `on_error`. The messages had the two phrases already: "is refused", and "did
@@ -325,7 +325,7 @@ was right and the code was not, it is under *What the stage found*.
     budgets.md
     budgets.md           the list of kept settings is shortened, when a share is given back;
                          `work_limit` and `memory_limit` have no floor
-    failure.md           `bridge_list_modules` does not say which module stopped the bridge;
+    failure.md           `bridge_list_modules` does not say which module stopped the deck;
                          the allocations refused in turn are three hundred and some
     failure.md,          a load refused before the module exists does not go by `on_error`,
     capabilities.md      which was decided on the way, above
@@ -406,7 +406,7 @@ offset now, and the gap is a member.
 **The list of what is free in the column region did not count singletons.** A gap lies between
 two blocks, and the list has room for one beside every block there may be. A singleton has a
 block, and was not counted, so a deployment with many of them could have a freed range dropped
-from the list and its bytes lost to the bridge for good. The room is by `types` now, which
+from the list and its bytes lost to the deck for good. The room is by `types` now, which
 bounds them.
 
 **Stage 13 promised a report it did not build**: a message that no document states. It is built

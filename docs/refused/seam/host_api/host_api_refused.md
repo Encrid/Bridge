@@ -29,7 +29,7 @@ another time was read as it lay. No condition brings it back.
 Of `host_api.md`, *Nothing a host hands over is parsed*.
 
 Refused: the host opening the library and handing over a table of functions, which keeps
-Bridge-ASM700 away from every file and costs every host the same loader. The condition that brings
+Bridge away from every file and costs every host the same loader. The condition that brings
 it back is an embedder that must link a backend statically.
 
 ## The data

@@ -13,7 +13,7 @@ The module says only *that* it failed, never how badly. Severity is a deployment
 declaring its own failure fatal would take the game down, which is backwards from everything else
 the deployment grants it.
 
-What Bridge-ASM700 does is mostly not a choice, because the set of coherent outcomes differs by call site:
+What Bridge does is mostly not a choice, because the set of coherent outcomes differs by call site:
 
     init        the module never ran, so running without it is coherent:
                 `on_error = fail | skip`, per module, and stated: there is no default
@@ -28,39 +28,39 @@ What Bridge-ASM700 does is mostly not a choice, because the set of coherent outc
 A mod ships `on_error = "skip"` and the base game `"fail"`, which is the whole of what "a mod must
 not take the deployment down" needs.
 
-**`fail` stops the bridge, since Bridge-ASM700 cannot stop the program.** The host owns the process,
+**`fail` stops the deck, since Bridge cannot stop the program.** The host owns the process,
 so the most the library can do is refuse to go on: after a `fail` module fails, every `bridge_run_phase`
 is refused, and every load, unload and reload but one. `skip` refuses that one load and carries on.
 
-**A stopped bridge accepts two things, both about the module that stopped it.** One brings it back:
-a load of it, if it never loaded, or a reload of it. If that succeeds the bridge runs again, and
+**A stopped deck accepts two things, both about the module that stopped it.** One brings it back:
+a load of it, if it never loaded, or a reload of it. If that succeeds the deck runs again, and
 says so. The reason for stopping was running without the module, and with the module back there is
 nothing left of it. The other gives it up: an unload of it, by its name. That is the host saying the
 deployment goes on without it, which only the host can say; its components go by the policies they
-were declared with, as at any unload, and the bridge runs again. After it the host may load
+were declared with, as at any unload, and the deck runs again. After it the host may load
 anything, a module of another name in its place among them. `tests/host`, case
-`bridge_unload-of-what-stopped-the-bridge`. A module that never loaded has nothing to unload, and
+`bridge_unload-of-what-stopped-the-deck`. A module that never loaded has nothing to unload, and
 for it the ways on are a load that succeeds, or `bridge_destroy`.
 
-Storage running out does not stop a bridge. A barrier that cannot place an entity, for want of a
+Storage running out does not stop a deck. A barrier that cannot place an entity, for want of a
 table or of columns, leaves it as it was and counts as a barrier the module that asked failed in,
 beside whatever its systems did - `budgets.md`, *What running out does*.
 
 **`fail` covers a stop as it covers a load.** A module stated `fail` and then stopped at its budget
-stops the bridge too, because the reason does not change with the frame number: the deployment
+stops the deck too, because the reason does not change with the frame number: the deployment
 called it essential, and nothing else here would notice it gone - no module calls another, so none
 gets an error back. The key is `on_error`, and a reader who wrote `fail` expects it to mean every
-error that takes the module away. The record that says the bridge has stopped names the
+error that takes the module away. The record that says the deck has stopped names the
 module, and `bridge_list_modules` shows it stopped.
 
 ## Out of memory
 
 **An allocation that fails is a refusal like any other: the call that needed it answers that it
-failed, a record says "out of memory" and what for, and the bridge is as it was.** Bridge-ASM700
-asks the allocator for memory when a bridge is created and when a module is loaded, reloaded or
+failed, a record says "out of memory" and what for, and the deck is as it was.** Bridge
+asks the allocator for memory when a deck is created and when a module is loaded, reloaded or
 unloaded, and never in a phase or at a barrier - `budgets.md`, *Nothing is allocated in a phase*.
 So it is `bridge_create`, `bridge_load` or `bridge_reload` that fails, by the path each already
-has: a bridge that is not made, a module that is not loaded, a reload after which the old
+has: a deck that is not made, a module that is not loaded, a reload after which the old
 instance runs on where the backend could keep it.
 
 **Whatever a call needs is had before any of it is kept.** A type, a system and a module's
@@ -75,8 +75,8 @@ writes there again: without it that load takes fresh room, and a record says so.
 
 **It is held by answering every allocation null in turn.** `tests/storage` is built against a
 library whose calls to the allocator are counted - `budgets.md`, *Nothing is allocated in a phase*,
-has the same build - and the case `allocation-each-refused-in-turn` makes a bridge, loads a module,
-runs it, reloads it, unloads it and destroys the bridge, once for each of the three hundred and some
+has the same build - and the case `allocation-each-refused-in-turn` makes a deck, loads a module,
+runs it, reloads it, unloads it and destroys the deck, once for each of the three hundred and some
 allocations all of that makes, with that one answered null. Each time, something is refused, a
 record says "out of memory", and nothing is written through a null pointer.
 
@@ -105,13 +105,13 @@ that with a single number, and stops any system that fails more often than not.
 
 `-1`, `BRIDGE_NO_LIMIT`, means never stop it, as for every limit.
 
-**A stopped module keeps its components.** Stopping is something Bridge-ASM700 does on its own
-initiative, and unloading discards data, so the two are kept apart: Bridge-ASM700 never discards data
+**A stopped module keeps its components.** Stopping is something Bridge does on its own
+initiative, and unloading discards data, so the two are kept apart: Bridge never discards data
 uninvited. Stale-but-readable is the less destructive failure.
 A deployment that wants the data gone unloads the module - the verb that says so: `lifetime.md`,
 *Lifetime*.
 
-**Bridge-ASM700's own refusals come at two moments, and `on_error` governs the second.** Before the
+**Bridge's own refusals come at two moments, and `on_error` governs the second.** Before the
 module exists, its config is held against the deployment and against its backend: a key left
 unset, another ABI, a backend the deployment has not, a capability that backend cannot honour, a
 phase mapped to one the deployment did not declare. Nothing has begun. `bridge_load` answers

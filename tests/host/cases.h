@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -102,7 +102,7 @@ void test_state_reader_limited(bridge_artifact_t *a);
 **     pins, pins_here
 **                   the calls a pinned module said it had, and how many of
 **                   them were on the thread that loaded it
-**     last_sum      of two bridges with one sink, the last sum each said
+**     last_sum      of two decks with one sink, the last sum each said
 **     minted        the ids a run's modules were given, in the order the
 **                   records arrived, for each of three runs
 **     minting       which run is in progress, or -1
@@ -122,7 +122,7 @@ typedef struct {
 } test_counts_t;
 
 /*
-** Who a bridge's records are from: the counts, and which of two bridges it
+** Who a deck's records are from: the counts, and which of two decks it
 ** is, or -1 where there is one.
 */
 typedef struct {

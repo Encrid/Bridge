@@ -151,7 +151,7 @@ No condition brings it back.
 Of `stage12.md`, *The refactor, as it goes*. G4 is excepted under `tests/modules`.
 
 Refused: a region of the private block for a module's own state, with a config key that sizes
-it. The bridge would size and publish what it never reads, each read in a wasm module would go
+it. The deck would size and publish what it never reads, each read in a wasm module would go
 through an accessor, and where the region is would still be a number the module keeps. The
 condition that brings it back is a module whose state has to outlive its instance.
 

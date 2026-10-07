@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -110,8 +110,8 @@ static int weigh_tables(storage_test_t *t)
 /*
 ** storage_test_weigh
 **
-** Every figure, each in a bridge of its own with [budget] columns of 256
-** MB. The last of those bridges is left for main to destroy.
+** Every figure, each in a deck of its own with [budget] columns of 256
+** MB. The last of those decks is left for main to destroy.
 */
 enum storage_test_end storage_test_weigh(storage_test_t *t)
 {

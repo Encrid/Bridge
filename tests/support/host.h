@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -31,10 +31,10 @@ constexpr int64_t HOST_MS = 1'000'000;
 **     kept          what the program's fixtures keep beside the host
 **     backends      the two backends there are, of which cfg names some
 **     phases        "update" and "present", of which cfg names some
-**     cfg           what the bridge is created from: a case changes it
+**     cfg           what the deck is created from: a case changes it
 **                   before it opens the host
 **     sink, ud      who is handed every record, and with what
-**     b             the bridge, once the host is open
+**     b             the deck, once the host is open
 */
 typedef struct host {
     const char *what;
@@ -81,7 +81,7 @@ int host_run(host_t *h, const host_case_t *cases, size_t count);
 /*
 ** host_open
 **
-** Creates the host's bridge. Answers 1, having said "bridge_create refused"
+** Creates the host's deck. Answers 1, having said "bridge_create refused"
 ** and "alive", if it was refused: the case is over.
 */
 [[nodiscard]] int host_open(host_t *h);
@@ -89,7 +89,7 @@ int host_run(host_t *h, const host_case_t *cases, size_t count);
 /*
 ** host_close
 **
-** Destroys the host's bridge and says "alive".
+** Destroys the host's deck and says "alive".
 */
 void host_close(host_t *h);
 

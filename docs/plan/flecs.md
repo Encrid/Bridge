@@ -10,11 +10,11 @@ it.
 
 ## Why the backend is swappable and this is not
 
-The backend surface abstracts a **behaviour**: Bridge-ASM700 hands over bytes, memories and host
+The backend surface abstracts a **behaviour**: Bridge hands over bytes, memories and host
 functions and asks for a function to be run, never looking inside. That is why the native backend
 implements the same seventeen entries and nothing leaks.
 
-An ECS surface would have to abstract a **memory layout**. Bridge-ASM700 needs four things of flecs: its
+An ECS surface would have to abstract a **memory layout**. Bridge needs four things of flecs: its
 column addresses, because a span's `base[]` *are* offsets into its columns; its entity index, to
 mirror; a row move it does not publish at all, so the mirror cannot drift; and control of its
 allocator, so columns land inside the shared memory. None of that is what an ECS does - it is how *this* ECS
@@ -48,7 +48,7 @@ The one place the embedding is not free. A wasm module reads component bytes wit
 bytes must sit inside the block backing the shared memory - and flecs, left alone, allocates wherever the
 system allocator puts it.
 
-So Bridge-ASM700 allocates that block, hands it to each backend as the shared memory, and gives
+So Bridge allocates that block, hands it to each backend as the shared memory, and gives
 flecs an allocator that carves columns out of it. One copy of the data: a native module reads it
 through real pointers, a wasm module reads the same bytes at `pointer - block start`. Neither goes
 through flecs to do it.
@@ -87,13 +87,13 @@ that argument means, and replaces the four allocations `flecs_table_shrink` make
 A `NULL` allocator still means the OS, which the rest of flecs relies on. Refused: making `NULL`
 itself mean the block, which would capture every other caller that passes it.
 
-What reaches Bridge-ASM700 is `flecs_confine`: allocate, reallocate and free, each handed its sizes,
+What reaches Bridge is `flecs_confine`: allocate, reallocate and free, each handed its sizes,
 set once before `ecs_init`. It is a global, as `ecs_os_api` is and for the same reason: the functions
 doing the allocating have no world in scope.
 
-**So which bridge a column is for is whichever the calling thread is working for.** Every way into
-Bridge-ASM700 notes its bridge for the thread before it reaches flecs, and the allocator reads that.
-Two bridges in one process are then two worlds that never see each other's block, on one thread or
+**So which deck a column is for is whichever the calling thread is working for.** Every way into
+Bridge notes its deck for the thread before it reaches flecs, and the allocator reads that.
+Two decks in one process are then two worlds that never see each other's block, on one thread or
 on two. flecs sets up globals of its own with its first world, so creating and destroying a world
 is done one at a time, under a lock that is the process's.
 
@@ -142,13 +142,13 @@ say so out loud, through `flecs_confine.row_moved`. With it the same shadow is w
 option is cheap only because the columns settled first: a callback into a library we were not
 already forking would have been a different question.
 
-**One hook, because one site is silent among those Bridge-ASM700 reaches.** A table merge, which a
+**One hook, because one site is silent among those Bridge reaches.** A table merge, which a
 component deletion causes, moves rows too, and the events do name those. `ecs_table_swap_rows` and
 sorting move rows silently and are not hooked: nothing here calls them. The condition that adds a
-hook there is Bridge-ASM700 using either.
+hook there is Bridge using either.
 
-**Table ids are Bridge-ASM700's own.** `ecs_record_t` is public and carries an `ecs_table_t *`, where a
-span needs a dense `u32` to index `column_base`. So Bridge-ASM700 keeps pointer-to-id itself and
+**Table ids are Bridge's own.** `ecs_record_t` is public and carries an `ecs_table_t *`, where a
+span needs a dense `u32` to index `column_base`. So Bridge keeps pointer-to-id itself and
 never reads `ecs_table_t`'s layout. A table gets its id the first time it is seen holding an entity:
 when the mirror places one in it, or when a query matches it. Id 0 is no table, which is what an
 entity with nothing on it has.
@@ -161,7 +161,7 @@ off it, and free after it.
 
 The observer's term is `EcsAny` and not a wildcard: a wildcard is not told of a table whose type is
 only pairs, which is what holds an enum's constants. `tests/tables.c` frees a table each way and
-fails for either that is missed; it is the one test that reads Bridge-ASM700's own structures,
+fails for either that is missed; it is the one test that reads Bridge's own structures,
 because an id that outlived its table is a pointer to freed memory and shows nowhere a host can
 look.
 

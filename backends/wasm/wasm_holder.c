@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -91,7 +91,7 @@ wasmtime_error_t *wasm_adopt_into(backend_instance_t *i, backend_memory_t *mem,
 /*
 ** memory_adopt
 **
-** Adopts a block Bridge-ASM700 reserved: a whole number of pages.
+** Adopts a block Bridge reserved: a whole number of pages.
 **
 ** backend.md, *Memory is adopted, not created*
 */

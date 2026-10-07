@@ -1,15 +1,15 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** include/bridge_backend.h -- the backend seam: what Bridge-ASM700 asks of
+** include/bridge_backend.h -- the backend seam: what Bridge asks of
 ** the thing that runs a module.
 **
 ** A backend is a shared library exporting the eighteen functions below by
-** name. Only a backend and Bridge-ASM700 compile this header.
+** name. Only a backend and Bridge compile this header.
 **
 ** backend.md, *What a backend is asked for*
 */
@@ -61,7 +61,7 @@ static_assert(alignof(backend_err_t) == 1);
 **     WORK_LIMIT      an invocation's work can be counted, and bounded
 **     TIMEOUT         a call can be given a timeout, and is abandoned past it
 **     MEMORY_LIMIT    a module's own memory can be given a ceiling
-**     RELOAD          a module can be replaced while the bridge runs
+**     RELOAD          a module can be replaced while the deck runs
 **     SIDE_BY_SIDE    two instances of one module can exist at once: which
 **                     order a reload takes
 **     UNLOAD          its library can be taken out of the process once
@@ -82,12 +82,12 @@ enum backend_capability : uint32_t {
 };
 
 /*
-** A setting is the backend's own: Bridge-ASM700 passes each through unread. A
-** backend refuses a key it does not know, by name, as Bridge-ASM700 refuses
+** A setting is the backend's own: Bridge passes each through unread. A
+** backend refuses a key it does not know, by name, as Bridge refuses
 ** one of its own it does not.
 **
 ** It is the host seam's bridge_setting_t again, on purpose: a seam's header is
-** whole without the other's. Bridge-ASM700 holds the two to one shape, where
+** whole without the other's. Bridge holds the two to one shape, where
 ** it copies one to the other.
 **
 ** backend.md, *What a backend is asked for*
@@ -149,7 +149,7 @@ static_assert(offsetof(backend_sig_t, result_count) == 24);
 static_assert(offsetof(backend_sig_t, pad1) == 28);
 
 /*
-** A function Bridge-ASM700 provides to a module. Every value travels as 64
+** A function Bridge provides to a module. Every value travels as 64
 ** bits. Non-zero says the call that reached it must not go on: a backend that
 ** can unwind a module does so there.
 **
@@ -203,7 +203,7 @@ static_assert(offsetof(backend_memory_import_t, memory) == 16);
 
 /*
 ** The backend seam's number: what this header says. A backend answers the one
-** it was built against, and Bridge-ASM700 refuses a library that answers
+** it was built against, and Bridge refuses a library that answers
 ** another, before it asks it for anything else.
 **
 ** backend.md, *What a backend is asked for*
@@ -268,7 +268,7 @@ static_assert(offsetof(backend_entry_t, sig) == 32);
 **     instance_set_timeout
 **                         the next call only
 **     instance_get_func   an export that `call` can run: one that takes
-**                         nothing of Bridge-ASM700's and answers a status.
+**                         nothing of Bridge's and answers a status.
 **                         nullptr, and why, if there is none of that name, or
 **                         if the backend can see that its shape is another
 **     call                0 if the function returned, and then `status` is

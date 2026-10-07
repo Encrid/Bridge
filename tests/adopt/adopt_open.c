@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -90,7 +90,7 @@ int adopt_run(adopt_t *t, backend_instance_t *i, const char *name,
 ** adopt_open
 **
 ** Opens the wasm backend, reserves a block of the shape it states, which is
-** Bridge-ASM700's, has the backend adopt two pages of it, and compiles the
+** Bridge's, has the backend adopt two pages of it, and compiles the
 ** module.
 */
 int adopt_open(adopt_t *t)

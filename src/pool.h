@@ -1,12 +1,12 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
 ** src/pool.h -- the threads a phase runs on: `threads - 1` workers kept for
-** the bridge's life, and the caller. Nothing here knows what a job is.
+** the deck's life, and the caller. Nothing here knows what a job is.
 **
 ** threads.md, *Threads*
 */

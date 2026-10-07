@@ -28,7 +28,7 @@ Three were waiting here from stage 2; two turned up while planning.
 ## What it produced
 
     include/bridge-backend.h      memory_release, module_compile's demands, a status from a
-                                  function Bridge-ASM700 provides
+                                  function Bridge provides
     backends/wasm/wasm.c          an engine per demand; a refused entry becomes a trap
     include/bridge.h              phases, [budget], a module's fuel, log level, scratch, ring,
                                   spans and grants; bridge_phase
@@ -65,7 +65,7 @@ and in a debug one, where flecs' own assertions are on.
     ceiling      a spawn past [budget] entities abandons that invocation, by name
     ring         100 lines into a ring of 16: 16 arrive, "84 log lines were dropped"
     nospans      a module whose spans do not fit is stopped, and the other runs on
-    nocolumns    columns running out stops the bridge; a phase is then refused; destroy works
+    nocolumns    columns running out stops the deck; a phase is then refused; destroy works
     nophase      a phase the deployment did not declare: refused by name
     nophases     a deployment with no phase: create refuses
     nobudget     a budget left unset: create refuses, naming the key
@@ -87,7 +87,7 @@ two, so the accessor module imports the compiled module's memory while the compi
 the accessors. Binaryen resolves both in one merge.
 
 **flecs' own tables take columns before any module declares anything**, so `[budget] columns` has
-a floor that is not ours - `budgets.md`, *Bridge-ASM700 defaults none of them*, for the figure and
+a floor that is not ours - `budgets.md`, *Bridge defaults none of them*, for the figure and
 what create does about it.
 
 **Table ids did not need flecs' table events.** A table gets its id the first time the mirror
@@ -106,7 +106,7 @@ trapping in `init`.
 ## What it left
 
 Nothing, any more. The stage closed with a failed load leaving what its `init` had done, an
-allocator in power-of-two classes, one bridge to a process, and `observe` refusing - `stage5.md`,
+allocator in power-of-two classes, one deck to a process, and `observe` refusing - `stage5.md`,
 *Closed after the stage*, for each.
 
 ## Open questions

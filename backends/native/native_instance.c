@@ -1,13 +1,13 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
 ** backends/native/native_instance.c -- an instance made and freed, and the
 ** three limits this backend keeps none of: it answered no to all three, so
-** Bridge-ASM700 never has a number to hand them.
+** Bridge never has a number to hand them.
 */
 
 #include <stdlib.h>

@@ -2,7 +2,7 @@
 
 What was weighed here and refused is `build_refused.md`, *What was refused: The build*.
 
-What Bridge-ASM700 is compiled with, for what, in which C, and against which C library. None of it
+What Bridge is compiled with, for what, in which C, and against which C library. None of it
 is the design of the library. All of it decides whether the library can be built the same way on
 three systems by somebody who installed two tools.
 
@@ -75,7 +75,7 @@ a DLL, which is the same thing whichever compiler wrote it, and zig's linker rea
 
 ## The standard
 
-**Each piece at its own.** wasmtime's headers are C11. Everything of Bridge-ASM700's own is C23:
+**Each piece at its own.** wasmtime's headers are C11. Everything of Bridge's own is C23:
 the source, the tests, the test modules and every header.
 
     backends/wasm/wasmtime        C11    read by backends/wasm and nothing else
@@ -143,7 +143,7 @@ A C library is three things under one name:
     the door          threads, mapping memory,     the operating system itself, on
                       loading a library            Linux and macOS
 
-**All three are the system's.** Bridge-ASM700 is a library: it is loaded into a process whose C
+**All three are the system's.** Bridge is a library: it is loaded into a process whose C
 library the host's executable chose, and it loads native modules that somebody else built. On
 Linux a process has one C library, and a module built against another will not load into it. On
 macOS the system's is the only supported way to reach the kernel. On Windows the build links
@@ -176,7 +176,7 @@ one with why it is there, and a case holds the list - `dependencies.md`, *Depend
 
 ## What an author is not bound by
 
-All of the above is how Bridge-ASM700 is built. **A module is built with whatever its author has**,
+All of the above is how Bridge is built. **A module is built with whatever its author has**,
 in any language that can produce a wasm module or a shared library. What binds it is the ABI: the
 ABI layouts of `bridge_abi.h`, the exported names, and the section its manifest sits in - `abi.md`,
 *The ABI*, and `module.md`, *The manifest*. `bridge_wasm.h` and `bridge_native.h` are the two

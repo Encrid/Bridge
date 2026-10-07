@@ -1,11 +1,11 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** src/storage_create.c -- a bridge's storage made, and unmade.
+** src/storage_create.c -- a deck's storage made, and unmade.
 */
 
 #include <stdlib.h>
@@ -42,7 +42,7 @@ static bool make_all(storage_t *r)
 /*
 ** storage_create
 **
-** Makes a bridge's storage: all of it, or none. `who` has a slot for each
+** Makes a deck's storage: all of it, or none. `who` has a slot for each
 ** eight bytes of the column region: a table's ids sit in it, so its twin
 ** sits at the same place here. What is never touched is never backed by
 ** memory.
@@ -93,7 +93,7 @@ static void free_fold(storage_t *r)
 /*
 ** storage_destroy
 **
-** Frees a bridge's storage.
+** Frees a deck's storage.
 */
 void storage_destroy(storage_t *r)
 {

@@ -1,11 +1,11 @@
 # Introspection
 
 `bridge_list_modules` exists for one reason, and it is not a console: **a module that loaded can be
-stopped later, and nothing else says so.** Past its failure budget Bridge-ASM700 stops a module - its
+stopped later, and nothing else says so.** Past its failure budget Bridge stops a module - its
 systems and observers stop running and its components stay, `failure.md`, *When something fails*.
 That happens at frame nine thousand, long after any return code the host saw.
 
-**And it says why the bridge stopped**, when a module's stop was what stopped it - `failure.md`,
+**And it says why the deck stopped**, when a module's stop was what stopped it - `failure.md`,
 *When something fails*: the module shows as STOPPED like any other, and the record that named it may
 have been dropped. A module whose reload failed with no old instance to keep shows as STOPPED too:
 for a host the two are one state, neither runs, both keep their data, and a reload or an unload is

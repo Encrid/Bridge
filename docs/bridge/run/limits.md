@@ -20,7 +20,7 @@ It cannot be shared across a phase either, which would be cheaper. One greedy sy
 its siblings and the trap would land on whichever ran last - destroying the attribution
 `validation.md`, *What a bad write costs, and what finds it*, is built on.
 
-**So Bridge-ASM700 re-sets the work limit before every dispatch.** It has no choice: what is left of
+**So Bridge re-sets the work limit before every dispatch.** It has no choice: what is left of
 one only goes down, and a store left at zero traps immediately (`signatures.md`, *A call takes
 nothing and answers a status*). One store write before a call is nothing against the call.
 
@@ -30,7 +30,7 @@ no way to interrupt.
 
 **Counting is enough for a system, which is why there is no per-invocation deadline.** On the wasm
 backend it counts only wasm instructions, so it would miss a module blocked inside a call it made
-out - except that a module has no such call. Its only imports are Bridge-ASM700's eight ABI entries
+out - except that a module has no such call. Its only imports are Bridge's eight ABI entries
 (`wasm.md`, *Memories*), and none of them waits on anything. A wall-clock bound beside a work limit
 would guard a case the design does not contain.
 

@@ -326,7 +326,7 @@ measured: it happens a few times in a run.
                   refused by name           mean none
 
 **2.6 The component a module names as `config` is a singleton, or the load is refused by
-name.** Bridge-ASM700 gives it its value with the id 0 at init, where it spawned an entity of
+name.** Bridge gives it its value with the id 0 at init, where it spawned an entity of
 its own for it; that entity and the code that keeps it go. It closes what the gate found: a
 module could attach its settings component to a second entity, and `config.md` called it a
 singleton with nothing holding it to one. Allowing either was scored as failing minimal, two
@@ -341,7 +341,7 @@ asked has failed.
 
 A sparse set's index and a direct-indexed component's cells and bits are kept for every entity
 there may be, carried or not, and how many such components there will be is not known when the
-bridge is created. So the deployment states it:
+deck is created. So the deployment states it:
 
     [budget] sparse_sets       how many components may be kept in a sparse set. Storage
                                reserves their indexes whole at create: eight bytes an entity
@@ -505,7 +505,7 @@ scratch figures were 0.98 and 1.6.
 
 **The singleton**, as `storage.md`, *A singleton*, has it. It is folded as the one thing index
 0 carries, so a barrier applies and tells it by the code that does so for an entity. A module's
-settings are one, and the entity Bridge-ASM700 kept for them is gone with the code that kept
+settings are one, and the entity Bridge kept for them is gone with the code that kept
 it. Cases `storage-single` and the three beside it, `stage6-configtable` and
 `stage6-confignoroom`, and every settings case of stage 6 on the wasm backend.
 

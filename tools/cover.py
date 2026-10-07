@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Every thing Bridge-ASM700 exposes has a case named for it, and every case is of one.
+"""Every thing Bridge exposes has a case named for it, and every case is of one.
 
     python tools/cover.py              hold docs/tests.md against the headers and the cases
     python tools/cover.py --surface    print what the headers expose, a name a line

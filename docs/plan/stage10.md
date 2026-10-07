@@ -10,7 +10,7 @@ and what came of it. What keeps the rows now is `storage.md`.
 ## What changed
 
 **flecs is not where the time goes.** What an ECS is tuned for is iteration: matching a query and
-walking its rows. Bridge-ASM700 does that itself. It publishes spans, and a system reads its
+walking its rows. Bridge does that itself. It publishes spans, and a system reads its
 columns through them with no call into anything. flecs runs at a barrier, where it applies each
 queued change, and at load. The parts that made it a framework - its systems, its pipeline, its
 deferral, its threads - were never used, because each had to be ours for a reason of its own.
@@ -26,7 +26,7 @@ patch touches. A thread-local variable, because its allocator callbacks carry no
 
 ## What was settled
 
-    the ECS            Bridge-ASM700's own, modelled on flecs
+    the ECS            Bridge's own, modelled on flecs
     when flecs goes    only when ours passes every case and is not slower on any measurement
     if it does not     flecs stays, and a fork or the patch is chosen with the numbers in hand
 
@@ -40,7 +40,7 @@ primitives under other names: make an id, attach, detach, match, watch. Behind a
 shape the best ours could be is a smaller flecs, and it was put back to be done again, from what
 the documents say and by every step of `stage0.md`.
 
-flecs has to serve any program. Bridge-ASM700 promises much more than any program does, and each
+flecs has to serve any program. Bridge promises much more than any program does, and each
 promise is something a design made for it can spend:
 
     storage is touched only at a barrier, by one thread    `threads.md`, *Threads*
@@ -89,7 +89,7 @@ its own index. The patch of stage 1 moved that array into the shared block, so t
 read it. A module can therefore write it, and what it writes is then an id flecs acts on. Nothing
 had asked what storage believes of memory a sandboxed module can reach; the answer now is nothing.
 
-**The last two exist because of the second.** Columns running out stopped the bridge for good,
+**The last two exist because of the second.** Columns running out stopped the deck for good,
 and the documents gave two reasons: nobody could be named, and flecs could not be unwound from
 the middle of a change. An entity's whole fate is known before a row of it moves, and so is who
 asked last, so neither reason holds, and one module's growth no longer takes a deployment down.
@@ -114,7 +114,7 @@ Every use of flecs was read, in the four files that reach it: `src/store.c`, `sr
                             in the declarer's namespace; pointer-sized types refused
     settings                written by a field's type, with every error text
     unload                  strip, sweep, delete; a type kept while a field names it
-    the column budget       refused at create, or the bridge stopped at a barrier
+    the column budget       refused at create, or the deck stopped at a barrier
 
 Four of those had no test: NOT and OPTIONAL terms, an observer with more than one term, what an
 emptied table's span says, and what a destroy tells an observer. They are pinned on flecs before
@@ -122,7 +122,7 @@ anything is written to match them.
 
 ## What goes with flecs
 
-Everything that exists because flecs decides where a row is and Bridge-ASM700 has to be told:
+Everything that exists because flecs decides where a row is and Bridge has to be told:
 the patch and its script, the hook for a moved row, the two observers that feed the mirror, the
 list of entities to look at again, the table ids that are dead and then free, the thread-local
 variable. Ours places every row, so the index is written where the row is placed.
@@ -138,7 +138,7 @@ variable. Ours places every row, so the index is written where the row is placed
     the generation          is 32 bits in fact, where flecs gave 16 in a field of 32
     [budget] tables         a new key: how many sets of components may exist at once
     out of tables, or of    the entity is left as it was and the module that asked has failed.
-    columns                 A bridge no longer stops for columns
+    columns                 A deck no longer stops for columns
     spans                   too small for `column_base` at the stated `tables`: refused at load,
                             where it was a stop at some later barrier
     tables                  none that nothing stays in, and none once it is emptied
@@ -304,7 +304,7 @@ Three cases are new and are of what only this storage does. Each is a transcript
                          left as they were and unheard, a record names the module, and at its
                          second failing barrier in a row it is stopped
     storage nocolumns    `columns` of 64 bytes: three of six rows fit, then a fourth, then a
-                         fifth exactly, with the bridge running throughout; the sixth never
+                         fifth exactly, with the deck running throughout; the sixth never
                          does, and the module is stopped at its budget
     storage scribble     a module writes over every index record and every entity array of
                          its entities, each to name the first; rows are then destroyed and
@@ -316,7 +316,7 @@ nobody had made.
 
 Three cases changed their answer, as the decisions said they would. `stage3-nospans` is refused
 at load where it was stopped at a barrier. `stage3-nocolumns` leaves 744 of 1,000 entities as they
-were and runs on, where the bridge stopped. `stage6-configceiling` runs out at `entities` of 1,
+were and runs on, where the deck stopped. `stage6-configceiling` runs out at `entities` of 1,
 where 440 was flecs' own entities and one more. And `stage5-nested2` is refused by the word the
 reading stopped at.
 
@@ -434,7 +434,7 @@ the first five were not, and should have been.
     closed  a phase exclusivity flag: refused as it was. Everything it could be for has an
             answer already: pinned, the conflict graph, one thread. `schedule.md`
     closed  memory high-water per module: wider than it said. How full every budget is, for
-            the bridge and for each module, as a pull, in `plan.md` 14 and its done-when 1183284
+            the deck and for each module, as a pull, in `plan.md` 14 and its done-when 1183284
     closed  an instance-grouping entry: refused. A backend that must group does it itself,
             and is told which by its own settings. `backend.md`
     closed  arena mark and reset: still refused, with its condition. What was behind it is
@@ -450,7 +450,7 @@ the first five were not, and should have been.
             component layout by field name; a field removed or renamed goes, and a record
             says so. Decided here, built in `plan.md` 11. `lifetime.md`
     closed  an SDK for a module that is not C: a stage of its own, `plan.md` 15, with two owners.
-            What Bridge-ASM700 writes is its own to state; how a module reaches it is the
+            What Bridge writes is its own to state; how a module reaches it is the
             backend's. Tried first: the project's compiler cannot translate the header
     closed  the tree itself, which had said otherwise: a folder for each owner. A backend has
             its SDK, its dependency and its own calls to the operating system, and compiles nothing
@@ -478,7 +478,7 @@ at least five things, none defined, and none of them the one that was meant.
 **3. Decided without the steps, or inherited**: one at a time.
 
     closed  the native SDK held to the wasm one. Three things, two owners. Offsets into the
-            scratch arena are Bridge-ASM700's, for a reason of its own, and stay. Who is
+            scratch arena are Bridge's, for a reason of its own, and stay. Who is
             calling is the backend's: the table is passed to every export and every entry
             takes it, so `bridge_bind`, a global in every module and a thread-local are
             gone, and the invariant is checked where it was implied. With the thread-local
@@ -642,7 +642,7 @@ Of earlier stages:
     closed  no row for a barrier in the profile: each phase has one, and a row says what it
             is. "A phase is the sum of its systems" was false. `profile.md`; built in
             stage 17
-    closed  a stopped bridge takes only the load or reload of the module that stopped it:
+    closed  a stopped deck takes only the load or reload of the module that stopped it:
             and an unload of it, by which a host goes on without it. `failure.md`
     closed  all pinned modules share the host's thread: it holds. What it does not serve is
             written, and each refusal has a condition. `pinned.md`
@@ -683,7 +683,7 @@ middle of a paragraph in `config.md`.
     closed  a component's array length cannot be a named constant: it holds. The number is
             written once, in the struct, and taken from the field elsewhere. `schema.md`
     closed  an allocation that fails at load: at create, load, reload or unload it is a
-            refusal with a record, and the bridge is as it was. Held by answering every
+            refusal with a record, and the deck is as it was. Held by answering every
             allocation null in turn, case `alloc-nomemory`. Found by it: a reload that
             stated more `spawns` wrote past the old instance's block of ids, since the
             block had stopped growing in a phase; a reload has a block of its own now.

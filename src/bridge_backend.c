@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -79,7 +79,7 @@ static backend_setting_t *convert_settings(const bridge_backend_t *want)
 ** open_library
 **
 ** Opens a backend's library and finds its entries. The backend is counted
-** once it has its name, so that a bridge that is refused frees it.
+** once it has its name, so that a deck that is refused frees it.
 **
 ** create.md, *Create*
 */

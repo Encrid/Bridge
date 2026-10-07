@@ -1,11 +1,11 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** src/bridge_inside.h -- a bridge made, stopped and run: what the files that
+** src/bridge_inside.h -- a deck made, stopped and run: what the files that
 ** do it share, and what the rest of the library asks of them.
 **
 ** create.md, *Create*
@@ -40,7 +40,7 @@
 ** Takes the deployment's phases, each a name. 1, with a record, if it
 ** declares none, or one has no name or is named twice.
 **
-** schedule.md, *Bridge-ASM700 ships no phase names*
+** schedule.md, *Bridge ships no phase names*
 */
 [[nodiscard]] int bridge_name_phases(bridge_t *b, const bridge_config_t *cfg);
 
@@ -65,9 +65,9 @@ const module_t *bridge_find_pinned(const bridge_t *b);
 /*
 ** bridge_check_call
 **
-** Answers 1, with a record, if nothing may run: the bridge has stopped, or a
+** Answers 1, with a record, if nothing may run: the deck has stopped, or a
 ** module is pinned to another thread. `repairing` names a module being
-** loaded or reloaded: the one call a stopped bridge accepts is one that
+** loaded or reloaded: the one call a stopped deck accepts is one that
 ** brings back the module that stopped it.
 */
 [[nodiscard]] int bridge_check_call(bridge_t *b, const char *repairing);
@@ -75,7 +75,7 @@ const module_t *bridge_find_pinned(const bridge_t *b);
 /*
 ** bridge_stop
 **
-** Stops the bridge: a module stated `fail` is lost, and nothing runs until
+** Stops the deck: a module stated `fail` is lost, and nothing runs until
 ** it is back. `what` says what became of it.
 **
 ** failure.md, *When something fails*
@@ -85,14 +85,14 @@ void bridge_stop(bridge_t *b, const char *identity, const char *what);
 /*
 ** bridge_resume
 **
-** Lets the bridge run again, if `m` is the module it was waiting for.
+** Lets the deck run again, if `m` is the module it was waiting for.
 */
 void bridge_resume(bridge_t *b, const module_t *m);
 
 /*
 ** bridge_give_up
 **
-** Lets the bridge run again without the module that stopped it: the host
+** Lets the deck run again without the module that stopped it: the host
 ** unloads it, by name, and so says the deployment goes on without it.
 */
 void bridge_give_up(bridge_t *b, const module_t *m);

@@ -7,7 +7,7 @@ lifecycle*.
 storage and the schedule, which is what a barrier makes safe. A native module holding the
 pointer could break this; nothing contains native code, so it is a contract rather than a guarantee.
 
-**`load`** takes an artifact rather than a path, because Bridge-ASM700 decides on `cfg` and never
+**`load`** takes an artifact rather than a path, because Bridge decides on `cfg` and never
 finds or reads a module's file. In order: find the backend the artifact names, check the ABI
 version, check `trusted` against what that backend says it runs, take one of `[budget] modules`,
 hand `bytes` and `path` to the backend, call `init` - which calls `declare`, `add_system` and
@@ -71,7 +71,7 @@ it. The original Bridge marks a module whose reload failed as failed rather than
 operator, for the reason that holds here: what failed was the new artifact, and a better one must be
 able to follow.
 
-That is `lifetime.md`, *When a component layout changed*, applied here: Bridge-ASM700 discards no
+That is `lifetime.md`, *When a component layout changed*, applied here: Bridge discards no
 data of its own accord on a call that means "keep running", and `bridge_reload` is such a call.
 
 **What a reload may change is what is the instance's.** The work limit, the memory limit, timeouts,

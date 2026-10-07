@@ -41,7 +41,7 @@ otherwise costs tens of nanoseconds a change. It is one more rule for each stora
 only the wasm backend, and it is not the one block a backend adopts - `backend.md`, *Memory is
 adopted, not created*.
 
-**The condition that would change the answer: Bridge-ASM700 being asked to run code the operator did not
+**The condition that would change the answer: Bridge being asked to run code the operator did not
 choose.** Modding is not that - a player installing a mod chose it - and no engine we looked at
 isolates mods from each other. Minecraft has the largest modding ecosystem there is with none at
 all. What that ecosystem suffers is unattributable crashes and mod conflicts, which attribution and
@@ -56,7 +56,7 @@ Kept: sandboxing from the host, traps caught, a work limit, lifecycle timeouts, 
 the manifest section, threading.
 
 Hot reload improves in one direction and gains a refusal. In the original Bridge a reloaded module loses
-its state; with storage in Bridge-ASM700's region **the data survives the swap**, which is what idTech3's
+its state; with storage in Bridge's region **the data survives the swap**, which is what idTech3's
 `VM_Restart` was for too. A component layout change is caught by the fingerprint and never
 silently reinterpreted: its values are carried across where they can be, and what would be lost
 is refused unless the deployment accepted that loss by name. See `lifetime.md`, *When a component

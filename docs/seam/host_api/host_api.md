@@ -2,21 +2,21 @@
 
 What was weighed here and refused is `host_api_refused.md`, *What was refused: Host API*.
 
-The surface any host links against. What Bridge-ASM700 requires of the values a host hands over is
+The surface any host links against. What Bridge requires of the values a host hands over is
 `config.md`.
 
 The arrangement is idTech3's: the engine is `qcommon/`, and `win32/win_main.c:1212` calls `Com_Init`
 then loops on `Com_Frame`.
 
-This is the third seam. `module.md` and `bridge_abi.h` are Bridge-ASM700 to modules, with each
+This is the third seam. `module.md` and `bridge_abi.h` are Bridge to modules, with each
 backend's SDK beside that backend - `readme.md`, *Three layers, three seams*;
-`backend.md` is Bridge-ASM700 to a backend; this is **host to Bridge-ASM700**. Everything in this
+`backend.md` is Bridge to a backend; this is **host to Bridge**. Everything in this
 folder is `bridge.h`, which is the only header a host includes - one per seam, `readme.md`, *Three
 layers, three seams*.
 
 ## A host links a built library
 
-**A host does not compile Bridge-ASM700. It links what the build made, and it may be written in
+**A host does not compile Bridge. It links what the build made, and it may be written in
 any language that can call C.** So the seam is judged by that and not by which compiler reads
 `bridge.h`: the header is the binding for a host in C, and one binding among however many.
 
@@ -91,13 +91,13 @@ library reads is a module's, the descriptor of a type: `schema.md`, *There is no
 two straight to the module's backend without inspecting either - `lifecycle.md`, *The runtime
 lifecycle*.
 
-**The one kind of file Bridge-ASM700 opens is a backend library.** Config names each backend and its
-library, and `bridge_create` opens them - `create.md`, *Create*. A backend is Bridge-ASM700's own
+**The one kind of file Bridge opens is a backend library.** Config names each backend and its
+library, and `bridge_create` opens them - `create.md`, *Create*. A backend is Bridge's own
 machinery rather than content, and a deployment that names one it cannot open has not got an
 orchestrator to start.
 
 So an embedder with its own config system - a database, compiled-in constants, another format -
-hands over data rather than being made to write a file for Bridge-ASM700 to read. And the three platform
+hands over data rather than being made to write a file for Bridge to read. And the three platform
 parsers that would otherwise sit in the library do not: `module.md`, *The parser of a manifest*.
 
 **No discovery either.** Finding modules is filesystem work, so the host finds them and calls
@@ -108,7 +108,7 @@ parsers that would otherwise sit in the library do not: `module.md`, *The parser
 Seven functions, and `include/bridge.h` is the statement of each: what it takes, what it answers
 and when it may be called. A document says why each is as it is.
 
-    bridge_create, bridge_destroy       a bridge made, and unmade: `create.md`
+    bridge_create, bridge_destroy       a deck made, and unmade: `create.md`
     bridge_run_phase                    a phase run, then its barrier: `loop.md`
     bridge_load, bridge_unload,         a module in, out, and replaced, between phases only:
     bridge_reload                       `lifecycle.md`
@@ -118,7 +118,7 @@ and when it may be called. A document says why each is as it is.
 profile*, and the two keys of `validation.md`, *The checksum pass, when asked*.
 
 Every answer above the pull is `[[nodiscard]]`: a status a host drops is one the compiler
-points at, and `bridge_destroy`'s is the one that leaks a bridge when dropped - `create.md`,
+points at, and `bridge_destroy`'s is the one that leaks a deck when dropped - `create.md`,
 *Destroy*.
 
 ## The data
@@ -153,7 +153,7 @@ any language hands to C with no binding, the call says which phase it runs, and 
 refused by its name.
 
 **The host resolves its own sources** - a manifest, a deployment's file, whatever it has - and
-hands one flat struct per module. Bridge-ASM700 has no notion of where a value came from, which is why
+hands one flat struct per module. Bridge has no notion of where a value came from, which is why
 nothing here records a source.
 
 **Every limit here carries its period, because a number without one means nothing** - `limits.md`,
@@ -164,14 +164,14 @@ nobody reads is a typo nobody would find, the argument `config.md`, *A module's 
 component*, makes for a module's. Neither backend built so far has a setting, so each refuses any.
 
 **A backend's `settings` are its own** - the cache directory, the pooling limits -
-and Bridge-ASM700 passes them to `backend_create` unread: `backend.md`, *What a backend is asked for*.
+and Bridge passes them to `backend_create` unread: `backend.md`, *What a backend is asked for*.
 
 **A module's `settings` seed a component, and nothing more** - `config.md`, *A module's own
 settings are a component*, for why that means there is no call to reconfigure here.
 
 ### Nothing here is an ABI layout
 
-The structs coming back out carry **resolved values**, never the shapes Bridge-ASM700 keeps
+The structs coming back out carry **resolved values**, never the shapes Bridge keeps
 internally. That is *Nothing a host hands over is parsed* pointing the other way: no formats in, no internal
 structs out, and a host that can be replaced without touching the library.
 

@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -75,7 +75,7 @@ void test_load_named(host_t *h)
 /*
 ** test_stop
 **
-** A module that fails stops the bridge if it stated fail, and does not if
+** A module that fails stops the deck if it stated fail, and does not if
 ** it stated skip: what is loaded after it says which.
 */
 void test_stop(host_t *h)

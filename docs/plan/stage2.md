@@ -3,7 +3,7 @@
 Done. The `linux` preset and the POSIX half of `src/os.c` were first run after stage 5, and passed
 as written.
 
-The first Bridge-ASM700 code. It produced **the backend seam and the wasm backend behind it**, the
+The first Bridge code. It produced **the backend seam and the wasm backend behind it**, the
 part of the host seam needed to load one module through them, and the tests that show a module
 running, failing and being refused. No storage, no systems, no phases: those are stage 3.
 
@@ -47,7 +47,7 @@ process still being there to print "alive" afterwards.
     stage2-abi        another ABI version:           "it wants ABI 2 and this is ABI 1"
     stage2-nobackend  an unconfigured backend:       "no backend named 'native'"
     stage2-unset      a key left at zero:            "memory_limit is unset"
-    stage2-stop       on_error = fail stops the bridge; skip does not
+    stage2-stop       on_error = fail stops the deck; skip does not
     stage2-nolib      a backend library that will not open: create refuses, with a record
     stage2-nosink     no sink: create refuses
 
@@ -56,7 +56,7 @@ process still being there to print "alive" afterwards.
 **One block does back a memory in two stores.** The question the stage opened with. Two stores on
 two threads each wrote a page of one block two hundred times, byte by byte; both pages came out
 whole, a third read found the other store's bytes, and a load one byte past the block trapped by
-faulting on the reservation. So Bridge-ASM700 allocates, every backend adopts, and no shared memory
+faulting on the reservation. So Bridge allocates, every backend adopts, and no shared memory
 or threads proposal is needed - `backend.md`, *Memory is adopted, not created*.
 
 **But not the way wasmtime's header says.** The host memory creator is not asked for the memory it

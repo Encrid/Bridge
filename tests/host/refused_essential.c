@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -18,7 +18,7 @@
 ** test_refuse_essential
 **
 ** A module that states fail and names a backend the deployment has not is
-** refused, and the bridge runs on: the next module loads.
+** refused, and the deck runs on: the next module loads.
 */
 void test_refuse_essential(host_t *h)
 {

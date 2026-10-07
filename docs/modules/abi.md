@@ -26,7 +26,7 @@ Any time, queued and applied at the next barrier:
     alloc(len)                     -> offset into the persistent arena
 
 `desc` is the descriptor string `BRIDGE_SCHEMA_STRUCT_DESC` makes of the typedef's own text -
-`schema.md`, *There is no schema format*, for what Bridge-ASM700 does with it and what it does not.
+`schema.md`, *There is no schema format*, for what Bridge does with it and what it does not.
 `kind` says what it describes: a struct, an enum or a bitmask - `schema.md`, *The type set*. It is
 stated, like every other value. A fourth kind is a tag, a component with no bytes, which has no
 descriptor: `storage.md`, *A tag*.
@@ -43,7 +43,7 @@ that declares the component states the same one.
 `desc`, `phase`, `terms`, `changes`, and `attach`'s `ptr`. A module writes the bytes there first and passes
 where they are. An offset means nothing without a memory, so the memory is fixed by the SDK
 rather than carried in the value - the rule `log.md`, *The log*, already set for a record's text,
-and for the same reason: the scratch arena is the one memory a module can write that Bridge-ASM700
+and for the same reason: the scratch arena is the one memory a module can write that Bridge
 can read and bounds-check. So one signature serves both backends, and every argument is 32 or 64
 bits wide - `signatures.md`, *Imports are declared, exports are checked*.
 
@@ -62,7 +62,7 @@ What the second copy costs was measured on the native backend, where a call pays
 else: an attach with a value of four bytes put through scratch took 19.9 ns against 19.6 to 20.0 without.
 
 **`attach` carries the initial value.** `ptr` says where it is, and it is as long as the type was
-declared: Bridge-ASM700 takes a copy of that many bytes at the call, bounds-checking them the way
+declared: Bridge takes a copy of that many bytes at the call, bounds-checking them the way
 it checks a log record's text. `BRIDGE_ZEROED` as `ptr` asks for a zeroed value. The copy is what
 reaches the row at the barrier, so the scratch arena may be reset in between - which it is, when
 the call was an observer's. Since the copy is taken during the call, the SDKs put the value above
@@ -130,7 +130,7 @@ the hot path is the one budget this design exists to protect.
 
 A system or an observer **is** a query plus a function, so one call registers the pair. `init`,
 `shutdown` and `reload` are reserved names that `add_system` and `observe` refuse. `terms` is an array
-of term structs rather than a string, so there is no parser in Bridge-ASM700 and no string handed
+of term structs rather than a string, so there is no parser in Bridge and no string handed
 over at init. A term is three things: the
 slot `declare` answered, the access, and whether the term must match, must not, or may. What a
 query may not ask for is `query.md`, *What a query may not ask for*.
@@ -157,7 +157,7 @@ authors who have never met. Among a module's own systems the order it registered
 order: `schedule.md`, *Order within a phase is never implicit*.
 
 **A system takes no arguments.** Its spans are already in its memory, found through the slot
-`add_system` answered. Frame time is not an argument and not a component Bridge-ASM700 declares: the system
+`add_system` answered. Frame time is not an argument and not a component Bridge declares: the system
 clock is hardware, so a native module reads it - usually the one already talking to the OS for input or a
 window - and writes the interval into a component of its own, which anything needing it reads under
 a grant.

@@ -17,9 +17,9 @@ Nine things must be addressable with no call, and they do not have the same read
     query spans         private   only the module they belong to
     column_base         private   only the module they belong to
     scratch arena       private   only the module they belong to
-    log ring            private   one per module, and Bridge-ASM700 draining it
+    log ring            private   one per module, and Bridge draining it
 
-The private memory is Bridge-ASM700's alone, so it is laid out from offset 0 with nothing to
+The private memory is Bridge's alone, so it is laid out from offset 0 with nothing to
 negotiate. A fixed header says where this module's spans, `column_base`, arena and log ring begin,
 the log level it is filtering at, and where the entity index begins in the shared memory - the one
 thing it reads there that it cannot derive - and, for each type it declared that is not kept in a
@@ -30,7 +30,7 @@ persistent arena, so nothing else needs a base.
 The span region holds the query slots, the spans, `column_base`, a cell for each declared type
 that says where a component not kept in a table is reached, and each observer's list of what
 triggered it. Its size is the module's `spans` budget, in bytes - `budgets.md`, *Budgets* - and how
-it is divided is Bridge-ASM700's, redone at a barrier, where nothing holds an offset into it. That
+it is divided is Bridge's, redone at a barrier, where nothing holds an offset into it. That
 is the memory layout of Quake's progs - fixed offsets at the bottom, everything else found through
 them.
 

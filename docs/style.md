@@ -1,6 +1,6 @@
 # Coding style
 
-How Bridge-ASM700's C is written. Why the tree has the shape it has is `design.md`; which C it is
+How Bridge's C is written. Why the tree has the shape it has is `design.md`; which C it is
 written in is `build.md`, *The standard*.
 
 The coding style is a set of rules and conventions for:
@@ -14,7 +14,7 @@ The coding style is a set of rules and conventions for:
 It is a purely syntactic convention. It cannot make a program work, and following it is no
 excuse for one that does not.
 
-It applies to every C source file (`.c`) and header (`.h`) that is Bridge-ASM700's own: the
+It applies to every C source file (`.c`) and header (`.h`) that is Bridge's own: the
 library, the seam headers, the backends and their SDKs, the test programs and the test
 modules. It does not apply to what is somebody else's and only carried here, such as a
 backend's dependency.
@@ -104,7 +104,7 @@ Every source file (`.c`, `.h`) starts with the project's standard header.
 /*
 ** Copyright (C) $YEAR Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -120,7 +120,7 @@ and no more.
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -136,7 +136,7 @@ with where the code is from and its licence:
 ** Copyright (C) 2026 Heuretes-Workshop
 ** Copyright (C) 2005-2020 Rich Felker, et al. (musl, MIT)
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -652,7 +652,7 @@ const float PI = 3.14159265358979323846;                    /* OK */
 
 ## What C23 adds
 
-The rules above were written for C as it was. Bridge-ASM700 is written in C23, and uses it
+The rules above were written for C as it was. Bridge is written in C23, and uses it
 fully - `build.md`, *The standard*. None of what C23 adds contradicts a rule here, and where it
 gives a rule a better spelling, that spelling is the one used:
 

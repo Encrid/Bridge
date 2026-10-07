@@ -80,7 +80,7 @@ Six, in this order, since each shapes the next.
 
 ### What a capability is
 
-**A capability is what Bridge-ASM700 exposes: a thing somebody outside the library can interact
+**A capability is what Bridge exposes: a thing somebody outside the library can interact
 with, on one of its three seams.** Those are the three there are, and all three count:
 
     the host seam       `bridge.h`: what a host calls, and the configuration it hands over
@@ -296,7 +296,7 @@ that asks, and unmarks it. Until stage 12 the mark was a variable of the thread.
 that file to the style, which has no variable of a file that is not constant, and moved the
 mark into the backend, where two threads share it: one that unmarked it between the other's
 marking and wasmtime's asking left that other a memory of wasmtime's own. Its module ran, every
-call returned, and nothing it wrote was in the shared block. Bridge-ASM700 makes instances one
+call returned, and nothing it wrote was in the shared block. Bridge makes instances one
 at a time, so no case of the library reached it. `tests/adopt` makes two on two threads, and in
 the first loaded run of the finished tree one copy of six said that a whole page was not what
 was written. The mark is set under the backend's lock now. It is the second defect that six
@@ -360,7 +360,7 @@ improved, and a citation written before it would be written twice.
 
 **It is refused at create, in its own words, as a deployment with no phase is.** The host seam
 reaches storage through modules and through nothing else, and a module is run by a backend. So
-a bridge with no backend can load nothing and run nothing, which is what a bridge with no phase
+a deck with no backend can load nothing and run nothing, which is what a deck with no phase
 is refused for. It was created, and the first sign was a load refused for the name of a backend,
 which says what is missing and not why.
 

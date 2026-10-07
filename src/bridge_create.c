@@ -1,11 +1,11 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** src/bridge_create.c -- a bridge made of a deployment: its backends opened,
+** src/bridge_create.c -- a deck made of a deployment: its backends opened,
 ** its phases named, its threads started and its storage built.
 */
 
@@ -14,13 +14,13 @@
 #include "bridge_inside.h"
 #include "say.h"
 
-static const char NO_BRIDGE[] = "out of memory: there was none for the bridge";
+static const char NO_BRIDGE[] = "out of memory: there was none for the deck";
 
 /*
 ** make_bridge
 **
-** Answers an empty bridge that knows its sink. With no memory for it there
-** is no bridge to say so through: the record is made here.
+** Answers an empty deck that knows its sink. With no memory for it there
+** is no deck to say so through: the record is made here.
 */
 static bridge_t *make_bridge(bridge_sink_fn_t sink, void *ud)
 {
@@ -88,7 +88,7 @@ static int start_pool(bridge_t *b, const bridge_config_t *cfg)
 /*
 ** build_bridge
 **
-** Makes of an empty bridge what the deployment states, a part at a time.
+** Makes of an empty deck what the deployment states, a part at a time.
 ** 1 at the first part that is refused, with a record.
 */
 static int build_bridge(bridge_t *b, const bridge_config_t *cfg)
@@ -107,7 +107,7 @@ static int build_bridge(bridge_t *b, const bridge_config_t *cfg)
 /*
 ** bridge_create
 **
-** Makes a bridge of a deployment. nullptr if the deployment cannot start;
+** Makes a deck of a deployment. nullptr if the deployment cannot start;
 ** which reason, the sink was told. A null sink or deployment is the one
 ** failure no record can explain, and a host that passed null already knows.
 */

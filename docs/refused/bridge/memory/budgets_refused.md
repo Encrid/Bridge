@@ -65,7 +65,7 @@ change that was, and a module that lost a change with the entity would still not
 condition that brings it back is a module that must not answer for an entity another module made
 unplaceable.
 
-Refused: stopping the bridge for every exhaustion, which is one rule and lets one module's `spawn`
+Refused: stopping the deck for every exhaustion, which is one rule and lets one module's `spawn`
 take the deployment down - and the entity ceiling recovers by itself when something is destroyed.
 The condition that brings it back is a deployment for which an entity left as it was is worse than
 not running; it is then a key that deployment states, and not the rule.

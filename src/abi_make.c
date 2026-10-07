@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -31,7 +31,7 @@ static void free_type(declared_type_t *c)
 **
 ** Allocates a declared type with its name, its zero value, room for the
 ** types its fields name, which are no more than its fields, and its place
-** among the bridge's types. nullptr, with nothing kept, if there was not the
+** among the deck's types. nullptr, with nothing kept, if there was not the
 ** memory for all of it.
 */
 static declared_type_t *alloc_type(declaring_t *g)
@@ -85,7 +85,7 @@ static int say_unmade(declaring_t *g, declared_type_t *c)
 /*
 ** keep_type
 **
-** Keeps a made type among the bridge's, with what the declaration stated,
+** Keeps a made type among the deck's, with what the declaration stated,
 ** and holds each declared type a field of it names for as long as it is.
 */
 static void keep_type(declaring_t *g, declared_type_t *c)

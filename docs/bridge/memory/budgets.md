@@ -4,7 +4,7 @@ What was weighed here and refused is `budgets_refused.md`, *What was refused: Bu
 
 Two tiers, because two things are being sized.
 
-**Shared, when Bridge-ASM700 starts, from `bridge_config_t`:**
+**Shared, when Bridge starts, from `bridge_config_t`:**
 
     how many there may be at once
     entities      entity indices. Index 0 is no entity
@@ -22,11 +22,11 @@ Two tiers, because two things are being sized.
     columns       every table's rows: its entity ids and its columns
 
 One block serves everyone, so no single module could size it. It arrives as a struct rather than a
-file, because Bridge-ASM700 reads none: `host_api.md`, *Nothing a host hands over is parsed*.
+file, because Bridge reads none: `host_api.md`, *Nothing a host hands over is parsed*.
 
 **`sparse_sets` and `direct_indexed` are stated because of what those two storage layouts
 keep for every entity there may be**, carried or not: a sparse set's index, and a direct-indexed
-component's bits. How many such components there will be is not known when the bridge is created,
+component's bits. How many such components there will be is not known when the deck is created,
 and storage allocates nothing after - `storage.md`, *What bounds it*. So the deployment says how
 many, and their room is had at create: eight bytes an entity for each sparse set. Either may be
 none, which is stated as `BRIDGE_NONE`; zero is unset, and refused. A `declare` past either is
@@ -50,7 +50,7 @@ module more. `tests/host`, cases `bridge_reload-room-for-one-system` and
 `bridge_reload-failed-with-room-for-one-system`, reload a module of one system with `systems` at
 one, and fail to. The two keys exist because storage's memory is a product: a table keeps an offset
 for every type there may be, and a system keeps a place for every table there may be. With the two
-stated, everything storage holds is known and allocated when the bridge is created, and it allocates
+stated, everything storage holds is known and allocated when the deck is created, and it allocates
 nothing after - `storage.md`, *What bounds it*. A `declare` or a `add_system` past its key is
 refused there, by name, which fails that module's `init`.
 
@@ -60,7 +60,7 @@ above that is refused at create, and a module's `changes` above it at its load. 
 reload that states a larger share than the arena has left is refused as a load would be.
 
 **`terms` is the most one system or observer may ask for**, and it is a key for the same reason:
-storage keeps a system's terms in a record made when the bridge is, so the record has a length.
+storage keeps a system's terms in a record made when the deck is, so the record has a length.
 No module compiles against the number, so it is one number and the deployment's.
 
 **Per module, when that module registers:** its scratch arena, its log ring and its spans - which
@@ -93,7 +93,7 @@ is -2 and not the -1 of a limit stated as none - `config.md`, *No unaccountable 
 ## Nothing is allocated in a phase
 
 **A phase and the barrier after it call the allocator not once.** Everything they use was given
-its room when the bridge was created or when a module loaded, from a number somebody stated:
+its room when the deck was created or when a module loaded, from a number somebody stated:
 
     storage's rows, tables and indexes    at create, from `[budget]`: `storage.md`
     what a dispatch works in              at create, `[budget] systems` long
@@ -112,7 +112,7 @@ allocation past `persistent` does. A module that queues none states `BRIDGE_NONE
 counted, and runs the cases `storage-changes`, `storage-tables` and `storage-strip` with a phase
 failing if the count moved: cases `allocation-changes`, `allocation-tables`, `allocation-strip`.
 
-**Loading, reloading and unloading a module do allocate**, and creating and destroying a bridge:
+**Loading, reloading and unloading a module do allocate**, and creating and destroying a deck:
 a record for the module, for each of its systems and types, and the rooms above. None is the
 hot path. What happens when one of those allocations fails is `failure.md`, *Out of memory*.
 
@@ -193,10 +193,10 @@ outgrows the deployment is stopped as any failing module is, by its own `on_erro
 asked once too often loses one barrier's changes and runs on.
 
 Nothing is taken from outside the block, ever. A column that does not fit is not served from
-the operating system, and the bridge is not stopped for it: who asked is named, and nothing has
+the operating system, and the deck is not stopped for it: who asked is named, and nothing has
 begun when the shortage is found, so there is nothing to unwind.
 
-## Bridge-ASM700 defaults none of them
+## Bridge defaults none of them
 
 A default is a value nobody in the chain accounted for, which `config.md`, *No unaccountable
 values*, refuses: **omitted everywhere is an error**, at create for the shared tier and at load for

@@ -5,13 +5,13 @@ What was weighed here and refused is `storage_refused.md`, *What was refused: St
 Who keeps the rows, and how. The model a module sees is `data.md`; what it reads is `query.md` and
 `reference.md`; which block each thing is in is `memory.md`.
 
-Storage is Bridge-ASM700's own: `src/storage_*.c`, behind the one internal header
+Storage is Bridge's own: `src/storage_*.c`, behind the one internal header
 `src/storage.h`.
 
-## Made for what the bridge promises
+## Made for what the deck promises
 
 A general ECS serves any program, so it must be right at every call: a row may move between any
-two of them, a query may be made at any time, anyone may iterate. Bridge-ASM700 promises much more
+two of them, a query may be made at any time, anyone may iterate. Bridge promises much more
 than any program does, and storage is made of what each promise allows:
 
     rows are touched only at a barrier,     no lock, no stage, no thread-local: one thread has
@@ -112,7 +112,7 @@ the read beside a table's column.** Its 204,800 values walked alone take 6.6 us,
 do. Reached from a table's rows through the index they take 89 us, 0.44 ns a row, where two
 columns of one table take 0.03. And it is eight bytes for every entity there may be, for each
 such component, the two indexes: `[budget] sparse_sets` says how many there may be, and their
-indexes are had when the bridge is created - `budgets.md`, *Budgets*.
+indexes are had when the deck is created - `budgets.md`, *Budgets*.
 
 **Running out, unload and observers are what they are for a table.** An entity the set has no
 room for is left as it was, with everything else that barrier asked of it, and that is a failure
@@ -178,7 +178,7 @@ keeps those bits for itself and writes another copy for modules, found as a togg
 sixteen bytes ahead of the cells hold where the bits begin. A module finds the cells through
 the cell its header has for each type it declared, tests the bit where it needs to know, and
 does not where it knows by its own design. `[budget] direct_indexed` says how many such
-components there may be, and their bits are had when the bridge is created.
+components there may be, and their bits are had when the deck is created.
 
 **It is for what is reached by id far more than it is walked.** A system cannot walk it: a
 term of it is stated `BRIDGE_OPTIONAL`, and one that selects is refused at `add_system`. Measured
@@ -335,7 +335,7 @@ Carved to what a table asks for, to sixteen bytes, so that every block begins wh
 *A table*. A freed range is a gap, kept in order and joined to its neighbours, and a request takes
 the smallest gap that holds it before fresh space. What says which ranges are free is kept outside
 the block: a list with a place for a gap beside every block there may be, a table's, a sparse
-set's and the one of each type kept apart, made with the bridge, which never grows.
+set's and the one of each type kept apart, made with the deck, which never grows.
 
 **Nothing is ever taken from outside it.** A request the region cannot meet is refused, and the
 barrier's second step is where that is found out, before anything has moved.
@@ -355,7 +355,7 @@ barrier's second step is where that is found out, before anything has moved.
     [budget] direct_indexed
                          how many direct-indexed: a bit an entity for each, twice
 
-**All of it is allocated when the bridge is created, and nothing after**: not at a barrier, not
+**All of it is allocated when the deck is created, and nothing after**: not at a barrier, not
 when a module loads. What a module declares takes a place that is already there, and a `declare`
 or an `add_system` past its key is refused - `budgets.md`, *Budgets*. A direct-indexed component's
 cells are the one thing taken at a `declare`, and they are taken from `[budget] columns`, which

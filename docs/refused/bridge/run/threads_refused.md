@@ -26,7 +26,7 @@ wrong one inside a host with a thread pool of its own. The condition that brings
 with no way to state a number, which would then state "as many as there are", by a name for it.
 
 Refused: borrowing the host's threads through a callback, a new seam nothing asks for yet. The
-condition that brings it back is a host whose job system Bridge-ASM700 has to run on.
+condition that brings it back is a host whose job system Bridge has to run on.
 
 Refused: one lock around every entry, which is what this replaced. It serialised modules that had no
 reason to wait for each other, and it made the ids two modules were given in one level a matter of

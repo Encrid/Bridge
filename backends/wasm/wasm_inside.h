@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -135,7 +135,7 @@ typedef struct {
 } wasm_own_t;
 
 /*
-** A function Bridge-ASM700 offers a module: what answers it, and the kinds
+** A function Bridge offers a module: what answers it, and the kinds
 ** of what it takes and gives.
 */
 typedef struct {
@@ -197,7 +197,7 @@ wasm_engine_t *wasm_get_engine(backend_t *b, enum wasm_engine kind);
 /*
 ** wasm_make_offered
 **
-** Answers what wasmtime is handed with a function Bridge-ASM700 offers.
+** Answers what wasmtime is handed with a function Bridge offers.
 */
 wasm_offered_t *wasm_make_offered(const backend_entry_t *entry);
 
@@ -212,7 +212,7 @@ void wasm_make_types(wasm_valtype_vec_t *vec, const enum backend_type *kinds,
 /*
 ** wasm_call_offered
 **
-** What wasmtime calls when a module calls a function Bridge-ASM700 offers.
+** What wasmtime calls when a module calls a function Bridge offers.
 */
 wasm_trap_t *wasm_call_offered(void *env, wasmtime_caller_t *caller,
     wasmtime_val_raw_t *raw, size_t count);

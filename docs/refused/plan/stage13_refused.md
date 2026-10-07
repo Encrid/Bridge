@@ -93,9 +93,9 @@ Of `stage13.md`, *A deployment with no backend*.
 Refused: left as it was, and unstated. Two counts of one kind with two rules, and nothing that
 says why. No condition brings it back.
 
-Refused: left as it was, with a sentence and a case that say such a bridge is created and loads
-nothing. A case and a sentence for a bridge nobody can use, and the two rules still. The
-condition that brings it back is something a host can do with a bridge before it has a backend.
+Refused: left as it was, with a sentence and a case that say such a deck is created and loads
+nothing. A case and a sentence for a deck nobody can use, and the two rules still. The
+condition that brings it back is something a host can do with a deck before it has a backend.
 
 ## What was built
 

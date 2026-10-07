@@ -23,11 +23,11 @@ look
 attach_b_half
   -: module 'st:store@0.1.0': [budget] tables of 1 is used up. Not applied, of the changes it asked: 3 0 0
   -: module 'st:store@0.1.0' is stopped: it reached its max_system_failures of 2, by entities it changed that could not be placed 0 0
-  -: the bridge has stopped: module 'st:store@0.1.0' was stopped and its on_error is fail 0 0
+  -: the deck has stopped: module 'st:store@0.1.0' was stopped and its on_error is fail 0 0
 attach_b_half
-  -: the bridge has stopped: module 'st:store@0.1.0' was stopped and its on_error is fail 0 0
+  -: the deck has stopped: module 'st:store@0.1.0' was stopped and its on_error is fail 0 0
   REFUSED
 look
-  -: the bridge has stopped: module 'st:store@0.1.0' was stopped and its on_error is fail 0 0
+  -: the deck has stopped: module 'st:store@0.1.0' was stopped and its on_error is fail 0 0
   REFUSED
 alive

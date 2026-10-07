@@ -2,7 +2,7 @@
 
 What was weighed here and refused is `lifetime_refused.md`, *What was refused: Lifetime*.
 
-Storage is the bridge's and outlives the module that declared a component, so a reloaded module finds its
+Storage is the deck's and outlives the module that declared a component, so a reloaded module finds its
 components still there - which the original Bridge does not do. What happens when a component layout
 has changed is *When a component layout changed*, below.
 
@@ -15,7 +15,7 @@ in place... without changing memory allocation"* (`vm.c:349`) - the allocation s
 this mode and not a reset. Where in-place is impossible it does not invent a third thing: *"DLL's
 can't be restarted in place"* and then `VM_Free` followed by `VM_Create` (`:363`).
 
-Bridge-ASM700 knows which components a module declared exclusively, because `declare` is idempotent and
+Bridge knows which components a module declared exclusively, because `declare` is idempotent and
 records its callers - a set operation when it matters and nothing per frame. A module that corrupted
 a *shared* component is not cleaned up by any of this.
 
@@ -31,7 +31,7 @@ per component, at `declare`:
 
 **It is a lifetime question, and no single answer fits.** An entity has no owner - several modules
 put components on one - so it cannot die with whoever spawned it. Its id sits as a plain `u64` in
-memories Bridge-ASM700 cannot trace, so it cannot be collected when unreachable either. What is left
+memories Bridge cannot trace, so it cannot be collected when unreachable either. What is left
 is that the author knows what the component *is*: an attribute of something that exists anyway, or
 the reason the entity exists at all.
 
@@ -125,7 +125,7 @@ is whatever else the unloaded modules held, as at any unload. The refusal lists 
 unload, so nobody has to find them.
 
 **Exclusive: its rows are moved to the new component layout, field by field, by name.**
-Bridge-ASM700 keeps the fields of every type, and a `declare` hands it the new descriptor, so it has
+Bridge keeps the fields of every type, and a `declare` hands it the new descriptor, so it has
 both. It is done as a move to another storage layout is, and by the same code, in whichever
 storage layout the component is kept - *When a component is moved*, above: a type is made for
 what the component becomes, and it takes every row or none when the reload holds. A component
@@ -177,8 +177,8 @@ list is not left where it is from one reload to the next, and a load, which lose
 states none. It is a list and not a yes or no because the rule is for the rename: a yes would
 let that through.
 
-**A removal is the author's, and that is why it migrates.** Bridge-ASM700 never discards data
-on a call that means "keep running", and that rule is for what Bridge-ASM700 would drop on its own
+**A removal is the author's, and that is why it migrates.** Bridge never discards data
+on a call that means "keep running", and that rule is for what Bridge would drop on its own
 account. A field the new
 struct no longer has was dropped by whoever edited the struct; refusing the reload does not keep
 the field, it keeps the author from running the code they wrote. What they are owed is to be told

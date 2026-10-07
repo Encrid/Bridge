@@ -7,7 +7,7 @@ What a component is and when the world changes. How a module reaches one is `que
 keeps the rows, and how, is `storage.md`.
 
 It is an ECS: components stored by type, entities as ids, systems declared by modules. Storage is
-Bridge-ASM700's own, and it is **an implementation detail, not the contract**. No module calls it,
+Bridge's own, and it is **an implementation detail, not the contract**. No module calls it,
 on either backend: a module reads what a barrier wrote for it and asks for change through the
 eight entries of `abi.md`, *The ABI*.
 
@@ -32,7 +32,7 @@ following*.
 ## Access mode
 
 Query terms carry it, and it is one of two: **read** or **write**. It is a **scheduling input and
-nothing else** - Bridge-ASM700 uses it to know which modules may run at once, and storage is never
+nothing else** - Bridge uses it to know which modules may run at once, and storage is never
 told.
 
 It is not enforced, which is how every ECS works. A module that writes a term it declared read is

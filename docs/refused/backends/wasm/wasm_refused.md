@@ -36,7 +36,7 @@ condition that brings that back is no backend taking that order.
 Of `wasm.md`, *The ABI layouts*.
 
 Refused: calling them `reserved`, which is what they were called. That is the word for bytes kept
-for a later use, and none is planned. Refused with it: Bridge-ASM700 refusing a module that left
+for a later use, and none is planned. Refused with it: Bridge refusing a module that left
 something other than zero there, which is what an interface does when it means to give such bytes a
 meaning later to programs already built. Here a changed ABI layout is a changed `BRIDGE_ABI`, and a
 module built against another is refused whole. The condition that brings the check back is an ABI

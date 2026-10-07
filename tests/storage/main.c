@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -140,7 +140,7 @@ const storage_test_variant_t *storage_test_find_variant(
 /*
 ** make_bridge
 **
-** Fills the fixture's deployment from a case's, and creates the bridge.
+** Fills the fixture's deployment from a case's, and creates the deck.
 ** Nothing is buffered from here on: a crash must not swallow what was said.
 */
 static void make_bridge(storage_test_t *t, const storage_test_room_t *room)
@@ -164,7 +164,7 @@ static void make_bridge(storage_test_t *t, const storage_test_room_t *room)
 /*
 ** main
 **
-** Runs the case the command line names, on a bridge of that case's
+** Runs the case the command line names, on a deck of that case's
 ** deployment, and says "alive" unless the case failed.
 */
 int main(int argc, char **argv)

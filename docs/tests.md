@@ -1,6 +1,6 @@
 # The tests
 
-What Bridge-ASM700 exposes, and the cases that show it. A capability is a thing somebody outside
+What Bridge exposes, and the cases that show it. A capability is a thing somebody outside
 the library can interact with, on one of its three seams: a function a host calls and a key it
 states, an entry a module calls and a layout it reads, an entry a backend answers. The headers
 are where each is, so the headers are what this list is held against.
@@ -387,8 +387,8 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
 ### BRIDGE_FAIL
 
     BRIDGE_FAIL-refused-before-it-exists-stops-nothing
-    BRIDGE_FAIL-stopped-module-stops-the-bridge
-    BRIDGE_FAIL-failed-reload-stops-the-bridge
+    BRIDGE_FAIL-stopped-module-stops-the-deck
+    BRIDGE_FAIL-failed-reload-stops-the-deck
 
 ### BRIDGE_SKIP
 
@@ -454,7 +454,7 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
 
     bridge_create-no-sink-refused
     bridge_create-budget-sum-beyond-32-bits-refused
-    bridge_create-two-bridges-at-once
+    bridge_create-two-decks-at-once
 
 ### bridge_destroy
 
@@ -468,14 +468,14 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
     bridge_load-no-init-export
     bridge_load-failed-init-undone
     bridge_load-refused-leaves-nothing
-    bridge_load-lifts-a-stopped-bridge
+    bridge_load-lifts-a-stopped-deck
     bridge_load-no-reload-export
     bridge_load-loaded-already-refused
     bridge_load-import-nobody-answers
 
 ### bridge_unload
 
-    bridge_unload-of-what-stopped-the-bridge
+    bridge_unload-of-what-stopped-the-deck
     bridge_unload-declarer-goes-user-holds-the-type
     bridge_unload-not-loaded-refused
     bridge_unload-after-a-failed-native-reload
@@ -496,7 +496,7 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
     bridge_reload-same-share-exhausted
     bridge_reload-smaller-share-refused
     bridge_reload-share-more-than-the-arena-refused
-    bridge_reload-lifts-a-stopped-bridge
+    bridge_reload-lifts-a-stopped-deck
     bridge_reload-to-another-backend-refused
     bridge_reload-dropped-declaration-frees-its-name
     bridge_reload-stopped-module-revived
@@ -1102,7 +1102,7 @@ handed.
 
 ### memory_adopt
 
-    memory_adopt-refused-refuses-the-bridge
+    memory_adopt-refused-refuses-the-deck
 
 ### memory_release
 
@@ -1171,7 +1171,7 @@ handed.
 
 ### BACKEND_RELOAD
 
-    BACKEND_RELOAD-a-module-replaced-while-the-bridge-runs
+    BACKEND_RELOAD-a-module-replaced-while-the-deck-runs
 
 ### BACKEND_SIDE_BY_SIDE
 

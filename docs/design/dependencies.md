@@ -1,6 +1,6 @@
 # Dependencies
 
-**Every thing Bridge-ASM700 is built with or linked against is listed here, with why it is
+**Every thing Bridge is built with or linked against is listed here, with why it is
 there.** Third-party code is not refused. A dependency nobody wrote down is: `tools/deps.py` reads
 this document and fails the build's tests on a tool `build.py` calls that is not listed, on a
 function a built artifact imports that is not listed, and on one that is listed and that nothing

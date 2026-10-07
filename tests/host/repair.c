@@ -1,11 +1,11 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** tests/host/repair.c -- a stopped bridge, and the one call it
+** tests/host/repair.c -- a stopped deck, and the one call it
 ** accepts: the one that brings back the module that stopped it.
 **
 ** failure.md, *When something fails*
@@ -16,9 +16,9 @@
 /*
 ** test_repair
 **
-** An essential module stopped at its budget stops the bridge; another
+** An essential module stopped at its budget stops the deck; another
 ** module is refused; reloading the first into one that works is the one
-** thing a stopped bridge accepts, and it runs again.
+** thing a stopped deck accepts, and it runs again.
 */
 void test_repair(host_t *h)
 {

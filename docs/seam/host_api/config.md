@@ -2,22 +2,22 @@
 
 What was weighed here and refused is `config_refused.md`, *What was refused: Config*.
 
-Bridge-ASM700 reads no file. A host hands it values as structs - `host_api.md`, *The data* - and
+Bridge reads no file. A host hands it values as structs - `host_api.md`, *The data* - and
 where those values came from is the host's business: a file, a database, compiled-in constants. This
-document is what Bridge-ASM700 requires of them.
+document is what Bridge requires of them.
 
 Keys are spelled here, and throughout these documents, the way a TOML file would spell them -
 `[budget] entities`, `[order] before` - because a key needs a name and that one is short.
-Bridge-ASM700 sees only the struct field.
+Bridge sees only the struct field.
 
 ## No unaccountable values
 
-**Every value is stated by somebody, and Bridge-ASM700 supplies none of its own.** A key the host
+**Every value is stated by somebody, and Bridge supplies none of its own.** A key the host
 leaves unset is an error naming the key rather than a guess - at create for the deployment's keys,
-at load for a module's. `budgets.md`, *Bridge-ASM700 defaults none of them*, for what that means for
+at load for a module's. `budgets.md`, *Bridge defaults none of them*, for what that means for
 a budget.
 
-**Unset is zero.** Bridge-ASM700 sees a struct, so a numeric or enum field left at zero is the unset
+**Unset is zero.** Bridge sees a struct, so a numeric or enum field left at zero is the unset
 one, and zero is never a legal value for it: a budget, `work_limit`, a timeout, `on_error`. `log_level` is
 no exception, though its numbers are syslog's and zero is one of them: zero is unset there too,
 and the least it can be stated as is 1 - `log.md`, *The log*. Where "none"
@@ -56,13 +56,13 @@ as what it hands over is one stated value per key. The original Bridge had the s
                                                read / write
                                                [.config]
 
-Each becomes a field in `host_api.md`, *The data*, and Bridge-ASM700's behaviour turns on it.
+Each becomes a field in `host_api.md`, *The data*, and Bridge's behaviour turns on it.
 Anything else a host configures - where modules are found, where records go, when a report is
 printed - is the host's and has no key here: `split.md`, *The split*.
 
-`[backend]` is Bridge-ASM700's because Bridge-ASM700 opens those libraries - `create.md`, *Create*.
+`[backend]` is Bridge's because Bridge opens those libraries - `create.md`, *Create*.
 What a backend is configured *with* is not: a cache directory, an instantiation policy, a tick
-period. The host hands those over as that backend's settings and Bridge-ASM700 passes them through
+period. The host hands those over as that backend's settings and Bridge passes them through
 unread.
 
 Two keys are designed and not in the table, since neither is built: `validation.md`, *The
@@ -77,7 +77,7 @@ inside one phase.
 
 `[.config]` - the `settings` a host hands over for a module - **seeds a singleton component.** The
 module declares the struct in its schema header like any other, and states it a singleton -
-`storage.md`, *A singleton*. Bridge-ASM700 gives it its value at init, matching the keys to the
+`storage.md`, *A singleton*. Bridge gives it its value at init, matching the keys to the
 field names its descriptor states - `schema.md`, *There is no schema format*. A key the
 deployment set that the module never declared is an error at init, by name, where the original
 Bridge silently ignores a typo.
@@ -116,8 +116,8 @@ by whoever holds the grant - not a call, not a reload, not a call to reconfigure
 value; the component is the running state.
 
 That is why nothing needs a mechanism for runtime settings: **the settings that change constantly in
-a running program were never Bridge-ASM700's.** The ones that are Bridge-ASM700's are administrative
+a running program were never Bridge's.** The ones that are Bridge's are administrative
 - a work limit, a log level - and change by reload, which is cheap because storage survives it.
 
 Keeping a changed setting across a restart is between a native module, which can write a file, and
-the host, which reads it back. Bridge-ASM700 never sees it.
+the host, which reads it back. Bridge never sees it.

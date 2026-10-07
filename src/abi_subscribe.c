@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -98,7 +98,7 @@ static void hand_over(subscribing_t *g)
 /*
 ** list_system
 **
-** Puts a system among the bridge's, and among its module's systems or its
+** Puts a system among the deck's, and among its module's systems or its
 ** observers, and answers its slot there.
 */
 static uint32_t list_system(subscribing_t *g)

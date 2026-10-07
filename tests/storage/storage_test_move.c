@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -82,7 +82,7 @@ static void say_kept(bridge_t *b)
 /*
 ** move
 **
-** One row, in a bridge of its own: the first build loaded, run, prepared
+** One row, in a deck of its own: the first build loaded, run, prepared
 ** and looked at, the reload into the second, another look, and what
 ** storage has of st:X.
 */
@@ -111,9 +111,9 @@ static void move(storage_test_t *t, const storage_test_moved_t *row)
 /*
 ** storage_test_move
 **
-** Every move of a component between storage layouts, each in a bridge of
+** Every move of a component between storage layouts, each in a deck of
 ** its own with room for one sparse set and one direct-indexed component.
-** The bridge main made is replaced by one of the last deployment.
+** The deck main made is replaced by one of the last deployment.
 */
 enum storage_test_end storage_test_move(storage_test_t *t)
 {

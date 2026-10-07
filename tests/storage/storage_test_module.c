@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -19,7 +19,7 @@
 **
 ** Answers a trusted native module as a deployment must state it, with the
 ** identity st:store@0.1.0: one that is not reloadable, and whose first
-** failure stops the bridge.
+** failure stops the deck.
 */
 bridge_artifact_t storage_test_state(const char *path, int64_t spawns,
     uint32_t spans, int64_t changes)
@@ -43,7 +43,7 @@ bridge_artifact_t storage_test_state(const char *path, int64_t spawns,
 /*
 ** storage_test_load
 **
-** Loads a module into the fixture's bridge. Answers 1, having said "FAIL:
+** Loads a module into the fixture's deck. Answers 1, having said "FAIL:
 ** not loaded", if it was refused.
 */
 int storage_test_load(storage_test_t *t, const bridge_artifact_t *a)
@@ -57,7 +57,7 @@ int storage_test_load(storage_test_t *t, const bridge_artifact_t *a)
 /*
 ** storage_test_try_load
 **
-** Loads a module into the fixture's bridge. Answers 1, having said "not
+** Loads a module into the fixture's deck. Answers 1, having said "not
 ** loaded", if it was refused: a refusal is what the case is for.
 */
 int storage_test_try_load(storage_test_t *t, const bridge_artifact_t *a)
@@ -71,8 +71,8 @@ int storage_test_try_load(storage_test_t *t, const bridge_artifact_t *a)
 /*
 ** storage_test_load_reloadable
 **
-** Loads into a bridge a module that is reloadable and may be reloaded. The
-** program ends, saying "FAIL: not loaded", if there is no bridge or the
+** Loads into a deck a module that is reloadable and may be reloaded. The
+** program ends, saying "FAIL: not loaded", if there is no deck or the
 ** load is refused.
 */
 void storage_test_load_reloadable(bridge_t *b, bridge_artifact_t *a)
@@ -88,7 +88,7 @@ void storage_test_load_reloadable(bridge_t *b, bridge_artifact_t *a)
 /*
 ** storage_test_reopen
 **
-** Destroys the fixture's bridge, creates another from the fixture's
+** Destroys the fixture's deck, creates another from the fixture's
 ** deployment with this sink, and loads a module into it. Answers 1, having
 ** said "FAIL: not loaded", if either is refused.
 */

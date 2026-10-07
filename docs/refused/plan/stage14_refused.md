@@ -131,7 +131,7 @@ what unload drops and keeps, and what becomes of the entities, twice; what a sys
 observer subscribe to; what is never discarded on a call that means keep running; what is kept
 elsewhere and reached from the row; what is refused at `add_system`; that a barrier at which
 nothing changed writes nothing, and what one writes for a module; the memory a module can write
-and Bridge-ASM700 can read, and that it is fixed by the SDK; that a `declare` that does not fit
+and Bridge can read, and that it is fixed by the SDK; that a `declare` that does not fit
 is refused; that a barrier is worked an entity at a time; that a module's settings are a
 component; what holds a share back at unload; what finds a bad write; that a work limit only
 goes down; who owns the loop; what is set aside at the last barrier; that a dependency nobody

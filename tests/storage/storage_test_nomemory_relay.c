@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -39,7 +39,7 @@ void *counted_os_reserve(size_t reserve, size_t commit)
 /*
 ** relay_one
 **
-** A bridge made, a module loaded, run, reloaded into a build with a field
+** A deck made, a module loaded, run, reloaded into a build with a field
 ** added and looked at, with the allocation numbered `k` answered null.
 ** Answers whether there was such an allocation.
 */

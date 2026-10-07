@@ -43,7 +43,7 @@ its library is opened".
 
 ## What the stage found
 
-**The seam held.** Bridge-ASM700 gained no native case. The scheduler, the barrier, the entries and
+**The seam held.** Bridge gained no native case. The scheduler, the barrier, the entries and
 the load path are the code stage 3 wrote; the native backend is under 300 lines beside them. That is the
 claim `backend.md` makes for the surface, and this is the first time it was tested by a second
 backend.

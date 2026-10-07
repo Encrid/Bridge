@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -65,7 +65,7 @@ int host_run(host_t *h, const host_case_t *cases, size_t count)
 /*
 ** host_open
 **
-** Creates the host's bridge.
+** Creates the host's deck.
 */
 int host_open(host_t *h)
 {
@@ -79,7 +79,7 @@ int host_open(host_t *h)
 /*
 ** host_close
 **
-** Destroys the host's bridge and says "alive".
+** Destroys the host's deck and says "alive".
 */
 void host_close(host_t *h)
 {

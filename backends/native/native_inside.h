@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -93,7 +93,7 @@ struct backend_instance {
 ** thread's callback say, or outside a call, answers zero.
 **
 ** A refusal cannot unwind native code, so the entry answers zero and the
-** call returns: Bridge-ASM700 fails the invocation then. Until it does
+** call returns: Bridge fails the invocation then. Until it does
 ** return, every entry answers zero and reaches nothing, which is as near to
 ** stopped as native code can be put.
 **

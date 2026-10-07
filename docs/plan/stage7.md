@@ -19,14 +19,14 @@ here because this is where they were asked.
     the C library                 the parts that can be carried, carried: `build.md`, *The C
                                   library*
     thread-local storage          none; the context is passed. Withdrawn in stage 9
-    flecs' log callback           to every live bridge's sink. Withdrawn in stage 9
+    flecs' log callback           to every live deck's sink. Withdrawn in stage 9
     a typed accessor              through a temporary of the struct's type. Withdrawn in stage 9
     Windows                       the `gnu` target, and no C runtime: `build.md`, *Platforms* and
                                   *The C library*
     where all this sits           a stage each, 7 to 10, before the host: `plan.md`
 
 Three were not questions. The compiler is zig, everywhere; the build is a Python script; and what
-all of it binds is Bridge-ASM700's own development, not a module's: `build.md`, *One compiler*,
+all of it binds is Bridge's own development, not a module's: `build.md`, *One compiler*,
 *One script*, and *What an author is not bound by*.
 
 The standard came out against the recommendation, which was C23 for the source with the headers

@@ -13,7 +13,7 @@ split by who can see it.
 
 The **scratch arena** is for anything transient: a message, a formatted number, a name assembled to
 be logged. Each module gets one in its own private memory at registration and bumps its own pointer, so
-allocating costs no crossing, and Bridge-ASM700 resets them all at each barrier.
+allocating costs no crossing, and Bridge resets them all at each barrier.
 
 It is named for what it is rather than for a frame: its lifetime is a phase.
 
@@ -60,10 +60,10 @@ So **replacing a string is free and growing one is not**, which is the asymmetry
 A module that grows a string once a level will never notice. One that does it per frame exhausts
 the arena and fails by name: nothing gives that space back while the module is loaded.
 
-**Bridge-ASM700 reuses its own range.** A module's `[.config]` strings are allocated by
-Bridge-ASM700 at init, from that module's own share, and `init` runs again on every load - so a day
+**Bridge reuses its own range.** A module's `[.config]` strings are allocated by
+Bridge at init, from that module's own share, and `init` runs again on every load - so a day
 of unload-and-load would leak one copy per cycle wherever the module's share has to stay - *It
-is given back when nothing points into it*. So where a share stays, Bridge-ASM700 keeps the
+is given back when nothing points into it*. So where a share stays, Bridge keeps the
 module's config-string range in it, and the next load of the module writes there again when the
 text fits, and takes from its new share only when it does not.
 
@@ -78,7 +78,7 @@ grant, and a reset would invalidate offsets held by modules that never asked - t
 are no immediate forms either: `abi.md`, *The ABI*.
 
 **At unload its share goes back to the arena, unless a row that is staying holds a string in
-it.** Bridge-ASM700 can know what the module could not. A string a component keeps is a
+it.** Bridge can know what the module could not. A string a component keeps is a
 `bridge_text_t` field - `schema.md`, *The type set* - so every place one is held can be found:
 after the module's own components are dropped, every `bridge_text_t` of every row left is read,
 in a field, in an array of them, or in a struct a field holds. If none lies in the leaving

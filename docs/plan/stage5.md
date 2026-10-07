@@ -119,9 +119,9 @@ work, and deferred work and its documents drift apart:
     the schedule          reachability as a row of bits per system
     the column allocator  exact sizes, gaps joined, growth in place - `flecs.md`, *It can be
                           confined*
-    one bridge a process  as many as a host creates, each its own world, at once
+    one deck a process  as many as a host creates, each its own world, at once
     a load that stopped   answers that it did not succeed
-    the bridge
+    the deck
 
 `setting` and `two` are the tests the first and fourth gained. The allocator moved a number:
 flecs' own tables fit in about 50 KB of columns where the first allocator needed 70.

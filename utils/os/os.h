@@ -1,11 +1,11 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** utils/os/os.h -- the operating system, as far as Bridge-ASM700 and its
+** utils/os/os.h -- the operating system, as far as Bridge and its
 ** backends need it: address space, shared libraries, threads, the clock, a
 ** mutex and an event.
 **

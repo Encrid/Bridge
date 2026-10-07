@@ -2,12 +2,12 @@
 
 What was weighed here and refused is `schedule_refused.md`, *What was refused: The schedule*.
 
-What Bridge-ASM700 does between a module's systems and observers: when they run, and what is visible
+What Bridge does between a module's systems and observers: when they run, and what is visible
 while they do. What bounds a run is `limits.md`; what happens when one fails is `failure.md`; which
 systems run at once is `threads.md`. The data they run over is `data.md`; what a module can ask
 for is `abi.md`.
 
-Bridge-ASM700 owns this because no host could do it differently - `split.md`, *The split*.
+Bridge owns this because no host could do it differently - `split.md`, *The split*.
 
 ## Phases
 
@@ -22,10 +22,10 @@ A phase runs, then a barrier. The host asks for them one at a time and decides t
 an immediate form that would need a phase of its own - `abi.md`, *The ABI* - so no second phase
 is forced.
 
-### Bridge-ASM700 ships no phase names
+### Bridge ships no phase names
 
 Not one, and not a default set. **A phase name is a name somebody has to invent**, and inventing one
-here would turn Bridge-ASM700's guess about the shape of a frame into something every module references.
+here would turn Bridge's guess about the shape of a frame into something every module references.
 That is the last clause of `no_builtins.md`, *No builtins*, and it fails that rule's universality test: a
 one-run tool and a game do not want the same phases.
 
@@ -102,7 +102,7 @@ today.
 
 Rows move when an entity is placed in another table, or into the place of one that left, so
 **nothing moves while any phase is in flight.**
-That is the whole reason for the shape. Every phase defers its structural change, so Bridge-ASM700 has one
+That is the whole reason for the shape. Every phase defers its structural change, so Bridge has one
 safe moment to restructure, and it is the same moment it republishes the spans - which is what lets
 a span be a snapshot. **Every phase, without exception**: `data.md`, *Structural change*.
 
@@ -133,7 +133,7 @@ modules and only the deployment knows both are there.
 
 ### Order within a phase is never implicit
 
-If two systems in the same phase conflict and nothing orders them, **Bridge-ASM700 refuses the
+If two systems in the same phase conflict and nothing orders them, **Bridge refuses the
 load that introduces the conflict** and names both. Never
 declaration order or load order: nothing is decided by which module happened to be found first.
 
@@ -188,7 +188,7 @@ reverse of the order a module registered two of its systems in, the pair stands.
 ## What a phase shows you
 
 **A spawn is visible at the next barrier.** `spawn` answers a usable id at once, since the id is
-Bridge-ASM700's to mint, but the row does not exist and no query counts it until then. Deletion mirrors
+Bridge's to mint, but the row does not exist and no query counts it until then. Deletion mirrors
 it: a destroyed entity stays readable for the rest of the phase that destroyed it.
 
 So **every system sees one world for the whole of a phase**, which is what lets parallel systems
@@ -209,7 +209,7 @@ so the order the rest happen to run in cannot change the result - the conflict g
 parallelism and hands this over for nothing.
 
 So a pass is reproducible from its storage and that one column set. Entity ids and arena offsets are
-Bridge-ASM700's to mint in order, iteration order follows from the same history, and a work limit is
+Bridge's to mint in order, iteration order follows from the same history, and a work limit is
 deterministic by period - `limits.md`, *What bounds a run*.
 
 **The one thing that is not reproducible is a timeout firing.** The same `init` may finish on a
@@ -225,12 +225,12 @@ It is stated here because an input path that bypassed a column would quietly mak
 on something nobody can see, and nothing later could recover that.
 
 **Recording a run and playing it back is what this is for, and it is a host's to build, all of
-it.** Nothing is missing from Bridge-ASM700 for it. A host loads native modules of its own, and a
+it.** Nothing is missing from Bridge for it. A host loads native modules of its own, and a
 native module reads the columns of the components it declares through real pointers, and writes
 them: so a module that copies what the input modules wrote, and another that writes it back in
 their place, are two modules like any other - `no_builtins.md`, *No builtins*: a new capability
 is a new module. The journal they feed is a file, and a file is the host's - `split.md`, *The
 split*. It may not drop a record, which is why it is not the log's path - `log.md`, *The log*.
 
-What is Bridge-ASM700's is what makes a recording mean anything: the rule above, the case that
+What is Bridge's is what makes a recording mean anything: the rule above, the case that
 holds it, and the checksums a played-back run is judged by.

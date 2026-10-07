@@ -1,14 +1,14 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
 ** tests/host/unset_budget.c -- keys of the deployment nobody stated: a
-** bridge is refused for each.
+** deck is refused for each.
 **
-** budgets.md, *Bridge-ASM700 defaults none of them*
+** budgets.md, *Bridge defaults none of them*
 */
 
 #include "cases.h"

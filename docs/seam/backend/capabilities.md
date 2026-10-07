@@ -41,15 +41,15 @@ timeouts, `reload` by `hot_reload`. **A guarantee has one name**, for the key th
 capability that answers. It is `timeout` and not a deadline, which is a moment where what the
 entry takes is a length of time. And it is `work_limit` and not fuel, which is what wasmtime
 calls the count it keeps, and belongs in the wasm backend's document as `sandbox` does.
-`side by side` is demanded by nothing: it is how Bridge-ASM700 learns which order a reload takes -
+`side by side` is demanded by nothing: it is how Bridge learns which order a reload takes -
 `lifecycle.md`, *The runtime lifecycle*. `unload` is demanded by nothing either: it is how
-Bridge-ASM700 learns what to do with a backend's library at `bridge_destroy` - `create.md`,
-*Destroy*. It says the library **may** go, and Bridge-ASM700 then closes it; whether it is then
+Bridge learns what to do with a backend's library at `bridge_destroy` - `create.md`,
+*Destroy*. It says the library **may** go, and Bridge then closes it; whether it is then
 unmapped is the operating system's. Windows and Linux unmap it. macOS does too, unless the image
 has a thread-local variable, and the native backend's has none.
 `tests/host`, case `BACKEND_UNLOAD-library-gone-or-kept`, asks the operating system on all three. So
 a mismatch is not a module arguing with a backend - it is **config contradicting config**, since the
-deployment chose both. It is therefore one of Bridge-ASM700's own refusals, made before the module
+deployment chose both. It is therefore one of Bridge's own refusals, made before the module
 exists, and the load answers it and nothing else does: `failure.md`, *When something fails*.
 
 **A key stated as "no limit" demands nothing.** `work_limit`, a timeout and `memory_limit` each take
@@ -67,7 +67,7 @@ than quietly given something else.
 The override is explicit instead: a developer who wants untrusted code on the native backend writes
 `trusted = true` - a statement in a file somebody can read, rather than a warning nobody does.
 
-The native backend answers no to `untrusted`, truthfully, and Bridge-ASM700 then refuses to load anything
+The native backend answers no to `untrusted`, truthfully, and Bridge then refuses to load anything
 marked untrusted onto it, before the library is opened. That makes the native backend a deliberate
 choice for code you wrote rather than a hole you discover.
 

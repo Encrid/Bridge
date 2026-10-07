@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -51,7 +51,7 @@
 ** ABI and where the two memories begin. It is passed to every export, and
 ** every entry takes it first, so nothing is found by who happens to be
 ** running. Every pointer argument of an entry is still an offset into the
-** scratch arena: that is Bridge-ASM700's, and the same on every backend.
+** scratch arena: that is Bridge's, and the same on every backend.
 **
 ** An entry may be called only from inside a call the backend made, on the
 ** thread it made it on: init, a system, an observer. The backend checks it.

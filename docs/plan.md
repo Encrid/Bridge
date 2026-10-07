@@ -48,15 +48,15 @@ written for.* Met.
 Done. `stage2.md` is what it built and found.
 
 `bridge_backend.h` with all sixteen entries it then had - eighteen now, `backend.md` - and the wasm
-backend as a shared library behind it, which Bridge-ASM700 opens by the name config gives -
-`backend.md`, *What a backend is asked for*. A core wasm module importing a Bridge-ASM700 memory,
+backend as a shared library behind it, which Bridge opens by the name config gives -
+`backend.md`, *What a backend is asked for*. A core wasm module importing a Bridge memory,
 which means `wasm_multi_memory` on since the module has its own. `bridge_abi.h` begins here, because
 a module reading the shared memory with plain loads needs to know what a span holds. `define_func`
 with a real signature and `instance_get_func`'s `() -> i32` check - `signatures.md`, *Imports are
 declared, exports are checked*.
 
 `bridge.h` begins here too, as far as this stage's claim needs: `bridge_create`, `bridge_destroy`
-and `bridge_load`, with **the sink and Bridge-ASM700's own records**, so every refusal from here on has a
+and `bridge_load`, with **the sink and Bridge's own records**, so every refusal from here on has a
 route - `create.md`, *The sink*. Load checks the identity and the ABI version, and each capability a
 config key demands - `capabilities.md`, *Capabilities, so the swap is honest*.
 
@@ -173,7 +173,7 @@ Windows.* Met.
 
 Done. `stage9.md` is what it built and found.
 
-Everything of Bridge-ASM700's own becomes C23 - the source, the tests, the test modules and all
+Everything of Bridge's own becomes C23 - the source, the tests, the test modules and all
 five headers - and uses it: named enums with stated widths, typed constants, `nullptr`,
 attributes, every ABI layout asserted where it is stated, and sums of stated sizes checked.
 flecs stays C99 and wasmtime's headers C11. `build.md`, *The standard*, is the rule and why.
@@ -189,18 +189,18 @@ and macOS.* Met.
 
 ## 10. Storage of our own
 
-Done. `stage10.md` is what it built and found. flecs leaves, and what Bridge-ASM700 used it
+Done. `stage10.md` is what it built and found. flecs leaves, and what Bridge used it
 for becomes its own: the entity index, tables and their columns, moving a row between them, matching
 a system's terms to tables, the events an observer hears, and reading a struct's fields out of its
 text. It is the reversal of a decision this plan began with, and `stage10.md` is why.
 
 **flecs was never on the path that repeats.** A system reads its columns through the spans
-Bridge-ASM700 publishes, and no row loop calls flecs. What flecs did, it did at a barrier and at
+Bridge publishes, and no row loop calls flecs. What flecs did, it did at a barrier and at
 load. Scheduling, deferral, threads, the entity mirror and where memory sits were ours already. So
 what is replaced is a hundred thousand lines kept for forty-one calls.
 
 **It is not a smaller flecs.** flecs serves any program, and so must be right at every call.
-Bridge-ASM700 touches storage only at a barrier, with every change of that barrier already in
+Bridge touches storage only at a barrier, with every change of that barrier already in
 hand, for queries fixed at load, and nobody iterates through it. Storage made for that works an
 entity once however much was asked of it, publishes what changed and nothing else, believes
 nothing a module can write, and allocates nothing after it is created.
@@ -210,7 +210,7 @@ Ours is built beside it, behind one internal header, and both run the same cases
 when ours passes all of them and is not slower on any measured operation. If it is, flecs stays
 and this stage has failed its claim.
 
-*Done when every case passes on storage that is Bridge-ASM700's own, on Windows, Linux and macOS,
+*Done when every case passes on storage that is Bridge's own, on Windows, Linux and macOS,
 alone and under load; on every measured operation it is not slower than flecs was, with both sets
 of figures recorded; storage allocates nothing after `bridge_create` and reads nothing back from
 the shared block; no line of flecs is left in the tree; and the behaviours no test covered before
@@ -373,19 +373,19 @@ finds no broken citation; and every case passes.*
 
 In progress: `stage15.md`.
 
-Bridge-ASM700 becomes Bridge: the library is finished as a library, and takes the name of what it
+Bridge becomes Bridge: the library is finished as a library, and takes the name of what it
 replaces. What is renamed - the repository, the name in every document and in the header every
 file of ours starts with, and what the original Bridge is called from then on in the documents
 that refer to it - is this stage's first question, by the method of `stage0.md`.
 
-*Done when nothing in the tree says Bridge-ASM700; the original Bridge has one name wherever it is
+*Done when nothing in the tree says Bridge; the original Bridge has one name wherever it is
 meant; and every case passes.*
 
 ## 16. A host, from outside
 
 A standalone host, in its own repository, that links the library built and nothing else of it, which
 is what tests the host seam - `host_api.md`, *A host links a built library*. It is handed the two
-library files and the headers, not the source tree: a host does not compile Bridge-ASM700. And a
+library files and the headers, not the source tree: a host does not compile Bridge. And a
 host may be in any language that can call C, so the seam is to be shown from more than C. Which
 languages, and whether one host or several, is this stage's first question, by the method of
 `stage0.md`; a host in C++ that links and runs is one of them, since the seam headers already say
@@ -411,14 +411,14 @@ in its own repository the way stage 13 covers the library's.*
 `[checks] validate` and `[checks] profile` - the barrier's checksum pass and the per-system
 counters - and `bridge_profile`, a pull. `validation.md`, *The checksum pass, when asked*, and
 `profile.md`, *The profile*. And a second pull: how much of each budget is in use, and the most
-that ever was, for the bridge and for each module - the reading a deployment sizes its budgets by.
+that ever was, for the deck and for each module - the reading a deployment sizes its budgets by.
 What a host does with it is the host's, in its own repository, which is why this stage follows
 the host's: stage 16. Each capability it adds has its case in the list of stage 13.
 
 *Done when a deliberate stray write is reported with the module that made it, a system made slow on
 purpose is the one the profile names, a barrier made slow on purpose by what was queued is the
 row the profile names, an observer cycle shows as call counts that never fall to
-zero, every budget of the bridge and of a module reads as what a test made it use and as the
+zero, every budget of the deck and of a module reads as what a test made it use and as the
 most it ever used, and one deployment run twice, and on one thread and on four, gives the same checksum of
 every column at every barrier - `schedule.md`, *What a pass depends on*.*
 
@@ -433,7 +433,7 @@ So this stage's first question, below, is asked of the three headers together.
 What a module needs to be written falls in two parts, and they have two owners - `readme.md`,
 *Three layers, three seams*.
 
-    Bridge-ASM700     what it writes for a module to read, the same on every backend:
+    Bridge     what it writes for a module to read, the same on every backend:
                       `bridge_abi.h`
     a backend         how a module it runs reaches that: its SDK, in its own `sdk/`
 
@@ -445,7 +445,7 @@ and no stage.
 
 This stage makes it true once, for one language that is not C, on the native backend: the ABI
 layouts in a form that language can read, and that backend's SDK in that language, each made by its
-owner. How Bridge-ASM700 states its ABI layouts so that more than C can read them - a description
+owner. How Bridge states its ABI layouts so that more than C can read them - a description
 with no language in it from which the header is written, or something less - is this stage's
 first question, by the method of `stage0.md`; which language, and what a backend's SDK in it
 consists of, are the next two.
@@ -454,7 +454,7 @@ After diagnostics; and what it adds goes into the list of the tests by capabilit
 it is added.
 
 *Done when a native module in a language that is not C runs as a case; what it was written with
-came from Bridge-ASM700 for the ABI layouts and from the native backend for the rest, and neither was
+came from Bridge for the ABI layouts and from the native backend for the rest, and neither was
 copied out of the other; and an ABI layout changed in one place changes what both languages read.*
 
 ## 19. Prove it
@@ -465,7 +465,7 @@ them ask another module a question synchronously - `costs.md`, *What we give up*
 189 is the number that can pass.
 
 It is also the first deployment that needs a clock and a set of phases, and nothing ships either:
-`no_builtins.md`, *No builtins*, and `schedule.md`, *Bridge-ASM700 ships no phase names*. Both are
+`no_builtins.md`, *No builtins*, and `schedule.md`, *Bridge ships no phase names*. Both are
 this deployment's own here. Whether either becomes content that deployments share - a module with
 a name and a version, a list of phase names - is this stage's question to put, by the method of
 `stage0.md`, with what the port actually needed in hand.

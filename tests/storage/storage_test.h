@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -52,8 +52,8 @@ constexpr uint32_t STORAGE_TEST_MEASURE_ROUNDS = 6;
 /*
 ** How a case ended.
 **
-**     DONE          main destroys the bridge and says "alive"
-**     LEFT          main says "alive", and the bridge is left as it is
+**     DONE          main destroys the deck and says "alive"
+**     LEFT          main says "alive", and the deck is left as it is
 **     FAILED        the case said why, and the program answers 1
 */
 enum storage_test_end : int {
@@ -66,9 +66,9 @@ enum storage_test_end : int {
 ** What main owns and every case is handed. It is what every sink is handed
 ** too.
 **
-**     cfg           the deployment the bridge was created from: a case that
-**                   makes a bridge of its own changes it first
-**     b             the bridge. The one main made, until a case replaces it
+**     cfg           the deployment the deck was created from: a case that
+**                   makes a deck of its own changes it first
+**     b             the deck. The one main made, until a case replaces it
 **     what          the case's name, as the command line said it
 **     more          the argument after it, or nullptr
 **     said          what a system last said it read: kept, so that a timing
@@ -275,7 +275,7 @@ void *counted_os_reserve(size_t reserve, size_t commit);
 **
 ** Answers a trusted native module as a deployment must state it, with the
 ** identity st:store@0.1.0: one that is not reloadable, and whose first
-** failure stops the bridge.
+** failure stops the deck.
 */
 bridge_artifact_t storage_test_state(const char *path, int64_t spawns,
     uint32_t spans, int64_t changes);
@@ -283,7 +283,7 @@ bridge_artifact_t storage_test_state(const char *path, int64_t spawns,
 /*
 ** storage_test_load, storage_test_try_load
 **
-** Load a module into the fixture's bridge. Each answers 1 if it was
+** Load a module into the fixture's deck. Each answers 1 if it was
 ** refused, having said "FAIL: not loaded", or "not loaded" where a refusal
 ** is what the case is for.
 */
@@ -293,8 +293,8 @@ int storage_test_try_load(storage_test_t *t, const bridge_artifact_t *a);
 /*
 ** storage_test_load_reloadable
 **
-** Loads into a bridge a module that is reloadable and may be reloaded. The
-** program ends, saying "FAIL: not loaded", if there is no bridge or the
+** Loads into a deck a module that is reloadable and may be reloaded. The
+** program ends, saying "FAIL: not loaded", if there is no deck or the
 ** load is refused.
 */
 void storage_test_load_reloadable(bridge_t *b, bridge_artifact_t *a);
@@ -302,7 +302,7 @@ void storage_test_load_reloadable(bridge_t *b, bridge_artifact_t *a);
 /*
 ** storage_test_reopen
 **
-** Destroys the fixture's bridge, creates another from the fixture's
+** Destroys the fixture's deck, creates another from the fixture's
 ** deployment with this sink, and loads a module into it. Answers 1, having
 ** said "FAIL: not loaded", if either is refused.
 */
@@ -424,7 +424,7 @@ int storage_test_weigh_single(storage_test_t *t);
 int storage_test_weigh_switch(storage_test_t *t);
 
 /*
-** The cases. Each is handed the fixture, with the bridge main made.
+** The cases. Each is handed the fixture, with the deck main made.
 */
 enum storage_test_end storage_test_look_at_shape(storage_test_t *t);
 enum storage_test_end storage_test_change(storage_test_t *t);

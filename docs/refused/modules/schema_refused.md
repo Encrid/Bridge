@@ -27,7 +27,7 @@ Refused: four bytes always, which is what this was, for the reason that the macr
 said four because C does, and nobody had chosen it. The condition that brings one width back is that
 width being worth more than the bytes.
 
-Refused: the smallest integer that holds the constants, found by Bridge-ASM700. A module's compiler
+Refused: the smallest integer that holds the constants, found by Bridge. A module's compiler
 lays the field out from the type it is given, and cannot be given one that is worked out later; and
 a constant added would move every field after it. No condition brings it back.
 

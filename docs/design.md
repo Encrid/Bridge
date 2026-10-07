@@ -1,6 +1,6 @@
 # Design
 
-Why Bridge-ASM700 has this shape, which side owns what, and what the shape costs. What the documents are
+Why Bridge has this shape, which side owns what, and what the shape costs. What the documents are
 is `readme.md`; the build order is `plan.md`.
 
 ## Why
@@ -24,11 +24,11 @@ shared storage is one crossing.
 ## What the design is
 
 **Data is declared once and addressed directly.** At registration a module declares the components
-it needs and gets a slot, and Bridge-ASM700 writes where they are, at a barrier, whenever that
+it needs and gets a slot, and Bridge writes where they are, at a barrier, whenever that
 changed. Reading and
 writing is then address arithmetic. No handle, no lookup, no crossing.
 
-**Bridge-ASM700 owns the memory.** It is the orchestrator, so it owns the region, the schema and the
+**Bridge owns the memory.** It is the orchestrator, so it owns the region, the schema and the
 allocation policy.
 
 **Core wasm, not components, and not WIT.** The component model exists to describe and copy values
@@ -38,7 +38,7 @@ with it: a type here is what C lays out - a struct of fixed-width fields, an enu
 with a size, an alignment and a fingerprint, and the schema is a C header both sides compile.
 See `schema.md`.
 
-**No call carries data at all.** Every function Bridge-ASM700 calls - `init`, `shutdown`, `reload`, a
+**No call carries data at all.** Every function Bridge calls - `init`, `shutdown`, `reload`, a
 system, an observer - takes no arguments and returns an i32 status. Data has nowhere to travel
 through a call, which is stronger than restricting what may travel: a design cannot drift back into
 passing things. What a module calls *into* still carries scalars, and only two kinds:
@@ -54,10 +54,10 @@ systems are declared by modules. The native backend is for what cannot be reache
 the wasm backend is for the three guarantees it buys. Either way it is the same module -
 `module.md`.
 
-Bridge-ASM700 keeps the rows itself, and no module ever calls what does: the ABI is eight entries.
-Storage is made for what the bridge already promises - rows touched only at a barrier, every change
+Bridge keeps the rows itself, and no module ever calls what does: the ABI is eight entries.
+Storage is made for what the deck already promises - rows touched only at a barrier, every change
 queued before the first is applied, systems fixed at load - and not for any program:
-`storage.md`, *Made for what the bridge promises*.
+`storage.md`, *Made for what the deck promises*.
 
 **One ABI, eight entries, and every module gets all of it.**
 
@@ -78,11 +78,11 @@ enough.
 freely in its own namespace and needs a grant to reach another's. That makes a game's mod API
 explicit instead of defaulting to every component present, and it is one check at init.
 
-**A backend is a shared library** behind a surface Bridge-ASM700 defines. One wraps wasmtime; the other
+**A backend is a shared library** behind a surface Bridge defines. One wraps wasmtime; the other
 is native, for code the deployment trusts. A module names the one that runs it.
 
 **Parallelism is derived; order is declared.** Declared read and write sets say which systems may
 run at once - two writers of the same component may not - which makes the hot path lock-free by
 construction. They do not say which of two conflicting systems goes *first*. Ordering comes from
-phases, and where a phase leaves two conflicting systems unordered Bridge-ASM700 refuses the load
+phases, and where a phase leaves two conflicting systems unordered Bridge refuses the load
 that brought the second one rather than fall back on load order.

@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -16,7 +16,7 @@
 /*
 ** is_repair
 **
-** Answers whether a call is one a stopped bridge accepts: what stopped it
+** Answers whether a call is one a stopped deck accepts: what stopped it
 ** can be brought back, or given up by an unload of it, and those are the
 ** calls that name it.
 */
@@ -43,7 +43,7 @@ int bridge_check_call(bridge_t *b, const char *repairing)
     const module_t *pinned = bridge_find_pinned(b);
 
     if (b->stopped_by && !is_repair(b, repairing)) {
-        say_error(b, "the bridge has stopped: %s", b->stopped_by);
+        say_error(b, "the deck has stopped: %s", b->stopped_by);
         return (1);
     }
     if (pinned) {

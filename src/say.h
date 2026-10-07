@@ -1,11 +1,11 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** src/say.h -- a record of Bridge-ASM700's own, and what every file of the
+** src/say.h -- a record of Bridge's own, and what every file of the
 ** library says when there is no memory.
 */
 
@@ -26,7 +26,7 @@ typedef struct {
 /*
 ** say_error
 **
-** Hands the sink an error of Bridge-ASM700's own, about no module, written
+** Hands the sink an error of Bridge's own, about no module, written
 ** as printf would.
 */
 [[gnu::format(printf, 2, 3)]] void say_error(bridge_t *b, const char *format,
@@ -35,7 +35,7 @@ typedef struct {
 /*
 ** say_about
 **
-** Hands the sink a record of Bridge-ASM700's own about a module or one of
+** Hands the sink a record of Bridge's own about a module or one of
 ** its systems, at the level `about` states.
 */
 [[gnu::format(printf, 3, 4)]] void say_about(bridge_t *b, const say_t *about,

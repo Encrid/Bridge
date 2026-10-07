@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -43,7 +43,7 @@ static uint32_t name_system(schedule_pairs_t *pairs, const char *name)
 ** add_pair
 **
 ** Takes the pair `i`: its two names are kept, and the first runs before the
-** second. It is counted once it has its names, so that a bridge that is
+** second. It is counted once it has its names, so that a deck that is
 ** refused frees them.
 **
 ** schedule.md, *Order within a phase is never implicit*

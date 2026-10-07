@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -40,7 +40,7 @@ void abi_free_subscriber(subscribing_t *g)
 /*
 ** make_room
 **
-** Makes room for one more among the bridge's systems, and among the
+** Makes room for one more among the deck's systems, and among the
 ** module's systems or its observers.
 */
 static bool make_room(subscribing_t *g)

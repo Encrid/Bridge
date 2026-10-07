@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -31,8 +31,8 @@ static void use_module(bridge_t *b, const bridge_artifact_t *a)
 /*
 ** refuse_one
 **
-** A bridge made, a module loaded, run, reloaded and unloaded, and the
-** bridge destroyed, with the allocation numbered `k` answered null. Answers
+** A deck made, a module loaded, run, reloaded and unloaded, and the
+** deck destroyed, with the allocation numbered `k` answered null. Answers
 ** whether there was such an allocation. With an argument after the case's
 ** name, which allocation it is goes to stderr first, to find a crash.
 */
@@ -61,7 +61,7 @@ static bool refuse_one(storage_test_t *t, size_t k)
 /*
 ** storage_test_refuse_memory
 **
-** Once for every allocation that a bridge and a module make from the first
+** Once for every allocation that a deck and a module make from the first
 ** call to the last, with that one answered null. Each time something is
 ** refused and says why, and nothing is written through a null pointer. An
 ** allocation whose refusal no record said is counted, and with an argument

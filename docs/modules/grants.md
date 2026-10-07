@@ -17,7 +17,7 @@ without it. A mod's own components need no config at all; touching the game need
 point where somebody should be asked.
 
 It composes with `schedule.md`, *Order within a phase is never implicit*: grant two modules write on
-`game:Transform` and their systems conflict, so Bridge-ASM700 refuses to load the second until the
+`game:Transform` and their systems conflict, so Bridge refuses to load the second until the
 deployment orders them.
 
 ## What a module may destroy

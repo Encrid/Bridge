@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -74,7 +74,7 @@ enum storage_test_end storage_test_stress(storage_test_t *t)
 /*
 ** storage_test_measure_stress
 **
-** The stress run on this many threads, timed, in a bridge of its own. Its
+** The stress run on this many threads, timed, in a deck of its own. Its
 ** records go nowhere: what they say is the stress case's to judge. Answers
 ** 1 if it could not load.
 */

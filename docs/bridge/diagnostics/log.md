@@ -2,14 +2,14 @@
 
 What was weighed here and refused is `log_refused.md`, *What was refused: The log*.
 
-The log is Bridge-ASM700's, not a module's, and it passes the test in `no_builtins.md`, *No builtins*:
+The log is Bridge's, not a module's, and it passes the test in `no_builtins.md`, *No builtins*:
 anything can fail, so every deployment needs it, and a failure nobody can report is worse than a
 missing feature.
 
 A module says things by appending to **one ring in its private memory**, with a single writer by
 construction: a module's systems are serialised - `threads.md`, *Threads* - so no line needs an
 atomic. No call either, so a line costs stores rather than the 500 ns a call out of a module cost
-in the original Bridge. Bridge-ASM700 drains every ring at each barrier.
+in the original Bridge. Bridge drains every ring at each barrier.
 
     u32 when      barrier count, and offset within the phase
     u8  -         padding: zero, and not read
@@ -19,7 +19,7 @@ in the original Bridge. Bridge-ASM700 drains every ring at each barrier.
     u32 len
     u32 arg[2]    two inline numbers: a value, and what it is set beside
 
-**This record never leaves Bridge-ASM700.** What the host sees is resolved - `host_api.md`, *Nothing
+**This record never leaves Bridge.** What the host sees is resolved - `host_api.md`, *Nothing
 here is an ABI layout* - so the shape above is the module seam's alone and its stride is free to
 change.
 
@@ -40,16 +40,16 @@ against a single `dataBase` (`vm.c:607`) and `ecs_os_api.log_` takes a real poin
 
 **So a literal is copied in, and costs a `memcpy` of its length.** Writing it instead as an offset
 into its own memory would be free, and would need one more seam entry to read a memory
-Bridge-ASM700 does not own - paying surface for zero copies on a path whose own claim is only that a
+Bridge does not own - paying surface for zero copies on a path whose own claim is only that a
 line costs stores. Godot's alternative is refused too: it copies at the boundary and hands back a
 handle - `string_new_with_utf8_chars_and_len2` - which is a call with a payload, the crossing this
 ring replaced.
 
 **That is also why the scratch arena exists**: it is the only memory a module can write that
-**Bridge-ASM700 can read**. A wasm module's own memory is never adopted; the shared memory is columns.
+**Bridge can read**. A wasm module's own memory is never adopted; the shared memory is columns.
 
 Two rules follow. **Drain precedes the scratch-arena reset**, because the message lives in that
-arena and the barrier does both. And **Bridge-ASM700 bounds-checks `text + len`** against a determinate
+arena and the barrier does both. And **Bridge bounds-checks `text + len`** against a determinate
 block, which is what makes the check writable at all. One compare per record is the price.
 
 **A level is a severity of syslog, RFC 5424, by its number**: 0 is the worst and 7 the most

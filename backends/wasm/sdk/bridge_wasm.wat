@@ -1,4 +1,4 @@
-;; The accessors a compiled wasm module reaches Bridge-ASM700's two memories through.
+;; The accessors a compiled wasm module reaches Bridge's two memories through.
 ;; docs/backends/wasm/wasm.md, *A compiled module reaches them through accessors*.
 ;;
 ;; No C compiler can emit a load from a memory other than the module's own, so these are

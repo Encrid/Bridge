@@ -1,18 +1,18 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** include/bridge_abi.h -- the module seam: what Bridge-ASM700 and every
+** include/bridge_abi.h -- the module seam: what Bridge and every
 ** module both compile.
 **
 ** It says how to find data and never what data there is: no component, no
 ** field. Everything here is read by a module with plain loads, so every
 ** member is a fixed width and the structs have no padding a compiler could
 ** place differently: each layout is asserted where it is stated, and a module
-** and Bridge-ASM700 that disagreed about one would not both compile.
+** and Bridge that disagreed about one would not both compile.
 **
 ** A member named `pad` is that padding, written out so that every offset is
 ** stated. It means nothing: whoever writes the struct writes zero there, and
@@ -260,14 +260,14 @@ constexpr uint32_t BRIDGE_ZEROED = UINT32_MAX;
 
 /*
 ** Offset 0 of the private memory: where each of this module's regions begins.
-** Bridge-ASM700 writes all of it; a module writes `scratch_used` and
+** Bridge writes all of it; a module writes `scratch_used` and
 ** `ring_head` and nothing else.
 **
 **     scratch, scratch_len    the scratch arena, in bytes
 **     scratch_used            the module bumps it; a barrier resets it
 **     ring, ring_len          the log ring, in records
 **     ring_head               records ever written, by the module
-**     ring_tail               records ever drained, by Bridge-ASM700
+**     ring_tail               records ever drained, by Bridge
 **     queries                 bridge_query_t, one per slot add_system answered
 **     column_base             u32 [tables][types] of shared-memory offsets
 **     types, tables           how many types this module declared, and tables

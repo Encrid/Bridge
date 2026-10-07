@@ -2,7 +2,7 @@
 
 Done. The `linux` preset was first run after stage 5, and passed as written.
 
-This stage wrote no Bridge-ASM700. It produced **a flecs that allocates component columns and entity
+This stage wrote no Bridge. It produced **a flecs that allocates component columns and entity
 arrays from a block we hand it, and says so when a row moves**; a script that produces that flecs
 from a pristine copy; two tests that prove both rather than asserting them; and the build they run
 in.
@@ -73,7 +73,7 @@ The open question the plan carried - how the vec sites are routed - closed in th
 not expect: not explicit calls replacing the vec, but a sentinel allocator the vec itself
 understands. "NULL means ours" stays refused; other callers pass `NULL` and mean the OS.
 
-**One hook is enough for what Bridge-ASM700 does**, and the test's workload includes the other
+**One hook is enough for what Bridge does**, and the test's workload includes the other
 thing that moves rows - `flecs.md`, *flecs will not tell you which*, for which sites are silent and
 why two of them are not hooked.
 

@@ -8,7 +8,7 @@ stage builds in its place.
 ## What compiling it showed
 
 The decisions of stage 7 were made by argument: C99 for the whole tree, and with it no
-thread-local storage, flecs' log to every bridge, and typed accessors without `_Generic`. Before
+thread-local storage, flecs' log to every deck, and typed accessors without `_Generic`. Before
 planning them, each was built in a scratch directory, and four things came out that the argument
 had not seen.
 
@@ -38,7 +38,7 @@ Three of the four were stated as facts in stage 7 and were wrong until compiled.
     the five headers     C23 as well, the three that declare the seams included
 
 Withdrawn, since nothing forces them: the context passed in place of thread-local storage, flecs'
-log to every live bridge, the accessors through a temporary, the alignment helper. The code keeps
+log to every live deck, the accessors through a temporary, the alignment helper. The code keeps
 `thread_local`, `_Generic` and the native ABI it had.
 
 ## What it built
@@ -58,7 +58,7 @@ hold it there: it runs with the tests and fails on an older spelling, and was sh
 
 Every layout `bridge-abi.h` states is asserted in it: size, alignment and each offset of the
 eight structs. All of them held. A compiler's own attribute is written in the standard brackets,
-and `ECS_ENUM` and `ECS_BITMASK` state the four bytes Bridge-ASM700 lays such a field out as,
+and `ECS_ENUM` and `ECS_BITMASK` state the four bytes Bridge lays such a field out as,
 where a module's compiler chose them before.
 
 **`[[nodiscard]]` found thirty-six dropped answers**, in the library and the tests. None was a
@@ -94,7 +94,7 @@ tree before this stage did the same, so it was not the stage's.
 `bridge_destroy` closed every backend's library. The wasm backend's took wasmtime out of the
 process with it, and wasmtime keeps threads of its own for compiling and a handler registered
 with the operating system for faults, with no call that stops either. The test that failed is
-the one that makes three bridges in a row: the second loaded wasmtime again beside what the first
+the one that makes three decks in a row: the second loaded wasmtime again beside what the first
 had left pointing into unmapped memory.
 
     six copies at once, a hundred runs each     crashed    never ended
@@ -107,7 +107,7 @@ themselves.
 
 **macOS does not unmap a library that has a thread-local variable.** The native backend's has
 one, so there it is closed and stays in the process, where Windows and Linux take it out. The
-test asks the operating system and not Bridge-ASM700, so it saw this, and it now states what each
+test asks the operating system and not Bridge, so it saw this, and it now states what each
 system does. The cause is what that system's loader is known to do, not something measured here.
 
 **One hundred and twenty-eight passing tests did not find the crash.** A busy machine did. The
@@ -119,7 +119,7 @@ from its output.
 One hundred and thirty-three: the hundred and twenty-eight, and
 
     c23                 no older spelling in what is ours
-    stage4-libraries    what a destroyed bridge leaves in the process, by backend and by system
+    stage4-libraries    what a destroyed deck leaves in the process, by backend and by system
     stage3-beyond       a budget no offset reaches: refused by its key
     stage3-toobig       budgets each in reach and together not: refused. This refusal existed
                         and had no test

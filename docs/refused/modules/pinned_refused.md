@@ -4,7 +4,7 @@ The record of `pinned.md`: `readme.md`, *Three layers, three seams*.
 
 ## Threads
 
-Refused: a thread of Bridge-ASM700's own for pinned modules, which would let a host call from
+Refused: a thread of Bridge's own for pinned modules, which would let a host call from
 anywhere. It can never be the first thread of the process, and every call into a pinned module would
 cross to it and wait. The condition that brings it back is no platform here demanding a particular
 thread, and hosts found fighting the rule.

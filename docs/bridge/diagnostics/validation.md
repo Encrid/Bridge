@@ -17,7 +17,7 @@ Three things narrow it, none of them costing anything per frame:
 written are the list and the rest are cleared - from data the scheduler keeps anyway.
 
 **The culprit is the system that was running.** Conflicting systems never run at once, so at any
-instant one system can be writing a given component, and Bridge-ASM700 dispatched it. One store per
+instant one system can be writing a given component, and Bridge dispatched it. One store per
 dispatch, into the header of the module's private memory, and every line the module then writes
 carries it: the `system` field of its record.
 
@@ -27,15 +27,15 @@ and always paid for; what we check always and what we check when asked are two d
 
 ## Always on
 
-Nothing of Bridge-ASM700's is on this list any more: what follows is the wasm backend's SDK, and
+Nothing of Bridge's is on this list any more: what follows is the wasm backend's SDK, and
 it is stated where it had been always on.
 
 ### The row test
 
 **The wasm SDK's accessors can test `row < count` before every load, and a module's author
 states whether they do**, where the module is compiled: `wasm.md`, *A compiled module reaches
-them through accessors*. It is not Bridge-ASM700's
-to state: that code is in the module's own artifact, which Bridge-ASM700 only ever sees as bytes.
+them through accessors*. It is not Bridge's
+to state: that code is in the module's own artifact, which Bridge only ever sees as bytes.
 And it is not redundant with wasm's bounds check: wasm catches a load outside the *memory*, and
 this catches one past the span's rows and still inside the shared memory, which wasm permits.
 
@@ -76,7 +76,7 @@ it, so narrowing is not enough. It is also **the only thing that finds a native 
 it has no sandbox and need not use the accessor, so the `row < count` test does not reach
 it.
 
-**The key is Bridge-ASM700's and no host's.** The pass runs at a barrier, and no host can reach
+**The key is Bridge's and no host's.** The pass runs at a barrier, and no host can reach
 one: a host that put it behind a switch of its own would be silently disabling a check of the
 library's. The same holds for the key that turns the profile on - `profile.md`, *The profile*.
 
@@ -91,7 +91,7 @@ deliberately left out: a corrupt string is visible to whoever reads it, where a 
 not, so hashing it would double the pass's cost to find the one kind of damage that announces
 itself.
 
-**What Bridge-ASM700 does not check is a component's own invariants.** It knows no content -
+**What Bridge does not check is a component's own invariants.** It knows no content -
 `wasm.md`, *It holds no content* - so a module that wants its invariants checked writes a
 system that checks them. That is not a missing feature; it is the same rule that keeps
 `bridge_abi.h` empty of components.

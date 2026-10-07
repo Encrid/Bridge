@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -64,7 +64,7 @@ static uint32_t find_phase(char *const *names, uint32_t count, const char *at,
 ** name for a phase is, and otherwise the name.
 **
 ** abi.md, *The ABI*
-** schedule.md, *Bridge-ASM700 ships no phase names*
+** schedule.md, *Bridge ships no phase names*
 */
 static int read_phase(module_t *m, const bridge_system_statement_t *st,
     uint32_t *phase)

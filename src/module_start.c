@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -64,7 +64,7 @@ static int check_losses(const module_t *m, backend_err_t *err)
 /*
 ** find_exports
 **
-** Finds every export Bridge-ASM700 calls, once: a system is an export,
+** Finds every export Bridge calls, once: a system is an export,
 ** checked here rather than on its first frame. Whether one has the shape a
 ** call runs is the backend's to see and to refuse. The three lifecycle
 ** exports are every module's: none is left out to mean something.

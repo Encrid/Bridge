@@ -22,8 +22,8 @@ statement - `style.md`, rule H3 - and no declaration is both a type and the text
 it. `BRIDGE_SCHEMA_ENUM_TYPE` and `BRIDGE_SCHEMA_ENUM_DESC`, and the pair for a bitmask, do the
 same for the other two kinds.
 
-**The macros are Bridge-ASM700's, and are written once.** The descriptor is a text
-Bridge-ASM700 parses, so how it is spelled in C is the library's to state, in `bridge_schema.h`,
+**The macros are Bridge's, and are written once.** The descriptor is a text
+Bridge parses, so how it is spelled in C is the library's to state, in `bridge_schema.h`,
 which each backend's SDK includes. A schema header is included by modules of either backend,
 and has to mean one thing in both. What is a backend's is how a module reaches a component once
 it is declared; what a type is, is not.
@@ -32,7 +32,7 @@ The shape is flecs' `ECS_STRUCT`, and the name is not. A name is a promise: a re
 expect flecs behind it, and a native module that links flecs for its own use would have the
 macro defined twice.
 
-**Bridge-ASM700 reads the string, and only the string.** `src/schema.c` lays the same struct out
+**Bridge reads the string, and only the string.** `src/schema.c` lays the same struct out
 from its text, by the rule C states - each field at the next multiple of its alignment, the whole a
 multiple of its widest - and answers with the size, the alignment, and the fields by name. That is
 how `[.config]` seeds a component by matching keys to field names: `config.md`, *A module's own
@@ -40,7 +40,7 @@ settings are a component*. A `declare` whose stated size or alignment is not wha
 to is refused with both.
 
 **None of that crosses.** A module is held to three numbers: size, alignment, and a hash of that
-string and its type kind. The field table stays on Bridge-ASM700's side. No field name is in
+string and its type kind. The field table stays on Bridge's side. No field name is in
 `bridge_abi.h` and none reaches a module: `wasm.md`, *It holds no content*.
 
 ## Why a header and not a format
@@ -68,7 +68,7 @@ is accepted:
 
 An entity id is a `uint64_t` - `reference.md`, *Reference following*, is built on it. An inline
 array has one length, and it is written as a number: the descriptor is the struct's text before the
-preprocessor has replaced any name, so `char title[N]` reaches Bridge-ASM700 as the letter and is
+preprocessor has replaced any name, so `char title[N]` reaches Bridge as the letter and is
 refused at it. The number is written once, in the struct, and code that needs it takes it from the
 field - `sizeof` of the field over `sizeof` of one of it. Anything else is refused at `declare`, and
 the refusal quotes the word the reading stopped at: `unsigned`, `const`, `*`, a second dimension, a
@@ -91,7 +91,7 @@ text with one fingerprint. What it costs is one more of `[budget] types`.
 int8_t, MODE_VALUES)`, with `{ Off, On, Adaptive }` as the values: the type is the width a row
 gives the field, it is what the module's
 compiler lays the enum out as, and it goes into the descriptor ahead of the brace, where
-Bridge-ASM700 reads it. An enum is any of `int8_t` to `uint32_t`; a bitmask is unsigned, to
+Bridge reads it. An enum is any of `int8_t` to `uint32_t`; a bitmask is unsigned, to
 `uint64_t`. Every constant is checked to fit, a counted one as well as a stated one, and a
 setting given by number is held to the same range. `tests/schema` has each width and each
 refusal.
@@ -133,7 +133,7 @@ reformatting and a new comment, and changes when a field is added, removed, rety
 A module built against an older component layout gets an error at init instead of reading the wrong bytes.
 
 **Nothing else is fingerprinted: nothing else has two parties.** A query has one: the module
-declares it and only that module walks it. A system has none: every function Bridge-ASM700 calls is
+declares it and only that module walks it. A system has none: every function Bridge calls is
 `() -> i32` - `signatures.md`, *A call takes nothing and answers a status* - so core wasm's numeric
 match is the whole check.
 

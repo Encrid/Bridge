@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -67,7 +67,7 @@ static void fail_always(host_t *h, enum bridge_on_error on_error)
 ** test_reach_budget
 **
 ** A module that states skip is stopped at its budget of failures, and the
-** bridge runs on.
+** deck runs on.
 */
 void test_reach_budget(host_t *h)
 {
@@ -80,8 +80,8 @@ void test_reach_budget(host_t *h)
 /*
 ** test_stop_by_failing
 **
-** A module that states fail stops the bridge at its budget. A stopped
-** bridge refuses an unload as it refuses a phase and a load.
+** A module that states fail stops the deck at its budget. A stopped
+** deck refuses an unload as it refuses a phase and a load.
 */
 void test_stop_by_failing(host_t *h)
 {

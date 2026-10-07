@@ -48,14 +48,14 @@ exist.
 **Opt-in, and nothing when off.** `no_builtins.md`, *No builtins*, uses a clock as its example of
 something not universal to every deployment, and a profile needs one: a shipped game does not
 measure itself. So `[checks] profile` beside `validate` - `validation.md`, *The checksum pass,
-when asked* - as the two things Bridge-ASM700 does only when asked, and both for the whole
+when asked* - as the two things Bridge does only when asked, and both for the whole
 deployment, with two clock reads per dispatch as the cost when on.
 
 **How full each budget is, is asked for the same way.** Every size a
 deployment states is a guess until something says how near it came: `memory.md`, *Where the
 regions live*, calls `spans` a key "a deployment is expected to correct", and nothing tells it
 what to correct it to but the refusal when it runs out. So a second pull, beside this one: for
-the bridge, what is in use and the most that ever was against each `[budget]` key; for each
+the deck, what is in use and the most that ever was against each `[budget]` key; for each
 module, the same against each of its own. They are numbers the library keeps already, with a
 mark kept where it kept only the present value.
 

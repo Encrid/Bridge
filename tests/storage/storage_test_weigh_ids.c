@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -50,7 +50,7 @@ int storage_test_weigh_direct(storage_test_t *t)
 /*
 ** use_columns
 **
-** Loads a build that gives every entity six markers, into a bridge of its
+** Loads a build that gives every entity six markers, into a deck of its
 ** own. Answers 1 if it could not be loaded, and leaves in `used` the KB of
 ** [budget] columns in use.
 */

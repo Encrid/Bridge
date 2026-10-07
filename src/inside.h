@@ -1,11 +1,11 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** src/inside.h -- Bridge-ASM700's inside: what a bridge, a module, a system
+** src/inside.h -- Bridge's inside: what a deck, a module, a system
 ** and a declared type are. Nothing here crosses a seam.
 */
 
@@ -166,7 +166,7 @@ typedef struct {
 **     stem          the identity without its version
 **     memory        its private block, as its backend sees it
 **     priv          the private block. A module can write all of it, so
-**                   every offset Bridge-ASM700 acts on is kept here and
+**                   every offset Bridge acts on is kept here and
 **                   never read back from the header
 **     spans         the span region: query slots, column_base, spans
 **     published, had_triggers, spans_end
@@ -350,15 +350,15 @@ typedef struct {
 } kept_text_t;
 
 /*
-** A bridge.
+** A deck.
 **
 **     reservation, guard, granule
 **                   of the shared block: the address space every block is
 **                   allocated with, the largest any backend stated
 **     stopped_by, stopped_stem
 **                   why nothing runs any more, and the module whose return
-**                   lifts it: nullptr while the bridge runs. They point at
-**                   the two arrays after them, since a bridge is stopped at
+**                   lifts it: nullptr while the deck runs. They point at
+**                   the two arrays after them, since a deck is stopped at
 **                   a barrier, where nothing is allocated
 **     turns         lifecycle calls since the last barrier
 **     parked        systems out of storage while their module reloads

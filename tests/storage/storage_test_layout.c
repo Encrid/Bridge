@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -86,7 +86,7 @@ static const storage_test_relaid_t RELAID_ELSEWHERE[] = {
 /*
 ** relay
 **
-** One row, in a bridge of its own: the first build loaded, run and looked
+** One row, in a deck of its own: the first build loaded, run and looked
 ** at, the reload into the second, and another look.
 */
 static void relay(storage_test_t *t, const storage_test_relaid_t *row)
@@ -147,8 +147,8 @@ static int relay_held(storage_test_t *t)
 /*
 ** storage_test_relay
 **
-** Every change of a component's layout, each in a bridge of its own with
-** room for two sparse sets and two direct-indexed components. The bridge
+** Every change of a component's layout, each in a deck of its own with
+** room for two sparse sets and two direct-indexed components. The deck
 ** main made is replaced by one of that deployment.
 */
 enum storage_test_end storage_test_relay(storage_test_t *t)

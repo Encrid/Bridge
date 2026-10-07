@@ -1,14 +1,14 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** src/storage_inside.h -- storage, kept by Bridge-ASM700 itself: what it
+** src/storage_inside.h -- storage, kept by Bridge itself: what it
 ** holds.
 **
-** It is made for what the bridge promises and a general store cannot assume:
+** It is made for what the deck promises and a general store cannot assume:
 ** rows are touched only at a barrier, by one thread, with every change of
 ** that barrier already queued; systems are fixed at load; nobody iterates
 ** through it; and no order of rows is anybody's to keep.
@@ -22,7 +22,7 @@
 **   - Nothing in the shared block is read back. Where an entity is, and which
 **     entity is in which row, are kept here; what the block holds of either
 **     is a copy for modules to read.
-**   - Everything it holds is sized by a budget and allocated when the bridge
+**   - Everything it holds is sized by a budget and allocated when the deck
 **     is created: entities, tables, columns, types, systems. Nothing is
 **     allocated after.
 **   - What a module reads is rewritten where a table was touched, and nowhere
@@ -150,7 +150,7 @@ typedef struct {
 } table_t;
 
 /*
-** One bridge's storage.
+** One deck's storage.
 **
 **     places        entities: where each is. Never the copy in the block
 **     high, free_head

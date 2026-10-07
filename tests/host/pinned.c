@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -77,7 +77,7 @@ static int call_elsewhere(bridge_t *b, int frames)
 ** test_call_from_wrong_thread
 **
 ** A phase run from a thread that did not load the pinned module is refused,
-** and so is a destroy from there, leaving the bridge to be destroyed here.
+** and so is a destroy from there, leaving the deck to be destroyed here.
 */
 void test_call_from_wrong_thread(host_t *h)
 {

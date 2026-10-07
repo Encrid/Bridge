@@ -20,7 +20,7 @@ So `memory_get_shape` answers that reservation and that guard. A block without t
 check every load, on the path this design exists to keep free.
 
 **Adoption** goes through wasmtime's host memory creator, the hook by which an embedder supplies the
-pages behind a memory. The backend answers it with the block Bridge-ASM700 allocated, and one block
+pages behind a memory. The backend answers it with the block Bridge allocated, and one block
 backs a memory in every store that imports it - each module has its own store, `backend.md`, *What
 the backend does not do*. `tests/adopt` is the proof: two stores on two threads write one block
 at once, each sees the other's bytes, and a load past it traps.
@@ -88,7 +88,7 @@ thousand.
 An increment reaches every store of the engine, and a store with no deadline set traps at once. So
 every other call on that engine runs under a deadline too far away to be reached. That is this
 backend's business and invisible at the surface: a system still has no deadline as far as
-Bridge-ASM700 is concerned.
+Bridge is concerned.
 
 ## One engine per demand
 

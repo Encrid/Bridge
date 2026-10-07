@@ -6,8 +6,8 @@ The record of `backend.md`: `readme.md`, *Three layers, three seams*.
 
 Of `backend.md`, *What a backend is asked for*.
 
-Refused: the backend stating which it needs so that Bridge-ASM700 could refuse first, which has
-Bridge-ASM700 inspect what it is built not to and answers once more a question the backend already
+Refused: the backend stating which it needs so that Bridge could refuse first, which has
+Bridge inspect what it is built not to and answers once more a question the backend already
 answers. The condition that brings it back is a backend for which "which one" is not obvious.
 
 Refused: one tagged source, which makes a host that has both choose for a backend it does not know.
@@ -17,7 +17,7 @@ The condition that brings it back is the one above: a backend for which "which o
 
 Of `backend.md`, *Memory is adopted, not created*.
 
-Refused: 65,536 written into Bridge-ASM700, to which it rounded every block, which is what this had:
+Refused: 65,536 written into Bridge, to which it rounded every block, which is what this had:
 one backend's number in the library, applied to another backend's modules, with no reason written.
 No condition brings it back.
 

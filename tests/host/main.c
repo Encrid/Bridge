@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -263,9 +263,9 @@ static const host_case_t TEST_CASES[] = {
         test_misname_constant, "", test_set_noting },
     { "BRIDGE_FAIL-refused-before-it-exists-stops-nothing",
         test_refuse_essential, "", test_set_small },
-    { "BRIDGE_FAIL-stopped-module-stops-the-bridge",
+    { "BRIDGE_FAIL-stopped-module-stops-the-deck",
         test_stop_by_failing, "", test_set_noting },
-    { "BRIDGE_FAIL-failed-reload-stops-the-bridge",
+    { "BRIDGE_FAIL-failed-reload-stops-the-deck",
         test_reload_native, "nreloadfailstop", test_set_noting },
     { "BRIDGE_SKIP-failed-init-skipped", test_skip_init, "", test_set_noting },
     { "BRIDGE_UNSET-flag-refused", test_leave_flag_unset, "", test_set_small },
@@ -297,7 +297,7 @@ static const host_case_t TEST_CASES[] = {
         test_create_no_sink, "", test_set_small },
     { "bridge_create-budget-sum-beyond-32-bits-refused",
         test_state_too_big, "", test_set_wasm },
-    { "bridge_create-two-bridges-at-once",
+    { "bridge_create-two-decks-at-once",
         test_run_two, "", test_set_counting },
     { "bridge_destroy-shuts-down-what-is-loaded",
         test_destroy_loaded, "", test_set_noting },
@@ -309,7 +309,7 @@ static const host_case_t TEST_CASES[] = {
     { "bridge_load-failed-init-undone", test_undo_load, "", test_set_wasm },
     { "bridge_load-refused-leaves-nothing",
         test_refuse_load, "", test_set_noting },
-    { "bridge_load-lifts-a-stopped-bridge",
+    { "bridge_load-lifts-a-stopped-deck",
         test_repair_by_load, "", test_set_noting },
     { "bridge_load-no-reload-export",
         test_leave_reload_out, "", test_set_noting },
@@ -317,7 +317,7 @@ static const host_case_t TEST_CASES[] = {
         test_load_twice, "", test_set_small },
     { "bridge_load-import-nobody-answers",
         test_load_named, "stray", test_set_small },
-    { "bridge_unload-of-what-stopped-the-bridge",
+    { "bridge_unload-of-what-stopped-the-deck",
         test_give_up, "", test_set_noting },
     { "bridge_unload-declarer-goes-user-holds-the-type",
         test_unload_declarer, "", test_set_noting },
@@ -351,7 +351,7 @@ static const host_case_t TEST_CASES[] = {
         test_grow_share, "shareless", test_set_noting },
     { "bridge_reload-share-more-than-the-arena-refused",
         test_grow_share, "sharebig", test_set_noting },
-    { "bridge_reload-lifts-a-stopped-bridge",
+    { "bridge_reload-lifts-a-stopped-deck",
         test_repair, "", test_set_noting },
     { "bridge_reload-to-another-backend-refused",
         test_reload_ticker, "reloadmove", test_set_noting },
@@ -644,7 +644,7 @@ static const host_case_t TEST_CASES[] = {
         test_leave_libraries, "", test_set_both },
     { "backend_get_capabilities-held-against-what-a-module-states",
         test_state_untrusted, "", test_set_both },
-    { "memory_adopt-refused-refuses-the-bridge",
+    { "memory_adopt-refused-refuses-the-deck",
         test_edit_backend, "refusing", test_set_both },
     { "module_compile-no-path-refused", test_state_no_path, "", test_set_both },
     { "module_list_imports-the-two-memories-lent",
@@ -671,7 +671,7 @@ static const host_case_t TEST_CASES[] = {
         test_state_native_timeout, "", test_set_noting },
     { "BACKEND_MEMORY_LIMIT-lacking-memory-limit-refused",
         test_state_limit, "memory_limit", test_set_both },
-    { "BACKEND_RELOAD-a-module-replaced-while-the-bridge-runs",
+    { "BACKEND_RELOAD-a-module-replaced-while-the-deck-runs",
         test_reload_native, "nreload", test_set_noting },
     { "BACKEND_SIDE_BY_SIDE-lacking-failed-reload-stops-the-module",
         test_reload_native, "nreloadfail", test_set_noting },

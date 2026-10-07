@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -79,7 +79,7 @@
 
 /*
 ** An attach with its value. An initial value travels with the attach, and
-** is as long as the type was declared. Bridge-ASM700 takes its copy during
+** is as long as the type was declared. Bridge takes its copy during
 ** the call.
 **
 ** abi.md, *The ABI*

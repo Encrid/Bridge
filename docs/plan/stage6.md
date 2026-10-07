@@ -29,7 +29,7 @@ to.
     a reload that fails with no   the module stays, stopped, with what it declared:
     old instance left             `lifecycle.md`, *The runtime lifecycle*
     a share, across a reload      it may grow and never shrink: `budgets.md`, *Budgets*
-    a stopped bridge              accepts the call that brings back what stopped it:
+    a stopped deck              accepts the call that brings back what stopped it:
                                   `failure.md`, *When something fails*
     when a table's id is retired  when flecs says it freed the table:
                                   `flecs.md`, *flecs will not tell you which*
@@ -48,9 +48,9 @@ path may be null, and the answer was to keep that and make the two refusals exac
 The last four were decided while building and reported afterwards as "forced by the documents".
 Put through the method, every one came out differently from what had been built. A failed native
 reload had been removing the module and dropping its data, on a call that means "keep running".
-A share could not change at all, where every other budget changes by reload. A stopped bridge was
+A share could not change at all, where every other budget changes by reload. A stopped deck was
 terminal, which made reload useless for the modules a deployment calls essential. And table ids
-were retired on Bridge-ASM700's decision to delete a component rather than on flecs freeing the
+were retired on Bridge's decision to delete a component rather than on flecs freeing the
 table, which missed two ways a table is freed. "Forced by the documents" was the same mistake four
 times: a choice with a justification bolted on, which is what `stage0.md` step 4 warns of.
 
@@ -88,7 +88,7 @@ library from inside.
     forgiven         failing one pass in three: never stopped
     notforgiven      failing two in three: stopped
     neverstop        -1: fails every pass, never stopped
-    failstop         a fail module stopped: the bridge stops, a phase and an unload are
+    failstop         a fail module stopped: the deck stops, a phase and an unload are
                      refused, and the pull says which module
     strip            unload: 9 rows of the shared component left, the 5 emptied entities alive
     sweep            the same, and the 5 emptied entities destroyed
@@ -96,8 +96,8 @@ library from inside.
     nested-unload    a type outlives its declarer while another module's field names it, and
                      goes when that module does
     nounload         an identity that is not loaded: refused by name
-    destroy          a bridge destroyed with two modules loaded: one's shutdown is heard, the
-                     other's never returns and is ended by its timeout, and the bridge goes
+    destroy          a deck destroyed with two modules loaded: one's shutdown is heard, the
+                     other's never returns and is ended by its timeout, and the deck goes
     timeouts         a shutdown that never returns: ended by its timeout, and the unload completes
     slots            max_modules: refused when full, and a record is given back by an unload
     reload           a row's bytes kept: 102, then 112 and 122 from the new code
@@ -119,8 +119,8 @@ library from inside.
     nreloadfail      native, the new reload fails: the module is STOPPED with its rows, the
                      other runs on, and a library that works picks the count up at 112
     nreloadfailunload  the same, then unloaded: a module with no code left can still leave
-    nreloadfailstop  the same with fail: the bridge stops, and that reload starts it again
-    repair           an essential module stopped at its budget: the bridge stops, refuses
+    nreloadfailstop  the same with fail: the deck stops, and that reload starts it again
+    repair           an essential module stopped at its budget: the deck stops, refuses
                      another module's load, and runs again when the module is reloaded
     repairload       the same when a load was what failed: loading it again lifts the stop
     churn            three modules of enums and nested types loaded and unloaded 200 times:

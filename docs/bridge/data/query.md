@@ -8,7 +8,7 @@ You do not get storage. You get your query's results, which is how an ECS is use
     declare(...)      registers a component type
     add_system(...)   registers a query, a function and a phase together, and gets a slot
 
-At each barrier Bridge-ASM700 writes, into the module's private memory, a span for every table its
+At each barrier Bridge writes, into the module's private memory, a span for every table its
 query matches. Nothing else reads that memory; see `wasm.md`, *Memories*. One span for each table
 that has rows, and a table without any does not exist - `storage.md`, *A table*.
 

@@ -1,4 +1,4 @@
-"""Bridge-ASM700's build: one compiler, one script. docs/design/build.md.
+"""Bridge's build: one compiler, one script. docs/design/build.md.
 
     python build.py                      build, for this machine
     python build.py test [-k NAME]       build, then run the tests (all, or those matching)
@@ -667,7 +667,7 @@ CASES = [
     ('module_config.memory_limit-negative-refused', ['host', 'module_config.memory_limit-negative-refused'],
      r"module 'test:ok@0.1.0' is refused: memory_limit is -7, which is neither a limit nor BRIDGE_NO_LIMIT.*alive", ': loaded'),
     ('module_config.on_error-fail-stops-and-skip-does-not', ['host', 'module_config.on_error-fail-stops-and-skip-does-not'],
-     r"test:ok@0.1.0: loaded.*the bridge has stopped: module 'test:oob@0.1.0' failed and its on_error is fail.*test:ok@0.1.0: not loaded.*alive", None),
+     r"test:ok@0.1.0: loaded.*the deck has stopped: module 'test:oob@0.1.0' failed and its on_error is fail.*test:ok@0.1.0: not loaded.*alive", None),
     ('backend.library-cannot-open-refused', ['host', 'backend.library-cannot-open-refused'],
      r"backend 'wasm': cannot open backend library 'no-such-backend-library'.*bridge_create refused.*alive", None),
     ('bridge_create-no-sink-refused', ['host', 'bridge_create-no-sink-refused'],
@@ -828,8 +828,8 @@ CASES = [
      r"module 'game:nested@0.1.0' did not load: type 'game:Body': its descriptor says 'vec2_t', which is neither a type a field can be nor one its namespace has declared.*alive", None),
     ('backend_create-unknown-setting-refused', ['host', 'backend_create-unknown-setting-refused'],
      r"backend 'native' would not start: it knows no setting 'cache'.*bridge_create refused.*alive", None),
-    ('bridge_create-two-bridges-at-once', ['host', 'bridge_create-two-bridges-at-once'],
-     r"two bridges: sums 275000 and 265000.*alive", None),
+    ('bridge_create-two-decks-at-once', ['host', 'bridge_create-two-decks-at-once'],
+     r"two decks: sums 275000 and 265000.*alive", None),
     ('alloc-string-kept', ['host', 'alloc-string-kept'],
      r"game:namer@0.1.0/say: kept in the arena.*alive", None),
     ('alloc-share-exhausted', ['host', 'alloc-share-exhausted'],
@@ -856,10 +856,10 @@ CASES = [
      r"its system 'trip' reached its max_system_failures of 3.*modules: test:flaky@0.1.0=STOPPED.*alive", None),
     ('module_config.max_system_failures-no-limit-never-stops', ['host', 'module_config.max_system_failures-no-limit-never-stops'],
      r"modules: test:flaky@0.1.0=RUNNING.*alive", None),
-    ('BRIDGE_FAIL-stopped-module-stops-the-bridge', ['host', 'BRIDGE_FAIL-stopped-module-stops-the-bridge'],
-     r"the bridge has stopped: module 'test:flaky@0.1.0' was stopped and its on_error is fail.*update refused.*test:flaky@0.1.0=STOPPED.*game:twostep@0.1.0: not unloaded.*alive", None),
-    ('bridge_unload-of-what-stopped-the-bridge', ['host', 'bridge_unload-of-what-stopped-the-bridge'],
-     r"the bridge has stopped.*game:twostep@0.1.0: not unloaded.*the bridge runs again: module 'test:flaky@0.1.0' is unloaded, and it goes on without it.*test:flaky@0.1.0: unloaded.*modules: game:twostep@0.1.0=RUNNING.*alive", None),
+    ('BRIDGE_FAIL-stopped-module-stops-the-deck', ['host', 'BRIDGE_FAIL-stopped-module-stops-the-deck'],
+     r"the deck has stopped: module 'test:flaky@0.1.0' was stopped and its on_error is fail.*update refused.*test:flaky@0.1.0=STOPPED.*game:twostep@0.1.0: not unloaded.*alive", None),
+    ('bridge_unload-of-what-stopped-the-deck', ['host', 'bridge_unload-of-what-stopped-the-deck'],
+     r"the deck has stopped.*game:twostep@0.1.0: not unloaded.*the deck runs again: module 'test:flaky@0.1.0' is unloaded, and it goes on without it.*test:flaky@0.1.0: unloaded.*modules: game:twostep@0.1.0=RUNNING.*alive", None),
     ('BRIDGE_STRIP-unload-strips', ['host', 'BRIDGE_STRIP-unload-strips'],
      r"left 10 5.*game:keeper@0.1.0: unloaded.*left 9 5.*game:retype@0.1.0: loaded.*alive", None),
     ('BRIDGE_SWEEP-unload-sweeps', ['host', 'BRIDGE_SWEEP-unload-sweeps'],
@@ -896,10 +896,10 @@ CASES = [
      r"is not reloaded: its persistent is 16 and a reload states less, which a loaded module's share cannot become.*tick 104 1.*alive", None),
     ('bridge_reload-share-more-than-the-arena-refused', ['host', 'bridge_reload-share-more-than-the-arena-refused'],
      r"is not reloaded: its persistent of 1048576 bytes does not fit in the [0-9]+ left of .budget. persistent.*tick 104 1.*alive", None),
-    ('bridge_reload-lifts-a-stopped-bridge', ['host', 'bridge_reload-lifts-a-stopped-bridge'],
-     r"the bridge has stopped: module 'game:ticker@0.1.0' was stopped and its on_error is fail.*game:twostep@0.1.0: not loaded.*the bridge runs again: module 'game:ticker@0.2.0' is back.*game:ticker@0.2.0: reloaded.*tick 1[0-9]3 10.*game:ticker@0.2.0=RUNNING.*alive", None),
-    ('bridge_load-lifts-a-stopped-bridge', ['host', 'bridge_load-lifts-a-stopped-bridge'],
-     r"the bridge has stopped: module 'game:thing@0.1.0' failed and its on_error is fail.*game:other@0.1.0: not loaded.*the bridge runs again: module 'game:thing@0.2.0' is back.*game:thing@0.2.0: loaded.*show: x 3 0.*alive", None),
+    ('bridge_reload-lifts-a-stopped-deck', ['host', 'bridge_reload-lifts-a-stopped-deck'],
+     r"the deck has stopped: module 'game:ticker@0.1.0' was stopped and its on_error is fail.*game:twostep@0.1.0: not loaded.*the deck runs again: module 'game:ticker@0.2.0' is back.*game:ticker@0.2.0: reloaded.*tick 1[0-9]3 10.*game:ticker@0.2.0=RUNNING.*alive", None),
+    ('bridge_load-lifts-a-stopped-deck', ['host', 'bridge_load-lifts-a-stopped-deck'],
+     r"the deck has stopped: module 'game:thing@0.1.0' failed and its on_error is fail.*game:other@0.1.0: not loaded.*the deck runs again: module 'game:thing@0.2.0' is back.*game:thing@0.2.0: loaded.*show: x 3 0.*alive", None),
     ('bridge_reload-to-another-backend-refused', ['host', 'bridge_reload-to-another-backend-refused'],
      r"it runs on backend 'wasm' and a reload does not move it to 'native'.*tick 104 1.*alive", None),
     ('bridge_reload-dropped-declaration-frees-its-name', ['host', 'bridge_reload-dropped-declaration-frees-its-name'],
@@ -950,8 +950,8 @@ CASES = [
      r"game:settings@0.2.0: reloaded.*game:retype@0.1.0: loaded.*alive", None),
     ('module_config.settings-reseeded-in-place', ['host', 'module_config.settings-reseeded-in-place'],
      r"settings text written to the same place.*alive", None),
-    ('BRIDGE_FAIL-failed-reload-stops-the-bridge', ['host', 'BRIDGE_FAIL-failed-reload-stops-the-bridge'],
-     r"the bridge has stopped: module 'game:ticker@0.1.0' could not be reloaded and its on_error is fail.*update refused.*the bridge runs again: module 'game:ticker@0.3.0' is back.*tick 112 10.*game:ticker@0.3.0=RUNNING.*alive", None),
+    ('BRIDGE_FAIL-failed-reload-stops-the-deck', ['host', 'BRIDGE_FAIL-failed-reload-stops-the-deck'],
+     r"the deck has stopped: module 'game:ticker@0.1.0' could not be reloaded and its on_error is fail.*update refused.*the deck runs again: module 'game:ticker@0.3.0' is back.*tick 112 10.*game:ticker@0.3.0=RUNNING.*alive", None),
     ('BACKEND_TIMEOUT-lacking-timeout-refused', ['host', 'BACKEND_TIMEOUT-lacking-timeout-refused'],
      r"module 'game:ticker@0.1.0' is refused: it states shutdown_timeout, which backend 'native' cannot keep.*alive", r"cannot open"),
     ('budget.columns-no-room-for-a-singleton-refused', ['host', 'budget.columns-no-room-for-a-singleton-refused'],
@@ -1115,7 +1115,7 @@ CASES = [
      r"system 'act' failed: detach names slot 9, which it never declared.*alive", None),
     ('BACKEND_ENTRY_COUNT-an-entry-missing-refused', ['host', 'BACKEND_ENTRY_COUNT-an-entry-missing-refused'],
      r"backend 'native': backend library '[^']*bridge_hollow[^']*' has no entry 'backend_create'.*bridge_create refused.*alive", None),
-    ('memory_adopt-refused-refuses-the-bridge', ['host', 'memory_adopt-refused-refuses-the-bridge'],
+    ('memory_adopt-refused-refuses-the-deck', ['host', 'memory_adopt-refused-refuses-the-deck'],
      r"backend 'native' cannot adopt the shared memory: this backend adopts no block.*alive", None),
     ('module_config.spans-outgrown-at-a-barrier', ['host', 'module_config.spans-outgrown-at-a-barrier'],
      r"module 'game:mover@0\.1\.0' is stopped: what its queries match no longer fits in its spans of 544 bytes.*alive", None),
@@ -1417,7 +1417,7 @@ CASES = [
      r"frozen.*alive", None),
     ('BRIDGE_SPAN_BASE-where-a-span-keeps-its-columns', ['host', 'BRIDGE_SPAN_BASE-where-a-span-keeps-its-columns'],
      r"sum 250500 0.*alive", None),
-    ('BACKEND_RELOAD-a-module-replaced-while-the-bridge-runs', ['host', 'BACKEND_RELOAD-a-module-replaced-while-the-bridge-runs'],
+    ('BACKEND_RELOAD-a-module-replaced-while-the-deck-runs', ['host', 'BACKEND_RELOAD-a-module-replaced-while-the-deck-runs'],
      r"tick 102 1.*game:ticker@0.1.0/-: shutdown 1 0.*game:ticker@0.2.0: reloaded.*tick 112 10.*tick 122 10.*alive", None),
     ('BACKEND_IMPORT_FUNC-an-entry-imported-is-no-memory', ['host', 'BACKEND_IMPORT_FUNC-an-entry-imported-is-no-memory'],
      r"sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive", None),
@@ -1437,7 +1437,7 @@ CASES = [
      r"module 'test:ok@0\.1\.0' is refused: no backend named 'native'.*test:image@0\.1\.0: loaded.*alive", r"has stopped"),
 ]
 
-# these again, through the static library: what a host does first, to create a bridge and to
+# these again, through the static library: what a host does first, to create a deck and to
 # load a module
 STATIC = (
     'bridge_load-loaded',

@@ -1,11 +1,11 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** backends/wasm/wasm_offered.c -- a function Bridge-ASM700 offers a module,
+** backends/wasm/wasm_offered.c -- a function Bridge offers a module,
 ** as wasmtime calls it: with the arguments where the results go, each a raw
 ** value of the kind its signature states.
 **
@@ -17,12 +17,12 @@
 
 #include "wasm_inside.h"
 
-static const char WASM_REFUSED[] = "refused by Bridge-ASM700";
+static const char WASM_REFUSED[] = "refused by Bridge";
 
 /*
 ** wasm_make_offered
 **
-** Answers what wasmtime is handed with a function Bridge-ASM700 offers.
+** Answers what wasmtime is handed with a function Bridge offers.
 */
 wasm_offered_t *wasm_make_offered(const backend_entry_t *entry)
 {
@@ -69,8 +69,8 @@ static void write_results(const wasm_offered_t *h, const uint64_t *out,
 /*
 ** wasm_call_offered
 **
-** What wasmtime calls when a module calls a function Bridge-ASM700 offers.
-** One that is refused traps: Bridge-ASM700 knows why and says so itself,
+** What wasmtime calls when a module calls a function Bridge offers.
+** One that is refused traps: Bridge knows why and says so itself,
 ** and the trap only has to unwind.
 */
 wasm_trap_t *wasm_call_offered(void *env,

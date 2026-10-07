@@ -1,13 +1,13 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
 ** tests/adopt/adopt.h -- one block, adopted by the wasm backend, backing a
 ** memory in two stores at once. This is the question stage 2 opens with:
-** Bridge-ASM700 allocates the shared memory and every module imports it,
+** Bridge allocates the shared memory and every module imports it,
 ** each from a store of its own. wasmtime does not promise that one block
 ** may back a memory twice, so it is tried here before anything is built on
 ** it.

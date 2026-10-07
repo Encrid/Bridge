@@ -1,4 +1,4 @@
-# Bridge-ASM700
+# Bridge
 
 An orchestrator, written in C, that runs modules over shared ECS storage. The name is temporary:
 this replaces the original Bridge when it is ready.
@@ -6,7 +6,7 @@ this replaces the original Bridge when it is ready.
 **It is its own design, not a rewrite.** The original Bridge is prior art here - cited where it
 gives a reason, as idTech3, flecs and Godot are - and never the specification.
 
-**Bridge-ASM700 is a library.** A host links it and owns `main`, the loop and every file. Hosts are
+**Bridge is a library.** A host links it and owns `main`, the loop and every file. Hosts are
 separate projects, and none is part of this one.
 
 Three documents go with this one. `design.md` is why the shape is what it is and what it costs.
@@ -15,7 +15,7 @@ rather than design.
 
 ## Three layers, three seams
 
-The three layers are a host, Bridge-ASM700 and the modules. A host is somebody else's project, so
+The three layers are a host, Bridge and the modules. A host is somebody else's project, so
 it has no directory here: only its seam does. **The tree is the structure** otherwise, rather than a
 diagram to keep in step with. One concern per document, in reading order:
 
@@ -40,15 +40,15 @@ diagram to keep in step with. One concern per document, in reading order:
         stage0.md            how we decide things. method, not design
         stagen.md            one per stage, written before that stage starts
 
-    seam/host_api/           host to Bridge-ASM700
+    seam/host_api/           host to Bridge
         host_api.md          the surface and its structs
         create.md            bridge_create, and the sink
         loop.md              who advances, and who decides when it ends
         lifecycle.md         load, unload, reload
         introspection.md     the one pull about modules
-        config.md            what Bridge-ASM700 requires of the values it is handed
+        config.md            what Bridge requires of the values it is handed
 
-    seam/backend/            Bridge-ASM700 to a backend
+    seam/backend/            Bridge to a backend
         backend.md           the eighteen entries, memory, the clock
         capabilities.md      what a backend says it can do
         signatures.md        imports declared, exports checked
@@ -101,7 +101,7 @@ citation check reads both, so a section renamed leaves no entry behind without s
 two files and not one because they are two concerns: a reader who wants to know what happens
 reads the first, and one who wants to know why not otherwise reads the second.
 
-The seams are host to Bridge-ASM700, Bridge-ASM700 to a backend, and Bridge-ASM700 to modules. The
+The seams are host to Bridge, Bridge to a backend, and Bridge to modules. The
 first two have a directory of their own under `seam/`: a separate build target sits on the far side,
 and filing the contract under either side would suggest that one owns it. The module seam is in
 two places because it has two owners. `modules/` is what is true of a module whatever runs it.
@@ -113,12 +113,12 @@ period: `backend.md`, *The backend owns its clock*.
 
 **The repository is laid out the same way: a path says whose a thing is.**
 
-    include/                 the three seams Bridge-ASM700 defines, and nothing else
+    include/                 the three seams Bridge defines, and nothing else
         bridge.h                 host seam: the functions and their structs
         bridge_backend.h         backend seam: the eighteen entries in `backend.md`
         bridge_schema.h          module seam: how a type is stated in C, for a module on any
                                  backend
-        bridge_abi.h             module seam: what Bridge-ASM700 writes for a module to read,
+        bridge_abi.h             module seam: what Bridge writes for a module to read,
                                  the same on every backend - `wasm.md`, *The ABI layouts*
     src/                     the library. Nothing outside it is compiled against it
     backends/wasm/           the wasm backend: its source
@@ -143,9 +143,9 @@ A backend is compiled against `include/bridge_backend.h` and its own folder. It 
 with the library, not even the few calls each makes to the operating system: a backend that
 somebody else writes has only the seam, and ours are held to the same.
 
-**How a module is written is its backend's, and not Bridge-ASM700's.** A backend is handed bytes,
+**How a module is written is its backend's, and not Bridge's.** A backend is handed bytes,
 memories and functions to offer a module, and asked to run a function - `backend.md`, *What the
-backend does not do* - so Bridge-ASM700 never learns what a module is made of, and cannot say how
+backend does not do* - so Bridge never learns what a module is made of, and cannot say how
 one is written. What it can say is what it puts in memory, and that is `bridge_abi.h`. Everything
 about reaching it - imports or a table of pointers, accessors, the macros an author types, and the
 same for a language that is not C - belongs to the backend that runs the module, and lives with it.
@@ -161,8 +161,8 @@ where two things could be meant the qualified form is the only form.
 
 **Who is who**
 
-    host              the program that links Bridge-ASM700 and drives it. `host_api.md`
-    backend           a shared library Bridge-ASM700 opens, which runs modules. `backend.md`
+    host              the program that links Bridge and drives it. `host_api.md`
+    backend           a shared library Bridge opens, which runs modules. `backend.md`
     module            what a backend runs: a wasm binary or a native library. `module.md`
     deployment        one host's choice of backends, modules and config
     seam              where two of them meet: host, backend, module. Each has one header
@@ -183,7 +183,7 @@ where two things could be meant the qualified form is the only form.
     pass              one walk of a deployment's phases, in the host's order
     stage             a step of `plan.md`. Never "phase"
     ABI entry         one of the eight things a module may call. `abi.md`
-    backend entry     one of the things a backend offers Bridge-ASM700. `backend.md`
+    backend entry     one of the things a backend offers Bridge. `backend.md`
     export            a function a module offers: `init`, `reload`, `shutdown`, a system
     call              what a host makes of `bridge.h`. Not an "entry"
 

@@ -1,12 +1,12 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
 ** tests/modules/wasm/settings/lifecycle.c -- a module whose settings are a
-** component: a singleton, given its value by Bridge-ASM700 after init,
+** component: a singleton, given its value by Bridge after init,
 ** which a system reads back.
 **
 ** KEPT is the storage layout the component is declared with: a singleton,

@@ -2,12 +2,12 @@
 
 What was weighed here and refused is `module_refused.md`, *What was refused: The module model*.
 
-A **module** is code Bridge-ASM700 runs through a backend. There is one model, whatever the backend, and
-Bridge-ASM700 has no opinion about which backend you build for - choosing is the deployment's, because the
+A **module** is code Bridge runs through a backend. There is one model, whatever the backend, and
+Bridge has no opinion about which backend you build for - choosing is the deployment's, because the
 trade is about guarantees rather than about where code belongs.
 
 Two backends exist: **wasm**, which runs a core wasm module in a sandbox, and **native**, which runs
-a shared library in Bridge-ASM700's process. "A wasm module" and "a native module" in these documents
+a shared library in Bridge's process. "A wasm module" and "a native module" in these documents
 say which backend runs it and nothing more. They are not two kinds: the ABI, the rules and the
 scheduler are the same for both.
 
@@ -21,7 +21,7 @@ the grant key, the namespace components are declared in, and how `[order]` names
 without the version there: `schedule.md`, *Order within a phase is never implicit*. A module without
 one is refused.
 
-Bridge-ASM700 is handed it as data, so **a host that cannot supply an identity cannot load a
+Bridge is handed it as data, so **a host that cannot supply an identity cannot load a
 module**. The convention is a named section in the artifact - a wasm custom section on one backend,
 an object-file section on the other - which a host reads, or has read for it: *The parser of a
 manifest*. A host sourcing it elsewhere is not doing anything wrong. Where the bytes sit and how
@@ -37,7 +37,7 @@ NUL-separated `key=value`.
 **It carries what only the author knows**, so that it travels with the artifact: the ABI version the
 module was built against, whether it must stay on one thread, how much scratch space its code uses,
 how long its init takes. Any per-module key of `config.md`, *The keys*, may be stated there.
-Combining those values with a deployment's own is the host's business, and Bridge-ASM700 sees
+Combining those values with a deployment's own is the host's business, and Bridge sees
 one flat struct either way.
 
 It is the shape of a Linux kernel module's `.modinfo`, for the reason `native.md`, *Identity*,
@@ -83,7 +83,7 @@ backend adds exactly one refusal of its own, in its own SDK.
 
     untrusted        on the wasm backend a module cannot reach memory it was not
                      given, so one that is not trusted can be run. on the native backend
-                     it is code in Bridge-ASM700's process, and nothing contains it
+                     it is code in Bridge's process, and nothing contains it
     limits           a work limit, timeouts and a memory limit apply on the wasm backend -
                      `limits.md`, *What bounds a run*. native code keeps none of them
     clean reload     on the wasm backend a reload is a fresh instance over surviving

@@ -77,25 +77,25 @@ direct-indexed to a singleton
   look: X, direct-indexed: carried by, sum 3 306
   -: module 'st:store@0.1.0' was not reloaded: type 'st:X' is carried by 3 entities, and is not moved to a singleton: nothing says which of them has its value 0 0
   -: module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept 0 0
-  -: the bridge has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+  -: the deck has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   reload: refused
-  -: the bridge has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+  -: the deck has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   storage: st:X is direct-indexed, carried by 3
 a singleton to a table
   look: X, a singleton: has a value, which is 1 104
   -: module 'st:store@0.1.0' was not reloaded: type 'st:X' is a singleton, and is not moved to a table: there is no entity to carry it 0 0
   -: module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept 0 0
-  -: the bridge has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+  -: the deck has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   reload: refused
-  -: the bridge has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+  -: the deck has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   storage: st:X is a singleton, carried by 1
 a toggle to a table, after flicker
   look: X, a toggle: carried by, sum 3 306
   -: module 'st:store@0.1.0' was not reloaded: type 'st:X' is a toggle that is off for 1 rows, and as a table they are carried like the rest. That is a loss this reload does not accept: 'st:X' 0 0
   -: module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept 0 0
-  -: the bridge has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+  -: the deck has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   reload: refused
-  -: the bridge has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+  -: the deck has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   storage: st:X is a toggle, carried by 3
 a toggle to a table, after flicker
   look: X, a toggle: carried by, sum 3 306
@@ -107,16 +107,16 @@ a table to a sparse set
   look: X, in tables: carried by, sum 3 306
   -: module 'st:store@0.1.0' was not reloaded: it accepts the loss of 'st:X', and loses nothing of that name 0 0
   -: module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept 0 0
-  -: the bridge has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+  -: the deck has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   reload: refused
-  -: the bridge has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+  -: the deck has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   storage: st:X is a table, carried by 3
 a table to a sparse set
   look: X, in tables: carried by, sum 3 306
   -: module 'st:store@0.1.0' was not reloaded: what it keeps another way, 1 of its components, could not be moved: [budget] tables of 32768 or [budget] columns of 112 bytes has no room for the rows where they are to go, while they are still where they were 0 0
   -: module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept 0 0
-  -: the bridge has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+  -: the deck has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   reload: refused
-  -: the bridge has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+  -: the deck has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   storage: st:X is a table, carried by 3
 alive

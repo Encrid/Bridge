@@ -1,4 +1,4 @@
-;; Two pages of a block Bridge-ASM700 owns, imported as the shared memory.
+;; Two pages of a block Bridge owns, imported as the shared memory.
 ;; Each function is one thing tests/adopt.c needs a module to do to it.
 (module
   (import "bridge" "shared" (memory 2 2))

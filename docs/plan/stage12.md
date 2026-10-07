@@ -441,7 +441,7 @@ is a header of that unit:
                     the column region, what a module is given, the log ring, the barrier,
                     the budget's checks, the layout of the shared block, the block made,
                     the block unmade. `block_create` was 95 lines
-    inside.h        what a bridge, a module, a system and a declared type are. Every member
+    inside.h        what a deck, a module, a system and a declared type are. Every member
                     has a line, and what each is for is said above its struct. The two
                     structs with no name have one: `system_term_t`, `module_mark_t`
 
@@ -569,7 +569,7 @@ open above, with a table made at 0.263 to 0.275 us among them.
 `backends/native/native.c` (288) is seven, each with a header of what its files share,
 `wasm_inside.h` and `native_inside.h`. Three things are not as they were:
 
-    a function Bridge-ASM700 offers    wasmtime called it with six arguments: the arguments and
+    a function Bridge offers    wasmtime called it with six arguments: the arguments and
     a wasm module                      the results, each an array of tagged values with its
                                        length. It is defined with
                                        `wasmtime_linker_define_func_unchecked` now, whose callback
@@ -583,7 +583,7 @@ open above, with a table made at 0.263 to 0.275 us among them.
     another backend seam               `backend_get_abi` is a file of its own, and the test links
                                        `tests/support/native_other_abi.c` in its place
 
-A call from a wasm module into Bridge-ASM700 was timed in scratch, twenty million `alloc(0)` in
+A call from a wasm module into Bridge was timed in scratch, twenty million `alloc(0)` in
 one `init`, beside the tree before the stage: 48 ns a call before, 8.6 ns now. The entry of the
 native backend, which every call from a native module goes through, is `static inline` in
 `native_inside.h`, as decision 4 has it for what runs in a phase; the call columns of `storage

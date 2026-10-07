@@ -22,7 +22,7 @@ key that gains a third answer.
 
 Of `config.md`, *A module's own settings are a component*.
 
-Refused: a component named by convention, which is a name Bridge-ASM700 would be inventing -
+Refused: a component named by convention, which is a name Bridge would be inventing -
 `no_builtins.md`, *No builtins*. No condition brings it back.
 
 Refused: marking it at `declare`, which would have `kind` say two things. The condition that brings

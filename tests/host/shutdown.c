@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -26,7 +26,7 @@ static void load_hang(host_t *h)
 /*
 ** test_destroy_loaded
 **
-** A bridge destroyed with modules loaded shuts each of them down first.
+** A deck destroyed with modules loaded shuts each of them down first.
 */
 void test_destroy_loaded(host_t *h)
 {

@@ -1,12 +1,12 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
 ** tests/host/backend.c -- a backend's library: what a destroyed
-** bridge leaves of it in the process, one built for another backend seam,
+** deck leaves of it in the process, one built for another backend seam,
 ** and a setting it does not know.
 **
 ** capabilities.md, *Capabilities, so the swap is honest*
@@ -20,10 +20,10 @@
 /*
 ** test_leave_libraries
 **
-** What a destroyed bridge leaves in the process: the library of a backend
+** What a destroyed deck leaves in the process: the library of a backend
 ** that does not say it can be unloaded, and not the library of one that
 ** does. The wasm backend's brought wasmtime in, whose own threads do not
-** survive being unloaded. Bridge-ASM700 closes the native backend's
+** survive being unloaded. Bridge closes the native backend's
 ** library, and every system this is built for then takes it out of the
 ** process.
 */
@@ -34,7 +34,7 @@ void test_leave_libraries(host_t *h)
     const char *native = "gone";
 
     if (!b || bridge_destroy(b)) {
-        printf("FAIL: the bridge was not created and destroyed\n");
+        printf("FAIL: the deck was not created and destroyed\n");
         exit(1);
     }
     if (host_is_library_loaded(BACKEND_PATH))

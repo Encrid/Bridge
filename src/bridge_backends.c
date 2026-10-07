@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -34,7 +34,7 @@ static uint64_t get_common_multiple(uint64_t a, uint64_t b)
 ** take_shape
 **
 ** Asks a backend what it can do and what it needs of a block it maps, and
-** widens what the bridge reserves to it. Every backend maps the shared
+** widens what the deck reserves to it. Every backend maps the shared
 ** block, so its length is a multiple of each one's granule.
 */
 static void take_shape(bridge_t *b, open_backend_t *o)
@@ -60,7 +60,7 @@ static void take_shape(bridge_t *b, open_backend_t *o)
 **
 ** Opens every backend the deployment configures, in the order it states
 ** them. It configures one at least: a module is run by a backend, so a
-** bridge with none could load nothing.
+** deck with none could load nothing.
 **
 ** create.md, *Create*
 */

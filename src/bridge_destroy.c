@@ -1,11 +1,11 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
-** src/bridge_destroy.c -- a bridge unmade: its modules shut down, and
+** src/bridge_destroy.c -- a deck unmade: its modules shut down, and
 ** everything else given back.
 */
 
@@ -76,7 +76,7 @@ static void free_names(bridge_t *b)
 **
 ** Destroys each backend, and closes the library of one that says its library
 ** can go. One that brought a runtime in is left in the process, where the
-** next bridge finds it again. A library that was opened and never became a
+** next deck finds it again. A library that was opened and never became a
 ** backend said nothing, and is left too.
 **
 ** capabilities.md, *Capabilities, so the swap is honest*
@@ -101,9 +101,9 @@ static void close_backends(bridge_t *b)
 /*
 ** bridge_destroy
 **
-** Every loaded module's shutdown, then everything else. 0 if the bridge is
+** Every loaded module's shutdown, then everything else. 0 if the deck is
 ** gone. A pinned module's shutdown is its code, and runs on its thread or
-** not at all: it is refused before anything is touched, so the bridge is
+** not at all: it is refused before anything is touched, so the deck is
 ** whole for the call that can.
 **
 ** create.md, *Destroy*

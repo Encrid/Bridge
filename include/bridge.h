@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -95,7 +95,7 @@ static_assert(offsetof(bridge_setting_t, pad) == 9);
 static_assert(offsetof(bridge_setting_t, v) == 16);
 
 /*
-** A backend the deployment configures: Bridge-ASM700 opens the library, and a
+** A backend the deployment configures: Bridge opens the library, and a
 ** module names the backend that runs it. `settings` are the backend's own,
 ** passed to it unread: it refuses a key it does not know.
 **
@@ -431,7 +431,7 @@ static_assert(offsetof(bridge_artifact_t, path) == 224);
 /*
 ** What comes back out.
 **
-**     identity    null for Bridge-ASM700's own records
+**     identity    null for Bridge's own records
 **     system      null outside a system
 **     text        this call only
 **     when        barrier count, then offset in the phase
@@ -462,7 +462,7 @@ static_assert(offsetof(bridge_record_t, pad) == 41);
 
 /*
 ** The severities of syslog, RFC 5424, by its numbers: 0 is the worst and 7
-** the most detail. These four are the ones Bridge-ASM700 and its bindings
+** the most detail. These four are the ones Bridge and its bindings
 ** name; a module may write any of the eight.
 **
 ** log.md, *The log*
@@ -504,7 +504,7 @@ static_assert(offsetof(bridge_module_info_t, pad) == 9);
 /*
 ** bridge_create
 **
-** Makes a bridge of a deployment. nullptr if the deployment cannot start;
+** Makes a deck of a deployment. nullptr if the deployment cannot start;
 ** which reason, the sink was told.
 **
 ** create.md, *Create*
@@ -515,9 +515,9 @@ BRIDGE_API [[nodiscard]] bridge_t *bridge_create(const bridge_config_t *cfg,
 /*
 ** bridge_destroy
 **
-** Every loaded module's shutdown, then everything else. 0 if the bridge is
+** Every loaded module's shutdown, then everything else. 0 if the deck is
 ** gone. With a pinned module loaded it answers 1 from any thread but the one
-** that loaded it, with a record, and nothing has been torn down: the bridge is
+** that loaded it, with a record, and nothing has been torn down: the deck is
 ** still there to be destroyed from the right one.
 **
 ** create.md, *Destroy*
@@ -527,8 +527,8 @@ BRIDGE_API [[nodiscard]] int bridge_destroy(bridge_t *b);
 /*
 ** bridge_load
 **
-** 0 if the module is loaded, its init answered 0, and the bridge can still run
-** it. Otherwise the load was refused or failed, or stopped the bridge, and a
+** 0 if the module is loaded, its init answered 0, and the deck can still run
+** it. Otherwise the load was refused or failed, or stopped the deck, and a
 ** record says why. Between phases only.
 **
 ** lifecycle.md, *The runtime lifecycle*

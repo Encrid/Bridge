@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -19,7 +19,7 @@
 **     one          it read a million times, found again each time, for a
 **                  measurement
 **
-** BAD is a build Bridge-ASM700 refuses something of: 1 a system that
+** BAD is a build Bridge refuses something of: 1 a system that
 ** selects by it, at load; 2 an attach of it with the id of an entity, when
 ** that system runs; 3 an attach of a component that is no singleton with
 ** the id 0.

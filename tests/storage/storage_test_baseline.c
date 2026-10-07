@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -92,7 +92,7 @@ static int say_one(storage_test_t *t)
 /*
 ** weigh_build
 **
-** One build, in a bridge of its own. The first is also timed at the work
+** One build, in a deck of its own. The first is also timed at the work
 ** that is the same in each. Answers 1 if it could not be loaded, or read
 ** less than it was to.
 */
@@ -115,8 +115,8 @@ static int weigh_build(storage_test_t *t, const char *path, bool first)
 /*
 ** storage_test_take_baseline
 **
-** Every figure, each build in a bridge of its own with [budget] columns of
-** 256 MB. The last of those bridges is left for main to destroy.
+** Every figure, each build in a deck of its own with [budget] columns of
+** 256 MB. The last of those decks is left for main to destroy.
 */
 enum storage_test_end storage_test_take_baseline(storage_test_t *t)
 {

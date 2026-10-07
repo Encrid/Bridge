@@ -1,7 +1,7 @@
 /*
 ** Copyright (C) 2026 Heuretes-Workshop
 **
-** This file is part of Bridge-ASM700.
+** This file is part of Bridge.
 **
 ** All rights reserved.
 **
@@ -16,7 +16,7 @@
 /*
 ** test_give_up
 **
-** A stopped bridge takes an unload of the module that stopped it: the host
+** A stopped deck takes an unload of the module that stopped it: the host
 ** goes on without it.
 */
 void test_give_up(host_t *h)

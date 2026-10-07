@@ -4,13 +4,13 @@ The record of `lifecycle.md`: `readme.md`, *Three layers, three seams*.
 
 ## The runtime lifecycle
 
-Refused: Bridge-ASM700 opening a native library itself, which would make native code a case of its
-own in Bridge-ASM700 where a backend already has the entry for it. The condition that brings it back
+Refused: Bridge opening a native library itself, which would make native code a case of its
+own in Bridge where a backend already has the entry for it. The condition that brings it back
 is native code that must run with no backend at all.
 
 Refused: a separate start call validating the whole schedule, which would need a notion of a
-complete deployment that Bridge-ASM700 does not have. The condition that brings it back is a host
-that needs all-or-nothing loading and cannot get it by destroying the bridge.
+complete deployment that Bridge does not have. The condition that brings it back is a host
+that needs all-or-nothing loading and cannot get it by destroying the deck.
 
 Refused: the original Bridge's arrangement, where the old instance's `reload` consents and the new
 one runs `init` - right there, where nothing survived a reload, and wrong here, where `init` would

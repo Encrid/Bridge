@@ -2,20 +2,20 @@
 
 What was weighed here and refused is `backend_refused.md`, *What was refused: The backend surface*.
 
-The surface a backend implements. Bridge-ASM700 defines it; a shared library provides it. Two exist: the
+The surface a backend implements. Bridge defines it; a shared library provides it. Two exist: the
 **wasm** backend, which wraps wasmtime, and the **native** backend, which opens a shared library and
 calls it directly, for code the deployment trusts. A module names the one that runs it -
 `host_api.md`, *The data*.
 
-Bridge-ASM700 keeps everything that is not the engine's business - `split.md`, *The split* - so a backend
+Bridge keeps everything that is not the engine's business - `split.md`, *The split* - so a backend
 does not reimplement a scheduler to swap an interpreter.
 
 What matters at this seam is the far side of that list: config, discovery and the formats are the
 host's, so **a backend never has a file to find**. It is handed a module's bytes and its path,
 uninspected, and the settings that are its own.
 
-**Bridge-ASM700 opens the backend libraries its config names**, and finds the eighteen entries in each by
-name - `create.md`, *Create*. That is the one kind of file Bridge-ASM700 opens.
+**Bridge opens the backend libraries its config names**, and finds the eighteen entries in each by
+name - `create.md`, *Create*. That is the one kind of file Bridge opens.
 
 ## What a backend is asked for
 
@@ -47,7 +47,7 @@ another is asked for nothing more - `host_api.md`, *A seam has a number*. The or
 
 **`module` at this seam is a module's loaded image**: compiled bytes on the wasm backend, an opened
 library on the native one. `module_compile` takes
-both the bytes and the path because Bridge-ASM700 inspects neither, and each backend uses the one it
+both the bytes and the path because Bridge inspects neither, and each backend uses the one it
 needs.
 
 **Either may be null, and that is a fact rather than a statement.** A host with no bytes for a
@@ -65,17 +65,17 @@ costs*. A backend is free to ignore them and enforce more than was asked; it is 
 enforce less, which the load check has already settled before this is called.
 
 `module_list_imports` is there for one decision: **which memories to hand `instance_create`.** Not every
-module imports both - `wasm.md`, *Memories* - so Bridge-ASM700 reads the list rather than supplying
+module imports both - `wasm.md`, *Memories* - so Bridge reads the list rather than supplying
 memories nobody asked for and letting the link fail.
 
 ## Memory is adopted, not created
 
-`memory_adopt` takes pages Bridge-ASM700 already owns and asks the backend to make them addressable by a
-module. It does not ask the backend to allocate. That is the whole of what "Bridge-ASM700 owns the
+`memory_adopt` takes pages Bridge already owns and asks the backend to make them addressable by a
+module. It does not ask the backend to allocate. That is the whole of what "Bridge owns the
 memory" means at this seam, and it is why the same region reaches a native module as a raw pointer
 and a wasm module as an import.
 
-**A backend states the shape it needs, and Bridge-ASM700 allocates to it.** An engine does not care
+**A backend states the shape it needs, and Bridge allocates to it.** An engine does not care
 who allocated a block; it cares what surrounds it. One that enforces bounds by faulting needs
 address space reserved after the block and left unmapped, so that a stray access lands on nothing.
 `memory_get_shape` answers the reservation and the guard a backend needs, and the granule: the number
@@ -87,7 +87,7 @@ that backend's. A backend with no requirement answers zero for both, and a nativ
 private block reserves what it uses and no more. `tests/storage`, case `storage-shape`.
 
 **A backend that refuses a block refuses what asked for it.** A block a backend will not adopt
-refuses the bridge, at create, by the backend's name and with its reason. And an instance that
+refuses the deck, at create, by the backend's name and with its reason. And an instance that
 cannot be given a memory its module imports is not made.
 
 The length follows the same rule: the shared block is a whole number of every backend's granule, and
@@ -103,14 +103,14 @@ is the shape a good abstraction should have.
 
 **`memory_release` takes the handle back**, and frees nothing of the block, which was never the
 backend's. A module's private block is adopted when it loads and released when it unloads, so a
-handle without a counterpart would leak once per unload. The order is Bridge-ASM700's to keep:
+handle without a counterpart would leak once per unload. The order is Bridge's to keep:
 **a memory is released after the last instance it was handed to is destroyed**, never before, since
 an instance may hold the handle for as long as it runs.
 
 ## The backend owns its clock
 
 `instance_set_timeout` takes **nanoseconds**, and the backend converts to whatever its engine
-counts in. Bridge-ASM700 asks in real time because that is the only unit every backend can mean the
+counts in. Bridge asks in real time because that is the only unit every backend can mean the
 same thing by.
 
 It is the backend rather than the host, even though `split.md`, *The split*, sends a policy about
@@ -130,7 +130,7 @@ a span holds. Choose a storage strategy. Parse a manifest.
 
 **There is no store.** A store is wasmtime's unit of "one thread at a time" - its own header says a
 store *"generally cannot be concurrently used"* while being *"cheap to create and cheap to
-dispose"*, so one per instance is both idiomatic and what Bridge-ASM700 wants. The unit at this seam is
+dispose"*, so one per instance is both idiomatic and what Bridge wants. The unit at this seam is
 therefore the **instance**, and how a backend groups instances internally is its business: wasmtime
 gives each a store, the native backend gives each nothing.
 
@@ -139,13 +139,13 @@ config, and a limiter that knows which module is executing can hold co-tenants t
 ceilings - so scoping them to one backend's concept would be wrong twice over.
 
 **What this gives up: a backend cannot be told to group instances.** It may group them internally -
-wasmtime could put several in one store - but Bridge-ASM700 has no way to ask and no reason to, since the
+wasmtime could put several in one store - but Bridge has no way to ask and no reason to, since the
 grouping policy would be a decision shaped by one engine. A backend whose instances **must**
 share state to be viable at all - one interpreter for all of them, say - groups them itself, and
 if a deployment has to say which go together it says so in that backend's own settings, which
-Bridge-ASM700 passes through unread. The condition that would change the answer is such a backend
-for which that is not enough: one where what Bridge-ASM700 asks of an instance - its work limit, its
-timeout, its memory limit - cannot be honoured without Bridge-ASM700 knowing the group.
+Bridge passes through unread. The condition that would change the answer is such a backend
+for which that is not enough: one where what Bridge asks of an instance - its work limit, its
+timeout, its memory limit - cannot be honoured without Bridge knowing the group.
 
 The test each entry passes is that it means something to **every** backend. `module_compile` is
 compile-or-dlopen; `instance_set_work_limit` is set-the-work-limit-or-say-you-cannot, which is what
@@ -155,7 +155,7 @@ So **meaningful-but-unavailable is not meaningless** - that is `instance_set_wor
 Meaningless to one backend is a different thing, and that is `store_create`: not "cannot do it" but
 "the word names nothing here", which no capability flag could rescue.
 
-Bridge-ASM700 hands it bytes, memories and functions to offer a module, and asks it to run a
+Bridge hands it bytes, memories and functions to offer a module, and asks it to run a
 function. That is the
 entire relationship, and it is why the surface is eighteen entries rather than a second copy of
-Bridge-ASM700.
+Bridge.
