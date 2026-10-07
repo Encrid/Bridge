@@ -286,8 +286,6 @@ def build(target, debug, out):
     # the same backend, with another answer to backend_get_abi in the place of its own
     native_other_o = [o for o in native_o if o.name != 'native_abi.o'] + [
         compile_('native_other_abi', ROOT / 'tests/support/native_other_abi.c', ours + [include])]
-    schema_test_o = compile_('schema-test', ROOT / 'tests/schema.c', ours + [include, src])
-    adopt_o = compile_('adopt', ROOT / 'tests/adopt.c', ours + [include, src, utils] + defines)
     # a host program is a directory of sources, with what the programs share compiled once -
     # stage12.md, *The test programs*. One that has not been cut yet is one source
     support = '-I%s' % (ROOT / 'tests/support')
@@ -295,15 +293,18 @@ def build(target, debug, out):
               for c in sorted((ROOT / 'tests/support').glob('host*.c')) +
               sorted((ROOT / 'tests/support' / row['os']).glob('host*.c'))]
 
-    def program(name, flags):
+    def program(name, flags, shared):
         where = ROOT / 'tests' / name
         if not where.is_dir():
             return [compile_(name, ROOT / 'tests' / (name + '.c'), flags)]
         return [compile_(name + '-' + c.stem, c, flags + [support])
-                for c in sorted(where.glob('*.c'))] + host_o
+                for c in sorted(where.glob('*.c'))] + shared
 
-    phase_o = {name: program(name, ours + [include] + defines)
+    phase_o = {name: program(name, ours + [include] + defines, host_o)
                for name in ('stage2', 'stage3', 'stage4', 'stage5', 'stage6')}
+    # these reach inside, to test it: they are compiled against src/ and share nothing
+    schema_test_o = program('schema', ours + [include, src], [])
+    adopt_o = program('adopt', ours + [include, src, utils] + defines, [])
     storage_o = compile_('storage-test', ROOT / 'tests/storage.c', ours + [include, src, utils] + defines)
     # the library again, with its calls to the allocator sent to the test that counts them
     counting = ['-D%s=counted_%s' % (f, f) for f in ('malloc', 'calloc', 'realloc', 'free')]
@@ -341,8 +342,8 @@ def build(target, debug, out):
     link('backends/bridge_native_other', native_other_o, system, shared=True)
     for name, _, _ in NATIVE:
         link(name, module_o[name], shared=True)
-    link('adopt', [adopt_o, obj / 'backend.o'] + os_o, system)
-    link('schema', [schema_test_o] + [obj / (name + '.o') for name in ['schema'] + SCHEMA], system)
+    link('adopt', adopt_o + [obj / 'backend.o'] + os_o, system)
+    link('schema', schema_test_o + [obj / (name + '.o') for name in ['schema'] + SCHEMA], system)
     whole = bridge_o + os_o
     # the library, built: shared and static. What a host links - host_api.md
     shared_lib, static_lib = out / ('bridge' + lib), out / 'bridge.a'
