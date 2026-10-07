@@ -5,11 +5,15 @@
     python tools/cover.py --surface    print what the headers expose, a name a line
 
 What is exposed is read from the headers of the three seams and of the two SDKs: a function, an
-entry, a macro, a constant, a layout, and each key of a struct a host fills. docs/tests.md lists
-each under a heading of its name, with the cases that show it; a case is named for its heading,
-then a hyphen, then what it shows. It fails on a name with no heading, a heading with no case, a
-heading in a seam's part that the headers do not expose, a case under no heading, a case listed
-that is not run, and a document that points at a case that is not run.
+entry, a macro that takes arguments, a constant, a layout, and each key of a struct a host fills.
+docs/tests.md lists each under a heading of its name, with the cases that show it; a case is
+named for its heading, then a hyphen, then what it shows. A constant may have, in the place of
+cases, one line: `with` and the heading whose cases are its own.
+
+It fails on an exposed name with no heading, a heading with no case, a heading in a seam's part
+that the headers do not expose, a heading there is twice, a case under no heading or under one
+it is not named for, a case listed that is not run, a `with` that is not a constant's or names
+no heading that has cases, and a document that points at a case that is not run.
 """
 import re
 import sys
@@ -55,8 +59,16 @@ def entries(body):
     return re.findall(r'\(\*(\w+)\)\(', body)
 
 
+def constants(text):
+    """The constants a header states: each member of an enum, and each constexpr."""
+    names = []
+    for body in re.findall(r'enum \w+(?: : \w+)? \{(.*?)\}', text, re.S):
+        names += re.findall(r'(\w+)(?: = [^,}]+)?\s*(?:,|$)', body.strip())
+    return names + re.findall(r'^constexpr [\w ]+?(\w+)(?:\[\])? =', text, re.M)
+
+
 def exposed(path):
-    """Every name a header exposes."""
+    """Every name a header exposes, and which of them are constants."""
     text = strip((ROOT / path).read_text(encoding='utf-8'))
     names = []
     for kind, body, name in re.findall(r'typedef (struct|union)\s*\w*\s*\{(.*?)\}\s*(\w+);', text, re.S):
@@ -64,17 +76,15 @@ def exposed(path):
         names += entries(body) or (keys(name, body) if by_key else [name])
     for name, body in re.findall(r'^struct (\w+) \{(.*?)\};', text, re.S | re.M):
         names += entries(body) + [name + '_t']
-    for body in re.findall(r'enum \w+(?: : \w+)? \{(.*?)\}', text, re.S):
-        names += re.findall(r'(\w+)(?: = [^,}]+)?\s*(?:,|$)', body.strip())
-    names += re.findall(r'^constexpr [\w ]+?(\w+)(?:\[\])? =', text, re.M)
+    names += constants(text)
     names += re.findall(r'^\s*#define (\w+)\(', text, re.M)
     names += re.findall(r'^(?:BRIDGE_API|static inline)[^;{]*?(\w+)\(', text, re.S | re.M)
-    return [n for n in names if not n.endswith('_')]
+    return [n for n in names if not n.endswith('_')], constants(text)
 
 
 def surface():
     """What each seam exposes, in the order the headers state it."""
-    return {seam: list(dict.fromkeys(n for h in headers for n in exposed(h)))
+    return {seam: list(dict.fromkeys(n for h in headers for n in exposed(h)[0]))
             for seam, headers in SEAMS.items()}
 
 
@@ -86,48 +96,73 @@ def cases():
 
 
 def listed():
-    """docs/tests.md, as its parts: each a list of headings, each with its cases."""
+    """docs/tests.md, as its parts: each a list of headings, each with its lines."""
     parts, part, head = {}, None, None
     for line in LIST.read_text(encoding='utf-8').splitlines():
         if line.startswith('## '):
             part, head = parts.setdefault(line[3:].strip(), {}), None
         elif line.startswith('### ') and part is not None:
             head = part.setdefault(line[4:].strip(), [])
-        elif head is not None and re.match(r'    \S+$', line):
+            head.append(None) if len(head) else None
+        elif head is not None and re.match(r'    \S', line):
             head.append(line.strip())
     return parts
 
 
 def pointed():
-    """Every case a document points at, as `tests`, case `name`, with where."""
+    """Every case a document points at, as case `name`, with the document."""
     found = []
     for doc in sorted((ROOT / 'docs').rglob('*.md')):
+        if 'plan' in doc.parts:
+            continue
         text = re.sub(r'\n(?=\S)', ' ', doc.read_text(encoding='utf-8'))
-        found += [(doc.name, m) for m in re.findall(r'cases? `([^`\s]+)`', text)]
+        for run in re.findall(r'\bcases? ((?:`[^`\s]+`(?:,? and |, )?)+)', text):
+            found += [(doc.name, name) for name in re.findall(r'`([^`]+)`', run)]
     return found
 
 
-def check():
-    said, run, parts = [], cases(), listed()
-    heads = {h: c for part in parts.values() for h, c in part.items()}
+def check_headings(parts, said):
+    """Holds each seam's part against its headers, and no heading twice."""
+    seen = []
     for seam, names in surface().items():
         part = parts.get(seam, {})
         said += ['%s is exposed, and has no heading in "%s"' % (n, seam) for n in names if n not in part]
         said += ['"%s" has the heading %s, which no header of it exposes' % (seam, h)
                  for h in part if h not in names]
+    for part in parts.values():
+        said += ['the heading %s is there twice' % h for h in part if h in seen or None in part[h]]
+        seen += list(part)
+
+
+def check_cases(heads, run, said):
+    """Holds what is under each heading against the cases that are run."""
+    constant = {n for hs in SEAMS.values() for h in hs for n in exposed(h)[1]}
     for head, under in heads.items():
+        shared = [u[5:] for u in under if u and u.startswith('with ')]
+        mine = [u for u in under if u and not u.startswith('with ')]
         said += ['%s has no case' % head] if not under else []
+        said += ['%s is said with %s, and is no constant' % (head, s) for s in shared if head not in constant]
+        said += ['%s is said with %s, which has no case of its own' % (head, s) for s in shared
+                 if not [u for u in heads.get(s, []) if u and not u.startswith('with ')]]
+        said += ['%s has cases, and is said with %s as well' % (head, s) for s in shared if mine]
         said += ['%s is listed under %s, and is not named for it' % (c, head)
-                 for c in under if not c.startswith(head + '-') and c != head]
-        said += ['%s is listed, and no case of that name is run' % c for c in under if c not in run]
-    everywhere = [c for under in heads.values() for c in under]
+                 for c in mine if not c.startswith(head + '-') and c != head]
+        said += ['%s is listed, and no case of that name is run' % c for c in mine if c not in run]
+    everywhere = [c for under in heads.values() for c in under if c and not c.startswith('with ')]
     said += ['%s is run, and is under no heading' % c for c in run if c not in everywhere]
-    said += ['%s is listed twice' % c for c in set(everywhere) if everywhere.count(c) > 1]
+    said += ['%s is listed twice' % c for c in sorted(set(everywhere)) if everywhere.count(c) > 1]
+
+
+def check():
+    said, run, parts = [], cases(), listed()
+    heads = {h: c for part in parts.values() for h, c in part.items()}
+    check_headings(parts, said)
+    check_cases(heads, run, said)
     said += ['%s points at the case %s, and no case of that name is run' % (doc, c)
              for doc, c in pointed() if c not in run]
     for line in said:
         print(line)
-    print('%d exposed, %d headings, %d cases: %d faults'
+    print('%d exposed names, %d headings, %d cases: %d faults'
           % (sum(len(n) for n in surface().values()), len(heads), len(run), len(said)))
     return 1 if said else 0
 

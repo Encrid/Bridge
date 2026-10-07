@@ -328,7 +328,7 @@ Storage keeps, in memory of its own that no module can address:
 What is in the shared block of any of these - the entity index, each table's array of ids - is a
 **copy**, written when a row is placed and never read. A module that writes over them misleads
 itself and whoever reads them after; it does not change what storage does next.
-`tests/storage`, case `scribble`, has a module overwrite every index record and every entity
+`tests/storage`, case `storage-scribble`, has a module overwrite every index record and every entity
 array, and then moves and destroys rows.
 
 That was not so under flecs. Its table read the id of the row it had moved from the array the

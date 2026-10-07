@@ -125,11 +125,12 @@ the scheduler cannot tell them apart. An entry's arguments are offsets into the 
 this backend as on any: Bridge-ASM700 reads them, and the scratch arena is the one memory of a
 module it can bounds-check - `abi.md`, *The ABI*. The SDK does the copy: `bridge_native_put`.
 
-**An entry is told whose it is by the table it is given.** A module's table is part of its
-instance, so `api->spawn(api)` says which module is asking, and nothing is found by which thread
-happens to be running. *The invariant* is then checked and not implied: the backend notes the
-thread it calls a module on, and an entry reached on any other thread, or outside a call, answers
-zero. `tests/stage5`, case `foreign`, reaches one from a thread the module started.
+**An entry is told whose it is by the table it is given.** A module's table is part of its instance,
+so `api->spawn(api)` says which module is asking, and nothing is found by which thread happens to be
+running. *The invariant* is then checked and not implied: the backend notes the thread it calls a
+module on, and an entry reached on any other thread, or outside a call, answers zero. `tests/host`,
+case `bridge_api_t-entry-from-a-foreign-thread-refused`, reaches one from a thread the module
+started.
 
 **A refused entry answers zero, and so does every entry after it until the call returns.** Nothing
 can unwind native code - `budgets.md`, *What running out does* - so the backend does the nearest

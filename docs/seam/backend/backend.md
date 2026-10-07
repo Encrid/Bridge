@@ -81,7 +81,7 @@ since a wasm memory is a whole number of them; the native backend has none. **A 
 shape of whoever maps it**. The shared block is mapped by every backend, so it has the largest of
 them all. A module's private block is mapped by that module's backend and no other, so it has
 that backend's. A backend with no requirement answers zero for both, and a native module's
-private block reserves what it uses and no more. `tests/storage`, case `shape`.
+private block reserves what it uses and no more. `tests/storage`, case `storage-shape`.
 
 The length follows the same rule: the shared block is a whole number of every backend's granule, and
 a module's private block of its own backend's.

@@ -66,12 +66,12 @@ outcome - a module that reads out of bounds, exhausts a system's work limit, or 
 call's timeout produces one, and the process keeps running - and `failure.md`, *When something
 fails*, treats the two alike on purpose.
 
-**The backend is who checks an export, because it is who can see one** - the other half of
-*Imports are declared, exports are checked*. `instance_get_func` answers a function `call` can run, or
-refuses and says why. The wasm backend reads the export's type and refuses one that is not
-`() -> i32`, at init and not on the first frame: `tests/stage2`, case `shape`. The native
-backend has a symbol from the loader, which carries no type, and checks nothing: it does not
-answer `untrusted`, of which the check is a part - `capabilities.md`, *Capabilities, so the swap
-is honest*. What it calls is
-not `() -> i32` either: it passes its table - `native.md`, *Lifecycle*. "Takes nothing" is what
+**The backend is who checks an export, because it is who can see one** - the other half of *Imports
+are declared, exports are checked*. `instance_get_func` answers a function `call` can run, or
+refuses and says why. The wasm backend reads the export's type and refuses one that is not `() ->
+i32`, at init and not on the first frame: `tests/host`, case
+`instance_get_func-export-taking-an-argument-refused`. The native backend has a symbol from the
+loader, which carries no type, and checks nothing: it does not answer `untrusted`, of which the
+check is a part - `capabilities.md`, *Capabilities, so the swap is honest*. What it calls is not `()
+-> i32` either: it passes its table - `native.md`, *Lifecycle*. "Takes nothing" is what
 Bridge-ASM700 hands a backend to pass on, not the shape of the function a backend runs.

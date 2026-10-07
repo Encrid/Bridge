@@ -28,11 +28,11 @@ so it is a write to all of them, and a module that may write none of them is rea
 namespace's with no grant. A module with a read grant on `game:Position` can find every entity
 of the game in its spans; it may not remove them.
 
-It is checked at the barrier, where what the entity carries is known, against what it carried
-before that barrier. A destroy that fails it leaves the entity as it was, the log says how many,
-and it is the module's failure, counted as a change that could not be placed is - `failure.md`,
-*The budget*. `tests/stage5`, cases `reapread` and `reapwrite`, are one module under the two
-grants.
+It is checked at the barrier, where what the entity carries is known, against what it carried before
+that barrier. A destroy that fails it leaves the entity as it was, the log says how many, and it is
+the module's failure, counted as a change that could not be placed is - `failure.md`, *The budget*.
+`tests/host`, cases `destroy-with-a-read-grant-left` and `module_config.write-destroy-goes`, are one
+module under the two grants.
 
 This is the sentence `lifetime.md`, *What unload leaves behind*, already had - a module may
 destroy an entity "it only partly populates" - enforced where it had been wider: any module could

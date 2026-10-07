@@ -69,8 +69,9 @@ at offsets the other side does not use is not an error anybody is told of; so it
     the module seam     BRIDGE_ABI        a module states it in its manifest, and a load
                                           refuses another - `wasm.md`, *The ABI layouts*
 
-`tests/stage2`, cases `hostabi` and `hostabiunset`, and `tests/stage4`, case `backendabi`.
-Each number is where it can always be found: first in the struct, the first entry.
+`tests/host`, cases `config.abi-another-refused`, `config.abi-unset-refused` and
+`backend_get_abi-another-refused`. Each number is where it can always be found: first in the
+struct, the first entry.
 
 **All three are 1, and stay 1 until there is a release.** A release is a version of this
 repository that is tagged and handed to something that is not rebuilt with it. None exists, so

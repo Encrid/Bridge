@@ -52,14 +52,14 @@ system can have, one float read, changed and written back per row of 200,000:
     a work limit         0.65             0.44      x1.5
 
 Under a work limit it costs more than itself, because the branch it adds is a block and the wasm
-backend counts work by the block - `limits.md`, *What a bound costs*. `tests/stage3`'s `bench`
-case is the measurement: one module, built both ways.
+backend counts work by the block - `limits.md`, *What a bound costs*. The case
+`BRIDGE_ROW-checked-and-unchecked-timed` is the measurement: one module, built both ways.
 
 **The entity index needs no check of its own.** It did while flecs kept the rows: flecs moved a
 row and Bridge-ASM700 had to be told, by a patch whose failure would have been silent, so every
 barrier compared row counts against table sizes. Storage now writes a record at the place in the
 code where it places the row - `reference.md`, *Reference following* - and reads none of it back,
-so there is no second account to compare. `tests/storage`, case `stress`, is where that is held:
+so there is no second account to compare. `tests/storage`, case `storage-stress`, is where that is held:
 four modules keep their own account of eight million changes and check every entity through the
 index, and every component through its spans, at every pass.
 

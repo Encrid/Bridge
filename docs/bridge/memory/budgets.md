@@ -42,17 +42,17 @@ may be, inside its `spans`. A module whose `spans` cannot hold that is refused a
 arithmetic, and not stopped at whichever barrier made one table too many.
 
 **`types` and `systems` are counts of what is there at once, across every module.** A type two
-modules declare is one. **A reload needs no room for a module's systems twice.** The old
-instance's systems leave storage before the new instance registers its own, in the places those
-had; if the reload fails, the new ones are dropped and the old put back as they were, which
-cannot fail, since the places are free again. So `systems` is the number a deployment has, and
-not that number and a module more. `tests/stage6`, cases `reloadexact` and
-`reloadexactfail`, reload a module of one system with `systems` at one, and fail to. The two
-keys exist because storage's memory is a product: a table
-keeps an offset for every type there may be, and a system keeps a place for every table there may
-be. With the two stated, everything storage holds is known and allocated when the bridge is
-created, and it allocates nothing after - `storage.md`, *What bounds it*. A `declare` or a
-`add_system` past its key is refused there, by name, which fails that module's `init`.
+modules declare is one. **A reload needs no room for a module's systems twice.** The old instance's
+systems leave storage before the new instance registers its own, in the places those had; if the
+reload fails, the new ones are dropped and the old put back as they were, which cannot fail, since
+the places are free again. So `systems` is the number a deployment has, and not that number and a
+module more. `tests/host`, cases `bridge_reload-room-for-one-system` and
+`bridge_reload-failed-with-room-for-one-system`, reload a module of one system with `systems` at
+one, and fail to. The two keys exist because storage's memory is a product: a table keeps an offset
+for every type there may be, and a system keeps a place for every table there may be. With the two
+stated, everything storage holds is known and allocated when the bridge is created, and it allocates
+nothing after - `storage.md`, *What bounds it*. A `declare` or a `add_system` past its key is
+refused there, by name, which fails that module's `init`.
 
 **`terms` is the most one system or observer may ask for**, and it is a key for the same reason:
 storage keeps a system's terms in a record made when the bridge is, so the record has a length. It
@@ -105,8 +105,8 @@ multiple of eight. A change that does not fit is refused and that invocation fai
 allocation past `persistent` does. A module that queues none states `BRIDGE_NONE`.
 
 `tests/storage` is built a second time against a library whose every call to the allocator is
-counted, and runs the cases `changes`, `tables` and `strip` with a phase failing if the count
-moved: cases `alloc-changes`, `alloc-tables`, `alloc-strip`.
+counted, and runs the cases `storage-changes`, `storage-tables` and `storage-strip` with a phase
+failing if the count moved: cases `allocation-changes`, `allocation-tables`, `allocation-strip`.
 
 **Loading, reloading and unloading a module do allocate**, and creating and destroying a bridge:
 a record for the module, for each of its systems and types, and the rooms above. None is the
@@ -179,7 +179,7 @@ first asked are the ones placed.** It asks the column region for half as many un
 fits, and then searches back up between that number and the last that did not. Entities are
 worked in the order their first change was asked, which is the order the calls ran -
 `threads.md`, *Threads* - so which are placed is the same every run. `tests/storage`, case
-`nocolumns`, has room for four rows of six and places four, where halving alone finds three.
+`storage-nocolumns`, has room for four rows of six and places four, where halving alone finds three.
 
 **It is a failure of every module that asked a change of it**, each for the changes that were its
 own. A record names the module, the key, and how many of its changes were not applied; and the

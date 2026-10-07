@@ -44,10 +44,11 @@ the module uses to a phase the deployment declared:
     [module."mods:physics".phases]
     tick = "update"
 
-A name that is not in the table is looked for among the deployment's phases as it is written, so
-a module that already says `update` needs no entry. A table that maps a name twice, or to a
-phase the deployment did not declare, refuses the load, by the name. `tests/stage5`, cases
-`phaseunmapped`, `phasemapped` and `phasebadmap`, are one module that says `tick`.
+A name that is not in the table is looked for among the deployment's phases as it is written, so a
+module that already says `update` needs no entry. A table that maps a name twice, or to a phase the
+deployment did not declare, refuses the load, by the name. `tests/host`, cases
+`module_config.phases-unmapped-refused`, `phase_name.from-mapped-loads` and
+`phase_name.to-undeclared-refused`, are one module that says `tick`.
 
 It is the deployment that resolves it, as it resolves an order between two systems and a grant
 between two namespaces: the only party that has seen both sides.
@@ -141,11 +142,11 @@ Two systems conflict in one of two ways:
                         the list each stated beside its terms - `abi.md`, *The ABI*
 
 **A change is in the graph because a barrier applies changes in the order the systems ran.** Two
-modules that attach one component to one entity in one phase leave the value of whichever ran
-last, so which ran last has to be something the deployment stated. `tests/stage5`, cases
-`changeorder` and `changeloaded`, load the same two modules in both orders and read the same
-value. A change does not conflict with a term: a change is applied at the barrier, after every
-system of the phase has read what was there before it.
+modules that attach one component to one entity in one phase leave the value of whichever ran last,
+so which ran last has to be something the deployment stated. `tests/host`, cases
+`order-changes-ordered-loaded-first` and `order-changes-ordered-loaded-last`, load the same two
+modules in both orders and read the same value. A change does not conflict with a term: a change is
+applied at the barrier, after every system of the phase has read what was there before it.
 
 **Every attach and every detach is stated, with no exception.** So two modules that send the same
 signal in one phase - each attaching the same component to entities only it holds - are refused

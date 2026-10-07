@@ -33,8 +33,9 @@ Of `failure.md`, *The budget*.
 Refused: one count for a module, raised by a barrier in which anything of its failed and lowered by
 one in which it ran clean, which is what this was. There is a barrier after every phase, so a module
 with a system that always failed in one phase and a system that ran clean in the next went up one
-and down one for ever, and was never stopped: the fault the next refusal names. `tests/stage6.c`,
-case `notmasked`, is that module. No condition brings it back.
+and down one for ever, and was never stopped: the fault the next refusal names. `tests/host`, case
+`module_config.max_system_failures-clean-system-forgives-no-other`, is that module. No condition
+brings it back.
 
 Refused: a count that one clean barrier resets, which is easier to say and never stops a module
 failing every other pass. The condition that brings it back is deployments finding this one hard to

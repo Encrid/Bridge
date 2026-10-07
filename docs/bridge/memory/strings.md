@@ -93,17 +93,17 @@ a `bridge_text_t` - is good only for as long as the module that allocated it is 
 **A share that stays is said.** One record for each component that holds a string in it: the
 module, the bytes that stay, the component and in how many rows. A later load can be refused for
 want of that room, and the reason is then in the log and not for anybody to work out.
-`tests/stage6`, case `arenakept`, reads it.
+`tests/host`, case `bridge_unload-share-kept-while-pointed-into`, reads it.
 
 **What it costs.** An unload reads every text field of every surviving row, once. Never at a
 barrier. And a share with one surviving string in it stays dead whole: on every need but that
 one this holds, and that one is what the record is there to show.
 
 **What it buys.** Loading and unloading modules can go on for as long as a deployment runs:
-`tests/stage6`, case `churn`, does two hundred cycles in an arena with room for one share. It
-could not, once: the arena was a high-water mark for the life of the process, and unbounded churn
-meant restarting. That was decided before a module's share was its own and before text was a type
-the library could see, and it was not read again when both became true.
+`tests/host`, case `bridge_unload-two-hundred-rounds`, does two hundred cycles in an arena with room
+for one share. It could not, once: the arena was a high-water mark for the life of the process, and
+unbounded churn meant restarting. That was decided before a module's share was its own and before
+text was a type the library could see, and it was not read again when both became true.
 
 The discipline while a module runs is still idTech3's: allocation for a lifetime, with no
 per-object bookkeeping. The lifetime is the module's, where theirs was a level's.
