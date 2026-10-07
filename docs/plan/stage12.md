@@ -605,3 +605,10 @@ Every function is `static inline` as it was, so what a module compiles to is the
 One macro went: `acc_row` was defined to `acc_row_unchecked` in a module built without the row
 test, lower case, which V1 refuses. The function is declared under the one name either way now,
 and the import it is bound to is the one that was stated.
+
+**The second exception.** A test module keeps the slots `declare` and `add_system` answered, and
+what it counts from one call to the next, in variables of its file: 69 of them, which G4 does not
+allow. An export takes nothing, wasm's `() -> i32` and the native table alike, scratch is reset at
+each barrier, and an offset into the persistent arena would itself have to be kept somewhere. So
+`style.md` excepts G4 under `tests/modules`. A host program keeps none: what its sink counts is in
+the fixture the sink is handed.

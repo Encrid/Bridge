@@ -680,3 +680,5 @@ excuses nothing is reported, so that none outlives what it was for.
     F5  backends/wasm/wasm_adopted.c:make_memory  its signature is wasmtime's: it is what
         `wasmtime_new_memory_callback_t` states, seven arguments, and wasmtime has no other
         way to be answered for a memory an instance defines
+    G4  tests/modules/*  a module's export takes nothing, and the ABI gives a module no other
+        place than the variables of its file for what `init` was answered and what it counts

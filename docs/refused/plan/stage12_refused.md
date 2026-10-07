@@ -145,3 +145,16 @@ condition that brings it back is a second library whose callbacks are many.
 Refused: a shim of seven arguments in `backends/wasm/wasmtime`, calling a function of ours of
 four. O1 excuses that folder because somebody else built what is in it, and this would be ours.
 No condition brings it back.
+
+## Where a module keeps what it was answered
+
+Of `stage12.md`, *The refactor, as it goes*. G4 is excepted under `tests/modules`.
+
+Refused: a region of the private block for a module's own state, with a config key that sizes
+it. The bridge would size and publish what it never reads, each read in a wasm module would go
+through an accessor, and where the region is would still be a number the module keeps. The
+condition that brings it back is a module whose state has to outlive its instance.
+
+Refused: slots written as constants, in the order they are declared. `abi.md` says a slot is what
+`declare` answered and promises no numbering, and a module that counts has variables all the
+same. The condition that brings it back is the ABI stating the numbering.
