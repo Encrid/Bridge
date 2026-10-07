@@ -244,7 +244,7 @@ def build(target, debug, out):
     utils = '-I%s' % (ROOT / 'utils/os')
     # how a module is written is its backend's: each backend's binding sits beside the backend
     sdk = {b: '-I%s' % (ROOT / 'backends' / b / 'sdk') for b in ('wasm', 'native')}
-    headers = [Path(__file__)] + [h for d in ('include', 'src', 'tests', 'tests/modules',
+    headers = [Path(__file__)] + [h for d in ('include', 'src', 'tests', 'tests/*', 'tests/modules',
                                               'tests/modules/native', 'tests/modules/wasm',
                                               'tests/modules/native/*', 'tests/modules/wasm/*',
                                               'backends/wasm', 'backends/wasm/sdk',
@@ -285,7 +285,20 @@ def build(target, debug, out):
         compile_('native_other_abi', ROOT / 'tests/support/native_other_abi.c', ours + [include])]
     schema_test_o = compile_('schema-test', ROOT / 'tests/schema.c', ours + [include, src])
     adopt_o = compile_('adopt', ROOT / 'tests/adopt.c', ours + [include, src, utils] + defines)
-    phase_o = {name: compile_(name, ROOT / 'tests' / (name + '.c'), ours + [include] + defines)
+    # a host program is a directory of sources, with what the programs share compiled once -
+    # stage12.md, *The test programs*. One that has not been cut yet is one source
+    support = '-I%s' % (ROOT / 'tests/support')
+    host_o = [compile_('support-' + c.stem, c, ours + [include] + defines)
+              for c in sorted((ROOT / 'tests/support').glob('host*.c'))]
+
+    def program(name, flags):
+        where = ROOT / 'tests' / name
+        if not where.is_dir():
+            return [compile_(name, ROOT / 'tests' / (name + '.c'), flags)]
+        return [compile_(name + '-' + c.stem, c, flags + [support])
+                for c in sorted(where.glob('*.c'))] + host_o
+
+    phase_o = {name: program(name, ours + [include] + defines)
                for name in ('stage2', 'stage3', 'stage4', 'stage5', 'stage6')}
     storage_o = compile_('storage-test', ROOT / 'tests/storage.c', ours + [include, src, utils] + defines)
     # the library again, with its calls to the allocator sent to the test that counts them
@@ -337,8 +350,8 @@ def build(target, debug, out):
     # a host is compiled against include/ alone and linked with the library as a host would be:
     # the shared one, and one of them the static one as well
     for name, o in phase_o.items():
-        link(name, [o, shared_lib], system + here)
-    link('stage2-static', [phase_o['stage2'], static_lib], system)
+        link(name, o + [shared_lib], system + here)
+    link('stage2-static', phase_o['stage2'] + [static_lib], system)
     # these three reach inside, to test it, and so are linked with its objects
     link('storage', [storage_o] + whole, system)
     link('storage-counted', [counted_test_o] + counted_o, system)
