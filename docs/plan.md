@@ -282,9 +282,9 @@ then told by a record what went.* Met.
 
 ## 12. One style, every platform, few dependencies
 
-In progress: `stage12.md`. Three things that are about the whole tree and not about what it
-does, done before a host is written against it - stage 13 - so that it is written against names
-that stay.
+Built, with one clause of its done-when waiting on a thing outside the tree: `stage12.md`,
+*The close*. Three things that are about the whole tree and not about what it does, done before
+a host is written against it - stage 13 - so that it is written against names that stay.
 
 **One coding style, and a program that holds it.** `style.md` is how the C is written, and
 every C file of ours follows it: the library, the seam headers, the backends and their SDKs,
@@ -317,8 +317,9 @@ tree, and no C runtime linked on Windows. That is not built, and why is the reco
 *Done when `tools/style.py` finds no breach in any C file of ours outside the exceptions
 `style.md` lists; every case passes on every platform the stage has, each run by a workflow on
 every push; no line of `storage measure`, `storage weigh` or the measurements beside flecs and
-EnTT is slower than before the stage; and every dependency is in the list, with a case that
-fails on one that is not.*
+EnTT is slower than before the stage by more than aligning every function moves it, and each
+that is slower at all is on record with what was tried; and every dependency is in the list,
+with a case that fails on one that is not.*
 
 ## 13. A host, from outside
 

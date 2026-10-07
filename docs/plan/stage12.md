@@ -785,3 +785,40 @@ into its five steps: 17.0 ns before it, 17.8 after. The steps are the same state
 order, and the compiler puts all five into `storage_apply` whole, 12.9 KB of it, with four
 functions left out of line as before. Read side by side, the fold, the placing of a cell and the
 writing of its value are what they were. The instructions differ and the source does not say why.
+
+## The close
+
+Enkrid ruled on the two clauses that were not met, on 2026-10-07.
+
+**The slower lines.** The one that is real was looked into further, and the rest are held to
+what moving a function moves. Found on the way: `pick_table` asked twice whether an entity's set
+is empty when it has no table, once to choose and once to refuse; it asks once. Then, with a
+harness that runs that one line fifteen times a tree: the fold, the reservation, the forgetting
+and the next run of a queue kept out of line, as they were before the barrier was cut, 17.5 ns;
+each of the five steps a function of its own, 17.5 ns, and an attach of two components 5% slower
+for it. Neither is kept. The line stands at 17.5 to 17.9 ns against 16.7 to 17.0, the statements
+are the ones that were there, and no arrangement of them that the style allows was found to give
+the instructions back.
+
+The done-when is reworded to say what can be held: no line slower by more than aligning every
+function moves it, which was measured at 3 to 11%, and each slower line on record. Against that:
+
+    direct-indexed, a component given    +0.5 to +1.1 ns, 3 to 6%    on record, above
+    attach, a component it has, first    +0.3 to +0.5 ns, 2 to 4%    on record
+    an id handed out, the call           level with every function aligned
+    the two loops of the test modules    theirs, and within 3%
+
+**The workflows.** GitHub Actions starts no job while the account's billing refuses them, and
+Enkrid ruled that this does not hold the stage. So the clause stands as written and is not met:
+six jobs are defined, three systems by two processors, and none has run. Windows on x86-64 is run
+here at every commit. The other five targets compile and link, with their imports held to the
+list. When the jobs run, what they find is this stage's to fix.
+
+**The done-when, line by line.**
+
+    no breach of the style in any C file of ours    met: 446 files, 0 infringements; two
+                                                    exceptions listed, each a decision
+    every case on every platform, by a workflow     not met: no workflow has run. 238 cases
+                                                    pass here, optimised and debug
+    no line slower, beyond what alignment moves     met as reworded; two lines on record
+    every dependency listed, held by a case         met: `dependencies.md`, the case `deps`

@@ -52,13 +52,14 @@
     uint32_t from = r->places[index].table;
     uint32_t t = 0;
 
-    if (from && set_is_same(r, want, get_set(r, from)))
+    if (from && set_is_same(r, want, get_set(r, from))) {
         t = from;
-    else if (!set_is_empty(r, want))
+    } else if (!set_is_empty(r, want)) {
         t = make_table(r, want);
-    if (!t && !set_is_empty(r, want)) {
-        drop_change(r, index, false);
-        return (false);
+        if (!t) {
+            drop_change(r, index, false);
+            return (false);
+        }
     }
     r->dest[index] = t;
     if (t && t != from) {
