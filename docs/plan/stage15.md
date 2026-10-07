@@ -1,6 +1,6 @@
 # Stage 15: Bridge
 
-Built in the tree; three actions outside it wait for this stage to be merged: *The close*.
+Built. *The close*.
 `plan.md`, stage 15, is what it is for and when it is done. This document is the order it was
 done in, what was counted before it began, each decision as it was taken, and what the library
 and two other things were called before. What a decision refused is `stage15_refused.md`.
@@ -240,12 +240,17 @@ In `Heuretes-Workshop/Bridge`, on 2026-10-07, with Enkrid's word for each step:
     removed    the branches `0.35`, `0.36`, `0.37`, `0.38` and `dev-web-backend`, once each
                commit had its new name
 
-And three that wait for this stage to be merged, since what is pushed is the merged tree:
+And three once this stage was merged, since what is pushed is the merged tree:
 
-    this history pushed as `main` and `dev`, over the Rust line's, which is forced: what they
-    were stays reachable as `legacy/rust-components`
-    the repository described, and `Heuretes-Workshop/Bridge-ASM700` archived
-    the remote of each clone on this machine pointed at the one repository
+    pushed      this history as `main` and `dev`, over the Rust line's, which was forced, and
+                made only if both were still where they had been read. What they were is
+                reachable as `legacy/rust-components`, the commit another project's submodule
+                names with it
+    described   the repository; and `Heuretes-Workshop/Bridge-ASM700` archived
+    pointed     the remote of each clone on this machine at the one repository; in the clone
+                of the Rust line, its branch renamed to what it is called there
+
+The tag `v0.1.0` of the Rust line is as it was.
 
 ## The close
 
