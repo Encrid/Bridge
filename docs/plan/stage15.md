@@ -76,24 +76,24 @@ which read as versions of one thing and are neither: the number counted iteratio
 package says 0.1.0 throughout. Read one by one, they are four designs, and two of the numbers
 mark the same one on its way:
 
-    0.35          a plugin framework in C++17, of      the tag `legacy/cpp-plugins`
+    0.35          a plugin framework in C++17, of      `legacy/cpp-plugins`
                   native libraries loaded dynamically
-    0.36          a module system in C17 with a        the tag `legacy/c-abi`
+    0.36          a module system in C17 with a        `legacy/c-abi`
                   stable C ABI
-    0.37          the first in Rust: a supervisor      the tag `legacy/rust-supervisor`
+    0.37          the first in Rust: a supervisor      `legacy/rust-supervisor`
                   of WebAssembly components
-    0.38          the same, with backends, plugins     the tag `legacy/rust-backends`
+    0.38          the same, with backends, plugins     `legacy/rust-backends`
                   and an SDK
-    main, dev     the same, finished: a host for       the branch `legacy/rust-components`,
-                  modules of the Component Model       at what `dev` was
-    dev-web-      its web backend, kept apart          the branch `legacy/rust-web-backend`
+    main, dev     the same, finished: a host for       `legacy/rust-components`, at what
+                  modules of the Component Model       `dev` was
+    dev-web-      its web backend, kept apart          `legacy/rust-web-backend`
     backend
 
-A point that never moves is a tag, and the first four are that: three were plain ancestors of
-`main` with nothing of their own. The last Rust line is a branch, since it has four commits
-`main` had not, issues open against it, and the submodule's commit on it. No name has a
-number: the count was not kept, and a name that needs none cannot be wrong. The dates git holds
-say the order.
+**Each is a branch.** The first four were made as tags, on the reasoning that a point which
+never moves is one, and Enkrid had them made branches the same day: they were branches, a
+branch is what a design is looked for under, and one kind of name for all six is one thing to
+know. No name has a number: the count was not kept, and a name that needs none cannot be
+wrong. The dates git holds say the order.
 
 **`Heuretes-Workshop/Bridge-ASM700` is archived, and not deleted**, once its history is in the
 other. The folder on this machine is decided with the actions, below.
@@ -234,7 +234,7 @@ the three old words in a tracked file of ours, and is the case `xref`: 474 cases
 In `Heuretes-Workshop/Bridge`, on 2026-10-07, with Enkrid's word for each step:
 
     made       the branch `legacy/rust-components`, at a commit of the Rust line that had
-               not been pushed; the branch `legacy/rust-web-backend`; and the tags
+               not been pushed; the branch `legacy/rust-web-backend`; and the branches
                `legacy/cpp-plugins`, `legacy/c-abi`, `legacy/rust-supervisor` and
                `legacy/rust-backends`, each at the commit its numbered branch was at
     removed    the branches `0.35`, `0.36`, `0.37`, `0.38` and `dev-web-backend`, once each

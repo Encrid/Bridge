@@ -26,6 +26,10 @@ Refused: Enkrid's count kept ahead of the name, `35-cpp-plugins`. It was recomme
 ruled against it: the count was not kept after 38, and is not sure before. The condition that
 brings it back is the count being written down somewhere it can be checked.
 
+Refused, after it had been done: the first four as tags, since none of them moves. Enkrid
+wanted them kept as the branches they were, and one kind of name for all six. The condition
+that brings it back is a design that is to be marked at more than one point.
+
 Refused: `old/` for `legacy/`. Either was offered. Legacy is the word for what is kept and no
 longer worked on, and old says only when. No condition brings it back.
 
