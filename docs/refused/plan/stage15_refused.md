@@ -75,3 +75,15 @@ here or mean the design this replaced. No condition brings any back.
 Refused: the new word in the documents alone, or in the documents and the comments. A host
 would read one word of the object in a document and another in its log. No condition brings
 it back.
+
+## The records
+
+Of `stage15.md`, *The records*.
+
+Refused: every record rewritten and the old name nowhere, this stage's record with the rest.
+What the library was called would be said nowhere, and this document could not state what it
+is about. No condition brings it back.
+
+Refused: the records left in the words of their day. Two vocabularies, by folder, and three
+words that mean two things by where they are read. The condition that brings it back is the
+records leaving the tree for an archive of their own.

@@ -161,3 +161,23 @@ of.
     extensible    a deck of another deployment in the same process is another deck
     minimal       one word, where two differed by a letter
     explicit      a sentence cannot be read of the wrong one
+
+### The records
+
+**Every record takes the three new names, and the old ones stand in this document and its
+refused record alone.** The documents under `plan/` and `refused/`, and `plan.md`, say what was
+decided and when, and stage 14 left them outside what it changed for that reason. A name is
+another matter: a reader goes from `storage.md` to the record of the stage that built storage,
+and is not to meet three words there that mean something else, or nothing, where they came
+from.
+
+What it was called is a fact, and is kept once, where a reader looks for it: here. So the
+done-when of `plan.md` is reworded to what is held: nothing in the tree says the old name but
+the record of the stage that changed it.
+
+    fast          no part of this runs
+    scalable      a record written later has the one vocabulary to write in
+    modular       one vocabulary in the tree, and the history of it in one document
+    extensible    a name changed again is changed everywhere, and said in that stage's record
+    minimal       one exemption, of two files, by name
+    explicit      what a word means does not depend on the folder it is read in
