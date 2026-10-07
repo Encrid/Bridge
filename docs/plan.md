@@ -329,6 +329,8 @@ still holds, and what it costs to wait is said in stage 16.
 
 ## 13. Tests, by capability
 
+In progress: `stage13.md`.
+
 Every test so far was written to meet one stage's claim, and is named for the stage: `stage2`
 to `stage6`. That says when a thing was built and not what is covered. This stage turns the
 tests around: **one case for each capability the documents state**, named for the capability, and

@@ -21,7 +21,7 @@ diagram to keep in step with. One concern per document, in reading order:
 
     readme.md            this file
     design.md            why, and what the design is
-    plan.md              the eighteen stages, each with a done-when that can fail
+    plan.md              the twenty stages, each with a done-when that can fail
     style.md             how the C is written: the rules, and the exceptions to them
 
     refused/             what was weighed and not chosen, in the same tree as what was:
