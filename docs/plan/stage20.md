@@ -180,3 +180,30 @@ boundary to find and nothing gained.
 
 **Of the author's account on the hosting service, `Encrid`, and nowhere else.** Enkrid ruled
 it. No address and no name of a person is in the tree.
+
+## What was found on the way
+
+**The line first ruled was too wide.** It is in *The line in every file*, above.
+
+**The workflows had never run, and then ran all at once.** Until 2026-10-07 every workflow of
+this repository failed before its first step, for a failure of payment on the account of the
+organisation it was in: 51 runs. The repository was moved that day to its author's own account,
+for reasons that were the hosting service's and not this stage's, and the next push started
+them: three workflows on every push to any branch, six machines each time, two of them macOS,
+whose minutes are counted as ten. Three pushes of this stage were running at once. All were
+cancelled, at Enkrid's word, and he ruled when they run:
+
+    for what reaches     `dev` and `main`, and for a pull request. A stage's branch is held
+                         by the cases run where it is written, as it always was
+    a newer push         stops the run of the one before it on the same branch
+    documents alone      start nothing: a change under `docs/`, to a markdown file or to the
+                         licence text
+
+So no run of Linux or of macOS has finished yet. The first is the merge of this stage.
+
+**What `legacy/rust-components` promised of a contribution would be false here.** Its agreement
+said one would never be taken private. Under terms that are sold it may be, inside a buyer's
+product, so `cla.md` is version 2.0 and says so before anything else.
+
+**musl's licence asks that its notice be kept with what is taken from it**, and the tree held
+only a line naming it in the header of `src/text.c`. The notice is in `licence.md`.

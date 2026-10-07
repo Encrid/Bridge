@@ -104,3 +104,14 @@ use the account.
 
 Refused: the line as first ruled, on two lines. It keeps every word, and every header grows by
 a line. The condition that brings it back is none.
+
+## When the workflows run
+
+Of `stage20.md`, *What was found on the way*.
+
+Refused: on every push to any branch, as they were written. Nothing had ever run, so what it
+costs had never been seen: a stage of twenty pushes would have spent a month's allowance. The
+condition that brings it back is minutes that are not counted, which is a public repository.
+
+Refused: only when started by hand. It is a check nobody runs. The condition that brings it
+back is none.

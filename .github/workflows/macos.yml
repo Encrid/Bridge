@@ -1,11 +1,22 @@
-# The macOS build, on every push, on each processor there is a target for. The tools are the ones
+# The macOS build, on each processor there is a target for. The tools are the ones
 # the build asks for, at the versions every other run uses - docs/design/dependencies.md.
 # Binaryen names its arm64 archive `arm64`, and zig names the same processor `aarch64`.
 name: macos
 
+# It runs for what reaches dev and main, and for a pull request: a stage's branch is held by
+# the cases run where it is written. A change to documents alone starts nothing, and a newer
+# push stops the run of the one before it, since a minute here is counted and a macOS one as
+# ten.
 on:
   push:
+    branches: [main, dev]
+    paths-ignore: ['docs/**', '**.md', 'license']
   pull_request:
+    paths-ignore: ['docs/**', '**.md', 'license']
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:

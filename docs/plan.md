@@ -12,7 +12,7 @@ ends, so each one carries the part of the host seam, the sink and the scheduler 
 
 **Met means on every platform the stage has.** Through stage 7 that is Windows and Linux, and from
 stage 8 macOS as well - `build.md`, *Platforms*. Windows is run where the code is written, and the
-others by the workflows under `.github/workflows/` on every push. Stages 1 to 5 were first met on
+others by the workflows under `.github/workflows/`, for what reaches `dev` or `main`. Stages 1 to 5 were first met on
 Windows alone and said so; the Linux run caught up with them after stage 5, and passed as written.
 
 ## 0. Documents, and the spikes they need

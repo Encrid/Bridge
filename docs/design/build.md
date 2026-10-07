@@ -50,8 +50,8 @@ nothing more.
 ## Platforms
 
     Windows    x86-64    x86_64-windows-gnu     run where the code is written, and by a workflow
-    Linux      x86-64    x86_64-linux-gnu       run by a workflow, on every push
-    macOS      arm64     aarch64-macos          run by a workflow, on every push
+    Linux      x86-64    x86_64-linux-gnu       run by a workflow, for what reaches dev or main
+    macOS      arm64     aarch64-macos          run by a workflow, for what reaches dev or main
     Linux      arm64     aarch64-linux-gnu      a target: compiled and linked, not yet run
     macOS      x86-64    x86_64-macos           a target: compiled and linked, not yet run
     Windows    arm64     aarch64-windows-gnu    a target: compiled and linked, not yet run

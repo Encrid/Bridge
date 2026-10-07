@@ -1,12 +1,23 @@
-# The Windows build, on every push, on each processor there is a target for. zig is the one tool
+# The Windows build, on each processor there is a target for. zig is the one tool
 # fetched: build.py fetches Binaryen itself on Windows, at its pin - docs/design/dependencies.md.
 # Python is asked for by processor, since build.py builds for the processor Python says it runs
 # on, and one that ran emulated would have it build the other target.
 name: windows
 
+# It runs for what reaches dev and main, and for a pull request: a stage's branch is held by
+# the cases run where it is written. A change to documents alone starts nothing, and a newer
+# push stops the run of the one before it, since a minute here is counted and a macOS one as
+# ten.
 on:
   push:
+    branches: [main, dev]
+    paths-ignore: ['docs/**', '**.md', 'license']
   pull_request:
+    paths-ignore: ['docs/**', '**.md', 'license']
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
