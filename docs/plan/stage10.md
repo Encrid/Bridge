@@ -38,7 +38,7 @@ Refused for now: a fork, a trimmed copy that is ours. It is what this falls back
 The first plan for this stage drew the line between the library and its storage at flecs'
 primitives under other names: make an id, attach, detach, match, watch. Behind a line of that
 shape the best ours could be is a smaller flecs, and it was put back to be done again, from what
-the documents say and by every step of `stage0.md`.
+the documents say and by every step of `contributing.md`.
 
 flecs has to serve any program. Bridge promises much more than any program does, and each
 promise is something a design made for it can spend:
@@ -329,7 +329,7 @@ the ways flecs could.
 ## What was not in the plan
 
 Five things were built as whatever was nearest to hand and written up as settled. None had been
-through the steps of `stage0.md`. Each is put back as a question, and this section says where
+through the steps of `contributing.md`. Each is put back as a question, and this section says where
 each stands.
 
 **A strip at unload: decided.** As first built it moved an entity at a time to the table of what
@@ -511,7 +511,7 @@ at least five things, none defined, and none of them the one that was meant.
     closed  a signature the native backend cannot check: the backend checks, since it is
             who can see an export. `instance_func` answers a function or refuses, and
             the arity, the count of results and the -1 left the seam. `signatures.md`
-    closed  every decision against every need, read. `stage0.md`, step 6, asked for the one
+    closed  every decision against every need, read. `contributing.md`, step 6, asked for the one
             need that decides, and a decision weighed that way was never scored on the other
             five. The step is corrected. Every document was read a line at a time: about
             280 decisions, of which about 250 hold on all six or fail one the text names

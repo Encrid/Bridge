@@ -8,7 +8,7 @@ the claim. This document is what the stage built and what it found on the way.
 
 ## What was settled first
 
-Four questions, each by the method of `stage0.md`, and each applied to the document it belongs to.
+Four questions, each by the method of `contributing.md`, and each applied to the document it belongs to.
 
     what an observer reads            the ids that triggered it, and the events:
                                       `abi.md`, *The ABI*

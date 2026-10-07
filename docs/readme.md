@@ -10,8 +10,8 @@ run them, until `bridge_destroy`. A process may have several, and each is its ow
 separate projects, and none is part of this one.
 
 Three documents go with this one. `design.md` is why the shape is what it is and what it costs.
-`plan.md` is the build order. `stage0.md` is how a decision gets made here at all, which is method
-rather than design.
+`plan.md` is the build order. `contributing.md` is how work is done here at all - a decision,
+a stage, and where each rule is - which is method rather than design.
 
 ## Three layers, three seams
 
@@ -22,6 +22,7 @@ diagram to keep in step with. One concern per document, in reading order:
     readme.md            this file
     design.md            why, and what the design is
     plan.md              the sixteen stages, each with a done-when that can fail
+    contributing.md      how a decision is made, how a stage is run, where each rule is
     style.md             how the C is written: the rules, and the exceptions to them
     tests.md             what is exposed on the three seams, and the cases that show it
 
@@ -37,7 +38,6 @@ diagram to keep in step with. One concern per document, in reading order:
         dependencies.md      every tool and every import, with why it is there
 
     plan/
-        stage0.md            how we decide things. method, not design
         stagen.md            one per stage, written before that stage starts
 
     seam/host_api/           host to Bridge

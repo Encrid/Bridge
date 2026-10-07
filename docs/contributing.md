@@ -1,4 +1,10 @@
-# Stage 0: how we decide things
+# Contributing
+
+How work is done on Bridge: how a decision is made, how a stage is run, and where the rules for
+the code, the tests and the documents are. Method, not design: what the design is, is
+`design.md`.
+
+## How a decision is made
 
 A sequence, not advice. Written down because it works when nobody is thinking clearly,
 which is when it matters.
@@ -96,10 +102,60 @@ was emptied and deleted when the stage closed, because a standing list outlives 
 on the way. Two of the worst were redundant fields added while claiming to copy prior art,
 and the scan found both where thinking had not.
 
+## How a stage is run
+
+`plan.md` is the stages, and each ends in a claim that can be false. This is what is done with
+one, every time.
+
+**It is planned before it is begun.** The plan says what there is today, counted and not
+remembered; the order the stage is done in; the questions it has to decide; what it reuses; and
+how each claim is verified. It is agreed before a file changes.
+
+**It has a record, written as it goes**: `plan/stagen.md`, which is the order, what was counted
+before it began, and each decision as it is taken. What a decision refused is
+`refused/plan/stagen_refused.md`, under the same heading, with the condition that brings it
+back.
+
+**Its decisions are put one at a time**, each by the sequence above, and before the files it
+governs change. A label that can be read two ways is read aloud first, and confirmed.
+
+**It is a branch of its own**, from `dev`, named for the stage. A commit and a push follow each
+item closed. It is merged when that is asked for, and not before: into `dev`, then `dev` into
+`main`, and the branch is deleted.
+
+**A commit is one line.** Conventional Commits, a subject and nothing under it:
+`type(scope): description`, where the type is one of `feat`, `fix`, `refactor`, `chore`, `docs`,
+`test`, `build`, `perf`, `style`, `ci`, `revert`.
+
+**Nothing is left behind it.** No list of what remains, no path that was not run, no shortcut
+to come back to: a thing is finished, or it is put as a decision. A question that stays open
+waits in the stage's record, and the stage is not done while one stands.
+
+**It is closed by its done-when, line by line**: each clause met, or said not to be with what
+it waits on. Every case passes, optimised and debug, alone and under six copies at once, and
+every other target compiles and links.
+
+## Where the other rules are
+
+Each is held by a program where a program can hold it, and each program is a case of
+`python build.py test`.
+
+    style.md                 how the C is written, and the line every file begins with:
+                             `tools/style.py`
+    tests.md                 what is exposed on the three seams, and the case for each. A
+                             thing exposed is added with its case: `tools/cover.py`
+    design/build.md          the compiler, the platforms, the standard: `tools/c23.py`
+    design/dependencies.md   every tool and every import, with why: `tools/deps.py`
+    a message                each is printed by a case, and what writes one cites the
+                             document that states it: `tools/said.py`
+    a document               every citation names a heading that is there; a document of the
+                             design names no stage; what is not built says so; a name that
+                             was retired is not written: `tools/xref.py`
+
 ## What no script can do
 
-Steps 1 to 8 here, and steps 4 to 7 of the scan, are reading and judgement. The three checks exist so
-that the **mechanical** checks are never what gets skipped - a count, a citation, a duplicated run, a
+Steps 1 to 8 of a decision, and steps 4 to 7 of the scan, are reading and judgement.
+The three checks exist so that the **mechanical** checks are never what gets skipped - a count, a citation, a duplicated run, a
 ragged line. They cannot weigh an option, re-read an open question against a decision just made, or
 notice that an edit left `"Create or Call a module"` behind.
 
@@ -108,11 +164,8 @@ weighed.
 
 ## The scan
 
-Run from `docs/`. The paths below are relative to that, not to this file -
-`plan/` is where a stage's own document lives, and the scan is run over the
-whole tree from one place. The two scripts walk subdirectories; the
-shell one-liner takes its list from git, so a document in a new folder is covered without editing
-it.
+Run from `docs/`, over the whole tree. The two scripts walk subdirectories; the shell
+one-liner takes its list from git, so a document in a new folder is covered without editing it.
 
 Steps 1 to 3 are scripts because a listed check gets skipped and a script gets run. Steps 4 to 7 are
 reading, in this order, because each one has caught something the one before it could not.

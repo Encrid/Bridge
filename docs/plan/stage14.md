@@ -7,13 +7,13 @@ finding with what was done of it. What a decision refused is `stage14_refused.md
 ## The order
 
     1  the stage         this document, with what was counted
-    2  the decisions     each by the method of `stage0.md`, one at a time, before a document
+    2  the decisions     each by the method of `contributing.md`, one at a time, before a document
                          changes
     3  the findings      every defect of the kinds the first decision keeps, listed once, by
                          script where a script can find it and by reading where it cannot
     4  the changes       each finding changed or refused on record, a document at a time
     5  the citations     a citation above each exposed name; `cover.py` fails on one with none
-    6  the scan          the scan of `stage0.md`, whole
+    6  the scan          the scan of `contributing.md`, whole
     7  close             by the done-when
 
 ## What there was, before any of it
@@ -70,7 +70,7 @@ new design.
     c  said twice                   a conclusion argued in two documents, which drift
     d  a stage named in the design  when a thing was built, in a document of what it is
     e  prior art that describes     a sentence that says what flecs does as what runs here.
-       nothing                      Prior art cited for its reasoning stays: `stage0.md`, step 3
+       nothing                      Prior art cited for its reasoning stays: `contributing.md`, step 3
     f  not followable               a sentence that names what the documents never define: an
                                     item of a register that is gone, a person, a discussion.
                                     Not a sentence that could read better
@@ -78,7 +78,7 @@ new design.
 
 `plan.md` named three of them, c, f and what stage 13 showed claimed and not held. The count
 turned up b, d, e and g, and a is the one no script finds. Each kind is a defect by a rule that
-is written: `stage0.md`, step 9, for where a decision is said, and step 5, which refuses two
+is written: `contributing.md`, step 9, for where a decision is said, and step 5, which refuses two
 things that answer one question, for c.
 
 **What is outside**: wording for taste; a decision of the design taken again; and the records
@@ -113,7 +113,7 @@ name outside its section that is not in a citation of it fails. The stage that b
 takes its names out of the list, and the mark then fails until it is removed with them. Without
 the script the next unmarked mention is found by nobody, as that of `validation.md` was not.
 
-The design stays in the documents of the design: it is decided, and `stage0.md`, step 9, puts
+The design stays in the documents of the design: it is decided, and `contributing.md`, step 9, puts
 a decision in the document it belongs to.
 
     fast          no part of this runs
@@ -179,7 +179,7 @@ one sparse set alone.
     a fact                       stated by its owner, and cited from the other
 
 **Each of the forty is a finding**, changed or refused by name. No script says who owns a fact,
-so none is asked to: `dup.py` stays where it is, in the scan of `stage0.md`, and is read.
+so none is asked to: `dup.py` stays where it is, in the scan of `contributing.md`, and is read.
 
     fast          no part of this runs
     scalable      a document written later is read by the same scan
@@ -428,6 +428,6 @@ here, as a failure and not a report: *Messages and the documents*.
 mention of what is not built with no citation of where it is stated: `xref.py`. A declaration
 of a header that cites no document: `cover.py`, the case `cover`. A function that writes a
 message and cites no document: `said.py`, the case `said`. What is false against the tree, and
-what two documents say twice, are held by nothing but the scan of `stage0.md`, read.
+what two documents say twice, are held by nothing but the scan of `contributing.md`, read.
 
 **Linux and macOS** are as stage 13 left them: no workflow has run, and that holds no stage.

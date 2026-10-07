@@ -32,7 +32,7 @@ with nothing that asserts it. No condition brings it back.
 
 Refused: several calls, one that names a type and answers a handle and others that state its
 shape and how it is kept. Each call fits the rule. A type is then half stated between two calls,
-and what is unset is known by a call that was not made, which `stage0.md` step 6 refuses under
+and what is unset is known by a call that was not made, which `contributing.md` step 6 refuses under
 explicit. No condition brings it back.
 
 Refused: an exception for the three in `style.md`. It was proposed with no reason: the seams

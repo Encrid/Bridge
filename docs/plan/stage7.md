@@ -9,7 +9,7 @@ first: the build. `plan.md` stage 7 is the claim.
 
 ## What was settled first
 
-Each by every step of `stage0.md`, one at a time. Most belong to later stages and are recorded
+Each by every step of `contributing.md`, one at a time. Most belong to later stages and are recorded
 here because this is where they were asked.
 
     how a host gets the library   as a submodule, built by `build.py`: `plan.md` stage 12

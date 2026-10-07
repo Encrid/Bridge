@@ -8,7 +8,7 @@ What a decision refused is `stage13_refused.md`.
 ## The order
 
     1  the stage        this document, with what was counted
-    2  the decisions    each by the method of `stage0.md`, one at a time, before a case moves
+    2  the decisions    each by the method of `contributing.md`, one at a time, before a case moves
     3  the list         every capability the documents state, written down once
     4  the check        a script and a case that hold the list against the cases
     5  the cases        renamed for what they cover; the programs with them

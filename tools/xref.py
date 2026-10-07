@@ -22,11 +22,11 @@ os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs'))
 # keyed by basename: prose cites `data.md`, not `bridge/data.md`, because a
 # reader wants the document's name and not where it sits in the tree.
 heads, paths = {}, {}
-# stage0.md is the method, not the design: it cites closed items on purpose,
-# as the worked examples that make each step concrete, and it carries a literal
-# `doc.md`, *Section* template.
+# contributing.md is the method, not the design: it cites closed items on
+# purpose, as the worked examples that make each step concrete, and it carries
+# a literal `doc.md`, *Section* template.
 for full in glob.glob('**/*.md', recursive=True):
-    if os.path.basename(full) == 'stage0.md':
+    if os.path.basename(full) == 'contributing.md':
         continue
     f = os.path.basename(full)
     paths[f] = full

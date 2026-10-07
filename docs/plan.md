@@ -252,10 +252,10 @@ argument: what a toggle saves over a move between tables, what direct-indexed sa
 set's index and what it costs in room for entities that do not carry the component, and what a
 singleton is that a component on one entity is not, which is how a module's settings are kept
 today. So for each, first: the weakness it answers, measured in scratch beside the layouts that
-exist; then all six needs of `stage0.md`, step 6, scored and shown. That comes before this
+exist; then all six needs of `contributing.md`, step 6, scored and shown. That comes before this
 stage's other questions.
 
-This stage's questions, each by the method of `stage0.md`, and in this order: who states a
+This stage's questions, each by the method of `contributing.md`, and in this order: who states a
 component's storage layout, and where; what a module is handed for each, in `bridge_abi.h` and in
 each backend's SDK, and what a query may ask across two of them; what each costs of which
 budget; whether a component may have no bytes at all, a tag; and what it takes to move a
@@ -361,7 +361,7 @@ The documents were written a stage at a time, each to say what that stage decide
 library is named and a host is written against it, they are read as one thing. What of them is to
 be improved - what a reader who was not there cannot follow, what two documents say twice, what a
 case of stage 13 showed to be claimed and not held - is this stage's first question, by the method
-of `stage0.md`. One thing is its already: each name a header exposes cites, in the comment above
+of `contributing.md`. One thing is its already: each name a header exposes cites, in the comment above
 it, the document that states it, and the build fails on one that cites none - `stage13.md`,
 *Where a name's document is said*. It comes after the tests by capability, whose list is what
 finds a claim with no case, and before the rename, so that what is renamed is settled.
@@ -376,7 +376,7 @@ Built: `stage15.md`.
 The library is finished as a library, and takes the name of what it replaces: the name it was
 built under goes. What is renamed - the repository, the name in every document and in the
 header every file of ours starts with, and what the design before it is called from then on in
-the documents that refer to it - is this stage's first question, by the method of `stage0.md`.
+the documents that refer to it - is this stage's first question, by the method of `contributing.md`.
 `stage15.md` says what each was called.
 
 *Done when nothing in the tree says the name the library was built under, but the record of
@@ -400,7 +400,7 @@ A record or a refusal in this tree that says one of these numbers means the stag
                                     and a list of phase names
 
 **What one of them asks of the library is built here**, in this tree, when that plan reaches it:
-by the method of `stage0.md`, as a stage of this plan with its own number, and with the case
+by the method of `contributing.md`, as a stage of this plan with its own number, and with the case
 that the rule of stage 13 demands for whatever it exposes.
 
 **What it costs.** The host seam is called finished before anything but our own tests has linked

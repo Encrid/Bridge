@@ -11,7 +11,7 @@ built and what it found on the way.
 
 ## What was settled first
 
-Five questions, each by the method of `stage0.md`, and each applied to the document it belongs to.
+Five questions, each by the method of `contributing.md`, and each applied to the document it belongs to.
 Three were waiting here from stage 2; two turned up while planning.
 
     what fuel costs                   a bound is paid for by the module that states it:

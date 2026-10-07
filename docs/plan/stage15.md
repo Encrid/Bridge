@@ -12,7 +12,7 @@ outside.
 ## The order
 
     1  the stage         this document, with what was counted
-    2  the decisions     each by the method of `stage0.md`, one at a time, before a file changes
+    2  the decisions     each by the method of `contributing.md`, one at a time, before a file changes
     3  the name          every "Bridge-ASM700" in the tree, by the decisions; the header of
                          every file, and the expression of `tools/style.py` that holds it
     4  the original      one name for the original Bridge wherever it is meant
@@ -192,7 +192,7 @@ of ours that is text: the documents, the sources, the tests, the tools, `build.p
 workflows. Not what is under `backends/wasm/wasmtime`, which is not ours; and not this document
 and its refused record, by name.
 
-**It was run by hand, in the scan of `stage0.md`, and failed no build.** So a citation of a
+**It was run by hand, in the scan of `contributing.md`, and failed no build.** So a citation of a
 heading that is gone, a stage named in a document of the design and a mention of what is not
 built with no citation, which stage 14 gave it to hold, were each held by whoever remembered
 to run it. It is the case `xref` now, and all of them fail the build.
