@@ -292,3 +292,122 @@ The code is right, and for a reason that makes the other reading impossible to h
     explicit      two phrases, two outcomes, and a case that shows the first
 
 The case is `BRIDGE_FAIL-refused-before-it-exists-stops-nothing`.
+
+## What was found
+
+By kind, as decided: a count for what a script holds, and a row for what reading found. Every
+one was changed, but those named in `stage14_refused.md`.
+
+### What a script holds
+
+    b  not built, said as built     15 mentions in 9 documents and one header, in four forms.
+                                    Three headings state what is not built now, each opening
+                                    with "It is not built.", and `xref.py` finds no mention
+                                    elsewhere without a citation of one
+    d  a stage named in the design  39 lines in 14 documents; none, held by `xref.py`
+    g  a name with no document      90 of the 114 comments above exposed names cited none;
+                                    none, held by `cover.py`
+    g  a message with no document   109 of the 125 functions that write a message cited none,
+                                    and 17 rules were stated in no document. Each rule has its
+                                    sentence and each function its citation, held by `said.py`
+
+### a: false against the tree
+
+Each was read against the code by one of three readers, and then checked. Where the document
+was right and the code was not, it is under *What the stage found*.
+
+    storage.md           the list of free ranges is not as long as there may be tables; a
+                         query's spans are rewritten with every other of the module's, and
+                         not those after it; a module reads four things, and not three
+    query.md             the entry is `add_system`; what is refused is two components walked
+                         in different ways, and not kept in different storage layouts
+    reference.md,        `column_base` has a row for each sparse set as well as each table
+    budgets.md
+    budgets.md           the list of kept settings is shortened, when a share is given back;
+                         `work_limit` and `memory_limit` have no floor
+    failure.md           `bridge_list_modules` does not say which module stopped the bridge;
+                         the allocations refused in turn are three hundred and some
+    failure.md,          a load refused before the module exists does not go by `on_error`,
+    capabilities.md      which was decided on the way, above
+    validation.md        the running system is stored in the module's header, and not in the log
+    schedule.md          a module whose own order a pair reverses is not refused: the pair
+                         stands
+    abi.md               a later module to declare a component is answered a slot of its own
+    schema.md            the row test can be left out, by the module's author
+    wasm.md              which enums are four bytes and which one; where the imports, the
+                         choice of the row test and `bridge_api_t` are declared
+    host_api.md          one host program, and the static one runs 22 cases again; one SDK
+                         uses `_Generic`; the library does parse a module's descriptors; the
+                         listings of the functions and the structs had another type's name,
+                         and lacked two budgets, the losses and a name for the union. They are
+                         tables now, and `bridge.h` states each
+    config.md            the phases are a list and not an ordered one; the table lacked
+                         `changes`, `after` and a module's phases
+    create.md            twelve causes refuse a deployment, and not seven; a null deployment
+                         is refused with no record, as a null sink is
+    lifecycle.md,        a changed component layout is carried across, and refused only for
+    costs.md             a loss the deployment did not accept; grants are checked as `init`
+                         declares, and not before the module has a record
+    design.md            the library has types; the entry is `add_system`
+    build.md             no variable is a thread's own, and `thread_local` is not used; four
+                         headers; six targets; sixteen functions of the C library, without
+                         `memchr` and `strpbrk`
+    no_builtins.md       the library keeps no clock
+    capabilities.md      what macOS does with the native backend's library
+
+### c: said twice
+
+Thirty-four passages of eight words that two documents of the design shared and that were no
+citation. Four stated a fact its owner states, with no pointer, and cite the owner now:
+
+    native.md            when rows move: `schedule.md`
+    validation.md        how the row test is stated: `wasm.md`
+    costs.md             that a write to what was declared read is a bug: `data.md`
+    config.md            how a module reaches its settings: `memory.md`
+
+The other thirty are left, and are named with why in `stage14_refused.md`.
+
+### e: prior art that describes nothing
+
+    validation.md        what the entity index needed while flecs kept the rows
+    budgets.md           that `terms` was a constant, flecs' default
+    build.md             the paragraph on C99 chosen for a number that matched flecs
+    schema.md            that the macro had flecs' name once
+
+flecs is still cited in ten documents, each time for its reasoning.
+
+### f: not followable
+
+    lifetime.md          "This document said that", of a text that is gone
+    strings.md           two files cited with no project; what "was decided before" a thing
+    failure.md           a heading cited with no document
+    abi.md               "since it was called a cost"
+    schema.md            "Both engines", with none named before
+    native.md            a project named nowhere else
+    capabilities.md      what three keys were called once
+    costs.md             two checks of a host's, quoted; what a refusal "was first" for
+    split.md             the escalation guards
+
+Four more are left, and are named in `stage14_refused.md`.
+
+## What the stage found
+
+**A tag handed a value was accepted.** `storage.md`, *A tag*, says an attach that hands a tag a
+value is refused. Nothing refused it: a tag's size is zero, so any place in the scratch arena
+passed as a value of no bytes. `attach` refuses it now, and the case is
+`attach-tag-with-a-value-refused`.
+
+**Three structs of the backend seam stated no layout.** `host_api.md` says every struct of a
+seam is laid out where it is stated, with no padding left to a compiler, and that
+`bridge_backend.h` holds to it. `backend_source_t` had four bytes of padding no member named,
+and it, `backend_entry_t` and `backend_err_t` asserted nothing. Each asserts its size and every
+offset now, and the gap is a member.
+
+**The list of what is free in the column region did not count singletons.** A gap lies between
+two blocks, and the list has room for one beside every block there may be. A singleton has a
+block, and was not counted, so a deployment with many of them could have a freed range dropped
+from the list and its bytes lost to the bridge for good. The room is by `types` now, which
+bounds them.
+
+**Stage 13 promised a report it did not build**: a message that no document states. It is built
+here, as a failure and not a report: *Messages and the documents*.

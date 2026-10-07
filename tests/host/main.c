@@ -261,6 +261,8 @@ static const host_case_t TEST_CASES[] = {
         test_overflow_text, "", test_set_noting },
     { "BRIDGE_STRING-no-such-constant-refused",
         test_misname_constant, "", test_set_noting },
+    { "BRIDGE_FAIL-refused-before-it-exists-stops-nothing",
+        test_refuse_essential, "", test_set_small },
     { "BRIDGE_FAIL-stopped-module-stops-the-bridge",
         test_stop_by_failing, "", test_set_noting },
     { "BRIDGE_FAIL-failed-reload-stops-the-bridge",
@@ -602,6 +604,8 @@ static const host_case_t TEST_CASES[] = {
         test_reap_with_read, "", test_set_counting },
     { "attach-unstated-change-fails",
         test_change_unstated, "", test_set_counting },
+    { "attach-tag-with-a-value-refused",
+        test_do_wrong, "wrong-attach-tag-value", test_set_wasm },
     { "attach-undeclared-slot-refused",
         test_do_wrong, "wrong-attach-undeclared", test_set_wasm },
     { "attach-ungranted-refused",
@@ -700,11 +704,7 @@ static const host_case_t TEST_CASES[] = {
     { "order-changes-ordered-loaded-first",
         test_order_changes, "", test_set_counting },
     { "order-changes-ordered-loaded-last",
-        test_order_changes_loaded_last, "", test_set_counting },
-    { "attach-tag-with-a-value-refused",
-        test_do_wrong, "wrong-attach-tag-value", test_set_wasm },
-    { "BRIDGE_FAIL-refused-before-it-exists-stops-nothing",
-        test_refuse_essential, "", test_set_small }
+        test_order_changes_loaded_last, "", test_set_counting }
 };
 
 /*

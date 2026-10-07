@@ -117,3 +117,54 @@ of its own. No condition brings it back.
 Refused: the capability and the mapped phase alone going by `on_error`, so that the documents'
 list were true as written. A line through the checks of a config with no rule behind it, and
 every check added later argued. No condition brings it back.
+
+## What was found
+
+Of `stage14.md`, *What was found*.
+
+### c: said twice
+
+Refused: a clause that says what a citation beside it is of. The citation is what points, and a
+pointer with no word of what it points at cannot be read. Twenty of the thirty: that a native
+module's code runs inside a phase; that a refused call fails the invocation when it returns;
+what unload drops and keeps, and what becomes of the entities, twice; what a system and an
+observer subscribe to; what is never discarded on a call that means keep running; what is kept
+elsewhere and reached from the row; what is refused at `add_system`; that a barrier at which
+nothing changed writes nothing, and what one writes for a module; the memory a module can write
+and Bridge-ASM700 can read, and that it is fixed by the SDK; that a `declare` that does not fit
+is refused; that a barrier is worked an entity at a time; that a module's settings are a
+component; what holds a share back at unload; what finds a bad write; that a work limit only
+goes down; who owns the loop; what is set aside at the last barrier; that a dependency nobody
+wrote down is refused; what a loss needs to be accepted. No condition brings it back.
+
+Refused: a phrase two documents use of two things. "On the path this design exists to keep
+free", of a load and of a count; "over the tightest loop a system can have", of two
+measurements; and "runs a core wasm module in a sandbox", which is what the wasm backend is
+called where it is introduced, twice. No condition brings it back.
+
+Refused: an example in the form of the document it is in. The manifest as text in `module.md`,
+and as the C that places it in a section in `native.md`. No condition brings it back.
+
+Refused: `design.md` saying in a line what another document states in full: what each backend
+is for, and that a module names the one that runs it. It is the document that says all of the
+design in short, and cites where each part is. The condition that brings it back is `design.md`
+and a document it summarises found to disagree.
+
+Refused: a row of a table. That a module cannot reach memory it was not given is a cell of the
+table of `module.md` and a sentence of `capabilities.md`, which owns it; a cell cannot cite. And
+the one kind of file the library opens, and what the native backend checks of an export, are
+each said in two documents of one seam that both cite the third that owns it. No condition
+brings it back.
+
+### f: not followable
+
+Refused: "Godot's own documented example", in `engine_callbacks.md`. The same sentence says
+what the example is. No condition brings it back.
+
+Refused: the trait of the original Bridge, in `backend.md`, and the crossings of its Godot
+adapter, in `design.md`. The original Bridge is named in `readme.md` as prior art, and is cited
+for what it measured and what it had, as flecs is. No condition brings it back.
+
+Refused: the things of the original Bridge in the table of `costs.md`. That document is the
+comparison against it, and the table is what is compared. The condition that brings it back is
+the original Bridge no longer being what this replaces.
