@@ -26,3 +26,15 @@ Refused: the list, and a pointer at every claim as well, held to each other. A r
 the case where the claim is made, and it is some hundreds of sentences changed just before stage
 14 reads the documents again. The condition that brings it back is stage 14 deciding the prose
 is to carry them.
+
+## What a case is named, and the host programs
+
+Of `stage13.md`, *What a case is named, and the host programs*.
+
+Refused: a program a document, about fifteen. The same names and the same grouping, with fifteen
+`main`s and fifteen links for nothing a case needs: each case is a process of its own already.
+The condition that brings it back is cases of two documents that cannot share a `main`.
+
+Refused: the five programs kept and renamed for what each stage was about. No case moves, and
+the cases stay grouped by when they were written, under other words. No condition brings it
+back.
