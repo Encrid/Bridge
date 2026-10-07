@@ -58,14 +58,17 @@ SCHEDULE = ['schedule_matrix', 'schedule_order', 'schedule_conflict', 'schedule_
             'schedule_account']
 BLOCK = ['region', 'region_take', 'block_column', 'block_module', 'block_log', 'block_barrier',
          'block_budget', 'block_layout', 'block_create', 'block_destroy']
+STORAGE = ['storage_apply', 'storage_cells', 'storage_spans', 'storage_publish', 'storage_drop',
+           'storage_drop_apart', 'storage_drop_table', 'storage_slots', 'storage_declare',
+           'storage_terms', 'storage_ids', 'storage_carriers', 'storage_any', 'storage_refold',
+           'storage_convert', 'storage_made', 'storage_create']
 CONFIG = ['config_say', 'config_scalar', 'config_enum', 'config_text', 'config_field',
           'config_room', 'config_kept']
 SCHEMA = ['schema_reader', 'schema_token', 'schema_value', 'schema_type', 'schema_struct',
           'schema_constants']
 BRIDGE = ['say', 'bridge_create', 'bridge_backend', 'bridge_backends', 'bridge_phases',
-          'bridge_destroy', 'bridge_stop', 'bridge_run', 'lifecycle', 'config', 'storage', 'storage_apply', 'storage_cells', 'storage_spans',
-          'storage_publish', 'storage_drop', 'storage_drop_apart', 'storage_drop_table',
-          'schema', 'abi', 'pool', 'pool_job', 'pool_run', 'backend'] + SCHEMA + CONFIG + SCHEDULE + BLOCK
+          'bridge_destroy', 'bridge_stop', 'bridge_run', 'lifecycle', 'config',
+          'schema', 'abi', 'pool', 'pool_job', 'pool_run', 'backend'] + SCHEMA + CONFIG + SCHEDULE + BLOCK + STORAGE
 # a native module is a shared library: the name, its source, what it is compiled with. The same
 # library twice is one module to the loader, so one source is built under several names.
 NATIVE = [

@@ -112,3 +112,13 @@ void storage_end_publish(storage_t *r)
     }
     r->dirty_count = 0;
 }
+
+/*
+** storage_count_tables
+**
+** Answers how many table ids there are, counting 0, which is no table.
+*/
+uint32_t storage_count_tables(storage_t *r)
+{
+    return (r->table_room + 1);
+}

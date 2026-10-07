@@ -1,0 +1,115 @@
+/*
+** Copyright (C) 2026 Heuretes-Workshop
+**
+** This file is part of Bridge-ASM700.
+**
+** All rights reserved.
+**
+** src/storage_made.c -- what storage holds, allocated a part at a time.
+*/
+
+#include <stdlib.h>
+
+#include "storage_create.h"
+
+/*
+** storage_make_tables
+**
+** Allocates what is kept of entities and of tables: a table for each
+** archetype there may be, and one for each sparse set. The hash of sets has
+** twice the room, in a power of two.
+*/
+bool storage_make_tables(storage_t *r)
+{
+    const bridge_t *b = r->b;
+    size_t tables = (size_t)r->table_room + 1;
+
+    r->hash_room = 16;
+    while (r->hash_room < tables * 2)
+        r->hash_room *= 2;
+    r->places = calloc(b->entities, sizeof(*r->places));
+    r->tables = calloc(tables, sizeof(*r->tables));
+    r->table_next = calloc(tables, sizeof(*r->table_next));
+    r->dirty = calloc(tables, sizeof(*r->dirty));
+    r->hash = calloc(r->hash_room, sizeof(*r->hash));
+    r->sets = calloc(tables * r->words, 8);
+    r->columns = calloc(tables * r->type_room, 4);
+    if (!r->places || !r->tables || !r->table_next || !r->dirty)
+        return (false);
+    return (r->hash && r->sets && r->columns);
+}
+
+/*
+** storage_make_fold
+**
+** Allocates what a barrier's fold works in: a set for each entity, and the
+** few sets a barrier needs beside.
+*/
+bool storage_make_fold(storage_t *r)
+{
+    size_t entities = r->b->entities;
+
+    r->work = calloc(entities * r->words, 8);
+    r->changed = calloc(entities, sizeof(*r->changed));
+    r->folded = calloc(entities, 1);
+    r->dest = calloc(entities, sizeof(*r->dest));
+    r->attached = calloc(entities * r->words, 8);
+    r->at = calloc(r->type_room ? r->type_room : 1, sizeof(*r->at));
+    r->scratch = calloc(r->words, 8);
+    r->before = calloc(r->words, 8);
+    r->masked = calloc(r->words, 8);
+    r->in_table = calloc(r->words, 8);
+    if (!r->work || !r->changed || !r->folded || !r->dest || !r->attached)
+        return (false);
+    return (r->at && r->scratch && r->before && r->masked && r->in_table);
+}
+
+/*
+** storage_make_apart
+**
+** Allocates what is kept of sparse sets and of direct-indexed components:
+** by slot, one more than there may be, and for each a cell or a bit for
+** every entity.
+*/
+bool storage_make_apart(storage_t *r)
+{
+    size_t entities = r->b->entities;
+    size_t sets = r->set_room ? r->set_room : 1;
+    size_t direct = r->direct_room ? r->direct_room : 1;
+
+    r->set_type = calloc((size_t)r->set_room + 1, sizeof(*r->set_type));
+    r->set_table = calloc((size_t)r->set_room + 1, sizeof(*r->set_table));
+    r->where = calloc(sets * entities, sizeof(*r->where));
+    r->direct_type = calloc((size_t)r->direct_room + 1,
+        sizeof(*r->direct_type));
+    r->given = calloc(direct * r->bit_words, 8);
+    if (!r->set_type || !r->set_table || !r->where)
+        return (false);
+    return (r->direct_type && r->given);
+}
+
+/*
+** storage_make_terms
+**
+** Allocates the types and the systems' terms there may be. There is one
+** more type and one more system than there may be, so that looking for a
+** free one always ends.
+*/
+bool storage_make_terms(storage_t *r)
+{
+    size_t room = r->terms_room;
+    size_t terms = room * r->b->max_terms;
+    size_t lists = room * 2 * ((size_t)r->table_room + 2);
+
+    r->types = calloc((size_t)r->type_room + 1, sizeof(*r->types));
+    r->type_pool = calloc(r->type_room, sizeof(*r->type_pool));
+    r->terms_pool = calloc(room + 1, sizeof(*r->terms_pool));
+    r->lists = calloc(lists, sizeof(*r->lists));
+    r->term_types = calloc(terms, sizeof(*r->term_types));
+    r->term_opers = calloc(terms, sizeof(*r->term_opers));
+    r->systems = calloc(room, sizeof(*r->systems));
+    r->observers = calloc(room, sizeof(*r->observers));
+    if (!r->types || !r->type_pool || !r->terms_pool || !r->lists)
+        return (false);
+    return (r->term_types && r->term_opers && r->systems && r->observers);
+}

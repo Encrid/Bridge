@@ -473,7 +473,38 @@ a microsecond, which hid it: they are printed to a nanosecond now.
                           old form of the table lookup and of the two term checks, the code
                           shifted by an unused function, the `inline` keyword left off
 
-**Open.** A table made and released at the next barrier measures 262 to 265 ns where the tree
-before the stage measures 248 to 253, and one emptied 258 to 261 where it was 243 to 251:
-about 10 ns of 250 that are not yet explained. The done-when asks that no line be slower, so
-this is closed before the stage is.
+    rows and values   a row added, removed and moved, a value found, a sparse set joined and
+                      left, an entity gone, what observers are owed: four headers
+    the barrier       `storage_apply.c`, five steps of a few lines each, over the fold, the
+                      reservation, the placing and the queues in seven headers
+    what is written   `storage_publish.c`, `storage_cells.c`, `storage_spans.c`. Publishing
+                      was one function of 98 lines
+    unload            `storage_drop.c` and two files beside it. Dropping was 71 lines
+    the rest          declaring, terms, ids, carriers, reload, create: nine files
+
+`storage.c` is gone. Storage is 23 headers and 17 source files, none over five functions and
+no function over twenty lines, and `storage.h` states what is asked of it in the style.
+
+**How it is measured now.** `storage measure` and `storage weigh` are run on the tree before
+the stage and on this one in turn, five rounds, and the least of each line is kept: the
+machine runs other things, and one round a tree showed 119 to 149 ns on a line that had not
+changed.
+
+**Where storage stands against the tree before the stage**, the least of five rounds, in ns:
+
+                                            before    now
+    attach, the first component             26.3      26.0
+    attach, a second component              28.4      28.8
+    detach                                  27.2      26.6
+    destroy                                 14.5      14.5
+    attach, a component it has              12.0      12.6
+    a sparse set given                      26.6      27.5
+    direct-indexed given                    17.1      17.6
+    a table made                            277       286
+    a table emptied                         240       247
+    the stress run, 4 threads, ms           1404      1395
+
+**Open.** Three lines are slower by about half a nanosecond, which is what two builds of the
+same code differ by, and are not explained beyond that: an attach of a component the entity
+has, a direct-indexed component given, and a table made or emptied, by 7 to 9 ns of 250. The
+done-when asks that no line be slower, so they are looked at again before the stage closes.

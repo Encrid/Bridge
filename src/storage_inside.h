@@ -284,4 +284,23 @@ typedef struct {
     const uint64_t *attached;
 } seen_t;
 
+/*
+** A question asked of a row's bytes, and what it is handed with them.
+*/
+typedef struct {
+    storage_is_fn_t is;
+    void *ctx;
+} question_t;
+
+/*
+** The rows of components being written again as other types: the moves,
+** and a copy of one entity's values as they were, each after the other.
+*/
+typedef struct {
+    storage_t *r;
+    const storage_move_t *moves;
+    uint32_t count;
+    uint8_t *was;
+} convert_t;
+
 #endif

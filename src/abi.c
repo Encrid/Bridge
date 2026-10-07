@@ -718,7 +718,7 @@ static int subscribe(module_t *m, uint64_t name_off, uint64_t name_len, uint32_t
         s->term[i].writes = t.access == BRIDGE_WRITE;
     }
 
-    s->matched = events ? storage_add_observer(b->storage, asked, count, events, heard, s)
+    s->matched = events ? storage_add_observer(b->storage, asked, count, &(storage_listener_t){ events, heard, s })
                : count ? storage_add_system(b->storage, asked, count) : nullptr;
     s->asked = asked;
     s->events = events;
@@ -830,7 +830,7 @@ void abi_park(bridge_t *b, bridge_system_t *s)
 void abi_unpark(bridge_t *b, bridge_system_t *s)
 {
     if (!s->parked) return;
-    s->matched = s->events ? storage_add_observer(b->storage, s->asked, s->terms, s->events, heard, s)
+    s->matched = s->events ? storage_add_observer(b->storage, s->asked, s->terms, &(storage_listener_t){ s->events, heard, s })
                : s->terms ? storage_add_system(b->storage, s->asked, s->terms) : nullptr;
     s->parked = 0;
     b->parked --;

@@ -59,15 +59,15 @@ static inline uint32_t get_table_value(const storage_t *r, uint32_t index,
 [[gnu::always_inline]] static inline uint32_t get_value(const storage_t *r,
     uint32_t index, const storage_type_t *type)
 {
-    uint32_t cell = type->cells + (uint32_t)COLUMN + index * type->size;
-
+    if (type->kept == BRIDGE_TABLE || type->kept == BRIDGE_TOGGLE)
+        return (get_table_value(r, index, type));
     if (type->kept == BRIDGE_SPARSE_SET)
         return (get_sparse_value(r, index, type));
-    if (type->kept == BRIDGE_DIRECT_INDEXED)
-        return (set_has(get_given(r, type->slot), index) ? cell : 0);
     if (type->kept == BRIDGE_SINGLETON)
         return (type->set ? type->cells : 0);
-    return (get_table_value(r, index, type));
+    if (!set_has(get_given(r, type->slot), index))
+        return (0);
+    return (type->cells + (uint32_t)COLUMN + index * type->size);
 }
 
 /*
