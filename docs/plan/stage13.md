@@ -116,7 +116,7 @@ have one: it is listed apart as that, so that its missing case is not read as a 
 
 ### Where the list lives
 
-**One document, `capabilities.md`: a row a capability, with the document and the heading that
+**One document, `tests.md`: a row a capability, with the document and the heading that
 state it, and its case.** A script reads it and fails three ways, each of which is mechanical: a
 row with no case, a case that is in no row, and a pointer anywhere in the documents to a case
 that is no row. The documents point at a case 34 times today, in prose where the claim is made,
@@ -137,7 +137,7 @@ once. After it the rule of `plan.md`, stage 13, holds: a capability is added wit
 **One host program, `tests/host`, and a case is named for what is exposed and what it shows**:
 `declare-past-types-refused`, `bridge_reload-smaller-share-refused`, `config-trusted-unset`. A
 behaviour of several entries is named for the behaviour: `order-unordered-conflict-refused`. The
-name is its row in `capabilities.md`, word for word, so a capability and its case are called the
+name is its row in `tests.md`, word for word, so a capability and its case are called the
 same.
 
 It was first taken as the document that states the capability, then the case. When a capability
