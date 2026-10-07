@@ -1,6 +1,6 @@
 /* The work `storage measure` and `storage weigh` time, done by EnTT: the reference a sparse
  * set is measured beside, and what reaching a value by id, a singleton and a marker with no
- * bytes cost in the ECS that keeps everything in sparse sets. docs/plan/STAGE11.md, *Beside
+ * bytes cost in the ECS that keeps everything in sparse sets. docs/plan/stage11.md, *Beside
  * the best there is*.
  *
  * Built and run by tools/reference.py against EnTT at a pinned tag, which it fetches. Not part

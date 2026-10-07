@@ -689,3 +689,10 @@ case `stage3-nocall`. Binaryen, which a build needs already for `wasm-merge` and
 carries `wasm-as` and `wasm-dis` in the same archive. All thirteen files assemble with it, to
 other bytes and the same behaviour: every case passes. So a build needs zig and Binaryen
 installed, and each workflow fetches one archive fewer.
+
+**The reference programs.** `tests/reference/flecs_ref.c` is ten files and a header, and
+`floor.c` has one. Each timed region is one function that reads the clock, makes the calls it
+made, and reads the clock again; what a timed loop uses is copied out of the struct it is handed
+before the clock is read, since the compiler read it again at every row otherwise. Beside the
+programs as they were, ten rounds alternated: every median within 3.3%. `entt_ref.cpp` is C++,
+and the style is of the C we own: the checker reads the `.c` and `.h` of that folder.

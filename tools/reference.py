@@ -55,8 +55,8 @@ def main():
     source = ROOT / 'tests' / 'reference'
     if not (out / 'flecs.o').exists():
         run([zig, 'cc', '-std=c23', *flags, '-c', out / 'flecs' / 'flecs.c', '-o', out / 'flecs.o'])
-    run([zig, 'cc', '-std=c23', *flags, '-I', out / 'flecs', source / 'flecs_ref.c', out / 'flecs.o',
-         '-o', out / ('flecs_ref' + exe), *windows])
+    run([zig, 'cc', '-std=c23', *flags, '-I', out / 'flecs', *sorted(source.glob('flecs_ref*.c')),
+         out / 'flecs.o', '-o', out / ('flecs_ref' + exe), *windows])
     run([zig, 'c++', '-std=c++23', *flags, '-I', out, source / 'entt_ref.cpp', '-o', out / ('entt_ref' + exe)])
     run([zig, 'cc', '-std=c23', *flags, source / 'floor.c', '-o', out / ('floor' + exe)])
 
