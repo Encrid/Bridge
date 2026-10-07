@@ -371,6 +371,8 @@ finds no broken citation; and every case passes.*
 
 ## 15. Bridge
 
+In progress: `stage15.md`.
+
 Bridge-ASM700 becomes Bridge: the library is finished as a library, and takes the name of what it
 replaces. What is renamed - the repository, the name in every document and in the header every
 file of ours starts with, and what the original Bridge is called from then on in the documents
