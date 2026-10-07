@@ -1,7 +1,7 @@
 # Stage 14: the documents
 
-In progress. `plan.md`, stage 14, is what it is for and when it is done. This document is the
-order it is done in, what was counted before it began, each decision as it is taken, and every
+Built. `plan.md`, stage 14, is what it is for and when it is done. This document is the order
+it was done in, what was counted before it began, each decision as it was taken, and every
 finding with what was done of it. What a decision refused is `stage14_refused.md`.
 
 ## The order
@@ -411,3 +411,23 @@ bounds them.
 
 **Stage 13 promised a report it did not build**: a message that no document states. It is built
 here, as a failure and not a report: *Messages and the documents*.
+
+## The close
+
+**The done-when, line by line.**
+
+    each thing the first question listed is    met: seven kinds. Three are held by a script
+    changed or refused on record               and count none; four have a row each above,
+                                               and what was left is named in the record
+    `xref.py` finds no broken citation         met: none, with two checks more than it had
+    every case passes                          met: 473, optimised and debug, alone and under
+                                               six copies for ten rounds; the five other
+                                               targets compile and link
+
+**What holds the documents from here on.** A stage named in a document of the design, and a
+mention of what is not built with no citation of where it is stated: `xref.py`. A declaration
+of a header that cites no document: `cover.py`, the case `cover`. A function that writes a
+message and cites no document: `said.py`, the case `said`. What is false against the tree, and
+what two documents say twice, are held by nothing but the scan of `stage0.md`, read.
+
+**Linux and macOS** are as stage 13 left them: no workflow has run, and that holds no stage.

@@ -355,7 +355,7 @@ several copies running at once.*
 
 ## 14. The documents
 
-In progress: `stage14.md`.
+Built: `stage14.md`.
 
 The documents were written a stage at a time, each to say what that stage decided. Before the
 library is named and a host is written against it, they are read as one thing. What of them is to
