@@ -178,3 +178,48 @@ nothing". No document had to be opened.
 **The two proof modules are with the other modules of the tests**, and not beside the host
 that loads them: the coding style lets a module keep its state in the variables of its file
 only under `tests/modules`, and no exception was added for a second place.
+
+## The first run for `main`
+
+On 2026-10-08, of the commit `6eabdde`, at Enkrid's word:
+
+    macOS      arm64, x86-64     passed, in 2 and 5 minutes
+    Linux      arm64, x86-64     passed, in 3 and 3 minutes
+    Windows    x86-64            passed, in 14 minutes, the packages of Windows arm64 built
+                                 in it
+
+It made the release `main-6eabdde1bd62`, which holds 30 archives: the five packages of each
+of six targets. Five of the six say `run yes`, and Windows arm64 says `run no`. It was the
+first time the step that publishes had run, and it ran as it was written.
+
+Four packages were fetched back by that commit, from four targets, and each was unpacked and
+checked: its statement names that commit and its target, and every file is the one its hash
+is of.
+
+A run was about 430 counted minutes the day before, and this one about 105: 6 of Linux, 7 of
+macOS counted ten times, 14 of Windows counted twice.
+
+## The close
+
+Put to Enkrid on 2026-10-08, and his to rule.
+
+    one command writes, for a target, the library's       met: `python build.py package`,
+    package and, for each backend, its own and its SDK's   on six targets
+    each holding what `host_api.md` says, and a           met: the case `package`. Shown
+    statement of the commit and of the hash of each       failing on a file removed, one
+    file, and a case fails on a package that differs      added, one changed, and a statement
+                                                          changed
+    a host, and a module for each backend, are built      met: two cases, with the shared
+    from the packages alone and run                       library and with the static one,
+                                                          on the five platforms that are run
+    a run for `main` publishes the packages of each       met: the run above
+    platform
+    from which one is fetched by its commit and its       met: four fetched and checked
+    hashes hold
+
+Every case passes: 484, optimised and debug, alone and six at once, where the code is
+written, and on the five platforms by the run.
+
+**What is not shown.** That a host which is not this tree's own builds from what was
+published: that is a host's to show. And that the release can be fetched by a build that is
+not its author's: the repository is private, and a host's build has to prove who it is.
