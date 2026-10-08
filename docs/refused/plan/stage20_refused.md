@@ -146,3 +146,7 @@ when the rights pass to an entity. The condition that brings it back is none.
 
 Refused: "Bridge Author". The author never changes and the holder may, and a contributor is an
 author too. The condition that brings it back is none.
+
+Refused, after one run of it: the platforms run for `main` as for `dev`. It is the same tree
+run twice, at about 410 minutes each. The condition that brings it back is a commit that
+reaches `main` by another way than `dev`.

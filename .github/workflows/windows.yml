@@ -4,16 +4,16 @@
 # on, and one that ran emulated would have it build the other target.
 name: windows
 
-# It runs for what reaches dev and main, and for a pull request: a stage's branch is held by
-# the cases run where it is written. A change to documents alone starts nothing, and a newer
-# push stops the run of the one before it, since a minute here is counted and a macOS one as
-# ten.
+# It runs for what reaches dev, and for a pull request: a stage's branch is held by the cases
+# run where it is written, and main only ever takes what dev already passed with. A change to
+# documents alone, or to these workflows, starts nothing, and a newer push stops the run of the
+# one before it, since a minute here is counted and a macOS one as ten.
 on:
   push:
-    branches: [main, dev]
-    paths-ignore: ['docs/**', '**.md', 'license']
+    branches: [dev]
+    paths-ignore: ['docs/**', '**.md', 'license', '.github/**']
   pull_request:
-    paths-ignore: ['docs/**', '**.md', 'license']
+    paths-ignore: ['docs/**', '**.md', 'license', '.github/**']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

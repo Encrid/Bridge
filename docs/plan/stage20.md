@@ -297,3 +297,21 @@ Put to Enkrid on 2026-10-07 with what is shown and what is not, and merged at hi
 **Decisions that went against what was recommended**, each in its section: the Affero licence
 over the plain one, words over an identifier, a role over the name the commits are made under,
 and the workflow with nothing checked by hand.
+
+## After the close
+
+**The first run of the platforms**, on the merge of this stage into `dev`, 2026-10-08:
+
+    macOS      arm64 and x86-64      passed, in 8 and 21 minutes
+    Linux      arm64 and x86-64      passed, in 16 and 27 minutes
+    Windows    arm64                 failed after 4 minutes, in the step that builds and tests
+    Windows    x86-64                still running when this was written
+
+So the cases pass on Linux and on macOS, on both processors of each, which no stage before
+this one had shown. What failed on Windows arm64 is not of this stage, which changed no line of
+C that is not a comment: it is the first time that target was run by anything.
+
+**What one push costs was measured**: 43 minutes of Linux, 29 of macOS counted ten times, and
+at least 40 of Windows counted twice, which is about 410 of the 3000 a month the account has.
+Enkrid ruled that `main` is not run: it only ever takes what `dev` passed with. A change to the
+workflows themselves starts nothing either.
