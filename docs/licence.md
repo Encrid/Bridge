@@ -51,9 +51,17 @@ They are asked of the account `Encrid`, on the service this repository is hosted
 
 ## Whose it is
 
-**The notices say Heuretes-Workshop, which is the name its author works under.** It is not a
-person in law: the rights are the author's, and an entity formed later to hold them takes that
-name's place.
+**The notices say "Bridge Owner", and that is one person: the author of Bridge.** The owner is
+whoever holds the rights in it, which is its author until the author transfers them in writing,
+to a person or to an entity formed to hold them, and then whoever they were transferred to. The
+notices stay true through that.
+
+**It is not decided by an account.** Where the repository is published from, and who
+administers that account or organisation, says nothing of who the owner is: a repository is
+moved in a minute, and the rights do not move with it.
+
+No name of a person is in the tree. Who the owner is in law is said to whoever takes other
+terms, in the contract that grants them.
 
 **A contribution is taken with an agreement, `cla.md`.** A contributor keeps the copyright of
 what they wrote and grants the holder a licence that may be passed on, under these terms and

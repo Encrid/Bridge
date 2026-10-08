@@ -104,8 +104,11 @@ loaded by is how these licences are generally read, and is not something this st
 
 ### Who the holder is
 
-**The name in the notices stays, and one document says whose it is.** "Heuretes-Workshop" is in
-all 468 notices. Enkrid: "Heuretes-Workshop is the name of a github organization I created and
+**Ruled twice. What stands is the second ruling, at the end of this section: the notices say
+"Bridge Owner".**
+
+The first: the name in the notices stays, and one document says whose it is. "Heuretes-Workshop"
+was in all 468 notices. Enkrid: "Heuretes-Workshop is the name of a github organization I created and
 I work under". So it is a name its author works under and not a person in law: the rights are
 the author's, and the document that says what may be done with Bridge says that this is the
 name they are held under, gives where other terms are asked for, and says that an entity formed
@@ -115,8 +118,32 @@ The repository itself was moved the same day from that organisation to its autho
 account, for reasons of the hosting service and not of this stage; the name is unchanged by
 that.
 
-Where a qualified reader matters: what a notice under a working name is worth as evidence of
-who holds the rights, where the author lives.
+**The second ruling: the notices name a role, "Bridge Owner", and no name of a person is in
+the tree.** Once the repository was on its author's own account and the organisation kept for
+work shared with others, a notice in the organisation's name read as a group holding the
+rights, which is the opposite of what selling other terms needs. Four ways were weighed with
+what others do: a real name, as most single authors; the account's name, which exists only
+because another was taken; the name the commits are made under; and a role. Enkrid first chose
+his real name, saw that it would tie that name to the one on every commit, in public and for
+good, and ruled the role.
+
+    it never changes     an entity formed later, or the repository moved to another account,
+                         changes one sentence of `licence.md` and no notice
+    owner, not author    a notice names who holds the rights, which may come to be somebody
+                         who wrote nothing; and a contributor is an author of their part and
+                         not an owner of Bridge
+    not an account       `licence.md` and `cla.md` say the owner is the author and whoever the
+                         author transfers the rights to in writing, and that who administers
+                         an account does not decide it
+    one way only         a name can be added to the tree later in a minute, and can never be
+                         taken out of a repository that has been public
+
+What it costs: a notice that names nobody is weak evidence taken alone. What shows who wrote
+Bridge is its history and what its author keeps privately, and the author's name in law is
+given in a contract, to whoever takes other terms.
+
+Where a qualified reader matters: what a notice that names a role is worth as evidence, where
+the author lives.
 
 ### The contributor's agreement
 

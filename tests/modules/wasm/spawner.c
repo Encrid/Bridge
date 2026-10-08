@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2026 Heuretes-Workshop
+** Copyright (C) 2026 Bridge Owner
 **
 ** This file is part of Bridge.
 **

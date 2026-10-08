@@ -126,3 +126,23 @@ that brings it back is none.
 
 Refused: the statement in `licence.md` only, and nothing in the seam files. Whoever writes a
 module reads the header and not that document. The condition that brings it back is none.
+
+## Who the holder is, ruled again
+
+Of `stage20.md`, *Who the holder is*.
+
+Refused, after it had been ruled: "Heuretes-Workshop" kept in the notices. It is an
+organisation with other members, and reads as a group holding the rights. The condition that
+brings it back is none.
+
+Refused: the author's real name, in every notice or once in `licence.md`. It is the strongest
+evidence; and it ties that name to the one on every commit, in public, which cannot be undone.
+The condition that brings it back is the author choosing to be named, which is a change of one
+script.
+
+Refused: the name the commits are made under, alone or with the account's beside it. It keeps
+the author private and matches the history; it was passed over for a role, which also holds
+when the rights pass to an entity. The condition that brings it back is none.
+
+Refused: "Bridge Author". The author never changes and the holder may, and a contributor is an
+author too. The condition that brings it back is none.

@@ -65,7 +65,7 @@ for path in listed:
     if m:
         fault('%s:%d says that all rights are reserved' % (path, body.count('\n', 0, m.start()) + 1))
     head = body[:600]
-    if path.endswith(('.c', '.h')) and re.search(r'^\*\* Copyright \(C\) (?!\d{4} Heuretes-Workshop)', head, re.M):
+    if path.endswith(('.c', '.h')) and re.search(r'^\*\* Copyright \(C\) (?!\d{4} Bridge Owner\s*$)', head, re.M):
         if '`%s`' % path not in said:
             fault('docs/licence.md does not name %s, whose header names another holder' % path)
 

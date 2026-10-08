@@ -102,7 +102,7 @@ Every source file (`.c`, `.h`) starts with the project's standard header.
 
 ```c
 /*
-** Copyright (C) $YEAR Heuretes-Workshop
+** Copyright (C) $YEAR Bridge Owner
 **
 ** This file is part of Bridge.
 **
@@ -112,14 +112,15 @@ Every source file (`.c`, `.h`) starts with the project's standard header.
 */
 ```
 
-The line under the project's name says what the file is under, in the same words in every file:
+The first line names who holds the rights, by role and not by name: `licence.md`, *Whose it
+is*. The line under the project's name says what the file is under, in the same words in every file:
 `licence.md`, *What Bridge is under*. `$YEAR` is the year the file was first written.
 `$PATH_OF_THE_FILE` is its path from the root of the repository, and what follows it says what the
 file is, in as many lines as are relevant and no more.
 
 ```c
 /*
-** Copyright (C) 2026 Heuretes-Workshop
+** Copyright (C) 2026 Bridge Owner
 **
 ** This file is part of Bridge.
 **
@@ -134,7 +135,7 @@ with where the code is from and its licence:
 
 ```c
 /*
-** Copyright (C) 2026 Heuretes-Workshop
+** Copyright (C) 2026 Bridge Owner
 ** Copyright (C) 2005-2020 Rich Felker, et al. (musl, MIT)
 **
 ** This file is part of Bridge.

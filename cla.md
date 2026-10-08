@@ -38,9 +38,10 @@ to your Contributions.
 **"You"** means the copyright owner, or the legal entity authorised by the copyright owner,
 entering into this agreement.
 
-**"Project Owner"** means the author of Bridge, who works under the name Heuretes-Workshop and
-holds the account from which Bridge is published, and their successors and assigns, including
-any legal entity they may later form to hold the project.
+**"Project Owner"** means the holder of the rights in Bridge, named "Bridge Owner" in its
+notices: its author, and those the author transfers the rights to in writing, including any
+legal entity formed to hold the project. Who administers the account or the organisation Bridge
+is published from does not decide it.
 
 **"Contribution"** means any original work of authorship, including any modification of or
 addition to an existing work, that is intentionally submitted by You to the Project Owner for
