@@ -425,3 +425,21 @@ says where that matters.
 ours says all rights are reserved, and `style` fails on one that does; each thing in the tree
 that is somebody else's is named with its licence; a document says, once, what a host, a module
 and a backend may be under, and where other terms are had; and every case passes.*
+
+## 21. What a host is handed
+
+In progress: `stage21.md`.
+
+A host links the built library and does not compile it - `host_api.md`, *A host links a built
+library*. Nothing says what that host is given, or where it finds it: the build writes two
+hundred files into one folder, and the header is in the source tree. This stage sets apart
+what a host takes, as units - the library, and each backend as a unit of its own - writes them
+by a step of the build, says in each which commit it is and the hash of every file, and
+publishes them from `main`, for each platform, by the run that tests it. The platforms run for
+`main` only from this stage on.
+
+*Done when one command writes, for a target, the library's unit and one for each backend, each
+holding what `host_api.md` says it holds and a statement of the commit and of the hash of each
+file, and a case fails on a unit that differs; the program of the tests is built and run from
+those units alone; and a run for `main` publishes the units of each platform, from which one
+is fetched by its commit and its hashes hold.*
