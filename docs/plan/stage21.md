@@ -192,7 +192,7 @@ It made the release `main-6eabdde1bd62`, which holds 30 archives: the five packa
 of six targets. Five of the six say `run yes`, and Windows arm64 says `run no`. It was the
 first time the step that publishes had run, and it ran as it was written.
 
-Four packages were fetched back by that commit, from four targets, and each was unpacked and
+Five packages were fetched back by that commit, from five targets, and each was unpacked and
 checked: its statement names that commit and its target, and every file is the one its hash
 is of.
 
@@ -214,7 +214,7 @@ Put to Enkrid on 2026-10-08, and his to rule.
                                                           on the five platforms that are run
     a run for `main` publishes the packages of each       met: the run above
     platform
-    from which one is fetched by its commit and its       met: four fetched and checked
+    from which one is fetched by its commit and its       met: five fetched and checked
     hashes hold
 
 Every case passes: 484, optimised and debug, alone and six at once, where the code is
