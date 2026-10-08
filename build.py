@@ -6,6 +6,7 @@
     python build.py test --rounds 10     the tests ten times over
     python build.py --target T ...       one of TARGETS, below: three systems, two processors
     python build.py --debug ...          unoptimised, with debug information
+    python build.py package              build, run every case, and make what a host is handed
 
 Needs zig on the path. Binaryen is taken from BINARYEN_ROOT or the path, and on Windows fetched
 at its pin when it is in neither. Every path is taken from where this file is
@@ -259,6 +260,70 @@ def binaryen(build):
     return found
 
 
+# What a host is handed - host_api.md, *What a host is handed*. A package is a folder, and
+# this is what each holds: a file of the tree or of the build, and its name in the package
+# where that differs. The three backends the tests build for themselves are in none.
+def packages(out, lib, runtime):
+    licence = (ROOT / 'license', 'license')
+
+    def sdk(backend):
+        return [(f, f.name) for f in [ROOT / 'include/bridge_abi.h', ROOT / 'include/bridge_schema.h'] +
+                sorted((ROOT / 'backends' / backend / 'sdk').iterdir())] + [licence]
+    return {
+        'bridge': [(out / ('bridge' + lib), 'bridge' + lib), (out / 'bridge.a', 'bridge.a'),
+                   (ROOT / 'include/bridge.h', 'bridge.h'), licence],
+        'backend_native': [(out / 'backends' / ('bridge_native' + lib), 'bridge_native' + lib), licence],
+        'backend_wasm': [(out / 'backends' / ('bridge_wasm' + lib), 'bridge_wasm' + lib),
+                         (out / 'backends' / runtime.name, runtime.name), licence,
+                         (ROOT / 'backends/wasm/wasmtime/LICENSE', 'license_wasmtime')],
+        'sdk_native': sdk('native'),
+        'sdk_wasm': sdk('wasm'),
+    }
+
+
+def commit():
+    """The commit the tree is at, and whether the tree is that commit and nothing more."""
+    def git(*words):
+        return subprocess.run(['git'] + list(words), cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    changed = git('status', '--porcelain', '--untracked-files=no')
+    return git('rev-parse', 'HEAD') + (' with changes that are not committed' if changed else '')
+
+
+def write_packages(target, out, lib, runtime, ran):
+    """Each package of a target, as a folder under packages/, with its statement: its name, the
+    commit, the target, whether the cases were run and passed on it, and the SHA-256 of each
+    file. A file is written only where it differs, so that what is built from a package is
+    built again only when the package changed."""
+    at = commit()
+    for name, files in packages(out, lib, runtime).items():
+        folder = out / 'packages' / name
+        folder.mkdir(parents=True, exist_ok=True)
+        said = ['package %s' % name, 'commit %s' % at, 'target %s' % target,
+                'run %s' % ('yes' if ran else 'no')]
+        for source, called in files:
+            data = source.read_bytes()
+            if not (folder / called).exists() or (folder / called).read_bytes() != data:
+                (folder / called).write_bytes(data)
+            said.append('%s  %s' % (hashlib.sha256(data).hexdigest(), called))
+        for stray in set(p.name for p in folder.iterdir()) - {c for _, c in files} - {'package.txt'}:
+            (folder / stray).unlink()
+        text = '\n'.join(said) + '\n'
+        if not (folder / 'package.txt').exists() or (folder / 'package.txt').read_text() != text:
+            (folder / 'package.txt').write_text(text, newline='\n')
+
+
+def archive_packages(target, out):
+    """Each package as one archive, named for the package and the target: what is published."""
+    made = []
+    for folder in sorted(p for p in (out / 'packages').iterdir() if p.is_dir()):
+        path = out / 'packages' / ('%s-%s.tar.gz' % (folder.name, target))
+        with tarfile.open(path, 'w:gz') as tar:
+            for f in sorted(folder.iterdir()):
+                tar.add(f, arcname='%s/%s' % (folder.name, f.name))
+        made.append(path)
+    return made
+
+
 def build(target, debug, out):
     row = TARGETS[target]
     exe, lib = row['program'], row['library']
@@ -284,7 +349,7 @@ def build(target, debug, out):
     sdk = {b: '-I%s' % (ROOT / 'backends' / b / 'sdk') for b in ('wasm', 'native')}
     headers = [Path(__file__)] + [h for d in ('include', 'src', 'tests', 'tests/*', 'tests/modules',
                                               'tests/modules/native', 'tests/modules/wasm',
-                                              'tests/modules/native/*', 'tests/modules/wasm/*',
+                                              'tests/modules/native/*', 'tests/modules/wasm/*', 'tests/modules/packaged',
                                               'backends/wasm', 'backends/wasm/sdk',
                                               'backends/native', 'backends/native/sdk',
                                               'utils/os', 'utils/os/' + row['os'])
@@ -430,6 +495,48 @@ def build(target, debug, out):
             [opt, merged] + FEATURES + ['-O3', '--remove-exports=acc_*',
                                          '--remove-unused-module-elements', '-o', final]]))
     together(compiled)
+
+    # ---- what a host is handed, and a host and a module of each backend built from it alone:
+    # nothing below names a path of the tree but the three sources - host_api.md, *What a host
+    # is handed* ----
+    write_packages(target, out, lib, runtime, False)
+    pk, made = out / 'packages', out / 'packaged'
+    stated = [pk / name / 'package.txt' for name in ('bridge', 'sdk_native', 'sdk_wasm')]
+    where = ['-D%s="%s"' % (key, path.as_posix()) for key, path in
+             [('NATIVE_BACKEND', pk / 'backend_native' / ('bridge_native' + lib)),
+              ('WASM_BACKEND', pk / 'backend_wasm' / ('bridge_wasm' + lib)),
+              ('NATIVE_MODULE', made / ('npack' + lib)), ('WASM_MODULE', made / 'pack.wasm')]]
+    # the number of the module seam is a module's to state, and bridge.h does not have it: a
+    # host is told it by who built the module, which here is this build, from the SDK's package
+    where.append('-DMODULE_ABI=%s' % re.search(r'BRIDGE_ABI = (\d+);', (
+        pk / 'sdk_native' / 'bridge_abi.h').read_text(encoding='utf-8')).group(1))
+    del compiles[:]
+    packaged_host_o = compile_('packaged-host', ROOT / 'tests/packaged/host.c',
+                               ours + ['-I%s' % (pk / 'bridge')] + where, stated)
+    packaged_npack_o = compile_('packaged-npack', ROOT / 'tests/modules/packaged/npack.c',
+                                ours + ['-I%s' % (pk / 'sdk_native'), '-fvisibility=hidden'], stated)
+    together(compiles)
+    beside = made / ('bridge' + lib)
+    step('putting the library beside the packaged host', [beside], [pk / 'bridge' / beside.name],
+         [lambda: shutil.copyfile(pk / 'bridge' / beside.name, beside)])
+    del links[:]
+    link('packaged/host', [packaged_host_o, pk / 'bridge' / beside.name], system + here)
+    link('packaged/host-static', [packaged_host_o, pk / 'bridge' / 'bridge.a'], system)
+    link('packaged/npack', [packaged_npack_o], shared=True)
+    together(links)
+    packed_acc = made / 'acc.wasm'
+    step('assembling the packaged accessors', [packed_acc], [pk / 'sdk_wasm' / 'bridge_wasm.wat'],
+         [[assemble, pk / 'sdk_wasm' / 'bridge_wasm.wat'] + FEATURES + ['-o', packed_acc]])
+    raw, merged, final = (made / ('pack' + s) for s in ('.raw.wasm', '.merged.wasm', '.wasm'))
+    step('building the packaged wasm module', [final],
+         [ROOT / 'tests/modules/packaged/pack.c', packed_acc] + stated, [
+             [zig, 'cc', '-target', 'wasm32-freestanding', '-std=c23', '-pedantic-errors', '-Wall',
+              '-Wextra', '-Werror', '-Wno-missing-field-initializers', '-O2', '-nostdlib',
+              '-DBRIDGE_ROWS_CHECKED', '-I%s' % (pk / 'sdk_wasm'), '-Wl,--no-entry', '-o', raw,
+              ROOT / 'tests/modules/packaged/pack.c'],
+             [merge, raw, 'main', packed_acc, 'acc'] + FEATURES + ['-o', merged],
+             [opt, merged] + FEATURES + ['-O3', '--remove-exports=acc_*',
+                                          '--remove-unused-module-elements', '-o', final]])
     return {'python': sys.executable, 'nocall': ROOT / 'tools/nocall.py',
             'wasm-dis': disassemble, 'modules': modules, 'exe': exe}
 
@@ -447,6 +554,8 @@ def sources(where, name, idle):
 
 def command_line(out, built, command, kept):
     """What a case runs: a program of the build, or a tool of ours over the tree."""
+    if command[0] == 'package':
+        return [str(built['python']), str(ROOT / 'tools/package.py'), str(out)]
     if command[0] == 'cla':
         return [str(built['python']), str(ROOT / 'tools/cla.py'), '--decide'] + command[1:]
     if command[0] in ('c23', 'style', 'cover', 'xref', 'licence'):
@@ -523,7 +632,7 @@ def test(out, built, only, copies):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
-    ap.add_argument('command', nargs='?', default='build', choices=['build', 'test'])
+    ap.add_argument('command', nargs='?', default='build', choices=['build', 'test', 'package'])
     ap.add_argument('--target', choices=sorted(TARGETS))
     ap.add_argument('--debug', action='store_true')
     ap.add_argument('--out', type=Path, help='where to build: build/<target> beside this file')
@@ -539,6 +648,16 @@ def main():
         die('%s cannot be run here: build it, and test it where it runs' % target)
     out = (args.out or ROOT / 'build' / (target + ('-debug' if args.debug else ''))).resolve()
     built = build(target, args.debug, out)
+    if args.command == 'package':
+        # the cases are run where the target is this machine's, and the statement of each
+        # package says whether they were: host_api.md, *What a host is handed*
+        if target == mine:
+            test(out, built, None, 1)
+        row = TARGETS[target]
+        write_packages(target, out, row['library'], ROOT / 'backends/wasm/wasmtime' / row['wasmtime'][1],
+                       target == mine)
+        for path in archive_packages(target, out):
+            print(path)
     if args.command == 'test':
         for _ in range(args.rounds):
             test(out, built, args.k, args.copies)
@@ -1481,6 +1600,7 @@ ALONE = {
     'BRIDGE_ROW-checked-and-unchecked-timed': MEASURES,
     'config.threads-two-run-at-once': CLOCKED, 'config.threads-one-runs-in-turn': CLOCKED,
     'c23': TREE, 'style': TREE, 'deps': TREE, 'cover': TREE, 'xref': TREE, 'licence': TREE,
+    'package': TREE,
     **{name: TREE for name in ('cla-the-holder-is-not-asked', 'cla-a-name-on-record-passes',
                                'cla-anybody-else-is-asked-and-fails',
                                'cla-the-sentence-by-its-author-is-recorded',
@@ -1493,6 +1613,14 @@ ALONE = {
 # the cases said, and docs/tests.md against the headers and the cases
 CASES += [('said', ['said'], None, None), ('cover', ['cover'], None, None),
           ('xref', ['xref'], None, None), ('licence', ['licence'], None, None)]
+
+# what a host is handed: that each package is what the document says, and that a host and a
+# module of each backend built from the packages alone run - host_api.md, *What a host is handed*
+PACKED = r'packed:native@0\.1\.0: count 3.*packed:wasm@0\.1\.0: sum 30.*destroyed: 0'
+CASES += [('package', ['package'], None, None),
+          ('package-a-host-and-two-modules-built-from-them', ['packaged/host'], PACKED, r'refused'),
+          ('package-the-same-host-with-the-static-library', ['packaged/host-static'], PACKED,
+           r'refused')]
 
 # who is asked to sign the agreement of contributors, decided as the workflow decides it
 SIGNS = 'I have read cla.md and I sign it.'

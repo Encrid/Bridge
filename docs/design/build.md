@@ -50,16 +50,18 @@ nothing more.
 ## Platforms
 
     Windows    x86-64    x86_64-windows-gnu     run where the code is written, and by a workflow
-    Linux      x86-64    x86_64-linux-gnu       run by a workflow, for what reaches dev
-    macOS      arm64     aarch64-macos          run by a workflow, for what reaches dev
-    Linux      arm64     aarch64-linux-gnu      run by a workflow, for what reaches dev
-    macOS      x86-64    x86_64-macos           run by a workflow, for what reaches dev
+    Linux      x86-64    x86_64-linux-gnu       run by a workflow, for what reaches main
+    macOS      arm64     aarch64-macos          run by a workflow, for what reaches main
+    Linux      arm64     aarch64-linux-gnu      run by a workflow, for what reaches main
+    macOS      x86-64    x86_64-macos           run by a workflow, for what reaches main
     Windows    arm64     aarch64-windows-gnu    a target: compiled and linked, and not run
 
 **A platform is one that is run.** A target is a name in `build.py`, and wasmtime's library for it
 in the tree; it is compiled and linked from the first, with what it imports held to
 `dependencies.md`. It becomes a platform, and this table says so, when a workflow has run its
 cases and they passed. Five have. The first run of any of them by a machine was on 2026-10-08.
+A run is of every case once, and then of every case six at once; and for `main` it publishes
+what a host is handed, for that commit - `host_api.md`, *What a host is handed*.
 
 **Windows on arm64 is compiled and linked, and its cases are not run.** On the runner there is
 for it, the arm64 build of the compiler at its pin does not hold: with several of it at once, as

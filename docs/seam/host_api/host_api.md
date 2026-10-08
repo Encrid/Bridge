@@ -57,6 +57,55 @@ The three seams in a form that needs no C parser at all: what a host, a module o
 another language reads to know each layout, each constant and each entry. And, for a module, a
 binding in its own language, which is its backend's to provide as the two there are provide C's.
 
+## What a host is handed
+
+**Packages.** A package is a folder of built files set apart for somebody else to take, and
+the build writes five for a target, under `packages/` of the folder it builds into:
+
+    `bridge`           the library: its shared file, its static file, `bridge.h`, which is
+                       the one header a host includes, and `license`
+    `backend_native`   the native backend's library, and `license`
+    `backend_wasm`     the wasm backend's library, wasmtime's shared library, which that
+                       backend loads from beside itself, `license`, and wasmtime's own as
+                       `license_wasmtime`
+    `sdk_native`       what a native module is written with: `bridge_abi.h`,
+                       `bridge_schema.h`, the files of that backend's `sdk/`, and `license`
+    `sdk_wasm`         the same for a wasm module
+
+**A host takes the library's, and a backend's for each backend its deployment names.** A
+backend is a library of its own that a deck opens by the path a deployment states - `config.md`,
+*The keys* - and a deck is not created without one, so the library's package alone runs
+nothing. An SDK's package is for whoever writes a module, which a host that only runs other
+people's modules never is. The backends the tests build for themselves are in no package.
+
+**Each package states itself, in `package.txt`.** Its name, the commit of Bridge it was built
+from, the target, whether the cases were run on that target and passed in the build that made
+it, and then the SHA-256 and the name of each file it holds. A host's build that takes a
+package reads that file and refuses one whose file is not what the hash says. It is not a
+manifest, which is a module's - `module.md`, *The manifest*.
+
+**`python build.py package` makes them to be taken.** It builds, runs every case where the
+target is the machine's own, writes `run yes` where they passed, and makes of each package one
+archive named for the package and the target. For a target of another machine it builds, and
+the statement says `run no`.
+
+**They are published for each commit of `main`**, by the run that tests it: a release of the
+repository named `main-` and the first twelve characters of the commit, which holds the
+archives of each target whose job passed. It is named for a commit and claims no version.
+Windows on arm64 is published by the job of Windows on x86-64, with `run no` - `build.md`,
+*Platforms*. A job that fails publishes nothing, so a release may lack a target.
+
+**What a host is handed is shown to be enough**, by a host and two modules that are built
+from the packages and from nothing else of the tree: `tests/packaged`, which includes
+`bridge.h` out of the library's package and links that library, shared and then static, and
+`tests/modules/packaged`, a native module and a wasm one, each compiled against its SDK's
+package. `tools/package.py` holds what each package holds against this section.
+
+**One thing `bridge.h` does not give a host: the number of the module seam.** A host states it
+for each module it loads, in `bridge_module_config_t`, and it is the module's to say, in its
+manifest - *A seam has a number*, below. Until a manifest is read for a host - `module.md`,
+*The parser of a manifest* - a host is told that number by whoever built the module.
+
 ## A seam has a number
 
 **Each of the three seams has a number, and a side that states another is refused before

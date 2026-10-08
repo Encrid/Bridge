@@ -139,3 +139,42 @@ packages and nowhere else.
 
 The done-when is reworded: a host, and a module for each backend, are built from the packages
 alone and run.
+
+## What was built
+
+    `python build.py package`   builds, runs every case where the target is the machine's
+                                own, writes the five packages with their statements, and
+                                makes an archive of each. Every build writes the packages,
+                                saying `run no`; this is what says `run yes`
+    `tools/package.py`          the case `package`: each package holds what `build.py` says a
+                                package holds, the document names it, every hash is the
+                                file's, and a header or a licence is the tree's
+    `tests/packaged/host.c`     a host built from the library's package alone, linked with
+                                the shared library and again with the static one
+    `tests/modules/packaged/`   a native module and a wasm one, each built from its SDK's
+                                package alone
+    two cases                   that host loads both modules through the two backends'
+                                packages, runs three passes and destroys the deck
+    `host_api.md`               *What a host is handed*
+    the three workflows         for `main`; the cases once, then six at once, once; the
+                                packages attached to the release of the commit; and the
+                                Windows job builds and attaches Windows arm64's, unrun
+
+## What was found on the way
+
+**A host built from the library's package could not state a module.** `bridge_module_config_t`
+has a key for the number of the module seam, and that number is in `bridge_abi.h`, which is
+the module seam's header and is in an SDK's package. The program of the tests includes that
+header, and so had never met this. It is as the design has it and not a defect of the seam: the
+number is the module's to state, in its manifest, and a host passes on what it read. What is
+missing is what reads a manifest for a host - `module.md`, *The parser of a manifest* - and
+until it is built a host is told the number by whoever built the module. `host_api.md` says so,
+and the proof is told it by the build, out of the SDK's package.
+
+**The library said what was wrong, the first time it refused that host.** The host had stated
+that its modules spawn nothing, and they spawn one entity each: "it stated that it spawns
+nothing". No document had to be opened.
+
+**The two proof modules are with the other modules of the tests**, and not beside the host
+that loads them: the coding style lets a module keep its state in the variables of its file
+only under `tests/modules`, and no exception was added for a second place.
