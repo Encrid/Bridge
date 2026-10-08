@@ -333,3 +333,9 @@ are run and one target is compiled and linked. That a failed step says how it en
 
 What the first day of workflows cost was about 580 of the month's 3000 minutes, of which the
 hour of the last probe was 120.
+
+**The stage reached `main` on 2026-10-08**, at Enkrid's word, without waiting for the run of
+the commit that removed the arm64 job, which changed no source. The hosting service recognises
+`license` in lower case, and shows the repository as under the GNU Affero General Public
+License, version 3: the names of the files stand. Of the four things not shown at the close,
+two are shown, the platforms and the name; the signing on the service, and the law, are not.
