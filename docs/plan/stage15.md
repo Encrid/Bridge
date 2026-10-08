@@ -287,3 +287,8 @@ The tag `v0.1.0` of the Rust line was made a branch after it: *Where it is still
                                               link
 
 **Linux and macOS** are as stage 13 left them: no workflow has run, and that holds no stage.
+
+## Since
+
+The repository was moved on 2026-10-07 to its author's own account. Where this record names an
+organisation as where it is, that is where it was.
