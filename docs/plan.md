@@ -410,7 +410,7 @@ changed here.
 
 ## 20. The licence
 
-In progress: `stage20.md`.
+Built, with four things not yet shown: `stage20.md`, *The close*.
 
 Bridge has no licence, and every file of ours says that all rights are reserved. The design
 before it had one that was its own: the GNU General Public License, with an exception by which

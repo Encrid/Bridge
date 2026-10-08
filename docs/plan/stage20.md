@@ -1,7 +1,8 @@
 # Stage 20: the licence
 
-In progress. `plan.md`, stage 20, is what it is for and when it is done. This document is the
-order it is done in, what was counted before it began, and each decision as it is taken. What a
+Built, with four things not yet shown: *The close*. `plan.md`, stage 20, is what it is for and
+when it is done. This document is the order it was done in, what was counted before it began,
+and each decision as it was taken. What a
 decision refused is `stage20_refused.md`.
 
 It is 20 and not 16: the numbers 16 to 19 are the four stages that were moved to a host's plan,
@@ -257,3 +258,42 @@ is read here:
 
 Where a qualified reader matters most in this stage: whether that reading of a sandboxed
 module holds.
+
+## The close
+
+Put to Enkrid on 2026-10-07 with what is shown and what is not, and merged at his word.
+
+**The done-when, line by line.**
+
+    the licence is in the tree, and is the     met: `license`, and the case `licence` fails on
+    published text, byte for byte              one word of it changed
+    no file of ours says all rights are        met: none outside this stage's records, and
+    reserved, and `style` fails on one that    both `style` and `licence` fail on a file given
+    does                                       the old line back
+    each thing in the tree that is somebody    met: wasmtime's folder and the file with musl's
+    else's is named with its licence           two functions, in `licence.md`; `licence` fails
+                                               when one is not named, and on a notice that
+                                               names another holder
+    a document says, once, what a host, a      met: `licence.md`. And each of the 18 seam
+    module and a backend may be under, and     files says it where it opens, which `licence`
+    where other terms are had                  holds
+    every case passes                          met on Windows: 481, optimised and debug, after
+                                               the last change to a source file. Not shown on
+                                               Linux or macOS: see below
+
+**What is not shown, and waits.**
+
+    Linux and macOS       no workflow of this repository has ever finished. The merge of this
+                          stage into `dev` is the first run
+    the name `license`    that the hosting service recognises it in lower case is seen only
+                          once it is on the default branch. If it does not, the names of the
+                          files are put again
+    the signing           what `tools/cla.py` decides is six cases. That the service runs it,
+                          asks, records and fails a pull request, needs one from an account
+                          that is not the holder's, and the workflow on the default branch
+    the law               nobody qualified has read `cla.md`, `licence.md`, or the reading that
+                          a module run in a sandbox is one work with what loads it
+
+**Decisions that went against what was recommended**, each in its section: the Affero licence
+over the plain one, words over an identifier, a role over the name the commits are made under,
+and the workflow with nothing checked by hand.
