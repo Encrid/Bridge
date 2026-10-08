@@ -209,8 +209,11 @@ def step(what, outs, deps, commands):
             for o in outs:
                 if o.exists():
                     o.unlink()
-            raise RuntimeError('%s\n  %s\n%s' % (what, ' '.join(str(c) for c in command),
-                                                done.stdout.decode('utf-8', 'replace')))
+            # how it ended is said with what it said: a process the system ended says nothing
+            raise RuntimeError('%s\n  %s\n  ended with %d (0x%08X)\n%s'
+                               % (what, ' '.join(str(c) for c in command), done.returncode,
+                                  done.returncode & 0xFFFFFFFF,
+                                  done.stdout.decode('utf-8', 'replace')))
         if done.stdout.strip():
             sys.stdout.write(done.stdout.decode('utf-8', 'replace'))
 

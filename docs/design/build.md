@@ -52,22 +52,29 @@ nothing more.
     Windows    x86-64    x86_64-windows-gnu     run where the code is written, and by a workflow
     Linux      x86-64    x86_64-linux-gnu       run by a workflow, for what reaches dev
     macOS      arm64     aarch64-macos          run by a workflow, for what reaches dev
-    Linux      arm64     aarch64-linux-gnu      a target: compiled and linked, not yet run
-    macOS      x86-64    x86_64-macos           a target: compiled and linked, not yet run
-    Windows    arm64     aarch64-windows-gnu    a target: compiled and linked, not yet run
+    Linux      arm64     aarch64-linux-gnu      run by a workflow, for what reaches dev
+    macOS      x86-64    x86_64-macos           run by a workflow, for what reaches dev
+    Windows    arm64     aarch64-windows-gnu    a target: compiled and linked, and not run
 
-**A platform is one that is run.** A target is a name in `build.py`, wasmtime's library for it in
-the tree, and a row of a workflow. The last three have all of that and have been compiled and
-linked from the first, with what each imports held to `dependencies.md`; none has executed a case,
-because no workflow has run them. Each becomes a platform, and this table says so, when its
-workflow has passed.
+**A platform is one that is run.** A target is a name in `build.py`, and wasmtime's library for it
+in the tree; it is compiled and linked from the first, with what it imports held to
+`dependencies.md`. It becomes a platform, and this table says so, when a workflow has run its
+cases and they passed. Five have. The first run of any of them by a machine was on 2026-10-08.
+
+**Windows on arm64 is compiled and linked, and its cases are not run.** On the runner there is
+for it, the arm64 build of the compiler at its pin does not hold: with several of it at once, as
+a build starts them, the system ends it for an access violation, some seventy steps of a build,
+and it prints the name of a processor feature with a byte of it changed; one at a time it does
+not finish building in an hour. Neither is of our sources, which that same compiler builds for
+that same target from x86-64 at every close. It is run again when a release of the compiler
+holds there.
 
 **Windows is the `gnu` target, not `msvc`.** The `msvc` target takes its headers and libraries from
 an installed Visual Studio, which is an installation *Dependencies* does not have. Both use the same
 calling convention for C, so a module or a host built by either loads into the other.
 
 **macOS is arm64 first**, the processor those machines have had since 2020 and the one the
-workflow runners will keep. x86-64 is a target beside it.
+workflow runners will keep. x86-64 is run beside it.
 
 **Windows on arm64 is the `gnu` target as well**, linked against the one library wasmtime
 publishes for that processor, which is built by `msvc`: its import library names the functions of

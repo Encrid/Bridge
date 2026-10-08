@@ -315,3 +315,21 @@ C that is not a comment: it is the first time that target was run by anything.
 at least 40 of Windows counted twice, which is about 410 of the 3000 a month the account has.
 Enkrid ruled that `main` is not run: it only ever takes what `dev` passed with. A change to the
 workflows themselves starts nothing either.
+
+**Windows x86-64 passed, in 39 minutes, and what failed on Windows arm64 was read.** A step of
+the build that failed said the command and what the tool had said, and the tool had said
+nothing. The build was made to say how a step ended, and on a branch that ran that one job:
+
+    all at once      the compiler was ended by the system, some seventy steps of a build for
+                     an access violation and two for a stack overrun, and it printed the
+                     name of a processor feature with a byte changed. Twice, with a different
+                     count each time
+    one at a time    no step failed, and the build had not finished after an hour, when the
+                     service stopped it. No case had run
+
+So it is the arm64 build of the compiler at its pin, on that runner, and not our sources.
+Enkrid ruled that the job is not run: `build.md`, *Platforms*, which now says five platforms
+are run and one target is compiled and linked. That a failed step says how it ended is kept.
+
+What the first day of workflows cost was about 580 of the month's 3000 minutes, of which the
+hour of the last probe was 120.

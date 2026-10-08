@@ -150,3 +150,11 @@ author too. The condition that brings it back is none.
 Refused, after one run of it: the platforms run for `main` as for `dev`. It is the same tree
 run twice, at about 410 minutes each. The condition that brings it back is a commit that
 reaches `main` by another way than `dev`.
+
+Refused: the cases run on Windows arm64, with fewer compilers at once than there are processors.
+It is more runs at a price, with no reason to expect a number that neither fails nor is too
+slow. The condition that brings it back is a release of the compiler whose build for that
+processor holds on that runner.
+
+Refused: the job left in and failing. Every run of `dev` would end failed, and say nothing.
+The condition that brings it back is none.

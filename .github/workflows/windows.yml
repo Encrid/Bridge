@@ -25,12 +25,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # x86-64 only. On the arm64 runner the arm64 build of zig 0.16.0 is ended by the
+          # system for an access violation when several run at once, and one at a time does not
+          # finish in an hour: docs/design/build.md, "Platforms". The target is still compiled
+          # and linked, from x86-64.
           - processor: x86_64
             python: x64
             runner: windows-latest
-          - processor: aarch64
-            python: arm64
-            runner: windows-11-arm
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     env:
