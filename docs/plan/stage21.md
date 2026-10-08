@@ -56,3 +56,25 @@ A host that is being written put four questions, and Enkrid ruled each on 2026-1
 package, a backend's package. The step of the build is `python build.py package`, and the
 whole has no name of its own: it is the packages of a target. It is the ordinary word for
 built files set apart for somebody else to take, and `readme.md`, *Words*, gains it.
+
+### What the library's package holds
+
+**The shared library, the static one, `bridge.h`, `license`, and its statement.** Enkrid ruled
+it, as recommended. It is what a host links and what the licence asks to travel with it; the
+statement says which commit it is, and so where its source is. The debug symbols are not in
+it, and no document of the tree is: `licence.md` cites other documents, which outside the tree
+are not there.
+
+### What a backend's package holds, and the SDK's
+
+**Two packages for a backend: its own, and its SDK's.** Enkrid ruled it, as recommended.
+
+    a backend's package    its library, and what has to sit beside it: for the wasm backend,
+                           wasmtime's library and wasmtime's licence. What a host needs to
+                           run modules on that backend
+    an SDK's package       `bridge_abi.h`, `bridge_schema.h` and that backend's `sdk/`. What
+                           somebody needs to write a module for it
+
+Two audiences, and each takes what it uses: a host that only runs other people's modules
+never opens a header of the module seam. With the library's, that is five packages for a
+target. The three backends the tests build for themselves are in none.
