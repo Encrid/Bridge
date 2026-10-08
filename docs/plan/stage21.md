@@ -96,3 +96,28 @@ Bridge counts none.
 
 What it costs: a tag and a release for every merge to `main`, which pile up; and about 190 MB
 uploaded each time, since the wasm backend's package holds wasmtime's library for each target.
+
+### Which targets are published
+
+**Six: the five that are run, and Windows arm64, which says in its statement that it was not.**
+Enkrid ruled it, over a recommendation to publish only what had run. That target is built
+from x86-64, as it is at every close, by the job that runs Windows x86-64. So `package.txt` has
+one line more than was ruled for it: whether the cases passed on that target in the run that
+published it. A host on Windows arm64 has something to take, and is told what it is.
+
+### What a run does when a platform fails
+
+**Each platform publishes its own.** Enkrid ruled it, over a recommendation of one workflow
+whose last job publishes only when all five have passed. The three workflows stay three, one
+for a system, and a job that passes attaches its packages to the release of its commit. A
+failure on one system does not keep a host on another from a package. What it costs: a release
+may lack some targets, and stays so, and the first job to finish is the one that makes it.
+
+### The run under load
+
+**One round, of six copies at once.** Enkrid ruled it, as recommended. The run of 2026-10-08
+was measured step by step: every case once took one to four minutes of a job, and every case
+six at once, ten times over, took six to twenty-five, which is nine tenths of it. One round
+still runs every case under load on every platform, which is what once found a failure that a
+case alone never showed, and by those times a run is about 90 counted minutes where it was
+430. A failure that shows once in ten rounds is seen a tenth as often.
