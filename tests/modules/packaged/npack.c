@@ -44,7 +44,7 @@ BRIDGE_NATIVE(advance)
 BRIDGE_NATIVE(init)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
-    count_t c = { 0 };
+    count_t c = {};
 
     count = BRIDGE_NATIVE_COMPONENT(api, "packed:Count", count_t,
         BRIDGE_DELETE, BRIDGE_TABLE);
@@ -62,7 +62,6 @@ BRIDGE_NATIVE(init)
 */
 BRIDGE_NATIVE(reload)
 {
-    (void)api;
     return (0);
 }
 
@@ -73,6 +72,5 @@ BRIDGE_NATIVE(reload)
 */
 BRIDGE_NATIVE(shutdown)
 {
-    (void)api;
     return (0);
 }

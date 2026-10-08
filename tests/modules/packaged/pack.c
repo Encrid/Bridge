@@ -42,7 +42,7 @@ BRIDGE_EXPORT(advance) int advance(void)
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
-    sum_t s = { 0 };
+    sum_t s = {};
 
     sum = BRIDGE_COMPONENT("packed:Sum", sum_t, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = sum;

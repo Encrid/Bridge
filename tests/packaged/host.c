@@ -21,9 +21,8 @@
 **
 ** The sink: a record, on a line.
 */
-static void say(void *ud, const bridge_record_t *r)
+static void say([[maybe_unused]] void *ud, const bridge_record_t *r)
 {
-    (void)ud;
     printf("%s: %.*s %u\n", r->identity ? r->identity : "bridge",
         (int)r->len, r->text, (unsigned)r->arg[0]);
 }
