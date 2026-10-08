@@ -428,7 +428,7 @@ and a backend may be under, and where other terms are had; and every case passes
 
 ## 21. What a host is handed
 
-In progress: `stage21.md`.
+Built: `stage21.md`.
 
 A host links the built library and does not compile it - `host_api.md`, *A host links a built
 library*. Nothing says what that host is given, or where it finds it: the build writes two

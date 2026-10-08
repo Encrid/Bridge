@@ -1,7 +1,7 @@
 # Stage 21: what a host is handed
 
-In progress. `plan.md`, stage 21, is what it is for and when it is done. This document is the
-order it is done in, what was counted before it began, and each decision as it is taken. What a
+Built: *The close*. `plan.md`, stage 21, is what it is for and when it is done. This document is
+the order it was done in, what was counted before it began, and each decision as it was taken. What a
 decision refused is `stage21_refused.md`.
 
 It is the library's half of a stage of a host's plan, and is built here as *From here, a
@@ -201,7 +201,7 @@ macOS counted ten times, 14 of Windows counted twice.
 
 ## The close
 
-Put to Enkrid on 2026-10-08, and his to rule.
+Put to Enkrid on 2026-10-08, who ruled it done.
 
     one command writes, for a target, the library's       met: `python build.py package`,
     package and, for each backend, its own and its SDK's   on six targets
