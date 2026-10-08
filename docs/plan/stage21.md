@@ -49,3 +49,10 @@ A host that is being written put four questions, and Enkrid ruled each on 2026-1
     8  close            put to Enkrid by the done-when
 
 ## The decisions
+
+### What it is called
+
+**A package.** Enkrid ruled it, as recommended. What a host takes is a package: the library's
+package, a backend's package. The step of the build is `python build.py package`, and the
+whole has no name of its own: it is the packages of a target. It is the ordinary word for
+built files set apart for somebody else to take, and `readme.md`, *Words*, gains it.
