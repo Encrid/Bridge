@@ -91,3 +91,14 @@ are a month of them. The condition that brings it back is minutes that are not c
 Refused: no run under load on the service, and only where the code is written. It would be
 true of one platform only, and what it once found was a matter of timing. The condition that
 brings it back is none.
+
+## What holds it
+
+Of `stage21.md`, *What holds it*.
+
+Refused: a case on what a package holds, and nothing built from one. Whether what a host is
+handed is enough would never be shown. The condition that brings it back is none.
+
+Refused: the program of the tests changed until all of it is built from packages. Its cases
+need modules and backends that are the tests' own, which would have to be packaged against
+what was ruled. The condition that brings it back is none.

@@ -121,3 +121,21 @@ six at once, ten times over, took six to twenty-five, which is nine tenths of it
 still runs every case under load on every platform, which is what once found a failure that a
 case alone never showed, and by those times a run is about 90 counted minutes where it was
 430. A failure that shows once in ten rounds is seen a tenth as often.
+
+### What holds it
+
+**A case on what each package holds, and a small proof built from the packages alone.** Enkrid
+ruled it, as recommended. The done-when had said the program of the tests would be built from
+the packages. It cannot be: that program includes `bridge_abi.h`, which is the module seam's
+and is in an SDK's package, and its cases load the modules and the three backends that exist
+for the tests, which are in no package. Nothing here had ever been built as a host outside the
+tree is.
+
+So the proof is a program of its own, small: it includes only what the library's package
+holds and links that library, shared and then static; it loads, through each backend's
+package, one module that was compiled against that backend's SDK package and nothing else;
+and it creates a deck, runs a phase and destroys it. The build points it at the folders of the
+packages and nowhere else.
+
+The done-when is reworded: a host, and a module for each backend, are built from the packages
+alone and run.
