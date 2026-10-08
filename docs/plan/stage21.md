@@ -78,3 +78,21 @@ are not there.
 Two audiences, and each takes what it uses: a host that only runs other people's modules
 never opens a header of the module seam. With the library's, that is five packages for a
 target. The three backends the tests build for themselves are in none.
+
+### The statement a package carries
+
+**A text file, `package.txt`: the package's name, the commit and the target, then for each
+file its SHA-256 and its name.** Enkrid ruled it, as recommended. It is read by eye and by a
+few lines of any language, so a host's build checks what it fetched without a reader for a
+format. It is not called a manifest: that word is a module's - `module.md`, *The manifest*.
+
+### Where the packages are published
+
+**A release for each published commit of `main`, named for the commit and marked as not a
+release proper.** Enkrid ruled it, as recommended. Its tag is `main-` and the first twelve
+characters of the commit; it holds one archive for each package of each target. It stays, it
+is fetched by a plain address made from the commit, and its name claims no version, of which
+Bridge counts none.
+
+What it costs: a tag and a release for every merge to `main`, which pile up; and about 190 MB
+uploaded each time, since the wasm backend's package holds wasmtime's library for each target.

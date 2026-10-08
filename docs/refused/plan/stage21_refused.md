@@ -37,3 +37,29 @@ run. The condition that brings it back is none.
 
 Refused: the SDK's package left until a host asks for it. It is asked for by the next stage
 of the host that asked for this one. The condition that brings it back is none.
+
+## The statement a package carries
+
+Of `stage21.md`, *The statement a package carries*.
+
+Refused: JSON. A host in C would need a reader for it to check three hashes, and the name such
+a file usually has means something else. The condition that brings it back is a fact to state
+that lines cannot hold.
+
+Refused: a file of checksums in the form the common tools check, and the commit only in the
+archive's name. What a package is would depend on what it is called. The condition that brings
+it back is none.
+
+## Where the packages are published
+
+Of `stage21.md`, *Where the packages are published*.
+
+Refused: files attached to the run that built them. They are gone after ninety days, and with
+them the library a host was built against. The condition that brings it back is none.
+
+Refused: one release that always holds the latest `main`. The same address would be a
+different library each week, and none could be fetched by its commit. The condition that
+brings it back is none.
+
+Refused: a branch that holds the built files. The repository would grow by about 190 MB each
+time, for ever. The condition that brings it back is none.
