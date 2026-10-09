@@ -31,8 +31,8 @@ no way to interrupt.
 **Counting is enough for a system, which is why there is no per-invocation deadline.** On the wasm
 backend it counts only wasm instructions, so it would miss a module blocked inside a call it made
 out - except that a module has no such call. Its only imports are Bridge's eight ABI entries
-(`wasm.md`, *Memories*), and none of them waits on anything. A wall-clock bound beside a work limit
-would guard a case the design does not contain.
+(`abi.md`, *The ABI*), and none of them waits on anything. A wall-clock bound beside a work
+limit would guard a case the design does not contain.
 
 **A lifecycle call is the one that needs wall time**, and gets a timeout and no work limit: `init` may
 legitimately do a great deal of work, so an instruction count is the wrong proxy for "took too long

@@ -33,8 +33,7 @@ it is stated where it had been always on.
 ### The row test
 
 **The wasm SDK's accessors can test `row < count` before every load, and a module's author
-states whether they do**, where the module is compiled: `wasm.md`, *A compiled module reaches
-them through accessors*. It is not Bridge's
+states whether they do**, where the module is compiled. It is not Bridge's
 to state: that code is in the module's own artifact, which Bridge only ever sees as bytes.
 And it is not redundant with wasm's bounds check: wasm catches a load outside the *memory*, and
 this catches one past the span's rows and still inside the shared memory, which wasm permits.
@@ -92,6 +91,6 @@ not, so hashing it would double the pass's cost to find the one kind of damage t
 itself.
 
 **What Bridge does not check is a component's own invariants.** It knows no content -
-`wasm.md`, *It holds no content* - so a module that wants its invariants checked writes a
+`abi.md`, *It holds no content* - so a module that wants its invariants checked writes a
 system that checks them. That is not a missing feature; it is the same rule that keeps
 `bridge_abi.h` empty of components.

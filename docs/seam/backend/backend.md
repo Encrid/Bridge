@@ -64,7 +64,7 @@ costs*. A backend is free to ignore them and enforce more than was asked; it is 
 enforce less, which the load check has already settled before this is called.
 
 `module_list_imports` is there for one decision: **which memories to hand `instance_create`.** Not every
-module imports both - `wasm.md`, *Memories* - so Bridge reads the list rather than supplying
+module imports both - `memory.md`, *Where the regions live* - so Bridge reads the list rather than supplying
 memories nobody asked for and letting the link fail.
 
 ## Memory is adopted, not created
@@ -116,7 +116,7 @@ It is the backend rather than the host, even though `split.md`, *The split*, sen
 time the other way. The host has no handle on an engine's internals, and a host that forgot to drive
 a clock would silently disable every deadline in the deployment. A backend that cannot interrupt
 says so through `timeout` in `capabilities.md`, *Capabilities, so the swap is honest*, instead of
-accepting a number it will ignore. How the wasm backend keeps time is `wasmtime.md`, *Deadlines*.
+accepting a number it will ignore. How a backend keeps time is its own, and its documents say.
 
 What is asked for is a **lifecycle call's** timeout; a system is bounded by a work limit alone, for the
 reason in `limits.md`, *What bounds a run*. And `instance_set_work_limit` is called **before every

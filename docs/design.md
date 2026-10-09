@@ -72,9 +72,8 @@ what an ECS already is - `abi.md`, *The ABI*. So there is no call machinery: no 
 `find_func` or `call`, no service registry, no signature fingerprint, no affinity propagating along
 a call graph.
 
-How a module is written differs by backend, and nothing differs in capability: `wasm.md` and
-`native.md`. `declare` carries a fingerprint - `schema.md`, *Fingerprints*, for why a hash is
-enough.
+How a module is written differs by backend, and nothing differs in capability. `declare`
+carries a fingerprint - `schema.md`, *Fingerprints*, for why a hash is enough.
 
 **A deployment says what a module may touch.** Component names are namespaced, so it declares
 freely in its own namespace and needs a grant to reach another's. That makes a game's mod API

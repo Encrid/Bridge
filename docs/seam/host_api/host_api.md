@@ -37,7 +37,7 @@ of what a host does first.
 language is written against numbers and checked by them. `bridge.h` asserts the size of each
 struct and the offset of every member, and leaves no padding to a compiler: a gap is a member
 named `pad`, numbered where a struct has several, written as zero and never read. It is the rule
-`bridge_abi.h` has for what a module reads - `wasm.md`, *The ABI layouts* - and `bridge_backend.h`
+`bridge_abi.h` has for what a module reads - `abi.md`, *The ABI layouts* - and `bridge_backend.h`
 has it too, for a backend that is not in C. A pointer and a `size_t` are eight bytes: no build of
 the library exists for any other. A host in C writes these structs by member name, and never
 sees a `pad`.
@@ -123,7 +123,7 @@ at offsets the other side does not use is not an error anybody is told of; so it
                                           for the rest - `backend.md`, *What a backend is
                                           asked for*
     the module seam     BRIDGE_ABI        a module states it in its manifest, and a load
-                                          refuses another - `wasm.md`, *The ABI layouts*
+                                          refuses another - `abi.md`, *The ABI layouts*
 
 `tests/host`, cases `config.abi-another-refused`, `config.abi-unset-refused` and
 `backend_get_abi-another-refused`. Each number is where it can always be found: first in the

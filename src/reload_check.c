@@ -40,7 +40,7 @@ int reload_refuse(const reloading_t *r, const char *format, ...)
 ** reloaded, or that names another backend than it runs on. hot_reload only
 ** ever forbids.
 **
-** wasm.md, *Exports*
+** lifecycle.md, *The runtime lifecycle*
 */
 int reload_check(reloading_t *r)
 {

@@ -87,13 +87,6 @@ diagram to keep in step with. One concern per document, in reading order:
         engine_callbacks.md  answering an engine from storage
         schema.md            how a module declares its data
 
-    backends/wasm/           the wasm backend, and how a module is written for it
-        wasm.md              a wasm module: memories, accessors, exports
-        wasmtime.md          the engine behind it: the pin, adoption, deadlines
-
-    backends/native/         the native backend, and how a module is written for it
-        native.md            a native module: the table of entries, the invariant
-
 **A document says what the design is, and its record says what it is not.** What was weighed
 and refused, with why and with the condition that would bring it back, is in `refused/`, in a
 file of the same name with `_refused` after it, under the same headings. A document names its
@@ -104,9 +97,10 @@ reads the first, and one who wants to know why not otherwise reads the second.
 
 The seams are host to Bridge, Bridge to a backend, and Bridge to modules. The
 first two have a directory of their own under `seam/`: a separate build target sits on the far side,
-and filing the contract under either side would suggest that one owns it. The module seam is in
-two places because it has two owners. `modules/` is what is true of a module whatever runs it.
-`backends/` is how one is written for the backend that runs it.
+and filing the contract under either side would suggest that one owns it. The module seam has
+two owners, and one of them is not here. `modules/` is what is true of a module whatever runs
+it. How one is written for the backend that runs it is that backend's, and each backend is a
+project of its own, with its documents.
 
 A backend is below the orchestrator rather than being a fourth layer: it has no modules and no
 deployment, it runs code. The one thing it is configured with is its own - a cache directory, a tick
@@ -120,29 +114,24 @@ period: `backend.md`, *The backend owns its clock*.
         bridge_schema.h          module seam: how a type is stated in C, for a module on any
                                  backend
         bridge_abi.h             module seam: what Bridge writes for a module to read,
-                                 the same on every backend - `wasm.md`, *The ABI layouts*
+                                 the same on every backend - `abi.md`, *The ABI layouts*
     src/                     the library. Nothing outside it is compiled against it
-    backends/wasm/           the wasm backend: its source
-        sdk/                     how a wasm module is written: `bridge_wasm.h`, which
-                                 includes the others, and the accessors of `bridge_wasm.wat`
-                                 that are merged into one
-        wasmtime/                the engine it is linked against
-    backends/native/         the native backend: its source
-        sdk/                     how a native module is written: `bridge_native.h`, which
-                                 includes the others
     utils/os/                the operating system's layer: one source, compiled into the
-                             library and into each backend - `build.md`, *The C library*
+                             library and into the tests' backend - `build.md`, *The C library*
         windows/, posix/         the same functions, for each kind of platform
     tests/                   the hosts that drive the cases
-        modules/wasm/            the modules they load, by the backend that runs each
-        modules/native/
+        backend/                 the tests' backend: what runs a module of the tests, and
+                                 is told by a case what it keeps. It is handed to nobody
+        binding/                 what a module of the tests is written with
+        modules/                 the modules the cases load
     tools/                   the scans, and `reference.py`, which measures the storage
                              layouts beside flecs and EnTT
     build.py                 the build - `build.md`, *One script*
 
-A backend is compiled against `include/bridge_backend.h` and its own folder. It shares no code
-with the library, not even the few calls each makes to the operating system: a backend that
-somebody else writes has only the seam, and ours are held to the same.
+A backend is compiled against `include/bridge_backend.h` and what is its own. It shares no code
+with the library: whoever writes one has only the seam, and no backend that a deployment runs
+is in this tree. The two there are, the wasm one and the native one, are each a project of
+its own, and take the seams as a package - `host_api.md`, *What a host is handed*.
 
 **How a module is written is its backend's, and not Bridge's.** A backend is handed bytes,
 memories and functions to offer a module, and asked to run a function - `backend.md`, *What the
@@ -242,7 +231,7 @@ where two things could be meant the qualified form is the only form.
     region            a named part of a memory. `memory.md` has the seven
     arena             a region handed out by advancing an offset: scratch, persistent
     memory layout     the regions of a memory and where each begins
-    ABI layout        the bytes of a struct `bridge_abi.h` states. `wasm.md`
+    ABI layout        the bytes of a struct `bridge_abi.h` states. `abi.md`
     shared memory     the one every module sees
     shared component  one that more than one module declares
     share             a module's own part of the persistent arena, and nothing else

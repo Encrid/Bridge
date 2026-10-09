@@ -12,7 +12,8 @@ say which backend runs it and nothing more. They are not two kinds: the ABI, the
 scheduler are the same for both.
 
 This file is what every module shares. The calls are `abi.md`; who may name a component is
-`grants.md`. `wasm.md` and `native.md` describe only how a module is written for each backend: its SDK.
+`grants.md`. How a module is written for a backend is that backend's SDK, and is said in that
+backend's documents, which are not here.
 
 ## Identity
 
@@ -25,7 +26,7 @@ Bridge is handed it as data, so **a host that cannot supply an identity cannot l
 module**. The convention is a named section in the artifact - a wasm custom section on one backend,
 an object-file section on the other - which a host reads, or has read for it: *The parser of a
 manifest*. A host sourcing it elsewhere is not doing anything wrong. Where the bytes sit and how
-they are read is the only part that differs: `wasm.md` and `native.md`, *Identity*.
+they are read is the only part that differs, and is each backend's to say.
 
 ### The manifest
 
@@ -40,8 +41,8 @@ how long its init takes. Any per-module key of `config.md`, *The keys*, may be s
 Combining those values with a deployment's own is the host's business, and Bridge sees
 one flat struct either way.
 
-It is the shape of a Linux kernel module's `.modinfo`, for the reason `native.md`, *Identity*,
-gives: the values have to be readable before any of the code runs.
+It is the shape of a Linux kernel module's `.modinfo`, for one reason: the values have to be
+readable before any of the code runs.
 
 ### The parser of a manifest
 
@@ -75,9 +76,9 @@ not keeping something, and one is about not assuming an order. A module that bre
 answers rather than a diagnostic, and what finds it afterwards is `validation.md`, *What a bad write
 costs, and what finds it*.
 
-Nothing on this list is a wall. The one refusal that is lives in `wasm.md`, *What a wasm module
-cannot do*, and it is not a shared rule: it is the first guarantee below, stated as a rule. Each
-backend adds exactly one refusal of its own, in its own SDK.
+Nothing on this list is a wall. The one refusal that is, is the wasm backend's, and it is not a
+shared rule: it is the first guarantee below, stated as a rule. Each backend adds exactly one
+refusal of its own, in its own SDK.
 
 ## Three guarantees differ
 
@@ -98,13 +99,13 @@ another cannot.
 
 ## So what decides
 
-The native backend is for what cannot be reached from inside wasm - `native.md` says what that
-covers. The wasm backend is for when the three guarantees above are worth having.
+The native backend is for what cannot be reached from inside wasm, which that backend's
+documents list. The wasm backend is for when the three guarantees above are worth having.
 
 Pure computation can run on either. A physics solver on the wasm backend pays the wasm execution
 penalty and gets bounds checks, a work limit, a trap instead of a crash and a clean reload; on the native
 backend it runs native and gets none of that. **That is a trade, not a rule**, and the deployment
 makes it.
 
-How a module is written is the backend's business and nobody else's: `wasm.md` and `native.md`. The
+How a module is written is the backend's business and nobody else's. The
 scheduler cannot tell which backend a module is on, which is the property worth having.

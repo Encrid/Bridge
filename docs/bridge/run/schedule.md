@@ -203,8 +203,8 @@ written, applied at a barrier.
 
 That is one place, because of three decisions taken elsewhere for their own reasons. **No module
 can call another**, so no value ever arrives as a return - `abi.md`, *The ABI*. **A native
-module's code runs inside a phase** and a foreign-thread callback touches no storage at all -
-`native.md`, *The invariant*. And **two writers of one component are never in flight together**,
+module's code runs inside a phase** and a foreign-thread callback touches no storage at all,
+which that backend checks. And **two writers of one component are never in flight together**,
 so the order the rest happen to run in cannot change the result - the conflict graph exists for
 parallelism and hands this over for nothing.
 

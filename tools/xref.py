@@ -22,6 +22,9 @@ os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs'))
 # keyed by basename: prose cites `data.md`, not `bridge/data.md`, because a
 # reader wants the document's name and not where it sits in the tree.
 heads, paths = {}, {}
+# the documents of the two backends, which left with them - stage22.md, *What a document here
+# says of a backend's*
+LEFT = ('native.md', 'wasm.md', 'wasmtime.md')
 # contributing.md is the method, not the design: it cites closed items on
 # purpose, as the worked examples that make each step concrete, and it carries
 # a literal `doc.md`, *Section* template.
@@ -52,10 +55,17 @@ for f in sorted(paths):
         print('%-14s:%d -> item %s is closed' % (f, line, m.group(1)))
         bad += 1
 
+    # a document that left this tree with what it was of is still cited by the record of a
+    # stage, which says what was true then, and by nothing else
+    record = paths[f].replace('\\', '/').startswith(('plan/', 'refused/plan/', 'plan.md'))
+    left = set()
+
     # cross-document: `other.md`, *Section*   (backticked or not)
     for m in re.finditer(r'`?([A-Za-z0-9_]+\.md)`?[^.\n]{0,30}?\*([^*\n]+)\*', text):
         doc, sec = m.group(1), m.group(2).strip().lower()
-        if doc not in heads:
+        if doc in LEFT and record:
+            left.add(sec)
+        elif doc not in heads:
             print('%-14s -> missing file %s' % (f, doc))
             bad += 1
         elif sec not in heads[doc]:
@@ -66,7 +76,7 @@ for f in sorted(paths):
     # so **bold** lead-ins are not mistaken for references.
     for m in re.finditer(r'(?<![*\w])\*(?!\*)([A-Z][^*\n]{3,40})\*(?!\*)', text):
         sec = m.group(1).strip().lower().rstrip('.,;')
-        if sec in heads[f] or any(sec in heads[d] for d in heads):
+        if sec in heads[f] or sec in left or any(sec in heads[d] for d in heads):
             continue
         print('%-14s -> dangling "%s"' % (f, m.group(1)))
         bad += 1

@@ -26,7 +26,7 @@
 ** that is not an id is. One that is a member of a term is one byte, which
 ** holds every value these have.
 **
-** wasm.md, *The ABI layouts*
+** `abi.md`, *The ABI layouts*
 */
 
 #ifndef BRIDGE_ABI_H
@@ -55,7 +55,7 @@ constexpr uint32_t BRIDGE_ABI = 1;
 ** Everything a module imports comes from one namespace; the two memories go
 ** by name.
 **
-** wasm.md, *Memories*
+** memory.md, *Where the regions live*
 */
 constexpr char BRIDGE_NAMESPACE[] = "bridge";
 constexpr char BRIDGE_SHARED[] = "shared";

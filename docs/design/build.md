@@ -131,8 +131,8 @@ here to do.
 **No variable is a thread's own.** `thread_local` is C23's and is not used: nothing in the
 library or in a backend is found by which thread is running. The wasm backend finds the memory
 wasmtime is asking it to create by a mark on the backend, set under its lock, because that
-callback of wasmtime's carries no context - `wasmtime.md`, *Memory*. The native backend knows
-which module called by the table it passes - `native.md`, *The invariant*.
+callback of wasmtime's carries no context. The native backend knows which module called by the
+table it passes. Each is said in that backend's own documents.
 
 ## Where a function is
 
@@ -176,7 +176,7 @@ are separate binaries.
 
 **What a build needs installed is zig and Python, and Binaryen for the wasm test modules**:
 it assembles the modules written as text, and merges the SDK's accessors into a module and puts
-them inline - `wasm.md`, *Memories*. **What the library
+them inline - `memory.md`, *Where the regions live*. **What the library
 is linked against is the system's C library, and the wasm backend against wasmtime**, which is
 in the tree with where it came from and its hash beside it.
 

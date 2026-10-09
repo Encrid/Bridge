@@ -9,8 +9,8 @@ You do not get storage. You get your query's results, which is how an ECS is use
     add_system(...)   registers a query, a function and a phase together, and gets a slot
 
 At each barrier Bridge writes, into the module's private memory, a span for every table its
-query matches. Nothing else reads that memory; see `wasm.md`, *Memories*. One span for each table
-that has rows, and a table without any does not exist - `storage.md`, *A table*.
+query matches. Nothing else reads that memory; see `memory.md`, *Where the regions live*. One
+span for each table that has rows, and a table without any does not exist - `storage.md`, *A table*.
 
 **Only what changed is written.** Systems are fixed at load, so a table is matched against every
 query once, when it is made; after that a span is rewritten when its table was touched, and a

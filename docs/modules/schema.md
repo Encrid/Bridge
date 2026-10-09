@@ -41,7 +41,7 @@ to is refused with both.
 
 **None of that crosses.** A module is held to three numbers: size, alignment, and a hash of that
 string and its type kind. The field table stays on Bridge's side. No field name is in
-`bridge_abi.h` and none reaches a module: `wasm.md`, *It holds no content*.
+`bridge_abi.h` and none reaches a module: `abi.md`, *It holds no content*.
 
 ## Why a header and not a format
 
@@ -152,7 +152,7 @@ the accessors themselves: a load or a store per width, and the row address, with
 `row < count` test or without it as the module's author states: `validation.md`, *The row test*.
 They are
 wasm text merged into the compiled module, because no C compiler can address the shared memory
-itself: `wasm.md`, *A compiled module reaches them through accessors*.
+itself. That SDK is the wasm backend's, and is described with it.
 
 A generator was planned and turned out to have nothing to compute. An accessor needs a field's
 type, its offset and its struct's size, and the module's own compiler has all three: `_Generic`
@@ -160,7 +160,7 @@ picks the load by the field's type, `offsetof` and `sizeof` supply the rest. So 
 a macro over the struct the schema header already declares, and a second description of that struct
 for a tool to read would be the format *Why a header and not a format* refuses.
 
-The ABI layouts are not here either. Those are `bridge_abi.h`: `wasm.md`, *The ABI
+The ABI layouts are not here either. Those are `bridge_abi.h`: `abi.md`, *The ABI
 layouts*.
 
 ## Not WIT

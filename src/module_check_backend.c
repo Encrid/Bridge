@@ -55,7 +55,7 @@ static int check_limits_kept(const module_check_t *k)
 ** the deployment "may not", each with a key: a deployment allowing what the
 ** author says cannot be done is config against config.
 **
-** wasm.md, *Exports*
+** lifecycle.md, *The runtime lifecycle*
 */
 int module_check_backend(const module_check_t *k)
 {

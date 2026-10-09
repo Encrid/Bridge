@@ -4,7 +4,7 @@ It is not built. What is here is its design.
 
 What was weighed here and refused is `profile_refused.md`, *What was refused: The profile*.
 
-It reports **per system rather than per module** - `wasm.md`, *Exports* - and an observer
+It reports **per system rather than per module** - `abi.md`, *The ABI* - and an observer
 cycle is visible in it, `schedule.md`, *An observer runs at the barrier, one hop per barrier*.
 
     int bridge_profile(bridge *b, bridge_profile_row *out, int max);

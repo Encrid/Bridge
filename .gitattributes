@@ -1,10 +1,2 @@
-backends/wasm/wasmtime/include/** -text
-backends/wasm/wasmtime/windows/* binary
-backends/wasm/wasmtime/linux/* binary
-backends/wasm/wasmtime/macos/* binary
-backends/wasm/wasmtime/linux_aarch64/* binary
-backends/wasm/wasmtime/macos_x86_64/* binary
-backends/wasm/wasmtime/windows_aarch64/* binary
-
 # the licence is its authors' text byte for byte, on every machine
 license text eol=lf

@@ -10,7 +10,7 @@
 ** tests/modules/offsets_idle.c, which has them: the three lifecycle exports
 ** are every module's, and none is left out to mean something.
 **
-** wasm.md, *Exports*
+** lifecycle.md, *The runtime lifecycle*
 */
 
 #ifndef TEST_OFFSETS_IDLE_H

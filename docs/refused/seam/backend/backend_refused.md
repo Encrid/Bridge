@@ -36,8 +36,8 @@ Refused: no handle at all, with `instance_create` taking a pointer and a length.
 fewer, and that is all it is. A backend owns what a memory is to it, which a pointer and a length at
 the seam would decide for every backend; a handle with a counterpart states a lifetime, where "the
 block outlives the instance" would be held by nothing; and the wasm backend has something to keep a
-block: the module that holds it for wasmtime, built once and not for every instance - `wasmtime.md`,
-*Memory*. On the native backend the handle is the two numbers. The condition that brings it back is
+block: the module that holds it for wasmtime, built once and not for every instance. On the
+native backend the handle is the two numbers. The condition that brings it back is
 every backend keeping nothing in it but the two numbers. This paragraph said the handle was "kept
 for the backend" that did not exist yet, when one that did had a use for it nobody had looked for.
 

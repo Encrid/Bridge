@@ -39,11 +39,11 @@ entity id is 64 - and **no ABI entry takes or returns a float.**
 and the native backend wants only the pointers, so handing over arrays lets each do its own thing, and
 passing wasmtime's type would leak the engine into the seam. It also keeps **one copy of the fact**:
 a backend told the signature cannot drift from it, where a backend compiling our ABI's signatures
-itself would re-derive what Bridge already holds - the thing `wasm.md`, *The ABI
+itself would re-derive what Bridge already holds - the thing `abi.md`, *The ABI
 layouts*, refuses for that header.
 
 **What it buys beyond being implementable.** Core wasm checks an import's shape at link time -
-`wasm.md`, *Identity*, for what that catches and what it does not - so a module that declares
+what that catches and what it does not is the wasm backend's to say - so a module that declares
 `declare` wrongly is **refused at instantiation, by name**. Bind to whatever the module declared
 instead and the same module links happily and passes garbage - a load-time refusal traded for
 runtime corruption.
@@ -76,5 +76,5 @@ refuses and says why. The wasm backend reads the export's type and refuses one t
 i32`, at init and not on the first frame. The native backend has a symbol from the
 loader, which carries no type, and checks nothing: it does not answer `untrusted`, of which the
 check is a part - `capabilities.md`, *Capabilities, so the swap is honest*. What it calls is not `()
--> i32` either: it passes its table - `native.md`, *Lifecycle*. "Takes nothing" is what
+-> i32` either: it passes its table. "Takes nothing" is what
 Bridge hands a backend to pass on, not the shape of the function a backend runs.

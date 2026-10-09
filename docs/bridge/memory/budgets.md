@@ -127,7 +127,7 @@ load, the same discipline as every other budget. The shared tier is untouched - 
 and the persistent arena do not care how many modules exist.
 
 **Each module's private memory is its own**, sized from that module's own `cfg` when it loads. It is not
-a share of anybody's block, and it could not be: the isolation in `wasm.md`, *Memories*, is
+a share of anybody's block, and it could not be: the isolation in `memory.md`, *Where the regions live*, is
 wasm's bounds check, which only separates two modules if each has a memory of its own.
 
 So **a reload that wants more just gets it.** Reload builds a fresh instance over surviving storage
