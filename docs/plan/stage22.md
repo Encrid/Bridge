@@ -451,14 +451,17 @@ each holds on its branch `dev` what left this tree at `ffda1a1`, put where that 
 it, with a build of its own that is handed the folder of this tree's two packages and reads
 no other path of it:
 
-    `BB-Native`             the backend, its SDK, 18 cases: 18 pass. The ten cases that
-                            read a layout through the SDK were run here by a program
-                            that reaches inside the library, and are not written there yet
-    `BB-Wasm`               the backend, its SDK, wasmtime, 298 cases: 298 pass. They are
-                            the cases named for its SDK and every case of the host program
-                            that ran on that backend alone, so that backend is shown against
-                            this library by more than what left with it. The program that
-                            called it as the library does is not carried there yet
+    `BB-Native`             the backend, its SDK, 30 cases: 30 pass. Every name of the SDK
+                            that had a case here has one there. The ten that read a layout
+                            through the SDK were run here by a program that reaches inside
+                            the library; there they are a host's, which loads the same
+                            modules and runs their phases. One case is of a program that
+                            calls the backend as the library does
+    `BB-Wasm`               the backend, its SDK, wasmtime, 308 cases: 308 pass. They are
+                            the cases named for its SDK, every case of the host program
+                            that ran on that backend alone, and the ten of the program
+                            that calls it as the library does. So that backend is shown
+                            against this library by more than what left with it
     the three together      a host built from the library's package, the two backends'
                             packages and a module compiled against each SDK's package, and
                             from nothing else of the three trees, loads a native module and
