@@ -1,5 +1,4 @@
-# The Windows build, on each processor there is a target for. zig is the one tool
-# fetched: build.py fetches Binaryen itself on Windows, at its pin - docs/design/dependencies.md.
+# The Windows build, on each processor there is a target for. zig is the one tool fetched.
 # Python is asked for by processor, since build.py builds for the processor Python says it runs
 # on, and one that ran emulated would have it build the other target.
 name: windows

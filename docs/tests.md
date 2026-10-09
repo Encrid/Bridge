@@ -8,7 +8,7 @@ are where each is, so the headers are what this list is held against.
 **Every exposed name has a heading here, and every heading has its cases.** A case is named for
 its heading, a hyphen, and what it shows: `bridge_reload-smaller-share-refused` is under
 `bridge_reload`. `python build.py test -k bridge_reload` runs what there is for one.
-`tools/cover.py` reads the headers of the three seams and of the two SDKs, this document, and
+`tools/cover.py` reads the headers of the three seams, this document, and
 the cases of `build.py`, and fails on an exposed name with no heading, a heading with no case, a
 heading the headers do not expose, a case under no heading, and a case listed that is not run.
 It is itself a case, `cover`, so the build fails with it.
@@ -516,8 +516,9 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
 
 ## The module seam
 
-`include/bridge_abi.h`, `include/bridge_schema.h`, and the binding of each backend: `backends/wasm/sdk` and
-`backends/native/sdk`. The eight entries are named as the ABI names them.
+`include/bridge_abi.h` and `include/bridge_schema.h`. The eight entries are named as the ABI
+names them, and the header states them as one type. How a module is written for a backend is
+that backend's SDK, and its cases are in that backend's project.
 
 ### bridge_term_t
 

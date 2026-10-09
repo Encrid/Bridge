@@ -85,7 +85,7 @@ for f in sorted(paths):
 # a function pointing at nothing. A comment's lines are joined first, as a paragraph's are.
 for full in sorted(glob.glob('../**/*.[ch]', recursive=True)):
     full = full.replace(os.sep, '/')
-    if '/build/' in full or '/wasmtime/' in full:
+    if '/build/' in full:
         continue
     text = re.sub(r'\n[ \t]*(?:\*\*?|//)[ \t]?', ' ', open(full, encoding='utf-8').read())
     for m in re.finditer(r'`?([A-Za-z0-9_]+\.md)`?[^.\n]{0,30}?\*([^*\n]+)\*', text):
@@ -120,7 +120,6 @@ for f in sorted(paths):
             print('%-14s:%d names a stage' % (f, n))
             bad += 1
 for full in sorted(glob.glob('../include/*.h') + glob.glob('../src/*.[ch]') +
-                   glob.glob('../backends/*/*.[ch]') + glob.glob('../backends/*/sdk/*') +
                    glob.glob('../utils/**/*.[ch]', recursive=True)):
     for n, line in enumerate(open(full, encoding='utf-8'), 1):
         if STAGE.search(line):
@@ -186,7 +185,7 @@ for f in sorted(paths):
     full = paths[f].replace(os.sep, '/')
     if is_design(full):
         bad += check_unbuilt(full, f, False)
-for full in sorted(glob.glob('../include/*.h') + glob.glob('../backends/*/sdk/*.h')):
+for full in sorted(glob.glob('../include/*.h')):
     bad += check_unbuilt(full, full[3:].replace(os.sep, '/'), True)
 
 # what is not built opens by saying so
@@ -211,11 +210,10 @@ RETIRED = [
      'what a host creates, which is a deck'),
 ]
 RECORD = ('docs/plan/stage15.md', 'docs/refused/plan/stage15_refused.md')
-NOT_OURS = 'backends/wasm/wasmtime/'
 
 listed = subprocess.run(['git', 'ls-files'], cwd='..', stdout=subprocess.PIPE).stdout.decode()
 for path in listed.split('\n'):
-    if not path or path.startswith(NOT_OURS) or path in RECORD:
+    if not path or path in RECORD:
         continue
     raw = open(os.path.join('..', path), 'rb').read()
     if b'\0' in raw[:4096]:

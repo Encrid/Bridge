@@ -37,7 +37,6 @@ jobs:
     timeout-minutes: 60
     env:
       ZIG_VERSION: 0.16.0
-      BINARYEN_VERSION: 133
       PROCESSOR: ${{ matrix.processor }}
     steps:
       - uses: actions/checkout@v4
@@ -48,9 +47,7 @@ jobs:
           mkdir -p "$HOME/tools"
           cd "$HOME/tools"
           curl -fsSL "https://ziglang.org/download/${ZIG_VERSION}/zig-${PROCESSOR}-linux-${ZIG_VERSION}.tar.xz" | tar -xJ
-          curl -fsSL "https://github.com/WebAssembly/binaryen/releases/download/version_${BINARYEN_VERSION}/binaryen-version_${BINARYEN_VERSION}-${PROCESSOR}-linux.tar.gz" | tar -xz
           echo "$HOME/tools/zig-${PROCESSOR}-linux-${ZIG_VERSION}" >> "$GITHUB_PATH"
-          echo "BINARYEN_ROOT=$HOME/tools/binaryen-version_${BINARYEN_VERSION}" >> "$GITHUB_ENV"
 
       # every case once, and then the packages of this target, which say that it ran
       - name: Build, test and package

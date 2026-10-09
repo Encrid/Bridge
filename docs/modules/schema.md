@@ -145,14 +145,13 @@ component model needed a type system.
 
 ## What a module compiles against
 
-A header and a file of wasm text, and **nothing is generated**. `bridge_wasm.h`, with the
-headers of its folder that it includes, holds the imports, the macros of `bridge_schema.h` above,
-and the span, the header and the log ring read through accessors. `bridge_wasm.wat` holds
-the accessors themselves: a load or a store per width, and the row address, with the
-`row < count` test or without it as the module's author states: `validation.md`, *The row test*.
-They are
-wasm text merged into the compiled module, because no C compiler can address the shared memory
-itself. That SDK is the wasm backend's, and is described with it.
+`bridge_schema.h` and `bridge_abi.h`, with what its backend's SDK adds, and **nothing is
+generated**. The wasm backend's SDK is a header and a file of wasm text: the imports, the macros
+of `bridge_schema.h` above, and the span, the header and the log ring read through accessors,
+which are a load or a store per width and the row address, with the `row < count` test or
+without it as the module's author states: `validation.md`, *The row test*. They are wasm text
+merged into the compiled module, because no C compiler can address the shared memory itself.
+That SDK is the wasm backend's, and is described with it.
 
 A generator was planned and turned out to have nothing to compute. An accessor needs a field's
 type, its offset and its struct's size, and the module's own compiler has all three: `_Generic`

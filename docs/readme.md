@@ -156,9 +156,10 @@ where two things could be meant the qualified form is the only form.
     module            what a backend runs: a wasm binary or a native library. `module.md`
     deployment        one host's choice of backends, modules and config
     seam              where two of them meet: host, backend, module. Each has one header
-    SDK               the files a module is written with. It is its backend's, in `sdk/`
-    package           a folder of built files set apart for somebody else to take: the
-                      library's, a backend's, an SDK's. `host_api.md`
+    SDK               the files a module is written with. It is its backend's, and is in
+                      that backend's project
+    package           a folder of files set apart for somebody else to take: the library's,
+                      and the seams'. `host_api.md`
     the operating     always in full. "system" alone is a module's
     system
 

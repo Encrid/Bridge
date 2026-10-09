@@ -8,8 +8,8 @@ three systems by somebody who installed two tools.
 
 ## One compiler
 
-**zig, at one pinned version, compiles everything on every platform**: the library, the backends,
-the tests, and the test modules, wasm and native. `zig cc` is clang with the headers and
+**zig, at one pinned version, compiles everything on every platform**: the library, the tests,
+their backend and the test modules. `zig cc` is clang with the headers and
 runtimes of every target inside it, so the Linux and macOS builds are compiled where the code is
 written, by the compiler that will compile them there.
 
@@ -56,8 +56,8 @@ nothing more.
     macOS      x86-64    x86_64-macos           run by a workflow, for what reaches main
     Windows    arm64     aarch64-windows-gnu    a target: compiled and linked, and not run
 
-**A platform is one that is run.** A target is a name in `build.py`, and wasmtime's library for it
-in the tree; it is compiled and linked from the first, with what it imports held to
+**A platform is one that is run.** A target is a name in `build.py`; it is compiled and linked
+from the first, with what it imports held to
 `dependencies.md`. It becomes a platform, and this table says so, when a workflow has run its
 cases and they passed. Five have. The first run of any of them by a machine was on 2026-10-08.
 A run is of every case once, and then of every case six at once; and for `main` it publishes
@@ -78,17 +78,15 @@ calling convention for C, so a module or a host built by either loads into the o
 **macOS is arm64 first**, the processor those machines have had since 2020 and the one the
 workflow runners will keep. x86-64 is run beside it.
 
-**Windows on arm64 is the `gnu` target as well**, linked against the one library wasmtime
-publishes for that processor, which is built by `msvc`: its import library names the functions of
+**Windows on arm64 is the `gnu` target as well.** A backend that is linked against a library
+built by `msvc` for that processor is so linked still: an import library names the functions of
 a DLL, which is the same thing whichever compiler wrote it, and zig's linker reads it.
 
 ## The standard
 
-**Each piece at its own.** wasmtime's headers are C11. Everything of Bridge's own is C23:
-the source, the tests, the test modules and every header.
-
-    backends/wasm/wasmtime        C11    read by backends/wasm and nothing else
-    everything else               C23
+**Everything in the tree is C23**: the source, the tests, the test modules and every header.
+Nothing of another standard is read by it since the wasm backend left with the engine it
+wraps, whose headers are C11.
 
 A file in a later standard reads a header in an earlier one, which is the direction that costs
 nothing. **A standard binds only at a boundary someone else compiles**, and ours is stated here:
@@ -158,8 +156,8 @@ Linux a process has one C library, and a module built against another will not l
 macOS the system's is the only supported way to reach the kernel. On Windows the build links
 the C runtime zig carries.
 
-**What our source calls of it is sixteen functions**, counted in the library and the two
-backends: four that allocate, `memcpy`, `memmove`, `memset`, `memcmp`, `strlen`, `strcmp`,
+**What our source calls of it is sixteen functions**, counted in the library: four that
+allocate, `memcpy`, `memmove`, `memset`, `memcmp`, `strlen`, `strcmp`,
 `strncmp`, `strchr`, `snprintf`, `vsnprintf`, `strtoll` and `strtoull`.
 No file, no stream, no `printf`, no floating point, no `qsort`. Each is listed as a dependency:
 `dependencies.md`, *The C library*.
@@ -169,16 +167,13 @@ reached through it and nowhere else, and that is the only code that differs by p
 `os.h` states it once, and a folder for each kind of platform holds the same functions:
 `windows/` and `posix/`. The build takes the folder its target names, so no file of the layer
 asks which platform it is compiled for. It
-depends on nothing of ours, and it is compiled into the library and into each backend, which
-are separate binaries.
+depends on nothing of ours, and it is compiled into the library and into the tests' backend,
+which are separate binaries. A backend that is a project of its own has a copy of it.
 
 ## Dependencies
 
-**What a build needs installed is zig and Python, and Binaryen for the wasm test modules**:
-it assembles the modules written as text, and merges the SDK's accessors into a module and puts
-them inline - `memory.md`, *Where the regions live*. **What the library
-is linked against is the system's C library, and the wasm backend against wasmtime**, which is
-in the tree with where it came from and its hash beside it.
+**What a build needs installed is zig and Python. What the library is linked against is the
+system's C library**, and nothing else is in the tree or fetched by the build.
 
 Third-party code is not refused. A dependency nobody wrote down is: `dependencies.md` lists every
 one with why it is there, and a case holds the list - `dependencies.md`, *Dependencies*.
@@ -188,7 +183,6 @@ one with why it is there, and a case holds the list - `dependencies.md`, *Depend
 All of the above is how Bridge is built. **A module is built with whatever its author has**,
 in any language that can produce a wasm module or a shared library. What binds it is the ABI: the
 ABI layouts of `bridge_abi.h`, the exported names, and the section its manifest sits in - `abi.md`,
-*The ABI*, and `module.md`, *The manifest*. `bridge_wasm.h` and `bridge_native.h` are the two
-backends' SDKs for C of that, not the contract itself, and each is its backend's: it sits in that
-backend's `sdk/`, beside the backend that runs what is written with it. They are C23, and so is
-whatever includes them: *The standard*.
+*The ABI*, and `module.md`, *The manifest*. What a module in C is written with is a backend's
+SDK for C of that, not the contract itself, and it is that backend's: it is in the backend's
+own project, beside what runs what is written with it.

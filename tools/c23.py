@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OURS = ('src/*.c', 'src/*.h', 'backends/*/*.c', 'backends/*/*.h', 'backends/*/sdk/*.h', 'include/*.h',
+OURS = ('src/*.c', 'src/*.h', 'include/*.h',
         'tests/*.c', 'tests/*.h', 'tests/*/*.c', 'tests/*/*.h', 'tests/modules/*/*.c',
         'tests/modules/*/*.h', 'tests/modules/*/*/*.c', 'tests/modules/*/*/*.h', 'utils/*/*.h',
         'utils/*/*/*.c', 'utils/*/*/*.h')

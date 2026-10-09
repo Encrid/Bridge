@@ -2,10 +2,10 @@
 
 What was weighed here and refused is `backend_refused.md`, *What was refused: The backend surface*.
 
-The surface a backend implements. Bridge defines it; a shared library provides it. Two exist: the
-**wasm** backend, which wraps wasmtime, and the **native** backend, which opens a shared library and
-calls it directly, for code the deployment trusts. A module names the one that runs it -
-`host_api.md`, *The data*.
+The surface a backend implements. Bridge defines it; a shared library provides it. Two exist,
+each a project of its own: the **wasm** backend, which wraps wasmtime, and the **native**
+backend, which opens a shared library and calls it directly, for code the deployment trusts. A
+module names the one that runs it - `host_api.md`, *The data*.
 
 Bridge keeps everything that is not the engine's business - `split.md`, *The split* - so a backend
 does not reimplement a scheduler to swap an interpreter.

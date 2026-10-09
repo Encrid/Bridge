@@ -10,8 +10,8 @@ words. What binds is the text of `license`, and where the two differ, that text 
 `license`, at the root, as its authors publish it. Nothing is added to it and nothing is
 excepted from it.
 
-**Everything in the tree that is ours is under it**: the library, the backends, their SDKs, the
-tests and their modules, the tools and these documents. A source file says so in the line its
+**Everything in the tree that is ours is under it**: the library, the tests, their backend and
+their modules, the tools and these documents. A source file says so in the line its
 header has for it - `style.md`, *G1 - File header*.
 
 `tools/licence.py` holds this, and is the case `licence`.
@@ -34,7 +34,7 @@ Bridge's own code. One written without them, from these documents alone, is stil
 loaded by Bridge and to work on Bridge's storage, through the layouts and the entries Bridge
 defines, and does nothing by itself: it is meant here as a part of the work it is loaded into,
 and whoever wants it otherwise asks for other terms. The same is meant of a backend. Each file
-of the three seams and of the two SDKs says so where it opens, since that is where whoever
+of the three seams says so where it opens, since that is where whoever
 writes a module looks.
 
 That a work which links or compiles in another is one work with it is how licences of this
@@ -76,12 +76,7 @@ not. The holder is not asked.
 
 Each keeps its own licence.
 
-    `backends/wasm/wasmtime/`   wasmtime, as its authors published it: its C headers, an import
-                                library and a shared library for each target. The Apache
-                                License, version 2.0, with the LLVM exception; the text is in
-                                that folder. It may be combined with this licence
-    `src/text.c`                two functions after musl's. The MIT licence, whose notice is
-                                below
+    `src/text.c`   two functions after musl's. The MIT licence, whose notice is below
 
 What a build needs installed, and what the built files import, is `dependencies.md`.
 

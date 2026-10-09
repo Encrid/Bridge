@@ -52,8 +52,8 @@ The scratch arena is reset at a barrier, so a value left there would stay for th
 phase, and a module's `scratch` would have to hold every value it attaches in one, beside its
 `changes`, which hold the same bytes: two sizes for one thing. So an SDK's attach copies the value
 above what the arena has in use, without counting it as used, and makes the call. A module's
-scratch then holds one value at a time. Each backend's SDK does it, in `bridge_lend` and
-`bridge_native_lend`, which `BRIDGE_ATTACH` and `BRIDGE_NATIVE_ATTACH` use - and a log line's
+scratch then holds one value at a time. Each backend's SDK does it, where it attaches - and a
+log line's
 text is the one thing put in scratch that stays until the barrier, since it is read there:
 `log.md`, *The log*. `tests/host`, case `attach-many-values-through-little-scratch`, attaches
 eight kilobytes of values through 512 bytes of scratch.
