@@ -33,6 +33,12 @@ constexpr int64_t HOST_MS = 1'000'000;
 constexpr int64_t HOST_TESTS_KEEPS = 1 << 4 | 1 << 6;
 
 /*
+** And what it is told where a deck calls it "wasm": everything a backend
+** may be asked to keep, but its library taken out of the process.
+*/
+constexpr int64_t HOST_TESTS_KEEPS_ALL = 63;
+
+/*
 ** A host under test.
 **
 **     what          the case that was asked for
@@ -189,6 +195,7 @@ void *host_read_module(const char *file, size_t *len);
 ** be none, and every other key said. It spawns nothing unless the case says
 ** so.
 */
+void host_name_module(bridge_artifact_t *a, const char *file);
 void host_state_built(bridge_artifact_t *a, const char *identity,
     const char *name);
 void host_state_native(bridge_artifact_t *a, const char *identity,

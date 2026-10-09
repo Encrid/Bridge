@@ -59,13 +59,25 @@ struct backend_memory {
     uint64_t len;
 };
 
+/*
+** A module.
+**
+**     keep          what a module written by offsets exports, and is called
+**                   with before each call: such a module's functions take
+**                   nothing, and are exported by their own names. nullptr
+**                   for a module whose functions take the table
+**     stray         it exports test_import_stray: it is said to import a
+**                   thing nobody answers, and no instance of it is made
+*/
 struct backend_module {
     void *lib;
+    void (*keep)(const test_api_t *);
+    bool stray;
 };
 
 struct backend_func {
     backend_instance_t *instance;
-    int (*fn)(const test_api_t *);
+    void *fn;
     backend_func_t *next;
 };
 

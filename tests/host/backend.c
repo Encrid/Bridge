@@ -37,7 +37,7 @@ void test_leave_libraries(host_t *h)
         printf("FAIL: the deck was not created and destroyed\n");
         exit(1);
     }
-    if (host_is_library_loaded(BACKEND_PATH))
+    if (host_is_library_loaded(TESTS_ALL_PATH))
         wasm = "still loaded";
     if (host_is_library_loaded(NATIVE_PATH))
         native = "STILL LOADED";

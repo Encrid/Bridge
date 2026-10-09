@@ -89,23 +89,3 @@ void host_state_native(bridge_artifact_t *a, const char *identity,
         .spawns = BRIDGE_NONE, .persistent = BRIDGE_NONE, .changes = 1 << 20,
         .loss_count = BRIDGE_NONE, .config = BRIDGE_NO_CONFIG };
 }
-
-/*
-** host_state_wasm
-**
-** States a wasm module of tests/modules, with the limits that backend can
-** keep.
-*/
-void host_state_wasm(bridge_artifact_t *a, const char *identity,
-    const char *file)
-{
-    host_state_native(a, identity, nullptr);
-    a->bytes = host_read_module(file, &a->len);
-    a->backend = "wasm";
-    a->cfg.trusted = BRIDGE_FALSE;
-    a->cfg.work_limit = 10'000'000;
-    a->cfg.memory_limit = 16 << 20;
-    a->cfg.init_timeout = 2000 * HOST_MS;
-    a->cfg.reload_timeout = 2000 * HOST_MS;
-    a->cfg.shutdown_timeout = 2000 * HOST_MS;
-}

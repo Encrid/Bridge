@@ -103,6 +103,9 @@ BRIDGE = ['say', 'bridge_create', 'bridge_backend', 'bridge_backends', 'bridge_p
 TESTS_BACKEND = ['tests_abi', 'tests_backend', 'tests_module', 'tests_instance', 'tests_func',
                  'tests_load', 'tests_phase', 'tests_moves']
 BUILT = [
+    ('ok', 'ok', []), ('image', 'image', []), ('oob', 'oob', []), ('spin', 'spin', []),
+    ('grow', 'grow', []), ('noinit', 'noinit', []), ('noreload', 'noreload', []),
+    ('stray', 'stray', []),
     ('sleep1', 'sleep', []), ('sleep2', 'sleep', []), ('pinned', 'pinned', []),
     ('setter', 'setter', []), ('reaper', 'reaper', []),
     ('stamp5', 'stamp', ['VALUE=5', 'PHASE="update"']),
@@ -382,9 +385,12 @@ def build(target, debug, out):
                 ('NATIVE_OTHER_PATH', backends / ('bridge_native_other' + lib)),
                 ('NATIVE_REFUSING_PATH', backends / ('bridge_native_refusing' + lib)),
                 ('HOLLOW_PATH', backends / ('bridge_hollow' + lib)),
-                ('TESTS_PATH', backends / ('bridge_tests' + lib)), ('MODULE_DIR', modules)] +
+                ('TESTS_PATH', backends / ('bridge_tests' + lib)),
+                ('TESTS_ALL_PATH', backends / ('bridge_tests_all' + lib)), ('MODULE_DIR', modules),
+                ('BUILT_DIR', out / 'built')] +
                [('%s_PATH' % name.upper(), out / (name + lib)) for name, _, _ in NATIVE] +
                [('%s_PATH' % name.upper(), out / 'built' / (name + lib)) for name, _, _ in BUILT]]
+    defines.append('-DBUILT_SUFFIX="%s"' % lib)
     compiles = []
 
     def compile_(name, source, flags, deps=()):
@@ -456,6 +462,19 @@ def build(target, debug, out):
     binding = '-I%s' % (ROOT / 'tests/binding')
     tests_o = [compile_(name, ROOT / 'tests/backend' / (name + '.c'), ours + [include, utils, binding])
                for name in TESTS_BACKEND] + backend_os_o
+    # a module written by offsets is built with the accessors that face of the binding is, which
+    # are compiled once for each way a row is tested
+    offsets_o = {kind: [compile_('offsets-%s-%s' % (kind, c.stem), c,
+                                 ours + [include, binding, '-fvisibility=hidden',
+                                         '-DBRIDGE_ROWS_' + kind.upper()])
+                        for c in sorted((ROOT / 'tests/binding').glob('offsets_*.c'))]
+                 for kind in ('checked', 'unchecked')}
+    by_offsets_o = {name: [compile_('built-%s-%s' % (name, c.stem), c,
+                                    ours + [include, binding, shared, '-fvisibility=hidden',
+                                            '-DBRIDGE_ROWS_' + kind.upper()] + ['-D' + d for d in flags])
+                           for c in sources(ROOT / 'tests/modules', source, 'offsets_idle',
+                                            '"offsets_idle.h"')] + offsets_o[kind]
+                    for name, source, kind, flags in WASM}
     built_o = {name: [compile_('built-%s-%s' % (name, c.stem), c,
                                ours + [include, binding, shared, '-fvisibility=hidden'] +
                                ['-D' + d for d in flags])
@@ -484,8 +503,13 @@ def build(target, debug, out):
     link('backends/bridge_native_refusing', native_refusing_o, system, shared=True)
     link('backends/bridge_hollow', hollow_o, system, shared=True)
     link('backends/bridge_tests', tests_o, system, shared=True)
+    # and again under another name: a library is in a process once, and a deck of the tests has
+    # the tests' backend twice, told it keeps different things
+    link('backends/bridge_tests_all', tests_o, system, shared=True)
     for name, _, _ in BUILT:
         link('built/' + name, built_o[name], shared=True)
+    for name, _, _, _ in WASM:
+        link('built/' + name, by_offsets_o[name], shared=True)
     for name, _, _ in NATIVE:
         link(name, module_o[name], shared=True)
     link('adopt', adopt_o + [obj / 'backend.o'] + os_o, system)
@@ -790,22 +814,16 @@ CASES = [
      r"test:ok@0.1.0: loaded.*alive", None),
     ('BRIDGE_NO_LIMIT-stated-for-every-limit', ['host', 'BRIDGE_NO_LIMIT-stated-for-every-limit'],
      r"test:ok@0.1.0: loaded.*alive", None),
-    ('bridge_load-memory-with-a-data-segment', ['host', 'bridge_load-memory-with-a-data-segment'],
-     r"test:image@0.1.0: loaded.*alive", None),
     ('bridge_load-init-trapped', ['host', 'bridge_load-init-trapped'],
-     r"module 'test:oob@0.1.0' did not load: its init trapped: out of bounds memory access.*alive", None),
+     r"module 'test:oob@0.1.0' did not load: its init trapped: the module asked for it.*alive", None),
     ('module_config.init_timeout-init-interrupted', ['host', 'module_config.init_timeout-init-interrupted'],
-     r"module 'test:spin@0.1.0' did not load: its init trapped: interrupt.*alive", None),
+     r"module 'test:spin@0.1.0' did not load: its init trapped: the timeout passed.*alive", None),
     ('module_config.memory_limit-growth-refused', ['host', 'module_config.memory_limit-growth-refused'],
      r"module 'test:grow@0.1.0' did not load: its init answered 7.*alive", None),
-    ('module_config.memory_limit-memory-larger-at-start', ['host', 'module_config.memory_limit-memory-larger-at-start'],
-     r"module 'test:big@0.1.0' did not load: cannot instantiate.*alive", None),
-    ('instance_get_func-export-taking-an-argument-refused', ['host', 'instance_get_func-export-taking-an-argument-refused'],
-     r"module 'test:shape@0.1.0' did not load: its export 'init' is not .. -> i32.*alive", None),
-    ('instance_get_func-export-answering-64-bits-refused', ['host', 'instance_get_func-export-answering-64-bits-refused'],
-     r"module 'test:shape64@0.1.0' did not load: its export 'init' is not .. -> i32.*alive", None),
+    ('instance_get_func-no-such-export-refused', ['host', 'instance_get_func-no-such-export-refused'],
+     r"module 'test:noinit@0.1.0' did not load: no exported function 'module_init'.*alive", None),
     ('bridge_load-no-init-export', ['host', 'bridge_load-no-init-export'],
-     r"module 'test:noinit@0.1.0' did not load: no exported function 'init'.*alive", None),
+     r"module 'test:noinit@0.1.0' did not load: no exported function 'module_init'.*alive", None),
     ('module_config.abi-another-refused', ['host', 'module_config.abi-another-refused'],
      r"module 'test:ok@0.1.0' is refused: it wants ABI 2 and this is ABI 1.*alive", None),
     ('artifact.backend-not-configured-refused', ['host', 'artifact.backend-not-configured-refused'],
@@ -861,7 +879,7 @@ CASES = [
     ('bridge_lend-scratch-given-back', ['host', 'bridge_lend-scratch-given-back'],
      r"game:mover@0.1.0: loaded.*moved.*alive", 'not loaded'),
     ('module_config.work_limit-spinning-system-ended', ['host', 'module_config.work_limit-spinning-system-ended'],
-     r"test:spin@0.1.0/forever: system 'forever' failed: trapped: all fuel consumed.*still here.*all fuel consumed.*still here.*alive", None),
+     r"test:spin@0.1.0/forever: system 'forever' failed: trapped: the work limit is used up.*still here.*the work limit is used up.*still here.*alive", None),
     ('module_config.spawns-used-up', ['host', 'module_config.spawns-used-up'],
      r"system 'flood' failed: spawn: its spawns of 3000 between two barriers are used up.*system 'flood' failed: spawn: .budget. entities of 4096 is reached.*alive", None),
     ('module_config.log_ring-full-lines-dropped', ['host', 'module_config.log_ring-full-lines-dropped'],
@@ -1029,7 +1047,7 @@ CASES = [
     ('bridge_unload-not-loaded-refused', ['host', 'bridge_unload-not-loaded-refused'],
      r"no module 'game:nobody@0.1.0' is loaded, so none is unloaded.*alive", None),
     ('module_config.shutdown_timeout-shutdown-interrupted', ['host', 'module_config.shutdown_timeout-shutdown-interrupted'],
-     r"its shutdown trapped: interrupt. its teardown continues.*test:hang@0.1.0: unloaded.*modules: .0..*alive", None),
+     r"its shutdown trapped: the timeout passed. its teardown continues.*test:hang@0.1.0: unloaded.*modules: .0..*alive", None),
     ('budget.modules-reached-refused', ['host', 'budget.modules-reached-refused'],
      r"module 'game:ticker@0.1.0' is refused: .budget. modules of 1 is reached.*game:twostep@0.1.0: unloaded.*game:ticker@0.1.0: loaded.*modules: game:ticker@0.1.0=RUNNING .1..*alive", None),
     ('bridge_reload-reloaded', ['host', 'bridge_reload-reloaded'],
@@ -1067,7 +1085,7 @@ CASES = [
     ('bridge_reload-stopped-module-revived', ['host', 'bridge_reload-stopped-module-revived'],
      r"game:ticker@0.1.0=STOPPED.*game:ticker@0.2.0: reloaded.*tick 1[0-9]3 10.*game:ticker@0.2.0=RUNNING.*alive", None),
     ('bridge_load-no-reload-export', ['host', 'bridge_load-no-reload-export'],
-     r"module 'test:noreload@0.1.0' did not load: no exported function 'reload'.*alive", None),
+     r"module 'test:noreload@0.1.0' did not load: no exported function 'module_reload'.*alive", None),
     ('module_config.reloadable-false-with-hot-reload-refused', ['host', 'module_config.reloadable-false-with-hot-reload-refused'],
      r"module 'game:twostep@0.1.0' is refused: hot_reload is stated, and its author states it is not reloadable.*alive", None),
     ('bridge_reload-not-loaded-refused', ['host', 'bridge_reload-not-loaded-refused'],
@@ -1120,7 +1138,7 @@ CASES = [
     ('artifact.path-none-for-native', ['host', 'artifact.path-none-for-native'],
      r"module 'game:mover@0.1.0' did not load: this backend opens a module's library by its path, and was handed none.*alive", None),
     ('artifact.bytes-none-for-wasm', ['host', 'artifact.bytes-none-for-wasm'],
-     r"module 'view:reader@0.1.0' did not load: this backend compiles a module from its bytes, and was handed none.*alive", None),
+     r"module 'view:reader@0.1.0' did not load: the tests' backend opens a module's library by its path, and was handed neither.*alive", None),
     ('bridge_unload-two-hundred-rounds', ['host', 'bridge_unload-two-hundred-rounds'],
      r"churned 200 times, 0 loads refused, 0 records of the index out of step.*alive", None),
     ('bridge_unload-share-given-back', ['host', 'bridge_unload-share-given-back'],
@@ -1128,7 +1146,7 @@ CASES = [
     ('bridge_unload-share-kept-while-pointed-into', ['host', 'bridge_unload-share-kept-while-pointed-into'],
      r"module 'game:namer@0.1.0' is unloaded and its share of the persistent arena, 64 bytes, stays: 'game:Name' holds a string in it, in this many rows: 1.*game:namer@0.1.0: unloaded.*game:reader@0.1.0/say: kept in the arena.*module 'game:ticker@0.1.0' is refused: its persistent of 64 bytes does not fit in the 0 left of .budget. persistent.*game:reader@0.1.0/say: kept in the arena.*alive", None),
     ('bridge_destroy-shuts-down-what-is-loaded', ['host', 'bridge_destroy-shuts-down-what-is-loaded'],
-     r"tick 101 1.*game:ticker@0.1.0/-: shutdown 1 0.*module 'test:hang@0.1.0': its shutdown trapped: interrupt. its teardown continues.*alive", None),
+     r"tick 101 1.*game:ticker@0.1.0/-: shutdown 1 0.*module 'test:hang@0.1.0': its shutdown trapped: the timeout passed. its teardown continues.*alive", None),
     ('budget.entities-unset-refused', ['host', 'budget.entities-unset-refused'],
      r".budget. entities is unset.*alive", None),
     ('budget.modules-unset-refused', ['host', 'budget.modules-unset-refused'],
@@ -1344,17 +1362,18 @@ CASES = [
     ('BRIDGE_DECLARE_TAG-carried-by-two-of-three', ['host', 'BRIDGE_DECLARE_TAG-carried-by-two-of-three'],
      r"frozen.*alive", None),
     ('bridge_take_scratch-more-than-given-stops-the-module', ['host', 'bridge_take_scratch-more-than-given-stops-the-module'],
-     r"module 'game:mover@0\.1\.0' did not load: its init trapped: wasm `unreachable` instruction executed.*alive", None),
+     r"module 'game:mover@0\.1\.0' did not load: its init trapped: the module asked for it.*alive", None),
     ('bridge_list_modules-fills-no-more-than-asked', ['host', 'bridge_list_modules-fills-no-more-than-asked'],
      r"2 loaded, and of two rows: test:ok@0\.1\.0, untouched\s+alive", None),
     ('BACKEND_MEMORY_LIMIT-lacking-memory-limit-refused', ['host', 'BACKEND_MEMORY_LIMIT-lacking-memory-limit-refused'],
      r"module 'game:mover@0\.1\.0' is refused: it states memory_limit, which backend 'native' cannot keep.*alive", r"cannot open"),
-    ('bridge_load-import-nobody-answers', ['host', 'bridge_load-import-nobody-answers'],
-     r"module 'test:stray@0\.1\.0' did not load: cannot instantiate: unknown import: `elsewhere::nothing` has not been defined.*alive", None),
     ('bridge_value_t-a-value-of-each-kind', ['host', 'bridge_value_t-a-value-of-each-kind'],
      r"vsync width 1 1280.*scale mode 150 2.*show: hello 7 0.*show: some/long/path.cfg 0 0.*flags ratio 3 3.*show: big 2 0.*alive", None),
     ('setting.v-seeds-the-field-its-key-names', ['host', 'setting.v-seeds-the-field-its-key-names'],
      r"vsync width 1 1280.*alive", None),
+    ('backend.settings-none-where-one-is-needed-refused',
+     ['host', 'backend.settings-none-where-one-is-needed-refused'],
+     r"it was not told its 'capabilities'.*bridge_create refused.*alive", None),
     ('backend.settings-handed-to-the-backend', ['host', 'backend.settings-handed-to-the-backend'],
      r"backend 'native' would not start: it knows no setting 'cache'.*bridge_create refused.*alive", None),
     ('config.backends-two-in-one-phase', ['host', 'config.backends-two-in-one-phase'],
@@ -1494,7 +1513,7 @@ CASES = [
     ('backend_import_t-the-two-memories-found', ['host', 'backend_import_t-the-two-memories-found'],
      r"sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive", None),
     ('backend_source_t-no-bytes-refused', ['host', 'backend_source_t-no-bytes-refused'],
-     r"module 'view:reader@0.1.0' did not load: this backend compiles a module from its bytes, and was handed none.*alive", None),
+     r"module 'view:reader@0.1.0' did not load: the tests' backend opens a module's library by its path, and was handed neither.*alive", None),
     ('backend_destroy-the-library-leaves-the-process', ['host', 'backend_destroy-the-library-leaves-the-process'],
      r"the wasm backend's library is still loaded, the native backend's is gone.*alive", None),
     ('backend_get_capabilities-held-against-what-a-module-states', ['host', 'backend_get_capabilities-held-against-what-a-module-states'],
@@ -1508,9 +1527,9 @@ CASES = [
     ('instance_destroy-an-unload-gives-its-share-back', ['host', 'instance_destroy-an-unload-gives-its-share-back'],
      r"game:namer@0.1.0/say: kept in the arena.*game:namer@0.1.0: unloaded.*game:ticker@0.1.0: loaded.*alive", None),
     ('instance_set_work_limit-a-spinning-system-ended', ['host', 'instance_set_work_limit-a-spinning-system-ended'],
-     r"test:spin@0.1.0/forever: system 'forever' failed: trapped: all fuel consumed.*still here.*all fuel consumed.*still here.*alive", None),
+     r"test:spin@0.1.0/forever: system 'forever' failed: trapped: the work limit is used up.*still here.*the work limit is used up.*still here.*alive", None),
     ('instance_set_timeout-a-spinning-init-interrupted', ['host', 'instance_set_timeout-a-spinning-init-interrupted'],
-     r"module 'test:spin@0.1.0' did not load: its init trapped: interrupt.*alive", None),
+     r"module 'test:spin@0.1.0' did not load: its init trapped: the timeout passed.*alive", None),
     ('instance_set_memory_limit-growth-refused', ['host', 'instance_set_memory_limit-growth-refused'],
      r"module 'test:grow@0.1.0' did not load: its init answered 7.*alive", None),
     ('backend.settings-each-kind-read-by-the-backend', ['host', 'backend.settings-each-kind-read-by-the-backend'],
@@ -1524,7 +1543,7 @@ CASES = [
     ('BACKEND_STRING-read-as-it-was-stated', ['host', 'BACKEND_STRING-read-as-it-was-stated'],
      r"it was handed.* where='somewhere'.*alive", None),
     ('BACKEND_IMPORT_OTHER-a-global-nobody-answers', ['host', 'BACKEND_IMPORT_OTHER-a-global-nobody-answers'],
-     r"module 'test:strayglobal@0\.1\.0' did not load: cannot instantiate: unknown import: `elsewhere::number` has not been defined.*alive", None),
+     r"module 'test:stray@0\.1\.0' did not load: nothing answers its import 'elsewhere::number'.*alive", None),
     ('BRIDGE_BOOL-seeds-a-bool', ['host', 'BRIDGE_BOOL-seeds-a-bool'],
      r"vsync width 1 1280.*alive", None),
     ('BRIDGE_FLOAT-seeds-a-float', ['host', 'BRIDGE_FLOAT-seeds-a-float'],
@@ -1600,13 +1619,10 @@ CASES = [
 STATIC = (
     'bridge_load-loaded',
     'BRIDGE_NO_LIMIT-stated-for-every-limit',
-    'bridge_load-memory-with-a-data-segment',
     'bridge_load-init-trapped',
     'module_config.init_timeout-init-interrupted',
     'module_config.memory_limit-growth-refused',
-    'module_config.memory_limit-memory-larger-at-start',
-    'instance_get_func-export-taking-an-argument-refused',
-    'instance_get_func-export-answering-64-bits-refused',
+    'instance_get_func-no-such-export-refused',
     'bridge_load-no-init-export',
     'module_config.abi-another-refused',
     'artifact.backend-not-configured-refused',

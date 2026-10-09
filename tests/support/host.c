@@ -18,6 +18,10 @@ static const bridge_setting_t HOST_KEEPS[1] = {
     { "capabilities", BRIDGE_INT, {}, { .i = HOST_TESTS_KEEPS } }
 };
 
+static const bridge_setting_t HOST_KEEPS_ALL[1] = {
+    { "capabilities", BRIDGE_INT, {}, { .i = HOST_TESTS_KEEPS_ALL } }
+};
+
 /*
 ** host_init
 **
@@ -33,7 +37,8 @@ void host_init(host_t *h, int argc, char **argv)
 
     setvbuf(stdout, nullptr, _IONBF, 0);
     *h = (host_t){ .what = argc > 1 ? argv[1] : "" };
-    h->backends[0] = (bridge_backend_t){ "wasm", BACKEND_PATH };
+    h->backends[0] = (bridge_backend_t){ "wasm", TESTS_ALL_PATH,
+        HOST_KEEPS_ALL, 1 };
     h->backends[1] = (bridge_backend_t){ "native", NATIVE_PATH };
     h->backends[2] = (bridge_backend_t){ "tests", TESTS_PATH, HOST_KEEPS, 1 };
     h->phases[0] = "update";

@@ -69,6 +69,7 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
 ### backend.settings
 
     backend.settings-handed-to-the-backend
+    backend.settings-none-where-one-is-needed-refused
     backend.settings-each-kind-read-by-the-backend
 
 ### budget.entities
@@ -222,7 +223,6 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
 ### module_config.memory_limit
 
     module_config.memory_limit-growth-refused
-    module_config.memory_limit-memory-larger-at-start
     module_config.memory_limit-unset-refused
     module_config.memory_limit-negative-refused
 
@@ -463,7 +463,6 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
 ### bridge_load
 
     bridge_load-loaded
-    bridge_load-memory-with-a-data-segment
     bridge_load-init-trapped
     bridge_load-no-init-export
     bridge_load-failed-init-undone
@@ -471,7 +470,6 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
     bridge_load-lifts-a-stopped-deck
     bridge_load-no-reload-export
     bridge_load-loaded-already-refused
-    bridge_load-import-nobody-answers
 
 ### bridge_unload
 
@@ -1146,8 +1144,7 @@ handed.
 
 ### instance_get_func
 
-    instance_get_func-export-taking-an-argument-refused
-    instance_get_func-export-answering-64-bits-refused
+    instance_get_func-no-such-export-refused
 
 ### call
 
@@ -1244,13 +1241,10 @@ The library linked statically: what a host does first, again.
 
     static-bridge_load-loaded
     static-BRIDGE_NO_LIMIT-stated-for-every-limit
-    static-bridge_load-memory-with-a-data-segment
     static-bridge_load-init-trapped
     static-module_config.init_timeout-init-interrupted
     static-module_config.memory_limit-growth-refused
-    static-module_config.memory_limit-memory-larger-at-start
-    static-instance_get_func-export-taking-an-argument-refused
-    static-instance_get_func-export-answering-64-bits-refused
+    static-instance_get_func-no-such-export-refused
     static-bridge_load-no-init-export
     static-module_config.abi-another-refused
     static-artifact.backend-not-configured-refused

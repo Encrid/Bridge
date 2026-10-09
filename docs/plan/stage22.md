@@ -274,6 +274,49 @@ variables moved into memory an instance is handed, in every module.
 **The tests' backend stands beside the two while the cases are moved.** A deck of the tests
 names three backends until the last case has left the other two.
 
+**A module written for the wasm backend is not written again.** That backend's SDK is a
+few dozen functions over a handful of accessors, which read and write at an offset into the two
+memories. So the tests' binding has a second face: the SDK's headers as they were, over
+accessors of the tests' own that do the same through the table. A module written by offsets
+compiles as it was, but for the header it includes, and what its cases show is what they showed.
+About 3,480 lines were copied and two of them changed, where a loop without end became work
+and waiting that are counted.
+
+**A module written by offsets is told its table before each call**, since its functions take
+nothing. The table is kept once for each thread: a deck may have one library's module twice,
+and two decks the same module, each called on a thread of its own.
+
+**What a host hands as bytes is the path.** A module of the wasm backend is handed as bytes
+and their length, and the tests' backend takes those bytes as the path of the module's
+library, of the length stated and no longer. So the cases that hand bytes still show that
+they arrive.
+
+**In a deck of the tests, "wasm" and "native" are still what two backends are called**, and
+both are now the tests' backend, built twice and told it keeps different things. The names
+are the deployment's, and are changed when the two backends have left: until then a case's
+expected text is not touched for a name.
+
+## Where each case went
+
+Counted against the build's list: 484 when the stage began.
+
+    left with the wasm      `bridge_load-memory-with-a-data-segment`, and the same with the
+    backend, which they     static library; `module_config.memory_limit-memory-larger-at-start`,
+    prove: 9                and static; `instance_get_func-export-taking-an-argument-refused`,
+                            and static; `instance_get_func-export-answering-64-bits-refused`,
+                            and static; `bridge_load-import-nobody-answers`
+    added: 3                `instance_get_func-no-such-export-refused`, and static: what the
+                            library does when a backend finds no such function, which the
+                            two that left had shown by a function of another shape.
+                            `backend.settings-none-where-one-is-needed-refused`: the tests'
+                            backend is not made without being told what it keeps
+    reworded, the same      `BACKEND_IMPORT_OTHER-a-global-nobody-answers`: a module of the
+    case: 1                 tests says it imports what nobody answers, and no instance is made
+
+478 after the modules written for the wasm backend were moved. A case whose expected text was
+the wasm backend's own words - a trap, fuel used up, an interrupt - now expects the tests'
+backend's, and is the same case.
+
 ## How each claim is shown
 
     each case accounted for   a table here: each of the 484 by name, where it is after the

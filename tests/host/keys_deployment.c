@@ -72,8 +72,9 @@ void test_edit_deployment(host_t *h)
 /*
 ** test_edit_backend
 **
-** A backend with no name, with no library, or named as the other is; and
-** one whose library lacks an entry, or adopts no block.
+** A backend with no name, with no library, or named as the other is; one
+** whose library lacks an entry, or adopts no block; and the tests' backend
+** handed none of the settings it is not made without.
 */
 void test_edit_backend(host_t *h)
 {
@@ -87,6 +88,8 @@ void test_edit_backend(host_t *h)
         h->backends[1].library = HOLLOW_PATH;
     if (!strcmp(h->arg, "refusing"))
         h->backends[1].library = NATIVE_REFUSING_PATH;
+    if (!strcmp(h->arg, "untold"))
+        h->backends[1] = (bridge_backend_t){ "native", TESTS_PATH };
     host_open_only(h);
 }
 

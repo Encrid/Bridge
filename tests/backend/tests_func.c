@@ -20,22 +20,20 @@
 /*
 ** define_func
 **
-** Keeps what answers an entry of the ABI.
+** Keeps what answers an entry of the ABI. One it has no place for is
+** kept nowhere: no module of the tests could call it.
 **
 ** signatures.md, *Imports are declared, exports are checked*
 */
 BACKEND_EXPORT int define_func(backend_instance_t *i,
-    const backend_entry_t *entry, backend_err_t *err)
+    const backend_entry_t *entry, [[maybe_unused]] backend_err_t *err)
 {
     uint32_t k = 0;
 
     while (k < TESTS_ENTRIES && strcmp(entry->field, TESTS_ENTRY_NAMES[k]))
         k++;
-    if (k == TESTS_ENTRIES || strcmp(entry->ns, BRIDGE_NAMESPACE)) {
-        snprintf(err->text, sizeof(err->text), "the tests' backend has no "
-            "entry '%.100s'", entry->field);
-        return (-1);
-    }
+    if (k == TESTS_ENTRIES || strcmp(entry->ns, BRIDGE_NAMESPACE))
+        return (0);
     i->fns[k] = entry->fn;
     i->uds[k] = entry->ud;
     return (0);
@@ -45,7 +43,8 @@ BACKEND_EXPORT int define_func(backend_instance_t *i,
 ** instance_get_func
 **
 ** Finds a function a module exports, once. Exports are named
-** bridge_<name>. A symbol carries no type, so there is no shape to see.
+** module_<name>, or by the name alone in a module written by offsets. A
+** symbol carries no type, so there is no shape to see.
 **
 ** signatures.md, *A call takes nothing and answers a status*
 */
@@ -56,7 +55,8 @@ BACKEND_EXPORT backend_func_t *instance_get_func(backend_instance_t *i,
     backend_func_t *f;
     void *fn;
 
-    snprintf(symbol, sizeof(symbol), "bridge_%.150s", name);
+    snprintf(symbol, sizeof(symbol), "%s%.150s", i->m->keep ? "" : "module_",
+        name);
     fn = os_lib_get_symbol(i->m->lib, symbol);
     if (!fn) {
         snprintf(err->text, sizeof(err->text), "no exported function '%s'",
@@ -65,10 +65,26 @@ BACKEND_EXPORT backend_func_t *instance_get_func(backend_instance_t *i,
     }
     f = calloc(1, sizeof(*f));
     f->instance = i;
-    f->fn = (int (*)(const test_api_t *))fn;
+    f->fn = fn;
     f->next = i->funcs;
     i->funcs = f;
     return (f);
+}
+
+/*
+** run
+**
+** Makes the call: with the table, or after the module was told which table
+** it is, as the module is written.
+*/
+static int32_t run(const backend_func_t *f)
+{
+    backend_instance_t *i = f->instance;
+
+    if (!i->m->keep)
+        return (((int (*)(const test_api_t *))f->fn)(&i->api));
+    i->m->keep(&i->api);
+    return (((int (*)(void))f->fn)());
 }
 
 /*
@@ -78,6 +94,8 @@ BACKEND_EXPORT backend_func_t *instance_get_func(backend_instance_t *i,
 ** made from inside a call returns to it. A move of the tests that ends the
 ** call comes back here, and the call answers that it did not return, and
 ** why. The timeout was for this call only.
+**
+** limits.md, *What bounds a run*
 */
 BACKEND_EXPORT int call(backend_func_t *f, int32_t *status, backend_err_t *err)
 {
@@ -94,7 +112,7 @@ BACKEND_EXPORT int call(backend_func_t *f, int32_t *status, backend_err_t *err)
         ended = 1;
         snprintf(err->text, sizeof(err->text), "trapped: %s", i->why);
     } else
-        *status = f->fn(&i->api);
+        *status = run(f);
     i->timeout = 0;
     i->calling = before;
     i->out = outer;

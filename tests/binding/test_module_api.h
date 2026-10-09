@@ -30,14 +30,14 @@
 /*
 ** What a module of the tests exports for the tests' backend to call: a
 ** function of this name, handed the table as `api`. A system called "move"
-** is the export bridge_move, which a module that calls one of its own
+** is the export module_move, which a module that calls one of its own
 ** writes as TEST_OWN(move).
 **
 ** abi.md, *The ABI*
 */
-    #define TEST_OWN(name) bridge_##name
+    #define TEST_OWN(name) module_##name
     #define TEST(name) \
-        TEST_EXPORT int bridge_##name( \
+        TEST_EXPORT int module_##name( \
             [[maybe_unused]] const test_api_t *api)
 
 /*

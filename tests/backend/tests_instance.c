@@ -12,6 +12,7 @@
 ** limits.md, *What bounds a run*
 */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -21,15 +22,20 @@
 ** instance_create
 **
 ** Makes an instance of a module, with the table it is handed and the two
-** memories.
+** memories. None is made of a module that imports what nobody answers.
 */
 BACKEND_EXPORT backend_instance_t *instance_create(backend_module_t *m,
     const backend_memory_import_t *memories, uint32_t count,
-    [[maybe_unused]] backend_err_t *err)
+    backend_err_t *err)
 {
-    backend_instance_t *i = calloc(1, sizeof(*i));
+    backend_instance_t *i = m->stray ? nullptr : calloc(1, sizeof(*i));
     uint32_t k = 0;
 
+    if (!i) {
+        snprintf(err->text, sizeof(err->text), "nothing answers its import "
+            "'elsewhere::number'");
+        return (nullptr);
+    }
     i->m = m;
     tests_fill_api(&i->api);
     while (k < count) {

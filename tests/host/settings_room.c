@@ -27,7 +27,7 @@ static void load_built(host_t *h, const char *file, const char *config,
     if (host_open(h))
         return;
     test_state_configured(h, &a, "game:settings@0.1.0");
-    a.bytes = host_read_module(file, &a.len);
+    host_name_module(&a, file);
     a.cfg.config = config;
     a.cfg.persistent = persistent;
     host_load(h, &a);

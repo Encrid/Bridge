@@ -23,9 +23,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCES = ('src/*.c', 'backends/wasm/*.c', 'backends/native/*.c')
+SOURCES = ('src/*.c', 'tests/backend/*.c')
 WRITERS = ('abi_refuse', 'module_refuse', 'reload_refuse', 'say_error', 'say_about', 'module_fail',
-           'config_refuse', 'schema_refuse', 'wasm_fail', 'snprintf')
+           'config_refuse', 'schema_refuse', 'snprintf')
 SPEC = r'%[-+ #0]*(?:\*|\d+)?(?:\.(?:\*|\d+))?(?:hh|h|ll|l|z|j|t)?[diouxXcsfgeEp]'
 LITERAL = r'"((?:[^"\\\n]|\\.)*)"'
 WORDS = 6
