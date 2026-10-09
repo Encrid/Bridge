@@ -187,6 +187,8 @@ void test_state_wasm(bridge_artifact_t *a, const char *identity,
 ** Load a module as it is stated, a native one minting `spawns` ids.
 */
 void test_load_wasm(host_t *h, const char *identity, const char *file);
+void test_load_built(host_t *h, const char *identity, const char *name,
+    int64_t spawns);
 void test_load_native(host_t *h, const char *identity, const char *path,
     int64_t spawns);
 

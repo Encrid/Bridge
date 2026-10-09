@@ -1,0 +1,65 @@
+/*
+** Copyright (C) 2026 Bridge Owner
+**
+** This file is part of Bridge.
+**
+** Under the GNU Affero General Public License, version 3 only: see license.
+**
+** tests/binding/test_module_log.h -- a line written to the log by a
+** module of the tests.
+**
+** log.md, *The log*
+*/
+
+#ifndef TEST_MODULE_LOG_H
+    #define TEST_MODULE_LOG_H
+
+    #include "test_module_api.h"
+
+/*
+** What a line of the log holds: its text, how long that is, and two
+** numbers.
+**
+** log.md, *The log*
+*/
+typedef struct {
+    const char *text;
+    uint32_t len;
+    uint32_t a0;
+    uint32_t a1;
+} bridge_line_t;
+
+/*
+** test_log
+**
+** Writes a line into the module's ring, if its level is one the module
+** logs. A ring that is full drops the line, and it is counted by the head
+** having moved.
+**
+** log.md, *The log*
+*/
+static inline void test_log(const test_api_t *api, uint32_t level,
+    const bridge_line_t *line)
+{
+    bridge_header_t *h = test_get_header(api);
+    bridge_log_record_t *r = (bridge_log_record_t *)(api->private_base
+        + h->ring);
+    uint32_t head = h->ring_head;
+
+    if (level > h->log_level)
+        return;
+    h->ring_head = head + 1u;
+    if (head - h->ring_tail >= h->ring_len)
+        return;
+    r += head % h->ring_len;
+    r->when = h->when;
+    r->pad = 0;
+    r->level = (uint8_t)level;
+    r->system = (uint16_t)h->system;
+    r->text = test_put(api, line->text, line->len);
+    r->len = line->len;
+    r->arg[0] = line->a0;
+    r->arg[1] = line->a1;
+}
+
+#endif

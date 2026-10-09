@@ -14,6 +14,10 @@
 
 #include "host.h"
 
+static const bridge_setting_t HOST_KEEPS[1] = {
+    { "capabilities", BRIDGE_INT, {}, { .i = HOST_TESTS_KEEPS } }
+};
+
 /*
 ** host_init
 **
@@ -31,11 +35,12 @@ void host_init(host_t *h, int argc, char **argv)
     *h = (host_t){ .what = argc > 1 ? argv[1] : "" };
     h->backends[0] = (bridge_backend_t){ "wasm", BACKEND_PATH };
     h->backends[1] = (bridge_backend_t){ "native", NATIVE_PATH };
+    h->backends[2] = (bridge_backend_t){ "tests", TESTS_PATH, HOST_KEEPS, 1 };
     h->phases[0] = "update";
     h->phases[1] = "present";
     h->cfg = (bridge_config_t){ .abi = BRIDGE_HOST_ABI, .threads = 1 };
     h->cfg.backends = h->backends;
-    h->cfg.backend_count = 2;
+    h->cfg.backend_count = 3;
     h->cfg.phases = h->phases;
     h->cfg.phase_count = 2;
     h->cfg.budget = budget;

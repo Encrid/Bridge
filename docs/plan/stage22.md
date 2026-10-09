@@ -249,6 +249,18 @@ was ever in this tree.
 None stands. Twelve were listed when the stage was planned: eight were put and ruled, and four
 followed from those and from a rule that stands, each said as such under its heading.
 
+## What was found on the way
+
+**A module that is compiled in has its variables once in a process.** Two instances of one such
+module share them, where the wasm backend gives each instance its own. So a case that needs one
+module twice, in two decks say, has it compiled in under two names, as a native module was
+built under several. What such a case shows is then that the library keeps two decks apart;
+that two instances of one wasm module are apart is that backend's to show. It was not put: the
+other way is every module's variables moved into memory an instance is handed, in every module.
+
+**The tests' backend stands beside the two while the cases are moved.** A deck of the tests
+names three backends until the last case has left the other two.
+
 ## How each claim is shown
 
     each case accounted for   a table here: each of the 484 by name, where it is after the

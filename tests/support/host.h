@@ -24,12 +24,21 @@
 constexpr int64_t HOST_MS = 1'000'000;
 
 /*
+** What the tests' backend is told it can keep, where a case says nothing
+** else: a reload, and its library taken out of the process. They are two
+** flags of bridge_backend.h, which a host does not compile.
+**
+** capabilities.md, *Capabilities, so the swap is honest*
+*/
+constexpr int64_t HOST_TESTS_KEEPS = 1 << 4 | 1 << 6;
+
+/*
 ** A host under test.
 **
 **     what          the case that was asked for
 **     arg           what the case's row hands it, or "" if it takes nothing
 **     kept          what the program's fixtures keep beside the host
-**     backends      the two backends there are, of which cfg names some
+**     backends      the three backends there are, of which cfg names some
 **     phases        "update" and "present", of which cfg names some
 **     cfg           what the deck is created from: a case changes it
 **                   before it opens the host
@@ -40,7 +49,7 @@ typedef struct host {
     const char *what;
     const char *arg;
     void *kept;
-    bridge_backend_t backends[2];
+    bridge_backend_t backends[3];
     const char *phases[2];
     bridge_config_t cfg;
     bridge_sink_fn_t sink;
@@ -180,6 +189,8 @@ void *host_read_module(const char *file, size_t *len);
 ** be none, and every other key said. It spawns nothing unless the case says
 ** so.
 */
+void host_state_built(bridge_artifact_t *a, const char *identity,
+    const char *name);
 void host_state_native(bridge_artifact_t *a, const char *identity,
     const char *path);
 

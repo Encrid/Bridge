@@ -98,6 +98,12 @@ BRIDGE = ['say', 'bridge_create', 'bridge_backend', 'bridge_backends', 'bridge_p
           'abi_relay_fields', 'abi_relay', 'abi_moved', 'abi_replace', 'abi_layout', 'abi_make',
           'abi_declare', 'abi_subscriber', 'abi_subscriber_room', 'abi_term', 'abi_subscribe',
           'abi_system'] + MODULE + ['pool', 'pool_job', 'pool_run', 'backend'] + SCHEMA + CONFIG + SCHEDULE + BLOCK + STORAGE
+# the tests' backend, and the modules compiled into it: the name a deployment states, its source
+# under tests/modules, what it is compiled with - stage22.md, *What a test module is written with*
+TESTS_BACKEND = ['tests_abi', 'tests_backend', 'tests_module', 'tests_instance', 'tests_func',
+                 'tests_load', 'tests_phase', 'tests_moves']
+BUILT = [('sleep1', 'sleep', []), ('sleep2', 'sleep', [])]
+
 # a native module is a shared library: the name, its source, what it is compiled with. The same
 # library twice is one module to the loader, so one source is built under several names.
 NATIVE = [
@@ -361,7 +367,8 @@ def build(target, debug, out):
                 ('NATIVE_PATH', backends / ('bridge_native' + lib)),
                 ('NATIVE_OTHER_PATH', backends / ('bridge_native_other' + lib)),
                 ('NATIVE_REFUSING_PATH', backends / ('bridge_native_refusing' + lib)),
-                ('HOLLOW_PATH', backends / ('bridge_hollow' + lib)), ('MODULE_DIR', modules)] +
+                ('HOLLOW_PATH', backends / ('bridge_hollow' + lib)),
+                ('TESTS_PATH', backends / ('bridge_tests' + lib)), ('MODULE_DIR', modules)] +
                [('%s_PATH' % name.upper(), out / (name + lib)) for name, _, _ in NATIVE]]
     compiles = []
 
@@ -430,6 +437,20 @@ def build(target, debug, out):
                                 ['-D' + d for d in flags])
                        for c in sources(ROOT / 'tests/modules/native', source, 'nidle')]
                 for name, source, flags in NATIVE}
+    # the tests' backend: its own sources, each module compiled in under its name, and the list
+    # of what was, which is written here from the functions each module's sources define
+    binding = '-I%s' % (ROOT / 'tests/binding')
+    built_sources = {name: sources(ROOT / 'tests/modules', source, 'idle', '"idle.h"')
+                     for name, source, _ in BUILT}
+    listed = obj / 'tests_modules.c'
+    write_if_changed(listed, list_built(built_sources))
+    tests_o = [compile_(name, ROOT / 'tests/backend' / (name + '.c'), ours + [include, utils, binding])
+               for name in TESTS_BACKEND] + [
+        compile_('tests_modules', listed, ours + [include, utils, binding,
+                                                  '-I%s' % (ROOT / 'tests/backend')])] + [
+        compile_('built-%s-%s' % (name, c.stem), c,
+                 ours + [include, binding, shared, '-DTEST_MODULE=' + name] + ['-D' + d for d in flags])
+        for name, _, flags in BUILT for c in built_sources[name]] + backend_os_o
     together(compiles)
 
     # ---- libraries and programs ----
@@ -452,6 +473,7 @@ def build(target, debug, out):
     link('backends/bridge_native_other', native_other_o, system, shared=True)
     link('backends/bridge_native_refusing', native_refusing_o, system, shared=True)
     link('backends/bridge_hollow', hollow_o, system, shared=True)
+    link('backends/bridge_tests', tests_o, system, shared=True)
     for name, _, _ in NATIVE:
         link(name, module_o[name], shared=True)
     link('adopt', adopt_o + [obj / 'backend.o'] + os_o, system)
@@ -541,14 +563,37 @@ def build(target, debug, out):
             'wasm-dis': disassemble, 'modules': modules, 'exe': exe}
 
 
-def sources(where, name, idle):
+def write_if_changed(path, text):
+    """Writes a file the build makes, unless it already says that."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not path.is_file() or path.read_text(encoding='utf-8') != text:
+        path.write_text(text, encoding='utf-8', newline='\n')
+
+
+def list_built(built_sources):
+    """The modules compiled into the tests' backend, and each function one has for it to call:
+    what a source defines with TEST(name), which is the function test_<module>_<name>."""
+    rows = [(name, fn) for name, found in built_sources.items() for c in found
+            for fn in re.findall(r'^TEST\((\w+)\)$', c.read_text(encoding='utf-8'), re.M)]
+    lines = ['#include "tests_inside.h"', '']
+    lines += ['int test_%s_%s(const test_api_t *api);' % row for row in rows]
+    lines += ['', 'const tests_function_t TESTS_FUNCTIONS[] = {']
+    lines += ['    { "%s", "%s", test_%s_%s },' % (name, fn, name, fn) for name, fn in rows]
+    lines += ['};', 'const uint32_t TESTS_FUNCTION_COUNT = %d;' % len(rows), '',
+              'const char *const TESTS_MODULES[] = {']
+    lines += ['    "%s",' % name for name in built_sources]
+    lines += ['};', 'const uint32_t TESTS_MODULE_COUNT = %d;' % len(built_sources), '']
+    return '\n'.join(lines)
+
+
+def sources(where, name, idle, said='_idle.h"'):
     """A module's sources: the one file of its name, or every C file of the directory of its
     name - docs/style.md, O3, allows five functions a file, and a module may export more. A
     module that includes the idle header of its backend states that its shutdown and its reload
     do nothing, and is built with the source that has them."""
     one = where / (name + '.c')
     found = [one] if one.is_file() else sorted((where / name).glob('*.c'))
-    stated = any('_idle.h"' in c.read_text(encoding='utf-8') for c in found)
+    stated = any(said in c.read_text(encoding='utf-8') for c in found)
     return found + ([where / (idle + '.c')] if stated else [])
 
 
