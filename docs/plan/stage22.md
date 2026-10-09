@@ -432,9 +432,19 @@ Of this tree, on 2026-10-09, at the commit after the backends were removed:
                             backend and a module built from them and from no header of the
                             tree, and run
 
+    the tools               each fails on a change that should fail it, on a clone of the
+                            tree: `cover` on a heading no header exposes and on a case
+                            taken from under its heading; `xref` on a document that is not
+                            there and on one that left, cited outside a record; `style` on
+                            a line too long in the tests' backend and on a variable of the
+                            binding that is not constant; `c23` on an older spelling;
+                            `licence` on a seam's header that does not say what it is
+                            under; `deps` on a tool nothing asks for; `package` on a
+                            package the document does not name; `said` on a message no
+                            case makes appear
+
     not shown               the five other targets run, which is the workflows' for what
-                            reaches `main`; and each tool shown to fail on a change that
-                            should fail it
+                            reaches `main`
 
 Of the two repositories, on the same day. Both were created at Enkrid's word, private, and
 each holds on its branch `dev` what left this tree at `ffda1a1`, put where that project keeps
