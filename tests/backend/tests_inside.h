@@ -50,8 +50,16 @@ static const char *const TESTS_ENTRY_NAMES[TESTS_ENTRIES] = {
     "alloc"
 };
 
+/*
+** The backend: what it was told it keeps, and the shape it was told to ask
+** of a block.
+*/
 struct backend {
     enum backend_capability capabilities;
+    uint64_t reservation;
+    uint64_t guard;
+    uint64_t granule;
+    uint32_t told;
 };
 
 struct backend_memory {

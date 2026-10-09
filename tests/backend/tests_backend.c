@@ -5,8 +5,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/backend/tests_backend.c -- the backend made and freed, what it
-** says of itself, and a block adopted.
+** tests/backend/tests_backend.c -- the backend made and freed, and what it
+** says of itself.
 **
 ** capabilities.md, *Capabilities, so the swap is honest*
 */
@@ -18,11 +18,39 @@
 #include "tests_inside.h"
 
 /*
+** take_setting
+**
+** Keeps one setting, and answers 1 if it is one of the four this backend
+** has: what it keeps, and the three numbers of the shape it asks of a
+** block.
+*/
+static int take_setting(backend_t *b, const backend_setting_t *s)
+{
+    static const char *const keys[4] = { "capabilities", "reservation",
+        "guard", "granule" };
+    uint64_t *into[4] = { nullptr, &b->reservation, &b->guard, &b->granule };
+    uint32_t k = 0;
+
+    while (k < 4 && (!s->key || strcmp(s->key, keys[k])))
+        k++;
+    if (k == 4)
+        return (0);
+    if (!k)
+        b->capabilities = (enum backend_capability)s->v.i;
+    else
+        *into[k] = (uint64_t)s->v.i;
+    b->told |= 1u << k;
+    return (1);
+}
+
+/*
 ** backend_create
 **
-** Makes the backend. It has one setting, `capabilities`, which is what it
-** then says it can keep: a case states the backend it needs. Any other key
-** is one it does not know, and it is not made without that one.
+** Makes the backend. A case states the backend it needs, by four settings:
+** `capabilities`, which is what it then says it can keep, and
+** `reservation`, `guard` and `granule`, which are the shape it then asks of
+** a block. Any other key is one it does not know, and it is not made
+** without all four.
 **
 ** host_api.md, *The data*
 */
@@ -30,18 +58,21 @@ BACKEND_EXPORT backend_t *backend_create(const backend_setting_t *settings,
     uint32_t count, backend_err_t *err)
 {
     constexpr size_t room = sizeof(err->text);
-    const char *key = count && settings[0].key ? settings[0].key : "";
-    backend_t *b;
+    backend_t *b = calloc(1, sizeof(*b));
+    uint32_t k = 0;
 
-    if (!count)
-        snprintf(err->text, room, "it was not told its 'capabilities'");
-    else if (count != 1 || strcmp(key, "capabilities"))
-        snprintf(err->text, room, "it knows no setting '%.100s'", key);
-    if (count != 1 || strcmp(key, "capabilities"))
-        return (nullptr);
-    b = calloc(1, sizeof(*b));
-    b->capabilities = (enum backend_capability)settings[0].v.i;
-    return (b);
+    while (k < count && take_setting(b, settings + k))
+        k++;
+    if (k < count)
+        snprintf(err->text, room, "it knows no setting '%.100s'",
+            settings[k].key ? settings[k].key : "");
+    else if (b->told != 15u)
+        snprintf(err->text, room, "it was not told its 'capabilities', and "
+            "the shape of a block it asks for");
+    if (k == count && b->told == 15u)
+        return (b);
+    free(b);
+    return (nullptr);
 }
 
 /*
@@ -62,33 +93,4 @@ BACKEND_EXPORT void backend_destroy(backend_t *b)
 BACKEND_EXPORT enum backend_capability backend_get_capabilities(backend_t *b)
 {
     return (b->capabilities);
-}
-
-/*
-** memory_get_shape
-**
-** Answers the shape this backend asks of a memory, which is none.
-*/
-BACKEND_EXPORT void memory_get_shape([[maybe_unused]] backend_t *b,
-    uint64_t *reservation, uint64_t *guard, uint64_t *granule)
-{
-    *reservation = 0;
-    *guard = 0;
-    *granule = 0;
-}
-
-/*
-** memory_adopt
-**
-** Adopts a block Bridge reserved, which is almost nothing: the pointer is
-** already addressable.
-*/
-BACKEND_EXPORT backend_memory_t *memory_adopt([[maybe_unused]] backend_t *b,
-    void *ptr, uint64_t len, [[maybe_unused]] backend_err_t *err)
-{
-    backend_memory_t *m = malloc(sizeof(*m));
-
-    m->ptr = ptr;
-    m->len = len;
-    return (m);
 }

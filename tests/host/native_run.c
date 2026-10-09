@@ -51,7 +51,7 @@ void test_run_native(host_t *h)
 
     if (host_open(h))
         return;
-    test_state_native(&a, "game:mover@0.1.0", NMOVER_PATH);
+    test_state_native(&a, "game:mover@0.1.0", TMOVER_PATH);
     host_load(h, &a);
     host_run_frames_unsaid(h->b, 2);
     host_close(h);
@@ -68,7 +68,7 @@ void test_run_mixed(host_t *h)
 
     if (host_open(h))
         return;
-    test_state_native(&a, "game:mover@0.1.0", NMOVER_PATH);
+    test_state_native(&a, "game:mover@0.1.0", TMOVER_PATH);
     host_load(h, &a);
     test_state_reader_limited(&a);
     host_load(h, &a);
@@ -87,7 +87,7 @@ void test_refuse_entry(host_t *h)
 
     if (host_open(h))
         return;
-    test_state_native(&a, "test:flood@0.1.0", NFLOOD_PATH);
+    test_state_native(&a, "test:flood@0.1.0", TFLOOD_PATH);
     host_load(h, &a);
     (void)bridge_run_phase(h->b, "update");
     host_close(h);

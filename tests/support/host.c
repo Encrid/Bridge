@@ -14,12 +14,18 @@
 
 #include "host.h"
 
-static const bridge_setting_t HOST_KEEPS[1] = {
-    { "capabilities", BRIDGE_INT, {}, { .i = HOST_TESTS_KEEPS } }
+static const bridge_setting_t HOST_KEEPS[4] = {
+    { "capabilities", BRIDGE_INT, {}, { .i = HOST_TESTS_KEEPS } },
+    { "reservation", BRIDGE_INT, {}, { .i = 0 } },
+    { "guard", BRIDGE_INT, {}, { .i = 0 } },
+    { "granule", BRIDGE_INT, {}, { .i = 0 } }
 };
 
-static const bridge_setting_t HOST_KEEPS_ALL[1] = {
-    { "capabilities", BRIDGE_INT, {}, { .i = HOST_TESTS_KEEPS_ALL } }
+static const bridge_setting_t HOST_KEEPS_ALL[4] = {
+    { "capabilities", BRIDGE_INT, {}, { .i = HOST_TESTS_KEEPS_ALL } },
+    { "reservation", BRIDGE_INT, {}, { .i = HOST_TESTS_RESERVES } },
+    { "guard", BRIDGE_INT, {}, { .i = HOST_TESTS_GRANULE } },
+    { "granule", BRIDGE_INT, {}, { .i = HOST_TESTS_GRANULE } }
 };
 
 /*
@@ -38,14 +44,13 @@ void host_init(host_t *h, int argc, char **argv)
     setvbuf(stdout, nullptr, _IONBF, 0);
     *h = (host_t){ .what = argc > 1 ? argv[1] : "" };
     h->backends[0] = (bridge_backend_t){ "wasm", TESTS_ALL_PATH,
-        HOST_KEEPS_ALL, 1 };
-    h->backends[1] = (bridge_backend_t){ "native", NATIVE_PATH };
-    h->backends[2] = (bridge_backend_t){ "tests", TESTS_PATH, HOST_KEEPS, 1 };
+        HOST_KEEPS_ALL, 4 };
+    h->backends[1] = (bridge_backend_t){ "native", TESTS_PATH, HOST_KEEPS, 4 };
     h->phases[0] = "update";
     h->phases[1] = "present";
     h->cfg = (bridge_config_t){ .abi = BRIDGE_HOST_ABI, .threads = 1 };
     h->cfg.backends = h->backends;
-    h->cfg.backend_count = 3;
+    h->cfg.backend_count = 2;
     h->cfg.phases = h->phases;
     h->cfg.phase_count = 2;
     h->cfg.budget = budget;

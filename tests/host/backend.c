@@ -39,7 +39,7 @@ void test_leave_libraries(host_t *h)
     }
     if (host_is_library_loaded(TESTS_ALL_PATH))
         wasm = "still loaded";
-    if (host_is_library_loaded(NATIVE_PATH))
+    if (host_is_library_loaded(TESTS_PATH))
         native = "STILL LOADED";
     printf("the wasm backend's library is %s, the native backend's is %s\n",
         wasm, native);

@@ -296,6 +296,18 @@ both are now the tests' backend, built twice and told it keeps different things.
 are the deployment's, and are changed when the two backends have left: until then a case's
 expected text is not touched for a name.
 
+**The tests' backend is told its shape as well as what it keeps.** A case of storage shows
+that the library reserves and rounds a block as the backend that maps it asks, which the wasm
+backend asked and the native one did not. So the tests' backend has four settings and is not
+made without them: `capabilities`, and the `reservation`, the `guard` and the `granule` it then
+asks of a block.
+
+**No case loads either backend any more, but for what proves one.** Both names of a deck of the
+tests are the tests' backend, and the three the tests had - one entry alone, another number,
+one that refuses - are built from it. What still opens a backend of the two is what leaves
+with it: the program that calls the wasm backend as the library does, the two cases that read
+a compiled wasm module, and the host and modules built from the packages.
+
 ## Where each case went
 
 Counted against the build's list: 484 when the stage began.

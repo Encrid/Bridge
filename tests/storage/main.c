@@ -28,13 +28,23 @@ static const char *const PHASES[] = {
 ** and the native one. A case that is not about the first has the second
 ** alone.
 */
-static const bridge_setting_t KEEPS[1] = {
-    { "capabilities", BRIDGE_INT, {}, { .i = 1 << 4 | 1 << 6 } }
+static const bridge_setting_t KEEPS[4] = {
+    { "capabilities", BRIDGE_INT, {}, { .i = 1 << 4 | 1 << 6 } },
+    { "reservation", BRIDGE_INT, {}, { .i = 0 } },
+    { "guard", BRIDGE_INT, {}, { .i = 0 } },
+    { "granule", BRIDGE_INT, {}, { .i = 0 } }
+};
+
+static const bridge_setting_t KEEPS_ALL[4] = {
+    { "capabilities", BRIDGE_INT, {}, { .i = 63 } },
+    { "reservation", BRIDGE_INT, {}, { .i = INT64_C(1) << 32 } },
+    { "guard", BRIDGE_INT, {}, { .i = 65'536 } },
+    { "granule", BRIDGE_INT, {}, { .i = 65'536 } }
 };
 
 static const bridge_backend_t BACKENDS[2] = {
-    { "wasm", BACKEND_PATH },
-    { "tests", TESTS_PATH, KEEPS, 1 }
+    { "wasm", TESTS_ALL_PATH, KEEPS_ALL, 4 },
+    { "tests", TESTS_PATH, KEEPS, 4 }
 };
 
 /*

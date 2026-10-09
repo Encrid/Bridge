@@ -39,12 +39,22 @@ constexpr int64_t HOST_TESTS_KEEPS = 1 << 4 | 1 << 6;
 constexpr int64_t HOST_TESTS_KEEPS_ALL = 63;
 
 /*
+** And the shape of a block it is told to ask for there: four gigabytes of
+** address space from its start, and a length and a guard of whole pages of
+** 64 kilobytes. Where a deck calls it "native" it asks for none.
+**
+** backend.md, *Memory is adopted, not created*
+*/
+constexpr int64_t HOST_TESTS_RESERVES = INT64_C(1) << 32;
+constexpr int64_t HOST_TESTS_GRANULE = 65'536;
+
+/*
 ** A host under test.
 **
 **     what          the case that was asked for
 **     arg           what the case's row hands it, or "" if it takes nothing
 **     kept          what the program's fixtures keep beside the host
-**     backends      the three backends there are, of which cfg names some
+**     backends      the two backends there are, of which cfg names some
 **     phases        "update" and "present", of which cfg names some
 **     cfg           what the deck is created from: a case changes it
 **                   before it opens the host
@@ -55,7 +65,7 @@ typedef struct host {
     const char *what;
     const char *arg;
     void *kept;
-    bridge_backend_t backends[3];
+    bridge_backend_t backends[2];
     const char *phases[2];
     bridge_config_t cfg;
     bridge_sink_fn_t sink;

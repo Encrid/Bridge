@@ -87,7 +87,7 @@ void test_edit_backend(host_t *h)
     if (!strcmp(h->arg, "hollow"))
         h->backends[1].library = HOLLOW_PATH;
     if (!strcmp(h->arg, "refusing"))
-        h->backends[1].library = NATIVE_REFUSING_PATH;
+        h->backends[1] = (bridge_backend_t){ "native", NATIVE_REFUSING_PATH };
     if (!strcmp(h->arg, "untold"))
         h->backends[1] = (bridge_backend_t){ "native", TESTS_PATH };
     host_open_only(h);

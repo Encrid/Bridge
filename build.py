@@ -100,12 +100,13 @@ BRIDGE = ['say', 'bridge_create', 'bridge_backend', 'bridge_backends', 'bridge_p
           'abi_system'] + MODULE + ['pool', 'pool_job', 'pool_run', 'backend'] + SCHEMA + CONFIG + SCHEDULE + BLOCK + STORAGE
 # the tests' backend, and the modules it runs: the name of a module's library, its source under
 # tests/modules, what it is compiled with - stage22.md, *What a test module is written with*
-TESTS_BACKEND = ['tests_abi', 'tests_backend', 'tests_module', 'tests_instance', 'tests_func',
+TESTS_BACKEND = ['tests_abi', 'tests_backend', 'tests_memory', 'tests_module', 'tests_instance', 'tests_func',
                  'tests_load', 'tests_phase', 'tests_moves']
 BUILT = [
     ('ok', 'ok', []), ('image', 'image', []), ('oob', 'oob', []), ('spin', 'spin', []),
     ('grow', 'grow', []), ('noinit', 'noinit', []), ('noreload', 'noreload', []),
-    ('stray', 'stray', []),
+    ('stray', 'stray', []), ('tmover', 'tmover', []), ('tflood', 'tflood', []),
+    ('tforeign', 'tforeign', []),
     ('sleep1', 'sleep', []), ('sleep2', 'sleep', []), ('pinned', 'pinned', []),
     ('setter', 'setter', []), ('reaper', 'reaper', []),
     ('stamp5', 'stamp', ['VALUE=5', 'PHASE="update"']),
@@ -413,14 +414,6 @@ def build(target, debug, out):
     native_o = [compile_(name, ROOT / 'backends/native' / (name + '.c'),
                          ours + [include, utils, sdk['native']])
                 for name in NATIVE_BACKEND] + backend_os_o
-    # the same backend, with another answer to backend_get_abi in the place of its own
-    native_other_o = [o for o in native_o if o.name != 'native_abi.o'] + [
-        compile_('native_other_abi', ROOT / 'tests/support/native_other_abi.c', ours + [include])]
-    # the same backend again, with first entries that adopt no block; and a library that has
-    # the seam's number and no other entry
-    native_refusing_o = [o for o in native_o if o.name != 'native_backend.o'] + [
-        compile_(name, ROOT / 'tests/support' / (name + '.c'), ours + [include])
-        for name in ('native_refusing_backend', 'native_refusing_memory')]
     hollow_o = [compile_('backend_hollow', ROOT / 'tests/support/backend_hollow.c', ours + [include])]
     # a host program is a directory of sources, with what the programs share compiled once -
     # stage12.md, *The test programs*. One that has not been cut yet is one source
@@ -462,6 +455,14 @@ def build(target, debug, out):
     binding = '-I%s' % (ROOT / 'tests/binding')
     tests_o = [compile_(name, ROOT / 'tests/backend' / (name + '.c'), ours + [include, utils, binding])
                for name in TESTS_BACKEND] + backend_os_o
+    # the same backend, with another answer to backend_get_abi in the place of its own
+    native_other_o = [o for o in tests_o if o.name != 'tests_abi.o'] + [
+        compile_('native_other_abi', ROOT / 'tests/support/native_other_abi.c', ours + [include])]
+    # the same backend again, with first entries that adopt no block; and a library that has
+    # the seam's number and no other entry
+    native_refusing_o = [o for o in tests_o if o.name not in ('tests_backend.o', 'tests_memory.o')] + [
+        compile_(name, ROOT / 'tests/support' / (name + '.c'), ours + [include])
+        for name in ('native_refusing_backend', 'native_refusing_memory')]
     # a module written by offsets is built with the accessors that face of the binding is, which
     # are compiled once for each way a row is tested
     offsets_o = {kind: [compile_('offsets-%s-%s' % (kind, c.stem), c,
@@ -1077,7 +1078,7 @@ CASES = [
     ('bridge_load-lifts-a-stopped-deck', ['host', 'bridge_load-lifts-a-stopped-deck'],
      r"the deck has stopped: module 'game:thing@0.1.0' failed and its on_error is fail.*game:other@0.1.0: not loaded.*the deck runs again: module 'game:thing@0.2.0' is back.*game:thing@0.2.0: loaded.*show: x 3 0.*alive", None),
     ('bridge_reload-to-another-backend-refused', ['host', 'bridge_reload-to-another-backend-refused'],
-     r"it runs on backend 'wasm' and a reload does not move it to 'tests'.*tick 104 1.*alive", None),
+     r"it runs on backend 'wasm' and a reload does not move it to 'native'.*tick 104 1.*alive", None),
     ('bridge_reload-dropped-declaration-frees-its-name', ['host', 'bridge_reload-dropped-declaration-frees-its-name'],
      r"game:ticker@0.2.0: reloaded.*tick 122 10.*game:retype@0.1.0: loaded.*alive", None),
     ('module_config.hot_reload-false-refused', ['host', 'module_config.hot_reload-false-refused'],
@@ -1136,7 +1137,7 @@ CASES = [
     ('module_config.config-not-a-singleton-refused', ['host', 'module_config.config-not-a-singleton-refused'],
      r"did not load: its config is 'game:Settings', which is not declared a singleton.*alive", None),
     ('artifact.path-none-for-native', ['host', 'artifact.path-none-for-native'],
-     r"module 'game:mover@0.1.0' did not load: this backend opens a module's library by its path, and was handed none.*alive", None),
+     r"module 'game:mover@0.1.0' did not load: the tests' backend opens a module's library by its path, and was handed neither.*alive", None),
     ('artifact.bytes-none-for-wasm', ['host', 'artifact.bytes-none-for-wasm'],
      r"module 'view:reader@0.1.0' did not load: the tests' backend opens a module's library by its path, and was handed neither.*alive", None),
     ('bridge_unload-two-hundred-rounds', ['host', 'bridge_unload-two-hundred-rounds'],
@@ -1373,7 +1374,7 @@ CASES = [
      r"vsync width 1 1280.*alive", None),
     ('backend.settings-none-where-one-is-needed-refused',
      ['host', 'backend.settings-none-where-one-is-needed-refused'],
-     r"it was not told its 'capabilities'.*bridge_create refused.*alive", None),
+     r"it was not told its 'capabilities', and the shape of a block it asks for.*bridge_create refused.*alive", None),
     ('backend.settings-handed-to-the-backend', ['host', 'backend.settings-handed-to-the-backend'],
      r"backend 'native' would not start: it knows no setting 'cache'.*bridge_create refused.*alive", None),
     ('config.backends-two-in-one-phase', ['host', 'config.backends-two-in-one-phase'],
@@ -1519,7 +1520,7 @@ CASES = [
     ('backend_get_capabilities-held-against-what-a-module-states', ['host', 'backend_get_capabilities-held-against-what-a-module-states'],
      r"module 'game:mover@0.1.0' is refused: it is not trusted, and backend 'native' runs only modules that are.*alive", r"cannot open"),
     ('module_compile-no-path-refused', ['host', 'module_compile-no-path-refused'],
-     r"module 'game:mover@0.1.0' did not load: this backend opens a module's library by its path, and was handed none.*alive", None),
+     r"module 'game:mover@0.1.0' did not load: the tests' backend opens a module's library by its path, and was handed neither.*alive", None),
     ('module_list_imports-the-two-memories-lent', ['host', 'module_list_imports-the-two-memories-lent'],
      r"sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive", None),
     ('module_destroy-a-failed-load-leaves-nothing', ['host', 'module_destroy-a-failed-load-leaves-nothing'],

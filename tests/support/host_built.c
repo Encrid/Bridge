@@ -23,7 +23,6 @@ void host_state_built(bridge_artifact_t *a, const char *identity,
     const char *path)
 {
     host_state_native(a, identity, path);
-    a->backend = "tests";
 }
 
 /*
