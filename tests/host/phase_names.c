@@ -19,7 +19,7 @@ static void load_ticking(host_t *h, const bridge_phase_name_t *tick)
 
     if (host_open(h))
         return;
-    host_state_built(&a, "game:stamp@0.1.0", "stamptick");
+    host_state_built(&a, "game:stamp@0.1.0", STAMPTICK_PATH);
     a.cfg.spawns = 8;
     a.cfg.phases = tick;
     a.cfg.phase_count = tick ? 1 : 0;

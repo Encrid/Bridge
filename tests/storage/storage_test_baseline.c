@@ -23,7 +23,7 @@ constexpr uint32_t BASELINE_ASKED = 1'000'000;
 ** The builds, with one row in 1, in 2 and in 16 switched on by its field.
 */
 static const char *const BASELINE_BUILDS[] = {
-    NWEIGH1_PATH, NWEIGH2_PATH, NWEIGH16_PATH
+    WEIGH1_PATH, WEIGH2_PATH, WEIGH16_PATH
 };
 
 /*

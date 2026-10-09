@@ -13,8 +13,8 @@
 ** native.md, *Lifecycle*
 */
 
-#ifndef TEST_NATIVE_IDLE_H
-    #define TEST_NATIVE_IDLE_H
+#ifndef TEST_IDLE_H
+    #define TEST_IDLE_H
 
     #include "bridge_native.h"
 

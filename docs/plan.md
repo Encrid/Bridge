@@ -452,9 +452,9 @@ Not built: `stage22.md`.
 A backend is a shared library behind a seam, and the two there are were written in this tree,
 with what a module is written with for each. On 2026-10-09 Enkrid ruled that each is a project
 of its own, in its own repository. What stays here is the seam and what holds it. This stage
-gives the library a backend of the tests' own, whose modules are compiled into it and which
-answers what a case asks of it, moves every case onto it that proves the library, puts each
-backend in its repository with its SDK and the cases that prove it, and removes them here.
+gives the library a backend of the tests' own, which answers what a case asks of it, moves
+every case onto it that proves the library, puts each backend in its repository with its SDK
+and the cases that prove it, and removes them here.
 
 *Done when no file of a backend or of an SDK is in the tree, and no tool or document of it names
 one as its own; every case passes on the tests' backend alone; each of the two repositories

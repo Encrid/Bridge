@@ -46,7 +46,7 @@ void *counted_os_reserve(size_t reserve, size_t commit)
 static bool relay_one(storage_test_t *t, size_t k)
 {
     storage_test_allocator_t *allocator = storage_test_get_allocator();
-    bridge_artifact_t a = storage_test_state(NLAYOUT0_PATH, 8, 1 << 20, 4096);
+    bridge_artifact_t a = storage_test_state(LAYOUT0_PATH, 8, 1 << 20, 4096);
 
     allocator->asked = 0;
     allocator->fail_at = k;
@@ -58,7 +58,7 @@ static bool relay_one(storage_test_t *t, size_t k)
     a.cfg.reloadable = BRIDGE_TRUE;
     a.cfg.hot_reload = BRIDGE_TRUE;
     if (!bridge_load(t->b, &a) && !bridge_run_phase(t->b, "spawn")) {
-        a.path = NLAYOUT1_PATH;
+        a.path = LAYOUT1_PATH;
         (void)bridge_reload(t->b, &a);
     }
     (void)bridge_destroy(t->b);

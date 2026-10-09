@@ -79,7 +79,7 @@ static void say_ops(const storage_test_times_t *m)
 static int measure_changes(storage_test_t *t)
 {
     storage_test_times_t m = {};
-    bridge_artifact_t a = storage_test_state(NSTOREBIG_PATH, MEASURE_COUNT,
+    bridge_artifact_t a = storage_test_state(STOREBIG_PATH, MEASURE_COUNT,
         1 << 20, 64 << 20);
     uint32_t round = 0;
 

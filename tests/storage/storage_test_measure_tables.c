@@ -72,7 +72,7 @@ static void measure_sets(storage_test_t *t)
 */
 int storage_test_measure_tables(storage_test_t *t)
 {
-    bridge_artifact_t a = storage_test_state(NSTORETAB_PATH, 10'000, 8 << 20,
+    bridge_artifact_t a = storage_test_state(STORETAB_PATH, 10'000, 8 << 20,
         32 << 20);
     uint64_t now;
 

@@ -14,11 +14,11 @@
 /*
 ** host_state_built
 **
-** States a module that is compiled into the tests' backend, by its name.
+** States a module of the tests' backend, by the path of its library.
 */
 void host_state_built(bridge_artifact_t *a, const char *identity,
-    const char *name)
+    const char *path)
 {
-    host_state_native(a, identity, name);
+    host_state_native(a, identity, path);
     a->backend = "tests";
 }

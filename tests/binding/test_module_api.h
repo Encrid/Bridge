@@ -21,19 +21,23 @@
     #include "bridge_abi.h"
     #include "bridge_schema.h"
 
+    #ifdef _WIN32
+        #define TEST_EXPORT [[gnu::dllexport]]
+    #else
+        #define TEST_EXPORT [[gnu::visibility("default")]]
+    #endif
+
 /*
-** What a module of the tests has for the tests' backend to call: a function
-** of this name, handed the table as `api`. Every module is compiled into
-** that backend, so a function is named for its module too, which the build
-** states as TEST_MODULE: a system called "move" of the module mover is the
-** function test_mover_move. The build lists them for the backend to find.
+** What a module of the tests exports for the tests' backend to call: a
+** function of this name, handed the table as `api`. A system called "move"
+** is the export bridge_move, which a module that calls one of its own
+** writes as TEST_OWN(move).
 **
 ** abi.md, *The ABI*
 */
-    #define TEST_JOIN(module, name) test_##module##_##name
-    #define TEST_NAME(module, name) TEST_JOIN(module, name)
+    #define TEST_OWN(name) bridge_##name
     #define TEST(name) \
-        int TEST_NAME(TEST_MODULE, name)( \
+        TEST_EXPORT int bridge_##name( \
             [[maybe_unused]] const test_api_t *api)
 
 /*

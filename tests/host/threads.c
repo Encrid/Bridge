@@ -62,8 +62,8 @@ static void nap_twice(host_t *h)
 
     if (host_open(h))
         return;
-    test_load_built(h, "test:sleep1@0.1.0", "sleep1", BRIDGE_NONE);
-    test_load_built(h, "test:sleep2@0.1.0", "sleep2", BRIDGE_NONE);
+    test_load_built(h, "test:sleep1@0.1.0", SLEEP1_PATH, BRIDGE_NONE);
+    test_load_built(h, "test:sleep2@0.1.0", SLEEP2_PATH, BRIDGE_NONE);
     ms = time_update(h->b);
     printf("two naps took %.0f ms on %u thread(s)\n", ms,
         test_count_threads(c));

@@ -5,7 +5,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/backend/tests_func.c -- what answers an entry kept, a function of
+** tests/backend/tests_func.c -- what answers an entry kept, an export of
 ** a module found, and a call made, which a move of the tests may end.
 **
 ** signatures.md, *A call takes nothing and answers a status*
@@ -44,28 +44,28 @@ BACKEND_EXPORT int define_func(backend_instance_t *i,
 /*
 ** instance_get_func
 **
-** Finds a function of a module, once, among those the build compiled in
-** under the module's name.
+** Finds a function a module exports, once. Exports are named
+** bridge_<name>. A symbol carries no type, so there is no shape to see.
 **
 ** signatures.md, *A call takes nothing and answers a status*
 */
 BACKEND_EXPORT backend_func_t *instance_get_func(backend_instance_t *i,
     const char *name, backend_err_t *err)
 {
-    const tests_function_t *t = TESTS_FUNCTIONS;
-    const tests_function_t *end = t + TESTS_FUNCTION_COUNT;
+    char symbol[160];
     backend_func_t *f;
+    void *fn;
 
-    while (t < end && (strcmp(t->module, i->m->name) || strcmp(t->name, name)))
-        t++;
-    if (t == end) {
-        snprintf(err->text, sizeof(err->text), "no function '%.100s' in the "
-            "module '%.100s'", name, i->m->name);
+    snprintf(symbol, sizeof(symbol), "bridge_%.150s", name);
+    fn = os_lib_get_symbol(i->m->lib, symbol);
+    if (!fn) {
+        snprintf(err->text, sizeof(err->text), "no exported function '%s'",
+            symbol);
         return (nullptr);
     }
     f = calloc(1, sizeof(*f));
     f->instance = i;
-    f->fn = t->fn;
+    f->fn = (int (*)(const test_api_t *))fn;
     f->next = i->funcs;
     i->funcs = f;
     return (f);

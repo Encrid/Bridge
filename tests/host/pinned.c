@@ -31,7 +31,7 @@ static void load_pinned(host_t *h)
 {
     bridge_artifact_t a;
 
-    host_state_built(&a, "test:pinned@0.1.0", "pinned");
+    host_state_built(&a, "test:pinned@0.1.0", PINNED_PATH);
     a.cfg.pinned = BRIDGE_TRUE;
     host_load(h, &a);
 }
@@ -49,8 +49,8 @@ void test_pin(host_t *h)
     h->cfg.threads = 4;
     if (host_open(h))
         return;
-    test_load_built(h, "test:sleep1@0.1.0", "sleep1", BRIDGE_NONE);
-    test_load_built(h, "test:sleep2@0.1.0", "sleep2", BRIDGE_NONE);
+    test_load_built(h, "test:sleep1@0.1.0", SLEEP1_PATH, BRIDGE_NONE);
+    test_load_built(h, "test:sleep2@0.1.0", SLEEP2_PATH, BRIDGE_NONE);
     load_pinned(h);
     host_run_frames_unsaid(h->b, 3);
     printf("the others used %u thread(s)\n", test_count_threads(c));

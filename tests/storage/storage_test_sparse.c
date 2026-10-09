@@ -49,12 +49,12 @@ static const char *const SPARSE_DROPPED[] = {
 ** are each refused at load.
 */
 static const storage_test_variant_t SPARSE_DROPS[] = {
-    { "sparsestrip", NSPARSE_PATH, BRIDGE_STRIP },
-    { "sparsesweep", NSPARSE_PATH, BRIDGE_SWEEP },
-    { "sparsedelete", NSPARSE_PATH, BRIDGE_DELETE },
-    { "sparsenone", NSPARSE_PATH, BRIDGE_DELETE },
-    { "sparsebad1", NSPARSEBAD1_PATH, BRIDGE_DELETE },
-    { "sparsebad2", NSPARSEBAD2_PATH, BRIDGE_DELETE }
+    { "sparsestrip", SPARSE_PATH, BRIDGE_STRIP },
+    { "sparsesweep", SPARSE_PATH, BRIDGE_SWEEP },
+    { "sparsedelete", SPARSE_PATH, BRIDGE_DELETE },
+    { "sparsenone", SPARSE_PATH, BRIDGE_DELETE },
+    { "sparsebad1", SPARSEBAD1_PATH, BRIDGE_DELETE },
+    { "sparsebad2", SPARSEBAD2_PATH, BRIDGE_DELETE }
 };
 
 /*
@@ -83,7 +83,7 @@ static int join_sparse(storage_test_t *t, const char *path, uint32_t failures)
 */
 enum storage_test_end storage_test_join_sparse(storage_test_t *t)
 {
-    if (join_sparse(t, NSPARSE_PATH, 1))
+    if (join_sparse(t, SPARSE_PATH, 1))
         return (STORAGE_TEST_LEFT);
     storage_test_run_all(t, SPARSE_KEPT);
     return (STORAGE_TEST_DONE);
@@ -100,7 +100,7 @@ enum storage_test_end storage_test_join_sparse(storage_test_t *t)
 */
 enum storage_test_end storage_test_fill_sparse(storage_test_t *t)
 {
-    if (join_sparse(t, NSPARSE_PATH, 4))
+    if (join_sparse(t, SPARSE_PATH, 4))
         return (STORAGE_TEST_LEFT);
     return (STORAGE_TEST_DONE);
 }
@@ -113,7 +113,7 @@ enum storage_test_end storage_test_fill_sparse(storage_test_t *t)
 */
 enum storage_test_end storage_test_sweep_beside_sparse(storage_test_t *t)
 {
-    if (join_sparse(t, NSPARSE_PATH, 1))
+    if (join_sparse(t, SPARSE_PATH, 1))
         return (STORAGE_TEST_LEFT);
     storage_test_drop(t, "st:A", BRIDGE_SWEEP);
     storage_test_run(t, "look");

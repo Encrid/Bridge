@@ -28,7 +28,7 @@ static const char *const ID_READS[2] = { "near", "far" };
 int storage_test_weigh_direct(storage_test_t *t)
 {
     storage_test_change_t c = {};
-    bridge_artifact_t a = storage_test_state(NDIRECTBIG_PATH, 204'802,
+    bridge_artifact_t a = storage_test_state(DIRECTBIG_PATH, 204'802,
         8 << 20, 128 << 20);
     uint64_t least[2] = {};
 
@@ -76,9 +76,9 @@ int storage_test_weigh_tags(storage_test_t *t)
 {
     uint32_t used[2] = {};
 
-    if (use_columns(t, NFRAG4096_PATH, &used[0]))
+    if (use_columns(t, FRAG4096_PATH, &used[0]))
         return (1);
-    if (use_columns(t, NFRAGTAG4096_PATH, &used[1]))
+    if (use_columns(t, FRAGTAG4096_PATH, &used[1]))
         return (1);
     printf("204800 entities with six markers each: columns in use %u KB as "
         "components of four bytes, %u KB as tags\n", used[0], used[1]);
@@ -96,7 +96,7 @@ int storage_test_weigh_tags(storage_test_t *t)
 */
 int storage_test_weigh_single(storage_test_t *t)
 {
-    bridge_artifact_t a = storage_test_state(NSINGLE_PATH, 8, 1 << 20, 4096);
+    bridge_artifact_t a = storage_test_state(SINGLE_PATH, 8, 1 << 20, 4096);
     uint64_t best;
 
     if (storage_test_reopen(t, storage_test_hear_counts, &a))
@@ -122,7 +122,7 @@ int storage_test_weigh_single(storage_test_t *t)
 */
 int storage_test_weigh_switch(storage_test_t *t)
 {
-    bridge_artifact_t a = storage_test_state(NTOGGLE2_PATH, 204'800, 8 << 20,
+    bridge_artifact_t a = storage_test_state(TOGGLE2_PATH, 204'800, 8 << 20,
         128 << 20);
     uint64_t best;
 

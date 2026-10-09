@@ -18,18 +18,18 @@
 #include "storage_test.h"
 
 static const storage_test_carried_t CARRIED[] = {
-    { NSTOREBIG_PATH, 4, 100'000 },
-    { NSTOREFAT64_PATH, 64, 100'000 },
-    { NSTOREFAT256_PATH, 256, 100'000 },
-    { NSTOREFAT1K_PATH, 1024, 10'000 },
-    { NSTOREFAT4K_PATH, 4096, 10'000 }
+    { STOREBIG_PATH, 4, 100'000 },
+    { STOREFAT64_PATH, 64, 100'000 },
+    { STOREFAT256_PATH, 256, 100'000 },
+    { STOREFAT1K_PATH, 1024, 10'000 },
+    { STOREFAT4K_PATH, 4096, 10'000 }
 };
 
 static const storage_test_spread_t SPREAD[] = {
-    { NFRAG1_PATH, 1 },
-    { NFRAG16_PATH, 16 },
-    { NFRAG256_PATH, 256 },
-    { NFRAG4096_PATH, 4096 }
+    { FRAG1_PATH, 1 },
+    { FRAG16_PATH, 16 },
+    { FRAG256_PATH, 256 },
+    { FRAG4096_PATH, 4096 }
 };
 
 /*

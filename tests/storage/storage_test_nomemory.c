@@ -39,7 +39,7 @@ static void use_module(bridge_t *b, const bridge_artifact_t *a)
 static bool refuse_one(storage_test_t *t, size_t k)
 {
     storage_test_allocator_t *allocator = storage_test_get_allocator();
-    bridge_artifact_t a = storage_test_state(NSTORE_PATH, 6, 1 << 20, 1 << 20);
+    bridge_artifact_t a = storage_test_state(STORE_PATH, 6, 1 << 20, 1 << 20);
 
     if (t->more)
         fprintf(stderr, "allocation %u\n", (unsigned)k);

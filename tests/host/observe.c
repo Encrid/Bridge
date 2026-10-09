@@ -32,7 +32,7 @@ void test_observe(host_t *h)
 {
     if (host_open(h))
         return;
-    test_load_built(h, "game:setter@0.1.0", "setter", 8);
+    test_load_built(h, "game:setter@0.1.0", SETTER_PATH, 8);
     test_load_watcher(h);
     host_run_frames_unsaid(h->b, 2);
     host_close(h);
@@ -50,7 +50,7 @@ void test_conflict_at_barrier(host_t *h)
 
     if (host_open(h))
         return;
-    test_load_built(h, "game:setter@0.1.0", "setter", 8);
+    test_load_built(h, "game:setter@0.1.0", SETTER_PATH, 8);
     test_load_watcher(h);
     test_state_wasm(&a, "view:fixer@0.1.0", "fixer");
     a.cfg.write = &TEST_GAME[1];

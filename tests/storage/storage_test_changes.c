@@ -83,7 +83,7 @@ static const char *const SCRIBBLE[] = {
 */
 enum storage_test_end storage_test_change(storage_test_t *t)
 {
-    bridge_artifact_t a = storage_test_state(NSTORE_PATH, 6, 1 << 20, 1 << 20);
+    bridge_artifact_t a = storage_test_state(STORE_PATH, 6, 1 << 20, 1 << 20);
 
     if (storage_test_load(t, &a))
         return (STORAGE_TEST_FAILED);
@@ -98,7 +98,7 @@ enum storage_test_end storage_test_change(storage_test_t *t)
 */
 enum storage_test_end storage_test_make_tables(storage_test_t *t)
 {
-    bridge_artifact_t a = storage_test_state(NSTORETAB_PATH, 10'000, 8 << 20,
+    bridge_artifact_t a = storage_test_state(STORETAB_PATH, 10'000, 8 << 20,
         32 << 20);
 
     if (storage_test_load(t, &a))
@@ -115,7 +115,7 @@ enum storage_test_end storage_test_make_tables(storage_test_t *t)
 */
 enum storage_test_end storage_test_use_up_tables(storage_test_t *t)
 {
-    bridge_artifact_t a = storage_test_state(NSTORE_PATH, 6, 1 << 20, 1 << 20);
+    bridge_artifact_t a = storage_test_state(STORE_PATH, 6, 1 << 20, 1 << 20);
 
     a.cfg.max_system_failures = 2;
     if (storage_test_load(t, &a))
@@ -131,7 +131,7 @@ enum storage_test_end storage_test_use_up_tables(storage_test_t *t)
 */
 enum storage_test_end storage_test_use_up_columns(storage_test_t *t)
 {
-    bridge_artifact_t a = storage_test_state(NSTORE_PATH, 6, 1 << 20, 1 << 20);
+    bridge_artifact_t a = storage_test_state(STORE_PATH, 6, 1 << 20, 1 << 20);
 
     a.cfg.max_system_failures = 4;
     if (storage_test_load(t, &a))
@@ -148,7 +148,7 @@ enum storage_test_end storage_test_use_up_columns(storage_test_t *t)
 */
 enum storage_test_end storage_test_scribble(storage_test_t *t)
 {
-    bridge_artifact_t a = storage_test_state(NSTORE_PATH, 6, 1 << 20, 1 << 20);
+    bridge_artifact_t a = storage_test_state(STORE_PATH, 6, 1 << 20, 1 << 20);
 
     if (storage_test_load(t, &a))
         return (STORAGE_TEST_FAILED);

@@ -24,7 +24,7 @@
 bridge_artifact_t storage_test_state(const char *path, int64_t spawns,
     uint32_t spans, int64_t changes)
 {
-    bridge_artifact_t a = { .backend = "native", .path = path };
+    bridge_artifact_t a = { .backend = "tests", .path = path };
 
     a.cfg = (bridge_module_config_t){ .identity = "st:store@0.1.0",
         .scratch = 64 << 10, .abi = BRIDGE_ABI, .trusted = BRIDGE_TRUE,

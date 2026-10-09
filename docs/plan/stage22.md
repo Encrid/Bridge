@@ -77,10 +77,10 @@ backend somebody uses works with the commit at hand: each backend's cases show i
 ### How the library is tested with no backend in its tree
 
 **By a backend of the tests' own, here.** Enkrid ruled it on 2026-10-09, as recommended. Its
-test modules are compiled into it and written against `bridge_abi.h`, so no library is opened
-for a module and no SDK is needed, and a case tells it which outcome to report: a trap, a work
-limit used up, a timeout, a memory limit, a refusal. The cases that prove the native backend or
-the wasm one go with that backend.
+test modules are written against `bridge_abi.h`, so no SDK is needed, and a case tells it which
+outcome to report: a trap, a work limit used up, a timeout, a memory limit, a refusal. How it
+carries a module was first ruled otherwise, and corrected: *How a test module is carried*. The
+cases that prove the native backend or the wasm one go with that backend.
 
 The library then depends on nothing outside its tree, and an outcome is had when a case asks
 for it, where today some need a wasm module made to misbehave.
@@ -244,6 +244,19 @@ What it costs: commits in those repositories whose message names a stage of this
 whose other half is here; and the wasm backend's repository holds every build of wasmtime that
 was ever in this tree.
 
+### How a test module is carried
+
+**As a library of its own, which the tests' backend opens by its path.** Enkrid ruled it on
+2026-10-09, as recommended, in the place of what the decision on testing had first said: that
+the test modules are compiled into the backend. That did not link. A module of several files
+shares functions and variables between its files, and one source is built under several names:
+compiled into one library, each of those names is there once for each build, and the linker
+refuses. The first family moved passed only because its modules are one file each.
+
+A library is a space of names of its own, so nothing meets, and it is how the build already
+made every native module. The library still has no backend of another project and no SDK:
+what opens a module's library is `utils/os`, which stays.
+
 ## The questions
 
 None stands. Twelve were listed when the stage was planned: eight were put and ruled, and four
@@ -251,12 +264,12 @@ followed from those and from a rule that stands, each said as such under its hea
 
 ## What was found on the way
 
-**A module that is compiled in has its variables once in a process.** Two instances of one such
-module share them, where the wasm backend gives each instance its own. So a case that needs one
-module twice, in two decks say, has it compiled in under two names, as a native module was
-built under several. What such a case shows is then that the library keeps two decks apart;
-that two instances of one wasm module are apart is that backend's to show. It was not put: the
-other way is every module's variables moved into memory an instance is handed, in every module.
+**A module's library has its variables once in a process.** Two instances of one module share
+them, where the wasm backend gives each instance its own. So a case that needs one module
+twice, in two decks say, has it built under two names, as a native module was. What such a
+case shows is then that the library keeps two decks apart; that two instances of one wasm
+module are apart is that backend's to show. It was not put: the other way is every module's
+variables moved into memory an instance is handed, in every module.
 
 **The tests' backend stands beside the two while the cases are moved.** A deck of the tests
 names three backends until the last case has left the other two.

@@ -5,8 +5,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/backend/tests_module.c -- a module found: a module of the tests is
-** a name, and what the build compiled in under it.
+** tests/backend/tests_module.c -- a module opened: a module of the tests
+** is its library.
 */
 
 #include <stdio.h>
@@ -33,26 +33,27 @@ BACKEND_EXPORT void memory_release(backend_memory_t *m)
 /*
 ** module_compile
 **
-** Finds a module by the name its path states.
+** Opens a module's library by its path.
 **
 ** backend.md, *What a backend is asked for*
 */
 BACKEND_EXPORT backend_module_t *module_compile([[maybe_unused]] backend_t *b,
     const backend_source_t *source, backend_err_t *err)
 {
-    const char *name = source->path ? source->path : "";
+    constexpr size_t room = sizeof(err->text);
+    const char *path = source->path;
+    void *lib = path && *path ? os_lib_open(path) : nullptr;
     backend_module_t *m;
-    uint32_t k = 0;
 
-    while (k < TESTS_MODULE_COUNT && strcmp(TESTS_MODULES[k], name))
-        k++;
-    if (k == TESTS_MODULE_COUNT) {
-        snprintf(err->text, sizeof(err->text), "no module '%.150s' is "
-            "compiled into the tests' backend", name);
+    if (!path || !*path)
+        snprintf(err->text, room, "the tests' backend opens a module's "
+            "library by its path, and was handed none");
+    else if (!lib)
+        snprintf(err->text, room, "cannot open the library '%.180s'", path);
+    if (!lib)
         return (nullptr);
-    }
     m = calloc(1, sizeof(*m));
-    m->name = TESTS_MODULES[k];
+    m->lib = lib;
     return (m);
 }
 
@@ -60,8 +61,8 @@ BACKEND_EXPORT backend_module_t *module_compile([[maybe_unused]] backend_t *b,
 ** module_list_imports
 **
 ** Writes up to `max` of what a module imports, and answers how many it
-** imports. Compiled code has no import section to read, so it is taken to
-** want both memories.
+** imports. A library has no import section to read, so it is taken to want
+** both memories.
 */
 BACKEND_EXPORT uint32_t module_list_imports(
     [[maybe_unused]] backend_module_t *m, backend_import_t *out, uint32_t max)
@@ -82,9 +83,10 @@ BACKEND_EXPORT uint32_t module_list_imports(
 /*
 ** module_destroy
 **
-** Frees a module.
+** Closes a module's library.
 */
 BACKEND_EXPORT void module_destroy(backend_module_t *m)
 {
+    os_lib_close(m->lib);
     free(m);
 }

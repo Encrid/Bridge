@@ -57,7 +57,7 @@ static int give_once(storage_test_t *t, const char *path)
 */
 enum storage_test_end storage_test_give_single(storage_test_t *t)
 {
-    if (give_once(t, NSINGLE_PATH))
+    if (give_once(t, SINGLE_PATH))
         return (STORAGE_TEST_LEFT);
     storage_test_run_all(t, SINGLE_KEPT);
     storage_test_drop(t, "st:G", BRIDGE_DELETE);
@@ -73,7 +73,7 @@ enum storage_test_end storage_test_give_single(storage_test_t *t)
 */
 enum storage_test_end storage_test_walk_single(storage_test_t *t)
 {
-    (void)give_once(t, NSINGLEBAD1_PATH);
+    (void)give_once(t, SINGLEBAD1_PATH);
     return (STORAGE_TEST_LEFT);
 }
 
@@ -84,7 +84,7 @@ enum storage_test_end storage_test_walk_single(storage_test_t *t)
 */
 enum storage_test_end storage_test_attach_single_to_entity(storage_test_t *t)
 {
-    (void)give_once(t, NSINGLEBAD2_PATH);
+    (void)give_once(t, SINGLEBAD2_PATH);
     return (STORAGE_TEST_LEFT);
 }
 
@@ -96,6 +96,6 @@ enum storage_test_end storage_test_attach_single_to_entity(storage_test_t *t)
 */
 enum storage_test_end storage_test_attach_to_no_entity(storage_test_t *t)
 {
-    (void)give_once(t, NSINGLEBAD3_PATH);
+    (void)give_once(t, SINGLEBAD3_PATH);
     return (STORAGE_TEST_LEFT);
 }

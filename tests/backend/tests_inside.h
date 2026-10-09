@@ -6,8 +6,9 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/backend/tests_inside.h -- the tests' backend: the entries of
-** bridge_backend.h, over modules that are compiled into it. What its files
-** share. It is in no package, and no deployment is handed it.
+** bridge_backend.h, over a module's library, with the limits kept by
+** counting. What its files share. It is in no package, and no deployment
+** is handed it.
 **
 ** backend.md, *What a backend is asked for*
 ** capabilities.md, *Capabilities, so the swap is honest*
@@ -49,24 +50,6 @@ static const char *const TESTS_ENTRY_NAMES[TESTS_ENTRIES] = {
     "alloc"
 };
 
-/*
-** A function of a module that is compiled in, and the modules there are:
-** both are written by the build, from the modules it compiles.
-**
-**     module        the module's name, as a deployment states its path
-**     name          the function's, as Bridge asks for it
-*/
-typedef struct {
-    const char *module;
-    const char *name;
-    int (*fn)(const test_api_t *);
-} tests_function_t;
-
-extern const tests_function_t TESTS_FUNCTIONS[];
-extern const uint32_t TESTS_FUNCTION_COUNT;
-extern const char *const TESTS_MODULES[];
-extern const uint32_t TESTS_MODULE_COUNT;
-
 struct backend {
     enum backend_capability capabilities;
 };
@@ -77,7 +60,7 @@ struct backend_memory {
 };
 
 struct backend_module {
-    const char *name;
+    void *lib;
 };
 
 struct backend_func {

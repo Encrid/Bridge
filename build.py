@@ -98,8 +98,8 @@ BRIDGE = ['say', 'bridge_create', 'bridge_backend', 'bridge_backends', 'bridge_p
           'abi_relay_fields', 'abi_relay', 'abi_moved', 'abi_replace', 'abi_layout', 'abi_make',
           'abi_declare', 'abi_subscriber', 'abi_subscriber_room', 'abi_term', 'abi_subscribe',
           'abi_system'] + MODULE + ['pool', 'pool_job', 'pool_run', 'backend'] + SCHEMA + CONFIG + SCHEDULE + BLOCK + STORAGE
-# the tests' backend, and the modules compiled into it: the name a deployment states, its source
-# under tests/modules, what it is compiled with - stage22.md, *What a test module is written with*
+# the tests' backend, and the modules it runs: the name of a module's library, its source under
+# tests/modules, what it is compiled with - stage22.md, *What a test module is written with*
 TESTS_BACKEND = ['tests_abi', 'tests_backend', 'tests_module', 'tests_instance', 'tests_func',
                  'tests_load', 'tests_phase', 'tests_moves']
 BUILT = [
@@ -112,6 +112,9 @@ BUILT = [
     ('stepper1', 'stepper', ['STEP=1']), ('stepper2', 'stepper', ['STEP=10']),
     ('stepper3', 'stepper', ['STEP=10', 'FAIL_RELOAD']),
 ]
+# what tests/storage loads: each was a native module, and is listed below as one until the native
+# backend leaves - stage22.md, *Which cases stay*
+STORED = ('direct', 'frag', 'holder', 'layout', 'move', 'single', 'sparse', 'store', 'stress', 'tag', 'toggle', 'weigh')
 
 # a native module is a shared library: the name, its source, what it is compiled with. The same
 # library twice is one module to the loader, so one source is built under several names.
@@ -147,6 +150,8 @@ NATIVE = [
     ('nstress1', 'nstress', ['SEED=1u', 'SPACE="s1"']), ('nstress2', 'nstress', ['SEED=2u', 'SPACE="s2"']),
     ('nstress3', 'nstress', ['SEED=3u', 'SPACE="s3"']), ('nstress4', 'nstress', ['SEED=4u', 'SPACE="s4"']),
 ]
+
+BUILT += [(name[1:], source[1:], flags) for name, source, flags in NATIVE if source[1:] in STORED]
 
 # a module in C: the name, its source, whether its rows are tested, what it is compiled with.
 # `checked` or `unchecked` is stated for each, as the SDK asks: BRIDGE_ROWS_CHECKED, or not.
@@ -378,7 +383,8 @@ def build(target, debug, out):
                 ('NATIVE_REFUSING_PATH', backends / ('bridge_native_refusing' + lib)),
                 ('HOLLOW_PATH', backends / ('bridge_hollow' + lib)),
                 ('TESTS_PATH', backends / ('bridge_tests' + lib)), ('MODULE_DIR', modules)] +
-               [('%s_PATH' % name.upper(), out / (name + lib)) for name, _, _ in NATIVE]]
+               [('%s_PATH' % name.upper(), out / (name + lib)) for name, _, _ in NATIVE] +
+               [('%s_PATH' % name.upper(), out / 'built' / (name + lib)) for name, _, _ in BUILT]]
     compiles = []
 
     def compile_(name, source, flags, deps=()):
@@ -446,20 +452,15 @@ def build(target, debug, out):
                                 ['-D' + d for d in flags])
                        for c in sources(ROOT / 'tests/modules/native', source, 'nidle')]
                 for name, source, flags in NATIVE}
-    # the tests' backend: its own sources, each module compiled in under its name, and the list
-    # of what was, which is written here from the functions each module's sources define
+    # the tests' backend, and the modules it runs: each a library of its own, as a module is
     binding = '-I%s' % (ROOT / 'tests/binding')
-    built_sources = {name: sources(ROOT / 'tests/modules', source, 'idle', '"idle.h"')
-                     for name, source, _ in BUILT}
-    listed = obj / 'tests_modules.c'
-    write_if_changed(listed, list_built(built_sources))
     tests_o = [compile_(name, ROOT / 'tests/backend' / (name + '.c'), ours + [include, utils, binding])
-               for name in TESTS_BACKEND] + [
-        compile_('tests_modules', listed, ours + [include, utils, binding,
-                                                  '-I%s' % (ROOT / 'tests/backend')])] + [
-        compile_('built-%s-%s' % (name, c.stem), c,
-                 ours + [include, binding, shared, '-DTEST_MODULE=' + name] + ['-D' + d for d in flags])
-        for name, _, flags in BUILT for c in built_sources[name]] + backend_os_o
+               for name in TESTS_BACKEND] + backend_os_o
+    built_o = {name: [compile_('built-%s-%s' % (name, c.stem), c,
+                               ours + [include, binding, shared, '-fvisibility=hidden'] +
+                               ['-D' + d for d in flags])
+                      for c in sources(ROOT / 'tests/modules', source, 'idle', '"idle.h"')]
+               for name, source, flags in BUILT}
     together(compiles)
 
     # ---- libraries and programs ----
@@ -483,6 +484,8 @@ def build(target, debug, out):
     link('backends/bridge_native_refusing', native_refusing_o, system, shared=True)
     link('backends/bridge_hollow', hollow_o, system, shared=True)
     link('backends/bridge_tests', tests_o, system, shared=True)
+    for name, _, _ in BUILT:
+        link('built/' + name, built_o[name], shared=True)
     for name, _, _ in NATIVE:
         link(name, module_o[name], shared=True)
     link('adopt', adopt_o + [obj / 'backend.o'] + os_o, system)
@@ -570,29 +573,6 @@ def build(target, debug, out):
                                           '--remove-unused-module-elements', '-o', final]])
     return {'python': sys.executable, 'nocall': ROOT / 'tools/nocall.py',
             'wasm-dis': disassemble, 'modules': modules, 'exe': exe}
-
-
-def write_if_changed(path, text):
-    """Writes a file the build makes, unless it already says that."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    if not path.is_file() or path.read_text(encoding='utf-8') != text:
-        path.write_text(text, encoding='utf-8', newline='\n')
-
-
-def list_built(built_sources):
-    """The modules compiled into the tests' backend, and each function one has for it to call:
-    what a source defines with TEST(name), which is the function test_<module>_<name>."""
-    rows = [(name, fn) for name, found in built_sources.items() for c in found
-            for fn in re.findall(r'^TEST\((\w+)\)$', c.read_text(encoding='utf-8'), re.M)]
-    lines = ['#include "tests_inside.h"', '']
-    lines += ['int test_%s_%s(const test_api_t *api);' % row for row in rows]
-    lines += ['', 'const tests_function_t TESTS_FUNCTIONS[] = {']
-    lines += ['    { "%s", "%s", test_%s_%s },' % (name, fn, name, fn) for name, fn in rows]
-    lines += ['};', 'const uint32_t TESTS_FUNCTION_COUNT = %d;' % len(rows), '',
-              'const char *const TESTS_MODULES[] = {']
-    lines += ['    "%s",' % name for name in built_sources]
-    lines += ['};', 'const uint32_t TESTS_MODULE_COUNT = %d;' % len(built_sources), '']
-    return '\n'.join(lines)
 
 
 def sources(where, name, idle, said='_idle.h"'):

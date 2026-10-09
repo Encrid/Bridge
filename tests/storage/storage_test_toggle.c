@@ -60,7 +60,7 @@ static const char *const TAG[] = {
 */
 enum storage_test_end storage_test_toggle(storage_test_t *t)
 {
-    bridge_artifact_t a = storage_test_state(NTOGGLE_PATH, 16, 1 << 20, 4096);
+    bridge_artifact_t a = storage_test_state(TOGGLE_PATH, 16, 1 << 20, 4096);
 
     if (storage_test_try_load(t, &a))
         return (STORAGE_TEST_LEFT);
@@ -82,7 +82,7 @@ enum storage_test_end storage_test_toggle(storage_test_t *t)
 */
 enum storage_test_end storage_test_toggle_full(storage_test_t *t)
 {
-    bridge_artifact_t a = storage_test_state(NTOGGLE_PATH, 16, 1 << 20, 4096);
+    bridge_artifact_t a = storage_test_state(TOGGLE_PATH, 16, 1 << 20, 4096);
 
     a.cfg.max_system_failures = 4;
     if (storage_test_try_load(t, &a))
@@ -100,7 +100,7 @@ enum storage_test_end storage_test_toggle_full(storage_test_t *t)
 */
 enum storage_test_end storage_test_tag(storage_test_t *t)
 {
-    bridge_artifact_t a = storage_test_state(NTAG_PATH, 8, 1 << 20, 4096);
+    bridge_artifact_t a = storage_test_state(TAG_PATH, 8, 1 << 20, 4096);
 
     if (storage_test_try_load(t, &a))
         return (STORAGE_TEST_LEFT);

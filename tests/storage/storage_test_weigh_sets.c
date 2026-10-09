@@ -17,16 +17,16 @@
 #include "storage_test.h"
 
 static const storage_test_carried_t SETS[2] = {
-    { NSPARSEBIG_PATH, 4, 204'800 },
-    { NSPARSEFAT_PATH, 4096, 10'000 }
+    { SPARSEBIG_PATH, 4, 204'800 },
+    { SPARSEFAT_PATH, 4096, 10'000 }
 };
 
 static const char *const SET_READS[2] = { "look", "look_b" };
 
 static const storage_test_spread_t TOGGLED[] = {
-    { NTOGGLE1_PATH, 1 },
-    { NTOGGLE2_PATH, 2 },
-    { NTOGGLE16_PATH, 16 }
+    { TOGGLE1_PATH, 1 },
+    { TOGGLE2_PATH, 2 },
+    { TOGGLE16_PATH, 16 }
 };
 
 static const char *const TOGGLE_READS[2] = { "look_b", "look" };

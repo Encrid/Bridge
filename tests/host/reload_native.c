@@ -52,7 +52,7 @@ static void reload_to(host_t *h, const char *identity, const char *path)
 static void end_failed(host_t *h)
 {
     if (strcmp(h->arg, "nreloadfailunload")) {
-        reload_to(h, "game:ticker@0.3.0", "stepper2");
+        reload_to(h, "game:ticker@0.3.0", STEPPER2_PATH);
         return;
     }
     host_unload(h, "game:ticker@0.1.0");
@@ -73,10 +73,10 @@ void test_reload_native(host_t *h)
     if (host_open(h))
         return;
     test_load_wasm_minting(h, "game:twostep@0.1.0", "twostep");
-    state_ticker(h, &a, "game:ticker@0.1.0", "stepper1");
+    state_ticker(h, &a, "game:ticker@0.1.0", STEPPER1_PATH);
     host_load(h, &a);
     host_run_frames(h, 2);
-    reload_to(h, "game:ticker@0.2.0", works ? "stepper2" : "stepper3");
+    reload_to(h, "game:ticker@0.2.0", works ? STEPPER2_PATH : STEPPER3_PATH);
     if (!works)
         end_failed(h);
     host_close(h);

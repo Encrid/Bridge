@@ -120,3 +120,13 @@ content came from. It was the one recommended: small repositories, in which ever
 about what is there, and the past one command away here. Against it, `git blame` there would
 stop at the first commit. The condition that brings it back is none once the repositories
 exist: a history is not taken out of one that is published.
+
+## How a test module is carried
+
+Of `stage22.md`, *How a test module is carried*.
+
+Refused: the modules stay compiled into the backend, and the build writes each name a module's
+files share again for each build of that module. The build would have to read C to find those
+names, by a pattern or by a tool that lists a file's symbols, on six targets, and a name it
+missed is two modules sharing a variable with nothing said. The condition that brings it back
+is none.

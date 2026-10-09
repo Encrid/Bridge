@@ -26,7 +26,7 @@ static const char *const STRESS_IDENTITIES[STRESSED] = {
 };
 
 static const char *const STRESS_PATHS[STRESSED] = {
-    NSTRESS1_PATH, NSTRESS2_PATH, NSTRESS3_PATH, NSTRESS4_PATH
+    STRESS1_PATH, STRESS2_PATH, STRESS3_PATH, STRESS4_PATH
 };
 
 static int load_stress(bridge_t *b)

@@ -56,7 +56,7 @@ static const char *const FULL_AFTER[] = {
 */
 enum storage_test_end storage_test_strip(storage_test_t *t)
 {
-    bridge_artifact_t a = storage_test_state(NSTORE_PATH, 6, 1 << 20, 1 << 20);
+    bridge_artifact_t a = storage_test_state(STORE_PATH, 6, 1 << 20, 1 << 20);
 
     if (storage_test_load(t, &a))
         return (STORAGE_TEST_FAILED);
@@ -76,7 +76,7 @@ enum storage_test_end storage_test_strip(storage_test_t *t)
 */
 enum storage_test_end storage_test_strip_full(storage_test_t *t)
 {
-    bridge_artifact_t a = storage_test_state(NSTORE_PATH, 6, 1 << 20, 1 << 20);
+    bridge_artifact_t a = storage_test_state(STORE_PATH, 6, 1 << 20, 1 << 20);
 
     if (storage_test_load(t, &a))
         return (STORAGE_TEST_FAILED);

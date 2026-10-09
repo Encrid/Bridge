@@ -41,12 +41,12 @@ static const char *const DIRECT_KEPT[] = {
 ** cells and the one whose system selects by D are each refused at load.
 */
 static const storage_test_variant_t DIRECT_DROPPED[] = {
-    { "directstrip", NDIRECT_PATH, BRIDGE_STRIP },
-    { "directsweep", NDIRECT_PATH, BRIDGE_SWEEP },
-    { "directdelete", NDIRECT_PATH, BRIDGE_DELETE },
-    { "directnone", NDIRECT_PATH, BRIDGE_DELETE },
-    { "directfull", NDIRECT_PATH, BRIDGE_DELETE },
-    { "directbad", NDIRECTBAD_PATH, BRIDGE_DELETE }
+    { "directstrip", DIRECT_PATH, BRIDGE_STRIP },
+    { "directsweep", DIRECT_PATH, BRIDGE_SWEEP },
+    { "directdelete", DIRECT_PATH, BRIDGE_DELETE },
+    { "directnone", DIRECT_PATH, BRIDGE_DELETE },
+    { "directfull", DIRECT_PATH, BRIDGE_DELETE },
+    { "directbad", DIRECTBAD_PATH, BRIDGE_DELETE }
 };
 
 /*
@@ -73,7 +73,7 @@ static int give_direct(storage_test_t *t, const char *path)
 */
 enum storage_test_end storage_test_index_directly(storage_test_t *t)
 {
-    if (give_direct(t, NDIRECT_PATH))
+    if (give_direct(t, DIRECT_PATH))
         return (STORAGE_TEST_LEFT);
     storage_test_run_all(t, DIRECT_KEPT);
     return (STORAGE_TEST_DONE);

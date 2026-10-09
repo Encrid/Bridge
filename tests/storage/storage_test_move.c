@@ -27,7 +27,7 @@ static const char *const KEPT_AS[] = {
 };
 
 static const char *const BUILDS[] = {
-    "", NMOVE1_PATH, NMOVE2_PATH, NMOVE3_PATH, NMOVE4_PATH, NMOVE5_PATH
+    "", MOVE1_PATH, MOVE2_PATH, MOVE3_PATH, MOVE4_PATH, MOVE5_PATH
 };
 
 static const char *const X_LOST[1] = { "st:X" };
