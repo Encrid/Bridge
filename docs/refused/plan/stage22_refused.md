@@ -97,3 +97,16 @@ Refused: from the project that new ones are started from, with this tree's tools
 Its own first stage is not closed, its method is another than the one this code was written
 by, and two programs would check one tree. The condition that brings it back is that project's
 first stage closed, and then for every project at once.
+
+## How a backend takes the library
+
+Of `stage22.md`, *How a backend takes the library*.
+
+Refused: this tree inside each backend's, as a submodule, built there. Another project's tree
+run by a backend's build, which a project that is whole by itself does not do. The condition
+that brings it back is none.
+
+Refused: the run of this tree also runs the cases of both backends. This tree's `main` would
+wait on two other repositories, and the three would move as one again, by the run. The
+condition that brings it back is a change to the seam breaking a backend from `main` more
+than once.

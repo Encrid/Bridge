@@ -199,14 +199,43 @@ its own that says where its content came from, by the commit of this tree.
 
 What it costs: the method's text is then in five repositories, kept true by hand.
 
+### How a backend takes the library
+
+**By a pin, and from a folder where a change is being tried.** Enkrid ruled it on 2026-10-09,
+as recommended. A backend's tree states one commit of this one and the hashes of `bridge` and
+`seams`, in a file `bridge.txt` at its root. Its build fetches the two from the release of that
+commit and refuses a file that is not what its hash says - `host_api.md`, *What a host is
+handed*.
+
+**A change to the seam goes in this order.**
+
+    1  on a branch here. Its two packages are written into a folder, and each backend's
+       build is pointed at that folder: the change is tried against both before it lands
+    2  to `main` here, which publishes
+    3  each backend moves its pin, passes its cases, and publishes
+
+A package from a folder is taken as a package is, by its statement and its hashes. Nothing of
+this tree is run by a backend's build.
+
+**What a backend publishes states the commit of the library it was built against.** The number
+of the seam cannot say it: nothing is released, so the number does not move while the seam
+does. A host that is handed a backend built against another commit than its library refuses
+it, and that check is the host's.
+
+What it costs: three steps where there was one commit, and between 2 and 3 the newest of each
+do not go together.
+
+### What a backend publishes, and when
+
+**Its two packages, for each commit of its `main`, by the run that tests it.** It follows from
+what each repository is made from, and was not put: it is what this tree does, copied -
+`host_api.md`, *What a host is handed*.
+
 ## The questions
 
 Each waits here until it is put, and the stage is not done while one stands.
 
-    10  how each backend tests itself: against which commit of the library, taken how, and
-        the order in which a change to the seam goes through three repositories
     11  whether the files that leave keep their history
-    12  what each repository publishes, from which branch, and by which run
 
 ## How each claim is shown
 
