@@ -127,7 +127,7 @@ module it can bounds-check - `abi.md`, *The ABI*. The SDK does the copy: `bridge
 so `api->spawn(api)` says which module is asking, and nothing is found by which thread happens to be
 running. *The invariant* is then checked and not implied: the backend notes the thread it calls a
 module on, and an entry reached on any other thread, or outside a call, answers zero. `tests/host`,
-case `bridge_api_t-entry-from-a-foreign-thread-refused`, reaches one from a thread the module
+a case reaches one from a thread the module
 started.
 
 **A refused entry answers zero, and so does every entry after it until the call returns.** Nothing

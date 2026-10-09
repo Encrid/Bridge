@@ -432,6 +432,28 @@ static_assert(offsetof(bridge_log_record_t, text) == 8);
 static_assert(offsetof(bridge_log_record_t, len) == 12);
 static_assert(offsetof(bridge_log_record_t, arg) == 16);
 
+/*
+** The eight entries a module may call, with what each takes and answers.
+** Three at init, each taking where its one struct is in the scratch arena;
+** five at any time, queued and applied at the next barrier. A backend
+** provides them to a module under these names, in the namespace
+** BRIDGE_NAMESPACE, and how a module reaches one is that backend's: an
+** import, a table. This type is those names and signatures, stated once.
+** It is no layout: nothing of it is in a memory.
+**
+** abi.md, *The ABI*
+*/
+typedef struct {
+    uint32_t (*declare)(uint32_t at);
+    uint32_t (*add_system)(uint32_t at);
+    uint32_t (*observe)(uint32_t at);
+    uint64_t (*spawn)(void);
+    void (*destroy)(uint64_t id);
+    void (*attach)(uint64_t id, uint32_t slot, uint32_t ptr);
+    void (*detach)(uint64_t id, uint32_t slot);
+    uint32_t (*alloc)(uint32_t len);
+} bridge_entries_t;
+
     #ifdef __cplusplus
 }
     #endif

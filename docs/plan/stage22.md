@@ -329,6 +329,55 @@ Counted against the build's list: 484 when the stage began.
 the wasm backend's own words - a trap, fuel used up, an interrupt - now expects the tests'
 backend's, and is the same case.
 
+**The eight entries of the ABI were named in no header of the library.** `declare`,
+`add_system`, `observe`, `spawn`, `destroy`, `attach`, `detach` and `alloc` were stated in
+`abi.md` and in each backend's SDK, and `tests.md` had their headings from the native SDK's
+table. With the SDKs gone, forty-one cases that prove the library would have hung on nothing.
+So `bridge_abi.h` states them, as `bridge_backend.h` states the entries of its seam: one
+type, `bridge_entries_t`, which is their names and what each takes and answers. It is in no
+memory and is no layout. It was not put: it is what the other seam's header already does.
+
+Then, counted again: **62 cases named for a function or a macro of an SDK left with that SDK.**
+What each ran is still run where a case of the library names it: most were a second name for a
+case of storage or of an entry. One a document relied on was kept under the entry it proves:
+`bridge_lend-scratch-given-back` is `attach-many-values-through-little-scratch`.
+
+    `BRIDGE_DECLARE-an-enum-and-a-bitmask`, `BRIDGE_COMPONENT-declared-by-two-modules`,
+    `BRIDGE_DECLARE_TAG-carried-by-two-of-three`, `BRIDGE_ADD_SYSTEM-registered-and-run`,
+    `BRIDGE_OBSERVER-registered-and-told`, `BRIDGE_PUT_CHANGES-an-observer-that-attaches`,
+    `BRIDGE_ATTACH-the-value-travels-with-it`, `BRIDGE_ROW-no-call-in-the-loop`,
+    `BRIDGE_ROW-checked-and-unchecked-timed`, `BRIDGE_GET-a-field-read`,
+    `BRIDGE_SET-a-field-written-each-frame`, `BRIDGE_IMPORT-the-entries-imported`,
+    `BRIDGE_ACC-the-accessors-merged-in`, `BRIDGE_EXPORT-a-system-found-by-its-name`,
+    `BRIDGE_HEADER-the-scratch-arena-found`, `bridge_get_entity-the-id-of-a-row`,
+    `bridge_get_ref-own-entities-followed`, `bridge_is_alive-ids-a-sweep-left`,
+    `bridge_get_sparse_index-where-the-index-is`, `bridge_get_sparse_value-the-value-of-an-id`,
+    `bridge_get_single-where-the-one-row-is`, `bridge_get_cells-where-the-cells-are`,
+    `bridge_get_cell-the-cell-of-an-id`, `bridge_line_t-a-line-of-text-found-at-run-time`,
+    `BRIDGE_LOG-a-line-with-two-numbers`, `bridge_log-a-line-of-text-found-at-run-time`,
+    `bridge_count_triggers-how-many-this-barrier`, `bridge_get_trigger-each-in-turn`,
+    `bridge_get_trigger_id-who-it-was`, `bridge_get_trigger_events-enter-attach-leave`,
+    `BRIDGE_STATE-a-statement-put-in-scratch`,
+    `bridge_take_scratch-more-than-given-stops-the-module`, `bridge_put-bytes-copied-into-scratch`,
+    `bridge_count_spans-one-table-matched`, `bridge_get_span-one-table-walked`,
+    `bridge_count_rows-rows-of-a-span`, `bridge_get_entities-where-a-span-keeps-its-ids`,
+    `bridge_get_base-where-a-column-begins`, `bridge_get_bits-where-a-toggle-keeps-them`,
+    `bridge_is_on-counted-by-its-bit`, `bridge_turn-four-turned-off`,
+    `BRIDGE_NATIVE_ATTACH-seen-by-a-wasm-observer`, `BRIDGE_NATIVE_DECLARE-an-enum-a-struct-names`,
+    `BRIDGE_NATIVE_COMPONENT-declared`, `BRIDGE_NATIVE_DECLARE_TAG-carried-with-no-bytes`,
+    `BRIDGE_NATIVE_ADD_SYSTEM-registered-and-run`, `BRIDGE_NATIVE_OBSERVER-registered-and-told`,
+    `BRIDGE_NATIVE_PUT_CHANGES-changes-stated-and-made`,
+    `bridge_native_get_query-the-query-of-a-system`, `bridge_native_get_span-two-tables-walked`,
+    `bridge_api_t-entry-from-a-foreign-thread-refused`, `BRIDGE_NATIVE-system-reads-and-writes`,
+    `BRIDGE_NATIVE_STATE-a-statement-put-in-scratch`,
+    `bridge_native_get_header-read-through-a-pointer`,
+    `bridge_native_put-bytes-copied-into-scratch`, `bridge_native_lend-a-value-lent-to-attach`,
+    `bridge_native_get_single-the-one-row`, `bridge_native_get_cells-reached-by-an-id`,
+    `bridge_native_get_sparse_index-reached-by-an-id`, `bridge_native_get_bits-read-and-turned`,
+    `bridge_native_get_list-triggers-of-an-observer`, `bridge_native_log-a-line-with-two-numbers`
+
+416 after them.
+
 ## How each claim is shown
 
     each case accounted for   a table here: each of the 484 by name, where it is after the

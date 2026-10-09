@@ -74,8 +74,7 @@ through `add_system`, and every accessor takes a parameter, so the `() -> i32` c
 them already - `signatures.md`, *Imports are declared, exports are checked*.
 
 The compiler sees those accessors as opaque calls until the merge, so it cannot vectorise across
-them. That is the cost, and what a row costs is measured: `tests/host`, case
-`BRIDGE_ROW-checked-and-unchecked-timed`.
+them. That is the cost, and what a row costs is measured.
 
 ## Exports
 

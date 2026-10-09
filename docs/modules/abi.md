@@ -55,8 +55,8 @@ above what the arena has in use, without counting it as used, and makes the call
 scratch then holds one value at a time. Each backend's SDK does it, in `bridge_lend` and
 `bridge_native_lend`, which `BRIDGE_ATTACH` and `BRIDGE_NATIVE_ATTACH` use - and a log line's
 text is the one thing put in scratch that stays until the barrier, since it is read there:
-`log.md`, *The log*. `tests/host`, case
-`bridge_lend-scratch-given-back`, attaches eight kilobytes of values through 512 bytes of scratch.
+`log.md`, *The log*. `tests/host`, case `attach-many-values-through-little-scratch`, attaches
+eight kilobytes of values through 512 bytes of scratch.
 
 What the second copy costs was measured on the native backend, where a call pays for nothing
 else: an attach with a value of four bytes put through scratch took 19.9 ns against 19.6 to 20.0 without.

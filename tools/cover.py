@@ -26,13 +26,7 @@ ROOT = Path(__file__).resolve().parent.parent
 LIST = ROOT / 'docs/tests.md'
 SEAMS = {
     'The host seam': ['include/bridge.h'],
-    'The module seam': ['include/bridge_abi.h', 'include/bridge_schema.h'] +
-                       ['backends/%s/sdk/%s' % (b, h) for b, hs in [
-                           ('wasm', 'bridge_wasm bridge_wasm_acc bridge_wasm_entity bridge_wasm_kept '
-                                    'bridge_wasm_log bridge_wasm_observer bridge_wasm_scratch '
-                                    'bridge_wasm_span bridge_wasm_toggle'),
-                           ('native', 'bridge_native bridge_native_api bridge_native_kept '
-                                      'bridge_native_log')] for h in (n + '.h' for n in hs.split())],
+    'The module seam': ['include/bridge_abi.h', 'include/bridge_schema.h'],
     'The backend seam': ['include/bridge_backend.h'],
 }
 # a struct a host fills is exposed key by key: each is stated, and each is refused in its own
