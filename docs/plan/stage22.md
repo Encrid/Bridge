@@ -491,10 +491,29 @@ no other path of it:
                             a wasm one and runs them three passes. Each backend's package
                             states the commit of this tree it was built against
 
-    not shown               in each repository: its pin of this tree and the fetch, which
-                            wait on `main` publishing the seams' package; its workflows
-                            and what it publishes; and the five other targets run. They
-                            are stage 1 of each project's own plan
+    this tree's `main`      merged at Enkrid's word, at `bb22256a976a`. Its three runs passed,
+                            and its prerelease holds twelve archives: `bridge` and `seams`
+                            for each of the six targets
+    each one's pin          a file at its root states that commit and the hash of each of
+                            the twelve. Its build fetches the two of its target once, holds
+                            each archive before it is opened, and passes its cases from a
+                            fresh clone with no folder named: 55 for `BB-Native`, 325 for
+                            `BB-Wasm`, each having gained the case that refuses an archive
+                            that is not the one stated
+    what each publishes     its `main` was made at Enkrid's word, and its three runs,
+                            started by hand, passed: every case once and six at once on
+                            Linux and macOS on both processors and on Windows on x86-64,
+                            with Windows on arm64 compiled, linked and packaged. Each
+                            prerelease holds twelve archives, and the backend's statement
+                            in each names its commit and this tree's
+    the three, published    a host built from the three prereleases' archives for Windows
+                            on x86-64, and from no build folder of any of the three, loads a
+                            native module and a wasm one and runs them three passes. The
+                            host's source and the two modules' are this tree's as they were
+                            at `ffda1a1`, and Binaryen is the one a build had fetched
+
+    not shown               in each repository: a run started by a push, and a pull
+                            request's. And a host built so on a system other than Windows
 
 ## How each claim is shown
 
