@@ -400,6 +400,21 @@ A record or a refusal in this tree that says one of these numbers means the stag
                                     heaviest system, and whether deployments share a clock
                                     and a list of phase names
 
+**Two of the four left the host's plan on 2026-10-09, at Enkrid's word**, as not a host's:
+
+    18  A seam, for a language      placed nowhere. The seams are C, and a binding is made
+        that is not C               from them by whoever wants one: neither this tree nor a
+                                    backend hands one, since one that is handed would be
+                                    written again at each change of a seam while nothing is
+                                    released. It comes back here, and to each backend for its
+                                    SDK, when the seams are released or somebody is stopped
+                                    writing a module in another language
+    19  Prove it                    a project of its own, which is not made yet: the workload
+                                    is an adapter to an engine, and that is a module of an
+                                    engine and not a host's
+
+16 and 17 are the host's still.
+
 **What one of them asks of the library is built here**, in this tree, when that plan reaches it:
 by the method of `contributing.md`, as a stage of this plan with its own number, and with the case
 that the rule of stage 13 demands for whatever it exposes.
