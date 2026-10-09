@@ -115,11 +115,12 @@ than once.
 
 Of `stage22.md`, *Whether what leaves keeps its history*.
 
-Refused: each repository begins with one commit, which names the commit of this tree its
-content came from. It was the one recommended: small repositories, in which every commit is
-about what is there, and the past one command away here. Against it, `git blame` there would
-stop at the first commit. The condition that brings it back is none once the repositories
-exist: a history is not taken out of one that is published.
+Refused: each repository holds the commits that touched its files. It was ruled first, and
+then not: commits there would name stages of this plan and have their other half here, the
+wasm backend's repository would hold every build of wasmtime that was ever in this tree, and a
+tool would have had to be installed to write the two histories. The condition that brings it
+back is a reason for a line having to be looked up here often enough to hurt, before either
+repository has a history of its own worth keeping.
 
 ## How a test module is carried
 

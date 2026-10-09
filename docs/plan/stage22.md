@@ -233,16 +233,16 @@ what each repository is made from, and was not put: it is what this tree does, c
 
 ### Whether what leaves keeps its history
 
-**It does: each repository holds the commits that touched its files.** Enkrid ruled it on
-2026-10-09, over a recommendation to start each with one commit that names this tree's. So
-`git log` and `git blame` answer there, for a line of a backend, as they answer here.
+**It does not: each repository begins with what left this tree, and says which commit of this
+tree that was.** Enkrid ruled it on 2026-10-09, having first ruled that the history be carried.
+When the tool that would carry it was to be chosen, he ruled that it is not. So each repository
+is small, every commit in it is about what is there, and the reason for a line of a backend
+written before this stage is read here, where the history stays whole.
 
 This tree is not written again: its history keeps the backends up to the commit that removes
 them.
 
-What it costs: commits in those repositories whose message names a stage of this plan and
-whose other half is here; and the wasm backend's repository holds every build of wasmtime that
-was ever in this tree.
+What it costs: `git blame` there stops at the first commit.
 
 ### How a test module is carried
 
@@ -261,6 +261,29 @@ what opens a module's library is `utils/os`, which stays.
 
 None stands. Twelve were listed when the stage was planned: eight were put and ruled, and four
 followed from those and from a rule that stands, each said as such under its heading.
+
+## What was built here
+
+    `tests/backend/`            the tests' backend: ten sources. It opens a module's library,
+                                keeps the three limits by counting what a module says it
+                                does, ends a call on a trap, and refuses an entry declared
+                                otherwise than `bridge_abi.h` states, or an instance not
+                                handed both memories. It is told what it keeps and the shape
+                                of a block it asks for, by four settings
+    `tests/binding/`            what a module of the tests is written with, in two faces: by
+                                the table, with four moves of the tests' own; and by offsets,
+                                over accessors that go through the same table
+    `tests/modules/`            every module the cases load, written with the binding, and
+                                seven written bare for a module's shape or its outcome
+    `include/bridge_abi.h`      the eight entries, stated as one type
+    `python build.py package`   two packages: `bridge` and `seams`
+    `tests/packaged`            a host from the library's package, with the tests' backend and
+                                a module compiled against the seams' package
+    the tools                   `cover.py` reads the three seams' headers; `said.py` the
+                                library's messages; `xref.py` lets a stage's record cite a
+                                document that left; `style.py`, `c23.py`, `licence.py`,
+                                `deps.py` and `package.py` name nothing that left
+    the workflows               fetch zig and nothing else
 
 ## What was found on the way
 

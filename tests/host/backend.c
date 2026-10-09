@@ -22,10 +22,10 @@
 **
 ** What a destroyed deck leaves in the process: the library of a backend
 ** that does not say it can be unloaded, and not the library of one that
-** does. The guarded backend's brought wasmtime in, whose own threads do not
-** survive being unloaded. Bridge closes the plain backend's
-** library, and every system this is built for then takes it out of the
-** process.
+** does. A backend that brought in a runtime with threads of its own does
+** not say so, since those would not survive it; guarded, the tests'
+** backend answers as one. Bridge closes the plain backend's library, and
+** every system this is built for then takes it out of the process.
 */
 void test_leave_libraries(host_t *h)
 {

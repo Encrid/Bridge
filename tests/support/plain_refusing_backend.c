@@ -5,11 +5,11 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/support/plain_refusing_backend.c -- the plain backend's first
+** tests/support/plain_refusing_backend.c -- the tests' backend's first
 ** entries, as a backend that refuses would answer them: one that says each
 ** setting it was handed and does not start, for the case that reads what
 ** crosses the backend seam. With plain_refusing_memory.c it stands in the
-** place of backends/plain/plain_backend.c.
+** place of tests/backend/tests_backend.c and tests_memory.c.
 */
 
 #include <stdio.h>
