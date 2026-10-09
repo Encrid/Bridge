@@ -114,15 +114,56 @@ The rule between the two: the binding, unless the binding could not say it.
 It is exposed to nobody, so `tests.md` gives it no heading. What it costs: the library holds
 what began as a copy of another project's SDK, and the two will differ.
 
+### How a case gets an outcome
+
+**The module does it, and the tests' backend judges it against what the library set.** Enkrid
+ruled it on 2026-10-09, as recommended. The tests' binding gives a module four moves: to trap,
+to spend so many units of work, to wait so long, to grow by so many bytes. The backend holds
+each against the limit the library set on that instance through the seam and, past it, unwinds
+the module and answers `call` as a backend does. No time passes: work and waiting are counted.
+A case chooses an outcome by the module it loads.
+
+So an outcome reaches the library by the seam and by nothing else, and a case that ends a
+spinning system also shows that the limit it stated is the one that was set.
+
+What a backend is, a case has by the library it names, as today: the capabilities by a setting
+of the tests' backend, and the three the tests have - one with a single entry, one that answers
+another number, one that refuses - built from the tests' backend where two were built from the
+native one.
+
+### Which cases stay
+
+**Settled by the two decisions above, and by what a case proves.** No question was put: one
+answer follows.
+
+    it proves the library, and     stays, on the tests' backend. A module that was native or
+    needs a module run             wasm only because it happened to be is written with the
+                                   binding
+    it proves what the library     stays, by the four moves. That the wasm backend produces
+    does with an outcome           the outcome is a case of that backend's, written there
+    it proves a backend, or an     leaves with it: the cases named for an SDK, `adopt`,
+    SDK                            `nocall`, the timing of the row accessors, a module of wasm
+                                   text refused for its shape
+    an entry of the seam           stays, shown on the tests' backend: that the library asks
+                                   it rightly. That a backend answers it rightly is that
+                                   backend's
+    a file that holds several      is split by function
+    kinds
+
+Each of the 484 is written down by name, with where it went, when it is moved: *How each claim
+is shown*.
+
+### The layer over the operating system
+
+**Copied into each repository, and made its own there.** Settled by a rule that stands: a
+project copies what it needs and runs nothing from another's directory. `utils/os` depends on
+nothing of the library's and says so. What it costs is three copies that may differ, of 910
+lines.
+
 ## The questions
 
 Each waits here until it is put, and the stage is not done while one stands.
 
-    3   how a case tells the tests' backend which outcome to report, and which of the
-        three the tests have today become part of it
-    4   which cases stay, which leave with which backend, and how a mixed file is split:
-        each of the 484, by name
-    5   `utils/os`, which both backends compile: copied into each repository, or handed
     6   what whoever writes a backend is handed: `bridge_backend.h`, `bridge_abi.h` and
         `bridge_schema.h` are in no package
     7   what the packages become, five being one or two, and what `host_api.md` then says

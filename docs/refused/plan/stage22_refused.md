@@ -64,3 +64,15 @@ binding being taken for an SDK by somebody outside.
 Refused: the binding for every module. A case about a module with no `init`, or with an `init`
 of another signature, could not be written. The condition that brings it back is every such
 case leaving with the wasm backend.
+
+## How a case gets an outcome
+
+Of `stage22.md`, *How a case gets an outcome*.
+
+Refused: the program of the tests tells the backend that the next call fails. A way into a
+backend beside the seam, state shared between threads and between cases, and the limit the
+library set never looked at. The condition that brings it back is an outcome needed at a
+moment no module can choose.
+
+Refused: the backend's settings say which call fails, and how. A small language in strings,
+and the same blindness to the limits. The condition that brings it back is none.
