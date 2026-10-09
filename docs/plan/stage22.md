@@ -93,12 +93,16 @@ and may drift.
 **Public, under the licence and the notice the library has.** Enkrid ruled it on 2026-10-09:
 the same as Bridge.
 
+### What the two are called
+
+**`BB-Native` and `BB-Wasm`, under `Encrid`.** Enkrid ruled it on 2026-10-09. BB is for a
+backend of Bridge's, and what follows is the backend. It was said as "BB as a prefix", read
+aloud both ways, and confirmed as the letters.
+
 ## The questions
 
 Each waits here until it is put, and the stage is not done while one stands.
 
-    1   the two names. "BB as a prefix (Bridge-Backend)" was said, and is read as
-        `BB-Native` and `BB-Wasm`: to be read aloud and confirmed
     2   how a test module is written once the SDKs are gone: against `bridge_abi.h` bare,
         or with a binding kept under `tests/` for the tests alone
     3   how a case tells the tests' backend which outcome to report, and which of the

@@ -36,3 +36,18 @@ Refused: a backend of the tests' own, and the cases of the seam handed as a pack
 backend runs. One set of cases for three users, and a package and a form more for a seam that
 is not released. The condition that brings it back is the seam released, and the two copies
 found to differ once.
+
+## What the two are called
+
+Of `stage22.md`, *What the two are called*.
+
+Refused: `Bridge-Backend-Native` and `Bridge-Backend-Wasm`, the words in full. Longer, for
+what the two letters say to whoever knows the library. The condition that brings it back is
+another project of the library's whose name would begin with the same two letters.
+
+Refused: `Bridge-Native` and `Bridge-Wasm`. It does not say that they are backends, and leaves
+no room for a project of the library's that is not one. The condition that brings it back is
+none.
+
+Refused: `Native-Backend` and `Wasm-Backend`. Nothing says whose backend. The condition that
+brings it back is none.
