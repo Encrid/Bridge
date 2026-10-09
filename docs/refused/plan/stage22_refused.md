@@ -88,3 +88,12 @@ host that has to compile another seam.
 Refused: each backend's repository keeps a copy of the three, made by hand. The seam's own
 header in three trees, and a backend built against a copy that is behind answers the same
 number and is wrong with nothing said. The condition that brings it back is none.
+
+## What each repository is made from
+
+Of `stage22.md`, *What each repository is made from*.
+
+Refused: from the project that new ones are started from, with this tree's tools for C added.
+Its own first stage is not closed, its method is another than the one this code was written
+by, and two programs would check one tree. The condition that brings it back is that project's
+first stage closed, and then for every project at once.

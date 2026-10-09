@@ -186,12 +186,23 @@ says is reworded to what the seam asks, or leaves with them. The two sections of
 that are of `bridge_abi.h` - its layouts, and that it holds no content - go to `abi.md`, which
 is that header's document.
 
+### What each repository is made from
+
+**From this one: its method, its style, the tools the code is held by, and its build, each
+copied and made that repository's own.** Enkrid ruled it on 2026-10-09, as recommended. The
+code that leaves was written under these rules and passes these tools, so nothing is written
+anew to hold it.
+
+Each file's notice names its own project, `BB-Native Owner` and `BB-Wasm Owner`. `license` is
+the same text, and `cla.md` the same agreement with the name changed. Each has a first stage of
+its own that says where its content came from, by the commit of this tree.
+
+What it costs: the method's text is then in five repositories, kept true by hand.
+
 ## The questions
 
 Each waits here until it is put, and the stage is not done while one stands.
 
-    9   what each repository is made from: its method, its style, its tools, its build,
-        its licence and its agreement
     10  how each backend tests itself: against which commit of the library, taken how, and
         the order in which a change to the seam goes through three repositories
     11  whether the files that leave keep their history
