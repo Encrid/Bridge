@@ -444,3 +444,20 @@ and its SDK's, each holding what `host_api.md` says it holds and a statement of 
 the hash of each file, and a case fails on a package that differs; a host, and a module for each
 backend, are built from the packages alone and run; and a run for `main` publishes the packages of
 each platform, from which one is fetched by its commit and its hashes hold.*
+
+## 22. The backends leave the tree
+
+Not built: `stage22.md`.
+
+A backend is a shared library behind a seam, and the two there are were written in this tree,
+with what a module is written with for each. On 2026-10-09 Enkrid ruled that each is a project
+of its own, in its own repository. What stays here is the seam and what holds it. This stage
+gives the library a backend of the tests' own, whose modules are compiled into it and which
+answers what a case asks of it, moves every case onto it that proves the library, puts each
+backend in its repository with its SDK and the cases that prove it, and removes them here.
+
+*Done when no file of a backend or of an SDK is in the tree, and no tool or document of it names
+one as its own; every case passes on the tests' backend alone; each of the two repositories
+builds its backend and its SDK from its own tree and from what the library hands, and passes the
+cases that left with it; each publishes what it makes for a commit; and a host built from what
+the three publish loads a native module and a wasm one and runs them.*
