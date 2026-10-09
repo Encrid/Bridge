@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCES = ('src/*.c', 'tests/backend/*.c')
+SOURCES = ('src/*.c',)
 WRITERS = ('abi_refuse', 'module_refuse', 'reload_refuse', 'say_error', 'say_about', 'module_fail',
            'config_refuse', 'schema_refuse', 'snprintf')
 SPEC = r'%[-+ #0]*(?:\*|\d+)?(?:\.(?:\*|\d+))?(?:hh|h|ll|l|z|j|t)?[diouxXcsfgeEp]'

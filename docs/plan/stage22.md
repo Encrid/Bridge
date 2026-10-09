@@ -378,6 +378,23 @@ case of storage or of an entry. One a document relied on was kept under the entr
 
 416 after them.
 
+**The program that called a backend as the library does was the wasm backend's.** Its ten
+cases stood under headings of the backend seam and showed that backend: one block in two
+stores, a trap after which the store runs on, twenty thousand timed calls. It leaves with it.
+What the library does at those entries is shown here by the tests' backend, which now holds
+what it is handed against the headers: `define_func` refuses an entry declared with another
+signature than `bridge_abi.h` states, and `instance_create` an instance that was not handed
+both memories. So every load of a module of the tests shows both, and nine cases under those
+headings are a load: `backend_sig_t-what-each-entry-takes-and-answers`,
+`backend_entry_t-what-answers-an-import`, `backend_memory_import_t-both-memories-handed`,
+`memory_release-after-the-last-instance`, `instance_create-with-both-memories`,
+`define_func-called-by-a-module`, `call-a-call-that-was-ended-answered`,
+`BACKEND_I32-an-argument-of-32-bits`, `BACKEND_I64-an-argument-of-64-bits`. The tenth, `adopt`,
+had no heading but its own and is gone. 415.
+
+**The check of what is said holds the library's messages, and no backend's.** It read the
+two backends' sources beside the library's; theirs are held where they now are.
+
 ## How each claim is shown
 
     each case accounted for   a table here: each of the 484 by name, where it is after the

@@ -22,14 +22,15 @@
 ** instance_create
 **
 ** Makes an instance of a module, with the table it is handed and the two
-** memories. None is made of a module that imports what nobody answers.
+** memories. None is made of a module that imports what nobody answers,
+** nor of one that was not handed both memories: every load of a module of
+** the tests then shows that Bridge hands them.
 */
 BACKEND_EXPORT backend_instance_t *instance_create(backend_module_t *m,
     const backend_memory_import_t *memories, uint32_t count,
     backend_err_t *err)
 {
     backend_instance_t *i = m->stray ? nullptr : calloc(1, sizeof(*i));
-    uint32_t k = 0;
 
     if (!i) {
         snprintf(err->text, sizeof(err->text), "nothing answers its import "
@@ -38,14 +39,12 @@ BACKEND_EXPORT backend_instance_t *instance_create(backend_module_t *m,
     }
     i->m = m;
     tests_fill_api(&i->api);
-    while (k < count) {
-        if (!strcmp(memories[k].field, BRIDGE_SHARED))
-            i->api.shared_base = memories[k].memory->ptr;
-        if (!strcmp(memories[k].field, BRIDGE_PRIVATE))
-            i->api.private_base = memories[k].memory->ptr;
-        k++;
-    }
-    return (i);
+    tests_take_memories(&i->api, memories, count);
+    if (i->api.shared_base && i->api.private_base)
+        return (i);
+    snprintf(err->text, sizeof(err->text), "it was not handed both memories");
+    free(i);
+    return (nullptr);
 }
 
 /*

@@ -100,7 +100,7 @@ BRIDGE = ['say', 'bridge_create', 'bridge_backend', 'bridge_backends', 'bridge_p
           'abi_system'] + MODULE + ['pool', 'pool_job', 'pool_run', 'backend'] + SCHEMA + CONFIG + SCHEDULE + BLOCK + STORAGE
 # the tests' backend, and the modules it runs: the name of a module's library, its source under
 # tests/modules, what it is compiled with - stage22.md, *What a test module is written with*
-TESTS_BACKEND = ['tests_abi', 'tests_backend', 'tests_memory', 'tests_module', 'tests_instance', 'tests_func',
+TESTS_BACKEND = ['tests_abi', 'tests_backend', 'tests_memory', 'tests_define', 'tests_module', 'tests_instance', 'tests_func',
                  'tests_load', 'tests_phase', 'tests_moves']
 BUILT = [
     ('ok', 'ok', []), ('image', 'image', []), ('oob', 'oob', []), ('spin', 'spin', []),
@@ -432,7 +432,6 @@ def build(target, debug, out):
     host_program_o = program('host', ours + [include] + defines, host_o)
     # these reach inside, to test it: they are compiled against src/ and share nothing
     schema_test_o = program('schema', ours + [include, src], [])
-    adopt_o = program('adopt', ours + [include, src, utils] + defines, [])
     storage_o = program('storage', ours + [include, src, utils] + defines, [])
     # the library again, with its calls to the allocator sent to the test that counts them
     counting = ['-D%s=counted_%s' % (f, f) for f in ('malloc', 'calloc', 'realloc', 'free')]
@@ -513,7 +512,6 @@ def build(target, debug, out):
         link('built/' + name, by_offsets_o[name], shared=True)
     for name, _, _ in NATIVE:
         link(name, module_o[name], shared=True)
-    link('adopt', adopt_o + [obj / 'backend.o'] + os_o, system)
     link('schema', schema_test_o + [obj / (name + '.o') for name in ['schema'] + SCHEMA], system)
     whole = bridge_o + os_o
     # the library, built: shared and static. What a host links - host_api.md
@@ -811,8 +809,6 @@ CASES = [
      r"read in order.*in no order.*204800 of them on.*found through its query.*alive", r"FAIL"),
     ('storage-measure', ['storage', 'measure'],
      r"an id handed out +[0-9.]+ ns each.*ten thousand tables made.*the stress run, on 1 thread.*alive", None),
-    ('adopt', ['adopt'],
-     None, None),
     ('bridge_load-loaded', ['host', 'bridge_load-loaded'],
      r"test:ok@0.1.0: loaded.*alive", None),
     ('BRIDGE_NO_LIMIT-stated-for-every-limit', ['host', 'BRIDGE_NO_LIMIT-stated-for-every-limit'],
@@ -1290,22 +1286,22 @@ CASES = [
      '@tests/storage_changes.txt', None),
     ('detach-queued-and-applied-at-the-barrier', ['storage', 'changes'],
      '@tests/storage_changes.txt', None),
-    ('backend_sig_t-an-i32-and-an-i64-answered', ['adopt'],
-     r"a host function: called with an i32 and an i64, answered 16", None),
-    ('backend_entry_t-what-answers-an-import', ['adopt'],
-     r"a host function: called with an i32 and an i64, answered 16", None),
-    ('backend_memory_import_t-one-block-in-two-stores', ['adopt'],
-     r"two stores, two threads: both halves intact, and each sees the other's", None),
+    ('backend_sig_t-what-each-entry-takes-and-answers', ['host', 'backend_sig_t-what-each-entry-takes-and-answers'],
+     r"game:mover@0.1.0: loaded.*moved.*alive", 'not loaded'),
+    ('backend_entry_t-what-answers-an-import', ['host', 'backend_entry_t-what-answers-an-import'],
+     r"game:mover@0.1.0: loaded.*moved.*alive", 'not loaded'),
+    ('backend_memory_import_t-both-memories-handed', ['host', 'backend_memory_import_t-both-memories-handed'],
+     r"game:mover@0.1.0: loaded.*moved.*alive", 'not loaded'),
     ('memory_get_shape-the-block-reserved-as-asked', ['storage', 'shape'],
      r"the shared block reserves more than it uses: yes.*a native module's private block reserves what it uses: yes.*the shared block is whole wasm pages: yes.*a native module's private block is not rounded to one: yes.*alive", None),
-    ('memory_release-after-the-last-instance', ['adopt'],
-     r"20000 timed calls back to back: none interrupted", None),
-    ('instance_create-one-block-in-two-stores', ['adopt'],
-     r"two stores, two threads: both halves intact, and each sees the other's", None),
-    ('define_func-called-by-a-module', ['adopt'],
-     r"a host function: called with an i32 and an i64, answered 16", None),
-    ('call-a-trap-answered-and-the-store-runs-on', ['adopt'],
-     r"stray load: trapped: out of bounds memory access.*after the trap: the store still runs", None),
+    ('memory_release-after-the-last-instance', ['host', 'memory_release-after-the-last-instance'],
+     r"game:mover@0.1.0: loaded.*moved.*alive", 'not loaded'),
+    ('instance_create-with-both-memories', ['host', 'instance_create-with-both-memories'],
+     r"game:mover@0.1.0: loaded.*moved.*alive", 'not loaded'),
+    ('define_func-called-by-a-module', ['host', 'define_func-called-by-a-module'],
+     r"game:mover@0.1.0: loaded.*moved.*alive", 'not loaded'),
+    ('call-a-call-that-was-ended-answered', ['host', 'call-a-call-that-was-ended-answered'],
+     r"its init trapped: the module asked for it.*test:oob@0.1.0: not loaded.*alive", None),
     ('BRIDGE_ERR-nothing-above-an-error-written', ['host', 'BRIDGE_ERR-nothing-above-an-error-written'],
      r"record.3.: an error\s+alive", r"a warning"),
     ('BRIDGE_WARN-a-warning-and-what-is-worse', ['host', 'BRIDGE_WARN-a-warning-and-what-is-worse'],
@@ -1479,10 +1475,10 @@ CASES = [
      r"sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive", None),
     ('BACKEND_ABI-answered-and-the-library-opened', ['host', 'BACKEND_ABI-answered-and-the-library-opened'],
      r"view:reader@0.1.0/sum: sum 250500 0.*native tally 2 1000.*sum 251000 0.*alive", None),
-    ('BACKEND_I32-an-argument-of-32-bits', ['adopt'],
-     r"a host function: called with an i32 and an i64, answered 16", None),
-    ('BACKEND_I64-an-argument-of-64-bits', ['adopt'],
-     r"a host function: called with an i32 and an i64, answered 16", None),
+    ('BACKEND_I32-an-argument-of-32-bits', ['host', 'BACKEND_I32-an-argument-of-32-bits'],
+     r"game:mover@0.1.0: loaded.*moved.*alive", 'not loaded'),
+    ('BACKEND_I64-an-argument-of-64-bits', ['host', 'BACKEND_I64-an-argument-of-64-bits'],
+     r"game:mover@0.1.0: loaded.*moved.*alive", 'not loaded'),
     ('config.backends-none-refused', ['host', 'config.backends-none-refused'],
      r"the deployment configures no backend, and a module is run by one.*bridge_create refused.*alive", None),
     ('attach-tag-with-a-value-refused', ['host', 'attach-tag-with-a-value-refused'],

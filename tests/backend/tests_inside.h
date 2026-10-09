@@ -19,6 +19,7 @@
 
     #include <setjmp.h>
     #include <stddef.h>
+    #include <string.h>
 
     #include "bridge_backend.h"
     #include "os.h"
@@ -118,6 +119,16 @@ struct backend_instance {
 };
 
 /*
+** What an entry takes and answers: its parameters, how many, and whether
+** it answers 32 bits, 64, or nothing.
+*/
+typedef struct {
+    enum backend_type params[3];
+    uint32_t count;
+    enum backend_type result;
+} tests_shape_t;
+
+/*
 ** tests_get_instance
 **
 ** Answers whose table this is: the table a module was handed is part of
@@ -154,6 +165,25 @@ static inline uint64_t tests_enter(const test_api_t *api,
         return (result);
     i->refused = 1;
     return (0);
+}
+
+/*
+** tests_take_memories
+**
+** Keeps where the two memories an instance was handed begin.
+*/
+static inline void tests_take_memories(test_api_t *api,
+    const backend_memory_import_t *memories, uint32_t count)
+{
+    uint32_t k = 0;
+
+    while (k < count) {
+        if (!strcmp(memories[k].field, BRIDGE_SHARED))
+            api->shared_base = memories[k].memory->ptr;
+        if (!strcmp(memories[k].field, BRIDGE_PRIVATE))
+            api->private_base = memories[k].memory->ptr;
+        k++;
+    }
 }
 
 /*

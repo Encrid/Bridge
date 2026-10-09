@@ -5,8 +5,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/backend/tests_func.c -- what answers an entry kept, an export of
-** a module found, and a call made, which a move of the tests may end.
+** tests/backend/tests_func.c -- an export of a module found, and a call
+** made, which a move of the tests may end.
 **
 ** signatures.md, *A call takes nothing and answers a status*
 */
@@ -16,28 +16,6 @@
 #include <string.h>
 
 #include "tests_inside.h"
-
-/*
-** define_func
-**
-** Keeps what answers an entry of the ABI. One it has no place for is
-** kept nowhere: no module of the tests could call it.
-**
-** signatures.md, *Imports are declared, exports are checked*
-*/
-BACKEND_EXPORT int define_func(backend_instance_t *i,
-    const backend_entry_t *entry, [[maybe_unused]] backend_err_t *err)
-{
-    uint32_t k = 0;
-
-    while (k < TESTS_ENTRIES && strcmp(entry->field, TESTS_ENTRY_NAMES[k]))
-        k++;
-    if (k == TESTS_ENTRIES || strcmp(entry->ns, BRIDGE_NAMESPACE))
-        return (0);
-    i->fns[k] = entry->fn;
-    i->uds[k] = entry->ud;
-    return (0);
-}
 
 /*
 ** instance_get_func

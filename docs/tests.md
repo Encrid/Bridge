@@ -812,7 +812,7 @@ handed.
 
 ### backend_sig_t
 
-    backend_sig_t-an-i32-and-an-i64-answered
+    backend_sig_t-what-each-entry-takes-and-answers
 
 ### backend_import_t
 
@@ -820,7 +820,7 @@ handed.
 
 ### backend_memory_import_t
 
-    backend_memory_import_t-one-block-in-two-stores
+    backend_memory_import_t-both-memories-handed
 
 ### backend_source_t
 
@@ -872,7 +872,7 @@ handed.
 
 ### instance_create
 
-    instance_create-one-block-in-two-stores
+    instance_create-with-both-memories
 
 ### instance_destroy
 
@@ -900,7 +900,7 @@ handed.
 
 ### call
 
-    call-a-trap-answered-and-the-store-runs-on
+    call-a-call-that-was-ended-answered
 
 ### BACKEND_UNTRUSTED
 
@@ -1060,12 +1060,6 @@ The library built with its calls to the allocator counted.
 The reader of descriptors: each that is read, and each that is refused.
 
     schema
-
-### adopt
-
-A backend, called as the library calls it.
-
-    adopt
 
 ## The tree
 
