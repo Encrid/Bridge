@@ -59,24 +59,27 @@ binding in its own language, which is its backend's to provide as the two there 
 
 ## What a host is handed
 
-**Packages.** A package is a folder of built files set apart for somebody else to take, and
-the build writes five for a target, under `packages/` of the folder it builds into:
+**Packages.** A package is a folder of files set apart for somebody else to take, and the
+build writes two for a target, under `packages/` of the folder it builds into:
 
-    `bridge`           the library: its shared file, its static file, `bridge.h`, which is
-                       the one header a host includes, and `license`
-    `backend_native`   the native backend's library, and `license`
-    `backend_wasm`     the wasm backend's library, wasmtime's shared library, which that
-                       backend loads from beside itself, `license`, and wasmtime's own as
-                       `license_wasmtime`
-    `sdk_native`       what a native module is written with: `bridge_abi.h`,
-                       `bridge_schema.h`, the files of that backend's `sdk/`, and `license`
-    `sdk_wasm`         the same for a wasm module
+    `bridge`   the library: its shared file, its static file, `bridge.h`, which is the one
+               header a host includes, and `license`
+    `seams`    the two other seams: `bridge_backend.h`, which a backend is written against,
+               `bridge_abi.h` and `bridge_schema.h`, which what a module is written with is
+               made of, and `license`
 
-**A host takes the library's, and a backend's for each backend its deployment names.** A
-backend is a library of its own that a deck opens by the path a deployment states - `config.md`,
-*The keys* - and a deck is not created without one, so the library's package alone runs
-nothing. An SDK's package is for whoever writes a module, which a host that only runs other
-people's modules never is. The backends the tests build for themselves are in no package.
+**A host takes the library's. Whoever writes a backend takes both.** A backend is a library of
+its own that a deck opens by the path a deployment states - `config.md`, *The keys* - and a
+deck is not created without one, so the library's package alone runs nothing: a host also takes
+a backend for each its deployment names, from that backend's own project, which is not this
+one. Each such project hands its backend, and what a module is written with for it. The
+backend the tests build for themselves is in no package.
+
+**What a backend hands states the commit of the library it was built against.** The number of
+a seam cannot tell a host that a backend and a library go together while nothing is released,
+since the number does not move while the seam does - *A seam has a number*, below. So a host
+that is handed a backend built against another commit than its library refuses it, by the two
+statements.
 
 **Each package states itself, in `package.txt`.** Its name, the commit of Bridge it was built
 from, the target, whether the cases were run on that target and passed in the build that made
@@ -95,11 +98,11 @@ archives of each target whose job passed. It is named for a commit and claims no
 Windows on arm64 is published by the job of Windows on x86-64, with `run no` - `build.md`,
 *Platforms*. A job that fails publishes nothing, so a release may lack a target.
 
-**What a host is handed is shown to be enough**, by a host and two modules that are built
-from the packages and from nothing else of the tree: `tests/packaged`, which includes
-`bridge.h` out of the library's package and links that library, shared and then static, and
-`tests/modules/packaged`, a native module and a wasm one, each compiled against its SDK's
-package. `tools/package.py` holds what each package holds against this section.
+**What is handed is shown to be enough**, by a host, a backend and a module that are built
+from the packages and from no header of the tree: `tests/packaged`, which includes `bridge.h`
+out of the library's package and links that library, shared and then static; and the tests'
+backend and a module of the tests, each compiled against the seams' package. `tools/package.py`
+holds what each package holds against this section.
 
 **One thing `bridge.h` does not give a host: the number of the module seam.** A host states it
 for each module it loads, in `bridge_module_config_t`, and it is the module's to say, in its

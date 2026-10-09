@@ -8,9 +8,7 @@
     python build.py --debug ...          unoptimised, with debug information
     python build.py package              build, run every case, and make what a host is handed
 
-Needs zig on the path. Binaryen is taken from BINARYEN_ROOT or the path, and on Windows fetched
-at its pin when it is in neither. Every path is taken from where this file is
-and from --out, so a repository that has this one as a submodule builds it by calling this.
+Needs zig on the path. Every path is taken from where this file is and from --out, so a repository that has this one as a submodule builds it by calling this.
 """
 import argparse
 import concurrent.futures
@@ -22,51 +20,37 @@ import shutil
 import subprocess
 import sys
 import tarfile
-import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 # What differs by target, and nothing else does: where it runs, how a program and a library are
 # named, which folder of utils/os is its operating system's, which of the system's declarations are asked for by name (the language is ISO C, and a
-# compiler's gnu mode would have shown them unasked), what a link names, how a library finds what
-# sits beside it, and wasmtime's files under backends/wasm/wasmtime: the one that backend is linked
-# against, and the one it loads.
+# compiler's gnu mode would have shown them unasked), what a link names, and how a library finds what
+# sits beside it.
 TARGETS = {
     'x86_64-windows-gnu': {
         'runs on': ('Windows', 'AMD64'), 'program': '.exe', 'library': '.dll', 'os': 'windows',
-        'compile': [], 'link': [], 'beside': [], 'named': [],
-        'wasmtime': ('windows/libwasmtime.dll.a', 'windows/wasmtime.dll')},
+        'compile': [], 'link': [], 'beside': [], 'named': []},
     'x86_64-linux-gnu': {
         'runs on': ('Linux', 'x86_64'), 'program': '', 'library': '.so', 'os': 'posix',
         'compile': ['-fPIC', '-D_DEFAULT_SOURCE'], 'link': ['-lm', '-lpthread', '-ldl'],
-        'beside': ['-Wl,-rpath,$ORIGIN'], 'named': ['-Wl,-soname,bridge.so'],
-        'wasmtime': ('linux/libwasmtime.so', 'linux/libwasmtime.so')},
+        'beside': ['-Wl,-rpath,$ORIGIN'], 'named': ['-Wl,-soname,bridge.so']},
     'aarch64-macos': {
         'runs on': ('Darwin', 'arm64'), 'program': '', 'library': '.dylib', 'os': 'posix',
         'compile': ['-fPIC', '-D_DARWIN_C_SOURCE'], 'link': [],
-        'beside': ['-Wl,-rpath,@loader_path'], 'named': ['-Wl,-install_name,@rpath/bridge.dylib'],
-        'wasmtime': ('macos/libwasmtime.dylib', 'macos/libwasmtime.dylib')},
+        'beside': ['-Wl,-rpath,@loader_path'], 'named': ['-Wl,-install_name,@rpath/bridge.dylib']},
     'aarch64-linux-gnu': {
         'runs on': ('Linux', 'aarch64'), 'program': '', 'library': '.so', 'os': 'posix',
         'compile': ['-fPIC', '-D_DEFAULT_SOURCE'], 'link': ['-lm', '-lpthread', '-ldl'],
-        'beside': ['-Wl,-rpath,$ORIGIN'], 'named': ['-Wl,-soname,bridge.so'],
-        'wasmtime': ('linux_aarch64/libwasmtime.so', 'linux_aarch64/libwasmtime.so')},
+        'beside': ['-Wl,-rpath,$ORIGIN'], 'named': ['-Wl,-soname,bridge.so']},
     'x86_64-macos': {
         'runs on': ('Darwin', 'x86_64'), 'program': '', 'library': '.dylib', 'os': 'posix',
         'compile': ['-fPIC', '-D_DARWIN_C_SOURCE'], 'link': [],
-        'beside': ['-Wl,-rpath,@loader_path'], 'named': ['-Wl,-install_name,@rpath/bridge.dylib'],
-        'wasmtime': ('macos_x86_64/libwasmtime.dylib', 'macos_x86_64/libwasmtime.dylib')},
+        'beside': ['-Wl,-rpath,@loader_path'], 'named': ['-Wl,-install_name,@rpath/bridge.dylib']},
     'aarch64-windows-gnu': {
         'runs on': ('Windows', 'ARM64'), 'program': '.exe', 'library': '.dll', 'os': 'windows',
-        'compile': [], 'link': [], 'beside': [], 'named': [],
-        'wasmtime': ('windows_aarch64/wasmtime.dll.lib', 'windows_aarch64/wasmtime.dll')},
+        'compile': [], 'link': [], 'beside': [], 'named': []},
 }
-BINARYEN = 'binaryen-version_133'
-BINARYEN_URL = ('https://github.com/WebAssembly/binaryen/releases/download/version_133/'
-                'binaryen-version_133-x86_64-windows.tar.gz')
-BINARYEN_SHA256 = '17a2cbeac6b5693c5fbafab3838d3c65fd9c1eb38b05f5baec6c657e8c84995b'
-FEATURES = ['--enable-multimemory', '--enable-bulk-memory', '--enable-sign-ext',
-            '--enable-nontrapping-float-to-int', '--enable-mutable-globals']
 TIMEOUT = 120
 
 OS = ['memory', 'library', 'thread', 'mutex', 'event']
@@ -87,10 +71,6 @@ MODULE = ['module_say', 'module_check', 'module_check_stated', 'module_check_fit
           'module_check_backend', 'module_record', 'module_discard', 'module_types', 'module_call',
           'module_instance', 'module_start', 'module_pointed', 'module_share', 'reload_check', 'reload_share',
           'reload_record', 'reload_rows', 'reload_fail']
-WASM_BACKEND = ['wasm_fail', 'wasm_own', 'wasm_adopted', 'wasm_holder', 'wasm_engine', 'wasm_backend',
-        'wasm_module', 'wasm_instance', 'wasm_call', 'wasm_offered', 'wasm_func']
-NATIVE_BACKEND = ['native_load', 'native_phase', 'native_backend', 'native_abi', 'native_module',
-                  'native_instance', 'native_func']
 BRIDGE = ['say', 'bridge_create', 'bridge_backend', 'bridge_backends', 'bridge_phases',
           'bridge_destroy', 'bridge_stop', 'bridge_run', 'bridge_load', 'bridge_unload',
           'bridge_reload', 'config',
@@ -116,48 +96,81 @@ BUILT = [
     ('stepper1', 'stepper', ['STEP=1']), ('stepper2', 'stepper', ['STEP=10']),
     ('stepper3', 'stepper', ['STEP=10', 'FAIL_RELOAD']),
 ]
-# what tests/storage loads: each was a native module, and is listed below as one until the native
-# backend leaves - stage22.md, *Which cases stay*
-STORED = ('direct', 'frag', 'holder', 'layout', 'move', 'single', 'sparse', 'store', 'stress', 'tag', 'toggle', 'weigh')
-
-# a native module is a shared library: the name, its source, what it is compiled with. The same
-# library twice is one module to the loader, so one source is built under several names.
-NATIVE = [
-    ('nmover', 'nmover', []), ('nflood', 'nflood', []), ('nsetter', 'nsetter', []),
-    ('nsleep1', 'nsleep', []), ('nsleep2', 'nsleep', []), ('npinned', 'npinned', []),
-    ('nforeign', 'nforeign', []),
-    ('nticker1', 'nticker', ['STEP=1']), ('nticker2', 'nticker', ['STEP=10']),
-    ('nticker3', 'nticker', ['STEP=10', 'FAIL_RELOAD']),
-    ('nstore', 'nstore', []), ('nstorebig', 'nstore', ['BIG']), ('nstoretab', 'nstore', ['TABLES']),
-    ('nstorefat64', 'nstore', ['BIG', 'FAT64']), ('nstorefat256', 'nstore', ['BIG', 'FAT256']),
-    ('nstorefat1k', 'nstore', ['BIG', 'FAT1K']), ('nstorefat4k', 'nstore', ['BIG', 'FAT4K']),
-    ('nstamp5', 'nstamp', ['VALUE=5', 'PHASE="update"']),
-    ('nstamp9', 'nstamp', ['VALUE=9', 'PHASE="update"']), ('nreaper', 'nreaper', []),
-    ('nstampunstated', 'nstamp', ['VALUE=1', 'PHASE="update"', 'UNSTATED']),
-    ('nstamptick', 'nstamp', ['VALUE=7', 'PHASE="tick"']),
-    ('nfrag1', 'nfrag', ['SPLIT=1']), ('nfrag16', 'nfrag', ['SPLIT=16']),
-    ('nfrag256', 'nfrag', ['SPLIT=256']), ('nfrag4096', 'nfrag', ['SPLIT=4096']),
-    ('nsparse', 'nsparse', []), ('nsparsebig', 'nsparse', ['BIG']), ('nsparsefat', 'nsparse', ['FAT']),
-    ('nsparsebad1', 'nsparse', ['BAD=1']), ('nsparsebad2', 'nsparse', ['BAD=2']),
-    ('nmove1', 'nmove', ['KEPT=1']), ('nmove2', 'nmove', ['KEPT=2']), ('nmove3', 'nmove', ['KEPT=3']),
-    ('nmove4', 'nmove', ['KEPT=4']), ('nmove5', 'nmove', ['KEPT=5']),
-    ('nholder', 'nholder', []),
-] + [('nlayout%d' % v, 'nlayout', ['V=%d' % v, 'KEPT=1']) for v in range(15)] + [
-    ('nlayout%dk%d' % (v, k), 'nlayout', ['V=%d' % v, 'KEPT=%d' % k]) for k in (2, 3, 4, 5) for v in (0, 1, 2)] + [
-    ('ntag', 'ntag', []), ('nfragtag4096', 'nfrag', ['SPLIT=4096', 'TAGS']),
-    ('nsingle', 'nsingle', []), ('nsinglebad1', 'nsingle', ['BAD=1']),
-    ('nsinglebad2', 'nsingle', ['BAD=2']), ('nsinglebad3', 'nsingle', ['BAD=3']),
-    ('ndirect', 'ndirect', []), ('ndirectbig', 'ndirect', ['BIG']), ('ndirectbad', 'ndirect', ['BAD']),
-    ('ntoggle', 'ntoggle', []), ('ntoggle1', 'ntoggle', ['BIG', 'ON=1']),
-    ('ntoggle2', 'ntoggle', ['BIG', 'ON=2']), ('ntoggle16', 'ntoggle', ['BIG', 'ON=16']),
-    ('nweigh1', 'nweigh', ['ON=1']), ('nweigh2', 'nweigh', ['ON=2']), ('nweigh16', 'nweigh', ['ON=16']),
-    ('nstress1', 'nstress', ['SEED=1u', 'SPACE="s1"']), ('nstress2', 'nstress', ['SEED=2u', 'SPACE="s2"']),
-    ('nstress3', 'nstress', ['SEED=3u', 'SPACE="s3"']), ('nstress4', 'nstress', ['SEED=4u', 'SPACE="s4"']),
+# what tests/storage loads
+BUILT += [
+    ('store', 'store', []),
+    ('storebig', 'store', ['BIG']),
+    ('storetab', 'store', ['TABLES']),
+    ('storefat64', 'store', ['BIG', 'FAT64']),
+    ('storefat256', 'store', ['BIG', 'FAT256']),
+    ('storefat1k', 'store', ['BIG', 'FAT1K']),
+    ('storefat4k', 'store', ['BIG', 'FAT4K']),
+    ('frag1', 'frag', ['SPLIT=1']),
+    ('frag16', 'frag', ['SPLIT=16']),
+    ('frag256', 'frag', ['SPLIT=256']),
+    ('frag4096', 'frag', ['SPLIT=4096']),
+    ('sparse', 'sparse', []),
+    ('sparsebig', 'sparse', ['BIG']),
+    ('sparsefat', 'sparse', ['FAT']),
+    ('sparsebad1', 'sparse', ['BAD=1']),
+    ('sparsebad2', 'sparse', ['BAD=2']),
+    ('move1', 'move', ['KEPT=1']),
+    ('move2', 'move', ['KEPT=2']),
+    ('move3', 'move', ['KEPT=3']),
+    ('move4', 'move', ['KEPT=4']),
+    ('move5', 'move', ['KEPT=5']),
+    ('holder', 'holder', []),
+    ('layout0', 'layout', ['V=0', 'KEPT=1']),
+    ('layout1', 'layout', ['V=1', 'KEPT=1']),
+    ('layout2', 'layout', ['V=2', 'KEPT=1']),
+    ('layout3', 'layout', ['V=3', 'KEPT=1']),
+    ('layout4', 'layout', ['V=4', 'KEPT=1']),
+    ('layout5', 'layout', ['V=5', 'KEPT=1']),
+    ('layout6', 'layout', ['V=6', 'KEPT=1']),
+    ('layout7', 'layout', ['V=7', 'KEPT=1']),
+    ('layout8', 'layout', ['V=8', 'KEPT=1']),
+    ('layout9', 'layout', ['V=9', 'KEPT=1']),
+    ('layout10', 'layout', ['V=10', 'KEPT=1']),
+    ('layout11', 'layout', ['V=11', 'KEPT=1']),
+    ('layout12', 'layout', ['V=12', 'KEPT=1']),
+    ('layout13', 'layout', ['V=13', 'KEPT=1']),
+    ('layout14', 'layout', ['V=14', 'KEPT=1']),
+    ('layout0k2', 'layout', ['V=0', 'KEPT=2']),
+    ('layout1k2', 'layout', ['V=1', 'KEPT=2']),
+    ('layout2k2', 'layout', ['V=2', 'KEPT=2']),
+    ('layout0k3', 'layout', ['V=0', 'KEPT=3']),
+    ('layout1k3', 'layout', ['V=1', 'KEPT=3']),
+    ('layout2k3', 'layout', ['V=2', 'KEPT=3']),
+    ('layout0k4', 'layout', ['V=0', 'KEPT=4']),
+    ('layout1k4', 'layout', ['V=1', 'KEPT=4']),
+    ('layout2k4', 'layout', ['V=2', 'KEPT=4']),
+    ('layout0k5', 'layout', ['V=0', 'KEPT=5']),
+    ('layout1k5', 'layout', ['V=1', 'KEPT=5']),
+    ('layout2k5', 'layout', ['V=2', 'KEPT=5']),
+    ('tag', 'tag', []),
+    ('fragtag4096', 'frag', ['SPLIT=4096', 'TAGS']),
+    ('single', 'single', []),
+    ('singlebad1', 'single', ['BAD=1']),
+    ('singlebad2', 'single', ['BAD=2']),
+    ('singlebad3', 'single', ['BAD=3']),
+    ('direct', 'direct', []),
+    ('directbig', 'direct', ['BIG']),
+    ('directbad', 'direct', ['BAD']),
+    ('toggle', 'toggle', []),
+    ('toggle1', 'toggle', ['BIG', 'ON=1']),
+    ('toggle2', 'toggle', ['BIG', 'ON=2']),
+    ('toggle16', 'toggle', ['BIG', 'ON=16']),
+    ('weigh1', 'weigh', ['ON=1']),
+    ('weigh2', 'weigh', ['ON=2']),
+    ('weigh16', 'weigh', ['ON=16']),
+    ('stress1', 'stress', ['SEED=1u', 'SPACE="s1"']),
+    ('stress2', 'stress', ['SEED=2u', 'SPACE="s2"']),
+    ('stress3', 'stress', ['SEED=3u', 'SPACE="s3"']),
+    ('stress4', 'stress', ['SEED=4u', 'SPACE="s4"']),
 ]
 
-BUILT += [(name[1:], source[1:], flags) for name, source, flags in NATIVE if source[1:] in STORED]
-
-# a module in C: the name, its source, whether its rows are tested, what it is compiled with.
+# a module written by offsets: the name, its source, whether its rows are tested, what it is
+# compiled with.
 # `checked` or `unchecked` is stated for each, as the SDK asks: BRIDGE_ROWS_CHECKED, or not.
 PLAIN = ('mover reader refs fp badterm spin3 flood chatty rows halver twostep watcher chain '
          'badobs events fixer nested namer spawner counter typer user hang hit '
@@ -260,48 +273,16 @@ def tool(name, hints=()):
     return Path(found) if found else None
 
 
-def binaryen(build):
-    """The four tools of Binaryen a build calls: from BINARYEN_ROOT, the path, or fetched at the
-    pin. wasm-as assembles what is written as wasm text, wasm-merge and wasm-opt put the SDK's
-    accessors into a compiled module, wasm-dis prints one for the case that reads it."""
-    hints = [build / BINARYEN / 'bin']
-    if os.environ.get('BINARYEN_ROOT'):
-        hints.insert(0, Path(os.environ['BINARYEN_ROOT']) / 'bin')
-    if not tool('wasm-merge', hints):
-        if os.name != 'nt':
-            die('wasm-merge is not on the path, and BINARYEN_ROOT does not name it')
-        archive = build / 'binaryen.tar.gz'
-        build.mkdir(parents=True, exist_ok=True)
-        urllib.request.urlretrieve(BINARYEN_URL, archive)
-        if hashlib.sha256(archive.read_bytes()).hexdigest() != BINARYEN_SHA256:
-            die('%s is not the Binaryen this build pins: its hash differs' % archive)
-        with tarfile.open(archive) as tar:
-            tar.extractall(build)
-    found = [tool('wasm-as', hints), tool('wasm-merge', hints), tool('wasm-opt', hints),
-             tool('wasm-dis', hints)]
-    if not all(found):
-        die('Binaryen was found without wasm-as, wasm-merge, wasm-opt or wasm-dis')
-    return found
-
-
-# What a host is handed - host_api.md, *What a host is handed*. A package is a folder, and
-# this is what each holds: a file of the tree or of the build, and its name in the package
-# where that differs. The three backends the tests build for themselves are in none.
-def packages(out, lib, runtime):
+# What is handed - host_api.md, *What a host is handed*. A package is a folder, and this is what
+# each holds: a file of the tree or of the build, and its name in the package where that
+# differs. The backends the tests build for themselves are in none.
+def packages(out, lib):
     licence = (ROOT / 'license', 'license')
-
-    def sdk(backend):
-        return [(f, f.name) for f in [ROOT / 'include/bridge_abi.h', ROOT / 'include/bridge_schema.h'] +
-                sorted((ROOT / 'backends' / backend / 'sdk').iterdir())] + [licence]
     return {
         'bridge': [(out / ('bridge' + lib), 'bridge' + lib), (out / 'bridge.a', 'bridge.a'),
                    (ROOT / 'include/bridge.h', 'bridge.h'), licence],
-        'backend_native': [(out / 'backends' / ('bridge_native' + lib), 'bridge_native' + lib), licence],
-        'backend_wasm': [(out / 'backends' / ('bridge_wasm' + lib), 'bridge_wasm' + lib),
-                         (out / 'backends' / runtime.name, runtime.name), licence,
-                         (ROOT / 'backends/wasm/wasmtime/LICENSE', 'license_wasmtime')],
-        'sdk_native': sdk('native'),
-        'sdk_wasm': sdk('wasm'),
+        'seams': [(ROOT / 'include' / h, h)
+                  for h in ('bridge_backend.h', 'bridge_abi.h', 'bridge_schema.h')] + [licence],
     }
 
 
@@ -313,13 +294,17 @@ def commit():
     return git('rev-parse', 'HEAD') + (' with changes that are not committed' if changed else '')
 
 
-def write_packages(target, out, lib, runtime, ran):
+def write_packages(target, out, lib, ran):
     """Each package of a target, as a folder under packages/, with its statement: its name, the
     commit, the target, whether the cases were run and passed on it, and the SHA-256 of each
     file. A file is written only where it differs, so that what is built from a package is
     built again only when the package changed."""
     at = commit()
-    for name, files in packages(out, lib, runtime).items():
+    stated = packages(out, lib)
+    for stray in (out / 'packages').glob('*/') if (out / 'packages').is_dir() else ():
+        if stray.name not in stated:
+            shutil.rmtree(stray)
+    for name, files in stated.items():
         folder = out / 'packages' / name
         folder.mkdir(parents=True, exist_ok=True)
         said = ['package %s' % name, 'commit %s' % at, 'target %s' % target,
@@ -352,10 +337,7 @@ def build(target, debug, out):
     row = TARGETS[target]
     exe, lib = row['program'], row['library']
     zig = tool('zig') or die('zig is not on the path')
-    assemble, merge, opt, disassemble = binaryen(out.parent)
-    obj, modules, backends = out / 'obj', out / 'modules', out / 'backends'
-    wasmtime = ROOT / 'backends/wasm/wasmtime'
-    link_wasmtime, runtime = (wasmtime / f for f in row['wasmtime'])
+    obj, backends = out / 'obj', out / 'backends'
 
     cc = [zig, 'cc', '-target', target] + (['-O0', '-g'] if debug else ['-O2', '-DNDEBUG'])
     cc += row['compile']
@@ -369,27 +351,18 @@ def build(target, debug, out):
     # separate binaries and each compile it - build.md, *The C library*
     os_dir = ROOT / 'utils/os' / row['os']
     utils = '-I%s' % (ROOT / 'utils/os')
-    # how a module is written is its backend's: each backend's binding sits beside the backend
-    sdk = {b: '-I%s' % (ROOT / 'backends' / b / 'sdk') for b in ('wasm', 'native')}
-    headers = [Path(__file__)] + [h for d in ('include', 'src', 'tests', 'tests/*', 'tests/modules',
-                                              'tests/modules/native', 'tests/modules/wasm',
-                                              'tests/modules/native/*', 'tests/modules/wasm/*', 'tests/modules/packaged',
-                                              'backends/wasm', 'backends/wasm/sdk',
-                                              'backends/native', 'backends/native/sdk',
+    headers = [Path(__file__)] + [h for d in ('include', 'src', 'tests', 'tests/*', 'tests/modules/*',
                                               'utils/os', 'utils/os/' + row['os'])
                                   for h in ROOT.glob(d + '/*.h')]
 
     # ---- objects ----
     defines = ['-D%s="%s"' % (key, path.as_posix()) for key, path in
-               [('BACKEND_PATH', backends / ('bridge_wasm' + lib)),
-                ('NATIVE_PATH', backends / ('bridge_native' + lib)),
-                ('NATIVE_OTHER_PATH', backends / ('bridge_native_other' + lib)),
+               [('NATIVE_OTHER_PATH', backends / ('bridge_native_other' + lib)),
                 ('NATIVE_REFUSING_PATH', backends / ('bridge_native_refusing' + lib)),
                 ('HOLLOW_PATH', backends / ('bridge_hollow' + lib)),
                 ('TESTS_PATH', backends / ('bridge_tests' + lib)),
-                ('TESTS_ALL_PATH', backends / ('bridge_tests_all' + lib)), ('MODULE_DIR', modules),
+                ('TESTS_ALL_PATH', backends / ('bridge_tests_all' + lib)),
                 ('BUILT_DIR', out / 'built')] +
-               [('%s_PATH' % name.upper(), out / (name + lib)) for name, _, _ in NATIVE] +
                [('%s_PATH' % name.upper(), out / 'built' / (name + lib)) for name, _, _ in BUILT]]
     defines.append('-DBUILT_SUFFIX="%s"' % lib)
     compiles = []
@@ -408,12 +381,6 @@ def build(target, debug, out):
     # a backend is compiled against the backend seam, the operating system's layer and what is
     # its own: nothing of src/
     backend_os_o = [compile_('backend-os-' + name, os_dir / (name + '.c'), ours + [utils]) for name in OS]
-    wasm_o = [compile_(name, ROOT / 'backends/wasm' / (name + '.c'),
-                       ours + [include, utils, '-I%s' % (wasmtime / 'include')])
-              for name in WASM_BACKEND] + backend_os_o
-    native_o = [compile_(name, ROOT / 'backends/native' / (name + '.c'),
-                         ours + [include, utils, sdk['native']])
-                for name in NATIVE_BACKEND] + backend_os_o
     hollow_o = [compile_('backend_hollow', ROOT / 'tests/support/backend_hollow.c', ours + [include])]
     # a host program is a directory of sources, with what the programs share compiled once -
     # stage12.md, *The test programs*. One that has not been cut yet is one source
@@ -445,11 +412,6 @@ def build(target, debug, out):
                                ours + [include, src, utils] + defines + ['-DCOUNTED'])
                       for c in sorted((ROOT / 'tests/storage').glob('*.c'))]
     shared = '-I%s' % (ROOT / 'tests/modules')
-    module_o = {name: [compile_(name + '-' + c.stem if c.stem != source else name, c,
-                                ours + [include, sdk['native'], shared, '-fvisibility=hidden'] +
-                                ['-D' + d for d in flags])
-                       for c in sources(ROOT / 'tests/modules/native', source, 'nidle')]
-                for name, source, flags in NATIVE}
     # the tests' backend, and the modules it runs: each a library of its own, as a module is
     binding = '-I%s' % (ROOT / 'tests/binding')
     tests_o = [compile_(name, ROOT / 'tests/backend' / (name + '.c'), ours + [include, utils, binding])
@@ -491,13 +453,6 @@ def build(target, debug, out):
                       [cc + (['-shared'] if shared else []) + list(objects) + list(flags) +
                        ['-o', target_file]]))
 
-    # the backend loads wasmtime from beside itself
-    # the backend loads wasmtime from beside itself, which is not beside the programs: a host is
-    # not where its backends are, and the tests would not notice if they were
-    step('copying wasmtime', [backends / runtime.name], [runtime],
-         [lambda: shutil.copyfile(runtime, backends / runtime.name)])
-    link('backends/bridge_wasm', wasm_o, [link_wasmtime] + system + here, shared=True)
-    link('backends/bridge_native', native_o, system, shared=True)
     # the same backend, saying it is of another backend seam: for the case that refuses it
     link('backends/bridge_native_other', native_other_o, system, shared=True)
     link('backends/bridge_native_refusing', native_refusing_o, system, shared=True)
@@ -510,8 +465,6 @@ def build(target, debug, out):
         link('built/' + name, built_o[name], shared=True)
     for name, _, _, _ in WASM:
         link('built/' + name, by_offsets_o[name], shared=True)
-    for name, _, _ in NATIVE:
-        link(name, module_o[name], shared=True)
     link('schema', schema_test_o + [obj / (name + '.o') for name in ['schema'] + SCHEMA], system)
     whole = bridge_o + os_o
     # the library, built: shared and static. What a host links - host_api.md
@@ -530,48 +483,27 @@ def build(target, debug, out):
     link('storage-counted', counted_test_o + counted_o, system)
     together(links)
 
-    # ---- wasm modules: text assembled, C compiled and merged with the accessors ----
-    accessors = ROOT / 'backends/wasm/sdk/bridge_wasm.wat'
-    acc = modules / 'acc.wasm'
-    assembled = [('assembling %s' % wat.name, [modules / (wat.stem + '.wasm')], [wat],
-                  [[assemble, wat] + FEATURES + ['-o', modules / (wat.stem + '.wasm')]])
-                 for wat in sorted((ROOT / 'tests/modules/wasm').glob('*.wat'))]
-    assembled += [('assembling the accessors', [acc], [accessors],
-                   [[assemble, accessors] + FEATURES + ['-o', acc]])]
-    together(assembled)
-    compiled = []
-    for name, source, kind, flags in WASM:
-        raw, merged, final = (modules / (name + s) for s in ('.raw.wasm', '.merged.wasm', '.wasm'))
-        c = sources(ROOT / 'tests/modules/wasm', source, 'idle')
-        compiled.append(('building module %s' % name, [final], c + [acc] + headers, [
-            [zig, 'cc', '-target', 'wasm32-freestanding', '-std=c23', '-pedantic-errors', '-Wall',
-             '-Wextra', '-Werror', '-Wno-missing-field-initializers', '-O2', '-nostdlib'] +
-            ['-D' + d for d in flags + ['BRIDGE_ROWS_' + kind.upper()]] +
-            [include, sdk['wasm'], shared, '-Wl,--no-entry', '-o', raw] + c,
-            [merge, raw, 'main', acc, 'acc'] + FEATURES + ['-o', merged],
-            [opt, merged] + FEATURES + ['-O3', '--remove-exports=acc_*',
-                                         '--remove-unused-module-elements', '-o', final]]))
-    together(compiled)
-
-    # ---- what a host is handed, and a host and a module of each backend built from it alone:
-    # nothing below names a path of the tree but the three sources - host_api.md, *What a host
-    # is handed* ----
-    write_packages(target, out, lib, runtime, False)
+    # ---- what is handed, and a host, a backend and a module built from it alone: nothing below
+    # names a path of the library's headers but the packages' - host_api.md, *What a host is
+    # handed* ----
+    write_packages(target, out, lib, False)
     pk, made = out / 'packages', out / 'packaged'
-    stated = [pk / name / 'package.txt' for name in ('bridge', 'sdk_native', 'sdk_wasm')]
+    stated = [pk / name / 'package.txt' for name in ('bridge', 'seams')]
+    seams = '-I%s' % (pk / 'seams')
     where = ['-D%s="%s"' % (key, path.as_posix()) for key, path in
-             [('NATIVE_BACKEND', pk / 'backend_native' / ('bridge_native' + lib)),
-              ('WASM_BACKEND', pk / 'backend_wasm' / ('bridge_wasm' + lib)),
-              ('NATIVE_MODULE', made / ('npack' + lib)), ('WASM_MODULE', made / 'pack.wasm')]]
+             [('BACKEND', made / ('bridge_tests' + lib)), ('MODULE', made / ('packed' + lib))]]
     # the number of the module seam is a module's to state, and bridge.h does not have it: a
-    # host is told it by who built the module, which here is this build, from the SDK's package
+    # host is told it by who built the module, which here is this build, from the seams' package
     where.append('-DMODULE_ABI=%s' % re.search(r'BRIDGE_ABI = (\d+);', (
-        pk / 'sdk_native' / 'bridge_abi.h').read_text(encoding='utf-8')).group(1))
+        pk / 'seams' / 'bridge_abi.h').read_text(encoding='utf-8')).group(1))
     del compiles[:]
     packaged_host_o = compile_('packaged-host', ROOT / 'tests/packaged/host.c',
                                ours + ['-I%s' % (pk / 'bridge')] + where, stated)
-    packaged_npack_o = compile_('packaged-npack', ROOT / 'tests/modules/packaged/npack.c',
-                                ours + ['-I%s' % (pk / 'sdk_native'), '-fvisibility=hidden'], stated)
+    packaged_backend_o = [compile_('packaged-' + name, ROOT / 'tests/backend' / (name + '.c'),
+                                   ours + [seams, utils, binding], stated)
+                          for name in TESTS_BACKEND] + backend_os_o
+    packaged_module_o = compile_('packaged-packed', ROOT / 'tests/modules/packed.c',
+                                 ours + [seams, binding, '-fvisibility=hidden'], stated)
     together(compiles)
     beside = made / ('bridge' + lib)
     step('putting the library beside the packaged host', [beside], [pk / 'bridge' / beside.name],
@@ -579,23 +511,10 @@ def build(target, debug, out):
     del links[:]
     link('packaged/host', [packaged_host_o, pk / 'bridge' / beside.name], system + here)
     link('packaged/host-static', [packaged_host_o, pk / 'bridge' / 'bridge.a'], system)
-    link('packaged/npack', [packaged_npack_o], shared=True)
+    link('packaged/bridge_tests', packaged_backend_o, system, shared=True)
+    link('packaged/packed', [packaged_module_o], shared=True)
     together(links)
-    packed_acc = made / 'acc.wasm'
-    step('assembling the packaged accessors', [packed_acc], [pk / 'sdk_wasm' / 'bridge_wasm.wat'],
-         [[assemble, pk / 'sdk_wasm' / 'bridge_wasm.wat'] + FEATURES + ['-o', packed_acc]])
-    raw, merged, final = (made / ('pack' + s) for s in ('.raw.wasm', '.merged.wasm', '.wasm'))
-    step('building the packaged wasm module', [final],
-         [ROOT / 'tests/modules/packaged/pack.c', packed_acc] + stated, [
-             [zig, 'cc', '-target', 'wasm32-freestanding', '-std=c23', '-pedantic-errors', '-Wall',
-              '-Wextra', '-Werror', '-Wno-missing-field-initializers', '-O2', '-nostdlib',
-              '-DBRIDGE_ROWS_CHECKED', '-I%s' % (pk / 'sdk_wasm'), '-Wl,--no-entry', '-o', raw,
-              ROOT / 'tests/modules/packaged/pack.c'],
-             [merge, raw, 'main', packed_acc, 'acc'] + FEATURES + ['-o', merged],
-             [opt, merged] + FEATURES + ['-O3', '--remove-exports=acc_*',
-                                          '--remove-unused-module-elements', '-o', final]])
-    return {'python': sys.executable, 'nocall': ROOT / 'tools/nocall.py',
-            'wasm-dis': disassemble, 'modules': modules, 'exe': exe}
+    return {'python': sys.executable, 'exe': exe}
 
 
 def sources(where, name, idle, said='_idle.h"'):
@@ -621,9 +540,6 @@ def command_line(out, built, command, kept):
         return [str(built['python']), str(ROOT / 'tools/said.py'), str(kept)]
     if command[0] == 'deps':
         return [str(built['python']), str(ROOT / 'tools/deps.py'), str(out), '--check']
-    if command[0] == 'nocall':
-        return [str(built[k]) for k in ('python', 'nocall', 'wasm-dis')] + FEATURES + \
-               [str(built['modules'] / command[1]), command[2]]
     return [str(out / (command[0] + built['exe']))] + command[1:]
 
 
@@ -711,8 +627,7 @@ def main():
         if target == mine:
             test(out, built, None, 1)
         row = TARGETS[target]
-        write_packages(target, out, row['library'], ROOT / 'backends/wasm/wasmtime' / row['wasmtime'][1],
-                       target == mine)
+        write_packages(target, out, row['library'], target == mine)
         for path in archive_packages(target, out):
             print(path)
     if args.command == 'test':
@@ -1538,9 +1453,9 @@ CASES += [('said', ['said'], None, None), ('cover', ['cover'], None, None),
 
 # what a host is handed: that each package is what the document says, and that a host and a
 # module of each backend built from the packages alone run - host_api.md, *What a host is handed*
-PACKED = r'packed:native@0\.1\.0: count 3.*packed:wasm@0\.1\.0: sum 30.*destroyed: 0'
+PACKED = r'packed:module@0\.1\.0: count 3.*destroyed: 0'
 CASES += [('package', ['package'], None, None),
-          ('package-a-host-and-two-modules-built-from-them', ['packaged/host'], PACKED, r'refused'),
+          ('package-a-host-a-backend-and-a-module-built-from-them', ['packaged/host'], PACKED, r'refused'),
           ('package-the-same-host-with-the-static-library', ['packaged/host-static'], PACKED,
            r'refused')]
 

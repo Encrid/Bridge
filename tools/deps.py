@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-ARTIFACTS = ('bridge', 'backends/bridge_wasm', 'backends/bridge_native')
+ARTIFACTS = ('bridge',)
 LISTED = re.compile(r'    (\w+)\s+(\S+)')
 SYSTEMS = {'windows': ('windows', 'every'), 'linux': ('linux', 'posix', 'every'),
            'macos': ('macos', 'posix', 'every')}

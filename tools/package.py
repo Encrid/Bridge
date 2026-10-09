@@ -28,8 +28,7 @@ if len(sys.argv) != 2:
 out = pathlib.Path(sys.argv[1])
 target = out.name.removesuffix('-debug')
 row = build.TARGETS[target]
-runtime = ROOT / 'backends/wasm/wasmtime' / row['wasmtime'][1]
-expected = build.packages(out, row['library'], runtime)
+expected = build.packages(out, row['library'])
 document = (ROOT / 'docs/seam/host_api/host_api.md').read_text(encoding='utf-8')
 bad = 0
 

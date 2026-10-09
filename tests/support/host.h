@@ -191,14 +191,6 @@ void host_thread_join(host_thread_t *t);
 bool host_is_library_loaded(const char *path);
 
 /*
-** host_read_module
-**
-** Answers the bytes of the wasm module of a name, from where the build put
-** it, and how many. The program ends if it cannot be read.
-*/
-void *host_read_module(const char *file, size_t *len);
-
-/*
 ** host_state_native
 **
 ** States a native module as a deployment must: trusted, every limit said to

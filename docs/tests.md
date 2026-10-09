@@ -1113,7 +1113,7 @@ What a host is handed is what `host_api.md` says, and is enough: `tools/package.
 and a module of each backend built from the packages and nothing else of the tree.
 
     package
-    package-a-host-and-two-modules-built-from-them
+    package-a-host-a-backend-and-a-module-built-from-them
     package-the-same-host-with-the-static-library
 
 ### cla

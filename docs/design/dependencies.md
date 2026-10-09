@@ -11,30 +11,12 @@ imports any more, so that the list is neither short nor long.
 A line is `tool`, the name `build.py` looks for, and why.
 
     tool      zig          the C compiler, the linker and the archiver, for every target
-    tool      wasm-as      Binaryen: assembles the test modules and the SDK's accessors, which
-                           are written as wasm text
-    tool      wasm-merge   Binaryen: merges the SDK's accessors into a compiled wasm module
-    tool      wasm-opt     Binaryen: puts the merged accessors inline - `wasm.md`, *Memories*
-    tool      wasm-dis     Binaryen: prints a module, for the case that reads one
-
-The four of Binaryen come in one archive, so what is installed is zig and Binaryen.
 
 Python runs `build.py` and the scripts of `tools/`, with nothing outside its standard library.
 
-## What is in the tree
-
-**wasmtime**, the engine the wasm backend is linked against: its C headers, its import library
-and its shared library, for each target, with where each came from and its hash beside it -
-`wasmtime.md`, *The pin*. The backend imports the functions of it that it calls, and nothing else
-imports any:
-
-    every     wasm_*       the wasm C API, as wasmtime implements it
-    every     wasmtime_*   wasmtime's own C API: linear memories it does not allocate, fuel,
-                           epochs, linkers
-
 ## What the built artifacts import
 
-The library, `bridge`, and the two backends, `bridge_wasm` and `bridge_native`. A line is the
+The library, `bridge`. A line is the
 system it is imported on, the function, and why. `every` is all three systems, and `posix` is
 Linux and macOS; a system with a processor after it, `macos_x86_64`, is that one alone. A
 function the compiler's own runtime provides is linked into the artifact and is not an import.

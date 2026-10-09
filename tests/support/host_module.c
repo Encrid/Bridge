@@ -11,9 +11,6 @@
 ** config.md, *No unaccountable values*
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "host.h"
 
 /*
@@ -30,43 +27,6 @@ void host_run_frames_unsaid(bridge_t *b, int count)
         (void)bridge_run_phase(b, "present");
         i++;
     }
-}
-
-static void *read_whole(FILE *f, size_t *len)
-{
-    void *data;
-
-    fseek(f, 0, SEEK_END);
-    *len = (size_t)ftell(f);
-    fseek(f, 0, SEEK_SET);
-    data = malloc(*len);
-    if (data && fread(data, 1, *len, f) != *len) {
-        free(data);
-        data = nullptr;
-    }
-    fclose(f);
-    return (data);
-}
-
-/*
-** host_read_module
-**
-** Answers the bytes of the wasm module of a name, and how many.
-*/
-void *host_read_module(const char *file, size_t *len)
-{
-    char path[1024];
-    FILE *f;
-    void *data = nullptr;
-
-    snprintf(path, sizeof(path), "%s/%s.wasm", MODULE_DIR, file);
-    f = fopen(path, "rb");
-    if (f)
-        data = read_whole(f, len);
-    if (data)
-        return (data);
-    printf("cannot read %s\n", path);
-    exit(2);
 }
 
 /*

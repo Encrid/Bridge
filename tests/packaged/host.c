@@ -6,7 +6,8 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/packaged/host.c -- a host as one outside the tree is: built from the
-** library's package and nothing else of Bridge.
+** library's package and nothing else of Bridge. The backend it names and
+** the module it loads are built from the seams' package.
 **
 ** host_api.md, *What a host is handed*
 */
@@ -49,55 +50,42 @@ static void state(bridge_artifact_t *a, const char *backend,
 }
 
 /*
-** load_wasm
+** load_module
 **
-** Loads the wasm module, whose bytes a host reads itself.
+** Loads the module, by the path of its library.
 */
-static int load_wasm(bridge_t *b)
+static int load_module(bridge_t *b)
 {
     bridge_artifact_t a;
-    FILE *f = fopen(WASM_MODULE, "rb");
-    static char bytes[1 << 20];
 
-    if (!f)
-        return (1);
-    state(&a, "wasm", "packed:wasm@0.1.0");
-    a.bytes = bytes;
-    a.len = fread(bytes, 1, sizeof(bytes), f);
-    fclose(f);
-    a.cfg.trusted = BRIDGE_FALSE;
-    a.cfg.work_limit = 10'000'000;
-    a.cfg.memory_limit = 16 << 20;
+    state(&a, "tests", "packed:module@0.1.0");
+    a.path = MODULE;
     return (bridge_load(b, &a));
 }
 
 /*
-** load_native
-**
-** Loads the native module, by the path of its library.
+** What the backend is told: what it keeps, and the shape it asks of a
+** block. It is the tests' own, built from the seams' package.
 */
-static int load_native(bridge_t *b)
-{
-    bridge_artifact_t a;
-
-    state(&a, "native", "packed:native@0.1.0");
-    a.path = NATIVE_MODULE;
-    return (bridge_load(b, &a));
-}
+static const bridge_setting_t TOLD[4] = {
+    { "capabilities", BRIDGE_INT, {}, { .i = 1 << 4 | 1 << 6 } },
+    { "reservation", BRIDGE_INT, {}, { .i = 0 } },
+    { "guard", BRIDGE_INT, {}, { .i = 0 } },
+    { "granule", BRIDGE_INT, {}, { .i = 0 } }
+};
 
 /*
 ** main
 **
-** A deck with both backends, a module on each, three passes, and the deck
+** A deck with the one backend, the module on it, three passes, and the deck
 ** destroyed.
 */
 int main(void)
 {
-    bridge_backend_t backends[2] = {{ "wasm", WASM_BACKEND },
-        { "native", NATIVE_BACKEND }};
+    bridge_backend_t backends[1] = {{ "tests", BACKEND, TOLD, 4 }};
     const char *phases[1] = { "update" };
     bridge_config_t cfg = { .abi = BRIDGE_HOST_ABI, .threads = 1,
-        .backends = backends, .backend_count = 2, .phases = phases,
+        .backends = backends, .backend_count = 1, .phases = phases,
         .phase_count = 1, .budget = { .entities = 64, .tables = 8, .types = 8,
         .systems = 8, .terms = 8, .modules = 4, .persistent = 4096,
         .columns = 1 << 16, .sparse_sets = BRIDGE_NONE,
@@ -105,7 +93,7 @@ int main(void)
     bridge_t *b = bridge_create(&cfg, say, nullptr);
 
     setvbuf(stdout, nullptr, _IONBF, 0);
-    if (!b || load_native(b) || load_wasm(b))
+    if (!b || load_module(b))
         return (printf("refused\n"), 1);
     for (int i = 0; i < 3; i++)
         (void)bridge_run_phase(b, "update");
