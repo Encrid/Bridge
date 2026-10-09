@@ -1,8 +1,8 @@
 # Stage 22: the backends leave the tree
 
 Built: *The close*. `plan.md`, stage 22, is what it is for and when it is done. This document is
-the order it was done in, what was counted before it began, and each decision as it was taken. What a decision
-refused is `stage22_refused.md`.
+the order it was done in, what was counted before it began, and each decision as it was taken.
+What a decision refused is `stage22_refused.md`.
 
 It was asked for by a host that is being designed, which takes each backend built and so has to
 know where one comes from. It is built here as *From here, a host's* of `plan.md` says such work
