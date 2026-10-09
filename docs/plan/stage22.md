@@ -451,27 +451,50 @@ each holds on its branch `dev` what left this tree at `ffda1a1`, put where that 
 it, with a build of its own that is handed the folder of this tree's two packages and reads
 no other path of it:
 
-    `BB-Native`             the backend, its SDK, 30 cases: 30 pass. Every name of the SDK
-                            that had a case here has one there. The ten that read a layout
-                            through the SDK were run here by a program that reaches inside
-                            the library; there they are a host's, which loads the same
-                            modules and runs their phases. One case is of a program that
-                            calls the backend as the library does
-    `BB-Wasm`               the backend, its SDK, wasmtime, 308 cases: 308 pass. They are
-                            the cases named for its SDK, every case of the host program
-                            that ran on that backend alone, and the ten of the program
-                            that calls it as the library does. So that backend is shown
-                            against this library by more than what left with it
+    `BB-Native`             the backend, its SDK, 54 cases: 54 pass. 39 are a host's and
+                            one is of a program that calls the backend as the library
+                            does; 14 are its tools. Every name of the SDK has a case. The
+                            ten that read a layout through the SDK were run here by a
+                            program that reaches inside the library; there they are a
+                            host's, which loads the same modules and runs their phases
+    `BB-Wasm`               the backend, its SDK, wasmtime, 324 cases: 324 pass. 298 are
+                            a host's: the cases named for its SDK, and every case of the
+                            host program that ran on that backend alone. Ten are of the
+                            program that calls it as the library does, two read a
+                            compiled module, and 14 are its tools. So that backend is
+                            shown against this library by more than what left with it
+    each of the two         its cases pass optimised and debug, alone and six at once, and
+                            from a fresh clone of its repository, with the folder of this
+                            tree's packages and no other path of it. For `BB-Wasm` the
+                            clone was handed the Binaryen the build had already fetched
+    their method            each holds its own: `contributing.md`, `style.md`, `plan.md`,
+                            `tests.md`, `dependencies.md`, `licence.md`, `cla.md`, and the
+                            tools, which are cases there as they are here. A document of
+                            theirs cites one of this tree's by its name and a heading,
+                            held against a list of this tree's headings at the commit the
+                            backend was written against
+    their tools             each fails on a change that should fail it, on a clone: the
+                            same eleven changes as here, made to that tree, and for
+                            `deps` an import nothing asks for as well. `nocall`, which is
+                            `BB-Wasm`'s, fails on a function that calls
+    every other target      each backend compiles and links for the five, and on each of
+                            the six what it imports is what its `dependencies.md` lists:
+                            41, 42, 25, 24, 27 and 25 for `BB-Native`, 89, 90, 74, 74, 75
+                            and 75 for `BB-Wasm`, in the order Windows, Linux, macOS, and
+                            x86-64 before arm64 in each. They are not run here
+    what was removed        from each backend's tests, what only the other backend's
+                            cases called: 15 functions, seven files with no function left
+                            in them, and the counts a native module fed in `BB-Wasm`
     the three together      a host built from the library's package, the two backends'
                             packages and a module compiled against each SDK's package, and
                             from nothing else of the three trees, loads a native module and
                             a wasm one and runs them three passes. Each backend's package
                             states the commit of this tree it was built against
 
-    not shown               in each repository: its method and its documents, the tools
-                            that hold its code, its workflows and what it publishes, its
-                            pin of this tree, which waits on `main` publishing the seams'
-                            package, and the five other targets
+    not shown               in each repository: its pin of this tree and the fetch, which
+                            wait on `main` publishing the seams' package; its workflows
+                            and what it publishes; and the five other targets run. They
+                            are stage 1 of each project's own plan
 
 ## How each claim is shown
 
