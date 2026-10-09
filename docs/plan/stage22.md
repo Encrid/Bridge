@@ -418,6 +418,25 @@ a host, the tests' backend and a module are built from them and from no header o
 `wasmtime.md` are cited by the records of ten stages, which say what was true then. The check
 of citations lets a record do so and nothing else: `tools/xref.py`.
 
+## What is shown so far, and what is not
+
+Of this tree, on 2026-10-09, at the commit after the backends were removed:
+
+    every case              415 of 415 pass, optimised, alone, where the code is written:
+                            Windows on x86-64
+    every other target      the five compile and link with no error: Linux and macOS on
+                            both processors, and Windows on arm64. They are not run here
+    what is imported        on each of the six, what the library imports is what
+                            `dependencies.md` lists: 45, 36, 36, 38, 38 and 46
+    the two packages        written, and held by `tools/package.py`; a host, the tests'
+                            backend and a module built from them and from no header of the
+                            tree, and run
+
+    not shown               the cases under six copies at once; the debug build; the five
+                            other targets run, which is the workflows' for what reaches
+                            `main`; each tool shown to fail on a change that should fail it;
+                            and everything of the two repositories
+
 ## How each claim is shown
 
     each case accounted for   a table here: each of the 484 by name, where it is after the
