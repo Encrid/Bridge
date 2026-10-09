@@ -160,16 +160,36 @@ project copies what it needs and runs nothing from another's directory. `utils/o
 nothing of the library's and says so. What it costs is three copies that may differ, of 910
 lines.
 
+### What whoever writes a backend is handed
+
+**A second package, `seams`: `bridge_backend.h`, `bridge_abi.h`, `bridge_schema.h` and
+`license`.** Enkrid ruled it on 2026-10-09, as recommended. It is for whoever writes a backend,
+or what a module is written with for one. A host is handed `bridge`, which keeps the one header
+a host includes. Each audience takes what it uses, as the packages were cut in the first place.
+
+A backend's repository takes both, at one commit and by the hash of each file: `seams` to be
+built, and `bridge` to run a host in its own cases.
+
+### What the packages become
+
+**Two from here, `bridge` and `seams`, and two from each backend's repository: its own and its
+SDK's.** It follows from the decision above and was not put. An SDK's package still holds
+`bridge_abi.h` and `bridge_schema.h`, which its repository has from `seams`, so that whoever
+writes a module takes one package.
+
+### What a document here says of a backend's
+
+**Nothing by name: no document of this tree cites one of a backend's.** Settled without a
+question, by which way the dependence runs: a backend is written against this tree, and this
+tree against no backend. A sentence here that needs what `native.md`, `wasm.md` or `wasmtime.md`
+says is reworded to what the seam asks, or leaves with them. The two sections of `wasm.md`
+that are of `bridge_abi.h` - its layouts, and that it holds no content - go to `abi.md`, which
+is that header's document.
+
 ## The questions
 
 Each waits here until it is put, and the stage is not done while one stands.
 
-    6   what whoever writes a backend is handed: `bridge_backend.h`, `bridge_abi.h` and
-        `bridge_schema.h` are in no package
-    7   what the packages become, five being one or two, and what `host_api.md` then says
-        a host takes from where
-    8   where the two sections on `bridge_abi.h` go, and how a document here names one
-        that is another project's
     9   what each repository is made from: its method, its style, its tools, its build,
         its licence and its agreement
     10  how each backend tests itself: against which commit of the library, taken how, and

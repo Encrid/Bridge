@@ -76,3 +76,15 @@ moment no module can choose.
 
 Refused: the backend's settings say which call fails, and how. A small language in strings,
 and the same blindness to the limits. The condition that brings it back is none.
+
+## What whoever writes a backend is handed
+
+Of `stage22.md`, *What whoever writes a backend is handed*.
+
+Refused: the three headers in the library's package. A host would be handed two seams that are
+not its own, where it is said to include one header. The condition that brings it back is a
+host that has to compile another seam.
+
+Refused: each backend's repository keeps a copy of the three, made by hand. The seam's own
+header in three trees, and a backend built against a copy that is behind answers the same
+number and is wrong with nothing said. The condition that brings it back is none.
