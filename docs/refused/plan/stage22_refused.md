@@ -110,3 +110,13 @@ Refused: the run of this tree also runs the cases of both backends. This tree's 
 wait on two other repositories, and the three would move as one again, by the run. The
 condition that brings it back is a change to the seam breaking a backend from `main` more
 than once.
+
+## Whether what leaves keeps its history
+
+Of `stage22.md`, *Whether what leaves keeps its history*.
+
+Refused: each repository begins with one commit, which names the commit of this tree its
+content came from. It was the one recommended: small repositories, in which every commit is
+about what is there, and the past one command away here. Against it, `git blame` there would
+stop at the first commit. The condition that brings it back is none once the repositories
+exist: a history is not taken out of one that is published.

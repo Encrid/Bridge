@@ -231,11 +231,23 @@ do not go together.
 what each repository is made from, and was not put: it is what this tree does, copied -
 `host_api.md`, *What a host is handed*.
 
+### Whether what leaves keeps its history
+
+**It does: each repository holds the commits that touched its files.** Enkrid ruled it on
+2026-10-09, over a recommendation to start each with one commit that names this tree's. So
+`git log` and `git blame` answer there, for a line of a backend, as they answer here.
+
+This tree is not written again: its history keeps the backends up to the commit that removes
+them.
+
+What it costs: commits in those repositories whose message names a stage of this plan and
+whose other half is here; and the wasm backend's repository holds every build of wasmtime that
+was ever in this tree.
+
 ## The questions
 
-Each waits here until it is put, and the stage is not done while one stands.
-
-    11  whether the files that leave keep their history
+None stands. Twelve were listed when the stage was planned: eight were put and ruled, and four
+followed from those and from a rule that stands, each said as such under its heading.
 
 ## How each claim is shown
 
