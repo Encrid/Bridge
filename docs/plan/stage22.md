@@ -434,8 +434,32 @@ Of this tree, on 2026-10-09, at the commit after the backends were removed:
 
     not shown               the cases under six copies at once; the debug build; the five
                             other targets run, which is the workflows' for what reaches
-                            `main`; each tool shown to fail on a change that should fail it;
-                            and everything of the two repositories
+                            `main`; and each tool shown to fail on a change that should
+                            fail it
+
+Of the two repositories, on the same day. Both were created at Enkrid's word, private, and
+each holds on its branch `dev` what left this tree at `ffda1a1`, put where that project keeps
+it, with a build of its own that is handed the folder of this tree's two packages and reads
+no other path of it:
+
+    `BB-Native`             the backend, its SDK, 18 cases: 18 pass. The ten cases that
+                            read a layout through the SDK were run here by a program
+                            that reaches inside the library, and are not written there yet
+    `BB-Wasm`               the backend, its SDK, wasmtime, 298 cases: 298 pass. They are
+                            the cases named for its SDK and every case of the host program
+                            that ran on that backend alone, so that backend is shown against
+                            this library by more than what left with it. The program that
+                            called it as the library does is not carried there yet
+    the three together      a host built from the library's package, the two backends'
+                            packages and a module compiled against each SDK's package, and
+                            from nothing else of the three trees, loads a native module and
+                            a wasm one and runs them three passes. Each backend's package
+                            states the commit of this tree it was built against
+
+    not shown               in each repository: its method and its documents, the tools
+                            that hold its code, its workflows and what it publishes, its
+                            pin of this tree, which waits on `main` publishing the seams'
+                            package, and the five other targets
 
 ## How each claim is shown
 
