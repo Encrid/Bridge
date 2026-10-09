@@ -33,7 +33,7 @@ bool host_is_library_loaded(const char *path)
 /*
 ** host_get_thread_id
 **
-** Answers which thread this is, as a native test module says it.
+** Answers which thread this is, as a plain test module says it.
 */
 uint32_t host_get_thread_id(void)
 {

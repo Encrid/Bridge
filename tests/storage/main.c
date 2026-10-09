@@ -24,8 +24,8 @@ static const char *const PHASES[] = {
 };
 
 /*
-** The wasm backend, which asks for address space around a block it maps,
-** and the native one. A case that is not about the first has the second
+** The guarded backend, which asks for address space around a block it maps,
+** and the plain one. A case that is not about the first has the second
 ** alone.
 */
 static const bridge_setting_t KEEPS[4] = {
@@ -43,7 +43,7 @@ static const bridge_setting_t KEEPS_ALL[4] = {
 };
 
 static const bridge_backend_t BACKENDS[2] = {
-    { "wasm", TESTS_ALL_PATH, KEEPS_ALL, 4 },
+    { "guarded", TESTS_ALL_PATH, KEEPS_ALL, 4 },
     { "tests", TESTS_PATH, KEEPS, 4 }
 };
 

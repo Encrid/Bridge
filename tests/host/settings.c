@@ -94,7 +94,7 @@ void test_reload_settings(host_t *h, bool drop)
     test_get_noted(h)->settings[1].v.i = 640;
     test_state_configured(h, &a, "game:settings@0.2.0");
     if (drop)
-        test_state_wasm_minting(&a, "game:settings@0.2.0", "settings-drop");
+        test_state_guarded_minting(&a, "game:settings@0.2.0", "settings-drop");
     a.cfg.persistent = 64;
     a.cfg.hot_reload = BRIDGE_TRUE;
     a.cfg.reloadable = BRIDGE_TRUE;

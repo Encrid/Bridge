@@ -21,13 +21,13 @@ static const char *const TEST_MOVER_GRANTS[] = {
 /*
 ** test_state_module
 **
-** States the wasm module of a file under an identity, with what it mints
+** States the guarded module of a file under an identity, with what it mints
 ** and the changes it queues.
 */
 void test_state_module(bridge_artifact_t *a, const char *identity,
     const char *file)
 {
-    host_state_wasm(a, identity, file);
+    host_state_guarded(a, identity, file);
     if (!strcmp(file, "mover"))
         a->cfg.spawns = 1024;
     if (!strcmp(file, "refs"))
@@ -41,7 +41,7 @@ void test_state_module(bridge_artifact_t *a, const char *identity,
 /*
 ** test_load_module
 **
-** Loads the wasm module of a file under an identity.
+** Loads the guarded module of a file under an identity.
 */
 void test_load_module(host_t *h, const char *identity, const char *file)
 {

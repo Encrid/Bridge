@@ -5,8 +5,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/host/observe.c -- observers: a native attach seen by a
-** wasm observer, and two observers of one change, in two modules, one of
+** tests/host/observe.c -- observers: a plain attach seen by a
+** guarded observer, and two observers of one change, in two modules, one of
 ** them writing what the other reads. The barrier is a phase like any other
 ** to the conflict graph.
 */
@@ -26,7 +26,7 @@ static const bridge_order_t TEST_FIX_FIRST = {
 /*
 ** test_observe
 **
-** A native attach, a wasm observer.
+** A plain attach, a guarded observer.
 */
 void test_observe(host_t *h)
 {
@@ -52,7 +52,7 @@ void test_conflict_at_barrier(host_t *h)
         return;
     test_load_built(h, "game:setter@0.1.0", SETTER_PATH, 8);
     test_load_watcher(h);
-    test_state_wasm(&a, "view:fixer@0.1.0", "fixer");
+    test_state_guarded(&a, "view:fixer@0.1.0", "fixer");
     a.cfg.write = &TEST_GAME[1];
     a.cfg.write_count = 1;
     host_load(h, &a);
@@ -93,6 +93,6 @@ void test_take_reserved_name(host_t *h)
 {
     if (host_open(h))
         return;
-    test_load_wasm(h, "game:badobs@0.1.0", "badobs");
+    test_load_guarded(h, "game:badobs@0.1.0", "badobs");
     host_close(h);
 }

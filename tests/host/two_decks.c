@@ -31,7 +31,7 @@ static bridge_t *open_one(host_t *h, test_listener_t *l)
         printf("deck %d refused\n", l->which);
         return (nullptr);
     }
-    test_state_wasm(&a, "game:mover@0.1.0", "mover");
+    test_state_guarded(&a, "game:mover@0.1.0", "mover");
     (void)bridge_load(b, &a);
     test_state_game_reader(&a);
     (void)bridge_load(b, &a);
@@ -84,7 +84,7 @@ static bool mint_run(host_t *h)
         printf("bridge_create refused\n");
         return (false);
     }
-    test_state_wasm(&a, "test:spawn1@0.1.0", "spawner");
+    test_state_guarded(&a, "test:spawn1@0.1.0", "spawner");
     a.cfg.spawns = 16;
     (void)bridge_load(b, &a);
     a.cfg.identity = "test:spawn2@0.1.0";

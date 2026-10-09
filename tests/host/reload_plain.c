@@ -5,7 +5,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/host/reload_native.c -- a native module reloaded: the old
+** tests/host/reload_plain.c -- a plain module reloaded: the old
 ** instance is shut down before the new library is opened, so a reload that
 ** fails leaves no code to keep.
 **
@@ -19,7 +19,7 @@
 /*
 ** state_ticker
 **
-** States a native build of the ticker that may be reloaded, and is
+** States a plain build of the ticker that may be reloaded, and is
 ** essential in the case named for that.
 */
 static void state_ticker(const host_t *h, bridge_artifact_t *a,
@@ -60,19 +60,19 @@ static void end_failed(host_t *h)
 }
 
 /*
-** test_reload_native
+** test_reload_plain
 **
-** Loads the native ticker beside a wasm module and reloads it: into a
+** Loads the plain ticker beside a guarded module and reloads it: into a
 ** library that works, or into one whose reload fails.
 */
-void test_reload_native(host_t *h)
+void test_reload_plain(host_t *h)
 {
     bool works = !strcmp(h->arg, "nreload");
     bridge_artifact_t a;
 
     if (host_open(h))
         return;
-    test_load_wasm_minting(h, "game:twostep@0.1.0", "twostep");
+    test_load_guarded_minting(h, "game:twostep@0.1.0", "twostep");
     state_ticker(h, &a, "game:ticker@0.1.0", STEPPER1_PATH);
     host_load(h, &a);
     host_run_frames(h, 2);

@@ -14,19 +14,19 @@
 #include "cases.h"
 
 /*
-** test_state_wasm
+** test_state_guarded
 **
-** States a wasm module of tests/modules, with what it mints between two
+** States a guarded module of tests/modules, with what it mints between two
 ** barriers.
 */
-void test_state_wasm(bridge_artifact_t *a, const char *identity,
+void test_state_guarded(bridge_artifact_t *a, const char *identity,
     const char *file)
 {
     bool few = !strcmp(file, "twostep") || !strcmp(file, "chain")
         || !strcmp(file, "events") || !strcmp(file, "nested")
         || !strcmp(file, "nested2");
 
-    host_state_wasm(a, identity, file);
+    host_state_guarded(a, identity, file);
     if (few)
         a->cfg.spawns = 8;
     if (!strcmp(file, "mover"))
@@ -34,29 +34,29 @@ void test_state_wasm(bridge_artifact_t *a, const char *identity,
 }
 
 /*
-** test_load_wasm
+** test_load_guarded
 **
-** Loads a wasm module as it is stated.
+** Loads a guarded module as it is stated.
 */
-void test_load_wasm(host_t *h, const char *identity, const char *file)
+void test_load_guarded(host_t *h, const char *identity, const char *file)
 {
     bridge_artifact_t a;
 
-    test_state_wasm(&a, identity, file);
+    test_state_guarded(&a, identity, file);
     host_load(h, &a);
 }
 
 /*
-** test_load_native
+** test_load_plain
 **
-** Loads a native module that mints `spawns` ids between two barriers.
+** Loads a plain module that mints `spawns` ids between two barriers.
 */
-void test_load_native(host_t *h, const char *identity, const char *path,
+void test_load_plain(host_t *h, const char *identity, const char *path,
     int64_t spawns)
 {
     bridge_artifact_t a;
 
-    host_state_native(&a, identity, path);
+    host_state_plain(&a, identity, path);
     a.cfg.spawns = spawns;
     host_load(h, &a);
 }
@@ -68,7 +68,7 @@ void test_load_native(host_t *h, const char *identity, const char *path,
 */
 void test_state_game_reader(bridge_artifact_t *a)
 {
-    test_state_wasm(a, "view:reader@0.1.0", "reader");
+    test_state_guarded(a, "view:reader@0.1.0", "reader");
     a->cfg.read = TEST_GAME;
     a->cfg.read_count = 2;
 }

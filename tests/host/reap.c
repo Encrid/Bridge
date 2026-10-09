@@ -68,7 +68,7 @@ void test_enter_from_foreign_thread(host_t *h)
 {
     if (host_open(h))
         return;
-    test_load_native(h, "test:foreign@0.1.0", TFOREIGN_PATH, 8);
+    test_load_plain(h, "test:foreign@0.1.0", TFOREIGN_PATH, 8);
     host_run_frames_unsaid(h->b, 1);
     host_close(h);
 }

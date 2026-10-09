@@ -21,39 +21,39 @@ test_noted_t *test_get_noted(const host_t *h)
 }
 
 /*
-** test_state_native_minting
+** test_state_plain_minting
 **
-** States a native module that mints up to 32 ids between two barriers.
+** States a plain module that mints up to 32 ids between two barriers.
 */
-void test_state_native_minting(bridge_artifact_t *a, const char *identity,
+void test_state_plain_minting(bridge_artifact_t *a, const char *identity,
     const char *path)
 {
-    host_state_native(a, identity, path);
+    host_state_plain(a, identity, path);
     a->cfg.spawns = 32;
 }
 
 /*
-** test_state_wasm_minting
+** test_state_guarded_minting
 **
-** States a wasm module that mints up to 32 ids between two barriers.
+** States a guarded module that mints up to 32 ids between two barriers.
 */
-void test_state_wasm_minting(bridge_artifact_t *a, const char *identity,
+void test_state_guarded_minting(bridge_artifact_t *a, const char *identity,
     const char *file)
 {
-    host_state_wasm(a, identity, file);
+    host_state_guarded(a, identity, file);
     a->cfg.spawns = 32;
 }
 
 /*
 ** test_state_ticker
 **
-** States a wasm build of the ticker that is reloadable, and may be
+** States a guarded build of the ticker that is reloadable, and may be
 ** reloaded.
 */
 void test_state_ticker(bridge_artifact_t *a, const char *identity,
     const char *file)
 {
-    test_state_wasm_minting(a, identity, file);
+    test_state_guarded_minting(a, identity, file);
     a->cfg.hot_reload = BRIDGE_TRUE;
     a->cfg.reloadable = BRIDGE_TRUE;
 }
@@ -67,7 +67,7 @@ void test_state_ticker(bridge_artifact_t *a, const char *identity,
 void test_state_configured(const host_t *h, bridge_artifact_t *a,
     const char *identity)
 {
-    test_state_wasm_minting(a, identity, "settings");
+    test_state_guarded_minting(a, identity, "settings");
     a->cfg.config = "game:Settings";
     a->cfg.settings = test_get_noted(h)->settings;
     a->cfg.setting_count = 10;

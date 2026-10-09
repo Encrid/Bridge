@@ -24,10 +24,10 @@ static const char *say_if(bool held)
 /*
 ** storage_test_look_at_shape
 **
-** A native module's private block reserves what it uses, though the wasm
+** A plain module's private block reserves what it uses, though the guarded
 ** backend is there and wants four gigabytes. And each block is as long as
-** who maps it needs: the shared block whole wasm pages, since the wasm
-** backend maps it, and a native module's private block not.
+** who maps it needs: the shared block whole guarded pages, since the guarded
+** backend maps it, and a plain module's private block not.
 */
 enum storage_test_end storage_test_look_at_shape(storage_test_t *t)
 {
@@ -38,11 +38,11 @@ enum storage_test_end storage_test_look_at_shape(storage_test_t *t)
         return (STORAGE_TEST_FAILED);
     printf("the shared block reserves more than it uses: %s\n",
         say_if(b->shared_reserve > b->shared_len));
-    printf("a native module's private block reserves what it uses: %s\n",
+    printf("a plain module's private block reserves what it uses: %s\n",
         say_if(b->modules->priv_reserve == b->modules->priv_len));
-    printf("the shared block is whole wasm pages: %s\n",
+    printf("the shared block is whole guarded pages: %s\n",
         say_if(b->shared_len % 65'536 == 0));
-    printf("a native module's private block is not rounded to one: %s\n",
+    printf("a plain module's private block is not rounded to one: %s\n",
         say_if(b->modules->priv_len % 65'536 != 0));
     return (STORAGE_TEST_DONE);
 }

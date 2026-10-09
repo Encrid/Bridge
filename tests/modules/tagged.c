@@ -5,7 +5,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/modules/tagged.c -- a tag, declared and attached by a wasm
+** tests/modules/tagged.c -- a tag, declared and attached by a guarded
 ** module, and a system that walks the entities that carry it.
 **
 ** storage.md, *A tag*

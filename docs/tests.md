@@ -164,7 +164,7 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
     config.threads-two-run-at-once
     config.threads-one-runs-in-turn
     config.threads-unset-refused
-    config.threads-four-wasm-instances-hop
+    config.threads-four-guarded-instances-hop
 
 ### phase_name.from
 
@@ -319,7 +319,7 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
 
 ### artifact.bytes
 
-    artifact.bytes-none-for-wasm
+    artifact.bytes-none-for-guarded
 
 ### artifact.len
 
@@ -328,7 +328,7 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
 ### artifact.path
 
     artifact.path-cannot-open
-    artifact.path-none-for-native
+    artifact.path-none-for-plain
 
 ### record.identity
 
@@ -476,7 +476,7 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
     bridge_unload-of-what-stopped-the-deck
     bridge_unload-declarer-goes-user-holds-the-type
     bridge_unload-not-loaded-refused
-    bridge_unload-after-a-failed-native-reload
+    bridge_unload-after-a-failed-plain-reload
     bridge_unload-two-hundred-rounds
     bridge_unload-share-given-back
     bridge_unload-share-kept-while-pointed-into
@@ -499,7 +499,7 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
     bridge_reload-dropped-declaration-frees-its-name
     bridge_reload-stopped-module-revived
     bridge_reload-not-loaded-refused
-    bridge_reload-native
+    bridge_reload-plain
     bridge_reload-settings-row-kept
     bridge_reload-config-dropped
 
@@ -511,7 +511,7 @@ in the comment above it, as `budgets.md`, *Budgets*, is above the budgets.
 ### bridge_run_phase
 
     bridge_run_phase-undeclared-phase-refused
-    bridge_run_phase-wasm-beside-native
+    bridge_run_phase-guarded-beside-plain
     bridge_run_phase-pinned-from-another-thread-refused
 
 ## The module seam
@@ -546,11 +546,11 @@ that backend's SDK, and its cases are in that backend's project.
 
 ### bridge_header_t
 
-    bridge_header_t-read-by-a-native-module
+    bridge_header_t-read-by-a-plain-module
 
 ### bridge_query_t
 
-    bridge_query_t-found-by-a-native-system
+    bridge_query_t-found-by-a-plain-system
 
 ### bridge_text_t
 
@@ -558,11 +558,11 @@ that backend's SDK, and its cases are in that backend's project.
 
 ### bridge_list_t
 
-    bridge_list_t-triggers-of-a-native-observer
+    bridge_list_t-triggers-of-a-plain-observer
 
 ### bridge_entity_t
 
-    bridge_entity_t-index-read-by-a-native-module
+    bridge_entity_t-index-read-by-a-plain-module
 
 ### bridge_log_record_t
 
@@ -755,7 +755,7 @@ that backend's SDK, and its cases are in that backend's project.
 
 ### observe
 
-    observe-native-attach-wasm-observer
+    observe-plain-attach-guarded-observer
     observe-chain-one-hop-a-barrier
     observe-reserved-name-refused
     observe-no-term-refused
@@ -764,7 +764,7 @@ that backend's SDK, and its cases are in that backend's project.
 
 ### spawn
 
-    spawn-refused-fails-a-native-invocation
+    spawn-refused-fails-a-plain-invocation
     spawn-stated-as-none-refused
     spawn-same-ids-on-one-thread-and-four
 

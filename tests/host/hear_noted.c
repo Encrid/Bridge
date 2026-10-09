@@ -41,28 +41,29 @@ void test_hear_noted(void *ud, const bridge_record_t *r)
 }
 
 /*
-** test_load_wasm_minting
+** test_load_guarded_minting
 **
-** Loads a wasm module as it is stated.
+** Loads a guarded module as it is stated.
 */
-void test_load_wasm_minting(host_t *h, const char *identity, const char *file)
+void test_load_guarded_minting(host_t *h, const char *identity,
+    const char *file)
 {
     bridge_artifact_t a;
 
-    test_state_wasm_minting(&a, identity, file);
+    test_state_guarded_minting(&a, identity, file);
     host_load(h, &a);
 }
 
 /*
 ** test_load_spawnless
 **
-** Loads a wasm module, stating that it spawns nothing.
+** Loads a guarded module, stating that it spawns nothing.
 */
 void test_load_spawnless(host_t *h, const char *identity, const char *file)
 {
     bridge_artifact_t a;
 
-    test_state_wasm_minting(&a, identity, file);
+    test_state_guarded_minting(&a, identity, file);
     a.cfg.spawns = BRIDGE_NONE;
     host_load(h, &a);
 }

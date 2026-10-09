@@ -5,7 +5,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/host/wasm_systems.c -- cases that load one wasm module and run it
+** tests/host/guarded_systems.c -- cases that load one guarded module and run it
 ** for some frames.
 */
 
@@ -16,7 +16,7 @@ static void run_one(host_t *h, const char *identity, const char *file,
 {
     if (host_open(h))
         return;
-    test_load_wasm(h, identity, file);
+    test_load_guarded(h, identity, file);
     host_run_frames_unsaid(h->b, frames);
     host_close(h);
 }

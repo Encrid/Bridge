@@ -29,7 +29,7 @@ void test_refuse_essential(host_t *h)
         return;
     test_state_small(&a, identity, "ok");
     a.cfg.on_error = BRIDGE_FAIL;
-    a.backend = "native";
+    a.backend = "plain";
     host_load(h, &a);
     test_load_small(h, "image");
     host_close(h);

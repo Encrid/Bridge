@@ -30,7 +30,7 @@ void test_repair(host_t *h)
     a.cfg.on_error = BRIDGE_FAIL;
     host_load(h, &a);
     host_run_frames(h, 4);
-    test_load_wasm_minting(h, "game:twostep@0.1.0", "twostep");
+    test_load_guarded_minting(h, "game:twostep@0.1.0", "twostep");
     test_state_ticker(&a, "game:ticker@0.2.0", "ticker-ten");
     a.cfg.on_error = BRIDGE_FAIL;
     host_reload(h, &a);
@@ -51,11 +51,11 @@ void test_repair_by_load(host_t *h)
 
     if (host_open(h))
         return;
-    test_state_wasm_minting(&a, "game:thing@0.1.0", "badobs");
+    test_state_guarded_minting(&a, "game:thing@0.1.0", "badobs");
     a.cfg.on_error = BRIDGE_FAIL;
     host_load(h, &a);
-    test_load_wasm_minting(h, "game:other@0.1.0", "twostep");
-    test_state_wasm_minting(&a, "game:thing@0.2.0", "twostep");
+    test_load_guarded_minting(h, "game:other@0.1.0", "twostep");
+    test_state_guarded_minting(&a, "game:thing@0.2.0", "twostep");
     a.cfg.on_error = BRIDGE_FAIL;
     host_load(h, &a);
     host_run_frames(h, 1);
@@ -74,7 +74,7 @@ void test_allow_not_reloadable(host_t *h)
 
     if (host_open(h))
         return;
-    test_state_wasm_minting(&a, "game:twostep@0.1.0", "twostep");
+    test_state_guarded_minting(&a, "game:twostep@0.1.0", "twostep");
     a.cfg.hot_reload = BRIDGE_TRUE;
     host_load(h, &a);
     host_close(h);

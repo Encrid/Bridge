@@ -30,14 +30,14 @@ void host_run_frames_unsaid(bridge_t *b, int count)
 }
 
 /*
-** host_state_native
+** host_state_plain
 **
-** States a native module as a deployment must.
+** States a plain module as a deployment must.
 */
-void host_state_native(bridge_artifact_t *a, const char *identity,
+void host_state_plain(bridge_artifact_t *a, const char *identity,
     const char *path)
 {
-    *a = (bridge_artifact_t){ .backend = "native", .path = path };
+    *a = (bridge_artifact_t){ .backend = "plain", .path = path };
     a->cfg = (bridge_module_config_t){ .identity = identity,
         .abi = BRIDGE_ABI, .trusted = BRIDGE_TRUE, .reloadable = BRIDGE_FALSE,
         .hot_reload = BRIDGE_FALSE, .pinned = BRIDGE_FALSE,

@@ -54,7 +54,7 @@ TEST(move)
 TEST(tally)
 {
     const bridge_query_t *q = test_get_query(api, tallying);
-    bridge_line_t line = { "native tally", 12, q->spans, 0 };
+    bridge_line_t line = { "plain tally", 12, q->spans, 0 };
     uint32_t s = 0;
 
     while (s < q->spans) {

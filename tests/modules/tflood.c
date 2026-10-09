@@ -6,7 +6,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/tflood.c -- spawns past the entity ceiling. Nothing
-** can unwind native code, so the system runs to its end and the invocation
+** can unwind plain code, so the system runs to its end and the invocation
 ** is failed when it returns.
 */
 

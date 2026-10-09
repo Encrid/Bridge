@@ -291,22 +291,11 @@ and their length, and the tests' backend takes those bytes as the path of the mo
 library, of the length stated and no longer. So the cases that hand bytes still show that
 they arrive.
 
-**In a deck of the tests, "wasm" and "native" are still what two backends are called**, and
-both are now the tests' backend, built twice and told it keeps different things. The names
-are the deployment's, and are changed when the two backends have left: until then a case's
-expected text is not touched for a name.
-
-**The tests' backend is told its shape as well as what it keeps.** A case of storage shows
-that the library reserves and rounds a block as the backend that maps it asks, which the wasm
-backend asked and the native one did not. So the tests' backend has four settings and is not
-made without them: `capabilities`, and the `reservation`, the `guard` and the `granule` it then
-asks of a block.
-
-**No case loads either backend any more, but for what proves one.** Both names of a deck of the
-tests are the tests' backend, and the three the tests had - one entry alone, another number,
-one that refuses - are built from it. What still opens a backend of the two is what leaves
-with it: the program that calls the wasm backend as the library does, the two cases that read
-a compiled wasm module, and the host and modules built from the packages.
+**A deck of the tests names the tests' backend twice: "guarded" and "plain".** It was "wasm"
+and "native" while the cases were moved, so that no expected text changed for a name. Guarded,
+it is told it keeps every limit and asks a block's shape; plain, it is told it keeps a reload
+and its library taken out, and asks none. The names are the deployment's. The files, the
+functions and the cases of the tests that said one of the two backends say one of these.
 
 ## Where each case went
 
@@ -394,6 +383,17 @@ had no heading but its own and is gone. 415.
 
 **The check of what is said holds the library's messages, and no backend's.** It read the
 two backends' sources beside the library's; theirs are held where they now are.
+
+**The build makes no backend that a deployment runs, and needs zig and Python.** The two
+backends, their SDKs, their test modules, the engine one of them wraps and the tools that
+assembled wasm are not built and not in the tree: `backends/`, the modules of each under
+`tests/modules/`, `tests/adopt`, `tools/nocall.py`, and the three documents under
+`docs/backends/` with their records. What is handed is two packages, `bridge` and `seams`, and
+a host, the tests' backend and a module are built from them and from no header of the tree.
+
+**A record of a stage still cites a document that left.** `native.md`, `wasm.md` and
+`wasmtime.md` are cited by the records of ten stages, which say what was true then. The check
+of citations lets a record do so and nothing else: `tools/xref.py`.
 
 ## How each claim is shown
 

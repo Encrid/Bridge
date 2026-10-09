@@ -6,7 +6,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/offsets_idle.c -- a shutdown and a reload that do nothing,
-** built into every wasm test module that includes wasm_idle.h.
+** built into every guarded test module that includes guarded_idle.h.
 */
 
 #include "offsets_idle.h"

@@ -33,7 +33,7 @@ void test_load_watcher(host_t *h)
 {
     bridge_artifact_t a;
 
-    test_state_wasm(&a, "view:watcher@0.1.0", "watcher");
+    test_state_guarded(&a, "view:watcher@0.1.0", "watcher");
     a.cfg.read = TEST_GAME;
     a.cfg.read_count = 2;
     host_load(h, &a);

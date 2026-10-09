@@ -5,7 +5,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/modules/shield.c -- a toggled component on the wasm backend:
+** tests/modules/shield.c -- a toggled component on the guarded backend:
 ** its bits found ahead of its column, read, and written.
 **
 ** storage.md, *A toggle*

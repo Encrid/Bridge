@@ -5,7 +5,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/host/refused_wasm.c -- what is refused for whose it is: an ABI
+** tests/host/refused_guarded.c -- what is refused for whose it is: an ABI
 ** that is another's, a backend there is not, a library that cannot be
 ** opened, no sink.
 */
@@ -58,7 +58,7 @@ void test_name_no_backend(host_t *h)
     if (host_open(h))
         return;
     test_state_small(&a, identity, "ok");
-    a.backend = "native";
+    a.backend = "plain";
     host_load(h, &a);
     host_close(h);
 }

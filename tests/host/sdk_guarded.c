@@ -5,9 +5,9 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/host/sdk_wasm.c -- what a wasm module's binding does that no other
-** case shows: a line at each severity, a tag, a scratch arena asked for
-** more than it has, and a pull of fewer modules than are loaded.
+** tests/host/sdk_guarded.c -- what a guarded module's binding does that no
+** other case shows: a line at each severity, a tag, a scratch arena asked
+** for more than it has, and a pull of fewer modules than are loaded.
 */
 
 #include <stdio.h>
@@ -27,7 +27,7 @@ void test_log_levels(host_t *h)
 
     if (host_open(h))
         return;
-    host_state_wasm(&a, "test:levels@0.1.0", "levels");
+    host_state_guarded(&a, "test:levels@0.1.0", "levels");
     a.cfg.log_level = (uint8_t)atoi(h->arg);
     host_load(h, &a);
     (void)bridge_run_phase(h->b, "update");
@@ -45,7 +45,7 @@ void test_tag_entities(host_t *h)
 
     if (host_open(h))
         return;
-    host_state_wasm(&a, "game:tagged@0.1.0", "tagged");
+    host_state_guarded(&a, "game:tagged@0.1.0", "tagged");
     a.cfg.spawns = 8;
     host_load(h, &a);
     host_run_frames(h, 1);

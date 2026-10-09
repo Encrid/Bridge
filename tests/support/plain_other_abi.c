@@ -5,7 +5,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/support/native_other_abi.c -- the native backend's answer to
+** tests/support/plain_other_abi.c -- the plain backend's answer to
 ** backend_get_abi, as a backend built for another backend seam would give
 ** it: for the case that refuses such a backend.
 */

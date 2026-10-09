@@ -175,7 +175,7 @@ BUILT += [
 PLAIN = ('mover reader refs fp badterm spin3 flood chatty rows halver twostep watcher chain '
          'badobs events fixer nested namer spawner counter typer user hang hit '
          'shield aim levels tagged')
-WASM = [(name, name, 'checked', []) for name in PLAIN.split()] + [
+BY_OFFSETS = [(name, name, 'checked', []) for name in PLAIN.split()] + [
     ('rows-unchecked', 'rows', 'unchecked', []),
     ('nested2', 'nested', 'checked', ['LEAVE_OUT_VEC2']),
     ('settings', 'settings', 'checked', ['KEPT=BRIDGE_SINGLETON']),
@@ -213,9 +213,9 @@ WRONG_AT_INIT = ('declare_outside declare_name_outside declare_no_namespace decl
                  'change_slot_undeclared change_ungranted alloc_stated_none')
 WRONG_IN_SYSTEM = ('declare_late system_late observe_late attach_undeclared attach_ungranted '
                    'attach_outside detach_undeclared attach_tag_value')
-WASM += [('wrong-' + act.replace('_', '-'), 'wrong', 'checked',
+BY_OFFSETS += [('wrong-' + act.replace('_', '-'), 'wrong', 'checked',
           ['AT_INIT=wrong_' + act, 'IN_SYSTEM=wrong_do_nothing']) for act in WRONG_AT_INIT.split()]
-WASM += [('wrong-' + act.replace('_', '-'), 'wrong', 'checked',
+BY_OFFSETS += [('wrong-' + act.replace('_', '-'), 'wrong', 'checked',
           ['AT_INIT=wrong_do_nothing', 'IN_SYSTEM=wrong_' + act]) for act in WRONG_IN_SYSTEM.split()]
 
 
@@ -357,8 +357,8 @@ def build(target, debug, out):
 
     # ---- objects ----
     defines = ['-D%s="%s"' % (key, path.as_posix()) for key, path in
-               [('NATIVE_OTHER_PATH', backends / ('bridge_native_other' + lib)),
-                ('NATIVE_REFUSING_PATH', backends / ('bridge_native_refusing' + lib)),
+               [('PLAIN_OTHER_PATH', backends / ('bridge_plain_other' + lib)),
+                ('PLAIN_REFUSING_PATH', backends / ('bridge_plain_refusing' + lib)),
                 ('HOLLOW_PATH', backends / ('bridge_hollow' + lib)),
                 ('TESTS_PATH', backends / ('bridge_tests' + lib)),
                 ('TESTS_ALL_PATH', backends / ('bridge_tests_all' + lib)),
@@ -417,13 +417,13 @@ def build(target, debug, out):
     tests_o = [compile_(name, ROOT / 'tests/backend' / (name + '.c'), ours + [include, utils, binding])
                for name in TESTS_BACKEND] + backend_os_o
     # the same backend, with another answer to backend_get_abi in the place of its own
-    native_other_o = [o for o in tests_o if o.name != 'tests_abi.o'] + [
-        compile_('native_other_abi', ROOT / 'tests/support/native_other_abi.c', ours + [include])]
+    plain_other_o = [o for o in tests_o if o.name != 'tests_abi.o'] + [
+        compile_('plain_other_abi', ROOT / 'tests/support/plain_other_abi.c', ours + [include])]
     # the same backend again, with first entries that adopt no block; and a library that has
     # the seam's number and no other entry
-    native_refusing_o = [o for o in tests_o if o.name not in ('tests_backend.o', 'tests_memory.o')] + [
+    plain_refusing_o = [o for o in tests_o if o.name not in ('tests_backend.o', 'tests_memory.o')] + [
         compile_(name, ROOT / 'tests/support' / (name + '.c'), ours + [include])
-        for name in ('native_refusing_backend', 'native_refusing_memory')]
+        for name in ('plain_refusing_backend', 'plain_refusing_memory')]
     # a module written by offsets is built with the accessors that face of the binding is, which
     # are compiled once for each way a row is tested
     offsets_o = {kind: [compile_('offsets-%s-%s' % (kind, c.stem), c,
@@ -436,7 +436,7 @@ def build(target, debug, out):
                                             '-DBRIDGE_ROWS_' + kind.upper()] + ['-D' + d for d in flags])
                            for c in sources(ROOT / 'tests/modules', source, 'offsets_idle',
                                             '"offsets_idle.h"')] + offsets_o[kind]
-                    for name, source, kind, flags in WASM}
+                    for name, source, kind, flags in BY_OFFSETS}
     built_o = {name: [compile_('built-%s-%s' % (name, c.stem), c,
                                ours + [include, binding, shared, '-fvisibility=hidden'] +
                                ['-D' + d for d in flags])
@@ -454,8 +454,8 @@ def build(target, debug, out):
                        ['-o', target_file]]))
 
     # the same backend, saying it is of another backend seam: for the case that refuses it
-    link('backends/bridge_native_other', native_other_o, system, shared=True)
-    link('backends/bridge_native_refusing', native_refusing_o, system, shared=True)
+    link('backends/bridge_plain_other', plain_other_o, system, shared=True)
+    link('backends/bridge_plain_refusing', plain_refusing_o, system, shared=True)
     link('backends/bridge_hollow', hollow_o, system, shared=True)
     link('backends/bridge_tests', tests_o, system, shared=True)
     # and again under another name: a library is in a process once, and a deck of the tests has
@@ -463,7 +463,7 @@ def build(target, debug, out):
     link('backends/bridge_tests_all', tests_o, system, shared=True)
     for name, _, _ in BUILT:
         link('built/' + name, built_o[name], shared=True)
-    for name, _, _, _ in WASM:
+    for name, _, _, _ in BY_OFFSETS:
         link('built/' + name, by_offsets_o[name], shared=True)
     link('schema', schema_test_o + [obj / (name + '.o') for name in ['schema'] + SCHEMA], system)
     whole = bridge_o + os_o
@@ -656,7 +656,7 @@ CASES = [
     ('allocation-strip', ['storage-counted', 'strip'],
      '@tests/storage_strip.txt', None),
     ('storage-shape', ['storage', 'shape'],
-     r"the shared block reserves more than it uses: yes.*a native module's private block reserves what it uses: yes.*the shared block is whole wasm pages: yes.*a native module's private block is not rounded to one: yes.*alive", None),
+     r"the shared block reserves more than it uses: yes.*a plain module's private block reserves what it uses: yes.*the shared block is whole guarded pages: yes.*a plain module's private block is not rounded to one: yes.*alive", None),
     ('allocation-each-refused-in-turn', ['storage-counted', 'nomemory'],
      r"more than forty allocations were each answered null in turn.*alive", 'FAIL'),
     ('allocation-each-refused-in-turn-laying-out-again', ['storage-counted', 'nomemoryrelay'],
@@ -741,7 +741,7 @@ CASES = [
     ('module_config.abi-another-refused', ['host', 'module_config.abi-another-refused'],
      r"module 'test:ok@0.1.0' is refused: it wants ABI 2 and this is ABI 1.*alive", None),
     ('artifact.backend-not-configured-refused', ['host', 'artifact.backend-not-configured-refused'],
-     r"module 'test:ok@0.1.0' is refused: no backend named 'native'.*alive", None),
+     r"module 'test:ok@0.1.0' is refused: no backend named 'plain'.*alive", None),
     ('module_config.log_level-unset-refused', ['host', 'module_config.log_level-unset-refused'],
      r"module 'test:ok@0.1.0' is refused: log_level is unset.*alive", ': loaded'),
     ('module_config.memory_limit-unset-refused', ['host', 'module_config.memory_limit-unset-refused'],
@@ -759,7 +759,7 @@ CASES = [
     ('module_config.on_error-fail-stops-and-skip-does-not', ['host', 'module_config.on_error-fail-stops-and-skip-does-not'],
      r"test:ok@0.1.0: loaded.*the deck has stopped: module 'test:oob@0.1.0' failed and its on_error is fail.*test:ok@0.1.0: not loaded.*alive", None),
     ('backend.library-cannot-open-refused', ['host', 'backend.library-cannot-open-refused'],
-     r"backend 'wasm': cannot open backend library 'no-such-backend-library'.*bridge_create refused.*alive", None),
+     r"backend 'guarded': cannot open backend library 'no-such-backend-library'.*bridge_create refused.*alive", None),
     ('bridge_create-no-sink-refused', ['host', 'bridge_create-no-sink-refused'],
      r"refused: no sink.*alive", None),
     ('module_config.read-another-namespace-read', ['host', 'module_config.read-another-namespace-read'],
@@ -824,19 +824,19 @@ CASES = [
      r".budget. cannot be satisfied: the shared memory would be [0-9]+ bytes and an offset into it is 32 bits.*bridge_create refused.*alive", None),
     ('module_config.scratch-private-beyond-32-bits-refused', ['host', 'module_config.scratch-private-beyond-32-bits-refused'],
      r"module 'game:mover@0.1.0' is refused: its scratch of 4294967040, log_ring of [0-9]+ and spans of 4096 bytes come to more than an offset of 32 bits can reach.*alive", None),
-    ('bridge_run_phase-wasm-beside-native', ['host', 'bridge_run_phase-wasm-beside-native'],
-     r"view:reader@0.1.0/sum: sum 250500 0.*native tally 2 1000.*sum 251000 0.*alive", None),
+    ('bridge_run_phase-guarded-beside-plain', ['host', 'bridge_run_phase-guarded-beside-plain'],
+     r"view:reader@0.1.0/sum: sum 250500 0.*plain tally 2 1000.*sum 251000 0.*alive", None),
     ('BACKEND_UNTRUSTED-lacking-untrusted-refused', ['host', 'BACKEND_UNTRUSTED-lacking-untrusted-refused'],
-     r"module 'game:mover@0.1.0' is refused: it is not trusted, and backend 'native' runs only modules that are.*alive", r"cannot open"),
+     r"module 'game:mover@0.1.0' is refused: it is not trusted, and backend 'plain' runs only modules that are.*alive", r"cannot open"),
     ('BACKEND_WORK_LIMIT-lacking-work-limit-refused', ['host', 'BACKEND_WORK_LIMIT-lacking-work-limit-refused'],
-     r"module 'game:mover@0.1.0' is refused: it states work_limit, which backend 'native' cannot keep.*alive", r"cannot open"),
+     r"module 'game:mover@0.1.0' is refused: it states work_limit, which backend 'plain' cannot keep.*alive", r"cannot open"),
     ('BACKEND_UNLOAD-library-gone-or-kept', ['host', 'BACKEND_UNLOAD-library-gone-or-kept'],
-     r"the wasm backend's library is still loaded, the native backend's is gone.*alive", None),
+     r"the guarded backend's library is still loaded, the plain backend's is gone.*alive", None),
     ('backend_get_abi-another-refused', ['host', 'backend_get_abi-another-refused'],
-     r"backend 'native': backend library '[^']*bridge_native_other[^']*' is of backend ABI 2, and this is 1.*bridge_create refused.*alive", None),
+     r"backend 'plain': backend library '[^']*bridge_plain_other[^']*' is of backend ABI 2, and this is 1.*bridge_create refused.*alive", None),
     ('artifact.path-cannot-open', ['host', 'artifact.path-cannot-open'],
      r"module 'game:mover@0.1.0' did not load: cannot open the library 'no-such-library'.*alive", None),
-    ('spawn-refused-fails-a-native-invocation', ['host', 'spawn-refused-fails-a-native-invocation'],
+    ('spawn-refused-fails-a-plain-invocation', ['host', 'spawn-refused-fails-a-plain-invocation'],
      r"test:flood@0.1.0/flood: system 'flood' failed: spawn: its spawns of 1024 between two barriers are used up.*alive", None),
     ('config.order-mover-before-halver', ['host', 'config.order-mover-before-halver'],
      r"sum 125250 0.*alive", None),
@@ -848,7 +848,7 @@ CASES = [
      r"game:twostep@0.1.0/show: x 3 0.*alive", None),
     ('config.order-cycle-refused', ['host', 'config.order-cycle-refused'],
      r".order. contradicts itself.*bridge_create refused.*alive", None),
-    ('observe-native-attach-wasm-observer', ['host', 'observe-native-attach-wasm-observer'],
+    ('observe-plain-attach-guarded-observer', ['host', 'observe-plain-attach-guarded-observer'],
      r"b2 game:setter@0.1.0/mark: marked.*b2 view:watcher@0.1.0/seen: seen 1 77.*alive", None),
     ('observe-chain-one-hop-a-barrier', ['host', 'observe-chain-one-hop-a-barrier'],
      r"b1 game:chain@0.1.0/got_a: hop A.*b2 game:chain@0.1.0/got_b: hop B.*b3 game:chain@0.1.0/got_c: hop C.*alive", r"hop A.*hop A"),
@@ -864,7 +864,7 @@ CASES = [
      r"module 'test:pinned@0.1.0' is pinned to the thread that loaded it, and this call comes from another.*from another thread: refused.*bridge_destroy is refused: module 'test:pinned@0.1.0' is pinned.*destroy from another thread: refused.*destroy from the thread that loaded it: done.*alive", None),
     ('config.threads-unset-refused', ['host', 'config.threads-unset-refused'],
      r"threads is unset.*bridge_create refused.*alive", None),
-    ('config.threads-four-wasm-instances-hop', ['host', 'config.threads-four-wasm-instances-hop'],
+    ('config.threads-four-guarded-instances-hop', ['host', 'config.threads-four-guarded-instances-hop'],
      r"sum 275000 0.*alive", None),
     ('order-unordered-observers-refused', ['host', 'order-unordered-observers-refused'],
      r"module 'view:fixer@0.1.0' did not load: 'view:watcher:seen' and 'view:fixer:fix' both touch 'game:Marked' at the barrier, one of them writing it, and nothing orders them.*seen 1 77.*alive", None),
@@ -901,7 +901,7 @@ CASES = [
     ('declare-undeclared-field-type-refused', ['host', 'declare-undeclared-field-type-refused'],
      r"module 'game:nested@0.1.0' did not load: type 'game:Body': its descriptor says 'vec2_t', which is neither a type a field can be nor one its namespace has declared.*alive", None),
     ('backend_create-unknown-setting-refused', ['host', 'backend_create-unknown-setting-refused'],
-     r"backend 'native' would not start: it knows no setting 'cache'.*bridge_create refused.*alive", None),
+     r"backend 'plain' would not start: it knows no setting 'cache'.*bridge_create refused.*alive", None),
     ('bridge_create-two-decks-at-once', ['host', 'bridge_create-two-decks-at-once'],
      r"two decks: sums 275000 and 265000.*alive", None),
     ('alloc-string-kept', ['host', 'alloc-string-kept'],
@@ -975,7 +975,7 @@ CASES = [
     ('bridge_load-lifts-a-stopped-deck', ['host', 'bridge_load-lifts-a-stopped-deck'],
      r"the deck has stopped: module 'game:thing@0.1.0' failed and its on_error is fail.*game:other@0.1.0: not loaded.*the deck runs again: module 'game:thing@0.2.0' is back.*game:thing@0.2.0: loaded.*show: x 3 0.*alive", None),
     ('bridge_reload-to-another-backend-refused', ['host', 'bridge_reload-to-another-backend-refused'],
-     r"it runs on backend 'wasm' and a reload does not move it to 'native'.*tick 104 1.*alive", None),
+     r"it runs on backend 'guarded' and a reload does not move it to 'plain'.*tick 104 1.*alive", None),
     ('bridge_reload-dropped-declaration-frees-its-name', ['host', 'bridge_reload-dropped-declaration-frees-its-name'],
      r"game:ticker@0.2.0: reloaded.*tick 122 10.*game:retype@0.1.0: loaded.*alive", None),
     ('module_config.hot_reload-false-refused', ['host', 'module_config.hot_reload-false-refused'],
@@ -988,11 +988,11 @@ CASES = [
      r"module 'game:twostep@0.1.0' is refused: hot_reload is stated, and its author states it is not reloadable.*alive", None),
     ('bridge_reload-not-loaded-refused', ['host', 'bridge_reload-not-loaded-refused'],
      r"is not reloaded: nothing of that name is loaded.*alive", None),
-    ('bridge_reload-native', ['host', 'bridge_reload-native'],
+    ('bridge_reload-plain', ['host', 'bridge_reload-plain'],
      r"tick 102 1.*game:ticker@0.1.0/-: shutdown 1 0.*game:ticker@0.2.0: reloaded.*tick 112 10.*tick 122 10.*alive", None),
     ('BACKEND_SIDE_BY_SIDE-lacking-failed-reload-stops-the-module', ['host', 'BACKEND_SIDE_BY_SIDE-lacking-failed-reload-stops-the-module'],
      r"shutdown 1 0.*was not reloaded: its reload answered 5.*module 'game:ticker@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept.*game:ticker@0.1.0=STOPPED.*game:ticker@0.3.0: reloaded.*tick 112 10.*tick 122 10.*game:ticker@0.3.0=RUNNING.*alive", None),
-    ('bridge_unload-after-a-failed-native-reload', ['host', 'bridge_unload-after-a-failed-native-reload'],
+    ('bridge_unload-after-a-failed-plain-reload', ['host', 'bridge_unload-after-a-failed-plain-reload'],
      r"game:ticker@0.1.0=STOPPED.*game:ticker@0.1.0: unloaded.*modules: game:twostep@0.1.0=RUNNING .1..*alive", None),
     ('module_config.settings-of-every-kind', ['host', 'module_config.settings-of-every-kind'],
      r"vsync width 1 1280.*scale mode 150 2.*show: hello 7 0.*show: some/long/path.cfg 0 0.*flags ratio 3 3.*show: big 2 0.*alive", None),
@@ -1027,15 +1027,15 @@ CASES = [
     ('BRIDGE_FAIL-failed-reload-stops-the-deck', ['host', 'BRIDGE_FAIL-failed-reload-stops-the-deck'],
      r"the deck has stopped: module 'game:ticker@0.1.0' could not be reloaded and its on_error is fail.*update refused.*the deck runs again: module 'game:ticker@0.3.0' is back.*tick 112 10.*game:ticker@0.3.0=RUNNING.*alive", None),
     ('BACKEND_TIMEOUT-lacking-timeout-refused', ['host', 'BACKEND_TIMEOUT-lacking-timeout-refused'],
-     r"module 'game:ticker@0.1.0' is refused: it states shutdown_timeout, which backend 'native' cannot keep.*alive", r"cannot open"),
+     r"module 'game:ticker@0.1.0' is refused: it states shutdown_timeout, which backend 'plain' cannot keep.*alive", r"cannot open"),
     ('budget.columns-no-room-for-a-singleton-refused', ['host', 'budget.columns-no-room-for-a-singleton-refused'],
      r"did not load: type 'game:Settings' is a singleton, and .budget. columns of 16 bytes has no room "
      r"for its \d+ bytes.*alive", None),
     ('module_config.config-not-a-singleton-refused', ['host', 'module_config.config-not-a-singleton-refused'],
      r"did not load: its config is 'game:Settings', which is not declared a singleton.*alive", None),
-    ('artifact.path-none-for-native', ['host', 'artifact.path-none-for-native'],
+    ('artifact.path-none-for-plain', ['host', 'artifact.path-none-for-plain'],
      r"module 'game:mover@0.1.0' did not load: the tests' backend opens a module's library by its path, and was handed neither.*alive", None),
-    ('artifact.bytes-none-for-wasm', ['host', 'artifact.bytes-none-for-wasm'],
+    ('artifact.bytes-none-for-guarded', ['host', 'artifact.bytes-none-for-guarded'],
      r"module 'view:reader@0.1.0' did not load: the tests' backend opens a module's library by its path, and was handed neither.*alive", None),
     ('bridge_unload-two-hundred-rounds', ['host', 'bridge_unload-two-hundred-rounds'],
      r"churned 200 times, 0 loads refused, 0 records of the index out of step.*alive", None),
@@ -1068,7 +1068,7 @@ CASES = [
     ('backend.library-none-refused', ['host', 'backend.library-none-refused'],
      r"backend 1 has no library.*alive", None),
     ('backend.name-twice-refused', ['host', 'backend.name-twice-refused'],
-     r"backend 'wasm' is named twice.*alive", None),
+     r"backend 'guarded' is named twice.*alive", None),
     ('config.phases-nameless-refused', ['host', 'config.phases-nameless-refused'],
      r"phase 1 has no name.*alive", None),
     ('config.phases-twice-refused', ['host', 'config.phases-twice-refused'],
@@ -1188,16 +1188,16 @@ CASES = [
     ('detach-undeclared-slot-refused', ['host', 'detach-undeclared-slot-refused'],
      r"system 'act' failed: detach names slot 9, which it never declared.*alive", None),
     ('BACKEND_ENTRY_COUNT-an-entry-missing-refused', ['host', 'BACKEND_ENTRY_COUNT-an-entry-missing-refused'],
-     r"backend 'native': backend library '[^']*bridge_hollow[^']*' has no entry 'backend_create'.*bridge_create refused.*alive", None),
+     r"backend 'plain': backend library '[^']*bridge_hollow[^']*' has no entry 'backend_create'.*bridge_create refused.*alive", None),
     ('memory_adopt-refused-refuses-the-deck', ['host', 'memory_adopt-refused-refuses-the-deck'],
-     r"backend 'native' cannot adopt the shared memory: this backend adopts no block.*alive", None),
+     r"backend 'plain' cannot adopt the shared memory: this backend adopts no block.*alive", None),
     ('module_config.spans-outgrown-at-a-barrier', ['host', 'module_config.spans-outgrown-at-a-barrier'],
      r"module 'game:mover@0\.1\.0' is stopped: what its queries match no longer fits in its spans of 544 bytes.*alive", None),
-    ('bridge_header_t-read-by-a-native-module', ['storage', 'stress1'],
+    ('bridge_header_t-read-by-a-plain-module', ['storage', 'stress1'],
      '@tests/storage_stress.txt', None),
-    ('bridge_entity_t-index-read-by-a-native-module', ['storage', 'stress1'],
+    ('bridge_entity_t-index-read-by-a-plain-module', ['storage', 'stress1'],
      '@tests/storage_stress.txt', None),
-    ('bridge_list_t-triggers-of-a-native-observer', ['storage', 'changes'],
+    ('bridge_list_t-triggers-of-a-plain-observer', ['storage', 'changes'],
      '@tests/storage_changes.txt', None),
     ('detach-queued-and-applied-at-the-barrier', ['storage', 'changes'],
      '@tests/storage_changes.txt', None),
@@ -1208,7 +1208,7 @@ CASES = [
     ('backend_memory_import_t-both-memories-handed', ['host', 'backend_memory_import_t-both-memories-handed'],
      r"game:mover@0.1.0: loaded.*moved.*alive", 'not loaded'),
     ('memory_get_shape-the-block-reserved-as-asked', ['storage', 'shape'],
-     r"the shared block reserves more than it uses: yes.*a native module's private block reserves what it uses: yes.*the shared block is whole wasm pages: yes.*a native module's private block is not rounded to one: yes.*alive", None),
+     r"the shared block reserves more than it uses: yes.*a plain module's private block reserves what it uses: yes.*the shared block is whole guarded pages: yes.*a plain module's private block is not rounded to one: yes.*alive", None),
     ('memory_release-after-the-last-instance', ['host', 'memory_release-after-the-last-instance'],
      r"game:mover@0.1.0: loaded.*moved.*alive", 'not loaded'),
     ('instance_create-with-both-memories', ['host', 'instance_create-with-both-memories'],
@@ -1236,7 +1236,7 @@ CASES = [
     ('bridge_list_modules-fills-no-more-than-asked', ['host', 'bridge_list_modules-fills-no-more-than-asked'],
      r"2 loaded, and of two rows: test:ok@0\.1\.0, untouched\s+alive", None),
     ('BACKEND_MEMORY_LIMIT-lacking-memory-limit-refused', ['host', 'BACKEND_MEMORY_LIMIT-lacking-memory-limit-refused'],
-     r"module 'game:mover@0\.1\.0' is refused: it states memory_limit, which backend 'native' cannot keep.*alive", r"cannot open"),
+     r"module 'game:mover@0\.1\.0' is refused: it states memory_limit, which backend 'plain' cannot keep.*alive", r"cannot open"),
     ('bridge_value_t-a-value-of-each-kind', ['host', 'bridge_value_t-a-value-of-each-kind'],
      r"vsync width 1 1280.*scale mode 150 2.*show: hello 7 0.*show: some/long/path.cfg 0 0.*flags ratio 3 3.*show: big 2 0.*alive", None),
     ('setting.v-seeds-the-field-its-key-names', ['host', 'setting.v-seeds-the-field-its-key-names'],
@@ -1245,9 +1245,9 @@ CASES = [
      ['host', 'backend.settings-none-where-one-is-needed-refused'],
      r"it was not told its 'capabilities', and the shape of a block it asks for.*bridge_create refused.*alive", None),
     ('backend.settings-handed-to-the-backend', ['host', 'backend.settings-handed-to-the-backend'],
-     r"backend 'native' would not start: it knows no setting 'cache'.*bridge_create refused.*alive", None),
+     r"backend 'plain' would not start: it knows no setting 'cache'.*bridge_create refused.*alive", None),
     ('config.backends-two-in-one-phase', ['host', 'config.backends-two-in-one-phase'],
-     r"view:reader@0.1.0/sum: sum 250500 0.*native tally 2 1000.*sum 251000 0.*alive", None),
+     r"view:reader@0.1.0/sum: sum 250500 0.*plain tally 2 1000.*sum 251000 0.*alive", None),
     ('artifact.len-as-many-bytes-compiled', ['host', 'artifact.len-as-many-bytes-compiled'],
      r"test:ok@0.1.0: loaded.*alive", None),
     ('record.identity-whose-it-is', ['host', 'record.identity-whose-it-is'],
@@ -1270,8 +1270,8 @@ CASES = [
      r"modules: game:twostep@0\.1\.0=RUNNING test:flaky@0\.1\.0=STOPPED .2..*alive", None),
     ('bridge_trigger_t-who-triggered-and-how', ['host', 'bridge_trigger_t-who-triggered-and-how'],
      r"any: event 3 1.*any: event 2 2.*any: event 4 57005.*alive", None),
-    ('bridge_query_t-found-by-a-native-system', ['host', 'bridge_query_t-found-by-a-native-system'],
-     r"game:mover@0.1.0/tally: native tally 2 1000.*native tally 2 1000.*alive", None),
+    ('bridge_query_t-found-by-a-plain-system', ['host', 'bridge_query_t-found-by-a-plain-system'],
+     r"game:mover@0.1.0/tally: plain tally 2 1000.*plain tally 2 1000.*alive", None),
     ('bridge_text_t-a-string-a-component-keeps', ['host', 'bridge_text_t-a-string-a-component-keeps'],
      r"game:namer@0.1.0/say: kept in the arena.*alive", None),
     ('bridge_log_record_t-written-by-a-module-and-drained', ['host', 'bridge_log_record_t-written-by-a-module-and-drained'],
@@ -1293,19 +1293,19 @@ CASES = [
     ('BRIDGE_SCHEMA_BITMASK_DESC-read-and-agreed-with', ['host', 'BRIDGE_SCHEMA_BITMASK_DESC-read-and-agreed-with'],
      r"read: body 2 2.*read: more 3 4.*alive", None),
     ('backend_err_t-why-an-entry-failed', ['host', 'backend_err_t-why-an-entry-failed'],
-     r"backend 'native' would not start: it knows no setting 'cache'.*bridge_create refused.*alive", None),
+     r"backend 'plain' would not start: it knows no setting 'cache'.*bridge_create refused.*alive", None),
     ('backend_value_t-handed-over-unread', ['host', 'backend_value_t-handed-over-unread'],
-     r"backend 'native' would not start: it knows no setting 'cache'.*bridge_create refused.*alive", None),
+     r"backend 'plain' would not start: it knows no setting 'cache'.*bridge_create refused.*alive", None),
     ('backend_setting_t-a-key-the-backend-refuses', ['host', 'backend_setting_t-a-key-the-backend-refuses'],
-     r"backend 'native' would not start: it knows no setting 'cache'.*bridge_create refused.*alive", None),
+     r"backend 'plain' would not start: it knows no setting 'cache'.*bridge_create refused.*alive", None),
     ('backend_import_t-the-two-memories-found', ['host', 'backend_import_t-the-two-memories-found'],
      r"sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive", None),
     ('backend_source_t-no-bytes-refused', ['host', 'backend_source_t-no-bytes-refused'],
      r"module 'view:reader@0.1.0' did not load: the tests' backend opens a module's library by its path, and was handed neither.*alive", None),
     ('backend_destroy-the-library-leaves-the-process', ['host', 'backend_destroy-the-library-leaves-the-process'],
-     r"the wasm backend's library is still loaded, the native backend's is gone.*alive", None),
+     r"the guarded backend's library is still loaded, the plain backend's is gone.*alive", None),
     ('backend_get_capabilities-held-against-what-a-module-states', ['host', 'backend_get_capabilities-held-against-what-a-module-states'],
-     r"module 'game:mover@0.1.0' is refused: it is not trusted, and backend 'native' runs only modules that are.*alive", r"cannot open"),
+     r"module 'game:mover@0.1.0' is refused: it is not trusted, and backend 'plain' runs only modules that are.*alive", r"cannot open"),
     ('module_compile-no-path-refused', ['host', 'module_compile-no-path-refused'],
      r"module 'game:mover@0.1.0' did not load: the tests' backend opens a module's library by its path, and was handed neither.*alive", None),
     ('module_list_imports-the-two-memories-lent', ['host', 'module_list_imports-the-two-memories-lent'],
@@ -1321,7 +1321,7 @@ CASES = [
     ('instance_set_memory_limit-growth-refused', ['host', 'instance_set_memory_limit-growth-refused'],
      r"module 'test:grow@0.1.0' did not load: its init answered 7.*alive", None),
     ('backend.settings-each-kind-read-by-the-backend', ['host', 'backend.settings-each-kind-read-by-the-backend'],
-     r"backend 'native' would not start: it was handed cached=true workers=7 ratio=1\.5 where='somewhere'.*alive", None),
+     r"backend 'plain' would not start: it was handed cached=true workers=7 ratio=1\.5 where='somewhere'.*alive", None),
     ('BACKEND_BOOL-read-as-it-was-stated', ['host', 'BACKEND_BOOL-read-as-it-was-stated'],
      r"it was handed cached=true.*alive", None),
     ('BACKEND_INT-read-as-it-was-stated', ['host', 'BACKEND_INT-read-as-it-was-stated'],
@@ -1389,7 +1389,7 @@ CASES = [
     ('BACKEND_IMPORT_MEMORY-the-two-memories-lent', ['host', 'BACKEND_IMPORT_MEMORY-the-two-memories-lent'],
      r"sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive", None),
     ('BACKEND_ABI-answered-and-the-library-opened', ['host', 'BACKEND_ABI-answered-and-the-library-opened'],
-     r"view:reader@0.1.0/sum: sum 250500 0.*native tally 2 1000.*sum 251000 0.*alive", None),
+     r"view:reader@0.1.0/sum: sum 250500 0.*plain tally 2 1000.*sum 251000 0.*alive", None),
     ('BACKEND_I32-an-argument-of-32-bits', ['host', 'BACKEND_I32-an-argument-of-32-bits'],
      r"game:mover@0.1.0: loaded.*moved.*alive", 'not loaded'),
     ('BACKEND_I64-an-argument-of-64-bits', ['host', 'BACKEND_I64-an-argument-of-64-bits'],
@@ -1399,7 +1399,7 @@ CASES = [
     ('attach-tag-with-a-value-refused', ['host', 'attach-tag-with-a-value-refused'],
      r"system 'act' failed: attach: 'game:Flag' is a tag, and is handed a value.*alive", None),
     ('BRIDGE_FAIL-refused-before-it-exists-stops-nothing', ['host', 'BRIDGE_FAIL-refused-before-it-exists-stops-nothing'],
-     r"module 'test:ok@0\.1\.0' is refused: no backend named 'native'.*test:image@0\.1\.0: loaded.*alive", r"has stopped"),
+     r"module 'test:ok@0\.1\.0' is refused: no backend named 'plain'.*test:image@0\.1\.0: loaded.*alive", r"has stopped"),
 ]
 
 # these again, through the static library: what a host does first, to create a deck and to

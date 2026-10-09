@@ -14,7 +14,7 @@
 /*
 ** test_set_small
 **
-** The wasm backend, the one phase "update", and the sink that prints a
+** The guarded backend, the one phase "update", and the sink that prints a
 ** record's level.
 */
 void test_set_small(host_t *h)
@@ -25,11 +25,11 @@ void test_set_small(host_t *h)
 }
 
 /*
-** test_set_wasm
+** test_set_guarded
 **
-** The wasm backend and both phases.
+** The guarded backend and both phases.
 */
-void test_set_wasm(host_t *h)
+void test_set_guarded(host_t *h)
 {
     h->cfg.backend_count = 1;
     h->sink = host_print_record;

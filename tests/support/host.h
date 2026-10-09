@@ -33,7 +33,7 @@ constexpr int64_t HOST_MS = 1'000'000;
 constexpr int64_t HOST_TESTS_KEEPS = 1 << 4 | 1 << 6;
 
 /*
-** And what it is told where a deck calls it "wasm": everything a backend
+** And what it is told where a deck calls it "guarded": everything a backend
 ** may be asked to keep, but its library taken out of the process.
 */
 constexpr int64_t HOST_TESTS_KEEPS_ALL = 63;
@@ -41,7 +41,7 @@ constexpr int64_t HOST_TESTS_KEEPS_ALL = 63;
 /*
 ** And the shape of a block it is told to ask for there: four gigabytes of
 ** address space from its start, and a length and a guard of whole pages of
-** 64 kilobytes. Where a deck calls it "native" it asks for none.
+** 64 kilobytes. Where a deck calls it "plain" it asks for none.
 **
 ** backend.md, *Memory is adopted, not created*
 */
@@ -169,7 +169,7 @@ typedef struct {
 /*
 ** host_get_thread_id
 **
-** Answers which thread this is, as a native test module says it: the low
+** Answers which thread this is, as a plain test module says it: the low
 ** 32 bits of what the operating system calls it.
 */
 uint32_t host_get_thread_id(void);
@@ -191,25 +191,25 @@ void host_thread_join(host_thread_t *t);
 bool host_is_library_loaded(const char *path);
 
 /*
-** host_state_native
+** host_state_plain
 **
-** States a native module as a deployment must: trusted, every limit said to
+** States a plain module as a deployment must: trusted, every limit said to
 ** be none, and every other key said. It spawns nothing unless the case says
 ** so.
 */
 void host_name_module(bridge_artifact_t *a, const char *file);
 void host_state_built(bridge_artifact_t *a, const char *identity,
     const char *name);
-void host_state_native(bridge_artifact_t *a, const char *identity,
+void host_state_plain(bridge_artifact_t *a, const char *identity,
     const char *path);
 
 /*
-** host_state_wasm
+** host_state_guarded
 **
-** States a wasm module of tests/modules, with the limits that backend can
+** States a guarded module of tests/modules, with the limits that backend can
 ** keep.
 */
-void host_state_wasm(bridge_artifact_t *a, const char *identity,
+void host_state_guarded(bridge_artifact_t *a, const char *identity,
     const char *file);
 
 #endif

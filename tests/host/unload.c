@@ -32,7 +32,7 @@ void test_fail_unlimited(host_t *h)
 
     if (host_open(h))
         return;
-    test_state_wasm_minting(&a, "test:flaky@0.1.0", "flaky-always");
+    test_state_guarded_minting(&a, "test:flaky@0.1.0", "flaky-always");
     a.cfg.spawns = BRIDGE_NONE;
     a.cfg.max_system_failures = BRIDGE_NO_LIMIT;
     host_load(h, &a);
@@ -53,8 +53,8 @@ static void load_keeper(host_t *h)
     bridge_artifact_t a;
 
     snprintf(file, sizeof(file), "keeper-%s", h->arg);
-    test_load_wasm_minting(h, "game:keeper@0.1.0", file);
-    test_state_wasm_minting(&a, "view:counter@0.1.0", "counter");
+    test_load_guarded_minting(h, "game:keeper@0.1.0", file);
+    test_state_guarded_minting(&a, "view:counter@0.1.0", "counter");
     a.cfg.read = TEST_ROSTER;
     a.cfg.read_count = 2;
     a.cfg.spawns = BRIDGE_NONE;
@@ -92,7 +92,7 @@ void test_unload_declarer(host_t *h)
     if (host_open(h))
         return;
     test_load_spawnless(h, "game:typer@0.1.0", "typer");
-    test_load_wasm_minting(h, "game:user@0.1.0", "user");
+    test_load_guarded_minting(h, "game:user@0.1.0", "user");
     host_unload(h, "game:typer@0.1.0");
     host_run_frames(h, 1);
     test_load_spawnless(h, "game:retype@0.1.0", "retype-vec2");

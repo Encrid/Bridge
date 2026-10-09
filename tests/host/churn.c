@@ -42,12 +42,12 @@ static int churn_three(host_t *h)
     bridge_artifact_t a;
     int refused;
 
-    test_state_wasm_minting(&a, "game:nested@0.1.0", "nested");
+    test_state_guarded_minting(&a, "game:nested@0.1.0", "nested");
     a.cfg.spawns = 8;
     refused = churn_one(h, &a);
     test_state_configured(h, &a, "game:settings@0.1.0");
     refused += churn_one(h, &a);
-    test_state_wasm_minting(&a, "game:keeper@0.1.0", "keeper-sweep");
+    test_state_guarded_minting(&a, "game:keeper@0.1.0", "keeper-sweep");
     return (refused + churn_one(h, &a));
 }
 

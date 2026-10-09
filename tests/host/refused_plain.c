@@ -5,7 +5,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/host/refused_native.c -- what a backend cannot keep or cannot
+** tests/host/refused_plain.c -- what a backend cannot keep or cannot
 ** find, refused at the load.
 **
 ** capabilities.md, *Nothing is downgraded*
@@ -25,7 +25,7 @@ void test_state_untrusted(host_t *h)
 
     if (host_open(h))
         return;
-    test_state_native(&a, "game:mover@0.1.0", "no-such-library");
+    test_state_plain(&a, "game:mover@0.1.0", "no-such-library");
     a.cfg.trusted = BRIDGE_FALSE;
     host_load(h, &a);
     host_close(h);
@@ -43,7 +43,7 @@ void test_state_limit(host_t *h)
 
     if (host_open(h))
         return;
-    test_state_native(&a, "game:mover@0.1.0", "no-such-library");
+    test_state_plain(&a, "game:mover@0.1.0", "no-such-library");
     if (*h->arg == 'w')
         a.cfg.work_limit = 1000;
     if (*h->arg == 'm')
@@ -55,7 +55,7 @@ void test_state_limit(host_t *h)
 /*
 ** test_state_no_path
 **
-** A native module, and nowhere to find it.
+** A plain module, and nowhere to find it.
 */
 void test_state_no_path(host_t *h)
 {
@@ -63,7 +63,7 @@ void test_state_no_path(host_t *h)
 
     if (host_open(h))
         return;
-    test_state_native(&a, "game:mover@0.1.0", nullptr);
+    test_state_plain(&a, "game:mover@0.1.0", nullptr);
     host_load(h, &a);
     host_close(h);
 }
@@ -71,7 +71,7 @@ void test_state_no_path(host_t *h)
 /*
 ** test_state_no_bytes
 **
-** A wasm module, and nothing to compile.
+** A guarded module, and nothing to compile.
 */
 void test_state_no_bytes(host_t *h)
 {
@@ -89,7 +89,7 @@ void test_state_no_bytes(host_t *h)
 /*
 ** test_name_no_library
 **
-** A native module whose library cannot be opened.
+** A plain module whose library cannot be opened.
 */
 void test_name_no_library(host_t *h)
 {
@@ -97,7 +97,7 @@ void test_name_no_library(host_t *h)
 
     if (host_open(h))
         return;
-    test_state_native(&a, "game:mover@0.1.0", "no-such-library");
+    test_state_plain(&a, "game:mover@0.1.0", "no-such-library");
     host_load(h, &a);
     host_close(h);
 }

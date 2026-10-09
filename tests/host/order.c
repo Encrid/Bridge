@@ -24,8 +24,8 @@ static void load_three(host_t *h)
 
     if (host_open(h))
         return;
-    test_load_wasm(h, "game:mover@0.1.0", "mover");
-    test_state_wasm(&a, "view:halver@0.1.0", "halver");
+    test_load_guarded(h, "game:mover@0.1.0", "mover");
+    test_state_guarded(&a, "view:halver@0.1.0", "halver");
     a.cfg.write = TEST_GAME;
     a.cfg.write_count = 1;
     host_load(h, &a);

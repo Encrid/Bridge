@@ -5,7 +5,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/modules/aim.c -- a direct-indexed component on the wasm
+** tests/modules/aim.c -- a direct-indexed component on the guarded
 ** backend, reached from the rows of a table by each entity's id.
 **
 ** storage.md, *Direct-indexed*

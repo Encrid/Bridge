@@ -6,7 +6,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/host/storage_layouts.c -- the storage layouts that are not a table,
-** as a wasm module reaches them, and a load that fails.
+** as a guarded module reaches them, and a load that fails.
 **
 ** storage.md, *Storage layouts*
 */

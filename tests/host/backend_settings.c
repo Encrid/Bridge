@@ -26,7 +26,7 @@ static const bridge_setting_t TEST_BACKEND_SETTINGS[4] = {
 */
 void test_hand_settings(host_t *h)
 {
-    h->backends[1].library = NATIVE_REFUSING_PATH;
+    h->backends[1].library = PLAIN_REFUSING_PATH;
     h->backends[1].settings = TEST_BACKEND_SETTINGS;
     h->backends[1].setting_count = 4;
     host_open_only(h);

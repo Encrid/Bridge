@@ -26,14 +26,14 @@ void test_print([[maybe_unused]] void *ud, const bridge_record_t *r)
 /*
 ** test_state_small
 **
-** States the wasm module of a name as `test:<name>@0.1.0`, with the small
+** States the guarded module of a name as `test:<name>@0.1.0`, with the small
 ** limits this stage loads everything under. `identity` is 64 bytes the name
 ** is written in.
 */
 void test_state_small(bridge_artifact_t *a, char *identity, const char *name)
 {
     snprintf(identity, 64, "test:%s@0.1.0", name);
-    host_state_wasm(a, identity, name);
+    host_state_guarded(a, identity, name);
     a->cfg.work_limit = 1'000'000;
     a->cfg.memory_limit = 1 << 20;
     a->cfg.init_timeout = 200 * HOST_MS;
@@ -48,7 +48,7 @@ void test_state_small(bridge_artifact_t *a, char *identity, const char *name)
 /*
 ** test_load_small
 **
-** Loads the wasm module of a name, stated as test_state_small has it.
+** Loads the guarded module of a name, stated as test_state_small has it.
 */
 void test_load_small(host_t *h, const char *name)
 {

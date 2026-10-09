@@ -5,11 +5,11 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/support/native_refusing_memory.c -- the native backend's entries
+** tests/support/plain_refusing_memory.c -- the plain backend's entries
 ** about memory, as a backend that cannot adopt a block would answer them:
 ** for the case in which a backend refuses the shared memory. With
-** native_refusing_backend.c it stands in the place of
-** backends/native/native_backend.c.
+** plain_refusing_backend.c it stands in the place of
+** backends/plain/plain_backend.c.
 */
 
 #include <stdio.h>

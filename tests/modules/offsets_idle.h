@@ -5,7 +5,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
-** tests/modules/offsets_idle.h -- for a wasm test module whose shutdown and
+** tests/modules/offsets_idle.h -- for a guarded test module whose shutdown and
 ** reload do nothing. A module that includes this says so, and is built with
 ** tests/modules/offsets_idle.c, which has them: the three lifecycle exports
 ** are every module's, and none is left out to mean something.

@@ -6,7 +6,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/hit/start.c -- a component kept in a sparse set, on
-** the wasm backend: what the hit module declares, and what it spawns.
+** the guarded backend: what the hit module declares, and what it spawns.
 **
 ** storage.md, *A sparse set*
 */

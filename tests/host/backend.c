@@ -22,27 +22,27 @@
 **
 ** What a destroyed deck leaves in the process: the library of a backend
 ** that does not say it can be unloaded, and not the library of one that
-** does. The wasm backend's brought wasmtime in, whose own threads do not
-** survive being unloaded. Bridge closes the native backend's
+** does. The guarded backend's brought wasmtime in, whose own threads do not
+** survive being unloaded. Bridge closes the plain backend's
 ** library, and every system this is built for then takes it out of the
 ** process.
 */
 void test_leave_libraries(host_t *h)
 {
     bridge_t *b = bridge_create(&h->cfg, h->sink, nullptr);
-    const char *wasm = "GONE";
-    const char *native = "gone";
+    const char *guarded = "GONE";
+    const char *plain = "gone";
 
     if (!b || bridge_destroy(b)) {
         printf("FAIL: the deck was not created and destroyed\n");
         exit(1);
     }
     if (host_is_library_loaded(TESTS_ALL_PATH))
-        wasm = "still loaded";
+        guarded = "still loaded";
     if (host_is_library_loaded(TESTS_PATH))
-        native = "STILL LOADED";
-    printf("the wasm backend's library is %s, the native backend's is %s\n",
-        wasm, native);
+        plain = "STILL LOADED";
+    printf("the guarded backend's library is %s, the plain backend's is %s\n",
+        guarded, plain);
     printf("alive\n");
 }
 
@@ -53,7 +53,7 @@ void test_leave_libraries(host_t *h)
 */
 void test_open_other_seam(host_t *h)
 {
-    h->backends[1].library = NATIVE_OTHER_PATH;
+    h->backends[1].library = PLAIN_OTHER_PATH;
     host_open_only(h);
 }
 

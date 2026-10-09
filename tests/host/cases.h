@@ -26,7 +26,7 @@ void test_print(void *ud, const bridge_record_t *r);
 /*
 ** test_state_small
 **
-** States the wasm module of a name as `test:<name>@0.1.0`, with the small
+** States the guarded module of a name as `test:<name>@0.1.0`, with the small
 ** limits this stage loads everything under.
 */
 void test_state_small(bridge_artifact_t *a, char *identity, const char *name);
@@ -34,14 +34,14 @@ void test_state_small(bridge_artifact_t *a, char *identity, const char *name);
 /*
 ** test_load_small
 **
-** Loads the wasm module of a name, stated as test_state_small has it.
+** Loads the guarded module of a name, stated as test_state_small has it.
 */
 void test_load_small(host_t *h, const char *name);
 
 /*
 ** test_state_module
 **
-** States the wasm module of a file under an identity, with what each test
+** States the guarded module of a file under an identity, with what each test
 ** module mints between two barriers: most mint nothing, and say so. The
 ** rows modules attach 200,000 rows in one init, at 32 bytes a change.
 */
@@ -51,7 +51,7 @@ void test_state_module(bridge_artifact_t *a, const char *identity,
 /*
 ** test_load_module
 **
-** Loads the wasm module of a file under an identity.
+** Loads the guarded module of a file under an identity.
 */
 void test_load_module(host_t *h, const char *identity, const char *file);
 
@@ -78,17 +78,17 @@ void test_state_reader(bridge_artifact_t *a);
 void test_load_reader(host_t *h);
 
 /*
-** test_state_native
+** test_state_plain
 **
-** States a native module that mints up to 1,024 ids between two barriers.
+** States a plain module that mints up to 1,024 ids between two barriers.
 */
-void test_state_native(bridge_artifact_t *a, const char *identity,
+void test_state_plain(bridge_artifact_t *a, const char *identity,
     const char *path);
 
 /*
 ** test_state_reader_limited
 **
-** States the reader of the mover, on the wasm backend, with the limits that
+** States the reader of the mover, on the guarded backend, with the limits that
 ** backend can keep and its grant. It only reads.
 */
 void test_state_reader_limited(bridge_artifact_t *a);
@@ -173,25 +173,25 @@ test_counts_t *test_get_counts(const host_t *h);
 uint32_t test_count_threads(const test_counts_t *c);
 
 /*
-** test_state_wasm
+** test_state_guarded
 **
-** States a wasm module of tests/modules, with what each mints between two
+** States a guarded module of tests/modules, with what each mints between two
 ** barriers: most mint nothing, and say so.
 */
-void test_state_wasm(bridge_artifact_t *a, const char *identity,
+void test_state_guarded(bridge_artifact_t *a, const char *identity,
     const char *file);
 
 /*
-** test_load_wasm, test_load_native
+** test_load_guarded, test_load_plain
 **
-** Load a module as it is stated, a native one minting `spawns` ids.
+** Load a module as it is stated, a plain one minting `spawns` ids.
 */
-void test_load_wasm(host_t *h, const char *identity, const char *file);
+void test_load_guarded(host_t *h, const char *identity, const char *file);
 void test_load_built(host_t *h, const char *identity, const char *name,
     int64_t spawns);
 void test_state_built_minting(bridge_artifact_t *a, const char *identity,
     const char *name);
-void test_load_native(host_t *h, const char *identity, const char *path,
+void test_load_plain(host_t *h, const char *identity, const char *path,
     int64_t spawns);
 
 /*
@@ -239,8 +239,8 @@ typedef struct {
 /*
 ** How a case of the reload family reloads the ticker.
 **
-**     file          the wasm build it is reloaded into, or nullptr for the
-**                   native one
+**     file          the guarded build it is reloaded into, or nullptr for the
+**                   plain one
 **     may           what the deployment's hot_reload says
 **     spawns        what the new instance states it mints
 **     then          a module loaded afterwards, or nullptr
@@ -269,19 +269,19 @@ void test_hear_noted(void *ud, const bridge_record_t *r);
 test_noted_t *test_get_noted(const host_t *h);
 
 /*
-** test_state_wasm_minting, test_state_native_minting
+** test_state_guarded_minting, test_state_plain_minting
 **
 ** State a module that mints up to 32 ids between two barriers.
 */
-void test_state_wasm_minting(bridge_artifact_t *a, const char *identity,
+void test_state_guarded_minting(bridge_artifact_t *a, const char *identity,
     const char *file);
-void test_state_native_minting(bridge_artifact_t *a, const char *identity,
+void test_state_plain_minting(bridge_artifact_t *a, const char *identity,
     const char *path);
 
 /*
 ** test_state_ticker
 **
-** States a wasm build of the ticker that is reloadable, and may be
+** States a guarded build of the ticker that is reloadable, and may be
 ** reloaded.
 */
 void test_state_ticker(bridge_artifact_t *a, const char *identity,
@@ -297,11 +297,12 @@ void test_state_configured(const host_t *h, bridge_artifact_t *a,
     const char *identity);
 
 /*
-** test_load_wasm_minting, test_load_spawnless
+** test_load_guarded_minting, test_load_spawnless
 **
-** Load a wasm module: as it is stated, or stating that it spawns nothing.
+** Load a guarded module: as it is stated, or stating that it spawns nothing.
 */
-void test_load_wasm_minting(host_t *h, const char *identity, const char *file);
+void test_load_guarded_minting(host_t *h, const char *identity,
+    const char *file);
 void test_load_spawnless(host_t *h, const char *identity, const char *file);
 
 /*
@@ -355,16 +356,16 @@ typedef struct {
 } test_kept_t;
 
 /*
-** test_set_small, test_set_wasm, test_set_both, test_set_counting,
+** test_set_small, test_set_guarded, test_set_both, test_set_counting,
 ** test_set_noting
 **
-** The fixtures: what a case's host is before the case changes it. The wasm
+** The fixtures: what a case's host is before the case changes it. The guarded
 ** backend with the one phase "update" and the sink that prints a level;
-** the wasm backend with both phases; both backends with both phases; and
+** the guarded backend with both phases; both backends with both phases; and
 ** that again with the sink that counts, and with the sink that notes.
 */
 void test_set_small(host_t *h);
-void test_set_wasm(host_t *h);
+void test_set_guarded(host_t *h);
 void test_set_both(host_t *h);
 void test_set_counting(host_t *h);
 void test_set_noting(host_t *h);
@@ -422,7 +423,7 @@ void test_use_up_systems(host_t *h);
 void test_use_up_terms(host_t *h);
 void test_use_up_columns(host_t *h);
 void test_bench(host_t *h);
-void test_run_native(host_t *h);
+void test_run_plain(host_t *h);
 void test_run_mixed(host_t *h);
 void test_state_untrusted(host_t *h);
 void test_state_limit(host_t *h);
@@ -490,8 +491,8 @@ void test_revive(host_t *h);
 void test_allow_not_reloadable(host_t *h);
 void test_leave_reload_out(host_t *h);
 void test_reload_nothing(host_t *h);
-void test_state_native_timeout(host_t *h);
-void test_reload_native(host_t *h);
+void test_state_plain_timeout(host_t *h);
+void test_reload_plain(host_t *h);
 void test_configure(host_t *h);
 void test_misname_setting(host_t *h);
 void test_mistype_setting(host_t *h);

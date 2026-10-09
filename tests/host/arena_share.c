@@ -32,7 +32,7 @@ static void load_namer(host_t *h)
 {
     bridge_artifact_t a;
 
-    test_state_wasm_minting(&a, "game:namer@0.1.0", "namer");
+    test_state_guarded_minting(&a, "game:namer@0.1.0", "namer");
     a.cfg.persistent = 64;
     host_load(h, &a);
 }
@@ -84,11 +84,11 @@ void test_use_arena(host_t *h)
         return;
     load_namer(h);
     if (kept)
-        test_load_wasm_minting(h, "game:reader@0.1.0", "namer-reader");
+        test_load_guarded_minting(h, "game:reader@0.1.0", "namer-reader");
     host_run_frames(h, 1);
     host_unload(h, "game:namer@0.1.0");
     host_run_frames(h, 1);
-    test_state_wasm_minting(&a, "game:ticker@0.1.0", "ticker");
+    test_state_guarded_minting(&a, "game:ticker@0.1.0", "ticker");
     a.cfg.persistent = 64;
     host_load(h, &a);
     host_run_frames(h, 1);

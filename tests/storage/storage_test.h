@@ -273,7 +273,7 @@ void *counted_os_reserve(size_t reserve, size_t commit);
 /*
 ** storage_test_state
 **
-** Answers a trusted native module as a deployment must state it, with the
+** Answers a trusted plain module as a deployment must state it, with the
 ** identity st:store@0.1.0: one that is not reloadable, and whose first
 ** failure stops the deck.
 */

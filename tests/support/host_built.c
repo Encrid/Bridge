@@ -22,7 +22,7 @@
 void host_state_built(bridge_artifact_t *a, const char *identity,
     const char *path)
 {
-    host_state_native(a, identity, path);
+    host_state_plain(a, identity, path);
 }
 
 /*
@@ -57,19 +57,19 @@ void host_name_module(bridge_artifact_t *a, const char *file)
 }
 
 /*
-** host_state_wasm
+** host_state_guarded
 **
 ** States a module of tests/modules that is written by offsets, with every
 ** limit a backend may be asked to keep. The backend it names is the one a
-** deck of the tests calls "wasm", which is the tests' backend told that it
+** deck of the tests calls "guarded", which is the tests' backend told that it
 ** keeps them.
 */
-void host_state_wasm(bridge_artifact_t *a, const char *identity,
+void host_state_guarded(bridge_artifact_t *a, const char *identity,
     const char *file)
 {
-    host_state_native(a, identity, nullptr);
+    host_state_plain(a, identity, nullptr);
     host_name_module(a, file);
-    a->backend = "wasm";
+    a->backend = "guarded";
     a->cfg.trusted = BRIDGE_FALSE;
     a->cfg.work_limit = 10'000'000;
     a->cfg.memory_limit = 16 << 20;

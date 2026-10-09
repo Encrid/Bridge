@@ -27,7 +27,7 @@ void test_do_wrong(host_t *h)
 
     if (host_open(h))
         return;
-    host_state_wasm(&a, "game:wrong@0.1.0", h->arg);
+    host_state_guarded(&a, "game:wrong@0.1.0", h->arg);
     a.cfg.read = TEST_THING;
     a.cfg.read_count = 1;
     host_load(h, &a);

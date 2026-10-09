@@ -6,7 +6,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 **
 ** tests/modules/setter.c -- a module that sets a component
-** in a system: the event a wasm observer subscribes to.
+** in a system: the event a guarded observer subscribes to.
 */
 
 #include "test_module.h"
