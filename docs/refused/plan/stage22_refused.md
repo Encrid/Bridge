@@ -51,3 +51,16 @@ none.
 
 Refused: `Native-Backend` and `Wasm-Backend`. Nothing says whose backend. The condition that
 brings it back is none.
+
+## What a test module is written with
+
+Of `stage22.md`, *What a test module is written with*.
+
+Refused: `bridge_abi.h` bare, every call written out in every module. About ten thousand lines
+written again and longer, what a case is about buried under the same six moves, and helpers
+that would come back one at a time with no owner. The condition that brings it back is the
+binding being taken for an SDK by somebody outside.
+
+Refused: the binding for every module. A case about a module with no `init`, or with an `init`
+of another signature, could not be written. The condition that brings it back is every such
+case leaving with the wasm backend.

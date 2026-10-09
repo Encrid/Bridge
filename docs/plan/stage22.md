@@ -99,12 +99,25 @@ the same as Bridge.
 backend of Bridge's, and what follows is the backend. It was said as "BB as a prefix", read
 aloud both ways, and confirmed as the letters.
 
+### What a test module is written with
+
+**A binding of the tests' own, and nothing at all where a module's shape is the subject.**
+Enkrid ruled it on 2026-10-09, as recommended. The binding is under `tests/`, made from the
+four headers of the native backend's SDK, with names that begin `test_` and `TEST_`. It
+includes `bridge_abi.h` and `bridge_schema.h` and nothing else, so the tests still show that
+the seam is enough to write a module. A module whose case is about what a module is - one with
+no `init`, one whose `init` has another signature - is written bare, as the fourteen in wasm
+text are today.
+
+The rule between the two: the binding, unless the binding could not say it.
+
+It is exposed to nobody, so `tests.md` gives it no heading. What it costs: the library holds
+what began as a copy of another project's SDK, and the two will differ.
+
 ## The questions
 
 Each waits here until it is put, and the stage is not done while one stands.
 
-    2   how a test module is written once the SDKs are gone: against `bridge_abi.h` bare,
-        or with a binding kept under `tests/` for the tests alone
     3   how a case tells the tests' backend which outcome to report, and which of the
         three the tests have today become part of it
     4   which cases stay, which leave with which backend, and how a mixed file is split:
