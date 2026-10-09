@@ -1,7 +1,7 @@
 # Stage 22: the backends leave the tree
 
-Not built. `plan.md`, stage 22, is what it is for and when it is done. This document is the order
-it is done in, what was counted before it began, and each decision as it is taken. What a decision
+Built: *The close*. `plan.md`, stage 22, is what it is for and when it is done. This document is
+the order it was done in, what was counted before it began, and each decision as it was taken. What a decision
 refused is `stage22_refused.md`.
 
 It was asked for by a host that is being designed, which takes each backend built and so has to
@@ -530,3 +530,25 @@ no other path of it:
                               library as it is handed and nothing else of this tree
     the three together        a host built from what the three publish, run
     every other target        compiles and links
+
+## The close
+
+Put to Enkrid on 2026-10-09, who ruled it done.
+
+    no file of a backend or of an SDK is in the tree,     met: a search of the tree, where
+    and no tool or document of it names one as its own    each hit is a record of a stage or
+                                                          a sentence on what a backend is
+    every case passes on the tests' backend alone         met: 415 of 415, optimised and
+                                                          debug, alone and six at once, and
+                                                          by the run for `main` on the five
+                                                          platforms that are run
+    each of the two repositories builds its backend       met: 55 and 325 cases, each from a
+    and its SDK from its own tree and from what the       fresh clone with its pin of this
+    library hands, and passes the cases that left         tree and nothing else of it
+    each publishes what it makes for a commit             met: a prerelease of each one's
+                                                          `main`, twelve archives
+    a host built from what the three publish loads a      met: on Windows on x86-64, from
+    native module and a wasm one and runs them            the three prereleases' archives
+
+**What is not shown.** A host built so on another system than Windows. And in each of the two
+repositories a run started by a push, theirs having been started by hand, and a pull request's.

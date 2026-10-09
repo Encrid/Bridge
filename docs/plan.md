@@ -447,7 +447,7 @@ each platform, from which one is fetched by its commit and its hashes hold.*
 
 ## 22. The backends leave the tree
 
-Not built: `stage22.md`.
+Built: `stage22.md`.
 
 A backend is a shared library behind a seam, and the two there are were written in this tree,
 with what a module is written with for each. On 2026-10-09 Enkrid ruled that each is a project
