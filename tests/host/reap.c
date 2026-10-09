@@ -28,8 +28,8 @@ static void reap(host_t *h, bool may_write)
 
     if (host_open(h))
         return;
-    test_load_native(h, "game:stamp5@0.1.0", NSTAMP5_PATH, 8);
-    host_state_native(&a, "view:reaper@0.1.0", NREAPER_PATH);
+    test_load_built(h, "game:stamp5@0.1.0", "stamp5", 8);
+    host_state_built(&a, "view:reaper@0.1.0", "reaper");
     a.cfg.read = may_write ? nullptr : TEST_GAME;
     a.cfg.read_count = may_write ? 0 : 1;
     a.cfg.write = may_write ? TEST_GAME : nullptr;

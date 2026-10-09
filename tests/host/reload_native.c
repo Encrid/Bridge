@@ -25,7 +25,7 @@
 static void state_ticker(const host_t *h, bridge_artifact_t *a,
     const char *identity, const char *path)
 {
-    test_state_native_minting(a, identity, path);
+    test_state_built_minting(a, identity, path);
     a->cfg.hot_reload = BRIDGE_TRUE;
     a->cfg.reloadable = BRIDGE_TRUE;
     if (!strcmp(h->arg, "nreloadfailstop"))
@@ -52,7 +52,7 @@ static void reload_to(host_t *h, const char *identity, const char *path)
 static void end_failed(host_t *h)
 {
     if (strcmp(h->arg, "nreloadfailunload")) {
-        reload_to(h, "game:ticker@0.3.0", NTICKER2_PATH);
+        reload_to(h, "game:ticker@0.3.0", "stepper2");
         return;
     }
     host_unload(h, "game:ticker@0.1.0");
@@ -73,10 +73,10 @@ void test_reload_native(host_t *h)
     if (host_open(h))
         return;
     test_load_wasm_minting(h, "game:twostep@0.1.0", "twostep");
-    state_ticker(h, &a, "game:ticker@0.1.0", NTICKER1_PATH);
+    state_ticker(h, &a, "game:ticker@0.1.0", "stepper1");
     host_load(h, &a);
     host_run_frames(h, 2);
-    reload_to(h, "game:ticker@0.2.0", works ? NTICKER2_PATH : NTICKER3_PATH);
+    reload_to(h, "game:ticker@0.2.0", works ? "stepper2" : "stepper3");
     if (!works)
         end_failed(h);
     host_close(h);

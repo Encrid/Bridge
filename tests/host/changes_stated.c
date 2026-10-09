@@ -19,7 +19,7 @@ static void load_stamp(host_t *h, int64_t changes)
 
     if (host_open(h))
         return;
-    host_state_native(&a, "game:stamp5@0.1.0", NSTAMP5_PATH);
+    host_state_built(&a, "game:stamp5@0.1.0", "stamp5");
     a.cfg.spawns = 8;
     a.cfg.changes = changes;
     host_load(h, &a);
@@ -56,7 +56,7 @@ void test_change_unstated(host_t *h)
 {
     if (host_open(h))
         return;
-    test_load_native(h, "game:stamp@0.1.0", NSTAMPUNSTATED_PATH, 8);
+    test_load_built(h, "game:stamp@0.1.0", "stampunstated", 8);
     test_load_watcher(h);
     host_run_frames_unsaid(h->b, 2);
     host_close(h);

@@ -51,7 +51,7 @@ static void state_next(bridge_artifact_t *a, const test_reload_t *r)
     if (r->file)
         test_state_ticker(a, "game:ticker@0.2.0", r->file);
     else
-        test_state_native_minting(a, "game:ticker@0.2.0", NTICKER1_PATH);
+        test_state_built_minting(a, "game:ticker@0.2.0", "stepper1");
     a->cfg.hot_reload = BRIDGE_TRUE;
     a->cfg.reloadable = BRIDGE_TRUE;
     a->cfg.spawns = r->spawns;

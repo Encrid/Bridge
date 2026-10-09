@@ -25,3 +25,16 @@ void test_load_built(host_t *h, const char *identity, const char *name,
     a.cfg.spawns = spawns;
     host_load(h, &a);
 }
+
+/*
+** test_state_built_minting
+**
+** States a module of the tests' backend that mints up to 32 ids between
+** two barriers.
+*/
+void test_state_built_minting(bridge_artifact_t *a, const char *identity,
+    const char *name)
+{
+    host_state_built(a, identity, name);
+    a->cfg.spawns = 32;
+}

@@ -102,7 +102,16 @@ BRIDGE = ['say', 'bridge_create', 'bridge_backend', 'bridge_backends', 'bridge_p
 # under tests/modules, what it is compiled with - stage22.md, *What a test module is written with*
 TESTS_BACKEND = ['tests_abi', 'tests_backend', 'tests_module', 'tests_instance', 'tests_func',
                  'tests_load', 'tests_phase', 'tests_moves']
-BUILT = [('sleep1', 'sleep', []), ('sleep2', 'sleep', [])]
+BUILT = [
+    ('sleep1', 'sleep', []), ('sleep2', 'sleep', []), ('pinned', 'pinned', []),
+    ('setter', 'setter', []), ('reaper', 'reaper', []),
+    ('stamp5', 'stamp', ['VALUE=5', 'PHASE="update"']),
+    ('stamp9', 'stamp', ['VALUE=9', 'PHASE="update"']),
+    ('stampunstated', 'stamp', ['VALUE=1', 'PHASE="update"', 'UNSTATED']),
+    ('stamptick', 'stamp', ['VALUE=7', 'PHASE="tick"']),
+    ('stepper1', 'stepper', ['STEP=1']), ('stepper2', 'stepper', ['STEP=10']),
+    ('stepper3', 'stepper', ['STEP=10', 'FAIL_RELOAD']),
+]
 
 # a native module is a shared library: the name, its source, what it is compiled with. The same
 # library twice is one module to the loader, so one source is built under several names.
@@ -1070,7 +1079,7 @@ CASES = [
     ('bridge_load-lifts-a-stopped-deck', ['host', 'bridge_load-lifts-a-stopped-deck'],
      r"the deck has stopped: module 'game:thing@0.1.0' failed and its on_error is fail.*game:other@0.1.0: not loaded.*the deck runs again: module 'game:thing@0.2.0' is back.*game:thing@0.2.0: loaded.*show: x 3 0.*alive", None),
     ('bridge_reload-to-another-backend-refused', ['host', 'bridge_reload-to-another-backend-refused'],
-     r"it runs on backend 'wasm' and a reload does not move it to 'native'.*tick 104 1.*alive", None),
+     r"it runs on backend 'wasm' and a reload does not move it to 'tests'.*tick 104 1.*alive", None),
     ('bridge_reload-dropped-declaration-frees-its-name', ['host', 'bridge_reload-dropped-declaration-frees-its-name'],
      r"game:ticker@0.2.0: reloaded.*tick 122 10.*game:retype@0.1.0: loaded.*alive", None),
     ('module_config.hot_reload-false-refused', ['host', 'module_config.hot_reload-false-refused'],

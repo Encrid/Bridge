@@ -189,6 +189,8 @@ void test_state_wasm(bridge_artifact_t *a, const char *identity,
 void test_load_wasm(host_t *h, const char *identity, const char *file);
 void test_load_built(host_t *h, const char *identity, const char *name,
     int64_t spawns);
+void test_state_built_minting(bridge_artifact_t *a, const char *identity,
+    const char *name);
 void test_load_native(host_t *h, const char *identity, const char *path,
     int64_t spawns);
 
