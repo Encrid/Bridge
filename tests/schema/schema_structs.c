@@ -69,7 +69,9 @@ static const want_struct_t SCHEMA_STRUCTS[] = {
     { "{ uint8_t a; uint16_t b; uint8_t c; uint64_t d; int8_t e; int16_t f; "
         "uint32_t g; }", sizeof(mixed_t), alignof(mixed_t), SCHEMA_MIXED, 7 },
     { "{float x;float y;}", sizeof(vec2_t), alignof(vec2_t), SCHEMA_VEC2, 2 },
-    { titled_t_desc, sizeof(titled_t), alignof(titled_t), SCHEMA_TITLED, 1 }
+    { titled_t_desc, sizeof(titled_t), alignof(titled_t), SCHEMA_TITLED, 1 },
+    { "{\tfloat x;\r\n\tfloat y;\r\n}", sizeof(vec2_t), alignof(vec2_t),
+        SCHEMA_VEC2, 2 }
 };
 
 int schema_run_structs(void)

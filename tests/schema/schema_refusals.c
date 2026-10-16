@@ -54,7 +54,19 @@ static const want_refusal_t SCHEMA_REFUSALS[] = {
     { BRIDGE_STRUCT, "{ char a[4294967287]; double b; }", "more bytes" },
     { BRIDGE_ENUM, "uint8_t { A = 0x"
         "0000000000000000000000000000000000000000"
-        "00000000000000000000000" "1 }", "'0x000" }
+        "00000000000000000000000" "1 }", "'0x000" },
+    { BRIDGE_BITMASK, "int16_t { A = 1 }", "'int16_t'" },
+    { BRIDGE_BITMASK, "int32_t { A = 1 }", "'int32_t'" },
+    { BRIDGE_ENUM, "int32_t { A = - 1 }", "'-'" },
+    { BRIDGE_STRUCT, "{ float x[-1]; }", "'-1'" },
+    { BRIDGE_STRUCT, "{ double x[1000000000]; }", "'1000000000'" },
+    { BRIDGE_STRUCT, "{ float ~; }", "'~'" },
+    { BRIDGE_STRUCT, "{ float x[2x]; }", "'2x'" },
+    { BRIDGE_ENUM, "uint32_t { A = 99999999999999999999 }",
+        "'99999999999999999999'" },
+    { BRIDGE_ENUM, "uint16_t { A = -1 }", "'-1'" },
+    { BRIDGE_ENUM, "uint16_t { A = 65536 }", "'65536'" },
+    { BRIDGE_ENUM, "uint32_t { A = 4294967296 }", "'4294967296'" }
 };
 
 static int check_refusal(const want_refusal_t *w)
