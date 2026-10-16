@@ -191,6 +191,18 @@ claims = { matches = ["line 15 0.*test:chatty@0.1.0/-: 84 log lines were dropped
 false = { run = ["{out}/host{exe}", "module_config.spans-too-small-refused"] }
 
 [[case]]
+name = "module_config.spans-rounded-up-to-8-refused"
+run = ["{out}/host{exe}", "module_config.spans-rounded-up-to-8-refused"]
+claims = { matches = ["its spans of 268 bytes do not hold a column_base of 1 components by \\d+ tables, which with its queries is 272 bytes.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.spans-a-multiple-of-8-taken"] }
+
+[[case]]
+name = "module_config.spans-a-multiple-of-8-taken"
+run = ["{out}/host{exe}", "module_config.spans-a-multiple-of-8-taken"]
+claims = { matches = ["test:spare@0.1.0: loaded.*modules: test:spare@0.1.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.spans-rounded-up-to-8-refused"] }
+
+[[case]]
 name = "module_config.spans-too-small-refused"
 run = ["{out}/host{exe}", "module_config.spans-too-small-refused"]
 claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }

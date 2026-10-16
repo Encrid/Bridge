@@ -65,6 +65,7 @@ static int check_spans(const module_t *m, backend_err_t *err)
         + sizeof(bridge_list_t) * m->observer_count
         + 4ull * m->declared_count * tables + 4ull * m->declared_count;
 
+    need = (need + 7u) & ~7ull;
     if (need <= m->spans_len)
         return (0);
     return (module_fail(err, "its spans of %u bytes do not hold a "

@@ -1196,6 +1196,15 @@ include = ["include", "tests/binding", "tests/modules"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "spare"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/spare.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "hold"
 kind = "library"
 test = true

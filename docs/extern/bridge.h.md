@@ -242,7 +242,7 @@ The host states each field: zero is unset, and a load refuses it. A count of an 
 | `pad1` | 3 bytes of padding. |
 | `scratch` | The size of the scratch arena of the module, in bytes. |
 | `log_ring` | The size of the log ring of the module, in bytes: one record of 32 bytes at least. |
-| `spans` | The size of the span region of the module, in bytes. |
+| `spans` | The size of the span region of the module, in bytes. Bridge rounds what the region must hold up to a multiple of 8. |
 | `spawns` | How many entity ids the module can take between two barriers, or `BRIDGE_NONE`. |
 | `persistent` | The share of the persistent arena of the module, in bytes, or `BRIDGE_NONE`. |
 | `changes` | How many bytes of changes the module can queue between two barriers, or `BRIDGE_NONE`. |

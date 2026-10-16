@@ -47,6 +47,8 @@ The spans need these bytes:
 | A cell for each component, where a component not kept in a table is reached | 4 |
 
 The count of table ids is the count that storage has room for: `src/storage_publish.c`.
+`check_spans` rounds the sum up to a multiple of 8, as the publish of a barrier does.
+So a module that loads also fits at its first barrier.
 
 ## Functions
 
