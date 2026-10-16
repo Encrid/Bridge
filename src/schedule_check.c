@@ -37,11 +37,6 @@ static int check_system(schedule_phase_t *p, uint32_t i)
 {
     uint32_t j = i + 1;
 
-    if (schedule_reaches(&p->reach, i, i)) {
-        snprintf(p->why, p->why_len, "[order] has '%.100s' run before itself",
-            p->in[i]->full);
-        return (1);
-    }
     while (j < p->n && !is_unordered(p, i, j))
         j++;
     if (j == p->n)

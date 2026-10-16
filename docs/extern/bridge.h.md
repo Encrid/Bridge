@@ -705,7 +705,6 @@ The reason is a text of the backend, a refusal of an entry of the module, or one
 - `its spans of <bytes> bytes do not hold a column_base of <count> components by <count> tables, which with its queries is <bytes> bytes`
 - `'<system>' and '<system>' both touch '<component>' in phase '<phase>', one of them writing it, and nothing orders them`
 - `'<observer>' and '<observer>' both attach or detach '<component>' at the barrier, and nothing orders them`
-- `[order] has '<system>' run before itself`
 
 `its <export> <reason>` tells that the export did not return: the reason is the text of the backend.
 A conflict names the full names of the two systems. A conflict of observers is at the barrier.

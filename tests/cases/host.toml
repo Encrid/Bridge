@@ -2215,7 +2215,7 @@ claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: no backend named '
 false = { run = ["{out}/host{exe}", "attach-many-values-through-little-scratch"] }
 
 [[case]]
-name = "config.order-own-cycle-refused"
-run = ["{out}/host{exe}", "config.order-own-cycle-refused"]
-claims = { matches = ["did not load: \\[order\\] has 'game:twostep:twice' run before itself.*alive"] }
+name = "config.order-pair-stands-against-a-chain-of-own"
+run = ["{out}/host{exe}", "config.order-pair-stands-against-a-chain-of-own"]
+claims = { matches = ["game:twostep@0.1.0/show: x 7 0.*alive"], matches_not = ["run before itself"] }
 false = { run = ["{out}/host{exe}", "config.order-cycle-refused"] }

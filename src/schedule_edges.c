@@ -63,6 +63,7 @@ static void order_after(schedule_phase_t *p, uint32_t i)
             schedule_add_edge(&p->reach, i, j);
         j++;
     }
+    schedule_join_through(&p->reach, i);
 }
 
 void schedule_add_own(schedule_phase_t *p)

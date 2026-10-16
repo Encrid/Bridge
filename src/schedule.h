@@ -62,6 +62,8 @@ bool schedule_reaches(const schedule_matrix_t *m, uint32_t i, uint32_t j);
 
 void schedule_add_edge(schedule_matrix_t *m, uint32_t i, uint32_t j);
 
+void schedule_join_through(schedule_matrix_t *m, uint32_t k);
+
 void schedule_close_matrix(schedule_matrix_t *m);
 
 const char *schedule_find_conflict(const bridge_system_t *a,

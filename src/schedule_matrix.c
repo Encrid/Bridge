@@ -24,10 +24,15 @@ bool schedule_reaches(const schedule_matrix_t *m, uint32_t i, uint32_t j)
 
 void schedule_add_edge(schedule_matrix_t *m, uint32_t i, uint32_t j)
 {
-    m->bits[(size_t)i * m->words + j / 64] |= (uint64_t)1 << (j % 64);
+    uint64_t *row = &m->bits[(size_t)i * m->words];
+    const uint64_t *after = &m->bits[(size_t)j * m->words];
+
+    for (uint32_t w = 0; w < m->words; w++)
+        row[w] |= after[w];
+    row[j / 64] |= (uint64_t)1 << (j % 64);
 }
 
-static void join_through(schedule_matrix_t *m, uint32_t k)
+void schedule_join_through(schedule_matrix_t *m, uint32_t k)
 {
     const uint64_t *via = &m->bits[(size_t)k * m->words];
     uint64_t *row = m->bits;
@@ -50,7 +55,7 @@ void schedule_close_matrix(schedule_matrix_t *m)
     uint32_t k = 0;
 
     while (k < m->n) {
-        join_through(m, k);
+        schedule_join_through(m, k);
         k++;
     }
 }

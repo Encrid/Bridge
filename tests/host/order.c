@@ -10,7 +10,7 @@ static const bridge_order_t TEST_PAIRS[2] = {
     { "view:halver:halve", "game:mover:move" }
 };
 
-static const bridge_order_t TEST_OWN_CYCLE[1] = {
+static const bridge_order_t TEST_PAIR_OVER_OWN[1] = {
     { "game:twostep:again", "game:twostep:twice" }
 };
 
@@ -56,9 +56,9 @@ void test_order_in_a_cycle(host_t *h)
     host_open_only(h);
 }
 
-void test_order_own_in_a_cycle(host_t *h)
+void test_order_pair_over_own(host_t *h)
 {
-    h->cfg.order = TEST_OWN_CYCLE;
+    h->cfg.order = TEST_PAIR_OVER_OWN;
     h->cfg.order_count = 1;
     if (host_open(h))
         return;

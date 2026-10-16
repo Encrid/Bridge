@@ -47,7 +47,6 @@ static int build_phase(bridge_t *b, schedule_phase_t *p)
     schedule_add_stated(b, p);
     schedule_close_matrix(&p->reach);
     schedule_add_own(p);
-    schedule_close_matrix(&p->reach);
     refused = schedule_check_phase(p);
     set_levels(p, refused);
     return (refused);

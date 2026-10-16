@@ -55,8 +55,10 @@ The systems of one module never overlap: they share the private memory of the mo
 
 For each phase, the schedule keeps a matrix of who must run before whom: a row of bits for each system.
 The closure of the matrix joins rows with an or: `n^3 / 64` word operations at a load, for `n` systems in the phase.
-For a phase of a thousand systems, that is some sixteen million operations.
+The order of registration of the modules keeps the matrix closed, with at most `3 n^3 / 128` more.
+For a phase of a thousand systems, that is at most some forty million operations.
 None of this runs in a frame.
+
 `schedule_room` makes the room for the schedule and for a dispatch once, at create, `[budget] systems` wide.
 So a load, a reload and an unload ask for no memory to build the schedule, and a phase allocates nothing.
 
@@ -148,12 +150,13 @@ One phase that `schedule_run` runs.
 | `schedule_account` | At a barrier, stops each module that reached its failure budget. In `src/schedule_account.c`. |
 | `schedule_init_matrix` | Makes an empty matrix for `n` systems. Gives `false` if there is no memory. In `src/schedule_matrix.c`. |
 | `schedule_reaches` | Gives whether `i` runs before `j`. In `src/schedule_matrix.c`. |
-| `schedule_add_edge` | Records that `i` runs before `j`. In `src/schedule_matrix.c`. |
+| `schedule_add_edge` | Records that `i` runs before `j`, and before all that `j` runs before. In `src/schedule_matrix.c`. |
+| `schedule_join_through` | Makes each system that reaches `k` reach all that `k` reaches. In `src/schedule_matrix.c`. |
 | `schedule_close_matrix` | Makes each system that reaches a system reach all that it reaches. In `src/schedule_matrix.c`. |
 | `schedule_find_conflict` | Gives the name of the component two systems conflict over, or `nullptr`. `changing` tells the kind. In `src/schedule_conflict.c`. |
 | `schedule_gather_phase` | Lists the systems of a phase that are not parked, with an empty matrix. In `src/schedule_edges.c`. |
 | `schedule_add_stated` | Adds the edges that the pairs of the deployment state. In `src/schedule_edges.c`. |
 | `schedule_add_own` | Adds the edges that a module states by the order of its registrations. In `src/schedule_edges.c`. |
-| `schedule_check_phase` | Refuses a phase with a system before itself, or with two unordered conflicting systems of two modules. Gives 1 with `why`. In `src/schedule_check.c`. |
+| `schedule_check_phase` | Refuses a phase with two unordered conflicting systems of two modules. Gives 1 with `why`. In `src/schedule_check.c`. |
 | `schedule_run_job` | What a thread runs: the systems of one job, one after the other. In `src/schedule_dispatch.c`. |
 | `schedule_gather_jobs` | Makes the jobs of one level, and gives a number to each system that runs. In `src/schedule_jobs.c`. |

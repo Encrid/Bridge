@@ -9,20 +9,22 @@ This file builds the schedule: for each phase, and for the barrier as one more p
 1. `schedule_gather_phase` lists the systems of the phase that are not parked.
 2. `schedule_add_stated` adds the edges of the pairs of the deployment.
 3. `schedule_close_matrix` closes the matrix over those edges.
-4. `schedule_add_own` adds the edges that each module states by its order of registration.
-5. `schedule_close_matrix` closes the matrix again.
-6. `schedule_check_phase` refuses the phase if it cannot be scheduled.
-7. `set_levels` gives each system its level.
+4. `schedule_add_own` adds the edges that each module states by its order of registration, and keeps the matrix closed.
+5. `schedule_check_phase` refuses the phase if it cannot be scheduled.
+6. `set_levels` gives each system its level.
 
-Step 4 adds no edge from a system to one that already runs before it.
-So the first closure lets a pair of the deployment stand against the order of a module.
+Step 4 adds no edge from a system to one that already runs before it, also through a chain of edges.
+So a pair of the deployment stands against the order of a module, as `docs/extern/bridge.h.md` says.
+
+No phase has a cycle: no system of a phase runs before itself.
+The pairs of the deployment have no cycle, since `check_pairs` refuses such pairs at create: `docs/intern/schedule_order.c.md`.
+Step 4 adds no cycle, since it adds no edge to a system that already runs before the first one.
 
 ## Levels
 
 A level holds each system whose predecessors are all in earlier levels.
 `set_levels` puts each system at level 0, then calls `raise_all` until a call raises no system.
-A phase that is not refused has no cycle, since `schedule_check_phase` refuses a system that runs before itself.
-So the levels stop growing, and the loop ends.
+A phase has no cycle, so the levels stop growing, and the loop ends.
 `raise_all` makes each system put every system that it runs before at a level after its own.
 A refused phase keeps each system at level 0.
 
