@@ -296,6 +296,12 @@ claims = { matches = ["reload: done.*after the reload: 65 types, 65 of them carr
 false = { run = ["{out}/storage{exe}", "shape"] }
 
 [[case]]
+name = "storage_give_single-tells-only-its-type-attached"
+run = ["{out}/storage{exe}", "twosingles"]
+claims = { matches = ["A observer heard ON_ATTACH when B got its value: 0\\s.*alive"] }
+false = { run = ["{out}/storage{exe}", "shape"] }
+
+[[case]]
 name = "storage-marks-full-refused"
 run = ["{out}/storage{exe}", "marks"]
 claims = { matches = ["refused: out of memory: there was none for a mark in its queue.*alive"] }

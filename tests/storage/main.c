@@ -75,6 +75,7 @@ static const storage_test_case_t CASES[] = {
     { "manytypes", storage_test_count_types, &PLAIN },
     { "manyall", storage_test_count_all, &PLAIN },
     { "manymove", storage_test_move_many, &PLAIN },
+    { "twosingles", storage_test_give_two_singles, &PLAIN },
     { "changes", storage_test_change, &PLAIN },
     { "tables", storage_test_make_tables, &PLAIN },
     { "notables", storage_test_use_up_tables, &ONE_TABLE },

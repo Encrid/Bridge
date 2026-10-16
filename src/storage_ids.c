@@ -62,11 +62,14 @@ void storage_give_single(storage_t *r, storage_type_t *type,
     const void *bytes, uint32_t size)
 {
     uint64_t *set = r->scratch;
+    uint64_t *attached = r->masked;
 
     get_carried(r, 0, r->before);
     set_copy(r, set, r->before);
     set_put(set, type->id);
-    tell_observers(r, &(seen_t){ 0, r->before, set, set });
+    set_clear(r, attached);
+    set_put(attached, type->id);
+    tell_observers(r, &(seen_t){ 0, r->before, set, attached });
     set_single(r, type, true);
     memcpy(r->b->shared + type->cells, bytes, size);
 }
