@@ -127,8 +127,11 @@ def build(args, here=False):
     fetch.sources(config, values, False)
     tools(config, values)
     take.take(config, values)
-    made = [built(config, values, artifact) for artifact in artifacts(config)]
-    packaged(config, values, [path for _, paths in made for path in paths])
+    made, shipped = [], []
+    for artifact in artifacts(config):
+        made.append(built(config, values, artifact))
+        shipped += [] if artifact.get('test') else made[-1][1]
+    packaged(config, values, shipped)
     return config, values, made
 
 

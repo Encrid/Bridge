@@ -105,7 +105,7 @@ target <target>
 ```
 
 `<project>` is the name that `shared.project_name` gives.
-It writes a line `<digest>  <file>` for each file that the build made, one time for each file.
+It writes a line `<digest>  <file>` for each file that the build made, one time for each file, but not for an artifact with `test = true`.
 The path of the file is from the output folder of the target.
 
 ## The zip
