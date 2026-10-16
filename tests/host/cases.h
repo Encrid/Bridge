@@ -233,6 +233,11 @@ void test_call_after_sink(host_t *h);
 void test_state_no_threads(host_t *h);
 void test_hop_threads(host_t *h);
 void test_tell_events(host_t *h);
+
+void test_run_guarded(host_t *h, const char *identity, const char *file,
+    int frames);
+
+void test_tell_places(host_t *h);
 void test_conflict_at_barrier(host_t *h);
 void test_order_observers(host_t *h);
 void test_reorder_observers(host_t *h);

@@ -1594,11 +1594,17 @@ false = { run = ["{out}/host{exe}", "record.len-as-long-as-the-text"] }
 name = "record.len-as-long-as-the-text"
 run = ["{out}/host{exe}", "record.len-as-long-as-the-text"]
 claims = { matches = ["/say: kept in the arena 0 0\\s+alive"] }
-false = { run = ["{out}/host{exe}", "record.when-the-barrier-it-was-said-after"] }
+false = { run = ["{out}/host{exe}", "record.barriers-the-count-it-was-said-after"] }
 
 [[case]]
-name = "record.when-the-barrier-it-was-said-after"
-run = ["{out}/host{exe}", "record.when-the-barrier-it-was-said-after"]
+name = "record.place-of-each-system-in-its-phase"
+run = ["{out}/host{exe}", "record.place-of-each-system-in-its-phase"]
+claims = { matches = ["b1 p0 game:places@0.1.0/first: at.*b1 p1 game:places@0.1.0/second: at.*alive"] }
+false = { run = ["{out}/host{exe}", "record.barriers-the-count-it-was-said-after"] }
+
+[[case]]
+name = "record.barriers-the-count-it-was-said-after"
+run = ["{out}/host{exe}", "record.barriers-the-count-it-was-said-after"]
 claims = { matches = ["b1 p\\d+ \\S+ event 3 1.*b3 p\\d+ \\S+ event 2 2.*b5 p\\d+ \\S+ event 4 57005.*alive"] }
 false = { run = ["{out}/host{exe}", "record.arg-the-two-numbers"] }
 

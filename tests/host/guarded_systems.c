@@ -5,7 +5,7 @@
 */
 #include "cases.h"
 
-static void run_one(host_t *h, const char *identity, const char *file,
+void test_run_guarded(host_t *h, const char *identity, const char *file,
     int frames)
 {
     if (host_open(h))
@@ -17,20 +17,20 @@ static void run_one(host_t *h, const char *identity, const char *file,
 
 void test_order_own(host_t *h)
 {
-    run_one(h, "game:twostep@0.1.0", "twostep", 1);
+    test_run_guarded(h, "game:twostep@0.1.0", "twostep", 1);
 }
 
 void test_chain(host_t *h)
 {
-    run_one(h, "game:chain@0.1.0", "chain", 3);
+    test_run_guarded(h, "game:chain@0.1.0", "chain", 3);
 }
 
 void test_tell_events(host_t *h)
 {
-    run_one(h, "game:events@0.1.0", "events", 3);
+    test_run_guarded(h, "game:events@0.1.0", "events", 3);
 }
 
 void test_nest(host_t *h)
 {
-    run_one(h, "game:nested@0.1.0", h->arg, 1);
+    test_run_guarded(h, "game:nested@0.1.0", h->arg, 1);
 }
