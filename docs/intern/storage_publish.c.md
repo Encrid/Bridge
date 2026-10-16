@@ -15,7 +15,8 @@ Storage writes into the span region of the private memory of the module, from `s
 5. The spans of each system, one after the other, from a multiple of 8.
 6. The records of the lists of the observers.
 
-If they do not fit in `spans_len` bytes, `storage_publish` gives 1, and `src/block_barrier.c` stops the module.
+Items 1 to 4 always fit: `check_spans` checked them at the load, and their counts do not change after it.
+If the spans or the lists do not fit in `spans_len` bytes, `storage_publish` gives 1, and `src/block_barrier.c` stops the module.
 
 ## The lists of the observers
 

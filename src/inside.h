@@ -112,7 +112,6 @@ struct module {
     uint32_t ring_tail;
     uint32_t spans;
     uint32_t spans_len;
-    bool published;
     bool had_triggers;
     uint32_t spans_end;
     declared_type_t **declared;

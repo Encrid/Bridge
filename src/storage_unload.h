@@ -18,7 +18,7 @@ static inline void destroy_entity(storage_t *r, uint32_t index)
     get_carried(r, index, r->before);
     tell_observers(r, &(seen_t){ id, r->before, nullptr, nullptr });
     kill_entity(r, index);
-    if (from && r->tables[from].live && !r->tables[from].rows)
+    if (from && !r->tables[from].rows)
         free_table(r, from);
 }
 

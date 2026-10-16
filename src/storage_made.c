@@ -36,7 +36,7 @@ bool storage_make_fold(storage_t *r)
     r->folded = calloc(entities, 1);
     r->dest = calloc(entities, sizeof(*r->dest));
     r->attached = calloc(entities * r->words, 8);
-    r->at = calloc(r->type_room ? r->type_room : 1, sizeof(*r->at));
+    r->at = calloc(r->type_room, sizeof(*r->at));
     r->scratch = calloc(r->words, 8);
     r->before = calloc(r->words, 8);
     r->masked = calloc(r->words, 8);

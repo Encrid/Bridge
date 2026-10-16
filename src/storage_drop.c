@@ -13,10 +13,8 @@ static void say_apart(storage_t *r, const storage_type_t *type, uint32_t rows)
     say_t about = { nullptr, nullptr, BRIDGE_WARN };
     uint32_t i = 0;
 
-    while (i < b->type_count && b->types[i]->type != type)
+    while (b->types[i]->type != type)
         i++;
-    if (i == b->type_count)
-        return;
     say_about(r->b, &about, "'%s' is stripped, and %u rows stay in a second "
         "table of their archetype: [budget] columns of %u bytes has no room "
         "to join them to the first", b->types[i]->name, rows, b->columns_len);

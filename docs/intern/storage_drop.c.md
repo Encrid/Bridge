@@ -22,6 +22,6 @@ It finds the name of the component in the declared types of the world, and write
 
 | Function | Result |
 | --- | --- |
-| `say_apart` | Writes the one trace of a strip: the rows that stay in a second table of their archetype. |
+| `say_apart` | Writes the one trace of a strip: the rows that stay in a second table of their archetype. Each caller strips a listed type, so it finds its name. |
 | `drop_tables` | Drops a component that tables keep, a table at a time. |
 | `storage_drop` | Drops the rows of a component that nobody declares any more, by its layout. |

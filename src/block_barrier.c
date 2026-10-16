@@ -39,8 +39,6 @@ static void publish_all(bridge_t *b)
     const char *list;
 
     while (m) {
-        if (m->stopped)
-            m->published = false;
         list = nullptr;
         if (!m->stopped && storage_publish(b->storage, m, &list))
             stop_full(b, m, list);

@@ -25,7 +25,7 @@ For each module, storage writes this:
 A barrier at which nothing changed writes nothing, however many tables there are.
 A span exists for each table that has rows, since a table with no row does not exist.
 
-Storage writes all of it again for a module the first time.
+Storage writes all of it for a new record, since `src/bridge_load.c` and `src/bridge_reload.c` set `layout_moved` before its first barrier.
 It writes all of it again for each module when `layout_moved` of the world is set: a module came or went, or a declaration changed.
 
 ## Types

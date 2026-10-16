@@ -24,6 +24,7 @@ These are the three things that the span of a table holds, so the same loop read
 The other terms of the query are optional, and the module reaches them by id.
 
 `terms_read` holds this rule: a system reads the table of a sparse set only if it has a `BRIDGE_AND` of the type of the set.
+That table holds the type of the set alone, so after `terms_match` each `BRIDGE_AND` names that type, and `terms_read` looks only for a `BRIDGE_AND`.
 
 ## Functions
 

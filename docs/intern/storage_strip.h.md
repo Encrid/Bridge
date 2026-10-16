@@ -20,5 +20,5 @@ It also puts the table in the hash if it is to be the table that its set finds.
 | --- | --- |
 | `close_bits` | Moves the bits of a toggled column down to where the shorter layout puts them, and writes their offset before the column. |
 | `close_column` | Moves one column down to where the shorter layout puts it, with its bits first if it is toggled. |
-| `shorten_block` | Lays out what is left of a table, and closes up the columns after the one that went. Gives back what the block no longer needs. |
+| `shorten_block` | Lays out what is left of a table, and closes up the columns after the one that went. Gives back what the block no longer needs. The block stays where it is, since a block that shrinks does not move. |
 | `strip_table` | Makes a table stop carrying a type, where it stands. With `name`, the table becomes the table that its set finds. |

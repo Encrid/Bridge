@@ -60,20 +60,17 @@ int storage_publish(storage_t *r, module_t *m, const char **list)
     uint32_t slots = (uint32_t)sizeof(bridge_query_t) * m->system_count
         + (uint32_t)sizeof(bridge_list_t) * m->observer_count;
 
-    p.all = r->b->layout_moved || !m->published;
+    p.all = r->b->layout_moved;
     p.again = p.all;
     p.cell = (uint32_t *)(m->priv + m->spans + slots);
     p.kept = p.cell + (size_t)m->declared_count * tables;
     p.at = (uint64_t)((uint8_t *)p.kept - m->priv) + 4ull * m->declared_count;
     p.at = (p.at + 7u) & ~7ull;
-    if (p.at > p.end)
-        return (1);
     storage_publish_cells(&p);
     if (storage_publish_spans(&p) || storage_publish_lists(&p)) {
         *list = p.full;
         return (1);
     }
-    m->published = true;
     return (0);
 }
 

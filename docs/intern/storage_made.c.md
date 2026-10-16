@@ -2,6 +2,7 @@
 
 This file allocates what storage holds, a part at a time, when Bridge makes a world.
 What each budget sizes is in `docs/intern/storage_create.h.md`, *What bounds it*.
+`type_room` is never 0: `[budget] types` is at least 1, and storage rounds it up to 64.
 
 ## The parts
 

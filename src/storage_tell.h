@@ -57,7 +57,7 @@ static inline uint32_t get_owed(const storage_t *r, const storage_terms_t *o,
 {
     const uint64_t *before = seen->before;
     const uint64_t *after = seen->after;
-    bool was = before && !set_is_empty(r, before) && terms_match(o, before);
+    bool was = !set_is_empty(r, before) && terms_match(o, before);
     bool is = after && !set_is_empty(r, after) && terms_match(o, after);
     uint32_t owed = was ? 0 : BRIDGE_ON_ENTER;
     uint32_t k = 0;

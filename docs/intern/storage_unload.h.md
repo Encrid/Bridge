@@ -14,7 +14,7 @@ The policies are in `docs/intern/storage_drop.h.md`, *What unload leaves behind*
 
 | Function | Result |
 | --- | --- |
-| `destroy_entity` | Destroys the entity at `index`, and tells its observers what it carried. Gives back its table if it was the last row. |
+| `destroy_entity` | Destroys the entity at `index`, and tells its observers what it carried. Gives back its table if it was the last row. The place of a live entity names 0 or a live table. |
 | `sweep_sets` | Gives back the table of each sparse set that nothing is left in, as the end of a barrier does. |
 | `is_apart` | Gives whether the entity at `index` is in a sparse set, or has a direct-indexed value. |
 | `see_less` | Writes into `before` what the entity at `index` carries, and into `left` the same set without a type. |

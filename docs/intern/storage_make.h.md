@@ -7,7 +7,9 @@ This header makes a table for a set that has none, and gives a table back when i
 `make_table` gives the table that the hash finds for a set, or makes one.
 A set that holds the type of a sparse set is the table of that set.
 Storage has room for the table of each sparse set beside `[budget] tables`, so it never refuses one of those.
-It gives 0 for a table of an archetype past `[budget] tables`, and when no table id is free.
+
+`make_table` gives 0 for a table of an archetype past `[budget] tables`.
+A table id is always free then, since live tables stay below `table_room`: `[budget] tables` and one table for each sparse set.
 A new table is live, with no row and no column yet.
 Storage puts it in the hash, in the list of each system that reads it, and in `dirty`.
 
@@ -23,7 +25,7 @@ An id given back at this barrier is in `dirty` already, so `open_table` keeps `t
 | Function | Result |
 | --- | --- |
 | `close_table` | Makes a table no table: not live, with no row, no room, no block and no sparse set. |
-| `take_table_id` | Gives a table id that nobody has: one given back, or the next one never used. Gives 0 if there is none. |
+| `take_table_id` | Gives a table id that nobody has: one given back, or the next one never used. |
 | `open_table` | Makes table `t` the live table of a set, with no row and no column. Writes its set, and puts it in the hash and in the lists. |
 | `make_table` | Gives the table of a set, made if there is none. Gives 0 if there is no room for it. |
 | `free_table` | Gives back a table whose last row left. |

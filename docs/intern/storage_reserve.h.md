@@ -24,6 +24,6 @@ There is room for a table for each sparse set, so storage never refuses that one
 | --- | --- |
 | `get_wanted` | Gives the set of the table that the entity at `index` is to be in. |
 | `pick_table` | Finds the table that the entity at `index` is to be in, made if there is none, and counts the entity among its new rows. Gives false, with the entity left as it was, if there is no room for the table. |
-| `reserve_join` | Counts the entity at `index` among the rows that the sparse set of `slot` gains. Makes the table of the set if it has none. |
+| `reserve_join` | Counts the entity at `index` among the rows that the sparse set of `slot` gains. Makes the table of the set if it has none, which `make_table` never refuses for a sparse set. |
 | `count_joins` | Counts a row in each sparse set that the entity at `index` is to join. |
 | `reserve_one` | Finds where the entity at `index` is to be while it is still where it was: its table, and each sparse set it joins. Does nothing for a destroyed entity. |

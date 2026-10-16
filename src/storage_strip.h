@@ -55,9 +55,7 @@ static inline void shorten_block(storage_t *r, uint32_t t, uint32_t gone)
             close_column(r, t, id);
         id = walk_next(r, &walk);
     }
-    if (block_column_regrow(r->b, block, tab->block_len, (uint32_t)len)
-        != block)
-        unreachable();
+    (void)block_column_regrow(r->b, block, tab->block_len, (uint32_t)len);
     tab->block_len = (uint32_t)len;
 }
 

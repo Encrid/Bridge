@@ -53,8 +53,7 @@ static inline void reserve_join(storage_t *r, uint32_t slot, uint32_t index)
     if (!r->set_table[slot]) {
         set_clear(r, r->scratch);
         set_put(r->scratch, r->set_type[slot]->id);
-        if (!make_table(r, r->scratch))
-            unreachable();
+        (void)make_table(r, r->scratch);
     }
     r->tables[r->set_table[slot]].incoming++;
     r->folded[index] |= MOVES;

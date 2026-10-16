@@ -46,15 +46,13 @@ static inline bool terms_match(const storage_terms_t *t, const uint64_t *set)
 static inline bool terms_read(const storage_t *r, const storage_terms_t *s,
     uint32_t t)
 {
-    uint32_t set = r->tables[t].set;
-    uint32_t type = set ? r->set_type[set - 1]->id : 0;
     uint32_t i = 0;
 
     if (!terms_match(s, get_set(r, t)))
         return (false);
-    if (!set)
+    if (!r->tables[t].set)
         return (true);
-    while (i < s->count && (s->oper[i] != BRIDGE_AND || s->type[i] != type))
+    while (i < s->count && s->oper[i] != BRIDGE_AND)
         i++;
     return (i < s->count);
 }

@@ -23,7 +23,8 @@ A module whose spans no longer hold what its queries match, or the list of an ob
 Its record names the size of its spans, and the observer whose list did not fit.
 If its `on_error` is `BRIDGE_FAIL`, the world stops too: `docs/intern/bridge_stop.c.md`.
 If it ran on, its systems would run over tables that they were not told about.
-A stopped module keeps its components, and its spans are published all over again if it comes back.
+A stopped module keeps its components, and storage writes nothing more for it.
+It comes back only as a new record, by a load or a reload, which storage writes as a whole.
 
 ## An observer at the barrier
 
@@ -50,6 +51,6 @@ A destroy that the module may not do counts the same way: `src/storage_settle.h`
 | Function | Result |
 | --- | --- |
 | `refill_all` | Tops up the ids of each module. |
-| `publish_all` | Publishes the spans of each running module, and stops a module whose spans no longer hold what its queries match. Marks a stopped module as not published. |
+| `publish_all` | Publishes the spans of each running module, and stops a module whose spans no longer hold what its queries match. |
 | `finish_barrier` | Ends a barrier once its observers ran: no system pending, the failure budgets settled, each log drained, and the barrier counted. |
 | `block_barrier` | Runs the barrier, with the steps of *The steps of a barrier*. |

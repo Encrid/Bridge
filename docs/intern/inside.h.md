@@ -119,7 +119,7 @@ A system and an observer are a query and a function either way, so one record se
 | `scratch`, `scratch_len` | Where the scratch arena is, and its length. |
 | `ring`, `ring_len`, `ring_tail` | Where the log ring is, its length in records, and the count of records drained. |
 | `spans`, `spans_len` | The span region: the query slots, the lists of the observers, `column_base` and the spans. |
-| `published`, `had_triggers`, `spans_end` | What storage last wrote in the span region: that it wrote, that the list of an observer was not empty, and where the spans end. |
+| `had_triggers`, `spans_end` | What storage last wrote in the span region: that the list of an observer was not empty, and where the spans end. |
 | `declared`, `policy`, `may_write`, `declared_count` | By slot: the component, what the module stated for unload, and whether its grants let it write the component. |
 | `systems`, `system_count`, `observers`, `observer_count` | Its systems and its observers, by slot. |
 | `work_limit` | The work limit set before each dispatch. |
