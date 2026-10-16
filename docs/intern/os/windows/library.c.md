@@ -20,4 +20,4 @@ The full path must be shorter than `MAX_PATH` characters: a longer path gives `n
 | --- | --- |
 | `os_lib_open` | Opens a bare name with `LoadLibraryA`, and a path with `LoadLibraryExA` after `GetFullPathNameA`. Gives `nullptr` on failure. |
 | `os_lib_get_symbol` | Gives what `GetProcAddress` finds of `name` in the library, or `nullptr`. |
-| `os_lib_close` | Closes the library with `FreeLibrary`. A null library does nothing. |
+| `os_lib_close` | Closes the library with `FreeLibrary`. |

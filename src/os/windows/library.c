@@ -28,6 +28,5 @@ void *os_lib_get_symbol(void *lib, const char *name)
 
 void os_lib_close(void *lib)
 {
-    if (lib)
-        FreeLibrary((HMODULE)lib);
+    FreeLibrary((HMODULE)lib);
 }

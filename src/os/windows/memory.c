@@ -20,6 +20,5 @@ void *os_reserve(size_t reserve, size_t commit)
 
 void os_release(void *base, [[maybe_unused]] size_t reserve)
 {
-    if (base)
-        VirtualFree(base, 0, MEM_RELEASE);
+    VirtualFree(base, 0, MEM_RELEASE);
 }

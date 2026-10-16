@@ -23,6 +23,5 @@ void *os_reserve(size_t reserve, size_t commit)
 
 void os_release(void *base, size_t reserve)
 {
-    if (base)
-        munmap(base, reserve);
+    munmap(base, reserve);
 }

@@ -16,4 +16,4 @@ The loader looks beside a library that a path names, and searches for a bare nam
 | --- | --- |
 | `os_lib_open` | Opens the library with `dlopen`. Gives `nullptr` on failure. |
 | `os_lib_get_symbol` | Gives what `dlsym` finds of `name` in the library, or `nullptr`. |
-| `os_lib_close` | Closes the library with `dlclose`. A null library does nothing. |
+| `os_lib_close` | Closes the library with `dlclose`. |

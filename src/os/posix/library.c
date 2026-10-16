@@ -19,6 +19,5 @@ void *os_lib_get_symbol(void *lib, const char *name)
 
 void os_lib_close(void *lib)
 {
-    if (lib)
-        dlclose(lib);
+    dlclose(lib);
 }

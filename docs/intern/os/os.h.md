@@ -179,10 +179,10 @@ Each function that can fail is `[[nodiscard]]`: the caller must use its result.
 | Function | Result |
 | --- | --- |
 | `os_reserve` | Reserves `reserve` bytes of address space, and makes the first `commit` bytes readable, writable and zero. The rest faults when touched, which a backend that enforces bounds by a fault needs after a block. Gives `nullptr` on failure. |
-| `os_release` | Gives back all of a reservation. A null `base` does nothing. |
+| `os_release` | Gives back all of a reservation. Each caller passes a base that `os_reserve` gave. |
 | `os_lib_open` | Opens a shared library, or gives `nullptr`. For a path, the loader looks there for the library and for what it needs, since a backend brings its runtime beside itself. A bare name goes to the search of the operating system. |
 | `os_lib_get_symbol` | Gives where a library has what it exports as `name`, or `nullptr`. |
-| `os_lib_close` | Closes a library. A null `lib` does nothing. |
+| `os_lib_close` | Closes a library. Each caller passes a library that `os_lib_open` gave. |
 | `os_thread_start` | Starts a thread that runs `fn(arg)`. Gives `nullptr` on failure. |
 | `os_thread_join` | Waits for a thread to end, and frees what `os_thread_start` gave. |
 | `os_get_thread_id` | Gives a number for the calling thread that no other live thread has. It is never 0. |
