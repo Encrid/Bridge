@@ -125,7 +125,7 @@ How `storage_convert` ended.
 | `storage_make_writable` | Makes the set of the types that a module may write. Gives false if there is no memory. In `src/storage_slots.c`. |
 | `storage_let_write` | Records that a module may write a type, which gives it a stake in an entity that carries the type. In `src/storage_slots.c`. |
 | `storage_reserve` | Takes up to `want` ids with nothing on them, for a module to hand out. Gives how many it took. In `src/storage_ids.c`. |
-| `storage_publish` | Writes what a module reads: its spans, its `column_base` and the lists of its observers. Gives 1 if they do not fit. In `src/storage_publish.c`. |
+| `storage_publish` | Writes what a module reads: its spans, its `column_base` and the lists of its observers. Gives 1 if they do not fit, with the observer whose list did not fit. In `src/storage_publish.c`. |
 | `storage_end_publish` | Forgets which tables changed, after storage wrote for each module. In `src/storage_publish.c`. |
 | `storage_count_tables` | Gives how many table ids there are, with 0, which is no table. In `src/storage_publish.c`. |
 | `storage_count_carriers` | Gives how many entities carry a type. In `src/storage_carriers.c`. |

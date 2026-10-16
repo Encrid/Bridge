@@ -302,6 +302,12 @@ claims = { matches = ["A observer heard ON_ATTACH when B got its value: 0\\s.*al
 false = { run = ["{out}/storage{exe}", "shape"] }
 
 [[case]]
+name = "observer-list-past-the-spans-names-the-observer"
+run = ["{out}/storage{exe}", "fulllist"]
+claims = { matches = ["is stopped: the list of its observer 'heard' no longer fits in its spans of 256 bytes.*alive"] }
+false = { run = ["{out}/storage{exe}", "shape"] }
+
+[[case]]
 name = "storage-marks-full-refused"
 run = ["{out}/storage{exe}", "marks"]
 claims = { matches = ["refused: out of memory: there was none for a mark in its queue.*alive"] }

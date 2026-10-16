@@ -776,6 +776,7 @@ Rows in a second table make a second span of the same archetype.
 - `module '<module>' is stopped: its system '<system>' reached its max_system_failures of <count>`
 - `module '<module>' is stopped: it reached its max_system_failures of <count>, by entities it changed that could not be placed`
 - `module '<module>' is stopped: what its queries match no longer fits in its spans of <bytes> bytes`
+- `module '<module>' is stopped: the list of its observer '<observer>' no longer fits in its spans of <bytes> bytes`
 - `module '<module>': [budget] tables of <count> is used up. Not applied, of the changes it asked: <count>`
 - `module '<module>': [budget] columns of <bytes> bytes is used up. Not applied, of the changes it asked: <count>`
 

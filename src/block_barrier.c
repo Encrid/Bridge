@@ -15,19 +15,33 @@ static void refill_all(bridge_t *b)
     }
 }
 
+static void stop_full(bridge_t *b, module_t *m, const char *list)
+{
+    const say_t about = { m, nullptr, BRIDGE_ERR };
+
+    m->stopped = 1;
+    if (list) {
+        say_about(b, &about, "module '%s' is stopped: the list of its "
+            "observer '%s' no longer fits in its spans of %u bytes",
+            m->identity, list, m->spans_len);
+        return;
+    }
+    say_about(b, &about, "module '%s' is stopped: what its queries match "
+        "no longer fits in its spans of %u bytes", m->identity,
+        m->spans_len);
+}
+
 static void publish_all(bridge_t *b)
 {
     module_t *m = b->modules;
+    const char *list;
 
     while (m) {
         if (m->stopped)
             m->published = false;
-        if (!m->stopped && storage_publish(b->storage, m)) {
-            m->stopped = 1;
-            say_about(b, &(say_t){ m, nullptr, BRIDGE_ERR }, "module '%s' "
-                "is stopped: what its queries match no longer fits in its "
-                "spans of %u bytes", m->identity, m->spans_len);
-        }
+        list = nullptr;
+        if (!m->stopped && storage_publish(b->storage, m, &list))
+            stop_full(b, m, list);
         m = m->next;
     }
 }

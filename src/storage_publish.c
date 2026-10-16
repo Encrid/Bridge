@@ -45,13 +45,15 @@ int storage_publish_lists(publish_t *p)
     q = 0;
     while (q < m->observer_count && !write_list(p, q))
         q++;
-    if (q < m->observer_count)
+    if (q < m->observer_count) {
+        p->full = m->observers[q]->name;
         return (1);
+    }
     m->had_triggers = pending != 0;
     return (0);
 }
 
-int storage_publish(storage_t *r, module_t *m)
+int storage_publish(storage_t *r, module_t *m, const char **list)
 {
     publish_t p = { .r = r, .m = m, .end = (uint64_t)m->spans + m->spans_len };
     uint32_t tables = r->table_room + 1;
@@ -67,8 +69,10 @@ int storage_publish(storage_t *r, module_t *m)
     if (p.at > p.end)
         return (1);
     storage_publish_cells(&p);
-    if (storage_publish_spans(&p) || storage_publish_lists(&p))
+    if (storage_publish_spans(&p) || storage_publish_lists(&p)) {
+        *list = p.full;
         return (1);
+    }
     m->published = true;
     return (0);
 }

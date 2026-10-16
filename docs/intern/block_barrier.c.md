@@ -19,7 +19,8 @@ This file runs the barrier: what happens between two phases, in an order that ne
 The header of a module tells how many table ids there are.
 That number is `[budget] tables` and `[budget] sparse_sets`, and 1. It is fixed when the world is made, so one publish is enough.
 
-A module whose spans no longer hold what its queries match is stopped, with a record that names the size of its spans.
+A module whose spans no longer hold what its queries match, or the list of an observer, is stopped.
+Its record names the size of its spans, and the observer whose list did not fit.
 If it ran on, its systems would run over tables that they were not told about.
 A stopped module keeps its components, and its spans are published all over again if it comes back.
 

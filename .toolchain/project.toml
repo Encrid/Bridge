@@ -58,6 +58,7 @@ paths = [
     "MOVE1_PATH=\"{out}/built/move1{library}\"",
     "MANYMOVE1_PATH=\"{out}/built/manymove1{library}\"",
     "MANYMOVE2_PATH=\"{out}/built/manymove2{library}\"",
+    "FULL_LIST_PATH=\"{out}/built/full-list{library}\"",
     "MOVE2_PATH=\"{out}/built/move2{library}\"",
     "MOVE3_PATH=\"{out}/built/move3{library}\"",
     "MOVE4_PATH=\"{out}/built/move4{library}\"",
@@ -578,6 +579,15 @@ folder = "built"
 sources = ["tests/modules/sparse/sparse.c", "tests/modules/sparse/sparse_changes.c", "tests/modules/sparse/sparse_half.c", "tests/modules/sparse/sparse_heard.c", "tests/modules/sparse/sparse_look.c", "tests/modules/idle.c"]
 include = ["include", "tests/binding", "tests/modules"]
 defines = ["BAD=2"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "full-list"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/full_list.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]

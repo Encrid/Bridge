@@ -74,7 +74,8 @@ void storage_let_write(storage_t *r, module_t *m, storage_type_t *type);
 
 uint32_t storage_reserve(storage_t *r, uint64_t *ids, uint32_t want);
 
-[[nodiscard]] int storage_publish(storage_t *r, module_t *m);
+[[nodiscard]] int storage_publish(storage_t *r, module_t *m,
+    const char **list);
 
 void storage_end_publish(storage_t *r);
 

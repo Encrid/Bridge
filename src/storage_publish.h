@@ -17,6 +17,7 @@ typedef struct {
     uint64_t end;
     bool all;
     bool again;
+    const char *full;
 } publish_t;
 
 void storage_publish_cells(publish_t *p);

@@ -42,6 +42,7 @@ One module that storage writes for.
 | `at`, `end` | Where the next thing goes in its private memory, and where its span region ends. |
 | `all` | A declaration changed, or storage never wrote for the module: storage writes each table, and not only the touched ones. |
 | `again` | Storage writes all the spans of the module again, since one of its systems reads other tables than it did. |
+| `full` | The name of the observer whose list did not fit, or null. |
 
 ## Functions
 
@@ -49,4 +50,4 @@ One module that storage writes for.
 | --- | --- |
 | `storage_publish_cells` | Writes the `column_base` of a module, and its `kept` cells. In `src/storage_cells.c`. |
 | `storage_publish_spans` | Writes the spans of a module: all of them, or the ones whose table was touched. Gives 1 if they do not fit. In `src/storage_spans.c`. |
-| `storage_publish_lists` | Writes the list of each observer of a module, when one of them has something or had something. Gives 1 if they do not fit. In `src/storage_publish.c`. |
+| `storage_publish_lists` | Writes the list of each observer of a module, when one of them has something or had something. Gives 1, with the observer in `full`, if a list does not fit. In `src/storage_publish.c`. |
