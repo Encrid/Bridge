@@ -57,8 +57,9 @@ a bitmask    integer { name = value , ... }
 - A name starts with a letter or `_`, and holds letters, digits and `_`: 63 characters at most.
 - An array has one length, and the length is a number.
 
-The descriptor is the text before the preprocessor replaces a name, thus `declare` refuses a macro as the length of an array.
-Write the number one time, in the struct. The code gets it from the field: `sizeof` of the field divided by `sizeof` of one item.
+The descriptor is the text after the preprocessor replaces each macro in it.
+Thus a macro can give the length of an array, and the descriptor holds its number.
+The code can get the length from the field: `sizeof` of the field divided by `sizeof` of one item.
 A pointer, `size_t` and `intptr_t` are not in the set. They have 4 bytes in a module of wasm32, and 8 bytes in a native module.
 Each type of the set has one size and one alignment on each target.
 

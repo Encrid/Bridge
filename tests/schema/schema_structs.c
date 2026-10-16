@@ -3,7 +3,18 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include "bridge_schema.h"
 #include "schema_test.h"
+
+    #define SCHEMA_TITLE_LENGTH 16
+    #define SCHEMA_TITLED_FIELDS { char title[SCHEMA_TITLE_LENGTH]; }
+
+BRIDGE_SCHEMA_STRUCT_TYPE(titled_t, SCHEMA_TITLED_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(titled_t, SCHEMA_TITLED_FIELDS);
+
+static const want_field_t SCHEMA_TITLED[] = {
+    SCHEMA_FIELD(titled_t, title, SCHEMA_CHAR, 16)
+};
 
 static const want_field_t SCHEMA_VEC2[] = {
     SCHEMA_FIELD(vec2_t, x, SCHEMA_F32, 1),
@@ -57,7 +68,8 @@ static const want_struct_t SCHEMA_STRUCTS[] = {
         alignof(body_t), SCHEMA_BODY, 4 },
     { "{ uint8_t a; uint16_t b; uint8_t c; uint64_t d; int8_t e; int16_t f; "
         "uint32_t g; }", sizeof(mixed_t), alignof(mixed_t), SCHEMA_MIXED, 7 },
-    { "{float x;float y;}", sizeof(vec2_t), alignof(vec2_t), SCHEMA_VEC2, 2 }
+    { "{float x;float y;}", sizeof(vec2_t), alignof(vec2_t), SCHEMA_VEC2, 2 },
+    { titled_t_desc, sizeof(titled_t), alignof(titled_t), SCHEMA_TITLED, 1 }
 };
 
 int schema_run_structs(void)
