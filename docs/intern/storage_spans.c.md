@@ -13,6 +13,7 @@ The base is 0 for a term `BRIDGE_NOT`, which must not match, and for a component
 ## Where the spans go
 
 The spans of a system are one after the other, and its `bridge_query_t` says where they begin and how many there are.
+The module can write its `bridge_query_t`, so storage keeps where the spans begin in `spans_at` of the system, and reads only that.
 The spans of the systems of a module are one after the other too.
 So when a system reads other tables than it did, storage writes all the spans of the module again, from the start.
 Otherwise it writes again, where it is, each span whose table was touched, which it finds through `pos` of the system.

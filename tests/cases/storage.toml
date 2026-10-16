@@ -272,6 +272,12 @@ claims = { matches = ["barriers 7 place 70000 system far.*alive"] }
 false = { run = ["{out}/storage{exe}", "matrix"] }
 
 [[case]]
+name = "bridge_query_t-at-that-a-module-writes-is-not-read"
+run = ["{out}/storage{exe}", "pointaway"]
+claims = { matches = ["outside spans \\[\\d+, \\d+\\): wrote 0 at \\d+.*alive"] }
+false = { run = ["{out}/storage{exe}", "shape"] }
+
+[[case]]
 name = "storage-marks-full-refused"
 run = ["{out}/storage{exe}", "marks"]
 claims = { matches = ["refused: out of memory: there was none for a mark in its queue.*alive"] }

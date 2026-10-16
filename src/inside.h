@@ -66,6 +66,7 @@ typedef struct {
     char *full;
     uint32_t phase;
     storage_terms_t *matched;
+    uint32_t spans_at;
     storage_term_t *asked;
     enum bridge_event events;
     uint32_t terms;

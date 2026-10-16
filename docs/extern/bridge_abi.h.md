@@ -406,6 +406,9 @@ A span stays good until the next barrier, and it does not change before then.
 | `spans` | How many spans the query has: how many tables it matches. |
 | `at` | Where the first span is, in the private memory. The spans follow one another. |
 
+Bridge keeps its own copy of each slot, and does not read a slot back.
+A module that writes a slot changes only what it reads.
+
 A span of a query of `n` terms has `BRIDGE_SPAN_SIZE(n)` bytes: 8 bytes, and 4 bytes for each term.
 
 | Offset | Content |

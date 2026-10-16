@@ -88,6 +88,7 @@ A system and an observer are a query and a function either way, so one record se
 | `full` | How `[order]` names it: the stem of its module, a colon, then its name. |
 | `phase` | Its phase. The phase of an observer is the one past the last phase of the deployment: the barrier. |
 | `matched` | Its terms, as storage holds them. Null with no terms. |
+| `spans_at` | Where its spans begin in the private memory of its module, as storage last wrote them. |
 | `asked` | What it asked storage for, kept to put a system back as it was after a reload took it out of storage. |
 | `events` | The events that an observer asks for. |
 | `terms` | How many terms it has. |

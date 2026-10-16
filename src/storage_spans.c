@@ -35,18 +35,17 @@ static int write_spans(publish_t *p, uint32_t q)
     storage_terms_t *s = m->systems[q]->matched;
     bridge_query_t *slot = (bridge_query_t *)(m->priv + m->spans) + q;
     uint32_t size = s ? BRIDGE_SPAN_SIZE(s->count) : 0;
-    uint32_t i = 0;
 
     slot->spans = 0;
     slot->at = (uint32_t)p->at;
+    m->systems[q]->spans_at = (uint32_t)p->at;
     if (!s)
         return (0);
     if (p->at + (uint64_t)s->matched * size > p->end)
         return (1);
-    while (i < s->matched) {
+    for (uint32_t i = 0; i < s->matched; i++) {
         write_span(p->r, s, s->list[i], m->priv + p->at);
         p->at += size;
-        i++;
     }
     slot->spans = s->matched;
     s->changed = false;
@@ -58,8 +57,7 @@ static void rewrite_spans(publish_t *p, uint32_t q)
     const storage_t *r = p->r;
     module_t *m = p->m;
     const storage_terms_t *s = m->systems[q]->matched;
-    const bridge_query_t *slot = (bridge_query_t *)(m->priv + m->spans) + q;
-    uint8_t *spans = m->priv + slot->at;
+    uint8_t *spans = m->priv + m->systems[q]->spans_at;
     uint32_t where;
     uint32_t i = 0;
 
