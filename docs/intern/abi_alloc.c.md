@@ -37,7 +37,7 @@ So a change that is put on the queue never has to ask for memory.
 ## A parked system
 
 A reload does not need room for the systems of a module twice.
-`src/bridge_reload.c` parks each system of the old instance: storage forgets its terms, and the deck counts it in `parked`.
+`src/bridge_reload.c` parks each system of the old instance: storage forgets its terms, and the world counts it in `parked`.
 A parked system counts for nothing against `[budget] systems`, so the systems of the new instance take the places that the old ones had.
 If the reload fails, `src/reload_fail.c` puts each parked system back, as it was.
 The places it had are free again, since whatever took them was dropped.

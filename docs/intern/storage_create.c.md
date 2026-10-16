@@ -1,6 +1,6 @@
 # src/storage_create.c
 
-This file makes the storage of a deck, all of it or none, and frees it.
+This file makes the storage of a world, all of it or none, and frees it.
 What each budget sizes is in `docs/intern/storage_create.h.md`, *What bounds it*.
 
 ## The sizes
@@ -33,6 +33,6 @@ If the operating system does not give `who`, `storage_create` writes that `[budg
 | --- | --- |
 | `set_sizes` | Takes from the budget how much of each thing storage may hold. |
 | `make_all` | Allocates the parts of storage with the four functions of `src/storage_create.h`. Gives false at the first that fails. |
-| `storage_create` | Makes the storage of a deck, all of it or none. Gives `nullptr`, with a record, if it cannot. |
+| `storage_create` | Makes the storage of a world, all of it or none. Gives `nullptr`, with a record, if it cannot. |
 | `free_fold` | Frees what the fold, the sparse sets and the direct-indexed components hold. |
 | `storage_destroy` | Gives `who` back to the operating system, and frees each part of storage and its record. |

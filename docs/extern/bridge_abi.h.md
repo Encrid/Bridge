@@ -50,7 +50,7 @@ A module imports each thing from the namespace `BRIDGE_NAMESPACE`, `bridge`. It 
 
 | Constant | Name | Memory |
 | --- | --- | --- |
-| `BRIDGE_SHARED` | `shared` | The shared memory of the deck: the entity index, the components and the persistent arena. Each module reads it. |
+| `BRIDGE_SHARED` | `shared` | The shared memory of the world: the entity index, the components and the persistent arena. Each module reads it. |
 | `BRIDGE_PRIVATE` | `private` | The private memory of the module: its header, its scratch arena, its log ring and its span region. |
 
 A module gets only the memories that it imports. Only the module and Bridge read its private memory.
@@ -475,7 +475,7 @@ A module that writes over it misleads the modules that read it, and changes noth
 `spawn` gives the id of a new entity at once. The entity has no component until a barrier applies an attach to it.
 The id comes from a block that a barrier set aside for the module: `spawns` of its config.
 Thus a system can use the new id at once, for example in the value of a component that it attaches to another entity.
-`spawn` refuses the call when the module states `BRIDGE_NONE` for `spawns`, when the block is used up, and when the deck has no more entities.
+`spawn` refuses the call when the module states `BRIDGE_NONE` for `spawns`, when the block is used up, and when the world has no more entities.
 A query can match the new entity from the next barrier on.
 
 ## destroy

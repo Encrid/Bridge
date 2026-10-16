@@ -5,9 +5,9 @@ This file unloads a module.
 
 ## The steps of an unload
 
-1. Refuse the call if the deck has stopped for another module, or a module is pinned to another thread.
+1. Refuse the call if the world has stopped for another module, or a module is pinned to another thread.
 2. Refuse an identity that no loaded module has, by the name that was asked for.
-3. If this module stopped the deck, let the deck run again without it.
+3. If this module stopped the world, let the world run again without it.
 4. Take its systems and observers out of the schedule, before its last call.
 5. Call its `shutdown` under its timeout, apply what it queued, and drain its log ring.
 6. Release each type that it declared. A component that no other module declares goes by its policy.

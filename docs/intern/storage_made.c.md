@@ -1,6 +1,6 @@
 # src/storage_made.c
 
-This file allocates what storage holds, a part at a time, when Bridge makes a deck.
+This file allocates what storage holds, a part at a time, when Bridge makes a world.
 What each budget sizes is in `docs/intern/storage_create.h.md`, *What bounds it*.
 
 ## The parts

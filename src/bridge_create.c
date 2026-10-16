@@ -8,15 +8,15 @@
 #include "bridge_inside.h"
 #include "say.h"
 
-static const char NO_DECK[] = "out of memory: there was none for the deck";
+static const char NO_WORLD[] = "out of memory: there was none for the world";
 
 static bridge_t *make_bridge(bridge_sink_fn_t sink, void *ud)
 {
     bridge_t *b = calloc(1, sizeof(*b));
-    bridge_record_t r = { .text = NO_DECK, .level = BRIDGE_ERR };
+    bridge_record_t r = { .text = NO_WORLD, .level = BRIDGE_ERR };
 
     if (!b) {
-        r.len = sizeof(NO_DECK) - 1;
+        r.len = sizeof(NO_WORLD) - 1;
         sink(ud, &r);
         return (nullptr);
     }

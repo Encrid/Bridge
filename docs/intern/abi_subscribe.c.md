@@ -9,7 +9,7 @@ This file registers a system or an observer: it reads what the module stated, ha
 3. Read its changes.
 4. Read its terms, one by one: `docs/intern/abi_term.c.md`.
 5. If a change or a term is refused, free what was had, and give 1.
-6. Hand the terms to storage, and list the system among those of the deck and of its module.
+6. Hand the terms to storage, and list the system among those of the world and of its module.
 7. Give its slot.
 
 ## The changes
@@ -40,7 +40,7 @@ A system with no term matches nothing, and storage holds nothing of it: it runs 
 
 The slot is the place of the system among the systems of its module, or of the observer among the observers.
 Systems and observers have slots of their own.
-The system is also put among the systems of the deck, in the order of registration.
+The system is also put among the systems of the world, in the order of registration.
 
 ## Functions
 
@@ -49,5 +49,5 @@ The system is also put among the systems of the deck, in the order of registrati
 | `read_changes` | Reads what a system or an observer attaches or detaches. 1 with a refusal. |
 | `read_term` | Reads term `i`: what storage is asked, and what the conflict graph reads of it. 1 with a refusal. |
 | `hand_over` | Hands the terms of a system or an observer to storage, and fills in the system. |
-| `list_system` | Puts a system among the systems of the deck, and among the systems or the observers of its module. Gives its slot there. |
+| `list_system` | Puts a system among the systems of the world, and among the systems or the observers of its module. Gives its slot there. |
 | `abi_subscribe` | Registers a system or an observer, and gives its slot in `r`. 1 with a refusal. |

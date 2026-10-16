@@ -14,13 +14,13 @@ This file reloads a module: a new instance takes the place of the old one, over 
 7. Build the schedule again, with the same refusal as a load.
 8. Move the rows of each type that the reload made in the place of another: `src/reload_rows.c`.
 9. Shut the old instance down, if step 5 did not, and put the new record in its place.
-10. Let the deck run again, if the deck waits for this module, and run a barrier.
+10. Let the world run again, if the world waits for this module, and run a barrier.
 
 Step 3 is in `src/reload_record.c`. A failure in steps 6 to 8 goes to `src/reload_fail.c`.
 A reload is the `reload` of the new instance, and then the `shutdown` of the old one.
 Where the backend holds both instances, the old instance is untouched until step 9.
 So a reload that fails before step 9 leaves the module as it ran.
-Like a load, `bridge_reload` gives 1 if the deck has stopped, since a module that nothing will ever run did not reload.
+Like a load, `bridge_reload` gives 1 if the world has stopped, since a module that nothing will ever run did not reload.
 
 ## Two instances at once
 
@@ -57,4 +57,4 @@ The ids held ready for the old instance are the ids of the new record from the s
 | `forget_config` | Forgets the settings component if the new instance no longer declares it. |
 | `swap` | Puts the new record in the place of the old one, releases what the new instance no longer declares, and discards the old record. |
 | `start_new` | Starts the new instance with `reload`, builds the schedule again, and moves the rows. 1, with why in the reload, if one fails. |
-| `bridge_reload` | Reloads a module. 0 if the new instance runs and the deck runs, and 1 if not. |
+| `bridge_reload` | Reloads a module. 0 if the new instance runs and the world runs, and 1 if not. |

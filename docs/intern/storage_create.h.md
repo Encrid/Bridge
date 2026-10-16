@@ -1,12 +1,12 @@
 # src/storage_create.h
 
-This header declares the four functions that allocate the parts of storage when Bridge makes a deck.
+This header declares the four functions that allocate the parts of storage when Bridge makes a world.
 `src/storage_made.c` defines them, and `src/storage_create.c` calls them.
 
 ## What bounds it
 
 A budget gives the size of each thing that storage holds.
-Storage allocates all of it when Bridge makes the deck, and nothing after: not at a barrier, and not at a load.
+Storage allocates all of it when Bridge makes the world, and nothing after: not at a barrier, and not at a load.
 
 | Budget | What it sizes in storage |
 | --- | --- |

@@ -5,13 +5,13 @@ This header gives the records of the library's own, and what each file of the li
 ## Out of memory
 
 An allocation that fails is a refusal like any other.
-The call that needed the memory fails. A record says "out of memory" and what for, and the deck stays as it was.
+The call that needed the memory fails. A record says "out of memory" and what for, and the world stays as it was.
 `bridge_lacks` writes that record.
 
-The library asks the allocator for memory when a deck is made, and when a module is loaded, reloaded or unloaded.
+The library asks the allocator for memory when a world is made, and when a module is loaded, reloaded or unloaded.
 It never asks in a phase or at a barrier: `docs/intern/inside.h.md`, *Nothing is allocated in a phase*.
 So the call that fails is `bridge_create`, `bridge_load` or `bridge_reload`, by the path that each has already.
-The deck is not made, the module is not loaded, or the old instance runs on after the reload, where the backend can keep it.
+The world is not made, the module is not loaded, or the old instance runs on after the reload, where the backend can keep it.
 
 Whatever a call needs, it gets before it keeps any of it.
 A type, a system and the record of a module each ask for all of their parts first.

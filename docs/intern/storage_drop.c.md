@@ -16,7 +16,7 @@ The policies are in `docs/intern/storage_drop.h.md`, *What unload leaves behind*
 
 `drop_tables` adds up the rows that stay in a second table of their archetype.
 If there are some, `say_apart` writes one warning, which names the component, the rows and `[budget] columns`.
-It finds the name of the component in the declared types of the deck, and writes nothing if it does not find it.
+It finds the name of the component in the declared types of the world, and writes nothing if it does not find it.
 
 ## Functions
 

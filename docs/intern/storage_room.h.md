@@ -43,7 +43,7 @@ The barrier then counts against the budget of the module: `docs/intern/schedule.
 Two modules that changed one entity both hear of it, since both lost what they asked.
 
 Nothing comes from outside the column region.
-Storage takes no column from the operating system, and it does not stop the deck for a shortage.
+Storage takes no column from the operating system, and it does not stop the world for a shortage.
 It names who asked, and nothing has begun when it finds the shortage, so nothing needs to be undone.
 
 ## Functions

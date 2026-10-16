@@ -8,13 +8,13 @@ A backend has a name and a library, and no two backends have the same name.
 Bridge opens the library by the path that the deployment states, with `backend_open` of `src/backend.c`.
 A library named by a path is looked for at that path, and what it needs is looked for beside it.
 A bare name is left to the search of the operating system: `src/os/windows/library.c` and `src/os/posix/library.c`.
-The deck counts the backend as soon as it has its name, so that a deck that is refused frees it.
+The world counts the backend as soon as it has its name, so that a world that is refused frees it.
 Then `backend_create` starts the backend with its settings.
 
 ## The settings of a backend
 
 The settings of a backend are its own, for example a cache folder, and Bridge passes them to `backend_create` unread.
-A backend refuses a setting that it does not know, by name, and then the deck is not created.
+A backend refuses a setting that it does not know, by name, and then the world is not created.
 The host seam states a setting as `bridge_setting_t`, and the backend seam as `backend_setting_t`.
 They are two structs for one fact, so that neither header needs the other.
 Static assertions hold them to one shape: the same four kinds with the same numbers, the same size and the same offsets.

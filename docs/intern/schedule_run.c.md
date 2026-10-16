@@ -11,7 +11,7 @@ This file runs a phase: a level at a time, one job for each module, and then it 
 2. `pool_run` runs the jobs at the same time, and returns when all of them returned.
 3. `account_job` counts each system of each job on the thread that asked for the phase.
 
-The count comes after the jobs, on that thread, so the deck calls the sink of the host only on that thread.
+The count comes after the jobs, on that thread, so the world calls the sink of the host only on that thread.
 `schedule_run` runs the levels from 0 to the highest level of the phase.
 
 ## The count of a system

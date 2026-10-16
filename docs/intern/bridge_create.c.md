@@ -1,9 +1,9 @@
 # src/bridge_create.c
 
-This file makes a deck of a deployment: it opens the backends, names the phases, starts the threads and builds the storage.
-A deck loads no module: the host loads each module after `bridge_create`.
+This file makes a world of a deployment: it opens the backends, names the phases, starts the threads and builds the storage.
+A world loads no module: the host loads each module after `bridge_create`.
 
-## The parts of a deck
+## The parts of a world
 
 1. Read the number of the host seam, then make room for the backends and the phases.
 2. Open and start the backends: `src/bridge_backends.c`.
@@ -20,7 +20,7 @@ A record to the sink tells the reason, and `bridge_destroy` frees what was made.
 These are the reasons:
 
 - The sink or the deployment is null. No record can tell this, and a host that passed null knows it already.
-- There is no memory for the deck. Then a record is made without a deck, and handed to the sink.
+- There is no memory for the world. Then a record is made without a world, and handed to the sink.
 - The number of the host seam is unset, or is not `BRIDGE_HOST_ABI`.
 - A key of the deployment is unset, for example `threads`.
 - The deployment has no backend, or no phase.
@@ -53,8 +53,8 @@ After the first release, a change to what a seam lays out or means increments th
 
 | Function | Result |
 | --- | --- |
-| `make_bridge` | Gives an empty deck that knows its sink. If there is not the memory, it hands the sink a record of its own and gives null. |
+| `make_bridge` | Gives an empty world that knows its sink. If there is not the memory, it hands the sink a record of its own and gives null. |
 | `check_config` | Refuses a number of the host seam that is unset or another, then makes room for the backends and the phases. 1, with a record, if refused. |
 | `start_pool` | Refuses an unset `threads`, and starts the threads that run a phase. 1, with a record, if refused. |
-| `build_bridge` | Makes each part of the deck that the deployment states. 1, with a record, at the first part that is refused. |
-| `bridge_create` | Makes a deck of a deployment. Gives the deck, or null if the deployment cannot start. |
+| `build_bridge` | Makes each part of the world that the deployment states. 1, with a record, at the first part that is refused. |
+| `bridge_create` | Makes a world of a deployment. Gives the world, or null if the deployment cannot start. |

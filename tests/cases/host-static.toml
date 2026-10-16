@@ -97,7 +97,7 @@ false = { run = ["{out}/host-static{exe}", "module_config.on_error-fail-stops-an
 [[case]]
 name = "static-module_config.on_error-fail-stops-and-skip-does-not"
 run = ["{out}/host-static{exe}", "module_config.on_error-fail-stops-and-skip-does-not"]
-claims = { matches = ["test:ok@0.1.0: loaded.*the deck has stopped: module 'test:oob@0.1.0' failed and its on_error is fail.*test:ok@0.1.0: not loaded.*alive"] }
+claims = { matches = ["test:ok@0.1.0: loaded.*the world has stopped: module 'test:oob@0.1.0' failed and its on_error is fail.*test:ok@0.1.0: not loaded.*alive"] }
 false = { run = ["{out}/host-static{exe}", "backend.library-cannot-open-refused"] }
 
 [[case]]

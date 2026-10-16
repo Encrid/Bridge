@@ -6,9 +6,9 @@ Each storage file includes it, directly or through another storage header.
 ## What storage is made for
 
 A general ECS serves any program, so it must be right at each call.
-Storage serves the deck, which promises more, and storage uses what each promise allows:
+Storage serves the world, which promises more, and storage uses what each promise allows:
 
-| The deck promises | So storage |
+| The world promises | So storage |
 | --- | --- |
 | One thread touches the rows, and only at a barrier. | Has no lock, no stage and no data local to a thread. |
 | A barrier has each change in a queue before it applies the first. | Knows the final set of an entity before it moves a row of it: `docs/intern/storage_apply.c.md`, *The steps of a barrier*. |
@@ -62,12 +62,12 @@ There is room for a table for each sparse set beside `[budget] tables`, so stora
 
 Storage finds the row of an entity in the set through its own index, `where`.
 Its cell for an entity holds the row plus one, or 0 for none.
-Storage writes a second index for modules in the shared memory, at the offset `sparse` of the deck.
+Storage writes a second index for modules in the shared memory, at the offset `sparse` of the world.
 Its cell for an entity holds the offset of the value from the shared base, or 0 for none.
 When the block of the set moves, storage writes again the cell of each entity in it.
 
 The two indexes take 8 bytes for each entity there may be, for each sparse set.
-`[budget] sparse_sets` gives how many sets there may be, and storage gets their indexes when it makes the deck.
+`[budget] sparse_sets` gives how many sets there may be, and storage gets their indexes when it makes the world.
 
 ## Direct-indexed
 
@@ -80,10 +80,10 @@ After that, an entity always has its cell.
 A cell exists for an entity that has no value, so a bit for each entity tells whether it has one.
 An attach sets the bit and a detach clears it, at the barrier, and storage tells the observers as for any other layout.
 The destroy of an entity clears its bit and its cell, so the next entity at that index has nothing of the old one.
-Storage keeps the bits in `given`, and writes a copy for modules in the shared memory, at the offset `direct` of the deck.
+Storage keeps the bits in `given`, and writes a copy for modules in the shared memory, at the offset `direct` of the world.
 The first 4 bytes of the 16 bytes before the cells hold the offset of that copy from the shared base.
 
-`[budget] direct_indexed` gives how many such components there may be, and storage gets their bits when it makes the deck.
+`[budget] direct_indexed` gives how many such components there may be, and storage gets their bits when it makes the world.
 The cost is the size of the component for each entity, carried or not: 64 bytes at 400,000 entities is 25.6 MB of `[budget] columns`.
 
 ## Nothing in the shared block is read back
@@ -175,12 +175,12 @@ A table.
 
 ### storage_t
 
-The storage of one deck, `struct storage`.
-Each budget sizes it when the deck is made, and storage allocates nothing after.
+The storage of one world, `struct storage`.
+Each budget sizes it when the world is made, and storage allocates nothing after.
 
 | Field | Content |
 | --- | --- |
-| `b` | The deck. |
+| `b` | The world. |
 | `places` | Where each entity is, by index. Never the copy in the block. |
 | `high` | The indexes from `high` on were never used. |
 | `free_head` | The first free index. The free indexes make a list through `row` of their places. |

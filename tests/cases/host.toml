@@ -103,7 +103,7 @@ false = { run = ["{out}/host{exe}", "module_config.on_error-fail-stops-and-skip-
 [[case]]
 name = "module_config.on_error-fail-stops-and-skip-does-not"
 run = ["{out}/host{exe}", "module_config.on_error-fail-stops-and-skip-does-not"]
-claims = { matches = ["test:ok@0.1.0: loaded.*the deck has stopped: module 'test:oob@0.1.0' failed and its on_error is fail.*test:ok@0.1.0: not loaded.*alive"] }
+claims = { matches = ["test:ok@0.1.0: loaded.*the world has stopped: module 'test:oob@0.1.0' failed and its on_error is fail.*test:ok@0.1.0: not loaded.*alive"] }
 false = { run = ["{out}/host{exe}", "backend.library-cannot-open-refused"] }
 
 [[case]]
@@ -526,12 +526,12 @@ false = { run = ["{out}/host{exe}", "backend_create-unknown-setting-refused"] }
 name = "backend_create-unknown-setting-refused"
 run = ["{out}/host{exe}", "backend_create-unknown-setting-refused"]
 claims = { matches = ["backend 'plain' would not start: it knows no setting 'cache'.*bridge_create refused.*alive"] }
-false = { run = ["{out}/host{exe}", "bridge_create-two-decks-at-once"] }
+false = { run = ["{out}/host{exe}", "bridge_create-two-worlds-at-once"] }
 
 [[case]]
-name = "bridge_create-two-decks-at-once"
-run = ["{out}/host{exe}", "bridge_create-two-decks-at-once"]
-claims = { matches = ["two decks: sums 275000 and 265000.*alive"] }
+name = "bridge_create-two-worlds-at-once"
+run = ["{out}/host{exe}", "bridge_create-two-worlds-at-once"]
+claims = { matches = ["two worlds: sums 275000 and 265000.*alive"] }
 false = { run = ["{out}/host{exe}", "alloc-string-kept"] }
 
 [[case]]
@@ -610,18 +610,18 @@ false = { run = ["{out}/host{exe}", "module_config.max_system_failures-no-limit-
 name = "module_config.max_system_failures-no-limit-never-stops"
 run = ["{out}/host{exe}", "module_config.max_system_failures-no-limit-never-stops"]
 claims = { matches = ["modules: test:flaky@0.1.0=RUNNING.*alive"] }
-false = { run = ["{out}/host{exe}", "BRIDGE_FAIL-stopped-module-stops-the-deck"] }
+false = { run = ["{out}/host{exe}", "BRIDGE_FAIL-stopped-module-stops-the-world"] }
 
 [[case]]
-name = "BRIDGE_FAIL-stopped-module-stops-the-deck"
-run = ["{out}/host{exe}", "BRIDGE_FAIL-stopped-module-stops-the-deck"]
-claims = { matches = ["the deck has stopped: module 'test:flaky@0.1.0' was stopped and its on_error is fail.*update refused.*test:flaky@0.1.0=STOPPED.*game:twostep@0.1.0: not unloaded.*alive"] }
+name = "BRIDGE_FAIL-stopped-module-stops-the-world"
+run = ["{out}/host{exe}", "BRIDGE_FAIL-stopped-module-stops-the-world"]
+claims = { matches = ["the world has stopped: module 'test:flaky@0.1.0' was stopped and its on_error is fail.*update refused.*test:flaky@0.1.0=STOPPED.*game:twostep@0.1.0: not unloaded.*alive"] }
 false = { run = ["{out}/host{exe}", "BRIDGE_STRIP-unload-strips"] }
 
 [[case]]
-name = "bridge_unload-of-what-stopped-the-deck"
-run = ["{out}/host{exe}", "bridge_unload-of-what-stopped-the-deck"]
-claims = { matches = ["the deck has stopped.*game:twostep@0.1.0: not unloaded.*the deck runs again: module 'test:flaky@0.1.0' is unloaded, and it goes on without it.*test:flaky@0.1.0: unloaded.*modules: game:twostep@0.1.0=RUNNING.*alive"] }
+name = "bridge_unload-of-what-stopped-the-world"
+run = ["{out}/host{exe}", "bridge_unload-of-what-stopped-the-world"]
+claims = { matches = ["the world has stopped.*game:twostep@0.1.0: not unloaded.*the world runs again: module 'test:flaky@0.1.0' is unloaded, and it goes on without it.*test:flaky@0.1.0: unloaded.*modules: game:twostep@0.1.0=RUNNING.*alive"] }
 false = { run = ["{out}/host{exe}", "BRIDGE_STRIP-unload-strips"] }
 
 [[case]]
@@ -730,18 +730,18 @@ false = { run = ["{out}/host{exe}", "bridge_reload-share-more-than-the-arena-ref
 name = "bridge_reload-share-more-than-the-arena-refused"
 run = ["{out}/host{exe}", "bridge_reload-share-more-than-the-arena-refused"]
 claims = { matches = ["is not reloaded: its persistent of 1048576 bytes does not fit in the [0-9]+ left of .budget. persistent.*tick 104 1.*alive"] }
-false = { run = ["{out}/host{exe}", "bridge_reload-lifts-a-stopped-deck"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-lifts-a-stopped-world"] }
 
 [[case]]
-name = "bridge_reload-lifts-a-stopped-deck"
-run = ["{out}/host{exe}", "bridge_reload-lifts-a-stopped-deck"]
-claims = { matches = ["the deck has stopped: module 'game:ticker@0.1.0' was stopped and its on_error is fail.*game:twostep@0.1.0: not loaded.*the deck runs again: module 'game:ticker@0.2.0' is back.*game:ticker@0.2.0: reloaded.*tick 1[0-9]3 10.*game:ticker@0.2.0=RUNNING.*alive"] }
-false = { run = ["{out}/host{exe}", "bridge_load-lifts-a-stopped-deck"] }
+name = "bridge_reload-lifts-a-stopped-world"
+run = ["{out}/host{exe}", "bridge_reload-lifts-a-stopped-world"]
+claims = { matches = ["the world has stopped: module 'game:ticker@0.1.0' was stopped and its on_error is fail.*game:twostep@0.1.0: not loaded.*the world runs again: module 'game:ticker@0.2.0' is back.*game:ticker@0.2.0: reloaded.*tick 1[0-9]3 10.*game:ticker@0.2.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_load-lifts-a-stopped-world"] }
 
 [[case]]
-name = "bridge_load-lifts-a-stopped-deck"
-run = ["{out}/host{exe}", "bridge_load-lifts-a-stopped-deck"]
-claims = { matches = ["the deck has stopped: module 'game:thing@0.1.0' failed and its on_error is fail.*game:other@0.1.0: not loaded.*the deck runs again: module 'game:thing@0.2.0' is back.*game:thing@0.2.0: loaded.*show: x 3 0.*alive"] }
+name = "bridge_load-lifts-a-stopped-world"
+run = ["{out}/host{exe}", "bridge_load-lifts-a-stopped-world"]
+claims = { matches = ["the world has stopped: module 'game:thing@0.1.0' failed and its on_error is fail.*game:other@0.1.0: not loaded.*the world runs again: module 'game:thing@0.2.0' is back.*game:thing@0.2.0: loaded.*show: x 3 0.*alive"] }
 false = { run = ["{out}/host{exe}", "bridge_reload-to-another-backend-refused"] }
 
 [[case]]
@@ -892,12 +892,12 @@ false = { run = ["{out}/host{exe}", "module_config.settings-reseeded-in-place"] 
 name = "module_config.settings-reseeded-in-place"
 run = ["{out}/host{exe}", "module_config.settings-reseeded-in-place"]
 claims = { matches = ["settings text written to the same place.*alive"] }
-false = { run = ["{out}/host{exe}", "BRIDGE_FAIL-failed-reload-stops-the-deck"] }
+false = { run = ["{out}/host{exe}", "BRIDGE_FAIL-failed-reload-stops-the-world"] }
 
 [[case]]
-name = "BRIDGE_FAIL-failed-reload-stops-the-deck"
-run = ["{out}/host{exe}", "BRIDGE_FAIL-failed-reload-stops-the-deck"]
-claims = { matches = ["the deck has stopped: module 'game:ticker@0.1.0' could not be reloaded and its on_error is fail.*update refused.*the deck runs again: module 'game:ticker@0.3.0' is back.*tick 112 10.*game:ticker@0.3.0=RUNNING.*alive"] }
+name = "BRIDGE_FAIL-failed-reload-stops-the-world"
+run = ["{out}/host{exe}", "BRIDGE_FAIL-failed-reload-stops-the-world"]
+claims = { matches = ["the world has stopped: module 'game:ticker@0.1.0' could not be reloaded and its on_error is fail.*update refused.*the world runs again: module 'game:ticker@0.3.0' is back.*tick 112 10.*game:ticker@0.3.0=RUNNING.*alive"] }
 false = { run = ["{out}/host{exe}", "BACKEND_TIMEOUT-lacking-timeout-refused"] }
 
 [[case]]
@@ -1384,11 +1384,11 @@ false = { run = ["{out}/host{exe}", "BACKEND_ENTRY_COUNT-an-entry-missing-refuse
 name = "BACKEND_ENTRY_COUNT-an-entry-missing-refused"
 run = ["{out}/host{exe}", "BACKEND_ENTRY_COUNT-an-entry-missing-refused"]
 claims = { matches = ["backend 'plain': backend library '[^']*bridge_hollow[^']*' has no entry 'backend_create'.*bridge_create refused.*alive"] }
-false = { run = ["{out}/host{exe}", "memory_adopt-refused-refuses-the-deck"] }
+false = { run = ["{out}/host{exe}", "memory_adopt-refused-refuses-the-world"] }
 
 [[case]]
-name = "memory_adopt-refused-refuses-the-deck"
-run = ["{out}/host{exe}", "memory_adopt-refused-refuses-the-deck"]
+name = "memory_adopt-refused-refuses-the-world"
+run = ["{out}/host{exe}", "memory_adopt-refused-refuses-the-world"]
 claims = { matches = ["backend 'plain' cannot adopt the shared memory: this backend adopts no block.*alive"] }
 false = { run = ["{out}/host{exe}", "module_config.spans-outgrown-at-a-barrier"] }
 
@@ -1930,11 +1930,11 @@ false = { run = ["{out}/host{exe}", "BRIDGE_SPAN_BASE-where-a-span-keeps-its-col
 name = "BRIDGE_SPAN_BASE-where-a-span-keeps-its-columns"
 run = ["{out}/host{exe}", "BRIDGE_SPAN_BASE-where-a-span-keeps-its-columns"]
 claims = { matches = ["sum 250500 0.*alive"] }
-false = { run = ["{out}/host{exe}", "BACKEND_RELOAD-a-module-replaced-while-the-deck-runs"] }
+false = { run = ["{out}/host{exe}", "BACKEND_RELOAD-a-module-replaced-while-the-world-runs"] }
 
 [[case]]
-name = "BACKEND_RELOAD-a-module-replaced-while-the-deck-runs"
-run = ["{out}/host{exe}", "BACKEND_RELOAD-a-module-replaced-while-the-deck-runs"]
+name = "BACKEND_RELOAD-a-module-replaced-while-the-world-runs"
+run = ["{out}/host{exe}", "BACKEND_RELOAD-a-module-replaced-while-the-world-runs"]
 claims = { matches = ["tick 102 1.*game:ticker@0.1.0/-: shutdown 1 0.*game:ticker@0.2.0: reloaded.*tick 112 10.*tick 122 10.*alive"] }
 false = { run = ["{out}/host{exe}", "BACKEND_IMPORT_FUNC-an-entry-imported-is-no-memory"] }
 

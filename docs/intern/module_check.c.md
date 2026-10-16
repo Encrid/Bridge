@@ -50,7 +50,7 @@ The demands go to the backend when it compiles the module: `docs/intern/module_i
 `module_check_room` refuses a load in three cases:
 
 - A module of the same stem is loaded already.
-- The deck has `[budget] modules` modules already.
+- The world has `[budget] modules` modules already.
 - The `persistent` share of the module is longer than the longest piece left in the persistent arena.
 
 ## Functions

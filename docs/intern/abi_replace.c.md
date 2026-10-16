@@ -5,7 +5,7 @@ It is that type, or, at a reload of the one module that declares it, the type th
 
 ## Shared and exclusive
 
-Storage belongs to the deck and lives on after the module that declared a component, so a reloaded module finds its components there.
+Storage belongs to the world and lives on after the module that declared a component, so a reloaded module finds its components there.
 A changed layout of a component is refused if another module declares the component, and the refusal names the other modules.
 That module runs with the old struct, and a column has one component layout only.
 To drop the rows takes the data of the other module, and to carry them over gives it new bytes to read with old code.

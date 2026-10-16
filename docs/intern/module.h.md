@@ -7,7 +7,7 @@ It gives the checks of a config, the record of a module, its private memory and 
 
 A load, an unload and a reload are legal only between phases, and never while `bridge_run_phase` runs.
 All three change storage and the schedule, and only the time between phases makes that safe.
-A native module that holds the deck can break this rule.
+A native module that holds the world can break this rule.
 Nothing contains native code, so the rule is a contract and not a guarantee.
 Each call has its steps in its own document:
 
@@ -36,8 +36,8 @@ What Bridge does depends on the call that failed:
 
 A stopped module runs no system and no observer, and its components stay.
 `on_error` is stated for each module, and has no default.
-`BRIDGE_FAIL` stops the deck: `docs/intern/bridge_stop.c.md`, *A stopped deck*.
-`BRIDGE_SKIP` refuses the load of that one module, and the deck continues.
+`BRIDGE_FAIL` stops the world: `docs/intern/bridge_stop.c.md`, *A stopped world*.
+`BRIDGE_SKIP` refuses the load of that one module, and the world continues.
 
 Bridge takes a module out when the module fails, and a failure during that work must not start the work again.
 What can fail then is the `shutdown` of the module: Bridge says the failure once, and never calls it again or counts it.
@@ -57,7 +57,7 @@ An artifact that the checks hold before it is touched: all that a load and a rel
 
 | Field | Content |
 | --- | --- |
-| `b` | The deck. |
+| `b` | The world. |
 | `a` | The artifact. |
 | `cfg`, `id` | The config of the artifact, and the identity that the config states. |
 | `on` | The backend that the artifact names. |

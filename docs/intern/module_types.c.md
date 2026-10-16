@@ -36,18 +36,18 @@ For each type:
 1. Lower the count of its declarers by one. If others still declare it, stop.
 2. Drop its rows by the policy of the module, if a policy applies.
 3. If no field of another type names it, delete its record.
-4. Mark that the layout of the deck moved.
+4. Mark that the layout of the world moved.
 
 No policy applies after a load that failed: nothing can carry a component that was never applied.
 A type that a field of another component still names stays as a type, with no rows.
-Deleting a record takes the type out of storage and out of the list of the deck.
+Deleting a record takes the type out of storage and out of the list of the world.
 It also lets go of the types that its fields name, and each of those goes too when nothing else declares or names it.
 
 ## Functions
 
 | Function | Result |
 | --- | --- |
-| `unlist_type` | Takes a type out of the list of the deck: the last type takes its place. |
+| `unlist_type` | Takes a type out of the list of the world: the last type takes its place. |
 | `delete_type` | Deletes the record of a component, with what storage knows of it and its hold on the types that its fields name. |
 | `release_type` | Stops one declaration of a type. The last declarer applies its policy, and a policy of zero is a load that failed. |
 | `module_release_types` | Stops the declarations of a module, last declared first. With `by_policy` false, no policy applies. |

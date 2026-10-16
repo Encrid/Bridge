@@ -1,6 +1,6 @@
 # src/pool.h
 
-This header gives the pool of threads that a phase runs on: `threads - 1` workers kept for the life of the deck, and the caller.
+This header gives the pool of threads that a phase runs on: `threads - 1` workers kept for the life of the world, and the caller.
 Nothing in the pool knows what a job is.
 
 ## The execution model
@@ -22,7 +22,7 @@ One loop over one component cannot be split between two modules either: both wou
 
 `threads` states how many threads run a phase, and it counts the thread that called `bridge_run_phase`.
 That thread works too, and at `threads = 1` it does all the work, in an order that never changes.
-The pool keeps the other threads for as long as the deck exists.
+The pool keeps the other threads for as long as the world exists.
 
 ## Types
 

@@ -41,11 +41,11 @@ These sections tell how storage keeps each layout:
 
 ### bridge_t, module_t
 
-The deck and a loaded module. `src/inside.h` defines them.
+The world and a loaded module. `src/inside.h` defines them.
 
 ### storage_t, storage_type_t, storage_terms_t
 
-The storage of one deck, a declared type, and the terms of one system or observer.
+The storage of one world, a declared type, and the terms of one system or observer.
 To the rest of the library they are opaque: `docs/intern/storage_inside.h.md`, *Types*, gives their fields.
 
 ### storage_term_t
@@ -112,8 +112,8 @@ How `storage_convert` ended.
 
 | Function | Result |
 | --- | --- |
-| `storage_create` | Makes the storage of a deck, sized by its budget. Gives `nullptr` and writes a record if it cannot. In `src/storage_create.c`. |
-| `storage_destroy` | Frees the storage of a deck. In `src/storage_create.c`. |
+| `storage_create` | Makes the storage of a world, sized by its budget. Gives `nullptr` and writes a record if it cannot. In `src/storage_create.c`. |
+| `storage_destroy` | Frees the storage of a world. In `src/storage_create.c`. |
 | `storage_declare` | Declares a type of `size` bytes, kept in the layout `kept`. Gives `nullptr` only when `[budget] columns` has no room for its cells or its value. In `src/storage_declare.c`. |
 | `storage_count_free_sets` | Gives how many more types a sparse set can keep. In `src/storage_slots.c`. |
 | `storage_count_free_direct` | Gives how many more types can be direct-indexed. In `src/storage_slots.c`. |

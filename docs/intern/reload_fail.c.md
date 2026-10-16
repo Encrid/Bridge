@@ -26,7 +26,7 @@ If the backend cannot hold both instances, the old instance was shut down before
 The module stays, stopped, with everything that it declared: its record, its components and their rows.
 A reload is a call that means "keep running", and such a call never discards data.
 The module has no code, so it runs nothing, and `bridge_list_modules` shows it stopped.
-If it states `fail` in `on_error`, the deck stops too: `docs/intern/bridge_stop.c.md`, *A stopped deck*.
+If it states `fail` in `on_error`, the world stops too: `docs/intern/bridge_stop.c.md`, *A stopped world*.
 A reload with an artifact that works brings the module back over the same rows, and an unload is what ends it.
 
 ## Functions
@@ -35,5 +35,5 @@ A reload with an artifact that works brings the module back over the same rows, 
 | --- | --- |
 | `undo_new` | Takes the new instance back out: its systems, its types, and what the reload added to the share. |
 | `keep_old` | Puts the systems of the old instance back in storage, as they were. |
-| `stop_old` | Drops the systems of the module and marks it stopped, with what it declared kept. Says so, and stops the deck if the module states `fail`. |
+| `stop_old` | Drops the systems of the module and marks it stopped, with what it declared kept. Says so, and stops the world if the module states `fail`. |
 | `reload_fail` | Says that the reload failed, takes the new instance out, then keeps the old instance or stops the module. Gives 1. |

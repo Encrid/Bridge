@@ -5,7 +5,7 @@ This file loads a module.
 
 ## The steps of a load
 
-1. Refuse the call if the deck has stopped for another module, or a module is pinned to another thread.
+1. Refuse the call if the world has stopped for another module, or a module is pinned to another thread.
 2. Refuse what the config alone decides, find the backend that it names, and work out its demands.
 3. Refuse a module loaded already in any version, a load past `[budget] modules`, or a share that does not fit.
 4. Make the record of the module: all of it, or none.
@@ -14,7 +14,7 @@ This file loads a module.
 7. Make the image, the instance and the private memory, and call `init`: `src/module_start.c`.
 8. Build the schedule again. It refuses a new system or observer that conflicts with another and that nothing orders.
 9. Put the module at the end of the list of modules.
-10. Let the deck run again, if the deck waits for this module.
+10. Let the world run again, if the world waits for this module.
 11. Run a barrier. It applies what `init` queued, and publishes the spans.
 
 Steps 2 and 3 are in `src/module_check.c`.
@@ -22,7 +22,7 @@ Before the module has a record, a refusal says that the module is refused, and `
 After it has a record, a failure is the failure of the module, and its `on_error` tells what it costs.
 `docs/intern/module_say.c.md`, *Refused or not loaded*, tells the two.
 The barrier applies the changes of the modules in the order of the list, which is the order in which they loaded.
-A module that is loaded and that nothing will ever run is not a load that succeeded: `bridge_load` gives 1 if the deck has stopped.
+A module that is loaded and that nothing will ever run is not a load that succeeded: `bridge_load` gives 1 if the world has stopped.
 
 ## The share of the arena
 
@@ -36,7 +36,7 @@ If there is no memory to keep track of the share, a record says so, and the reco
 
 A failure after the record leaves storage as it was before the load:
 
-1. Say that the module did not load. If its `on_error` is `fail`, stop the deck.
+1. Say that the module did not load. If its `on_error` is `fail`, stop the world.
 2. Take its systems and observers out first, because a query must not outlive a component that it names.
 3. Release the ids set aside for it.
 4. Give its share of the persistent arena back.
@@ -54,6 +54,6 @@ So the rebuild cannot be refused, and it asks for no memory.
 | --- | --- |
 | `keep_share` | Records a share of `share` bytes at `at` as the one range of the module, with all of it left. |
 | `take_share` | Takes the share of the module of the persistent arena. 1, with a record, and the module discarded, if there is no memory to keep track of it. |
-| `fail_load` | Says that the load failed, stops the deck if the module states `fail`, and leaves storage as it was. Gives 1. |
+| `fail_load` | Says that the load failed, stops the world if the module states `fail`, and leaves storage as it was. Gives 1. |
 | `start_loaded` | Sets the ids aside, runs `init`, and builds the schedule again. 1, with why in `err`, if one fails. |
-| `bridge_load` | Loads a module. 0 if it loaded and the deck runs, and 1 if not. |
+| `bridge_load` | Loads a module. 0 if it loaded and the world runs, and 1 if not. |

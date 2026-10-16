@@ -33,7 +33,7 @@ For one module, `settle_module` does these steps:
 
 A stopped module gets `stopped`, and `say_stopped` writes a record at the level `BRIDGE_ERR`.
 The record names the system, or says that entities the module changed could not be placed.
-If the module states `BRIDGE_FAIL`, `bridge_stop` stops the deck too.
+If the module states `BRIDGE_FAIL`, `bridge_stop` stops the world too.
 
 ## Functions
 

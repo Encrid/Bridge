@@ -22,7 +22,7 @@ int bridge_check_call(bridge_t *b, const char *repairing)
     const module_t *pinned = bridge_find_pinned(b);
 
     if (b->stopped_by && !is_repair(b, repairing)) {
-        say_error(b, "the deck has stopped: %s", b->stopped_by);
+        say_error(b, "the world has stopped: %s", b->stopped_by);
         return (1);
     }
     if (pinned) {

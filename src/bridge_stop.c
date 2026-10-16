@@ -40,7 +40,7 @@ void bridge_stop(bridge_t *b, const char *identity, const char *what)
         identity);
     b->stopped_by = b->stopped_why;
     b->stopped_stem = b->stopped_name;
-    say_error(b, "the deck has stopped: %s", b->stopped_why);
+    say_error(b, "the world has stopped: %s", b->stopped_why);
 }
 
 void bridge_resume(bridge_t *b, const module_t *m)
@@ -51,7 +51,7 @@ void bridge_resume(bridge_t *b, const module_t *m)
         return;
     b->stopped_by = nullptr;
     b->stopped_stem = nullptr;
-    say_about(b, &about, "the deck runs again: module '%s' is back",
+    say_about(b, &about, "the world runs again: module '%s' is back",
         m->identity);
 }
 
@@ -63,6 +63,6 @@ void bridge_give_up(bridge_t *b, const module_t *m)
         return;
     b->stopped_by = nullptr;
     b->stopped_stem = nullptr;
-    say_about(b, &about, "the deck runs again: module '%s' is unloaded, "
+    say_about(b, &about, "the world runs again: module '%s' is unloaded, "
         "and it goes on without it", m->identity);
 }

@@ -12,7 +12,7 @@ A backend is a shared library that exports the 18 functions of `backend_api_t`, 
 A C++ compiler reads the declarations as C, thus a backend in C++ exports the names that Bridge looks for.
 
 `bridge_create` opens the library that the deployment names, and finds each entry by its name: `docs/extern/bridge.h.md`, *bridge_backend_t*.
-A library that lacks an entry is not a backend, and `bridge_create` refuses the deck.
+A library that lacks an entry is not a backend, and `bridge_create` refuses the world.
 The structs follow the rules of the host seam: `docs/extern/bridge.h.md`, *The layouts*.
 What a backend compiles with this header is a work based on Bridge: `readme.md`, *License*.
 
@@ -78,7 +78,7 @@ Each capability is a promise. State only what the backend keeps.
 | `BACKEND_WORK_LIMIT` | The backend counts the work of an invocation, and stops it at its limit. | `work_limit` |
 | `BACKEND_TIMEOUT` | The backend stops a call at its timeout. | A timeout |
 | `BACKEND_MEMORY_LIMIT` | The backend keeps the own memory of a module under a ceiling. | `memory_limit` |
-| `BACKEND_RELOAD` | A reload can replace a module while the deck runs. | `hot_reload` |
+| `BACKEND_RELOAD` | A reload can replace a module while the world runs. | `hot_reload` |
 | `BACKEND_SIDE_BY_SIDE` | Two instances of one module can exist at one time. | None. |
 | `BACKEND_UNLOAD` | Bridge can take the library out of the process after `backend_destroy`. | None. |
 
@@ -107,7 +107,7 @@ The private memory of a module has the shape that the backend of the module need
 
 `memory_adopt` makes `len` bytes at `ptr`, which Bridge owns, a memory that the modules of the backend can address.
 It does not allocate. It gives the handle of the memory, or null with `err`.
-A backend that refuses the shared memory refuses the deck. A backend that refuses a private memory fails the load of its module.
+A backend that refuses the shared memory refuses the world. A backend that refuses a private memory fails the load of its module.
 
 `memory_release` gives the handle back, and frees nothing of the block.
 Bridge calls it after it destroyed the last instance that it gave the memory to.

@@ -28,7 +28,7 @@ So there is no entry to find a type: `declare` does it.
 A new slot keeps three things: the type, the `on_unload` policy that the module stated, and whether the module may write the type.
 A module may write a type of its own namespace, and a type that a write grant names.
 If it may, storage records it: that gives the module a stake in an entity that carries the type.
-The type counts one more declarer, and the deck notes in `layout_moved` that a declaration changed.
+The type counts one more declarer, and the world notes in `layout_moved` that a declaration changed.
 
 ## Functions
 

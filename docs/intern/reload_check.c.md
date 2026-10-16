@@ -7,7 +7,7 @@ This file refuses a reload before anything is made, and says that a module is no
 A reload is refused for each reason that refuses a load from its config alone: `src/module_check.c`.
 These refuse a reload too:
 
-- The deck has stopped for another module, or a loaded module is pinned to another thread.
+- The world has stopped for another module, or a loaded module is pinned to another thread.
 - No loaded module has the identity of the artifact, whatever its version.
 - The loaded module states `hot_reload` false.
 - The artifact names another backend than the backend that runs the module. A reload does not move a module to another backend.

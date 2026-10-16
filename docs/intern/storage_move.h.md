@@ -14,7 +14,7 @@ Table 0 is no table: a move to 0 only takes the row out, and a move from 0 only 
 ## A singleton and a direct-indexed value
 
 `set_single` gives a singleton a value of zero, or takes its value.
-It sets `layout_moved` of the deck, so storage writes for each module again.
+It sets `layout_moved` of the world, so storage writes for each module again.
 The cell where a module reaches the singleton tells whether it has a value.
 `give_cell` sets or clears the bit of an entity for a direct-indexed component, in `given` and in the copy for modules.
 It makes the cell of the entity zero either way.

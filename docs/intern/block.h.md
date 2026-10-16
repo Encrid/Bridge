@@ -53,7 +53,7 @@ A barrier costs what changed, and a visit to each module: its ids topped up, its
 A spawn is visible at the next barrier.
 `spawn` gives a usable id at once, but the row does not exist until the barrier, and no query counts it.
 A destroyed entity stays readable for the rest of the phase that destroyed it.
-So each system sees one world for the whole of a phase, and the systems that run at the same time agree.
+So each system sees the same state of the world for the whole of a phase. The systems that run at the same time agree.
 
 ## Types
 

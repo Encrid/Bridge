@@ -6,7 +6,7 @@ It also writes the values that the changes carry.
 ## The order of the queues
 
 While a phase runs, each module puts its destroy, attach and detach calls on a queue of its own, so no entry takes a lock.
-The barrier, where one thread has the world, applies the queues in the order the calls that filled them ran:
+The barrier, where one thread has the storage, applies the queues in the order the calls that filled them ran:
 
 1. The observers of the barrier before.
 2. Then each lifecycle call made since that barrier.

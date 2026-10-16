@@ -12,7 +12,7 @@ A reload in progress.
 
 | Field | Content |
 | --- | --- |
-| `b`, `a` | The deck, and the artifact of the new instance. |
+| `b`, `a` | The world, and the artifact of the new instance. |
 | `on`, `demands` | The backend that the artifact names, and what its config asks that backend to keep. |
 | `old`, `n` | The record of the loaded instance, and the record of the instance that takes its place. |
 | `extra` | How many bytes the share of the persistent arena grows by. |

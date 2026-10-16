@@ -48,7 +48,7 @@ A level holds each system whose predecessors are all in earlier levels, and a ph
 In one level, the systems of one module make one job, in the order the module registered them.
 One thread runs a job from its start to its end.
 The jobs of different modules run at the same time, on the threads of `src/pool.h`.
-So the deck runs modules in parallel, and the systems of one module one after the other.
+So the world runs modules in parallel, and the systems of one module one after the other.
 The systems of one module never overlap: they share the private memory of the module.
 
 ## Cost
@@ -71,7 +71,7 @@ The limit is `max_system_failures` of its module, and `-1`, `BRIDGE_NO_LIMIT`, m
 - A destroy that the module may not do raises the same count by 1.
 - A barrier that placed each entity the module changed lowers that count by 1. A barrier where the module changed nothing does neither.
 - A stopped module keeps its components. Its systems and observers stop.
-- If the module states `BRIDGE_FAIL` for `on_error`, its stop stops the deck too: the deployment does not run without it.
+- If the module states `BRIDGE_FAIL` for `on_error`, its stop stops the world too: the deployment does not run without it.
 
 A system is counted alone, so a clean system of a module does not forgive a system of it that always fails.
 A count that falls as fast as it rises stops a system that fails more often than not.
@@ -130,7 +130,7 @@ One phase that `schedule_run` runs.
 
 | Field | Content |
 | --- | --- |
-| `b` | The deck. |
+| `b` | The world. |
 | `phase` | The index of the phase. |
 | `level` | The level that runs. |
 | `count` | How many jobs the level has. |

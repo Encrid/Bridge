@@ -75,14 +75,14 @@ On Windows, the folder of a library with a path is also searched for the librari
 
 ## bridge_budget_t
 
-`bridge_budget_t` states how many of each thing a deck can hold at one time, and how many bytes.
+`bridge_budget_t` states how many of each thing a world can hold at one time, and how many bytes.
 `bridge_create` takes the memory of the whole budget. A phase and a barrier take no more memory.
 Zero is unset, and `bridge_create` refuses it.
 A record names a key as a TOML file does: `[budget] entities` is `entities` of `budget`.
 
 | Field | Content |
 | --- | --- |
-| `entities` | The size of the entity index. Index 0 is no entity, thus the deck holds `entities` minus 1 entities. |
+| `entities` | The size of the entity index. Index 0 is no entity, thus the world holds `entities` minus 1 entities. |
 | `tables` | The tables at one time. A table holds the entities that carry one set of components: an archetype. |
 | `types` | The declared types at one time: the components, and the structs, enums and bitmasks that their fields name. |
 | `systems` | The systems and the observers at one time. |
@@ -91,7 +91,7 @@ A record names a key as a TOML file does: `[budget] entities` is `entities` of `
 | `pad` | 4 bytes of padding. |
 | `persistent` | The size of the persistent arena, in bytes. Each module takes a share of it. |
 | `columns` | The size of the column region, in bytes: the rows of all the tables and sets, and the cells of the other components. |
-| `sparse_sets` | How many components the deck can keep in sparse sets, or `BRIDGE_NONE`. |
+| `sparse_sets` | How many components the world can keep in sparse sets, or `BRIDGE_NONE`. |
 | `direct_indexed` | How many components can be direct-indexed, or `BRIDGE_NONE`. |
 
 `entities`, `persistent` and `columns` are each at most `UINT32_MAX`, since an offset has 32 bits.
@@ -141,7 +141,7 @@ A pair wins over the order in which a module registered its systems.
 
 ## bridge_config_t
 
-`bridge_config_t` is a deployment: all that `bridge_create` makes a deck of.
+`bridge_config_t` is a deployment: all that `bridge_create` makes a world of.
 
 | Field | Content |
 | --- | --- |
@@ -156,12 +156,12 @@ A pair wins over the order in which a module registered its systems.
 | `order` | The pairs of systems in the order that they run, `order_count` of them. |
 | `order_count` | How many pairs `order` holds. Zero is no pair. |
 | `threads` | How many threads run a phase. The thread that calls `bridge_run_phase` counts. Zero is unset. |
-| `budget` | The budget of the deck: a `bridge_budget_t`. |
+| `budget` | The budget of the world: a `bridge_budget_t`. |
 
 A phase is a name, and nothing more. Bridge has no phase of its own, thus a deployment declares one at least.
 Each name of a phase is different, and not empty.
 The host calls the phases in the order that it wants, as often as it wants.
-The deck keeps `threads` minus 1 threads of its own for as long as it exists.
+The world keeps `threads` minus 1 threads of its own for as long as it exists.
 At `threads` of 1, the thread of the host runs all the systems, in an order that never changes.
 
 ## bridge_phase_name_t
@@ -205,14 +205,14 @@ Each key takes one of the two. A load refuses the other one, and each other numb
 
 | Item | Meaning |
 | --- | --- |
-| `BRIDGE_FAIL` | The deck stops when the module fails to load, when Bridge stops the module, and when a failed reload stops it. |
-| `BRIDGE_SKIP` | The deck goes on without the module. |
+| `BRIDGE_FAIL` | The world stops when the module fails to load, when Bridge stops the module, and when a failed reload stops it. |
+| `BRIDGE_SKIP` | The world goes on without the module. |
 
 A config that Bridge refuses before the module exists stops nothing: `on_error` does not apply to it.
-A stopped deck refuses `bridge_run_phase`, and each load, unload and reload of a module other than the one that stopped it.
-A load or a reload of that module that succeeds lets the deck run again.
-An unload of that module lets the deck run again, without it.
-`bridge_list_modules` and `bridge_destroy` work on a stopped deck.
+A stopped world refuses `bridge_run_phase`, and each load, unload and reload of a module other than the one that stopped it.
+A load or a reload of that module that succeeds lets the world run again.
+An unload of that module lets the world run again, without it.
+`bridge_list_modules` and `bridge_destroy` work on a stopped world.
 
 ## bridge_module_config_t
 
@@ -383,7 +383,7 @@ Bridge does not find modules: the host finds each module, and gives it to `bridg
 ## bridge_record_t
 
 `bridge_record_t` is a record: what Bridge tells the host. Bridge writes no file.
-The sink of the deck gets each record.
+The sink of the world gets each record.
 
 | Field | Content |
 | --- | --- |
@@ -417,7 +417,7 @@ A module can write each of the eight levels: `docs/extern/bridge_abi.h.md`, *The
 `ud` is the pointer that the host gave to `bridge_create`, and `r` is the record.
 
 - Bridge calls the sink one time for each record.
-- Bridge calls the sink only on the thread that called a function of the deck, thus the sink of a deck needs no lock.
+- Bridge calls the sink only on the thread that called a function of the world, thus the sink of a world needs no lock.
 - A record and its text are good only during the call. To keep a line, copy it.
 - Bridge gives the lines of the logs to the sink at each barrier, after the systems of the phase returned.
 
@@ -442,7 +442,7 @@ Bridge stops a module at its failure budget, a module whose spans no longer fit,
 
 ## bridge_create
 
-`bridge_create` makes a deck of a deployment. It loads no module.
+`bridge_create` makes a world of a deployment. It loads no module.
 
 | Parameter | Content |
 | --- | --- |
@@ -453,39 +453,39 @@ Bridge stops a module at its failure budget, a module whose spans no longer fit,
 1. Bridge reads `abi` of `cfg`.
 2. Bridge opens the library of each backend, finds its entries, and starts the backend with its settings.
 3. Bridge takes the phases and the pairs of `order`.
-4. Bridge starts the threads of the deck.
+4. Bridge starts the threads of the world.
 5. Bridge makes the shared memory and the storage of the budget.
 6. Each backend adopts the shared memory.
 
-The result is the deck, or nullptr if the deployment cannot start.
+The result is the world, or nullptr if the deployment cannot start.
 If `sink` or `cfg` is null, the result is nullptr, with no record.
 Else the sink gets a record that tells why: *The deployment*.
 
 ## bridge_destroy
 
-`bridge_destroy` destroys a deck.
+`bridge_destroy` destroys a world.
 
 | Parameter | Content |
 | --- | --- |
-| `b` | The deck, or null. |
+| `b` | The world, or null. |
 
 1. Bridge calls `shutdown` of each loaded module, in the order that the modules loaded, each under its `shutdown_timeout`.
 2. A `shutdown` that fails is a record, and the destruction continues.
 3. Bridge destroys the modules, the storage, the threads and the backends.
-4. Bridge closes the library of a backend that states `BACKEND_UNLOAD`. Another library stays, and the next deck uses it.
+4. Bridge closes the library of a backend that states `BACKEND_UNLOAD`. Another library stays, and the next world uses it.
 
-The result is 0 when the deck is gone, and for a null `b`.
+The result is 0 when the world is gone, and for a null `b`.
 The result is 1 if a pinned module is loaded and the call comes from another thread.
-Then Bridge destroys nothing, and the deck stays whole. Call again from the thread that loaded the module.
-A host that ignores the result can lose a deck that stays.
+Then Bridge destroys nothing, and the world stays whole. Call again from the thread that loaded the module.
+A host that ignores the result can lose a world that stays.
 
 ## bridge_load
 
-`bridge_load` loads a module onto a deck.
+`bridge_load` loads a module onto a world.
 
 | Parameter | Content |
 | --- | --- |
-| `b` | The deck. |
+| `b` | The world. |
 | `a` | The module. |
 
 1. Bridge checks the config of the module against the deployment and against the backend.
@@ -497,8 +497,8 @@ A host that ignores the result can lose a deck that stays.
 7. The load fails if a system of the module conflicts with a system of another module, and nothing orders them.
 8. A barrier applies what `init` queued, and writes the spans of the module.
 
-The result is 0 if the module is loaded, its `init` gave 0, and the deck can run it. Else the result is 1, with a record.
-A refusal of the config stops nothing. A failure after the module exists stops the deck, if `on_error` is `BRIDGE_FAIL`.
+The result is 0 if the module is loaded, its `init` gave 0, and the world can run it. Else the result is 1, with a record.
+A refusal of the config stops nothing. A failure after the module exists stops the world, if `on_error` is `BRIDGE_FAIL`.
 A load that fails leaves the storage as it was.
 
 The module comes after the modules that loaded before it. A barrier applies the changes of the modules in this order.
@@ -506,11 +506,11 @@ When two modules conflict, the order of the loads decides which load fails. The 
 
 ## bridge_unload
 
-`bridge_unload` removes a module from a deck.
+`bridge_unload` removes a module from a world.
 
 | Parameter | Content |
 | --- | --- |
-| `b` | The deck. |
+| `b` | The world. |
 | `identity` | The identity of a loaded module, with its version. |
 
 1. The systems and the observers of the module leave the schedule.
@@ -530,7 +530,7 @@ A component that another loaded module declares stays, with its rows.
 
 | Parameter | Content |
 | --- | --- |
-| `b` | The deck. |
+| `b` | The world. |
 | `a` | The new module. Its identity without the version is the identity of a loaded module. |
 
 1. Bridge checks the config as a load does. The loaded module must allow `hot_reload`, and stay on its backend.
@@ -556,7 +556,7 @@ Without it, a reload that fails stops the module, and keeps what it declared. A 
 
 | Parameter | Content |
 | --- | --- |
-| `b` | The deck. |
+| `b` | The world. |
 | `out` | An array of `max` items, or null. |
 | `max` | How many items `out` holds. |
 
@@ -570,7 +570,7 @@ A module that Bridge stopped long after its load shows as `BRIDGE_STOPPED`.
 
 | Parameter | Content |
 | --- | --- |
-| `b` | The deck. |
+| `b` | The world. |
 | `name` | The name of a phase of the deployment. |
 
 1. The systems of the phase run. Systems of different modules run at the same time, if they do not conflict.
@@ -582,7 +582,7 @@ The systems of one module run one after another, and each one from its start to 
 The result is 0 if the phase ran, whatever its systems did: a system that failed is a record.
 The result is 1, with a record, if Bridge refuses the call: *A call refused*.
 
-A system sees one world for the whole of a phase. An entity that a phase makes is visible in the next phase.
+A system sees the same state of the world for the whole of a phase. An entity that a phase makes is visible in the next phase.
 A host can call a phase more often than another, for example a phase of physics at a fixed rate.
 Bridge does not know if a host forgets a phase.
 
@@ -629,7 +629,7 @@ The reason of `would not start` and of `cannot adopt` is the text of the backend
 
 A function writes one of these records when it refuses the call, and gives 1:
 
-- `the deck has stopped: <reason>`
+- `the world has stopped: <reason>`
 - `refused: module '<module>' is pinned to the thread that loaded it, and this call comes from another`
 - `bridge_destroy is refused: module '<module>' is pinned to the thread that loaded it, and this call comes from another`
 - `phase '<phase>' is not one the deployment declared`
@@ -637,7 +637,7 @@ A function writes one of these records when it refuses the call, and gives 1:
 - `no module '<module>' is loaded, so none is unloaded`
 - `module '<module>' is not reloaded: nothing of that name is loaded`
 
-The reason of `the deck has stopped` is in *A stopped deck*.
+The reason of `the world has stopped` is in *A stopped world*.
 
 ### A module refused
 
@@ -771,19 +771,19 @@ This record, at the level `BRIDGE_WARN`, counts the lines that a full log ring d
 
 - `<count> log lines were dropped: its ring holds <count>`
 
-### A stopped deck
+### A stopped world
 
-Bridge writes one of these records when a module of `BRIDGE_FAIL` stops the deck:
+Bridge writes one of these records when a module of `BRIDGE_FAIL` stops the world:
 
-- `the deck has stopped: module '<module>' failed and its on_error is fail`
-- `the deck has stopped: module '<module>' was stopped and its on_error is fail`
-- `the deck has stopped: module '<module>' could not be reloaded and its on_error is fail`
+- `the world has stopped: module '<module>' failed and its on_error is fail`
+- `the world has stopped: module '<module>' was stopped and its on_error is fail`
+- `the world has stopped: module '<module>' could not be reloaded and its on_error is fail`
 
-Each later call that the stopped deck refuses writes the same record.
-Bridge writes one of these records, at the level 0, when the deck runs again:
+Each later call that the stopped world refuses writes the same record.
+Bridge writes one of these records, at the level 0, when the world runs again:
 
-- `the deck runs again: module '<module>' is back`
-- `the deck runs again: module '<module>' is unloaded, and it goes on without it`
+- `the world runs again: module '<module>' is back`
+- `the world runs again: module '<module>' is unloaded, and it goes on without it`
 
 ### Out of memory
 
@@ -792,5 +792,5 @@ A function that cannot get memory writes this record, and fails as for any other
 - `out of memory: there was none for <what>`
 
 `<what>` names what Bridge needed the memory for.
-Bridge takes memory only in the functions that make or destroy a deck, and that load, reload or unload a module.
-It never takes memory in a phase or at a barrier. A function that fails for want of memory leaves the deck as it was.
+Bridge takes memory only in the functions that make or destroy a world, and that load, reload or unload a module.
+It never takes memory in a phase or at a barrier. A function that fails for want of memory leaves the world as it was.

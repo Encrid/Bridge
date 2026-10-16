@@ -1,6 +1,6 @@
 # src/inside.h
 
-This header gives the inside of the library: what a deck, a module, a system and a declared type are.
+This header gives the inside of the library: what a world, a module, a system and a declared type are.
 Nothing here crosses a seam.
 
 The header includes `include/bridge.h`, `include/bridge_abi.h`, `src/backend.h`, `src/os/os.h`, `src/pool.h`, `src/region.h`, `src/schema.h` and `src/storage.h` first.
@@ -9,7 +9,7 @@ After its types, it includes the headers that use them: `src/say.h`, `src/schedu
 ## Nothing is allocated in a phase
 
 A phase and the barrier after it never call the allocator.
-Each thing that they use got its room when the deck was made or when a module loaded, from a number that somebody stated:
+Each thing that they use got its room when the world was made or when a module loaded, from a number that somebody stated:
 
 | What | When | How much |
 | --- | --- | --- |
@@ -21,7 +21,7 @@ Each thing that they use got its room when the deck was made or when a module lo
 | The list of who triggered an observer | At load | As many records as the `spans` of the module can publish. |
 | The marks that order the queues | When a module gets a system, and before a lifecycle call | One for each system of the module. |
 
-A load, a reload and an unload of a module allocate, and so do the creation and the destruction of a deck.
+A load, a reload and an unload of a module allocate, and so do the creation and the destruction of a world.
 They allocate the record of the module, of each of its systems and of each of its types, and the rooms above.
 None of them is on the hot path.
 
@@ -38,7 +38,7 @@ None of them is on the hot path.
 | `module_t` | A loaded module. |
 | `change_t` | One queued change. |
 | `kept_text_t` | Where the settings text of an unloaded module was: `stem`, `at` and `room`. |
-| `bridge_t` | A deck. |
+| `bridge_t` | A world. |
 
 ### An open backend
 
@@ -107,7 +107,7 @@ A system and an observer are a query and a function either way, so one record se
 
 | Field | Content |
 | --- | --- |
-| `b` | The deck. |
+| `b` | The world. |
 | `identity`, `ns`, `stem` | Its identity, its namespace, and its identity without the version. |
 | `on`, `image`, `instance` | Its backend, its loaded image and its instance. |
 | `memory` | Its private block, as its backend sees it. |
@@ -167,14 +167,14 @@ At unload, the ranges go back to the arena if nothing that stays points into the
 `size` bytes of value follow it, padded to a multiple of eight.
 A change is 24 bytes.
 
-### A deck
+### A world
 
 | Field | Content |
 | --- | --- |
 | `sink`, `ud` | The sink of the host, and what it is handed with each record. |
 | `backends`, `backend_count` | The backends of the deployment, opened. |
 | `reservation`, `guard`, `granule` | The shape of the shared block: the largest that any backend stated. Each block is allocated with this address space. |
-| `stopped_by`, `stopped_stem` | Why nothing runs any more, and the stem of the module whose return lifts the stop. Null while the deck runs. |
+| `stopped_by`, `stopped_stem` | Why nothing runs any more, and the stem of the module whose return lifts the stop. Null while the world runs. |
 | `stopped_why`, `stopped_name` | The two arrays that `stopped_by` and `stopped_stem` point at. |
 | `phases`, `phase_count` | The phases of the deployment, by name. |
 | `barriers` | The count of barriers that ran. |
@@ -201,7 +201,7 @@ A change is 24 bytes.
 | `systems`, `system_count` | The systems of every module, in the order of registration. |
 | `modules`, `module_count`, `max_modules` | The loaded modules, how many, and `[budget] modules`. |
 
-A deck is stopped at a barrier, where nothing is allocated.
+A world is stopped at a barrier, where nothing is allocated.
 So `stopped_by` and `stopped_stem` point at the two arrays after them.
 The list of gaps of the arena has room for one gap more than `arena_ranges`, made when a range is taken.
 So a range given back never asks for memory.

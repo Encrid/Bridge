@@ -4,7 +4,7 @@ This file makes the jobs of one level of a phase: for each module, its systems t
 
 ## The jobs of a level
 
-`schedule_gather_jobs` looks at the systems of the deck in the order of registration.
+`schedule_gather_jobs` looks at the systems of the world in the order of registration.
 At the first system of a module that has no job yet, `fill_job` makes the next job of the level for that module.
 The job lists each system of the module, from that one on, that runs now.
 A job with no system is not counted.

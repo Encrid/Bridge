@@ -5,8 +5,8 @@ An orchestrator, written in C, that runs modules over shared ECS storage.
 ## Background
 
 Bridge is a library. A host links it, and owns `main`, the loop and each file.
-A host gives `bridge_create` a deployment, and gets a deck: the storage, the modules loaded onto it, and the threads that run them.
-The deck stays until `bridge_destroy`. A process can have more than one deck, and each deck is separate.
+A host gives `bridge_create` a deployment, and gets a world: the storage, the modules loaded onto it, and the threads that run them.
+The world stays until `bridge_destroy`. A process can have more than one world, and each world is separate.
 
 The three layers are a host, Bridge and the modules. A module runs on a backend, for example native code or WebAssembly.
 `docs/extern/bridge.h.md` tells how a host uses Bridge.

@@ -26,7 +26,7 @@ A stopped module keeps its components, and its spans are published all over agai
 
 An observer subscribes to a change, and not to a phase.
 So it runs at the barrier that applied the change, after the layout changed and the spans were published again.
-It reads the world that the change made.
+It reads the state that the change made.
 
 What an observer queues is applied at the next barrier, and not at this one: one hop for each barrier.
 A chain of three observers, each one reacting to the one before, settles in three barriers.
@@ -36,7 +36,7 @@ A cycle is legal, so nothing refuses it.
 
 ## The count of a module
 
-Storage that runs out does not stop a deck.
+Storage that runs out does not stop a world.
 A barrier that cannot place an entity, for want of a table or of columns, leaves the entity as it was.
 The barrier then counts as one that the module which asked failed in, beside what its systems did.
 A destroy that the module may not do counts the same way: `src/storage_settle.h` marks both.

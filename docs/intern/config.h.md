@@ -24,7 +24,7 @@ The fields of `config_seed_t`:
 
 | Field | Content |
 | --- | --- |
-| `b`, `m`, `cfg` | The deck, the module, and the config of the module. |
+| `b`, `m`, `cfg` | The world, the module, and the config of the module. |
 | `c` | The component that the settings are a value of. |
 | `row` | That value, while it is written. |
 | `text_used` | How much of the block of text of the module the settings before this one took. |

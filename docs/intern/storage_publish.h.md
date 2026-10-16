@@ -26,7 +26,7 @@ A barrier at which nothing changed writes nothing, however many tables there are
 A span exists for each table that has rows, since a table with no row does not exist.
 
 Storage writes all of it again for a module the first time.
-It writes all of it again for each module when `layout_moved` of the deck is set: a module came or went, or a declaration changed.
+It writes all of it again for each module when `layout_moved` of the world is set: a module came or went, or a declaration changed.
 
 ## Types
 

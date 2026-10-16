@@ -5,7 +5,7 @@ This file checks the budget of a deployment, key by key, before the library make
 ## The budget of a deployment
 
 The budget has two tiers, because two things are sized.
-The deployment states the shared tier in `bridge_budget_t`, and the library reads it when it creates the deck.
+The deployment states the shared tier in `bridge_budget_t`, and the library reads it when it creates the world.
 One shared block serves each module, so no single module can size it.
 The budget comes as a struct, because the library reads no file.
 Each module states its own tier when it loads: `docs/intern/module_check_fit.c.md`, *The budget of a module*.
@@ -29,15 +29,15 @@ A table lives while it has rows, so the number to state is how many sets of comp
 
 `types` and `systems` count what exists at one time, across every module.
 A type that two modules declare counts once.
-With these two keys, everything that storage holds is known and allocated when the deck is made, and storage allocates nothing after.
+With these two keys, everything that storage holds is known and allocated when the world is made, and storage allocates nothing after.
 A `declare` or an `add_system` past its key is refused, by name, and the first call of that module fails.
 
-`terms` is a key because storage keeps the terms of a system in a record made with the deck, so the record has a length.
+`terms` is a key because storage keeps the terms of a system in a record made with the world, so the record has a length.
 No module compiles against the number.
 
 `sparse_sets` and `direct_indexed` are keys because of what those two storage layouts keep for each entity there may be.
 A sparse set keeps an index for each entity, and a direct-indexed component keeps a bit for each entity.
-How many such components there will be is not known when the deck is made, so the deployment states it.
+How many such components there will be is not known when the world is made, so the deployment states it.
 Either may be none, which is `BRIDGE_NONE`. Zero is unset, and the check refuses it.
 
 `modules` bounds how many records of modules exist at one time.

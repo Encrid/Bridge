@@ -15,7 +15,7 @@ void test_leave_libraries(host_t *h)
     const char *plain = "gone";
 
     if (!b || bridge_destroy(b)) {
-        printf("FAIL: the deck was not created and destroyed\n");
+        printf("FAIL: the world was not created and destroyed\n");
         exit(1);
     }
     if (host_is_library_loaded(TESTS_ALL_PATH))

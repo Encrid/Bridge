@@ -14,7 +14,7 @@ static bridge_t *open_one(host_t *h, test_listener_t *l)
     bridge_artifact_t a;
 
     if (!b) {
-        printf("deck %d refused\n", l->which);
+        printf("world %d refused\n", l->which);
         return (nullptr);
     }
     test_state_guarded(&a, "game:mover@0.1.0", "mover");
@@ -40,7 +40,7 @@ void test_run_two(host_t *h)
     test_start_elsewhere(&e, both[1], 30);
     host_run_frames_unsaid(both[0], 50);
     test_join_elsewhere(&e);
-    printf("two decks: sums %u and %u\n", c->last_sum[0], c->last_sum[1]);
+    printf("two worlds: sums %u and %u\n", c->last_sum[0], c->last_sum[1]);
     (void)bridge_destroy(both[0]);
     (void)bridge_destroy(both[1]);
     printf("alive\n");

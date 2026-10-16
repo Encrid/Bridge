@@ -5,7 +5,7 @@ Why: `docs/intern/config.h.md`, *The text of the settings*.
 
 ## The list of places
 
-The deck keeps a list of places, one for each unloaded module whose share stays.
+The world keeps a list of places, one for each unloaded module whose share stays.
 An entry is the stem of the module, and the offset and the length of the block of its text.
 The list grows by one when such a module unloads, and loses the entry when the share goes back to the arena.
 Each entry is a share that is still held, so `[budget] persistent` bounds the list, and no count does.

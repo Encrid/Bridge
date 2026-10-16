@@ -7,14 +7,14 @@ This file takes the pairs that a deployment states in `[order]`: two systems tha
 
 `schedule_order` reads the pairs in their order, with these steps:
 
-1. It allocates the list of names, and `before` and `after` of the deck.
+1. It allocates the list of names, and `before` and `after` of the world.
 2. It allocates a matrix for twice as many names as pairs.
 3. For each pair, `add_pair` refuses a pair that does not name two different systems.
 4. `add_pair` copies the two names into `before` and `after`.
 5. `add_pair` gives each name its index among the names met so far, and adds the edge.
 6. `check_pairs` closes the matrix, and refuses the pairs if a name reaches itself.
 
-A pair counts in `order_count` once it has its names, so a refused deck frees them.
+A pair counts in `order_count` once it has its names, so a refused world frees them.
 The function frees the list of names and the matrix before it returns.
 A pair need not name a loaded system: `schedule_build` reads `before` and `after` each time it builds the schedule.
 

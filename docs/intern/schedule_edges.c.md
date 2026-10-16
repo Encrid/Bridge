@@ -5,7 +5,7 @@ The pairs of the deployment order them, and so does the order in which a module 
 
 ## The systems of a phase
 
-`schedule_gather_phase` lists each system of the phase that is not parked, in the order of `systems` of the deck, which is the order of registration.
+`schedule_gather_phase` lists each system of the phase that is not parked, in the order of `systems` of the world, which is the order of registration.
 A parked system is out of the schedule while a reload decides what becomes of it.
 The list is in the room of `build_in`, and the matrix is in the room of `build_bits`, which the function makes zero.
 That room is `[budget] systems` wide, and `schedule_room` makes it at create.

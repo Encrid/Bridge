@@ -14,7 +14,7 @@ A phase has no other property either, and a phase that the host never calls does
 
 1. Refuse a deployment with no phase.
 2. For each phase, refuse an empty name, or the name of a phase before it.
-3. Copy the name. Count the phase only then, so that a deck that is refused frees it.
+3. Copy the name. Count the phase only then, so that a world that is refused frees it.
 
 ## Functions
 

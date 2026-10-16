@@ -5,7 +5,7 @@ The types of the backend seam, `backend_api_t` among them, are in `include/bridg
 
 ## The entries of a backend
 
-A backend is a library of its own that runs the modules of a deck.
+A backend is a library of its own that runs the modules of a world.
 Bridge opens the library by the path that the deployment states, and finds its eighteen entries by name.
 `backend_api_t` holds the entries in the order of `BACKEND_ENTRY_NAMES`.
 The first entry gives the number of the backend seam that the library was built against.
