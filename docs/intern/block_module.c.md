@@ -56,7 +56,6 @@ So `spans` is a key whose value an author can only estimate, and a deployment co
 
 | Function | Result |
 | --- | --- |
-| `block_get_offset` | Gives where a pointer is in the shared memory, or 0 for a pointer that is null or not in it. |
 | `block_refill` | Tops up the ids of a module. 1 if the entity ceiling cut them short. |
 | `block_write_header` | Writes the header at offset 0 of the private memory of a module: where its regions begin, and how many of each thing there are. |
 | `block_hand_out` | Ends the hold on the ids that each loaded module handed out since the last barrier, and on those that it took from its `lender`. |

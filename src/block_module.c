@@ -7,15 +7,6 @@
 
 #include "block.h"
 
-uint32_t block_get_offset(bridge_t *b, const void *p)
-{
-    const uint8_t *c = p;
-
-    if (!c || c < b->shared || c >= b->shared + b->shared_len)
-        return (0);
-    return ((uint32_t)(c - b->shared));
-}
-
 int block_refill(bridge_t *b, module_t *m)
 {
     uint32_t want = m->spawns > 0 ? (uint32_t)m->spawns : 0;
@@ -66,6 +57,6 @@ void block_write_header(bridge_t *b, module_t *m)
     h->types = m->declared_count;
     h->tables = storage_count_tables(b->storage);
     h->kept = h->column_base + 4u * h->types * h->tables;
-    h->entity_index = block_get_offset(b, b->index);
+    h->entity_index = (uint32_t)((const uint8_t *)b->index - b->shared);
     h->entities = b->entities;
 }

@@ -86,7 +86,6 @@ The fields of `block_layout_t`:
 | `block_refill` | `src/block_module.c` | Tops up the ids of a module until the next barrier: what it did not use, up to what its config stated. 1 if the entity ceiling cut them short. |
 | `block_write_header` | `src/block_module.c` | Writes what a module reads at offset 0 of its private memory. |
 | `block_hand_out` | `src/block_module.c` | Ends the hold on each id that a module handed out since the last barrier. |
-| `block_get_offset` | `src/block_module.c` | Gives where a pointer is in the shared memory, or 0 for a pointer that is null or not in it. |
 | `block_drain` | `src/block_log.c` | Hands the log ring of a module to the sink. Then gives the module its scratch arena back, which holds the text of the lines. |
 | `block_barrier` | `src/block_barrier.c` | Runs the barrier: the queued changes applied, the spans published again, the observers run, the failure budgets settled, the log rings drained. |
 | `block_column_regrow` | `src/block_column.c` | Gives `new_size` bytes of the column region that hold what the `old_size` bytes at `ptr` held, or fresh bytes if `ptr` is null. |

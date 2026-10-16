@@ -34,8 +34,6 @@ int block_refill(bridge_t *b, module_t *m);
 
 void block_write_header(bridge_t *b, module_t *m);
 
-uint32_t block_get_offset(bridge_t *b, const void *p);
-
 void block_drain(bridge_t *b, module_t *m);
 
 void block_hand_out(bridge_t *b);
