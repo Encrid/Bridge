@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <string.h>
+
 #include "cases.h"
 
 static void load_hang(host_t *h)
@@ -55,7 +57,12 @@ void test_state_plain_timeout(host_t *h)
     if (host_open(h))
         return;
     test_state_plain_minting(&a, "game:ticker@0.1.0", "no-such-library");
-    a.cfg.shutdown_timeout = 100 * HOST_MS;
+    if (!strcmp(h->arg, "init"))
+        a.cfg.init_timeout = 100 * HOST_MS;
+    else if (!strcmp(h->arg, "reload"))
+        a.cfg.reload_timeout = 100 * HOST_MS;
+    else
+        a.cfg.shutdown_timeout = 100 * HOST_MS;
     host_load(h, &a);
     host_close(h);
 }

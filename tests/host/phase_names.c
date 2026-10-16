@@ -33,6 +33,13 @@ void test_map_phase(host_t *h)
     load_ticking(h, &tick);
 }
 
+void test_map_phase_second(host_t *h)
+{
+    bridge_phase_name_t tick = { "tick", "present" };
+
+    load_ticking(h, &tick);
+}
+
 void test_map_phase_nowhere(host_t *h)
 {
     bridge_phase_name_t tick = { "tick", "nowhere" };

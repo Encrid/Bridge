@@ -371,6 +371,10 @@ void test_edit_backend(host_t *h);
 void test_edit_phases(host_t *h);
 void test_order_nobody(host_t *h);
 void test_edit_module(host_t *h);
+
+void test_edit_module_more(host_t *h);
+
+void test_map_phase_second(host_t *h);
 void test_load_twice(host_t *h);
 void test_spawn_past_entities(host_t *h);
 void test_edit_phase_names(host_t *h);

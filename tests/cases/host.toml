@@ -1651,6 +1651,144 @@ claims = { matches = ["game:hearer@0.1.0/heard: heard 1 1.*game:swapper@0.2.0: r
 false = { run = ["{out}/host{exe}", "observer-hears-a-singleton-attached-twice-at-one-barrier-once"] }
 
 [[case]]
+name = "module_config.max_system_failures-negative-refused"
+run = ["{out}/host{exe}", "module_config.max_system_failures-negative-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: max_system_failures is -5, which is neither a limit nor BRIDGE_NO_LIMIT.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "module_config.init_timeout-negative-refused"
+run = ["{out}/host{exe}", "module_config.init_timeout-negative-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: init_timeout is -5, which is neither a limit nor BRIDGE_NO_LIMIT.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "module_config.reload_timeout-negative-refused"
+run = ["{out}/host{exe}", "module_config.reload_timeout-negative-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: reload_timeout is -5, which is neither a limit nor BRIDGE_NO_LIMIT.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "module_config.shutdown_timeout-negative-refused"
+run = ["{out}/host{exe}", "module_config.shutdown_timeout-negative-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: shutdown_timeout is -5, which is neither a limit nor BRIDGE_NO_LIMIT.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "module_config.persistent-negative-refused"
+run = ["{out}/host{exe}", "module_config.persistent-negative-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: persistent is -5, which is neither an amount nor BRIDGE_NONE.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "module_config.changes-negative-refused"
+run = ["{out}/host{exe}", "module_config.changes-negative-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: changes is -5, which is neither an amount nor BRIDGE_NONE.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "module_config.loss_count-negative-refused"
+run = ["{out}/host{exe}", "module_config.loss_count-negative-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: loss_count is -5, which is neither an amount nor BRIDGE_NONE.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "module_config.scratch-past-32-bits-refused"
+run = ["{out}/host{exe}", "module_config.scratch-past-32-bits-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: its scratch of 4294967280, log_ring of 320 and spans of 4096 bytes come to more than an offset of 32 bits can reach.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "module_config.scratch-rounded-past-32-bits-refused"
+run = ["{out}/host{exe}", "module_config.scratch-rounded-past-32-bits-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: its scratch of 4294967164, log_ring of 320 and spans of 4096 bytes come to more than an offset of 32 bits can reach.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "module_config.spans-past-32-bits-refused"
+run = ["{out}/host{exe}", "module_config.spans-past-32-bits-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: its scratch of 4096, log_ring of 320 and spans of 4294967295 bytes come to more than an offset of 32 bits can reach.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "module_config.init_timeout-none-beside-other-timeouts-taken"
+run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"]
+claims = { matches = ["test:ok@0\\.1\\.0: loaded.*alive"], matches_not = ["refused"] }
+false = { run = ["{out}/host{exe}", "module_config.config-empty-refused"] }
+
+[[case]]
+name = "module_config.identity-empty-refused"
+run = ["{out}/host{exe}", "module_config.identity-empty-refused"]
+claims = { matches = ["a module with no identity is refused.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "module_config.config-empty-refused"
+run = ["{out}/host{exe}", "module_config.config-empty-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: config is unset.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "module_config.log_ring-past-32-bits-refused"
+run = ["{out}/host{exe}", "module_config.log_ring-past-32-bits-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: its scratch of 1024, log_ring of 4294966140 and spans of 4096 bytes come to more than an offset of 32 bits can reach.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "module_config.shutdown_timeout-alone-taken"
+run = ["{out}/host{exe}", "module_config.shutdown_timeout-alone-taken"]
+claims = { matches = ["test:ok@0\\.1\\.0: loaded.*alive"], matches_not = ["refused"] }
+false = { run = ["{out}/host{exe}", "module_config.config-empty-refused"] }
+
+[[case]]
+name = "phase_name.from-empty-refused"
+run = ["{out}/host{exe}", "phase_name.from-empty-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: phase name 0 of its config is unset.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "phase_name.to-null-refused"
+run = ["{out}/host{exe}", "phase_name.to-null-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: phase name 0 of its config is unset.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "phase_name.to-empty-refused"
+run = ["{out}/host{exe}", "phase_name.to-empty-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: phase name 0 of its config is unset.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "phase_name.two-mapped-to-one-phase-taken"
+run = ["{out}/host{exe}", "phase_name.two-mapped-to-one-phase-taken"]
+claims = { matches = ["test:ok@0\\.1\\.0: loaded.*alive"], matches_not = ["refused"] }
+false = { run = ["{out}/host{exe}", "module_config.config-empty-refused"] }
+
+[[case]]
+name = "bridge_reload-config-that-the-checks-refuse-refused"
+run = ["{out}/host{exe}", "bridge_reload-config-that-the-checks-refuse-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: a log_ring of 8 bytes holds no record, and one is 32.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "BACKEND_TIMEOUT-lacking-init_timeout-refused"
+run = ["{out}/host{exe}", "BACKEND_TIMEOUT-lacking-init_timeout-refused"]
+claims = { matches = ["module 'game:ticker@0\\.1\\.0' is refused: it states init_timeout, which backend 'plain' cannot keep.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "BACKEND_TIMEOUT-lacking-reload_timeout-refused"
+run = ["{out}/host{exe}", "BACKEND_TIMEOUT-lacking-reload_timeout-refused"]
+claims = { matches = ["module 'game:ticker@0\\.1\\.0' is refused: it states reload_timeout, which backend 'plain' cannot keep.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
+
+[[case]]
+name = "phase_name.mapped-to-the-second-phase-loads"
+run = ["{out}/host{exe}", "phase_name.mapped-to-the-second-phase-loads"]
+claims = { matches = ["game:stamp@0.1.0: loaded.*seen 1 7.*alive"] }
+false = { run = ["{out}/host{exe}", "phase_name.to-undeclared-refused"] }
+
+[[case]]
 name = "module_config.identity-none-refused"
 run = ["{out}/host{exe}", "module_config.identity-none-refused"]
 claims = { matches = ["a module with no identity is refused.*alive"] }
