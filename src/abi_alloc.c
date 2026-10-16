@@ -25,22 +25,23 @@ int abi_refuse(module_t *m, const char *format, ...)
 int abi_alloc(void *ud, const uint64_t *a, uint64_t *r)
 {
     module_t *m = ud;
+    module_t *from = m->lender ? m->lender : m;
     uint64_t len = (a[0] + 7u) & ~7ull;
 
-    if (m->persistent <= 0)
+    if (from->persistent <= 0)
         return (abi_refuse(m, "alloc: it stated that it keeps nothing in "
             "the persistent arena"));
-    while (len > m->arena_left && m->own_next < m->own_count) {
-        m->arena_at = m->owned[m->own_next].at;
-        m->arena_left = m->owned[m->own_next].len;
-        m->own_next++;
+    while (len > from->arena_left && from->own_next < from->own_count) {
+        from->arena_at = from->owned[from->own_next].at;
+        from->arena_left = from->owned[from->own_next].len;
+        from->own_next++;
     }
-    if (len > m->arena_left)
+    if (len > from->arena_left)
         return (abi_refuse(m, "alloc: its persistent of %lld bytes is "
-            "exhausted", (long long)m->persistent));
-    r[0] = m->arena_at;
-    m->arena_at += (uint32_t)len;
-    m->arena_left -= (uint32_t)len;
+            "exhausted", (long long)from->persistent));
+    r[0] = from->arena_at;
+    from->arena_at += (uint32_t)len;
+    from->arena_left -= (uint32_t)len;
     return (0);
 }
 

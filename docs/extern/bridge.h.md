@@ -549,6 +549,9 @@ A component that another loaded module declares stays, with its rows.
 7. Bridge checks the schedule, and moves the rows of each component whose layout changed.
 8. Bridge shuts the old instance down, and the new instance takes its place.
 
+The old and the new instance take entity ids and bytes of the persistent arena from one supply.
+Each id and each byte goes to one instance only.
+
 The result is 0 if the new instance runs. Else the result is 1, with a record.
 From the sink, the result is 1, with no record.
 

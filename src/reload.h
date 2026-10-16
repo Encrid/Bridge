@@ -34,6 +34,8 @@ void reload_give_back(reloading_t *r);
 
 [[nodiscard]] int reload_make_record(reloading_t *r);
 
+void reload_take_cursors(reloading_t *r);
+
 [[nodiscard]] int reload_move_rows(reloading_t *r);
 
 int reload_fail(reloading_t *r);

@@ -8,19 +8,20 @@
 int abi_spawn(void *ud, [[maybe_unused]] const uint64_t *a, uint64_t *r)
 {
     module_t *m = ud;
+    module_t *from = m->lender ? m->lender : m;
 
-    if (m->id_next != m->id_count) {
-        r[0] = m->ids[m->id_next];
-        m->id_next++;
+    if (from->id_next != from->id_count) {
+        r[0] = from->ids[from->id_next];
+        from->id_next++;
         return (0);
     }
-    if (m->spawns <= 0)
+    if (from->spawns <= 0)
         return (abi_refuse(m, "spawn: it stated that it spawns nothing"));
-    if (m->ids_short)
+    if (from->ids_short)
         return (abi_refuse(m, "spawn: [budget] entities of %u is reached",
             m->b->entities));
     return (abi_refuse(m, "spawn: its spawns of %lld between two barriers "
-        "are used up", (long long)m->spawns));
+        "are used up", (long long)from->spawns));
 }
 
 int abi_destroy(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)

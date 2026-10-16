@@ -7,19 +7,20 @@ This file reloads a module: a new instance takes the place of the old one, over 
 
 1. Refuse what a load refuses from the config, and what a reload alone is refused for: `src/reload_check.c`.
 2. Grow the share of the persistent arena to what the reload states: `src/reload_share.c`.
-3. Make the record of the new instance, which takes over what was set aside for the module.
+3. Make the record of the new instance.
 4. Take the systems of the old instance out of storage.
 5. If the backend cannot hold two instances, shut the old instance down and destroy it.
-6. Make the new image, instance and private memory, and call `reload` of the new instance.
-7. Build the schedule again, with the same refusal as a load.
-8. Move the rows of each type that the reload made in the place of another: `src/reload_rows.c`.
-9. Shut the old instance down, if step 5 did not, and put the new record in its place.
-10. Let the world run again, if the world waits for this module, and run a barrier.
+6. Let the new record take over what was set aside for the module.
+7. Make the new image, instance and private memory, and call `reload` of the new instance.
+8. Build the schedule again, with the same refusal as a load.
+9. Move the rows of each type that the reload made in the place of another: `src/reload_rows.c`.
+10. Shut the old instance down, if step 5 did not, and put the new record in its place.
+11. Let the world run again, if the world waits for this module, and run a barrier.
 
-Step 3 is in `src/reload_record.c`. A failure in steps 6 to 8 goes to `src/reload_fail.c`.
+Steps 3 and 6 are in `src/reload_record.c`. A failure in steps 7 to 9 goes to `src/reload_fail.c`.
 A reload is the `reload` of the new instance, and then the `shutdown` of the old one.
-Where the backend holds both instances, the old instance is untouched until step 9.
-So a reload that fails before step 9 leaves the module as it ran.
+Where the backend holds both instances, the old instance is untouched until step 10.
+So a reload that fails before step 10 leaves the module as it ran.
 Like a load, `bridge_reload` gives 1 if the world has stopped, since a module that nothing will ever run did not reload.
 
 ## Two instances at once
@@ -48,6 +49,13 @@ The systems of the old instance leave storage before the new instance registers 
 So a reload needs no room for the systems of a module twice: `src/abi_alloc.c`.
 The new record takes the place of the old one in the list of modules, so the order of the loads stays.
 The ids held ready for the old instance are the ids of the new record from the swap on.
+
+## One supply of ids and bytes
+
+The `shutdown` of the old instance can spawn and allocate, and so can the `reload` of the new one.
+Step 6 comes after the shutdown of step 5, so the new record takes the ids and the bytes that the shutdown left.
+In the shutdown of step 10, `lender` of the old record is the new record, and `spawn` and `alloc` take from it.
+So the two instances never get the same id or the same bytes.
 
 ## Functions
 

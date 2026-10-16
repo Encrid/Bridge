@@ -67,11 +67,14 @@ static void take_share(const reloading_t *r, module_t *n, const module_t *old)
 int reload_make_record(reloading_t *r)
 {
     r->n = alloc_record(r);
-    if (!r->n) {
-        reload_give_back(r);
-        return (1);
-    }
+    if (r->n)
+        return (0);
+    reload_give_back(r);
+    return (1);
+}
+
+void reload_take_cursors(reloading_t *r)
+{
     take_ids(r->n, r->old);
     take_share(r, r->n, r->old);
-    return (0);
 }

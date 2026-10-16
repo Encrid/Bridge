@@ -1174,6 +1174,15 @@ defines = ["BRIDGE_ROWS_CHECKED"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "reload-takes"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/reload_takes.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "places"
 kind = "library"
 test = true

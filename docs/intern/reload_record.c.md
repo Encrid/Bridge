@@ -5,7 +5,7 @@ This file makes the record of the instance that a reload brings in. The new reco
 ## What the new record takes over
 
 The new record is made from the new config, as at a load: `src/module_record.c`.
-Then it takes copies of what the old record holds for the module:
+Then, after any shutdown of the old instance, it takes copies of what the old record holds for the module:
 
 - The ids held ready for the old instance. They are the ids of the new instance from the swap on.
 - The settings component that the config seeded, and where its text is.
@@ -33,4 +33,5 @@ A module that had no share starts to allocate from the new range.
 | `alloc_record` | Makes the new record, with room for the ranges of the old share and one more, and for each id held ready. Null, with a record, if there is no memory. |
 | `take_ids` | Copies the ids held ready for the old instance, the settings component, and where the text of the settings is. |
 | `take_share` | Copies the share of the old instance, with what the reload added to it. |
-| `reload_make_record` | Makes the new record and fills it. 1, with a record, and the added bytes of the share given back, if there is no memory. |
+| `reload_make_record` | Makes the new record. 1, with a record, and the added bytes of the share given back, if there is no memory. |
+| `reload_take_cursors` | Fills the new record with the ids, the settings component and the share of the old record. |

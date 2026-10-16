@@ -45,6 +45,7 @@ static void swap(reloading_t *r)
     module_t *n = r->n;
     module_t **link = &b->modules;
 
+    old->lender = n;
     if (r->side_by_side)
         module_shut_down(b, old);
     module_drop_systems(b, old);
@@ -82,6 +83,7 @@ int bridge_reload(bridge_t *b, const bridge_artifact_t *a)
     if (reload_check(&r) || reload_grow_share(&r) || reload_make_record(&r))
         return (1);
     retire_old(&r);
+    reload_take_cursors(&r);
     if (start_new(&r))
         return (reload_fail(&r));
     swap(&r);

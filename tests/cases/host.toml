@@ -1597,6 +1597,18 @@ claims = { matches = ["/say: kept in the arena 0 0\\s+alive"] }
 false = { run = ["{out}/host{exe}", "record.barriers-the-count-it-was-said-after"] }
 
 [[case]]
+name = "bridge_reload-old-shutdown-takes-before-the-new-reload"
+run = ["{out}/host{exe}", "bridge_reload-old-shutdown-takes-before-the-new-reload"]
+claims = { matches = ["shutdown took 1 (\\d+).*reload took 2 (?!\\1\\b)\\d+.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-new-reload-takes-before-the-old-shutdown"] }
+
+[[case]]
+name = "bridge_reload-new-reload-takes-before-the-old-shutdown"
+run = ["{out}/host{exe}", "bridge_reload-new-reload-takes-before-the-old-shutdown"]
+claims = { matches = ["shutdown took 2 (\\d+).*reload took 1 (?!\\1\\b)\\d+.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-old-shutdown-takes-before-the-new-reload"] }
+
+[[case]]
 name = "record.place-of-each-system-in-its-phase"
 run = ["{out}/host{exe}", "record.place-of-each-system-in-its-phase"]
 claims = { matches = ["b1 p0 game:places@0.1.0/first: at.*b1 p1 game:places@0.1.0/second: at.*alive"] }

@@ -238,6 +238,8 @@ void test_run_guarded(host_t *h, const char *identity, const char *file,
     int frames);
 
 void test_tell_places(host_t *h);
+
+void test_take_in_old_shutdown(host_t *h);
 void test_conflict_at_barrier(host_t *h);
 void test_order_observers(host_t *h);
 void test_reorder_observers(host_t *h);
