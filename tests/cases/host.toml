@@ -203,6 +203,18 @@ claims = { matches = ["test:spare@0.1.0: loaded.*modules: test:spare@0.1.0=RUNNI
 false = { run = ["{out}/host{exe}", "module_config.spans-rounded-up-to-8-refused"] }
 
 [[case]]
+name = "module_config.persistent-rounded-up-to-8-refused"
+run = ["{out}/host{exe}", "module_config.persistent-rounded-up-to-8-refused"]
+claims = { matches = ["module 'ten:small@0.1.0' is refused: its persistent of 12 bytes does not fit in the 12 left of \\[budget\\] persistent.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-persistent-beyond-32-bits-refused"] }
+
+[[case]]
+name = "bridge_reload-persistent-beyond-32-bits-refused"
+run = ["{out}/host{exe}", "bridge_reload-persistent-beyond-32-bits-refused"]
+claims = { matches = ["its persistent of 4294967304 bytes does not fit in the \\d+ left of \\[budget\\] persistent.*game:ticker@0.2.0: not reloaded.*modules: game:ticker@0.1.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.persistent-rounded-up-to-8-refused"] }
+
+[[case]]
 name = "module_config.spans-too-small-refused"
 run = ["{out}/host{exe}", "module_config.spans-too-small-refused"]
 claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }

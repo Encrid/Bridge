@@ -126,6 +126,7 @@ What a module starts from.
 | `module_record` | `src/module_record.c` | Makes the record of a module from its config: all of it, or none. Gives `nullptr` with a record said. |
 | `module_drop_systems` | `src/module_discard.c` | Takes the systems and the observers of a module out of storage, and frees them. |
 | `module_release_types` | `src/module_types.c` | Stops the declarations of a module, last declared first. The last declarer of a type applies its policy, unless `by_policy` is false. |
+| `module_round_share` | `src/module_share.c` | Gives the share that a `persistent` takes, rounded up to a multiple of 8, in 64 bits. |
 | `module_give_share` | `src/module_share.c` | Gives the share of a module back to the persistent arena. |
 | `module_settle_share` | `src/module_share.c` | Gives the share of a module back at its unload, unless a row that stays holds a string in it. |
 | `module_count_pointing` | `src/module_pointed.c` | Gives how many rows of a type hold a string in the share of a module. |

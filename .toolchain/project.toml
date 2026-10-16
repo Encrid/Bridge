@@ -1215,6 +1215,15 @@ include = ["include", "tests/binding", "tests/modules"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "alloc-twelve"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/alloc_twelve.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "hold"
 kind = "library"
 test = true

@@ -51,7 +51,7 @@ The demands go to the backend when it compiles the module: `docs/intern/module_i
 
 - A module of the same stem is loaded already.
 - The world has `[budget] modules` modules already.
-- The `persistent` share of the module is longer than the longest piece left in the persistent arena.
+- The `persistent` share of the module, rounded up to a multiple of 8, is longer than the longest piece left in the persistent arena.
 
 ## Functions
 

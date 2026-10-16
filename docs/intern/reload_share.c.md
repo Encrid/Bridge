@@ -18,7 +18,9 @@ The added bytes come from what is left of the arena:
 The offsets that the module has stay good. What was left of the range before is dead space.
 Before it takes a range, the list of gaps of the arena gets room for one more range.
 So to give a range back never asks for memory.
+
 If no free piece of the arena holds the added bytes, the reload is refused, and the record tells what is left.
+The added bytes are computed in 64 bits, so a `persistent` past 32 bits is refused this way, and is never cut.
 
 ## Functions
 

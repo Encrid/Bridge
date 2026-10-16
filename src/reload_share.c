@@ -18,7 +18,7 @@ static void grow_in_place(reloading_t *r)
     r->in_place = region_grow(space, at, r->last.len, r->last.len + r->extra);
 }
 
-static int take_range(reloading_t *r, int64_t wants)
+static int take_range(reloading_t *r, int64_t wants, uint64_t extra)
 {
     bridge_t *b = r->b;
     uint32_t left = region_get_most(&b->arena_space) + r->old->arena_share;
@@ -26,7 +26,8 @@ static int take_range(reloading_t *r, int64_t wants)
     if (!region_make_room(&b->arena_space, b->arena_ranges + 1))
         return (bridge_lacks(b, nullptr, "one more range of the persistent "
             "arena"));
-    if (!region_take(&b->arena_space, r->extra, &r->extra_at))
+    if (extra > UINT32_MAX
+        || !region_take(&b->arena_space, (uint32_t)extra, &r->extra_at))
         return (reload_refuse(r, "its persistent of %lld bytes does not fit "
             "in the %u left of [budget] persistent", (long long)wants, left));
     b->arena_ranges++;
@@ -38,6 +39,7 @@ int reload_grow_share(reloading_t *r)
     const module_t *old = r->old;
     int64_t had = old->persistent > 0 ? old->persistent : 0;
     int64_t wants = r->a->cfg.persistent > 0 ? r->a->cfg.persistent : 0;
+    uint64_t extra = module_round_share(wants) - old->arena_share;
 
     if (wants < had)
         return (reload_refuse(r, "its persistent is %lld and a reload states "
@@ -45,9 +47,11 @@ int reload_grow_share(reloading_t *r)
             (long long)had));
     if (wants == had)
         return (0);
-    r->extra = (((uint32_t)wants + 7u) & ~7u) - old->arena_share;
-    grow_in_place(r);
-    return (r->in_place ? 0 : take_range(r, wants));
+    if (extra <= UINT32_MAX) {
+        r->extra = (uint32_t)extra;
+        grow_in_place(r);
+    }
+    return (r->in_place ? 0 : take_range(r, wants, extra));
 }
 
 void reload_give_back(reloading_t *r)

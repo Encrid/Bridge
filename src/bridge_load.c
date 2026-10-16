@@ -19,8 +19,7 @@ static void keep_share(module_t *m, uint32_t at, uint32_t share)
 
 static int take_share(bridge_t *b, module_t *m)
 {
-    uint32_t most = region_get_most(&b->arena_space);
-    uint32_t share = ((uint32_t)m->persistent + 7u) & ~7u;
+    uint32_t share = (uint32_t)module_round_share(m->persistent);
     uint32_t at;
 
     m->owned = calloc(1, sizeof(*m->owned));
@@ -30,7 +29,6 @@ static int take_share(bridge_t *b, module_t *m)
         module_discard(b, m);
         return (1);
     }
-    share = share > most ? most : share;
     if (!region_take(&b->arena_space, share, &at))
         unreachable();
     b->arena_ranges++;

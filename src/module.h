@@ -87,6 +87,8 @@ void module_drop_systems(bridge_t *b, module_t *m);
 
 void module_release_types(bridge_t *b, module_t *m, bool by_policy);
 
+uint64_t module_round_share(int64_t persistent);
+
 void module_give_share(bridge_t *b, const module_t *m);
 
 void module_settle_share(bridge_t *b, module_t *m);

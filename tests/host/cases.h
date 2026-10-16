@@ -244,6 +244,10 @@ void test_take_in_old_shutdown(host_t *h);
 void test_guess(host_t *h);
 
 void test_round_spans(host_t *h);
+
+void test_alloc_unaligned_share(host_t *h);
+
+void test_reload_beyond_reach(host_t *h);
 void test_conflict_at_barrier(host_t *h);
 void test_order_observers(host_t *h);
 void test_reorder_observers(host_t *h);

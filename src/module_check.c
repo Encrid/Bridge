@@ -52,7 +52,7 @@ int module_check_room(const module_check_t *k)
 {
     bridge_t *b = k->b;
     const module_t *other = module_find(b, k->id);
-    int64_t share = k->cfg->persistent;
+    uint64_t share = module_round_share(k->cfg->persistent);
     uint32_t left = region_get_most(&b->arena_space);
 
     if (other)
@@ -61,10 +61,10 @@ int module_check_room(const module_check_t *k)
     if (b->module_count >= b->max_modules)
         return (module_refuse(b, k->id, "[budget] modules of %u is reached",
             b->max_modules));
-    if (share > 0 && (uint64_t)share > left)
+    if (share > left)
         return (module_refuse(b, k->id, "its persistent of %lld bytes does "
-            "not fit in the %u left of [budget] persistent", (long long)share,
-            left));
+            "not fit in the %u left of [budget] persistent",
+            (long long)k->cfg->persistent, left));
     return (0);
 }
 

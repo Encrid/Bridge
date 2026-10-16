@@ -38,6 +38,7 @@ When the share goes back, that place is forgotten: `docs/intern/config_kept.c.md
 
 | Function | Result |
 | --- | --- |
+| `module_round_share` | Gives the share that a `persistent` takes: the bytes rounded up to a multiple of 8, in 64 bits, or 0 for none. |
 | `module_give_share` | Gives each range of the share of a module back to the persistent arena, and lowers the count of ranges that modules hold. |
 | `get_share_size` | Gives the length of the share of a module, in bytes: the sum of its ranges. |
 | `is_share_held` | Gives whether a row that stays holds a string in the share of a module, and says each component that does. |

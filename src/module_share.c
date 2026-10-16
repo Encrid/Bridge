@@ -5,6 +5,13 @@
 */
 #include "module.h"
 
+uint64_t module_round_share(int64_t persistent)
+{
+    if (persistent <= 0)
+        return (0);
+    return (((uint64_t)persistent + 7u) & ~7ull);
+}
+
 void module_give_share(bridge_t *b, const module_t *m)
 {
     const range_t *own = m->owned;
