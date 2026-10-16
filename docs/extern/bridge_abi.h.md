@@ -274,6 +274,7 @@ For a component of another namespace, it needs a grant: the name of the componen
 
 Bridge checks a grant when a module declares a type, registers a system or an observer, and calls `attach` or `detach`.
 A module can destroy an entity that carries a component that it can write, or that carries nothing: *destroy*.
+An id that `spawn` has not handed out yet is no entity, and no module can destroy it.
 The memory does not enforce a grant: a module can write what it reads. That breaks a rule: *Rules*.
 
 ## add_system
@@ -492,6 +493,7 @@ A destroyed entity stays readable for the rest of the phase.
 
 The module must be able to write a component that the entity carries, or the entity must carry nothing.
 The barrier checks it against what the entity carried before that barrier.
+An id that a module holds and that `spawn` has not handed out yet cannot be destroyed.
 Else the entity stays as it was, a record counts it, and the module fails at that barrier: `docs/extern/bridge.h.md`, *Failures*.
 A destroy of a dead id is nothing.
 
@@ -697,6 +699,8 @@ For `detach`, a reason says `detach` in place of `attach`.
 A barrier writes this record when it refuses a destroy:
 
 - `module '<module>' asked to destroy entities that carry nothing it may write. Left as they were: <count>`
+
+The count includes each id that no `spawn` handed out yet.
 
 ### The log line
 

@@ -107,6 +107,7 @@ A module that writes a term it has does what the term is for.
 | Constant | Content |
 | --- | --- |
 | `DEAD` | `0xffffffff`. The table of a place whose entity is gone, and the generation that the entity index shows for it. |
+| `HELD` | `0xffffffff`. The row of a place in table 0 whose id a block holds and `spawn` has not handed out. |
 | `COLUMN` | 16. The multiple at which each column and each block begins, and the bytes before a toggled column or direct-indexed cells. |
 
 ## Types

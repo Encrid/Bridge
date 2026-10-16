@@ -32,7 +32,7 @@ uint32_t storage_reserve(storage_t *r, uint64_t *ids, uint32_t want)
     while (index) {
         p = &r->places[index];
         p->table = 0;
-        p->row = 0;
+        p->row = HELD;
         r->b->index[index] = (bridge_entity_t){ 0, 0, p->generation };
         ids[count] = (uint64_t)p->generation << 32 | index;
         count++;

@@ -10,6 +10,8 @@
 
 constexpr uint32_t DEAD = 0xffffffffu;
 
+constexpr uint32_t HELD = 0xffffffffu;
+
 constexpr uint64_t COLUMN = 16;
 
 enum folded : uint8_t {

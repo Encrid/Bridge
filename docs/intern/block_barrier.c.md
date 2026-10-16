@@ -5,15 +5,16 @@ This file runs the barrier: what happens between two phases, in an order that ne
 
 ## The steps of a barrier
 
-1. Storage applies the queued changes of each module: `src/storage_apply.c`.
-2. Each module gets its ids topped up: `docs/intern/block_module.c.md`, *The ids set aside*.
-3. The spans of each running module are published again, until publishing makes no more table ids.
-4. Storage ends the publish, and the layout counts as not moved.
-5. The observers of what changed run. Their phase is the one past the last phase of the deployment.
-6. No system or observer is pending any more, and the count of lifecycle calls goes back to 0.
-7. The failure budgets are settled: `src/schedule_account.c`.
-8. The log ring of each module is drained to the sink: `docs/intern/block_log.c.md`, *The log ring*.
-9. The count of barriers goes up by 1.
+1. Storage ends the hold on the ids that each module handed out: `docs/intern/storage_held.c.md`.
+2. Storage applies the queued changes of each module: `src/storage_apply.c`.
+3. Each module gets its ids topped up: `docs/intern/block_module.c.md`, *The ids set aside*.
+4. The spans of each running module are published again, until publishing makes no more table ids.
+5. Storage ends the publish, and the layout counts as not moved.
+6. The observers of what changed run. Their phase is the one past the last phase of the deployment.
+7. No system or observer is pending any more, and the count of lifecycle calls goes back to 0.
+8. The failure budgets are settled: `src/schedule_account.c`.
+9. The log ring of each module is drained to the sink: `docs/intern/block_log.c.md`, *The log ring*.
+10. The count of barriers goes up by 1.
 
 The header of a module tells how many table ids there are.
 So if publishing makes more table ids, every module is published again, until the number stays the same.

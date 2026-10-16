@@ -101,6 +101,8 @@ void storage_drop(storage_t *r, storage_type_t *type,
 
 void storage_release(storage_t *r, const uint64_t *ids, uint32_t count);
 
+void storage_hand_out(storage_t *r, const uint64_t *ids, uint32_t count);
+
 void storage_give_single(storage_t *r, storage_type_t *type,
     const void *bytes, uint32_t size);
 

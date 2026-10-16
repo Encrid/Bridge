@@ -85,6 +85,7 @@ void module_shut_down(bridge_t *b, module_t *m)
     if (m->instance && module_call(m, &call, &err))
         say_about(b, &about, "module '%s': %s; its teardown continues",
             m->identity, err.text);
+    block_hand_out(b);
     storage_apply(b->storage);
     block_drain(b, m);
 }

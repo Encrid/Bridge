@@ -42,6 +42,8 @@ static inline bool has_apart_stake(const storage_t *r, const module_t *m,
     uint64_t written = 0;
     uint32_t w = 0;
 
+    if (!t && r->places[index].row == HELD)
+        return (false);
     if (r->apart)
         return (has_apart_stake(r, m, index));
     while (t && m->writable && w < r->words) {

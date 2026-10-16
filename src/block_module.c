@@ -36,6 +36,18 @@ int block_refill(bridge_t *b, module_t *m)
     return (m->ids_short);
 }
 
+void block_hand_out(bridge_t *b)
+{
+    module_t *m = b->modules;
+
+    while (m) {
+        storage_hand_out(b->storage, m->ids, m->id_next);
+        if (m->lender)
+            storage_hand_out(b->storage, m->lender->ids, m->lender->id_next);
+        m = m->next;
+    }
+}
+
 void block_write_header(bridge_t *b, module_t *m)
 {
     bridge_header_t *h = (bridge_header_t *)m->priv;

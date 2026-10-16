@@ -38,6 +38,8 @@ uint32_t block_get_offset(bridge_t *b, const void *p);
 
 void block_drain(bridge_t *b, module_t *m);
 
+void block_hand_out(bridge_t *b);
+
 void block_barrier(bridge_t *b);
 
 [[nodiscard]] void *block_column_regrow(bridge_t *b, void *ptr,

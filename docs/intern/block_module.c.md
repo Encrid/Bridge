@@ -7,6 +7,7 @@ This file gives a module what it gets at a barrier: ids to hand out, and the hea
 At each barrier, a module gets a block of ids for the time until the next barrier, as many as its `spawns`.
 They are real entities with nothing on them, which no query matches, and they count against `[budget] entities`.
 `spawn` hands them out: `docs/intern/abi_calls.c.md`, *spawn*.
+Before storage applies changes, `block_hand_out` ends the hold on the ids that each module handed out: `docs/intern/storage_held.c.md`.
 
 `block_refill` keeps the ids that the module did not use, and moves them to the front of the block.
 Storage then gives fresh ids for the rest.
@@ -58,3 +59,4 @@ So `spans` is a key whose value an author can only estimate, and a deployment co
 | `block_get_offset` | Gives where a pointer is in the shared memory, or 0 for a pointer that is null or not in it. |
 | `block_refill` | Tops up the ids of a module. 1 if the entity ceiling cut them short. |
 | `block_write_header` | Writes the header at offset 0 of the private memory of a module: where its regions begin, and how many of each thing there are. |
+| `block_hand_out` | Ends the hold on the ids that each loaded module handed out since the last barrier, and on those that it took from its `lender`. |

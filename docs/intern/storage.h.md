@@ -134,6 +134,7 @@ How `storage_convert` ended.
 | `storage_convert` | Writes the rows of components again as other types, all of them or none. Gives an `enum storage_moved`. In `src/storage_convert.c`. |
 | `storage_drop` | Drops the rows of a component that nobody declares any more, by the policy of its last declarer. In `src/storage_drop.c`. |
 | `storage_release` | Destroys ids that storage set aside and no module handed out, with what is on them. In `src/storage_ids.c`. |
+| `storage_hand_out` | Ends the hold on ids that a module handed out, so that a destroy of them can pass. In `src/storage_held.c`. |
 | `storage_give_single` | Gives a singleton its value outside a barrier, and tells its observers. In `src/storage_ids.c`. |
 | `storage_is_alive` | Gives whether an id names an entity that exists. In `src/storage_ids.c`. |
 | `storage_has_any` | Gives whether `is` answers true for a row of a type. In `src/storage_any.c`. |

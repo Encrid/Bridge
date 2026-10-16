@@ -62,6 +62,7 @@ static void finish_barrier(bridge_t *b)
 
 void block_barrier(bridge_t *b)
 {
+    block_hand_out(b);
     storage_apply(b->storage);
     refill_all(b);
     republish(b);

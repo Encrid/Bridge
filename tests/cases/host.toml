@@ -2035,6 +2035,18 @@ claims = { matches = ["the deployment configures no backend, and a module is run
 false = { run = ["{out}/host{exe}", "attach-tag-with-a-value-refused"] }
 
 [[case]]
+name = "destroy-of-a-held-id-refused"
+run = ["{out}/host{exe}", "destroy-of-a-held-id-refused"]
+claims = { matches = ["asked to destroy entities that carry nothing it may write. Left as they were: 1.*alive"] }
+false = { run = ["{out}/host{exe}", "destroy-of-a-handed-out-id-done"] }
+
+[[case]]
+name = "destroy-of-a-handed-out-id-done"
+run = ["{out}/host{exe}", "destroy-of-a-handed-out-id-done"]
+claims = { matches = ["test:guess@0.1.0: loaded.*alive"], matches_not = ["asked to destroy"] }
+false = { run = ["{out}/host{exe}", "destroy-of-a-held-id-refused"] }
+
+[[case]]
 name = "destroy-of-id-0-refused"
 run = ["{out}/host{exe}", "destroy-of-id-0-refused"]
 claims = { matches = ["system 'act' failed: destroy: the id 0 is no entity.*alive"] }

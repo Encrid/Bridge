@@ -8,6 +8,7 @@ It also gives a singleton its value outside a barrier.
 A module hands out ids from a block that storage sets aside for it, and each id names a real entity.
 `storage_reserve` takes each index from the free list, or the next index never used, which starts at generation 1.
 An entity set aside has nothing on it: it is in no table, and no query matches it.
+Its row is `HELD` until the barrier after `spawn` hands it out: `src/storage_held.c`.
 It counts against `[budget] entities`.
 When no index is left, `storage_reserve` takes fewer ids than asked, and gives how many it took.
 

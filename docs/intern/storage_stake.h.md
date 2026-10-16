@@ -5,6 +5,7 @@ This header tells what a module may destroy, and puts a type in a set or takes i
 ## What a module may destroy
 
 A module may destroy an entity in which it has a stake.
+Nobody has a stake in an id that a block holds and that `spawn` has not handed out: its row is `HELD`.
 The entity carries a component that the module may write, or it carries nothing.
 A destroy takes each component on the entity with it, whoever declared it, so it is a write to all of them.
 A module with a read grant can find entities in its spans, but it may not remove them.

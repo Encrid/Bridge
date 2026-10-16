@@ -54,4 +54,4 @@ A module whose reload failed after its old instance went has no code left, so Br
 | `module_take_private` | Reserves the private memory of a module and hands it to its backend. Gives 1 with `err`. |
 | `say_trap` | Writes into `err` that the export `name` trapped, with the text of the backend, cut at 200 characters. Gives 1. |
 | `module_call` | Calls a lifecycle export once, under its timeout. Gives 0 if the export gave 0, and 1 with the reason in `err` if not. |
-| `module_shut_down` | Runs the `shutdown` of a module, applies what it asked for, and drains what it said. |
+| `module_shut_down` | Runs the `shutdown` of a module, ends the hold on the ids handed out, applies what it asked for, and drains what it said. |
