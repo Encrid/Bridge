@@ -16,12 +16,14 @@ This file finds where each part of the shared block begins, how long the block i
 A count of `BRIDGE_NONE` gives no sparse set or no direct-indexed component, and its part is empty.
 The length of the block is a whole number of the granule that the backends need.
 
-Each amount of the budget is below 2^32 when this file runs, so no sum can be past 64 bits.
+The layout first refuses `entities`, `persistent` or `columns` above `UINT32_MAX`.
+Then each amount of the budget is below 2^32, so no sum can be past 64 bits.
 
 ## The limits
 
-Each offset into the shared block is 32 bits, so the layout refuses three things:
+Each offset into the shared block is 32 bits, so the layout refuses these things:
 
+- `entities`, `persistent` or `columns` above `UINT32_MAX`, by its key, before any sum.
 - Sparse sets whose indexes, at four bytes for each entity, are past what an offset reaches.
 - Direct-indexed components whose bits are past what an offset reaches.
 - A block longer than 2^32 bytes.
@@ -37,6 +39,7 @@ If the block is longer than that reservation, it is reserved in its own length, 
 
 | Function | Result |
 | --- | --- |
+| `is_beyond` | Refuses a size above `UINT32_MAX`, by its key, because an offset is 32 bits. 1 with a record. |
 | `lay_sparse` | Places the indexes of the sparse sets after the entity index. 1 with a record if they are past what an offset of 32 bits reaches. |
 | `lay_direct` | Places the direct-indexed bits after the indexes of the sparse sets. 1 with a record if they are past what an offset of 32 bits reaches. |
 | `lay_rest` | Places the arena and the columns, and gives the block a length: a whole number of the granule, at most 2^32 bytes. 1 with a record if not. |

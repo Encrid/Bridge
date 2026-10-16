@@ -1,6 +1,7 @@
 # src/block_budget.c
 
-This file checks the budget of a deployment, key by key, before the library makes any sum of it.
+This file checks the budget of a deployment, key by key.
+Each amount must be set, and each count that may be none must be a count or none.
 
 ## The budget of a deployment
 
@@ -57,18 +58,16 @@ A floor that clamps a value would change what the deployment stated, with nobody
 ## The checks
 
 1. Refuse the first of the eight amounts left at 0: `entities`, `persistent`, `columns`, `modules`, `tables`, `types`, `systems`, `terms`.
-2. Refuse `entities`, `persistent` or `columns` above `UINT32_MAX`: an offset is 32 bits.
-3. Refuse `sparse_sets` or `direct_indexed` that is neither `BRIDGE_NONE` nor a count from 1 to `UINT32_MAX`.
+2. Refuse `sparse_sets` or `direct_indexed` that is neither `BRIDGE_NONE` nor a count from 1 to `UINT32_MAX`.
 
 The first fault ends the check, with one record that names the key.
-The other counts are 32 bits wide in `bridge_budget_t`, so no offset can be past them.
+The bounds of 32 bits are in one place: `docs/intern/block_layout.c.md`, *The limits*.
 
 ## Functions
 
 | Function | Result |
 | --- | --- |
 | `is_unset` | Refuses an amount left at 0, by its key. 1 with a record. |
-| `is_beyond` | Refuses a size above `UINT32_MAX`, by its key, because an offset is 32 bits. 1 with a record. |
 | `is_miscounted` | Refuses a count that may be none and is neither a count nor `BRIDGE_NONE`. Zero is unset. 1 with a record. |
 | `has_unset` | Refuses a budget that leaves one of its eight amounts unset, at the first. 1 with a record. |
-| `block_check_budget` | Refuses a budget with a key unset, a size past what 32 bits reach, or a count that is neither a count nor none. 1 with a record. |
+| `block_check_budget` | Refuses a budget with a key unset, or a count that is neither a count nor none. 1 with a record. |

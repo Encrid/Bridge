@@ -5,6 +5,15 @@
 */
 #include "block.h"
 
+static int is_beyond(bridge_t *b, const char *key, uint64_t value)
+{
+    if (value <= UINT32_MAX)
+        return (0);
+    say_error(b, "[budget] %s of %llu is more than an offset of 32 bits can "
+        "reach", key, (unsigned long long)value);
+    return (1);
+}
+
 static int lay_sparse(bridge_t *b, const bridge_budget_t *budget,
     block_layout_t *layout)
 {
@@ -64,6 +73,12 @@ static int lay_rest(bridge_t *b, const bridge_budget_t *budget,
 int block_lay_out(bridge_t *b, const bridge_budget_t *budget,
     block_layout_t *layout)
 {
+    if (is_beyond(b, "entities", budget->entities))
+        return (1);
+    if (is_beyond(b, "persistent", budget->persistent))
+        return (1);
+    if (is_beyond(b, "columns", budget->columns))
+        return (1);
     layout->index = 8;
     if (lay_sparse(b, budget, layout) || lay_direct(b, budget, layout))
         return (1);

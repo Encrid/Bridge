@@ -13,15 +13,6 @@ static int is_unset(bridge_t *b, const char *key, uint64_t value)
     return (1);
 }
 
-static int is_beyond(bridge_t *b, const char *key, uint64_t value)
-{
-    if (value <= UINT32_MAX)
-        return (0);
-    say_error(b, "[budget] %s of %llu is more than an offset of 32 bits can "
-        "reach", key, (unsigned long long)value);
-    return (1);
-}
-
 static int is_miscounted(bridge_t *b, const char *key, int64_t value)
 {
     if (value == BRIDGE_NONE || (value > 0 && value <= UINT32_MAX))
@@ -57,12 +48,6 @@ static int has_unset(bridge_t *b, const bridge_budget_t *budget)
 int block_check_budget(bridge_t *b, const bridge_budget_t *budget)
 {
     if (has_unset(b, budget))
-        return (1);
-    if (is_beyond(b, "entities", budget->entities))
-        return (1);
-    if (is_beyond(b, "persistent", budget->persistent))
-        return (1);
-    if (is_beyond(b, "columns", budget->columns))
         return (1);
     if (is_miscounted(b, "sparse_sets", budget->sparse_sets))
         return (1);

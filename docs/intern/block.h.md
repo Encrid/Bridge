@@ -81,8 +81,8 @@ The fields of `block_layout_t`:
 | --- | --- | --- |
 | `block_create` | `src/block_create.c` | Makes the shared block that the budget of a deployment states, with storage in it, and has every backend adopt it. 0, or 1 with a record. |
 | `block_destroy` | `src/block_destroy.c` | Gives the shared block back, with storage and every declared type. |
-| `block_check_budget` | `src/block_budget.c` | Refuses a budget with a key unset, a size past what 32 bits reach, or a count that is neither a count nor none. 1 with a record. |
-| `block_lay_out` | `src/block_layout.c` | Finds where each part of the shared block begins. 1, with a record, if together they are more than an offset of 32 bits can reach. |
+| `block_check_budget` | `src/block_budget.c` | Refuses a budget with a key unset, or a count that is neither a count nor none. 1 with a record. |
+| `block_lay_out` | `src/block_layout.c` | Finds where each part of the shared block begins. 1, with a record, if a key or the parts together are more than an offset of 32 bits can reach. |
 | `block_refill` | `src/block_module.c` | Tops up the ids of a module until the next barrier: what it did not use, up to what its config stated. 1 if the entity ceiling cut them short. |
 | `block_write_header` | `src/block_module.c` | Writes what a module reads at offset 0 of its private memory. |
 | `block_hand_out` | `src/block_module.c` | Ends the hold on each id that a module handed out since the last barrier. |
