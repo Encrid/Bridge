@@ -212,6 +212,8 @@ static const host_case_t TEST_CASES[] = {
         test_stop_by_barred, "", test_set_counting },
     { "record.level-above-seven-given-as-seven",
         test_log_out_of_range, "", test_set_guarded },
+    { "bridge_backend_t-reservation-past-the-address-space-refused",
+        test_reserve_too_much, "", test_set_both },
     { "bridge_setting_t-no-kind-refused",
         test_hand_keys, "nokind", test_set_noting },
     { "BRIDGE_INT-negative-for-a-bitmask-refused",

@@ -311,6 +311,12 @@ claims = { matches = ["record\\[7\\] test:s5@0.1.0/shout: over every severity.*a
 false = { run = ["{out}/host{exe}", "bridge_load-failed-init-log-given"] }
 
 [[case]]
+name = "bridge_backend_t-reservation-past-the-address-space-refused"
+run = ["{out}/host{exe}", "bridge_backend_t-reservation-past-the-address-space-refused"]
+claims = { matches = ["the operating system would not give \\d+ bytes, in a reservation of 1125899906\\d+ bytes.*bridge_create refused.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_load-failed-init-log-given"] }
+
+[[case]]
 name = "module_config.spans-too-small-refused"
 run = ["{out}/host{exe}", "module_config.spans-too-small-refused"]
 claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }

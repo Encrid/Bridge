@@ -636,7 +636,7 @@ Each record of Bridge has the level `BRIDGE_ERR`, unless its group tells another
 - `[budget] cannot be satisfied: sparse_sets of <number>, with four bytes for each of <number> entities, is more than an offset of 32 bits can reach`
 - `[budget] cannot be satisfied: direct_indexed of <number>, with a bit for each of <number> entities, is more than an offset of 32 bits can reach`
 - `[budget] cannot be satisfied: the shared memory would be <bytes> bytes and an offset into it is 32 bits`
-- `[budget] cannot be satisfied: the operating system would not give <bytes> bytes`
+- `[budget] cannot be satisfied: the operating system would not give <bytes> bytes, in a reservation of <bytes> bytes`
 - `[budget] cannot be satisfied: the operating system would not give storage <bytes> bytes of its own for the columns it keeps`
 
 The reason of `backend '<backend>': <reason>` is `cannot open backend library '<path>'`, or a reason of `docs/extern/bridge_backend.h.md`, *Messages*.

@@ -12,7 +12,9 @@ static int map_block(bridge_t *b, const block_layout_t *layout)
     b->shared = os_reserve((size_t)layout->reserve, (size_t)layout->len);
     if (!b->shared) {
         say_error(b, "[budget] cannot be satisfied: the operating system "
-            "would not give %llu bytes", (unsigned long long)layout->len);
+            "would not give %llu bytes, in a reservation of %llu bytes",
+            (unsigned long long)layout->len,
+            (unsigned long long)layout->reserve);
         return (1);
     }
     b->shared_len = (size_t)layout->len;
