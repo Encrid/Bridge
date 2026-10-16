@@ -1,0 +1,260 @@
+[[case]]
+name = "storage-changes"
+run = ["{out}/storage{exe}", "changes"]
+claims = { output = "tests/storage_changes.txt" }
+false = { run = ["{out}/storage{exe}", "shape"] }
+
+[[case]]
+name = "storage-shape"
+run = ["{out}/storage{exe}", "shape"]
+claims = { matches = ["the shared block reserves more than it uses: yes.*a plain module's private block reserves what it uses: yes.*the shared block is whole guarded pages: yes.*a plain module's private block is not rounded to one: yes.*alive"] }
+false = { run = ["{out}/storage{exe}", "tables"] }
+
+[[case]]
+name = "storage-tables"
+run = ["{out}/storage{exe}", "tables"]
+claims = { output = "tests/storage_tables.txt" }
+false = { run = ["{out}/storage{exe}", "stress"] }
+
+[[case]]
+name = "storage-stress"
+run = ["{out}/storage{exe}", "stress"]
+claims = { output = "tests/storage_stress.txt" }
+false = { run = ["{out}/storage{exe}", "tables"] }
+
+[[case]]
+name = "storage-stress1"
+run = ["{out}/storage{exe}", "stress1"]
+claims = { output = "tests/storage_stress.txt" }
+false = { run = ["{out}/storage{exe}", "notables"] }
+
+[[case]]
+name = "storage-notables"
+run = ["{out}/storage{exe}", "notables"]
+claims = { output = "tests/storage_notables.txt" }
+false = { run = ["{out}/storage{exe}", "nocolumns"] }
+
+[[case]]
+name = "storage-nocolumns"
+run = ["{out}/storage{exe}", "nocolumns"]
+claims = { output = "tests/storage_nocolumns.txt" }
+false = { run = ["{out}/storage{exe}", "scribble"] }
+
+[[case]]
+name = "storage-scribble"
+run = ["{out}/storage{exe}", "scribble"]
+claims = { output = "tests/storage_scribble.txt" }
+false = { run = ["{out}/storage{exe}", "strip"] }
+
+[[case]]
+name = "storage-strip"
+run = ["{out}/storage{exe}", "strip"]
+claims = { output = "tests/storage_strip.txt" }
+false = { run = ["{out}/storage{exe}", "stripfull"] }
+
+[[case]]
+name = "storage-stripfull"
+run = ["{out}/storage{exe}", "stripfull"]
+claims = { output = "tests/storage_stripfull.txt" }
+false = { run = ["{out}/storage{exe}", "weigh"] }
+
+[[case]]
+name = "storage-weigh"
+alone = true
+run = ["{out}/storage{exe}", "weigh"]
+claims = { matches = ["an entity of 4096 bytes.*in    1 table.*in 4096 tables.*a sparse set.*of 4096 bytes.*a toggle, one row in 16 on.*direct-indexed.*in no order.*as tags.*a singleton read.*a toggled row switched.*alive"], lacks = ["FAIL"] }
+false = { run = ["{out}/storage{exe}", "toggle"] }
+
+[[case]]
+name = "storage-toggle"
+run = ["{out}/storage{exe}", "toggle"]
+claims = { output = "tests/storage_toggle.txt" }
+false = { run = ["{out}/storage{exe}", "togglefull"] }
+
+[[case]]
+name = "storage-togglefull"
+run = ["{out}/storage{exe}", "togglefull"]
+claims = { output = "tests/storage_togglefull.txt" }
+false = { run = ["{out}/storage{exe}", "move"] }
+
+[[case]]
+name = "storage-move"
+run = ["{out}/storage{exe}", "move"]
+claims = { output = "tests/storage_move.txt" }
+false = { run = ["{out}/storage{exe}", "layout"] }
+
+[[case]]
+name = "storage-layout"
+run = ["{out}/storage{exe}", "layout"]
+claims = { output = "tests/storage_layout.txt" }
+false = { run = ["{out}/storage{exe}", "tag"] }
+
+[[case]]
+name = "BRIDGE_TAG-carried-with-no-bytes"
+run = ["{out}/storage{exe}", "tag"]
+claims = { output = "tests/storage_tag.txt" }
+false = { run = ["{out}/storage{exe}", "single"] }
+
+[[case]]
+name = "BRIDGE_SINGLETON-given-and-read"
+run = ["{out}/storage{exe}", "single"]
+claims = { output = "tests/storage_single.txt" }
+false = { run = ["{out}/storage{exe}", "singlebad1"] }
+
+[[case]]
+name = "BRIDGE_SINGLETON-walked-refused"
+run = ["{out}/storage{exe}", "singlebad1"]
+claims = { matches = ["did not load: term 0 of system 'by': 'st:G' is a singleton, and is on no entity a system walks.*alive"] }
+false = { run = ["{out}/storage{exe}", "singlebad2"] }
+
+[[case]]
+name = "attach-singleton-to-an-id-refused"
+run = ["{out}/storage{exe}", "singlebad2"]
+claims = { matches = ["attach: 'st:G' is a singleton, and its id is 0.*alive"] }
+false = { run = ["{out}/storage{exe}", "singlebad3"] }
+
+[[case]]
+name = "attach-to-id-zero-refused"
+run = ["{out}/storage{exe}", "singlebad3"]
+claims = { matches = ["attach: the id 0 is no entity, and 'st:A' is not a singleton.*alive"] }
+false = { run = ["{out}/storage{exe}", "direct"] }
+
+[[case]]
+name = "storage-direct"
+run = ["{out}/storage{exe}", "direct"]
+claims = { output = "tests/storage_direct.txt" }
+false = { run = ["{out}/storage{exe}", "directstrip"] }
+
+[[case]]
+name = "storage-directstrip"
+run = ["{out}/storage{exe}", "directstrip"]
+claims = { output = "tests/storage_directstrip.txt" }
+false = { run = ["{out}/storage{exe}", "directsweep"] }
+
+[[case]]
+name = "storage-directsweep"
+run = ["{out}/storage{exe}", "directsweep"]
+claims = { output = "tests/storage_directsweep.txt" }
+false = { run = ["{out}/storage{exe}", "directdelete"] }
+
+[[case]]
+name = "storage-directdelete"
+run = ["{out}/storage{exe}", "directdelete"]
+claims = { output = "tests/storage_directdelete.txt" }
+false = { run = ["{out}/storage{exe}", "directnone"] }
+
+[[case]]
+name = "budget.direct_indexed-none-refused"
+run = ["{out}/storage{exe}", "directnone"]
+claims = { matches = ["did not load: type 'st:D' is one more than .budget. direct_indexed of 0.*alive"] }
+false = { run = ["{out}/storage{exe}", "directfull"] }
+
+[[case]]
+name = "budget.columns-no-room-for-direct-indexed-refused"
+run = ["{out}/storage{exe}", "directfull"]
+claims = { matches = ["did not load: type 'st:D' is direct-indexed, and .budget. columns of 1024 bytes has no room for a cell of 4 bytes for each of 400000 entities.*alive"] }
+false = { run = ["{out}/storage{exe}", "directbad"] }
+
+[[case]]
+name = "BRIDGE_DIRECT_INDEXED-as-second-term-refused"
+run = ["{out}/storage{exe}", "directbad"]
+claims = { matches = ["did not load: term 1 of system 'both': 'st:D' is direct-indexed, and does not select what a system walks.*alive"] }
+false = { run = ["{out}/storage{exe}", "sparse"] }
+
+[[case]]
+name = "storage-sparse"
+run = ["{out}/storage{exe}", "sparse"]
+claims = { output = "tests/storage_sparse.txt" }
+false = { run = ["{out}/storage{exe}", "sparsefull"] }
+
+[[case]]
+name = "storage-sparsefull"
+run = ["{out}/storage{exe}", "sparsefull"]
+claims = { output = "tests/storage_sparsefull.txt" }
+false = { run = ["{out}/storage{exe}", "sparsestrip"] }
+
+[[case]]
+name = "storage-sparsestrip"
+run = ["{out}/storage{exe}", "sparsestrip"]
+claims = { output = "tests/storage_sparsestrip.txt" }
+false = { run = ["{out}/storage{exe}", "sparsesweep"] }
+
+[[case]]
+name = "storage-sparsesweep"
+run = ["{out}/storage{exe}", "sparsesweep"]
+claims = { output = "tests/storage_sparsesweep.txt" }
+false = { run = ["{out}/storage{exe}", "sparsesweepa"] }
+
+[[case]]
+name = "storage-sparsesweepa"
+run = ["{out}/storage{exe}", "sparsesweepa"]
+claims = { output = "tests/storage_sparsesweepa.txt" }
+false = { run = ["{out}/storage{exe}", "sparsedelete"] }
+
+[[case]]
+name = "storage-sparsedelete"
+run = ["{out}/storage{exe}", "sparsedelete"]
+claims = { output = "tests/storage_sparsedelete.txt" }
+false = { run = ["{out}/storage{exe}", "sparsenone"] }
+
+[[case]]
+name = "budget.sparse_sets-none-refused"
+run = ["{out}/storage{exe}", "sparsenone"]
+claims = { matches = ["did not load: type 'st:S' is one more than .budget. sparse_sets of 0.*alive"] }
+false = { run = ["{out}/storage{exe}", "sparsebad1"] }
+
+[[case]]
+name = "BRIDGE_SPARSE_SET-as-second-term-refused"
+run = ["{out}/storage{exe}", "sparsebad1"]
+claims = { matches = ["did not load: term 1 of system 'both': 'st:S' is kept in a sparse set, and does not select the rows of a table.*alive"] }
+false = { run = ["{out}/storage{exe}", "sparsebad2"] }
+
+[[case]]
+name = "BRIDGE_NOT-of-a-sparse-set-refused"
+run = ["{out}/storage{exe}", "sparsebad2"]
+claims = { matches = ["did not load: term 0 of system 'without': 'st:S' is kept in a sparse set, and a system cannot walk the entities that are not in it.*alive"] }
+false = { run = ["{out}/storage{exe}", "baseline"] }
+
+[[case]]
+name = "storage-baseline"
+alone = true
+run = ["{out}/storage{exe}", "baseline"]
+claims = { matches = ["read in order.*in no order.*204800 of them on.*found through its query.*alive"], lacks = ["FAIL"] }
+false = { run = ["{out}/storage{exe}", "measure"] }
+
+[[case]]
+name = "storage-measure"
+alone = true
+run = ["{out}/storage{exe}", "measure"]
+claims = { matches = ["an id handed out +[0-9.]+ ns each.*ten thousand tables made.*the stress run, on 1 thread.*alive"] }
+false = { run = ["{out}/storage{exe}", "stress1"] }
+
+[[case]]
+name = "bridge_header_t-read-by-a-plain-module"
+run = ["{out}/storage{exe}", "stress1"]
+claims = { output = "tests/storage_stress.txt" }
+false = { run = ["{out}/storage{exe}", "changes"] }
+
+[[case]]
+name = "bridge_entity_t-index-read-by-a-plain-module"
+run = ["{out}/storage{exe}", "stress1"]
+claims = { output = "tests/storage_stress.txt" }
+false = { run = ["{out}/storage{exe}", "changes"] }
+
+[[case]]
+name = "bridge_list_t-triggers-of-a-plain-observer"
+run = ["{out}/storage{exe}", "changes"]
+claims = { output = "tests/storage_changes.txt" }
+false = { run = ["{out}/storage{exe}", "shape"] }
+
+[[case]]
+name = "detach-queued-and-applied-at-the-barrier"
+run = ["{out}/storage{exe}", "changes"]
+claims = { output = "tests/storage_changes.txt" }
+false = { run = ["{out}/storage{exe}", "shape"] }
+
+[[case]]
+name = "memory_get_shape-the-block-reserved-as-asked"
+run = ["{out}/storage{exe}", "shape"]
+claims = { matches = ["the shared block reserves more than it uses: yes.*a plain module's private block reserves what it uses: yes.*the shared block is whole guarded pages: yes.*a plain module's private block is not rounded to one: yes.*alive"] }
+false = { run = ["{out}/storage{exe}", "changes"] }

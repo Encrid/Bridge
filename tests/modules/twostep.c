@@ -20,6 +20,9 @@ static uint32_t position;
 static uint32_t doubling;
 static uint32_t adding;
 static uint32_t showing;
+#ifdef THIRD
+static uint32_t adding_again;
+#endif
 
 static uint32_t get_first_row(uint32_t query)
 {
@@ -55,6 +58,16 @@ BRIDGE_EXPORT(more) int more(void)
     return (0);
 }
 
+#ifdef THIRD
+BRIDGE_EXPORT(again) int again(void)
+{
+    uint32_t at = get_first_row(adding_again);
+
+    BRIDGE_SET(position_t, x, at, BRIDGE_GET(position_t, x, at) + 2.0f);
+    return (0);
+}
+#endif
+
 /*
 ** show
 **
@@ -85,6 +98,9 @@ BRIDGE_EXPORT(init) int init(void)
     terms[0].slot = position;
     doubling = BRIDGE_ADD_SYSTEM("twice", "update", terms, 1, nullptr, 0);
     adding = BRIDGE_ADD_SYSTEM("more", "update", terms, 1, nullptr, 0);
+#ifdef THIRD
+    adding_again = BRIDGE_ADD_SYSTEM("again", "update", terms, 1, nullptr, 0);
+#endif
     terms[0].access = BRIDGE_READ;
     showing = BRIDGE_ADD_SYSTEM("show", "present", terms, 1, nullptr, 0);
     BRIDGE_ATTACH(bridge_spawn(), position, p);

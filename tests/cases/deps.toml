@@ -1,0 +1,6 @@
+[[case]]
+name = "deps"
+alone = true
+run = ["{python}", "{root}/tools/deps.py", "{out}", "--check"]
+claims = { status = 0 }
+false = { run = ["{python}", "{root}/tools/deps.py", "{out}/backends", "--check"] }

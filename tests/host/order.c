@@ -18,6 +18,10 @@ static const bridge_order_t TEST_PAIRS[2] = {
     { "view:halver:halve", "game:mover:move" }
 };
 
+static const bridge_order_t TEST_OWN_CYCLE[1] = {
+    { "game:twostep:again", "game:twostep:twice" }
+};
+
 static void load_three(host_t *h)
 {
     bridge_artifact_t a;
@@ -78,4 +82,15 @@ void test_order_in_a_cycle(host_t *h)
     h->cfg.order = TEST_PAIRS;
     h->cfg.order_count = 2;
     host_open_only(h);
+}
+
+void test_order_own_in_a_cycle(host_t *h)
+{
+    h->cfg.order = TEST_OWN_CYCLE;
+    h->cfg.order_count = 1;
+    if (host_open(h))
+        return;
+    test_load_guarded_minting(h, "game:twostep@0.1.0", "twostep_third");
+    host_run_frames_unsaid(h->b, 1);
+    host_close(h);
 }
