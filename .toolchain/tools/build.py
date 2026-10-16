@@ -46,7 +46,13 @@ def put(path, data):
         path.write_bytes(data)
 
 
-def built(config, values, artifact):
+def moved(path, tree):
+    if tree and path.split('/', 1)[0] in ('src', 'include'):
+        return (Path(tree) / path).as_posix()
+    return path
+
+
+def planned(config, values, artifact, tree=None):
     kind = config['kinds'][artifact['kind']]
     mine = dict(values)
     if 'target' in artifact:
@@ -58,11 +64,17 @@ def built(config, values, artifact):
         die('no file matches the sources of %s' % name)
     output = Path(values['out']) / artifact.get('folder', '') / expand(kind['output'], mine)
     work = Path(values['out']) / 'obj' / name
-    mine.update(sources=sources, output=output.as_posix(), work=work.as_posix(),
+    mine.update(sources=[moved(source, tree) for source in sources], output=output.as_posix(), work=work.as_posix(),
                 defines=['-D' + define for define in expanded(artifact.get('defines', []), mine)],
-                include=['-I' + folder for folder in expanded(artifact.get('include', []), mine)],
+                include=['-I' + moved(folder, tree) for folder in expanded(artifact.get('include', []), mine)],
                 flags=expanded(artifact.get('flags', []), mine),
                 link=expanded(artifact.get('link', []), mine), manifest=expanded(artifact.get('manifest', []), mine))
+    return kind, mine
+
+
+def built(config, values, artifact, tree=None):
+    kind, mine = planned(config, values, artifact, tree)
+    name, output, work = mine['name'], Path(mine['output']), Path(mine['work'])
     output.parent.mkdir(parents=True, exist_ok=True)
     work.parent.mkdir(parents=True, exist_ok=True)
     missing = [file for file in mine['link'] if not Path(file).is_file()]
@@ -122,17 +134,26 @@ def prepared(args, here=False):
     return config, shared.variables(config, args, target, zig)
 
 
-def build(args, here=False):
+def ready(args, here=False):
     config, values = prepared(args, here)
     fetch.sources(config, values, False)
     tools(config, values)
     take.take(config, values)
-    made, shipped = [], []
+    return config, values
+
+
+def made(config, values, tree=None):
+    done, shipped = [], []
     for artifact in artifacts(config):
-        made.append(built(config, values, artifact))
-        shipped += [] if artifact.get('test') else made[-1][1]
+        done.append(built(config, values, artifact, tree))
+        shipped += [] if artifact.get('test') else done[-1][1]
     packaged(config, values, shipped)
-    return config, values, made
+    return done
+
+
+def build(args, here=False):
+    config, values = ready(args, here)
+    return config, values, made(config, values)
 
 
 def main():

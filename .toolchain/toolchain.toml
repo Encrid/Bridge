@@ -130,6 +130,9 @@ steps = [
     { copy = ["{sources}", "{output}"] },
 ]
 
+[branches]
+dump = ["{zig}", "cc", "-target", "{triple}", "-mcpu={cpu}", "{optimize}", "{float}", "{errno}", "{language}", "-Wno-unused-command-line-argument", "{define}", "{defines}", "{include}", "{flags}", "-fsyntax-only", "-Xclang", "-ast-dump=json", "-o", "{work}.dump", "{source}"]
+
 [style]
 columns = 80
 lines = 20

@@ -11,6 +11,7 @@ import threading
 import tomllib
 from pathlib import Path
 
+import branches
 import build
 import shared
 from said import checked
@@ -199,8 +200,7 @@ def test(config, values, outputs, groups, broken, said, copies):
               '%s: %d cases: %d as written' % (group, len(cases), right))
     if said:
         (Path(values['out']) / 'said.txt').write_text('\n'.join(texts), encoding='utf-8', newline='\n')
-    if wrong:
-        die(('still as written with their claims made false: ' if broken else 'not as written: ') + ', '.join(wrong))
+    return wrong
 
 
 def groups_of(values, folder):
@@ -224,8 +224,30 @@ def chosen(groups, part):
     return [(group, cases) for group, cases in found if cases] or die('no case has %s in its name' % part)
 
 
+def measured(args):
+    if args.broken or args.toolchain or args.copies or args.rounds:
+        die('--branches runs each case one time: it takes no --break, --toolchain, --copies or --rounds')
+    config, values = build.ready(args, True)
+    values['out'] = (Path(values['build']) / 'branches' / values['target']).as_posix()
+    probes, gaps = branches.probed(config, values)
+    made = build.made(config, values, branches.tree(values))
+    unlinked = [name for name, paths in made if not paths]
+    if unlinked:
+        die('the cases need what is linked: ' + ' '.join(unlinked))
+    groups = groups_of(values, 'tests/cases')
+    groups = chosen(groups, args.k) if args.k and groups else groups
+    hits = Path(values['out']) / 'hits.txt'
+    hits.unlink(missing_ok=True)
+    os.environ['C23_BRANCHES'] = str(hits)
+    test(config, values, {name: paths[0] for name, paths in made}, groups, False, False, 1)
+    branches.reported(probes, gaps, hits)
+
+
 def main():
-    args = shared.arguments('-k', ('--copies', int), ('--rounds', int), broken='--break', toolchain='--toolchain')
+    args = shared.arguments('-k', ('--copies', int), ('--rounds', int), broken='--break', toolchain='--toolchain',
+                            branches='--branches')
+    if args.branches:
+        return measured(args)
     if args.toolchain:
         config, values = build.prepared(args, True)
         made = []
@@ -245,7 +267,10 @@ def main():
     for done in range(rounds):
         if rounds > 1:
             print('round %d of %d' % (done + 1, rounds))
-        test(config, values, {name: paths[0] for name, paths in made}, groups, args.broken, own, copies)
+        wrong = test(config, values, {name: paths[0] for name, paths in made}, groups, args.broken, own, copies)
+        if wrong:
+            die(('still as written with their claims made false: ' if args.broken else 'not as written: ')
+                + ', '.join(wrong))
     if own:
         checked(Path(values['root']), Path(values['out']))
 

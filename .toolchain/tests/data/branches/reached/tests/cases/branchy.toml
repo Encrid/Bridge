@@ -1,0 +1,23 @@
+[[case]]
+name = "nothing"
+run = ["{out}/branchy{exe}"]
+claims = { status = 0, line = ["sign 0"] }
+false = { run = ["{out}/branchy{exe}", "1"] }
+
+[[case]]
+name = "one"
+run = ["{out}/branchy{exe}", "1"]
+claims = { status = 0, line = ["one", "sign 1"] }
+false = { run = ["{out}/branchy{exe}", "2"] }
+
+[[case]]
+name = "two and a flag"
+run = ["{out}/branchy{exe}", "2", "flag"]
+claims = { status = 0, line = ["two", "both"] }
+false = { run = ["{out}/branchy{exe}", "2"] }
+
+[[case]]
+name = "below zero"
+run = ["{out}/branchy{exe}", "-1"]
+claims = { status = 0, line = ["other", "sign -1"] }
+false = { run = ["{out}/branchy{exe}", "1"] }

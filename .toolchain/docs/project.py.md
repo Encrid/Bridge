@@ -53,6 +53,7 @@ If the command is not in the table, `project.py` stops with the message
 | `--copies <number>` | Runs this number of copies of each case at the same time. It is an option of `test` only. |
 | `--rounds <number>` | Runs all the cases this number of times. It is an option of `test` only. |
 | `--toolchain` | Runs the cases of the toolchain, in place of the cases of the project. It is an option of `test` only. |
+| `--branches` | Builds the project with probes, runs each case one time, and writes each branch that no case reaches. It is an option of `test` only. |
 | `--all` | Removes all of the output folder. The command `distclean` gives this option to `.toolchain/tools/clean.py`. |
 | `--commits <range>` | Checks the messages of the commits of this range of git. It is an option of `check` only. |
 
@@ -72,6 +73,8 @@ zig and its caches stay in the folder of `project.py`.
 - `pack` writes one zip file, `<build>/<project>-<target>.zip`. `<project>` is the value of `[project] name`.
 - Each case runs in its own empty folder, `<build>/<target>/cases/<group>/<number>`.
 - `test` writes the output of the commands of all the cases into `<build>/<target>/said.txt`, but not with `--break`.
+- `test --branches` puts the sources with the probes into `<build>/branches/tree`, and its build, its cases and the
+  file of the hits `hits.txt` into `<build>/branches/<target>`.
 - The caches of zig are in `build/zig-cache` of the folder of `project.py`. Thus a build does not use a cache of the machine.
 
 `build` writes the path of each artifact.

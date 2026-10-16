@@ -27,6 +27,7 @@ The three layers are a host, Bridge and the modules. A module runs on a backend,
 | `python project.py pack` | Packs the library and its headers for a release. |
 | `python project.py test` | Runs the tests. |
 | `python project.py test --break` | Runs the tests with their claims made false. Each test must fail. |
+| `python project.py test --branches` | Runs the tests on a build with probes. Each branch of the code must run. |
 | `python project.py check` | Checks the project. |
 | `python project.py clean` | Removes what the build made. Keeps what `fetch` downloaded. |
 | `python project.py distclean` | Removes the folder `build`, also what `fetch` downloaded. |

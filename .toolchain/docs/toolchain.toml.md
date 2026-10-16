@@ -57,6 +57,14 @@ The `runs_on` of `aarch64-windows-gnu` is empty. Thus the tools build it, and do
 | `archive` | `{name}.a` | `zig build-lib -static` compiles the sources into a static library. It does not report a flag that it does not use. |
 | `file` | `{name}` | It copies the one source to the output. |
 
+## [branches]
+
+`dump` is the command that gives the syntax tree of one source as JSON, for `test --branches`.
+It has the variables of the kinds, and `{source}`, the path of the source.
+It does not report a flag that it does not use, since it compiles nothing.
+Its `-o` names a file in the folder `obj`. Without it, zig would leave an empty `a.out` in the root of the project.
+`.toolchain/docs/branches.py.md` tells how the tree is used.
+
 ## [style]
 
 These keys are the limits of the style of the code. The check of the style reads them.

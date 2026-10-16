@@ -123,12 +123,30 @@ Thus the break run shows that each case can fail.
 
 `test` refuses a case that has no false variant, also without `--break`.
 
+## The branches
+
+Each branch of the code must run in a case.
+`python project.py test --branches` builds the project with probes in each function of `src` and of `include`.
+It runs each case one time. Then it writes a line for each branch that no case runs:
+
+- a condition that no case makes true, or that no case makes false. A test with `&&` or `||` counts by its parts;
+- a `case` or a `default` that no case reaches;
+- a function that no case calls.
+
+For each line, write a case that runs the branch, or remove the branch.
+A condition in an argument or in the body of a macro cannot get a probe. The run writes it, and stops.
+Thus write such a condition outside the macro.
+
+The probes change the program, thus the run does not judge the claims. It writes the verdicts only for information.
+`.toolchain/docs/branches.py.md` tells how the probes work.
+
 ## Run the tests
 
 | Command | Result |
 | --- | --- |
 | `python project.py test` | Runs each case. |
 | `python project.py test --break` | Runs the false variant of each case. Each case must fail. |
+| `python project.py test --branches` | Runs each case one time on a build with probes. Each branch must run. |
 | `python project.py test -k <part>` | Runs only the cases whose name contains `<part>`. |
 | `python project.py test --copies <number>` | Runs this number of copies of each case at the same time. Each copy must pass. |
 | `python project.py test --rounds <number>` | Runs all the cases this number of times, one round after the other. |

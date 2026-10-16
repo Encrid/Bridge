@@ -1,0 +1,17 @@
+# .toolchain/tests/cases/branches.toml
+
+The group `branches` checks `.toolchain/tools/branches.py`, through `test --branches` of `.toolchain/tools/test.py`.
+Each case runs `test.py` on a project of `.toolchain/tests/data/branches`, with its output in `{case}/out`.
+
+| Project | Content |
+| --- | --- |
+| `missed` | The program `branchy` and its header `branchy.h`. One case runs it with `1`. Thus one function, two labels and six outcomes of conditions are not reached. One test with `\|\|` is in an argument of the macro `CHECKED`. |
+| `reached` | The same program, with no function that no case calls and no macro. Four cases reach each outcome. |
+| `empty` | A project with no source and no case. |
+
+| Case | Claim | False variant |
+| --- | --- | --- |
+| branches that no case reaches | `test` writes a line for a function, a label, a condition never false, a condition never true, a condition in a macro and a condition of the header. Then it writes `branches: 17 outcomes, 9 reached`, and stops. | The project `reached`. |
+| each branch reached | `test` writes `branches: 16 outcomes, 16 reached`, and ends with 0. | The project `missed`. |
+| branches of a project with no source | `test` writes `branches: 0 outcomes, 0 reached`, and ends with 0. | The project `reached`. |
+| branches with a false variant | `test --branches --break` stops: `--branches runs each case one time`. | No `--break`. |

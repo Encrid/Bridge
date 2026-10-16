@@ -23,14 +23,15 @@
 | `tried(config, values, outputs, where, case, broken)` | Runs one case. |
 | `judged(config, group, broken, run)` | Gives the verdict of one run of a case. |
 | `verdict(config, values, outputs, group, index, case, broken, copies)` | Runs the copies of one case at the same time, and gives their verdict. |
-| `test(config, values, outputs, groups, broken, said, copies)` | Runs all the groups, and writes each verdict. With `said`, it writes `said.txt`. |
+| `test(config, values, outputs, groups, broken, said, copies)` | Runs all the groups, and writes each verdict. With `said`, it writes `said.txt`. It gives the names of the cases that failed. |
 | `chosen(groups, part)` | Gives only the cases whose name contains `part`. It stops if no case has it: `no case has <part> in its name`. |
 | `groups_of(values, folder)` | Reads and checks the groups of a folder: `tests/cases`, or `.toolchain/tests/cases`. |
+| `measured(args)` | Runs the command `test --branches`, as *The branches* tells. |
 | `main()` | Runs the command `test`. |
 
 ## main
 
-`main` does these steps:
+With `--branches`, `main` runs `measured`, and nothing else. Else `main` does these steps:
 
 1. It builds with `build`, which stops if the target does not run on this machine. With `--toolchain`, it only calls `prepared` of `build.py`, and builds nothing.
 2. It stops if an artifact is not linked: `the cases need what is linked: <names>`.
@@ -42,7 +43,7 @@
 
 The number of copies is `--copies`, or `[test] copies`. If neither gives it, `main` stops: `.toolchain/project.toml: write [test] copies`.
 
-`test` stops at step 6 if a case failed. Thus step 7 runs only if each case passed.
+`main` stops at step 6 if a case failed. Thus step 7 runs only if each case passed.
 `.toolchain/docs/said.py.md` gives the checks of step 7.
 
 The message of step 1 is `<target> does not run here: build it, and test it where it runs`.
@@ -106,3 +107,22 @@ If a case failed, `test` stops with the names of the cases that failed, after it
 `holds` tells if each claim of a case is true. It replaces the variables in each text of the claims.
 The output of a command is what it writes to its output and to its errors, without the carriage returns.
 A claim `line` compares full lines. A claim `order` ignores the spaces at the start and at the end of a line.
+
+## The branches
+
+`measured` does these steps:
+
+1. It stops with one of these options: `--break`, `--toolchain`, `--copies` or `--rounds`.
+2. It does the steps 1 to 10 of a build with `ready` of `build.py`.
+3. It sets the output folder of the target to `<build>/branches/<target>`.
+4. It writes the sources with their probes, with `probed` of `branches.py`.
+5. It builds the artifacts from these sources, with `made` of `build.py`.
+6. It stops if an artifact is not linked, as step 2 of *main* tells.
+7. It reads the groups of `tests/cases`. With `-k`, it keeps only the cases whose name contains the part.
+8. It sets the variable `C23_BRANCHES` of the environment to `<build>/branches/<target>/hits.txt`.
+9. It runs each case one time, and writes its verdict. A case that fails does not stop it.
+10. It writes the report, with `reported` of `branches.py`.
+
+The message of step 1 is `--branches runs each case one time: it takes no --break, --toolchain, --copies or --rounds`.
+`ready` stops at step 2 if the target does not run on this machine.
+`.toolchain/docs/branches.py.md` tells what the probes measure, and what the report contains.

@@ -2,7 +2,7 @@
 
 `build.py` builds the artifacts of the project, and lists them in `package.txt`.
 With `--pack`, it also puts the package into a zip file.
-`test.py` uses its function `build`.
+`test.py` uses its functions `build`, `prepared`, `ready` and `made`. `branches.py` uses `artifacts` and `planned`.
 
 ## Functions
 
@@ -12,11 +12,15 @@ With `--pack`, it also puts the package into a zip file.
 | `leb(n)` | Gives a number as an unsigned LEB128, the format of the numbers of WebAssembly. |
 | `do(step, values, unstamped)` | Does one step of a kind. |
 | `put(path, data)` | Writes a file only if it is not there or is different. |
-| `built(config, values, artifact)` | Builds one artifact. It gives the name of the artifact and its files. |
+| `moved(path, tree)` | Gives the path in `tree` for a path of `src` or of `include`, and else the path. With no tree, it gives the path. |
+| `planned(config, values, artifact, tree)` | Gives the kind and the variables of one artifact, as steps 1 to 4 of *Artifacts* tell. |
+| `built(config, values, artifact, tree)` | Builds one artifact. It gives the name of the artifact and its files. |
 | `packaged(config, values, made)` | Writes `package.txt`. |
 | `packed(config, values)` | Writes the zip of the package. Then it writes the path of the zip and the names in it. |
 | `artifacts(config)` | Gives each artifact, and after it each of its variants. |
 | `prepared(args, here)` | Gives the configuration and the variables, as steps 1 to 8 of *build* tell. |
+| `ready(args, here)` | Does the steps 1 to 10 of *build*, and gives the configuration and the variables. |
+| `made(config, values, tree)` | Builds each artifact and writes `package.txt`: step 11 of *build*. It gives the name and the files of each artifact. |
 | `build(args, here)` | Does all the steps of a build. With `here`, it stops if the target does not run here. |
 | `main()` | Runs the commands `build` and `pack`. |
 
@@ -47,7 +51,7 @@ With `--pack`, it then writes the zip with `packed`.
 
 ## Artifacts
 
-`built` does these steps for an artifact:
+`built` does these steps for an artifact. `planned` does the steps 1 to 4:
 
 1. If the artifact gives a `target`, it uses the keys of that target and its name as `{target}`.
 2. It replaces the variables of the name, and finds the sources.
@@ -56,6 +60,10 @@ With `--pack`, it then writes the zip with `packed`.
 5. It makes the folder of the output, and the folder `obj`.
 6. If a file of `link` is not there, it does the `unlinked` steps of the kind.
 7. Else, it does the `steps` of the kind, and copies the `beside` files into the folder of the output.
+
+With a tree, step 4 changes each path that is in `src` or in `include`, for the sources and the folders of `include`.
+It gives the copy of the path in the tree.
+`test --branches` builds so, from the copy with the probes: `.toolchain/docs/branches.py.md`.
 
 An artifact with a `target` stays in the output folder of the build.
 Thus a build for one target can make a file for a different target, for example a library for each system.
