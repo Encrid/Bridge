@@ -805,7 +805,7 @@ Bridge writes one of these records when a module of `BRIDGE_FAIL` stops the worl
 - `the world has stopped: module '<module>' could not be reloaded and its on_error is fail`
 
 Each later call that the stopped world refuses writes the same record.
-Bridge writes one of these records, at the level 0, when the world runs again:
+Bridge writes one of these records, at the level `BRIDGE_INFO`, when the world runs again:
 
 - `the world runs again: module '<module>' is back`
 - `the world runs again: module '<module>' is unloaded, and it goes on without it`
