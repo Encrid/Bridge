@@ -36,3 +36,21 @@ void test_keep_two_shares(host_t *h)
     test_say_modules(h);
     host_close(h);
 }
+
+void test_keep_for_another(host_t *h)
+{
+    bridge_artifact_t a;
+
+    h->cfg.budget.persistent = 1024;
+    if (host_open(h))
+        return;
+    test_state_guarded_minting(&a, "game:other@0.1.0", "settings");
+    host_load(h, &a);
+    load_settings(h, 128);
+    host_unload(h, "game:settings@0.1.0");
+    test_state_configured(h, &a, "game:third@0.1.0");
+    a.cfg.persistent = 128;
+    host_load(h, &a);
+    test_say_modules(h);
+    host_close(h);
+}

@@ -257,6 +257,12 @@ claims = { matches = ["nine:first@0.2.0: reloaded.*which is already the settings
 false = { run = ["{out}/host{exe}", "bridge_load-failed-init-log-given"] }
 
 [[case]]
+name = "module_config.settings-kept-share-left-to-its-stem"
+run = ["{out}/host{exe}", "module_config.settings-kept-share-left-to-its-stem"]
+claims = { matches = ["game:settings@0.1.0: unloaded.*game:third@0.1.0: loaded.*alive"], matches_not = ["did not load"] }
+false = { run = ["{out}/host{exe}", "module_config.settings-kept-share-given-back"] }
+
+[[case]]
 name = "module_config.settings-kept-share-given-back"
 run = ["{out}/host{exe}", "module_config.settings-kept-share-given-back"]
 claims = { matches = ["game:other@0.1.0: unloaded.*game:settings@0.1.0: loaded.*modules: game:settings@0.1.0=RUNNING \\(1\\).*alive"] }
@@ -1349,6 +1355,126 @@ name = "order.own-order-orders-no-other-module"
 run = ["{out}/host{exe}", "order.own-order-orders-no-other-module"]
 claims = { matches = ["module 'game:twostep@0.1.0' did not load: 'game:mover:move' and 'game:twostep:more' both touch 'game:Position' in phase 'update', one of them writing it, and nothing orders them.*alive"] }
 false = { run = ["{out}/host{exe}", "order.chain-through-an-unloaded-system-stands"] }
+
+[[case]]
+name = "module_config.setting-enum-as-an-integer-taken"
+run = ["{out}/host{exe}", "module_config.setting-enum-as-an-integer-taken"]
+claims = { matches = ["game:settings@0.1.0: loaded.*alive"], matches_not = ["did not load"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-out-of-range-refused"] }
+
+[[case]]
+name = "module_config.setting-enum-out-of-range-refused"
+run = ["{out}/host{exe}", "module_config.setting-enum-out-of-range-refused"]
+claims = { matches = ["did not load: its setting 'mode' is -200, which the enum of the field it names cannot hold.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-as-an-integer-taken"] }
+
+[[case]]
+name = "module_config.setting-enum-as-a-bool-refused"
+run = ["{out}/host{exe}", "module_config.setting-enum-as-a-bool-refused"]
+claims = { matches = ["did not load: its setting 'mode' is a bool, and the field it names is an enum.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-as-an-integer-taken"] }
+
+[[case]]
+name = "module_config.setting-bitmask-as-a-bool-refused"
+run = ["{out}/host{exe}", "module_config.setting-bitmask-as-a-bool-refused"]
+claims = { matches = ["did not load: its setting 'flags' is a bool, and the field it names is a bitmask.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-as-an-integer-taken"] }
+
+[[case]]
+name = "module_config.setting-bitmask-out-of-range-refused"
+run = ["{out}/host{exe}", "module_config.setting-bitmask-out-of-range-refused"]
+claims = { matches = ["did not load: its setting 'flags' is 4294967296, which the bitmask of the field it names cannot hold.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-as-an-integer-taken"] }
+
+[[case]]
+name = "bridge_setting_t-kind-zero-refused"
+run = ["{out}/host{exe}", "bridge_setting_t-kind-zero-refused"]
+claims = { matches = ["did not load: its setting 'vsync' has the kind 0, which is no kind of a setting.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-as-an-integer-taken"] }
+
+[[case]]
+name = "module_config.setting-of-no-field-refused"
+run = ["{out}/host{exe}", "module_config.setting-of-no-field-refused"]
+claims = { matches = ["did not load: its settings have a key 'titel', and 'game:Settings' has no field of that name.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-as-an-integer-taken"] }
+
+[[case]]
+name = "module_config.setting-bool-as-an-integer-refused"
+run = ["{out}/host{exe}", "module_config.setting-bool-as-an-integer-refused"]
+claims = { matches = ["did not load: its setting 'vsync' is an integer, and the field it names is a bool.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-as-an-integer-taken"] }
+
+[[case]]
+name = "module_config.setting-bool-false-taken"
+run = ["{out}/host{exe}", "module_config.setting-bool-false-taken"]
+claims = { matches = ["game:settings@0.1.0: loaded.*alive"], matches_not = ["did not load"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-out-of-range-refused"] }
+
+[[case]]
+name = "module_config.setting-integer-out-of-range-refused"
+run = ["{out}/host{exe}", "module_config.setting-integer-out-of-range-refused"]
+claims = { matches = ["did not load: its setting 'small' is -1, which the field it names cannot hold.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-as-an-integer-taken"] }
+
+[[case]]
+name = "module_config.setting-integer-as-a-float-refused"
+run = ["{out}/host{exe}", "module_config.setting-integer-as-a-float-refused"]
+claims = { matches = ["did not load: its setting 'width' is a float, and the field it names is an integer.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-as-an-integer-taken"] }
+
+[[case]]
+name = "module_config.setting-text-as-an-integer-refused"
+run = ["{out}/host{exe}", "module_config.setting-text-as-an-integer-refused"]
+claims = { matches = ["did not load: its setting 'path' is an integer, and the field it names is a struct, which only text into a bridge_text_t fills.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-as-an-integer-taken"] }
+
+[[case]]
+name = "module_config.setting-char-array-as-an-integer-refused"
+run = ["{out}/host{exe}", "module_config.setting-char-array-as-an-integer-refused"]
+claims = { matches = ["did not load: its setting 'title' is an integer, and the field it names is an array, which only text into a char array fills.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-as-an-integer-taken"] }
+
+[[case]]
+name = "module_config.settings-text-with-no-persistent-refused"
+run = ["{out}/host{exe}", "module_config.settings-text-with-no-persistent-refused"]
+claims = { matches = ["did not load: its settings hold 24 bytes of text, and its persistent share has 0 left.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-as-an-integer-taken"] }
+
+[[case]]
+name = "module_config.config-an-enum-refused"
+run = ["{out}/host{exe}", "module_config.config-an-enum-refused"]
+claims = { matches = ["did not load: its config is 'game:mode_t', which is not a struct its init declared.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-as-an-integer-taken"] }
+
+[[case]]
+name = "module_config.setting-enums-of-three-bases-taken"
+run = ["{out}/host{exe}", "module_config.setting-enums-of-three-bases-taken"]
+claims = { matches = ["game:settings@0.1.0: loaded.*alive"], matches_not = ["did not load"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enum-of-uint8-below-zero-refused"] }
+
+[[case]]
+name = "module_config.setting-enum-of-uint8-below-zero-refused"
+run = ["{out}/host{exe}", "module_config.setting-enum-of-uint8-below-zero-refused"]
+claims = { matches = ["did not load: its setting 'eu8' is -1, which the enum of the field it names cannot hold.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enums-of-three-bases-taken"] }
+
+[[case]]
+name = "module_config.setting-enum-of-uint8-past-255-refused"
+run = ["{out}/host{exe}", "module_config.setting-enum-of-uint8-past-255-refused"]
+claims = { matches = ["did not load: its setting 'eu8' is 256, which the enum of the field it names cannot hold.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enums-of-three-bases-taken"] }
+
+[[case]]
+name = "module_config.setting-text-into-a-text-array-refused"
+run = ["{out}/host{exe}", "module_config.setting-text-into-a-text-array-refused"]
+claims = { matches = ["did not load: its setting 'names' is text, and the field it names is an array, which only text into a char array fills.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enums-of-three-bases-taken"] }
+
+[[case]]
+name = "module_config.setting-into-a-struct-field-refused"
+run = ["{out}/host{exe}", "module_config.setting-into-a-struct-field-refused"]
+claims = { matches = ["did not load: its setting 'pair' is an integer, and the field it names is a struct, which only text into a bridge_text_t fills.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.setting-enums-of-three-bases-taken"] }
 
 [[case]]
 name = "module_config.identity-none-refused"

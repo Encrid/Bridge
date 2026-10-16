@@ -16,6 +16,16 @@ BRIDGE_EXPORT(init) int init(void)
         BRIDGE_TABLE);
     BRIDGE_DECLARE(BRIDGE_BITMASK, "game:flags_t", flags_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
+#ifdef MORE
+    BRIDGE_DECLARE(BRIDGE_ENUM, "game:e16_t", e16_t, BRIDGE_STRIP,
+        BRIDGE_TABLE);
+    BRIDGE_DECLARE(BRIDGE_ENUM, "game:e32_t", e32_t, BRIDGE_STRIP,
+        BRIDGE_TABLE);
+    BRIDGE_DECLARE(BRIDGE_ENUM, "game:eu8_t", eu8_t, BRIDGE_STRIP,
+        BRIDGE_TABLE);
+    BRIDGE_DECLARE(BRIDGE_STRUCT, "game:pair_t", pair_t, BRIDGE_STRIP,
+        BRIDGE_TABLE);
+#endif
     settings = BRIDGE_COMPONENT("game:Settings", settings_t, BRIDGE_DELETE,
         KEPT);
     terms[0].slot = settings;

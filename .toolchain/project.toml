@@ -1582,6 +1582,16 @@ defines = ["BRIDGE_ROWS_CHECKED", "KEPT=BRIDGE_SINGLETON"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "settings-wide"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/settings/lifecycle.c", "tests/modules/settings/show.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "KEPT=BRIDGE_SINGLETON", "MORE"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "kept-unset"
 kind = "library"
 test = true
