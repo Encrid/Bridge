@@ -86,6 +86,12 @@ The fingerprint of a type covers its own text, and not the texts of the types th
 Each of those types has its fingerprint, which `declare` checks when the module declares it.
 Thus `declare` refuses a module built for an older `Vec3` at `Vec3`, before `Body`.
 
+The fingerprint is the 64-bit FNV-1a hash of the descriptor, XOR the kind.
+FNV-1a is not a cryptographic hash, so an author can make two descriptors with one fingerprint.
+Bridge then takes them as one layout.
+It still refuses another size or alignment of a type that it holds, and a move to another storage layout copies the smaller size.
+So such a pair changes how a module reads the bytes of the type, and nothing more than its grants allow.
+
 ## Messages
 
 `declare` writes this reason when it refuses a descriptor, and the record of the host gives it: `docs/extern/bridge_abi.h.md`, *Messages*.

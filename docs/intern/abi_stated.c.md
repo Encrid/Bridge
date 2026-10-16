@@ -30,6 +30,9 @@ It changes when a field is added, removed, given another type, or put in another
 
 A module built against another layout of a component is refused when it declares it, and does not read the wrong bytes.
 At a reload, `docs/intern/abi_replace.c.md` compares the fingerprints, and lays out the type again where it may.
+
+An author can make two descriptors with one fingerprint, since FNV-1a is not a cryptographic hash.
+Bridge takes such a pair as one layout, and the checks of size, of moves and of fields keep it safe: `docs/intern/abi_relay_fields.c.md`.
 The fingerprint of a component covers its own body, and not the bodies of the types that it names.
 Those are declared, each with a fingerprint of its own, and checked where they are declared.
 So a module built against an older `Vec3` is refused at `Vec3`, before `Body`.

@@ -22,6 +22,10 @@ A field is of the type that it was if all of these are true:
 - Where it names a declared type, it names that type, or the type that this reload made of it.
 - It has the same size, unless it is a struct.
 
+Two descriptors with one fingerprint pass `declare` as one layout: `docs/intern/abi_stated.c.md`, *The fingerprint*.
+The test of the size, and the match of a struct inside field by field, find such a pair here.
+So a value is never copied into a field of another size.
+
 ## Functions
 
 | Function | Result |
