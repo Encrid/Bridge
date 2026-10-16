@@ -2175,7 +2175,24 @@ variants = [
     { name = "wrong-system-name-empty", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_empty", "IN_SYSTEM=wrong_do_nothing"] },
     { name = "wrong-system-name-long", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_long", "IN_SYSTEM=wrong_do_nothing"] },
     { name = "wrong-system-name-at", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_at", "IN_SYSTEM=wrong_do_nothing"] },
-    { name = "wrong-observer-name-colon", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observer_name_colon", "IN_SYSTEM=wrong_do_nothing"] }
+    { name = "wrong-observer-name-colon", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observer_name_colon", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-declare-desc-huge", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_desc_huge", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-declare-again", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_again", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-declare-align-other", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_align_other", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-declare-toggle", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_toggle", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-declare-kind-five", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_kind_five", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-declare-tag-with-desc", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_tag_with_desc", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-declare-unload-four", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_unload_four", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-observe-nine-terms", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_nine_terms", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-system-terms-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_terms_outside", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-system-change-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_change_outside", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-observe-many-changes", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_many_changes", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-observe-twice", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_twice", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-system-named-shutdown", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_named_shutdown", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-system-named-reload", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_named_reload", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-system-ghost", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_ghost", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-observe-events-eight", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_events_eight", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-detach-id-zero", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_detach_id_zero"] }
 ]
 
 [[artifact]]

@@ -62,5 +62,22 @@ void wrong_attach_outside(void);
 void wrong_detach_undeclared(void);
 void wrong_attach_tag_value(void);
 void wrong_destroy_zero(void);
+void wrong_declare_desc_huge(void);
+void wrong_declare_again(void);
+void wrong_declare_align_other(void);
+void wrong_declare_toggle(void);
+void wrong_declare_kind_five(void);
+void wrong_declare_tag_with_desc(void);
+void wrong_declare_unload_four(void);
+void wrong_observe_nine_terms(void);
+void wrong_system_terms_outside(void);
+void wrong_system_change_outside(void);
+void wrong_observe_many_changes(void);
+void wrong_observe_twice(void);
+void wrong_system_named_shutdown(void);
+void wrong_system_named_reload(void);
+void wrong_system_ghost(void);
+void wrong_observe_events_eight(void);
+void wrong_detach_id_zero(void);
 
 #endif

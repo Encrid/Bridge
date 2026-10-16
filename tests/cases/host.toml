@@ -1495,6 +1495,108 @@ claims = { matches = [".order. pair 0 does not name two systems.*bridge_create r
 false = { run = ["{out}/host{exe}", "config.order-cycle-refused"] }
 
 [[case]]
+name = "bridge_declaration_t-descriptor-outside-the-scratch-refused"
+run = ["{out}/host{exe}", "bridge_declaration_t-descriptor-outside-the-scratch-refused"]
+claims = { matches = ["did not load: declare: a name or a descriptor lies outside the scratch arena.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "declare-of-the-same-type-again-taken"
+run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"]
+claims = { matches = ["game:wrong@0.1.0: loaded.*alive"], matches_not = ["did not load", "failed"] }
+false = { run = ["{out}/host{exe}", "bridge_declaration_t-kind-past-the-last-refused"] }
+
+[[case]]
+name = "bridge_declaration_t-other-alignment-of-a-held-type-refused"
+run = ["{out}/host{exe}", "bridge_declaration_t-other-alignment-of-a-held-type-refused"]
+claims = { matches = ["did not load: type 'game:Position' is 8 bytes aligned to 8 in the module and 8 aligned to 4 by its descriptor.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "declare-of-a-type-as-another-storage-refused"
+run = ["{out}/host{exe}", "declare-of-a-type-as-another-storage-refused"]
+claims = { matches = ["did not load: type 'game:Position' is stated as a toggle here, and it was declared as a table.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "bridge_declaration_t-kind-past-the-last-refused"
+run = ["{out}/host{exe}", "bridge_declaration_t-kind-past-the-last-refused"]
+claims = { matches = ["did not load: type 'game:Odd': its kind is unset.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "bridge_declaration_t-tag-with-a-descriptor-refused"
+run = ["{out}/host{exe}", "bridge_declaration_t-tag-with-a-descriptor-refused"]
+claims = { matches = ["did not load: type 'game:Odd' is a tag, and a tag has no bytes and no descriptor.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "bridge_declaration_t-on_unload-past-the-last-refused"
+run = ["{out}/host{exe}", "bridge_declaration_t-on_unload-past-the-last-refused"]
+claims = { matches = ["did not load: type 'game:Odd': on_unload is unset.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "observe-more-terms-than-the-budget-refused"
+run = ["{out}/host{exe}", "observe-more-terms-than-the-budget-refused"]
+claims = { matches = ["did not load: an observer asks for 9 terms, which is more than \\[budget\\] terms of 8.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "bridge_system_statement_t-terms-outside-the-scratch-refused"
+run = ["{out}/host{exe}", "bridge_system_statement_t-terms-outside-the-scratch-refused"]
+claims = { matches = ["did not load: system: a name, a term or a change lies outside the scratch arena.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "bridge_system_statement_t-change-outside-the-scratch-refused"
+run = ["{out}/host{exe}", "bridge_system_statement_t-change-outside-the-scratch-refused"]
+claims = { matches = ["did not load: system: a name, a term or a change lies outside the scratch arena.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "bridge_observer_statement_t-more-changes-than-types-refused"
+run = ["{out}/host{exe}", "bridge_observer_statement_t-more-changes-than-types-refused"]
+claims = { matches = ["did not load: an observer states 5 changes, and the module declared 3 types.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "observe-the-same-name-twice-refused"
+run = ["{out}/host{exe}", "observe-the-same-name-twice-refused"]
+claims = { matches = ["did not load: 'again' is registered twice.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "add_system-named-shutdown-refused"
+run = ["{out}/host{exe}", "add_system-named-shutdown-refused"]
+claims = { matches = ["did not load: 'shutdown' is a reserved name, and no system may take it.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "add_system-named-reload-refused"
+run = ["{out}/host{exe}", "add_system-named-reload-refused"]
+claims = { matches = ["did not load: 'reload' is a reserved name, and no system may take it.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "add_system-of-no-export-refused"
+run = ["{out}/host{exe}", "add_system-of-no-export-refused"]
+claims = { matches = ["did not load: no exported function 'ghost'.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "bridge_observer_statement_t-event-there-is-not-refused"
+run = ["{out}/host{exe}", "bridge_observer_statement_t-event-there-is-not-refused"]
+claims = { matches = ["did not load: observe: its events are unset, or name one there is not.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "detach-of-id-0-of-a-table-type-fails"
+run = ["{out}/host{exe}", "detach-of-id-0-of-a-table-type-fails"]
+claims = { matches = ["system 'act' failed: detach: the id 0 is no entity, and 'game:Position' is not a singleton.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
 name = "module_config.identity-none-refused"
 run = ["{out}/host{exe}", "module_config.identity-none-refused"]
 claims = { matches = ["a module with no identity is refused.*alive"] }
