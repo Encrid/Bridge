@@ -31,7 +31,7 @@ bool schema_get_integer(const schema_reader_t *r, int64_t *value, bool *below)
         *value = strtoll(r->word, &end, 0);
     else
         *value = (int64_t)strtoull(r->word, &end, 0);
-    return (!*end && end != r->word && !errno);
+    return (!*end && !errno);
 }
 
 int schema_find_given(const schema_reader_t *r)

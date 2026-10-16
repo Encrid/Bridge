@@ -22,10 +22,8 @@ bool schema_fits(enum schema_kind base, int64_t value, bool below)
             return (!below && bits <= UINT16_MAX);
         case SCHEMA_U32:
             return (!below && bits <= UINT32_MAX);
-        case SCHEMA_U64:
-            return (!below);
         default:
-            return (false);
+            return (!below);
     }
 }
 

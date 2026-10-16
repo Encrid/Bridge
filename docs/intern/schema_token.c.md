@@ -8,8 +8,11 @@ It also copies a text.
 `schema_get_integer` reads a token that begins with a minus sign as signed, with `strtoll`.
 It reads a token that begins with a digit as unsigned, with `strtoull`, and keeps its bits.
 So the bits of a bitmask of 64 bits stay as they are.
-The token is an integer only if the read takes all of it, and `errno` stays 0.
 Both reads use base 0: `0x10` is 16, and a number that begins with 0 is octal, so `010` is 8.
+The token is an integer only if the read takes all of it, and `errno` stays 0.
+
+A read that takes no character leaves `end` on the first character, a digit or a minus sign, which is not the zero byte.
+So the test that `end` is on the zero byte also tells that the read took a character.
 
 ## Functions
 
