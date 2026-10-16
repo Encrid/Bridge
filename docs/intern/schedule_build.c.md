@@ -1,0 +1,41 @@
+# src/schedule_build.c
+
+This file builds the schedule: for each phase, and for the barrier as one more phase, the edges, the refusal, then the levels.
+
+## The steps of a phase
+
+`build_phase` schedules one phase in this order:
+
+1. `schedule_gather_phase` lists the systems of the phase that are not parked.
+2. `schedule_add_stated` adds the edges of the pairs of the deployment.
+3. `schedule_close_matrix` closes the matrix over those edges.
+4. `schedule_add_own` adds the edges that each module states by its order of registration.
+5. `schedule_close_matrix` closes the matrix again.
+6. `schedule_check_phase` refuses the phase if it cannot be scheduled.
+7. `set_levels` gives each system its level.
+
+Step 4 adds no edge from a system to one that already runs before it.
+So the first closure lets a pair of the deployment stand against the order of a module.
+
+## Levels
+
+A level holds each system whose predecessors are all in earlier levels.
+`set_levels` puts each system at level 0, then calls `raise_all` once for each system of the phase.
+`raise_all` makes each system put every system that it runs before at a level after its own.
+A refused phase keeps each system at level 0.
+
+## The loop
+
+`schedule_build` schedules the phases 0 to `phase_count`, where `phase_count` is the barrier.
+All of them use the room of `build_in` and `build_bits`, and only the levels stay in the systems.
+The loop stops at the first refused phase, and `why` then says why.
+
+## Functions
+
+| Function | Result |
+| --- | --- |
+| `raise_after` | Puts each system that system `i` runs before at a level after the level of `i`. |
+| `raise_all` | Calls `raise_after` for each system of the phase. |
+| `set_levels` | Gives each system its level. A refused phase has each system at level 0. |
+| `build_phase` | Schedules one phase. Gives 1 if the phase is refused. |
+| `schedule_build` | Schedules every phase and the barrier. Gives 0, or 1 with `why`. |

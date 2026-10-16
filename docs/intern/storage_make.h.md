@@ -1,0 +1,29 @@
+# src/storage_make.h
+
+This header makes a table for a set that has none, and gives a table back when its last row left.
+
+## A table made
+
+`make_table` gives the table that the hash finds for a set, or makes one.
+A set that holds the type of a sparse set is the table of that set.
+Storage has room for the table of each sparse set beside `[budget] tables`, so it never refuses one of those.
+It gives 0 for a table of an archetype past `[budget] tables`, and when no table id is free.
+A new table is live, with no row and no column yet.
+Storage puts it in the hash, in the list of each system that reads it, and in `dirty`.
+
+## A table given back
+
+`free_table` gives the block of the table back to the column region, and takes the table out of the hash and of each list.
+It makes the columns of the table 0, marks it touched, and puts its id on the free list.
+`close_table` makes the record no table, and keeps what a barrier keeps of it: `incoming`, `sized` and `touched`.
+An id given back at this barrier is in `dirty` already, so `open_table` keeps `touched` when it takes the id again.
+
+## Functions
+
+| Function | Result |
+| --- | --- |
+| `close_table` | Makes a table no table: not live, with no row, no room, no block and no sparse set. |
+| `take_table_id` | Gives a table id that nobody has: one given back, or the next one never used. Gives 0 if there is none. |
+| `open_table` | Makes table `t` the live table of a set, with no row and no column. Writes its set, and puts it in the hash and in the lists. |
+| `make_table` | Gives the table of a set, made if there is none. Gives 0 if there is no room for it. |
+| `free_table` | Gives back a table whose last row left. |

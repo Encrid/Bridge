@@ -1,0 +1,45 @@
+# src/schedule_account.c
+
+This file gives the room in which a dispatch and a schedule work, and the settlement of the failure budgets at a barrier.
+The rules of the budget are in `docs/intern/schedule.h.md`, *The failure budget*.
+
+## The room
+
+`schedule_room` runs once, at create, from `src/bridge_create.c`.
+It allocates these arrays, where `n` is `max_systems`, which is `[budget] systems`, or 1 if that is 0:
+
+| Array | Content |
+| --- | --- |
+| `run_jobs` | The jobs of a level: `n` of `schedule_job_t`. |
+| `run_handed` | A pointer to each job, as `pool_run` gets them. |
+| `run_lists` | The systems that the jobs list, one run of entries for each job. |
+| `run_callers` | A byte for each job: 1 if the job must run on the thread that asked for the phase. |
+| `build_in` | The systems of the phase that `schedule_build` works on. |
+| `build_bits` | The matrix of a phase: `n * ((n + 63) / 64) + 1` words of 64 bits. |
+
+If an allocation fails, `bridge_lacks` writes a record and the function gives 1.
+
+## The settlement at a barrier
+
+`src/block_barrier.c` calls `schedule_account` at the end of each barrier, after the observers ran.
+`schedule_account` settles each module, in the order of the list of modules.
+For one module, `settle_module` does these steps:
+
+1. If `unplaced_now` is set, it adds 1 to `failures`, the count of the module.
+2. If not, and `changed_now` is set and `failures` is above 0, it removes 1.
+3. It clears `changed_now`, `unplaced_now` and `reached` for the next barrier.
+4. It stops nothing if the module is stopped already, or if `max_failures` is not above 0.
+5. It stops the module if a system reached the limit, in `reached`, or if `failures` reached it.
+
+A stopped module gets `stopped`, and `say_stopped` writes a record at the level `BRIDGE_ERR`.
+The record names the system, or says that entities the module changed could not be placed.
+If the module states `BRIDGE_FAIL`, `bridge_stop` stops the deck too.
+
+## Functions
+
+| Function | Result |
+| --- | --- |
+| `schedule_room` | Allocates the room of a dispatch and of a schedule, `[budget] systems` wide. Gives 0, or 1 with a record if there is no memory. |
+| `say_stopped` | Writes the record that a module is stopped: by the system that reached the limit, or by its own count. |
+| `settle_module` | Counts the barrier of one module against its budget, and stops the module if a count reached the limit. |
+| `schedule_account` | Settles each module at a barrier. |

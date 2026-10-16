@@ -1,0 +1,17 @@
+# src/os/posix/mutex.c
+
+This file gives the mutex of `src/os/os.h` on Linux and macOS: a `pthread_mutex_t` in memory from `malloc`.
+Each function keeps the contract of `docs/intern/os/os.h.md`, *Functions*.
+
+## Limits
+
+`os_mutex_create` does not check the result of `pthread_mutex_init`.
+
+## Functions
+
+| Function | Result |
+| --- | --- |
+| `os_mutex_create` | Allocates the mutex with `malloc`, and starts it with the default attributes. Gives `nullptr` if there is no memory. |
+| `os_mutex_free` | Destroys the mutex and frees it. A null mutex does nothing. |
+| `os_mutex_lock` | Locks the mutex with `pthread_mutex_lock`. |
+| `os_mutex_unlock` | Unlocks the mutex with `pthread_mutex_unlock`. |

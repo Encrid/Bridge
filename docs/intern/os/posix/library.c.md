@@ -1,0 +1,19 @@
+# src/os/posix/library.c
+
+This file gives the shared libraries of `src/os/os.h` on Linux and macOS: a library opened, looked into and closed.
+Each function keeps the contract of `docs/intern/os/os.h.md`, *Functions*.
+
+## Opening
+
+`os_lib_open` calls `dlopen` with `RTLD_NOW` and `RTLD_LOCAL`.
+`RTLD_NOW` resolves every symbol of the library before `dlopen` returns.
+`RTLD_LOCAL` keeps the names of the library to itself: they do not resolve the symbols of a library that opens later.
+The loader looks beside a library that a path names, and searches for a bare name, with no flag of this file.
+
+## Functions
+
+| Function | Result |
+| --- | --- |
+| `os_lib_open` | Opens the library with `dlopen`. Gives `nullptr` on failure. |
+| `os_lib_get_symbol` | Gives what `dlsym` finds of `name` in the library, or `nullptr`. |
+| `os_lib_close` | Closes the library with `dlclose`. A null library does nothing. |

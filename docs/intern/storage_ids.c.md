@@ -1,0 +1,25 @@
+# src/storage_ids.c
+
+This file sets ids aside for a module to hand out, and destroys the ones it did not hand out.
+It also gives a singleton its value outside a barrier.
+
+## Ids set aside
+
+A module hands out ids from a block that storage sets aside for it, and each id names a real entity.
+`storage_reserve` takes each index from the free list, or the next index never used, which starts at generation 1.
+An entity set aside has nothing on it: it is in no table, and no query matches it.
+It counts against `[budget] entities`.
+When no index is left, `storage_reserve` takes fewer ids than asked, and gives how many it took.
+
+`storage_give_single` writes the value of a singleton outside a barrier, for the settings of a module.
+Index 0 comes to carry the singleton, and storage tells the observers before it writes the value.
+
+## Functions
+
+| Function | Result |
+| --- | --- |
+| `take_index` | Gives an entity index that nobody has: a freed one, or the next one never used, at its first generation. Gives 0 if no entity is left. |
+| `storage_reserve` | Takes up to `want` ids with nothing on them, and writes each in `ids` and in the entity index for modules. Gives how many it took. |
+| `storage_release` | Destroys each id of `ids` that is alive, with what is on it. Gives back the tables of the sparse sets that have no row. |
+| `storage_is_alive` | Gives whether an id names an entity that exists. |
+| `storage_give_single` | Gives a singleton its value outside a barrier, and tells its observers. |

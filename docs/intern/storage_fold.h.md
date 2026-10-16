@@ -1,0 +1,25 @@
+# src/storage_fold.h
+
+This header gives the fold: what each entity that a barrier changes is becoming, kept beside where it still is.
+
+## The sets of the fold
+
+For each entity, `work` holds the set that it is becoming.
+`attached` holds the types that an attach wrote a value of.
+The fold of an entity starts from what the entity carries now.
+An entity that storage leaves as it was gets the flag `DROPPED`.
+It also gets `SHORT` when columns are short, and not a table.
+
+Such an entity is a failure of each module that asked a change of it, each toward its own budget.
+`write_value` of `src/storage_runs.h` counts it, where it writes the value of the change.
+Running out is in `docs/intern/storage_room.h.md`, *Running out*.
+
+## Functions
+
+| Function | Result |
+| --- | --- |
+| `get_work` | Gives the set of what the entity at `index` is becoming. |
+| `get_attached` | Gives the set of the types that an attach wrote a value of, for the entity at `index`. |
+| `start_fold` | Starts the fold of an entity from what it carries now. |
+| `drop_change` | Leaves an entity as it was, for want of a table, or of columns with `for_columns`. |
+| `is_joining` | Gives whether the entity at `index`, as the fold has it, is to join the sparse set of `slot`. |
