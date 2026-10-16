@@ -20,7 +20,9 @@ So the first closure lets a pair of the deployment stand against the order of a 
 ## Levels
 
 A level holds each system whose predecessors are all in earlier levels.
-`set_levels` puts each system at level 0, then calls `raise_all` once for each system of the phase.
+`set_levels` puts each system at level 0, then calls `raise_all` until a call raises no system.
+A phase that is not refused has no cycle, since `schedule_check_phase` refuses a system that runs before itself.
+So the levels stop growing, and the loop ends.
 `raise_all` makes each system put every system that it runs before at a level after its own.
 A refused phase keeps each system at level 0.
 
@@ -34,8 +36,8 @@ The loop stops at the first refused phase, and `why` then says why.
 
 | Function | Result |
 | --- | --- |
-| `raise_after` | Puts each system that system `i` runs before at a level after the level of `i`. |
-| `raise_all` | Calls `raise_after` for each system of the phase. |
+| `raise_after` | Puts each system that system `i` runs before at a level after the level of `i`. Gives whether it raised one. |
+| `raise_all` | Calls `raise_after` for each system of the phase. Gives whether one call raised a system. |
 | `set_levels` | Gives each system its level. A refused phase has each system at level 0. |
 | `build_phase` | Schedules one phase. Gives 1 if the phase is refused. |
 | `schedule_build` | Schedules every phase and the barrier. Gives 0, or 1 with `why`. |

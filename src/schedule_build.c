@@ -5,42 +5,38 @@
 */
 #include "schedule.h"
 
-static void raise_after(schedule_phase_t *p, uint32_t i)
+static bool raise_after(schedule_phase_t *p, uint32_t i)
 {
     uint32_t level = p->in[i]->level;
-    uint32_t j = 0;
+    bool raised = false;
 
-    while (j < p->n) {
+    for (uint32_t j = 0; j < p->n; j++) {
         if (i != j && schedule_reaches(&p->reach, i, j)
-            && p->in[j]->level <= level)
+            && p->in[j]->level <= level) {
             p->in[j]->level = level + 1;
-        j++;
+            raised = true;
+        }
     }
+    return (raised);
 }
 
-static void raise_all(schedule_phase_t *p)
+static bool raise_all(schedule_phase_t *p)
 {
-    uint32_t i = 0;
+    bool raised = false;
 
-    while (i < p->n) {
-        raise_after(p, i);
-        i++;
-    }
+    for (uint32_t i = 0; i < p->n; i++)
+        raised = raise_after(p, i) || raised;
+    return (raised);
 }
 
 static void set_levels(schedule_phase_t *p, bool refused)
 {
-    uint32_t i = 0;
-    uint32_t k = 0;
+    bool raised = !refused;
 
-    while (i < p->n) {
+    for (uint32_t i = 0; i < p->n; i++)
         p->in[i]->level = 0;
-        i++;
-    }
-    while (k < p->n && !refused) {
-        raise_all(p);
-        k++;
-    }
+    while (raised)
+        raised = raise_all(p);
 }
 
 static int build_phase(bridge_t *b, schedule_phase_t *p)
