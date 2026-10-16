@@ -217,6 +217,8 @@ void test_order_in_a_cycle(host_t *h);
 void test_order_pair_over_own(host_t *h);
 
 void test_order_unnamed(host_t *h);
+
+void test_load_by_identity(host_t *h);
 void test_order_own(host_t *h);
 void test_observe(host_t *h);
 void test_chain(host_t *h);

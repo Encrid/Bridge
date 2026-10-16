@@ -227,7 +227,7 @@ The host states each field: zero is unset, and a load refuses it. A count of an 
 
 | Field | Content |
 | --- | --- |
-| `identity` | The identity of the module: `namespace:name@version`, for example `tri:triangle@0.1.0`. At most 127 bytes. |
+| `identity` | The identity of the module: `namespace:name@version`, for example `tri:triangle@0.1.0`. It has one `:` and one `@`, in this order, and no empty part. At most 127 bytes. |
 | `abi` | The number of the module seam that the module was built against: `docs/extern/bridge_abi.h.md`, *BRIDGE_ABI*. |
 | `trusted` | `BRIDGE_TRUE` if the code of the module needs no containment. |
 | `reloadable` | `BRIDGE_TRUE` if the author of the module states that a reload can replace it. |
@@ -265,7 +265,7 @@ The host states each field: zero is unset, and a load refuses it. A count of an 
 | `losses` | The names of what a reload accepts to lose, `loss_count` of them. |
 | `loss_count` | How many names `losses` holds, or `BRIDGE_NONE`. |
 
-The namespace of a module is the part of its identity before the first colon.
+The namespace of a module is the part of its identity before the colon.
 Bridge finds a loaded module by its identity without the version.
 Thus a load refuses a module whose identity without the version is loaded already.
 
@@ -654,6 +654,7 @@ A function writes one of these records when it refuses the call, and gives 1:
 - `phase '<phase>' is not one the deployment declared`
 - `a module with no identity is refused`
 - `a module with an identity of <count> bytes is refused: an identity has at most 127 bytes`
+- `a module with the identity '<module>' is refused: an identity has the form namespace:name@version`
 - `no module '<module>' is loaded, so none is unloaded`
 - `module '<module>' is not reloaded: nothing of that name is loaded`
 

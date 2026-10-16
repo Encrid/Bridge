@@ -117,6 +117,7 @@ What a module starts from.
 | `module_check_phases` | `src/module_check_fit.c` | Refuses a config whose phase names are unset, mapped twice, or mapped to a phase that the deployment did not declare. |
 | `module_check_stated` | `src/module_check_stated.c` | Refuses a config with a policy, a limit or an amount left unset, or stated as a number that is nobody's. |
 | `module_check_fit` | `src/module_check_fit.c` | Refuses a config whose amounts do not fit: a wrong log level, too many spawns, regions past 32 bits, or a ring too small. |
+| `module_check_identity` | `src/module_identity.c` | Refuses a module with no identity, with an identity of more than 127 bytes, or with one that does not have the form `namespace:name@version`. Gives 1 with a record. |
 | `module_check_backend` | `src/module_check_backend.c` | Refuses a config that states what its backend cannot keep, or that allows what its author says cannot be done. |
 | `module_check` | `src/module_check.c` | Refuses all that a load and a reload both refuse before the artifact is touched, and finds the backend and its demands. Gives 1 with a record. |
 | `module_check_room` | `src/module_check.c` | Refuses a load of a module that is loaded already, one past `[budget] modules`, or a share that does not fit. Gives 1 with a record. |

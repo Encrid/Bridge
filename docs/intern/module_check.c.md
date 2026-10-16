@@ -15,7 +15,9 @@ The manifest holds the identity, then the values that the author states, as `key
 It holds what only the author knows, for example the ABI version, `pinned` and the size of `scratch`.
 The host combines these values with those of the deployment, and Bridge sees one flat struct.
 
-A module is refused if it has no identity, if it names no backend of the deployment, or if it was built for another ABI.
+A module is refused if its identity is missing or of another form.
+It is also refused if it names no backend of the deployment, or if it was built for another ABI.
+`docs/intern/module_identity.c.md` gives the form of an identity.
 
 ## The stem
 
@@ -59,6 +61,6 @@ The demands go to the backend when it compiles the module: `docs/intern/module_i
 | --- | --- |
 | `module_find` | Gives the loaded module of an identity, whatever its version, or `nullptr`. |
 | `find_backend` | Gives the opened backend of a name, or `nullptr`. A null name finds none. |
-| `check_whose` | Refuses an artifact with no identity or one longer than 127 bytes, one that names no backend there is, and one built for another ABI. |
+| `check_whose` | Refuses an artifact whose identity `module_check_identity` refuses, one that names no backend there is, and one built for another ABI. |
 | `module_check_room` | Refuses a module that is loaded already, one more than `[budget] modules`, or a share that does not fit. Gives 1 with a record. |
 | `module_check` | Makes every check that a load and a reload share, and finds the demands of the config. Gives 1 with a record. |

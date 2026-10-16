@@ -69,6 +69,8 @@ int module_check_fit(const module_check_t *k);
 
 int module_check_backend(const module_check_t *k);
 
+int module_check_identity(bridge_t *b, const char *id);
+
 [[nodiscard]] int module_check(module_check_t *k);
 
 [[nodiscard]] int module_check_room(const module_check_t *k);

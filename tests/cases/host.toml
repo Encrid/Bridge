@@ -1261,6 +1261,48 @@ claims = { matches = [".order. pair 0 does not name two systems.*alive"] }
 false = { run = ["{out}/host{exe}", "config.order-cycle-refused"] }
 
 [[case]]
+name = "module_config.identity-with-no-colon-refused"
+run = ["{out}/host{exe}", "module_config.identity-with-no-colon-refused"]
+claims = { matches = ["a module with the identity 'game@0.1.0' is refused: an identity has the form namespace:name@version.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.identity-none-refused"] }
+
+[[case]]
+name = "module_config.identity-with-no-version-refused"
+run = ["{out}/host{exe}", "module_config.identity-with-no-version-refused"]
+claims = { matches = ["a module with the identity 'game:mover' is refused: an identity has the form namespace:name@version.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.identity-none-refused"] }
+
+[[case]]
+name = "module_config.identity-with-an-empty-version-refused"
+run = ["{out}/host{exe}", "module_config.identity-with-an-empty-version-refused"]
+claims = { matches = ["a module with the identity 'game:mover@' is refused: an identity has the form namespace:name@version.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.identity-none-refused"] }
+
+[[case]]
+name = "module_config.identity-with-an-empty-namespace-refused"
+run = ["{out}/host{exe}", "module_config.identity-with-an-empty-namespace-refused"]
+claims = { matches = ["a module with the identity ':mover@0.1.0' is refused: an identity has the form namespace:name@version.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.identity-none-refused"] }
+
+[[case]]
+name = "module_config.identity-with-an-empty-name-refused"
+run = ["{out}/host{exe}", "module_config.identity-with-an-empty-name-refused"]
+claims = { matches = ["a module with the identity 'game:@0.1.0' is refused: an identity has the form namespace:name@version.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.identity-none-refused"] }
+
+[[case]]
+name = "module_config.identity-with-two-colons-refused"
+run = ["{out}/host{exe}", "module_config.identity-with-two-colons-refused"]
+claims = { matches = ["a module with the identity 'game:mo:ver@0.1.0' is refused: an identity has the form namespace:name@version.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.identity-none-refused"] }
+
+[[case]]
+name = "module_config.identity-with-two-at-signs-refused"
+run = ["{out}/host{exe}", "module_config.identity-with-two-at-signs-refused"]
+claims = { matches = ["a module with the identity 'game:mover@0.1.0@2' is refused: an identity has the form namespace:name@version.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.identity-none-refused"] }
+
+[[case]]
 name = "module_config.identity-none-refused"
 run = ["{out}/host{exe}", "module_config.identity-none-refused"]
 claims = { matches = ["a module with no identity is refused.*alive"] }
