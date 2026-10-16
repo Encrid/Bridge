@@ -42,8 +42,10 @@ What a reload may change is what belongs to the instance.
 The new config brings the work limit, the memory limit, the timeouts, the log level and the three sizes of the private memory.
 It brings `spawns` and the grants too, and `persistent`, which only grows.
 A component that the new instance no longer declares goes as at an unload: `docs/intern/module_types.c.md`, *The policies at unload*.
+
 The settings are not seeded again, since after `init` the settings component is the state.
 If the new instance no longer declares the settings component, the record forgets it: its value went by its policy.
+If the reload lays the settings component out again, the new type is the settings component of the record: `src/reload_rows.c`.
 
 The systems of the old instance leave storage before the new instance registers its own, in the places that those had.
 So a reload needs no room for the systems of a module twice: `src/abi_alloc.c`.

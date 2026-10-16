@@ -21,12 +21,14 @@ static void set_move(const declared_type_t *c, storage_move_t *move,
     move->run_count = was->run_count;
 }
 
-static void settle(bridge_t *b, const module_t *n)
+static void settle(bridge_t *b, module_t *n)
 {
     say_t about = { n, nullptr, BRIDGE_WARN };
     uint32_t i = 0;
 
     while (i < n->declared_count) {
+        if (n->config && n->declared[i]->replaces == n->config)
+            n->config = n->declared[i];
         n->declared[i]->replaces = nullptr;
         i++;
     }
@@ -77,7 +79,7 @@ static int refuse_move(reloading_t *r, enum storage_moved moved,
 
 int reload_move_rows(reloading_t *r)
 {
-    const module_t *n = r->n;
+    module_t *n = r->n;
     enum storage_moved moved = STORAGE_MOVED;
     uint32_t count = 0;
 

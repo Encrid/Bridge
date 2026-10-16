@@ -256,6 +256,8 @@ void test_drain_failed_start(host_t *h);
 void test_declare_other_size(host_t *h);
 
 void test_load_long_identity(host_t *h);
+
+void test_reload_settings_layout(host_t *h);
 void test_conflict_at_barrier(host_t *h);
 void test_order_observers(host_t *h);
 void test_reorder_observers(host_t *h);

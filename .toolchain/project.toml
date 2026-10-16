@@ -1246,6 +1246,16 @@ flags = ["{quiet}", "{hidden}", "{system_defines}"]
 variants = [{ name = "spot-wide", defines = ["EXTRA=8"] }]
 
 [[artifact]]
+name = "nine"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/nine.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+variants = [{ name = "nine-wide", defines = ["WIDE"] }]
+
+[[artifact]]
 name = "hold"
 kind = "library"
 test = true

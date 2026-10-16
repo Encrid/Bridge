@@ -251,6 +251,12 @@ claims = { matches = ["long:a+@0.1.0: loaded.*=RUNNING \\(1\\).*alive"] }
 false = { run = ["{out}/host{exe}", "bridge_module_config_t-identity-of-128-bytes-refused"] }
 
 [[case]]
+name = "bridge_reload-new-settings-layout-stays-taken"
+run = ["{out}/host{exe}", "bridge_reload-new-settings-layout-stays-taken"]
+claims = { matches = ["nine:first@0.2.0: reloaded.*which is already the settings of module 'nine:first@0.2.0'.*nine:second@0.1.0: not loaded.*nine:first@0.2.0/show: width 1280.*alive"], matches_not = ["width 7"] }
+false = { run = ["{out}/host{exe}", "bridge_load-failed-init-log-given"] }
+
+[[case]]
 name = "module_config.spans-too-small-refused"
 run = ["{out}/host{exe}", "module_config.spans-too-small-refused"]
 claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }
