@@ -33,3 +33,19 @@ void test_drain_failed_start(host_t *h)
     test_say_modules(h);
     host_close(h);
 }
+
+void test_keep_after_failed_reload(host_t *h)
+{
+    bridge_artifact_t a;
+
+    if (host_open(h))
+        return;
+    test_load_guarded(h, "game:mover@0.1.0", "mover");
+    state_why(&a, "game:keep@0.1.0", "keep");
+    host_load(h, &a);
+    state_why(&a, "game:keep@0.2.0", "keep-fail");
+    host_reload(h, &a);
+    host_run_frames(h, 1);
+    test_say_modules(h);
+    host_close(h);
+}

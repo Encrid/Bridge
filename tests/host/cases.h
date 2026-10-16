@@ -263,6 +263,14 @@ void test_stop_by_spans(host_t *h);
 
 void test_drain_failed_start(host_t *h);
 
+void test_keep_after_failed_reload(host_t *h);
+
+void test_watch_no_room(host_t *h);
+
+void test_name_many_declarers(host_t *h);
+
+void test_two_turns_of_one_module(host_t *h);
+
 void test_declare_other_size(host_t *h);
 
 void test_load_long_identity(host_t *h);

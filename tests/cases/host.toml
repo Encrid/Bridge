@@ -1609,6 +1609,30 @@ claims = { matches = ["observer 'seen' failed: observer 'seen' may not attach 'g
 false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
 
 [[case]]
+name = "bridge_reload-failed-keeps-the-old-systems-running"
+run = ["{out}/host{exe}", "bridge_reload-failed-keeps-the-old-systems-running"]
+claims = { matches = ["module 'game:keep@0.2.0' was not reloaded: its reload answered 7.*game:keep@0.1.0/tick: tick.*game:keep@0.1.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_load-failed-init-log-given"] }
+
+[[case]]
+name = "bridge_observer_statement_t-spans-with-no-room-for-a-trigger-refused"
+run = ["{out}/host{exe}", "bridge_observer_statement_t-spans-with-no-room-for-a-trigger-refused"]
+claims = { matches = ["did not load: its spans of 8 bytes do not hold a column_base.*alive"] }
+false = { run = ["{out}/host{exe}", "attach-by-two-systems-of-one-module-in-one-phase-taken"] }
+
+[[case]]
+name = "declare-of-another-layout-names-the-declarers-the-text-holds"
+run = ["{out}/host{exe}", "declare-of-another-layout-names-the-declarers-the-text-holds"]
+claims = { matches = ["It is also declared by 'game:mover_with_a_long_name_that_fills_the_list_of_declarers@0.1.0', 'view:reader_with.*game:fp@0.1.0: not loaded.*alive"], matches_not = ["'game:duo"] }
+false = { run = ["{out}/host{exe}", "bridge_observer_statement_t-spans-with-no-room-for-a-trigger-refused"] }
+
+[[case]]
+name = "attach-by-two-systems-of-one-module-in-one-phase-taken"
+run = ["{out}/host{exe}", "attach-by-two-systems-of-one-module-in-one-phase-taken"]
+claims = { matches = ["game:duo@0.1.0=RUNNING.*alive"], matches_not = ["failed"] }
+false = { run = ["{out}/host{exe}", "bridge_observer_statement_t-spans-with-no-room-for-a-trigger-refused"] }
+
+[[case]]
 name = "module_config.identity-none-refused"
 run = ["{out}/host{exe}", "module_config.identity-none-refused"]
 claims = { matches = ["a module with no identity is refused.*alive"] }
