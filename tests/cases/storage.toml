@@ -312,3 +312,9 @@ name = "schedule_build-levels-of-a-chain-in-two-rounds"
 run = ["{out}/storage{exe}", "levels"]
 claims = { matches = ["levels: 100 systems in one phase, built: set_levels tested reach 19800 times, last level 99.*alive"] }
 false = { run = ["{out}/storage{exe}", "shape"] }
+
+[[case]]
+name = "bridge_reload-share-grown-within-eight-bytes-takes-no-range"
+run = ["{out}/storage{exe}", "ranges"]
+claims = { matches = ["ranges: 2 when loaded, reload done, 2 after it, 0 after the unloads.*alive"] }
+false = { run = ["{out}/storage{exe}", "levels"] }

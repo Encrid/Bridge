@@ -6,7 +6,7 @@ This file grows the share of a module of the persistent arena at a reload, and g
 
 A reload can change a budget of a module, and `persistent` only upwards.
 A reload that states less is refused: what the module allocated is in its share, and stays there while the module is loaded.
-A reload that states the same `persistent` changes nothing.
+A reload whose `persistent` rounds up to the same share changes nothing: the same `persistent`, or one more within the same 8 bytes.
 A reload that states more adds bytes, so that the share becomes the new `persistent` rounded up to a multiple of 8.
 
 The added bytes come from what is left of the arena:

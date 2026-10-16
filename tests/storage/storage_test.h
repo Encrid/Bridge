@@ -181,6 +181,7 @@ enum storage_test_end storage_test_move_many(storage_test_t *t);
 enum storage_test_end storage_test_give_two_singles(storage_test_t *t);
 enum storage_test_end storage_test_fill_list(storage_test_t *t);
 enum storage_test_end storage_test_count_levels(storage_test_t *t);
+enum storage_test_end storage_test_count_ranges(storage_test_t *t);
 enum storage_test_end storage_test_change(storage_test_t *t);
 enum storage_test_end storage_test_make_tables(storage_test_t *t);
 enum storage_test_end storage_test_use_up_tables(storage_test_t *t);

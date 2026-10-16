@@ -45,7 +45,7 @@ int reload_grow_share(reloading_t *r)
         return (reload_refuse(r, "its persistent is %lld and a reload states "
             "less, which a loaded module's share cannot become",
             (long long)had));
-    if (wants == had)
+    if (!extra)
         return (0);
     if (extra <= UINT32_MAX) {
         r->extra = (uint32_t)extra;
