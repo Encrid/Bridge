@@ -14,10 +14,7 @@ typedef struct os_mutex os_mutex_t;
 typedef struct os_event os_event_t;
 typedef void (*os_thread_fn_t)(void *arg);
 
-constexpr uint64_t OS_FOREVER = UINT64_MAX;
-
 constexpr uint64_t OS_SECOND = 1'000'000'000;
-constexpr uint64_t OS_MILLISECOND = 1'000'000;
 
 [[nodiscard]] void *os_reserve(size_t reserve, size_t commit);
 
@@ -53,6 +50,6 @@ void os_event_free(os_event_t *e);
 
 void os_event_set(os_event_t *e);
 
-int os_event_wait(os_event_t *e, uint64_t nanos);
+void os_event_wait(os_event_t *e);
 
 #endif

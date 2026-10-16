@@ -149,9 +149,7 @@ Each constant is a `constexpr uint64_t`.
 
 | Constant | Content |
 | --- | --- |
-| `OS_FOREVER` | `UINT64_MAX`: the time of an `os_event_wait` that waits until the event is set. |
 | `OS_SECOND` | `1'000'000'000`: the nanoseconds in a second. |
-| `OS_MILLISECOND` | `1'000'000`: the nanoseconds in a millisecond. |
 
 ## Types
 
@@ -195,4 +193,4 @@ Each function that can fail is `[[nodiscard]]`: the caller must use its result.
 | `os_event_create` | Makes an event that one thread sets and another waits for. A set before the wait is not lost, and a wait consumes it. Gives `nullptr` on failure. |
 | `os_event_free` | Frees an event that no thread waits for. A null `e` does nothing. |
 | `os_event_set` | Sets an event: one wait, now or later, returns for it. |
-| `os_event_wait` | Waits for an event for at most `nanos`, or until it is set if `nanos` is `OS_FOREVER`. Gives 1 if it was set, and 0 if the time ran out. |
+| `os_event_wait` | Waits until the event is set, and consumes the set. A wait has no time limit: no caller needs one. |

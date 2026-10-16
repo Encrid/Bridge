@@ -33,11 +33,7 @@ void os_event_set(os_event_t *e)
     SetEvent(e->handle);
 }
 
-int os_event_wait(os_event_t *e, uint64_t nanos)
+void os_event_wait(os_event_t *e)
 {
-    DWORD ms = INFINITE;
-
-    if (nanos != OS_FOREVER)
-        ms = (DWORD)((nanos + OS_MILLISECOND - 1) / OS_MILLISECOND);
-    return (WaitForSingleObject(e->handle, ms) == WAIT_OBJECT_0);
+    WaitForSingleObject(e->handle, INFINITE);
 }
