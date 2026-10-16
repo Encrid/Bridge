@@ -3,10 +3,17 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <string.h>
+
 #include "cases.h"
 
 static const char *const TEST_THING[] = {
     "other:Thing"
+};
+
+static const char *const TEST_THING_NEAR[] = {
+    "other:Thing",
+    "gamex:Odd"
 };
 
 void test_do_wrong(host_t *h)
@@ -18,6 +25,12 @@ void test_do_wrong(host_t *h)
     host_state_guarded(&a, "game:wrong@0.1.0", h->arg);
     a.cfg.read = TEST_THING;
     a.cfg.read_count = 1;
+    if (!strcmp(h->arg, "wrong-declare-near-namespace")) {
+        a.cfg.read = TEST_THING_NEAR;
+        a.cfg.read_count = 2;
+    }
+    if (!strcmp(h->arg, "wrong-observer-attaches-unstated"))
+        a.cfg.spawns = 4;
     host_load(h, &a);
     host_run_frames(h, 1);
     host_close(h);

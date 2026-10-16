@@ -1597,6 +1597,18 @@ claims = { matches = ["system 'act' failed: detach: the id 0 is no entity, and '
 false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
 
 [[case]]
+name = "declare-field-naming-a-tag-past-other-namespaces-refused"
+run = ["{out}/host{exe}", "declare-field-naming-a-tag-past-other-namespaces-refused"]
+claims = { matches = ["did not load: type 'game:Odd2': its descriptor says 'Flag', which is neither a type a field can be nor one its namespace has declared.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "attach-by-an-observer-that-stated-no-change-fails"
+run = ["{out}/host{exe}", "attach-by-an-observer-that-stated-no-change-fails"]
+claims = { matches = ["observer 'seen' failed: observer 'seen' may not attach 'game:Flag': it is not among the changes it stated.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
 name = "module_config.identity-none-refused"
 run = ["{out}/host{exe}", "module_config.identity-none-refused"]
 claims = { matches = ["a module with no identity is refused.*alive"] }

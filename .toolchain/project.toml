@@ -2192,7 +2192,9 @@ variants = [
     { name = "wrong-system-named-reload", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_named_reload", "IN_SYSTEM=wrong_do_nothing"] },
     { name = "wrong-system-ghost", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_ghost", "IN_SYSTEM=wrong_do_nothing"] },
     { name = "wrong-observe-events-eight", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_events_eight", "IN_SYSTEM=wrong_do_nothing"] },
-    { name = "wrong-detach-id-zero", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_detach_id_zero"] }
+    { name = "wrong-detach-id-zero", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_detach_id_zero"] },
+    { name = "wrong-declare-near-namespace", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_near_namespace", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-observer-attaches-unstated", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_entry", "IN_SYSTEM=wrong_spawn_position"] }
 ]
 
 [[artifact]]

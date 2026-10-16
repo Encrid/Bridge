@@ -79,5 +79,8 @@ void wrong_system_named_reload(void);
 void wrong_system_ghost(void);
 void wrong_observe_events_eight(void);
 void wrong_detach_id_zero(void);
+void wrong_declare_near_namespace(void);
+void wrong_observe_entry(void);
+void wrong_spawn_position(void);
 
 #endif

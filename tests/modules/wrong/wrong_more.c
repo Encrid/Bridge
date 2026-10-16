@@ -146,3 +146,43 @@ void wrong_detach_id_zero(void)
 {
     bridge_detach(0, wrong_position);
 }
+
+void wrong_declare_near_namespace(void)
+{
+    static const char desc[] = "{ Flag f; }";
+    bridge_declaration_t d = wrong_state_type();
+    bridge_declaration_t e = { bridge_put("game:Odd2", 9), 9, BRIDGE_STRUCT,
+        1, 1, bridge_put(desc, sizeof(desc) - 1), sizeof(desc) - 1,
+        BRIDGE_STRIP, BRIDGE_TABLE };
+
+    d.name = bridge_put("gamex:Odd", 9);
+    d.name_len = 9;
+    bridge_declare(bridge_put(&d, sizeof(d)));
+    bridge_declare(bridge_put(&e, sizeof(e)));
+}
+
+BRIDGE_EXPORT(seen) int seen(void)
+{
+    bridge_attach(1, wrong_flag, BRIDGE_ZEROED);
+    return (0);
+}
+
+void wrong_observe_entry(void)
+{
+    bridge_term_t term = { wrong_position, BRIDGE_READ, BRIDGE_AND, 0 };
+    bridge_observer_statement_t o = { bridge_put("seen", 4), 4,
+        BRIDGE_ON_ENTER, bridge_put(&term, sizeof(term)), 1, 0, 0 };
+
+    bridge_observe(bridge_put(&o, sizeof(o)));
+}
+
+void wrong_spawn_position(void)
+{
+    static bool spawned;
+    position_t p = { 0.0f, 0.0f };
+
+    if (spawned)
+        return;
+    spawned = true;
+    BRIDGE_ATTACH(bridge_spawn(), wrong_position, p);
+}
