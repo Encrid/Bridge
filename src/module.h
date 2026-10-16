@@ -27,7 +27,8 @@ typedef struct {
 } module_private_t;
 
 typedef struct {
-    const module_t *m;
+    const range_t *owned;
+    uint32_t own_count;
     const declared_type_t *c;
     uint32_t rows;
 } module_pointing_t;
@@ -89,11 +90,12 @@ void module_release_types(bridge_t *b, module_t *m, bool by_policy);
 
 uint64_t module_round_share(int64_t persistent);
 
-void module_give_share(bridge_t *b, const module_t *m);
+void module_give_share(bridge_t *b, const range_t *owned, uint32_t own_count);
 
 void module_settle_share(bridge_t *b, module_t *m);
 
-uint32_t module_count_pointing(const bridge_t *b, const module_t *m,
+uint32_t module_count_pointing(const bridge_t *b, const range_t *owned,
+    uint32_t own_count,
     const declared_type_t *c);
 
 [[nodiscard]] int module_call(module_t *m, const module_call_t *call,

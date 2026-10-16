@@ -31,15 +31,15 @@ An unload reads each text field of each row that stays, once, and never at a bar
 A share with one string left in it stays whole: the record is there to show it.
 In exchange, modules can be loaded and unloaded for as long as a deployment runs.
 
-When the share stays, or the module has none, the place of its settings text is kept for its next load.
-When the share goes back, that place is forgotten: `docs/intern/config_kept.c.md`.
+When the share stays, the world keeps its ranges, and the place of the settings text for the next load.
+After each unload, each kept share that no row holds a string in goes back: `docs/intern/config_kept.c.md`.
 
 ## Functions
 
 | Function | Result |
 | --- | --- |
 | `module_round_share` | Gives the share that a `persistent` takes: the bytes rounded up to a multiple of 8, in 64 bits, or 0 for none. |
-| `module_give_share` | Gives each range of the share of a module back to the persistent arena, and lowers the count of ranges that modules hold. |
+| `module_give_share` | Gives each range of a share back to the persistent arena, and lowers the count of ranges that the world holds. |
 | `get_share_size` | Gives the length of the share of a module, in bytes: the sum of its ranges. |
 | `is_share_held` | Gives whether a row that stays holds a string in the share of a module, and says each component that does. |
-| `module_settle_share` | Gives the share of a module back at its unload, unless a row that stays holds a string in it. |
+| `module_settle_share` | Gives the share of a module back at its unload, unless a row that stays holds a string in it. Then gives back each kept share that is free. |

@@ -47,6 +47,7 @@ void block_destroy(bridge_t *b)
     free_types(b);
     while (i < b->kept_count) {
         free(b->kept[i].stem);
+        free(b->kept[i].owned);
         i++;
     }
     free(b->kept);

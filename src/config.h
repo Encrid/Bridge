@@ -33,7 +33,7 @@ typedef struct {
 
 void config_keep(bridge_t *b, module_t *m);
 
-void config_forget(bridge_t *b, const module_t *m);
+void config_give_back_free(bridge_t *b);
 
 kept_text_t *config_find_kept(bridge_t *b, const char *stem);
 

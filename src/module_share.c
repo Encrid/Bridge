@@ -12,16 +12,11 @@ uint64_t module_round_share(int64_t persistent)
     return (((uint64_t)persistent + 7u) & ~7ull);
 }
 
-void module_give_share(bridge_t *b, const module_t *m)
+void module_give_share(bridge_t *b, const range_t *owned, uint32_t own_count)
 {
-    const range_t *own = m->owned;
-    uint32_t i = 0;
-
-    while (i < m->own_count) {
-        region_give(&b->arena_space, own[i].at - b->arena, own[i].len);
-        i++;
-    }
-    b->arena_ranges -= m->own_count;
+    for (uint32_t i = 0; i < own_count; i++)
+        region_give(&b->arena_space, owned[i].at - b->arena, owned[i].len);
+    b->arena_ranges -= own_count;
 }
 
 static uint64_t get_share_size(const module_t *m)
@@ -45,7 +40,7 @@ static bool is_share_held(bridge_t *b, const module_t *m)
     uint32_t i = 0;
 
     while (i < b->type_count) {
-        rows = module_count_pointing(b, m, b->types[i]);
+        rows = module_count_pointing(b, m->owned, m->own_count, b->types[i]);
         if (rows)
             say_about(b, &about, "module '%s' is unloaded and its share of "
                 "the persistent arena, %llu bytes, stays: '%s' holds a "
@@ -59,10 +54,9 @@ static bool is_share_held(bridge_t *b, const module_t *m)
 
 void module_settle_share(bridge_t *b, module_t *m)
 {
-    if (!m->own_count || is_share_held(b, m)) {
+    if (m->own_count && is_share_held(b, m))
         config_keep(b, m);
-        return;
-    }
-    module_give_share(b, m);
-    config_forget(b, m);
+    else
+        module_give_share(b, m->owned, m->own_count);
+    config_give_back_free(b);
 }

@@ -36,7 +36,7 @@ The fields of `config_seed_t`:
 | --- | --- | --- |
 | `config_seed` | `src/config.c` | Writes the settings of a module into the component that its config names. Gives 0, or 1 with `err` saying which setting or name was refused. |
 | `config_keep` | `src/config_kept.c` | Remembers where the settings text of an unloaded module is: the block outlives the module, and its next load writes there. |
-| `config_forget` | `src/config_kept.c` | Forgets where the settings text of a module was: its share went back to the arena, with the block. |
+| `config_give_back_free` | `src/config_kept.c` | Gives back each kept share that no row holds a string in, and forgets it. |
 | `config_find_kept` | `src/config_kept.c` | Gives what is remembered of the settings text of the module `stem`, or `nullptr`. |
 | `config_refuse` | `src/config_say.c` | Writes why the settings are refused, as `printf` would. Gives 1. |
 | `config_say_misfit` | `src/config_say.c` | Refuses a setting whose kind the field it names does not take. `field` tells what the field is. Gives 1. |

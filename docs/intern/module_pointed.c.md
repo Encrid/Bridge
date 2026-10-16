@@ -1,6 +1,7 @@
 # src/module_pointed.c
 
-This file tells whether a row holds a string that lies in the share of a module of the persistent arena.
+This file tells whether a row holds a string that lies in a share of the persistent arena.
+The share is given by its ranges: those of a module, or those of a share that stayed.
 An unload reads it to know whether the share can go back: `docs/intern/module_share.c.md`, *When a share goes back*.
 
 ## How a string is found
@@ -21,8 +22,8 @@ Every row of the type is read, and each row that holds such a string counts once
 
 | Function | Result |
 | --- | --- |
-| `is_in_share` | Gives whether the text at `bytes` lies in one of the ranges of the share of a module. |
+| `is_in_share` | Gives whether the text at `bytes` lies in one of the ranges of a share. |
 | `get_element` | Gives where element `i` of a field is in a value. Gives `nullptr` past the last element, or for a kind that holds no string. |
-| `points_in` | Gives whether a value holds a string in the share of a module. |
+| `points_in` | Gives whether a value holds a string in a share. |
 | `count_row` | Counts a row that holds a string in the share. Gives false, so that the walk reads every row. |
-| `module_count_pointing` | Gives how many rows of a type hold a string in the share of a module. |
+| `module_count_pointing` | Gives how many rows of a type hold a string in a share, given by its ranges. |

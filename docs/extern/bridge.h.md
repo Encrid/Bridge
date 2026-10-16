@@ -766,6 +766,7 @@ The reason is a reason of `did not load`, or one of these:
 - `'<component>' is stripped, and <count> rows stay in a second table of their archetype: [budget] columns of <bytes> bytes has no room to join them to the first`
 
 A share that stays keeps its room, thus Bridge can refuse a later load for want of room.
+A share that stays goes back at a later unload, once no row that stays holds a string in it.
 Rows in a second table make a second span of the same archetype.
 
 ### A phase

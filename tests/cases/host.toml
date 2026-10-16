@@ -257,6 +257,12 @@ claims = { matches = ["nine:first@0.2.0: reloaded.*which is already the settings
 false = { run = ["{out}/host{exe}", "bridge_load-failed-init-log-given"] }
 
 [[case]]
+name = "module_config.settings-kept-share-given-back"
+run = ["{out}/host{exe}", "module_config.settings-kept-share-given-back"]
+claims = { matches = ["game:other@0.1.0: unloaded.*game:settings@0.1.0: loaded.*modules: game:settings@0.1.0=RUNNING \\(1\\).*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_load-failed-init-log-given"] }
+
+[[case]]
 name = "module_config.spans-too-small-refused"
 run = ["{out}/host{exe}", "module_config.spans-too-small-refused"]
 claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }

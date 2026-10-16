@@ -7,16 +7,16 @@
 
 #include "module.h"
 
-static bool is_in_share(const module_t *m, const uint8_t *bytes)
+static bool is_in_share(const module_pointing_t *p, const uint8_t *bytes)
 {
-    const range_t *own = m->owned;
+    const range_t *own = p->owned;
     bridge_text_t text;
     uint64_t end;
     uint32_t o = 0;
 
     memcpy(&text, bytes, sizeof(text));
     end = (uint64_t)text.at + text.len;
-    while (text.len && o < m->own_count) {
+    while (text.len && o < p->own_count) {
         if (text.at < own[o].at + own[o].len && own[o].at < end)
             return (true);
         o++;
@@ -39,7 +39,7 @@ static const uint8_t *get_element(const schema_field_t *f,
     return (bytes + f->offset + i * size);
 }
 
-static bool points_in(const module_t *m, const declared_type_t *c,
+static bool points_in(const module_pointing_t *p, const declared_type_t *c,
     const uint8_t *bytes)
 {
     const schema_field_t *f = c->s.fields;
@@ -51,9 +51,9 @@ static bool points_in(const module_t *m, const declared_type_t *c,
     while (!found && k < c->s.field_count) {
         at = get_element(&f[k], bytes, i);
         if (at && f[k].kind == SCHEMA_STRUCT)
-            found = points_in(m, f[k].type, at);
+            found = points_in(p, f[k].type, at);
         if (at && f[k].kind == SCHEMA_TEXT)
-            found = is_in_share(m, at);
+            found = is_in_share(p, at);
         i = at ? i + 1 : 0;
         k += !at;
     }
@@ -64,14 +64,14 @@ static bool count_row(void *ctx, const uint8_t *row)
 {
     module_pointing_t *p = ctx;
 
-    p->rows += points_in(p->m, p->c, row);
+    p->rows += points_in(p, p->c, row);
     return (false);
 }
 
-uint32_t module_count_pointing(const bridge_t *b, const module_t *m,
-    const declared_type_t *c)
+uint32_t module_count_pointing(const bridge_t *b, const range_t *owned,
+    uint32_t own_count, const declared_type_t *c)
 {
-    module_pointing_t p = { m, c, 0 };
+    module_pointing_t p = { owned, own_count, c, 0 };
 
     if (c->kind == BRIDGE_STRUCT)
         (void)storage_has_any(b->storage, c->type, count_row, &p);

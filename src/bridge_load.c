@@ -47,7 +47,7 @@ static int fail_load(bridge_t *b, module_t *m, backend_err_t *err)
     storage_release(b->storage, m->ids, m->id_count);
     m->id_count = 0;
     m->id_next = 0;
-    module_give_share(b, m);
+    module_give_share(b, m->owned, m->own_count);
     m->own_count = 0;
     module_release_types(b, m, false);
     b->layout_moved = 1;

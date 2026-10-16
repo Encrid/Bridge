@@ -201,6 +201,8 @@ typedef struct {
     char *stem;
     uint32_t at;
     uint32_t room;
+    range_t *owned;
+    uint32_t own_count;
 } kept_text_t;
 
 struct bridge {

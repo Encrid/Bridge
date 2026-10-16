@@ -198,6 +198,8 @@ static const host_case_t TEST_CASES[] = {
         test_load_long_identity, "127", test_set_guarded },
     { "bridge_reload-new-settings-layout-stays-taken",
         test_reload_settings_layout, "", test_set_noting },
+    { "module_config.settings-kept-share-given-back",
+        test_keep_two_shares, "", test_set_noting },
     { "module_config.spans-rounded-up-to-8-refused",
         test_round_spans, "268", test_set_both },
     { "module_config.spans-a-multiple-of-8-taken",

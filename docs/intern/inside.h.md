@@ -37,7 +37,7 @@ None of them is on the hot path.
 | `module_mark_t` | Where the changes of one turn begin in the queue of a module: `turn` and `at`. |
 | `module_t` | A loaded module. |
 | `change_t` | One queued change. |
-| `kept_text_t` | Where the settings text of an unloaded module was: `stem`, `at` and `room`. |
+| `kept_text_t` | A share of an unloaded module that stays: `stem`, the place of its settings text `at` and `room`, and its ranges `owned` and `own_count`. |
 | `bridge_t` | A world. |
 
 ### An open backend
@@ -200,7 +200,7 @@ A change is 24 bytes.
 | `max_types`, `max_systems`, `max_terms` | `[budget] types`, `systems` and `terms`. |
 | `storage` | What keeps the rows: `src/storage.h`. |
 | `types`, `type_count` | The declared types. |
-| `kept`, `kept_count` | Where the settings text of each unloaded module was. |
+| `kept`, `kept_count` | Each share of an unloaded module that stays. |
 | `systems`, `system_count` | The systems of every module, in the order of registration. |
 | `modules`, `module_count`, `max_modules` | The loaded modules, how many, and `[budget] modules`. |
 
