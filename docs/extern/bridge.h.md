@@ -15,9 +15,11 @@ A host gives values in structs, and Bridge reads no file of the host.
 Bridge has no default value: the host states each value. A field left at zero is unset, and Bridge refuses it by its name.
 A count of an array can be zero, unless this document tells otherwise.
 Each function but `bridge_list_modules` is `[[nodiscard]]`: the compiler warns when a host ignores its result.
-Call `bridge_load`, `bridge_unload` and `bridge_reload` between two phases: never while `bridge_run_phase` runs.
 
-A call from the sink gives 1: *bridge_sink_fn_t*.
+Call the functions of one world one at a time, also from two threads: a call starts after the call before it returns.
+So call `bridge_load`, `bridge_unload` and `bridge_reload` between two phases, never while `bridge_run_phase` runs.
+Bridge checks neither rule. If two calls of one world overlap, the result is not defined.
+Only a call from the sink comes during another call, and it gives 1: *bridge_sink_fn_t*.
 
 ## The layouts
 
