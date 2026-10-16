@@ -184,6 +184,8 @@ static const host_case_t TEST_CASES[] = {
         test_alloc_unaligned_share, "", test_set_noting },
     { "bridge_reload-persistent-beyond-32-bits-refused",
         test_reload_beyond_reach, "", test_set_noting },
+    { "module_config.spans-outgrown-on_error-fail-stops-the-world",
+        test_stop_by_spans, "", test_set_guarded },
     { "module_config.spans-rounded-up-to-8-refused",
         test_round_spans, "268", test_set_both },
     { "module_config.spans-a-multiple-of-8-taken",

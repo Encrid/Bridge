@@ -24,11 +24,13 @@ static void stop_full(bridge_t *b, module_t *m, const char *list)
         say_about(b, &about, "module '%s' is stopped: the list of its "
             "observer '%s' no longer fits in its spans of %u bytes",
             m->identity, list, m->spans_len);
-        return;
+    } else {
+        say_about(b, &about, "module '%s' is stopped: what its queries "
+            "match no longer fits in its spans of %u bytes", m->identity,
+            m->spans_len);
     }
-    say_about(b, &about, "module '%s' is stopped: what its queries match "
-        "no longer fits in its spans of %u bytes", m->identity,
-        m->spans_len);
+    if (m->on_error == BRIDGE_FAIL)
+        bridge_stop(b, m->identity, "was stopped");
 }
 
 static void publish_all(bridge_t *b)

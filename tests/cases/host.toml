@@ -215,6 +215,12 @@ claims = { matches = ["its persistent of 4294967304 bytes does not fit in the \\
 false = { run = ["{out}/host{exe}", "module_config.persistent-rounded-up-to-8-refused"] }
 
 [[case]]
+name = "module_config.spans-outgrown-on_error-fail-stops-the-world"
+run = ["{out}/host{exe}", "module_config.spans-outgrown-on_error-fail-stops-the-world"]
+claims = { matches = ["no longer fits in its spans of 544 bytes.*the world has stopped: module 'game:mover@0.1.0' was stopped and its on_error is fail.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.spans-outgrown-at-a-barrier"] }
+
+[[case]]
 name = "module_config.spans-too-small-refused"
 run = ["{out}/host{exe}", "module_config.spans-too-small-refused"]
 claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }

@@ -21,6 +21,7 @@ That number is `[budget] tables` and `[budget] sparse_sets`, and 1. It is fixed 
 
 A module whose spans no longer hold what its queries match, or the list of an observer, is stopped.
 Its record names the size of its spans, and the observer whose list did not fit.
+If its `on_error` is `BRIDGE_FAIL`, the world stops too: `docs/intern/bridge_stop.c.md`.
 If it ran on, its systems would run over tables that they were not told about.
 A stopped module keeps its components, and its spans are published all over again if it comes back.
 
