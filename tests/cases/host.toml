@@ -1633,6 +1633,24 @@ claims = { matches = ["game:duo@0.1.0=RUNNING.*alive"], matches_not = ["failed"]
 false = { run = ["{out}/host{exe}", "bridge_observer_statement_t-spans-with-no-room-for-a-trigger-refused"] }
 
 [[case]]
+name = "add_system-sparse-term-beside-an-optional-term-taken"
+run = ["{out}/host{exe}", "add_system-sparse-term-beside-an-optional-term-taken"]
+claims = { matches = ["game:pick@0.1.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-of-a-type-as-another-storage-refused"] }
+
+[[case]]
+name = "observer-hears-a-singleton-attached-twice-at-one-barrier-once"
+run = ["{out}/host{exe}", "observer-hears-a-singleton-attached-twice-at-one-barrier-once"]
+claims = { matches = ["game:hearer@0.1.0/heard: heard 1 2.*game:swapper@0.2.0: reloaded.*alive"] }
+false = { run = ["{out}/host{exe}", "observer-hears-a-singleton-attached-once-at-one-barrier"] }
+
+[[case]]
+name = "observer-hears-a-singleton-attached-once-at-one-barrier"
+run = ["{out}/host{exe}", "observer-hears-a-singleton-attached-once-at-one-barrier"]
+claims = { matches = ["game:hearer@0.1.0/heard: heard 1 1.*game:swapper@0.2.0: reloaded.*alive"] }
+false = { run = ["{out}/host{exe}", "observer-hears-a-singleton-attached-twice-at-one-barrier-once"] }
+
+[[case]]
 name = "module_config.identity-none-refused"
 run = ["{out}/host{exe}", "module_config.identity-none-refused"]
 claims = { matches = ["a module with no identity is refused.*alive"] }

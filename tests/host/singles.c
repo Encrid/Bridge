@@ -50,3 +50,33 @@ void test_two_turns_of_one_module(host_t *h)
     test_say_modules(h);
     host_close(h);
 }
+
+void test_pick_sparse(host_t *h)
+{
+    h->cfg.budget.sparse_sets = 1;
+    if (host_open(h))
+        return;
+    test_load_guarded(h, "game:pick@0.1.0", "pick");
+    host_run_frames(h, 1);
+    test_say_modules(h);
+    host_close(h);
+}
+
+void test_hear_singleton_twice(host_t *h)
+{
+    bridge_artifact_t a;
+
+    if (host_open(h))
+        return;
+    test_load_guarded(h, "game:hearer@0.1.0", "hearer");
+    test_state_guarded(&a, "game:swapper@0.1.0", "swapper");
+    a.cfg.reloadable = BRIDGE_TRUE;
+    a.cfg.hot_reload = BRIDGE_TRUE;
+    host_load(h, &a);
+    test_state_guarded(&a, "game:swapper@0.2.0", h->arg);
+    a.cfg.reloadable = BRIDGE_TRUE;
+    a.cfg.hot_reload = BRIDGE_TRUE;
+    host_reload(h, &a);
+    host_run_frames(h, 1);
+    host_close(h);
+}

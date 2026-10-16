@@ -407,6 +407,46 @@ defines = ["BRIDGE_ROWS_CHECKED"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "pick"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/pick.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "hearer"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/hearer.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "swapper"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/swapper.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "swapper-second"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/swapper.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "SECOND"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "reaper"
 kind = "library"
 test = true

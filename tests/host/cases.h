@@ -271,6 +271,10 @@ void test_name_many_declarers(host_t *h);
 
 void test_two_turns_of_one_module(host_t *h);
 
+void test_pick_sparse(host_t *h);
+
+void test_hear_singleton_twice(host_t *h);
+
 void test_declare_other_size(host_t *h);
 
 void test_load_long_identity(host_t *h);
