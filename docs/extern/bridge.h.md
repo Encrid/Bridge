@@ -43,7 +43,7 @@ A deployment gives settings to a backend in `bridge_backend_t`, and to a module 
 
 | Field | Content |
 | --- | --- |
-| `key` | The name of the setting. |
+| `key` | The name of the setting. Not null, and once in the settings of a module. |
 | `kind` | The kind of the value: an item of `enum bridge_setting_kind`. Zero is unset. |
 | `pad` | 7 bytes of padding. |
 | `v` | The value: a `bridge_value_t`. |
@@ -719,6 +719,9 @@ These reasons of `did not load` tell that Bridge cannot write the settings of th
 - `its config is '<component>', which is already the settings of module '<module>'`
 - `its config is '<component>', which is not a struct its init declared`
 - `its config is '<component>', which is not declared a singleton`
+- `its setting <index> has no key`
+- `its setting '<key>' is text, and its text is null`
+- `its setting '<key>' is handed more than once`
 - `out of memory: there was none for the row of its settings`
 - `its settings have a key '<key>', and '<component>' has no field of that name`
 - `its setting '<key>' is <kind>, and the field it names is <kind>`

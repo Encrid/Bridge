@@ -26,14 +26,38 @@ static const config_seeder_fn_t CONFIG_SEEDERS[SCHEMA_STRUCT + 1] = {
     [SCHEMA_STRUCT] = config_seed_struct
 };
 
+static bool is_repeated(const bridge_setting_t *s, uint32_t i)
+{
+    for (uint32_t j = 0; j < i; j++) {
+        if (!strcmp(s[j].key, s[i].key))
+            return (true);
+    }
+    return (false);
+}
+
+int config_check_keys(config_seed_t *seed)
+{
+    const bridge_setting_t *s = seed->cfg->settings;
+
+    for (uint32_t i = 0; i < seed->cfg->setting_count; i++) {
+        if (!s[i].key)
+            return (config_refuse(seed, "its setting %u has no key", i));
+        if (s[i].kind == BRIDGE_STRING && !s[i].v.s)
+            return (config_refuse(seed, "its setting '%.80s' is text, "
+                "and its text is null", s[i].key));
+        if (is_repeated(s, i))
+            return (config_refuse(seed, "its setting '%.80s' is handed "
+                "more than once", s[i].key));
+    }
+    return (0);
+}
+
 static const schema_field_t *find_field(const config_seed_t *seed,
     const char *key)
 {
     const schema_t *s = &seed->c->s;
     uint32_t k = 0;
 
-    if (!key)
-        return (nullptr);
     while (k < s->field_count && strcmp(s->fields[k].name, key))
         k++;
     if (k == s->field_count)
@@ -57,7 +81,7 @@ int config_seed_setting(config_seed_t *seed, const bridge_setting_t *s)
 
     if (!field)
         return (config_refuse(seed, "its settings have a key '%.80s', and "
-            "'%.100s' has no field of that name", s->key ? s->key : "",
+            "'%.100s' has no field of that name", s->key,
             seed->c->name));
     return (seed_field(seed, field, s));
 }

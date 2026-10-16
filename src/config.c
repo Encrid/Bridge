@@ -82,7 +82,8 @@ int config_seed(module_t *m, const bridge_module_config_t *cfg,
     seed.why_len = sizeof(err->text);
     if (!strcmp(cfg->config, BRIDGE_NO_CONFIG))
         return (check_none(&seed));
-    if (find_config(&seed) || config_place_text(&seed))
+    if (find_config(&seed) || config_check_keys(&seed)
+        || config_place_text(&seed))
         return (1);
     return (seed_all(&seed));
 }

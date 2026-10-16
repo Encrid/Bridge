@@ -12,8 +12,6 @@ static bool find_constant(const declared_type_t *of, const char *name,
 {
     uint32_t i = 0;
 
-    if (!name || !of)
-        return (false);
     while (i < of->s.constant_count && strcmp(of->s.constants[i].name, name))
         i++;
     if (i == of->s.constant_count)
@@ -45,7 +43,7 @@ int config_seed_enum(config_seed_t *seed, const schema_field_t *field,
     if (s->kind == BRIDGE_STRING && !find_constant(of, s->v.s, &value))
         return (config_refuse(seed, "its setting '%.80s' is '%.60s', which "
             "the enum of the field it names has no constant for", s->key,
-            s->v.s ? s->v.s : ""));
+            s->v.s));
     if (s->kind != BRIDGE_INT && s->kind != BRIDGE_STRING)
         return (config_say_misfit(seed, s, "an enum"));
     memcpy(seed->row + field->offset, &value, of->s.size);

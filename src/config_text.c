@@ -9,7 +9,7 @@
 
 static uint32_t get_text_len(const bridge_setting_t *s)
 {
-    if (s->kind != BRIDGE_STRING || !s->v.s)
+    if (s->kind != BRIDGE_STRING)
         return (0);
     return ((uint32_t)strlen(s->v.s));
 }

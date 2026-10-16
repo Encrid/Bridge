@@ -269,6 +269,24 @@ claims = { matches = ["six:seeded@0.1.0: not loaded.*six:holder@0.1.0/show: x 1 
 false = { run = ["{out}/host{exe}", "bridge_load-failed-init-log-given"] }
 
 [[case]]
+name = "bridge_setting_t-key-handed-twice-refused"
+run = ["{out}/host{exe}", "bridge_setting_t-key-handed-twice-refused"]
+claims = { matches = ["its setting 'title' is handed more than once.*game:settings@0.1.0: not loaded.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_setting_t-null-text-refused"] }
+
+[[case]]
+name = "bridge_setting_t-null-text-refused"
+run = ["{out}/host{exe}", "bridge_setting_t-null-text-refused"]
+claims = { matches = ["its setting 'path' is text, and its text is null.*game:settings@0.1.0: not loaded.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_setting_t-null-key-refused"] }
+
+[[case]]
+name = "bridge_setting_t-null-key-refused"
+run = ["{out}/host{exe}", "bridge_setting_t-null-key-refused"]
+claims = { matches = ["its setting 9 has no key.*game:settings@0.1.0: not loaded.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_setting_t-key-handed-twice-refused"] }
+
+[[case]]
 name = "module_config.spans-too-small-refused"
 run = ["{out}/host{exe}", "module_config.spans-too-small-refused"]
 claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }

@@ -13,7 +13,7 @@ static uint32_t get_text_size(const config_seed_t *seed,
     const schema_t *of = &seed->c->s;
     uint32_t k = 0;
 
-    if (!s->key || s->kind != BRIDGE_STRING || !s->v.s)
+    if (s->kind != BRIDGE_STRING)
         return (0);
     while (k < of->field_count && strcmp(of->fields[k].name, s->key))
         k++;

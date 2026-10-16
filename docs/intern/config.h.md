@@ -41,6 +41,7 @@ The fields of `config_seed_t`:
 | `config_find_kept` | `src/config_kept.c` | Gives what is remembered of the settings text of the module `stem`, or `nullptr`. |
 | `config_refuse` | `src/config_say.c` | Writes why the settings are refused, as `printf` would. Gives 1. |
 | `config_say_misfit` | `src/config_say.c` | Refuses a setting whose kind the field it names does not take. `field` tells what the field is. Gives 1. |
+| `config_check_keys` | `src/config_field.c` | Refuses a setting with no key, a text setting with a null text, and a key that comes twice. Gives 1 with a reason. |
 | `config_place_text` | `src/config_room.c` | Finds where the text of the settings goes, before any is written. Gives 1 if there is no room. |
 | `config_seed_setting` | `src/config_field.c` | Writes one setting into the field that its key names. Gives 1 if no field has that name, or the field does not take it. |
 | `config_seed_bool` | `src/config_scalar.c` | Writes a setting into a bool field. |

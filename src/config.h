@@ -44,6 +44,8 @@ kept_text_t *config_find_kept(bridge_t *b, const char *stem);
 int config_say_misfit(config_seed_t *seed, const bridge_setting_t *s,
     const char *field);
 
+int config_check_keys(config_seed_t *seed);
+
 int config_place_text(config_seed_t *seed);
 
 int config_seed_setting(config_seed_t *seed, const bridge_setting_t *s);
