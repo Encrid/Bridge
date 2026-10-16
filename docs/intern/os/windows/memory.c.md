@@ -15,5 +15,4 @@ Windows gives committed pages that hold zeros.
 | Function | Result |
 | --- | --- |
 | `os_reserve` | Reserves the range, and commits the first `commit` bytes if `commit` is not 0. Gives `nullptr` on failure, with nothing left reserved. |
-| `os_commit` | Commits the first `bytes` of the range. Gives 0 on success, and -1 if `VirtualAlloc` fails. |
 | `os_release` | Frees the reservation. A null `base` does nothing. |

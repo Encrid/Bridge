@@ -18,8 +18,6 @@ constexpr uint64_t OS_SECOND = 1'000'000'000;
 
 [[nodiscard]] void *os_reserve(size_t reserve, size_t commit);
 
-[[nodiscard]] int os_commit(void *base, size_t bytes);
-
 void os_release(void *base, size_t reserve);
 
 [[nodiscard]] void *os_lib_open(const char *path);

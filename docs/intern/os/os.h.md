@@ -177,7 +177,6 @@ Each function that can fail is `[[nodiscard]]`: the caller must use its result.
 | Function | Result |
 | --- | --- |
 | `os_reserve` | Reserves `reserve` bytes of address space, and makes the first `commit` bytes readable, writable and zero. The rest faults when touched, which a backend that enforces bounds by a fault needs after a block. Gives `nullptr` on failure. |
-| `os_commit` | Makes the first `bytes` of a reservation readable and writable. Gives 0 on success. |
 | `os_release` | Gives back all of a reservation. A null `base` does nothing. |
 | `os_lib_open` | Opens a shared library, or gives `nullptr`. For a path, the loader looks there for the library and for what it needs, since a backend brings its runtime beside itself. A bare name goes to the search of the operating system. |
 | `os_lib_get_symbol` | Gives where a library has what it exports as `name`, or `nullptr`. |
