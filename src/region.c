@@ -38,8 +38,6 @@ static uint32_t add_gap(region_t *r, uint32_t i, range_t piece)
         gaps[i - 1].len += piece.len;
         return (i - 1);
     }
-    if (r->count == r->room)
-        return (r->count);
     memmove(&gaps[i + 1], &gaps[i], (r->count - i) * sizeof(*gaps));
     gaps[i] = piece;
     r->count++;
@@ -54,8 +52,6 @@ void region_give(region_t *r, uint32_t at, uint32_t len)
     while (i < r->count && gaps[i].at < at)
         i++;
     i = add_gap(r, i, (range_t){ at, len });
-    if (i == r->count)
-        return;
     if (i + 1 < r->count && gaps[i].at + gaps[i].len == gaps[i + 1].at) {
         gaps[i].len += gaps[i + 1].len;
         region_drop_gap(r, i + 1);

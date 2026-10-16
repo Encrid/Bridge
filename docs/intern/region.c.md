@@ -10,7 +10,7 @@ So a list of gaps for `ranges` ranges has room for `ranges + 1` gaps.
 The caller makes this room when it takes a range, so a later give never asks for memory.
 The list of the column region has room for each table there may be.
 The list of the persistent arena has room for each range that the modules hold, plus one.
-If the list has no room, the freed piece is not recorded, and its bytes are not used again.
+So the list always has room for a freed piece, and `add_gap` does not test it.
 
 ## A piece given back
 
@@ -28,5 +28,5 @@ A gap at the top is not a gap: it becomes part of the space that was never used.
 | --- | --- |
 | `region_make_room` | Makes room in the list for the gaps that `ranges` ranges can leave. False if there is not the memory. |
 | `region_drop_gap` | Takes gap `i` out of the list and moves the gaps after it down. |
-| `add_gap` | Records a freed piece in the gap before `i`, or in a new gap at `i`. Gives the index of its gap, or `count` if the list has no room. |
+| `add_gap` | Records a freed piece in the gap before `i`, or in a new gap at `i`. Gives the index of its gap. |
 | `region_give` | Gives a piece back to the region, with the steps of *A piece given back*. |
