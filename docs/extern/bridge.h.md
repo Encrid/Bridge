@@ -629,6 +629,8 @@ Each record of Bridge has the level `BRIDGE_ERR`, unless its group tells another
 - `[order] contradicts itself: '<system>' would run before itself`
 - `[budget] <key> is unset`
 - `[budget] <key> of <number> is more than an offset of 32 bits can reach`
+- `[budget] types of <number>, rounded up to a multiple of 64, is more than a count of 32 bits holds`
+- `[budget] tables, sparse_sets and types come to <number>, which is more than a count of 32 bits holds`
 - `[budget] <key> is <number>, which is neither a count nor none`
 - `[budget] cannot be satisfied: sparse_sets of <number>, with four bytes for each of <number> entities, is more than an offset of 32 bits can reach`
 - `[budget] cannot be satisfied: direct_indexed of <number>, with a bit for each of <number> entities, is more than an offset of 32 bits can reach`

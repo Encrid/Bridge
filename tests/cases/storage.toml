@@ -278,6 +278,18 @@ claims = { matches = ["outside spans \\[\\d+, \\d+\\): wrote 0 at \\d+.*alive"] 
 false = { run = ["{out}/storage{exe}", "shape"] }
 
 [[case]]
+name = "bridge_budget_t-types-past-a-count-of-32-bits-refused"
+run = ["{out}/storage{exe}", "manytypes"]
+claims = { matches = ["types of 4294967295, rounded up to a multiple of 64, is more than a count of 32 bits holds.*the budget was refused.*alive"] }
+false = { run = ["{out}/storage{exe}", "manyall"] }
+
+[[case]]
+name = "bridge_budget_t-tables-sparse_sets-and-types-past-a-count-of-32-bits-refused"
+run = ["{out}/storage{exe}", "manyall"]
+claims = { matches = ["tables, sparse_sets and types come to \\d+, which is more than a count of 32 bits holds.*the budget was refused.*alive"] }
+false = { run = ["{out}/storage{exe}", "manytypes"] }
+
+[[case]]
 name = "storage-marks-full-refused"
 run = ["{out}/storage{exe}", "marks"]
 claims = { matches = ["refused: out of memory: there was none for a mark in its queue.*alive"] }

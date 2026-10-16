@@ -67,12 +67,12 @@ bool storage_make_terms(storage_t *r)
 {
     size_t room = r->terms_room;
     size_t terms = room * r->b->max_terms;
-    size_t lists = room * 2 * ((size_t)r->table_room + 2);
 
     r->types = calloc((size_t)r->type_room + 1, sizeof(*r->types));
     r->type_pool = calloc(r->type_room, sizeof(*r->type_pool));
     r->terms_pool = calloc(room + 1, sizeof(*r->terms_pool));
-    r->lists = calloc(lists, sizeof(*r->lists));
+    r->lists = calloc(room * 2,
+        ((size_t)r->table_room + 2) * sizeof(*r->lists));
     r->term_types = calloc(terms, sizeof(*r->term_types));
     r->term_opers = calloc(terms, sizeof(*r->term_opers));
     r->systems = calloc(room, sizeof(*r->systems));

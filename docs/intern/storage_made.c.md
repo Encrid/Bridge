@@ -16,6 +16,7 @@ There is a table id for each archetype there may be, and one for each sparse set
 The hash has twice the room of the table ids, in a power of two, and at least 16 places.
 A part for which the budget asks no room still gets one place, so that `calloc` gets a size above 0.
 The lists of types, of sparse sets, of direct-indexed types and of records of terms each have one more place than there may be.
+The lists of the systems take two factors in `calloc`, so a product past 64 bits gives no memory, and not a short list.
 So a search for a free one always ends.
 
 ## Functions

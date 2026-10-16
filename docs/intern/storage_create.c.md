@@ -17,6 +17,7 @@ What each budget sizes is in `docs/intern/storage_create.h.md`, *What bounds it*
 | `terms_room` | `[budget] systems`. |
 
 Table 0 is no table and index 0 is no entity, so `table_high` and `high` start at 1.
+The budget check bounds these counts, so no size here wraps: `docs/intern/block_budget.c.md`, *The checks*.
 
 ## Out of memory
 

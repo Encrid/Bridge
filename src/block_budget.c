@@ -26,6 +26,27 @@ static int is_miscounted(bridge_t *b, const char *key, int64_t value)
     return (1);
 }
 
+static int is_too_many(bridge_t *b, const bridge_budget_t *budget)
+{
+    uint64_t sets = (uint64_t)budget->sparse_sets;
+    uint64_t sum;
+
+    if (budget->sparse_sets == BRIDGE_NONE)
+        sets = 0;
+    sum = (uint64_t)budget->tables + sets + budget->types + 1;
+    if (((uint64_t)budget->types + 63) / 64 * 64 > UINT32_MAX) {
+        say_error(b, "[budget] types of %u, rounded up to a multiple"
+            " of 64, is more than a count of 32 bits holds", budget->types);
+        return (1);
+    }
+    if (sum <= UINT32_MAX)
+        return (0);
+    say_error(b, "[budget] tables, sparse_sets and types come to %llu, "
+        "which is more than a count of 32 bits holds",
+        (unsigned long long)sum);
+    return (1);
+}
+
 static int has_unset(bridge_t *b, const bridge_budget_t *budget)
 {
     if (is_unset(b, "entities", budget->entities))
@@ -51,5 +72,7 @@ int block_check_budget(bridge_t *b, const bridge_budget_t *budget)
         return (1);
     if (is_miscounted(b, "sparse_sets", budget->sparse_sets))
         return (1);
-    return (is_miscounted(b, "direct_indexed", budget->direct_indexed));
+    if (is_miscounted(b, "direct_indexed", budget->direct_indexed))
+        return (1);
+    return (is_too_many(b, budget));
 }
