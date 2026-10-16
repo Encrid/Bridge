@@ -720,6 +720,7 @@ These reasons of `did not load` tell that Bridge cannot write the settings of th
 - `its config is '<component>', which is not a struct its init declared`
 - `its config is '<component>', which is not declared a singleton`
 - `its setting <index> has no key`
+- `its setting '<key>' has the kind <number>, which is no kind of a setting`
 - `its setting '<key>' is text, and its text is null`
 - `its setting '<key>' is handed more than once`
 - `out of memory: there was none for the row of its settings`
@@ -727,6 +728,7 @@ These reasons of `did not load` tell that Bridge cannot write the settings of th
 - `its setting '<key>' is <kind>, and the field it names is <kind>`
 - `its setting '<key>' is <number>, which the field it names cannot hold`
 - `its setting '<key>' is <number>, which the enum of the field it names cannot hold`
+- `its setting '<key>' is <number>, which the bitmask of the field it names cannot hold`
 - `its setting '<key>' is '<text>', which the enum of the field it names has no constant for`
 - `its setting '<key>' is <bytes> bytes of text, and the field it names holds <bytes> with the zero that ends it`
 - `its settings hold <bytes> bytes of text, and its persistent share has <bytes> left`

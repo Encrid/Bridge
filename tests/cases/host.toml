@@ -287,6 +287,18 @@ claims = { matches = ["its setting 9 has no key.*game:settings@0.1.0: not loaded
 false = { run = ["{out}/host{exe}", "bridge_setting_t-key-handed-twice-refused"] }
 
 [[case]]
+name = "bridge_setting_t-no-kind-refused"
+run = ["{out}/host{exe}", "bridge_setting_t-no-kind-refused"]
+claims = { matches = ["its setting 'vsync' has the kind 5, which is no kind of a setting.*not loaded.*alive"] }
+false = { run = ["{out}/host{exe}", "BRIDGE_INT-negative-for-a-bitmask-refused"] }
+
+[[case]]
+name = "BRIDGE_INT-negative-for-a-bitmask-refused"
+run = ["{out}/host{exe}", "BRIDGE_INT-negative-for-a-bitmask-refused"]
+claims = { matches = ["its setting 'flags' is -1, which the bitmask of the field it names cannot hold.*not loaded.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_setting_t-no-kind-refused"] }
+
+[[case]]
 name = "module_config.spans-too-small-refused"
 run = ["{out}/host{exe}", "module_config.spans-too-small-refused"]
 claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }

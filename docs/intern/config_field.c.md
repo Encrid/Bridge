@@ -28,7 +28,7 @@ A field of a kind with no seeder is refused as a type that no setting fills.
 | Function | Result |
 | --- | --- |
 | `is_repeated` | Gives whether setting `i` has the key of a setting before it. |
-| `config_check_keys` | Refuses a setting with no key, a text setting with a null text, and a key that comes twice. Gives 1 with a reason. |
+| `config_check_settings` | Refuses a setting with no key, of no kind, with a null text, or with a key that comes twice. Gives 1 with a reason. |
 | `find_field` | Gives the field of the config component that a key names, or `nullptr`. |
 | `seed_field` | Writes a setting into a field: an inline array by itself, and any other field by the seeder of its kind. |
 | `config_seed_setting` | Writes one setting into the field that its key names. Gives 1 if no field has that name, or the field does not take it. |

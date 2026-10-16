@@ -18,6 +18,10 @@ static void hand_wrong(host_t *h, bridge_setting_t *s)
         s[5].v.s = nullptr;
     if (!strcmp(h->arg, "nullkey"))
         s[9].key = nullptr;
+    if (!strcmp(h->arg, "nokind"))
+        s[0].kind = (enum bridge_setting_kind)5;
+    if (!strcmp(h->arg, "negative"))
+        s[7].v.i = -1;
 }
 
 void test_hand_keys(host_t *h)

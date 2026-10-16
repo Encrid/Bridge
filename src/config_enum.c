@@ -56,8 +56,12 @@ int config_seed_bitmask(config_seed_t *seed, const schema_field_t *field,
     const declared_type_t *of = field->type;
     uint64_t most = UINT64_MAX >> (64 - 8 * of->s.size);
 
-    if (s->kind != BRIDGE_INT || s->v.i < 0 || (uint64_t)s->v.i > most)
+    if (s->kind != BRIDGE_INT)
         return (config_say_misfit(seed, s, "a bitmask"));
+    if (s->v.i < 0 || (uint64_t)s->v.i > most)
+        return (config_refuse(seed, "its setting '%.80s' is %lld, which "
+            "the bitmask of the field it names cannot hold", s->key,
+            (long long)s->v.i));
     memcpy(seed->row + field->offset, &s->v.i, of->s.size);
     return (0);
 }

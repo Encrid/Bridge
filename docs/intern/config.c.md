@@ -40,7 +40,7 @@ The steps:
 1. If `config` is `BRIDGE_NO_CONFIG`, refuse any setting, and stop.
 2. Find the component among the types that `init` declared.
 3. Refuse it if it is not a struct, not a singleton, or already the settings of another module.
-4. Refuse a setting with no key, a text setting with a null text, and a key that comes twice: `src/config_field.c`.
+4. Refuse a setting with no key, of no kind, with a null text, or with a repeated key: `src/config_field.c`.
 5. Find where the text of the settings goes: `docs/intern/config_room.c.md`. Only the second run moves the cursor of the share.
 6. Write each setting into one value, in order, and stop at the first refusal.
 7. If no setting is refused, the second run gives the singleton that value. It records the component as the settings of the module.

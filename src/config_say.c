@@ -9,7 +9,6 @@
 #include "config.h"
 
 static const char *const CONFIG_KINDS[] = {
-    "unset",
     "a bool",
     "an integer",
     "a float",
@@ -29,10 +28,6 @@ int config_refuse(config_seed_t *seed, const char *format, ...)
 int config_say_misfit(config_seed_t *seed, const bridge_setting_t *s,
     const char *field)
 {
-    const char *kind = CONFIG_KINDS[0];
-
-    if (s->kind <= BRIDGE_STRING)
-        kind = CONFIG_KINDS[s->kind];
     return (config_refuse(seed, "its setting '%.80s' is %s, and the field "
-        "it names is %s", s->key, kind, field));
+        "it names is %s", s->key, CONFIG_KINDS[s->kind - 1], field));
 }

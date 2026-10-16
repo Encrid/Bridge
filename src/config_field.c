@@ -35,13 +35,17 @@ static bool is_repeated(const bridge_setting_t *s, uint32_t i)
     return (false);
 }
 
-int config_check_keys(config_seed_t *seed)
+int config_check_settings(config_seed_t *seed)
 {
     const bridge_setting_t *s = seed->cfg->settings;
 
     for (uint32_t i = 0; i < seed->cfg->setting_count; i++) {
         if (!s[i].key)
             return (config_refuse(seed, "its setting %u has no key", i));
+        if (s[i].kind < BRIDGE_BOOL || s[i].kind > BRIDGE_STRING)
+            return (config_refuse(seed, "its setting '%.80s' has the kind "
+                "%u, which is no kind of a setting", s[i].key,
+                (unsigned)s[i].kind));
         if (s[i].kind == BRIDGE_STRING && !s[i].v.s)
             return (config_refuse(seed, "its setting '%.80s' is text, "
                 "and its text is null", s[i].key));
