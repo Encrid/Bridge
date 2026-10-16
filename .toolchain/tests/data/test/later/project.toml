@@ -1,0 +1,13 @@
+[project]
+name = "later"
+
+[kinds.later]
+output = "{name}.txt"
+steps = [{ copy = ["{sources}", "{output}"] }]
+unlinked = [{ copy = ["{sources}", "{work}.txt"] }]
+
+[[artifact]]
+name = "later"
+kind = "later"
+sources = [".toolchain/project.toml"]
+link = ["{root}/linked.txt"]

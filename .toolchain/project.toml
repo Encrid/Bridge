@@ -1,0 +1,1824 @@
+[project]
+name = "bridge"
+
+[test]
+timeout = 120
+copies = 6
+writers = ["abi_refuse", "module_refuse", "reload_refuse", "say_error", "say_about", "module_fail", "config_refuse", "schema_refuse", "snprintf"]
+
+[variables]
+quiet = ["-Wno-missing-field-initializers"]
+hidden = ["-fvisibility=hidden"]
+paths = [
+    "PLAIN_OTHER_PATH=\"{out}/backends/bridge_plain_other{library}\"",
+    "PLAIN_REFUSING_PATH=\"{out}/backends/bridge_plain_refusing{library}\"",
+    "HOLLOW_PATH=\"{out}/backends/bridge_hollow{library}\"",
+    "TESTS_PATH=\"{out}/backends/bridge_tests{library}\"",
+    "TESTS_ALL_PATH=\"{out}/backends/bridge_tests_all{library}\"",
+    "BUILT_DIR=\"{out}/built\"",
+    "OK_PATH=\"{out}/built/ok{library}\"",
+    "IMAGE_PATH=\"{out}/built/image{library}\"",
+    "OOB_PATH=\"{out}/built/oob{library}\"",
+    "SPIN_PATH=\"{out}/built/spin{library}\"",
+    "GROW_PATH=\"{out}/built/grow{library}\"",
+    "NOINIT_PATH=\"{out}/built/noinit{library}\"",
+    "NORELOAD_PATH=\"{out}/built/noreload{library}\"",
+    "STRAY_PATH=\"{out}/built/stray{library}\"",
+    "TMOVER_PATH=\"{out}/built/tmover{library}\"",
+    "TFLOOD_PATH=\"{out}/built/tflood{library}\"",
+    "TFOREIGN_PATH=\"{out}/built/tforeign{library}\"",
+    "SLEEP1_PATH=\"{out}/built/sleep1{library}\"",
+    "SLEEP2_PATH=\"{out}/built/sleep2{library}\"",
+    "PINNED_PATH=\"{out}/built/pinned{library}\"",
+    "SETTER_PATH=\"{out}/built/setter{library}\"",
+    "REAPER_PATH=\"{out}/built/reaper{library}\"",
+    "STAMP5_PATH=\"{out}/built/stamp5{library}\"",
+    "STAMP9_PATH=\"{out}/built/stamp9{library}\"",
+    "STAMPUNSTATED_PATH=\"{out}/built/stampunstated{library}\"",
+    "STAMPTICK_PATH=\"{out}/built/stamptick{library}\"",
+    "STEPPER1_PATH=\"{out}/built/stepper1{library}\"",
+    "STEPPER2_PATH=\"{out}/built/stepper2{library}\"",
+    "STEPPER3_PATH=\"{out}/built/stepper3{library}\"",
+    "STORE_PATH=\"{out}/built/store{library}\"",
+    "STOREBIG_PATH=\"{out}/built/storebig{library}\"",
+    "STORETAB_PATH=\"{out}/built/storetab{library}\"",
+    "STOREFAT64_PATH=\"{out}/built/storefat64{library}\"",
+    "STOREFAT256_PATH=\"{out}/built/storefat256{library}\"",
+    "STOREFAT1K_PATH=\"{out}/built/storefat1k{library}\"",
+    "STOREFAT4K_PATH=\"{out}/built/storefat4k{library}\"",
+    "FRAG1_PATH=\"{out}/built/frag1{library}\"",
+    "FRAG16_PATH=\"{out}/built/frag16{library}\"",
+    "FRAG256_PATH=\"{out}/built/frag256{library}\"",
+    "FRAG4096_PATH=\"{out}/built/frag4096{library}\"",
+    "SPARSE_PATH=\"{out}/built/sparse{library}\"",
+    "SPARSEBIG_PATH=\"{out}/built/sparsebig{library}\"",
+    "SPARSEFAT_PATH=\"{out}/built/sparsefat{library}\"",
+    "SPARSEBAD1_PATH=\"{out}/built/sparsebad1{library}\"",
+    "SPARSEBAD2_PATH=\"{out}/built/sparsebad2{library}\"",
+    "MOVE1_PATH=\"{out}/built/move1{library}\"",
+    "MOVE2_PATH=\"{out}/built/move2{library}\"",
+    "MOVE3_PATH=\"{out}/built/move3{library}\"",
+    "MOVE4_PATH=\"{out}/built/move4{library}\"",
+    "MOVE5_PATH=\"{out}/built/move5{library}\"",
+    "HOLDER_PATH=\"{out}/built/holder{library}\"",
+    "LAYOUT0_PATH=\"{out}/built/layout0{library}\"",
+    "LAYOUT1_PATH=\"{out}/built/layout1{library}\"",
+    "LAYOUT2_PATH=\"{out}/built/layout2{library}\"",
+    "LAYOUT3_PATH=\"{out}/built/layout3{library}\"",
+    "LAYOUT4_PATH=\"{out}/built/layout4{library}\"",
+    "LAYOUT5_PATH=\"{out}/built/layout5{library}\"",
+    "LAYOUT6_PATH=\"{out}/built/layout6{library}\"",
+    "LAYOUT7_PATH=\"{out}/built/layout7{library}\"",
+    "LAYOUT8_PATH=\"{out}/built/layout8{library}\"",
+    "LAYOUT9_PATH=\"{out}/built/layout9{library}\"",
+    "LAYOUT10_PATH=\"{out}/built/layout10{library}\"",
+    "LAYOUT11_PATH=\"{out}/built/layout11{library}\"",
+    "LAYOUT12_PATH=\"{out}/built/layout12{library}\"",
+    "LAYOUT13_PATH=\"{out}/built/layout13{library}\"",
+    "LAYOUT14_PATH=\"{out}/built/layout14{library}\"",
+    "LAYOUT0K2_PATH=\"{out}/built/layout0k2{library}\"",
+    "LAYOUT1K2_PATH=\"{out}/built/layout1k2{library}\"",
+    "LAYOUT2K2_PATH=\"{out}/built/layout2k2{library}\"",
+    "LAYOUT0K3_PATH=\"{out}/built/layout0k3{library}\"",
+    "LAYOUT1K3_PATH=\"{out}/built/layout1k3{library}\"",
+    "LAYOUT2K3_PATH=\"{out}/built/layout2k3{library}\"",
+    "LAYOUT0K4_PATH=\"{out}/built/layout0k4{library}\"",
+    "LAYOUT1K4_PATH=\"{out}/built/layout1k4{library}\"",
+    "LAYOUT2K4_PATH=\"{out}/built/layout2k4{library}\"",
+    "LAYOUT0K5_PATH=\"{out}/built/layout0k5{library}\"",
+    "LAYOUT1K5_PATH=\"{out}/built/layout1k5{library}\"",
+    "LAYOUT2K5_PATH=\"{out}/built/layout2k5{library}\"",
+    "TAG_PATH=\"{out}/built/tag{library}\"",
+    "FRAGTAG4096_PATH=\"{out}/built/fragtag4096{library}\"",
+    "SINGLE_PATH=\"{out}/built/single{library}\"",
+    "SINGLEBAD1_PATH=\"{out}/built/singlebad1{library}\"",
+    "SINGLEBAD2_PATH=\"{out}/built/singlebad2{library}\"",
+    "SINGLEBAD3_PATH=\"{out}/built/singlebad3{library}\"",
+    "DIRECT_PATH=\"{out}/built/direct{library}\"",
+    "DIRECTBIG_PATH=\"{out}/built/directbig{library}\"",
+    "DIRECTBAD_PATH=\"{out}/built/directbad{library}\"",
+    "TOGGLE_PATH=\"{out}/built/toggle{library}\"",
+    "TOGGLE1_PATH=\"{out}/built/toggle1{library}\"",
+    "TOGGLE2_PATH=\"{out}/built/toggle2{library}\"",
+    "TOGGLE16_PATH=\"{out}/built/toggle16{library}\"",
+    "WEIGH1_PATH=\"{out}/built/weigh1{library}\"",
+    "WEIGH2_PATH=\"{out}/built/weigh2{library}\"",
+    "WEIGH16_PATH=\"{out}/built/weigh16{library}\"",
+    "STRESS1_PATH=\"{out}/built/stress1{library}\"",
+    "STRESS2_PATH=\"{out}/built/stress2{library}\"",
+    "STRESS3_PATH=\"{out}/built/stress3{library}\"",
+    "STRESS4_PATH=\"{out}/built/stress4{library}\"",
+    "BUILT_SUFFIX=\"{library}\"",
+]
+
+[targets.x86_64-windows-gnu]
+system_defines = []
+system_libraries = []
+
+[targets.x86_64-linux-gnu]
+system_defines = []
+system_libraries = ["-lm", "-lpthread", "-ldl"]
+
+[targets.aarch64-macos]
+system_defines = ["-D_DARWIN_C_SOURCE"]
+system_libraries = []
+
+[targets.aarch64-linux-gnu]
+system_defines = []
+system_libraries = ["-lm", "-lpthread", "-ldl"]
+
+[targets.x86_64-macos]
+system_defines = ["-D_DARWIN_C_SOURCE"]
+system_libraries = []
+
+[targets.aarch64-windows-gnu]
+system_defines = []
+system_libraries = []
+
+[[artifact]]
+name = "bridge"
+kind = "library"
+sources = ["src/*.c", "src/os/{system}/*.c"]
+include = ["include", "src", "src/os"]
+defines = ["BRIDGE_BUILDING"]
+flags = ["{quiet}", "{hidden}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "bridge"
+kind = "archive"
+sources = ["src/*.c", "src/os/{system}/*.c"]
+include = ["include", "src", "src/os"]
+defines = ["BRIDGE_BUILDING"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "counted"
+kind = "archive"
+sources = ["src/*.c"]
+include = ["include", "src", "src/os"]
+defines = ["malloc=counted_malloc", "calloc=counted_calloc", "realloc=counted_realloc", "free=counted_free", "os_reserve=counted_os_reserve"]
+flags = ["{quiet}", "{system_defines}"]
+
+[[artifact]]
+name = "counted_os"
+kind = "archive"
+sources = ["src/os/{system}/*.c"]
+include = ["src/os"]
+defines = ["malloc=counted_malloc", "calloc=counted_calloc", "realloc=counted_realloc", "free=counted_free"]
+flags = ["{quiet}", "{system_defines}"]
+
+[[artifact]]
+name = "bridge_tests"
+kind = "library"
+folder = "backends"
+sources = ["tests/backend/tests_abi.c", "tests/backend/tests_backend.c", "tests/backend/tests_memory.c", "tests/backend/tests_define.c", "tests/backend/tests_module.c", "tests/backend/tests_instance.c", "tests/backend/tests_func.c", "tests/backend/tests_load.c", "tests/backend/tests_phase.c", "tests/backend/tests_moves.c", "src/os/{system}/*.c"]
+include = ["include", "src/os", "tests/binding"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+variants = [{ name = "bridge_tests_all" }]
+
+[[artifact]]
+name = "bridge_plain_other"
+kind = "library"
+folder = "backends"
+sources = ["tests/backend/tests_backend.c", "tests/backend/tests_memory.c", "tests/backend/tests_define.c", "tests/backend/tests_module.c", "tests/backend/tests_instance.c", "tests/backend/tests_func.c", "tests/backend/tests_load.c", "tests/backend/tests_phase.c", "tests/backend/tests_moves.c", "tests/support/plain_other_abi.c", "src/os/{system}/*.c"]
+include = ["include", "src/os", "tests/binding"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "bridge_plain_refusing"
+kind = "library"
+folder = "backends"
+sources = ["tests/backend/tests_abi.c", "tests/backend/tests_define.c", "tests/backend/tests_module.c", "tests/backend/tests_instance.c", "tests/backend/tests_func.c", "tests/backend/tests_load.c", "tests/backend/tests_phase.c", "tests/backend/tests_moves.c", "tests/support/plain_refusing_backend.c", "tests/support/plain_refusing_memory.c", "src/os/{system}/*.c"]
+include = ["include", "src/os", "tests/binding"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "bridge_hollow"
+kind = "library"
+folder = "backends"
+sources = ["tests/support/backend_hollow.c"]
+include = ["include"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "ok"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/ok.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "image"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/image.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "oob"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/oob.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "spin"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/spin.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "grow"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/grow.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "noinit"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/noinit.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "noreload"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/noreload.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "stray"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/stray.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "tmover"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/tmover.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "tflood"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/tflood.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "tforeign"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/tforeign.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "sleep1"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/sleep.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "sleep2"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/sleep.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "pinned"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/pinned.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "setter"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/setter.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "reaper"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/reaper.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "stamp5"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/stamp.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["VALUE=5", "PHASE=\"update\""]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "stamp9"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/stamp.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["VALUE=9", "PHASE=\"update\""]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "stampunstated"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/stamp.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["VALUE=1", "PHASE=\"update\"", "UNSTATED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "stamptick"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/stamp.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["VALUE=7", "PHASE=\"tick\""]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "stepper1"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/stepper.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["STEP=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "stepper2"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/stepper.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["STEP=10"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "stepper3"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/stepper.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["STEP=10", "FAIL_RELOAD"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "store"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/store/store.c", "tests/modules/store/store_changes.c", "tests/modules/store/store_find.c", "tests/modules/store/store_gone.c", "tests/modules/store/store_half.c", "tests/modules/store/store_heard.c", "tests/modules/store/store_heard_both.c", "tests/modules/store/store_look.c", "tests/modules/store/store_never.c", "tests/modules/store/store_one.c", "tests/modules/store/store_plain.c", "tests/modules/store/store_scribble.c", "tests/modules/store/store_tables.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "storebig"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/store/store.c", "tests/modules/store/store_changes.c", "tests/modules/store/store_find.c", "tests/modules/store/store_gone.c", "tests/modules/store/store_half.c", "tests/modules/store/store_heard.c", "tests/modules/store/store_heard_both.c", "tests/modules/store/store_look.c", "tests/modules/store/store_never.c", "tests/modules/store/store_one.c", "tests/modules/store/store_plain.c", "tests/modules/store/store_scribble.c", "tests/modules/store/store_tables.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BIG"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "storetab"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/store/store.c", "tests/modules/store/store_changes.c", "tests/modules/store/store_find.c", "tests/modules/store/store_gone.c", "tests/modules/store/store_half.c", "tests/modules/store/store_heard.c", "tests/modules/store/store_heard_both.c", "tests/modules/store/store_look.c", "tests/modules/store/store_never.c", "tests/modules/store/store_one.c", "tests/modules/store/store_plain.c", "tests/modules/store/store_scribble.c", "tests/modules/store/store_tables.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["TABLES"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "storefat64"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/store/store.c", "tests/modules/store/store_changes.c", "tests/modules/store/store_find.c", "tests/modules/store/store_gone.c", "tests/modules/store/store_half.c", "tests/modules/store/store_heard.c", "tests/modules/store/store_heard_both.c", "tests/modules/store/store_look.c", "tests/modules/store/store_never.c", "tests/modules/store/store_one.c", "tests/modules/store/store_plain.c", "tests/modules/store/store_scribble.c", "tests/modules/store/store_tables.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BIG", "FAT64"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "storefat256"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/store/store.c", "tests/modules/store/store_changes.c", "tests/modules/store/store_find.c", "tests/modules/store/store_gone.c", "tests/modules/store/store_half.c", "tests/modules/store/store_heard.c", "tests/modules/store/store_heard_both.c", "tests/modules/store/store_look.c", "tests/modules/store/store_never.c", "tests/modules/store/store_one.c", "tests/modules/store/store_plain.c", "tests/modules/store/store_scribble.c", "tests/modules/store/store_tables.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BIG", "FAT256"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "storefat1k"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/store/store.c", "tests/modules/store/store_changes.c", "tests/modules/store/store_find.c", "tests/modules/store/store_gone.c", "tests/modules/store/store_half.c", "tests/modules/store/store_heard.c", "tests/modules/store/store_heard_both.c", "tests/modules/store/store_look.c", "tests/modules/store/store_never.c", "tests/modules/store/store_one.c", "tests/modules/store/store_plain.c", "tests/modules/store/store_scribble.c", "tests/modules/store/store_tables.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BIG", "FAT1K"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "storefat4k"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/store/store.c", "tests/modules/store/store_changes.c", "tests/modules/store/store_find.c", "tests/modules/store/store_gone.c", "tests/modules/store/store_half.c", "tests/modules/store/store_heard.c", "tests/modules/store/store_heard_both.c", "tests/modules/store/store_look.c", "tests/modules/store/store_never.c", "tests/modules/store/store_one.c", "tests/modules/store/store_plain.c", "tests/modules/store/store_scribble.c", "tests/modules/store/store_tables.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BIG", "FAT4K"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "frag1"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/frag.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["SPLIT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "frag16"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/frag.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["SPLIT=16"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "frag256"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/frag.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["SPLIT=256"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "frag4096"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/frag.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["SPLIT=4096"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "sparse"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/sparse/sparse.c", "tests/modules/sparse/sparse_changes.c", "tests/modules/sparse/sparse_half.c", "tests/modules/sparse/sparse_heard.c", "tests/modules/sparse/sparse_look.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "sparsebig"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/sparse/sparse.c", "tests/modules/sparse/sparse_changes.c", "tests/modules/sparse/sparse_half.c", "tests/modules/sparse/sparse_heard.c", "tests/modules/sparse/sparse_look.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BIG"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "sparsefat"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/sparse/sparse.c", "tests/modules/sparse/sparse_changes.c", "tests/modules/sparse/sparse_half.c", "tests/modules/sparse/sparse_heard.c", "tests/modules/sparse/sparse_look.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["FAT"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "sparsebad1"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/sparse/sparse.c", "tests/modules/sparse/sparse_changes.c", "tests/modules/sparse/sparse_half.c", "tests/modules/sparse/sparse_heard.c", "tests/modules/sparse/sparse_look.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BAD=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "sparsebad2"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/sparse/sparse.c", "tests/modules/sparse/sparse_changes.c", "tests/modules/sparse/sparse_half.c", "tests/modules/sparse/sparse_heard.c", "tests/modules/sparse/sparse_look.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BAD=2"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "move1"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/move/move_change.c", "tests/modules/move/move_init.c", "tests/modules/move/move_look.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "move2"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/move/move_change.c", "tests/modules/move/move_init.c", "tests/modules/move/move_look.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["KEPT=2"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "move3"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/move/move_change.c", "tests/modules/move/move_init.c", "tests/modules/move/move_look.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["KEPT=3"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "move4"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/move/move_change.c", "tests/modules/move/move_init.c", "tests/modules/move/move_look.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["KEPT=4"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "move5"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/move/move_change.c", "tests/modules/move/move_init.c", "tests/modules/move/move_look.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["KEPT=5"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "holder"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/holder.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout0"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=0", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout1"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=1", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout2"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=2", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout3"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=3", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout4"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=4", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout5"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=5", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout6"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=6", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout7"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=7", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout8"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=8", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout9"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=9", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout10"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=10", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout11"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=11", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout12"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=12", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout13"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=13", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout14"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=14", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout0k2"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=0", "KEPT=2"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout1k2"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=1", "KEPT=2"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout2k2"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=2", "KEPT=2"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout0k3"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=0", "KEPT=3"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout1k3"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=1", "KEPT=3"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout2k3"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=2", "KEPT=3"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout0k4"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=0", "KEPT=4"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout1k4"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=1", "KEPT=4"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout2k4"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=2", "KEPT=4"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout0k5"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=0", "KEPT=5"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout1k5"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=1", "KEPT=5"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout2k5"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=2", "KEPT=5"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "tag"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/tag/tag.c", "tests/modules/tag/tag_changes.c", "tests/modules/tag/tag_look.c", "tests/modules/tag/tag_look_set.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "fragtag4096"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/frag.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["SPLIT=4096", "TAGS"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "single"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/single/single.c", "tests/modules/single/single_changes.c", "tests/modules/single/single_look.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "singlebad1"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/single/single.c", "tests/modules/single/single_changes.c", "tests/modules/single/single_look.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BAD=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "singlebad2"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/single/single.c", "tests/modules/single/single_changes.c", "tests/modules/single/single_look.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BAD=2"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "singlebad3"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/single/single.c", "tests/modules/single/single_changes.c", "tests/modules/single/single_look.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BAD=3"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "direct"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/direct/direct.c", "tests/modules/direct/direct_changes.c", "tests/modules/direct/direct_half.c", "tests/modules/direct/direct_heard.c", "tests/modules/direct/direct_look.c", "tests/modules/direct/direct_reach.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "directbig"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/direct/direct.c", "tests/modules/direct/direct_changes.c", "tests/modules/direct/direct_half.c", "tests/modules/direct/direct_heard.c", "tests/modules/direct/direct_look.c", "tests/modules/direct/direct_reach.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BIG"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "directbad"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/direct/direct.c", "tests/modules/direct/direct_changes.c", "tests/modules/direct/direct_half.c", "tests/modules/direct/direct_heard.c", "tests/modules/direct/direct_look.c", "tests/modules/direct/direct_reach.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BAD"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "toggle"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/toggle/toggle.c", "tests/modules/toggle/toggle_bits.c", "tests/modules/toggle/toggle_changes.c", "tests/modules/toggle/toggle_find.c", "tests/modules/toggle/toggle_look.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "toggle1"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/toggle/toggle.c", "tests/modules/toggle/toggle_bits.c", "tests/modules/toggle/toggle_changes.c", "tests/modules/toggle/toggle_find.c", "tests/modules/toggle/toggle_look.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BIG", "ON=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "toggle2"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/toggle/toggle.c", "tests/modules/toggle/toggle_bits.c", "tests/modules/toggle/toggle_changes.c", "tests/modules/toggle/toggle_find.c", "tests/modules/toggle/toggle_look.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BIG", "ON=2"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "toggle16"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/toggle/toggle.c", "tests/modules/toggle/toggle_bits.c", "tests/modules/toggle/toggle_changes.c", "tests/modules/toggle/toggle_find.c", "tests/modules/toggle/toggle_look.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BIG", "ON=16"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "weigh1"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/weigh/weigh.c", "tests/modules/weigh/weigh_follow.c", "tests/modules/weigh/weigh_read.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["ON=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "weigh2"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/weigh/weigh.c", "tests/modules/weigh/weigh_follow.c", "tests/modules/weigh/weigh_read.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["ON=2"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "weigh16"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/weigh/weigh.c", "tests/modules/weigh/weigh_follow.c", "tests/modules/weigh/weigh_read.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["ON=16"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "stress1"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/stress/stress.c", "tests/modules/stress/stress_by_id.c", "tests/modules/stress/stress_by_spans.c", "tests/modules/stress/stress_see_first.c", "tests/modules/stress/stress_see_last.c", "tests/modules/stress/stress_work.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["SEED=1u", "SPACE=\"s1\""]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "stress2"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/stress/stress.c", "tests/modules/stress/stress_by_id.c", "tests/modules/stress/stress_by_spans.c", "tests/modules/stress/stress_see_first.c", "tests/modules/stress/stress_see_last.c", "tests/modules/stress/stress_work.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["SEED=2u", "SPACE=\"s2\""]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "stress3"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/stress/stress.c", "tests/modules/stress/stress_by_id.c", "tests/modules/stress/stress_by_spans.c", "tests/modules/stress/stress_see_first.c", "tests/modules/stress/stress_see_last.c", "tests/modules/stress/stress_work.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["SEED=3u", "SPACE=\"s3\""]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "stress4"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/stress/stress.c", "tests/modules/stress/stress_by_id.c", "tests/modules/stress/stress_by_spans.c", "tests/modules/stress/stress_see_first.c", "tests/modules/stress/stress_see_last.c", "tests/modules/stress/stress_work.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["SEED=4u", "SPACE=\"s4\""]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "mover"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/mover.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "reader"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/reader.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "refs"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/refs.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "fp"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/fp.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "badterm"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/badterm.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "spin3"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/spin3.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "flood"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/flood.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "chatty"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/chatty.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "rows"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/rows.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "halver"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/halver.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "twostep"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/twostep.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+variants = [{ name = "twostep_third", defines = ["BRIDGE_ROWS_CHECKED", "THIRD"] }]
+
+[[artifact]]
+name = "watcher"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/watcher.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "chain"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/chain.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "badobs"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/badobs.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "events"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/events.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "fixer"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/fixer.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "nested"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/nested.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "namer"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/namer.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "spawner"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/spawner.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "counter"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/counter.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "typer"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/typer.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "user"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/user.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "hang"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/hang.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "hit"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/hit/start.c", "tests/modules/hit/walk.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "shield"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/shield.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "aim"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/aim.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "levels"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/levels.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "tagged"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/tagged.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "rows-unchecked"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/rows.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_UNCHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "nested2"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/nested.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "LEAVE_OUT_VEC2"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "settings"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/settings/lifecycle.c", "tests/modules/settings/show.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "KEPT=BRIDGE_SINGLETON"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "kept-unset"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/kept.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "KEPT=0"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "kept-none"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/kept.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "KEPT=9"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "kept-sparse"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/kept.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "KEPT=BRIDGE_SPARSE_SET"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "namer-reader"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/namer.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "READER"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "flaky-always"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/flaky.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "OF=1", "FAILS=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "flaky-third"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/flaky.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "OF=3", "FAILS=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "flaky-twothirds"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/flaky.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "OF=3", "FAILS=2"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "flaky-calm"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/flaky.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "OF=1", "FAILS=1", "CALM"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "keeper-strip"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/keeper.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "PRIVATE_POLICY=BRIDGE_STRIP"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "keeper-sweep"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/keeper.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "PRIVATE_POLICY=BRIDGE_SWEEP"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "keeper-delete"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/keeper.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "PRIVATE_POLICY=BRIDGE_DELETE"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "retype-private"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/retype.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "WHICH=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "retype-vec2"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/retype.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "WHICH=2"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "retype-extra"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/retype.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "WHICH=3"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "retype-settings"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/retype.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "WHICH=4"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "settings-drop"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/settings/lifecycle.c", "tests/modules/settings/show.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "DROP", "KEPT=BRIDGE_SINGLETON"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "settings-table"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/settings/lifecycle.c", "tests/modules/settings/show.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "KEPT=BRIDGE_TABLE"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "ticker"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/ticker.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "STEP=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "ticker-ten"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/ticker.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "STEP=10"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "ticker-wide"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/ticker.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "WIDE"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "ticker-fail"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/ticker.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "FAIL_RELOAD"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "ticker-noextra"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/ticker.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "NO_EXTRA"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "ticker-trip"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/ticker.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "STEP=1", "TRIP"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "ticker-alloc"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/ticker.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "ALLOC"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-declare-outside"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_outside", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-declare-name-outside"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_name_outside", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-declare-no-namespace"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_no_namespace", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-declare-kind-unset"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_kind_unset", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-declare-tag-with-bytes"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_tag_with_bytes", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-declare-policy-unset"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_policy_unset", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-declare-size-other"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_size_other", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-system-outside"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_outside", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-system-phase-outside"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_phase_outside", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-system-name-outside"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_outside", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-system-many-changes"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_many_changes", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-system-twice"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_twice", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-observer-no-term"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observer_no_term", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-observe-outside"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_outside", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-observe-events-unset"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_events_unset", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-term-access-unset"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_term_access_unset", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-term-access-other"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_term_access_other", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-term-oper-unset"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_term_oper_unset", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-term-slot-undeclared"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_term_slot_undeclared", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-term-write-ungranted"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_term_write_ungranted", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-change-slot-undeclared"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_change_slot_undeclared", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-change-ungranted"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_change_ungranted", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-alloc-stated-none"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_alloc_stated_none", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-declare-late"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_declare_late"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-system-late"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_system_late"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-observe-late"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_observe_late"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-attach-undeclared"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_undeclared"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-attach-ungranted"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_ungranted"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-attach-outside"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_outside"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-detach-undeclared"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_detach_undeclared"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "wrong-attach-tag-value"
+kind = "library"
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_tag_value"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "schema"
+kind = "program"
+sources = ["tests/schema/*.c", "src/schema.c", "src/schema_*.c"]
+include = ["include", "src", "src/os"]
+defines = ["BRIDGE_BUILDING"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "storage"
+kind = "program"
+sources = ["tests/storage/*.c", "src/*.c", "src/os/{system}/*.c"]
+include = ["include", "src", "src/os"]
+defines = ["BRIDGE_BUILDING", "{paths}"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "storage-counted"
+kind = "program"
+sources = ["tests/storage/*.c"]
+include = ["include", "src", "src/os"]
+defines = ["COUNTED", "{paths}"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+link = ["{out}/counted.a", "{out}/counted_os.a"]
+
+[[artifact]]
+name = "host"
+kind = "program"
+sources = ["tests/host/*.c", "tests/support/host*.c", "tests/support/{system}/host*.c"]
+include = ["include", "tests/support"]
+defines = ["{paths}"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+link = ["{out}/bridge{library}"]
+
+[[artifact]]
+name = "host-static"
+kind = "program"
+sources = ["tests/host/*.c", "tests/support/host*.c", "tests/support/{system}/host*.c"]
+include = ["include", "tests/support"]
+defines = ["{paths}"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+link = ["{out}/bridge.a"]

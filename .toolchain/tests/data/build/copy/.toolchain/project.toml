@@ -1,0 +1,16 @@
+[project]
+name = "copy"
+
+[variables]
+tool = "{python}"
+source = ".toolchain/project.toml"
+linked = ".toolchain/project.toml"
+
+[tools]
+interpreter = "{tool}"
+
+[[artifact]]
+name = "copy.txt"
+kind = "file"
+sources = ["{source}"]
+link = ["{root}/{linked}"]

@@ -1,0 +1,79 @@
+[[case]]
+name = "a licence that is not there"
+run = ["{python}", "{root}/.toolchain/tools/licence.py", "--root", "{case}/p"]
+folders = { "{case}/p" = ["cla.md"] }
+files = { "{case}/p/readme.md" = "# p\n\nRead `cla.md`.\n" }
+claims = { status_not = 0, line = ["license is not there"] }
+false = { folders = { "{case}/p" = ["license", "cla.md"] } }
+
+[[case]]
+name = "a licence that is not the published text"
+run = ["{python}", "{root}/.toolchain/tools/licence.py", "--root", "{case}/p"]
+folders = { "{case}/p" = [".toolchain/tests/data/licence/license", "cla.md"] }
+files = { "{case}/p/readme.md" = "# p\n\nRead `cla.md`.\n" }
+claims = { status_not = 0, line = ["license is not the published text of the licence"] }
+false = { folders = { "{case}/p" = ["license", "cla.md"] } }
+
+[[case]]
+name = "a file that says that all rights are reserved"
+run = ["{python}", "{root}/.toolchain/tools/licence.py", "--root", "{case}/p"]
+folders = { "{case}/p" = ["license", "cla.md"], "{case}/p/src" = [".toolchain/tests/data/licence/license"] }
+files = { "{case}/p/readme.md" = "# p\n\nRead `cla.md`.\n" }
+claims = { status_not = 0, line = ["src/license:1: says that all rights are reserved"] }
+false = { folders = { "{case}/p/src" = [] } }
+
+[[case]]
+name = "a file of third_party"
+run = ["{python}", "{root}/.toolchain/tools/licence.py", "--root", "{case}/p"]
+folders = { "{case}/p" = ["license", "cla.md"], "{case}/p/third_party/zlib" = [".toolchain/tests/data/licence/license"] }
+files = { "{case}/p/readme.md" = "# p\n\nRead `cla.md` and `third_party/zlib/license`.\n" }
+claims = { status = 0 }
+false = { folders = { "{case}/p/src" = [".toolchain/tests/data/licence/license"] } }
+
+[[case]]
+name = "a file of tests"
+run = ["{python}", "{root}/.toolchain/tools/licence.py", "--root", "{case}/p"]
+folders = { "{case}/p" = ["license", "cla.md"], "{case}/p/tests" = [".toolchain/tests/data/licence/license"] }
+files = { "{case}/p/readme.md" = "# p\n\nRead `cla.md`.\n" }
+claims = { status = 0 }
+false = { folders = { "{case}/p/src" = [".toolchain/tests/data/licence/license"] } }
+
+[[case]]
+name = "a file that is not text"
+run = ["{python}", "{root}/.toolchain/tools/licence.py", "--root", "{case}/p"]
+folders = { "{case}/p" = ["license", "cla.md"], "{case}/p/src" = [".toolchain/tests/data/licence/reserved.bin"] }
+files = { "{case}/p/readme.md" = "# p\n\nRead `cla.md`.\n" }
+claims = { status = 0 }
+false = { folders = { "{case}/p/src" = [".toolchain/tests/data/licence/license"] } }
+
+[[case]]
+name = "a source with no notice"
+run = ["{python}", "{root}/.toolchain/tools/licence.py", "--root", "{case}/p"]
+folders = { "{case}/p" = ["license", "cla.md"] }
+files = { "{case}/p/readme.md" = "# p\n\nRead `cla.md` and `third_party/zlib/license`.\n", "{case}/p/third_party/zlib/fix.patch" = "a patch\n" }
+claims = { status_not = 0, line = ["third_party/zlib/license is not there"] }
+false = { files = { "{case}/p/third_party/zlib/license" = "the licence of zlib\n" } }
+
+[[case]]
+name = "a notice that the readme does not name"
+run = ["{python}", "{root}/.toolchain/tools/licence.py", "--root", "{case}/p"]
+folders = { "{case}/p" = ["license", "cla.md"] }
+files = { "{case}/p/readme.md" = "# p\n\nRead `cla.md`.\n", "{case}/p/third_party/zlib/license" = "the licence of zlib\n" }
+claims = { status_not = 0, line = ["readme.md does not name third_party/zlib/license"] }
+false = { files = { "{case}/p/readme.md" = "# p\n\nRead `cla.md` and `third_party/zlib/license`.\n" } }
+
+[[case]]
+name = "an agreement that is not there"
+run = ["{python}", "{root}/.toolchain/tools/licence.py", "--root", "{case}/p"]
+folders = { "{case}/p" = ["license"] }
+files = { "{case}/p/readme.md" = "# p\n\nRead `cla.md`.\n" }
+claims = { status_not = 0, line = ["cla.md is not there"] }
+false = { folders = { "{case}/p" = ["license", "cla.md"] } }
+
+[[case]]
+name = "an agreement that the readme does not name"
+run = ["{python}", "{root}/.toolchain/tools/licence.py", "--root", "{case}/p"]
+folders = { "{case}/p" = ["license", "cla.md"] }
+files = { "{case}/p/readme.md" = "# p\n" }
+claims = { status_not = 0, line = ["readme.md does not name cla.md"] }
+false = { files = { "{case}/p/readme.md" = "# p\n\nRead `cla.md`.\n" } }

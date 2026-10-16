@@ -1,0 +1,63 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-linux-gnu
+            runner: ubuntu-latest
+            architecture: x64
+          - target: aarch64-linux-gnu
+            runner: ubuntu-24.04-arm
+            architecture: arm64
+          - target: aarch64-macos
+            runner: macos-latest
+            architecture: arm64
+          - target: x86_64-macos
+            runner: macos-15-intel
+            architecture: x64
+          - target: x86_64-windows-gnu
+            runner: windows-latest
+            architecture: x64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+          architecture: ${{ matrix.architecture }}
+      - name: Fetch
+        run: python project.py fetch
+      - name: Check
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || format('{0}~1', github.sha) }}
+          HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: python project.py check --commits "$BASE..$HEAD"
+      - name: Test
+        run: python project.py test
+      - name: Break
+        run: python project.py test --break
+      - name: Build for aarch64-windows-gnu
+        if: runner.os == 'Windows'
+        run: python project.py build --target aarch64-windows-gnu

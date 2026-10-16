@@ -1,6 +1,2 @@
-# a file is the same bytes on every machine, whatever git there is set to: what is handed
-# is copied from the tree, and a header of a commit has one hash and not one a system
 * text=auto eol=lf
-
-# the licence is its authors' text byte for byte, on every machine
-license text eol=lf
+*.patch -text

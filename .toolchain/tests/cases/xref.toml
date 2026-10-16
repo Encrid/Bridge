@@ -1,0 +1,69 @@
+[[case]]
+name = "a path that is not in the project"
+run = ["{python}", "{root}/.toolchain/tools/xref.py", "--root", "{case}/p"]
+files = { "{case}/p/readme.md" = "# p\n\nRead `src/gone.c`.\n" }
+claims = { status_not = 0, has = ["readme.md:3: src/gone.c is not a file of the project"] }
+false = { files = { "{case}/p/src/gone.c" = "int gone;\n" } }
+
+[[case]]
+name = "a path into include"
+run = ["{python}", "{root}/.toolchain/tools/xref.py", "--root", "{case}/p"]
+files = { "{case}/p/readme.md" = "# p\n\nRead `include/gone.h`.\n" }
+claims = { status_not = 0, has = ["readme.md:3: include/gone.h is not a file of the project"] }
+false = { files = { "{case}/p/include/gone.h" = "int gone;\n" } }
+
+[[case]]
+name = "a citation of a document that is not there"
+run = ["{python}", "{root}/.toolchain/tools/xref.py", "--root", "{case}/p"]
+files = { "{case}/p/readme.md" = "# p\n\nRead `notes.md`, *Usage*.\n" }
+claims = { status_not = 0, has = ["readme.md:3: notes.md is not a file of the project"] }
+false = { files = { "{case}/p/notes.md" = "# notes.md\n\n## Usage\n" } }
+
+[[case]]
+name = "a citation of a heading that is not there"
+run = ["{python}", "{root}/.toolchain/tools/xref.py", "--root", "{case}/p"]
+files = { "{case}/p/readme.md" = "# p\n\nRead `docs/a.md`, *Usage*.\n", "{case}/p/docs/a.md" = "# docs/a.md\n\n## Use\n" }
+claims = { status_not = 0, has = ["readme.md:3: docs/a.md has no heading Usage"] }
+false = { files = { "{case}/p/docs/a.md" = "# docs/a.md\n\n## Usage\n" } }
+
+[[case]]
+name = "a citation on two lines"
+run = ["{python}", "{root}/.toolchain/tools/xref.py", "--root", "{case}/p"]
+files = { "{case}/p/readme.md" = "# p\n\nRead `docs/a.md`,\n*Usage*.\n", "{case}/p/docs/a.md" = "# docs/a.md\n\n## Use\n" }
+claims = { status_not = 0, has = ["readme.md:3: docs/a.md has no heading Usage"] }
+false = { files = { "{case}/p/docs/a.md" = "# docs/a.md\n\n## Usage\n" } }
+
+[[case]]
+name = "a reference to a heading that is not there"
+run = ["{python}", "{root}/.toolchain/tools/xref.py", "--root", "{case}/p"]
+files = { "{case}/p/readme.md" = "# p\n\nRead the section *Usage*.\n" }
+claims = { status_not = 0, has = ["readme.md:3: this document has no heading Usage"] }
+false = { files = { "{case}/p/readme.md" = "# p\n\nRead the section *Usage*.\n\n## Usage\n" } }
+
+[[case]]
+name = "a path in a fenced block"
+run = ["{python}", "{root}/.toolchain/tools/xref.py", "--root", "{case}/p"]
+files = { "{case}/p/readme.md" = "# p\n\n```text\n`src/gone.c`\n```\n" }
+claims = { status = 0 }
+false = { files = { "{case}/p/readme.md" = "# p\n\n`src/gone.c`\n" } }
+
+[[case]]
+name = "a path out of the folders of the layout"
+run = ["{python}", "{root}/.toolchain/tools/xref.py", "--root", "{case}/p"]
+files = { "{case}/p/readme.md" = "# p\n\nRead `build/gone.c`.\n" }
+claims = { status = 0 }
+false = { files = { "{case}/p/readme.md" = "# p\n\nRead `.toolchain/gone.c`.\n" } }
+
+[[case]]
+name = "a folder"
+run = ["{python}", "{root}/.toolchain/tools/xref.py", "--root", "{case}/p"]
+files = { "{case}/p/readme.md" = "# p\n\nRead `src/gone`.\n" }
+claims = { status = 0 }
+false = { files = { "{case}/p/readme.md" = "# p\n\nRead `src/gone.c`.\n" } }
+
+[[case]]
+name = "a document of tests"
+run = ["{python}", "{root}/.toolchain/tools/xref.py", "--root", "{case}/p"]
+files = { "{case}/p/tests/a.md" = "# a\n\nRead `src/gone.c`.\n" }
+claims = { status = 0 }
+false = { files = { "{case}/p/docs/a.md" = "# a\n\nRead `src/gone.c`.\n" } }

@@ -1,0 +1,30 @@
+[[case]]
+name = "a source, patched"
+run = ["{python}", "{root}/.toolchain/tools/fetch.py", "--root", "{root}/.toolchain/tests/data/fetch", "--out", "{case}/out"]
+claims = { status = 0, files = { "{case}/out/third_party/sample/sample/greeting.txt" = "hello, patched" } }
+false = { run = ["{python}", "{root}/.toolchain/tools/fetch.py", "--root", "{root}/.toolchain/tests/data/fetch", "--out", "{case}/out", "--set", "patch=wrong"] }
+
+[[case]]
+name = "a patch that does not apply"
+run = ["{python}", "{root}/.toolchain/tools/fetch.py", "--root", "{root}/.toolchain/tests/data/fetch", "--out", "{case}/out", "--set", "patch=wrong"]
+claims = { status_not = 0, has = ["wrong.patch does not apply to greeting.txt"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/fetch.py", "--root", "{root}/.toolchain/tests/data/fetch", "--out", "{case}/out"] }
+
+[[case]]
+name = "a source that is not what its maker publishes"
+run = ["{python}", "{root}/.toolchain/tools/fetch.py", "--root", "{root}/.toolchain/tests/data/fetch", "--out", "{case}/out", "--set", "digest=0000000000000000000000000000000000000000000000000000000000000000"]
+claims = { status_not = 0, has = ["sample.zip is not what the maker publishes"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/fetch.py", "--root", "{root}/.toolchain/tests/data/fetch", "--out", "{case}/out"] }
+
+[[case]]
+name = "a source that is not fetched"
+run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/fetch", "--out", "{case}/out"]
+claims = { status_not = 0, has = ["sample is not fetched as project.toml states: run fetch"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/fetch.py", "--root", "{root}/.toolchain/tests/data/fetch", "--out", "{case}/out"] }
+
+[[case]]
+name = "a source that is fetched already"
+run = ["{python}", "{root}/.toolchain/tools/fetch.py", "--root", "{root}/.toolchain/tests/data/fetch", "--out", "{case}/out"]
+files = { "{case}/out/third_party/sample/fetched.txt" = "75567b2a051f774b98ae9465066ee4c6c574ebdbc1337c8aa584b85b977190d2 221a50d71324360e205e1813d4cd5e7ed637e9eb7e1c9ec3b082ca3aa4234f61", "{case}/out/third_party/sample/sample/greeting.txt" = "hello, kept" }
+claims = { status = 0, files = { "{case}/out/third_party/sample/sample/greeting.txt" = "hello, kept" } }
+false = { files = { "{case}/out/third_party/sample/fetched.txt" = "an older stamp" } }

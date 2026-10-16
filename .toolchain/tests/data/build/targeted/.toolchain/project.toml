@@ -1,0 +1,8 @@
+[project]
+name = "targeted"
+
+[[artifact]]
+name = "near-{target}.txt"
+kind = "file"
+sources = [".toolchain/project.toml"]
+variants = [{ name = "far-{target}.txt", target = "aarch64-windows-gnu" }]

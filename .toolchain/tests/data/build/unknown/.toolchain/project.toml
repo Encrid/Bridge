@@ -1,0 +1,10 @@
+[project]
+name = "unknown"
+
+[variables]
+named = "{nothing}"
+
+[[artifact]]
+name = "{named}"
+kind = "file"
+sources = [".toolchain/project.toml"]

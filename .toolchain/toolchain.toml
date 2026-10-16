@@ -1,0 +1,145 @@
+[zig]
+version = "0.16.0"
+folder = "build/zig"
+url = "https://ziglang.org/download/{version}/zig-{host}-{version}.{format}"
+
+[zig.archives]
+x86_64-windows-gnu = { host = "x86_64-windows", format = "zip", sha256 = "68659eb5f1e4eb1437a722f1dd889c5a322c9954607f5edcf337bc3684a75a7e" }
+x86_64-linux-gnu = { host = "x86_64-linux", format = "tar.xz", sha256 = "70e49664a74374b48b51e6f3fdfbf437f6395d42509050588bd49abe52ba3d00" }
+aarch64-macos = { host = "aarch64-macos", format = "tar.xz", sha256 = "b23d70deaa879b5c2d486ed3316f7eaa53e84acf6fc9cc747de152450d401489" }
+aarch64-linux-gnu = { host = "aarch64-linux", format = "tar.xz", sha256 = "ea4b09bfb22ec6f6c6ceac57ab63efb6b46e17ab08d21f69f3a48b38e1534f17" }
+x86_64-macos = { host = "x86_64-macos", format = "tar.xz", sha256 = "0387557ed1877bc6a2e1802c8391953baddba76081876301c522f52977b52ba7" }
+
+[build]
+folder = "build"
+cache = "build/zig-cache"
+
+[variables]
+language = ["-std=c23", "-pedantic-errors", "-Wall", "-Wextra", "-Werror"]
+optimize = ["-O2", "-DNDEBUG", "-g", "-fno-sanitize=undefined", "-fno-stack-protector", "-fno-omit-frame-pointer"]
+float = ["-ffp-contract=on", "-fno-fast-math", "-fno-rounding-math"]
+
+[debug]
+optimize = ["-O0", "-g", "-fsanitize=undefined", "-fno-sanitize=vptr", "-fno-sanitize=function", "-fstack-protector-strong", "-fno-omit-frame-pointer"]
+
+[targets.x86_64-windows-gnu]
+runs_on = ["Windows", "AMD64"]
+system = "windows"
+triple = "x86_64-windows.win10...win11_dt-gnu"
+cpu = "x86_64"
+exe = ".exe"
+library = ".dll"
+define = []
+pic = []
+rpath = []
+soname = []
+stack = "-Wl,--stack,16777216"
+errno = "-fmath-errno"
+
+[targets.x86_64-linux-gnu]
+runs_on = ["Linux", "x86_64"]
+system = "posix"
+triple = "x86_64-linux.5.10.0...6.19.0-gnu.2.31.0"
+cpu = "x86_64"
+exe = ""
+library = ".so"
+define = ["-D_DEFAULT_SOURCE"]
+pic = ["-fPIC"]
+rpath = ["-Wl,-rpath,$ORIGIN"]
+soname = ["-Wl,-soname,{name}{library}"]
+stack = "-Wl,-z,stack-size=16777216"
+errno = "-fmath-errno"
+
+[targets.aarch64-macos]
+runs_on = ["Darwin", "arm64"]
+system = "posix"
+triple = "aarch64-macos.13.0.0...15.6.0"
+cpu = "apple_m1"
+exe = ""
+library = ".dylib"
+define = []
+pic = ["-fPIC"]
+rpath = ["-Wl,-rpath,@loader_path"]
+soname = ["-Wl,-install_name,@rpath/{name}{library}"]
+stack = "-Wl,-stack_size,16777216"
+errno = "-fno-math-errno"
+
+[targets.aarch64-linux-gnu]
+runs_on = ["Linux", "aarch64"]
+system = "posix"
+triple = "aarch64-linux.5.10.0...6.19.0-gnu.2.31.0"
+cpu = "generic"
+exe = ""
+library = ".so"
+define = ["-D_DEFAULT_SOURCE"]
+pic = ["-fPIC"]
+rpath = ["-Wl,-rpath,$ORIGIN"]
+soname = ["-Wl,-soname,{name}{library}"]
+stack = "-Wl,-z,stack-size=16777216"
+errno = "-fmath-errno"
+
+[targets.x86_64-macos]
+runs_on = ["Darwin", "x86_64"]
+system = "posix"
+triple = "x86_64-macos.13.0.0...15.6.0"
+cpu = "core2"
+exe = ""
+library = ".dylib"
+define = []
+pic = ["-fPIC"]
+rpath = ["-Wl,-rpath,@loader_path"]
+soname = ["-Wl,-install_name,@rpath/{name}{library}"]
+stack = "-Wl,-stack_size,16777216"
+errno = "-fno-math-errno"
+
+[targets.aarch64-windows-gnu]
+runs_on = []
+system = "windows"
+triple = "aarch64-windows.win10...win11_dt-gnu"
+cpu = "generic"
+exe = ".exe"
+library = ".dll"
+define = []
+pic = []
+rpath = []
+soname = []
+stack = "-Wl,--stack,16777216"
+errno = "-fmath-errno"
+
+[kinds.program]
+output = "{name}{exe}"
+steps = [
+    { run = ["{zig}", "cc", "-target", "{triple}", "-mcpu={cpu}", "{optimize}", "{float}", "{errno}", "{language}", "{define}", "{defines}", "{include}", "{sources}", "{link}", "{flags}", "{rpath}", "-o", "{output}", "{stack}"] },
+]
+
+[kinds.library]
+output = "{name}{library}"
+steps = [
+    { run = ["{zig}", "cc", "-target", "{triple}", "-mcpu={cpu}", "-shared", "{pic}", "{soname}", "{optimize}", "{float}", "{errno}", "{language}", "{define}", "{defines}", "{include}", "{sources}", "{flags}", "-o", "{output}"] },
+]
+
+[kinds.archive]
+output = "{name}.a"
+steps = [
+    { run = ["{zig}", "build-lib", "-static", "-target", "{triple}", "-mcpu={cpu}", "-lc", "-femit-bin={output}", "-cflags", "{optimize}", "{float}", "{errno}", "{language}", "-Wno-unused-command-line-argument", "{define}", "{defines}", "{include}", "{flags}", "--", "{sources}"] },
+]
+
+[kinds.file]
+output = "{name}"
+steps = [
+    { copy = ["{sources}", "{output}"] },
+]
+
+[style]
+columns = 80
+lines = 20
+functions = 5
+arguments = 4
+branches = 3
+depth = 2
+
+[prose]
+sentence = 25
+step = 20
+paragraph = 6
+description = 119

@@ -1,0 +1,5 @@
+[[case]]
+name = "still"
+run = ["{python}", "-c", ""]
+claims = { status = 0 }
+false = { env = {} }

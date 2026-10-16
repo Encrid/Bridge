@@ -1,22 +1,14 @@
-"""Measure each storage layout beside the best implementation of it there is.
-
-    python tools/reference.py [--target x86_64-windows-gnu] [--times 2]
-
-flecs and EnTT are fetched at the tags pinned below into build/reference/, built with zig, and
-run in turn with the library's own `storage measure`, `storage weigh` and `storage baseline`,
-which `python build.py` must have built. Nothing of either is kept in the tree: the library is
-self contained, and these are what it is measured beside - docs/plan/stage11.md, *Beside the
-best there is*.
-"""
+# Copyright (C) 2026 Enkrid
+#
+# Under the GNU Affero General Public License, version 3 only: see license.
 import argparse
-import pathlib
 import shutil
 import subprocess
 import sys
 import urllib.request
+from pathlib import Path
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
-# what is measured beside: a project, its tag, and the files of it that are needed
+ROOT = Path(__file__).resolve().parent.parent
 PINNED = {
     'flecs': ('https://raw.githubusercontent.com/SanderMertens/flecs/v4.1.6/distr/', ['flecs.c', 'flecs.h']),
     'entt': ('https://raw.githubusercontent.com/skypjack/entt/v4.0.0/single_include/entt/', ['entt.hpp']),
@@ -26,22 +18,16 @@ PINNED = {
 def run(command, **more):
     done = subprocess.run([str(c) for c in command], capture_output=True, text=True, **more)
     if done.returncode:
-        sys.exit('reference: failed: %s\n%s%s' % (' '.join(str(c) for c in command), done.stdout, done.stderr))
+        sys.exit('reference.py: failed: %s\n%s%s' % (' '.join(str(c) for c in command), done.stdout, done.stderr))
     return done.stdout
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__.split('\n')[0])
-    parser.add_argument('--target', default='x86_64-windows-gnu')
-    parser.add_argument('--times', type=int, default=2)
-    args = parser.parse_args()
-    zig = shutil.which('zig') or sys.exit('reference: zig is not on the path')
-    out = ROOT / 'build' / 'reference'
-    exe = '.exe' if 'windows' in args.target else ''
-    ours = ROOT / 'build' / args.target / ('storage' + exe)
-    if not ours.exists():
-        sys.exit('reference: %s is not built: python build.py' % ours)
+def zig_path():
+    fetched = sorted(ROOT.glob('build/zig/*/zig.exe')) + sorted(ROOT.glob('build/zig/*/zig'))
+    return str(fetched[0]) if fetched else shutil.which('zig') or sys.exit('reference.py: zig is not there: run fetch')
 
+
+def fetched(out):
     for name, (url, files) in PINNED.items():
         where = out / name
         where.mkdir(parents=True, exist_ok=True)
@@ -50,8 +36,10 @@ def main():
                 print('fetching', url + file, flush=True)
                 urllib.request.urlretrieve(url + file, where / file)
 
-    flags = ['-target', args.target, '-O2', '-DNDEBUG']
-    windows = ['-lws2_32', '-ldbghelp'] if 'windows' in args.target else []
+
+def built(zig, target, out, exe):
+    flags = ['-target', target, '-O2', '-DNDEBUG']
+    windows = ['-lws2_32', '-ldbghelp'] if 'windows' in target else []
     source = ROOT / 'tests' / 'reference'
     if not (out / 'flecs.o').exists():
         run([zig, 'cc', '-std=c23', *flags, '-c', out / 'flecs' / 'flecs.c', '-o', out / 'flecs.o'])
@@ -60,7 +48,19 @@ def main():
     run([zig, 'c++', '-std=c++23', *flags, '-I', out, source / 'entt_ref.cpp', '-o', out / ('entt_ref' + exe)])
     run([zig, 'cc', '-std=c23', *flags, source / 'floor.c', '-o', out / ('floor' + exe)])
 
-    # in turn, and more than once: a machine is not as quick from one minute to the next
+
+def main():
+    parser = argparse.ArgumentParser(description='Measure each storage layout beside flecs and EnTT.')
+    parser.add_argument('--target', default='x86_64-windows-gnu')
+    parser.add_argument('--times', type=int, default=2)
+    args = parser.parse_args()
+    out = ROOT / 'build' / 'reference'
+    exe = '.exe' if 'windows' in args.target else ''
+    ours = ROOT / 'build' / args.target / ('storage' + exe)
+    if not ours.exists():
+        sys.exit('reference.py: %s is not built: run python project.py build' % ours.as_posix())
+    fetched(out)
+    built(zig_path(), args.target, out, exe)
     for time in range(args.times):
         print('==== run %d' % (time + 1), flush=True)
         for what in ('measure', 'weigh', 'baseline'):

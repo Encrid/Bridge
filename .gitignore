@@ -1,5 +1,2 @@
-build/
+/build/
 __pycache__/
-*.pyc
-.zig-cache/
-a.out

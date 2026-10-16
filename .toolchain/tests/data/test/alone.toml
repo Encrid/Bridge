@@ -1,0 +1,4 @@
+[[case]]
+name = "alone"
+run = ["{python}", "-c", ""]
+claims = { status = 0 }

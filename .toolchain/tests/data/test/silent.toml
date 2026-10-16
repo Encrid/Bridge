@@ -1,0 +1,4 @@
+[[case]]
+name = "silent"
+run = ["{python}", "-c", ""]
+false = { run = ["{python}", "-c", "import sys; sys.exit(1)"] }

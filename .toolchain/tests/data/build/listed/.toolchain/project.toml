@@ -1,0 +1,10 @@
+[project]
+name = "listed"
+
+[variables]
+named = "{language}"
+
+[[artifact]]
+name = "{named}"
+kind = "file"
+sources = [".toolchain/project.toml"]

@@ -1,0 +1,81 @@
+# .toolchain/tools/layout.py
+
+`layout.py` checks the tree of the project: the paths, the needed files, the documents and the names.
+It reads the files that `ours` gives. `ours` leaves out the files of `tests` and of `.toolchain/tests`, thus no rule of `layout.py` applies to them.
+
+## Functions
+
+| Function | Result |
+| --- | --- |
+| `faults(root, paths)` | Gives the faults of the tree. |
+| `main()` | Runs the check. |
+
+## The paths
+
+The layout allows only the paths of this table.
+`<name>` is one name of a file or of a folder.
+`**` is one name or more, with a `/` between two names.
+
+| Path | Rule |
+| --- | --- |
+| `.github/workflows/ci.yml`, `.github/workflows/release.yml`, `.github/workflows/cla.yml` | Needed. |
+| `.gitattributes`, `.gitignore`, `cla.md`, `license` | Needed. |
+| `project.py`, `.toolchain/project.toml`, `readme.md` | Needed. |
+| `docs/contributing/<name>.md`, for each name of `GUIDES`: `agreement`, `coding_style`, `commits`, `documentation_style`, `pull_request` and `tests` | Needed. |
+| `docs/extern/**.md`, `docs/intern/**.md` | The documents of the files. The section *The documents* gives their rules. |
+| `include/**.h` | The public headers. |
+| `src/**` | The sources, the private headers and the other inputs of a build. |
+| `tools/**` | The tools of the project. |
+| `third_party/<source>/<name>.patch` | A patch of a source. |
+| `third_party/<source>/license` | The licence of a source. |
+| `.toolchain/tools/<name>.py` | Needed: one file or more. The tools of the toolchain. |
+| `.toolchain/toolchain.toml` and `.toolchain/header.txt` | The values and the legal notice of the toolchain. |
+| `.toolchain/docs/<name>.md` | A document of the toolchain. |
+| `<folder>/.gitkeep`, in `docs/extern`, `docs/intern`, `include` or `src` | An empty file that keeps an empty folder in git. |
+
+`layout.py` does not read `tests` and `.toolchain/tests`. Thus they can hold any file.
+
+The messages are:
+
+- `<path>: the layout does not allow this file`
+- `<path>: the layout needs this file`
+- `<folder>/: the layout needs this folder`
+
+## The documents
+
+`shared.document` gives the document of a file:
+
+- The document of `include/<path>` is `docs/extern/<path>.md`.
+- The document of `src/<path>` is `docs/intern/<path>.md`.
+- A file `.gitkeep` has no document.
+
+The first line of a document is `#`, a space, and the path of its file.
+A document of `docs/extern` or of `docs/intern` is a fault if its file is not there.
+
+The messages are:
+
+- `<path>: no document <document>`
+- `<document>: no file has this document`
+- `<document>: the first line is not # <path>`
+
+## The names
+
+Each name of a path is in snake_case.
+Such a name has lower-case letters, digits and `_`, then each extension: a `.`, then lower-case letters and digits.
+`.github`, `.gitattributes`, `.gitignore` and `.gitkeep` are the only exceptions.
+
+A file that a build or an editor makes is a fault. Its name has one of these forms:
+
+- It ends with `.o`, `.obj`, `.a`, `.so`, `.dll`, `.dylib`, `.exe`, `.gch`, `.d` or `.pyc`.
+- It ends with `~`, or it starts and ends with `#`.
+- It is `a.out`.
+
+The messages are:
+
+- `<path>: '<name>' is not in snake_case`
+- `<path>: a compiled or temporary file`
+
+## Output
+
+`main` gives the faults to `report` of `shared.py`, in the order of the paths.
+Thus the output is the faults, then `faults: <number>`, or else `no fault in <number> files`.

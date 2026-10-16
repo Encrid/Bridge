@@ -1,0 +1,50 @@
+# .toolchain/tests/cases/build.toml
+
+The group `build` checks `.toolchain/tools/build.py`, and the parts of `.toolchain/tools/shared.py` that the tools share.
+Its cases run `build.py` or `test.py` on a project in `.toolchain/tests/data/build`, with the output in `{case}/out`.
+The cases of the options, of the report and of the files of a project run a short Python program that calls `shared`.
+
+| Project | Content |
+| --- | --- |
+| `built` | The library `greet`, the program `greeter`, the archive `greet_static` (with the flag `-DGREETING`), the program `greeter_static` that links it, and the artifact `stamped` with its variant `plain`. |
+| `copy` | The artifact `copy.txt` of the kind `file`. The variables `tool`, `source` and `linked` give its tool, its source and its link. |
+| `twice` | `[variables] language`, a key that `.toolchain/toolchain.toml` also gives. |
+| `builtin` | `[variables] root`, the name of a variable that the tools give. |
+| `unknown` | An artifact with the name `{named}`. The variable `named` is `{nothing}`, which has no value. |
+| `listed` | An artifact with the name `{named}`. The variable `named` is `{language}`, a list in a text. |
+| `targeted` | The artifact `near-{target}.txt`, and its variant `far-{target}.txt` with the target `aarch64-windows-gnu`. |
+| `untargeted` | The same artifact and variant, but the variant has no `target`. |
+
+In `built`, `greet` gets its greeting from `defines`.
+`greeter` includes `.toolchain/tests/data/build/built/include/greet.h`, links `greet`, and has `greet` beside it in its folder.
+`greeter` also compiles `.toolchain/tests/data/build/built/src/<system>/system.c`, and writes `hello from a library, on <system>`.
+The case `greeter` of `built` runs `greeter`. Its false variant runs a copy of `greeter` without the library.
+
+The kind `stamped` copies `.toolchain/tests/data/build/built/src/note.txt` to a work file, renames the work file to the output, and adds the section `said`.
+Then it checks that the output contains `{said}`. The default of `said` is `written`, a word of `note.txt`.
+The section holds the items of `manifest` with commas between them: `first,second`.
+The variant `plain` is unstamped.
+
+| Case | Claim | False variant |
+| --- | --- | --- |
+| a program linked with a library | `test` on `built` passes the cases `greeter` and `greeter_static`: the archive and its flag work. | `test --break`. |
+| a variant without its section | With `--set said=first,second`, `build` stops: `plain.txt does not hold 'first,second'`. | No `--set`. |
+| a build for debugging | With `--debug`, `package.txt` is in `{case}/out/{target}-debug`. | No `--debug`. |
+| a package in a zip | `build --pack` writes the path of the zip, and the names of the files in it. | No `--pack`. |
+| a variable that [variables] does not have | `--set nowhere=1` stops `build`: `--set nowhere=1: [variables] has no nowhere`. | No `--set`. |
+| a key in project.toml and in toolchain.toml | `build` on `twice` stops: `project.toml states variables.language, and toolchain.toml states it too`. | `build` on `copy`. |
+| a built-in variable in [variables] | `build` on `builtin` stops: `[variables] names a built-in variable or a key of a target: root`. | `build` on `copy`. |
+| a target that the toolchain does not have | `--target nowhere` stops `build`: `no target nowhere; the targets:`. | No `--target`. |
+| a tool that is not there | `--set tool=nowhere` stops `build`: `the tool interpreter is not at nowhere`. | No `--set`. |
+| sources that match no file | `--set source=none.txt` stops `build`: `no file matches the sources of copy.txt`. | No `--set`. |
+| a link that is not there | `--set linked=missing.txt` stops `build`: `missing.txt is not there, and copy.txt is linked with it`. | No `--set`. |
+| a variable that has no value | `build` on `unknown` stops: `no variable`. | `--set named=named.txt`. |
+| a list variable in a text | `build` on `listed` stops: `is a list inside a text`. | `--set named=named.txt`. |
+| an artifact for a different target | `build` on `targeted` lists `far-aarch64-windows-gnu.txt` in `package.txt`. No machine runs that target. | `build` on `untargeted`. |
+| an option with a value | `shared.arguments('--commits')` gets `--commits a..b`, and the program writes `a..b`. | No `--commits`, thus the program writes `None`. |
+| a report with faults | `shared.report` gets two faults. It writes them and `faults: 2`, and the status is 1. | No fault. |
+| a report with no fault | `shared.report` gets no fault, 12 and `commits`. It writes `no fault in 12 commits`, and the status is 0. | One fault. |
+| the files of a project, walked | `shared.repository` writes `False` for `{case}/w`. `shared.ours` gives `{case}/w/a.txt` and `{case}/w/src/build/e.txt`. It leaves out `tests`, the folder `build` at the root and `__pycache__`. | `{case}/w/src/b.txt` is also there. |
+| the files of a project, from git | The program makes `{case}/g` a repository of git, and `shared.repository` writes `True`. `shared.ours` gives `a.txt` and `.gitignore`, but not `tests` or a file that git ignores. | `{case}/g/src/b.txt` is also there. |
+
+`.toolchain/docs/build.py.md` gives the limits of these cases.

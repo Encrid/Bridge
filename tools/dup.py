@@ -1,54 +1,49 @@
-#!/usr/bin/env python3
-"""Runs of eight words appearing in more than one document.
-
-Finds a document re-arguing a conclusion that lives elsewhere, which is how two
-copies drift until neither is clearly wrong. One shared passage is one hit:
-overlapping runs over the same pair of files are grown into the longest run and
-reported once, so the count is passages and not windows. Run from docs/.
-
-Not every hit is a defect. A signature stated in both ABI documents, a shared
-boilerplate line, and two documents citing one source are all fine. Read the
-hits; do not chase the number to zero.
-"""
+# Copyright (C) 2026 Enkrid
+#
+# Under the GNU Affero General Public License, version 3 only: see license.
 import collections
-import glob
-import os
 import re
+from pathlib import Path
 
-N = 8
-files = glob.glob('**/*.md', recursive=True)
-grams = collections.defaultdict(set)
-words_of = {}
+ROOT = Path(__file__).resolve().parent.parent
+RUN = 8
 
-for f in files:
-    text = open(f, encoding='utf-8').read().lower()
-    text = re.sub(r'[`*_#\[\]()]', ' ', text)
-    words = re.findall(r"[a-z0-9']+", text)
-    words_of[f] = words
-    for i in range(len(words) - (N - 1)):
-        grams[' '.join(words[i:i + N])].add(f)
 
-# grow each shared window rightwards while every file still shares it, then keep
-# only the windows nothing longer already covers. a passage quoted in two places
-# is one hit rather than len(passage) - 7 of them.
-out = {}
-for f, words in sorted(words_of.items()):
-    i, n = 0, len(words)
-    while i <= n - N:
-        fs = grams[' '.join(words[i:i + N])]
-        if len(fs) < 2:
-            i += 1
-            continue
-        end = i + N
-        while end < n and grams[' '.join(words[end - N + 1:end + 1])] >= fs:
-            end += 1
-        out[' '.join(words[i:end])] = fs
-        i = end - N + 1
+def words_of(path):
+    text = re.sub(r'[`*_#\[\]()]', ' ', path.read_text(encoding='utf-8').lower())
+    return re.findall(r"[a-z0-9']+", text)
 
-runs = sorted(out, key=lambda x: -len(x))
-runs = [g for g in runs if not any(g in o and g != o for o in runs)]
 
-for g in sorted(runs, key=lambda x: sorted(out[x])):
-    names = ','.join(x.replace(os.sep, '/').replace('.md', '') for x in sorted(out[g]))
-    print('%-32s %s' % (names, g))
-print('\n%d duplicated passages' % len(runs))
+def shared_runs(words_by_file):
+    grams = collections.defaultdict(set)
+    for name, words in words_by_file.items():
+        for i in range(len(words) - (RUN - 1)):
+            grams[' '.join(words[i:i + RUN])].add(name)
+    found = {}
+    for name, words in sorted(words_by_file.items()):
+        i, count = 0, len(words)
+        while i <= count - RUN:
+            files = grams[' '.join(words[i:i + RUN])]
+            if len(files) < 2:
+                i += 1
+                continue
+            end = i + RUN
+            while end < count and grams[' '.join(words[end - RUN + 1:end + 1])] >= files:
+                end += 1
+            found[' '.join(words[i:end])] = files
+            i = end - RUN + 1
+    return found
+
+
+def main():
+    paths = sorted(ROOT.glob('docs/**/*.md'))
+    found = shared_runs({p.relative_to(ROOT).as_posix(): words_of(p) for p in paths})
+    runs = sorted(found, key=lambda run: -len(run))
+    runs = [run for run in runs if not any(run in other and run != other for other in runs)]
+    for run in sorted(runs, key=lambda run: sorted(found[run])):
+        print('%s  %s' % (','.join(sorted(found[run])), run))
+    print('%d passages are in more than one document' % len(runs))
+
+
+if __name__ == '__main__':
+    main()

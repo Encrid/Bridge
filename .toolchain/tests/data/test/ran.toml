@@ -1,0 +1,5 @@
+[[case]]
+name = "ran"
+run = ["{python}", "-c", "import sys; open(sys.argv[1] + '/ran.txt', 'w').write('ran')", "{case}"]
+claims = { status = 0 }
+false = { run = ["{python}", "-c", "import sys; sys.exit(1)"] }

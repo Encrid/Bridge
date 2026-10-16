@@ -1,0 +1,5 @@
+[[case]]
+name = "said"
+run = ["{python}", "-c", "print('the file a.txt is not there')"]
+claims = { status = 0 }
+false = { run = ["{python}", "-c", ""] }
