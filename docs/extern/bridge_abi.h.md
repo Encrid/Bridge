@@ -125,7 +125,7 @@ A line is a `bridge_log_record_t` of 32 bytes:
 | `place` | `place` of the header, when the module wrote the line. |
 | `system` | `system` of the header, when the module wrote the line. |
 | `observer` | `observer` of the header, when the module wrote the line. |
-| `level` | The level of the line: 0 to 7. Lower is worse. |
+| `level` | The level of the line: 0 to 7. Lower is worse. Bridge gives a level above 7 to the sink as 7, with the text of the line. |
 | `pad` | 2 bytes of padding. |
 | `text` | Where the text of the line is: an offset into the private memory, in the scratch arena. |
 | `len` | How many bytes the text has. |

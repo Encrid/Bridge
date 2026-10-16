@@ -1311,6 +1311,16 @@ defines = ["BRIDGE_ROWS_CHECKED"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "shout"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/shout.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "chatty"
 kind = "library"
 test = true

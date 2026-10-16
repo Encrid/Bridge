@@ -31,6 +31,8 @@ A host names the same four in `include/bridge.h`, as `BRIDGE_ERR` and the others
 Each header is whole without the other.
 This file holds the two sets of names equal with static assertions, where the level of a module becomes the level of a host.
 
+A module can write a byte above 7 in a line. `send_line` gives the sink `BRIDGE_LEVEL_MOST` in its place, and keeps the text.
+
 ## The drain
 
 1. Read `ring_head` in the header: the count of the records that the module ever wrote.

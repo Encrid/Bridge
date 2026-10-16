@@ -50,6 +50,8 @@ static void send_line(bridge_t *b, const module_t *m, uint32_t at)
     r.arg[0] = rec.arg[0];
     r.arg[1] = rec.arg[1];
     r.level = rec.level;
+    if (rec.level > BRIDGE_LEVEL_MOST)
+        r.level = BRIDGE_LEVEL_MOST;
     say_send(b, &r);
 }
 

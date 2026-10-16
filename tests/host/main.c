@@ -210,6 +210,8 @@ static const host_case_t TEST_CASES[] = {
         test_hand_keys, "nullkey", test_set_noting },
     { "module_config.max_system_failures-reached-by-barred-destroys",
         test_stop_by_barred, "", test_set_counting },
+    { "record.level-above-seven-given-as-seven",
+        test_log_out_of_range, "", test_set_guarded },
     { "bridge_setting_t-no-kind-refused",
         test_hand_keys, "nokind", test_set_noting },
     { "BRIDGE_INT-negative-for-a-bitmask-refused",
