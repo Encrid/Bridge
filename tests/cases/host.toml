@@ -1477,6 +1477,24 @@ claims = { matches = ["did not load: its setting 'pair' is an integer, and the f
 false = { run = ["{out}/host{exe}", "module_config.setting-enums-of-three-bases-taken"] }
 
 [[case]]
+name = "module_config.max_system_failures-reached-by-two-observers-at-once"
+run = ["{out}/host{exe}", "module_config.max_system_failures-reached-by-two-observers-at-once"]
+claims = { matches = ["observer 'first' failed.*observer 'second' failed.*is stopped: its observer 'first' reached its max_system_failures of 1.*view:sour@0.1.0=STOPPED.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.max_system_failures-a-clean-change-takes-one-back"] }
+
+[[case]]
+name = "module_config.max_system_failures-a-clean-change-takes-one-back"
+run = ["{out}/host{exe}", "module_config.max_system_failures-a-clean-change-takes-one-back"]
+claims = { matches = ["asked to destroy.*asked to destroy.*view:reaper@0.1.0=RUNNING.*alive"], matches_not = ["is stopped"] }
+false = { run = ["{out}/host{exe}", "module_config.max_system_failures-reached-by-barred-destroys"] }
+
+[[case]]
+name = "order.first-of-two-pairs-refused"
+run = ["{out}/host{exe}", "order.first-of-two-pairs-refused"]
+claims = { matches = [".order. pair 0 does not name two systems.*bridge_create refused.*alive"] }
+false = { run = ["{out}/host{exe}", "config.order-cycle-refused"] }
+
+[[case]]
 name = "module_config.identity-none-refused"
 run = ["{out}/host{exe}", "module_config.identity-none-refused"]
 claims = { matches = ["a module with no identity is refused.*alive"] }

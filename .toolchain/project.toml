@@ -351,6 +351,26 @@ include = ["include", "tests/binding", "tests/modules"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "reaper-mend"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/reaper.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["MEND"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "sour"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/sour.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "reaper"
 kind = "library"
 test = true

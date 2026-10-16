@@ -24,6 +24,18 @@ static const char *pick_name(const char *arg)
     return (test_long_name);
 }
 
+void test_order_two_pairs(host_t *h)
+{
+    bridge_order_t pairs[2] = {
+        { "move", "game:twostep:twice" },
+        { "game:mover:move", "game:twostep:twice" }
+    };
+
+    h->cfg.order = pairs;
+    h->cfg.order_count = 2;
+    host_open_only(h);
+}
+
 void test_order_unnamed(host_t *h)
 {
     bridge_order_t pair = { pick_name(h->arg), "game:twostep:twice" };

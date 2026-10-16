@@ -281,6 +281,12 @@ void test_state_wide(host_t *h);
 
 void test_stop_by_barred(host_t *h);
 
+void test_stop_two_observers(host_t *h);
+
+void test_mend_after_fault(host_t *h);
+
+void test_order_two_pairs(host_t *h);
+
 void test_log_out_of_range(host_t *h);
 
 void test_reserve_too_much(host_t *h);
