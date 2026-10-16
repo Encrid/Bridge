@@ -1,22 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/schema_value.c -- the value of a constant, and whether the integer an
-** enum or a bitmask is can hold it.
 */
-
 #include "schema_reader.h"
 
-/*
-** schema_fits
-**
-** Answers whether the integer `base` is holds a value. A value that is not
-** below zero is compared as its bits.
-*/
 bool schema_fits(enum schema_kind base, int64_t value, bool below)
 {
     uint64_t bits = (uint64_t)value;
@@ -41,13 +29,6 @@ bool schema_fits(enum schema_kind base, int64_t value, bool below)
     }
 }
 
-/*
-** read_value
-**
-** Reads the value stated after an equals sign, and the token after it.
-**
-** schema.md, *The type set*
-*/
 static int read_value(schema_reader_t *r)
 {
     schema_read_next(r);
@@ -59,14 +40,6 @@ static int read_value(schema_reader_t *r)
     return (0);
 }
 
-/*
-** schema_set_value
-**
-** Gives the constant just named its value: the one stated, or one more than
-** the last. A bitmask states every one.
-**
-** schema.md, *The type set*
-*/
 int schema_set_value(schema_reader_t *r, bool bits)
 {
     if (schema_is(r, "="))

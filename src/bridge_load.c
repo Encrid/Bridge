@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/bridge_load.c -- a module loaded.
-**
-** lifecycle.md, *The runtime lifecycle*
 */
-
 #include <stdlib.h>
 
 #include "module.h"
@@ -24,13 +17,6 @@ static void keep_share(module_t *m, uint32_t at, uint32_t share)
     m->arena_left = share;
 }
 
-/*
-** take_share
-**
-** Takes a module's share of the persistent arena, for as long as it is
-** loaded: nobody else allocates from it. 1 with a record, and the module
-** discarded, if there was no memory to keep track of it.
-*/
 static int take_share(bridge_t *b, module_t *m)
 {
     uint32_t most = region_get_most(&b->arena_space);
@@ -52,18 +38,6 @@ static int take_share(bridge_t *b, module_t *m)
     return (0);
 }
 
-/*
-** fail_load
-**
-** Says that a load failed, and leaves storage as it was: the ids set aside
-** for the module, what it took of the arena, and every component nobody
-** else declared. Its systems go first, since a query must not outlive a
-** component it names; what it queued goes with its queue. A schedule with
-** its systems taken back out is one that was built before, so the rebuild
-** cannot be refused, and asks for no memory.
-**
-** failure.md, *When something fails*
-*/
 static int fail_load(bridge_t *b, module_t *m, backend_err_t *err)
 {
     say_error(b, "module '%s' did not load: %s", m->identity, err->text);
@@ -82,15 +56,6 @@ static int fail_load(bridge_t *b, module_t *m, backend_err_t *err)
     return (1);
 }
 
-/*
-** start_loaded
-**
-** Runs a module being loaded for the first time. init may spawn, so its ids
-** are set aside before it runs; and a new system or observer that conflicts
-** unordered is refused.
-**
-** budgets.md, *Budgets*
-*/
 static int start_loaded(const module_check_t *k, module_t *m,
     backend_err_t *err)
 {
@@ -106,15 +71,6 @@ static int start_loaded(const module_check_t *k, module_t *m,
     return (schedule_build(b, err->text, sizeof(err->text)));
 }
 
-/*
-** bridge_load
-**
-** Loads a module. Once it has a record a failure is the module's, and its
-** on_error decides what it costs. It goes at the end of the modules: the
-** order they loaded in is the order their changes are applied in. What init
-** queued is applied, and its spans are published. A module that is in and
-** that nothing will ever run is not a load that succeeded.
-*/
 int bridge_load(bridge_t *b, const bridge_artifact_t *a)
 {
     module_check_t k = { b, a };

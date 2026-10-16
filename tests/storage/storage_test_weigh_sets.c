@@ -1,17 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/storage/storage_test_weigh_sets.c -- what a sparse set costs, and
-** what a toggle costs: the change, and the read.
-**
-** storage.md, *A sparse set*
-** storage.md, *A toggle*
 */
-
 #include <stdio.h>
 
 #include "storage_test.h"
@@ -31,13 +22,6 @@ static const storage_test_spread_t TOGGLED[] = {
 
 static const char *const TOGGLE_READS[2] = { "look_b", "look" };
 
-/*
-** weigh_set
-**
-** The change that was weighed in tables, of a component kept in a sparse
-** set, on an entity that carries this much. Answers 1 if the module could
-** not be loaded.
-*/
 static int weigh_set(storage_test_t *t, const storage_test_carried_t *row)
 {
     storage_test_change_t c = {};
@@ -65,14 +49,6 @@ static void say_set_reads(storage_test_t *t, uint32_t count)
         (double)least[1] / 1000.0, (double)least[1] / count);
 }
 
-/*
-** storage_test_weigh_sets
-**
-** A sparse set, changed and read. It is read where the table's own rows
-** are small: a row of 4 KB is a cache miss by itself, and that is the
-** table's and says nothing of the set. Answers 1 if a module could not be
-** loaded.
-*/
 int storage_test_weigh_sets(storage_test_t *t)
 {
     if (weigh_set(t, &SETS[0]))
@@ -81,13 +57,6 @@ int storage_test_weigh_sets(storage_test_t *t)
     return (weigh_set(t, &SETS[1]));
 }
 
-/*
-** weigh_toggle
-**
-** Rows read through their bits, where one row in this many is on: tested
-** at every row, and found a word of bits at a time. Answers 1 if the
-** module could not be loaded.
-*/
 static int weigh_toggle(storage_test_t *t, const storage_test_spread_t *row)
 {
     bridge_artifact_t a = storage_test_state(row->path, 204'800, 8 << 20,
@@ -105,12 +74,6 @@ static int weigh_toggle(storage_test_t *t, const storage_test_spread_t *row)
     return (0);
 }
 
-/*
-** storage_test_weigh_toggles
-**
-** A toggle read, by the share of its rows that is on. Answers 1 if a
-** module could not be loaded.
-*/
 int storage_test_weigh_toggles(storage_test_t *t)
 {
     size_t k = 0;

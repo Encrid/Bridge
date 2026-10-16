@@ -1,26 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/wrong.c -- the wrong module, in the build the case's row
-** names: it does one thing an entry refuses, at init or in its system.
 */
-
 #include "cases.h"
 
 static const char *const TEST_THING[] = {
     "other:Thing"
 };
 
-/*
-** test_do_wrong
-**
-** Loads a build of the wrong module, granted to read the thing of another
-** namespace it declares, and runs a frame.
-*/
 void test_do_wrong(host_t *h)
 {
     bridge_artifact_t a;

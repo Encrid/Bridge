@@ -1,23 +1,11 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/toggle/toggle_find.c -- the system of ntoggle that
-** reaches each entity by its id, and reads whether its T is on.
 */
-
 #include "toggle.h"
 #include "reach.h"
 
-/*
-** see_entity
-**
-** Counts the entity `e` is the record of if its T is on, and adds its
-** value: the column through column_base, and the bits ahead of it.
-*/
 static void see_entity(const test_api_t *api, const bridge_entity_t *e,
     seen_t *seen)
 {
@@ -35,12 +23,6 @@ static void see_entity(const test_api_t *api, const bridge_entity_t *e,
     seen->on++;
 }
 
-/*
-** find
-**
-** Reaches each entity by its id, and says how many are alive, how many of
-** them have T on, and the sum of those.
-*/
 TEST(find)
 {
     const bridge_entity_t *index = get_entity_index(api);

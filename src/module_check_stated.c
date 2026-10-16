@@ -1,24 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/module_check_stated.c -- the keys of a module's config that somebody
-** has to have stated: a zero is nobody's, and so is a negative number that
-** is not the key's "none".
-**
-** config.md, *No unaccountable values*
 */
-
 #include "module.h"
 
-/*
-** module_check_flags
-**
-** Refuses a config with a flag left unset.
-*/
 int module_check_flags(const module_check_t *k)
 {
     const bridge_module_config_t *cfg = k->cfg;
@@ -75,15 +61,6 @@ static int check_bounds(const module_check_t *k)
         || module_check_bound(k, "loss_count", cfg->loss_count, none));
 }
 
-/*
-** module_check_stated
-**
-** Refuses a config with a policy, a limit or an amount left unset, or
-** stated as a number that is nobody's.
-**
-** config.md, *No unaccountable values*
-** budgets.md, *Budgets*
-*/
 int module_check_stated(const module_check_t *k)
 {
     const bridge_module_config_t *cfg = k->cfg;

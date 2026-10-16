@@ -1,21 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/tag/tag_look_set.c -- what a module is handed for
-** a tag kept in a sparse set.
 */
-
 #include "tag.h"
 
-/*
-** look_index
-**
-** Says how many entities have a cell of P's index that says carried.
-*/
 static void look_index(const test_api_t *api)
 {
     const uint32_t *index = test_get_sparse_index(api, ntag_p);
@@ -29,13 +18,6 @@ static void look_index(const test_api_t *api)
     say(api, "P, by its index: entities whose cell says carried", carried, 0);
 }
 
-/*
-** ntag_look_set
-**
-** Says what a module is handed for P, the tag kept in a sparse set: by the
-** spans of a query on it alone, whose base says carried as a table's does,
-** and by each entity's cell of its index, which says the same.
-*/
 void ntag_look_set(const test_api_t *api)
 {
     const bridge_query_t *q = test_get_query(api, ntag_in_set);

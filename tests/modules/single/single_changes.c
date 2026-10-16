@@ -1,23 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/single/single_changes.c -- the systems of nsingle
-** that give the singleton a value, write it and take it.
 */
-
 #include "single.h"
 
-/*
-** attach_a
-**
-** Gives the singleton a value, with the id 0. In the build BAD 2 it first
-** attaches it with the id of an entity, and in the build BAD 3 it first
-** attaches a component that is no singleton with the id 0.
-*/
 TEST(attach_a)
 {
     g_t value = { 10, 1 };
@@ -32,11 +19,6 @@ TEST(attach_a)
     return (0);
 }
 
-/*
-** value_a
-**
-** Gives the singleton another value, when it has one.
-*/
 TEST(value_a)
 {
     g_t value = { 20, 2 };
@@ -45,11 +27,6 @@ TEST(value_a)
     return (0);
 }
 
-/*
-** work
-**
-** Writes a field of the singleton where it is, with no call.
-*/
 TEST(work)
 {
     g_t *value = test_get_single(api, nsingle_g);
@@ -59,11 +36,6 @@ TEST(work)
     return (0);
 }
 
-/*
-** detach_b
-**
-** Takes the singleton's value.
-*/
 TEST(detach_b)
 {
     api->detach(api, 0, nsingle_g);

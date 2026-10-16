@@ -1,25 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/block_create.c -- the shared block made, and unmade.
 */
-
 #include <stdlib.h>
 
 #include "block.h"
 
-/*
-** map_block
-**
-** Reserves the shared block's address space and commits the block, and
-** keeps where each of its parts begins.
-**
-** failure.md, *Out of memory*
-*/
 static int map_block(bridge_t *b, const block_layout_t *layout)
 {
     b->shared = os_reserve((size_t)layout->reserve, (size_t)layout->len);
@@ -52,14 +39,6 @@ static void set_limits(bridge_t *b, const bridge_budget_t *budget)
     b->max_terms = budget->terms;
 }
 
-/*
-** make_storage
-**
-** Makes the two regions' lists of what is free, and storage. A gap lies
-** between two blocks. A table has one block, and so has a sparse set, and
-** so has each type that is direct-indexed or a singleton, of which there
-** are no more than types: never more gaps than those, and one.
-*/
 static int make_storage(bridge_t *b)
 {
     uint32_t room = b->tables + b->sparse_sets + b->max_types + 1;
@@ -74,14 +53,6 @@ static int make_storage(bridge_t *b)
     return (!b->storage);
 }
 
-/*
-** adopt_shared
-**
-** Has every backend adopt the shared block, so that each can hand it to the
-** modules it runs.
-**
-** backend.md, *Memory is adopted, not created*
-*/
 static int adopt_shared(bridge_t *b)
 {
     backend_err_t err = {};
@@ -101,12 +72,6 @@ static int adopt_shared(bridge_t *b)
     return (0);
 }
 
-/*
-** block_create
-**
-** Makes the shared block a deployment's budget states, with storage in it,
-** and has every backend adopt it.
-*/
 int block_create(bridge_t *b, const bridge_budget_t *budget)
 {
     block_layout_t layout = {};

@@ -1,24 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_calls.c -- the entries a module calls in a phase that change an
-** entity: spawn, destroy, attach, detach.
 */
-
 #include "abi_entry.h"
 
-/*
-** abi_spawn
-**
-** spawn() -> id. Hands out one of the ids set aside for the module, or says
-** which of three things left it with none.
-**
-** budgets.md, *What running out does*
-*/
 int abi_spawn(void *ud, [[maybe_unused]] const uint64_t *a, uint64_t *r)
 {
     module_t *m = ud;
@@ -37,13 +23,6 @@ int abi_spawn(void *ud, [[maybe_unused]] const uint64_t *a, uint64_t *r)
         "are used up", (long long)m->spawns));
 }
 
-/*
-** abi_destroy
-**
-** destroy(id). An id that has already died is nobody's mistake: two modules
-** may both want it gone, and which of them is told at the barrier, where it
-** is looked at.
-*/
 int abi_destroy(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 {
     change_t ch = { a[0], nullptr, 0, CHANGE_DESTROY };
@@ -51,16 +30,6 @@ int abi_destroy(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
     return (queue_change(ud, &ch, nullptr));
 }
 
-/*
-** check_written
-**
-** Answers the component a slot names, if the module may attach or detach
-** it: it declared the slot, a grant lets it write the component, and what
-** is running stated that it changes it. nullptr, with a refusal, otherwise.
-**
-** abi.md, *The ABI*
-** grants.md, *Whose component it is*
-*/
 static declared_type_t *check_written(module_t *m, uint64_t slot,
     const char *entry)
 {
@@ -83,16 +52,6 @@ static declared_type_t *check_written(module_t *m, uint64_t slot,
     return (nullptr);
 }
 
-/*
-** abi_attach
-**
-** attach(id, slot, ptr). The value travels with it, and is as long as the
-** type was declared; BRIDGE_ZEROED as `ptr` asks for a zeroed one, and is
-** the one `ptr` a tag takes, since a tag has no value.
-**
-** abi.md, *The ABI*
-** storage.md, *A tag*
-*/
 int abi_attach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 {
     module_t *m = ud;
@@ -115,11 +74,6 @@ int abi_attach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
     return (queue_change(m, &ch, value));
 }
 
-/*
-** abi_detach
-**
-** detach(id, slot).
-*/
 int abi_detach(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 {
     module_t *m = ud;

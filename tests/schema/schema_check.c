@@ -1,25 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/schema/schema_check.c -- one descriptor read, and held against
-** what was wanted of it.
 */
-
 #include <stdio.h>
 #include <string.h>
 
 #include "schema_test.h"
 
-/*
-** schema_find_named
-**
-** What the reader calls for a type a field names: a namespace that has
-** declared three types already.
-*/
 bool schema_find_named([[maybe_unused]] void *ctx, const char *name,
     schema_named_t *named)
 {
@@ -33,11 +21,6 @@ bool schema_find_named([[maybe_unused]] void *ctx, const char *name,
         || !strcmp(name, "Flags"));
 }
 
-/*
-** schema_say_failed
-**
-** Says that a descriptor did not read as wanted. Answers 1.
-*/
 int schema_say_failed(const char *text, const char *what)
 {
     printf("FAIL: %s: %s\n", text, what);
@@ -50,12 +33,6 @@ static bool is_wanted(const schema_field_t *f, const want_field_t *want)
         && f->count == want->count && f->kind == want->kind);
 }
 
-/*
-** schema_check_struct
-**
-** Reads a struct's descriptor and holds its size, its alignment and each
-** field against what this compiler made of the same struct.
-*/
 int schema_check_struct(const want_struct_t *w)
 {
     char why[160];
@@ -79,12 +56,6 @@ int schema_check_struct(const want_struct_t *w)
     return (failed);
 }
 
-/*
-** schema_check_constants
-**
-** Reads an enum's or a bitmask's descriptor and holds its width and each
-** constant against what is wanted.
-*/
 int schema_check_constants(const want_constants_t *w)
 {
     char why[160];

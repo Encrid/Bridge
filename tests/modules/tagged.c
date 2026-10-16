@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/tagged.c -- a tag, declared and attached by a guarded
-** module, and a system that walks the entities that carry it.
-**
-** storage.md, *A tag*
 */
-
 #include "test_offsets.h"
 #include "game.h"
 #include "offsets_idle.h"
@@ -19,12 +11,6 @@ static uint32_t position;
 static uint32_t frozen;
 static uint32_t counting;
 
-/*
-** count
-**
-** Says how many rows carry the tag, and in how many spans the place of its
-** value is BRIDGE_CARRIED.
-*/
 BRIDGE_EXPORT(count) int count(void)
 {
     uint32_t spans = bridge_count_spans(counting);
@@ -43,11 +29,6 @@ BRIDGE_EXPORT(count) int count(void)
     return (0);
 }
 
-/*
-** populate
-**
-** Spawns three entities with a position, and freezes two of them.
-*/
 static void populate(void)
 {
     position_t p = { 0.0f, 0.0f };
@@ -63,12 +44,6 @@ static void populate(void)
     }
 }
 
-/*
-** init
-**
-** Declares the position and the tag, registers the system that reads both,
-** and spawns the entities.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[2] = {

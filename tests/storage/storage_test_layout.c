@@ -1,17 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/storage/storage_test_layout.c -- a module that states st:X one
-** way, reloaded as a build that states it another: what is carried over,
-** what is refused, and what is refused until its loss is accepted.
-**
-** lifetime.md, *When a component layout changed*
 */
-
 #include <stdio.h>
 
 #include "storage_test.h"
@@ -20,9 +11,6 @@ static const char *const B_GONE[1] = { "st:X.b" };
 static const char *const ARR_CUT[1] = { "st:X.arr" };
 static const char *const Y_GONE[1] = { "st:X.at.y" };
 
-/*
-** Each change of the layout, of a component kept in tables.
-*/
 static const storage_test_relaid_t RELAID[] = {
     { LAYOUT0_PATH, LAYOUT1_PATH, "a field added", nullptr, BRIDGE_NONE },
     { LAYOUT0_PATH, LAYOUT2_PATH, "the fields in another order", nullptr,
@@ -60,10 +48,6 @@ static const storage_test_relaid_t RELAID[] = {
         BRIDGE_NONE }
 };
 
-/*
-** And in each of the other storage layouts: a field added, and the fields
-** in another order.
-*/
 static const storage_test_relaid_t RELAID_ELSEWHERE[] = {
     { LAYOUT0K2_PATH, LAYOUT1K2_PATH, "a field added, in a sparse set",
         nullptr, BRIDGE_NONE },
@@ -83,12 +67,6 @@ static const storage_test_relaid_t RELAID_ELSEWHERE[] = {
         "the fields in another order, in a singleton", nullptr, BRIDGE_NONE }
 };
 
-/*
-** relay
-**
-** One row, in a deck of its own: the first build loaded, run and looked
-** at, the reload into the second, and another look.
-*/
 static void relay(storage_test_t *t, const storage_test_relaid_t *row)
 {
     bridge_t *b = bridge_create(&t->cfg, storage_test_hear, t);
@@ -117,12 +95,6 @@ static void relay_all(storage_test_t *t, const storage_test_relaid_t *rows,
     }
 }
 
-/*
-** relay_held
-**
-** A struct that a field of another module's component names, changed: that
-** module's rows hold it. Answers 1 if either module could not be loaded.
-*/
 static int relay_held(storage_test_t *t)
 {
     bridge_artifact_t holder = storage_test_state(HOLDER_PATH, BRIDGE_NONE,
@@ -144,13 +116,6 @@ static int relay_held(storage_test_t *t)
     return (0);
 }
 
-/*
-** storage_test_relay
-**
-** Every change of a component's layout, each in a deck of its own with
-** room for two sparse sets and two direct-indexed components. The deck
-** main made is replaced by one of that deployment.
-*/
 enum storage_test_end storage_test_relay(storage_test_t *t)
 {
     (void)bridge_destroy(t->b);

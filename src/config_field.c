@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/config_field.c -- a setting written into the field its key names, by
-** what the field is.
 */
-
 #include <string.h>
 
 #include "config.h"
@@ -32,11 +26,6 @@ static const config_seeder_fn_t CONFIG_SEEDERS[SCHEMA_STRUCT + 1] = {
     [SCHEMA_STRUCT] = config_seed_struct
 };
 
-/*
-** find_field
-**
-** Answers the field of the config component that a key names, or nullptr.
-*/
 static const schema_field_t *find_field(const config_seed_t *seed,
     const char *key)
 {
@@ -52,12 +41,6 @@ static const schema_field_t *find_field(const config_seed_t *seed,
     return (&s->fields[k]);
 }
 
-/*
-** seed_field
-**
-** Writes a setting into a field: an inline array by itself, and any other by
-** the seeder of its kind.
-*/
 static int seed_field(config_seed_t *seed, const schema_field_t *field,
     const bridge_setting_t *s)
 {
@@ -68,13 +51,6 @@ static int seed_field(config_seed_t *seed, const schema_field_t *field,
     return (CONFIG_SEEDERS[field->kind](seed, field, s));
 }
 
-/*
-** config_seed_setting
-**
-** Writes one setting into the field its key names.
-**
-** config.md, *A module's own settings are a component*
-*/
 int config_seed_setting(config_seed_t *seed, const bridge_setting_t *s)
 {
     const schema_field_t *field = find_field(seed, s->key);

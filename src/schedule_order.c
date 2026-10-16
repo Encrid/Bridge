@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/schedule_order.c -- the pairs a deployment states: two systems that
-** conflict in one phase, in the order they are to run.
 */
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -21,11 +15,6 @@ static bool is_pair(const char *before, const char *after)
     return (strcmp(before, after) != 0);
 }
 
-/*
-** name_system
-**
-** Answers which of the names met so far a name is, and adds it if it is new.
-*/
 static uint32_t name_system(schedule_pairs_t *pairs, const char *name)
 {
     uint32_t at = 0;
@@ -39,15 +28,6 @@ static uint32_t name_system(schedule_pairs_t *pairs, const char *name)
     return (at);
 }
 
-/*
-** add_pair
-**
-** Takes the pair `i`: its two names are kept, and the first runs before the
-** second. It is counted once it has its names, so that a deck that is
-** refused frees them.
-**
-** schedule.md, *Order within a phase is never implicit*
-*/
 static int add_pair(bridge_t *b, schedule_pairs_t *pairs,
     const bridge_order_t *pair, uint32_t i)
 {
@@ -69,14 +49,6 @@ static int add_pair(bridge_t *b, schedule_pairs_t *pairs,
     return (0);
 }
 
-/*
-** check_pairs
-**
-** Refuses pairs that contradict each other: a system that would run before
-** itself.
-**
-** schedule.md, *Order within a phase is never implicit*
-*/
 static int check_pairs(bridge_t *b, schedule_pairs_t *pairs)
 {
     uint32_t i = 0;
@@ -91,11 +63,6 @@ static int check_pairs(bridge_t *b, schedule_pairs_t *pairs)
     return (1);
 }
 
-/*
-** schedule_order
-**
-** Takes the pairs a deployment states.
-*/
 int schedule_order(bridge_t *b, const bridge_order_t *order, uint32_t count)
 {
     schedule_pairs_t pairs = {};

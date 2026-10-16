@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/block_destroy.c -- the shared block given back, with what was kept
-** about it.
 */
-
 #include <stdlib.h>
 
 #include "block.h"
@@ -41,12 +35,6 @@ static void free_types(bridge_t *b)
     free(b->types);
 }
 
-/*
-** block_destroy
-**
-** Gives the shared block back: storage first, then the block, once every
-** backend has released it, and every declared type.
-*/
 void block_destroy(bridge_t *b)
 {
     uint32_t i = 0;

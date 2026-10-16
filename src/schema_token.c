@@ -1,25 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/schema_token.c -- what a token of a descriptor is: a name, an integer,
-** a type that is given.
 */
-
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "schema_reader.h"
 
-/*
-** schema_is_name
-**
-** Answers whether the token is a name a field or a constant may have.
-*/
 bool schema_is_name(const schema_reader_t *r)
 {
     char c = r->word[0];
@@ -29,12 +18,6 @@ bool schema_is_name(const schema_reader_t *r)
     return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_');
 }
 
-/*
-** schema_get_integer
-**
-** Reads the token as an integer. One below zero is read signed, and any
-** other unsigned, so that the bits of a bitmask of 64 are kept.
-*/
 bool schema_get_integer(const schema_reader_t *r, int64_t *value, bool *below)
 {
     char first = r->word[0];
@@ -51,11 +34,6 @@ bool schema_get_integer(const schema_reader_t *r, int64_t *value, bool *below)
     return (!*end && end != r->word && !errno);
 }
 
-/*
-** schema_find_given
-**
-** Answers which of SCHEMA_GIVEN the token names, or -1.
-*/
 int schema_find_given(const schema_reader_t *r)
 {
     uint32_t i = 0;
@@ -67,11 +45,6 @@ int schema_find_given(const schema_reader_t *r)
     return ((int)i);
 }
 
-/*
-** schema_copy_text
-**
-** Answers a copy of a text that free gives back, or nullptr.
-*/
 char *schema_copy_text(const char *text)
 {
     size_t n = strlen(text) + 1;

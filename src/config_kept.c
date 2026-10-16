@@ -1,25 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/config_kept.c -- where an unloaded module's settings text is,
-** remembered for its next load.
 */
-
 #include <stdlib.h>
 #include <string.h>
 
 #include "config.h"
 
-/*
-** config_find_kept
-**
-** Answers what is remembered of the settings text of the module `stem`, or
-** nullptr.
-*/
 kept_text_t *config_find_kept(bridge_t *b, const char *stem)
 {
     uint32_t i = 0;
@@ -31,15 +19,6 @@ kept_text_t *config_find_kept(bridge_t *b, const char *stem)
     return (&b->kept[i]);
 }
 
-/*
-** add_kept
-**
-** Makes room to remember one more module's text. nullptr if there is no
-** memory for it: an unload does not fail, what is lost is the reuse of that
-** range by the module's next load, and it is said.
-**
-** failure.md, *Out of memory*
-*/
 static kept_text_t *add_kept(bridge_t *b, const char *stem)
 {
     size_t room = (b->kept_count + 1) * sizeof(*b->kept);
@@ -59,11 +38,6 @@ static kept_text_t *add_kept(bridge_t *b, const char *stem)
     return (&b->kept[b->kept_count - 1]);
 }
 
-/*
-** config_keep
-**
-** Remembers where an unloaded module's settings text is.
-*/
 void config_keep(bridge_t *b, module_t *m)
 {
     kept_text_t *kept = config_find_kept(b, m->stem);
@@ -78,11 +52,6 @@ void config_keep(bridge_t *b, module_t *m)
     kept->room = m->text_room;
 }
 
-/*
-** config_forget
-**
-** Forgets where a module's settings text was.
-*/
 void config_forget(bridge_t *b, const module_t *m)
 {
     kept_text_t *kept = config_find_kept(b, m->stem);

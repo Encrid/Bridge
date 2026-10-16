@@ -1,33 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/store/store.c -- storage, exercised and told
-** about: every structural change a module can ask for, each in a phase of
-** its own so that a host can make one and then look, and what a system and
-** an observer see afterwards. It says what it saw in its log and decides
-** nothing.
-**
-** Built three ways. Plain: a handful of entities, with observers, for what
-** storage does. BIG: many entities and no observer, for what it costs.
-** TABLES: ten thousand tables. And BIG again with A made larger, FAT64 to
-** FAT4K.
-**
-** stage10.md, *What flecs does, pinned*
 */
-
 #include "store.h"
 #include "measured.h"
 #include "idle.h"
 
-/*
-** spawn
-**
-** Spawns the entities, with no component.
-*/
 TEST_MEASURED TEST(spawn)
 {
     uint32_t i = 0;
@@ -39,12 +18,6 @@ TEST_MEASURED TEST(spawn)
     return (0);
 }
 
-/*
-** add_changes
-**
-** Registers the six systems every build has. What a system attaches or
-** detaches is stated with it.
-*/
 static void add_changes(const test_api_t *api)
 {
     int none = 0;
@@ -62,12 +35,6 @@ static void add_changes(const test_api_t *api)
         both, 2);
 }
 
-/*
-** init
-**
-** Declares A and B, and registers the systems and the observers the build
-** has.
-*/
 TEST(init)
 {
     nstore_a = TEST_COMPONENT(api, "st:A", a_t, BRIDGE_DELETE,

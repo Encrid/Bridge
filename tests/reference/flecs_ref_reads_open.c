@@ -1,23 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/reference/flecs_ref_reads_open.c -- what the reads are made over,
-** none of it timed.
 */
-
 #include "flecs_ref.h"
 
-/*
-** flecs_ref_open_reads
-**
-** Makes ROWS entities that carry the small component in a table and the
-** sparse one, which does not fragment, and the three queries: the column,
-** the sparse component, and both.
-*/
 void flecs_ref_open_reads(flecs_ref_t *r, ecs_query_t **q)
 {
     ECS_COMPONENT(r->w, small_t);

@@ -1,17 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_set.h -- a set of types: a bit a type, in 64-bit words.
-**
-** A set is a word for each 64 types there may be: one, in most deployments.
-** It is copied a word at a time here, since memcpy of a length the compiler
-** cannot see is a call, and this is made for every entity a barrier changes.
 */
-
 #ifndef BRIDGE_SRC_STORAGE_SET_H
     #define BRIDGE_SRC_STORAGE_SET_H
 

@@ -1,25 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/config_room.c -- where the text of a module's settings goes, known
-** before any of it is written.
 */
-
 #include <string.h>
 
 #include "config.h"
 
-/*
-** get_text_size
-**
-** Answers how many bytes of the arena one setting takes: its text rounded up
-** to eight, when it is a text for a field that is a bridge_text_t, and 0 for
-** any other.
-*/
 static uint32_t get_text_size(const config_seed_t *seed,
     const bridge_setting_t *s)
 {
@@ -49,12 +36,6 @@ static uint32_t count_text(const config_seed_t *seed)
     return (total);
 }
 
-/*
-** reuse_kept
-**
-** Takes the block this module's text went in the last time it was loaded,
-** when `total` bytes still fit there.
-*/
 static void reuse_kept(config_seed_t *seed, uint32_t total)
 {
     module_t *m = seed->m;
@@ -66,14 +47,6 @@ static void reuse_kept(config_seed_t *seed, uint32_t total)
     m->text_room = kept->room;
 }
 
-/*
-** config_place_text
-**
-** Finds where the text of the settings goes: the block it had, or as much of
-** the module's persistent share.
-**
-** config.md, *A module's own settings are a component*
-*/
 int config_place_text(config_seed_t *seed)
 {
     module_t *m = seed->m;

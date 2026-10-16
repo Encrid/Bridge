@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/schedule_conflict.c -- whether two systems conflict: what may not run
-** at once.
 */
-
 #include "schedule.h"
 
 static bool changes_it(const bridge_system_t *s, const declared_type_t *type)
@@ -20,11 +14,6 @@ static bool changes_it(const bridge_system_t *s, const declared_type_t *type)
     return (i < s->change_count);
 }
 
-/*
-** find_changed
-**
-** Answers the name of a component both systems attach or detach, or nullptr.
-*/
 static const char *find_changed(const bridge_system_t *a,
     const bridge_system_t *b)
 {
@@ -37,12 +26,6 @@ static const char *find_changed(const bridge_system_t *a,
     return (a->changes[i]->name);
 }
 
-/*
-** touches_it
-**
-** Answers whether a system touches the component of term `i` of another,
-** with one of the two writing it.
-*/
 static bool touches_it(const bridge_system_t *s, const bridge_system_t *other,
     uint32_t i)
 {
@@ -60,12 +43,6 @@ static bool touches_it(const bridge_system_t *s, const bridge_system_t *other,
     return (false);
 }
 
-/*
-** find_touched
-**
-** Answers the name of a component both systems touch with one of them
-** writing it, or nullptr.
-*/
 static const char *find_touched(const bridge_system_t *a,
     const bridge_system_t *b)
 {
@@ -78,12 +55,6 @@ static const char *find_touched(const bridge_system_t *a,
     return (a->term[i].touches->name);
 }
 
-/*
-** schedule_find_conflict
-**
-** Answers the name of the component two systems conflict over, or nullptr:
-** one both attach or detach first, then one both touch.
-*/
 const char *schedule_find_conflict(const bridge_system_t *a,
     const bridge_system_t *b, bool *changing)
 {

@@ -1,28 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_subscribe.c -- a system or an observer registered.
 */
-
 #include <stdio.h>
 #include <string.h>
 
 #include "abi_subscribe.h"
 
-/*
-** read_changes
-**
-** Reads what a system or an observer attaches or detaches: a write, so it
-** wants the grant a write wants. A call that was refused before a change is
-** refused at it.
-**
-** abi.md, *The ABI*
-** grants.md, *Whose component it is*
-*/
 static int read_changes(subscribing_t *g)
 {
     module_t *m = g->m;
@@ -47,12 +32,6 @@ static int read_changes(subscribing_t *g)
     return (0);
 }
 
-/*
-** read_term
-**
-** Reads term `i`: what storage is asked, and what the conflict graph reads
-** of it. A term that must not match touches nothing.
-*/
 static int read_term(subscribing_t *g, uint32_t i)
 {
     bridge_system_t *s = g->s;
@@ -71,12 +50,6 @@ static int read_term(subscribing_t *g, uint32_t i)
     return (0);
 }
 
-/*
-** hand_over
-**
-** Hands a system's or an observer's terms to storage. A system with no term
-** matches nothing, and storage holds nothing of it.
-*/
 static void hand_over(subscribing_t *g)
 {
     storage_t *storage = g->m->b->storage;
@@ -95,12 +68,6 @@ static void hand_over(subscribing_t *g)
     s->observer = g->events != 0;
 }
 
-/*
-** list_system
-**
-** Puts a system among the deck's, and among its module's systems or its
-** observers, and answers its slot there.
-*/
 static uint32_t list_system(subscribing_t *g)
 {
     module_t *m = g->m;
@@ -115,11 +82,6 @@ static uint32_t list_system(subscribing_t *g)
     return (m->system_count++);
 }
 
-/*
-** abi_subscribe
-**
-** Registers a system or an observer, and answers its slot in `r`.
-*/
 int abi_subscribe(subscribing_t *g, uint64_t *r)
 {
     int refused;

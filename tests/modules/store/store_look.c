@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/store/store_look.c -- what a system of the plain
-** build of nstore sees: the spans of a query with A, of one with A and not
-** B, and of one with A and maybe B.
 */
-
 #include "store.h"
 
 #if !defined(BIG) && !defined(TABLES)
@@ -17,12 +10,6 @@ uint32_t nstore_with_a;
 uint32_t nstore_without_b;
 uint32_t nstore_maybe_b;
 
-/*
-** say_first_a
-**
-** Says the first value of A: that of the first row of the first span that
-** has rows.
-*/
 static void say_first_a(const test_api_t *api, const bridge_query_t *q)
 {
     const uint32_t *span = test_get_span(api, q, 0, 1);
@@ -35,13 +22,6 @@ static void say_first_a(const test_api_t *api, const bridge_query_t *q)
     say(api, "first A", ((const a_t *)(api->shared_base + span[2]))->v, 0);
 }
 
-/*
-** say_with_a
-**
-** Says the spans and the rows of the query with A, how many spans have no
-** rows if any has none, and the first value. A matched term with no base is
-** said as a failure.
-*/
 static void say_with_a(const test_api_t *api)
 {
     const bridge_query_t *q = test_get_query(api, nstore_with_a);
@@ -65,12 +45,6 @@ static void say_with_a(const test_api_t *api)
         say_first_a(api, q);
 }
 
-/*
-** say_without_b
-**
-** Says the spans and the rows of the query with A and not B. A term that
-** is NOT has no base: one that has is said as a failure.
-*/
 static void say_without_b(const test_api_t *api)
 {
     const bridge_query_t *q = test_get_query(api, nstore_without_b);
@@ -88,12 +62,6 @@ static void say_without_b(const test_api_t *api)
     say(api, "with A and not B: spans, rows", q->spans, rows);
 }
 
-/*
-** say_maybe_b
-**
-** Says the spans and the rows of the query with A and maybe B, and how many
-** of the rows have B: those of a span that has a base for it.
-*/
 static void say_maybe_b(const test_api_t *api)
 {
     const bridge_query_t *q = test_get_query(api, nstore_maybe_b);
@@ -113,12 +81,6 @@ static void say_maybe_b(const test_api_t *api)
     say(api, "of them with B: rows", have, 0);
 }
 
-/*
-** look
-**
-** Says what three queries see: with A, with A and not B, and with A and
-** maybe B.
-*/
 TEST(look)
 {
     say_with_a(api);

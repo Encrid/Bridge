@@ -1,27 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/direct/direct_reach.c -- the systems of ndirect
-** that reach D by ids that are held, and walk nothing.
 */
-
 #include "direct.h"
 #include "measured.h"
 #include "reach.h"
 
 uint64_t ndirect_mixed[COUNT];
 
-/*
-** count_reached
-**
-** Reaches each of `count` entities by an id that is held: the generation of
-** its record of the index, its bit, and its cell. Counts in `sum` those
-** that are alive, those of them given D, and the sum of their D.
-*/
 static void count_reached(const test_api_t *api, const uint64_t *held,
     uint32_t count, reached_t *sum)
 {
@@ -47,12 +34,6 @@ static void count_reached(const test_api_t *api, const uint64_t *held,
     }
 }
 
-/*
-** reach
-**
-** Reaches each of `count` entities by an id that is held, and says how many
-** are alive, how many of them were given D, and the sum of their D.
-*/
 TEST_MEASURED static int reach(const test_api_t *api, const uint64_t *held,
     uint32_t count)
 {
@@ -64,21 +45,11 @@ TEST_MEASURED static int reach(const test_api_t *api, const uint64_t *held,
     return (0);
 }
 
-/*
-** near
-**
-** Reaches every entity by its id, in the order they lie.
-*/
 TEST(near)
 {
     return (reach(api, ndirect_ids, COUNT + 2));
 }
 
-/*
-** far
-**
-** Reaches entities by ids that are in no order.
-*/
 TEST(far)
 {
     return (reach(api, ndirect_mixed, COUNT));

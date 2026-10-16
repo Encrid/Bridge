@@ -1,26 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/module_check_backend.c -- what a module's config asks of its backend:
-** a stated limit demands that the backend can enforce it.
-**
-** capabilities.md, *Capabilities, so the swap is honest*
 */
-
 #include "module.h"
 
-/*
-** check_kept
-**
-** Refuses a key that states what the backend cannot keep. A guarantee has
-** one name, for the key that asks it and the capability that answers.
-**
-** capabilities.md, *Capabilities, so the swap is honest*
-*/
 static int check_kept(const module_check_t *k, uint32_t flag, const char *key)
 {
     if (k->on->capabilities & flag)
@@ -47,16 +31,6 @@ static int check_limits_kept(const module_check_t *k)
             && check_kept(k, BACKEND_RELOAD, "hot_reload")));
 }
 
-/*
-** module_check_backend
-**
-** Refuses a config that states what its backend cannot keep. `trusted` asks
-** one guarantee, and the backend answers it. The author says "cannot" and
-** the deployment "may not", each with a key: a deployment allowing what the
-** author says cannot be done is config against config.
-**
-** lifecycle.md, *The runtime lifecycle*
-*/
 int module_check_backend(const module_check_t *k)
 {
     const bridge_module_config_t *cfg = k->cfg;

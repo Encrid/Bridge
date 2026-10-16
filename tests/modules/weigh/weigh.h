@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/weigh/weigh.h -- what the sources of nweigh share:
-** the four components, what init was answered, and the line every one of
-** its systems says.
 */
-
 #ifndef TEST_NWEIGH_H
     #define TEST_NWEIGH_H
 
@@ -32,12 +25,6 @@ BRIDGE_SCHEMA_STRUCT_DESC(s_t, S_FIELDS);
 constexpr uint32_t COUNT = 204'800;
 constexpr uint32_t ASKED = 1'000'000;
 
-/*
-** The slots of the four components, the queries of `walk`, `flag` and
-** `near`, and which query `one` reads, behind a load the compiler cannot
-** see through: it is to find the value again each time, as a system does
-** once a call.
-*/
 extern uint32_t nweigh_value;
 extern uint32_t nweigh_flag;
 extern uint32_t nweigh_link;
@@ -47,12 +34,6 @@ extern uint32_t nweigh_flagged;
 extern uint32_t nweigh_linked;
 extern volatile uint32_t nweigh_which;
 
-/*
-** say_read
-**
-** Says what a system read: the sum of the values, and how many spans its
-** query had.
-*/
 static inline void say_read(const test_api_t *api, uint32_t total,
     uint32_t spans)
 {

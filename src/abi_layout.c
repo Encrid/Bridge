@@ -1,31 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_layout.c -- the descriptor of a type being declared, read and
-** laid out, and held against what its module's compiler made of it.
-**
-** schema.md, *There is no schema format*
 */
-
 #include <stdlib.h>
 #include <string.h>
 
 #include "abi_declare.h"
 
-/*
-** parse_descriptor
-**
-** Reads the descriptor of the type being declared. A field's type is a bare
-** C name, looked for in the declarer's namespace: `Vec3` in game:Body is
-** game:Vec3. The name is cut at its namespace while the text is read.
-**
-** schema.md, *The type set*
-** failure.md, *Out of memory*
-*/
 static int parse_descriptor(declaring_t *g)
 {
     char *desc = copy_text(g->desc, g->d.desc_len);
@@ -46,14 +28,6 @@ static int parse_descriptor(declaring_t *g)
     return (abi_refuse(g->m, "type '%s': its descriptor %s", g->name, why));
 }
 
-/*
-** check_size
-**
-** Refuses a type that its descriptor lays out as other bytes, or aligned
-** otherwise, than its module's compiler did.
-**
-** schema.md, *There is no schema format*
-*/
 static int check_size(declaring_t *g)
 {
     const bridge_declaration_t *d = &g->d;
@@ -65,14 +39,6 @@ static int check_size(declaring_t *g)
         d->align, g->s.size, g->s.align));
 }
 
-/*
-** check_room
-**
-** Carries a replaced type's values over to this one's layout, where it
-** changed, and refuses a type that is one more than a budget allows.
-**
-** budgets.md, *Budgets*
-*/
 static int check_room(declaring_t *g)
 {
     module_t *m = g->m;
@@ -96,13 +62,6 @@ static int check_room(declaring_t *g)
         "direct_indexed of %u", g->name, b->direct_indexed));
 }
 
-/*
-** abi_read_layout
-**
-** Reads and lays out the descriptor of the type being declared, and checks
-** it against what the module stated and against the budgets. A tag has
-** nothing to read: it is what it was stated to be, which is nothing.
-*/
 int abi_read_layout(declaring_t *g)
 {
     memset(&g->s, 0, sizeof(g->s));

@@ -1,11 +1,8 @@
-/* The work `storage measure` and `storage weigh` time, done by EnTT: the reference a sparse
- * set is measured beside, and what reaching a value by id, a singleton and a marker with no
- * bytes cost in the ECS that keeps everything in sparse sets. docs/plan/stage11.md, *Beside
- * the best there is*.
- *
- * Built and run by tools/reference.py against EnTT at a pinned tag, which it fetches. Not part
- * of the library, and not built by build.py. EnTT applies every change at once: it has no
- * queue to compare a barrier's with, and no toggle. */
+/*
+** Copyright (C) 2026 Enkrid
+**
+** Under the GNU Affero General Public License, version 3 only: see license.
+*/
 #include <entt/entt.hpp>
 
 #include <chrono>
@@ -55,7 +52,6 @@ static std::size_t held()
 static std::size_t held() { return 0; }
 #endif
 
-/* a four-byte component given to, and taken from, an entity that carries `bytes` */
 template<typename Carried> static void change(unsigned bytes, int count)
 {
     entt::registry r;
@@ -115,7 +111,6 @@ static void reads()
         r.view<A, S>().each([&](const A &a, const S &s) { total += a.v + s.v; });
         t = now() - t;
         if (!round || t < best[1]) best[1] = t;
-        /* and with no view between: the storage's own values, as it keeps them */
         t = now();
         for (const S &s : r.storage<S>()) total += s.v;
         t = now() - t;

@@ -1,29 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/store/store_heard.c -- what an observer of the
-** plain build of nstore hears: who, and how. These are the observers of one
-** component.
 */
-
 #include "store.h"
 
 #if !defined(BIG) && !defined(TABLES)
 uint32_t nstore_on_a;
 uint32_t nstore_on_b;
 
-/*
-** get_place
-**
-** Answers where an id sits among the module's own, so that nothing said
-** depends on how ids are numbered: the place of a current one, 100 and the
-** place of one it destroyed, and 999 for one that is neither, which was
-** destroyed longer ago or was never the module's.
-*/
 static uint32_t get_place(uint64_t id)
 {
     uint32_t i = 0;
@@ -42,13 +27,6 @@ static uint32_t get_place(uint64_t id)
     return (999);
 }
 
-/*
-** nstore_say_heard
-**
-** Says each thing `observer` heard, under the text `what`: who, and the
-** events. Who is where the id sits among the module's own, so that nothing
-** said depends on how ids are numbered. Answers 0.
-*/
 int nstore_say_heard(const test_api_t *api, const char *what,
     uint32_t observer)
 {
@@ -64,21 +42,11 @@ int nstore_say_heard(const test_api_t *api, const char *what,
     return (0);
 }
 
-/*
-** heard_a
-**
-** Says what the observer of A heard.
-*/
 TEST(heard_a)
 {
     return (nstore_say_heard(api, "A: who, events", nstore_on_a));
 }
 
-/*
-** heard_b
-**
-** Says what the observer of B heard.
-*/
 TEST(heard_b)
 {
     return (nstore_say_heard(api, "B: who, events", nstore_on_b));

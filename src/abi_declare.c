@@ -1,29 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_declare.c -- the entry a module declares a type by.
-**
-** abi.md, *The ABI*
 */
-
 #include <stdlib.h>
 #include <string.h>
 
 #include "abi_declare.h"
 #include "abi_entry.h"
 
-/*
-** read_stated
-**
-** Copies what a declaration states out of the scratch arena, since a module
-** may have put it at any offset, and its name with it.
-**
-** abi.md, *The ABI*
-*/
 static int read_stated(declaring_t *g, uint64_t at)
 {
     module_t *m = g->m;
@@ -48,14 +33,6 @@ static int read_stated(declaring_t *g, uint64_t at)
     return (0);
 }
 
-/*
-** make_slots
-**
-** Makes room for one more of what a module declares, and the set of what it
-** may write, before anything is made that would have to be unmade.
-**
-** failure.md, *Out of memory*
-*/
 static int make_slots(module_t *m)
 {
     size_t n = m->declared_count + 1;
@@ -75,24 +52,12 @@ static int make_slots(module_t *m)
         "declares"));
 }
 
-/*
-** abi_is_writable
-**
-** Answers whether a module may write a type: one of its own namespace, or
-** one a grant lets it write.
-*/
 bool abi_is_writable(const module_t *m, const declared_type_t *c)
 {
     return (!abi_is_foreign(m, c->name)
         || abi_is_listed(m->write, m->write_count, c->name));
 }
 
-/*
-** take_slot
-**
-** Answers the slot a module has a type in, which is a new one unless it
-** declared the type before: declare is idempotent.
-*/
 static uint32_t take_slot(declaring_t *g)
 {
     module_t *m = g->m;
@@ -114,11 +79,6 @@ static uint32_t take_slot(declaring_t *g)
     return (i);
 }
 
-/*
-** abi_declare
-**
-** declare(at) -> slot.
-*/
 int abi_declare(void *ud, const uint64_t *at, uint64_t *r)
 {
     declaring_t g = { .m = ud };

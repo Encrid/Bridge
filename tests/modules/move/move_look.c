@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/move/move_look.c -- the system of nmove that reads
-** X as this build keeps it: who carries it, and what the values come to.
 */
-
 #include "move.h"
 
 static const char *const TEXTS[5] = {
@@ -19,12 +13,6 @@ static const char *const TEXTS[5] = {
     "X, a singleton: has a value, which is"
 };
 
-/*
-** add_cells
-**
-** Adds to the line what a direct-indexed X holds: the cell of every entity
-** below 16 whose bit says it was given one.
-*/
 static void add_cells(const test_api_t *api, bridge_line_t *line)
 {
     uint32_t cells = test_get_cells(api, x_slot);
@@ -51,12 +39,6 @@ static void add_single(const test_api_t *api, bridge_line_t *line)
     line->a1 = value->v;
 }
 
-/*
-** add_columns
-**
-** Adds to the line what the query matched: X kept in tables, in a sparse
-** set, or as a toggle.
-*/
 static void add_columns(const test_api_t *api, bridge_line_t *line)
 {
     const bridge_query_t *q = test_get_query(api, reading);
@@ -78,12 +60,6 @@ static void add_columns(const test_api_t *api, bridge_line_t *line)
     }
 }
 
-/*
-** look
-**
-** Says how this build keeps X, how many carry it, and the sum of its
-** values.
-*/
 TEST(look)
 {
     const char *text = TEXTS[KEPT - 1];

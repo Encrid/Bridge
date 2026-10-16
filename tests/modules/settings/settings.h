@@ -1,17 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/settings/settings.h -- what the sources of the
-** settings module share: the component its settings are, with a field of
-** every kind a setting can be, and what init was answered for it.
-**
-** config.md, *A module's own settings are a component*
 */
-
 #ifndef TEST_SETTINGS_H
     #define TEST_SETTINGS_H
 

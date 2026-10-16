@@ -1,27 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/two_decks.c -- more than one deck: two at once in one
-** process, and three one after another that mint the same ids.
-**
-** threads.md, *Threads*
 */
-
 #include <stdio.h>
 #include <string.h>
 
 #include "cases.h"
 
-/*
-** open_one
-**
-** Creates one of two decks, whose records say which it is, and loads the
-** mover and the reader into it. nullptr, with a line, if it was refused.
-*/
 static bridge_t *open_one(host_t *h, test_listener_t *l)
 {
     bridge_t *b = bridge_create(&h->cfg, h->sink, l);
@@ -38,13 +24,6 @@ static bridge_t *open_one(host_t *h, test_listener_t *l)
     return (b);
 }
 
-/*
-** test_run_two
-**
-** Two decks in one process, each with its own storage, running at once on
-** two threads. The same modules in both, a different number of frames in
-** each: the sums are exact, and each is its own.
-*/
 void test_run_two(host_t *h)
 {
     test_counts_t *c = test_get_counts(h);
@@ -67,13 +46,6 @@ void test_run_two(host_t *h)
     printf("alive\n");
 }
 
-/*
-** mint_run
-**
-** One run: two spawners in one level, twenty passes, on as many threads as
-** the host is configured with. false, with a line, if the deck was
-** refused.
-*/
 static bool mint_run(host_t *h)
 {
     bridge_t *b = bridge_create(&h->cfg, h->sink, h->ud);
@@ -105,14 +77,6 @@ static const char *compare(const test_counts_t *c, int run)
     return (same ? "the same" : "DIFFERENT");
 }
 
-/*
-** test_mint
-**
-** Two modules spawn in one level. On one thread, then twice on four: the
-** ids each is given are the same all three times, because they were set
-** aside for it at the barrier and not taken in whatever order the threads
-** arrived.
-*/
 void test_mint(host_t *h)
 {
     constexpr uint32_t threads[3] = { 1, 4, 4 };

@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_carried.h -- everything an entity carries: what its table
-** holds, every sparse set it is in, and every direct-indexed component it
-** has been given.
 */
-
 #ifndef BRIDGE_SRC_STORAGE_CARRIED_H
     #define BRIDGE_SRC_STORAGE_CARRIED_H
 
@@ -17,11 +10,6 @@
     #include "storage_set.h"
     #include "storage_sets.h"
 
-/*
-** add_sets
-**
-** Adds to a set the type of every sparse set the entity at `index` is in.
-*/
 static inline void add_sets(const storage_t *r, uint32_t index, uint64_t *set)
 {
     uint32_t slot = 0;
@@ -33,12 +21,6 @@ static inline void add_sets(const storage_t *r, uint32_t index, uint64_t *set)
     }
 }
 
-/*
-** add_cells
-**
-** Adds to a set the type of every direct-indexed component the entity at
-** `index` has been given.
-*/
 static inline void add_cells(const storage_t *r, uint32_t index, uint64_t *set)
 {
     uint32_t slot = 0;
@@ -50,12 +32,6 @@ static inline void add_cells(const storage_t *r, uint32_t index, uint64_t *set)
     }
 }
 
-/*
-** add_singles
-**
-** Adds to a set every singleton that has a value: index 0, which is no
-** entity, is what such a singleton is on.
-*/
 static inline void add_singles(const storage_t *r, uint64_t *set)
 {
     uint32_t id = 0;
@@ -67,12 +43,6 @@ static inline void add_singles(const storage_t *r, uint64_t *set)
     }
 }
 
-/*
-** get_carried
-**
-** Writes into a set everything the entity at `index` carries. While no type
-** is kept apart from tables, that is what its table holds and no more.
-*/
 [[gnu::always_inline]] static inline void get_carried(const storage_t *r,
     uint32_t index, uint64_t *set)
 {

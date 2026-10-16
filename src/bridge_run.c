@@ -1,25 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/bridge_run.c -- a phase run, and what is loaded said.
 */
-
 #include <string.h>
 
 #include "bridge_inside.h"
 #include "say.h"
 
-/*
-** is_repair
-**
-** Answers whether a call is one a stopped deck accepts: what stopped it
-** can be brought back, or given up by an unload of it, and those are the
-** calls that name it.
-*/
 static bool is_repair(const bridge_t *b, const char *repairing)
 {
     size_t n = repairing ? bridge_get_stem_length(repairing) : 0;
@@ -29,15 +17,6 @@ static bool is_repair(const bridge_t *b, const char *repairing)
     return (!memcmp(b->stopped_stem, repairing, n));
 }
 
-/*
-** bridge_check_call
-**
-** Answers 1, with a record, if nothing may run. Both calls that run module
-** code come through here.
-**
-** failure.md, *When something fails*
-** pinned.md, *Threads*
-*/
 int bridge_check_call(bridge_t *b, const char *repairing)
 {
     const module_t *pinned = bridge_find_pinned(b);
@@ -54,12 +33,6 @@ int bridge_check_call(bridge_t *b, const char *repairing)
     return (0);
 }
 
-/*
-** find_phase
-**
-** Answers which phase of the deployment a name is, or how many there are if
-** it is none of them.
-*/
 static uint32_t find_phase(const bridge_t *b, const char *name)
 {
     uint32_t phase = 0;
@@ -71,14 +44,6 @@ static uint32_t find_phase(const bridge_t *b, const char *name)
     return (phase);
 }
 
-/*
-** bridge_run_phase
-**
-** Runs the systems registered to one phase, then its barrier. 0 if the phase
-** ran, whatever its systems did.
-**
-** host_api.md, *The data*
-*/
 int bridge_run_phase(bridge_t *b, const char *name)
 {
     uint32_t phase;
@@ -96,14 +61,6 @@ int bridge_run_phase(bridge_t *b, const char *name)
     return (0);
 }
 
-/*
-** bridge_list_modules
-**
-** Says what is loaded, and whether it still runs. It is a pull, because a
-** stop must not arrive by a route that may drop it.
-**
-** introspection.md, *Introspection*
-*/
 int bridge_list_modules(bridge_t *b, bridge_module_info_t *out, int max)
 {
     const module_t *m = b->modules;

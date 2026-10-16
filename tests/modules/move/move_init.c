@@ -1,27 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/move/move_init.c -- one component, X, kept the way
-** this build states: KEPT is the number of the storage layout. A module is
-** loaded as one build and reloaded as another, and X's values are to be
-** what they were.
-**
-**     spawn          six entities with A, and X on every second one: 100,
-**                    102, 104
-**     detach_b       X taken from two of the three, so that one entity
-**                    carries it
-**     detach_b_half  and from all three, so that none does
-**     flicker        a toggle: the row whose value is 102 turned off
-**     look           who carries X and what the values come to, read as
-**                    this build keeps it
-**
-** lifetime.md, *When a component is moved*
 */
-
 #include "move.h"
 
 constexpr uint8_t ASKED = KEPT >= 4 ? BRIDGE_OPTIONAL : BRIDGE_AND;
@@ -31,13 +12,6 @@ uint32_t x_slot;
 uint32_t reading;
 uint64_t ids[COUNT];
 
-/*
-** init
-**
-** Declares A, and X kept as KEPT says, and the five systems. A component
-** kept direct-indexed or as a singleton is in no table, so the term that
-** names it does not ask for it.
-*/
 TEST(init)
 {
     int none = 0;
@@ -62,21 +36,11 @@ TEST(init)
     return (0);
 }
 
-/*
-** reload
-**
-** Declares everything again, as init does.
-*/
 TEST(reload)
 {
     return (TEST_OWN(init)(api));
 }
 
-/*
-** shutdown
-**
-** Does nothing.
-*/
 TEST(shutdown)
 {
     return (0);

@@ -1,25 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/tag/tag.c -- tags: components with no bytes, one
-** kept in each storage layout. A is a component of four bytes that every
-** entity carries.
-**
-**     spawn        six entities with A. M, in tables, on every second; P,
-**                  in a sparse set, on the first two; O, a toggle, on every
-**                  one; R, direct-indexed, on the odd
-**     flicker      O turned off for the first three, by their bits
-**     attach_a     W, a singleton, given
-**     detach_b     M taken from every one that has it: one table again
-**     look         what a module is handed for each
-**
-** storage.md, *A tag*
 */
-
 #include "tag.h"
 #include "idle.h"
 
@@ -34,11 +17,6 @@ uint32_t ntag_in_set;
 uint32_t ntag_toggled;
 uint64_t ntag_ids[COUNT];
 
-/*
-** declare_components
-**
-** Declares A, and a tag kept in each storage layout.
-*/
 static void declare_components(const test_api_t *api)
 {
     ntag_a = TEST_COMPONENT(api, "st:A", a_t, BRIDGE_DELETE,
@@ -55,12 +33,6 @@ static void declare_components(const test_api_t *api)
         BRIDGE_SINGLETON);
 }
 
-/*
-** add_changes
-**
-** Registers the three systems that walk nothing, each with the components
-** it attaches or detaches.
-*/
 static void add_changes(const test_api_t *api)
 {
     int none = 0;
@@ -73,11 +45,6 @@ static void add_changes(const test_api_t *api)
         1);
 }
 
-/*
-** add_walks
-**
-** Registers the three systems that walk, and keeps the query of each.
-*/
 static void add_walks(const test_api_t *api)
 {
     bridge_term_t two[2] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 },
@@ -97,11 +64,6 @@ static void add_walks(const test_api_t *api)
         nullptr, 0);
 }
 
-/*
-** init
-**
-** Declares A and the five tags, and registers the systems.
-*/
 TEST(init)
 {
     declare_components(api);
@@ -110,12 +72,6 @@ TEST(init)
     return (0);
 }
 
-/*
-** in_set
-**
-** Does nothing. It is registered in a phase no host runs, and exists for
-** the spans its query is given, which `look` reads.
-*/
 TEST(in_set)
 {
     return (0);

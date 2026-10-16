@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/holder.h -- the one component of nholder.c, and the
-** type its field is of. That type, st:vec_t, is declared by the module
-** loaded before this one: here it is only what y_t is made of.
 */
-
 #ifndef TEST_NHOLDER_H
     #define TEST_NHOLDER_H
 

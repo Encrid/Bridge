@@ -1,23 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/support/host_module.c -- a module as a deployment would state it:
-** every key said, nothing left at zero.
-**
-** config.md, *No unaccountable values*
 */
-
 #include "host.h"
 
-/*
-** host_run_frames_unsaid
-**
-** Runs "update" and "present" `count` times, and says nothing.
-*/
 void host_run_frames_unsaid(bridge_t *b, int count)
 {
     int i = 0;
@@ -29,11 +16,6 @@ void host_run_frames_unsaid(bridge_t *b, int count)
     }
 }
 
-/*
-** host_state_plain
-**
-** States a plain module as a deployment must.
-*/
 void host_state_plain(bridge_artifact_t *a, const char *identity,
     const char *path)
 {

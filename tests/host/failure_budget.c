@@ -1,24 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/failure_budget.c -- the count of a system's failures: it
-** falls as fast as it rises.
-**
-** failure.md, *The budget*
 */
-
 #include "cases.h"
 
-/*
-** test_give_up
-**
-** A stopped deck takes an unload of the module that stopped it: the host
-** goes on without it.
-*/
 void test_give_up(host_t *h)
 {
     bridge_artifact_t a;
@@ -39,12 +25,6 @@ void test_give_up(host_t *h)
     host_close(h);
 }
 
-/*
-** run_flaky
-**
-** Loads one build of the flaky module, which stops after `limit` failures,
-** runs it for some frames and says what is loaded.
-*/
 static void run_flaky(host_t *h, const char *file, int frames, int64_t limit)
 {
     bridge_artifact_t a;
@@ -60,32 +40,16 @@ static void run_flaky(host_t *h, const char *file, int frames, int64_t limit)
     host_close(h);
 }
 
-/*
-** test_forgive
-**
-** One pass in three fails: the count never reaches the budget.
-*/
 void test_forgive(host_t *h)
 {
     run_flaky(h, "flaky-third", 12, 3);
 }
 
-/*
-** test_forgive_too_little
-**
-** Two passes in three fail: the count reaches the budget.
-*/
 void test_forgive_too_little(host_t *h)
 {
     run_flaky(h, "flaky-twothirds", 12, 3);
 }
 
-/*
-** test_fail_beside_clean
-**
-** A system that always fails, and one in the next phase that never does:
-** the clean one does not forgive the other.
-*/
 void test_fail_beside_clean(host_t *h)
 {
     run_flaky(h, "flaky-calm", 5, 3);

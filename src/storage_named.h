@@ -1,24 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_named.h -- a table found by its set, and listed by the
-** systems that read it.
 */
-
 #ifndef BRIDGE_SRC_STORAGE_NAMED_H
     #define BRIDGE_SRC_STORAGE_NAMED_H
 
     #include "storage_table.h"
 
-/*
-** name_table
-**
-** Makes table `t` the table its set is found as.
-*/
 static inline void name_table(storage_t *r, uint32_t t)
 {
     uint32_t i = hash_set(r, get_set(r, t));
@@ -29,12 +18,6 @@ static inline void name_table(storage_t *r, uint32_t t)
     r->tables[t].named = true;
 }
 
-/*
-** move_home
-**
-** Puts the table found at place `k` of the hash back where it is found now
-** that a place before it is empty.
-*/
 static inline void move_home(storage_t *r, uint32_t k)
 {
     uint32_t other = r->hash[k];
@@ -46,11 +29,6 @@ static inline void move_home(storage_t *r, uint32_t k)
     r->hash[home] = other;
 }
 
-/*
-** unname_table
-**
-** Makes table `t` the table its set is found as no longer.
-*/
 static inline void unname_table(storage_t *r, uint32_t t)
 {
     uint32_t mask = r->hash_room - 1;
@@ -68,11 +46,6 @@ static inline void unname_table(storage_t *r, uint32_t t)
     r->tables[t].named = false;
 }
 
-/*
-** list_table
-**
-** Puts table `t` in the list of each system that reads it.
-*/
 static inline void list_table(storage_t *r, uint32_t t)
 {
     storage_terms_t *s;
@@ -90,12 +63,6 @@ static inline void list_table(storage_t *r, uint32_t t)
     }
 }
 
-/*
-** unlist_table
-**
-** Takes table `t` out of every system's list: the last of a list takes its
-** place.
-*/
 static inline void unlist_table(storage_t *r, uint32_t t)
 {
     storage_terms_t *s;

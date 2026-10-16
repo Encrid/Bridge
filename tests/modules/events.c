@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/events.c -- one observer of all three events, and a
-** system that causes each in turn: an attach to an entity without the
-** component, an attach to one with it, and a detach.
 */
-
 #include "test_offsets.h"
 #include "game.h"
 #include "offsets_idle.h"
@@ -19,12 +12,6 @@ static uint32_t watching;
 static uint32_t runs;
 static uint64_t entity;
 
-/*
-** poke
-**
-** Attaches the component on its first two passes, and detaches it on the
-** third.
-*/
 BRIDGE_EXPORT(poke) int poke(void)
 {
     marked_t m = { runs + 1 };
@@ -37,12 +24,6 @@ BRIDGE_EXPORT(poke) int poke(void)
     return (0);
 }
 
-/*
-** any
-**
-** Says, for each trigger, which events it is of and the value its id leads
-** to. An id that leads nowhere was removed, and 0xdead is said for it.
-*/
 BRIDGE_EXPORT(any) int any(void)
 {
     uint32_t count = bridge_count_triggers(watching);
@@ -62,12 +43,6 @@ BRIDGE_EXPORT(any) int any(void)
     return (0);
 }
 
-/*
-** init
-**
-** Declares the component, the system that changes it and the observer of
-** its three events, and spawns the entity.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};

@@ -1,28 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/packed.c -- a module, built from the
-** seams' package and nothing else of Bridge, as one outside the
-** tree is.
-**
-** host_api.md, *What a host is handed*
 */
-
 #include "test_module.h"
 #include "packed.h"
 
 static uint32_t count;
 static uint32_t counting;
 
-/*
-** advance
-**
-** Adds one to the count, and says what it has become.
-*/
 TEST(advance)
 {
     const bridge_query_t *q = test_get_query(api, counting);
@@ -36,11 +22,6 @@ TEST(advance)
     return (0);
 }
 
-/*
-** init
-**
-** Declares the component and the system, and spawns one entity.
-*/
 TEST(init)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
@@ -55,21 +36,11 @@ TEST(init)
     return (0);
 }
 
-/*
-** reload
-**
-** Nothing to carry over.
-*/
 TEST(reload)
 {
     return (0);
 }
 
-/*
-** shutdown
-**
-** Nothing to release.
-*/
 TEST(shutdown)
 {
     return (0);

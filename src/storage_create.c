@@ -1,23 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_create.c -- a deck's storage made, and unmade.
 */
-
 #include <stdlib.h>
 
 #include "storage_create.h"
 
-/*
-** set_sizes
-**
-** Takes from the budget how much of each thing storage may hold. Table 0 is
-** no table, and index 0 is no entity.
-*/
 static void set_sizes(storage_t *r, bridge_t *b)
 {
     r->b = b;
@@ -39,16 +28,6 @@ static bool make_all(storage_t *r)
     return (storage_make_apart(r) && storage_make_terms(r));
 }
 
-/*
-** storage_create
-**
-** Makes a deck's storage: all of it, or none. `who` has a slot for each
-** eight bytes of the column region: a table's ids sit in it, so its twin
-** sits at the same place here. What is never touched is never backed by
-** memory.
-**
-** failure.md, *Out of memory*
-*/
 storage_t *storage_create(bridge_t *b)
 {
     storage_t *r = calloc(1, sizeof(*r));
@@ -90,11 +69,6 @@ static void free_fold(storage_t *r)
     free(r->given);
 }
 
-/*
-** storage_destroy
-**
-** Frees a deck's storage.
-*/
 void storage_destroy(storage_t *r)
 {
     if (r->who)

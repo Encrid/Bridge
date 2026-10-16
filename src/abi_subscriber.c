@@ -1,27 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_subscriber.c -- what a system or an observer states, checked
-** before anything is made of it.
 */
-
 #include <string.h>
 
 #include "abi_entry.h"
 #include "abi_subscribe.h"
 
-/*
-** check_budget
-**
-** Refuses a system or an observer that is one more than [budget] systems, or
-** that asks for more terms than [budget] terms.
-**
-** budgets.md, *Budgets*
-*/
 static int check_budget(subscribing_t *g)
 {
     const bridge_t *b = g->m->b;
@@ -36,14 +22,6 @@ static int check_budget(subscribing_t *g)
     return (0);
 }
 
-/*
-** read_stated
-**
-** Finds a name, the terms and the changes in the scratch arena, and copies
-** the name out of it.
-**
-** abi.md, *The ABI*
-*/
 static int read_stated(subscribing_t *g)
 {
     module_t *m = g->m;
@@ -68,12 +46,6 @@ static int read_stated(subscribing_t *g)
     return (0);
 }
 
-/*
-** is_taken
-**
-** Answers whether a module has a system or an observer of a name. Both are
-** exports, and an export has one name.
-*/
 static bool is_taken(const module_t *m, const char *name)
 {
     uint32_t i = 0;
@@ -88,14 +60,6 @@ static bool is_taken(const module_t *m, const char *name)
     return (i < m->observer_count);
 }
 
-/*
-** check_name
-**
-** Refuses a reserved name, a name the module registered already, and an
-** observer with no term.
-**
-** abi.md, *The ABI*
-*/
 static int check_name(subscribing_t *g)
 {
     const char *name = g->name;
@@ -112,11 +76,6 @@ static int check_name(subscribing_t *g)
     return (0);
 }
 
-/*
-** abi_check_subscriber
-**
-** Refuses a system or an observer that states what it may not.
-*/
 int abi_check_subscriber(subscribing_t *g)
 {
     return (check_budget(g) || read_stated(g) || check_name(g));

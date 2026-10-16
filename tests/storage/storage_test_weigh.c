@@ -1,18 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/storage/storage_test_weigh.c -- what keeping a component in tables
-** costs where that is weakest: a change to an entity that carries a lot,
-** and a system whose rows are spread over many tables. And then what each
-** of the other storage layouts costs.
-**
-** stage10.md, *The repair*
 */
-
 #include <stdio.h>
 
 #include "storage_test.h"
@@ -32,13 +22,6 @@ static const storage_test_spread_t SPREAD[] = {
     { FRAG4096_PATH, 4096 }
 };
 
-/*
-** weigh_carried
-**
-** A small component given to, and taken from, an entity that carries this
-** much: the entity moves to another table each time, and all it carries
-** moves with it. Answers 1 if the module could not be loaded.
-*/
 static int weigh_carried(storage_test_t *t, const storage_test_carried_t *row)
 {
     storage_test_change_t c = {};
@@ -56,13 +39,6 @@ static int weigh_carried(storage_test_t *t, const storage_test_carried_t *row)
     return (0);
 }
 
-/*
-** weigh_spread
-**
-** One system reading one component of the same rows, spread over this many
-** tables. Answers 1, having said why, if the module could not be loaded or
-** the system did not read every row in as many spans as there are tables.
-*/
 static int weigh_spread(storage_test_t *t, const storage_test_spread_t *row)
 {
     bridge_artifact_t a = storage_test_state(row->path, STORAGE_TEST_ROWS,
@@ -83,12 +59,6 @@ static int weigh_spread(storage_test_t *t, const storage_test_spread_t *row)
     return (0);
 }
 
-/*
-** weigh_tables
-**
-** Each build that carries more, and each that is spread wider. Answers 1
-** if one of them failed.
-*/
 static int weigh_tables(storage_test_t *t)
 {
     size_t k = 0;
@@ -107,12 +77,6 @@ static int weigh_tables(storage_test_t *t)
     return (0);
 }
 
-/*
-** storage_test_weigh
-**
-** Every figure, each in a deck of its own with [budget] columns of 256
-** MB. The last of those decks is left for main to destroy.
-*/
 enum storage_test_end storage_test_weigh(storage_test_t *t)
 {
     t->cfg.budget.columns = 256 << 20;

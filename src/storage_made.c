@@ -1,24 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_made.c -- what storage holds, allocated a part at a time.
 */
-
 #include <stdlib.h>
 
 #include "storage_create.h"
 
-/*
-** storage_make_tables
-**
-** Allocates what is kept of entities and of tables: a table for each
-** archetype there may be, and one for each sparse set. The hash of sets has
-** twice the room, in a power of two.
-*/
 bool storage_make_tables(storage_t *r)
 {
     const bridge_t *b = r->b;
@@ -39,12 +27,6 @@ bool storage_make_tables(storage_t *r)
     return (r->hash && r->sets && r->columns);
 }
 
-/*
-** storage_make_fold
-**
-** Allocates what a barrier's fold works in: a set for each entity, and the
-** few sets a barrier needs beside.
-*/
 bool storage_make_fold(storage_t *r)
 {
     size_t entities = r->b->entities;
@@ -64,13 +46,6 @@ bool storage_make_fold(storage_t *r)
     return (r->at && r->scratch && r->before && r->masked && r->in_table);
 }
 
-/*
-** storage_make_apart
-**
-** Allocates what is kept of sparse sets and of direct-indexed components:
-** by slot, one more than there may be, and for each a cell or a bit for
-** every entity.
-*/
 bool storage_make_apart(storage_t *r)
 {
     size_t entities = r->b->entities;
@@ -88,13 +63,6 @@ bool storage_make_apart(storage_t *r)
     return (r->direct_type && r->given);
 }
 
-/*
-** storage_make_terms
-**
-** Allocates the types and the systems' terms there may be. There is one
-** more type and one more system than there may be, so that looking for a
-** free one always ends.
-*/
 bool storage_make_terms(storage_t *r)
 {
     size_t room = r->terms_room;

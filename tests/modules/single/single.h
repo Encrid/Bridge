@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/single/single.h -- what the sources of nsingle
-** share: the singleton's type and a table's, and what init was answered.
 */
-
 #ifndef TEST_NSINGLE_H
     #define TEST_NSINGLE_H
 
@@ -25,11 +19,6 @@ BRIDGE_SCHEMA_STRUCT_DESC(a_t, A_FIELDS);
 
 constexpr uint32_t ASKED = 1'000'000;
 
-/*
-** The slots of G, the singleton, and of A, which is kept in a table; the
-** observer of G; and which singleton `one` reads, behind a load the
-** compiler cannot see through.
-*/
 extern uint32_t nsingle_g;
 extern uint32_t nsingle_a;
 extern uint32_t nsingle_on_g;

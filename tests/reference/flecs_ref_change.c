@@ -1,24 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/reference/flecs_ref_change.c -- a four-byte component given to, and
-** taken from, an entity that carries four bytes or 4,096.
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "flecs_ref.h"
 
-/*
-** time_give
-**
-** Answers the nanoseconds it takes to give every entity the component.
-*/
 static uint64_t time_give(const flecs_ref_t *r)
 {
     ecs_world_t *w = r->w;
@@ -39,11 +28,6 @@ static uint64_t time_give(const flecs_ref_t *r)
     return (read_clock() - t);
 }
 
-/*
-** time_take
-**
-** Answers the nanoseconds it takes to take the component from every entity.
-*/
 static uint64_t time_take(const flecs_ref_t *r)
 {
     ecs_world_t *w = r->w;
@@ -62,11 +46,6 @@ static uint64_t time_take(const flecs_ref_t *r)
     return (read_clock() - t);
 }
 
-/*
-** time_rounds
-**
-** Gives and takes ROUNDS times, and keeps the least time of each.
-*/
 static void time_rounds(const flecs_ref_t *r, uint64_t *on, uint64_t *off)
 {
     uint64_t t;
@@ -83,13 +62,6 @@ static void time_rounds(const flecs_ref_t *r, uint64_t *on, uint64_t *off)
     }
 }
 
-/*
-** open_change
-**
-** Makes the components, the one that is given sparse and not fragmenting if
-** that is asked, and the entities, which carry the fat component or the
-** small one.
-*/
 static void open_change(flecs_ref_t *r, bool fat, bool sparse)
 {
     ECS_COMPONENT(r->w, small_t);
@@ -104,12 +76,6 @@ static void open_change(flecs_ref_t *r, bool fat, bool sparse)
         fat ? ecs_id(fat_t) : ecs_id(small_t), r->count);
 }
 
-/*
-** flecs_ref_measure_change
-**
-** Times the component given and taken, on 10,000 entities if they are fat
-** and on ROWS if not.
-*/
 void flecs_ref_measure_change(bool fat, bool sparse, bool deferred)
 {
     flecs_ref_t r = { .w = ecs_mini(), .count = fat ? 10'000 : ROWS };

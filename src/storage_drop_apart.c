@@ -1,24 +1,11 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_drop_apart.c -- a component that is not kept in a table,
-** dropped: direct-indexed, kept in a sparse set, or a singleton.
 */
-
 #include "storage_drop.h"
 #include "storage_unload.h"
 
-/*
-** drop_cell
-**
-** Drops a direct-indexed component from the entity at `index`: the entity is
-** destroyed if the policy says so of what it is left with, and otherwise
-** loses its cell, with whoever observes it told.
-*/
 static void drop_cell(storage_t *r, const storage_type_t *type,
     enum bridge_on_unload policy, uint32_t index)
 {
@@ -33,11 +20,6 @@ static void drop_cell(storage_t *r, const storage_type_t *type,
     give_cell(r, type->slot, index, false);
 }
 
-/*
-** storage_drop_cells
-**
-** Drops a direct-indexed component: every entity that has been given one.
-*/
 void storage_drop_cells(storage_t *r, const storage_type_t *type,
     enum bridge_on_unload policy)
 {
@@ -51,11 +33,6 @@ void storage_drop_cells(storage_t *r, const storage_type_t *type,
     sweep_sets(r);
 }
 
-/*
-** drop_member
-**
-** Drops a sparse set's component from the entity `id`, which is in it.
-*/
 static void drop_member(storage_t *r, const storage_type_t *type,
     enum bridge_on_unload policy, uint64_t id)
 {
@@ -70,12 +47,6 @@ static void drop_member(storage_t *r, const storage_type_t *type,
     leave_set(r, type->slot, index);
 }
 
-/*
-** storage_drop_set
-**
-** Drops a component kept in a sparse set: an entity at a time, from the
-** last, until its table is gone or has no row.
-*/
 void storage_drop_set(storage_t *r, const storage_type_t *type,
     enum bridge_on_unload policy)
 {
@@ -90,11 +61,6 @@ void storage_drop_set(storage_t *r, const storage_type_t *type,
     sweep_sets(r);
 }
 
-/*
-** storage_drop_single
-**
-** Drops a singleton: it has no value, and whoever observes it is told.
-*/
 void storage_drop_single(storage_t *r, storage_type_t *type)
 {
     if (!type->set)

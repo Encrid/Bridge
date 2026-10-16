@@ -1,23 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/unset_module.c -- keys nobody stated: each is refused, and
-** none is taken for a default.
-**
-** config.md, *No unaccountable values*
 */
-
 #include "cases.h"
 
-/*
-** test_state_no_host_abi
-**
-** A host that stated no ABI is refused.
-*/
 void test_state_no_host_abi(host_t *h)
 {
     h->cfg.abi = 0;
@@ -27,11 +14,6 @@ void test_state_no_host_abi(host_t *h)
     host_close(h);
 }
 
-/*
-** test_leave_unset
-**
-** A limit left at zero is unset, and refused.
-*/
 void test_leave_unset(host_t *h)
 {
     char identity[64];
@@ -45,12 +27,6 @@ void test_leave_unset(host_t *h)
     host_close(h);
 }
 
-/*
-** test_leave_level_unset
-**
-** A log level left at zero is refused: zero is a severity, and is unset all
-** the same.
-*/
 void test_leave_level_unset(host_t *h)
 {
     char identity[64];
@@ -64,12 +40,6 @@ void test_leave_level_unset(host_t *h)
     host_close(h);
 }
 
-/*
-** test_leave_flag_unset
-**
-** A yes or no nobody stated is not a no, and a value that is neither is
-** refused too.
-*/
 void test_leave_flag_unset(host_t *h)
 {
     char identity[64];
@@ -86,11 +56,6 @@ void test_leave_flag_unset(host_t *h)
     host_close(h);
 }
 
-/*
-** test_state_negative
-**
-** A negative number that is no "none" at all is refused.
-*/
 void test_state_negative(host_t *h)
 {
     char identity[64];

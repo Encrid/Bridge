@@ -1,27 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/reference/flecs_ref_toggle.c -- a toggled component: a row
-** switched, and the rows that are on read.
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "flecs_ref.h"
 
-/*
-** time_switch
-**
-** Answers the nanoseconds it takes to switch every row, on for one draw in
-** `one_in` and off for the others. The draw is timed with the switch.
-** What the loop uses is copied out of `r` and `state` first, so that
-** nothing is read back from them between two calls of flecs.
-*/
 static uint64_t time_switch(const flecs_ref_t *r, uint32_t *state,
     uint32_t one_in)
 {
@@ -41,12 +27,6 @@ static uint64_t time_switch(const flecs_ref_t *r, uint32_t *state,
     return (t);
 }
 
-/*
-** time_walk
-**
-** Answers the nanoseconds it takes to read the rows that are on. Adds what
-** was read to `total`, and how many rows there were to `on`.
-*/
 static uint64_t time_walk(ecs_iter_t *it, uint32_t *total, uint32_t *on)
 {
     const toggled_t *v;
@@ -68,11 +48,6 @@ static uint64_t time_walk(ecs_iter_t *it, uint32_t *total, uint32_t *on)
     return (t);
 }
 
-/*
-** time_switches
-**
-** Switches every row ROUNDS times, and answers the least time.
-*/
 static uint64_t time_switches(const flecs_ref_t *r, uint32_t *state,
     uint32_t one_in)
 {
@@ -89,12 +64,6 @@ static uint64_t time_switches(const flecs_ref_t *r, uint32_t *state,
     return (best);
 }
 
-/*
-** time_walks
-**
-** Reads the rows that are on four times ROUNDS, and answers the least
-** time. `on` is how many rows the last walk read.
-*/
 static uint64_t time_walks(const flecs_ref_t *r, ecs_query_t *q,
     uint32_t *total, uint32_t *on)
 {
@@ -114,12 +83,6 @@ static uint64_t time_walks(const flecs_ref_t *r, ecs_query_t *q,
     return (best);
 }
 
-/*
-** flecs_ref_measure_toggle
-**
-** Times a row of ROWS switched, and the rows that are on read, with one
-** row in `one_in` on.
-*/
 void flecs_ref_measure_toggle(uint32_t *state, uint32_t one_in)
 {
     flecs_ref_t r = { .w = ecs_mini(), .count = ROWS };

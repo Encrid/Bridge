@@ -1,26 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/sdk_guarded.c -- what a guarded module's binding does that no
-** other case shows: a line at each severity, a tag, a scratch arena asked
-** for more than it has, and a pull of fewer modules than are loaded.
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "cases.h"
 
-/*
-** test_log_levels
-**
-** The module that writes a line at each severity, with the log_level the
-** case's row states.
-*/
 void test_log_levels(host_t *h)
 {
     bridge_artifact_t a;
@@ -34,11 +21,6 @@ void test_log_levels(host_t *h)
     host_close(h);
 }
 
-/*
-** test_tag_entities
-**
-** The module that freezes two of its three entities with a tag.
-*/
 void test_tag_entities(host_t *h)
 {
     bridge_artifact_t a;
@@ -52,12 +34,6 @@ void test_tag_entities(host_t *h)
     host_close(h);
 }
 
-/*
-** test_take_scratch_past
-**
-** The mover, with a scratch arena of 64 bytes: what its init states does
-** not fit, and the binding stops it there.
-*/
 void test_take_scratch_past(host_t *h)
 {
     bridge_artifact_t a;
@@ -70,12 +46,6 @@ void test_take_scratch_past(host_t *h)
     host_close(h);
 }
 
-/*
-** test_list_fewer
-**
-** Two modules loaded, and a pull with room for one: it answers two, and
-** fills one.
-*/
 void test_list_fewer(host_t *h)
 {
     bridge_module_info_t info[2] = { { "untouched", BRIDGE_RUNNING },

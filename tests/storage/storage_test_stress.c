@@ -1,19 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/storage/storage_test_stress.c -- the stress run: four modules at
-** once, each in its own namespace, a hundred rounds of work and check,
-** eight million changes. Each module keeps its own account of what should
-** be there and checks it. On one thread it must say the same as on four,
-** word for word.
-**
-** schedule.md, *What a pass depends on*
 */
-
 #include <stdio.h>
 
 #include "storage_test.h"
@@ -56,11 +45,6 @@ static void run_stress(bridge_t *b)
     }
 }
 
-/*
-** storage_test_stress
-**
-** The stress run, on as many threads as the case's deployment states.
-*/
 enum storage_test_end storage_test_stress(storage_test_t *t)
 {
     if (load_stress(t->b)) {
@@ -71,13 +55,6 @@ enum storage_test_end storage_test_stress(storage_test_t *t)
     return (STORAGE_TEST_DONE);
 }
 
-/*
-** storage_test_measure_stress
-**
-** The stress run on this many threads, timed, in a deck of its own. Its
-** records go nowhere: what they say is the stress case's to judge. Answers
-** 1 if it could not load.
-*/
 int storage_test_measure_stress(storage_test_t *t, uint32_t threads)
 {
     uint64_t began;

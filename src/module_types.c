@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/module_types.c -- components leaving: a module stops declaring what
-** it declared.
-**
-** lifetime.md, *What unload leaves behind*
 */
-
 #include <stdlib.h>
 
 #include "module.h"
@@ -25,13 +17,6 @@ static void unlist_type(bridge_t *b, const declared_type_t *c)
     b->types[k] = b->types[b->type_count];
 }
 
-/*
-** delete_type
-**
-** A component's record goes: what storage knows of it, and its hold on the
-** types its fields name, which go with it when nothing else declares or
-** names them.
-*/
 static void delete_type(bridge_t *b, declared_type_t *c)
 {
     declared_type_t *named;
@@ -54,13 +39,6 @@ static void delete_type(bridge_t *b, declared_type_t *c)
     free(c);
 }
 
-/*
-** release_type
-**
-** A module stops declaring a type. Shared, it stays; the last to leave
-** applies its own policy. Policy zero is a load that failed. A type some
-** other component's field still names is kept as a type, with no rows.
-*/
 static void release_type(bridge_t *b, declared_type_t *c,
     enum bridge_on_unload policy)
 {
@@ -74,12 +52,6 @@ static void release_type(bridge_t *b, declared_type_t *c,
     b->layout_moved = 1;
 }
 
-/*
-** module_release_types
-**
-** A module stops declaring what it declared, last declared first: a type
-** is used by what was declared after it.
-*/
 void module_release_types(bridge_t *b, module_t *m, bool by_policy)
 {
     enum bridge_on_unload policy = 0;

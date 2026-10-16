@@ -1,21 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/schema_type.c -- the type of a field: one that is given, or one its
-** namespace declared.
 */
-
 #include "schema_reader.h"
 
-/*
-** get_field_kind
-**
-** Answers what a field holds whose type is a declared one of `kind`.
-*/
 static enum schema_kind get_field_kind(enum bridge_kind kind)
 {
     if (kind == BRIDGE_STRUCT)
@@ -25,12 +14,6 @@ static enum schema_kind get_field_kind(enum bridge_kind kind)
     return (SCHEMA_BITMASK);
 }
 
-/*
-** set_named_type
-**
-** Reads the token as a type the namespace declared. false if it has declared
-** nothing of that name.
-*/
 static bool set_named_type(schema_reader_t *r, schema_laid_t *laid)
 {
     const schema_source_t *source = r->source;
@@ -45,14 +28,6 @@ static bool set_named_type(schema_reader_t *r, schema_laid_t *laid)
     return (true);
 }
 
-/*
-** schema_set_type
-**
-** Reads the token as a field's type. bridge_text_t is given and not
-** declared: an offset and a length into the persistent arena.
-**
-** schema.md, *The type set*
-*/
 int schema_set_type(schema_reader_t *r, schema_laid_t *laid)
 {
     int given = schema_find_given(r);

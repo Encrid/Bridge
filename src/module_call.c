@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/module_call.c -- a lifecycle export called, and a module's private
-** memory, which is what the call is made with.
 */
-
 #include <stdio.h>
 
 #include "module.h"
@@ -28,16 +22,6 @@ static void place_regions(module_t *m, const bridge_module_config_t *cfg,
     header->system = UINT32_MAX;
 }
 
-/*
-** module_take_private
-**
-** Reserves a module's private memory: the header at 0, then the three
-** regions its config sized, with no system running. Only its own backend
-** maps the block, so it has that backend's shape. The checks refused a
-** config this could not lay out.
-**
-** failure.md, *Out of memory*
-*/
 int module_take_private(module_t *m, const bridge_module_config_t *cfg,
     backend_err_t *err)
 {
@@ -69,16 +53,6 @@ static int say_trap(const char *name, backend_err_t *err)
     return (module_fail(err, "its %s %.200s", name, reason));
 }
 
-/*
-** module_call
-**
-** Calls a lifecycle export once, under its timeout. What it changes is
-** applied after the last barrier's observers and before the next phase's
-** systems, in the order the calls were made. An entry that refused is the
-** reason: Bridge knows why better than the trap does.
-**
-** threads.md, *Threads*
-*/
 int module_call(module_t *m, const module_call_t *call, backend_err_t *err)
 {
     const backend_api_t *api = &m->on->api;
@@ -102,16 +76,6 @@ int module_call(module_t *m, const module_call_t *call, backend_err_t *err)
     return (0);
 }
 
-/*
-** module_shut_down
-**
-** Runs a module's shutdown, with what it asked for and what it said: its
-** ring is about to go with it. A shutdown that fails is logged, and the
-** teardown continues. A module whose reload failed after its old instance
-** went has no code left to call.
-**
-** failure.md, *When something fails*
-*/
 void module_shut_down(bridge_t *b, module_t *m)
 {
     module_call_t call = { m->shutdown, "shutdown", m->shutdown_timeout };

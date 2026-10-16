@@ -1,27 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_move.h -- an entity moved from one table to another, a
-** direct-indexed component given and taken, and a singleton set.
 */
-
 #ifndef BRIDGE_SRC_STORAGE_MOVE_H
     #define BRIDGE_SRC_STORAGE_MOVE_H
 
     #include "storage_row.h"
     #include "storage_set.h"
 
-/*
-** set_single
-**
-** Makes a singleton have a value, of zero until one is written, or have
-** none: and every module is written for again, since where it is reached
-** says which.
-*/
 static inline void set_single(storage_t *r, storage_type_t *type, bool set)
 {
     type->set = set;
@@ -29,13 +16,6 @@ static inline void set_single(storage_t *r, storage_type_t *type, bool set)
     r->b->layout_moved = 1;
 }
 
-/*
-** give_cell
-**
-** Gives the entity at `index` the direct-indexed component of `slot`, or
-** takes it: its bit, here and where modules read it, and its cell made zero
-** either way.
-*/
 static inline void give_cell(storage_t *r, uint32_t slot, uint32_t index,
     bool on)
 {
@@ -52,13 +32,6 @@ static inline void give_cell(storage_t *r, uint32_t slot, uint32_t index,
     clear_bytes(cells + (size_t)index * type->size, type->size);
 }
 
-/*
-** carry_value
-**
-** Writes one column of a row an entity moves into: what it carried of that
-** type goes with it, and what it did not is zero. A toggled component is on
-** when it is given, and as it was when it moves.
-*/
 [[gnu::always_inline]] static inline void carry_value(storage_t *r,
     const row_move_t *move, uint32_t id)
 {
@@ -80,11 +53,6 @@ static inline void give_cell(storage_t *r, uint32_t slot, uint32_t index,
     turn_row(r, get_bits(into, r->tables[move->to].room), move->at, on);
 }
 
-/*
-** carry_row
-**
-** Writes every column of the row an entity moves into.
-*/
 [[gnu::always_inline]] static inline void carry_row(storage_t *r,
     const row_move_t *move)
 {
@@ -97,13 +65,6 @@ static inline void give_cell(storage_t *r, uint32_t slot, uint32_t index,
     }
 }
 
-/*
-** move_row
-**
-** Moves the entity at `index` to table `to`, which has room: what it carried
-** that `to` also holds goes with it, and what `to` holds that it did not is
-** zero.
-*/
 [[gnu::always_inline]] static inline void move_row(storage_t *r,
     uint32_t index, uint32_t to)
 {

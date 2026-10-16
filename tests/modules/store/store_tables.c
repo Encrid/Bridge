@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/store/store_tables.c -- the build TABLES of
-** nstore: fourteen components, and a set of them for each entity that no
-** other entity has, so that each entity is in a table of its own.
 */
-
 #include "store.h"
 
 #ifdef TABLES
@@ -21,12 +14,6 @@ static const char *const NAMES[KINDS] = {
 static uint32_t kinds[KINDS];
 static uint32_t seeing;
 
-/*
-** attach_kinds
-**
-** Attaches to entity `i` the kinds whose bits are set in i + 1: no two
-** entities carry the same set.
-*/
 static void attach_kinds(const test_api_t *api, uint32_t i)
 {
     uint32_t k = 0;
@@ -38,11 +25,6 @@ static void attach_kinds(const test_api_t *api, uint32_t i)
     }
 }
 
-/*
-** combine
-**
-** Gives every entity a set of the fourteen kinds that is its own.
-*/
 TEST(combine)
 {
     uint32_t i = 0;
@@ -54,11 +36,6 @@ TEST(combine)
     return (0);
 }
 
-/*
-** see
-**
-** Says how many spans a query for the first kind has, and how many rows.
-*/
 TEST(see)
 {
     const bridge_query_t *q = test_get_query(api, seeing);
@@ -73,12 +50,6 @@ TEST(see)
     return (0);
 }
 
-/*
-** declare_kind
-**
-** Declares kind `k`. Its name is not a literal, so it is stated without the
-** macro that takes one.
-*/
 static void declare_kind(const test_api_t *api, uint32_t k)
 {
     uint32_t len = (uint32_t)strlen(NAMES[k]);
@@ -90,12 +61,6 @@ static void declare_kind(const test_api_t *api, uint32_t k)
         sizeof(t_t_desc) - 1, BRIDGE_DELETE, BRIDGE_TABLE));
 }
 
-/*
-** nstore_add_tables
-**
-** Declares the fourteen components, and registers the system that gives
-** each entity a set of them of its own and the system that sees the first.
-*/
 void nstore_add_tables(const test_api_t *api)
 {
     int none = 0;

@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/wrong/wrong.h -- the wrong module: a module that does one thing
-** an entry refuses, at init or in its system. Which thing is stated by
-** whoever builds it, as AT_INIT and IN_SYSTEM: a function of this header
-** each, and wrong_do_nothing for the place it does no wrong in.
 */
-
 #ifndef TEST_WRONG_H
     #define TEST_WRONG_H
 
@@ -20,38 +12,17 @@
 constexpr uint32_t WRONG_OUTSIDE = 0xFFFFFF00u;
 constexpr uint32_t WRONG_NO_SLOT = 9;
 
-/*
-** The slots init was answered: the position, the thing of another
-** namespace the module is granted to read, and a tag.
-*/
 extern uint32_t wrong_position;
 extern uint32_t wrong_thing;
 extern uint32_t wrong_flag;
 
-/*
-** wrong_state_type, wrong_state_system, wrong_state_observer
-**
-** Answer a declaration, a system and an observer that would be accepted:
-** a struct "game:Odd", and "again", which reads the position. A function
-** below changes one member and hands it over.
-*/
 bridge_declaration_t wrong_state_type(void);
 bridge_system_statement_t wrong_state_system(void);
 bridge_observer_statement_t wrong_state_observer(void);
 
-/*
-** wrong_add_with_term, wrong_add_with_change
-**
-** Register "again" with one term stated as it is handed, and with one
-** change of a slot.
-*/
 void wrong_add_with_term(uint32_t slot, uint8_t access, uint8_t oper);
 void wrong_add_with_change(uint32_t slot);
 
-/*
-** What is done at init or in the system. Each but the first is refused by
-** the entry it calls.
-*/
 void wrong_do_nothing(void);
 void wrong_declare_outside(void);
 void wrong_declare_name_outside(void);

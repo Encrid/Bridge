@@ -1,22 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/keeper.c -- declares a component it shares, one only
-** it declares, and a roster of ids so that another module can ask after its
-** entities once it is gone. Built once per on_unload policy, which
-** PRIVATE_POLICY states.
-**
-** Ten entities carry position_t and private_t; five carry private_t alone.
-** Its shutdown destroys the first of the ten: what a shutdown asks for is
-** applied.
-**
-** lifetime.md, *What unload leaves behind*
 */
-
 #include "test_offsets.h"
 #include "roster.h"
 
@@ -28,13 +14,6 @@ static uint32_t hidden;
 static uint32_t roster;
 static uint64_t first;
 
-/*
-** spawn_one
-**
-** Spawns entity `i` with its private component. One of the first ten is
-** given a position as well; one of the last five has its id written into
-** the roster `r`. Answers the id.
-*/
 static uint64_t spawn_one(uint32_t i, roster_t *r)
 {
     private_t secret = { i };
@@ -49,12 +28,6 @@ static uint64_t spawn_one(uint32_t i, roster_t *r)
     return (id);
 }
 
-/*
-** init
-**
-** Declares the three components, spawns the fifteen entities and keeps the
-** id of the first, and spawns one more that carries the roster.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     roster_t r = {};
@@ -77,22 +50,12 @@ BRIDGE_EXPORT(init) int init(void)
     return (0);
 }
 
-/*
-** shutdown
-**
-** Destroys the first entity.
-*/
 BRIDGE_EXPORT(shutdown) int shutdown(void)
 {
     bridge_destroy(first);
     return (0);
 }
 
-/*
-** reload
-**
-** Does nothing.
-*/
 BRIDGE_EXPORT(reload) int reload(void)
 {
     return (0);

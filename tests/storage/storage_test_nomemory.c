@@ -1,17 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/storage/storage_test_nomemory.c -- the allocator answering that
-** there is no memory, at every call the library makes in turn. Of the
-** build that counts those calls, and of no other.
-**
-** failure.md, *Out of memory*
 */
-
 #include <stdio.h>
 
 #include "storage_test.h"
@@ -28,14 +19,6 @@ static void use_module(bridge_t *b, const bridge_artifact_t *a)
     (void)bridge_unload(b, a->cfg.identity);
 }
 
-/*
-** refuse_one
-**
-** A deck made, a module loaded, run, reloaded and unloaded, and the
-** deck destroyed, with the allocation numbered `k` answered null. Answers
-** whether there was such an allocation. With an argument after the case's
-** name, which allocation it is goes to stderr first, to find a crash.
-*/
 static bool refuse_one(storage_test_t *t, size_t k)
 {
     storage_test_allocator_t *allocator = storage_test_get_allocator();
@@ -58,15 +41,6 @@ static bool refuse_one(storage_test_t *t, size_t k)
     return (allocator->failed);
 }
 
-/*
-** storage_test_refuse_memory
-**
-** Once for every allocation that a deck and a module make from the first
-** call to the last, with that one answered null. Each time something is
-** refused and says why, and nothing is written through a null pointer. An
-** allocation whose refusal no record said is counted, and with an argument
-** after the case's name is said on stderr.
-*/
 enum storage_test_end storage_test_refuse_memory(storage_test_t *t)
 {
     size_t k = 1;

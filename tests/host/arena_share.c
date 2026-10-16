@@ -1,18 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/arena_share.c -- a module with sixteen bytes of the arena,
-** reloaded into one whose reload takes forty. Stating more gives it more;
-** the same leaves it short; less is refused. With another module's share
-** carved after its own, the more is a second range.
-**
-** budgets.md, *Budgets*
 */
-
 #include <string.h>
 
 #include "cases.h"
@@ -37,12 +27,6 @@ static void load_namer(host_t *h)
     host_load(h, &a);
 }
 
-/*
-** test_grow_share
-**
-** Loads the ticker with sixteen bytes and reloads it stating what the case
-** is named after.
-*/
 void test_grow_share(host_t *h)
 {
     bridge_artifact_t a;
@@ -63,17 +47,6 @@ void test_grow_share(host_t *h)
     host_close(h);
 }
 
-/*
-** test_use_arena
-**
-** The whole arena is one module's share, and it keeps a string there.
-** Alone, its unload gives the share back and the next module has it. With
-** another module that declares the same component the row stays, the
-** string with it, and the share is not given to anybody: the reader still
-** says it, after the refusal as before.
-**
-** strings.md, *It is given back when nothing points into it*
-*/
 void test_use_arena(host_t *h)
 {
     bool kept = !strcmp(h->arg, "arenakept");

@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/refs.c -- follows ids it kept, across two batches of
-** destroys. Every destroy moves the last row into the hole, which no event
-** names: the survivors must still be found, and the dead refused.
 */
-
 #include "test_offsets.h"
 #include "game.h"
 #include "offsets_idle.h"
@@ -20,12 +13,6 @@ static uint32_t position;
 static uint32_t round;
 static uint64_t ids[ENTITIES];
 
-/*
-** cull
-**
-** Destroys every third entity, from the first on its first pass and from
-** the second on its second pass, and none after that.
-*/
 BRIDGE_EXPORT(cull) int cull(void)
 {
     uint32_t i = round;
@@ -38,12 +25,6 @@ BRIDGE_EXPORT(cull) int cull(void)
     return (0);
 }
 
-/*
-** is_mirrored
-**
-** Answers whether id `i` leads where it must: nowhere when its entity was
-** destroyed, and to the position it was given when it was not.
-*/
 static bool is_mirrored(uint32_t i)
 {
     uint32_t at = bridge_get_ref(ids[i], position, sizeof(position_t));
@@ -54,11 +35,6 @@ static bool is_mirrored(uint32_t i)
     return (at && BRIDGE_GET(position_t, x, at) == (float)i);
 }
 
-/*
-** check
-**
-** Says how many ids lead where they must, and how many do not.
-*/
 BRIDGE_EXPORT(check) int check(void)
 {
     uint32_t right = 0;
@@ -76,12 +52,6 @@ BRIDGE_EXPORT(check) int check(void)
     return (0);
 }
 
-/*
-** init
-**
-** Declares the position and the two systems, which state no term, and
-** spawns the entities, keeping each id.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     position_t p = { 0.0f, 0.0f };

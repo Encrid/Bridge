@@ -1,25 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/bridge_destroy.c -- a deck unmade: its modules shut down, and
-** everything else given back.
 */
-
 #include <stdlib.h>
 
 #include "bridge_inside.h"
 #include "say.h"
 
-/*
-** end_modules
-**
-** Runs each module's shutdown, in the order they loaded, and then discards
-** each: nothing here depends on anything, so no other order would mean more.
-*/
 static void end_modules(bridge_t *b)
 {
     module_t *m = b->modules;
@@ -46,12 +34,6 @@ static void free_schedule(bridge_t *b)
     free(b->build_bits);
 }
 
-/*
-** free_names
-**
-** Frees the names the deployment gave: the orders of its systems, and its
-** phases.
-*/
 static void free_names(bridge_t *b)
 {
     uint32_t i = 0;
@@ -71,16 +53,6 @@ static void free_names(bridge_t *b)
     free(b->phases);
 }
 
-/*
-** close_backends
-**
-** Destroys each backend, and closes the library of one that says its library
-** can go. One that brought a runtime in is left in the process, where the
-** next deck finds it again. A library that was opened and never became a
-** backend said nothing, and is left too.
-**
-** capabilities.md, *Capabilities, so the swap is honest*
-*/
 static void close_backends(bridge_t *b)
 {
     open_backend_t *o;
@@ -98,16 +70,6 @@ static void close_backends(bridge_t *b)
     free(b->backends);
 }
 
-/*
-** bridge_destroy
-**
-** Every loaded module's shutdown, then everything else. 0 if the deck is
-** gone. A pinned module's shutdown is its code, and runs on its thread or
-** not at all: it is refused before anything is touched, so the deck is
-** whole for the call that can.
-**
-** create.md, *Destroy*
-*/
 int bridge_destroy(bridge_t *b)
 {
     const module_t *pinned = b ? bridge_find_pinned(b) : nullptr;

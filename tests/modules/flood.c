@@ -1,24 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/flood.c -- spawns until the entity ceiling, and past
-** it.
 */
-
 #include "test_offsets.h"
 #include "offsets_idle.h"
 
 constexpr uint32_t SPAWNS = 1'000'000;
 
-/*
-** flood
-**
-** Spawns a million entities.
-*/
 BRIDGE_EXPORT(flood) int flood(void)
 {
     uint32_t i = 0;
@@ -30,11 +19,6 @@ BRIDGE_EXPORT(flood) int flood(void)
     return (0);
 }
 
-/*
-** init
-**
-** Registers the system.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     int none = 0;

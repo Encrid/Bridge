@@ -1,21 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/region_take.c -- a piece taken from a region, and one made longer.
 */
-
 #include "region.h"
 
-/*
-** find_best
-**
-** Answers the smallest gap that holds `len` bytes, or how many gaps there
-** are if none does.
-*/
 static uint32_t find_best(const region_t *r, uint32_t len)
 {
     uint32_t best = r->count;
@@ -30,12 +19,6 @@ static uint32_t find_best(const region_t *r, uint32_t len)
     return (best);
 }
 
-/*
-** region_take
-**
-** Takes a piece of `len` bytes: from the smallest gap that holds it, and
-** otherwise from what has never been used.
-*/
 int region_take(region_t *r, uint32_t len, uint32_t *at)
 {
     uint32_t best = find_best(r, len);
@@ -55,12 +38,6 @@ int region_take(region_t *r, uint32_t len, uint32_t *at)
     return (1);
 }
 
-/*
-** find_after
-**
-** Answers the gap that begins at `end`, or how many gaps there are if none
-** does.
-*/
 static uint32_t find_after(const region_t *r, uint32_t end)
 {
     uint32_t i = 0;
@@ -72,13 +49,6 @@ static uint32_t find_after(const region_t *r, uint32_t end)
     return (r->count);
 }
 
-/*
-** region_grow
-**
-** Makes the piece at `at` longer where it stands. Mostly it is the last
-** piece handed out, and what follows it has never been used; otherwise the
-** gap after it gives what is asked, if it is that long.
-*/
 bool region_grow(region_t *r, uint32_t at, uint32_t had, uint32_t want)
 {
     uint32_t more = want - had;
@@ -97,11 +67,6 @@ bool region_grow(region_t *r, uint32_t at, uint32_t had, uint32_t want)
     return (true);
 }
 
-/*
-** region_get_most
-**
-** Answers the longest piece the region could give now.
-*/
 uint32_t region_get_most(const region_t *r)
 {
     uint32_t most = r->len - r->used;

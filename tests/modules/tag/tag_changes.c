@@ -1,22 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/tag/tag_changes.c -- the systems of ntag that
-** change something: the entities and their tags, and the bits of O.
 */
-
 #include "tag.h"
 
-/*
-** spawn
-**
-** Spawns six entities with A. M is given to every second one, P to the
-** first two, O to every one, and R to the odd ones.
-*/
 TEST(spawn)
 {
     a_t value = {};
@@ -36,12 +24,6 @@ TEST(spawn)
     return (0);
 }
 
-/*
-** turn_low_off
-**
-** Turns off, by a write of its bit, each row of a span whose A is less than
-** three.
-*/
 static void turn_low_off(const a_t *column, uint64_t *bits, uint32_t count)
 {
     uint32_t row = 0;
@@ -53,11 +35,6 @@ static void turn_low_off(const a_t *column, uint64_t *bits, uint32_t count)
     }
 }
 
-/*
-** flicker
-**
-** Turns O off for the first three entities, by a write of their bits.
-*/
 TEST(flicker)
 {
     const bridge_query_t *q = test_get_query(api, ntag_toggled);
@@ -73,22 +50,12 @@ TEST(flicker)
     return (0);
 }
 
-/*
-** attach_a
-**
-** Gives W, the singleton.
-*/
 TEST(attach_a)
 {
     api->attach(api, 0, ntag_w, BRIDGE_ZEROED);
     return (0);
 }
 
-/*
-** detach_b
-**
-** Takes M from every entity that has it, which leaves one table.
-*/
 TEST(detach_b)
 {
     uint32_t i = 0;

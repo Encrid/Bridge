@@ -1,13 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/packed.h -- the component of npack.c.
 */
-
 #ifndef TEST_PACKED_H
     #define TEST_PACKED_H
     #include "bridge_schema.h"

@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/fp.h -- game:Position with another struct body
-** than game.h gives it, as a module built against an older header would.
 */
-
 #ifndef TEST_FP_H
     #define TEST_FP_H
 

@@ -1,26 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/reference/flecs_ref_setup.c -- what the measures share to make a
-** world ready, none of it timed: entities, their values, a query, and what
-** the process holds.
 */
-
 #include <stdlib.h>
 #include <string.h>
 
 #include "flecs_ref.h"
 
-/*
-** flecs_ref_make_ids
-**
-** Answers `count` new entities that carry `with`, or nothing if it is 0, in
-** an array the caller frees.
-*/
 ecs_entity_t *flecs_ref_make_ids(ecs_world_t *w, ecs_entity_t with,
     int32_t count)
 {
@@ -31,11 +18,6 @@ ecs_entity_t *flecs_ref_make_ids(ecs_world_t *w, ecs_entity_t with,
     return (ids);
 }
 
-/*
-** flecs_ref_set_ones
-**
-** Gives every entity of the measure its component, four bytes that hold 1.
-*/
 void flecs_ref_set_ones(const flecs_ref_t *r)
 {
     const uint32_t one = 1;
@@ -47,12 +29,6 @@ void flecs_ref_set_ones(const flecs_ref_t *r)
     }
 }
 
-/*
-** flecs_ref_make_query
-**
-** Answers a query for the entities that carry `first`, and `second` too
-** unless it is 0.
-*/
 ecs_query_t *flecs_ref_make_query(ecs_world_t *w, ecs_entity_t first,
     ecs_entity_t second)
 {
@@ -65,11 +41,6 @@ ecs_query_t *flecs_ref_make_query(ecs_world_t *w, ecs_entity_t first,
 
 #ifdef _WIN32
 
-/*
-** flecs_ref_read_held
-**
-** Answers the kilobytes the process holds.
-*/
 size_t flecs_ref_read_held(void)
 {
     held_counters_t c = { .cb = sizeof(c) };
@@ -81,11 +52,6 @@ size_t flecs_ref_read_held(void)
 
 #else
 
-/*
-** flecs_ref_read_held
-**
-** Answers 0: what the process holds is asked on Windows alone.
-*/
 size_t flecs_ref_read_held(void)
 {
     return (0);

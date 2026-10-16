@@ -1,24 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/storage/storage_test_measure.c -- nanoseconds for each kind of
-** change, at a barrier: a measurement, which passes by running.
 */
-
 #include <stdio.h>
 
 #include "storage_test.h"
 
 constexpr uint32_t MEASURE_COUNT = 100'000;
 
-/*
-** The phases of one round, in order. The second spawn and the second
-** destroy only make and undo what attach_both needs, and have no line.
-*/
 static const storage_test_op_t OPS[STORAGE_TEST_OPS] = {
     { "spawn", "an id handed out" },
     { "attach_a", "attach, the entity's first component" },
@@ -68,14 +58,6 @@ static void say_ops(const storage_test_times_t *m)
     printf("%-38s %7.0f ns\n", OPS[last].what, (double)m->best[last]);
 }
 
-/*
-** measure_changes
-**
-** Each kind of change, of a hundred thousand entities in the deck main
-** made. What is held is said with every entity carrying both components
-** again: a destroyed one holds nothing in either. Answers 1 if the module
-** could not be loaded.
-*/
 static int measure_changes(storage_test_t *t)
 {
     storage_test_times_t m = {};
@@ -96,13 +78,6 @@ static int measure_changes(storage_test_t *t)
     return (0);
 }
 
-/*
-** storage_test_measure
-**
-** Each kind of change; then the same deck with ten thousand tables
-** standing; then the stress run, on four threads and on one: eight million
-** changes and their checks.
-*/
 enum storage_test_end storage_test_measure(storage_test_t *t)
 {
     if (measure_changes(t) || storage_test_measure_tables(t))

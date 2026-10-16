@@ -1,25 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/reload_rows.c -- the rows of a type that a reload made another in the
-** place of.
-**
-** lifetime.md, *When a component is moved*
 */
-
 #include "reload.h"
 
-/*
-** set_move
-**
-** Writes the move of a type's rows to the one made in its place: the whole
-** value, as many bytes as the shorter of the two, or, where the component
-** layout changed, field by field, as declare worked it out.
-*/
 static void set_move(const declared_type_t *c, storage_move_t *move,
     storage_run_t *whole)
 {
@@ -34,14 +19,6 @@ static void set_move(const declared_type_t *c, storage_move_t *move,
     move->run_count = was->run_count;
 }
 
-/*
-** settle
-**
-** The rows have moved: no type replaces another any more, and what went is
-** said, by the names it was accepted under.
-**
-** lifetime.md, *When a component layout changed*
-*/
 static void settle(bridge_t *b, const module_t *n)
 {
     say_t about = { n, nullptr, BRIDGE_WARN };
@@ -75,15 +52,6 @@ static uint32_t list_moves(const module_t *n, storage_move_t *moves,
     return (count);
 }
 
-/*
-** refuse_move
-**
-** Says why the rows of `count` components were not moved: for want of the
-** memory to carry their values, or of room where they were to go.
-**
-** lifetime.md, *When a component is moved*
-** failure.md, *Out of memory*
-*/
 static int refuse_move(reloading_t *r, enum storage_moved moved,
     uint32_t count)
 {
@@ -100,12 +68,6 @@ static int refuse_move(reloading_t *r, enum storage_moved moved,
         b->columns_len));
 }
 
-/*
-** reload_move_rows
-**
-** Every type this reload made in the place of another takes that one's
-** rows, all of them or none.
-*/
 int reload_move_rows(reloading_t *r)
 {
     const module_t *n = r->n;

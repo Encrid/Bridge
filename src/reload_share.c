@@ -1,24 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/reload_share.c -- a share of the persistent arena that a reload
-** grows.
-**
-** budgets.md, *Budgets*
 */
-
 #include "reload.h"
 
-/*
-** grow_in_place
-**
-** Grows a module's last range where it stands, if that is the one it
-** allocates from and what follows it is free.
-*/
 static void grow_in_place(reloading_t *r)
 {
     const module_t *old = r->old;
@@ -32,13 +18,6 @@ static void grow_in_place(reloading_t *r)
     r->in_place = region_grow(space, at, r->last.len, r->last.len + r->extra);
 }
 
-/*
-** take_range
-**
-** Takes one more range of the persistent arena for what a share grows by.
-**
-** budgets.md, *Budgets*
-*/
 static int take_range(reloading_t *r, int64_t wants)
 {
     bridge_t *b = r->b;
@@ -54,14 +33,6 @@ static int take_range(reloading_t *r, int64_t wants)
     return (0);
 }
 
-/*
-** reload_grow_share
-**
-** Grows a module's share of the persistent arena to what the reload states:
-** its last range where it stands, and otherwise a range more.
-**
-** budgets.md, *Budgets*
-*/
 int reload_grow_share(reloading_t *r)
 {
     const module_t *old = r->old;
@@ -79,11 +50,6 @@ int reload_grow_share(reloading_t *r)
     return (r->in_place ? 0 : take_range(r, wants));
 }
 
-/*
-** reload_give_back
-**
-** Gives back what reload_grow_share added.
-*/
 void reload_give_back(reloading_t *r)
 {
     bridge_t *b = r->b;

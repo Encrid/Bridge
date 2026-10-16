@@ -1,25 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_cells.c -- a module's column_base: for each table and each
-** type it declared, where that type's column is.
 */
-
 #include <string.h>
 
 #include "storage_publish.h"
 #include "storage_reach.h"
 #include "storage_view.h"
 
-/*
-** write_cells
-**
-** Writes the row of a module's column_base that is table `t`.
-*/
 static void write_cells(publish_t *p, uint32_t t)
 {
     const module_t *m = p->m;
@@ -35,14 +24,6 @@ static void write_cells(publish_t *p, uint32_t t)
     }
 }
 
-/*
-** get_kept
-**
-** Answers where a module reaches a component that is not kept in a table: a
-** sparse set's index, a direct-indexed component's cells, a singleton's
-** value while it has one. 0 for a component kept in a table, and for a
-** singleton with no value.
-*/
 static uint32_t get_kept(const bridge_t *b, const storage_type_t *type)
 {
     uint64_t index = 4ull * type->slot * b->entities;
@@ -56,12 +37,6 @@ static uint32_t get_kept(const bridge_t *b, const storage_type_t *type)
     return (type->size ? type->cells : BRIDGE_CARRIED);
 }
 
-/*
-** write_every_cell
-**
-** Writes a module's whole column_base, with its header: every live table,
-** and where each component kept apart is reached.
-*/
 static void write_every_cell(publish_t *p)
 {
     const storage_t *r = p->r;
@@ -83,12 +58,6 @@ static void write_every_cell(publish_t *p)
     }
 }
 
-/*
-** storage_publish_cells
-**
-** Writes a module's column_base: every table when a declaration changed,
-** and otherwise the ones touched.
-*/
 void storage_publish_cells(publish_t *p)
 {
     const storage_t *r = p->r;

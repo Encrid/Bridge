@@ -1,23 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/module_check.c -- what can be decided from a config alone: everything
-** a load and a reload both refuse before the artifact is touched.
 */
-
 #include <string.h>
 
 #include "module.h"
 
-/*
-** module_find
-**
-** Answers the loaded module of an identity, whatever its version.
-*/
 module_t *module_find(bridge_t *b, const char *identity)
 {
     size_t stem = bridge_get_stem_length(identity);
@@ -41,15 +30,6 @@ static open_backend_t *find_backend(bridge_t *b, const char *name)
     return (o);
 }
 
-/*
-** check_whose
-**
-** Refuses an artifact with no identity, one that names no backend there is,
-** and one built for another ABI.
-**
-** module.md, *Identity*
-** lifecycle.md, *The runtime lifecycle*
-*/
 static int check_whose(module_check_t *k)
 {
     const char *backend = k->a->backend;
@@ -68,16 +48,6 @@ static int check_whose(module_check_t *k)
     return (0);
 }
 
-/*
-** module_check_room
-**
-** Refuses a module that is loaded already, that is one more than the budget
-** of modules, or whose share does not fit in what is left of the persistent
-** arena.
-**
-** schedule.md, *Order within a phase is never implicit*
-** budgets.md, *Budgets*
-*/
 int module_check_room(const module_check_t *k)
 {
     bridge_t *b = k->b;
@@ -98,12 +68,6 @@ int module_check_room(const module_check_t *k)
     return (0);
 }
 
-/*
-** module_check
-**
-** Refuses everything a load and a reload both refuse before the artifact is
-** touched, and works out what its config demands of its backend.
-*/
 int module_check(module_check_t *k)
 {
     const bridge_module_config_t *cfg = &k->a->cfg;

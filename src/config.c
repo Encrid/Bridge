@@ -1,27 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/config.c -- a module's own settings, written into the component its
-** config names.
 */
-
 #include <stdlib.h>
 #include <string.h>
 
 #include "config.h"
 
-/*
-** check_none
-**
-** Refuses settings handed to a module that states it has no config
-** component.
-**
-** config.md, *A module's own settings are a component*
-*/
 static int check_none(config_seed_t *seed)
 {
     if (!seed->cfg->setting_count)
@@ -30,14 +16,6 @@ static int check_none(config_seed_t *seed)
         "it has no config component", seed->cfg->setting_count));
 }
 
-/*
-** check_taken
-**
-** Refuses a config component that is already another module's settings: it
-** is one value, so one module's.
-**
-** config.md, *A module's own settings are a component*
-*/
 static int check_taken(config_seed_t *seed)
 {
     const module_t *other = seed->b->modules;
@@ -50,14 +28,6 @@ static int check_taken(config_seed_t *seed)
         "the settings of module '%.80s'", seed->c->name, other->identity));
 }
 
-/*
-** find_config
-**
-** Finds the component the module's config names, among what its init
-** declared: a struct, and a singleton, that no other module's settings are.
-**
-** config.md, *A module's own settings are a component*
-*/
 static int find_config(config_seed_t *seed)
 {
     const module_t *m = seed->m;
@@ -80,12 +50,6 @@ static int find_config(config_seed_t *seed)
     return (check_taken(seed));
 }
 
-/*
-** seed_all
-**
-** Writes every setting into one value of the config component, and gives the
-** singleton that value when none was refused.
-*/
 static int seed_all(config_seed_t *seed)
 {
     const bridge_module_config_t *cfg = seed->cfg;
@@ -106,11 +70,6 @@ static int seed_all(config_seed_t *seed)
     return (refused);
 }
 
-/*
-** config_seed
-**
-** Writes a module's settings into the component its config names.
-*/
 int config_seed(bridge_t *b, module_t *m, const bridge_module_config_t *cfg,
     backend_err_t *err)
 {

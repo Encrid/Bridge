@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_convert.c -- the second half of a move: each entity placed
-** once, its values taken before it leaves where they were and written
-** where it is now.
 */
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -19,12 +12,6 @@
 
 constexpr uint32_t MOVES_MOST = 64;
 
-/*
-** take_values
-**
-** Copies the values of the moved types that the entity at `index` has, one
-** after another, and writes into `had` where each was: 0 for one it has not.
-*/
 static void take_values(const convert_t *c, uint32_t index, uint32_t *had)
 {
     const storage_type_t *from;
@@ -42,13 +29,6 @@ static void take_values(const convert_t *c, uint32_t index, uint32_t *had)
     }
 }
 
-/*
-** write_runs
-**
-** Writes the value of one moved type as its new type: zero, but for the runs
-** of bytes copied across. `was` is the value as it was, and `to` where the
-** new one is.
-*/
 static void write_runs(const convert_t *c, uint32_t k, const uint8_t *was,
     uint32_t to)
 {
@@ -63,12 +43,6 @@ static void write_runs(const convert_t *c, uint32_t k, const uint8_t *was,
     }
 }
 
-/*
-** write_values
-**
-** Writes, for the entity at `index` now that it is placed, each value it
-** had of a moved type, as the type it became. A singleton's is on index 0.
-*/
 static void write_values(const convert_t *c, uint32_t index,
     const uint32_t *had)
 {
@@ -87,11 +61,6 @@ static void write_values(const convert_t *c, uint32_t index,
     }
 }
 
-/*
-** convert_all
-**
-** Places each changed entity once, with its values carried across.
-*/
 static void convert_all(const convert_t *c)
 {
     storage_t *r = c->r;
@@ -107,11 +76,6 @@ static void convert_all(const convert_t *c)
     }
 }
 
-/*
-** storage_convert
-**
-** Writes the rows of components again, as other types. All of them or none.
-*/
 enum storage_moved storage_convert(storage_t *r, const storage_move_t *moves,
     uint32_t count)
 {

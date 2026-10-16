@@ -1,22 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/pool_job.c -- a job of a run: taken by one thread, run, and counted
-** as done.
 */
-
 #include "pool.h"
 
-/*
-** take_job
-**
-** Answers the next job nobody took and marks it taken, or -1. A job marked
-** for the caller is the caller's alone.
-*/
 static int take_job(pool_t *p, int caller)
 {
     int found = -1;
@@ -34,11 +22,6 @@ static int take_job(pool_t *p, int caller)
     return (found);
 }
 
-/*
-** finish_job
-**
-** Counts one job as done, and sets the pool's event when it was the last.
-*/
 static void finish_job(pool_t *p)
 {
     os_mutex_lock(p->lock);
@@ -48,12 +31,6 @@ static void finish_job(pool_t *p)
     os_mutex_unlock(p->lock);
 }
 
-/*
-** pool_run_taken
-**
-** Takes jobs of the run in progress and runs them, until none is left to
-** take.
-*/
 void pool_run_taken(pool_t *p, int caller)
 {
     int job = take_job(p, caller);
@@ -65,12 +42,6 @@ void pool_run_taken(pool_t *p, int caller)
     }
 }
 
-/*
-** pool_work
-**
-** What a worker's thread runs: it sleeps until woken, runs what it can take,
-** and ends when the pool is told to quit.
-*/
 void pool_work(void *arg)
 {
     pool_worker_t *w = arg;

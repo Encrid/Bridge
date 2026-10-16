@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/schema/schema_refusals.c -- what a looser parser would take and
-** this one does not, and what was never C; an enum with no integer stated,
-** or one it cannot be, or a constant past it. Each is refused by its word.
 */
-
 #include <stdio.h>
 #include <string.h>
 
@@ -60,12 +53,6 @@ static const want_refusal_t SCHEMA_REFUSALS[] = {
         "more bytes" }
 };
 
-/*
-** check_refusal
-**
-** Reads a descriptor that is to be refused, and checks that the refusal
-** says the word it stopped at. What it said is printed, whole.
-*/
 static int check_refusal(const want_refusal_t *w)
 {
     char why[160] = "";
@@ -85,11 +72,6 @@ static int check_refusal(const want_refusal_t *w)
     return (1);
 }
 
-/*
-** schema_run_refusals
-**
-** Checks every refusal there is a row for.
-*/
 int schema_run_refusals(void)
 {
     constexpr size_t count = sizeof(SCHEMA_REFUSALS)

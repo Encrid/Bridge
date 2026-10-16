@@ -1,24 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/reference/flecs_ref_basics.c -- the lines of `storage measure`: an
-** entity's first component, one it has, and its end.
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "flecs_ref.h"
 
-/*
-** time_set
-**
-** Answers the nanoseconds it takes to set the component on every entity.
-*/
 static uint64_t time_set(const flecs_ref_t *r)
 {
     ecs_world_t *w = r->w;
@@ -38,11 +27,6 @@ static uint64_t time_set(const flecs_ref_t *r)
     return (read_clock() - t);
 }
 
-/*
-** time_delete
-**
-** Answers the nanoseconds it takes to destroy every entity.
-*/
 static uint64_t time_delete(const flecs_ref_t *r)
 {
     ecs_world_t *w = r->w;
@@ -60,12 +44,6 @@ static uint64_t time_delete(const flecs_ref_t *r)
     return (read_clock() - t);
 }
 
-/*
-** flecs_ref_measure_basics
-**
-** Times a component set on 100,000 entities that have none, set again, and
-** the entities destroyed.
-*/
 void flecs_ref_measure_basics(bool deferred)
 {
     flecs_ref_t r = { .w = ecs_mini(), .count = 100'000 };

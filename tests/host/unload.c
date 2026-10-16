@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/unload.c -- what an unload leaves behind, by the
-** policy the component's last declarer stated.
-**
-** lifetime.md, *What unload leaves behind*
 */
-
 #include <stdio.h>
 
 #include "cases.h"
@@ -20,12 +12,6 @@ static const char *const TEST_ROSTER[] = {
     "game:Roster"
 };
 
-/*
-** test_fail_unlimited
-**
-** A budget of failures stated as no limit: the system fails every pass and
-** its module is never stopped.
-*/
 void test_fail_unlimited(host_t *h)
 {
     bridge_artifact_t a;
@@ -41,12 +27,6 @@ void test_fail_unlimited(host_t *h)
     host_close(h);
 }
 
-/*
-** load_keeper
-**
-** Loads the keeper built with the policy the case is named after, and the
-** counter, which reads what the keeper leaves.
-*/
 static void load_keeper(host_t *h)
 {
     char file[32];
@@ -61,13 +41,6 @@ static void load_keeper(host_t *h)
     host_load(h, &a);
 }
 
-/*
-** test_unload_keeper
-**
-** The keeper is unloaded, and its private component goes by its policy.
-** The component only the keeper declared is gone: its name is free for
-** another layout.
-*/
 void test_unload_keeper(host_t *h)
 {
     if (host_open(h))
@@ -81,12 +54,6 @@ void test_unload_keeper(host_t *h)
     host_close(h);
 }
 
-/*
-** test_unload_declarer
-**
-** The declarer of a type goes and its user stays: the type is still held,
-** and another layout of it is refused until the user goes too.
-*/
 void test_unload_declarer(host_t *h)
 {
     if (host_open(h))
@@ -101,11 +68,6 @@ void test_unload_declarer(host_t *h)
     host_close(h);
 }
 
-/*
-** test_unload_nobody
-**
-** An unload of a module that is not loaded.
-*/
 void test_unload_nobody(host_t *h)
 {
     if (host_open(h))

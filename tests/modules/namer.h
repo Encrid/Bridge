@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/namer.h -- the component of namer.c: a string, by
-** where its bytes are in the persistent arena and how many they are.
 */
-
 #ifndef TEST_NAMER_H
     #define TEST_NAMER_H
 

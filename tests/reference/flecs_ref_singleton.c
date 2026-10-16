@@ -1,26 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/reference/flecs_ref_singleton.c -- a singleton read.
 */
-
 #include <stdio.h>
 
 #include "flecs_ref.h"
 
 constexpr uint32_t READS = 1'000'000;
 
-/*
-** time_reads
-**
-** Answers the nanoseconds it takes to read the singleton READS times, and
-** adds what was read to `total`. The call is the one ecs_singleton_get
-** makes: the component is the entity that carries it.
-*/
 static uint64_t time_reads(const ecs_world_t *w, ecs_entity_t id,
     uint32_t *total)
 {
@@ -39,11 +27,6 @@ static uint64_t time_reads(const ecs_world_t *w, ecs_entity_t id,
     return (t);
 }
 
-/*
-** flecs_ref_measure_singleton
-**
-** Times a singleton read, the least of four times ROUNDS.
-*/
 void flecs_ref_measure_singleton(void)
 {
     ecs_world_t *w = ecs_mini();

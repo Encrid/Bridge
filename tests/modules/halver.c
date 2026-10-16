@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/halver.c -- halves every game:Position.x, under a
-** write grant, in the phase the mover adds to it.
 */
-
 #include "test_offsets.h"
 #include "game.h"
 #include "offsets_idle.h"
@@ -16,11 +10,6 @@
 static uint32_t position;
 static uint32_t halving;
 
-/*
-** halve_span
-**
-** Halves the x of every position of one span.
-*/
 static void halve_span(uint32_t span)
 {
     uint32_t count = bridge_count_rows(span);
@@ -35,11 +24,6 @@ static void halve_span(uint32_t span)
     }
 }
 
-/*
-** halve
-**
-** Halves the x of every position.
-*/
 BRIDGE_EXPORT(halve) int halve(void)
 {
     uint32_t spans = bridge_count_spans(halving);
@@ -52,11 +36,6 @@ BRIDGE_EXPORT(halve) int halve(void)
     return (0);
 }
 
-/*
-** init
-**
-** Declares the position, and the system that writes it.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};

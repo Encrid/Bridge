@@ -1,22 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/frag.c -- what it costs a system when the entities
-** it reads are spread over many tables: one component every entity carries,
-** and markers that split them into SPLIT sets of the same size. The system
-** reads the one component of every row and says how many rows there were,
-** so that a host can time it and know the loop ran.
-**
-** Built once for each SPLIT: 1, 16, 256, 4096. The entities are the same
-** number every time. Twelve markers make 2^12 sets at the most.
-**
-** stage10.md, *The repair*
 */
-
 #include "test_module.h"
 #include "measured.h"
 #include "idle.h"
@@ -44,12 +30,6 @@ static void attach_markers(const test_api_t *api, uint64_t id, uint32_t set)
     }
 }
 
-/*
-** fill
-**
-** Spawns the entities. Each is made with all it will carry, the value and
-** the markers of its set, so each is placed once.
-*/
 TEST(fill)
 {
     uint64_t id;
@@ -64,12 +44,6 @@ TEST(fill)
     return (0);
 }
 
-/*
-** sum
-**
-** Reads the value of every row, and says once a call what was read and
-** over how many spans.
-*/
 TEST_MEASURED TEST(sum)
 {
     const bridge_query_t *q = test_get_query(api, reading);
@@ -94,12 +68,6 @@ TEST_MEASURED TEST(sum)
     return (0);
 }
 
-/*
-** declare_marker
-**
-** Declares one marker by its name, as a struct, or as a tag in a build with
-** TAGS, and answers its slot.
-*/
 static uint32_t declare_marker(const test_api_t *api, const char *name)
 {
     uint32_t len = (uint32_t)strlen(name);
@@ -116,12 +84,6 @@ static uint32_t declare_marker(const test_api_t *api, const char *name)
 #endif
 }
 
-/*
-** init
-**
-** Declares the value and the markers, and the two systems: `fill` states
-** that it attaches the value and every marker.
-*/
 TEST(init)
 {
     int none = 0;

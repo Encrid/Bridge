@@ -1,27 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_term.c -- a term of a system or an observer, checked.
-**
-** query.md, *What a query may not ask for*
 */
-
 #include <string.h>
 
 #include "abi_subscribe.h"
 
-/*
-** check_values
-**
-** Refuses a term whose access or whose operator is unset, or is none there
-** is.
-**
-** query.md, *What a query may not ask for*
-*/
 static int check_values(subscribing_t *g, const bridge_term_t *t)
 {
     if (!t->access)
@@ -37,12 +22,6 @@ static int check_values(subscribing_t *g, const bridge_term_t *t)
     return (0);
 }
 
-/*
-** selects_alone
-**
-** Answers whether term `i` is the one term that selects: every other is
-** optional.
-*/
 static bool selects_alone(const subscribing_t *g, uint32_t i)
 {
     bridge_term_t other;
@@ -57,14 +36,6 @@ static bool selects_alone(const subscribing_t *g, uint32_t i)
     return (true);
 }
 
-/*
-** check_sparse
-**
-** Refuses a term of a component kept in a sparse set that selects beside
-** another, or that is negated.
-**
-** storage.md, *What a query walks*
-*/
 static int check_sparse(subscribing_t *g, uint32_t i, const bridge_term_t *t,
     const declared_type_t *c)
 {
@@ -80,15 +51,6 @@ static int check_sparse(subscribing_t *g, uint32_t i, const bridge_term_t *t,
     return (0);
 }
 
-/*
-** check_walked
-**
-** Refuses a term of a system that selects by what a system does not walk. A
-** system walks tables, or one sparse set alone, and what is kept elsewhere
-** it reaches from the row. An observer walks nothing.
-**
-** storage.md, *What a query walks*
-*/
 static int check_walked(subscribing_t *g, uint32_t i, const bridge_term_t *t,
     const declared_type_t *c)
 {
@@ -107,15 +69,6 @@ static int check_walked(subscribing_t *g, uint32_t i, const bridge_term_t *t,
     return (0);
 }
 
-/*
-** abi_check_term
-**
-** Refuses term `i` if it asks for what a query may not. A call that was
-** refused before this term is refused at it.
-**
-** query.md, *What a query may not ask for*
-** grants.md, *Whose component it is*
-*/
 int abi_check_term(subscribing_t *g, uint32_t i, const bridge_term_t *t)
 {
     module_t *m = g->m;

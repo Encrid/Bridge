@@ -1,17 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/storage/storage_test_nomemory_relay.c -- a reload into another
-** component layout, with each allocation answered null in turn, and what
-** the operating system reserves counted among them.
-**
-** failure.md, *Out of memory*
 */
-
 #include <stdio.h>
 
 #include "os.h"
@@ -19,12 +10,6 @@
 
 #ifdef COUNTED
 
-/*
-** counted_os_reserve
-**
-** os_reserve, counted among the allocations: nullptr if this call is the
-** one that is to fail.
-*/
 void *counted_os_reserve(size_t reserve, size_t commit)
 {
     storage_test_allocator_t *allocator = storage_test_get_allocator();
@@ -36,13 +21,6 @@ void *counted_os_reserve(size_t reserve, size_t commit)
     return (nullptr);
 }
 
-/*
-** relay_one
-**
-** A deck made, a module loaded, run, reloaded into a build with a field
-** added and looked at, with the allocation numbered `k` answered null.
-** Answers whether there was such an allocation.
-*/
 static bool relay_one(storage_test_t *t, size_t k)
 {
     storage_test_allocator_t *allocator = storage_test_get_allocator();
@@ -65,14 +43,6 @@ static bool relay_one(storage_test_t *t, size_t k)
     return (allocator->failed);
 }
 
-/*
-** storage_test_refuse_relay
-**
-** Once for every allocation of a reload that lays a component out again,
-** with that one answered null: each time something is refused and says
-** why. With an argument after the case's name, an allocation whose refusal
-** no record said is named on stderr.
-*/
 enum storage_test_end storage_test_refuse_relay(storage_test_t *t)
 {
     size_t k = 1;

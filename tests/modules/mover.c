@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/mover.c -- writes game:Position. It owns the
-** namespace, spawns the entities, and marks half of them.
 */
-
 #include "test_offsets.h"
 #include "game.h"
 #include "offsets_idle.h"
@@ -20,11 +14,6 @@ static uint32_t marked;
 static uint32_t moving;
 static uint32_t counting;
 
-/*
-** move
-**
-** Adds one to the x of every position.
-*/
 BRIDGE_EXPORT(move) int move(void)
 {
     uint32_t spans = bridge_count_spans(moving);
@@ -48,12 +37,6 @@ BRIDGE_EXPORT(move) int move(void)
     return (0);
 }
 
-/*
-** count
-**
-** Says what its own query matched: every table holding a position, marked
-** or not.
-*/
 BRIDGE_EXPORT(count) int count(void)
 {
     uint32_t spans = bridge_count_spans(counting);
@@ -68,11 +51,6 @@ BRIDGE_EXPORT(count) int count(void)
     return (0);
 }
 
-/*
-** populate
-**
-** Spawns the entities: each with a position, and every other one marked.
-*/
 static void populate(void)
 {
     position_t p = { 0.0f, 0.0f };
@@ -89,11 +67,6 @@ static void populate(void)
     }
 }
 
-/*
-** init
-**
-** Declares the two components and the two systems, and spawns the entities.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};

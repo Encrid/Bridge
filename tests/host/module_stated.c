@@ -1,23 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/module_stated.c -- what a module's config states of itself:
-** a log level, the size of its private memory, what it spawns.
 */
-
 #include <stdio.h>
 
 #include "cases.h"
 
-/*
-** test_state_bad_level
-**
-** A log level that is no severity is refused.
-*/
 void test_state_bad_level(host_t *h)
 {
     bridge_artifact_t a;
@@ -31,11 +20,6 @@ void test_state_bad_level(host_t *h)
     host_close(h);
 }
 
-/*
-** test_log_warnings
-**
-** At warnings, what the mover says at info is never written.
-*/
 void test_log_warnings(host_t *h)
 {
     bridge_artifact_t a;
@@ -49,11 +33,6 @@ void test_log_warnings(host_t *h)
     host_close(h);
 }
 
-/*
-** test_state_big_private
-**
-** Regions that do not fit in 32 bits of offset.
-*/
 void test_state_big_private(host_t *h)
 {
     bridge_artifact_t a;
@@ -67,11 +46,6 @@ void test_state_big_private(host_t *h)
     host_close(h);
 }
 
-/*
-** test_state_no_spawns
-**
-** The mover, stating that it spawns nothing.
-*/
 void test_state_no_spawns(host_t *h)
 {
     bridge_artifact_t a;
@@ -84,11 +58,6 @@ void test_state_no_spawns(host_t *h)
     host_close(h);
 }
 
-/*
-** test_run_unknown_phase
-**
-** A phase the deployment did not declare is refused.
-*/
 void test_run_unknown_phase(host_t *h)
 {
     if (host_open(h))

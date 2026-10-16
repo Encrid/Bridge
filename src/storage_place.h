@@ -1,26 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_place.h -- an entity put where the fold has it: its table, its
-** sparse sets, its cells.
 */
-
 #ifndef BRIDGE_SRC_STORAGE_PLACE_H
     #define BRIDGE_SRC_STORAGE_PLACE_H
 
     #include "storage_fold.h"
     #include "storage_tell.h"
 
-/*
-** place_sets
-**
-** Has the entity at `index` join each sparse set the fold put it in, and
-** leave each it is in that the fold took it out of.
-*/
 static inline void place_sets(storage_t *r, uint32_t index)
 {
     const uint64_t *work = get_work(r, index);
@@ -36,13 +24,6 @@ static inline void place_sets(storage_t *r, uint32_t index)
     }
 }
 
-/*
-** place_cells
-**
-** Gives the entity at `index` each direct-indexed component the fold gave
-** it, and takes each the fold took. Such a component has its cell already,
-** so it cannot be short of room.
-*/
 static inline void place_cells(storage_t *r, uint32_t index)
 {
     const uint64_t *work = get_work(r, index);
@@ -57,12 +38,6 @@ static inline void place_cells(storage_t *r, uint32_t index)
     }
 }
 
-/*
-** place_singles
-**
-** Gives each singleton the value the fold gave it, or takes it: what index
-** 0, which is no entity, carries.
-*/
 static inline void place_singles(storage_t *r)
 {
     storage_type_t *type;
@@ -77,12 +52,6 @@ static inline void place_singles(storage_t *r)
     }
 }
 
-/*
-** place_one
-**
-** Puts the entity at `index` where the fold has it. While no type is kept
-** apart from tables, that is one move and no more.
-*/
 [[gnu::always_inline]] static inline void place_one(storage_t *r,
     uint32_t index)
 {

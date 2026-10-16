@@ -1,21 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/elsewhere.c -- the modules several cases load, and a call
-** made from a thread that loaded nothing.
 */
-
 #include "cases.h"
 
-/*
-** test_load_game_reader
-**
-** Loads the reader, with its grant.
-*/
 void test_load_game_reader(host_t *h)
 {
     bridge_artifact_t a;
@@ -24,11 +13,6 @@ void test_load_game_reader(host_t *h)
     host_load(h, &a);
 }
 
-/*
-** test_load_watcher
-**
-** Loads the watcher, an observer of another namespace, with its grant.
-*/
 void test_load_watcher(host_t *h)
 {
     bridge_artifact_t a;
@@ -51,11 +35,6 @@ static void work_elsewhere(void *arg)
         host_run_frames_unsaid(e->b, e->frames);
 }
 
-/*
-** test_start_elsewhere
-**
-** Makes a call from another thread.
-*/
 void test_start_elsewhere(test_elsewhere_t *e, bridge_t *b, int frames)
 {
     e->b = b;
@@ -65,11 +44,6 @@ void test_start_elsewhere(test_elsewhere_t *e, bridge_t *b, int frames)
     host_thread_start(&e->thread);
 }
 
-/*
-** test_join_elsewhere
-**
-** Waits for a call made from another thread.
-*/
 void test_join_elsewhere(test_elsewhere_t *e)
 {
     host_thread_join(&e->thread);

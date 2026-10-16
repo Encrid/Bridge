@@ -1,21 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/schedule_build.c -- a schedule built: for every phase, edges, the
-** refusal, then levels.
 */
-
 #include "schedule.h"
 
-/*
-** raise_after
-**
-** Puts every system that `i` runs before at a level after its own.
-*/
 static void raise_after(schedule_phase_t *p, uint32_t i)
 {
     uint32_t level = p->in[i]->level;
@@ -39,12 +28,6 @@ static void raise_all(schedule_phase_t *p)
     }
 }
 
-/*
-** set_levels
-**
-** Gives each system its level: a level is everything whose predecessors are
-** all in earlier ones. A refused phase is left with every system at level 0.
-*/
 static void set_levels(schedule_phase_t *p, bool refused)
 {
     uint32_t i = 0;
@@ -60,12 +43,6 @@ static void set_levels(schedule_phase_t *p, bool refused)
     }
 }
 
-/*
-** build_phase
-**
-** Schedules one phase: what the deployment orders, then what each module
-** orders of its own, each closed over, then the refusal and the levels.
-*/
 static int build_phase(bridge_t *b, schedule_phase_t *p)
 {
     int refused;
@@ -80,11 +57,6 @@ static int build_phase(bridge_t *b, schedule_phase_t *p)
     return (refused);
 }
 
-/*
-** schedule_build
-**
-** Schedules every phase, and the barrier after them as one more.
-*/
 int schedule_build(bridge_t *b, char *why, size_t why_len)
 {
     schedule_phase_t p = { .why = why, .why_len = why_len };

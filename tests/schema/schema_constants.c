@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/schema/schema_constants.c -- the enums and bitmasks a descriptor is
-** read as. The integer its author stated is its width, and its range.
 */
-
 #include "schema_test.h"
 
 static const want_constants_t SCHEMA_CONSTANTS[] = {
@@ -25,11 +19,6 @@ static const want_constants_t SCHEMA_CONSTANTS[] = {
         { INT64_MIN }, 1 }
 };
 
-/*
-** schema_run_constants
-**
-** Checks every enum and bitmask there is a row for.
-*/
 int schema_run_constants(void)
 {
     constexpr size_t count = sizeof(SCHEMA_CONSTANTS)

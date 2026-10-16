@@ -1,26 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/schema_constants.c -- an enum or a bitmask read from its descriptor:
-** the integer it is, then its constants.
 */
-
 #include <stdlib.h>
 
 #include "schema_reader.h"
 
-/*
-** set_base
-**
-** Reads the token as the integer the type is, which its author states: one
-** of 8 to 32 bits for an enum, and an unsigned one of 8 to 64 for a bitmask.
-**
-** schema.md, *The type set*
-*/
 static int set_base(schema_reader_t *r, bool bits)
 {
     int given = schema_find_given(r);
@@ -40,13 +26,6 @@ static int set_base(schema_reader_t *r, bool bits)
     return (0);
 }
 
-/*
-** add_constant
-**
-** Adds a constant named by the token, with room made for it.
-**
-** failure.md, *Out of memory*
-*/
 static int add_constant(schema_reader_t *r)
 {
     schema_t *out = r->out;
@@ -67,13 +46,6 @@ static int add_constant(schema_reader_t *r)
     return (0);
 }
 
-/*
-** read_constant
-**
-** Reads one constant, from its name to the comma or the brace after it.
-**
-** schema.md, *The type set*
-*/
 static int read_constant(schema_reader_t *r, bool bits)
 {
     schema_t *out = r->out;
@@ -96,13 +68,6 @@ static int read_constant(schema_reader_t *r, bool bits)
     return (0);
 }
 
-/*
-** schema_parse_constants
-**
-** Reads an enum's or a bitmask's integer, its brace and its constants.
-**
-** schema.md, *The type set*
-*/
 int schema_parse_constants(schema_reader_t *r, bool bits)
 {
     int refused = set_base(r, bits);

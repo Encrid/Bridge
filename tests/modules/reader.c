@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/reader.c -- reads game:Position under a grant, over
-** the marked entities only, and says what it saw.
 */
-
 #include "test_offsets.h"
 #include "game.h"
 #include "offsets_idle.h"
@@ -17,12 +11,6 @@ static uint32_t position;
 static uint32_t marked;
 static uint32_t summing;
 
-/*
-** add_span
-**
-** Adds to `total` the x of every position of one span, and answers how
-** many rows the span has.
-*/
 static uint32_t add_span(uint32_t span, float *total)
 {
     uint32_t count = bridge_count_rows(span);
@@ -37,11 +25,6 @@ static uint32_t add_span(uint32_t span, float *total)
     return (count);
 }
 
-/*
-** sum
-**
-** Says how many spans and rows its query matched, and the sum of their x.
-*/
 BRIDGE_EXPORT(sum) int sum(void)
 {
     uint32_t spans = bridge_count_spans(summing);
@@ -58,11 +41,6 @@ BRIDGE_EXPORT(sum) int sum(void)
     return (0);
 }
 
-/*
-** init
-**
-** Declares the two components, and the system that reads both.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[2] = {

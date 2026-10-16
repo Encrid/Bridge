@@ -1,26 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/module_start.c -- a module started: its first call, and what is
-** checked of what it registered.
-**
-** lifecycle.md, *The runtime lifecycle*
 */
-
 #include <string.h>
 
 #include "module.h"
 
-/*
-** call_first
-**
-** Makes the first call into a module, `init` or `reload`, the one call in
-** which it may declare and register.
-*/
 static int call_first(module_t *m, const module_start_t *st,
     backend_err_t *err)
 {
@@ -40,15 +26,6 @@ static int call_first(module_t *m, const module_start_t *st,
     return (failed);
 }
 
-/*
-** check_losses
-**
-** Refuses a loss that was accepted and not made. A loss that is accepted is
-** one that is made: a name nothing was lost under is refused, so that a
-** list is not left where it is from one reload to the next.
-**
-** lifetime.md, *When a component layout changed*
-*/
 static int check_losses(const module_t *m, backend_err_t *err)
 {
     uint32_t i = 0;
@@ -61,16 +38,6 @@ static int check_losses(const module_t *m, backend_err_t *err)
         "nothing of that name", m->losses[i]));
 }
 
-/*
-** find_exports
-**
-** Finds every export Bridge calls, once: a system is an export,
-** checked here rather than on its first frame. Whether one has the shape a
-** call runs is the backend's to see and to refuse. The three lifecycle
-** exports are every module's: none is left out to mean something.
-**
-** signatures.md, *Imports are declared, exports are checked*
-*/
 static int find_exports(module_t *m, backend_err_t *err)
 {
     const backend_api_t *api = &m->on->api;
@@ -91,16 +58,6 @@ static int find_exports(module_t *m, backend_err_t *err)
     return (!api->instance_get_func(m->instance, "reload", err));
 }
 
-/*
-** check_spans
-**
-** Refuses a module whose spans do not hold what a barrier publishes for it.
-** column_base has a cell for each of its components in every table there
-** may be, so whether its spans hold it is known here, and not at some
-** barrier.
-**
-** budgets.md, *Budgets*
-*/
 static int check_spans(const module_t *m, backend_err_t *err)
 {
     uint32_t tables = storage_count_tables(m->b->storage);
@@ -116,15 +73,6 @@ static int check_spans(const module_t *m, backend_err_t *err)
         (unsigned long long)need));
 }
 
-/*
-** module_start
-**
-** An image, an instance, a private memory, and the first call into it. A
-** module's settings are one row, written after init has declared the struct
-** it is a row of.
-**
-** config.md, *A module's own settings are a component*
-*/
 int module_start(module_t *m, const module_start_t *st, backend_err_t *err)
 {
     bool loading = strcmp(st->entry, "reload") != 0;

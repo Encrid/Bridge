@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/module_instance.c -- a module's image compiled and instantiated. A
-** module is handed the memories it imports, and no other.
-**
-** backend.md, *Memory is adopted, not created*
 */
-
 #include <string.h>
 
 #include "module.h"
@@ -20,12 +12,6 @@ static bool is_text(const char *at, size_t len, const char *text)
     return (len == strlen(text) && !memcmp(at, text, len));
 }
 
-/*
-** lend_memory
-**
-** Writes the memory an import asks for, if it is one of the two there are:
-** the shared block, or the module's private one. Answers how many it wrote.
-*/
 static uint32_t lend_memory(const module_t *m, const backend_import_t *im,
     backend_memory_import_t *lent)
 {
@@ -60,12 +46,6 @@ static uint32_t lend_memories(const module_t *m,
     return (lent);
 }
 
-/*
-** module_make_instance
-**
-** Compiles a module's image, reserves its private memory, and instantiates
-** it with the memories it imports and the ABI.
-*/
 int module_make_instance(module_t *m, const module_start_t *st,
     backend_err_t *err)
 {

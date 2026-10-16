@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_define.c -- the eight imports of the ABI, defined for a module's
-** instance with the signature each is declared with.
-**
-** signatures.md, *Imports are declared, exports are checked*
 */
-
 #include "abi.h"
 
 constexpr uint32_t ABI_ENTRY_COUNT = 8;
@@ -28,12 +20,6 @@ static const abi_entry_t ABI_ENTRIES[ABI_ENTRY_COUNT] = {
     { "alloc", abi_alloc, { I }, 1, { I }, 1 }
 };
 
-/*
-** abi_define
-**
-** Defines the eight imports of the ABI for a module's instance, each handed
-** the module when it is called.
-*/
 int abi_define(module_t *m, backend_err_t *err)
 {
     const abi_entry_t *e = ABI_ENTRIES;

@@ -1,24 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/schedule_dispatch.c -- one system run: its module told which one it
-** is, the call made, and what the call answered kept.
 */
-
 #include <stdio.h>
 
 #include "schedule.h"
 
-/*
-** find_slot
-**
-** Answers the slot of a system among its module's systems, or its
-** observers: the number the module was answered when it registered it.
-*/
 static uint32_t find_slot(const module_t *m, const bridge_system_t *s)
 {
     bridge_system_t *const *slots = s->observer ? m->observers : m->systems;
@@ -29,15 +17,6 @@ static uint32_t find_slot(const module_t *m, const bridge_system_t *s)
     return (slot);
 }
 
-/*
-** call_system
-**
-** Calls a system, and marks it failed with why if the call did not return,
-** was refused on its way, or answered anything but 0. What is left of the
-** work limit only goes down, so it is set again before every call.
-**
-** limits.md, *What bounds a run*
-*/
 static void call_system(module_t *m, bridge_system_t *s)
 {
     backend_err_t err = {};
@@ -58,15 +37,6 @@ static void call_system(module_t *m, bridge_system_t *s)
     s->failed = 1;
 }
 
-/*
-** run_system
-**
-** Runs one system. Its module's header says which system is running for as
-** long as it is, in one store per dispatch: the culprit of anything that
-** goes wrong is the system that was running.
-**
-** validation.md, *What a bad write costs, and what finds it*
-*/
 static void run_system(module_t *m, bridge_system_t *s)
 {
     bridge_header_t *h = (bridge_header_t *)m->priv;
@@ -81,12 +51,6 @@ static void run_system(module_t *m, bridge_system_t *s)
     m->running = nullptr;
 }
 
-/*
-** schedule_run_job
-**
-** What a thread runs: a module's systems of one level, in the order it
-** registered them.
-*/
 void schedule_run_job(void *arg)
 {
     const schedule_job_t *job = arg;

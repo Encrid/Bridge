@@ -1,22 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/stress/stress_by_spans.c -- every component of
-** nstress checked against its account by the spans of its query.
 */
-
 #include "stress.h"
 
-/*
-** sum_spans
-**
-** Answers the sum of the values in every span of `q`, and adds how many
-** rows they have to `rows`.
-*/
 static uint32_t sum_spans(const test_api_t *api, const bridge_query_t *q,
     uint32_t *rows)
 {
@@ -40,12 +28,6 @@ static uint32_t sum_spans(const test_api_t *api, const bridge_query_t *q,
     return (sum);
 }
 
-/*
-** is_accounted
-**
-** Answers whether the account has component `kind` on `rows` entities,
-** with values whose sum is `sum`.
-*/
 static bool is_accounted(uint32_t kind, uint32_t rows, uint32_t sum)
 {
     uint32_t want_rows = 0;
@@ -62,13 +44,6 @@ static bool is_accounted(uint32_t kind, uint32_t rows, uint32_t sum)
     return (rows == want_rows && sum == want_sum);
 }
 
-/*
-** nstress_check_kind
-**
-** Looks at component `kind` by its spans: as many rows as carry it, holding
-** what they should. Counts a disagreement with the account, and for the
-** first component checks every entity as well. Answers 0.
-*/
 int nstress_check_kind(const test_api_t *api, uint32_t kind)
 {
     const bridge_query_t *q = test_get_query(api,

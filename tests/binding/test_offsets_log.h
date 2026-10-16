@@ -1,35 +1,16 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/binding/test_offsets_log.h -- a line written to the log, by
-** offsets.
-**
-** log.md, *The log*
 */
-
 #ifndef TEST_OFFSETS_LOG_H
     #define TEST_OFFSETS_LOG_H
 
     #include "test_offsets_scratch.h"
 
-/*
-** A line of the log whose text is a literal, with two numbers.
-**
-** log.md, *The log*
-*/
     #define BRIDGE_LOG(level, text, a0, a1) \
         bridge_log(level, &(bridge_line_t){ text, sizeof(text) - 1, a0, a1 })
 
-/*
-** What a line of the log holds: its text, how long that is, and two
-** numbers.
-**
-** log.md, *The log*
-*/
 typedef struct {
     const char *text;
     uint32_t len;
@@ -37,15 +18,6 @@ typedef struct {
     uint32_t a1;
 } bridge_line_t;
 
-/*
-** bridge_log
-**
-** Writes a line into the module's ring, if its level is one the module
-** logs. A ring that is full drops the line, and it is counted by the head
-** having moved.
-**
-** log.md, *The log*
-*/
 static inline void bridge_log(uint32_t level, const bridge_line_t *line)
 {
     constexpr uint32_t size = sizeof(bridge_log_record_t);

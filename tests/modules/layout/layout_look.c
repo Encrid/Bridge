@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/layout/layout_look.c -- the system of nlayout that
-** says what the values of X are: every field this build has, summed.
 */
-
 #include "layout.h"
 
 constexpr uint32_t ROOM = 8;
@@ -21,13 +15,6 @@ static void say(const test_api_t *api, const char *text, uint32_t first,
     test_log(api, BRIDGE_LOG_INFO, &line);
 }
 
-/*
-** add_plain
-**
-** Adds to the sums the fields of a value that are X's own: a, b under the
-** name this build gives it and where it has one, every element of arr, and
-** mode.
-*/
 static void add_plain(sums_t *sums, const x_t *value)
 {
     uint32_t k = 0;
@@ -45,12 +32,6 @@ static void add_plain(sums_t *sums, const x_t *value)
     sums->mode += (uint32_t)value->mode;
 }
 
-/*
-** add_rest
-**
-** Adds to the sums the fields of the struct `at` names, those this build
-** has, and the field a build added: to that struct, or to X.
-*/
 static void add_rest(sums_t *sums, const x_t *value)
 {
     sums->at_x += value->at.x;
@@ -64,12 +45,6 @@ static void add_rest(sums_t *sums, const x_t *value)
 #endif
 }
 
-/*
-** look
-**
-** Says how many values of X there are, and the sum of every field this
-** build has over them.
-*/
 TEST(look)
 {
     const x_t *value[ROOM];

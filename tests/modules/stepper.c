@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/stepper.c -- ticker.c as a shared library. A process
-** cannot hold two copies of one library, so a reload of this one shuts the
-** old instance down before the new one is opened. STEP is what a tick adds,
-** and a build with FAIL_RELOAD refuses its reload.
 */
-
 #include "test_module.h"
 #include "stepper.h"
 
@@ -23,11 +15,6 @@ constexpr int RELOADED = 0;
 static uint32_t tick;
 static uint32_t ticking;
 
-/*
-** advance
-**
-** Adds STEP to the count, and says what it has become.
-*/
 TEST(advance)
 {
     const bridge_query_t *q = test_get_query(api, ticking);
@@ -52,12 +39,6 @@ static void declare_tick(const test_api_t *api)
         nullptr, 0);
 }
 
-/*
-** init
-**
-** Declares the component and the system, and spawns one entity whose count
-** is 100.
-*/
 TEST(init)
 {
     tick_t t = { 100 };
@@ -67,23 +48,12 @@ TEST(init)
     return (0);
 }
 
-/*
-** reload
-**
-** Declares the component and the system again. It answers 0, or 5 in a
-** build with FAIL_RELOAD, which is a reload that failed.
-*/
 TEST(reload)
 {
     declare_tick(api);
     return (RELOADED);
 }
 
-/*
-** shutdown
-**
-** Says that it is shut down, with the STEP of this build.
-*/
 TEST(shutdown)
 {
     bridge_line_t line = { "shutdown", 8, STEP, 0 };

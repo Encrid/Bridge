@@ -1,25 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/sparse/sparse_look.c -- the systems of nsparse
-** that read S: by a walk of the set, and from the rows of the table.
 */
-
 #include "sparse.h"
 #include "measured.h"
 
 uint32_t nsparse_in_set;
 uint32_t nsparse_in_table;
 
-/*
-** add_values
-**
-** Answers `total` and the value of every row of a column.
-*/
 static uint32_t add_values(const s_t *column, uint32_t count, uint32_t total)
 {
     uint32_t r = 0;
@@ -31,12 +20,6 @@ static uint32_t add_values(const s_t *column, uint32_t count, uint32_t total)
     return (total);
 }
 
-/*
-** look
-**
-** Walks the set: one span, its rows the entities that are in it. Says the
-** spans, the rows, and the sum of the values.
-*/
 TEST_MEASURED TEST(look)
 {
     const bridge_query_t *q = test_get_query(api, nsparse_in_set);
@@ -57,13 +40,6 @@ TEST_MEASURED TEST(look)
     return (0);
 }
 
-/*
-** add_reached
-**
-** Looks for S at each row of a span of the table: the entity's cell of the
-** set's index is where its value is, or zero. Answers `total` and the sum
-** of A and S of each row that has both, and counts those rows in `found`.
-*/
 static uint32_t add_reached(const test_api_t *api, const uint32_t *span,
     uint32_t total, uint32_t *found)
 {
@@ -84,14 +60,6 @@ static uint32_t add_reached(const test_api_t *api, const uint32_t *span,
     return (total);
 }
 
-/*
-** look_b
-**
-** Walks the table, and reaches S from each row through the set's index.
-** Says the rows, how many of them are in the set, and the sum of A and S
-** where a row has both. S is not in the table, so a span has no base for
-** it: one that has is said as a failure.
-*/
 TEST_MEASURED TEST(look_b)
 {
     const bridge_query_t *q = test_get_query(api, nsparse_in_table);

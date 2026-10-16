@@ -1,24 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/schedule_edges.c -- the systems of one phase, and what orders them:
-** the deployment's pairs, and the order a module registered its own in.
 */
-
 #include <string.h>
 
 #include "schedule.h"
 
-/*
-** schedule_gather_phase
-**
-** Lists the systems of a phase that are not parked, with an empty matrix
-** for them, in room made at create, [budget] systems wide.
-*/
 void schedule_gather_phase(bridge_t *b, schedule_phase_t *p)
 {
     uint32_t i = 0;
@@ -39,12 +27,6 @@ void schedule_gather_phase(bridge_t *b, schedule_phase_t *p)
     memset(p->reach.bits, 0, words * sizeof(*p->reach.bits));
 }
 
-/*
-** find_system
-**
-** Answers which system of the phase has a full name, or how many there are
-** if none has.
-*/
 static uint32_t find_system(const schedule_phase_t *p, const char *full)
 {
     uint32_t i = 0;
@@ -54,11 +36,6 @@ static uint32_t find_system(const schedule_phase_t *p, const char *full)
     return (i);
 }
 
-/*
-** schedule_add_stated
-**
-** Adds the edges the deployment's pairs state between systems of the phase.
-*/
 void schedule_add_stated(const bridge_t *b, schedule_phase_t *p)
 {
     uint32_t k = 0;
@@ -74,12 +51,6 @@ void schedule_add_stated(const bridge_t *b, schedule_phase_t *p)
     }
 }
 
-/*
-** order_after
-**
-** Puts system `i` before each later system of its module that it conflicts
-** with, unless that one already runs before it.
-*/
 static void order_after(schedule_phase_t *p, uint32_t i)
 {
     const bridge_system_t *s = p->in[i];
@@ -94,11 +65,6 @@ static void order_after(schedule_phase_t *p, uint32_t i)
     }
 }
 
-/*
-** schedule_add_own
-**
-** Adds the edges a module states by registering its systems in an order.
-*/
 void schedule_add_own(schedule_phase_t *p)
 {
     uint32_t i = 0;

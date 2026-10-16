@@ -1,27 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/reference/flecs_ref.c -- flecs as the reference: the measures, in
-** order.
-**
-** stage11.md, *Beside the best there is*
 */
-
 #include <stdio.h>
 
 #include "flecs_ref.h"
 
-/*
-** main
-**
-** Makes each measure, a change both at once and deferred. Nothing is
-** buffered: a crash must not swallow what was said. The draw is one
-** sequence for the whole run.
-*/
 int main(void)
 {
     uint32_t state = 2463534242u;

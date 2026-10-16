@@ -1,23 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/pool_run.c -- one run of the pool: a batch of jobs shared between the
-** workers and the caller.
 */
-
 #include <string.h>
 
 #include "pool.h"
 
-/*
-** run_alone
-**
-** Runs a batch on the calling thread, in order.
-*/
 static void run_alone(const pool_batch_t *batch)
 {
     uint32_t i = 0;
@@ -28,12 +17,6 @@ static void run_alone(const pool_batch_t *batch)
     }
 }
 
-/*
-** begin_run
-**
-** Makes a batch the run in progress, with none of its jobs taken, and wakes
-** as many workers as there are jobs beyond the caller's first.
-*/
 static void begin_run(pool_t *p, const pool_batch_t *batch)
 {
     uint32_t i = 0;
@@ -49,12 +32,6 @@ static void begin_run(pool_t *p, const pool_batch_t *batch)
     }
 }
 
-/*
-** end_run
-**
-** Waits until every job of the run is done, and then leaves no job to take:
-** nothing of a run may be taken once the caller's arrays are gone.
-*/
 static void end_run(pool_t *p)
 {
     uint32_t left = 1;
@@ -70,12 +47,6 @@ static void end_run(pool_t *p)
     os_mutex_unlock(p->lock);
 }
 
-/*
-** pool_run
-**
-** Runs every job of a batch and returns when all have. One job, or no worker
-** to share with: no thread is woken for it.
-*/
 void pool_run(pool_t *p, const pool_batch_t *batch)
 {
     if (batch->count < 2 || !p->worker_count) {

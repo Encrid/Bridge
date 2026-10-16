@@ -1,24 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/config_enum.c -- a setting written into a field that is an enum or a
-** bitmask.
 */
-
 #include <string.h>
 
 #include "config.h"
 
-/*
-** find_constant
-**
-** Answers the value of an enum's constant, by its name. false if there is no
-** name, no enum, or no constant of that name.
-*/
 static bool find_constant(const declared_type_t *of, const char *name,
     int64_t *value)
 {
@@ -34,12 +22,6 @@ static bool find_constant(const declared_type_t *of, const char *name,
     return (true);
 }
 
-/*
-** fits_enum
-**
-** Answers whether an enum holds an integer. An enum is the integer its
-** author stated: as many bytes, signed or not.
-*/
 static bool fits_enum(const declared_type_t *of, int64_t value)
 {
     enum schema_kind base = of->s.base;
@@ -50,15 +32,6 @@ static bool fits_enum(const declared_type_t *of, int64_t value)
     return (value >= 0 && value <= most * 2 + 1);
 }
 
-/*
-** config_seed_enum
-**
-** Writes an integer into an enum, or the value of the constant a text names:
-** a constant's name is the one thing a deployment can be expected to know.
-**
-** config.md, *A module's own settings are a component*
-** schema.md, *The type set*
-*/
 int config_seed_enum(config_seed_t *seed, const schema_field_t *field,
     const bridge_setting_t *s)
 {
@@ -79,11 +52,6 @@ int config_seed_enum(config_seed_t *seed, const schema_field_t *field,
     return (0);
 }
 
-/*
-** config_seed_bitmask
-**
-** Writes an integer into a bitmask that has that many bits.
-*/
 int config_seed_bitmask(config_seed_t *seed, const schema_field_t *field,
     const bridge_setting_t *s)
 {

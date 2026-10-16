@@ -1,22 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/layout/layout_values.c -- where the values of X
-** are, in each of the storage layouts a build of nlayout may keep it in.
 */
-
 #include "layout.h"
 
-/*
-** collect_cells
-**
-** Collects from a direct-indexed X the cell of every entity below 16 whose
-** bit says it was given one.
-*/
 static uint32_t collect_cells(const test_api_t *api, const x_t **out,
     uint32_t room)
 {
@@ -46,12 +34,6 @@ static uint32_t collect_single(const test_api_t *api, const x_t **out,
     return (1);
 }
 
-/*
-** collect_columns
-**
-** Collects the rows the query matched: X kept in tables, in a sparse set,
-** or as a toggle.
-*/
 static uint32_t collect_columns(const test_api_t *api, const x_t **out,
     uint32_t room)
 {
@@ -74,12 +56,6 @@ static uint32_t collect_columns(const test_api_t *api, const x_t **out,
     return (n);
 }
 
-/*
-** collect_values
-**
-** Puts in `out` where the values of X are, however this build keeps it, and
-** answers how many: `room` at the most.
-*/
 uint32_t collect_values(const test_api_t *api, const x_t **out,
     uint32_t room)
 {

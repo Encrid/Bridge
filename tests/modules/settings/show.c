@@ -1,25 +1,11 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/settings/show.c -- the system of the settings module:
-** it reads back the value its settings were given.
-**
-** config.md, *A module's own settings are a component*
 */
-
 #include "test_offsets.h"
 #include "settings.h"
 
-/*
-** say_title
-**
-** Says the title, up to its first zero byte, and the small number beside
-** it.
-*/
 static void say_title(uint32_t at)
 {
     char text[sizeof(((settings_t *)0)->title)];
@@ -37,11 +23,6 @@ static void say_title(uint32_t at)
         &(bridge_line_t){ text, len, BRIDGE_GET(settings_t, small, at), 0 });
 }
 
-/*
-** say_path
-**
-** Says the path, up to 64 bytes of it: a string in the persistent arena.
-*/
 static void say_path(uint32_t at)
 {
     char text[64];
@@ -53,12 +34,6 @@ static void say_path(uint32_t at)
     bridge_log(BRIDGE_LOG_INFO, &(bridge_line_t){ text, len, 0, 0 });
 }
 
-/*
-** say_wide
-**
-** Says the bitmask and the ratio, the high half of the 64-bit integer, and
-** where the path's bytes are.
-*/
 static void say_wide(uint32_t at)
 {
     BRIDGE_LOG(BRIDGE_LOG_INFO, "flags ratio",
@@ -70,12 +45,6 @@ static void say_wide(uint32_t at)
         0);
 }
 
-/*
-** show
-**
-** Says every field of the settings row, and that there is none when there
-** is none.
-*/
 BRIDGE_EXPORT(show) int show(void)
 {
     uint32_t at = bridge_get_single(settings);

@@ -1,24 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_ids.c -- ids set aside for a module to hand out, and given
-** back; and a singleton given its value outside a barrier.
 */
-
 #include <string.h>
 
 #include "storage_unload.h"
 
-/*
-** take_index
-**
-** Answers an entity index nobody has: one that was freed, or the next never
-** used, under its first generation. 0 if there may be no more entities.
-*/
 static uint32_t take_index(storage_t *r)
 {
     uint32_t index = r->free_head;
@@ -35,11 +23,6 @@ static uint32_t take_index(storage_t *r)
     return (index);
 }
 
-/*
-** storage_reserve
-**
-** Takes up to `want` ids with nothing on them: real entities, in no table.
-*/
 uint32_t storage_reserve(storage_t *r, uint64_t *ids, uint32_t want)
 {
     uint32_t count = 0;
@@ -58,12 +41,6 @@ uint32_t storage_reserve(storage_t *r, uint64_t *ids, uint32_t want)
     return (count);
 }
 
-/*
-** storage_release
-**
-** Destroys ids that were set aside and never handed out, with what is on
-** them.
-*/
 void storage_release(storage_t *r, const uint64_t *ids, uint32_t count)
 {
     uint32_t i = 0;
@@ -76,22 +53,11 @@ void storage_release(storage_t *r, const uint64_t *ids, uint32_t count)
     sweep_sets(r);
 }
 
-/*
-** storage_is_alive
-**
-** Answers whether an id names an entity there is.
-*/
 bool storage_is_alive(storage_t *r, uint64_t id)
 {
     return (is_alive(r, id));
 }
 
-/*
-** storage_give_single
-**
-** Gives a singleton its value, outside any barrier, and tells whoever
-** observes it: index 0, which is no entity, comes to carry it.
-*/
 void storage_give_single(storage_t *r, storage_type_t *type,
     const void *bytes, uint32_t size)
 {

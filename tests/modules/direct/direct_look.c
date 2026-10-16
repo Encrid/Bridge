@@ -1,25 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/direct/direct_look.c -- the system of ndirect that
-** walks the table, and reaches D at each row by the entity's id.
 */
-
 #include "direct.h"
 
 uint32_t ndirect_in_table;
 
-/*
-** add_given
-**
-** Looks for D at each row of a span of the table: the entity's own cell, if
-** its bit says it was given one. Answers `total` and the sum of A and D of
-** each row that has both, and counts those rows in `found`.
-*/
 static uint32_t add_given(const test_api_t *api, const uint32_t *span,
     uint32_t total, uint32_t *found)
 {
@@ -42,14 +29,6 @@ static uint32_t add_given(const test_api_t *api, const uint32_t *span,
     return (total);
 }
 
-/*
-** look_b
-**
-** Walks the table, and reaches D at each row by the entity's id. Says the
-** rows, how many of them were given D, and the sum of A and D where a row
-** has both. D is not in the table, so a span has no base for it: one that
-** has is said as a failure.
-*/
 TEST(look_b)
 {
     const bridge_query_t *q = test_get_query(api, ndirect_in_table);

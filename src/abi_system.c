@@ -1,29 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_system.c -- the entries a module registers a system and an
-** observer by, and what storage tells an observer.
-**
-** abi.md, *The ABI*
 */
-
 #include <string.h>
 
 #include "abi_entry.h"
 #include "abi_subscribe.h"
 
-/*
-** abi_hear
-**
-** Storage says who and what; the observer itself runs at the barrier, after
-** the republish. Its list is as long as what its module's spans could
-** publish of it, and one past that is all that needs knowing:
-** storage_publish finds it does not fit, and says so.
-*/
 void abi_hear(void *ctx, uint64_t id, enum bridge_event event)
 {
     bridge_system_t *s = ctx;
@@ -42,11 +26,6 @@ void abi_hear(void *ctx, uint64_t id, enum bridge_event event)
     s->pending_count++;
 }
 
-/*
-** find_phase
-**
-** Answers which of `count` names is the `len` bytes at `at`, or `count`.
-*/
 static uint32_t find_phase(char *const *names, uint32_t count, const char *at,
     uint32_t len)
 {
@@ -57,15 +36,6 @@ static uint32_t find_phase(char *const *names, uint32_t count, const char *at,
     return (i);
 }
 
-/*
-** read_phase
-**
-** Finds the phase a system names: what the deployment says this module's
-** name for a phase is, and otherwise the name.
-**
-** abi.md, *The ABI*
-** schedule.md, *Bridge ships no phase names*
-*/
 static int read_phase(module_t *m, const bridge_system_statement_t *st,
     uint32_t *phase)
 {
@@ -89,13 +59,6 @@ static int read_phase(module_t *m, const bridge_system_statement_t *st,
         "did not declare", (int)len, at));
 }
 
-/*
-** abi_add_system
-**
-** add_system(at) -> slot.
-**
-** abi.md, *The ABI*
-*/
 int abi_add_system(void *ud, const uint64_t *at, uint64_t *r)
 {
     module_t *m = ud;
@@ -117,14 +80,6 @@ int abi_add_system(void *ud, const uint64_t *at, uint64_t *r)
     return (abi_subscribe(&g, r));
 }
 
-/*
-** abi_observe
-**
-** observe(at) -> slot. An observer's phase is the one past the deployment's
-** last: the barrier that applied its trigger.
-**
-** abi.md, *The ABI*
-*/
 int abi_observe(void *ud, const uint64_t *at, uint64_t *r)
 {
     module_t *m = ud;

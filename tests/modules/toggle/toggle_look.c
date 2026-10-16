@@ -1,27 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/toggle/toggle_look.c -- the systems of ntoggle
-** that read the rows that are on: found a word of bits at a time, and by a
-** test at every row.
 */
-
 #include "toggle.h"
 #include "measured.h"
 
 uint32_t ntoggle_reading;
 
-/*
-** see_word
-**
-** Counts the rows whose bits are set in `word`, which is word `w` of the
-** bits of `column`, and adds their values. Sixty-four rows that are all on
-** are read as a column is.
-*/
 static void see_word(const t_t *column, uint64_t word, uint32_t w,
     seen_t *seen)
 {
@@ -42,12 +28,6 @@ static void see_word(const t_t *column, uint64_t word, uint32_t w,
     }
 }
 
-/*
-** see_words
-**
-** Counts the rows of a span that are on, a word of bits at a time. The last
-** word has bits past the last row, which are nobody's, and are set aside.
-*/
 static void see_words(const test_api_t *api, const uint32_t *span,
     seen_t *seen)
 {
@@ -67,12 +47,6 @@ static void see_words(const test_api_t *api, const uint32_t *span,
     }
 }
 
-/*
-** look
-**
-** Says the rows that are on, found a word of bits at a time: the rows, how
-** many of them are on, the sum of those, and the spans.
-*/
 TEST_MEASURED TEST(look)
 {
     const bridge_query_t *q = test_get_query(api, ntoggle_reading);
@@ -92,12 +66,6 @@ TEST_MEASURED TEST(look)
     return (0);
 }
 
-/*
-** see_rows
-**
-** Counts the rows that are on by a test of the bit of every row, and adds
-** their values.
-*/
 static void see_rows(const t_t *restrict column, const uint64_t *restrict bits,
     uint32_t count, seen_t *seen)
 {
@@ -112,11 +80,6 @@ static void see_rows(const t_t *restrict column, const uint64_t *restrict bits,
     }
 }
 
-/*
-** look_b
-**
-** Says the rows that are on, tested at every row: how many, and their sum.
-*/
 TEST_MEASURED TEST(look_b)
 {
     const bridge_query_t *q = test_get_query(api, ntoggle_reading);

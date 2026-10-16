@@ -1,13 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** utils/os/windows/thread.c -- a thread on Windows, and the clock.
 */
-
 #include <stdlib.h>
 
 #include "os_types.h"
@@ -20,11 +15,6 @@ static DWORD WINAPI run_thread(LPVOID p)
     return (0);
 }
 
-/*
-** os_thread_start
-**
-** Starts a thread that runs `fn(arg)`. nullptr if there is no memory for it.
-*/
 os_thread_t *os_thread_start(os_thread_fn_t fn, void *arg)
 {
     os_thread_t *t = malloc(sizeof(*t));
@@ -37,11 +27,6 @@ os_thread_t *os_thread_start(os_thread_fn_t fn, void *arg)
     return (t);
 }
 
-/*
-** os_thread_join
-**
-** Waits for a thread to end, and frees what os_thread_start answered.
-*/
 void os_thread_join(os_thread_t *t)
 {
     WaitForSingleObject(t->handle, INFINITE);
@@ -49,22 +34,11 @@ void os_thread_join(os_thread_t *t)
     free(t);
 }
 
-/*
-** os_get_thread_id
-**
-** Answers the calling thread's id, which Windows never makes 0.
-*/
 uint64_t os_get_thread_id(void)
 {
     return (GetCurrentThreadId());
 }
 
-/*
-** os_get_now
-**
-** Answers nanoseconds from the performance counter. The whole seconds and
-** the rest are scaled apart, so that the product stays inside 64 bits.
-*/
 uint64_t os_get_now(void)
 {
     LARGE_INTEGER frequency;

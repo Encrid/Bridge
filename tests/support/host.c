@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/support/host.c -- a host made, opened and closed, and the case the
-** command line named run.
 */
-
 #include <stdio.h>
 #include <string.h>
 
@@ -28,12 +22,6 @@ static const bridge_setting_t HOST_KEEPS_ALL[4] = {
     { "granule", BRIDGE_INT, {}, { .i = HOST_TESTS_GRANULE } }
 };
 
-/*
-** host_init
-**
-** Fills a host from the command line, with the configuration every case
-** starts from.
-*/
 void host_init(host_t *h, int argc, char **argv)
 {
     bridge_budget_t budget = { .entities = 4096, .tables = 64, .types = 64,
@@ -56,11 +44,6 @@ void host_init(host_t *h, int argc, char **argv)
     h->cfg.budget = budget;
 }
 
-/*
-** host_run
-**
-** Runs the case the command line named.
-*/
 int host_run(host_t *h, const host_case_t *cases, size_t count)
 {
     size_t i = 0;
@@ -77,11 +60,6 @@ int host_run(host_t *h, const host_case_t *cases, size_t count)
     return (0);
 }
 
-/*
-** host_open
-**
-** Creates the host's deck.
-*/
 int host_open(host_t *h)
 {
     h->b = bridge_create(&h->cfg, h->sink, h->ud);
@@ -91,22 +69,12 @@ int host_open(host_t *h)
     return (1);
 }
 
-/*
-** host_close
-**
-** Destroys the host's deck and says "alive".
-*/
 void host_close(host_t *h)
 {
     (void)bridge_destroy(h->b);
     printf("alive\n");
 }
 
-/*
-** host_open_only
-**
-** A whole case: the host is opened as it is configured, and closed.
-*/
 void host_open_only(host_t *h)
 {
     if (!host_open(h))

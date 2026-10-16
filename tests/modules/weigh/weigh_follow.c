@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/weigh/weigh_follow.c -- the systems of nweigh that
-** reach a value by the id of its entity, as a reference is followed.
 */
-
 #include "weigh.h"
 #include "measured.h"
 #include "reach.h"
@@ -16,14 +10,6 @@
 uint32_t nweigh_value;
 uint32_t nweigh_linked;
 
-/*
-** add_followed
-**
-** Follows the link of every row of a span to the value of the entity it
-** names, the far one or the near one, through the index and column_base.
-** Answers `total` and the values it reached: an entity that is gone, or
-** that has no value, adds nothing.
-*/
 static uint32_t add_followed(const test_api_t *api, const uint32_t *span,
     bool far, uint32_t total)
 {
@@ -49,12 +35,6 @@ static uint32_t add_followed(const test_api_t *api, const uint32_t *span,
     return (total);
 }
 
-/*
-** follow
-**
-** Follows every row's link, the far one or the near one, and says the sum
-** of the values it reached.
-*/
 TEST_MEASURED static int follow(const test_api_t *api, bool far)
 {
     const bridge_query_t *q = test_get_query(api, nweigh_linked);
@@ -70,21 +50,11 @@ TEST_MEASURED static int follow(const test_api_t *api, bool far)
     return (0);
 }
 
-/*
-** near
-**
-** Reaches each value by an id, the ids in the order their entities lie.
-*/
 TEST(near)
 {
     return (follow(api, false));
 }
 
-/*
-** far
-**
-** Reaches each value by an id, the ids in no order.
-*/
 TEST(far)
 {
     return (follow(api, true));

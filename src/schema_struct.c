@@ -1,25 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/schema_struct.c -- a struct read from its descriptor, a field at a
-** time, and laid out as C lays it out.
 */
-
 #include <stdlib.h>
 
 #include "schema_reader.h"
 
-/*
-** add_field
-**
-** Adds a field named by the token to the struct, with room made for it.
-**
-** failure.md, *Out of memory*
-*/
 static int add_field(schema_reader_t *r, schema_field_t *field)
 {
     schema_t *out = r->out;
@@ -41,14 +28,6 @@ static int add_field(schema_reader_t *r, schema_field_t *field)
     return (0);
 }
 
-/*
-** read_length
-**
-** Reads the length of an inline array, from its opening bracket to past its
-** closing one, and makes the field just added that many.
-**
-** schema.md, *The type set*
-*/
 static int read_length(schema_reader_t *r, schema_laid_t *laid)
 {
     schema_field_t *field = &r->out->fields[r->out->field_count - 1];
@@ -68,14 +47,6 @@ static int read_length(schema_reader_t *r, schema_laid_t *laid)
     return (0);
 }
 
-/*
-** place_field
-**
-** Places the field just added at the next multiple of its alignment, and
-** counts it in the struct's size and alignment.
-**
-** schema.md, *The type set*
-*/
 static int place_field(schema_reader_t *r, const schema_laid_t *laid)
 {
     schema_t *out = r->out;
@@ -92,13 +63,6 @@ static int place_field(schema_reader_t *r, const schema_laid_t *laid)
     return (0);
 }
 
-/*
-** read_field
-**
-** Reads one field, from its type to its semicolon, and lays it out.
-**
-** schema.md, *The type set*
-*/
 static int read_field(schema_reader_t *r)
 {
     schema_laid_t laid = { .field = { .count = 1 } };
@@ -118,13 +82,6 @@ static int read_field(schema_reader_t *r)
     return (place_field(r, &laid));
 }
 
-/*
-** schema_parse_struct
-**
-** Reads a struct's fields, and rounds its size to a multiple of its widest.
-**
-** schema.md, *The type set*
-*/
 int schema_parse_struct(schema_reader_t *r)
 {
     schema_t *out = r->out;

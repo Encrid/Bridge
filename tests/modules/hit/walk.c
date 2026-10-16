@@ -1,25 +1,11 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/hit/walk.c -- the two systems of the hit module: the
-** sparse set walked alone, and reached from the rows of a table.
-**
-** storage.md, *A sparse set*
 */
-
 #include "test_offsets.h"
 #include "hit.h"
 
-/*
-** add_hits
-**
-** Adds to `sum` the hit of every row of one span of the set, and answers
-** how many rows the span has.
-*/
 static uint32_t add_hits(uint32_t span, uint32_t *sum)
 {
     uint32_t count = bridge_count_rows(span);
@@ -33,12 +19,6 @@ static uint32_t add_hits(uint32_t span, uint32_t *sum)
     return (count);
 }
 
-/*
-** walked
-**
-** Walks the set, which is one span as a table's is, and says how many rows
-** it has and the sum of their hits.
-*/
 BRIDGE_EXPORT(walked) int walked(void)
 {
     uint32_t spans = bridge_count_spans(hits);
@@ -54,13 +34,6 @@ BRIDGE_EXPORT(walked) int walked(void)
     return (0);
 }
 
-/*
-** add_reached
-**
-** Looks for the hit of each entity of one span of the table, through the
-** set's index. Adds one to `found` and the hit to `sum` for each that has
-** one, and answers how many rows the span has.
-*/
 static uint32_t add_reached(uint32_t span, uint32_t index, uint32_t *found,
     uint32_t *sum)
 {
@@ -81,12 +54,6 @@ static uint32_t add_reached(uint32_t span, uint32_t index, uint32_t *found,
     return (count);
 }
 
-/*
-** reached
-**
-** Walks the table of positions, and says how many rows it has, how many of
-** them have a hit, and the sum of those hits.
-*/
 BRIDGE_EXPORT(reached) int reached(void)
 {
     uint32_t spans = bridge_count_spans(bodies);

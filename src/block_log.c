@@ -1,17 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/block_log.c -- a module's log ring, drained to the sink.
-**
-** A module's four names for a level and a host's are two seams' names for
-** the same numbers, each header being whole without the other: they are
-** held equal here, where one becomes the other.
 */
-
 #include <string.h>
 
 #include "block.h"
@@ -24,12 +15,6 @@ static_assert((int)BRIDGE_LOG_DEBUG == (int)BRIDGE_DEBUG);
 static const char OUTSIDE[] =
     "(a log line whose text lies outside the scratch arena)";
 
-/*
-** get_writer
-**
-** Answers the name of the system or the observer a record says wrote it, by
-** its slot, or nullptr if the module has none there.
-*/
 static const char *get_writer(const module_t *m, uint32_t system)
 {
     uint32_t observer = system - 0x8000u;
@@ -48,13 +33,6 @@ static bool is_in_scratch(const module_t *m, const bridge_log_record_t *rec)
     return (rec->text - m->scratch <= m->scratch_len - rec->len);
 }
 
-/*
-** send_line
-**
-** Hands the sink the record at `at` of a module's ring. It is copied out
-** first, and its text is checked to lie in the scratch arena, since a
-** module can write all of its private memory.
-*/
 static void send_line(bridge_t *b, const module_t *m, uint32_t at)
 {
     const uint8_t *ring = m->priv + m->ring;
@@ -75,15 +53,6 @@ static void send_line(bridge_t *b, const module_t *m, uint32_t at)
     b->sink(b->ud, &r);
 }
 
-/*
-** block_drain
-**
-** Hands a module's log ring to the sink: the lines it holds, and how many
-** more were written than it holds. Then the scratch arena is the module's
-** again, after the drain, since a line's text lives there.
-**
-** log.md, *The log*
-*/
 void block_drain(bridge_t *b, module_t *m)
 {
     bridge_header_t *h = (bridge_header_t *)m->priv;

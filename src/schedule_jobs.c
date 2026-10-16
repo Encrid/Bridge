@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/schedule_jobs.c -- the jobs of one level of a phase: a module's
-** systems that run in it, gathered into one list.
 */
-
 #include "schedule.h"
 
 static bool has_job(const schedule_pass_t *pass, const module_t *m)
@@ -21,13 +15,6 @@ static bool has_job(const schedule_pass_t *pass, const module_t *m)
     return (k < pass->count);
 }
 
-/*
-** runs_now
-**
-** Answers whether a system runs in this level of this phase: it is of them,
-** its module runs, it is not parked, and if it is an observer something
-** triggered it.
-*/
 static bool runs_now(const schedule_pass_t *pass, const bridge_system_t *s)
 {
     if (s->phase != pass->phase || s->level != pass->level)
@@ -37,15 +24,6 @@ static bool runs_now(const schedule_pass_t *pass, const bridge_system_t *s)
     return (!s->observer || s->pending_count);
 }
 
-/*
-** list_system
-**
-** Adds a system to a job and numbers it: its turn and when it runs, by the
-** barriers so far and its place in this phase. An observer ran at the last
-** barrier, before anything since, and its turn says so.
-**
-** threads.md, *Threads*
-*/
 static void list_system(schedule_pass_t *pass, schedule_job_t *job,
     bridge_system_t *s)
 {
@@ -61,13 +39,6 @@ static void list_system(schedule_pass_t *pass, schedule_job_t *job,
     pass->ordinal++;
 }
 
-/*
-** fill_job
-**
-** Makes the next job of the level the one of the module of system `i`, with
-** every system of that module from `i` on that runs now. An empty job is not
-** counted.
-*/
 static void fill_job(schedule_pass_t *pass, uint32_t i)
 {
     bridge_t *b = pass->b;
@@ -90,12 +61,6 @@ static void fill_job(schedule_pass_t *pass, uint32_t i)
     pass->count++;
 }
 
-/*
-** schedule_gather_jobs
-**
-** Makes the jobs of one level of a phase, one for each module that has a
-** system running in it.
-*/
 void schedule_gather_jobs(schedule_pass_t *pass)
 {
     const bridge_t *b = pass->b;

@@ -1,13 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/config_say.c -- why a module's settings are refused, said.
 */
-
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -21,11 +16,6 @@ static const char *const CONFIG_KINDS[] = {
     "text"
 };
 
-/*
-** config_refuse
-**
-** Writes why the settings are refused, as printf would. Answers 1.
-*/
 int config_refuse(config_seed_t *seed, const char *format, ...)
 {
     va_list args;
@@ -36,13 +26,6 @@ int config_refuse(config_seed_t *seed, const char *format, ...)
     return (1);
 }
 
-/*
-** config_say_misfit
-**
-** Refuses a setting whose kind is not one the field it names takes.
-**
-** config.md, *A module's own settings are a component*
-*/
 int config_say_misfit(config_seed_t *seed, const bridge_setting_t *s,
     const char *field)
 {

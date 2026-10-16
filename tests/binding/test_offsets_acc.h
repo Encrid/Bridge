@@ -1,19 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/binding/test_offsets_acc.h -- the second face of the tests'
-** binding: for a module written by offsets into the two memories, as a
-** module is where it cannot hold a pointer into them. The eight entries of
-** the ABI as functions that take no table, and the accessors that read and
-** write at an offset.
-**
-** abi.md, *The ABI*
 */
-
 #ifndef TEST_OFFSETS_ACC_H
     #define TEST_OFFSETS_ACC_H
 
@@ -21,24 +10,13 @@
 
     #include "test_module_api.h"
 
-/*
-** What such a module exports for the tests' backend to call: a function of
-** its own name that takes nothing. The backend tells such a module by
-** test_keep_table, which it then calls before each call it makes.
-*/
     #define BRIDGE_EXPORT(name) TEST_EXPORT
 
     #define BRIDGE_HEADER(field) acc_own_32(offsetof(bridge_header_t, field))
 
-/*
-** The table of the call in progress, kept and answered.
-*/
 TEST_EXPORT void test_keep_table(const test_api_t *api);
 const test_api_t *test_get_table(void);
 
-/*
-** The entries of the ABI.
-*/
 uint32_t bridge_declare(uint32_t at);
 uint32_t bridge_add_system(uint32_t at);
 uint32_t bridge_observe(uint32_t at);
@@ -48,17 +26,9 @@ void bridge_attach(uint64_t id, uint32_t slot, uint32_t ptr);
 void bridge_detach(uint64_t id, uint32_t slot);
 uint32_t bridge_alloc(uint32_t len);
 
-/*
-** Where a row is, which ends the call if it is not one of the span's rows
-** and the module was built with BRIDGE_ROWS_CHECKED; and the end of a call
-** by a module that cannot go on.
-*/
 uint32_t acc_row(uint32_t base, uint32_t row, uint32_t count, uint32_t stride);
 void acc_trap(void);
 
-/*
-** The shared memory, by width.
-*/
 int32_t acc_ld_i8(uint32_t at);
 uint32_t acc_ld_u8(uint32_t at);
 int32_t acc_ld_i16(uint32_t at);
@@ -74,16 +44,10 @@ void acc_st_64(uint32_t at, uint64_t v);
 void acc_st_f32(uint32_t at, float v);
 void acc_st_f64(uint32_t at, double v);
 
-/*
-** The private memory: the header, the spans, the ring.
-*/
 uint32_t acc_own_32(uint32_t at);
 uint64_t acc_own_64(uint32_t at);
 void acc_own_st(uint32_t at, uint32_t v);
 
-/*
-** Bytes between what a module holds and the two memories.
-*/
 void acc_to_private(uint32_t to, const void *from, uint32_t len);
 void acc_to_shared(uint32_t to, const void *from, uint32_t len);
 void acc_from_shared(void *to, uint32_t from, uint32_t len);

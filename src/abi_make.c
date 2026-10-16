@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_make.c -- a declared type made: everything it needs is had before
-** any of it is kept.
-**
-** failure.md, *Out of memory*
 */
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -26,14 +18,6 @@ static void free_type(declared_type_t *c)
     free(c);
 }
 
-/*
-** alloc_type
-**
-** Allocates a declared type with its name, its zero value, room for the
-** types its fields name, which are no more than its fields, and its place
-** among the deck's types. nullptr, with nothing kept, if there was not the
-** memory for all of it.
-*/
 static declared_type_t *alloc_type(declaring_t *g)
 {
     bridge_t *b = g->m->b;
@@ -54,16 +38,6 @@ static declared_type_t *alloc_type(declaring_t *g)
     return (nullptr);
 }
 
-/*
-** say_unmade
-**
-** Frees what was had of a type that is not made, and refuses it: there was
-** no memory for it, or storage has no room for a singleton's value or a
-** direct-indexed type's cells.
-**
-** failure.md, *Out of memory*
-** storage.md, *A singleton*
-*/
 static int say_unmade(declaring_t *g, declared_type_t *c)
 {
     const bridge_t *b = g->m->b;
@@ -82,12 +56,6 @@ static int say_unmade(declaring_t *g, declared_type_t *c)
         "%u entities", g->name, b->columns_len, g->d.size, b->entities));
 }
 
-/*
-** keep_type
-**
-** Keeps a made type among the deck's, with what the declaration stated,
-** and holds each declared type a field of it names for as long as it is.
-*/
 static void keep_type(declaring_t *g, declared_type_t *c)
 {
     bridge_t *b = g->m->b;
@@ -112,11 +80,6 @@ static void keep_type(declaring_t *g, declared_type_t *c)
     }
 }
 
-/*
-** abi_make_type
-**
-** Makes the type a declaration states.
-*/
 int abi_make_type(declaring_t *g)
 {
     const bridge_declaration_t *d = &g->d;

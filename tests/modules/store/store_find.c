@@ -1,27 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/store/store_find.c -- what the plain build of
-** nstore finds of its entities: each by its own id, and B by a query for it
-** alone.
 */
-
 #include "store.h"
 #include "reach.h"
 
 #if !defined(BIG) && !defined(TABLES)
 uint32_t nstore_with_b;
 
-/*
-** count_named
-**
-** Answers how many rows of the spans of the query with A name the entity
-** `id`.
-*/
 static uint32_t count_named(const test_api_t *api, uint64_t id)
 {
     const bridge_query_t *q = test_get_query(api, nstore_with_a);
@@ -44,13 +31,6 @@ static uint32_t count_named(const test_api_t *api, uint64_t id)
     return (named);
 }
 
-/*
-** find
-**
-** Finds each entity that is left by its own id: where the index says it is,
-** and what is there. Says how many are alive and found through the index
-** with A, and how many times a span names one of them.
-*/
 TEST(find)
 {
     const bridge_header_t *h = test_get_header(api);
@@ -74,11 +54,6 @@ TEST(find)
     return (0);
 }
 
-/*
-** add_values
-**
-** Answers `sum` and the value of every row of a column.
-*/
 static uint32_t add_values(const b_t *values, uint32_t count, uint32_t sum)
 {
     uint32_t row = 0;
@@ -90,12 +65,6 @@ static uint32_t add_values(const b_t *values, uint32_t count, uint32_t sum)
     return (sum);
 }
 
-/*
-** look_b
-**
-** Says what a query for B alone sees: the spans, the rows, and the sum of
-** the values.
-*/
 TEST(look_b)
 {
     const bridge_query_t *q = test_get_query(api, nstore_with_b);

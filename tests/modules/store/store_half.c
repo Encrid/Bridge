@@ -1,22 +1,11 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/store/store_half.c -- the changes the plain build
-** of nstore asks for of half of its entities.
 */
-
 #include "store.h"
 
 #if !defined(BIG) && !defined(TABLES)
-/*
-** attach_b_half
-**
-** Attaches B to the first half of the entities.
-*/
 TEST(attach_b_half)
 {
     uint32_t i = 0;
@@ -28,11 +17,6 @@ TEST(attach_b_half)
     return (0);
 }
 
-/*
-** detach_b_half
-**
-** Detaches B from the first half of the entities.
-*/
 TEST(detach_b_half)
 {
     uint32_t i = 0;
@@ -44,11 +28,6 @@ TEST(detach_b_half)
     return (0);
 }
 
-/*
-** attach_a_half
-**
-** Attaches A to the second half of the entities.
-*/
 TEST(attach_a_half)
 {
     uint32_t i = COUNT / 2;
@@ -60,13 +39,6 @@ TEST(attach_a_half)
     return (0);
 }
 
-/*
-** value_b
-**
-** Attaches B to the first half of the entities, each with a value of its
-** own: for a column that has to be where it was after the one before it is
-** taken away, which a query for B alone then sees.
-*/
 TEST(value_b)
 {
     b_t value;

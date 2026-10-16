@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/inside.h -- Bridge's inside: what a deck, a module, a system
-** and a declared type are. Nothing here crosses a seam.
 */
-
 #ifndef BRIDGE_SRC_INSIDE_H
     #define BRIDGE_SRC_INSIDE_H
 
@@ -24,14 +18,6 @@
 typedef struct module module_t;
 typedef struct declared_type declared_type_t;
 
-/*
-** A backend the deployment configured, opened. `shared` is the shared block,
-** as this backend sees it. `reservation`, `guard` and `granule` are the
-** address space it needs around a block it maps: a module's private block
-** has this, and the shared block the largest any backend stated.
-**
-** backend.md, *Memory is adopted, not created*
-*/
 typedef struct {
     char *name;
     void *lib;
@@ -44,28 +30,6 @@ typedef struct {
     uint64_t granule;
 } open_backend_t;
 
-/*
-** A component, by its namespaced name. Storage holds the rows; this is what
-** load checks.
-**
-**     type          as storage knows it: a size
-**     s             its fields or its constants, read from its text
-**     storage       the storage layout every declarer stated
-**     fingerprint   of the descriptor string
-**     declarers     how many loaded modules declared it
-**     users         how many components name it as a field's type
-**     deps          the declared types its own fields name
-**     zero          `size` zero bytes: what an attach with no value copies
-**     replaces      at a reload, the type of this name whose rows become
-**                   this one's when the reload holds
-**     superseded    that the other has such a successor
-**     runs          on the one that is superseded, which bytes of a value of
-**                   it are which bytes of a value of its successor: nullptr
-**                   if they are the same bytes
-**
-** schema.md, *Fingerprints*
-** lifetime.md, *When a component is moved*
-*/
 struct declared_type {
     char *name;
     storage_type_t *type;
@@ -86,46 +50,16 @@ struct declared_type {
     uint32_t run_count;
 };
 
-/*
-** Who triggered an observer since the last barrier, and how.
-*/
 typedef struct {
     uint64_t id;
     enum bridge_event events;
 } pending_t;
 
-/*
-** What the conflict graph reads of a term: the component, or nullptr where
-** the term reads nothing, and whether it is written.
-*/
 typedef struct {
     declared_type_t *touches;
     bool writes;
 } system_term_t;
 
-/*
-** A system, or an observer: a query and a function either way. An observer's
-** phase is the one past the deployment's last, which is the barrier.
-**
-**     full          how [order] names it: the module's stem, then the name
-**     matched       its terms, as storage holds them. nullptr with no terms
-**     asked         what it asked storage for, kept so that a system taken
-**                   out of storage for the length of a reload can be put
-**                   back as it was
-**     level         within its phase: a level runs before the next
-**     parked        out of the schedule while a reload decides its fate
-**     pending       who triggered it since the last barrier
-**     when          of the dispatch in progress
-**     turn          and where it comes among all that ran before the barrier
-**     failed, why   how it ended, said after the join
-**     failures      its own count
-**     changes       the components it stated that it attaches or detaches.
-**                   They lie after the terms, in the same block
-**     term          `terms` of them
-**
-** schedule.md, *Order within a phase is never implicit*
-** failure.md, *The budget*
-*/
 typedef struct {
     module_t *m;
     char *name;
@@ -152,83 +86,11 @@ typedef struct {
     system_term_t term[];
 } bridge_system_t;
 
-/*
-** Where in a module's queue the changes of one turn begin.
-*/
 typedef struct {
     uint32_t turn;
     uint32_t at;
 } module_mark_t;
 
-/*
-** A loaded module.
-**
-**     stem          the identity without its version
-**     memory        its private block, as its backend sees it
-**     priv          the private block. A module can write all of it, so
-**                   every offset Bridge acts on is kept here and
-**                   never read back from the header
-**     spans         the span region: query slots, column_base, spans
-**     published, had_triggers, spans_end
-**                   what storage last wrote there: whether it has, whether
-**                   an observer's list was not empty, where its spans end
-**     declared, policy, may_write
-**                   by slot: the component, what it stated for unload, and
-**                   whether its grants let it write the component. Worked
-**                   out once, at declare: an attach asks it every time
-**     systems, observers
-**                   by slot
-**
-** What is set aside for it alone. Only its own thread touches any of it.
-**
-**     ids           ids it may hand out, taken from storage at a barrier
-**     ids_short     the entity ceiling cut its last refill short
-**     arena_at, arena_left, arena_share
-**                   its share of the persistent arena
-**     owned         the ranges of the arena that are its share: one from its
-**                   load, and one more for each reload that could not add to
-**                   the last where it stood. `alloc` moves to the next once
-**                   what is asked no longer fits in the one before. They are
-**                   what goes back to the arena at unload, if nothing left
-**                   alive points into them
-**     queue         what it asked to have changed, applied at the next
-**                   barrier in the order it asked
-**     read, write   grants
-**     phase_from, phase_to
-**                   the phases it names that the deployment calls otherwise,
-**                   and which of the deployment's each is
-**     thread        the one that loaded it
-**     max_failures, failures
-**                   each system has a count of its own. `failures` is the
-**                   module's, for what is nobody's system: a barrier that
-**                   could not place an entity it changed raises it, and one
-**                   that placed all it changed lowers it
-**     changed_now, unplaced_now
-**                   at this barrier
-**     reached       the system whose count reached the number, if one did
-**     left          how many changes it asked were not applied at this
-**                   barrier, for want of a table and for want of columns
-**     writable      the types it may write, as storage numbers them
-**     barred        how many entities it asked to destroy at this barrier
-**                   that carry none of them
-**     config        the component its settings seeded
-**     text_at, text_room
-**                   where their text is
-**     running       what is running in it now, or nullptr for a lifecycle
-**                   call, and `turn` its turn
-**     marks         where in the queue each turn's changes begin: one for
-**                   every call that queued something, so the barrier can
-**                   apply the queues in the order the calls ran
-**     reloads       the instance this one is to take the place of
-**     losses        what a reload accepts to lose
-**     loss_rows     by loss: how many rows lost something under that name,
-**                   plus one. Zero: nothing was
-**     refused, why  an entry refused during the call in progress, and why
-**
-** threads.md, *Threads*
-** budgets.md, *What running out does*
-** strings.md, *It is given back when nothing points into it*
-*/
 struct module {
     bridge_t *b;
     char *identity;
@@ -317,9 +179,6 @@ struct module {
     module_t *next;
 };
 
-/*
-** One queued change: `size` bytes of value follow it, padded to eight.
-*/
 enum change_op : uint32_t {
     CHANGE_DESTROY = 1,
     CHANGE_ATTACH = 2,
@@ -333,69 +192,15 @@ typedef struct {
     enum change_op op;
 } change_t;
 
-/*
-** A turn: observers of the last barrier, then lifecycle calls, then the
-** phase's systems, each in the order it ran.
-*/
 constexpr uint32_t TURN_LIFECYCLE = 1u << 16;
 constexpr uint32_t TURN_SYSTEM = 2u << 16;
 
-/*
-** Where an unloaded module's settings text was.
-*/
 typedef struct {
     char *stem;
     uint32_t at;
     uint32_t room;
 } kept_text_t;
 
-/*
-** A deck.
-**
-**     reservation, guard, granule
-**                   of the shared block: the address space every block is
-**                   allocated with, the largest any backend stated
-**     stopped_by, stopped_stem
-**                   why nothing runs any more, and the module whose return
-**                   lifts it: nullptr while the deck runs. They point at
-**                   the two arrays after them, since a deck is stopped at
-**                   a barrier, where nothing is allocated
-**     turns         lifecycle calls since the last barrier
-**     parked        systems out of storage while their module reloads
-**     arena_ranges  how many ranges of the arena modules hold: its list of
-**                   gaps has room for one more than that, found when a range
-**                   is taken, so that giving one back never asks for memory
-**     run_jobs, run_handed, run_lists, run_callers
-**                   what a phase's dispatch works in, [budget] systems long
-**     build_in, build_bits
-**                   what the schedule is worked out in, when a module comes
-**                   or goes: a load, a reload and an unload ask for no
-**                   memory to do it, so none of them can fail there
-**     before, after
-**                   [order], pair by pair
-**     shared        the shared block: eight bytes nothing is at, so that
-**                   offset 0 is none; the entity index, the persistent
-**                   arena, the columns
-**     sparse_sets, sparse
-**                   [budget] sparse_sets, and where their indexes begin in
-**                   the shared memory: one after another, each a u32 for
-**                   every entity there may be
-**     direct_indexed, direct
-**                   [budget] direct_indexed, and where their bits begin: one
-**                   after another, each a bit for every entity there may be,
-**                   in 64-bit words
-**     arena_space, column_space
-**                   what of each is handed out
-**     layout_moved  a module came or went, or a declaration changed
-**     tables        [budget] tables: how many may exist at once
-**     max_types, max_systems, max_terms
-**                   [budget] types, systems and terms
-**     storage       who keeps the rows: storage.h
-**     kept          where an unloaded module's settings text was
-**     systems       every module's, in registration order
-**
-** budgets.md, *Nothing is allocated in a phase*
-*/
 struct bridge {
     bridge_sink_fn_t sink;
     void *ud;
@@ -456,18 +261,8 @@ struct bridge {
     uint32_t max_modules;
 };
 
-/*
-** module_discard
-**
-** Frees a module and what it held.
-*/
 void module_discard(bridge_t *b, module_t *m);
 
-/*
-** module_shut_down
-**
-** Runs a module's shutdown, with what it asked for and what it said.
-*/
 void module_shut_down(bridge_t *b, module_t *m);
 
     #include "say.h"

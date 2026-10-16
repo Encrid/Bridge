@@ -1,24 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/single/single_look.c -- what a system reads of the
-** singleton and what an observer hears of it, said in the log.
 */
-
 #include "single.h"
 #include "measured.h"
 
 volatile uint32_t nsingle_which;
 
-/*
-** look
-**
-** Says whether the singleton has a value, and the value.
-*/
 TEST(look)
 {
     const g_t *value = test_get_single(api, nsingle_g);
@@ -31,12 +20,6 @@ TEST(look)
     return (0);
 }
 
-/*
-** one
-**
-** Reads the singleton a million times, finding it again each time, and
-** says the sum of what it read.
-*/
 TEST_MEASURED TEST(one)
 {
     const g_t *value;
@@ -53,12 +36,6 @@ TEST_MEASURED TEST(one)
     return (0);
 }
 
-/*
-** heard_g
-**
-** Says each thing the observer of the singleton heard: the id, and the
-** events.
-*/
 TEST(heard_g)
 {
     const bridge_list_t *list = test_get_list(api, nsingle_on_g);

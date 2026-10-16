@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/frag.h -- the components of nfrag.c: the value
-** every entity carries, and what a marker holds. Built with TAGS, the
-** markers are tags and hold nothing.
 */
-
 #ifndef TEST_NFRAG_H
     #define TEST_NFRAG_H
 

@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/stress/stress_work.c -- the changes nstress asks
-** for, drawn by a generator it seeds itself, and written into its account.
 */
-
 #include "stress.h"
 
 static uint32_t state = SEED;
@@ -19,12 +13,6 @@ static uint32_t draw_number(void)
     return (state >> 8);
 }
 
-/*
-** set_value
-**
-** Gives the entity of `slot` a drawn value for component `kind`: an attach,
-** or a set where it has the component already.
-*/
 static void set_value(const test_api_t *api, uint32_t slot, uint32_t kind)
 {
     v_t value = { draw_number() };
@@ -34,12 +22,6 @@ static void set_value(const test_api_t *api, uint32_t slot, uint32_t kind)
     nstress_values[slot][kind] = value.v;
 }
 
-/*
-** make_entity
-**
-** Spawns the entity of `slot`, with one to three components that are
-** drawn.
-*/
 static void make_entity(const test_api_t *api, uint32_t slot)
 {
     uint32_t k;
@@ -53,13 +35,6 @@ static void make_entity(const test_api_t *api, uint32_t slot)
     }
 }
 
-/*
-** change_entity
-**
-** Changes the entity of `slot` by what was drawn: 15 times in 100 it is
-** destroyed, 55 times it is given a value for component `kind`, and 30
-** times that component is detached.
-*/
 static void change_entity(const test_api_t *api, uint32_t slot,
     uint32_t what, uint32_t kind)
 {
@@ -74,12 +49,6 @@ static void change_entity(const test_api_t *api, uint32_t slot,
     }
 }
 
-/*
-** work
-**
-** Asks for twenty thousand changes, each of an entity that is drawn: one
-** that does not exist is made, and one that does is changed.
-*/
 TEST(work)
 {
     uint32_t slot;

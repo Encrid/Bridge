@@ -1,17 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_apply.c -- a barrier, worked an entity at a time: the queues
-** folded, room found, observers told, each entity placed once, the values
-** written.
-**
-** storage.md, *A barrier is worked an entity at a time*
 */
-
 #include "storage_change.h"
 #include "storage_forget.h"
 #include "storage_place.h"
@@ -19,11 +10,6 @@
 #include "storage_runs.h"
 #include "storage_settle.h"
 
-/*
-** fold_all
-**
-** The first step: what each changed entity will carry, and nothing moved.
-*/
 static void fold_all(storage_t *r)
 {
     module_t *m;
@@ -38,12 +24,6 @@ static void fold_all(storage_t *r)
     }
 }
 
-/*
-** tell_all
-**
-** The third step: what observers are owed, for each entity that was not
-** left as it was, from what it carried against what it will.
-*/
 static void tell_all(storage_t *r)
 {
     seen_t seen = { .before = r->before };
@@ -65,11 +45,6 @@ static void tell_all(storage_t *r)
     }
 }
 
-/*
-** place_all
-**
-** The fourth step: each entity placed, once.
-*/
 static void place_all(storage_t *r)
 {
     uint32_t i = 0;
@@ -81,12 +56,6 @@ static void place_all(storage_t *r)
     }
 }
 
-/*
-** write_all
-**
-** The fifth step: the values, in the order they were asked, so that the
-** last one written is the one that stays.
-*/
 static void write_all(storage_t *r)
 {
     module_t *m;
@@ -106,12 +75,6 @@ static void write_all(storage_t *r)
     }
 }
 
-/*
-** storage_apply
-**
-** Applies every module's queue, in the order the calls that filled them ran.
-** An entity that cannot be placed is left as it was, and its module told.
-*/
 void storage_apply(storage_t *r)
 {
     fold_all(r);

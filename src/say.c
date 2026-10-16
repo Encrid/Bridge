@@ -1,13 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/say.c -- a record of Bridge's own, handed to the host's sink.
 */
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,12 +10,6 @@
 
 #include "say.h"
 
-/*
-** send_record
-**
-** Hands the sink one record: the text, whose it is about, and the barrier it
-** was said at.
-*/
 static void send_record(bridge_t *b, const say_t *about, const char *text)
 {
     bridge_record_t r = {};
@@ -34,11 +23,6 @@ static void send_record(bridge_t *b, const say_t *about, const char *text)
     b->sink(b->ud, &r);
 }
 
-/*
-** say_error
-**
-** Hands the sink an error of Bridge's own, about no module.
-*/
 void say_error(bridge_t *b, const char *format, ...)
 {
     say_t about = { nullptr, nullptr, BRIDGE_ERR };
@@ -51,11 +35,6 @@ void say_error(bridge_t *b, const char *format, ...)
     send_record(b, &about, text);
 }
 
-/*
-** say_about
-**
-** Hands the sink a record about a module or one of its systems.
-*/
 void say_about(bridge_t *b, const say_t *about, const char *format, ...)
 {
     char text[512];
@@ -67,11 +46,6 @@ void say_about(bridge_t *b, const say_t *about, const char *format, ...)
     send_record(b, about, text);
 }
 
-/*
-** copy_text
-**
-** Answers a copy of the first `n` bytes of a text, with a zero after them.
-*/
 char *copy_text(const char *s, size_t n)
 {
     char *copy = malloc(n + 1);
@@ -83,13 +57,6 @@ char *copy_text(const char *s, size_t n)
     return (copy);
 }
 
-/*
-** bridge_lacks
-**
-** Answers 1, with a record, if `got` is nullptr.
-**
-** failure.md, *Out of memory*
-*/
 int bridge_lacks(bridge_t *b, const void *got, const char *what)
 {
     if (got)

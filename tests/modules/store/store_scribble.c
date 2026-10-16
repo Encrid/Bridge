@@ -1,23 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/store/store_scribble.c -- what storage publishes
-** in the shared block, written over by a module that should not.
 */
-
 #include "store.h"
 #include "reach.h"
 
 #if !defined(BIG) && !defined(TABLES)
-/*
-** overwrite_index
-**
-** Makes the index record of every entity of the module that of the first.
-*/
 static void overwrite_index(const test_api_t *api)
 {
     bridge_entity_t *index = get_entity_index(api);
@@ -30,12 +19,6 @@ static void overwrite_index(const test_api_t *api)
     }
 }
 
-/*
-** overwrite_names
-**
-** Makes every row of the entity array of every table with A name the first
-** entity.
-*/
 static void overwrite_names(const test_api_t *api)
 {
     const bridge_query_t *q = test_get_query(api, nstore_with_a);
@@ -56,14 +39,6 @@ static void overwrite_names(const test_api_t *api)
     }
 }
 
-/*
-** scribble
-**
-** Writes over the index record of every one of the module's entities, and
-** over the entity array of every table with A. Each is made to name the
-** first entity, which is alive: a storage that read either back would act
-** on it.
-*/
 TEST(scribble)
 {
     overwrite_index(api);

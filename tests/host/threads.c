@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/threads.c -- two systems that nap, in two modules that
-** share nothing: on two threads they run at once, and on one, in turn.
-**
-** threads.md, *Threads*
 */
-
 #include <stdio.h>
 #include <time.h>
 
@@ -28,15 +20,6 @@ static double time_update(bridge_t *b)
         + (double)(t1.tv_nsec - t0.tv_nsec) / 1e6);
 }
 
-/*
-** say_naps
-**
-** Says whether the two naps ran at once. At once is one beginning before
-** the other ended, and nothing about how long either took: a sleep of a
-** tenth of a second returns after two on some systems. The clock is in
-** milliseconds, so two that follow each other may share one: not an
-** overlap.
-*/
 static void say_naps(const test_counts_t *c, uint32_t threads)
 {
     const uint32_t *began = c->began;
@@ -71,22 +54,12 @@ static void nap_twice(host_t *h)
     host_close(h);
 }
 
-/*
-** test_run_at_once
-**
-** Two threads: the naps overlap.
-*/
 void test_run_at_once(host_t *h)
 {
     h->cfg.threads = 2;
     nap_twice(h);
 }
 
-/*
-** test_run_in_turn
-**
-** One thread: one nap follows the other.
-*/
 void test_run_in_turn(host_t *h)
 {
     nap_twice(h);

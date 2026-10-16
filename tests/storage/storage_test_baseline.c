@@ -1,17 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/storage/storage_test_baseline.c -- what tables cost at the work no
-** storage layout was made for: a component switched off by a field, a
-** value reached by id, one value for everything.
-**
-** stage11.md, *The baseline*
 */
-
 #include <stdio.h>
 
 #include "storage_test.h"
@@ -19,28 +10,16 @@
 constexpr uint32_t BASELINE_ROUNDS = 32;
 constexpr uint32_t BASELINE_ASKED = 1'000'000;
 
-/*
-** The builds, with one row in 1, in 2 and in 16 switched on by its field.
-*/
 static const char *const BASELINE_BUILDS[] = {
     WEIGH1_PATH, WEIGH2_PATH, WEIGH16_PATH
 };
 
-/*
-** The work that does not depend on how many rows are switched on.
-*/
 static const storage_test_op_t BASELINE_READS[] = {
     { "walk", "read in order" },
     { "near", "reached by id, in the order they lie" },
     { "far", "reached by id, in no order" }
 };
 
-/*
-** say_reads
-**
-** Times each way of reading every value. Answers 1, having said so, if one
-** of them did not read every row.
-*/
 static int say_reads(storage_test_t *t)
 {
     const storage_test_op_t *w = BASELINE_READS;
@@ -70,12 +49,6 @@ static void say_flagged(storage_test_t *t)
         (double)best / STORAGE_TEST_ROWS);
 }
 
-/*
-** say_one
-**
-** Times one value on one entity, found through its query a million times
-** a pass. Answers 1, having said so, if it was not found that often.
-*/
 static int say_one(storage_test_t *t)
 {
     uint64_t best = storage_test_time_least(t, "one", BASELINE_ROUNDS);
@@ -89,13 +62,6 @@ static int say_one(storage_test_t *t)
     return (0);
 }
 
-/*
-** weigh_build
-**
-** One build, in a deck of its own. The first is also timed at the work
-** that is the same in each. Answers 1 if it could not be loaded, or read
-** less than it was to.
-*/
 static int weigh_build(storage_test_t *t, const char *path, bool first)
 {
     bridge_artifact_t a = storage_test_state(path, STORAGE_TEST_ROWS + 1,
@@ -112,12 +78,6 @@ static int weigh_build(storage_test_t *t, const char *path, bool first)
     return (0);
 }
 
-/*
-** storage_test_take_baseline
-**
-** Every figure, each build in a deck of its own with [budget] columns of
-** 256 MB. The last of those decks is left for main to destroy.
-*/
 enum storage_test_end storage_test_take_baseline(storage_test_t *t)
 {
     constexpr size_t count = sizeof(BASELINE_BUILDS) / sizeof(char *);

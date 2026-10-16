@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_forget.h -- the end of a barrier's work on rows: the fold
-** forgotten, and each table nothing is left in given back.
 */
-
 #ifndef BRIDGE_SRC_STORAGE_FORGET_H
     #define BRIDGE_SRC_STORAGE_FORGET_H
 
@@ -20,12 +14,6 @@ static inline void unsize_table(storage_t *r, uint32_t t)
     r->tables[t].sized = false;
 }
 
-/*
-** forget_changed
-**
-** Forgets what the fold decided of each changed entity, and the room that
-** was found for it.
-*/
 static inline void forget_changed(storage_t *r)
 {
     uint32_t index;
@@ -53,12 +41,6 @@ static inline void forget_sets(storage_t *r)
     }
 }
 
-/*
-** forget_all
-**
-** Forgets the fold, and gives back each table that was touched and that
-** nothing is left in.
-*/
 static inline void forget_all(storage_t *r)
 {
     uint32_t t;

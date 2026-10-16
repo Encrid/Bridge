@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/watcher.c -- observes game:Marked being added, under
-** a read grant, and says who it was added to.
 */
-
 #include "test_offsets.h"
 #include "game.h"
 #include "offsets_idle.h"
@@ -16,13 +10,6 @@
 static uint32_t marked;
 static uint32_t seeing;
 
-/*
-** seen
-**
-** Says, for each trigger, which events it is of and the value the other
-** module attached, followed from the id. 0xdead is said for an id that
-** leads nowhere.
-*/
 BRIDGE_EXPORT(seen) int seen(void)
 {
     uint32_t count = bridge_count_triggers(seeing);
@@ -42,11 +29,6 @@ BRIDGE_EXPORT(seen) int seen(void)
     return (0);
 }
 
-/*
-** init
-**
-** Declares the component, and the observer that reads it.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};

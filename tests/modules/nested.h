@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/nested.h -- the types of nested.c: a component whose
-** fields are a struct, an enum and a bitmask.
 */
-
 #ifndef TEST_NESTED_H
     #define TEST_NESTED_H
 

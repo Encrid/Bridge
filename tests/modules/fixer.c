@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/fixer.c -- observes game:Marked being added and
-** overwrites it, under a write grant. Beside the watcher, which reads it at
-** the same barrier, that is a conflict only the deployment can order.
 */
-
 #include "test_offsets.h"
 #include "game.h"
 #include "offsets_idle.h"
@@ -17,12 +10,6 @@
 static uint32_t marked;
 static uint32_t fixing;
 
-/*
-** fix
-**
-** Writes 5 over the component of every entity that triggered the observer
-** and still has it.
-*/
 BRIDGE_EXPORT(fix) int fix(void)
 {
     uint32_t count = bridge_count_triggers(fixing);
@@ -40,11 +27,6 @@ BRIDGE_EXPORT(fix) int fix(void)
     return (0);
 }
 
-/*
-** init
-**
-** Declares the component, and the observer that writes it.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};

@@ -1,24 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_publish.c -- what a module reads, written at a barrier, and
-** what was touched forgotten once every module has been written for.
 */
-
 #include <string.h>
 
 #include "storage_publish.h"
 
-/*
-** write_list
-**
-** Writes observer `q` of a module its list of who triggered it since the
-** last barrier. 1 if it does not fit.
-*/
 static int write_list(publish_t *p, uint32_t q)
 {
     module_t *m = p->m;
@@ -42,12 +30,6 @@ static int write_list(publish_t *p, uint32_t q)
     return (0);
 }
 
-/*
-** storage_publish_lists
-**
-** Writes each of a module's observers its list, when one of them has
-** somebody in it, or had, or the spans before them were written again.
-*/
 int storage_publish_lists(publish_t *p)
 {
     module_t *m = p->m;
@@ -69,12 +51,6 @@ int storage_publish_lists(publish_t *p)
     return (0);
 }
 
-/*
-** storage_publish
-**
-** Writes what a module reads: its column_base, its spans, its observers'
-** lists. 1 if they do not fit in its span region.
-*/
 int storage_publish(storage_t *r, module_t *m)
 {
     publish_t p = { .r = r, .m = m, .end = (uint64_t)m->spans + m->spans_len };
@@ -97,11 +73,6 @@ int storage_publish(storage_t *r, module_t *m)
     return (0);
 }
 
-/*
-** storage_end_publish
-**
-** Forgets what was touched, once every module has been written for.
-*/
 void storage_end_publish(storage_t *r)
 {
     uint32_t i = 0;
@@ -113,11 +84,6 @@ void storage_end_publish(storage_t *r)
     r->dirty_count = 0;
 }
 
-/*
-** storage_count_tables
-**
-** Answers how many table ids there are, counting 0, which is no table.
-*/
 uint32_t storage_count_tables(storage_t *r)
 {
     return (r->table_room + 1);

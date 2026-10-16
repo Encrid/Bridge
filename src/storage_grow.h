@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_grow.h -- a table given room for more rows: a longer block,
-** and each column moved out to where the new room puts it.
 */
-
 #ifndef BRIDGE_SRC_STORAGE_GROW_H
     #define BRIDGE_SRC_STORAGE_GROW_H
 
@@ -21,13 +15,6 @@
     #include "storage_view.h"
     #include "storage_walk.h"
 
-/*
-** take_longer
-**
-** Asks for a block of half as much room again as the table had, so that one
-** that grows a row at a time is not moved each time, and for what was asked
-** and no more where that is not to be had. Writes the room it got.
-*/
 static inline uint8_t *take_longer(storage_t *r, uint32_t t, uint32_t *room,
     uint64_t *len)
 {
@@ -44,12 +31,6 @@ static inline uint8_t *take_longer(storage_t *r, uint32_t t, uint32_t *room,
     return (take_block(r, t, asked, len));
 }
 
-/*
-** move_column
-**
-** Moves one column out to where the new room puts it, which lay_out
-** has just said. `was` and `had` are the block and the room the table had.
-*/
 static inline void move_column(storage_t *r, uint32_t t, uint32_t id,
     const table_t *old)
 {
@@ -67,13 +48,6 @@ static inline void move_column(storage_t *r, uint32_t t, uint32_t id,
     columns[id] = tab->block + (uint32_t)r->at[id];
 }
 
-/*
-** move_columns
-**
-** Moves who is in which row to the new block, and every column out to where
-** the new room puts it: the last first, so that none is written over before
-** it is read. The columns are where the old room put them, in the new block.
-*/
 static inline void move_columns(storage_t *r, uint32_t t, const table_t *old)
 {
     const table_t *tab = &r->tables[t];
@@ -90,12 +64,6 @@ static inline void move_columns(storage_t *r, uint32_t t, const table_t *old)
         reseat_set(r, t);
 }
 
-/*
-** place_columns
-**
-** Writes where each column of a table's first block is, which storage_lay_out
-** has just said: nothing was anywhere before, so nothing moves.
-*/
 static inline void place_columns(storage_t *r, uint32_t t)
 {
     const table_t *tab = &r->tables[t];
@@ -111,14 +79,6 @@ static inline void place_columns(storage_t *r, uint32_t t)
     }
 }
 
-/*
-** grow_table
-**
-** Makes room for `room` rows in table `t`, or for half as much again as it
-** had. Measured against twice: as fast, with half the idle room.
-**
-** storage.md, *A table*
-*/
 static inline bool grow_table(storage_t *r, uint32_t t, uint32_t room)
 {
     table_t *tab = &r->tables[t];

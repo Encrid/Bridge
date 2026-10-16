@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/stepper.h -- the one component of stepper.c: a
-** count.
 */
-
 #ifndef TEST_STEPPER_H
     #define TEST_STEPPER_H
 

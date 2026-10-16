@@ -1,13 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/module_discard.c -- a module's record freed, with what it held.
 */
-
 #include <stdlib.h>
 
 #include "module.h"
@@ -25,11 +20,6 @@ static void free_system(bridge_t *b, bridge_system_t *s)
     free(s);
 }
 
-/*
-** module_drop_systems
-**
-** Takes a module's systems and observers out of storage and frees them.
-*/
 void module_drop_systems(bridge_t *b, module_t *m)
 {
     bridge_system_t *s;
@@ -83,13 +73,6 @@ static void free_record(module_t *m)
     free(m);
 }
 
-/*
-** module_discard
-**
-** Frees a module and what it held: its systems, its instance, its image,
-** its private memory, and the record. The order is the backend seam's: a
-** memory is released after the last instance it was handed to.
-*/
 void module_discard(bridge_t *b, module_t *m)
 {
     module_drop_systems(b, m);

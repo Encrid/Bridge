@@ -1,18 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/changes_order.c -- two systems of one phase, in two
-** modules, that attach one component to the same entities. Unordered, the
-** second does not load. Ordered, the one stated to run last is the one
-** whose value stays, whichever of them was loaded first.
-**
-** schedule.md, *Order within a phase is never implicit*
 */
-
 #include "cases.h"
 
 static const bridge_order_t TEST_FIVE_FIRST = {
@@ -34,21 +24,11 @@ static void stamp_twice(host_t *h, bool nine_first)
     host_close(h);
 }
 
-/*
-** test_conflict_by_change
-**
-** Nothing orders the two: the second to load is refused.
-*/
 void test_conflict_by_change(host_t *h)
 {
     stamp_twice(h, false);
 }
 
-/*
-** test_order_changes
-**
-** The five is ordered before the nine, and is loaded first.
-*/
 void test_order_changes(host_t *h)
 {
     h->cfg.order = &TEST_FIVE_FIRST;
@@ -56,11 +36,6 @@ void test_order_changes(host_t *h)
     stamp_twice(h, false);
 }
 
-/*
-** test_order_changes_loaded_last
-**
-** The five is ordered before the nine, and is loaded second.
-*/
 void test_order_changes_loaded_last(host_t *h)
 {
     h->cfg.order = &TEST_FIVE_FIRST;
@@ -68,12 +43,6 @@ void test_order_changes_loaded_last(host_t *h)
     stamp_twice(h, true);
 }
 
-/*
-** test_tell_both
-**
-** The same, with room for one table, which the entities with a position
-** take: one with a mark as well has none.
-*/
 void test_tell_both(host_t *h)
 {
     h->cfg.order = &TEST_FIVE_FIRST;

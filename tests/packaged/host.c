@@ -1,38 +1,19 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/packaged/host.c -- a host as one outside the tree is: built from the
-** library's package and nothing else of Bridge. The backend it names and
-** the module it loads are built from the seams' package.
-**
-** host_api.md, *What a host is handed*
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "bridge.h"
 
-/*
-** say
-**
-** The sink: a record, on a line.
-*/
 static void say([[maybe_unused]] void *ud, const bridge_record_t *r)
 {
     printf("%s: %.*s %u\n", r->identity ? r->identity : "bridge",
         (int)r->len, r->text, (unsigned)r->arg[0]);
 }
 
-/*
-** state
-**
-** States every key of a module, for the backend named.
-*/
 static void state(bridge_artifact_t *a, const char *backend,
     const char *identity)
 {
@@ -49,11 +30,6 @@ static void state(bridge_artifact_t *a, const char *backend,
         .loss_count = BRIDGE_NONE, .config = BRIDGE_NO_CONFIG };
 }
 
-/*
-** load_module
-**
-** Loads the module, by the path of its library.
-*/
 static int load_module(bridge_t *b)
 {
     bridge_artifact_t a;
@@ -63,10 +39,6 @@ static int load_module(bridge_t *b)
     return (bridge_load(b, &a));
 }
 
-/*
-** What the backend is told: what it keeps, and the shape it asks of a
-** block. It is the tests' own, built from the seams' package.
-*/
 static const bridge_setting_t TOLD[4] = {
     { "capabilities", BRIDGE_INT, {}, { .i = 1 << 4 | 1 << 6 } },
     { "reservation", BRIDGE_INT, {}, { .i = 0 } },
@@ -74,12 +46,6 @@ static const bridge_setting_t TOLD[4] = {
     { "granule", BRIDGE_INT, {}, { .i = 0 } }
 };
 
-/*
-** main
-**
-** A deck with the one backend, the module on it, three passes, and the deck
-** destroyed.
-*/
 int main(void)
 {
     bridge_backend_t backends[1] = {{ "tests", BACKEND, TOLD, 4 }};

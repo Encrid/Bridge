@@ -1,26 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/bridge_reload.c -- a module reloaded.
-**
-** lifecycle.md, *The runtime lifecycle*
 */
-
 #include "reload.h"
 
-/*
-** retire_old
-**
-** The old instance's systems stand aside, and out of storage: the new one
-** registers the same names, in the places these had. A backend that cannot
-** hold two copies of one library has the old one go first.
-**
-** budgets.md, *Budgets*
-*/
 static void retire_old(reloading_t *r)
 {
     bridge_t *b = r->b;
@@ -44,12 +28,6 @@ static void retire_old(reloading_t *r)
     old->image = nullptr;
 }
 
-/*
-** forget_config
-**
-** Forgets the settings component if the new instance no longer declares it:
-** its value went by its policy.
-*/
 static void forget_config(module_t *n)
 {
     uint32_t i = 0;
@@ -60,13 +38,6 @@ static void forget_config(module_t *n)
         n->config = nullptr;
 }
 
-/*
-** swap
-**
-** The new instance takes the old one's place among the modules, so the
-** order they loaded in is kept. What it no longer declares is treated as an
-** unload treats it, and the entities are the new record's now.
-*/
 static void swap(reloading_t *r)
 {
     bridge_t *b = r->b;
@@ -90,12 +61,6 @@ static void swap(reloading_t *r)
     b->layout_moved = 1;
 }
 
-/*
-** start_new
-**
-** Starts the new instance, with the old one for what it replaces. 1 with
-** why in the reload.
-*/
 static int start_new(reloading_t *r)
 {
     bridge_t *b = r->b;
@@ -110,12 +75,6 @@ static int start_new(reloading_t *r)
     return (reload_move_rows(r));
 }
 
-/*
-** bridge_reload
-**
-** Reloads a module. One that is in and that nothing will ever run is not a
-** reload that succeeded.
-*/
 int bridge_reload(bridge_t *b, const bridge_artifact_t *a)
 {
     reloading_t r = { .b = b, .a = a };

@@ -1,26 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/reload_check.c -- what a reload is refused for before anything is
-** made.
 */
-
 #include <stdarg.h>
 #include <stdio.h>
 
 #include "reload.h"
 
-/*
-** reload_refuse
-**
-** Says that the loaded module is not reloaded, and why. Answers 1.
-**
-** failure.md, *The budget*
-*/
 int reload_refuse(const reloading_t *r, const char *format, ...)
 {
     char text[512];
@@ -33,15 +20,6 @@ int reload_refuse(const reloading_t *r, const char *format, ...)
     return (1);
 }
 
-/*
-** reload_check
-**
-** Refuses a reload of a module that is not loaded, that may not be
-** reloaded, or that names another backend than it runs on. hot_reload only
-** ever forbids.
-**
-** lifecycle.md, *The runtime lifecycle*
-*/
 int reload_check(reloading_t *r)
 {
     module_check_t k = { r->b, r->a };

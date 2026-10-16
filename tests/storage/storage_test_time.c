@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/storage/storage_test_time.c -- a phase, timed: its systems, and
-** its barrier. A change is the call that asks for it and the barrier that
-** applies it, and a library that applies a change at the call has one
-** figure where this has two.
 */
-
 #include <string.h>
 
 #include "storage_test.h"
@@ -24,13 +16,6 @@ static uint32_t find_phase(const storage_test_t *t, const char *phase)
     return (i);
 }
 
-/*
-** storage_test_time_barrier
-**
-** Runs the systems of one phase and then its barrier, each timed. Answers
-** the nanoseconds of the barrier, and leaves those of the systems in
-** `t->called`.
-*/
 uint64_t storage_test_time_barrier(storage_test_t *t, const char *phase)
 {
     bridge_t *b = t->b;
@@ -44,12 +29,6 @@ uint64_t storage_test_time_barrier(storage_test_t *t, const char *phase)
     return (os_get_now() - began);
 }
 
-/*
-** storage_test_time_systems
-**
-** Runs the systems of one phase, timed, and then its barrier. Answers the
-** nanoseconds of the systems.
-*/
 uint64_t storage_test_time_systems(storage_test_t *t, const char *phase)
 {
     bridge_t *b = t->b;
@@ -62,11 +41,6 @@ uint64_t storage_test_time_systems(storage_test_t *t, const char *phase)
     return (spent);
 }
 
-/*
-** storage_test_time_least
-**
-** Answers the least of the systems of a phase, timed `rounds` times.
-*/
 uint64_t storage_test_time_least(storage_test_t *t, const char *phase,
     uint32_t rounds)
 {
@@ -83,12 +57,6 @@ uint64_t storage_test_time_least(storage_test_t *t, const char *phase,
     return (least);
 }
 
-/*
-** storage_test_time_two
-**
-** Leaves in `least` the least of the systems of two phases, run one after
-** the other four times as often as a change is weighed.
-*/
 void storage_test_time_two(storage_test_t *t, const char *const *phases,
     uint64_t *least)
 {

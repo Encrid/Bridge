@@ -1,22 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/tag/tag_look.c -- what a module is handed for a
-** tag in each storage layout, said in the log.
 */
-
 #include "tag.h"
 
-/*
-** look_tables
-**
-** Says of M, kept in tables, how many rows carry it and how many spans have
-** a base that says carried: there is nothing at such a base.
-*/
 static void look_tables(const test_api_t *api)
 {
     const bridge_query_t *q = test_get_query(api, ntag_marked);
@@ -36,13 +24,6 @@ static void look_tables(const test_api_t *api)
         rows, carried);
 }
 
-/*
-** look_toggle
-**
-** Says of O, a toggle, how many rows have it and how many of them are on.
-** Its bits are ahead of where its column would be, so the base it is handed
-** is that place.
-*/
 static void look_toggle(const test_api_t *api)
 {
     const bridge_query_t *q = test_get_query(api, ntag_toggled);
@@ -67,12 +48,6 @@ static void look_toggle(const test_api_t *api)
     say(api, "O, a toggle: rows, and of them on", rows, on);
 }
 
-/*
-** look_direct
-**
-** Says of R, direct-indexed, how many entities were given it: a bit an
-** entity, and no cells behind the bits.
-*/
 static void look_direct(const test_api_t *api)
 {
     uint32_t cells = test_get_cells(api, ntag_r);
@@ -89,12 +64,6 @@ static void look_direct(const test_api_t *api)
     say(api, "R, direct-indexed: entities given it", given, 0);
 }
 
-/*
-** look
-**
-** Says what a module is handed for a tag in each storage layout. The cell
-** of W, a singleton, holds that it is carried, or zero.
-*/
 TEST(look)
 {
     const bridge_header_t *h = test_get_header(api);

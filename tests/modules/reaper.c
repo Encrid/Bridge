@@ -1,18 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/reaper.c -- a system that destroys every entity
-** with a position, and says how many it found. Whether it may is the
-** deployment's: with a read grant it has no stake in them and they stay,
-** with a write grant they go.
-**
-** grants.md, *What a module may destroy*
 */
-
 #include "test_module.h"
 #include "game.h"
 #include "idle.h"
@@ -31,12 +21,6 @@ static void destroy_rows(const test_api_t *api, const uint32_t *span)
     }
 }
 
-/*
-** reap
-**
-** Destroys every entity its query matched, and says how many rows that
-** was.
-*/
 TEST(reap)
 {
     const bridge_query_t *q = test_get_query(api, reaping);
@@ -54,11 +38,6 @@ TEST(reap)
     return (0);
 }
 
-/*
-** init
-**
-** Declares the position and the system, which reads it.
-*/
 TEST(init)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};

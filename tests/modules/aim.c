@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/aim.c -- a direct-indexed component on the guarded
-** backend, reached from the rows of a table by each entity's id.
-**
-** storage.md, *Direct-indexed*
 */
-
 #include "test_offsets.h"
 #include "game.h"
 #include "aim.h"
@@ -22,13 +14,6 @@ static uint32_t position;
 static uint32_t aim;
 static uint32_t bodies;
 
-/*
-** add_aims
-**
-** Looks for the aim of each entity of one span, by its id. Adds one to
-** `found` and the aim to `sum` for each that has one, and answers how many
-** rows the span has.
-*/
 static uint32_t add_aims(uint32_t span, uint32_t cells, uint32_t *found,
     uint32_t *sum)
 {
@@ -49,12 +34,6 @@ static uint32_t add_aims(uint32_t span, uint32_t cells, uint32_t *found,
     return (count);
 }
 
-/*
-** reached
-**
-** Walks the table of positions, and says how many rows it has, how many of
-** them have an aim, and the sum of those aims.
-*/
 BRIDGE_EXPORT(reached) int reached(void)
 {
     uint32_t spans = bridge_count_spans(bodies);
@@ -73,12 +52,6 @@ BRIDGE_EXPORT(reached) int reached(void)
     return (0);
 }
 
-/*
-** populate
-**
-** Spawns the entities: each with a position, and every other one with an
-** aim.
-*/
 static void populate(void)
 {
     position_t p = { 0.0f, 0.0f };
@@ -95,11 +68,6 @@ static void populate(void)
     }
 }
 
-/*
-** init
-**
-** Declares the two components and the system, and spawns the entities.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t two[2] = {

@@ -1,27 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/binding/test_module_log.h -- a line written to the log by a
-** module of the tests.
-**
-** log.md, *The log*
 */
-
 #ifndef TEST_MODULE_LOG_H
     #define TEST_MODULE_LOG_H
 
     #include "test_module_api.h"
 
-/*
-** What a line of the log holds: its text, how long that is, and two
-** numbers.
-**
-** log.md, *The log*
-*/
 typedef struct {
     const char *text;
     uint32_t len;
@@ -29,15 +15,6 @@ typedef struct {
     uint32_t a1;
 } bridge_line_t;
 
-/*
-** test_log
-**
-** Writes a line into the module's ring, if its level is one the module
-** logs. A ring that is full drops the line, and it is counted by the head
-** having moved.
-**
-** log.md, *The log*
-*/
 static inline void test_log(const test_api_t *api, uint32_t level,
     const bridge_line_t *line)
 {

@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/config_scalar.c -- a setting written into a field that is a bool, a
-** float or an integer.
 */
-
 #include <string.h>
 
 #include "config.h"
@@ -25,11 +19,6 @@ static const config_integer_t CONFIG_INTEGERS[SCHEMA_U64 + 1] = {
     [SCHEMA_U64] = { 0, INT64_MAX, 8 }
 };
 
-/*
-** config_seed_bool
-**
-** Writes a bool into a bool: one byte, 1 or 0.
-*/
 int config_seed_bool(config_seed_t *seed, const schema_field_t *field,
     const bridge_setting_t *s)
 {
@@ -39,11 +28,6 @@ int config_seed_bool(config_seed_t *seed, const schema_field_t *field,
     return (0);
 }
 
-/*
-** config_seed_float
-**
-** Writes a float or an integer into a float of 32 or of 64 bits.
-*/
 int config_seed_float(config_seed_t *seed, const schema_field_t *field,
     const bridge_setting_t *s)
 {
@@ -60,13 +44,6 @@ int config_seed_float(config_seed_t *seed, const schema_field_t *field,
     return (0);
 }
 
-/*
-** put_integer
-**
-** Writes an integer into an integer field that holds it: its low bytes, as
-** many as the field is, every target being little-endian. 1 if it does not
-** fit.
-*/
 static int put_integer(uint8_t *at, enum schema_kind kind, int64_t value)
 {
     const config_integer_t *range = &CONFIG_INTEGERS[kind];
@@ -77,13 +54,6 @@ static int put_integer(uint8_t *at, enum schema_kind kind, int64_t value)
     return (0);
 }
 
-/*
-** config_seed_integer
-**
-** Writes an integer into an integer field, if the field holds it.
-**
-** config.md, *A module's own settings are a component*
-*/
 int config_seed_integer(config_seed_t *seed, const schema_field_t *field,
     const bridge_setting_t *s)
 {

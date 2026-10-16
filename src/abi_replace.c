@@ -1,28 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_replace.c -- a declaration of a name there already is a type of:
-** it is that type, or, at a reload of the one module that declares it, the
-** type that takes its place.
-**
-** lifetime.md, *When a component layout changed*
 */
-
 #include <stdlib.h>
 #include <string.h>
 
 #include "abi_declare.h"
 
-/*
-** find_named
-**
-** Answers the type of a name there is, that no reload has made anew, or
-** nullptr.
-*/
 static declared_type_t *find_named(const bridge_t *b, const char *name)
 {
     declared_type_t *c = nullptr;
@@ -36,11 +21,6 @@ static declared_type_t *find_named(const bridge_t *b, const char *name)
     return (c);
 }
 
-/*
-** is_reloaded
-**
-** Answers whether a module is a reload of one that declares a type.
-*/
 static bool is_reloaded(const module_t *m, const declared_type_t *c)
 {
     const module_t *old = m->reloads;
@@ -53,16 +33,6 @@ static bool is_reloaded(const module_t *m, const declared_type_t *c)
     return (i < old->declared_count);
 }
 
-/*
-** replace_changed
-**
-** Refuses a type that has another component layout than it was declared
-** with, unless it is exclusive to the module reloading and no other
-** module's rows hold a value of it. Shared, it is refused, naming who else
-** declares it.
-**
-** lifetime.md, *When a component layout changed*
-*/
 static int replace_changed(declaring_t *g)
 {
     module_t *m = g->m;
@@ -85,16 +55,6 @@ static int replace_changed(declaring_t *g)
     return (c->storage != g->d.storage && abi_check_move(m, c, g->d.storage));
 }
 
-/*
-** replace_moved
-**
-** Refuses a type stated in another storage layout than it was declared in,
-** unless it is exclusive to the module reloading. A module reads a component
-** by code compiled for one storage layout, so every declarer states the
-** same.
-**
-** storage.md, *Storage layouts*
-*/
 static int replace_moved(declaring_t *g)
 {
     module_t *m = g->m;
@@ -109,13 +69,6 @@ static int replace_moved(declaring_t *g)
     return (abi_check_move(m, c, g->d.storage));
 }
 
-/*
-** abi_replace_type
-**
-** Decides what becomes of the type of that name there already is. One that
-** this declaration replaces takes the rows if the reload holds; whatever an
-** earlier reload that failed worked out for it is not this one's.
-*/
 int abi_replace_type(declaring_t *g)
 {
     declared_type_t *c = find_named(g->m->b, g->name);

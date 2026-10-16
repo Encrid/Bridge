@@ -1,24 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/state_game.c -- how this program states and loads a
-** module.
 */
-
 #include <string.h>
 
 #include "cases.h"
 
-/*
-** test_state_guarded
-**
-** States a guarded module of tests/modules, with what it mints between two
-** barriers.
-*/
 void test_state_guarded(bridge_artifact_t *a, const char *identity,
     const char *file)
 {
@@ -33,11 +21,6 @@ void test_state_guarded(bridge_artifact_t *a, const char *identity,
         a->cfg.spawns = 1024;
 }
 
-/*
-** test_load_guarded
-**
-** Loads a guarded module as it is stated.
-*/
 void test_load_guarded(host_t *h, const char *identity, const char *file)
 {
     bridge_artifact_t a;
@@ -46,11 +29,6 @@ void test_load_guarded(host_t *h, const char *identity, const char *file)
     host_load(h, &a);
 }
 
-/*
-** test_load_plain
-**
-** Loads a plain module that mints `spawns` ids between two barriers.
-*/
 void test_load_plain(host_t *h, const char *identity, const char *path,
     int64_t spawns)
 {
@@ -61,11 +39,6 @@ void test_load_plain(host_t *h, const char *identity, const char *path,
     host_load(h, &a);
 }
 
-/*
-** test_state_game_reader
-**
-** States the reader, with its grant.
-*/
 void test_state_game_reader(bridge_artifact_t *a)
 {
     test_state_guarded(a, "view:reader@0.1.0", "reader");
@@ -73,11 +46,6 @@ void test_state_game_reader(bridge_artifact_t *a)
     a->cfg.read_count = 2;
 }
 
-/*
-** test_count_threads
-**
-** Answers how many distinct threads the napping modules said they ran on.
-*/
 uint32_t test_count_threads(const test_counts_t *c)
 {
     uint32_t n = 0;

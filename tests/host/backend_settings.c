@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/backend_settings.c -- a backend's own settings, handed over
-** unread: a backend that says each one it was handed, of each kind.
 */
-
 #include "cases.h"
 
 static const bridge_setting_t TEST_BACKEND_SETTINGS[4] = {
@@ -18,12 +12,6 @@ static const bridge_setting_t TEST_BACKEND_SETTINGS[4] = {
     { .key = "where", .kind = BRIDGE_STRING, .v = { .s = "somewhere" } }
 };
 
-/*
-** test_hand_settings
-**
-** A backend handed a setting of each kind: it says what it read of each,
-** and does not start.
-*/
 void test_hand_settings(host_t *h)
 {
     h->backends[1].library = PLAIN_REFUSING_PATH;

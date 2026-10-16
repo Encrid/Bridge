@@ -1,25 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/backend/tests_define.c -- what answers an entry kept, once what it
-** is declared to take and to answer has been held against the header.
-**
-** signatures.md, *Imports are declared, exports are checked*
 */
-
 #include <stdio.h>
 #include <string.h>
 
 #include "tests_inside.h"
 
-/*
-** What each entry takes and answers, as bridge_abi.h states it, in the
-** order of their names.
-*/
 constexpr enum backend_type I = BACKEND_I32;
 constexpr enum backend_type L = BACKEND_I64;
 
@@ -34,11 +22,6 @@ static const tests_shape_t TESTS_SHAPES[TESTS_ENTRIES] = {
     { { I }, 1, I }
 };
 
-/*
-** is_shaped
-**
-** Answers whether a signature is the one the header states for an entry.
-*/
 static bool is_shaped(const tests_shape_t *shape, const backend_sig_t *sig)
 {
     uint32_t results = shape->result ? 1 : 0;
@@ -53,17 +36,6 @@ static bool is_shaped(const tests_shape_t *shape, const backend_sig_t *sig)
     return (!results || sig->results[0] == shape->result);
 }
 
-/*
-** define_func
-**
-** Keeps what answers an entry of the ABI, and refuses one that is declared
-** with another signature than bridge_abi.h states: every load of a module
-** of the tests then shows that Bridge declares each as stated. One this
-** backend has no place for is kept nowhere: no module of the tests could
-** call it.
-**
-** signatures.md, *Imports are declared, exports are checked*
-*/
 BACKEND_EXPORT int define_func(backend_instance_t *i,
     const backend_entry_t *entry, backend_err_t *err)
 {

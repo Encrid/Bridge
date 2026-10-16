@@ -1,25 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/tflood.c -- spawns past the entity ceiling. Nothing
-** can unwind plain code, so the system runs to its end and the invocation
-** is failed when it returns.
 */
-
 #include "test_module.h"
 #include "idle.h"
 
 constexpr uint32_t SPAWNS = 100'000;
 
-/*
-** flood
-**
-** Spawns more entities than there may be.
-*/
 TEST(flood)
 {
     uint32_t i = 0;
@@ -31,11 +19,6 @@ TEST(flood)
     return (0);
 }
 
-/*
-** init
-**
-** Declares the one system.
-*/
 TEST(init)
 {
     int none = 0;

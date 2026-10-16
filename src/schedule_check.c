@@ -1,24 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/schedule_check.c -- what a schedule refuses: a system before itself,
-** and two that conflict with nothing to order them.
 */
-
 #include <stdio.h>
 
 #include "schedule.h"
 
-/*
-** is_unordered
-**
-** Answers whether two systems of two modules conflict and neither runs
-** before the other.
-*/
 static bool is_unordered(const schedule_phase_t *p, uint32_t i, uint32_t j)
 {
     bool changing;
@@ -30,12 +18,6 @@ static bool is_unordered(const schedule_phase_t *p, uint32_t i, uint32_t j)
     return (schedule_find_conflict(p->in[i], p->in[j], &changing) != nullptr);
 }
 
-/*
-** say_unordered
-**
-** Writes why two systems cannot be scheduled: what they both touch, or both
-** attach or detach, and where.
-*/
 static void say_unordered(schedule_phase_t *p, uint32_t i, uint32_t j)
 {
     bool changing;
@@ -51,12 +33,6 @@ static void say_unordered(schedule_phase_t *p, uint32_t i, uint32_t j)
         shared, place, tail);
 }
 
-/*
-** check_system
-**
-** Refuses system `i` if it runs before itself, or if a later system
-** conflicts with it and nothing orders the two.
-*/
 static int check_system(schedule_phase_t *p, uint32_t i)
 {
     uint32_t j = i + 1;
@@ -74,12 +50,6 @@ static int check_system(schedule_phase_t *p, uint32_t i)
     return (1);
 }
 
-/*
-** schedule_check_phase
-**
-** Refuses a phase that cannot be scheduled, at the first system that says
-** why.
-*/
 int schedule_check_phase(schedule_phase_t *p)
 {
     uint32_t i = 0;

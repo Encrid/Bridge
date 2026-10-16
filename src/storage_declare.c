@@ -1,29 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_declare.c -- a type declared: its number, its slot if it is
-** kept apart from tables, and the block it needs if it has one.
-**
-** storage.md, *Storage layouts*
 */
-
 #include <string.h>
 
 #include "storage_bytes.h"
 #include "storage_reach.h"
 #include "storage_set.h"
 
-/*
-** find_slot
-**
-** Answers a free slot for a type kept in a sparse set or direct-indexed, and
-** 0 for any other. Whoever declares asked first how many are left, so there
-** is one.
-*/
 static uint32_t find_slot(const storage_t *r, enum bridge_storage kept)
 {
     uint32_t slot = 0;
@@ -35,12 +20,6 @@ static uint32_t find_slot(const storage_t *r, enum bridge_storage kept)
     return (slot);
 }
 
-/*
-** take_zeroed
-**
-** Takes `want` bytes of the column region, made zero: the one thing a
-** declare asks of [budget] columns. nullptr if it has no room for them.
-*/
 static uint8_t *take_zeroed(storage_t *r, uint64_t want)
 {
     uint8_t *block = nullptr;
@@ -52,14 +31,6 @@ static uint8_t *take_zeroed(storage_t *r, uint64_t want)
     return (block);
 }
 
-/*
-** take_cells
-**
-** Takes the block a type kept apart needs. Direct-indexed: a cell for every
-** entity there may be, behind the sixteen bytes that say where its bits are,
-** and its bits made none. A singleton: its one value, in a block of its
-** own. false if [budget] columns has no room for it.
-*/
 static bool take_cells(storage_t *r, storage_type_t *type)
 {
     bool direct = type->kept == BRIDGE_DIRECT_INDEXED;
@@ -80,12 +51,6 @@ static bool take_cells(storage_t *r, storage_type_t *type)
     return (true);
 }
 
-/*
-** file_type
-**
-** Counts a declared type where its storage layout is counted: among the
-** sparse sets, the direct-indexed, or the types kept in tables.
-*/
 static void file_type(storage_t *r, storage_type_t *type)
 {
     enum bridge_storage kept = type->kept;
@@ -101,12 +66,6 @@ static void file_type(storage_t *r, storage_type_t *type)
     r->tags += !type->size;
 }
 
-/*
-** storage_declare
-**
-** Declares a type whose rows are `size` bytes, kept in the storage layout
-** `kept`. Its declarer counted, so there is a number for it.
-*/
 storage_type_t *storage_declare(storage_t *r, uint32_t size, uint32_t align,
     enum bridge_storage kept)
 {

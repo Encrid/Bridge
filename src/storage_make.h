@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_make.h -- a table made for a set that has none, and given
-** back when its last row has left.
 */
-
 #ifndef BRIDGE_SRC_STORAGE_MAKE_H
     #define BRIDGE_SRC_STORAGE_MAKE_H
 
@@ -18,12 +12,6 @@
     #include "storage_reach.h"
     #include "storage_table.h"
 
-/*
-** close_table
-**
-** Makes a table no table: not live, with no row, no room, no block and no
-** sparse set. What a barrier keeps of it for its own length stays.
-*/
 static inline void close_table(table_t *tab)
 {
     tab->live = false;
@@ -34,12 +22,6 @@ static inline void close_table(table_t *tab)
     tab->set = 0;
 }
 
-/*
-** take_table_id
-**
-** Answers a table id nobody has: one given back, or the next never used.
-** 0 if there is none.
-*/
 static inline uint32_t take_table_id(storage_t *r)
 {
     uint32_t t = r->table_free;
@@ -54,13 +36,6 @@ static inline uint32_t take_table_id(storage_t *r)
     return (r->table_high - 1);
 }
 
-/*
-** open_table
-**
-** Makes table `t` the live table of a set, with no row and no column yet.
-** Touched or not is kept: an id given back in this barrier is already on the
-** list of what was touched.
-*/
 static inline void open_table(storage_t *r, uint32_t t, uint32_t slot,
     const uint64_t *set)
 {
@@ -78,13 +53,6 @@ static inline void open_table(storage_t *r, uint32_t t, uint32_t slot,
     touch(r, t);
 }
 
-/*
-** make_table
-**
-** Answers the table of a set, made if there is none. There is room for a
-** table for each sparse set beside [budget] tables, so one of those is
-** never refused.
-*/
 static inline uint32_t make_table(storage_t *r, const uint64_t *set)
 {
     uint32_t t = find_table(r, set);
@@ -101,11 +69,6 @@ static inline uint32_t make_table(storage_t *r, const uint64_t *set)
     return (t);
 }
 
-/*
-** free_table
-**
-** Gives back a table whose last row has left.
-*/
 static inline void free_table(storage_t *r, uint32_t t)
 {
     table_t *tab = &r->tables[t];

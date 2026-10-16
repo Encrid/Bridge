@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/stress/stress_by_id.c -- the account nstress
-** keeps, and every entity checked against it by its id.
 */
-
 #include "stress.h"
 #include "reach.h"
 
@@ -18,14 +12,6 @@ uint32_t nstress_values[SLOTS][KINDS];
 uint32_t nstress_wrong;
 static uint32_t passes;
 
-/*
-** check_kinds
-**
-** Checks each component of the entity of `slot`, which `record` says where
-** to find: that its table carries the component exactly when the account
-** says so, and that the value is the account's. Answers `digest` with the
-** values the account has for it.
-*/
 static uint32_t check_kinds(const test_api_t *api,
     const bridge_entity_t *record, uint32_t slot, uint32_t digest)
 {
@@ -48,13 +34,6 @@ static uint32_t check_kinds(const test_api_t *api,
     return (digest);
 }
 
-/*
-** check_slot
-**
-** Checks the entity of `slot`: that its record of the index has the
-** generation of its id, and then each of its components. Answers `digest`
-** with what the account has for it.
-*/
 static uint32_t check_slot(const test_api_t *api,
     const bridge_entity_t *record, uint32_t slot, uint32_t digest)
 {
@@ -76,14 +55,6 @@ static void say_account(const test_api_t *api, uint32_t live,
     test_log(api, BRIDGE_LOG_INFO, &wrong);
 }
 
-/*
-** nstress_check_entities
-**
-** Looks at every entity by its id: where the index says it is, and what
-** column_base says is there. Counts what disagrees with the account, and
-** every twenty-fifth time says how many entities are alive, a digest of the
-** account, and the disagreements so far.
-*/
 void nstress_check_entities(const test_api_t *api)
 {
     const bridge_entity_t *index = get_entity_index(api);

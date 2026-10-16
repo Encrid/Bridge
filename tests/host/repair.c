@@ -1,25 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/repair.c -- a stopped deck, and the one call it
-** accepts: the one that brings back the module that stopped it.
-**
-** failure.md, *When something fails*
 */
-
 #include "cases.h"
 
-/*
-** test_repair
-**
-** An essential module stopped at its budget stops the deck; another
-** module is refused; reloading the first into one that works is the one
-** thing a stopped deck accepts, and it runs again.
-*/
 void test_repair(host_t *h)
 {
     bridge_artifact_t a;
@@ -39,12 +24,6 @@ void test_repair(host_t *h)
     host_close(h);
 }
 
-/*
-** test_repair_by_load
-**
-** The same when what stopped it was a load: loading that module again, from
-** an artifact that works, lifts it.
-*/
 void test_repair_by_load(host_t *h)
 {
     bridge_artifact_t a;
@@ -63,11 +42,6 @@ void test_repair_by_load(host_t *h)
     host_close(h);
 }
 
-/*
-** test_allow_not_reloadable
-**
-** The deployment allows what the author says cannot be done.
-*/
 void test_allow_not_reloadable(host_t *h)
 {
     bridge_artifact_t a;
@@ -80,11 +54,6 @@ void test_allow_not_reloadable(host_t *h)
     host_close(h);
 }
 
-/*
-** test_leave_reload_out
-**
-** One of the three lifecycle exports is missing.
-*/
 void test_leave_reload_out(host_t *h)
 {
     if (host_open(h))

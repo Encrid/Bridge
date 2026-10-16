@@ -1,17 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/twostep.c -- two systems of one module that conflict
-** in one phase: the order they were registered in is the order they run in.
-** Doubling then adding gives 3 from 1; the other way gives 4.
-**
-** schedule.md, *Order within a phase is never implicit*
 */
-
 #include "test_offsets.h"
 #include "game.h"
 #include "offsets_idle.h"
@@ -32,11 +23,6 @@ static uint32_t get_first_row(uint32_t query)
     return (BRIDGE_ROW(position_t, bridge_get_base(span, 0), 0, count));
 }
 
-/*
-** twice
-**
-** Doubles the x of the first position.
-*/
 BRIDGE_EXPORT(twice) int twice(void)
 {
     uint32_t at = get_first_row(doubling);
@@ -45,11 +31,6 @@ BRIDGE_EXPORT(twice) int twice(void)
     return (0);
 }
 
-/*
-** more
-**
-** Adds one to the x of the first position.
-*/
 BRIDGE_EXPORT(more) int more(void)
 {
     uint32_t at = get_first_row(adding);
@@ -68,11 +49,6 @@ BRIDGE_EXPORT(again) int again(void)
 }
 #endif
 
-/*
-** show
-**
-** Says the x of the first position.
-*/
 BRIDGE_EXPORT(show) int show(void)
 {
     uint32_t at = get_first_row(showing);
@@ -82,12 +58,6 @@ BRIDGE_EXPORT(show) int show(void)
     return (0);
 }
 
-/*
-** init
-**
-** Declares the position and the three systems, the doubling before the
-** adding, and spawns one entity at 1.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};

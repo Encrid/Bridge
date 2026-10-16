@@ -1,22 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/schedule_matrix.c -- who runs before whom, as a row of bits a system.
 */
-
 #include <stdlib.h>
 
 #include "schedule.h"
 
-/*
-** schedule_init_matrix
-**
-** Makes an empty matrix for `n` systems. false if there was not the memory.
-*/
 bool schedule_init_matrix(schedule_matrix_t *m, uint32_t n)
 {
     m->n = n;
@@ -25,11 +15,6 @@ bool schedule_init_matrix(schedule_matrix_t *m, uint32_t n)
     return (m->bits != nullptr);
 }
 
-/*
-** schedule_reaches
-**
-** Answers whether `i` runs before `j`.
-*/
 bool schedule_reaches(const schedule_matrix_t *m, uint32_t i, uint32_t j)
 {
     uint64_t word = m->bits[(size_t)i * m->words + j / 64];
@@ -37,21 +22,11 @@ bool schedule_reaches(const schedule_matrix_t *m, uint32_t i, uint32_t j)
     return (word >> (j % 64) & 1);
 }
 
-/*
-** schedule_add_edge
-**
-** States that `i` runs before `j`.
-*/
 void schedule_add_edge(schedule_matrix_t *m, uint32_t i, uint32_t j)
 {
     m->bits[(size_t)i * m->words + j / 64] |= (uint64_t)1 << (j % 64);
 }
 
-/*
-** join_through
-**
-** Makes every system that reaches `k` reach all that `k` does.
-*/
 static void join_through(schedule_matrix_t *m, uint32_t k)
 {
     const uint64_t *via = &m->bits[(size_t)k * m->words];
@@ -70,12 +45,6 @@ static void join_through(schedule_matrix_t *m, uint32_t k)
     }
 }
 
-/*
-** schedule_close_matrix
-**
-** Makes whatever reaches a system reach all that it does: Warshall's
-** closure, a system at a time.
-*/
 void schedule_close_matrix(schedule_matrix_t *m)
 {
     uint32_t k = 0;

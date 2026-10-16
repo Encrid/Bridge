@@ -1,23 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/badobs.c -- names an observer init, which is an
-** export that already means something.
 */
-
 #include "test_offsets.h"
 #include "game.h"
 #include "offsets_idle.h"
 
-/*
-** init
-**
-** Declares the position, and an observer of it under the name init.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};

@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_strip.h -- a table that stops carrying a type, where it
-** stands.
 */
-
 #ifndef BRIDGE_SRC_STORAGE_STRIP_H
     #define BRIDGE_SRC_STORAGE_STRIP_H
 
@@ -21,13 +15,6 @@
     #include "storage_table.h"
     #include "storage_walk.h"
 
-/*
-** close_bits
-**
-** Moves the bits of a toggled column down to where the shorter layout puts
-** them, before its values, since both move down; and writes ahead of the
-** column where they are now.
-*/
 static inline void close_bits(storage_t *r, uint32_t t, uint32_t id)
 {
     const table_t *tab = &r->tables[t];
@@ -40,12 +27,6 @@ static inline void close_bits(storage_t *r, uint32_t t, uint32_t id)
     memcpy(shared + to - COLUMN, &bits, 4);
 }
 
-/*
-** close_column
-**
-** Moves one column down to where the shorter layout puts it, which
-** lay_out has just said.
-*/
 static inline void close_column(storage_t *r, uint32_t t, uint32_t id)
 {
     const table_t *tab = &r->tables[t];
@@ -60,14 +41,6 @@ static inline void close_column(storage_t *r, uint32_t t, uint32_t id)
     columns[id] = to;
 }
 
-/*
-** shorten_block
-**
-** Lays out what is left of a table, closes up the columns after the one that
-** went, the first first, and gives back what the block no longer needs. It
-** is the same block, shorter: what a smaller size is answered with is where
-** it already is.
-*/
 static inline void shorten_block(storage_t *r, uint32_t t, uint32_t gone)
 {
     table_t *tab = &r->tables[t];
@@ -88,12 +61,6 @@ static inline void shorten_block(storage_t *r, uint32_t t, uint32_t gone)
     tab->block_len = (uint32_t)len;
 }
 
-/*
-** strip_table
-**
-** Makes a table stop carrying a type, where it stands. The columns before
-** the one that went are where they were.
-*/
 static inline void strip_table(storage_t *r, uint32_t t,
     const storage_type_t *type, bool name)
 {

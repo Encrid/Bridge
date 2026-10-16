@@ -1,25 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** utils/os/posix/event.c -- an event on Linux and macOS: a flag, the mutex
-** that guards it and the condition a wait sleeps on.
 */
-
 #include <errno.h>
 #include <stdlib.h>
 #include <time.h>
 
 #include "os_types.h"
 
-/*
-** os_event_create
-**
-** Makes an event, not set. nullptr if there is no memory for it.
-*/
 os_event_t *os_event_create(void)
 {
     os_event_t *e = malloc(sizeof(*e));
@@ -32,11 +21,6 @@ os_event_t *os_event_create(void)
     return (e);
 }
 
-/*
-** os_event_free
-**
-** Frees an event nobody waits for. A null `e` is nothing to free.
-*/
 void os_event_free(os_event_t *e)
 {
     if (!e)
@@ -46,11 +30,6 @@ void os_event_free(os_event_t *e)
     free(e);
 }
 
-/*
-** os_event_set
-**
-** Sets an event: one wait, now or later, returns for it.
-*/
 void os_event_set(os_event_t *e)
 {
     pthread_mutex_lock(&e->lock);
@@ -59,12 +38,6 @@ void os_event_set(os_event_t *e)
     pthread_mutex_unlock(&e->lock);
 }
 
-/*
-** get_deadline
-**
-** Answers when a wait of `nanos` from now ends, by the clock a condition
-** counts in.
-*/
 static struct timespec get_deadline(uint64_t nanos)
 {
     struct timespec until;
@@ -79,13 +52,6 @@ static struct timespec get_deadline(uint64_t nanos)
     return (until);
 }
 
-/*
-** os_event_wait
-**
-** Waits for an event for at most `nanos`, or until it is set if that is
-** OS_FOREVER. A wait that wakes with the event not set waits again. 1 if it
-** was set, and it no longer is; 0 if the time ran out.
-*/
 int os_event_wait(os_event_t *e, uint64_t nanos)
 {
     struct timespec until = {};

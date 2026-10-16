@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/main.c -- host <case>: the cases of the host program, by name.
-** A case is named for what is exposed and what it shows of it, as
-** docs/tests.md lists it.
 */
-
 #include <string.h>
 
 #include "cases.h"
@@ -646,11 +639,6 @@ static const host_case_t TEST_CASES[] = {
         test_order_changes_loaded_last, "", test_set_counting }
 };
 
-/*
-** A module's settings of every kind, as a deployment would hand them over:
-** a bitmask by its bits, an integer into a float field, and one of more
-** than 32 bits.
-*/
 static const bridge_setting_t TEST_SETTINGS[10] = {
     { .key = "vsync", .kind = BRIDGE_BOOL, .v = { .b = true } },
     { .key = "width", .kind = BRIDGE_INT, .v = { .i = 1280 } },
@@ -665,12 +653,6 @@ static const bridge_setting_t TEST_SETTINGS[10] = {
     { .key = "big", .kind = BRIDGE_INT, .v = { .i = 8'589'934'592ll } }
 };
 
-/*
-** fill_kept
-**
-** Fills what the fixtures keep: counts of no run yet, and those settings,
-** which a case changes before it loads.
-*/
 static void fill_kept(test_kept_t *kept)
 {
     *kept = (test_kept_t){ };
@@ -680,11 +662,6 @@ static void fill_kept(test_kept_t *kept)
     memcpy(kept->noted.settings, TEST_SETTINGS, sizeof(TEST_SETTINGS));
 }
 
-/*
-** main
-**
-** Runs the case the command line names, on the host its fixture sets.
-*/
 int main(int argc, char **argv)
 {
     constexpr size_t count = sizeof(TEST_CASES) / sizeof(*TEST_CASES);

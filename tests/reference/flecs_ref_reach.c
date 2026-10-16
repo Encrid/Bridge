@@ -1,25 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/reference/flecs_ref_reach.c -- a value reached by an id that is
-** held: kept in a table, and sparse.
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "flecs_ref.h"
 
-/*
-** time_reach
-**
-** Answers the nanoseconds it takes to reach the value of each of ROWS ids,
-** and adds what was read to `total`.
-*/
 static uint64_t time_reach(const flecs_ref_t *r, const ecs_entity_t *ids,
     uint32_t *total)
 {
@@ -40,12 +28,6 @@ static uint64_t time_reach(const flecs_ref_t *r, const ecs_entity_t *ids,
     return (t);
 }
 
-/*
-** time_rounds
-**
-** Reaches the values by the ids in the order they lie, and then in no
-** order, four times ROUNDS, and keeps the least time of each.
-*/
 static void time_rounds(const flecs_ref_t *r, const ecs_entity_t *mixed,
     uint64_t *best, uint32_t *total)
 {
@@ -63,13 +45,6 @@ static void time_rounds(const flecs_ref_t *r, const ecs_entity_t *mixed,
     }
 }
 
-/*
-** open_reach
-**
-** Makes ROWS entities with a value each, sparse and not fragmenting if that
-** is asked. Answers their ids drawn in no order, in an array the caller
-** frees.
-*/
 static ecs_entity_t *open_reach(flecs_ref_t *r, uint32_t *state, bool sparse)
 {
     ecs_entity_t *mixed;
@@ -91,11 +66,6 @@ static ecs_entity_t *open_reach(flecs_ref_t *r, uint32_t *state, bool sparse)
     return (mixed);
 }
 
-/*
-** flecs_ref_measure_reach
-**
-** Times ROWS values reached by id, in the order they lie and in none.
-*/
 void flecs_ref_measure_reach(uint32_t *state, bool sparse)
 {
     flecs_ref_t r = { .w = ecs_mini(), .count = ROWS };

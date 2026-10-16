@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/rows.c -- a column long enough to time: the loop of
-** mover.c, over 200,000 rows.
 */
-
 #include "test_offsets.h"
 #include "game.h"
 #include "offsets_idle.h"
@@ -18,11 +12,6 @@ constexpr uint32_t ENTITIES = 200'000;
 static uint32_t position;
 static uint32_t moving;
 
-/*
-** move_span
-**
-** Adds one to the x of every position of one span.
-*/
 static void move_span(uint32_t span)
 {
     uint32_t count = bridge_count_rows(span);
@@ -37,11 +26,6 @@ static void move_span(uint32_t span)
     }
 }
 
-/*
-** move
-**
-** Adds one to the x of every position.
-*/
 BRIDGE_EXPORT(move) int move(void)
 {
     uint32_t spans = bridge_count_spans(moving);
@@ -54,13 +38,6 @@ BRIDGE_EXPORT(move) int move(void)
     return (0);
 }
 
-/*
-** init
-**
-** Declares the position and the system, and spawns the entities. Each
-** position is attached zeroed: a value each would need a scratch arena of
-** their sum.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};

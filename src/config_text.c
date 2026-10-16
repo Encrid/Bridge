@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/config_text.c -- a setting written into a field that holds text, and
-** the fields a setting cannot fill.
 */
-
 #include <string.h>
 
 #include "config.h"
@@ -20,12 +14,6 @@ static uint32_t get_text_len(const bridge_setting_t *s)
     return ((uint32_t)strlen(s->v.s));
 }
 
-/*
-** put_text
-**
-** Copies the bytes of a text setting into this module's block of the arena.
-** Answers where they are.
-*/
 static uint32_t put_text(config_seed_t *seed, const char *text, uint32_t len)
 {
     uint32_t at = seed->m->text_at + seed->text_used;
@@ -35,14 +23,6 @@ static uint32_t put_text(config_seed_t *seed, const char *text, uint32_t len)
     return (at);
 }
 
-/*
-** config_seed_text
-**
-** Writes a text into a bridge_text_t: where its bytes are in the persistent
-** arena, and how many.
-**
-** strings.md, *Which of the three a string belongs in*
-*/
 int config_seed_text(config_seed_t *seed, const schema_field_t *field,
     const bridge_setting_t *s)
 {
@@ -57,11 +37,6 @@ int config_seed_text(config_seed_t *seed, const schema_field_t *field,
     return (0);
 }
 
-/*
-** config_seed_struct
-**
-** Refuses a setting for a field that is a struct: no setting fills one.
-*/
 int config_seed_struct(config_seed_t *seed,
     [[maybe_unused]] const schema_field_t *field, const bridge_setting_t *s)
 {
@@ -69,13 +44,6 @@ int config_seed_struct(config_seed_t *seed,
         "bridge_text_t fills"));
 }
 
-/*
-** config_seed_array
-**
-** Writes a text into a char array: the bytes, inline, and a zero after them.
-**
-** config.md, *A module's own settings are a component*
-*/
 int config_seed_array(config_seed_t *seed, const schema_field_t *field,
     const bridge_setting_t *s)
 {

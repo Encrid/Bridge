@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_relay_fields.c -- the fields of a struct as it was, matched by
-** name to those of what it becomes.
 */
-
 #include <stdio.h>
 #include <string.h>
 
@@ -27,13 +21,6 @@ static const schema_field_t *find_field(const schema_t *s, const char *name)
     return (found);
 }
 
-/*
-** is_same_type
-**
-** Answers whether a field is of the type it was: the same kind; and where
-** it names a declared type, that one, or what this reload has made of it;
-** and, but for a struct, of the same size.
-*/
 static bool is_same_type(const schema_field_t *old, const schema_field_t *new)
 {
     const declared_type_t *held = old->type;
@@ -48,12 +35,6 @@ static bool is_same_type(const schema_field_t *old, const schema_field_t *new)
     return (holds->size == held->size || old->kind == SCHEMA_STRUCT);
 }
 
-/*
-** relay_structs
-**
-** Matches a field that is a struct this reload changed, element by element:
-** the same rules, one level down.
-*/
 static int relay_structs(relaying_t *l, const relay_at_t *at,
     const schema_field_t *old, const schema_field_t *new)
 {
@@ -73,14 +54,6 @@ static int relay_structs(relaying_t *l, const relay_at_t *at,
     return (0);
 }
 
-/*
-** relay_field
-**
-** Matches one field of a struct as it was. `at` names the field, by its
-** path. One that is gone, or an array that got shorter, is a loss.
-**
-** lifetime.md, *When a component layout changed*
-*/
 static int relay_field(relaying_t *l, const relay_at_t *at,
     const schema_field_t *old)
 {
@@ -103,11 +76,6 @@ static int relay_field(relaying_t *l, const relay_at_t *at,
     return (0);
 }
 
-/*
-** abi_relay_fields
-**
-** Matches the fields of a struct as it was to those of what it becomes.
-*/
 int abi_relay_fields(relaying_t *l, const relay_at_t *at)
 {
     relay_at_t field = *at;

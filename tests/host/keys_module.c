@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/keys_module.c -- a key of a module's config stated as what is
-** refused: each a row, the key and the value it is given.
 */
-
 #include "cases.h"
 
 static const test_edit_t TEST_MODULE_EDITS[] = {
@@ -36,12 +30,6 @@ static const test_edit_t TEST_MODULE_EDITS[] = {
     { "loss_count=2", offsetof(test_keys_t, loss_count), 8, 2 }
 };
 
-/*
-** test_edit_module
-**
-** A module with one key of its config stated as the case's row says: its
-** load is refused.
-*/
 void test_edit_module(host_t *h)
 {
     const test_edit_t *e = test_find_edit(TEST_MODULE_EDITS, h->arg);
@@ -56,11 +44,6 @@ void test_edit_module(host_t *h)
     host_close(h);
 }
 
-/*
-** test_load_twice
-**
-** A module loaded, and loaded again under the same identity.
-*/
 void test_load_twice(host_t *h)
 {
     if (host_open(h))
@@ -70,12 +53,6 @@ void test_load_twice(host_t *h)
     host_close(h);
 }
 
-/*
-** test_spawn_past_entities
-**
-** Two modules that each state 3,000 ids between two barriers, under a
-** deployment of 4,096 entities: the second does not fit.
-*/
 void test_spawn_past_entities(host_t *h)
 {
     char identity[64];
@@ -92,11 +69,6 @@ void test_spawn_past_entities(host_t *h)
     host_close(h);
 }
 
-/*
-** test_edit_phase_names
-**
-** A module whose config names a phase with no name, or maps one twice.
-*/
 void test_edit_phase_names(host_t *h)
 {
     bridge_phase_name_t names[2] = { { "tick", "update" },
@@ -114,11 +86,6 @@ void test_edit_phase_names(host_t *h)
     host_close(h);
 }
 
-/*
-** test_order_nobody
-**
-** A pair of the deployment's order with no system before, or none after.
-*/
 void test_order_nobody(host_t *h)
 {
     bridge_order_t pair = { "game:mover:move", "view:halver:halve" };

@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/hit/start.c -- a component kept in a sparse set, on
-** the guarded backend: what the hit module declares, and what it spawns.
-**
-** storage.md, *A sparse set*
 */
-
 #include "test_offsets.h"
 #include "game.h"
 #include "hit.h"
@@ -23,12 +15,6 @@ uint32_t hit;
 uint32_t hits;
 uint32_t bodies;
 
-/*
-** populate
-**
-** Spawns the entities: each with a position, and every third one with a
-** hit.
-*/
 static void populate(void)
 {
     position_t p = { 0.0f, 0.0f };
@@ -45,12 +31,6 @@ static void populate(void)
     }
 }
 
-/*
-** init
-**
-** Declares the two components, a system over the set and a system over the
-** table with the set as an optional term, and spawns the entities.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t one[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};

@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/vec2.h -- a struct that is a field's type in the
-** components of other modules: typer.c declares it, user.c and nested.c
-** have a field of it.
 */
-
 #ifndef TEST_VEC2_H
     #define TEST_VEC2_H
 

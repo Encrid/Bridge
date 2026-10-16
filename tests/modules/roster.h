@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/roster.h -- what the keeper and the counter share: a
-** position, something private, and a list of ids to ask after.
 */
-
 #ifndef TEST_ROSTER_H
     #define TEST_ROSTER_H
 

@@ -1,22 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/schema/main.c -- schema: every descriptor there is a row for, read.
 */
-
 #include <stdio.h>
 
 #include "schema_test.h"
 
-/*
-** main
-**
-** Reads every descriptor and says whether each read as it should.
-*/
 int main(void)
 {
     int failed = schema_run_structs();

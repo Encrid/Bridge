@@ -1,23 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/move/move_change.c -- the systems of nmove that
-** change who carries X: the spawn, the two detaches, and the toggle.
 */
-
 #include "move.h"
 
-/*
-** spawn
-**
-** Spawns six entities with A, and gives X to every second one: 100, 102,
-** 104. A singleton has one value and no entity, so that build gives it
-** once, with the id 0: 104.
-*/
 TEST(spawn)
 {
     a_t first = {};
@@ -38,12 +25,6 @@ TEST(spawn)
     return (0);
 }
 
-/*
-** detach_b
-**
-** Takes X from two of the three that carry it, so that one entity does. It
-** does nothing to a singleton.
-*/
 TEST(detach_b)
 {
     if (KEPT == 5)
@@ -53,12 +34,6 @@ TEST(detach_b)
     return (0);
 }
 
-/*
-** detach_b_half
-**
-** Takes X from all three that carry it, so that none does. It does nothing
-** to a singleton.
-*/
 TEST(detach_b_half)
 {
     uint32_t i = 0;
@@ -85,12 +60,6 @@ static void turn_off(const test_api_t *api, const uint32_t *span)
     }
 }
 
-/*
-** flicker
-**
-** Turns off the row whose value is 102, where X is kept as a toggle. It
-** does nothing in any other build.
-*/
 TEST(flicker)
 {
     const bridge_query_t *q;

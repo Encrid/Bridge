@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/schema/schema_structs.c -- the structs a descriptor is read as,
-** each beside what this compiler lays it out as. The last is the first
-** again, with no spaces at all.
 */
-
 #include "schema_test.h"
 
 static const want_field_t SCHEMA_VEC2[] = {
@@ -67,11 +60,6 @@ static const want_struct_t SCHEMA_STRUCTS[] = {
     { "{float x;float y;}", sizeof(vec2_t), alignof(vec2_t), SCHEMA_VEC2, 2 }
 };
 
-/*
-** schema_run_structs
-**
-** Checks every struct there is a row for.
-*/
 int schema_run_structs(void)
 {
     constexpr size_t count = sizeof(SCHEMA_STRUCTS) / sizeof(*SCHEMA_STRUCTS);

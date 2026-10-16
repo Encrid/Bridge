@@ -1,13 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/shield.h -- the component of shield.c.
 */
-
 #ifndef TEST_SHIELD_H
     #define TEST_SHIELD_H
 

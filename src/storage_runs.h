@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_runs.h -- the queues, taken a run at a time in the order the
-** calls that filled them ran, and the values they carry written.
-**
-** threads.md, *Threads*
 */
-
 #ifndef BRIDGE_SRC_STORAGE_RUNS_H
     #define BRIDGE_SRC_STORAGE_RUNS_H
 
@@ -27,14 +19,6 @@ static inline void reset_marks(bridge_t *b)
     }
 }
 
-/*
-** find_next_run
-**
-** Answers the module whose next run comes first, or nullptr when every
-** queue has been taken whole. The queues are applied in the order the calls
-** that filled them ran, and not a module at a time; a module's own queue is
-** in that order already, so this is the earliest of what each has next.
-*/
 static inline module_t *find_next_run(bridge_t *b)
 {
     module_t *first = nullptr;
@@ -49,13 +33,6 @@ static inline module_t *find_next_run(bridge_t *b)
     return (first);
 }
 
-/*
-** take_next_run
-**
-** Takes the next run of changes: one module's, of one turn. Answers the
-** module and writes where in its queue the run begins and ends, or nullptr
-** when there is none left.
-*/
 static inline module_t *take_next_run(bridge_t *b, uint32_t *from,
     uint32_t *to)
 {
@@ -71,13 +48,6 @@ static inline module_t *take_next_run(bridge_t *b, uint32_t *from,
     return (first);
 }
 
-/*
-** is_written
-**
-** Answers whether a change is an attach whose value is to be written: of an
-** entity this barrier changed and neither destroyed nor left as it was, and
-** that is the entity the change named.
-*/
 [[gnu::always_inline]] static inline bool is_written(const storage_t *r,
     const change_t *ch)
 {
@@ -91,15 +61,6 @@ static inline module_t *take_next_run(bridge_t *b, uint32_t *from,
     return (r->places[index].generation == (uint32_t)(ch->id >> 32));
 }
 
-/*
-** write_value
-**
-** Writes the value one change carries, and counts for its module a change
-** of an entity that was left as it was: a change that was not applied is
-** told to who asked it.
-**
-** budgets.md, *What running out does*
-*/
 [[gnu::always_inline]] static inline void write_value(storage_t *r,
     module_t *m, const change_t *ch, const uint8_t *value)
 {

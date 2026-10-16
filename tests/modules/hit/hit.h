@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/hit/hit.h -- what the sources of the hit module
-** share: its component, and what init was answered.
 */
-
 #ifndef TEST_HIT_H
     #define TEST_HIT_H
 

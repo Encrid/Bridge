@@ -1,25 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/sparse/sparse_heard.c -- what the observers of
-** nsparse hear, said in the log. A build for a measurement has none.
 */
-
 #include "sparse.h"
 
 #if !defined(BIG) && !defined(FAT)
 uint32_t nsparse_on_s;
 uint32_t nsparse_on_both;
 
-/*
-** say_heard
-**
-** Says each thing an observer heard: the entity, and the events.
-*/
 static void say_heard(const test_api_t *api, uint32_t observer,
     const char *text)
 {
@@ -34,22 +23,12 @@ static void say_heard(const test_api_t *api, uint32_t observer,
     }
 }
 
-/*
-** heard_s
-**
-** Says what the observer of S heard.
-*/
 TEST(heard_s)
 {
     say_heard(api, nsparse_on_s, "heard of S: entity, events");
     return (0);
 }
 
-/*
-** heard_both
-**
-** Says what the observer of A and S heard.
-*/
 TEST(heard_both)
 {
     say_heard(api, nsparse_on_both, "heard of A and S: entity, events");

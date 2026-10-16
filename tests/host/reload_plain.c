@@ -1,27 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/reload_plain.c -- a plain module reloaded: the old
-** instance is shut down before the new library is opened, so a reload that
-** fails leaves no code to keep.
-**
-** failure.md, *When something fails*
 */
-
 #include <string.h>
 
 #include "cases.h"
 
-/*
-** state_ticker
-**
-** States a plain build of the ticker that may be reloaded, and is
-** essential in the case named for that.
-*/
 static void state_ticker(const host_t *h, bridge_artifact_t *a,
     const char *identity, const char *path)
 {
@@ -42,13 +27,6 @@ static void reload_to(host_t *h, const char *identity, const char *path)
     test_say_modules(h);
 }
 
-/*
-** end_failed
-**
-** What follows a reload that failed. In one case the verb that discards: a
-** module with no code left can still be unloaded. In the others its rows
-** were kept: an artifact that works picks up where the count was.
-*/
 static void end_failed(host_t *h)
 {
     if (strcmp(h->arg, "nreloadfailunload")) {
@@ -59,12 +37,6 @@ static void end_failed(host_t *h)
     test_say_modules(h);
 }
 
-/*
-** test_reload_plain
-**
-** Loads the plain ticker beside a guarded module and reloads it: into a
-** library that works, or into one whose reload fails.
-*/
 void test_reload_plain(host_t *h)
 {
     bool works = !strcmp(h->arg, "nreload");

@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/layout/layout_spawn.c -- the system of nlayout
-** that gives X its values. The build whose V is 0 is the one a test loads
-** first, so it alone spawns: every other build finds the values there.
 */
-
 #include "layout.h"
 
 #if V == 0
@@ -29,13 +22,6 @@ static void set_value(x_t *value, uint32_t i)
     }
 }
 
-/*
-** spawn
-**
-** Spawns three entities with X: a 1000 and up, b 20 and up, arr 1 2 3 4
-** and up, at 5 6 and up, ON. A singleton has one value and no entity, so
-** that build gives the first of them once, with the id 0.
-*/
 TEST(spawn)
 {
     x_t value = {};
@@ -54,11 +40,6 @@ TEST(spawn)
 
 #else
 
-/*
-** spawn
-**
-** Does nothing.
-*/
 TEST(spawn)
 {
     return (0);

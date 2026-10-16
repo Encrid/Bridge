@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/platform.h -- what a test module asks the
-** operating system and is spelled differently on Windows: a sleep, the
-** thread it is on, and the time.
 */
-
 #ifndef TEST_PLATFORM_H
     #define TEST_PLATFORM_H
 
@@ -24,11 +17,6 @@
         #include <unistd.h>
     #endif
 
-/*
-** sleep_tenth
-**
-** Sleeps a tenth of a second, or more: a sleep is a least time.
-*/
 static inline void sleep_tenth(void)
 {
     #ifdef _WIN32
@@ -38,12 +26,6 @@ static inline void sleep_tenth(void)
     #endif
 }
 
-/*
-** get_thread_id
-**
-** Answers a number that is the calling thread's and no other running
-** thread's.
-*/
 static inline uint32_t get_thread_id(void)
 {
     #ifdef _WIN32
@@ -55,11 +37,6 @@ static inline uint32_t get_thread_id(void)
 
     #ifdef _WIN32
 
-/*
-** get_now_ms
-**
-** Answers a time in milliseconds, from a clock that does not go back.
-*/
 static inline uint32_t get_now_ms(void)
 {
     return ((uint32_t)GetTickCount64());
@@ -67,11 +44,6 @@ static inline uint32_t get_now_ms(void)
 
     #else
 
-/*
-** get_now_ms
-**
-** Answers a time in milliseconds, from a clock that does not go back.
-*/
 static inline uint32_t get_now_ms(void)
 {
     struct timespec t;

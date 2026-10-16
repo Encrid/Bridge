@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/shutdown.c -- a module's last call, and the record a
-** module takes of the budget while it is loaded.
-**
-** lifecycle.md, *The runtime lifecycle*
 */
-
 #include "cases.h"
 
 static void load_hang(host_t *h)
@@ -23,11 +15,6 @@ static void load_hang(host_t *h)
     host_load(h, &a);
 }
 
-/*
-** test_destroy_loaded
-**
-** A deck destroyed with modules loaded shuts each of them down first.
-*/
 void test_destroy_loaded(host_t *h)
 {
     if (host_open(h))
@@ -38,11 +25,6 @@ void test_destroy_loaded(host_t *h)
     host_close(h);
 }
 
-/*
-** test_time_out_shutdown
-**
-** A shutdown that never returns.
-*/
 void test_time_out_shutdown(host_t *h)
 {
     if (host_open(h))
@@ -53,11 +35,6 @@ void test_time_out_shutdown(host_t *h)
     host_close(h);
 }
 
-/*
-** test_take_slot
-**
-** Room for one module: a record is taken at load and given back at unload.
-*/
 void test_take_slot(host_t *h)
 {
     h->cfg.budget.modules = 1;
@@ -71,11 +48,6 @@ void test_take_slot(host_t *h)
     host_close(h);
 }
 
-/*
-** test_state_plain_timeout
-**
-** A timeout is a deadline, which the plain backend lacks.
-*/
 void test_state_plain_timeout(host_t *h)
 {
     bridge_artifact_t a;

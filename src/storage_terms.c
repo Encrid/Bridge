@@ -1,25 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_terms.c -- a system's terms, and an observer's, handed over
-** at load and forgotten at unload.
 */
-
 #include <string.h>
 
 #include "storage_table.h"
 
-/*
-** take_terms
-**
-** Takes one of the [budget] systems there are for a system's terms or an
-** observer's, with its own part of every list. Whoever registers counted,
-** so there is one.
-*/
 static storage_terms_t *take_terms(storage_t *r, const storage_term_t *terms,
     uint32_t count)
 {
@@ -44,12 +31,6 @@ static storage_terms_t *take_terms(storage_t *r, const storage_term_t *terms,
     return (t);
 }
 
-/*
-** storage_add_system
-**
-** Hands over a system's terms, and lists every table there is that it
-** reads.
-*/
 storage_terms_t *storage_add_system(storage_t *r, const storage_term_t *terms,
     uint32_t count)
 {
@@ -70,11 +51,6 @@ storage_terms_t *storage_add_system(storage_t *r, const storage_term_t *terms,
     return (s);
 }
 
-/*
-** storage_add_observer
-**
-** Hands over an observer's terms, and who is told what it is owed.
-*/
 storage_terms_t *storage_add_observer(storage_t *r,
     const storage_term_t *terms, uint32_t count,
     const storage_listener_t *listener)
@@ -89,13 +65,6 @@ storage_terms_t *storage_add_observer(storage_t *r,
     return (o);
 }
 
-/*
-** storage_forget
-**
-** Forgets a system's terms, or an observer's. A system's place is taken by
-** the last; an observer's by the ones after it, in order, since the order
-** observers are told in is the order they came.
-*/
 void storage_forget(storage_t *r, storage_terms_t *terms)
 {
     storage_terms_t **observers = r->observers;

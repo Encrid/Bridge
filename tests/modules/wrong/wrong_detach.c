@@ -1,31 +1,15 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/wrong/wrong_detach.c -- the wrong module: a detach
-** an entry refuses, and a tag attached with a value.
 */
-
 #include "wrong.h"
 
-/*
-** wrong_detach_undeclared
-**
-** Detaches a slot the module never declared.
-*/
 void wrong_detach_undeclared(void)
 {
     bridge_detach(1, WRONG_NO_SLOT);
 }
 
-/*
-** wrong_attach_tag_value
-**
-** Attaches the tag with a value, which a tag has not.
-*/
 void wrong_attach_tag_value(void)
 {
     uint32_t value = 1;

@@ -1,22 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/reference/floor.c -- what reaching a value by entity id costs with
-** nothing in the way: a C array with a cell for every entity, the id's
-** generation tested and a bit that says the entity has a value. No ECS
-** ships a direct-indexed storage layout to measure ours beside, so this is
-** the least it could cost.
-**
-** Built and run by tools/reference.py. Not part of the library, and not
-** built by build.py.
-**
-** stage11.md, *Beside the best there is*
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,15 +13,6 @@
 constexpr uint32_t ROWS = 204'800;
 constexpr uint32_t ROUNDS = 32;
 
-/*
-** sum_reached
-**
-** Answers the sum of the values ROWS ids reach: an id whose generation is
-** not its entity's reaches nothing, and neither does an entity with no
-** value. It is not inlined, so that what is timed is this loop alone, and
-** the arrays are taken out of `f` before it, so that it reads nothing of
-** `f` at a row.
-*/
 [[gnu::noinline]]
 static uint32_t sum_reached(const floor_t *f, const uint64_t *ids)
 {
@@ -56,12 +33,6 @@ static uint32_t sum_reached(const floor_t *f, const uint64_t *ids)
     return (total);
 }
 
-/*
-** time_reached
-**
-** Answers the nanoseconds it takes to reach the values of ROWS ids. The sum
-** is written where the compiler cannot drop it.
-*/
 static uint64_t time_reached(const floor_t *f, const uint64_t *ids)
 {
     [[maybe_unused]] volatile uint32_t sink = 0;
@@ -71,12 +42,6 @@ static uint64_t time_reached(const floor_t *f, const uint64_t *ids)
     return (read_clock() - t);
 }
 
-/*
-** fill_floor
-**
-** Makes the arrays, with ROWS entities that each have a value, and their
-** ids twice: `near` in the order they lie, `far` drawn in no order.
-*/
 static void fill_floor(floor_t *f, uint64_t *near, uint64_t *far)
 {
     uint32_t state = 2463534242u;
@@ -99,12 +64,6 @@ static void fill_floor(floor_t *f, uint64_t *near, uint64_t *far)
     }
 }
 
-/*
-** time_rounds
-**
-** Reaches the values by the ids in the order they lie, and then in no
-** order, ROUNDS times, and keeps the least time of each.
-*/
 static void time_rounds(const floor_t *f, const uint64_t *near,
     const uint64_t *far, uint64_t *best)
 {
@@ -122,12 +81,6 @@ static void time_rounds(const floor_t *f, const uint64_t *near,
     }
 }
 
-/*
-** main
-**
-** Times ROWS values reached by id, in the order they lie and in none, and
-** says the least time of each.
-*/
 int main(void)
 {
     floor_t f = {};

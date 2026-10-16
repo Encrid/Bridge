@@ -1,32 +1,16 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/direct/direct_half.c -- the systems of ndirect
-** that change one entity or two.
 */
-
 #include "direct.h"
 
-/*
-** detach_b_half
-**
-** Takes D from the first entity that has it.
-*/
 TEST(detach_b_half)
 {
     api->detach(api, ndirect_ids[0], ndirect_d);
     return (0);
 }
 
-/*
-** value_b
-**
-** Gives a value to an entity that has D already.
-*/
 TEST(value_b)
 {
     d_t value = { 900 };
@@ -35,11 +19,6 @@ TEST(value_b)
     return (0);
 }
 
-/*
-** destroy_half
-**
-** Destroys an entity that has D, and one that has not.
-*/
 TEST(destroy_half)
 {
     api->destroy(api, ndirect_ids[2 % COUNT]);
@@ -47,12 +26,6 @@ TEST(destroy_half)
     return (0);
 }
 
-/*
-** respawn_half
-**
-** Spawns two more entities, with A alone: they are given the places of the
-** two that went, and none of what was there.
-*/
 TEST(respawn_half)
 {
     a_t value = { COUNT };

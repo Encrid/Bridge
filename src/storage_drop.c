@@ -1,26 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_drop.c -- the rows of a component nobody declares any more,
-** dropped by the policy its last declarer stated.
 */
-
 #include "storage_drop.h"
 #include "storage_set.h"
 #include "storage_sets.h"
 
-/*
-** say_apart
-**
-** Says the one case of a strip with a trace: rows that stay in a second
-** table of their archetype.
-**
-** lifetime.md, *What unload leaves behind*
-*/
 static void say_apart(storage_t *r, const storage_type_t *type, uint32_t rows)
 {
     const bridge_t *b = r->b;
@@ -36,11 +22,6 @@ static void say_apart(storage_t *r, const storage_type_t *type, uint32_t rows)
         "to join them to the first", b->types[i]->name, rows, b->columns_len);
 }
 
-/*
-** drop_tables
-**
-** Drops a component kept in tables: a table at a time.
-*/
 static void drop_tables(storage_t *r, const storage_type_t *type,
     enum bridge_on_unload policy)
 {
@@ -56,11 +37,6 @@ static void drop_tables(storage_t *r, const storage_type_t *type,
         say_apart(r, type, apart);
 }
 
-/*
-** storage_drop
-**
-** Drops the rows of a component nobody declares any more, by how it is kept.
-*/
 void storage_drop(storage_t *r, storage_type_t *type,
     enum bridge_on_unload policy)
 {

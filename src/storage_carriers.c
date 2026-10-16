@@ -1,24 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_carriers.c -- every entity that carries a type, visited,
-** whichever way the type is kept.
 */
-
 #include "storage_reach.h"
 #include "storage_set.h"
 #include "storage_sets.h"
 #include "storage_view.h"
 
-/*
-** visit_given
-**
-** Visits every entity that has been given a direct-indexed component.
-*/
 static void visit_given(storage_t *r, const storage_type_t *type,
     storage_visit_fn_t visit, void *ctx)
 {
@@ -32,11 +21,6 @@ static void visit_given(storage_t *r, const storage_type_t *type,
     }
 }
 
-/*
-** visit_rows
-**
-** Visits the entity of every row of one table.
-*/
 static void visit_rows(storage_t *r, uint32_t t, storage_visit_fn_t visit,
     void *ctx)
 {
@@ -49,13 +33,6 @@ static void visit_rows(storage_t *r, uint32_t t, storage_visit_fn_t visit,
     }
 }
 
-/*
-** storage_visit_carriers
-**
-** Calls `visit` for every entity that carries a type. A singleton is on
-** index 0, which is no entity, when it has a value; a type kept in a sparse
-** set is in that set's table, as a type kept in tables is in its own.
-*/
 void storage_visit_carriers(storage_t *r, const storage_type_t *type,
     storage_visit_fn_t visit, void *ctx)
 {
@@ -82,11 +59,6 @@ static void count_one([[maybe_unused]] storage_t *r,
     (*n)++;
 }
 
-/*
-** storage_count_carriers
-**
-** Answers how many entities carry a type.
-*/
 uint32_t storage_count_carriers(storage_t *r, const storage_type_t *type)
 {
     uint32_t n = 0;

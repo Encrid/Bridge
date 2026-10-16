@@ -1,17 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/counter.c -- counts the rows of the shared component,
-** and how many of the roster's ids are still alive: what an unload left
-** behind, seen by a module that stayed.
-**
-** lifetime.md, *What unload leaves behind*
 */
-
 #include "test_offsets.h"
 #include "roster.h"
 #include "offsets_idle.h"
@@ -23,12 +14,6 @@ static uint32_t roster;
 static uint32_t counting;
 static uint32_t listing;
 
-/*
-** count_alive
-**
-** Answers how many of the ids of the first roster are alive, and 0 when
-** there is no roster.
-*/
 static uint32_t count_alive(void)
 {
     uint32_t span;
@@ -49,12 +34,6 @@ static uint32_t count_alive(void)
     return (alive);
 }
 
-/*
-** count
-**
-** Says how many rows the position has, and how many of the roster's ids
-** are alive.
-*/
 BRIDGE_EXPORT(count) int count(void)
 {
     uint32_t spans = bridge_count_spans(counting);
@@ -69,21 +48,11 @@ BRIDGE_EXPORT(count) int count(void)
     return (0);
 }
 
-/*
-** rosters
-**
-** Does nothing: it is a system for the query it states, which count reads.
-*/
 BRIDGE_EXPORT(rosters) int rosters(void)
 {
     return (0);
 }
 
-/*
-** init
-**
-** Declares the two components, and a system over each.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};

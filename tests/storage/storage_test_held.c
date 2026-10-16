@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/storage/storage_test_held.c -- what the process holds, asked of
-** the operating system. The figures of the plan are taken on Windows, and
-** elsewhere this says nothing of the process.
 */
-
 #include <stdio.h>
 
 #ifdef _WIN32
@@ -21,13 +14,6 @@
 
 #ifdef _WIN32
 
-/*
-** storage_test_say_held
-**
-** Says the columns in use and what the process holds, in KB: the touched
-** pages of the block and everything outside it. Says nothing if the
-** operating system does not answer.
-*/
 void storage_test_say_held(const bridge_t *b)
 {
     PROCESS_MEMORY_COUNTERS c = { .cb = sizeof(c) };
@@ -40,11 +26,6 @@ void storage_test_say_held(const bridge_t *b)
 
 #else
 
-/*
-** storage_test_say_held
-**
-** Says the columns in use, in KB.
-*/
 void storage_test_say_held(const bridge_t *b)
 {
     printf("columns in use %u KB\n", b->column_space.used >> 10);

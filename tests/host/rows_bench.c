@@ -1,29 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/rows_bench.c -- the accessor's row test, against a build
-** without it, with the count that a work limit adds and without; and a
-** column region the mover's rows use up.
-**
-** validation.md, *Always on*
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 #include "cases.h"
 
-/*
-** test_use_up_columns
-**
-** A column region of as many bytes as the case's argument says: storage
-** cannot hold what the mover spawns.
-*/
 void test_use_up_columns(host_t *h)
 {
     h->cfg.budget.columns = (uint64_t)atoi(*h->arg ? h->arg : "0");
@@ -34,11 +19,6 @@ void test_use_up_columns(host_t *h)
     host_close(h);
 }
 
-/*
-** run_passes
-**
-** Answers the nanoseconds fifty passes of "update" take.
-*/
 static double run_passes(bridge_t *b)
 {
     struct timespec t0;
@@ -55,12 +35,6 @@ static double run_passes(bridge_t *b)
         + (double)(t1.tv_nsec - t0.tv_nsec));
 }
 
-/*
-** time_passes
-**
-** Answers the nanoseconds fifty passes of "update" take, the best of
-** twenty.
-*/
 static double time_passes(bridge_t *b)
 {
     double best = 1e30;
@@ -75,12 +49,6 @@ static double time_passes(bridge_t *b)
     return (best);
 }
 
-/*
-** bench_build
-**
-** Times one build of the rows module, under a work limit or under none, and
-** says the nanoseconds a row.
-*/
 static void bench_build(host_t *h, const char *build, bool metered)
 {
     bridge_t *b = bridge_create(&h->cfg, h->sink, nullptr);
@@ -101,12 +69,6 @@ static void bench_build(host_t *h, const char *build, bool metered)
     (void)bridge_destroy(b);
 }
 
-/*
-** test_bench
-**
-** Times the two builds of the rows module, each with a work limit and
-** without.
-*/
 void test_bench(host_t *h)
 {
     h->cfg.budget.entities = 262'144;

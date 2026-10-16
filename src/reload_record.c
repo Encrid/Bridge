@@ -1,27 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/reload_record.c -- the record of the instance a reload brings in,
-** which takes over what was set aside for the module.
 */
-
 #include <stdlib.h>
 #include <string.h>
 
 #include "reload.h"
 
-/*
-** alloc_record
-**
-** Makes the new instance's record, with room for the ranges of the old
-** one's share and one more, and for the ids held ready for the old one: an
-** array of its own that holds them all, whatever `spawns` it now states.
-** nullptr with a record said.
-*/
 static module_t *alloc_record(reloading_t *r)
 {
     const module_t *old = r->old;
@@ -44,12 +30,6 @@ static module_t *alloc_record(reloading_t *r)
     return (nullptr);
 }
 
-/*
-** take_ids
-**
-** Copies the ids held ready for the old instance, which are the new one's
-** from the swap on, and the settings its config seeded.
-*/
 static void take_ids(module_t *n, const module_t *old)
 {
     if (old->id_count)
@@ -61,13 +41,6 @@ static void take_ids(module_t *n, const module_t *old)
     n->text_room = old->text_room;
 }
 
-/*
-** take_share
-**
-** Copies the old instance's share of the persistent arena, with what the
-** reload added to it. A module that had none starts where the range it was
-** given is.
-*/
 static void take_share(const reloading_t *r, module_t *n, const module_t *old)
 {
     uint32_t at = r->b->arena + r->extra_at;
@@ -91,12 +64,6 @@ static void take_share(const reloading_t *r, module_t *n, const module_t *old)
     n->own_next = 1;
 }
 
-/*
-** reload_make_record
-**
-** Makes the new instance's record, which takes over what was set aside for
-** the module.
-*/
 int reload_make_record(reloading_t *r)
 {
     r->n = alloc_record(r);

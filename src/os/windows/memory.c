@@ -1,22 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** utils/os/windows/memory.c -- address space on Windows: reserved, committed
-** and given back.
 */
-
 #include "os_types.h"
 
-/*
-** os_reserve
-**
-** Reserves `reserve` bytes and commits the first `commit` of them. nullptr on
-** failure, with nothing left reserved.
-*/
 void *os_reserve(size_t reserve, size_t commit)
 {
     void *base = VirtualAlloc(nullptr, reserve, MEM_RESERVE, PAGE_NOACCESS);
@@ -30,11 +18,6 @@ void *os_reserve(size_t reserve, size_t commit)
     return (base);
 }
 
-/*
-** os_commit
-**
-** Commits the first `bytes` of a reservation. 0 on success.
-*/
 int os_commit(void *base, size_t bytes)
 {
     if (!VirtualAlloc(base, bytes, MEM_COMMIT, PAGE_READWRITE))
@@ -42,11 +25,6 @@ int os_commit(void *base, size_t bytes)
     return (0);
 }
 
-/*
-** os_release
-**
-** Gives a reservation back. Windows frees all of one by its base alone.
-*/
 void os_release(void *base, [[maybe_unused]] size_t reserve)
 {
     if (base)

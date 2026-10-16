@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/shield.c -- a toggled component on the guarded backend:
-** its bits found ahead of its column, read, and written.
-**
-** storage.md, *A toggle*
 */
-
 #include "test_offsets.h"
 #include "shield.h"
 #include "offsets_idle.h"
@@ -21,12 +13,6 @@ static uint32_t shield;
 static uint32_t lowering;
 static uint32_t counting;
 
-/*
-** lower_span
-**
-** Turns off every shield of one span whose strength is a multiple of
-** three, and turns every other one on.
-*/
 static void lower_span(uint32_t span)
 {
     uint32_t count = bridge_count_rows(span);
@@ -43,12 +29,6 @@ static void lower_span(uint32_t span)
     }
 }
 
-/*
-** lower
-**
-** Turns every third shield off: a write of its bit, by a system that
-** stated the term as written.
-*/
 BRIDGE_EXPORT(lower) int lower(void)
 {
     uint32_t spans = bridge_count_spans(lowering);
@@ -61,12 +41,6 @@ BRIDGE_EXPORT(lower) int lower(void)
     return (0);
 }
 
-/*
-** add_span
-**
-** Adds one to `on` and the strength to `sum` for every shield of one span
-** that is on, and answers how many rows the span has.
-*/
 static uint32_t add_span(uint32_t span, uint32_t *on, uint32_t *sum)
 {
     uint32_t count = bridge_count_rows(span);
@@ -85,12 +59,6 @@ static uint32_t add_span(uint32_t span, uint32_t *on, uint32_t *sum)
     return (count);
 }
 
-/*
-** count
-**
-** Says how many shields there are, how many are on, and the sum of the
-** strengths of those.
-*/
 BRIDGE_EXPORT(count) int count(void)
 {
     uint32_t spans = bridge_count_spans(counting);
@@ -108,13 +76,6 @@ BRIDGE_EXPORT(count) int count(void)
     return (0);
 }
 
-/*
-** init
-**
-** Declares the component as a toggle, the system that writes its bits and
-** the one that reads them, and spawns the entities, each with a shield of
-** its own number as strength.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};

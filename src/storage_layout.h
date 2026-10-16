@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_layout.h -- a table's block: its entity ids, then a column a
-** type, each at a multiple of sixteen.
 */
-
 #ifndef BRIDGE_SRC_STORAGE_LAYOUT_H
     #define BRIDGE_SRC_STORAGE_LAYOUT_H
 
@@ -20,13 +14,6 @@
     #include "storage_view.h"
     #include "storage_walk.h"
 
-/*
-** lay_out
-**
-** Answers how long a block of `room` rows of a set is, and writes into
-** r->at where each of its columns begins in it. A tag has no column to begin
-** anywhere, and a toggled column has its bits and sixteen bytes ahead of it.
-*/
 static inline uint64_t lay_out(const storage_t *r, const uint64_t *set,
     uint32_t room)
 {
@@ -48,12 +35,6 @@ static inline uint64_t lay_out(const storage_t *r, const uint64_t *set,
     return (pad_column(at));
 }
 
-/*
-** reseat_set
-**
-** Writes again where each entity's value of a sparse set is, after the
-** set's table moved.
-*/
 static inline void reseat_set(storage_t *r, uint32_t t)
 {
     const table_t *tab = &r->tables[t];
@@ -69,13 +50,6 @@ static inline void reseat_set(storage_t *r, uint32_t t)
     }
 }
 
-/*
-** move_bits
-**
-** Moves the bits of a toggled column to where the new room puts them, after
-** its values, since both move out; and writes ahead of the column where they
-** are now. `from` is where the bits were in the block, or 0 for a new block.
-*/
 static inline void move_bits(storage_t *r, uint32_t t, uint32_t id,
     uint32_t from)
 {
@@ -89,13 +63,6 @@ static inline void move_bits(storage_t *r, uint32_t t, uint32_t id,
     memcpy(block + r->at[id] - COLUMN, &bits, 4);
 }
 
-/*
-** take_block
-**
-** Asks the column region for the block table `t` needs for `room` rows,
-** grown from the one it has. Answers the block and writes how long it is, or
-** nullptr with nothing changed.
-*/
 static inline uint8_t *take_block(storage_t *r, uint32_t t, uint32_t room,
     uint64_t *len)
 {

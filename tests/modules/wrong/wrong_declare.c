@@ -1,32 +1,15 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/wrong/wrong_declare.c -- the wrong module: a
-** declaration that is not in the scratch arena, or has no namespace, no
-** kind, or a tag's bytes.
 */
-
 #include "wrong.h"
 
-/*
-** wrong_declare_outside
-**
-** Hands declare a place that is not in the scratch arena.
-*/
 void wrong_declare_outside(void)
 {
     bridge_declare(WRONG_OUTSIDE);
 }
 
-/*
-** wrong_declare_name_outside
-**
-** Declares a type whose name is not in the scratch arena.
-*/
 void wrong_declare_name_outside(void)
 {
     bridge_declaration_t d = wrong_state_type();
@@ -35,11 +18,6 @@ void wrong_declare_name_outside(void)
     bridge_declare(bridge_put(&d, sizeof(d)));
 }
 
-/*
-** wrong_declare_no_namespace
-**
-** Declares a type whose name has no colon.
-*/
 void wrong_declare_no_namespace(void)
 {
     bridge_declaration_t d = wrong_state_type();
@@ -49,11 +27,6 @@ void wrong_declare_no_namespace(void)
     bridge_declare(bridge_put(&d, sizeof(d)));
 }
 
-/*
-** wrong_declare_kind_unset
-**
-** Declares a type of no kind.
-*/
 void wrong_declare_kind_unset(void)
 {
     bridge_declaration_t d = wrong_state_type();
@@ -62,11 +35,6 @@ void wrong_declare_kind_unset(void)
     bridge_declare(bridge_put(&d, sizeof(d)));
 }
 
-/*
-** wrong_declare_tag_with_bytes
-**
-** Declares a tag that states bytes and a descriptor.
-*/
 void wrong_declare_tag_with_bytes(void)
 {
     bridge_declaration_t d = wrong_state_type();

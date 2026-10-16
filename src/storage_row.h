@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_row.h -- a row of a table: added at its end, and taken out
-** with the last one moved into its place.
 */
-
 #ifndef BRIDGE_SRC_STORAGE_ROW_H
     #define BRIDGE_SRC_STORAGE_ROW_H
 
@@ -18,12 +12,6 @@
     #include "storage_view.h"
     #include "storage_walk.h"
 
-/*
-** place_row
-**
-** Records that the entity at `index` is in row `row` of table `t`: here, and
-** in the entity index modules read.
-*/
 static inline void place_row(storage_t *r, uint32_t index, uint32_t t,
     uint32_t row)
 {
@@ -34,12 +22,6 @@ static inline void place_row(storage_t *r, uint32_t index, uint32_t t,
     r->b->index[index] = (bridge_entity_t){ t, row, p->generation };
 }
 
-/*
-** seat_row
-**
-** Records that the entity at `index` has row `row` of a sparse set's table:
-** kept here, and written where modules read it.
-*/
 static inline void seat_row(storage_t *r, const table_t *tab, uint32_t index,
     uint32_t row)
 {
@@ -51,12 +33,6 @@ static inline void seat_row(storage_t *r, const table_t *tab, uint32_t index,
     get_cells(r, slot)[index] = get_cell(type, column, row);
 }
 
-/*
-** append_row
-**
-** Adds a row at the end of table `t`, which has room for it, for the entity
-** at `index`. Answers the row.
-*/
 static inline uint32_t append_row(storage_t *r, uint32_t t, uint32_t index)
 {
     table_t *tab = &r->tables[t];
@@ -70,12 +46,6 @@ static inline uint32_t append_row(storage_t *r, uint32_t t, uint32_t index)
     return (row);
 }
 
-/*
-** fill_row
-**
-** Copies the last row of a table into row `row`, a column at a time, with
-** whether each toggled column is on.
-*/
 [[gnu::always_inline]] static inline void fill_row(storage_t *r, uint32_t t,
     uint32_t row, uint32_t last)
 {
@@ -97,12 +67,6 @@ static inline uint32_t append_row(storage_t *r, uint32_t t, uint32_t index)
     }
 }
 
-/*
-** remove_row
-**
-** Takes a row out of table `t`: the last one is moved into its place, and
-** the entity that was in it is told where it is now.
-*/
 [[gnu::always_inline]] static inline void remove_row(storage_t *r, uint32_t t,
     uint32_t row)
 {

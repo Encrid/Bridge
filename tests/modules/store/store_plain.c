@@ -1,24 +1,11 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/store/store_plain.c -- what only the plain build
-** of nstore registers: the changes of some entities, what a system sees,
-** and the observers.
 */
-
 #include "store.h"
 
 #if !defined(BIG) && !defined(TABLES)
-/*
-** add_first_changes
-**
-** Registers the first seven of the systems that state no term, each with
-** the components it attaches or detaches.
-*/
 static void add_first_changes(const test_api_t *api)
 {
     int none = 0;
@@ -39,12 +26,6 @@ static void add_first_changes(const test_api_t *api)
         nullptr, 0);
 }
 
-/*
-** add_last_changes
-**
-** Registers the last six of the systems that state no term, each with the
-** component it attaches or detaches.
-*/
 static void add_last_changes(const test_api_t *api)
 {
     int none = 0;
@@ -62,13 +43,6 @@ static void add_last_changes(const test_api_t *api)
         1);
 }
 
-/*
-** add_looks
-**
-** Registers the system that looks, the two whose queries it reads, which
-** are in a phase no host runs, and the observer of A; and keeps the query
-** or the list of each.
-*/
 static void add_looks(const test_api_t *api)
 {
     bridge_term_t one[1] = {{ nstore_a, BRIDGE_READ, BRIDGE_AND, 0 }};
@@ -87,13 +61,6 @@ static void add_looks(const test_api_t *api)
         0);
 }
 
-/*
-** add_hearers
-**
-** Registers the system that looks at B and the observers that state B, and
-** keeps the query or the list of each. An event is about the terms and not
-** about the change: the observer of A and not B enters at a detach.
-*/
 static void add_hearers(const test_api_t *api)
 {
     bridge_term_t one[1] = {{ nstore_b, BRIDGE_READ, BRIDGE_AND, 0 }};
@@ -114,11 +81,6 @@ static void add_hearers(const test_api_t *api)
         0);
 }
 
-/*
-** nstore_add_plain
-**
-** Registers the systems and the observers that only the plain build has.
-*/
 void nstore_add_plain(const test_api_t *api)
 {
     add_first_changes(api);

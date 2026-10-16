@@ -1,29 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/support/plain_refusing_backend.c -- the tests' backend's first
-** entries, as a backend that refuses would answer them: one that says each
-** setting it was handed and does not start, for the case that reads what
-** crosses the backend seam. With plain_refusing_memory.c it stands in the
-** place of tests/backend/tests_backend.c and tests_memory.c.
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "bridge_backend.h"
 
-/*
-** say_setting
-**
-** Writes a setting after what `err` holds: its key, and its value as its
-** kind says to read it.
-*/
 static void say_setting(backend_err_t *err, const backend_setting_t *s)
 {
     size_t at = strlen(err->text);
@@ -40,12 +25,6 @@ static void say_setting(backend_err_t *err, const backend_setting_t *s)
         snprintf(to, room, " %s='%s'", s->key, s->v.s);
 }
 
-/*
-** backend_create
-**
-** Makes the backend if it is handed no setting: a byte, since it keeps
-** nothing. Handed some, it says each and does not start.
-*/
 BACKEND_EXPORT backend_t *backend_create(const backend_setting_t *settings,
     uint32_t count, backend_err_t *err)
 {
@@ -61,11 +40,6 @@ BACKEND_EXPORT backend_t *backend_create(const backend_setting_t *settings,
     return (nullptr);
 }
 
-/*
-** backend_destroy
-**
-** Frees the backend.
-*/
 BACKEND_EXPORT void backend_destroy(backend_t *b)
 {
     free(b);

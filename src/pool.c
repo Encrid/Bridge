@@ -1,23 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/pool.c -- the pool of threads a phase runs on, made and unmade.
 */
-
 #include <stdlib.h>
 
 #include "pool.h"
 
-/*
-** start_worker
-**
-** Starts the worker `i`. It is counted only once it runs, so that a pool
-** which could not start them all is unmade a worker at a time. 0 on success.
-*/
 static int start_worker(pool_t *p, uint32_t i)
 {
     pool_worker_t *w = &p->workers[i];
@@ -35,12 +24,6 @@ static int start_worker(pool_t *p, uint32_t i)
     return (0);
 }
 
-/*
-** pool_create
-**
-** Makes a pool of `workers` threads that can run `most_jobs` jobs at once.
-** nullptr if there was not the memory for it, with what was made unmade.
-*/
 pool_t *pool_create(uint32_t workers, uint32_t most_jobs)
 {
     pool_t *p = calloc(1, sizeof(*p));
@@ -63,12 +46,6 @@ pool_t *pool_create(uint32_t workers, uint32_t most_jobs)
     return (p);
 }
 
-/*
-** pool_destroy
-**
-** Ends every worker that runs and frees the pool. A null `p` is nothing to
-** free.
-*/
 void pool_destroy(pool_t *p)
 {
     uint32_t i = 0;

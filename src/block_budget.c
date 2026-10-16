@@ -1,25 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/block_budget.c -- a deployment's budget, checked key by key before any
-** sum is made of it.
-**
-** budgets.md, *Budgets*
 */
-
 #include "block.h"
 
-/*
-** is_unset
-**
-** Refuses a budget left at zero, by its key.
-**
-** budgets.md, *Bridge defaults none of them*
-*/
 static int is_unset(bridge_t *b, const char *key, uint64_t value)
 {
     if (value)
@@ -28,13 +13,6 @@ static int is_unset(bridge_t *b, const char *key, uint64_t value)
     return (1);
 }
 
-/*
-** is_beyond
-**
-** Refuses a size an offset cannot reach, by name: an offset is 32 bits.
-**
-** budgets.md, *Budgets*
-*/
 static int is_beyond(bridge_t *b, const char *key, uint64_t value)
 {
     if (value <= UINT32_MAX)
@@ -44,14 +22,6 @@ static int is_beyond(bridge_t *b, const char *key, uint64_t value)
     return (1);
 }
 
-/*
-** is_miscounted
-**
-** Refuses a count that may be none and is neither: zero is unset,
-** BRIDGE_NONE is none, and nothing else below one is anything.
-**
-** budgets.md, *Budgets*
-*/
 static int is_miscounted(bridge_t *b, const char *key, int64_t value)
 {
     if (value == BRIDGE_NONE || (value > 0 && value <= UINT32_MAX))
@@ -65,11 +35,6 @@ static int is_miscounted(bridge_t *b, const char *key, int64_t value)
     return (1);
 }
 
-/*
-** has_unset
-**
-** Refuses a budget that leaves one of its eight amounts unset, at the first.
-*/
 static int has_unset(bridge_t *b, const bridge_budget_t *budget)
 {
     if (is_unset(b, "entities", budget->entities))
@@ -89,12 +54,6 @@ static int has_unset(bridge_t *b, const bridge_budget_t *budget)
     return (is_unset(b, "terms", budget->terms));
 }
 
-/*
-** block_check_budget
-**
-** Refuses a budget with a key unset, a size an offset of 32 bits cannot
-** reach, or a count that is neither a count nor none.
-*/
 int block_check_budget(bridge_t *b, const bridge_budget_t *budget)
 {
     if (has_unset(b, budget))

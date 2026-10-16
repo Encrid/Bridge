@@ -1,22 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/layout/layout_init.c -- one component, X, whose
-** struct this build states: V says which. A module is loaded as V 0 and
-** reloaded as another, and what its values become is what is tested. KEPT
-** is the storage layout X is kept in, the same in both.
-**
-**     spawn    three entities with X: a 1000.., b 20.., arr 1 2 3 4 and up,
-**              at 5 6 and up, ON
-**     look     every field this build has, summed over the values there are
-**
-** lifetime.md, *When a component layout changed*
 */
-
 #include "layout.h"
 
 constexpr uint8_t ASKED = KEPT >= 4 ? BRIDGE_OPTIONAL : BRIDGE_AND;
@@ -24,14 +10,6 @@ constexpr uint8_t ASKED = KEPT >= 4 ? BRIDGE_OPTIONAL : BRIDGE_AND;
 uint32_t x_slot;
 uint32_t reading;
 
-/*
-** init
-**
-** Declares the enum and the struct that X's fields name, then X kept as
-** KEPT says, and the two systems. The build whose V is 13 declares the
-** struct as a tag. A component kept direct-indexed or as a singleton is in
-** no table, so the term that names it does not ask for it.
-*/
 TEST(init)
 {
     int none = 0;
@@ -54,21 +32,11 @@ TEST(init)
     return (0);
 }
 
-/*
-** reload
-**
-** Declares everything again, as init does.
-*/
 TEST(reload)
 {
     return (TEST_OWN(init)(api));
 }
 
-/*
-** shutdown
-**
-** Does nothing.
-*/
 TEST(shutdown)
 {
     return (0);

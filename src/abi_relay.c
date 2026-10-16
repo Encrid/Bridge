@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_relay.c -- a type that has another component layout at a reload:
-** how its values are carried over, or why they cannot be.
 */
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -22,14 +16,6 @@ static const char *const KIND_NAMES[] = {
     "a tag"
 };
 
-/*
-** check_constant
-**
-** Refuses a constant of an enum or a bitmask that is gone, or has another
-** value: every value a row may hold must still mean what it meant.
-**
-** lifetime.md, *When a component layout changed*
-*/
 static int check_constant(module_t *m, const declared_type_t *was,
     const schema_t *is, const schema_constant_t *old)
 {
@@ -52,14 +38,6 @@ static int check_constant(module_t *m, const declared_type_t *was,
         was->name, old->name, (long long)new->value, (long long)old->value));
 }
 
-/*
-** check_constants
-**
-** Refuses an enum or a bitmask whose integer or whose constants changed. A
-** constant added is nothing.
-**
-** lifetime.md, *When a component layout changed*
-*/
 static int check_constants(module_t *m, const declared_type_t *was,
     const schema_t *is)
 {
@@ -77,15 +55,6 @@ static int check_constants(module_t *m, const declared_type_t *was,
     return (0);
 }
 
-/*
-** keep_runs
-**
-** Leaves on a type how its values are carried over, or refuses the relay
-** for what it found: no memory, or a loss this reload does not accept.
-**
-** lifetime.md, *When a component layout changed*
-** failure.md, *Out of memory*
-*/
 static int keep_runs(relaying_t *l, declared_type_t *was)
 {
     if (l->short_of)
@@ -104,11 +73,6 @@ static int keep_runs(relaying_t *l, declared_type_t *was)
         "'%s' is laid out again", was->name));
 }
 
-/*
-** relay_struct
-**
-** Works out how the values of a struct are carried over to what it becomes.
-*/
 static int relay_struct(module_t *m, declared_type_t *was, const schema_t *is)
 {
     storage_t *storage = m->b->storage;
@@ -124,15 +88,6 @@ static int relay_struct(module_t *m, declared_type_t *was, const schema_t *is)
     return (refused);
 }
 
-/*
-** abi_relay
-**
-** Works out how the values of a type are carried over to what it becomes. A
-** reload does not change what kind of type one is; a tag has no value to
-** carry.
-**
-** lifetime.md, *When a component layout changed*
-*/
 int abi_relay(module_t *m, declared_type_t *was, enum bridge_kind kind,
     const schema_t *is)
 {

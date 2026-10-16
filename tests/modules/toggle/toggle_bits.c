@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/toggle/toggle_bits.c -- the systems of ntoggle
-** that write T: a value for one entity, and rows turned on or off by a
-** write of their bits, as a value is written, with no call and no barrier.
 */
-
 #include "toggle.h"
 #include "measured.h"
 
@@ -28,12 +21,6 @@ static uint32_t draw_number(void)
 
 #endif
 
-/*
-** switch_rows
-**
-** Turns each row of a span on or off by writing its bit: on where its value
-** is odd, or in a build for a measurement where one row in ON is drawn.
-*/
 static void switch_rows([[maybe_unused]] const t_t *column, uint64_t *bits,
     uint32_t count)
 {
@@ -54,11 +41,6 @@ static void switch_rows([[maybe_unused]] const t_t *column, uint64_t *bits,
     }
 }
 
-/*
-** flicker
-**
-** Turns off the rows whose T is even, and on the others.
-*/
 TEST_MEASURED TEST(flicker)
 {
     const bridge_query_t *q = test_get_query(api, ntoggle_writing);
@@ -74,11 +56,6 @@ TEST_MEASURED TEST(flicker)
     return (0);
 }
 
-/*
-** combine
-**
-** Turns every row on again.
-*/
 TEST(combine)
 {
     const bridge_query_t *q = test_get_query(api, ntoggle_writing);
@@ -100,11 +77,6 @@ TEST(combine)
     return (0);
 }
 
-/*
-** value_a
-**
-** Gives a value to an entity whose T is off: it stays off.
-*/
 TEST(value_a)
 {
     t_t value = { 500 };

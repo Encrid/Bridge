@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_tell.h -- an entity gone, and what each observer is owed for
-** an entity, from what it carried and what it carries.
-**
-** data.md, *Observers*
 */
-
 #ifndef BRIDGE_SRC_STORAGE_TELL_H
     #define BRIDGE_SRC_STORAGE_TELL_H
 
@@ -26,12 +18,6 @@ static inline bool is_alive(const storage_t *r, uint64_t id)
     return (r->places[index].generation == (uint32_t)(id >> 32));
 }
 
-/*
-** leave_apart
-**
-** Takes the entity at `index` out of every sparse set it is in, and takes
-** from it every direct-indexed component it was given.
-*/
 static inline void leave_apart(storage_t *r, uint32_t index)
 {
     uint32_t slot = 0;
@@ -49,12 +35,6 @@ static inline void leave_apart(storage_t *r, uint32_t index)
     }
 }
 
-/*
-** kill_entity
-**
-** Makes the entity at `index` gone: its row, and its index, which comes back
-** under another generation.
-*/
 [[gnu::always_inline]] static inline void kill_entity(storage_t *r,
     uint32_t index)
 {
@@ -72,13 +52,6 @@ static inline void leave_apart(storage_t *r, uint32_t index)
     r->free_head = index;
 }
 
-/*
-** get_owed
-**
-** Answers what one observer is owed for an entity: that it entered what the
-** observer's terms match, left it, or matches and was attached one of them.
-** An entity that carries nothing is in no table, and matches nothing.
-*/
 static inline uint32_t get_owed(const storage_t *r, const storage_terms_t *o,
     const seen_t *seen)
 {
@@ -99,12 +72,6 @@ static inline uint32_t get_owed(const storage_t *r, const storage_terms_t *o,
     return (owed & o->events);
 }
 
-/*
-** tell_observers
-**
-** Tells each observer what it is owed for an entity, in the order the
-** observers came.
-*/
 static inline void tell_observers(const storage_t *r, const seen_t *seen)
 {
     const storage_terms_t *o;

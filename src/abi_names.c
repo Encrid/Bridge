@@ -1,24 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_names.c -- names: whose a type's is, where a bare one is looked
-** for, and who else declares one.
 */
-
 #include <stdio.h>
 #include <string.h>
 
 #include "abi_declare.h"
 
-/*
-** abi_is_listed
-**
-** Answers whether a list of names holds a name.
-*/
 bool abi_is_listed(char **list, uint32_t count, const char *name)
 {
     uint32_t i = 0;
@@ -28,11 +17,6 @@ bool abi_is_listed(char **list, uint32_t count, const char *name)
     return (i < count);
 }
 
-/*
-** abi_is_foreign
-**
-** Answers whether a name is of another namespace than the module's.
-*/
 bool abi_is_foreign(const module_t *m, const char *name)
 {
     size_t n = strlen(m->ns);
@@ -40,13 +24,6 @@ bool abi_is_foreign(const module_t *m, const char *name)
     return (strncmp(name, m->ns, n) || name[n] != ':');
 }
 
-/*
-** abi_find_type
-**
-** Finds the type a field names bare, in the namespace of the type being
-** declared. A tag has no bytes for a field to be, and a type a reload has
-** made anew is the one that is meant.
-*/
 bool abi_find_type(void *ctx, const char *bare, schema_named_t *named)
 {
     const declaring_t *g = ctx;
@@ -68,12 +45,6 @@ bool abi_find_type(void *ctx, const char *bare, schema_named_t *named)
     return (c != nullptr);
 }
 
-/*
-** declares_it
-**
-** Answers whether a module other than the one declaring, and than the one
-** it reloads, declares a type.
-*/
 static bool declares_it(const module_t *o, const module_t *m,
     const declared_type_t *c)
 {
@@ -86,11 +57,6 @@ static bool declares_it(const module_t *o, const module_t *m,
     return (i < o->declared_count);
 }
 
-/*
-** abi_say_others
-**
-** Writes who else declares a type, as the end of a refusal.
-*/
 void abi_say_others(const module_t *m, const declared_type_t *c,
     abi_others_t *others)
 {

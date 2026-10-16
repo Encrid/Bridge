@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/storage/main.c -- storage <case>: the cases of the program, by
-** name, and the deployment each runs in.
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,11 +17,6 @@ static const char *const PHASES[] = {
     "value_b", "look_b", "walk", "flag", "near", "far", "one"
 };
 
-/*
-** The guarded backend, which asks for address space around a block it maps,
-** and the plain one. A case that is not about the first has the second
-** alone.
-*/
 static const bridge_setting_t KEEPS[4] = {
     { "capabilities", BRIDGE_INT, {}, { .i = 1 << 4 | 1 << 6 } },
     { "reservation", BRIDGE_INT, {}, { .i = 0 } },
@@ -47,15 +36,6 @@ static const bridge_backend_t BACKENDS[2] = {
     { "tests", TESTS_PATH, KEEPS, 4 }
 };
 
-/*
-** The deployments. Every case is run on the caller's thread alone but the
-** stress run, which is the one thing here that is run on more than one. A
-** case that is about a sparse set or a direct-indexed component has room
-** for one, and the case that states there are none has not.
-**
-** storage.md, *A sparse set*
-** storage.md, *Direct-indexed*
-*/
 static const storage_test_room_t PLAIN = { BACKENDS + 1, 1, 1, 32'768,
     64 << 20, BRIDGE_NONE, BRIDGE_NONE, false };
 static const storage_test_room_t FOUR_THREADS = { BACKENDS + 1, 1, 4, 32'768,
@@ -137,11 +117,6 @@ static const storage_test_case_t *find_case(const char *what)
     return (i < count ? &CASES[i] : nullptr);
 }
 
-/*
-** storage_test_find_variant
-**
-** Answers the row of a case's name, among `count` of them, or nullptr.
-*/
 const storage_test_variant_t *storage_test_find_variant(
     const storage_test_variant_t *rows, size_t count, const char *what)
 {
@@ -152,12 +127,6 @@ const storage_test_variant_t *storage_test_find_variant(
     return (i < count ? &rows[i] : nullptr);
 }
 
-/*
-** make_bridge
-**
-** Fills the fixture's deployment from a case's, and creates the deck.
-** Nothing is buffered from here on: a crash must not swallow what was said.
-*/
 static void make_bridge(storage_test_t *t, const storage_test_room_t *room)
 {
     constexpr uint32_t count = sizeof(PHASES) / sizeof(*PHASES);
@@ -176,12 +145,6 @@ static void make_bridge(storage_test_t *t, const storage_test_room_t *room)
     setvbuf(stdout, nullptr, _IONBF, 0);
 }
 
-/*
-** main
-**
-** Runs the case the command line names, on a deck of that case's
-** deployment, and says "alive" unless the case failed.
-*/
 int main(int argc, char **argv)
 {
     storage_test_t t = { .what = argc > 1 ? argv[1] : "" };

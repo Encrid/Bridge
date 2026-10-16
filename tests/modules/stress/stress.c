@@ -1,28 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/stress/stress.c -- storage under load, with the
-** module's own account of what should be there.
-**
-** Each pass it asks for twenty thousand changes chosen by a generator it
-** seeds itself: an entity made with a few components, one destroyed, a
-** component attached, set or detached. It keeps what each of its entities
-** ought to carry and with what value, and at the next pass looks: at every
-** entity through the index and column_base, and at every component through
-** its spans. What it says is how many disagreed, which must be none, and a
-** digest of its own account, which is the same whatever keeps the rows and
-** on however many threads.
-**
-** Built several times, each with its own SEED and under its own namespace,
-** SPACE, so that they run at once.
-**
-** stage10.md, *What flecs cost*
 */
-
 #include "stress.h"
 #include "idle.h"
 
@@ -37,13 +17,6 @@ static const char *const SYSTEMS[KINDS] = {
 uint32_t nstress_kinds[KINDS];
 uint32_t nstress_seeing[KINDS];
 
-/*
-** declare_kind
-**
-** Declares component `k`, and registers the system that sees it, in the
-** phase "check". Their names are not literals, so both are stated without
-** the macros that take a literal.
-*/
 static void declare_kind(const test_api_t *api, uint32_t k)
 {
     bridge_term_t term[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
@@ -61,12 +34,6 @@ static void declare_kind(const test_api_t *api, uint32_t k)
         test_put(api, term, sizeof(term)), 1, 0, 0));
 }
 
-/*
-** init
-**
-** Declares the eight components, each with the system that sees it, and
-** registers the system that changes them.
-*/
 TEST(init)
 {
     int none = 0;

@@ -1,26 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_spans.c -- a module's spans: for each of its systems, one span
-** a table it matches.
 */
-
 #include <string.h>
 
 #include "storage_publish.h"
 #include "storage_reach.h"
 #include "storage_view.h"
 
-/*
-** write_span
-**
-** Writes one span: how many rows, where their ids are, and a base for each
-** term. A term that must not match has no base.
-*/
 static void write_span(const storage_t *r, const storage_terms_t *s,
     uint32_t t, uint8_t *at)
 {
@@ -41,12 +29,6 @@ static void write_span(const storage_t *r, const storage_terms_t *s,
     }
 }
 
-/*
-** write_spans
-**
-** Writes every span of system `q` of a module, one after another, and where
-** they begin. 1 if they do not fit.
-*/
 static int write_spans(publish_t *p, uint32_t q)
 {
     module_t *m = p->m;
@@ -71,12 +53,6 @@ static int write_spans(publish_t *p, uint32_t q)
     return (0);
 }
 
-/*
-** rewrite_spans
-**
-** Writes again, where it is, each span of system `q` whose table was
-** touched.
-*/
 static void rewrite_spans(publish_t *p, uint32_t q)
 {
     const storage_t *r = p->r;
@@ -96,13 +72,6 @@ static void rewrite_spans(publish_t *p, uint32_t q)
     }
 }
 
-/*
-** write_every_span
-**
-** Writes all of a module's spans again, and where they end. A span is a
-** multiple of four bytes, and what follows the spans holds an id, so the end
-** is rounded to eight. 1 if they do not fit.
-*/
 static int write_every_span(publish_t *p)
 {
     module_t *m = p->m;
@@ -120,12 +89,6 @@ static int write_every_span(publish_t *p)
     return (0);
 }
 
-/*
-** storage_publish_spans
-**
-** Writes a module's spans: all of them again if any of its systems matches
-** other tables than it did, and otherwise the ones whose table was touched.
-*/
 int storage_publish_spans(publish_t *p)
 {
     module_t *m = p->m;

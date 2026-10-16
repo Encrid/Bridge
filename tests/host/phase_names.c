@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/phase_names.c -- a module that says "tick" for what this
-** deployment calls "update".
-**
-** schedule.md, *A module's phase names are mapped by the deployment*
 */
-
 #include "cases.h"
 
 static void load_ticking(host_t *h, const bridge_phase_name_t *tick)
@@ -29,21 +21,11 @@ static void load_ticking(host_t *h, const bridge_phase_name_t *tick)
     host_close(h);
 }
 
-/*
-** test_leave_phase_unmapped
-**
-** Refused as it is: the deployment has no phase "tick".
-*/
 void test_leave_phase_unmapped(host_t *h)
 {
     load_ticking(h, nullptr);
 }
 
-/*
-** test_map_phase
-**
-** Loaded once the deployment says which of its phases "tick" is.
-*/
 void test_map_phase(host_t *h)
 {
     bridge_phase_name_t tick = { "tick", "update" };
@@ -51,11 +33,6 @@ void test_map_phase(host_t *h)
     load_ticking(h, &tick);
 }
 
-/*
-** test_map_phase_nowhere
-**
-** Refused when the deployment maps "tick" to a phase it does not have.
-*/
 void test_map_phase_nowhere(host_t *h)
 {
     bridge_phase_name_t tick = { "tick", "nowhere" };

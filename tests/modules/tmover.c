@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/tmover.c -- mover.c as a shared library: it reads
-** and writes the column through a raw pointer.
 */
-
 #include "test_module.h"
 #include "game.h"
 #include "idle.h"
@@ -20,11 +14,6 @@ static uint32_t marked;
 static uint32_t moving;
 static uint32_t tallying;
 
-/*
-** move
-**
-** Adds one to the x of every position.
-*/
 TEST(move)
 {
     const bridge_query_t *q = test_get_query(api, moving);
@@ -46,11 +35,6 @@ TEST(move)
     return (0);
 }
 
-/*
-** tally
-**
-** Says what its own query matched.
-*/
 TEST(tally)
 {
     const bridge_query_t *q = test_get_query(api, tallying);
@@ -65,11 +49,6 @@ TEST(tally)
     return (0);
 }
 
-/*
-** populate
-**
-** Spawns the entities: each with a position, and every other one marked.
-*/
 static void populate(const test_api_t *api)
 {
     position_t p = { 0.0f, 0.0f };
@@ -86,11 +65,6 @@ static void populate(const test_api_t *api)
     }
 }
 
-/*
-** init
-**
-** Declares the two components and the two systems, and spawns the entities.
-*/
 TEST(init)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};

@@ -1,27 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/reap.c -- a module of another namespace that
-** destroys what it finds: with a read grant it has no stake in the entity,
-** which stays; with a write grant it has, and the entity goes. And two
-** cases of threads: an entry reached from one nobody called on, and a
-** deployment that states none.
-**
-** grants.md, *What a module may destroy*
 */
-
 #include "cases.h"
 
-/*
-** reap
-**
-** Loads a module that stamps and one of another namespace that destroys
-** what it finds, with a grant to read or to write.
-*/
 static void reap(host_t *h, bool may_write)
 {
     bridge_artifact_t a;
@@ -39,31 +22,16 @@ static void reap(host_t *h, bool may_write)
     host_close(h);
 }
 
-/*
-** test_reap_with_read
-**
-** The reaper may read the position: what it destroys stays.
-*/
 void test_reap_with_read(host_t *h)
 {
     reap(h, false);
 }
 
-/*
-** test_reap_with_write
-**
-** The reaper may write the position: what it destroys goes.
-*/
 void test_reap_with_write(host_t *h)
 {
     reap(h, true);
 }
 
-/*
-** test_enter_from_foreign_thread
-**
-** An entry reached from a thread nobody called on.
-*/
 void test_enter_from_foreign_thread(host_t *h)
 {
     if (host_open(h))
@@ -73,11 +41,6 @@ void test_enter_from_foreign_thread(host_t *h)
     host_close(h);
 }
 
-/*
-** test_state_no_threads
-**
-** A deployment that states no thread.
-*/
 void test_state_no_threads(host_t *h)
 {
     h->cfg.threads = 0;

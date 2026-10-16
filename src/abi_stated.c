@@ -1,23 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_stated.c -- what a declaration states, checked before anything is
-** made of it: every value is stated, and none is taken for a default.
 */
-
 #include <string.h>
 
 #include "abi_declare.h"
 
-/*
-** abi_hash_text
-**
-** Answers the fingerprint of `n` bytes of text: FNV-1a.
-*/
 uint64_t abi_hash_text(const char *s, size_t n)
 {
     uint64_t h = 1'469'598'103'934'665'603ull;
@@ -30,15 +19,6 @@ uint64_t abi_hash_text(const char *s, size_t n)
     return (h);
 }
 
-/*
-** check_kind
-**
-** Refuses a name with no namespace, a kind left unset, and a tag that
-** states bytes or a descriptor.
-**
-** abi.md, *The ABI*
-** storage.md, *A tag*
-*/
 static int check_kind(declaring_t *g)
 {
     const bridge_declaration_t *d = &g->d;
@@ -54,15 +34,6 @@ static int check_kind(declaring_t *g)
     return (0);
 }
 
-/*
-** check_policy
-**
-** Refuses another namespace's name that no grant names, and a policy or a
-** storage layout left unset.
-**
-** grants.md, *Whose component it is*
-** abi.md, *The ABI*
-*/
 static int check_policy(declaring_t *g)
 {
     module_t *m = g->m;
@@ -81,12 +52,6 @@ static int check_policy(declaring_t *g)
     return (0);
 }
 
-/*
-** abi_check_stated
-**
-** Refuses a declaration that states what it may not, and works out the
-** fingerprint of what it states: of its descriptor, and of its kind.
-*/
 int abi_check_stated(declaring_t *g)
 {
     const char *desc = g->d.kind == BRIDGE_TAG ? "" : g->desc;

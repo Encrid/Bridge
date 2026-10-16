@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/block_barrier.c -- the barrier: what happens between two phases, in
-** an order that never varies.
 */
-
 #include "block.h"
 
 static void refill_all(bridge_t *b)
@@ -21,15 +15,6 @@ static void refill_all(bridge_t *b)
     }
 }
 
-/*
-** publish_all
-**
-** Publishes every running module's spans, and stops one whose spans no
-** longer hold what its queries match. A stopped module is published all
-** over again, if it returns.
-**
-** budgets.md, *What running out does*
-*/
 static void publish_all(bridge_t *b)
 {
     module_t *m = b->modules;
@@ -47,12 +32,6 @@ static void publish_all(bridge_t *b)
     }
 }
 
-/*
-** republish
-**
-** Publishes until publishing makes no more tables: a module's header says
-** how many there are, so all are written again when that changed.
-*/
 static void republish(bridge_t *b)
 {
     uint32_t tables = storage_count_tables(b->storage) + 1;
@@ -63,14 +42,6 @@ static void republish(bridge_t *b)
     }
 }
 
-/*
-** finish_barrier
-**
-** Ends a barrier once its observers have run: nobody is pending any more,
-** the failure budgets are settled, and each module's log is drained.
-**
-** failure.md, *The budget*
-*/
 static void finish_barrier(bridge_t *b)
 {
     module_t *m = b->modules;
@@ -89,15 +60,6 @@ static void finish_barrier(bridge_t *b)
     b->barriers++;
 }
 
-/*
-** block_barrier
-**
-** The barrier. Queued changes are applied and spans republished; then the
-** observers of what changed run, and what they ask for goes on their queues,
-** and so is the next barrier's.
-**
-** schedule.md, *An observer runs at the barrier, one hop per barrier*
-*/
 void block_barrier(bridge_t *b)
 {
     storage_apply(b->storage);

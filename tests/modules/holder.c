@@ -1,26 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/holder.c -- declares a struct with a field of
-** st:vec_t, a type another module declares: its rows hold a vec_t as it is,
-** so no reload of that other module may lay vec_t out again.
-**
-** lifetime.md, *When a component layout changed*
 */
-
 #include "test_module.h"
 #include "idle.h"
 #include "holder.h"
 
-/*
-** init
-**
-** Declares st:Y, whose one field is of the other module's type.
-*/
 TEST(init)
 {
     TEST_COMPONENT(api, "st:Y", y_t, BRIDGE_DELETE, BRIDGE_TABLE);

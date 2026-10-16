@@ -1,30 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/block_layout.c -- where each part of the shared block begins: the
-** entity index, the sparse sets' indexes, the direct-indexed bits, the
-** persistent arena, the columns.
-**
-** Each amount of the budget is under 2^32 by the time this runs, so none of
-** these sums can leave 64 bits.
-**
-** storage.md, *Storage layouts*
 */
-
 #include "block.h"
 
-/*
-** lay_sparse
-**
-** Places the sparse sets' indexes after the entity index. A sparse set's
-** index is a u32 for every entity, and there is one for each there may be.
-**
-** budgets.md, *Budgets*
-*/
 static int lay_sparse(bridge_t *b, const bridge_budget_t *budget,
     block_layout_t *layout)
 {
@@ -44,14 +24,6 @@ static int lay_sparse(bridge_t *b, const bridge_budget_t *budget,
     return (1);
 }
 
-/*
-** lay_direct
-**
-** Places the direct-indexed bits after the sparse sets' indexes. A
-** direct-indexed component's bits are one for every entity, in 64-bit words.
-**
-** budgets.md, *Budgets*
-*/
 static int lay_direct(bridge_t *b, const bridge_budget_t *budget,
     block_layout_t *layout)
 {
@@ -71,15 +43,6 @@ static int lay_direct(bridge_t *b, const bridge_budget_t *budget,
     return (1);
 }
 
-/*
-** lay_rest
-**
-** Places the arena and the columns, and sizes the block: a whole number of
-** what every backend that maps it needs, and together never more than an
-** offset can reach.
-**
-** backend.md, *Memory is adopted, not created*
-*/
 static int lay_rest(bridge_t *b, const bridge_budget_t *budget,
     block_layout_t *layout)
 {
@@ -98,13 +61,6 @@ static int lay_rest(bridge_t *b, const bridge_budget_t *budget,
     return (1);
 }
 
-/*
-** block_lay_out
-**
-** Works out where each part of the shared block begins, and how much
-** address space it is reserved in: the largest any backend stated, and its
-** guard after it.
-*/
 int block_lay_out(bridge_t *b, const bridge_budget_t *budget,
     block_layout_t *layout)
 {

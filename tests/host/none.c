@@ -1,23 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/none.c -- a key's "none": it is a value, and each
-** key has its own.
-**
-** config.md, *No unaccountable values*
 */
-
 #include "cases.h"
 
-/*
-** test_state_no_limit
-**
-** "None" is a value, and a module that states it for every limit loads.
-*/
 void test_state_no_limit(host_t *h)
 {
     char identity[64];
@@ -35,12 +22,6 @@ void test_state_no_limit(host_t *h)
     host_close(h);
 }
 
-/*
-** test_state_other_none
-**
-** The "none" of another key is not this one's: an amount stated as no
-** limit, and a limit stated as no amount, are each refused.
-*/
 void test_state_other_none(host_t *h)
 {
     char identity[64];

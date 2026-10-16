@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/retype.h -- the layout retype.c gives a component
-** name, which nobody else gives it.
 */
-
 #ifndef TEST_RETYPE_H
     #define TEST_RETYPE_H
 

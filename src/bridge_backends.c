@@ -1,21 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/bridge_backends.c -- the backends of a deployment, opened one after
-** another, and what all of them together need of a block they map.
 */
-
 #include "bridge_inside.h"
 
-/*
-** get_common_multiple
-**
-** Answers the least length that is a whole number of both.
-*/
 static uint64_t get_common_multiple(uint64_t a, uint64_t b)
 {
     uint64_t x = a;
@@ -30,13 +19,6 @@ static uint64_t get_common_multiple(uint64_t a, uint64_t b)
     return (a / x * b);
 }
 
-/*
-** take_shape
-**
-** Asks a backend what it can do and what it needs of a block it maps, and
-** widens what the deck reserves to it. Every backend maps the shared
-** block, so its length is a multiple of each one's granule.
-*/
 static void take_shape(bridge_t *b, open_backend_t *o)
 {
     uint64_t reservation = 0;
@@ -55,15 +37,6 @@ static void take_shape(bridge_t *b, open_backend_t *o)
     b->granule = get_common_multiple(b->granule, o->granule);
 }
 
-/*
-** bridge_open_backends
-**
-** Opens every backend the deployment configures, in the order it states
-** them. It configures one at least: a module is run by a backend, so a
-** deck with none could load nothing.
-**
-** create.md, *Create*
-*/
 int bridge_open_backends(bridge_t *b, const bridge_config_t *cfg)
 {
     uint32_t i = 0;

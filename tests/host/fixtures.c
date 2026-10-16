@@ -1,22 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/fixtures.c -- the fixtures of the host program: what a case's
-** host is before the case changes it.
 */
-
 #include "cases.h"
 
-/*
-** test_set_small
-**
-** The guarded backend, the one phase "update", and the sink that prints a
-** record's level.
-*/
 void test_set_small(host_t *h)
 {
     h->cfg.backend_count = 1;
@@ -24,32 +12,17 @@ void test_set_small(host_t *h)
     h->sink = test_print;
 }
 
-/*
-** test_set_guarded
-**
-** The guarded backend and both phases.
-*/
 void test_set_guarded(host_t *h)
 {
     h->cfg.backend_count = 1;
     h->sink = host_print_record;
 }
 
-/*
-** test_set_both
-**
-** Both backends and both phases.
-*/
 void test_set_both(host_t *h)
 {
     h->sink = host_print_record;
 }
 
-/*
-** test_set_counting
-**
-** Both backends, both phases, and the sink that counts.
-*/
 void test_set_counting(host_t *h)
 {
     test_kept_t *kept = h->kept;
@@ -58,11 +31,6 @@ void test_set_counting(host_t *h)
     h->ud = &kept->listener;
 }
 
-/*
-** test_set_noting
-**
-** Both backends, both phases, and the sink that notes.
-*/
 void test_set_noting(host_t *h)
 {
     test_kept_t *kept = h->kept;

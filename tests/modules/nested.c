@@ -1,20 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/nested.c -- a component whose fields are other
-** declared types: a struct, an enum and a bitmask. Each is declared first,
-** in the namespace the component is in.
-**
-** Built a second way, LEAVE_OUT_VEC2: without declaring the struct one of
-** its fields is.
-**
-** schema.md, *The type set*
 */
-
 #include "test_offsets.h"
 #include "nested.h"
 #include "offsets_idle.h"
@@ -22,12 +10,6 @@
 static uint32_t body;
 static uint32_t reading;
 
-/*
-** read
-**
-** Says four fields of the first row: the y of the struct, the enum, the
-** bitmask and the mass.
-*/
 BRIDGE_EXPORT(read) int read(void)
 {
     uint32_t span = bridge_get_span(reading, 0, 1);
@@ -42,12 +24,6 @@ BRIDGE_EXPORT(read) int read(void)
     return (0);
 }
 
-/*
-** init
-**
-** Declares the three types the fields are of, then the component and the
-** system, and spawns one entity.
-*/
 BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};

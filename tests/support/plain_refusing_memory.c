@@ -1,37 +1,18 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/support/plain_refusing_memory.c -- the tests' backend's entries
-** about memory, as a backend that cannot adopt a block would answer them:
-** for the case in which a backend refuses the shared memory. With
-** plain_refusing_backend.c it stands in the place of
-** tests/backend/tests_backend.c and tests_memory.c.
 */
-
 #include <stdio.h>
 
 #include "bridge_backend.h"
 
-/*
-** backend_get_capabilities
-**
-** Answers that this backend can keep nothing.
-*/
 BACKEND_EXPORT enum backend_capability backend_get_capabilities(
     [[maybe_unused]] backend_t *b)
 {
     return ((enum backend_capability)0);
 }
 
-/*
-** memory_get_shape
-**
-** Answers the shape this backend asks of a memory, which is none.
-*/
 BACKEND_EXPORT void memory_get_shape([[maybe_unused]] backend_t *b,
     uint64_t *reservation, uint64_t *guard, uint64_t *granule)
 {
@@ -40,11 +21,6 @@ BACKEND_EXPORT void memory_get_shape([[maybe_unused]] backend_t *b,
     *granule = 0;
 }
 
-/*
-** memory_adopt
-**
-** Refuses the block, and says why.
-*/
 BACKEND_EXPORT backend_memory_t *memory_adopt([[maybe_unused]] backend_t *b,
     [[maybe_unused]] void *ptr, [[maybe_unused]] uint64_t len,
     backend_err_t *err)

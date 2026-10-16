@@ -1,24 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/reload_fail.c -- a reload that failed.
-**
-** failure.md, *When something fails*
 */
-
 #include "reload.h"
 
-/*
-** undo_new
-**
-** Takes the new instance back out. What it would have moved stays as it is,
-** under the type it has; the entities are the old record's still; and what
-** the reload added to the share goes back.
-*/
 static void undo_new(reloading_t *r)
 {
     bridge_t *b = r->b;
@@ -40,12 +26,6 @@ static void undo_new(reloading_t *r)
     module_discard(b, n);
 }
 
-/*
-** keep_old
-**
-** The old instance is kept, and its systems are put back as they were. The
-** new one's were dropped, so the places are there.
-*/
 static void keep_old(bridge_t *b)
 {
     uint32_t i = 0;
@@ -56,16 +36,6 @@ static void keep_old(bridge_t *b)
     }
 }
 
-/*
-** stop_old
-**
-** There is no instance left to keep. The module stays, stopped, with
-** everything it declared: a reload is a call that means "keep running", and
-** those never discard. An artifact that works brings it back; an unload is
-** what ends it.
-**
-** lifetime.md, *Lifetime*
-*/
 static void stop_old(bridge_t *b, module_t *old)
 {
     say_t about = { old, nullptr, BRIDGE_ERR };
@@ -79,15 +49,6 @@ static void stop_old(bridge_t *b, module_t *old)
         bridge_stop(b, old->identity, "could not be reloaded");
 }
 
-/*
-** reload_fail
-**
-** Says that a reload failed and takes the new instance back out. A schedule
-** with its systems taken back out is one that was built before, so the
-** rebuild cannot be refused.
-**
-** failure.md, *The budget*
-*/
 int reload_fail(reloading_t *r)
 {
     bridge_t *b = r->b;

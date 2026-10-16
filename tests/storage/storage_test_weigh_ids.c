@@ -1,30 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/storage/storage_test_weigh_ids.c -- what a direct-indexed
-** component costs, what a tag saves, and what a singleton and a toggled
-** row cost where they are.
-**
-** storage.md, *Direct-indexed*
-** storage.md, *A tag*
 */
-
 #include <stdio.h>
 
 #include "storage_test.h"
 
 static const char *const ID_READS[2] = { "near", "far" };
 
-/*
-** storage_test_weigh_direct
-**
-** A direct-indexed component given and taken, and a value reached by an id
-** that is held. Answers 1 if the module could not be loaded.
-*/
 int storage_test_weigh_direct(storage_test_t *t)
 {
     storage_test_change_t c = {};
@@ -47,13 +31,6 @@ int storage_test_weigh_direct(storage_test_t *t)
     return (0);
 }
 
-/*
-** use_columns
-**
-** Loads a build that gives every entity six markers, into a deck of its
-** own. Answers 1 if it could not be loaded, and leaves in `used` the KB of
-** [budget] columns in use.
-*/
 static int use_columns(storage_test_t *t, const char *path, uint32_t *used)
 {
     bridge_artifact_t a = storage_test_state(path, STORAGE_TEST_ROWS, 8 << 20,
@@ -66,12 +43,6 @@ static int use_columns(storage_test_t *t, const char *path, uint32_t *used)
     return (0);
 }
 
-/*
-** storage_test_weigh_tags
-**
-** What a marker costs of [budget] columns, with bytes and with none.
-** Answers 1 if a module could not be loaded.
-*/
 int storage_test_weigh_tags(storage_test_t *t)
 {
     uint32_t used[2] = {};
@@ -85,15 +56,6 @@ int storage_test_weigh_tags(storage_test_t *t)
     return (0);
 }
 
-/*
-** storage_test_weigh_single
-**
-** A singleton read where it is, ten million times a pass. Answers 1,
-** having said why, if the module could not be loaded or did not read that
-** often.
-**
-** storage.md, *A singleton*
-*/
 int storage_test_weigh_single(storage_test_t *t)
 {
     bridge_artifact_t a = storage_test_state(SINGLE_PATH, 8, 1 << 20, 4096);
@@ -112,14 +74,6 @@ int storage_test_weigh_single(storage_test_t *t)
     return (0);
 }
 
-/*
-** storage_test_weigh_switch
-**
-** A toggled row switched by a write. Answers 1 if the module could not be
-** loaded.
-**
-** storage.md, *A toggle*
-*/
 int storage_test_weigh_switch(storage_test_t *t)
 {
     bridge_artifact_t a = storage_test_state(TOGGLE2_PATH, 204'800, 8 << 20,

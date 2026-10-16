@@ -1,25 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/host/pinned.c -- a pinned module: its code runs on the
-** thread that loaded it, or not at all.
-**
-** threads.md, *Threads*
 */
-
 #include <stdio.h>
 
 #include "cases.h"
 
-/*
-** test_get_counts
-**
-** Answers what the host's sink counts.
-*/
 test_counts_t *test_get_counts(const host_t *h)
 {
     const test_listener_t *l = h->ud;
@@ -36,12 +23,6 @@ static void load_pinned(host_t *h)
     host_load(h, &a);
 }
 
-/*
-** test_pin
-**
-** Three systems, pinned, among others. The naps run beside it, on
-** whichever threads: its own lines are the ones counted.
-*/
 void test_pin(host_t *h)
 {
     const test_counts_t *c = test_get_counts(h);
@@ -59,11 +40,6 @@ void test_pin(host_t *h)
     host_close(h);
 }
 
-/*
-** call_elsewhere
-**
-** Makes a call from another thread, and answers what it returned.
-*/
 static int call_elsewhere(bridge_t *b, int frames)
 {
     test_elsewhere_t e = {};
@@ -73,12 +49,6 @@ static int call_elsewhere(bridge_t *b, int frames)
     return (e.result);
 }
 
-/*
-** test_call_from_wrong_thread
-**
-** A phase run from a thread that did not load the pinned module is refused,
-** and so is a destroy from there, leaving the deck to be destroyed here.
-*/
 void test_call_from_wrong_thread(host_t *h)
 {
     h->cfg.threads = 4;

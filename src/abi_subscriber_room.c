@@ -1,27 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_subscriber_room.c -- the memory of a system or an observer:
-** everything it needs is had before any of it is kept.
-**
-** failure.md, *Out of memory*
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "abi_subscribe.h"
 
-/*
-** abi_free_subscriber
-**
-** Frees what abi_alloc_subscriber allocated, of one that is refused.
-*/
 void abi_free_subscriber(subscribing_t *g)
 {
     bridge_system_t *s = g->s;
@@ -37,12 +24,6 @@ void abi_free_subscriber(subscribing_t *g)
     g->asked = nullptr;
 }
 
-/*
-** make_room
-**
-** Makes room for one more among the deck's systems, and among the
-** module's systems or its observers.
-*/
 static bool make_room(subscribing_t *g)
 {
     module_t *m = g->m;
@@ -60,13 +41,6 @@ static bool make_room(subscribing_t *g)
     return (all && own);
 }
 
-/*
-** name_system
-**
-** Gives a system its name, its name as [order] has it, and, an observer,
-** its list of who triggered it: as long as what its module's spans could
-** publish of it.
-*/
 static bool name_system(subscribing_t *g)
 {
     const module_t *m = g->m;
@@ -84,14 +58,6 @@ static bool name_system(subscribing_t *g)
     return (s->name && s->full && (!g->events || s->pending));
 }
 
-/*
-** abi_alloc_subscriber
-**
-** Allocates everything a system or an observer needs. Its changes lie after
-** its terms, in the same block.
-**
-** failure.md, *Out of memory*
-*/
 int abi_alloc_subscriber(subscribing_t *g)
 {
     bridge_system_t *s;

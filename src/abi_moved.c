@@ -1,21 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/abi_moved.c -- what a reload may not change of a type: one somebody
-** else's rows hold, and a storage layout it cannot be moved to.
 */
-
 #include "abi_declare.h"
 
-/*
-** abi_names_superseded
-**
-** Answers whether a field of a type names a type this reload has made anew.
-*/
 bool abi_names_superseded(const declared_type_t *c)
 {
     uint32_t k = 0;
@@ -35,12 +24,6 @@ static bool has_field_of(const declared_type_t *other,
     return (k < other->dep_count);
 }
 
-/*
-** find_declarer
-**
-** Answers a loaded module, other than the one reloading and the one it
-** reloads, that declares a type, or nullptr.
-*/
 static const module_t *find_declarer(const module_t *m,
     const declared_type_t *type)
 {
@@ -59,12 +42,6 @@ static const module_t *find_declarer(const module_t *m,
     return (nullptr);
 }
 
-/*
-** abi_find_holder
-**
-** Answers a type with a field of type `c` that another loaded module
-** declares, and writes that module.
-*/
 const declared_type_t *abi_find_holder(const module_t *m,
     const declared_type_t *c, const module_t **by)
 {
@@ -81,17 +58,6 @@ const declared_type_t *abi_find_holder(const module_t *m,
     return (nullptr);
 }
 
-/*
-** abi_check_move
-**
-** Refuses a move of a type to another storage layout that cannot be made:
-** from a singleton, since there is no entity to carry it; to a singleton
-** from more than one entity, since nothing says which has its value; and of
-** a toggle that is off for some rows, unless the reload accepts that they
-** are then carried like the rest.
-**
-** lifetime.md, *When a component is moved*
-*/
 int abi_check_move(module_t *m, const declared_type_t *c,
     enum bridge_storage kept)
 {

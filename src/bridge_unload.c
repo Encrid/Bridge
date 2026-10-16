@@ -1,15 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/bridge_unload.c -- a module unloaded.
-**
-** lifetime.md, *What unload leaves behind*
 */
-
 #include <string.h>
 
 #include "module.h"
@@ -23,14 +16,6 @@ static module_t *find_loaded(bridge_t *b, const char *identity)
     return (m);
 }
 
-/*
-** take_out
-**
-** The rest of an unload, once the module's code has run for the last time:
-** what it declared goes by its policy, the ids held ready for it are
-** entities nobody will ever spawn, and its share of the arena goes back to
-** it unless a row that is staying holds a string there.
-*/
 static void take_out(bridge_t *b, module_t *m)
 {
     module_t **link = &b->modules;
@@ -47,16 +32,6 @@ static void take_out(bridge_t *b, module_t *m)
     module_discard(b, m);
 }
 
-/*
-** bridge_unload
-**
-** Unloads a module. A stopped deck takes an unload of the module that
-** stopped it, and of no other. Its systems are out of the schedule before
-** its last call; and after the barrier what left is out of every module's
-** spans, and observed.
-**
-** lifecycle.md, *The runtime lifecycle*
-*/
 int bridge_unload(bridge_t *b, const char *identity)
 {
     char why[256];

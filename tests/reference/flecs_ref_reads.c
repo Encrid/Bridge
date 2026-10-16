@@ -1,26 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/reference/flecs_ref_reads.c -- read: a table's column; a sparse
-** component alone; and the sparse one beside the column. A query's iterator
-** is made before its walk, and is not timed.
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "flecs_ref.h"
 
-/*
-** time_column
-**
-** Answers the nanoseconds it takes to read a table's column, and adds what
-** was read to `total`.
-*/
 static uint64_t time_column(ecs_iter_t *it, uint32_t *total)
 {
     const small_t *a;
@@ -41,12 +28,6 @@ static uint64_t time_column(ecs_iter_t *it, uint32_t *total)
     return (t);
 }
 
-/*
-** time_alone
-**
-** Answers the nanoseconds it takes to walk a sparse component alone, and
-** adds what was read to `total`.
-*/
 static uint64_t time_alone(ecs_iter_t *it, uint32_t *total)
 {
     uint32_t sum = 0;
@@ -65,12 +46,6 @@ static uint64_t time_alone(ecs_iter_t *it, uint32_t *total)
     return (t);
 }
 
-/*
-** time_beside
-**
-** Answers the nanoseconds it takes to read a table's column and the sparse
-** component of the same entities, and adds what was read to `total`.
-*/
 static uint64_t time_beside(ecs_iter_t *it, uint32_t *total)
 {
     const small_t *a;
@@ -91,12 +66,6 @@ static uint64_t time_beside(ecs_iter_t *it, uint32_t *total)
     return (t);
 }
 
-/*
-** time_reads
-**
-** Walks the three queries in turn, four times ROUNDS, and keeps the least
-** time of each.
-*/
 static void time_reads(ecs_world_t *w, ecs_query_t **q, uint64_t *best,
     uint32_t *total)
 {
@@ -121,11 +90,6 @@ static void time_reads(ecs_world_t *w, ecs_query_t **q, uint64_t *best,
     }
 }
 
-/*
-** flecs_ref_measure_reads
-**
-** Times the three reads over ROWS entities.
-*/
 void flecs_ref_measure_reads(void)
 {
     flecs_ref_t r = { .w = ecs_mini(), .count = ROWS };

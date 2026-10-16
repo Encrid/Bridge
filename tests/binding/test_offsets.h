@@ -1,17 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/binding/test_offsets.h -- what a module of the tests that is
-** written by offsets compiles against: registration, an attach with its
-** value, and a component's fields.
-**
-** schema.md, *What a module compiles against*
 */
-
 #ifndef TEST_OFFSETS_H
     #define TEST_OFFSETS_H
 
@@ -26,12 +17,6 @@
     #include "test_offsets_span.h"
     #include "test_offsets_toggle.h"
 
-/*
-** Registration, with names as literals. A type another declaration's fields
-** use is declared before it, in the same namespace.
-**
-** schema.md, *What a module compiles against*
-*/
     #define BRIDGE_DECLARE(kind, name, T, on_unload, storage) \
         bridge_declare(BRIDGE_STATE(bridge_declaration_t, \
             bridge_put(name, sizeof(name) - 1), sizeof(name) - 1, kind, \
@@ -41,23 +26,11 @@
     #define BRIDGE_COMPONENT(name, T, on_unload, storage) \
         BRIDGE_DECLARE(BRIDGE_STRUCT, name, T, on_unload, storage)
 
-/*
-** A tag: a component with no bytes, so no type to take them from.
-**
-** storage.md, *A tag*
-*/
     #define BRIDGE_DECLARE_TAG(name, on_unload, storage) \
         bridge_declare(BRIDGE_STATE(bridge_declaration_t, \
             bridge_put(name, sizeof(name) - 1), sizeof(name) - 1, BRIDGE_TAG, \
             0, 1, 0, 0, on_unload, storage))
 
-/*
-** A system, and an observer. `changes` is the slots of the components it
-** attaches or detaches, `change_count` of them: one that does neither hands
-** nullptr and 0.
-**
-** abi.md, *The ABI*
-*/
     #define BRIDGE_ADD_SYSTEM(name, phase, terms, count, changes, \
         change_count) \
         bridge_add_system(BRIDGE_STATE(bridge_system_statement_t, \
@@ -73,23 +46,9 @@
     #define BRIDGE_PUT_CHANGES(changes, count) \
         ((count) ? bridge_put(changes, (count) * sizeof(uint32_t)) : 0)
 
-/*
-** An attach with its value. An initial value travels with the attach, and
-** is as long as the type was declared. Bridge takes its copy during
-** the call.
-**
-** abi.md, *The ABI*
-*/
     #define BRIDGE_ATTACH(id, slot, value) \
         bridge_attach(id, slot, bridge_lend(&(value), sizeof(value)))
 
-/*
-** A component's fields. BRIDGE_ROW is where row `row` of a column of T is,
-** and carries the row < count test; `at` is what it or bridge_get_ref
-** answered.
-**
-** abi.md, *The ABI*
-*/
     #define BRIDGE_ROW(T, base, row, count) acc_row(base, row, count, sizeof(T))
     #define BRIDGE_GET(T, field, at) \
         BRIDGE_LD_(((T *)0)->field)((at) + (uint32_t)offsetof(T, field))
@@ -110,11 +69,6 @@
         unsigned long: BRIDGE_ST_LONG_, long long: acc_st_64, \
         unsigned long long: acc_st_64, float: acc_st_f32, double: acc_st_f64)
 
-/*
-** A long is 32 bits where a module is compiled for wasm and on Windows, and
-** 64 on the other systems these modules are compiled for, where it is what
-** a field of 64 bits is declared as.
-*/
     #if ULONG_MAX > 0xffffffffu
         #define BRIDGE_LD_LONG_ acc_ld_64
         #define BRIDGE_ST_LONG_ acc_st_64

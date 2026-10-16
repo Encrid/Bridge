@@ -1,25 +1,14 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/storage_table.h -- a table found by its set, matched against terms,
-** and marked touched.
 */
-
 #ifndef BRIDGE_SRC_STORAGE_TABLE_H
     #define BRIDGE_SRC_STORAGE_TABLE_H
 
     #include "storage_set.h"
     #include "storage_sets.h"
 
-/*
-** touch
-**
-** Marks a table touched since what modules read was last written.
-*/
 static inline void touch(storage_t *r, uint32_t t)
 {
     if (r->tables[t].touched)
@@ -29,11 +18,6 @@ static inline void touch(storage_t *r, uint32_t t)
     r->dirty_count++;
 }
 
-/*
-** find_table
-**
-** Answers the table a set is found as, or 0.
-*/
 static inline uint32_t find_table(const storage_t *r, const uint64_t *set)
 {
     uint32_t i = hash_set(r, set);
@@ -43,12 +27,6 @@ static inline uint32_t find_table(const storage_t *r, const uint64_t *set)
     return (r->hash[i]);
 }
 
-/*
-** terms_match
-**
-** Answers whether a set carries every type the terms must have and none
-** they must not.
-*/
 static inline bool terms_match(const storage_terms_t *t, const uint64_t *set)
 {
     uint32_t i = 0;
@@ -65,14 +43,6 @@ static inline bool terms_match(const storage_terms_t *t, const uint64_t *set)
     return (true);
 }
 
-/*
-** terms_read
-**
-** Answers whether a system's spans include table `t`: its set matches, and a
-** sparse set's table is walked only by a system that must have its type.
-**
-** storage.md, *What a query walks*
-*/
 static inline bool terms_read(const storage_t *r, const storage_terms_t *s,
     uint32_t t)
 {
@@ -89,13 +59,6 @@ static inline bool terms_read(const storage_t *r, const storage_terms_t *s,
     return (i < s->count);
 }
 
-/*
-** find_set_slot
-**
-** Answers which sparse set has a type in a set, or how many there may be if
-** none has: a set that holds a type kept in a sparse set is that sparse
-** set's table.
-*/
 static inline uint32_t find_set_slot(const storage_t *r, const uint64_t *set)
 {
     uint32_t slot = 0;

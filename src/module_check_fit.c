@@ -1,27 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/module_check_fit.c -- the keys of a module's config that have to fit:
-** in what there is, and with one another.
 */
-
 #include <stdckdint.h>
 #include <string.h>
 
 #include "module.h"
 
-/*
-** check_phase
-**
-** Refuses a phase name of a config that is unset, that is mapped twice, or
-** that is mapped to a phase the deployment did not declare.
-**
-** schedule.md, *A module's phase names are mapped by the deployment*
-*/
 static int check_phase(const module_check_t *k, uint32_t i)
 {
     const bridge_module_config_t *cfg = k->cfg;
@@ -46,11 +32,6 @@ static int check_phase(const module_check_t *k, uint32_t i)
         "which the deployment did not declare", n->from, n->to));
 }
 
-/*
-** module_check_phases
-**
-** Refuses a config whose phase names cannot be mapped.
-*/
 int module_check_phases(const module_check_t *k)
 {
     int refused = 0;
@@ -63,12 +44,6 @@ int module_check_phases(const module_check_t *k)
     return (refused);
 }
 
-/*
-** module_lay_private
-**
-** Works out where a module's regions sit in its private memory. Rounded up
-** to its backend's granule, its end is still an offset of 32 bits.
-*/
 int module_lay_private(const bridge_module_config_t *cfg, uint64_t granule,
     module_private_t *at)
 {
@@ -86,14 +61,6 @@ int module_lay_private(const bridge_module_config_t *cfg, uint64_t granule,
     return ((uint64_t)at->end + granule - 1 > UINT32_MAX);
 }
 
-/*
-** check_log_level
-**
-** Refuses a log level that is unset, or that is not one there is. Zero is
-** unset for it as for every key, so the least it can be is 1.
-**
-** log.md, *The log*
-*/
 static int check_log_level(const module_check_t *k)
 {
     uint32_t level = k->cfg->log_level;
@@ -106,15 +73,6 @@ static int check_log_level(const module_check_t *k)
         "can be, which is 1 to %u", level, BRIDGE_LEVEL_MOST));
 }
 
-/*
-** module_check_fit
-**
-** Refuses a config whose amounts do not fit. A log ring has the one floor
-** with an argument: a module that can report nothing is the one legal
-** number that makes a deployment incoherent.
-**
-** budgets.md, *Budgets*
-*/
 int module_check_fit(const module_check_t *k)
 {
     const bridge_module_config_t *cfg = k->cfg;

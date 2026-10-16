@@ -1,24 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/schedule_account.c -- what a dispatch works in, and the failure
-** budgets settled at a barrier.
 */
-
 #include <stdlib.h>
 
 #include "schedule.h"
 
-/*
-** schedule_room
-**
-** Makes, once, what a dispatch and a schedule are worked out in, [budget]
-** systems wide.
-*/
 int schedule_room(bridge_t *b)
 {
     uint32_t n = b->max_systems ? b->max_systems : 1;
@@ -37,14 +25,6 @@ int schedule_room(bridge_t *b)
         "what a dispatch and a schedule are worked out in"));
 }
 
-/*
-** say_stopped
-**
-** Says that a module is stopped, and by what: the system that reached its
-** number, or the module itself.
-**
-** failure.md, *The budget*
-*/
 static void say_stopped(bridge_t *b, const module_t *m,
     const bridge_system_t *s)
 {
@@ -62,14 +42,6 @@ static void say_stopped(bridge_t *b, const module_t *m,
         "not be placed", m->identity, most);
 }
 
-/*
-** settle_module
-**
-** Counts a module's barrier against its budget, and stops it if a system of
-** its reached its number or it did itself, by entities it changed that
-** could not be placed. `fail` covers a stop as it covers a load: the
-** deployment does not run without it.
-*/
 static void settle_module(bridge_t *b, module_t *m)
 {
     const bridge_system_t *s = m->reached;
@@ -91,13 +63,6 @@ static void settle_module(bridge_t *b, module_t *m)
         bridge_stop(b, m->identity, "was stopped");
 }
 
-/*
-** schedule_account
-**
-** Stops, at a barrier, each module that reached its failure budget. It is
-** counted in invocations and in barriers and never in time, so that the
-** same history stops the same module at the same place every run.
-*/
 void schedule_account(bridge_t *b)
 {
     module_t *m = b->modules;

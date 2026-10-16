@@ -1,27 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/module_pointed.c -- whether a row holds a string in a module's share
-** of the persistent arena. A string a component keeps is a bridge_text_t
-** field, so every reference there is can be found: in a field, in an array
-** of them, or in a struct a field holds.
-**
-** strings.md, *It is given back when nothing points into it*
 */
-
 #include <string.h>
 
 #include "module.h"
 
-/*
-** is_in_share
-**
-** Answers whether the text at `bytes` lies in a module's share.
-*/
 static bool is_in_share(const module_t *m, const uint8_t *bytes)
 {
     const range_t *own = m->owned;
@@ -39,13 +24,6 @@ static bool is_in_share(const module_t *m, const uint8_t *bytes)
     return (false);
 }
 
-/*
-** get_element
-**
-** Answers where element `i` of a field is in a value, or nullptr if the
-** field has no such element or is of a kind that holds no string: only a
-** text does, and a struct may.
-*/
 static const uint8_t *get_element(const schema_field_t *f,
     const uint8_t *bytes, uint32_t i)
 {
@@ -61,13 +39,6 @@ static const uint8_t *get_element(const schema_field_t *f,
     return (bytes + f->offset + i * size);
 }
 
-/*
-** points_in
-**
-** Answers whether a value holds a string in a module's share: every element
-** of every field is read, one at a time, and a struct as a value of its
-** own.
-*/
 static bool points_in(const module_t *m, const declared_type_t *c,
     const uint8_t *bytes)
 {
@@ -89,12 +60,6 @@ static bool points_in(const module_t *m, const declared_type_t *c,
     return (found);
 }
 
-/*
-** count_row
-**
-** Counts a row that holds a string in the share, and never answers that it
-** found one: every row is to be read.
-*/
 static bool count_row(void *ctx, const uint8_t *row)
 {
     module_pointing_t *p = ctx;
@@ -103,12 +68,6 @@ static bool count_row(void *ctx, const uint8_t *row)
     return (false);
 }
 
-/*
-** module_count_pointing
-**
-** Answers how many rows of a type hold a string in a module's share of the
-** persistent arena.
-*/
 uint32_t module_count_pointing(const bridge_t *b, const module_t *m,
     const declared_type_t *c)
 {

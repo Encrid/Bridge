@@ -1,24 +1,12 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/storage/storage_test_measure_tables.c -- what a barrier costs with
-** ten thousand tables standing, and what making and emptying them costs.
 */
-
 #include <stdio.h>
 
 #include "storage_test.h"
 
-/*
-** time_idle
-**
-** Answers the least of a barrier with nothing to do, of one and then as
-** many as a measurement has rounds.
-*/
 static uint64_t time_idle(storage_test_t *t)
 {
     uint64_t least = storage_test_time_barrier(t, "never");
@@ -34,13 +22,6 @@ static uint64_t time_idle(storage_test_t *t)
     return (least);
 }
 
-/*
-** measure_sets
-**
-** Every one of ten thousand sets filled at one barrier and emptied at the
-** next: where a table that lives only while it has rows is made and
-** released each time.
-*/
 static void measure_sets(storage_test_t *t)
 {
     uint64_t filled = 0;
@@ -63,13 +44,6 @@ static void measure_sets(storage_test_t *t)
         (double)emptied / 1000.0 / 10'000);
 }
 
-/*
-** storage_test_measure_tables
-**
-** Ten thousand tables made, a barrier with them standing, ten thousand
-** more, and the sets filled and emptied, in a deck of its own. Answers 1
-** if the module could not be loaded.
-*/
 int storage_test_measure_tables(storage_test_t *t)
 {
     bridge_artifact_t a = storage_test_state(STORETAB_PATH, 10'000, 8 << 20,

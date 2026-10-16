@@ -1,16 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/module_record.c -- a module's record, made from its config: all of
-** it, or none of it.
-**
-** failure.md, *Out of memory*
 */
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -52,14 +44,6 @@ static void copy_stated(module_t *m, const bridge_module_config_t *cfg)
     m->loss_count = cfg->loss_count > 0 ? (uint32_t)cfg->loss_count : 0;
 }
 
-/*
-** alloc_room
-**
-** Allocates a module's names, and its ids and its queue, as long as it
-** stated, now. false if there was not the memory for all of them.
-**
-** budgets.md, *Nothing is allocated in a phase*
-*/
 static bool alloc_room(module_t *m, const bridge_module_config_t *cfg)
 {
     const char *id = cfg->identity;
@@ -83,13 +67,6 @@ static bool alloc_room(module_t *m, const bridge_module_config_t *cfg)
     return ((cfg->spawns <= 0 || m->ids) && (cfg->changes <= 0 || m->queue));
 }
 
-/*
-** copy_phases
-**
-** Copies what the deployment says this module's name for a phase is, with
-** the phase it stands for, which the checks found. false if there was not
-** the memory for it.
-*/
 static bool copy_phases(const bridge_t *b, module_t *m,
     const bridge_module_config_t *cfg)
 {
@@ -112,11 +89,6 @@ static bool copy_phases(const bridge_t *b, module_t *m,
     return (whole);
 }
 
-/*
-** module_record
-**
-** Makes a module's record from its config: all of it, or none.
-*/
 module_t *module_record(bridge_t *b, const bridge_artifact_t *a,
     open_backend_t *o)
 {

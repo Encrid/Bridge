@@ -1,28 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/module_say.c -- how a refused module and a failed load are said, and
-** the keys of a config that are checked one by one.
-**
-** config.md, *No unaccountable values*
 */
-
 #include <stdarg.h>
 #include <stdio.h>
 
 #include "module.h"
 
-/*
-** module_refuse
-**
-** Says that a module is refused, and why. Answers 1.
-**
-** create.md, *The sink*
-*/
 int module_refuse(bridge_t *b, const char *identity, const char *format, ...)
 {
     char text[512];
@@ -35,11 +20,6 @@ int module_refuse(bridge_t *b, const char *identity, const char *format, ...)
     return (1);
 }
 
-/*
-** module_fail
-**
-** Writes why a module's load or reload failed. Answers 1.
-*/
 int module_fail(backend_err_t *err, const char *format, ...)
 {
     va_list args;
@@ -50,13 +30,6 @@ int module_fail(backend_err_t *err, const char *format, ...)
     return (1);
 }
 
-/*
-** module_check_set
-**
-** Refuses a key whose zero means nobody stated it.
-**
-** config.md, *No unaccountable values*
-*/
 int module_check_set(const module_check_t *k, const char *key, int64_t value)
 {
     if (value)
@@ -64,13 +37,6 @@ int module_check_set(const module_check_t *k, const char *key, int64_t value)
     return (module_refuse(k->b, k->id, "%s is unset", key));
 }
 
-/*
-** module_check_bound
-**
-** Refuses a negative number that is not `none`.
-**
-** config.md, *No unaccountable values*
-*/
 int module_check_bound(const module_check_t *k, const char *key,
     int64_t value, int64_t none)
 {
@@ -84,13 +50,6 @@ int module_check_bound(const module_check_t *k, const char *key,
         (long long)value, either));
 }
 
-/*
-** module_check_flag
-**
-** Refuses a key that is yes or no and is stated as neither.
-**
-** config.md, *No unaccountable values*
-*/
 int module_check_flag(const module_check_t *k, const char *key,
     enum bridge_flag value)
 {

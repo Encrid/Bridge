@@ -1,14 +1,8 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/bridge_backend.c -- one backend of a deployment: its library opened,
-** and the backend started with its settings.
 */
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -26,13 +20,6 @@ static_assert(offsetof(bridge_setting_t, kind)
     == offsetof(backend_setting_t, kind));
 static_assert(offsetof(bridge_setting_t, v) == offsetof(backend_setting_t, v));
 
-/*
-** check_backend
-**
-** Refuses a backend with no name or no library, or named as one before it.
-**
-** create.md, *Create*
-*/
 static int check_backend(bridge_t *b, const bridge_config_t *cfg, uint32_t i)
 {
     const bridge_backend_t *want = &cfg->backends[i];
@@ -52,14 +39,6 @@ static int check_backend(bridge_t *b, const bridge_config_t *cfg, uint32_t i)
     return (0);
 }
 
-/*
-** convert_settings
-**
-** Answers a backend's settings as the backend seam states them. There are
-** two structs for one fact, one per seam, so that neither header needs the
-** other: they are held to one shape above, where one is copied to the other,
-** the same four kinds under the two seams' names and the same numbers.
-*/
 static backend_setting_t *convert_settings(const bridge_backend_t *want)
 {
     uint32_t count = want->setting_count;
@@ -75,14 +54,6 @@ static backend_setting_t *convert_settings(const bridge_backend_t *want)
     return (settings);
 }
 
-/*
-** open_library
-**
-** Opens a backend's library and finds its entries. The backend is counted
-** once it has its name, so that a deck that is refused frees it.
-**
-** create.md, *Create*
-*/
 static int open_library(bridge_t *b, const bridge_backend_t *want,
     open_backend_t *o)
 {
@@ -99,13 +70,6 @@ static int open_library(bridge_t *b, const bridge_backend_t *want,
     return (1);
 }
 
-/*
-** start_backend
-**
-** Creates the backend, with its settings passed to it unread.
-**
-** host_api.md, *The data*
-*/
 static int start_backend(bridge_t *b, const bridge_backend_t *want,
     open_backend_t *o)
 {
@@ -122,11 +86,6 @@ static int start_backend(bridge_t *b, const bridge_backend_t *want,
     return (1);
 }
 
-/*
-** bridge_open_backend
-**
-** Opens the backend `i` of the deployment and starts it.
-*/
 int bridge_open_backend(bridge_t *b, const bridge_config_t *cfg, uint32_t i)
 {
     const bridge_backend_t *want = &cfg->backends[i];

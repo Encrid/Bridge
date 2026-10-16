@@ -1,21 +1,10 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** src/schedule_run.c -- a phase run: a level at a time, one job per module,
-** and what failed counted.
 */
-
 #include "schedule.h"
 
-/*
-** count_levels
-**
-** Answers how many levels a phase has: one more than its highest.
-*/
 static uint32_t count_levels(const bridge_t *b, uint32_t phase)
 {
     uint32_t levels = 0;
@@ -29,15 +18,6 @@ static uint32_t count_levels(const bridge_t *b, uint32_t phase)
     return (levels);
 }
 
-/*
-** count_failure
-**
-** Counts what one system's run came to. A system is counted alone, so that
-** one that always fails is not forgiven by another of its module's that
-** never does. A failed invocation is abandoned, and logged.
-**
-** failure.md, *The budget*
-*/
 static void count_failure(bridge_t *b, bridge_system_t *s)
 {
     say_t about = { s->m, s, BRIDGE_ERR };
@@ -64,13 +44,6 @@ static void account_job(bridge_t *b, const schedule_job_t *job)
     }
 }
 
-/*
-** run_level
-**
-** Runs one level of a phase: its jobs at once, and then what failed counted
-** and said, here, so that the sink is only ever called on the thread that
-** asked for the phase.
-*/
 static void run_level(schedule_pass_t *pass)
 {
     bridge_t *b = pass->b;
@@ -87,11 +60,6 @@ static void run_level(schedule_pass_t *pass)
     }
 }
 
-/*
-** schedule_run
-**
-** Runs the systems of one phase, a level at a time.
-*/
 void schedule_run(bridge_t *b, uint32_t phase)
 {
     schedule_pass_t pass = { .b = b, .phase = phase };

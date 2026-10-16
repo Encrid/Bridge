@@ -1,27 +1,13 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/storage/storage_test_move.c -- a module that keeps st:X in one
-** storage layout, reloaded as a build that keeps it in another. What
-** storage has of it afterwards is said from in here, whatever became of
-** the module.
-**
-** lifetime.md, *When a component is moved*
 */
-
 #include <stdio.h>
 #include <string.h>
 
 #include "storage_test.h"
 
-/*
-** What a transcript calls each storage layout, and the build that keeps
-** st:X in it, by the layout's number.
-*/
 static const char *const KEPT_AS[] = {
     "", "a table", "a sparse set", "a toggle", "direct-indexed", "a singleton"
 };
@@ -32,14 +18,6 @@ static const char *const BUILDS[] = {
 
 static const char *const X_LOST[1] = { "st:X" };
 
-/*
-** Every one of the four layouts that an entity carries, to every other.
-** Then to a singleton: from one entity, from none, and from three, which
-** nothing chooses among. And from a singleton, which no entity is there to
-** carry. A toggle with a row that is off is refused, naming the loss,
-** until the loss is accepted. The last row is a loss that is accepted and
-** not made.
-*/
 static const storage_test_moved_t MOVED[] = {
     { 1, 2, "", nullptr, BRIDGE_NONE }, { 1, 3, "", nullptr, BRIDGE_NONE },
     { 1, 4, "", nullptr, BRIDGE_NONE }, { 2, 1, "", nullptr, BRIDGE_NONE },
@@ -57,10 +35,6 @@ static const storage_test_moved_t MOVED[] = {
     { 1, 2, "", X_LOST, 1 }
 };
 
-/*
-** From a table to a sparse set with [budget] columns of 112 bytes: no room
-** for the rows where they are to go, and nothing has moved.
-*/
 static const storage_test_moved_t MOVED_WITHOUT_ROOM = { 1, 2, "", nullptr,
     BRIDGE_NONE };
 
@@ -79,13 +53,6 @@ static void say_kept(bridge_t *b)
     }
 }
 
-/*
-** move
-**
-** One row, in a deck of its own: the first build loaded, run, prepared
-** and looked at, the reload into the second, another look, and what
-** storage has of st:X.
-*/
 static void move(storage_test_t *t, const storage_test_moved_t *row)
 {
     bridge_t *b = bridge_create(&t->cfg, storage_test_hear, t);
@@ -108,13 +75,6 @@ static void move(storage_test_t *t, const storage_test_moved_t *row)
     (void)bridge_destroy(b);
 }
 
-/*
-** storage_test_move
-**
-** Every move of a component between storage layouts, each in a deck of
-** its own with room for one sparse set and one direct-indexed component.
-** The deck main made is replaced by one of the last deployment.
-*/
 enum storage_test_end storage_test_move(storage_test_t *t)
 {
     constexpr size_t count = sizeof(MOVED) / sizeof(*MOVED);

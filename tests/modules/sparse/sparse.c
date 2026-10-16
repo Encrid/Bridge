@@ -1,44 +1,11 @@
 /*
-** Copyright (C) 2026 Bridge Owner
-**
-** This file is part of Bridge.
+** Copyright (C) 2026 Enkrid
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
-**
-** tests/modules/sparse/sparse.c -- a component kept in a sparse
-** set, beside one kept in a table. A is in a table and every entity carries
-** it; S is in a sparse set and some do.
-**
-**     spawn            the entities, each with A
-**     attach_b         S for every second one, with a value of its own.
-**                      BIG: for every one
-**     detach_b         and taken from each of them again
-**     detach_b_half    S taken from the first that has it
-**     value_b          a value for one that has S already
-**     attach_b_half    one more entity, with S and nothing else: it is in
-**                      no table
-**     destroy_half     one that has S destroyed, and one that has not
-**     look             the set walked: a query on S alone, one span
-**     look_b           the table walked, S reached from each row through
-**                      the set's index
-**     destroy          every one
-**
-** BIG is 204,800 entities and no observer, for a measurement; FAT is 10,000
-** that carry 4 KB. BAD is a system the load is refused for: 1 selects by A
-** and by S, 2 by not having S.
-**
-** storage.md, *A sparse set*
 */
-
 #include "sparse.h"
 #include "idle.h"
 
-/*
-** add_changes
-**
-** Registers the eight systems that walk nothing, each with the component it
-** attaches or detaches.
-*/
 static void add_changes(const test_api_t *api)
 {
     int none = 0;
@@ -59,12 +26,6 @@ static void add_changes(const test_api_t *api)
     TEST_ADD_SYSTEM(api, "destroy", "destroy", &none, 0, nullptr, 0);
 }
 
-/*
-** add_walks
-**
-** Registers the system that walks the set, by S alone, and the one that
-** walks the table, by A and maybe S, and keeps their queries.
-*/
 static void add_walks(const test_api_t *api)
 {
     bridge_term_t one[1] = {{ nsparse_s, BRIDGE_READ, BRIDGE_AND, 0 }};
@@ -78,12 +39,6 @@ static void add_walks(const test_api_t *api)
 }
 
 #if !defined(BIG) && !defined(FAT)
-/*
-** add_observers
-**
-** Registers the observer of S, and the observer of A and S: an observer
-** walks nothing, so its terms may be of both.
-*/
 static void add_observers(const test_api_t *api)
 {
     bridge_term_t one[1] = {{ nsparse_s, BRIDGE_READ, BRIDGE_AND, 0 }};
@@ -101,13 +56,6 @@ static void add_observers(const test_api_t *api)
 #endif
 
 #ifdef BAD
-/*
-** add_refused
-**
-** Registers the system the load is refused for: in the build BAD 1 one that
-** selects by A and by S, and in the build BAD 2 one that selects by not
-** having S.
-*/
 static void add_refused(const test_api_t *api)
 {
     bridge_term_t one[1] = {{ nsparse_s, BRIDGE_READ, BRIDGE_NOT, 0 }};
@@ -122,12 +70,6 @@ static void add_refused(const test_api_t *api)
 
 #endif
 
-/*
-** init
-**
-** Declares the two components, and registers the systems, the observers a
-** build has, and the system a build is refused for.
-*/
 TEST(init)
 {
     nsparse_a = TEST_COMPONENT(api, "st:A", a_t, BRIDGE_DELETE,
