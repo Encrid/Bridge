@@ -13,14 +13,20 @@ The backends open in the order that the deployment states them.
 
 After a backend starts, Bridge asks it for its capabilities and for the shape of a block that it maps.
 The shape is a reservation, a guard and a granule. A backend with no granule gets a granule of 1.
+`check_shape` refuses a granule that is not 0 and not a power of two up to 2 to the power 30.
+It also refuses a reservation or a guard past 2 to the power 47 bytes.
+So no length and no reservation that Bridge adds from them passes 64 bits.
+
 Every backend maps the shared block, so the world keeps the largest reservation and the largest guard of the backends.
-The length of the shared block is a whole number of each granule, so the world keeps the least common multiple of the granules.
+Each granule is a power of two, so a length that is a whole number of the largest one is a whole number of each.
+The world keeps the largest granule.
 `src/block_create.c` makes the shared block to this shape.
 
 ## Functions
 
 | Function | Result |
 | --- | --- |
-| `get_common_multiple` | Gives the least length that is a whole number of both `a` and `b`. |
-| `take_shape` | Asks a backend for its capabilities and its shape, and makes the shape of the world hold it. |
+| `refuse_span` | Refuses a reservation or a guard past 2 to the power 47 bytes, with a record. Gives 1. |
+| `check_shape` | Refuses a granule that is not 0 and not a power of two up to 2 to the power 30, and calls `refuse_span`. Gives 1 with a record. |
+| `take_shape` | Asks a backend for its capabilities and its shape, and makes the shape of the world hold it. Gives 1, with a record, if refused. |
 | `bridge_open_backends` | Opens and starts every backend of the deployment, in its order. 1, with a record, if there is none or one fails. |

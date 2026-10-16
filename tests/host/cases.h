@@ -280,6 +280,8 @@ void test_stop_by_barred(host_t *h);
 void test_log_out_of_range(host_t *h);
 
 void test_reserve_too_much(host_t *h);
+
+void test_state_shape(host_t *h);
 void test_conflict_at_barrier(host_t *h);
 void test_order_observers(host_t *h);
 void test_reorder_observers(host_t *h);

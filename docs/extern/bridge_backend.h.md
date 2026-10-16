@@ -101,6 +101,10 @@ It writes three numbers, and 0 for each one that it does not need:
 | `guard` | How many bytes after the reservation have nothing mapped into them. |
 | `granule` | The length of the block is a whole number of `granule` bytes. |
 
+A `granule` that is not 0 is a power of two, of at most 1073741824 bytes.
+A `reservation` and a `guard` each have at most 140737488355328 bytes, 2 to the power 47.
+Bridge refuses a backend that states more, and the world with it.
+
 Bridge reserves the length of a block or `reservation`, the larger of the two, and `guard` after it.
 Each backend maps the shared memory, thus it has the largest `reservation` and `guard`, and a length that is a whole number of each `granule`.
 The private memory of a module has the shape that the backend of the module needs.

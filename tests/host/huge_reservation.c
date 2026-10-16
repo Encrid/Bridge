@@ -7,8 +7,8 @@
 
 static const bridge_setting_t HUGE[4] = {
     { "capabilities", BRIDGE_INT, {}, { .i = HOST_TESTS_KEEPS_ALL } },
-    { "reservation", BRIDGE_INT, {}, { .i = INT64_C(1) << 50 } },
-    { "guard", BRIDGE_INT, {}, { .i = HOST_TESTS_GRANULE } },
+    { "reservation", BRIDGE_INT, {}, { .i = INT64_C(1) << 47 } },
+    { "guard", BRIDGE_INT, {}, { .i = INT64_C(1) << 47 } },
     { "granule", BRIDGE_INT, {}, { .i = HOST_TESTS_GRANULE } }
 };
 
