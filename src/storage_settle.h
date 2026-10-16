@@ -21,7 +21,7 @@ static inline void say_unapplied(bridge_t *b, module_t *m)
             "used up. Not applied, of the changes it asked: %u", m->identity,
             b->columns_len, m->left[1]);
     if (m->left[0] || m->left[1])
-        m->unplaced_now = 1;
+        m->fault_now = "by entities it changed that could not be placed";
     m->left[0] = 0;
     m->left[1] = 0;
 }
@@ -36,7 +36,8 @@ static inline void say_barred(bridge_t *b, module_t *m)
         "nothing it may write. Left as they were: %u", m->identity,
         m->barred);
     m->barred = 0;
-    m->unplaced_now = 1;
+    m->fault_now = "by destroys of entities that carry nothing it may "
+        "write";
 }
 
 static inline void empty_queues(bridge_t *b)

@@ -132,7 +132,7 @@ A system and an observer are a query and a function either way, so one record se
 | `hot_reload`, `on_error` | What its config states for them. |
 | `shutdown`, `shutdown_timeout` | Its export `shutdown`, and the timeout of that call. |
 | `max_failures`, `failures` | The `max_system_failures` of its config, and its own count for what is no system's. |
-| `changed_now`, `unplaced_now` | At this barrier: it changed an entity, and an entity it changed was not placed. |
+| `changed_now`, `fault_now` | At this barrier: it changed an entity, and the words of its fault, or null. |
 | `reached` | The system whose count reached the number, if one did. |
 | `left` | How many of its changes this barrier did not apply, for want of a table and for want of columns. |
 | `writable` | The types that it may write, as storage numbers them. |

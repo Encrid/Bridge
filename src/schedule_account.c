@@ -26,7 +26,7 @@ int schedule_room(bridge_t *b)
 }
 
 static void say_stopped(bridge_t *b, const module_t *m,
-    const bridge_system_t *s)
+    const bridge_system_t *s, const char *fault)
 {
     say_t about = { m, nullptr, BRIDGE_ERR };
     long long most = (long long)m->max_failures;
@@ -38,27 +38,27 @@ static void say_stopped(bridge_t *b, const module_t *m,
         return;
     }
     say_about(b, &about, "module '%s' is stopped: it reached its "
-        "max_system_failures of %lld, by entities it changed that could "
-        "not be placed", m->identity, most);
+        "max_system_failures of %lld, %s", m->identity, most, fault);
 }
 
 static void settle_module(bridge_t *b, module_t *m)
 {
     const bridge_system_t *s = m->reached;
+    const char *fault = m->fault_now;
 
-    if (m->unplaced_now)
+    if (fault)
         m->failures++;
     else if (m->changed_now && m->failures)
         m->failures--;
     m->changed_now = 0;
-    m->unplaced_now = 0;
+    m->fault_now = nullptr;
     m->reached = nullptr;
     if (m->stopped || m->max_failures <= 0)
         return;
     if (!s && m->failures < m->max_failures)
         return;
     m->stopped = 1;
-    say_stopped(b, m, s);
+    say_stopped(b, m, s, fault);
     if (m->on_error == BRIDGE_FAIL)
         bridge_stop(b, m->identity, "was stopped");
 }

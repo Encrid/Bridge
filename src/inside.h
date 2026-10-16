@@ -155,7 +155,7 @@ struct module {
     int64_t max_failures;
     int64_t failures;
     int changed_now;
-    int unplaced_now;
+    const char *fault_now;
     const void *reached;
     uint32_t left[2];
     uint64_t *writable;

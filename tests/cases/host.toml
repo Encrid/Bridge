@@ -299,6 +299,12 @@ claims = { matches = ["its setting 'flags' is -1, which the bitmask of the field
 false = { run = ["{out}/host{exe}", "bridge_setting_t-no-kind-refused"] }
 
 [[case]]
+name = "module_config.max_system_failures-reached-by-barred-destroys"
+run = ["{out}/host{exe}", "module_config.max_system_failures-reached-by-barred-destroys"]
+claims = { matches = ["is stopped: it reached its max_system_failures of 1, by destroys of entities that carry nothing it may write.*view:reaper@0.1.0=STOPPED.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_load-failed-init-log-given"] }
+
+[[case]]
 name = "module_config.spans-too-small-refused"
 run = ["{out}/host{exe}", "module_config.spans-too-small-refused"]
 claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }

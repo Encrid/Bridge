@@ -9,7 +9,7 @@ It empties the queue of each module, forgets the fold, and tells each module whi
 The record names the module, the budget and its value, and how many of its changes storage did not apply.
 `say_barred` writes an error record for the destroys that storage barred.
 It says how many entities the module asked to destroy that carry nothing that it may write.
-Either record sets `unplaced_now` of the module, so the barrier counts against its budget: `docs/intern/schedule.h.md`, *The failure budget*.
+Either record sets `fault_now` of the module to the words of its fault, so the barrier counts against its budget: `docs/intern/schedule.h.md`, *The failure budget*.
 `empty_queues` sets `changed_now` of each module that queued something, for the same budget.
 
 ## Functions

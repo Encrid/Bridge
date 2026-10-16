@@ -264,6 +264,8 @@ void test_keep_two_shares(host_t *h);
 void test_seed_failed_load(host_t *h);
 
 void test_hand_keys(host_t *h);
+
+void test_stop_by_barred(host_t *h);
 void test_conflict_at_barrier(host_t *h);
 void test_order_observers(host_t *h);
 void test_reorder_observers(host_t *h);

@@ -25,14 +25,15 @@ If an allocation fails, `bridge_lacks` writes a record and the function gives 1.
 `schedule_account` settles each module, in the order of the list of modules.
 For one module, `settle_module` does these steps:
 
-1. If `unplaced_now` is set, it adds 1 to `failures`, the count of the module.
+1. If `fault_now` is set, it adds 1 to `failures`, the count of the module.
 2. If not, and `changed_now` is set and `failures` is above 0, it removes 1.
-3. It clears `changed_now`, `unplaced_now` and `reached` for the next barrier.
+3. It clears `changed_now`, `fault_now` and `reached` for the next barrier.
 4. It stops nothing if the module is stopped already, or if `max_failures` is not above 0.
 5. It stops the module if a system reached the limit, in `reached`, or if `failures` reached it.
 
 A stopped module gets `stopped`, and `say_stopped` writes a record at the level `BRIDGE_ERR`.
-The record names the system, or says that entities the module changed could not be placed.
+The record names the system, or ends with the words of the fault of this barrier.
+A count of the module reaches the limit only at a barrier that raised it, so that barrier had a fault.
 If the module states `BRIDGE_FAIL`, `bridge_stop` stops the world too.
 
 ## Functions
