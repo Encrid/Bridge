@@ -19,7 +19,7 @@ static bool runs_now(const schedule_pass_t *pass, const bridge_system_t *s)
 {
     if (s->phase != pass->phase || s->level != pass->level)
         return (false);
-    if (s->m->stopped || s->parked)
+    if (s->m->stopped)
         return (false);
     return (!s->observer || s->pending_count);
 }

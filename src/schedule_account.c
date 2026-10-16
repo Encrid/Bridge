@@ -9,7 +9,7 @@
 
 int schedule_room(bridge_t *b)
 {
-    uint32_t n = b->max_systems ? b->max_systems : 1;
+    uint32_t n = b->max_systems;
     size_t bits = (size_t)n * (((size_t)n + 63) / 64) + 1;
     bool made;
 

@@ -6,7 +6,8 @@ The rules of the budget are in `docs/intern/schedule.h.md`, *The failure budget*
 ## The room
 
 `schedule_room` runs once, at create, from `src/bridge_create.c`.
-It allocates these arrays, where `n` is `max_systems`, which is `[budget] systems`, or 1 if that is 0:
+It allocates these arrays, where `n` is `max_systems`, which is `[budget] systems`.
+`block_check_budget` refuses a budget of 0 systems before, so `n` is never 0:
 
 | Array | Content |
 | --- | --- |

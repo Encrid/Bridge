@@ -13,8 +13,12 @@ The list of each job is one run of `run_lists`, after the list of the job before
 A system runs now if all these are true:
 
 - It is of this phase and of this level.
-- Its module is not stopped, and the system is not parked.
+- Its module is not stopped.
 - It is a system, or it is an observer that something triggered since the last barrier.
+
+A parked system is in the list of the world only while `bridge_reload` runs, and no phase runs then.
+A call from the sink is refused, and a call from another thread may not overlap: `docs/extern/bridge.h.md`.
+So `runs_now` does not test `parked`.
 
 `run_handed` gets a pointer to each job, for `pool_run`.
 `run_callers` gets 1 for the job of a pinned module: the thread that asked for the phase runs that job.
