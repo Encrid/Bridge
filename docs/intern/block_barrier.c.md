@@ -8,7 +8,7 @@ This file runs the barrier: what happens between two phases, in an order that ne
 1. Storage ends the hold on the ids that each module handed out: `docs/intern/storage_held.c.md`.
 2. Storage applies the queued changes of each module: `src/storage_apply.c`.
 3. Each module gets its ids topped up: `docs/intern/block_module.c.md`, *The ids set aside*.
-4. The spans of each running module are published again, until publishing makes no more table ids.
+4. The spans of each running module are published again.
 5. Storage ends the publish, and the layout counts as not moved.
 6. The observers of what changed run. Their phase is the one past the last phase of the deployment.
 7. No system or observer is pending any more, and the count of lifecycle calls goes back to 0.
@@ -17,7 +17,7 @@ This file runs the barrier: what happens between two phases, in an order that ne
 10. The count of barriers goes up by 1.
 
 The header of a module tells how many table ids there are.
-So if publishing makes more table ids, every module is published again, until the number stays the same.
+That number is `[budget] tables` and `[budget] sparse_sets`, and 1. It is fixed when the world is made, so one publish is enough.
 
 A module whose spans no longer hold what its queries match is stopped, with a record that names the size of its spans.
 If it ran on, its systems would run over tables that they were not told about.
@@ -49,6 +49,5 @@ A destroy that the module may not do counts the same way: `src/storage_settle.h`
 | --- | --- |
 | `refill_all` | Tops up the ids of each module. |
 | `publish_all` | Publishes the spans of each running module, and stops a module whose spans no longer hold what its queries match. Marks a stopped module as not published. |
-| `republish` | Publishes until publishing makes no more table ids. |
 | `finish_barrier` | Ends a barrier once its observers ran: no system pending, the failure budgets settled, each log drained, and the barrier counted. |
 | `block_barrier` | Runs the barrier, with the steps of *The steps of a barrier*. |

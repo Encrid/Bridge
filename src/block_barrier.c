@@ -32,16 +32,6 @@ static void publish_all(bridge_t *b)
     }
 }
 
-static void republish(bridge_t *b)
-{
-    uint32_t tables = storage_count_tables(b->storage) + 1;
-
-    while (tables != storage_count_tables(b->storage)) {
-        tables = storage_count_tables(b->storage);
-        publish_all(b);
-    }
-}
-
 static void finish_barrier(bridge_t *b)
 {
     module_t *m = b->modules;
@@ -65,7 +55,7 @@ void block_barrier(bridge_t *b)
     block_hand_out(b);
     storage_apply(b->storage);
     refill_all(b);
-    republish(b);
+    publish_all(b);
     storage_end_publish(b->storage);
     b->layout_moved = 0;
     schedule_run(b, b->phase_count);
