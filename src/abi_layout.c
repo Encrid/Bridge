@@ -28,15 +28,15 @@ static int parse_descriptor(declaring_t *g)
     return (abi_refuse(g->m, "type '%s': its descriptor %s", g->name, why));
 }
 
-static int check_size(declaring_t *g)
+int abi_check_size(declaring_t *g, uint32_t size, uint32_t align)
 {
     const bridge_declaration_t *d = &g->d;
 
-    if (g->s.size == d->size && g->s.align == d->align)
+    if (size == d->size && align == d->align)
         return (0);
     return (abi_refuse(g->m, "type '%s' is %u bytes aligned to %u in the "
         "module and %u aligned to %u by its descriptor", g->name, d->size,
-        d->align, g->s.size, g->s.align));
+        d->align, size, align));
 }
 
 static int check_room(declaring_t *g)
@@ -68,7 +68,7 @@ int abi_read_layout(declaring_t *g)
     g->s.align = g->d.align;
     if (g->d.kind != BRIDGE_TAG && parse_descriptor(g))
         return (1);
-    if (!check_size(g) && !check_room(g))
+    if (!abi_check_size(g, g->s.size, g->s.align) && !check_room(g))
         return (0);
     schema_free(&g->s);
     return (1);

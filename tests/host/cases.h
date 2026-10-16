@@ -252,6 +252,8 @@ void test_reload_beyond_reach(host_t *h);
 void test_stop_by_spans(host_t *h);
 
 void test_drain_failed_start(host_t *h);
+
+void test_declare_other_size(host_t *h);
 void test_conflict_at_barrier(host_t *h);
 void test_order_observers(host_t *h);
 void test_reorder_observers(host_t *h);

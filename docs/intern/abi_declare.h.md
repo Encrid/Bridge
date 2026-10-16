@@ -75,5 +75,6 @@ These files check the type, make it, and lay it out again at a reload.
 | `abi_relay` | `src/abi_relay.c` | Works out how the values of a type are carried over to what it becomes, and keeps that on the type. 1 with a refusal. |
 | `abi_check_stated` | `src/abi_stated.c` | Refuses a declaration that states what it may not, and works out its fingerprint. 1 with a refusal. |
 | `abi_read_layout` | `src/abi_layout.c` | Reads and lays out the descriptor, and checks its size and alignment. 1 with a refusal, and nothing left allocated. |
+| `abi_check_size` | `src/abi_layout.c` | Refuses a size and an alignment that the module states and that the descriptor does not give. 1 with a refusal. |
 | `abi_replace_type` | `src/abi_replace.c` | Decides what becomes of the type of that name that is there already. 1 with a refusal. |
 | `abi_make_type` | `src/abi_make.c` | Makes the type that a declaration states. 1 with a refusal. |

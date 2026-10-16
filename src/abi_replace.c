@@ -76,8 +76,10 @@ int abi_replace_type(declaring_t *g)
 
     g->c = c;
     changed = changed || (c && abi_names_superseded(c));
-    if (!c || (!changed && c->storage == g->d.storage))
+    if (!c)
         return (0);
+    if (!changed && c->storage == g->d.storage)
+        return (abi_check_size(g, c->size, c->align));
     if (changed ? replace_changed(g) : replace_moved(g))
         return (1);
     g->was = c;

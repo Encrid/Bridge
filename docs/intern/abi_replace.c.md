@@ -27,6 +27,9 @@ A module reads a component by code that is compiled for one storage layout, so e
 A declaration that states another storage layout is refused, naming both layouts and the other declarers.
 At a reload of the one module that declares it, it is a move: `docs/intern/abi_moved.c.md`, *A move to another storage layout*.
 
+A declaration of a type that is there already, with the same layout, states the same size and alignment as the type.
+If not, it is refused as a type whose descriptor lays it out another way: `docs/intern/abi_layout.c.md`.
+
 ## The steps
 
 1. Find the type of the name that no reload made anew. If there is none, the declaration makes a new type.

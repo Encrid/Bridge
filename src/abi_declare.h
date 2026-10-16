@@ -89,6 +89,8 @@ int abi_check_stated(declaring_t *g);
 
 int abi_read_layout(declaring_t *g);
 
+int abi_check_size(declaring_t *g, uint32_t size, uint32_t align);
+
 int abi_replace_type(declaring_t *g);
 
 int abi_make_type(declaring_t *g);

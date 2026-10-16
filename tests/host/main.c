@@ -190,6 +190,8 @@ static const host_case_t TEST_CASES[] = {
         test_drain_failed_start, "init", test_set_noting },
     { "bridge_reload-failed-reload-log-given",
         test_drain_failed_start, "reload", test_set_noting },
+    { "declare-second-declarer-other-size-refused",
+        test_declare_other_size, "", test_set_noting },
     { "module_config.spans-rounded-up-to-8-refused",
         test_round_spans, "268", test_set_both },
     { "module_config.spans-a-multiple-of-8-taken",

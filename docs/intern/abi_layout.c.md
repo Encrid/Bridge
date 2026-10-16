@@ -40,6 +40,6 @@ At a reload, the type that a new type replaces still counts, so the two count tw
 | Function | Result |
 | --- | --- |
 | `parse_descriptor` | Reads the descriptor of the type being declared into its layout. 1 with a refusal. |
-| `check_size` | Refuses a type that its descriptor lays out as another size, or another alignment, than the compiler of the module did. |
+| `abi_check_size` | Refuses a type that its descriptor lays out as another size, or another alignment, than the compiler of the module did. |
 | `check_room` | At a reload, works out how values are carried over where the type changed. Refuses a type that is one more than a budget allows. |
 | `abi_read_layout` | Reads and lays out the descriptor, and checks it against what the module stated and against the budgets. 1 with a refusal, and nothing left allocated. |

@@ -1235,6 +1235,17 @@ flags = ["{quiet}", "{hidden}", "{system_defines}"]
 variants = [{ name = "why-reload", defines = ["INIT_STATUS=0"] }]
 
 [[artifact]]
+name = "spot"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/spot.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["EXTRA=0"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+variants = [{ name = "spot-wide", defines = ["EXTRA=8"] }]
+
+[[artifact]]
 name = "hold"
 kind = "library"
 test = true
