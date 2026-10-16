@@ -16,6 +16,6 @@ Both reads use base 0: `0x10` is 16, and a number that begins with 0 is octal, s
 | Function | Result |
 | --- | --- |
 | `schema_is_name` | Gives whether the token is a name that a field or a constant may have. A name begins with a letter or an underscore, and is not cut. |
-| `schema_get_integer` | Reads the token as an integer, and says whether it is below zero. Gives false if it is not an integer. |
+| `schema_get_integer` | Reads the token as an integer, and says whether it is below zero. Gives false if it is not an integer, or if the token was cut. |
 | `schema_find_given` | Gives the index in `SCHEMA_GIVEN` of the type that the token names, or -1. |
 | `schema_copy_text` | Gives a copy of a text in memory from `malloc`, or `nullptr` if there is no memory. |

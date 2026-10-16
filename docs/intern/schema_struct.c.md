@@ -23,6 +23,6 @@ The reader does not refuse two fields of one name.
 | --- | --- |
 | `add_field` | Adds a field that the token names, with room made for it. Gives 1 if there is no memory. |
 | `read_length` | Reads the length of an inline array, from its opening bracket to past its closing one. Sets `count` of the field, and multiplies its size. Gives 1 if refused. |
-| `place_field` | Places the field just added at the next multiple of its alignment, and counts it in the size and the alignment of the struct. Gives 1 if the size cannot be counted. |
+| `place_field` | Places the field just added at the next multiple of its alignment, and counts it in the size and the alignment of the struct. It adds in 64 bits. Gives 1 if the size cannot be counted in 32 bits. |
 | `read_field` | Reads one field, from its type to its semicolon, and lays it out. Gives 1 if refused. |
 | `schema_parse_struct` | Reads the fields of a struct to its closing brace, and rounds its size up to a multiple of its widest field. Refuses a struct with no field. Gives 1 if refused. |

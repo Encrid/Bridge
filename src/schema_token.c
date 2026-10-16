@@ -23,7 +23,7 @@ bool schema_get_integer(const schema_reader_t *r, int64_t *value, bool *below)
     char first = r->word[0];
     char *end;
 
-    if (!(first >= '0' && first <= '9') && first != '-')
+    if (r->cut || (!(first >= '0' && first <= '9') && first != '-'))
         return (false);
     *below = first == '-';
     errno = 0;

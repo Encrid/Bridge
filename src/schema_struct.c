@@ -51,13 +51,14 @@ static int place_field(schema_reader_t *r, const schema_laid_t *laid)
 {
     schema_t *out = r->out;
     schema_field_t *field = &out->fields[out->field_count - 1];
+    uint64_t at = ((uint64_t)out->size + laid->align - 1)
+        & ~((uint64_t)laid->align - 1);
 
-    out->size = (out->size + laid->align - 1) & ~(laid->align - 1);
-    field->offset = out->size;
-    if (laid->size > UINT32_MAX - out->size - 8)
+    if (at + laid->size + 8 > UINT32_MAX)
         return (schema_refuse(r, "is more bytes than can be counted, at "
             "'%s'"));
-    out->size += laid->size;
+    field->offset = (uint32_t)at;
+    out->size = (uint32_t)(at + laid->size);
     if (laid->align > out->align)
         out->align = laid->align;
     return (0);

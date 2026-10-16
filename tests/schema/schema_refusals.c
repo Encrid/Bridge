@@ -50,7 +50,11 @@ static const want_refusal_t SCHEMA_REFUSALS[] = {
     { BRIDGE_ENUM, "int32_t A }", "'A'" },
     { BRIDGE_STRUCT, "{ float x[2; }", "';'" },
     { BRIDGE_STRUCT, "{ uint64_t a[400000000]; uint64_t b[400000000]; }",
-        "more bytes" }
+        "more bytes" },
+    { BRIDGE_STRUCT, "{ char a[4294967287]; double b; }", "more bytes" },
+    { BRIDGE_ENUM, "uint8_t { A = 0x"
+        "0000000000000000000000000000000000000000"
+        "00000000000000000000000" "1 }", "'0x000" }
 };
 
 static int check_refusal(const want_refusal_t *w)
