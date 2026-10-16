@@ -1219,6 +1219,48 @@ claims = { matches = [".order. pair 0 does not name two systems.*alive"] }
 false = { run = ["{out}/host{exe}", "module_config.identity-none-refused"] }
 
 [[case]]
+name = "bridge_system_statement_t-name-with-at-refused"
+run = ["{out}/host{exe}", "bridge_system_statement_t-name-with-at-refused"]
+claims = { matches = ["'fire@will' has '@' in it, and no system may have '@' or ':' in its name.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_system_statement_t-name-long-refused"] }
+
+[[case]]
+name = "bridge_observer_statement_t-name-with-colon-refused"
+run = ["{out}/host{exe}", "bridge_observer_statement_t-name-with-colon-refused"]
+claims = { matches = ["'on:enter' has ':' in it, and no observer may have '@' or ':' in its name.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_system_statement_t-name-with-at-refused"] }
+
+[[case]]
+name = "order.name-with-a-version-refused"
+run = ["{out}/host{exe}", "order.name-with-a-version-refused"]
+claims = { matches = [".order. pair 0 does not name two systems.*alive"] }
+false = { run = ["{out}/host{exe}", "config.order-cycle-refused"] }
+
+[[case]]
+name = "order.name-with-no-colon-refused"
+run = ["{out}/host{exe}", "order.name-with-no-colon-refused"]
+claims = { matches = [".order. pair 0 does not name two systems.*alive"] }
+false = { run = ["{out}/host{exe}", "config.order-cycle-refused"] }
+
+[[case]]
+name = "order.name-with-no-system-refused"
+run = ["{out}/host{exe}", "order.name-with-no-system-refused"]
+claims = { matches = [".order. pair 0 does not name two systems.*alive"] }
+false = { run = ["{out}/host{exe}", "config.order-cycle-refused"] }
+
+[[case]]
+name = "order.name-with-a-long-system-refused"
+run = ["{out}/host{exe}", "order.name-with-a-long-system-refused"]
+claims = { matches = [".order. pair 0 does not name two systems.*alive"] }
+false = { run = ["{out}/host{exe}", "config.order-cycle-refused"] }
+
+[[case]]
+name = "order.same-name-twice-refused"
+run = ["{out}/host{exe}", "order.same-name-twice-refused"]
+claims = { matches = [".order. pair 0 does not name two systems.*alive"] }
+false = { run = ["{out}/host{exe}", "config.order-cycle-refused"] }
+
+[[case]]
 name = "module_config.identity-none-refused"
 run = ["{out}/host{exe}", "module_config.identity-none-refused"]
 claims = { matches = ["a module with no identity is refused.*alive"] }

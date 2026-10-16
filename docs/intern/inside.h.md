@@ -221,6 +221,7 @@ A load, a reload and an unload ask for no memory to make the schedule, so none o
 | `CHANGE_DETACH` | 3: a queued `detach`. |
 | `TURN_LIFECYCLE` | `1 << 32`: the turns of the lifecycle calls. |
 | `TURN_SYSTEM` | `2 << 32`: the turns of the systems of a phase. |
+| `NAME_MOST` | 127: the most bytes of the name of a type, a system or an observer. |
 
 A turn orders all the calls that ran before a barrier.
 The observers of the last barrier come first, then the lifecycle calls, then the systems of the phase, each in the order it ran.

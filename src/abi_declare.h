@@ -16,7 +16,7 @@ typedef struct {
     module_t *m;
     bridge_declaration_t d;
     const char *desc;
-    char name[128];
+    char name[NAME_MOST + 1];
     char *bare;
     uint64_t print;
     declared_type_t *c;

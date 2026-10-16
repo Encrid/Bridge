@@ -137,6 +137,9 @@ A pair can also order two observers.
 
 The full name of a system is the identity of its module without the version, a colon, and the name of the system.
 For example, `game:actors:movement` is the system `movement` of the module `game:actors@1.0.0`.
+A full name has no `@`, and has 1 to 127 bytes after its last colon: the name of the system.
+Bridge refuses a pair unless it has two different full names of this form.
+
 A pair can name a system that is not loaded.
 A pair wins over the order in which a module registered its systems.
 `docs/extern/bridge_abi.h.md`, *Conflicts* tells when two systems conflict.

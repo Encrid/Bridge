@@ -54,10 +54,10 @@ static int check_policy(declaring_t *g)
 
 int abi_check_name(module_t *m, const char *what, uint32_t len)
 {
-    if (len && len <= 127)
+    if (len && len <= NAME_MOST)
         return (0);
     return (abi_refuse(m, "%s: its name has %u bytes, and a name has 1 to "
-        "127", what, len));
+        "%u", what, len, NAME_MOST));
 }
 
 int abi_check_stated(declaring_t *g)

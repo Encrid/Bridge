@@ -2123,7 +2123,9 @@ flags = ["{quiet}", "{hidden}", "{system_defines}"]
 variants = [
     { name = "wrong-declare-name-long", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_name_long", "IN_SYSTEM=wrong_do_nothing"] },
     { name = "wrong-system-name-empty", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_empty", "IN_SYSTEM=wrong_do_nothing"] },
-    { name = "wrong-system-name-long", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_long", "IN_SYSTEM=wrong_do_nothing"] }
+    { name = "wrong-system-name-long", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_long", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-system-name-at", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_at", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-observer-name-colon", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observer_name_colon", "IN_SYSTEM=wrong_do_nothing"] }
 ]
 
 [[artifact]]

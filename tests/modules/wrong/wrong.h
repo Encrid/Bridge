@@ -36,6 +36,8 @@ void wrong_declare_name_empty(void);
 void wrong_declare_name_long(void);
 void wrong_system_name_empty(void);
 void wrong_system_name_long(void);
+void wrong_system_name_at(void);
+void wrong_observer_name_colon(void);
 void wrong_system_outside(void);
 void wrong_system_phase_outside(void);
 void wrong_system_name_outside(void);

@@ -63,11 +63,15 @@ static bool is_taken(const module_t *m, const char *name)
 static int check_name(subscribing_t *g)
 {
     const char *name = g->name;
+    const char *mark = strpbrk(name, "@:");
 
     if (!strcmp(name, "init") || !strcmp(name, "shutdown")
         || !strcmp(name, "reload"))
         return (abi_refuse(g->m, "'%s' is a reserved name, and no %s may "
             "take it", name, g->what));
+    if (mark)
+        return (abi_refuse(g->m, "'%s' has '%c' in it, and no %s may have "
+            "'@' or ':' in its name", name, *mark, g->what));
     if (is_taken(g->m, name))
         return (abi_refuse(g->m, "'%s' is registered twice", name));
     if (g->events && !g->count)

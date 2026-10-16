@@ -196,6 +196,7 @@ typedef struct {
 
 constexpr uint64_t TURN_LIFECYCLE = 1ull << 32;
 constexpr uint64_t TURN_SYSTEM = 2ull << 32;
+constexpr uint32_t NAME_MOST = 127;
 
 typedef struct {
     char *stem;

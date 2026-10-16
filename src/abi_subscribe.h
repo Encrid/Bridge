@@ -19,7 +19,7 @@ typedef struct {
     uint32_t phase;
     uint32_t events;
     const char *what;
-    char name[128];
+    char name[NAME_MOST + 1];
     const bridge_term_t *terms;
     const void *changes;
     char of[192];

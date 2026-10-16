@@ -8,11 +8,15 @@
 
 #include "schedule.h"
 
-static bool is_pair(const char *before, const char *after)
+static bool is_full_name(const char *name)
 {
-    if (!before || !after || !*before || !*after)
+    const char *colon = name ? strrchr(name, ':') : nullptr;
+    size_t tail;
+
+    if (!colon || strchr(name, '@'))
         return (false);
-    return (strcmp(before, after) != 0);
+    tail = strlen(colon + 1);
+    return (tail && tail <= NAME_MOST);
 }
 
 static uint32_t name_system(schedule_pairs_t *pairs, const char *name)
@@ -34,7 +38,8 @@ static int add_pair(bridge_t *b, schedule_pairs_t *pairs,
     uint32_t before;
     uint32_t after;
 
-    if (!is_pair(pair->before, pair->after)) {
+    if (!is_full_name(pair->before) || !is_full_name(pair->after)
+        || !strcmp(pair->before, pair->after)) {
         say_error(b, "[order] pair %u does not name two systems", i);
         return (1);
     }

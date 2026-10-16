@@ -99,7 +99,7 @@ The signature of an `abi_entry_t` is `params` and `param_count`, and `results` a
 
 | Function | Source | Result |
 | --- | --- | --- |
-| `abi_check_name` | `src/abi_stated.c` | Refuses a name that has 0 bytes, or more than 127. 1 with a refusal. |
+| `abi_check_name` | `src/abi_stated.c` | Refuses a name that has 0 bytes, or more than `NAME_MOST`. 1 with a refusal. |
 | `abi_refuse` | `src/abi_alloc.c` | Refuses the call in progress, with why, written as `printf` writes. Gives 1. |
 | `abi_define` | `src/abi_define.c` | Defines the eight imports for the instance of a module. 1, with `err`, if its backend refuses one. |
 | `abi_marks` | `src/abi_alloc.c` | Makes room for the marks of the queue of a module, so that a queued change never asks for memory. False if there is no memory. |

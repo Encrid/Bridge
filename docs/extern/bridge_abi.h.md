@@ -297,6 +297,7 @@ The name of a phase is the name that the module uses: `docs/extern/bridge.h.md`,
 A system with no term runs one time in each run of its phase.
 A system names no other system, and nothing of an order: *Conflicts*.
 `init`, `shutdown` and `reload` are reserved names. Each system and observer of a module has a different name.
+The name of a system or of an observer has no `@` and no `:`, so that its full name has one meaning: `docs/extern/bridge.h.md`, *bridge_order_t*.
 
 A system that attaches or detaches a component states it in `changes`.
 An `attach` or a `detach` of a component that the system did not state fails its invocation.
@@ -652,6 +653,7 @@ When other modules declare the type, the reason of a layout ends with `. It is a
 - `system: a name, a term or a change lies outside the scratch arena`
 - `a system states <count> changes, and the module declared <count> types`
 - `'<name>' is a reserved name, and no system may take it`
+- `'<name>' has '<character>' in it, and no system may have '@' or ':' in its name`
 - `'<name>' is registered twice`
 - `observer '<name>' has no term, and so nothing to observe`
 - `change <index> of system '<name>' names slot <slot>, which it never declared`

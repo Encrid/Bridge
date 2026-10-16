@@ -30,6 +30,8 @@ every            free
 every            strcmp
 every            strncmp
 every            strchr
+every            strrchr
+every            strpbrk
 every            strtoll
 every            strtoull
 posix            strlen
@@ -120,7 +122,7 @@ They are in the list because they are imports all the same: a new one is a depen
 | Imports | Why |
 | --- | --- |
 | `malloc`, `calloc`, `realloc`, `free` | The library allocates records, their tables and copies of names outside a phase. It allocates nothing in a phase. |
-| `strcmp`, `strncmp`, `strchr` | The library compares names of modules, phases, components and settings, and a name up to its namespace. `strchr` finds where a namespace or a version ends, and a folder in the path of a library. |
+| `strcmp`, `strncmp`, `strchr`, `strrchr`, `strpbrk` | The library compares names of modules, phases, components and settings, and a name up to its namespace. `strchr` finds where a namespace or a version ends, and a folder in the path of a library. `strrchr` finds where the name of a system begins in a full name. `strpbrk` finds an `@` or a `:` in the name of a system. |
 | `strtoll`, `strtoull` | The schema reads the constants of a descriptor with them. |
 | `__errno_location`, `__error`, `_errno` | They give `errno` on Linux, macOS and Windows. `strtoll` and `strtoull` set it. |
 | `strlen`, `memcpy`, `memmove` | The library measures names, copies values and names, and closes up a run of a table. The compiler makes them inline on Windows. |

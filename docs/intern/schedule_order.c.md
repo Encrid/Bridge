@@ -9,7 +9,7 @@ This file takes the pairs that a deployment states in `[order]`: two systems tha
 
 1. It allocates the list of names, and `before` and `after` of the world.
 2. It allocates a matrix for twice as many names as pairs.
-3. For each pair, `add_pair` refuses a pair that does not name two different systems.
+3. For each pair, `add_pair` refuses a pair unless `is_full_name` accepts its two names, and they differ.
 4. `add_pair` copies the two names into `before` and `after`.
 5. `add_pair` gives each name its index among the names met so far, and adds the edge.
 6. `check_pairs` closes the matrix, and refuses the pairs if a name reaches itself.
@@ -17,6 +17,10 @@ This file takes the pairs that a deployment states in `[order]`: two systems tha
 A pair counts in `order_count` once it has its names, so a refused world frees them.
 The function frees the list of names and the matrix before it returns.
 A pair need not name a loaded system: `schedule_build` reads `before` and `after` each time it builds the schedule.
+
+The name of a system has no `@` and no `:`: `docs/intern/abi_subscriber.c.md`.
+So a full name has no `@`, and the name of the system follows its last colon.
+`is_full_name` refuses a name that no system can have. So Bridge accepts no pair that can never order a system.
 
 ## Refusals
 
@@ -30,7 +34,7 @@ Each refusal writes a record and gives 1:
 
 | Function | Result |
 | --- | --- |
-| `is_pair` | Gives whether two names make a pair: neither is null or empty, and they differ. |
+| `is_full_name` | Gives whether a system can have the name: it has a colon, no `@`, and 1 to `NAME_MOST` bytes after its last colon. |
 | `name_system` | Gives the index of a name among the names met so far, and adds the name if it is new. |
 | `add_pair` | Takes pair `i`: keeps its two names and adds the edge from the first to the second. Gives 1, with a record, if refused. |
 | `check_pairs` | Refuses pairs that contradict each other: a system that would run before itself. Gives 1 with a record. |
