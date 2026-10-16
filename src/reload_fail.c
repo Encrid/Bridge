@@ -54,6 +54,8 @@ int reload_fail(reloading_t *r)
     bridge_t *b = r->b;
     const char *id = r->a->cfg.identity;
 
+    if (r->n->priv)
+        block_drain(b, r->n);
     say_error(b, "module '%s' was not reloaded: %s", id, r->err.text);
     undo_new(r);
     if (r->side_by_side)

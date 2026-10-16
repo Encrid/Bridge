@@ -36,4 +36,4 @@ A reload with an artifact that works brings the module back over the same rows, 
 | `undo_new` | Takes the new instance back out: its systems, its types, and what the reload added to the share. |
 | `keep_old` | Puts the systems of the old instance back in storage, as they were. |
 | `stop_old` | Drops the systems of the module and marks it stopped, with what it declared kept. Says so, and stops the world if the module states `fail`. |
-| `reload_fail` | Says that the reload failed, takes the new instance out, then keeps the old instance or stops the module. Gives 1. |
+| `reload_fail` | Gives the lines that the new instance wrote, and says that the reload failed. Takes the new instance out, then keeps the old instance or stops the module. Gives 1. |

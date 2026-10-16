@@ -1224,6 +1224,17 @@ include = ["include", "tests/binding", "tests/modules"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "why"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/why.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["INIT_STATUS=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+variants = [{ name = "why-reload", defines = ["INIT_STATUS=0"] }]
+
+[[artifact]]
 name = "hold"
 kind = "library"
 test = true

@@ -221,6 +221,18 @@ claims = { matches = ["no longer fits in its spans of 544 bytes.*the world has s
 false = { run = ["{out}/host{exe}", "module_config.spans-outgrown-at-a-barrier"] }
 
 [[case]]
+name = "bridge_load-failed-init-log-given"
+run = ["{out}/host{exe}", "bridge_load-failed-init-log-given"]
+claims = { matches = ["init wrote this 7 0.*did not load: its init answered 1.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-failed-reload-log-given"] }
+
+[[case]]
+name = "bridge_reload-failed-reload-log-given"
+run = ["{out}/host{exe}", "bridge_reload-failed-reload-log-given"]
+claims = { matches = ["reload wrote this 5 0.*was not reloaded: its reload answered 5.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_load-failed-init-log-given"] }
+
+[[case]]
 name = "module_config.spans-too-small-refused"
 run = ["{out}/host{exe}", "module_config.spans-too-small-refused"]
 claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }

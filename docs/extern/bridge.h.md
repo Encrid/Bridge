@@ -423,6 +423,7 @@ A module can write each of the eight levels: `docs/extern/bridge_abi.h.md`, *The
 - Bridge calls the sink only on the thread that called a function of the world, thus the sink of a world needs no lock.
 - A record and its text are good only during the call. To keep a line, copy it.
 - Bridge gives the lines of the logs to the sink at each barrier, after the systems of the phase returned.
+- A module whose `init` or `reload` fails gives its lines too, before the record of the failure.
 - The sink can call `bridge_list_modules`. An identity that it gives there is good only during that call of the sink.
 - If the sink calls another function of the world, the function does nothing, gives 1, and writes no record.
 

@@ -38,6 +38,8 @@ static int take_share(bridge_t *b, module_t *m)
 
 static int fail_load(bridge_t *b, module_t *m, backend_err_t *err)
 {
+    if (m->priv)
+        block_drain(b, m);
     say_error(b, "module '%s' did not load: %s", m->identity, err->text);
     if (m->on_error == BRIDGE_FAIL)
         bridge_stop(b, m->identity, "failed");

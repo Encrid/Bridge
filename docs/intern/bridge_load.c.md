@@ -54,6 +54,6 @@ So the rebuild cannot be refused, and it asks for no memory.
 | --- | --- |
 | `keep_share` | Records a share of `share` bytes at `at` as the one range of the module, with all of it left. |
 | `take_share` | Takes the share of the module of the persistent arena. 1, with a record, and the module discarded, if there is no memory to keep track of it. |
-| `fail_load` | Says that the load failed, stops the world if the module states `fail`, and leaves storage as it was. Gives 1. |
+| `fail_load` | Gives the lines that the module wrote, and says that the load failed. Stops the world if the module states `fail`, and leaves storage as it was. Gives 1. |
 | `start_loaded` | Sets the ids aside, runs `init`, and builds the schedule again. 1, with why in `err`, if one fails. |
 | `bridge_load` | Loads a module. 0 if it loaded and the world runs, and 1 if not. |
