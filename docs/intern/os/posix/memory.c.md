@@ -5,10 +5,11 @@ Each function keeps the contract of `docs/intern/os/os.h.md`, *Functions*.
 
 ## The range
 
-`os_reserve` maps `reserve` bytes with `PROT_NONE` and the flags `MAP_PRIVATE`, `MAP_ANONYMOUS` and `MAP_NORESERVE`.
+`os_reserve` maps `reserve` bytes with `PROT_NONE` and the flags `MAP_PRIVATE` and `MAP_ANONYMOUS`.
 A touch of a byte with no access faults.
-`MAP_NORESERVE` reserves no swap space for the range.
 A commit gives the first bytes `PROT_READ` and `PROT_WRITE` with `mprotect`.
+Linux counts those bytes against its commit limit then, and `mprotect` can refuse them.
+The rest of the range has no access, and Linux counts none of it.
 An anonymous mapping holds zeros, so a committed byte is zero until a write.
 
 ## Functions

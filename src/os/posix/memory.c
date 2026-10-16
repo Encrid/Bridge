@@ -9,7 +9,7 @@
 
 void *os_reserve(size_t reserve, size_t commit)
 {
-    int flags = MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE;
+    int flags = MAP_PRIVATE | MAP_ANONYMOUS;
     void *base = mmap(nullptr, reserve, PROT_NONE, flags, -1, 0);
 
     if (base == MAP_FAILED)
