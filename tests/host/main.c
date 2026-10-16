@@ -200,6 +200,8 @@ static const host_case_t TEST_CASES[] = {
         test_reload_settings_layout, "", test_set_noting },
     { "module_config.settings-kept-share-given-back",
         test_keep_two_shares, "", test_set_noting },
+    { "bridge_load-failed-load-leaves-storage-as-it-was",
+        test_seed_failed_load, "", test_set_noting },
     { "module_config.spans-rounded-up-to-8-refused",
         test_round_spans, "268", test_set_both },
     { "module_config.spans-a-multiple-of-8-taken",

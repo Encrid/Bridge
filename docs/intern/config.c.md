@@ -30,14 +30,19 @@ To keep a changed setting across a restart, a native module writes a file, and t
 
 ## The steps
 
-`config_seed` writes the settings in these steps:
+`config_seed` runs two times for a load, with the same steps.
+First it checks, and writes nothing that outlives the load: `docs/intern/module_start.c.md`.
+Then, after the schedule accepts the load, it writes: `docs/intern/bridge_load.c.md`.
+A load that fails between the two leaves storage and the arena as they were.
+
+The steps:
 
 1. If `config` is `BRIDGE_NO_CONFIG`, refuse any setting, and stop.
 2. Find the component among the types that `init` declared.
 3. Refuse it if it is not a struct, not a singleton, or already the settings of another module.
-4. Find where the text of the settings goes: `docs/intern/config_room.c.md`.
+4. Find where the text of the settings goes: `docs/intern/config_room.c.md`. Only the second run moves the cursor of the share.
 5. Write each setting into one value, in order, and stop at the first refusal.
-6. If no setting is refused, give the singleton that value, and record the component as the settings of the module.
+6. If no setting is refused, the second run gives the singleton that value. It records the component as the settings of the module.
 
 The reason of a refusal goes into the error of the load.
 A reload does not write the settings again: `docs/intern/module_start.c.md`.
@@ -50,4 +55,4 @@ A reload does not write the settings again: `docs/intern/module_start.c.md`.
 | `check_taken` | Refuses a config component that is already the settings of another module: it is one value, so it is one module's. |
 | `find_config` | Finds the component that the config of the module names, among what its `init` declared. It must be a struct and a singleton that is no other module's settings. |
 | `seed_all` | Writes each setting into one value of the config component, and gives the singleton that value when no setting was refused. Refuses, with a reason, if there is no memory for the value. |
-| `config_seed` | Writes the settings of a module into the component that its config names. Gives 0, or 1 with `err`. |
+| `config_seed` | Checks the settings of a module, or, with `writing`, writes them into the component that its config names. Gives 0, or 1 with `err`. |

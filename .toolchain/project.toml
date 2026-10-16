@@ -1256,6 +1256,16 @@ flags = ["{quiet}", "{hidden}", "{system_defines}"]
 variants = [{ name = "nine-wide", defines = ["WIDE"] }]
 
 [[artifact]]
+name = "six"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/six.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+variants = [{ name = "six-seeded", defines = ["SEEDED"] }]
+
+[[artifact]]
 name = "hold"
 kind = "library"
 test = true

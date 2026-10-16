@@ -260,6 +260,8 @@ void test_load_long_identity(host_t *h);
 void test_reload_settings_layout(host_t *h);
 
 void test_keep_two_shares(host_t *h);
+
+void test_seed_failed_load(host_t *h);
 void test_conflict_at_barrier(host_t *h);
 void test_order_observers(host_t *h);
 void test_reorder_observers(host_t *h);

@@ -28,13 +28,14 @@ The fields of `config_seed_t`:
 | `c` | The component that the settings are a value of. |
 | `row` | That value, while it is written. |
 | `text_used` | How much of the block of text of the module the settings before this one took. |
+| `writing` | False while the settings are checked, and true while they are written. |
 | `why`, `why_len` | Where the reason of a refusal goes, and its length. |
 
 ## Functions
 
 | Function | Source | Result |
 | --- | --- | --- |
-| `config_seed` | `src/config.c` | Writes the settings of a module into the component that its config names. Gives 0, or 1 with `err` saying which setting or name was refused. |
+| `config_seed` | `src/config.c` | Checks the settings of a module, or, with `writing`, writes them into the component that its config names. Gives 0, or 1 with `err` saying which setting or name was refused. |
 | `config_keep` | `src/config_kept.c` | Remembers where the settings text of an unloaded module is: the block outlives the module, and its next load writes there. |
 | `config_give_back_free` | `src/config_kept.c` | Gives back each kept share that no row holds a string in, and forgets it. |
 | `config_find_kept` | `src/config_kept.c` | Gives what is remembered of the settings text of the module `stem`, or `nullptr`. |

@@ -68,7 +68,9 @@ static int start_loaded(const module_check_t *k, module_t *m,
             b->entities));
     if (module_start(m, &st, err))
         return (1);
-    return (schedule_build(b, err->text, sizeof(err->text)));
+    if (schedule_build(b, err->text, sizeof(err->text)))
+        return (1);
+    return (config_seed(m, &k->a->cfg, err, true));
 }
 
 int bridge_load(bridge_t *b, const bridge_artifact_t *a)

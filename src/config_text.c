@@ -18,7 +18,8 @@ static uint32_t put_text(config_seed_t *seed, const char *text, uint32_t len)
 {
     uint32_t at = seed->m->text_at + seed->text_used;
 
-    memcpy(seed->b->shared + at, text, len);
+    if (seed->writing)
+        memcpy(seed->b->shared + at, text, len);
     seed->text_used += (len + 7u) & ~7u;
     return (at);
 }

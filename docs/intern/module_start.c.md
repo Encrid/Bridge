@@ -10,7 +10,7 @@ A load and a reload both start a module with it.
 1. Make the image, the private memory and the instance: `docs/intern/module_instance.c.md`.
 2. Make the first call, `init` for a load or `reload` for a reload.
 3. Refuse a loss that the config accepts and that was not made.
-4. For a load, write the settings of the module: `docs/intern/config.c.md`, *The settings component*.
+4. For a load, check the settings of the module: `docs/intern/config.c.md`, *The steps*. `src/bridge_load.c` writes them later.
 5. Find each export that Bridge calls.
 6. Check that the spans hold what a barrier writes for the module.
 

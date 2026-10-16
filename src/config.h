@@ -15,6 +15,7 @@ typedef struct {
     declared_type_t *c;
     uint8_t *row;
     uint32_t text_used;
+    bool writing;
     char *why;
     size_t why_len;
 } config_seed_t;
@@ -28,8 +29,8 @@ typedef struct {
     uint32_t size;
 } config_integer_t;
 
-[[nodiscard]] int config_seed(bridge_t *b, module_t *m,
-    const bridge_module_config_t *cfg, backend_err_t *err);
+[[nodiscard]] int config_seed(module_t *m, const bridge_module_config_t *cfg,
+    backend_err_t *err, bool writing);
 
 void config_keep(bridge_t *b, module_t *m);
 

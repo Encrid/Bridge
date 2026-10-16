@@ -82,7 +82,7 @@ int module_start(module_t *m, const module_start_t *st, backend_err_t *err)
         return (1);
     if (check_losses(m, err))
         return (1);
-    if (loading && config_seed(m->b, m, &st->a->cfg, err))
+    if (loading && config_seed(m, &st->a->cfg, err, false))
         return (1);
     return (find_exports(m, err) || check_spans(m, err));
 }

@@ -36,15 +36,18 @@ static uint32_t count_text(const config_seed_t *seed)
     return (total);
 }
 
-static void reuse_kept(config_seed_t *seed, uint32_t total)
+static bool reuse_kept(config_seed_t *seed, uint32_t total)
 {
     module_t *m = seed->m;
     const kept_text_t *kept = config_find_kept(seed->b, m->stem);
 
     if (!kept || kept->room < total)
-        return;
-    m->text_at = kept->at;
-    m->text_room = kept->room;
+        return (false);
+    if (seed->writing) {
+        m->text_at = kept->at;
+        m->text_room = kept->room;
+    }
+    return (true);
 }
 
 int config_place_text(config_seed_t *seed)
@@ -54,13 +57,14 @@ int config_place_text(config_seed_t *seed)
 
     if (!total)
         return (0);
-    reuse_kept(seed, total);
-    if (m->text_room)
+    if (reuse_kept(seed, total))
         return (0);
     if (m->persistent <= 0 || total > m->arena_left)
         return (config_refuse(seed, "its settings hold %u bytes of text, "
             "and its persistent share has %u left", total,
             m->persistent > 0 ? m->arena_left : 0));
+    if (!seed->writing)
+        return (0);
     m->text_at = m->arena_at;
     m->text_room = total;
     m->arena_at += total;
