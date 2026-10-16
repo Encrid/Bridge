@@ -23,8 +23,19 @@ TEST(init)
     TEST_DECLARE(api, BRIDGE_STRUCT, "st:vec_t", vec_t,
         BRIDGE_STRIP, BRIDGE_TABLE);
 #endif
+#if V == 16
+    TEST_DECLARE(api, BRIDGE_STRUCT, "st:other_t", other_t,
+        BRIDGE_STRIP, BRIDGE_TABLE);
+#endif
     x_slot = TEST_COMPONENT(api, "st:X", x_t, BRIDGE_DELETE,
         (enum bridge_storage)KEPT);
+#if V == 20
+    x_slot = TEST_COMPONENT(api, "st:X", x_t, BRIDGE_DELETE,
+        (enum bridge_storage)KEPT);
+#elif V == 21
+    x_slot = TEST_COMPONENT(api, "st:X", x3_t, BRIDGE_DELETE,
+        (enum bridge_storage)KEPT);
+#endif
     TEST_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, &x_slot, 1);
     one[0].slot = x_slot;
     reading = TEST_ADD_SYSTEM(api, "look", "look", one, 1, nullptr,

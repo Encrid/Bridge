@@ -79,6 +79,12 @@ paths = [
     "LAYOUT12_PATH=\"{out}/built/layout12{library}\"",
     "LAYOUT13_PATH=\"{out}/built/layout13{library}\"",
     "LAYOUT14_PATH=\"{out}/built/layout14{library}\"",
+    "LAYOUT15_PATH=\"{out}/built/layout15{library}\"",
+    "LAYOUT16_PATH=\"{out}/built/layout16{library}\"",
+    "LAYOUT17_PATH=\"{out}/built/layout17{library}\"",
+    "LAYOUT18_PATH=\"{out}/built/layout18{library}\"",
+    "LAYOUT20_PATH=\"{out}/built/layout20{library}\"",
+    "LAYOUT21_PATH=\"{out}/built/layout21{library}\"",
     "LAYOUT0K2_PATH=\"{out}/built/layout0k2{library}\"",
     "LAYOUT1K2_PATH=\"{out}/built/layout1k2{library}\"",
     "LAYOUT2K2_PATH=\"{out}/built/layout2k2{library}\"",
@@ -854,6 +860,66 @@ folder = "built"
 sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
 include = ["include", "tests/binding", "tests/modules"]
 defines = ["V=13", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout15"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=15", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout16"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=16", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout17"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=17", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout18"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=18", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout20"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=20", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "layout21"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/layout/layout_init.c", "tests/modules/layout/layout_look.c", "tests/modules/layout/layout_spawn.c", "tests/modules/layout/layout_values.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=21", "KEPT=1"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]

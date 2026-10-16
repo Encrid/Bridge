@@ -182,6 +182,81 @@ an enum of a wider integer
   -: the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   reload: refused
   -: the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+every field renamed, and each loss accepted
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+  -: module 'st:store@0.1.0' is reloaded, and 'st:X.a' is lost from 3 rows, as it accepted 0 0
+  -: module 'st:store@0.1.0' is reloaded, and 'st:X.b' is lost from 3 rows, as it accepted 0 0
+  -: module 'st:store@0.1.0' is reloaded, and 'st:X.arr' is lost from 3 rows, as it accepted 0 0
+  -: module 'st:store@0.1.0' is reloaded, and 'st:X.at' is lost from 3 rows, as it accepted 0 0
+  -: module 'st:store@0.1.0' is reloaded, and 'st:X.mode' is lost from 3 rows, as it accepted 0 0
+  reload: done
+  look: values, and the sum of a 3 0
+  look: the sums of b, and of arr 0 0
+  look: the sums of at.x, and of at.y 0 0
+  look: the sums of mode, and of what was added 0 0
+a field made a struct of another type
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+  -: module 'st:store@0.1.0' was not reloaded: field 'st:X.at' is of another type than it was, and bytes of one type are not a value of another 0 0
+  -: module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept 0 0
+  -: the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+  reload: refused
+  -: the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+a struct a field names, changed, in an array made longer
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+  reload: done
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+five fields of long names removed
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+  -: module 'st:store@0.1.0' was not reloaded: type 'st:X' has another component layout here, and 3 rows would lose 'st:X.removed_field_1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'st:X.removed_field_2_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'st:X.removed_field_3_xxxxxxxxxxxxxxxxxxxx 0 0
+  -: module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept 0 0
+  -: the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+  reload: refused
+  -: the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+a field added, declared twice
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+  reload: done
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+a field added, then another layout declared
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+  -: module 'st:store@0.1.0' was not reloaded: type 'st:X' has another component layout here: fingerprint 18e284e01ff693e4, and it was declared with 16c2f6518a5fbe6f 0 0
+  -: module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept 0 0
+  -: the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+  reload: refused
+  -: the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+a field removed, and its loss accepted with one that does not happen
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+  -: module 'st:store@0.1.0' was not reloaded: it accepts the loss of 'st:X.arr', and loses nothing of that name 0 0
+  -: module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept 0 0
+  -: the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+  reload: refused
+  -: the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
 a struct a field of another module's component names
   -: module 'st:store@0.1.0' was not reloaded: type 'st:vec_t' has another component layout here, and 'st:Y', which module 'st:holder@0.1.0' declares, has a field of it 0 0
   -: module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept 0 0
@@ -267,4 +342,24 @@ the fields in another order, in a singleton
   look: the sums of b, and of arr 20 10
   look: the sums of at.x, and of at.y 5 6
   look: the sums of mode, and of what was added 1 0
+a field added, and the table made a toggle
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+  reload: done
+  look: values, and the sum of a 3 3003
+  look: the sums of b, and of arr 63 42
+  look: the sums of at.x, and of at.y 18 21
+  look: the sums of mode, and of what was added 3 0
+a field added, and the singleton made a table
+  look: values, and the sum of a 1 1000
+  look: the sums of b, and of arr 20 10
+  look: the sums of at.x, and of at.y 5 6
+  look: the sums of mode, and of what was added 1 0
+  -: module 'st:store@0.1.0' was not reloaded: type 'st:X' is a singleton, and is not moved to a table: there is no entity to carry it 0 0
+  -: module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept 0 0
+  -: the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
+  reload: refused
+  -: the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
 alive

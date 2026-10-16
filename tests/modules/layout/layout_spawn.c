@@ -5,7 +5,7 @@
 */
 #include "layout.h"
 
-#if V == 0
+#if V == 0 || V == 18
 
 static void set_value(x_t *value, uint32_t i)
 {

@@ -19,6 +19,15 @@ static void add_plain(sums_t *sums, const x_t *value)
 {
     uint32_t k = 0;
 
+#if V == 15
+    sums->a += value->a2;
+    sums->b += value->b2;
+    while (k < sizeof(value->arr2)) {
+        sums->arr += value->arr2[k];
+        k++;
+    }
+    sums->mode += (uint32_t)value->mode2;
+#else
     sums->a += value->a;
 #if V == 6
     sums->b += value->bee;
@@ -30,18 +39,28 @@ static void add_plain(sums_t *sums, const x_t *value)
         k++;
     }
     sums->mode += (uint32_t)value->mode;
+#endif
 }
 
 static void add_rest(sums_t *sums, const x_t *value)
 {
+#if V == 15
+    sums->at_x += value->at2.x;
+    sums->at_y += value->at2.y;
+#elif V == 17
+    sums->at_x += value->at[0].x;
+    sums->at_y += value->at[0].y;
+    sums->more += value->at[1].x;
+#else
     sums->at_x += value->at.x;
 #if V != 11
     sums->at_y += value->at.y;
 #endif
 #if V == 8
     sums->more += value->at.z;
-#elif V == 1
+#elif V == 1 || V == 20 || V == 21
     sums->more += value->added;
+#endif
 #endif
 }
 

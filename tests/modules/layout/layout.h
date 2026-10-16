@@ -30,18 +30,42 @@ BRIDGE_SCHEMA_ENUM_DESC(switch_t, int8_t, SWITCH_VALUES);
         #define VEC_FIELDS { uint16_t y; uint16_t x; uint16_t z; }
     #elif V == 11
         #define VEC_FIELDS { uint16_t x; }
+    #elif V == 17
+        #define VEC_FIELDS { uint16_t x; uint16_t y; uint16_t w; }
     #else
         #define VEC_FIELDS { uint16_t x; uint16_t y; }
     #endif
 
 BRIDGE_SCHEMA_STRUCT_TYPE(vec_t, VEC_FIELDS);
+    #if V == 16
+        #define OTHER_FIELDS { uint16_t x; uint16_t y; }
+BRIDGE_SCHEMA_STRUCT_TYPE(other_t, OTHER_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(other_t, OTHER_FIELDS);
+    #endif
     #if V != 13
 BRIDGE_SCHEMA_STRUCT_DESC(vec_t, VEC_FIELDS);
     #endif
 
-    #if V == 1
+    #if V == 1 || V == 20 || V == 21
         #define X_FIELDS { uint32_t a; uint16_t b; uint8_t arr[4]; \
             vec_t at; switch_t mode; uint32_t added; }
+    #elif V == 15
+        #define X_FIELDS { uint32_t a2; uint16_t b2; uint8_t arr2[4]; \
+            vec_t at2; switch_t mode2; }
+    #elif V == 16
+        #define X_FIELDS { uint32_t a; uint16_t b; uint8_t arr[4]; \
+            other_t at; switch_t mode; }
+    #elif V == 17
+        #define X_FIELDS { uint32_t a; uint16_t b; uint8_t arr[4]; \
+            vec_t at[2]; switch_t mode; }
+    #elif V == 18
+        #define X_FIELDS { uint32_t a; uint16_t b; uint8_t arr[4]; \
+            vec_t at; switch_t mode; \
+            uint8_t removed_field_1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx; \
+            uint8_t removed_field_2_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx; \
+            uint8_t removed_field_3_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx; \
+            uint8_t removed_field_4_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx; \
+            uint8_t removed_field_5_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx; }
     #elif V == 2
         #define X_FIELDS { switch_t mode; vec_t at; uint8_t arr[4]; \
             uint16_t b; uint32_t a; }
@@ -70,6 +94,11 @@ BRIDGE_SCHEMA_STRUCT_DESC(vec_t, VEC_FIELDS);
 
 BRIDGE_SCHEMA_STRUCT_TYPE(x_t, X_FIELDS);
 BRIDGE_SCHEMA_STRUCT_DESC(x_t, X_FIELDS);
+    #if V == 21
+        #define X3_FIELDS { uint32_t a; uint64_t b; }
+BRIDGE_SCHEMA_STRUCT_TYPE(x3_t, X3_FIELDS);
+BRIDGE_SCHEMA_STRUCT_DESC(x3_t, X3_FIELDS);
+    #endif
 
 typedef struct sums {
     uint32_t a;

@@ -10,6 +10,9 @@
 static const char *const B_GONE[1] = { "st:X.b" };
 static const char *const ARR_CUT[1] = { "st:X.arr" };
 static const char *const Y_GONE[1] = { "st:X.at.y" };
+static const char *const ALL_GONE[5] = { "st:X.a", "st:X.b", "st:X.arr",
+    "st:X.at", "st:X.mode" };
+static const char *const ARR_AND_B[2] = { "st:X.arr", "st:X.b" };
 
 static const storage_test_relaid_t RELAID[] = {
     { LAYOUT0_PATH, LAYOUT1_PATH, "a field added", nullptr, BRIDGE_NONE },
@@ -45,7 +48,22 @@ static const storage_test_relaid_t RELAID[] = {
     { LAYOUT0_PATH, LAYOUT13_PATH, "a struct declared as a tag", nullptr,
         BRIDGE_NONE },
     { LAYOUT0_PATH, LAYOUT14_PATH, "an enum of a wider integer", nullptr,
-        BRIDGE_NONE }
+        BRIDGE_NONE },
+    { LAYOUT0_PATH, LAYOUT15_PATH,
+        "every field renamed, and each loss accepted", ALL_GONE, 5 },
+    { LAYOUT0_PATH, LAYOUT16_PATH, "a field made a struct of another type",
+        nullptr, BRIDGE_NONE },
+    { LAYOUT0_PATH, LAYOUT17_PATH,
+        "a struct a field names, changed, in an array made longer", nullptr,
+        BRIDGE_NONE },
+    { LAYOUT18_PATH, LAYOUT0_PATH, "five fields of long names removed",
+        nullptr, BRIDGE_NONE },
+    { LAYOUT0_PATH, LAYOUT20_PATH, "a field added, declared twice", nullptr,
+        BRIDGE_NONE },
+    { LAYOUT0_PATH, LAYOUT21_PATH,
+        "a field added, then another layout declared", nullptr, BRIDGE_NONE },
+    { LAYOUT0_PATH, LAYOUT4_PATH,
+        "a field removed, and its loss accepted with one that does not happen", ARR_AND_B, 2 }
 };
 
 static const storage_test_relaid_t RELAID_ELSEWHERE[] = {
@@ -64,7 +82,11 @@ static const storage_test_relaid_t RELAID_ELSEWHERE[] = {
     { LAYOUT0K4_PATH, LAYOUT2K4_PATH,
         "the fields in another order, direct-indexed", nullptr, BRIDGE_NONE },
     { LAYOUT0K5_PATH, LAYOUT2K5_PATH,
-        "the fields in another order, in a singleton", nullptr, BRIDGE_NONE }
+        "the fields in another order, in a singleton", nullptr, BRIDGE_NONE },
+    { LAYOUT0_PATH, LAYOUT1K3_PATH, "a field added, and the table made a toggle",
+        nullptr, BRIDGE_NONE },
+    { LAYOUT0K5_PATH, LAYOUT1_PATH,
+        "a field added, and the singleton made a table", nullptr, BRIDGE_NONE }
 };
 
 static void relay(storage_test_t *t, const storage_test_relaid_t *row)
