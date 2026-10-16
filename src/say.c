@@ -20,7 +20,7 @@ static void send_record(bridge_t *b, const say_t *about, const char *text)
     r.len = (uint32_t)strlen(text);
     r.barriers = b->barriers;
     r.level = about->level;
-    b->sink(b->ud, &r);
+    say_send(b, &r);
 }
 
 void say_error(bridge_t *b, const char *format, ...)

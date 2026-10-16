@@ -19,6 +19,8 @@ size_t bridge_get_stem_length(const char *identity);
 
 const module_t *bridge_find_pinned(const bridge_t *b);
 
+[[nodiscard]] int bridge_check_entry(bridge_t *b);
+
 [[nodiscard]] int bridge_check_call(bridge_t *b, const char *repairing);
 
 void bridge_stop(bridge_t *b, const char *identity, const char *what);

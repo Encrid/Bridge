@@ -50,7 +50,7 @@ static void send_line(bridge_t *b, const module_t *m, uint32_t at)
     r.arg[0] = rec.arg[0];
     r.arg[1] = rec.arg[1];
     r.level = rec.level;
-    b->sink(b->ud, &r);
+    say_send(b, &r);
 }
 
 void block_drain(bridge_t *b, module_t *m)

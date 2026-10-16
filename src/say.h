@@ -14,6 +14,8 @@ typedef struct {
     uint8_t level;
 } say_t;
 
+void say_send(bridge_t *b, const bridge_record_t *r);
+
 [[gnu::format(printf, 2, 3)]] void say_error(bridge_t *b, const char *format,
     ...);
 

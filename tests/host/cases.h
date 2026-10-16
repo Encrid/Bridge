@@ -224,6 +224,12 @@ void test_run_in_turn(host_t *h);
 void test_enter_from_foreign_thread(host_t *h);
 void test_pin(host_t *h);
 void test_call_from_wrong_thread(host_t *h);
+
+void test_set_calling(host_t *h);
+
+void test_call_from_sink(host_t *h);
+
+void test_call_after_sink(host_t *h);
 void test_state_no_threads(host_t *h);
 void test_hop_threads(host_t *h);
 void test_tell_events(host_t *h);

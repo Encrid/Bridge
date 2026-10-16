@@ -72,16 +72,10 @@ static void close_backends(bridge_t *b)
 
 int bridge_destroy(bridge_t *b)
 {
-    const module_t *pinned = b ? bridge_find_pinned(b) : nullptr;
-
     if (!b)
         return (0);
-    if (pinned) {
-        say_error(b, "bridge_destroy is refused: module '%s' is pinned to "
-            "the thread that loaded it, and this call comes from another",
-            pinned->identity);
+    if (bridge_check_entry(b))
         return (1);
-    }
     end_modules(b);
     free_schedule(b);
     block_destroy(b);

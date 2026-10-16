@@ -17,6 +17,8 @@ A count of an array can be zero, unless this document tells otherwise.
 Each function but `bridge_list_modules` is `[[nodiscard]]`: the compiler warns when a host ignores its result.
 Call `bridge_load`, `bridge_unload` and `bridge_reload` between two phases: never while `bridge_run_phase` runs.
 
+A call from the sink gives 1: *bridge_sink_fn_t*.
+
 ## The layouts
 
 A host can be in any language that can call C.
@@ -421,6 +423,8 @@ A module can write each of the eight levels: `docs/extern/bridge_abi.h.md`, *The
 - Bridge calls the sink only on the thread that called a function of the world, thus the sink of a world needs no lock.
 - A record and its text are good only during the call. To keep a line, copy it.
 - Bridge gives the lines of the logs to the sink at each barrier, after the systems of the phase returned.
+- The sink can call `bridge_list_modules`. An identity that it gives there is good only during that call of the sink.
+- If the sink calls another function of the world, the function does nothing, gives 1, and writes no record.
 
 A function gives its result. A record tells why. `bridge_list_modules` tells what runs.
 
@@ -476,8 +480,8 @@ Else the sink gets a record that tells why: *The deployment*.
 4. Bridge closes the library of a backend that states `BACKEND_UNLOAD`. Another library stays, and the next world uses it.
 
 The result is 0 when the world is gone, and for a null `b`.
-The result is 1 if a pinned module is loaded and the call comes from another thread.
-Then Bridge destroys nothing, and the world stays whole. Call again from the thread that loaded the module.
+The result is 1 if a pinned module is loaded and the call comes from another thread, or if the sink calls it.
+Then Bridge destroys nothing, and the world stays whole. Call again from the thread that loaded the module, after the sink returns.
 A host that ignores the result can lose a world that stays.
 
 ## bridge_load
@@ -499,6 +503,7 @@ A host that ignores the result can lose a world that stays.
 8. A barrier applies what `init` queued, and writes the spans of the module.
 
 The result is 0 if the module is loaded, its `init` gave 0, and the world can run it. Else the result is 1, with a record.
+From the sink, the result is 1, with no record.
 A refusal of the config stops nothing. A failure after the module exists stops the world, if `on_error` is `BRIDGE_FAIL`.
 A load that fails leaves the storage as it was.
 
@@ -522,6 +527,7 @@ When two modules conflict, the order of the loads decides which load fails. The 
 6. The backend destroys the instance and the image, and a barrier follows.
 
 The result is 0 if the module was loaded. Else the result is 1, with a record.
+From the sink, the result is 1, with no record.
 A component that another loaded module declares stays, with its rows.
 `docs/extern/bridge_abi.h.md`, *bridge_on_unload* tells what happens to the entities of a component that goes.
 
@@ -544,6 +550,8 @@ A component that another loaded module declares stays, with its rows.
 8. Bridge shuts the old instance down, and the new instance takes its place.
 
 The result is 0 if the new instance runs. Else the result is 1, with a record.
+From the sink, the result is 1, with no record.
+
 A reload keeps the components, their rows and the entities. Bridge does not write the settings again.
 A component that the new instance does not declare goes, as at an unload.
 The new instance runs under the new config, but `persistent` can grow and not shrink.
@@ -582,6 +590,7 @@ A module that Bridge stopped long after its load shows as `BRIDGE_STOPPED`.
 The systems of one module run one after another, and each one from its start to its return.
 The result is 0 if the phase ran, whatever its systems did: a system that failed is a record.
 The result is 1, with a record, if Bridge refuses the call: *A call refused*.
+From the sink, the result is 1, with no record.
 
 A system sees the same state of the world for the whole of a phase. An entity that a phase makes is visible in the next phase.
 A host can call a phase more often than another, for example a phase of physics at a fixed rate.
@@ -632,7 +641,6 @@ A function writes one of these records when it refuses the call, and gives 1:
 
 - `the world has stopped: <reason>`
 - `refused: module '<module>' is pinned to the thread that loaded it, and this call comes from another`
-- `bridge_destroy is refused: module '<module>' is pinned to the thread that loaded it, and this call comes from another`
 - `phase '<phase>' is not one the deployment declared`
 - `a module with no identity is refused`
 - `no module '<module>' is loaded, so none is unloaded`

@@ -4,7 +4,7 @@ This file unmakes a world: it shuts down each loaded module, and then gives back
 
 ## The steps of destroy
 
-1. Refuse the call if a loaded module is pinned to another thread.
+1. Refuse the call if the sink of the world runs, or if a loaded module is pinned to another thread.
 2. Run the `shutdown` of each module, in the order that the modules loaded.
 3. Discard each module.
 4. Free the schedule, the shared block with the storage, the threads, and the names of the deployment.
@@ -25,7 +25,7 @@ The modules shut down in the order that they loaded. No module depends on anothe
 The `shutdown` of a pinned module is code of that module, so it runs on the thread that loaded the module, or not at all.
 From another thread, `bridge_destroy` gives 1, with a record that names the module, and touches nothing.
 The world stays whole for a call from the thread that can destroy it.
-`docs/intern/bridge_run.c.md`, *A pinned module*, tells the rule.
+`docs/intern/bridge_check.c.md`, *A pinned module*, tells the rule.
 
 ## The libraries of the backends
 

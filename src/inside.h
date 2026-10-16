@@ -204,6 +204,7 @@ typedef struct {
 struct bridge {
     bridge_sink_fn_t sink;
     void *ud;
+    bool in_sink;
     open_backend_t *backends;
     uint32_t backend_count;
     uint64_t reservation;
