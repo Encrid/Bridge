@@ -2102,6 +2102,21 @@ defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_a
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "wrong-declare-name-empty"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/wrong/*.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_name_empty", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+variants = [
+    { name = "wrong-declare-name-long", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_name_long", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-system-name-empty", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_empty", "IN_SYSTEM=wrong_do_nothing"] },
+    { name = "wrong-system-name-long", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_long", "IN_SYSTEM=wrong_do_nothing"] }
+]
+
+[[artifact]]
 name = "wrong-destroy-zero"
 kind = "library"
 test = true

@@ -24,8 +24,8 @@ static int read_stated(declaring_t *g, uint64_t at)
         return (abi_refuse(m, "declare is called outside init"));
     name = get_scratch(m, d->name, d->name_len);
     g->desc = get_scratch(m, d->desc, d->desc_len);
-    if (!name || (!g->desc && d->kind != BRIDGE_TAG) || !d->name_len
-        || d->name_len >= sizeof(g->name))
+    if (abi_check_name(m, "declare", d->name_len) || !name
+        || (!g->desc && d->kind != BRIDGE_TAG))
         return (abi_refuse(m, "declare: a name or a descriptor lies outside "
             "the scratch arena"));
     memcpy(g->name, name, d->name_len);

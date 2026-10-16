@@ -52,6 +52,14 @@ static int check_policy(declaring_t *g)
     return (0);
 }
 
+int abi_check_name(module_t *m, const char *what, uint32_t len)
+{
+    if (len && len <= 127)
+        return (0);
+    return (abi_refuse(m, "%s: its name has %u bytes, and a name has 1 to "
+        "127", what, len));
+}
+
 int abi_check_stated(declaring_t *g)
 {
     const char *desc = g->d.kind == BRIDGE_TAG ? "" : g->desc;

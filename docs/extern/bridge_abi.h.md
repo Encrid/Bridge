@@ -596,6 +596,7 @@ A name of 0 bytes, or of 128 bytes or more, gets the reason of a name outside th
 
 - `declare: what it states lies outside the scratch arena`
 - `declare is called outside init`
+- `declare: its name has <count> bytes, and a name has 1 to 127`
 - `declare: a name or a descriptor lies outside the scratch arena`
 - `type '<type>' has no namespace`
 - `type '<type>': its kind is unset`
@@ -647,6 +648,7 @@ When other modules declare the type, the reason of a layout ends with `. It is a
 - `observe: its events are unset, or name one there is not`
 - `it registers one more than [budget] systems of <count>`
 - `a system asks for <count> terms, which is more than [budget] terms of <count>`
+- `system: its name has <count> bytes, and a name has 1 to 127`
 - `system: a name, a term or a change lies outside the scratch arena`
 - `a system states <count> changes, and the module declared <count> types`
 - `'<name>' is a reserved name, and no system may take it`

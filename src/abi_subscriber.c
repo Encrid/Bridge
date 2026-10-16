@@ -33,8 +33,8 @@ static int read_stated(subscribing_t *g)
     g->changes = "";
     if (g->change_count)
         g->changes = get_scratch(m, g->changes_at, changes_len);
-    if (!name || !g->terms || !g->changes || !g->name_len
-        || g->name_len >= sizeof(g->name))
+    if (abi_check_name(m, g->what, g->name_len) || !name || !g->terms
+        || !g->changes)
         return (abi_refuse(m, "%s: a name, a term or a change lies outside "
             "the scratch arena", g->what));
     if (g->change_count > m->declared_count)

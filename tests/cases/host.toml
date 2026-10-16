@@ -2155,6 +2155,30 @@ claims = { matches = ["test:guess@0.1.0: loaded.*alive"], matches_not = ["asked 
 false = { run = ["{out}/host{exe}", "destroy-of-a-held-id-refused"] }
 
 [[case]]
+name = "bridge_declaration_t-name-empty-refused"
+run = ["{out}/host{exe}", "bridge_declaration_t-name-empty-refused"]
+claims = { matches = ["declare: its name has 0 bytes, and a name has 1 to 127.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_declaration_t-name-long-refused"] }
+
+[[case]]
+name = "bridge_declaration_t-name-long-refused"
+run = ["{out}/host{exe}", "bridge_declaration_t-name-long-refused"]
+claims = { matches = ["declare: its name has 128 bytes, and a name has 1 to 127.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_system_statement_t-name-empty-refused"] }
+
+[[case]]
+name = "bridge_system_statement_t-name-empty-refused"
+run = ["{out}/host{exe}", "bridge_system_statement_t-name-empty-refused"]
+claims = { matches = ["system: its name has 0 bytes, and a name has 1 to 127.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_system_statement_t-name-long-refused"] }
+
+[[case]]
+name = "bridge_system_statement_t-name-long-refused"
+run = ["{out}/host{exe}", "bridge_system_statement_t-name-long-refused"]
+claims = { matches = ["system: its name has 128 bytes, and a name has 1 to 127.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_declaration_t-name-empty-refused"] }
+
+[[case]]
 name = "destroy-of-id-0-refused"
 run = ["{out}/host{exe}", "destroy-of-id-0-refused"]
 claims = { matches = ["system 'act' failed: destroy: the id 0 is no entity.*alive"] }

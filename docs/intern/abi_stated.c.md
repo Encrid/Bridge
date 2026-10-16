@@ -46,4 +46,5 @@ A fingerprint finds a difference, and never describes it.
 | `abi_hash_text` | The 64-bit FNV-1a hash of `n` bytes of text: the fingerprint of a descriptor. |
 | `check_kind` | Refuses a name with no namespace, an unset kind, and a tag that states bytes or a descriptor. Sets `bare` to the colon of the name. |
 | `check_policy` | Refuses a name of another namespace that no grant names, and an unset policy or storage layout. |
+| `abi_check_name` | Refuses a name of a type, a system or an observer that has 0 bytes, or more than 127. 1 with a refusal. |
 | `abi_check_stated` | Refuses a declaration that states what it may not, and works out its fingerprint. 1 with a refusal. |
