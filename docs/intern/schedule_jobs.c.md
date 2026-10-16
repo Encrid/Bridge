@@ -26,15 +26,11 @@ It also sets `failed` of the system to 0.
 
 | Value | Content |
 | --- | --- |
-| `turn` | The kind in the high bits, and the ordinal in the low 16 bits. The kind is 0 for an observer, which runs at the barrier, and `TURN_SYSTEM` for a phase. |
-| `when` | The count of barriers shifted left by 16, and the ordinal in the low 16 bits. |
+| `turn` | The kind above bit 32, and the ordinal in the low 32 bits. The kind is 0 for an observer, which runs at the barrier, and `TURN_SYSTEM` for a phase. |
+| `place` | The ordinal. |
 
 An observer ran at the last barrier, before anything since, and the kind 0 of its turn says so.
 The barrier applies the queues in the order of the turns: `docs/intern/storage_runs.h.md`, *The order of the queues*.
-
-## Limits
-
-`turn` and `when` keep only the low 16 bits of the ordinal, and `when` keeps only the low 16 bits of the barrier count.
 
 ## Functions
 
@@ -42,6 +38,6 @@ The barrier applies the queues in the order of the turns: `docs/intern/storage_r
 | --- | --- |
 | `has_job` | Gives whether a module has a job in the level already. |
 | `runs_now` | Gives whether a system runs in this level of this phase. |
-| `list_system` | Adds a system to a job and gives it its turn and `when`. |
+| `list_system` | Adds a system to a job and gives it its turn and its place. |
 | `fill_job` | Makes the next job of the level for the module of system `i`, with each of its systems from `i` on that runs now. |
 | `schedule_gather_jobs` | Makes the jobs of one level of a phase, one for each module that has a system that runs in it. |

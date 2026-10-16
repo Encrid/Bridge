@@ -81,14 +81,16 @@ Bridge writes it. The module writes only `scratch_used` and `ring_head`.
 | `tables` | How many table ids there are, 0 included. |
 | `entity_index` | Where the entity index begins, in the shared memory. |
 | `entities` | How many items of `bridge_entity_t` the entity index has. |
-| `when` | When the system that runs was dispatched. Bridge writes it before each dispatch. |
-| `system` | The slot of the system that runs. For an observer, it is the slot plus `0x8000`. |
+| `barriers` | How many barriers the world had made when the system that runs was dispatched. |
+| `place` | The place of the system that runs in its phase, from 0. |
+| `system` | The slot of the system that runs, among the systems or the observers of the module. |
+| `observer` | 1 if an observer runs, and 0 if a system runs. |
 | `log_level` | The highest level of a line that the module writes. |
 | `observers` | Where the observer slots begin: a `bridge_list_t` for each slot that `observe` gave. |
 | `kept` | Where the kept cells begin: a `uint32_t` for each type that the module declared. |
 
-`when` holds the count of barriers in its high 16 bits, and the place of the system in its phase in its low 16 bits.
-`system` is `0xFFFFFFFF` while no system runs, for example in `init`.
+Bridge writes `barriers`, `place`, `system` and `observer` before each dispatch.
+`system` is `0xFFFFFFFF` and `observer` is 0 while no system runs, for example in `init`.
 
 ## The scratch arena
 
@@ -115,14 +117,16 @@ A module can write each of the eight levels.
 | `BRIDGE_LOG_DEBUG` | 7: detail. |
 
 The four items have the numbers of `enum bridge_level`: `docs/extern/bridge.h.md`, *bridge_record_t*.
-A line is a `bridge_log_record_t` of 24 bytes:
+A line is a `bridge_log_record_t` of 32 bytes:
 
 | Field | Content |
 | --- | --- |
-| `when` | `when` of the header, when the module wrote the line. |
-| `pad` | 1 byte of padding. |
-| `level` | The level of the line: 0 to 7. Lower is worse. |
+| `barriers` | `barriers` of the header, when the module wrote the line. |
+| `place` | `place` of the header, when the module wrote the line. |
 | `system` | `system` of the header, when the module wrote the line. |
+| `observer` | `observer` of the header, when the module wrote the line. |
+| `level` | The level of the line: 0 to 7. Lower is worse. |
+| `pad` | 2 bytes of padding. |
 | `text` | Where the text of the line is: an offset into the private memory, in the scratch arena. |
 | `len` | How many bytes the text has. |
 | `arg` | Two numbers: a value, and what it is set beside. |

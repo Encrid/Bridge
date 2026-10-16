@@ -260,6 +260,18 @@ claims = { matches = ["the shared block reserves more than it uses: yes.*a plain
 false = { run = ["{out}/storage{exe}", "changes"] }
 
 [[case]]
+name = "schedule_init_matrix-too-large-not-made"
+run = ["{out}/storage{exe}", "matrix"]
+claims = { matches = ["a matrix for 4294967233 systems: not made, 67108864 words a row.*alive"] }
+false = { run = ["{out}/storage{exe}", "matrixsmall"] }
+
+[[case]]
+name = "bridge_log_record_t-place-and-slot-past-16-bits"
+run = ["{out}/storage{exe}", "widerecord"]
+claims = { matches = ["barriers 7 place 70000 system far.*alive"] }
+false = { run = ["{out}/storage{exe}", "matrix"] }
+
+[[case]]
 name = "storage-marks-full-refused"
 run = ["{out}/storage{exe}", "marks"]
 claims = { matches = ["refused: out of memory: there was none for a mark in its queue.*alive"] }

@@ -96,7 +96,7 @@ A system and an observer are a query and a function either way, so one record se
 | `parked` | Out of the schedule while a reload decides what becomes of it. |
 | `observer` | Whether it is an observer. |
 | `pending`, `pending_count`, `pending_room` | Who triggered it since the last barrier, how many, and the room of the list. |
-| `when` | The `when` of the dispatch in progress. |
+| `place` | The place of the system in its phase, at its dispatch. |
 | `turn` | Where it comes among all that ran before the barrier. |
 | `failed`, `why` | How its dispatch ended, said after the join. |
 | `failures` | Its own count of failures. |
@@ -216,12 +216,12 @@ A load, a reload and an unload ask for no memory to make the schedule, so none o
 | `CHANGE_DESTROY` | 1: a queued `destroy`. |
 | `CHANGE_ATTACH` | 2: a queued `attach`. |
 | `CHANGE_DETACH` | 3: a queued `detach`. |
-| `TURN_LIFECYCLE` | `1 << 16`: the turns of the lifecycle calls. |
-| `TURN_SYSTEM` | `2 << 16`: the turns of the systems of a phase. |
+| `TURN_LIFECYCLE` | `1 << 32`: the turns of the lifecycle calls. |
+| `TURN_SYSTEM` | `2 << 32`: the turns of the systems of a phase. |
 
 A turn orders all the calls that ran before a barrier.
 The observers of the last barrier come first, then the lifecycle calls, then the systems of the phase, each in the order it ran.
-The low 16 bits of a turn give that order.
+The low 32 bits of a turn give that order.
 
 ## Functions
 

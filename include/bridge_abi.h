@@ -163,13 +163,15 @@ typedef struct {
     uint32_t tables;
     uint32_t entity_index;
     uint32_t entities;
-    uint32_t when;
+    uint32_t barriers;
+    uint32_t place;
     uint32_t system;
+    uint32_t observer;
     uint32_t log_level;
     uint32_t observers;
     uint32_t kept;
 } bridge_header_t;
-static_assert(sizeof(bridge_header_t) == 76);
+static_assert(sizeof(bridge_header_t) == 84);
 static_assert(alignof(bridge_header_t) == 4);
 static_assert(offsetof(bridge_header_t, abi) == 0);
 static_assert(offsetof(bridge_header_t, scratch) == 4);
@@ -185,11 +187,13 @@ static_assert(offsetof(bridge_header_t, types) == 40);
 static_assert(offsetof(bridge_header_t, tables) == 44);
 static_assert(offsetof(bridge_header_t, entity_index) == 48);
 static_assert(offsetof(bridge_header_t, entities) == 52);
-static_assert(offsetof(bridge_header_t, when) == 56);
-static_assert(offsetof(bridge_header_t, system) == 60);
-static_assert(offsetof(bridge_header_t, log_level) == 64);
-static_assert(offsetof(bridge_header_t, observers) == 68);
-static_assert(offsetof(bridge_header_t, kept) == 72);
+static_assert(offsetof(bridge_header_t, barriers) == 56);
+static_assert(offsetof(bridge_header_t, place) == 60);
+static_assert(offsetof(bridge_header_t, system) == 64);
+static_assert(offsetof(bridge_header_t, observer) == 68);
+static_assert(offsetof(bridge_header_t, log_level) == 72);
+static_assert(offsetof(bridge_header_t, observers) == 76);
+static_assert(offsetof(bridge_header_t, kept) == 80);
 
 typedef struct {
     uint32_t spans;
@@ -240,23 +244,27 @@ enum bridge_log : uint8_t {
 };
 
 typedef struct {
-    uint32_t when;
-    uint8_t pad;
+    uint32_t barriers;
+    uint32_t place;
+    uint32_t system;
+    uint8_t observer;
     uint8_t level;
-    uint16_t system;
+    uint8_t pad[2];
     uint32_t text;
     uint32_t len;
     uint32_t arg[2];
 } bridge_log_record_t;
-static_assert(sizeof(bridge_log_record_t) == 24);
+static_assert(sizeof(bridge_log_record_t) == 32);
 static_assert(alignof(bridge_log_record_t) == 4);
-static_assert(offsetof(bridge_log_record_t, when) == 0);
-static_assert(offsetof(bridge_log_record_t, pad) == 4);
-static_assert(offsetof(bridge_log_record_t, level) == 5);
-static_assert(offsetof(bridge_log_record_t, system) == 6);
-static_assert(offsetof(bridge_log_record_t, text) == 8);
-static_assert(offsetof(bridge_log_record_t, len) == 12);
-static_assert(offsetof(bridge_log_record_t, arg) == 16);
+static_assert(offsetof(bridge_log_record_t, barriers) == 0);
+static_assert(offsetof(bridge_log_record_t, place) == 4);
+static_assert(offsetof(bridge_log_record_t, system) == 8);
+static_assert(offsetof(bridge_log_record_t, observer) == 12);
+static_assert(offsetof(bridge_log_record_t, level) == 13);
+static_assert(offsetof(bridge_log_record_t, pad) == 14);
+static_assert(offsetof(bridge_log_record_t, text) == 16);
+static_assert(offsetof(bridge_log_record_t, len) == 20);
+static_assert(offsetof(bridge_log_record_t, arg) == 24);
 
 typedef struct {
     uint32_t (*declare)(uint32_t at);

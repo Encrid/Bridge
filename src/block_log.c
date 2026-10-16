@@ -15,14 +15,13 @@ static_assert((int)BRIDGE_LOG_DEBUG == (int)BRIDGE_DEBUG);
 static const char OUTSIDE[] =
     "(a log line whose text lies outside the scratch arena)";
 
-static const char *get_writer(const module_t *m, uint32_t system)
+static const char *get_writer(const module_t *m,
+    const bridge_log_record_t *rec)
 {
-    uint32_t observer = system - 0x8000u;
-
-    if (system < m->system_count)
-        return (m->systems[system]->name);
-    if (system >= 0x8000u && observer < m->observer_count)
-        return (m->observers[observer]->name);
+    if (rec->observer && rec->system < m->observer_count)
+        return (m->observers[rec->system]->name);
+    if (!rec->observer && rec->system < m->system_count)
+        return (m->systems[rec->system]->name);
     return (nullptr);
 }
 
@@ -41,12 +40,13 @@ static void send_line(bridge_t *b, const module_t *m, uint32_t at)
 
     memcpy(&rec, ring + (at % m->ring_len) * sizeof(rec), sizeof(rec));
     r.identity = m->identity;
-    r.system = get_writer(m, rec.system);
+    r.system = get_writer(m, &rec);
     if (is_in_scratch(m, &rec)) {
         r.text = (const char *)m->priv + rec.text;
         r.len = rec.len;
     }
-    r.when = rec.when;
+    r.barriers = rec.barriers;
+    r.place = rec.place;
     r.arg[0] = rec.arg[0];
     r.arg[1] = rec.arg[1];
     r.level = rec.level;

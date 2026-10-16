@@ -24,7 +24,7 @@ A failed call gives its status, `bridge_list_modules` tells what runs, and a rec
 The text is written as `printf` writes it, into 512 bytes, so a longer text is cut.
 The identity is the identity of the module, or null.
 The system is the name of the system or the observer, or null.
-`when` holds the count of barriers in its high 16 bits, and 0 as the offset in the phase.
+`barriers` holds the count of barriers, and `place` is 0.
 The level is the level that `say_t` states, and `say_error` states `BRIDGE_ERR`.
 
 ## Functions

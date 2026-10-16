@@ -31,12 +31,14 @@ static inline void bridge_log(uint32_t level, const bridge_line_t *line)
     if (head - BRIDGE_HEADER(ring_tail) >= BRIDGE_HEADER(ring_len))
         return;
     at = BRIDGE_HEADER(ring) + (head % BRIDGE_HEADER(ring_len)) * size;
-    acc_own_st(at, BRIDGE_HEADER(when));
-    acc_own_st(at + 4u, (level & 0xffu) << 8 | BRIDGE_HEADER(system) << 16);
-    acc_own_st(at + 8u, bridge_put(line->text, line->len));
-    acc_own_st(at + 12u, line->len);
-    acc_own_st(at + 16u, line->a0);
-    acc_own_st(at + 20u, line->a1);
+    acc_own_st(at, BRIDGE_HEADER(barriers));
+    acc_own_st(at + 4u, BRIDGE_HEADER(place));
+    acc_own_st(at + 8u, BRIDGE_HEADER(system));
+    acc_own_st(at + 12u, (level & 0xffu) << 8 | (BRIDGE_HEADER(observer) & 0xffu));
+    acc_own_st(at + 16u, bridge_put(line->text, line->len));
+    acc_own_st(at + 20u, line->len);
+    acc_own_st(at + 24u, line->a0);
+    acc_own_st(at + 28u, line->a1);
 }
 
 #endif

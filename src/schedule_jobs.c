@@ -28,11 +28,10 @@ static void list_system(schedule_pass_t *pass, schedule_job_t *job,
     bridge_system_t *s)
 {
     const bridge_t *b = pass->b;
-    uint32_t ordinal = pass->ordinal & 0xffffu;
-    uint32_t kind = pass->phase == b->phase_count ? 0 : TURN_SYSTEM;
+    uint64_t kind = pass->phase == b->phase_count ? 0 : TURN_SYSTEM;
 
-    s->turn = kind | ordinal;
-    s->when = b->barriers << 16 | ordinal;
+    s->turn = kind | pass->ordinal;
+    s->place = pass->ordinal;
     s->failed = 0;
     job->list[job->count] = s;
     job->count++;

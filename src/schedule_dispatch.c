@@ -42,12 +42,15 @@ static void run_system(module_t *m, bridge_system_t *s)
     bridge_header_t *h = (bridge_header_t *)m->priv;
     uint32_t slot = find_slot(m, s);
 
-    h->when = s->when;
+    h->barriers = m->b->barriers;
+    h->place = s->place;
     m->running = s;
     m->turn = s->turn;
-    h->system = s->observer ? slot | 0x8000u : slot;
+    h->system = slot;
+    h->observer = s->observer ? 1 : 0;
     call_system(m, s);
     h->system = UINT32_MAX;
+    h->observer = 0;
     m->running = nullptr;
 }
 

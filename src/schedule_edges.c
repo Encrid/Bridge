@@ -21,7 +21,7 @@ void schedule_gather_phase(bridge_t *b, schedule_phase_t *p)
         i++;
     }
     p->reach.n = p->n;
-    p->reach.words = (p->n + 63) / 64;
+    p->reach.words = (uint32_t)(((uint64_t)p->n + 63) / 64);
     p->reach.bits = b->build_bits;
     words = (size_t)p->n * p->reach.words + 1;
     memset(p->reach.bits, 0, words * sizeof(*p->reach.bits));

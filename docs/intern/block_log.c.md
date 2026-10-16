@@ -8,7 +8,7 @@ The log is the library's, and not a module's: each module can fail, so each depl
 A module writes a line as a record in one ring in its private memory.
 The systems of a module run one after another, so the ring has one writer, and no line needs an atomic.
 A line is no call: it costs stores.
-The record is a `bridge_log_record_t` of 24 bytes, and the ring is an array of them.
+The record is a `bridge_log_record_t` of 32 bytes, and the ring is an array of them.
 The head and the tail are counters, and the number of lines dropped is a subtraction.
 
 The text of a record is always an offset into the scratch arena of the module.
@@ -44,9 +44,9 @@ This file holds the two sets of names equal with static assertions, where the le
 A module can write all of its private memory.
 So the drain copies a record out of the ring before it reads it, and checks that the text lies in the scratch arena.
 A text outside the scratch arena reaches the sink as "(a log line whose text lies outside the scratch arena)".
-The system is the system of the slot in the record, or the observer of the slot less `0x8000`.
+The system is the system of the slot in the record, or the observer of the slot if `observer` is not 0.
 A slot with no system or observer gives null.
-`when`, `arg` and `level` go to the sink as they are.
+`barriers`, `place`, `arg` and `level` go to the sink as they are.
 
 ## Functions
 

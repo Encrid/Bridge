@@ -29,10 +29,13 @@ static inline void test_log(const test_api_t *api, uint32_t level,
     if (head - h->ring_tail >= h->ring_len)
         return;
     r += head % h->ring_len;
-    r->when = h->when;
-    r->pad = 0;
+    r->barriers = h->barriers;
+    r->place = h->place;
+    r->system = h->system;
+    r->observer = (uint8_t)h->observer;
     r->level = (uint8_t)level;
-    r->system = (uint16_t)h->system;
+    r->pad[0] = 0;
+    r->pad[1] = 0;
     r->text = test_put(api, line->text, line->len);
     r->len = line->len;
     r->arg[0] = line->a0;

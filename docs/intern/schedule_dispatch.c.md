@@ -5,13 +5,13 @@ This file runs one system: it tells the module which system runs, makes the call
 ## The culprit
 
 Before the call, `run_system` writes in the header of the private memory of the module which system runs.
-It is one store for each dispatch, of `when` and `system`, and every line that the module then writes to its log carries them.
+It writes `barriers`, `place`, `system` and `observer`. Each line that the module then writes to its log carries them.
 Two systems that conflict never run at the same time.
 So at one time only one system can write a given component, and the header names it: it is the culprit of a bad write.
 
 `system` is the slot of the system among the systems of its module: the number that the module got when it registered the system.
-For an observer, it is the slot among the observers, with the bit `0x8000` set.
-After the call, `system` is `UINT32_MAX`.
+For an observer, it is the slot among the observers, and `observer` is 1.
+After the call, `system` is `UINT32_MAX` and `observer` is 0.
 While the system runs, `running` and `turn` of the module hold the system and its turn.
 The entries that the system calls read them: `src/abi_calls.c` checks the stated changes, and `src/abi_entry.h` marks the turn in the queue.
 

@@ -22,7 +22,7 @@ void test_state_small(bridge_artifact_t *a, char *identity, const char *name)
     a->cfg.reload_timeout = 200 * HOST_MS;
     a->cfg.shutdown_timeout = 200 * HOST_MS;
     a->cfg.scratch = 4096;
-    a->cfg.log_ring = 240;
+    a->cfg.log_ring = 320;
     a->cfg.spans = 4096;
     a->cfg.changes = 4096;
 }

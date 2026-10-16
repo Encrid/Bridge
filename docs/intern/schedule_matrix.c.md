@@ -5,6 +5,7 @@ This file gives the matrix of who runs before whom: a row of bits for each syste
 ## The matrix
 
 Row `i` has `words` words of 64 bits, and bit `j` of the row says that system `i` runs before system `j`.
+Bridge computes `words` in 64 bits, so a count of systems near 2^32 does not give 0 words.
 Word `j / 64` of the row holds that bit, at the place `j % 64`.
 A matrix has one word more than its rows need, so its size is never 0.
 

@@ -65,6 +65,7 @@ void test_hear_counts(void *ud, const bridge_record_t *r)
 
     if (keep_counted(ud, r))
         return;
-    printf("record[%d] b%u %s/%s: %.*s %u %u\n", r->level, r->when >> 16,
-        identity, system, (int)r->len, r->text, r->arg[0], r->arg[1]);
+    printf("record[%d] b%u p%u %s/%s: %.*s %u %u\n", r->level, r->barriers,
+        r->place, identity, system, (int)r->len, r->text, r->arg[0],
+        r->arg[1]);
 }

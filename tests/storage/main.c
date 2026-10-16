@@ -68,6 +68,9 @@ static const storage_test_case_t CASES[] = {
 #endif
     { "shape", storage_test_look_at_shape, &BOTH_BACKENDS },
     { "marks", storage_test_fill_marks, &PLAIN },
+    { "matrix", storage_test_make_large_matrix, &PLAIN },
+    { "matrixsmall", storage_test_make_small_matrix, &PLAIN },
+    { "widerecord", storage_test_drain_wide_record, &PLAIN },
     { "changes", storage_test_change, &PLAIN },
     { "tables", storage_test_make_tables, &PLAIN },
     { "notables", storage_test_use_up_tables, &ONE_TABLE },

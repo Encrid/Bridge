@@ -10,7 +10,7 @@
 bool schedule_init_matrix(schedule_matrix_t *m, uint32_t n)
 {
     m->n = n;
-    m->words = (n + 63) / 64;
+    m->words = (uint32_t)(((uint64_t)n + 63) / 64);
     m->bits = calloc((size_t)n * m->words + 1, sizeof(*m->bits));
     return (m->bits != nullptr);
 }

@@ -43,7 +43,7 @@ This file refuses these amounts:
 - A `config` that is null or empty. A module with no settings component states `BRIDGE_NO_CONFIG`.
 - More `spawns` than `[budget] entities`. Whether they fit in what is left is found when they are set aside: `src/bridge_load.c`.
 - Regions of the private memory that an offset of 32 bits cannot reach.
-- A `log_ring` that cannot hold one record of 24 bytes.
+- A `log_ring` that cannot hold one record of 32 bytes.
 
 A log level is a severity of syslog: 0 is the worst, and 7 is the most detail.
 Zero is unset for `log_level`, as for every key, so the least it can be is 1.

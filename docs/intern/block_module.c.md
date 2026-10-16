@@ -37,7 +37,7 @@ A module writes `scratch_used` and `ring_head`, and nothing else.
 
 Each offset is from the start of the private memory, except `entity_index`.
 The entity index is the one thing in the shared memory that a module reads and cannot find from other values.
-`when` and `system` are written before each dispatch: `src/schedule_dispatch.c`.
+`barriers`, `place`, `system` and `observer` are written before each dispatch: `src/schedule_dispatch.c`.
 `log_level` is written when the private memory is made: `src/module_call.c`.
 
 The span region holds the queries, the lists of the observers, `column_base`, `kept` and the spans.

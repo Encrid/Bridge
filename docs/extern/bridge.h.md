@@ -239,7 +239,7 @@ The host states each field: zero is unset, and a load refuses it. A count of an 
 | `log_level` | The highest level of a line that the module writes: 1 to `BRIDGE_LEVEL_MOST`. |
 | `pad1` | 3 bytes of padding. |
 | `scratch` | The size of the scratch arena of the module, in bytes. |
-| `log_ring` | The size of the log ring of the module, in bytes: one record of 24 bytes at least. |
+| `log_ring` | The size of the log ring of the module, in bytes: one record of 32 bytes at least. |
 | `spans` | The size of the span region of the module, in bytes. |
 | `spawns` | How many entity ids the module can take between two barriers, or `BRIDGE_NONE`. |
 | `persistent` | The share of the persistent arena of the module, in bytes, or `BRIDGE_NONE`. |
@@ -391,13 +391,14 @@ The sink of the world gets each record.
 | `system` | The name of the system or the observer that the record comes from, or null. |
 | `text` | The text, `len` bytes. A zero does not always follow it. |
 | `len` | How many bytes `text` has. |
-| `when` | The count of barriers in the high 16 bits, and the place of the system in its phase in the low 16 bits. |
+| `barriers` | How many barriers the world had made when the record was made. |
+| `place` | The place of the system in its phase, from 0. Zero in a record of Bridge. |
 | `arg` | Two numbers that a module writes with a line: a value, and what it is set beside. Zero in a record of Bridge. |
 | `level` | The severity of the record: 0 to 7. Lower is worse. |
-| `pad` | 7 bytes of padding. |
+| `pad` | 3 bytes of padding. |
 
 A record of Bridge that names a module in its text can have a null `identity`.
-A line of the log of a module has the `when` that the module wrote.
+A line of the log of a module has the `barriers` and the `place` that the module wrote.
 
 `enum bridge_level` names four severities of syslog, RFC 5424, by their numbers. 0 is the worst, and 7 is the most detail.
 

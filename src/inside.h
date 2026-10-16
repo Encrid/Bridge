@@ -76,8 +76,8 @@ typedef struct {
     pending_t *pending;
     uint32_t pending_count;
     uint32_t pending_room;
-    uint32_t when;
-    uint32_t turn;
+    uint32_t place;
+    uint64_t turn;
     int failed;
     char why[256];
     int64_t failures;
@@ -87,7 +87,7 @@ typedef struct {
 } bridge_system_t;
 
 typedef struct {
-    uint32_t turn;
+    uint64_t turn;
     uint32_t at;
 } module_mark_t;
 
@@ -165,7 +165,7 @@ struct module {
     int in_init;
     int stopped;
     const void *running;
-    uint32_t turn;
+    uint64_t turn;
     module_mark_t *marks;
     uint32_t mark_count;
     uint32_t mark_room;
@@ -192,8 +192,8 @@ typedef struct {
     enum change_op op;
 } change_t;
 
-constexpr uint32_t TURN_LIFECYCLE = 1u << 16;
-constexpr uint32_t TURN_SYSTEM = 2u << 16;
+constexpr uint64_t TURN_LIFECYCLE = 1ull << 32;
+constexpr uint64_t TURN_SYSTEM = 2ull << 32;
 
 typedef struct {
     char *stem;

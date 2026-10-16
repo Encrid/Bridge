@@ -47,7 +47,7 @@ void test_fill_ring(host_t *h)
     if (host_open(h))
         return;
     test_state_module(&a, "test:chatty@0.1.0", "chatty");
-    a.cfg.log_ring = 16 * 24;
+    a.cfg.log_ring = 16 * 32;
     host_load(h, &a);
     host_run_frames(h, 1);
     host_close(h);

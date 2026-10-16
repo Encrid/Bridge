@@ -18,7 +18,7 @@ static void send_record(bridge_t *b, const say_t *about, const char *text)
     r.system = about->s ? about->s->name : nullptr;
     r.text = text;
     r.len = (uint32_t)strlen(text);
-    r.when = b->barriers << 16;
+    r.barriers = b->barriers;
     r.level = about->level;
     b->sink(b->ud, &r);
 }

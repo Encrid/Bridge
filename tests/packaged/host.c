@@ -25,7 +25,7 @@ static void state(bridge_artifact_t *a, const char *backend,
         .work_limit = BRIDGE_NO_LIMIT, .memory_limit = BRIDGE_NO_LIMIT,
         .init_timeout = BRIDGE_NO_LIMIT, .reload_timeout = BRIDGE_NO_LIMIT,
         .shutdown_timeout = BRIDGE_NO_LIMIT, .scratch = 64 << 10,
-        .log_ring = 64 * 24, .spans = 16 << 10, .log_level = BRIDGE_INFO,
+        .log_ring = 64 * 32, .spans = 16 << 10, .log_level = BRIDGE_INFO,
         .spawns = 4, .persistent = BRIDGE_NONE, .changes = 1 << 20,
         .loss_count = BRIDGE_NONE, .config = BRIDGE_NO_CONFIG };
 }

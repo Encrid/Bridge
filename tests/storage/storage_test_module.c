@@ -20,7 +20,7 @@ bridge_artifact_t storage_test_state(const char *path, int64_t spawns,
         .max_system_failures = 1, .work_limit = BRIDGE_NO_LIMIT,
         .memory_limit = BRIDGE_NO_LIMIT, .init_timeout = BRIDGE_NO_LIMIT,
         .reload_timeout = BRIDGE_NO_LIMIT,
-        .shutdown_timeout = BRIDGE_NO_LIMIT, .log_ring = 256 * 24,
+        .shutdown_timeout = BRIDGE_NO_LIMIT, .log_ring = 256 * 32,
         .spans = spans, .log_level = BRIDGE_INFO, .spawns = spawns,
         .persistent = BRIDGE_NONE, .changes = changes,
         .loss_count = BRIDGE_NONE, .config = BRIDGE_NO_CONFIG };

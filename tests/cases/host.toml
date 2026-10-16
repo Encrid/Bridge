@@ -367,13 +367,13 @@ false = { run = ["{out}/host{exe}", "observe-plain-attach-guarded-observer"] }
 [[case]]
 name = "observe-plain-attach-guarded-observer"
 run = ["{out}/host{exe}", "observe-plain-attach-guarded-observer"]
-claims = { matches = ["b2 game:setter@0.1.0/mark: marked.*b2 view:watcher@0.1.0/seen: seen 1 77.*alive"] }
+claims = { matches = ["b2 p0 game:setter@0.1.0/mark: marked.*b2 p\\d+ view:watcher@0.1.0/seen: seen 1 77.*alive"] }
 false = { run = ["{out}/host{exe}", "observe-chain-one-hop-a-barrier"] }
 
 [[case]]
 name = "observe-chain-one-hop-a-barrier"
 run = ["{out}/host{exe}", "observe-chain-one-hop-a-barrier"]
-claims = { matches = ["b1 game:chain@0.1.0/got_a: hop A.*b2 game:chain@0.1.0/got_b: hop B.*b3 game:chain@0.1.0/got_c: hop C.*alive"], matches_not = ["hop A.*hop A"] }
+claims = { matches = ["b1 p\\d+ game:chain@0.1.0/got_a: hop A.*b2 p\\d+ game:chain@0.1.0/got_b: hop B.*b3 p\\d+ game:chain@0.1.0/got_c: hop C.*alive"], matches_not = ["hop A.*hop A"] }
 false = { run = ["{out}/host{exe}", "observe-reserved-name-refused"] }
 
 [[case]]
@@ -1125,7 +1125,7 @@ false = { run = ["{out}/host{exe}", "module_config.log_ring-smaller-than-a-recor
 [[case]]
 name = "module_config.log_ring-smaller-than-a-record-refused"
 run = ["{out}/host{exe}", "module_config.log_ring-smaller-than-a-record-refused"]
-claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: a log_ring of 8 bytes holds no record, and one is 24.*alive"] }
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: a log_ring of 8 bytes holds no record, and one is 32.*alive"] }
 false = { run = ["{out}/host{exe}", "module_config.spans-unset-refused"] }
 
 [[case]]
@@ -1563,7 +1563,7 @@ false = { run = ["{out}/host{exe}", "record.when-the-barrier-it-was-said-after"]
 [[case]]
 name = "record.when-the-barrier-it-was-said-after"
 run = ["{out}/host{exe}", "record.when-the-barrier-it-was-said-after"]
-claims = { matches = ["b1 \\S+ event 3 1.*b3 \\S+ event 2 2.*b5 \\S+ event 4 57005.*alive"] }
+claims = { matches = ["b1 p\\d+ \\S+ event 3 1.*b3 p\\d+ \\S+ event 2 2.*b5 p\\d+ \\S+ event 4 57005.*alive"] }
 false = { run = ["{out}/host{exe}", "record.arg-the-two-numbers"] }
 
 [[case]]

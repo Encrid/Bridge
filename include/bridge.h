@@ -259,10 +259,11 @@ typedef struct {
     const char *system;
     const char *text;
     uint32_t len;
-    uint32_t when;
+    uint32_t barriers;
+    uint32_t place;
     uint32_t arg[2];
     uint8_t level;
-    uint8_t pad[7];
+    uint8_t pad[3];
 } bridge_record_t;
 static_assert(sizeof(bridge_record_t) == 48);
 static_assert(alignof(bridge_record_t) == 8);
@@ -270,10 +271,11 @@ static_assert(offsetof(bridge_record_t, identity) == 0);
 static_assert(offsetof(bridge_record_t, system) == 8);
 static_assert(offsetof(bridge_record_t, text) == 16);
 static_assert(offsetof(bridge_record_t, len) == 24);
-static_assert(offsetof(bridge_record_t, when) == 28);
-static_assert(offsetof(bridge_record_t, arg) == 32);
-static_assert(offsetof(bridge_record_t, level) == 40);
-static_assert(offsetof(bridge_record_t, pad) == 41);
+static_assert(offsetof(bridge_record_t, barriers) == 28);
+static_assert(offsetof(bridge_record_t, place) == 32);
+static_assert(offsetof(bridge_record_t, arg) == 36);
+static_assert(offsetof(bridge_record_t, level) == 44);
+static_assert(offsetof(bridge_record_t, pad) == 45);
 
 enum bridge_level : uint8_t {
     BRIDGE_ERR = 3,
