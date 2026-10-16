@@ -14,7 +14,7 @@ void *os_reserve(size_t reserve, size_t commit)
 
     if (base == MAP_FAILED)
         return (nullptr);
-    if (commit && mprotect(base, commit, PROT_READ | PROT_WRITE)) {
+    if (mprotect(base, commit, PROT_READ | PROT_WRITE)) {
         munmap(base, reserve);
         return (nullptr);
     }

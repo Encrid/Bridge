@@ -9,8 +9,8 @@ void *os_reserve(size_t reserve, size_t commit)
 {
     void *base = VirtualAlloc(nullptr, reserve, MEM_RESERVE, PAGE_NOACCESS);
 
-    if (!base || !commit)
-        return (base);
+    if (!base)
+        return (nullptr);
     if (!VirtualAlloc(base, commit, MEM_COMMIT, PAGE_READWRITE)) {
         VirtualFree(base, 0, MEM_RELEASE);
         return (nullptr);
