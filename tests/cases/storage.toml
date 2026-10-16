@@ -290,6 +290,12 @@ claims = { matches = ["tables, sparse_sets and types come to \\d+, which is more
 false = { run = ["{out}/storage{exe}", "manytypes"] }
 
 [[case]]
+name = "bridge_reload-65-replaced-types-carried-across"
+run = ["{out}/storage{exe}", "manymove"]
+claims = { matches = ["reload: done.*after the reload: 65 types, 65 of them carried by each of the 4 entities.*alive"] }
+false = { run = ["{out}/storage{exe}", "shape"] }
+
+[[case]]
 name = "storage-marks-full-refused"
 run = ["{out}/storage{exe}", "marks"]
 claims = { matches = ["refused: out of memory: there was none for a mark in its queue.*alive"] }

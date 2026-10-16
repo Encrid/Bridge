@@ -22,7 +22,7 @@ The observers hear nothing, because no entity gains or loses a component.
 
 A move copies each value whole: as many bytes as the shorter of the two types has.
 Where the component layout changed, it copies the value field by field, in the runs that `declare` worked out: `src/abi_relay.c`.
-`list_moves` lists at most 64 types, and a type past the 64th is not moved.
+`move_all` takes room for a move of each type that replaces another, however many there are.
 
 ## A move refused
 
@@ -40,6 +40,6 @@ A warning names each loss that the reload accepted, with the number of rows that
 | --- | --- |
 | `set_move` | Writes the move of the rows of a type to the type made in its place: the whole value, or the runs of `declare`. |
 | `settle` | Marks that no type replaces another any more, and says each loss that the reload accepted, with its number of rows. |
-| `list_moves` | Writes the move of each type that replaces another, at most 64, and gives how many there are. |
+| `move_all` | Takes room for the moves, writes the move of each type that replaces another, and hands them to `storage_convert`. Gives `STORAGE_NO_MEMORY` if there is no room. |
 | `refuse_move` | Writes why the rows of `count` components did not move: no memory to carry the values, or no room where they go. Gives 1. |
 | `reload_move_rows` | Moves the rows of each type that the reload made in the place of another, all of them or none. 1 and why if not. |

@@ -178,6 +178,7 @@ enum storage_test_end storage_test_drain_wide_record(storage_test_t *t);
 enum storage_test_end storage_test_point_query_away(storage_test_t *t);
 enum storage_test_end storage_test_count_types(storage_test_t *t);
 enum storage_test_end storage_test_count_all(storage_test_t *t);
+enum storage_test_end storage_test_move_many(storage_test_t *t);
 enum storage_test_end storage_test_change(storage_test_t *t);
 enum storage_test_end storage_test_make_tables(storage_test_t *t);
 enum storage_test_end storage_test_use_up_tables(storage_test_t *t);

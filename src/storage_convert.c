@@ -10,8 +10,6 @@
 #include "storage_forget.h"
 #include "storage_place.h"
 
-constexpr uint32_t MOVES_MOST = 64;
-
 static void take_values(const convert_t *c, uint32_t index, uint32_t *had)
 {
     const storage_type_t *from;
@@ -19,7 +17,7 @@ static void take_values(const convert_t *c, uint32_t index, uint32_t *had)
     uint32_t at = 0;
     uint32_t k = 0;
 
-    while (k < c->count && k < MOVES_MOST) {
+    while (k < c->count) {
         from = c->moves[k].from;
         had[k] = get_value(c->r, index, from);
         if (had[k])
@@ -51,7 +49,7 @@ static void write_values(const convert_t *c, uint32_t index,
     uint32_t at = 0;
     uint32_t k = 0;
 
-    while (k < c->count && k < MOVES_MOST) {
+    while (k < c->count) {
         move = &c->moves[k];
         owner = move->to->kept == BRIDGE_SINGLETON ? 0 : index;
         if (had[k])
@@ -64,38 +62,33 @@ static void write_values(const convert_t *c, uint32_t index,
 static void convert_all(const convert_t *c)
 {
     storage_t *r = c->r;
-    uint32_t had[MOVES_MOST];
-    uint32_t i = 0;
 
-    while (i < r->changed_count) {
-        memset(had, 0, sizeof(had));
-        take_values(c, r->changed[i], had);
+    for (uint32_t i = 0; i < r->changed_count; i++) {
+        memset(c->had, 0, c->count * sizeof(*c->had));
+        take_values(c, r->changed[i], c->had);
         place_one(r, r->changed[i]);
-        write_values(c, r->changed[i], had);
-        i++;
+        write_values(c, r->changed[i], c->had);
     }
 }
 
 enum storage_moved storage_convert(storage_t *r, const storage_move_t *moves,
     uint32_t count)
 {
-    convert_t c = { r, moves, count, nullptr };
-    uint32_t total = 0;
-    uint32_t k = 0;
+    convert_t c = { r, moves, count, nullptr, nullptr };
+    size_t total = 0;
 
-    while (k < count) {
+    for (uint32_t k = 0; k < count; k++)
         total += moves[k].from->size;
-        k++;
-    }
-    c.was = malloc(total ? total : 1);
-    if (!c.was)
+    c.had = malloc(count * sizeof(*c.had) + total);
+    if (!c.had)
         return (STORAGE_NO_MEMORY);
+    c.was = (uint8_t *)(c.had + count);
     if (!storage_fold_moves(&c)) {
-        free(c.was);
+        free(c.had);
         return (STORAGE_NO_ROOM);
     }
     convert_all(&c);
     forget_all(r);
-    free(c.was);
+    free(c.had);
     return (STORAGE_MOVED);
 }

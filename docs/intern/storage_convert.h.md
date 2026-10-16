@@ -7,7 +7,7 @@ A move writes the rows of a component again as another type, at a reload.
 
 A reload moves a component when its `declare` states another storage layout, or another component layout.
 The reload makes a type for what the component becomes, beside the type it is.
-`src/reload_rows.c` then hands `storage_convert` a move for each such type, at most 64.
+`src/reload_rows.c` then hands `storage_convert` a move for each such type.
 For each move, the runs say which bytes of the old value become which bytes of the new value.
 The runs are the whole value, or field by field where the component layout changed.
 

@@ -21,10 +21,10 @@ A new value is zero, except for the runs of the move, which `write_runs` copies.
 The value of a singleton is on index 0.
 At the end, storage forgets the fold, and gives back each table that nothing is left in.
 
-## Limits
+## The room of a conversion
 
-`take_values` and `write_values` handle at most `MOVES_MOST` moves, which is 64.
-`src/reload_rows.c` hands at most 64 moves.
+`storage_convert` takes one block before it folds anything: a place for each move in `had`, and then the bytes of each old value in `was`.
+So a conversion that has no memory changes nothing, and any number of moves fits.
 
 ## Functions
 

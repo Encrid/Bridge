@@ -56,6 +56,8 @@ paths = [
     "SPARSEBAD1_PATH=\"{out}/built/sparsebad1{library}\"",
     "SPARSEBAD2_PATH=\"{out}/built/sparsebad2{library}\"",
     "MOVE1_PATH=\"{out}/built/move1{library}\"",
+    "MANYMOVE1_PATH=\"{out}/built/manymove1{library}\"",
+    "MANYMOVE2_PATH=\"{out}/built/manymove2{library}\"",
     "MOVE2_PATH=\"{out}/built/move2{library}\"",
     "MOVE3_PATH=\"{out}/built/move3{library}\"",
     "MOVE4_PATH=\"{out}/built/move4{library}\"",
@@ -577,6 +579,17 @@ sources = ["tests/modules/sparse/sparse.c", "tests/modules/sparse/sparse_changes
 include = ["include", "tests/binding", "tests/modules"]
 defines = ["BAD=2"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "manymove1"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/manymove.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+variants = [{ name = "manymove2", defines = ["KEPT=2"] }]
 
 [[artifact]]
 name = "move1"

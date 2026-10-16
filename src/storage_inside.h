@@ -145,6 +145,7 @@ typedef struct {
     const storage_move_t *moves;
     uint32_t count;
     uint8_t *was;
+    uint32_t *had;
 } convert_t;
 
 #endif
