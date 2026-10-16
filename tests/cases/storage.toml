@@ -258,3 +258,9 @@ name = "memory_get_shape-the-block-reserved-as-asked"
 run = ["{out}/storage{exe}", "shape"]
 claims = { matches = ["the shared block reserves more than it uses: yes.*a plain module's private block reserves what it uses: yes.*the shared block is whole guarded pages: yes.*a plain module's private block is not rounded to one: yes.*alive"] }
 false = { run = ["{out}/storage{exe}", "changes"] }
+
+[[case]]
+name = "storage-marks-full-refused"
+run = ["{out}/storage{exe}", "marks"]
+claims = { matches = ["refused: out of memory: there was none for a mark in its queue.*alive"] }
+false = { run = ["{out}/storage{exe}", "shape"] }

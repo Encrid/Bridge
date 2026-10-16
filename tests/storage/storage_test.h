@@ -427,6 +427,7 @@ int storage_test_weigh_switch(storage_test_t *t);
 ** The cases. Each is handed the fixture, with the deck main made.
 */
 enum storage_test_end storage_test_look_at_shape(storage_test_t *t);
+enum storage_test_end storage_test_fill_marks(storage_test_t *t);
 enum storage_test_end storage_test_change(storage_test_t *t);
 enum storage_test_end storage_test_make_tables(storage_test_t *t);
 enum storage_test_end storage_test_use_up_tables(storage_test_t *t);
