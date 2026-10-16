@@ -1,6 +1,6 @@
 # include/bridge.h
 
-`include/bridge.h` is the only header that a host includes.
+`include/bridge.h` is the only header that a host needs.
 It gives the seven functions of the library, and the structs that a host gives to them and gets from them.
 
 ## The library
