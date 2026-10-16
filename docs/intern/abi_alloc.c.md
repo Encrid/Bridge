@@ -40,6 +40,9 @@ A reload does not need room for the systems of a module twice.
 `src/bridge_reload.c` parks each system of the old instance: storage forgets its terms, and the world counts it in `parked`.
 A parked system counts for nothing against `[budget] systems`, so the systems of the new instance take the places that the old ones had.
 If the reload fails, `src/reload_fail.c` puts each parked system back, as it was.
+
+Each reload ends with `swap` or with `src/reload_fail.c`, and neither leaves a system parked.
+So no system is parked when `abi_park` parks it, and `abi_park` does not test it.
 The places it had are free again, since whatever took them was dropped.
 
 ## Functions
@@ -49,5 +52,5 @@ The places it had are free again, since whatever took them was dropped.
 | `abi_refuse` | Refuses the call in progress, with why, written as `printf` writes. Keeps only the first refusal of a call. Gives 1. |
 | `abi_alloc` | `alloc(len) -> offset`: `len` bytes, rounded up to eight, from the share of the module, or of its `lender`, in the persistent arena. |
 | `abi_marks` | Makes room for the marks of the queue of a module. False if there is no memory. |
-| `abi_park` | Takes a system out of storage, for a reload. Does nothing to a parked system. |
+| `abi_park` | Takes a system out of storage, for a reload. |
 | `abi_unpark` | Puts a parked system back in storage: an observer with its listener, a system with its terms. A system with no term stays out of storage. |

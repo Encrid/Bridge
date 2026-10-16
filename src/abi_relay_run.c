@@ -41,7 +41,7 @@ uint32_t abi_get_element_size(const schema_field_t *f)
 {
     const declared_type_t *type = f->type;
 
-    if (f->kind <= SCHEMA_STRUCT && ELEMENT_SIZES[f->kind])
+    if (ELEMENT_SIZES[f->kind])
         return (ELEMENT_SIZES[f->kind]);
     return (type->size);
 }

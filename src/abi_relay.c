@@ -95,8 +95,6 @@ int abi_relay(module_t *m, declared_type_t *was, enum bridge_kind kind,
         return (abi_refuse(m, "type '%s' is %s here and was %s: a reload does "
             "not change what kind of type one is", was->name,
             KIND_NAMES[kind], KIND_NAMES[was->kind]));
-    if (kind == BRIDGE_TAG)
-        return (0);
     if (kind != BRIDGE_STRUCT)
         return (check_constants(m, was, is));
     return (relay_struct(m, was, is));

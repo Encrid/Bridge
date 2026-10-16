@@ -171,7 +171,6 @@ int storage_test_weigh_single(storage_test_t *t);
 int storage_test_weigh_switch(storage_test_t *t);
 
 enum storage_test_end storage_test_look_at_shape(storage_test_t *t);
-enum storage_test_end storage_test_fill_marks(storage_test_t *t);
 enum storage_test_end storage_test_make_large_matrix(storage_test_t *t);
 enum storage_test_end storage_test_make_small_matrix(storage_test_t *t);
 enum storage_test_end storage_test_drain_wide_record(storage_test_t *t);

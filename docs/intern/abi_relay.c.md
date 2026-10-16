@@ -31,6 +31,7 @@ another kind                 refused: a reload does not change the kind of a typ
 
 A loss is refused until the reload states it: `docs/intern/abi_relay_run.c.md`, *A loss stated by name*.
 A tag has no value to carry.
+A tag has no descriptor and no field, so `check_room` never finds a tag changed, and `abi_relay` never gets a tag of a tag.
 
 The values are carried over as a move to another storage layout is, by the same code.
 A type is made for what the component becomes, and it takes every row or none when the reload holds.
@@ -43,11 +44,10 @@ A system reads the old component and writes the new one, and then the module sto
 ## The steps
 
 1. Refuse a type that has another kind than it had.
-2. Do nothing for a tag.
-3. For an enum or a bitmask, refuse a new width, and each constant that is gone or has another value.
-4. For a struct, count the rows that carry the type, and match its fields: `docs/intern/abi_relay_fields.c.md`.
-5. Refuse the struct if a run had no memory, or if a loss is not accepted.
-6. Keep the runs on the old type, in `runs` and `run_count`, for the reload to use if it holds.
+2. For an enum or a bitmask, refuse a new width, and each constant that is gone or has another value.
+3. For a struct, count the rows that carry the type, and match its fields: `docs/intern/abi_relay_fields.c.md`.
+4. Refuse the struct if a run had no memory, or if a loss is not accepted.
+5. Keep the runs on the old type, in `runs` and `run_count`, for the reload to use if it holds.
 
 The refusal of a loss names every field that goes, and how many rows hold the type.
 A struct that keeps no bytes still gets a list of runs, so that `runs` is not nullptr once the relay is worked out.

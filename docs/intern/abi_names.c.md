@@ -36,8 +36,8 @@ It gets the kind, the size, the alignment and the declared type in `named`.
 ## Who else declares a type
 
 `abi_say_others` writes the end of a refusal: ". It is also declared by", then the identity of each module.
-It names the loaded modules that declare the type, other than the module that declares and the module that it reloads.
-It also skips a module of the same identity.
+It names the loaded modules that declare the type, other than the module that the declaring module reloads.
+The module that declares is not in the list of modules yet, and only the module that it reloads has its stem.
 A host needs these names: to unload these modules is what lets the layout of the component change.
 
 ## Functions
@@ -47,5 +47,5 @@ A host needs these names: to unload these modules is what lets the layout of the
 | `abi_is_listed` | Whether a list of names holds a name. |
 | `abi_is_foreign` | Whether a name is of another namespace than the module's. |
 | `abi_find_type` | Finds the type that a field names bare, and writes what the descriptor reader needs of it in `named`. False if there is none. |
-| `declares_it` | Whether a module declares a type, if it is not the module that declares, the module that it reloads, or one of the same identity. |
+| `declares_it` | Whether a module declares a type, if it is not the module that the declaring module reloads. |
 | `abi_say_others` | Writes who else declares a type, as the end of a refusal. Nothing if nobody does. |

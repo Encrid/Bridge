@@ -63,8 +63,6 @@ bool abi_marks(module_t *m, uint32_t more)
 
 void abi_park(bridge_t *b, bridge_system_t *s)
 {
-    if (s->parked)
-        return;
     if (s->matched)
         storage_forget(b->storage, s->matched);
     s->matched = nullptr;

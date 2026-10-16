@@ -694,7 +694,6 @@ When other modules declare the type, the reason of a layout ends with `. It is a
 - `destroy: the id 0 is no entity`
 - `it stated that it queues no change`
 - `its changes of <bytes> bytes are used up`
-- `out of memory: there was none for a mark in its queue`
 - `alloc: it stated that it keeps nothing in the persistent arena`
 - `alloc: its persistent of <bytes> bytes is exhausted`
 

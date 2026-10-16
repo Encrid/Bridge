@@ -69,7 +69,6 @@ static const storage_test_case_t CASES[] = {
     { "nomemorythreads", storage_test_refuse_memory, &FOUR_THREADS },
 #endif
     { "shape", storage_test_look_at_shape, &BOTH_BACKENDS },
-    { "marks", storage_test_fill_marks, &PLAIN },
     { "matrix", storage_test_make_large_matrix, &PLAIN },
     { "matrixsmall", storage_test_make_small_matrix, &PLAIN },
     { "widerecord", storage_test_drain_wide_record, &PLAIN },

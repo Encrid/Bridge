@@ -50,7 +50,7 @@ static bool declares_it(const module_t *o, const module_t *m,
 {
     uint32_t i = 0;
 
-    if (o == m || o == m->reloads || !strcmp(o->identity, m->identity))
+    if (o == m->reloads)
         return (false);
     while (i < o->declared_count && o->declared[i] != c)
         i++;

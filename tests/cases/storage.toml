@@ -312,9 +312,3 @@ name = "schedule_build-levels-of-a-chain-in-two-rounds"
 run = ["{out}/storage{exe}", "levels"]
 claims = { matches = ["levels: 100 systems in one phase, built: set_levels tested reach 19800 times, last level 99.*alive"] }
 false = { run = ["{out}/storage{exe}", "shape"] }
-
-[[case]]
-name = "storage-marks-full-refused"
-run = ["{out}/storage{exe}", "marks"]
-claims = { matches = ["refused: out of memory: there was none for a mark in its queue.*alive"] }
-false = { run = ["{out}/storage{exe}", "shape"] }

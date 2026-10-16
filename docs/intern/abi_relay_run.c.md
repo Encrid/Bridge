@@ -46,6 +46,6 @@ A struct has no size there: it is the size of the declared type that the field n
 | Function | Result |
 | --- | --- |
 | `abi_accepts` | Whether the reload accepts the loss named `name`. If it does, records how many rows lose something under that name. |
-| `abi_get_element_size` | How many bytes one element of a field is: what its kind says, or the size of the declared type that it names. |
+| `abi_get_element_size` | How many bytes one element of a field is: what its kind says, or the size of the declared type that it names. The kind of a field is at most `SCHEMA_STRUCT`, since the parser sets no other. |
 | `abi_add_run` | Records a run of bytes carried over, or marks the relay short of memory. |
 | `abi_say_lost` | Records by name what has no place in what the type becomes, unless no row holds the type or the reload accepts the loss. |
