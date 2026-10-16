@@ -13,7 +13,8 @@ static bool is_unordered(const schedule_phase_t *p, uint32_t i, uint32_t j)
 
     if (p->in[i]->m == p->in[j]->m)
         return (false);
-    if (schedule_reaches(&p->reach, i, j) || schedule_reaches(&p->reach, j, i))
+    if (schedule_orders(p->order, p->in[i], p->in[j])
+        || schedule_orders(p->order, p->in[j], p->in[i]))
         return (false);
     return (schedule_find_conflict(p->in[i], p->in[j], &changing) != nullptr);
 }

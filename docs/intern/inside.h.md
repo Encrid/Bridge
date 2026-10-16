@@ -38,6 +38,8 @@ None of them is on the hot path.
 | `module_t` | A loaded module. |
 | `change_t` | One queued change. |
 | `kept_text_t` | A share of an unloaded module that stays: `stem`, the place of its settings text `at` and `room`, and its ranges `owned` and `own_count`. |
+| `schedule_matrix_t` | Who runs before whom among `n` systems or names. |
+| `schedule_pairs_t` | The names of the pairs of `[order]`, and their closed matrix. |
 | `bridge_t` | A world. |
 
 ### An open backend
@@ -86,6 +88,7 @@ A system and an observer are a query and a function either way, so one record se
 | `m` | Its module. |
 | `name` | The name that it registered. |
 | `full` | How `[order]` names it: the stem of its module, a colon, then its name. |
+| `named` | The index of `full` among the names of `[order]`, or the count of names if no pair names it. |
 | `phase` | Its phase. The phase of an observer is the one past the last phase of the deployment: the barrier. |
 | `matched` | Its terms, as storage holds them. Null with no terms. |
 | `spans_at` | Where its spans begin in the private memory of its module, as storage last wrote them. |
@@ -169,6 +172,26 @@ At unload, the ranges go back to the arena if nothing that stays points into the
 `size` bytes of value follow it, padded to a multiple of eight.
 A change is 24 bytes.
 
+### A matrix of reach
+
+Bit `j` of row `i` of a `schedule_matrix_t` says that `i` runs before `j`.
+
+| Field | Content |
+| --- | --- |
+| `bits` | The rows, one after the other. |
+| `n` | How many systems or names. |
+| `words` | How many 64-bit words a row has: `(n + 63) / 64`. |
+
+### The pairs of a world
+
+A `schedule_pairs_t` holds the pairs of `[order]`: `docs/intern/schedule_order.c.md`.
+
+| Field | Content |
+| --- | --- |
+| `names` | Each name of a pair, copied, in the order met. |
+| `n` | How many names. |
+| `reach` | Who runs before whom among the names, closed at create. It has a row for twice as many names as pairs. |
+
 ### A world
 
 | Field | Content |
@@ -186,7 +209,7 @@ A change is 24 bytes.
 | `arena_ranges` | How many ranges of the arena the modules hold. |
 | `run_jobs`, `run_handed`, `run_lists`, `run_callers` | What the dispatch of a phase works in, `[budget] systems` long. |
 | `build_in`, `build_bits` | What the schedule is made in, when a module comes or goes. |
-| `before`, `after`, `order_count` | The pairs of `[order]`. |
+| `order` | The names of the pairs of `[order]`, and their closed matrix. |
 | `pool` | The threads that run a phase. |
 | `shared`, `shared_len`, `shared_reserve` | The shared block, its length, and the address space reserved for it. |
 | `index`, `entities` | The entity index in the shared block, and `[budget] entities`. |

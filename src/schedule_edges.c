@@ -27,28 +27,18 @@ void schedule_gather_phase(bridge_t *b, schedule_phase_t *p)
     memset(p->reach.bits, 0, words * sizeof(*p->reach.bits));
 }
 
-static uint32_t find_system(const schedule_phase_t *p, const char *full)
+static void add_stated_from(const bridge_t *b, schedule_phase_t *p,
+    uint32_t i)
 {
-    uint32_t i = 0;
-
-    while (i < p->n && strcmp(p->in[i]->full, full))
-        i++;
-    return (i);
+    for (uint32_t j = 0; j < p->n; j++)
+        if (schedule_orders(&b->order, p->in[i], p->in[j]))
+            schedule_add_edge(&p->reach, i, j);
 }
 
 void schedule_add_stated(const bridge_t *b, schedule_phase_t *p)
 {
-    uint32_t k = 0;
-    uint32_t i;
-    uint32_t j;
-
-    while (k < b->order_count) {
-        i = find_system(p, b->before[k]);
-        j = find_system(p, b->after[k]);
-        if (i < p->n && j < p->n)
-            schedule_add_edge(&p->reach, i, j);
-        k++;
-    }
+    for (uint32_t i = 0; i < p->n; i++)
+        add_stated_from(b, p, i);
 }
 
 static void order_after(schedule_phase_t *p, uint32_t i)

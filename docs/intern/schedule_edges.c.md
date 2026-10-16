@@ -12,9 +12,9 @@ That room is `[budget] systems` wide, and `schedule_room` makes it at create.
 
 ## The edges
 
-`schedule_add_stated` adds an edge for each pair of `[order]` whose two systems are in the phase.
-It finds a system by its full name: the identity of its module without the version, a colon, and its own name.
-A pair that names a system out of the phase adds nothing.
+`schedule_add_stated` adds an edge from each system of the phase to each one that the pairs put after it: `docs/intern/schedule_names.c.md`.
+The matrix of the pairs is closed, so these edges make a closed matrix, and they need no closure.
+A chain of pairs counts also through a system that is out of the phase.
 
 `schedule_add_own` adds the order of a module: each system runs before each later system of its module that it conflicts with.
 It adds no edge from a system to one that already runs before it, so a pair of the deployment stands against it.
@@ -26,7 +26,7 @@ So the test of a later system sees each chain of the edges before it.
 | Function | Result |
 | --- | --- |
 | `schedule_gather_phase` | Lists the systems of the phase that are not parked, with an empty matrix for them. |
-| `find_system` | Gives the index of the system of the phase that has a full name, or how many systems there are if none has it. |
-| `schedule_add_stated` | Adds the edges that the pairs of the deployment state between systems of the phase. |
+| `add_stated_from` | Adds an edge from system `i` to each system of the phase that the pairs put after it. |
+| `schedule_add_stated` | Calls `add_stated_from` for each system of the phase. |
 | `order_after` | Puts system `i` before each later system of its module that it conflicts with, unless that one already runs before it. Then closes the matrix again with `schedule_join_through`. |
 | `schedule_add_own` | Calls `order_after` for each system of the phase. |

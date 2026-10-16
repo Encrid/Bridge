@@ -1303,6 +1303,18 @@ claims = { matches = ["a module with the identity 'game:mover@0.1.0@2' is refuse
 false = { run = ["{out}/host{exe}", "module_config.identity-none-refused"] }
 
 [[case]]
+name = "order.chain-through-an-unloaded-system-stands"
+run = ["{out}/host{exe}", "order.chain-through-an-unloaded-system-stands"]
+claims = { matches = ["view:counter@0.1.0: unloaded.*view:reader@0.1.0: loaded.*alive"], matches_not = ["nothing orders them"] }
+false = { run = ["{out}/host{exe}", "order.own-order-orders-no-other-module"] }
+
+[[case]]
+name = "order.own-order-orders-no-other-module"
+run = ["{out}/host{exe}", "order.own-order-orders-no-other-module"]
+claims = { matches = ["module 'game:twostep@0.1.0' did not load: 'game:mover:move' and 'game:twostep:more' both touch 'game:Position' in phase 'update', one of them writing it, and nothing orders them.*alive"] }
+false = { run = ["{out}/host{exe}", "order.chain-through-an-unloaded-system-stands"] }
+
+[[case]]
 name = "module_config.identity-none-refused"
 run = ["{out}/host{exe}", "module_config.identity-none-refused"]
 claims = { matches = ["a module with no identity is refused.*alive"] }

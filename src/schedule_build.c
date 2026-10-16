@@ -45,7 +45,6 @@ static int build_phase(bridge_t *b, schedule_phase_t *p)
 
     schedule_gather_phase(b, p);
     schedule_add_stated(b, p);
-    schedule_close_matrix(&p->reach);
     schedule_add_own(p);
     refused = schedule_check_phase(p);
     set_levels(p, refused);
@@ -54,7 +53,8 @@ static int build_phase(bridge_t *b, schedule_phase_t *p)
 
 int schedule_build(bridge_t *b, char *why, size_t why_len)
 {
-    schedule_phase_t p = { .why = why, .why_len = why_len };
+    schedule_phase_t p = { .order = &b->order, .why = why,
+        .why_len = why_len };
     int refused = 0;
 
     p.in = (bridge_system_t **)b->build_in;

@@ -51,6 +51,7 @@ static bool name_system(subscribing_t *g)
     snprintf(full, sizeof(full), "%s:%s", m->stem, g->name);
     s->name = copy_text(g->name, strlen(g->name));
     s->full = copy_text(full, strlen(full));
+    s->named = schedule_find_name(&m->b->order, full);
     if (g->events) {
         s->pending_room = room;
         s->pending = calloc(room ? room : 1, sizeof(*s->pending));

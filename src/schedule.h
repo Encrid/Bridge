@@ -9,21 +9,10 @@
     #include "inside.h"
 
 typedef struct {
-    uint64_t *bits;
-    uint32_t n;
-    uint32_t words;
-} schedule_matrix_t;
-
-typedef struct {
-    const char **names;
-    uint32_t n;
-    schedule_matrix_t reach;
-} schedule_pairs_t;
-
-typedef struct {
     bridge_system_t **in;
     uint32_t n;
     schedule_matrix_t reach;
+    const schedule_pairs_t *order;
     uint32_t phase;
     const char *where;
     char *why;
@@ -72,6 +61,11 @@ const char *schedule_find_conflict(const bridge_system_t *a,
 void schedule_gather_phase(bridge_t *b, schedule_phase_t *p);
 
 void schedule_add_stated(const bridge_t *b, schedule_phase_t *p);
+
+uint32_t schedule_find_name(const schedule_pairs_t *order, const char *full);
+
+bool schedule_orders(const schedule_pairs_t *order, const bridge_system_t *s,
+    const bridge_system_t *t);
 
 void schedule_add_own(schedule_phase_t *p);
 

@@ -141,7 +141,9 @@ A full name has no `@`, and has 1 to 127 bytes after its last colon: the name of
 Bridge refuses a pair unless it has two different full names of this form.
 
 A pair can name a system that is not loaded.
-A pair wins over the order in which a module registered its systems.
+Pairs make chains: if `a` runs before `b`, and `b` before `c`, then `a` runs before `c`, also while `b` is not loaded.
+Only the pairs and their chains order two systems of two modules.
+The order in which a module registered its systems orders only the systems of that module, and a pair wins over it.
 `docs/extern/bridge_abi.h.md`, *Conflicts* tells when two systems conflict.
 
 ## bridge_config_t

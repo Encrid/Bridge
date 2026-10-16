@@ -19,38 +19,35 @@ static bool is_full_name(const char *name)
     return (tail && tail <= NAME_MOST);
 }
 
-static uint32_t name_system(schedule_pairs_t *pairs, const char *name)
+static uint32_t name_system(schedule_pairs_t *order, const char *name)
 {
-    uint32_t at = 0;
+    uint32_t at = schedule_find_name(order, name);
 
-    while (at < pairs->n && strcmp(pairs->names[at], name))
-        at++;
-    if (at == pairs->n) {
-        pairs->names[at] = name;
-        pairs->n++;
-    }
+    if (at < order->n)
+        return (at);
+    order->names[at] = copy_text(name, strlen(name));
+    if (order->names[at])
+        order->n++;
     return (at);
 }
 
-static int add_pair(bridge_t *b, schedule_pairs_t *pairs,
-    const bridge_order_t *pair, uint32_t i)
+static int add_pair(bridge_t *b, const bridge_order_t *pair, uint32_t i)
 {
+    schedule_pairs_t *order = &b->order;
     uint32_t before;
-    uint32_t after;
+    uint32_t after = 0;
 
     if (!is_full_name(pair->before) || !is_full_name(pair->after)
         || !strcmp(pair->before, pair->after)) {
         say_error(b, "[order] pair %u does not name two systems", i);
         return (1);
     }
-    b->before[i] = copy_text(pair->before, strlen(pair->before));
-    b->after[i] = copy_text(pair->after, strlen(pair->after));
-    b->order_count = i + 1;
-    if (!b->before[i] || !b->after[i])
+    before = name_system(order, pair->before);
+    if (before < order->n)
+        after = name_system(order, pair->after);
+    if (before == order->n || after == order->n)
         return (bridge_lacks(b, nullptr, "the order a deployment states"));
-    before = name_system(pairs, pair->before);
-    after = name_system(pairs, pair->after);
-    schedule_add_edge(&pairs->reach, before, after);
+    schedule_add_edge(&order->reach, before, after);
     return (0);
 }
 
@@ -70,22 +67,18 @@ static int check_pairs(bridge_t *b, schedule_pairs_t *pairs)
 
 int schedule_order(bridge_t *b, const bridge_order_t *order, uint32_t count)
 {
-    schedule_pairs_t pairs = {};
-    int refused = !schedule_init_matrix(&pairs.reach, count * 2);
+    schedule_pairs_t *pairs = &b->order;
+    int refused = !schedule_init_matrix(&pairs->reach, count * 2);
     uint32_t i = 0;
 
-    pairs.names = calloc(count ? count * 2 : 1, sizeof(*pairs.names));
-    b->before = calloc(count ? count : 1, sizeof(*b->before));
-    b->after = calloc(count ? count : 1, sizeof(*b->after));
-    if (refused || !pairs.names || !b->before || !b->after)
+    pairs->names = calloc(count ? count * 2 : 1, sizeof(*pairs->names));
+    if (refused || !pairs->names)
         refused = bridge_lacks(b, nullptr, "the order a deployment states");
     while (i < count && !refused) {
-        refused = add_pair(b, &pairs, &order[i], i);
+        refused = add_pair(b, &order[i], i);
         i++;
     }
     if (!refused && count)
-        refused = check_pairs(b, &pairs);
-    free(pairs.names);
-    free(pairs.reach.bits);
+        refused = check_pairs(b, pairs);
     return (refused);
 }

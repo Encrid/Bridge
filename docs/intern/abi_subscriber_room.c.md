@@ -14,6 +14,7 @@ It has everything that the system needs before it keeps any of it: `docs/intern/
 
 The full name is how `[order]` names a system: the stem of the module, a colon, and the name.
 The stem is the identity of the module with no version.
+The system also gets `named`, the index of its full name among the names of `[order]`: `docs/intern/schedule_names.c.md`.
 The list of an observer has a place for as many `bridge_trigger_t` as the spans of its module can hold.
 That is what the spans could publish of it: `docs/intern/abi_system.c.md`, *The list of an observer*.
 
@@ -25,5 +26,5 @@ If a piece is missing, all of it is freed, and the registration is refused for w
 | --- | --- |
 | `abi_free_subscriber` | Frees what `abi_alloc_subscriber` had, of a system or an observer that is refused. |
 | `make_room` | Makes room for one more among the systems of the world, and among the systems or the observers of the module. False if there is no memory. |
-| `name_system` | Gives a system its name and its full name, and an observer its list of who triggered it. False if there is no memory. |
+| `name_system` | Gives a system its name, its full name and `named`, and an observer its list of who triggered it. False if there is no memory. |
 | `abi_alloc_subscriber` | Has everything that a system or an observer needs. 1 with a refusal, and nothing left allocated. |

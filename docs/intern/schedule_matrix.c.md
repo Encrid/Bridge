@@ -18,7 +18,7 @@ After it, each system that reaches a system reaches all that system reaches: the
 `schedule_add_edge` gives row `i` the bit of `j` and all of row `j`.
 Then `schedule_join_through` of `i` gives the new row `i` to each row that reaches `i`.
 If the matrix was closed before the edges from `i`, it is closed again after them.
-So `schedule_add_own` needs no second closure.
+So `schedule_add_own` needs no closure after it.
 Its cost is in `docs/intern/schedule.h.md`, *Cost*.
 
 ## Functions

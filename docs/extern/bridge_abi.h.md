@@ -393,8 +393,10 @@ A term of `BRIDGE_NOT` touches nothing.
 Systems of different modules that do not conflict can run at the same time. Systems that conflict never do.
 
 Two systems of one module that conflict run in the order that the module registered them.
-Two systems of different modules that conflict in one phase need a pair of the deployment: `docs/extern/bridge.h.md`, *bridge_order_t*.
+Two systems of different modules that conflict in one phase need a pair of the deployment, or a chain of pairs: `docs/extern/bridge.h.md`, *bridge_order_t*.
 Else the load that brings the second one fails. Two observers that conflict at a barrier need a pair too.
+The order in which a module registered its systems does not order a system of another module.
+
 A barrier applies the changes in the order that the systems ran. Of two attaches of one component to one entity, the later stays.
 
 ## Spans

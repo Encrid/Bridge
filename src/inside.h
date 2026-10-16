@@ -64,6 +64,7 @@ typedef struct {
     module_t *m;
     char *name;
     char *full;
+    uint32_t named;
     uint32_t phase;
     storage_terms_t *matched;
     uint32_t spans_at;
@@ -206,6 +207,18 @@ typedef struct {
     uint32_t own_count;
 } kept_text_t;
 
+typedef struct {
+    uint64_t *bits;
+    uint32_t n;
+    uint32_t words;
+} schedule_matrix_t;
+
+typedef struct {
+    char **names;
+    uint32_t n;
+    schedule_matrix_t reach;
+} schedule_pairs_t;
+
 struct bridge {
     bridge_sink_fn_t sink;
     void *ud;
@@ -231,9 +244,7 @@ struct bridge {
     uint8_t *run_callers;
     void **build_in;
     uint64_t *build_bits;
-    char **before;
-    char **after;
-    uint32_t order_count;
+    schedule_pairs_t order;
     pool_t *pool;
     uint8_t *shared;
     size_t shared_len;

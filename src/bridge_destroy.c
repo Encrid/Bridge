@@ -36,20 +36,12 @@ static void free_schedule(bridge_t *b)
 
 static void free_names(bridge_t *b)
 {
-    uint32_t i = 0;
-
-    while (i < b->order_count) {
-        free(b->before[i]);
-        free(b->after[i]);
-        i++;
-    }
-    free(b->before);
-    free(b->after);
-    i = 0;
-    while (i < b->phase_count) {
+    for (uint32_t i = 0; i < b->order.n; i++)
+        free(b->order.names[i]);
+    free(b->order.names);
+    free(b->order.reach.bits);
+    for (uint32_t i = 0; i < b->phase_count; i++)
         free(b->phases[i]);
-        i++;
-    }
     free(b->phases);
 }
 

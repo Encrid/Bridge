@@ -41,6 +41,6 @@ A library that opened but never became a backend states nothing, and stays too.
 | --- | --- |
 | `end_modules` | Runs the `shutdown` of each module in load order, then discards each module. |
 | `free_schedule` | Frees the list of systems, and what a dispatch and a schedule are worked out in. |
-| `free_names` | Frees the names that the deployment gave: the pairs of `[order]`, and the phases. |
+| `free_names` | Frees what the deployment gave: the names of `[order]` and their matrix, and the phases. |
 | `close_backends` | Destroys each backend, and closes each library whose backend states `BACKEND_UNLOAD`. |
 | `bridge_destroy` | Runs the `shutdown` of each loaded module, then frees the world. 0 if the world is gone, 1 if a pinned module refuses the call. |

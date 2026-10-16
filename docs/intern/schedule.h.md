@@ -33,14 +33,22 @@ Without the version in the name, an upgrade of a module does not change the pair
 A pair need not name a loaded system, because a deployment can order modules that it does not load.
 `schedule_order` refuses a pair that does not name two systems, and pairs that contradict each other.
 
+The world keeps the names of the pairs and their closed matrix from create.
+So a chain of pairs orders two systems also through a name that is not loaded.
+
 A module orders its own systems that conflict by the order in which it registers them.
 One author wrote both registrations, so that order stands without a pair.
 A pair can state the reverse order, and then the pair stands.
+This order counts only between the systems of that module.
 
-Two systems of two modules that conflict in one phase, with nothing to order them, refuse the load that brings the second one.
+Two systems of two modules that conflict in one phase refuse the load that brings the second one.
+Only a pair, or a chain of pairs, orders them.
 The refusal names both systems and the component.
 The order of declaration and the order of load never decide, so nothing depends on which module the host found first.
 Two observers at the barrier follow the same rule.
+
+So an unload, a failed load and a reload take the order of no two loaded systems away.
+The `schedule_build` after each of them refuses nothing, and its callers drop no reason when they drop its result.
 
 ## Levels and jobs
 
@@ -54,13 +62,14 @@ The systems of one module never overlap: they share the private memory of the mo
 ## Cost
 
 For each phase, the schedule keeps a matrix of who must run before whom: a row of bits for each system.
-The closure of the matrix joins rows with an or: `n^3 / 64` word operations at a load, for `n` systems in the phase.
+The edges of the pairs join rows with an or: at most `n^3 / 64` word operations at a load, for `n` systems in the phase.
 The order of registration of the modules keeps the matrix closed, with at most `3 n^3 / 128` more.
 For a phase of a thousand systems, that is at most some forty million operations.
 None of this runs in a frame.
 
 `schedule_room` makes the room for the schedule and for a dispatch once, at create, `[budget] systems` wide.
 So a load, a reload and an unload ask for no memory to build the schedule, and a phase allocates nothing.
+The matrix of the names of `[order]` is closed once, at create: `n^3 / 64` word operations for `n` names.
 
 ## The failure budget
 
@@ -83,25 +92,7 @@ So the same history stops the same module at the same place on every run.
 
 ## Types
 
-### schedule_matrix_t
-
-Who reaches whom among `n` systems. Bit `j` of row `i` says that system `i` runs before system `j`.
-
-| Field | Content |
-| --- | --- |
-| `bits` | The rows, one after the other. |
-| `n` | How many systems. |
-| `words` | How many 64-bit words a row has: `(n + 63) / 64`. |
-
-### schedule_pairs_t
-
-The pairs of `[order]`, as `schedule_order` reads them.
-
-| Field | Content |
-| --- | --- |
-| `names` | Every name met so far, in the order met. |
-| `n` | How many names. |
-| `reach` | Who runs before whom among the names. |
+`schedule_matrix_t` and `schedule_pairs_t` are in `src/inside.h`, since the world holds its pairs: `docs/intern/inside.h.md`, *Types*.
 
 ### schedule_phase_t
 
@@ -112,6 +103,7 @@ One phase that `schedule_build` schedules, or the barrier after all the phases.
 | `in` | The systems of the phase, in the room of `build_in`. |
 | `n` | How many systems. |
 | `reach` | Who reaches whom among them. |
+| `order` | The pairs of the world, and their closed matrix. |
 | `phase` | The index of the phase, and `phase_count` for the barrier. |
 | `where` | The name of the phase, and `nullptr` for the barrier. |
 | `why`, `why_len` | Where a refusal is written, and its size. |
@@ -155,7 +147,9 @@ One phase that `schedule_run` runs.
 | `schedule_close_matrix` | Makes each system that reaches a system reach all that it reaches. In `src/schedule_matrix.c`. |
 | `schedule_find_conflict` | Gives the name of the component two systems conflict over, or `nullptr`. `changing` tells the kind. In `src/schedule_conflict.c`. |
 | `schedule_gather_phase` | Lists the systems of a phase that are not parked, with an empty matrix. In `src/schedule_edges.c`. |
-| `schedule_add_stated` | Adds the edges that the pairs of the deployment state. In `src/schedule_edges.c`. |
+| `schedule_add_stated` | Adds the edges that the closed matrix of the pairs states. In `src/schedule_edges.c`. |
+| `schedule_find_name` | Gives the index of a full name among the names of the pairs, or the count of names. In `src/schedule_names.c`. |
+| `schedule_orders` | Gives whether the pairs put one system before another. In `src/schedule_names.c`. |
 | `schedule_add_own` | Adds the edges that a module states by the order of its registrations. In `src/schedule_edges.c`. |
 | `schedule_check_phase` | Refuses a phase with two unordered conflicting systems of two modules. Gives 1 with `why`. In `src/schedule_check.c`. |
 | `schedule_run_job` | What a thread runs: the systems of one job, one after the other. In `src/schedule_dispatch.c`. |
