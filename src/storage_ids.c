@@ -46,8 +46,7 @@ void storage_release(storage_t *r, const uint64_t *ids, uint32_t count)
     uint32_t i = 0;
 
     while (i < count) {
-        if (is_alive(r, ids[i]))
-            destroy_entity(r, (uint32_t)ids[i]);
+        destroy_entity(r, (uint32_t)ids[i]);
         i++;
     }
     sweep_sets(r);
