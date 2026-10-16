@@ -52,7 +52,7 @@ static bool alloc_room(module_t *m, const bridge_module_config_t *cfg)
 
     m->identity = copy_text(id, strlen(id));
     m->stem = copy_text(id, bridge_get_stem_length(id));
-    m->ns = copy_text(id, colon ? (size_t)(colon - id) : strlen(id));
+    m->ns = copy_text(id, (size_t)(colon - id));
     m->loss_rows = calloc(losses, sizeof(*m->loss_rows));
     if (cfg->spawns > 0)
         m->ids = calloc((size_t)cfg->spawns, sizeof(*m->ids));

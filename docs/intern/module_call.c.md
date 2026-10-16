@@ -10,7 +10,7 @@ Each module has a private memory of its own, sized from its own config, and not 
 A reload makes a new instance with a new private memory, so a reload can state larger sizes.
 `module_take_private` makes the private memory in these steps:
 
-1. Find where the regions sit, with `module_lay_private`.
+1. Find where the regions sit, with `module_lay_private`. `module_check_fit` laid out the same config with the same granule, so it fits.
 2. Round the length up to the granule of the backend.
 3. Reserve the larger of that length and the reservation of the backend, plus its guard.
 4. Record the regions: the scratch arena at `MODULE_SCRATCH_AT`, and the log ring as a count of records.

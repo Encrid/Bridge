@@ -15,7 +15,7 @@ The general rule is in `docs/intern/say.h.md`, *Out of memory*.
 | --- | --- |
 | What was stated | `pinned`, `on_error`, `hot_reload`, `max_system_failures`, `shutdown_timeout`, `work_limit`, `spawns`, `persistent` and `loss_count`. |
 | The thread | The thread that makes the record, which is the thread that loads the module. |
-| The names | Copies of the identity, of the stem, and of the namespace: the text before the first colon. |
+| The names | Copies of the identity, of the stem, and of the namespace: the text before the colon. An identity has one colon: `docs/intern/module_identity.c.md`. |
 | The losses | The `losses` of the config itself, and a count of rows for each loss. |
 | The ids | Room for `spawns` ids. |
 | The queue | Room for `changes` bytes of changes. |

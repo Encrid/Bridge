@@ -30,8 +30,7 @@ int module_take_private(module_t *m, const bridge_module_config_t *cfg,
     uint64_t len;
     uint64_t reserve;
 
-    if (module_lay_private(cfg, o->granule, &at))
-        unreachable();
+    (void)module_lay_private(cfg, o->granule, &at);
     len = ((uint64_t)at.end + o->granule - 1) / o->granule * o->granule;
     reserve = (len > o->reservation ? len : o->reservation) + o->guard;
     m->priv = os_reserve((size_t)reserve, (size_t)len);
