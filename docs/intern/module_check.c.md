@@ -59,6 +59,6 @@ The demands go to the backend when it compiles the module: `docs/intern/module_i
 | --- | --- |
 | `module_find` | Gives the loaded module of an identity, whatever its version, or `nullptr`. |
 | `find_backend` | Gives the opened backend of a name, or `nullptr`. A null name finds none. |
-| `check_whose` | Refuses an artifact with no identity, one that names no backend there is, and one built for another ABI. |
+| `check_whose` | Refuses an artifact with no identity or one longer than 127 bytes, one that names no backend there is, and one built for another ABI. |
 | `module_check_room` | Refuses a module that is loaded already, one more than `[budget] modules`, or a share that does not fit. Gives 1 with a record. |
 | `module_check` | Makes every check that a load and a reload share, and finds the demands of the config. Gives 1 with a record. |

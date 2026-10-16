@@ -239,6 +239,18 @@ claims = { matches = ["five:first@0.1.0: loaded.*module 'five:second@0.1.0' did 
 false = { run = ["{out}/host{exe}", "bridge_load-failed-init-log-given"] }
 
 [[case]]
+name = "bridge_module_config_t-identity-of-128-bytes-refused"
+run = ["{out}/host{exe}", "bridge_module_config_t-identity-of-128-bytes-refused"]
+claims = { matches = ["a module with an identity of 128 bytes is refused: an identity has at most 127 bytes.*modules: \\(0\\).*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_module_config_t-identity-of-127-bytes-taken"] }
+
+[[case]]
+name = "bridge_module_config_t-identity-of-127-bytes-taken"
+run = ["{out}/host{exe}", "bridge_module_config_t-identity-of-127-bytes-taken"]
+claims = { matches = ["long:a+@0.1.0: loaded.*=RUNNING \\(1\\).*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_module_config_t-identity-of-128-bytes-refused"] }
+
+[[case]]
 name = "module_config.spans-too-small-refused"
 run = ["{out}/host{exe}", "module_config.spans-too-small-refused"]
 claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }

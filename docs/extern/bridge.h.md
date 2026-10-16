@@ -224,7 +224,7 @@ The host states each field: zero is unset, and a load refuses it. A count of an 
 
 | Field | Content |
 | --- | --- |
-| `identity` | The identity of the module: `namespace:name@version`, for example `tri:triangle@0.1.0`. |
+| `identity` | The identity of the module: `namespace:name@version`, for example `tri:triangle@0.1.0`. At most 127 bytes. |
 | `abi` | The number of the module seam that the module was built against: `docs/extern/bridge_abi.h.md`, *BRIDGE_ABI*. |
 | `trusted` | `BRIDGE_TRUE` if the code of the module needs no containment. |
 | `reloadable` | `BRIDGE_TRUE` if the author of the module states that a reload can replace it. |
@@ -650,6 +650,7 @@ A function writes one of these records when it refuses the call, and gives 1:
 - `refused: module '<module>' is pinned to the thread that loaded it, and this call comes from another`
 - `phase '<phase>' is not one the deployment declared`
 - `a module with no identity is refused`
+- `a module with an identity of <count> bytes is refused: an identity has at most 127 bytes`
 - `no module '<module>' is loaded, so none is unloaded`
 - `module '<module>' is not reloaded: nothing of that name is loaded`
 

@@ -38,6 +38,11 @@ static int check_whose(module_check_t *k)
         say_error(k->b, "a module with no identity is refused");
         return (1);
     }
+    if (strlen(k->id) > 127) {
+        say_error(k->b, "a module with an identity of %zu bytes is refused: "
+            "an identity has at most 127 bytes", strlen(k->id));
+        return (1);
+    }
     k->on = find_backend(k->b, backend);
     if (!k->on)
         return (module_refuse(k->b, k->id, "no backend named '%s'",
