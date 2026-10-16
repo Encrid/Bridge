@@ -47,7 +47,7 @@ void bridge_resume(bridge_t *b, const module_t *m)
 {
     say_t about = { m, nullptr, BRIDGE_INFO };
 
-    if (!b->stopped_stem || strcmp(b->stopped_stem, m->stem))
+    if (!b->stopped_stem)
         return;
     b->stopped_by = nullptr;
     b->stopped_stem = nullptr;
@@ -59,7 +59,7 @@ void bridge_give_up(bridge_t *b, const module_t *m)
 {
     say_t about = { m, nullptr, BRIDGE_INFO };
 
-    if (!b->stopped_stem || strcmp(b->stopped_stem, m->stem))
+    if (!b->stopped_stem)
         return;
     b->stopped_by = nullptr;
     b->stopped_stem = nullptr;

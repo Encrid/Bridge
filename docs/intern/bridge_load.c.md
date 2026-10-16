@@ -30,6 +30,7 @@ The share is the own part of the module of the persistent arena, for as long as 
 No other module allocates from it.
 Its length is `persistent`, rounded up to a multiple of 8, but not more than the longest free piece of the arena.
 The list of gaps of the arena gets room for one more range, so that to give the share back never asks for memory.
+Step 3 refused a share past the largest gap and the tail, so `region_take` always finds room for it.
 If there is no memory to keep track of the share, a record says so, and the record of the module is discarded.
 
 ## A load that fails

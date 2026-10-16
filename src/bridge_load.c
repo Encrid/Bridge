@@ -29,8 +29,7 @@ static int take_share(bridge_t *b, module_t *m)
         module_discard(b, m);
         return (1);
     }
-    if (!region_take(&b->arena_space, share, &at))
-        unreachable();
+    (void)region_take(&b->arena_space, share, &at);
     b->arena_ranges++;
     keep_share(m, b->arena + at, share);
     return (0);

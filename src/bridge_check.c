@@ -12,7 +12,7 @@ static bool is_repair(const bridge_t *b, const char *repairing)
 {
     size_t n = repairing ? bridge_get_stem_length(repairing) : 0;
 
-    if (!repairing || !b->stopped_stem || strlen(b->stopped_stem) != n)
+    if (!repairing || strlen(b->stopped_stem) != n)
         return (false);
     return (!memcmp(b->stopped_stem, repairing, n));
 }

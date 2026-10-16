@@ -24,6 +24,9 @@ A module that never loaded has nothing to unload. For it, the ways on are a load
 Storage that runs out does not stop a world: `docs/intern/block_barrier.c.md`, *The count of a module*.
 The world keeps why it stopped, and the stem of the module, in two arrays of its own: `docs/intern/inside.h.md`, *A world*.
 
+While the world is stopped, only a call that names that stem passes `bridge_check_call`.
+So the module that `bridge_resume` or `bridge_give_up` gets has that stem, and they test only that the world stopped.
+
 ## The stem of an identity
 
 The stem is the identity without its version: what comes before its `@`, or all of it if it has no `@`.
@@ -38,5 +41,5 @@ An unload names the whole identity of the loaded module, with its version.
 | `bridge_get_stem_length` | Gives the length of an identity without its version: the bytes before its `@`, or all of them. |
 | `bridge_find_pinned` | Gives the first loaded module that is pinned to a thread other than the calling thread, or null. |
 | `bridge_stop` | Stops the world for the loss of a module that states `fail`, and keeps why and the stem of the module. Does nothing if the world has stopped already. |
-| `bridge_resume` | Lets the world run again, with a record, if `m` has the stem of the module that stopped it. |
-| `bridge_give_up` | Lets the world run again without the module that stopped it, with a record, if `m` has its stem. |
+| `bridge_resume` | Lets the world run again, with a record, if it stopped. |
+| `bridge_give_up` | Lets the world run again without the module that stopped it, with a record, if it stopped. |

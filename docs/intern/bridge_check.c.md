@@ -39,6 +39,6 @@ Nothing is sent to another thread, and nothing is deferred: the call on the wron
 
 | Function | Result |
 | --- | --- |
-| `is_repair` | Gives whether a call names the module that stopped the world, by its identity without the version. |
+| `is_repair` | Gives whether a call names the module that stopped the world, by its identity without the version. `stopped_stem` is set whenever `stopped_by` is. |
 | `bridge_check_entry` | 1 if the sink of the world runs, with no record, or if a module is pinned to another thread, with a record. Else 0. |
 | `bridge_check_call` | 1 if `bridge_check_entry` refuses, or, with a record, if the world stopped and the call does not repair it. Else 0. |
