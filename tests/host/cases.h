@@ -251,6 +251,8 @@ void test_take_in_old_shutdown(host_t *h);
 
 void test_guess(host_t *h);
 
+void test_stick(host_t *h);
+
 void test_round_spans(host_t *h);
 
 void test_alloc_unaligned_share(host_t *h);

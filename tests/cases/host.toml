@@ -2269,6 +2269,18 @@ claims = { matches = ["test:guess@0.1.0: loaded.*alive"], matches_not = ["asked 
 false = { run = ["{out}/host{exe}", "destroy-of-a-held-id-refused"] }
 
 [[case]]
+name = "attach-to-a-held-id-is-nothing"
+run = ["{out}/host{exe}", "attach-to-a-held-id-is-nothing"]
+claims = { matches = ["count: rows 0 0.*count: rows 0 0.*alive"], matches_not = ["count: rows 1"] }
+false = { run = ["{out}/host{exe}", "attach-to-a-handed-out-id-done"] }
+
+[[case]]
+name = "attach-to-a-handed-out-id-done"
+run = ["{out}/host{exe}", "attach-to-a-handed-out-id-done"]
+claims = { matches = ["test:stick@0.1.0/count: rows 0 0.*test:stick@0.1.0/count: rows 1 0.*alive"] }
+false = { run = ["{out}/host{exe}", "attach-to-a-held-id-is-nothing"] }
+
+[[case]]
 name = "bridge_declaration_t-name-empty-refused"
 run = ["{out}/host{exe}", "bridge_declaration_t-name-empty-refused"]
 claims = { matches = ["declare: its name has 0 bytes, and a name has 1 to 127.*alive"] }

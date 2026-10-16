@@ -16,7 +16,9 @@
 
     if (ch->op != CHANGE_DESTROY && ch->c->type->kept == BRIDGE_SINGLETON)
         return (ch->id == 0);
-    return (is_alive(r, ch->id) && !(r->folded[index] & DESTROYED));
+    if (!is_alive(r, ch->id) || r->folded[index] & DESTROYED)
+        return (false);
+    return (ch->op == CHANGE_DESTROY || !is_held(r, index));
 }
 
 [[gnu::always_inline]] static inline void begin_entity(storage_t *r,

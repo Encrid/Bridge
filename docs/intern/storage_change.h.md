@@ -12,6 +12,9 @@ While there is an observer, storage writes the same change into a second set, `a
 That set holds each type whose last change at this barrier is an attach.
 
 Storage folds nothing for a change of an entity that is not alive, or that this barrier destroyed already.
+It folds no attach and no detach of a held id either.
+A held id is one that a block holds and that `spawn` has not handed out, and it is no entity.
+A destroy of a held id goes on to `fold_destroy`, which refuses it: `docs/intern/storage_stake.h.md`.
 
 ## A singleton
 

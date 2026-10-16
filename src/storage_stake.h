@@ -34,6 +34,11 @@ static inline bool has_apart_stake(const storage_t *r, const module_t *m,
     return (written || !any);
 }
 
+static inline bool is_held(const storage_t *r, uint32_t index)
+{
+    return (!r->places[index].table && r->places[index].row == HELD);
+}
+
 [[gnu::always_inline]] static inline bool has_stake(const storage_t *r,
     const module_t *m, uint32_t index)
 {
@@ -42,7 +47,7 @@ static inline bool has_apart_stake(const storage_t *r, const module_t *m,
     uint64_t written = 0;
     uint32_t w = 0;
 
-    if (!t && r->places[index].row == HELD)
+    if (is_held(r, index))
         return (false);
     if (r->apart)
         return (has_apart_stake(r, m, index));

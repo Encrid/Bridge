@@ -510,6 +510,8 @@ An attach of a component that the entity carries writes its new value.
 
 `detach` queues the removal of the component `slot` from the entity `id`.
 A detach of what the entity does not carry is nothing.
+An attach or a detach of a dead id is nothing.
+So is an attach or a detach of an id that `spawn` has not handed out yet, since it is no entity.
 
 For each of the two, `id` is 0 for a singleton, and not 0 for each other component.
 The module needs a grant to write the component, and the system that runs must state it in its `changes`.

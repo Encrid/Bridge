@@ -1281,6 +1281,26 @@ include = ["include", "tests/binding", "tests/modules"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "stick-held"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/stick.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["TARGET=3"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "stick-given"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/stick.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["TARGET=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "guess-held"
 kind = "library"
 test = true

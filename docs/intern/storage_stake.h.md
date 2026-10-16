@@ -22,5 +22,6 @@ A destroy that fails the check leaves the entity as it was, and storage counts i
 | --- | --- |
 | `set_write` | Puts a type in a set if `put` is true, and takes it out if not. |
 | `has_apart_stake` | Gives whether a module may destroy the entity at `index`, from all that the entity carries. Storage uses it when a type is kept apart from tables. |
+| `is_held` | Gives whether the entity at `index` is held: in no table, with its row `HELD`. |
 | `has_stake` | Gives whether a module may destroy the entity at `index`, from where the entity is before this barrier moves it. While no type is kept apart, that is what its table holds. |
 | `fold_destroy` | Folds a destroy. The entity is gone at this barrier if the module has a stake in it. If not, the destroy is barred and counted against the module. |
