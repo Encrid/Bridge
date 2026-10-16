@@ -27,3 +27,9 @@ name = "allocation-each-refused-in-turn-laying-out-again"
 run = ["{out}/storage-counted{exe}", "nomemoryrelay"]
 claims = { matches = ["more than forty allocations were each answered null in turn.*alive"], lacks = ["FAIL"] }
 false = { run = ["{out}/storage-counted{exe}", "changes"] }
+
+[[case]]
+name = "allocation-each-refused-in-turn-seeding-settings"
+run = ["{out}/storage-counted{exe}", "nomemoryconfig"]
+claims = { matches = ["\\d+ allocations were each answered null in turn.*alive"], lacks = ["FAIL"] }
+false = { run = ["{out}/storage-counted{exe}", "changes"] }

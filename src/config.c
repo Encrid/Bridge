@@ -58,6 +58,9 @@ static int seed_all(config_seed_t *seed)
     uint32_t i = 0;
 
     seed->row = calloc(1, c->size);
+    if (!seed->row)
+        return (config_refuse(seed, "out of memory: there was none for "
+            "the row of its settings"));
     while (!refused && i < cfg->setting_count) {
         refused = config_seed_setting(seed, &cfg->settings[i]);
         i++;

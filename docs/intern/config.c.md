@@ -49,5 +49,5 @@ A reload does not write the settings again: `docs/intern/module_start.c.md`.
 | `check_none` | Refuses settings handed to a module that states it has no config component. |
 | `check_taken` | Refuses a config component that is already the settings of another module: it is one value, so it is one module's. |
 | `find_config` | Finds the component that the config of the module names, among what its `init` declared. It must be a struct and a singleton that is no other module's settings. |
-| `seed_all` | Writes each setting into one value of the config component, and gives the singleton that value when no setting was refused. |
+| `seed_all` | Writes each setting into one value of the config component, and gives the singleton that value when no setting was refused. Refuses, with a reason, if there is no memory for the value. |
 | `config_seed` | Writes the settings of a module into the component that its config names. Gives 0, or 1 with `err`. |

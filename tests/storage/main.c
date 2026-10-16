@@ -65,6 +65,7 @@ static const storage_test_case_t CASES[] = {
 #ifdef COUNTED
     { "nomemory", storage_test_refuse_memory, &PLAIN },
     { "nomemoryrelay", storage_test_refuse_relay, &PLAIN },
+    { "nomemoryconfig", storage_test_refuse_config_memory, &PLAIN },
 #endif
     { "shape", storage_test_look_at_shape, &BOTH_BACKENDS },
     { "marks", storage_test_fill_marks, &PLAIN },

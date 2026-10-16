@@ -719,6 +719,7 @@ These reasons of `did not load` tell that Bridge cannot write the settings of th
 - `its config is '<component>', which is already the settings of module '<module>'`
 - `its config is '<component>', which is not a struct its init declared`
 - `its config is '<component>', which is not declared a singleton`
+- `out of memory: there was none for the row of its settings`
 - `its settings have a key '<key>', and '<component>' has no field of that name`
 - `its setting '<key>' is <kind>, and the field it names is <kind>`
 - `its setting '<key>' is <number>, which the field it names cannot hold`
