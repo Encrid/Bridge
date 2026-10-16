@@ -13,8 +13,10 @@ os_mutex_t *os_mutex_create(void)
 
     if (!m)
         return (nullptr);
-    pthread_mutex_init(&m->mutex, nullptr);
-    return (m);
+    if (!pthread_mutex_init(&m->mutex, nullptr))
+        return (m);
+    free(m);
+    return (nullptr);
 }
 
 void os_mutex_free(os_mutex_t *m)

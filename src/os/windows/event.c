@@ -14,7 +14,10 @@ os_event_t *os_event_create(void)
     if (!e)
         return (nullptr);
     e->handle = CreateEventA(nullptr, FALSE, FALSE, nullptr);
-    return (e);
+    if (e->handle)
+        return (e);
+    free(e);
+    return (nullptr);
 }
 
 void os_event_free(os_event_t *e)

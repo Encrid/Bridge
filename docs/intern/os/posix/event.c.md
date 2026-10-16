@@ -16,7 +16,7 @@ That is the clock of a condition with the default attributes, so a change of the
 
 ## Limits
 
-`os_event_create` does not check the results of `pthread_mutex_init` and `pthread_cond_init`.
+`os_event_create` checks the results of `pthread_mutex_init` and `pthread_cond_init`, and gives `nullptr` if one fails.
 
 ## Functions
 

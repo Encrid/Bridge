@@ -117,26 +117,32 @@ paths = [
 [targets.x86_64-windows-gnu]
 system_defines = []
 system_libraries = []
+counted_system = ["WINBASEAPI=", "CreateEventA=counted_create_event", "CreateThread=counted_create_thread"]
 
 [targets.x86_64-linux-gnu]
 system_defines = []
 system_libraries = ["-lm", "-lpthread", "-ldl"]
+counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init"]
 
 [targets.aarch64-macos]
 system_defines = ["-D_DARWIN_C_SOURCE"]
 system_libraries = []
+counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init"]
 
 [targets.aarch64-linux-gnu]
 system_defines = []
 system_libraries = ["-lm", "-lpthread", "-ldl"]
+counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init"]
 
 [targets.x86_64-macos]
 system_defines = ["-D_DARWIN_C_SOURCE"]
 system_libraries = []
+counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init"]
 
 [targets.aarch64-windows-gnu]
 system_defines = []
 system_libraries = []
+counted_system = ["WINBASEAPI=", "CreateEventA=counted_create_event", "CreateThread=counted_create_thread"]
 
 [[artifact]]
 name = "bridge"
@@ -169,7 +175,7 @@ kind = "archive"
 test = true
 sources = ["src/os/{system}/*.c"]
 include = ["src/os"]
-defines = ["malloc=counted_malloc", "calloc=counted_calloc", "realloc=counted_realloc", "free=counted_free"]
+defines = ["malloc=counted_malloc", "calloc=counted_calloc", "realloc=counted_realloc", "free=counted_free", "{counted_system}"]
 flags = ["{quiet}", "{system_defines}"]
 
 [[artifact]]

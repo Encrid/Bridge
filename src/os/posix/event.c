@@ -15,10 +15,16 @@ os_event_t *os_event_create(void)
 
     if (!e)
         return (nullptr);
-    pthread_mutex_init(&e->lock, nullptr);
-    pthread_cond_init(&e->cond, nullptr);
     e->set = 0;
-    return (e);
+    if (pthread_mutex_init(&e->lock, nullptr)) {
+        free(e);
+        return (nullptr);
+    }
+    if (!pthread_cond_init(&e->cond, nullptr))
+        return (e);
+    pthread_mutex_destroy(&e->lock);
+    free(e);
+    return (nullptr);
 }
 
 void os_event_free(os_event_t *e)

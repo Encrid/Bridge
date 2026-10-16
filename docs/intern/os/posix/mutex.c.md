@@ -5,7 +5,7 @@ Each function keeps the contract of `docs/intern/os/os.h.md`, *Functions*.
 
 ## Limits
 
-`os_mutex_create` does not check the result of `pthread_mutex_init`.
+`os_mutex_create` checks the result of `pthread_mutex_init`, and gives `nullptr` if it fails.
 
 ## Functions
 

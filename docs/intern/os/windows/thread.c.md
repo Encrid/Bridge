@@ -11,7 +11,7 @@ So the product stays inside 64 bits: `whole * OS_SECOND + rest * OS_SECOND / tic
 
 ## Limits
 
-`os_thread_start` does not check the result of `CreateThread`: if that call fails, the function still gives the record of the thread.
+`os_thread_start` checks the result of `CreateThread`. If that call fails, it frees the record and gives `nullptr`.
 
 ## Functions
 

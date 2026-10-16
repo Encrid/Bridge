@@ -24,7 +24,10 @@ os_thread_t *os_thread_start(os_thread_fn_t fn, void *arg)
     t->fn = fn;
     t->arg = arg;
     t->handle = CreateThread(nullptr, 0, run_thread, t, 0, nullptr);
-    return (t);
+    if (t->handle)
+        return (t);
+    free(t);
+    return (nullptr);
 }
 
 void os_thread_join(os_thread_t *t)

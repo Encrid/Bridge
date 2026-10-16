@@ -9,7 +9,7 @@
 
 #ifdef COUNTED
 
-static bool count_request(void)
+bool storage_test_count_request(void)
 {
     storage_test_allocator_t *allocator = storage_test_get_allocator();
 
@@ -23,21 +23,21 @@ static bool count_request(void)
 
 void *counted_malloc(size_t n)
 {
-    if (count_request())
+    if (storage_test_count_request())
         return (nullptr);
     return (malloc(n));
 }
 
 void *counted_calloc(size_t n, size_t each)
 {
-    if (count_request())
+    if (storage_test_count_request())
         return (nullptr);
     return (calloc(n, each));
 }
 
 void *counted_realloc(void *p, size_t n)
 {
-    if (count_request())
+    if (storage_test_count_request())
         return (nullptr);
     return (realloc(p, n));
 }
