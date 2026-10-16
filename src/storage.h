@@ -41,7 +41,7 @@ typedef struct {
     uint32_t run_count;
 } storage_move_t;
 
-typedef bool (*storage_is_fn_t)(void *ctx, const uint8_t *row);
+typedef void (*storage_read_fn_t)(void *ctx, const uint8_t *value);
 typedef void (*storage_visit_fn_t)(storage_t *r, uint32_t index, void *ctx);
 
 [[nodiscard]] storage_t *storage_create(bridge_t *b);
@@ -109,7 +109,7 @@ void storage_give_single(storage_t *r, storage_type_t *type,
 
 bool storage_is_alive(storage_t *r, uint64_t id);
 
-bool storage_has_any(storage_t *r, storage_type_t *type, storage_is_fn_t is,
-    void *ctx);
+void storage_visit_values(storage_t *r, storage_type_t *type,
+    storage_read_fn_t read, void *ctx);
 
 #endif

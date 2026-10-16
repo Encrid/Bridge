@@ -25,5 +25,5 @@ Every row of the type is read, and each row that holds such a string counts once
 | `is_in_share` | Gives whether the text at `bytes` lies in one of the ranges of a share. |
 | `get_element` | Gives where element `i` of a field is in a value. Gives `nullptr` past the last element, or for a kind that holds no string. |
 | `points_in` | Gives whether a value holds a string in a share. |
-| `count_row` | Counts a row that holds a string in the share. Gives false, so that the walk reads every row. |
+| `count_row` | Counts a row that holds a string in the share. `storage_visit_values` calls it for each value. |
 | `module_count_pointing` | Gives how many rows of a type hold a string in a share, given by its ranges. |

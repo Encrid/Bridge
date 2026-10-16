@@ -93,9 +93,9 @@ Each value of type `from` becomes a value of type `to`: zero, but for the runs t
 | `to` | The type as it will be. |
 | `runs`, `run_count` | The runs of bytes to copy. |
 
-### storage_is_fn_t, storage_visit_fn_t
+### storage_read_fn_t, storage_visit_fn_t
 
-A question about the bytes of a row, which answers true or false.
+A function that storage calls with the bytes of a value.
 A function that storage calls for the index of an entity.
 
 ### enum storage_moved
@@ -129,7 +129,7 @@ How `storage_convert` ended.
 | `storage_end_publish` | Forgets which tables changed, after storage wrote for each module. In `src/storage_publish.c`. |
 | `storage_count_tables` | Gives how many table ids there are, with 0, which is no table. In `src/storage_publish.c`. |
 | `storage_count_carriers` | Gives how many entities carry a type. In `src/storage_carriers.c`. |
-| `storage_count_off` | Gives how many of the entities that carry a toggled type have it off. In `src/storage_any.c`. |
+| `storage_count_off` | Gives how many of the entities that carry a toggled type have it off. In `src/storage_values.c`. |
 | `storage_visit_carriers` | Calls `visit` for each entity that carries a type, in each layout. In `src/storage_carriers.c`. |
 | `storage_convert` | Writes the rows of components again as other types, all of them or none. Gives an `enum storage_moved`. In `src/storage_convert.c`. |
 | `storage_drop` | Drops the rows of a component that nobody declares any more, by the policy of its last declarer. In `src/storage_drop.c`. |
@@ -137,4 +137,4 @@ How `storage_convert` ended.
 | `storage_hand_out` | Ends the hold on ids that a module handed out, so that a destroy of them can pass. In `src/storage_held.c`. |
 | `storage_give_single` | Gives a singleton its value outside a barrier, and tells its observers. In `src/storage_ids.c`. |
 | `storage_is_alive` | Gives whether an id names an entity that exists. In `src/storage_ids.c`. |
-| `storage_has_any` | Gives whether `is` answers true for a row of a type. In `src/storage_any.c`. |
+| `storage_visit_values` | Gives `read` the bytes of each value of a type. In `src/storage_values.c`. |

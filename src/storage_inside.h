@@ -136,9 +136,9 @@ typedef struct {
 } seen_t;
 
 typedef struct {
-    storage_is_fn_t is;
+    storage_read_fn_t read;
     void *ctx;
-} question_t;
+} value_reader_t;
 
 typedef struct {
     storage_t *r;

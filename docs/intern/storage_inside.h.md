@@ -228,9 +228,9 @@ What an observer is told of: the id of an entity, the set it carried, `before`, 
 `attached` is the set of what an attach wrote a value of.
 `before` and `after` are null for an entity that carried nothing, or that is gone.
 
-### question_t
+### value_reader_t
 
-A question about the bytes of a row, `is`, and the context it gets, `ctx`.
+A function that reads the bytes of a value, `read`, and the context it gets, `ctx`.
 
 ### convert_t
 
