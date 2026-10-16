@@ -44,7 +44,7 @@ Both refuse a singleton with an id that is not 0, and anything else with the id 
 | Function | Result |
 | --- | --- |
 | `abi_spawn` | `spawn() -> id`: the next id set aside for the module, or for its `lender`, or a refusal that says why none is left. |
-| `abi_destroy` | `destroy(id)`: puts the destroy of the entity on the queue. |
+| `abi_destroy` | `destroy(id)`: puts the destroy of the entity on the queue. Refuses the id 0, which is no entity. |
 | `check_written` | The component that a slot names, if the module may attach or detach it. Else nullptr, with a refusal. |
 | `abi_attach` | `attach(id, slot, ptr)`: puts the attach on the queue, with a copy of the value. |
 | `abi_detach` | `detach(id, slot)`: puts the detach on the queue. |

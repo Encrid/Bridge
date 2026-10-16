@@ -2035,6 +2035,12 @@ claims = { matches = ["the deployment configures no backend, and a module is run
 false = { run = ["{out}/host{exe}", "attach-tag-with-a-value-refused"] }
 
 [[case]]
+name = "destroy-of-id-0-refused"
+run = ["{out}/host{exe}", "destroy-of-id-0-refused"]
+claims = { matches = ["system 'act' failed: destroy: the id 0 is no entity.*alive"] }
+false = { run = ["{out}/host{exe}", "attach-tag-with-a-value-refused"] }
+
+[[case]]
 name = "attach-tag-with-a-value-refused"
 run = ["{out}/host{exe}", "attach-tag-with-a-value-refused"]
 claims = { matches = ["system 'act' failed: attach: 'game:Flag' is a tag, and is handed a value.*alive"] }

@@ -580,6 +580,8 @@ static const host_case_t TEST_CASES[] = {
         test_change_unstated, "", test_set_counting },
     { "attach-tag-with-a-value-refused",
         test_do_wrong, "wrong-attach-tag-value", test_set_guarded },
+    { "destroy-of-id-0-refused",
+        test_do_wrong, "wrong-destroy-zero", test_set_guarded },
     { "attach-undeclared-slot-refused",
         test_do_wrong, "wrong-attach-undeclared", test_set_guarded },
     { "attach-ungranted-refused",

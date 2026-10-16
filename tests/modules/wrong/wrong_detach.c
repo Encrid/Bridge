@@ -10,6 +10,11 @@ void wrong_detach_undeclared(void)
     bridge_detach(1, WRONG_NO_SLOT);
 }
 
+void wrong_destroy_zero(void)
+{
+    bridge_destroy(0);
+}
+
 void wrong_attach_tag_value(void)
 {
     uint32_t value = 1;

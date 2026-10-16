@@ -21,6 +21,7 @@ A `declare` that finds no room for the block fails.
 It has a value or it has none: it cannot have two.
 
 Each entry that gives or takes a component names an entity, and the id 0 is no entity.
+`destroy` refuses the id 0 at the entry, so no destroy reaches the singletons.
 So an attach or a detach of a singleton has the id 0.
 The fold folds it as the one thing that index 0 carries.
 Storage applies the change at the barrier with the others, in the order it was asked.

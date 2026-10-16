@@ -683,6 +683,7 @@ When other modules declare the type, the reason of a layout ends with `. It is a
 - `attach: the value lies outside the scratch arena`
 - `attach: '<component>' is a singleton, and its id is 0`
 - `attach: the id 0 is no entity, and '<component>' is not a singleton`
+- `destroy: the id 0 is no entity`
 - `it stated that it queues no change`
 - `its changes of <bytes> bytes are used up`
 - `out of memory: there was none for a mark in its queue`

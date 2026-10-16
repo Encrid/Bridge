@@ -28,6 +28,8 @@ int abi_destroy(void *ud, const uint64_t *a, [[maybe_unused]] uint64_t *r)
 {
     change_t ch = { a[0], nullptr, 0, CHANGE_DESTROY };
 
+    if (!a[0])
+        return (abi_refuse(ud, "destroy: the id 0 is no entity"));
     return (queue_change(ud, &ch, nullptr));
 }
 

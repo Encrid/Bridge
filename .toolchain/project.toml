@@ -1984,6 +1984,16 @@ defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_a
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "wrong-destroy-zero"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_destroy_zero"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "schema"
 kind = "program"
 test = true

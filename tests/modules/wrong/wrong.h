@@ -55,5 +55,6 @@ void wrong_attach_ungranted(void);
 void wrong_attach_outside(void);
 void wrong_detach_undeclared(void);
 void wrong_attach_tag_value(void);
+void wrong_destroy_zero(void);
 
 #endif
