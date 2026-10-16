@@ -721,6 +721,12 @@ claims = { matches = ["was not reloaded: its reload answered 5.*tick 103 1.*tick
 false = { run = ["{out}/host{exe}", "bridge_reload-more-spawns-stated"] }
 
 [[case]]
+name = "bridge_reload-fewer-spawns-stated"
+run = ["{out}/host{exe}", "bridge_reload-fewer-spawns-stated"]
+claims = { matches = ["game:ticker@0.2.0: reloaded.*tick 122 10.*modules: game:ticker@0.2.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-reload-answered-nonzero"] }
+
+[[case]]
 name = "bridge_reload-more-spawns-stated"
 run = ["{out}/host{exe}", "bridge_reload-more-spawns-stated"]
 claims = { matches = ["tick 102 1.*game:ticker@0.2.0: reloaded.*tick 112 10.*tick 122 10.*alive"] }

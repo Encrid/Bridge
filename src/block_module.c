@@ -20,15 +20,18 @@ int block_refill(bridge_t *b, module_t *m)
 {
     uint32_t want = m->spawns > 0 ? (uint32_t)m->spawns : 0;
     uint32_t kept = m->id_count - m->id_next;
-    uint64_t *fresh = m->ids + kept;
 
-    if (!want)
-        return (0);
+    if (kept > want) {
+        storage_release(b->storage, m->ids + m->id_next + want, kept - want);
+        kept = want;
+    }
     if (m->id_next)
         memmove(m->ids, m->ids + m->id_next, kept * sizeof(*m->ids));
     m->id_next = 0;
-    m->ids_short = 0;
-    m->id_count = kept + storage_reserve(b->storage, fresh, want - kept);
+    m->id_count = kept;
+    if (!want)
+        return (0);
+    m->id_count += storage_reserve(b->storage, m->ids + kept, want - kept);
     m->ids_short = m->id_count < want;
     return (m->ids_short);
 }

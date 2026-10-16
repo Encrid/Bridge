@@ -17,6 +17,7 @@ If there is no memory for the new record, a record says so, and the reload gives
 ## The ids
 
 The array of ids of the new record holds all the ids held ready for the old one, whatever `spawns` the new config states.
+At the first barrier after the reload, `block_refill` gives back the ids past the new `spawns`.
 
 ## The share
 

@@ -558,6 +558,7 @@ From the sink, the result is 1, with no record.
 A reload keeps the components, their rows and the entities. Bridge does not write the settings again.
 A component that the new instance does not declare goes, as at an unload.
 The new instance runs under the new config, but `persistent` can grow and not shrink.
+If the new config states fewer `spawns`, the module keeps that many of the ids that it held ready. Bridge takes the others back at the next barrier.
 
 With `BACKEND_SIDE_BY_SIDE`, a reload that fails keeps the old instance running, as it was.
 Without it, a reload that fails stops the module, and keeps what it declared. A reload that succeeds brings it back.

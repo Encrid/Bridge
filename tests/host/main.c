@@ -360,6 +360,8 @@ static const host_case_t TEST_CASES[] = {
         test_reload_ticker, "reloadexactfail", test_set_noting },
     { "bridge_reload-more-spawns-stated",
         test_reload_ticker, "reloadspawns", test_set_noting },
+    { "bridge_reload-fewer-spawns-stated",
+        test_reload_ticker, "reloadfewer", test_set_noting },
     { "bridge_reload-wider-layout",
         test_reload_ticker, "reloadlayout", test_set_noting },
     { "bridge_reload-reload-answered-nonzero",

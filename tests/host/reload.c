@@ -12,6 +12,7 @@ static const test_reload_t TEST_RELOADS[] = {
     { "reloadexact", "ticker-ten", BRIDGE_TRUE, 32, nullptr },
     { "reloadexactfail", "ticker-fail", BRIDGE_TRUE, 32, nullptr },
     { "reloadspawns", "ticker-ten", BRIDGE_TRUE, 4000, nullptr },
+    { "reloadfewer", "ticker-ten", BRIDGE_TRUE, 4, nullptr },
     { "reloadlayout", "ticker-wide", BRIDGE_TRUE, 32, nullptr },
     { "reloadfail", "ticker-fail", BRIDGE_TRUE, 32, nullptr },
     { "reloadmove", nullptr, BRIDGE_TRUE, 32, nullptr },

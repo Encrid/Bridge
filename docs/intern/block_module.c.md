@@ -11,9 +11,13 @@ They are real entities with nothing on them, which no query matches, and they co
 `block_refill` keeps the ids that the module did not use, and moves them to the front of the block.
 Storage then gives fresh ids for the rest.
 A module that used no id since the last barrier has no id to move, so a quiet barrier costs little.
+
+`block_refill` keeps at most `spawns` ids, and gives the others back to storage.
+A reload that states fewer `spawns` than before leaves more ids than that: `docs/intern/reload_record.c.md`, *The ids*.
+A module that states no `spawns` gets no ids, and gives back the ids that it held.
+
 The entity index is twelve bytes for each id up to the highest, and the budget states that size.
 So a refill can come up short, and then `ids_short` is set: the next `spawn` past the ids names `[budget] entities`.
-A module that states no `spawns` gets no ids.
 
 ## The header
 
