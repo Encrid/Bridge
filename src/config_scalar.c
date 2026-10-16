@@ -48,7 +48,7 @@ static int put_integer(uint8_t *at, enum schema_kind kind, int64_t value)
 {
     const config_integer_t *range = &CONFIG_INTEGERS[kind];
 
-    if (!range->size || value < range->least || value > range->most)
+    if (value < range->least || value > range->most)
         return (1);
     memcpy(at, &value, range->size);
     return (0);

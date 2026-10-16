@@ -18,6 +18,7 @@ Any other setting is refused as a misfit.
 An integer field takes an integer setting that it can hold.
 The value goes into the field as its low bytes, as many as the field has, because each target is little-endian.
 An integer that the field cannot hold is refused, and any other setting is refused as a misfit.
+`put_integer` gets only the nine integer kinds, and `CONFIG_INTEGERS` gives each of them a size of 1, 2, 4 or 8 bytes.
 
 | Field | Least | Most | Bytes |
 | --- | --- | --- | --- |

@@ -21,7 +21,8 @@ Any other field is written by the seeder of its kind.
 | `bridge_text_t` | `config_seed_text` | `src/config_text.c` |
 | A struct | `config_seed_struct`, which refuses | `src/config_text.c` |
 
-A field of a kind with no seeder is refused as a type that no setting fills.
+Each field of a config has one of these kinds, since `schema_set_type` refuses any other: `docs/intern/schema_type.c.md`.
+Each kind has its seeder in `CONFIG_SEEDERS`, so `seed_field` calls the seeder of the kind with no test.
 
 ## Functions
 
