@@ -13,6 +13,12 @@ constexpr uint32_t MORE_BEFORE_COUNT = 0;
 constexpr uint32_t MORE_BEFORE_COUNT = 1;
 #endif
 
+#ifdef CHANGING
+constexpr uint32_t CHANGE_COUNT = 1;
+#else
+constexpr uint32_t CHANGE_COUNT = 0;
+#endif
+
 #ifdef THIRD
     #ifdef REPEATED
 constexpr uint32_t AGAIN_BEFORE_COUNT = 2;
@@ -82,10 +88,10 @@ static void register_all(void)
     position = BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_DELETE,
         BRIDGE_TABLE);
     terms[0].slot = position;
-    doubling = BRIDGE_ADD_SYSTEM("twice", "update", terms, 1, nullptr, 0,
-        nullptr, 0);
-    adding = BRIDGE_ADD_SYSTEM("more", "update", terms, 1, nullptr, 0,
-        &doubling, MORE_BEFORE_COUNT);
+    doubling = BRIDGE_ADD_SYSTEM("twice", "update", terms, 1, &position,
+        CHANGE_COUNT, nullptr, 0);
+    adding = BRIDGE_ADD_SYSTEM("more", "update", terms, 1, &position,
+        CHANGE_COUNT, &doubling, MORE_BEFORE_COUNT);
 #ifdef THIRD
     after_more[0] = adding;
     after_more[1] = adding;

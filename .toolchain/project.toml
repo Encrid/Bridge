@@ -1740,7 +1740,8 @@ flags = ["{quiet}", "{hidden}", "{system_defines}"]
 variants = [
     { name = "twostep_third", defines = ["BRIDGE_ROWS_CHECKED", "THIRD"] },
     { name = "twostep_unstated", defines = ["BRIDGE_ROWS_CHECKED", "UNSTATED"] },
-    { name = "twostep_repeated", defines = ["BRIDGE_ROWS_CHECKED", "THIRD", "REPEATED"] }
+    { name = "twostep_repeated", defines = ["BRIDGE_ROWS_CHECKED", "THIRD", "REPEATED"] },
+    { name = "twostep_changing", defines = ["BRIDGE_ROWS_CHECKED", "UNSTATED", "CHANGING"] }
 ]
 
 [[artifact]]
@@ -1763,6 +1764,7 @@ sources = ["tests/modules/watcher.c", "tests/modules/offsets_idle.c", "tests/bin
 include = ["include", "tests/binding", "tests/modules"]
 defines = ["BRIDGE_ROWS_CHECKED"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
+variants = [{ name = "watcher_change", defines = ["BRIDGE_ROWS_CHECKED", "CHANGE"] }]
 
 [[artifact]]
 name = "chain"
@@ -1804,6 +1806,10 @@ sources = ["tests/modules/fixer.c", "tests/modules/offsets_idle.c", "tests/bindi
 include = ["include", "tests/binding", "tests/modules"]
 defines = ["BRIDGE_ROWS_CHECKED"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
+variants = [
+    { name = "fixer_watch", defines = ["BRIDGE_ROWS_CHECKED", "WATCH"] },
+    { name = "fixer_change", defines = ["BRIDGE_ROWS_CHECKED", "CHANGE"] }
+]
 
 [[artifact]]
 name = "nested"

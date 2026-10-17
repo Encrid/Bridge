@@ -337,6 +337,8 @@ void test_reserve_too_much(host_t *h);
 
 void test_state_shape(host_t *h);
 void test_conflict_at_barrier(host_t *h);
+void test_conflict_own_observers(host_t *h);
+void test_conflict_changes_at_barrier(host_t *h);
 void test_order_observers(host_t *h);
 void test_reorder_observers(host_t *h);
 void test_queue_too_few(host_t *h);

@@ -7,6 +7,12 @@
 #include "game.h"
 #include "offsets_idle.h"
 
+#ifdef CHANGE
+constexpr uint32_t CHANGE_COUNT = 1;
+#else
+constexpr uint32_t CHANGE_COUNT = 0;
+#endif
+
 static uint32_t marked;
 static uint32_t seeing;
 
@@ -36,7 +42,7 @@ BRIDGE_EXPORT(init) int init(void)
     marked = BRIDGE_COMPONENT("game:Marked", marked_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
     terms[0].slot = marked;
-    seeing = BRIDGE_OBSERVER("seen", BRIDGE_ON_ENTER, terms, 1, nullptr, 0,
-        nullptr, 0);
+    seeing = BRIDGE_OBSERVER("seen", BRIDGE_ON_ENTER, terms, 1, &marked,
+        CHANGE_COUNT, nullptr, 0);
     return (0);
 }

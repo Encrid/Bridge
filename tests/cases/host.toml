@@ -563,6 +563,12 @@ claims = { matches = ["module 'game:twostep@0.1.0' did not load: 'game:twostep:t
 false = { run = ["{out}/host{exe}", "add_system-before-orders-two-systems-that-conflict"] }
 
 [[case]]
+name = "add_system-own-changes-conflict-with-no-before-refused"
+run = ["{out}/host{exe}", "add_system-own-changes-conflict-with-no-before-refused"]
+claims = { matches = ["module 'game:twostep@0.1.0' did not load: 'game:twostep:twice' and 'game:twostep:more' both attach or detach 'game:Position' in phase 'update', and their module states no order of them.*alive"] }
+false = { run = ["{out}/host{exe}", "add_system-own-conflict-with-no-before-refused"] }
+
+[[case]]
 name = "add_system-before-makes-a-chain-of-three-systems"
 run = ["{out}/host{exe}", "add_system-before-makes-a-chain-of-three-systems"]
 claims = { matches = ["game:twostep@0.1.0/show: x 5 0.*alive"] }
@@ -591,6 +597,12 @@ name = "observe-own-conflict-with-no-before-refused"
 run = ["{out}/host{exe}", "observe-own-conflict-with-no-before-refused"]
 claims = { matches = ["did not load: 'game:chain:got_b' and 'game:chain:got_c' both attach or detach 'game:LinkC' at the barrier, and their module states no order of them.*alive"] }
 false = { run = ["{out}/host{exe}", "observe-chain-one-hop-a-barrier"] }
+
+[[case]]
+name = "observe-own-touch-conflict-with-no-before-refused"
+run = ["{out}/host{exe}", "observe-own-touch-conflict-with-no-before-refused"]
+claims = { matches = ["module 'view:fixer@0.1.0' did not load: 'view:fixer:fix' and 'view:fixer:seen' both touch 'game:Marked' at the barrier, one of them writing it, and their module states no order of them.*alive"] }
+false = { run = ["{out}/host{exe}", "order-unordered-observers-refused"] }
 
 [[case]]
 name = "observe-reserved-name-refused"
@@ -713,6 +725,12 @@ name = "order-unordered-observers-refused"
 run = ["{out}/host{exe}", "order-unordered-observers-refused"]
 claims = { matches = ["module 'view:fixer@0.1.0' did not load: 'view:watcher:seen' and 'view:fixer:fix' both touch 'game:Marked' at the barrier, one of them writing it, and no pair orders them.*seen 1 77.*alive"] }
 false = { run = ["{out}/host{exe}", "module_config.changes-used-up"] }
+
+[[case]]
+name = "order-unordered-observer-changes-refused"
+run = ["{out}/host{exe}", "order-unordered-observer-changes-refused"]
+claims = { matches = ["module 'view:fixer@0.1.0' did not load: 'view:watcher:seen' and 'view:fixer:fix' both attach or detach 'game:Marked' at the barrier, and no pair orders them.*alive"] }
+false = { run = ["{out}/host{exe}", "observe-own-conflict-with-no-before-refused"] }
 
 [[case]]
 name = "module_config.changes-used-up"
