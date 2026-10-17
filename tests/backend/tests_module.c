@@ -20,7 +20,7 @@ static const backend_import_t TESTS_STRAYS[3] = {
     { "bridge", 6, "spare", 5, BACKEND_IMPORT_MEMORY, {} }
 };
 
-constexpr uint32_t TESTS_STRAY_COUNT = 64;
+constexpr uint32_t TESTS_CROWD = 64;
 
 BACKEND_EXPORT void memory_release(backend_memory_t *m)
 {
@@ -61,18 +61,31 @@ BACKEND_EXPORT backend_module_t *module_compile([[maybe_unused]] backend_t *b,
     m->keep = (void (*)(const test_api_t *))os_lib_get_symbol(lib,
         "test_keep_table");
     m->stray = os_lib_get_symbol(lib, "test_import_stray") != nullptr;
+    m->crowd = os_lib_get_symbol(lib, "test_import_crowd") != nullptr;
     m->insists = os_lib_get_symbol(lib, "test_enter_after_refusal") != nullptr;
     m->undefined = os_lib_get_symbol(lib, "test_refuse_define") != nullptr;
     return (m);
 }
 
-static backend_import_t get_import(uint32_t strays, uint32_t i)
+static uint32_t count_imports(const backend_module_t *m)
 {
+    if (m->crowd)
+        return (TESTS_CROWD + 2);
+    return (m->stray ? 6 : 2);
+}
+
+static backend_import_t get_import(const backend_module_t *m, uint32_t i)
+{
+    uint32_t first = m->stray ? 3 : 0;
     const char *field;
 
-    if (i < strays)
-        return (TESTS_STRAYS[i < 3 ? i : 0]);
-    field = TESTS_MEMORIES[i - strays];
+    if (m->crowd)
+        first = TESTS_CROWD;
+    if (i < first)
+        return (TESTS_STRAYS[m->crowd ? 0 : i]);
+    if (i >= first + 2)
+        return (TESTS_STRAYS[0]);
+    field = TESTS_MEMORIES[i - first];
     return ((backend_import_t){ BRIDGE_NAMESPACE,
         sizeof(BRIDGE_NAMESPACE) - 1, field, strlen(field),
         BACKEND_IMPORT_MEMORY, {} });
@@ -81,14 +94,14 @@ static backend_import_t get_import(uint32_t strays, uint32_t i)
 BACKEND_EXPORT uint32_t module_list_imports(backend_module_t *m,
     backend_import_t *out, uint32_t max)
 {
-    uint32_t strays = m->stray ? TESTS_STRAY_COUNT : 0;
+    uint32_t count = count_imports(m);
     uint32_t i = 0;
 
-    while (i < strays + 2 && i < max) {
-        out[i] = get_import(strays, i);
+    while (i < count && i < max) {
+        out[i] = get_import(m, i);
         i++;
     }
-    return (strays + 2);
+    return (count);
 }
 
 BACKEND_EXPORT void module_destroy(backend_module_t *m)

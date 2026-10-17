@@ -84,6 +84,13 @@ static void add_hearers(const test_api_t *api)
 
 void nstore_add_plain(const test_api_t *api)
 {
+    uint32_t three[3] = { nstore_a, nstore_b, 0 };
+    int none = 0;
+
+    nstore_c = TEST_COMPONENT(api, "st:C", b_t, BRIDGE_DELETE,
+        BRIDGE_TABLE);
+    three[2] = nstore_c;
+    TEST_ADD_SYSTEM(api, "attach_three", "attach_three", &none, 0, three, 3);
     add_first_changes(api);
     add_last_changes(api);
     add_looks(api);

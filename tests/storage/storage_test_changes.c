@@ -27,8 +27,8 @@ static const char *const NO_TABLES[] = {
 };
 
 static const char *const NO_TABLES_STALE[] = {
-    "spawn", "attach_a", "destroy_half", "respawn_half", "stale", "look",
-    nullptr
+    "spawn", "attach_a", "destroy_half", "respawn_half", "respawn_half",
+    "respawn_half", "stale", "look", nullptr
 };
 
 static const char *const NO_COLUMNS[] = {

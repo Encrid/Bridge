@@ -322,6 +322,15 @@ include = ["include", "tests/binding", "tests/modules"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "crowd"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/crowd.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "stray"
 kind = "library"
 test = true

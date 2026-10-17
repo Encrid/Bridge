@@ -8,6 +8,7 @@
 
 uint32_t nstore_a;
 uint32_t nstore_b;
+uint32_t nstore_c;
 uint64_t nstore_ids[COUNT];
 
 TEST_MEASURED TEST(attach_a)

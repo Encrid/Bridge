@@ -39,6 +39,7 @@ constexpr uint32_t COUNT = 6;
 
 extern uint32_t nstore_a;
 extern uint32_t nstore_b;
+extern uint32_t nstore_c;
 extern uint64_t nstore_ids[COUNT];
 
     #ifdef TABLES

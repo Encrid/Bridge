@@ -37,7 +37,7 @@ false = { run = ["{out}/storage{exe}", "nocolumns"] }
 [[case]]
 name = "change-of-a-stale-id-beside-a-dropped-change-of-its-index"
 run = ["{out}/storage{exe}", "notablesstale"]
-claims = { matches = ["respawn_half.*stale.*\\[budget\\] tables of 1 is used up. Not applied, of the changes it asked: 3 .*look: with A: spans, rows 1 3.*alive"] }
+claims = { matches = ["respawn_half.*stale.*\\[budget\\] tables of 1 is used up. Not applied, of the changes it asked: 3 .*stale ids whose index a live id took 3 .*look: with A: spans, rows 1 3.*alive"] }
 false = { run = ["{out}/storage{exe}", "notables"] }
 
 [[case]]
@@ -81,6 +81,12 @@ name = "entity-generation-after-the-last-wraps-to-1"
 run = ["{out}/storage{exe}", "generation"]
 claims = { matches = ["index 1, killed at generation 4294967294, comes back at generation 1.*alive"] }
 false = { run = ["{out}/storage{exe}", "manygrow"] }
+
+[[case]]
+name = "BRIDGE_STRIP-of-a-type-in-an-unnamed-table-of-two-types"
+run = ["{out}/storage{exe}", "stripunnamed", "160"]
+claims = { matches = ["look: with A: spans, rows 2 6.*'st:B' is stripped, and 3 rows stay in a second table of their archetype: \\[budget\\] columns of 160 bytes has no room to join them to the first.*strip st:A.*look: with A: spans, rows 0 0.*alive"] }
+false = { run = ["{out}/storage{exe}", "stripunnamed", "512"] }
 
 [[case]]
 name = "storage-stripfull"

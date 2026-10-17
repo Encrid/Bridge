@@ -31,10 +31,42 @@ TEST(flicker)
     return (0);
 }
 
+TEST(attach_three)
+{
+    uint32_t i = 0;
+
+    while (i < COUNT) {
+        api->attach(api, nstore_ids[i], nstore_a, BRIDGE_ZEROED);
+        if (i < COUNT / 2)
+            api->attach(api, nstore_ids[i], nstore_b, BRIDGE_ZEROED);
+        api->attach(api, nstore_ids[i], nstore_c, BRIDGE_ZEROED);
+        i++;
+    }
+    return (0);
+}
+
+static uint32_t count_taken(void)
+{
+    uint32_t taken = 0;
+    uint32_t i = COUNT / 2;
+    uint32_t k;
+
+    while (i < COUNT) {
+        k = COUNT / 2;
+        while (k < COUNT) {
+            taken += (uint32_t)nstore_ids[i] == (uint32_t)nstore_old[k];
+            k++;
+        }
+        i++;
+    }
+    return (taken);
+}
+
 TEST(stale)
 {
     uint32_t i = COUNT / 2;
 
+    say(api, "stale ids whose index a live id took", count_taken(), 0);
     while (i < COUNT) {
         api->attach(api, nstore_ids[i], nstore_b, BRIDGE_ZEROED);
         api->attach(api, nstore_old[i], nstore_b, BRIDGE_ZEROED);

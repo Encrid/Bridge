@@ -14,7 +14,8 @@ static const char *const PHASES[] = {
     "detach_b_half", "detach_b_absent", "value_a", "flicker", "destroy_half",
     "respawn_half", "touch_dead", "attach_a_half", "recycled", "combine",
     "look", "never", "work", "check", "attach_both", "scribble", "find",
-    "value_b", "look_b", "walk", "flag", "near", "far", "one", "stale"
+    "value_b", "look_b", "walk", "flag", "near", "far", "one", "stale",
+    "attach_three"
 };
 
 static const bridge_setting_t KEEPS[4] = {
@@ -58,6 +59,8 @@ static const storage_test_room_t DIRECT = { BACKENDS + 1, 1, 1, 32'768,
     64 << 20, BRIDGE_NONE, 1, false };
 static const storage_test_room_t DIRECT_1024 = { BACKENDS + 1, 1, 1, 32'768,
     1024, BRIDGE_NONE, 1, false };
+static const storage_test_room_t COLUMNS_ASKED = { BACKENDS + 1, 1, 1,
+    32'768, 64 << 20, BRIDGE_NONE, BRIDGE_NONE, true };
 static const storage_test_room_t ONE_SET_TWO_DIRECT = { BACKENDS + 1, 1, 1,
     32'768, 64 << 20, 1, 2, false };
 static const storage_test_room_t ONE_OF_EACH = { BACKENDS + 1, 1, 1, 32'768,
@@ -94,6 +97,7 @@ static const storage_test_case_t CASES[] = {
     { "strip", storage_test_strip, &PLAIN },
     { "stripfull", storage_test_strip_full, &COLUMNS_160 },
     { "stripfulltwice", storage_test_strip_full, &COLUMNS_160 },
+    { "stripunnamed", storage_test_strip_unnamed, &COLUMNS_ASKED },
     { "layout", storage_test_relay, &PLAIN },
     { "move", storage_test_move, &PLAIN },
     { "tag", storage_test_tag, &ONE_OF_EACH },

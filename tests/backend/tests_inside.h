@@ -54,6 +54,7 @@ struct backend_module {
     void *lib;
     void (*keep)(const test_api_t *);
     bool stray;
+    bool crowd;
     bool insists;
     bool undefined;
 };

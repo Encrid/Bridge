@@ -967,6 +967,8 @@ static const host_case_t TEST_CASES[] = {
         test_share, "", test_set_guarded },
     { "BACKEND_IMPORT_OTHER-a-global-nobody-answers",
         test_load_named, "stray", test_set_small },
+    { "BACKEND_IMPORT_MEMORY-past-the-first-64-imports-not-lent",
+        test_load_named, "crowd", test_set_small },
     { "define_func-refused-load-refused",
         test_load_named, "undefined", test_set_small },
     { "BACKEND_ENTRY-called-after-a-refusal-keeps-the-first-reason",
