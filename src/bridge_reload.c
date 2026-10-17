@@ -76,7 +76,7 @@ static int start_new(reloading_t *r)
     return (reload_move_rows(r));
 }
 
-int bridge_reload(bridge_t *b, const bridge_artifact_t *a)
+int bridge_reload_now(bridge_t *b, const bridge_artifact_t *a)
 {
     reloading_t r = { .b = b, .a = a };
 

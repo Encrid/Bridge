@@ -34,4 +34,4 @@ So an unload has no reference to look for and clear.
 | --- | --- |
 | `find_loaded` | Gives the loaded module whose identity is `identity`, or null. A null identity matches no module. |
 | `take_out` | Does the rest of an unload, after the last code of the module ran: its types, its ids, its share and its record. |
-| `bridge_unload` | Unloads a module. 0 if it is gone, and 1, with a record, if refused. |
+| `bridge_unload_now` | Unloads a module. 0 if it is gone, and 1, with a record, if refused. |

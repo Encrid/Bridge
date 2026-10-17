@@ -32,7 +32,7 @@ static void take_out(bridge_t *b, module_t *m)
     module_discard(b, m);
 }
 
-int bridge_unload(bridge_t *b, const char *identity)
+int bridge_unload_now(bridge_t *b, const char *identity)
 {
     char why[256];
     module_t *m;

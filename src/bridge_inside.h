@@ -19,9 +19,23 @@ size_t bridge_get_stem_length(const char *identity);
 
 const module_t *bridge_find_pinned(const bridge_t *b);
 
+[[nodiscard]] bool bridge_enter(bridge_t *b, bool *owner);
+
+void bridge_leave(bridge_t *b, bool owner);
+
 [[nodiscard]] int bridge_check_entry(bridge_t *b);
 
 [[nodiscard]] int bridge_check_call(bridge_t *b, const char *repairing);
+
+[[nodiscard]] int bridge_load_now(bridge_t *b, const bridge_artifact_t *a);
+
+[[nodiscard]] int bridge_unload_now(bridge_t *b, const char *identity);
+
+[[nodiscard]] int bridge_reload_now(bridge_t *b, const bridge_artifact_t *a);
+
+[[nodiscard]] int bridge_run_phase_now(bridge_t *b, const char *name);
+
+int bridge_list_modules_now(bridge_t *b, bridge_module_info_t *out, int max);
 
 void bridge_stop(bridge_t *b, const char *identity, const char *what);
 

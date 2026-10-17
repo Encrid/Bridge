@@ -16,10 +16,14 @@ Bridge has no default value: the host states each value. A field left at zero is
 A count of an array can be zero, unless this document tells otherwise.
 Each function but `bridge_list_modules` is `[[nodiscard]]`: the compiler warns when a host ignores its result.
 
-Call the functions of one world one at a time, also from two threads: a call starts after the call before it returns.
+Call the functions of one world one at a time: a call starts after the call before it returns.
 So call `bridge_load`, `bridge_unload` and `bridge_reload` between two phases, never while `bridge_run_phase` runs.
-Bridge checks neither rule. If two calls of one world overlap, the result is not defined.
-Only a call from the sink comes during another call, and it gives 1: *bridge_sink_fn_t*.
+
+A call from another thread while a call of the world runs does nothing and writes no record.
+A record would call the sink on that thread, during the call that runs.
+The refused call gives 1, and `bridge_list_modules` gives -1.
+Only a call from the sink comes during another call on its thread: *bridge_sink_fn_t*.
+A call that overlaps `bridge_destroy`, or comes after it, is not defined, since the world is gone.
 
 ## The layouts
 
@@ -582,6 +586,7 @@ Without it, a reload that fails stops the module, and keeps what it declared. A 
 | `max` | How many items `out` holds. |
 
 The result is the number of loaded modules. Bridge fills at most `max` items, in the order that the modules loaded.
+The result is -1 if another thread calls while a call of the world runs: *The library*.
 A host gets the state of a module only from this function, since the log can drop a line.
 A module that Bridge stopped long after its load shows as `BRIDGE_STOPPED`.
 
@@ -665,6 +670,7 @@ A function writes one of these records when it refuses the call, and gives 1:
 - `module '<module>' is not reloaded: nothing of that name is loaded`
 
 The reason of `the world has stopped` is in *A stopped world*.
+A call from another thread while a call of the world runs gives 1 and writes no record: *The library*.
 
 ### A module refused
 

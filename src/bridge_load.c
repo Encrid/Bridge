@@ -72,7 +72,7 @@ static int start_loaded(const module_check_t *k, module_t *m,
     return (config_seed(m, &k->a->cfg, err, true));
 }
 
-int bridge_load(bridge_t *b, const bridge_artifact_t *a)
+int bridge_load_now(bridge_t *b, const bridge_artifact_t *a)
 {
     module_check_t k = { b, a };
     backend_err_t err = {};

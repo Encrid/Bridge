@@ -198,7 +198,7 @@ A `schedule_pairs_t` holds the pairs of `[order]`: `docs/intern/schedule_order.c
 | Field | Content |
 | --- | --- |
 | `sink`, `ud` | The sink of the host, and what it is handed with each record. |
-| `in_sink` | Whether the sink runs now: `docs/intern/say_sink.c.md`. |
+| `caller` | The id of the thread whose call of the world runs, or 0: `docs/intern/bridge_check.c.md`, *A call from another thread*. |
 | `backends`, `backend_count` | The backends of the deployment, opened. |
 | `reservation`, `guard`, `granule` | The shape of the shared block: the largest that any backend stated. Each block is allocated with this address space. |
 | `stopped_by`, `stopped_stem` | Why nothing runs any more, and the stem of the module whose return lifts the stop. Null while the world runs. |

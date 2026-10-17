@@ -3,6 +3,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdatomic.h>
 #include <string.h>
 
 #include "bridge_inside.h"
@@ -17,13 +18,26 @@ static bool is_repair(const bridge_t *b, const char *repairing)
     return (!memcmp(b->stopped_stem, repairing, n));
 }
 
+bool bridge_enter(bridge_t *b, bool *owner)
+{
+    uint64_t me = os_get_thread_id();
+    uint64_t was = 0;
+
+    *owner = atomic_compare_exchange_strong_explicit(&b->caller, &was, me,
+        memory_order_acquire, memory_order_relaxed);
+    return (*owner || was == me);
+}
+
+void bridge_leave(bridge_t *b, bool owner)
+{
+    if (owner)
+        atomic_store_explicit(&b->caller, 0, memory_order_release);
+}
+
 int bridge_check_entry(bridge_t *b)
 {
-    const module_t *pinned;
+    const module_t *pinned = bridge_find_pinned(b);
 
-    if (b->in_sink)
-        return (1);
-    pinned = bridge_find_pinned(b);
     if (!pinned)
         return (0);
     say_error(b, "refused: module '%s' is pinned to the thread that "

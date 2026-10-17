@@ -239,6 +239,8 @@ void test_call_from_wrong_thread(host_t *h);
 
 void test_set_calling(host_t *h);
 
+void test_set_calling_elsewhere(host_t *h);
+
 void test_call_from_sink(host_t *h);
 
 void test_call_after_sink(host_t *h);

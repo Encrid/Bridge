@@ -64,10 +64,16 @@ static void close_backends(bridge_t *b)
 
 int bridge_destroy(bridge_t *b)
 {
+    bool owner;
+
     if (!b)
         return (0);
-    if (bridge_check_entry(b))
+    if (!bridge_enter(b, &owner) || !owner)
         return (1);
+    if (bridge_check_entry(b)) {
+        bridge_leave(b, owner);
+        return (1);
+    }
     end_modules(b);
     free_schedule(b);
     block_destroy(b);

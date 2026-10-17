@@ -607,6 +607,42 @@ claims = { matches = ["module 'test:pinned@0.1.0' is pinned to the thread that l
 false = { run = ["{out}/host{exe}", "config.threads-unset-refused"] }
 
 [[case]]
+name = "bridge_load-from-another-thread-during-a-call-refused"
+run = ["{out}/host{exe}", "bridge_load-from-another-thread-during-a-call-refused"]
+claims = { matches = ["talk: line 0 0\\s+from another thread during the call: bridge_load gave 1\\s.*the outer call ended.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_load-after-the-outer-call"] }
+
+[[case]]
+name = "bridge_reload-from-another-thread-during-a-call-refused"
+run = ["{out}/host{exe}", "bridge_reload-from-another-thread-during-a-call-refused"]
+claims = { matches = ["talk: line 0 0\\s+from another thread during the call: bridge_reload gave 1\\s.*the outer call ended.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-after-the-outer-call"] }
+
+[[case]]
+name = "bridge_unload-from-another-thread-during-a-call-refused"
+run = ["{out}/host{exe}", "bridge_unload-from-another-thread-during-a-call-refused"]
+claims = { matches = ["talk: line 0 0\\s+from another thread during the call: bridge_unload gave 1\\s.*the outer call ended.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_unload-after-the-outer-call"] }
+
+[[case]]
+name = "bridge_run_phase-from-another-thread-during-a-call-refused"
+run = ["{out}/host{exe}", "bridge_run_phase-from-another-thread-during-a-call-refused"]
+claims = { matches = ["talk: line 0 0\\s+from another thread during the call: bridge_run_phase gave 1\\s.*the outer call ended.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_run_phase-after-the-outer-call"] }
+
+[[case]]
+name = "bridge_destroy-from-another-thread-during-a-call-refused"
+run = ["{out}/host{exe}", "bridge_destroy-from-another-thread-during-a-call-refused"]
+claims = { matches = ["talk: line 0 0\\s+from another thread during the call: bridge_destroy gave 1\\s.*the outer call ended.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_destroy-after-the-outer-call"] }
+
+[[case]]
+name = "bridge_list_modules-from-another-thread-during-a-call-refused"
+run = ["{out}/host{exe}", "bridge_list_modules-from-another-thread-during-a-call-refused"]
+claims = { matches = ["talk: line 0 0\\s+from another thread during the call: bridge_list_modules gave -1\\s.*the outer call ended.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_list_modules-after-the-outer-call"] }
+
+[[case]]
 name = "bridge_load-from-the-sink-refused"
 run = ["{out}/host{exe}", "bridge_load-from-the-sink-refused"]
 claims = { matches = ["talk: line 0 0\\s+from the sink: bridge_load gave 1\\s.*the outer call ended.*alive"] }

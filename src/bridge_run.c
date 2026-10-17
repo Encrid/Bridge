@@ -19,7 +19,7 @@ static uint32_t find_phase(const bridge_t *b, const char *name)
     return (phase);
 }
 
-int bridge_run_phase(bridge_t *b, const char *name)
+int bridge_run_phase_now(bridge_t *b, const char *name)
 {
     uint32_t phase;
 
@@ -36,7 +36,7 @@ int bridge_run_phase(bridge_t *b, const char *name)
     return (0);
 }
 
-int bridge_list_modules(bridge_t *b, bridge_module_info_t *out, int max)
+int bridge_list_modules_now(bridge_t *b, bridge_module_info_t *out, int max)
 {
     const module_t *m = b->modules;
     int count = 0;

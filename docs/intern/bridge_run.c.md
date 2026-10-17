@@ -29,5 +29,5 @@ It writes at most `max` modules into `out`, and gives the number of all the load
 | Function | Result |
 | --- | --- |
 | `find_phase` | Gives the index of the phase of a name, or the number of phases if the name is none of them. |
-| `bridge_run_phase` | Runs the systems of one phase, then its barrier. 0 if the phase ran, whatever its systems did, and 1, with a record, if refused. |
-| `bridge_list_modules` | Writes up to `max` loaded modules into `out`, each with its state, and gives how many modules are loaded. |
+| `bridge_run_phase_now` | Runs the systems of one phase, then its barrier. 0 if the phase ran, whatever its systems did, and 1, with a record, if refused. |
+| `bridge_list_modules_now` | Writes up to `max` loaded modules into `out`, each with its state, and gives how many modules are loaded. |

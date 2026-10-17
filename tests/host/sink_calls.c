@@ -47,6 +47,41 @@ static void hear_and_call(void *ud, const bridge_record_t *r)
     printf("from the sink: %s gave %d\n", h->arg, call_world(h));
 }
 
+typedef struct {
+    host_t *h;
+    int result;
+} elsewhere_t;
+
+static void call_there(void *arg)
+{
+    elsewhere_t *e = arg;
+
+    e->result = call_world(e->h);
+}
+
+static void hear_and_call_elsewhere(void *ud, const bridge_record_t *r)
+{
+    host_t *h = ud;
+    elsewhere_t e = { h, 0 };
+    host_thread_t t = { call_there, &e, nullptr };
+
+    host_print_record(nullptr, r);
+    if (called)
+        return;
+    called = true;
+    host_thread_start(&t);
+    host_thread_join(&t);
+    printf("from another thread during the call: %s gave %d\n", h->arg,
+        e.result);
+}
+
+void test_set_calling_elsewhere(host_t *h)
+{
+    h->cfg.backend_count = 1;
+    h->sink = hear_and_call_elsewhere;
+    h->ud = h;
+}
+
 void test_set_calling(host_t *h)
 {
     h->cfg.backend_count = 1;
