@@ -43,17 +43,30 @@ void test_name_no_backend(host_t *h)
     host_close(h);
 }
 
+static size_t get_most(const char *what)
+{
+    if (!strcmp(what, "long"))
+        return (40'000);
+    return (strcmp(what, "multibyte") ? 260 : 300);
+}
+
 static const char *get_library(const char *what)
 {
     static char path[40'001];
-    size_t len = strcmp(what, "long") ? 260 : 40'000;
+    const char *unit = strcmp(what, "multibyte") ? "a" : "\xc3\xa9";
+    size_t step = strlen(unit);
+    size_t most = get_most(what);
+    size_t len = 3;
 
     if (!strcmp(what, "nolib"))
         return ("no-such-backend-library");
     if (!strcmp(what, "backslash"))
         return ("no\\such-backend-library");
-    memset(path, 'a', len);
     memcpy(path, "C:/", 3);
+    while (len + step <= most) {
+        memcpy(path + len, unit, step);
+        len += step;
+    }
     path[len] = '\0';
     return (path);
 }

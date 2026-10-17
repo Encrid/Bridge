@@ -12,7 +12,10 @@ Then it opens the library with `LoadLibraryExA` and `LOAD_WITH_ALTERED_SEARCH_PA
 
 ## Limits
 
-The full path must be shorter than `MAX_PATH` characters: a longer path gives `nullptr`.
+The full path must be shorter than `MAX_PATH` bytes: a longer path gives `nullptr`.
+With a code page of one byte for each character, `GetFullPathNameA` gives 0 for such a path.
+With a code page such as UTF-8, a path of fewer than `MAX_PATH` characters can have `MAX_PATH` bytes or more.
+`GetFullPathNameA` then gives the size that it needs and fills nothing, and `os_lib_open` refuses that too.
 
 ## Functions
 

@@ -125,6 +125,12 @@ claims = { matches = ["backend 'guarded': cannot open backend library 'C:/a{200}
 false = { run = ["{out}/host{exe}", "backend.library-with-a-backslash-cannot-open-refused"] }
 
 [[case]]
+name = "backend.library-path-of-299-bytes-and-151-characters-refused"
+run = ["{out}/host{exe}", "backend.library-path-of-299-bytes-and-151-characters-refused"]
+claims = { matches = ["backend 'guarded': cannot open backend library 'C:/[^a\\s].*bridge_create refused.*alive"] }
+false = { run = ["{out}/host{exe}", "backend.library-path-of-260-bytes-refused"] }
+
+[[case]]
 name = "backend.library-cannot-open-refused"
 run = ["{out}/host{exe}", "backend.library-cannot-open-refused"]
 claims = { matches = ["backend 'guarded': cannot open backend library 'no-such-backend-library'.*bridge_create refused.*alive"] }

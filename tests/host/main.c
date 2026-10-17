@@ -29,6 +29,8 @@ static const host_case_t TEST_CASES[] = {
         test_open_no_library, "long", test_set_small },
     { "backend.library-path-of-260-bytes-refused",
         test_open_no_library, "max", test_set_small },
+    { "backend.library-path-of-299-bytes-and-151-characters-refused",
+        test_open_no_library, "multibyte", test_set_small },
     { "backend.library-none-refused",
         test_edit_backend, "library", test_set_both },
     { "backend.settings-handed-to-the-backend",
