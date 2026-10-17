@@ -3001,6 +3001,12 @@ claims = { matches = ["test:guess@0.1.0: loaded.*alive"], matches_not = ["asked 
 false = { run = ["{out}/host{exe}", "destroy-of-a-held-id-refused"] }
 
 [[case]]
+name = "destroy-of-each-empty-entity-in-the-index-meets-no-held-id"
+run = ["{out}/host{exe}", "destroy-of-each-empty-entity-in-the-index-meets-no-held-id"]
+claims = { matches = ["test:sweeper@0.1.0: loaded.*sweep: swept 1 .*sweep: swept 0 .*alive"], matches_not = ["asked to destroy"] }
+false = { run = ["{out}/host{exe}", "destroy-of-a-held-id-refused"] }
+
+[[case]]
 name = "attach-to-a-held-id-is-nothing"
 run = ["{out}/host{exe}", "attach-to-a-held-id-is-nothing"]
 claims = { matches = ["count: rows 0 0.*count: rows 0 0.*alive"], matches_not = ["count: rows 1"] }

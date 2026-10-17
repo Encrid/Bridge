@@ -11,7 +11,10 @@ void storage_hand_out(storage_t *r, const uint64_t *ids, uint32_t count)
 
     for (uint32_t i = 0; i < count; i++) {
         p = &r->places[(uint32_t)ids[i]];
-        if (!p->table && p->row == HELD)
+        if (!p->table && p->row == HELD) {
             p->row = 0;
+            r->b->index[(uint32_t)ids[i]] = (bridge_entity_t){ 0, 0,
+                p->generation };
+        }
     }
 }

@@ -906,6 +906,8 @@ static const host_case_t TEST_CASES[] = {
         test_guess, "guess-zero", test_set_both },
     { "destroy-of-an-index-past-every-entity-is-nothing",
         test_guess, "guess-far", test_set_both },
+    { "destroy-of-each-empty-entity-in-the-index-meets-no-held-id",
+        test_sweep, "sweeper", test_set_both },
     { "attach-to-a-held-id-is-nothing",
         test_stick, "stick-held", test_set_both },
     { "attach-to-a-handed-out-id-done",

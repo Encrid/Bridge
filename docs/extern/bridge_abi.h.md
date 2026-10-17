@@ -274,7 +274,7 @@ For a component of another namespace, it needs a grant: the name of the componen
 
 Bridge checks a grant when a module declares a type, registers a system or an observer, and calls `attach` or `detach`.
 A module can destroy an entity that carries a component that it can write, or that carries nothing: *destroy*.
-An id that `spawn` has not handed out yet is no entity, and no module can destroy it.
+An id that `spawn` has not handed out yet is no entity: the entity index does not show it, and no module can destroy it.
 The memory does not enforce a grant: a module can write what it reads. That breaks a rule: *Rules*.
 
 ## add_system
@@ -486,8 +486,10 @@ A module that writes over it misleads the modules that read it, and changes noth
 `spawn` gives the id of a new entity at once. The entity has no component until a barrier applies an attach to it.
 The id comes from a block that a barrier set aside for the module: `spawns` of its config.
 Thus a system can use the new id at once, for example in the value of a component that it attaches to another entity.
+
 `spawn` refuses the call when the module states `BRIDGE_NONE` for `spawns`, when the block is used up, and when the world has no more entities.
 A query can match the new entity from the next barrier on.
+The entity index shows it from that barrier on too. Before it, the generation there does not match the id.
 
 ## destroy
 

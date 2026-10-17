@@ -34,6 +34,11 @@ void test_guess(host_t *h)
     run_beside_hold(h, "test:guess@0.1.0");
 }
 
+void test_sweep(host_t *h)
+{
+    run_beside_hold(h, "test:sweeper@0.1.0");
+}
+
 void test_stick(host_t *h)
 {
     run_beside_hold(h, "test:stick@0.1.0");
