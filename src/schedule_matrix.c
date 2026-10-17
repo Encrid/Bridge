@@ -10,52 +10,29 @@
 bool schedule_init_matrix(schedule_matrix_t *m, uint32_t n)
 {
     m->n = n;
-    m->words = (uint32_t)(((uint64_t)n + 63) / 64);
-    m->bits = calloc((size_t)n * m->words + 1, sizeof(*m->bits));
+    m->words = schedule_get_words(n);
+    m->bits = calloc(schedule_get_matrix_words(n), sizeof(*m->bits));
     return (m->bits != nullptr);
 }
 
 bool schedule_reaches(const schedule_matrix_t *m, uint32_t i, uint32_t j)
 {
-    uint64_t word = m->bits[(size_t)i * m->words + j / 64];
-
-    return (word >> (j % 64) & 1);
+    return (schedule_has_bit(&m->bits[(size_t)i * m->words], j));
 }
 
 void schedule_add_edge(schedule_matrix_t *m, uint32_t i, uint32_t j)
 {
     uint64_t *row = &m->bits[(size_t)i * m->words];
-    const uint64_t *after = &m->bits[(size_t)j * m->words];
 
-    for (uint32_t w = 0; w < m->words; w++)
-        row[w] |= after[w];
-    row[j / 64] |= (uint64_t)1 << (j % 64);
+    schedule_join_bits(row, &m->bits[(size_t)j * m->words], m->words);
+    schedule_put_bit(row, j);
 }
 
 void schedule_join_through(schedule_matrix_t *m, uint32_t k)
 {
     const uint64_t *via = &m->bits[(size_t)k * m->words];
-    uint64_t *row = m->bits;
-    uint32_t i = 0;
-    uint32_t w;
 
-    while (i < m->n) {
-        w = schedule_reaches(m, i, k) ? 0 : m->words;
-        while (w < m->words) {
-            row[w] |= via[w];
-            w++;
-        }
-        row += m->words;
-        i++;
-    }
-}
-
-void schedule_close_matrix(schedule_matrix_t *m)
-{
-    uint32_t k = 0;
-
-    while (k < m->n) {
-        schedule_join_through(m, k);
-        k++;
-    }
+    for (uint32_t i = 0; i < m->n; i++)
+        if (schedule_reaches(m, i, k))
+            schedule_join_bits(&m->bits[(size_t)i * m->words], via, m->words);
 }

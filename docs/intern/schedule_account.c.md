@@ -16,7 +16,7 @@ It allocates these arrays, where `n` is `max_systems`, which is `[budget] system
 | `run_lists` | The systems that the jobs list, one run of entries for each job. |
 | `run_callers` | A byte for each job: 1 if the job must run on the thread that asked for the phase. |
 | `build_in` | The systems of the phase that `schedule_build` works on. |
-| `build_bits` | The matrix of a phase: `n * ((n + 63) / 64) + 1` words of 64 bits, computed in 64 bits. |
+| `build_bits` | The matrix of a phase: as many words of 64 bits as `schedule_get_matrix_words` gives for `n`. |
 
 If an allocation fails, `bridge_lacks` writes a record and the function gives 1.
 

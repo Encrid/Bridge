@@ -12,7 +12,10 @@ This file takes the pairs that a deployment states in `[order]`: two systems tha
 3. For each pair, `add_pair` refuses a pair unless `is_full_name` accepts its two names, and they differ.
 4. `add_pair` gives each name its index among the names met so far, and copies a new name into the list.
 5. `add_pair` adds the edge from the first name to the second.
-6. `check_pairs` closes the matrix, and refuses the pairs if a name reaches itself.
+6. `check_pairs` closes the matrix, and refuses the pairs if a name reaches itself: `schedule_get_cycle`.
+
+The matrix has a row for twice as many names as pairs, and a row past the last name is empty.
+So `check_pairs` compares the result of `schedule_get_cycle` with the count of rows, and not with the count of names.
 
 A name counts in `order` once it is copied, so a refused world frees it.
 The world keeps the names and the closed matrix until `bridge_destroy`.

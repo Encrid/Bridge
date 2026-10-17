@@ -53,12 +53,11 @@ static int add_pair(bridge_t *b, const bridge_order_t *pair, uint32_t i)
 
 static int check_pairs(bridge_t *b, schedule_pairs_t *pairs)
 {
-    uint32_t i = 0;
+    uint32_t i;
 
     schedule_close_matrix(&pairs->reach);
-    while (i < pairs->n && !schedule_reaches(&pairs->reach, i, i))
-        i++;
-    if (i == pairs->n)
+    i = schedule_get_cycle(&pairs->reach);
+    if (i == pairs->reach.n)
         return (0);
     say_error(b, "[order] contradicts itself: '%s' would run before itself",
         pairs->names[i]);

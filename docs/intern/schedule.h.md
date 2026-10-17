@@ -144,7 +144,8 @@ One phase that `schedule_run` runs.
 | `schedule_reaches` | Gives whether `i` runs before `j`. In `src/schedule_matrix.c`. |
 | `schedule_add_edge` | Records that `i` runs before `j`, and before all that `j` runs before. In `src/schedule_matrix.c`. |
 | `schedule_join_through` | Makes each system that reaches `k` reach all that `k` reaches. In `src/schedule_matrix.c`. |
-| `schedule_close_matrix` | Makes each system that reaches a system reach all that it reaches. In `src/schedule_matrix.c`. |
+| `schedule_close_matrix` | Makes each system that reaches a system reach all that it reaches. In `src/schedule_closure.c`. |
+| `schedule_get_cycle` | Gives the first system of a closed matrix that reaches itself, or the count of rows. In `src/schedule_closure.c`. |
 | `schedule_find_conflict` | Gives the name of the component two systems conflict over, or `nullptr`. `changing` tells the kind. In `src/schedule_conflict.c`. |
 | `schedule_gather_phase` | Lists the systems of a phase that are not parked, with an empty matrix. In `src/schedule_edges.c`. |
 | `schedule_add_stated` | Adds the edges that the closed matrix of the pairs states. In `src/schedule_edges.c`. |
