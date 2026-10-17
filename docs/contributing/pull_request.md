@@ -8,10 +8,11 @@ This document tells how to write a pull request that is easy to review.
 1. Make sure that `python project.py check` passes.
 2. Make sure that `python project.py test` passes.
 3. Make sure that `python project.py test --break` passes: each case fails, as it must.
-4. Read the full change, and remove each part that the change does not need.
-5. Make sure that the documents describe the change, and that a case checks each new behavior.
+4. Make sure that `python project.py test --branches` passes: each branch of the code runs in a case.
+5. Read the full change, and remove each part that the change does not need.
+6. Make sure that the documents describe the change, and that a case checks each new behavior.
 
-The workflow `ci` runs the three commands again on five platforms.
+The workflow `ci` runs the four commands again on a machine of each target of `.toolchain/toolchain.toml`.
 
 ## One purpose
 

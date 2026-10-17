@@ -11,9 +11,11 @@ This document tells how to write the documents of the project.
 | `docs/contributing/<name>.md` | A rule of a contribution, for the contributors. |
 | `docs/extern/<path>.md` | The document of `include/<path>`, for the users of the project. |
 | `docs/intern/<path>.md` | The document of `src/<path>`, for the developers of the project. |
+| `docs/tools/<path>.md` | The document of `tools/<path>`, for the developers of the project. |
 | `.toolchain/docs/<name>.md` | The document of a part of the toolchain. |
 
-Each file of `include` and of `src` has its document. No other file is in `docs/extern` or `docs/intern`.
+Each file of `include`, of `src` and of `tools` has its document.
+No other file is in `docs/extern`, `docs/intern` or `docs/tools`.
 The first line of the document of a file is `#`, a space, and the path of the file, for example `# src/parse.c`.
 
 ## The readme
@@ -104,8 +106,8 @@ To cite a section of the same document, write its heading between two asterisks.
 
 ## The messages of the code
 
-`[test] writers` of `.toolchain/project.toml` can name the functions that write the messages of the code.
-Then `readme.md` or a document of `docs/extern` quotes each message.
+`readme.md` or a document of `docs/extern` quotes each message of the code.
+`docs/contributing/tests.md`, *The messages of the code*, names the functions that write them.
 In a quote, write `<name>` in place of a conversion such as `%s`.
 
 ## Characters

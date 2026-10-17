@@ -9,7 +9,7 @@ Obey the style from the first line. That is easier than a change of finished cod
 If no rule decides a choice, select the option that makes the code clearer.
 Do not write unclear code that this document does not name.
 
-`python project.py check` checks each rule that a program can check.
+`python project.py check` checks the rules of this guide that a program can check.
 `[style]` of `.toolchain/toolchain.toml` gives the limits of the rules F3, F4, F5, O3 and C1.
 
 ## O - The files
