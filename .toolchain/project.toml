@@ -2628,3 +2628,14 @@ include = ["include", "tests/support"]
 defines = ["{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{host_resources}"]
 link = ["{out}/bridge.a"]
+
+[check.retired]
+deck = "world"
+decks = "worlds"
+session = "world"
+sessions = "worlds"
+BridgeC = "Bridge"
+ASM700 = ""
+IdeaTek = ""
+plugin = "module"
+plugins = "modules"
