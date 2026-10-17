@@ -41,6 +41,11 @@ BACKEND_EXPORT int define_func(backend_instance_t *i,
 {
     uint32_t k = 0;
 
+    if (i->m->undefined) {
+        snprintf(err->text, sizeof(err->text), "the tests' backend defines "
+            "no entry '%.100s' for this module", entry->field);
+        return (-1);
+    }
     while (k < TESTS_ENTRIES && strcmp(entry->field, TESTS_ENTRY_NAMES[k]))
         k++;
     if (k == TESTS_ENTRIES || strcmp(entry->ns, BRIDGE_NAMESPACE))

@@ -54,6 +54,8 @@ struct backend_module {
     void *lib;
     void (*keep)(const test_api_t *);
     bool stray;
+    bool insists;
+    bool undefined;
 };
 
 struct backend_func {
@@ -98,7 +100,7 @@ static inline uint64_t tests_enter(const test_api_t *api,
     backend_instance_t *i = tests_get_instance(api);
     uint64_t result = 0;
 
-    if (!i->calling || i->refused || !i->fns[entry])
+    if (!i->calling || (i->refused && !i->m->insists) || !i->fns[entry])
         return (0);
     if (i->calling != os_get_thread_id())
         return (0);

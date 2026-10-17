@@ -304,6 +304,24 @@ defines = ["SPANNED"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "undefined"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/undefined.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "insist"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/insist.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "stray"
 kind = "library"
 test = true

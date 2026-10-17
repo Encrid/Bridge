@@ -14,6 +14,14 @@ static const char *const TESTS_MEMORIES[2] = {
     BRIDGE_PRIVATE
 };
 
+static const backend_import_t TESTS_STRAYS[3] = {
+    { "elsewhere", 9, "number", 6, BACKEND_IMPORT_OTHER, {} },
+    { "bridgf", 6, "shared", 6, BACKEND_IMPORT_MEMORY, {} },
+    { "bridge", 6, "spare", 5, BACKEND_IMPORT_MEMORY, {} }
+};
+
+constexpr uint32_t TESTS_STRAY_COUNT = 64;
+
 BACKEND_EXPORT void memory_release(backend_memory_t *m)
 {
     free(m);
@@ -53,24 +61,34 @@ BACKEND_EXPORT backend_module_t *module_compile([[maybe_unused]] backend_t *b,
     m->keep = (void (*)(const test_api_t *))os_lib_get_symbol(lib,
         "test_keep_table");
     m->stray = os_lib_get_symbol(lib, "test_import_stray") != nullptr;
+    m->insists = os_lib_get_symbol(lib, "test_enter_after_refusal") != nullptr;
+    m->undefined = os_lib_get_symbol(lib, "test_refuse_define") != nullptr;
     return (m);
+}
+
+static backend_import_t get_import(uint32_t strays, uint32_t i)
+{
+    const char *field;
+
+    if (i < strays)
+        return (TESTS_STRAYS[i < 3 ? i : 0]);
+    field = TESTS_MEMORIES[i - strays];
+    return ((backend_import_t){ BRIDGE_NAMESPACE,
+        sizeof(BRIDGE_NAMESPACE) - 1, field, strlen(field),
+        BACKEND_IMPORT_MEMORY, {} });
 }
 
 BACKEND_EXPORT uint32_t module_list_imports(backend_module_t *m,
     backend_import_t *out, uint32_t max)
 {
+    uint32_t strays = m->stray ? TESTS_STRAY_COUNT : 0;
     uint32_t i = 0;
 
-    while (i < 2 && i < max) {
-        out[i] = (backend_import_t){ BRIDGE_NAMESPACE,
-            sizeof(BRIDGE_NAMESPACE) - 1, TESTS_MEMORIES[i],
-            strlen(TESTS_MEMORIES[i]), BACKEND_IMPORT_MEMORY, {} };
+    while (i < strays + 2 && i < max) {
+        out[i] = get_import(strays, i);
         i++;
     }
-    if (m->stray && max > 2)
-        out[2] = (backend_import_t){ "elsewhere", 9, "number", 6,
-            BACKEND_IMPORT_OTHER, {} };
-    return (m->stray ? 3 : 2);
+    return (strays + 2);
 }
 
 BACKEND_EXPORT void module_destroy(backend_module_t *m)
