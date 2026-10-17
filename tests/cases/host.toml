@@ -2857,6 +2857,36 @@ claims = { matches = ["the deployment configures no backend, and a module is run
 false = { run = ["{out}/host{exe}", "attach-tag-with-a-value-refused"] }
 
 [[case]]
+name = "destroy-of-a-bare-id-beside-an-apart-type-done"
+run = ["{out}/host{exe}", "destroy-of-a-bare-id-beside-an-apart-type-done"]
+claims = { matches = ["test:guess@0.1.0: loaded.*test:guess@0.1.0=RUNNING.*alive"], matches_not = ["asked to destroy"] }
+false = { run = ["{out}/host{exe}", "destroy-of-a-carried-id-beside-an-apart-type-refused"] }
+
+[[case]]
+name = "destroy-of-a-carried-id-beside-an-apart-type-refused"
+run = ["{out}/host{exe}", "destroy-of-a-carried-id-beside-an-apart-type-refused"]
+claims = { matches = ["game:hearer@0.1.0: loaded.*test:guess@0.1.0: loaded.*asked to destroy entities that carry nothing it may write. Left as they were: 1.*test:guess@0.1.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "destroy-of-a-bare-id-beside-an-apart-type-done"] }
+
+[[case]]
+name = "destroy-of-an-id-in-a-table-it-cannot-write-refused"
+run = ["{out}/host{exe}", "destroy-of-an-id-in-a-table-it-cannot-write-refused"]
+claims = { matches = ["test:stick@0.1.0: loaded.*test:guess@0.1.0: loaded.*asked to destroy entities that carry nothing it may write. Left as they were: 1.*test:guess@0.1.0=RUNNING.*alive"], matches_not = ["hearer"] }
+false = { run = ["{out}/host{exe}", "destroy-of-a-bare-id-beside-an-apart-type-done"] }
+
+[[case]]
+name = "destroy-of-index-0-is-nothing"
+run = ["{out}/host{exe}", "destroy-of-index-0-is-nothing"]
+claims = { matches = ["test:guess@0.1.0: loaded.*alive"], matches_not = ["asked to destroy", "no entity", "stopped"] }
+false = { run = ["{out}/host{exe}", "destroy-of-a-held-id-refused"] }
+
+[[case]]
+name = "destroy-of-an-index-past-every-entity-is-nothing"
+run = ["{out}/host{exe}", "destroy-of-an-index-past-every-entity-is-nothing"]
+claims = { matches = ["test:guess@0.1.0: loaded.*alive"], matches_not = ["asked to destroy", "no entity", "stopped"] }
+false = { run = ["{out}/host{exe}", "destroy-of-a-held-id-refused"] }
+
+[[case]]
 name = "destroy-of-a-held-id-refused"
 run = ["{out}/host{exe}", "destroy-of-a-held-id-refused"]
 claims = { matches = ["asked to destroy entities that carry nothing it may write. Left as they were: 1.*alive"] }

@@ -26,6 +26,8 @@ static void add_changes(const test_api_t *api)
         1);
     TEST_ADD_SYSTEM(api, "detach_b", "detach_b", &none, 0,
         &nsingle_g, 1);
+    TEST_ADD_SYSTEM(api, "flicker", "flicker", &none, 0,
+        &nsingle_g, 1);
 }
 
 static void add_readers(const test_api_t *api)

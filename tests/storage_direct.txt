@@ -12,6 +12,10 @@ look_b
 near
   near: by id: alive, and of them given D 6 3
   near: by id: the sum of D 306 0
+flicker
+look_b
+  look_b: the table walked: rows, and of them given D 6 3
+  look_b: the table walked: the sum of A and D where both 312 0
 value_b
   heard_d: heard of D: entity, events 3 2
   heard_both: heard of A and D: entity, events 3 2

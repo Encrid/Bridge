@@ -12,7 +12,7 @@ static const char *const DIRECT_GIVEN[] = {
 };
 
 static const char *const DIRECT_KEPT[] = {
-    "value_b", "near", "detach_b_half", "look_b", "destroy_half", "look_b",
+    "flicker", "look_b", "value_b", "near", "detach_b_half", "look_b", "destroy_half", "look_b",
     "near", "respawn_half", "look_b", "near", "detach_b", "look_b", "destroy",
     "look_b", nullptr
 };

@@ -17,6 +17,7 @@ static void add_changes(const test_api_t *api)
         &ndirect_d, 1);
     TEST_ADD_SYSTEM(api, "detach_b", "detach_b", &none, 0,
         &ndirect_d, 1);
+    TEST_ADD_SYSTEM(api, "flicker", "flicker", &none, 0, &ndirect_d, 1);
     TEST_ADD_SYSTEM(api, "detach_b_half", "detach_b_half", &none, 0,
         &ndirect_d, 1);
     TEST_ADD_SYSTEM(api, "value_b", "value_b", &none, 0, &ndirect_d,

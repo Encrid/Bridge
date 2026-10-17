@@ -61,6 +61,15 @@ TEST_MEASURED TEST(detach_b)
     return (0);
 }
 
+TEST(flicker)
+{
+    d_t value = { 7 };
+
+    TEST_ATTACH(api, ndirect_ids[1], ndirect_d, value);
+    api->detach(api, ndirect_ids[1], ndirect_d);
+    return (0);
+}
+
 TEST(destroy)
 {
     uint32_t i = 0;

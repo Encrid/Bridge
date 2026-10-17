@@ -36,6 +36,15 @@ TEST(work)
     return (0);
 }
 
+TEST(flicker)
+{
+    g_t value = { 30, 3 };
+
+    TEST_ATTACH(api, 0, nsingle_g, value);
+    api->detach(api, 0, nsingle_g);
+    return (0);
+}
+
 TEST(detach_b)
 {
     api->detach(api, 0, nsingle_g);

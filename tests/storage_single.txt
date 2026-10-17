@@ -15,6 +15,9 @@ detach_b
   heard_g: heard of it: the id, events 0 4
 look
   look: it has no value 0 0
+flicker
+look
+  look: it has no value 0 0
 attach_a
   heard_g: heard of it: the id, events 0 3
 look

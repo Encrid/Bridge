@@ -1496,6 +1496,26 @@ defines = ["TARGET=1"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "guess-zero"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/guess.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["TARGET=0"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "guess-far"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/guess.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["TARGET=4000"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "guess-held"
 kind = "library"
 test = true

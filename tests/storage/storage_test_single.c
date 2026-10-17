@@ -10,8 +10,8 @@ static const char *const SINGLE_GIVEN[] = {
 };
 
 static const char *const SINGLE_KEPT[] = {
-    "value_a", "look", "work", "look", "detach_b", "look", "attach_a", "look",
-    nullptr
+    "value_a", "look", "work", "look", "detach_b", "look", "flicker", "look",
+    "attach_a", "look", nullptr
 };
 
 static int give_once(storage_test_t *t, const char *path)
