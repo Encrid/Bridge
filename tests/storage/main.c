@@ -14,7 +14,7 @@ static const char *const PHASES[] = {
     "detach_b_half", "detach_b_absent", "value_a", "flicker", "destroy_half",
     "respawn_half", "touch_dead", "attach_a_half", "recycled", "combine",
     "look", "never", "work", "check", "attach_both", "scribble", "find",
-    "value_b", "look_b", "walk", "flag", "near", "far", "one"
+    "value_b", "look_b", "walk", "flag", "near", "far", "one", "stale"
 };
 
 static const bridge_setting_t KEEPS[4] = {
@@ -58,6 +58,8 @@ static const storage_test_room_t DIRECT = { BACKENDS + 1, 1, 1, 32'768,
     64 << 20, BRIDGE_NONE, 1, false };
 static const storage_test_room_t DIRECT_1024 = { BACKENDS + 1, 1, 1, 32'768,
     1024, BRIDGE_NONE, 1, false };
+static const storage_test_room_t ONE_SET_TWO_DIRECT = { BACKENDS + 1, 1, 1,
+    32'768, 64 << 20, 1, 2, false };
 static const storage_test_room_t ONE_OF_EACH = { BACKENDS + 1, 1, 1, 32'768,
     64 << 20, 1, 1, false };
 
@@ -76,6 +78,8 @@ static const storage_test_case_t CASES[] = {
     { "manytypes", storage_test_count_types, &PLAIN },
     { "manyall", storage_test_count_all, &PLAIN },
     { "manymove", storage_test_move_many, &PLAIN },
+    { "manygrow", storage_test_grow_many, &PLAIN },
+    { "generation", storage_test_wrap_generation, &PLAIN },
     { "twosingles", storage_test_give_two_singles, &PLAIN },
     { "fulllist", storage_test_fill_list, &ONE_TABLE },
     { "levels", storage_test_count_levels, &PLAIN },
@@ -83,10 +87,12 @@ static const storage_test_case_t CASES[] = {
     { "changes", storage_test_change, &PLAIN },
     { "tables", storage_test_make_tables, &PLAIN },
     { "notables", storage_test_use_up_tables, &ONE_TABLE },
+    { "notablesstale", storage_test_use_up_tables, &ONE_TABLE },
     { "nocolumns", storage_test_use_up_columns, &COLUMNS_64 },
     { "scribble", storage_test_scribble, &PLAIN },
     { "strip", storage_test_strip, &PLAIN },
     { "stripfull", storage_test_strip_full, &COLUMNS_160 },
+    { "stripfulltwice", storage_test_strip_full, &COLUMNS_160 },
     { "layout", storage_test_relay, &PLAIN },
     { "move", storage_test_move, &PLAIN },
     { "tag", storage_test_tag, &ONE_OF_EACH },
@@ -101,6 +107,7 @@ static const storage_test_case_t CASES[] = {
     { "directnone", storage_test_drop_direct, &PLAIN },
     { "directfull", storage_test_drop_direct, &DIRECT_1024 },
     { "directbad", storage_test_drop_direct, &DIRECT },
+    { "directsweepfree", storage_test_drop_direct, &ONE_SET_TWO_DIRECT },
     { "togglefull", storage_test_toggle_full, &COLUMNS_112 },
     { "toggle", storage_test_toggle, &PLAIN },
     { "sparse", storage_test_join_sparse, &SPARSE },

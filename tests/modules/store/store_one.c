@@ -31,6 +31,18 @@ TEST(flicker)
     return (0);
 }
 
+TEST(stale)
+{
+    uint32_t i = COUNT / 2;
+
+    while (i < COUNT) {
+        api->attach(api, nstore_ids[i], nstore_b, BRIDGE_ZEROED);
+        api->attach(api, nstore_old[i], nstore_b, BRIDGE_ZEROED);
+        i++;
+    }
+    return (0);
+}
+
 TEST(touch_dead)
 {
     api->attach(api, nstore_old[COUNT - 1], nstore_a, BRIDGE_ZEROED);

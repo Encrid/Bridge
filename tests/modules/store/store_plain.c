@@ -32,6 +32,7 @@ static void add_last_changes(const test_api_t *api)
 
     TEST_ADD_SYSTEM(api, "touch_dead", "touch_dead", &none, 0,
         &nstore_a, 1);
+    TEST_ADD_SYSTEM(api, "stale", "stale", &none, 0, &nstore_b, 1);
     TEST_ADD_SYSTEM(api, "recycled", "recycled", &none, 0, nullptr,
         0);
     TEST_ADD_SYSTEM(api, "attach_a_half", "attach_a_half", &none, 0,

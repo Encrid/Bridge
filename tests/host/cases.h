@@ -169,6 +169,10 @@ void test_declare_other_layout(host_t *h);
 void test_declare_other_storage(host_t *h);
 void test_declare_ungranted(host_t *h);
 void test_reach_direct(host_t *h);
+
+void test_declare_huge(host_t *h);
+
+void test_grow_past_room(host_t *h);
 void test_count_toggled(host_t *h);
 void test_walk_sparse(host_t *h);
 void test_state_bad_term(host_t *h);

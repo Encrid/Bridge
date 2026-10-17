@@ -11,7 +11,8 @@ static void state_twice(const host_t *h, bridge_artifact_t *a,
     const char *identity)
 {
     host_state_plain(a, identity, nullptr);
-    host_name_module(a, "reload-takes");
+    host_name_module(a, strstr(h->arg, "marked") ? "reload-takes-marked"
+        : "reload-takes");
     if (!strcmp(h->arg, "guarded"))
         host_state_guarded(a, identity, "reload-takes");
     a->cfg.reloadable = BRIDGE_TRUE;

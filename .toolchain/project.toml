@@ -1398,6 +1398,46 @@ defines = ["BRIDGE_ROWS_CHECKED"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "reload-takes-marked"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/reload_takes.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["MARKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "huge"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/huge.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "huge-grown"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/huge.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=2"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "huge-direct"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/huge.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["V=3"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "reload-takes"
 kind = "library"
 test = true

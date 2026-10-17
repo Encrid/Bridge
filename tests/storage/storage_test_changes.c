@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <string.h>
+
 #include "storage_test.h"
 
 static const char *const CHANGES[] = {
@@ -22,6 +24,11 @@ static const char *const TABLES[] = {
 static const char *const NO_TABLES[] = {
     "spawn", "attach_a", "attach_b_half", "look", "attach_b_half",
     "attach_b_half", "look", nullptr
+};
+
+static const char *const NO_TABLES_STALE[] = {
+    "spawn", "attach_a", "destroy_half", "respawn_half", "stale", "look",
+    nullptr
 };
 
 static const char *const NO_COLUMNS[] = {
@@ -62,7 +69,8 @@ enum storage_test_end storage_test_use_up_tables(storage_test_t *t)
     a.cfg.max_system_failures = 2;
     if (storage_test_load(t, &a))
         return (STORAGE_TEST_FAILED);
-    storage_test_run_all(t, NO_TABLES);
+    storage_test_run_all(t, strcmp(t->what, "notables") ? NO_TABLES_STALE
+        : NO_TABLES);
     return (STORAGE_TEST_DONE);
 }
 

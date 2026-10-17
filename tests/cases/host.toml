@@ -2425,6 +2425,24 @@ claims = { matches = ["/say: kept in the arena 0 0\\s+alive"] }
 false = { run = ["{out}/host{exe}", "record.barriers-the-count-it-was-said-after"] }
 
 [[case]]
+name = "bridge_reload-id-the-old-shutdown-marked-handed-out-with-its-table"
+run = ["{out}/host{exe}", "bridge_reload-id-the-old-shutdown-marked-handed-out-with-its-table"]
+claims = { matches = ["dup:twice@0.1.0: loaded.*shutdown took 1 .*reload took 2 .*dup:twice@0.2.0: reloaded.*dup:twice@0.2.0=RUNNING.*alive"], matches_not = ["refused", "stopped"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-table-past-an-offset-refused"] }
+
+[[case]]
+name = "BRIDGE_DIRECT_INDEXED-cells-past-an-offset-refused"
+run = ["{out}/host{exe}", "BRIDGE_DIRECT_INDEXED-cells-past-an-offset-refused"]
+claims = { matches = ["module 'test:huge-direct@0.1.0' did not load: type 'test:Huge' is direct-indexed, and \\[budget\\] columns of 1048576 bytes has no room for a cell of 524288 bytes for each of 4096 entities.*alive"] }
+false = { run = ["{out}/host{exe}", "BRIDGE_DIRECT_INDEXED-reached-from-rows"] }
+
+[[case]]
+name = "bridge_reload-table-past-an-offset-refused"
+run = ["{out}/host{exe}", "bridge_reload-table-past-an-offset-refused"]
+claims = { matches = ["module 'test:huge@0.2.0' was not reloaded: what it keeps another way, 1 of its components, could not be moved: \\[budget\\] tables of 64 or \\[budget\\] columns of 1048576 bytes has no room for the rows where they are to go, while they are still where they were.*test:huge@0.1.0=STOPPED.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-id-the-old-shutdown-marked-handed-out-with-its-table"] }
+
+[[case]]
 name = "bridge_reload-old-shutdown-takes-before-the-new-reload"
 run = ["{out}/host{exe}", "bridge_reload-old-shutdown-takes-before-the-new-reload"]
 claims = { matches = ["shutdown took 1 (\\d+).*reload took 2 (?!\\1\\b)\\d+.*alive"] }

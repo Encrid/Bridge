@@ -35,6 +35,12 @@ claims = { output = "tests/storage_notables.txt" }
 false = { run = ["{out}/storage{exe}", "nocolumns"] }
 
 [[case]]
+name = "change-of-a-stale-id-beside-a-dropped-change-of-its-index"
+run = ["{out}/storage{exe}", "notablesstale"]
+claims = { matches = ["respawn_half.*stale.*\\[budget\\] tables of 1 is used up. Not applied, of the changes it asked: 3 .*look: with A: spans, rows 1 3.*alive"] }
+false = { run = ["{out}/storage{exe}", "notables"] }
+
+[[case]]
 name = "storage-nocolumns"
 run = ["{out}/storage{exe}", "nocolumns"]
 claims = { output = "tests/storage_nocolumns.txt" }
@@ -51,6 +57,30 @@ name = "storage-strip"
 run = ["{out}/storage{exe}", "strip"]
 claims = { output = "tests/storage_strip.txt" }
 false = { run = ["{out}/storage{exe}", "stripfull"] }
+
+[[case]]
+name = "BRIDGE_STRIP-second-strip-of-an-unnamed-table"
+run = ["{out}/storage{exe}", "stripfulltwice"]
+claims = { matches = ["'st:B' is stripped, and 3 rows stay in a second table of their archetype.*strip st:A.*look: with A: spans, rows 0 0.*alive"] }
+false = { run = ["{out}/storage{exe}", "stripfull"] }
+
+[[case]]
+name = "BRIDGE_SWEEP-keeps-entities-with-a-direct-type-beside-free-slots"
+run = ["{out}/storage{exe}", "directsweepfree"]
+claims = { matches = ["sweep st:A.*entity 1 is alive.*entity 2 is gone.*entity 3 is alive.*entity 4 is gone.*entity 5 is alive.*entity 6 is gone.*near: by id: alive, and of them given D 3 3.*alive"] }
+false = { run = ["{out}/storage{exe}", "directsweep"] }
+
+[[case]]
+name = "table-of-65-types-grown-in-a-second-barrier"
+run = ["{out}/storage{exe}", "manygrow"]
+claims = { matches = ["after two spawns: 65 types, 65 of them carried by each of the 8 entities.*alive"] }
+false = { run = ["{out}/storage{exe}", "manymove"] }
+
+[[case]]
+name = "entity-generation-after-the-last-wraps-to-1"
+run = ["{out}/storage{exe}", "generation"]
+claims = { matches = ["index 1, killed at generation 4294967294, comes back at generation 1.*alive"] }
+false = { run = ["{out}/storage{exe}", "manygrow"] }
 
 [[case]]
 name = "storage-stripfull"

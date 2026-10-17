@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <string.h>
+
 #include "storage_test.h"
 
 static const char *const STRIP_TWO_TABLES[] = {
@@ -47,6 +49,11 @@ enum storage_test_end storage_test_strip_full(storage_test_t *t)
         return (STORAGE_TEST_FAILED);
     storage_test_run_all(t, FULL_BEFORE);
     storage_test_drop(t, "st:B", BRIDGE_STRIP);
+    if (!strcmp(t->what, "stripfulltwice")) {
+        storage_test_drop(t, "st:A", BRIDGE_STRIP);
+        storage_test_run(t, "look");
+        return (STORAGE_TEST_DONE);
+    }
     storage_test_run_all(t, FULL_AFTER);
     return (STORAGE_TEST_DONE);
 }

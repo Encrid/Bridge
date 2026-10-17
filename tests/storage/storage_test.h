@@ -178,6 +178,8 @@ enum storage_test_end storage_test_point_query_away(storage_test_t *t);
 enum storage_test_end storage_test_count_types(storage_test_t *t);
 enum storage_test_end storage_test_count_all(storage_test_t *t);
 enum storage_test_end storage_test_move_many(storage_test_t *t);
+enum storage_test_end storage_test_grow_many(storage_test_t *t);
+enum storage_test_end storage_test_wrap_generation(storage_test_t *t);
 enum storage_test_end storage_test_give_two_singles(storage_test_t *t);
 enum storage_test_end storage_test_fill_list(storage_test_t *t);
 enum storage_test_end storage_test_count_levels(storage_test_t *t);

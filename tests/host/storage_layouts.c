@@ -19,6 +19,32 @@ void test_reach_direct(host_t *h)
     host_close(h);
 }
 
+void test_declare_huge(host_t *h)
+{
+    h->cfg.budget.direct_indexed = 1;
+    test_load_named(h);
+}
+
+void test_grow_past_room(host_t *h)
+{
+    bridge_artifact_t a;
+
+    if (host_open(h))
+        return;
+    host_state_plain(&a, "test:huge@0.1.0", nullptr);
+    host_name_module(&a, "huge");
+    a.cfg.spawns = 2;
+    a.cfg.reloadable = BRIDGE_TRUE;
+    a.cfg.hot_reload = BRIDGE_TRUE;
+    host_load(h, &a);
+    host_run_frames(h, 1);
+    a.cfg.identity = "test:huge@0.2.0";
+    host_name_module(&a, "huge-grown");
+    host_reload(h, &a);
+    test_say_modules(h);
+    host_close(h);
+}
+
 void test_count_toggled(host_t *h)
 {
     bridge_artifact_t a;
