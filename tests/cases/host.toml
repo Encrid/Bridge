@@ -1915,6 +1915,18 @@ claims = { matches = ["the world has stopped: module 'view:sour@0\\.1\\.0' was s
 false = { run = ["{out}/host{exe}", "bridge_reload-share-from-none-taken"] }
 
 [[case]]
+name = "bridge_reload-colliding-fingerprint-of-a-held-struct-relaid-and-refused"
+run = ["{out}/host{exe}", "bridge_reload-colliding-fingerprint-of-a-held-struct-relaid-and-refused"]
+claims = { matches = ["st:collide@0.1.0: loaded.*module 'st:collide@0.2.0' was not reloaded: field 'st:X\\.y\\.v' is of another type than it was, and bytes of one type are not a value of another.*st:collide@0.1.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-colliding-fingerprint-of-a-held-enum-relaid-and-refused"] }
+
+[[case]]
+name = "bridge_reload-colliding-fingerprint-of-a-held-enum-relaid-and-refused"
+run = ["{out}/host{exe}", "bridge_reload-colliding-fingerprint-of-a-held-enum-relaid-and-refused"]
+claims = { matches = ["st:collide@0.1.0: loaded.*module 'st:collide@0.2.0' was not reloaded: field 'st:X\\.y' is of another type than it was, and bytes of one type are not a value of another.*st:collide@0.1.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-colliding-fingerprint-of-a-held-struct-relaid-and-refused"] }
+
+[[case]]
 name = "module_config.identity-none-refused"
 run = ["{out}/host{exe}", "module_config.identity-none-refused"]
 claims = { matches = ["a module with no identity is refused.*alive"] }

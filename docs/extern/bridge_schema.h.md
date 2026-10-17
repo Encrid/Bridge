@@ -90,6 +90,7 @@ The fingerprint is the 64-bit FNV-1a hash of the descriptor, XOR the kind.
 FNV-1a is not a cryptographic hash, so an author can make two descriptors with one fingerprint.
 Bridge then takes them as one layout.
 It still refuses another size or alignment of a type that it holds, and a move to another storage layout copies the smaller size.
+When a reload lays out again a component that holds such a type, a field of another type in it is refused.
 So such a pair changes how a module reads the bytes of the type, and nothing more than its grants allow.
 
 ## Messages

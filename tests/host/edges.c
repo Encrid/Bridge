@@ -88,6 +88,23 @@ void test_reload_into_conflict(host_t *h)
     host_close(h);
 }
 
+void test_reload_colliding(host_t *h)
+{
+    bridge_artifact_t a;
+    char moved[32];
+
+    if (host_open(h))
+        return;
+    test_state_ticker(&a, "st:collide@0.1.0", h->arg);
+    host_load(h, &a);
+    host_run_frames(h, 1);
+    snprintf(moved, sizeof(moved), "%s-moved", h->arg);
+    test_state_ticker(&a, "st:collide@0.2.0", moved);
+    host_reload(h, &a);
+    test_say_modules(h);
+    host_close(h);
+}
+
 void test_reload_then_stop(host_t *h)
 {
     bridge_artifact_t a;

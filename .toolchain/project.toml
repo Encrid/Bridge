@@ -494,6 +494,46 @@ defines = ["BRIDGE_ROWS_CHECKED"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "collide-struct"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/collide.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "V=1", "NAME=puviutcw5s5udo"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "collide-struct-moved"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/collide.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "V=2", "NAME=plxytbt2tg4x3m"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "collide-enum"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/collide.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "V=3", "NAME=Eqiwr4en1gbdeg"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "collide-enum-moved"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/collide.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "V=4", "NAME=En4nwwglif1zfp"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "marker"
 kind = "library"
 test = true
