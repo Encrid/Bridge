@@ -9,14 +9,16 @@
 
 #ifdef COUNTED
 
-static void use_module(bridge_t *b, const bridge_artifact_t *a)
+static void use_module(bridge_t *b, bridge_artifact_t a)
 {
     (void)bridge_run_phase(b, "spawn");
     (void)bridge_run_phase(b, "attach_a");
     (void)bridge_run_phase(b, "attach_b_half");
-    (void)bridge_reload(b, a);
+    a.cfg.spawns = 2;
+    a.cfg.persistent = 64;
+    (void)bridge_reload(b, &a);
     (void)bridge_run_phase(b, "look");
-    (void)bridge_unload(b, a->cfg.identity);
+    (void)bridge_unload(b, a.cfg.identity);
 }
 
 static bool refuse_one(storage_test_t *t, size_t k)
@@ -36,7 +38,7 @@ static bool refuse_one(storage_test_t *t, size_t k)
     a.cfg.reloadable = BRIDGE_TRUE;
     a.cfg.hot_reload = BRIDGE_TRUE;
     if (!bridge_load(t->b, &a))
-        use_module(t->b, &a);
+        use_module(t->b, a);
     (void)bridge_destroy(t->b);
     return (allocator->failed);
 }

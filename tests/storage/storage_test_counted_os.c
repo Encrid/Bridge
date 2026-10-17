@@ -25,9 +25,18 @@ HANDLE counted_create_thread(LPSECURITY_ATTRIBUTES attributes, SIZE_T stack,
     return (CreateThread(attributes, stack, start, arg, flags, id));
 }
 
+LPVOID WINAPI counted_virtual_alloc(LPVOID at, SIZE_T size, DWORD type,
+    DWORD protect)
+{
+    if (storage_test_count_request())
+        return (nullptr);
+    return (VirtualAlloc(at, size, type, protect));
+}
+
     #else
         #include <errno.h>
         #include <pthread.h>
+        #include <sys/mman.h>
 
 int counted_pthread_create(pthread_t *thread, const pthread_attr_t *attributes,
     void *(*start)(void *), void *arg)
@@ -50,6 +59,14 @@ int counted_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attributes
     if (storage_test_count_request())
         return (ENOMEM);
     return (pthread_cond_init(cond, attributes));
+}
+
+int counted_mprotect(void *at, size_t len, int protect)
+{
+    if (!storage_test_count_request())
+        return (mprotect(at, len, protect));
+    errno = ENOMEM;
+    return (-1);
 }
 
     #endif

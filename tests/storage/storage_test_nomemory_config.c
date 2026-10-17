@@ -24,6 +24,19 @@ static const bridge_setting_t SETTINGS[10] = {
 
 static const char *const UPDATE[1] = { "update" };
 
+static const char *const READ[2] = { "view", "menu" };
+
+static const bridge_order_t ORDER[1] = {{ "game:first:tick",
+    "game:second:tock" }};
+
+static void load_other(bridge_t *b, bridge_artifact_t a)
+{
+    a.cfg.identity = "game:other@0.1.0";
+    a.cfg.read = READ;
+    a.cfg.read_count = 2;
+    (void)bridge_load(b, &a);
+}
+
 static bool load_configured(storage_test_t *t, size_t k)
 {
     storage_test_allocator_t *allocator = storage_test_get_allocator();
@@ -35,15 +48,19 @@ static bool load_configured(storage_test_t *t, size_t k)
     t->said_memory = 0;
     t->cfg.phases = UPDATE;
     t->cfg.phase_count = 1;
+    t->cfg.order = ORDER;
+    t->cfg.order_count = 1;
     t->b = bridge_create(&t->cfg, storage_test_hear_memory, t);
     if (!t->b)
         return (allocator->failed);
+    load_other(t->b, a);
     a.cfg.identity = "game:settings@0.1.0";
     a.cfg.config = "game:Settings";
     a.cfg.settings = SETTINGS;
     a.cfg.setting_count = 10;
-    a.cfg.persistent = 64;
+    a.cfg.persistent = 128;
     (void)bridge_load(t->b, &a);
+    (void)bridge_unload(t->b, a.cfg.identity);
     (void)bridge_destroy(t->b);
     return (allocator->failed);
 }
