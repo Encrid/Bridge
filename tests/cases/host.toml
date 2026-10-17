@@ -107,6 +107,24 @@ claims = { matches = ["test:ok@0.1.0: loaded.*the world has stopped: module 'tes
 false = { run = ["{out}/host{exe}", "backend.library-cannot-open-refused"] }
 
 [[case]]
+name = "backend.library-with-a-backslash-cannot-open-refused"
+run = ["{out}/host{exe}", "backend.library-with-a-backslash-cannot-open-refused"]
+claims = { matches = ["backend 'guarded': cannot open backend library 'no\\\\such-backend-library'.*bridge_create refused.*alive"] }
+false = { run = ["{out}/host{exe}", "backend.library-path-of-40000-bytes-refused"] }
+
+[[case]]
+name = "backend.library-path-of-40000-bytes-refused"
+run = ["{out}/host{exe}", "backend.library-path-of-40000-bytes-refused"]
+claims = { matches = ["backend 'guarded': cannot open backend library 'C:/a{200}.*bridge_create refused.*alive"] }
+false = { run = ["{out}/host{exe}", "backend.library-cannot-open-refused"] }
+
+[[case]]
+name = "backend.library-path-of-260-bytes-refused"
+run = ["{out}/host{exe}", "backend.library-path-of-260-bytes-refused"]
+claims = { matches = ["backend 'guarded': cannot open backend library 'C:/a{200}.*bridge_create refused.*alive"] }
+false = { run = ["{out}/host{exe}", "backend.library-with-a-backslash-cannot-open-refused"] }
+
+[[case]]
 name = "backend.library-cannot-open-refused"
 run = ["{out}/host{exe}", "backend.library-cannot-open-refused"]
 claims = { matches = ["backend 'guarded': cannot open backend library 'no-such-backend-library'.*bridge_create refused.*alive"] }
@@ -201,6 +219,12 @@ name = "module_config.spans-a-multiple-of-8-taken"
 run = ["{out}/host{exe}", "module_config.spans-a-multiple-of-8-taken"]
 claims = { matches = ["test:spare@0.1.0: loaded.*modules: test:spare@0.1.0=RUNNING.*alive"] }
 false = { run = ["{out}/host{exe}", "module_config.spans-rounded-up-to-8-refused"] }
+
+[[case]]
+name = "module_config.spans-with-no-room-to-round-the-match-stopped"
+run = ["{out}/host{exe}", "module_config.spans-with-no-room-to-round-the-match-stopped"]
+claims = { matches = ["module 'test:spare@0.1.0' is stopped: what its queries match no longer fits in its spans of 284 bytes.*test:spare@0.1.0=STOPPED.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.spans-a-multiple-of-8-taken"] }
 
 [[case]]
 name = "module_config.persistent-rounded-up-to-8-refused"
@@ -1211,6 +1235,30 @@ name = "budget.sparse_sets-beyond-32-bits-refused"
 run = ["{out}/host{exe}", "budget.sparse_sets-beyond-32-bits-refused"]
 claims = { matches = [".budget. cannot be satisfied: sparse_sets of 16777216, with four bytes for each of 4096 entities, is more than an offset of 32 bits can reach.*alive"] }
 false = { run = ["{out}/host{exe}", "budget.direct_indexed-unset-refused"] }
+
+[[case]]
+name = "budget.sparse_sets-past-a-count-of-32-bits-refused"
+run = ["{out}/host{exe}", "budget.sparse_sets-past-a-count-of-32-bits-refused"]
+claims = { matches = [".budget. sparse_sets is 4294967296, which is neither a count nor none.*alive"] }
+false = { run = ["{out}/host{exe}", "budget.persistent-past-32-bits-refused"] }
+
+[[case]]
+name = "budget.persistent-past-32-bits-refused"
+run = ["{out}/host{exe}", "budget.persistent-past-32-bits-refused"]
+claims = { matches = [".budget. persistent of 4294967296 is more than an offset of 32 bits can reach.*alive"] }
+false = { run = ["{out}/host{exe}", "budget.columns-past-32-bits-refused"] }
+
+[[case]]
+name = "budget.columns-past-32-bits-refused"
+run = ["{out}/host{exe}", "budget.columns-past-32-bits-refused"]
+claims = { matches = [".budget. columns of 4294967296 is more than an offset of 32 bits can reach.*alive"] }
+false = { run = ["{out}/host{exe}", "budget.sparse_sets-past-a-count-of-32-bits-refused"] }
+
+[[case]]
+name = "record.line-outside-the-scratch-or-of-no-system-replaced"
+run = ["{out}/host{exe}", "record.line-outside-the-scratch-or-of-no-system-replaced"]
+claims = { matches = ["record\\[7\\] test:s5@0.1.0/-: \\(a log line whose text lies outside the scratch arena\\) 0 0.*record\\[7\\] test:s5@0.1.0/shout: \\(a log line whose text lies outside the scratch arena\\) 0 0.*alive"] }
+false = { run = ["{out}/host{exe}", "record.level-above-seven-given-as-seven"] }
 
 [[case]]
 name = "budget.direct_indexed-unset-refused"

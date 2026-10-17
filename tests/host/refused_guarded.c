@@ -5,6 +5,8 @@
 */
 #include <stdio.h>
 
+#include <string.h>
+
 #include "cases.h"
 
 void test_create_no_sink(host_t *h)
@@ -41,9 +43,24 @@ void test_name_no_backend(host_t *h)
     host_close(h);
 }
 
+static const char *get_library(const char *what)
+{
+    static char path[40'001];
+    size_t len = strcmp(what, "long") ? 260 : 40'000;
+
+    if (!strcmp(what, "nolib"))
+        return ("no-such-backend-library");
+    if (!strcmp(what, "backslash"))
+        return ("no\\such-backend-library");
+    memset(path, 'a', len);
+    memcpy(path, "C:/", 3);
+    path[len] = '\0';
+    return (path);
+}
+
 void test_open_no_library(host_t *h)
 {
-    h->backends[0].library = "no-such-backend-library";
+    h->backends[0].library = get_library(h->arg);
     if (host_open(h))
         return;
     test_load_small(h, h->arg);

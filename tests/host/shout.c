@@ -11,7 +11,7 @@ void test_log_out_of_range(host_t *h)
 
     if (host_open(h))
         return;
-    host_state_guarded(&a, "test:s5@0.1.0", "shout");
+    host_state_guarded(&a, "test:s5@0.1.0", *h->arg ? h->arg : "shout");
     host_load(h, &a);
     (void)bridge_run_phase(h->b, "update");
     host_close(h);

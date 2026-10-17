@@ -8,6 +8,7 @@
 #include "cases.h"
 
 constexpr int64_t BEYOND = 1ll << 24;
+constexpr int64_t PAST = 1ll << 32;
 
 static const test_edit_t TEST_DEPLOYMENT_EDITS[] = {
     { "backends=0", offsetof(bridge_config_t, backend_count), 4, 0 },
@@ -19,6 +20,11 @@ static const test_edit_t TEST_DEPLOYMENT_EDITS[] = {
         -5 },
     { "sparse_sets=beyond", offsetof(bridge_config_t, budget.sparse_sets),
         8, BEYOND },
+    { "sparse_sets=past", offsetof(bridge_config_t, budget.sparse_sets),
+        8, PAST },
+    { "persistent=past", offsetof(bridge_config_t, budget.persistent), 8,
+        PAST },
+    { "columns=past", offsetof(bridge_config_t, budget.columns), 8, PAST },
     { "direct_indexed=0", offsetof(bridge_config_t, budget.direct_indexed),
         8, 0 },
     { "direct_indexed=no limit",

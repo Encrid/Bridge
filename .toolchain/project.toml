@@ -294,6 +294,16 @@ include = ["include", "tests/binding", "tests/modules"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "spare-spanned"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/spare.c", "tests/modules/idle.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["SPANNED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "stray"
 kind = "library"
 test = true
@@ -1513,6 +1523,16 @@ folder = "built"
 sources = ["tests/modules/places.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
 include = ["include", "tests/binding", "tests/modules"]
 defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "shout-forged"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/shout.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "FORGED"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
