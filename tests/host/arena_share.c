@@ -86,3 +86,24 @@ void test_use_arena(host_t *h)
     host_run_frames(h, 1);
     host_close(h);
 }
+
+void test_scan_shares(host_t *h)
+{
+    bridge_artifact_t a;
+
+    h->cfg.budget.persistent = 128;
+    if (host_open(h))
+        return;
+    load_namer(h);
+    test_load_guarded(h, "game:nested@0.1.0", "nested");
+    test_load_guarded_minting(h, "game:blank@0.1.0", "namer-blank");
+    test_state_guarded_minting(&a, "game:ticker@0.1.0", "ticker");
+    a.cfg.persistent = 64;
+    host_load(h, &a);
+    host_run_frames(h, 1);
+    host_unload(h, "game:ticker@0.1.0");
+    a.cfg.identity = "game:ticker@0.2.0";
+    host_load(h, &a);
+    host_unload(h, "game:namer@0.1.0");
+    host_close(h);
+}

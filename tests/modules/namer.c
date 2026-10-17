@@ -45,5 +45,9 @@ BRIDGE_EXPORT(init) int init(void)
     acc_to_shared(n.text.at, HELLO, n.text.len);
     BRIDGE_ATTACH(bridge_spawn(), name, n);
 #endif
+#ifdef BLANK
+    n.text.len = 0;
+    BRIDGE_ATTACH(bridge_spawn(), name, n);
+#endif
     return (0);
 }

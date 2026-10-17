@@ -354,6 +354,10 @@ void test_repair_by_load(host_t *h);
 void test_revive(host_t *h);
 void test_allow_not_reloadable(host_t *h);
 void test_leave_reload_out(host_t *h);
+
+void test_leave_shutdown_out(host_t *h);
+
+void test_scan_shares(host_t *h);
 void test_reload_nothing(host_t *h);
 void test_state_plain_timeout(host_t *h);
 void test_reload_plain(host_t *h);

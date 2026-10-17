@@ -985,6 +985,12 @@ claims = { matches = ["module 'test:noreload@0.1.0' did not load: no exported fu
 false = { run = ["{out}/host{exe}", "module_config.reloadable-false-with-hot-reload-refused"] }
 
 [[case]]
+name = "bridge_load-no-shutdown-export"
+run = ["{out}/host{exe}", "bridge_load-no-shutdown-export"]
+claims = { matches = ["module 'test:noshutdown@0.1.0' did not load: no exported function 'module_shutdown'.*test:noshutdown@0.1.0: not loaded.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_load-no-reload-export"] }
+
+[[case]]
 name = "module_config.reloadable-false-with-hot-reload-refused"
 run = ["{out}/host{exe}", "module_config.reloadable-false-with-hot-reload-refused"]
 claims = { matches = ["module 'game:twostep@0.1.0' is refused: hot_reload is stated, and its author states it is not reloadable.*alive"] }
@@ -1157,6 +1163,12 @@ name = "bridge_unload-share-kept-while-pointed-into"
 run = ["{out}/host{exe}", "bridge_unload-share-kept-while-pointed-into"]
 claims = { matches = ["module 'game:namer@0.1.0' is unloaded and its share of the persistent arena, 64 bytes, stays: 'game:Name' holds a string in it, in this many rows: 1.*game:namer@0.1.0: unloaded.*game:reader@0.1.0/say: kept in the arena.*module 'game:ticker@0.1.0' is refused: its persistent of 64 bytes does not fit in the 0 left of .budget. persistent.*game:reader@0.1.0/say: kept in the arena.*alive"] }
 false = { run = ["{out}/host{exe}", "bridge_destroy-shuts-down-what-is-loaded"] }
+
+[[case]]
+name = "bridge_unload-share-given-back-past-strings-of-other-shares"
+run = ["{out}/host{exe}", "bridge_unload-share-given-back-past-strings-of-other-shares"]
+claims = { matches = ["game:nested@0.1.0/read: body 2 2.*game:ticker@0.1.0: unloaded.*game:ticker@0.2.0: loaded.*module 'game:namer@0.1.0' is unloaded and its share of the persistent arena, 64 bytes, stays: 'game:Name' holds a string in it, in this many rows: 1 .*alive"], matches_not = ["module 'game:ticker@0.1.0' is unloaded and its share"] }
+false = { run = ["{out}/host{exe}", "bridge_unload-share-kept-while-pointed-into"] }
 
 [[case]]
 name = "bridge_destroy-shuts-down-what-is-loaded"

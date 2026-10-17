@@ -61,3 +61,11 @@ void test_leave_reload_out(host_t *h)
     test_load_spawnless(h, "test:noreload@0.1.0", "noreload");
     host_close(h);
 }
+
+void test_leave_shutdown_out(host_t *h)
+{
+    if (host_open(h))
+        return;
+    test_load_spawnless(h, "test:noshutdown@0.1.0", "noshutdown");
+    host_close(h);
+}

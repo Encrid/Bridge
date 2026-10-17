@@ -285,6 +285,15 @@ include = ["include", "tests/binding", "tests/modules"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "noshutdown"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/noshutdown.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "stray"
 kind = "library"
 test = true
@@ -1805,6 +1814,16 @@ folder = "built"
 sources = ["tests/modules/namer.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
 include = ["include", "tests/binding", "tests/modules"]
 defines = ["BRIDGE_ROWS_CHECKED", "READER"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "namer-blank"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/namer.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "READER", "BLANK"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
