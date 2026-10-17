@@ -28,16 +28,16 @@ static void add_changes(const test_api_t *api)
     int none = 0;
     uint32_t made[2] = { ntoggle_a, ntoggle_t };
 
-    TEST_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, made, 2);
+    TEST_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, made, 2, nullptr, 0);
     TEST_ADD_SYSTEM(api, "respawn_half", "respawn_half", &none, 0,
-        made, 2);
+        made, 2, nullptr, 0);
     TEST_ADD_SYSTEM(api, "attach_b", "attach_b", &none, 0,
-        &ntoggle_b, 1);
+        &ntoggle_b, 1, nullptr, 0);
     TEST_ADD_SYSTEM(api, "destroy_half", "destroy_half", &none, 0,
-        nullptr, 0);
+        nullptr, 0, nullptr, 0);
     TEST_ADD_SYSTEM(api, "value_a", "value_a", &none, 0, &ntoggle_t,
-        1);
-    TEST_ADD_SYSTEM(api, "find", "find", &none, 0, nullptr, 0);
+        1, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "find", "find", &none, 0, nullptr, 0, nullptr, 0);
 }
 
 static void add_walks(const test_api_t *api)
@@ -47,15 +47,15 @@ static void add_walks(const test_api_t *api)
 #ifndef BIG
     on_t = TEST_OBSERVER(api, "heard_t",
         BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, one, 1, nullptr,
-        0);
+        0, nullptr, 0);
 #endif
     ntoggle_reading = TEST_ADD_SYSTEM(api, "look", "look", one, 1,
-        nullptr, 0);
-    TEST_ADD_SYSTEM(api, "look_b", "look_b", one, 1, nullptr, 0);
+        nullptr, 0, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "look_b", "look_b", one, 1, nullptr, 0, nullptr, 0);
     one[0].access = BRIDGE_WRITE;
     ntoggle_writing = TEST_ADD_SYSTEM(api, "flicker", "flicker", one,
-        1, nullptr, 0);
-    TEST_ADD_SYSTEM(api, "combine", "combine", one, 1, nullptr, 0);
+        1, nullptr, 0, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "combine", "combine", one, 1, nullptr, 0, nullptr, 0);
 }
 
 TEST(init)

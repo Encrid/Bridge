@@ -5,7 +5,7 @@
 */
 #include <string.h>
 
-#include "abi_entry.h"
+#include "abi_slots.h"
 #include "abi_subscribe.h"
 
 static int check_budget(subscribing_t *g)
@@ -27,12 +27,9 @@ static int read_stated(subscribing_t *g)
     module_t *m = g->m;
     const char *name = get_scratch(m, g->name_at, g->name_len);
     uint64_t terms_len = (uint64_t)g->count * sizeof(bridge_term_t);
-    uint64_t changes_len = (uint64_t)g->change_count * sizeof(uint32_t);
 
     g->terms = get_scratch(m, g->terms_at, terms_len);
-    g->changes = "";
-    if (g->change_count)
-        g->changes = get_scratch(m, g->changes_at, changes_len);
+    g->changes = get_slots(m, g->changes_at, g->change_count);
     if (abi_check_name(m, g->what, g->name_len) || !name || !g->terms
         || !g->changes)
         return (abi_refuse(m, "%s: a name, a term or a change lies outside "
@@ -82,5 +79,6 @@ static int check_name(subscribing_t *g)
 
 int abi_check_subscriber(subscribing_t *g)
 {
-    return (check_budget(g) || read_stated(g) || check_name(g));
+    return (check_budget(g) || read_stated(g) || check_name(g)
+        || abi_check_before(g));
 }

@@ -62,8 +62,10 @@ BRIDGE_EXPORT(init) int init(void)
     roster = BRIDGE_COMPONENT("game:Roster", roster_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
     terms[0].slot = position;
-    counting = BRIDGE_ADD_SYSTEM("count", "update", terms, 1, nullptr, 0);
+    counting = BRIDGE_ADD_SYSTEM("count", "update", terms, 1, nullptr, 0,
+        nullptr, 0);
     terms[0].slot = roster;
-    listing = BRIDGE_ADD_SYSTEM("rosters", "present", terms, 1, nullptr, 0);
+    listing = BRIDGE_ADD_SYSTEM("rosters", "present", terms, 1, nullptr, 0,
+        nullptr, 0);
     return (0);
 }

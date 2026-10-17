@@ -31,7 +31,7 @@ TEST(init)
         BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = count;
     counting = TEST_ADD_SYSTEM(api, "advance", "update", terms, 1,
-        nullptr, 0);
+        nullptr, 0, nullptr, 0);
     TEST_ATTACH(api, api->spawn(api), count, c);
     return (0);
 }

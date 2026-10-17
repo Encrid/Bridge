@@ -5,7 +5,8 @@
 */
 #include "cases.h"
 
-static void load_ticking(host_t *h, const bridge_phase_name_t *tick)
+static void load_mapped(host_t *h, const bridge_phase_name_t *names,
+    uint32_t count)
 {
     bridge_artifact_t a;
 
@@ -13,8 +14,8 @@ static void load_ticking(host_t *h, const bridge_phase_name_t *tick)
         return;
     host_state_built(&a, "game:stamp@0.1.0", STAMPTICK_PATH);
     a.cfg.spawns = 8;
-    a.cfg.phases = tick;
-    a.cfg.phase_count = tick ? 1 : 0;
+    a.cfg.phases = names;
+    a.cfg.phase_count = count;
     host_load(h, &a);
     test_load_watcher(h);
     host_run_frames_unsaid(h->b, 2);
@@ -23,26 +24,34 @@ static void load_ticking(host_t *h, const bridge_phase_name_t *tick)
 
 void test_leave_phase_unmapped(host_t *h)
 {
-    load_ticking(h, nullptr);
+    load_mapped(h, nullptr, 0);
 }
 
 void test_map_phase(host_t *h)
 {
     bridge_phase_name_t tick = { "tick", "update" };
 
-    load_ticking(h, &tick);
+    load_mapped(h, &tick, 1);
 }
 
 void test_map_phase_second(host_t *h)
 {
     bridge_phase_name_t tick = { "tick", "present" };
 
-    load_ticking(h, &tick);
+    load_mapped(h, &tick, 1);
 }
 
 void test_map_phase_nowhere(host_t *h)
 {
     bridge_phase_name_t tick = { "tick", "nowhere" };
 
-    load_ticking(h, &tick);
+    load_mapped(h, &tick, 1);
+}
+
+void test_map_two_phases(host_t *h)
+{
+    bridge_phase_name_t names[2] = { { "tock", "update" },
+        { "tick", "present" } };
+
+    load_mapped(h, names, 2);
 }

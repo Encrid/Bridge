@@ -50,7 +50,7 @@ TEST(init)
         BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = position;
     stamping = TEST_ADD_SYSTEM(api, "stamp", PHASE, terms, 1,
-        &marked, STATED);
+        &marked, STATED, nullptr, 0);
     TEST_ATTACH(api, api->spawn(api), position, p);
     return (0);
 }

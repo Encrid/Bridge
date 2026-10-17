@@ -1,4 +1,34 @@
 [[case]]
+name = "order-a-cycle-of-pairs-and-before-refused-in-each-load-order"
+run = ["{out}/storage{exe}", "ordertwo"]
+claims = { matches = ["game:m loaded first: refused: 'game:m:m1' would run before itself.*cycle\\s+game:n loaded first: refused: 'game:n:n1' would run before itself.*cycle\\s+alive"] }
+false = { run = ["{out}/storage{exe}", "orderchain"] }
+
+[[case]]
+name = "order-a-chain-of-pairs-keeps-the-before-of-two-modules"
+run = ["{out}/storage{exe}", "orderchain"]
+claims = { matches = ["game:m loaded first: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+game:n loaded first: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+alive"] }
+false = { run = ["{out}/storage{exe}", "ordertwo"] }
+
+[[case]]
+name = "order-a-chain-of-pairs-keeps-the-before-of-two-modules-at-the-barrier"
+run = ["{out}/storage{exe}", "orderbarrier"]
+claims = { matches = ["game:m loaded first, at the barrier: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+game:n loaded first, at the barrier: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+alive"] }
+false = { run = ["{out}/storage{exe}", "ordercyclebarrier"] }
+
+[[case]]
+name = "order-a-cycle-of-pairs-and-before-at-the-barrier-refused"
+run = ["{out}/storage{exe}", "ordercyclebarrier"]
+claims = { matches = ["game:m loaded first, at the barrier: refused: 'game:m:m1' would run before itself at the barrier: the \\[order\\] pairs.*game:n loaded first, at the barrier: refused: 'game:n:n1' would run before itself at the barrier.*alive"] }
+false = { run = ["{out}/storage{exe}", "orderbarrier"] }
+
+[[case]]
+name = "order-before-holds-whatever-the-order-of-the-list-of-systems"
+run = ["{out}/storage{exe}", "orderreversed"]
+claims = { matches = ["game:m loaded first, the systems of each module reversed: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+game:n loaded first, the systems of each module reversed: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+alive"] }
+false = { run = ["{out}/storage{exe}", "ordertwo"] }
+
+[[case]]
 name = "storage-changes"
 run = ["{out}/storage{exe}", "changes"]
 claims = { output = "tests/storage_changes.txt" }

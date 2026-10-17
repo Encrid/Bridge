@@ -279,7 +279,7 @@ The memory does not enforce a grant: a module can write what it reads. That brea
 
 ## add_system
 
-`add_system` registers a system: a query, a function and a phase.
+`add_system` registers a system: a query, a function, a phase, and the systems that run before it.
 It gets `at`: where a `bridge_system_statement_t` is, in the scratch arena. It gives the slot of the system.
 
 | Field | Content |
@@ -292,10 +292,16 @@ It gets `at`: where a `bridge_system_statement_t` is, in the scratch arena. It g
 | `term_count` | How many terms the query has. |
 | `changes` | Where the slots of the components that the system attaches or detaches are: `change_count` items of `uint32_t`. |
 | `change_count` | How many slots `changes` holds. |
+| `before` | Where the slots of the systems that run before this one are, in the scratch arena: `before_count` items of `uint32_t`. |
+| `before_count` | How many slots `before` holds. |
 
 The name of a phase is the name that the module uses: `docs/extern/bridge.h.md`, *bridge_phase_name_t*.
 A system with no term runs one time in each run of its phase.
-A system names no other system, and nothing of an order: *Conflicts*.
+
+Each slot of `before` is a slot that `add_system` gave to an earlier system of the module, in the same phase: *Conflicts*.
+`before` holds at most as many slots as the module has earlier systems. A slot can come two times.
+If `before_count` is 0, Bridge does not read `before`.
+
 `init`, `shutdown` and `reload` are reserved names. Each system and observer of a module has a different name.
 The name of a system or of an observer has no `@` and no `:`, so that its full name has one meaning: `docs/extern/bridge.h.md`, *bridge_order_t*.
 
@@ -317,8 +323,13 @@ It gets `at`: where a `bridge_observer_statement_t` is, in the scratch arena. It
 | `term_count` | How many terms the query has: one at least. |
 | `changes` | Where the slots of the components that the observer attaches or detaches are: `change_count` items of `uint32_t`. |
 | `change_count` | How many slots `changes` holds. |
+| `before` | Where the slots of the observers that run before this one are, in the scratch arena: `before_count` items of `uint32_t`. |
+| `before_count` | How many slots `before` holds. |
 
 An observer has no phase: it runs at the barrier that applied its trigger, after the barrier wrote the spans.
+Each slot of `before` is a slot that `observe` gave to an earlier observer of the module: *Conflicts*.
+`before` holds at most as many slots as the module has earlier observers. A slot can come two times.
+If `before_count` is 0, Bridge does not read `before`.
 `enum bridge_event` tells what a barrier made of an entity, against the terms of the observer:
 
 | Item | The entity |
@@ -392,11 +403,18 @@ They also conflict when both attach or detach one component, as their changes te
 A term of `BRIDGE_NOT` touches nothing.
 Systems of different modules that do not conflict can run at the same time. Systems that conflict never do.
 
-Two systems of one module that conflict run in the order that the module registered them.
-Two systems of different modules that conflict in one phase need a pair of the deployment, or a chain of pairs: `docs/extern/bridge.h.md`, *bridge_order_t*.
-Else the load that brings the second one fails. Two observers that conflict at a barrier need a pair too.
-The order in which a module registered its systems does not order a system of another module.
+Two systems of one module that conflict in one phase need an order that their module states in `before`.
+Without it, the load fails, also if a pair of the deployment orders them.
+`before` makes chains: if `c` names `b`, and `b` names `a`, then `a` runs before `c`.
 
+Two systems of different modules that conflict in one phase need a pair of the deployment, or a chain of pairs: `docs/extern/bridge.h.md`, *bridge_order_t*.
+Else the load that brings the second one fails. For such a conflict, only the pairs and their chains count, and not `before`.
+Two observers that conflict at the barrier follow the same rules.
+
+In one phase, an order that `before` or a pair states always holds, also between two systems that do not conflict.
+If the pairs and `before` make a cycle, the load or the reload that closes it fails.
+In the schedule, `before` and the pairs make chains together.
+An unload can take such a chain away, but never the order of two systems that conflict.
 A barrier applies the changes in the order that the systems ran. Of two attaches of one component to one entity, the later stays.
 
 ## Spans
@@ -580,13 +598,14 @@ Then do not declare the old component any more.
 
 ## Rules
 
-A module keeps these four rules on each backend.
+A module keeps these five rules on each backend.
 Bridge does not enforce them: a module that breaks one gets wrong values, and no record.
 
 - Do not write a component through a term of `BRIDGE_READ`.
 - Do not keep a reference into storage across a barrier: a row, a span or an address in a column.
 - Do not keep an offset into the scratch arena across a phase, also the text of a log line.
 - Do not rely on the order of the rows and the spans: it changes when entities come and go.
+- Do not rely on which of two systems runs first, if nothing orders them.
 
 ## Messages
 
@@ -595,6 +614,7 @@ In `init`, the reason follows `did not load:`. In `reload`, it follows `was not 
 
 In a quote, a word in angle brackets is a part that changes.
 For an observer, a reason says `observer` and `an observer` in place of `system` and `a system`.
+Only a system names a phase, so a reason about a phase has no form for an observer.
 A name of 0 bytes, or of 128 bytes or more, gets the reason of a name outside the scratch arena.
 
 ### A declaration
@@ -650,6 +670,7 @@ When other modules declare the type, the reason of a layout ends with `. It is a
 - `add_system is called outside init`
 - `add_system: a phase lies outside the scratch arena`
 - `a system names phase '<phase>', which the deployment did not declare`
+- `a system names phase '<phase>' as it is, and its config also maps '<name>' to that phase`
 - `observe: what it states lies outside the scratch arena`
 - `observe is called outside init`
 - `observe: its events are unset, or name one there is not`
@@ -664,6 +685,10 @@ When other modules declare the type, the reason of a layout ends with `. It is a
 - `observer '<name>' has no term, and so nothing to observe`
 - `change <index> of system '<name>' names slot <slot>, which it never declared`
 - `system '<name>' may not attach or detach '<component>': no grant says so`
+- `system: before lies outside the scratch arena`
+- `a system states <count> systems before it, and the module registered <count>`
+- `before <index> of system '<name>' names slot <slot>, which is not an earlier system`
+- `before <index> of system '<name>' names system '<name>', which is of another phase`
 - `out of memory: there was none for system '<name>'`
 
 ### A term

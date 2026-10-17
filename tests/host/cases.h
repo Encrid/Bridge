@@ -218,7 +218,9 @@ void test_order(host_t *h);
 void test_reorder(host_t *h);
 void test_leave_unordered(host_t *h);
 void test_order_in_a_cycle(host_t *h);
-void test_order_pair_over_own(host_t *h);
+void test_order_pair_against_before(host_t *h);
+void test_order_pair_beside_before(host_t *h);
+void test_reload_into_cycle(host_t *h);
 
 void test_order_unnamed(host_t *h);
 
@@ -252,6 +254,12 @@ void test_run_guarded(host_t *h, const char *identity, const char *file,
     int frames);
 
 void test_tell_places(host_t *h);
+void test_map_onto_a_named_phase(host_t *h);
+void test_map_beside_a_named_phase(host_t *h);
+void test_place_before(host_t *h);
+void test_place_paired(host_t *h);
+void test_place_two(host_t *h);
+void test_place_reordered(host_t *h);
 
 void test_take_in_old_shutdown(host_t *h);
 
@@ -403,6 +411,7 @@ void test_edit_module(host_t *h);
 void test_edit_module_more(host_t *h);
 
 void test_map_phase_second(host_t *h);
+void test_map_two_phases(host_t *h);
 void test_load_twice(host_t *h);
 void test_spawn_past_entities(host_t *h);
 void test_edit_phase_names(host_t *h);

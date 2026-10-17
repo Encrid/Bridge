@@ -1,6 +1,6 @@
 # src/schedule_order.c
 
-This file takes the pairs that a deployment states in `[order]`: two systems that conflict in one phase, in the order they must run.
+This file takes the pairs that a deployment states in `[order]`: two systems of one phase, in the order they must run.
 `src/bridge_create.c` calls `schedule_order` once, at create.
 
 ## The pairs

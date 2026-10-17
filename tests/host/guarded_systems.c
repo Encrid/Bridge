@@ -17,12 +17,12 @@ void test_run_guarded(host_t *h, const char *identity, const char *file,
 
 void test_order_own(host_t *h)
 {
-    test_run_guarded(h, "game:twostep@0.1.0", "twostep", 1);
+    test_run_guarded(h, "game:twostep@0.1.0", h->arg, 1);
 }
 
 void test_chain(host_t *h)
 {
-    test_run_guarded(h, "game:chain@0.1.0", "chain", 3);
+    test_run_guarded(h, "game:chain@0.1.0", h->arg, 3);
 }
 
 void test_tell_events(host_t *h)

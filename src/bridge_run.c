@@ -8,24 +8,16 @@
 #include "bridge_inside.h"
 #include "say.h"
 
-static uint32_t find_phase(const bridge_t *b, const char *name)
-{
-    uint32_t phase = 0;
-
-    if (!name)
-        return (b->phase_count);
-    while (phase < b->phase_count && strcmp(b->phases[phase], name))
-        phase++;
-    return (phase);
-}
-
 int bridge_run_phase_now(bridge_t *b, const char *name)
 {
     uint32_t phase;
 
     if (bridge_check_call(b, nullptr))
         return (1);
-    phase = find_phase(b, name);
+    phase = b->phase_count;
+    if (name)
+        phase = bridge_find_phase(b->phases, b->phase_count, name,
+            strlen(name));
     if (phase == b->phase_count) {
         say_error(b, "phase '%s' is not one the deployment declared",
             name ? name : "");

@@ -17,7 +17,7 @@ BRIDGE_EXPORT(init) int init(void)
 
     terms[0].slot = BRIDGE_COMPONENT("game:Position", position_t,
         BRIDGE_STRIP, BRIDGE_TABLE);
-    BRIDGE_ADD_SYSTEM("push", "update", terms, 1, nullptr, 0);
+    BRIDGE_ADD_SYSTEM("push", "update", terms, 1, nullptr, 0, nullptr, 0);
     return (0);
 }
 

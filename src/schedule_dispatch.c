@@ -7,16 +7,6 @@
 
 #include "schedule.h"
 
-static uint32_t find_slot(const module_t *m, const bridge_system_t *s)
-{
-    bridge_system_t *const *slots = s->observer ? m->observers : m->systems;
-    uint32_t slot = 0;
-
-    while (slots[slot] != s)
-        slot++;
-    return (slot);
-}
-
 static void call_system(module_t *m, bridge_system_t *s)
 {
     backend_err_t err = {};
@@ -40,13 +30,12 @@ static void call_system(module_t *m, bridge_system_t *s)
 static void run_system(module_t *m, bridge_system_t *s)
 {
     bridge_header_t *h = (bridge_header_t *)m->priv;
-    uint32_t slot = find_slot(m, s);
 
     h->barriers = m->b->barriers;
     h->place = s->place;
     m->running = s;
     m->turn = s->turn;
-    h->system = slot;
+    h->system = s->slot;
     h->observer = s->observer ? 1 : 0;
     call_system(m, s);
     h->system = UINT32_MAX;

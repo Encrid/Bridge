@@ -44,8 +44,8 @@ TEST(init)
 
     slot6 = TEST_COMPONENT(api, "st:A", v6_t, BRIDGE_DELETE, BRIDGE_TABLE);
     a[0].slot = slot6;
-    TEST_ADD_SYSTEM(api, "fill", "spawn", &none, 0, &slot6, 1);
-    TEST_ADD_SYSTEM(api, "look", "look", a, 1, nullptr, 0);
-    TEST_OBSERVER(api, "heard", BRIDGE_ON_ENTER, a, 1, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "fill", "spawn", &none, 0, &slot6, 1, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "look", "look", a, 1, nullptr, 0, nullptr, 0);
+    TEST_OBSERVER(api, "heard", BRIDGE_ON_ENTER, a, 1, nullptr, 0, nullptr, 0);
     return (0);
 }

@@ -32,19 +32,22 @@
             0, 1, 0, 0, on_unload, storage))
 
     #define BRIDGE_ADD_SYSTEM(name, phase, terms, count, changes, \
-        change_count) \
+        change_count, before, before_count) \
         bridge_add_system(BRIDGE_STATE(bridge_system_statement_t, \
             bridge_put(name, sizeof(name) - 1), sizeof(name) - 1, \
             bridge_put(phase, sizeof(phase) - 1), sizeof(phase) - 1, \
             bridge_put(terms, (count) * sizeof(bridge_term_t)), count, \
-            BRIDGE_PUT_CHANGES(changes, change_count), change_count))
-    #define BRIDGE_OBSERVER(name, events, terms, count, changes, change_count) \
+            BRIDGE_PUT_SLOTS(changes, change_count), change_count, \
+            BRIDGE_PUT_SLOTS(before, before_count), before_count))
+    #define BRIDGE_OBSERVER(name, events, terms, count, changes, \
+        change_count, before, before_count) \
         bridge_observe(BRIDGE_STATE(bridge_observer_statement_t, \
             bridge_put(name, sizeof(name) - 1), sizeof(name) - 1, events, \
             bridge_put(terms, (count) * sizeof(bridge_term_t)), count, \
-            BRIDGE_PUT_CHANGES(changes, change_count), change_count))
-    #define BRIDGE_PUT_CHANGES(changes, count) \
-        ((count) ? bridge_put(changes, (count) * sizeof(uint32_t)) : 0)
+            BRIDGE_PUT_SLOTS(changes, change_count), change_count, \
+            BRIDGE_PUT_SLOTS(before, before_count), before_count))
+    #define BRIDGE_PUT_SLOTS(slots, count) \
+        ((count) ? bridge_put(slots, (count) * sizeof(uint32_t)) : 0)
 
     #define BRIDGE_ATTACH(id, slot, value) \
         bridge_attach(id, slot, bridge_lend(&(value), sizeof(value)))

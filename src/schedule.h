@@ -15,7 +15,7 @@ typedef struct {
     schedule_matrix_t reach;
     const schedule_pairs_t *order;
     uint32_t phase;
-    const char *where;
+    char where[64];
     char *why;
     size_t why_len;
 } schedule_phase_t;
@@ -68,6 +68,11 @@ void schedule_add_stated(const bridge_t *b, schedule_phase_t *p);
 uint32_t schedule_find_name(const schedule_pairs_t *order, const char *full);
 
 bool schedule_orders(const schedule_pairs_t *order, const bridge_system_t *s,
+    const bridge_system_t *t);
+
+void schedule_join_before(bridge_system_t *s, const bridge_system_t *t);
+
+bool schedule_is_stated_before(const bridge_system_t *s,
     const bridge_system_t *t);
 
 void schedule_add_own(schedule_phase_t *p);

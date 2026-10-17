@@ -10,20 +10,21 @@ static void add_changes(const test_api_t *api)
 {
     int none = 0;
 
-    TEST_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, &nsparse_a, 1);
+    TEST_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, &nsparse_a, 1, nullptr, 0);
     TEST_ADD_SYSTEM(api, "attach_b", "attach_b", &none, 0,
-        &nsparse_s, 1);
+        &nsparse_s, 1, nullptr, 0);
     TEST_ADD_SYSTEM(api, "detach_b", "detach_b", &none, 0,
-        &nsparse_s, 1);
+        &nsparse_s, 1, nullptr, 0);
     TEST_ADD_SYSTEM(api, "detach_b_half", "detach_b_half", &none, 0,
-        &nsparse_s, 1);
+        &nsparse_s, 1, nullptr, 0);
     TEST_ADD_SYSTEM(api, "value_b", "value_b", &none, 0, &nsparse_s,
-        1);
+        1, nullptr, 0);
     TEST_ADD_SYSTEM(api, "attach_b_half", "attach_b_half", &none, 0,
-        &nsparse_s, 1);
+        &nsparse_s, 1, nullptr, 0);
     TEST_ADD_SYSTEM(api, "destroy_half", "destroy_half", &none, 0,
+        nullptr, 0, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "destroy", "destroy", &none, 0, nullptr, 0,
         nullptr, 0);
-    TEST_ADD_SYSTEM(api, "destroy", "destroy", &none, 0, nullptr, 0);
 }
 
 static void add_walks(const test_api_t *api)
@@ -33,9 +34,9 @@ static void add_walks(const test_api_t *api)
         { nsparse_s, BRIDGE_READ, BRIDGE_OPTIONAL, 0 }};
 
     nsparse_in_set = TEST_ADD_SYSTEM(api, "look", "look", one, 1,
-        nullptr, 0);
+        nullptr, 0, nullptr, 0);
     nsparse_in_table = TEST_ADD_SYSTEM(api, "look_b", "look_b", two,
-        2, nullptr, 0);
+        2, nullptr, 0, nullptr, 0);
 }
 
 #if !defined(BIG) && !defined(FAT)
@@ -47,10 +48,10 @@ static void add_observers(const test_api_t *api)
 
     nsparse_on_s = TEST_OBSERVER(api, "heard_s",
         BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, one, 1, nullptr,
-        0);
+        0, nullptr, 0);
     nsparse_on_both = TEST_OBSERVER(api, "heard_both",
         BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, two, 2, nullptr,
-        0);
+        0, nullptr, 0);
 }
 
 #endif
@@ -63,9 +64,10 @@ static void add_refused(const test_api_t *api)
         { nsparse_s, BRIDGE_READ, BRIDGE_AND, 0 }};
 
     if (BAD == 1)
-        TEST_ADD_SYSTEM(api, "both", "never", two, 2, nullptr, 0);
+        TEST_ADD_SYSTEM(api, "both", "never", two, 2, nullptr, 0, nullptr, 0);
     else
-        TEST_ADD_SYSTEM(api, "without", "never", one, 1, nullptr, 0);
+        TEST_ADD_SYSTEM(api, "without", "never", one, 1, nullptr, 0,
+            nullptr, 0);
 }
 
 #endif

@@ -87,6 +87,8 @@ typedef struct {
     int64_t failures;
     declared_type_t **changes;
     uint32_t change_count;
+    uint32_t slot;
+    uint64_t *stated_before;
     system_term_t term[];
 } bridge_system_t;
 

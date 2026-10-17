@@ -47,7 +47,7 @@ TEST(init)
         BRIDGE_TABLE);
     terms[0].slot = mark;
     counting = TEST_ADD_SYSTEM(api, "count", "update", terms, 1, nullptr,
-        0);
-    TEST_ADD_SYSTEM(api, "stick", "update", &none, 0, &mark, 1);
+        0, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "stick", "update", &none, 0, &mark, 1, nullptr, 0);
     return (0);
 }

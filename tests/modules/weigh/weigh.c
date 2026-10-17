@@ -55,17 +55,17 @@ static void add_readers(const test_api_t *api)
     bridge_term_t one[1] = {{ nweigh_value, BRIDGE_READ, BRIDGE_AND, 0 }};
 
     nweigh_walking = TEST_ADD_SYSTEM(api, "walk", "walk", one, 1,
-        nullptr, 0);
+        nullptr, 0, nullptr, 0);
     one[0].slot = nweigh_flag;
     nweigh_flagged = TEST_ADD_SYSTEM(api, "flag", "flag", one, 1,
-        nullptr, 0);
+        nullptr, 0, nullptr, 0);
     one[0].slot = nweigh_link;
     nweigh_linked = TEST_ADD_SYSTEM(api, "near", "near", one, 1,
-        nullptr, 0);
-    TEST_ADD_SYSTEM(api, "far", "far", one, 1, nullptr, 0);
+        nullptr, 0, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "far", "far", one, 1, nullptr, 0, nullptr, 0);
     one[0].slot = nweigh_single;
     nweigh_which = TEST_ADD_SYSTEM(api, "one", "one", one, 1,
-        nullptr, 0);
+        nullptr, 0, nullptr, 0);
 }
 
 TEST(init)
@@ -85,7 +85,7 @@ TEST(init)
     filled[1] = nweigh_flag;
     filled[2] = nweigh_link;
     filled[3] = nweigh_single;
-    TEST_ADD_SYSTEM(api, "fill", "spawn", &none, 0, filled, 4);
+    TEST_ADD_SYSTEM(api, "fill", "spawn", &none, 0, filled, 4, nullptr, 0);
     add_readers(api);
     return (0);
 }

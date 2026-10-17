@@ -15,7 +15,7 @@ static void declare_nine(const test_api_t *api)
     settings = TEST_COMPONENT(api, "nine:Settings", nine_t, BRIDGE_DELETE,
         BRIDGE_SINGLETON);
     terms[0].slot = settings;
-    TEST_ADD_SYSTEM(api, "show", "update", terms, 1, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "show", "update", terms, 1, nullptr, 0, nullptr, 0);
 }
 
 TEST(show)

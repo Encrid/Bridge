@@ -37,7 +37,7 @@ TEST(init)
         BRIDGE_DELETE, BRIDGE_TABLE);
     marked = TEST_COMPONENT(api, "game:Marked", marked_t,
         BRIDGE_STRIP, BRIDGE_TABLE);
-    TEST_ADD_SYSTEM(api, "mark", "update", &none, 0, &marked, 1);
+    TEST_ADD_SYSTEM(api, "mark", "update", &none, 0, &marked, 1, nullptr, 0);
     while (i < ENTITIES) {
         p.x = (float)i;
         ids[i] = api->spawn(api);

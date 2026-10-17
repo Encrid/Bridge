@@ -27,6 +27,6 @@ BRIDGE_EXPORT(init) int init(void)
         BRIDGE_SINGLETON);
     terms[0].slot = single;
     hearing = BRIDGE_OBSERVER("heard", BRIDGE_ON_ATTACH, terms, 1, nullptr,
-        0);
+        0, nullptr, 0);
     return (0);
 }

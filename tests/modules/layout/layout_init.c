@@ -36,10 +36,10 @@ TEST(init)
     x_slot = TEST_COMPONENT(api, "st:X", x3_t, BRIDGE_DELETE,
         (enum bridge_storage)KEPT);
 #endif
-    TEST_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, &x_slot, 1);
+    TEST_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, &x_slot, 1, nullptr, 0);
     one[0].slot = x_slot;
     reading = TEST_ADD_SYSTEM(api, "look", "look", one, 1, nullptr,
-        0);
+        0, nullptr, 0);
     return (0);
 }
 

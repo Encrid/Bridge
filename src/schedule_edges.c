@@ -44,15 +44,10 @@ void schedule_add_stated(const bridge_t *b, schedule_phase_t *p)
 static void order_after(schedule_phase_t *p, uint32_t i)
 {
     const bridge_system_t *s = p->in[i];
-    bool changing;
-    uint32_t j = i + 1;
 
-    while (j < p->n) {
-        if (s->m == p->in[j]->m && !schedule_reaches(&p->reach, j, i)
-            && schedule_find_conflict(s, p->in[j], &changing))
+    for (uint32_t j = 0; j < p->n; j++)
+        if (s->m == p->in[j]->m && schedule_is_stated_before(s, p->in[j]))
             schedule_add_edge(&p->reach, i, j);
-        j++;
-    }
     schedule_join_through(&p->reach, i);
 }
 

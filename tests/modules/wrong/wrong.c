@@ -33,7 +33,7 @@ BRIDGE_EXPORT(init) int init(void)
     terms[0].slot = wrong_position;
     changes[0] = wrong_position;
     changes[1] = wrong_flag;
-    BRIDGE_ADD_SYSTEM("act", "update", terms, 1, changes, 2);
+    BRIDGE_ADD_SYSTEM("act", "update", terms, 1, changes, 2, nullptr, 0);
     AT_INIT();
     return (0);
 }

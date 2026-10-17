@@ -1,29 +1,35 @@
 # src/schedule_check.c
 
-This file gives the refusal of a schedule: two systems that conflict while nothing orders them.
+This file gives the refusals of a schedule: a cycle, and two systems that conflict while nothing orders them.
 
 ## The refusal
 
-`schedule_check_phase` looks at the systems of the phase in their order, and stops at the first one that gives a reason.
+`check_cycle` comes first: in the closed matrix of the phase, a system on a cycle reaches itself, and `schedule_get_cycle` finds it.
+Then `schedule_check_phase` looks at the systems of the phase in their order, and stops at the first one that gives a reason.
 For system `i`, `check_system` looks only at the systems after `i`, so it checks each pair once.
 
 | Refusal | Condition | Reason in `why` |
 | --- | --- | --- |
-| Two systems are not ordered | Two systems of two modules conflict, and the pairs put neither before the other. | The two systems, the component they both touch or both attach or detach, and the phase or the barrier. |
+| A system runs before itself | The pairs and the orders that the modules state make a cycle. | The first system of the phase on the cycle, and the phase or the barrier. |
+| Two systems are not ordered | Two systems conflict. For one module, `before` puts neither before the other. For two modules, the pairs put neither before the other. | The two systems, the component, and the phase or the barrier. |
 
-No system of a phase runs before itself, so this file does not test it: `docs/intern/schedule_build.c.md`, *The steps of a phase*.
-Two systems of one module never cause the refusal, because their module orders them: `docs/intern/schedule.h.md`, *What orders two systems*.
+`set_levels` must not meet a cycle, since its loop would never end: `docs/intern/schedule_build.c.md`, *Levels*.
+For two systems of one module, only `before` counts, and not a pair: `docs/intern/schedule.h.md`, *What orders two systems*.
+The reason for two systems of one module ends with `their module states no order of them`.
+The reason for two systems of two modules ends with `no pair orders them`.
 
 ## Limits
 
 A reason cuts each name to a length: a system name to 80 characters.
 A component name is cut to 60 characters, and a phase name to 40.
+The whole reason has at most 255 bytes, so long names can cut its end.
 
 ## Functions
 
 | Function | Result |
 | --- | --- |
-| `is_unordered` | Gives whether two systems of two modules conflict and the pairs put neither before the other: `schedule_orders`. |
-| `say_unordered` | Writes in `why` the two systems, what they both touch or both attach or detach, and where: in the phase or at the barrier. |
+| `check_cycle` | Refuses the phase if a system reaches itself in its closed matrix. Gives 1 with `why`. |
+| `is_unordered` | Gives whether two systems conflict and nothing orders them: `before` in either direction for one module, the pairs for two modules. |
+| `say_unordered` | Writes in `why` the two systems, what they both touch or both attach or detach, and where: in the phase or at the barrier. For one module, it adds that their module states no order of them. |
 | `check_system` | Refuses system `i` if a later system conflicts with it and nothing orders them. Gives 1 with `why`. |
 | `schedule_check_phase` | Refuses a phase at the first system that gives a reason. Gives 1 if it refuses. |

@@ -20,7 +20,7 @@ bridge_system_statement_t wrong_state_system(void)
     bridge_term_t term = { wrong_position, BRIDGE_READ, BRIDGE_AND, 0 };
     bridge_system_statement_t s = { bridge_put("again", 5), 5,
         bridge_put("update", 6), 6, bridge_put(&term, sizeof(term)), 1, 0,
-        0 };
+        0, 0, 0 };
 
     return (s);
 }
@@ -29,7 +29,7 @@ bridge_observer_statement_t wrong_state_observer(void)
 {
     bridge_term_t term = { wrong_position, BRIDGE_READ, BRIDGE_AND, 0 };
     bridge_observer_statement_t o = { bridge_put("again", 5), 5,
-        BRIDGE_ON_ENTER, bridge_put(&term, sizeof(term)), 1, 0, 0 };
+        BRIDGE_ON_ENTER, bridge_put(&term, sizeof(term)), 1, 0, 0, 0, 0 };
 
     return (o);
 }

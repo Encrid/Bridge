@@ -106,6 +106,8 @@ A system and an observer are a query and a function either way, so one record se
 | `failed`, `why` | How its dispatch ended, said after the join. |
 | `failures` | Its own count of failures. |
 | `changes`, `change_count` | The components that it stated that it attaches or detaches. They lie after the terms, in the same block. |
+| `slot` | Its slot among the systems of its module, or among its observers: what `add_system` or `observe` gave. |
+| `stated_before` | The slots of each system that its module states before it, also through a chain, as bits: `docs/intern/schedule_before.c.md`. They lie after the changes, in the same block. |
 | `term` | Its `terms` terms, as the conflict graph reads them. |
 
 ### A module
@@ -225,7 +227,7 @@ A `schedule_pairs_t` holds the pairs of `[order]`: `docs/intern/schedule_order.c
 | `storage` | What keeps the rows: `src/storage.h`. |
 | `types`, `type_count` | The declared types. |
 | `kept`, `kept_count` | Each share of an unloaded module that stays. |
-| `systems`, `system_count` | The systems of every module, in the order of registration. |
+| `systems`, `system_count` | The systems of every module, in the order of registration. So the systems of one module are in the order of their slots. |
 | `modules`, `module_count`, `max_modules` | The loaded modules, how many, and `[budget] modules`. |
 
 A world is stopped at a barrier, where nothing is allocated.

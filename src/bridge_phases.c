@@ -30,6 +30,17 @@ static int add_phase(bridge_t *b, const bridge_config_t *cfg, uint32_t i)
     return (0);
 }
 
+uint32_t bridge_find_phase(char *const *names, uint32_t count,
+    const char *name, size_t len)
+{
+    uint32_t i = 0;
+
+    while (i < count && (strlen(names[i]) != len
+        || memcmp(names[i], name, len)))
+        i++;
+    return (i);
+}
+
 int bridge_name_phases(bridge_t *b, const bridge_config_t *cfg)
 {
     uint32_t i = 0;

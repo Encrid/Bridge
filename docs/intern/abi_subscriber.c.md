@@ -13,6 +13,7 @@ This file checks what a system or an observer states, before anything is made of
 7. Refuse a name that has `@` or `:`.
 8. Refuse a name that the module registered already, as a system or as an observer.
 9. Refuse an observer with no term.
+10. Refuse a list of `before` outside the scratch arena, or with more slots than the module has earlier systems.
 
 Systems and observers are exports of the module, and an export has one name.
 So a system and an observer of one module do not share a name.
@@ -20,6 +21,9 @@ A name with no `@` and no `:` gives each system one full name, which a pair of `
 An observer with no term has no change to subscribe to.
 `docs/intern/abi_system.c.md` refuses a registration outside the first call of the module, and an observer with no events or unknown ones.
 `docs/intern/abi_subscribe.c.md` refuses a change of a slot that the module never declared.
+
+`get_slots` of `src/abi_slots.h` finds the changes in the scratch arena. A list of no change needs no place there.
+`abi_check_before` of `src/abi_before.c` checks the list of `before` last: `docs/intern/abi_before.c.md`.
 
 ## Functions
 

@@ -30,7 +30,8 @@ static void register_tick(void)
 
     tick = BRIDGE_COMPONENT("game:Tick", tick_t, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = tick;
-    ticking = BRIDGE_ADD_SYSTEM("advance", "update", terms, 1, nullptr, 0);
+    ticking = BRIDGE_ADD_SYSTEM("advance", "update", terms, 1, nullptr, 0,
+        nullptr, 0);
 }
 
 BRIDGE_EXPORT(init) int init(void)

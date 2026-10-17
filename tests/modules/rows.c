@@ -46,7 +46,8 @@ BRIDGE_EXPORT(init) int init(void)
     position = BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_DELETE,
         BRIDGE_TABLE);
     terms[0].slot = position;
-    moving = BRIDGE_ADD_SYSTEM("move", "update", terms, 1, nullptr, 0);
+    moving = BRIDGE_ADD_SYSTEM("move", "update", terms, 1, nullptr, 0,
+        nullptr, 0);
     while (i < ENTITIES) {
         bridge_attach(bridge_spawn(), position, BRIDGE_ZEROED);
         i++;

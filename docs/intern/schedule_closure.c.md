@@ -13,6 +13,7 @@ After it, each system that reaches a system reaches all that system reaches: the
 In a closed matrix, each system on a cycle reaches itself.
 `schedule_get_cycle` gives the first system that reaches itself, or the count of rows if no system does.
 `src/schedule_order.c` uses it to refuse pairs that contradict each other.
+`src/schedule_check.c` uses it to refuse a phase with a cycle.
 
 ## Functions
 

@@ -9,6 +9,9 @@
 
 #include "abi_subscribe.h"
 
+static_assert(alignof(system_term_t) % alignof(uint64_t) == 0);
+static_assert(sizeof(declared_type_t *) % alignof(uint64_t) == 0);
+
 void abi_free_subscriber(subscribing_t *g)
 {
     bridge_system_t *s = g->s;
@@ -29,7 +32,7 @@ static bool make_room(subscribing_t *g)
     module_t *m = g->m;
     bridge_t *b = m->b;
     bridge_system_t ***mine = g->events ? &m->observers : &m->systems;
-    size_t have = g->events ? m->observer_count : m->system_count;
+    size_t have = g->slot;
     size_t held = b->system_count;
     void *all = realloc(b->systems, (held + 1) * sizeof(*b->systems));
     void *own = realloc(*mine, (have + 1) * sizeof(**mine));
@@ -63,7 +66,8 @@ int abi_alloc_subscriber(subscribing_t *g)
 {
     bridge_system_t *s;
     size_t size = sizeof(*s) + g->count * sizeof(*s->term)
-        + g->change_count * sizeof(*s->changes);
+        + g->change_count * sizeof(*s->changes)
+        + schedule_get_words(g->slot) * sizeof(*s->stated_before);
     bool had;
 
     s = calloc(1, size);
@@ -73,6 +77,7 @@ int abi_alloc_subscriber(subscribing_t *g)
     had = s && name_system(g) && had && g->asked;
     if (had && abi_marks(g->m, 1)) {
         s->changes = (declared_type_t **)(void *)&s->term[g->count];
+        s->stated_before = (uint64_t *)(void *)&s->changes[g->change_count];
         return (0);
     }
     abi_free_subscriber(g);

@@ -24,15 +24,15 @@ TEST(init)
         (enum bridge_storage)KEPT);
     both[0] = a_slot;
     both[1] = x_slot;
-    TEST_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, both, 2);
+    TEST_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, both, 2, nullptr, 0);
     TEST_ADD_SYSTEM(api, "detach_b", "detach_b", &none, 0, &x_slot,
-        1);
+        1, nullptr, 0);
     TEST_ADD_SYSTEM(api, "detach_b_half", "detach_b_half", &none, 0,
-        &x_slot, 1);
+        &x_slot, 1, nullptr, 0);
     one[0].slot = x_slot;
     reading = TEST_ADD_SYSTEM(api, "look", "look", one, 1, nullptr,
-        0);
-    TEST_ADD_SYSTEM(api, "flicker", "flicker", one, 1, nullptr, 0);
+        0, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "flicker", "flicker", one, 1, nullptr, 0, nullptr, 0);
     return (0);
 }
 

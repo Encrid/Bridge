@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdio.h>
+
 #include "schedule.h"
 
 static bool raise_after(schedule_phase_t *p, uint32_t i)
@@ -43,6 +45,10 @@ static int build_phase(bridge_t *b, schedule_phase_t *p)
 {
     int refused;
 
+    snprintf(p->where, sizeof(p->where), "at the barrier");
+    if (p->phase < b->phase_count)
+        snprintf(p->where, sizeof(p->where), "in phase '%.40s'",
+            b->phases[p->phase]);
     schedule_gather_phase(b, p);
     schedule_add_stated(b, p);
     schedule_add_own(p);
@@ -59,7 +65,6 @@ int schedule_build(bridge_t *b, char *why, size_t why_len)
 
     p.in = (bridge_system_t **)b->build_in;
     while (p.phase <= b->phase_count && !refused) {
-        p.where = p.phase < b->phase_count ? b->phases[p.phase] : nullptr;
         refused = build_phase(b, &p);
         p.phase++;
     }

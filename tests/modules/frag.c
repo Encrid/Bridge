@@ -101,8 +101,8 @@ TEST(init)
     }
     one[0].slot = value;
     TEST_ADD_SYSTEM(api, "fill", "spawn", &none, 0, filled,
-        1 + MARKERS);
+        1 + MARKERS, nullptr, 0);
     reading = TEST_ADD_SYSTEM(api, "sum", "look", one, 1, nullptr,
-        0);
+        0, nullptr, 0);
     return (0);
 }

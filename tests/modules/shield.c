@@ -85,9 +85,11 @@ BRIDGE_EXPORT(init) int init(void)
     shield = BRIDGE_COMPONENT("game:Shield", shield_t, BRIDGE_DELETE,
         BRIDGE_TOGGLE);
     terms[0].slot = shield;
-    lowering = BRIDGE_ADD_SYSTEM("lower", "update", terms, 1, nullptr, 0);
+    lowering = BRIDGE_ADD_SYSTEM("lower", "update", terms, 1, nullptr, 0,
+        nullptr, 0);
     terms[0].access = BRIDGE_READ;
-    counting = BRIDGE_ADD_SYSTEM("count", "present", terms, 1, nullptr, 0);
+    counting = BRIDGE_ADD_SYSTEM("count", "present", terms, 1, nullptr, 0,
+        nullptr, 0);
     while (value.strength < ENTITIES) {
         id = bridge_spawn();
         BRIDGE_ATTACH(id, shield, value);

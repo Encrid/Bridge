@@ -36,18 +36,19 @@ A pair need not name a loaded system, because a deployment can order modules tha
 The world keeps the names of the pairs and their closed matrix from create.
 So a chain of pairs orders two systems also through a name that is not loaded.
 
-A module orders its own systems that conflict by the order in which it registers them.
-One author wrote both registrations, so that order stands without a pair.
-A pair can state the reverse order, and then the pair stands.
-This order counts only between the systems of that module.
+A module orders its own systems in `before`: each system names the earlier systems of its module that run before it.
+One author wrote both systems, so their order is in the module.
+Two systems of one module that conflict refuse the load if `before` does not order them, also if a pair orders them.
+A pair against `before` makes a cycle, and `schedule_check_phase` refuses it.
+For a conflict, the order that a module states counts only between the systems of that module.
 
 Two systems of two modules that conflict in one phase refuse the load that brings the second one.
-Only a pair, or a chain of pairs, orders them.
+Only a pair, or a chain of pairs, counts for them.
 The refusal names both systems and the component.
 The order of declaration and the order of load never decide, so nothing depends on which module the host found first.
-Two observers at the barrier follow the same rule.
+Two observers at the barrier follow the same rules.
 
-So an unload, a failed load and a reload take the order of no two loaded systems away.
+So an unload, a failed load and a reload take away the order of no two loaded systems that conflict.
 The `schedule_build` after each of them refuses nothing, and its callers drop no reason when they drop its result.
 
 ## Levels and jobs
@@ -63,7 +64,7 @@ The systems of one module never overlap: they share the private memory of the mo
 
 For each phase, the schedule keeps a matrix of who must run before whom: a row of bits for each system.
 The edges of the pairs join rows with an or: at most `n^3 / 64` word operations at a load, for `n` systems in the phase.
-The order of registration of the modules keeps the matrix closed, with at most `3 n^3 / 128` more.
+The order that the modules state keeps the matrix closed, with at most `3 n^3 / 128` more.
 For a phase of a thousand systems, that is at most some forty million operations.
 None of this runs in a frame.
 
@@ -105,7 +106,7 @@ One phase that `schedule_build` schedules, or the barrier after all the phases.
 | `reach` | Who reaches whom among them. |
 | `order` | The pairs of the world, and their closed matrix. |
 | `phase` | The index of the phase, and `phase_count` for the barrier. |
-| `where` | The name of the phase, and `nullptr` for the barrier. |
+| `where` | Where the phase is, as a reason names it: in the phase of its name, or at the barrier. |
 | `why`, `why_len` | Where a refusal is written, and its size. |
 
 ### schedule_job_t
@@ -151,7 +152,9 @@ One phase that `schedule_run` runs.
 | `schedule_add_stated` | Adds the edges that the closed matrix of the pairs states. In `src/schedule_edges.c`. |
 | `schedule_find_name` | Gives the index of a full name among the names of the pairs, or the count of names. In `src/schedule_names.c`. |
 | `schedule_orders` | Gives whether the pairs put one system before another. In `src/schedule_names.c`. |
-| `schedule_add_own` | Adds the edges that a module states by the order of its registrations. In `src/schedule_edges.c`. |
-| `schedule_check_phase` | Refuses a phase with two unordered conflicting systems of two modules. Gives 1 with `why`. In `src/schedule_check.c`. |
+| `schedule_join_before` | Puts system `t`, and each system before `t`, among the systems before `s`. In `src/schedule_before.c`. |
+| `schedule_is_stated_before` | Gives whether the module states that system `s` runs before system `t`. In `src/schedule_before.c`. |
+| `schedule_add_own` | Adds the edges that a module states in `before`. In `src/schedule_edges.c`. |
+| `schedule_check_phase` | Refuses a phase with a cycle, or with two conflicting systems that nothing orders. Gives 1 with `why`. In `src/schedule_check.c`. |
 | `schedule_run_job` | What a thread runs: the systems of one job, one after the other. In `src/schedule_dispatch.c`. |
 | `schedule_gather_jobs` | Makes the jobs of one level, and gives a number to each system that runs. In `src/schedule_jobs.c`. |

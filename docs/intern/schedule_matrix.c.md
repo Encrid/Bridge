@@ -14,6 +14,8 @@ Then `schedule_join_through` of `i` gives the new row `i` to each row that reach
 If the matrix was closed before the edges from `i`, it is closed again after them.
 So `schedule_add_own` needs no closure after it.
 Its cost is in `docs/intern/schedule.h.md`, *Cost*.
+
+With a cycle, the matrix is closed too: each system on the cycle then reaches itself.
 `src/schedule_closure.c` closes a full matrix.
 
 ## Functions

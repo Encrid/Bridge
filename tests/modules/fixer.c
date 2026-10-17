@@ -34,6 +34,7 @@ BRIDGE_EXPORT(init) int init(void)
     marked = BRIDGE_COMPONENT("game:Marked", marked_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
     terms[0].slot = marked;
-    fixing = BRIDGE_OBSERVER("fix", BRIDGE_ON_ENTER, terms, 1, nullptr, 0);
+    fixing = BRIDGE_OBSERVER("fix", BRIDGE_ON_ENTER, terms, 1, nullptr, 0,
+        nullptr, 0);
     return (0);
 }

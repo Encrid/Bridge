@@ -25,10 +25,10 @@ TEST(init)
 
 #ifdef SPANNED
     TEST_ATTACH(api, api->spawn(api), slot, value);
-    TEST_ADD_SYSTEM(api, "tick", "update", &term, 1, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "tick", "update", &term, 1, nullptr, 0, nullptr, 0);
 #else
     (void)value;
-    TEST_ADD_SYSTEM(api, "tick", "update", &term, 0, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "tick", "update", &term, 0, nullptr, 0, nullptr, 0);
 #endif
     return (0);
 }

@@ -4,45 +4,8 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include <stdckdint.h>
-#include <string.h>
 
 #include "module.h"
-
-static int check_phase(const module_check_t *k, uint32_t i)
-{
-    const bridge_module_config_t *cfg = k->cfg;
-    const bridge_t *b = k->b;
-    const bridge_phase_name_t *n = &cfg->phases[i];
-    uint32_t at = 0;
-
-    if (!n->from || !*n->from || !n->to || !*n->to)
-        return (module_refuse(k->b, k->id, "phase name %u of its config is "
-            "unset", i));
-    while (at < i && strcmp(cfg->phases[at].from, n->from))
-        at++;
-    if (at < i)
-        return (module_refuse(k->b, k->id, "its config maps phase '%s' "
-            "twice", n->from));
-    at = 0;
-    while (at < b->phase_count && strcmp(b->phases[at], n->to))
-        at++;
-    if (at < b->phase_count)
-        return (0);
-    return (module_refuse(k->b, k->id, "its config maps phase '%s' to '%s', "
-        "which the deployment did not declare", n->from, n->to));
-}
-
-int module_check_phases(const module_check_t *k)
-{
-    int refused = 0;
-    uint32_t i = 0;
-
-    while (!refused && i < k->cfg->phase_count) {
-        refused = check_phase(k, i);
-        i++;
-    }
-    return (refused);
-}
 
 int module_lay_private(const bridge_module_config_t *cfg, uint64_t granule,
     module_private_t *at)

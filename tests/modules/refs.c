@@ -59,8 +59,8 @@ BRIDGE_EXPORT(init) int init(void)
 
     position = BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_DELETE,
         BRIDGE_TABLE);
-    BRIDGE_ADD_SYSTEM("cull", "update", nullptr, 0, nullptr, 0);
-    BRIDGE_ADD_SYSTEM("check", "present", nullptr, 0, nullptr, 0);
+    BRIDGE_ADD_SYSTEM("cull", "update", nullptr, 0, nullptr, 0, nullptr, 0);
+    BRIDGE_ADD_SYSTEM("check", "present", nullptr, 0, nullptr, 0, nullptr, 0);
     while (i < ENTITIES) {
         p.x = (float)i;
         ids[i] = bridge_spawn();

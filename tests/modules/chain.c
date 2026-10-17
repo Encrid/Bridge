@@ -7,6 +7,12 @@
 #include "chain.h"
 #include "offsets_idle.h"
 
+#ifdef CLASH
+constexpr uint32_t GOT_C_BEFORE_COUNT = 0;
+#else
+constexpr uint32_t GOT_C_BEFORE_COUNT = 1;
+#endif
+
 static uint32_t a;
 static uint32_t b;
 static uint32_t c;
@@ -59,13 +65,16 @@ BRIDGE_EXPORT(init) int init(void)
     a = BRIDGE_COMPONENT("game:LinkA", link_t, BRIDGE_STRIP, BRIDGE_TABLE);
     b = BRIDGE_COMPONENT("game:LinkB", link_t, BRIDGE_STRIP, BRIDGE_TABLE);
     c = BRIDGE_COMPONENT("game:LinkC", link_t, BRIDGE_STRIP, BRIDGE_TABLE);
-    BRIDGE_ADD_SYSTEM("start", "update", &none, 0, &a, 1);
+    BRIDGE_ADD_SYSTEM("start", "update", &none, 0, &a, 1, nullptr, 0);
     terms[0].slot = a;
-    on_a = BRIDGE_OBSERVER("got_a", BRIDGE_ON_ENTER, terms, 1, &b, 1);
+    on_a = BRIDGE_OBSERVER("got_a", BRIDGE_ON_ENTER, terms, 1, &b, 1,
+        nullptr, 0);
     terms[0].slot = b;
-    on_b = BRIDGE_OBSERVER("got_b", BRIDGE_ON_ENTER, terms, 1, &c, 1);
+    on_b = BRIDGE_OBSERVER("got_b", BRIDGE_ON_ENTER, terms, 1, &c, 1,
+        nullptr, 0);
     terms[0].slot = c;
-    BRIDGE_OBSERVER("got_c", BRIDGE_ON_ENTER, terms, 1, nullptr, 0);
+    BRIDGE_OBSERVER("got_c", BRIDGE_ON_ENTER, terms, 1, &c, 1, &on_b,
+        GOT_C_BEFORE_COUNT);
     entity = bridge_spawn();
     return (0);
 }

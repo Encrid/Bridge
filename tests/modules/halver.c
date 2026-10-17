@@ -43,6 +43,7 @@ BRIDGE_EXPORT(init) int init(void)
     position = BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
     terms[0].slot = position;
-    halving = BRIDGE_ADD_SYSTEM("halve", "update", terms, 1, nullptr, 0);
+    halving = BRIDGE_ADD_SYSTEM("halve", "update", terms, 1, nullptr, 0,
+        nullptr, 0);
     return (0);
 }

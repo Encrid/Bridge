@@ -5,7 +5,7 @@ It has everything that the system needs before it keeps any of it: `docs/intern/
 
 ## The memory
 
-- One block for the system, its terms, and after the terms its changes.
+- One block for the system, its terms, after the terms its changes, and after the changes the bits of `stated_before`: `docs/intern/schedule_before.c.md`.
 - One `storage_term_t` for each term, plus one: what storage is asked.
 - Room for one more among the systems of the world, and among the systems or the observers of the module.
 - The name of the system, and its full name.
@@ -18,6 +18,8 @@ The system also gets `named`, the index of its full name among the names of `[or
 The list of an observer has a place for as many `bridge_trigger_t` as the spans of its module can hold.
 That is what the spans could publish of it: `docs/intern/abi_system.c.md`, *The list of an observer*.
 
+`abi_alloc_subscriber` points `stated_before` of the system to its bits.
+The bits start on a word of 8 bytes, since a term and a pointer each take a multiple of 8 bytes. Two static assertions say so.
 If a piece is missing, all of it is freed, and the registration is refused for want of memory.
 
 ## Functions

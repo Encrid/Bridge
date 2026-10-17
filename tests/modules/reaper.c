@@ -69,10 +69,11 @@ TEST(init)
     terms[0].slot = position;
 #ifdef MEND
     mend = TEST_DECLARE_TAG(api, "view:Mend", BRIDGE_DELETE, BRIDGE_TABLE);
-    reaping = TEST_ADD_SYSTEM(api, "reap", "update", terms, 1, &mend, 1);
+    reaping = TEST_ADD_SYSTEM(api, "reap", "update", terms, 1, &mend, 1,
+        nullptr, 0);
 #else
     reaping = TEST_ADD_SYSTEM(api, "reap", "update", terms, 1,
-        nullptr, 0);
+        nullptr, 0, nullptr, 0);
 #endif
     return (0);
 }

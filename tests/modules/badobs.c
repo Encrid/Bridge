@@ -13,6 +13,6 @@ BRIDGE_EXPORT(init) int init(void)
 
     terms[0].slot = BRIDGE_COMPONENT("game:Position", position_t,
         BRIDGE_STRIP, BRIDGE_TABLE);
-    BRIDGE_OBSERVER("init", BRIDGE_ON_ENTER, terms, 1, nullptr, 0);
+    BRIDGE_OBSERVER("init", BRIDGE_ON_ENTER, terms, 1, nullptr, 0, nullptr, 0);
     return (0);
 }

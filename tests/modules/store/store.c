@@ -23,16 +23,17 @@ static void add_changes(const test_api_t *api)
     int none = 0;
     uint32_t both[2] = { nstore_a, nstore_b };
 
-    TEST_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, nullptr, 0, nullptr, 0);
     TEST_ADD_SYSTEM(api, "attach_a", "attach_a", &none, 0, &nstore_a,
-        1);
+        1, nullptr, 0);
     TEST_ADD_SYSTEM(api, "attach_b", "attach_b", &none, 0, &nstore_b,
-        1);
+        1, nullptr, 0);
     TEST_ADD_SYSTEM(api, "detach_b", "detach_b", &none, 0, &nstore_b,
-        1);
-    TEST_ADD_SYSTEM(api, "destroy", "destroy", &none, 0, nullptr, 0);
+        1, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "destroy", "destroy", &none, 0, nullptr, 0,
+        nullptr, 0);
     TEST_ADD_SYSTEM(api, "attach_both", "attach_both", &none, 0,
-        both, 2);
+        both, 2, nullptr, 0);
 }
 
 TEST(init)

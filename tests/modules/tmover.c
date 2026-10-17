@@ -75,10 +75,10 @@ TEST(init)
         BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = position;
     moving = TEST_ADD_SYSTEM(api, "move", "update", terms, 1,
-        nullptr, 0);
+        nullptr, 0, nullptr, 0);
     terms[0].access = BRIDGE_READ;
     tallying = TEST_ADD_SYSTEM(api, "tally", "present", terms, 1,
-        nullptr, 0);
+        nullptr, 0, nullptr, 0);
     populate(api);
     return (0);
 }

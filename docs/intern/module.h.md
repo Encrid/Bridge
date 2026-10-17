@@ -114,7 +114,7 @@ What a module starts from.
 | `module_check_bound` | `src/module_say.c` | Refuses a negative number that is not `none`: `BRIDGE_NO_LIMIT` or `BRIDGE_NONE`, the "none" of the key. Gives 1 if it refuses. |
 | `module_check_flag` | `src/module_say.c` | Refuses a key that is yes or no and is stated as neither. Gives 1 if it refuses. |
 | `module_check_flags` | `src/module_check_stated.c` | Refuses a config with a flag left unset. |
-| `module_check_phases` | `src/module_check_fit.c` | Refuses a config whose phase names are unset, mapped twice, or mapped to a phase that the deployment did not declare. |
+| `module_check_phases` | `src/module_check_phases.c` | Refuses phase names that are unset or mapped twice. Also refuses two names mapped to one phase, and a phase that the deployment did not declare. |
 | `module_check_stated` | `src/module_check_stated.c` | Refuses a config with a policy, a limit or an amount left unset, or stated as a number that is nobody's. |
 | `module_check_fit` | `src/module_check_fit.c` | Refuses a config whose amounts do not fit: a wrong log level, too many spawns, regions past 32 bits, or a ring too small. |
 | `module_check_identity` | `src/module_identity.c` | Refuses a module with no identity, with an identity of more than 127 bytes, or with one that does not have the form `namespace:name@version`. Gives 1 with a record. |

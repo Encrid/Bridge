@@ -31,7 +31,7 @@ static void declare_kind(const test_api_t *api, uint32_t k)
     nstress_seeing[k] = api->add_system(api, TEST_STATE(api,
         bridge_system_statement_t, test_put(api, SYSTEMS[k], 4), 4,
         test_put(api, "check", 5), 5,
-        test_put(api, term, sizeof(term)), 1, 0, 0));
+        test_put(api, term, sizeof(term)), 1, 0, 0, 0, 0));
 }
 
 TEST(init)
@@ -44,6 +44,6 @@ TEST(init)
         k++;
     }
     TEST_ADD_SYSTEM(api, "work", "work", &none, 0, nstress_kinds,
-        KINDS);
+        KINDS, nullptr, 0);
     return (0);
 }

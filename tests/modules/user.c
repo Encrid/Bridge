@@ -28,7 +28,8 @@ BRIDGE_EXPORT(init) int init(void)
 
     body = BRIDGE_COMPONENT("game:Body", body_t, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = body;
-    reading = BRIDGE_ADD_SYSTEM("read", "update", terms, 1, nullptr, 0);
+    reading = BRIDGE_ADD_SYSTEM("read", "update", terms, 1, nullptr, 0,
+        nullptr, 0);
     BRIDGE_ATTACH(bridge_spawn(), body, b);
     return (0);
 }

@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "abi_slots.h"
 #include "abi_subscribe.h"
 
 static int read_changes(subscribing_t *g)
@@ -17,7 +18,7 @@ static int read_changes(subscribing_t *g)
     uint32_t i = 0;
 
     while (i < g->change_count) {
-        memcpy(&slot, at + i * sizeof(slot), sizeof(slot));
+        slot = get_slot(at, i);
         if (slot >= m->declared_count)
             abi_refuse(m, "change %u of %s '%s' names slot %u, which it "
                 "never declared", i, g->what, g->name, slot);
@@ -66,6 +67,7 @@ static void hand_over(subscribing_t *g)
     s->phase = g->phase;
     s->terms = g->count;
     s->observer = g->events != 0;
+    s->slot = g->slot;
 }
 
 static uint32_t list_system(subscribing_t *g)
@@ -74,12 +76,11 @@ static uint32_t list_system(subscribing_t *g)
     bridge_t *b = m->b;
 
     b->systems[b->system_count++] = g->s;
-    if (g->events) {
-        m->observers[m->observer_count] = g->s;
-        return (m->observer_count++);
-    }
-    m->systems[m->system_count] = g->s;
-    return (m->system_count++);
+    if (g->events)
+        m->observers[m->observer_count++] = g->s;
+    else
+        m->systems[m->system_count++] = g->s;
+    return (g->slot);
 }
 
 int abi_subscribe(subscribing_t *g, uint64_t *r)
@@ -88,9 +89,10 @@ int abi_subscribe(subscribing_t *g, uint64_t *r)
     uint32_t i = 0;
 
     g->what = g->events ? "observer" : "system";
+    g->slot = g->events ? g->m->observer_count : g->m->system_count;
     if (abi_check_subscriber(g) || abi_alloc_subscriber(g))
         return (1);
-    refused = read_changes(g);
+    refused = read_changes(g) || abi_read_before(g);
     while (!refused && i < g->count) {
         refused = read_term(g, i);
         i++;

@@ -16,7 +16,7 @@ static void hold_one(const test_api_t *api)
 
     terms[0].slot = six;
     TEST_ATTACH(api, 0, six, one);
-    TEST_ADD_SYSTEM(api, "show", "update", terms, 1, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "show", "update", terms, 1, nullptr, 0, nullptr, 0);
 }
 
 TEST(show)

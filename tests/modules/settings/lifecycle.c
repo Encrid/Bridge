@@ -29,7 +29,7 @@ BRIDGE_EXPORT(init) int init(void)
     settings = BRIDGE_COMPONENT("game:Settings", settings_t, BRIDGE_DELETE,
         KEPT);
     terms[0].slot = settings;
-    BRIDGE_ADD_SYSTEM("show", "update", terms, 1, nullptr, 0);
+    BRIDGE_ADD_SYSTEM("show", "update", terms, 1, nullptr, 0, nullptr, 0);
     return (0);
 }
 

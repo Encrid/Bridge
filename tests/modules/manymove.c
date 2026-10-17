@@ -149,7 +149,7 @@ TEST(init)
         (enum bridge_storage)KEPT);
     slots[64] = TEST_COMPONENT(api, "st:M64", v_t, BRIDGE_DELETE,
         (enum bridge_storage)KEPT);
-    TEST_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, slots, TYPES);
+    TEST_ADD_SYSTEM(api, "spawn", "spawn", &none, 0, slots, TYPES, nullptr, 0);
     return (0);
 }
 

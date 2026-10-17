@@ -171,7 +171,7 @@ void wrong_observe_entry(void)
 {
     bridge_term_t term = { wrong_position, BRIDGE_READ, BRIDGE_AND, 0 };
     bridge_observer_statement_t o = { bridge_put("seen", 4), 4,
-        BRIDGE_ON_ENTER, bridge_put(&term, sizeof(term)), 1, 0, 0 };
+        BRIDGE_ON_ENTER, bridge_put(&term, sizeof(term)), 1, 0, 0, 0, 0 };
 
     bridge_observe(bridge_put(&o, sizeof(o)));
 }

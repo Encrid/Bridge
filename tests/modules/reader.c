@@ -54,6 +54,7 @@ BRIDGE_EXPORT(init) int init(void)
         BRIDGE_TABLE);
     terms[0].slot = position;
     terms[1].slot = marked;
-    summing = BRIDGE_ADD_SYSTEM("sum", "present", terms, 2, nullptr, 0);
+    summing = BRIDGE_ADD_SYSTEM("sum", "present", terms, 2, nullptr, 0,
+        nullptr, 0);
     return (0);
 }

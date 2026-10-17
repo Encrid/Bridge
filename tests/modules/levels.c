@@ -19,6 +19,6 @@ BRIDGE_EXPORT(init) int init(void)
 {
     int none = 0;
 
-    BRIDGE_ADD_SYSTEM("say", "update", &none, 0, nullptr, 0);
+    BRIDGE_ADD_SYSTEM("say", "update", &none, 0, nullptr, 0, nullptr, 0);
     return (0);
 }

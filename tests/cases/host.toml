@@ -547,14 +547,26 @@ false = { run = ["{out}/host{exe}", "order-unordered-conflict-refused"] }
 [[case]]
 name = "order-unordered-conflict-refused"
 run = ["{out}/host{exe}", "order-unordered-conflict-refused"]
-claims = { matches = ["module 'view:halver@0.1.0' did not load: 'game:mover:move' and 'view:halver:halve' both touch 'game:Position' in phase 'update', one of them writing it, and nothing orders them.*alive"] }
-false = { run = ["{out}/host{exe}", "add_system-own-conflict-in-registration-order"] }
+claims = { matches = ["module 'view:halver@0.1.0' did not load: 'game:mover:move' and 'view:halver:halve' both touch 'game:Position' in phase 'update', one of them writing it, and no pair orders them.*alive"] }
+false = { run = ["{out}/host{exe}", "add_system-before-orders-two-systems-that-conflict"] }
 
 [[case]]
-name = "add_system-own-conflict-in-registration-order"
-run = ["{out}/host{exe}", "add_system-own-conflict-in-registration-order"]
+name = "add_system-before-orders-two-systems-that-conflict"
+run = ["{out}/host{exe}", "add_system-before-orders-two-systems-that-conflict"]
 claims = { matches = ["game:twostep@0.1.0/show: x 3 0.*alive"] }
-false = { run = ["{out}/host{exe}", "config.order-cycle-refused"] }
+false = { run = ["{out}/host{exe}", "add_system-own-conflict-with-no-before-refused"] }
+
+[[case]]
+name = "add_system-own-conflict-with-no-before-refused"
+run = ["{out}/host{exe}", "add_system-own-conflict-with-no-before-refused"]
+claims = { matches = ["module 'game:twostep@0.1.0' did not load: 'game:twostep:twice' and 'game:twostep:more' both touch 'game:Position' in phase 'update', one of them writing it, and their module states no order of them.*alive"] }
+false = { run = ["{out}/host{exe}", "add_system-before-orders-two-systems-that-conflict"] }
+
+[[case]]
+name = "add_system-before-makes-a-chain-of-three-systems"
+run = ["{out}/host{exe}", "add_system-before-makes-a-chain-of-three-systems"]
+claims = { matches = ["game:twostep@0.1.0/show: x 5 0.*alive"] }
+false = { run = ["{out}/host{exe}", "config.order-pair-against-before-makes-a-cycle-refused"] }
 
 [[case]]
 name = "config.order-cycle-refused"
@@ -573,6 +585,12 @@ name = "observe-chain-one-hop-a-barrier"
 run = ["{out}/host{exe}", "observe-chain-one-hop-a-barrier"]
 claims = { matches = ["b1 p\\d+ game:chain@0.1.0/got_a: hop A.*b2 p\\d+ game:chain@0.1.0/got_b: hop B.*b3 p\\d+ game:chain@0.1.0/got_c: hop C.*alive"], matches_not = ["hop A.*hop A"] }
 false = { run = ["{out}/host{exe}", "observe-reserved-name-refused"] }
+
+[[case]]
+name = "observe-own-conflict-with-no-before-refused"
+run = ["{out}/host{exe}", "observe-own-conflict-with-no-before-refused"]
+claims = { matches = ["did not load: 'game:chain:got_b' and 'game:chain:got_c' both attach or detach 'game:LinkC' at the barrier, and their module states no order of them.*alive"] }
+false = { run = ["{out}/host{exe}", "observe-chain-one-hop-a-barrier"] }
 
 [[case]]
 name = "observe-reserved-name-refused"
@@ -693,7 +711,7 @@ false = { run = ["{out}/host{exe}", "order-unordered-observers-refused"] }
 [[case]]
 name = "order-unordered-observers-refused"
 run = ["{out}/host{exe}", "order-unordered-observers-refused"]
-claims = { matches = ["module 'view:fixer@0.1.0' did not load: 'view:watcher:seen' and 'view:fixer:fix' both touch 'game:Marked' at the barrier, one of them writing it, and nothing orders them.*seen 1 77.*alive"] }
+claims = { matches = ["module 'view:fixer@0.1.0' did not load: 'view:watcher:seen' and 'view:fixer:fix' both touch 'game:Marked' at the barrier, one of them writing it, and no pair orders them.*seen 1 77.*alive"] }
 false = { run = ["{out}/host{exe}", "module_config.changes-used-up"] }
 
 [[case]]
@@ -735,7 +753,7 @@ false = { run = ["{out}/host{exe}", "order-unordered-changes-refused"] }
 [[case]]
 name = "order-unordered-changes-refused"
 run = ["{out}/host{exe}", "order-unordered-changes-refused"]
-claims = { matches = ["module 'game:stamp9@0.1.0' did not load: 'game:stamp5:stamp' and 'game:stamp9:stamp' both attach or detach 'game:Marked' in phase 'update', and nothing orders them.*seen 1 5.*alive"], lacks = ["seen 1 9"] }
+claims = { matches = ["module 'game:stamp9@0.1.0' did not load: 'game:stamp5:stamp' and 'game:stamp9:stamp' both attach or detach 'game:Marked' in phase 'update', and no pair orders them.*seen 1 5.*alive"], lacks = ["seen 1 9"] }
 false = { run = ["{out}/host{exe}", "order-changes-ordered-loaded-first"] }
 
 [[case]]
@@ -1449,13 +1467,13 @@ false = { run = ["{out}/host{exe}", "module_config.identity-none-refused"] }
 [[case]]
 name = "order.chain-through-an-unloaded-system-stands"
 run = ["{out}/host{exe}", "order.chain-through-an-unloaded-system-stands"]
-claims = { matches = ["view:counter@0.1.0: unloaded.*view:reader@0.1.0: loaded.*alive"], matches_not = ["nothing orders them"] }
+claims = { matches = ["view:counter@0.1.0: unloaded.*view:reader@0.1.0: loaded.*alive"], matches_not = ["no pair orders them"] }
 false = { run = ["{out}/host{exe}", "order.own-order-orders-no-other-module"] }
 
 [[case]]
 name = "order.own-order-orders-no-other-module"
 run = ["{out}/host{exe}", "order.own-order-orders-no-other-module"]
-claims = { matches = ["module 'game:twostep@0.1.0' did not load: 'game:mover:move' and 'game:twostep:more' both touch 'game:Position' in phase 'update', one of them writing it, and nothing orders them.*alive"] }
+claims = { matches = ["module 'game:twostep@0.1.0' did not load: 'game:mover:move' and 'game:twostep:more' both touch 'game:Position' in phase 'update', one of them writing it, and no pair orders them.*alive"] }
 false = { run = ["{out}/host{exe}", "order.chain-through-an-unloaded-system-stands"] }
 
 [[case]]
@@ -1655,6 +1673,48 @@ name = "bridge_system_statement_t-change-outside-the-scratch-refused"
 run = ["{out}/host{exe}", "bridge_system_statement_t-change-outside-the-scratch-refused"]
 claims = { matches = ["did not load: system: a name, a term or a change lies outside the scratch arena.*alive"] }
 false = { run = ["{out}/host{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "bridge_system_statement_t-before-of-its-own-slot-refused"
+run = ["{out}/host{exe}", "bridge_system_statement_t-before-of-its-own-slot-refused"]
+claims = { matches = ["did not load: before 0 of system 'again' names slot 1, which is not an earlier system.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_system_statement_t-before-of-another-phase-refused"] }
+
+[[case]]
+name = "bridge_system_statement_t-more-before-than-earlier-systems-refused"
+run = ["{out}/host{exe}", "bridge_system_statement_t-more-before-than-earlier-systems-refused"]
+claims = { matches = ["did not load: a system states 2 systems before it, and the module registered 1.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_system_statement_t-before-of-its-own-slot-refused"] }
+
+[[case]]
+name = "bridge_system_statement_t-before-of-another-phase-refused"
+run = ["{out}/host{exe}", "bridge_system_statement_t-before-of-another-phase-refused"]
+claims = { matches = ["did not load: before 0 of system 'again' names system 'act', which is of another phase.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_system_statement_t-before-of-an-earlier-system-of-the-same-phase-read"] }
+
+[[case]]
+name = "bridge_system_statement_t-before-outside-the-scratch-refused"
+run = ["{out}/host{exe}", "bridge_system_statement_t-before-outside-the-scratch-refused"]
+claims = { matches = ["did not load: system: before lies outside the scratch arena.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_system_statement_t-before-of-its-own-slot-refused"] }
+
+[[case]]
+name = "bridge_observer_statement_t-more-before-than-earlier-observers-refused"
+run = ["{out}/host{exe}", "bridge_observer_statement_t-more-before-than-earlier-observers-refused"]
+claims = { matches = ["did not load: an observer states 1 observers before it, and the module registered 0.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_observer_statement_t-before-of-its-own-slot-refused"] }
+
+[[case]]
+name = "bridge_observer_statement_t-before-of-its-own-slot-refused"
+run = ["{out}/host{exe}", "bridge_observer_statement_t-before-of-its-own-slot-refused"]
+claims = { matches = ["did not load: before 0 of observer 'again' names slot 1, which is not an earlier observer.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_observer_statement_t-before-of-an-earlier-observer-read"] }
+
+[[case]]
+name = "bridge_observer_statement_t-before-outside-the-scratch-refused"
+run = ["{out}/host{exe}", "bridge_observer_statement_t-before-outside-the-scratch-refused"]
+claims = { matches = ["did not load: observer: before lies outside the scratch arena.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_observer_statement_t-before-of-its-own-slot-refused"] }
 
 [[case]]
 name = "bridge_observer_statement_t-more-changes-than-types-refused"
@@ -1861,10 +1921,22 @@ claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: phase name 0 of it
 false = { run = ["{out}/host{exe}", "module_config.init_timeout-none-beside-other-timeouts-taken"] }
 
 [[case]]
-name = "phase_name.two-mapped-to-one-phase-taken"
-run = ["{out}/host{exe}", "phase_name.two-mapped-to-one-phase-taken"]
-claims = { matches = ["test:ok@0\\.1\\.0: loaded.*alive"], matches_not = ["refused"] }
-false = { run = ["{out}/host{exe}", "module_config.config-empty-refused"] }
+name = "phase_name.two-mapped-to-one-phase-refused"
+run = ["{out}/host{exe}", "phase_name.two-mapped-to-one-phase-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: its config maps phases 'tick' and 'tock' to one phase 'update'.*alive"] }
+false = { run = ["{out}/host{exe}", "phase_name.from-mapped-loads"] }
+
+[[case]]
+name = "phase_name.as-it-is-beside-a-map-onto-another-phase-taken"
+run = ["{out}/host{exe}", "phase_name.as-it-is-beside-a-map-onto-another-phase-taken"]
+claims = { matches = ["game:places@0.1.0: loaded.*b1 p0 game:places@0.1.0/first: at.*alive"], matches_not = ["as it is"] }
+false = { run = ["{out}/host{exe}", "phase_name.as-it-is-with-a-map-onto-it-refused"] }
+
+[[case]]
+name = "phase_name.as-it-is-with-a-map-onto-it-refused"
+run = ["{out}/host{exe}", "phase_name.as-it-is-with-a-map-onto-it-refused"]
+claims = { matches = ["did not load: a system names phase 'update' as it is, and its config also maps 'tick' to that phase.*alive"] }
+false = { run = ["{out}/host{exe}", "add_system-before-orders-two-systems-that-conflict"] }
 
 [[case]]
 name = "bridge_reload-config-that-the-checks-refuse-refused"
@@ -1889,6 +1961,12 @@ name = "phase_name.mapped-to-the-second-phase-loads"
 run = ["{out}/host{exe}", "phase_name.mapped-to-the-second-phase-loads"]
 claims = { matches = ["game:stamp@0.1.0: loaded.*seen 1 7.*alive"] }
 false = { run = ["{out}/host{exe}", "phase_name.to-undeclared-refused"] }
+
+[[case]]
+name = "phase_name.two-names-mapped-to-two-phases-load"
+run = ["{out}/host{exe}", "phase_name.two-names-mapped-to-two-phases-load"]
+claims = { matches = ["game:stamp@0.1.0: loaded.*seen 1 7.*alive"] }
+false = { run = ["{out}/host{exe}", "phase_name.two-mapped-to-one-phase-refused"] }
 
 [[case]]
 name = "host-api-null-arguments-refused"
@@ -1947,7 +2025,7 @@ false = { run = ["{out}/host{exe}", "bridge_reload-share-from-none-taken"] }
 [[case]]
 name = "bridge_reload-into-an-unordered-conflict-refused"
 run = ["{out}/host{exe}", "bridge_reload-into-an-unordered-conflict-refused"]
-claims = { matches = ["module 'game:thing@0\\.2\\.0' was not reloaded: 'game:mover:move' and 'game:thing:push' both touch 'game:Position' in phase 'update', one of them writing it, and nothing orders them.*alive"] }
+claims = { matches = ["module 'game:thing@0\\.2\\.0' was not reloaded: 'game:mover:move' and 'game:thing:push' both touch 'game:Position' in phase 'update', one of them writing it, and no pair orders them.*alive"] }
 false = { run = ["{out}/host{exe}", "bridge_reload-share-from-none-taken"] }
 
 [[case]]
@@ -2527,6 +2605,24 @@ claims = { matches = ["b1 p0 game:places@0.1.0/first: at.*b1 p1 game:places@0.1.
 false = { run = ["{out}/host{exe}", "record.barriers-the-count-it-was-said-after"] }
 
 [[case]]
+name = "add_system-before-holds-without-a-conflict"
+run = ["{out}/host{exe}", "add_system-before-holds-without-a-conflict"]
+claims = { matches = ["b2 p3 game:places@0.1.0/second: at.*alive"] }
+false = { run = ["{out}/host{exe}", "record.place-of-the-systems-of-two-modules"] }
+
+[[case]]
+name = "record.place-of-the-systems-of-two-modules"
+run = ["{out}/host{exe}", "record.place-of-the-systems-of-two-modules"]
+claims = { matches = ["b2 p0 game:places@0.1.0/first: at.*b2 p1 game:places@0.1.0/second: at.*b2 p2 game:other@0.1.0/first: at.*b2 p3 game:other@0.1.0/second: at.*alive"] }
+false = { run = ["{out}/host{exe}", "add_system-before-holds-without-a-conflict"] }
+
+[[case]]
+name = "config.order-pair-orders-two-systems-of-one-module"
+run = ["{out}/host{exe}", "config.order-pair-orders-two-systems-of-one-module"]
+claims = { matches = ["b1 p0 game:places@0.1.0/second: at.*b1 p1 game:places@0.1.0/first: at.*alive"] }
+false = { run = ["{out}/host{exe}", "record.place-of-each-system-in-its-phase"] }
+
+[[case]]
 name = "record.barriers-the-count-it-was-said-after"
 run = ["{out}/host{exe}", "record.barriers-the-count-it-was-said-after"]
 claims = { matches = ["b1 p\\d+ \\S+ event 3 1.*b3 p\\d+ \\S+ event 2 2.*b5 p\\d+ \\S+ event 4 57005.*alive"] }
@@ -3043,6 +3139,12 @@ claims = { matches = ["system: its name has 128 bytes, and a name has 1 to 127.*
 false = { run = ["{out}/host{exe}", "bridge_declaration_t-name-empty-refused"] }
 
 [[case]]
+name = "bridge_system_statement_t-phase-undeclared-cut-to-40-bytes-in-the-reason"
+run = ["{out}/host{exe}", "bridge_system_statement_t-phase-undeclared-cut-to-40-bytes-in-the-reason"]
+claims = { matches = ["a system names phase 'o{40}', which the deployment did not declare.*alive"] }
+false = { run = ["{out}/host{exe}", "module_config.phases-unmapped-refused"] }
+
+[[case]]
 name = "destroy-of-id-0-refused"
 run = ["{out}/host{exe}", "destroy-of-id-0-refused"]
 claims = { matches = ["system 'act' failed: destroy: the id 0 is no entity.*alive"] }
@@ -3061,7 +3163,37 @@ claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: no backend named '
 false = { run = ["{out}/host{exe}", "attach-many-values-through-little-scratch"] }
 
 [[case]]
-name = "config.order-pair-stands-against-a-chain-of-own"
-run = ["{out}/host{exe}", "config.order-pair-stands-against-a-chain-of-own"]
-claims = { matches = ["game:twostep@0.1.0/show: x 7 0.*alive"], matches_not = ["run before itself"] }
-false = { run = ["{out}/host{exe}", "config.order-cycle-refused"] }
+name = "config.order-pair-against-before-makes-a-cycle-refused"
+run = ["{out}/host{exe}", "config.order-pair-against-before-makes-a-cycle-refused"]
+claims = { matches = ["did not load: 'game:twostep:twice' would run before itself in phase 'update': the \\[order\\] pairs and the orders that the modules state make a cycle.*alive"] }
+false = { run = ["{out}/host{exe}", "add_system-before-makes-a-chain-of-three-systems"] }
+
+[[case]]
+name = "config.order-pair-does-not-replace-before-refused"
+run = ["{out}/host{exe}", "config.order-pair-does-not-replace-before-refused"]
+claims = { matches = ["did not load: 'game:twostep:twice' and 'game:twostep:more' both touch 'game:Position' in phase 'update', one of them writing it, and their module states no order of them.*alive"] }
+false = { run = ["{out}/host{exe}", "config.order-pair-agrees-with-before"] }
+
+[[case]]
+name = "config.order-pair-holds-without-a-conflict"
+run = ["{out}/host{exe}", "config.order-pair-holds-without-a-conflict"]
+claims = { matches = ["b2 p3 game:places@0.1.0/first: at.*alive"] }
+false = { run = ["{out}/host{exe}", "record.place-of-the-systems-of-two-modules"] }
+
+[[case]]
+name = "config.order-pair-agrees-with-before"
+run = ["{out}/host{exe}", "config.order-pair-agrees-with-before"]
+claims = { matches = ["game:twostep@0.1.0/show: x 3 0.*alive"] }
+false = { run = ["{out}/host{exe}", "config.order-pair-does-not-replace-before-refused"] }
+
+[[case]]
+name = "add_system-before-with-a-slot-two-times-taken"
+run = ["{out}/host{exe}", "add_system-before-with-a-slot-two-times-taken"]
+claims = { matches = ["game:twostep@0.1.0/show: x 5 0.*alive"] }
+false = { run = ["{out}/host{exe}", "config.order-pair-against-before-makes-a-cycle-refused"] }
+
+[[case]]
+name = "bridge_reload-that-closes-a-cycle-refused"
+run = ["{out}/host{exe}", "bridge_reload-that-closes-a-cycle-refused"]
+claims = { matches = ["module 'game:twostep@0\\.2\\.0' was not reloaded: 'game:twostep:twice' would run before itself in phase 'update': the \\[order\\] pairs and the orders that the modules state make a cycle.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-that-closes-no-cycle-taken"] }

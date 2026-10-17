@@ -26,15 +26,19 @@ int counted_build(bridge_t *b, char *why, size_t why_len);
 #undef schedule_build
 #undef schedule_reaches
 
-static bridge_system_t *make_system(module_t *m, declared_type_t *c)
+static bridge_system_t *make_system(module_t *m, declared_type_t *c,
+    uint32_t slot)
 {
-    bridge_system_t *s = calloc(1, sizeof(*s) + sizeof(system_term_t));
+    bridge_system_t *s = calloc(1, sizeof(*s) + sizeof(system_term_t)
+        + schedule_get_words(slot) * sizeof(uint64_t));
 
     if (!s)
         return (nullptr);
     s->m = m;
     s->terms = 1;
     s->term[0] = (system_term_t){ c, true };
+    s->slot = slot;
+    s->stated_before = (uint64_t *)(void *)&s->term[1];
     return (s);
 }
 
@@ -44,9 +48,11 @@ static bool fill_world(bridge_t *b, bridge_system_t **list, module_t *m,
     uint32_t i = 0;
 
     while (i < CHAIN_SYSTEMS) {
-        list[i] = make_system(m, c);
+        list[i] = make_system(m, c, i);
         if (!list[i])
             return (false);
+        if (i)
+            schedule_join_before(list[i], list[i - 1]);
         i++;
     }
     b->systems = list;

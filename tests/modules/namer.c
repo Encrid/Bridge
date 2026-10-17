@@ -39,7 +39,8 @@ BRIDGE_EXPORT(init) int init(void)
 
     name = BRIDGE_COMPONENT("game:Name", name_t, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = name;
-    saying = BRIDGE_ADD_SYSTEM("say", "update", terms, 1, nullptr, 0);
+    saying = BRIDGE_ADD_SYSTEM("say", "update", terms, 1, nullptr, 0,
+        nullptr, 0);
 #ifndef READER
     n.text.at = bridge_alloc(n.text.len);
     acc_to_shared(n.text.at, HELLO, n.text.len);

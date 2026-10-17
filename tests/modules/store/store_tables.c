@@ -72,9 +72,9 @@ void nstore_add_tables(const test_api_t *api)
         k++;
     }
     first[0].slot = kinds[0];
-    TEST_ADD_SYSTEM(api, "combine", "combine", &none, 0, kinds, 14);
+    TEST_ADD_SYSTEM(api, "combine", "combine", &none, 0, kinds, 14, nullptr, 0);
     seeing = TEST_ADD_SYSTEM(api, "see", "look", first, 1, nullptr,
-        0);
+        0, nullptr, 0);
 }
 
 #endif

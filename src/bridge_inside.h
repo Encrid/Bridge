@@ -15,6 +15,9 @@
 
 [[nodiscard]] int bridge_name_phases(bridge_t *b, const bridge_config_t *cfg);
 
+uint32_t bridge_find_phase(char *const *names, uint32_t count,
+    const char *name, size_t len);
+
 size_t bridge_get_stem_length(const char *identity);
 
 const module_t *bridge_find_pinned(const bridge_t *b);

@@ -3,24 +3,6 @@
 This file refuses the keys of the config of a module that do not fit: in what there is, and with one another.
 It also finds where the regions of a module sit in its private memory.
 
-## The phase names of a module
-
-A module names its phases in its own words, and the deployment says which of its phases each name is.
-The author of a module never saw the deployment, and Bridge ships no phase names, so two authors can use two names for one phase.
-Why Bridge ships no phase names is in `docs/intern/bridge_phases.c.md`, *No phase names*.
-So the config of a module carries a table, `phases`, from a name that the module uses to a phase that the deployment declared:
-
-```toml
-[module."mods:physics".phases]
-tick = "update"
-```
-
-A name that is not in the table is looked for among the phases of the deployment, as it is written.
-So a module that already uses the name of the deployment needs no entry.
-The load is refused for an entry with no name on one side, by its place in the table.
-It is refused for a name mapped twice, and for a mapping to a phase that the deployment did not declare, by the name.
-The deployment resolves the names because it is the only party that has seen both sides.
-
 ## The budget of a module
 
 A module states the sizes of its private memory: `scratch`, `log_ring` and `spans`, in bytes.
@@ -68,8 +50,6 @@ So each sum must fit in 32 bits, and the end, rounded up to the granule of the b
 
 | Function | Result |
 | --- | --- |
-| `check_phase` | Refuses phase name `i` of a config if it is unset, mapped twice, or mapped to a phase that the deployment did not declare. |
-| `module_check_phases` | Refuses a config whose phase names cannot be mapped. |
 | `module_lay_private` | Finds where the regions of a module sit in its private memory. Gives 1 if they cannot be laid out in 32 bits. |
 | `check_log_level` | Refuses a log level that is unset, or that is not one there is. |
 | `module_check_fit` | Refuses a config whose amounts do not fit. |

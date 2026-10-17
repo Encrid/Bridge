@@ -76,9 +76,11 @@ BRIDGE_EXPORT(init) int init(void)
     marked = BRIDGE_COMPONENT("game:Marked", marked_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
     terms[0].slot = position;
-    moving = BRIDGE_ADD_SYSTEM("move", "update", terms, 1, nullptr, 0);
+    moving = BRIDGE_ADD_SYSTEM("move", "update", terms, 1, nullptr, 0,
+        nullptr, 0);
     terms[0].access = BRIDGE_READ;
-    counting = BRIDGE_ADD_SYSTEM("count", "present", terms, 1, nullptr, 0);
+    counting = BRIDGE_ADD_SYSTEM("count", "present", terms, 1, nullptr, 0,
+        nullptr, 0);
     populate();
     return (0);
 }

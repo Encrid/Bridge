@@ -16,12 +16,16 @@ typedef struct {
     uint32_t count;
     uint32_t changes_at;
     uint32_t change_count;
+    uint32_t before_at;
+    uint32_t before_count;
     uint32_t phase;
     uint32_t events;
+    uint32_t slot;
     const char *what;
     char name[NAME_MOST + 1];
     const bridge_term_t *terms;
-    const void *changes;
+    const char *changes;
+    const char *before;
     char of[192];
     bridge_system_t *s;
     storage_term_t *asked;
@@ -35,6 +39,13 @@ void abi_free_subscriber(subscribing_t *g);
 
 int abi_check_term(subscribing_t *g, uint32_t i, const bridge_term_t *t);
 
+int abi_check_before(subscribing_t *g);
+
+int abi_read_before(const subscribing_t *g);
+
 int abi_subscribe(subscribing_t *g, uint64_t *r);
+
+int abi_read_phase(module_t *m, const bridge_system_statement_t *st,
+    uint32_t *phase);
 
 #endif

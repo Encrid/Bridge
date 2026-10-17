@@ -81,7 +81,8 @@ BRIDGE_EXPORT(init) int init(void)
         BRIDGE_DIRECT_INDEXED);
     two[0].slot = position;
     two[1].slot = aim;
-    bodies = BRIDGE_ADD_SYSTEM("reached", "present", two, 2, nullptr, 0);
+    bodies = BRIDGE_ADD_SYSTEM("reached", "present", two, 2, nullptr, 0,
+        nullptr, 0);
     populate();
     return (0);
 }

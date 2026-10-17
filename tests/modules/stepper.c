@@ -36,7 +36,7 @@ static void declare_tick(const test_api_t *api)
         BRIDGE_TABLE);
     terms[0].slot = tick;
     ticking = TEST_ADD_SYSTEM(api, "advance", "update", terms, 1,
-        nullptr, 0);
+        nullptr, 0, nullptr, 0);
 }
 
 TEST(init)

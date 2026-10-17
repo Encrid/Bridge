@@ -25,7 +25,7 @@ BRIDGE_EXPORT(init) int init(void)
 {
     int none = 0;
 
-    BRIDGE_ADD_SYSTEM("forever", "update", &none, 0, nullptr, 0);
-    BRIDGE_ADD_SYSTEM("after", "present", &none, 0, nullptr, 0);
+    BRIDGE_ADD_SYSTEM("forever", "update", &none, 0, nullptr, 0, nullptr, 0);
+    BRIDGE_ADD_SYSTEM("after", "present", &none, 0, nullptr, 0, nullptr, 0);
     return (0);
 }

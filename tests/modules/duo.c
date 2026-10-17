@@ -28,7 +28,7 @@ BRIDGE_EXPORT(init) int init(void)
 
     one = BRIDGE_DECLARE_TAG("game:One", BRIDGE_STRIP, BRIDGE_TABLE);
     two = BRIDGE_DECLARE_TAG("game:Two", BRIDGE_STRIP, BRIDGE_TABLE);
-    BRIDGE_ADD_SYSTEM("first", "update", &none, 0, &one, 1);
-    BRIDGE_ADD_SYSTEM("second", "update", &none, 0, &two, 1);
+    BRIDGE_ADD_SYSTEM("first", "update", &none, 0, &one, 1, nullptr, 0);
+    BRIDGE_ADD_SYSTEM("second", "update", &none, 0, &two, 1, nullptr, 0);
     return (0);
 }

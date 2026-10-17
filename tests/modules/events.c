@@ -51,10 +51,10 @@ BRIDGE_EXPORT(init) int init(void)
     marked = BRIDGE_COMPONENT("game:Marked", marked_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
     terms[0].slot = marked;
-    BRIDGE_ADD_SYSTEM("poke", "update", &none, 0, &marked, 1);
+    BRIDGE_ADD_SYSTEM("poke", "update", &none, 0, &marked, 1, nullptr, 0);
     watching = BRIDGE_OBSERVER("any",
         BRIDGE_ON_ENTER | BRIDGE_ON_ATTACH | BRIDGE_ON_LEAVE, terms, 1,
-        nullptr, 0);
+        nullptr, 0, nullptr, 0);
     entity = bridge_spawn();
     return (0);
 }

@@ -27,6 +27,6 @@ TEST(init)
     term.slot = TEST_COMPONENT(api, "test:Bare", bare_t, BRIDGE_DELETE,
         BRIDGE_TABLE);
     (void)TEST_COMPONENT(api, "Bare", bare_t, BRIDGE_DELETE, BRIDGE_TABLE);
-    TEST_ADD_SYSTEM(api, "look", "update", &term, 1, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "look", "update", &term, 1, nullptr, 0, nullptr, 0);
     return (0);
 }

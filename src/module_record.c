@@ -79,8 +79,8 @@ static bool copy_phases(const bridge_t *b, module_t *m,
     m->phase_to = calloc(count, sizeof(*m->phase_to));
     whole = m->phase_from && m->phase_to;
     while (whole && i < cfg->phase_count) {
-        while (strcmp(b->phases[m->phase_to[i]], n[i].to))
-            m->phase_to[i]++;
+        m->phase_to[i] = bridge_find_phase(b->phases, b->phase_count, n[i].to,
+            strlen(n[i].to));
         m->phase_from[i] = copy_text(n[i].from, strlen(n[i].from));
         whole = m->phase_from[i] != nullptr;
         i++;

@@ -133,7 +133,7 @@ Bridge never gives a row memory from outside `columns`.
 
 ## bridge_order_t
 
-`bridge_order_t` is a pair of systems that conflict in one phase, in the order that they run.
+`bridge_order_t` is a pair of systems of one phase, in the order that they run.
 A pair can also order two observers.
 
 | Field | Content |
@@ -148,8 +148,11 @@ Bridge refuses a pair unless it has two different full names of this form.
 
 A pair can name a system that is not loaded.
 Pairs make chains: if `a` runs before `b`, and `b` before `c`, then `a` runs before `c`, also while `b` is not loaded.
-Only the pairs and their chains order two systems of two modules.
-The order in which a module registered its systems orders only the systems of that module, and a pair wins over it.
+For a conflict of two systems of two modules, only the pairs and their chains count.
+In one phase, a pair holds also between two systems that do not conflict.
+
+A pair can also order two systems of one module, but it does not replace the order that the module states: `docs/extern/bridge_abi.h.md`, *Conflicts*.
+A pair against that order makes a cycle, and the load or the reload fails.
 `docs/extern/bridge_abi.h.md`, *Conflicts* tells when two systems conflict.
 
 ## bridge_config_t
@@ -188,7 +191,12 @@ The author of a module did not see the deployment, thus a module can use other n
 | `to` | The name of a phase of the deployment. |
 
 If no map holds a name, Bridge looks for the name, as it is, among the phases of the deployment.
-A load refuses a map with an empty name, a name that two maps hold, and a phase that the deployment did not declare.
+A load refuses a map with an empty name, a name that two maps hold, or a phase that the deployment did not declare.
+It also refuses two maps onto one phase.
+
+The phases of one module stay different phases of the deployment.
+Thus a barrier always separates two systems that a module put in two phases.
+A system that names a phase as it is fails to register if a map of its module puts another name onto that phase.
 
 ## bridge_flag
 
@@ -511,7 +519,7 @@ A host that ignores the result can lose a world that stays.
 4. Bridge calls `init` under `init_timeout`. `init` declares the types, and registers the systems and the observers.
 5. Bridge writes the settings into the component that `config` names.
 6. Bridge finds the export of each system and observer, and `shutdown` and `reload`.
-7. The load fails if a system of the module conflicts with a system of another module, and nothing orders them.
+7. The load fails if the orders make a cycle, or if two systems conflict and nothing orders them. `docs/extern/bridge_abi.h.md`, *Conflicts* tells which order counts.
 8. A barrier applies what `init` queued, and writes the spans of the module.
 
 The result is 0 if the module is loaded, its `init` gave 0, and the world can run it. Else the result is 1, with a record.
@@ -692,6 +700,7 @@ The reason is one of these:
 - `phase name <index> of its config is unset`
 - `its config maps phase '<name>' twice`
 - `its config maps phase '<name>' to '<phase>', which the deployment did not declare`
+- `its config maps phases '<name>' and '<name>' to one phase '<phase>'`
 - `its log_level of <number> is not one it can be, which is 1 to <number>`
 - `its changes of <bytes> bytes is more than an offset of 32 bits can reach`
 - `its spawns of <count> is more than [budget] entities of <count>`
@@ -719,11 +728,20 @@ The reason is a text of the backend, a refusal of an entry of the module, or one
 - `its spawns of <count> do not fit under [budget] entities of <count>`
 - `it accepts the loss of '<name>', and loses nothing of that name`
 - `its spans of <bytes> bytes do not hold a column_base of <count> components by <count> tables, which with its queries is <bytes> bytes`
-- `'<system>' and '<system>' both touch '<component>' in phase '<phase>', one of them writing it, and nothing orders them`
-- `'<observer>' and '<observer>' both attach or detach '<component>' at the barrier, and nothing orders them`
+- `'<system>' and '<system>' both touch '<component>' in phase '<phase>', one of them writing it, and no pair orders them`
+- `'<observer>' and '<observer>' both attach or detach '<component>' at the barrier, and no pair orders them`
+- `'<system>' and '<system>' both touch '<component>' in phase '<phase>', one of them writing it, and their module states no order of them`
+- `'<observer>' and '<observer>' both attach or detach '<component>' at the barrier, and their module states no order of them`
+- `'<system>' would run before itself in phase '<phase>': the [order] pairs and the orders that the modules state make a cycle`
+- `'<observer>' would run before itself at the barrier: the [order] pairs and the orders that the modules state make a cycle`
 
 `its <export> <reason>` tells that the export did not return: the reason is the text of the backend.
 A conflict names the full names of the two systems. A conflict of observers is at the barrier.
+
+A conflict of two systems of one module ends with `their module states no order of them`.
+A conflict of two systems of two modules ends with `no pair orders them`.
+A reason has at most 255 bytes, so long names can cut its end: `docs/extern/bridge_backend.h.md`, *backend_err_t*.
+
 `docs/extern/bridge_abi.h.md`, *Messages* gives the refusals of the entries.
 
 ### The settings

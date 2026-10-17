@@ -29,26 +29,28 @@
             BRIDGE_TAG, 0, 1, 0, 0, on_unload, storage))
 
     #define TEST_ADD_SYSTEM(api, name, phase, terms, count, changes, \
-        change_count) \
+        change_count, before, before_count) \
         (api)->add_system(api, TEST_STATE(api, \
             bridge_system_statement_t, \
             test_put(api, name, sizeof(name) - 1), sizeof(name) - 1, \
             test_put(api, phase, sizeof(phase) - 1), \
             sizeof(phase) - 1, \
             test_put(api, terms, (count) * sizeof(bridge_term_t)), \
-            count, TEST_PUT_CHANGES(api, changes, change_count), \
-            change_count))
+            count, TEST_PUT_SLOTS(api, changes, change_count), \
+            change_count, TEST_PUT_SLOTS(api, before, before_count), \
+            before_count))
     #define TEST_OBSERVER(api, name, events, terms, count, changes, \
-        change_count) \
+        change_count, before, before_count) \
         (api)->observe(api, TEST_STATE(api, \
             bridge_observer_statement_t, \
             test_put(api, name, sizeof(name) - 1), sizeof(name) - 1, \
             events, \
             test_put(api, terms, (count) * sizeof(bridge_term_t)), \
-            count, TEST_PUT_CHANGES(api, changes, change_count), \
-            change_count))
-    #define TEST_PUT_CHANGES(api, changes, count) \
-        ((count) ? test_put(api, changes, \
+            count, TEST_PUT_SLOTS(api, changes, change_count), \
+            change_count, TEST_PUT_SLOTS(api, before, before_count), \
+            before_count))
+    #define TEST_PUT_SLOTS(api, slots, count) \
+        ((count) ? test_put(api, slots, \
             (count) * sizeof(uint32_t)) : 0)
 
 static inline const bridge_query_t *test_get_query(

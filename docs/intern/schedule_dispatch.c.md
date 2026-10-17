@@ -10,6 +10,7 @@ Two systems that conflict never run at the same time.
 So at one time only one system can write a given component, and the header names it: it is the culprit of a bad write.
 
 `system` is the slot of the system among the systems of its module: the number that the module got when it registered the system.
+`run_system` takes it from `slot` of the system.
 For an observer, it is the slot among the observers, and `observer` is 1.
 After the call, `system` is `UINT32_MAX` and `observer` is 0.
 While the system runs, `running` and `turn` of the module hold the system and its turn.
@@ -36,7 +37,6 @@ It does this only if `work_limit` of the module is above 0: `-1` is no limit, an
 
 | Function | Result |
 | --- | --- |
-| `find_slot` | Gives the slot of a system among the systems of its module, or among its observers. |
 | `call_system` | Sets the work limit, calls the system, and marks it failed with a reason if the call failed. |
 | `run_system` | Writes which system runs in the header of the module, runs it, then clears the header. |
 | `schedule_run_job` | What a thread runs: the systems of one job, in the order the module registered them. |

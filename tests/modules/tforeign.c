@@ -33,6 +33,6 @@ TEST(init)
 {
     int none = 0;
 
-    TEST_ADD_SYSTEM(api, "reach", "update", &none, 0, nullptr, 0);
+    TEST_ADD_SYSTEM(api, "reach", "update", &none, 0, nullptr, 0, nullptr, 0);
     return (0);
 }

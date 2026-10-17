@@ -12,7 +12,7 @@ This file loads a module.
 5. Take the share of the persistent arena, if `persistent` is more than zero.
 6. Set aside the ids of the module before `init` runs, because `init` can spawn.
 7. Make the image, the instance and the private memory, and call `init`: `src/module_start.c`.
-8. Build the schedule again. It refuses a new system or observer that conflicts with another and that nothing orders.
+8. Build the schedule again. It refuses a cycle, and a new system or observer that conflicts with another and that nothing orders.
 9. Put the module at the end of the list of modules.
 10. Let the world run again, if the world waits for this module.
 11. Run a barrier. It applies what `init` queued, and publishes the spans.

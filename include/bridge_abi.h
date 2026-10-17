@@ -115,8 +115,10 @@ typedef struct {
     uint32_t term_count;
     uint32_t changes;
     uint32_t change_count;
+    uint32_t before;
+    uint32_t before_count;
 } bridge_system_statement_t;
-static_assert(sizeof(bridge_system_statement_t) == 32);
+static_assert(sizeof(bridge_system_statement_t) == 40);
 static_assert(alignof(bridge_system_statement_t) == 4);
 static_assert(offsetof(bridge_system_statement_t, name) == 0);
 static_assert(offsetof(bridge_system_statement_t, name_len) == 4);
@@ -126,6 +128,8 @@ static_assert(offsetof(bridge_system_statement_t, terms) == 16);
 static_assert(offsetof(bridge_system_statement_t, term_count) == 20);
 static_assert(offsetof(bridge_system_statement_t, changes) == 24);
 static_assert(offsetof(bridge_system_statement_t, change_count) == 28);
+static_assert(offsetof(bridge_system_statement_t, before) == 32);
+static_assert(offsetof(bridge_system_statement_t, before_count) == 36);
 
 typedef struct {
     uint32_t name;
@@ -135,8 +139,10 @@ typedef struct {
     uint32_t term_count;
     uint32_t changes;
     uint32_t change_count;
+    uint32_t before;
+    uint32_t before_count;
 } bridge_observer_statement_t;
-static_assert(sizeof(bridge_observer_statement_t) == 28);
+static_assert(sizeof(bridge_observer_statement_t) == 36);
 static_assert(alignof(bridge_observer_statement_t) == 4);
 static_assert(offsetof(bridge_observer_statement_t, name) == 0);
 static_assert(offsetof(bridge_observer_statement_t, name_len) == 4);
@@ -145,6 +151,8 @@ static_assert(offsetof(bridge_observer_statement_t, terms) == 12);
 static_assert(offsetof(bridge_observer_statement_t, term_count) == 16);
 static_assert(offsetof(bridge_observer_statement_t, changes) == 20);
 static_assert(offsetof(bridge_observer_statement_t, change_count) == 24);
+static_assert(offsetof(bridge_observer_statement_t, before) == 28);
+static_assert(offsetof(bridge_observer_statement_t, before_count) == 32);
 
 constexpr uint32_t BRIDGE_ZEROED = UINT32_MAX;
 
