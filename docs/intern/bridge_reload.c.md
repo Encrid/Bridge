@@ -10,16 +10,16 @@ This file reloads a module: a new instance takes the place of the old one, over 
 3. Make the record of the new instance.
 4. Take the systems of the old instance out of storage.
 5. If the backend cannot hold two instances, shut the old instance down and destroy it.
-6. Let the new record take over what was set aside for the module.
+6. Let the new record take over from the old record.
 7. Make the new image, instance and private memory, and call `reload` of the new instance.
 8. Build the schedule again, with the same refusal as a load.
-9. Move the rows of each type that the reload made in the place of another: `src/reload_rows.c`.
+9. Move the rows of each replaced type to the type that replaces it: `src/reload_rows.c`.
 10. Shut the old instance down, if step 5 did not, and put the new record in its place.
-11. Let the world run again, if the world waits for this module, and run a barrier.
+11. Let the world run again, if it waits for this module, and run a barrier.
 
 Steps 3 and 6 are in `src/reload_record.c`. A failure in steps 7 to 9 goes to `src/reload_fail.c`.
 A reload is the `reload` of the new instance, and then the `shutdown` of the old one.
-Where the backend holds both instances, the old instance is untouched until step 10.
+With `BACKEND_SIDE_BY_SIDE`, the old instance is untouched until step 10.
 So a reload that fails before step 10 leaves the module as it ran.
 Like a load, `bridge_reload` gives 1 if the world has stopped, since a module that nothing will ever run did not reload.
 
@@ -50,7 +50,7 @@ If the reload lays the settings component out again, the new type is the setting
 The systems of the old instance leave storage before the new instance registers its own, in the places that those had.
 So a reload needs no room for the systems of a module twice: `src/abi_alloc.c`.
 The new record takes the place of the old one in the list of modules, so the order of the loads stays.
-The ids held ready for the old instance are the ids of the new record from the swap on.
+`docs/intern/reload_record.c.md`, *What the new record takes over*, tells what else the new record takes.
 
 ## One supply of ids and bytes
 
@@ -67,4 +67,4 @@ So the two instances never get the same id or the same bytes.
 | `forget_config` | Forgets the settings component if the new instance no longer declares it. |
 | `swap` | Puts the new record in the place of the old one, releases what the new instance no longer declares, and discards the old record. |
 | `start_new` | Starts the new instance with `reload`, builds the schedule again, and moves the rows. 1, with why in the reload, if one fails. |
-| `bridge_reload_now` | Reloads a module. 0 if the new instance runs and the world runs, and 1 if not. |
+| `bridge_reload_now` | Reloads a module. 0 if the new instance and the world run, and 1 if not. |

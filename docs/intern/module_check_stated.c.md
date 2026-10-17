@@ -1,6 +1,6 @@
 # src/module_check_stated.c
 
-This file refuses the keys of the config of a module that nobody stated.
+This file refuses each key of the config of a module that nobody stated.
 A zero is nobody's value, and so is a negative number that is not the "none" of its key.
 
 ## No unaccountable values
@@ -36,7 +36,7 @@ The flags are `trusted`, `reloadable`, `hot_reload` and `pinned`.
 3. An amount that is zero: `scratch`, `log_ring`, `spans`, `spawns`, `persistent`, `changes` or `loss_count`.
 4. A `loss_count` above zero with `losses` unset.
 5. A negative number that is not the "none" of its key.
-6. A `changes` that an offset of 32 bits cannot reach.
+6. A `changes` above `UINT32_MAX`.
 
 The messages of the refusals are in `docs/intern/module_say.c.md`, *The keys checked one by one*.
 

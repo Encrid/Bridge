@@ -1,6 +1,6 @@
 # src/os/windows/library.c
 
-This file gives the shared libraries of `src/os/os.h` on Windows: a library opened, looked into and closed.
+This file gives `src/os/os.h` its shared libraries on Windows: a library opened, looked into and closed.
 Each function keeps the contract of `docs/intern/os/os.h.md`, *Functions*.
 
 ## Opening
@@ -22,5 +22,5 @@ With a code page such as UTF-8, a path of fewer than `MAX_PATH` characters can h
 | Function | Result |
 | --- | --- |
 | `os_lib_open` | Opens a bare name with `LoadLibraryA`, and a path with `LoadLibraryExA` after `GetFullPathNameA`. Gives `nullptr` on failure. |
-| `os_lib_get_symbol` | Gives what `GetProcAddress` finds of `name` in the library, or `nullptr`. |
+| `os_lib_get_symbol` | Gives the result of `GetProcAddress` for `name` in the library: the address, or `nullptr`. |
 | `os_lib_close` | Closes the library with `FreeLibrary`. |

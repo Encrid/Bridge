@@ -8,7 +8,7 @@ This file keeps the list of gaps of a region, and gives a piece back to the regi
 Each range handed out can leave one gap after it, and the first range can leave one gap before it.
 So a list of gaps for `ranges` ranges has room for `ranges + 1` gaps.
 The caller makes this room when it takes a range, so a later give never asks for memory.
-The list of the column region has room for each table there may be.
+`docs/intern/block_create.c.md`, *The lists of gaps*, gives the room of the list of the column region.
 The list of the persistent arena has room for each range that the modules hold, plus one.
 So the list always has room for a freed piece, and `add_gap` does not test it.
 

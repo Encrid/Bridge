@@ -9,7 +9,7 @@ It writes `barriers`, `place`, `system` and `observer`. Each line that the modul
 Two systems that conflict never run at the same time.
 So at one time only one system can write a given component, and the header names it: it is the culprit of a bad write.
 
-`system` is the slot of the system among the systems of its module: the number that the module got when it registered the system.
+`system` is the slot of the system, which the module got when it registered the system: `docs/intern/abi_subscribe.c.md`, *The slot*.
 `run_system` takes it from `slot` of the system.
 For an observer, it is the slot among the observers, and `observer` is 1.
 After the call, `system` is `UINT32_MAX` and `observer` is 0.

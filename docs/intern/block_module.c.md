@@ -7,7 +7,7 @@ This file gives a module what it gets at a barrier: ids to hand out, and the hea
 At each barrier, a module gets a block of ids for the time until the next barrier, as many as its `spawns`.
 They are real entities with nothing on them, which no query matches, and they count against `[budget] entities`.
 `spawn` hands them out: `docs/intern/abi_calls.c.md`, *spawn*.
-Before storage applies changes, `block_hand_out` ends the hold on the ids that each module handed out: `docs/intern/storage_held.c.md`.
+`block_hand_out` ends the hold on the ids that `spawn` handed out, in the first step of a barrier: `docs/intern/block_barrier.c.md`, *The steps of a barrier*.
 
 `block_refill` keeps the ids that the module did not use, and moves them to the front of the block.
 Storage then gives fresh ids for the rest.
@@ -22,9 +22,7 @@ So a refill can come up short, and then `ids_short` is set: the next `spawn` pas
 
 ## The header
 
-At offset 0 of the private memory, a `bridge_header_t` tells where each region of the module begins.
-The library writes all of the header.
-A module writes `scratch_used` and `ring_head`, and nothing else.
+The header is the `bridge_header_t` at offset 0 of the private memory: `docs/extern/bridge_abi.h.md`, *bridge_header_t*.
 `block_write_header` writes these fields:
 
 | Field | Value |
@@ -32,13 +30,13 @@ A module writes `scratch_used` and `ring_head`, and nothing else.
 | `abi` | `BRIDGE_ABI`: the number of the module seam. |
 | `scratch`, `scratch_len` | Where the scratch arena begins, and its length in bytes. |
 | `ring`, `ring_len`, `ring_tail` | Where the log ring begins, its length in records, and the count of records drained. |
-| `queries` | The start of the span region: a `bridge_query_t` for each slot that `add_system` gave. |
-| `observers` | After the queries: a `bridge_list_t` for each slot that `observe` gave. |
-| `column_base` | After the lists: a `u32` for each type of the module in each table id. |
+| `queries` | The start of the span region. |
+| `observers` | After the queries. |
+| `column_base` | After the lists. |
 | `types` | How many types the module declared. |
 | `tables` | How many table ids there are, with 0, which is no table. |
-| `kept` | After `column_base`: a `u32` for each type, which tells where a type that is not kept in a table is reached. |
-| `entity_index`, `entities` | Where the entity index begins in the shared memory, and `[budget] entities`. |
+| `kept` | After `column_base`. |
+| `entity_index`, `entities` | The offset of the entity index, and `[budget] entities`. |
 
 Each offset is from the start of the private memory, except `entity_index`.
 The entity index is the one thing in the shared memory that a module reads and cannot find from other values.

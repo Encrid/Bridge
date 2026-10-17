@@ -36,8 +36,7 @@ A module that states `pinned` runs each of its systems and observers on the thre
 Some code must run on the thread that created what it drives.
 Some code needs one thread in particular, for example the first thread of the process, and only the host can choose that thread.
 So `init` runs inside `bridge_load`, on the thread that called it.
-The systems of a pinned module run on the thread that calls `bridge_run_phase`.
-A host with a pinned module loaded calls both from one thread.
+A host with a pinned module loaded calls `bridge_load` and `bridge_run_phase` from one thread: `docs/extern/bridge.h.md`, *A pinned module*.
 
 The author of the module states `pinned`, because only the author knows that the code needs one thread.
 Each call from another thread is refused by name, before anything runs, and so is `bridge_destroy`.

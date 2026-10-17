@@ -7,7 +7,7 @@ This file gives the shared block back, with what the world kept about it.
 1. Destroy storage.
 2. Have each backend that adopted the block release it.
 3. Give the address space of the block back to the operating system.
-4. Free the lists of gaps of the column region and of the persistent arena.
+4. Free the list of gaps of each region: the column region and the persistent arena.
 5. Free each declared type: its fields, the types its fields name, its name and its zero value.
 6. Free the list of where the settings text of unloaded modules was.
 

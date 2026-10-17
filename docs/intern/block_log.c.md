@@ -25,7 +25,7 @@ The sink gets a `bridge_record_t` with resolved values: the identity of the modu
 
 ## The levels
 
-A level is a severity of syslog, RFC 5424, by its number: 0 is the worst and 7 is the most detail.
+A level is a severity of syslog, by its number: `docs/extern/bridge.h.md`, *bridge_record_t*.
 A module names four of them in `include/bridge_abi.h`, as `BRIDGE_LOG_ERR` and the others.
 A host names the same four in `include/bridge.h`, as `BRIDGE_ERR` and the others.
 Each header is whole without the other.
@@ -45,7 +45,7 @@ A module can write a byte above 7 in a line. `send_line` gives the sink `BRIDGE_
 
 A module can write all of its private memory.
 So the drain copies a record out of the ring before it reads it, and checks that the text lies in the scratch arena.
-A text outside the scratch arena reaches the sink as "(a log line whose text lies outside the scratch arena)".
+A text outside the scratch arena reaches the sink as a text of Bridge: `docs/extern/bridge_abi.h.md`, *The log line*.
 The system is the system of the slot in the record, or the observer of the slot if `observer` is not 0.
 A slot with no system or observer gives null.
 `barriers`, `place`, `arg` and `level` go to the sink as they are.
@@ -54,7 +54,7 @@ A slot with no system or observer gives null.
 
 | Function | Result |
 | --- | --- |
-| `get_writer` | Gives the name of the system or the observer that wrote a record, by the slot in the record. Null if the module has none there. |
+| `get_writer` | Gives the name of the system, or of the observer, that wrote a record, by the slot in the record. Null if the module has none there. |
 | `is_in_scratch` | True if the text of a record lies in the scratch arena of the module. |
 | `send_line` | Hands the sink the record at `at` of the ring of a module. |
 | `block_drain` | Hands the log ring of a module to the sink, tells how many lines were dropped, and gives the module its scratch arena back. |

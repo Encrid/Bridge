@@ -5,9 +5,7 @@ It tells whose a name is, where a bare type name is found, and who else declares
 
 ## Whose a component is
 
-The name of a component has a namespace, for example `mymod:Explosion`.
-A module may always declare a component in its own namespace.
-To reach a component of another namespace, a module needs a grant of the deployment: `read` or `write` names the component.
+`docs/extern/bridge_abi.h.md`, *Grants*, tells which components a module may reach.
 A name is foreign to a module if it does not start with the namespace of the module and a colon.
 
 The grants let a deployment say what its mod API is, in place of every component that it holds.
@@ -37,7 +35,7 @@ It gets the kind, the size, the alignment and the declared type in `named`.
 
 `abi_say_others` writes the end of a refusal: ". It is also declared by", then the identity of each module.
 It names the loaded modules that declare the type, other than the module that the declaring module reloads.
-The module that declares is not in the list of modules yet, and only the module that it reloads has its stem.
+The declaring module is not linked yet, so only the module that it reloads has its stem: `docs/intern/abi_moved.c.md`, *A type that other rows hold*.
 A host needs these names: to unload these modules is what lets the layout of the component change.
 
 ## Functions

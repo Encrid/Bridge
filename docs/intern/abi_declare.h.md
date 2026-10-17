@@ -25,7 +25,7 @@ These files check the type, make it, and lay it out again at a reload.
 | `name` | The name, copied. |
 | `bare` | Where the namespace ends in `name`: the colon. |
 | `print` | The fingerprint of the descriptor and of the kind. |
-| `c` | The type of that name that is there, and then the type declared. |
+| `c` | The type that has that name already, and then the type declared. |
 | `was` | At a reload, the type of that name that this one replaces. |
 | `s` | The layout, read from the descriptor. |
 
@@ -59,24 +59,24 @@ These files check the type, make it, and lay it out again at a reload.
 
 | Function | Source | Result |
 | --- | --- | --- |
-| `abi_hash_text` | `src/abi_stated.c` | The fingerprint of `n` bytes of text. |
-| `abi_is_same_layout` | `src/abi_layout.c` | Whether a declared type has the kind and the descriptor that a declaration states. |
-| `abi_is_listed` | `src/abi_names.c` | Whether a list of names holds a name. |
-| `abi_is_foreign` | `src/abi_names.c` | Whether a name is of another namespace than the module's. |
-| `abi_is_writable` | `src/abi_declare.c` | Whether a module may write a type. |
-| `abi_find_type` | `src/abi_names.c` | Finds the type that a field names bare. The descriptor reader calls it, with a `declaring_t` as `ctx`. |
-| `abi_say_others` | `src/abi_names.c` | Writes who else declares a type, as the end of a refusal. Nothing if nobody does. |
-| `abi_accepts` | `src/abi_relay_run.c` | Whether a reload accepts the loss named `name`, which it now makes, of what `rows` rows hold. |
-| `abi_get_element_size` | `src/abi_relay_run.c` | How many bytes one element of a field is. |
-| `abi_add_run` | `src/abi_relay_run.c` | Records that `len` bytes at `from` of a value as it was are the bytes at `to` of the value as it will be. |
-| `abi_say_lost` | `src/abi_relay_run.c` | Records by name what has no place in what the type becomes. |
-| `abi_names_superseded` | `src/abi_moved.c` | Whether a field of a type names a type that this reload made anew. |
-| `abi_find_holder` | `src/abi_moved.c` | A type with a field of type `c` that another loaded module declares, and that module in `by`. nullptr if none. |
-| `abi_check_move` | `src/abi_moved.c` | Refuses a move to another storage layout that cannot be made, or that loses what is not accepted. 1 with a refusal. |
-| `abi_relay_fields` | `src/abi_relay_fields.c` | Matches the fields of a struct as it was to those of what it becomes, by name. 1 with a refusal. |
-| `abi_relay` | `src/abi_relay.c` | Works out how the values of a type are carried over to what it becomes, and keeps that on the type. 1 with a refusal. |
-| `abi_check_stated` | `src/abi_stated.c` | Refuses a declaration that states what it may not, and works out its fingerprint. 1 with a refusal. |
-| `abi_read_layout` | `src/abi_layout.c` | Reads and lays out the descriptor, and checks its size and alignment. 1 with a refusal, and nothing left allocated. |
-| `abi_check_size` | `src/abi_layout.c` | Refuses a size and an alignment that the module states and that the descriptor does not give. 1 with a refusal. |
-| `abi_replace_type` | `src/abi_replace.c` | Decides what becomes of the type of that name that is there already. 1 with a refusal. |
-| `abi_make_type` | `src/abi_make.c` | Makes the type that a declaration states. 1 with a refusal. |
+| `abi_hash_text` | `src/abi_stated.c` | The fingerprint of a text: `docs/intern/abi_stated.c.md`, *Functions*. |
+| `abi_is_same_layout` | `src/abi_layout.c` | Whether a declaration matches its type: `docs/intern/abi_layout.c.md`, *Functions*. |
+| `abi_is_listed` | `src/abi_names.c` | Whether a list holds a name: `docs/intern/abi_names.c.md`, *Functions*. |
+| `abi_is_foreign` | `src/abi_names.c` | Whether a name is foreign: `docs/intern/abi_names.c.md`, *Functions*. |
+| `abi_is_writable` | `src/abi_declare.c` | Whether a module may write a type: `docs/intern/abi_declare.c.md`, *Functions*. |
+| `abi_find_type` | `src/abi_names.c` | Finds a type that a field names: `docs/intern/abi_names.c.md`, *Functions*. |
+| `abi_say_others` | `src/abi_names.c` | Names the other declarers: `docs/intern/abi_names.c.md`, *Functions*. |
+| `abi_accepts` | `src/abi_relay_run.c` | Whether a reload accepts a loss: `docs/intern/abi_relay_run.c.md`, *Functions*. |
+| `abi_get_element_size` | `src/abi_relay_run.c` | The size of one element: `docs/intern/abi_relay_run.c.md`, *Functions*. |
+| `abi_add_run` | `src/abi_relay_run.c` | Records a run: `docs/intern/abi_relay_run.c.md`, *Functions*. |
+| `abi_say_lost` | `src/abi_relay_run.c` | Records a loss by name: `docs/intern/abi_relay_run.c.md`, *Functions*. |
+| `abi_names_superseded` | `src/abi_moved.c` | Whether a field names a type that the reload made anew: `docs/intern/abi_moved.c.md`, *Functions*. |
+| `abi_find_holder` | `src/abi_moved.c` | Finds a type that holds `c`: `docs/intern/abi_moved.c.md`, *Functions*. |
+| `abi_check_move` | `src/abi_moved.c` | Checks a move to another storage layout: `docs/intern/abi_moved.c.md`, *Functions*. |
+| `abi_relay_fields` | `src/abi_relay_fields.c` | Matches the fields of a struct: `docs/intern/abi_relay_fields.c.md`, *Functions*. |
+| `abi_relay` | `src/abi_relay.c` | Works out how values carry over: `docs/intern/abi_relay.c.md`, *Functions*. |
+| `abi_check_stated` | `src/abi_stated.c` | Checks what a declaration states: `docs/intern/abi_stated.c.md`, *Functions*. |
+| `abi_read_layout` | `src/abi_layout.c` | Reads and checks the descriptor: `docs/intern/abi_layout.c.md`, *Functions*. |
+| `abi_check_size` | `src/abi_layout.c` | Checks the stated size and alignment: `docs/intern/abi_layout.c.md`, *Functions*. 1 with a refusal. |
+| `abi_replace_type` | `src/abi_replace.c` | Decides what becomes of an earlier type: `docs/intern/abi_replace.c.md`, *Functions*. |
+| `abi_make_type` | `src/abi_make.c` | Makes a declared type: `docs/intern/abi_make.c.md`, *Functions*. |

@@ -4,18 +4,18 @@ This header makes a table for a set that has none, and gives a table back when i
 
 ## A table made
 
-`make_table` gives the table that the hash finds for a set, or makes one.
+`make_table` gives the table of a set: the one that `find_table` finds, or a new one.
 A set that holds the type of a sparse set is the table of that set.
 Storage has room for the table of each sparse set beside `[budget] tables`, so it never refuses one of those.
 
 `make_table` gives 0 for a table of an archetype past `[budget] tables`.
 A table id is always free then, since live tables stay below `table_room`: `[budget] tables` and one table for each sparse set.
 A new table is live, with no row and no column yet.
-Storage puts it in the hash, in the list of each system that reads it, and in `dirty`.
+Storage puts it in `dirty`, in the hash, and in the lists of the systems: `docs/intern/storage_named.h.md`.
 
 ## A table given back
 
-`free_table` gives the block of the table back to the column region, and takes the table out of the hash and of each list.
+`free_table` gives the block of the table back to the column region, and removes the table from the hash and from each list.
 It makes the columns of the table 0, marks it touched, and puts its id on the free list.
 `close_table` makes the record no table, and keeps what a barrier keeps of it: `incoming`, `sized` and `touched`.
 An id given back at this barrier is in `dirty` already, so `open_table` keeps `touched` when it takes the id again.

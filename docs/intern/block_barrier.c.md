@@ -5,12 +5,12 @@ This file runs the barrier: what happens between two phases, in an order that ne
 
 ## The steps of a barrier
 
-1. Storage ends the hold on the ids that each module handed out: `docs/intern/storage_held.c.md`.
+1. Storage ends the hold on each id that a module handed out: `docs/intern/storage_held.c.md`.
 2. Storage applies the queued changes of each module: `src/storage_apply.c`.
 3. Each module gets its ids topped up: `docs/intern/block_module.c.md`, *The ids set aside*.
 4. The spans of each running module are published again.
 5. Storage ends the publish, and the layout counts as not moved.
-6. The observers of what changed run. Their phase is the one past the last phase of the deployment.
+6. The observers of what changed run in their phase: `docs/intern/abi_system.c.md`, *observe*.
 7. No system or observer is pending any more, and the count of lifecycle calls goes back to 0.
 8. The failure budgets are settled: `src/schedule_account.c`.
 9. The log ring of each module is drained to the sink: `docs/intern/block_log.c.md`, *The log ring*.
@@ -19,7 +19,7 @@ This file runs the barrier: what happens between two phases, in an order that ne
 The header of a module tells how many table ids there are.
 That number is `[budget] tables` and `[budget] sparse_sets`, and 1. It is fixed when the world is made, so one publish is enough.
 
-A module whose spans no longer hold what its queries match, or the list of an observer, is stopped.
+The barrier stops a module whose span region cannot hold its spans, or the list of an observer: `docs/extern/bridge.h.md`, *The private memory*, and `docs/extern/bridge_abi.h.md`, *observe*.
 Its record names the size of its spans, and the observer whose list did not fit.
 If its `on_error` is `BRIDGE_FAIL`, the world stops too: `docs/intern/bridge_stop.c.md`.
 If it ran on, its systems would run over tables that they were not told about.
@@ -41,16 +41,16 @@ A cycle is legal, so nothing refuses it.
 ## The count of a module
 
 Storage that runs out does not stop a world.
-A barrier that cannot place an entity, for want of a table or of columns, leaves the entity as it was.
+A barrier that has no table or no columns for an entity leaves the entity as it was: `docs/extern/bridge.h.md`, *Running out*.
 The barrier then counts as one that the module which asked failed in, beside what its systems did.
 A destroy that the module may not do counts the same way: `src/storage_settle.h` marks both.
-`src/schedule.h` gives the rules of the counts of a module and of its systems, and `src/schedule_account.c` settles them in step 7.
+`src/schedule.h` gives the rules of the counts of a module and of its systems, and `src/schedule_account.c` settles them in step 8.
 
 ## Functions
 
 | Function | Result |
 | --- | --- |
 | `refill_all` | Tops up the ids of each module. |
-| `publish_all` | Publishes the spans of each running module, and stops a module whose spans no longer hold what its queries match. |
+| `publish_all` | Publishes the spans of each running module, and stops a module whose spans do not fit. |
 | `finish_barrier` | Ends a barrier once its observers ran: no system pending, the failure budgets settled, each log drained, and the barrier counted. |
 | `block_barrier` | Runs the barrier, with the steps of *The steps of a barrier*. |

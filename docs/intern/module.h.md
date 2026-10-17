@@ -34,7 +34,7 @@ What Bridge does depends on the call that failed:
 | `shutdown` | Bridge says the failure, and the teardown continues. |
 | `reload` | Bridge keeps the old instance if it still exists. If not, the module is stopped, and keeps all that it declared. |
 
-A stopped module runs no system and no observer, and its components stay.
+`docs/extern/bridge.h.md`, *Failures*, tells what a stopped module runs and keeps.
 `on_error` is stated for each module, and has no default.
 `BRIDGE_FAIL` stops the world: `docs/intern/bridge_stop.c.md`, *A stopped world*.
 `BRIDGE_SKIP` refuses the load of that one module, and the world continues.
@@ -65,8 +65,8 @@ An artifact that the checks hold before it is touched: all that a load and a rel
 
 ### module_private_t
 
-Where the regions of a module sit in its private memory.
-The header comes first, then the scratch arena, the log ring and the spans, each at a multiple of 8.
+The place of each region in the private memory of a module, at a multiple of 8.
+`docs/extern/bridge_abi.h.md`, *The memories*, gives their order.
 
 | Field | Content |
 | --- | --- |
@@ -76,7 +76,7 @@ The header comes first, then the scratch arena, the log ring and the spans, each
 
 ### module_pointing_t
 
-What a search of the rows of a type looks for: a string that lies in the share of a module of the persistent arena.
+What a search of the rows of a type looks for: a string that lies in the persistent share of a module.
 
 | Field | Content |
 | --- | --- |
@@ -108,29 +108,29 @@ What a module starts from.
 
 | Function | Source | Result |
 | --- | --- | --- |
-| `module_refuse` | `src/module_say.c` | Says that a module is refused, and why, written as `printf` would. Gives 1. |
-| `module_fail` | `src/module_say.c` | Writes why the load or the reload of a module failed into `err`, as `printf` would. Gives 1. |
-| `module_check_set` | `src/module_say.c` | Refuses a key whose value is zero, which means that nobody stated it. Gives 1 if it refuses. |
-| `module_check_bound` | `src/module_say.c` | Refuses a negative number that is not `none`: `BRIDGE_NO_LIMIT` or `BRIDGE_NONE`, the "none" of the key. Gives 1 if it refuses. |
-| `module_check_flag` | `src/module_say.c` | Refuses a key that is yes or no and is stated as neither. Gives 1 if it refuses. |
-| `module_check_flags` | `src/module_check_stated.c` | Refuses a config with a flag left unset. |
-| `module_check_phases` | `src/module_check_phases.c` | Refuses phase names that are unset or mapped twice. Also refuses two names mapped to one phase, and a phase that the deployment did not declare. |
-| `module_check_stated` | `src/module_check_stated.c` | Refuses a config with a policy, a limit or an amount left unset, or stated as a number that is nobody's. |
-| `module_check_fit` | `src/module_check_fit.c` | Refuses a config whose amounts do not fit: a wrong log level, too many spawns, regions past 32 bits, or a ring too small. |
-| `module_check_identity` | `src/module_identity.c` | Refuses a module with no identity, with an identity of more than 127 bytes, or with one that does not have the form `namespace:name@version`. Gives 1 with a record. |
-| `module_check_backend` | `src/module_check_backend.c` | Refuses a config that states what its backend cannot keep, or that allows what its author says cannot be done. |
-| `module_check` | `src/module_check.c` | Refuses all that a load and a reload both refuse before the artifact is touched, and finds the backend and its demands. Gives 1 with a record. |
-| `module_check_room` | `src/module_check.c` | Refuses a load of a module that is loaded already, one past `[budget] modules`, or a share that does not fit. Gives 1 with a record. |
-| `module_find` | `src/module_check.c` | Gives the loaded module of an identity, whatever its version, or `nullptr`. |
-| `module_lay_private` | `src/module_check_fit.c` | Finds where the regions of a module sit in its private memory. Gives 1 if they cannot be laid out in 32 bits. |
-| `module_take_private` | `src/module_call.c` | Reserves the private memory of a module and hands it to its backend. Gives 1 with `err`. |
-| `module_record` | `src/module_record.c` | Makes the record of a module from its config: all of it, or none. Gives `nullptr` with a record said. |
-| `module_drop_systems` | `src/module_discard.c` | Takes the systems and the observers of a module out of storage, and frees them. |
-| `module_release_types` | `src/module_types.c` | Stops the declarations of a module, last declared first. The last declarer of a type applies its policy, unless `by_policy` is false. |
-| `module_round_share` | `src/module_share.c` | Gives the share that a `persistent` takes, rounded up to a multiple of 8, in 64 bits. |
-| `module_give_share` | `src/module_share.c` | Gives the share of a module back to the persistent arena. |
-| `module_settle_share` | `src/module_share.c` | Gives the share of a module back at its unload, unless a row that stays holds a string in it. |
-| `module_count_pointing` | `src/module_pointed.c` | Gives how many rows of a type hold a string in the share of a module. |
-| `module_call` | `src/module_call.c` | Calls a lifecycle export once, under its timeout. Gives 0 if the export gave 0, and 1 with the reason in `err` if not. |
-| `module_make_instance` | `src/module_instance.c` | Compiles the image of a module, reserves its private memory, and makes its instance with the memories it imports and the ABI. Gives 1 with `err`. |
-| `module_start` | `src/module_start.c` | Makes the image, the instance and the private memory, and makes the first call. Gives 0 if the module registered and every export it named is there. |
+| `module_refuse` | `src/module_say.c` | Says why a module is refused: `docs/intern/module_say.c.md`, *Functions*. |
+| `module_fail` | `src/module_say.c` | Writes why a load or reload failed: `docs/intern/module_say.c.md`, *Functions*. |
+| `module_check_set` | `src/module_say.c` | Refuses a key left at zero: `docs/intern/module_say.c.md`, *Functions*. |
+| `module_check_bound` | `src/module_say.c` | Refuses a wrong negative number: `docs/intern/module_say.c.md`, *The keys checked one by one*. |
+| `module_check_flag` | `src/module_say.c` | Refuses an unset or wrong flag: `docs/intern/module_say.c.md`, *Functions*. |
+| `module_check_flags` | `src/module_check_stated.c` | Refuses the flags of a config: `docs/intern/module_check_stated.c.md`, *Functions*. |
+| `module_check_phases` | `src/module_check_phases.c` | Refuses the phase names of a config: `docs/intern/module_check_phases.c.md`, *Functions*. |
+| `module_check_stated` | `src/module_check_stated.c` | Refuses the keys that nobody stated: `docs/intern/module_check_stated.c.md`, *Functions*. |
+| `module_check_fit` | `src/module_check_fit.c` | Refuses the amounts that do not fit: `docs/intern/module_check_fit.c.md`, *The budget of a module*. |
+| `module_check_identity` | `src/module_identity.c` | Refuses a wrong identity: `docs/intern/module_identity.c.md`, *Functions*. |
+| `module_check_backend` | `src/module_check_backend.c` | Refuses what the backend cannot keep: `docs/intern/module_check_backend.c.md`, *Functions*. |
+| `module_check` | `src/module_check.c` | Checks a config, and finds its demands: `docs/intern/module_check.c.md`, *Functions*. |
+| `module_check_room` | `src/module_check.c` | Refuses a load that has no room: `docs/intern/module_check.c.md`, *Functions*. |
+| `module_find` | `src/module_check.c` | Finds a loaded module by its stem: `docs/intern/module_check.c.md`, *Functions*. |
+| `module_lay_private` | `src/module_check_fit.c` | Lays out the private memory: `docs/intern/module_check_fit.c.md`, *Functions*. |
+| `module_take_private` | `src/module_call.c` | Reserves the private memory: `docs/intern/module_call.c.md`, *Functions*. |
+| `module_record` | `src/module_record.c` | Makes the record of a module: `docs/intern/module_record.c.md`, *Functions*. |
+| `module_drop_systems` | `src/module_discard.c` | Takes the systems out of storage: `docs/intern/module_discard.c.md`, *Functions*. |
+| `module_release_types` | `src/module_types.c` | Stops the declarations of a module: `docs/intern/module_types.c.md`, *Functions*. |
+| `module_round_share` | `src/module_share.c` | Gives a share, rounded up: `docs/intern/module_share.c.md`, *Functions*. |
+| `module_give_share` | `src/module_share.c` | Gives a share back: `docs/intern/module_share.c.md`, *Functions*. |
+| `module_settle_share` | `src/module_share.c` | Settles a share at an unload: `docs/intern/module_share.c.md`, *Functions*. |
+| `module_count_pointing` | `src/module_pointed.c` | Counts the rows that hold a string: `docs/intern/module_pointed.c.md`, *Functions*. |
+| `module_call` | `src/module_call.c` | Calls a lifecycle export: `docs/intern/module_call.c.md`, *Functions*. |
+| `module_make_instance` | `src/module_instance.c` | Makes the instance of a module: `docs/intern/module_instance.c.md`, *Functions*. |
+| `module_start` | `src/module_start.c` | Starts a module: `docs/intern/module_start.c.md`, *Functions*. |

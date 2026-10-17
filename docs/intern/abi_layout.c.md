@@ -11,8 +11,7 @@ One text gives the body of a type to two macros of `include/bridge_schema.h`: on
 So the type and its descriptor cannot be different.
 
 The compiler of the module lays out the type, and the module states its size and its alignment at `declare`.
-Bridge reads only the descriptor: `src/schema.c` lays the type out from the text by the rule of C.
-Each field is at the next multiple of its alignment, and the whole is a multiple of its widest field.
+Bridge reads only the descriptor, and `src/schema.c` lays the type out from the text as C does: `docs/extern/bridge_schema.h.md`, *The type set*.
 A declaration whose stated size or alignment is not what the text lays out to is refused, with both.
 
 The layout also gives the fields by name, and they stay in Bridge: a module is held to the size, the alignment and the descriptor.
@@ -33,9 +32,7 @@ A tag has no descriptor, so two tags of one name have one layout.
 
 Two modules that declare one component from the same schema header hand over the same descriptor.
 Each expanded the same macro over the same tokens, so no generator is needed.
-The stringification of C makes each run of white space one space and drops the comments.
-So the descriptor stays the same when the text gets another format or a new comment.
-It changes when a field is added, removed, given another type, or put in another place.
+`docs/extern/bridge_schema.h.md`, *Layouts*, tells which edits of the text change the descriptor.
 
 A module built against another layout of a component is refused when it declares it, and does not read the wrong bytes.
 At a reload, `docs/intern/abi_replace.c.md` compares the descriptors, and lays out the type again where it may.
@@ -50,7 +47,7 @@ A system has none: every function that Bridge calls is `() -> i32`.
 ## The budgets
 
 At a reload, a type that changed has its values worked out first: `docs/intern/abi_relay.c.md`, *What each change does*.
-A type changed if its descriptor or its kind is not the same, or if a field names a type that this reload made anew.
+`docs/intern/abi_replace.c.md`, *The steps*, tells when a type changed.
 
 Then a type that is one more than `[budget] types` is refused.
 A type kept in a sparse set is refused if `[budget] sparse_sets` is used up.

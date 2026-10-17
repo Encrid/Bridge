@@ -4,8 +4,8 @@ This file unmakes a world: it shuts down each loaded module, and then gives back
 
 ## The steps of destroy
 
-1. Refuse the call if the sink of the world runs, or if a loaded module is pinned to another thread.
-2. Run the `shutdown` of each module, in the order that the modules loaded.
+1. Refuse a call from the sink, and a call that `bridge_check_entry` refuses.
+2. Run the `shutdown` of each module: *The shutdown of the modules*.
 3. Discard each module.
 4. Free the schedule, the shared block with the storage, the threads, and the names of the deployment.
 5. Destroy each backend, and close the library of each backend that states `BACKEND_UNLOAD`.
@@ -40,7 +40,7 @@ A library that opened but never became a backend states nothing, and stays too.
 | Function | Result |
 | --- | --- |
 | `end_modules` | Runs the `shutdown` of each module in load order, then discards each module. |
-| `free_schedule` | Frees the list of systems, and what a dispatch and a schedule are worked out in. |
+| `free_schedule` | Frees the list of systems, and the room that `schedule_room` made. |
 | `free_names` | Frees what the deployment gave: the names of `[order]` and their matrix, and the phases. |
 | `close_backends` | Destroys each backend, and closes each library whose backend states `BACKEND_UNLOAD`. |
 | `bridge_destroy` | Runs the `shutdown` of each loaded module, then frees the world. 0 if the world is gone, 1 if a pinned module refuses the call. |

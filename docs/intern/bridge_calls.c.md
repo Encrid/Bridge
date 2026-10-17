@@ -2,7 +2,7 @@
 
 This file gives the functions of the world that a host calls, but `bridge_create` and `bridge_destroy`.
 Each one claims the world for its thread, calls the function that does the work, and gives the world back.
-A call from another thread while a call of the world runs does nothing: `docs/intern/bridge_check.c.md`, *A call from another thread*.
+`docs/intern/bridge_check.c.md`, *A call from another thread*, tells how a call claims the world.
 
 ## Functions
 

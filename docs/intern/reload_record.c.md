@@ -31,7 +31,7 @@ A module that had no share starts to allocate from the new range.
 
 | Function | Result |
 | --- | --- |
-| `alloc_record` | Makes the new record, with room for the ranges of the old share and one more, and for each id held ready. Null, with a record, if there is no memory. |
+| `alloc_record` | Makes the new record, with room for the ranges of the old share and one more, and for each id held ready. Null, with a record, if the memory runs out. |
 | `take_ids` | Copies the ids held ready for the old instance, the settings component, and where the text of the settings is. |
 | `take_share` | Copies the share of the old instance, with what the reload added to it. |
 | `reload_make_record` | Makes the new record. 1, with a record, and the added bytes of the share given back, if there is no memory. |

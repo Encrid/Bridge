@@ -25,7 +25,7 @@ An entity with no component and no id that anybody keeps could never be destroye
 The policy that applies is that of the module that unloads, and only when it is the last to declare the component.
 Two declarers need not agree, because the first to leave drops nothing.
 A stored id of an entity that `sweep` or `delete` destroyed is refused as stale, by its generation.
-So an entity that must outlive the unload of another module carries a component of the module that holds its id.
+`docs/extern/bridge_abi.h.md`, *bridge_on_unload*, tells how an entity outlives the unload of another module.
 How storage drops the rows is in `src/storage_drop.c`.
 
 ## The steps

@@ -1,6 +1,6 @@
 # src/storage_settle.h
 
-This header ends the work of a barrier on rows.
+This header gives the release, the last step of `docs/intern/storage_apply.c.md`, *The steps of a barrier*.
 It empties the queue of each module, forgets the fold, and tells each module which of its changes storage did not apply.
 
 ## What a module hears

@@ -1,6 +1,6 @@
 # src/bridge_backend.c
 
-This file opens one backend of a deployment: it opens the library of the backend, and starts the backend with its settings.
+This file opens the library of one backend of a deployment, and then starts that backend with its settings.
 
 ## A backend of the deployment
 

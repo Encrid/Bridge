@@ -18,7 +18,7 @@ It also refuses a reservation or a guard past 2 to the power 47 bytes.
 So no length and no reservation that Bridge adds from them passes 64 bits.
 
 Every backend maps the shared block, so the world keeps the largest reservation and the largest guard of the backends.
-Each granule is a power of two, so a length that is a whole number of the largest one is a whole number of each.
+Each granule is a power of two, so a multiple of the largest one is a multiple of each.
 The world keeps the largest granule.
 `src/block_create.c` makes the shared block to this shape.
 

@@ -1,13 +1,12 @@
 # src/pool.h
 
-This header gives the pool of threads that a phase runs on: `threads - 1` workers kept for the life of the world, and the caller.
+This header gives the pool that runs a phase: `threads - 1` workers kept for the life of the world, and the caller.
 Nothing in the pool knows what a job is.
 
 ## The execution model
 
-The systems of different modules run at the same time, each module on a thread, when they do not conflict.
-The systems of one module run one after another, each from its start to its return.
-Two systems of one module never run at the same time, and one never waits paused for another.
+A phase runs its systems as `docs/extern/bridge.h.md`, *bridge_run_phase*, tells.
+In each level, the schedule makes one job of the systems of each module, and one thread runs each job: `docs/intern/schedule.h.md`, *Levels and jobs*.
 The schedule finds the order a system at a time, and what runs at the same time a module at a time: `src/schedule.h`.
 
 The systems of one module cannot overlap, because they share what only one of them may use.
@@ -20,9 +19,7 @@ So one heavy system cannot use more than one core.
 A deployment gets parallel work from more modules whose systems do not conflict, and not from more systems.
 One loop over one component cannot be split between two modules either: both would write it, conflict, and be put in order.
 
-`threads` states how many threads run a phase, and it counts the thread that called `bridge_run_phase`.
-That thread works too, and at `threads = 1` it does all the work, in an order that never changes.
-The pool keeps the other threads for as long as the world exists.
+`threads` is the size of the pool, with the caller: `docs/extern/bridge.h.md`, *bridge_config_t*.
 
 ## Types
 
@@ -41,8 +38,8 @@ Each thread reads and writes the run in progress only under the lock.
 
 | Function | Source | Result |
 | --- | --- | --- |
-| `pool_create` | `src/pool.c` | Makes a pool of `workers` threads that can run `most_jobs` jobs at one time. Null if there was not the memory. |
-| `pool_destroy` | `src/pool.c` | Ends each worker and frees the pool. A null `p` is nothing to free. |
-| `pool_run` | `src/pool_run.c` | Runs each job of a batch on the threads of the pool and on the caller's, and returns when all ran. |
-| `pool_run_taken` | `src/pool_job.c` | Takes jobs of the run in progress and runs them, until none is left to take. |
-| `pool_work` | `src/pool_job.c` | What the thread of a worker runs: it sleeps until woken, runs what it can take, and ends when the pool must quit. |
+| `pool_create` | `src/pool.c` | Makes a pool: `docs/intern/pool.c.md`, *Functions*. |
+| `pool_destroy` | `src/pool.c` | Frees a pool: `docs/intern/pool.c.md`, *Functions*. |
+| `pool_run` | `src/pool_run.c` | Runs a batch of jobs: `docs/intern/pool_run.c.md`, *Functions*. |
+| `pool_run_taken` | `src/pool_job.c` | Runs the jobs that a thread can take: `docs/intern/pool_job.c.md`, *Functions*. |
+| `pool_work` | `src/pool_job.c` | Runs the thread of a worker: `docs/intern/pool_job.c.md`, *Functions*. |

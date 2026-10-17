@@ -1,6 +1,6 @@
 # src/config_scalar.c
 
-This file writes a setting into a field that is a bool, a float or an integer.
+This file writes a setting into a bool field, a float field or an integer field.
 
 ## A bool
 

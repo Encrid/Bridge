@@ -25,8 +25,7 @@ A table keeps one archetype: the entities that carry exactly that set, and their
 Storage finds a table by its archetype, a bit for each declared type, through a hash: `docs/intern/storage_table.h.md`, *Functions*.
 No graph links the tables, because nothing walks from one table to another: storage knows the final set of an entity before it places it.
 
-The rows of a table are one block of the column region.
-The block holds the entity ids, then a column for each type, in the order of the type ids.
+The rows of a table are one block of the column region: `docs/intern/storage_layout.h.md`, *The layout of a block*.
 Each column begins at a multiple of 16 bytes, `COLUMN`, as the block does.
 
 A loop of a system over a column compiles to loads of 16 bytes, and then no load lies across two cache lines.
@@ -39,7 +38,7 @@ How a table grows is in `docs/intern/storage_grow.h.md`, *Growth*.
 When a row leaves, the last row of the table fills its place.
 
 There is one table for each set, with one exception.
-A strip at an unload that has no room to join two tables leaves both: `docs/intern/storage_drop.h.md`, *What unload leaves behind*.
+A strip at an unload can leave two tables of one set: `docs/intern/storage_drop.h.md`, *What unload leaves behind*.
 Then the hash finds the table that was there first, which has `named`, and the other table lives until its rows leave.
 
 A table lives while it has rows.
@@ -62,8 +61,7 @@ There is room for a table for each sparse set beside `[budget] tables`, so stora
 
 Storage finds the row of an entity in the set through its own index, `where`.
 Its cell for an entity holds the row plus one, or 0 for none.
-Storage writes a second index for modules in the shared memory, at the offset `sparse` of the world.
-Its cell for an entity holds the offset of the value from the shared base, or 0 for none.
+Storage writes a second index for modules in the shared memory, at the offset `sparse` of the world: `docs/extern/bridge_abi.h.md`, *Storage layouts*.
 When the block of the set moves, storage writes again the cell of each entity in it.
 
 The two indexes take 8 bytes for each entity there may be, for each sparse set.
@@ -140,7 +138,7 @@ A declared type, `struct storage_type`.
 
 ### storage_terms_t
 
-The terms of a system or of an observer, `struct storage_terms`.
+The terms of one system or observer, `struct storage_terms`.
 
 | Field | Content |
 | --- | --- |
@@ -177,7 +175,7 @@ A table.
 ### storage_t
 
 The storage of one world, `struct storage`.
-Each budget sizes it when the world is made, and storage allocates nothing after.
+The budget sizes it when the world is made: `docs/intern/block_budget.c.md`, *The budget of a deployment*.
 
 | Field | Content |
 | --- | --- |
@@ -194,7 +192,7 @@ Each budget sizes it when the world is made, and storage allocates nothing after
 | `words`, `type_room` | How wide a set is, in 64-bit words and in types. |
 | `terms_room` | `[budget] systems`. |
 | `who` | Which entity is in which row: a twin of the column region, a cell for each 8 bytes of it. |
-| `dirty`, `dirty_count` | The tables touched since storage last wrote what modules read. |
+| `dirty`, `dirty_count` | The tables whose `touched` is set: *table_t*. |
 | `types` | The declared types, by id, and `nullptr` where none is declared. |
 | `type_pool`, `terms_pool` | The records of the types, and of the terms of `[budget] systems` systems and observers. |
 | `lists` | The `list` and `pos` of each record of terms, one after the other. |

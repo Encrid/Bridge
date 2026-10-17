@@ -32,11 +32,11 @@ A system and an observer are each a query and a function, so one registration se
 
 | Function | Source | Result |
 | --- | --- | --- |
-| `abi_check_subscriber` | `src/abi_subscriber.c` | Refuses a system or an observer past a budget, with what lies outside the scratch arena, or with a reserved or taken name. Copies the name. 1 with a refusal. |
-| `abi_alloc_subscriber` | `src/abi_subscriber_room.c` | Has everything that a system or an observer needs, before it keeps any of it. 1 with a refusal, and nothing left allocated. |
-| `abi_free_subscriber` | `src/abi_subscriber_room.c` | Frees what `abi_alloc_subscriber` had, of a system or an observer that is refused. |
-| `abi_check_term` | `src/abi_term.c` | Refuses term `i` if it asks for what a query may not. 1 with a refusal. |
-| `abi_check_before` | `src/abi_before.c` | Finds the list of `before`, and refuses it outside the scratch arena or with more slots than the module has earlier systems. 1 with a refusal. |
-| `abi_read_before` | `src/abi_before.c` | Reads the slots of `before`, and gives the new system the bits of each one. 1 with a refusal. |
-| `abi_read_phase` | `src/abi_phase.c` | Finds the phase that a system names, and refuses a name that would merge two phases of the module. 1 with a refusal. |
-| `abi_subscribe` | `src/abi_subscribe.c` | Registers a system or an observer, and gives its slot in `r`. 1 with a refusal. |
+| `abi_check_subscriber` | `src/abi_subscriber.c` | Checks what a registration states: `docs/intern/abi_subscriber.c.md`, *Functions*. |
+| `abi_alloc_subscriber` | `src/abi_subscriber_room.c` | Has the memory of a registration: `docs/intern/abi_subscriber_room.c.md`, *Functions*. |
+| `abi_free_subscriber` | `src/abi_subscriber_room.c` | Frees what a refused registration had: `docs/intern/abi_subscriber_room.c.md`, *Functions*. |
+| `abi_check_term` | `src/abi_term.c` | Checks one term: `docs/intern/abi_term.c.md`, *Functions*. |
+| `abi_check_before` | `src/abi_before.c` | Checks the list of `before`: `docs/intern/abi_before.c.md`, *Functions*. |
+| `abi_read_before` | `src/abi_before.c` | Reads the slots of `before`: `docs/intern/abi_before.c.md`, *Functions*. |
+| `abi_read_phase` | `src/abi_phase.c` | Finds the phase of a system: `docs/intern/abi_phase.c.md`, *Functions*. |
+| `abi_subscribe` | `src/abi_subscribe.c` | Registers a system or an observer: `docs/intern/abi_subscribe.c.md`, *Functions*. |

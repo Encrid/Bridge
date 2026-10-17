@@ -10,7 +10,7 @@ It then puts the column of each type of the set, in the order of the type ids, a
 A column with bytes, and each toggled column, begins at a multiple of 16.
 A toggled column has its bits and 16 bytes before it: `docs/intern/storage_bytes.h.md`, *A toggle*.
 A tag that is not toggled has no column, and takes no byte.
-The length of the block is rounded up to a multiple of 16.
+`lay_out` makes the length of the block a multiple of 16.
 
 ## Functions
 

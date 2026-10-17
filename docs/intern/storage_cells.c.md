@@ -1,7 +1,7 @@
 # src/storage_cells.c
 
-This file writes the `column_base` of a module.
-For each table and each type that the module declared, it tells where the column of that type is.
+This file writes the `column_base` of a module, and its `kept` cells.
+A module reads them as `docs/extern/bridge_abi.h.md`, *Spans*, tells.
 
 ## The cells
 

@@ -17,7 +17,7 @@ A load and a reload both start a module with it.
 The first call is the one call in which a module can declare and register.
 `init` runs under `init_timeout`, and `reload` under `reload_timeout`.
 The settings are one value of a struct, so they are written after `init` declared the struct.
-A reload does not write the settings again: after `init`, the component is the live state.
+A reload leaves them as they are: `docs/extern/bridge.h.md`, *The settings of a module*.
 
 ## The losses
 

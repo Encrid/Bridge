@@ -11,10 +11,10 @@ A second refusal in the same call changes nothing: the first is the reason.
 
 ## The persistent arena
 
-`alloc(len)` gives an offset into the persistent arena, from the share of the module, and rounds `len` up to a multiple of eight.
+`docs/extern/bridge_abi.h.md`, *alloc*, tells what `alloc(len)` gives.
 Each module has a share of its own, so its offsets do not depend on the order in which the threads of other modules ran.
 The share is one or more ranges, in `owned`.
-The load gives one range, and a reload that cannot grow the last range where it is adds one more.
+The load gives one range, and a reload can add more: `docs/intern/reload_share.c.md`, *A share that a reload grows*.
 `alloc` goes to the next range when the request does not fit in what is left of the current one.
 What is left of the range before is dead space, as a string that outgrew its place leaves.
 
@@ -36,7 +36,7 @@ So a change that is put on the queue never has to ask for memory.
 
 ## A parked system
 
-A reload does not need room for the systems of a module twice.
+At a reload, the systems of a module count one time against `[budget] systems`: `docs/extern/bridge.h.md`, *bridge_budget_t*.
 `src/bridge_reload.c` parks each system of the old instance: storage forgets its terms, and the world counts it in `parked`.
 A parked system counts for nothing against `[budget] systems`, so the systems of the new instance take the places that the old ones had.
 If the reload fails, `src/reload_fail.c` puts each parked system back, as it was.

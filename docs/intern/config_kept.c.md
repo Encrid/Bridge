@@ -11,7 +11,7 @@ An unload adds an entry when the share of the module stays.
 Each entry is a share that is still held, so `[budget] persistent` bounds the list, and no count does.
 
 After each unload, `config_give_back_free` looks at each entry.
-If no row that stays holds a string in its ranges, the share goes back to the arena, and the entry goes.
+If `is_kept_held` gives false, the share goes back to the arena, and the entry goes: `docs/extern/bridge.h.md`, *An unload*.
 When an entry goes, the last entry of the list takes its place.
 
 ## The next load
@@ -31,7 +31,7 @@ What is lost is the share: the arena does not get it back.
 | Function | Result |
 | --- | --- |
 | `config_find_kept` | Gives the newest entry of the module `stem`, or `nullptr`. |
-| `add_kept` | Makes an entry for the share of an unloaded module, with a copy of its ranges. Gives `nullptr`, with a record, if there is no memory for it. |
+| `add_kept` | Makes an entry for the share of an unloaded module, with a copy of its ranges. Gives `nullptr`, and says so, if there is no memory for it. |
 | `config_keep` | Keeps the share of an unloaded module that stays, and the place of its settings text. |
-| `is_kept_held` | Gives whether a row that stays holds a string in the ranges of an entry. |
+| `is_kept_held` | Gives whether a string of a row that stays lies in the ranges of an entry. |
 | `config_give_back_free` | Gives back each kept share that no row holds a string in, and forgets it. |

@@ -5,28 +5,15 @@ It also reads and switches the bit of a toggled row.
 
 ## A tag
 
-A tag is a component with no bytes: it says that an entity is one of something, and it has no value.
-Standard C has no struct without a member, so a module declares a tag as a fourth kind, `BRIDGE_TAG`, with size 0 and no descriptor.
-Each of the 5 storage layouts can keep a tag, and storage gives, takes, matches and tells it as any other component.
-
-A tag has no column, no values and no cell:
+A tag is a component with no bytes: `docs/extern/bridge_abi.h.md`, *bridge_kind*, tells how a module declares it and what it gets for it.
+Storage keeps it in each storage layout as any other component, with no column, no values and no cell:
 
 | Layout | What the tag is |
 | --- | --- |
 | A table | Nothing in the block. |
-| A sparse set | The ids of the entities in the set. |
+| A sparse set | The entity ids of its block, with no values. |
 | Direct-indexed | The bits alone. |
 | A singleton | The flag `set`. |
-
-Where a module gets the offset of a value, for a tag it gets `BRIDGE_CARRIED`, which is 1.
-Offset 0 of the shared memory is reserved, and its first 8 bytes hold nothing.
-So 1 is not 0, which says absent, and it is the place of no value.
-A module gets `BRIDGE_CARRIED` as the base of the term of a tag in a span, and as its cell of `column_base`.
-The index of a sparse set holds it for an entity in the set.
-The cell of a singleton that has a value holds it too.
-
-Two tags get an offset all the same, because a module finds their bits from it.
-A toggled tag gets where its column would begin, and a direct-indexed tag gets where its cells would begin.
 
 ## Functions
 

@@ -6,13 +6,13 @@ This file gives the entries by which a module registers a system and an observer
 ## add_system
 
 `add_system(at) -> slot` takes the offset of a `bridge_system_statement_t` in the scratch arena: the name, the phase, the terms, the changes and the systems before it.
-It is refused outside the first call of the module: `init`, or `reload` at a reload.
+It is refused outside the first call of the module: `docs/intern/abi.h.md`, *The entries*.
 
-A system states its phase, and in `before` the earlier systems of its module that run before it: `docs/intern/abi_before.c.md`.
+A system states its phase, and in `before` the systems that run before it: `docs/intern/abi_before.c.md`.
 It never names a system of another module.
 A system takes no arguments: its spans are in the private memory of the module, found through the slot that `add_system` gives.
 
-The phase is the name that the module uses: `docs/intern/abi_phase.c.md`.
+`src/abi_phase.c` finds the phase that a system names: `docs/intern/abi_phase.c.md`.
 
 ## observe
 

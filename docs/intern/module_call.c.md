@@ -5,7 +5,7 @@ It also runs the `shutdown` of a module.
 
 ## The private memory
 
-The private memory of a module holds its header at 0, then its scratch arena, its log ring and its spans.
+`docs/extern/bridge_abi.h.md`, *The memories*, tells what the private memory of a module holds.
 Each module has a private memory of its own, sized from its own config, and not a share of a block.
 A reload makes a new instance with a new private memory, so a reload can state larger sizes.
 `module_take_private` makes the private memory in these steps:
@@ -19,7 +19,7 @@ A reload makes a new instance with a new private memory, so a reload can state l
 
 Only the backend of the module maps the block, so the block has the shape of that backend.
 The checks of the config refused a config that cannot be laid out, so the first step cannot fail.
-If the operating system does not give the memory, the load fails and says how many bytes it asked for.
+If `os_reserve` fails, the load fails and says how many bytes it asked for.
 
 ## A lifecycle call
 
@@ -28,7 +28,7 @@ If the operating system does not give the memory, the load fails and says how ma
 1. If the timeout of the call is above 0, set it on the instance, in nanoseconds.
 2. Clear the refusal of the module.
 3. Give the call its turn: `TURN_LIFECYCLE`, and the count of lifecycle calls since the last barrier.
-4. Make room for the marks of the queue of the module, with `abi_marks`.
+4. Make room for its marks: `docs/intern/abi_alloc.c.md`, *The marks of the queue*.
 5. Call the export.
 
 The barrier applies what a lifecycle call changed after the observers of the last barrier, and before the systems of the next phase.

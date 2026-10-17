@@ -12,28 +12,26 @@ That is the difference between what the entity carried before the barrier and wh
 
 | The entity | Event |
 | --- | --- |
-| It did not match the terms, and now matches them. | Enter. |
-| It matched the terms, and no longer matches them, or it is destroyed. | Leave. |
+| Its set did not match the terms before the barrier, and matches them after. | Enter. |
+| Its set matched the terms before the barrier, and does not after, or the entity is gone. | Leave. |
 | It matches the terms, and an attach of one of its terms that is not `BRIDGE_NOT` is still on it. | Attach, with enter if it matches only now. |
 
 Enter and leave are about the terms of the observer, and not about what was done to the entity.
-An observer of "A and not B" hears an entity that carries A enter when B is detached, and leave when B is attached.
 Attach is about the entry `attach`, and not about a value.
-A system that writes a component in place raises nothing, since storage does not hear of a write.
+Storage does not hear of a write in place, so the write raises nothing.
 An entity that carries nothing is in no table, and matches nothing.
 
 So an observer of two terms hears an entity when it comes to carry both, by the attach that completes the pair.
-An entity made and destroyed in one phase is not heard at all, nor one that gets a component and loses it in one phase.
-An entity that loses a component and gets it back in the same phase is heard as an attach, since it carries a new value.
+An entity that gets a component and loses it in one phase is not heard.
+The other cases are in `docs/extern/bridge_abi.h.md`, *observe*.
 An observer gets one call for an entity at a barrier, with the events that hold.
-A detach of what is not there, and any change of a dead id, is nothing.
-Storage tells the observers in the order they came.
+Storage tells the observers in their order: `docs/intern/storage_terms.c.md`, *A record of terms*.
 
 ## Functions
 
 | Function | Result |
 | --- | --- |
-| `is_alive` | Gives whether an id names an entity that exists. Its index is not 0, storage used it, its place is not `DEAD`, and it has the generation of the id. |
+| `is_alive` | Gives whether the entity of an id exists. Its index is not 0, storage used it, its place is not `DEAD`, and it has the generation of the id. |
 | `leave_apart` | Takes the entity at `index` out of each sparse set it is in, and takes from it each direct-indexed value. |
 | `kill_entity` | Makes the entity at `index` gone: its row, and its index, which comes back with the next generation. The entity index shows `DEAD`, and the generation goes back to 1 before it reaches `DEAD`. |
 | `get_owed` | Gives what one observer is owed for an entity, as the table above says, limited to the events it asked for. Each caller gives the set `before` of storage, so it is never null. |

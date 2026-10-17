@@ -19,7 +19,7 @@ Otherwise, for each changed entity, in the order of the fold:
 
 A new value is zero, except for the runs of the move, which `write_runs` copies.
 The value of a singleton is on index 0.
-At the end, storage forgets the fold, and gives back each table that nothing is left in.
+At the end, storage forgets the fold with `forget_all`: `docs/intern/storage_forget.h.md`.
 
 ## The room of a conversion
 

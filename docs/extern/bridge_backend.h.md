@@ -9,12 +9,13 @@ A backend is a shared library that exports the 18 functions of `backend_api_t`, 
 `BACKEND_ENTRY_NAMES` gives the names, in the order of the fields of `backend_api_t`.
 `BACKEND_ENTRY_COUNT` is how many there are: 18.
 `BACKEND_EXPORT` exports a function from the library: a backend in C writes it before each of the 18 functions.
-A C++ compiler reads the declarations as C, thus a backend in C++ exports the names that Bridge looks for.
+A C++ compiler reads the declarations of this header as C, as it does those of `include/bridge.h`: `docs/extern/bridge.h.md`, *The library*.
+A backend in C++ writes `extern "C"` before `BACKEND_EXPORT` on each of the 18 functions, since the header does not declare them.
 
 `bridge_create` opens the library that the deployment names, and finds each entry by its name: `docs/extern/bridge.h.md`, *bridge_backend_t*.
 A library that lacks an entry is not a backend, and `bridge_create` refuses the world.
 The structs follow the rules of the host seam: `docs/extern/bridge.h.md`, *The layouts*.
-What a backend compiles with this header is a work based on Bridge: `readme.md`, *License*.
+A backend is a work based on Bridge, since it compiles with this header: `readme.md`, *License*.
 
 The backend owns five kinds of handle, and Bridge never reads into them:
 
@@ -28,7 +29,7 @@ The backend owns five kinds of handle, and Bridge never reads into them:
 
 ## BACKEND_ABI
 
-`BACKEND_ABI` is the number of the backend seam: the version of the layouts and the entries of this header.
+`BACKEND_ABI` is the number of the backend seam: the version of its layouts and its entries.
 `backend_get_abi` gives the number that the backend was built against.
 Bridge calls `backend_get_abi` first, and refuses a library that gives another number, before it asks for another entry.
 The number changes as `BRIDGE_HOST_ABI` does: `docs/extern/bridge.h.md`, *BRIDGE_HOST_ABI*.
@@ -51,7 +52,7 @@ A setting of a backend is a `backend_setting_t`, with a value of one of four kin
 | Field | Content |
 | --- | --- |
 | `key` | The name of the setting. |
-| `kind` | The kind of the value: an item of `enum backend_setting_kind`. |
+| `kind` | The kind of its value: an item of `enum backend_setting_kind`. |
 | `pad` | 7 bytes of padding. |
 | `v` | The value: a `backend_value_t`. |
 
@@ -85,7 +86,7 @@ Each capability is a promise. State only what the backend keeps.
 A module that is not trusted cannot reach memory that it was not given.
 Such a backend checks each export that it gives: `call` can run it. How the backend does it is its own business.
 
-A load refuses a module whose config demands a capability that its backend does not have: `docs/extern/bridge.h.md`, *The limits*.
+If the backend does not state a capability that the config of a module demands, a load refuses the module: `docs/extern/bridge.h.md`, *The limits*.
 `BACKEND_SIDE_BY_SIDE` decides the order of a reload: `docs/extern/bridge.h.md`, *bridge_reload*.
 A backend that brought a runtime with threads of its own into the process does not state `BACKEND_UNLOAD`.
 Bridge reads the capabilities and the shape of a backend once, after `backend_create`.
@@ -131,7 +132,7 @@ It gives the image, or null with `err`.
 
 | Field | Content |
 | --- | --- |
-| `bytes` | The image of the module, `len` bytes, or null. |
+| `bytes` | The image of the module, as the host gave it: `docs/extern/bridge.h.md`, *bridge_artifact_t*. |
 | `len` | How many bytes `bytes` holds. |
 | `path` | The path of the module, or null. |
 | `demands` | The capabilities that the config of the module demands: a mask of items of `enum backend_capability`. |
@@ -228,7 +229,7 @@ A backend that cannot see the type of an export checks nothing, and does not sta
 `call` runs a function. It gives 0 if the function returned, and then `status` is what the function gave.
 It gives a value that is not 0, with `err`, if the function did not return.
 For example, the function met its timeout or its work limit, or read out of its memory. The process goes on.
-Bridge treats a status that is not 0 and a call that did not return as the same failure.
+Bridge treats a call that did not return as it treats a status that is not 0: `docs/extern/bridge_abi.h.md`, *The exports*.
 
 ## The order of the calls
 
@@ -248,7 +249,7 @@ For the old instance, it calls as an unload does.
 
 `bridge_create` writes one of these reasons when a library is not a backend.
 The record is `backend '<backend>': <reason>`: `docs/extern/bridge.h.md`, *The deployment*.
-In a quote, a word in angle brackets is a part that changes.
+Angle brackets mark a part that changes: `docs/extern/bridge.h.md`, *Messages*.
 
 - `backend library '<path>' has no entry '<entry>'`
 - `backend library '<path>' is of backend ABI <number>, and this is <number>`

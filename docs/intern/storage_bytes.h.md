@@ -5,7 +5,7 @@ It also gives where a column and the bits of a toggled column begin in a block.
 
 ## A toggle
 
-A toggled component is a column of its table, and a bit for each row that tells whether the row has it on.
+A toggled component is a column of its table, with a bit for each row: `docs/extern/bridge_abi.h.md`, *Storage layouts*.
 It is part of the archetype of the entity, as a component in a table is.
 A system that states it matches its table, because each row carries it, on or off.
 The code of the module tests whether a row is on, and the value of a row that is off stays where it is.
@@ -19,11 +19,9 @@ The bits are in the block of the table, before the column:
 A module that has the column, from a span or from `column_base`, finds the bits with one load, at the column less 16.
 The bits past the last row of the table are of no row.
 
-A system that states the term `BRIDGE_WRITE` turns a row on or off: it writes the bit, as it writes a value.
-The schedule keeps it from running beside a system that reads or writes the component, so two systems never write one word at once.
-It is no call, it waits for no barrier, and no observer hears of it.
-A component is on when an entity gets it.
-An attach of a component that the entity has writes the value, and does not change the bit.
+`docs/extern/bridge_abi.h.md`, *Storage layouts*, tells how a system turns a row on or off, and what an attach does to the bit.
+The schedule never runs such a system beside one that reads or writes the component, so no two systems write one word at once.
+The write is no call, and it waits for no barrier.
 A row that moves, to another table or in its table, takes its bit with it: `carry_value` of `src/storage_move.h`, and `fill_row` of `src/storage_row.h`.
 
 ## Copies of values

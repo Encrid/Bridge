@@ -6,30 +6,17 @@ Each amount must be set, and each count that may be none must be a count or none
 ## The budget of a deployment
 
 The budget has two tiers, because two things are sized.
-The deployment states the shared tier in `bridge_budget_t`, and the library reads it when it creates the world.
+The deployment states the shared tier in `bridge_budget_t`, and the library reads it when it creates the world: `docs/extern/bridge.h.md`, *bridge_budget_t*.
 One shared block serves each module, so no single module can size it.
 The budget comes as a struct, because the library reads no file.
 Each module states its own tier when it loads: `docs/intern/module_check_fit.c.md`, *The budget of a module*.
 
-| Key | How many there may be at one time, or how many bytes |
-| --- | --- |
-| `entities` | Entity indexes. Index 0 is no entity, so `entities` of N holds N - 1 entities. |
-| `tables` | Tables: the sets of components that entities carry. |
-| `types` | Declared types: the components, and the structs, enums and bitmasks that their fields name. |
-| `systems` | Systems and observers registered. |
-| `terms` | The terms that one system or observer may have. |
-| `modules` | Modules loaded. |
-| `sparse_sets` | Components kept in a sparse set, or `BRIDGE_NONE`. |
-| `direct_indexed` | Components kept direct-indexed, or `BRIDGE_NONE`. |
-| `persistent` | The bytes of the persistent arena. |
-| `columns` | The bytes of the rows of every table: its entity ids and its columns. |
-
 `tables` counts what exists at one time, and not what ever existed.
 A table lives while it has rows, so the number to state is how many sets of components the entities carry at one time.
 `tables` sizes what storage keeps for each table, and the `column_base` of each module.
+In `columns`, the block of a table also holds the ids of its entities: `docs/intern/storage_layout.h.md`, *The layout of a block*.
 
 `types` and `systems` count what exists at one time, across every module.
-A type that two modules declare counts once.
 With these two keys, everything that storage holds is known and allocated when the world is made, and storage allocates nothing after.
 A `declare` or an `add_system` past its key is refused, by name, and the first call of that module fails.
 

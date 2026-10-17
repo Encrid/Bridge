@@ -1,6 +1,6 @@
 # src/config_enum.c
 
-This file writes a setting into a field that is an enum or a bitmask.
+This file writes a setting into an enum field or a bitmask field.
 
 ## An enum
 
@@ -14,9 +14,9 @@ A setting of any other kind is refused as a misfit.
 ## A bitmask
 
 A bitmask takes an integer from 0 to the most that its bits hold.
-Any other setting is refused as a misfit.
+An integer outside that range is refused, and a setting that is not an integer is refused as a misfit.
 
-The value goes into the field as its low bytes, as many as the type has.
+The field gets the low bytes of the value, as many as the type has.
 
 ## Functions
 

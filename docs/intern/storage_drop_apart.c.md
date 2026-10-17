@@ -1,7 +1,7 @@
 # src/storage_drop_apart.c
 
 This file drops a component that no table keeps: a direct-indexed one, one of a sparse set, or a singleton.
-The policies are in `docs/intern/storage_drop.h.md`, *What unload leaves behind*.
+The policies are in `docs/extern/bridge_abi.h.md`, *bridge_on_unload*.
 
 ## An entity at a time
 

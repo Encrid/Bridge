@@ -20,9 +20,8 @@ A backend that checks the shape of an import refuses a module that declares an e
 Bridge defines all the imports right after it makes the instance, before it finds the first function of the module.
 
 A function that Bridge gives to a module gives a status beside its results.
-Non-zero says that the call that reached it must not go on.
-A backend that can unwind a module does it there: the wasm backend raises a trap.
-A backend that cannot lets the call return, and Bridge fails the invocation when it does.
+`docs/extern/bridge_backend.h.md`, *define_func*, tells what a backend does with a status that is not 0.
+The wasm backend can stop the module, and does it with a trap.
 
 ## The entries
 

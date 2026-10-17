@@ -21,7 +21,7 @@ A stopped world accepts two calls, both about the module that stopped it:
 
 After that unload, the host can load any module, and a module of another name can take its place.
 A module that never loaded has nothing to unload. For it, the ways on are a load that succeeds, or `bridge_destroy`.
-Storage that runs out does not stop a world: `docs/intern/block_barrier.c.md`, *The count of a module*.
+Storage that runs out is no cause of a stop: `docs/intern/block_barrier.c.md`, *The count of a module*.
 The world keeps why it stopped, and the stem of the module, in two arrays of its own: `docs/intern/inside.h.md`, *A world*.
 
 While the world is stopped, only a call that names that stem passes `bridge_check_call`.

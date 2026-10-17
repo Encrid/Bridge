@@ -1,7 +1,7 @@
 # src/storage_reserve.h
 
 This header finds a table for each changed entity before anything moves.
-It is the first part of the second step of a barrier, and of a move: `docs/intern/storage_room.h.md`, *Functions*.
+It is the first part of `reserve_all`: `docs/intern/storage_room.h.md`, *Functions*.
 
 ## A table for each entity
 
@@ -16,7 +16,7 @@ If storage cannot make the table, it leaves the entity as it was.
 
 An entity that joins a sparse set counts as a row that the table of the set gains.
 Storage makes that table if no entity is in the set.
-There is room for a table for each sparse set, so storage never refuses that one.
+Storage never refuses that table: `docs/intern/storage_inside.h.md`, *A sparse set*.
 
 ## Functions
 
@@ -25,5 +25,5 @@ There is room for a table for each sparse set, so storage never refuses that one
 | `get_wanted` | Gives the set of the table that the entity at `index` is to be in. |
 | `pick_table` | Finds the table that the entity at `index` is to be in, made if there is none, and counts the entity among its new rows. Gives false, with the entity left as it was, if there is no room for the table. |
 | `reserve_join` | Counts the entity at `index` among the rows that the sparse set of `slot` gains. Makes the table of the set if it has none, which `make_table` never refuses for a sparse set. |
-| `count_joins` | Counts a row in each sparse set that the entity at `index` is to join. |
+| `count_joins` | For the entity at `index`, counts a row in the table of each sparse set that it is to join. |
 | `reserve_one` | Finds where the entity at `index` is to be while it is still where it was: its table, and each sparse set it joins. Does nothing for a destroyed entity. |

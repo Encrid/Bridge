@@ -8,7 +8,7 @@ It also checks whether the module may make the change.
 
 `get_scratch` gives the `len` bytes at offset `at` of the private memory of a module, if they lie in its scratch arena.
 If not, it gives nullptr, and the entry refuses the call.
-The scratch arena is the one memory that a module can write and that Bridge can read and bounds-check.
+An offset that a module hands over must lie in the scratch arena: `docs/intern/block_log.c.md`, *The log ring*, tells why.
 
 ## The queue
 
@@ -18,10 +18,10 @@ The value is copied at the call, since the scratch arena that holds it is reset 
 `queue_change` asks for no memory: `docs/intern/inside.h.md`, *Nothing is allocated in a phase*.
 
 A module that stated `BRIDGE_NONE` for `changes` has a queue with no room, and each change it asks for is refused.
-A change that does not fit in what is left of the queue is refused: the changes of the module are used up.
+`queue_change` refuses a change when the rest of the queue has no room for it: the changes of the module are used up.
 
 The first change of a turn puts a mark in the queue: where the changes of that turn begin.
-The barrier applies the queues in the order that the calls ran, by these marks: see `src/storage_runs.h`.
+The barrier uses these marks to keep the order of the calls: `docs/intern/storage_runs.h.md`, *The order of the queues*.
 `abi_marks` makes the room for the marks before a turn: `docs/intern/abi_alloc.c.md`, *The marks of the queue*.
 Between two applies, a module takes at most one mark for each system, one for each observer, and one for the lifecycle call.
 Each apply empties the marks, so the room is always there, and `mark_turn` asks for nothing.
@@ -42,6 +42,6 @@ No other component takes the id 0.
 | --- | --- | --- |
 | `get_scratch` | `src/abi_entry.h` | The `len` bytes at `at` in the scratch arena of the module, or nullptr if they do not lie in it. |
 | `mark_turn` | `src/abi_entry.h` | Marks where the changes of the turn in progress begin in the queue, at the first change of that turn. |
-| `queue_change` | `src/abi_entry.h` | Puts a change on the queue of the module, with a copy of its value after it. 1 if refused. |
-| `is_stated` | `src/abi_entry.h` | Whether what runs in the module stated that it changes the component. True for a lifecycle call. |
+| `queue_change` | `src/abi_entry.h` | Adds a change to the queue of the module, with a copy of its value after it. 1 if refused. |
+| `is_stated` | `src/abi_entry.h` | Whether the system or the observer that runs states the component among its changes. True for a lifecycle call. |
 | `check_owner` | `src/abi_entry.h` | Refuses a change of a singleton that names an entity, and a change of anything else that names none. 1 if refused. |

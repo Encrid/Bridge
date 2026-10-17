@@ -180,7 +180,7 @@ Each function that can fail is `[[nodiscard]]`: the caller must use its result.
 | --- | --- |
 | `os_reserve` | Reserves `reserve` bytes of address space, and makes the first `commit` bytes readable, writable and zero. The rest faults when touched, which a backend that enforces bounds by a fault needs after a block. Gives `nullptr` on failure. |
 | `os_release` | Gives back all of a reservation. Each caller passes a base that `os_reserve` gave. |
-| `os_lib_open` | Opens a shared library, or gives `nullptr`. For a path, the loader looks there for the library and for what it needs, since a backend brings its runtime beside itself. A bare name goes to the search of the operating system. |
+| `os_lib_open` | Opens a shared library, or gives `nullptr`. For a path, the loader looks there for the library and for what it needs, since a backend brings its runtime beside itself. The search of a bare name is in `docs/extern/bridge.h.md`, *bridge_backend_t*. |
 | `os_lib_get_symbol` | Gives where a library has what it exports as `name`, or `nullptr`. |
 | `os_lib_close` | Closes a library. Each caller passes a library that `os_lib_open` gave. |
 | `os_thread_start` | Starts a thread that runs `fn(arg)`. Gives `nullptr` on failure. |

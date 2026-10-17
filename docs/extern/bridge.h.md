@@ -149,7 +149,7 @@ Bridge refuses a pair unless it has two different full names of this form.
 A pair can name a system that is not loaded.
 Pairs make chains: if `a` runs before `b`, and `b` before `c`, then `a` runs before `c`, also while `b` is not loaded.
 For a conflict of two systems of two modules, only the pairs and their chains count.
-In one phase, a pair holds also between two systems that do not conflict.
+In one phase, a pair orders its two systems also when they do not conflict: `docs/extern/bridge_abi.h.md`, *Conflicts*.
 
 A pair can also order two systems of one module, but it does not replace the order that the module states: `docs/extern/bridge_abi.h.md`, *Conflicts*.
 A pair against that order makes a cycle, and the load or the reload fails.
@@ -414,7 +414,7 @@ The sink of the world gets each record.
 | `len` | How many bytes `text` has. |
 | `barriers` | How many barriers the world had made when the record was made. |
 | `place` | The place of the system in its phase, from 0. Zero in a record of Bridge. |
-| `arg` | Two numbers that a module writes with a line: a value, and what it is set beside. Zero in a record of Bridge. |
+| `arg` | The two numbers of a line of a module: `docs/extern/bridge_abi.h.md`, *The log*. Zero in a record of Bridge. |
 | `level` | The severity of the record: 0 to 7. Lower is worse. |
 | `pad` | 3 bytes of padding. |
 
@@ -548,8 +548,7 @@ When two modules conflict, the order of the loads decides which load fails. The 
 
 The result is 0 if the module was loaded. Else the result is 1, with a record.
 From the sink, the result is 1, with no record.
-A component that another loaded module declares stays, with its rows.
-`docs/extern/bridge_abi.h.md`, *bridge_on_unload* tells what happens to the entities of a component that goes.
+`docs/extern/bridge_abi.h.md`, *bridge_on_unload* tells which components stay, and what becomes of the entities of a component that goes.
 
 ## bridge_reload
 
@@ -642,6 +641,7 @@ Each record of Bridge has the level `BRIDGE_ERR`, unless its group tells another
 - `backend '<backend>': <reason>`
 - `backend '<backend>' states a granule of <count>, and a granule is 0, or a power of two up to 1073741824`
 - `backend '<backend>' states a reservation of <bytes> bytes, and the most is 140737488355328`
+- `backend '<backend>' states a guard of <bytes> bytes, and the most is 140737488355328`
 - `cannot open backend library '<path>'`
 - `backend '<backend>' would not start: <reason>`
 - `backend '<backend>' cannot adopt the shared memory: <reason>`
@@ -729,8 +729,12 @@ The reason is a text of the backend, a refusal of an entry of the module, or one
 - `it accepts the loss of '<name>', and loses nothing of that name`
 - `its spans of <bytes> bytes do not hold a column_base of <count> components by <count> tables, which with its queries is <bytes> bytes`
 - `'<system>' and '<system>' both touch '<component>' in phase '<phase>', one of them writing it, and no pair orders them`
+- `'<system>' and '<system>' both attach or detach '<component>' in phase '<phase>', and no pair orders them`
+- `'<observer>' and '<observer>' both touch '<component>' at the barrier, one of them writing it, and no pair orders them`
 - `'<observer>' and '<observer>' both attach or detach '<component>' at the barrier, and no pair orders them`
 - `'<system>' and '<system>' both touch '<component>' in phase '<phase>', one of them writing it, and their module states no order of them`
+- `'<system>' and '<system>' both attach or detach '<component>' in phase '<phase>', and their module states no order of them`
+- `'<observer>' and '<observer>' both touch '<component>' at the barrier, one of them writing it, and their module states no order of them`
 - `'<observer>' and '<observer>' both attach or detach '<component>' at the barrier, and their module states no order of them`
 - `'<system>' would run before itself in phase '<phase>': the [order] pairs and the orders that the modules state make a cycle`
 - `'<observer>' would run before itself at the barrier: the [order] pairs and the orders that the modules state make a cycle`

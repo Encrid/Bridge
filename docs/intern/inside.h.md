@@ -54,8 +54,6 @@ None of them is on the hot path.
 | `shared` | The shared block, as this backend sees it. |
 | `reservation`, `guard`, `granule` | The address space that the backend needs around a block it maps: `docs/intern/block_create.c.md`, *The shape of a block*. |
 
-A private block has the shape of its backend, and the shared block has the largest shape that any backend stated.
-
 ### A declared type
 
 Storage holds the rows of a component, and this record is what a load checks.
@@ -89,8 +87,8 @@ A system and an observer are a query and a function either way, so one record se
 | `m` | Its module. |
 | `name` | The name that it registered. |
 | `full` | How `[order]` names it: the stem of its module, a colon, then its name. |
-| `named` | The index of `full` among the names of `[order]`, or the count of names if no pair names it. |
-| `phase` | Its phase. The phase of an observer is the one past the last phase of the deployment: the barrier. |
+| `named` | The index of `full` among the names of `[order]`: `docs/intern/schedule_names.c.md`, *The index of a system*. |
+| `phase` | Its phase, or the barrier for an observer: `docs/intern/abi_system.c.md`, *observe*. |
 | `matched` | Its terms, as storage holds them. Null with no terms. |
 | `spans_at` | Where its spans begin in the private memory of its module, as storage last wrote them. |
 | `asked` | What it asked storage for, kept to put a system back as it was after a reload took it out of storage. |
@@ -98,16 +96,16 @@ A system and an observer are a query and a function either way, so one record se
 | `terms` | How many terms it has. |
 | `fn` | Its function. |
 | `level` | Its level in its phase: a level runs before the next. |
-| `parked` | Out of the schedule while a reload decides what becomes of it. |
+| `parked` | Whether it is parked: `docs/intern/schedule_edges.c.md`, *The systems of a phase*. |
 | `observer` | Whether it is an observer. |
 | `pending`, `pending_count`, `pending_room` | Who triggered it since the last barrier, how many, and the room of the list. |
-| `place` | The place of the system in its phase, at its dispatch. |
+| `place` | Its place in its phase, from 0, at its dispatch: `docs/intern/schedule_jobs.c.md`, *The turn of a system*. |
 | `turn` | Where it comes among all that ran before the barrier. |
 | `failed`, `why` | How its dispatch ended, said after the join. |
 | `failures` | Its own count of failures. |
 | `changes`, `change_count` | The components that it stated that it attaches or detaches. They lie after the terms, in the same block. |
 | `slot` | Its slot among the systems of its module, or among its observers: what `add_system` or `observe` gave. |
-| `stated_before` | The slots of each system that its module states before it, also through a chain, as bits: `docs/intern/schedule_before.c.md`. They lie after the changes, in the same block. |
+| `stated_before` | The order that its module states, as bits: `docs/intern/schedule_before.c.md`, *The bits*. They lie after the changes, in the same block. |
 | `term` | Its `terms` terms, as the conflict graph reads them. |
 
 ### A module
@@ -120,7 +118,7 @@ A system and an observer are a query and a function either way, so one record se
 | `memory` | Its private block, as its backend sees it. |
 | `priv`, `priv_len`, `priv_reserve` | The private block, its length, and the address space reserved for it. |
 | `scratch`, `scratch_len` | Where the scratch arena is, and its length. |
-| `ring`, `ring_len`, `ring_tail` | Where the log ring is, its length in records, and the count of records drained. |
+| `ring`, `ring_len`, `ring_tail` | The start of the log ring, how many records it holds, and how many records were drained. |
 | `spans`, `spans_len` | The span region: the query slots, the lists of the observers, `column_base` and the spans. |
 | `had_triggers`, `spans_end` | What storage last wrote in the span region: that the list of an observer was not empty, and where the spans end. |
 | `declared`, `policy`, `may_write`, `declared_count` | By slot: the component, what the module stated for unload, and whether its grants let it write the component. |
@@ -137,13 +135,13 @@ A system and an observer are a query and a function either way, so one record se
 | `pinned`, `thread` | Whether it is pinned, and the thread that loaded it. |
 | `hot_reload`, `on_error` | What its config states for them. |
 | `shutdown`, `shutdown_timeout` | Its export `shutdown`, and the timeout of that call. |
-| `max_failures`, `failures` | The `max_system_failures` of its config, and its own count for what is no system's. |
+| `max_failures`, `failures` | The `max_system_failures` of its config, and the count of the failures that are no system's. |
 | `changed_now`, `fault_now` | At this barrier: it changed an entity, and the words of its fault, or null. |
 | `reached` | The system whose count reached the number, if one did. |
-| `left` | How many of its changes this barrier did not apply, for want of a table and for want of columns. |
+| `left` | How many of its changes this barrier did not apply, by cause: no table, or no columns. |
 | `writable` | The types that it may write, as storage numbers them. |
 | `barred` | How many entities it asked to destroy at this barrier that carry none of those types. |
-| `config`, `text_at`, `text_room` | The component that its settings seeded, and where the text of the settings is. |
+| `config`, `text_at`, `text_room` | The component that its settings seeded, and the place and the room of its settings text. |
 | `in_init`, `stopped` | It is in its first call, and it is stopped. |
 | `running`, `turn` | What runs in it now, or null for a lifecycle call, and the turn of that call. |
 | `marks`, `mark_count`, `mark_room`, `mark_at` | Where the changes of each turn begin in its queue, and the next mark that the barrier takes. |
@@ -154,19 +152,18 @@ A system and an observer are a query and a function either way, so one record se
 | `refused`, `why` | An entry refused during the call in progress, and why. |
 | `next` | The next loaded module. |
 
-A module can write all of its private block.
-So the library keeps here each offset that it acts on, and never reads the offset back from the header.
+The library keeps here each offset that it acts on, and never reads the offset back from the header.
+`docs/intern/block_log.c.md`, *A line handed to the sink*, tells why.
 `declared`, `policy` and `may_write` are found once, at `declare`, and each attach reads them.
 
 Only the thread of the module touches what is set aside for it alone: its ids, its share of the arena and its queue.
 Each system has its own count of failures, and `failures` counts what is no system's.
 A barrier that could not place an entity that the module changed raises it, and a barrier that placed all it changed lowers it.
 
-There is a mark for each call that queued something.
-So the barrier applies the queues in the order the calls ran: `src/storage_runs.h`.
+With `marks`, the barrier can apply the queues in order: `docs/intern/storage_runs.h.md`, *The order of the queues*.
 
-Each reload that could not add to the last range where it was gives the share one more range.
-`alloc` moves to the next range once what it is asked no longer fits in the range before.
+A reload can give the share one more range: `docs/intern/reload_share.c.md`, *A share that a reload grows*.
+`alloc` moves to the next range as `docs/intern/abi_alloc.c.md`, *The persistent arena*, tells.
 At unload, the ranges go back to the arena if nothing that stays points into them: `docs/intern/module_share.c.md`, *When a share goes back*.
 
 ### A queued change
@@ -193,7 +190,7 @@ A `schedule_pairs_t` holds the pairs of `[order]`: `docs/intern/schedule_order.c
 | --- | --- |
 | `names` | Each name of a pair, copied, in the order met. |
 | `n` | How many names. |
-| `reach` | Who runs before whom among the names, closed at create. It has a row for twice as many names as pairs. |
+| `reach` | Who runs before whom among the names, closed at create: `docs/intern/schedule_order.c.md`, *The pairs*. |
 
 ### A world
 
@@ -207,7 +204,7 @@ A `schedule_pairs_t` holds the pairs of `[order]`: `docs/intern/schedule_order.c
 | `stopped_why`, `stopped_name` | The two arrays that `stopped_by` and `stopped_stem` point at. |
 | `phases`, `phase_count` | The phases of the deployment, by name. |
 | `barriers` | The count of barriers that ran. |
-| `turns` | The count of lifecycle calls since the last barrier. |
+| `turns` | How many lifecycle calls ran since the last barrier. |
 | `parked` | The systems out of storage while their module reloads. |
 | `arena_ranges` | How many ranges of the arena the modules hold. |
 | `run_jobs`, `run_handed`, `run_lists`, `run_callers` | What the dispatch of a phase works in, `[budget] systems` long. |
@@ -221,20 +218,20 @@ A `schedule_pairs_t` holds the pairs of `[order]`: `docs/intern/schedule_order.c
 | `sparse_sets`, `sparse` | `[budget] sparse_sets`, and where their indexes begin: one after another, each a `u32` for each entity there may be. |
 | `direct_indexed`, `direct` | `[budget] direct_indexed`, and where their bits begin: one after another, each a bit for each entity there may be. |
 | `arena_space`, `column_space` | What of the arena and of the column region is handed out. |
-| `layout_moved` | A module came or went, or a declaration changed. |
+| `layout_moved` | Set when a module comes or goes, or when a declaration changes. |
 | `tables` | `[budget] tables`: how many tables may exist at one time. |
 | `max_types`, `max_systems`, `max_terms` | `[budget] types`, `systems` and `terms`. |
 | `storage` | What keeps the rows: `src/storage.h`. |
 | `types`, `type_count` | The declared types. |
-| `kept`, `kept_count` | Each share of an unloaded module that stays. |
-| `systems`, `system_count` | The systems of every module, in the order of registration. So the systems of one module are in the order of their slots. |
+| `kept`, `kept_count` | The shares that stay after their module unloaded: `docs/intern/config_kept.c.md`, *The list of shares*. |
+| `systems`, `system_count` | The systems of every module, in the order of registration: `docs/intern/abi_subscribe.c.md`, *The slot*. |
 | `modules`, `module_count`, `max_modules` | The loaded modules, how many, and `[budget] modules`. |
 
 A world is stopped at a barrier, where nothing is allocated.
 So `stopped_by` and `stopped_stem` point at the two arrays after them.
 The list of gaps of the arena has room for one gap more than `arena_ranges`, made when a range is taken.
 So a range given back never asks for memory.
-A load, a reload and an unload ask for no memory to make the schedule, so none of them can fail there.
+`docs/intern/schedule.h.md`, *Cost*, tells why a load, a reload and an unload cannot fail for the room of the schedule.
 
 `docs/intern/block_layout.c.md`, *The parts*, gives the parts of the shared block, and where each begins.
 
@@ -247,7 +244,7 @@ A load, a reload and an unload ask for no memory to make the schedule, so none o
 | `CHANGE_DETACH` | 3: a queued `detach`. |
 | `TURN_LIFECYCLE` | `1 << 32`: the turns of the lifecycle calls. |
 | `TURN_SYSTEM` | `2 << 32`: the turns of the systems of a phase. |
-| `NAME_MOST` | 127: the most bytes of the name of a type, a system or an observer. |
+| `NAME_MOST` | 127: the longest name, in bytes, that a declared type, a system or an observer can have. |
 
 A turn orders all the calls that ran before a barrier.
 The observers of the last barrier come first, then the lifecycle calls, then the systems of the phase, each in the order it ran.
@@ -257,6 +254,6 @@ The low 32 bits of a turn give that order.
 
 | Function | Source | Result |
 | --- | --- | --- |
-| `module_discard` | `src/module_discard.c` | Frees a module and what it held. |
-| `module_shut_down` | `src/module_call.c` | Runs the `shutdown` of a module, with what it asked for and what it said. |
-| `module_free_type` | `src/module_types.c` | Frees a declared type with what it holds: its layout, runs, types, name, zero value and descriptor. |
+| `module_discard` | `src/module_discard.c` | Frees a module: `docs/intern/module_discard.c.md`, *Functions*. |
+| `module_shut_down` | `src/module_call.c` | Runs the `shutdown` of a module: `docs/intern/module_call.c.md`, *Functions*. |
+| `module_free_type` | `src/module_types.c` | Frees a declared type: `docs/intern/module_types.c.md`, *Functions*. |

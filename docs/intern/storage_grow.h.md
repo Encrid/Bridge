@@ -39,7 +39,7 @@ The first block of a table has nothing in it, so nothing moves: `place_columns` 
 | Function | Result |
 | --- | --- |
 | `take_longer` | Asks for a block with half as much room again as the table had, or for `room` rows if that fails. Writes the room it got, and gives the block or `nullptr`. |
-| `move_column` | Moves one column, and the bits of a toggled column, to where the new room puts it. Writes the new place of the column. |
+| `move_column` | Moves one column out to its place in the new room, with its bits if it is toggled. Writes the new place of the column. |
 | `move_columns` | Moves `who` to the new block, and each column out to where the new room puts it, the last first. |
 | `place_columns` | Writes where each column of the first block of a table is, and where the bits of a toggled column are. |
 | `grow_table` | Makes room for `room` rows in table `t`, or for half as much again as it had. Gives true if the table has the room, and false with nothing changed if it cannot have it. |

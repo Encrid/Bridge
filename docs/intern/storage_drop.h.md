@@ -5,18 +5,8 @@ A component is dropped when nobody declares it any more, by the policy that its 
 
 ## What unload leaves behind
 
-An unload drops the components that only the unloading module declares, and keeps the shared ones.
-The author of each component states at `declare` what happens to the entities that carry it:
-
-| Policy | What storage does |
-| --- | --- |
-| `BRIDGE_STRIP` | Removes the component. The entity stays, even with nothing left on it. |
-| `BRIDGE_SWEEP` | Removes the component, and destroys an entity that has no component left. |
-| `BRIDGE_DELETE` | Destroys each entity that has the component, with all else that is on it. |
-
-Storage applies the policy of the module that unloads, and only when it is the last module that declares the component.
+The policies, and which one applies, are in `docs/extern/bridge_abi.h.md`, *bridge_on_unload*.
 For a sweep, an entity has nothing left when it is in no table, in no other sparse set, and has no other direct-indexed value.
-A stored id of an entity that a sweep or a delete destroyed is stale, and the check of its generation refuses it.
 
 A strip never fails, and never costs an entity.
 Storage works it a table at a time, and it never needs more than what is there.
@@ -41,7 +31,7 @@ An entity in either table stays there while its archetype does not change.
 
 | Function | Result |
 | --- | --- |
-| `storage_drop_cells` | Drops a direct-indexed component from each entity that has a value of it. In `src/storage_drop_apart.c`. |
-| `storage_drop_set` | Drops a component of a sparse set, an entity at a time, from the last. In `src/storage_drop_apart.c`. |
-| `storage_drop_single` | Drops a singleton. It is on no entity, so the three policies say one thing: it has no value. In `src/storage_drop_apart.c`. |
-| `storage_drop_table` | Drops a component from one table that carries it. Gives how many rows stay in a second table of their archetype. In `src/storage_drop_table.c`. |
+| `storage_drop_cells` | Drops a direct-indexed component: `docs/intern/storage_drop_apart.c.md`, *Functions*. |
+| `storage_drop_set` | Drops a component of a sparse set: `docs/intern/storage_drop_apart.c.md`, *Functions*. |
+| `storage_drop_single` | Drops a singleton: `docs/intern/storage_drop_apart.c.md`, *An entity at a time*. |
+| `storage_drop_table` | Drops a component from one table: `docs/intern/storage_drop_table.c.md`, *Functions*. |

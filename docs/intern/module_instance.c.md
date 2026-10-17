@@ -13,15 +13,14 @@ A module gets the memories that it imports, and no other.
 4. Find the memories that the image imports.
 5. Make the instance with those memories.
 6. Define the eight imports of the ABI: `docs/intern/abi_define.c.md`, *The signatures*.
-7. If `memory_limit` is above 0, set it on the instance.
+7. Set `memory_limit` on the instance, if it is above 0.
 
 The demands tell the backend which guarantees the config asks for.
 A guarantee can cost something at each instruction, and a backend need not compile in a guarantee that the module declined.
 
 ## The memories a module imports
 
-Bridge owns the memory of a module, and the backend only makes it addressable: `memory_adopt` takes pages that Bridge already has.
-So one block reaches a native module as a pointer, and a wasm module as an import.
+Bridge owns the memory of a module, and the backend only makes it addressable: `docs/intern/block_create.c.md`, *The adoption*.
 
 Not every module imports both memories.
 So Bridge reads the imports of the image, and does not hand over memories that nobody asked for, which would make the link fail.

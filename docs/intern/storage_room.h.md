@@ -6,7 +6,7 @@ It is the second step of a barrier, and of a move.
 ## Running out
 
 A barrier knows what each changed entity will carry before it moves a row: `docs/intern/storage_apply.c.md`, *The steps of a barrier*.
-So it knows here what it cannot have, while each entity is still where it was: a table past `[budget] tables`, or rows past `[budget] columns`.
+So here it finds a shortage before any row moves: a table past `[budget] tables`, or rows past `[budget] columns`.
 Then storage drops all the changes asked of that entity at that barrier, and not only some of them.
 The entity keeps the components and the values it had, and no observer hears of it.
 Storage places the other entities as usual.
@@ -52,6 +52,6 @@ It names who asked, and nothing has begun when it finds the shortage, so nothing
 | --- | --- |
 | `size_table` | Finds room in table `t` for all the rows it gains at this barrier, or for as many as the column region holds. Sets `incoming` to that number. |
 | `make_room` | Takes room for one more row that table `t` gains. The first time, it sizes the table. Gives false if no room is left. |
-| `room_joins` | Takes room in each sparse set that the entity at `index` joins. Gives false at the first set with no room. |
-| `room_one` | Takes room for the entity at `index` where it is to be, or leaves it as it was for want of columns. An entity that gets no new row needs no room. An attach of a component that the entity has is most of what a barrier sees. |
+| `room_joins` | For the entity at `index`, takes room in each sparse set that it joins. Gives false at the first set with no room. |
+| `room_one` | Takes room for the entity at `index` where it is to be, or leaves it as it was for want of columns. An entity that gets no new row needs no room. Most of what a barrier sees is an attach to an entity that has the component already. |
 | `reserve_all` | The second step of a barrier and of a move. Finds a table for each changed entity, then room in it and in each sparse set that it joins, before anything moves. |

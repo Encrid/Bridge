@@ -10,8 +10,7 @@ Bridge gives the component its value at `init`, by matching the keys of the sett
 A key that the struct has no field for is refused at `init`, by its name: a typo is not ignored.
 
 The author names the component with the key `config` of the manifest, because only the author knows which struct holds the settings.
-A module with no settings component states `BRIDGE_NO_CONFIG`, which is `none`.
-That names no component, because the name of each component has a namespace and a colon.
+`docs/extern/bridge.h.md`, *The settings of a module*, gives the `config` of a module that has no settings component.
 A `config` left null is unset and refused: an author who forgot it is told, and is not taken to mean none.
 Settings handed to a module that states `none` are refused.
 A `config` that `init` did not declare as a struct is refused by its name.
@@ -40,13 +39,13 @@ The steps:
 1. If `config` is `BRIDGE_NO_CONFIG`, refuse any setting, and stop.
 2. Find the component among the types that `init` declared.
 3. Refuse it if it is not a struct, not a singleton, or already the settings of another module.
-4. Refuse a setting with no key, of no kind, with a null text, or with a repeated key: `src/config_field.c`.
+4. Refuse the settings that `config_check_settings` refuses: `src/config_field.c`.
 5. Find where the text of the settings goes: `docs/intern/config_room.c.md`. Only the second run moves the cursor of the share.
 6. Write each setting into one value, in order, and stop at the first refusal.
 7. If no setting is refused, the second run gives the singleton that value. It records the component as the settings of the module.
 
 The reason of a refusal goes into the error of the load.
-A reload does not write the settings again: `docs/intern/module_start.c.md`.
+`docs/extern/bridge.h.md`, *The settings of a module*, tells what a reload does with the settings.
 
 ## Functions
 

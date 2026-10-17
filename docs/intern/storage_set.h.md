@@ -7,7 +7,8 @@ This header gives a set of types: a bit for each type, in 64-bit words.
 A set has a word for each 64 types there may be, which is one word in most deployments.
 Type `t` is bit `t & 63` of word `t >> 6`.
 `set_copy` and `set_clear` work a word at a time.
-A `memcpy` of a length that the compiler cannot see is a call, and storage makes a set for each entity that a barrier changes.
+A `memcpy` of a set is a call, since the compiler cannot see its length: `docs/intern/storage_bytes.h.md`, *Copies of values*.
+Storage makes a set for each entity that a barrier changes.
 
 ## Functions
 

@@ -1,6 +1,6 @@
 # src/os/windows/os_types.h
 
-This header gives the thread, the mutex and the event of `src/os/os.h` on Windows.
+This header gives `src/os/os.h` its thread, its mutex and its event on Windows.
 It defines `WIN32_LEAN_AND_MEAN`, includes `<windows.h>` and `src/os/os.h`, and the other files of `src/os/windows` include it.
 
 ## Types
@@ -25,7 +25,7 @@ A mutex: a critical section.
 
 ### struct os_event
 
-An event: an event object of Windows that resets itself when a wait returns for it.
+An event: an event object of Windows, which resets itself as a wait returns for it.
 
 | Field | Content |
 | --- | --- |

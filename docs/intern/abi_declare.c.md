@@ -9,19 +9,18 @@ This file gives `declare(at) -> slot`, the entry by which a module declares a ty
 3. Find the name and the descriptor in the scratch arena, and copy the name. A tag has no descriptor.
 4. Make room for one more slot of the module, and for the set of the types that it may write.
 5. Refuse what the declaration may not state: `docs/intern/abi_stated.c.md`.
-6. Decide what becomes of a type of that name that is there already: `docs/intern/abi_replace.c.md`.
+6. Decide what becomes of an earlier type of that name: `docs/intern/abi_replace.c.md`.
 7. If no type of that name is there, make one: `docs/intern/abi_make.c.md`.
 8. Give the slot of the module for the type.
 
 The declaration is copied because a module can put it at any offset, aligned or not.
-A name that is empty, or of 128 bytes or more, is refused as a name outside the scratch arena.
+`abi_check_name` refuses a name that is empty or too long: `docs/extern/bridge_abi.h.md`, *A declaration*.
 Step 4 has all its memory before anything is made that would have to be unmade.
 If a piece is missing, the call is refused for want of memory.
 
 ## The slots
 
-`declare` is idempotent.
-The first module that declares a component makes it, and a later module gets a slot of its own for the same component.
+`declare` is idempotent: `docs/extern/bridge_abi.h.md`, *declare*.
 A module that declares a type again gets the slot that it has.
 So there is no entry to find a type: `declare` does it.
 

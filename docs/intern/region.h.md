@@ -24,9 +24,9 @@ Everything past `used` was never handed out. `len` is the length of the region.
 
 | Function | Source | Result |
 | --- | --- | --- |
-| `region_make_room` | `src/region.c` | Makes room in the list for the gaps that `ranges` ranges can leave. False if there is not the memory. |
-| `region_drop_gap` | `src/region.c` | Takes gap `i` out of the list. |
-| `region_give` | `src/region.c` | Gives a piece back. The piece becomes a gap, joined to the gaps that it touches. |
-| `region_take` | `src/region_take.c` | Takes a piece of `len` bytes: 1 and its offset, or 0 if the region has no piece that long. |
-| `region_grow` | `src/region_take.c` | Makes the piece at `at` longer where it is. False, with no change, if what follows it is not free. |
-| `region_get_most` | `src/region_take.c` | Gives the length of the longest piece that the region can give now. |
+| `region_make_room` | `src/region.c` | Makes room in the list of gaps: `docs/intern/region.c.md`, *Functions*. |
+| `region_drop_gap` | `src/region.c` | Takes a gap out of the list: `docs/intern/region.c.md`, *Functions*. |
+| `region_give` | `src/region.c` | Gives a piece back: `docs/intern/region.c.md`, *Functions*. |
+| `region_take` | `src/region_take.c` | Takes a piece: `docs/intern/region_take.c.md`, *Functions*. |
+| `region_grow` | `src/region_take.c` | Makes a piece longer where it is: `docs/intern/region_take.c.md`, *Functions*. |
+| `region_get_most` | `src/region_take.c` | Tells how long the longest piece is: `docs/intern/region_take.c.md`, *Functions*. |

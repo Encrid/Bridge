@@ -15,7 +15,7 @@ If the room cannot be had, nothing has moved, and the reload fails and says why.
 The new type is made beside the old one, so for the length of a reload the component is two types.
 It counts twice against `[budget] types`.
 It counts twice against `[budget] sparse_sets` or `[budget] direct_indexed` too, if both types are kept that way.
-Its rows need room where they go while they are still where they were.
+Its rows need room where they go, before they leave where they are: `docs/extern/bridge.h.md`, *A reload*.
 The observers hear nothing, because no entity gains or loses a component.
 
 ## The move of a type
@@ -27,7 +27,7 @@ Where the component layout changed, it copies the value field by field, in the r
 ## A move refused
 
 - If there is no memory to carry the values across, the reload fails with "out of memory", and the count of components.
-- If `[budget] tables` or `[budget] columns` has no room for the rows where they go, the reload fails and names both keys.
+- If `[budget] tables` or `[budget] columns` has no room for the rows, the reload fails with a record that names both keys: `docs/extern/bridge.h.md`, *A reload*.
 
 ## After the move
 

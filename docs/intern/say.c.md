@@ -23,7 +23,7 @@ A failed call gives its status, `bridge_list_modules` tells what runs, and a rec
 
 The text is written as `printf` writes it, into 512 bytes, so a longer text is cut.
 The identity is the identity of the module, or null.
-The system is the name of the system or the observer, or null.
+The system is the name of `s` of `say_t`, or null. `s` is a system or an observer.
 `barriers` holds the count of barriers, and `place` is 0.
 The level is the level that `say_t` states, and `say_error` states `BRIDGE_ERR`.
 
@@ -35,4 +35,4 @@ The level is the level that `say_t` states, and `say_error` states `BRIDGE_ERR`.
 | `say_error` | Hands the sink an error of the library's own, about no module, written as `printf` writes. |
 | `say_about` | Hands the sink a record about a module or one of its systems, written as `printf` writes. |
 | `copy_text` | Gives a copy of the first `n` bytes of a text, with a zero after them. Null if there was not the memory. |
-| `bridge_lacks` | Gives 1, with the record "out of memory: there was none for `<what>`", if `got` is null. Gives 0 if not. |
+| `bridge_lacks` | Gives 1, with the record of `docs/extern/bridge.h.md`, *Out of memory*, if `got` is null. Gives 0 if not. |

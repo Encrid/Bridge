@@ -28,7 +28,7 @@ Storage takes them from `[budget] columns`, which exists already.
 
 | Function | Result |
 | --- | --- |
-| `storage_make_tables` | Allocates what storage keeps of entities and of tables. Gives false if there is not the memory for all of it. |
-| `storage_make_fold` | Allocates what the fold of a barrier works in. Gives false if there is not the memory for all of it. |
-| `storage_make_apart` | Allocates what storage keeps of sparse sets and of direct-indexed components. Gives false if there is not the memory for all of it. |
-| `storage_make_terms` | Allocates the types and the terms of the systems there may be. Gives false if there is not the memory for all of it. |
+| `storage_make_tables` | Allocates the entities and the tables: `docs/intern/storage_made.c.md`, *Functions*. |
+| `storage_make_fold` | Allocates the fold: `docs/intern/storage_made.c.md`, *Functions*. |
+| `storage_make_apart` | Allocates the sparse sets and the direct-indexed components: `docs/intern/storage_made.c.md`, *Functions*. |
+| `storage_make_terms` | Allocates the types and the terms: `docs/intern/storage_made.c.md`, *Functions*. |

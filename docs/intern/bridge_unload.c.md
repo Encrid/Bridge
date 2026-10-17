@@ -5,14 +5,14 @@ This file unloads a module.
 
 ## The steps of an unload
 
-1. Refuse the call if the world has stopped for another module, or a module is pinned to another thread.
+1. Refuse what `bridge_check_call` refuses: `docs/intern/bridge_check.c.md`, *A call that runs the code of a module*.
 2. Refuse an identity that no loaded module has, by the name that was asked for.
 3. If this module stopped the world, let the world run again without it.
 4. Take its systems and observers out of the schedule, before its last call.
 5. Call its `shutdown` under its timeout, apply what it queued, and drain its log ring.
 6. Release each type that it declared. A component that no other module declares goes by its policy.
 7. Destroy the ids held ready for it, since nobody will ever spawn them.
-8. Give its share of the persistent arena back, unless a row that stays holds a string in it.
+8. Give its share of the persistent arena back, or keep it.
 9. Take it out of the list of modules, and discard its record, its instance and its image.
 10. Build the schedule again, and run a barrier.
 

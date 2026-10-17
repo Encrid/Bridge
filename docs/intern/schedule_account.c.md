@@ -14,7 +14,7 @@ It allocates these arrays, where `n` is `max_systems`, which is `[budget] system
 | `run_jobs` | The jobs of a level: `n` of `schedule_job_t`. |
 | `run_handed` | A pointer to each job, as `pool_run` gets them. |
 | `run_lists` | The systems that the jobs list, one run of entries for each job. |
-| `run_callers` | A byte for each job: 1 if the job must run on the thread that asked for the phase. |
+| `run_callers` | A byte for each job: 1 if the job must run on the calling thread. |
 | `build_in` | The systems of the phase that `schedule_build` works on. |
 | `build_bits` | The matrix of a phase: as many words of 64 bits as `schedule_get_matrix_words` gives for `n`. |
 

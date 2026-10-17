@@ -13,5 +13,5 @@ Bridge reads nothing in the version.
 
 | Function | Result |
 | --- | --- |
-| `has_form` | Gives whether an identity has one `:` and one `@`, in this order, and no empty part. |
+| `has_form` | Gives whether an identity has the form that *The form* tells. |
 | `module_check_identity` | Refuses a module with no identity, with an identity of more than 127 bytes, or with one of another form. Gives 1 with a record. |

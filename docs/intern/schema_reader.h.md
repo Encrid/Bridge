@@ -68,15 +68,15 @@ A field with what it takes in a row, before the reader places it.
 
 | Function | Result |
 | --- | --- |
-| `schema_read_next` | Reads the next token into `word`. `src/schema_reader.c` defines it. |
-| `schema_refuse` | Writes why the descriptor is refused, with the token where the reading stopped. Gives 1. `src/schema_reader.c` defines it. |
-| `schema_is` | Gives whether the token is a text. `src/schema_reader.c` defines it. |
-| `schema_is_name` | Gives whether the token is a name that a field or a constant may have: it begins with a letter or an underscore. `src/schema_token.c` defines it. |
-| `schema_get_integer` | Reads the token as an integer: below zero, or as its bits, which can be above `INT64_MAX`. Gives false if it is not one. `src/schema_token.c` defines it. |
-| `schema_find_given` | Gives which of `SCHEMA_GIVEN` the token names, or -1. `src/schema_token.c` defines it. |
-| `schema_copy_text` | Gives a copy of a text that `free` gives back, or `nullptr`. `src/schema_token.c` defines it. |
-| `schema_fits` | Gives whether the integer `base` can hold a value. `src/schema_value.c` defines it. |
-| `schema_set_value` | Gives the constant just named its value: the one stated after an equals sign, or one more than the last. Gives 1 if refused. `src/schema_value.c` defines it. |
-| `schema_set_type` | Reads the token as the type of a field: what it is, and what it takes in a row. Gives 1 if refused. `src/schema_type.c` defines it. |
-| `schema_parse_struct` | Reads the fields of a struct to its closing brace, and lays them out. Gives 1 if refused. `src/schema_struct.c` defines it. |
-| `schema_parse_constants` | Reads the integer and the constants of an enum or a bitmask, to its closing brace. Gives 1 if refused. `src/schema_constants.c` defines it. |
+| `schema_read_next` | Reads the next token: `docs/intern/schema_reader.c.md`, *Functions*. |
+| `schema_refuse` | Writes the reason of a refusal: `docs/intern/schema_reader.c.md`, *Functions*. |
+| `schema_is` | Compares the token with a text: `docs/intern/schema_reader.c.md`, *Functions*. |
+| `schema_is_name` | Whether the token is a name: `docs/intern/schema_token.c.md`, *Functions*. |
+| `schema_get_integer` | Reads the token as an integer: `docs/intern/schema_token.c.md`, *Functions*. |
+| `schema_find_given` | Finds a given type: `docs/intern/schema_token.c.md`, *Functions*. |
+| `schema_copy_text` | Copies a text: `docs/intern/schema_token.c.md`, *Functions*. |
+| `schema_fits` | Whether an integer can hold a value: `docs/intern/schema_value.c.md`, *Functions*. |
+| `schema_set_value` | Gives a constant its value: `docs/intern/schema_value.c.md`, *Functions*. Gives 1 if refused. |
+| `schema_set_type` | Reads the type of a field: `docs/intern/schema_type.c.md`, *Functions*. |
+| `schema_parse_struct` | Reads a struct: `docs/intern/schema_struct.c.md`, *Functions*. |
+| `schema_parse_constants` | Reads an enum or a bitmask: `docs/intern/schema_constants.c.md`, *Functions*. |

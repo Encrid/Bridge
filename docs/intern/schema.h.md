@@ -8,7 +8,7 @@ It reads text and gives a layout: who keeps the rows is not its concern, and sto
 A descriptor is what `BRIDGE_SCHEMA_TEXT` of `include/bridge_schema.h` makes of the body of a type.
 That is the stringification of the preprocessor: the tokens of the body, with one space between them and no comment.
 The descriptor of an enum or of a bitmask begins with the integer type that its author states.
-The compiler of the module lays out the type, and `schema_parse` lays out the same text.
+Both the compiler of the module and `schema_parse` lay out the type from the same text.
 `src/abi_layout.c` refuses a type whose two layouts differ in size or in alignment.
 
 ## The type set
@@ -32,14 +32,12 @@ a bitmask     unsigned { name = integer , ... }
 
 A field of a type that its namespace declared names the type bare: `Vec3 at;` in `game:Body` is `game:Vec3`.
 The `find` function of the source looks for the name in the namespace of the type that the descriptor describes.
-The named type is a struct, an enum or a bitmask that the namespace declared before.
+The namespace declared the named type before: a struct, an enum or a bitmask.
 
 An inline array has one length, written as a number.
 The descriptor is the text before the preprocessor replaces a name, so `char title[N]` reaches Bridge as `N`, and the reader refuses it.
 
-`schema_parse` lays out a struct as C does on every target of a module.
-Each field begins at the next multiple of its alignment.
-The size of the struct is a multiple of the largest alignment of its fields.
+`schema_parse` lays out a struct as C does on every target of a module: `docs/extern/bridge_schema.h.md`, *The type set*.
 This is sound because no type of the set is a pointer, holds a pointer, or has the size of a pointer.
 So each type has one size and one alignment on every target.
 
@@ -56,13 +54,14 @@ A refusal quotes the token where the reading stopped, or says "the end of it".
 
 ## What it gives
 
-`schema_parse` gives the size and the alignment of the type, and the integer of an enum or a bitmask.
-It also gives the fields of a struct in their order, and the constants of an enum or a bitmask.
+`schema_parse` gives the size of the type and its alignment.
+For a struct, it also gives the fields in their order.
+For an enum or a bitmask, it gives the integer that the author states, and the constants in their order.
 After a refusal, it gives 1, writes the reason into `why`, and leaves nothing allocated.
 The reason is the rest of a sentence that begins "its descriptor", which `src/abi_layout.c` writes.
 
 The fields stay with Bridge, and no field name reaches a module.
-`src/config_field.c` writes a setting into the field that its key names.
+`src/config_field.c` uses them to write the settings of a module: `docs/intern/config_field.c.md`.
 `src/abi_relay_fields.c` matches the fields of a type by name at a reload.
 
 ## Types
@@ -115,7 +114,7 @@ It gives false if the namespace declared nothing of that name, and otherwise wri
 
 ### schema_constant_t
 
-A constant of an enum or a bitmask.
+One constant of an enum or of a bitmask.
 
 | Field | Content |
 | --- | --- |
@@ -149,5 +148,5 @@ What `schema_parse` reads.
 
 | Function | Result |
 | --- | --- |
-| `schema_parse` | Lays out a type from its text. Gives 0 and fills `out`, or gives 1 and writes `why` of the source. It is `[[nodiscard]]`, and `src/schema.c` defines it. |
-| `schema_free` | Frees what a parsed type holds, and leaves it empty. `src/schema.c` defines it. |
+| `schema_parse` | Lays out a type: `docs/intern/schema.c.md`, *Functions*. It is `[[nodiscard]]`. |
+| `schema_free` | Frees a parsed type: `docs/intern/schema.c.md`, *Functions*. |

@@ -5,9 +5,9 @@ It also gives the failure budget that each barrier settles.
 
 ## Phases and the barrier
 
-The host asks for the phases one at a time, and a barrier follows each phase.
+A barrier follows each phase, and the host asks for one phase at a time.
 The schedule has an entry for each phase of the deployment, and one more entry for the barrier, at the index `phase_count`.
-A system has the index of its phase, and an observer has `phase_count`: the observers run at the barrier.
+A system is in the entry of its phase, and an observer is in the entry of the barrier: `docs/intern/abi_system.c.md`, *observe*.
 `schedule_build` makes the schedule again when a module loads, reloads or unloads.
 
 ## Conflicts
@@ -16,10 +16,10 @@ Two systems conflict in one of two ways:
 
 | Conflict | Condition |
 | --- | --- |
-| Through a column | One system writes a component that the other reads or writes. Their terms show it. |
+| Through a column | `docs/extern/bridge_abi.h.md`, *Conflicts*. |
 | Through a change | Both systems attach or detach the same component. The list of changes that each system states beside its terms shows it. |
 
-A change is in the conflict graph because a barrier applies the changes in the order the systems ran.
+A change is in the conflict graph because of the order in which a barrier applies the changes: `docs/extern/bridge_abi.h.md`, *Conflicts*.
 Two modules that attach one component to one entity in one phase leave the value of the module that ran last.
 So the deployment must state which one runs last.
 A change does not conflict with a term: the barrier applies a change after each system of the phase read its terms.
@@ -28,18 +28,18 @@ Every attach and every detach is stated, so two systems that attach one componen
 ## What orders two systems
 
 A pair of `[order]` states that one system runs before another.
-A pair names a system by the identity of its module without the version, a colon, and the name of the system: `game:actors:movement`.
+A pair names a system by its full name, for example `game:actors:movement`: `docs/extern/bridge.h.md`, *bridge_order_t*.
 Without the version in the name, an upgrade of a module does not change the pairs of a deployment.
-A pair need not name a loaded system, because a deployment can order modules that it does not load.
-`schedule_order` refuses a pair that does not name two systems, and pairs that contradict each other.
+A deployment can order modules that it does not load: `docs/extern/bridge.h.md`, *bridge_order_t*.
+`schedule_order` refuses the pairs that `docs/intern/schedule_order.c.md`, *Refusals*, names.
 
 The world keeps the names of the pairs and their closed matrix from create.
 So a chain of pairs orders two systems also through a name that is not loaded.
 
-A module orders its own systems in `before`: each system names the earlier systems of its module that run before it.
+A module orders its own systems in `before`: `docs/extern/bridge_abi.h.md`, *add_system*.
 One author wrote both systems, so their order is in the module.
 Two systems of one module that conflict refuse the load if `before` does not order them, also if a pair orders them.
-A pair against `before` makes a cycle, and `schedule_check_phase` refuses it.
+`docs/intern/schedule_build.c.md`, *The steps of a phase*, tells what refuses a pair against `before`.
 For a conflict, the order that a module states counts only between the systems of that module.
 
 Two systems of two modules that conflict in one phase refuse the load that brings the second one.
@@ -53,16 +53,16 @@ The `schedule_build` after each of them refuses nothing, and its callers drop no
 
 ## Levels and jobs
 
-A level holds each system whose predecessors are all in earlier levels, and a phase runs its levels one after the other.
-In one level, the systems of one module make one job, in the order the module registered them.
+A phase runs its levels one after the other, and `docs/intern/schedule_build.c.md`, *Levels*, tells what a level holds.
+In one level, the systems of one module make one job: `docs/intern/schedule_jobs.c.md`, *The jobs of a level*.
 One thread runs a job from its start to its end.
-The jobs of different modules run at the same time, on the threads of `src/pool.h`.
+The threads of `src/pool.h` run the jobs of different modules at the same time.
 So the world runs modules in parallel, and the systems of one module one after the other.
 The systems of one module never overlap: they share the private memory of the module.
 
 ## Cost
 
-For each phase, the schedule keeps a matrix of who must run before whom: a row of bits for each system.
+For each phase, the schedule keeps the matrix of who runs before whom, `n` rows of `n` bits for `n` systems: `docs/intern/schedule_matrix.c.md`, *The matrix*.
 The edges of the pairs join rows with an or: at most `n^3 / 64` word operations at a load, for `n` systems in the phase.
 The order that the modules state keeps the matrix closed, with at most `3 n^3 / 128` more.
 For a phase of a thousand systems, that is at most some forty million operations.
@@ -77,10 +77,10 @@ The matrix of the names of `[order]` is closed once, at create: `n^3 / 64` word 
 Each system and each observer has its own count of failures.
 The limit is `max_system_failures` of its module, and `-1`, `BRIDGE_NO_LIMIT`, means no limit.
 
-- A failed invocation adds 1 to the count of its system. A clean invocation removes 1, and the count does not go below 0.
+- An invocation changes the count of its system: `docs/extern/bridge.h.md`, *Failures*.
 - When the count of a system reaches the limit, the barrier that follows stops its module. The record names the system.
 - The module has its own count for what is no system's. A barrier raises it by 1 if an entity that the module changed could not be placed.
-- A destroy that the module may not do raises the same count by 1.
+- So does a destroy that it may not do: `docs/intern/block_barrier.c.md`, *The count of a module*.
 - A barrier that placed each entity the module changed lowers that count by 1. A barrier where the module changed nothing does neither.
 - A stopped module keeps its components. Its systems and observers stop.
 - If the module states `BRIDGE_FAIL` for `on_error`, its stop stops the world too: the deployment does not run without it.
@@ -111,7 +111,7 @@ One phase that `schedule_build` schedules, or the barrier after all the phases.
 
 ### schedule_job_t
 
-The systems of one module in one level, in the order the module registered them: what one thread runs.
+What one thread runs: the systems that one module has in one level, in the order of their registration.
 
 | Field | Content |
 | --- | --- |
@@ -136,25 +136,25 @@ One phase that `schedule_run` runs.
 
 | Function | Result |
 | --- | --- |
-| `schedule_order` | Takes the pairs of `[order]` at create. Gives 1, with a record, if it refuses them. In `src/schedule_order.c`. |
-| `schedule_build` | Schedules every phase and the barrier: the edges, the refusal, then the levels. Gives 0, or 1 with `why`. In `src/schedule_build.c`. |
-| `schedule_room` | Makes, once, the room of a dispatch and of a schedule. Gives 1, with a record, if there is no memory. In `src/schedule_account.c`. |
-| `schedule_run` | Runs the systems of one phase, a level at a time, one job for each module. In `src/schedule_run.c`. |
-| `schedule_account` | At a barrier, stops each module that reached its failure budget. In `src/schedule_account.c`. |
-| `schedule_init_matrix` | Makes an empty matrix for `n` systems. Gives `false` if there is no memory. In `src/schedule_matrix.c`. |
-| `schedule_reaches` | Gives whether `i` runs before `j`. In `src/schedule_matrix.c`. |
-| `schedule_add_edge` | Records that `i` runs before `j`, and before all that `j` runs before. In `src/schedule_matrix.c`. |
-| `schedule_join_through` | Makes each system that reaches `k` reach all that `k` reaches. In `src/schedule_matrix.c`. |
-| `schedule_close_matrix` | Makes each system that reaches a system reach all that it reaches. In `src/schedule_closure.c`. |
-| `schedule_get_cycle` | Gives the first system of a closed matrix that reaches itself, or the count of rows. In `src/schedule_closure.c`. |
-| `schedule_find_conflict` | Gives the name of the component two systems conflict over, or `nullptr`. `changing` tells the kind. In `src/schedule_conflict.c`. |
-| `schedule_gather_phase` | Lists the systems of a phase that are not parked, with an empty matrix. In `src/schedule_edges.c`. |
-| `schedule_add_stated` | Adds the edges that the closed matrix of the pairs states. In `src/schedule_edges.c`. |
-| `schedule_find_name` | Gives the index of a full name among the names of the pairs, or the count of names. In `src/schedule_names.c`. |
-| `schedule_orders` | Gives whether the pairs put one system before another. In `src/schedule_names.c`. |
-| `schedule_join_before` | Puts system `t`, and each system before `t`, among the systems before `s`. In `src/schedule_before.c`. |
-| `schedule_is_stated_before` | Gives whether the module states that system `s` runs before system `t`. In `src/schedule_before.c`. |
-| `schedule_add_own` | Adds the edges that a module states in `before`. In `src/schedule_edges.c`. |
-| `schedule_check_phase` | Refuses a phase with a cycle, or with two conflicting systems that nothing orders. Gives 1 with `why`. In `src/schedule_check.c`. |
-| `schedule_run_job` | What a thread runs: the systems of one job, one after the other. In `src/schedule_dispatch.c`. |
-| `schedule_gather_jobs` | Makes the jobs of one level, and gives a number to each system that runs. In `src/schedule_jobs.c`. |
+| `schedule_order` | Takes the pairs of `[order]`: `docs/intern/schedule_order.c.md`, *Functions*. |
+| `schedule_build` | Builds the schedule: `docs/intern/schedule_build.c.md`, *The steps of a phase*. |
+| `schedule_room` | Makes the room of the schedule: `docs/intern/schedule_account.c.md`, *Functions*. |
+| `schedule_run` | Runs one phase: `docs/intern/schedule_run.c.md`, *Functions*. |
+| `schedule_account` | Settles the failure budgets: `docs/intern/schedule_account.c.md`, *Functions*. |
+| `schedule_init_matrix` | Makes an empty matrix: `docs/intern/schedule_matrix.c.md`, *Functions*. |
+| `schedule_reaches` | Tells whether `i` runs before `j`: `docs/intern/schedule_matrix.c.md`, *Functions*. |
+| `schedule_add_edge` | Adds an edge: `docs/intern/schedule_matrix.c.md`, *Functions*. |
+| `schedule_join_through` | Joins the rows through `k`: `docs/intern/schedule_matrix.c.md`, *Functions*. |
+| `schedule_close_matrix` | Closes a matrix: `docs/intern/schedule_closure.c.md`, *Functions*. |
+| `schedule_get_cycle` | Finds a system on a cycle: `docs/intern/schedule_closure.c.md`, *Functions*. |
+| `schedule_find_conflict` | Finds what two systems conflict over: `docs/intern/schedule_conflict.c.md`, *Functions*. |
+| `schedule_gather_phase` | Lists the systems of a phase: `docs/intern/schedule_edges.c.md`, *Functions*. |
+| `schedule_add_stated` | Adds the edges of the pairs: `docs/intern/schedule_edges.c.md`, *Functions*. |
+| `schedule_find_name` | Finds the index of a full name: `docs/intern/schedule_names.c.md`, *Functions*. |
+| `schedule_orders` | Tells whether the pairs order two systems: `docs/intern/schedule_names.c.md`, *Functions*. |
+| `schedule_join_before` | Joins `t` to the systems before `s`: `docs/intern/schedule_before.c.md`, *Functions*. |
+| `schedule_is_stated_before` | Tells whether `before` orders two systems: `docs/intern/schedule_before.c.md`, *Functions*. |
+| `schedule_add_own` | Adds the edges of `before`: `docs/intern/schedule_edges.c.md`, *Functions*. |
+| `schedule_check_phase` | Refuses a phase that it cannot schedule: `docs/intern/schedule_check.c.md`, *Functions*. |
+| `schedule_run_job` | Runs one job: `docs/intern/schedule_dispatch.c.md`, *Functions*. |
+| `schedule_gather_jobs` | Makes the jobs of one level: `docs/intern/schedule_jobs.c.md`, *Functions*. |

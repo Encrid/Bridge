@@ -22,7 +22,7 @@ a toggle     any other      a row that is off is carried like the rest, with its
 When the component leaves a toggle, which rows were off is lost.
 The reload is refused, naming the component and how many rows are off, unless the name of the component is among its losses.
 The value is kept, and the `reload` of the module, which runs next, can detach what it does not want.
-No observer is told of a move, since no entity gains or loses a component.
+No observer hears a move: `docs/extern/bridge_abi.h.md`, *When a type changes*.
 
 Storage writes the rows again: see `src/storage_convert.h`.
 All the rows move or none do: `docs/intern/reload_rows.c.md`, *All the rows or none*.

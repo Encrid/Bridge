@@ -62,7 +62,7 @@ A struct that keeps no bytes still gets a list of runs, so that `runs` is not nu
 
 | Function | Result |
 | --- | --- |
-| `check_constant` | Refuses a constant of an enum or a bitmask that is gone, or has another value. A value that a row holds must keep its meaning. |
+| `check_constant` | Refuses a constant that is gone from an enum or a bitmask, or that has another value. A value that a row holds must keep its meaning. |
 | `check_constants` | Refuses an enum or a bitmask whose integer, or one of whose constants, changed. |
 | `keep_runs` | Keeps on a type how its values are carried over, or refuses for want of memory or for a loss that is not accepted. |
 | `relay_struct` | Works out how the values of a struct are carried over to what it becomes. 1 with a refusal. |

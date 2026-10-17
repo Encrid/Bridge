@@ -19,9 +19,9 @@ A module reaches nine regions with no call, and they do not have the same reader
 | The scratch arena | private | Only its module. |
 | The log ring | private | Its module, and Bridge, which drains the ring. |
 
-Each module has a private memory of its own, and every module sees the shared memory.
+Each module has its own private memory, and all modules see one shared memory: `docs/extern/bridge_abi.h.md`, *The memories*.
 The private memory is the library's alone, so the library lays it out from offset 0, with nothing to agree.
-A header at offset 0 tells where each region of the module begins: `docs/intern/block_module.c.md`, *The header*.
+A header at offset 0 tells where the regions are: `docs/extern/bridge_abi.h.md`, *bridge_header_t*, and `docs/intern/block_module.c.md`, *The header*.
 
 Each other offset into the shared memory is from the start of the shared memory.
 The `(offset, length)` that a component holds into the persistent arena is one of them, so nothing else needs a base.
@@ -50,10 +50,10 @@ A barrier follows each phase, and not each frame.
 So a spawn in one phase is visible in the next phase of the same frame.
 A barrier costs what changed, and a visit to each module: its ids topped up, its failures counted, and its log drained.
 
-A spawn is visible at the next barrier.
+A spawn is visible at the next barrier: `docs/extern/bridge_abi.h.md`, *spawn*.
 `spawn` gives a usable id at once, but the row does not exist until the barrier, and no query counts it.
-A destroyed entity stays readable for the rest of the phase that destroyed it.
-So each system sees the same state of the world for the whole of a phase. The systems that run at the same time agree.
+A destroyed entity stays until the barrier too: `docs/extern/bridge_abi.h.md`, *destroy*.
+So the state of the world does not change during a phase, and the systems that run at the same time agree: `docs/extern/bridge.h.md`, *bridge_run_phase*.
 
 ## Types
 
@@ -79,14 +79,14 @@ The fields of `block_layout_t`:
 
 | Function | Source | Result |
 | --- | --- | --- |
-| `block_create` | `src/block_create.c` | Makes the shared block that the budget of a deployment states, with storage in it, and has every backend adopt it. 0, or 1 with a record. |
-| `block_destroy` | `src/block_destroy.c` | Gives the shared block back, with storage and every declared type. |
-| `block_check_budget` | `src/block_budget.c` | Refuses a budget with a key unset, or a count that is neither a count nor none. 1 with a record. |
-| `block_lay_out` | `src/block_layout.c` | Finds where each part of the shared block begins. 1, with a record, if a key or the parts together are more than an offset of 32 bits can reach. |
-| `block_refill` | `src/block_module.c` | Tops up the ids of a module until the next barrier: what it did not use, up to what its config stated. 1 if the entity ceiling cut them short. |
-| `block_write_header` | `src/block_module.c` | Writes what a module reads at offset 0 of its private memory. |
-| `block_hand_out` | `src/block_module.c` | Ends the hold on each id that a module handed out since the last barrier. |
-| `block_drain` | `src/block_log.c` | Hands the log ring of a module to the sink. Then gives the module its scratch arena back, which holds the text of the lines. |
-| `block_barrier` | `src/block_barrier.c` | Runs the barrier: the queued changes applied, the spans published again, the observers run, the failure budgets settled, the log rings drained. |
-| `block_column_regrow` | `src/block_column.c` | Gives `new_size` bytes of the column region that hold what the `old_size` bytes at `ptr` held, or fresh bytes if `ptr` is null. |
-| `block_column_free` | `src/block_column.c` | Gives `size` bytes of the column region back. |
+| `block_create` | `src/block_create.c` | Makes the shared block: `docs/intern/block_create.c.md`, *Functions*. |
+| `block_destroy` | `src/block_destroy.c` | Gives the shared block back: `docs/intern/block_destroy.c.md`, *Functions*. |
+| `block_check_budget` | `src/block_budget.c` | Checks the budget of a deployment: `docs/intern/block_budget.c.md`, *Functions*. |
+| `block_lay_out` | `src/block_layout.c` | Lays out the shared block: `docs/intern/block_layout.c.md`, *Functions*. |
+| `block_refill` | `src/block_module.c` | Tops up the ids of a module: `docs/intern/block_module.c.md`, *The ids set aside*. |
+| `block_write_header` | `src/block_module.c` | Writes the header of a module: `docs/intern/block_module.c.md`, *Functions*. |
+| `block_hand_out` | `src/block_module.c` | For each module, ends the hold on the ids that it handed out: `docs/intern/block_module.c.md`, *Functions*. |
+| `block_drain` | `src/block_log.c` | Drains the log ring of a module, and gives back its scratch arena: `docs/intern/block_log.c.md`, *The log ring*. |
+| `block_barrier` | `src/block_barrier.c` | Runs the barrier: `docs/intern/block_barrier.c.md`, *The steps of a barrier*. |
+| `block_column_regrow` | `src/block_column.c` | Gives a piece of the column region a new length: `docs/intern/block_column.c.md`, *Functions*. |
+| `block_column_free` | `src/block_column.c` | Frees a piece of the column region: `docs/intern/block_column.c.md`, *Functions*. |

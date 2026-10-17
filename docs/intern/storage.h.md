@@ -17,25 +17,16 @@ To storage, a type is a size, an alignment and a storage layout, and nothing mor
 
 ## Storage layouts
 
-The author of a component states its storage layout at `declare`, because the code of a module that reads the component depends on it.
-There are 5 storage layouts, and each has the name of what keeps the component:
-
-| Layout | What keeps the component | What it is for |
-| --- | --- | --- |
-| `BRIDGE_TABLE` | The table of the archetype of its entity: a column beside the other components of the entity. | What systems read together, row by row. |
-| `BRIDGE_SPARSE_SET` | Its own packed array, and an index by entity. | What comes and goes, and what few entities carry. |
-| `BRIDGE_TOGGLE` | A column of a table, and a bit for each row that tells whether the component is on. | What an entity always has and sometimes does not use. |
-| `BRIDGE_DIRECT_INDEXED` | A cell for each entity: the value of entity `i` is in cell `i`. | What a module reaches by id much more often than it walks it. |
-| `BRIDGE_SINGLETON` | One value for the deployment, on no entity. | A value of which there is one, such as the settings of a module. |
-
-A tag is a component with no bytes, and each of the 5 layouts can keep it: `docs/intern/storage_view.h.md`, *A tag*.
-These sections tell how storage keeps each layout:
+The author of a component states its storage layout at `declare`: `docs/extern/bridge_abi.h.md`, *Storage layouts*.
+Each of the 5 storage layouts has the name of what keeps the component.
+These sections tell how storage keeps each layout, and a tag in each of them:
 
 - `docs/intern/storage_inside.h.md`, *A table*
 - `docs/intern/storage_inside.h.md`, *A sparse set*
 - `docs/intern/storage_bytes.h.md`, *A toggle*
 - `docs/intern/storage_inside.h.md`, *Direct-indexed*
 - `docs/intern/storage_change.h.md`, *A singleton*
+- `docs/intern/storage_view.h.md`, *A tag*
 
 ## Types
 
@@ -106,35 +97,35 @@ How `storage_convert` ended.
 | --- | --- |
 | `STORAGE_MOVED` | Storage moved the rows. |
 | `STORAGE_NO_ROOM` | Storage changed nothing: there is no room where the rows were to go. |
-| `STORAGE_NO_MEMORY` | Storage changed nothing: there is no memory to carry the values across. |
+| `STORAGE_NO_MEMORY` | Storage changed nothing: it has no memory to hold the values while they move. |
 
 ## Functions
 
 | Function | Result |
 | --- | --- |
-| `storage_create` | Makes the storage of a world, sized by its budget. Gives `nullptr` and writes a record if it cannot. In `src/storage_create.c`. |
-| `storage_destroy` | Frees the storage of a world. In `src/storage_create.c`. |
-| `storage_declare` | Declares a type of `size` bytes, kept in the layout `kept`. Gives `nullptr` only when `[budget] columns` has no room for its cells or its value. In `src/storage_declare.c`. |
-| `storage_count_free_sets` | Gives how many more types a sparse set can keep. In `src/storage_slots.c`. |
-| `storage_count_free_direct` | Gives how many more types can be direct-indexed. In `src/storage_slots.c`. |
-| `storage_undeclare` | Forgets a type that nobody declares any more. In `src/storage_slots.c`. |
-| `storage_add_system` | Takes the terms of a system. In `src/storage_terms.c`. |
-| `storage_add_observer` | Takes the terms of an observer, and who gets what it is owed. In `src/storage_terms.c`. |
-| `storage_forget` | Forgets the terms of a system or of an observer. In `src/storage_terms.c`. |
-| `storage_apply` | Applies the queue of each module, in the order of `docs/intern/storage_runs.h.md`, *The order of the queues*. In `src/storage_apply.c`. |
-| `storage_make_writable` | Makes the set of the types that a module may write. Gives false if there is no memory. In `src/storage_slots.c`. |
-| `storage_let_write` | Records that a module may write a type, which gives it a stake in an entity that carries the type. In `src/storage_slots.c`. |
-| `storage_reserve` | Takes up to `want` ids with nothing on them, for a module to hand out. Gives how many it took. In `src/storage_ids.c`. |
-| `storage_publish` | Writes what a module reads: its spans, its `column_base` and the lists of its observers. Gives 1 if they do not fit, with the observer whose list did not fit. In `src/storage_publish.c`. |
-| `storage_end_publish` | Forgets which tables changed, after storage wrote for each module. In `src/storage_publish.c`. |
-| `storage_count_tables` | Gives how many table ids there are, with 0, which is no table. In `src/storage_publish.c`. |
-| `storage_count_carriers` | Gives how many entities carry a type. In `src/storage_carriers.c`. |
-| `storage_count_off` | Gives how many of the entities that carry a toggled type have it off. In `src/storage_values.c`. |
-| `storage_visit_carriers` | Calls `visit` for each entity that carries a type, in each layout. In `src/storage_carriers.c`. |
-| `storage_convert` | Writes the rows of components again as other types, all of them or none. Gives an `enum storage_moved`. In `src/storage_convert.c`. |
-| `storage_drop` | Drops the rows of a component that nobody declares any more, by the policy of its last declarer. In `src/storage_drop.c`. |
-| `storage_release` | Destroys ids that storage set aside and no module handed out, with what is on them. In `src/storage_ids.c`. |
-| `storage_hand_out` | Ends the hold on ids that a module handed out, so that a destroy of them can pass. In `src/storage_held.c`. |
-| `storage_give_single` | Gives a singleton its value outside a barrier, and tells its observers. In `src/storage_ids.c`. |
-| `storage_is_alive` | Gives whether an id names an entity that exists. In `src/storage_ids.c`. |
-| `storage_visit_values` | Gives `read` the bytes of each value of a type. In `src/storage_values.c`. |
+| `storage_create` | Makes the storage of a world: `docs/intern/storage_create.c.md`, *Functions*. |
+| `storage_destroy` | Frees the storage of a world: `docs/intern/storage_create.c.md`, *Functions*. |
+| `storage_declare` | Declares a type: `docs/intern/storage_declare.c.md`, *Functions*. |
+| `storage_count_free_sets` | Counts the free slots of sparse sets: `docs/intern/storage_slots.c.md`, *Functions*. |
+| `storage_count_free_direct` | Counts the free direct-indexed slots: `docs/intern/storage_slots.c.md`, *Functions*. |
+| `storage_undeclare` | Forgets a type: `docs/intern/storage_slots.c.md`, *Functions*. |
+| `storage_add_system` | Takes the terms of a system: `docs/intern/storage_terms.c.md`, *Functions*. |
+| `storage_add_observer` | Takes the terms of an observer: `docs/intern/storage_terms.c.md`, *Functions*. |
+| `storage_forget` | Forgets a record of terms: `docs/intern/storage_terms.c.md`, *Functions*. |
+| `storage_apply` | Applies the queue of each module: `docs/intern/storage_apply.c.md`, *The steps of a barrier*. |
+| `storage_make_writable` | Makes the set `writable` of a module: `docs/intern/storage_slots.c.md`, *Functions*. |
+| `storage_let_write` | Records what a module may write: `docs/intern/storage_slots.c.md`, *Functions*. |
+| `storage_reserve` | Sets ids aside for a module: `docs/intern/storage_ids.c.md`, *Functions*. |
+| `storage_publish` | Writes what a module reads: `docs/intern/storage_publish.c.md`, *Functions*. |
+| `storage_end_publish` | Forgets which tables changed: `docs/intern/storage_publish.c.md`, *Functions*. |
+| `storage_count_tables` | Counts the table ids: `docs/intern/storage_publish.c.md`, *Functions*. |
+| `storage_count_carriers` | Counts the entities that carry a type: `docs/intern/storage_carriers.c.md`, *Functions*. |
+| `storage_count_off` | Counts the toggled rows that are off: `docs/intern/storage_values.c.md`, *Functions*. |
+| `storage_visit_carriers` | Visits each entity that carries a type: `docs/intern/storage_carriers.c.md`, *Functions*. |
+| `storage_convert` | Moves components to their new types: `docs/intern/storage_convert.c.md`, *Functions*. |
+| `storage_drop` | Drops a component that nobody declares any more: `docs/intern/storage_drop.c.md`, *Functions*. |
+| `storage_release` | Destroys the ids not handed out: `docs/intern/storage_ids.c.md`, *Functions*. |
+| `storage_hand_out` | Ends the hold on a list of ids: `docs/intern/storage_held.c.md`, *The ids that a block holds*. |
+| `storage_give_single` | Gives a singleton its value: `docs/intern/storage_ids.c.md`, *Functions*. |
+| `storage_is_alive` | Tells whether an entity exists: `docs/intern/storage_ids.c.md`, *Functions*. |
+| `storage_visit_values` | Reads each value of a type: `docs/intern/storage_values.c.md`, *Functions*. |

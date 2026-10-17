@@ -10,19 +10,18 @@ For system `i`, `check_system` looks only at the systems after `i`, so it checks
 
 | Refusal | Condition | Reason in `why` |
 | --- | --- | --- |
-| A system runs before itself | The pairs and the orders that the modules state make a cycle. | The first system of the phase on the cycle, and the phase or the barrier. |
+| A system runs before itself | The pairs and `before` make a cycle together. | The first system of the phase on the cycle, and the phase or the barrier. |
 | Two systems are not ordered | Two systems conflict. For one module, `before` puts neither before the other. For two modules, the pairs put neither before the other. | The two systems, the component, and the phase or the barrier. |
 
 `set_levels` must not meet a cycle, since its loop would never end: `docs/intern/schedule_build.c.md`, *Levels*.
 For two systems of one module, only `before` counts, and not a pair: `docs/intern/schedule.h.md`, *What orders two systems*.
-The reason for two systems of one module ends with `their module states no order of them`.
-The reason for two systems of two modules ends with `no pair orders them`.
+`docs/extern/bridge.h.md`, *A load that failed*, gives how each reason ends.
 
 ## Limits
 
 A reason cuts each name to a length: a system name to 80 characters.
 A component name is cut to 60 characters, and a phase name to 40.
-The whole reason has at most 255 bytes, so long names can cut its end.
+The whole reason is cut as `docs/extern/bridge.h.md`, *A load that failed*, tells.
 
 ## Functions
 

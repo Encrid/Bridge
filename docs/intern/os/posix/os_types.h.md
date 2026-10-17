@@ -25,7 +25,7 @@ A mutex.
 
 ### struct os_event
 
-An event: a flag, the mutex that guards the flag, and the condition that a wait sleeps on.
+An event: a flag, the mutex that guards the flag, and a condition for a wait.
 
 | Field | Content |
 | --- | --- |

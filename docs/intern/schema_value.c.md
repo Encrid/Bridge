@@ -1,6 +1,6 @@
 # src/schema_value.c
 
-This file gives the value of a constant, and whether the integer of an enum or a bitmask can hold it.
+This file gives the value of a constant, and whether the integer of its type can hold it.
 How a constant gets its value is `docs/intern/schema.h.md`, *The type set*.
 
 ## Fitting

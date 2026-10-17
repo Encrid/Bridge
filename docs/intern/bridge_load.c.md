@@ -5,13 +5,13 @@ This file loads a module.
 
 ## The steps of a load
 
-1. Refuse the call if the world has stopped for another module, or a module is pinned to another thread.
+1. Refuse what `bridge_check_call` refuses: `docs/intern/bridge_check.c.md`, *A call that runs the code of a module*.
 2. Refuse what the config alone decides, find the backend that it names, and work out its demands.
 3. Refuse a module loaded already in any version, a load past `[budget] modules`, or a share that does not fit.
 4. Make the record of the module: all of it, or none.
 5. Take the share of the persistent arena, if `persistent` is more than zero.
 6. Set aside the ids of the module before `init` runs, because `init` can spawn.
-7. Make the image, the instance and the private memory, and call `init`: `src/module_start.c`.
+7. Start the module, with `init` as its first call: `src/module_start.c`.
 8. Build the schedule again. It refuses a cycle, and a new system or observer that conflicts with another and that nothing orders.
 9. Put the module at the end of the list of modules.
 10. Let the world run again, if the world waits for this module.
@@ -21,14 +21,14 @@ Steps 2 and 3 are in `src/module_check.c`.
 Before the module has a record, a refusal says that the module is refused, and `on_error` does not apply.
 After it has a record, a failure is the failure of the module, and its `on_error` tells what it costs.
 `docs/intern/module_say.c.md`, *Refused or not loaded*, tells the two.
-The barrier applies the changes of the modules in the order of the list, which is the order in which they loaded.
+The list of modules gives the order in which a barrier applies their changes: `docs/extern/bridge.h.md`, *bridge_load*.
 A module that is loaded and that nothing will ever run is not a load that succeeded: `bridge_load` gives 1 if the world has stopped.
 
 ## The share of the arena
 
 The share is the own part of the module of the persistent arena, for as long as it is loaded.
 No other module allocates from it.
-Its length is `persistent`, rounded up to a multiple of 8, but not more than the longest free piece of the arena.
+Its length is what `module_round_share` gives for `persistent`: `docs/intern/module_share.c.md`, *Functions*.
 The list of gaps of the arena gets room for one more range, so that to give the share back never asks for memory.
 Step 3 refused a share past the largest gap and the tail, so `region_take` always finds room for it.
 If there is no memory to keep track of the share, a record says so, and the record of the module is discarded.
@@ -40,7 +40,7 @@ A failure after the record leaves storage as it was before the load:
 1. Say that the module did not load. If its `on_error` is `fail`, stop the world.
 2. Take its systems and observers out first, because a query must not outlive a component that it names.
 3. Release the ids set aside for it.
-4. Give its share of the persistent arena back.
+4. Give the share back to the persistent arena.
 5. Release each component that no other module declares, with no policy.
 6. Discard the record, with the queue of what the module asked.
 7. Build the schedule again.

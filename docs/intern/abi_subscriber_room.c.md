@@ -7,7 +7,7 @@ It has everything that the system needs before it keeps any of it: `docs/intern/
 
 - One block for the system, its terms, after the terms its changes, and after the changes the bits of `stated_before`: `docs/intern/schedule_before.c.md`.
 - One `storage_term_t` for each term, plus one: what storage is asked.
-- Room for one more among the systems of the world, and among the systems or the observers of the module.
+- Room for one more system of the world, and for one more system or observer of the module.
 - The name of the system, and its full name.
 - For an observer, its list of who triggered it.
 - Room for one more mark in the queue of the module: `docs/intern/abi_alloc.c.md`, *The marks of the queue*.
@@ -27,6 +27,6 @@ If a piece is missing, all of it is freed, and the registration is refused for w
 | Function | Result |
 | --- | --- |
 | `abi_free_subscriber` | Frees what `abi_alloc_subscriber` had, of a system or an observer that is refused. |
-| `make_room` | Makes room for one more among the systems of the world, and among the systems or the observers of the module. False if there is no memory. |
+| `make_room` | Makes room for one more system of the world, and for one more system or observer of the module. False if there is no memory. |
 | `name_system` | Gives a system its name, its full name and `named`, and an observer its list of who triggered it. False if there is no memory. |
-| `abi_alloc_subscriber` | Has everything that a system or an observer needs. 1 with a refusal, and nothing left allocated. |
+| `abi_alloc_subscriber` | Has everything that a system or an observer needs. 1 with a refusal, and then it holds no memory. |

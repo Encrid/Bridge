@@ -1,6 +1,6 @@
 # src/config_field.c
 
-This file writes a setting into the field that its key names, by what the field is.
+This file finds the field that the key of a setting names, and writes the setting into it by what the field is.
 
 ## The field of a key
 
@@ -32,4 +32,4 @@ Each kind has its seeder in `CONFIG_SEEDERS`, so `seed_field` calls the seeder o
 | `config_check_settings` | Refuses a setting with no key, of no kind, with a null text, or with a key that comes twice. Gives 1 with a reason. |
 | `find_field` | Gives the field of the config component that a key names, or `nullptr`. |
 | `seed_field` | Writes a setting into a field: an inline array by itself, and any other field by the seeder of its kind. |
-| `config_seed_setting` | Writes one setting into the field that its key names. Gives 1 if no field has that name, or the field does not take it. |
+| `config_seed_setting` | Writes one setting into the field of its key. Gives 1 if no field has that name, or the field does not take it. |

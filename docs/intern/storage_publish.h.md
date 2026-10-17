@@ -1,6 +1,6 @@
 # src/storage_publish.h
 
-This header gives what storage writes for a module at a barrier: its `column_base`, its spans and the lists of its observers.
+This header gives what storage writes for a module at a barrier.
 
 ## What a barrier writes for a module
 
@@ -37,17 +37,17 @@ One module that storage writes for.
 | Field | Content |
 | --- | --- |
 | `r`, `m` | The storage, and the module. |
-| `cell` | Its `column_base`: for each table and each type it declared, where the column of the type is in that table. |
+| `cell` | Its `column_base`: `docs/extern/bridge_abi.h.md`, *Spans*. |
 | `kept` | After `column_base`, a cell for each type it declared: where it reaches a component that no table keeps. |
 | `at`, `end` | Where the next thing goes in its private memory, and where its span region ends. |
 | `all` | A declaration changed, or storage never wrote for the module: storage writes each table, and not only the touched ones. |
-| `again` | Storage writes all the spans of the module again, since one of its systems reads other tables than it did. |
+| `again` | Storage writes every span of the module again: `docs/intern/storage_spans.c.md`, *Where the spans go*. |
 | `full` | The name of the observer whose list did not fit, or null. |
 
 ## Functions
 
 | Function | Result |
 | --- | --- |
-| `storage_publish_cells` | Writes the `column_base` of a module, and its `kept` cells. In `src/storage_cells.c`. |
-| `storage_publish_spans` | Writes the spans of a module: all of them, or the ones whose table was touched. Gives 1 if they do not fit. In `src/storage_spans.c`. |
-| `storage_publish_lists` | Writes the list of each observer of a module, when one of them has something or had something. Gives 1, with the observer in `full`, if a list does not fit. In `src/storage_publish.c`. |
+| `storage_publish_cells` | Writes `column_base` and `kept`: `docs/intern/storage_cells.c.md`, *Functions*. |
+| `storage_publish_spans` | Writes the spans of a module: `docs/intern/storage_spans.c.md`, *Functions*. |
+| `storage_publish_lists` | Writes the lists of the observers: `docs/intern/storage_publish.c.md`, *Functions*. |

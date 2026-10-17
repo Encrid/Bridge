@@ -10,8 +10,8 @@ It gives each value to a function, and tells how many toggled rows are off.
 | Layout | The values it asks |
 | --- | --- |
 | A singleton | Its one value, while it has one. |
-| Direct-indexed | The cell of each entity that has a value, from index 1. |
-| A table, a toggle or a sparse set | The rows of each live table whose set holds the type. |
+| Direct-indexed | From index 1, the cell of each entity with a value. |
+| A sparse set, a table or a toggle | Each row of each live table that holds the type in its set. |
 
 The table of a sparse set holds the type of the set, so the walk of the tables covers the set.
 

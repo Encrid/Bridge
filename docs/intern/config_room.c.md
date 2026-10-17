@@ -24,4 +24,4 @@ The refusal gives the bytes of text, and the bytes left in the share.
 | `get_text_size` | Gives how many bytes of the arena one setting takes: its text rounded up to 8 for a `bridge_text_t` field, and 0 for any other. |
 | `count_text` | Gives how many bytes of the arena all the settings take. |
 | `reuse_kept` | Takes the block that the text of the module had at its last load, if `total` bytes still fit there. |
-| `config_place_text` | Finds where the text of the settings goes: the block it had, or the persistent share of the module. Gives 1 if there is no room. |
+| `config_place_text` | Finds where the text of the settings goes, before any is written: the block it had, or the persistent share of the module. Gives 1 if there is no room. |

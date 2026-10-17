@@ -14,8 +14,8 @@ The compiler adds no padding: a gap is a field `pad`. Write zero into it. Nobody
 
 An enum has the width of its place: 1 byte in `bridge_term_t`, and 4 bytes in each other struct.
 A module in another language cannot include this header. It needs the same layouts, written in its language.
-A C++ compiler reads the declarations as C.
-What a module compiles with this header is a work based on Bridge: `readme.md`, *License*.
+A C++ compiler reads this header as it reads `include/bridge.h`: `docs/extern/bridge.h.md`, *The library*.
+A module that compiles with `include/bridge_abi.h` is a work based on Bridge: `readme.md`, *License*.
 
 ## BRIDGE_ABI
 
@@ -81,11 +81,11 @@ Bridge writes it. The module writes only `scratch_used` and `ring_head`.
 | `tables` | How many table ids there are, 0 included. |
 | `entity_index` | Where the entity index begins, in the shared memory. |
 | `entities` | How many items of `bridge_entity_t` the entity index has. |
-| `barriers` | How many barriers the world had made when the system that runs was dispatched. |
+| `barriers` | How many barriers the world made before it dispatched the system that runs. |
 | `place` | The place of the system that runs in its phase, from 0. |
 | `system` | The slot of the system that runs, among the systems or the observers of the module. |
 | `observer` | 1 if an observer runs, and 0 if a system runs. |
-| `log_level` | The highest level of a line that the module writes. |
+| `log_level` | The `log_level` of the config of the module: `docs/extern/bridge.h.md`, *bridge_module_config_t*. |
 | `observers` | Where the observer slots begin: a `bridge_list_t` for each slot that `observe` gave. |
 | `kept` | Where the kept cells begin: a `uint32_t` for each type that the module declared. |
 
@@ -106,8 +106,7 @@ The text of a log line stays until the barrier. Count it in `scratch_used`.
 ## The log
 
 A module writes a line of its log into its log ring, with no call. Each barrier gives the lines to the sink of the host.
-`enum bridge_log` names four severities of syslog, RFC 5424, by their numbers. 0 is the worst, and 7 is the most detail.
-A module can write each of the eight levels.
+`enum bridge_log` names four of the eight levels of a line, with the numbers of `enum bridge_level`: `docs/extern/bridge.h.md`, *bridge_record_t*.
 
 | Item | Value |
 | --- | --- |
@@ -116,7 +115,6 @@ A module can write each of the eight levels.
 | `BRIDGE_LOG_INFO` | 6: information. |
 | `BRIDGE_LOG_DEBUG` | 7: detail. |
 
-The four items have the numbers of `enum bridge_level`: `docs/extern/bridge.h.md`, *bridge_record_t*.
 A line is a `bridge_log_record_t` of 32 bytes:
 
 | Field | Content |
@@ -227,7 +225,7 @@ A toggled tag gets where its column would begin, and a direct-indexed tag where 
 | `BRIDGE_SWEEP` | Bridge destroys an entity with nothing left on it. |
 | `BRIDGE_DELETE` | Bridge destroys each entity that carried the component, with each other component on it. |
 
-The policy of the module that unloads last applies. A component that another loaded module declares stays.
+The policy of the module that unloads last applies. A component that another loaded module declares stays, with its rows.
 A strip takes no memory and does not fail. A strip that has no room to join two tables leaves the two: `docs/extern/bridge.h.md`, *An unload*.
 An id of an entity that a sweep or a delete destroyed is stale: *bridge_entity_t*.
 An entity that must outlive the unload of another module carries a component of the module that holds it.
@@ -242,7 +240,7 @@ The author states it, since the code that reads the component depends on it.
 | `BRIDGE_TABLE` | A column of the table of the archetype of its entity. | What systems read together, row by row. |
 | `BRIDGE_SPARSE_SET` | An array of its own, with an index by entity. It is in no archetype. | What comes and goes, and what few entities carry. |
 | `BRIDGE_TOGGLE` | A column of a table, and a bit for each row that tells whether the row is on. | What an entity always has, and sometimes does not use. |
-| `BRIDGE_DIRECT_INDEXED` | A cell for each entity. It is in no archetype. | What a module reaches by id more often than it walks. |
+| `BRIDGE_DIRECT_INDEXED` | A cell for each entity. It is in no archetype. | What a module reaches by id much more often than it walks. |
 | `BRIDGE_SINGLETON` | One value for the deployment, on no entity. | One value, for example the settings of a module. |
 
 In this section, `e` is the low 32 bits of the id of an entity. Each offset is an offset into the shared memory.
@@ -258,7 +256,7 @@ The bits are 64-bit words: bit `n` is bit `n` modulo 64 of word `n` divided by 6
 A system turns a row of a toggle on or off: it writes the bit, with a term of `BRIDGE_WRITE`. No observer hears it.
 
 An attach gives a toggle that is on. An attach of a toggle that the entity carries writes the value, and keeps the bit.
-`attach` and `detach` give and take a singleton with the id 0. A system writes a field of a singleton where it is.
+`attach` and `detach` give and take a singleton with the id 0. A system writes a field of a singleton where it is, with a term of `BRIDGE_WRITE`.
 
 The cells of a direct-indexed component take its size for each entity of `entities`, from `columns`, at `declare`.
 A singleton takes its size from `columns`, at `declare`.
@@ -267,7 +265,7 @@ A system cannot walk a singleton or a direct-indexed component: *bridge_term_t*.
 ## Grants
 
 The name of a component has a namespace, for example `mymod:Explosion`.
-The namespace of a module is the part of its identity before the first colon.
+A module has the namespace that its identity names: `docs/extern/bridge.h.md`, *bridge_module_config_t*.
 A module can always declare, read and write a component of its own namespace.
 For a component of another namespace, it needs a grant: the name of the component in `read` or `write` of its config.
 `read` lets the module declare the component and read it. `write` also lets it write, attach and detach it.
@@ -341,7 +339,7 @@ If `before_count` is 0, Bridge does not read `before`.
 An observer of A and not B hears an entity with A enter when a module detaches B, and leave when a module attaches B.
 A write in place raises no event. To have a new value heard, attach it.
 An entity that a phase made and destroyed raises nothing.
-An entity that loses a component and gets it again in one phase raises `BRIDGE_ON_ATTACH`.
+An entity that loses a component and gets it again in one phase raises `BRIDGE_ON_ATTACH`, since it carries a new value.
 A detach of what is not there, and a change of a dead id, raise nothing.
 
 `observers` of the header is where the observer slots begin: a `bridge_list_t` for each slot.
@@ -408,7 +406,7 @@ Without it, the load fails, also if a pair of the deployment orders them.
 `before` makes chains: if `c` names `b`, and `b` names `a`, then `a` runs before `c`.
 
 Two systems of different modules that conflict in one phase need a pair of the deployment, or a chain of pairs: `docs/extern/bridge.h.md`, *bridge_order_t*.
-Else the load that brings the second one fails. For such a conflict, only the pairs and their chains count, and not `before`.
+Else the load that brings the second one fails. `before` does not order such a conflict.
 Two observers that conflict at the barrier follow the same rules.
 
 In one phase, an order that `before` or a pair states always holds, also between two systems that do not conflict.
@@ -612,10 +610,9 @@ Bridge does not enforce them: a module that breaks one gets wrong values, and no
 An entry that refuses a call writes one of these reasons. The record of the host gives it: `docs/extern/bridge.h.md`, *Messages*.
 In `init`, the reason follows `did not load:`. In `reload`, it follows `was not reloaded:`. In a system, it follows `failed:`.
 
-In a quote, a word in angle brackets is a part that changes.
+Angle brackets mark a part that changes: `docs/extern/bridge.h.md`, *Messages*.
 For an observer, a reason says `observer` and `an observer` in place of `system` and `a system`.
 Only a system names a phase, so a reason about a phase has no form for an observer.
-A name of 0 bytes, or of 128 bytes or more, gets the reason of a name outside the scratch arena.
 
 ### A declaration
 

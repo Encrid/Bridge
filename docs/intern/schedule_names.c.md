@@ -4,7 +4,7 @@ This file reads the names of `[order]` that the world keeps: `docs/intern/schedu
 
 ## The index of a system
 
-Each system has `named`: the index of its full name among the names of the pairs.
+Each system has `named`: the index of its full name in the list of the names of the pairs.
 A system that no pair names has the count of names.
 `src/abi_subscriber_room.c` sets `named` once, when the module registers the system.
 Neither the full name of a system nor the pairs change after that.

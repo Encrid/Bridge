@@ -6,7 +6,7 @@ This file builds the schedule: for each phase, and for the barrier as one more p
 
 `build_phase` schedules one phase in this order:
 
-1. `schedule_gather_phase` lists the systems of the phase that are not parked.
+1. `schedule_gather_phase` lists the systems of the phase: `docs/intern/schedule_edges.c.md`, *The systems of a phase*.
 2. `schedule_add_stated` adds the edges of the pairs of the deployment. They make a closed matrix.
 3. `schedule_add_own` adds the edges that each module states in `before`, and keeps the matrix closed.
 4. `schedule_check_phase` refuses the phase if it cannot be scheduled.
@@ -28,7 +28,7 @@ A refused phase keeps each system at level 0.
 
 ## The loop
 
-`schedule_build` schedules the phases 0 to `phase_count`, where `phase_count` is the barrier.
+`schedule_build` schedules the entries 0 to `phase_count` of `docs/intern/schedule.h.md`, *Phases and the barrier*.
 First `build_phase` writes in `where` the phase or the barrier, as each reason names it.
 All of them use the room of `build_in` and `build_bits`, and only the levels stay in the systems.
 The loop stops at the first refused phase, and `why` then says why.

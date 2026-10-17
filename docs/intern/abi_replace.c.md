@@ -21,7 +21,7 @@ The refusal lists the modules to unload: `docs/intern/abi_names.c.md`, *Who else
 
 A changed layout is refused too if another loaded module declares a type with a field of it.
 The rows of that type hold the type as it is.
-A component that only the reloading module declares is laid out again: `docs/intern/abi_relay.c.md`, *What each change does*.
+If the reloading module alone declares the component, Bridge lays it out again: `docs/intern/abi_relay.c.md`, *What each change does*.
 
 A module reads a component by code that is compiled for one storage layout, so every declarer states the same storage layout.
 A declaration that states another storage layout is refused, naming both layouts and the other declarers.
@@ -33,7 +33,7 @@ If not, it is refused as a type whose descriptor lays it out another way: `docs/
 ## The steps
 
 1. Find the type of the name that no reload made anew. If there is none, the declaration makes a new type.
-2. It changed if its descriptor or kind is new, or a field names a type that this reload made anew.
+2. It changed if its descriptor or kind is new, or if `abi_names_superseded` gives true: `docs/intern/abi_moved.c.md`, *Functions*.
 3. If it did not change and has the same storage layout, it is the type declared.
 4. Else refuse it, unless this is a reload of its one declarer that may replace it.
 5. If it may, the declaration makes a new type, and keeps the old one in `was`.

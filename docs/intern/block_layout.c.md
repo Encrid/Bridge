@@ -1,6 +1,6 @@
 # src/block_layout.c
 
-This file finds where each part of the shared block begins, how long the block is, and how much address space it needs.
+This file finds the `block_layout_t` of the shared block: `docs/intern/block.h.md`, *Types*.
 
 ## The parts
 
@@ -14,7 +14,7 @@ This file finds where each part of the shared block begins, how long the block i
 | `columns` | A multiple of 16 | The column region: `[budget] columns` bytes. |
 
 A count of `BRIDGE_NONE` gives no sparse set or no direct-indexed component, and its part is empty.
-The length of the block is a whole number of the granule that the backends need.
+The layout rounds the length of the block up to a whole number of the largest granule that a backend states: `docs/extern/bridge_backend.h.md`, *Memory*.
 
 The layout first refuses `entities`, `persistent` or `columns` above `UINT32_MAX`.
 Then each amount of the budget is below 2^32, so no sum can be past 64 bits.
@@ -43,4 +43,4 @@ If the block is longer than that reservation, it is reserved in its own length, 
 | `lay_sparse` | Places the indexes of the sparse sets after the entity index. 1 with a record if they are past what an offset of 32 bits reaches. |
 | `lay_direct` | Places the direct-indexed bits after the indexes of the sparse sets. 1 with a record if they are past what an offset of 32 bits reaches. |
 | `lay_rest` | Places the arena and the columns, and gives the block a length: a whole number of the granule, at most 2^32 bytes. 1 with a record if not. |
-| `block_lay_out` | Finds where each part of the shared block begins, and how much address space the block is reserved in. 1 with a record if it cannot. |
+| `block_lay_out` | Fills the `block_layout_t` of the shared block. 1 with a record if it cannot. |

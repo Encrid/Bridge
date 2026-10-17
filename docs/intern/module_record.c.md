@@ -5,7 +5,7 @@ This file makes the record of a module from its config: all of it, or none of it
 ## All or none
 
 The record asks for every part that it is made of first.
-If one part is missing, it keeps none of them, so nothing half made is left to unmake.
+If one part is missing, it keeps none of them.
 Then a record says "out of memory: there was none for a module's record", and the parts that were had are freed.
 The general rule is in `docs/intern/say.h.md`, *Out of memory*.
 

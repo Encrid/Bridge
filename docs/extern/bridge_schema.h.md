@@ -24,11 +24,12 @@ BRIDGE_SCHEMA_STRUCT_DESC(position_t, POSITION_FIELDS);
 | `BRIDGE_SCHEMA_BITMASK_TYPE` | The bitmask `name`, an enum of the integer `type`, with the body that its other arguments give. |
 | `BRIDGE_SCHEMA_BITMASK_DESC` | The descriptor of the bitmask, `name_desc`: the integer, a space, and the text of the body. |
 
-A pair is two macros, since a macro is one statement, and no declaration is both a type and the text that describes it.
+A macro holds one statement only: `docs/contributing/coding_style.md`, *H3 - The macros*.
+No declaration makes both a type and its descriptor, thus a pair is two macros.
 `name_desc` is a `static const char` array: the name of the type, and `_desc` after it, for example `position_t_desc`.
 Give it to `declare` as `desc`, with `sizeof(name_desc) - 1` as `desc_len`.
 `docs/extern/bridge_abi.h.md`, *declare* tells the other fields of a declaration.
-What a module compiles with this header is a work based on Bridge: `readme.md`, *License*.
+A module that compiles with `include/bridge_schema.h` is a work based on Bridge: `readme.md`, *License*.
 
 Write the schema header of a module with these macros.
 A module that shares a component includes the schema header of the module that declares it.
@@ -93,7 +94,7 @@ Then the record of the refusal shows the same fingerprint two times.
 ## Messages
 
 `declare` writes this reason when it refuses a descriptor, and the record of the host gives it: `docs/extern/bridge_abi.h.md`, *Messages*.
-In a quote, a word in angle brackets is a part that changes.
+Angle brackets mark a part that changes: `docs/extern/bridge.h.md`, *Messages*.
 
 - `type '<type>': its descriptor <reason>`
 

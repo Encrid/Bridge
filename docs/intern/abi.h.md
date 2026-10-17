@@ -27,14 +27,14 @@ detach(id, slot)
 alloc(len)               -> offset into the persistent arena
 ```
 
-Every pointer argument is an offset into the scratch arena of the caller: `docs/intern/abi_entry.h.md`, *The scratch arena*.
+Every pointer argument is an offset that lies in the scratch arena of the caller: `docs/intern/abi_entry.h.md`, *The scratch arena*.
 An entry reads what it is handed during the call, and the scratch that held it is free after the call.
 
 Nothing applies at once.
-`destroy`, `attach` and `detach` put a change on the queue of the module, and the next barrier applies it.
+`destroy`, `attach` and `detach` queue a change for the next barrier: `docs/intern/abi_calls.c.md`.
 So a row exists at the next barrier, and not before.
 `attach` carries the first value of the component: Bridge copies the value at the call, so the scratch arena can be reset before the barrier.
-`spawn` gives a usable id at once: one of the ids set aside for the module at the last barrier.
+`spawn` gives a usable id at once: `docs/intern/abi_calls.c.md`, *spawn*.
 So a system can spawn a parent and give its id to the children in the same call.
 
 There are no immediate forms of these entries.
@@ -43,8 +43,8 @@ And the last row of a table fills the place of a row that leaves.
 So an immediate destroy moves the row of another entity.
 The offsets that a module holds then become wrong, and no check can find it.
 
-No entry lets a module call another module.
-A module that needs something done writes data, and the module that subscribes to that data does the work: a system or an observer.
+No entry lets a module call another module: `docs/extern/bridge_abi.h.md`, *The exports*.
+A module writes data in place of a call, and a system or an observer that subscribes to the data does the work.
 To read and to write a component is not an entry either: a system reads its spans and writes its columns.
 There is no entry for each frame: all the work of a frame is in systems, and each system has a phase.
 
@@ -61,7 +61,7 @@ Three facts make it so:
 - The code of a native module runs inside a phase.
 - Two writers of one component never run at the same time, so the order of the others cannot change the result.
 
-So the entries of a phase do not touch storage, and what a module asks for does not depend on who ran beside it.
+So the entries of a phase do not touch storage, and what a module asks for is the same whoever ran beside it.
 An id comes from a block set aside for the module, arena space from its own share, and a change goes on its own queue.
 The barrier applies the queues in an order that never changes.
 So these are the same on each run: the ids that a module gets, its offsets in the arena, and the rows of its changes.
@@ -70,7 +70,8 @@ A timeout is the one thing that is not the same on each run.
 The same `init` can end on a quiet machine and be stopped on a busy one.
 
 No entry takes a lock.
-The systems of a module run one after another, so its block of ids, its share and its queue each have one writer.
+Bridge runs one system of a module at a time: `docs/extern/bridge.h.md`, *bridge_run_phase*.
+So the block of ids, the share and the queue of a module each have one writer.
 
 ## A refused entry
 
@@ -99,18 +100,18 @@ The signature of an `abi_entry_t` is `params` and `param_count`, and `results` a
 
 | Function | Source | Result |
 | --- | --- | --- |
-| `abi_check_name` | `src/abi_stated.c` | Refuses a name that has 0 bytes, or more than `NAME_MOST`. 1 with a refusal. |
-| `abi_refuse` | `src/abi_alloc.c` | Refuses the call in progress, with why, written as `printf` writes. Gives 1. |
-| `abi_define` | `src/abi_define.c` | Defines the eight imports for the instance of a module. 1, with `err`, if its backend refuses one. |
-| `abi_marks` | `src/abi_alloc.c` | Makes room for the marks of the queue of a module, so that a queued change never asks for memory. False if there is no memory. |
-| `abi_park` | `src/abi_alloc.c` | Takes a system out of storage, for a reload. |
-| `abi_unpark` | `src/abi_alloc.c` | Puts a parked system back in storage, as it was. |
-| `abi_hear` | `src/abi_system.c` | Adds a change that an observer is owed to the list of who triggered it. Storage calls it. |
-| `abi_declare` | `src/abi_declare.c` | `declare(at) -> slot`. |
-| `abi_add_system` | `src/abi_system.c` | `add_system(at) -> slot`. |
-| `abi_observe` | `src/abi_system.c` | `observe(at) -> slot`. |
-| `abi_spawn` | `src/abi_calls.c` | `spawn() -> id`. |
-| `abi_destroy` | `src/abi_calls.c` | `destroy(id)`. |
-| `abi_attach` | `src/abi_calls.c` | `attach(id, slot, ptr)`. |
-| `abi_detach` | `src/abi_calls.c` | `detach(id, slot)`. |
-| `abi_alloc` | `src/abi_alloc.c` | `alloc(len) -> offset`. |
+| `abi_check_name` | `src/abi_stated.c` | Refuses a name of a wrong length: `docs/intern/abi_stated.c.md`, *Functions*. |
+| `abi_refuse` | `src/abi_alloc.c` | Refuses the call in progress: `docs/intern/abi_alloc.c.md`, *Functions*. |
+| `abi_define` | `src/abi_define.c` | Defines the imports of an instance: `docs/intern/abi_define.c.md`, *Functions*. |
+| `abi_marks` | `src/abi_alloc.c` | Makes room for the marks: `docs/intern/abi_alloc.c.md`, *Functions*. |
+| `abi_park` | `src/abi_alloc.c` | Parks a system for a reload: `docs/intern/abi_alloc.c.md`, *Functions*. |
+| `abi_unpark` | `src/abi_alloc.c` | Puts a parked system back: `docs/intern/abi_alloc.c.md`, *Functions*. |
+| `abi_hear` | `src/abi_system.c` | Lists a change for an observer: `docs/intern/abi_system.c.md`, *Functions*. |
+| `abi_declare` | `src/abi_declare.c` | `declare(at) -> slot`: `docs/intern/abi_declare.c.md`, *Functions*. |
+| `abi_add_system` | `src/abi_system.c` | `add_system(at) -> slot`: `docs/intern/abi_system.c.md`, *Functions*. |
+| `abi_observe` | `src/abi_system.c` | `observe(at) -> slot`: `docs/intern/abi_system.c.md`, *Functions*. |
+| `abi_spawn` | `src/abi_calls.c` | `spawn() -> id`: `docs/intern/abi_calls.c.md`, *Functions*. |
+| `abi_destroy` | `src/abi_calls.c` | `destroy(id)`: `docs/intern/abi_calls.c.md`, *Functions*. |
+| `abi_attach` | `src/abi_calls.c` | `attach(id, slot, ptr)`: `docs/intern/abi_calls.c.md`, *Functions*. |
+| `abi_detach` | `src/abi_calls.c` | `detach(id, slot)`: `docs/intern/abi_calls.c.md`, *Functions*. |
+| `abi_alloc` | `src/abi_alloc.c` | `alloc(len) -> offset`: `docs/intern/abi_alloc.c.md`, *Functions*. |

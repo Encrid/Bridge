@@ -1,15 +1,14 @@
 # src/backend.h
 
-This header gives `backend_open`, which opens the library of a backend and finds its entries.
+This header gives `backend_open`, which opens the library of a backend: `docs/intern/backend.c.md`.
 The types of the backend seam, `backend_api_t` among them, are in `include/bridge_backend.h`.
 
 ## The entries of a backend
 
 A backend is a library of its own that runs the modules of a world.
-Bridge opens the library by the path that the deployment states, and finds its eighteen entries by name.
+Bridge opens the library by its path in the deployment: `docs/intern/bridge_backend.c.md`, *A backend of the deployment*.
+`docs/intern/backend.c.md` tells how Bridge finds the entries and checks the number of the backend seam.
 `backend_api_t` holds the entries in the order of `BACKEND_ENTRY_NAMES`.
-The first entry gives the number of the backend seam that the library was built against.
-Bridge asks a library of another number for no other entry.
 
 | Entry | What Bridge asks for |
 | --- | --- |
@@ -31,12 +30,10 @@ An image is the loaded form of a module: compiled bytes on the wasm backend, an 
 Either can be null. A backend that needs the one that it did not get refuses the module by name.
 That refusal, and a library that the operating system cannot open, are failures of the module, as a failed `init` is.
 
-`module_compile` also gets `demands`: the capabilities that the config of the module asks for.
-A backend need not compile in a guarantee that nobody asked for.
-A backend can keep more than was asked, but never less.
+`module_compile` also gets `demands`: `docs/extern/bridge_backend.h.md`, *module_compile*, tells what a backend may do with them.
 
 A block is adopted, not created: the backend makes addressable a block that Bridge allocated.
-Bridge releases a memory only after it destroys the last instance that it gave the memory to.
+`docs/extern/bridge_backend.h.md`, *Memory*, tells when Bridge releases a memory.
 `instance_set_timeout` takes nanoseconds, for the next call only, and the backend changes them to the unit of its engine.
 Only a lifecycle call gets a timeout. A system gets a work limit, which Bridge sets again before each dispatch.
 A backend does not decide when anything runs, find a file, or know what a component, an entity or a barrier is.
@@ -45,4 +42,4 @@ A backend does not decide when anything runs, find a file, or know what a compon
 
 | Function | Source | Result |
 | --- | --- | --- |
-| `backend_open` | `src/backend.c` | Opens the library of a backend and finds its eighteen entries by name. Gives the library, or null with `err` that tells why. |
+| `backend_open` | `src/backend.c` | Opens a backend: `docs/intern/backend.c.md`, *Functions*. |

@@ -1,6 +1,6 @@
 # src/os/windows/memory.c
 
-This file gives the address space of `src/os/os.h` on Windows: a range reserved, committed and given back.
+This file gives `src/os/os.h` its address space on Windows: a range reserved, committed and given back.
 Each function keeps the contract of `docs/intern/os/os.h.md`, *Functions*.
 
 ## The range
@@ -14,5 +14,5 @@ Windows gives committed pages that hold zeros.
 
 | Function | Result |
 | --- | --- |
-| `os_reserve` | Reserves the range, and commits the first `commit` bytes. Each caller commits more than 0. Gives `nullptr` on failure, with nothing left reserved. |
+| `os_reserve` | Reserves the range, then commits its first `commit` bytes. Each caller commits more than 0. Gives `nullptr` on failure, with nothing left reserved. |
 | `os_release` | Frees the reservation. |

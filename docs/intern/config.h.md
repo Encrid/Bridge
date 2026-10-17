@@ -5,7 +5,7 @@ This header gives the settings of a module: one value of the component that its 
 
 ## The text of the settings
 
-Bridge writes the text of the settings of a module at `init`, into the persistent share of that module.
+Bridge writes the settings text of a module at `init`, into the persistent share of that module.
 `init` runs again at each load of the module.
 Where the share of a module stays at its unload, a new copy at each load would waste one block for each cycle.
 So where a share stays, Bridge remembers the block of the text in it.
@@ -35,23 +35,23 @@ The fields of `config_seed_t`:
 
 | Function | Source | Result |
 | --- | --- | --- |
-| `config_seed` | `src/config.c` | Checks the settings of a module, or, with `writing`, writes them into the component that its config names. Gives 0, or 1 with `err` saying which setting or name was refused. |
-| `config_keep` | `src/config_kept.c` | Remembers where the settings text of an unloaded module is: the block outlives the module, and its next load writes there. |
-| `config_give_back_free` | `src/config_kept.c` | Gives back each kept share that no row holds a string in, and forgets it. |
-| `config_find_kept` | `src/config_kept.c` | Gives what is remembered of the settings text of the module `stem`, or `nullptr`. |
-| `config_refuse` | `src/config_say.c` | Writes why the settings are refused, as `printf` would. Gives 1. |
-| `config_say_misfit` | `src/config_say.c` | Refuses a setting whose kind the field it names does not take. `field` tells what the field is. Gives 1. |
-| `config_check_settings` | `src/config_field.c` | Refuses a setting with no key, of no kind, with a null text, or with a key that comes twice. Gives 1 with a reason. |
-| `config_place_text` | `src/config_room.c` | Finds where the text of the settings goes, before any is written. Gives 1 if there is no room. |
-| `config_seed_setting` | `src/config_field.c` | Writes one setting into the field that its key names. Gives 1 if no field has that name, or the field does not take it. |
-| `config_seed_bool` | `src/config_scalar.c` | Writes a setting into a bool field. |
-| `config_seed_float` | `src/config_scalar.c` | Writes a setting into a float field. |
-| `config_seed_integer` | `src/config_scalar.c` | Writes a setting into an integer field. |
-| `config_seed_enum` | `src/config_enum.c` | Writes a setting into an enum field. |
-| `config_seed_bitmask` | `src/config_enum.c` | Writes a setting into a bitmask field. |
-| `config_seed_text` | `src/config_text.c` | Writes a setting into a `bridge_text_t` field. |
-| `config_seed_struct` | `src/config_text.c` | Refuses a setting for a struct field. |
-| `config_seed_array` | `src/config_text.c` | Writes a setting into an inline array. |
+| `config_seed` | `src/config.c` | Checks or writes the settings: `docs/intern/config.c.md`, *Functions*. `err` says which setting or name was refused. |
+| `config_keep` | `src/config_kept.c` | Keeps a share that stays, for the next load of its module: `docs/intern/config_kept.c.md`, *The next load*. |
+| `config_give_back_free` | `src/config_kept.c` | Gives back the free shares: `docs/intern/config_kept.c.md`, *Functions*. |
+| `config_find_kept` | `src/config_kept.c` | Finds a kept share: `docs/intern/config_kept.c.md`, *Functions*. |
+| `config_refuse` | `src/config_say.c` | Says why the settings are refused: `docs/intern/config_say.c.md`, *Functions*. |
+| `config_say_misfit` | `src/config_say.c` | Refuses a setting of the wrong kind: `docs/intern/config_say.c.md`, *Functions*. |
+| `config_check_settings` | `src/config_field.c` | Refuses a wrong setting: `docs/intern/config_field.c.md`, *Functions*. |
+| `config_place_text` | `src/config_room.c` | Finds the room of the settings text: `docs/intern/config_room.c.md`, *Functions*. |
+| `config_seed_setting` | `src/config_field.c` | Writes one setting: `docs/intern/config_field.c.md`, *Functions*. |
+| `config_seed_bool` | `src/config_scalar.c` | Writes a bool field: `docs/intern/config_scalar.c.md`, *Functions*. |
+| `config_seed_float` | `src/config_scalar.c` | Writes a float field: `docs/intern/config_scalar.c.md`, *Functions*. |
+| `config_seed_integer` | `src/config_scalar.c` | Writes an integer field: `docs/intern/config_scalar.c.md`, *Functions*. |
+| `config_seed_enum` | `src/config_enum.c` | Writes an enum field: `docs/intern/config_enum.c.md`, *Functions*. |
+| `config_seed_bitmask` | `src/config_enum.c` | Writes a bitmask field: `docs/intern/config_enum.c.md`, *Functions*. |
+| `config_seed_text` | `src/config_text.c` | Writes a `bridge_text_t` field: `docs/intern/config_text.c.md`, *Functions*. |
+| `config_seed_struct` | `src/config_text.c` | Refuses a struct field: `docs/intern/config_text.c.md`, *Functions*. |
+| `config_seed_array` | `src/config_text.c` | Writes an inline array: `docs/intern/config_text.c.md`, *Functions*. |
 
 Each seeder gives 1 if it refuses the setting.
 There is one seeder for each kind of field, and one for an inline array.

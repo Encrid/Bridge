@@ -20,7 +20,7 @@ So a system and an observer of one module do not share a name.
 A name with no `@` and no `:` gives each system one full name, which a pair of `[order]` can name: `docs/intern/schedule_order.c.md`.
 An observer with no term has no change to subscribe to.
 `docs/intern/abi_system.c.md` refuses a registration outside the first call of the module, and an observer with no events or unknown ones.
-`docs/intern/abi_subscribe.c.md` refuses a change of a slot that the module never declared.
+`docs/intern/abi_subscribe.c.md` refuses a change whose slot the module did not declare.
 
 `get_slots` of `src/abi_slots.h` finds the changes in the scratch arena. A list of no change needs no place there.
 `abi_check_before` of `src/abi_before.c` checks the list of `before` last: `docs/intern/abi_before.c.md`.

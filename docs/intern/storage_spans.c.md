@@ -31,4 +31,4 @@ If the spans do not fit in the span region, storage gives 1.
 | `write_spans` | Writes each span of system `q` of a module, one after the other, and where they begin. Gives 1 if they do not fit. |
 | `rewrite_spans` | Writes again, where it is, each span of system `q` whose table was touched. |
 | `write_every_span` | Writes all the spans of a module again, and where they end. Gives 1 if they do not fit. |
-| `storage_publish_spans` | Writes the spans of a module. It writes all of them again if a system reads other tables than it did, and otherwise the touched ones. |
+| `storage_publish_spans` | Writes the spans of a module. It writes all of them again if a system reads other tables than it did, and otherwise the touched ones. Gives 1 if they do not fit. |

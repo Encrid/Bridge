@@ -14,14 +14,11 @@ The runs are the whole value, or field by field where the component layout chang
 A move is all of the rows or none:
 
 1. Storage folds what each entity that carries a moved type will carry, and moves nothing.
-2. It finds a table and room for each entity, while each value is still where it was.
+2. It finds a table for each entity, and room in it, before any value moves.
 3. If it cannot have the room, it forgets the fold, moves nothing, and gives `STORAGE_NO_ROOM`.
 4. Otherwise it places each entity once, and writes each value across.
 
-For the length of a reload, the component is two types.
-It counts twice against `[budget] types`, and against `sparse_sets` or `direct_indexed` if both types are kept that way.
-Its rows need room where they go, while they are still where they were.
-Observers hear nothing, since no entity gains or loses a component.
+During a reload, the old and the new type both count and both take room: `docs/intern/reload_rows.c.md`, *All the rows or none*.
 
 What a move does to the values:
 
@@ -39,4 +36,4 @@ It also refuses a move out of a toggle with rows that are off, unless the reload
 
 | Function | Result |
 | --- | --- |
-| `storage_fold_moves` | Folds what each entity that carries a moved type will carry, and finds a table and room for each, with nothing moved. Gives false, with the fold forgotten and nothing changed, if it cannot have them. In `src/storage_refold.c`. |
+| `storage_fold_moves` | Folds the moves of a reload: `docs/intern/storage_refold.c.md`, *Functions*. |
