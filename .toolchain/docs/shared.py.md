@@ -16,7 +16,7 @@ The tools import it. It does not run alone.
 
 | Function | Result |
 | --- | --- |
-| `die(why)` | Stops the tool with the message `<tool>: <why>`. `<tool>` is the name of the file of the tool. |
+| `die(why)` | Stops the tool with the message `<tool>: <why>`, where `<tool>` is the file name of the tool. |
 | `known(table, what, where)` | Gives `table`. It stops if `table` has a key that `KEYS[what]` does not have. |
 | `merged(into, more, above)` | Adds the keys of `more` to `into`, as the section *The configuration* tells. |
 | `config(root)` | Gives the configuration of the project in `root`. |
@@ -30,11 +30,11 @@ The tools import it. It does not run alone.
 | `sha256(data)` | Gives the SHA-256 digest of the bytes, in hexadecimal. |
 | `variables(config, args, target, zig)` | Gives the variables of a build, as the section *Variables* tells. |
 | `arguments(*valued, **flags)` | Reads the options of the command line. Each item of `valued` adds an option that has a value. An item can be a pair of the option and the type of its value, for example `('--copies', int)`. Each item of `flags` adds an option that has no value. |
-| `header(mark)` | Gives the pattern of the legal notice of `.toolchain/header.txt`, each line after `mark`, as the section *The legal notice* tells. |
+| `header(mark)` | Gives a pattern for the lines of `.toolchain/header.txt`, each one after `mark`, as the section *The legal notice* tells. |
 | `project_name(config)` | Gives `[project] name`, as the section *The name of the project* tells. |
 | `document(path)` | Gives the document of a file, as the section *The documents* tells. |
 | `repository(root)` | Tells if the root is the top folder of a git repository. |
-| `ours(root)` | Gives the files of the project, as the section *The files of the project* tells. |
+| `ours(root, tests)` | Gives the files of the project, as the section *The files of the project* tells. |
 | `report(faults, count, items)` | Writes the faults of a check, and ends the check, as the section *The report of a check* tells. |
 
 ## The configuration
@@ -85,7 +85,7 @@ The default of `--root` is `HERE`. `arguments` makes the root an absolute path.
 `header` reads `.toolchain/header.txt` of `HERE`, and gives a pattern for each line of it:
 
 1. It writes `mark`, a space and the line. For an empty line, it writes `mark` only.
-2. `<year>` matches four digits, or two years with a `-` between them.
+2. `<year>` matches a year as `.toolchain/docs/header.txt.md` gives it.
 3. `<holder>` matches any text. A line with `<holder>` matches one time or more.
 
 `text.py` gives the mark `#`. `style.py` gives the mark `**`, and adds `/*` before the notice and `*/` after it.
@@ -93,8 +93,7 @@ The default of `--root` is `HERE`. `arguments` makes the root an absolute path.
 ## The name of the project
 
 `project_name` gives the value of `name` in `[project]` of `.toolchain/project.toml`.
-If the value is empty or not there, it stops the tool: `.toolchain/project.toml: write the name of the project in [project] name`.
-The check of the readme, `package.txt` and the zip of `pack` use it.
+If the value is empty or not there, it stops the tool with the message that `.toolchain/docs/project.toml.md`, *[project]*, quotes.
 
 ## The documents
 
@@ -102,6 +101,7 @@ The check of the readme, `package.txt` and the zip of `pack` use it.
 
 - The document of `include/<path>` is `docs/extern/<path>.md`.
 - The document of `src/<path>` is `docs/intern/<path>.md`.
+- The document of `tools/<path>` is `docs/tools/<path>.md`.
 - A file `.gitkeep`, and a file of a different folder, have no document. Then `document` gives `None`.
 
 The check of the layout and the check of the cover use `document`.
@@ -113,6 +113,8 @@ These are the files that git tracks, and the files that git does not ignore.
 Else, `ours` walks the folders of the root, as `.gitignore` tells: it skips `build` at the root, and each `__pycache__`.
 `ours` gives only the files that exist, as paths from the root.
 It leaves out the files of `tests` and of `.toolchain/tests`. Thus no check reads the tests of the project or of the toolchain.
+
+With `tests=True`, `ours` keeps the files of `tests`, and leaves out only `.toolchain/tests`. The check of the retired words uses it.
 
 `repository` asks `git -C <root> rev-parse --show-toplevel` for the top folder of the repository of the root.
 Thus a project in a folder of a different repository, for example a case in `build`, is not a repository.
@@ -126,5 +128,7 @@ Each check tool ends with `report`. `faults` is the list of the faults, one line
 1. `report` writes each fault on its own line.
 2. If there is a fault, it writes `faults: <number>`, and the check ends with the status 1.
 3. Else, it writes `no fault in <count> <items>`, and the check ends with the status 0.
+
+A check gives its faults in the order of the paths and of the lines, unless its document gives another order.
 
 For example, the check of the commits gives `items='commits'`, and writes `no fault in 12 commits`.

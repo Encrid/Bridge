@@ -31,7 +31,6 @@ It is the same in each project, and a project does not change it.
 ## [targets.\<target\>]
 
 There are six targets: three operating systems on two types of processor.
-The `runs_on` of `aarch64-windows-gnu` is empty. Thus the tools build it, and do not test it.
 
 | Key | Value |
 | --- | --- |

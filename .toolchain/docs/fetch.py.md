@@ -85,4 +85,4 @@ No case runs these branches. The workflows run some of them.
 
 - The download of zig, and its two refusals. Each runner of the workflows downloads zig with `fetch`.
 - A source with an address on the network. A case does not use the network.
-- A machine on which no target runs. Each machine of the cases runs a target.
+- A machine that is no target. The machines of the cases are all targets.

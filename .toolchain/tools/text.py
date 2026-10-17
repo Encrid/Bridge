@@ -39,15 +39,28 @@ def faults(path, data, notice, unicode):
     return found
 
 
+def retired(text, words):
+    found = []
+    for word, new in words.items():
+        for m in re.finditer(r'\b%s\b' % re.escape(word), text, re.IGNORECASE):
+            what = "'%s' is retired: write '%s'" % (m.group(), new) if new else "'%s' is retired" % m.group()
+            found.append((text.count('\n', 0, m.start()) + 1, what))
+    return found
+
+
 def main():
     root = arguments().root
     settings = config(root)
     paths = ours(root)
     unicode = set(files(root, settings.get('check', {}).get('unicode', [])))
+    words = settings.get('check', {}).get('retired', {})
+    worded = [path for path in ours(root, tests=True) if not path.startswith('.toolchain/')]
     legal = notice()
-    found = sorted((path, n, what) for path in paths
-                   for n, what in faults(path, (root / path).read_bytes(), legal, path in unicode))
-    report(['%s:%d: %s' % fault for fault in found], len(paths))
+    found = sorted([(path, n, what) for path in paths
+                    for n, what in faults(path, (root / path).read_bytes(), legal, path in unicode)]
+                   + [(path, n, what) for path in worded
+                      for n, what in retired((root / path).read_text(encoding='utf-8', errors='replace'), words)])
+    report(['%s:%d: %s' % fault for fault in found], len(set(paths) | set(worded)))
 
 
 if __name__ == '__main__':

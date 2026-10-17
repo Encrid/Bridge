@@ -57,7 +57,7 @@ The message is `<path>:<line>: the tag '<tag>' is not one of pseudo c toml sh te
 Standard Readme is a specification of the readme of a project: https://github.com/RichardLitt/standard-readme.
 `readme` checks these rules of Standard Readme:
 
-1. The first line is `# <name>`. `<name>` is the name that `shared.project_name` gives.
+1. The first line is `# <name>`. `<name>` comes from `shared.project_name`.
 2. The description is the first line with text after the title. It is not a heading.
 3. The description has at most `[prose] description` characters.
 4. The sections follow the order of Standard Readme. A section starts with `##`.
@@ -77,5 +77,4 @@ The messages are:
 
 ## Output
 
-`main` gives the faults to `report` of `shared.py`, in the order of the paths and of the lines.
-Thus the output is the faults, then `faults: <number>`, or else `no fault in <number> files`.
+The output follows `.toolchain/docs/shared.py.md`, *The report of a check*.

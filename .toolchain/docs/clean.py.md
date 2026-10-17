@@ -9,7 +9,7 @@ python .toolchain/tools/clean.py [--root <folder>] [--out <folder>] [--all]
 
 ## The output folder
 
-The output folder is `--out`, or `[build] folder` in the root, as `shared.variables` gives it.
+The output folder is the variable `build` of `shared.variables`.
 If the output folder is not there, `clean.py` writes `nothing to clean: <folder> is not there`.
 
 ## clean

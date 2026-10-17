@@ -1,7 +1,7 @@
 # .toolchain/project.toml
 
 `.toolchain/project.toml` holds the values of the project.
-`.toolchain/toolchain.toml` holds the values of the tools: zig, the targets, the flags of the compiler and the limits of the style.
+zig, the targets, the flags of the compiler and the limits of the style are in `.toolchain/toolchain.toml`.
 The tools read the two files as one configuration.
 
 - A table of `.toolchain/project.toml` adds its keys to the table of `.toolchain/toolchain.toml` that has the same name.
@@ -30,7 +30,7 @@ The tools give these variables:
 | Variable | Value |
 | --- | --- |
 | `{root}` | The folder of the project. |
-| `{build}` | The output folder: `--out`, or the folder `build` of the project. |
+| `{build}` | The output folder, as `.toolchain/docs/shared.py.md`, *Variables*, gives it. |
 | `{out}` | The output folder of the target. |
 | `{target}` | The name of the target. |
 | `{home}` | The name of the target of this machine. |
@@ -56,7 +56,7 @@ They also stop if a list variable is a part of a text, and has no separator.
 
 | Key | Value |
 | --- | --- |
-| `name` | The name of the project. The title of `readme.md`, `package.txt` and the zip of `pack` use it. |
+| `name` | The name of the project. The title of `readme.md`, `package.txt` and the zip of `pack` take it. |
 
 If `name` is empty, the tools that need it stop: `.toolchain/project.toml: write the name of the project in [project] name`.
 
@@ -66,7 +66,7 @@ Each key of `[variables]` is a variable.
 A key must not have the name of a variable that the tools give, or of a key of a target.
 `.toolchain/toolchain.toml` gives the keys `language`, `optimize` and `float`.
 With `--debug`, each key of `[debug]` in `.toolchain/toolchain.toml` replaces the variable with the same name.
-`--set <name>=<value>` gives a new value to a key of `[variables]`.
+`--set <name>=<value>` replaces the value of a key of `[variables]`.
 
 ## [tools]
 
@@ -82,7 +82,7 @@ Put the patches of a source and its licence into `third_party/<source>`.
 | Key | Value |
 | --- | --- |
 | `name` | The name of the source. The variable `{<name>}` is its `top` folder, in its `into` folder. |
-| `url` | The address of the archive. If the text has no `://`, it is a file of the project. |
+| `url` | The address of the archive. A text with no `://` names a file of the project. |
 | `sha256` | The SHA-256 digest of the archive. |
 | `into` | The folder that gets the files, for example `{build}/third_party/<source>`. |
 | `top` | Optional. The folder of the archive that holds the files. |
@@ -104,12 +104,12 @@ The command `fetch` does these steps for each source:
 
 1. It removes the files of the `into` folder, and downloads the archive into the folder.
 2. It stops if the archive does not have the digest of the source.
-3. It unpacks the archive, and removes the archive.
+3. It unpacks the archive, and deletes it.
 4. It applies each patch to the files of the `top` folder, in the order of the list.
 5. It writes `fetched.txt` into the `into` folder. The file holds the digest of the archive and of each patch.
 
 A patch applies only if each line of its context is in the file, at the line that the patch gives.
-`fetch` reads a patch with the line ends of Windows or of Linux.
+A patch can end its lines as Windows does or as Linux does.
 `fetch` stops if a patch does not apply.
 If `fetched.txt` holds the digests of the configuration, `fetch` does not download the archive again.
 The commands `build`, `pack` and `test` do not download a source.
@@ -163,14 +163,14 @@ A kind gives the steps that make an artifact.
 | --- | --- |
 | `output` | The name of the file of an artifact. |
 | `steps` | The steps that make an artifact. |
-| `unlinked` | Optional. The steps if a file of `link` is not there. |
+| `unlinked` | Optional. The steps when one of the files of `link` is missing. |
 
 A step does one of these actions:
 
 | Key | Action |
 | --- | --- |
 | `run` | Runs a command, in the folder of the project. |
-| `section`, `text` | Adds a custom section of WebAssembly to the artifact, with this name and this text. |
+| `section`, `text` | The name and the text of the custom section that the step writes into a WebAssembly artifact. |
 | `contains` | Makes sure that the bytes of the artifact contain this text. |
 | `copy` | Copies the first file to the second file. |
 | `rename` | Moves the first file to the second file. |
@@ -217,9 +217,8 @@ An artifact is a file that the build makes, for example a program, a library or 
 A variant is a copy of the artifact with a different name and some different keys.
 A variant with `unstamped = true` does not do the `section` steps.
 An artifact with a `target` gets the keys of that target and the variable `{target}`, for example `{exe}` and `{triple}`.
-It stays in the output folder of the build.
+`.toolchain/docs/build.py.md`, *Artifacts*, tells where its output goes, and when the `unlinked` steps run.
 
-If a file of `link` is not there, the tools do the `unlinked` steps of the kind, and do not copy the `beside` files.
 Thus a build for a different target can compile the sources, and not link them.
 If the kind has no `unlinked` steps, the tools stop.
 The command `test` stops if an artifact is not linked.
@@ -233,12 +232,18 @@ The command `test` stops if an artifact is not linked.
 | Key | Value |
 | --- | --- |
 | `unicode` | Optional. The paths of the files that can hold text that is not ASCII. A path can contain `*`. The default is an empty list. |
+| `guides` | Optional. The names of the guides that the project adds to `docs/contributing`, beside the 6 guides of the template, for example `timings.md`. `.toolchain/docs/layout.py.md`, *The paths* allows them. |
+| `retired` | Optional. A table of the retired words of the project. A key is a retired word, and its value is the word to write, or an empty text. `.toolchain/docs/text.py.md`, *Retired words* tells the check. |
 
 For example:
 
 ```toml
 [check]
 unicode = ["docs/extern/names.md"]
+
+[check.retired]
+utilise = "use"
+whilst = ""
 ```
 
 ## [[style.exception]]

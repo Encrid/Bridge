@@ -17,6 +17,7 @@ The other cases run `test.py` on a project in `{case}`. Their `folders` copy the
 | `said.toml` and `ruled/project.toml` | The case `said`, which writes `ended after`, and a rule that refuses this text, but not in the group `free/said`. |
 | `still.toml` | The case `still`, whose false variant also passes. |
 | `later/project.toml` | An artifact that links `linked.txt`, which is not there. Its kind has `unlinked` steps. |
+| `nowhere/project.toml` | The project of `.toolchain/project.toml`, and the target `nowhere`, whose `runs_on` is empty. |
 
 | Case | Claim | False variant |
 | --- | --- | --- |
@@ -35,7 +36,7 @@ The other cases run `test.py` on a project in `{case}`. Their `folders` copy the
 | a rule of the tests | The group `held/said` fails, and the group `free/said` passes. | `passes.toml` in `held`. |
 | no case | `test` writes `no case: tests/cases holds no case`, and ends with 0. | `passes.toml`. |
 | a false variant that still holds | `test --break` stops: `still as written with their claims made false: still`. | `passes.toml`. |
-| a target that does not run here | `test --target aarch64-windows-gnu` stops: `aarch64-windows-gnu does not run here`. | No `--target`. |
+| a target that does not run here | `nowhere/project.toml` is the project. `test --target nowhere` stops: `nowhere does not run here`. | No `--target`. |
 | a case that needs what is not linked | `test` writes `compiled, not linked: later:`. Then it stops: `the cases need what is linked: later`. | `linked.txt` is there. |
 | the output of the cases | `test` runs the case `said`, and `{case}/out/{target}/said.txt` holds its output `ended after`. | `test --break`, which writes no `said.txt`. |
 | a claim of a pattern | The output matches `first.*second: \d+` over two lines. | The two lines in the other order. |

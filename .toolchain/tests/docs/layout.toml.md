@@ -14,7 +14,7 @@ The project of the case `a full project` has these files, and the document of ea
 | --- | --- |
 | The root, `.github` and `docs/contributing` | Each other file that the layout needs. |
 | `.toolchain` | `project.toml`, `toolchain.toml`, `header.txt`, `tools/check.py`, `docs/check.py.md`, and the case file `tests/cases/Any Name.toml`. |
-| `tools` | `release.py`. |
+| `tools` | `release.py`, with its document `docs/tools/release.py.md`. |
 | `src` | `sample.c` and `net/socket.c`. |
 | `include` | `sample.h`. |
 | `third_party/sample` | `fix.patch` and `license`. |
@@ -37,3 +37,6 @@ The project of the case `a full project` has these files, and the document of ea
 | a compiled file | `src/sample.o: a compiled or temporary file`. | `sample.c` in place of `sample.o`. |
 | an empty folder | `include`, `src`, `tools`, `docs/extern` and `docs/intern` hold only `.gitkeep`. No line names `.gitkeep`. | The project also has `notes/.gitkeep`, which the layout does not allow. |
 | a file of tests | `Any Name.txt` in `tests` is not in snake_case. No line names it. | The file is in `src`, not in `tests`. |
+| a tool without its document | `tools/a.py` has no document: `tools/a.py: no document docs/tools/a.py.md`. | `docs/tools/a.py.md` is there. |
+| a document of a tool that is not there | `docs/tools/gone.py.md` has no file: `docs/tools/gone.py.md: no file has this document`. | `tools/gone.py` is there. |
+| a guide that [check] guides names | `[check] guides` names `timings.md`, so the layout allows `docs/contributing/timings.md`. The output does not name it. | `.toolchain/project.toml` is empty. |

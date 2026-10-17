@@ -31,3 +31,8 @@ A Python file of a case has no legal notice if the fault of the case is a differ
 | a comment in a TOML file | `a.toml:1: a comment`. | The `#` is in the string. |
 | a comment in a YAML file | `.github/workflows/ci.yml:1: a comment`. | The `#` is in a string. |
 | a comment in a document | `a.md` has an HTML comment: `docs/a.md:3: a comment`. | No HTML comment. |
+| a retired word | `[check.retired]` gives `utilise` the new word `use`, and `a.md` holds `utilise`: `docs/a.md:3: 'utilise' is retired: write 'use'`. | `a.md` holds `use`. |
+| a retired word with no new word | `[check.retired]` gives `whilst` an empty text, and `a.md` holds `Whilst`: `docs/a.md:3: 'Whilst' is retired`. | The table gives the new word `while`. |
+| a word that holds a retired word | `a.md` holds `utilised`, which is not the whole word `utilise`. `text.py` writes `no fault in 2 files`. | `a.md` holds `utilise`. |
+| a retired word in the tests | `tests/a.md` holds `utilise`: `tests/a.md:1: 'utilise' is retired: write 'use'`. | `tests/a.md` holds `use`. |
+| a retired word in the toolchain | `.toolchain/docs/a.md` holds `utilise`, and so does the table in `.toolchain/project.toml`. Neither is a fault: `no fault in 2 files`. | `docs/a.md` holds `utilise` too. |

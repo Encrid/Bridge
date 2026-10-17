@@ -23,15 +23,14 @@ For check 2, `licence.py` reads each file of the project as text, but not these 
 
 - `license`,
 - the files of `third_party`, because their code has the notices of its holders,
-- the files of `tests` and of `.toolchain/tests`, which `ours` leaves out,
+- each file that `ours` leaves out,
 - a file with the byte 0 in its first 4096 bytes, because it is not text.
 
 For checks 4 and 5, `readme.md` names a file if it holds the path of the file in a code span.
 
 ## Output
 
-`licence.py` gives its faults to `report` of `.toolchain/tools/shared.py`.
-`report` writes each fault on its own line, then stops: `faults: <number>`. If there is no fault, it writes `no fault in <number> files`.
+The output follows `.toolchain/docs/shared.py.md`, *The report of a check*.
 
 | Fault | Line |
 | --- | --- |

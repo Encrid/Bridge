@@ -2,7 +2,7 @@
 name = "every check"
 run = ["{python}", "{root}/.toolchain/tools/check.py", "--root", "{case}/p"]
 folders = { "{case}/p" = ["license", "project.py"], "{case}/p/.toolchain/tools" = [".toolchain/tools/check.py"] }
-claims = { status = 0, order = ["layout.py", "text.py", "prose.py", "pseudo.py", "xref.py", "cover.py", "licence.py", "commits.py", "style.py", "c23.py", "every check passes"] }
+claims = { status = 0, order = ["layout.py", "text.py", "prose.py", "pseudo.py", "xref.py", "dup.py", "cover.py", "licence.py", "commits.py", "style.py", "c23.py", "every check passes"] }
 false = { run = ["{python}", "{root}/.toolchain/tools/check.py", "--root", "{case}"] }
 
 [case.files]
@@ -31,5 +31,5 @@ false = { run = ["{python}", "{root}/.toolchain/tools/check.py", "--root", "{cas
 name = "a tool that is not there"
 run = ["{python}", "{case}/.toolchain/tools/check.py", "--root", "{case}"]
 folders = { "{case}/.toolchain/tools" = [".toolchain/tools/check.py", ".toolchain/tools/shared.py"], "{case}/.toolchain" = [".toolchain/toolchain.toml"] }
-claims = { status = 1, line = ["check.py: failed: layout text prose pseudo xref cover licence commits style c23"] }
+claims = { status = 1, line = ["check.py: failed: layout text prose pseudo xref dup cover licence commits style c23"] }
 false = { run = ["{python}", "{root}/.toolchain/tools/check.py", "--root", "{case}"] }

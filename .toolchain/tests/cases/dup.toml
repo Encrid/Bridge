@@ -1,0 +1,87 @@
+[[case]]
+name = "a passage of 8 shared words"
+run = ["{python}", "{root}/.toolchain/tools/dup.py", "--root", "{case}/p"]
+files = { "{case}/p/docs/a.md" = "# a\n\nOne two three four five six seven eight.\n", "{case}/p/docs/b.md" = "# b\n\nOne two three four five six seven eight.\n" }
+claims = { status = 1, has = ["docs/a.md:3, docs/b.md:3: one two three four five six seven eight"] }
+false = { files = { "{case}/p/docs/b.md" = "# b\n\nOne two three four five six seven nine.\n" } }
+
+[[case]]
+name = "a passage of 7 shared words"
+run = ["{python}", "{root}/.toolchain/tools/dup.py", "--root", "{case}/p"]
+files = { "{case}/p/docs/a.md" = "# a\n\nOne two three four five six seven.\n", "{case}/p/docs/b.md" = "# b\n\nOne two three four five six seven.\n" }
+claims = { status = 0, line = ["no fault in 2 documents"] }
+false = { files = { "{case}/p/docs/a.md" = "# a\n\nOne two three four five six seven eight.\n", "{case}/p/docs/b.md" = "# b\n\nOne two three four five six seven eight.\n" } }
+
+[[case]]
+name = "a passage in 2 sentences of one document"
+run = ["{python}", "{root}/.toolchain/tools/dup.py", "--root", "{case}/p"]
+files = { "{case}/p/docs/a.md" = "# a\n\nOne two three four five six seven eight nine.\n", "{case}/p/docs/b.md" = "# b\n\nOne two three four five six seven eight.\n\nTwo three four five six seven eight nine.\n" }
+claims = { status = 1, has = ["docs/a.md:3, docs/b.md:3, docs/b.md:5: one two three four five six seven eight nine"] }
+false = { files = { "{case}/p/docs/b.md" = "# b\n\nOne two three four five six seven ten.\n\nTwo three four five six seven eight ten.\n" } }
+
+[[case]]
+name = "a passage that a third document holds in part"
+run = ["{python}", "{root}/.toolchain/tools/dup.py", "--root", "{case}/p"]
+files = { "{case}/p/docs/a.md" = "# a\n\nOne two three four five six seven eight nine.\n", "{case}/p/docs/b.md" = "# b\n\nOne two three four five six seven eight nine.\n", "{case}/p/docs/c.md" = "# c\n\nTwo three four five six seven eight nine.\n" }
+claims = { status = 1, has = ["docs/a.md:3, docs/b.md:3, docs/c.md:3: one two three four five six seven eight nine"] }
+false = { files = { "{case}/p/docs/c.md" = "# c\n\nTwo three four five six seven eight ten.\n" } }
+
+[[case]]
+name = "a passage across 2 sentences"
+run = ["{python}", "{root}/.toolchain/tools/dup.py", "--root", "{case}/p"]
+files = { "{case}/p/docs/a.md" = "# a\n\nOne two three four. Five six seven eight.\n", "{case}/p/docs/b.md" = "# b\n\nOne two three four five six seven eight.\n" }
+claims = { status = 0, line = ["no fault in 2 documents"] }
+false = { files = { "{case}/p/docs/a.md" = "# a\n\nOne two three four five six seven eight.\n" } }
+
+[[case]]
+name = "a passage across 2 cells"
+run = ["{python}", "{root}/.toolchain/tools/dup.py", "--root", "{case}/p"]
+files = { "{case}/p/docs/a.md" = "# a\n\n| One two three four | five six seven eight |\n", "{case}/p/docs/b.md" = "# b\n\nOne two three four five six seven eight.\n" }
+claims = { status = 0, line = ["no fault in 2 documents"] }
+false = { files = { "{case}/p/docs/a.md" = "# a\n\n| One two three four five six seven eight |\n" } }
+
+[[case]]
+name = "a passage in a fenced block"
+run = ["{python}", "{root}/.toolchain/tools/dup.py", "--root", "{case}/p"]
+files = { "{case}/p/docs/a.md" = "# a\n\n```text\none two three four five six seven eight\n```\n", "{case}/p/docs/b.md" = "# b\n\nOne two three four five six seven eight.\n" }
+claims = { status = 0, line = ["no fault in 2 documents"] }
+false = { files = { "{case}/p/docs/a.md" = "# a\n\none two three four five six seven eight\n" } }
+
+[[case]]
+name = "2 quotes that share 8 words"
+run = ["{python}", "{root}/.toolchain/tools/dup.py", "--root", "{case}/p"]
+files = { "{case}/p/docs/a.md" = "# a\n\n- `one two three four five six seven eight nine`\n", "{case}/p/docs/b.md" = "# b\n\n- `one two three four five six seven eight ten`\n" }
+claims = { status = 0, line = ["no fault in 2 documents"] }
+false = { files = { "{case}/p/docs/b.md" = "# b\n\n- `one two three four five six seven eight nine`\n" } }
+
+[[case]]
+name = "a sentence that repeats a quote"
+run = ["{python}", "{root}/.toolchain/tools/dup.py", "--root", "{case}/p"]
+files = { "{case}/p/docs/a.md" = "# a\n\n- `one two three four five six seven eight nine`\n", "{case}/p/docs/b.md" = "# b\n\nOne two three four five six seven eight.\n" }
+claims = { status = 1, has = ["docs/a.md:3, docs/b.md:3: one two three four five six seven eight"] }
+false = { files = { "{case}/p/docs/b.md" = "# b\n\nOne two three four five six seven nine.\n" } }
+
+[[case]]
+name = "a citation in 2 documents"
+run = ["{python}", "{root}/.toolchain/tools/dup.py", "--root", "{case}/p"]
+files = { "{case}/p/docs/a.md" = "# a\n\nRead `docs/c.md`, *The use of the tool in each case*.\n", "{case}/p/docs/b.md" = "# b\n\nRead `docs/c.md`, *The use of the tool in each case*.\n" }
+claims = { status = 0, line = ["no fault in 2 documents"] }
+false = { files = { "{case}/p/docs/a.md" = "# a\n\nRead docs/c.md, the use of the tool in each case.\n", "{case}/p/docs/b.md" = "# b\n\nRead docs/c.md, the use of the tool in each case.\n" } }
+
+[[case]]
+name = "a passage of 2 scopes"
+run = ["{python}", "{root}/.toolchain/tools/dup.py", "--root", "{case}/p"]
+files = { "{case}/p/docs/a.md" = "# a\n\nOne two three four five six seven eight.\n", "{case}/p/.toolchain/docs/b.md" = "# b\n\nOne two three four five six seven eight.\n" }
+claims = { status = 0, line = ["no fault in 2 documents"] }
+false = { files = { "{case}/p/docs/b.md" = "# b\n\nOne two three four five six seven eight.\n" } }
+
+[[case]]
+name = "the documents of this project"
+run = ["{python}", "{root}/.toolchain/tools/dup.py", "--root", "{case}"]
+claims = { status = 0, line = ["no fault in 32 documents"] }
+false = { files = { "{case}/docs/a.md" = "# a\n\nThe false variant changes the command or its input.\n" } }
+
+[case.folders]
+"{case}" = ["readme.md"]
+"{case}/docs/contributing" = ["docs/contributing/agreement.md", "docs/contributing/coding_style.md", "docs/contributing/commits.md", "docs/contributing/documentation_style.md", "docs/contributing/pull_request.md", "docs/contributing/tests.md"]
+"{case}/.toolchain/docs" = [".toolchain/docs/branches.py.md", ".toolchain/docs/build.py.md", ".toolchain/docs/c23.py.md", ".toolchain/docs/check.py.md", ".toolchain/docs/cla.py.md", ".toolchain/docs/clean.py.md", ".toolchain/docs/commits.py.md", ".toolchain/docs/cover.py.md", ".toolchain/docs/dup.py.md", ".toolchain/docs/fetch.py.md", ".toolchain/docs/header.txt.md", ".toolchain/docs/layout.py.md", ".toolchain/docs/licence.py.md", ".toolchain/docs/project.py.md", ".toolchain/docs/project.toml.md", ".toolchain/docs/prose.py.md", ".toolchain/docs/pseudo.py.md", ".toolchain/docs/said.py.md", ".toolchain/docs/shared.py.md", ".toolchain/docs/style.py.md", ".toolchain/docs/take.py.md", ".toolchain/docs/test.py.md", ".toolchain/docs/text.py.md", ".toolchain/docs/toolchain.toml.md", ".toolchain/docs/xref.py.md"]

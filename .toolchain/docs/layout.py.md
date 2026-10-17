@@ -1,12 +1,13 @@
 # .toolchain/tools/layout.py
 
 `layout.py` checks the tree of the project: the paths, the needed files, the documents and the names.
-It reads the files that `ours` gives. `ours` leaves out the files of `tests` and of `.toolchain/tests`, thus no rule of `layout.py` applies to them.
+It reads the files that `ours` gives, so no rule of `layout.py` applies to a file that `ours` leaves out.
 
 ## Functions
 
 | Function | Result |
 | --- | --- |
+| `guides(root)` | Gives the paths of the guides that `[check] guides` of `.toolchain/project.toml` adds. |
 | `faults(root, paths)` | Gives the faults of the tree. |
 | `main()` | Runs the check. |
 
@@ -22,7 +23,8 @@ The layout allows only the paths of this table.
 | `.gitattributes`, `.gitignore`, `cla.md`, `license` | Needed. |
 | `project.py`, `.toolchain/project.toml`, `readme.md` | Needed. |
 | `docs/contributing/<name>.md`, for each name of `GUIDES`: `agreement`, `coding_style`, `commits`, `documentation_style`, `pull_request` and `tests` | Needed. |
-| `docs/extern/**.md`, `docs/intern/**.md` | The documents of the files. The section *The documents* gives their rules. |
+| `docs/contributing/<name>`, for each name of `[check] guides` | A guide of the project. |
+| `docs/extern/**.md`, `docs/intern/**.md`, `docs/tools/**.md` | The documents of the files. The section *The documents* gives their rules. |
 | `include/**.h` | The public headers. |
 | `src/**` | The sources, the private headers and the other inputs of a build. |
 | `tools/**` | The tools of the project. |
@@ -43,14 +45,10 @@ The messages are:
 
 ## The documents
 
-`shared.document` gives the document of a file:
-
-- The document of `include/<path>` is `docs/extern/<path>.md`.
-- The document of `src/<path>` is `docs/intern/<path>.md`.
-- A file `.gitkeep` has no document.
+`shared.document` gives the document of a file: `.toolchain/docs/shared.py.md`, *The documents*.
 
 The first line of a document is `#`, a space, and the path of its file.
-A document of `docs/extern` or of `docs/intern` is a fault if its file is not there.
+A document of `docs/extern`, of `docs/intern` or of `docs/tools` is a fault if its file is not there.
 
 The messages are:
 
@@ -77,5 +75,5 @@ The messages are:
 
 ## Output
 
-`main` gives the faults to `report` of `shared.py`, in the order of the paths.
-Thus the output is the faults, then `faults: <number>`, or else `no fault in <number> files`.
+A fault of `layout.py` has no line, so its faults follow the paths only.
+The output follows `.toolchain/docs/shared.py.md`, *The report of a check*.

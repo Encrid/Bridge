@@ -12,7 +12,7 @@ The cases of the options, of the report and of the files of a project run a shor
 | `builtin` | `[variables] root`, the name of a variable that the tools give. |
 | `unknown` | An artifact with the name `{named}`. The variable `named` is `{nothing}`, which has no value. |
 | `listed` | An artifact with the name `{named}`. The variable `named` is `{language}`, a list in a text. |
-| `targeted` | The artifact `near-{target}.txt`, and its variant `far-{target}.txt` with the target `aarch64-windows-gnu`. |
+| `targeted` | The artifact `near-{target}.txt`, and its variant `far-{target}.txt` with the target `nowhere`. The project adds `nowhere`, whose `runs_on` is empty. |
 | `untargeted` | The same artifact and variant, but the variant has no `target`. |
 
 In `built`, `greet` gets its greeting from `defines`.
@@ -40,7 +40,7 @@ The variant `plain` is unstamped.
 | a link that is not there | `--set linked=missing.txt` stops `build`: `missing.txt is not there, and copy.txt is linked with it`. | No `--set`. |
 | a variable that has no value | `build` on `unknown` stops: `no variable`. | `--set named=named.txt`. |
 | a list variable in a text | `build` on `listed` stops: `is a list inside a text`. | `--set named=named.txt`. |
-| an artifact for a different target | `build` on `targeted` lists `far-aarch64-windows-gnu.txt` in `package.txt`. No machine runs that target. | `build` on `untargeted`. |
+| an artifact for a different target | `build` on `targeted` lists `far-nowhere.txt` in `package.txt`. No machine runs that target. | `build` on `untargeted`. |
 | an option with a value | `shared.arguments('--commits')` gets `--commits a..b`, and the program writes `a..b`. | No `--commits`, thus the program writes `None`. |
 | a report with faults | `shared.report` gets two faults. It writes them and `faults: 2`, and the status is 1. | No fault. |
 | a report with no fault | `shared.report` gets no fault, 12 and `commits`. It writes `no fault in 12 commits`, and the status is 0. | One fault. |

@@ -37,8 +37,8 @@ The own characters of a format are the characters that are not in a conversion.
 
 ## Output
 
-`said.py` gives its faults to `report` of `.toolchain/tools/shared.py`, in the order of the files and of the lines.
-`report` writes each fault on its own line, then stops: `faults: <number>`. If there is no fault, it writes `no fault in <number> messages`.
+The count names messages.
+The output follows `.toolchain/docs/shared.py.md`, *The report of a check*.
 
 | Fault | Line |
 | --- | --- |

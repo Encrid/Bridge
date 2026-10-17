@@ -33,6 +33,9 @@ jobs:
           - target: x86_64-windows-gnu
             runner: windows-latest
             architecture: x64
+          - target: aarch64-windows-gnu
+            runner: windows-11-arm
+            architecture: arm64
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     defaults:
@@ -60,6 +63,3 @@ jobs:
         run: python project.py test --break
       - name: Branches
         run: python project.py test --branches
-      - name: Build for aarch64-windows-gnu
-        if: runner.os == 'Windows'
-        run: python project.py build --target aarch64-windows-gnu

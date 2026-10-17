@@ -3,14 +3,14 @@
 # Under the GNU Affero General Public License, version 3 only: see license.
 import re
 
-from shared import arguments, document, ours, report
+from shared import arguments, config, document, ours, report
 
 GUIDES = ('agreement', 'coding_style', 'commits', 'documentation_style', 'pull_request', 'tests')
 NEEDED = (('.github/workflows/ci.yml', '.github/workflows/release.yml', '.github/workflows/cla.yml', '.gitattributes',
            '.gitignore', 'cla.md', 'license', 'project.py', '.toolchain/project.toml', 'readme.md')
           + tuple('docs/contributing/%s.md' % guide for guide in GUIDES))
 FOLDERS = ('.toolchain/tools',)
-DOCUMENT = r'docs/(?:extern|intern)/.+\.md'
+DOCUMENT = r'docs/(?:extern|intern|tools)/.+\.md'
 ALLOWED = (DOCUMENT + r'|include/.+\.h|src/.+|tools/.+|third_party/[^/]+/(?:[^/]+\.patch|license)'
            r'|\.toolchain/tools/[^/]+\.py|\.toolchain/toolchain\.toml|\.toolchain/header\.txt|\.toolchain/docs/[^/]+\.md'
            r'|(?:docs/extern|docs/intern|include)/\.gitkeep')
@@ -19,8 +19,14 @@ DOTTED = ('.github', '.gitattributes', '.gitignore', '.gitkeep', '.toolchain')
 MADE = re.compile(r'.*\.(?:o|obj|a|so|dll|dylib|exe|gch|d|pyc)|.*~|#.*#|a\.out')
 
 
+def guides(root):
+    if not (root / '.toolchain' / 'project.toml').is_file():
+        return ()
+    return tuple('docs/contributing/%s' % name for name in config(root).get('check', {}).get('guides', []))
+
+
 def faults(root, paths):
-    allowed = re.compile('|'.join(map(re.escape, NEEDED)) + '|' + ALLOWED)
+    allowed = re.compile('|'.join(map(re.escape, NEEDED + guides(root))) + '|' + ALLOWED)
     found = ['%s: the layout needs this file' % path for path in NEEDED if path not in paths]
     found += ['%s/: the layout needs this folder' % folder for folder in FOLDERS
               if not any(path.startswith(folder + '/') for path in paths)]

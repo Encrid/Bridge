@@ -1,7 +1,7 @@
 [[case]]
 name = "a full project"
 run = ["{python}", "{root}/.toolchain/tools/layout.py", "--root", "{case}/project"]
-claims = { status = 0, line = ["no fault in 33 files"] }
+claims = { status = 0, line = ["no fault in 34 files"] }
 false = { files = { "{case}/project/notes.txt" = "" } }
 
 [case.files]
@@ -27,6 +27,7 @@ false = { files = { "{case}/project/notes.txt" = "" } }
 "{case}/project/.toolchain/docs/check.py.md" = ""
 "{case}/project/.toolchain/tests/cases/Any Name.toml" = ""
 "{case}/project/tools/release.py" = ""
+"{case}/project/docs/tools/release.py.md" = "# tools/release.py\n"
 "{case}/project/src/sample.c" = ""
 "{case}/project/src/net/socket.c" = ""
 "{case}/project/include/sample.h" = ""
@@ -131,3 +132,24 @@ run = ["{python}", "{root}/.toolchain/tools/layout.py", "--root", "{case}/projec
 files = { "{case}/project/.toolchain/project.toml" = "", "{case}/project/tests/Any Name.txt" = "" }
 claims = { status = 1, lacks = ["Any Name.txt"] }
 false = { run = ["{python}", "{root}/.toolchain/tools/layout.py", "--root", "{case}/fixed"], files = { "{case}/fixed/.toolchain/project.toml" = "", "{case}/fixed/src/Any Name.txt" = "" } }
+
+[[case]]
+name = "a tool without its document"
+run = ["{python}", "{root}/.toolchain/tools/layout.py", "--root", "{case}/project"]
+files = { "{case}/project/.toolchain/project.toml" = "", "{case}/project/tools/a.py" = "" }
+claims = { status = 1, line = ["tools/a.py: no document docs/tools/a.py.md"] }
+false = { files = { "{case}/project/docs/tools/a.py.md" = "# tools/a.py\n" } }
+
+[[case]]
+name = "a document of a tool that is not there"
+run = ["{python}", "{root}/.toolchain/tools/layout.py", "--root", "{case}/project"]
+files = { "{case}/project/.toolchain/project.toml" = "", "{case}/project/docs/tools/gone.py.md" = "# tools/gone.py\n" }
+claims = { status = 1, line = ["docs/tools/gone.py.md: no file has this document"] }
+false = { files = { "{case}/project/tools/gone.py" = "" } }
+
+[[case]]
+name = "a guide that [check] guides names"
+run = ["{python}", "{root}/.toolchain/tools/layout.py", "--root", "{case}/project"]
+files = { "{case}/project/.toolchain/project.toml" = "[check]\nguides = [\"timings.md\"]\n", "{case}/project/docs/contributing/timings.md" = "" }
+claims = { status = 1, lacks = ["docs/contributing/timings.md"] }
+false = { files = { "{case}/project/.toolchain/project.toml" = "" } }

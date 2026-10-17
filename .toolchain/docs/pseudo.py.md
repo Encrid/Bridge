@@ -215,5 +215,4 @@ It raises `ValueError` through `need` if the tokens do not have its form.
 
 ## Output
 
-`main` gives the faults to `report` of `shared.py`, in the order of the paths and of the lines.
-Thus the output is the faults, then `faults: <number>`, or else `no fault in <number> files`.
+The output follows `.toolchain/docs/shared.py.md`, *The report of a check*.

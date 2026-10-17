@@ -20,7 +20,7 @@ KEYS = {'step': {'run', 'section', 'text', 'contains', 'copy', 'rename'},
         'script': {'wait', 'put', 'remove', 'type'},
         'claims': {'status', 'status_not', 'line', 'has', 'lacks', 'matches', 'matches_not', 'order', 'output', 'files'},
         'source': {'name', 'url', 'sha256', 'into', 'top', 'patches'}}
-SIDES = {'include': 'extern', 'src': 'intern'}
+SIDES = {'include': 'docs/extern', 'src': 'docs/intern', 'tools': 'docs/tools'}
 
 
 def die(why):
@@ -160,7 +160,7 @@ def document(path):
     top, _, rest = path.partition('/')
     if top not in SIDES or path.endswith('/.gitkeep'):
         return None
-    return 'docs/%s/%s.md' % (SIDES[top], rest)
+    return '%s/%s.md' % (SIDES[top], rest)
 
 
 def repository(root):
@@ -168,7 +168,7 @@ def repository(root):
     return not top.returncode and Path(top.stdout.strip()).resolve() == Path(root).resolve()
 
 
-def ours(root):
+def ours(root, tests=False):
     if repository(root):
         found = subprocess.run(['git', 'ls-files', '-co', '--exclude-standard'], cwd=root, capture_output=True,
                                text=True).stdout.split('\n')
@@ -178,8 +178,8 @@ def ours(root):
             subfolders[:] = [name for name in subfolders
                              if name != '__pycache__' and not (name == 'build' and Path(folder) == root)]
             found += [(Path(folder) / name).relative_to(root).as_posix() for name in names]
-    return [path for path in found if path and not path.startswith(('tests/', '.toolchain/tests/'))
-            and (root / path).is_file()]
+    left_out = ('.toolchain/tests/',) if tests else ('tests/', '.toolchain/tests/')
+    return [path for path in found if path and not path.startswith(left_out) and (root / path).is_file()]
 
 
 def report(faults, count, items='files'):

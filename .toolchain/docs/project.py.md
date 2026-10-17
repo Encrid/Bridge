@@ -30,7 +30,7 @@ python project.py <command> [<option> ...]
 | `check` | `.toolchain/tools/check.py` | Runs all the checks of the project. |
 | `clean` | `.toolchain/tools/clean.py` | Removes what the build made, but keeps zig and the sources that `fetch` downloaded. |
 | `distclean` | `.toolchain/tools/clean.py --all` | Removes the output folder, also zig and the sources that `fetch` downloaded. |
-| `cla` | `.toolchain/tools/cla.py` | Decides if the author of a pull request signed `cla.md`. |
+| `cla` | `.toolchain/tools/cla.py` | Checks that the author of a pull request signed `cla.md`. |
 
 `project.py` gives its options to the tool without a change.
 It ends with the exit status of the tool.
@@ -46,7 +46,7 @@ If the command is not in the table, `project.py` stops with the message
 | `--target <target>` | Builds for this target. The default is the target of this machine. |
 | `--debug` | Replaces each variable that `[debug]` names with the value of `[debug]`. |
 | `--out <folder>` | Puts the output into this folder. The default is the folder `build` of the project. |
-| `--set <name>=<value>` | Gives a new value to a key of `[variables]`. You can use this option more than one time. |
+| `--set <name>=<value>` | Sets a key of `[variables]` to the value. You can use this option more than one time. |
 | `--pack` | Puts the package into a zip file. The command `pack` gives this option to `.toolchain/tools/build.py`. |
 | `--break` | Runs the false variant of each case. It is an option of `test` only. |
 | `-k <part>` | Runs only the cases whose name contains `<part>`. It is an option of `test` only. |
@@ -64,7 +64,7 @@ zig and its caches stay in the folder of `project.py`.
 
 ## Output
 
-- The output folder is `--out`, or the folder `build` of the project. Here, its name is `<build>`.
+- The output folder is the variable `build`: `.toolchain/docs/shared.py.md`, *Variables*. Here, its name is `<build>`.
 - The output folder of a target is `<build>/<target>`. With `--debug`, it is `<build>/<target>-debug`.
 - An artifact is in the output folder of the target, or in its `folder` in that output folder.
 - The steps of a kind put their temporary files into `<build>/<target>/obj`.
@@ -78,15 +78,11 @@ zig and its caches stay in the folder of `project.py`.
 - The caches of zig are in `build/zig-cache` of the folder of `project.py`. Thus a build does not use a cache of the machine.
 
 `build` writes the path of each artifact.
-`pack` also writes the path of the zip, then the name of each file in the zip.
+`pack` also writes what `packed` writes: `.toolchain/docs/build.py.md`, *The zip*.
 
 ### The zip
 
-`pack` puts these files into the zip:
-
-- `package.txt`, and each file that `package.txt` lists, at its path in the output folder of the target.
-- Each header of `include`, at its path in the project.
-- `license`, and `license` of each folder of `third_party`.
+`pack` puts into the zip the files that `.toolchain/docs/build.py.md`, *The zip*, lists.
 
 ## Cases
 

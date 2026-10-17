@@ -106,9 +106,9 @@ false = { folders = { "{case}/tests/cases" = [".toolchain/tests/data/test/passes
 
 [[case]]
 name = "a target that does not run here"
-run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out", "--target", "aarch64-windows-gnu"]
-folders = { "{case}/.toolchain" = [".toolchain/tests/data/test/project.toml"] }
-claims = { status_not = 0, has = ["aarch64-windows-gnu does not run here: build it, and test it where it runs"] }
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out", "--target", "nowhere"]
+folders = { "{case}/.toolchain" = [".toolchain/tests/data/test/nowhere/project.toml"] }
+claims = { status_not = 0, has = ["nowhere does not run here: build it, and test it where it runs"] }
 false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out"] }
 
 [[case]]

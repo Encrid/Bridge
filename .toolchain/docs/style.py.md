@@ -9,7 +9,7 @@ python .toolchain/tools/style.py [--root <folder>]
 
 ## The files
 
-`style.py` checks each file `.c` and `.h` that `ours` gives. `ours` leaves out the files of `tests` and of `.toolchain/tests`.
+`style.py` checks each file `.c` and `.h` that `ours` gives.
 `[style]` of `.toolchain/toolchain.toml` gives the limits of the rules F3, F4, F5, O3 and C1.
 
 ## The checks
@@ -70,9 +70,8 @@ The line of an exception that excuses nothing is `.toolchain/project.toml:1: <ru
 
 ## Output
 
-`style.py` gives its faults to `report` of `.toolchain/tools/shared.py`, in the order of the paths and of the lines.
 A fault is `<path>:<line>: <rule> <what>`.
-`report` writes each fault on its own line, then stops: `faults: <number>`. If there is no fault, it writes `no fault in <number> files`.
+The output follows `.toolchain/docs/shared.py.md`, *The report of a check*.
 
 ## Functions
 

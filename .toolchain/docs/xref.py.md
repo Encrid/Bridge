@@ -1,7 +1,7 @@
 # .toolchain/tools/xref.py
 
 `xref.py` checks that the documents of the project cite only what is there.
-A document is a file `.md` of the project. `xref.py` does not read the files of `tests` and of `.toolchain/tests`.
+A document is a file `.md` of the project that `ours` gives.
 
 ```sh
 python .toolchain/tools/xref.py [--root <folder>]
@@ -48,8 +48,7 @@ Each step keeps the length of the text. Thus the line of a fault is its line in 
 
 ## Output
 
-`xref.py` gives its faults to `report` of `.toolchain/tools/shared.py`, in the order of the documents and of the lines.
-`report` writes each fault on its own line, then stops: `faults: <number>`. If there is no fault, it writes `no fault in <number> files`.
+The output follows `.toolchain/docs/shared.py.md`, *The report of a check*.
 
 | Fault | Line |
 | --- | --- |
