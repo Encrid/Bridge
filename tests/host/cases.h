@@ -275,6 +275,16 @@ void test_pick_sparse(host_t *h);
 
 void test_hear_singleton_twice(host_t *h);
 
+void test_call_with_nulls(host_t *h);
+
+void test_hot_reload_unkept(host_t *h);
+
+void test_repair_fails_again(host_t *h);
+
+void test_reload_into_conflict(host_t *h);
+
+void test_reload_then_stop(host_t *h);
+
 void test_declare_other_size(host_t *h);
 
 void test_load_long_identity(host_t *h);

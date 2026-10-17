@@ -447,6 +447,26 @@ defines = ["BRIDGE_ROWS_CHECKED", "SECOND"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "writer"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/writer.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "marker"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/marker.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "reaper"
 kind = "library"
 test = true

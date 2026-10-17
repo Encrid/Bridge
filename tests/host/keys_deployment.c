@@ -59,6 +59,8 @@ void test_edit_backend(host_t *h)
         h->backends[1].library = HOLLOW_PATH;
     if (!strcmp(h->arg, "refusing"))
         h->backends[1] = (bridge_backend_t){ "plain", PLAIN_REFUSING_PATH };
+    if (!strcmp(h->arg, "module"))
+        h->backends[1].library = OK_PATH;
     if (!strcmp(h->arg, "untold"))
         h->backends[1] = (bridge_backend_t){ "plain", TESTS_PATH };
     host_open_only(h);
@@ -67,5 +69,7 @@ void test_edit_backend(host_t *h)
 void test_edit_phases(host_t *h)
 {
     h->phases[1] = strcmp(h->arg, "twice") ? nullptr : h->phases[0];
+    if (!strcmp(h->arg, "empty"))
+        h->phases[1] = "";
     host_open_only(h);
 }

@@ -1789,6 +1789,72 @@ claims = { matches = ["game:stamp@0.1.0: loaded.*seen 1 7.*alive"] }
 false = { run = ["{out}/host{exe}", "phase_name.to-undeclared-refused"] }
 
 [[case]]
+name = "host-api-null-arguments-refused"
+run = ["{out}/host{exe}", "host-api-null-arguments-refused"]
+claims = { matches = ["bridge_create with no config: refused.*bridge_destroy of no world: 0.*phase '' is not one the deployment declared.*bridge_run_phase with no name: 1.*bridge_list_modules with no list: 1.*no module '' is loaded, so none is unloaded.*bridge_unload with no identity: 1.*is refused: no backend named ''.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-share-from-none-taken"] }
+
+[[case]]
+name = "bridge_backend_t-library-with-no-entries-refused"
+run = ["{out}/host{exe}", "bridge_backend_t-library-with-no-entries-refused"]
+claims = { matches = ["has no entry 'backend_get_abi'.*bridge_create refused.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-share-from-none-taken"] }
+
+[[case]]
+name = "config.phases-empty-name-refused"
+run = ["{out}/host{exe}", "config.phases-empty-name-refused"]
+claims = { matches = ["phase 1 has no name.*bridge_create refused.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-share-from-none-taken"] }
+
+[[case]]
+name = "BACKEND_RELOAD-lacking-hot_reload-refused"
+run = ["{out}/host{exe}", "BACKEND_RELOAD-lacking-hot_reload-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: it states hot_reload, which backend 'plain' cannot keep.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-share-from-none-taken"] }
+
+[[case]]
+name = "bridge_load-repair-that-fails-again-keeps-the-world-stopped"
+run = ["{out}/host{exe}", "bridge_load-repair-that-fails-again-keeps-the-world-stopped"]
+claims = { matches = ["the world has stopped: module 'game:thing@0\\.1\\.0' failed.*no module 'game:thing' is loaded, so none is unloaded.*module 'game:thing@0\\.2\\.0' did not load.*modules: \\(0\\).*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-share-from-none-taken"] }
+
+[[case]]
+name = "bridge_reload-share-from-none-taken"
+run = ["{out}/host{exe}", "bridge_reload-share-from-none-taken"]
+claims = { matches = ["game:ticker@0\\.2\\.0: reloaded.*game:ticker@0\\.2\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-into-an-unordered-conflict-refused"] }
+
+[[case]]
+name = "bridge_reload-share-grown-twice-past-a-neighbour"
+run = ["{out}/host{exe}", "bridge_reload-share-grown-twice-past-a-neighbour"]
+claims = { matches = ["game:ticker@0\\.2\\.0: reloaded.*game:ticker@0\\.3\\.0: reloaded.*game:ticker@0\\.3\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-into-an-unordered-conflict-refused"] }
+
+[[case]]
+name = "bridge_reload-failed-gives-back-a-share-grown-in-place"
+run = ["{out}/host{exe}", "bridge_reload-failed-gives-back-a-share-grown-in-place"]
+claims = { matches = ["was not reloaded: its reload answered 5.*modules: game:ticker@0\\.1\\.0=RUNNING \\(1\\).*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-share-from-none-taken"] }
+
+[[case]]
+name = "bridge_reload-failed-gives-back-a-range-past-a-neighbour"
+run = ["{out}/host{exe}", "bridge_reload-failed-gives-back-a-range-past-a-neighbour"]
+claims = { matches = ["was not reloaded: its reload answered 5.*game:ticker@0\\.1\\.0=RUNNING game:namer@0\\.1\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-share-from-none-taken"] }
+
+[[case]]
+name = "bridge_reload-into-an-unordered-conflict-refused"
+run = ["{out}/host{exe}", "bridge_reload-into-an-unordered-conflict-refused"]
+claims = { matches = ["module 'game:thing@0\\.2\\.0' was not reloaded: 'game:mover:move' and 'game:thing:push' both touch 'game:Position' in phase 'update', one of them writing it, and nothing orders them.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-share-from-none-taken"] }
+
+[[case]]
+name = "bridge_reload-whose-barrier-stops-the-world-gives-1"
+run = ["{out}/host{exe}", "bridge_reload-whose-barrier-stops-the-world-gives-1"]
+claims = { matches = ["the world has stopped: module 'view:sour@0\\.1\\.0' was stopped and its on_error is fail.*game:marker@0\\.2\\.0: not reloaded.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-share-from-none-taken"] }
+
+[[case]]
 name = "module_config.identity-none-refused"
 run = ["{out}/host{exe}", "module_config.identity-none-refused"]
 claims = { matches = ["a module with no identity is refused.*alive"] }
