@@ -17,6 +17,19 @@ static void unlist_type(bridge_t *b, const declared_type_t *c)
     b->types[k] = b->types[b->type_count];
 }
 
+void module_free_type(declared_type_t *c)
+{
+    if (!c)
+        return;
+    schema_free(&c->s);
+    free(c->runs);
+    free(c->deps);
+    free(c->name);
+    free(c->zero);
+    free(c->desc);
+    free(c);
+}
+
 static void delete_type(bridge_t *b, declared_type_t *c)
 {
     declared_type_t *named;
@@ -31,12 +44,7 @@ static void delete_type(bridge_t *b, declared_type_t *c)
             delete_type(b, named);
         k++;
     }
-    schema_free(&c->s);
-    free(c->runs);
-    free(c->deps);
-    free(c->name);
-    free(c->zero);
-    free(c);
+    module_free_type(c);
 }
 
 static void release_type(bridge_t *b, declared_type_t *c,

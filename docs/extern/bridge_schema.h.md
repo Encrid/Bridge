@@ -74,24 +74,21 @@ A tag cannot be the type of a field.
 For a struct of another namespace in a component, declare a struct of your own namespace from the same text. It costs one more of `types`.
 `bridge_text_t` is a type of Bridge, and no module declares it: `docs/extern/bridge_abi.h.md`, *alloc*.
 
-## Fingerprints
+## Layouts
 
-Bridge makes a fingerprint of the descriptor and the kind of each type.
-Two modules that declare one type state the same fingerprint, or `declare` refuses the second one.
+Two modules that declare one type state the same descriptor and the same kind, or `declare` refuses the second one.
+Bridge compares the two descriptors byte for byte.
 The `#` of the preprocessor makes each run of white space one space, and removes the comments.
-Thus a new layout of the text or a new comment does not change the fingerprint.
+Thus a new layout of the text or a new comment does not change the descriptor.
 A field added, removed, of another type, or in another order changes it.
 
-The fingerprint of a type covers its own text, and not the texts of the types that its fields name.
-Each of those types has its fingerprint, which `declare` checks when the module declares it.
+The descriptor of a type covers its own text, and not the texts of the types that its fields name.
+Each of those types has its descriptor, which `declare` checks when the module declares it.
 Thus `declare` refuses a module built for an older `Vec3` at `Vec3`, before `Body`.
 
-The fingerprint is the 64-bit FNV-1a hash of the descriptor, XOR the kind.
-FNV-1a is not a cryptographic hash, so an author can make two descriptors with one fingerprint.
-Bridge then takes them as one layout.
-It still refuses another size or alignment of a type that it holds, and a move to another storage layout copies the smaller size.
-When a reload lays out again a component that holds such a type, a field of another type in it is refused.
-So such a pair changes how a module reads the bytes of the type, and nothing more than its grants allow.
+A record names a layout by its fingerprint: the 64-bit FNV-1a hash of the descriptor, XOR the kind.
+The fingerprint only names a layout, and two different descriptors can have one fingerprint.
+Then the record of the refusal shows the same fingerprint two times.
 
 ## Messages
 

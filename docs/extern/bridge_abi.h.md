@@ -195,7 +195,7 @@ Bridge lays the type out from its descriptor, and refuses a type whose `size` or
 A later module gets a slot of its own for the same type.
 Each module that declares a type states the same descriptor, the same kind and the same storage layout.
 `declare` refuses a different one, but at a reload: *When a type changes*.
-Bridge compares the descriptors by their fingerprints: `docs/extern/bridge_schema.h.md`, *Fingerprints*.
+Bridge compares the descriptors byte for byte: `docs/extern/bridge_schema.h.md`, *Layouts*.
 
 ## bridge_kind
 

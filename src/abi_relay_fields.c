@@ -28,14 +28,10 @@ static bool is_same_type(const schema_field_t *old, const schema_field_t *new)
 
     if (old->kind != new->kind)
         return (false);
-    if (!held)
-        return (true);
-    if (holds != held && holds->replaces != held)
-        return (false);
-    return (holds->size == held->size || old->kind == SCHEMA_STRUCT);
+    return (!held || holds == held || holds->replaces == held);
 }
 
-static int relay_structs(relaying_t *l, const relay_at_t *at,
+static void relay_structs(relaying_t *l, const relay_at_t *at,
     const schema_field_t *old, const schema_field_t *new)
 {
     const declared_type_t *held = old->type;
@@ -47,11 +43,9 @@ static int relay_structs(relaying_t *l, const relay_at_t *at,
     while (k < count) {
         inner.from = at->from + old->offset + k * held->size;
         inner.to = at->to + new->offset + k * holds->size;
-        if (abi_relay_fields(l, &inner))
-            return (1);
+        (void)abi_relay_fields(l, &inner);
         k++;
     }
-    return (0);
 }
 
 static int relay_field(relaying_t *l, const relay_at_t *at,
@@ -70,9 +64,10 @@ static int relay_field(relaying_t *l, const relay_at_t *at,
     if (new->count < old->count)
         abi_say_lost(l, at->path);
     if (old->kind == SCHEMA_STRUCT && new->type != old->type)
-        return (relay_structs(l, at, old, new));
-    abi_add_run(l, at->from + old->offset, at->to + new->offset,
-        count * abi_get_element_size(new));
+        relay_structs(l, at, old, new);
+    else
+        abi_add_run(l, at->from + old->offset, at->to + new->offset,
+            count * abi_get_element_size(new));
     return (0);
 }
 

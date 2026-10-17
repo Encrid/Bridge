@@ -14,7 +14,7 @@ Nothing has begun, and the load gives that the module was refused.
 `module_refuse` says this at once, as an error about no module: "module 'x' is refused: why".
 
 Once the module exists, a refusal takes the path of a failed `init`, because it is a failure to load.
-Examples are a grant denied, a fingerprint that does not match, an undeclared phase, a reserved system name and an order that is not stated.
+Examples are a grant denied, a descriptor that does not match, an undeclared phase, a reserved system name and an order that is not stated.
 `module_fail` writes the reason into the error of the backend, and the caller says "module 'x' did not load: why".
 So the record tells which moment it was.
 The records go to the sink of the host: `docs/intern/say.c.md`, *The sink*.

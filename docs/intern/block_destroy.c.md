@@ -19,5 +19,5 @@ The library gives the block back only after each backend released it.
 | Function | Result |
 | --- | --- |
 | `release_shared` | Has each backend that adopted the shared block release it, and then gives the block back to the operating system. |
-| `free_types` | Frees each declared type of the world, and the list of them. |
+| `free_types` | Frees each declared type of the world with `module_free_type`, and the list of them. |
 | `block_destroy` | Gives the shared block back: storage first, then the block once each backend released it, then each declared type. |

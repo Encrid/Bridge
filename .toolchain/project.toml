@@ -529,6 +529,16 @@ defines = ["BRIDGE_ROWS_CHECKED", "V=2", "NAME=plxytbt2tg4x3m"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "collide-struct-rival"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/collide.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "V=5", "NAME=plxytbt2tg4x3m"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "collide-enum"
 kind = "library"
 test = true

@@ -8,16 +8,6 @@
 
 #include "abi_declare.h"
 
-static void free_type(declared_type_t *c)
-{
-    if (!c)
-        return;
-    free(c->name);
-    free(c->zero);
-    free(c->deps);
-    free(c);
-}
-
 static declared_type_t *alloc_type(declaring_t *g)
 {
     bridge_t *b = g->m->b;
@@ -34,7 +24,7 @@ static declared_type_t *alloc_type(declaring_t *g)
     }
     if (c && c->name && c->zero && c->deps && types)
         return (c);
-    free_type(c);
+    module_free_type(c);
     return (nullptr);
 }
 
@@ -43,10 +33,12 @@ static int say_unmade(declaring_t *g, declared_type_t *c)
     const bridge_t *b = g->m->b;
 
     schema_free(&g->s);
+    free(g->text);
+    g->text = nullptr;
     if (!c)
         return (abi_refuse(g->m, "out of memory: there was none for type "
             "'%s'", g->name));
-    free_type(c);
+    module_free_type(c);
     if (g->d.storage == BRIDGE_SINGLETON)
         return (abi_refuse(g->m, "type '%s' is a singleton, and [budget] "
             "columns of %u bytes has no room for its %u bytes", g->name,
@@ -56,20 +48,11 @@ static int say_unmade(declaring_t *g, declared_type_t *c)
         "%u entities", g->name, b->columns_len, g->d.size, b->entities));
 }
 
-static void keep_type(declaring_t *g, declared_type_t *c)
+static void hold_named(declared_type_t *c)
 {
-    bridge_t *b = g->m->b;
     declared_type_t *held;
     uint32_t k = 0;
 
-    c->s = g->s;
-    c->kind = g->d.kind;
-    c->storage = g->d.storage;
-    c->size = g->d.size;
-    c->align = g->d.align;
-    c->fingerprint = g->print;
-    c->replaces = g->was;
-    b->types[b->type_count++] = c;
     while (k < c->s.field_count) {
         held = c->s.fields[k].type;
         if (held) {
@@ -78,6 +61,24 @@ static void keep_type(declaring_t *g, declared_type_t *c)
         }
         k++;
     }
+}
+
+static void keep_type(declaring_t *g, declared_type_t *c)
+{
+    bridge_t *b = g->m->b;
+
+    c->s = g->s;
+    c->kind = g->d.kind;
+    c->storage = g->d.storage;
+    c->size = g->d.size;
+    c->align = g->d.align;
+    c->fingerprint = g->print;
+    c->desc = g->text;
+    c->desc_len = g->d.desc_len;
+    g->text = nullptr;
+    c->replaces = g->was;
+    b->types[b->type_count++] = c;
+    hold_named(c);
 }
 
 int abi_make_type(declaring_t *g)

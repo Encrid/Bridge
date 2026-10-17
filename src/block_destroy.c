@@ -25,11 +25,7 @@ static void free_types(bridge_t *b)
     uint32_t i = 0;
 
     while (i < b->type_count) {
-        schema_free(&b->types[i]->s);
-        free(b->types[i]->deps);
-        free(b->types[i]->name);
-        free(b->types[i]->zero);
-        free(b->types[i]);
+        module_free_type(b->types[i]);
         i++;
     }
     free(b->types);

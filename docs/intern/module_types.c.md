@@ -47,6 +47,7 @@ It also lets go of the types that its fields name, and each of those goes too wh
 
 | Function | Result |
 | --- | --- |
+| `module_free_type` | Frees a declared type with what it holds: its layout, runs, types, name, zero value and descriptor. Null is nothing. |
 | `unlist_type` | Takes a type out of the list of the world: the last type takes its place. |
 | `delete_type` | Deletes the record of a component, with what storage knows of it and its hold on the types that its fields name. |
 | `release_type` | Stops one declaration of a type. The last declarer applies its policy, and a policy of zero is a load that failed. |

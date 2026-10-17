@@ -39,6 +39,8 @@ struct declared_type {
     uint32_t size;
     uint32_t align;
     uint64_t fingerprint;
+    char *desc;
+    uint32_t desc_len;
     uint32_t declarers;
     uint32_t users;
     declared_type_t **deps;
@@ -280,6 +282,8 @@ struct bridge {
 void module_discard(bridge_t *b, module_t *m);
 
 void module_shut_down(bridge_t *b, module_t *m);
+
+void module_free_type(declared_type_t *c);
 
     #include "say.h"
     #include "schedule.h"

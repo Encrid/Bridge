@@ -16,15 +16,17 @@ For each field of the struct as it was, in order:
 
 What is new in the struct is in no run, so it stays zero.
 
-A field is of the type that it was if all of these are true:
+A field is of the type that it was if both of these are true:
 
 - It is of the same kind.
 - Where it names a declared type, it names that type, or the type that this reload made of it.
-- It has the same size, unless it is a struct.
 
-Two descriptors with one fingerprint pass `declare` as one layout: `docs/intern/abi_stated.c.md`, *The fingerprint*.
-The test of the size, and the match of a struct inside field by field, find such a pair here.
-So a value is never copied into a field of another size.
+A type that a field holds changes only at a reload of the module that declares both types: `docs/intern/abi_replace.c.md`.
+That type is declared first, and its own relay refuses a field of another type in it.
+For an enum or a bitmask, that relay also refuses another size: `docs/intern/abi_relay.c.md`.
+So a field that holds such a type has the same size, unless it is a struct.
+And the match of a struct inside compares the two layouts that the own relay accepted, so it refuses nothing.
+It still records the runs and the losses of the rows of the holder.
 
 ## Functions
 
@@ -32,6 +34,6 @@ So a value is never copied into a field of another size.
 | --- | --- |
 | `find_field` | The field of a name in a struct, or nullptr. |
 | `is_same_type` | Whether a field is of the type that it was. |
-| `relay_structs` | Matches a field that is a struct this reload changed, element by element: the same rules, one level down. 1 with a refusal. |
+| `relay_structs` | Matches a field that is a struct this reload changed, element by element: the same rules, one level down. It refuses nothing. |
 | `relay_field` | Matches one field of a struct as it was. 1 with a refusal. |
 | `abi_relay_fields` | Matches the fields of a struct as it was to those of what it becomes. 1 with a refusal. |

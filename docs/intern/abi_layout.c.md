@@ -15,7 +15,7 @@ Bridge reads only the descriptor: `src/schema.c` lays the type out from the text
 Each field is at the next multiple of its alignment, and the whole is a multiple of its widest field.
 A declaration whose stated size or alignment is not what the text lays out to is refused, with both.
 
-The layout also gives the fields by name, and they stay in Bridge: a module is held to the size, the alignment and the fingerprint.
+The layout also gives the fields by name, and they stay in Bridge: a module is held to the size, the alignment and the descriptor.
 Bridge uses the fields to write the settings of a module, `docs/intern/config.c.md`, *The settings component*.
 It also uses them to carry values over at a reload: `docs/intern/abi_relay.c.md`, *What each change does*.
 
@@ -23,12 +23,34 @@ A field names its type as a bare C name, which is looked for in the namespace of
 For example, `Vec3` in `game:Body` is `game:Vec3`: `docs/intern/abi_names.c.md`, *A bare name*.
 While the text is read, `name` is cut at the colon, so that it holds only the namespace.
 The descriptor is copied out of the scratch arena before it is read, and a copy that has no memory refuses the type.
+The type keeps the copy, to compare it with a later declaration: `docs/intern/abi_make.c.md`, *A type kept*.
 A tag has nothing to read: it is what it was stated to be, which is nothing.
+
+## One layout
+
+Two declarations of one type have one layout if they have the same kind and the same descriptor, byte for byte.
+A tag has no descriptor, so two tags of one name have one layout.
+
+Two modules that declare one component from the same schema header hand over the same descriptor.
+Each expanded the same macro over the same tokens, so no generator is needed.
+The stringification of C makes each run of white space one space and drops the comments.
+So the descriptor stays the same when the text gets another format or a new comment.
+It changes when a field is added, removed, given another type, or put in another place.
+
+A module built against another layout of a component is refused when it declares it, and does not read the wrong bytes.
+At a reload, `docs/intern/abi_replace.c.md` compares the descriptors, and lays out the type again where it may.
+The descriptor of a component covers its own body, and not the bodies of the types that it names.
+Those are declared, each with a descriptor of its own, and checked where they are declared.
+So a module built against an older `Vec3` is refused at `Vec3`, before `Body`.
+
+Nothing else has a layout to compare, since nothing else has two parties.
+A query has one party: the module declares it, and only that module walks it.
+A system has none: every function that Bridge calls is `() -> i32`.
 
 ## The budgets
 
 At a reload, a type that changed has its values worked out first: `docs/intern/abi_relay.c.md`, *What each change does*.
-A type changed if its fingerprint is not the same, or if a field names a type that this reload made anew.
+A type changed if its descriptor or its kind is not the same, or if a field names a type that this reload made anew.
 
 Then a type that is one more than `[budget] types` is refused.
 A type kept in a sparse set is refused if `[budget] sparse_sets` is used up.
@@ -39,6 +61,7 @@ At a reload, the type that a new type replaces still counts, so the two count tw
 
 | Function | Result |
 | --- | --- |
+| `abi_is_same_layout` | Whether a declared type has the kind and the descriptor that a declaration states. |
 | `parse_descriptor` | Reads the descriptor of the type being declared into its layout. 1 with a refusal. |
 | `abi_check_size` | Refuses a type that its descriptor lays out as another size, or another alignment, than the compiler of the module did. |
 | `check_room` | At a reload, works out how values are carried over where the type changed. Refuses a type that is one more than a budget allows. |

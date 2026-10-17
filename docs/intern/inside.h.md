@@ -68,7 +68,8 @@ Storage holds the rows of a component, and this record is what a load checks.
 | `kind` | What it is: a struct, an enum, a bitmask or a tag. |
 | `storage` | The storage layout that each declarer stated. |
 | `size`, `align` | Its size and its alignment. |
-| `fingerprint` | The fingerprint of its descriptor: `docs/intern/abi_stated.c.md`, *The fingerprint*. |
+| `fingerprint` | The fingerprint of its descriptor, which names its layout in a record: `docs/intern/abi_stated.c.md`, *The fingerprint*. |
+| `desc`, `desc_len` | A copy of its descriptor, which a later declaration is compared with: `docs/intern/abi_layout.c.md`, *One layout*. |
 | `declarers` | How many loaded modules declared it. |
 | `users` | How many components name it as the type of a field. |
 | `deps`, `dep_count` | The declared types that its own fields name. |
@@ -256,3 +257,4 @@ The low 32 bits of a turn give that order.
 | --- | --- | --- |
 | `module_discard` | `src/module_discard.c` | Frees a module and what it held. |
 | `module_shut_down` | `src/module_call.c` | Runs the `shutdown` of a module, with what it asked for and what it said. |
+| `module_free_type` | `src/module_types.c` | Frees a declared type with what it holds: its layout, runs, types, name, zero value and descriptor. |

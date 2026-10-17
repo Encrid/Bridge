@@ -293,6 +293,8 @@ void test_reload_then_stop(host_t *h);
 
 void test_reload_colliding(host_t *h);
 
+void test_load_rival(host_t *h);
+
 void test_declare_other_size(host_t *h);
 
 void test_load_long_identity(host_t *h);

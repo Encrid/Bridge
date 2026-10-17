@@ -105,6 +105,20 @@ void test_reload_colliding(host_t *h)
     host_close(h);
 }
 
+void test_load_rival(host_t *h)
+{
+    bridge_artifact_t a;
+
+    if (host_open(h))
+        return;
+    test_state_ticker(&a, "st:collide@0.1.0", "collide-struct");
+    host_load(h, &a);
+    test_state_ticker(&a, "st:rival@0.1.0", h->arg);
+    host_load(h, &a);
+    test_say_modules(h);
+    host_close(h);
+}
+
 void test_reload_then_stop(host_t *h)
 {
     bridge_artifact_t a;

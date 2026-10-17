@@ -33,7 +33,7 @@ If not, it is refused as a type whose descriptor lays it out another way: `docs/
 ## The steps
 
 1. Find the type of the name that no reload made anew. If there is none, the declaration makes a new type.
-2. The type changed if its fingerprint is new, or if a field names a type that this reload made anew.
+2. It changed if its descriptor or kind is new, or a field names a type that this reload made anew.
 3. If it did not change and has the same storage layout, it is the type declared.
 4. Else refuse it, unless this is a reload of its one declarer that may replace it.
 5. If it may, the declaration makes a new type, and keeps the old one in `was`.

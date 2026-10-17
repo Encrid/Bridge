@@ -7,10 +7,10 @@
 
 #if V == 1
     #define Y_FIELDS { uint32_t v; uint8_t NAME; }
-#elif V == 2
+#elif V == 2 || V == 5
     #define Y_FIELDS { float v; uint8_t NAME; }
 #endif
-#if V <= 2
+#if V <= 2 || V == 5
 BRIDGE_SCHEMA_STRUCT_TYPE(y_t, Y_FIELDS);
 BRIDGE_SCHEMA_STRUCT_DESC(y_t, Y_FIELDS);
     #define Y_KIND BRIDGE_STRUCT

@@ -1921,16 +1921,28 @@ claims = { matches = ["the world has stopped: module 'view:sour@0\\.1\\.0' was s
 false = { run = ["{out}/host{exe}", "bridge_reload-share-from-none-taken"] }
 
 [[case]]
-name = "bridge_reload-colliding-fingerprint-of-a-held-struct-relaid-and-refused"
-run = ["{out}/host{exe}", "bridge_reload-colliding-fingerprint-of-a-held-struct-relaid-and-refused"]
-claims = { matches = ["st:collide@0.1.0: loaded.*module 'st:collide@0.2.0' was not reloaded: field 'st:X\\.y\\.v' is of another type than it was, and bytes of one type are not a value of another.*st:collide@0.1.0=RUNNING.*alive"] }
-false = { run = ["{out}/host{exe}", "bridge_reload-colliding-fingerprint-of-a-held-enum-relaid-and-refused"] }
+name = "declare-two-descriptors-with-one-fingerprint-refused"
+run = ["{out}/host{exe}", "declare-two-descriptors-with-one-fingerprint-refused"]
+claims = { matches = ["st:collide@0.1.0: loaded.*module 'st:rival@0.1.0' did not load: type 'st:y_t' has another component layout here: fingerprint 581383d61aa6b58f, and it was declared with 581383d61aa6b58f.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-one-descriptor-by-two-modules-taken"] }
 
 [[case]]
-name = "bridge_reload-colliding-fingerprint-of-a-held-enum-relaid-and-refused"
-run = ["{out}/host{exe}", "bridge_reload-colliding-fingerprint-of-a-held-enum-relaid-and-refused"]
-claims = { matches = ["st:collide@0.1.0: loaded.*module 'st:collide@0.2.0' was not reloaded: field 'st:X\\.y' is of another type than it was, and bytes of one type are not a value of another.*st:collide@0.1.0=RUNNING.*alive"] }
-false = { run = ["{out}/host{exe}", "bridge_reload-colliding-fingerprint-of-a-held-struct-relaid-and-refused"] }
+name = "declare-one-descriptor-by-two-modules-taken"
+run = ["{out}/host{exe}", "declare-one-descriptor-by-two-modules-taken"]
+claims = { matches = ["st:collide@0.1.0: loaded.*st:rival@0.1.0: loaded.*st:collide@0.1.0=RUNNING st:rival@0.1.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "declare-two-descriptors-with-one-fingerprint-refused"] }
+
+[[case]]
+name = "bridge_reload-held-struct-with-a-field-of-another-type-refused"
+run = ["{out}/host{exe}", "bridge_reload-held-struct-with-a-field-of-another-type-refused"]
+claims = { matches = ["st:collide@0.1.0: loaded.*module 'st:collide@0.2.0' was not reloaded: field 'st:y_t\\.v' is of another type than it was, and bytes of one type are not a value of another.*st:collide@0.1.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-held-enum-of-another-size-refused"] }
+
+[[case]]
+name = "bridge_reload-held-enum-of-another-size-refused"
+run = ["{out}/host{exe}", "bridge_reload-held-enum-of-another-size-refused"]
+claims = { matches = ["st:collide@0.1.0: loaded.*module 'st:collide@0.2.0' was not reloaded: type 'st:y_t' is an integer of 2 bytes here and was one of 1: every value kept of it would be read as another.*st:collide@0.1.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-held-struct-with-a-field-of-another-type-refused"] }
 
 [[case]]
 name = "module_config.identity-none-refused"

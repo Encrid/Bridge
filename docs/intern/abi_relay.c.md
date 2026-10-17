@@ -5,7 +5,7 @@ If the values cannot be carried over, it says why.
 
 ## What each change does
 
-The fingerprint finds a changed layout: `docs/intern/abi_stated.c.md`, *The fingerprint*.
+The descriptor finds a changed layout: `docs/intern/abi_layout.c.md`, *One layout*.
 What follows depends on who else holds the component: `docs/intern/abi_replace.c.md`.
 A component that only the reloading module declares has its rows carried over to the new layout, field by field, by name.
 Bridge keeps the fields of every type, and the new `declare` gives the new descriptor, so Bridge has both.

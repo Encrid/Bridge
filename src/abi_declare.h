@@ -16,6 +16,7 @@ typedef struct {
     module_t *m;
     bridge_declaration_t d;
     const char *desc;
+    char *text;
     char name[NAME_MOST + 1];
     char *bare;
     uint64_t print;
@@ -52,6 +53,8 @@ static const char *const ABI_STORAGE_NAMES[] = {
 };
 
 uint64_t abi_hash_text(const char *s, size_t n);
+
+bool abi_is_same_layout(const declared_type_t *c, const declaring_t *g);
 
 bool abi_is_listed(char **list, uint32_t count, const char *name);
 

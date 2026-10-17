@@ -21,6 +21,7 @@ These files check the type, make it, and lay it out again at a reload.
 | `m` | The module that declares. |
 | `d` | What the module stated. |
 | `desc` | The descriptor, in the scratch arena. |
+| `text` | The copy of the descriptor that the parse made, until the type keeps it. |
 | `name` | The name, copied. |
 | `bare` | Where the namespace ends in `name`: the colon. |
 | `print` | The fingerprint of the descriptor and of the kind. |
@@ -59,6 +60,7 @@ These files check the type, make it, and lay it out again at a reload.
 | Function | Source | Result |
 | --- | --- | --- |
 | `abi_hash_text` | `src/abi_stated.c` | The fingerprint of `n` bytes of text. |
+| `abi_is_same_layout` | `src/abi_layout.c` | Whether a declared type has the kind and the descriptor that a declaration states. |
 | `abi_is_listed` | `src/abi_names.c` | Whether a list of names holds a name. |
 | `abi_is_foreign` | `src/abi_names.c` | Whether a name is of another namespace than the module's. |
 | `abi_is_writable` | `src/abi_declare.c` | Whether a module may write a type. |

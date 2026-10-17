@@ -72,7 +72,7 @@ static int replace_moved(declaring_t *g)
 int abi_replace_type(declaring_t *g)
 {
     declared_type_t *c = find_named(g->m->b, g->name);
-    bool changed = c && c->fingerprint != g->print;
+    bool changed = c && !abi_is_same_layout(c, g);
 
     g->c = c;
     changed = changed || (c && abi_names_superseded(c));
