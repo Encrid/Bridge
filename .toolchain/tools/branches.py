@@ -215,7 +215,7 @@ class Probing:
 def dumped(command, root):
     done = subprocess.run(command, cwd=root, capture_output=True)
     errors = [line for line in done.stderr.decode('utf-8', 'replace').splitlines()
-              if ' error: ' in line and not line.endswith('error: FileNotFound')]
+              if ' error: ' in line and not line.endswith('FileNotFound')]
     if errors:
         die('the tree of %s cannot be read:\n%s' % (command[-1], '\n'.join(errors)))
     try:

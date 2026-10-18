@@ -66,7 +66,7 @@ If a line has a different number of bits than the probes of its file, it stops: 
 ## The syntax tree
 
 `dump` runs `zig cc` with `-fsyntax-only`, and with the other flags of the artifact.
-zig 0.16 then writes `error: FileNotFound`, because no object is made. `dumped` ignores only this error.
+zig then writes an error ending with `FileNotFound`, because no object is made. `dumped` ignores only such an error.
 If clang writes a different error, `dumped` stops: `the tree of <path> cannot be read:`, and the errors.
 If the output is not JSON, it stops: `the tree of <path> is not JSON`.
 
