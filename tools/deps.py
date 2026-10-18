@@ -84,14 +84,22 @@ def macho(data):
 def imports(path):
     data = path.read_bytes()
     if data[:2] == b'MZ':
+        system, read = 'windows', pe
         machine, = struct.unpack_from('<H', data, struct.unpack_from('<I', data, 0x3c)[0] + 4)
-        return 'windows', PROCESSORS[machine], pe(data)
-    if data[:4] == b'\x7fELF':
-        return 'linux', PROCESSORS[struct.unpack_from('<H', data, 18)[0]], elf(data)
-    return 'macos', PROCESSORS[struct.unpack_from('<I', data, 4)[0]], macho(data)
+    elif data[:4] == b'\x7fELF':
+        system, read = 'linux', elf
+        machine, = struct.unpack_from('<H', data, 18)
+    else:
+        system, read = 'macos', macho
+        machine, = struct.unpack_from('<I', data, 4)
+    if machine not in PROCESSORS:
+        sys.exit('deps.py: %s is for a processor that PROCESSORS does not map: 0x%x' % (path.as_posix(), machine))
+    return system, PROCESSORS[machine], read(data)
 
 
 def listed(kinds):
+    if not LIST.is_file():
+        sys.exit('deps.py: %s is not there' % LIST.relative_to(ROOT).as_posix())
     document = LIST.read_text(encoding='utf-8')
     block = re.search(r'^## The imports\n.*?^```text\n(.*?)^```', document, re.M | re.S)
     if not block:
@@ -111,8 +119,11 @@ def compare(asked, known, what):
 
 
 def main():
-    built = Path(sys.argv[1])
-    check = '--check' in sys.argv
+    folders = [argument for argument in sys.argv[1:] if argument != '--check']
+    if not folders:
+        sys.exit('deps.py: name the folder of a build')
+    built = Path(folders[0])
+    check = '--check' in sys.argv[1:]
     if built.name.endswith('-debug') and check:
         return print('a debug build is not what ships: its imports are not held to the list')
     found = [p for p in sorted(built.glob('bridge.*')) if p.suffix in ('.dll', '.so', '.dylib')]

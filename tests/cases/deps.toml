@@ -2,5 +2,59 @@
 name = "deps"
 alone = true
 run = ["{python}", "{root}/tools/deps.py", "{out}", "--check"]
-claims = { status = 0 }
+claims = { status = 0, has = [" imports: each is in the list, and each one in the list is imported"] }
 false = { run = ["{python}", "{root}/tools/deps.py", "{out}/backends", "--check"] }
+
+[[case]]
+name = "deps.py writes a line for each import without --check"
+run = ["{python}", "{root}/tools/deps.py", "{out}"]
+claims = { status = 0, matches = ["(?m)^bridge +\\S"], lacks = [" imports: each is in the list"] }
+false = { run = ["{python}", "{root}/tools/deps.py", "{out}", "--check"] }
+
+[[case]]
+name = "deps.py refuses a run with no folder"
+run = ["{python}", "{root}/tools/deps.py", "--check"]
+claims = { status = 1, line = ["deps.py: name the folder of a build"] }
+false = { run = ["{python}", "{root}/tools/deps.py", "--check", "{out}"] }
+
+[[case]]
+name = "deps.py refuses a folder with no library bridge"
+run = ["{python}", "{root}/tools/deps.py", "{case}"]
+claims = { status = 1, line = ["deps.py: no library bridge in {case}"] }
+false = { run = ["{python}", "{root}/tools/deps.py", "{out}"] }
+
+[[case]]
+name = "deps.py refuses a library of a processor that PROCESSORS does not map"
+run = ["{python}", "{root}/tools/deps.py", "{case}"]
+files = { "{case}/bridge.dylib" = "xxxxxxxx" }
+claims = { status = 1, line = ["deps.py: {case}/bridge.dylib is for a processor that PROCESSORS does not map: 0x78787878"] }
+false = { run = ["{python}", "{root}/tools/deps.py", "{out}"] }
+
+[[case]]
+name = "deps.py --check refuses a list that is not there"
+run = ["{python}", "{case}/tools/deps.py", "{out}", "--check"]
+folders = { "{case}/tools" = ["tools/deps.py"] }
+claims = { status = 1, line = ["deps.py: docs/intern/os/os.h.md is not there"] }
+false = { run = ["{python}", "{root}/tools/deps.py", "{out}", "--check"] }
+
+[[case]]
+name = "deps.py --check refuses a list with no block of text under The imports"
+run = ["{python}", "{case}/tools/deps.py", "{out}", "--check"]
+folders = { "{case}/tools" = ["tools/deps.py"] }
+files = { "{case}/docs/intern/os/os.h.md" = "# src/os/os.h\n" }
+claims = { status = 1, line = ["deps.py: docs/intern/os/os.h.md has no block of text under ## The imports"] }
+false = { run = ["{python}", "{root}/tools/deps.py", "{out}", "--check"] }
+
+[[case]]
+name = "deps.py --check refuses imports that differ from the list"
+run = ["{python}", "{case}/tools/deps.py", "{out}", "--check"]
+folders = { "{case}/tools" = ["tools/deps.py"] }
+files = { "{case}/docs/intern/os/os.h.md" = "## The imports\n\n```text\nevery nothing_imports_this\n```\n" }
+claims = { status = 1, has = [": nothing_imports_this is in the list, and nothing imports it", " is not in the list"], line = ["deps.py: the imports of the library and the list differ"] }
+false = { run = ["{python}", "{root}/tools/deps.py", "{out}", "--check"] }
+
+[[case]]
+name = "deps.py --check leaves a debug build unchecked"
+run = ["{python}", "{root}/tools/deps.py", "{case}/{target}-debug", "--check"]
+claims = { status = 0, line = ["a debug build is not what ships: its imports are not held to the list"] }
+false = { run = ["{python}", "{root}/tools/deps.py", "{case}/{target}", "--check"] }

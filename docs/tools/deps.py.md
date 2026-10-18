@@ -7,7 +7,8 @@ With `--check`, it compares them with the list of `docs/intern/os/os.h.md`, *The
 python tools/deps.py <folder> [--check]
 ```
 
-The first argument is the output of a build, for example `build/x86_64-windows-gnu`.
+The folder is the first argument that is not `--check`: the output of a build, for example
+`build/x86_64-windows-gnu`.
 `deps.py` reads the first of the files `bridge.dll`, `bridge.so` and `bridge.dylib` of that folder, by name.
 
 ## The imports of a library
@@ -21,7 +22,7 @@ The first argument is the output of a build, for example `build/x86_64-windows-g
 | Mach-O, of macOS | Each other value | Each undefined name of the symbol table, with its first `_` taken away. |
 
 The header of each format gives the type of the processor. `PROCESSORS` maps its number to `x86_64` or `aarch64`.
-`deps.py` reads a library of these 2 processors only.
+`deps.py` refuses a library of a different processor.
 
 ## Without --check
 
@@ -50,9 +51,19 @@ A folder whose name ends with `-debug` holds a debug build. `deps.py --check` do
 | `an import on <system>_<processor>: <name> is not in the list` | `--check` found an import that no row matches. |
 | `an import on <system>_<processor>: <row> is in the list, and nothing imports it` | `--check` found a row that no import matches. |
 | `deps.py: the imports of the library and the list differ` | `--check` wrote one of the 2 lines above. The status is 1. |
+| `deps.py: name the folder of a build` | No argument names a folder. The status is 1. |
 | `deps.py: no library bridge in <folder>` | The folder holds no library. The status is 1. |
-| `deps.py: docs/intern/os/os.h.md has no block of text under ## The imports` | The list is not there. The status is 1. |
+| `deps.py: <file> is for a processor that PROCESSORS does not map: 0x<number>` | The header names a different processor. The status is 1. |
+| `deps.py: docs/intern/os/os.h.md is not there` | `--check` found no file of the list. The status is 1. |
+| `deps.py: docs/intern/os/os.h.md has no block of text under ## The imports` | The file has no list. The status is 1. |
 | `a debug build is not what ships: its imports are not held to the list` | `--check` was given a debug build. The status is 0. |
+
+## Limits
+
+No case runs these branches.
+
+- An import by its number only. The built library of Bridge has none.
+- An address outside each section of a PE file. Only a broken library has one.
 
 ## Functions
 
