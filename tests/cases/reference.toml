@@ -1,0 +1,54 @@
+[[case]]
+name = "reference.py takes the target of this machine when --target is not given"
+run = ["{python}", "{root}/tools/reference.py", "--root", "{case}"]
+files = { "{case}/.toolchain/project.toml" = "[project]\nname = \"timed\"\n" }
+claims = { status = 1, line = ["reference.py: {case}/build/{target}/storage{exe} is not built: run python project.py build"] }
+false = { run = ["{python}", "{root}/tools/reference.py", "--root", "{case}", "--target", "{triple}"] }
+
+[[case]]
+name = "reference.py refuses a target that [targets] does not name"
+run = ["{python}", "{root}/tools/reference.py", "--root", "{case}", "--target", "{triple}"]
+files = { "{case}/.toolchain/project.toml" = "[project]\nname = \"timed\"\n" }
+claims = { status = 1, has = ["reference.py: no target {triple}; the targets: "] }
+false = { run = ["{python}", "{root}/tools/reference.py", "--root", "{case}"] }
+
+[[case]]
+name = "reference.py refuses a target that does not run on this machine"
+run = ["{python}", "{root}/tools/reference.py", "--root", "{case}", "--target", "nowhere"]
+files = { "{case}/.toolchain/project.toml" = "[project]\nname = \"timed\"\n\n[targets.nowhere]\nruns_on = []\n" }
+claims = { status = 1, line = ["reference.py: nowhere does not run here: build it, and test it where it runs"] }
+false = { run = ["{python}", "{root}/tools/reference.py", "--root", "{case}", "--target", "{target}"] }
+
+[[case]]
+name = "reference.py names a download that has the pinned sha256"
+run = ["{python}", "-c", "import sys\nfrom pathlib import Path\nsys.path.insert(0, sys.argv[1])\nimport reference\nurl = sys.argv[2] if '://' in sys.argv[2] else Path(sys.argv[2]).as_uri()\npath = Path(sys.argv[3])\ntry:\n    reference.downloaded(url, path, sys.argv[4])\nexcept SystemExit as stop:\n    print(stop)\nprint('file', path.exists(), 'part', path.with_name(path.name + '.part').exists())", "{root}/tools", "{case}/served.c", "{case}/got/served.c", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"]
+files = { "{case}/served.c" = "abc" }
+claims = { line = ["file True part False"], has = ["fetching file:"], files = { "{case}/got/served.c" = "abc" } }
+false = { files = { "{case}/served.c" = "abd" } }
+
+[[case]]
+name = "reference.py keeps no file of a download whose sha256 is not the pinned one"
+run = ["{python}", "-c", "import sys\nfrom pathlib import Path\nsys.path.insert(0, sys.argv[1])\nimport reference\nurl = sys.argv[2] if '://' in sys.argv[2] else Path(sys.argv[2]).as_uri()\npath = Path(sys.argv[3])\ntry:\n    reference.downloaded(url, path, sys.argv[4])\nexcept SystemExit as stop:\n    print(stop)\nprint('file', path.exists(), 'part', path.with_name(path.name + '.part').exists())", "{root}/tools", "{case}/served.c", "{case}/got/served.c", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"]
+files = { "{case}/served.c" = "abd" }
+claims = { line = ["file False part False"], has = ["reference.py: served.c is not the pinned file: its sha256 is "] }
+false = { files = { "{case}/served.c" = "abc" } }
+
+[[case]]
+name = "reference.py keeps no file of a download that fails"
+run = ["{python}", "-c", "import sys\nfrom pathlib import Path\nsys.path.insert(0, sys.argv[1])\nimport reference\nurl = sys.argv[2] if '://' in sys.argv[2] else Path(sys.argv[2]).as_uri()\npath = Path(sys.argv[3])\ntry:\n    reference.downloaded(url, path, sys.argv[4])\nexcept SystemExit as stop:\n    print(stop)\nprint('file', path.exists(), 'part', path.with_name(path.name + '.part').exists())", "{root}/tools", "http://127.0.0.1:{port}/served.c", "{case}/got/served.c", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"]
+claims = { line = ["file False part False"], has = ["reference.py: http://127.0.0.1:{port}/served.c did not download: "] }
+false = { run = ["{python}", "-c", "import sys\nfrom pathlib import Path\nsys.path.insert(0, sys.argv[1])\nimport reference\nurl = sys.argv[2] if '://' in sys.argv[2] else Path(sys.argv[2]).as_uri()\npath = Path(sys.argv[3])\ntry:\n    reference.downloaded(url, path, sys.argv[4])\nexcept SystemExit as stop:\n    print(stop)\nprint('file', path.exists(), 'part', path.with_name(path.name + '.part').exists())", "{root}/tools", "{case}/served.c", "{case}/got/served.c", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"], files = { "{case}/served.c" = "abc" } }
+
+[[case]]
+name = "reference.py keeps a pinned file whose sha256 is the pinned one"
+run = ["{python}", "-c", "import sys\nfrom pathlib import Path\nsys.path.insert(0, sys.argv[1])\nimport reference\nreference.PINNED = dict(x=(Path(sys.argv[2]).as_uri() + '/', dict([('served.c', sys.argv[4])])))\nout = Path(sys.argv[3])\ntry:\n    reference.fetched(out)\nexcept SystemExit as stop:\n    print(stop)\nheld = out / 'x' / 'served.c'\nprint('holds', held.read_text() if held.exists() else 'nothing')", "{root}/tools", "{case}/served", "{case}/out", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"]
+files = { "{case}/served/served.c" = "zzz", "{case}/out/x/served.c" = "abc" }
+claims = { line = ["holds abc"], lacks = ["fetching"] }
+false = { files = { "{case}/out/x/served.c" = "abd" } }
+
+[[case]]
+name = "reference.py downloads again a pinned file whose sha256 is not the pinned one"
+run = ["{python}", "-c", "import sys\nfrom pathlib import Path\nsys.path.insert(0, sys.argv[1])\nimport reference\nreference.PINNED = dict(x=(Path(sys.argv[2]).as_uri() + '/', dict([('served.c', sys.argv[4])])))\nout = Path(sys.argv[3])\ntry:\n    reference.fetched(out)\nexcept SystemExit as stop:\n    print(stop)\nheld = out / 'x' / 'served.c'\nprint('holds', held.read_text() if held.exists() else 'nothing')", "{root}/tools", "{case}/served", "{case}/out", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"]
+files = { "{case}/served/served.c" = "abc", "{case}/out/x/served.c" = "abd" }
+claims = { line = ["holds abc"], has = ["fetching file:"] }
+false = { files = { "{case}/served/served.c" = "abd" } }

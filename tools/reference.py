@@ -2,16 +2,25 @@
 #
 # Under the GNU Affero General Public License, version 3 only: see license.
 import argparse
-import shutil
 import subprocess
 import sys
 import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / '.toolchain' / 'tools'))
+
+import build
+import shared
+
 PINNED = {
-    'flecs': ('https://raw.githubusercontent.com/SanderMertens/flecs/v4.1.6/distr/', ['flecs.c', 'flecs.h']),
-    'entt': ('https://raw.githubusercontent.com/skypjack/entt/v4.0.0/single_include/entt/', ['entt.hpp']),
+    'flecs': ('https://raw.githubusercontent.com/SanderMertens/flecs/v4.1.6/distr/', {
+        'flecs.c': '6005392eb13c0f3c7abdecb2f85271e50934f63919afebf0bbe85f6dfc7320d6',
+        'flecs.h': '526036a5a41678e2a43a3cb835e9eaa70fd1993868b1978950c0d275752f69b1',
+    }),
+    'entt': ('https://raw.githubusercontent.com/skypjack/entt/v4.0.0/single_include/entt/', {
+        'entt.hpp': 'eedcb83fedffe640334ef69a0647625a186cf1daeb333b21b0a1445f01e89b6c',
+    }),
 }
 
 
@@ -22,24 +31,37 @@ def run(command, **more):
     return done.stdout
 
 
-def zig_path():
-    fetched = sorted(ROOT.glob('build/zig/*/zig.exe')) + sorted(ROOT.glob('build/zig/*/zig'))
-    return str(fetched[0]) if fetched else shutil.which('zig') or sys.exit('reference.py: zig is not there: run fetch')
+def downloaded(url, path, digest):
+    part = path.with_name(path.name + '.part')
+    path.parent.mkdir(parents=True, exist_ok=True)
+    print('fetching', url, flush=True)
+    try:
+        with urllib.request.urlopen(url) as got:
+            part.write_bytes(got.read())
+    except OSError as failure:
+        part.unlink(missing_ok=True)
+        sys.exit('reference.py: %s did not download: %s' % (url, failure))
+    found = shared.sha256(part.read_bytes())
+    if found != digest:
+        part.unlink()
+        sys.exit('reference.py: %s is not the pinned file: its sha256 is %s' % (path.name, found))
+    part.replace(path)
 
 
 def fetched(out):
     for name, (url, files) in PINNED.items():
-        where = out / name
-        where.mkdir(parents=True, exist_ok=True)
-        for file in files:
-            if not (where / file).exists():
-                print('fetching', url + file, flush=True)
-                urllib.request.urlretrieve(url + file, where / file)
+        for file, digest in files.items():
+            path = out / name / file
+            if path.is_file() and shared.sha256(path.read_bytes()) == digest:
+                continue
+            path.unlink(missing_ok=True)
+            downloaded(url + file, path, digest)
 
 
-def built(zig, target, out, exe):
-    flags = ['-target', target, '-O2', '-DNDEBUG']
-    windows = ['-lws2_32', '-ldbghelp'] if 'windows' in target else []
+def built(values, out):
+    zig, exe = values['zig'], values['exe']
+    flags = ['-target', values['target'], '-O2', '-DNDEBUG']
+    windows = ['-lws2_32', '-ldbghelp'] if values['system'] == 'windows' else []
     source = ROOT / 'tests' / 'reference'
     if not (out / 'flecs.o').exists():
         run([zig, 'cc', '-std=c23', *flags, '-c', out / 'flecs' / 'flecs.c', '-o', out / 'flecs.o'])
@@ -51,22 +73,24 @@ def built(zig, target, out, exe):
 
 def main():
     parser = argparse.ArgumentParser(description='Measure each storage layout beside flecs and EnTT.')
-    parser.add_argument('--target', default='x86_64-windows-gnu')
+    parser.add_argument('--root', type=Path, default=ROOT)
+    parser.add_argument('--target')
     parser.add_argument('--times', type=int, default=2)
     args = parser.parse_args()
-    out = ROOT / 'build' / 'reference'
-    exe = '.exe' if 'windows' in args.target else ''
-    ours = ROOT / 'build' / args.target / ('storage' + exe)
+    tree = argparse.Namespace(root=args.root.resolve(), target=args.target, debug=False, out=None, set=[])
+    _, values = build.prepared(tree, here=True)
+    ours = Path(values['out']) / ('storage' + values['exe'])
     if not ours.exists():
         sys.exit('reference.py: %s is not built: run python project.py build' % ours.as_posix())
+    out = ROOT / 'build' / 'reference'
     fetched(out)
-    built(zig_path(), args.target, out, exe)
+    built(values, out)
     for time in range(args.times):
         print('==== run %d' % (time + 1), flush=True)
         for what in ('measure', 'weigh', 'baseline'):
             print(run([ours, what], cwd=ours.parent), end='', flush=True)
         for name in ('flecs_ref', 'entt_ref', 'floor'):
-            print(run([out / (name + exe)]), end='', flush=True)
+            print(run([out / (name + values['exe'])]), end='', flush=True)
 
 
 if __name__ == '__main__':
