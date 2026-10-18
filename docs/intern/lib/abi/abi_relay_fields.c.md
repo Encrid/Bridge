@@ -1,0 +1,39 @@
+# src/lib/abi/abi_relay_fields.c
+
+This file matches the fields of a struct as it was, by name, to the fields of what it becomes.
+`docs/intern/lib/abi/abi_relay.c.md`, *What each change does*, gives the rules.
+
+## A field matched
+
+For each field of the struct as it was, in order:
+
+1. Name the field by its path: the type, then each field, joined by dots, for example `game:Body.at.z`.
+2. Find the field of that name in what the struct becomes. If there is none, record a loss.
+3. Refuse a field of another type: `docs/extern/bridge_abi.h.md`, *At a reload*.
+4. If the array is now shorter, record its end as a loss.
+5. If the field is a struct that this reload changed, match its fields, element by element.
+6. Else record a run: the elements that both have, from the old offset to the new one.
+
+What is new in the struct is in no run, so it stays zero.
+
+A field is of the type that it was if both of these are true:
+
+- It is of the same kind.
+- Where it names a declared type, it names that type, or the type that this reload made of it.
+
+A type that a field holds changes only at a reload of the module that declares both types: `docs/intern/lib/abi/abi_replace.c.md`.
+That type is declared first, and its own relay refuses a field of another type in it.
+For an enum or a bitmask, that relay also refuses another size: `docs/intern/lib/abi/abi_relay.c.md`.
+So a field that holds such a type has the same size, unless it is a struct.
+And the match of a struct inside compares the two layouts that the own relay accepted, so it refuses nothing.
+It still records the runs and the losses of the rows of the holder.
+
+## Functions
+
+| Function | Result |
+| --- | --- |
+| `find_field` | The field of a name in a struct, or nullptr. |
+| `is_same_type` | Whether a field is of the type that it was. |
+| `relay_structs` | Matches a field that is a struct this reload changed, element by element: the same rules, one level down. It refuses nothing. |
+| `relay_field` | Matches one field of a struct as it was. 1 with a refusal. |
+| `abi_relay_fields` | Matches the fields of a struct as it was to those of what it becomes. 1 with a refusal. |

@@ -159,16 +159,16 @@ host_resources = ["tests/host/host.rc"]
 [[artifact]]
 name = "bridge"
 kind = "library"
-sources = ["src/*.c", "src/os/{system}/*.c"]
-include = ["include", "src", "src/os"]
+sources = ["src/lib/**/*.c", "src/os/{system}/*.c"]
+include = ["include", "src/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
 defines = ["BRIDGE_BUILDING"]
 flags = ["{quiet}", "{hidden}", "{system_defines}", "{system_libraries}"]
 
 [[artifact]]
 name = "bridge"
 kind = "archive"
-sources = ["src/*.c", "src/os/{system}/*.c"]
-include = ["include", "src", "src/os"]
+sources = ["src/lib/**/*.c", "src/os/{system}/*.c"]
+include = ["include", "src/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
 defines = ["BRIDGE_BUILDING"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
@@ -176,8 +176,8 @@ flags = ["{quiet}", "{hidden}", "{system_defines}"]
 name = "counted"
 kind = "archive"
 test = true
-sources = ["src/*.c"]
-include = ["include", "src", "src/os"]
+sources = ["src/lib/**/*.c"]
+include = ["include", "src/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
 defines = ["malloc=counted_malloc", "calloc=counted_calloc", "realloc=counted_realloc", "free=counted_free", "os_reserve=counted_os_reserve"]
 flags = ["{quiet}", "{system_defines}"]
 
@@ -2601,8 +2601,8 @@ flags = ["{quiet}", "{hidden}", "{system_defines}"]
 name = "schema"
 kind = "program"
 test = true
-sources = ["tests/schema/*.c", "src/schema.c", "src/schema_*.c"]
-include = ["include", "src", "src/os"]
+sources = ["tests/schema/*.c", "src/lib/schema/*.c"]
+include = ["include", "src/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
 defines = ["BRIDGE_BUILDING"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 
@@ -2610,8 +2610,8 @@ flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 name = "storage"
 kind = "program"
 test = true
-sources = ["tests/storage/*.c", "src/*.c", "src/os/{system}/*.c"]
-include = ["include", "src", "src/os"]
+sources = ["tests/storage/*.c", "src/lib/**/*.c", "src/os/{system}/*.c"]
+include = ["include", "src/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
 defines = ["BRIDGE_BUILDING", "{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 
@@ -2620,7 +2620,7 @@ name = "storage-counted"
 kind = "program"
 test = true
 sources = ["tests/storage/*.c"]
-include = ["include", "src", "src/os"]
+include = ["include", "src/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
 defines = ["COUNTED", "{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 link = ["{out}/counted.a", "{out}/counted_os.a"]
