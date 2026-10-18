@@ -2053,6 +2053,18 @@ claims = { matches = ["the world has stopped: module 'view:sour@0\\.1\\.0' was s
 false = { run = ["{out}/host{exe}", "bridge_reload-share-from-none-taken"] }
 
 [[case]]
+name = "bridge_reload-a-tag-redeclared-keeps-the-same-layout"
+run = ["{out}/host{exe}", "bridge_reload-a-tag-redeclared-keeps-the-same-layout"]
+claims = { matches = ["game:ticker@0\\.1\\.0: loaded.*game:ticker@0\\.2\\.0: reloaded.*game:ticker@0\\.2\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-not-loaded-refused"] }
+
+[[case]]
+name = "bridge_reload-while-the-world-is-stopped-by-another-gives-1"
+run = ["{out}/host{exe}", "bridge_reload-while-the-world-is-stopped-by-another-gives-1"]
+claims = { matches = ["the world has stopped: module 'test:flaky@0\\.1\\.0'.*game:ticker@0\\.2\\.0: not reloaded.*game:ticker@0\\.1\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/host{exe}", "bridge_reload-reloaded"] }
+
+[[case]]
 name = "declare-two-descriptors-with-one-fingerprint-refused"
 run = ["{out}/host{exe}", "declare-two-descriptors-with-one-fingerprint-refused"]
 claims = { matches = ["st:collide@0.1.0: loaded.*module 'st:rival@0.1.0' did not load: type 'st:y_t' has another component layout here: fingerprint 581383d61aa6b58f, and it was declared with 581383d61aa6b58f.*alive"] }

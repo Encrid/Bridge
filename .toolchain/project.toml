@@ -2172,6 +2172,16 @@ defines = ["BRIDGE_ROWS_CHECKED", "STEP=10"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "ticker-tag"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/ticker.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "STEP=1", "TAG"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "ticker-wide"
 kind = "library"
 test = true

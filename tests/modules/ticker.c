@@ -29,6 +29,9 @@ static void register_tick(void)
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
 
     tick = BRIDGE_COMPONENT("game:Tick", tick_t, BRIDGE_DELETE, BRIDGE_TABLE);
+#ifdef TAG
+    BRIDGE_DECLARE_TAG("game:Flag", BRIDGE_DELETE, BRIDGE_TABLE);
+#endif
     terms[0].slot = tick;
     ticking = BRIDGE_ADD_SYSTEM("advance", "update", terms, 1, nullptr, 0,
         nullptr, 0);

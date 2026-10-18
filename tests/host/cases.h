@@ -372,6 +372,8 @@ void test_unload_nobody(host_t *h);
 void test_time_out_shutdown(host_t *h);
 void test_take_slot(host_t *h);
 void test_reload_ticker(host_t *h);
+void test_reload_tag(host_t *h);
+void test_reload_while_stopped(host_t *h);
 void test_grow_share(host_t *h);
 void test_repair(host_t *h);
 void test_repair_by_load(host_t *h);
