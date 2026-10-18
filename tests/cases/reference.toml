@@ -52,3 +52,122 @@ run = ["{python}", "-c", "import sys\nfrom pathlib import Path\nsys.path.insert(
 files = { "{case}/served/served.c" = "abc", "{case}/out/x/served.c" = "abd" }
 claims = { line = ["holds abc"], has = ["fetching file:"] }
 false = { files = { "{case}/served/served.c" = "abd" } }
+
+[[case]]
+name = "reference.py --compare takes a number before ns, us or ms as a time"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 ns 1.0 us 1.0 ms\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 2.0 ns 2.0 us 2.0 ms\n" }
+claims = { status = 0, line = ["slower: storage measure: x # ns # us # ms, row 1, number 1: 1.0 to 1.0, then 2.0 to 2.0", "3 of 3 times of Bridge are slower"] }
+false = { files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 KB 1.0 KB 1.0 KB\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 2.0 KB 2.0 KB 2.0 KB\n" } }
+
+[[case]]
+name = "reference.py --compare gives a number with no unit the unit of time before it"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 ns first 1.0\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 1.0 ns first 2.0\n" }
+claims = { status = 0, line = ["slower: storage measure: x # ns first #, row 1, number 2: 1.0 to 1.0, then 2.0 to 2.0", "1 of 2 times of Bridge are slower"] }
+false = { files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 KB first 1.0\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 1.0 KB first 2.0\n" } }
+
+[[case]]
+name = "reference.py --compare takes no number before the first unit of time as a time"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/old.txt" = "==== run 1\n==== storage measure\n100 x 1.0 ns\n", "{case}/new.txt" = "==== run 1\n==== storage measure\n200 x 1.0 ns\n" }
+claims = { status = 0, line = ["0 of 1 times of Bridge are slower"] }
+false = { files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 ns 100\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 1.0 ns 200\n" } }
+
+[[case]]
+name = "reference.py --compare takes no number in parentheses as a time"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 ns (0)\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 1.0 ns (1)\n" }
+claims = { status = 0, line = ["0 of 1 times of Bridge are slower"] }
+false = { files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 ns 0\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 1.0 ns 1\n" } }
+
+[[case]]
+name = "reference.py --compare takes no count in parentheses in the middle of a row as a time"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 us (12800 of 204800): 1.0 us\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 1.0 us (25600 of 204800): 1.0 us\n" }
+claims = { status = 0, line = ["0 of 2 times of Bridge are slower"] }
+false = { files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 us 12800 of 204800: 1.0 us\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 1.0 us 25600 of 204800: 1.0 us\n" } }
+
+[[case]]
+name = "reference.py --compare takes a unit before a comma or a semicolon"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 us, 1.0 ns;\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 2.0 us, 2.0 ns;\n" }
+claims = { status = 0, line = ["2 of 2 times of Bridge are slower"] }
+false = { files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 KB, 1.0 KB;\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 2.0 KB, 2.0 KB;\n" } }
+
+[[case]]
+name = "reference.py --compare keeps 2 rows of one text apart"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 ns\nx 5.0 ns\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 1.0 ns\nx 9.0 ns\n" }
+claims = { status = 0, line = ["slower: storage measure: x # ns, row 2, number 1: 5.0 to 5.0, then 9.0 to 9.0"] }
+false = { files = { "{case}/new.txt" = "==== run 1\n==== storage measure\nx 9.0 ns\nx 5.0 ns\n" } }
+
+[[case]]
+name = "reference.py --compare keeps the key of a number that gains a digit"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx   9.9 ns\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx  10.1 ns\n" }
+claims = { status = 0, line = ["slower: storage measure: x # ns, row 1, number 1: 9.9 to 9.9, then 10.1 to 10.1"] }
+false = { files = { "{case}/new.txt" = "==== run 1\n==== storage measure\nx   9.8 ns\n" } }
+
+[[case]]
+name = "reference.py --compare starts the count of the rows again in each run"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 ns\n==== run 2\n==== storage measure\nx 1.2 ns\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 1.5 ns\n==== run 2\n==== storage measure\nx 1.6 ns\n" }
+claims = { status = 0, line = ["slower: storage measure: x # ns, row 1, number 1: 1.0 to 1.2, then 1.5 to 1.6"] }
+false = { files = { "{case}/new.txt" = "==== run 1\n==== storage measure\nx 1.5 ns\n==== run 2\n==== storage measure\nx 1.1 ns\n" } }
+
+[[case]]
+name = "reference.py --compare finds no time slower by exactly the larger spread"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 0.3 ns\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 0.5 ns\n==== run 2\n==== storage measure\nx 0.7 ns\n" }
+claims = { status = 0, line = ["0 of 1 times of Bridge are slower"] }
+false = { files = { "{case}/new.txt" = "==== run 1\n==== storage measure\nx 0.6 ns\n==== run 2\n==== storage measure\nx 0.7 ns\n" } }
+
+[[case]]
+name = "reference.py --compare counts a time only if both pairs are slower"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt", "--compare", "{case}/old2.txt", "{case}/new2.txt"]
+files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 ns\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 2.0 ns\n", "{case}/old2.txt" = "==== run 1\n==== storage measure\nx 1.0 ns\n", "{case}/new2.txt" = "==== run 1\n==== storage measure\nx 1.0 ns\n" }
+claims = { status = 0, line = ["0 of 1 times of Bridge are slower"] }
+false = { files = { "{case}/new2.txt" = "==== run 1\n==== storage measure\nx 2.0 ns\n" } }
+
+[[case]]
+name = "reference.py --compare writes a slower time of floor as a control row"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/old.txt" = "==== run 1\n==== floor\nx 1.0 ns\n", "{case}/new.txt" = "==== run 1\n==== floor\nx 2.0 ns\n" }
+claims = { status = 0, line = ["control: floor: x # ns, row 1, number 1: 1.0 to 1.0, then 2.0 to 2.0", "1 of 1 times of the control rows are slower"] }
+false = { files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 ns\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 2.0 ns\n" } }
+
+[[case]]
+name = "reference.py --compare writes a row that one tree lacks"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 ns\ny 1.0 ns\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 1.0 ns\n" }
+claims = { status = 0, line = ["only in one tree: storage measure: y # ns, row 1"] }
+false = { files = { "{case}/new.txt" = "==== run 1\n==== storage measure\nx 1.0 ns\ny 1.0 ns\n" } }
+
+[[case]]
+name = "reference.py --compare refuses a file that is not there"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/new.txt" = "==== run 1\n==== storage measure\nx 1.0 ns\n" }
+claims = { status = 1, line = ["reference.py: {case}/old.txt is not there"] }
+false = { files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 ns\n" } }
+
+[[case]]
+name = "reference.py --compare refuses a file with no run"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/old.txt" = "x 1.0 ns\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 1.0 ns\n" }
+claims = { status = 1, line = ["reference.py: {case}/old.txt holds no run"] }
+false = { files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 ns\n" } }
+
+[[case]]
+name = "reference.py --compare counts no row before the first command of a run"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/old.txt" = "==== run 1\nx 1.0 ns\n==== storage measure\ny 1.0 ns\n", "{case}/new.txt" = "==== run 1\nx 2.0 ns\n==== storage measure\ny 1.0 ns\n" }
+claims = { status = 0, line = ["0 of 1 times of Bridge are slower"] }
+false = { files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nx 1.0 ns\ny 1.0 ns\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nx 2.0 ns\ny 1.0 ns\n" } }
+
+[[case]]
+name = "reference.py --compare lists the times in the order of the first file"
+run = ["{python}", "{root}/tools/reference.py", "--compare", "{case}/old.txt", "{case}/new.txt"]
+files = { "{case}/old.txt" = "==== run 1\n==== storage measure\nb 1.0 ns 1.0 ns\na 1.0 ns\n", "{case}/new.txt" = "==== run 1\n==== storage measure\nb 2.0 ns 2.0 ns\na 2.0 ns\n" }
+claims = { status = 0, order = ["slower: storage measure: b # ns # ns, row 1, number 1: 1.0 to 1.0, then 2.0 to 2.0", "slower: storage measure: b # ns # ns, row 1, number 2: 1.0 to 1.0, then 2.0 to 2.0", "slower: storage measure: a # ns, row 1, number 1: 1.0 to 1.0, then 2.0 to 2.0"] }
+false = { files = { "{case}/old.txt" = "==== run 1\n==== storage measure\na 1.0 ns\nb 1.0 ns 1.0 ns\n" } }

@@ -2,9 +2,11 @@
 #
 # Under the GNU Affero General Public License, version 3 only: see license.
 import argparse
+import re
 import subprocess
 import sys
 import urllib.request
+from decimal import Decimal
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -22,6 +24,11 @@ PINNED = {
         'entt.hpp': 'eedcb83fedffe640334ef69a0647625a186cf1daeb333b21b0a1445f01e89b6c',
     }),
 }
+STORAGE = ('measure', 'weigh', 'baseline')
+CONTROLS = ('flecs_ref', 'entt_ref', 'floor')
+UNITS = ('ns', 'us', 'ms')
+NUMBER = re.compile(r'\d+(?:\.\d+)?')
+ORDER = {}
 
 
 def run(command, **more):
@@ -71,26 +78,157 @@ def built(values, out):
     run([zig, 'cc', '-std=c23', *flags, source / 'floor.c', '-o', out / ('floor' + exe)])
 
 
+def prepared(root, target):
+    tree = argparse.Namespace(root=Path(root).resolve(), target=target, debug=False, out=None, set=[])
+    _, values = build.prepared(tree, here=True)
+    return values, Path(values['out']) / ('storage' + values['exe'])
+
+
+def measured(number, ours, out, exe):
+    parts = ['==== run %d\n' % number]
+    for what in STORAGE:
+        parts += ['==== storage %s\n' % what, run([ours, what], cwd=ours.parent)]
+    for name in CONTROLS:
+        parts += ['==== %s\n' % name, run([out / (name + exe)])]
+    return ''.join(parts)
+
+
+def timed(row):
+    words = row.split()
+    text, times, unit, place, at = [], [], None, 0, 0
+    for i, word in enumerate(words):
+        start = row.index(word, at)
+        at = start + len(word)
+        core = word.lstrip('(').rstrip('),;:')
+        if NUMBER.fullmatch(core):
+            place += 1
+            text.append(word.replace(core, '#', 1))
+            begin = start + len(word) - len(word.lstrip('('))
+            inside = row.rfind('(', 0, begin) > row.rfind(')', 0, begin)
+            following = words[i + 1].rstrip(',;') if i + 1 < len(words) else ''
+            if (following in UNITS or unit) and not inside:
+                times.append((place, Decimal(core)))
+        else:
+            text.append(word)
+        if word.rstrip(',;') in UNITS:
+            unit = word.rstrip(',;')
+    return ' '.join(text), times
+
+
+def runs(path):
+    if not path.is_file():
+        sys.exit('reference.py: %s is not there' % path.as_posix())
+    found, command, counts = [], None, {}
+    for row in path.read_text(encoding='utf-8').splitlines():
+        if row.startswith('==== run '):
+            found.append({})
+            command = None
+        elif row.startswith('===='):
+            command, counts = row[4:].strip(), {}
+        elif found and command and row.strip():
+            text, times = timed(row)
+            count = counts.get(text, 0)
+            counts[text] = count + 1
+            for place, value in times:
+                found[-1][(command, text, place, count)] = value
+                ORDER.setdefault((command, text, place, count), len(ORDER))
+    if not found:
+        sys.exit('reference.py: %s holds no run' % path.as_posix())
+    return found
+
+
+def compared(old, new):
+    every = [set(found) for found in old + new]
+    both = set.intersection(*every)
+    slower = {}
+    for key in both:
+        before = [found[key] for found in old]
+        after = [found[key] for found in new]
+        spread = max(max(before) - min(before), max(after) - min(after))
+        if min(after) - min(before) > spread:
+            slower[key] = (min(before), max(before), min(after), max(after))
+    return both, set.union(*every) - both, slower
+
+
+def reported(pairs):
+    results = [compared(runs(Path(old)), runs(Path(new))) for old, new in pairs]
+    both = set.intersection(*(result[0] for result in results))
+    lone = set.union(*(result[1] for result in results))
+    slower = set.intersection(*(set(result[2]) for result in results))
+    lines = []
+    for key in sorted(slower, key=ORDER.get):
+        command, text, place, count = key
+        kind = 'control' if command in CONTROLS else 'slower'
+        for _, _, ranges in results:
+            lines.append('%s: %s: %s, row %d, number %d: %s to %s, then %s to %s'
+                         % ((kind, command, text, count + 1, place) + ranges[key]))
+    rows = {}
+    for command, text, place, count in lone:
+        rows.setdefault((command, text, count), ORDER[(command, text, place, count)])
+    for command, text, count in sorted(rows, key=rows.get):
+        lines.append('only in one tree: %s: %s, row %d' % (command, text, count + 1))
+    for name, controls in (('Bridge', False), ('the control rows', True)):
+        keys = [key for key in both if (key[0] in CONTROLS) == controls]
+        lines.append('%d of %d times of %s are slower' % (len([key for key in keys if key in slower]), len(keys), name))
+    return lines
+
+
+def paired(old, new, target):
+    timing = ROOT / 'build' / 'timing'
+    timing.mkdir(parents=True, exist_ok=True)
+    run(['git', '-C', ROOT, 'worktree', 'prune'])
+    ours = {}
+    for side, commit in (('old', old), ('new', new)):
+        tree = timing / side
+        if (tree / '.git').is_file():
+            run(['git', '-C', tree, 'checkout', '--quiet', '--detach', commit])
+        else:
+            run(['git', '-C', ROOT, 'worktree', 'add', '--quiet', '--detach', tree, commit])
+        run([sys.executable, ROOT / '.toolchain' / 'tools' / 'build.py', '--root', tree])
+        values, ours[side] = prepared(tree, target)
+    out = ROOT / 'build' / 'reference'
+    fetched(out)
+    built(values, out)
+    for side in ('old', 'new'):
+        measured(0, ours[side], out, values['exe'])
+    texts = {'old1': [], 'new1': [], 'old2': [], 'new2': []}
+    for number in (1, 2, 3):
+        texts['old1'].append(measured(number, ours['old'], out, values['exe']))
+        texts['new1'].append(measured(number, ours['new'], out, values['exe']))
+    for number in (1, 2, 3):
+        texts['new2'].append(measured(number, ours['new'], out, values['exe']))
+        texts['old2'].append(measured(number, ours['old'], out, values['exe']))
+    folder = timing / 'runs' / ('%s-%s' % (old, new))
+    folder.mkdir(parents=True, exist_ok=True)
+    for name, parts in texts.items():
+        (folder / (name + '.txt')).write_text(''.join(parts), encoding='utf-8')
+    lines = reported([(folder / 'old1.txt', folder / 'new1.txt'), (folder / 'old2.txt', folder / 'new2.txt')])
+    (folder / 'report.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+    print('\n'.join(lines))
+
+
 def main():
-    parser = argparse.ArgumentParser(description='Measure each storage layout beside flecs and EnTT.')
+    parser = argparse.ArgumentParser(description='Measure the storage of Bridge beside flecs and EnTT.')
     parser.add_argument('--root', type=Path, default=ROOT)
     parser.add_argument('--target')
     parser.add_argument('--times', type=int, default=2)
+    parser.add_argument('--compare', nargs=2, action='append', metavar=('OLD', 'NEW'))
+    parser.add_argument('--pair', nargs=2, metavar=('OLD', 'NEW'))
     args = parser.parse_args()
-    tree = argparse.Namespace(root=args.root.resolve(), target=args.target, debug=False, out=None, set=[])
-    _, values = build.prepared(tree, here=True)
-    ours = Path(values['out']) / ('storage' + values['exe'])
+    if args.compare:
+        print('\n'.join(reported(args.compare)))
+        return
+    if args.pair:
+        paired(args.pair[0], args.pair[1], args.target)
+        return
+    values, ours = prepared(args.root, args.target)
     if not ours.exists():
         sys.exit('reference.py: %s is not built: run python project.py build' % ours.as_posix())
     out = ROOT / 'build' / 'reference'
     fetched(out)
     built(values, out)
     for time in range(args.times):
-        print('==== run %d' % (time + 1), flush=True)
-        for what in ('measure', 'weigh', 'baseline'):
-            print(run([ours, what], cwd=ours.parent), end='', flush=True)
-        for name in ('flecs_ref', 'entt_ref', 'floor'):
-            print(run([out / (name + values['exe'])]), end='', flush=True)
+        print(measured(time + 1, ours, out, values['exe']), end='', flush=True)
 
 
 if __name__ == '__main__':
