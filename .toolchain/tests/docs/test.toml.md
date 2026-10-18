@@ -48,4 +48,6 @@ The other cases run `test.py` on a project in `{case}`. Their `folders` copy the
 | rounds of the cases | `test --rounds 2` writes `round 2 of 2`. | No `--rounds`. |
 | the cases of a part of a name | `test -k second` runs `second case` of `two.toml`, and not `first case`. | `-k first`. |
 | a part of no name | `test -k nothing` stops: `no case has nothing in its name`. | `-k second`. |
+| the groups of a part | `test --part alpha` runs the group `alpha/passes`, and not `beta/passes`. | `--part beta`. |
+| a part of no group | `test --part nothing` stops: `no case group is in the part nothing`. | `--part alpha`. |
 | a project with no copies | The `.toolchain/project.toml` of the project has no `[test] copies`: `test` stops. | The project gives `copies = 1`. |

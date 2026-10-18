@@ -23,6 +23,12 @@ claims = { status = 0, line = ["{case}/out/built-{target}.zip", "package.txt", "
 false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out"] }
 
 [[case]]
+name = "a build of a part skips the artifacts of other parts"
+run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out", "--part", "main"]
+claims = { status = 0, has = ["greeter"], lacks = ["stamped.txt"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out"] }
+
+[[case]]
 name = "a variable that [variables] does not have"
 run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/copy", "--out", "{case}/out", "--set", "nowhere=1"]
 claims = { status_not = 0, has = ["--set nowhere=1: [variables] has no nowhere"] }

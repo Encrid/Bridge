@@ -213,6 +213,7 @@ An artifact is a file that the build makes, for example a program, a library or 
 | `target` | Optional. The target of the artifact, if it is not the target of the build. |
 | `variants` | Optional. The variants. Each variant has a `name`, and can have the other keys and `unstamped`. |
 | `test` | Optional. `true` for an artifact that only the tests use. The build makes it, and `package.txt` does not list it. Thus `pack` does not put it into the zip. |
+| `part` | Optional. The name of a part of the project. A build or a test with `--part <name>` acts on the untagged artifacts and on the artifacts of the part `<name>`. Without `--part`, they act on every artifact. |
 
 A variant is a copy of the artifact with a different name and some different keys.
 A variant with `unstamped = true` does not do the `section` steps.

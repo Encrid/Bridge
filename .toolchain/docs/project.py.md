@@ -47,6 +47,7 @@ If the command is not in the table, `project.py` stops with the message
 | `--debug` | Replaces each variable that `[debug]` names with the value of `[debug]`. |
 | `--out <folder>` | Puts the output into this folder. The default is the folder `build` of the project. |
 | `--set <name>=<value>` | Sets a key of `[variables]` to the value. You can use this option more than one time. |
+| `--part <name>` | Builds the base and the part `<name>`, and with `test` runs only the groups of that part. It is an option of `build`, `pack` and `test`. |
 | `--pack` | Puts the package into a zip file. The command `pack` gives this option to `.toolchain/tools/build.py`. |
 | `--break` | Runs the false variant of each case. It is an option of `test` only. |
 | `-k <part>` | Runs only the cases whose name contains `<part>`. It is an option of `test` only. |

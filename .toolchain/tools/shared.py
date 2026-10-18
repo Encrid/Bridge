@@ -130,6 +130,7 @@ def arguments(*valued, **flags):
     ap = argparse.ArgumentParser(prog=Path(sys.argv[0]).name)
     ap.add_argument('--root', type=Path, default=HERE)
     ap.add_argument('--target')
+    ap.add_argument('--part')
     ap.add_argument('--debug', action='store_true')
     ap.add_argument('--out', type=Path)
     ap.add_argument('--set', action='append', default=[], metavar='NAME=VALUE')

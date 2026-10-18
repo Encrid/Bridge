@@ -33,17 +33,18 @@
 
 With `--branches`, `main` runs `measured`, and nothing else. Else `main` does these steps:
 
-1. It builds with `build`, which stops if the target does not run on this machine. With `--toolchain`, it only calls `prepared` of `build.py`, and builds nothing.
+1. It builds with `build`, which stops if the target does not run on this machine. With `--toolchain`, it only calls `prepared` of `build.py`, and builds nothing. With `--part <name>`, `build` builds only the base and the artifacts of the part.
 2. It stops if an artifact is not linked: `the cases need what is linked: <names>`.
 3. It reads the groups of `tests/cases`, or of `.toolchain/tests/cases` with `--toolchain`.
 4. If there is no case, it writes `no case: <folder> holds no case`, and ends.
 5. With `-k`, it keeps only the cases whose name contains the part.
-6. It runs the groups, one time for each round of `--rounds`. Before each round of 2 rounds or more, it writes `round <n> of <rounds>`.
-7. With no `--break`, `--toolchain` or `-k`, it checks the messages of the code with `checked` of `said.py`.
+6. With `--part <name>`, it keeps only the groups of the part `<name>`. It stops if no group is in the part: `no case group is in the part <name>`.
+7. It runs the groups, one time for each round of `--rounds`. Before each round of 2 rounds or more, it writes `round <n> of <rounds>`.
+8. With no `--break`, `--toolchain`, `-k` or `--part`, it checks the messages of the code with `checked` of `said.py`.
 
 The number of copies is `--copies`, or `[test] copies`. If neither gives it, `main` stops: `.toolchain/project.toml: write [test] copies`.
 
-`main` stops at step 6 if a case failed. Thus step 7 runs only if each case passed.
+`main` stops at step 7 if a case failed. Thus step 8 runs only if each case passed.
 `.toolchain/docs/said.py.md` gives the checks of step 7.
 
 The message of step 1 is `<target> does not run here: build it, and test it where it runs`.
@@ -52,6 +53,7 @@ The message of step 1 is `<target> does not run here: build it, and test it wher
 
 `groups_of` reads each file `**.toml` of its folder, in the order of the paths.
 The name of a group is the path of its file in `tests/cases`, without `.toml`.
+A group is in a part if the name of the group is the part, or begins with the part and a slash.
 A file with no case gives no group.
 `groups_of` stops if a case:
 

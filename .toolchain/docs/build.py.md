@@ -20,7 +20,7 @@ With `--pack`, it also puts the package into a zip file.
 | `artifacts(config)` | Gives each artifact, and after it each of its variants. |
 | `prepared(args, here)` | Gives the configuration and the variables, as steps 1 to 8 of *build* tell. |
 | `ready(args, here)` | Does the steps 1 to 10 of *build*, and gives the configuration and the variables. |
-| `made(config, values, tree)` | Builds each artifact and writes `package.txt`: step 11 of *build*. It gives the name and the files of each artifact. |
+| `made(config, values, tree, part)` | Builds each artifact and writes `package.txt`: step 11 of *build*. It gives the name and the files of each artifact. With a part, it skips a tagged artifact of a different part. |
 | `build(args, here)` | Does all the steps of a build. With `here`, it stops if the target does not run here. |
 | `main()` | Runs the commands `build` and `pack`. |
 
@@ -39,6 +39,12 @@ With `--pack`, it also puts the package into a zip file.
 9. It checks that each source is fetched.
 10. It finds the tools, and takes the dependencies.
 11. It builds each artifact, and writes `package.txt`.
+
+With `--part <name>`, step 11 builds only the untagged artifacts and the artifacts of the part `<name>`.
+It skips an artifact whose `part` is set and is not `<name>`.
+An untagged artifact has no `part`, so every part builds it, and the links of the part resolve.
+Without `--part`, step 11 builds every artifact.
+`.toolchain/docs/project.toml.md`, *[[artifact]]*, tells the key `part`.
 
 The caches of zig are the variables `ZIG_GLOBAL_CACHE_DIR` and `ZIG_LOCAL_CACHE_DIR` of the environment.
 The commands of the steps and of the cases get them too.

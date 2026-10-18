@@ -186,6 +186,20 @@ claims = { status_not = 0, has = ["no case has nothing in its name"] }
 false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out", "-k", "second"] }
 
 [[case]]
+name = "the groups of a part"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out", "--part", "alpha"]
+folders = { "{case}/.toolchain" = [".toolchain/tests/data/test/project.toml"], "{case}/tests/cases/alpha" = [".toolchain/tests/data/test/passes.toml"], "{case}/tests/cases/beta" = [".toolchain/tests/data/test/passes.toml"] }
+claims = { status = 0, has = ["alpha/passes"], lacks = ["beta/passes"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out", "--part", "beta"] }
+
+[[case]]
+name = "a part of no group"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out", "--part", "nothing"]
+folders = { "{case}/.toolchain" = [".toolchain/tests/data/test/project.toml"], "{case}/tests/cases/alpha" = [".toolchain/tests/data/test/passes.toml"] }
+claims = { status_not = 0, has = ["no case group is in the part nothing"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out", "--part", "alpha"] }
+
+[[case]]
 name = "a project with no copies"
 run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out"]
 folders = { "{case}/.toolchain" = [".toolchain/tests/data/test/nocopies/project.toml"], "{case}/tests/cases" = [".toolchain/tests/data/test/passes.toml"] }

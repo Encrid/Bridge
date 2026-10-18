@@ -142,9 +142,11 @@ def ready(args, here=False):
     return config, values
 
 
-def made(config, values, tree=None):
+def made(config, values, tree=None, part=None):
     done, shipped = [], []
     for artifact in artifacts(config):
+        if part is not None and artifact.get('part') not in (None, part):
+            continue
         done.append(built(config, values, artifact, tree))
         shipped += [] if artifact.get('test') else done[-1][1]
     packaged(config, values, shipped)
@@ -153,7 +155,7 @@ def made(config, values, tree=None):
 
 def build(args, here=False):
     config, values = ready(args, here)
-    return config, values, made(config, values)
+    return config, values, made(config, values, part=args.part)
 
 
 def main():

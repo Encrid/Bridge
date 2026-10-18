@@ -6,7 +6,7 @@ The cases of the options, of the report and of the files of a project run a shor
 
 | Project | Content |
 | --- | --- |
-| `built` | The library `greet`, the program `greeter`, the archive `greet_static` (with the flag `-DGREETING`), the program `greeter_static` that links it, and the artifact `stamped` with its variant `plain`. |
+| `built` | The library `greet`, the program `greeter`, the archive `greet_static` (with the flag `-DGREETING`), the program `greeter_static` that links it, and the artifact `stamped` of the part `extra`, with its variant `plain`. |
 | `copy` | The artifact `copy.txt` of the kind `file`. The variables `tool`, `source` and `linked` give its tool, its source and its link. |
 | `twice` | `[variables] language`, a key that `.toolchain/toolchain.toml` also gives. |
 | `builtin` | `[variables] root`, the name of a variable that the tools give. |
@@ -31,6 +31,7 @@ The variant `plain` is unstamped.
 | a variant without its section | With `--set said=first,second`, `build` stops: `plain.txt does not hold 'first,second'`. | No `--set`. |
 | a build for debugging | With `--debug`, `package.txt` is in `{case}/out/{target}-debug`. | No `--debug`. |
 | a package in a zip | `build --pack` writes the path of the zip, and the names of the files in it. `greeter_static` has `test = true`, thus no name of the zip starts with `greeter_static/`. | No `--pack`. |
+| a build of a part skips the artifacts of other parts | `build --part main` builds the untagged `greeter`, and not `stamped.txt` of the part `extra`. | No `--part`, thus `stamped.txt` too. |
 | a variable that [variables] does not have | `--set nowhere=1` stops `build`: `--set nowhere=1: [variables] has no nowhere`. | No `--set`. |
 | a key in project.toml and in toolchain.toml | `build` on `twice` stops: `project.toml states variables.language, and toolchain.toml states it too`. | `build` on `copy`. |
 | a built-in variable in [variables] | `build` on `builtin` stops: `[variables] names a built-in variable or a key of a target: root`. | `build` on `copy`. |

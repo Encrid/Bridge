@@ -72,7 +72,7 @@ A list value in a text needs a separator: `{<name>:<separator>}`. `expand` joins
 
 ## The options
 
-`arguments` reads the options `--root`, `--target`, `--debug`, `--out` and `--set`.
+`arguments` reads the options `--root`, `--target`, `--part`, `--debug`, `--out` and `--set`.
 A tool adds its own options:
 
 - `arguments('--commits')` adds the option `--commits <value>`. Its value is in `args.commits`, or `None` if the option is not given.
