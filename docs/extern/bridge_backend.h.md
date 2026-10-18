@@ -255,3 +255,17 @@ Angle brackets mark a part that changes: `docs/extern/bridge.h.md`, *Messages*.
 - `backend library '<path>' is of backend ABI <number>, and this is <number>`
 
 Bridge puts each text that a backend writes in `err` into a record of its own, after the name of the backend or the module.
+
+## The native backend
+
+Bridge ships one backend, `native`, in `src/backends/native`. It runs each module as a native shared library.
+It opens the library of a module from the path that the host gave, and finds each export by its name, as `bridge_<name>`.
+The native backend keeps none of the limits, and runs only a module that is trusted.
+
+It writes one of these reasons in `err` when it refuses. Angle brackets mark a part that changes:
+
+- `it knows no setting '<key>'`
+- `the native SDK has no entry '<name>'`
+- `no exported function '<name>'`
+- `this backend opens a module's library by its path, and was handed none`
+- `cannot open the library '<path>'`

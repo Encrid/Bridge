@@ -1,0 +1,245 @@
+[[case]]
+name = "BRIDGE_NATIVE-system-reads-and-writes"
+run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"]
+claims = { matches = ["game:mover@0.1.0/tally: native tally 2 1000.*native tally 2 1000.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_ATTACH-seen-by-an-observer"] }
+
+[[case]]
+name = "BRIDGE_NATIVE_COMPONENT-declared"
+run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_COMPONENT-declared"]
+claims = { matches = ["game:mover@0.1.0/tally: native tally 2 1000.*native tally 2 1000.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_ATTACH-seen-by-an-observer"] }
+
+[[case]]
+name = "BRIDGE_NATIVE_ADD_SYSTEM-registered-and-run"
+run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_ADD_SYSTEM-registered-and-run"]
+claims = { matches = ["game:mover@0.1.0/tally: native tally 2 1000.*native tally 2 1000.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_ATTACH-seen-by-an-observer"] }
+
+[[case]]
+name = "bridge_native_get_query-the-query-of-a-system"
+run = ["{out}/native-host{exe}", "bridge_native_get_query-the-query-of-a-system"]
+claims = { matches = ["game:mover@0.1.0/tally: native tally 2 1000.*native tally 2 1000.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_ATTACH-seen-by-an-observer"] }
+
+[[case]]
+name = "bridge_native_get_span-two-tables-walked"
+run = ["{out}/native-host{exe}", "bridge_native_get_span-two-tables-walked"]
+claims = { matches = ["game:mover@0.1.0/tally: native tally 2 1000.*native tally 2 1000.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_ATTACH-seen-by-an-observer"] }
+
+[[case]]
+name = "bridge_native_log-a-line-with-two-numbers"
+run = ["{out}/native-host{exe}", "bridge_native_log-a-line-with-two-numbers"]
+claims = { matches = ["game:mover@0.1.0/tally: native tally 2 1000.*native tally 2 1000.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_ATTACH-seen-by-an-observer"] }
+
+[[case]]
+name = "BRIDGE_NATIVE_ATTACH-seen-by-an-observer"
+run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_ATTACH-seen-by-an-observer"]
+claims = { matches = ["b2 game:setter@0.1.0/mark: marked.*b2 view:watcher@0.1.0/seen: seen 1 77.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "bridge_native_lend-a-value-lent-to-attach"
+run = ["{out}/native-host{exe}", "bridge_native_lend-a-value-lent-to-attach"]
+claims = { matches = ["seen 1 77.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "BRIDGE_NATIVE_PUT_CHANGES-changes-stated-and-made"
+run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_PUT_CHANGES-changes-stated-and-made"]
+claims = { matches = ["seen 1 9.*alive"], lacks = ["seen 1 5"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "bridge_api_t-entry-from-a-foreign-thread-refused"
+run = ["{out}/native-host{exe}", "bridge_api_t-entry-from-a-foreign-thread-refused"]
+claims = { matches = ["test:foreign@0.1.0/reach: an id from another thread, and from this one 0 1.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "call-an-entry-refused-fails-the-invocation"
+run = ["{out}/native-host{exe}", "call-an-entry-refused-fails-the-invocation"]
+claims = { matches = ["test:flood@0.1.0/flood: system 'flood' failed: spawn: its spawns of 1024 between two barriers are used up.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "backend_get_capabilities-untrusted-refused"
+run = ["{out}/native-host{exe}", "backend_get_capabilities-untrusted-refused"]
+claims = { matches = ["module 'game:mover@0.1.0' is refused: it is not trusted, and backend 'native' runs only modules that are.*alive"], lacks = ["cannot open"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "backend_get_capabilities-work-limit-refused"
+run = ["{out}/native-host{exe}", "backend_get_capabilities-work-limit-refused"]
+claims = { matches = ["is refused: it states work_limit, which backend 'native' cannot keep.*alive"], lacks = ["cannot open"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "backend_get_capabilities-memory-limit-refused"
+run = ["{out}/native-host{exe}", "backend_get_capabilities-memory-limit-refused"]
+claims = { matches = ["is refused: it states memory_limit, which backend 'native' cannot keep.*alive"], lacks = ["cannot open"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "backend_get_capabilities-timeout-refused"
+run = ["{out}/native-host{exe}", "backend_get_capabilities-timeout-refused"]
+claims = { matches = ["is refused: it states shutdown_timeout, which backend 'native' cannot keep.*alive"], lacks = ["cannot open"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "module_compile-no-path-refused"
+run = ["{out}/native-host{exe}", "module_compile-no-path-refused"]
+claims = { matches = ["did not load: this backend opens a module's library by its path, and was handed none.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "module_compile-library-cannot-open"
+run = ["{out}/native-host{exe}", "module_compile-library-cannot-open"]
+claims = { matches = ["did not load: cannot open the library 'no-such-library'.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "backend_create-a-setting-refused"
+run = ["{out}/native-host{exe}", "backend_create-a-setting-refused"]
+claims = { matches = ["backend 'native' would not start: it knows no setting 'cache'.*bridge_create refused.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "bridge_native_get_single-the-one-row"
+run = ["{out}/native-host{exe}", "bridge_native_get_single-the-one-row"]
+claims = { matches = ["it has no value 0 0.*it has a value: gravity, wind 10 1.*wind 20 2.*wind 20 77.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "bridge_native_get_bits-read-and-turned"
+run = ["{out}/native-host{exe}", "bridge_native_get_bits-read-and-turned"]
+claims = { matches = ["by words: rows, and of them on 6 6.*flicker.*rows, and of them on 6 3.*look_b: by rows: on, and their sum 3 39.*find: by id: alive, and of them on 6 3.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "BRIDGE_NATIVE_DECLARE_TAG-carried-with-no-bytes"
+run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_DECLARE_TAG-carried-with-no-bytes"]
+claims = { matches = ["look: M, in tables: rows that carry it, and spans whose base says carried 3 1.*P, by its index: entities whose cell says carried 2 0.*R, direct-indexed: entities given it 3 0.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "bridge_native_get_cells-reached-by-an-id"
+run = ["{out}/native-host{exe}", "bridge_native_get_cells-reached-by-an-id"]
+claims = { matches = ["look_b: the table walked: rows, and of them given D 6 3.*near: by id: alive, and of them given D 6 3.*near: by id: the sum of D 306 0.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "bridge_native_get_sparse_index-reached-by-an-id"
+run = ["{out}/native-host{exe}", "bridge_native_get_sparse_index-reached-by-an-id"]
+claims = { matches = ["look: the set walked: spans, rows 1 3.*the sum of its values 306 0.*look_b: the table walked: rows, and of them in the set 6 3.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "BRIDGE_NATIVE_DECLARE-an-enum-a-struct-names"
+run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_DECLARE-an-enum-a-struct-names"]
+claims = { matches = ["st:store@0.1.0: loaded.*look: values, and the sum of a 3 3003.*alive"], lacks = ["not loaded"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "bridge_native_get_list-triggers-of-an-observer"
+run = ["{out}/native-host{exe}", "bridge_native_get_list-triggers-of-an-observer"]
+claims = { matches = ["b2 game:setter@0.1.0/mark: marked.*b2 view:watcher@0.1.0/seen: seen 1 77.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "BRIDGE_NATIVE_OBSERVER-registered-and-told"
+run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_OBSERVER-registered-and-told"]
+claims = { matches = ["b2 game:setter@0.1.0/mark: marked.*b2 view:watcher@0.1.0/seen: seen 1 77.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "bridge_native_get_header-read-through-a-pointer"
+run = ["{out}/native-host{exe}", "bridge_native_get_header-read-through-a-pointer"]
+claims = { matches = ["b2 game:setter@0.1.0/mark: marked.*b2 view:watcher@0.1.0/seen: seen 1 77.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "BRIDGE_NATIVE_STATE-a-statement-put-in-scratch"
+run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_STATE-a-statement-put-in-scratch"]
+claims = { matches = ["game:mover@0.1.0/tally: native tally 2 1000.*native tally 2 1000.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_ATTACH-seen-by-an-observer"] }
+
+[[case]]
+name = "bridge_native_put-bytes-copied-into-scratch"
+run = ["{out}/native-host{exe}", "bridge_native_put-bytes-copied-into-scratch"]
+claims = { matches = ["game:mover@0.1.0/tally: native tally 2 1000.*native tally 2 1000.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_ATTACH-seen-by-an-observer"] }
+
+[[case]]
+name = "bridge_line_t-a-line-with-its-two-numbers"
+run = ["{out}/native-host{exe}", "bridge_line_t-a-line-with-its-two-numbers"]
+claims = { matches = ["game:mover@0.1.0/tally: native tally 2 1000.*native tally 2 1000.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_ATTACH-seen-by-an-observer"] }
+
+[[case]]
+name = "declare-two-components-declared"
+run = ["{out}/native-host{exe}", "declare-two-components-declared"]
+claims = { matches = ["game:mover@0.1.0/tally: native tally 2 1000.*native tally 2 1000.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_ATTACH-seen-by-an-observer"] }
+
+[[case]]
+name = "add_system-registered-and-run"
+run = ["{out}/native-host{exe}", "add_system-registered-and-run"]
+claims = { matches = ["game:mover@0.1.0/tally: native tally 2 1000.*native tally 2 1000.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_ATTACH-seen-by-an-observer"] }
+
+[[case]]
+name = "spawn-a-thousand-made-at-init"
+run = ["{out}/native-host{exe}", "spawn-a-thousand-made-at-init"]
+claims = { matches = ["game:mover@0.1.0/tally: native tally 2 1000.*native tally 2 1000.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE_ATTACH-seen-by-an-observer"] }
+
+[[case]]
+name = "observe-told-of-an-attach"
+run = ["{out}/native-host{exe}", "observe-told-of-an-attach"]
+claims = { matches = ["b2 game:setter@0.1.0/mark: marked.*b2 view:watcher@0.1.0/seen: seen 1 77.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "attach-a-value-given-again"
+run = ["{out}/native-host{exe}", "attach-a-value-given-again"]
+claims = { matches = ["value_b.*heard_d: heard of D: entity, events 3 2.*near: by id: the sum of D 1104 0.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "detach-a-component-taken"
+run = ["{out}/native-host{exe}", "detach-a-component-taken"]
+claims = { matches = ["detach_b_half.*heard_d: heard of D: entity, events 1 4.*rows, and of them given D 6 2.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "destroy-two-entities-gone"
+run = ["{out}/native-host{exe}", "destroy-two-entities-gone"]
+claims = { matches = ["destroy_half.*rows, and of them given D 4 1.*near: by id: alive, and of them given D 4 1.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "alloc-bytes-kept-from-init"
+run = ["{out}/native-host{exe}", "alloc-bytes-kept-from-init"]
+claims = { matches = ["say: kept 1 42.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "instance_get_func-no-such-export-refused"
+run = ["{out}/native-host{exe}", "instance_get_func-no-such-export-refused"]
+claims = { matches = ["module 'test:noinit@0.1.0' did not load: no exported function 'bridge_init'.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "test:cover-the-sdk-guards"
+run = ["{out}/native-host{exe}", "test:cover-the-sdk-guards"]
+claims = { matches = ["test:cover@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
+
+[[case]]
+name = "define_func-an-entry-the-abi-has-not-refused"
+run = ["{out}/native-direct{exe}", "define_func-an-entry-the-abi-has-not-refused"]
+claims = { matches = ["an entry the SDK has not is refused: the native SDK has no entry 'teleport'"] }
+false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }

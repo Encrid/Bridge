@@ -117,6 +117,23 @@ paths = [
     "STRESS2_PATH=\"{out}/built/stress2{library}\"",
     "STRESS3_PATH=\"{out}/built/stress3{library}\"",
     "STRESS4_PATH=\"{out}/built/stress4{library}\"",
+    "NATIVE_PATH=\"{out}/backends/bridge_native{library}\"",
+    "NMOVER_PATH=\"{out}/built/nmover{library}\"",
+    "NFLOOD_PATH=\"{out}/built/nflood{library}\"",
+    "NFOREIGN_PATH=\"{out}/built/nforeign{library}\"",
+    "NSETTER_PATH=\"{out}/built/nsetter{library}\"",
+    "NWATCHER_PATH=\"{out}/built/nwatcher{library}\"",
+    "NSTAMP5_PATH=\"{out}/built/nstamp5{library}\"",
+    "NSTAMP9_PATH=\"{out}/built/nstamp9{library}\"",
+    "NSINGLE_PATH=\"{out}/built/nsingle{library}\"",
+    "NTOGGLE_PATH=\"{out}/built/ntoggle{library}\"",
+    "NTAG_PATH=\"{out}/built/ntag{library}\"",
+    "NDIRECT_PATH=\"{out}/built/ndirect{library}\"",
+    "NSPARSE_PATH=\"{out}/built/nsparse{library}\"",
+    "NLAYOUT0_PATH=\"{out}/built/nlayout0{library}\"",
+    "NALLOC_PATH=\"{out}/built/nalloc{library}\"",
+    "NNOINIT_PATH=\"{out}/built/nnoinit{library}\"",
+    "NCOVER_PATH=\"{out}/built/ncover{library}\"",
     "BUILT_SUFFIX=\"{library}\"",
 ]
 
@@ -2644,6 +2661,199 @@ include = ["include", "tests/support"]
 defines = ["{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{host_resources}"]
 link = ["{out}/bridge.a"]
+
+[[artifact]]
+name = "bridge_native"
+kind = "library"
+part = "native"
+folder = "backends"
+sources = ["src/backends/native/*.c", "src/os/{system}/*.c"]
+include = ["include", "src/backends/native", "src/backends/native/sdk", "src/os"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "native-host"
+kind = "program"
+test = true
+part = "native"
+sources = ["tests/backends/native/host/*.c", "tests/backends/native/support/host*.c"]
+include = ["include", "src/os", "tests/backends/native/host", "tests/backends/native/support"]
+defines = ["{paths}"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+link = ["{out}/bridge{library}"]
+
+[[artifact]]
+name = "native-direct"
+kind = "program"
+test = true
+part = "native"
+sources = ["tests/backends/native/direct/*.c", "src/os/{system}/*.c"]
+include = ["include", "src/os", "tests/backends/native/direct"]
+defines = ["{paths}"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "nmover"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/nmover.c", "tests/backends/native/modules/nidle.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "nflood"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/nflood.c", "tests/backends/native/modules/nidle.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "nforeign"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/nforeign.c", "tests/backends/native/modules/nidle.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "nsetter"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/nsetter.c", "tests/backends/native/modules/nidle.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "nwatcher"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/nwatcher.c", "tests/backends/native/modules/nidle.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "nstamp5"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/nstamp.c", "tests/backends/native/modules/nidle.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+defines = ["VALUE=5", 'PHASE="update"']
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "nstamp9"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/nstamp.c", "tests/backends/native/modules/nidle.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+defines = ["VALUE=9", 'PHASE="update"']
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "nsingle"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/nsingle/*.c", "tests/backends/native/modules/nidle.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "ntoggle"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/ntoggle/*.c", "tests/backends/native/modules/nidle.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "ntag"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/ntag/*.c", "tests/backends/native/modules/nidle.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "ndirect"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/ndirect/*.c", "tests/backends/native/modules/nidle.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "nsparse"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/nsparse/*.c", "tests/backends/native/modules/nidle.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "nlayout0"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/nlayout/*.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+defines = ["V=0", "KEPT=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "nalloc"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/nalloc.c", "tests/backends/native/modules/nidle.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "nnoinit"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/nnoinit.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "ncover"
+kind = "library"
+test = true
+part = "native"
+folder = "built"
+sources = ["tests/backends/native/modules/ncover.c", "tests/backends/native/modules/nidle.c"]
+include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [check]
 guides = ["timings.md"]
