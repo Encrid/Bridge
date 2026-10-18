@@ -17,4 +17,5 @@ An anonymous mapping holds zeros, so a committed byte is zero until a write.
 | Function | Result |
 | --- | --- |
 | `os_reserve` | Maps the range, and commits the first `commit` bytes. Each caller commits more than 0. Gives `nullptr` on failure, with nothing left mapped. |
+| `os_commit` | Opens the first `bytes` of the range to reading and writing with `mprotect`. Gives what `mprotect` gives: 0 on success. |
 | `os_release` | Unmaps all `reserve` bytes of the range with `munmap`. |

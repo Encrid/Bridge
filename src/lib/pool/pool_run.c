@@ -37,7 +37,7 @@ static void end_run(pool_t *p)
     uint32_t left = 1;
 
     while (left) {
-        os_event_wait(p->done);
+        os_event_wait(p->done, OS_FOREVER);
         os_mutex_lock(p->lock);
         left = p->left;
         os_mutex_unlock(p->lock);

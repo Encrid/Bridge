@@ -18,6 +18,11 @@ void *os_reserve(size_t reserve, size_t commit)
     return (base);
 }
 
+int os_commit(void *base, size_t bytes)
+{
+    return (!VirtualAlloc(base, bytes, MEM_COMMIT, PAGE_READWRITE));
+}
+
 void os_release(void *base, [[maybe_unused]] size_t reserve)
 {
     VirtualFree(base, 0, MEM_RELEASE);

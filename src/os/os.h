@@ -15,8 +15,11 @@ typedef struct os_event os_event_t;
 typedef void (*os_thread_fn_t)(void *arg);
 
 constexpr uint64_t OS_SECOND = 1'000'000'000;
+constexpr uint64_t OS_FOREVER = UINT64_MAX;
 
 [[nodiscard]] void *os_reserve(size_t reserve, size_t commit);
+
+[[nodiscard]] int os_commit(void *base, size_t bytes);
 
 void os_release(void *base, size_t reserve);
 
@@ -48,6 +51,6 @@ void os_event_free(os_event_t *e);
 
 void os_event_set(os_event_t *e);
 
-void os_event_wait(os_event_t *e);
+void os_event_wait(os_event_t *e, uint64_t nanos);
 
 #endif

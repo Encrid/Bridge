@@ -21,6 +21,11 @@ void *os_reserve(size_t reserve, size_t commit)
     return (base);
 }
 
+int os_commit(void *base, size_t bytes)
+{
+    return (mprotect(base, bytes, PROT_READ | PROT_WRITE));
+}
+
 void os_release(void *base, size_t reserve)
 {
     munmap(base, reserve);

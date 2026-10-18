@@ -152,6 +152,7 @@ Each constant is a `constexpr uint64_t`.
 | Constant | Content |
 | --- | --- |
 | `OS_SECOND` | `1'000'000'000`: the nanoseconds in a second. |
+| `OS_FOREVER` | `UINT64_MAX`: a wait of this many nanoseconds has no time limit. |
 
 ## Types
 
@@ -179,6 +180,7 @@ Each function that can fail is `[[nodiscard]]`: the caller must use its result.
 | Function | Result |
 | --- | --- |
 | `os_reserve` | Reserves `reserve` bytes of address space, and makes the first `commit` bytes readable, writable and zero. The rest faults when touched, which a backend that enforces bounds by a fault needs after a block. Gives `nullptr` on failure. |
+| `os_commit` | Makes the first `bytes` of a reservation readable and writable. A backend grows a module's memory with it, up to the reservation. Gives 0 on success. |
 | `os_release` | Gives back all of a reservation. Each caller passes a base that `os_reserve` gave. |
 | `os_lib_open` | Opens a shared library, or gives `nullptr`. For a path, the loader looks there for the library and for what it needs, since a backend brings its runtime beside itself. The search of a bare name is in `docs/extern/bridge.h.md`, *bridge_backend_t*. |
 | `os_lib_get_symbol` | Gives where a library has what it exports as `name`, or `nullptr`. |
@@ -194,4 +196,4 @@ Each function that can fail is `[[nodiscard]]`: the caller must use its result.
 | `os_event_create` | Makes an event that one thread sets and another waits for. A set before the wait is not lost, and a wait consumes it. Gives `nullptr` on failure. |
 | `os_event_free` | Frees an event that no thread waits for. A null `e` does nothing. |
 | `os_event_set` | Sets an event: one wait, now or later, returns for it. |
-| `os_event_wait` | Waits until the event is set, and consumes the set. A wait has no time limit: no caller needs one. |
+| `os_event_wait` | Waits until the event is set or `nanos` nanoseconds pass, and consumes a set. With `OS_FOREVER` it has no time limit. The core waits with `OS_FOREVER`; a backend watchdog waits with a deadline. |

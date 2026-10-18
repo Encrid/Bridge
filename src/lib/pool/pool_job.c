@@ -46,9 +46,9 @@ void pool_work(void *arg)
 {
     pool_worker_t *w = arg;
 
-    os_event_wait(w->wake);
+    os_event_wait(w->wake, OS_FOREVER);
     while (!w->p->quit) {
         pool_run_taken(w->p, 0);
-        os_event_wait(w->wake);
+        os_event_wait(w->wake, OS_FOREVER);
     }
 }
