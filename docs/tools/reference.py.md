@@ -143,7 +143,7 @@ The output of the builds stays out of the report. A failed command stops the too
 
 ## Limits
 
-No case runs these branches.
+No case runs these branches. The step of `docs/contributing/timings.md` runs them.
 
 - The download of the pinned files from their addresses. A case does not use the network.
 - The run of the 6 commands, with its lines `====` and `--times`. The controls need the pinned files.

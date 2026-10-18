@@ -42,6 +42,7 @@ The three layers are a host, Bridge and the modules. A module runs on a backend,
 | `docs/contributing/coding_style.md` | How to write the code. |
 | `docs/contributing/documentation_style.md` | How to write the documents. |
 | `docs/contributing/tests.md` | How to write the tests. |
+| `docs/contributing/timings.md` | How to time a refactor commit and a perf commit. |
 | `docs/contributing/commits.md` | How to write a commit. |
 | `docs/contributing/pull_request.md` | How to write a pull request. |
 | `docs/contributing/agreement.md` | The agreement `cla.md`, which each contributor signs. |
