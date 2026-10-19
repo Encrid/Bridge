@@ -1,0 +1,1859 @@
+[[case]]
+name = "adopt"
+run = ["{out}/wasm-adopt{exe}"]
+claims = { status = 0 }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_load-loaded"
+run = ["{out}/wasm-host{exe}", "bridge_load-loaded"]
+claims = { matches = ["test:ok@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_NO_LIMIT-stated-for-every-limit"
+run = ["{out}/wasm-host{exe}", "BRIDGE_NO_LIMIT-stated-for-every-limit"]
+claims = { matches = ["test:ok@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_load-memory-with-a-data-segment"
+run = ["{out}/wasm-host{exe}", "bridge_load-memory-with-a-data-segment"]
+claims = { matches = ["test:image@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_load-init-trapped"
+run = ["{out}/wasm-host{exe}", "bridge_load-init-trapped"]
+claims = { matches = ["module 'test:oob@0.1.0' did not load: its init trapped: out of bounds memory access.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.init_timeout-init-interrupted"
+run = ["{out}/wasm-host{exe}", "module_config.init_timeout-init-interrupted"]
+claims = { matches = ["module 'test:spin@0.1.0' did not load: its init trapped: interrupt.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.memory_limit-growth-refused"
+run = ["{out}/wasm-host{exe}", "module_config.memory_limit-growth-refused"]
+claims = { matches = ["module 'test:grow@0.1.0' did not load: its init answered 7.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.memory_limit-memory-larger-at-start"
+run = ["{out}/wasm-host{exe}", "module_config.memory_limit-memory-larger-at-start"]
+claims = { matches = ["module 'test:big@0.1.0' did not load: cannot instantiate.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "instance_get_func-export-taking-an-argument-refused"
+run = ["{out}/wasm-host{exe}", "instance_get_func-export-taking-an-argument-refused"]
+claims = { matches = ["module 'test:shape@0.1.0' did not load: its export 'init' is not .. -> i32.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "instance_get_func-export-answering-64-bits-refused"
+run = ["{out}/wasm-host{exe}", "instance_get_func-export-answering-64-bits-refused"]
+claims = { matches = ["module 'test:shape64@0.1.0' did not load: its export 'init' is not .. -> i32.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_load-no-init-export"
+run = ["{out}/wasm-host{exe}", "bridge_load-no-init-export"]
+claims = { matches = ["module 'test:noinit@0.1.0' did not load: no exported function 'init'.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.abi-another-refused"
+run = ["{out}/wasm-host{exe}", "module_config.abi-another-refused"]
+claims = { matches = ["module 'test:ok@0.1.0' is refused: it wants ABI 2 and this is ABI 1.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "artifact.backend-not-configured-refused"
+run = ["{out}/wasm-host{exe}", "artifact.backend-not-configured-refused"]
+claims = { matches = ["module 'test:ok@0.1.0' is refused: no backend named 'native'.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.log_level-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.log_level-unset-refused"]
+claims = { matches = ["module 'test:ok@0.1.0' is refused: log_level is unset.*alive"], lacks = [": loaded"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.memory_limit-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.memory_limit-unset-refused"]
+claims = { matches = ["module 'test:ok@0.1.0' is refused: memory_limit is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_NONE-for-a-limit-refused"
+run = ["{out}/wasm-host{exe}", "BRIDGE_NONE-for-a-limit-refused"]
+claims = { matches = ["module 'test:ok@0.1.0' is refused: spawns is -1, which is neither an amount nor BRIDGE_NONE.*module 'test:ok@0.1.0' is refused: work_limit is -2, which is neither a limit nor BRIDGE_NO_LIMIT.*alive"], lacks = [": loaded"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "config.abi-another-refused"
+run = ["{out}/wasm-host{exe}", "config.abi-another-refused"]
+claims = { matches = ["the host is of host ABI 2, and this is 1.*bridge_create refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "config.abi-unset-refused"
+run = ["{out}/wasm-host{exe}", "config.abi-unset-refused"]
+claims = { matches = ["abi is unset.*bridge_create refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_UNSET-flag-refused"
+run = ["{out}/wasm-host{exe}", "BRIDGE_UNSET-flag-refused"]
+claims = { matches = ["module 'test:ok@0.1.0' is refused: pinned is unset.*module 'test:ok@0.1.0' is refused: trusted is 3, which is neither BRIDGE_TRUE nor BRIDGE_FALSE.*alive"], lacks = [": loaded"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.memory_limit-negative-refused"
+run = ["{out}/wasm-host{exe}", "module_config.memory_limit-negative-refused"]
+claims = { matches = ["module 'test:ok@0.1.0' is refused: memory_limit is -7, which is neither a limit nor BRIDGE_NO_LIMIT.*alive"], lacks = [": loaded"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.on_error-fail-stops-and-skip-does-not"
+run = ["{out}/wasm-host{exe}", "module_config.on_error-fail-stops-and-skip-does-not"]
+claims = { matches = ["test:ok@0.1.0: loaded.*the world has stopped: module 'test:oob@0.1.0' failed and its on_error is fail.*test:ok@0.1.0: not loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "backend.library-cannot-open-refused"
+run = ["{out}/wasm-host{exe}", "backend.library-cannot-open-refused"]
+claims = { matches = ["backend 'wasm': cannot open backend library 'no-such-backend-library'.*bridge_create refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_create-no-sink-refused"
+run = ["{out}/wasm-host{exe}", "bridge_create-no-sink-refused"]
+claims = { matches = ["refused: no sink.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_ROW-no-call-in-the-loop"
+run = ["{wasm_dis}", "{out}/wasm/mover.wasm", "{features}"]
+claims = { matches = ["\\(module"], lacks = ["acc_"] }
+false = { run = ["{wasm_dis}", "{out}/obj/mover.raw.wasm", "{features}"] }
+
+[[case]]
+name = "module_config.read-another-namespace-read"
+run = ["{out}/wasm-host{exe}", "module_config.read-another-namespace-read"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_get_span-one-table-walked"
+run = ["{out}/wasm-host{exe}", "bridge_get_span-one-table-walked"]
+claims = { matches = ["view:reader@0.1.0/sum: saw 1 500.*game:mover@0.1.0/count: moved 2 1000.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "record.level-info-with-its-two-numbers"
+run = ["{out}/wasm-host{exe}", "record.level-info-with-its-two-numbers"]
+claims = { matches = ["record.6. view:reader@0.1.0/sum: sum 250500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_get_ref-own-entities-followed"
+run = ["{out}/wasm-host{exe}", "bridge_get_ref-own-entities-followed"]
+claims = { matches = ["mirror 100 0.*mirror 100 0.*mirror 100 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "declare-storage-unset-refused"
+run = ["{out}/wasm-host{exe}", "declare-storage-unset-refused"]
+claims = { matches = ["module 'game:kept@0.1.0' did not load: type 'game:Position': its storage layout is unset.*module 'game:kept@0.1.0' did not load: type 'game:Position' is stated as a sparse set here, and it was declared as a table. It is also declared by 'game:mover@0.1.0'.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_DIRECT_INDEXED-reached-from-rows"
+run = ["{out}/wasm-host{exe}", "BRIDGE_DIRECT_INDEXED-reached-from-rows"]
+claims = { matches = ["game:aim@0.1.0/reached: aims 10 5.*game:aim@0.1.0/reached: aimed 20 0.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_TOGGLE-counted-on-and-off"
+run = ["{out}/wasm-host{exe}", "BRIDGE_TOGGLE-counted-on-and-off"]
+claims = { matches = ["game:shield@0.1.0/count: shields 10 10.*game:shield@0.1.0/count: strength 45 0.*game:shield@0.1.0/count: shields 10 6.*game:shield@0.1.0/count: strength 27 0.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_SPARSE_SET-walked-and-reached"
+run = ["{out}/wasm-host{exe}", "BRIDGE_SPARSE_SET-walked-and-reached"]
+claims = { matches = ["game:hit@0.1.0/walked: hits 4 18.*game:hit@0.1.0/reached: bodies 10 4.*game:hit@0.1.0/reached: reached 18 0.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "declare-another-layout-refused"
+run = ["{out}/wasm-host{exe}", "declare-another-layout-refused"]
+claims = { matches = ["module 'game:fp@0.1.0' did not load: type 'game:Position' has another component layout here: fingerprint [0-9a-f]+, and it was declared with [0-9a-f]+. It is also declared by 'game:mover@0.1.0'.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "declare-ungranted-namespace-refused"
+run = ["{out}/wasm-host{exe}", "declare-ungranted-namespace-refused"]
+claims = { matches = ["module 'view:reader@0.1.0' did not load: it may not declare 'game:Position': that is another namespace's, and no grant names it.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "add_system-unknown-operator-refused"
+run = ["{out}/wasm-host{exe}", "add_system-unknown-operator-refused"]
+claims = { matches = ["module 'game:badterm@0.1.0' did not load: term 0 of system 'any': its operator is 4, and there are three.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_lend-scratch-given-back"
+run = ["{out}/wasm-host{exe}", "bridge_lend-scratch-given-back"]
+claims = { matches = ["game:mover@0.1.0: loaded.*moved.*alive"], lacks = ["not loaded"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.work_limit-spinning-system-ended"
+run = ["{out}/wasm-host{exe}", "module_config.work_limit-spinning-system-ended"]
+claims = { matches = ["test:spin@0.1.0/forever: system 'forever' failed: trapped: all fuel consumed.*still here.*all fuel consumed.*still here.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.spawns-used-up"
+run = ["{out}/wasm-host{exe}", "module_config.spawns-used-up"]
+claims = { matches = ["system 'flood' failed: spawn: its spawns of 3000 between two barriers are used up.*system 'flood' failed: spawn: .budget. entities of 4096 is reached.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.log_ring-full-lines-dropped"
+run = ["{out}/wasm-host{exe}", "module_config.log_ring-full-lines-dropped"]
+claims = { matches = ["line 11 0.*test:chatty@0.1.0/-: 88 log lines were dropped: its ring holds 12.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.spans-too-small-refused"
+run = ["{out}/wasm-host{exe}", "module_config.spans-too-small-refused"]
+claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.columns-used-up-changes-not-applied"
+run = ["{out}/wasm-host{exe}", "budget.columns-used-up-changes-not-applied"]
+claims = { matches = ["module 'game:mover@0.1.0': .budget. columns of 4096 bytes is used up. Not applied, of the changes it asked: 1244 .*moved 1 256.*alive"], lacks = ["has stopped"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_run_phase-undeclared-phase-refused"
+run = ["{out}/wasm-host{exe}", "bridge_run_phase-undeclared-phase-refused"]
+claims = { matches = ["phase 'render' is not one the deployment declared.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "config.phases-none-refused"
+run = ["{out}/wasm-host{exe}", "config.phases-none-refused"]
+claims = { matches = ["the deployment declares no phase.*bridge_create refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.tables-unset-refused"
+run = ["{out}/wasm-host{exe}", "budget.tables-unset-refused"]
+claims = { matches = [".budget. tables is unset.*bridge_create refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.types-unset-refused"
+run = ["{out}/wasm-host{exe}", "budget.types-unset-refused"]
+claims = { matches = [".budget. types is unset.*bridge_create refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.systems-unset-refused"
+run = ["{out}/wasm-host{exe}", "budget.systems-unset-refused"]
+claims = { matches = [".budget. systems is unset.*bridge_create refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.types-reached-refused"
+run = ["{out}/wasm-host{exe}", "budget.types-reached-refused"]
+claims = { matches = ["module 'game:mover@0.1.0' did not load: type 'game:Marked' is one more than .budget. types of 1 .*not loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.systems-reached-refused"
+run = ["{out}/wasm-host{exe}", "budget.systems-reached-refused"]
+claims = { matches = ["module 'game:mover@0.1.0' did not load: it registers one more than .budget. systems of 1 .*not loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.log_level-no-severity-refused"
+run = ["{out}/wasm-host{exe}", "module_config.log_level-no-severity-refused"]
+claims = { matches = ["module 'game:mover@0.1.0' is refused: its log_level of 8 is not one it can be, which is 1 to 7.*not loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.log_level-warnings-drop-info"
+run = ["{out}/wasm-host{exe}", "module_config.log_level-warnings-drop-info"]
+claims = { matches = ["game:mover@0.1.0: loaded\\s+alive"], lacks = ["moved"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.terms-unset-refused"
+run = ["{out}/wasm-host{exe}", "budget.terms-unset-refused"]
+claims = { matches = [".budget. terms is unset.*bridge_create refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.terms-exceeded-refused"
+run = ["{out}/wasm-host{exe}", "budget.terms-exceeded-refused"]
+claims = { matches = ["module 'view:reader@0.1.0' did not load: a system asks for 2 terms, which is more than .budget. terms of 1 .*not loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.columns-unset-refused"
+run = ["{out}/wasm-host{exe}", "budget.columns-unset-refused"]
+claims = { matches = [".budget. columns is unset.*bridge_create refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.entities-beyond-32-bits-refused"
+run = ["{out}/wasm-host{exe}", "budget.entities-beyond-32-bits-refused"]
+claims = { matches = [".budget. entities of 1099511627776 is more than an offset of 32 bits can reach.*bridge_create refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_create-budget-sum-beyond-32-bits-refused"
+run = ["{out}/wasm-host{exe}", "bridge_create-budget-sum-beyond-32-bits-refused"]
+claims = { matches = [".budget. cannot be satisfied: the shared memory would be [0-9]+ bytes and an offset into it is 32 bits.*bridge_create refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.scratch-private-beyond-32-bits-refused"
+run = ["{out}/wasm-host{exe}", "module_config.scratch-private-beyond-32-bits-refused"]
+claims = { matches = ["module 'game:mover@0.1.0' is refused: its scratch of 4294967040, log_ring of [0-9]+ and spans of 4096 bytes come to more than an offset of 32 bits can reach.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_ROW-checked-and-unchecked-timed"
+run = ["{out}/wasm-host{exe}", "BRIDGE_ROW-checked-and-unchecked-timed"]
+claims = { matches = ["rows-unchecked  no limit  [0-9.]+ ns a row.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "config.order-mover-before-halver"
+run = ["{out}/wasm-host{exe}", "config.order-mover-before-halver"]
+claims = { matches = ["sum 125250 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "config.order-halver-before-mover"
+run = ["{out}/wasm-host{exe}", "config.order-halver-before-mover"]
+claims = { matches = ["sum 125500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "order-unordered-conflict-refused"
+run = ["{out}/wasm-host{exe}", "order-unordered-conflict-refused"]
+claims = { matches = ["module 'view:halver@0.1.0' did not load: 'game:mover:move' and 'view:halver:halve' both touch 'game:Position' in phase 'update', one of them writing it, and no pair orders them.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "add_system-own-conflict-in-registration-order"
+run = ["{out}/wasm-host{exe}", "add_system-own-conflict-in-registration-order"]
+claims = { matches = ["game:twostep@0.1.0/show: x 3 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "config.order-cycle-refused"
+run = ["{out}/wasm-host{exe}", "config.order-cycle-refused"]
+claims = { matches = [".order. contradicts itself.*bridge_create refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "observe-chain-one-hop-a-barrier"
+run = ["{out}/wasm-host{exe}", "observe-chain-one-hop-a-barrier"]
+claims = { matches = ["b1 game:chain@0.1.0/got_a: hop A.*b2 game:chain@0.1.0/got_b: hop B.*b3 game:chain@0.1.0/got_c: hop C.*alive"], lacks = ["hop A.*hop A"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "observe-reserved-name-refused"
+run = ["{out}/wasm-host{exe}", "observe-reserved-name-refused"]
+claims = { matches = ["'init' is a reserved name, and no observer may take it.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "config.threads-unset-refused"
+run = ["{out}/wasm-host{exe}", "config.threads-unset-refused"]
+claims = { matches = ["threads is unset.*bridge_create refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "config.threads-four-wasm-instances-hop"
+run = ["{out}/wasm-host{exe}", "config.threads-four-wasm-instances-hop"]
+claims = { matches = ["sum 275000 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_get_trigger_events-enter-attach-leave"
+run = ["{out}/wasm-host{exe}", "bridge_get_trigger_events-enter-attach-leave"]
+claims = { matches = ["any: event 3 1.*any: event 2 2.*any: event 4 57005.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "declare-nested-types"
+run = ["{out}/wasm-host{exe}", "declare-nested-types"]
+claims = { matches = ["read: body 2 2.*read: more 3 4.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "declare-undeclared-field-type-refused"
+run = ["{out}/wasm-host{exe}", "declare-undeclared-field-type-refused"]
+claims = { matches = ["module 'game:nested@0.1.0' did not load: type 'game:Body': its descriptor says 'vec2_t', which is neither a type a field can be nor one its namespace has declared.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_create-two-worlds-at-once"
+run = ["{out}/wasm-host{exe}", "bridge_create-two-worlds-at-once"]
+claims = { matches = ["two worlds: sums 275000 and 265000.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "alloc-string-kept"
+run = ["{out}/wasm-host{exe}", "alloc-string-kept"]
+claims = { matches = ["game:namer@0.1.0/say: kept in the arena.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "alloc-share-exhausted"
+run = ["{out}/wasm-host{exe}", "alloc-share-exhausted"]
+claims = { matches = ["module 'game:namer@0.1.0' did not load: alloc: its persistent of 4 bytes is exhausted.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.persistent-more-than-the-arena-refused"
+run = ["{out}/wasm-host{exe}", "module_config.persistent-more-than-the-arena-refused"]
+claims = { matches = ["module 'game:namer@0.1.0' is refused: its persistent of 1048576 bytes does not fit in the 4096 left of .budget. persistent.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "spawn-stated-as-none-refused"
+run = ["{out}/wasm-host{exe}", "spawn-stated-as-none-refused"]
+claims = { matches = ["module 'game:mover@0.1.0' did not load: spawn: it stated that it spawns nothing.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_load-failed-init-undone"
+run = ["{out}/wasm-host{exe}", "bridge_load-failed-init-undone"]
+claims = { matches = ["game:badterm@0.1.0: not loaded.*game:fp@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "spawn-same-ids-on-one-thread-and-four"
+run = ["{out}/wasm-host{exe}", "spawn-same-ids-on-one-thread-and-four"]
+claims = { matches = ["minted 160 ids a run. on four threads the same, and again the same.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_SKIP-failed-init-skipped"
+run = ["{out}/wasm-host{exe}", "BRIDGE_SKIP-failed-init-skipped"]
+claims = { matches = ["game:badobs@0.1.0: not loaded.*show: x 3 0.*modules: game:twostep@0.1.0=RUNNING .1..*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_load-refused-leaves-nothing"
+run = ["{out}/wasm-host{exe}", "bridge_load-refused-leaves-nothing"]
+claims = { matches = ["game:badterm@0.1.0: not loaded.*game:fp@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.max_system_failures-reached-stops-the-module"
+run = ["{out}/wasm-host{exe}", "module_config.max_system_failures-reached-stops-the-module"]
+claims = { matches = ["module 'test:flaky@0.1.0' is stopped: its system 'trip' reached its max_system_failures of 3.*show: x 63 0.*game:twostep@0.1.0=RUNNING test:flaky@0.1.0=STOPPED.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.max_system_failures-one-in-three-forgiven"
+run = ["{out}/wasm-host{exe}", "module_config.max_system_failures-one-in-three-forgiven"]
+claims = { matches = ["modules: test:flaky@0.1.0=RUNNING.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.max_system_failures-two-in-three-reached"
+run = ["{out}/wasm-host{exe}", "module_config.max_system_failures-two-in-three-reached"]
+claims = { matches = ["its system 'trip' reached its max_system_failures of 3.*modules: test:flaky@0.1.0=STOPPED.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.max_system_failures-clean-system-forgives-no-other"
+run = ["{out}/wasm-host{exe}", "module_config.max_system_failures-clean-system-forgives-no-other"]
+claims = { matches = ["its system 'trip' reached its max_system_failures of 3.*modules: test:flaky@0.1.0=STOPPED.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.max_system_failures-no-limit-never-stops"
+run = ["{out}/wasm-host{exe}", "module_config.max_system_failures-no-limit-never-stops"]
+claims = { matches = ["modules: test:flaky@0.1.0=RUNNING.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_FAIL-stopped-module-stops-the-world"
+run = ["{out}/wasm-host{exe}", "BRIDGE_FAIL-stopped-module-stops-the-world"]
+claims = { matches = ["the world has stopped: module 'test:flaky@0.1.0' was stopped and its on_error is fail.*update refused.*test:flaky@0.1.0=STOPPED.*game:twostep@0.1.0: not unloaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_unload-of-what-stopped-the-world"
+run = ["{out}/wasm-host{exe}", "bridge_unload-of-what-stopped-the-world"]
+claims = { matches = ["the world has stopped.*game:twostep@0.1.0: not unloaded.*the world runs again: module 'test:flaky@0.1.0' is unloaded, and it goes on without it.*test:flaky@0.1.0: unloaded.*modules: game:twostep@0.1.0=RUNNING.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_STRIP-unload-strips"
+run = ["{out}/wasm-host{exe}", "BRIDGE_STRIP-unload-strips"]
+claims = { matches = ["left 10 5.*game:keeper@0.1.0: unloaded.*left 9 5.*game:retype@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_SWEEP-unload-sweeps"
+run = ["{out}/wasm-host{exe}", "BRIDGE_SWEEP-unload-sweeps"]
+claims = { matches = ["left 10 5.*game:keeper@0.1.0: unloaded.*left 9 0.*game:retype@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_DELETE-unload-deletes"
+run = ["{out}/wasm-host{exe}", "BRIDGE_DELETE-unload-deletes"]
+claims = { matches = ["left 10 5.*game:keeper@0.1.0: unloaded.*left 0 0.*game:retype@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_unload-declarer-goes-user-holds-the-type"
+run = ["{out}/wasm-host{exe}", "bridge_unload-declarer-goes-user-holds-the-type"]
+claims = { matches = ["game:typer@0.1.0: unloaded.*read: body 2 3.*game:retype@0.1.0: not loaded.*game:user@0.1.0: unloaded.*game:retype@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_unload-not-loaded-refused"
+run = ["{out}/wasm-host{exe}", "bridge_unload-not-loaded-refused"]
+claims = { matches = ["no module 'game:nobody@0.1.0' is loaded, so none is unloaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.shutdown_timeout-shutdown-interrupted"
+run = ["{out}/wasm-host{exe}", "module_config.shutdown_timeout-shutdown-interrupted"]
+claims = { matches = ["its shutdown trapped: interrupt. its teardown continues.*test:hang@0.1.0: unloaded.*modules: .0..*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.modules-reached-refused"
+run = ["{out}/wasm-host{exe}", "budget.modules-reached-refused"]
+claims = { matches = ["module 'game:ticker@0.1.0' is refused: .budget. modules of 1 is reached.*game:twostep@0.1.0: unloaded.*game:ticker@0.1.0: loaded.*modules: game:ticker@0.1.0=RUNNING .1..*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_reload-larger-share"
+run = ["{out}/wasm-host{exe}", "bridge_reload-larger-share"]
+claims = { matches = ["game:ticker@0.2.0: reloaded.*tick 112 10.*tick 122 10.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_reload-larger-share-past-a-neighbour"
+run = ["{out}/wasm-host{exe}", "bridge_reload-larger-share-past-a-neighbour"]
+claims = { matches = ["game:namer@0.1.0: loaded.*game:ticker@0.2.0: reloaded.*tick 112 10.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_reload-same-share-exhausted"
+run = ["{out}/wasm-host{exe}", "bridge_reload-same-share-exhausted"]
+claims = { matches = ["was not reloaded: alloc: its persistent of 16 bytes is exhausted.*tick 103 1.*tick 104 1.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_reload-smaller-share-refused"
+run = ["{out}/wasm-host{exe}", "bridge_reload-smaller-share-refused"]
+claims = { matches = ["is not reloaded: its persistent is 16 and a reload states less, which a loaded module's share cannot become.*tick 104 1.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_reload-share-more-than-the-arena-refused"
+run = ["{out}/wasm-host{exe}", "bridge_reload-share-more-than-the-arena-refused"]
+claims = { matches = ["is not reloaded: its persistent of 1048576 bytes does not fit in the [0-9]+ left of .budget. persistent.*tick 104 1.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_reload-lifts-a-stopped-world"
+run = ["{out}/wasm-host{exe}", "bridge_reload-lifts-a-stopped-world"]
+claims = { matches = ["the world has stopped: module 'game:ticker@0.1.0' was stopped and its on_error is fail.*game:twostep@0.1.0: not loaded.*the world runs again: module 'game:ticker@0.2.0' is back.*game:ticker@0.2.0: reloaded.*tick 1[0-9]3 10.*game:ticker@0.2.0=RUNNING.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_load-lifts-a-stopped-world"
+run = ["{out}/wasm-host{exe}", "bridge_load-lifts-a-stopped-world"]
+claims = { matches = ["the world has stopped: module 'game:thing@0.1.0' failed and its on_error is fail.*game:other@0.1.0: not loaded.*the world runs again: module 'game:thing@0.2.0' is back.*game:thing@0.2.0: loaded.*show: x 3 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_reload-stopped-module-revived"
+run = ["{out}/wasm-host{exe}", "bridge_reload-stopped-module-revived"]
+claims = { matches = ["game:ticker@0.1.0=STOPPED.*game:ticker@0.2.0: reloaded.*tick 1[0-9]3 10.*game:ticker@0.2.0=RUNNING.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_load-no-reload-export"
+run = ["{out}/wasm-host{exe}", "bridge_load-no-reload-export"]
+claims = { matches = ["module 'test:noreload@0.1.0' did not load: no exported function 'reload'.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.reloadable-false-with-hot-reload-refused"
+run = ["{out}/wasm-host{exe}", "module_config.reloadable-false-with-hot-reload-refused"]
+claims = { matches = ["module 'game:twostep@0.1.0' is refused: hot_reload is stated, and its author states it is not reloadable.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_reload-not-loaded-refused"
+run = ["{out}/wasm-host{exe}", "bridge_reload-not-loaded-refused"]
+claims = { matches = ["is not reloaded: nothing of that name is loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.settings-of-every-kind"
+run = ["{out}/wasm-host{exe}", "module_config.settings-of-every-kind"]
+claims = { matches = ["vsync width 1 1280.*scale mode 150 2.*show: hello 7 0.*show: some/long/path.cfg 0 0.*flags ratio 3 3.*show: big 2 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "setting.key-no-such-field-refused"
+run = ["{out}/wasm-host{exe}", "setting.key-no-such-field-refused"]
+claims = { matches = ["its settings have a key 'vsynk', and 'game:Settings' has no field of that name.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "setting.kind-text-for-a-float-refused"
+run = ["{out}/wasm-host{exe}", "setting.kind-text-for-a-float-refused"]
+claims = { matches = ["its setting 'scale' is text, and the field it names is a float.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_STRING-longer-than-the-field-refused"
+run = ["{out}/wasm-host{exe}", "BRIDGE_STRING-longer-than-the-field-refused"]
+claims = { matches = ["its setting 'title' is 20 bytes of text, and the field it names holds 16 with the zero that ends it.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_INT-beyond-the-field-refused"
+run = ["{out}/wasm-host{exe}", "BRIDGE_INT-beyond-the-field-refused"]
+claims = { matches = ["its setting 'small' is 300, which the field it names cannot hold.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_INT-beyond-the-enum-refused"
+run = ["{out}/wasm-host{exe}", "BRIDGE_INT-beyond-the-enum-refused"]
+claims = { matches = ["its setting 'mode' is 200, which the enum of the field it names cannot hold.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_STRING-no-such-constant-refused"
+run = ["{out}/wasm-host{exe}", "BRIDGE_STRING-no-such-constant-refused"]
+claims = { matches = ["its setting 'mode' is 'Sometimes', which the enum of the field it names has no constant for.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_NO_CONFIG-with-settings-refused"
+run = ["{out}/wasm-host{exe}", "BRIDGE_NO_CONFIG-with-settings-refused"]
+claims = { matches = ["it is handed 10 settings, and states that it has no config component.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.config-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.config-unset-refused"]
+claims = { matches = ["module 'game:settings@0.1.0' is refused: config is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.config-undeclared-refused"
+run = ["{out}/wasm-host{exe}", "module_config.config-undeclared-refused"]
+claims = { matches = ["its config is 'game:Nope', which is not a struct its init declared.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.settings-text-beyond-the-share-refused"
+run = ["{out}/wasm-host{exe}", "module_config.settings-text-beyond-the-share-refused"]
+claims = { matches = ["its settings hold 24 bytes of text, and its persistent share has 8 left.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.config-taken-refused"
+run = ["{out}/wasm-host{exe}", "module_config.config-taken-refused"]
+claims = { matches = ["its config is 'game:Settings', which is already the settings of module 'game:settings@0.1.0'.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_reload-settings-row-kept"
+run = ["{out}/wasm-host{exe}", "bridge_reload-settings-row-kept"]
+claims = { matches = ["vsync width 1 1280.*game:settings@0.2.0: reloaded.*vsync width 1 1280.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_reload-config-dropped"
+run = ["{out}/wasm-host{exe}", "bridge_reload-config-dropped"]
+claims = { matches = ["game:settings@0.2.0: reloaded.*game:retype@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.settings-reseeded-in-place"
+run = ["{out}/wasm-host{exe}", "module_config.settings-reseeded-in-place"]
+claims = { matches = ["settings text written to the same place.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.columns-no-room-for-a-singleton-refused"
+run = ["{out}/wasm-host{exe}", "budget.columns-no-room-for-a-singleton-refused"]
+claims = { matches = ["did not load: type 'game:Settings' is a singleton, and .budget. columns of 16 bytes has no room for its \\d+ bytes.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.config-not-a-singleton-refused"
+run = ["{out}/wasm-host{exe}", "module_config.config-not-a-singleton-refused"]
+claims = { matches = ["did not load: its config is 'game:Settings', which is not declared a singleton.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "artifact.bytes-none-for-wasm"
+run = ["{out}/wasm-host{exe}", "artifact.bytes-none-for-wasm"]
+claims = { matches = ["module 'view:reader@0.1.0' did not load: this backend compiles a module from its bytes, and was handed none.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_unload-two-hundred-rounds"
+run = ["{out}/wasm-host{exe}", "bridge_unload-two-hundred-rounds"]
+claims = { matches = ["churned 200 times, 0 loads refused, 0 records of the index out of step.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_unload-share-given-back"
+run = ["{out}/wasm-host{exe}", "bridge_unload-share-given-back"]
+claims = { matches = ["game:namer@0.1.0/say: kept in the arena.*game:namer@0.1.0: unloaded.*game:ticker@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_unload-share-kept-while-pointed-into"
+run = ["{out}/wasm-host{exe}", "bridge_unload-share-kept-while-pointed-into"]
+claims = { matches = ["module 'game:namer@0.1.0' is unloaded and its share of the persistent arena, 64 bytes, stays: 'game:Name' holds a string in it, in this many rows: 1.*game:namer@0.1.0: unloaded.*game:reader@0.1.0/say: kept in the arena.*module 'game:ticker@0.1.0' is refused: its persistent of 64 bytes does not fit in the 0 left of .budget. persistent.*game:reader@0.1.0/say: kept in the arena.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_destroy-shuts-down-what-is-loaded"
+run = ["{out}/wasm-host{exe}", "bridge_destroy-shuts-down-what-is-loaded"]
+claims = { matches = ["tick 101 1.*game:ticker@0.1.0/-: shutdown 1 0.*module 'test:hang@0.1.0': its shutdown trapped: interrupt. its teardown continues.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.entities-unset-refused"
+run = ["{out}/wasm-host{exe}", "budget.entities-unset-refused"]
+claims = { matches = [".budget. entities is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.modules-unset-refused"
+run = ["{out}/wasm-host{exe}", "budget.modules-unset-refused"]
+claims = { matches = [".budget. modules is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.persistent-unset-refused"
+run = ["{out}/wasm-host{exe}", "budget.persistent-unset-refused"]
+claims = { matches = [".budget. persistent is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.sparse_sets-unset-refused"
+run = ["{out}/wasm-host{exe}", "budget.sparse_sets-unset-refused"]
+claims = { matches = [".budget. sparse_sets is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.sparse_sets-negative-refused"
+run = ["{out}/wasm-host{exe}", "budget.sparse_sets-negative-refused"]
+claims = { matches = [".budget. sparse_sets is -5, which is neither a count nor none.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.sparse_sets-beyond-32-bits-refused"
+run = ["{out}/wasm-host{exe}", "budget.sparse_sets-beyond-32-bits-refused"]
+claims = { matches = [".budget. cannot be satisfied: sparse_sets of 16777216, with four bytes for each of 4096 entities, is more than an offset of 32 bits can reach.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.direct_indexed-unset-refused"
+run = ["{out}/wasm-host{exe}", "budget.direct_indexed-unset-refused"]
+claims = { matches = [".budget. direct_indexed is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.direct_indexed-no-limit-refused"
+run = ["{out}/wasm-host{exe}", "budget.direct_indexed-no-limit-refused"]
+claims = { matches = [".budget. direct_indexed is -1, which is neither a count nor none.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "budget.direct_indexed-beyond-32-bits-refused"
+run = ["{out}/wasm-host{exe}", "budget.direct_indexed-beyond-32-bits-refused"]
+claims = { matches = [".budget. cannot be satisfied: direct_indexed of 16777216, with a bit for each of 4096 entities, is more than an offset of 32 bits can reach.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "config.phases-nameless-refused"
+run = ["{out}/wasm-host{exe}", "config.phases-nameless-refused"]
+claims = { matches = ["phase 1 has no name.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "config.phases-twice-refused"
+run = ["{out}/wasm-host{exe}", "config.phases-twice-refused"]
+claims = { matches = ["phase 'update' is named twice.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "order.before-none-refused"
+run = ["{out}/wasm-host{exe}", "order.before-none-refused"]
+claims = { matches = [".order. pair 0 does not name two systems.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "order.after-none-refused"
+run = ["{out}/wasm-host{exe}", "order.after-none-refused"]
+claims = { matches = [".order. pair 0 does not name two systems.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.identity-none-refused"
+run = ["{out}/wasm-host{exe}", "module_config.identity-none-refused"]
+claims = { matches = ["a module with no identity is refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.trusted-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.trusted-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: trusted is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.reloadable-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.reloadable-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: reloadable is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.hot_reload-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.hot_reload-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: hot_reload is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.on_error-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.on_error-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: on_error is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.max_system_failures-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.max_system_failures-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: max_system_failures is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.work_limit-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.work_limit-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: work_limit is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.init_timeout-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.init_timeout-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: init_timeout is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.reload_timeout-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.reload_timeout-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: reload_timeout is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.shutdown_timeout-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.shutdown_timeout-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: shutdown_timeout is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.scratch-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.scratch-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: scratch is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.log_ring-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.log_ring-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: log_ring is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.log_ring-smaller-than-a-record-refused"
+run = ["{out}/wasm-host{exe}", "module_config.log_ring-smaller-than-a-record-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: a log_ring of 8 bytes holds no record, and one is 32.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.spans-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.spans-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: spans is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.spawns-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.spawns-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: spawns is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.spawns-more-than-entities-refused"
+run = ["{out}/wasm-host{exe}", "module_config.spawns-more-than-entities-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: its spawns of 5000 is more than .budget. entities of 4096.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.persistent-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.persistent-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: persistent is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.changes-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.changes-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: changes is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.changes-beyond-32-bits-refused"
+run = ["{out}/wasm-host{exe}", "module_config.changes-beyond-32-bits-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: its changes of 8589934592 bytes is more than an offset of 32 bits can reach.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.losses-count-unset-refused"
+run = ["{out}/wasm-host{exe}", "module_config.losses-count-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: loss_count is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.losses-counted-and-none-refused"
+run = ["{out}/wasm-host{exe}", "module_config.losses-counted-and-none-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: it states 2 losses, and losses is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_load-loaded-already-refused"
+run = ["{out}/wasm-host{exe}", "bridge_load-loaded-already-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: 'test:ok@0\\.1\\.0' is loaded already.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.spawns-sum-beyond-entities-refused"
+run = ["{out}/wasm-host{exe}", "module_config.spawns-sum-beyond-entities-refused"]
+claims = { matches = ["module 'test:image@0\\.1\\.0' did not load: its spawns of 3000 do not fit under .budget. entities of 4096.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "phase_name.from-unset-refused"
+run = ["{out}/wasm-host{exe}", "phase_name.from-unset-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: phase name 1 of its config is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.phases-mapped-twice-refused"
+run = ["{out}/wasm-host{exe}", "module_config.phases-mapped-twice-refused"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: its config maps phase 'tick' twice.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "declare-statement-outside-scratch-refused"
+run = ["{out}/wasm-host{exe}", "declare-statement-outside-scratch-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: declare: what it states lies outside the scratch arena.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_declaration_t-name-outside-scratch-refused"
+run = ["{out}/wasm-host{exe}", "bridge_declaration_t-name-outside-scratch-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: declare: a name or a descriptor lies outside the scratch arena.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "declare-name-with-no-namespace-refused"
+run = ["{out}/wasm-host{exe}", "declare-name-with-no-namespace-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: type 'Odd' has no namespace.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "declare-kind-unset-refused"
+run = ["{out}/wasm-host{exe}", "declare-kind-unset-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: type 'game:Odd': its kind is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_TAG-with-bytes-refused"
+run = ["{out}/wasm-host{exe}", "BRIDGE_TAG-with-bytes-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: type 'game:Odd' is a tag, and a tag has no bytes and no descriptor.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "declare-on-unload-unset-refused"
+run = ["{out}/wasm-host{exe}", "declare-on-unload-unset-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: type 'game:Odd': on_unload is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "declare-size-other-than-descriptor-refused"
+run = ["{out}/wasm-host{exe}", "declare-size-other-than-descriptor-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: type 'game:Odd' is 12 bytes aligned to 4 in the module and 8 aligned to 4 by its descriptor.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "add_system-statement-outside-scratch-refused"
+run = ["{out}/wasm-host{exe}", "add_system-statement-outside-scratch-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: add_system: what it states lies outside the scratch arena.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_system_statement_t-phase-outside-scratch-refused"
+run = ["{out}/wasm-host{exe}", "bridge_system_statement_t-phase-outside-scratch-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: add_system: a phase lies outside the scratch arena.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_system_statement_t-name-outside-scratch-refused"
+run = ["{out}/wasm-host{exe}", "bridge_system_statement_t-name-outside-scratch-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: system: a name, a term or a change lies outside the scratch arena.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "add_system-more-changes-than-types-refused"
+run = ["{out}/wasm-host{exe}", "add_system-more-changes-than-types-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: a system states 5 changes, and the module declared 3 types.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "add_system-name-twice-refused"
+run = ["{out}/wasm-host{exe}", "add_system-name-twice-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: 'act' is registered twice.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "observe-no-term-refused"
+run = ["{out}/wasm-host{exe}", "observe-no-term-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: observer 'again' has no term, and so nothing to observe.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "observe-statement-outside-scratch-refused"
+run = ["{out}/wasm-host{exe}", "observe-statement-outside-scratch-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: observe: what it states lies outside the scratch arena.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_observer_statement_t-events-unset-refused"
+run = ["{out}/wasm-host{exe}", "bridge_observer_statement_t-events-unset-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: observe: its events are unset, or name one there is not.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_term_t-access-unset-refused"
+run = ["{out}/wasm-host{exe}", "bridge_term_t-access-unset-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: term 0 of system 'again': its access is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_term_t-access-neither-refused"
+run = ["{out}/wasm-host{exe}", "bridge_term_t-access-neither-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: term 0 of system 'again': its access is 3, and there is read and write.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_term_t-operator-unset-refused"
+run = ["{out}/wasm-host{exe}", "bridge_term_t-operator-unset-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: term 0 of system 'again': its operator is unset.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_term_t-slot-undeclared-refused"
+run = ["{out}/wasm-host{exe}", "bridge_term_t-slot-undeclared-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: term 0 of system 'again' names slot 9, which it never declared.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_WRITE-ungranted-refused"
+run = ["{out}/wasm-host{exe}", "BRIDGE_WRITE-ungranted-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: system 'again' may not write 'other:Thing': no grant says so.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "add_system-change-of-an-undeclared-slot-refused"
+run = ["{out}/wasm-host{exe}", "add_system-change-of-an-undeclared-slot-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: change 0 of system 'again' names slot 9, which it never declared.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "add_system-change-ungranted-refused"
+run = ["{out}/wasm-host{exe}", "add_system-change-ungranted-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: system 'again' may not attach or detach 'other:Thing': no grant says so.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "alloc-stated-as-none-refused"
+run = ["{out}/wasm-host{exe}", "alloc-stated-as-none-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: alloc: it stated that it keeps nothing in the persistent arena.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "declare-outside-init-refused"
+run = ["{out}/wasm-host{exe}", "declare-outside-init-refused"]
+claims = { matches = ["system 'act' failed: declare is called outside init.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "add_system-outside-init-refused"
+run = ["{out}/wasm-host{exe}", "add_system-outside-init-refused"]
+claims = { matches = ["system 'act' failed: add_system is called outside init.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "observe-outside-init-refused"
+run = ["{out}/wasm-host{exe}", "observe-outside-init-refused"]
+claims = { matches = ["system 'act' failed: observe is called outside init.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "attach-undeclared-slot-refused"
+run = ["{out}/wasm-host{exe}", "attach-undeclared-slot-refused"]
+claims = { matches = ["system 'act' failed: attach names slot 9, which it never declared.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "attach-ungranted-refused"
+run = ["{out}/wasm-host{exe}", "attach-ungranted-refused"]
+claims = { matches = ["system 'act' failed: it may not attach 'other:Thing': no grant says so.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "attach-value-outside-scratch-refused"
+run = ["{out}/wasm-host{exe}", "attach-value-outside-scratch-refused"]
+claims = { matches = ["system 'act' failed: attach: the value lies outside the scratch arena.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "detach-undeclared-slot-refused"
+run = ["{out}/wasm-host{exe}", "detach-undeclared-slot-refused"]
+claims = { matches = ["system 'act' failed: detach names slot 9, which it never declared.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_config.spans-outgrown-at-a-barrier"
+run = ["{out}/wasm-host{exe}", "module_config.spans-outgrown-at-a-barrier"]
+claims = { matches = ["module 'game:mover@0\\.1\\.0' is stopped: what its queries match no longer fits in its spans of 544 bytes.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_ACC-the-accessors-merged-in"
+run = ["{wasm_dis}", "{out}/wasm/mover.wasm", "{features}"]
+claims = { matches = ["\\(module"], lacks = ["acc_"] }
+false = { run = ["{wasm_dis}", "{out}/obj/mover.raw.wasm", "{features}"] }
+
+[[case]]
+name = "backend_sig_t-an-i32-and-an-i64-answered"
+run = ["{out}/wasm-adopt{exe}"]
+claims = { matches = ["a host function: called with an i32 and an i64, answered 16"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "backend_entry_t-what-answers-an-import"
+run = ["{out}/wasm-adopt{exe}"]
+claims = { matches = ["a host function: called with an i32 and an i64, answered 16"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "backend_memory_import_t-one-block-in-two-stores"
+run = ["{out}/wasm-adopt{exe}"]
+claims = { matches = ["two stores, two threads: both halves intact, and each sees the other's"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "memory_release-after-the-last-instance"
+run = ["{out}/wasm-adopt{exe}"]
+claims = { matches = ["20000 timed calls back to back: none interrupted"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "instance_create-one-block-in-two-stores"
+run = ["{out}/wasm-adopt{exe}"]
+claims = { matches = ["two stores, two threads: both halves intact, and each sees the other's"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "define_func-called-by-a-module"
+run = ["{out}/wasm-adopt{exe}"]
+claims = { matches = ["a host function: called with an i32 and an i64, answered 16"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "call-a-trap-answered-and-the-store-runs-on"
+run = ["{out}/wasm-adopt{exe}"]
+claims = { matches = ["stray load: trapped: out of bounds memory access.*after the trap: the store still runs"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_ERR-nothing-above-an-error-written"
+run = ["{out}/wasm-host{exe}", "BRIDGE_ERR-nothing-above-an-error-written"]
+claims = { matches = ["record.3.: an error\\s+alive"], lacks = ["a warning"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_WARN-a-warning-and-what-is-worse"
+run = ["{out}/wasm-host{exe}", "BRIDGE_WARN-a-warning-and-what-is-worse"]
+claims = { matches = ["an error.*a warning\\s+alive"], lacks = ["some information"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_INFO-information-and-what-is-worse"
+run = ["{out}/wasm-host{exe}", "BRIDGE_INFO-information-and-what-is-worse"]
+claims = { matches = ["an error.*a warning.*some information\\s+alive"], lacks = ["a detail"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_DEBUG-every-line-written"
+run = ["{out}/wasm-host{exe}", "BRIDGE_DEBUG-every-line-written"]
+claims = { matches = ["an error.*a warning.*some information.*a detail.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_LOG_ERR-written-as-severity-3"
+run = ["{out}/wasm-host{exe}", "BRIDGE_LOG_ERR-written-as-severity-3"]
+claims = { matches = ["record.3.: an error.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_LOG_WARN-written-as-severity-4"
+run = ["{out}/wasm-host{exe}", "BRIDGE_LOG_WARN-written-as-severity-4"]
+claims = { matches = ["record.4.: a warning.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_LOG_INFO-written-as-severity-6"
+run = ["{out}/wasm-host{exe}", "BRIDGE_LOG_INFO-written-as-severity-6"]
+claims = { matches = ["record.6.: some information.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_LOG_DEBUG-written-as-severity-7"
+run = ["{out}/wasm-host{exe}", "BRIDGE_LOG_DEBUG-written-as-severity-7"]
+claims = { matches = ["record.7.: a detail.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_DECLARE_TAG-carried-by-two-of-three"
+run = ["{out}/wasm-host{exe}", "BRIDGE_DECLARE_TAG-carried-by-two-of-three"]
+claims = { matches = ["frozen.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_take_scratch-more-than-given-stops-the-module"
+run = ["{out}/wasm-host{exe}", "bridge_take_scratch-more-than-given-stops-the-module"]
+claims = { matches = ["module 'game:mover@0\\.1\\.0' did not load: its init trapped: wasm `unreachable` instruction executed.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_list_modules-fills-no-more-than-asked"
+run = ["{out}/wasm-host{exe}", "bridge_list_modules-fills-no-more-than-asked"]
+claims = { matches = ["2 loaded, and of two rows: test:ok@0\\.1\\.0, untouched\\s+alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_load-import-nobody-answers"
+run = ["{out}/wasm-host{exe}", "bridge_load-import-nobody-answers"]
+claims = { matches = ["module 'test:stray@0\\.1\\.0' did not load: cannot instantiate: unknown import: `elsewhere::nothing` has not been defined.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_value_t-a-value-of-each-kind"
+run = ["{out}/wasm-host{exe}", "bridge_value_t-a-value-of-each-kind"]
+claims = { matches = ["vsync width 1 1280.*scale mode 150 2.*show: hello 7 0.*show: some/long/path.cfg 0 0.*flags ratio 3 3.*show: big 2 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "setting.v-seeds-the-field-its-key-names"
+run = ["{out}/wasm-host{exe}", "setting.v-seeds-the-field-its-key-names"]
+claims = { matches = ["vsync width 1 1280.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "artifact.len-as-many-bytes-compiled"
+run = ["{out}/wasm-host{exe}", "artifact.len-as-many-bytes-compiled"]
+claims = { matches = ["test:ok@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "record.identity-whose-it-is"
+run = ["{out}/wasm-host{exe}", "record.identity-whose-it-is"]
+claims = { matches = ["view:reader@0\\.1\\.0/sum: sum 250500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "record.system-which-system-said-it"
+run = ["{out}/wasm-host{exe}", "record.system-which-system-said-it"]
+claims = { matches = ["game:mover@0\\.1\\.0/count: moved.*view:reader@0\\.1\\.0/sum: saw.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "record.text-what-was-said"
+run = ["{out}/wasm-host{exe}", "record.text-what-was-said"]
+claims = { matches = ["/sum: sum 250500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "record.len-as-long-as-the-text"
+run = ["{out}/wasm-host{exe}", "record.len-as-long-as-the-text"]
+claims = { matches = ["/say: kept in the arena 0 0\\s+alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "record.when-the-barrier-it-was-said-after"
+run = ["{out}/wasm-host{exe}", "record.when-the-barrier-it-was-said-after"]
+claims = { matches = ["b1 \\S+ event 3 1.*b3 \\S+ event 2 2.*b5 \\S+ event 4 57005.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "record.arg-the-two-numbers"
+run = ["{out}/wasm-host{exe}", "record.arg-the-two-numbers"]
+claims = { matches = ["moved 2 1000.*saw 1 500.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_info.identity-of-each-that-is-loaded"
+run = ["{out}/wasm-host{exe}", "module_info.identity-of-each-that-is-loaded"]
+claims = { matches = ["modules: game:twostep@0\\.1\\.0=RUNNING test:flaky@0\\.1\\.0=STOPPED .2..*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_info.state-running-and-stopped"
+run = ["{out}/wasm-host{exe}", "module_info.state-running-and-stopped"]
+claims = { matches = ["modules: game:twostep@0\\.1\\.0=RUNNING test:flaky@0\\.1\\.0=STOPPED .2..*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_list_modules-what-is-loaded-and-whether-it-runs"
+run = ["{out}/wasm-host{exe}", "bridge_list_modules-what-is-loaded-and-whether-it-runs"]
+claims = { matches = ["modules: game:twostep@0\\.1\\.0=RUNNING test:flaky@0\\.1\\.0=STOPPED .2..*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_trigger_t-who-triggered-and-how"
+run = ["{out}/wasm-host{exe}", "bridge_trigger_t-who-triggered-and-how"]
+claims = { matches = ["any: event 3 1.*any: event 2 2.*any: event 4 57005.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_text_t-a-string-a-component-keeps"
+run = ["{out}/wasm-host{exe}", "bridge_text_t-a-string-a-component-keeps"]
+claims = { matches = ["game:namer@0.1.0/say: kept in the arena.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_log_record_t-written-by-a-module-and-drained"
+run = ["{out}/wasm-host{exe}", "bridge_log_record_t-written-by-a-module-and-drained"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_line_t-a-line-of-text-found-at-run-time"
+run = ["{out}/wasm-host{exe}", "bridge_line_t-a-line-of-text-found-at-run-time"]
+claims = { matches = ["game:namer@0.1.0/say: kept in the arena.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_DECLARE-an-enum-and-a-bitmask"
+run = ["{out}/wasm-host{exe}", "BRIDGE_DECLARE-an-enum-and-a-bitmask"]
+claims = { matches = ["read: body 2 2.*read: more 3 4.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_COMPONENT-declared-by-two-modules"
+run = ["{out}/wasm-host{exe}", "BRIDGE_COMPONENT-declared-by-two-modules"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_ADD_SYSTEM-registered-and-run"
+run = ["{out}/wasm-host{exe}", "BRIDGE_ADD_SYSTEM-registered-and-run"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "backend_create-a-setting-refused"
+run = ["{out}/wasm-host{exe}", "backend_create-a-setting-refused"]
+claims = { matches = ["backend 'wasm' would not start: it knows no setting 'cache'.*bridge_create refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_OBSERVER-registered-and-told"
+run = ["{out}/wasm-host{exe}", "BRIDGE_OBSERVER-registered-and-told"]
+claims = { matches = ["b1 game:chain@0.1.0/got_a: hop A.*alive"], lacks = ["hop A.*hop A"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_PUT_CHANGES-an-observer-that-attaches"
+run = ["{out}/wasm-host{exe}", "BRIDGE_PUT_CHANGES-an-observer-that-attaches"]
+claims = { matches = ["b1 game:chain@0.1.0/got_a: hop A.*b2 game:chain@0.1.0/got_b: hop B.*b3 game:chain@0.1.0/got_c: hop C.*alive"], lacks = ["hop A.*hop A"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_ATTACH-the-value-travels-with-it"
+run = ["{out}/wasm-host{exe}", "BRIDGE_ATTACH-the-value-travels-with-it"]
+claims = { matches = ["sum 250500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_GET-a-field-read"
+run = ["{out}/wasm-host{exe}", "BRIDGE_GET-a-field-read"]
+claims = { matches = ["sum 250500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_SET-a-field-written-each-frame"
+run = ["{out}/wasm-host{exe}", "BRIDGE_SET-a-field-written-each-frame"]
+claims = { matches = ["sum 250500 0.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_IMPORT-the-entries-imported"
+run = ["{out}/wasm-host{exe}", "BRIDGE_IMPORT-the-entries-imported"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_EXPORT-a-system-found-by-its-name"
+run = ["{out}/wasm-host{exe}", "BRIDGE_EXPORT-a-system-found-by-its-name"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_HEADER-the-scratch-arena-found"
+run = ["{out}/wasm-host{exe}", "BRIDGE_HEADER-the-scratch-arena-found"]
+claims = { matches = ["game:mover@0.1.0: loaded.*moved.*alive"], lacks = ["not loaded"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_STATE-a-statement-put-in-scratch"
+run = ["{out}/wasm-host{exe}", "BRIDGE_STATE-a-statement-put-in-scratch"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_put-bytes-copied-into-scratch"
+run = ["{out}/wasm-host{exe}", "bridge_put-bytes-copied-into-scratch"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_LOG-a-line-with-two-numbers"
+run = ["{out}/wasm-host{exe}", "BRIDGE_LOG-a-line-with-two-numbers"]
+claims = { matches = ["moved 2 1000.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_log-a-line-of-text-found-at-run-time"
+run = ["{out}/wasm-host{exe}", "bridge_log-a-line-of-text-found-at-run-time"]
+claims = { matches = ["game:namer@0.1.0/say: kept in the arena.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_count_spans-one-table-matched"
+run = ["{out}/wasm-host{exe}", "bridge_count_spans-one-table-matched"]
+claims = { matches = ["saw 1 500.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_count_rows-rows-of-a-span"
+run = ["{out}/wasm-host{exe}", "bridge_count_rows-rows-of-a-span"]
+claims = { matches = ["saw 1 500.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_get_base-where-a-column-begins"
+run = ["{out}/wasm-host{exe}", "bridge_get_base-where-a-column-begins"]
+claims = { matches = ["sum 250500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_get_entity-the-id-of-a-row"
+run = ["{out}/wasm-host{exe}", "bridge_get_entity-the-id-of-a-row"]
+claims = { matches = ["game:aim@0.1.0/reached: aims 10 5.*game:aim@0.1.0/reached: aimed 20 0.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_get_entities-where-a-span-keeps-its-ids"
+run = ["{out}/wasm-host{exe}", "bridge_get_entities-where-a-span-keeps-its-ids"]
+claims = { matches = ["game:aim@0.1.0/reached: aims 10 5.*game:aim@0.1.0/reached: aimed 20 0.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_get_cells-where-the-cells-are"
+run = ["{out}/wasm-host{exe}", "bridge_get_cells-where-the-cells-are"]
+claims = { matches = ["game:aim@0.1.0/reached: aims 10 5.*game:aim@0.1.0/reached: aimed 20 0.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_get_cell-the-cell-of-an-id"
+run = ["{out}/wasm-host{exe}", "bridge_get_cell-the-cell-of-an-id"]
+claims = { matches = ["game:aim@0.1.0/reached: aims 10 5.*game:aim@0.1.0/reached: aimed 20 0.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_get_sparse_index-where-the-index-is"
+run = ["{out}/wasm-host{exe}", "bridge_get_sparse_index-where-the-index-is"]
+claims = { matches = ["game:hit@0.1.0/walked: hits 4 18.*game:hit@0.1.0/reached: bodies 10 4.*game:hit@0.1.0/reached: reached 18 0.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_get_sparse_value-the-value-of-an-id"
+run = ["{out}/wasm-host{exe}", "bridge_get_sparse_value-the-value-of-an-id"]
+claims = { matches = ["game:hit@0.1.0/walked: hits 4 18.*game:hit@0.1.0/reached: bodies 10 4.*game:hit@0.1.0/reached: reached 18 0.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_get_single-where-the-one-row-is"
+run = ["{out}/wasm-host{exe}", "bridge_get_single-where-the-one-row-is"]
+claims = { matches = ["vsync width 1 1280.*scale mode 150 2.*show: hello 7 0.*show: some/long/path.cfg 0 0.*flags ratio 3 3.*show: big 2 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_is_alive-ids-a-sweep-left"
+run = ["{out}/wasm-host{exe}", "bridge_is_alive-ids-a-sweep-left"]
+claims = { matches = ["left 10 5.*game:keeper@0.1.0: unloaded.*left 9 0.*game:retype@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_count_triggers-how-many-this-barrier"
+run = ["{out}/wasm-host{exe}", "bridge_count_triggers-how-many-this-barrier"]
+claims = { matches = ["any: event 3 1.*any: event 2 2.*any: event 4 57005.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_get_trigger-each-in-turn"
+run = ["{out}/wasm-host{exe}", "bridge_get_trigger-each-in-turn"]
+claims = { matches = ["any: event 3 1.*any: event 2 2.*any: event 4 57005.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_get_trigger_id-who-it-was"
+run = ["{out}/wasm-host{exe}", "bridge_get_trigger_id-who-it-was"]
+claims = { matches = ["event 4 57005.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_get_bits-where-a-toggle-keeps-them"
+run = ["{out}/wasm-host{exe}", "bridge_get_bits-where-a-toggle-keeps-them"]
+claims = { matches = ["game:shield@0.1.0/count: shields 10 10.*game:shield@0.1.0/count: strength 45 0.*game:shield@0.1.0/count: shields 10 6.*game:shield@0.1.0/count: strength 27 0.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_is_on-counted-by-its-bit"
+run = ["{out}/wasm-host{exe}", "bridge_is_on-counted-by-its-bit"]
+claims = { matches = ["game:shield@0.1.0/count: shields 10 10.*game:shield@0.1.0/count: strength 45 0.*game:shield@0.1.0/count: shields 10 6.*game:shield@0.1.0/count: strength 27 0.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "bridge_turn-four-turned-off"
+run = ["{out}/wasm-host{exe}", "bridge_turn-four-turned-off"]
+claims = { matches = ["shields 10 10.*shields 10 6.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_SPAN_SIZE-what-a-span-takes-of-the-spans"
+run = ["{out}/wasm-host{exe}", "BRIDGE_SPAN_SIZE-what-a-span-takes-of-the-spans"]
+claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_SCHEMA_TEXT-a-descriptor-of-the-type-s-own-text"
+run = ["{out}/wasm-host{exe}", "BRIDGE_SCHEMA_TEXT-a-descriptor-of-the-type-s-own-text"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_SCHEMA_STRUCT_TYPE-laid-out-as-its-descriptor"
+run = ["{out}/wasm-host{exe}", "BRIDGE_SCHEMA_STRUCT_TYPE-laid-out-as-its-descriptor"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_SCHEMA_STRUCT_DESC-read-and-agreed-with"
+run = ["{out}/wasm-host{exe}", "BRIDGE_SCHEMA_STRUCT_DESC-read-and-agreed-with"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_SCHEMA_ENUM_TYPE-of-the-integer-stated"
+run = ["{out}/wasm-host{exe}", "BRIDGE_SCHEMA_ENUM_TYPE-of-the-integer-stated"]
+claims = { matches = ["read: body 2 2.*read: more 3 4.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_SCHEMA_ENUM_DESC-read-and-agreed-with"
+run = ["{out}/wasm-host{exe}", "BRIDGE_SCHEMA_ENUM_DESC-read-and-agreed-with"]
+claims = { matches = ["read: body 2 2.*read: more 3 4.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_SCHEMA_BITMASK_TYPE-of-the-integer-stated"
+run = ["{out}/wasm-host{exe}", "BRIDGE_SCHEMA_BITMASK_TYPE-of-the-integer-stated"]
+claims = { matches = ["read: body 2 2.*read: more 3 4.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_SCHEMA_BITMASK_DESC-read-and-agreed-with"
+run = ["{out}/wasm-host{exe}", "BRIDGE_SCHEMA_BITMASK_DESC-read-and-agreed-with"]
+claims = { matches = ["read: body 2 2.*read: more 3 4.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "backend_import_t-the-two-memories-found"
+run = ["{out}/wasm-host{exe}", "backend_import_t-the-two-memories-found"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "backend_source_t-no-bytes-refused"
+run = ["{out}/wasm-host{exe}", "backend_source_t-no-bytes-refused"]
+claims = { matches = ["module 'view:reader@0.1.0' did not load: this backend compiles a module from its bytes, and was handed none.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_list_imports-the-two-memories-lent"
+run = ["{out}/wasm-host{exe}", "module_list_imports-the-two-memories-lent"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "module_destroy-a-failed-load-leaves-nothing"
+run = ["{out}/wasm-host{exe}", "module_destroy-a-failed-load-leaves-nothing"]
+claims = { matches = ["game:badterm@0.1.0: not loaded.*game:fp@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "instance_destroy-an-unload-gives-its-share-back"
+run = ["{out}/wasm-host{exe}", "instance_destroy-an-unload-gives-its-share-back"]
+claims = { matches = ["game:namer@0.1.0/say: kept in the arena.*game:namer@0.1.0: unloaded.*game:ticker@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "instance_set_work_limit-a-spinning-system-ended"
+run = ["{out}/wasm-host{exe}", "instance_set_work_limit-a-spinning-system-ended"]
+claims = { matches = ["test:spin@0.1.0/forever: system 'forever' failed: trapped: all fuel consumed.*still here.*all fuel consumed.*still here.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "instance_set_timeout-a-spinning-init-interrupted"
+run = ["{out}/wasm-host{exe}", "instance_set_timeout-a-spinning-init-interrupted"]
+claims = { matches = ["module 'test:spin@0.1.0' did not load: its init trapped: interrupt.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "instance_set_memory_limit-growth-refused"
+run = ["{out}/wasm-host{exe}", "instance_set_memory_limit-growth-refused"]
+claims = { matches = ["module 'test:grow@0.1.0' did not load: its init answered 7.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BACKEND_IMPORT_OTHER-a-global-nobody-answers"
+run = ["{out}/wasm-host{exe}", "BACKEND_IMPORT_OTHER-a-global-nobody-answers"]
+claims = { matches = ["module 'test:strayglobal@0\\.1\\.0' did not load: cannot instantiate: unknown import: `elsewhere::number` has not been defined.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_BOOL-seeds-a-bool"
+run = ["{out}/wasm-host{exe}", "BRIDGE_BOOL-seeds-a-bool"]
+claims = { matches = ["vsync width 1 1280.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_FLOAT-seeds-a-float"
+run = ["{out}/wasm-host{exe}", "BRIDGE_FLOAT-seeds-a-float"]
+claims = { matches = ["scale mode 150 2.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_RUNNING-a-module-that-still-runs"
+run = ["{out}/wasm-host{exe}", "BRIDGE_RUNNING-a-module-that-still-runs"]
+claims = { matches = ["game:twostep@0\\.1\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_STOPPED-a-module-at-its-failures"
+run = ["{out}/wasm-host{exe}", "BRIDGE_STOPPED-a-module-at-its-failures"]
+claims = { matches = ["test:flaky@0\\.1\\.0=STOPPED.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_HOST_ABI-stated-and-created"
+run = ["{out}/wasm-host{exe}", "BRIDGE_HOST_ABI-stated-and-created"]
+claims = { matches = ["test:ok@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_LEVEL_MOST-every-line-written"
+run = ["{out}/wasm-host{exe}", "BRIDGE_LEVEL_MOST-every-line-written"]
+claims = { matches = ["an error.*a warning.*some information.*a detail.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_STRUCT-a-struct-a-field-names"
+run = ["{out}/wasm-host{exe}", "BRIDGE_STRUCT-a-struct-a-field-names"]
+claims = { matches = ["read: body 2 2.*read: more 3 4.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_ENUM-an-enum-a-field-names"
+run = ["{out}/wasm-host{exe}", "BRIDGE_ENUM-an-enum-a-field-names"]
+claims = { matches = ["read: body 2 2.*read: more 3 4.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_BITMASK-a-bitmask-a-field-names"
+run = ["{out}/wasm-host{exe}", "BRIDGE_BITMASK-a-bitmask-a-field-names"]
+claims = { matches = ["read: body 2 2.*read: more 3 4.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_TABLE-walked-by-its-rows"
+run = ["{out}/wasm-host{exe}", "BRIDGE_TABLE-walked-by-its-rows"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_READ-a-term-that-reads"
+run = ["{out}/wasm-host{exe}", "BRIDGE_READ-a-term-that-reads"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_AND-only-the-entities-that-carry-both"
+run = ["{out}/wasm-host{exe}", "BRIDGE_AND-only-the-entities-that-carry-both"]
+claims = { matches = ["moved 2 1000.*saw 1 500.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_OPTIONAL-a-term-an-entity-may-lack"
+run = ["{out}/wasm-host{exe}", "BRIDGE_OPTIONAL-a-term-an-entity-may-lack"]
+claims = { matches = ["game:aim@0.1.0/reached: aims 10 5.*game:aim@0.1.0/reached: aimed 20 0.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_ON_ENTER-told-with-the-attach-that-made-it"
+run = ["{out}/wasm-host{exe}", "BRIDGE_ON_ENTER-told-with-the-attach-that-made-it"]
+claims = { matches = ["event 3 1.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_ON_ATTACH-told-alone-of-an-attach-again"
+run = ["{out}/wasm-host{exe}", "BRIDGE_ON_ATTACH-told-alone-of-an-attach-again"]
+claims = { matches = ["event 2 2.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_ON_LEAVE-told-of-what-was-destroyed"
+run = ["{out}/wasm-host{exe}", "BRIDGE_ON_LEAVE-told-of-what-was-destroyed"]
+claims = { matches = ["event 4 57005.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_ABI-stated-and-loaded"
+run = ["{out}/wasm-host{exe}", "BRIDGE_ABI-stated-and-loaded"]
+claims = { matches = ["test:ok@0.1.0: loaded.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_NAMESPACE-where-every-import-is"
+run = ["{out}/wasm-host{exe}", "BRIDGE_NAMESPACE-where-every-import-is"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_SHARED-the-memory-two-modules-read"
+run = ["{out}/wasm-host{exe}", "BRIDGE_SHARED-the-memory-two-modules-read"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_PRIVATE-the-memory-of-one-module"
+run = ["{out}/wasm-host{exe}", "BRIDGE_PRIVATE-the-memory-of-one-module"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_CARRIED-where-a-tag-would-have-a-value"
+run = ["{out}/wasm-host{exe}", "BRIDGE_CARRIED-where-a-tag-would-have-a-value"]
+claims = { matches = ["frozen.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_ZEROED-attached-with-no-value"
+run = ["{out}/wasm-host{exe}", "BRIDGE_ZEROED-attached-with-no-value"]
+claims = { matches = ["frozen.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_SPAN_BASE-where-a-span-keeps-its-columns"
+run = ["{out}/wasm-host{exe}", "BRIDGE_SPAN_BASE-where-a-span-keeps-its-columns"]
+claims = { matches = ["sum 250500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BACKEND_IMPORT_FUNC-an-entry-imported-is-no-memory"
+run = ["{out}/wasm-host{exe}", "BACKEND_IMPORT_FUNC-an-entry-imported-is-no-memory"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BACKEND_IMPORT_MEMORY-the-two-memories-lent"
+run = ["{out}/wasm-host{exe}", "BACKEND_IMPORT_MEMORY-the-two-memories-lent"]
+claims = { matches = ["sum 250500 0.*moved 2 1000.*sum 251000 0.*sum 251500 0.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BACKEND_I32-an-argument-of-32-bits"
+run = ["{out}/wasm-adopt{exe}"]
+claims = { matches = ["a host function: called with an i32 and an i64, answered 16"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BACKEND_I64-an-argument-of-64-bits"
+run = ["{out}/wasm-adopt{exe}"]
+claims = { matches = ["a host function: called with an i32 and an i64, answered 16"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "config.backends-none-refused"
+run = ["{out}/wasm-host{exe}", "config.backends-none-refused"]
+claims = { matches = ["the deployment configures no backend, and a module is run by one.*bridge_create refused.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "attach-tag-with-a-value-refused"
+run = ["{out}/wasm-host{exe}", "attach-tag-with-a-value-refused"]
+claims = { matches = ["system 'act' failed: attach: 'game:Flag' is a tag, and is handed a value.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "BRIDGE_FAIL-refused-before-it-exists-stops-nothing"
+run = ["{out}/wasm-host{exe}", "BRIDGE_FAIL-refused-before-it-exists-stops-nothing"]
+claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: no backend named 'native'.*test:image@0\\.1\\.0: loaded.*alive"], lacks = ["has stopped"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }

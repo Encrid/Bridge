@@ -9,6 +9,9 @@ writers = ["abi_refuse", "module_refuse", "reload_refuse", "say_error", "say_abo
 [variables]
 quiet = ["-Wno-missing-field-initializers"]
 hidden = ["-fvisibility=hidden"]
+binaryen_top = "binaryen-version_133"
+features = ["--enable-multimemory", "--enable-bulk-memory", "--enable-sign-ext", "--enable-nontrapping-float-to-int", "--enable-mutable-globals"]
+acc_wasm = "{out}/wasm/acc.wasm"
 paths = [
     "PLAIN_OTHER_PATH=\"{out}/backends/bridge_plain_other{library}\"",
     "PLAIN_REFUSING_PATH=\"{out}/backends/bridge_plain_refusing{library}\"",
@@ -137,41 +140,117 @@ paths = [
     "BUILT_SUFFIX=\"{library}\"",
 ]
 
+[tools]
+wasm_as = "{binaryen}/bin/wasm-as"
+wasm_merge = "{binaryen}/bin/wasm-merge"
+wasm_opt = "{binaryen}/bin/wasm-opt"
+wasm_dis = "{binaryen}/bin/wasm-dis"
+
+[[source]]
+name = "wasmtime"
+url = "https://github.com/bytecodealliance/wasmtime/releases/download/v48.0.5/{wasmtime_archive}"
+sha256 = "{wasmtime_sha256}"
+into = "{build}/third_party/wasmtime/{target}"
+top = "{wasmtime_top}"
+
+[[source]]
+name = "binaryen"
+url = "https://github.com/WebAssembly/binaryen/releases/download/version_133/{binaryen_archive}"
+sha256 = "{binaryen_sha256}"
+into = "{build}/third_party/binaryen/{target}"
+top = "{binaryen_top}"
+
+[kinds.wasm_text]
+output = "{name}.wasm"
+steps = [
+    { run = ["{wasm_as}", "{sources}", "{features}", "-o", "{output}"] },
+]
+
+[kinds.wasm_module]
+output = "{name}.wasm"
+steps = [
+    { run = ["{zig}", "cc", "-target", "wasm32-freestanding", "{language}", "-Wno-missing-field-initializers", "-O2", "-nostdlib", "{defines}", "{include}", "-Wl,--no-entry", "-o", "{work}.raw.wasm", "{sources}"] },
+    { run = ["{wasm_merge}", "{work}.raw.wasm", "main", "{acc_wasm}", "acc", "{features}", "-o", "{work}.merged.wasm"] },
+    { run = ["{wasm_opt}", "{work}.merged.wasm", "{features}", "-O3", "--remove-exports=acc_*", "--remove-unused-module-elements", "-o", "{output}"] },
+]
+
 [targets.x86_64-windows-gnu]
 system_defines = []
 system_libraries = []
 counted_system = ["WINBASEAPI=", "CreateEventA=counted_create_event", "CreateThread=counted_create_thread", "VirtualAlloc=counted_virtual_alloc"]
 host_resources = ["tests/host/host.rc"]
+wasmtime_archive = "wasmtime-v48.0.5-x86_64-mingw-c-api.zip"
+wasmtime_top = "wasmtime-v48.0.5-x86_64-mingw-c-api"
+wasmtime_sha256 = "7842335b4199bb5cdf3031c0d9084db17ab3d0619829726ed19576d48b5b8ead"
+wasmtime_link = "lib/libwasmtime.dll.a"
+wasmtime_runtime = "lib/wasmtime.dll"
+binaryen_archive = "binaryen-version_133-x86_64-windows.tar.gz"
+binaryen_sha256 = "17a2cbeac6b5693c5fbafab3838d3c65fd9c1eb38b05f5baec6c657e8c84995b"
 
 [targets.x86_64-linux-gnu]
 system_defines = []
 system_libraries = ["-lm", "-lpthread", "-ldl"]
 counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init", "mprotect=counted_mprotect"]
 host_resources = []
+wasmtime_archive = "wasmtime-v48.0.5-x86_64-linux-c-api.tar.xz"
+wasmtime_top = "wasmtime-v48.0.5-x86_64-linux-c-api"
+wasmtime_sha256 = "81fffe5fe895c7f8f84a744f4d4d165dda28793d00ee943ee71fcfb6ab5ed923"
+wasmtime_link = "lib/libwasmtime.so"
+wasmtime_runtime = "lib/libwasmtime.so"
+binaryen_archive = "binaryen-version_133-x86_64-linux.tar.gz"
+binaryen_sha256 = "2dc9c7813f5375db93d96ead4b78222fcc3e2677bbb832297af4797782a37489"
 
 [targets.aarch64-macos]
 system_defines = ["-D_DARWIN_C_SOURCE"]
 system_libraries = []
 counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init", "mprotect=counted_mprotect"]
 host_resources = []
+wasmtime_archive = "wasmtime-v48.0.5-aarch64-macos-c-api.tar.xz"
+wasmtime_top = "wasmtime-v48.0.5-aarch64-macos-c-api"
+wasmtime_sha256 = "92e74e76ef06ae699beec893cf3268d439da4d05dbca020e8f608ca3f0c1e862"
+wasmtime_link = "lib/libwasmtime.dylib"
+wasmtime_runtime = "lib/libwasmtime.dylib"
+binaryen_archive = "binaryen-version_133-arm64-macos.tar.gz"
+binaryen_sha256 = "ad66da82ac13f163e424b1643f16c6dfcccc98b5966296b43e52d3cab04f84a8"
 
 [targets.aarch64-linux-gnu]
 system_defines = []
 system_libraries = ["-lm", "-lpthread", "-ldl"]
 counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init", "mprotect=counted_mprotect"]
 host_resources = []
+wasmtime_archive = "wasmtime-v48.0.5-aarch64-linux-c-api.tar.xz"
+wasmtime_top = "wasmtime-v48.0.5-aarch64-linux-c-api"
+wasmtime_sha256 = "3fd35813cf4a922b968fa3dbd12a300ecea032181a895c4ffe7b1f6f2824fca6"
+wasmtime_link = "lib/libwasmtime.so"
+wasmtime_runtime = "lib/libwasmtime.so"
+binaryen_archive = "binaryen-version_133-aarch64-linux.tar.gz"
+binaryen_sha256 = "89c07ea56faf38d0fbecf36ca8ec0721756716185f265b568e133d427f299bf8"
 
 [targets.x86_64-macos]
 system_defines = ["-D_DARWIN_C_SOURCE"]
 system_libraries = []
 counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init", "mprotect=counted_mprotect"]
 host_resources = []
+wasmtime_archive = "wasmtime-v48.0.5-x86_64-macos-c-api.tar.xz"
+wasmtime_top = "wasmtime-v48.0.5-x86_64-macos-c-api"
+wasmtime_sha256 = "47789d6be9ae03d4ba0ff13821e1d069bbaa3a8926bcd4b701482c3149539556"
+wasmtime_link = "lib/libwasmtime.dylib"
+wasmtime_runtime = "lib/libwasmtime.dylib"
+binaryen_archive = "binaryen-version_133-x86_64-macos.tar.gz"
+binaryen_sha256 = "13a9b90be775c6389ce3d1f879cb8627bea56708ba8c122983941d53a8199b95"
 
 [targets.aarch64-windows-gnu]
 system_defines = []
 system_libraries = []
 counted_system = ["WINBASEAPI=", "CreateEventA=counted_create_event", "CreateThread=counted_create_thread", "VirtualAlloc=counted_virtual_alloc"]
 host_resources = ["tests/host/host.rc"]
+wasmtime_archive = "wasmtime-v48.0.5-aarch64-windows-c-api.zip"
+wasmtime_top = "wasmtime-v48.0.5-aarch64-windows-c-api"
+wasmtime_sha256 = "a1b598234681cc04f56f7cb79bcd83f8e001f5545c26ad51363c38102c0065d8"
+wasmtime_link = "lib/wasmtime.dll.lib"
+wasmtime_runtime = "lib/wasmtime.dll"
+binaryen_archive = "binaryen-version_133-arm64-windows.tar.gz"
+binaryen_sha256 = "492a8e1847a0be1554bb9a7f384227981d60bc013aedc02d8ba1372c3943178c"
 
 [[artifact]]
 name = "bridge"
@@ -2863,6 +2942,1033 @@ sources = ["tests/backends/native/modules/ncover.c", "tests/backends/native/modu
 include = ["include", "src/backends/native/sdk", "tests/backends/native/modules"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
+[[artifact]]
+name = "bridge_wasm"
+kind = "library"
+part = "wasm"
+folder = "backends"
+sources = ["src/backends/wasm/*.c", "src/os/{system}/*.c"]
+include = ["include", "src/backends/wasm", "src/os", "{wasmtime}/include"]
+flags = ["{quiet}", "{system_defines}", "{wasmtime}/{wasmtime_link}", "{system_libraries}", "{rpath}"]
+beside = ["{wasmtime}/{wasmtime_runtime}"]
+
+[[artifact]]
+name = "wasm-host"
+kind = "program"
+test = true
+part = "wasm"
+sources = ["tests/backends/wasm/host/*.c", "tests/backends/wasm/support/host*.c", "tests/backends/wasm/support/{system}/host*.c"]
+include = ["include", "tests/backends/wasm/host", "tests/backends/wasm/support"]
+defines = ['BACKEND_PATH="{out}/backends/bridge_wasm{library}"', 'MODULE_DIR="{out}/wasm"']
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+link = ["{out}/bridge{library}"]
+
+[[artifact]]
+name = "wasm-adopt"
+kind = "program"
+test = true
+part = "wasm"
+sources = ["tests/backends/wasm/adopt/*.c", "src/os/{system}/*.c"]
+include = ["include", "src/os", "tests/backends/wasm/adopt"]
+defines = ['BACKEND_PATH="{out}/backends/bridge_wasm{library}"', 'MODULE_DIR="{out}/wasm"']
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "acc"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["src/backends/wasm/sdk/bridge_wasm.wat"]
+
+[[artifact]]
+name = "adopt"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/adopt.wat"]
+
+[[artifact]]
+name = "big"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/big.wat"]
+
+[[artifact]]
+name = "edges"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/edges.wat"]
+
+[[artifact]]
+name = "trapstart"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/trapstart.wat"]
+
+[[artifact]]
+name = "grow"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/grow.wat"]
+
+[[artifact]]
+name = "host"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/host.wat"]
+
+[[artifact]]
+name = "image"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/image.wat"]
+
+[[artifact]]
+name = "noinit"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/noinit.wat"]
+
+[[artifact]]
+name = "noreload"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/noreload.wat"]
+
+[[artifact]]
+name = "ok"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ok.wat"]
+
+[[artifact]]
+name = "oob"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/oob.wat"]
+
+[[artifact]]
+name = "shape"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/shape.wat"]
+
+[[artifact]]
+name = "shape64"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/shape64.wat"]
+
+[[artifact]]
+name = "spin"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/spin.wat"]
+
+[[artifact]]
+name = "stray"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/stray.wat"]
+
+[[artifact]]
+name = "strayglobal"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/strayglobal.wat"]
+
+[[artifact]]
+name = "mover"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/mover.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "reader"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/reader.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "refs"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/refs.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "fp"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/fp.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "badterm"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/badterm.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "spin3"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/spin3.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "flood"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/flood.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "chatty"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/chatty.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "rows"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/rows.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "halver"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/halver.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "twostep"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/twostep.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "watcher"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/watcher.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "chain"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/chain.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "badobs"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/badobs.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "events"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/events.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "fixer"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/fixer.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "nested"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/nested.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "namer"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/namer.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "spawner"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/spawner.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "counter"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/counter.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "typer"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/typer.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "user"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/user.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "hang"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/hang.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "hit"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/hit/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "shield"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/shield.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "aim"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/aim.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "levels"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/levels.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "tagged"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/tagged.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "rows-unchecked"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/rows.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_UNCHECKED"]
+
+[[artifact]]
+name = "nested2"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/nested.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["LEAVE_OUT_VEC2", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "settings"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/settings/*.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["KEPT=BRIDGE_SINGLETON", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "kept-unset"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/kept.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["KEPT=0", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "kept-none"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/kept.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["KEPT=9", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "kept-sparse"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/kept.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["KEPT=BRIDGE_SPARSE_SET", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "namer-reader"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/namer.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["READER", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "flaky-always"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/flaky.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["OF=1", "FAILS=1", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "flaky-third"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/flaky.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["OF=3", "FAILS=1", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "flaky-twothirds"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/flaky.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["OF=3", "FAILS=2", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "flaky-calm"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/flaky.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["OF=1", "FAILS=1", "CALM", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "keeper-strip"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/keeper.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["PRIVATE_POLICY=BRIDGE_STRIP", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "keeper-sweep"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/keeper.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["PRIVATE_POLICY=BRIDGE_SWEEP", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "keeper-delete"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/keeper.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["PRIVATE_POLICY=BRIDGE_DELETE", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "retype-private"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/retype.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["WHICH=1", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "retype-vec2"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/retype.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["WHICH=2", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "retype-extra"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/retype.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["WHICH=3", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "retype-settings"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/retype.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["WHICH=4", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "settings-drop"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/settings/*.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["DROP", "KEPT=BRIDGE_SINGLETON", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "settings-table"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/settings/*.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["KEPT=BRIDGE_TABLE", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "ticker"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ticker.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["STEP=1", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "ticker-ten"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ticker.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["STEP=10", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "ticker-wide"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ticker.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["STEP=10", "WIDE", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "ticker-fail"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ticker.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["STEP=10", "FAIL_RELOAD", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "ticker-noextra"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ticker.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["STEP=10", "NO_EXTRA", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "ticker-trip"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ticker.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["STEP=1", "TRIP", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "ticker-alloc"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ticker.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["STEP=10", "ALLOC", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-outside"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_outside", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-name-outside"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_name_outside", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-no-namespace"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_no_namespace", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-kind-unset"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_kind_unset", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-tag-with-bytes"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_tag_with_bytes", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-policy-unset"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_policy_unset", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-size-other"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_size_other", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-system-outside"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_system_outside", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-system-phase-outside"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_system_phase_outside", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-system-name-outside"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_system_name_outside", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-system-many-changes"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_system_many_changes", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-system-twice"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_system_twice", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-observer-no-term"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_observer_no_term", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-observe-outside"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_observe_outside", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-observe-events-unset"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_observe_events_unset", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-term-access-unset"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_term_access_unset", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-term-access-other"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_term_access_other", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-term-oper-unset"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_term_oper_unset", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-term-slot-undeclared"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_term_slot_undeclared", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-term-write-ungranted"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_term_write_ungranted", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-change-slot-undeclared"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_change_slot_undeclared", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-change-ungranted"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_change_ungranted", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-alloc-stated-none"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_alloc_stated_none", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-late"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_declare_late", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-system-late"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_system_late", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-observe-late"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_observe_late", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-attach-undeclared"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_undeclared", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-attach-ungranted"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_ungranted", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-attach-outside"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_outside", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-detach-undeclared"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_detach_undeclared", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-attach-tag-value"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_tag_value", "BRIDGE_ROWS_CHECKED"]
+
 [check]
 guides = ["timings.md"]
 
@@ -2876,3 +3982,134 @@ ASM700 = ""
 IdeaTek = ""
 plugin = "module"
 plugins = "modules"
+
+[[style.exception]]
+rule = "F5"
+path = "src/backends/wasm/wasm_adopted.c:make_memory"
+why = "wasmtime fixes the signature of its linear-memory create callback."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_adopted.c"
+line = 17
+col = 26
+side = "function"
+why = "An adopted block reports a capacity equal to its size, so wasmtime never grows it and never calls grow_adopted."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_adopted.c"
+line = 21
+col = 9
+side = "true"
+why = "grow_adopted never runs, because an adopted block reports a capacity equal to its size."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_adopted.c"
+line = 21
+col = 9
+side = "false"
+why = "grow_adopted never runs, because an adopted block reports a capacity equal to its size."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_adopted.c"
+line = 33
+col = 9
+side = "true"
+why = "wasmtime asks the creator for the reservation it was configured with, which is WASM_RESERVATION, so it never asks for more."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_adopted.c"
+line = 33
+col = 40
+side = "true"
+why = "wasmtime asks the creator for the guard it was configured with, which is WASM_GUARD, so it never asks for more."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_adopted.c"
+line = 38
+col = 9
+side = "true"
+why = "The holder declares the adopted block's exact page count, so the import minimum always equals the block length."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_fail.c"
+line = 37
+col = 10
+side = "true"
+why = "No error or trap message in the tests is longer than 200 bytes, and snprintf into err->text bounds the result anyway."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_holder.c"
+line = 53
+col = 9
+side = "false"
+why = "build_holder assembles a valid memory-only module, which wasmtime always compiles."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_holder.c"
+line = 58
+col = 9
+side = "true"
+why = "The holder is valid and its only memory comes from the creator, so instantiating it never returns an error."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_holder.c"
+line = 58
+col = 18
+side = "true"
+why = "The holder has no start function, so instantiating it never traps."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_holder.c"
+line = 60
+col = 9
+side = "false"
+why = "build_holder always exports the memory under the name 'm'."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_instance.c"
+line = 45
+col = 9
+side = "true"
+why = "wasm_adopt_into of a valid holder never returns an error."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_instance.c"
+line = 45
+col = 18
+side = "true"
+why = "The holder has no start function, so adopting its memory never traps."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_instance.c"
+line = 61
+col = 35
+side = "false"
+why = "Giving an adopted memory never traps, so the loop never stops on a trap."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_instance.c"
+line = 65
+col = 19
+side = "false"
+why = "Giving an adopted memory never traps, so this never reports a trap."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_own.c"
+line = 23
+col = 9
+side = "true"
+why = "A wasm32 memory holds at most 65536 pages, which is WASM_RESERVATION, so a grow never exceeds the reserve."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_own.c"
+line = 23
+col = 34
+side = "true"
+why = "A commit within the reserved block fails only when the operating system runs out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/backends/wasm/wasm_own.c"
+line = 45
+col = 9
+side = "true"
+why = "A 4 GiB reservation fails only when the operating system runs out of address space, which the tests do not force."

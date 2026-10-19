@@ -258,7 +258,7 @@ Bridge puts each text that a backend writes in `err` into a record of its own, a
 
 ## The native backend
 
-Bridge ships one backend, `native`, in `src/backends/native`. It runs each module as a native shared library.
+The native backend, `native`, is in `src/backends/native`. It runs each module as a native shared library.
 It opens the library of a module from the path that the host gave, and finds each export by its name, as `bridge_<name>`.
 The native backend keeps none of the limits, and runs only a module that is trusted.
 
@@ -269,3 +269,14 @@ It writes one of these reasons in `err` when it refuses. Angle brackets mark a p
 - `no exported function '<name>'`
 - `this backend opens a module's library by its path, and was handed none`
 - `cannot open the library '<path>'`
+
+## The wasm backend
+
+The wasm backend, `wasm`, is in `src/backends/wasm`. It runs each module as sandboxed core wasm over
+wasmtime, which it fetches and pins. It compiles the bytes of a module into a wasm instance, and reaches
+each export by its name.
+
+It writes this reason in `err` when an export has the wrong type. The angle brackets mark a part that
+changes:
+
+- `its export '<name>' is not () -> i32`
