@@ -1,113 +1,113 @@
 [[case]]
 name = "static-bridge_load-loaded"
-run = ["{out}/host-static{exe}", "bridge_load-loaded"]
+run = ["{out}/seam-static{exe}", "bridge_load-loaded"]
 claims = { matches = ["test:ok@0.1.0: loaded.*alive"] }
-false = { run = ["{out}/host-static{exe}", "bridge_load-init-trapped"] }
+false = { run = ["{out}/seam-static{exe}", "bridge_load-init-trapped"] }
 
 [[case]]
 name = "static-BRIDGE_NO_LIMIT-stated-for-every-limit"
-run = ["{out}/host-static{exe}", "BRIDGE_NO_LIMIT-stated-for-every-limit"]
+run = ["{out}/seam-static{exe}", "BRIDGE_NO_LIMIT-stated-for-every-limit"]
 claims = { matches = ["test:ok@0.1.0: loaded.*alive"] }
-false = { run = ["{out}/host-static{exe}", "bridge_load-init-trapped"] }
+false = { run = ["{out}/seam-static{exe}", "bridge_load-init-trapped"] }
 
 [[case]]
 name = "static-bridge_load-init-trapped"
-run = ["{out}/host-static{exe}", "bridge_load-init-trapped"]
+run = ["{out}/seam-static{exe}", "bridge_load-init-trapped"]
 claims = { matches = ["module 'test:oob@0.1.0' did not load: its init trapped: the module asked for it.*alive"] }
-false = { run = ["{out}/host-static{exe}", "module_config.init_timeout-init-interrupted"] }
+false = { run = ["{out}/seam-static{exe}", "module_config.init_timeout-init-interrupted"] }
 
 [[case]]
 name = "static-module_config.init_timeout-init-interrupted"
-run = ["{out}/host-static{exe}", "module_config.init_timeout-init-interrupted"]
+run = ["{out}/seam-static{exe}", "module_config.init_timeout-init-interrupted"]
 claims = { matches = ["module 'test:spin@0.1.0' did not load: its init trapped: the timeout passed.*alive"] }
-false = { run = ["{out}/host-static{exe}", "module_config.memory_limit-growth-refused"] }
+false = { run = ["{out}/seam-static{exe}", "module_config.memory_limit-growth-refused"] }
 
 [[case]]
 name = "static-module_config.memory_limit-growth-refused"
-run = ["{out}/host-static{exe}", "module_config.memory_limit-growth-refused"]
+run = ["{out}/seam-static{exe}", "module_config.memory_limit-growth-refused"]
 claims = { matches = ["module 'test:grow@0.1.0' did not load: its init answered 7.*alive"] }
-false = { run = ["{out}/host-static{exe}", "instance_get_func-no-such-export-refused"] }
+false = { run = ["{out}/seam-static{exe}", "instance_get_func-no-such-export-refused"] }
 
 [[case]]
 name = "static-instance_get_func-no-such-export-refused"
-run = ["{out}/host-static{exe}", "instance_get_func-no-such-export-refused"]
+run = ["{out}/seam-static{exe}", "instance_get_func-no-such-export-refused"]
 claims = { matches = ["module 'test:noinit@0.1.0' did not load: no exported function 'module_init'.*alive"] }
-false = { run = ["{out}/host-static{exe}", "module_config.abi-another-refused"] }
+false = { run = ["{out}/seam-static{exe}", "module_config.abi-another-refused"] }
 
 [[case]]
 name = "static-bridge_load-no-init-export"
-run = ["{out}/host-static{exe}", "bridge_load-no-init-export"]
+run = ["{out}/seam-static{exe}", "bridge_load-no-init-export"]
 claims = { matches = ["module 'test:noinit@0.1.0' did not load: no exported function 'module_init'.*alive"] }
-false = { run = ["{out}/host-static{exe}", "module_config.abi-another-refused"] }
+false = { run = ["{out}/seam-static{exe}", "module_config.abi-another-refused"] }
 
 [[case]]
 name = "static-module_config.abi-another-refused"
-run = ["{out}/host-static{exe}", "module_config.abi-another-refused"]
+run = ["{out}/seam-static{exe}", "module_config.abi-another-refused"]
 claims = { matches = ["module 'test:ok@0.1.0' is refused: it wants ABI 2 and this is ABI 1.*alive"] }
-false = { run = ["{out}/host-static{exe}", "artifact.backend-not-configured-refused"] }
+false = { run = ["{out}/seam-static{exe}", "artifact.backend-not-configured-refused"] }
 
 [[case]]
 name = "static-artifact.backend-not-configured-refused"
-run = ["{out}/host-static{exe}", "artifact.backend-not-configured-refused"]
+run = ["{out}/seam-static{exe}", "artifact.backend-not-configured-refused"]
 claims = { matches = ["module 'test:ok@0.1.0' is refused: no backend named 'plain'.*alive"] }
-false = { run = ["{out}/host-static{exe}", "module_config.log_level-unset-refused"] }
+false = { run = ["{out}/seam-static{exe}", "module_config.log_level-unset-refused"] }
 
 [[case]]
 name = "static-module_config.log_level-unset-refused"
-run = ["{out}/host-static{exe}", "module_config.log_level-unset-refused"]
+run = ["{out}/seam-static{exe}", "module_config.log_level-unset-refused"]
 claims = { matches = ["module 'test:ok@0.1.0' is refused: log_level is unset.*alive"], lacks = [": loaded"] }
-false = { run = ["{out}/host-static{exe}", "module_config.memory_limit-unset-refused"] }
+false = { run = ["{out}/seam-static{exe}", "module_config.memory_limit-unset-refused"] }
 
 [[case]]
 name = "static-module_config.memory_limit-unset-refused"
-run = ["{out}/host-static{exe}", "module_config.memory_limit-unset-refused"]
+run = ["{out}/seam-static{exe}", "module_config.memory_limit-unset-refused"]
 claims = { matches = ["module 'test:ok@0.1.0' is refused: memory_limit is unset.*alive"] }
-false = { run = ["{out}/host-static{exe}", "BRIDGE_NONE-for-a-limit-refused"] }
+false = { run = ["{out}/seam-static{exe}", "BRIDGE_NONE-for-a-limit-refused"] }
 
 [[case]]
 name = "static-BRIDGE_NONE-for-a-limit-refused"
-run = ["{out}/host-static{exe}", "BRIDGE_NONE-for-a-limit-refused"]
+run = ["{out}/seam-static{exe}", "BRIDGE_NONE-for-a-limit-refused"]
 claims = { matches = ["module 'test:ok@0.1.0' is refused: spawns is -1, which is neither an amount nor BRIDGE_NONE.*module 'test:ok@0.1.0' is refused: work_limit is -2, which is neither a limit nor BRIDGE_NO_LIMIT.*alive"], lacks = [": loaded"] }
-false = { run = ["{out}/host-static{exe}", "config.abi-another-refused"] }
+false = { run = ["{out}/seam-static{exe}", "config.abi-another-refused"] }
 
 [[case]]
 name = "static-config.abi-another-refused"
-run = ["{out}/host-static{exe}", "config.abi-another-refused"]
+run = ["{out}/seam-static{exe}", "config.abi-another-refused"]
 claims = { matches = ["the host is of host ABI 2, and this is 1.*bridge_create refused.*alive"] }
-false = { run = ["{out}/host-static{exe}", "config.abi-unset-refused"] }
+false = { run = ["{out}/seam-static{exe}", "config.abi-unset-refused"] }
 
 [[case]]
 name = "static-config.abi-unset-refused"
-run = ["{out}/host-static{exe}", "config.abi-unset-refused"]
+run = ["{out}/seam-static{exe}", "config.abi-unset-refused"]
 claims = { matches = ["abi is unset.*bridge_create refused.*alive"] }
-false = { run = ["{out}/host-static{exe}", "BRIDGE_UNSET-flag-refused"] }
+false = { run = ["{out}/seam-static{exe}", "BRIDGE_UNSET-flag-refused"] }
 
 [[case]]
 name = "static-BRIDGE_UNSET-flag-refused"
-run = ["{out}/host-static{exe}", "BRIDGE_UNSET-flag-refused"]
+run = ["{out}/seam-static{exe}", "BRIDGE_UNSET-flag-refused"]
 claims = { matches = ["module 'test:ok@0.1.0' is refused: pinned is unset.*module 'test:ok@0.1.0' is refused: trusted is 3, which is neither BRIDGE_TRUE nor BRIDGE_FALSE.*alive"], lacks = [": loaded"] }
-false = { run = ["{out}/host-static{exe}", "module_config.memory_limit-negative-refused"] }
+false = { run = ["{out}/seam-static{exe}", "module_config.memory_limit-negative-refused"] }
 
 [[case]]
 name = "static-module_config.memory_limit-negative-refused"
-run = ["{out}/host-static{exe}", "module_config.memory_limit-negative-refused"]
+run = ["{out}/seam-static{exe}", "module_config.memory_limit-negative-refused"]
 claims = { matches = ["module 'test:ok@0.1.0' is refused: memory_limit is -7, which is neither a limit nor BRIDGE_NO_LIMIT.*alive"], lacks = [": loaded"] }
-false = { run = ["{out}/host-static{exe}", "module_config.on_error-fail-stops-and-skip-does-not"] }
+false = { run = ["{out}/seam-static{exe}", "module_config.on_error-fail-stops-and-skip-does-not"] }
 
 [[case]]
 name = "static-module_config.on_error-fail-stops-and-skip-does-not"
-run = ["{out}/host-static{exe}", "module_config.on_error-fail-stops-and-skip-does-not"]
+run = ["{out}/seam-static{exe}", "module_config.on_error-fail-stops-and-skip-does-not"]
 claims = { matches = ["test:ok@0.1.0: loaded.*the world has stopped: module 'test:oob@0.1.0' failed and its on_error is fail.*test:ok@0.1.0: not loaded.*alive"] }
-false = { run = ["{out}/host-static{exe}", "backend.library-cannot-open-refused"] }
+false = { run = ["{out}/seam-static{exe}", "backend.library-cannot-open-refused"] }
 
 [[case]]
 name = "static-backend.library-cannot-open-refused"
-run = ["{out}/host-static{exe}", "backend.library-cannot-open-refused"]
+run = ["{out}/seam-static{exe}", "backend.library-cannot-open-refused"]
 claims = { matches = ["backend 'guarded': cannot open backend library 'no-such-backend-library'.*bridge_create refused.*alive"] }
-false = { run = ["{out}/host-static{exe}", "bridge_create-no-sink-refused"] }
+false = { run = ["{out}/seam-static{exe}", "bridge_create-no-sink-refused"] }
 
 [[case]]
 name = "static-bridge_create-no-sink-refused"
-run = ["{out}/host-static{exe}", "bridge_create-no-sink-refused"]
+run = ["{out}/seam-static{exe}", "bridge_create-no-sink-refused"]
 claims = { matches = ["refused: no sink.*alive"] }
-false = { run = ["{out}/host-static{exe}", "bridge_load-loaded"] }
+false = { run = ["{out}/seam-static{exe}", "bridge_load-loaded"] }

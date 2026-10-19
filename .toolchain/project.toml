@@ -178,7 +178,7 @@ steps = [
 system_defines = []
 system_libraries = []
 counted_system = ["WINBASEAPI=", "CreateEventA=counted_create_event", "CreateThread=counted_create_thread", "VirtualAlloc=counted_virtual_alloc"]
-host_resources = ["tests/host/host.rc"]
+host_resources = ["tests/seam/seam.rc"]
 wasmtime_archive = "wasmtime-v48.0.5-x86_64-mingw-c-api.zip"
 wasmtime_top = "wasmtime-v48.0.5-x86_64-mingw-c-api"
 wasmtime_sha256 = "7842335b4199bb5cdf3031c0d9084db17ab3d0619829726ed19576d48b5b8ead"
@@ -243,7 +243,7 @@ binaryen_sha256 = "13a9b90be775c6389ce3d1f879cb8627bea56708ba8c122983941d53a8199
 system_defines = []
 system_libraries = []
 counted_system = ["WINBASEAPI=", "CreateEventA=counted_create_event", "CreateThread=counted_create_thread", "VirtualAlloc=counted_virtual_alloc"]
-host_resources = ["tests/host/host.rc"]
+host_resources = ["tests/seam/seam.rc"]
 wasmtime_archive = "wasmtime-v48.0.5-aarch64-windows-c-api.zip"
 wasmtime_top = "wasmtime-v48.0.5-aarch64-windows-c-api"
 wasmtime_sha256 = "a1b598234681cc04f56f7cb79bcd83f8e001f5545c26ad51363c38102c0065d8"
@@ -2722,20 +2722,20 @@ flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 link = ["{out}/counted.a", "{out}/counted_os.a"]
 
 [[artifact]]
-name = "host"
+name = "seam"
 kind = "program"
 test = true
-sources = ["tests/host/*.c", "tests/support/host*.c", "tests/support/{system}/host*.c"]
+sources = ["tests/seam/*.c", "tests/support/host*.c", "tests/support/{system}/host*.c"]
 include = ["include", "tests/support"]
 defines = ["{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{host_resources}"]
 link = ["{out}/bridge{library}"]
 
 [[artifact]]
-name = "host-static"
+name = "seam-static"
 kind = "program"
 test = true
-sources = ["tests/host/*.c", "tests/support/host*.c", "tests/support/{system}/host*.c"]
+sources = ["tests/seam/*.c", "tests/support/host*.c", "tests/support/{system}/host*.c"]
 include = ["include", "tests/support"]
 defines = ["{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{host_resources}"]

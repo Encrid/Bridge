@@ -2,4 +2,4 @@
 name = "the os layer reserves, commits, and waits with a timeout"
 run = ["{out}/os{exe}"]
 claims = { matches = ["os ok"] }
-false = { run = ["{out}/host{exe}", "bridge_load-loaded"] }
+false = { run = ["{out}/seam{exe}", "bridge_load-loaded"] }
