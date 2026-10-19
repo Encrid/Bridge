@@ -58,10 +58,23 @@ Then it writes these lines, in the order of the files, the lines and the columns
 - `<path>:<line>:<column>: no case reaches this case`
 - `<path>:<line>:<column>: no case calls this function`
 - `<path>:<line>:<column>: this condition is in a macro, and is not measured`, or `this case`, or `this function`
+- `<path>:<line>:<column>: this exemption states no reason`
+- `<path>:<line>:<column>: this exemption excuses no unreached outcome`
 
-Then it writes `branches: <outcomes> outcomes, <reached> reached`.
+Then it writes `branches: <outcomes> outcomes, <reached> reached`, and `, <exempt> exempt` when an exemption excuses an outcome.
 If an outcome is not reached, or a branch is not measured, it stops: `outcomes not reached: <number>; branches not measured: <number>`.
 If a line has a different number of bits than the probes of its file, it stops: `<hits>: a line of <path> does not match its probes`.
+
+## Exemptions
+
+`[[branches.exception]]` of `project.toml` marks a defensive branch that stays though no test drives it.
+Each exemption names a branch by `path`, `line`, `column` and `side`, and states a `why`.
+The `side` is `true`, `false`, `function` or `case`.
+
+`reported` excuses an unreached outcome that an exemption matches, and counts it as exempt, not as missed.
+An exemption with no `why` excuses nothing and is a fault.
+An exemption that matches no unreached outcome is a fault, so a branch that a case reaches again loses its exemption.
+`.toolchain/docs/project.toml.md`, *[[branches.exception]]*.
 
 ## The syntax tree
 
@@ -104,4 +117,5 @@ If the output is not JSON, it stops: `the tree of <path> is not JSON`.
 | `probed(config, values)` | Writes the copies with the probes, as *The steps* tells. It gives the probes and the branches that are not measured. |
 | `written(root, where, edits, skips)` | Copies `src` and `include`, and writes the probes of each file. |
 | `joined(probes, hits)` | Gives the bits of each file, joined from all the lines of `hits`. |
-| `reported(probes, gaps, hits)` | Writes the report, as *The report* tells. |
+| `excused(listed, name, line, col, said)` | Tells if an exemption of `listed` matches this unreached outcome, and counts the match. |
+| `reported(probes, gaps, hits, excepted)` | Writes the report, as *The report* tells. `excepted` holds the exemptions. |

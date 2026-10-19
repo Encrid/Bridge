@@ -1,0 +1,19 @@
+[project]
+name = "excused"
+
+[[artifact]]
+name = "defend"
+kind = "program"
+sources = ["src/*.c"]
+include = ["src"]
+
+[[branches.exception]]
+path = "src/defend.c"
+line = 10
+col = 9
+side = "true"
+why = "The one case calls defend with a value that is never negative."
+
+[test]
+timeout = 60
+copies = 1

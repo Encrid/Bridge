@@ -21,3 +21,15 @@ name = "branches with a false variant"
 run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/branches/empty", "--out", "{case}/out", "--branches", "--break"]
 claims = { status_not = 0, has = ["--branches runs each case one time: it takes no --break, --toolchain, --copies or --rounds"] }
 false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/branches/empty", "--out", "{case}/out", "--branches"] }
+
+[[case]]
+name = "an exemption excuses an unreached branch"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/branches/excused", "--out", "{case}/out", "--branches"]
+claims = { status = 0, line = ["branches: 4 outcomes, 3 reached, 1 exempt"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/branches/badexempt", "--out", "{case}/out", "--branches"] }
+
+[[case]]
+name = "an exemption with no reason or no target is a fault"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/branches/badexempt", "--out", "{case}/out", "--branches"]
+claims = { status = 1, line = ["src/defend.c:10:9: no case makes this condition true", "src/defend.c:10:9: this exemption states no reason", "src/defend.c:12:9: this exemption excuses no unreached outcome"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/branches/excused", "--out", "{case}/out", "--branches"] }

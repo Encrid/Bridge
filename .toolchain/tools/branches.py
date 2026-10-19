@@ -2,6 +2,7 @@
 #
 # Under the GNU Affero General Public License, version 3 only: see license.
 import concurrent.futures
+import fnmatch
 import json
 import os
 import shutil
@@ -317,8 +318,23 @@ def joined(probes, hits):
     return seen
 
 
-def reported(probes, gaps, hits):
-    seen, faults, total = joined(probes, hits), [], 0
+BRANCH_SIDE = {'true': 'no case makes this condition true',
+               'false': 'no case makes this condition false',
+               'function': 'no case calls this function',
+               'case': 'no case reaches this case'}
+
+
+def excused(listed, name, line, col, said):
+    for entry in listed:
+        if (entry.get('why') and entry.get('line') == line and entry.get('col') == col
+                and BRANCH_SIDE.get(entry.get('side')) == said and fnmatch.fnmatch(name, entry['path'])):
+            entry['hits'] = entry.get('hits', 0) + 1
+            return True
+    return False
+
+
+def reported(probes, gaps, hits, excepted=()):
+    seen, outcomes, total = joined(probes, hits), [], 0
     for name, rows in probes.items():
         bits = seen.get(name, '0' * (2 * max(1, len(rows))))
         for number, row in enumerate(rows):
@@ -326,13 +342,22 @@ def reported(probes, gaps, hits):
             for side, said in zip(range(2 - len(sides), 2), sides):
                 total += 1
                 if bits[2 * number + side] == '0':
-                    faults.append((name, row['line'], row['col'], said))
-    missed = len(faults)
-    for name, rows in gaps.items():
-        faults += [(name, row['line'], row['col'], 'this %s is in a macro, and is not measured' % row['kind'])
-                   for row in rows]
-    for fault in sorted(faults):
+                    outcomes.append((name, row['line'], row['col'], said))
+    macros = [(name, row['line'], row['col'], 'this %s is in a macro, and is not measured' % row['kind'])
+              for name, rows in gaps.items() for row in rows]
+    listed = [dict(entry) for entry in excepted]
+    missed = [fault for fault in outcomes if not excused(listed, *fault)]
+    exempt = len(outcomes) - len(missed)
+    stale = []
+    for entry in listed:
+        where = (entry.get('path', '?'), entry.get('line', 0), entry.get('col', 0))
+        if not entry.get('why'):
+            stale.append(where + ('this exemption states no reason',))
+        elif not entry.get('hits'):
+            stale.append(where + ('this exemption excuses no unreached outcome',))
+    for fault in sorted(missed + macros + stale):
         print('%s:%d:%d: %s' % fault)
-    print('branches: %d outcomes, %d reached' % (total, total - missed))
-    if faults:
-        die('outcomes not reached: %d; branches not measured: %d' % (missed, len(faults) - missed))
+    print('branches: %d outcomes, %d reached%s'
+          % (total, total - len(outcomes), ', %d exempt' % exempt if exempt else ''))
+    if missed or macros or stale:
+        die('outcomes not reached: %d; branches not measured: %d' % (len(missed), len(macros)))

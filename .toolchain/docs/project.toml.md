@@ -267,3 +267,28 @@ why = "The table of the grammar is one long function."
 ```
 
 The check of the style reports an exception that excuses nothing.
+
+## [[branches.exception]]
+
+An exception lets a project keep a defensive branch that no case can reach, for `test --branches`.
+
+| Key | Value |
+| --- | --- |
+| `path` | The path of the file. It can contain `*`. |
+| `line` | The line of the branch. |
+| `col` | The column of the branch. |
+| `side` | `true`, `false`, `function` or `case`. |
+| `why` | The reason the branch is unreachable. |
+
+For example:
+
+```toml
+[[branches.exception]]
+path = "src/backends/wasm/wasm_own.c"
+line = 23
+col = 9
+side = "true"
+why = "A wasm32 memory holds at most 65536 pages, which is the reserve, so a grow never exceeds it."
+```
+
+`test --branches` reports an exception that states no reason, or that matches no unreached outcome.
