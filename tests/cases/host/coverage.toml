@@ -294,12 +294,12 @@ native = "{out}/backends/bridge_native"
 '''
 
 [[case]]
-name = "two files whose orders do not share a pair"
-run = ["{out}/bridge-host{exe}", "{case}/oc.toml"]
+name = "two files with disjoint orders compose"
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/oc.toml"]
 
 [case.claims]
-status = 1
-has = ["refused: order "]
+status = 0
+has = ["order: a before b", "order: e before f", "order: x before y"]
 
 [case.folders]
 "{case}/cq" = ["quiet"]
@@ -324,11 +324,15 @@ native = "{out}/backends/bridge_native"
 
 [case.false.files]
 "{case}/oc2.toml" = '''
+[order]
+before = [["b", "a"]]
 '''
 "{case}/oc.toml" = '''
 presets = ["{root}/tests/host/test.toml", "oc2.toml"]
 phases = ["update"]
 rounds = 8
+[order]
+before = [["a", "b"], ["e", "f"]]
 [content]
 paths = ["cq"]
 [backend]

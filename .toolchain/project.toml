@@ -4353,7 +4353,7 @@ why = "names_add's realloc returns null only when memory runs out, which the tes
 
 [[branches.exception]]
 path = "src/host/config_order.c"
-line = 47
+line = 48
 col = 9
 side = "true"
 why = "add_order's realloc returns null only when memory runs out, which the tests do not force."

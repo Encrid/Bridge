@@ -17,14 +17,15 @@ static bool is_pair(const char *a, const char *b, const char *const *two)
 static bool states_pair(const cfile_t *f, const void *asked, said_t *said)
 {
     const char *const *two = asked;
+    said_t list = {};
     const value_t *pair = nullptr;
 
-    if (!config_states_key(f, &ORDERED, said))
+    if (!config_states_key(f, &ORDERED, &list))
         return (false);
-    for (uint32_t i = 0; i < said->value->count; i++) {
-        pair = &said->value->items[i];
+    for (uint32_t i = 0; i < list.value->count; i++) {
+        pair = &list.value->items[i];
         if (is_pair(pair->items[0].text, pair->items[1].text, two)) {
-            said->value = pair;
+            *said = (said_t){ pair, list.file, list.line };
             return (true);
         }
     }
