@@ -1,0 +1,92 @@
+[[case]]
+name = "two configs at once"
+run = ["{out}/bridge-host{exe}", "{case}/two.toml"]
+stdin = "go\n"
+
+[case.claims]
+status = 0
+has = ["destroyed: 0"]
+
+[case.helper]
+run = ["{out}/bridge-host{exe}", "{case}/one.toml"]
+wait = "? go on"
+stdin = "go\n"
+
+[case.helper.claims]
+status = 0
+has = ["destroyed: 0"]
+
+[case.folders]
+"{case}/together-one" = ["wait"]
+"{case}/together-two" = ["wait"]
+
+[case.files]
+"{case}/one.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 16
+[content]
+paths = ["together-one"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+"{case}/two.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 16
+[content]
+paths = ["together-two"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "{case}/one.toml"]
+
+[[case]]
+name = "one config twice"
+run = ["{out}/bridge-host{exe}", "{case}/one.toml"]
+stdin = "go\n"
+
+[case.claims]
+status = 1
+line = ["refused: one.toml is being run"]
+
+[case.helper]
+run = ["{out}/bridge-host{exe}", "{case}/one.toml"]
+wait = "? go on"
+stdin = "go\n"
+
+[case.helper.claims]
+status = 0
+
+[case.folders]
+"{case}/together-one" = ["wait"]
+"{case}/together-two" = ["wait"]
+
+[case.files]
+"{case}/one.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 16
+[content]
+paths = ["together-one"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+"{case}/two.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 16
+[content]
+paths = ["together-two"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "{case}/two.toml"]

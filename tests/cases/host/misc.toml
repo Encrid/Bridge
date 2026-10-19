@@ -1,0 +1,115 @@
+[[case]]
+name = "two arguments where the first is not the show flag"
+run = ["{out}/bridge-host{exe}", "{case}/none.toml", "extra"]
+
+[case.claims]
+status = 2
+has = ["usage: bridge-host"]
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/none.toml"]
+
+[[case]]
+name = "an argument that begins with a dash"
+run = ["{out}/bridge-host{exe}", "-x"]
+
+[case.claims]
+status = 2
+has = ["usage: bridge-host"]
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "{case}/none.toml"]
+
+[[case]]
+name = "the config shown with an empty file, a non-module, and a module with no load"
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/sm.toml"]
+
+[case.claims]
+status = 1
+has = [
+    "module bridge-host:quiet@1.0.0, wasm, sm/quiet.wasm",
+    "not stated: content.load.all",
+    "not a module: sm/junk.txt",
+]
+
+[case.folders]
+"{case}/sm" = ["quiet"]
+
+[case.files]
+"{case}/sm/empty.wasm" = ""
+"{case}/sm/junk.txt" = "junk"
+"{case}/sm.toml" = '''
+threads = 1
+phases = ["update"]
+rounds = 8
+[budget]
+entities = 8192
+tables = 8
+types = 16
+systems = 16
+terms = 8
+modules = 8
+persistent = 262144
+columns = 1048576
+sparse_sets = "none"
+direct_indexed = "none"
+[content]
+paths = ["sm"]
+[content.arrive]
+wasm = "load"
+native = "ask"
+[module.all]
+hot_reload = false
+on_error = "skip"
+max_system_failures = 3
+log_level = 7
+scratch = 65536
+log_ring = 6144
+spans = 16384
+spawns = "none"
+persistent = "none"
+changes = 1048576
+losses = "none"
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/sm.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["sm"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a module that logs below the shown level"
+run = ["{out}/bridge-host{exe}", "{case}/dbg.toml"]
+
+[case.claims]
+status = 0
+has = ["loaded: bridge-host:debugger@1.0.0, wasm, not trusted"]
+lacks = ["deep"]
+
+[case.folders]
+"{case}/mods" = ["debugger"]
+
+[case.files]
+"{case}/dbg.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["mods"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.folders]
+"{case}/mods" = ["hello"]

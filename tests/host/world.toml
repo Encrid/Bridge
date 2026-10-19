@@ -1,0 +1,29 @@
+threads = 1
+
+[budget]
+entities = 8192
+tables = 8
+types = 16
+systems = 16
+terms = 8
+modules = 8
+persistent = 262144
+columns = 1048576
+sparse_sets = "none"
+direct_indexed = "none"
+
+[content.load]
+all = true
+
+[module.all]
+hot_reload = false
+on_error = "skip"
+max_system_failures = 3
+log_level = 7
+scratch = 65536
+log_ring = 6144
+spans = 16384
+spawns = "none"
+persistent = "none"
+changes = 1048576
+losses = "none"

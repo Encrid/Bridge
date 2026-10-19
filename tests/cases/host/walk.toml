@@ -1,0 +1,134 @@
+[[case]]
+name = "ignores that match a folder exactly, by prefix, and not at a boundary"
+run = ["{out}/bridge-host{exe}", "{case}/ig.toml"]
+
+[case.claims]
+status = 0
+has = [
+    "record[6] bridge-host:quiet@1.0.0/say: said once 1 0",
+    "not a module: prex/y.txt",
+]
+
+[case.folders]
+"{case}/base" = ["quiet"]
+"{case}/base/skip" = []
+
+[case.files]
+"{case}/base/empty.wasm" = ""
+"{case}/pre/x.txt" = "junk"
+"{case}/prex/y.txt" = "junk"
+"{case}/ig.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["base", "pre", "prex"]
+ignore = ["base/skip", "pre"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/ig.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["base"]
+ignore = ["base"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a content path that names a single file"
+run = ["{out}/bridge-host{exe}", "{case}/sf.toml"]
+
+[case.claims]
+status = 0
+has = ["record[6] bridge-host:quiet@1.0.0/say: said once 1 0"]
+
+[case.folders]
+"{case}/mods" = ["quiet"]
+
+[case.files]
+"{case}/sf.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["mods/quiet.wasm"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/sf.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["mods/none.wasm"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "more files than the host can hold, by two"
+run = ["{out}/bridge-host{exe}", "{case}/mny.toml"]
+
+[case.claims]
+has = ["too many files: 32 are looked at"]
+
+[case.files]
+"{case}/mny.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 1
+[content]
+paths = ["heap"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+"{case}/heap/f01.txt" = "x"
+"{case}/heap/f02.txt" = "x"
+"{case}/heap/f03.txt" = "x"
+"{case}/heap/f04.txt" = "x"
+"{case}/heap/f05.txt" = "x"
+"{case}/heap/f06.txt" = "x"
+"{case}/heap/f07.txt" = "x"
+"{case}/heap/f08.txt" = "x"
+"{case}/heap/f09.txt" = "x"
+"{case}/heap/f10.txt" = "x"
+"{case}/heap/f11.txt" = "x"
+"{case}/heap/f12.txt" = "x"
+"{case}/heap/f13.txt" = "x"
+"{case}/heap/f14.txt" = "x"
+"{case}/heap/f15.txt" = "x"
+"{case}/heap/f16.txt" = "x"
+"{case}/heap/f17.txt" = "x"
+"{case}/heap/f18.txt" = "x"
+"{case}/heap/f19.txt" = "x"
+"{case}/heap/f20.txt" = "x"
+"{case}/heap/f21.txt" = "x"
+"{case}/heap/f22.txt" = "x"
+"{case}/heap/f23.txt" = "x"
+"{case}/heap/f24.txt" = "x"
+"{case}/heap/f25.txt" = "x"
+"{case}/heap/f26.txt" = "x"
+"{case}/heap/f27.txt" = "x"
+"{case}/heap/f28.txt" = "x"
+"{case}/heap/f29.txt" = "x"
+"{case}/heap/f30.txt" = "x"
+"{case}/heap/f31.txt" = "x"
+"{case}/heap/f32.txt" = "x"
+"{case}/heap/f33.txt" = "x"
+"{case}/heap/f34.txt" = "x"
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "{case}/none.toml"]

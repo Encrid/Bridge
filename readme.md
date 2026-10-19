@@ -35,6 +35,100 @@ The three layers are a host, Bridge and the modules. A module runs on a backend,
 `python tools/deps.py build/<target> --check` compares the imports of the built library with `docs/intern/os/os.h.md`, *The imports*.
 `python tools/reference.py` measures the storage of Bridge beside flecs and EnTT.
 
+## The host
+
+Bridge ships `bridge-host`, a host that runs modules from a deployment file.
+After `python project.py build`, run `bridge-host <config.toml>`, or `bridge-host --show-config <config.toml>` to print the deployment without running it.
+It reads the file and its `.d/local.toml` overlay, reads each module's manifest, loads the modules a backend holds, and runs the phases in rounds.
+
+These are its messages.
+
+With no file, or a bad one, it prints its usage:
+
+```text
+usage: bridge-host <config.toml>
+       bridge-host --show-config <config.toml>
+```
+
+Reading the deployment:
+
+- `cannot go into '%s'`
+- `cannot read '%s'`
+- `not stated: backend`
+- `not stated: content.paths`
+- `not stated: %s`
+- `refused: %s:%u: %s`
+- `refused: %s:%u: %s: %s`
+- `refused: %s:%u: %s: no module found is it`
+- `refused: %s:%u: presets: a list of files`
+- `refused: %s names itself:`
+- `refused: %s: %s in %s:%u, %s in %s:%u`
+- `, over %s:%u`
+- `, named by %s:%u`
+- `%s.d/local.toml`
+
+Holding one instance:
+
+- `refused: %s.d is no folder`
+- `refused: %s is being run`
+- `%s.d/lock`
+- `cannot lock '%s'`
+
+Finding the modules:
+
+- `cannot look in '%s'`
+- `too many files: %d are looked at`
+- `not a module: %s: %s`
+- `states a %.60s that cannot be`
+- `unloaded: %s: %s is gone`
+
+Loading a module:
+
+- `loaded: %s, %s, %s, %s`
+- `? trust %s, %s, %s`
+- `not loaded: %s: %s is %s`
+- `not loaded: %s: %s %s`
+- `not loaded: %s: %s, %s, not trusted`
+- `not loaded: %s: %s was built against another ABI`
+- `not loaded: %s: %s asks for %s, which the host was not given`
+- `not loaded: %s: %s, as content.load says`
+- `not loaded: %s: %s was refused`
+- `not loaded: %s: %s:`
+
+Replacing a module:
+
+- `replaced: %s by %s, %s`
+- `not replaced: %s: it does not say it can be`
+- `not replaced: %s: %s was refused`
+- `not replaced: %s: %s%s%s`
+- `not replaced: %s: %s:`
+
+Running the rounds:
+
+- `bridge_create refused`
+- `record[%d] %s/%s: %.*s %u %u`
+- `ended after %d rounds, as many as it was given`
+- `still loaded:`
+- `destroyed: %d`
+
+Showing the deployment:
+
+- `found:`
+- `content.paths: %s`
+- `content.ignore: %s`
+- `order: %s before %s`
+- `config = "%s"  its file`
+- `settings = "%s"  its file`
+- `pinned = %s  its file`
+- `reloadable = %s  its file`
+- `its file states %s: %s`
+- `its file states no config`
+- `its file states no pinned`
+- `its file states no reloadable`
+- `it takes no config.%s, stated in %s:%u`
+- `it names no component, and settings`
+- `phases.%s`
+
 ## Contributing
 
 | Document | Content |

@@ -4,9 +4,10 @@ name = "Bridge"
 [test]
 timeout = 120
 copies = 6
-writers = ["abi_refuse", "module_refuse", "reload_refuse", "say_error", "say_about", "module_fail", "config_refuse", "schema_refuse", "snprintf"]
+writers = ["abi_refuse", "module_refuse", "reload_refuse", "say_error", "say_about", "module_fail", "config_refuse", "schema_refuse", "snprintf", "printf"]
 
 [variables]
+own = ["abi=1", "pinned=false", "reloadable=false", "config=none"]
 quiet = ["-Wno-missing-field-initializers"]
 hidden = ["-fvisibility=hidden"]
 binaryen_top = "binaryen-version_133"
@@ -175,6 +176,7 @@ steps = [
 ]
 
 [targets.x86_64-windows-gnu]
+section = ".bridge"
 system_defines = []
 system_libraries = []
 counted_system = ["WINBASEAPI=", "CreateEventA=counted_create_event", "CreateThread=counted_create_thread", "VirtualAlloc=counted_virtual_alloc"]
@@ -188,6 +190,7 @@ binaryen_archive = "binaryen-version_133-x86_64-windows.tar.gz"
 binaryen_sha256 = "17a2cbeac6b5693c5fbafab3838d3c65fd9c1eb38b05f5baec6c657e8c84995b"
 
 [targets.x86_64-linux-gnu]
+section = ".bridge"
 system_defines = []
 system_libraries = ["-lm", "-lpthread", "-ldl"]
 counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init", "mprotect=counted_mprotect"]
@@ -201,6 +204,7 @@ binaryen_archive = "binaryen-version_133-x86_64-linux.tar.gz"
 binaryen_sha256 = "2dc9c7813f5375db93d96ead4b78222fcc3e2677bbb832297af4797782a37489"
 
 [targets.aarch64-macos]
+section = "__TEXT,.bridge"
 system_defines = ["-D_DARWIN_C_SOURCE"]
 system_libraries = []
 counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init", "mprotect=counted_mprotect"]
@@ -214,6 +218,7 @@ binaryen_archive = "binaryen-version_133-arm64-macos.tar.gz"
 binaryen_sha256 = "ad66da82ac13f163e424b1643f16c6dfcccc98b5966296b43e52d3cab04f84a8"
 
 [targets.aarch64-linux-gnu]
+section = ".bridge"
 system_defines = []
 system_libraries = ["-lm", "-lpthread", "-ldl"]
 counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init", "mprotect=counted_mprotect"]
@@ -227,6 +232,7 @@ binaryen_archive = "binaryen-version_133-aarch64-linux.tar.gz"
 binaryen_sha256 = "89c07ea56faf38d0fbecf36ca8ec0721756716185f265b568e133d427f299bf8"
 
 [targets.x86_64-macos]
+section = "__TEXT,.bridge"
 system_defines = ["-D_DARWIN_C_SOURCE"]
 system_libraries = []
 counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init", "mprotect=counted_mprotect"]
@@ -240,6 +246,7 @@ binaryen_archive = "binaryen-version_133-x86_64-macos.tar.gz"
 binaryen_sha256 = "13a9b90be775c6389ce3d1f879cb8627bea56708ba8c122983941d53a8199b95"
 
 [targets.aarch64-windows-gnu]
+section = ".bridge"
 system_defines = []
 system_libraries = []
 counted_system = ["WINBASEAPI=", "CreateEventA=counted_create_event", "CreateThread=counted_create_thread", "VirtualAlloc=counted_virtual_alloc"]
@@ -2953,6 +2960,26 @@ flags = ["{quiet}", "{system_defines}", "{wasmtime}/{wasmtime_link}", "{system_l
 beside = ["{wasmtime}/{wasmtime_runtime}"]
 
 [[artifact]]
+name = "bridge-host"
+kind = "program"
+part = "host"
+sources = ["src/host/*.c", "src/host/os/{system}/*.c"]
+include = ["include", "src/host", "src/host/os"]
+defines = ['LIBRARY_SUFFIX="{library}"']
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+link = ["{out}/bridge{library}"]
+beside = ["{out}/bridge{library}"]
+
+[[artifact]]
+name = "host-unit"
+kind = "program"
+test = true
+part = "host"
+sources = ["tests/host/unit/*.c", "src/host/toml*.c", "src/host/config_value.c"]
+include = ["include", "src/host"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
 name = "wasm-host"
 kind = "program"
 test = true
@@ -4113,3 +4140,696 @@ line = 45
 col = 9
 side = "true"
 why = "A 4 GiB reservation fails only when the operating system runs out of address space, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/toml_text.c"
+line = 80
+col = 9
+side = "false"
+why = "The text buffer comes from malloc, which returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/toml_text.c"
+line = 83
+col = 12
+side = "false"
+why = "The loop reads into the malloc'd text buffer, which is null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/toml_text.c"
+line = 87
+col = 9
+side = "true"
+why = "The text buffer is null only when malloc runs out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/toml_pair.c"
+line = 15
+col = 9
+side = "false"
+why = "copy_key returns null only when its malloc runs out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/toml_pair.c"
+line = 27
+col = 9
+side = "true"
+why = "whole is null only when copy_key's malloc runs out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/toml_value.c"
+line = 38
+col = 9
+side = "true"
+why = "add_item's realloc returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/toml_value.c"
+line = 53
+col = 43
+side = "true"
+why = "add_item fails only when its realloc runs out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/toml_key.c"
+line = 45
+col = 13
+side = "true"
+why = "The key array's realloc returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/toml_add.c"
+line = 40
+col = 9
+side = "true"
+why = "whole_key's malloc returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/toml_add.c"
+line = 52
+col = 23
+side = "false"
+why = "whole is null only when whole_key's malloc runs out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/toml_add.c"
+line = 59
+col = 16
+side = "true"
+why = "The entries realloc returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/toml_add.c"
+line = 60
+col = 32
+side = "false"
+why = "why is null at this point only when the entries realloc ran out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/toml_number.c"
+line = 18
+col = 30
+side = "true"
+why = "toml_read_number runs only on a value that starts with a sign or a digit, so the first copied character is never an underscore."
+
+[[branches.exception]]
+path = "src/host/config.c"
+line = 19
+col = 9
+side = "false"
+why = "take_local's lock path comes from malloc, which returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config.c"
+line = 21
+col = 13
+side = "false"
+why = "take_local's path is null only when its malloc ran out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config.c"
+line = 34
+col = 9
+side = "false"
+why = "config_read copies the name with malloc, which returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_backend.c"
+line = 17
+col = 9
+side = "false"
+why = "with_suffix allocates with malloc, which returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_backend.c"
+line = 58
+col = 26
+side = "false"
+why = "h->held comes from calloc, which returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_backend.c"
+line = 58
+col = 37
+side = "false"
+why = "h->backends comes from calloc, which returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_backend.c"
+line = 61
+col = 22
+side = "false"
+why = "h->held is null only when its calloc ran out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_backend.c"
+line = 61
+col = 33
+side = "false"
+why = "h->backends is null only when its calloc ran out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_content.c"
+line = 11
+col = 19
+side = "false"
+why = "add_path gets its path from config_path, whose malloc returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_content.c"
+line = 22
+col = 18
+side = "false"
+why = "the path is null only when config_path's malloc ran out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_content.c"
+line = 28
+col = 21
+side = "false"
+why = "add_path's realloc returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_file.c"
+line = 34
+col = 18
+side = "true"
+why = "config_add_file's realloc returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_name.c"
+line = 30
+col = 9
+side = "true"
+why = "add_named's realloc returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_name.c"
+line = 54
+col = 25
+side = "true"
+why = "add_named fails only when its realloc runs out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_name.c"
+line = 62
+col = 19
+side = "false"
+why = "config_take_file's path is null only when an earlier malloc ran out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_name.c"
+line = 74
+col = 10
+side = "false"
+why = "the path is null only when an earlier malloc ran out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_names.c"
+line = 19
+col = 9
+side = "true"
+why = "names_add's realloc returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_order.c"
+line = 47
+col = 9
+side = "true"
+why = "add_order's realloc returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_path.c"
+line = 25
+col = 9
+side = "false"
+why = "config_path's malloc returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_path.c"
+line = 56
+col = 9
+side = "false"
+why = "config_get_folder's malloc returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_path.c"
+line = 58
+col = 9
+side = "false"
+why = "config_get_folder's folder is null only when its malloc ran out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_world.c"
+line = 16
+col = 26
+side = "false"
+why = "take_phases allocates with malloc, which returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/state_own.c"
+line = 12
+col = 9
+side = "false"
+why = "copy_text's malloc returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/state_own.c"
+line = 14
+col = 9
+side = "false"
+why = "copy_text's buffer is null only when its malloc ran out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/state_own.c"
+line = 34
+col = 38
+side = "false"
+why = "read_own's text is null only when copy_text's malloc ran out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/state_own.c"
+line = 42
+col = 9
+side = "true"
+why = "state_find_own's own comes from malloc, which returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/state_setting.c"
+line = 56
+col = 9
+side = "false"
+why = "split_names copies with malloc, which returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/state_setting_find.c"
+line = 47
+col = 9
+side = "true"
+why = "state_own_setting's own comes from malloc, which returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/host_meet.c"
+line = 65
+col = 9
+side = "false"
+why = "meet allocates f->path with malloc, which returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/host_meet.c"
+line = 72
+col = 21
+side = "false"
+why = "f->path is null only when its malloc ran out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/host_lock.c"
+line = 15
+col = 9
+side = "false"
+why = "take_lock allocates the path with malloc, which returns null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/host_lock.c"
+line = 17
+col = 9
+side = "true"
+why = "the path is null only when take_lock's malloc ran out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_content.c"
+line = 16
+col = 26
+side = "false"
+why = "os_path_whole on this host uses _fullpath, which resolves a path lexically and returns null only for an unparseable path, which the tests do not provide."
+
+[[branches.exception]]
+path = "src/host/config_content.c"
+line = 18
+col = 16
+side = "false"
+why = "os_path_whole of a stored path returns null only for an unparseable path, which the tests do not provide."
+
+[[branches.exception]]
+path = "src/host/config_file.c"
+line = 52
+col = 13
+side = "false"
+why = "config_find_whole's key from os_path_whole is null only for an unparseable path, which the tests do not provide."
+
+[[branches.exception]]
+path = "src/host/config_file.c"
+line = 52
+col = 22
+side = "false"
+why = "a stored file's whole path is null only when os_path_whole could not resolve it, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/host_walk.c"
+line = 18
+col = 26
+side = "false"
+why = "is_ignored's path from os_path_whole is null only for an unparseable path, which the tests do not provide."
+
+[[branches.exception]]
+path = "src/host/host_walk.c"
+line = 20
+col = 15
+side = "false"
+why = "an ignore entry's whole path from os_path_whole is null only for an unparseable path, which the tests do not provide."
+
+[[branches.exception]]
+path = "src/host/host_walk.c"
+line = 21
+col = 14
+side = "false"
+why = "the ignore path is null only when os_path_whole could not resolve it, which the tests do not force."
+
+[[branches.exception]]
+path = "src/host/host_walk.c"
+line = 22
+col = 32
+side = "true"
+why = "On this host os_path_whole yields backslash separators, so the character after an ignored prefix is never a forward slash."
+
+[[branches.exception]]
+path = "src/host/file_bytes.c"
+line = 15
+col = 9
+side = "false"
+why = "read_whole opens a regular file, whose seek to the end always succeeds; this fires only on an I/O error the tests do not force."
+
+[[branches.exception]]
+path = "src/host/file_bytes.c"
+line = 17
+col = 22
+side = "true"
+why = "the seek to the start of a regular file always succeeds; this fires only on an I/O error the tests do not force."
+
+[[branches.exception]]
+path = "src/host/file_bytes.c"
+line = 33
+col = 17
+side = "true"
+why = "a full read of a regular file returns its whole size; a short read happens only on an I/O error the tests do not force."
+
+[[branches.exception]]
+path = "src/host/config_backend.c"
+line = 26
+col = 31
+side = "false"
+why = "content.arrive is checked to be ask, load, or leave, so get_arrive always matches before its index reaches four."
+
+[[branches.exception]]
+path = "src/host/config_find.c"
+line = 63
+col = 9
+side = "true"
+why = "config_say_value prints a found value. The state callers reach it only past config_say_found, which is true when the value is non-null. show reaches it only when the world loaded, which needs phases, threads, rounds and the budget stated, and shows other keys only when config_names lists them, so every key it prints is found."
+
+[[branches.exception]]
+path = "src/host/config_find.c"
+line = 68
+col = 9
+side = "false"
+why = "every caller of config_say_value passes a non-null states function."
+
+[[branches.exception]]
+path = "src/host/config_states.c"
+line = 53
+col = 13
+side = "false"
+why = "config_states_module always gets three non-null table names: a module's identity, its backend, and all."
+
+[[branches.exception]]
+path = "src/host/config_file.c"
+line = 59
+col = 23
+side = "false"
+why = "config_say_chain stops at the re-included file, which is an ancestor of the including file, so it never reaches the root's -1."
+
+[[branches.exception]]
+path = "src/host/config_say.c"
+line = 40
+col = 25
+side = "false"
+why = "config_find sets f.at whenever it sets f.other, so f.other is never set on its own."
+
+[[branches.exception]]
+path = "src/host/state_setting_find.c"
+line = 10
+col = 43
+side = "true"
+why = "config_check refuses a setting deeper than five keys, so state_is_setting never sees a greater depth."
+
+[[branches.exception]]
+path = "src/host/state_setting_find.c"
+line = 11
+col = 12
+side = "true"
+why = "a depth-four-or-five entry that reaches state is under module, so its first key is always module."
+
+[[branches.exception]]
+path = "src/host/state_setting_find.c"
+line = 16
+col = 30
+side = "false"
+why = "config_check refuses a depth-five setting whose fifth key is not path, so it is always path here."
+
+[[branches.exception]]
+path = "src/host/host_walk.c"
+line = 35
+col = 29
+side = "false"
+why = "walk_folder opens a directory that walk_path already opened, so the open always succeeds."
+
+[[branches.exception]]
+path = "src/host/host_run.c"
+line = 27
+col = 34
+side = "false"
+why = "bridge_list_modules returns at most FILES modules, so the count guard ends the loop before the FILES guard can fail."
+
+[[branches.exception]]
+path = "src/host/manifest.c"
+line = 76
+col = 9
+side = "true"
+why = "read_own reads a module's own bytes, whose format manifest_find already recognized, so it never fails to find it."
+
+[[branches.exception]]
+path = "src/host/os/windows/os_folder.c"
+line = 22
+col = 9
+side = "false"
+why = "os_folder_make's mkdir fails only when the lock folder already exists, and then _stat finds it, so the not-found branch is not reached."
+
+[[branches.exception]]
+path = "src/host/host_look.c"
+line = 61
+col = 26
+side = "false"
+why = "bridge_unload fails only when the engine cannot unload a module the host recorded as loaded. The host records a file as loaded after the engine loaded it, so unloading a file that is gone always succeeds."
+
+[[branches.exception]]
+path = "src/host/host_walk.c"
+line = 41
+col = 9
+side = "false"
+why = "walk_folder opens the same folder that walk_path already confirmed as a folder, so its handle is never null and the close always runs."
+
+[[branches.exception]]
+path = "src/host/manifest.c"
+line = 78
+col = 20
+side = "false"
+why = "manifest_get_value steps over the NUL-separated words of a module's manifest to find a key. The toolchain writes the words with one separator each and no empty word, so the scan ends when the remaining length reaches zero, never on a zero byte with bytes still left."
+
+[[branches.exception]]
+path = "src/host/state_key.c"
+line = 16
+col = 24
+side = "false"
+why = "config_find sets other only together with at, so other is null whenever at is null; the right test runs only when at is null, where other is also null."
+
+[[branches.exception]]
+path = "src/host/state_setting.c"
+line = 39
+col = 24
+side = "false"
+why = "config_find sets other only together with at, so other is null whenever at is null; the right test runs only when at is null, where other is also null."
+
+[[branches.exception]]
+path = "src/host/state_setting.c"
+line = 58
+col = 12
+side = "false"
+why = "copy is the result of malloc for the settings string; it is null only when the allocation fails."
+
+[[branches.exception]]
+path = "src/host/state_setting.c"
+line = 70
+col = 53
+side = "false"
+why = "set is the result of calloc for the settings array; it is null only when the allocation fails."
+
+[[branches.exception]]
+path = "src/host/state_setting.c"
+line = 76
+col = 26
+side = "false"
+why = "set is the result of calloc for the settings array; it is null only when the allocation fails, and it does not change inside the loop."
+
+[[branches.exception]]
+path = "src/host/state_setting_find.c"
+line = 34
+col = 26
+side = "false"
+why = "state_is_path receives a value that points at an entry of the named file, so the scan always finds that entry and returns before the loop ends."
+
+[kinds.host_wasm]
+output = "{name}.wasm"
+steps = [
+    { run = ["{wasm_as}", "src/backends/wasm/sdk/bridge_wasm.wat", "{features}", "-o", "{work}.acc.wasm"] },
+    { run = ["{zig}", "cc", "-target", "wasm32-freestanding", "{language}", "-Wno-missing-field-initializers", "-O2", "-nostdlib", "-DBRIDGE_ROWS_CHECKED", "{defines}", "{include}", "-Wl,--no-entry", "-o", "{work}.raw.wasm", "{sources}"] },
+    { run = ["{wasm_merge}", "{work}.raw.wasm", "main", "{work}.acc.wasm", "acc", "{features}", "-o", "{work}.merged.wasm"] },
+    { run = ["{wasm_opt}", "{work}.merged.wasm", "{features}", "-O3", "--remove-exports=acc_*", "--remove-unused-module-elements", "-o", "{output}"] },
+    { section = "bridge:manifest", text = "{manifest:\u0000}" },
+]
+
+[kinds.host_native]
+output = "{name}{library}"
+steps = [
+    { run = ["{zig}", "cc", "-target", "{triple}", "-mcpu={cpu}", "-O2", "-DNDEBUG", "{language}", "-Wno-missing-field-initializers", "{pic}", "{include}", "-fvisibility=hidden", '-DMANIFEST="{manifest:\0}"', '-DMANIFEST_SECTION="{section}"', '-DLIBRARY_SUFFIX="{library}"', "-shared", "{defines}", "{sources}", "-o", "{output}"] },
+    { contains = "{manifest:\u0000}" },
+]
+
+[kinds.madebin]
+output = "{name}.bin"
+steps = [
+    { run = ["{python}", "tests/host/modules/mkbin.py", "{output}", "{name}"] },
+]
+
+[[artifact]]
+name = "hello"
+kind = "host_wasm"
+test = true
+part = "host"
+folder = "fixtures"
+sources = ["tests/host/modules/hello.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/host/modules"]
+defines = ['SAY="hello from the host"']
+manifest = ["bridge-host:hello@1.0.0", "{own}"]
+variants = [
+    { name = "plain", unstamped = true },
+    { name = "other", defines = ['SAY="hello from elsewhere"'] },
+    { name = "reacher", defines = ["REACH", 'SAY="reaches"'], manifest = ["bridge-host:reacher@1.0.0", "{own}"] },
+    { name = "debugger", defines = ['SAY="deep"', "SAY_LEVEL=BRIDGE_LOG_DEBUG"], manifest = ["bridge-host:debugger@1.0.0", "{own}"] },
+]
+
+[[artifact]]
+name = "quiet"
+kind = "host_wasm"
+test = true
+part = "host"
+folder = "fixtures"
+sources = ["tests/host/modules/hello.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/host/modules"]
+defines = ["ONCE", 'SAY="said once"']
+manifest = ["bridge-host:quiet@1.0.0", "{own}"]
+variants = [
+    { name = "quiet2", defines = ["ONCE", 'SAY="said once, again"'] },
+    { name = "noabi", manifest = ["bridge-host:noabi@1.0.0", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "mute", manifest = ["bridge-host:mute@1.0.0", "abi=1", "reloadable=false", "config=none"] },
+    { name = "swap", defines = ["ONCE", 'SAY="swaps"'], manifest = ["bridge-host:swap@1.0.0", "abi=1", "pinned=false", "reloadable=true", "config=none"] },
+    { name = "swap2", defines = ["ONCE", 'SAY="swapped"'], manifest = ["bridge-host:swap@1.0.0", "abi=1", "pinned=false", "reloadable=true", "config=none"] },
+    { name = "abitwo", manifest = ["bridge-host:abitwo@1.0.0", "abi=2", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "badabi", manifest = ["bridge-host:badabi@1.0.0", "abi=x", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "noconfig", manifest = ["bridge-host:noconfig@1.0.0", "abi=1", "pinned=false", "reloadable=false"] },
+    { name = "noreload", manifest = ["bridge-host:noreload@1.0.0", "abi=1", "pinned=false", "config=none"] },
+    { name = "nocolon", manifest = ["nocolon", "abi=1", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "nocat", manifest = ["has:colon", "abi=1", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "firsteq", manifest = ["x:y@1=v", "abi=1", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "bareword", manifest = ["bw:x@1", "bareword", "abi=1", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "longword", manifest = ["lw:x@1", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"] },
+    { name = "longid", manifest = ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "abi=1"] },
+    { name = "emptyabi", manifest = ["ea:x@1", "abi="] },
+    { name = "longconfig", manifest = ["lc:x@1", "abi=1", "pinned=false", "reloadable=false", "config=cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"] },
+    { name = "badflag", manifest = ["bf:x@1", "abi=1", "pinned=maybe", "reloadable=false", "config=none"] },
+    { name = "negabi", manifest = ["ng:x@1", "abi=-5", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "relfirst", manifest = ["rf:x@1", "abi=1", "reloadable=false", "pinned=false", "config=none"] },
+]
+
+[[artifact]]
+name = "word"
+kind = "host_wasm"
+test = true
+part = "host"
+folder = "fixtures"
+sources = ["tests/host/modules/word.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/host/modules"]
+manifest = ["bridge-host:word@1.0.0", "abi=1", "pinned=false", "reloadable=false", "config=bridge-host:Word", "settings=word"]
+variants = [
+    { name = "guest", manifest = ["guest:word@1.0.0", "{own}"] },
+    { name = "owned", manifest = ["bridge-host:owned@1.0.0", "abi=1", "pinned=false", "reloadable=false", "config=bridge-host:Word", "settings=word", 'config.word="its own"'] },
+    { name = "nocomp", manifest = ["bridge-host:nocomp@1.0.0", "abi=1", "pinned=false", "reloadable=false", "config=none", "settings=word"] },
+    { name = "badset", manifest = ["bridge-host:badset@1.0.0", "abi=1", "pinned=false", "reloadable=false", "config=bridge-host:Word", "settings=word", 'config.word=[1, 2]'] },
+    { name = "multi", manifest = ["bridge-host:multi@1.0.0", "abi=1", "pinned=false", "reloadable=false", "config=bridge-host:Word", "settings=w x y z"] },
+    { name = "owns", manifest = ["bridge-host:owns@1.0.0", "abi=1", "pinned=true", "reloadable=true", "config=bridge-host:Word", "settings=own", "scratch=100", "log_level=9", "on_error=@", "spans=1\nx=2", ""] },
+]
+
+[[artifact]]
+name = "knock"
+kind = "host_native"
+test = true
+part = "host"
+folder = "fixtures"
+sources = ["tests/host/modules/knock.c"]
+include = ["include", "src/backends/native/sdk", "tests/host/modules"]
+manifest = ["bridge-host:knock@1.0.0", "{own}"]
+variants = [
+    { name = "wait", defines = ["WAIT"], manifest = ["bridge-host:wait@1.0.0", "{own}"] },
+    { name = "pe", target = "x86_64-windows-gnu", manifest = ["bridge-host:pe@1.0.0", "{own}"] },
+    { name = "elf", target = "x86_64-linux-gnu", manifest = ["bridge-host:elf@1.0.0", "{own}"] },
+    { name = "macho", target = "aarch64-macos", manifest = ["bridge-host:macho@1.0.0", "{own}"] },
+]
+
+[[artifact]]
+name = "pe_farhdr"
+kind = "madebin"
+test = true
+part = "host"
+folder = "fixtures"
+sources = ["tests/host/modules/mkbin.py"]
+variants = [
+    { name = "pe_edge" },
+    { name = "pe_nosig" },
+    { name = "pe_notbridge" },
+    { name = "pe_shorttab" },
+    { name = "pe_oob" },
+    { name = "pe_bigsize" },
+    { name = "elf_farshoff" },
+    { name = "elf_badcount" },
+    { name = "elf_badstrndx" },
+    { name = "elf_nobridge" },
+    { name = "elf_oob" },
+    { name = "elf_bigsize" },
+    { name = "elf_nameoob" },
+    { name = "elf_nameedge" },
+    { name = "elf_namesoob" },
+    { name = "macho_oob" },
+    { name = "macho_bigsize" },
+    { name = "macho_notext" },
+    { name = "macho_nosec" },
+    { name = "macho_notseg" },
+    { name = "macho_secoob" },
+    { name = "macho_secedge" },
+    { name = "macho_cmd0" },
+    { name = "macho_manycmd" },
+    { name = "wasm_bigsec" },
+    { name = "wasm_badname" },
+    { name = "wasm_longleb" },
+    { name = "wasm_cutleb" },
+    { name = "wasm_emptyman" },
+    { name = "wasm_nulfirst" },
+]

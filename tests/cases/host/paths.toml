@@ -1,0 +1,152 @@
+[[case]]
+name = "content paths that are whole, by slash and by backslash"
+run = ["{out}/bridge-host{exe}", "{case}/whole.toml"]
+
+[case.claims]
+status = 1
+has = ["cannot look in '"]
+
+[case.files]
+"{case}/whole.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ['/no-such-abs-one', '\no-such-abs-two']
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/whole.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["cq"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+"{case}/cq/quiet.wasm" = "x"
+
+[[case]]
+name = "a preset whose name is empty"
+run = ["{out}/bridge-host{exe}", "{case}/emptypre.toml"]
+
+[case.claims]
+status = 1
+has = ["cannot read '"]
+
+[case.files]
+"{case}/emptypre.toml" = '''
+presets = [""]
+'''
+
+[case.false.files]
+"{case}/emptypre.toml" = '''
+rounds = 1
+phases = ["update"]
+threads = 1
+[content]
+paths = ["x"]
+[backend]
+wasm = "y"
+'''
+
+[[case]]
+name = "a config named with a backslash in the path"
+run = ["{out}/bridge-host{exe}", "{case}/sub\\x.toml"]
+
+[case.claims]
+status = 1
+has = ["not stated: phases"]
+
+[case.files]
+"{case}/sub/x.toml" = '''
+rounds = 1
+'''
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "{case}/sub\\y.toml"]
+
+[case.false.files]
+"{case}/sub/y.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 1
+[content]
+paths = ["z"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a config named with no folder at all"
+run = ["{out}/bridge-host{exe}", "no-such-bare-config-12345.toml"]
+
+[case.claims]
+status = 1
+has = ["cannot read '"]
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/none.toml"]
+
+[case.false.files]
+"{case}/none.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+'''
+
+[[case]]
+name = "a config named from the root of the drive"
+run = ["{out}/bridge-host{exe}", "/no-such-root-config-12345.toml"]
+
+[case.claims]
+status = 1
+has = ["cannot read '"]
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/none.toml"]
+
+[case.false.files]
+"{case}/none.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+'''
+
+[[case]]
+name = "presets whose folders use backslashes"
+run = ["{out}/bridge-host{exe}", "{case}/gf.toml"]
+
+[case.claims]
+status = 1
+
+[case.folders]
+"{case}/cq" = ["quiet"]
+
+[case.files]
+"{case}/d/sub/q.toml" = '''
+'''
+"{case}/sub/q2.toml" = '''
+'''
+"{case}/a/b/q3.toml" = '''
+'''
+"{case}/gf.toml" = '''
+presets = ['d/sub\q.toml', 'sub\q2.toml', 'a\b/q3.toml']
+'''
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "{case}/good.toml"]
+
+[case.false.files]
+"{case}/good.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["cq"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''

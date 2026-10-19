@@ -1,0 +1,10 @@
+[content.arrive]
+wasm = "load"
+
+[module.wasm]
+trusted = false
+work_limit = 100000000
+memory_limit = 16777216
+init_timeout = 2000000000
+reload_timeout = 2000000000
+shutdown_timeout = 2000000000

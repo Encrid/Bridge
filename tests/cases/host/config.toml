@@ -1,0 +1,649 @@
+[[case]]
+name = "a key stated twice in a file"
+run = ["{out}/bridge-host{exe}", "{case}/twice.toml"]
+
+[case.claims]
+status = 1
+has = ["twice.toml:5: a key stated twice"]
+
+[case.folders]
+"{case}/config-quiet" = ["quiet"]
+
+[case.files]
+"{case}/twice.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+threads = 1
+threads = 1
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/twice.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a key nobody states"
+run = ["{out}/bridge-host{exe}", "{case}/unstated.toml"]
+
+[case.claims]
+status = 1
+line = ["not stated: content.paths"]
+
+[case.folders]
+"{case}/config-quiet" = ["quiet"]
+
+[case.files]
+"{case}/unstated.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/unstated.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "two peers that differ"
+run = ["{out}/bridge-host{exe}", "{case}/peers.toml"]
+
+[case.claims]
+status = 1
+line = ["refused: rounds: 3 in peer1.toml:1, 4 in peer2.toml:1"]
+
+[case.folders]
+"{case}/config-quiet" = ["quiet"]
+
+[case.files]
+"{case}/peer1.toml" = '''
+rounds = 3
+'''
+"{case}/peer2.toml" = '''
+rounds = 4
+'''
+"{case}/peer3.toml" = '''
+rounds = 3
+'''
+"{case}/peers.toml" = '''
+presets = ["{root}/tests/host/test.toml", "peer1.toml", "peer2.toml"]
+phases = ["update"]
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/peers.toml" = '''
+presets = ["{root}/tests/host/test.toml", "peer1.toml", "peer3.toml"]
+phases = ["update"]
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a file that names itself"
+run = ["{out}/bridge-host{exe}", "{case}/cycle.toml"]
+
+[case.claims]
+status = 1
+line = ["refused: cycle.toml names itself: cycle.toml loop.toml cycle.toml"]
+
+[case.folders]
+"{case}/config-quiet" = ["quiet"]
+
+[case.files]
+"{case}/loop.toml" = '''
+presets = ["cycle.toml"]
+'''
+"{case}/plain.toml" = "\n"
+"{case}/cycle.toml" = '''
+presets = ["{root}/tests/host/test.toml", "loop.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/cycle.toml" = '''
+presets = ["{root}/tests/host/test.toml", "plain.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a key that is nobody's"
+run = ["{out}/bridge-host{exe}", "{case}/nobody.toml"]
+
+[case.claims]
+status = 1
+line = ["refused: nobody.toml:5: budgett.entities: no key of Bridge-Host's or Bridge's"]
+
+[case.folders]
+"{case}/config-quiet" = ["quiet"]
+
+[case.files]
+"{case}/nobody.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[budgett]
+entities = 1
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/nobody.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a key only a module's author states"
+run = ["{out}/bridge-host{exe}", "{case}/author.toml"]
+
+[case.claims]
+status = 1
+line = ["refused: author.toml:5: module.all.pinned: only a module's author states it, in its file"]
+
+[case.folders]
+"{case}/config-quiet" = ["quiet"]
+
+[case.files]
+"{case}/author.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[module.all]
+pinned = false
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/author.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a path from the folder of the file that states it"
+run = ["{out}/bridge-host{exe}", "{case}/beside.toml"]
+
+[case.claims]
+status = 0
+line = ["record[6] bridge-host:quiet@1.0.0/say: said once 1 0"]
+
+[case.folders]
+"{case}/beside/mods" = ["quiet"]
+
+[case.files]
+"{case}/beside/beside.toml" = '''
+[content]
+paths = ["mods"]
+'''
+"{case}/beside/elsewhere.toml" = '''
+[content]
+paths = ["elsewhere"]
+'''
+"{case}/beside.toml" = '''
+presets = ["{root}/tests/host/test.toml", "{case}/beside/beside.toml"]
+phases = ["update"]
+rounds = 8
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/beside.toml" = '''
+presets = ["{root}/tests/host/test.toml", "{case}/beside/elsewhere.toml"]
+phases = ["update"]
+rounds = 8
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a backend not given"
+run = ["{out}/bridge-host{exe}", "{case}/wasm-only.toml"]
+
+[case.claims]
+status = 0
+line = [
+    "record[6] bridge-host:quiet@1.0.0/say: said once 1 0",
+    "not loaded: config-knock/knock{library}: bridge-host:knock@1.0.0 asks for native, which the host was not given",
+]
+
+[case.folders]
+"{case}/config-knock" = ["quiet", "knock"]
+
+[case.files]
+"{case}/wasm-only.toml" = '''
+presets = ["{root}/tests/host/world.toml", "{root}/tests/host/wasm.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-knock"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+'''
+
+[case.false.files]
+"{case}/wasm-only.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-knock"]
+'''
+
+[[case]]
+name = "a library of each format, read"
+run = ["{out}/bridge-host{exe}", "{case}/formats.toml"]
+
+[case.claims]
+status = 0
+line = [
+    "not loaded: config-formats/pe.dll: bridge-host:pe@1.0.0 asks for native, which the host was not given",
+    "not loaded: config-formats/elf.so: bridge-host:elf@1.0.0 asks for native, which the host was not given",
+    "not loaded: config-formats/macho.dylib: bridge-host:macho@1.0.0 asks for native, which the host was not given",
+]
+
+[case.folders]
+"{case}/config-formats" = ["quiet", "pe", "elf", "macho"]
+
+[case.files]
+"{case}/formats.toml" = '''
+presets = ["{root}/tests/host/world.toml", "{root}/tests/host/wasm.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-formats"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+'''
+
+[case.false.files]
+"{case}/formats.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-formats"]
+'''
+
+[[case]]
+name = "the local file over every other"
+run = ["{out}/bridge-host{exe}", "{case}/local.toml"]
+
+[case.claims]
+status = 0
+line = ["record[6] bridge-host:word@1.0.0/say: local 0 0"]
+
+[case.folders]
+"{case}/config-word" = ["word"]
+
+[case.files]
+"{case}/local.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["late"]
+rounds = 8
+[module."bridge-host:word@1.0.0".config]
+word = "hi"
+[content]
+paths = ["config-word"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+"{case}/local.toml.d/local.toml" = '''
+[module."bridge-host:word@1.0.0".config]
+word = "local"
+'''
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "{case}/unlocal.toml"]
+
+[case.false.files]
+"{case}/unlocal.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["late"]
+rounds = 8
+[module."bridge-host:word@1.0.0".config]
+word = "hi"
+[content]
+paths = ["config-word"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a table for a module not found"
+run = ["{out}/bridge-host{exe}", "{case}/unfound.toml"]
+
+[case.claims]
+status = 1
+line = [
+    "refused: unfound.toml:4: bridge-host:nobody@1.0.0: no module found is it",
+    "found: bridge-host:quiet@1.0.0",
+]
+
+[case.folders]
+"{case}/config-quiet" = ["quiet"]
+
+[case.files]
+"{case}/unfound.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[module."bridge-host:nobody@1.0.0"]
+trusted = false
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/unfound.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a module its own file says too little of"
+run = ["{out}/bridge-host{exe}", "{case}/mute.toml"]
+
+[case.claims]
+status = 1
+line = ["not loaded: config-mute/mute.wasm: bridge-host:mute@1.0.0: its file states no pinned"]
+
+[case.folders]
+"{case}/config-mute" = ["mute"]
+"{case}/config-quiet" = ["quiet"]
+
+[case.files]
+"{case}/mute.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-mute"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/mute.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a key of a module nobody states"
+run = ["{out}/bridge-host{exe}", "{case}/terse.toml"]
+
+[case.claims]
+status = 1
+line = ["not loaded: config-quiet/quiet.wasm: bridge-host:quiet@1.0.0: not stated: log_level"]
+
+[case.folders]
+"{case}/config-quiet" = ["quiet"]
+
+[case.files]
+"{case}/terse-world.toml" = '''
+threads = 1
+
+[budget]
+entities = 8192
+tables = 8
+types = 16
+systems = 16
+terms = 8
+modules = 8
+persistent = 262144
+columns = 1048576
+sparse_sets = "none"
+direct_indexed = "none"
+
+[content.load]
+all = true
+
+[module.all]
+hot_reload = false
+on_error = "skip"
+max_system_failures = 3
+scratch = 65536
+log_ring = 6144
+spans = 16384
+spawns = "none"
+persistent = "none"
+changes = 1048576
+losses = "none"
+'''
+"{case}/terse.toml" = '''
+presets = ["{case}/terse-world.toml", "{root}/tests/host/wasm.toml", "{root}/tests/host/native.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/terse.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a module the config does not load"
+run = ["{out}/bridge-host{exe}", "{case}/unloaded.toml"]
+
+[case.claims]
+status = 0
+line = ["not loaded: config-quiet/quiet.wasm: bridge-host:quiet@1.0.0, as content.load says"]
+lacks = ["record[6] bridge-host:quiet@1.0.0/say: said once 1 0"]
+
+[case.folders]
+"{case}/config-quiet" = ["quiet"]
+
+[case.files]
+"{case}/unloaded.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content.load]
+"bridge-host:quiet@1.0.0" = false
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/unloaded.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "the order of two systems, stated two ways"
+run = ["{out}/bridge-host{exe}", "{case}/order.toml"]
+
+[case.claims]
+status = 1
+line = ['refused: order bridge-host:hello:say bridge-host:quiet:say: ["bridge-host:hello:say", "bridge-host:quiet:say"] in first.toml:2, ["bridge-host:quiet:say", "bridge-host:hello:say"] in back.toml:2']
+
+[case.folders]
+"{case}/config-quiet" = ["quiet"]
+
+[case.files]
+"{case}/first.toml" = '''
+[order]
+before = [["bridge-host:hello:say", "bridge-host:quiet:say"]]
+'''
+"{case}/back.toml" = '''
+[order]
+before = [["bridge-host:quiet:say", "bridge-host:hello:say"]]
+'''
+"{case}/again.toml" = '''
+[order]
+before = [["bridge-host:hello:say", "bridge-host:quiet:say"]]
+'''
+"{case}/order.toml" = '''
+presets = ["{root}/tests/host/test.toml", "first.toml", "back.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/order.toml" = '''
+presets = ["{root}/tests/host/test.toml", "first.toml", "again.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "the config said"
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/shown.toml"]
+
+[case.claims]
+status = 0
+line = [
+    "threads = 1  {root}/tests/host/world.toml:1",
+    "module bridge-host:quiet@1.0.0, wasm, config-quiet/quiet.wasm",
+    "  trusted = false  {root}/tests/host/wasm.toml:5",
+    "  pinned = false  its file",
+]
+
+[case.folders]
+"{case}/config-quiet" = ["quiet"]
+
+[case.files]
+"{case}/shown.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/peer1.toml" = '''
+rounds = 3
+'''
+"{case}/peer2.toml" = '''
+rounds = 4
+'''
+"{case}/shown.toml" = '''
+presets = ["{root}/tests/host/test.toml", "peer1.toml", "peer2.toml"]
+phases = ["update"]
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''

@@ -1,0 +1,10 @@
+[content.arrive]
+native = "ask"
+
+[module.native]
+trusted = true
+work_limit = "none"
+memory_limit = "none"
+init_timeout = "none"
+reload_timeout = "none"
+shutdown_timeout = "none"

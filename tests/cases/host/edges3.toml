@@ -1,0 +1,102 @@
+[[case]]
+name = "a module that declares a setting the config does not give"
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/us.toml"]
+
+[case.claims]
+status = 1
+has = ["not stated: config.z"]
+
+[case.folders]
+"{case}/mods" = ["multi"]
+
+[case.files]
+"{case}/us.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update", "late"]
+rounds = 8
+[content]
+paths = ["mods"]
+[module."bridge-host:multi@1.0.0".config]
+w = "a"
+x = 5
+y = 1.5
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/us.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update", "late"]
+rounds = 8
+[content]
+paths = ["mods"]
+[module."bridge-host:multi@1.0.0".config]
+w = "a"
+x = 5
+y = 1.5
+z = true
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a phase taken after a conflicting one is refused"
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/pp.toml"]
+
+[case.claims]
+status = 1
+has = ["refused: phases.foo: "]
+
+[case.folders]
+"{case}/mods" = ["word"]
+
+[case.files]
+"{case}/pa.toml" = '''
+[module."bridge-host:word@1.0.0".phases]
+foo = "update"
+'''
+"{case}/pb.toml" = '''
+[module."bridge-host:word@1.0.0".phases]
+foo = "late"
+'''
+"{case}/pp.toml" = '''
+presets = ["{root}/tests/host/test.toml", "pa.toml", "pb.toml"]
+phases = ["update", "late"]
+rounds = 8
+[module.all.phases]
+bar = "update"
+[module."bridge-host:word@1.0.0".config]
+word = "hi"
+[content]
+paths = ["mods"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/pa.toml" = '''
+[module."bridge-host:word@1.0.0".phases]
+foo = "update"
+'''
+"{case}/pb.toml" = '''
+[module."bridge-host:word@1.0.0".phases]
+foo = "update"
+'''
+"{case}/pp.toml" = '''
+presets = ["{root}/tests/host/test.toml", "pa.toml", "pb.toml"]
+phases = ["update", "late"]
+rounds = 8
+[module.all.phases]
+bar = "update"
+[module."bridge-host:word@1.0.0".config]
+word = "hi"
+[content]
+paths = ["mods"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''

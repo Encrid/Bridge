@@ -1,0 +1,5 @@
+[[case]]
+name = "the toml parser and the value rules, every branch"
+run = ["{out}/host-unit{exe}"]
+claims = { has = ["unit ok"], status = 0 }
+false = { run = ["{out}/host-unit{exe}", "fail"] }

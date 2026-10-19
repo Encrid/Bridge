@@ -1,0 +1,269 @@
+[[case]]
+name = "a module that states keys and settings in its own file"
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/owns.toml"]
+
+[case.claims]
+status = 1
+has = [
+    "pinned = true  its file",
+    "reloadable = true  its file",
+    "scratch = 100  its file",
+    "its file states log_level: a level, from 1 to 7",
+    "its file states on_error: \"fail\" or \"skip\"",
+]
+
+[case.folders]
+"{case}/mods" = ["owns"]
+
+[case.files]
+"{case}/owns.toml" = '''
+threads = 1
+phases = ["update"]
+rounds = 8
+[budget]
+entities = 8192
+tables = 8
+types = 16
+systems = 16
+terms = 8
+modules = 8
+persistent = 262144
+columns = 1048576
+sparse_sets = "none"
+direct_indexed = "none"
+[content]
+paths = ["mods"]
+[content.load]
+all = true
+[content.arrive]
+wasm = "load"
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+'''
+
+[case.false.folders]
+"{case}/mods" = ["quiet"]
+
+[[case]]
+name = "settings of every kind, grants, losses, and an own setting"
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/st.toml"]
+
+[case.claims]
+status = 0
+has = [
+    "config.w = \"p\"",
+    "config.x = 5",
+    "config.y = 1.5",
+    "config.z = true",
+    'read = ["bridge-host:Word", "a:b@1"]',
+    'write = ["c:d@1"]',
+    "config.word = \"its own\"  its file",
+]
+
+[case.folders]
+"{case}/mods" = ["multi", "word", "owned"]
+
+[case.files]
+"{case}/grants.toml" = '''
+[module."bridge-host:word@1.0.0"]
+read = ["bridge-host:Word", "a:b@1"]
+'''
+"{case}/st.toml" = '''
+presets = ["{root}/tests/host/world.toml", "{root}/tests/host/wasm.toml", "{root}/tests/host/native.toml", "grants.toml"]
+phases = ["update", "late"]
+rounds = 8
+[content]
+paths = ["mods"]
+[module."bridge-host:multi@1.0.0".config]
+w = { path = "p" }
+x = 5
+y = 1.5
+z = true
+[module."bridge-host:word@1.0.0"]
+write = ["c:d@1"]
+losses = ["e:f@1"]
+[module."bridge-host:word@1.0.0".config]
+word = "hi"
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.folders]
+"{case}/mods" = ["quiet"]
+
+[[case]]
+name = "on_error fail and a module key stated two ways"
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/sk.toml"]
+
+[case.claims]
+status = 1
+has = [
+    "refused: trusted: true in ta.toml:2, false in tb.toml:2",
+    'on_error = "fail"',
+]
+
+[case.folders]
+"{case}/mods" = ["quiet"]
+
+[case.files]
+"{case}/ta.toml" = '''
+[module."bridge-host:quiet@1.0.0"]
+trusted = true
+'''
+"{case}/tb.toml" = '''
+[module."bridge-host:quiet@1.0.0"]
+trusted = false
+'''
+"{case}/sk.toml" = '''
+presets = ["ta.toml", "tb.toml"]
+threads = 1
+phases = ["update"]
+rounds = 8
+[budget]
+entities = 8192
+tables = 8
+types = 16
+systems = 16
+terms = 8
+modules = 8
+persistent = 262144
+columns = 1048576
+sparse_sets = "none"
+direct_indexed = "none"
+[content]
+paths = ["mods"]
+[content.load]
+all = true
+[content.arrive]
+wasm = "load"
+[module.all]
+hot_reload = false
+on_error = "fail"
+max_system_failures = 3
+log_level = 7
+scratch = 65536
+log_ring = 6144
+spans = 16384
+spawns = "none"
+persistent = "none"
+changes = 1048576
+losses = "none"
+work_limit = "none"
+memory_limit = "none"
+init_timeout = "none"
+reload_timeout = "none"
+shutdown_timeout = "none"
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+'''
+
+[case.false.files]
+"{case}/ta.toml" = '''
+[module."bridge-host:quiet@1.0.0"]
+trusted = true
+'''
+"{case}/tb.toml" = '''
+[module."bridge-host:quiet@1.0.0"]
+trusted = true
+'''
+"{case}/sk.toml" = '''
+presets = ["{root}/tests/host/test.toml", "ta.toml", "tb.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["mods"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a phase stated two ways"
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/sp.toml"]
+
+[case.claims]
+status = 1
+has = ['refused: phases.late: "update" in pa.toml:2, "early" in pb.toml:2']
+
+[case.folders]
+"{case}/mods" = ["word"]
+
+[case.files]
+"{case}/pa.toml" = '''
+[module.all.phases]
+late = "update"
+'''
+"{case}/pb.toml" = '''
+[module.all.phases]
+late = "early"
+'''
+"{case}/sp.toml" = '''
+presets = ["{root}/tests/host/test.toml", "pa.toml", "pb.toml"]
+phases = ["update", "late", "early"]
+rounds = 8
+[content]
+paths = ["mods"]
+[module."bridge-host:word@1.0.0".config]
+word = "hi"
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/pa.toml" = '''
+[module.all.phases]
+late = "update"
+'''
+"{case}/pb.toml" = '''
+[module.all.phases]
+late = "update"
+'''
+"{case}/sp.toml" = '''
+presets = ["{root}/tests/host/test.toml", "pa.toml", "pb.toml"]
+phases = ["update", "late", "early"]
+rounds = 8
+[content]
+paths = ["mods"]
+[module."bridge-host:word@1.0.0".config]
+word = "hi"
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a grant stated in the local file"
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/lg.toml"]
+
+[case.claims]
+status = 0
+has = ['read = ["bridge-host:Word"]']
+
+[case.folders]
+"{case}/mods" = ["word"]
+
+[case.files]
+"{case}/lg.toml.d/local.toml" = '''
+[module."bridge-host:word@1.0.0"]
+read = ["bridge-host:Word"]
+'''
+"{case}/lg.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update", "late"]
+rounds = 8
+[content]
+paths = ["mods"]
+[module."bridge-host:word@1.0.0".config]
+word = "hi"
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/lg.toml.d/local.toml" = '''
+[module."bridge-host:word@1.0.0".config]
+word = "local"
+'''

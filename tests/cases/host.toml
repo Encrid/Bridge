@@ -1,0 +1,124 @@
+[[case]]
+name = "it runs"
+run = ["{out}/bridge-host{exe}", "{case}/hello.toml"]
+
+[case.claims]
+status = 0
+order = [
+    "record[6] bridge-host:hello@1.0.0/say: hello from the host 1 0",
+    "record[6] bridge-host:hello@1.0.0/say: hello from the host 2 0",
+    "record[6] bridge-host:hello@1.0.0/say: hello from the host 3 0",
+    "destroyed: 0",
+]
+
+[case.folders]
+"{case}/hello" = ["hello"]
+
+[case.files]
+"{case}/hello.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 3
+[content]
+paths = ["hello"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.folders]
+"{case}/hello" = ["other"]
+
+[[case]]
+name = "no backend"
+run = ["{out}/bridge-host{exe}", "{case}/nothing.toml"]
+
+[case.claims]
+status_not = 0
+has = ["cannot open backend library"]
+
+[case.folders]
+"{case}/nothing" = ["hello"]
+
+[case.files]
+"{case}/nothing.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 3
+[content]
+paths = ["nothing"]
+[backend]
+wasm = "{out}/no-such-backend{library}"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/nothing.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 3
+[content]
+paths = ["nothing"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "no module"
+run = ["{out}/bridge-host{exe}", "{case}/no-such-folder.toml"]
+
+[case.claims]
+status_not = 0
+line = ["cannot look in 'no-such-folder'"]
+
+[case.files]
+"{case}/no-such-folder.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 3
+[content]
+paths = ["no-such-folder"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.folders]
+"{case}/no-such-folder" = ["hello"]
+
+[[case]]
+name = "a file over the files it names"
+run = ["{out}/bridge-host{exe}", "{case}/over.toml"]
+
+[case.claims]
+line = ["ended after 2 rounds, as many as it was given"]
+
+[case.folders]
+"{case}/hello" = ["hello"]
+
+[case.files]
+"{case}/three.toml" = '''
+rounds = 3
+'''
+"{case}/over.toml" = '''
+presets = ["{root}/tests/host/test.toml", "{case}/three.toml"]
+phases = ["update"]
+rounds = 2
+[content]
+paths = ["hello"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/over.toml" = '''
+presets = ["{root}/tests/host/test.toml", "{case}/three.toml"]
+phases = ["update"]
+[content]
+paths = ["hello"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''

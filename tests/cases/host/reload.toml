@@ -1,0 +1,226 @@
+[[case]]
+name = "a reload to a file with a bad manifest"
+run = ["{out}/bridge-host{exe}", "{case}/r.toml"]
+script = [{ wait = "? go on", put = { "{case}/d/swap.wasm" = "nocolon" }, type = "go" }]
+
+[case.claims]
+status = 0
+has = ["not replaced: d/swap.wasm: its manifest does not begin with who it is"]
+
+[case.folders]
+"{case}/d" = ["wait", "swap"]
+
+[case.files]
+"{case}/r.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 16
+[module."bridge-host:swap@1.0.0"]
+hot_reload = true
+[content]
+paths = ["d"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false]
+script = [{ wait = "? go on", type = "go" }]
+
+[[case]]
+name = "a reload of a module that does not say it can be"
+run = ["{out}/bridge-host{exe}", "{case}/r.toml"]
+script = [{ wait = "? go on", put = { "{case}/d/quiet.wasm" = "quiet2" }, type = "go" }]
+
+[case.claims]
+status = 0
+has = ["not replaced: bridge-host:quiet@1.0.0: it does not say it can be"]
+
+[case.folders]
+"{case}/d" = ["wait", "quiet"]
+
+[case.files]
+"{case}/r.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 16
+[content]
+paths = ["d"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false]
+script = [{ wait = "? go on", type = "go" }]
+
+[[case]]
+name = "a reload to a file built against another ABI"
+run = ["{out}/bridge-host{exe}", "{case}/r.toml"]
+script = [{ wait = "? go on", put = { "{case}/d/swap.wasm" = "abitwo" }, type = "go" }]
+
+[case.claims]
+status = 1
+has = ["not replaced: d/swap.wasm: bridge-host:abitwo@1.0.0 was refused"]
+
+[case.folders]
+"{case}/d" = ["wait", "swap"]
+
+[case.files]
+"{case}/r.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 16
+[module."bridge-host:swap@1.0.0"]
+hot_reload = true
+[content]
+paths = ["d"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false]
+script = [{ wait = "? go on", type = "go" }]
+
+[[case]]
+name = "a file seen but not loaded, then changed"
+run = ["{out}/bridge-host{exe}", "{case}/r.toml"]
+script = [{ wait = "? go on", put = { "{case}/d/mute.wasm" = "quiet2" }, type = "go" }]
+
+[case.claims]
+has = [
+    "not loaded: d/mute.wasm: bridge-host:mute@1.0.0: its file states no pinned",
+    "loaded: bridge-host:quiet@1.0.0, wasm, not trusted, d/mute.wasm",
+]
+
+[case.folders]
+"{case}/d" = ["wait", "mute"]
+
+[case.files]
+"{case}/r.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 16
+[content]
+paths = ["d"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false]
+script = [{ wait = "? go on", type = "go" }]
+
+[[case]]
+name = "a loaded module and a failed one both gone"
+run = ["{out}/bridge-host{exe}", "{case}/r.toml"]
+script = [{ wait = "? go on", remove = ["{case}/d/quiet.wasm", "{case}/d/mute.wasm"], type = "go" }]
+
+[case.claims]
+has = ["unloaded: bridge-host:quiet@1.0.0: "]
+
+[case.folders]
+"{case}/d" = ["wait", "quiet", "mute"]
+
+[case.files]
+"{case}/r.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 16
+[content]
+paths = ["d"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false]
+script = [{ wait = "? go on", type = "go" }]
+
+[[case]]
+name = "a module that arrives on a later round and is asked about"
+run = ["{out}/bridge-host{exe}", "{case}/r.toml"]
+script = [{ wait = "? go on", put = { "{case}/d/knock.dll" = "knock" }, type = "go" }]
+
+[case.claims]
+status = 0
+has = ["not loaded: d/knock.dll: bridge-host:knock@1.0.0, native, not trusted"]
+
+[case.folders]
+"{case}/d" = ["wait"]
+
+[case.files]
+"{case}/r.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 16
+[content]
+paths = ["d"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false]
+script = [{ wait = "? go on", type = "go" }]
+
+[[case]]
+name = "a reload to a file whose manifest names it but has a bad word"
+run = ["{out}/bridge-host{exe}", "{case}/r.toml"]
+script = [{ wait = "? go on", put = { "{case}/d/swap.wasm" = "bareword" }, type = "go" }]
+
+[case.claims]
+status = 0
+has = ["not replaced: d/swap.wasm: bw:x@1 states a bareword that cannot be"]
+
+[case.folders]
+"{case}/d" = ["wait", "swap"]
+
+[case.files]
+"{case}/r.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 16
+[module."bridge-host:swap@1.0.0"]
+hot_reload = true
+[content]
+paths = ["d"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false]
+script = [{ wait = "? go on", type = "go" }]
+
+[[case]]
+name = "a reload the engine refuses"
+run = ["{out}/bridge-host{exe}", "{case}/r.toml"]
+script = [{ wait = "? go on", put = { "{case}/d/swap.wasm" = "word" }, type = "go" }]
+
+[case.claims]
+status = 1
+has = ["not replaced: d/swap.wasm: bridge-host:word@1.0.0"]
+
+[case.folders]
+"{case}/d" = ["wait", "swap"]
+
+[case.files]
+"{case}/r.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update", "late"]
+rounds = 16
+[module."bridge-host:swap@1.0.0"]
+hot_reload = true
+[module."bridge-host:word@1.0.0".config]
+word = "hi"
+[content]
+paths = ["d"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false]
+script = [{ wait = "? go on", type = "go" }]

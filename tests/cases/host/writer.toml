@@ -1,0 +1,441 @@
+[[case]]
+name = "usage when no config is named"
+run = ["{out}/bridge-host{exe}"]
+
+[case.claims]
+status = 2
+has = ["usage: bridge-host <config.toml>"]
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "{case}/none.toml"]
+
+[[case]]
+name = "a config whose folder is not there"
+run = ["{out}/bridge-host{exe}", "{case}/gone/deep.toml"]
+
+[case.claims]
+status = 1
+has = ["cannot go into '"]
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "{case}/none.toml"]
+
+[[case]]
+name = "a config that cannot be read"
+run = ["{out}/bridge-host{exe}", "{case}/missing.toml"]
+
+[case.claims]
+status = 1
+has = ["cannot read '"]
+
+[case.false]
+run = ["{out}/bridge-host{exe}"]
+
+[[case]]
+name = "presets that are not a list of files"
+run = ["{out}/bridge-host{exe}", "{case}/plist.toml"]
+
+[case.claims]
+status = 1
+line = ["refused: plist.toml:1: presets: a list of files"]
+
+[case.files]
+"{case}/plist.toml" = '''
+presets = "nope"
+[content]
+paths = ["cq"]
+'''
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "{case}/none.toml"]
+
+[[case]]
+name = "no backend is stated"
+run = ["{out}/bridge-host{exe}", "{case}/noback.toml"]
+
+[case.claims]
+status = 1
+has = ["not stated: backend"]
+
+[case.folders]
+"{case}/cq" = ["quiet"]
+
+[case.files]
+"{case}/noback.toml" = '''
+presets = ["{root}/tests/host/world.toml"]
+phases = ["update"]
+rounds = 1
+[content]
+paths = ["cq"]
+'''
+
+[case.false.files]
+"{case}/noback.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 1
+[content]
+paths = ["cq"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "the config said, in full"
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/show.toml"]
+
+[case.claims]
+status = 1
+has = [
+    ", over peer.toml:1",
+    "content.ignore: skip-me",
+    "order: bridge-host:word:say before bridge-host:other:say",
+    "phases.late",
+    "it takes no config.bogus, stated in",
+    ".d/local.toml",
+]
+
+[case.folders]
+"{case}/cw" = ["word"]
+
+[case.files]
+"{case}/peer.toml" = '''
+rounds = 8
+'''
+"{case}/show.toml.d/local.toml" = '''
+[module."bridge-host:word@1.0.0".config]
+word = "local"
+'''
+"{case}/show.toml" = '''
+presets = ["{root}/tests/host/test.toml", "peer.toml"]
+phases = ["late"]
+rounds = 8
+[module."bridge-host:word@1.0.0".phases]
+late = "update"
+[module."bridge-host:word@1.0.0".config]
+word = "hi"
+bogus = 1
+[content]
+paths = ["cw"]
+ignore = ["skip-me"]
+[order]
+before = [["bridge-host:word:say", "bridge-host:other:say"]]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/plain.toml"]
+
+[case.false.files]
+"{case}/plain.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 1
+[module."bridge-host:word@1.0.0".config]
+word = "hi"
+[content]
+paths = ["cw"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "the lock folder is a file"
+run = ["{out}/bridge-host{exe}", "{case}/lf.toml"]
+
+[case.claims]
+status = 1
+has = [".d is no folder"]
+
+[case.folders]
+"{case}/cq" = ["quiet"]
+
+[case.files]
+"{case}/lf.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 1
+[content]
+paths = ["cq"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+"{case}/lf.toml.d" = "x"
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "{case}/none.toml"]
+
+[[case]]
+name = "the lock cannot be taken"
+run = ["{out}/bridge-host{exe}", "{case}/cl.toml"]
+
+[case.claims]
+status = 1
+has = ["cannot lock '", ".d/lock"]
+
+[case.folders]
+"{case}/cq" = ["quiet"]
+"{case}/cl.toml.d/lock" = []
+
+[case.files]
+"{case}/cl.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 1
+[content]
+paths = ["cq"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "{case}/none.toml"]
+
+[[case]]
+name = "too many files in a folder"
+run = ["{out}/bridge-host{exe}", "{case}/many.toml"]
+
+[case.claims]
+has = ["too many files: 32 are looked at"]
+
+[case.files]
+"{case}/many.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 1
+[content]
+paths = ["many"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+"{case}/many/f01.txt" = "x"
+"{case}/many/f02.txt" = "x"
+"{case}/many/f03.txt" = "x"
+"{case}/many/f04.txt" = "x"
+"{case}/many/f05.txt" = "x"
+"{case}/many/f06.txt" = "x"
+"{case}/many/f07.txt" = "x"
+"{case}/many/f08.txt" = "x"
+"{case}/many/f09.txt" = "x"
+"{case}/many/f10.txt" = "x"
+"{case}/many/f11.txt" = "x"
+"{case}/many/f12.txt" = "x"
+"{case}/many/f13.txt" = "x"
+"{case}/many/f14.txt" = "x"
+"{case}/many/f15.txt" = "x"
+"{case}/many/f16.txt" = "x"
+"{case}/many/f17.txt" = "x"
+"{case}/many/f18.txt" = "x"
+"{case}/many/f19.txt" = "x"
+"{case}/many/f20.txt" = "x"
+"{case}/many/f21.txt" = "x"
+"{case}/many/f22.txt" = "x"
+"{case}/many/f23.txt" = "x"
+"{case}/many/f24.txt" = "x"
+"{case}/many/f25.txt" = "x"
+"{case}/many/f26.txt" = "x"
+"{case}/many/f27.txt" = "x"
+"{case}/many/f28.txt" = "x"
+"{case}/many/f29.txt" = "x"
+"{case}/many/f30.txt" = "x"
+"{case}/many/f31.txt" = "x"
+"{case}/many/f32.txt" = "x"
+"{case}/many/f33.txt" = "x"
+
+[case.false]
+run = ["{out}/bridge-host{exe}", "{case}/none.toml"]
+
+[[case]]
+name = "a reload that is refused"
+run = ["{out}/bridge-host{exe}", "{case}/fr.toml"]
+script = [{ wait = "? go on", put = { "{case}/fr/swap.wasm" = "word" }, type = "go" }]
+
+[case.claims]
+status = 1
+has = [
+    "bridge-host:word@1.0.0: not stated: config.word",
+    "bridge-host:word@1.0.0 was refused",
+]
+
+[case.folders]
+"{case}/fr" = ["wait", "swap"]
+
+[case.files]
+"{case}/fr.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 16
+[module."bridge-host:swap@1.0.0"]
+hot_reload = true
+[content]
+paths = ["fr"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false]
+script = [{ wait = "? go on", type = "go" }]
+
+[[case]]
+name = "a module built against another ABI"
+run = ["{out}/bridge-host{exe}", "{case}/abitwo.toml"]
+
+[case.claims]
+status = 0
+has = ["bridge-host:abitwo@1.0.0 was built against another ABI"]
+
+[case.folders]
+"{case}/ab" = ["abitwo"]
+
+[case.files]
+"{case}/abitwo.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 1
+[content]
+paths = ["ab"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.folders]
+"{case}/ab" = ["quiet"]
+
+[[case]]
+name = "a manifest word that cannot be"
+run = ["{out}/bridge-host{exe}", "{case}/badabi.toml"]
+
+[case.claims]
+status = 0
+has = ["bridge-host:badabi@1.0.0 states a abi that cannot be"]
+
+[case.folders]
+"{case}/ba" = ["badabi"]
+
+[case.files]
+"{case}/badabi.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 1
+[content]
+paths = ["ba"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.folders]
+"{case}/ba" = ["quiet"]
+
+[[case]]
+name = "settings without a component"
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/nocomp.toml"]
+
+[case.claims]
+status = 1
+has = ["it names no component, and settings"]
+
+[case.folders]
+"{case}/nc" = ["nocomp"]
+
+[case.files]
+"{case}/nocomp.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 1
+[content]
+paths = ["nc"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.folders]
+"{case}/nc" = ["quiet"]
+
+[[case]]
+name = "a manifest that states no config"
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/noconfig.toml"]
+
+[case.claims]
+status = 1
+has = ["its file states no config"]
+
+[case.folders]
+"{case}/ncf" = ["noconfig"]
+
+[case.files]
+"{case}/noconfig.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 1
+[content]
+paths = ["ncf"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.folders]
+"{case}/ncf" = ["quiet"]
+
+[[case]]
+name = "a manifest that states no reloadable"
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/noreload.toml"]
+
+[case.claims]
+status = 1
+has = ["its file states no reloadable"]
+
+[case.folders]
+"{case}/nr" = ["noreload"]
+
+[case.files]
+"{case}/noreload.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 1
+[content]
+paths = ["nr"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.folders]
+"{case}/nr" = ["quiet"]
+
+[[case]]
+name = "a manifest that states a setting that cannot be"
+run = ["{out}/bridge-host{exe}", "--show-config", "{case}/badset.toml"]
+
+[case.claims]
+status = 1
+has = ["its file states config.word: text, a number"]
+
+[case.folders]
+"{case}/bs" = ["badset"]
+
+[case.files]
+"{case}/badset.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 1
+[content]
+paths = ["bs"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.folders]
+"{case}/bs" = ["quiet"]
