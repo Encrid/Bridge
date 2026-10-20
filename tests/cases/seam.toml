@@ -2245,6 +2245,12 @@ claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: type 'Odd' ha
 false = { run = ["{out}/seam{exe}", "declare-kind-unset-refused"] }
 
 [[case]]
+name = "declare-name-with-a-zero-byte-refused"
+run = ["{out}/seam{exe}", "declare-name-with-a-zero-byte-refused"]
+claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: declare: its name has a zero byte.*alive"] }
+false = { run = ["{out}/seam{exe}", "declare-name-with-no-namespace-refused"] }
+
+[[case]]
 name = "declare-kind-unset-refused"
 run = ["{out}/seam{exe}", "declare-kind-unset-refused"]
 claims = { matches = ["module 'game:wrong@0\\.1\\.0' did not load: type 'game:Odd': its kind is unset.*alive"] }

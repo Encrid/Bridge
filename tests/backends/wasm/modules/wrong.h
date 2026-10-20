@@ -27,6 +27,7 @@ void wrong_do_nothing(void);
 void wrong_declare_outside(void);
 void wrong_declare_name_outside(void);
 void wrong_declare_no_namespace(void);
+void wrong_declare_name_zero(void);
 void wrong_declare_kind_unset(void);
 void wrong_declare_tag_with_bytes(void);
 void wrong_declare_policy_unset(void);

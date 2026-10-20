@@ -2366,6 +2366,16 @@ defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_no_namespace", "IN_SYST
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "wrong-declare-name-zero"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/wrong/wrong.c", "tests/modules/wrong/wrong_change.c", "tests/modules/wrong/wrong_declare.c", "tests/modules/wrong/wrong_declare_more.c", "tests/modules/wrong/wrong_detach.c", "tests/modules/wrong/wrong_observe.c", "tests/modules/wrong/wrong_state.c", "tests/modules/wrong/wrong_system.c", "tests/modules/wrong/wrong_term.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_name_zero", "IN_SYSTEM=wrong_do_nothing"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "wrong-declare-kind-unset"
 kind = "library"
 test = true
@@ -3826,6 +3836,16 @@ include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
 defines = ["AT_INIT=wrong_declare_no_namespace", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
 
 [[artifact]]
+name = "wrong-declare-name-zero"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_name_zero", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
 name = "wrong-declare-kind-unset"
 kind = "wasm_module"
 test = true
@@ -4263,6 +4283,20 @@ line = 83
 col = 12
 side = "false"
 why = "The loop reads into the malloc'd text buffer, which is null only when memory runs out, which the tests do not force."
+
+[[branches.exception]]
+path = "src/os/windows/library.c"
+line = 27
+col = 9
+side = "true"
+why = "GetFullPathNameW gives zero only for a path it cannot resolve; to_wide has already made the path a valid wide string of at most MAX_PATH-1 characters, so the tests do not force it."
+
+[[branches.exception]]
+path = "src/os/windows/library.c"
+line = 27
+col = 17
+side = "true"
+why = "The reachable refusal of an over-long path is at to_wide; a wide path that fits yet whose absolute form passes MAX_PATH depends on the working directory, which the tests do not force."
 
 [[branches.exception]]
 path = "src/host/toml_text.c"

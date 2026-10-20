@@ -52,12 +52,15 @@ static int check_policy(declaring_t *g)
     return (0);
 }
 
-int abi_check_name(module_t *m, const char *what, uint32_t len)
+int abi_check_name(module_t *m, const char *what, const char *name,
+    uint32_t len)
 {
-    if (len && len <= NAME_MOST)
-        return (0);
-    return (abi_refuse(m, "%s: its name has %u bytes, and a name has 1 to "
-        "%u", what, len, NAME_MOST));
+    if (!len || len > NAME_MOST)
+        return (abi_refuse(m, "%s: its name has %u bytes, and a name has 1 to "
+            "%u", what, len, NAME_MOST));
+    if (name && memchr(name, 0, len))
+        return (abi_refuse(m, "%s: its name has a zero byte", what));
+    return (0);
 }
 
 int abi_check_stated(declaring_t *g)

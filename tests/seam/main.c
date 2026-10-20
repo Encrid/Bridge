@@ -859,6 +859,8 @@ static const host_case_t TEST_CASES[] = {
         test_do_wrong, "wrong-declare-outside", test_set_guarded },
     { "declare-name-with-no-namespace-refused",
         test_do_wrong, "wrong-declare-no-namespace", test_set_guarded },
+    { "declare-name-with-a-zero-byte-refused",
+        test_do_wrong, "wrong-declare-name-zero", test_set_guarded },
     { "declare-kind-unset-refused",
         test_do_wrong, "wrong-declare-kind-unset", test_set_guarded },
     { "declare-on-unload-unset-refused",

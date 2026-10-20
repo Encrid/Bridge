@@ -30,7 +30,7 @@ static int read_stated(subscribing_t *g)
 
     g->terms = get_scratch(m, g->terms_at, terms_len);
     g->changes = get_slots(m, g->changes_at, g->change_count);
-    if (abi_check_name(m, g->what, g->name_len) || !name || !g->terms
+    if (abi_check_name(m, g->what, name, g->name_len) || !name || !g->terms
         || !g->changes)
         return (abi_refuse(m, "%s: a name, a term or a change lies outside "
             "the scratch arena", g->what));

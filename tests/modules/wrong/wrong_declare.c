@@ -27,6 +27,16 @@ void wrong_declare_no_namespace(void)
     bridge_declare(bridge_put(&d, sizeof(d)));
 }
 
+void wrong_declare_name_zero(void)
+{
+    static const char name[5] = { 'a', ':', 'b', 0, 'c' };
+    bridge_declaration_t d = wrong_state_type();
+
+    d.name = bridge_put(name, 5);
+    d.name_len = 5;
+    bridge_declare(bridge_put(&d, sizeof(d)));
+}
+
 void wrong_declare_kind_unset(void)
 {
     bridge_declaration_t d = wrong_state_type();

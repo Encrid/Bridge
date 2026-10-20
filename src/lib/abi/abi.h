@@ -17,7 +17,8 @@ typedef struct {
     uint32_t result_count;
 } abi_entry_t;
 
-int abi_check_name(module_t *m, const char *what, uint32_t len);
+int abi_check_name(module_t *m, const char *what, const char *name,
+    uint32_t len);
 
 [[gnu::format(printf, 2, 3)]] int abi_refuse(module_t *m, const char *format,
     ...);
