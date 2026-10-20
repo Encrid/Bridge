@@ -25,7 +25,7 @@ The other "none", like any other negative number, is refused by the name of the 
 
 A key that is yes or no is an `enum bridge_flag`: `BRIDGE_TRUE` or `BRIDGE_FALSE`.
 It is not a bool, because a bool has no third state: its zero is `BRIDGE_UNSET`, and that is refused like any unset key.
-The flags are `trusted`, `reloadable`, `hot_reload` and `pinned`.
+The flags are `reloadable`, `hot_reload` and `pinned`.
 
 ## The checks
 

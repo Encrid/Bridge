@@ -9,24 +9,12 @@
 #include "storage_reach.h"
 #include "storage_view.h"
 
-static void write_span(const storage_t *r, const storage_terms_t *s,
-    uint32_t t, uint8_t *at)
+static void write_span(const storage_t *r, uint32_t t, uint8_t *at)
 {
     const table_t *tab = &r->tables[t];
-    const uint32_t *columns = get_columns(r, t);
-    uint32_t value = tab->rows;
-    uint32_t i = 0;
 
-    memset(at, 0, BRIDGE_SPAN_SIZE(s->count));
-    memcpy(at, &value, 4);
-    memcpy(at + 4, &tab->block, 4);
-    while (i < s->count) {
-        value = 0;
-        if (s->oper[i] != BRIDGE_NOT)
-            value = get_handed(r, s->type[i], columns[s->type[i]]);
-        memcpy(at + BRIDGE_SPAN_BASE + 4u * i, &value, 4);
-        i++;
-    }
+    memcpy(at, &t, 4);
+    memcpy(at + 4, &tab->rows, 4);
 }
 
 static int write_spans(publish_t *p, uint32_t q)
@@ -34,7 +22,7 @@ static int write_spans(publish_t *p, uint32_t q)
     module_t *m = p->m;
     storage_terms_t *s = m->systems[q]->matched;
     bridge_query_t *slot = (bridge_query_t *)(m->priv + m->spans) + q;
-    uint32_t size = s ? BRIDGE_SPAN_SIZE(s->count) : 0;
+    uint32_t size = s ? BRIDGE_SPAN_SIZE : 0;
 
     slot->spans = 0;
     slot->at = (uint32_t)p->at;
@@ -44,7 +32,7 @@ static int write_spans(publish_t *p, uint32_t q)
     if (p->at + (uint64_t)s->matched * size > p->end)
         return (1);
     for (uint32_t i = 0; i < s->matched; i++) {
-        write_span(p->r, s, s->list[i], m->priv + p->at);
+        write_span(p->r, s->list[i], m->priv + p->at);
         p->at += size;
     }
     slot->spans = s->matched;
@@ -64,8 +52,8 @@ static void rewrite_spans(publish_t *p, uint32_t q)
     while (s && i < r->dirty_count) {
         where = s->pos[r->dirty[i]];
         if (where)
-            write_span(r, s, r->dirty[i],
-                spans + (where - 1) * BRIDGE_SPAN_SIZE(s->count));
+            write_span(r, r->dirty[i],
+                spans + (where - 1) * BRIDGE_SPAN_SIZE);
         i++;
     }
 }

@@ -84,7 +84,7 @@ Finding the modules:
 
 Loading a module:
 
-- `loaded: %s, %s, %s, %s`
+- `loaded: %s, %s, %s`
 - `? trust %s, %s, %s`
 - `not loaded: %s: %s is %s`
 - `not loaded: %s: %s %s`

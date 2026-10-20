@@ -4,6 +4,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "ntag.h"
+#include "native_reach.h"
 
 BRIDGE_NATIVE(spawn)
 {
@@ -38,13 +39,17 @@ static void turn_low_off(const a_t *column, uint64_t *bits, uint32_t count)
 BRIDGE_NATIVE(flicker)
 {
     const bridge_query_t *q = bridge_native_get_query(api, ntag_toggled);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = bridge_native_get_header(api)->types;
     const uint32_t *span;
     uint32_t i = 0;
 
     while (i < q->spans) {
         span = bridge_native_get_span(api, q, i, 2);
-        turn_low_off((const a_t *)(api->shared_base + span[2]),
-            bridge_native_get_bits(api, span[3]), span[0]);
+        turn_low_off((const a_t *)(api->shared_base
+            + bases[span[0] * types + ntag_a]),
+            bridge_native_get_bits(api, bases[span[0] * types + ntag_o]),
+            span[1]);
         i++;
     }
     return (0);

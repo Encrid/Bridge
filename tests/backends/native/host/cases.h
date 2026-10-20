@@ -33,7 +33,6 @@ void test_refuse_entry(host_t *h);
 void test_enter_from_foreign_thread(host_t *h);
 void test_observe(host_t *h);
 void test_order_changes(host_t *h);
-void test_state_untrusted(host_t *h);
 void test_state_limit(host_t *h);
 void test_state_no_path(host_t *h);
 void test_name_no_library(host_t *h);

@@ -12,36 +12,35 @@ static uint32_t doubling;
 static uint32_t adding;
 static uint32_t showing;
 
-static uint32_t get_first_row(uint32_t query)
+static uint32_t get_first_table(uint32_t query)
 {
-    uint32_t span = bridge_get_span(query, 0, 1);
-    uint32_t count = bridge_count_rows(span);
-
-    return (BRIDGE_ROW(position_t, bridge_get_base(span, 0), 0, count));
+    return (bridge_span_table(bridge_get_span(query, 0)));
 }
 
 BRIDGE_EXPORT(twice) int twice(void)
 {
-    uint32_t at = get_first_row(doubling);
+    uint32_t table = get_first_table(doubling);
 
-    BRIDGE_SET(position_t, x, at, BRIDGE_GET(position_t, x, at) * 2.0f);
+    BRIDGE_SET(position_t, x, position, table, 0,
+        BRIDGE_GET(position_t, x, position, table, 0) * 2.0f);
     return (0);
 }
 
 BRIDGE_EXPORT(more) int more(void)
 {
-    uint32_t at = get_first_row(adding);
+    uint32_t table = get_first_table(adding);
 
-    BRIDGE_SET(position_t, x, at, BRIDGE_GET(position_t, x, at) + 1.0f);
+    BRIDGE_SET(position_t, x, position, table, 0,
+        BRIDGE_GET(position_t, x, position, table, 0) + 1.0f);
     return (0);
 }
 
 BRIDGE_EXPORT(show) int show(void)
 {
-    uint32_t at = get_first_row(showing);
+    uint32_t table = get_first_table(showing);
 
-    BRIDGE_LOG(BRIDGE_LOG_INFO, "x", (uint32_t)BRIDGE_GET(position_t, x, at),
-        0);
+    BRIDGE_LOG(BRIDGE_LOG_INFO, "x",
+        (uint32_t)BRIDGE_GET(position_t, x, position, table, 0), 0);
     return (0);
 }
 

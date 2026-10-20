@@ -9,8 +9,7 @@ int module_check_flags(const module_check_t *k)
 {
     const bridge_module_config_t *cfg = k->cfg;
 
-    return (module_check_flag(k, "trusted", cfg->trusted)
-        || module_check_flag(k, "reloadable", cfg->reloadable)
+    return (module_check_flag(k, "reloadable", cfg->reloadable)
         || module_check_flag(k, "hot_reload", cfg->hot_reload)
         || module_check_flag(k, "pinned", cfg->pinned));
 }

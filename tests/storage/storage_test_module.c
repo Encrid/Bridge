@@ -14,7 +14,7 @@ bridge_artifact_t storage_test_state(const char *path, int64_t spawns,
     bridge_artifact_t a = { .backend = "tests", .path = path };
 
     a.cfg = (bridge_module_config_t){ .identity = "st:store@0.1.0",
-        .scratch = 64 << 10, .abi = BRIDGE_ABI, .trusted = BRIDGE_TRUE,
+        .scratch = 64 << 10, .abi = BRIDGE_ABI,
         .reloadable = BRIDGE_FALSE, .hot_reload = BRIDGE_FALSE,
         .pinned = BRIDGE_FALSE, .on_error = BRIDGE_FAIL,
         .max_system_failures = 1, .work_limit = BRIDGE_NO_LIMIT,

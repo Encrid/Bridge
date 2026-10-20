@@ -5,6 +5,7 @@
 */
 #include "test_module.h"
 #include "stepper.h"
+#include "reach.h"
 
 #ifdef FAIL_RELOAD
 constexpr int RELOADED = 5;
@@ -18,8 +19,11 @@ static uint32_t ticking;
 TEST(advance)
 {
     const bridge_query_t *q = test_get_query(api, ticking);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
     const uint32_t *span = test_get_span(api, q, 0, 1);
-    tick_t *t = (tick_t *)(api->shared_base + span[2]);
+    tick_t *t = (tick_t *)(api->shared_base
+        + bases[span[0] * types + tick]);
     bridge_line_t line = { "tick", 4, 0, STEP };
 
     t->n += STEP;

@@ -93,7 +93,7 @@ run = ["{out}/bridge-host{exe}", "{case}/dbg.toml"]
 
 [case.claims]
 status = 0
-has = ["loaded: bridge-host:debugger@1.0.0, wasm, not trusted"]
+has = ["loaded: bridge-host:debugger@1.0.0, wasm"]
 lacks = ["deep"]
 
 [case.folders]

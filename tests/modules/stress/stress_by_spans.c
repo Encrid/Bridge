@@ -4,10 +4,13 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "stress.h"
+#include "reach.h"
 
 static uint32_t sum_spans(const test_api_t *api, const bridge_query_t *q,
-    uint32_t *rows)
+    uint32_t slot, uint32_t *rows)
 {
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
     const uint32_t *span;
     const v_t *column;
     uint32_t sum = 0;
@@ -16,10 +19,11 @@ static uint32_t sum_spans(const test_api_t *api, const bridge_query_t *q,
 
     while (s < q->spans) {
         span = test_get_span(api, q, s, 1);
-        column = (const v_t *)(api->shared_base + span[2]);
-        *rows += span[0];
+        column = (const v_t *)(api->shared_base
+            + bases[span[0] * types + slot]);
+        *rows += span[1];
         r = 0;
-        while (r < span[0]) {
+        while (r < span[1]) {
             sum += column[r].v;
             r++;
         }
@@ -49,7 +53,7 @@ int nstress_check_kind(const test_api_t *api, uint32_t kind)
     const bridge_query_t *q = test_get_query(api,
         nstress_seeing[kind]);
     uint32_t rows = 0;
-    uint32_t sum = sum_spans(api, q, &rows);
+    uint32_t sum = sum_spans(api, q, nstress_kinds[kind], &rows);
 
     nstress_wrong += !is_accounted(kind, rows, sum);
     if (!kind)

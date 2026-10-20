@@ -12,7 +12,7 @@ void test_outgrow_spans(host_t *h)
     if (host_open(h))
         return;
     test_state_module(&a, "game:mover@0.1.0", "mover");
-    a.cfg.spans = 544;
+    a.cfg.spans = 1160;
     host_load(h, &a);
     host_run_frames(h, 2);
     host_close(h);

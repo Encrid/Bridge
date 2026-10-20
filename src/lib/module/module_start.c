@@ -63,7 +63,10 @@ static int check_spans(const module_t *m, backend_err_t *err)
     uint32_t tables = storage_count_tables(m->b->storage);
     uint64_t need = sizeof(bridge_query_t) * m->system_count
         + sizeof(bridge_list_t) * m->observer_count
-        + 4ull * m->declared_count * tables + 4ull * m->declared_count;
+        + 4ull * m->declared_count * tables
+        + 8ull * tables
+        + 16ull * m->declared_count
+        + 4ull + 8ull * BRIDGE_OWNED_CAP;
 
     need = (need + 7u) & ~7ull;
     if (need <= m->spans_len)

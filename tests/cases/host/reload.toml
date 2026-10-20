@@ -91,7 +91,7 @@ script = [{ wait = "? go on", put = { "{case}/d/mute.wasm" = "quiet2" }, type = 
 [case.claims]
 has = [
     "not loaded: d/mute.wasm: bridge-host:mute@1.0.0: its file states no pinned",
-    "loaded: bridge-host:quiet@1.0.0, wasm, not trusted, d/mute.wasm",
+    "loaded: bridge-host:quiet@1.0.0, wasm, d/mute.wasm",
 ]
 
 [case.folders]

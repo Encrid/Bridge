@@ -12,10 +12,8 @@ static uint32_t hearing;
 
 BRIDGE_EXPORT(heard) int heard(void)
 {
-    uint32_t at = bridge_get_single(single);
-
     BRIDGE_LOG(BRIDGE_LOG_INFO, "heard", bridge_count_triggers(hearing),
-        at ? BRIDGE_GET(marked_t, by, at) : 0);
+        BRIDGE_GET(marked_t, by, single, 0, 0));
     return (0);
 }
 

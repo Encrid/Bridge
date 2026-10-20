@@ -16,18 +16,17 @@ BRIDGE_EXPORT(say) int say(void)
 {
     char text[32];
     uint32_t span;
-    uint32_t at;
+    uint32_t table;
     uint32_t len;
 
     if (!bridge_count_spans(saying))
         return (0);
-    span = bridge_get_span(saying, 0, 1);
-    at = BRIDGE_ROW(name_t, bridge_get_base(span, 0), 0,
-        bridge_count_rows(span));
-    len = BRIDGE_GET(name_t, text.len, at);
+    span = bridge_get_span(saying, 0);
+    table = bridge_span_table(span);
+    len = BRIDGE_GET(name_t, text.len, name, table, 0);
     if (len > sizeof(text))
         len = sizeof(text);
-    acc_from_shared(text, BRIDGE_GET(name_t, text.at, at), len);
+    acc_from_shared(text, BRIDGE_GET(name_t, text.at, name, table, 0), len);
     bridge_log(BRIDGE_LOG_INFO, &(bridge_line_t){ text, len, 0, 0 });
     return (0);
 }

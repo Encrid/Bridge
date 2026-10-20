@@ -28,16 +28,20 @@ BRIDGE_EXPORT(any) int any(void)
 {
     uint32_t count = bridge_count_triggers(watching);
     uint32_t trigger;
-    uint32_t at;
+    uint64_t id;
+    uint64_t e;
     uint32_t i = 0;
 
     while (i < count) {
         trigger = bridge_get_trigger(watching, i);
-        at = bridge_get_ref(bridge_get_trigger_id(trigger), marked,
-            sizeof(marked_t));
+        id = bridge_get_trigger_id(trigger);
+        e = bridge_find(id);
         BRIDGE_LOG(BRIDGE_LOG_INFO, "event",
             bridge_get_trigger_events(trigger),
-            at ? BRIDGE_GET(marked_t, by, at) : 0xdead);
+            (bridge_is_alive(id)
+                    && bridge_base(marked, bridge_entity_table(e)))
+                ? BRIDGE_GET(marked_t, by, marked, bridge_entity_table(e),
+                    bridge_entity_row(e)) : 0xdead);
         i++;
     }
     return (0);

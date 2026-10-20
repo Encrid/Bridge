@@ -39,6 +39,35 @@ void block_hand_out(bridge_t *b)
     }
 }
 
+static void write_caps(bridge_header_t *h, const bridge_t *b)
+{
+    h->rows = h->kept + 4u * h->types;
+    h->blocks = h->rows + 4u * h->tables;
+    h->stride = h->blocks + 4u * h->tables;
+    h->write = h->stride + 4u * h->types;
+    h->kind = h->write + 4u * h->types;
+    h->owned = h->kind + 4u * h->types;
+    h->arena_lo = b->arena;
+    h->arena_hi = b->arena + b->arena_len;
+}
+
+static void write_owned(bridge_header_t *h, const module_t *m)
+{
+    uint32_t count = m->own_count < BRIDGE_OWNED_CAP ? m->own_count
+        : BRIDGE_OWNED_CAP;
+    uint32_t *owned = (uint32_t *)(m->priv + h->owned);
+    uint32_t i = 0;
+
+    if (h->owned + 4u + 8u * count > m->spans + m->spans_len)
+        return;
+    owned[0] = count;
+    while (i < count) {
+        owned[1u + 2u * i] = m->owned[i].at;
+        owned[2u + 2u * i] = m->owned[i].len;
+        i++;
+    }
+}
+
 void block_write_header(bridge_t *b, module_t *m)
 {
     bridge_header_t *h = (bridge_header_t *)m->priv;
@@ -59,4 +88,6 @@ void block_write_header(bridge_t *b, module_t *m)
     h->kept = h->column_base + 4u * h->types * h->tables;
     h->entity_index = (uint32_t)((const uint8_t *)b->index - b->shared);
     h->entities = b->entities;
+    write_caps(h, b);
+    write_owned(h, m);
 }

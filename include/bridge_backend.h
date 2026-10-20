@@ -32,7 +32,6 @@ static_assert(sizeof(backend_err_t) == 256);
 static_assert(alignof(backend_err_t) == 1);
 
 enum backend_capability : uint32_t {
-    BACKEND_UNTRUSTED = 1 << 0,
     BACKEND_WORK_LIMIT = 1 << 1,
     BACKEND_TIMEOUT = 1 << 2,
     BACKEND_MEMORY_LIMIT = 1 << 3,

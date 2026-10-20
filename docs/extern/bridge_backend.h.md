@@ -75,16 +75,12 @@ Each capability is a promise. State only what the backend keeps.
 
 | Item | Promise | The key that demands it |
 | --- | --- | --- |
-| `BACKEND_UNTRUSTED` | The backend runs a module that is not trusted. | `trusted` of `BRIDGE_FALSE` |
 | `BACKEND_WORK_LIMIT` | The backend counts the work of an invocation, and stops it at its limit. | `work_limit` |
 | `BACKEND_TIMEOUT` | The backend stops a call at its timeout. | A timeout |
 | `BACKEND_MEMORY_LIMIT` | The backend keeps the own memory of a module under a ceiling. | `memory_limit` |
 | `BACKEND_RELOAD` | A reload can replace a module while the world runs. | `hot_reload` |
 | `BACKEND_SIDE_BY_SIDE` | Two instances of one module can exist at one time. | None. |
 | `BACKEND_UNLOAD` | Bridge can take the library out of the process after `backend_destroy`. | None. |
-
-A module that is not trusted cannot reach memory that it was not given.
-Such a backend checks each export that it gives: `call` can run it. How the backend does it is its own business.
 
 If the backend does not state a capability that the config of a module demands, a load refuses the module: `docs/extern/bridge.h.md`, *The limits*.
 `BACKEND_SIDE_BY_SIDE` decides the order of a reload: `docs/extern/bridge.h.md`, *bridge_reload*.
@@ -224,7 +220,7 @@ A backend that can stop the module stops it there. Another backend lets the call
 The export takes nothing, and gives an `int32_t` status.
 It gives null, with `err`, if there is no export of that name, or if the backend sees that the export has another shape.
 At each load and reload, Bridge asks for `init` or `reload`, for each system and observer, and for `shutdown` and `reload`.
-A backend that cannot see the type of an export checks nothing, and does not state `BACKEND_UNTRUSTED`.
+A backend that cannot see the type of an export checks nothing.
 
 `call` runs a function. It gives 0 if the function returned, and then `status` is what the function gave.
 It gives a value that is not 0, with `err`, if the function did not return.
@@ -260,7 +256,7 @@ Bridge puts each text that a backend writes in `err` into a record of its own, a
 
 The native backend, `native`, is in `src/backends/native`. It runs each module as a native shared library.
 It opens the library of a module from the path that the host gave, and finds each export by its name, as `bridge_<name>`.
-The native backend keeps none of the limits, and runs only a module that is trusted.
+The native backend keeps none of the limits.
 
 It writes one of these reasons in `err` when it refuses. Angle brackets mark a part that changes:
 

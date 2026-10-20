@@ -178,8 +178,16 @@ typedef struct {
     uint32_t log_level;
     uint32_t observers;
     uint32_t kept;
+    uint32_t rows;
+    uint32_t blocks;
+    uint32_t stride;
+    uint32_t write;
+    uint32_t kind;
+    uint32_t owned;
+    uint32_t arena_lo;
+    uint32_t arena_hi;
 } bridge_header_t;
-static_assert(sizeof(bridge_header_t) == 84);
+static_assert(sizeof(bridge_header_t) == 116);
 static_assert(alignof(bridge_header_t) == 4);
 static_assert(offsetof(bridge_header_t, abi) == 0);
 static_assert(offsetof(bridge_header_t, scratch) == 4);
@@ -202,6 +210,14 @@ static_assert(offsetof(bridge_header_t, observer) == 68);
 static_assert(offsetof(bridge_header_t, log_level) == 72);
 static_assert(offsetof(bridge_header_t, observers) == 76);
 static_assert(offsetof(bridge_header_t, kept) == 80);
+static_assert(offsetof(bridge_header_t, rows) == 84);
+static_assert(offsetof(bridge_header_t, blocks) == 88);
+static_assert(offsetof(bridge_header_t, stride) == 92);
+static_assert(offsetof(bridge_header_t, write) == 96);
+static_assert(offsetof(bridge_header_t, kind) == 100);
+static_assert(offsetof(bridge_header_t, owned) == 104);
+static_assert(offsetof(bridge_header_t, arena_lo) == 108);
+static_assert(offsetof(bridge_header_t, arena_hi) == 112);
 
 typedef struct {
     uint32_t spans;
@@ -230,8 +246,9 @@ static_assert(alignof(bridge_list_t) == 4);
 static_assert(offsetof(bridge_list_t, count) == 0);
 static_assert(offsetof(bridge_list_t, at) == 4);
 
-constexpr uint32_t BRIDGE_SPAN_BASE = 8;
-    #define BRIDGE_SPAN_SIZE(n) (8u + 4u * (n))
+constexpr uint32_t BRIDGE_OWNED_CAP = 8;
+
+constexpr uint32_t BRIDGE_SPAN_SIZE = 8;
 
 typedef struct {
     uint32_t table;

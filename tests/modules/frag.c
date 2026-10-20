@@ -7,6 +7,7 @@
 #include "measured.h"
 #include "idle.h"
 #include "frag.h"
+#include "reach.h"
 
 constexpr uint32_t COUNT = 204'800;
 constexpr uint32_t MARKERS = 12;
@@ -47,6 +48,8 @@ TEST(fill)
 TEST_MEASURED TEST(sum)
 {
     const bridge_query_t *q = test_get_query(api, reading);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
     bridge_line_t line = { "rows, spans", 11, 0, q->spans };
     const uint32_t *span;
     const v_t *column;
@@ -55,13 +58,14 @@ TEST_MEASURED TEST(sum)
 
     while (s < q->spans) {
         span = test_get_span(api, q, s, 1);
-        column = (const v_t *)(api->shared_base + span[2]);
+        column = (const v_t *)(api->shared_base
+            + bases[span[0] * types + value]);
         r = 0;
-        while (r < span[0]) {
+        while (r < span[1]) {
             line.a0 += column[r].v;
             r++;
         }
-        line.a0 += span[0];
+        line.a0 += span[1];
         s++;
     }
     test_log(api, BRIDGE_LOG_INFO, &line);

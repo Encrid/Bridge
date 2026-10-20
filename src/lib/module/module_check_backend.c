@@ -34,11 +34,7 @@ static int check_limits_kept(const module_check_t *k)
 int module_check_backend(const module_check_t *k)
 {
     const bridge_module_config_t *cfg = k->cfg;
-    const open_backend_t *o = k->on;
 
-    if (cfg->trusted == BRIDGE_FALSE && !(o->capabilities & BACKEND_UNTRUSTED))
-        return (module_refuse(k->b, k->id, "it is not trusted, and backend "
-            "'%s' runs only modules that are", o->name));
     if (check_limits_kept(k))
         return (1);
     if (cfg->hot_reload == BRIDGE_TRUE && cfg->reloadable == BRIDGE_FALSE)

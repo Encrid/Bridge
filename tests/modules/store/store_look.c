@@ -4,6 +4,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "store.h"
+#include "reach.h"
 
 #if !defined(BIG) && !defined(TABLES)
 uint32_t nstore_with_a;
@@ -12,19 +13,24 @@ uint32_t nstore_maybe_b;
 
 static void say_first_a(const test_api_t *api, const bridge_query_t *q)
 {
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
     const uint32_t *span = test_get_span(api, q, 0, 1);
     uint32_t s = 0;
 
-    while (!span[0]) {
+    while (!span[1]) {
         span = test_get_span(api, q, s + 1, 1);
         s++;
     }
-    say(api, "first A", ((const a_t *)(api->shared_base + span[2]))->v, 0);
+    say(api, "first A", ((const a_t *)(api->shared_base
+        + bases[span[0] * types + nstore_a]))->v, 0);
 }
 
 static void say_with_a(const test_api_t *api)
 {
     const bridge_query_t *q = test_get_query(api, nstore_with_a);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
     const uint32_t *span;
     uint32_t rows = 0;
     uint32_t empty = 0;
@@ -32,9 +38,9 @@ static void say_with_a(const test_api_t *api)
 
     while (s < q->spans) {
         span = test_get_span(api, q, s, 1);
-        rows += span[0];
-        empty += !span[0];
-        if (!span[2])
+        rows += span[1];
+        empty += !span[1];
+        if (!bases[span[0] * types + nstore_a])
             say(api, "FAIL: a matched term with no base", s, 0);
         s++;
     }
@@ -48,14 +54,16 @@ static void say_with_a(const test_api_t *api)
 static void say_without_b(const test_api_t *api)
 {
     const bridge_query_t *q = test_get_query(api, nstore_without_b);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
     const uint32_t *span;
     uint32_t rows = 0;
     uint32_t s = 0;
 
     while (s < q->spans) {
         span = test_get_span(api, q, s, 2);
-        rows += span[0];
-        if (span[3])
+        rows += span[1];
+        if (bases[span[0] * types + nstore_b])
             say(api, "FAIL: a NOT term with a base", s, 0);
         s++;
     }
@@ -65,6 +73,8 @@ static void say_without_b(const test_api_t *api)
 static void say_maybe_b(const test_api_t *api)
 {
     const bridge_query_t *q = test_get_query(api, nstore_maybe_b);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
     const uint32_t *span;
     uint32_t rows = 0;
     uint32_t have = 0;
@@ -72,9 +82,9 @@ static void say_maybe_b(const test_api_t *api)
 
     while (s < q->spans) {
         span = test_get_span(api, q, s, 2);
-        rows += span[0];
-        if (span[3])
-            have += span[0];
+        rows += span[1];
+        if (bases[span[0] * types + nstore_b])
+            have += span[1];
         s++;
     }
     say(api, "with A and maybe B: spans, rows", q->spans, rows);

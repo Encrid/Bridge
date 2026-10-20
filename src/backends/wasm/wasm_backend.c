@@ -48,7 +48,7 @@ BACKEND_EXPORT void backend_destroy(backend_t *b)
 BACKEND_EXPORT enum backend_capability backend_get_capabilities(
     [[maybe_unused]] backend_t *b)
 {
-    return (BACKEND_UNTRUSTED | BACKEND_WORK_LIMIT | BACKEND_TIMEOUT
+    return (BACKEND_WORK_LIMIT | BACKEND_TIMEOUT
         | BACKEND_MEMORY_LIMIT | BACKEND_RELOAD | BACKEND_SIDE_BY_SIDE);
 }
 

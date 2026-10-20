@@ -16,15 +16,13 @@ static uint32_t counting;
 static void lower_span(uint32_t span)
 {
     uint32_t count = bridge_count_rows(span);
-    uint32_t base = bridge_get_base(span, 0);
-    uint32_t bits = bridge_get_bits(base);
+    uint32_t table = bridge_span_table(span);
     uint32_t strength;
     uint32_t r = 0;
 
     while (r < count) {
-        strength = BRIDGE_GET(shield_t, strength,
-            BRIDGE_ROW(shield_t, base, r, count));
-        bridge_turn(bits, r, count, strength % 3 != 0);
+        strength = BRIDGE_GET(shield_t, strength, shield, table, r);
+        bridge_turn(shield, table, r, strength % 3 != 0);
         r++;
     }
 }
@@ -35,7 +33,7 @@ BRIDGE_EXPORT(lower) int lower(void)
     uint32_t s = 0;
 
     while (s < spans) {
-        lower_span(bridge_get_span(lowering, s, 1));
+        lower_span(bridge_get_span(lowering, s));
         s++;
     }
     return (0);
@@ -44,14 +42,12 @@ BRIDGE_EXPORT(lower) int lower(void)
 static uint32_t add_span(uint32_t span, uint32_t *on, uint32_t *sum)
 {
     uint32_t count = bridge_count_rows(span);
-    uint32_t base = bridge_get_base(span, 0);
-    uint32_t bits = bridge_get_bits(base);
+    uint32_t table = bridge_span_table(span);
     uint32_t r = 0;
 
     while (r < count) {
-        if (bridge_is_on(bits, r, count)) {
-            *sum += BRIDGE_GET(shield_t, strength,
-                BRIDGE_ROW(shield_t, base, r, count));
+        if (bridge_is_on(shield, table, r)) {
+            *sum += BRIDGE_GET(shield_t, strength, shield, table, r);
             (*on)++;
         }
         r++;
@@ -68,7 +64,7 @@ BRIDGE_EXPORT(count) int count(void)
     uint32_t s = 0;
 
     while (s < spans) {
-        rows += add_span(bridge_get_span(counting, s, 1), &on, &sum);
+        rows += add_span(bridge_get_span(counting, s), &on, &sum);
         s++;
     }
     BRIDGE_LOG(BRIDGE_LOG_INFO, "shields", rows, on);

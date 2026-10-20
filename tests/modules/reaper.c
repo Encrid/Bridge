@@ -6,6 +6,7 @@
 #include "test_module.h"
 #include "game.h"
 #include "idle.h"
+#include "reach.h"
 
 static uint32_t position;
 static uint32_t reaping;
@@ -16,10 +17,12 @@ static uint32_t runs;
 
 static void destroy_rows(const test_api_t *api, const uint32_t *span)
 {
-    const uint64_t *who = (const uint64_t *)(api->shared_base + span[1]);
+    const uint32_t *blocks = get_blocks(api);
+    const uint64_t *who = (const uint64_t *)(api->shared_base
+        + blocks[span[0]]);
     uint32_t row = 0;
 
-    while (row < span[0]) {
+    while (row < span[1]) {
         api->destroy(api, who[row]);
         row++;
     }
@@ -50,7 +53,7 @@ TEST(reap)
 #else
         destroy_rows(api, span);
 #endif
-        line.a0 += span[0];
+        line.a0 += span[1];
         s++;
     }
 #ifdef MEND

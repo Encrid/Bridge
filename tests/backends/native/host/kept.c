@@ -68,7 +68,7 @@ void test_read_kept(host_t *h)
         return;
     host_state_native(&a, "st:store@0.1.0", c->path);
     a.cfg.spawns = 16;
-    a.cfg.spans = 1 << 20;
+    a.cfg.spans = 1 << 21;
     a.cfg.log_ring = 256 * 24;
     host_load(h, &a);
     run_phases(h, c);

@@ -11,12 +11,13 @@ static uint32_t ticking;
 
 BRIDGE_EXPORT(advance) int advance(void)
 {
-    uint32_t span = bridge_get_span(ticking, 0, 1);
-    uint32_t at = BRIDGE_ROW(tick_t, bridge_get_base(span, 0), 0,
-        bridge_count_rows(span));
+    uint32_t span = bridge_get_span(ticking, 0);
+    uint32_t table = bridge_span_table(span);
 
-    BRIDGE_SET(tick_t, n, at, BRIDGE_GET(tick_t, n, at) + STEP);
-    BRIDGE_LOG(BRIDGE_LOG_INFO, "tick", BRIDGE_GET(tick_t, n, at), STEP);
+    BRIDGE_SET(tick_t, n, tick, table, 0,
+        BRIDGE_GET(tick_t, n, tick, table, 0) + STEP);
+    BRIDGE_LOG(BRIDGE_LOG_INFO, "tick", BRIDGE_GET(tick_t, n, tick, table, 0),
+        STEP);
 #ifdef TRIP
     return (7);
 #else

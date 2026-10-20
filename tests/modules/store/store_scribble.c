@@ -22,6 +22,7 @@ static void overwrite_index(const test_api_t *api)
 static void overwrite_names(const test_api_t *api)
 {
     const bridge_query_t *q = test_get_query(api, nstore_with_a);
+    const uint32_t *blocks = get_blocks(api);
     const uint32_t *span;
     uint64_t *who;
     uint32_t s = 0;
@@ -29,9 +30,9 @@ static void overwrite_names(const test_api_t *api)
 
     while (s < q->spans) {
         span = test_get_span(api, q, s, 1);
-        who = (uint64_t *)(api->shared_base + span[1]);
+        who = (uint64_t *)(api->shared_base + blocks[span[0]]);
         row = 0;
-        while (row < span[0]) {
+        while (row < span[1]) {
             who[row] = nstore_ids[0];
             row++;
         }

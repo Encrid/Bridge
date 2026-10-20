@@ -75,7 +75,7 @@ presets = ["{root}/tests/host/test.toml"]
 phases = ["update"]
 rounds = 8
 [module."bridge-host:nobody@1.0.0"]
-trusted = false
+hot_reload = false
 [content]
 paths = ["cq"]
 [backend]

@@ -63,10 +63,10 @@ static inline const bridge_query_t *test_get_query(
 }
 
 static inline const uint32_t *test_get_span(const test_api_t *api,
-    const bridge_query_t *q, uint32_t i, uint32_t terms)
+    const bridge_query_t *q, uint32_t i, [[maybe_unused]] uint32_t terms)
 {
     return ((const uint32_t *)(api->private_base + q->at
-        + i * BRIDGE_SPAN_SIZE(terms)));
+        + i * BRIDGE_SPAN_SIZE));
 }
 
 #endif

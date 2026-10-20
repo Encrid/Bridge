@@ -13,15 +13,16 @@ static uint32_t fixing;
 BRIDGE_EXPORT(fix) int fix(void)
 {
     uint32_t count = bridge_count_triggers(fixing);
-    uint32_t at;
+    uint64_t id;
+    uint64_t e;
     uint32_t i = 0;
 
     while (i < count) {
-        at = bridge_get_ref(
-            bridge_get_trigger_id(bridge_get_trigger(fixing, i)), marked,
-            sizeof(marked_t));
-        if (at)
-            BRIDGE_SET(marked_t, by, at, 5u);
+        id = bridge_get_trigger_id(bridge_get_trigger(fixing, i));
+        e = bridge_find(id);
+        if (bridge_is_alive(id))
+            BRIDGE_SET(marked_t, by, marked, bridge_entity_table(e),
+                bridge_entity_row(e), 5u);
         i++;
     }
     return (0);

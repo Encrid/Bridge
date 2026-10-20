@@ -53,7 +53,7 @@ enum storage_test_end storage_test_toggle_full(storage_test_t *t)
 
 enum storage_test_end storage_test_tag(storage_test_t *t)
 {
-    bridge_artifact_t a = storage_test_state(TAG_PATH, 8, 1 << 20, 4096);
+    bridge_artifact_t a = storage_test_state(TAG_PATH, 8, 1 << 21, 4096);
 
     if (storage_test_try_load(t, &a))
         return (STORAGE_TEST_LEFT);

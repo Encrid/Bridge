@@ -5,6 +5,7 @@
 */
 #include "toggle.h"
 #include "measured.h"
+#include "reach.h"
 
 uint32_t ntoggle_writing;
 
@@ -44,13 +45,17 @@ static void switch_rows([[maybe_unused]] const t_t *column, uint64_t *bits,
 TEST_MEASURED TEST(flicker)
 {
     const bridge_query_t *q = test_get_query(api, ntoggle_writing);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
     const uint32_t *span;
+    uint32_t base;
     uint32_t i = 0;
 
     while (i < q->spans) {
         span = test_get_span(api, q, i, 1);
-        switch_rows((const t_t *)(api->shared_base + span[2]),
-            test_get_bits(api, span[2]), span[0]);
+        base = bases[span[0] * types + ntoggle_t];
+        switch_rows((const t_t *)(api->shared_base + base),
+            test_get_bits(api, base), span[1]);
         i++;
     }
     return (0);
@@ -59,6 +64,8 @@ TEST_MEASURED TEST(flicker)
 TEST(combine)
 {
     const bridge_query_t *q = test_get_query(api, ntoggle_writing);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
     const uint32_t *span;
     uint64_t *bits;
     uint32_t i = 0;
@@ -66,9 +73,9 @@ TEST(combine)
 
     while (i < q->spans) {
         span = test_get_span(api, q, i, 1);
-        bits = test_get_bits(api, span[2]);
+        bits = test_get_bits(api, bases[span[0] * types + ntoggle_t]);
         r = 0;
-        while (r < span[0]) {
+        while (r < span[1]) {
             bits[r >> 6] |= (uint64_t)1 << (r & 63);
             r++;
         }

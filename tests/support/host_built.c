@@ -37,7 +37,6 @@ void host_state_guarded(bridge_artifact_t *a, const char *identity,
     host_state_plain(a, identity, nullptr);
     host_name_module(a, file);
     a->backend = "guarded";
-    a->cfg.trusted = BRIDGE_FALSE;
     a->cfg.work_limit = 10'000'000;
     a->cfg.memory_limit = 16 << 20;
     a->cfg.init_timeout = 2000 * HOST_MS;

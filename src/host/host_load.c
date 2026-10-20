@@ -74,7 +74,6 @@ void load_found(host_t *h, file_t *f, bool first)
         printf("not loaded: %s: %s was refused\n", f->path, who);
         return;
     }
-    printf("loaded: %s, %s, %s, %s\n", who, a.backend,
-        a.cfg.trusted == BRIDGE_TRUE ? "trusted" : "not trusted", f->path);
+    printf("loaded: %s, %s, %s\n", who, a.backend, f->path);
     f->loaded = true;
 }

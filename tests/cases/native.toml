@@ -65,12 +65,6 @@ claims = { matches = ["test:flood@0.1.0/flood: system 'flood' failed: spawn: its
 false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
 
 [[case]]
-name = "backend_get_capabilities-untrusted-refused"
-run = ["{out}/native-host{exe}", "backend_get_capabilities-untrusted-refused"]
-claims = { matches = ["module 'game:mover@0.1.0' is refused: it is not trusted, and backend 'native' runs only modules that are.*alive"], lacks = ["cannot open"] }
-false = { run = ["{out}/native-host{exe}", "BRIDGE_NATIVE-system-reads-and-writes"] }
-
-[[case]]
 name = "backend_get_capabilities-work-limit-refused"
 run = ["{out}/native-host{exe}", "backend_get_capabilities-work-limit-refused"]
 claims = { matches = ["is refused: it states work_limit, which backend 'native' cannot keep.*alive"], lacks = ["cannot open"] }

@@ -5,6 +5,7 @@
 */
 #include "test_module.h"
 #include "packed.h"
+#include "reach.h"
 
 static uint32_t count;
 static uint32_t counting;
@@ -12,8 +13,11 @@ static uint32_t counting;
 TEST(advance)
 {
     const bridge_query_t *q = test_get_query(api, counting);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
     const uint32_t *span = test_get_span(api, q, 0, 1);
-    count_t *c = (count_t *)(api->shared_base + span[2]);
+    count_t *c = (count_t *)(api->shared_base
+        + bases[span[0] * types + count]);
     bridge_line_t line = { "count", 5, 0, 0 };
 
     c->n += 1;

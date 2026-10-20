@@ -4,11 +4,10 @@ This file writes the spans of a module: for each of its systems, one span for ea
 
 ## A span
 
-A span has `BRIDGE_SPAN_SIZE` bytes for its count of terms.
-It holds the count of rows, where the entity ids are, and then a base for each term.
-The entity ids are at the start of the block of the table.
-The base of a term is what `get_handed` gives for its column.
-The base is 0 for a term `BRIDGE_NOT`, which must not match, and for a component that the table does not hold.
+A span is 8 bytes, the value of `BRIDGE_SPAN_SIZE`, whatever the count of terms.
+It holds the id of the table, and then the count of rows of the table.
+A span carries no column now: a module finds a column through the capability table that `src/lib/storage/storage_cells.c` writes.
+The id of a row lives in the block of the table, which `blocks` of the header points to.
 
 ## Where the spans go
 
@@ -19,7 +18,7 @@ So when a system reads other tables than it did, storage writes all the spans of
 Otherwise it writes again, where it is, each span whose table was touched, which it finds through `pos` of the system.
 A system with no record of terms has no span.
 
-A span is a multiple of 4 bytes, and the records after the spans hold ids.
+Each span is 8 bytes, and the spans begin on an 8-byte bound.
 So storage rounds the end of the spans up to 8.
 If the spans do not fit in the span region, storage gives 1.
 
@@ -27,7 +26,7 @@ If the spans do not fit in the span region, storage gives 1.
 
 | Function | Result |
 | --- | --- |
-| `write_span` | Writes one span of table `t` for a system. |
+| `write_span` | Writes the span of table `t`: its id and its row count. |
 | `write_spans` | Writes each span of system `q` of a module, one after the other, and where they begin. Gives 1 if they do not fit. |
 | `rewrite_spans` | Writes again, where it is, each span of system `q` whose table was touched. |
 | `write_every_span` | Writes all the spans of a module again, and where they end. Gives 1 if they do not fit. |

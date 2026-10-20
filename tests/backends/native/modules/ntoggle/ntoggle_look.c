@@ -5,6 +5,7 @@
 */
 #include "ntoggle.h"
 #include "native_measured.h"
+#include "native_reach.h"
 
 uint32_t ntoggle_reading;
 
@@ -31,9 +32,12 @@ static void see_word(const t_t *column, uint64_t word, uint32_t w,
 static void see_words(const bridge_api_t *api, const uint32_t *span,
     seen_t *seen)
 {
-    const t_t *column = (const t_t *)(api->shared_base + span[2]);
-    const uint64_t *bits = bridge_native_get_bits(api, span[2]);
-    const uint32_t count = span[0];
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = bridge_native_get_header(api)->types;
+    uint32_t base = bases[span[0] * types + ntoggle_t];
+    const t_t *column = (const t_t *)(api->shared_base + base);
+    const uint64_t *bits = bridge_native_get_bits(api, base);
+    const uint32_t count = span[1];
     const uint32_t whole = count / 64;
     uint64_t word;
     uint32_t w = 0;
@@ -58,7 +62,7 @@ NATIVE_MEASURED BRIDGE_NATIVE(look)
     while (i < q->spans) {
         span = bridge_native_get_span(api, q, i, 1);
         see_words(api, span, &seen);
-        rows += span[0];
+        rows += span[1];
         i++;
     }
     say(api, "by words: rows, and of them on", rows, seen.on);
@@ -83,14 +87,18 @@ static void see_rows(const t_t *restrict column, const uint64_t *restrict bits,
 NATIVE_MEASURED BRIDGE_NATIVE(look_b)
 {
     const bridge_query_t *q = bridge_native_get_query(api, ntoggle_reading);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = bridge_native_get_header(api)->types;
     const uint32_t *span;
+    uint32_t base;
     seen_t seen = {};
     uint32_t i = 0;
 
     while (i < q->spans) {
         span = bridge_native_get_span(api, q, i, 1);
-        see_rows((const t_t *)(api->shared_base + span[2]),
-            bridge_native_get_bits(api, span[2]), span[0], &seen);
+        base = bases[span[0] * types + ntoggle_t];
+        see_rows((const t_t *)(api->shared_base + base),
+            bridge_native_get_bits(api, base), span[1], &seen);
         i++;
     }
     say(api, "by rows: on, and their sum", seen.on, seen.total);

@@ -15,13 +15,12 @@ static uint32_t moving;
 static void move_span(uint32_t span)
 {
     uint32_t count = bridge_count_rows(span);
-    uint32_t base = bridge_get_base(span, 0);
-    uint32_t at;
+    uint32_t table = bridge_span_table(span);
     uint32_t r = 0;
 
     while (r < count) {
-        at = BRIDGE_ROW(position_t, base, r, count);
-        BRIDGE_SET(position_t, x, at, BRIDGE_GET(position_t, x, at) + 1.0f);
+        BRIDGE_SET(position_t, x, position, table, r,
+            BRIDGE_GET(position_t, x, position, table, r) + 1.0f);
         r++;
     }
 }
@@ -32,7 +31,7 @@ BRIDGE_EXPORT(move) int move(void)
     uint32_t s = 0;
 
     while (s < spans) {
-        move_span(bridge_get_span(moving, s, 1));
+        move_span(bridge_get_span(moving, s));
         s++;
     }
     return (0);

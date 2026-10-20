@@ -9,7 +9,7 @@
 
 static bridge_artifact_t state_share(const char *identity, int64_t persistent)
 {
-    bridge_artifact_t a = storage_test_state(OK_PATH, BRIDGE_NONE, 64,
+    bridge_artifact_t a = storage_test_state(OK_PATH, BRIDGE_NONE, 1 << 19,
         BRIDGE_NONE);
 
     a.cfg.identity = identity;

@@ -36,6 +36,10 @@ The header is the `bridge_header_t` at offset 0 of the private memory: `docs/ext
 | `types` | How many types the module declared. |
 | `tables` | How many table ids there are, with 0, which is no table. |
 | `kept` | After `column_base`. |
+| `rows`, `blocks` | After `kept`: a cell per table for its row count, then a cell per table for its block. |
+| `stride`, `write`, `kind` | A cell per type for its size, whether the module may write it, and its storage layout. |
+| `owned` | After them: the count of owned ranges, then the ranges of the shared arena the module may write. |
+| `arena_lo`, `arena_hi` | The bounds of the shared arena that the module may read. |
 | `entity_index`, `entities` | The offset of the entity index, and `[budget] entities`. |
 
 Each offset is from the start of the private memory, except `entity_index`.
@@ -43,12 +47,18 @@ The entity index is the one thing in the shared memory that a module reads and c
 `barriers`, `place`, `system` and `observer` are written before each dispatch: `src/lib/schedule/schedule_dispatch.c`.
 `log_level` is written when the private memory is made: `src/lib/module/module_call.c`.
 
-The span region holds the queries, the lists of the observers, `column_base`, `kept` and the spans.
+The span region holds the queries, the lists of the observers, `column_base`, `kept`, the capability table and the spans.
 Its length is the `spans` of the module, and how it is divided is the library's.
 The library divides it again at a barrier, where nothing holds an offset into it.
 `column_base` follows `[budget] tables`, and the spans follow how many tables the queries match.
 Both come from the deployment, and not from the module.
 So `spans` is a key whose value an author can only estimate, and a deployment corrects it.
+
+`write_caps` lays the capability table after `kept`: the row counts, the blocks, and the stride, write and kind of each type.
+It also sets `arena_lo` and `arena_hi` to the bounds of the shared arena that a module may read.
+`write_owned` writes the module's owned ranges after the table, up to `BRIDGE_OWNED_CAP` of them.
+It writes the count first, then a pair of an offset and a length for each range.
+It writes nothing if the ranges do not fit in the span region.
 
 ## Functions
 
@@ -56,4 +66,6 @@ So `spans` is a key whose value an author can only estimate, and a deployment co
 | --- | --- |
 | `block_refill` | Tops up the ids of a module. 1 if the entity ceiling cut them short. |
 | `block_write_header` | Writes the header at offset 0 of the private memory of a module: where its regions begin, and how many of each thing there are. |
+| `write_caps` | Lays the capability table and the arena bounds into the header. |
+| `write_owned` | Writes the owned ranges of the shared arena after the capability table. |
 | `block_hand_out` | Ends the hold on the ids that each loaded module handed out since the last barrier, and on those that it took from its `lender`. |

@@ -6,61 +6,55 @@
 #include "test_offsets.h"
 #include "settings.h"
 
-static void say_title(uint32_t at)
+static void say_title(void)
 {
     char text[sizeof(((settings_t *)0)->title)];
-    uint32_t from = at + (uint32_t)offsetof(settings_t, title);
     uint32_t len = 0;
     uint32_t i = 0;
 
     while (i < sizeof(text)) {
-        text[i] = (char)acc_ld_u8(from + i);
+        text[i] = (char)acc_ld_u8(settings, 0, 0,
+            (uint32_t)offsetof(settings_t, title) + i);
         i++;
     }
     while (len < sizeof(text) && text[len])
         len++;
-    bridge_log(BRIDGE_LOG_INFO,
-        &(bridge_line_t){ text, len, BRIDGE_GET(settings_t, small, at), 0 });
+    bridge_log(BRIDGE_LOG_INFO, &(bridge_line_t){ text, len,
+        BRIDGE_GET(settings_t, small, settings, 0, 0), 0 });
 }
 
-static void say_path(uint32_t at)
+static void say_path(void)
 {
     char text[64];
-    uint32_t len = BRIDGE_GET(settings_t, path.len, at);
+    uint32_t len = BRIDGE_GET(settings_t, path.len, settings, 0, 0);
 
     if (len > sizeof(text))
         len = sizeof(text);
-    acc_from_shared(text, BRIDGE_GET(settings_t, path.at, at), len);
+    acc_from_shared(text, BRIDGE_GET(settings_t, path.at, settings, 0, 0), len);
     bridge_log(BRIDGE_LOG_INFO, &(bridge_line_t){ text, len, 0, 0 });
 }
 
-static void say_wide(uint32_t at)
+static void say_wide(void)
 {
     BRIDGE_LOG(BRIDGE_LOG_INFO, "flags ratio",
-        (uint32_t)BRIDGE_GET(settings_t, flags, at),
-        (uint32_t)BRIDGE_GET(settings_t, ratio, at));
+        (uint32_t)BRIDGE_GET(settings_t, flags, settings, 0, 0),
+        (uint32_t)BRIDGE_GET(settings_t, ratio, settings, 0, 0));
     BRIDGE_LOG(BRIDGE_LOG_INFO, "big",
-        (uint32_t)(BRIDGE_GET(settings_t, big, at) >> 32), 0);
-    BRIDGE_LOG(BRIDGE_LOG_INFO, "path at", BRIDGE_GET(settings_t, path.at, at),
-        0);
+        (uint32_t)(BRIDGE_GET(settings_t, big, settings, 0, 0) >> 32), 0);
+    BRIDGE_LOG(BRIDGE_LOG_INFO, "path at",
+        BRIDGE_GET(settings_t, path.at, settings, 0, 0), 0);
 }
 
 BRIDGE_EXPORT(show) int show(void)
 {
-    uint32_t at = bridge_get_single(settings);
-
-    if (!at) {
-        BRIDGE_LOG(BRIDGE_LOG_INFO, "no settings row", 0, 0);
-        return (0);
-    }
     BRIDGE_LOG(BRIDGE_LOG_INFO, "vsync width",
-        BRIDGE_GET(settings_t, vsync, at),
-        (uint32_t)BRIDGE_GET(settings_t, width, at));
+        BRIDGE_GET(settings_t, vsync, settings, 0, 0),
+        (uint32_t)BRIDGE_GET(settings_t, width, settings, 0, 0));
     BRIDGE_LOG(BRIDGE_LOG_INFO, "scale mode",
-        (uint32_t)(BRIDGE_GET(settings_t, scale, at) * 100.0f),
-        (uint32_t)BRIDGE_GET(settings_t, mode, at));
-    say_title(at);
-    say_path(at);
-    say_wide(at);
+        (uint32_t)(BRIDGE_GET(settings_t, scale, settings, 0, 0) * 100.0f),
+        (uint32_t)BRIDGE_GET(settings_t, mode, settings, 0, 0));
+    say_title();
+    say_path();
+    say_wide();
     return (0);
 }

@@ -4,6 +4,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "move.h"
+#include "reach.h"
 
 TEST(spawn)
 {
@@ -49,11 +50,14 @@ TEST(detach_b_half)
 
 static void turn_off(const test_api_t *api, const uint32_t *span)
 {
-    const x_t *column = (const x_t *)(api->shared_base + span[2]);
-    uint64_t *bits = test_get_bits(api, span[2]);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
+    uint32_t base = bases[span[0] * types + x_slot];
+    const x_t *column = (const x_t *)(api->shared_base + base);
+    uint64_t *bits = test_get_bits(api, base);
     uint32_t r = 0;
 
-    while (r < span[0]) {
+    while (r < span[1]) {
         if (column[r].v == 102)
             bits[r >> 6] &= ~((uint64_t)1 << (r & 63));
         r++;

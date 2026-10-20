@@ -6,6 +6,7 @@
 #include "bridge_native.h"
 #include "game.h"
 #include "native_idle.h"
+#include "native_reach.h"
 
 constexpr uint32_t ENTITIES = 1000;
 
@@ -17,6 +18,8 @@ static uint32_t tallying;
 BRIDGE_NATIVE(move)
 {
     const bridge_query_t *q = bridge_native_get_query(api, moving);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = bridge_native_get_header(api)->types;
     const uint32_t *span;
     position_t *p;
     uint32_t s = 0;
@@ -24,9 +27,10 @@ BRIDGE_NATIVE(move)
 
     while (s < q->spans) {
         span = bridge_native_get_span(api, q, s, 1);
-        p = (position_t *)(api->shared_base + span[2]);
+        p = (position_t *)(api->shared_base
+            + bases[span[0] * types + position]);
         r = 0;
-        while (r < span[0]) {
+        while (r < span[1]) {
             p[r].x += 1.0f;
             r++;
         }
@@ -42,7 +46,7 @@ BRIDGE_NATIVE(tally)
     uint32_t s = 0;
 
     while (s < q->spans) {
-        line.a1 += bridge_native_get_span(api, q, s, 1)[0];
+        line.a1 += bridge_native_get_span(api, q, s, 1)[1];
         s++;
     }
     bridge_native_log(api, BRIDGE_LOG_INFO, &line);

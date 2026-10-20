@@ -4,6 +4,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "move.h"
+#include "reach.h"
 
 static const char *const TEXTS[5] = {
     "X, in tables: carried by, sum",
@@ -42,6 +43,8 @@ static void add_single(const test_api_t *api, bridge_line_t *line)
 static void add_columns(const test_api_t *api, bridge_line_t *line)
 {
     const bridge_query_t *q = test_get_query(api, reading);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
     const uint32_t *span;
     const x_t *column;
     uint32_t i = 0;
@@ -49,13 +52,14 @@ static void add_columns(const test_api_t *api, bridge_line_t *line)
 
     while (i < q->spans) {
         span = test_get_span(api, q, i, 1);
-        column = (const x_t *)(api->shared_base + span[2]);
+        column = (const x_t *)(api->shared_base
+            + bases[span[0] * types + x_slot]);
         r = 0;
-        while (r < span[0]) {
+        while (r < span[1]) {
             line->a1 += column[r].v;
             r++;
         }
-        line->a0 += span[0];
+        line->a0 += span[1];
         i++;
     }
 }

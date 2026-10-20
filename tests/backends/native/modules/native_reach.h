@@ -22,4 +22,11 @@ static inline const uint32_t *get_column_bases(const bridge_api_t *api)
     return ((const uint32_t *)(api->private_base + h->column_base));
 }
 
+static inline const uint32_t *get_blocks(const bridge_api_t *api)
+{
+    const bridge_header_t *h = bridge_native_get_header(api);
+
+    return ((const uint32_t *)(api->private_base + h->blocks));
+}
+
 #endif

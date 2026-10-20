@@ -85,7 +85,7 @@ false = { run = ["{out}/seam-static{exe}", "BRIDGE_UNSET-flag-refused"] }
 [[case]]
 name = "static-BRIDGE_UNSET-flag-refused"
 run = ["{out}/seam-static{exe}", "BRIDGE_UNSET-flag-refused"]
-claims = { matches = ["module 'test:ok@0.1.0' is refused: pinned is unset.*module 'test:ok@0.1.0' is refused: trusted is 3, which is neither BRIDGE_TRUE nor BRIDGE_FALSE.*alive"], lacks = [": loaded"] }
+claims = { matches = ["module 'test:ok@0.1.0' is refused: pinned is unset.*module 'test:ok@0.1.0' is refused: hot_reload is 3, which is neither BRIDGE_TRUE nor BRIDGE_FALSE.*alive"], lacks = [": loaded"] }
 false = { run = ["{out}/seam-static{exe}", "module_config.memory_limit-negative-refused"] }
 
 [[case]]

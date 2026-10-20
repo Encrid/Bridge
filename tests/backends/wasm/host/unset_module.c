@@ -51,7 +51,7 @@ void test_leave_flag_unset(host_t *h)
     a.cfg.pinned = BRIDGE_UNSET;
     host_load(h, &a);
     test_state_small(&a, identity, "ok");
-    a.cfg.trusted = (enum bridge_flag)3;
+    a.cfg.hot_reload = (enum bridge_flag)3;
     host_load(h, &a);
     host_close(h);
 }

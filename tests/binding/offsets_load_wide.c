@@ -7,27 +7,30 @@
 
 #include "test_offsets_acc.h"
 
-uint64_t acc_ld_64(uint32_t at)
+uint64_t acc_ld_64(uint32_t slot, uint32_t a, uint32_t b, uint32_t field)
 {
     uint64_t v;
 
-    memcpy(&v, test_get_table()->shared_base + at, sizeof(v));
+    memcpy(&v, test_get_table()->shared_base
+        + acc_resolve(slot, a, b, field, sizeof(v), 0u), sizeof(v));
     return (v);
 }
 
-float acc_ld_f32(uint32_t at)
+float acc_ld_f32(uint32_t slot, uint32_t a, uint32_t b, uint32_t field)
 {
     float v;
 
-    memcpy(&v, test_get_table()->shared_base + at, sizeof(v));
+    memcpy(&v, test_get_table()->shared_base
+        + acc_resolve(slot, a, b, field, sizeof(v), 0u), sizeof(v));
     return (v);
 }
 
-double acc_ld_f64(uint32_t at)
+double acc_ld_f64(uint32_t slot, uint32_t a, uint32_t b, uint32_t field)
 {
     double v;
 
-    memcpy(&v, test_get_table()->shared_base + at, sizeof(v));
+    memcpy(&v, test_get_table()->shared_base
+        + acc_resolve(slot, a, b, field, sizeof(v), 0u), sizeof(v));
     return (v);
 }
 

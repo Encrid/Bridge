@@ -97,9 +97,10 @@ name = "on_error fail and a module key stated two ways"
 run = ["{out}/bridge-host{exe}", "--show-config", "{case}/sk.toml"]
 
 [case.claims]
-status = 1
+status = 0
 has = [
-    "refused: trusted: true in ta.toml:2, false in tb.toml:2",
+    "hot_reload = false",
+    "over ta.toml:2, over tb.toml:2",
     'on_error = "fail"',
 ]
 
@@ -109,11 +110,11 @@ has = [
 [case.files]
 "{case}/ta.toml" = '''
 [module."bridge-host:quiet@1.0.0"]
-trusted = true
+hot_reload = true
 '''
 "{case}/tb.toml" = '''
 [module."bridge-host:quiet@1.0.0"]
-trusted = false
+hot_reload = false
 '''
 "{case}/sk.toml" = '''
 presets = ["ta.toml", "tb.toml"]
@@ -161,11 +162,11 @@ wasm = "{out}/backends/bridge_wasm"
 [case.false.files]
 "{case}/ta.toml" = '''
 [module."bridge-host:quiet@1.0.0"]
-trusted = true
+hot_reload = true
 '''
 "{case}/tb.toml" = '''
 [module."bridge-host:quiet@1.0.0"]
-trusted = true
+hot_reload = true
 '''
 "{case}/sk.toml" = '''
 presets = ["{root}/tests/host/test.toml", "ta.toml", "tb.toml"]

@@ -12,6 +12,7 @@ uint32_t nstore_with_b;
 static uint32_t count_named(const test_api_t *api, uint64_t id)
 {
     const bridge_query_t *q = test_get_query(api, nstore_with_a);
+    const uint32_t *blocks = get_blocks(api);
     const uint32_t *span;
     const uint64_t *who;
     uint32_t named = 0;
@@ -20,9 +21,9 @@ static uint32_t count_named(const test_api_t *api, uint64_t id)
 
     while (s < q->spans) {
         span = test_get_span(api, q, s, 1);
-        who = (const uint64_t *)(api->shared_base + span[1]);
+        who = (const uint64_t *)(api->shared_base + blocks[span[0]]);
         row = 0;
-        while (row < span[0]) {
+        while (row < span[1]) {
             named += who[row] == id;
             row++;
         }
@@ -68,6 +69,8 @@ static uint32_t add_values(const b_t *values, uint32_t count, uint32_t sum)
 TEST(look_b)
 {
     const bridge_query_t *q = test_get_query(api, nstore_with_b);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
     const uint32_t *span;
     uint32_t rows = 0;
     uint32_t sum = 0;
@@ -75,9 +78,9 @@ TEST(look_b)
 
     while (s < q->spans) {
         span = test_get_span(api, q, s, 1);
-        rows += span[0];
-        sum = add_values((const b_t *)(api->shared_base + span[2]), span[0],
-            sum);
+        rows += span[1];
+        sum = add_values((const b_t *)(api->shared_base
+            + bases[span[0] * types + nstore_b]), span[1], sum);
         s++;
     }
     say(api, "with B: spans, rows", q->spans, rows);

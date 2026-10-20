@@ -5,7 +5,7 @@ run = ["{out}/bridge-host{exe}", "{case}/word.toml"]
 [case.claims]
 status = 0
 order = [
-    "loaded: bridge-host:word@1.0.0, wasm, not trusted, word/word.wasm",
+    "loaded: bridge-host:word@1.0.0, wasm, word/word.wasm",
     "record[6] bridge-host:word@1.0.0/say: hi 0 0",
 ]
 

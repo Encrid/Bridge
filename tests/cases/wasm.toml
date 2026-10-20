@@ -109,7 +109,7 @@ false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
 [[case]]
 name = "BRIDGE_UNSET-flag-refused"
 run = ["{out}/wasm-host{exe}", "BRIDGE_UNSET-flag-refused"]
-claims = { matches = ["module 'test:ok@0.1.0' is refused: pinned is unset.*module 'test:ok@0.1.0' is refused: trusted is 3, which is neither BRIDGE_TRUE nor BRIDGE_FALSE.*alive"], lacks = [": loaded"] }
+claims = { matches = ["module 'test:ok@0.1.0' is refused: pinned is unset.*module 'test:ok@0.1.0' is refused: hot_reload is 3, which is neither BRIDGE_TRUE nor BRIDGE_FALSE.*alive"], lacks = [": loaded"] }
 false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
 
 [[case]]
@@ -833,12 +833,6 @@ claims = { matches = ["a module with no identity is refused.*alive"] }
 false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
 
 [[case]]
-name = "module_config.trusted-unset-refused"
-run = ["{out}/wasm-host{exe}", "module_config.trusted-unset-refused"]
-claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: trusted is unset.*alive"] }
-false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
-
-[[case]]
 name = "module_config.reloadable-unset-refused"
 run = ["{out}/wasm-host{exe}", "module_config.reloadable-unset-refused"]
 claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: reloadable is unset.*alive"] }
@@ -1159,7 +1153,7 @@ false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
 [[case]]
 name = "module_config.spans-outgrown-at-a-barrier"
 run = ["{out}/wasm-host{exe}", "module_config.spans-outgrown-at-a-barrier"]
-claims = { matches = ["module 'game:mover@0\\.1\\.0' is stopped: what its queries match no longer fits in its spans of 544 bytes.*alive"] }
+claims = { matches = ["module 'game:mover@0\\.1\\.0' is stopped: what its queries match no longer fits in its spans of 1160 bytes.*alive"] }
 false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
 
 [[case]]
@@ -1856,4 +1850,76 @@ false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
 name = "BRIDGE_FAIL-refused-before-it-exists-stops-nothing"
 run = ["{out}/wasm-host{exe}", "BRIDGE_FAIL-refused-before-it-exists-stops-nothing"]
 claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: no backend named 'native'.*test:image@0\\.1\\.0: loaded.*alive"], lacks = ["has stopped"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "isolate.slot-out-of-range-trapped"
+run = ["{out}/wasm-host{exe}", "isolate.slot-out-of-range-trapped"]
+claims = { matches = ["game:breach@0\\.1\\.0/breach: system 'breach' failed: trapped: wasm .unreachable. instruction executed.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "isolate.a-valid-access-is-allowed"] }
+
+[[case]]
+name = "isolate.row-out-of-range-trapped"
+run = ["{out}/wasm-host{exe}", "isolate.row-out-of-range-trapped"]
+claims = { matches = ["game:breach@0\\.1\\.0/breach: system 'breach' failed: trapped: wasm .unreachable. instruction executed.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "isolate.a-valid-access-is-allowed"] }
+
+[[case]]
+name = "isolate.field-out-of-the-cell-trapped"
+run = ["{out}/wasm-host{exe}", "isolate.field-out-of-the-cell-trapped"]
+claims = { matches = ["game:breach@0\\.1\\.0/breach: system 'breach' failed: trapped: wasm .unreachable. instruction executed.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "isolate.a-valid-access-is-allowed"] }
+
+[[case]]
+name = "isolate.store-to-a-read-only-column-trapped"
+run = ["{out}/wasm-host{exe}", "isolate.store-to-a-read-only-column-trapped"]
+claims = { matches = ["game:breach@0\\.1\\.0/breach: system 'breach' failed: trapped: wasm .unreachable. instruction executed.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "isolate.a-valid-access-is-allowed"] }
+
+[[case]]
+name = "isolate.forge-the-capability-table-trapped"
+run = ["{out}/wasm-host{exe}", "isolate.forge-the-capability-table-trapped"]
+claims = { matches = ["game:breach@0\\.1\\.0/breach: system 'breach' failed: trapped: wasm .unreachable. instruction executed.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "isolate.a-valid-access-is-allowed"] }
+
+[[case]]
+name = "isolate.sparse-id-out-of-range-trapped"
+run = ["{out}/wasm-host{exe}", "isolate.sparse-id-out-of-range-trapped"]
+claims = { matches = ["game:breach@0\\.1\\.0/breach: system 'breach' failed: trapped: wasm .unreachable. instruction executed.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "isolate.a-valid-access-is-allowed"] }
+
+[[case]]
+name = "isolate.direct-id-out-of-range-trapped"
+run = ["{out}/wasm-host{exe}", "isolate.direct-id-out-of-range-trapped"]
+claims = { matches = ["game:breach@0\\.1\\.0/breach: system 'breach' failed: trapped: wasm .unreachable. instruction executed.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "isolate.a-valid-access-is-allowed"] }
+
+[[case]]
+name = "isolate.blob-to-outside-the-arena-trapped"
+run = ["{out}/wasm-host{exe}", "isolate.blob-to-outside-the-arena-trapped"]
+claims = { matches = ["game:breach@0\\.1\\.0/breach: system 'breach' failed: trapped: wasm .unreachable. instruction executed.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "isolate.a-valid-access-is-allowed"] }
+
+[[case]]
+name = "isolate.blob-from-outside-the-arena-trapped"
+run = ["{out}/wasm-host{exe}", "isolate.blob-from-outside-the-arena-trapped"]
+claims = { matches = ["game:breach@0\\.1\\.0/breach: system 'breach' failed: trapped: wasm .unreachable. instruction executed.*alive"] }
+false = { run = ["{out}/wasm-host{exe}", "isolate.a-valid-access-is-allowed"] }
+
+[[case]]
+name = "isolate.a-valid-access-is-allowed"
+run = ["{out}/wasm-host{exe}", "isolate.a-valid-access-is-allowed"]
+claims = { matches = ["game:breach@0\\.1\\.0/breach: ok 4 0.*alive"], lacks = ["trapped"] }
+false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }
+
+[[case]]
+name = "isolate.imports-shared-memory-refused-at-build"
+run = ["{python}", "{root}/.toolchain/tools/wasm_guard.py", "{out}/wasm/importsshared.wasm"]
+claims = { status = 1, has = ["is refused: it imports the memory 'bridge.shared'"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/wasm_guard.py", "{out}/obj/mover.raw.wasm"] }
+
+[[case]]
+name = "isolate.owned-ranges-past-the-cap-clamped"
+run = ["{out}/wasm-host{exe}", "isolate.owned-ranges-past-the-cap-clamped"]
+claims = { matches = ["game:ticker@0\\.9\\.0: reloaded.*alive"], lacks = ["not reloaded"] }
 false = { run = ["{out}/wasm-host{exe}", "no-such-case"] }

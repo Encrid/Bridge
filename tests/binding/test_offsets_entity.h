@@ -8,40 +8,35 @@
 
     #include "test_offsets_acc.h"
 
-static inline uint64_t bridge_get_entity(uint32_t entities, uint32_t row,
-    uint32_t count)
+static inline uint64_t bridge_get_entity(uint32_t table, uint32_t row)
 {
-    return (acc_ld_64(acc_row(entities, row, count, 8u)));
+    return (acc_who(table, row));
 }
 
-static inline uint32_t bridge_get_ref(uint64_t id, uint32_t slot,
-    uint32_t stride)
+static inline uint64_t bridge_find(uint64_t id)
 {
-    constexpr uint32_t size = sizeof(bridge_entity_t);
-    uint32_t index = (uint32_t)id;
-    uint32_t record;
-    uint32_t base;
-
-    if (index >= BRIDGE_HEADER(entities))
-        return (0);
-    record = BRIDGE_HEADER(entity_index) + index * size;
-    if (acc_ld_32(record + 8u) != (uint32_t)(id >> 32))
-        return (0);
-    base = acc_ld_32(record) * BRIDGE_HEADER(types) + slot;
-    base = acc_own_32(BRIDGE_HEADER(column_base) + base * 4u);
-    return (base ? base + acc_ld_32(record + 4u) * stride : 0);
+    return (acc_entity(id));
 }
 
 static inline int bridge_is_alive(uint64_t id)
 {
-    constexpr uint32_t size = sizeof(bridge_entity_t);
-    uint32_t index = (uint32_t)id;
-    uint32_t record;
+    return (id != 0 && acc_entity(id) != UINT64_MAX);
+}
 
-    if (!id || index >= BRIDGE_HEADER(entities))
-        return (0);
-    record = BRIDGE_HEADER(entity_index) + index * size;
-    return (acc_ld_32(record + 8u) == (uint32_t)(id >> 32));
+static inline uint32_t bridge_entity_table(uint64_t at)
+{
+    return ((uint32_t)(at >> 32));
+}
+
+static inline uint32_t bridge_entity_row(uint64_t at)
+{
+    return ((uint32_t)at);
+}
+
+static inline uint32_t bridge_base(uint32_t slot, uint32_t table)
+{
+    return (acc_own_32(BRIDGE_HEADER(column_base)
+        + (table * BRIDGE_HEADER(types) + slot) * 4u));
 }
 
 #endif

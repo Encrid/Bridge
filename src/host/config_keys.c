@@ -9,8 +9,6 @@
 #include "config.h"
 
 const module_rule_t MODULE_KEYS[] = {
-    { "trusted", CHECK_FLAG, 1, offsetof(bridge_module_config_t, trusted),
-        0 },
     { "hot_reload", CHECK_FLAG, 1,
         offsetof(bridge_module_config_t, hot_reload), 0 },
     { "on_error", CHECK_ERROR, 1,

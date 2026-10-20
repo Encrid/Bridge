@@ -26,8 +26,6 @@ static const host_case_t TEST_CASES[] = {
         test_enter_from_foreign_thread, "", test_set },
     { "call-an-entry-refused-fails-the-invocation",
         test_refuse_entry, "", test_set },
-    { "backend_get_capabilities-untrusted-refused",
-        test_state_untrusted, "", test_set },
     { "backend_get_capabilities-work-limit-refused",
         test_state_limit, "w", test_set },
     { "backend_get_capabilities-memory-limit-refused",

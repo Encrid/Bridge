@@ -5,6 +5,7 @@
 */
 #include "weigh.h"
 #include "measured.h"
+#include "reach.h"
 
 uint32_t nweigh_walking;
 uint32_t nweigh_flagged;
@@ -13,6 +14,8 @@ volatile uint32_t nweigh_which;
 TEST_MEASURED TEST(walk)
 {
     const bridge_query_t *q = test_get_query(api, nweigh_walking);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
     const uint32_t *span;
     const v_t *column;
     uint32_t total = 0;
@@ -21,9 +24,10 @@ TEST_MEASURED TEST(walk)
 
     while (s < q->spans) {
         span = test_get_span(api, q, s, 1);
-        column = (const v_t *)(api->shared_base + span[2]);
+        column = (const v_t *)(api->shared_base
+            + bases[span[0] * types + nweigh_value]);
         r = 0;
-        while (r < span[0]) {
+        while (r < span[1]) {
             total += column[r].v;
             r++;
         }
@@ -49,14 +53,16 @@ static uint32_t add_flagged(const f_t *column, uint32_t count,
 TEST_MEASURED TEST(flag)
 {
     const bridge_query_t *q = test_get_query(api, nweigh_flagged);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
     const uint32_t *span;
     uint32_t total = 0;
     uint32_t s = 0;
 
     while (s < q->spans) {
         span = test_get_span(api, q, s, 1);
-        total = add_flagged((const f_t *)(api->shared_base + span[2]),
-            span[0], total);
+        total = add_flagged((const f_t *)(api->shared_base
+            + bases[span[0] * types + nweigh_flag]), span[1], total);
         s++;
     }
     say_read(api, total, q->spans);
@@ -65,6 +71,8 @@ TEST_MEASURED TEST(flag)
 
 TEST_MEASURED TEST(one)
 {
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = test_get_header(api)->types;
     const bridge_query_t *q;
     const uint32_t *span;
     uint32_t total = 0;
@@ -74,8 +82,9 @@ TEST_MEASURED TEST(one)
     while (i < ASKED) {
         q = test_get_query(api, nweigh_which);
         span = test_get_span(api, q, 0, 1);
-        if (q->spans && span[0]) {
-            total += ((const s_t *)(api->shared_base + span[2]))->v;
+        if (q->spans && span[1]) {
+            total += ((const s_t *)(api->shared_base
+                + bases[span[0] * types + nweigh_single]))->v;
             spans = q->spans;
         }
         i++;

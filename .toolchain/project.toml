@@ -171,6 +171,7 @@ steps = [
 output = "{name}.wasm"
 steps = [
     { run = ["{zig}", "cc", "-target", "wasm32-freestanding", "{language}", "-Wno-missing-field-initializers", "-O2", "-nostdlib", "{defines}", "{include}", "-Wl,--no-entry", "-o", "{work}.raw.wasm", "{sources}"] },
+    { run = ["{python}", "{root}/.toolchain/tools/wasm_guard.py", "{work}.raw.wasm"] },
     { run = ["{wasm_merge}", "{work}.raw.wasm", "main", "{acc_wasm}", "acc", "{features}", "-o", "{work}.merged.wasm"] },
     { run = ["{wasm_opt}", "{work}.merged.wasm", "{features}", "-O3", "--remove-exports=acc_*", "--remove-unused-module-elements", "-o", "{output}"] },
 ]
@@ -3687,6 +3688,114 @@ include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
 defines = ["STEP=10", "ALLOC", "BRIDGE_ROWS_CHECKED"]
 
 [[artifact]]
+name = "importsshared"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/importsshared.wat"]
+
+[[artifact]]
+name = "breach-slot"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BREACH_SLOT", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-row"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BREACH_ROW", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-field"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BREACH_FIELD", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-readonly"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BREACH_READONLY", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-forge"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BREACH_FORGE", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-sparse"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BREACH_SPARSE", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-direct"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BREACH_DIRECT", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-to-shared"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BREACH_TO_SHARED", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-from-shared"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BREACH_FROM_SHARED", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-ok"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include", "src/backends/wasm/sdk", "tests/backends/wasm/modules"]
+defines = ["BREACH_OK", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
 name = "wrong-declare-outside"
 kind = "wasm_module"
 test = true
@@ -4329,6 +4438,13 @@ line = 54
 col = 25
 side = "true"
 why = "add_named fails only when its realloc runs out of memory, which the tests do not force."
+
+[[branches.exception]]
+path = "src/lib/storage/storage_spans.c"
+line = 72
+col = 9
+side = "true"
+why = "Span entries are 8 bytes and p->at is already 8-aligned, so the alignment above never moves it, and write_spans stops the loop when a system's spans pass the end; this guard is reached only by a module that publishes with no systems and a header grown past its spans, which the tests do not load."
 
 [[branches.exception]]
 path = "src/host/config_name.c"

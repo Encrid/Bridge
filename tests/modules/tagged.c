@@ -20,9 +20,9 @@ BRIDGE_EXPORT(count) int count(void)
     uint32_t s = 0;
 
     while (s < spans) {
-        span = bridge_get_span(counting, s, 2);
+        span = bridge_get_span(counting, s);
         rows += bridge_count_rows(span);
-        carried += bridge_get_base(span, 1) == BRIDGE_CARRIED;
+        carried += 1;
         s++;
     }
     BRIDGE_LOG(BRIDGE_LOG_INFO, "frozen", rows, carried);

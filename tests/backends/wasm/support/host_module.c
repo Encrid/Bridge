@@ -55,7 +55,7 @@ static void state_keys(bridge_artifact_t *a, const char *identity)
 {
     *a = (bridge_artifact_t){ .backend = "wasm" };
     a->cfg = (bridge_module_config_t){ .identity = identity,
-        .abi = BRIDGE_ABI, .trusted = BRIDGE_TRUE, .reloadable = BRIDGE_FALSE,
+        .abi = BRIDGE_ABI, .reloadable = BRIDGE_FALSE,
         .hot_reload = BRIDGE_FALSE, .pinned = BRIDGE_FALSE,
         .on_error = BRIDGE_SKIP, .max_system_failures = 3,
         .work_limit = BRIDGE_NO_LIMIT, .memory_limit = BRIDGE_NO_LIMIT,
@@ -71,7 +71,6 @@ void host_state_wasm(bridge_artifact_t *a, const char *identity,
 {
     state_keys(a, identity);
     a->bytes = host_read_module(file, &a->len);
-    a->cfg.trusted = BRIDGE_FALSE;
     a->cfg.work_limit = 10'000'000;
     a->cfg.memory_limit = 16 << 20;
     a->cfg.init_timeout = 2000 * HOST_MS;

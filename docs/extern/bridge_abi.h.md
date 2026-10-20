@@ -88,9 +88,27 @@ Bridge writes it. The module writes only `scratch_used` and `ring_head`.
 | `log_level` | The `log_level` of the config of the module: `docs/extern/bridge.h.md`, *bridge_module_config_t*. |
 | `observers` | Where the observer slots begin: a `bridge_list_t` for each slot that `observe` gave. |
 | `kept` | Where the kept cells begin: a `uint32_t` for each type that the module declared. |
+| `rows` | Where a `uint32_t` for each table begins: how many rows the table has. |
+| `blocks` | Where a `uint32_t` for each table begins: where the ids of the rows of the table are, in the shared memory. |
+| `stride` | Where a `uint32_t` for each declared type begins: the size of the type, in bytes. |
+| `write` | Where a `uint32_t` for each declared type begins: 1 if the module can write the type, and 0 if not. |
+| `kind` | Where a `uint32_t` for each declared type begins: the storage layout of the type, an item of `enum bridge_storage`. |
+| `owned` | Where the owned ranges of the module begin: a count, and then that many ranges of the shared arena. |
+| `arena_lo` | The low bound of the shared arena that the module can read, in the shared memory. |
+| `arena_hi` | The high bound of the shared arena that the module can read, in the shared memory. |
 
 Bridge writes `barriers`, `place`, `system` and `observer` before each dispatch.
 `system` is `0xFFFFFFFF` and `observer` is 0 while no system runs, for example in `init`.
+
+The arrays from `column_base` to `kind` make the capability table.
+A module names a cell by a coordinate: a slot, a place, and an offset in the cell.
+The place is a table and a row, or an entity id, or nothing for a singleton.
+`column_base`, `kept`, `rows`, `blocks`, `stride`, `write` and `kind` turn the coordinate into an offset into the shared memory.
+A backend that does not trust a module reads a cell only through them, and stops a module that reaches past what it declared.
+
+`owned` lists the ranges of the shared arena that the module can write, up to `BRIDGE_OWNED_CAP` of them.
+The count comes first, and then that many pairs of an offset and a length.
+`arena_lo` and `arena_hi` bound the bytes of the shared arena that the module can read.
 
 ## The scratch arena
 
@@ -245,7 +263,7 @@ The author states it, since the code that reads the component depends on it.
 
 In this section, `e` is the low 32 bits of the id of an entity. Each offset is an offset into the shared memory.
 
-- A table: a span or `column_base` gives where the column is.
+- A table: `column_base` gives where the column is.
 - A sparse set: the kept cell holds where its index is: a `uint32_t` for each `e`, that holds where the value is, or 0.
 - A toggle: the `uint32_t` 16 bytes before the column holds where its bits are. Bit `r` tells whether row `r` is on.
 - Direct-indexed: the kept cell holds where the cells are, and cell `e` is the value of the entity.
@@ -392,7 +410,7 @@ A system walks the rows of tables, or the entries of one sparse set alone. Thus:
 - A term of a singleton or of a direct-indexed component is `BRIDGE_OPTIONAL`.
 
 Bridge refuses another term at `add_system`, by its number. An observer walks nothing, thus these rules do not apply to it.
-In a walk of tables, a component of a sparse set has a base of 0. The module reaches it from the row, by its kept cell.
+In a walk of tables, a component of a sparse set has a base of 0. The module reaches it by the id of the row, through its kept cell.
 
 ## Conflicts
 
@@ -429,26 +447,29 @@ A span stays good until the next barrier, and it does not change before then.
 Bridge keeps its own copy of each slot, and does not read a slot back.
 A module that writes a slot changes only what it reads.
 
-A span of a query of `n` terms has `BRIDGE_SPAN_SIZE(n)` bytes: 8 bytes, and 4 bytes for each term.
+A span has `BRIDGE_SPAN_SIZE` bytes, which is 8. It names one table that the query matches:
 
 | Offset | Content |
 | --- | --- |
-| 0 | A `uint32_t`: how many rows the table has. |
-| 4 | A `uint32_t`: where the ids of the rows are, in the shared memory. Each id is a `uint64_t`. |
-| `BRIDGE_SPAN_BASE` | A `uint32_t` for each term, in the order of the terms: where the column of the term is, in the shared memory. |
+| 0 | A `uint32_t`: the id of the table. |
+| 4 | A `uint32_t`: how many rows the table has. |
 
-A base of 0 says that the table does not carry the component. A term of `BRIDGE_NOT` has the base 0.
-Row `r` of a term is at its base plus `r` times the size of its type. The compiler of the module knows the size.
+A span no longer holds a column. A module names a cell, and the capability table bounds the access.
+
+To read a component of a row, name its slot, the table and the row, and the offset in the cell.
+The cell is at `column_base[table * types + slot]` plus `row` times `stride[slot]`, plus the offset.
+`blocks` gives the id of a row: the id of row `r` of table `T` is at `blocks[T]` plus `r` times 8.
 A query whose one selecting term is a sparse set has one span: its rows are the entities of the set.
 
 ```pseudo
-FOR s <- 0 TO slot.spans - 1
-   span <- slot.at + s * BRIDGE_SPAN_SIZE(term_count)
-   rows <- read_u32(span)
-   base <- read_u32(span + BRIDGE_SPAN_BASE + 4 * t)
+FOR s <- 0 TO query.spans - 1
+   span <- query.at + s * BRIDGE_SPAN_SIZE
+   table <- read_u32(span)
+   rows <- read_u32(span + 4)
+   base <- column_base[table * types + slot]
    IF base <> 0 THEN
       FOR r <- 0 TO rows - 1
-         CALL use_value(base + r * size)
+         CALL use_value(base + r * stride[slot])
       NEXT r
    ENDIF
 NEXT s
@@ -459,6 +480,9 @@ A barrier writes only what changed. The first barrier after the load of a module
 `column_base` of the header is where a `uint32_t` for each table and each declared type begins.
 The cell of table `T` and slot `s` is at `column_base + 4 * (T * types + s)`.
 It holds where the column of the type is in that table: 0 if the table does not carry it, and `BRIDGE_CARRIED` for a tag.
+
+`stride` holds the size of each type, and `rows` the row count of each table.
+`write` tells whether the module can write a type, and `kind` gives its storage layout.
 `kept` of the header is where a `uint32_t` for each declared type begins: *Storage layouts*. It is 0 for a type of a table.
 
 ## bridge_entity_t
@@ -477,7 +501,7 @@ A new entity can take the index of a destroyed one, with another generation. Thu
 This function finds the value of a component of an entity, or 0:
 
 ```pseudo
-FUNCTION find_value(id : U64, slot : U32, size : U32) RETURNS U32
+FUNCTION find_value(id : U64, slot : U32) RETURNS U32
    DECLARE record : bridge_entity_t
    DECLARE base : U32
    record <- entity_index[id MOD 4294967296]
@@ -488,7 +512,7 @@ FUNCTION find_value(id : U64, slot : U32, size : U32) RETURNS U32
    IF base = 0 THEN
       RETURN 0
    ENDIF
-   RETURN base + record.row * size
+   RETURN base + record.row * stride[slot]
 ENDFUNCTION
 ```
 

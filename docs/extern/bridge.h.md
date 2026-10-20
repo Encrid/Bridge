@@ -245,7 +245,6 @@ The host states each field: zero is unset, and a load refuses it. A count of an 
 | --- | --- |
 | `identity` | The identity of the module: `namespace:name@version`, for example `tri:triangle@0.1.0`. It has one `:` and one `@`, in this order, and no empty part. At most 127 bytes. |
 | `abi` | The number of the module seam that the module was built against: `docs/extern/bridge_abi.h.md`, *BRIDGE_ABI*. |
-| `trusted` | `BRIDGE_TRUE` if the code of the module needs no containment. |
 | `reloadable` | `BRIDGE_TRUE` if the author of the module states that a reload can replace it. |
 | `hot_reload` | `BRIDGE_TRUE` if the deployment lets `bridge_reload` replace the module. It cannot allow what `reloadable` forbids. |
 | `pinned` | `BRIDGE_TRUE` if each system and observer of the module runs on the thread that loaded it. |
@@ -292,7 +291,6 @@ A limit above zero, and some other keys, demand a capability of the backend:
 
 | Key | Capability |
 | --- | --- |
-| `trusted` of `BRIDGE_FALSE` | `BACKEND_UNTRUSTED` |
 | `work_limit` above zero | `BACKEND_WORK_LIMIT` |
 | `memory_limit` above zero | `BACKEND_MEMORY_LIMIT` |
 | A timeout above zero | `BACKEND_TIMEOUT` |
@@ -706,7 +704,6 @@ The reason is one of these:
 - `its spawns of <count> is more than [budget] entities of <count>`
 - `its scratch of <bytes>, log_ring of <bytes> and spans of <bytes> bytes come to more than an offset of 32 bits can reach`
 - `a log_ring of <bytes> bytes holds no record, and one is <bytes>`
-- `it is not trusted, and backend '<backend>' runs only modules that are`
 - `it states <key>, which backend '<backend>' cannot keep`
 - `hot_reload is stated, and its author states it is not reloadable`
 - `'<module>' is loaded already`

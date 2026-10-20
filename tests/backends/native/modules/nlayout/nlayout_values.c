@@ -4,6 +4,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "nlayout.h"
+#include "native_reach.h"
 
 static uint32_t collect_cells(const bridge_api_t *api, const x_t **out,
     uint32_t room)
@@ -38,16 +39,20 @@ static uint32_t collect_columns(const bridge_api_t *api, const x_t **out,
     uint32_t room)
 {
     const bridge_query_t *q = bridge_native_get_query(api, reading);
+    const uint32_t *bases = get_column_bases(api);
+    uint32_t types = bridge_native_get_header(api)->types;
     const uint32_t *span;
+    uint32_t base;
     uint32_t n = 0;
     uint32_t i = 0;
     uint32_t r;
 
     while (i < q->spans) {
         span = bridge_native_get_span(api, q, i, 1);
+        base = bases[span[0] * types + x_slot];
         r = 0;
-        while (r < span[0] && n < room) {
-            out[n] = (const x_t *)(api->shared_base + span[2]) + r;
+        while (r < span[1] && n < room) {
+            out[n] = (const x_t *)(api->shared_base + base) + r;
             n++;
             r++;
         }

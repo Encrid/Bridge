@@ -78,8 +78,6 @@ int module_check(module_check_t *k)
     if (module_check_stated(k) || module_check_fit(k)
         || module_check_backend(k))
         return (1);
-    if (cfg->trusted != BRIDGE_TRUE)
-        k->demands |= BACKEND_UNTRUSTED;
     if (cfg->work_limit > 0)
         k->demands |= BACKEND_WORK_LIMIT;
     if (cfg->memory_limit > 0)

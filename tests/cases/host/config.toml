@@ -397,7 +397,7 @@ presets = ["{root}/tests/host/test.toml"]
 phases = ["update"]
 rounds = 8
 [module."bridge-host:nobody@1.0.0"]
-trusted = false
+hot_reload = false
 [content]
 paths = ["config-quiet"]
 [backend]
@@ -612,7 +612,6 @@ status = 0
 line = [
     "threads = 1  {root}/tests/host/world.toml:1",
     "module bridge-host:quiet@1.0.0, wasm, config-quiet/quiet.wasm",
-    "  trusted = false  {root}/tests/host/wasm.toml:5",
     "  pinned = false  its file",
 ]
 

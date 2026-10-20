@@ -16,13 +16,14 @@ static uint32_t add_followed(const test_api_t *api, const uint32_t *span,
     const bridge_header_t *h = test_get_header(api);
     const bridge_entity_t *index = get_entity_index(api);
     const uint32_t *base = get_column_bases(api);
-    const l_t *column = (const l_t *)(api->shared_base + span[2]);
+    const l_t *column = (const l_t *)(api->shared_base
+        + base[span[0] * h->types + nweigh_link]);
     const bridge_entity_t *e;
     uint64_t id;
     uint32_t at;
     uint32_t r = 0;
 
-    while (r < span[0]) {
+    while (r < span[1]) {
         id = far ? column[r].far : column[r].near;
         e = &index[(uint32_t)id];
         at = 0;

@@ -10,14 +10,16 @@ static bool said;
 
 BRIDGE_EXPORT(say) int say(void)
 {
-    uint32_t at = bridge_get_single(word);
     char text[sizeof(((word_t *)0)->word)];
     uint32_t len = 0;
 
-    if (!at || said)
+    if (!bridge_has(word, 0) || said)
         return (0);
-    while (len < sizeof(text) && acc_ld_u8(at + len)) {
-        text[len] = (char)acc_ld_u8(at + len);
+    while (len < sizeof(text)
+        && acc_ld_u8(word, BRIDGE_AT(0, 0),
+            (uint32_t)offsetof(word_t, word) + len)) {
+        text[len] = (char)acc_ld_u8(word, BRIDGE_AT(0, 0),
+            (uint32_t)offsetof(word_t, word) + len);
         len++;
     }
     bridge_log(BRIDGE_LOG_INFO, &(bridge_line_t){ text, len, 0, 0 });

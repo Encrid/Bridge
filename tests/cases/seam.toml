@@ -91,7 +91,7 @@ false = { run = ["{out}/seam{exe}", "BRIDGE_UNSET-flag-refused"] }
 [[case]]
 name = "BRIDGE_UNSET-flag-refused"
 run = ["{out}/seam{exe}", "BRIDGE_UNSET-flag-refused"]
-claims = { matches = ["module 'test:ok@0.1.0' is refused: pinned is unset.*module 'test:ok@0.1.0' is refused: trusted is 3, which is neither BRIDGE_TRUE nor BRIDGE_FALSE.*alive"], lacks = [": loaded"] }
+claims = { matches = ["module 'test:ok@0.1.0' is refused: pinned is unset.*module 'test:ok@0.1.0' is refused: hot_reload is 3, which is neither BRIDGE_TRUE nor BRIDGE_FALSE.*alive"], lacks = [": loaded"] }
 false = { run = ["{out}/seam{exe}", "module_config.memory_limit-negative-refused"] }
 
 [[case]]
@@ -217,7 +217,7 @@ false = { run = ["{out}/seam{exe}", "module_config.spans-too-small-refused"] }
 [[case]]
 name = "module_config.spans-rounded-up-to-8-refused"
 run = ["{out}/seam{exe}", "module_config.spans-rounded-up-to-8-refused"]
-claims = { matches = ["its spans of 268 bytes do not hold a column_base of 1 components by \\d+ tables, which with its queries is 272 bytes.*alive"] }
+claims = { matches = ["its spans of 860 bytes do not hold a column_base of 1 components by \\d+ tables, which with its queries is 864 bytes.*alive"] }
 false = { run = ["{out}/seam{exe}", "module_config.spans-a-multiple-of-8-taken"] }
 
 [[case]]
@@ -229,7 +229,7 @@ false = { run = ["{out}/seam{exe}", "module_config.spans-rounded-up-to-8-refused
 [[case]]
 name = "module_config.spans-with-no-room-to-round-the-match-stopped"
 run = ["{out}/seam{exe}", "module_config.spans-with-no-room-to-round-the-match-stopped"]
-claims = { matches = ["module 'test:spare@0.1.0' is stopped: what its queries match no longer fits in its spans of 284 bytes.*test:spare@0.1.0=STOPPED.*alive"] }
+claims = { matches = ["module 'test:spare@0.1.0' is stopped: what its queries match no longer fits in its spans of 868 bytes.*test:spare@0.1.0=STOPPED.*alive"] }
 false = { run = ["{out}/seam{exe}", "module_config.spans-a-multiple-of-8-taken"] }
 
 [[case]]
@@ -247,7 +247,7 @@ false = { run = ["{out}/seam{exe}", "module_config.persistent-rounded-up-to-8-re
 [[case]]
 name = "module_config.spans-outgrown-on_error-fail-stops-the-world"
 run = ["{out}/seam{exe}", "module_config.spans-outgrown-on_error-fail-stops-the-world"]
-claims = { matches = ["no longer fits in its spans of 544 bytes.*the world has stopped: module 'game:mover@0.1.0' was stopped and its on_error is fail.*alive"] }
+claims = { matches = ["no longer fits in its spans of 1160 bytes.*the world has stopped: module 'game:mover@0.1.0' was stopped and its on_error is fail.*alive"] }
 false = { run = ["{out}/seam{exe}", "module_config.spans-outgrown-at-a-barrier"] }
 
 [[case]]
@@ -494,12 +494,6 @@ false = { run = ["{out}/seam{exe}", "bridge_run_phase-guarded-beside-plain"] }
 name = "bridge_run_phase-guarded-beside-plain"
 run = ["{out}/seam{exe}", "bridge_run_phase-guarded-beside-plain"]
 claims = { matches = ["view:reader@0.1.0/sum: sum 250500 0.*plain tally 2 1000.*sum 251000 0.*alive"] }
-false = { run = ["{out}/seam{exe}", "BACKEND_UNTRUSTED-lacking-untrusted-refused"] }
-
-[[case]]
-name = "BACKEND_UNTRUSTED-lacking-untrusted-refused"
-run = ["{out}/seam{exe}", "BACKEND_UNTRUSTED-lacking-untrusted-refused"]
-claims = { matches = ["module 'game:mover@0.1.0' is refused: it is not trusted, and backend 'plain' runs only modules that are.*alive"], lacks = ["cannot open"] }
 false = { run = ["{out}/seam{exe}", "BACKEND_WORK_LIMIT-lacking-work-limit-refused"] }
 
 [[case]]
@@ -2092,12 +2086,6 @@ false = { run = ["{out}/seam{exe}", "bridge_reload-held-struct-with-a-field-of-a
 name = "module_config.identity-none-refused"
 run = ["{out}/seam{exe}", "module_config.identity-none-refused"]
 claims = { matches = ["a module with no identity is refused.*alive"] }
-false = { run = ["{out}/seam{exe}", "module_config.trusted-unset-refused"] }
-
-[[case]]
-name = "module_config.trusted-unset-refused"
-run = ["{out}/seam{exe}", "module_config.trusted-unset-refused"]
-claims = { matches = ["module 'test:ok@0\\.1\\.0' is refused: trusted is unset.*alive"] }
 false = { run = ["{out}/seam{exe}", "module_config.reloadable-unset-refused"] }
 
 [[case]]
@@ -2433,7 +2421,7 @@ false = { run = ["{out}/seam{exe}", "module_config.spans-outgrown-at-a-barrier"]
 [[case]]
 name = "module_config.spans-outgrown-at-a-barrier"
 run = ["{out}/seam{exe}", "module_config.spans-outgrown-at-a-barrier"]
-claims = { matches = ["module 'game:mover@0\\.1\\.0' is stopped: what its queries match no longer fits in its spans of 544 bytes.*alive"] }
+claims = { matches = ["module 'game:mover@0\\.1\\.0' is stopped: what its queries match no longer fits in its spans of 1160 bytes.*alive"] }
 false = { run = ["{out}/seam{exe}", "backend_sig_t-what-each-entry-takes-and-answers"] }
 
 [[case]]
@@ -2788,12 +2776,6 @@ false = { run = ["{out}/seam{exe}", "backend_destroy-the-library-leaves-the-proc
 name = "backend_destroy-the-library-leaves-the-process"
 run = ["{out}/seam{exe}", "backend_destroy-the-library-leaves-the-process"]
 claims = { matches = ["the guarded backend's library is still loaded, the plain backend's is gone.*alive"] }
-false = { run = ["{out}/seam{exe}", "backend_get_capabilities-held-against-what-a-module-states"] }
-
-[[case]]
-name = "backend_get_capabilities-held-against-what-a-module-states"
-run = ["{out}/seam{exe}", "backend_get_capabilities-held-against-what-a-module-states"]
-claims = { matches = ["module 'game:mover@0.1.0' is refused: it is not trusted, and backend 'plain' runs only modules that are.*alive"], lacks = ["cannot open"] }
 false = { run = ["{out}/seam{exe}", "module_compile-no-path-refused"] }
 
 [[case]]

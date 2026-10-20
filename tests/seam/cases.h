@@ -205,7 +205,6 @@ void test_use_up_columns(host_t *h);
 void test_bench(host_t *h);
 void test_run_plain(host_t *h);
 void test_run_mixed(host_t *h);
-void test_state_untrusted(host_t *h);
 void test_state_limit(host_t *h);
 void test_state_no_path(host_t *h);
 void test_state_no_bytes(host_t *h);

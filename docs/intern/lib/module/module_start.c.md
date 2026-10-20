@@ -44,7 +44,10 @@ The spans need these bytes:
 | A query for each system | 8 |
 | A list for each observer | 8 |
 | A cell of `column_base` for each component in each table id, counting 0 | 4 |
-| A cell for each component, where a component not kept in a table is reached | 4 |
+| A row count and a block for each table id | 8 |
+| A `kept`, `stride`, `write` and `kind` cell for each component | 16 |
+| An offset and a length for each of `BRIDGE_OWNED_CAP` ranges | 8 |
+| The count of the owned ranges | 4 |
 
 The count of table ids is the count that storage has room for: `src/lib/storage/storage_publish.c`.
 `check_spans` rounds the sum up to a multiple of 8, as the publish of a barrier does.

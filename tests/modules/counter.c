@@ -17,18 +17,17 @@ static uint32_t listing;
 static uint32_t count_alive(void)
 {
     uint32_t span;
-    uint32_t at;
+    uint32_t table;
     uint32_t alive = 0;
     uint32_t i = 0;
 
     if (!bridge_count_spans(listing))
         return (0);
-    span = bridge_get_span(listing, 0, 1);
-    at = BRIDGE_ROW(roster_t, bridge_get_base(span, 0), 0,
-        bridge_count_rows(span));
-    at += (uint32_t)offsetof(roster_t, ids);
+    span = bridge_get_span(listing, 0);
+    table = bridge_span_table(span);
     while (i < LISTED) {
-        alive += bridge_is_alive(acc_ld_64(at + 8u * i));
+        alive += bridge_is_alive(acc_ld_64(roster, table, 0,
+            (uint32_t)offsetof(roster_t, ids) + 8u * i));
         i++;
     }
     return (alive);
@@ -41,7 +40,7 @@ BRIDGE_EXPORT(count) int count(void)
     uint32_t s = 0;
 
     while (s < spans) {
-        rows += bridge_count_rows(bridge_get_span(counting, s, 1));
+        rows += bridge_count_rows(bridge_get_span(counting, s));
         s++;
     }
     BRIDGE_LOG(BRIDGE_LOG_INFO, "left", rows, count_alive());

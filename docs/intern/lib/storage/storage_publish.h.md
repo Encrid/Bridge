@@ -39,10 +39,15 @@ One module that storage writes for.
 | `r`, `m` | The storage, and the module. |
 | `cell` | Its `column_base`: `docs/extern/bridge_abi.h.md`, *Spans*. |
 | `kept` | After `column_base`, a cell for each type it declared: where it reaches a component that no table keeps. |
+| `rows`, `blocks` | Per table: the row count, and where the ids are in the shared memory. |
+| `stride`, `write`, `kind` | Per type: the size in bytes, the write flag, and the storage kind. |
+| `owned` | The owned ranges of the module in the shared arena: a count, then the ranges. |
 | `at`, `end` | Where the next thing goes in its private memory, and where its span region ends. |
 | `all` | A declaration changed, or storage never wrote for the module: storage writes each table, and not only the touched ones. |
 | `again` | Storage writes every span of the module again: `docs/intern/lib/storage/storage_spans.c.md`, *Where the spans go*. |
 | `full` | The name of the observer whose list did not fit, or null. |
+
+`lay_private` places these arrays in the private memory, one after another, and leaves `at` past them for the spans.
 
 ## Functions
 
@@ -51,3 +56,4 @@ One module that storage writes for.
 | `storage_publish_cells` | Writes `column_base` and `kept`: `docs/intern/lib/storage/storage_cells.c.md`, *Functions*. |
 | `storage_publish_spans` | Writes the spans of a module: `docs/intern/lib/storage/storage_spans.c.md`, *Functions*. |
 | `storage_publish_lists` | Writes the lists of the observers: `docs/intern/lib/storage/storage_publish.c.md`, *Functions*. |
+| `lay_private` | Lays the arrays of the capability table in the private memory, and sets `at` past them. |

@@ -14,19 +14,17 @@ static uint32_t position;
 static uint32_t aim;
 static uint32_t bodies;
 
-static uint32_t add_aims(uint32_t span, uint32_t cells, uint32_t *found,
-    uint32_t *sum)
+static uint32_t add_aims(uint32_t span, uint32_t *found, uint32_t *sum)
 {
     uint32_t count = bridge_count_rows(span);
-    uint32_t entities = bridge_get_entities(span);
-    uint32_t at;
+    uint32_t table = bridge_span_table(span);
+    uint64_t id;
     uint32_t r = 0;
 
     while (r < count) {
-        at = bridge_get_cell(cells, bridge_get_entity(entities, r, count),
-            sizeof(aim_t));
-        if (at) {
-            *sum += BRIDGE_GET(aim_t, at, at);
+        id = bridge_get_entity(table, r);
+        if (bridge_has(aim, id)) {
+            *sum += BRIDGE_GET(aim_t, at, aim, (uint32_t)id, 0);
             (*found)++;
         }
         r++;
@@ -37,14 +35,13 @@ static uint32_t add_aims(uint32_t span, uint32_t cells, uint32_t *found,
 BRIDGE_EXPORT(reached) int reached(void)
 {
     uint32_t spans = bridge_count_spans(bodies);
-    uint32_t cells = bridge_get_cells(aim);
     uint32_t rows = 0;
     uint32_t found = 0;
     uint32_t sum = 0;
     uint32_t s = 0;
 
     while (s < spans) {
-        rows += add_aims(bridge_get_span(bodies, s, 2), cells, &found, &sum);
+        rows += add_aims(bridge_get_span(bodies, s), &found, &sum);
         s++;
     }
     BRIDGE_LOG(BRIDGE_LOG_INFO, "aims", rows, found);

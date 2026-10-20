@@ -9,11 +9,13 @@
 static uint32_t add_hits(uint32_t span, uint32_t *sum)
 {
     uint32_t count = bridge_count_rows(span);
-    uint32_t base = bridge_get_base(span, 0);
+    uint32_t table = bridge_span_table(span);
+    uint64_t id;
     uint32_t r = 0;
 
     while (r < count) {
-        *sum += BRIDGE_GET(hit_t, by, BRIDGE_ROW(hit_t, base, r, count));
+        id = bridge_get_entity(table, r);
+        *sum += BRIDGE_GET(hit_t, by, hit, (uint32_t)id, 0);
         r++;
     }
     return (count);
@@ -27,26 +29,24 @@ BRIDGE_EXPORT(walked) int walked(void)
     uint32_t s = 0;
 
     while (s < spans) {
-        rows += add_hits(bridge_get_span(hits, s, 1), &sum);
+        rows += add_hits(bridge_get_span(hits, s), &sum);
         s++;
     }
     BRIDGE_LOG(BRIDGE_LOG_INFO, "hits", rows, sum);
     return (0);
 }
 
-static uint32_t add_reached(uint32_t span, uint32_t index, uint32_t *found,
-    uint32_t *sum)
+static uint32_t add_reached(uint32_t span, uint32_t *found, uint32_t *sum)
 {
     uint32_t count = bridge_count_rows(span);
-    uint32_t entities = bridge_get_entities(span);
-    uint32_t at;
+    uint32_t table = bridge_span_table(span);
+    uint64_t id;
     uint32_t r = 0;
 
     while (r < count) {
-        at = bridge_get_sparse_value(index,
-            bridge_get_entity(entities, r, count));
-        if (at) {
-            *sum += BRIDGE_GET(hit_t, by, at);
+        id = bridge_get_entity(table, r);
+        if (bridge_has(hit, id)) {
+            *sum += BRIDGE_GET(hit_t, by, hit, (uint32_t)id, 0);
             (*found)++;
         }
         r++;
@@ -57,15 +57,13 @@ static uint32_t add_reached(uint32_t span, uint32_t index, uint32_t *found,
 BRIDGE_EXPORT(reached) int reached(void)
 {
     uint32_t spans = bridge_count_spans(bodies);
-    uint32_t index = bridge_get_sparse_index(hit);
     uint32_t rows = 0;
     uint32_t found = 0;
     uint32_t sum = 0;
     uint32_t s = 0;
 
     while (s < spans) {
-        rows += add_reached(bridge_get_span(bodies, s, 2), index, &found,
-            &sum);
+        rows += add_reached(bridge_get_span(bodies, s), &found, &sum);
         s++;
     }
     BRIDGE_LOG(BRIDGE_LOG_INFO, "bodies", rows, found);

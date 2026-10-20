@@ -13,13 +13,12 @@ static uint32_t halving;
 static void halve_span(uint32_t span)
 {
     uint32_t count = bridge_count_rows(span);
-    uint32_t base = bridge_get_base(span, 0);
-    uint32_t at;
+    uint32_t table = bridge_span_table(span);
     uint32_t r = 0;
 
     while (r < count) {
-        at = BRIDGE_ROW(position_t, base, r, count);
-        BRIDGE_SET(position_t, x, at, BRIDGE_GET(position_t, x, at) * 0.5f);
+        BRIDGE_SET(position_t, x, position, table, r,
+            BRIDGE_GET(position_t, x, position, table, r) * 0.5f);
         r++;
     }
 }
@@ -30,7 +29,7 @@ BRIDGE_EXPORT(halve) int halve(void)
     uint32_t s = 0;
 
     while (s < spans) {
-        halve_span(bridge_get_span(halving, s, 1));
+        halve_span(bridge_get_span(halving, s));
         s++;
     }
     return (0);

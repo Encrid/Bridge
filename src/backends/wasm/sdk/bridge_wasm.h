@@ -50,12 +50,13 @@
     #define BRIDGE_ATTACH(id, slot, value) \
         bridge_attach(id, slot, bridge_lend(&(value), sizeof(value)))
 
-    #define BRIDGE_ROW(T, base, row, count) acc_row(base, row, count, sizeof(T))
-    #define BRIDGE_GET(T, field, at) \
-        BRIDGE_LD_(((T *)0)->field)((at) + (uint32_t)offsetof(T, field))
-    #define BRIDGE_SET(T, field, at, value) \
-        BRIDGE_ST_(((T *)0)->field)((at) + (uint32_t)offsetof(T, field), \
-            (value))
+    #define BRIDGE_AT(a, b) (((uint64_t)(uint32_t)(a) << 32) | (uint32_t)(b))
+    #define BRIDGE_GET(T, field, slot, a, b) \
+        BRIDGE_LD_(((T *)0)->field)(slot, BRIDGE_AT(a, b), \
+            (uint32_t)offsetof(T, field))
+    #define BRIDGE_SET(T, field, slot, a, b, value) \
+        BRIDGE_ST_(((T *)0)->field)(slot, BRIDGE_AT(a, b), \
+            (uint32_t)offsetof(T, field), (value))
     #define BRIDGE_LD_(v) _Generic((v), \
         bool: acc_ld_u8, char: acc_ld_i8, signed char: acc_ld_i8, \
         unsigned char: acc_ld_u8, short: acc_ld_i16, \

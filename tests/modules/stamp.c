@@ -6,6 +6,7 @@
 #include "test_module.h"
 #include "game.h"
 #include "idle.h"
+#include "reach.h"
 
 #ifdef UNSTATED
 constexpr uint32_t STATED = 0;
@@ -20,6 +21,7 @@ static uint32_t stamping;
 TEST(stamp)
 {
     const bridge_query_t *q = test_get_query(api, stamping);
+    const uint32_t *blocks = get_blocks(api);
     marked_t m = { VALUE };
     const uint32_t *span;
     const uint64_t *who;
@@ -28,9 +30,9 @@ TEST(stamp)
 
     while (s < q->spans) {
         span = test_get_span(api, q, s, 1);
-        who = (const uint64_t *)(api->shared_base + span[1]);
+        who = (const uint64_t *)(api->shared_base + blocks[span[0]]);
         row = 0;
-        while (row < span[0]) {
+        while (row < span[1]) {
             TEST_ATTACH(api, who[row], marked, m);
             row++;
         }

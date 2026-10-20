@@ -10,14 +10,12 @@ A key of the config of a module demands a capability:
 
 | Key | Capability |
 | --- | --- |
-| `trusted` is `BRIDGE_FALSE` | `BACKEND_UNTRUSTED` |
 | `work_limit` is above 0 | `BACKEND_WORK_LIMIT` |
 | `memory_limit` is above 0 | `BACKEND_MEMORY_LIMIT` |
 | `init_timeout`, `reload_timeout` or `shutdown_timeout` is above 0 | `BACKEND_TIMEOUT` |
 | `hot_reload` is `BRIDGE_TRUE` | `BACKEND_RELOAD` |
 
 A guarantee has one name, for the key that asks for it and for the capability that gives it.
-`trusted` is one guarantee: the deployment states whether a module is trusted, and the backend states whether it runs a module that is not.
 A key stated as `BRIDGE_NO_LIMIT` demands nothing, so a module on a backend with no limits states its limits that way.
 
 Nothing is downgraded.

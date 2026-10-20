@@ -21,7 +21,7 @@ void host_state_native(bridge_artifact_t *a, const char *identity,
 {
     *a = (bridge_artifact_t){ .backend = "native", .path = path };
     a->cfg = (bridge_module_config_t){ .identity = identity,
-        .abi = BRIDGE_ABI, .trusted = BRIDGE_TRUE, .reloadable = BRIDGE_FALSE,
+        .abi = BRIDGE_ABI, .reloadable = BRIDGE_FALSE,
         .hot_reload = BRIDGE_FALSE, .pinned = BRIDGE_FALSE,
         .on_error = BRIDGE_SKIP, .max_system_failures = 3,
         .work_limit = BRIDGE_NO_LIMIT, .memory_limit = BRIDGE_NO_LIMIT,

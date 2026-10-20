@@ -9,18 +9,6 @@ static const bridge_setting_t TEST_SETTING[1] = {
     { "cache", BRIDGE_STRING, {}, { .s = "somewhere" } }
 };
 
-void test_state_untrusted(host_t *h)
-{
-    bridge_artifact_t a;
-
-    if (host_open(h))
-        return;
-    host_state_native(&a, "game:mover@0.1.0", "no-such-library");
-    a.cfg.trusted = BRIDGE_FALSE;
-    host_load(h, &a);
-    host_close(h);
-}
-
 void test_state_limit(host_t *h)
 {
     bridge_artifact_t a;

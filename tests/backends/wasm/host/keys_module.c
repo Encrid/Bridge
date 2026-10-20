@@ -7,7 +7,6 @@
 
 static const test_edit_t TEST_MODULE_EDITS[] = {
     { "identity=0", offsetof(test_keys_t, identity), 8, 0 },
-    { "trusted=0", offsetof(test_keys_t, trusted), 1, BRIDGE_UNSET },
     { "reloadable=0", offsetof(test_keys_t, reloadable), 1, BRIDGE_UNSET },
     { "hot_reload=0", offsetof(test_keys_t, hot_reload), 1, BRIDGE_UNSET },
     { "on_error=0", offsetof(test_keys_t, on_error), 1, 0 },

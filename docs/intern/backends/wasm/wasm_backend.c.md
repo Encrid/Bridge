@@ -21,6 +21,6 @@ It builds no engine here; `docs/intern/backends/wasm/wasm_adopted.c.md` makes ea
 | --- | --- |
 | `backend_create` | Gives a new backend. Refuses any setting and writes why in `err`. |
 | `backend_destroy` | Stops the watchdog, deletes every engine, and frees the backend. |
-| `backend_get_capabilities` | Gives the flags the backend keeps: untrusted, work limit, timeout, memory limit, reload, side by side. |
+| `backend_get_capabilities` | Gives the flags the backend keeps: work limit, timeout, memory limit, reload, side by side. |
 | `backend_get_abi` | Gives `BACKEND_ABI`. Bridge reads it before all else and rejects a mismatch. |
 | `memory_get_shape` | Asks for a 4 GiB reservation, a 32 MiB guard, and a 64 KiB granule. |

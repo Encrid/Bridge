@@ -12,15 +12,15 @@ static uint32_t reading;
 
 BRIDGE_EXPORT(read) int read(void)
 {
-    uint32_t span = bridge_get_span(reading, 0, 1);
-    uint32_t at = BRIDGE_ROW(body_t, bridge_get_base(span, 0), 0,
-        bridge_count_rows(span));
+    uint32_t span = bridge_get_span(reading, 0);
+    uint32_t table = bridge_span_table(span);
 
-    BRIDGE_LOG(BRIDGE_LOG_INFO, "body", (uint32_t)BRIDGE_GET(body_t, at.y, at),
-        (uint32_t)BRIDGE_GET(body_t, team, at));
+    BRIDGE_LOG(BRIDGE_LOG_INFO, "body",
+        (uint32_t)BRIDGE_GET(body_t, at.y, body, table, 0),
+        (uint32_t)BRIDGE_GET(body_t, team, body, table, 0));
     BRIDGE_LOG(BRIDGE_LOG_INFO, "more",
-        (uint32_t)BRIDGE_GET(body_t, flags, at),
-        (uint32_t)BRIDGE_GET(body_t, mass, at));
+        (uint32_t)BRIDGE_GET(body_t, flags, body, table, 0),
+        (uint32_t)BRIDGE_GET(body_t, mass, body, table, 0));
     return (0);
 }
 

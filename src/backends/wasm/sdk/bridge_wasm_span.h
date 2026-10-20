@@ -15,27 +15,21 @@ static inline uint32_t bridge_count_spans(uint32_t query)
     return (acc_own_32(at + query * sizeof(bridge_query_t)));
 }
 
-static inline uint32_t bridge_get_span(uint32_t query, uint32_t i,
-    uint32_t terms)
+static inline uint32_t bridge_get_span(uint32_t query, uint32_t i)
 {
     uint32_t at = BRIDGE_HEADER(queries) + query * sizeof(bridge_query_t);
 
-    return (acc_own_32(at + 4u) + i * BRIDGE_SPAN_SIZE(terms));
+    return (acc_own_32(at + 4u) + i * BRIDGE_SPAN_SIZE);
 }
 
-static inline uint32_t bridge_count_rows(uint32_t span)
+static inline uint32_t bridge_span_table(uint32_t span)
 {
     return (acc_own_32(span));
 }
 
-static inline uint32_t bridge_get_entities(uint32_t span)
+static inline uint32_t bridge_count_rows(uint32_t span)
 {
     return (acc_own_32(span + 4u));
-}
-
-static inline uint32_t bridge_get_base(uint32_t span, uint32_t term)
-{
-    return (acc_own_32(span + BRIDGE_SPAN_BASE + 4u * term));
 }
 
 #endif
