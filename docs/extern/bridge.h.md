@@ -649,6 +649,7 @@ Each record of Bridge has the level `BRIDGE_ERR`, unless its group tells another
 - `phase <index> has no name`
 - `phase '<phase>' is named twice`
 - `[order] pair <index> does not name two systems`
+- `[order] has <count> pairs Bridge cannot read`
 - `[order] contradicts itself: '<system>' would run before itself`
 - `[budget] <key> is unset`
 - `[budget] <key> of <number> is more than an offset of 32 bits can reach`

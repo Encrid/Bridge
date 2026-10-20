@@ -644,6 +644,7 @@ Only a system names a phase, so a reason about a phase has no form for an observ
 - `declare: what it states lies outside the scratch arena`
 - `declare is called outside init`
 - `declare: its name has <count> bytes, and a name has 1 to 127`
+- `declare: its name has a zero byte`
 - `declare: a name or a descriptor lies outside the scratch arena`
 - `type '<type>' has no namespace`
 - `type '<type>': its kind is unset`
@@ -697,6 +698,7 @@ When other modules declare the type, the reason of a layout ends with `. It is a
 - `it registers one more than [budget] systems of <count>`
 - `a system asks for <count> terms, which is more than [budget] terms of <count>`
 - `system: its name has <count> bytes, and a name has 1 to 127`
+- `system: its name has a zero byte`
 - `system: a name, a term or a change lies outside the scratch arena`
 - `a system states <count> changes, and the module declared <count> types`
 - `'<name>' is a reserved name, and no system may take it`
