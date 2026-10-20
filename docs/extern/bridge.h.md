@@ -8,7 +8,6 @@ It gives the seven functions of the library, and the structs that a host gives t
 A host links the built library: the shared library or the static library.
 The shared library exports only the seven functions of this header, and `BRIDGE_API` marks each of them.
 Only the build of the library defines `BRIDGE_BUILDING`. A host does not define it.
-A C++ compiler reads the declarations as C, thus a host in C++ links the names as the library exports them.
 What a host compiles with this header is a work based on Bridge: `readme.md`, *License*.
 
 A host gives values in structs, and Bridge reads no file of the host.
@@ -81,10 +80,13 @@ A name with no folder goes to the search of the operating system.
 On Windows, the folder of a library with a path is also searched for the libraries that it needs.
 `docs/extern/bridge_backend.h.md` tells what the library of a backend holds.
 
+A path is a sequence of bytes in UTF-8, on each system.
+
 ## bridge_budget_t
 
 `bridge_budget_t` states how many of each thing a world can hold at one time, and how many bytes.
 `bridge_create` takes the memory of the whole budget. A phase and a barrier take no more memory.
+On Linux under the default overcommit, the system gives the pages as the world uses them; overcommit mode 2 takes the whole budget at `bridge_create`.
 Zero is unset, and `bridge_create` refuses it.
 A record names a key as a TOML file does: `[budget] entities` is `entities` of `budget`.
 
@@ -525,7 +527,7 @@ From the sink, the result is 1, with no record.
 A refusal of the config stops nothing. A failure after the module exists stops the world, if `on_error` is `BRIDGE_FAIL`.
 A load that fails leaves the storage as it was.
 
-The module comes after the modules that loaded before it. A barrier applies the changes of the modules in this order.
+The module comes after the modules that loaded before it. A barrier applies what was queued in the order the calls ran.
 When two modules conflict, the order of the loads decides which load fails. The record names the two systems.
 
 ## bridge_unload

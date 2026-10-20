@@ -9,8 +9,6 @@ A backend is a shared library that exports the 18 functions of `backend_api_t`, 
 `BACKEND_ENTRY_NAMES` gives the names, in the order of the fields of `backend_api_t`.
 `BACKEND_ENTRY_COUNT` is how many there are: 18.
 `BACKEND_EXPORT` exports a function from the library: a backend in C writes it before each of the 18 functions.
-A C++ compiler reads the declarations of this header as C, as it does those of `include/bridge.h`: `docs/extern/bridge.h.md`, *The library*.
-A backend in C++ writes `extern "C"` before `BACKEND_EXPORT` on each of the 18 functions, since the header does not declare them.
 
 `bridge_create` opens the library that the deployment names, and finds each entry by its name: `docs/extern/bridge.h.md`, *bridge_backend_t*.
 A library that lacks an entry is not a backend, and `bridge_create` refuses the world.

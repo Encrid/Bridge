@@ -14,7 +14,6 @@ The compiler adds no padding: a gap is a field `pad`. Write zero into it. Nobody
 
 An enum has the width of its place: 1 byte in `bridge_term_t`, and 4 bytes in each other struct.
 A module in another language cannot include this header. It needs the same layouts, written in its language.
-A C++ compiler reads this header as it reads `include/bridge.h`: `docs/extern/bridge.h.md`, *The library*.
 A module that compiles with `include/bridge_abi.h` is a work based on Bridge: `readme.md`, *License*.
 
 ## BRIDGE_ABI

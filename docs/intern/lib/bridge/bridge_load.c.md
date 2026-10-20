@@ -21,7 +21,7 @@ Steps 2 and 3 are in `src/lib/module/module_check.c`.
 Before the module has a record, a refusal says that the module is refused, and `on_error` does not apply.
 After it has a record, a failure is the failure of the module, and its `on_error` tells what it costs.
 `docs/intern/lib/module/module_say.c.md`, *Refused or not loaded*, tells the two.
-The list of modules gives the order in which a barrier applies their changes: `docs/extern/bridge.h.md`, *bridge_load*.
+A barrier applies the queued changes as `docs/intern/lib/storage/storage_runs.h.md`, *The order of the queues*, gives.
 A module that is loaded and that nothing will ever run is not a load that succeeded: `bridge_load` gives 1 if the world has stopped.
 
 ## The share of the arena
