@@ -30,8 +30,8 @@ every            free
 every            strcmp
 every            strncmp
 every            strchr
-every            strrchr
 every            strpbrk
+every            memchr
 every            strtoll
 every            strtoull
 posix            strlen
@@ -51,9 +51,11 @@ windows          _errno
 windows          __stdio_common_vsprintf
 windows          VirtualAlloc
 windows          VirtualFree
-windows          LoadLibraryA
-windows          LoadLibraryExA
-windows          GetFullPathNameA
+windows          LoadLibraryW
+windows          LoadLibraryExW
+windows          GetFullPathNameW
+windows          MultiByteToWideChar
+windows          wcschr
 windows          GetProcAddress
 windows          FreeLibrary
 windows          CreateThread
@@ -122,7 +124,7 @@ They are in the list because they are imports all the same: a new one is a depen
 | Imports | Why |
 | --- | --- |
 | `malloc`, `calloc`, `realloc`, `free` | The library allocates records, their tables and copies of names outside a phase. It allocates nothing in a phase. |
-| `strcmp`, `strncmp`, `strchr`, `strrchr`, `strpbrk` | The library compares names of modules, phases, components and settings, and a name up to its namespace. `strchr` finds where a namespace or a version ends, and a folder in the path of a library. `strrchr` finds where the name of a system begins in a full name. `strpbrk` finds an `@` or a `:` in the name of a system. |
+| `strcmp`, `strncmp`, `strchr`, `strpbrk`, `memchr` | The library compares names of modules, phases, components and settings, and a name up to its namespace. `strchr` finds where a namespace or a version ends. `strpbrk` finds an `@` or a `:` in the name of a system. `memchr` finds a zero byte in a name. |
 | `strtoll`, `strtoull` | The schema reads the constants of a descriptor with them. |
 | `__errno_location`, `__error`, `_errno` | They give `errno` on Linux, macOS and Windows. `strtoll` and `strtoull` set it. |
 | `strlen`, `memcpy`, `memmove` | The library measures names, copies values and names, and closes up a run of a table. The compiler makes them inline on Windows. |
@@ -132,7 +134,7 @@ They are in the list because they are imports all the same: a new one is a depen
 | `bzero`, `__bzero` | The compiler makes them of a block made zero on macOS: `bzero` on aarch64, and `__bzero` on x86_64. |
 | `__memcpy_chk` | The headers of macOS make it of `memcpy`. |
 | `VirtualAlloc`, `VirtualFree`, `mmap`, `mprotect`, `munmap` | This layer reserves, commits and releases memory. |
-| `LoadLibraryA`, `LoadLibraryExA`, `GetFullPathNameA`, `GetProcAddress`, `FreeLibrary`, `dlopen`, `dlsym`, `dlclose` | This layer opens the library of a backend or of a native module, finds a symbol in it, and closes it. |
+| `LoadLibraryW`, `LoadLibraryExW`, `GetFullPathNameW`, `MultiByteToWideChar`, `wcschr`, `GetProcAddress`, `FreeLibrary`, `dlopen`, `dlsym`, `dlclose` | This layer opens the library of a backend or of a native module, finds a symbol in it, and closes it. On Windows it makes the path a wide string and finds a folder in it. |
 | `CreateThread`, `WaitForSingleObject`, `CloseHandle`, `pthread_create`, `pthread_join` | This layer starts and joins a worker thread. On Windows, `WaitForSingleObject` also waits for an event, and `CloseHandle` also closes one. |
 | `GetCurrentThreadId`, `pthread_self` | This layer gives the thread that runs, for a pinned module. |
 | `QueryPerformanceCounter`, `QueryPerformanceFrequency`, `clock_gettime` | This layer reads the clock that keeps a deadline, and its unit. |
