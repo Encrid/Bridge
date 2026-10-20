@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "module.h"
+#include "storage_publish.h"
 
 static int call_first(module_t *m, const module_start_t *st,
     backend_err_t *err)
@@ -61,14 +62,10 @@ static int find_exports(module_t *m, backend_err_t *err)
 static int check_spans(const module_t *m, backend_err_t *err)
 {
     uint32_t tables = storage_count_tables(m->w->storage);
-    uint64_t need = sizeof(bridge_query_t) * m->system_count
-        + sizeof(bridge_list_t) * m->observer_count
-        + 4ull * m->declared_count * tables
-        + 8ull * tables
-        + 16ull * m->declared_count
-        + 4ull + 8ull * BRIDGE_OWNED_CAP;
+    uint32_t slots = (uint32_t)sizeof(bridge_query_t) * m->system_count
+        + (uint32_t)sizeof(bridge_list_t) * m->observer_count;
+    uint64_t need = span_bytes(slots, m->declared_count, tables);
 
-    need = (need + 7u) & ~7ull;
     if (need <= m->spans_len)
         return (0);
     return (module_fail(err, "its spans of %u bytes do not hold a "

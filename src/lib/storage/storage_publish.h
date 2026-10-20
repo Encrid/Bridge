@@ -26,6 +26,15 @@ typedef struct {
     const char *full;
 } publish_t;
 
+static inline uint64_t span_bytes(uint32_t slots, uint32_t declared,
+    uint32_t tables)
+{
+    uint64_t need = (uint64_t)slots + 4ull * declared * tables + 8ull * tables
+        + 16ull * declared + 4ull + 8ull * BRIDGE_OWNED_CAP;
+
+    return ((need + 7u) & ~7ull);
+}
+
 static inline void lay_private(publish_t *p, uint32_t tables, uint32_t slots)
 {
     module_t *m = p->m;
@@ -38,9 +47,7 @@ static inline void lay_private(publish_t *p, uint32_t tables, uint32_t slots)
     p->write = p->stride + m->declared_count;
     p->kind = p->write + m->declared_count;
     p->owned = p->kind + m->declared_count;
-    p->at = (uint64_t)((uint8_t *)(p->owned + 1 + 2u * BRIDGE_OWNED_CAP)
-        - m->priv);
-    p->at = (p->at + 7u) & ~7ull;
+    p->at = m->spans + span_bytes(slots, m->declared_count, tables);
 }
 
 void storage_publish_cells(publish_t *p);
