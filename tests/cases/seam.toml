@@ -1411,6 +1411,36 @@ claims = { matches = [".order. pair 0 does not name two systems.*alive"] }
 false = { run = ["{out}/seam{exe}", "config.order-cycle-refused"] }
 
 [[case]]
+name = "order.name-of-two-parts-refused"
+run = ["{out}/seam{exe}", "order.name-of-two-parts-refused"]
+claims = { matches = [".order. pair 0 does not name two systems.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.order-cycle-refused"] }
+
+[[case]]
+name = "order.name-of-four-parts-refused"
+run = ["{out}/seam{exe}", "order.name-of-four-parts-refused"]
+claims = { matches = [".order. pair 0 does not name two systems.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.order-cycle-refused"] }
+
+[[case]]
+name = "order.name-with-an-empty-part-refused"
+run = ["{out}/seam{exe}", "order.name-with-an-empty-part-refused"]
+claims = { matches = [".order. pair 0 does not name two systems.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.order-cycle-refused"] }
+
+[[case]]
+name = "order.pairs-with-no-array-refused"
+run = ["{out}/seam{exe}", "order.pairs-with-no-array-refused"]
+claims = { matches = [".order. has 2 pairs Bridge cannot read.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "order.name-with-a-version-refused"] }
+
+[[case]]
+name = "order.pairs-too-many-refused"
+run = ["{out}/seam{exe}", "order.pairs-too-many-refused"]
+claims = { matches = [".order. has 2147483648 pairs Bridge cannot read.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "order.name-with-a-version-refused"] }
+
+[[case]]
 name = "order.name-with-no-colon-refused"
 run = ["{out}/seam{exe}", "order.name-with-no-colon-refused"]
 claims = { matches = [".order. pair 0 does not name two systems.*alive"] }

@@ -19,6 +19,12 @@ static const char *pick_name(const char *arg)
         return ("game:mover:");
     if (!strcmp(arg, "same"))
         return ("game:twostep:twice");
+    if (!strcmp(arg, "two"))
+        return ("game:move");
+    if (!strcmp(arg, "four"))
+        return ("game:a:b:c");
+    if (!strcmp(arg, "empty"))
+        return ("game::move");
     memset(test_long_name, 'o', sizeof(test_long_name) - 1);
     memcpy(test_long_name, "game:mover:", 11);
     return (test_long_name);
@@ -47,4 +53,20 @@ void test_order_unnamed(host_t *h)
     test_load_guarded(h, "game:mover@0.1.0", "mover");
     test_load_guarded(h, "game:twostep@0.1.0", "twostep");
     host_close(h);
+}
+
+void test_order_no_array(host_t *h)
+{
+    h->cfg.order = nullptr;
+    h->cfg.order_count = 2;
+    host_open_only(h);
+}
+
+void test_order_too_many(host_t *h)
+{
+    bridge_order_t pair = { "game:mover:move", "game:twostep:twice" };
+
+    h->cfg.order = &pair;
+    h->cfg.order_count = 0x80000000u;
+    host_open_only(h);
 }

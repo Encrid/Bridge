@@ -10,13 +10,22 @@
 
 static bool is_full_name(const char *name)
 {
-    const char *colon = name ? strrchr(name, ':') : nullptr;
-    size_t tail;
+    uint32_t colons = 0;
+    size_t run = 0;
 
-    if (!colon || strchr(name, '@'))
+    if (!name || strchr(name, '@'))
         return (false);
-    tail = strlen(colon + 1);
-    return (tail && tail <= NAME_MOST);
+    for (const char *c = name; *c; c++) {
+        if (*c != ':') {
+            run++;
+            continue;
+        }
+        if (!run)
+            return (false);
+        colons++;
+        run = 0;
+    }
+    return (colons == 2 && run && run <= NAME_MOST);
 }
 
 static uint32_t name_system(schedule_pairs_t *order, const char *name)
@@ -68,9 +77,14 @@ int schedule_order(bridge_world_t *w, const bridge_order_t *order,
     uint32_t count)
 {
     schedule_pairs_t *pairs = &w->order;
-    int refused = !schedule_init_matrix(&pairs->reach, count * 2);
+    int refused;
     uint32_t i = 0;
 
+    if ((count && !order) || count > UINT32_MAX / 2u) {
+        say_error(w, "[order] has %u pairs Bridge cannot read", count);
+        return (1);
+    }
+    refused = !schedule_init_matrix(&pairs->reach, count * 2);
     pairs->names = calloc(count ? count * 2 : 1, sizeof(*pairs->names));
     if (refused || !pairs->names)
         refused = bridge_lacks(w, nullptr, "the order a deployment states");

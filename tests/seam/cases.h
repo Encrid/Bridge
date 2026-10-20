@@ -329,6 +329,8 @@ void test_stop_two_observers(host_t *h);
 void test_mend_after_fault(host_t *h);
 
 void test_order_two_pairs(host_t *h);
+void test_order_no_array(host_t *h);
+void test_order_too_many(host_t *h);
 
 void test_log_out_of_range(host_t *h);
 
