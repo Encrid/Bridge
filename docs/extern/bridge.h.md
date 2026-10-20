@@ -517,9 +517,9 @@ A host that ignores the result can lose a world that stays.
 2. Bridge makes a record of the module, takes its share of the arena, and sets ids aside.
 3. The backend compiles the image, and makes an instance with the memories that the module imports.
 4. Bridge calls `init` under `init_timeout`. `init` declares the types, and registers the systems and the observers.
-5. Bridge writes the settings into the component that `config` names.
-6. Bridge finds the export of each system and observer, and `shutdown` and `reload`.
-7. The load fails if the orders make a cycle, or if two systems conflict and nothing orders them. `docs/extern/bridge_abi.h.md`, *Conflicts* tells which order counts.
+5. Bridge finds the export of each system and observer, and `shutdown` and `reload`.
+6. The load fails if the orders make a cycle, or if two systems conflict and nothing orders them. `docs/extern/bridge_abi.h.md`, *Conflicts* tells which order counts.
+7. Bridge writes the settings into the component that `config` names.
 8. A barrier applies what `init` queued, and writes the spans of the module.
 
 The result is 0 if the module is loaded, its `init` gave 0, and the world can run it. Else the result is 1, with a record.

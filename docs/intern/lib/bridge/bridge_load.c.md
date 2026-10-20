@@ -13,9 +13,10 @@ This file loads a module.
 6. Set aside the ids of the module before `init` runs, because `init` can spawn.
 7. Start the module, with `init` as its first call: `src/lib/module/module_start.c`.
 8. Build the schedule again. It refuses a cycle, and a new system or observer that conflicts with another and that nothing orders.
-9. Put the module at the end of the list of modules.
-10. Let the world run again, if the world waits for this module.
-11. Run a barrier. It applies what `init` queued, and publishes the spans.
+9. Write the settings into the config component. A refusal here is a refusal of the config, and stops nothing.
+10. Put the module at the end of the list of modules.
+11. Let the world run again, if the world waits for this module.
+12. Run a barrier. It applies what `init` queued, and publishes the spans.
 
 Steps 2 and 3 are in `src/lib/module/module_check.c`.
 Before the module has a record, a refusal says that the module is refused, and `on_error` does not apply.
@@ -53,8 +54,8 @@ So the rebuild cannot be refused, and it asks for no memory.
 
 | Function | Result |
 | --- | --- |
-| `keep_share` | Records a share of `share` bytes at `at` as the one range of the module, with all of it left. |
-| `take_share` | Takes the share of the module of the persistent arena. 1, with a record, and the module discarded, if there is no memory to keep track of it. |
-| `fail_load` | Gives the lines that the module wrote, and says that the load failed. Stops the world if the module states `fail`, and leaves storage as it was. Gives 1. |
-| `start_loaded` | Sets the ids aside, runs `init`, builds the schedule again, and then writes the settings. 1, with why in `err`, if one fails. |
+| `take_share` | Takes the share of the module of the persistent arena, and records it as the one range of the module, with all of it left. 1, with a record, and the module discarded, if there is no memory to keep track of it. |
+| `fail_load` | Gives the lines that the module wrote, and says that the load failed. Stops the world if the module states `fail` and the failure is not a refusal of the config, and leaves storage as it was. Gives 1. |
+| `start_loaded` | Sets the ids aside, runs `init`, builds the schedule again, and then writes the settings. 1 if a step fails, 2 if the config is refused, with why in `err`. |
+| `commit_load` | Puts the module at the end of the list, lets the world run it, and runs a barrier. |
 | `bridge_load_now` | Loads a module. 0 if it loaded and the world runs, and 1 if not. |
