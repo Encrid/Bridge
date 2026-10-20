@@ -67,7 +67,7 @@ typedef struct {
 } table_t;
 
 struct storage {
-    bridge_t *b;
+    bridge_world_t *w;
     place_t *places;
     uint32_t high;
     uint32_t free_head;

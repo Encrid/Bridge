@@ -8,14 +8,14 @@
 
 #include "abi_declare.h"
 
-static declared_type_t *find_named(const bridge_t *b, const char *name)
+static declared_type_t *find_named(const bridge_world_t *w, const char *name)
 {
     declared_type_t *c = nullptr;
     uint32_t i = 0;
 
-    while (i < b->type_count) {
-        if (!strcmp(b->types[i]->name, name) && !b->types[i]->superseded)
-            c = b->types[i];
+    while (i < w->type_count) {
+        if (!strcmp(w->types[i]->name, name) && !w->types[i]->superseded)
+            c = w->types[i];
         i++;
     }
     return (c);
@@ -71,7 +71,7 @@ static int replace_moved(declaring_t *g)
 
 int abi_replace_type(declaring_t *g)
 {
-    declared_type_t *c = find_named(g->m->b, g->name);
+    declared_type_t *c = find_named(g->m->w, g->name);
     bool changed = c && !abi_is_same_layout(c, g);
 
     g->c = c;

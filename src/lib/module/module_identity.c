@@ -17,20 +17,20 @@ static bool has_form(const char *id)
     return (!strchr(colon + 1, ':') && !strchr(at + 1, '@'));
 }
 
-int module_check_identity(bridge_t *b, const char *id)
+int module_check_identity(bridge_world_t *w, const char *id)
 {
     if (!id || !*id) {
-        say_error(b, "a module with no identity is refused");
+        say_error(w, "a module with no identity is refused");
         return (1);
     }
     if (strlen(id) > 127) {
-        say_error(b, "a module with an identity of %zu bytes is refused: "
+        say_error(w, "a module with an identity of %zu bytes is refused: "
             "an identity has at most 127 bytes", strlen(id));
         return (1);
     }
     if (has_form(id))
         return (0);
-    say_error(b, "a module with the identity '%s' is refused: an identity "
+    say_error(w, "a module with the identity '%s' is refused: an identity "
         "has the form namespace:name@version", id);
     return (1);
 }

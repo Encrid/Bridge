@@ -18,7 +18,7 @@ static void reap(host_t *h, bool may_write)
     a.cfg.write = may_write ? TEST_GAME : nullptr;
     a.cfg.write_count = may_write ? 1 : 0;
     host_load(h, &a);
-    host_run_frames_unsaid(h->b, 2);
+    host_run_frames_unsaid(h->w, 2);
     host_close(h);
 }
 
@@ -37,7 +37,7 @@ void test_enter_from_foreign_thread(host_t *h)
     if (host_open(h))
         return;
     test_load_plain(h, "test:foreign@0.1.0", TFOREIGN_PATH, 8);
-    host_run_frames_unsaid(h->b, 1);
+    host_run_frames_unsaid(h->w, 1);
     host_close(h);
 }
 

@@ -9,15 +9,15 @@
 
 static void say_apart(storage_t *r, const storage_type_t *type, uint32_t rows)
 {
-    const bridge_t *b = r->b;
+    const bridge_world_t *w = r->w;
     say_t about = { nullptr, nullptr, BRIDGE_WARN };
     uint32_t i = 0;
 
-    while (b->types[i]->type != type)
+    while (w->types[i]->type != type)
         i++;
-    say_about(r->b, &about, "'%s' is stripped, and %u rows stay in a second "
+    say_about(r->w, &about, "'%s' is stripped, and %u rows stay in a second "
         "table of their archetype: [budget] columns of %u bytes has no room "
-        "to join them to the first", b->types[i]->name, rows, b->columns_len);
+        "to join them to the first", w->types[i]->name, rows, w->columns_len);
 }
 
 static void drop_tables(storage_t *r, const storage_type_t *type,

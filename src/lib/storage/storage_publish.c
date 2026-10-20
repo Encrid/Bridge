@@ -60,7 +60,7 @@ int storage_publish(storage_t *r, module_t *m, const char **list)
     uint32_t slots = (uint32_t)sizeof(bridge_query_t) * m->system_count
         + (uint32_t)sizeof(bridge_list_t) * m->observer_count;
 
-    p.all = r->b->layout_moved;
+    p.all = r->w->layout_moved;
     p.again = p.all;
     lay_private(&p, tables, slots);
     storage_publish_cells(&p);

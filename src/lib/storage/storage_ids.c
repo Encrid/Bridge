@@ -15,7 +15,7 @@ static uint32_t take_index(storage_t *r)
         r->free_head = r->places[index].row;
         return (index);
     }
-    if (r->high >= r->b->entities)
+    if (r->high >= r->w->entities)
         return (0);
     index = r->high;
     r->high++;
@@ -69,5 +69,5 @@ void storage_give_single(storage_t *r, storage_type_t *type,
     set_put(attached, type->id);
     tell_observers(r, &(seen_t){ 0, r->before, set, attached });
     set_single(r, type, true);
-    memcpy(r->b->shared + type->cells, bytes, size);
+    memcpy(r->w->shared + type->cells, bytes, size);
 }

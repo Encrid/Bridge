@@ -18,19 +18,19 @@ static int call_world(host_t *h)
 
     if (!strcmp(h->arg, "bridge_load")) {
         test_state_module(&a, "test:other@0.1.0", "chatty");
-        return (bridge_load(h->b, &a));
+        return (bridge_load(h->w, &a));
     }
     if (!strcmp(h->arg, "bridge_reload")) {
         test_state_module(&a, "test:chatty@0.1.0", "chatty");
-        return (bridge_reload(h->b, &a));
+        return (bridge_reload(h->w, &a));
     }
     if (!strcmp(h->arg, "bridge_unload"))
-        return (bridge_unload(h->b, "test:chatty@0.1.0"));
+        return (bridge_unload(h->w, "test:chatty@0.1.0"));
     if (!strcmp(h->arg, "bridge_run_phase"))
-        return (bridge_run_phase(h->b, "update"));
+        return (bridge_run_phase(h->w, "update"));
     if (!strcmp(h->arg, "bridge_destroy"))
-        return (bridge_destroy(h->b));
-    count = bridge_list_modules(h->b, list, 4);
+        return (bridge_destroy(h->w));
+    count = bridge_list_modules(h->w, list, 4);
     if (count > 0)
         printf("listed %s\n", list[0].identity);
     return (count);
@@ -118,6 +118,6 @@ void test_call_after_sink(host_t *h)
     result = call_world(h);
     printf("from the host: %s gave %d\n", h->arg, result);
     if (!strcmp(h->arg, "bridge_destroy") && !result)
-        h->b = nullptr;
+        h->w = nullptr;
     host_close(h);
 }

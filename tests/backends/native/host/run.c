@@ -34,7 +34,7 @@ void test_run_mover(host_t *h)
     if (host_open(h))
         return;
     test_load(h, "game:mover@0.1.0", NMOVER_PATH, 1024);
-    host_run_frames_unsaid(h->b, 2);
+    host_run_frames_unsaid(h->w, 2);
     host_close(h);
 }
 
@@ -51,6 +51,6 @@ void test_refuse_entry(host_t *h)
     if (host_open(h))
         return;
     test_load(h, "test:flood@0.1.0", NFLOOD_PATH, 1024);
-    (void)bridge_run_phase(h->b, "update");
+    (void)bridge_run_phase(h->w, "update");
     host_close(h);
 }

@@ -31,27 +31,27 @@ static uint32_t name_system(schedule_pairs_t *order, const char *name)
     return (at);
 }
 
-static int add_pair(bridge_t *b, const bridge_order_t *pair, uint32_t i)
+static int add_pair(bridge_world_t *w, const bridge_order_t *pair, uint32_t i)
 {
-    schedule_pairs_t *order = &b->order;
+    schedule_pairs_t *order = &w->order;
     uint32_t before;
     uint32_t after = 0;
 
     if (!is_full_name(pair->before) || !is_full_name(pair->after)
         || !strcmp(pair->before, pair->after)) {
-        say_error(b, "[order] pair %u does not name two systems", i);
+        say_error(w, "[order] pair %u does not name two systems", i);
         return (1);
     }
     before = name_system(order, pair->before);
     if (before < order->n)
         after = name_system(order, pair->after);
     if (before == order->n || after == order->n)
-        return (bridge_lacks(b, nullptr, "the order a deployment states"));
+        return (bridge_lacks(w, nullptr, "the order a deployment states"));
     schedule_add_edge(&order->reach, before, after);
     return (0);
 }
 
-static int check_pairs(bridge_t *b, schedule_pairs_t *pairs)
+static int check_pairs(bridge_world_t *w, schedule_pairs_t *pairs)
 {
     uint32_t i;
 
@@ -59,25 +59,26 @@ static int check_pairs(bridge_t *b, schedule_pairs_t *pairs)
     i = schedule_get_cycle(&pairs->reach);
     if (i == pairs->reach.n)
         return (0);
-    say_error(b, "[order] contradicts itself: '%s' would run before itself",
+    say_error(w, "[order] contradicts itself: '%s' would run before itself",
         pairs->names[i]);
     return (1);
 }
 
-int schedule_order(bridge_t *b, const bridge_order_t *order, uint32_t count)
+int schedule_order(bridge_world_t *w, const bridge_order_t *order,
+    uint32_t count)
 {
-    schedule_pairs_t *pairs = &b->order;
+    schedule_pairs_t *pairs = &w->order;
     int refused = !schedule_init_matrix(&pairs->reach, count * 2);
     uint32_t i = 0;
 
     pairs->names = calloc(count ? count * 2 : 1, sizeof(*pairs->names));
     if (refused || !pairs->names)
-        refused = bridge_lacks(b, nullptr, "the order a deployment states");
+        refused = bridge_lacks(w, nullptr, "the order a deployment states");
     while (i < count && !refused) {
-        refused = add_pair(b, &order[i], i);
+        refused = add_pair(w, &order[i], i);
         i++;
     }
     if (!refused && count)
-        refused = check_pairs(b, pairs);
+        refused = check_pairs(w, pairs);
     return (refused);
 }

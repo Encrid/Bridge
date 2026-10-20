@@ -38,41 +38,41 @@ static const storage_test_moved_t MOVED[] = {
 static const storage_test_moved_t MOVED_WITHOUT_ROOM = { 1, 2, "", nullptr,
     BRIDGE_NONE };
 
-static void say_kept(bridge_t *b)
+static void say_kept(bridge_world_t *w)
 {
     const declared_type_t *c;
     uint32_t i = 0;
 
-    while (i < b->type_count) {
-        c = b->types[i];
+    while (i < w->type_count) {
+        c = w->types[i];
         if (!strcmp(c->name, "st:X"))
             printf("  storage: st:X is %s, carried by %u\n",
                 KEPT_AS[c->storage],
-                storage_count_carriers(b->storage, c->type));
+                storage_count_carriers(w->storage, c->type));
         i++;
     }
 }
 
 static void move(storage_test_t *t, const storage_test_moved_t *row)
 {
-    bridge_t *b = bridge_create(&t->cfg, storage_test_hear, t);
+    bridge_world_t *w = bridge_create(&t->cfg, storage_test_hear, t);
     bridge_artifact_t a = storage_test_state(BUILDS[row->from], 8, 1 << 20,
         4096);
 
     printf("%s to %s%s%s\n", KEPT_AS[row->from], KEPT_AS[row->to],
         *row->prepare ? ", after " : "", row->prepare);
-    storage_test_load_reloadable(b, &a);
-    (void)bridge_run_phase(b, "spawn");
+    storage_test_load_reloadable(w, &a);
+    (void)bridge_run_phase(w, "spawn");
     if (*row->prepare)
-        (void)bridge_run_phase(b, row->prepare);
-    (void)bridge_run_phase(b, "look");
+        (void)bridge_run_phase(w, row->prepare);
+    (void)bridge_run_phase(w, "look");
     a.path = BUILDS[row->to];
     a.cfg.losses = row->losses;
     a.cfg.loss_count = row->loss_count;
-    printf("  reload: %s\n", bridge_reload(b, &a) ? "refused" : "done");
-    (void)bridge_run_phase(b, "look");
-    say_kept(b);
-    (void)bridge_destroy(b);
+    printf("  reload: %s\n", bridge_reload(w, &a) ? "refused" : "done");
+    (void)bridge_run_phase(w, "look");
+    say_kept(w);
+    (void)bridge_destroy(w);
 }
 
 enum storage_test_end storage_test_move(storage_test_t *t)
@@ -80,7 +80,7 @@ enum storage_test_end storage_test_move(storage_test_t *t)
     constexpr size_t count = sizeof(MOVED) / sizeof(*MOVED);
     size_t i = 0;
 
-    (void)bridge_destroy(t->b);
+    (void)bridge_destroy(t->w);
     t->cfg.budget.sparse_sets = 1;
     t->cfg.budget.direct_indexed = 1;
     while (i < count) {
@@ -89,6 +89,6 @@ enum storage_test_end storage_test_move(storage_test_t *t)
     }
     t->cfg.budget.columns = 112;
     move(t, &MOVED_WITHOUT_ROOM);
-    t->b = bridge_create(&t->cfg, storage_test_hear, t);
+    t->w = bridge_create(&t->cfg, storage_test_hear, t);
     return (STORAGE_TEST_DONE);
 }

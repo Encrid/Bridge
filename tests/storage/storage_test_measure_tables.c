@@ -62,6 +62,6 @@ int storage_test_measure_tables(storage_test_t *t)
     printf("%-38s %7.3f us a table\n", "ten thousand more, by one attach each",
         (double)now / 1000.0 / 10'000);
     measure_sets(t);
-    storage_test_say_held(t->b);
+    storage_test_say_held(t->w);
     return (0);
 }

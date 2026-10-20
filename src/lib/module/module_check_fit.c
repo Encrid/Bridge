@@ -32,7 +32,7 @@ static int check_log_level(const module_check_t *k)
         return (1);
     if (level <= BRIDGE_LEVEL_MOST)
         return (0);
-    return (module_refuse(k->b, k->id, "its log_level of %u is not one it "
+    return (module_refuse(k->w, k->id, "its log_level of %u is not one it "
         "can be, which is 1 to %u", level, BRIDGE_LEVEL_MOST));
 }
 
@@ -45,16 +45,16 @@ int module_check_fit(const module_check_t *k)
     if (check_log_level(k))
         return (1);
     if (!cfg->config || !*cfg->config)
-        return (module_refuse(k->b, k->id, "config is unset"));
-    if (cfg->spawns > (int64_t)k->b->entities)
-        return (module_refuse(k->b, k->id, "its spawns of %lld is more than "
-            "[budget] entities of %u", (long long)cfg->spawns, k->b->entities));
+        return (module_refuse(k->w, k->id, "config is unset"));
+    if (cfg->spawns > (int64_t)k->w->entities)
+        return (module_refuse(k->w, k->id, "its spawns of %lld is more than "
+            "[budget] entities of %u", (long long)cfg->spawns, k->w->entities));
     if (module_lay_private(cfg, k->on->granule, &at))
-        return (module_refuse(k->b, k->id, "its scratch of %u, log_ring of %u "
+        return (module_refuse(k->w, k->id, "its scratch of %u, log_ring of %u "
             "and spans of %u bytes come to more than an offset of 32 bits can "
             "reach", cfg->scratch, cfg->log_ring, cfg->spans));
     if (cfg->log_ring >= record)
         return (0);
-    return (module_refuse(k->b, k->id, "a log_ring of %u bytes holds no "
+    return (module_refuse(k->w, k->id, "a log_ring of %u bytes holds no "
         "record, and one is %u", cfg->log_ring, record));
 }

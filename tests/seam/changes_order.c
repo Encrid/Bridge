@@ -20,7 +20,7 @@ static void stamp_twice(host_t *h, bool nine_first)
     if (!nine_first)
         test_load_built(h, "game:stamp9@0.1.0", STAMP9_PATH, 8);
     test_load_watcher(h);
-    host_run_frames_unsaid(h->b, 2);
+    host_run_frames_unsaid(h->w, 2);
     host_close(h);
 }
 

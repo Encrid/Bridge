@@ -9,10 +9,10 @@
 
 static int churn_one(host_t *h, const bridge_artifact_t *a)
 {
-    int refused = bridge_load(h->b, a);
+    int refused = bridge_load(h->w, a);
 
     host_run_frames(h, 1);
-    (void)bridge_unload(h->b, a->cfg.identity);
+    (void)bridge_unload(h->w, a->cfg.identity);
     return (refused);
 }
 

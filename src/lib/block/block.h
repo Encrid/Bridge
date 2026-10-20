@@ -20,29 +20,30 @@ typedef struct {
     uint64_t reserve;
 } block_layout_t;
 
-[[nodiscard]] int block_create(bridge_t *b, const bridge_budget_t *budget);
-
-void block_destroy(bridge_t *b);
-
-[[nodiscard]] int block_check_budget(bridge_t *b,
+[[nodiscard]] int block_create(bridge_world_t *w,
     const bridge_budget_t *budget);
 
-[[nodiscard]] int block_lay_out(bridge_t *b, const bridge_budget_t *budget,
-    block_layout_t *layout);
+void block_destroy(bridge_world_t *w);
 
-int block_refill(bridge_t *b, module_t *m);
+[[nodiscard]] int block_check_budget(bridge_world_t *w,
+    const bridge_budget_t *budget);
 
-void block_write_header(bridge_t *b, module_t *m);
+[[nodiscard]] int block_lay_out(bridge_world_t *w,
+    const bridge_budget_t *budget, block_layout_t *layout);
 
-void block_drain(bridge_t *b, module_t *m);
+int block_refill(bridge_world_t *w, module_t *m);
 
-void block_hand_out(bridge_t *b);
+void block_write_header(bridge_world_t *w, module_t *m);
 
-void block_barrier(bridge_t *b);
+void block_drain(bridge_world_t *w, module_t *m);
 
-[[nodiscard]] void *block_column_regrow(bridge_t *b, void *ptr,
+void block_hand_out(bridge_world_t *w);
+
+void block_barrier(bridge_world_t *w);
+
+[[nodiscard]] void *block_column_regrow(bridge_world_t *w, void *ptr,
     uint32_t old_size, uint32_t new_size);
 
-void block_column_free(bridge_t *b, void *ptr, uint32_t size);
+void block_column_free(bridge_world_t *w, void *ptr, uint32_t size);
 
 #endif

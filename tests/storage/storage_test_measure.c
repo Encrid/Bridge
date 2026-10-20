@@ -74,7 +74,7 @@ static int measure_changes(storage_test_t *t)
     say_ops(&m);
     (void)storage_test_time_barrier(t, "spawn");
     (void)storage_test_time_barrier(t, "attach_both");
-    storage_test_say_held(t->b);
+    storage_test_say_held(t->w);
     return (0);
 }
 

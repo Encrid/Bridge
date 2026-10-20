@@ -39,7 +39,7 @@ static uint32_t count_text(const config_seed_t *seed)
 static bool reuse_kept(config_seed_t *seed, uint32_t total)
 {
     module_t *m = seed->m;
-    const kept_text_t *kept = config_find_kept(seed->b, m->stem);
+    const kept_text_t *kept = config_find_kept(seed->w, m->stem);
 
     if (!kept || kept->room < total)
         return (false);

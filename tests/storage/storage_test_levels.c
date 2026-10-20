@@ -18,7 +18,7 @@ static bool count_reach(const schedule_matrix_t *m, uint32_t i, uint32_t j)
     return (schedule_reaches(m, i, j));
 }
 
-int counted_build(bridge_t *b, char *why, size_t why_len);
+int counted_build(bridge_world_t *w, char *why, size_t why_len);
 
 #define schedule_reaches count_reach
 #define schedule_build counted_build
@@ -42,7 +42,7 @@ static bridge_system_t *make_system(module_t *m, declared_type_t *c,
     return (s);
 }
 
-static bool fill_world(bridge_t *b, bridge_system_t **list, module_t *m,
+static bool fill_world(bridge_world_t *w, bridge_system_t **list, module_t *m,
     declared_type_t *c)
 {
     uint32_t i = 0;
@@ -55,14 +55,14 @@ static bool fill_world(bridge_t *b, bridge_system_t **list, module_t *m,
             schedule_join_before(list[i], list[i - 1]);
         i++;
     }
-    b->systems = list;
-    b->system_count = CHAIN_SYSTEMS;
-    b->build_in = calloc(CHAIN_SYSTEMS, sizeof(*b->build_in));
-    b->build_bits = calloc(CHAIN_SYSTEMS * 2 + 1, sizeof(*b->build_bits));
-    return (b->build_in && b->build_bits);
+    w->systems = list;
+    w->system_count = CHAIN_SYSTEMS;
+    w->build_in = calloc(CHAIN_SYSTEMS, sizeof(*w->build_in));
+    w->build_bits = calloc(CHAIN_SYSTEMS * 2 + 1, sizeof(*w->build_bits));
+    return (w->build_in && w->build_bits);
 }
 
-static void free_all(bridge_t *b, bridge_system_t **list)
+static void free_all(bridge_world_t *w, bridge_system_t **list)
 {
     uint32_t i = 0;
 
@@ -70,8 +70,8 @@ static void free_all(bridge_t *b, bridge_system_t **list)
         free(list[i]);
         i++;
     }
-    free(b->build_in);
-    free(b->build_bits);
+    free(w->build_in);
+    free(w->build_bits);
 }
 
 enum storage_test_end storage_test_count_levels([[maybe_unused]] storage_test_t *t)
@@ -81,15 +81,15 @@ enum storage_test_end storage_test_count_levels([[maybe_unused]] storage_test_t 
     char *phases[1] = { update };
     declared_type_t c = { .name = update };
     module_t m = {};
-    bridge_t b = { .phases = phases, .phase_count = 1 };
+    bridge_world_t w = { .phases = phases, .phase_count = 1 };
     char why[256] = "";
-    bool made = fill_world(&b, list, &m, &c);
-    int refused = made ? counted_build(&b, why, sizeof(why)) : 1;
+    bool made = fill_world(&w, list, &m, &c);
+    int refused = made ? counted_build(&w, why, sizeof(why)) : 1;
 
     printf("levels: %u systems in one phase, %s: set_levels tested reach %llu "
         "times, last level %u\n", CHAIN_SYSTEMS,
         refused ? "refused" : "built", (unsigned long long)reach_tests,
         made ? list[CHAIN_SYSTEMS - 1]->level : 0);
-    free_all(&b, list);
+    free_all(&w, list);
     return (STORAGE_TEST_DONE);
 }

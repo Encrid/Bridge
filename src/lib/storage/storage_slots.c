@@ -46,7 +46,7 @@ void storage_let_write([[maybe_unused]] storage_t *r, module_t *m,
 
 void storage_undeclare(storage_t *r, storage_type_t *type)
 {
-    bridge_t *b = r->b;
+    bridge_world_t *w = r->w;
 
     r->apart -= type->kept != BRIDGE_TABLE && type->kept != BRIDGE_TOGGLE;
     r->tags -= !type->size;
@@ -57,7 +57,7 @@ void storage_undeclare(storage_t *r, storage_type_t *type)
     if (type->kept == BRIDGE_DIRECT_INDEXED)
         r->direct_type[type->slot] = nullptr;
     if (type->cells_len)
-        block_column_free(b, b->shared + type->cells, type->cells_len);
+        block_column_free(w, w->shared + type->cells, type->cells_len);
     type->set = false;
     r->types[type->id] = nullptr;
 }

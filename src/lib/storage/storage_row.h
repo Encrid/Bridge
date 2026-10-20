@@ -19,7 +19,7 @@ static inline void place_row(storage_t *r, uint32_t index, uint32_t t,
 
     p->table = t;
     p->row = row;
-    r->b->index[index] = (bridge_entity_t){ t, row, p->generation };
+    r->w->index[index] = (bridge_entity_t){ t, row, p->generation };
 }
 
 static inline void seat_row(storage_t *r, const table_t *tab, uint32_t index,
@@ -41,7 +41,7 @@ static inline uint32_t append_row(storage_t *r, uint32_t t, uint32_t index)
 
     tab->rows++;
     get_who(r, tab)[row] = id;
-    memcpy(r->b->shared + tab->block + 8ull * row, &id, 8);
+    memcpy(r->w->shared + tab->block + 8ull * row, &id, 8);
     touch(r, t);
     return (row);
 }
@@ -58,7 +58,7 @@ static inline uint32_t append_row(storage_t *r, uint32_t t, uint32_t index)
 
     while (id < r->type_room) {
         size = r->types[id]->size;
-        column = r->b->shared + columns[id];
+        column = r->w->shared + columns[id];
         copy_bytes(column + row * size, column + last * size, (uint32_t)size);
         if (r->types[id]->kept == BRIDGE_TOGGLE)
             turn_row(r, get_bits(columns[id], room), row,
@@ -80,7 +80,7 @@ static inline uint32_t append_row(storage_t *r, uint32_t t, uint32_t index)
         return;
     fill_row(r, t, row, last);
     who[row] = who[last];
-    memcpy(r->b->shared + tab->block + 8ull * row, &who[row], 8);
+    memcpy(r->w->shared + tab->block + 8ull * row, &who[row], 8);
     if (tab->set)
         seat_row(r, tab, (uint32_t)who[row], row);
     else

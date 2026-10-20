@@ -7,12 +7,12 @@
 
 #include "module.h"
 
-static void free_system(bridge_t *b, bridge_system_t *s)
+static void free_system(bridge_world_t *w, bridge_system_t *s)
 {
     if (s->matched)
-        storage_forget(b->storage, s->matched);
+        storage_forget(w->storage, s->matched);
     if (s->parked)
-        b->parked--;
+        w->parked--;
     free(s->asked);
     free(s->pending);
     free(s->name);
@@ -20,21 +20,21 @@ static void free_system(bridge_t *b, bridge_system_t *s)
     free(s);
 }
 
-void module_drop_systems(bridge_t *b, module_t *m)
+void module_drop_systems(bridge_world_t *w, module_t *m)
 {
     bridge_system_t *s;
     uint32_t kept = 0;
     uint32_t i = 0;
 
-    while (i < b->system_count) {
-        s = b->systems[i];
+    while (i < w->system_count) {
+        s = w->systems[i];
         if (s->m == m)
-            free_system(b, s);
+            free_system(w, s);
         else
-            b->systems[kept++] = s;
+            w->systems[kept++] = s;
         i++;
     }
-    b->system_count = kept;
+    w->system_count = kept;
     m->system_count = 0;
     m->observer_count = 0;
 }
@@ -73,9 +73,9 @@ static void free_record(module_t *m)
     free(m);
 }
 
-void module_discard(bridge_t *b, module_t *m)
+void module_discard(bridge_world_t *w, module_t *m)
 {
-    module_drop_systems(b, m);
+    module_drop_systems(w, m);
     if (m->instance)
         m->on->api.instance_destroy(m->instance);
     if (m->image)

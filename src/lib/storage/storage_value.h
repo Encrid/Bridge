@@ -50,7 +50,7 @@ static inline void join_set(storage_t *r, uint32_t slot, uint32_t index)
     const storage_type_t *type = r->set_type[slot];
     uint32_t t = r->set_table[slot];
     uint32_t row = append_row(r, t, index);
-    uint8_t *column = r->b->shared + get_columns(r, t)[type->id];
+    uint8_t *column = r->w->shared + get_columns(r, t)[type->id];
 
     clear_bytes(column + (size_t)row * type->size, type->size);
     seat_row(r, &r->tables[t], index, row);

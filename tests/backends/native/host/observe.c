@@ -31,7 +31,7 @@ void test_observe(host_t *h)
         return;
     test_load(h, "game:setter@0.1.0", NSETTER_PATH, 8);
     test_load_watcher(h);
-    host_run_frames_unsaid(h->b, 2);
+    host_run_frames_unsaid(h->w, 2);
     host_close(h);
 }
 
@@ -44,7 +44,7 @@ void test_order_changes(host_t *h)
     test_load(h, "game:stamp5@0.1.0", NSTAMP5_PATH, 8);
     test_load(h, "game:stamp9@0.1.0", NSTAMP9_PATH, 8);
     test_load_watcher(h);
-    host_run_frames_unsaid(h->b, 2);
+    host_run_frames_unsaid(h->w, 2);
     host_close(h);
 }
 
@@ -53,6 +53,6 @@ void test_enter_from_foreign_thread(host_t *h)
     if (host_open(h))
         return;
     test_load(h, "test:foreign@0.1.0", NFOREIGN_PATH, 8);
-    host_run_frames_unsaid(h->b, 1);
+    host_run_frames_unsaid(h->w, 1);
     host_close(h);
 }

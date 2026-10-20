@@ -10,7 +10,7 @@
 
 enum storage_test_end storage_test_wrap_generation(storage_test_t *t)
 {
-    storage_t *r = t->b->storage;
+    storage_t *r = t->w->storage;
     uint64_t id;
     uint32_t index;
 

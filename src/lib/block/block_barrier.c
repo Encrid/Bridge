@@ -5,73 +5,73 @@
 */
 #include "block.h"
 
-static void refill_all(bridge_t *b)
+static void refill_all(bridge_world_t *w)
 {
-    module_t *m = b->modules;
+    module_t *m = w->modules;
 
     while (m) {
-        block_refill(b, m);
+        block_refill(w, m);
         m = m->next;
     }
 }
 
-static void stop_full(bridge_t *b, module_t *m, const char *list)
+static void stop_full(bridge_world_t *w, module_t *m, const char *list)
 {
     const say_t about = { m, nullptr, BRIDGE_ERR };
 
     m->stopped = 1;
     if (list) {
-        say_about(b, &about, "module '%s' is stopped: the list of its "
+        say_about(w, &about, "module '%s' is stopped: the list of its "
             "observer '%s' no longer fits in its spans of %u bytes",
             m->identity, list, m->spans_len);
     } else {
-        say_about(b, &about, "module '%s' is stopped: what its queries "
+        say_about(w, &about, "module '%s' is stopped: what its queries "
             "match no longer fits in its spans of %u bytes", m->identity,
             m->spans_len);
     }
     if (m->on_error == BRIDGE_FAIL)
-        bridge_stop(b, m->identity, "was stopped");
+        bridge_stop(w, m->identity, "was stopped");
 }
 
-static void publish_all(bridge_t *b)
+static void publish_all(bridge_world_t *w)
 {
-    module_t *m = b->modules;
+    module_t *m = w->modules;
     const char *list;
 
     while (m) {
         list = nullptr;
-        if (!m->stopped && storage_publish(b->storage, m, &list))
-            stop_full(b, m, list);
+        if (!m->stopped && storage_publish(w->storage, m, &list))
+            stop_full(w, m, list);
         m = m->next;
     }
 }
 
-static void finish_barrier(bridge_t *b)
+static void finish_barrier(bridge_world_t *w)
 {
-    module_t *m = b->modules;
+    module_t *m = w->modules;
     uint32_t i = 0;
 
-    b->turns = 0;
-    while (i < b->system_count) {
-        b->systems[i]->pending_count = 0;
+    w->turns = 0;
+    while (i < w->system_count) {
+        w->systems[i]->pending_count = 0;
         i++;
     }
-    schedule_account(b);
+    schedule_account(w);
     while (m) {
-        block_drain(b, m);
+        block_drain(w, m);
         m = m->next;
     }
-    b->barriers++;
+    w->barriers++;
 }
 
-void block_barrier(bridge_t *b)
+void block_barrier(bridge_world_t *w)
 {
-    block_hand_out(b);
-    storage_apply(b->storage);
-    refill_all(b);
-    publish_all(b);
-    storage_end_publish(b->storage);
-    b->layout_moved = 0;
-    schedule_run(b, b->phase_count);
-    finish_barrier(b);
+    block_hand_out(w);
+    storage_apply(w->storage);
+    refill_all(w);
+    publish_all(w);
+    storage_end_publish(w->storage);
+    w->layout_moved = 0;
+    schedule_run(w, w->phase_count);
+    finish_barrier(w);
 }

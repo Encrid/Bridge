@@ -57,7 +57,7 @@ An artifact that the checks hold before it is touched: all that a load and a rel
 
 | Field | Content |
 | --- | --- |
-| `b` | The world. |
+| `w` | The world. |
 | `a` | The artifact. |
 | `cfg`, `id` | The config of the artifact, and the identity that the config states. |
 | `on` | The backend that the artifact names. |

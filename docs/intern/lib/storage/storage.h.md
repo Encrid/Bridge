@@ -30,7 +30,7 @@ These sections tell how storage keeps each layout, and a tag in each of them:
 
 ## Types
 
-### bridge_t, module_t
+### bridge_world_t, module_t
 
 The world and a loaded module. `src/lib/inside.h` defines them.
 

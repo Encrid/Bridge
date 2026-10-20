@@ -18,21 +18,21 @@ void host_print_record([[maybe_unused]] void *ud, const bridge_record_t *r)
 
 void host_load(host_t *h, const bridge_artifact_t *a)
 {
-    const char *ended = bridge_load(h->b, a) ? "not loaded" : "loaded";
+    const char *ended = bridge_load(h->w, a) ? "not loaded" : "loaded";
 
     printf("%s: %s\n", a->cfg.identity, ended);
 }
 
 void host_reload(host_t *h, const bridge_artifact_t *a)
 {
-    const char *ended = bridge_reload(h->b, a) ? "not reloaded" : "reloaded";
+    const char *ended = bridge_reload(h->w, a) ? "not reloaded" : "reloaded";
 
     printf("%s: %s\n", a->cfg.identity, ended);
 }
 
 void host_unload(host_t *h, const char *identity)
 {
-    const char *ended = bridge_unload(h->b, identity) ? "not unloaded"
+    const char *ended = bridge_unload(h->w, identity) ? "not unloaded"
         : "unloaded";
 
     printf("%s: %s\n", identity, ended);
@@ -43,9 +43,9 @@ void host_run_frames(host_t *h, int count)
     int i = 0;
 
     while (i < count) {
-        if (bridge_run_phase(h->b, "update"))
+        if (bridge_run_phase(h->w, "update"))
             printf("update refused\n");
-        if (bridge_run_phase(h->b, "present"))
+        if (bridge_run_phase(h->w, "present"))
             printf("present refused\n");
         i++;
     }

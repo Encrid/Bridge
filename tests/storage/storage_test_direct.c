@@ -52,7 +52,7 @@ static void say_alive(const storage_test_t *t)
     bool alive;
 
     while (e <= 6) {
-        alive = storage_is_alive(t->b->storage, (uint64_t)1 << 32 | e);
+        alive = storage_is_alive(t->w->storage, (uint64_t)1 << 32 | e);
         printf("entity %u is %s\n", e, alive ? "alive" : "gone");
         e++;
     }

@@ -27,7 +27,7 @@ static bool has_field_of(const declared_type_t *other,
 static const module_t *find_declarer(const module_t *m,
     const declared_type_t *type)
 {
-    const module_t *o = m->b->modules;
+    const module_t *o = m->w->modules;
     uint32_t d;
 
     while (o) {
@@ -45,14 +45,14 @@ static const module_t *find_declarer(const module_t *m,
 const declared_type_t *abi_find_holder(const module_t *m,
     const declared_type_t *c, const module_t **by)
 {
-    const bridge_t *b = m->b;
+    const bridge_world_t *w = m->w;
     uint32_t i = 0;
 
-    while (i < b->type_count) {
-        *by = has_field_of(b->types[i], c) ? find_declarer(m, b->types[i])
+    while (i < w->type_count) {
+        *by = has_field_of(w->types[i], c) ? find_declarer(m, w->types[i])
             : nullptr;
         if (*by)
-            return (b->types[i]);
+            return (w->types[i]);
         i++;
     }
     return (nullptr);
@@ -61,7 +61,7 @@ const declared_type_t *abi_find_holder(const module_t *m,
 int abi_check_move(module_t *m, const declared_type_t *c,
     enum bridge_storage kept)
 {
-    storage_t *storage = m->b->storage;
+    storage_t *storage = m->w->storage;
     uint32_t carriers = storage_count_carriers(storage, c->type);
     uint32_t off = storage_count_off(storage, c->type);
 

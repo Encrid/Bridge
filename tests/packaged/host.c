@@ -30,13 +30,13 @@ static void state(bridge_artifact_t *a, const char *backend,
         .loss_count = BRIDGE_NONE, .config = BRIDGE_NO_CONFIG };
 }
 
-static int load_module(bridge_t *b)
+static int load_module(bridge_world_t *w)
 {
     bridge_artifact_t a;
 
     state(&a, "tests", "packed:module@0.1.0");
     a.path = MODULE;
-    return (bridge_load(b, &a));
+    return (bridge_load(w, &a));
 }
 
 static const bridge_setting_t TOLD[4] = {
@@ -56,13 +56,13 @@ int main(void)
         .systems = 8, .terms = 8, .modules = 4, .persistent = 4096,
         .columns = 1 << 16, .sparse_sets = BRIDGE_NONE,
         .direct_indexed = BRIDGE_NONE }};
-    bridge_t *b = bridge_create(&cfg, say, nullptr);
+    bridge_world_t *w = bridge_create(&cfg, say, nullptr);
 
     setvbuf(stdout, nullptr, _IONBF, 0);
-    if (!b || load_module(b))
+    if (!w || load_module(w))
         return (printf("refused\n"), 1);
     for (int i = 0; i < 3; i++)
-        (void)bridge_run_phase(b, "update");
-    printf("destroyed: %d\n", bridge_destroy(b));
+        (void)bridge_run_phase(w, "update");
+    printf("destroyed: %d\n", bridge_destroy(w));
     return (0);
 }

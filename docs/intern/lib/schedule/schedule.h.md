@@ -125,7 +125,7 @@ One phase that `schedule_run` runs.
 
 | Field | Content |
 | --- | --- |
-| `b` | The world. |
+| `w` | The world. |
 | `phase` | The index of the phase. |
 | `level` | The level that runs. |
 | `count` | How many jobs the level has. |

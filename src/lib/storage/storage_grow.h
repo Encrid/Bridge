@@ -36,7 +36,7 @@ static inline void move_column(storage_t *r, uint32_t t, uint32_t id,
 {
     const table_t *tab = &r->tables[t];
     const storage_type_t *type = r->types[id];
-    uint8_t *block = r->b->shared + tab->block;
+    uint8_t *block = r->w->shared + tab->block;
     uint32_t *columns = get_columns(r, t);
     uint32_t from = columns[id] - old->block;
     uint32_t bits = get_bits(columns[id], old->room) - old->block;
@@ -88,7 +88,7 @@ static inline bool grow_table(storage_t *r, uint32_t t, uint32_t room)
 
     if (room <= old.room || !block)
         return (room <= old.room);
-    tab->block = (uint32_t)(block - r->b->shared);
+    tab->block = (uint32_t)(block - r->w->shared);
     tab->block_len = (uint32_t)len;
     tab->room = room;
     if (old.block)

@@ -67,7 +67,7 @@ static bool alloc_room(module_t *m, const bridge_module_config_t *cfg)
     return ((cfg->spawns <= 0 || m->ids) && (cfg->changes <= 0 || m->queue));
 }
 
-static bool copy_phases(const bridge_t *b, module_t *m,
+static bool copy_phases(const bridge_world_t *w, module_t *m,
     const bridge_module_config_t *cfg)
 {
     size_t count = cfg->phase_count ? cfg->phase_count : 1;
@@ -79,7 +79,7 @@ static bool copy_phases(const bridge_t *b, module_t *m,
     m->phase_to = calloc(count, sizeof(*m->phase_to));
     whole = m->phase_from && m->phase_to;
     while (whole && i < cfg->phase_count) {
-        m->phase_to[i] = bridge_find_phase(b->phases, b->phase_count, n[i].to,
+        m->phase_to[i] = bridge_find_phase(w->phases, w->phase_count, n[i].to,
             strlen(n[i].to));
         m->phase_from[i] = copy_text(n[i].from, strlen(n[i].from));
         whole = m->phase_from[i] != nullptr;
@@ -89,27 +89,27 @@ static bool copy_phases(const bridge_t *b, module_t *m,
     return (whole);
 }
 
-module_t *module_record(bridge_t *b, const bridge_artifact_t *a,
+module_t *module_record(bridge_world_t *w, const bridge_artifact_t *a,
     open_backend_t *o)
 {
     const bridge_module_config_t *cfg = &a->cfg;
     module_t *m = calloc(1, sizeof(*m));
     bool whole;
 
-    if (bridge_lacks(b, m, "a module's record"))
+    if (bridge_lacks(w, m, "a module's record"))
         return (nullptr);
-    m->b = b;
+    m->w = w;
     m->on = o;
     copy_stated(m, cfg);
     whole = alloc_room(m, cfg);
-    whole = copy_phases(b, m, cfg) && whole;
+    whole = copy_phases(w, m, cfg) && whole;
     m->read = copy_list(cfg->read, cfg->read_count);
     m->read_count = m->read ? cfg->read_count : 0;
     m->write = copy_list(cfg->write, cfg->write_count);
     m->write_count = m->write ? cfg->write_count : 0;
     if (whole && m->read && m->write)
         return (m);
-    (void)bridge_lacks(b, nullptr, "a module's record");
-    module_discard(b, m);
+    (void)bridge_lacks(w, nullptr, "a module's record");
+    module_discard(w, m);
     return (nullptr);
 }

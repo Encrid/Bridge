@@ -15,14 +15,14 @@ static inline uint32_t *get_columns(const storage_t *r, uint32_t t)
 
 static inline uint32_t *get_where(const storage_t *r, uint32_t slot)
 {
-    return (r->where + (size_t)slot * r->b->entities);
+    return (r->where + (size_t)slot * r->w->entities);
 }
 
 static inline uint32_t *get_cells(const storage_t *r, uint32_t slot)
 {
-    uint32_t *cells = (uint32_t *)(r->b->shared + r->b->sparse);
+    uint32_t *cells = (uint32_t *)(r->w->shared + r->w->sparse);
 
-    return (cells + (size_t)slot * r->b->entities);
+    return (cells + (size_t)slot * r->w->entities);
 }
 
 static inline uint64_t *get_given(const storage_t *r, uint32_t slot)
@@ -32,7 +32,7 @@ static inline uint64_t *get_given(const storage_t *r, uint32_t slot)
 
 static inline uint64_t *get_shown(const storage_t *r, uint32_t slot)
 {
-    uint64_t *shown = (uint64_t *)(r->b->shared + r->b->direct);
+    uint64_t *shown = (uint64_t *)(r->w->shared + r->w->direct);
 
     return (shown + (size_t)slot * r->bit_words);
 }

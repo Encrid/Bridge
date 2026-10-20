@@ -26,12 +26,12 @@ static void write_cells(publish_t *p, uint32_t t)
     }
 }
 
-static uint32_t get_kept(const bridge_t *b, const storage_type_t *type)
+static uint32_t get_kept(const bridge_world_t *w, const storage_type_t *type)
 {
-    uint64_t index = 4ull * type->slot * b->entities;
+    uint64_t index = 4ull * type->slot * w->entities;
 
     if (type->kept == BRIDGE_SPARSE_SET)
-        return (b->sparse + (uint32_t)index);
+        return (w->sparse + (uint32_t)index);
     if (type->kept == BRIDGE_DIRECT_INDEXED)
         return (type->cells + (uint32_t)COLUMN);
     if (type->kept != BRIDGE_SINGLETON || !type->set)
@@ -45,7 +45,7 @@ static void write_slots(publish_t *p)
     uint32_t s = 0;
 
     while (s < m->declared_count) {
-        p->kept[s] = get_kept(p->r->b, m->declared[s]->type);
+        p->kept[s] = get_kept(p->r->w, m->declared[s]->type);
         p->stride[s] = m->declared[s]->type->size;
         p->write[s] = m->may_write[s] ? 1u : 0u;
         p->kind[s] = m->declared[s]->type->kept;
@@ -60,7 +60,7 @@ static void write_every_cell(publish_t *p)
     uint32_t tables = r->table_room + 1;
     uint32_t t = 1;
 
-    block_write_header(r->b, m);
+    block_write_header(r->w, m);
     memset(p->cell, 0, 4u * m->declared_count * tables);
     memset(p->rows, 0, 4u * tables);
     memset(p->blocks, 0, 4u * tables);

@@ -22,7 +22,7 @@ static void load_three(host_t *h)
     a.cfg.write_count = 1;
     host_load(h, &a);
     test_load_game_reader(h);
-    host_run_frames_unsaid(h->b, 1);
+    host_run_frames_unsaid(h->w, 1);
     host_close(h);
 }
 

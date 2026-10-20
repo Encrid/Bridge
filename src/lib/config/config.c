@@ -18,7 +18,7 @@ static int check_none(config_seed_t *seed)
 
 static int check_taken(config_seed_t *seed)
 {
-    const module_t *other = seed->b->modules;
+    const module_t *other = seed->w->modules;
 
     while (other && other->config != seed->c)
         other = other->next;
@@ -66,7 +66,7 @@ static int seed_all(config_seed_t *seed)
         i++;
     }
     if (!refused && seed->writing) {
-        storage_give_single(seed->b->storage, c->type, seed->row, c->size);
+        storage_give_single(seed->w->storage, c->type, seed->row, c->size);
         seed->m->config = c;
     }
     free(seed->row);
@@ -76,7 +76,7 @@ static int seed_all(config_seed_t *seed)
 int config_seed(module_t *m, const bridge_module_config_t *cfg,
     backend_err_t *err, bool writing)
 {
-    config_seed_t seed = { .b = m->b, .m = m, .cfg = cfg, .why = err->text,
+    config_seed_t seed = { .w = m->w, .m = m, .cfg = cfg, .why = err->text,
         .writing = writing };
 
     seed.why_len = sizeof(err->text);

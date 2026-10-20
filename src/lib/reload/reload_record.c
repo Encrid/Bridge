@@ -11,7 +11,7 @@
 static module_t *alloc_record(reloading_t *r)
 {
     const module_t *old = r->old;
-    module_t *n = module_record(r->b, r->a, r->on);
+    module_t *n = module_record(r->w, r->a, r->on);
     uint64_t *ids = nullptr;
 
     if (!n)
@@ -25,8 +25,8 @@ static module_t *alloc_record(reloading_t *r)
     }
     if (n->owned && n->id_room >= old->id_count)
         return (n);
-    (void)bridge_lacks(r->b, nullptr, "a reloaded module's record");
-    module_discard(r->b, n);
+    (void)bridge_lacks(r->w, nullptr, "a reloaded module's record");
+    module_discard(r->w, n);
     return (nullptr);
 }
 
@@ -43,7 +43,7 @@ static void take_ids(module_t *n, const module_t *old)
 
 static void take_share(const reloading_t *r, module_t *n, const module_t *old)
 {
-    uint32_t at = r->b->arena + r->extra_at;
+    uint32_t at = r->w->arena + r->extra_at;
 
     n->arena_share = old->arena_share + r->extra;
     n->arena_at = old->arena_at;

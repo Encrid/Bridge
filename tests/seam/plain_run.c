@@ -32,7 +32,7 @@ void test_run_plain(host_t *h)
         return;
     test_state_plain(&a, "game:mover@0.1.0", TMOVER_PATH);
     host_load(h, &a);
-    host_run_frames_unsaid(h->b, 2);
+    host_run_frames_unsaid(h->w, 2);
     host_close(h);
 }
 
@@ -46,7 +46,7 @@ void test_run_mixed(host_t *h)
     host_load(h, &a);
     test_state_reader_limited(&a);
     host_load(h, &a);
-    host_run_frames_unsaid(h->b, 2);
+    host_run_frames_unsaid(h->w, 2);
     host_close(h);
 }
 
@@ -58,6 +58,6 @@ void test_refuse_entry(host_t *h)
         return;
     test_state_plain(&a, "test:flood@0.1.0", TFLOOD_PATH);
     host_load(h, &a);
-    (void)bridge_run_phase(h->b, "update");
+    (void)bridge_run_phase(h->w, "update");
     host_close(h);
 }

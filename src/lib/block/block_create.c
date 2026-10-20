@@ -7,65 +7,65 @@
 
 #include "block.h"
 
-static int map_block(bridge_t *b, const block_layout_t *layout)
+static int map_block(bridge_world_t *w, const block_layout_t *layout)
 {
-    b->shared = os_reserve((size_t)layout->reserve, (size_t)layout->len);
-    if (!b->shared) {
-        say_error(b, "[budget] cannot be satisfied: the operating system "
+    w->shared = os_reserve((size_t)layout->reserve, (size_t)layout->len);
+    if (!w->shared) {
+        say_error(w, "[budget] cannot be satisfied: the operating system "
             "would not give %llu bytes, in a reservation of %llu bytes",
             (unsigned long long)layout->len,
             (unsigned long long)layout->reserve);
         return (1);
     }
-    b->shared_len = (size_t)layout->len;
-    b->shared_reserve = (size_t)layout->reserve;
-    b->index = (bridge_entity_t *)(b->shared + layout->index);
-    b->sparse = (uint32_t)layout->sparse;
-    b->sparse_sets = (uint32_t)layout->sets;
-    b->direct = (uint32_t)layout->direct;
-    b->direct_indexed = (uint32_t)layout->cells;
-    b->arena = (uint32_t)layout->arena;
-    b->columns = (uint32_t)layout->columns;
+    w->shared_len = (size_t)layout->len;
+    w->shared_reserve = (size_t)layout->reserve;
+    w->index = (bridge_entity_t *)(w->shared + layout->index);
+    w->sparse = (uint32_t)layout->sparse;
+    w->sparse_sets = (uint32_t)layout->sets;
+    w->direct = (uint32_t)layout->direct;
+    w->direct_indexed = (uint32_t)layout->cells;
+    w->arena = (uint32_t)layout->arena;
+    w->columns = (uint32_t)layout->columns;
     return (0);
 }
 
-static void set_limits(bridge_t *b, const bridge_budget_t *budget)
+static void set_limits(bridge_world_t *w, const bridge_budget_t *budget)
 {
-    b->entities = (uint32_t)budget->entities;
-    b->arena_len = (uint32_t)budget->persistent;
-    b->columns_len = (uint32_t)budget->columns;
-    b->max_modules = budget->modules;
-    b->tables = budget->tables;
-    b->max_types = budget->types;
-    b->max_systems = budget->systems;
-    b->max_terms = budget->terms;
+    w->entities = (uint32_t)budget->entities;
+    w->arena_len = (uint32_t)budget->persistent;
+    w->columns_len = (uint32_t)budget->columns;
+    w->max_modules = budget->modules;
+    w->tables = budget->tables;
+    w->max_types = budget->types;
+    w->max_systems = budget->systems;
+    w->max_terms = budget->terms;
 }
 
-static int make_storage(bridge_t *b)
+static int make_storage(bridge_world_t *w)
 {
-    uint32_t room = b->tables + b->sparse_sets + b->max_types + 1;
+    uint32_t room = w->tables + w->sparse_sets + w->max_types + 1;
 
-    b->column_space = (region_t){ .room = room, .len = b->columns_len };
-    b->column_space.gaps = malloc(room * sizeof(range_t));
-    b->arena_space = (region_t){ .len = b->arena_len };
-    if (bridge_lacks(b, b->column_space.gaps, "the list of what is free in "
+    w->column_space = (region_t){ .room = room, .len = w->columns_len };
+    w->column_space.gaps = malloc(room * sizeof(range_t));
+    w->arena_space = (region_t){ .len = w->arena_len };
+    if (bridge_lacks(w, w->column_space.gaps, "the list of what is free in "
         "[budget] columns"))
         return (1);
-    b->storage = storage_create(b);
-    return (!b->storage);
+    w->storage = storage_create(w);
+    return (!w->storage);
 }
 
-static int adopt_shared(bridge_t *b)
+static int adopt_shared(bridge_world_t *w)
 {
     backend_err_t err = {};
-    open_backend_t *o = b->backends;
+    open_backend_t *o = w->backends;
     uint32_t i = 0;
 
-    while (i < b->backend_count) {
-        o = &b->backends[i];
-        o->shared = o->api.memory_adopt(o->be, b->shared, b->shared_len, &err);
+    while (i < w->backend_count) {
+        o = &w->backends[i];
+        o->shared = o->api.memory_adopt(o->be, w->shared, w->shared_len, &err);
         if (!o->shared) {
-            say_error(b, "backend '%s' cannot adopt the shared memory: %s",
+            say_error(w, "backend '%s' cannot adopt the shared memory: %s",
                 o->name, err.text);
             return (1);
         }
@@ -74,16 +74,16 @@ static int adopt_shared(bridge_t *b)
     return (0);
 }
 
-int block_create(bridge_t *b, const bridge_budget_t *budget)
+int block_create(bridge_world_t *w, const bridge_budget_t *budget)
 {
     block_layout_t layout = {};
 
-    if (block_check_budget(b, budget) || block_lay_out(b, budget, &layout))
+    if (block_check_budget(w, budget) || block_lay_out(w, budget, &layout))
         return (1);
-    if (map_block(b, &layout))
+    if (map_block(w, &layout))
         return (1);
-    set_limits(b, budget);
-    if (make_storage(b))
+    set_limits(w, budget);
+    if (make_storage(w))
         return (1);
-    return (adopt_shared(b));
+    return (adopt_shared(w));
 }

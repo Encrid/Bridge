@@ -18,26 +18,26 @@ static uint32_t find_phase(const storage_test_t *t, const char *phase)
 
 uint64_t storage_test_time_barrier(storage_test_t *t, const char *phase)
 {
-    bridge_t *b = t->b;
+    bridge_world_t *w = t->w;
     uint32_t i = find_phase(t, phase);
     uint64_t began = os_get_now();
 
-    schedule_run(b, i);
+    schedule_run(w, i);
     t->called = os_get_now() - began;
     began = os_get_now();
-    block_barrier(b);
+    block_barrier(w);
     return (os_get_now() - began);
 }
 
 uint64_t storage_test_time_systems(storage_test_t *t, const char *phase)
 {
-    bridge_t *b = t->b;
+    bridge_world_t *w = t->w;
     uint32_t i = find_phase(t, phase);
     uint64_t spent = os_get_now();
 
-    schedule_run(b, i);
+    schedule_run(w, i);
     spent = os_get_now() - spent;
-    block_barrier(b);
+    block_barrier(w);
     return (spent);
 }
 

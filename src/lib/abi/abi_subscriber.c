@@ -10,15 +10,15 @@
 
 static int check_budget(subscribing_t *g)
 {
-    const bridge_t *b = g->m->b;
+    const bridge_world_t *w = g->m->w;
 
-    if (b->system_count - b->parked >= b->max_systems)
+    if (w->system_count - w->parked >= w->max_systems)
         return (abi_refuse(g->m, "it registers one more than [budget] "
-            "systems of %u", b->max_systems));
-    if (g->count > b->max_terms)
+            "systems of %u", w->max_systems));
+    if (g->count > w->max_terms)
         return (abi_refuse(g->m, "a%s %s asks for %u terms, which is more "
             "than [budget] terms of %u", g->events ? "n" : "", g->what,
-            g->count, b->max_terms));
+            g->count, w->max_terms));
     return (0);
 }
 

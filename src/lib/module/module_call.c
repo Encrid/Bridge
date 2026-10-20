@@ -61,7 +61,7 @@ int module_call(module_t *m, const module_call_t *call, backend_err_t *err)
     if (call->timeout > 0)
         api->instance_set_timeout(m->instance, (uint64_t)call->timeout);
     m->refused = 0;
-    m->turn = TURN_LIFECYCLE | m->b->turns++;
+    m->turn = TURN_LIFECYCLE | m->w->turns++;
     if (!abi_marks(m, 0))
         return (module_fail(err, "out of memory: there was none to call its "
             "%s with", call->name));
@@ -75,16 +75,16 @@ int module_call(module_t *m, const module_call_t *call, backend_err_t *err)
     return (0);
 }
 
-void module_shut_down(bridge_t *b, module_t *m)
+void module_shut_down(bridge_world_t *w, module_t *m)
 {
     module_call_t call = { m->shutdown, "shutdown", m->shutdown_timeout };
     say_t about = { m, nullptr, BRIDGE_ERR };
     backend_err_t err = {};
 
     if (m->instance && module_call(m, &call, &err))
-        say_about(b, &about, "module '%s': %s; its teardown continues",
+        say_about(w, &about, "module '%s': %s; its teardown continues",
             m->identity, err.text);
-    block_hand_out(b);
-    storage_apply(b->storage);
-    block_drain(b, m);
+    block_hand_out(w);
+    storage_apply(w->storage);
+    block_drain(w, m);
 }

@@ -11,7 +11,7 @@ static void load_places(host_t *h, const char *first)
         return;
     test_load_guarded(h, "game:places@0.1.0", first);
     test_load_guarded(h, "game:other@0.1.0", "places");
-    host_run_frames_unsaid(h->b, 1);
+    host_run_frames_unsaid(h->w, 1);
     host_close(h);
 }
 

@@ -7,13 +7,13 @@
 
 #include "block.h"
 
-int block_refill(bridge_t *b, module_t *m)
+int block_refill(bridge_world_t *w, module_t *m)
 {
     uint32_t want = m->spawns > 0 ? (uint32_t)m->spawns : 0;
     uint32_t kept = m->id_count - m->id_next;
 
     if (kept > want) {
-        storage_release(b->storage, m->ids + m->id_next + want, kept - want);
+        storage_release(w->storage, m->ids + m->id_next + want, kept - want);
         kept = want;
     }
     if (m->id_next)
@@ -22,24 +22,24 @@ int block_refill(bridge_t *b, module_t *m)
     m->id_count = kept;
     if (!want)
         return (0);
-    m->id_count += storage_reserve(b->storage, m->ids + kept, want - kept);
+    m->id_count += storage_reserve(w->storage, m->ids + kept, want - kept);
     m->ids_short = m->id_count < want;
     return (m->ids_short);
 }
 
-void block_hand_out(bridge_t *b)
+void block_hand_out(bridge_world_t *w)
 {
-    module_t *m = b->modules;
+    module_t *m = w->modules;
 
     while (m) {
-        storage_hand_out(b->storage, m->ids, m->id_next);
+        storage_hand_out(w->storage, m->ids, m->id_next);
         if (m->lender)
-            storage_hand_out(b->storage, m->lender->ids, m->lender->id_next);
+            storage_hand_out(w->storage, m->lender->ids, m->lender->id_next);
         m = m->next;
     }
 }
 
-static void write_caps(bridge_header_t *h, const bridge_t *b)
+static void write_caps(bridge_header_t *h, const bridge_world_t *w)
 {
     h->rows = h->kept + 4u * h->types;
     h->blocks = h->rows + 4u * h->tables;
@@ -47,8 +47,8 @@ static void write_caps(bridge_header_t *h, const bridge_t *b)
     h->write = h->stride + 4u * h->types;
     h->kind = h->write + 4u * h->types;
     h->owned = h->kind + 4u * h->types;
-    h->arena_lo = b->arena;
-    h->arena_hi = b->arena + b->arena_len;
+    h->arena_lo = w->arena;
+    h->arena_hi = w->arena + w->arena_len;
 }
 
 static void write_owned(bridge_header_t *h, const module_t *m)
@@ -68,7 +68,7 @@ static void write_owned(bridge_header_t *h, const module_t *m)
     }
 }
 
-void block_write_header(bridge_t *b, module_t *m)
+void block_write_header(bridge_world_t *w, module_t *m)
 {
     bridge_header_t *h = (bridge_header_t *)m->priv;
     uint32_t queries = (uint32_t)sizeof(bridge_query_t) * m->system_count;
@@ -84,10 +84,10 @@ void block_write_header(bridge_t *b, module_t *m)
     h->observers = m->spans + queries;
     h->column_base = h->observers + lists;
     h->types = m->declared_count;
-    h->tables = storage_count_tables(b->storage);
+    h->tables = storage_count_tables(w->storage);
     h->kept = h->column_base + 4u * h->types * h->tables;
-    h->entity_index = (uint32_t)((const uint8_t *)b->index - b->shared);
-    h->entities = b->entities;
-    write_caps(h, b);
+    h->entity_index = (uint32_t)((const uint8_t *)w->index - w->shared);
+    h->entities = w->entities;
+    write_caps(h, w);
     write_owned(h, m);
 }

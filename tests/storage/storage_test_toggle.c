@@ -58,6 +58,6 @@ enum storage_test_end storage_test_tag(storage_test_t *t)
     if (storage_test_try_load(t, &a))
         return (STORAGE_TEST_LEFT);
     storage_test_run_all(t, TAG);
-    printf("columns in use %u bytes\n", t->b->column_space.used);
+    printf("columns in use %u bytes\n", t->w->column_space.used);
     return (STORAGE_TEST_DONE);
 }

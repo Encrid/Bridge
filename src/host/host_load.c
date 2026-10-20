@@ -70,7 +70,7 @@ void load_found(host_t *h, file_t *f, bool first)
         return;
     if (!first && !may_arrive(f, get_held(h, f->of->who.backend)))
         return;
-    if (bridge_load(h->world, &a)) {
+    if (bridge_load(h->w, &a)) {
         printf("not loaded: %s: %s was refused\n", f->path, who);
         return;
     }

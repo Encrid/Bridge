@@ -66,6 +66,6 @@ int abi_observe(void *ud, const uint64_t *at, uint64_t *r)
             "there is not"));
     g = (subscribing_t){ m, o.name, o.name_len, o.terms, o.term_count,
         o.changes, o.change_count, o.before, o.before_count,
-        m->b->phase_count, o.events };
+        m->w->phase_count, o.events };
     return (abi_subscribe(&g, r));
 }

@@ -29,7 +29,7 @@ bridge_artifact_t storage_test_state(const char *path, int64_t spawns,
 
 int storage_test_load(storage_test_t *t, const bridge_artifact_t *a)
 {
-    if (!bridge_load(t->b, a))
+    if (!bridge_load(t->w, a))
         return (0);
     printf("FAIL: not loaded\n");
     return (1);
@@ -37,17 +37,17 @@ int storage_test_load(storage_test_t *t, const bridge_artifact_t *a)
 
 int storage_test_try_load(storage_test_t *t, const bridge_artifact_t *a)
 {
-    if (!bridge_load(t->b, a))
+    if (!bridge_load(t->w, a))
         return (0);
     printf("not loaded\n");
     return (1);
 }
 
-void storage_test_load_reloadable(bridge_t *b, bridge_artifact_t *a)
+void storage_test_load_reloadable(bridge_world_t *w, bridge_artifact_t *a)
 {
     a->cfg.reloadable = BRIDGE_TRUE;
     a->cfg.hot_reload = BRIDGE_TRUE;
-    if (b && !bridge_load(b, a))
+    if (w && !bridge_load(w, a))
         return;
     printf("FAIL: not loaded\n");
     exit(1);
@@ -56,9 +56,9 @@ void storage_test_load_reloadable(bridge_t *b, bridge_artifact_t *a)
 int storage_test_reopen(storage_test_t *t, bridge_sink_fn_t sink,
     const bridge_artifact_t *a)
 {
-    (void)bridge_destroy(t->b);
-    t->b = bridge_create(&t->cfg, sink, t);
-    if (t->b && !bridge_load(t->b, a))
+    (void)bridge_destroy(t->w);
+    t->w = bridge_create(&t->cfg, sink, t);
+    if (t->w && !bridge_load(t->w, a))
         return (0);
     printf("FAIL: not loaded\n");
     return (1);

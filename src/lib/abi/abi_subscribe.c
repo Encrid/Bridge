@@ -53,7 +53,7 @@ static int read_term(subscribing_t *g, uint32_t i)
 
 static void hand_over(subscribing_t *g)
 {
-    storage_t *storage = g->m->b->storage;
+    storage_t *storage = g->m->w->storage;
     bridge_system_t *s = g->s;
     storage_listener_t hears = { g->events, abi_hear, s };
 
@@ -73,9 +73,9 @@ static void hand_over(subscribing_t *g)
 static uint32_t list_system(subscribing_t *g)
 {
     module_t *m = g->m;
-    bridge_t *b = m->b;
+    bridge_world_t *w = m->w;
 
-    b->systems[b->system_count++] = g->s;
+    w->systems[w->system_count++] = g->s;
     if (g->events)
         m->observers[m->observer_count++] = g->s;
     else

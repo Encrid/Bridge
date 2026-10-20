@@ -34,19 +34,19 @@ static int check_phase(const module_check_t *k, uint32_t i)
     uint32_t at;
 
     if (!n->from || !*n->from || !n->to || !*n->to)
-        return (module_refuse(k->b, k->id, "phase name %u of its config is "
+        return (module_refuse(k->w, k->id, "phase name %u of its config is "
             "unset", i));
     if (find_from(names, i, n->from) < i)
-        return (module_refuse(k->b, k->id, "its config maps phase '%s' "
+        return (module_refuse(k->w, k->id, "its config maps phase '%s' "
             "twice", n->from));
     at = find_to(names, i, n->to);
     if (at < i)
-        return (module_refuse(k->b, k->id, "its config maps phases '%s' and "
+        return (module_refuse(k->w, k->id, "its config maps phases '%s' and "
             "'%s' to one phase '%s'", names[at].from, n->from, n->to));
-    if (bridge_find_phase(k->b->phases, k->b->phase_count, n->to,
-        strlen(n->to)) < k->b->phase_count)
+    if (bridge_find_phase(k->w->phases, k->w->phase_count, n->to,
+        strlen(n->to)) < k->w->phase_count)
         return (0);
-    return (module_refuse(k->b, k->id, "its config maps phase '%s' to '%s', "
+    return (module_refuse(k->w, k->id, "its config maps phase '%s' to '%s', "
         "which the deployment did not declare", n->from, n->to));
 }
 

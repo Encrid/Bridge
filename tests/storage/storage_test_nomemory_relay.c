@@ -32,16 +32,16 @@ static bool relay_one(storage_test_t *t, size_t k)
     allocator->fail_at = k;
     allocator->failed = false;
     t->said_memory = 0;
-    t->b = bridge_create(&t->cfg, storage_test_hear_memory, t);
-    if (!t->b)
+    t->w = bridge_create(&t->cfg, storage_test_hear_memory, t);
+    if (!t->w)
         return (allocator->failed);
     a.cfg.reloadable = BRIDGE_TRUE;
     a.cfg.hot_reload = BRIDGE_TRUE;
-    if (!bridge_load(t->b, &a) && (empty || !bridge_run_phase(t->b, "spawn"))) {
+    if (!bridge_load(t->w, &a) && (empty || !bridge_run_phase(t->w, "spawn"))) {
         a.path = empty ? LAYOUT15_PATH : LAYOUT1_PATH;
-        (void)bridge_reload(t->b, &a);
+        (void)bridge_reload(t->w, &a);
     }
-    (void)bridge_destroy(t->b);
+    (void)bridge_destroy(t->w);
     return (allocator->failed);
 }
 
@@ -50,7 +50,7 @@ enum storage_test_end storage_test_refuse_relay(storage_test_t *t)
     size_t k = 1;
     size_t silent = 0;
 
-    (void)bridge_destroy(t->b);
+    (void)bridge_destroy(t->w);
     while (relay_one(t, k)) {
         silent += !t->said_memory;
         if (t->more && !t->said_memory)

@@ -11,12 +11,12 @@
 static int read_as_it_is(module_t *m, const char *at, uint32_t len,
     uint32_t *phase)
 {
-    const bridge_t *b = m->b;
+    const bridge_world_t *w = m->w;
     int shown = len < 40 ? (int)len : 40;
     uint32_t i = 0;
 
-    *phase = bridge_find_phase(b->phases, b->phase_count, at, len);
-    if (*phase == b->phase_count)
+    *phase = bridge_find_phase(w->phases, w->phase_count, at, len);
+    if (*phase == w->phase_count)
         return (abi_refuse(m, "a system names phase '%.*s', which the "
             "deployment did not declare", shown, at));
     while (i < m->phase_names && m->phase_to[i] != *phase)

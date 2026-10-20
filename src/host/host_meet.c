@@ -40,7 +40,7 @@ static void replace(host_t *h, file_t *f, handed_t *now, const char *why)
     if (keep_old(f, now, why))
         return;
     if (now->who.abi != BRIDGE_ABI || !make_artifact(&s, f, &a)
-        || bridge_reload(h->world, &a)) {
+        || bridge_reload(h->w, &a)) {
         printf("not replaced: %s: %s was refused\n", f->path,
             now->who.identity);
         h->counts.failed++;

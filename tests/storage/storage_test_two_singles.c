@@ -19,7 +19,7 @@ static void hear_attach(void *ctx, uint64_t id, enum bridge_event event)
 
 enum storage_test_end storage_test_give_two_singles(storage_test_t *t)
 {
-    storage_t *r = t->b->storage;
+    storage_t *r = t->w->storage;
     storage_type_t *a = storage_declare(r, 4, 4, BRIDGE_SINGLETON);
     storage_type_t *b = storage_declare(r, 4, 4, BRIDGE_SINGLETON);
     storage_term_t term = { a, BRIDGE_AND };

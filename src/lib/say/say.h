@@ -14,16 +14,17 @@ typedef struct {
     uint8_t level;
 } say_t;
 
-void say_send(bridge_t *b, const bridge_record_t *r);
+void say_send(bridge_world_t *w, const bridge_record_t *r);
 
-[[gnu::format(printf, 2, 3)]] void say_error(bridge_t *b, const char *format,
-    ...);
-
-[[gnu::format(printf, 3, 4)]] void say_about(bridge_t *b, const say_t *about,
+[[gnu::format(printf, 2, 3)]] void say_error(bridge_world_t *w,
     const char *format, ...);
+
+[[gnu::format(printf, 3, 4)]] void say_about(bridge_world_t *w,
+    const say_t *about, const char *format, ...);
 
 [[nodiscard]] char *copy_text(const char *s, size_t n);
 
-[[nodiscard]] int bridge_lacks(bridge_t *b, const void *got, const char *what);
+[[nodiscard]] int bridge_lacks(bridge_world_t *w, const void *got,
+    const char *what);
 
 #endif

@@ -54,12 +54,12 @@ static inline void move_bits(storage_t *r, uint32_t t, uint32_t id,
     uint32_t from)
 {
     const table_t *tab = &r->tables[t];
-    uint8_t *block = r->b->shared + tab->block;
+    uint8_t *block = r->w->shared + tab->block;
     uint32_t bits = tab->block + get_bits((uint32_t)r->at[id], tab->room);
     size_t len = 8u * ((tab->rows + 63) / 64);
 
     if (from)
-        memmove(r->b->shared + bits, block + from, len);
+        memmove(r->w->shared + bits, block + from, len);
     memcpy(block + r->at[id] - COLUMN, &bits, 4);
 }
 
@@ -67,13 +67,13 @@ static inline uint8_t *take_block(storage_t *r, uint32_t t, uint32_t room,
     uint64_t *len)
 {
     const table_t *tab = &r->tables[t];
-    bridge_t *b = r->b;
-    void *was = tab->block ? b->shared + tab->block : nullptr;
+    bridge_world_t *w = r->w;
+    void *was = tab->block ? w->shared + tab->block : nullptr;
 
     *len = lay_out(r, get_set(r, t), room);
     if (*len > INT32_MAX)
         return (nullptr);
-    return (block_column_regrow(b, was, tab->block_len, (uint32_t)*len));
+    return (block_column_regrow(w, was, tab->block_len, (uint32_t)*len));
 }
 
 #endif

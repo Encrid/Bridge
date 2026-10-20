@@ -10,7 +10,7 @@
 
 #include "say.h"
 
-static void send_record(bridge_t *b, const say_t *about, const char *text)
+static void send_record(bridge_world_t *w, const say_t *about, const char *text)
 {
     bridge_record_t r = {};
 
@@ -18,12 +18,12 @@ static void send_record(bridge_t *b, const say_t *about, const char *text)
     r.system = about->s ? about->s->name : nullptr;
     r.text = text;
     r.len = (uint32_t)strlen(text);
-    r.barriers = b->barriers;
+    r.barriers = w->barriers;
     r.level = about->level;
-    say_send(b, &r);
+    say_send(w, &r);
 }
 
-void say_error(bridge_t *b, const char *format, ...)
+void say_error(bridge_world_t *w, const char *format, ...)
 {
     say_t about = { nullptr, nullptr, BRIDGE_ERR };
     char text[512];
@@ -32,10 +32,10 @@ void say_error(bridge_t *b, const char *format, ...)
     va_start(args, format);
     vsnprintf(text, sizeof(text), format, args);
     va_end(args);
-    send_record(b, &about, text);
+    send_record(w, &about, text);
 }
 
-void say_about(bridge_t *b, const say_t *about, const char *format, ...)
+void say_about(bridge_world_t *w, const say_t *about, const char *format, ...)
 {
     char text[512];
     va_list args;
@@ -43,7 +43,7 @@ void say_about(bridge_t *b, const say_t *about, const char *format, ...)
     va_start(args, format);
     vsnprintf(text, sizeof(text), format, args);
     va_end(args);
-    send_record(b, about, text);
+    send_record(w, about, text);
 }
 
 char *copy_text(const char *s, size_t n)
@@ -57,10 +57,10 @@ char *copy_text(const char *s, size_t n)
     return (copy);
 }
 
-int bridge_lacks(bridge_t *b, const void *got, const char *what)
+int bridge_lacks(bridge_world_t *w, const void *got, const char *what)
 {
     if (got)
         return (0);
-    say_error(b, "out of memory: there was none for %s", what);
+    say_error(w, "out of memory: there was none for %s", what);
     return (1);
 }

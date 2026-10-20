@@ -54,7 +54,7 @@ void test_count_toggled(host_t *h)
     test_state_module(&a, "game:shield@0.1.0", "shield");
     a.cfg.spawns = 16;
     host_load(h, &a);
-    (void)bridge_run_phase(h->b, "present");
+    (void)bridge_run_phase(h->w, "present");
     host_run_frames(h, 1);
     host_close(h);
 }

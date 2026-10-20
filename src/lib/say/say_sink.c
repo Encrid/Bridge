@@ -5,7 +5,7 @@
 */
 #include "say.h"
 
-void say_send(bridge_t *b, const bridge_record_t *r)
+void say_send(bridge_world_t *w, const bridge_record_t *r)
 {
-    b->sink(b->ud, r);
+    w->sink(w->ud, r);
 }

@@ -45,7 +45,7 @@ static inline void leave_apart(storage_t *r, uint32_t index)
         leave_apart(r, index);
     if (p->table)
         remove_row(r, p->table, p->row);
-    r->b->index[index] = (bridge_entity_t){ 0, 0, DEAD };
+    r->w->index[index] = (bridge_entity_t){ 0, 0, DEAD };
     p->table = DEAD;
     p->generation = next >= DEAD ? 1 : next;
     p->row = r->free_head;

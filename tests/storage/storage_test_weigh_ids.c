@@ -39,7 +39,7 @@ static int use_columns(storage_test_t *t, const char *path, uint32_t *used)
     if (storage_test_reopen(t, storage_test_hear_counts, &a))
         return (1);
     (void)storage_test_time_barrier(t, "spawn");
-    *used = t->b->column_space.used >> 10;
+    *used = t->w->column_space.used >> 10;
     return (0);
 }
 

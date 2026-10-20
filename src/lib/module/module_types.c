@@ -7,14 +7,14 @@
 
 #include "module.h"
 
-static void unlist_type(bridge_t *b, const declared_type_t *c)
+static void unlist_type(bridge_world_t *w, const declared_type_t *c)
 {
     uint32_t k = 0;
 
-    while (b->types[k] != c)
+    while (w->types[k] != c)
         k++;
-    b->type_count--;
-    b->types[k] = b->types[b->type_count];
+    w->type_count--;
+    w->types[k] = w->types[w->type_count];
 }
 
 void module_free_type(declared_type_t *c)
@@ -30,37 +30,37 @@ void module_free_type(declared_type_t *c)
     free(c);
 }
 
-static void delete_type(bridge_t *b, declared_type_t *c)
+static void delete_type(bridge_world_t *w, declared_type_t *c)
 {
     declared_type_t *named;
     uint32_t k = 0;
 
-    storage_undeclare(b->storage, c->type);
-    unlist_type(b, c);
+    storage_undeclare(w->storage, c->type);
+    unlist_type(w, c);
     while (k < c->dep_count) {
         named = c->deps[k];
         named->users--;
         if (!named->users && !named->declarers)
-            delete_type(b, named);
+            delete_type(w, named);
         k++;
     }
     module_free_type(c);
 }
 
-static void release_type(bridge_t *b, declared_type_t *c,
+static void release_type(bridge_world_t *w, declared_type_t *c,
     enum bridge_on_unload policy)
 {
     c->declarers--;
     if (c->declarers)
         return;
     if (policy)
-        storage_drop(b->storage, c->type, policy);
+        storage_drop(w->storage, c->type, policy);
     if (!c->users)
-        delete_type(b, c);
-    b->layout_moved = 1;
+        delete_type(w, c);
+    w->layout_moved = 1;
 }
 
-void module_release_types(bridge_t *b, module_t *m, bool by_policy)
+void module_release_types(bridge_world_t *w, module_t *m, bool by_policy)
 {
     enum bridge_on_unload policy = 0;
     uint32_t i = m->declared_count;
@@ -69,7 +69,7 @@ void module_release_types(bridge_t *b, module_t *m, bool by_policy)
         i--;
         if (by_policy)
             policy = m->policy[i];
-        release_type(b, m->declared[i], policy);
+        release_type(w, m->declared[i], policy);
     }
     m->declared_count = 0;
 }

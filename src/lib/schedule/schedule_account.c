@@ -7,41 +7,41 @@
 
 #include "schedule.h"
 
-int schedule_room(bridge_t *b)
+int schedule_room(bridge_world_t *w)
 {
-    uint32_t n = b->max_systems;
+    uint32_t n = w->max_systems;
     size_t bits = schedule_get_matrix_words(n);
     bool made;
 
-    b->run_jobs = calloc(n, sizeof(schedule_job_t));
-    b->run_handed = calloc(n, sizeof(*b->run_handed));
-    b->run_lists = calloc(n, sizeof(*b->run_lists));
-    b->run_callers = calloc(n, 1);
-    b->build_in = calloc(n, sizeof(*b->build_in));
-    b->build_bits = calloc(bits, sizeof(*b->build_bits));
-    made = b->run_jobs && b->run_handed && b->run_lists && b->run_callers;
-    made = made && b->build_in && b->build_bits;
-    return (bridge_lacks(b, made ? b : nullptr,
+    w->run_jobs = calloc(n, sizeof(schedule_job_t));
+    w->run_handed = calloc(n, sizeof(*w->run_handed));
+    w->run_lists = calloc(n, sizeof(*w->run_lists));
+    w->run_callers = calloc(n, 1);
+    w->build_in = calloc(n, sizeof(*w->build_in));
+    w->build_bits = calloc(bits, sizeof(*w->build_bits));
+    made = w->run_jobs && w->run_handed && w->run_lists && w->run_callers;
+    made = made && w->build_in && w->build_bits;
+    return (bridge_lacks(w, made ? w : nullptr,
         "what a dispatch and a schedule are worked out in"));
 }
 
-static void say_stopped(bridge_t *b, const module_t *m,
+static void say_stopped(bridge_world_t *w, const module_t *m,
     const bridge_system_t *s, const char *fault)
 {
     say_t about = { m, nullptr, BRIDGE_ERR };
     long long most = (long long)m->max_failures;
 
     if (s) {
-        say_about(b, &about, "module '%s' is stopped: its %s '%s' reached "
+        say_about(w, &about, "module '%s' is stopped: its %s '%s' reached "
             "its max_system_failures of %lld", m->identity,
             s->observer ? "observer" : "system", s->name, most);
         return;
     }
-    say_about(b, &about, "module '%s' is stopped: it reached its "
+    say_about(w, &about, "module '%s' is stopped: it reached its "
         "max_system_failures of %lld, %s", m->identity, most, fault);
 }
 
-static void settle_module(bridge_t *b, module_t *m)
+static void settle_module(bridge_world_t *w, module_t *m)
 {
     const bridge_system_t *s = m->reached;
     const char *fault = m->fault_now;
@@ -58,17 +58,17 @@ static void settle_module(bridge_t *b, module_t *m)
     if (!s && m->failures < m->max_failures)
         return;
     m->stopped = 1;
-    say_stopped(b, m, s, fault);
+    say_stopped(w, m, s, fault);
     if (m->on_error == BRIDGE_FAIL)
-        bridge_stop(b, m->identity, "was stopped");
+        bridge_stop(w, m->identity, "was stopped");
 }
 
-void schedule_account(bridge_t *b)
+void schedule_account(bridge_world_t *w)
 {
-    module_t *m = b->modules;
+    module_t *m = w->modules;
 
     while (m) {
-        settle_module(b, m);
+        settle_module(w, m);
         m = m->next;
     }
 }

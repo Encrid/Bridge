@@ -27,7 +27,7 @@ typedef struct {
 } schedule_job_t;
 
 typedef struct {
-    bridge_t *b;
+    bridge_world_t *w;
     uint32_t phase;
     uint32_t level;
     uint32_t count;
@@ -35,16 +35,16 @@ typedef struct {
     uint32_t ordinal;
 } schedule_pass_t;
 
-[[nodiscard]] int schedule_order(bridge_t *b, const bridge_order_t *order,
+[[nodiscard]] int schedule_order(bridge_world_t *w, const bridge_order_t *order,
     uint32_t count);
 
-[[nodiscard]] int schedule_build(bridge_t *b, char *why, size_t why_len);
+[[nodiscard]] int schedule_build(bridge_world_t *w, char *why, size_t why_len);
 
-[[nodiscard]] int schedule_room(bridge_t *b);
+[[nodiscard]] int schedule_room(bridge_world_t *w);
 
-void schedule_run(bridge_t *b, uint32_t phase);
+void schedule_run(bridge_world_t *w, uint32_t phase);
 
-void schedule_account(bridge_t *b);
+void schedule_account(bridge_world_t *w);
 
 bool schedule_init_matrix(schedule_matrix_t *m, uint32_t n);
 
@@ -59,11 +59,11 @@ void schedule_close_matrix(schedule_matrix_t *m);
 uint32_t schedule_get_cycle(const schedule_matrix_t *m);
 
 const char *schedule_find_conflict(const bridge_system_t *a,
-    const bridge_system_t *b, bool *changing);
+    const bridge_system_t *w, bool *changing);
 
-void schedule_gather_phase(bridge_t *b, schedule_phase_t *p);
+void schedule_gather_phase(bridge_world_t *w, schedule_phase_t *p);
 
-void schedule_add_stated(const bridge_t *b, schedule_phase_t *p);
+void schedule_add_stated(const bridge_world_t *w, schedule_phase_t *p);
 
 uint32_t schedule_find_name(const schedule_pairs_t *order, const char *full);
 

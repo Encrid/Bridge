@@ -11,9 +11,9 @@
 
 void test_create_no_sink(host_t *h)
 {
-    bridge_t *b = bridge_create(&h->cfg, nullptr, nullptr);
+    bridge_world_t *w = bridge_create(&h->cfg, nullptr, nullptr);
 
-    printf("%s\n", b ? "created" : "refused: no sink");
+    printf("%s\n", w ? "created" : "refused: no sink");
     printf("alive\n");
 }
 

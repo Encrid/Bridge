@@ -67,12 +67,12 @@ static void count_row(void *ctx, const uint8_t *row)
     p->rows += points_in(p, p->c, row);
 }
 
-uint32_t module_count_pointing(const bridge_t *b, const range_t *owned,
+uint32_t module_count_pointing(const bridge_world_t *w, const range_t *owned,
     uint32_t own_count, const declared_type_t *c)
 {
     module_pointing_t p = { owned, own_count, c, 0 };
 
     if (c->kind == BRIDGE_STRUCT)
-        storage_visit_values(b->storage, c->type, count_row, &p);
+        storage_visit_values(w->storage, c->type, count_row, &p);
     return (p.rows);
 }

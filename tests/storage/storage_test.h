@@ -21,7 +21,7 @@ enum storage_test_end : int {
 
 typedef struct {
     bridge_config_t cfg;
-    bridge_t *b;
+    bridge_world_t *w;
     const char *what;
     const char *more;
     uint32_t said[2];
@@ -130,7 +130,7 @@ bridge_artifact_t storage_test_state(const char *path, int64_t spawns,
 int storage_test_load(storage_test_t *t, const bridge_artifact_t *a);
 int storage_test_try_load(storage_test_t *t, const bridge_artifact_t *a);
 
-void storage_test_load_reloadable(bridge_t *b, bridge_artifact_t *a);
+void storage_test_load_reloadable(bridge_world_t *w, bridge_artifact_t *a);
 
 int storage_test_reopen(storage_test_t *t, bridge_sink_fn_t sink,
     const bridge_artifact_t *a);
@@ -158,7 +158,7 @@ void storage_test_time_attach_detach(storage_test_t *t,
     storage_test_change_t *c);
 void storage_test_time_give_take(storage_test_t *t, storage_test_change_t *c);
 
-void storage_test_say_held(const bridge_t *b);
+void storage_test_say_held(const bridge_world_t *w);
 
 int storage_test_measure_tables(storage_test_t *t);
 int storage_test_measure_stress(storage_test_t *t, uint32_t threads);

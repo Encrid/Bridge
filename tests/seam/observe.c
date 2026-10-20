@@ -21,7 +21,7 @@ void test_observe(host_t *h)
         return;
     test_load_built(h, "game:setter@0.1.0", SETTER_PATH, 8);
     test_load_watcher(h);
-    host_run_frames_unsaid(h->b, 2);
+    host_run_frames_unsaid(h->w, 2);
     host_close(h);
 }
 
@@ -42,7 +42,7 @@ void test_conflict_at_barrier(host_t *h)
     test_load_built(h, "game:setter@0.1.0", SETTER_PATH, 8);
     test_load_watcher(h);
     load_writer(h, "view:fixer@0.1.0", "fixer");
-    host_run_frames_unsaid(h->b, 1);
+    host_run_frames_unsaid(h->w, 1);
     host_close(h);
 }
 
@@ -51,7 +51,7 @@ void test_conflict_own_observers(host_t *h)
     if (host_open(h))
         return;
     load_writer(h, "view:fixer@0.1.0", "fixer_watch");
-    host_run_frames_unsaid(h->b, 1);
+    host_run_frames_unsaid(h->w, 1);
     host_close(h);
 }
 
@@ -61,7 +61,7 @@ void test_conflict_changes_at_barrier(host_t *h)
         return;
     load_writer(h, "view:watcher@0.1.0", "watcher_change");
     load_writer(h, "view:fixer@0.1.0", "fixer_change");
-    host_run_frames_unsaid(h->b, 1);
+    host_run_frames_unsaid(h->w, 1);
     host_close(h);
 }
 

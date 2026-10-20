@@ -20,20 +20,21 @@ static_assert(offsetof(bridge_setting_t, kind)
     == offsetof(backend_setting_t, kind));
 static_assert(offsetof(bridge_setting_t, v) == offsetof(backend_setting_t, v));
 
-static int check_backend(bridge_t *b, const bridge_config_t *cfg, uint32_t i)
+static int check_backend(bridge_world_t *w, const bridge_config_t *cfg,
+    uint32_t i)
 {
     const bridge_backend_t *want = &cfg->backends[i];
     uint32_t k = 0;
 
     if (!want->name || !want->library) {
-        say_error(b, "backend %u has no %s", i,
+        say_error(w, "backend %u has no %s", i,
             want->name ? "library" : "name");
         return (1);
     }
-    while (k < i && strcmp(b->backends[k].name, want->name))
+    while (k < i && strcmp(w->backends[k].name, want->name))
         k++;
     if (k < i) {
-        say_error(b, "backend '%s' is named twice", want->name);
+        say_error(w, "backend '%s' is named twice", want->name);
         return (1);
     }
     return (0);
@@ -54,46 +55,47 @@ static backend_setting_t *convert_settings(const bridge_backend_t *want)
     return (settings);
 }
 
-static int open_library(bridge_t *b, const bridge_backend_t *want,
+static int open_library(bridge_world_t *w, const bridge_backend_t *want,
     open_backend_t *o)
 {
     backend_err_t opened;
 
     o->name = copy_text(want->name, strlen(want->name));
-    if (bridge_lacks(b, o->name, "a backend's name"))
+    if (bridge_lacks(w, o->name, "a backend's name"))
         return (1);
-    b->backend_count++;
+    w->backend_count++;
     o->lib = backend_open(want->library, &o->api, &opened);
     if (o->lib)
         return (0);
-    say_error(b, "backend '%s': %s", want->name, opened.text);
+    say_error(w, "backend '%s': %s", want->name, opened.text);
     return (1);
 }
 
-static int start_backend(bridge_t *b, const bridge_backend_t *want,
+static int start_backend(bridge_world_t *w, const bridge_backend_t *want,
     open_backend_t *o)
 {
     backend_err_t err = {};
     backend_setting_t *settings = convert_settings(want);
 
-    if (bridge_lacks(b, settings, "a backend's settings"))
+    if (bridge_lacks(w, settings, "a backend's settings"))
         return (1);
     o->be = o->api.backend_create(settings, want->setting_count, &err);
     free(settings);
     if (o->be)
         return (0);
-    say_error(b, "backend '%s' would not start: %s", want->name, err.text);
+    say_error(w, "backend '%s' would not start: %s", want->name, err.text);
     return (1);
 }
 
-int bridge_open_backend(bridge_t *b, const bridge_config_t *cfg, uint32_t i)
+int bridge_open_backend(bridge_world_t *w, const bridge_config_t *cfg,
+    uint32_t i)
 {
     const bridge_backend_t *want = &cfg->backends[i];
-    open_backend_t *o = &b->backends[i];
+    open_backend_t *o = &w->backends[i];
 
-    if (check_backend(b, cfg, i))
+    if (check_backend(w, cfg, i))
         return (1);
-    if (open_library(b, want, o))
+    if (open_library(w, want, o))
         return (1);
-    return (start_backend(b, want, o));
+    return (start_backend(w, want, o));
 }

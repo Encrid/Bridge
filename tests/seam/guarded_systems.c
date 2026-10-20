@@ -11,7 +11,7 @@ void test_run_guarded(host_t *h, const char *identity, const char *file,
     if (host_open(h))
         return;
     test_load_guarded(h, identity, file);
-    host_run_frames_unsaid(h->b, frames);
+    host_run_frames_unsaid(h->w, frames);
     host_close(h);
 }
 

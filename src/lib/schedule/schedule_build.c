@@ -41,31 +41,31 @@ static void set_levels(schedule_phase_t *p, bool refused)
         raised = raise_all(p);
 }
 
-static int build_phase(bridge_t *b, schedule_phase_t *p)
+static int build_phase(bridge_world_t *w, schedule_phase_t *p)
 {
     int refused;
 
     snprintf(p->where, sizeof(p->where), "at the barrier");
-    if (p->phase < b->phase_count)
+    if (p->phase < w->phase_count)
         snprintf(p->where, sizeof(p->where), "in phase '%.40s'",
-            b->phases[p->phase]);
-    schedule_gather_phase(b, p);
-    schedule_add_stated(b, p);
+            w->phases[p->phase]);
+    schedule_gather_phase(w, p);
+    schedule_add_stated(w, p);
     schedule_add_own(p);
     refused = schedule_check_phase(p);
     set_levels(p, refused);
     return (refused);
 }
 
-int schedule_build(bridge_t *b, char *why, size_t why_len)
+int schedule_build(bridge_world_t *w, char *why, size_t why_len)
 {
-    schedule_phase_t p = { .order = &b->order, .why = why,
+    schedule_phase_t p = { .order = &w->order, .why = why,
         .why_len = why_len };
     int refused = 0;
 
-    p.in = (bridge_system_t **)b->build_in;
-    while (p.phase <= b->phase_count && !refused) {
-        refused = build_phase(b, &p);
+    p.in = (bridge_system_t **)w->build_in;
+    while (p.phase <= w->phase_count && !refused) {
+        refused = build_phase(w, &p);
         p.phase++;
     }
     return (refused);

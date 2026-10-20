@@ -23,7 +23,7 @@ void storage_test_run(storage_test_t *t, const char *phase)
     size_t before = allocator->calls;
 
     printf("%s\n", phase);
-    if (bridge_run_phase(t->b, phase))
+    if (bridge_run_phase(t->w, phase))
         printf("  REFUSED\n");
     if (allocator->calls != before)
         printf("  FAIL: the allocator was called %u times in a phase\n",
@@ -43,13 +43,13 @@ void storage_test_run_all(storage_test_t *t, const char *const *phases)
 void storage_test_drop(storage_test_t *t, const char *name,
     enum bridge_on_unload policy)
 {
-    bridge_t *b = t->b;
+    bridge_world_t *w = t->w;
     uint32_t i = 0;
 
     printf("%s %s\n", POLICIES[policy], name);
-    while (i < b->type_count) {
-        if (!strcmp(b->types[i]->name, name))
-            storage_drop(b->storage, b->types[i]->type, policy);
+    while (i < w->type_count) {
+        if (!strcmp(w->types[i]->name, name))
+            storage_drop(w->storage, w->types[i]->type, policy);
         i++;
     }
     storage_test_run(t, "never");

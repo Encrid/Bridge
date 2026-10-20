@@ -39,7 +39,7 @@ enum storage_test_end storage_test_drain_wide_record(
     char name[] = "far";
     bridge_system_t far = { .name = name };
     bridge_system_t **systems = calloc(WIDE + 1, sizeof(*systems));
-    bridge_t b = { .sink = hear_wide };
+    bridge_world_t b = { .sink = hear_wide };
     module_t m = { .priv = priv, .scratch = WIDE_SCRATCH,
         .scratch_len = WIDE_SCRATCH, .ring = WIDE_RING, .ring_len = 1,
         .systems = systems, .system_count = WIDE + 1 };

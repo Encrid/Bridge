@@ -77,7 +77,7 @@ enum storage_test_end storage_test_drop_sparse(storage_test_t *t)
     storage_test_run(t, "attach_b_half");
     storage_test_drop(t, "st:S", v->policy);
     printf("the entity that was in the set alone is %s\n",
-        storage_is_alive(t->b->storage, (uint64_t)1 << 32 | 7) ? "alive" :
+        storage_is_alive(t->w->storage, (uint64_t)1 << 32 | 7) ? "alive" :
         "gone");
     storage_test_run_all(t, SPARSE_DROPPED);
     return (STORAGE_TEST_DONE);

@@ -8,13 +8,13 @@
 
 #include "host.h"
 
-void host_run_frames_unsaid(bridge_t *b, int count)
+void host_run_frames_unsaid(bridge_world_t *w, int count)
 {
     int i = 0;
 
     while (i < count) {
-        (void)bridge_run_phase(b, "update");
-        (void)bridge_run_phase(b, "present");
+        (void)bridge_run_phase(w, "update");
+        (void)bridge_run_phase(w, "present");
         i++;
     }
 }

@@ -11,7 +11,7 @@
 static void read_cells(storage_t *r, const storage_type_t *type,
     const value_reader_t *reader)
 {
-    const uint8_t *cells = r->b->shared + type->cells + COLUMN;
+    const uint8_t *cells = r->w->shared + type->cells + COLUMN;
     const uint64_t *given = get_given(r, type->slot);
 
     for (uint32_t index = 1; index < r->high; index++)
@@ -22,7 +22,7 @@ static void read_cells(storage_t *r, const storage_type_t *type,
 static void read_rows(storage_t *r, uint32_t t, const storage_type_t *type,
     const value_reader_t *reader)
 {
-    const uint8_t *column = r->b->shared + get_columns(r, t)[type->id];
+    const uint8_t *column = r->w->shared + get_columns(r, t)[type->id];
 
     for (uint32_t row = 0; row < r->tables[t].rows; row++)
         reader->read(reader->ctx, column + (size_t)row * type->size);
@@ -35,7 +35,7 @@ void storage_visit_values(storage_t *r, storage_type_t *type,
 
     if (type->kept == BRIDGE_SINGLETON) {
         if (type->set)
-            read(ctx, r->b->shared + type->cells);
+            read(ctx, r->w->shared + type->cells);
         return;
     }
     if (type->kept == BRIDGE_DIRECT_INDEXED)

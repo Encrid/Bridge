@@ -12,15 +12,15 @@
 static inline void set_single(storage_t *r, storage_type_t *type, bool set)
 {
     type->set = set;
-    memset(r->b->shared + type->cells, 0, type->size);
-    r->b->layout_moved = 1;
+    memset(r->w->shared + type->cells, 0, type->size);
+    r->w->layout_moved = 1;
 }
 
 static inline void give_cell(storage_t *r, uint32_t slot, uint32_t index,
     bool on)
 {
     const storage_type_t *type = r->direct_type[slot];
-    uint8_t *cells = r->b->shared + type->cells + COLUMN;
+    uint8_t *cells = r->w->shared + type->cells + COLUMN;
 
     if (on) {
         set_put(get_given(r, slot), index);
@@ -38,7 +38,7 @@ static inline void give_cell(storage_t *r, uint32_t slot, uint32_t index,
     uint32_t size = r->types[id]->size;
     uint32_t into = get_columns(r, move->to)[id];
     uint32_t out = move->from ? get_columns(r, move->from)[id] : 0;
-    uint8_t *shared = r->b->shared;
+    uint8_t *shared = r->w->shared;
     uint8_t *cell = shared + into + (size_t)move->at * size;
     bool on = !out;
 

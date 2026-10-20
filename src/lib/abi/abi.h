@@ -26,9 +26,9 @@ int abi_check_name(module_t *m, const char *what, uint32_t len);
 
 [[nodiscard]] bool abi_marks(module_t *m, uint32_t more);
 
-void abi_park(bridge_t *b, bridge_system_t *s);
+void abi_park(bridge_world_t *w, bridge_system_t *s);
 
-void abi_unpark(bridge_t *b, bridge_system_t *s);
+void abi_unpark(bridge_world_t *w, bridge_system_t *s);
 
 void abi_hear(void *ctx, uint64_t id, enum bridge_event event);
 

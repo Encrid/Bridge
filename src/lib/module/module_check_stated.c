@@ -65,16 +65,16 @@ int module_check_stated(const module_check_t *k)
     const bridge_module_config_t *cfg = k->cfg;
 
     if (cfg->on_error != BRIDGE_FAIL && cfg->on_error != BRIDGE_SKIP)
-        return (module_refuse(k->b, k->id, "on_error is unset"));
+        return (module_refuse(k->w, k->id, "on_error is unset"));
     if (check_limits_set(k) || check_amounts_set(k))
         return (1);
     if (cfg->loss_count > 0 && !cfg->losses)
-        return (module_refuse(k->b, k->id, "it states %lld losses, and "
+        return (module_refuse(k->w, k->id, "it states %lld losses, and "
             "losses is unset", (long long)cfg->loss_count));
     if (check_bounds(k))
         return (1);
     if (cfg->changes > (int64_t)UINT32_MAX)
-        return (module_refuse(k->b, k->id, "its changes of %lld bytes is "
+        return (module_refuse(k->w, k->id, "its changes of %lld bytes is "
             "more than an offset of 32 bits can reach",
             (long long)cfg->changes));
     return (0);

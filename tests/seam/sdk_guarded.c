@@ -17,7 +17,7 @@ void test_log_levels(host_t *h)
     host_state_guarded(&a, "test:levels@0.1.0", "levels");
     a.cfg.log_level = (uint8_t)atoi(h->arg);
     host_load(h, &a);
-    (void)bridge_run_phase(h->b, "update");
+    (void)bridge_run_phase(h->w, "update");
     host_close(h);
 }
 
@@ -56,7 +56,7 @@ void test_list_fewer(host_t *h)
         return;
     test_load_small(h, "ok");
     test_load_small(h, "image");
-    n = bridge_list_modules(h->b, info, 1);
+    n = bridge_list_modules(h->w, info, 1);
     printf("%d loaded, and of two rows: %s, %s\n", n, info[0].identity,
         info[1].identity);
     host_close(h);

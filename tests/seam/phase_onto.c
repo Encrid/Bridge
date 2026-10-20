@@ -30,6 +30,6 @@ void test_map_beside_a_named_phase(host_t *h)
     a.cfg.phases = &tick;
     a.cfg.phase_count = 1;
     host_load(h, &a);
-    host_run_frames_unsaid(h->b, 1);
+    host_run_frames_unsaid(h->w, 1);
     host_close(h);
 }

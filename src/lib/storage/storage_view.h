@@ -10,7 +10,7 @@
 
 static inline uint64_t *get_who(const storage_t *r, const table_t *tab)
 {
-    return (r->who + (tab->block - r->b->columns) / 8);
+    return (r->who + (tab->block - r->w->columns) / 8);
 }
 
 static inline uint32_t get_handed(const storage_t *r, uint32_t type,
@@ -36,13 +36,13 @@ static inline bool is_on(const storage_t *r, uint32_t column, uint32_t room,
 {
     uint64_t word;
 
-    memcpy(&word, r->b->shared + get_bits(column, room) + 8u * (row >> 6), 8);
+    memcpy(&word, r->w->shared + get_bits(column, room) + 8u * (row >> 6), 8);
     return (word >> (row & 63) & 1);
 }
 
 static inline void turn_row(storage_t *r, uint32_t bits, uint32_t row, bool on)
 {
-    uint8_t *at = r->b->shared + bits + 8u * (row >> 6);
+    uint8_t *at = r->w->shared + bits + 8u * (row >> 6);
     uint64_t bit = (uint64_t)1 << (row & 63);
     uint64_t word;
 

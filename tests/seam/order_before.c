@@ -20,7 +20,7 @@ void test_order_pair_against_before(host_t *h)
     if (host_open(h))
         return;
     test_load_guarded_minting(h, "game:twostep@0.1.0", "twostep_third");
-    host_run_frames_unsaid(h->b, 1);
+    host_run_frames_unsaid(h->w, 1);
     host_close(h);
 }
 

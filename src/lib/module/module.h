@@ -12,7 +12,7 @@
 constexpr uint32_t MODULE_SCRATCH_AT = 128;
 
 typedef struct {
-    bridge_t *b;
+    bridge_world_t *w;
     const bridge_artifact_t *a;
     const bridge_module_config_t *cfg;
     const char *id;
@@ -45,7 +45,7 @@ typedef struct {
     const char *entry;
 } module_start_t;
 
-[[gnu::format(printf, 3, 4)]] int module_refuse(bridge_t *b,
+[[gnu::format(printf, 3, 4)]] int module_refuse(bridge_world_t *w,
     const char *identity, const char *format, ...);
 
 [[gnu::format(printf, 2, 3)]] int module_fail(backend_err_t *err,
@@ -69,13 +69,13 @@ int module_check_fit(const module_check_t *k);
 
 int module_check_backend(const module_check_t *k);
 
-int module_check_identity(bridge_t *b, const char *id);
+int module_check_identity(bridge_world_t *w, const char *id);
 
 [[nodiscard]] int module_check(module_check_t *k);
 
 [[nodiscard]] int module_check_room(const module_check_t *k);
 
-module_t *module_find(bridge_t *b, const char *identity);
+module_t *module_find(bridge_world_t *w, const char *identity);
 
 int module_lay_private(const bridge_module_config_t *cfg, uint64_t granule,
     module_private_t *at);
@@ -83,20 +83,21 @@ int module_lay_private(const bridge_module_config_t *cfg, uint64_t granule,
 [[nodiscard]] int module_take_private(module_t *m,
     const bridge_module_config_t *cfg, backend_err_t *err);
 
-[[nodiscard]] module_t *module_record(bridge_t *b, const bridge_artifact_t *a,
-    open_backend_t *o);
+[[nodiscard]] module_t *module_record(bridge_world_t *w,
+    const bridge_artifact_t *a, open_backend_t *o);
 
-void module_drop_systems(bridge_t *b, module_t *m);
+void module_drop_systems(bridge_world_t *w, module_t *m);
 
-void module_release_types(bridge_t *b, module_t *m, bool by_policy);
+void module_release_types(bridge_world_t *w, module_t *m, bool by_policy);
 
 uint64_t module_round_share(int64_t persistent);
 
-void module_give_share(bridge_t *b, const range_t *owned, uint32_t own_count);
+void module_give_share(bridge_world_t *w, const range_t *owned,
+    uint32_t own_count);
 
-void module_settle_share(bridge_t *b, module_t *m);
+void module_settle_share(bridge_world_t *w, module_t *m);
 
-uint32_t module_count_pointing(const bridge_t *b, const range_t *owned,
+uint32_t module_count_pointing(const bridge_world_t *w, const range_t *owned,
     uint32_t own_count,
     const declared_type_t *c);
 

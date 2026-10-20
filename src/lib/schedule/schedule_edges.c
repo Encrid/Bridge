@@ -7,38 +7,38 @@
 
 #include "schedule.h"
 
-void schedule_gather_phase(bridge_t *b, schedule_phase_t *p)
+void schedule_gather_phase(bridge_world_t *w, schedule_phase_t *p)
 {
     uint32_t i = 0;
     size_t words;
 
     p->n = 0;
-    while (i < b->system_count) {
-        if (b->systems[i]->phase == p->phase && !b->systems[i]->parked) {
-            p->in[p->n] = b->systems[i];
+    while (i < w->system_count) {
+        if (w->systems[i]->phase == p->phase && !w->systems[i]->parked) {
+            p->in[p->n] = w->systems[i];
             p->n++;
         }
         i++;
     }
     p->reach.n = p->n;
     p->reach.words = schedule_get_words(p->n);
-    p->reach.bits = b->build_bits;
+    p->reach.bits = w->build_bits;
     words = schedule_get_matrix_words(p->n);
     memset(p->reach.bits, 0, words * sizeof(*p->reach.bits));
 }
 
-static void add_stated_from(const bridge_t *b, schedule_phase_t *p,
+static void add_stated_from(const bridge_world_t *w, schedule_phase_t *p,
     uint32_t i)
 {
     for (uint32_t j = 0; j < p->n; j++)
-        if (schedule_orders(&b->order, p->in[i], p->in[j]))
+        if (schedule_orders(&w->order, p->in[i], p->in[j]))
             schedule_add_edge(&p->reach, i, j);
 }
 
-void schedule_add_stated(const bridge_t *b, schedule_phase_t *p)
+void schedule_add_stated(const bridge_world_t *w, schedule_phase_t *p)
 {
     for (uint32_t i = 0; i < p->n; i++)
-        add_stated_from(b, p, i);
+        add_stated_from(w, p, i);
 }
 
 static void order_after(schedule_phase_t *p, uint32_t i)

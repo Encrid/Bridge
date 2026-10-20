@@ -18,8 +18,8 @@ static storage_terms_t *take_terms(storage_t *r, const storage_term_t *terms,
         k++;
     t = &r->terms_pool[k];
     *t = (storage_terms_t){ .count = count, .used = true };
-    t->type = r->term_types + (size_t)k * r->b->max_terms;
-    t->oper = r->term_opers + (size_t)k * r->b->max_terms;
+    t->type = r->term_types + (size_t)k * r->w->max_terms;
+    t->oper = r->term_opers + (size_t)k * r->w->max_terms;
     t->list = r->lists + (size_t)k * 2 * room;
     t->pos = t->list + room;
     memset(t->list, 0, 8u * room);

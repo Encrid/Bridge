@@ -6,7 +6,7 @@ It then declares the functions that the other sources of `src/host` define.
 
 ## The data
 
-`host_t` holds one run: the parsed `config_t`, the world settings, the backends, the content paths, the live `bridge_t`, and a fixed array of `file_t` slots.
+`host_t` holds one run: the parsed `config_t`, the world settings, the backends, the content paths, the live `bridge_world_t`, and a fixed array of `file_t` slots.
 A `file_t` records one known file by its path, its hash mark, and the module behind it.
 A `handed_t` keeps the bytes of a file together with the manifest that the host read from them.
 A `held_t` names a backend, its library path, and its arrive rule.

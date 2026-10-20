@@ -47,7 +47,7 @@ enum storage_test_end storage_test_point_query_away(storage_test_t *t)
         return (STORAGE_TEST_FAILED);
     storage_test_run(t, "spawn");
     storage_test_run(t, "attach_a");
-    m = t->b->modules;
+    m = t->w->modules;
     i = find_live_query(m);
     at = m->scratch + m->scratch_len / 2;
     if (i < m->system_count)

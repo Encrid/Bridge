@@ -75,7 +75,7 @@ static int keep_runs(relaying_t *l, declared_type_t *was)
 
 static int relay_struct(module_t *m, declared_type_t *was, const schema_t *is)
 {
-    storage_t *storage = m->b->storage;
+    storage_t *storage = m->w->storage;
     relaying_t l = { .m = m };
     relay_at_t at = { &was->s, is, 0, 0, was->name };
     int refused;

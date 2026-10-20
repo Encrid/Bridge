@@ -18,7 +18,7 @@ static void load_mapped(host_t *h, const bridge_phase_name_t *names,
     a.cfg.phase_count = count;
     host_load(h, &a);
     test_load_watcher(h);
-    host_run_frames_unsaid(h->b, 2);
+    host_run_frames_unsaid(h->w, 2);
     host_close(h);
 }
 

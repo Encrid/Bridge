@@ -49,7 +49,7 @@ void test_load_spawnless(host_t *h, const char *identity, const char *file)
 void test_say_modules(host_t *h)
 {
     bridge_module_info_t info[8];
-    int n = bridge_list_modules(h->b, info, 8);
+    int n = bridge_list_modules(h->w, info, 8);
     int i = 0;
 
     printf("modules:");

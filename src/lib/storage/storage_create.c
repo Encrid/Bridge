@@ -7,18 +7,18 @@
 
 #include "storage_create.h"
 
-static void set_sizes(storage_t *r, bridge_t *b)
+static void set_sizes(storage_t *r, bridge_world_t *w)
 {
-    r->b = b;
-    r->table_room = b->tables + b->sparse_sets;
-    r->set_room = b->sparse_sets;
-    r->direct_room = b->direct_indexed;
-    r->bit_words = (b->entities + 63) / 64;
+    r->w = w;
+    r->table_room = w->tables + w->sparse_sets;
+    r->set_room = w->sparse_sets;
+    r->direct_room = w->direct_indexed;
+    r->bit_words = (w->entities + 63) / 64;
     r->table_high = 1;
     r->high = 1;
-    r->words = (b->max_types + 63) / 64;
+    r->words = (w->max_types + 63) / 64;
     r->type_room = r->words * 64;
-    r->terms_room = b->max_systems;
+    r->terms_room = w->max_systems;
 }
 
 static bool make_all(storage_t *r)
@@ -28,24 +28,24 @@ static bool make_all(storage_t *r)
     return (storage_make_apart(r) && storage_make_terms(r));
 }
 
-storage_t *storage_create(bridge_t *b)
+storage_t *storage_create(bridge_world_t *w)
 {
     storage_t *r = calloc(1, sizeof(*r));
 
-    if (bridge_lacks(b, r, "storage"))
+    if (bridge_lacks(w, r, "storage"))
         return (nullptr);
-    set_sizes(r, b);
-    r->who = os_reserve(b->columns_len, b->columns_len);
+    set_sizes(r, w);
+    r->who = os_reserve(w->columns_len, w->columns_len);
     if (!make_all(r)) {
-        (void)bridge_lacks(b, nullptr, "storage, as [budget] sizes it");
+        (void)bridge_lacks(w, nullptr, "storage, as [budget] sizes it");
         storage_destroy(r);
         return (nullptr);
     }
     if (r->who)
         return (r);
-    say_error(b, "[budget] cannot be satisfied: the operating system would "
+    say_error(w, "[budget] cannot be satisfied: the operating system would "
         "not give storage %u bytes of its own for the columns it keeps",
-        b->columns_len);
+        w->columns_len);
     storage_destroy(r);
     return (nullptr);
 }
@@ -72,7 +72,7 @@ static void free_fold(storage_t *r)
 void storage_destroy(storage_t *r)
 {
     if (r->who)
-        os_release(r->who, r->b->columns_len);
+        os_release(r->who, r->w->columns_len);
     free(r->types);
     free(r->type_pool);
     free(r->terms_pool);

@@ -50,7 +50,7 @@ typedef struct {
 } test_listener_t;
 
 typedef struct {
-    bridge_t *b;
+    bridge_world_t *w;
     int frames;
     int result;
     host_thread_t thread;
@@ -83,7 +83,7 @@ void test_state_game_reader(bridge_artifact_t *a);
 void test_load_game_reader(host_t *h);
 void test_load_watcher(host_t *h);
 
-void test_start_elsewhere(test_elsewhere_t *e, bridge_t *b, int frames);
+void test_start_elsewhere(test_elsewhere_t *e, bridge_world_t *w, int frames);
 void test_join_elsewhere(test_elsewhere_t *e);
 
 typedef struct {

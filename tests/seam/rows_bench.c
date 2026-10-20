@@ -19,7 +19,7 @@ void test_use_up_columns(host_t *h)
     host_close(h);
 }
 
-static double run_passes(bridge_t *b)
+static double run_passes(bridge_world_t *w)
 {
     struct timespec t0;
     struct timespec t1;
@@ -27,7 +27,7 @@ static double run_passes(bridge_t *b)
 
     timespec_get(&t0, TIME_UTC);
     while (pass < 50) {
-        (void)bridge_run_phase(b, "update");
+        (void)bridge_run_phase(w, "update");
         pass++;
     }
     timespec_get(&t1, TIME_UTC);
@@ -35,14 +35,14 @@ static double run_passes(bridge_t *b)
         + (double)(t1.tv_nsec - t0.tv_nsec));
 }
 
-static double time_passes(bridge_t *b)
+static double time_passes(bridge_world_t *w)
 {
     double best = 1e30;
     double ns;
     int round = 0;
 
     while (round < 20) {
-        ns = run_passes(b);
+        ns = run_passes(w);
         best = ns < best ? ns : best;
         round++;
     }
@@ -51,7 +51,7 @@ static double time_passes(bridge_t *b)
 
 static void bench_build(host_t *h, const char *build, bool metered)
 {
-    bridge_t *b = bridge_create(&h->cfg, h->sink, nullptr);
+    bridge_world_t *w = bridge_create(&h->cfg, h->sink, nullptr);
     bridge_artifact_t a;
 
     test_state_module(&a, "game:rows@0.1.0", build);
@@ -60,13 +60,13 @@ static void bench_build(host_t *h, const char *build, bool metered)
     a.cfg.reload_timeout = BRIDGE_NO_LIMIT;
     a.cfg.shutdown_timeout = BRIDGE_NO_LIMIT;
     a.cfg.spawns = 200'000;
-    if (!b || bridge_load(b, &a)) {
+    if (!w || bridge_load(w, &a)) {
         printf("bench: cannot load\n");
         exit(2);
     }
     printf("%-15s %-9s %.3f ns a row\n", build,
-        metered ? "limit" : "no limit", time_passes(b) / (50.0 * 200'000.0));
-    (void)bridge_destroy(b);
+        metered ? "limit" : "no limit", time_passes(w) / (50.0 * 200'000.0));
+    (void)bridge_destroy(w);
 }
 
 void test_bench(host_t *h)

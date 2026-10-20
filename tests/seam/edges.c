@@ -25,11 +25,11 @@ void test_call_with_nulls(host_t *h)
         return;
     test_load_guarded(h, "game:mover@0.1.0", "mover");
     printf("bridge_run_phase with no name: %d\n",
-        bridge_run_phase(h->b, nullptr));
+        bridge_run_phase(h->w, nullptr));
     printf("bridge_list_modules with no list: %d\n",
-        bridge_list_modules(h->b, nullptr, 0));
+        bridge_list_modules(h->w, nullptr, 0));
     printf("bridge_unload with no identity: %d\n",
-        bridge_unload(h->b, nullptr));
+        bridge_unload(h->w, nullptr));
     test_state_guarded(&a, "game:loose@0.1.0", "mover");
     a.backend = nullptr;
     host_load(h, &a);

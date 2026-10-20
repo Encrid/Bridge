@@ -51,7 +51,7 @@ bool abi_is_same_layout(const declared_type_t *c, const declaring_t *g)
 static int check_room(declaring_t *g)
 {
     module_t *m = g->m;
-    const bridge_t *b = m->b;
+    const bridge_world_t *w = m->w;
     declared_type_t *was = g->was;
     enum bridge_storage kept = g->d.storage;
     bool changed = was && !abi_is_same_layout(was, g);
@@ -59,16 +59,16 @@ static int check_room(declaring_t *g)
     changed = changed || (was && abi_names_superseded(was));
     if (changed && abi_relay(m, was, g->d.kind, &g->s))
         return (1);
-    if (b->type_count >= b->max_types)
+    if (w->type_count >= w->max_types)
         return (abi_refuse(m, "type '%s' is one more than [budget] types of "
-            "%u", g->name, b->max_types));
-    if (kept == BRIDGE_SPARSE_SET && !storage_count_free_sets(b->storage))
+            "%u", g->name, w->max_types));
+    if (kept == BRIDGE_SPARSE_SET && !storage_count_free_sets(w->storage))
         return (abi_refuse(m, "type '%s' is one more than [budget] "
-            "sparse_sets of %u", g->name, b->sparse_sets));
-    if (kept != BRIDGE_DIRECT_INDEXED || storage_count_free_direct(b->storage))
+            "sparse_sets of %u", g->name, w->sparse_sets));
+    if (kept != BRIDGE_DIRECT_INDEXED || storage_count_free_direct(w->storage))
         return (0);
     return (abi_refuse(m, "type '%s' is one more than [budget] "
-        "direct_indexed of %u", g->name, b->direct_indexed));
+        "direct_indexed of %u", g->name, w->direct_indexed));
 }
 
 int abi_read_layout(declaring_t *g)

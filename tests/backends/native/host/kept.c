@@ -50,7 +50,7 @@ static void run_phases(host_t *h, const test_kept_case_t *c)
 
     while (i < 12 && c->phases[i]) {
         printf("%s\n", c->phases[i]);
-        if (bridge_run_phase(h->b, c->phases[i]))
+        if (bridge_run_phase(h->w, c->phases[i]))
             printf("  refused\n");
         i++;
     }
@@ -85,6 +85,6 @@ void test_keep_bytes(host_t *h)
     host_state_native(&a, "test:alloc@0.1.0", NALLOC_PATH);
     a.cfg.persistent = 64;
     host_load(h, &a);
-    host_run_frames_unsaid(h->b, 1);
+    host_run_frames_unsaid(h->w, 1);
     host_close(h);
 }

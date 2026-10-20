@@ -91,19 +91,19 @@ static const storage_test_relaid_t RELAID_ELSEWHERE[] = {
 
 static void relay(storage_test_t *t, const storage_test_relaid_t *row)
 {
-    bridge_t *b = bridge_create(&t->cfg, storage_test_hear, t);
+    bridge_world_t *w = bridge_create(&t->cfg, storage_test_hear, t);
     bridge_artifact_t a = storage_test_state(row->from, 8, 1 << 20, 4096);
 
     printf("%s\n", row->what);
-    storage_test_load_reloadable(b, &a);
-    (void)bridge_run_phase(b, "spawn");
-    (void)bridge_run_phase(b, "look");
+    storage_test_load_reloadable(w, &a);
+    (void)bridge_run_phase(w, "spawn");
+    (void)bridge_run_phase(w, "look");
     a.path = row->to;
     a.cfg.losses = row->losses;
     a.cfg.loss_count = row->loss_count;
-    printf("  reload: %s\n", bridge_reload(b, &a) ? "refused" : "done");
-    (void)bridge_run_phase(b, "look");
-    (void)bridge_destroy(b);
+    printf("  reload: %s\n", bridge_reload(w, &a) ? "refused" : "done");
+    (void)bridge_run_phase(w, "look");
+    (void)bridge_destroy(w);
 }
 
 static void relay_all(storage_test_t *t, const storage_test_relaid_t *rows,
@@ -121,26 +121,26 @@ static int relay_held(storage_test_t *t)
 {
     bridge_artifact_t holder = storage_test_state(HOLDER_PATH, BRIDGE_NONE,
         1 << 20, BRIDGE_NONE);
-    bridge_t *b = bridge_create(&t->cfg, storage_test_hear, t);
+    bridge_world_t *w = bridge_create(&t->cfg, storage_test_hear, t);
     bridge_artifact_t a = storage_test_state(LAYOUT0_PATH, 8, 1 << 20, 4096);
 
     a.cfg.reloadable = BRIDGE_TRUE;
     a.cfg.hot_reload = BRIDGE_TRUE;
     holder.cfg.identity = "st:holder@0.1.0";
     printf("a struct a field of another module's component names\n");
-    if (!b || bridge_load(b, &a) || bridge_load(b, &holder)) {
+    if (!w || bridge_load(w, &a) || bridge_load(w, &holder)) {
         printf("FAIL: not loaded\n");
         return (1);
     }
     a.path = LAYOUT8_PATH;
-    printf("  reload: %s\n", bridge_reload(b, &a) ? "refused" : "done");
-    (void)bridge_destroy(b);
+    printf("  reload: %s\n", bridge_reload(w, &a) ? "refused" : "done");
+    (void)bridge_destroy(w);
     return (0);
 }
 
 enum storage_test_end storage_test_relay(storage_test_t *t)
 {
-    (void)bridge_destroy(t->b);
+    (void)bridge_destroy(t->w);
     t->cfg.budget.sparse_sets = 2;
     t->cfg.budget.direct_indexed = 2;
     relay_all(t, RELAID, sizeof(RELAID) / sizeof(*RELAID));
@@ -148,6 +148,6 @@ enum storage_test_end storage_test_relay(storage_test_t *t)
         return (STORAGE_TEST_FAILED);
     relay_all(t, RELAID_ELSEWHERE,
         sizeof(RELAID_ELSEWHERE) / sizeof(*RELAID_ELSEWHERE));
-    t->b = bridge_create(&t->cfg, storage_test_hear, t);
+    t->w = bridge_create(&t->cfg, storage_test_hear, t);
     return (STORAGE_TEST_DONE);
 }

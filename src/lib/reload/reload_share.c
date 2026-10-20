@@ -8,29 +8,29 @@
 static void grow_in_place(reloading_t *r)
 {
     const module_t *old = r->old;
-    region_t *space = &r->b->arena_space;
+    region_t *space = &r->w->arena_space;
     uint32_t at;
 
     if (!old->own_count || old->own_next != old->own_count)
         return;
     r->last = old->owned[old->own_count - 1];
-    at = r->last.at - r->b->arena;
+    at = r->last.at - r->w->arena;
     r->in_place = region_grow(space, at, r->last.len, r->last.len + r->extra);
 }
 
 static int take_range(reloading_t *r, int64_t wants, uint64_t extra)
 {
-    bridge_t *b = r->b;
-    uint32_t left = region_get_most(&b->arena_space) + r->old->arena_share;
+    bridge_world_t *w = r->w;
+    uint32_t left = region_get_most(&w->arena_space) + r->old->arena_share;
 
-    if (!region_make_room(&b->arena_space, b->arena_ranges + 1))
-        return (bridge_lacks(b, nullptr, "one more range of the persistent "
+    if (!region_make_room(&w->arena_space, w->arena_ranges + 1))
+        return (bridge_lacks(w, nullptr, "one more range of the persistent "
             "arena"));
     if (extra > UINT32_MAX
-        || !region_take(&b->arena_space, (uint32_t)extra, &r->extra_at))
+        || !region_take(&w->arena_space, (uint32_t)extra, &r->extra_at))
         return (reload_refuse(r, "its persistent of %lld bytes does not fit "
             "in the %u left of [budget] persistent", (long long)wants, left));
-    b->arena_ranges++;
+    w->arena_ranges++;
     return (0);
 }
 
@@ -56,15 +56,15 @@ int reload_grow_share(reloading_t *r)
 
 void reload_give_back(reloading_t *r)
 {
-    bridge_t *b = r->b;
-    uint32_t end = r->last.at - b->arena + r->last.len;
+    bridge_world_t *w = r->w;
+    uint32_t end = r->last.at - w->arena + r->last.len;
 
     if (r->in_place) {
-        region_give(&b->arena_space, end, r->extra);
+        region_give(&w->arena_space, end, r->extra);
         return;
     }
     if (!r->extra)
         return;
-    region_give(&b->arena_space, r->extra_at, r->extra);
-    b->arena_ranges--;
+    region_give(&w->arena_space, r->extra_at, r->extra);
+    w->arena_ranges--;
 }

@@ -14,21 +14,21 @@
 
 #ifdef _WIN32
 
-void storage_test_say_held(const bridge_t *b)
+void storage_test_say_held(const bridge_world_t *w)
 {
     PROCESS_MEMORY_COUNTERS c = { .cb = sizeof(c) };
 
     if (!K32GetProcessMemoryInfo(GetCurrentProcess(), &c, sizeof(c)))
         return;
     printf("columns in use %u KB, and the process holds %zu KB\n",
-        b->column_space.used >> 10, (size_t)c.WorkingSetSize >> 10);
+        w->column_space.used >> 10, (size_t)c.WorkingSetSize >> 10);
 }
 
 #else
 
-void storage_test_say_held(const bridge_t *b)
+void storage_test_say_held(const bridge_world_t *w)
 {
-    printf("columns in use %u KB\n", b->column_space.used >> 10);
+    printf("columns in use %u KB\n", w->column_space.used >> 10);
 }
 
 #endif

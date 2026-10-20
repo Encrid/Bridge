@@ -9,43 +9,43 @@
 #include "config.h"
 #include "module.h"
 
-kept_text_t *config_find_kept(bridge_t *b, const char *stem)
+kept_text_t *config_find_kept(bridge_world_t *w, const char *stem)
 {
-    uint32_t i = b->kept_count;
+    uint32_t i = w->kept_count;
 
-    while (i && strcmp(b->kept[i - 1].stem, stem))
+    while (i && strcmp(w->kept[i - 1].stem, stem))
         i--;
     if (!i)
         return (nullptr);
-    return (&b->kept[i - 1]);
+    return (&w->kept[i - 1]);
 }
 
-static kept_text_t *add_kept(bridge_t *b, const module_t *m)
+static kept_text_t *add_kept(bridge_world_t *w, const module_t *m)
 {
-    size_t room = (b->kept_count + 1) * sizeof(*b->kept);
-    kept_text_t *more = realloc(b->kept, room);
+    size_t room = (w->kept_count + 1) * sizeof(*w->kept);
+    kept_text_t *more = realloc(w->kept, room);
     char *named = copy_text(m->stem, strlen(m->stem));
     range_t *owned = malloc(m->own_count * sizeof(*owned));
 
     if (more)
-        b->kept = more;
+        w->kept = more;
     if (!more || !named || !owned) {
         free(named);
         free(owned);
-        (void)bridge_lacks(b, nullptr, "a share that stays: the arena "
+        (void)bridge_lacks(w, nullptr, "a share that stays: the arena "
             "loses its bytes");
         return (nullptr);
     }
     memcpy(owned, m->owned, m->own_count * sizeof(*owned));
-    b->kept[b->kept_count] = (kept_text_t){ named, 0, 0, owned,
+    w->kept[w->kept_count] = (kept_text_t){ named, 0, 0, owned,
         m->own_count };
-    b->kept_count++;
-    return (&b->kept[b->kept_count - 1]);
+    w->kept_count++;
+    return (&w->kept[w->kept_count - 1]);
 }
 
-void config_keep(bridge_t *b, module_t *m)
+void config_keep(bridge_world_t *w, module_t *m)
 {
-    kept_text_t *kept = add_kept(b, m);
+    kept_text_t *kept = add_kept(w, m);
 
     if (!kept)
         return;
@@ -53,31 +53,31 @@ void config_keep(bridge_t *b, module_t *m)
     kept->room = m->text_room;
 }
 
-static bool is_kept_held(const bridge_t *b, const kept_text_t *kept)
+static bool is_kept_held(const bridge_world_t *w, const kept_text_t *kept)
 {
-    for (uint32_t i = 0; i < b->type_count; i++) {
-        if (module_count_pointing(b, kept->owned, kept->own_count,
-            b->types[i]))
+    for (uint32_t i = 0; i < w->type_count; i++) {
+        if (module_count_pointing(w, kept->owned, kept->own_count,
+            w->types[i]))
             return (true);
     }
     return (false);
 }
 
-void config_give_back_free(bridge_t *b)
+void config_give_back_free(bridge_world_t *w)
 {
     kept_text_t *kept;
     uint32_t i = 0;
 
-    while (i < b->kept_count) {
-        kept = &b->kept[i];
-        if (is_kept_held(b, kept)) {
+    while (i < w->kept_count) {
+        kept = &w->kept[i];
+        if (is_kept_held(w, kept)) {
             i++;
         } else {
-            module_give_share(b, kept->owned, kept->own_count);
+            module_give_share(w, kept->owned, kept->own_count);
             free(kept->stem);
             free(kept->owned);
-            b->kept_count--;
-            *kept = b->kept[b->kept_count];
+            w->kept_count--;
+            *kept = w->kept[w->kept_count];
         }
     }
 }

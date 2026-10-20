@@ -61,16 +61,16 @@ bool abi_marks(module_t *m, uint32_t more)
     return (true);
 }
 
-void abi_park(bridge_t *b, bridge_system_t *s)
+void abi_park(bridge_world_t *w, bridge_system_t *s)
 {
     if (s->matched)
-        storage_forget(b->storage, s->matched);
+        storage_forget(w->storage, s->matched);
     s->matched = nullptr;
     s->parked = 1;
-    b->parked++;
+    w->parked++;
 }
 
-void abi_unpark(bridge_t *b, bridge_system_t *s)
+void abi_unpark(bridge_world_t *w, bridge_system_t *s)
 {
     storage_listener_t listener = { s->events, abi_hear, s };
 
@@ -78,10 +78,10 @@ void abi_unpark(bridge_t *b, bridge_system_t *s)
         return;
     s->matched = nullptr;
     if (s->events)
-        s->matched = storage_add_observer(b->storage, s->asked, s->terms,
+        s->matched = storage_add_observer(w->storage, s->asked, s->terms,
             &listener);
     else if (s->terms)
-        s->matched = storage_add_system(b->storage, s->asked, s->terms);
+        s->matched = storage_add_system(w->storage, s->asked, s->terms);
     s->parked = 0;
-    b->parked--;
+    w->parked--;
 }

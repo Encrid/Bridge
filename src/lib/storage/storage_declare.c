@@ -25,7 +25,7 @@ static uint8_t *take_zeroed(storage_t *r, uint64_t want)
     uint8_t *block = nullptr;
 
     if (want <= INT32_MAX)
-        block = block_column_regrow(r->b, nullptr, 0, (uint32_t)want);
+        block = block_column_regrow(r->w, nullptr, 0, (uint32_t)want);
     if (block)
         memset(block, 0, (size_t)want);
     return (block);
@@ -34,14 +34,14 @@ static uint8_t *take_zeroed(storage_t *r, uint64_t want)
 static bool take_cells(storage_t *r, storage_type_t *type)
 {
     bool direct = type->kept == BRIDGE_DIRECT_INDEXED;
-    uint64_t cells = COLUMN + (uint64_t)type->size * r->b->entities;
+    uint64_t cells = COLUMN + (uint64_t)type->size * r->w->entities;
     uint64_t want = pad_column(direct ? cells : type->size + !type->size);
-    uint32_t bits = r->b->direct + (uint32_t)(8ull * type->slot * r->bit_words);
+    uint32_t bits = r->w->direct + (uint32_t)(8ull * type->slot * r->bit_words);
     uint8_t *block = take_zeroed(r, want);
 
     if (!block)
         return (false);
-    type->cells = (uint32_t)(block - r->b->shared);
+    type->cells = (uint32_t)(block - r->w->shared);
     type->cells_len = (uint32_t)want;
     if (!direct)
         return (true);

@@ -22,7 +22,7 @@ typedef struct host {
     bridge_config_t cfg;
     bridge_sink_fn_t sink;
     void *ud;
-    bridge_t *b;
+    bridge_world_t *w;
 } host_t;
 
 typedef struct {
@@ -44,7 +44,7 @@ void host_open_only(host_t *h);
 
 void host_load(host_t *h, const bridge_artifact_t *a);
 
-void host_run_frames_unsaid(bridge_t *b, int count);
+void host_run_frames_unsaid(bridge_world_t *w, int count);
 
 void host_state_native(bridge_artifact_t *a, const char *identity,
     const char *path);

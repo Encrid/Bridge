@@ -46,7 +46,7 @@ static int make_slots(module_t *m)
         m->policy = policy;
     if (writes)
         m->may_write = writes;
-    if (declared && policy && writes && storage_make_writable(m->b->storage, m))
+    if (declared && policy && writes && storage_make_writable(m->w->storage, m))
         return (0);
     return (abi_refuse(m, "out of memory: there was none for what it "
         "declares"));
@@ -72,9 +72,9 @@ static uint32_t take_slot(declaring_t *g)
     m->declared[i] = c;
     m->may_write[i] = abi_is_writable(m, c);
     if (m->may_write[i])
-        storage_let_write(m->b->storage, m, c->type);
+        storage_let_write(m->w->storage, m, c->type);
     c->declarers++;
-    m->b->layout_moved = 1;
+    m->w->layout_moved = 1;
     m->declared_count++;
     return (i);
 }

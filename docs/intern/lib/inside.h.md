@@ -40,7 +40,7 @@ None of them is on the hot path.
 | `kept_text_t` | A share of an unloaded module that stays: `stem`, the place of its settings text `at` and `room`, and its ranges `owned` and `own_count`. |
 | `schedule_matrix_t` | Who runs before whom among `n` systems or names. |
 | `schedule_pairs_t` | The names of the pairs of `[order]`, and their closed matrix. |
-| `bridge_t` | A world. |
+| `bridge_world_t` | A world. |
 
 ### An open backend
 
@@ -112,7 +112,7 @@ A system and an observer are a query and a function either way, so one record se
 
 | Field | Content |
 | --- | --- |
-| `b` | The world. |
+| `w` | The world. |
 | `identity`, `ns`, `stem` | Its identity, its namespace, and its identity without the version. |
 | `on`, `image`, `instance` | Its backend, its loaded image and its instance. |
 | `memory` | Its private block, as its backend sees it. |

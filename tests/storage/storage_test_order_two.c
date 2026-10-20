@@ -48,12 +48,12 @@ static bridge_system_t *make_two(module_t *m, declared_type_t *own,
     return (s);
 }
 
-static bool make_four(order_world_t *w, bridge_system_t **s)
+static bool make_four(order_world_t *o, bridge_system_t **s)
 {
-    s[0] = make_two(&w->m, &w->a, &w->d, false);
-    s[1] = make_two(&w->m, &w->a, &w->c, true);
-    s[2] = make_two(&w->n, &w->b, &w->c, false);
-    s[3] = make_two(&w->n, &w->b, &w->d, true);
+    s[0] = make_two(&o->m, &o->a, &o->d, false);
+    s[1] = make_two(&o->m, &o->a, &o->c, true);
+    s[2] = make_two(&o->n, &o->b, &o->c, false);
+    s[3] = make_two(&o->n, &o->b, &o->d, true);
     if (!s[0] || !s[1] || !s[2] || !s[3])
         return (false);
     s[1]->slot = 1;
@@ -63,7 +63,7 @@ static bool make_four(order_world_t *w, bridge_system_t **s)
     return (true);
 }
 
-static void free_world(bridge_t *b, bridge_system_t **s)
+static void free_world(bridge_world_t *w, bridge_system_t **s)
 {
     uint32_t k = 0;
 
@@ -72,17 +72,17 @@ static void free_world(bridge_t *b, bridge_system_t **s)
         k++;
     }
     k = 0;
-    while (k < b->order.n) {
-        free(b->order.names[k]);
+    while (k < w->order.n) {
+        free(w->order.names[k]);
         k++;
     }
-    free(b->order.names);
-    free(b->order.reach.bits);
-    free(b->build_in);
-    free(b->build_bits);
+    free(w->order.names);
+    free(w->order.reach.bits);
+    free(w->build_in);
+    free(w->build_bits);
 }
 
-static void build_in_order(bridge_t *b, bridge_system_t **s,
+static void build_in_order(bridge_world_t *w, bridge_system_t **s,
     const uint32_t *order, const char *what)
 {
     bridge_system_t *list[4];
@@ -95,9 +95,9 @@ static void build_in_order(bridge_t *b, bridge_system_t **s,
         list[k]->level = 0;
         k++;
     }
-    b->systems = list;
-    b->system_count = 4;
-    refused = schedule_build(b, why, sizeof(why));
+    w->systems = list;
+    w->system_count = 4;
+    refused = schedule_build(w, why, sizeof(why));
     printf("%s: %s%s\n", what, refused ? "refused: " : "built", why);
     k = 0;
     while (!refused && k < 4) {
@@ -106,7 +106,7 @@ static void build_in_order(bridge_t *b, bridge_system_t **s,
     }
 }
 
-static void build_both(bridge_t *b, bridge_system_t **s, const char *what,
+static void build_both(bridge_world_t *w, bridge_system_t **s, const char *what,
     uint32_t barrier)
 {
     static const uint32_t M_FIRST[4] = { 0, 1, 2, 3 };
@@ -115,15 +115,15 @@ static void build_both(bridge_t *b, bridge_system_t **s, const char *what,
     static const uint32_t N_REVERSED[4] = { 3, 2, 1, 0 };
 
     if (!strcmp(what, "orderreversed")) {
-        build_in_order(b, s, M_REVERSED,
+        build_in_order(w, s, M_REVERSED,
             "game:m loaded first, the systems of each module reversed");
-        build_in_order(b, s, N_REVERSED,
+        build_in_order(w, s, N_REVERSED,
             "game:n loaded first, the systems of each module reversed");
         return;
     }
-    build_in_order(b, s, M_FIRST, barrier
+    build_in_order(w, s, M_FIRST, barrier
         ? "game:m loaded first, at the barrier" : "game:m loaded first");
-    build_in_order(b, s, N_FIRST, barrier
+    build_in_order(w, s, N_FIRST, barrier
         ? "game:n loaded first, at the barrier" : "game:n loaded first");
 }
 
@@ -134,29 +134,29 @@ enum storage_test_end storage_test_order_two_modules(storage_test_t *t)
     char names[4][8] = { "game:A", "game:B", "game:C", "game:D" };
     char fulls[4][16] = { "game:m:m1", "game:m:m2", "game:n:n1",
         "game:n:n2" };
-    order_world_t w = { .a = { .name = names[0] }, .b = { .name = names[1] },
+    order_world_t o = { .a = { .name = names[0] }, .b = { .name = names[1] },
         .c = { .name = names[2] }, .d = { .name = names[3] } };
     bridge_system_t *s[4] = {};
-    bridge_t b = { .phases = phases, .phase_count = 1 };
+    bridge_world_t w = { .phases = phases, .phase_count = 1 };
     bool cycle = !strcmp(t->what, "ordertwo")
         || !strcmp(t->what, "ordercyclebarrier");
     uint32_t barrier = !strcmp(t->what, "orderbarrier")
         || !strcmp(t->what, "ordercyclebarrier");
     uint32_t k = 0;
 
-    b.build_in = calloc(4, sizeof(*b.build_in));
-    b.build_bits = calloc(4 * 2 + 1, sizeof(*b.build_bits));
-    if (!b.build_in || !b.build_bits || !make_four(&w, s)
-        || schedule_order(&b, cycle ? ORDER_PAIRS : CHAIN_PAIRS, 2))
+    w.build_in = calloc(4, sizeof(*w.build_in));
+    w.build_bits = calloc(4 * 2 + 1, sizeof(*w.build_bits));
+    if (!w.build_in || !w.build_bits || !make_four(&o, s)
+        || schedule_order(&w, cycle ? ORDER_PAIRS : CHAIN_PAIRS, 2))
         printf("FAIL: the world of the order was not made\n");
     while (k < 4 && s[k]) {
         s[k]->full = fulls[k];
-        s[k]->named = schedule_find_name(&b.order, fulls[k]);
+        s[k]->named = schedule_find_name(&w.order, fulls[k]);
         s[k]->phase = barrier;
         s[k]->observer = (int)barrier;
         k++;
     }
-    build_both(&b, s, t->what, barrier);
-    free_world(&b, s);
+    build_both(&w, s, t->what, barrier);
+    free_world(&w, s);
     return (STORAGE_TEST_LEFT);
 }

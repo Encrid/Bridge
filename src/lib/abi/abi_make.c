@@ -10,13 +10,13 @@
 
 static declared_type_t *alloc_type(declaring_t *g)
 {
-    bridge_t *b = g->m->b;
+    bridge_world_t *w = g->m->w;
     declared_type_t *c = calloc(1, sizeof(*c));
-    void *types = realloc(b->types, (b->type_count + 1) * sizeof(*b->types));
+    void *types = realloc(w->types, (w->type_count + 1) * sizeof(*w->types));
     uint32_t held = g->s.field_count;
 
     if (types)
-        b->types = types;
+        w->types = types;
     if (c) {
         c->name = copy_text(g->name, strlen(g->name));
         c->zero = calloc(1, g->d.size ? g->d.size : 1);
@@ -30,7 +30,7 @@ static declared_type_t *alloc_type(declaring_t *g)
 
 static int say_unmade(declaring_t *g, declared_type_t *c)
 {
-    const bridge_t *b = g->m->b;
+    const bridge_world_t *w = g->m->w;
 
     schema_free(&g->s);
     free(g->text);
@@ -42,10 +42,10 @@ static int say_unmade(declaring_t *g, declared_type_t *c)
     if (g->d.storage == BRIDGE_SINGLETON)
         return (abi_refuse(g->m, "type '%s' is a singleton, and [budget] "
             "columns of %u bytes has no room for its %u bytes", g->name,
-            b->columns_len, g->d.size));
+            w->columns_len, g->d.size));
     return (abi_refuse(g->m, "type '%s' is direct-indexed, and [budget] "
         "columns of %u bytes has no room for a cell of %u bytes for each of "
-        "%u entities", g->name, b->columns_len, g->d.size, b->entities));
+        "%u entities", g->name, w->columns_len, g->d.size, w->entities));
 }
 
 static void hold_named(declared_type_t *c)
@@ -65,7 +65,7 @@ static void hold_named(declared_type_t *c)
 
 static void keep_type(declaring_t *g, declared_type_t *c)
 {
-    bridge_t *b = g->m->b;
+    bridge_world_t *w = g->m->w;
 
     c->s = g->s;
     c->kind = g->d.kind;
@@ -77,14 +77,14 @@ static void keep_type(declaring_t *g, declared_type_t *c)
     c->desc_len = g->d.desc_len;
     g->text = nullptr;
     c->replaces = g->was;
-    b->types[b->type_count++] = c;
+    w->types[w->type_count++] = c;
     hold_named(c);
 }
 
 int abi_make_type(declaring_t *g)
 {
     const bridge_declaration_t *d = &g->d;
-    storage_t *storage = g->m->b->storage;
+    storage_t *storage = g->m->w->storage;
     declared_type_t *c;
 
     if (abi_read_layout(g))

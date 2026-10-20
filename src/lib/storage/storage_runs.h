@@ -9,9 +9,9 @@
     #include "storage_fold.h"
     #include "storage_value.h"
 
-static inline void reset_marks(bridge_t *b)
+static inline void reset_marks(bridge_world_t *w)
 {
-    module_t *m = b->modules;
+    module_t *m = w->modules;
 
     while (m) {
         m->mark_at = 0;
@@ -19,10 +19,10 @@ static inline void reset_marks(bridge_t *b)
     }
 }
 
-static inline module_t *find_next_run(bridge_t *b)
+static inline module_t *find_next_run(bridge_world_t *w)
 {
     module_t *first = nullptr;
-    module_t *m = b->modules;
+    module_t *m = w->modules;
 
     while (m) {
         if (m->mark_at != m->mark_count && (!first
@@ -33,10 +33,10 @@ static inline module_t *find_next_run(bridge_t *b)
     return (first);
 }
 
-static inline module_t *take_next_run(bridge_t *b, uint32_t *from,
+static inline module_t *take_next_run(bridge_world_t *w, uint32_t *from,
     uint32_t *to)
 {
-    module_t *first = find_next_run(b);
+    module_t *first = find_next_run(w);
 
     if (!first)
         return (nullptr);
@@ -74,7 +74,7 @@ static inline module_t *take_next_run(bridge_t *b, uint32_t *from,
     if (is_written(r, ch))
         to = get_value(r, index, ch->c->type);
     if (to)
-        copy_bytes(r->b->shared + to, value, ch->size);
+        copy_bytes(r->w->shared + to, value, ch->size);
 }
 
 #endif

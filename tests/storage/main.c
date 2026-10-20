@@ -170,7 +170,7 @@ static void make_bridge(storage_test_t *t, const storage_test_room_t *room)
     t->cfg = cfg;
     if (room->asks_columns && t->more)
         t->cfg.budget.columns = (uint64_t)atoi(t->more);
-    t->b = bridge_create(&t->cfg, storage_test_hear, t);
+    t->w = bridge_create(&t->cfg, storage_test_hear, t);
     setvbuf(stdout, nullptr, _IONBF, 0);
 }
 
@@ -186,13 +186,13 @@ int main(int argc, char **argv)
     }
     t.more = argc > 2 ? argv[2] : nullptr;
     make_bridge(&t, c->room);
-    if (!t.b) {
+    if (!t.w) {
         printf("FAIL: bridge_create\n");
         return (1);
     }
     end = c->run(&t);
     if (end == STORAGE_TEST_DONE)
-        (void)bridge_destroy(t.b);
+        (void)bridge_destroy(t.w);
     if (end != STORAGE_TEST_FAILED)
         printf("alive\n");
     return (end == STORAGE_TEST_FAILED);

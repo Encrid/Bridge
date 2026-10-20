@@ -9,9 +9,9 @@
 
 static enum storage_test_end create_with(storage_test_t *t)
 {
-    (void)bridge_destroy(t->b);
-    t->b = bridge_create(&t->cfg, storage_test_hear, t);
-    if (!t->b) {
+    (void)bridge_destroy(t->w);
+    t->w = bridge_create(&t->cfg, storage_test_hear, t);
+    if (!t->w) {
         printf("the budget was refused\n");
         return (STORAGE_TEST_LEFT);
     }

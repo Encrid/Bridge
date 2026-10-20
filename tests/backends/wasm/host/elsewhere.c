@@ -18,16 +18,16 @@ static void work_elsewhere(void *arg)
     test_elsewhere_t *e = arg;
 
     if (e->frames < 0)
-        e->result = bridge_destroy(e->b);
+        e->result = bridge_destroy(e->w);
     if (!e->frames)
-        e->result = bridge_run_phase(e->b, "update");
+        e->result = bridge_run_phase(e->w, "update");
     if (e->frames > 0)
-        host_run_frames_unsaid(e->b, e->frames);
+        host_run_frames_unsaid(e->w, e->frames);
 }
 
-void test_start_elsewhere(test_elsewhere_t *e, bridge_t *b, int frames)
+void test_start_elsewhere(test_elsewhere_t *e, bridge_world_t *w, int frames)
 {
-    e->b = b;
+    e->w = w;
     e->frames = frames;
     e->thread.run = work_elsewhere;
     e->thread.arg = e;

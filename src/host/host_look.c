@@ -58,7 +58,7 @@ static void drop_gone(host_t *h, look_t *lk)
         f = &h->files[i];
         if (!f->path || f->seen)
             continue;
-        if (f->loaded && !bridge_unload(h->world, f->of->who.identity))
+        if (f->loaded && !bridge_unload(h->w, f->of->who.identity))
             printf("unloaded: %s: %s is gone\n", f->of->who.identity,
                 f->path);
         lk->did += f->loaded;

@@ -33,18 +33,18 @@ void test_pin(host_t *h)
     test_load_built(h, "test:sleep1@0.1.0", SLEEP1_PATH, BRIDGE_NONE);
     test_load_built(h, "test:sleep2@0.1.0", SLEEP2_PATH, BRIDGE_NONE);
     load_pinned(h);
-    host_run_frames_unsaid(h->b, 3);
+    host_run_frames_unsaid(h->w, 3);
     printf("the others used %u thread(s)\n", test_count_threads(c));
     printf("pinned: %u of its %u calls were on the thread that loaded it\n",
         c->pins_here, c->pins);
     host_close(h);
 }
 
-static int call_elsewhere(bridge_t *b, int frames)
+static int call_elsewhere(bridge_world_t *w, int frames)
 {
     test_elsewhere_t e = {};
 
-    test_start_elsewhere(&e, b, frames);
+    test_start_elsewhere(&e, w, frames);
     test_join_elsewhere(&e);
     return (e.result);
 }
@@ -56,10 +56,10 @@ void test_call_from_wrong_thread(host_t *h)
         return;
     load_pinned(h);
     printf("from another thread: %s\n",
-        call_elsewhere(h->b, 0) ? "refused" : "ran");
+        call_elsewhere(h->w, 0) ? "refused" : "ran");
     printf("destroy from another thread: %s\n",
-        call_elsewhere(h->b, -1) ? "refused" : "done");
+        call_elsewhere(h->w, -1) ? "refused" : "done");
     printf("destroy from the thread that loaded it: %s\n",
-        bridge_destroy(h->b) ? "refused" : "done");
+        bridge_destroy(h->w) ? "refused" : "done");
     printf("alive\n");
 }

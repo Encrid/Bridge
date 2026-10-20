@@ -8,50 +8,50 @@
 #include "bridge_inside.h"
 #include "say.h"
 
-static void end_modules(bridge_t *b)
+static void end_modules(bridge_world_t *w)
 {
-    module_t *m = b->modules;
+    module_t *m = w->modules;
 
     while (m) {
-        module_shut_down(b, m);
+        module_shut_down(w, m);
         m = m->next;
     }
-    while (b->modules) {
-        m = b->modules;
-        b->modules = m->next;
-        module_discard(b, m);
+    while (w->modules) {
+        m = w->modules;
+        w->modules = m->next;
+        module_discard(w, m);
     }
 }
 
-static void free_schedule(bridge_t *b)
+static void free_schedule(bridge_world_t *w)
 {
-    free(b->systems);
-    free(b->run_jobs);
-    free(b->run_handed);
-    free(b->run_lists);
-    free(b->run_callers);
-    free(b->build_in);
-    free(b->build_bits);
+    free(w->systems);
+    free(w->run_jobs);
+    free(w->run_handed);
+    free(w->run_lists);
+    free(w->run_callers);
+    free(w->build_in);
+    free(w->build_bits);
 }
 
-static void free_names(bridge_t *b)
+static void free_names(bridge_world_t *w)
 {
-    for (uint32_t i = 0; i < b->order.n; i++)
-        free(b->order.names[i]);
-    free(b->order.names);
-    free(b->order.reach.bits);
-    for (uint32_t i = 0; i < b->phase_count; i++)
-        free(b->phases[i]);
-    free(b->phases);
+    for (uint32_t i = 0; i < w->order.n; i++)
+        free(w->order.names[i]);
+    free(w->order.names);
+    free(w->order.reach.bits);
+    for (uint32_t i = 0; i < w->phase_count; i++)
+        free(w->phases[i]);
+    free(w->phases);
 }
 
-static void close_backends(bridge_t *b)
+static void close_backends(bridge_world_t *w)
 {
     open_backend_t *o;
     uint32_t i = 0;
 
-    while (i < b->backend_count) {
-        o = &b->backends[i];
+    while (i < w->backend_count) {
+        o = &w->backends[i];
         if (o->be)
             o->api.backend_destroy(o->be);
         if (o->lib && (o->capabilities & BACKEND_UNLOAD))
@@ -59,27 +59,27 @@ static void close_backends(bridge_t *b)
         free(o->name);
         i++;
     }
-    free(b->backends);
+    free(w->backends);
 }
 
-int bridge_destroy(bridge_t *b)
+int bridge_destroy(bridge_world_t *w)
 {
     bool owner;
 
-    if (!b)
+    if (!w)
         return (0);
-    if (!bridge_enter(b, &owner) || !owner)
+    if (!bridge_enter(w, &owner) || !owner)
         return (1);
-    if (bridge_check_entry(b)) {
-        bridge_leave(b, owner);
+    if (bridge_check_entry(w)) {
+        bridge_leave(w, owner);
         return (1);
     }
-    end_modules(b);
-    free_schedule(b);
-    block_destroy(b);
-    pool_destroy(b->pool);
-    free_names(b);
-    close_backends(b);
-    free(b);
+    end_modules(w);
+    free_schedule(w);
+    block_destroy(w);
+    pool_destroy(w->pool);
+    free_names(w);
+    close_backends(w);
+    free(w);
     return (0);
 }

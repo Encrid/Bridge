@@ -8,13 +8,13 @@
 
 #include "cases.h"
 
-static double time_update(bridge_t *b)
+static double time_update(bridge_world_t *w)
 {
     struct timespec t0;
     struct timespec t1;
 
     timespec_get(&t0, TIME_UTC);
-    (void)bridge_run_phase(b, "update");
+    (void)bridge_run_phase(w, "update");
     timespec_get(&t1, TIME_UTC);
     return ((double)(t1.tv_sec - t0.tv_sec) * 1e3
         + (double)(t1.tv_nsec - t0.tv_nsec) / 1e6);
@@ -47,7 +47,7 @@ static void nap_twice(host_t *h)
         return;
     test_load_built(h, "test:sleep1@0.1.0", SLEEP1_PATH, BRIDGE_NONE);
     test_load_built(h, "test:sleep2@0.1.0", SLEEP2_PATH, BRIDGE_NONE);
-    ms = time_update(h->b);
+    ms = time_update(h->w);
     printf("two naps took %.0f ms on %u thread(s)\n", ms,
         test_count_threads(c));
     say_naps(c, test_count_threads(c));

@@ -32,7 +32,7 @@ static bool is_in_scratch(const module_t *m, const bridge_log_record_t *rec)
     return (rec->text - m->scratch <= m->scratch_len - rec->len);
 }
 
-static void send_line(bridge_t *b, const module_t *m, uint32_t at)
+static void send_line(bridge_world_t *w, const module_t *m, uint32_t at)
 {
     const uint8_t *ring = m->priv + m->ring;
     bridge_log_record_t rec;
@@ -52,10 +52,10 @@ static void send_line(bridge_t *b, const module_t *m, uint32_t at)
     r.level = rec.level;
     if (rec.level > BRIDGE_LEVEL_MOST)
         r.level = BRIDGE_LEVEL_MOST;
-    say_send(b, &r);
+    say_send(w, &r);
 }
 
-void block_drain(bridge_t *b, module_t *m)
+void block_drain(bridge_world_t *w, module_t *m)
 {
     bridge_header_t *h = (bridge_header_t *)m->priv;
     uint32_t head = h->ring_head;
@@ -64,11 +64,11 @@ void block_drain(bridge_t *b, module_t *m)
     uint32_t i = 0;
 
     while (i < kept) {
-        send_line(b, m, m->ring_tail + i);
+        send_line(w, m, m->ring_tail + i);
         i++;
     }
     if (written > kept)
-        say_about(b, &(say_t){ m, nullptr, BRIDGE_WARN }, "%u log lines "
+        say_about(w, &(say_t){ m, nullptr, BRIDGE_WARN }, "%u log lines "
             "were dropped: its ring holds %u", written - kept, m->ring_len);
     m->ring_tail = head;
     h->ring_tail = head;

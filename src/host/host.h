@@ -66,7 +66,7 @@ typedef struct {
     uint32_t path_count;
     char **ignore;
     uint32_t ignore_count;
-    bridge_t *world;
+    bridge_world_t *w;
     file_t files[FILES];
     bool looked;
     bool full;

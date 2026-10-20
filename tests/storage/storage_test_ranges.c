@@ -24,16 +24,16 @@ enum storage_test_end storage_test_count_ranges(storage_test_t *t)
     uint32_t loaded;
     int refused;
 
-    storage_test_load_reloadable(t->b, &a);
+    storage_test_load_reloadable(t->w, &a);
     if (storage_test_load(t, &n))
         return (STORAGE_TEST_FAILED);
-    loaded = t->b->arena_ranges;
+    loaded = t->w->arena_ranges;
     a.cfg.persistent = 5;
-    refused = bridge_reload(t->b, &a);
+    refused = bridge_reload(t->w, &a);
     printf("ranges: %u when loaded, reload %s, %u after it", loaded,
-        refused ? "refused" : "done", t->b->arena_ranges);
-    (void)bridge_unload(t->b, "st:a@0.1.0");
-    (void)bridge_unload(t->b, "st:b@0.1.0");
-    printf(", %u after the unloads\n", t->b->arena_ranges);
+        refused ? "refused" : "done", t->w->arena_ranges);
+    (void)bridge_unload(t->w, "st:a@0.1.0");
+    (void)bridge_unload(t->w, "st:b@0.1.0");
+    printf(", %u after the unloads\n", t->w->arena_ranges);
     return (STORAGE_TEST_DONE);
 }

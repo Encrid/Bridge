@@ -9,7 +9,7 @@ static int check_kept(const module_check_t *k, uint32_t flag, const char *key)
 {
     if (k->on->capabilities & flag)
         return (0);
-    return (module_refuse(k->b, k->id, "it states %s, which backend '%s' "
+    return (module_refuse(k->w, k->id, "it states %s, which backend '%s' "
         "cannot keep", key, k->on->name));
 }
 
@@ -38,7 +38,7 @@ int module_check_backend(const module_check_t *k)
     if (check_limits_kept(k))
         return (1);
     if (cfg->hot_reload == BRIDGE_TRUE && cfg->reloadable == BRIDGE_FALSE)
-        return (module_refuse(k->b, k->id, "hot_reload is stated, and its "
+        return (module_refuse(k->w, k->id, "hot_reload is stated, and its "
             "author states it is not reloadable"));
     return (0);
 }

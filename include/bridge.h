@@ -21,7 +21,7 @@ extern "C" {
         #define BRIDGE_API
     #endif
 
-typedef struct bridge bridge_t;
+typedef struct bridge_world bridge_world_t;
 
 constexpr uint32_t BRIDGE_HOST_ABI = 1;
 
@@ -302,23 +302,25 @@ static_assert(offsetof(bridge_module_info_t, identity) == 0);
 static_assert(offsetof(bridge_module_info_t, state) == 8);
 static_assert(offsetof(bridge_module_info_t, pad) == 9);
 
-BRIDGE_API [[nodiscard]] bridge_t *bridge_create(const bridge_config_t *cfg,
-    bridge_sink_fn_t sink, void *ud);
+BRIDGE_API [[nodiscard]] bridge_world_t *bridge_create(
+    const bridge_config_t *cfg, bridge_sink_fn_t sink, void *ud);
 
-BRIDGE_API [[nodiscard]] int bridge_destroy(bridge_t *b);
+BRIDGE_API [[nodiscard]] int bridge_destroy(bridge_world_t *w);
 
-BRIDGE_API [[nodiscard]] int bridge_load(bridge_t *b,
+BRIDGE_API [[nodiscard]] int bridge_load(bridge_world_t *w,
     const bridge_artifact_t *a);
 
-BRIDGE_API [[nodiscard]] int bridge_unload(bridge_t *b, const char *identity);
+BRIDGE_API [[nodiscard]] int bridge_unload(bridge_world_t *w,
+    const char *identity);
 
-BRIDGE_API [[nodiscard]] int bridge_reload(bridge_t *b,
+BRIDGE_API [[nodiscard]] int bridge_reload(bridge_world_t *w,
     const bridge_artifact_t *a);
 
-BRIDGE_API int bridge_list_modules(bridge_t *b, bridge_module_info_t *out,
+BRIDGE_API int bridge_list_modules(bridge_world_t *w, bridge_module_info_t *out,
     int max);
 
-BRIDGE_API [[nodiscard]] int bridge_run_phase(bridge_t *b, const char *name);
+BRIDGE_API [[nodiscard]] int bridge_run_phase(bridge_world_t *w,
+    const char *name);
 
     #ifdef __cplusplus
 }

@@ -10,11 +10,11 @@
 
 void test_leave_libraries(host_t *h)
 {
-    bridge_t *b = bridge_create(&h->cfg, h->sink, nullptr);
+    bridge_world_t *w = bridge_create(&h->cfg, h->sink, nullptr);
     const char *guarded = "GONE";
     const char *plain = "gone";
 
-    if (!b || bridge_destroy(b)) {
+    if (!w || bridge_destroy(w)) {
         printf("FAIL: the world was not created and destroyed\n");
         exit(1);
     }

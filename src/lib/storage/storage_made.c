@@ -9,13 +9,13 @@
 
 bool storage_make_tables(storage_t *r)
 {
-    const bridge_t *b = r->b;
+    const bridge_world_t *w = r->w;
     size_t tables = (size_t)r->table_room + 1;
 
     r->hash_room = 16;
     while (r->hash_room < tables * 2)
         r->hash_room *= 2;
-    r->places = calloc(b->entities, sizeof(*r->places));
+    r->places = calloc(w->entities, sizeof(*r->places));
     r->tables = calloc(tables, sizeof(*r->tables));
     r->table_next = calloc(tables, sizeof(*r->table_next));
     r->dirty = calloc(tables, sizeof(*r->dirty));
@@ -29,7 +29,7 @@ bool storage_make_tables(storage_t *r)
 
 bool storage_make_fold(storage_t *r)
 {
-    size_t entities = r->b->entities;
+    size_t entities = r->w->entities;
 
     r->work = calloc(entities * r->words, 8);
     r->changed = calloc(entities, sizeof(*r->changed));
@@ -48,7 +48,7 @@ bool storage_make_fold(storage_t *r)
 
 bool storage_make_apart(storage_t *r)
 {
-    size_t entities = r->b->entities;
+    size_t entities = r->w->entities;
     size_t sets = r->set_room ? r->set_room : 1;
     size_t direct = r->direct_room ? r->direct_room : 1;
 
@@ -66,7 +66,7 @@ bool storage_make_apart(storage_t *r)
 bool storage_make_terms(storage_t *r)
 {
     size_t room = r->terms_room;
-    size_t terms = room * r->b->max_terms;
+    size_t terms = room * r->w->max_terms;
 
     r->types = calloc((size_t)r->type_room + 1, sizeof(*r->types));
     r->type_pool = calloc(r->type_room, sizeof(*r->type_pool));

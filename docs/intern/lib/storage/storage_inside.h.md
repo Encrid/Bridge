@@ -179,7 +179,7 @@ The budget sizes it when the world is made: `docs/intern/lib/block/block_budget.
 
 | Field | Content |
 | --- | --- |
-| `b` | The world. |
+| `w` | The world. |
 | `places` | Where each entity is, by index. Never the copy in the block. |
 | `high` | The indexes from `high` on were never used. |
 | `free_head` | The first free index. The free indexes make a list through `row` of their places. |

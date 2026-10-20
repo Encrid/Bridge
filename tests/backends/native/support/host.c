@@ -46,8 +46,8 @@ int host_run(host_t *h, const host_case_t *cases, size_t count)
 
 int host_open(host_t *h)
 {
-    h->b = bridge_create(&h->cfg, h->sink, h->ud);
-    if (h->b)
+    h->w = bridge_create(&h->cfg, h->sink, h->ud);
+    if (h->w)
         return (0);
     printf("bridge_create refused\nalive\n");
     return (1);
@@ -55,7 +55,7 @@ int host_open(host_t *h)
 
 void host_close(host_t *h)
 {
-    (void)bridge_destroy(h->b);
+    (void)bridge_destroy(h->w);
     printf("alive\n");
 }
 

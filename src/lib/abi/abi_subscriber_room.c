@@ -30,15 +30,15 @@ void abi_free_subscriber(subscribing_t *g)
 static bool make_room(subscribing_t *g)
 {
     module_t *m = g->m;
-    bridge_t *b = m->b;
+    bridge_world_t *w = m->w;
     bridge_system_t ***mine = g->events ? &m->observers : &m->systems;
     size_t have = g->slot;
-    size_t held = b->system_count;
-    void *all = realloc(b->systems, (held + 1) * sizeof(*b->systems));
+    size_t held = w->system_count;
+    void *all = realloc(w->systems, (held + 1) * sizeof(*w->systems));
     void *own = realloc(*mine, (have + 1) * sizeof(**mine));
 
     if (all)
-        b->systems = all;
+        w->systems = all;
     if (own)
         *mine = own;
     return (all && own);
@@ -54,7 +54,7 @@ static bool name_system(subscribing_t *g)
     snprintf(full, sizeof(full), "%s:%s", m->stem, g->name);
     s->name = copy_text(g->name, strlen(g->name));
     s->full = copy_text(full, strlen(full));
-    s->named = schedule_find_name(&m->b->order, full);
+    s->named = schedule_find_name(&m->w->order, full);
     if (g->events) {
         s->pending_room = room;
         s->pending = calloc(room ? room : 1, sizeof(*s->pending));

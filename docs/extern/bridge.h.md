@@ -490,7 +490,7 @@ Else the sink gets a record that tells why: *The deployment*.
 
 | Parameter | Content |
 | --- | --- |
-| `b` | The world, or null. |
+| `w` | The world, or null. |
 
 1. Bridge calls `shutdown` of each loaded module, in the order that the modules loaded, each under its `shutdown_timeout`.
 2. A `shutdown` that fails is a record, and the destruction continues.
@@ -508,7 +508,7 @@ A host that ignores the result can lose a world that stays.
 
 | Parameter | Content |
 | --- | --- |
-| `b` | The world. |
+| `w` | The world. |
 | `a` | The module. |
 
 1. Bridge checks the config of the module against the deployment and against the backend.
@@ -534,7 +534,7 @@ When two modules conflict, the order of the loads decides which load fails. The 
 
 | Parameter | Content |
 | --- | --- |
-| `b` | The world. |
+| `w` | The world. |
 | `identity` | The identity of a loaded module, with its version. |
 
 1. The systems and the observers of the module leave the schedule.
@@ -554,7 +554,7 @@ From the sink, the result is 1, with no record.
 
 | Parameter | Content |
 | --- | --- |
-| `b` | The world. |
+| `w` | The world. |
 | `a` | The new module. Its identity without the version is the identity of a loaded module. |
 
 1. Bridge checks the config as a load does. The loaded module must allow `hot_reload`, and stay on its backend.
@@ -586,7 +586,7 @@ Without it, a reload that fails stops the module, and keeps what it declared. A 
 
 | Parameter | Content |
 | --- | --- |
-| `b` | The world. |
+| `w` | The world. |
 | `out` | An array of `max` items, or null. |
 | `max` | How many items `out` holds. |
 
@@ -601,7 +601,7 @@ A module that Bridge stopped long after its load shows as `BRIDGE_STOPPED`.
 
 | Parameter | Content |
 | --- | --- |
-| `b` | The world. |
+| `w` | The world. |
 | `name` | The name of a phase of the deployment. |
 
 1. The systems of the phase run. Systems of different modules run at the same time, if they do not conflict.

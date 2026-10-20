@@ -9,7 +9,7 @@
     #include "module.h"
 
 typedef struct {
-    bridge_t *b;
+    bridge_world_t *w;
     const bridge_artifact_t *a;
     open_backend_t *on;
     enum backend_capability demands;

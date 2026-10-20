@@ -7,44 +7,44 @@
 
 #include "block.h"
 
-static void release_shared(bridge_t *b)
+static void release_shared(bridge_world_t *w)
 {
     uint32_t i = 0;
 
-    while (i < b->backend_count) {
-        if (b->backends[i].shared)
-            b->backends[i].api.memory_release(b->backends[i].shared);
+    while (i < w->backend_count) {
+        if (w->backends[i].shared)
+            w->backends[i].api.memory_release(w->backends[i].shared);
         i++;
     }
-    if (b->shared)
-        os_release(b->shared, b->shared_reserve);
+    if (w->shared)
+        os_release(w->shared, w->shared_reserve);
 }
 
-static void free_types(bridge_t *b)
+static void free_types(bridge_world_t *w)
 {
     uint32_t i = 0;
 
-    while (i < b->type_count) {
-        module_free_type(b->types[i]);
+    while (i < w->type_count) {
+        module_free_type(w->types[i]);
         i++;
     }
-    free(b->types);
+    free(w->types);
 }
 
-void block_destroy(bridge_t *b)
+void block_destroy(bridge_world_t *w)
 {
     uint32_t i = 0;
 
-    if (b->storage)
-        storage_destroy(b->storage);
-    release_shared(b);
-    free(b->column_space.gaps);
-    free(b->arena_space.gaps);
-    free_types(b);
-    while (i < b->kept_count) {
-        free(b->kept[i].stem);
-        free(b->kept[i].owned);
+    if (w->storage)
+        storage_destroy(w->storage);
+    release_shared(w);
+    free(w->column_space.gaps);
+    free(w->arena_space.gaps);
+    free_types(w);
+    while (i < w->kept_count) {
+        free(w->kept[i].stem);
+        free(w->kept[i].owned);
         i++;
     }
-    free(b->kept);
+    free(w->kept);
 }

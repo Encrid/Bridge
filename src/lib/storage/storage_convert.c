@@ -13,7 +13,7 @@
 static void take_values(const convert_t *c, uint32_t index, uint32_t *had)
 {
     const storage_type_t *from;
-    const uint8_t *shared = c->r->b->shared;
+    const uint8_t *shared = c->r->w->shared;
     uint32_t at = 0;
     uint32_t k = 0;
 
@@ -31,7 +31,7 @@ static void write_runs(const convert_t *c, uint32_t k, const uint8_t *was,
     uint32_t to)
 {
     const storage_move_t *move = &c->moves[k];
-    uint8_t *value = c->r->b->shared + to;
+    uint8_t *value = c->r->w->shared + to;
     uint32_t run = 0;
 
     while (run < move->run_count) {

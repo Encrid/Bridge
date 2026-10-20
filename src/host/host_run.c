@@ -18,10 +18,10 @@ static void say_record(void *ud, const bridge_record_t *r)
     counts->said++;
 }
 
-static void say_loaded(bridge_t *b)
+static void say_loaded(bridge_world_t *w)
 {
     bridge_module_info_t loaded[FILES];
-    int count = bridge_list_modules(b, loaded, FILES);
+    int count = bridge_list_modules(w, loaded, FILES);
 
     printf("still loaded:");
     for (int i = 0; i < count && i < FILES; i++)
@@ -40,7 +40,7 @@ static int run_round(host_t *h, int *did)
     h->counts.said = 0;
     refused = *did < 0;
     for (uint32_t p = 0; p < h->phase_count && !refused; p++)
-        refused = bridge_run_phase(h->world, h->phases[p]);
+        refused = bridge_run_phase(h->w, h->phases[p]);
     return (refused);
 }
 
@@ -52,10 +52,10 @@ static bool make_world(host_t *h)
         .order = h->order, .order_count = h->order_count,
         .budget = h->budget };
 
-    h->world = bridge_create(&cfg, say_record, &h->counts);
-    if (!h->world)
+    h->w = bridge_create(&cfg, say_record, &h->counts);
+    if (!h->w)
         printf("bridge_create refused\n");
-    return (h->world != nullptr);
+    return (h->w != nullptr);
 }
 
 int run(host_t *h)
@@ -70,7 +70,7 @@ int run(host_t *h)
         refused = run_round(h, &did);
     if (!refused && h->rounds && left < 0)
         printf("ended after %d rounds, as many as it was given\n", h->rounds);
-    say_loaded(h->world);
-    printf("destroyed: %d\n", bridge_destroy(h->world));
+    say_loaded(h->w);
+    printf("destroyed: %d\n", bridge_destroy(h->w));
     return (refused || h->counts.failed ? 1 : 0);
 }

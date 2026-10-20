@@ -8,20 +8,20 @@
 
 #include "cases.h"
 
-static bridge_t *open_one(host_t *h, test_listener_t *l)
+static bridge_world_t *open_one(host_t *h, test_listener_t *l)
 {
-    bridge_t *b = bridge_create(&h->cfg, h->sink, l);
+    bridge_world_t *w = bridge_create(&h->cfg, h->sink, l);
     bridge_artifact_t a;
 
-    if (!b) {
+    if (!w) {
         printf("world %d refused\n", l->which);
         return (nullptr);
     }
     test_state_guarded(&a, "game:mover@0.1.0", "mover");
-    (void)bridge_load(b, &a);
+    (void)bridge_load(w, &a);
     test_state_game_reader(&a);
-    (void)bridge_load(b, &a);
-    return (b);
+    (void)bridge_load(w, &a);
+    return (w);
 }
 
 void test_run_two(host_t *h)
@@ -29,7 +29,7 @@ void test_run_two(host_t *h)
     test_counts_t *c = test_get_counts(h);
     test_listener_t which[2] = {{ c, 0 }, { c, 1 }};
     test_elsewhere_t e = {};
-    bridge_t *both[2] = {};
+    bridge_world_t *both[2] = {};
 
     h->cfg.threads = 2;
     both[0] = open_one(h, &which[0]);
@@ -48,24 +48,24 @@ void test_run_two(host_t *h)
 
 static bool mint_run(host_t *h)
 {
-    bridge_t *b = bridge_create(&h->cfg, h->sink, h->ud);
+    bridge_world_t *w = bridge_create(&h->cfg, h->sink, h->ud);
     bridge_artifact_t a;
     int f = 0;
 
-    if (!b) {
+    if (!w) {
         printf("bridge_create refused\n");
         return (false);
     }
     test_state_guarded(&a, "test:spawn1@0.1.0", "spawner");
     a.cfg.spawns = 16;
-    (void)bridge_load(b, &a);
+    (void)bridge_load(w, &a);
     a.cfg.identity = "test:spawn2@0.1.0";
-    (void)bridge_load(b, &a);
+    (void)bridge_load(w, &a);
     while (f < 20) {
-        (void)bridge_run_phase(b, "update");
+        (void)bridge_run_phase(w, "update");
         f++;
     }
-    (void)bridge_destroy(b);
+    (void)bridge_destroy(w);
     return (true);
 }
 

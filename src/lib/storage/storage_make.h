@@ -59,7 +59,7 @@ static inline uint32_t make_table(storage_t *r, const uint64_t *set)
     if (t)
         return (t);
     slot = find_set_slot(r, set);
-    if (slot == r->set_room && r->table_count >= r->b->tables)
+    if (slot == r->set_room && r->table_count >= r->w->tables)
         return (0);
     t = take_table_id(r);
     open_table(r, t, slot, set);
@@ -71,7 +71,7 @@ static inline void free_table(storage_t *r, uint32_t t)
     table_t *tab = &r->tables[t];
 
     if (tab->block)
-        block_column_free(r->b, r->b->shared + tab->block, tab->block_len);
+        block_column_free(r->w, r->w->shared + tab->block, tab->block_len);
     if (tab->named)
         unname_table(r, t);
     unlist_table(r, t);

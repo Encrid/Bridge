@@ -98,7 +98,7 @@ typedef struct {
 } module_mark_t;
 
 struct module {
-    bridge_t *b;
+    bridge_world_t *w;
     char *identity;
     char *ns;
     char *stem;
@@ -222,7 +222,7 @@ typedef struct {
     schedule_matrix_t reach;
 } schedule_pairs_t;
 
-struct bridge {
+struct bridge_world {
     bridge_sink_fn_t sink;
     void *ud;
     _Atomic uint64_t caller;
@@ -281,9 +281,9 @@ struct bridge {
     uint32_t max_modules;
 };
 
-void module_discard(bridge_t *b, module_t *m);
+void module_discard(bridge_world_t *w, module_t *m);
 
-void module_shut_down(bridge_t *b, module_t *m);
+void module_shut_down(bridge_world_t *w, module_t *m);
 
 void module_free_type(declared_type_t *c);
 

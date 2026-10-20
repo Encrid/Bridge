@@ -31,7 +31,7 @@ static void run_system(module_t *m, bridge_system_t *s)
 {
     bridge_header_t *h = (bridge_header_t *)m->priv;
 
-    h->barriers = m->b->barriers;
+    h->barriers = m->w->barriers;
     h->place = s->place;
     m->running = s;
     m->turn = s->turn;

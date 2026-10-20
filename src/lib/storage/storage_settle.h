@@ -8,31 +8,31 @@
 
     #include "storage_forget.h"
 
-static inline void say_unapplied(bridge_t *b, module_t *m)
+static inline void say_unapplied(bridge_world_t *w, module_t *m)
 {
     say_t about = { m, nullptr, BRIDGE_ERR };
 
     if (m->left[0])
-        say_about(b, &about, "module '%s': [budget] tables of %u is used "
+        say_about(w, &about, "module '%s': [budget] tables of %u is used "
             "up. Not applied, of the changes it asked: %u", m->identity,
-            b->tables, m->left[0]);
+            w->tables, m->left[0]);
     if (m->left[1])
-        say_about(b, &about, "module '%s': [budget] columns of %u bytes is "
+        say_about(w, &about, "module '%s': [budget] columns of %u bytes is "
             "used up. Not applied, of the changes it asked: %u", m->identity,
-            b->columns_len, m->left[1]);
+            w->columns_len, m->left[1]);
     if (m->left[0] || m->left[1])
         m->fault_now = "by entities it changed that could not be placed";
     m->left[0] = 0;
     m->left[1] = 0;
 }
 
-static inline void say_barred(bridge_t *b, module_t *m)
+static inline void say_barred(bridge_world_t *w, module_t *m)
 {
     say_t about = { m, nullptr, BRIDGE_ERR };
 
     if (!m->barred)
         return;
-    say_about(b, &about, "module '%s' asked to destroy entities that carry "
+    say_about(w, &about, "module '%s' asked to destroy entities that carry "
         "nothing it may write. Left as they were: %u", m->identity,
         m->barred);
     m->barred = 0;
@@ -40,9 +40,9 @@ static inline void say_barred(bridge_t *b, module_t *m)
         "write";
 }
 
-static inline void empty_queues(bridge_t *b)
+static inline void empty_queues(bridge_world_t *w)
 {
-    module_t *m = b->modules;
+    module_t *m = w->modules;
 
     while (m) {
         m->changed_now = m->queue_len != 0;
@@ -54,13 +54,13 @@ static inline void empty_queues(bridge_t *b)
 
 static inline void settle_all(storage_t *r)
 {
-    module_t *m = r->b->modules;
+    module_t *m = r->w->modules;
 
-    empty_queues(r->b);
+    empty_queues(r->w);
     forget_all(r);
     while (m) {
-        say_unapplied(r->b, m);
-        say_barred(r->b, m);
+        say_unapplied(r->w, m);
+        say_barred(r->w, m);
         m = m->next;
     }
 }

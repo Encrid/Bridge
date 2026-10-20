@@ -29,12 +29,12 @@ static const char *const READ[2] = { "view", "menu" };
 static const bridge_order_t ORDER[1] = {{ "game:first:tick",
     "game:second:tock" }};
 
-static void load_other(bridge_t *b, bridge_artifact_t a)
+static void load_other(bridge_world_t *w, bridge_artifact_t a)
 {
     a.cfg.identity = "game:other@0.1.0";
     a.cfg.read = READ;
     a.cfg.read_count = 2;
-    (void)bridge_load(b, &a);
+    (void)bridge_load(w, &a);
 }
 
 static bool load_configured(storage_test_t *t, size_t k)
@@ -50,18 +50,18 @@ static bool load_configured(storage_test_t *t, size_t k)
     t->cfg.phase_count = 1;
     t->cfg.order = ORDER;
     t->cfg.order_count = 1;
-    t->b = bridge_create(&t->cfg, storage_test_hear_memory, t);
-    if (!t->b)
+    t->w = bridge_create(&t->cfg, storage_test_hear_memory, t);
+    if (!t->w)
         return (allocator->failed);
-    load_other(t->b, a);
+    load_other(t->w, a);
     a.cfg.identity = "game:settings@0.1.0";
     a.cfg.config = "game:Settings";
     a.cfg.settings = SETTINGS;
     a.cfg.setting_count = 10;
     a.cfg.persistent = 128;
-    (void)bridge_load(t->b, &a);
-    (void)bridge_unload(t->b, a.cfg.identity);
-    (void)bridge_destroy(t->b);
+    (void)bridge_load(t->w, &a);
+    (void)bridge_unload(t->w, a.cfg.identity);
+    (void)bridge_destroy(t->w);
     return (allocator->failed);
 }
 
@@ -70,7 +70,7 @@ enum storage_test_end storage_test_refuse_config_memory(storage_test_t *t)
     size_t k = 1;
     size_t silent = 0;
 
-    (void)bridge_destroy(t->b);
+    (void)bridge_destroy(t->w);
     while (load_configured(t, k)) {
         silent += !t->said_memory;
         k++;

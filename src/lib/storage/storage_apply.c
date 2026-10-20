@@ -16,11 +16,11 @@ static void fold_all(storage_t *r)
     uint32_t at;
     uint32_t end;
 
-    reset_marks(r->b);
-    m = take_next_run(r->b, &at, &end);
+    reset_marks(r->w);
+    m = take_next_run(r->w, &at, &end);
     while (m) {
         fold_run(r, m, at, end);
-        m = take_next_run(r->b, &at, &end);
+        m = take_next_run(r->w, &at, &end);
     }
 }
 
@@ -63,15 +63,15 @@ static void write_all(storage_t *r)
     uint32_t at;
     uint32_t end;
 
-    reset_marks(r->b);
-    m = take_next_run(r->b, &at, &end);
+    reset_marks(r->w);
+    m = take_next_run(r->w, &at, &end);
     while (m) {
         while (at < end) {
             memcpy(&ch, m->queue + at, sizeof(ch));
             write_value(r, m, &ch, m->queue + at + sizeof(ch));
             at += (uint32_t)sizeof(ch) + ((ch.size + 7u) & ~7u);
         }
-        m = take_next_run(r->b, &at, &end);
+        m = take_next_run(r->w, &at, &end);
     }
 }
 

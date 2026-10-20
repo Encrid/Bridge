@@ -9,7 +9,7 @@
     #include "inside.h"
 
 typedef struct {
-    bridge_t *b;
+    bridge_world_t *w;
     module_t *m;
     const bridge_module_config_t *cfg;
     declared_type_t *c;
@@ -32,11 +32,11 @@ typedef struct {
 [[nodiscard]] int config_seed(module_t *m, const bridge_module_config_t *cfg,
     backend_err_t *err, bool writing);
 
-void config_keep(bridge_t *b, module_t *m);
+void config_keep(bridge_world_t *w, module_t *m);
 
-void config_give_back_free(bridge_t *b);
+void config_give_back_free(bridge_world_t *w);
 
-kept_text_t *config_find_kept(bridge_t *b, const char *stem);
+kept_text_t *config_find_kept(bridge_world_t *w, const char *stem);
 
 [[gnu::format(printf, 2, 3)]] int config_refuse(config_seed_t *seed,
     const char *format, ...);

@@ -19,7 +19,7 @@ int abi_spawn(void *ud, [[maybe_unused]] const uint64_t *a, uint64_t *r)
         return (abi_refuse(m, "spawn: it stated that it spawns nothing"));
     if (from->ids_short)
         return (abi_refuse(m, "spawn: [budget] entities of %u is reached",
-            m->b->entities));
+            m->w->entities));
     return (abi_refuse(m, "spawn: its spawns of %lld between two barriers "
         "are used up", (long long)from->spawns));
 }

@@ -62,7 +62,7 @@ void test_run_unknown_phase(host_t *h)
 {
     if (host_open(h))
         return;
-    if (bridge_run_phase(h->b, "render"))
+    if (bridge_run_phase(h->w, "render"))
         printf("render refused\n");
     host_close(h);
 }

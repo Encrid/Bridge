@@ -8,7 +8,7 @@
 
     #include "bridge_abi.h"
 
-typedef struct bridge bridge_t;
+typedef struct bridge_world bridge_world_t;
 typedef struct module module_t;
 typedef struct storage storage_t;
 typedef struct storage_type storage_type_t;
@@ -44,7 +44,7 @@ typedef struct {
 typedef void (*storage_read_fn_t)(void *ctx, const uint8_t *value);
 typedef void (*storage_visit_fn_t)(storage_t *r, uint32_t index, void *ctx);
 
-[[nodiscard]] storage_t *storage_create(bridge_t *b);
+[[nodiscard]] storage_t *storage_create(bridge_world_t *w);
 
 void storage_destroy(storage_t *r);
 

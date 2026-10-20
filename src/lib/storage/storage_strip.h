@@ -18,7 +18,7 @@
 static inline void close_bits(storage_t *r, uint32_t t, uint32_t id)
 {
     const table_t *tab = &r->tables[t];
-    uint8_t *shared = r->b->shared;
+    uint8_t *shared = r->w->shared;
     uint32_t to = tab->block + (uint32_t)r->at[id];
     uint32_t bits = get_bits(to, tab->room);
     uint32_t from = get_bits(get_columns(r, t)[id], tab->room);
@@ -31,7 +31,7 @@ static inline void close_column(storage_t *r, uint32_t t, uint32_t id)
 {
     const table_t *tab = &r->tables[t];
     const storage_type_t *type = r->types[id];
-    uint8_t *shared = r->b->shared;
+    uint8_t *shared = r->w->shared;
     uint32_t *columns = get_columns(r, t);
     uint32_t to = tab->block + (uint32_t)r->at[id];
 
@@ -45,7 +45,7 @@ static inline void shorten_block(storage_t *r, uint32_t t, uint32_t gone)
 {
     table_t *tab = &r->tables[t];
     const uint64_t *set = get_set(r, t);
-    uint8_t *block = r->b->shared + tab->block;
+    uint8_t *block = r->w->shared + tab->block;
     uint64_t len = lay_out(r, set, tab->room);
     walk_t walk = walk_set(set);
     uint32_t id = walk_next(r, &walk);
@@ -55,7 +55,7 @@ static inline void shorten_block(storage_t *r, uint32_t t, uint32_t gone)
             close_column(r, t, id);
         id = walk_next(r, &walk);
     }
-    (void)block_column_regrow(r->b, block, tab->block_len, (uint32_t)len);
+    (void)block_column_regrow(r->w, block, tab->block_len, (uint32_t)len);
     tab->block_len = (uint32_t)len;
 }
 
