@@ -305,6 +305,12 @@ claims = { matches = ["six:seeded@0.1.0: not loaded.*six:holder@0.1.0/show: x 1 
 false = { run = ["{out}/seam{exe}", "bridge_load-failed-init-log-given"] }
 
 [[case]]
+name = "bridge_load-config-refusal-under-fail-does-not-stop"
+run = ["{out}/seam{exe}", "bridge_load-config-refusal-under-fail-does-not-stop"]
+claims = { matches = ["its settings have a key 'vsynk', and 'game:Settings' has no field of that name"], matches_not = ["has stopped"] }
+false = { run = ["{out}/seam{exe}", "setting.kind-text-for-a-float-refused"] }
+
+[[case]]
 name = "bridge_setting_t-key-handed-twice-refused"
 run = ["{out}/seam{exe}", "bridge_setting_t-key-handed-twice-refused"]
 claims = { matches = ["its setting 'title' is handed more than once.*game:settings@0.1.0: not loaded.*alive"] }

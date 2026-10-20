@@ -79,13 +79,9 @@ static int check_spans(const module_t *m, backend_err_t *err)
 
 int module_start(module_t *m, const module_start_t *st, backend_err_t *err)
 {
-    bool loading = strcmp(st->entry, "reload") != 0;
-
     if (module_make_instance(m, st, err) || call_first(m, st, err))
         return (1);
     if (check_losses(m, err))
-        return (1);
-    if (loading && config_seed(m, &st->a->cfg, err, false))
         return (1);
     return (find_exports(m, err) || check_spans(m, err));
 }

@@ -317,6 +317,7 @@ void test_keep_two_shares(host_t *h);
 void test_keep_for_another(host_t *h);
 
 void test_seed_failed_load(host_t *h);
+void test_config_refused_under_fail(host_t *h);
 
 void test_hand_keys(host_t *h);
 

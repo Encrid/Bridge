@@ -7,16 +7,6 @@
 
 #include "module.h"
 
-static void keep_share(module_t *m, uint32_t at, uint32_t share)
-{
-    m->owned[0] = (range_t){ at, share };
-    m->own_count = 1;
-    m->own_next = 1;
-    m->arena_share = share;
-    m->arena_at = at;
-    m->arena_left = share;
-}
-
 static int take_share(bridge_world_t *w, module_t *m)
 {
     uint32_t share = (uint32_t)module_round_share(m->persistent);
@@ -31,16 +21,22 @@ static int take_share(bridge_world_t *w, module_t *m)
     }
     (void)region_take(&w->arena_space, share, &at);
     w->arena_ranges++;
-    keep_share(m, w->arena + at, share);
+    m->owned[0] = (range_t){ w->arena + at, share };
+    m->own_count = 1;
+    m->own_next = 1;
+    m->arena_share = share;
+    m->arena_at = w->arena + at;
+    m->arena_left = share;
     return (0);
 }
 
-static int fail_load(bridge_world_t *w, module_t *m, backend_err_t *err)
+static int fail_load(bridge_world_t *w, module_t *m, backend_err_t *err,
+    bool config)
 {
     if (m->priv)
         block_drain(w, m);
     say_error(w, "module '%s' did not load: %s", m->identity, err->text);
-    if (m->on_error == BRIDGE_FAIL)
+    if (!config && m->on_error == BRIDGE_FAIL)
         bridge_stop(w, m->identity, "failed");
     module_drop_systems(w, m);
     storage_release(w->storage, m->ids, m->id_count);
@@ -69,23 +65,13 @@ static int start_loaded(const module_check_t *k, module_t *m,
         return (1);
     if (schedule_build(w, err->text, sizeof(err->text)))
         return (1);
-    return (config_seed(m, &k->a->cfg, err, true));
+    return (config_seed(m, &k->a->cfg, err) ? 2 : 0);
 }
 
-int bridge_load_now(bridge_world_t *w, const bridge_artifact_t *a)
+static void commit_load(bridge_world_t *w, module_t *m)
 {
-    module_check_t k = { w, a };
-    backend_err_t err = {};
     module_t **last = &w->modules;
-    module_t *m;
 
-    if (bridge_check_call(w, a->cfg.identity) || module_check(&k))
-        return (1);
-    m = module_check_room(&k) ? nullptr : module_record(w, a, k.on);
-    if (!m || (m->persistent > 0 && take_share(w, m)))
-        return (1);
-    if (start_loaded(&k, m, &err))
-        return (fail_load(w, m, &err));
     while (*last)
         last = &(*last)->next;
     *last = m;
@@ -93,5 +79,23 @@ int bridge_load_now(bridge_world_t *w, const bridge_artifact_t *a)
     w->layout_moved = 1;
     bridge_resume(w, m);
     block_barrier(w);
+}
+
+int bridge_load_now(bridge_world_t *w, const bridge_artifact_t *a)
+{
+    module_check_t k = { w, a };
+    backend_err_t err = {};
+    module_t *m;
+    int refused;
+
+    if (bridge_check_call(w, a->cfg.identity) || module_check(&k))
+        return (1);
+    m = module_check_room(&k) ? nullptr : module_record(w, a, k.on);
+    if (!m || (m->persistent > 0 && take_share(w, m)))
+        return (1);
+    refused = start_loaded(&k, m, &err);
+    if (refused)
+        return (fail_load(w, m, &err, refused == 2));
+    commit_load(w, m);
     return (w->stopped_by ? 1 : 0);
 }

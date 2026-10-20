@@ -240,6 +240,8 @@ static const host_case_t TEST_CASES[] = {
         test_keep_for_another, "", test_set_noting },
     { "bridge_load-failed-load-leaves-storage-as-it-was",
         test_seed_failed_load, "", test_set_noting },
+    { "bridge_load-config-refusal-under-fail-does-not-stop",
+        test_config_refused_under_fail, "", test_set_noting },
     { "bridge_setting_t-key-handed-twice-refused",
         test_hand_keys, "twice", test_set_noting },
     { "bridge_setting_t-null-text-refused",

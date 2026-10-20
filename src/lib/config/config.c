@@ -65,7 +65,7 @@ static int seed_all(config_seed_t *seed)
         refused = config_seed_setting(seed, &cfg->settings[i]);
         i++;
     }
-    if (!refused && seed->writing) {
+    if (!refused) {
         storage_give_single(seed->w->storage, c->type, seed->row, c->size);
         seed->m->config = c;
     }
@@ -74,10 +74,9 @@ static int seed_all(config_seed_t *seed)
 }
 
 int config_seed(module_t *m, const bridge_module_config_t *cfg,
-    backend_err_t *err, bool writing)
+    backend_err_t *err)
 {
-    config_seed_t seed = { .w = m->w, .m = m, .cfg = cfg, .why = err->text,
-        .writing = writing };
+    config_seed_t seed = { .w = m->w, .m = m, .cfg = cfg, .why = err->text };
 
     seed.why_len = sizeof(err->text);
     if (!strcmp(cfg->config, BRIDGE_NO_CONFIG))

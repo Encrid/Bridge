@@ -43,10 +43,8 @@ static bool reuse_kept(config_seed_t *seed, uint32_t total)
 
     if (!kept || kept->room < total)
         return (false);
-    if (seed->writing) {
-        m->text_at = kept->at;
-        m->text_room = kept->room;
-    }
+    m->text_at = kept->at;
+    m->text_room = kept->room;
     return (true);
 }
 
@@ -63,8 +61,6 @@ int config_place_text(config_seed_t *seed)
         return (config_refuse(seed, "its settings hold %u bytes of text, "
             "and its persistent share has %u left", total,
             m->persistent > 0 ? m->arena_left : 0));
-    if (!seed->writing)
-        return (0);
     m->text_at = m->arena_at;
     m->text_room = total;
     m->arena_at += total;
