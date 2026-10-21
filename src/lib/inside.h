@@ -164,6 +164,7 @@ struct module {
     uint32_t left[2];
     uint64_t *writable;
     uint32_t barred;
+    uint32_t unhanded;
     declared_type_t *config;
     uint32_t text_at;
     uint32_t text_room;

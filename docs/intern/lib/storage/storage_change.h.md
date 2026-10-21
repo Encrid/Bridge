@@ -13,7 +13,8 @@ That set holds each type whose last change at this barrier is an attach.
 
 Storage folds nothing for a change of an entity that is not alive, or that this barrier destroyed already.
 A held id is an id of a block that `spawn` has not handed out: its row is `HELD`.
-It is no entity, so storage folds no attach and no detach of it: `docs/extern/bridge_abi.h.md`, *attach and detach*.
+An attach or a detach of a held id counts as a fault of the module.
+Storage folds nothing for it: `docs/extern/bridge_abi.h.md`, *attach and detach*.
 A destroy of a held id goes on to `fold_destroy`, which refuses it: `docs/intern/lib/storage/storage_stake.h.md`.
 
 ## A singleton
@@ -41,7 +42,7 @@ When its last declarer unloads, a singleton has no value, whatever the policy, a
 
 | Function | Result |
 | --- | --- |
-| `is_foldable` | Gives whether a change is of something that exists. A change of a singleton must have the id 0. Any other change must name an entity that is alive and that this barrier did not destroy. |
+| `foldable` | Gives whether a change applies, does nothing, or faults the module. An attach or a detach of a held id faults; a change of a dead id does nothing; a singleton or a live change applies. |
 | `begin_entity` | At the first change of the entity at `index`, counts it among the entities that this barrier changes, and starts its fold. |
 | `fold_change` | Folds one change into what its entity will carry. |
 | `fold_run` | Folds one run of the queue of a module, from `at` to `end`. Each change has its value after it, padded to 8 bytes. |

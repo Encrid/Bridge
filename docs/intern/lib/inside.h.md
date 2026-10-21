@@ -141,6 +141,7 @@ A system and an observer are a query and a function either way, so one record se
 | `left` | How many of its changes this barrier did not apply, by cause: no table, or no columns. |
 | `writable` | The types that it may write, as storage numbers them. |
 | `barred` | How many entities it asked to destroy at this barrier that carry none of those types. |
+| `unhanded` | The count of the held-id attaches and detaches it asked this barrier. |
 | `config`, `text_at`, `text_room` | The component that its settings seeded, and the place and the room of its settings text. |
 | `in_init`, `stopped` | It is in its first call, and it is stopped. |
 | `running`, `turn` | What runs in it now, or null for a lifecycle call, and the turn of that call. |

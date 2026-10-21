@@ -40,6 +40,20 @@ static inline void say_barred(bridge_world_t *w, module_t *m)
         "write";
 }
 
+static inline void say_unhanded(bridge_world_t *w, module_t *m)
+{
+    say_t about = { m, nullptr, BRIDGE_ERR };
+
+    if (!m->unhanded)
+        return;
+    say_about(w, &about, "module '%s' asked to attach or detach a component "
+        "of an id that spawn never handed it. Left undone: %u", m->identity,
+        m->unhanded);
+    m->unhanded = 0;
+    m->fault_now = "by attaches or detaches of an id that spawn never handed "
+        "it";
+}
+
 static inline void empty_queues(bridge_world_t *w)
 {
     module_t *m = w->modules;
@@ -61,6 +75,7 @@ static inline void settle_all(storage_t *r)
     while (m) {
         say_unapplied(r->w, m);
         say_barred(r->w, m);
+        say_unhanded(r->w, m);
         m = m->next;
     }
 }

@@ -9,16 +9,24 @@
     #include "storage_stake.h"
     #include "storage_tell.h"
 
-[[gnu::always_inline]] static inline bool is_foldable(const storage_t *r,
+enum fold : uint32_t {
+    FOLD_SKIP,
+    FOLD_APPLY,
+    FOLD_UNHANDED
+};
+
+[[gnu::always_inline]] static inline enum fold foldable(const storage_t *r,
     const change_t *ch)
 {
     uint32_t index = (uint32_t)ch->id;
 
     if (ch->op != CHANGE_DESTROY && ch->c->type->kept == BRIDGE_SINGLETON)
-        return (ch->id == 0);
+        return (FOLD_APPLY);
     if (!is_alive(r, ch->id) || r->folded[index] & DESTROYED)
-        return (false);
-    return (ch->op == CHANGE_DESTROY || !is_held(r, index));
+        return (FOLD_SKIP);
+    if (ch->op == CHANGE_DESTROY || !is_held(r, index))
+        return (FOLD_APPLY);
+    return (FOLD_UNHANDED);
 }
 
 [[gnu::always_inline]] static inline void begin_entity(storage_t *r,
@@ -40,8 +48,11 @@
     uint32_t index = (uint32_t)ch->id;
     uint32_t type = ch->op == CHANGE_DESTROY ? 0 : ch->c->type->id;
     bool attach = ch->op == CHANGE_ATTACH;
+    enum fold verdict = foldable(r, ch);
 
-    if (!is_foldable(r, ch))
+    if (verdict == FOLD_UNHANDED)
+        m->unhanded++;
+    if (verdict != FOLD_APPLY)
         return;
     begin_entity(r, index);
     if (ch->op == CHANGE_DESTROY) {
