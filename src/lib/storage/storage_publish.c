@@ -63,6 +63,8 @@ int storage_publish(storage_t *r, module_t *m, const char **list)
     p.all = r->w->layout_moved;
     p.again = p.all;
     lay_private(&p, tables, slots);
+    if (p.at > p.end)
+        return (1);
     storage_publish_cells(&p);
     if (storage_publish_spans(&p) || storage_publish_lists(&p)) {
         *list = p.full;

@@ -1,4 +1,16 @@
 [[case]]
+name = "storage-a-table-past-the-room-is-refused"
+run = ["{out}/storage{exe}", "tablefull"]
+claims = { matches = ["table past the room: 0.*alive"] }
+false = { run = ["{out}/storage{exe}", "ordersamephase"] }
+
+[[case]]
+name = "storage-a-span-region-past-the-spans-is-refused"
+run = ["{out}/storage{exe}", "spansfull"]
+claims = { matches = ["spans too small: 1.*alive"] }
+false = { run = ["{out}/storage{exe}", "ordersamephase"] }
+
+[[case]]
 name = "region-a-give-into-a-full-list-of-gaps-keeps-the-piece-out"
 run = ["{out}/storage{exe}", "regionfull"]
 claims = { matches = ["region full: count 2.*alive"] }

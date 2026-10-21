@@ -95,6 +95,8 @@ static const storage_test_case_t CASES[] = {
     { "relaybadkind", storage_test_relay_bad_kind, &PLAIN },
     { "marks", storage_test_fill_marks, &PLAIN },
     { "regionfull", storage_test_region_full, &PLAIN },
+    { "tablefull", storage_test_table_full, &PLAIN },
+    { "spansfull", storage_test_spans_full, &PLAIN },
     { "twosingles", storage_test_give_two_singles, &PLAIN },
     { "fulllist", storage_test_fill_list, &ONE_TABLE },
     { "levels", storage_test_count_levels, &PLAIN },

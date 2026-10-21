@@ -186,6 +186,8 @@ enum storage_test_end storage_test_config_bad_kind(storage_test_t *t);
 enum storage_test_end storage_test_relay_bad_kind(storage_test_t *t);
 enum storage_test_end storage_test_fill_marks(storage_test_t *t);
 enum storage_test_end storage_test_region_full(storage_test_t *t);
+enum storage_test_end storage_test_table_full(storage_test_t *t);
+enum storage_test_end storage_test_spans_full(storage_test_t *t);
 enum storage_test_end storage_test_give_two_singles(storage_test_t *t);
 enum storage_test_end storage_test_fill_list(storage_test_t *t);
 enum storage_test_end storage_test_count_levels(storage_test_t *t);

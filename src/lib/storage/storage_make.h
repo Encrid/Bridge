@@ -30,6 +30,8 @@ static inline uint32_t take_table_id(storage_t *r)
         r->table_free = r->table_next[t];
         return (t);
     }
+    if (r->table_high > r->table_room)
+        return (0);
     r->table_high++;
     return (r->table_high - 1);
 }
@@ -62,7 +64,8 @@ static inline uint32_t make_table(storage_t *r, const uint64_t *set)
     if (slot == r->set_room && r->table_count >= r->w->tables)
         return (0);
     t = take_table_id(r);
-    open_table(r, t, slot, set);
+    if (t)
+        open_table(r, t, slot, set);
     return (t);
 }
 
