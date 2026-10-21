@@ -190,6 +190,8 @@ A `schedule_pairs_t` holds the pairs of `[order]`: `docs/intern/lib/schedule/sch
 | --- | --- |
 | `names` | Each name of a pair, copied, in the order met. |
 | `n` | How many names. |
+| `pairs` | The two names of each pair, by index into `names`: a load reads them to refuse a pair of two phases. |
+| `pair_count` | How many pairs. |
 | `reach` | Who runs before whom among the names, closed at create: `docs/intern/lib/schedule/schedule_order.c.md`, *The pairs*. |
 
 ### A world

@@ -89,6 +89,8 @@ static const storage_test_case_t CASES[] = {
     { "orderbarrier", storage_test_order_two_modules, &PLAIN },
     { "ordercyclebarrier", storage_test_order_two_modules, &PLAIN },
     { "orderreversed", storage_test_order_two_modules, &PLAIN },
+    { "orderphases", storage_test_order_phase, &PLAIN },
+    { "ordersamephase", storage_test_order_phase, &PLAIN },
     { "twosingles", storage_test_give_two_singles, &PLAIN },
     { "fulllist", storage_test_fill_list, &ONE_TABLE },
     { "levels", storage_test_count_levels, &PLAIN },

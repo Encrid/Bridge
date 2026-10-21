@@ -219,6 +219,8 @@ typedef struct {
 typedef struct {
     char **names;
     uint32_t n;
+    uint32_t *pairs;
+    uint32_t pair_count;
     schedule_matrix_t reach;
 } schedule_pairs_t;
 

@@ -56,6 +56,9 @@ static int add_pair(bridge_world_t *w, const bridge_order_t *pair, uint32_t i)
         after = name_system(order, pair->after);
     if (before == order->n || after == order->n)
         return (bridge_lacks(w, nullptr, "the order a deployment states"));
+    order->pairs[2 * order->pair_count] = before;
+    order->pairs[2 * order->pair_count + 1] = after;
+    order->pair_count++;
     schedule_add_edge(&order->reach, before, after);
     return (0);
 }
@@ -86,7 +89,8 @@ int schedule_order(bridge_world_t *w, const bridge_order_t *order,
     }
     refused = !schedule_init_matrix(&pairs->reach, count * 2);
     pairs->names = calloc(count ? count * 2 : 1, sizeof(*pairs->names));
-    if (refused || !pairs->names)
+    pairs->pairs = calloc(count ? count * 2 : 1, sizeof(*pairs->pairs));
+    if (refused || !pairs->names || !pairs->pairs)
         refused = bridge_lacks(w, nullptr, "the order a deployment states");
     while (i < count && !refused) {
         refused = add_pair(w, &order[i], i);

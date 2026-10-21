@@ -181,6 +181,7 @@ enum storage_test_end storage_test_move_many(storage_test_t *t);
 enum storage_test_end storage_test_grow_many(storage_test_t *t);
 enum storage_test_end storage_test_wrap_generation(storage_test_t *t);
 enum storage_test_end storage_test_order_two_modules(storage_test_t *t);
+enum storage_test_end storage_test_order_phase(storage_test_t *t);
 enum storage_test_end storage_test_give_two_singles(storage_test_t *t);
 enum storage_test_end storage_test_fill_list(storage_test_t *t);
 enum storage_test_end storage_test_count_levels(storage_test_t *t);

@@ -1,4 +1,16 @@
 [[case]]
+name = "order-a-pair-of-two-phases-is-refused"
+run = ["{out}/storage{exe}", "orderphases"]
+claims = { matches = ["orderphases: refused: the \\[order\\] pair of 'game:m:a' and 'game:n:b' orders nothing: they run in different phases"] }
+false = { run = ["{out}/storage{exe}", "ordersamephase"] }
+
+[[case]]
+name = "order-a-pair-of-one-phase-builds"
+run = ["{out}/storage{exe}", "ordersamephase"]
+claims = { matches = ["ordersamephase: built"], lacks = ["refused"] }
+false = { run = ["{out}/storage{exe}", "orderphases"] }
+
+[[case]]
 name = "order-a-cycle-of-pairs-and-before-refused-in-each-load-order"
 run = ["{out}/storage{exe}", "ordertwo"]
 claims = { matches = ["game:m loaded first: refused: 'game:m:m1' would run before itself.*cycle\\s+game:n loaded first: refused: 'game:n:n1' would run before itself.*cycle\\s+alive"] }

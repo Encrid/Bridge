@@ -28,7 +28,8 @@ A refused phase keeps each system at level 0.
 
 ## The loop
 
-`schedule_build` schedules the entries 0 to `phase_count` of `docs/intern/lib/schedule/schedule.h.md`, *Phases and the barrier*.
+`schedule_build` first calls `schedule_cross_phase`, which refuses an `[order]` pair whose two systems a load put in different phases: `docs/intern/lib/schedule/schedule_cross.c.md`.
+Then it schedules the entries 0 to `phase_count` of `docs/intern/lib/schedule/schedule.h.md`, *Phases and the barrier*.
 First `build_phase` writes in `where` the phase or the barrier, as each reason names it.
 All of them use the room of `build_in` and `build_bits`, and only the levels stay in the systems.
 The loop stops at the first refused phase, and `why` then says why.

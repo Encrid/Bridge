@@ -40,6 +40,9 @@ typedef struct {
 
 [[nodiscard]] int schedule_build(bridge_world_t *w, char *why, size_t why_len);
 
+[[nodiscard]] int schedule_cross_phase(const bridge_world_t *w, char *why,
+    size_t why_len);
+
 [[nodiscard]] int schedule_room(bridge_world_t *w);
 
 void schedule_run(bridge_world_t *w, uint32_t phase);

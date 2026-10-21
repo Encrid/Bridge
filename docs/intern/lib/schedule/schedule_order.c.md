@@ -1,6 +1,6 @@
 # src/lib/schedule/schedule_order.c
 
-This file takes the pairs that a deployment states in `[order]`: two systems of one phase, in the order they must run.
+This file takes the pairs that a deployment states in `[order]`: two systems, in the order they must run.
 `src/lib/bridge/bridge_create.c` calls `schedule_order` once, at create.
 
 ## The pairs
@@ -18,8 +18,9 @@ The matrix has a row for twice as many names as pairs, and a row past the last n
 So `check_pairs` compares the result of `schedule_get_cycle` with the count of rows, and not with the count of names.
 
 A name counts in `order` once it is copied, so a refused world frees it.
-The world keeps the names and the closed matrix until `bridge_destroy`.
+The world keeps the names, the pairs and the closed matrix until `bridge_destroy`.
 A pair need not name a loaded system: `schedule_build` reads the matrix each time it builds the schedule.
+The world keeps each pair by index so that a load refuses a pair of two phases: `docs/intern/lib/schedule/schedule_cross.c.md`.
 
 The name of a system has no `@` and no `:`: `docs/intern/lib/abi/abi_subscriber.c.md`.
 So a full name has no `@`, and the name of the system follows its last colon.

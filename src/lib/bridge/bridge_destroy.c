@@ -39,6 +39,7 @@ static void free_names(bridge_world_t *w)
     for (uint32_t i = 0; i < w->order.n; i++)
         free(w->order.names[i]);
     free(w->order.names);
+    free(w->order.pairs);
     free(w->order.reach.bits);
     for (uint32_t i = 0; i < w->phase_count; i++)
         free(w->phases[i]);

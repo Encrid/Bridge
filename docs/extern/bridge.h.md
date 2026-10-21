@@ -738,6 +738,7 @@ The reason is a text of the backend, a refusal of an entry of the module, or one
 - `'<observer>' and '<observer>' both attach or detach '<component>' at the barrier, and their module states no order of them`
 - `'<system>' would run before itself in phase '<phase>': the [order] pairs and the orders that the modules state make a cycle`
 - `'<observer>' would run before itself at the barrier: the [order] pairs and the orders that the modules state make a cycle`
+- `the [order] pair of '<system>' and '<system>' orders nothing: they run in different phases`
 
 `its <export> <reason>` tells that the export did not return: the reason is the text of the backend.
 A conflict names the full names of the two systems. A conflict of observers is at the barrier.
