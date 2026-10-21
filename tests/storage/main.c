@@ -92,6 +92,7 @@ static const storage_test_case_t CASES[] = {
     { "orderphases", storage_test_order_phase, &PLAIN },
     { "ordersamephase", storage_test_order_phase, &PLAIN },
     { "configbadkind", storage_test_config_bad_kind, &PLAIN },
+    { "relaybadkind", storage_test_relay_bad_kind, &PLAIN },
     { "twosingles", storage_test_give_two_singles, &PLAIN },
     { "fulllist", storage_test_fill_list, &ONE_TABLE },
     { "levels", storage_test_count_levels, &PLAIN },

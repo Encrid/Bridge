@@ -1,4 +1,10 @@
 [[case]]
+name = "relay-a-field-of-a-kind-past-the-element-table-takes-the-type-size"
+run = ["{out}/storage{exe}", "relaybadkind"]
+claims = { matches = ["element size of a bad kind: 42.*alive"] }
+false = { run = ["{out}/storage{exe}", "ordersamephase"] }
+
+[[case]]
 name = "config-a-setting-of-a-kind-past-the-seeder-table-refused"
 run = ["{out}/storage{exe}", "configbadkind"]
 claims = { matches = ["kind 0: its setting 'setting' is a bool, and the field it names is of a type no setting fills.*kind 17: .*of a type no setting fills.*alive"] }
