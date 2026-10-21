@@ -1,4 +1,10 @@
 [[case]]
+name = "storage-marks-full-refused"
+run = ["{out}/storage{exe}", "marks"]
+claims = { matches = ["refused: out of memory: there was none for the mark of its queue.*alive"] }
+false = { run = ["{out}/storage{exe}", "shape"] }
+
+[[case]]
 name = "relay-a-field-of-a-kind-past-the-element-table-takes-the-type-size"
 run = ["{out}/storage{exe}", "relaybadkind"]
 claims = { matches = ["element size of a bad kind: 42.*alive"] }

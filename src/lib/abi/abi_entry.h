@@ -20,13 +20,17 @@ static inline const void *get_scratch(const module_t *m, uint64_t at,
     return (m->priv + at);
 }
 
-static inline void mark_turn(module_t *m)
+static inline int mark_turn(module_t *m)
 {
     if (m->mark_count && m->marks[m->mark_count - 1].turn == m->turn)
-        return;
+        return (0);
+    if (m->mark_count == m->mark_room)
+        return (abi_refuse(m, "out of memory: there was none for the mark of "
+            "its queue"));
     m->marks[m->mark_count].turn = m->turn;
     m->marks[m->mark_count].at = m->queue_len;
     m->mark_count++;
+    return (0);
 }
 
 static inline int queue_change(module_t *m, const change_t *ch,
@@ -40,7 +44,8 @@ static inline int queue_change(module_t *m, const change_t *ch,
     if (need > m->queue_room - m->queue_len)
         return (abi_refuse(m, "its changes of %u bytes are used up",
             m->queue_room));
-    mark_turn(m);
+    if (mark_turn(m))
+        return (1);
     memcpy(at, ch, sizeof(*ch));
     if (value)
         memcpy(at + sizeof(*ch), value, ch->size);

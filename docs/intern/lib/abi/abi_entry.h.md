@@ -24,7 +24,7 @@ The first change of a turn puts a mark in the queue: where the changes of that t
 The barrier uses these marks to keep the order of the calls: `docs/intern/lib/storage/storage_runs.h.md`, *The order of the queues*.
 `abi_marks` makes the room for the marks before a turn: `docs/intern/lib/abi/abi_alloc.c.md`, *The marks of the queue*.
 Between two applies, a module takes at most one mark for each system, one for each observer, and one for the lifecycle call.
-Each apply empties the marks, so the room is always there, and `mark_turn` asks for nothing.
+Each apply empties the marks, so the room is always there. `mark_turn` guards it still: a mark with no room is refused with a record.
 
 ## What a call may change
 
@@ -41,7 +41,7 @@ No other component takes the id 0.
 | Function | Source | Result |
 | --- | --- | --- |
 | `get_scratch` | `src/lib/abi/abi_entry.h` | The `len` bytes at `at` in the scratch arena of the module, or nullptr if they do not lie in it. |
-| `mark_turn` | `src/lib/abi/abi_entry.h` | Marks where the changes of the turn in progress begin in the queue, at the first change of that turn. |
+| `mark_turn` | `src/lib/abi/abi_entry.h` | Marks where the changes of the turn in progress begin in the queue, at the first change of that turn. Refuses with a record if the marks have no room. |
 | `queue_change` | `src/lib/abi/abi_entry.h` | Adds a change to the queue of the module, with a copy of its value after it. 1 if refused. |
 | `is_stated` | `src/lib/abi/abi_entry.h` | Whether the system or the observer that runs states the component among its changes. True for a lifecycle call. |
 | `check_owner` | `src/lib/abi/abi_entry.h` | Refuses a change of a singleton that names an entity, and a change of anything else that names none. 1 if refused. |
