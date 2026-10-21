@@ -6,7 +6,7 @@
 #include "bridge_inside.h"
 
 static constexpr uint64_t GRANULE_MOST = (uint64_t)1 << 30;
-static constexpr uint64_t SPAN_MOST = (uint64_t)1 << 47;
+static constexpr uint64_t SPAN_MOST = (uint64_t)1 << 62;
 
 static int refuse_span(bridge_world_t *w, const open_backend_t *o,
     const char *what, uint64_t bytes)

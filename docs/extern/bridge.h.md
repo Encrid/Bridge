@@ -655,8 +655,8 @@ Each record of Bridge has the level `BRIDGE_ERR`, unless its group tells another
 - `backend '<backend>' is named twice`
 - `backend '<backend>': <reason>`
 - `backend '<backend>' states a granule of <count>, and a granule is 0, or a power of two up to 1073741824`
-- `backend '<backend>' states a reservation of <bytes> bytes, and the most is 140737488355328`
-- `backend '<backend>' states a guard of <bytes> bytes, and the most is 140737488355328`
+- `backend '<backend>' states a reservation of <bytes> bytes, and the most is 4611686018427387904`
+- `backend '<backend>' states a guard of <bytes> bytes, and the most is 4611686018427387904`
 - `cannot open backend library '<path>'`
 - `backend '<backend>' would not start: <reason>`
 - `backend '<backend>' cannot adopt the shared memory: <reason>`

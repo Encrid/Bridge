@@ -355,7 +355,7 @@ false = { run = ["{out}/seam{exe}", "bridge_load-failed-init-log-given"] }
 [[case]]
 name = "bridge_backend_t-reservation-past-the-address-space-refused"
 run = ["{out}/seam{exe}", "bridge_backend_t-reservation-past-the-address-space-refused"]
-claims = { matches = ["the operating system would not give \\d+ bytes, in a reservation of 281474976710656 bytes.*bridge_create refused.*alive"] }
+claims = { matches = ["the operating system would not give \\d+ bytes, in a reservation of 2305843009213693952 bytes.*bridge_create refused.*alive"] }
 false = { run = ["{out}/seam{exe}", "bridge_load-failed-init-log-given"] }
 
 [[case]]
@@ -377,15 +377,15 @@ claims = { matches = ["states a granule of 18446744073709551615, and a granule i
 false = { run = ["{out}/seam{exe}", "bridge_backend_t-granule-of-a-page-taken"] }
 
 [[case]]
-name = "bridge_backend_t-reservation-past-two-to-the-47-refused"
-run = ["{out}/seam{exe}", "bridge_backend_t-reservation-past-two-to-the-47-refused"]
-claims = { matches = ["states a reservation of 140737488355329 bytes, and the most is 140737488355328.*bridge_create refused.*alive"] }
+name = "bridge_backend_t-reservation-past-two-to-the-62-refused"
+run = ["{out}/seam{exe}", "bridge_backend_t-reservation-past-two-to-the-62-refused"]
+claims = { matches = ["states a reservation of 4611686018427387905 bytes, and the most is 4611686018427387904.*bridge_create refused.*alive"] }
 false = { run = ["{out}/seam{exe}", "bridge_backend_t-granule-of-a-page-taken"] }
 
 [[case]]
-name = "bridge_backend_t-guard-past-two-to-the-47-refused"
-run = ["{out}/seam{exe}", "bridge_backend_t-guard-past-two-to-the-47-refused"]
-claims = { matches = ["states a guard of 140737488355329 bytes, and the most is 140737488355328.*bridge_create refused.*alive"] }
+name = "bridge_backend_t-guard-past-two-to-the-62-refused"
+run = ["{out}/seam{exe}", "bridge_backend_t-guard-past-two-to-the-62-refused"]
+claims = { matches = ["states a guard of 4611686018427387905 bytes, and the most is 4611686018427387904.*bridge_create refused.*alive"] }
 false = { run = ["{out}/seam{exe}", "bridge_backend_t-granule-of-a-page-taken"] }
 
 [[case]]

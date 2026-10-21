@@ -97,7 +97,7 @@ It writes three numbers, and 0 for each one that it does not need:
 | `granule` | The length of the block is a whole number of `granule` bytes. |
 
 A `granule` that is not 0 is a power of two, of at most 1073741824 bytes.
-A `reservation` and a `guard` each have at most 140737488355328 bytes, 2 to the power 47.
+A `reservation` and a `guard` each have at most 4611686018427387904 bytes, 2 to the power 62.
 Bridge refuses a backend that states more, and the world with it.
 
 Bridge reserves the length of a block or `reservation`, the larger of the two, and `guard` after it.
