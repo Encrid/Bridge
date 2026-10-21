@@ -74,6 +74,8 @@ static int seed_field(config_seed_t *seed, const schema_field_t *field,
 {
     if (field->count > 1)
         return (config_seed_array(seed, field, s));
+    if (field->kind > SCHEMA_STRUCT || !CONFIG_SEEDERS[field->kind])
+        return (config_say_misfit(seed, s, "of a type no setting fills"));
     return (CONFIG_SEEDERS[field->kind](seed, field, s));
 }
 

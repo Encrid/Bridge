@@ -22,7 +22,7 @@ Any other field is written by the seeder of its kind.
 | A struct | `config_seed_struct`, which refuses | `src/lib/config/config_text.c` |
 
 Each field of a config has one of these kinds, since `schema_set_type` refuses any other: `docs/intern/lib/schema/schema_type.c.md`.
-Each kind has its seeder in `CONFIG_SEEDERS`, so `seed_field` calls the seeder of the kind with no test.
+Each kind has its seeder in `CONFIG_SEEDERS`. `seed_field` guards the call: a field of a kind past the table, or with no seeder, is refused, so no bad index calls through it.
 
 ## Functions
 
@@ -31,5 +31,5 @@ Each kind has its seeder in `CONFIG_SEEDERS`, so `seed_field` calls the seeder o
 | `is_repeated` | Gives whether setting `i` has the key of a setting before it. |
 | `config_check_settings` | Refuses a setting with no key, of no kind, with a null text, or with a key that comes twice. Gives 1 with a reason. |
 | `find_field` | Gives the field of the config component that a key names, or `nullptr`. |
-| `seed_field` | Writes a setting into a field: an inline array by itself, and any other field by the seeder of its kind. |
+| `seed_field` | Writes a setting into a field: an inline array by itself, and any other by the seeder of its kind. Refuses a field of a kind with no seeder. |
 | `config_seed_setting` | Writes one setting into the field of its key. Gives 1 if no field has that name, or the field does not take it. |
