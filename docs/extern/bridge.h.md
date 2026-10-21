@@ -82,6 +82,21 @@ On Windows, the folder of a library with a path is also searched for the librari
 
 A path is a sequence of bytes in UTF-8, on each system.
 
+## Trust and isolation
+
+The world is the trust boundary: the host, storage and the schedule.
+A backend runs a module either as trusted code or as code that it does not trust.
+
+An untrusting backend confines a module to the cells and the arena that it declared, and traps it if it reaches further.
+So the module cannot read or write the memory of the world or of another module.
+The `wasm` backend is one: `docs/extern/bridge_backend.h.md`, *The wasm backend*.
+
+A trusting backend runs a module with the access of the host, for the speed of the hardware.
+The native backend trusts its modules: `docs/extern/bridge_backend.h.md`, *The native backend*.
+
+The confinement bounds what a module reaches, not what it does within its reach.
+Bridge does not enforce the grants or the rules there: `docs/extern/bridge_abi.h.md`, *Rules*.
+
 ## bridge_budget_t
 
 `bridge_budget_t` states how many of each thing a world can hold at one time, and how many bytes.

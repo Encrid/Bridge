@@ -290,7 +290,7 @@ For a component of another namespace, it needs a grant: the name of the componen
 Bridge checks a grant when a module declares a type, registers a system or an observer, and calls `attach` or `detach`.
 A module can destroy an entity that carries a component that it can write, or that carries nothing: *destroy*.
 An id that `spawn` has not handed out yet is no entity: the entity index does not show it, and no module can destroy it.
-The memory does not enforce a grant: a module can write what it reads. That breaks a rule: *Rules*.
+The memory does not enforce a grant: a module can write what it reads. That breaks a rule: *Rules*. The confinement does not catch it: `docs/extern/bridge.h.md`, *Trust and isolation*.
 
 ## add_system
 
