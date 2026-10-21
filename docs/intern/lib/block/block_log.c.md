@@ -26,20 +26,21 @@ The sink gets a `bridge_record_t` with resolved values: the identity of the modu
 ## The levels
 
 A level is a severity of syslog, by its number: `docs/extern/bridge.h.md`, *bridge_record_t*.
-A module names four of them in `include/bridge_abi.h`, as `BRIDGE_LOG_ERR` and the others.
-A host names the same four in `include/bridge.h`, as `BRIDGE_ERR` and the others.
+A module names five of them in `include/bridge_abi.h`, as `BRIDGE_LOG_ERR` and the others.
+A host names the same five in `include/bridge.h`, as `BRIDGE_ERR` and the others.
 Each header is whole without the other.
 This file holds the two sets of names equal with static assertions, where the level of a module becomes the level of a host.
 
-A module can write a byte above 7 in a line. `send_line` gives the sink `BRIDGE_LEVEL_MOST` in its place, and keeps the text.
+A module can write a byte above 7 in a line. `send_line` gives the sink `BRIDGE_LEVEL_MOST` in its place, and keeps the text. `block_drain` counts these lines, and names the first such level in a warning.
 
 ## The drain
 
 1. Read `ring_head` in the header: the count of the records that the module ever wrote.
 2. Hand the sink each record still in the ring, the oldest first. The ring holds `ring_len` records at most.
 3. If the module wrote more than the ring holds, write a warning with how many lines were dropped.
-4. Set the tail to the head, in the record of the module and in the header.
-5. Set `scratch_used` to 0: the scratch arena is the module's again.
+4. Warn of the broken lines: the count with a bad level, the first bad level, and the count outside scratch.
+5. Set the tail to the head, in the record of the module and in the header.
+6. Set `scratch_used` to 0: the scratch arena is the module's again.
 
 ## A line handed to the sink
 
@@ -56,5 +57,6 @@ A slot with no system or observer gives null.
 | --- | --- |
 | `get_writer` | Gives the name of the system, or of the observer, that wrote a record, by the slot in the record. Null if the module has none there. |
 | `is_in_scratch` | True if the text of a record lies in the scratch arena of the module. |
-| `send_line` | Hands the sink the record at `at` of the ring of a module. |
-| `block_drain` | Hands the log ring of a module to the sink, tells how many lines were dropped, and gives the module its scratch arena back. |
+| `note_fault` | Counts a broken line: a level above 7, keeping the first such level, or a text outside the scratch arena. |
+| `send_line` | Hands the sink the record at `at` of the ring of a module, and notes a broken line in the faults. |
+| `block_drain` | Hands the log ring of a module to the sink, warns of the dropped and the broken lines, and gives the scratch arena back. |

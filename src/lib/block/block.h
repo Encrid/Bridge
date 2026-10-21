@@ -20,6 +20,12 @@ typedef struct {
     uint64_t reserve;
 } block_layout_t;
 
+typedef struct {
+    uint32_t loud;
+    uint32_t outside;
+    uint32_t first;
+} log_fault_t;
+
 [[nodiscard]] int block_create(bridge_world_t *w,
     const bridge_budget_t *budget);
 

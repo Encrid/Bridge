@@ -33,7 +33,19 @@ static bool is_in_scratch(const module_t *m, const bridge_log_record_t *rec)
     return (rec->text - m->scratch <= m->scratch_len - rec->len);
 }
 
-static void send_line(bridge_world_t *w, const module_t *m, uint32_t at)
+static void note_fault(log_fault_t *f, const bridge_log_record_t *rec,
+    bool inside)
+{
+    if (!inside)
+        f->outside++;
+    if (rec->level <= BRIDGE_LEVEL_MOST)
+        return;
+    f->first = f->loud ? f->first : rec->level;
+    f->loud++;
+}
+
+static void send_line(bridge_world_t *w, const module_t *m, uint32_t at,
+    log_fault_t *f)
 {
     const uint8_t *ring = m->priv + m->ring;
     bridge_log_record_t rec;
@@ -53,6 +65,7 @@ static void send_line(bridge_world_t *w, const module_t *m, uint32_t at)
     r.level = rec.level;
     if (rec.level > BRIDGE_LEVEL_MOST)
         r.level = BRIDGE_LEVEL_MOST;
+    note_fault(f, &rec, is_in_scratch(m, &rec));
     say_send(w, &r);
 }
 
@@ -62,15 +75,17 @@ void block_drain(bridge_world_t *w, module_t *m)
     uint32_t head = h->ring_head;
     uint32_t written = head - m->ring_tail;
     uint32_t kept = written < m->ring_len ? written : m->ring_len;
-    uint32_t i = 0;
+    log_fault_t faults = {};
 
-    while (i < kept) {
-        send_line(w, m, m->ring_tail + i);
-        i++;
-    }
+    for (uint32_t i = 0; i < kept; i++)
+        send_line(w, m, m->ring_tail + i, &faults);
     if (written > kept)
         say_about(w, &(say_t){ m, nullptr, BRIDGE_WARN }, "%u log lines "
             "were dropped: its ring holds %u", written - kept, m->ring_len);
+    if (faults.loud + faults.outside)
+        say_about(w, &(say_t){ m, nullptr, BRIDGE_WARN }, "%u log lines had "
+            "a level above 7, the first was %u, and %u had text outside the "
+            "scratch arena", faults.loud, faults.first, faults.outside);
     m->ring_tail = head;
     h->ring_tail = head;
     h->scratch_used = 0;

@@ -349,7 +349,7 @@ false = { run = ["{out}/seam{exe}", "bridge_load-failed-init-log-given"] }
 [[case]]
 name = "record.level-above-seven-given-as-seven"
 run = ["{out}/seam{exe}", "record.level-above-seven-given-as-seven"]
-claims = { matches = ["record\\[7\\] test:s5@0.1.0/shout: over every severity.*alive"] }
+claims = { matches = ["record\\[7\\] test:s5@0.1.0/shout: over every severity.*1 log lines had a level above 7, the first was 200, and 0 had text outside the scratch arena.*alive"] }
 false = { run = ["{out}/seam{exe}", "bridge_load-failed-init-log-given"] }
 
 [[case]]
@@ -1335,7 +1335,7 @@ false = { run = ["{out}/seam{exe}", "budget.sparse_sets-past-a-count-of-32-bits-
 [[case]]
 name = "record.line-outside-the-scratch-or-of-no-system-replaced"
 run = ["{out}/seam{exe}", "record.line-outside-the-scratch-or-of-no-system-replaced"]
-claims = { matches = ["record\\[7\\] test:s5@0.1.0/-: \\(a log line whose text lies outside the scratch arena\\) 0 0.*record\\[7\\] test:s5@0.1.0/shout: \\(a log line whose text lies outside the scratch arena\\) 0 0.*alive"] }
+claims = { matches = ["record\\[7\\] test:s5@0.1.0/-: \\(a log line whose text lies outside the scratch arena\\) 0 0.*record\\[7\\] test:s5@0.1.0/shout: \\(a log line whose text lies outside the scratch arena\\) 0 0.*2 log lines had a level above 7, the first was 200, and 2 had text outside the scratch arena.*alive"] }
 false = { run = ["{out}/seam{exe}", "record.level-above-seven-given-as-seven"] }
 
 [[case]]

@@ -852,6 +852,10 @@ This record, at the level `BRIDGE_WARN`, counts the lines that a full log ring d
 
 - `<count> log lines were dropped: its ring holds <count>`
 
+This record, at the level `BRIDGE_WARN`, counts a module's broken log lines of a barrier. It gives the count with a level above 7 and the first such level, and the count whose text lay outside the scratch arena:
+
+- `<count> log lines had a level above 7, the first was <level>, and <count> had text outside the scratch arena`
+
 ### A stopped world
 
 Bridge writes one of these records when a module of `BRIDGE_FAIL` stops the world:
