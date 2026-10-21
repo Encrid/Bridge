@@ -40,7 +40,7 @@ enum storage_test_end storage_test_move_many(storage_test_t *t)
     (void)bridge_run_phase(w, "spawn");
     say_carried(w, "before the reload", 4);
     a.path = MANYMOVE2_PATH;
-    printf("reload: %s\n", bridge_reload(w, &a) ? "refused" : "done");
+    printf("reload: %s\n", bridge_reload(w, &a, 1) ? "refused" : "done");
     say_carried(w, "after the reload", 4);
     (void)bridge_destroy(w);
     return (STORAGE_TEST_LEFT);

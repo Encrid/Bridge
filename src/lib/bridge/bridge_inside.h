@@ -40,6 +40,9 @@ void bridge_leave(bridge_world_t *w, bool owner);
 [[nodiscard]] int bridge_reload_now(bridge_world_t *w,
     const bridge_artifact_t *a);
 
+[[nodiscard]] int bridge_reload_group_now(bridge_world_t *w,
+    const bridge_artifact_t *artifacts, uint32_t count);
+
 [[nodiscard]] int bridge_run_phase_now(bridge_world_t *w, const char *name);
 
 [[nodiscard]] int bridge_set_order_now(bridge_world_t *w,

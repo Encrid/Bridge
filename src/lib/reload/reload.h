@@ -40,4 +40,24 @@ void reload_take_cursors(reloading_t *r);
 
 int reload_fail(reloading_t *r);
 
+void reload_retire(reloading_t *r);
+
+void reload_swap(reloading_t *r);
+
+void reload_undo(reloading_t *r);
+
+void reload_set_move(const declared_type_t *c, storage_move_t *move,
+    storage_run_t *whole);
+
+void reload_settle(bridge_world_t *w, module_t *n);
+
+int reload_refuse_move(reloading_t *r, enum storage_moved moved,
+    uint32_t count);
+
+[[nodiscard]] int reload_move_group(reloading_t *reloads, uint32_t count,
+    char *why, size_t len);
+
+void reload_commit_group(bridge_world_t *w, reloading_t *reloads,
+    uint32_t count);
+
 #endif

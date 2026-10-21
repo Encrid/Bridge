@@ -101,7 +101,7 @@ static void relay(storage_test_t *t, const storage_test_relaid_t *row)
     a.path = row->to;
     a.cfg.losses = row->losses;
     a.cfg.loss_count = row->loss_count;
-    printf("  reload: %s\n", bridge_reload(w, &a) ? "refused" : "done");
+    printf("  reload: %s\n", bridge_reload(w, &a, 1) ? "refused" : "done");
     (void)bridge_run_phase(w, "look");
     (void)bridge_destroy(w);
 }
@@ -133,7 +133,7 @@ static int relay_held(storage_test_t *t)
         return (1);
     }
     a.path = LAYOUT8_PATH;
-    printf("  reload: %s\n", bridge_reload(w, &a) ? "refused" : "done");
+    printf("  reload: %s\n", bridge_reload(w, &a, 1) ? "refused" : "done");
     (void)bridge_destroy(w);
     return (0);
 }

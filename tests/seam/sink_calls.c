@@ -22,7 +22,7 @@ static int call_world(host_t *h)
     }
     if (!strcmp(h->arg, "bridge_reload")) {
         test_state_module(&a, "test:chatty@0.1.0", "chatty");
-        return (bridge_reload(h->w, &a));
+        return (bridge_reload(h->w, &a, 1));
     }
     if (!strcmp(h->arg, "bridge_unload"))
         return (bridge_unload(h->w, "test:chatty@0.1.0"));

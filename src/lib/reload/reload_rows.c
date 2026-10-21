@@ -7,7 +7,7 @@
 
 #include "reload.h"
 
-static void set_move(const declared_type_t *c, storage_move_t *move,
+void reload_set_move(const declared_type_t *c, storage_move_t *move,
     storage_run_t *whole)
 {
     const declared_type_t *was = c->replaces;
@@ -21,7 +21,7 @@ static void set_move(const declared_type_t *c, storage_move_t *move,
     move->run_count = was->run_count;
 }
 
-static void settle(bridge_world_t *w, module_t *n)
+void reload_settle(bridge_world_t *w, module_t *n)
 {
     say_t about = { n, nullptr, BRIDGE_WARN };
     uint32_t i = 0;
@@ -51,7 +51,7 @@ static enum storage_moved move_all(reloading_t *r, uint32_t count)
 
     for (uint32_t i = 0; moves && whole && i < n->declared_count; i++) {
         if (n->declared[i]->replaces)
-            set_move(n->declared[i], &moves[k], &whole[k]);
+            reload_set_move(n->declared[i], &moves[k], &whole[k]);
         k += n->declared[i]->replaces != nullptr;
     }
     if (moves && whole)
@@ -61,7 +61,7 @@ static enum storage_moved move_all(reloading_t *r, uint32_t count)
     return (moved);
 }
 
-static int refuse_move(reloading_t *r, enum storage_moved moved,
+int reload_refuse_move(reloading_t *r, enum storage_moved moved,
     uint32_t count)
 {
     const bridge_world_t *w = r->w;
@@ -88,7 +88,7 @@ int reload_move_rows(reloading_t *r)
     if (count)
         moved = move_all(r, count);
     if (moved != STORAGE_MOVED)
-        return (refuse_move(r, moved, count));
-    settle(r->w, n);
+        return (reload_refuse_move(r, moved, count));
+    reload_settle(r->w, n);
     return (0);
 }

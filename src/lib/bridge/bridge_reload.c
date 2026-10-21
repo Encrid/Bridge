@@ -5,7 +5,7 @@
 */
 #include "reload.h"
 
-static void retire_old(reloading_t *r)
+void reload_retire(reloading_t *r)
 {
     bridge_world_t *w = r->w;
     module_t *old = r->old;
@@ -38,7 +38,7 @@ static void forget_config(module_t *n)
         n->config = nullptr;
 }
 
-static void swap(reloading_t *r)
+void reload_swap(reloading_t *r)
 {
     bridge_world_t *w = r->w;
     module_t *old = r->old;
@@ -82,11 +82,11 @@ int bridge_reload_now(bridge_world_t *w, const bridge_artifact_t *a)
 
     if (reload_check(&r) || reload_grow_share(&r) || reload_make_record(&r))
         return (1);
-    retire_old(&r);
+    reload_retire(&r);
     reload_take_cursors(&r);
     if (start_new(&r))
         return (reload_fail(&r));
-    swap(&r);
+    reload_swap(&r);
     bridge_resume(w, r.n);
     block_barrier(w);
     return (w->stopped_by ? 1 : 0);

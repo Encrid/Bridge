@@ -50,7 +50,7 @@ static bool declares_it(const module_t *o, const module_t *m,
 {
     uint32_t i = 0;
 
-    if (o == m->reloads)
+    if (o == m->reloads || o->regrouping)
         return (false);
     while (i < o->declared_count && o->declared[i] != c)
         i++;

@@ -16,7 +16,7 @@ static void use_module(bridge_world_t *w, bridge_artifact_t a)
     (void)bridge_run_phase(w, "attach_b_half");
     a.cfg.spawns = 2;
     a.cfg.persistent = 64;
-    (void)bridge_reload(w, &a);
+    (void)bridge_reload(w, &a, 1);
     (void)bridge_run_phase(w, "look");
     (void)bridge_unload(w, a.cfg.identity);
 }

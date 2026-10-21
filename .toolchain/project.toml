@@ -1567,6 +1567,66 @@ defines = ["BRIDGE_ROWS_CHECKED"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "share1"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/share.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "share2"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/share.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "WIDE=1"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "sharew"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/share.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "WRITER"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "sharebad"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/share.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "TRAP"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "sharehold0"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/share.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "HOLD"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "sharehold1"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/share.c", "tests/binding/offsets_*.c"]
+include = ["include", "tests/binding", "tests/modules"]
+defines = ["BRIDGE_ROWS_CHECKED", "WIDE=1", "HOLD"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "badterm"
 kind = "library"
 test = true

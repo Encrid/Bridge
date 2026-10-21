@@ -25,9 +25,18 @@ void host_load(host_t *h, const bridge_artifact_t *a)
 
 void host_reload(host_t *h, const bridge_artifact_t *a)
 {
-    const char *ended = bridge_reload(h->w, a) ? "not reloaded" : "reloaded";
+    const char *ended = bridge_reload(h->w, a, 1) ? "not reloaded" : "reloaded";
 
     printf("%s: %s\n", a->cfg.identity, ended);
+}
+
+void host_reload_many(host_t *h, const bridge_artifact_t *artifacts,
+    uint32_t count)
+{
+    const char *ended = bridge_reload(h->w, artifacts, count) ? "not reloaded"
+        : "reloaded";
+
+    printf("group: %s\n", ended);
 }
 
 void host_unload(host_t *h, const char *identity)

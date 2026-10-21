@@ -225,6 +225,7 @@ enum storage_test_end storage_test_weigh(storage_test_t *t);
 enum storage_test_end storage_test_take_baseline(storage_test_t *t);
     #ifdef COUNTED
 enum storage_test_end storage_test_refuse_memory(storage_test_t *t);
+enum storage_test_end storage_test_refuse_memory_group(storage_test_t *t);
 enum storage_test_end storage_test_refuse_relay(storage_test_t *t);
 bool storage_test_count_request(void);
 enum storage_test_end storage_test_refuse_config_memory(storage_test_t *t);

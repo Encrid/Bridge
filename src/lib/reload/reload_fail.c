@@ -5,7 +5,7 @@
 */
 #include "reload.h"
 
-static void undo_new(reloading_t *r)
+void reload_undo(reloading_t *r)
 {
     bridge_world_t *w = r->w;
     module_t *n = r->n;
@@ -57,7 +57,7 @@ int reload_fail(reloading_t *r)
     if (r->n->priv)
         block_drain(w, r->n);
     say_error(w, "module '%s' was not reloaded: %s", id, r->err.text);
-    undo_new(r);
+    reload_undo(r);
     if (r->side_by_side)
         keep_old(w);
     else

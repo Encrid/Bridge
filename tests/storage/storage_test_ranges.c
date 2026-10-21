@@ -29,7 +29,7 @@ enum storage_test_end storage_test_count_ranges(storage_test_t *t)
         return (STORAGE_TEST_FAILED);
     loaded = t->w->arena_ranges;
     a.cfg.persistent = 5;
-    refused = bridge_reload(t->w, &a);
+    refused = bridge_reload(t->w, &a, 1);
     printf("ranges: %u when loaded, reload %s, %u after it", loaded,
         refused ? "refused" : "done", t->w->arena_ranges);
     (void)bridge_unload(t->w, "st:a@0.1.0");

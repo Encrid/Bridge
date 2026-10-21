@@ -30,5 +30,14 @@ A reload in progress.
 | `reload_grow_share` | `src/lib/reload/reload_share.c` | Grows the share of the module: `docs/intern/lib/reload/reload_share.c.md`, *A share that a reload grows*. |
 | `reload_give_back` | `src/lib/reload/reload_share.c` | Gives the growth back: `docs/intern/lib/reload/reload_share.c.md`, *Functions*. Nothing that lives was allocated from it. |
 | `reload_make_record` | `src/lib/reload/reload_record.c` | Makes the new record: `docs/intern/lib/reload/reload_record.c.md`, *What the new record takes over*. |
+| `reload_take_cursors` | `src/lib/reload/reload_record.c` | Takes the ids and the share of the old record into the new one: `docs/intern/lib/reload/reload_record.c.md`, *Functions*. |
 | `reload_move_rows` | `src/lib/reload/reload_rows.c` | Moves the rows: `docs/intern/lib/reload/reload_rows.c.md`, *Functions*. |
 | `reload_fail` | `src/lib/reload/reload_fail.c` | Undoes a reload that failed: `docs/intern/lib/reload/reload_fail.c.md`, *Functions*. |
+| `reload_retire` | `src/lib/bridge/bridge_reload.c` | Takes the systems of the old instance aside, for one module or a group: `docs/intern/lib/bridge/bridge_reload.c.md`, *Functions*. |
+| `reload_swap` | `src/lib/bridge/bridge_reload.c` | Puts a new record in the place of its old: `docs/intern/lib/bridge/bridge_reload.c.md`, *Functions*. |
+| `reload_undo` | `src/lib/reload/reload_fail.c` | Takes a new instance back out: `docs/intern/lib/reload/reload_fail.c.md`, *Functions*. |
+| `reload_set_move` | `src/lib/reload/reload_rows.c` | Writes the move of one type: `docs/intern/lib/reload/reload_rows.c.md`, *Functions*. |
+| `reload_settle` | `src/lib/reload/reload_rows.c` | Settles a reloaded module after the rows moved: `docs/intern/lib/reload/reload_rows.c.md`, *Functions*. |
+| `reload_refuse_move` | `src/lib/reload/reload_rows.c` | Writes why the rows did not move: `docs/intern/lib/reload/reload_rows.c.md`, *Functions*. |
+| `reload_move_group` | `src/lib/reload/reload_group_rows.c` | Moves the rows of a group as one: `docs/intern/lib/reload/reload_group_rows.c.md`, *One move for the list*. |
+| `reload_commit_group` | `src/lib/reload/reload_group_rows.c` | Commits a group reload: `docs/intern/lib/reload/reload_group_rows.c.md`, *The commit*. |

@@ -177,6 +177,7 @@ struct module {
     uint32_t mark_room;
     uint32_t mark_at;
     module_t *reloads;
+    bool regrouping;
     module_t *lender;
     const char *const *losses;
     uint32_t loss_count;

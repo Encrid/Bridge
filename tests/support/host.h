@@ -53,6 +53,8 @@ void host_print_record(void *ud, const bridge_record_t *r);
 
 void host_load(host_t *h, const bridge_artifact_t *a);
 void host_reload(host_t *h, const bridge_artifact_t *a);
+void host_reload_many(host_t *h, const bridge_artifact_t *artifacts,
+    uint32_t count);
 void host_unload(host_t *h, const char *identity);
 
 void host_run_frames(host_t *h, int count);

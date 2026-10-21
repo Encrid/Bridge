@@ -32,10 +32,10 @@ static const module_t *find_declarer(const module_t *m,
 
     while (o) {
         d = 0;
-        while (o != m->reloads && d < o->declared_count
+        while (o != m->reloads && !o->regrouping && d < o->declared_count
             && o->declared[d] != type)
             d++;
-        if (o != m->reloads && d < o->declared_count)
+        if (o != m->reloads && !o->regrouping && d < o->declared_count)
             return (o);
         o = o->next;
     }

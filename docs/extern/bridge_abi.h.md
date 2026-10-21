@@ -582,7 +582,8 @@ An offset that a module keeps in another place than a `bridge_text_t` is good on
 
 At a reload, the new instance can declare a type with another layout or with another storage layout.
 If another loaded module declares the type, the reload fails, and the record names the other modules.
-To change such a type, unload each other module that declares it, and reload this module. Then load the others, built for the new type.
+To change such a type, reload every module that declares it as one list, or unload the others first.
+A declarer left out of the list blocks the change, and the record names it.
 If this module alone declares the type, Bridge moves its rows to the new layout: all of them, or none.
 Bridge matches the fields by their names:
 

@@ -34,9 +34,11 @@ It gets the kind, the size, the alignment and the declared type in `named`.
 ## Who else declares a type
 
 `abi_say_others` writes the end of a refusal: ". It is also declared by", then the identity of each module.
-It names the loaded modules that declare the type, other than the module that the declaring module reloads.
-The declaring module is not linked yet, so only the module that it reloads has its stem: `docs/intern/lib/abi/abi_moved.c.md`, *A type that other rows hold*.
-A host needs these names: to unload these modules is what lets the layout of the component change.
+It names the loaded modules that declare the type. It passes over the module that the declaring module reloads, and every module that is regrouping.
+
+A module is regrouping while a group reload replaces it.
+So the modules of one group may change a type that they share: `docs/intern/lib/reload/reload_group.c.md`, *As one*.
+A host needs these names to change the layout: it reloads every declarer as one group, or unloads the rest.
 
 ## Functions
 
@@ -45,5 +47,5 @@ A host needs these names: to unload these modules is what lets the layout of the
 | `abi_is_listed` | Whether a list of names holds a name. |
 | `abi_is_foreign` | Whether a name is of another namespace than the module's. |
 | `abi_find_type` | Finds the type that a field names bare, and writes what the descriptor reader needs of it in `named`. False if there is none. |
-| `declares_it` | Whether a module declares a type, if it is not the module that the declaring module reloads. |
+| `declares_it` | Whether a module declares a type, if it is not the module that the declaring module reloads, and is not regrouping. |
 | `abi_say_others` | Writes who else declares a type, as the end of a refusal. Nothing if nobody does. |

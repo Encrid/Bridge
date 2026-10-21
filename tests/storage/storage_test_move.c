@@ -69,7 +69,7 @@ static void move(storage_test_t *t, const storage_test_moved_t *row)
     a.path = BUILDS[row->to];
     a.cfg.losses = row->losses;
     a.cfg.loss_count = row->loss_count;
-    printf("  reload: %s\n", bridge_reload(w, &a) ? "refused" : "done");
+    printf("  reload: %s\n", bridge_reload(w, &a, 1) ? "refused" : "done");
     (void)bridge_run_phase(w, "look");
     say_kept(w);
     (void)bridge_destroy(w);

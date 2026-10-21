@@ -376,6 +376,18 @@ void test_take_slot(host_t *h);
 void test_reload_ticker(host_t *h);
 void test_reload_tag(host_t *h);
 void test_reload_while_stopped(host_t *h);
+
+void group_state(bridge_artifact_t *a, const char *identity, const char *file);
+void test_reload_group(host_t *h);
+void test_reload_group_outside(host_t *h);
+void test_reload_group_start(host_t *h);
+void test_reload_group_cycle(host_t *h);
+void test_reload_group_plain(host_t *h);
+void test_reload_group_empty(host_t *h);
+void test_reload_group_dup(host_t *h);
+void test_reload_group_ghost(host_t *h);
+void test_reload_group_stop(host_t *h);
+void test_reload_group_hold(host_t *h);
 void test_grow_share(host_t *h);
 void test_repair(host_t *h);
 void test_repair_by_load(host_t *h);

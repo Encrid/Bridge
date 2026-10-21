@@ -32,7 +32,7 @@ All the rows move or none do: `docs/intern/lib/reload/reload_rows.c.md`, *All th
 A type with a field of another type holds values of that type in its rows.
 If another loaded module declares such a type, no reload of somebody else may change the type of the field.
 `abi_find_holder` finds such a type, and the module that declares it, for the refusal.
-It skips the instance that the reload replaces.
+It skips the instance that the reload replaces, and every module that a group reload is replacing.
 The module that reloads is not in the list of modules yet: it declares only in its first call, before it is linked.
 
 A type with a field of a type that this reload made anew is laid out again, though its own text is the same.
@@ -44,6 +44,6 @@ What a reload makes anew of a type, it makes of every type that has a field of i
 | --- | --- |
 | `abi_names_superseded` | Whether a field of a type names a type that this reload made anew. |
 | `has_field_of` | Whether a type has a field of type `c`. |
-| `find_declarer` | A loaded module, other than the one that the reload replaces, that declares a type. nullptr if none. |
+| `find_declarer` | A loaded module, other than the one that the reload replaces or a regrouping module, that declares a type. nullptr if none. |
 | `abi_find_holder` | A type with a field of type `c` that another loaded module declares, and that module in `by`. nullptr if none. |
 | `abi_check_move` | Refuses a move that the table of *A move to another storage layout* refuses, and a loss of a toggle that is not accepted. 1 with a refusal. |

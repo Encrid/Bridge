@@ -2095,6 +2095,72 @@ claims = { matches = ["the world has stopped: module 'test:flaky@0\\.1\\.0'.*gam
 false = { run = ["{out}/seam{exe}", "bridge_reload-reloaded"] }
 
 [[case]]
+name = "bridge_reload-group-of-two-reloaded"
+run = ["{out}/seam{exe}", "bridge_reload-group-of-two-reloaded"]
+claims = { matches = ["group: reloaded.*game:one@0\\.2\\.0/run: saw 2 84.*game:one@0\\.2\\.0=RUNNING game:two@0\\.2\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-group-of-none-refused"] }
+
+[[case]]
+name = "bridge_reload-group-changes-a-shared-type"
+run = ["{out}/seam{exe}", "bridge_reload-group-changes-a-shared-type"]
+claims = { matches = ["group: reloaded.*game:one@0\\.2\\.0/run: saw 2 84.*game:two@0\\.2\\.0/run: saw 2 84.*game:one@0\\.2\\.0=RUNNING game:two@0\\.2\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-group-names-an-outside-declarer-refused"] }
+
+[[case]]
+name = "bridge_reload-group-names-an-outside-declarer-refused"
+run = ["{out}/seam{exe}", "bridge_reload-group-names-an-outside-declarer-refused"]
+claims = { matches = ["is not reloaded: type 'game:Shared'.*It is also declared by 'game:three@0\\.1\\.0'.*group: not reloaded.*game:one@0\\.1\\.0=RUNNING game:two@0\\.1\\.0=RUNNING game:three@0\\.1\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-group-changes-a-shared-type"] }
+
+[[case]]
+name = "bridge_reload-group-member-failed-start-changes-nothing"
+run = ["{out}/seam{exe}", "bridge_reload-group-member-failed-start-changes-nothing"]
+claims = { matches = ["module 'game:two@0\\.1\\.0' is not reloaded: its reload answered 1.*group: not reloaded.*game:one@0\\.1\\.0=RUNNING game:two@0\\.1\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-group-of-two-reloaded"] }
+
+[[case]]
+name = "bridge_reload-group-schedule-conflict-refused"
+run = ["{out}/seam{exe}", "bridge_reload-group-schedule-conflict-refused"]
+claims = { matches = ["no module of the group is reloaded: 'game:one:run' and 'game:two:run' both touch 'game:Shared' in phase 'update'.*group: not reloaded.*game:one@0\\.1\\.0=RUNNING game:two@0\\.1\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-group-of-two-reloaded"] }
+
+[[case]]
+name = "bridge_reload-group-plain-member-refused"
+run = ["{out}/seam{exe}", "bridge_reload-group-plain-member-refused"]
+claims = { matches = ["module 'game:two@0\\.1\\.0' is not reloaded: a group needs every module on a backend that reloads side by side.*group: not reloaded.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-group-of-two-reloaded"] }
+
+[[case]]
+name = "bridge_reload-group-of-none-refused"
+run = ["{out}/seam{exe}", "bridge_reload-group-of-none-refused"]
+claims = { matches = ["no module of the group is reloaded: the group is empty.*group: not reloaded.*game:one@0\\.1\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-group-of-two-reloaded"] }
+
+[[case]]
+name = "bridge_reload-group-one-module-twice-refused"
+run = ["{out}/seam{exe}", "bridge_reload-group-one-module-twice-refused"]
+claims = { matches = ["module 'game:one@0\\.1\\.0' is not reloaded: the group names it twice.*group: not reloaded.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-group-of-two-reloaded"] }
+
+[[case]]
+name = "bridge_reload-group-with-a-member-not-loaded-refused"
+run = ["{out}/seam{exe}", "bridge_reload-group-with-a-member-not-loaded-refused"]
+claims = { matches = ["module 'game:ghost@0\\.2\\.0' is not reloaded: nothing of that name is loaded.*group: not reloaded.*game:one@0\\.1\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-group-of-two-reloaded"] }
+
+[[case]]
+name = "bridge_reload-group-whose-barrier-stops-the-world-gives-1"
+run = ["{out}/seam{exe}", "bridge_reload-group-whose-barrier-stops-the-world-gives-1"]
+claims = { matches = ["the world has stopped: module 'view:sour@0\\.1\\.0' was stopped and its on_error is fail.*group: not reloaded.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-group-of-two-reloaded"] }
+
+[[case]]
+name = "bridge_reload-group-holds-a-shared-type-in-a-field"
+run = ["{out}/seam{exe}", "bridge_reload-group-holds-a-shared-type-in-a-field"]
+claims = { matches = ["group: reloaded.*game:one@0\\.2\\.0=RUNNING game:two@0\\.2\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-group-names-an-outside-declarer-refused"] }
+
+[[case]]
 name = "declare-two-descriptors-with-one-fingerprint-refused"
 run = ["{out}/seam{exe}", "declare-two-descriptors-with-one-fingerprint-refused"]
 claims = { matches = ["st:collide@0.1.0: loaded.*module 'st:rival@0.1.0' did not load: type 'st:y_t' has another component layout here: fingerprint 581383d61aa6b58f, and it was declared with 581383d61aa6b58f.*alive"] }

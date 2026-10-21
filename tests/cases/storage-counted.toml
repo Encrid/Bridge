@@ -45,3 +45,9 @@ name = "allocation-each-refused-in-turn-with-four-threads"
 run = ["{out}/storage-counted{exe}", "nomemorythreads"]
 claims = { matches = ["more than forty allocations were each answered null in turn.*alive"], lacks = ["FAIL"] }
 false = { run = ["{out}/storage-counted{exe}", "changes"] }
+
+[[case]]
+name = "allocation-each-refused-in-turn-reloading-a-group"
+run = ["{out}/storage-counted{exe}", "nomemorygroup"]
+claims = { matches = ["more than thirty allocations were each answered null in turn.*alive"], lacks = ["FAIL"] }
+false = { run = ["{out}/storage-counted{exe}", "changes"] }

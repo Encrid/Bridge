@@ -63,8 +63,8 @@ So the two instances never get the same id or the same bytes.
 
 | Function | Result |
 | --- | --- |
-| `retire_old` | Takes the systems of the old instance out of storage. Without `BACKEND_SIDE_BY_SIDE`, it also shuts the old instance down and destroys it. |
+| `reload_retire` | Takes the systems of the old instance out of storage. Without `BACKEND_SIDE_BY_SIDE`, it also shuts the old instance down and destroys it. |
 | `forget_config` | Forgets the settings component if the new instance no longer declares it. |
-| `swap` | Puts the new record in the place of the old one, releases what the new instance no longer declares, and discards the old record. |
+| `reload_swap` | Puts the new record in the place of the old one, releases what the new instance no longer declares, and discards the old record. |
 | `start_new` | Starts the new instance with `reload`, builds the schedule again, and moves the rows. 1, with why in the reload, if one fails. |
 | `bridge_reload_now` | Reloads a module. 0 if the new instance and the world run, and 1 if not. |

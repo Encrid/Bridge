@@ -315,7 +315,7 @@ BRIDGE_API [[nodiscard]] int bridge_unload(bridge_world_t *w,
     const char *identity);
 
 BRIDGE_API [[nodiscard]] int bridge_reload(bridge_world_t *w,
-    const bridge_artifact_t *a);
+    const bridge_artifact_t *artifacts, uint32_t count);
 
 BRIDGE_API int bridge_list_modules(bridge_world_t *w, bridge_module_info_t *out,
     int max);

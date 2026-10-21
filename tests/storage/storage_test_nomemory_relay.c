@@ -39,7 +39,7 @@ static bool relay_one(storage_test_t *t, size_t k)
     a.cfg.hot_reload = BRIDGE_TRUE;
     if (!bridge_load(t->w, &a) && (empty || !bridge_run_phase(t->w, "spawn"))) {
         a.path = empty ? LAYOUT15_PATH : LAYOUT1_PATH;
-        (void)bridge_reload(t->w, &a);
+        (void)bridge_reload(t->w, &a, 1);
     }
     (void)bridge_destroy(t->w);
     return (allocator->failed);

@@ -568,35 +568,44 @@ From the sink, the result is 1, with no record.
 
 ## bridge_reload
 
-`bridge_reload` replaces the instance of a loaded module, and keeps its storage.
+`bridge_reload` replaces the instances of a list of loaded modules as one, and keeps their storage.
 
 | Parameter | Content |
 | --- | --- |
 | `w` | The world. |
-| `a` | The new module. Its identity without the version is the identity of a loaded module. |
+| `artifacts` | The new modules. Each identity without the version names a loaded module. |
+| `count` | How many modules the list holds. A reload of one module is a list of one. |
 
-1. Bridge checks the config as a load does. The loaded module must allow `hot_reload`, and stay on its backend.
-2. The share of the arena of the module grows to the new `persistent`.
-3. The systems of the old instance stand aside.
-4. Without `BACKEND_SIDE_BY_SIDE`, Bridge shuts the old instance down first.
-5. The backend makes a new image, a new instance and a new private memory.
-6. Bridge calls `reload` of the new instance under `reload_timeout`. It declares and registers as `init` did.
-7. Bridge checks the schedule, and moves the rows of each component whose layout changed.
-8. Bridge shuts the old instance down, and the new instance takes its place.
+1. Bridge checks each config as a load does. Each module must allow `hot_reload`, and stay on its backend.
+2. The share of the arena of each module grows to the new `persistent`.
+3. The systems of each old instance stand aside.
+4. The backend makes a new image, a new instance and a new private memory for each.
+5. Bridge calls `reload` of each new instance under `reload_timeout`. It declares and registers as `init` did.
+6. Bridge checks the schedule once, then moves the rows of each changed component, all of them or none.
+7. Bridge shuts each old instance down, and the new instances take their place at one barrier.
+
+A type that only modules of the list declare may change, and its rows move once.
+A type that another loaded module declares may not change, and the record names that module.
+
+A list of more than one needs every module on a backend with `BACKEND_SIDE_BY_SIDE`.
+Bridge refuses such a list, and names the module: `a group needs every module on a backend that reloads side by side`.
+It refuses a list that names one module twice: `the group names it twice`.
+A single module without `BACKEND_SIDE_BY_SIDE` reloads alone: Bridge shuts its old instance down before the new one starts.
 
 The old and the new instance take entity ids and bytes of the persistent arena from one supply.
 Each id and each byte goes to one instance only.
 
-The result is 0 if the new instance runs. Else the result is 1, with a record.
+The result is 0 if every new instance runs. Else the result is 1, and nothing of the list changes.
+A refused rebuild records `no module of the group is reloaded: <reason>`. A list of no module is refused.
 From the sink, the result is 1, with no record.
 
 A reload keeps the components, their rows and the entities. Bridge does not write the settings again.
-A component that the new instance does not declare goes, as at an unload.
-The new instance runs under the new config, but `persistent` can grow and not shrink.
-If the new config states fewer `spawns`, the module keeps that many of the ids that it held ready. Bridge takes the others back at the next barrier.
+A component that a new instance does not declare goes, as at an unload.
+A new instance runs under the new config, but `persistent` can grow and not shrink.
+If a new config states fewer `spawns`, the module keeps that many ready ids. Bridge takes the others back at the next barrier.
 
 With `BACKEND_SIDE_BY_SIDE`, a reload that fails keeps the old instance running, as it was.
-Without it, a reload that fails stops the module, and keeps what it declared. A reload that succeeds brings it back.
+Without it, a single reload that fails stops the module, and keeps what it declared. A later reload brings it back.
 
 ## bridge_list_modules
 

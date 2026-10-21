@@ -147,6 +147,7 @@ A system and an observer are a query and a function either way, so one record se
 | `running`, `turn` | What runs in it now, or null for a lifecycle call, and the turn of that call. |
 | `marks`, `mark_count`, `mark_room`, `mark_at` | Where the changes of each turn begin in its queue, and the next mark that the barrier takes. |
 | `reloads` | The instance that this one is to take the place of. |
+| `regrouping` | That a group reload is replacing this old instance, so the declare of another member of the group passes over it. |
 | `lender` | The new record, during the `shutdown` of this old instance in a reload: `spawn` and `alloc` take from it. Else null. |
 | `losses`, `loss_count` | What a reload accepts to lose. |
 | `loss_rows` | By loss: how many rows lost something under that name, plus one. Zero if none did. |

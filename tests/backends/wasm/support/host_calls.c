@@ -25,7 +25,7 @@ void host_load(host_t *h, const bridge_artifact_t *a)
 
 void host_reload(host_t *h, const bridge_artifact_t *a)
 {
-    const char *ended = bridge_reload(h->w, a) ? "not reloaded" : "reloaded";
+    const char *ended = bridge_reload(h->w, a, 1) ? "not reloaded" : "reloaded";
 
     printf("%s: %s\n", a->cfg.identity, ended);
 }

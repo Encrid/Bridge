@@ -29,14 +29,16 @@ int bridge_unload(bridge_world_t *w, const char *identity)
     return (result);
 }
 
-int bridge_reload(bridge_world_t *w, const bridge_artifact_t *a)
+int bridge_reload(bridge_world_t *w, const bridge_artifact_t *artifacts,
+    uint32_t count)
 {
     bool owner;
     int result;
 
     if (!bridge_enter(w, &owner) || !owner)
         return (1);
-    result = bridge_reload_now(w, a);
+    result = count == 1 ? bridge_reload_now(w, &artifacts[0])
+        : bridge_reload_group_now(w, artifacts, count);
     bridge_leave(w, owner);
     return (result);
 }
