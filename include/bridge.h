@@ -323,6 +323,9 @@ BRIDGE_API int bridge_list_modules(bridge_world_t *w, bridge_module_info_t *out,
 BRIDGE_API [[nodiscard]] int bridge_run_phase(bridge_world_t *w,
     const char *name);
 
+BRIDGE_API [[nodiscard]] int bridge_set_order(bridge_world_t *w,
+    const bridge_order_t *pairs, uint32_t count);
+
     #ifdef __cplusplus
 }
     #endif

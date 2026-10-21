@@ -42,6 +42,9 @@ void bridge_leave(bridge_world_t *w, bool owner);
 
 [[nodiscard]] int bridge_run_phase_now(bridge_world_t *w, const char *name);
 
+[[nodiscard]] int bridge_set_order_now(bridge_world_t *w,
+    const bridge_order_t *pairs, uint32_t count);
+
 int bridge_list_modules_now(bridge_world_t *w, bridge_module_info_t *out,
     int max);
 

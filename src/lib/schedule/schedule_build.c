@@ -63,6 +63,7 @@ int schedule_build(bridge_world_t *w, char *why, size_t why_len)
         .why_len = why_len };
     int refused = 0;
 
+    schedule_resolve_names(w);
     if (schedule_cross_phase(w, why, why_len))
         return (1);
     p.in = (bridge_system_t **)w->build_in;

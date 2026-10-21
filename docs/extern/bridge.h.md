@@ -16,7 +16,7 @@ A count of an array can be zero, unless this document tells otherwise.
 Each function but `bridge_list_modules` is `[[nodiscard]]`: the compiler warns when a host ignores its result.
 
 Call the functions of one world one at a time: a call starts after the call before it returns.
-So call `bridge_load`, `bridge_unload` and `bridge_reload` between two phases, never while `bridge_run_phase` runs.
+So call `bridge_load`, `bridge_unload`, `bridge_reload` and `bridge_set_order` between two phases, never while `bridge_run_phase` runs.
 
 A call from another thread while a call of the world runs does nothing and writes no record.
 A record would call the sink on that thread, during the call that runs.
@@ -636,6 +636,27 @@ A system sees the same state of the world for the whole of a phase. An entity th
 A host can call a phase more often than another, for example a phase of physics at a fixed rate.
 Bridge does not know if a host forgets a phase.
 
+## bridge_set_order
+
+`bridge_set_order` replaces the whole `[order]` set of a running world between two phases.
+
+| Parameter | Content |
+| --- | --- |
+| `w` | The world. |
+| `pairs` | The order pairs, the whole new set: `bridge_order_t`. |
+| `count` | How many pairs there are. |
+
+The pairs are the whole set, not an addition. They are the `[order]` of `bridge_create`, stated again.
+Bridge builds the order and the schedule again from the whole set.
+
+The call is all or nothing. A new set can make a cycle, leave two loaded systems in conflict with no order, or name a pair of two phases. Each of these refuses the call. The old set stays, and so does the schedule.
+
+The result is 0 if the new set took. The result is 1, with a record, if Bridge refuses it. From the sink, the result is 1 with no record.
+
+A refusal of the new pairs writes a record of *The deployment*. A refusal of the rebuilt schedule writes `[order] is unchanged: <reason>`, where `<reason>` is a reason of *A load that failed* for the order.
+
+Call it between two phases, as a load. Out of memory refuses the call and keeps the old set.
+
 ## Messages
 
 Bridge gives each message to the sink in a record.
@@ -680,6 +701,7 @@ Each record of Bridge has the level `BRIDGE_ERR`, unless its group tells another
 
 The reason of `backend '<backend>': <reason>` is `cannot open backend library '<path>'`, or a reason of `docs/extern/bridge_backend.h.md`, *Messages*.
 The reason of `would not start` and of `cannot adopt` is the text of the backend.
+`bridge_set_order` writes the three `[order]` records of this group too, when a new set does not name two systems, cannot be read, or contradicts itself.
 
 ### A call refused
 
@@ -878,5 +900,5 @@ A function that cannot get memory writes this record, and fails as for any other
 - `out of memory: there was none for <what>`
 
 `<what>` names what Bridge needed the memory for.
-Bridge takes memory only in the functions that make or destroy a world, and that load, reload or unload a module.
+Bridge takes memory only in the functions that make or destroy a world, that load, reload or unload a module, and that set the order.
 It never takes memory in a phase or at a barrier. A function that fails for want of memory leaves the world as it was.

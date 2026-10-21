@@ -70,6 +70,10 @@ void schedule_add_stated(const bridge_world_t *w, schedule_phase_t *p);
 
 uint32_t schedule_find_name(const schedule_pairs_t *order, const char *full);
 
+void schedule_resolve_names(bridge_world_t *w);
+
+void schedule_free_pairs(schedule_pairs_t *o);
+
 bool schedule_orders(const schedule_pairs_t *order, const bridge_system_t *s,
     const bridge_system_t *t);
 

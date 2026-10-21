@@ -182,6 +182,8 @@ enum storage_test_end storage_test_grow_many(storage_test_t *t);
 enum storage_test_end storage_test_wrap_generation(storage_test_t *t);
 enum storage_test_end storage_test_order_two_modules(storage_test_t *t);
 enum storage_test_end storage_test_order_phase(storage_test_t *t);
+enum storage_test_end storage_test_set_order(storage_test_t *t);
+enum storage_test_end storage_test_set_order_guard(storage_test_t *t);
 enum storage_test_end storage_test_config_bad_kind(storage_test_t *t);
 enum storage_test_end storage_test_relay_bad_kind(storage_test_t *t);
 enum storage_test_end storage_test_fill_marks(storage_test_t *t);

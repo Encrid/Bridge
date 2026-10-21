@@ -7,6 +7,7 @@
 
 #include "bridge_inside.h"
 #include "say.h"
+#include "schedule.h"
 
 static void end_modules(bridge_world_t *w)
 {
@@ -36,11 +37,7 @@ static void free_schedule(bridge_world_t *w)
 
 static void free_names(bridge_world_t *w)
 {
-    for (uint32_t i = 0; i < w->order.n; i++)
-        free(w->order.names[i]);
-    free(w->order.names);
-    free(w->order.pairs);
-    free(w->order.reach.bits);
+    schedule_free_pairs(&w->order);
     for (uint32_t i = 0; i < w->phase_count; i++)
         free(w->phases[i]);
     free(w->phases);

@@ -23,6 +23,30 @@ claims = { matches = ["spans too small: 1.*alive"] }
 false = { run = ["{out}/storage{exe}", "ordersamephase"] }
 
 [[case]]
+name = "bridge-a-new-order-replaces-the-whole-set-or-the-old-set-stays"
+run = ["{out}/storage{exe}", "setorder"]
+claims = { matches = ["contradicts itself.*cycle: refused 0 1 2 3.*is unchanged.*no pair orders them.*empty: refused 0 1 2 3.*alt: ok 0 1 0 1.*alive"] }
+false = { run = ["{out}/storage{exe}", "ordersamephase"] }
+
+[[case]]
+name = "bridge-set-order-is-refused-when-the-world-has-stopped"
+run = ["{out}/storage{exe}", "setorderstopped"]
+claims = { matches = ["the world has stopped: a module stopped it.*guard setorderstopped: 1.*alive"] }
+false = { run = ["{out}/storage{exe}", "ordersamephase"] }
+
+[[case]]
+name = "bridge-set-order-is-refused-from-a-second-caller"
+run = ["{out}/storage{exe}", "setorderbusy"]
+claims = { matches = ["guard setorderbusy: 1.*alive"] }
+false = { run = ["{out}/storage{exe}", "ordersamephase"] }
+
+[[case]]
+name = "bridge-set-order-is-refused-from-a-reentrant-call"
+run = ["{out}/storage{exe}", "setorderreentrant"]
+claims = { matches = ["guard setorderreentrant: 1.*alive"] }
+false = { run = ["{out}/storage{exe}", "ordersamephase"] }
+
+[[case]]
 name = "region-a-give-into-a-full-list-of-gaps-keeps-the-piece-out"
 run = ["{out}/storage{exe}", "regionfull"]
 claims = { matches = ["region full: count 2.*alive"] }

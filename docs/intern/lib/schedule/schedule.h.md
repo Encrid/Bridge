@@ -8,7 +8,7 @@ It also gives the failure budget that each barrier settles.
 A barrier follows each phase, and the host asks for one phase at a time.
 The schedule has an entry for each phase of the deployment, and one more entry for the barrier, at the index `phase_count`.
 A system is in the entry of its phase, and an observer is in the entry of the barrier: `docs/intern/lib/abi/abi_system.c.md`, *observe*.
-`schedule_build` makes the schedule again when a module loads, reloads or unloads.
+`schedule_build` makes the schedule again when a module loads, reloads or unloads, and when a host sets the order.
 
 ## Conflicts
 
@@ -33,7 +33,7 @@ Without the version in the name, an upgrade of a module does not change the pair
 A deployment can order modules that it does not load: `docs/extern/bridge.h.md`, *bridge_order_t*.
 `schedule_order` refuses the pairs that `docs/intern/lib/schedule/schedule_order.c.md`, *Refusals*, names.
 
-The world keeps the names of the pairs and their closed matrix from create.
+The world keeps the names of the pairs and their closed matrix.
 So a chain of pairs orders two systems also through a name that is not loaded.
 
 A module orders its own systems in `before`: `docs/extern/bridge_abi.h.md`, *add_system*.
@@ -71,7 +71,7 @@ None of this runs in a frame.
 
 `schedule_room` makes the room for the schedule and for a dispatch once, at create, `[budget] systems` wide.
 So a load, a reload and an unload ask for no memory to build the schedule, and a phase allocates nothing.
-The matrix of the names of `[order]` is closed once, at create: `n^3 / 64` word operations for `n` names.
+The matrix of the names of `[order]` is closed each time the order is built: `n^3 / 64` word operations for `n` names.
 
 ## The failure budget
 
@@ -153,6 +153,8 @@ One phase that `schedule_run` runs.
 | `schedule_add_stated` | Adds the edges of the pairs: `docs/intern/lib/schedule/schedule_edges.c.md`, *Functions*. |
 | `schedule_find_name` | Finds the index of a full name: `docs/intern/lib/schedule/schedule_names.c.md`, *Functions*. |
 | `schedule_orders` | Tells whether the pairs order two systems: `docs/intern/lib/schedule/schedule_names.c.md`, *Functions*. |
+| `schedule_resolve_names` | Resets each system's index from its name: `docs/intern/lib/schedule/schedule_names.c.md`, *Functions*. |
+| `schedule_free_pairs` | Frees an order set: `docs/intern/lib/schedule/schedule_names.c.md`, *Functions*. |
 | `schedule_join_before` | Joins `t` to the systems before `s`: `docs/intern/lib/schedule/schedule_before.c.md`, *Functions*. |
 | `schedule_is_stated_before` | Tells whether `before` orders two systems: `docs/intern/lib/schedule/schedule_before.c.md`, *Functions*. |
 | `schedule_add_own` | Adds the edges of `before`: `docs/intern/lib/schedule/schedule_edges.c.md`, *Functions*. |
