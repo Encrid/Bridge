@@ -65,3 +65,10 @@ void region_give(region_t *r, uint32_t at, uint32_t len)
         region_drop_gap(r, i);
     }
 }
+
+void region_bump(region_t *r, uint32_t by)
+{
+    r->used += by;
+    if (r->used > r->peak)
+        r->peak = r->used;
+}

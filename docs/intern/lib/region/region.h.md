@@ -16,9 +16,9 @@ A region never takes memory from outside itself: it refuses a request that it ca
 | Type | Content |
 | --- | --- |
 | `range_t` | A range of a region: `at`, its offset from the start of the region, and `len`, its length in bytes. |
-| `region_t` | A region: `gaps` and `count` of them, `room` gaps that the list has memory for, `used` and `len`. |
+| `region_t` | A region: `gaps` and `count` of them, `room` gaps that the list has memory for, `used`, `peak` and `len`. |
 
-Everything past `used` was never handed out. `len` is the length of the region.
+Everything past `used` was never handed out. `peak` is the highest that `used` ever reached. `len` is the length of the region.
 
 ## Functions
 
@@ -27,6 +27,7 @@ Everything past `used` was never handed out. `len` is the length of the region.
 | `region_make_room` | `src/lib/region/region.c` | Makes room in the list of gaps: `docs/intern/lib/region/region.c.md`, *Functions*. |
 | `region_drop_gap` | `src/lib/region/region.c` | Takes a gap out of the list: `docs/intern/lib/region/region.c.md`, *Functions*. |
 | `region_give` | `src/lib/region/region.c` | Gives a piece back: `docs/intern/lib/region/region.c.md`, *Functions*. |
+| `region_bump` | `src/lib/region/region.c` | Adds to `used` and lifts `peak`: `docs/intern/lib/region/region.c.md`, *Functions*. |
 | `region_take` | `src/lib/region/region_take.c` | Takes a piece: `docs/intern/lib/region/region_take.c.md`, *Functions*. |
 | `region_grow` | `src/lib/region/region_take.c` | Makes a piece longer where it is: `docs/intern/lib/region/region_take.c.md`, *Functions*. |
 | `region_get_most` | `src/lib/region/region_take.c` | Tells how long the longest piece is: `docs/intern/lib/region/region_take.c.md`, *Functions*. |

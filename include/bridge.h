@@ -316,6 +316,23 @@ static_assert(offsetof(bridge_profile_row_t, name) == 0);
 static_assert(offsetof(bridge_profile_row_t, calls) == 8);
 static_assert(offsetof(bridge_profile_row_t, nanos) == 16);
 
+typedef struct {
+    const char *identity;
+    uint64_t persistent;
+    uint32_t systems;
+    uint32_t observers;
+    uint32_t entities;
+    uint32_t pad;
+} bridge_module_usage_row_t;
+static_assert(sizeof(bridge_module_usage_row_t) == 32);
+static_assert(alignof(bridge_module_usage_row_t) == 8);
+static_assert(offsetof(bridge_module_usage_row_t, identity) == 0);
+static_assert(offsetof(bridge_module_usage_row_t, persistent) == 8);
+static_assert(offsetof(bridge_module_usage_row_t, systems) == 16);
+static_assert(offsetof(bridge_module_usage_row_t, observers) == 20);
+static_assert(offsetof(bridge_module_usage_row_t, entities) == 24);
+static_assert(offsetof(bridge_module_usage_row_t, pad) == 28);
+
 BRIDGE_API [[nodiscard]] bridge_world_t *bridge_create(
     const bridge_config_t *cfg, bridge_sink_fn_t sink, void *ud);
 
@@ -335,6 +352,12 @@ BRIDGE_API int bridge_list_modules(bridge_world_t *w, bridge_module_info_t *out,
 
 BRIDGE_API int bridge_profile(bridge_world_t *w, bridge_profile_row_t *out,
     int max);
+
+BRIDGE_API int bridge_usage(bridge_world_t *w, bridge_budget_t *used,
+    bridge_budget_t *most);
+
+BRIDGE_API int bridge_module_usage(bridge_world_t *w,
+    bridge_module_usage_row_t *out, int max);
 
 BRIDGE_API [[nodiscard]] int bridge_run_phase(bridge_world_t *w,
     const char *name);

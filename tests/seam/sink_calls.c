@@ -32,6 +32,10 @@ static int call_world(host_t *h)
         return (bridge_destroy(h->w));
     if (!strcmp(h->arg, "bridge_profile"))
         return (bridge_profile(h->w, nullptr, 0));
+    if (!strcmp(h->arg, "bridge_usage"))
+        return (bridge_usage(h->w, nullptr, nullptr));
+    if (!strcmp(h->arg, "bridge_module_usage"))
+        return (bridge_module_usage(h->w, nullptr, 0));
     count = bridge_list_modules(h->w, list, 4);
     if (count > 0)
         printf("listed %s\n", list[0].identity);

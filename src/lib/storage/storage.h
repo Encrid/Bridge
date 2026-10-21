@@ -41,6 +41,13 @@ typedef struct {
     uint32_t run_count;
 } storage_move_t;
 
+typedef struct {
+    uint32_t entities;
+    uint32_t entities_peak;
+    uint32_t tables;
+    uint32_t tables_peak;
+} storage_usage_t;
+
 typedef void (*storage_read_fn_t)(void *ctx, const uint8_t *value);
 typedef void (*storage_visit_fn_t)(storage_t *r, uint32_t index, void *ctx);
 
@@ -80,6 +87,8 @@ uint32_t storage_reserve(storage_t *r, uint64_t *ids, uint32_t want);
 void storage_end_publish(storage_t *r);
 
 uint32_t storage_count_tables(storage_t *r);
+
+storage_usage_t storage_usage(const storage_t *r);
 
 uint32_t storage_count_carriers(storage_t *r, const storage_type_t *type);
 

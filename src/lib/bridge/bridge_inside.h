@@ -51,6 +51,12 @@ void bridge_leave(bridge_world_t *w, bool owner);
 int bridge_list_modules_now(bridge_world_t *w, bridge_module_info_t *out,
     int max);
 
+int bridge_usage_now(bridge_world_t *w, bridge_budget_t *used,
+    bridge_budget_t *most);
+
+int bridge_module_usage_now(bridge_world_t *w, bridge_module_usage_row_t *out,
+    int max);
+
 void bridge_stop(bridge_world_t *w, const char *identity, const char *what);
 
 void bridge_resume(bridge_world_t *w, const module_t *m);

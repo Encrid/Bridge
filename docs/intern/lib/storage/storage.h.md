@@ -84,6 +84,15 @@ Each value of type `from` becomes a value of type `to`: zero, but for the runs t
 | `to` | The type as it will be. |
 | `runs`, `run_count` | The runs of bytes to copy. |
 
+### storage_usage_t
+
+How much of two storage limits the world uses, and the most it has used.
+
+| Field | Content |
+| --- | --- |
+| `entities`, `entities_peak` | The live entities, and the highest the entity index ever reached. |
+| `tables`, `tables_peak` | The live tables, and the most tables ever made at one time. |
+
 ### storage_read_fn_t, storage_visit_fn_t
 
 A function that storage calls with the bytes of a value.
@@ -119,6 +128,7 @@ How `storage_convert` ended.
 | `storage_publish` | Writes what a module reads: `docs/intern/lib/storage/storage_publish.c.md`, *Functions*. |
 | `storage_end_publish` | Forgets which tables changed: `docs/intern/lib/storage/storage_publish.c.md`, *Functions*. |
 | `storage_count_tables` | Counts the table ids: `docs/intern/lib/storage/storage_publish.c.md`, *Functions*. |
+| `storage_usage` | Tells the live and the peak entities and tables: `docs/intern/lib/storage/storage_usage.c.md`, *Functions*. |
 | `storage_count_carriers` | Counts the entities that carry a type: `docs/intern/lib/storage/storage_carriers.c.md`, *Functions*. |
 | `storage_count_off` | Counts the toggled rows that are off: `docs/intern/lib/storage/storage_values.c.md`, *Functions*. |
 | `storage_visit_carriers` | Visits each entity that carries a type: `docs/intern/lib/storage/storage_carriers.c.md`, *Functions*. |

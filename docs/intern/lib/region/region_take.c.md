@@ -16,6 +16,10 @@ Usually the piece is the last piece handed out, and the space after it was never
 If not, the gap that begins where the piece ends gives the bytes, if that gap is long enough.
 If neither has the bytes, nothing changes.
 
+## The high-water
+
+`region_take` and `region_grow` add to `used` through `region_bump`, which raises `peak` when `used` passes its old top. A piece given back lowers `used`, never `peak`.
+
 ## Functions
 
 | Function | Result |

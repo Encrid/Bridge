@@ -13,14 +13,14 @@ What a host compiles with this header is a work based on Bridge: `readme.md`, *L
 A host gives values in structs, and Bridge reads no file of the host.
 Bridge has no default value: the host states each value. A field left at zero is unset, and Bridge refuses it by its name.
 A count of an array can be zero, unless this document tells otherwise.
-Each function but `bridge_list_modules` and `bridge_profile` is `[[nodiscard]]`: the compiler warns when a host ignores its result.
+Each function but `bridge_list_modules`, `bridge_profile`, `bridge_usage` and `bridge_module_usage` is `[[nodiscard]]`: the compiler warns when a host ignores its result.
 
 Call the functions of one world one at a time: a call starts after the call before it returns.
 So call `bridge_load`, `bridge_unload`, `bridge_reload` and `bridge_set_order` between two phases, never while `bridge_run_phase` runs.
 
 A call from another thread while a call of the world runs does nothing and writes no record.
 A record would call the sink on that thread, during the call that runs.
-The refused call gives 1, and `bridge_list_modules` and `bridge_profile` give -1.
+The refused call gives 1, and `bridge_list_modules`, `bridge_profile`, `bridge_usage` and `bridge_module_usage` give -1.
 Only a call from the sink comes during another call on its thread: *bridge_sink_fn_t*.
 A call that overlaps `bridge_destroy`, or comes after it, is not defined, since the world is gone.
 
@@ -494,6 +494,20 @@ Bridge stops a module at its failure budget, a module whose spans no longer fit,
 
 The counts are the sum since the module loaded. A host reads them twice and subtracts for a window.
 
+## bridge_module_usage_row_t
+
+`bridge_module_usage_row_t` is what one module uses of the budget, as `bridge_module_usage` tells it.
+Each number is the module's own, so the rows sum to the world total of the same key.
+
+| Field | Content |
+| --- | --- |
+| `identity` | The identity of the module. |
+| `persistent` | The bytes of the persistent arena that the module reserved at its load. |
+| `systems` | The systems that the module registered. |
+| `observers` | The observers that the module registered. |
+| `entities` | The entity ids that the module holds. |
+| `pad` | 4 bytes of padding. |
+
 ## bridge_create
 
 `bridge_create` makes a world of a deployment. It loads no module.
@@ -649,6 +663,38 @@ The result is the number of systems and observers. Bridge fills at most `max` it
 The result is -1 if another thread calls while a call of the world runs: *The library*.
 Bridge times a run only while `profile` is on, at the cost of two clock reads for each run.
 The time and the count stay 0 while `profile` is off. A pull never resets a count.
+
+## bridge_usage
+
+`bridge_usage` tells how much of the budget the world uses now, and the most it has used.
+
+| Parameter | Content |
+| --- | --- |
+| `w` | The world. |
+| `used` | A `bridge_budget_t` that Bridge fills with the use now, or null. |
+| `most` | A `bridge_budget_t` that Bridge fills with the high-water, or null. |
+
+Each field holds the same key as in `bridge_budget_t`, a count or bytes, so a host reads it beside the budget it gave.
+The use now covers every key: the counts, the arena and column bytes, and the two kinds of slot measured against their caps.
+A tier that is off reads 0. `terms` is the most terms that one system has, since the budget bounds terms per system.
+
+The high-water holds for the entities, tables, arena bytes and column bytes, which rise and fall while a world runs.
+For the other keys `most` equals `used`: a host adds and drops them itself, and Bridge keeps no mark of its own.
+If another thread runs a call of the world, this one changes nothing and gives -1: *The library*.
+
+## bridge_module_usage
+
+`bridge_module_usage` tells what each loaded module uses of the four keys that one module owns.
+
+| Parameter | Content |
+| --- | --- |
+| `w` | The world. |
+| `out` | An array of `max` items, or null. |
+| `max` | How many items `out` holds. |
+
+The result is the number of loaded modules. Bridge writes one row per module, up to `max` of them, in load order.
+A module owns its systems, its observers, the arena bytes it reserved, and the entity ids it holds. The shared keys appear in no row.
+A call from a second thread, while the world is busy with a call, gives -1 and writes nothing: *The library*.
 
 ## bridge_run_phase
 

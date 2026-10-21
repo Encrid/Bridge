@@ -27,7 +27,7 @@ int region_take(region_t *r, uint32_t len, uint32_t *at)
         return (0);
     if (best == r->count) {
         *at = r->used;
-        r->used += len;
+        region_bump(r, len);
         return (1);
     }
     *at = r->gaps[best].at;
@@ -55,7 +55,7 @@ bool region_grow(region_t *r, uint32_t at, uint32_t had, uint32_t want)
     uint32_t i = find_after(r, at + had);
 
     if (at + had == r->used && more <= r->len - r->used) {
-        r->used += more;
+        region_bump(r, more);
         return (true);
     }
     if (i == r->count || r->gaps[i].len < more)

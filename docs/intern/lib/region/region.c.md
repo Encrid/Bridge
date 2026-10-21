@@ -30,3 +30,4 @@ A gap at the top is not a gap: it becomes part of the space that was never used.
 | `region_drop_gap` | Takes gap `i` out of the list and moves the gaps after it down. |
 | `add_gap` | Records a freed piece in the gap before `i`, or in a new gap at `i`. Gives the index of its gap, or the count if the list is full. |
 | `region_give` | Gives a piece back to the region, with the steps of *A piece given back*. A full list of gaps keeps the piece out. |
+| `region_bump` | Adds `by` to `used` and lifts `peak` if `used` reaches a new high. |

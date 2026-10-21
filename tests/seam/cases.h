@@ -445,4 +445,7 @@ void test_refuse_essential(host_t *h);
 void test_profile(host_t *h);
 void test_set_profile(host_t *h);
 
+void test_usage(host_t *h);
+void test_set_usage(host_t *h);
+
 #endif

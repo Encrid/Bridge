@@ -2659,6 +2659,42 @@ claims = { matches = ["profile max 2, first game:events:poke, second untouched.*
 false = { run = ["{out}/seam{exe}", "bridge_profile-count-only-writes-no-rows"] }
 
 [[case]]
+name = "bridge_module_usage-owned-keys-sum-to-the-world"
+run = ["{out}/seam{exe}", "bridge_module_usage-owned-keys-sum-to-the-world"]
+claims = { matches = ["usage mods 2 rows 2 systems match persistent match.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_module_usage-count-only-writes-no-rows"] }
+
+[[case]]
+name = "bridge_usage-high-water-outlives-a-freed-module"
+run = ["{out}/seam{exe}", "bridge_usage-high-water-outlives-a-freed-module"]
+claims = { matches = ["most entities used 0 most [1-9][0-9]* kept yes.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_module_usage-owned-keys-sum-to-the-world"] }
+
+[[case]]
+name = "bridge_module_usage-count-only-writes-no-rows"
+run = ["{out}/seam{exe}", "bridge_module_usage-count-only-writes-no-rows"]
+claims = { matches = ["usage count 2.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_module_usage-into-fewer-rows-than-there-are"] }
+
+[[case]]
+name = "bridge_module_usage-into-fewer-rows-than-there-are"
+run = ["{out}/seam{exe}", "bridge_module_usage-into-fewer-rows-than-there-are"]
+claims = { matches = ["usage max 2, first game:nested@0\\.1\\.0, second untouched.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_module_usage-count-only-writes-no-rows"] }
+
+[[case]]
+name = "bridge_usage-from-another-thread-during-a-call-refused"
+run = ["{out}/seam{exe}", "bridge_usage-from-another-thread-during-a-call-refused"]
+claims = { matches = ["talk: line 0 0\\s+from another thread during the call: bridge_usage gave -1\\s.*the outer call ended.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_list_modules-after-the-outer-call"] }
+
+[[case]]
+name = "bridge_module_usage-from-another-thread-during-a-call-refused"
+run = ["{out}/seam{exe}", "bridge_module_usage-from-another-thread-during-a-call-refused"]
+claims = { matches = ["talk: line 0 0\\s+from another thread during the call: bridge_module_usage gave -1\\s.*the outer call ended.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_list_modules-after-the-outer-call"] }
+
+[[case]]
 name = "BACKEND_MEMORY_LIMIT-lacking-memory-limit-refused"
 run = ["{out}/seam{exe}", "BACKEND_MEMORY_LIMIT-lacking-memory-limit-refused"]
 claims = { matches = ["module 'game:mover@0\\.1\\.0' is refused: it states memory_limit, which backend 'plain' cannot keep.*alive"], lacks = ["cannot open"] }
