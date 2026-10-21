@@ -1,4 +1,10 @@
 [[case]]
+name = "region-a-give-into-a-full-list-of-gaps-keeps-the-piece-out"
+run = ["{out}/storage{exe}", "regionfull"]
+claims = { matches = ["region full: count 2.*alive"] }
+false = { run = ["{out}/storage{exe}", "ordersamephase"] }
+
+[[case]]
 name = "storage-marks-full-refused"
 run = ["{out}/storage{exe}", "marks"]
 claims = { matches = ["refused: out of memory: there was none for the mark of its queue.*alive"] }
