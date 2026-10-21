@@ -66,6 +66,7 @@ For each phase, the schedule keeps the matrix of who runs before whom, `n` rows 
 The edges of the pairs join rows with an or: at most `n^3 / 64` word operations at a load, for `n` systems in the phase.
 The order that the modules state keeps the matrix closed, with at most `3 n^3 / 128` more.
 For a phase of a thousand systems, that is at most some forty million operations.
+`set_levels` then gives each system its level, at most `n` passes over the `n^2` edges, so `n^3` comparisons for a chain of `n` systems.
 None of this runs in a frame.
 
 `schedule_room` makes the room for the schedule and for a dispatch once, at create, `[budget] systems` wide.
