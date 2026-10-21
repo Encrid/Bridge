@@ -8,6 +8,7 @@
 
     #include <string.h>
 
+    #include "bits.h"
     #include "storage_inside.h"
 
 static inline void copy_bytes(uint8_t *to, const uint8_t *from, uint32_t size)
@@ -37,7 +38,7 @@ static inline uint64_t pad_column(uint64_t bytes)
 
 static inline uint64_t get_bits_len(uint32_t room)
 {
-    return (pad_column(8ull * ((room + 63) / 64)));
+    return (pad_column(8ull * bits_words(room)));
 }
 
 static inline uint32_t get_bits(uint32_t column, uint32_t room)

@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "abi_subscribe.h"
+#include "bits.h"
 
 static_assert(alignof(system_term_t) % alignof(uint64_t) == 0);
 static_assert(sizeof(declared_type_t *) % alignof(uint64_t) == 0);
@@ -67,7 +68,7 @@ int abi_alloc_subscriber(subscribing_t *g)
     bridge_system_t *s;
     size_t size = sizeof(*s) + g->count * sizeof(*s->term)
         + g->change_count * sizeof(*s->changes)
-        + schedule_get_words(g->slot) * sizeof(*s->stated_before);
+        + bits_words(g->slot) * sizeof(*s->stated_before);
     bool had;
 
     s = calloc(1, size);

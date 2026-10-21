@@ -5,6 +5,7 @@
 */
 #include <string.h>
 
+#include "bits.h"
 #include "schedule.h"
 
 void schedule_gather_phase(bridge_world_t *w, schedule_phase_t *p)
@@ -21,7 +22,7 @@ void schedule_gather_phase(bridge_world_t *w, schedule_phase_t *p)
         i++;
     }
     p->reach.n = p->n;
-    p->reach.words = schedule_get_words(p->n);
+    p->reach.words = bits_words(p->n);
     p->reach.bits = w->build_bits;
     words = schedule_get_matrix_words(p->n);
     memset(p->reach.bits, 0, words * sizeof(*p->reach.bits));

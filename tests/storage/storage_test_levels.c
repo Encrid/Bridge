@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "bits.h"
 #include "storage_test.h"
 
 constexpr uint32_t CHAIN_SYSTEMS = 100;
@@ -30,7 +31,7 @@ static bridge_system_t *make_system(module_t *m, declared_type_t *c,
     uint32_t slot)
 {
     bridge_system_t *s = calloc(1, sizeof(*s) + sizeof(system_term_t)
-        + schedule_get_words(slot) * sizeof(uint64_t));
+        + bits_words(slot) * sizeof(uint64_t));
 
     if (!s)
         return (nullptr);

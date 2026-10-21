@@ -3,6 +3,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include "bits.h"
 #include "block.h"
 
 static int is_beyond(bridge_world_t *w, const char *key, uint64_t value)
@@ -55,7 +56,7 @@ static int lay_direct(bridge_world_t *w, const bridge_budget_t *budget,
 static int lay_rest(bridge_world_t *w, const bridge_budget_t *budget,
     block_layout_t *layout)
 {
-    uint64_t bits = 8 * ((budget->entities + 63) / 64) * layout->cells;
+    uint64_t bits = 8ull * bits_words(budget->entities) * layout->cells;
     uint64_t end;
 
     layout->arena = (layout->direct + bits + 7u) & ~7ull;

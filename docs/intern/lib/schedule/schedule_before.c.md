@@ -5,7 +5,7 @@ This file gives the order that a module states between its own systems: the bits
 ## The bits
 
 `stated_before` of a system has a bit for each earlier slot of its module, in words of 64 bits.
-A system of slot `k` has `schedule_get_words(k)` words, after its changes, in the block of the system.
+A system of slot `k` has `bits_words(k)` words, after its changes, in the block of the system.
 The bit of slot `j` tells that the module states the system of slot `j` before this one, also through a chain.
 The system of slot 0 has no word, since no system of its module comes before it.
 

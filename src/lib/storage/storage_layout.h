@@ -8,6 +8,7 @@
 
     #include <string.h>
 
+    #include "bits.h"
     #include "storage_bytes.h"
     #include "storage_reach.h"
     #include "storage_table.h"
@@ -56,7 +57,7 @@ static inline void move_bits(storage_t *r, uint32_t t, uint32_t id,
     const table_t *tab = &r->tables[t];
     uint8_t *block = r->w->shared + tab->block;
     uint32_t bits = tab->block + get_bits((uint32_t)r->at[id], tab->room);
-    size_t len = 8u * ((tab->rows + 63) / 64);
+    size_t len = 8u * bits_words(tab->rows);
 
     if (from)
         memmove(r->w->shared + bits, block + from, len);

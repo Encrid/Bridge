@@ -3,6 +3,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include "bits.h"
 #include "block.h"
 
 static int is_unset(bridge_world_t *w, const char *key, uint64_t value)
@@ -34,7 +35,7 @@ static int is_too_many(bridge_world_t *w, const bridge_budget_t *budget)
     if (budget->sparse_sets == BRIDGE_NONE)
         sets = 0;
     sum = (uint64_t)budget->tables + sets + budget->types + 1;
-    if (((uint64_t)budget->types + 63) / 64 * 64 > UINT32_MAX) {
+    if ((uint64_t)bits_words(budget->types) * 64 > UINT32_MAX) {
         say_error(w, "[budget] types of %u, rounded up to a multiple"
             " of 64, is more than a count of 32 bits holds", budget->types);
         return (1);

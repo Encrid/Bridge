@@ -5,6 +5,7 @@
 */
 #include <stdlib.h>
 
+#include "bits.h"
 #include "storage_create.h"
 
 static void set_sizes(storage_t *r, bridge_world_t *w)
@@ -13,10 +14,10 @@ static void set_sizes(storage_t *r, bridge_world_t *w)
     r->table_room = w->tables + w->sparse_sets;
     r->set_room = w->sparse_sets;
     r->direct_room = w->direct_indexed;
-    r->bit_words = (w->entities + 63) / 64;
+    r->bit_words = bits_words(w->entities);
     r->table_high = 1;
     r->high = 1;
-    r->words = (w->max_types + 63) / 64;
+    r->words = bits_words(w->max_types);
     r->type_room = r->words * 64;
     r->terms_room = w->max_systems;
 }

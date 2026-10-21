@@ -8,6 +8,7 @@
 
     #include <string.h>
 
+    #include "bits.h"
     #include "storage_bytes.h"
     #include "storage_layout.h"
     #include "storage_named.h"
@@ -23,7 +24,7 @@ static inline void close_bits(storage_t *r, uint32_t t, uint32_t id)
     uint32_t bits = get_bits(to, tab->room);
     uint32_t from = get_bits(get_columns(r, t)[id], tab->room);
 
-    memmove(shared + bits, shared + from, 8u * ((tab->rows + 63) / 64));
+    memmove(shared + bits, shared + from, 8u * bits_words(tab->rows));
     memcpy(shared + to - COLUMN, &bits, 4);
 }
 

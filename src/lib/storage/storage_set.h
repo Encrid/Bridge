@@ -6,21 +6,22 @@
 #ifndef BRIDGE_SRC_STORAGE_SET_H
     #define BRIDGE_SRC_STORAGE_SET_H
 
+    #include "bits.h"
     #include "storage_inside.h"
 
 static inline bool set_has(const uint64_t *set, uint32_t type)
 {
-    return (set[type >> 6] >> (type & 63) & 1);
+    return (bits_has(set, type));
 }
 
 static inline void set_put(uint64_t *set, uint32_t type)
 {
-    set[type >> 6] |= (uint64_t)1 << (type & 63);
+    bits_set(set, type);
 }
 
 static inline void set_take(uint64_t *set, uint32_t type)
 {
-    set[type >> 6] &= ~((uint64_t)1 << (type & 63));
+    bits_clear(set, type);
 }
 
 static inline void set_copy(const storage_t *r, uint64_t *to,
