@@ -264,6 +264,7 @@ static_assert(offsetof(bridge_entity_t, generation) == 8);
 enum bridge_log : uint8_t {
     BRIDGE_LOG_ERR = 3,
     BRIDGE_LOG_WARN = 4,
+    BRIDGE_LOG_NOTICE = 5,
     BRIDGE_LOG_INFO = 6,
     BRIDGE_LOG_DEBUG = 7
 };

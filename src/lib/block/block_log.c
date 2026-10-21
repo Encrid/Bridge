@@ -9,6 +9,7 @@
 
 static_assert((int)BRIDGE_LOG_ERR == (int)BRIDGE_ERR);
 static_assert((int)BRIDGE_LOG_WARN == (int)BRIDGE_WARN);
+static_assert((int)BRIDGE_LOG_NOTICE == (int)BRIDGE_NOTICE);
 static_assert((int)BRIDGE_LOG_INFO == (int)BRIDGE_INFO);
 static_assert((int)BRIDGE_LOG_DEBUG == (int)BRIDGE_DEBUG);
 

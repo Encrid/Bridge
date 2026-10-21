@@ -278,6 +278,7 @@ static_assert(offsetof(bridge_record_t, pad) == 45);
 enum bridge_level : uint8_t {
     BRIDGE_ERR = 3,
     BRIDGE_WARN = 4,
+    BRIDGE_NOTICE = 5,
     BRIDGE_INFO = 6,
     BRIDGE_DEBUG = 7
 };

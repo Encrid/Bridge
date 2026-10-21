@@ -927,7 +927,7 @@ false = { run = ["{out}/seam{exe}", "BRIDGE_STRIP-unload-strips"] }
 [[case]]
 name = "bridge_unload-of-what-stopped-the-world"
 run = ["{out}/seam{exe}", "bridge_unload-of-what-stopped-the-world"]
-claims = { matches = ["the world has stopped.*game:twostep@0.1.0: not unloaded.*record\\[6\\] \\S+: the world runs again: module 'test:flaky@0.1.0' is unloaded, and it goes on without it.*test:flaky@0.1.0: unloaded.*modules: game:twostep@0.1.0=RUNNING.*alive"] }
+claims = { matches = ["the world has stopped.*game:twostep@0.1.0: not unloaded.*record\\[5\\] \\S+: the world runs again: module 'test:flaky@0.1.0' is unloaded, and it goes on without it.*test:flaky@0.1.0: unloaded.*modules: game:twostep@0.1.0=RUNNING.*alive"] }
 false = { run = ["{out}/seam{exe}", "BRIDGE_STRIP-unload-strips"] }
 
 [[case]]

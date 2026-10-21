@@ -45,7 +45,7 @@ void bridge_stop(bridge_world_t *w, const char *identity, const char *what)
 
 void bridge_resume(bridge_world_t *w, const module_t *m)
 {
-    say_t about = { m, nullptr, BRIDGE_INFO };
+    say_t about = { m, nullptr, BRIDGE_NOTICE };
 
     if (!w->stopped_stem)
         return;
@@ -57,7 +57,7 @@ void bridge_resume(bridge_world_t *w, const module_t *m)
 
 void bridge_give_up(bridge_world_t *w, const module_t *m)
 {
-    say_t about = { m, nullptr, BRIDGE_INFO };
+    say_t about = { m, nullptr, BRIDGE_NOTICE };
 
     if (!w->stopped_stem)
         return;

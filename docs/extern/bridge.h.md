@@ -436,12 +436,13 @@ The sink of the world gets each record.
 A record of Bridge that names a module in its text can have a null `identity`.
 A line of the log of a module has the `barriers` and the `place` that the module wrote.
 
-`enum bridge_level` names four severities of syslog, RFC 5424, by their numbers. 0 is the worst, and 7 is the most detail.
+`enum bridge_level` names five severities of syslog, RFC 5424, by their numbers. 0 is the worst, and 7 is the most detail.
 
 | Item | Value |
 | --- | --- |
 | `BRIDGE_ERR` | 3: an error. |
 | `BRIDGE_WARN` | 4: a warning. |
+| `BRIDGE_NOTICE` | 5: a normal but significant condition. |
 | `BRIDGE_INFO` | 6: information. |
 | `BRIDGE_DEBUG` | 7: detail. |
 
@@ -860,7 +861,7 @@ Bridge writes one of these records when a module of `BRIDGE_FAIL` stops the worl
 - `the world has stopped: module '<module>' could not be reloaded and its on_error is fail`
 
 Each later call that the stopped world refuses writes the same record.
-Bridge writes one of these records, at the level `BRIDGE_INFO`, when the world runs again:
+Bridge writes one of these records, at the level `BRIDGE_NOTICE`, when the world runs again:
 
 - `the world runs again: module '<module>' is back`
 - `the world runs again: module '<module>' is unloaded, and it goes on without it`

@@ -123,12 +123,13 @@ The text of a log line stays until the barrier. Count it in `scratch_used`.
 ## The log
 
 A module writes a line of its log into its log ring, with no call. Each barrier gives the lines to the sink of the host.
-`enum bridge_log` names four of the eight levels of a line, with the numbers of `enum bridge_level`: `docs/extern/bridge.h.md`, *bridge_record_t*.
+`enum bridge_log` names five of the eight levels of a line, with the numbers of `enum bridge_level`: `docs/extern/bridge.h.md`, *bridge_record_t*.
 
 | Item | Value |
 | --- | --- |
 | `BRIDGE_LOG_ERR` | 3: an error. |
 | `BRIDGE_LOG_WARN` | 4: a warning. |
+| `BRIDGE_LOG_NOTICE` | 5: a normal but significant condition. |
 | `BRIDGE_LOG_INFO` | 6: information. |
 | `BRIDGE_LOG_DEBUG` | 7: detail. |
 
