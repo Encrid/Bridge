@@ -49,6 +49,7 @@ static void write_caps(bridge_header_t *h, const bridge_world_t *w)
     h->owned = h->kind + 4u * h->types;
     h->arena_lo = w->arena;
     h->arena_hi = w->arena + w->arena_len;
+    h->entities = w->entities;
 }
 
 static void write_owned(bridge_header_t *h, const module_t *m)
@@ -68,7 +69,7 @@ static void write_owned(bridge_header_t *h, const module_t *m)
     }
 }
 
-void block_write_header(bridge_world_t *w, module_t *m)
+int block_write_header(bridge_world_t *w, module_t *m)
 {
     bridge_header_t *h = (bridge_header_t *)m->priv;
     uint32_t queries = (uint32_t)sizeof(bridge_query_t) * m->system_count;
@@ -86,8 +87,8 @@ void block_write_header(bridge_world_t *w, module_t *m)
     h->types = m->declared_count;
     h->tables = storage_count_tables(w->storage);
     h->kept = h->column_base + 4u * h->types * h->tables;
-    h->entity_index = (uint32_t)((const uint8_t *)w->index - w->shared);
-    h->entities = w->entities;
+    h->entity_index = block_get_offset(w, w->index);
     write_caps(h, w);
     write_owned(h, m);
+    return (h->entity_index == 0);
 }

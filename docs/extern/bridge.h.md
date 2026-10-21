@@ -742,6 +742,7 @@ The reason is a text of the backend, a refusal of an entry of the module, or one
 - `its <export> answered <status>`
 - `its <export> <reason>`
 - `its spawns of <count> do not fit under [budget] entities of <count>`
+- `the entity index is outside the block`
 - `it accepts the loss of '<name>', and loses nothing of that name`
 - `its spans of <bytes> bytes do not hold a column_base of <count> components by <count> tables, which with its queries is <bytes> bytes`
 - `'<system>' and '<system>' both touch '<component>' in phase '<phase>', one of them writing it, and no pair orders them`

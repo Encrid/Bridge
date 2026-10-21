@@ -25,6 +25,7 @@ A header at offset 0 tells where the regions are: `docs/extern/bridge_abi.h.md`,
 
 Each other offset into the shared memory is from the start of the shared memory.
 The `(offset, length)` that a component holds into the persistent arena is one of them, so nothing else needs a base.
+`block_get_offset` gives the offset of a pointer into the shared memory, or 0 if the pointer is null or lies outside it.
 
 The shared memory stays open to each module that it is handed to.
 The columns are shared because shared columns are the design.

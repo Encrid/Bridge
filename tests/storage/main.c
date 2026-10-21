@@ -97,6 +97,8 @@ static const storage_test_case_t CASES[] = {
     { "regionfull", storage_test_region_full, &PLAIN },
     { "tablefull", storage_test_table_full, &PLAIN },
     { "spansfull", storage_test_spans_full, &PLAIN },
+    { "blockoffset", storage_test_block_offset, &PLAIN },
+    { "indexoutside", storage_test_index_outside, &PLAIN },
     { "twosingles", storage_test_give_two_singles, &PLAIN },
     { "fulllist", storage_test_fill_list, &ONE_TABLE },
     { "levels", storage_test_count_levels, &PLAIN },

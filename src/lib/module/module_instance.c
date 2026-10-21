@@ -58,7 +58,8 @@ int module_make_instance(module_t *m, const module_start_t *st,
     m->image = o->api.module_compile(o->be, &source, err);
     if (!m->image || module_take_private(m, &a->cfg, err))
         return (1);
-    block_write_header(m->w, m);
+    if (block_write_header(m->w, m))
+        return (module_fail(err, "the entity index is outside the block"));
     count = lend_memories(m, memories);
     m->instance = o->api.instance_create(m->image, memories, count, err);
     if (!m->instance || abi_define(m, err))

@@ -1,4 +1,16 @@
 [[case]]
+name = "block-the-offset-of-a-pointer-outside-the-block-is-zero"
+run = ["{out}/storage{exe}", "blockoffset"]
+claims = { matches = ["offset null 0 below 0 above 0 inside 50.*alive"] }
+false = { run = ["{out}/storage{exe}", "ordersamephase"] }
+
+[[case]]
+name = "block-a-module-whose-entity-index-is-outside-the-block-is-refused"
+run = ["{out}/storage{exe}", "indexoutside"]
+claims = { matches = ["the entity index is outside the block.*alive"] }
+false = { run = ["{out}/storage{exe}", "ordersamephase"] }
+
+[[case]]
 name = "storage-a-table-past-the-room-is-refused"
 run = ["{out}/storage{exe}", "tablefull"]
 claims = { matches = ["table past the room: 0.*alive"] }

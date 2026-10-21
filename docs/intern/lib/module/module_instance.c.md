@@ -9,7 +9,7 @@ A module gets the memories that it imports, and no other.
 
 1. Compile the image from the bytes and the path of the artifact, with the demands of the config.
 2. Reserve the private memory: `docs/intern/lib/module/module_call.c.md`, *The private memory*.
-3. Write the header of the private memory, with `block_write_header`.
+3. Write the header with `block_write_header`, and refuse the module if the entity index is outside the block.
 4. Find the memories that the image imports.
 5. Make the instance with those memories.
 6. Define the eight imports of the ABI: `docs/intern/lib/abi/abi_define.c.md`, *The signatures*.

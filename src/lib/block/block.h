@@ -26,6 +26,15 @@ typedef struct {
     uint32_t first;
 } log_fault_t;
 
+static inline uint32_t block_get_offset(bridge_world_t *w, const void *p)
+{
+    const uint8_t *c = p;
+
+    if (!c || c < w->shared || c >= w->shared + w->shared_len)
+        return (0);
+    return ((uint32_t)(c - w->shared));
+}
+
 [[nodiscard]] int block_create(bridge_world_t *w,
     const bridge_budget_t *budget);
 
@@ -39,7 +48,7 @@ void block_destroy(bridge_world_t *w);
 
 int block_refill(bridge_world_t *w, module_t *m);
 
-void block_write_header(bridge_world_t *w, module_t *m);
+int block_write_header(bridge_world_t *w, module_t *m);
 
 void block_drain(bridge_world_t *w, module_t *m);
 

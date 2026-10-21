@@ -60,7 +60,7 @@ static void write_every_cell(publish_t *p)
     uint32_t tables = r->table_room + 1;
     uint32_t t = 1;
 
-    block_write_header(r->w, m);
+    (void)block_write_header(r->w, m);
     memset(p->cell, 0, 4u * m->declared_count * tables);
     memset(p->rows, 0, 4u * tables);
     memset(p->blocks, 0, 4u * tables);
