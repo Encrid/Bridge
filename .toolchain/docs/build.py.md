@@ -18,11 +18,13 @@ With `--pack`, it also puts the package into a zip file.
 | `packaged(config, values, made)` | Writes `package.txt`. |
 | `packed(config, values)` | Writes the zip of the package. Then it writes the path of the zip and the names in it. |
 | `artifacts(config)` | Gives each artifact, and after it each of its variants. |
+| `archives(config, values)` | Gives the path of each shipped archive, from the output folder. |
+| `prove(config, values)` | Proves the package, as *The package proof* tells. It does nothing if `[package]` has no `proof`. |
 | `prepared(args, here)` | Gives the configuration and the variables, as steps 1 to 8 of *build* tell. |
 | `ready(args, here)` | Does the steps 1 to 10 of *build*, and gives the configuration and the variables. |
 | `made(config, values, tree, part)` | Builds each artifact and writes `package.txt`: step 11 of *build*. It gives the name and the files of each artifact. With a part, it skips a tagged artifact of a different part. |
 | `build(args, here)` | Does all the steps of a build. With `here`, it stops if the target does not run here. |
-| `main()` | Runs the commands `build` and `pack`. |
+| `main()` | Runs the commands `build` and `pack`. After a `pack`, it proves the package. |
 
 ## build
 
@@ -133,9 +135,23 @@ It puts these files into the zip:
 
 `packed` writes the path of the zip, then the name of each file in the zip.
 
+## The package proof
+
+`[package] proof` names a source that uses only the package.
+After a `pack`, `prove` reads it, so a project proves that its package is enough to build against.
+
+`prove` extracts the zip into `<out>/proof`, so nothing of the source tree is there.
+It builds the proof source as a program, with the headers of the package and each shipped archive, in `<out>/proof/host`.
+It runs the program if the target runs here, and `shared.run` stops the tool if the program does not end with 0.
+It then writes `package proof: <project> ran`, or `package proof: <project> built` when the target does not run here.
+
+`archives` gives the shipped archives that the proof links.
+
 ## Limits
 
 No case runs these branches.
 
 - A machine on which no target runs. Each machine of the cases runs a target.
 - A machine with no pinned zig. Each case uses the zig of the project that runs it.
+- A `pack` of a project with no `proof` in `[package]`. Each project that a case packs states a proof.
+- A proof built for a target that does not run here. Each case packs for the target of its machine.

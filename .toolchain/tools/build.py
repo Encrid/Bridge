@@ -119,6 +119,34 @@ def artifacts(config):
             yield dict(artifact, **variant)
 
 
+def archives(config, values):
+    out = Path(values['out'])
+    found = []
+    for artifact in artifacts(config):
+        if not artifact.get('test') and artifact['kind'] == 'archive':
+            found.append(Path(planned(config, values, artifact)[1]['output']).relative_to(out))
+    return found
+
+
+def prove(config, values):
+    proof = config.get('package', {}).get('proof')
+    if not proof:
+        return
+    clean = Path(values['out']) / 'proof'
+    shutil.rmtree(clean, ignore_errors=True)
+    zipped = Path(values['build']) / ('%s-%s.zip' % (shared.project_name(config), values['target']))
+    with zipfile.ZipFile(zipped) as packing:
+        packing.extractall(clean)
+    artifact = {'name': 'proof', 'kind': 'program', 'sources': [proof],
+                'include': [(clean / 'include').as_posix()],
+                'link': [(clean / name).as_posix() for name in archives(config, values)]}
+    _, made = built(config, dict(values, out=(clean / 'host').as_posix()), artifact)
+    if values['target'] == shared.this_target(config['targets']):
+        run([made[0].as_posix()], values['root'])
+    print('package proof: %s %s' % (shared.project_name(config),
+          'ran' if values['target'] == shared.this_target(config['targets']) else 'built'))
+
+
 def prepared(args, here=False):
     config = shared.config(args.root)
     home = shared.this_target(config['targets'])
@@ -164,6 +192,7 @@ def main():
     print('\n'.join(paths[0].as_posix() for _, paths in made if paths))
     if args.pack:
         packed(config, values)
+        prove(config, values)
 
 
 if __name__ == '__main__':

@@ -4,6 +4,9 @@ name = "built"
 [variables]
 said = "written"
 
+[package]
+proof = "tests/package/host.c"
+
 [kinds.stamped]
 output = "{name}.txt"
 steps = [
