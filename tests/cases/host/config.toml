@@ -646,3 +646,42 @@ paths = ["config-quiet"]
 wasm = "{out}/backends/bridge_wasm"
 native = "{out}/backends/bridge_native"
 '''
+
+[[case]]
+name = "the checks table turns the profile on"
+run = ["{out}/bridge-host{exe}", "{case}/checks.toml"]
+
+[case.claims]
+status = 0
+line = ["record[6] bridge-host:quiet@1.0.0/say: said once 1 0"]
+
+[case.folders]
+"{case}/config-quiet" = ["quiet"]
+
+[case.files]
+"{case}/checks.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[checks]
+profile = true
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/checks.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[checks]
+profile = "nope"
+[content]
+paths = ["config-quiet"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''

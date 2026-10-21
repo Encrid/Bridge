@@ -119,8 +119,9 @@ typedef struct {
     uint32_t order_count;
     uint32_t threads;
     bridge_budget_t budget;
+    bool profile;
 } bridge_config_t;
-static_assert(sizeof(bridge_config_t) == 120);
+static_assert(sizeof(bridge_config_t) == 128);
 static_assert(alignof(bridge_config_t) == 8);
 static_assert(offsetof(bridge_config_t, abi) == 0);
 static_assert(offsetof(bridge_config_t, pad2) == 4);
@@ -134,6 +135,7 @@ static_assert(offsetof(bridge_config_t, order) == 40);
 static_assert(offsetof(bridge_config_t, order_count) == 48);
 static_assert(offsetof(bridge_config_t, threads) == 52);
 static_assert(offsetof(bridge_config_t, budget) == 56);
+static_assert(offsetof(bridge_config_t, profile) == 120);
 
 typedef struct {
     const char *from;
@@ -303,6 +305,17 @@ static_assert(offsetof(bridge_module_info_t, identity) == 0);
 static_assert(offsetof(bridge_module_info_t, state) == 8);
 static_assert(offsetof(bridge_module_info_t, pad) == 9);
 
+typedef struct {
+    const char *name;
+    uint64_t calls;
+    uint64_t nanos;
+} bridge_profile_row_t;
+static_assert(sizeof(bridge_profile_row_t) == 24);
+static_assert(alignof(bridge_profile_row_t) == 8);
+static_assert(offsetof(bridge_profile_row_t, name) == 0);
+static_assert(offsetof(bridge_profile_row_t, calls) == 8);
+static_assert(offsetof(bridge_profile_row_t, nanos) == 16);
+
 BRIDGE_API [[nodiscard]] bridge_world_t *bridge_create(
     const bridge_config_t *cfg, bridge_sink_fn_t sink, void *ud);
 
@@ -318,6 +331,9 @@ BRIDGE_API [[nodiscard]] int bridge_reload(bridge_world_t *w,
     const bridge_artifact_t *artifacts, uint32_t count);
 
 BRIDGE_API int bridge_list_modules(bridge_world_t *w, bridge_module_info_t *out,
+    int max);
+
+BRIDGE_API int bridge_profile(bridge_world_t *w, bridge_profile_row_t *out,
     int max);
 
 BRIDGE_API [[nodiscard]] int bridge_run_phase(bridge_world_t *w,

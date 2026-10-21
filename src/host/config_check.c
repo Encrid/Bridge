@@ -28,6 +28,8 @@ static const char *check_entry(const config_t *c, const entry_t *e,
         return (check_order(e));
     if (!strcmp(top, "budget"))
         return (config_check_budget(e, local));
+    if (!strcmp(top, "checks"))
+        return (config_check_checks(e, local));
     if (!strcmp(top, "backend"))
         return (config_check_backend(e, local));
     return (config_check_world(e, local));

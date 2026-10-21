@@ -56,6 +56,7 @@ typedef struct {
     uint32_t phase_count;
     uint32_t threads;
     int rounds;
+    bool profile;
     bridge_budget_t budget;
     held_t *held;
     bridge_backend_t *backends;
@@ -94,6 +95,8 @@ typedef struct {
 typedef void see_fn(void *ud, const char *path);
 
 [[nodiscard]] bool config_world(host_t *h);
+
+void take_checks(host_t *h);
 
 [[nodiscard]] bool config_order(host_t *h);
 

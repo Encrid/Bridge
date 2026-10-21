@@ -13,14 +13,14 @@ What a host compiles with this header is a work based on Bridge: `readme.md`, *L
 A host gives values in structs, and Bridge reads no file of the host.
 Bridge has no default value: the host states each value. A field left at zero is unset, and Bridge refuses it by its name.
 A count of an array can be zero, unless this document tells otherwise.
-Each function but `bridge_list_modules` is `[[nodiscard]]`: the compiler warns when a host ignores its result.
+Each function but `bridge_list_modules` and `bridge_profile` is `[[nodiscard]]`: the compiler warns when a host ignores its result.
 
 Call the functions of one world one at a time: a call starts after the call before it returns.
 So call `bridge_load`, `bridge_unload`, `bridge_reload` and `bridge_set_order` between two phases, never while `bridge_run_phase` runs.
 
 A call from another thread while a call of the world runs does nothing and writes no record.
 A record would call the sink on that thread, during the call that runs.
-The refused call gives 1, and `bridge_list_modules` gives -1.
+The refused call gives 1, and `bridge_list_modules` and `bridge_profile` give -1.
 Only a call from the sink comes during another call on its thread: *bridge_sink_fn_t*.
 A call that overlaps `bridge_destroy`, or comes after it, is not defined, since the world is gone.
 
@@ -190,6 +190,7 @@ A pair against that order makes a cycle, and the load or the reload fails.
 | `order_count` | How many pairs `order` holds. Zero is no pair. |
 | `threads` | How many threads run a phase. The thread that calls `bridge_run_phase` counts. Zero is unset. |
 | `budget` | The budget of the world: a `bridge_budget_t`. |
+| `profile` | Whether Bridge times each system and observer for `bridge_profile`. Zero is off, the default. |
 
 A phase is a name, and nothing more. Bridge has no phase of its own, thus a deployment declares one at least.
 Each name of a phase is different, and not empty.
@@ -481,6 +482,18 @@ A function gives its result. A record tells why. `bridge_list_modules` tells wha
 
 Bridge stops a module at its failure budget, a module whose spans no longer fit, and a module whose reload failed with no old instance.
 
+## bridge_profile_row_t
+
+`bridge_profile_row_t` is the time of one system or observer, as `bridge_profile` tells it.
+
+| Field | Content |
+| --- | --- |
+| `name` | The name of the system or observer, as `module:name`. |
+| `calls` | How many times an observer ran. A system runs once a pass, so its `calls` stays 0. |
+| `nanos` | The nanoseconds the system or observer spent since its load. |
+
+The counts are the sum since the module loaded. A host reads them twice and subtracts for a window.
+
 ## bridge_create
 
 `bridge_create` makes a world of a deployment. It loads no module.
@@ -621,6 +634,21 @@ The result is the number of loaded modules. Bridge fills at most `max` items, in
 The result is -1 if another thread calls while a call of the world runs: *The library*.
 A host gets the state of a module only from this function, since the log can drop a line.
 A module that Bridge stopped long after its load shows as `BRIDGE_STOPPED`.
+
+## bridge_profile
+
+`bridge_profile` tells the time of each system and observer. The deployment turns it on with `profile` of `bridge_config_t`.
+
+| Parameter | Content |
+| --- | --- |
+| `w` | The world. |
+| `out` | An array of `max` items, or null. |
+| `max` | How many items `out` holds. |
+
+The result is the number of systems and observers. Bridge fills at most `max` items, in the order that they registered.
+The result is -1 if another thread calls while a call of the world runs: *The library*.
+Bridge times a run only while `profile` is on, at the cost of two clock reads for each run.
+The time and the count stay 0 while `profile` is off. A pull never resets a count.
 
 ## bridge_run_phase
 

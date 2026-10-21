@@ -135,6 +135,8 @@ void config_say_chain(const config_t *c, int32_t from, int32_t to);
 
 [[nodiscard]] const char *config_check_budget(const entry_t *e, bool local);
 
+[[nodiscard]] const char *config_check_checks(const entry_t *e, bool local);
+
 [[nodiscard]] const char *config_check_backend(const entry_t *e, bool local);
 
 [[nodiscard]] const char *config_check_content(const entry_t *e);

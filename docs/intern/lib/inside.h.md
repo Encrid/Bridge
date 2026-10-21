@@ -106,6 +106,7 @@ A system and an observer are a query and a function either way, so one record se
 | `changes`, `change_count` | The components that it stated that it attaches or detaches. They lie after the terms, in the same block. |
 | `slot` | Its slot among the systems of its module, or among its observers: what `add_system` or `observe` gave. |
 | `stated_before` | The order that its module states, as bits: `docs/intern/lib/schedule/schedule_before.c.md`, *The bits*. They lie after the changes, in the same block. |
+| `calls`, `nanos` | The profile: how many times an observer ran, and the nanoseconds it or a system spent, both since its load. Written only while `profile` is on. |
 | `term` | Its `terms` terms, as the conflict graph reads them. |
 
 ### A module
@@ -230,6 +231,7 @@ A `schedule_pairs_t` holds the pairs of `[order]`: `docs/intern/lib/schedule/sch
 | `kept`, `kept_count` | The shares that stay after their module unloaded: `docs/intern/lib/config/config_kept.c.md`, *The list of shares*. |
 | `systems`, `system_count` | The systems of every module, in the order of registration: `docs/intern/lib/abi/abi_subscribe.c.md`, *The slot*. |
 | `modules`, `module_count`, `max_modules` | The loaded modules, how many, and `[budget] modules`. |
+| `profile` | Whether a phase times each system and observer, from `profile` of the config: `docs/intern/lib/schedule/schedule_dispatch.c.md`, *The time*. |
 
 A world is stopped at a barrier, where nothing is allocated.
 So `stopped_by` and `stopped_stem` point at the two arrays after them.

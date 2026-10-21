@@ -50,7 +50,7 @@ static bool make_world(host_t *h)
         .backends = h->backends, .backend_count = h->backend_count,
         .phases = h->phases, .phase_count = h->phase_count,
         .order = h->order, .order_count = h->order_count,
-        .budget = h->budget };
+        .budget = h->budget, .profile = h->profile };
 
     h->w = bridge_create(&cfg, say_record, &h->counts);
     if (!h->w)

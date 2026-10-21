@@ -55,6 +55,7 @@ has = [
     "backend: no key of Bridge-Host's or Bridge's",
     "content: no key of Bridge-Host's or Bridge's",
     "order: no key of Bridge-Host's or Bridge's",
+    "checks: no key of Bridge-Host's or Bridge's",
 ]
 
 [case.files]
@@ -64,6 +65,7 @@ budget = 1
 backend = 2
 content = 3
 order = 4
+checks = 5
 '''
 
 [case.false.files]
@@ -80,6 +82,7 @@ status = 1
 has = [
     "content.foo.bar: no key of Bridge-Host's or Bridge's",
     "order.after: no key of Bridge-Host's or Bridge's",
+    "checks.bogus: no key of Bridge-Host's or Bridge's",
     "empty: a table with nothing in it",
 ]
 
@@ -88,6 +91,7 @@ has = [
 content.load.all.deep = 1
 content.foo.bar = 2
 order.after = 3
+checks.bogus = 1
 [empty]
 '''
 
@@ -106,6 +110,7 @@ has = [
     "rounds: fixed when the world is made: not in the local file",
     "budget.entities: fixed when the world is made: not in the local file",
     "backend.wasm: fixed when the world is made: not in the local file",
+    "checks.profile: fixed when the world is made: not in the local file",
 ]
 
 [case.files]
@@ -118,6 +123,8 @@ rounds = 1
 entities = 1
 [backend]
 wasm = "y"
+[checks]
+profile = true
 '''
 
 [case.false.files]

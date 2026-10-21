@@ -33,10 +33,17 @@ It does this only if `work_limit` of the module is above 0: `-1` is no limit, an
 
 `src/lib/schedule/schedule_run.c` counts the failure after the level ends.
 
+## The time
+
+When `profile` of the world is on, `run_system` reads the clock before and after the call, and adds the span to `nanos` of the system.
+It adds 1 to `calls` for an observer, since a system runs once a pass and its count would say nothing.
+When `profile` is off, it reads no clock and writes nothing: the cost is one test.
+`src/lib/bridge/bridge_profile.c` gives the counts to a host.
+
 ## Functions
 
 | Function | Result |
 | --- | --- |
 | `call_system` | Sets the work limit, calls the system, and marks it failed with a reason if the call failed. |
-| `run_system` | Writes which system runs in the header of the module, runs it, then clears the header. |
+| `run_system` | Writes which system runs in the header, times the run when `profile` is on, then clears the header. |
 | `schedule_run_job` | What a thread runs: the systems of one job, in the order the module registered them. |

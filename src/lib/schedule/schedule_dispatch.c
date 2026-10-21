@@ -5,6 +5,7 @@
 */
 #include <stdio.h>
 
+#include "os.h"
 #include "schedule.h"
 
 static void call_system(module_t *m, bridge_system_t *s)
@@ -30,6 +31,7 @@ static void call_system(module_t *m, bridge_system_t *s)
 static void run_system(module_t *m, bridge_system_t *s)
 {
     bridge_header_t *h = (bridge_header_t *)m->priv;
+    uint64_t start = 0;
 
     h->barriers = m->w->barriers;
     h->place = s->place;
@@ -37,7 +39,13 @@ static void run_system(module_t *m, bridge_system_t *s)
     m->turn = s->turn;
     h->system = s->slot;
     h->observer = s->observer ? 1 : 0;
+    if (m->w->profile)
+        start = os_get_now();
     call_system(m, s);
+    if (m->w->profile) {
+        s->nanos += os_get_now() - start;
+        s->calls += s->observer;
+    }
     h->system = UINT32_MAX;
     h->observer = 0;
     m->running = nullptr;

@@ -673,6 +673,12 @@ claims = { matches = ["talk: line 0 0\\s+from another thread during the call: br
 false = { run = ["{out}/seam{exe}", "bridge_list_modules-after-the-outer-call"] }
 
 [[case]]
+name = "bridge_profile-from-another-thread-during-a-call-refused"
+run = ["{out}/seam{exe}", "bridge_profile-from-another-thread-during-a-call-refused"]
+claims = { matches = ["talk: line 0 0\\s+from another thread during the call: bridge_profile gave -1\\s.*the outer call ended.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_list_modules-after-the-outer-call"] }
+
+[[case]]
 name = "bridge_load-from-the-sink-refused"
 run = ["{out}/seam{exe}", "bridge_load-from-the-sink-refused"]
 claims = { matches = ["talk: line 0 0\\s+from the sink: bridge_load gave 1\\s.*the outer call ended.*alive"] }
@@ -2627,6 +2633,30 @@ name = "bridge_list_modules-fills-no-more-than-asked"
 run = ["{out}/seam{exe}", "bridge_list_modules-fills-no-more-than-asked"]
 claims = { matches = ["2 loaded, and of two rows: test:ok@0\\.1\\.0, untouched\\s+alive"] }
 false = { run = ["{out}/seam{exe}", "BACKEND_MEMORY_LIMIT-lacking-memory-limit-refused"] }
+
+[[case]]
+name = "bridge_profile-times-each-system-and-observer"
+run = ["{out}/seam{exe}", "bridge_profile-times-each-system-and-observer"]
+claims = { matches = ["profile: 2 rows.*row game:events:poke calls 0 timed 1.*row game:events:any calls [1-9][0-9]* timed 1.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_profile-off-times-nothing"] }
+
+[[case]]
+name = "bridge_profile-off-times-nothing"
+run = ["{out}/seam{exe}", "bridge_profile-off-times-nothing"]
+claims = { matches = ["row game:events:poke calls 0 timed 0.*row game:events:any calls 0 timed 0.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_profile-times-each-system-and-observer"] }
+
+[[case]]
+name = "bridge_profile-count-only-writes-no-rows"
+run = ["{out}/seam{exe}", "bridge_profile-count-only-writes-no-rows"]
+claims = { matches = ["profile count 2.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_profile-into-fewer-rows-than-there-are"] }
+
+[[case]]
+name = "bridge_profile-into-fewer-rows-than-there-are"
+run = ["{out}/seam{exe}", "bridge_profile-into-fewer-rows-than-there-are"]
+claims = { matches = ["profile max 2, first game:events:poke, second untouched.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_profile-count-only-writes-no-rows"] }
 
 [[case]]
 name = "BACKEND_MEMORY_LIMIT-lacking-memory-limit-refused"

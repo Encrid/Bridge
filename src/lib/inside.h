@@ -89,6 +89,8 @@ typedef struct {
     uint32_t change_count;
     uint32_t slot;
     uint64_t *stated_before;
+    uint64_t calls;
+    uint64_t nanos;
     system_term_t term[];
 } bridge_system_t;
 
@@ -283,6 +285,7 @@ struct bridge_world {
     module_t *modules;
     uint32_t module_count;
     uint32_t max_modules;
+    bool profile;
 };
 
 void module_discard(bridge_world_t *w, module_t *m);
