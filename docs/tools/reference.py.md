@@ -25,7 +25,7 @@ It also gives zig, the folder of the build of the tree, and the keys `exe` and `
 
 1. It stops if the build of the tree has no program `storage` for the target: `python project.py build` makes it.
 2. `fetched` makes sure that `build/reference` of this tree holds each pinned file.
-3. `built` compiles the 3 programs of `tests/reference` of this tree, with `-O2` and `-DNDEBUG`.
+3. `built` compiles the 3 programs of `tests/shared/reference` of this tree, with `-O2` and `-DNDEBUG`.
 4. Each run writes `==== run <number>`. Then it writes the output of each of the 6 commands of the table, in order.
 5. Before the output of a command, it writes `====` and the command, for example `==== storage measure`.
 
@@ -37,9 +37,9 @@ The 3 programs come from the tree of the tool, so the runs of 2 trees use the sa
 | `storage measure` | `tests/lib/storage/storage_test_measure.c` | Each operation of storage: its best round, its first round on new tables, and the cost of the call of a module. It also times ten thousand tables and sets that it makes and fills, a barrier with nothing to do, and a stress run. The stress run uses 4 threads, then 1 thread. |
 | `storage weigh` | `tests/lib/storage/storage_test_weigh.c` | An attach and a detach for each size of an entity, and a walk of the same rows in more and more tables. It also weighs a sparse set, a toggle, a direct-indexed component, markers, a singleton, and a toggle that a write switches. |
 | `storage baseline` | `tests/lib/storage/storage_test_baseline.c` | The reads of values: through a query, with a test of a field, and of one value on one entity. |
-| `flecs_ref` | `tests/reference/flecs_ref.c` and the files `flecs_ref_*.c` | The same operations in flecs. |
-| `entt_ref` | `tests/reference/entt_ref.cpp` | The same operations in EnTT. |
-| `floor` | `tests/reference/floor.c` | A C array by entity, the least that a lookup by id can cost. |
+| `flecs_ref` | `tests/shared/reference/flecs_ref.c` and the files `flecs_ref_*.c` | The same operations in flecs. |
+| `entt_ref` | `tests/shared/reference/entt_ref.cpp` | The same operations in EnTT. |
+| `floor` | `tests/shared/reference/floor.c` | A C array by entity, the least that a lookup by id can cost. |
 
 Some rows give memory in KB, and not a time.
 Each program ends with the `exe` of the target. For a target whose `system` is `windows`, `flecs_ref` also links
@@ -120,7 +120,7 @@ changed.
 1. It prunes the worktrees of the repository, then makes `build/timing/old` and `build/timing/new`.
 2. It checks out each commit in its worktree, with no branch.
 3. It builds each tree with `.toolchain/tools/build.py --root` of this tree, so with the same zig.
-4. It builds the 3 programs of `tests/reference` of this tree one time.
+4. It builds the 3 programs of `tests/shared/reference` of this tree one time.
 5. It makes one run of each tree that it does not count. A scan of the new files can end during it.
 6. It makes 12 runs: old, new, old, new, old, new, then new, old, new, old, new, old.
 7. The first 6 runs are the first pair, and the last 6 are the second pair.

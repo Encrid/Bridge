@@ -1,9 +1,11 @@
 # Tests
 
-`python project.py test` builds the project, then runs the cases of `tests/cases`.
+`python project.py test` builds the project, then runs the cases of `tests/shared/cases`.
 A case runs a command, and makes claims about its exit status, its output and its files.
 `python project.py test --break` runs the false variant of each case. Each case must then fail.
 `tests` can also hold other files, for example the data that the cases read. No check reads `tests`.
+
+The tests mirror `src`. `tests/lib`, `tests/backends`, `tests/host` and `tests/os` hold the tests of each part. `tests/shared` holds what serves many parts: the cases, the package proof and the references.
 
 ## Write a case
 
@@ -33,10 +35,10 @@ With `Bob`, the output has no line `hello, Ada`. Thus the claims of the false va
 
 ## Groups
 
-A group is a file of cases in `tests/cases`, or in a folder of `tests/cases`.
-The name of a group is the path of the file in `tests/cases`, without `.toml`.
-For example, the name of the group `tests/cases/<folder>/<name>.toml` is `<folder>/<name>`.
-If `tests/cases` holds no case, `test` writes `no case: tests/cases holds no case`.
+A group is a file of cases in `tests/shared/cases`, or in a folder of `tests/shared/cases`.
+The name of a group is the path of the file in `tests/shared/cases`, without `.toml`.
+For example, the name of the group `tests/shared/cases/<folder>/<name>.toml` is `<folder>/<name>`.
+If `tests/shared/cases` holds no case, `test` writes `no case: tests/shared/cases holds no case`.
 
 ## The keys of a case
 
@@ -162,6 +164,7 @@ A case that fails in some copies writes the number of these copies, for example 
 | --- | --- |
 | `timeout` | The maximum time of a case, in seconds. A case fails if its command does not end in time, also with `--break`. |
 | `copies` | The number of copies of each case that run at the same time. `--copies` replaces it. |
+| `cases` | The folder of the test cases. The default is `tests/cases`; this project uses `tests/shared/cases`. |
 | `rule` | The rules of the groups. Each `[[test.rule]]` has `lacks` and `exempt`. |
 | `writers` | The functions that write the messages of the code, for example `fprintf`. |
 

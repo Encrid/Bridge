@@ -69,7 +69,7 @@ def built(values, out):
     zig, exe = values['zig'], values['exe']
     flags = ['-target', values['target'], '-O2', '-DNDEBUG']
     windows = ['-lws2_32', '-ldbghelp'] if values['system'] == 'windows' else []
-    source = ROOT / 'tests' / 'reference'
+    source = ROOT / 'tests' / 'shared' / 'reference'
     if not (out / 'flecs.o').exists():
         run([zig, 'cc', '-std=c23', *flags, '-c', out / 'flecs' / 'flecs.c', '-o', out / 'flecs.o'])
     run([zig, 'cc', '-std=c23', *flags, '-I', out / 'flecs', *sorted(source.glob('flecs_ref*.c')),

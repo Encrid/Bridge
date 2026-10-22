@@ -234,7 +234,7 @@ def measured(args):
     unlinked = [name for name, paths in made if not paths]
     if unlinked:
         die('the cases need what is linked: ' + ' '.join(unlinked))
-    groups = groups_of(values, 'tests/cases')
+    groups = groups_of(values, config.get('test', {}).get('cases', 'tests/cases'))
     groups = chosen(groups, args.k) if args.k and groups else groups
     hits = Path(values['out']) / 'hits.txt'
     hits.unlink(missing_ok=True)
@@ -256,7 +256,7 @@ def main():
     unlinked = [name for name, paths in made if not paths]
     if unlinked:
         die('the cases need what is linked: ' + ' '.join(unlinked))
-    folder = '.toolchain/tests/cases' if args.toolchain else 'tests/cases'
+    folder = '.toolchain/tests/cases' if args.toolchain else config.get('test', {}).get('cases', 'tests/cases')
     groups = groups_of(values, folder)
     if not groups:
         return print('no case: %s holds no case' % folder)

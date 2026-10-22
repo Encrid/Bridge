@@ -1,6 +1,6 @@
 # .toolchain/tools/test.py
 
-`test.py` builds the project with `build.py`, then runs the cases of `tests/cases`.
+`test.py` builds the project with `build.py`, then runs the cases of `[test] cases`, which is `tests/cases` by default.
 
 ## Functions
 
@@ -35,7 +35,7 @@ With `--branches`, `main` runs `measured`, and nothing else. Else `main` does th
 
 1. It builds with `build`, which stops if the target does not run on this machine. With `--toolchain`, it only calls `prepared` of `build.py`, and builds nothing. `--part` builds the base and the named parts, and repeats.
 2. It stops if an artifact is not linked: `the cases need what is linked: <names>`.
-3. It reads the groups of `tests/cases`, or of `.toolchain/tests/cases` with `--toolchain`.
+3. It reads the groups of `[test] cases` (the default is `tests/cases`), or of `.toolchain/tests/cases` with `--toolchain`.
 4. If there is no case, it writes `no case: <folder> holds no case`, and ends.
 5. With `-k`, it keeps only the cases whose name contains the part.
 6. With `--part`, it keeps only the groups of the named parts. It stops if no group is in them: `no case group is in the parts <names>`.
