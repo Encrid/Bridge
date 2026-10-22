@@ -122,7 +122,7 @@ false = { files = { "{case}/linked.txt" = "here" } }
 name = "the output of the cases"
 run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out"]
 folders = { "{case}/.toolchain" = [".toolchain/tests/data/test/project.toml"], "{case}/tests/cases" = [".toolchain/tests/data/test/said.toml"] }
-claims = { status = 0, files = { "{case}/out/{target}/said.txt" = "ended after" } }
+claims = { status = 0, files = { "{case}/out/{target}/scratch/said.txt" = "ended after" } }
 false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out", "--break"] }
 
 [[case]]
@@ -147,14 +147,14 @@ false = { run = ["{python}", "-c", "print('one')"] }
 name = "copies of a case"
 run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out", "--copies", "3"]
 folders = { "{case}/.toolchain" = [".toolchain/tests/data/test/project.toml"], "{case}/tests/cases" = [".toolchain/tests/data/test/ran.toml"] }
-claims = { status = 0, files = { "{case}/out/{target}/cases/ran/0/2/ran.txt" = "ran" } }
+claims = { status = 0, files = { "{case}/out/{target}/scratch/cases/ran/0/2/ran.txt" = "ran" } }
 false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out"] }
 
 [[case]]
 name = "a case that runs alone"
 run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out", "--copies", "3"]
 folders = { "{case}/.toolchain" = [".toolchain/tests/data/test/project.toml"], "{case}/tests/cases" = [".toolchain/tests/data/test/lone.toml"] }
-claims = { status = 0, files = { "{case}/out/{target}/cases/lone/0/ran.txt" = "ran" } }
+claims = { status = 0, files = { "{case}/out/{target}/scratch/cases/lone/0/ran.txt" = "ran" } }
 false = { folders = { "{case}/tests/cases" = [".toolchain/tests/data/test/ran.toml"] } }
 
 [[case]]
@@ -196,7 +196,7 @@ false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case
 name = "a part of no group"
 run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out", "--part", "nothing"]
 folders = { "{case}/.toolchain" = [".toolchain/tests/data/test/project.toml"], "{case}/tests/cases/alpha" = [".toolchain/tests/data/test/passes.toml"] }
-claims = { status_not = 0, has = ["no case group is in the part nothing"] }
+claims = { status_not = 0, has = ["no case group is in the parts nothing"] }
 false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{case}", "--out", "{case}/out", "--part", "alpha"] }
 
 [[case]]

@@ -1,7 +1,8 @@
 # .toolchain/tools/build.py
 
-`build.py` builds the artifacts of the project, and lists them in `package.txt`.
-With `--pack`, it also puts the package into a zip file.
+`build.py` builds the artifacts of the project into the scratch folder, and lists them in `package.txt`.
+It then composes the deliverable of the picked parts into the folder `dist`.
+With `--pack`, it also puts the deliverable into a zip file.
 `test.py` uses its functions `build`, `prepared`, `ready` and `made`. `branches.py` uses `artifacts` and `planned`.
 
 ## Functions
@@ -16,15 +17,16 @@ With `--pack`, it also puts the package into a zip file.
 | `planned(config, values, artifact, tree)` | Gives the kind and the variables of one artifact, as steps 1 to 4 of *Artifacts* tell. |
 | `built(config, values, artifact, tree)` | Builds one artifact. It gives the name of the artifact and its files. |
 | `packaged(config, values, made)` | Writes `package.txt`. |
-| `packed(config, values)` | Writes the zip of the package. Then it writes the path of the zip and the names in it. |
+| `packed(config, values, kit)` | Writes the zip of the deliverable `kit`. Then it writes the path of the zip and the names in it. |
 | `artifacts(config)` | Gives each artifact, and after it each of its variants. |
 | `archives(config, values)` | Gives the path of each shipped archive, from the output folder. |
-| `prove(config, values)` | Proves the package, as *The package proof* tells. It does nothing if `[package]` has no `proof`. |
+| `prove(config, values, pick)` | Proves the package, as *The package proof* tells. It does nothing if `[package]` has no `proof`, or if `pick` leaves out the base. |
+| `composed(config, values, pick)` | Composes the deliverable of the parts of `pick`, as *The deliverable* tells. With no `pick`, it composes every part. It gives the files of the deliverable. |
 | `prepared(args, here)` | Gives the configuration and the variables, as steps 1 to 8 of *build* tell. |
 | `ready(args, here)` | Does the steps 1 to 10 of *build*, and gives the configuration and the variables. |
-| `made(config, values, tree, part)` | Builds each artifact and writes `package.txt`: step 11 of *build*. It gives the name and the files of each artifact. With a part, it skips a tagged artifact of a different part. |
+| `made(config, values, tree, part)` | Builds each artifact and writes `package.txt`: step 11 of *build*. It gives the name and the files of each artifact. With a list of parts, it builds the base and the artifacts of those parts. |
 | `build(args, here)` | Does all the steps of a build. With `here`, it stops if the target does not run here. |
-| `main()` | Runs the commands `build` and `pack`. After a `pack`, it proves the package. |
+| `main()` | Runs the commands `build` and `pack`. It composes the deliverable, and after a `pack` makes the zip and proves the package. |
 
 ## build
 
@@ -42,9 +44,10 @@ With `--pack`, it also puts the package into a zip file.
 10. It finds the tools, and takes the dependencies.
 11. It builds each artifact, and writes `package.txt`.
 
-With `--part <name>`, step 11 builds only the untagged artifacts and the artifacts of the part `<name>`.
-It skips an artifact whose `part` is set and is not `<name>`.
-An untagged artifact has no `part`, so every part builds it, and the links of the part resolve.
+`--part <name>` names a part to build. The option repeats, for example `--part base --part wasm`.
+Step 11 builds the base and the artifacts of each named part. The base is the untagged artifacts.
+It builds the base for every part, so the links of each part resolve.
+
 Without `--part`, step 11 builds every artifact.
 `.toolchain/docs/project.toml.md`, *[[artifact]]*, tells the key `part`.
 
@@ -55,7 +58,8 @@ The commands of the steps and of the cases get them too.
 ## main
 
 `main` builds, then writes the path of each artifact.
-With `--pack`, it then writes the zip with `packed`.
+It then composes the deliverable of the picked parts with `composed`.
+With `--pack`, it writes the zip with `packed`, and proves the package with `prove`.
 
 ## Artifacts
 
@@ -124,21 +128,34 @@ target <target>
 It writes a line `<digest>  <file>` for each file that the build made, one time for each file, but not for an artifact with `test = true`.
 The path of the file is from the output folder of the target.
 
+## The deliverable
+
+The build makes each artifact in the scratch folder `out`. A built binary is not a deliverable.
+`composed` gathers the deliverable of the picked parts into the folder `dist`, beside `scratch`.
+
+For each part of `pick`, `composed` copies into `dist`:
+
+1. the output of each shipped artifact of the part, and its `beside` files, at the top of `dist`,
+2. each header of the part, from `[compose.<part>] headers`, at its path from the root,
+3. each asset of the part, from `[compose.<part>] assets`, at the top of `dist`.
+
+It also copies `license`, and `license` of each folder of `third_party`, at their paths from the root.
+With no `pick`, it composes every part. A part with no header, for example a host, composes only its binaries.
+`composed` writes the path of each file of the deliverable.
+`.toolchain/docs/project.toml.md`, *[compose]*, tells the keys `headers` and `assets`.
+
 ## The zip
 
 `packed` writes one file, `<build>/<project>-<target>.zip`, in the output folder and not in the folder of the target.
-It puts these files into the zip:
-
-1. `package.txt`, and each file that `package.txt` lists, at its path from the output folder of the target.
-2. Each header of `include`, at its path from the root.
-3. `license`, and `license` of each folder of `third_party`, at their paths from the root.
-
+It puts each file of the deliverable `kit` into the zip, at its path from `dist`.
+So the zip is the deliverable that `composed` made, and `pack --part` zips the parts that it picks.
 `packed` writes the path of the zip, then the name of each file in the zip.
 
 ## The package proof
 
 `[package] proof` names a source that uses only the package.
 After a `pack`, `prove` reads it, so a project proves that its package is enough to build against.
+`prove` does nothing when `--part` leaves out the base, since the proof links the base archives.
 
 `prove` extracts the zip into `<out>/proof`, so nothing of the source tree is there.
 It builds the proof source as a program, with the headers of the package and each shipped archive, in `<out>/proof/host`.

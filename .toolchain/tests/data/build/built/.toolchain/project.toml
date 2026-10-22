@@ -7,6 +7,9 @@ said = "written"
 [package]
 proof = "tests/package/host.c"
 
+[compose.base]
+headers = ["include/*.h"]
+
 [kinds.stamped]
 output = "{name}.txt"
 steps = [

@@ -31,7 +31,8 @@ The tools give these variables:
 | --- | --- |
 | `{root}` | The folder of the project. |
 | `{build}` | The output folder, as `.toolchain/docs/shared.py.md`, *Variables*, gives it. |
-| `{out}` | The output folder of the target. |
+| `{dist}` | The deliverable folder of the target, `<build>/<target>`. |
+| `{out}` | The scratch folder of the target, `<dist>/scratch`. |
 | `{target}` | The name of the target. |
 | `{home}` | The name of the target of this machine. |
 | `{python}` | The Python program that runs the tool. |
@@ -213,7 +214,7 @@ An artifact is a file that the build makes, for example a program, a library or 
 | `target` | Optional. The target of the artifact, if it is not the target of the build. |
 | `variants` | Optional. The variants. Each variant has a `name`, and can have the other keys and `unstamped`. |
 | `test` | Optional. `true` for an artifact that only the tests use. The build makes it, and `package.txt` does not list it. Thus `pack` does not put it into the zip. |
-| `part` | Optional. The name of a part of the project. A build or a test with `--part <name>` acts on the untagged artifacts and on the artifacts of the part `<name>`. Without `--part`, they act on every artifact. |
+| `part` | Optional. The name of a part of the project. `--part <name>` acts on the part `<name>`, and repeats. A build makes the base and each named part. The base is the untagged artifacts, and a build always makes it. |
 
 A variant is a copy of the artifact with a different name and some different keys.
 A variant with `unstamped = true` does not do the `section` steps.
@@ -223,6 +224,20 @@ An artifact with a `target` gets the keys of that target and the variable `{targ
 Thus a build for a different target can compile the sources, and not link them.
 If the kind has no `unlinked` steps, the tools stop.
 The command `test` stops if an artifact is not linked.
+
+## [compose]
+
+`[compose]` tells what the deliverable of each part holds, beside the binaries that the part builds.
+`.toolchain/docs/build.py.md`, *The deliverable*, tells how `build` composes it.
+
+`[compose.<part>]` has these keys, for the part `<part>`:
+
+| Key | Value |
+| --- | --- |
+| `headers` | Optional. The patterns of the public headers of the part, from the folder of the project. |
+| `assets` | Optional. The files of the part, from the scratch folder, for example a merged `acc.wasm`. |
+
+A part with no table, and a part with empty keys, composes only its binaries.
 
 ## [test]
 

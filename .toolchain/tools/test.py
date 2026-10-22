@@ -263,8 +263,8 @@ def main():
     groups = chosen(groups, args.k) if args.k else groups
     if args.part:
         groups = [(group, cases) for group, cases in groups
-                  if group == args.part or group.startswith(args.part + '/')] \
-            or die('no case group is in the part %s' % args.part)
+                  if any(group == p or group.startswith(p + '/') for p in args.part)] \
+            or die('no case group is in the parts %s' % ' '.join(args.part))
     copies = args.copies or config['test'].get('copies') or die('.toolchain/project.toml: write [test] copies')
     own = not (args.broken or args.toolchain or args.k or args.part)
     rounds = args.rounds or 1

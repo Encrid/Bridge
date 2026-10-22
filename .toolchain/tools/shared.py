@@ -108,8 +108,9 @@ def sha256(data):
 
 def variables(config, args, target, zig):
     build = (args.out or args.root / config['build']['folder']).resolve()
+    sub = target + ('-debug' if args.debug else '')
     values = {'root': args.root.as_posix(), 'build': build.as_posix(), 'home': this_target(config['targets']) or '',
-              'out': (build / (target + ('-debug' if args.debug else ''))).as_posix(), 'target': target,
+              'dist': (build / sub).as_posix(), 'out': (build / sub / 'scratch').as_posix(), 'target': target,
               'python': Path(sys.executable).as_posix(), 'zig': zig}
     values.update(config['targets'][target])
     own = config.get('variables', {})
@@ -130,7 +131,7 @@ def arguments(*valued, **flags):
     ap = argparse.ArgumentParser(prog=Path(sys.argv[0]).name)
     ap.add_argument('--root', type=Path, default=HERE)
     ap.add_argument('--target')
-    ap.add_argument('--part')
+    ap.add_argument('--part', action='append')
     ap.add_argument('--debug', action='store_true')
     ap.add_argument('--out', type=Path)
     ap.add_argument('--set', action='append', default=[], metavar='NAME=VALUE')

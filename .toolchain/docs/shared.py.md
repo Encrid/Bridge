@@ -53,14 +53,15 @@ Thus a list of tables, for example `[[artifact]]`, comes from one file only.
 
 `variables` gives the values in this order. A later value replaces an earlier value with the same name.
 
-1. The variables that the tools give: `root`, `build`, `home`, `out`, `target`, `python` and `zig`.
+1. The variables that the tools give: `root`, `build`, `home`, `dist`, `out`, `target`, `python` and `zig`.
 2. The keys of the target.
 3. The keys of `[variables]`. The tool stops if a key has a name of step 1 or of step 2.
 4. With `--debug`, the keys of `[debug]`.
 5. The values of `--set`. The tool stops if `[variables]` does not have the name.
 
 `build` is `--out`, or `[build] folder` in the root.
-`out` is `<build>/<target>`, or `<build>/<target>-debug` with `--debug`.
+`dist` is `<build>/<target>`, or `<build>/<target>-debug` with `--debug`. It holds the deliverable that the build composes.
+`out` is `<dist>/scratch`. It holds each built artifact, and the scratch of the tests.
 The messages are `[variables] names a built-in variable or a key of a target: <names>` and `--set <name>=<value>: [variables] has no <name>`.
 
 ## Expansion
@@ -79,6 +80,7 @@ A tool adds its own options:
 - `arguments(pack='--pack')` adds the option `--pack`, with no value. `args.pack` tells if the option is given.
 
 The default of `--root` is `HERE`. `arguments` makes the root an absolute path.
+`--part` can be given more than one time. `args.part` is the list of its values, or `None`.
 
 ## The legal notice
 

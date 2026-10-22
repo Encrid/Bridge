@@ -33,12 +33,12 @@
 
 With `--branches`, `main` runs `measured`, and nothing else. Else `main` does these steps:
 
-1. It builds with `build`, which stops if the target does not run on this machine. With `--toolchain`, it only calls `prepared` of `build.py`, and builds nothing. With `--part <name>`, `build` builds only the base and the artifacts of the part.
+1. It builds with `build`, which stops if the target does not run on this machine. With `--toolchain`, it only calls `prepared` of `build.py`, and builds nothing. `--part` builds the base and the named parts, and repeats.
 2. It stops if an artifact is not linked: `the cases need what is linked: <names>`.
 3. It reads the groups of `tests/cases`, or of `.toolchain/tests/cases` with `--toolchain`.
 4. If there is no case, it writes `no case: <folder> holds no case`, and ends.
 5. With `-k`, it keeps only the cases whose name contains the part.
-6. With `--part <name>`, it keeps only the groups of the part `<name>`. It stops if no group is in the part: `no case group is in the part <name>`.
+6. With `--part`, it keeps only the groups of the named parts. It stops if no group is in them: `no case group is in the parts <names>`.
 7. It runs the groups, one time for each round of `--rounds`. Before each round of 2 rounds or more, it writes `round <n> of <rounds>`.
 8. With no `--break`, `--toolchain`, `-k` or `--part`, it checks the messages of the code with `checked` of `said.py`.
 

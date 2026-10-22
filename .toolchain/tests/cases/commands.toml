@@ -7,7 +7,7 @@ false = { run = ["{python}", "{root}/project.py", "build", "--root", "{root}/.to
 [[case]]
 name = "the command build"
 run = ["{python}", "{root}/project.py", "build", "--root", "{root}/.toolchain/tests/data/take", "--out", "{case}/out"]
-claims = { status = 0, files = { "{case}/out/{target}/package.txt" = "package taken" } }
+claims = { status = 0, files = { "{case}/out/{target}/scratch/package.txt" = "package taken" } }
 false = { run = ["{python}", "{root}/project.py", "fetch", "--root", "{root}/.toolchain/tests/data/take", "--out", "{case}/out"] }
 
 [[case]]

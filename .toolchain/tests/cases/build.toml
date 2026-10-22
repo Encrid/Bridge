@@ -13,19 +13,37 @@ false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{roo
 [[case]]
 name = "a build for debugging"
 run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out", "--debug"]
-claims = { status = 0, files = { "{case}/out/{target}-debug/package.txt" = "package built" } }
+claims = { status = 0, files = { "{case}/out/{target}-debug/scratch/package.txt" = "package built" } }
 false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out"] }
 
 [[case]]
 name = "a package in a zip"
 run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out", "--pack"]
-claims = { status = 0, line = ["{case}/out/built-{target}.zip", "package.txt", "greeter/greet{library}", "include/greet.h", "license", "third_party/sample/license", "package proof: built ran"], matches_not = ["(?m)^greeter_static/"] }
+claims = { status = 0, line = ["{case}/out/built-{target}.zip", "greet{library}", "greet_static.a", "include/greet.h", "license", "third_party/sample/license", "package proof: built ran"], matches_not = ["(?m)^greeter_static/"] }
 false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out"] }
+
+[[case]]
+name = "a pack of a part without the base skips the proof"
+run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out", "--pack", "--part", "extra"]
+claims = { status = 0, has = ["stamped.txt", "{case}/out/built-{target}.zip"], lacks = ["package proof"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out", "--pack"] }
 
 [[case]]
 name = "a build of a part skips the artifacts of other parts"
 run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out", "--part", "main"]
 claims = { status = 0, has = ["greeter"], lacks = ["stamped.txt"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out"] }
+
+[[case]]
+name = "a build takes several parts"
+run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out", "--part", "base", "--part", "extra"]
+claims = { status = 0, has = ["greeter", "stamped.txt"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out", "--part", "base"] }
+
+[[case]]
+name = "compose gathers only the picked parts"
+run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out", "--part", "base"]
+claims = { status = 0, has = ["greet{library}", "include/greet.h"], lacks = ["stamped.txt"] }
 false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out"] }
 
 [[case]]
@@ -85,7 +103,7 @@ false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{roo
 [[case]]
 name = "an artifact for a different target"
 run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/targeted", "--out", "{case}/out"]
-claims = { status = 0, files = { "{case}/out/{target}/package.txt" = "  far-nowhere.txt\n" } }
+claims = { status = 0, files = { "{case}/out/{target}/scratch/package.txt" = "  far-nowhere.txt\n" } }
 false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/untargeted", "--out", "{case}/out"] }
 
 [[case]]
