@@ -6,7 +6,7 @@
 #include <dirent.h>
 
 #include "host.h"
-#include "os/os.h"
+#include "host/os.h"
 
 static bool is_ignored(const host_t *h, const char *path)
 {

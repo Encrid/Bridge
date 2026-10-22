@@ -4,7 +4,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "host.h"
-#include "os/os.h"
+#include "host/os.h"
 
 bool take_lock(const char *name)
 {
