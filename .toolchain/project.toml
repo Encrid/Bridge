@@ -264,9 +264,17 @@ binaryen_sha256 = "492a8e1847a0be1554bb9a7f384227981d60bc013aedc02d8ba1372c39431
 proof = "tests/package/host.c"
 
 [[artifact]]
+name = "os"
+kind = "archive"
+sources = ["src/os/{system}/*.c"]
+include = ["include/os"]
+flags = ["{quiet}", "{system_defines}"]
+
+[[artifact]]
 name = "bridge"
 kind = "library"
-sources = ["src/lib/**/*.c", "src/os/{system}/*.c"]
+sources = ["src/lib/**/*.c"]
+link = ["{out}/os.a"]
 include = ["include/lib", "include/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
 defines = ["BRIDGE_BUILDING"]
 flags = ["{quiet}", "{hidden}", "{system_defines}", "{system_libraries}"]
@@ -2844,7 +2852,8 @@ name = "bridge_native"
 kind = "library"
 part = "native"
 folder = "backends"
-sources = ["src/backends/native/*.c", "src/os/{system}/*.c"]
+sources = ["src/backends/native/*.c"]
+link = ["{out}/os.a"]
 include = ["include/lib", "src/backends/native", "include/backends/native", "include/os"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 
@@ -3037,7 +3046,8 @@ name = "bridge_wasm"
 kind = "library"
 part = "wasm"
 folder = "backends"
-sources = ["src/backends/wasm/*.c", "src/os/{system}/*.c"]
+sources = ["src/backends/wasm/*.c"]
+link = ["{out}/os.a"]
 include = ["include/lib", "src/backends/wasm", "include/os", "{wasmtime}/include"]
 flags = ["{quiet}", "{system_defines}", "{wasmtime}/{wasmtime_link}", "{system_libraries}", "{rpath}"]
 beside = ["{wasmtime}/{wasmtime_runtime}"]

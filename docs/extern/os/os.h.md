@@ -8,7 +8,11 @@ That is address space, shared libraries, threads, the clock, a mutex, an event, 
 This layer is the only code that differs by platform, and it depends on nothing of ours.
 It includes `<stddef.h>` and `<stdint.h>` and no other header.
 Bridge reaches memory mapping, shared libraries, threads and the clock through this layer and nowhere else.
-The library compiles it, and so does each backend, which is a binary of its own.
+
+The build makes the layer into an archive `os`.
+The library and each backend link this archive.
+The linker takes only the functions that the binary calls, so none imports a function it does not use.
+The host compiles the layer, since it alone uses the folders, paths and locks.
 A backend that is a project of its own keeps a copy of the layer.
 
 `include/os/os.h` declares each function once.
@@ -106,20 +110,6 @@ windows          TlsGetValue
 windows          Sleep
 windows_aarch64  _fpreset
 macos            dyld_stub_binder
-posix            chdir
-posix            close
-posix            flock
-posix            mkdir
-posix            open
-posix            realpath
-posix            stat
-windows          _chdir
-windows          _close
-windows          _fullpath
-windows          _locking
-windows          _mkdir
-windows          _open
-windows          _stat64i32
 ```
 
 ## Why the library imports them
@@ -160,7 +150,6 @@ They are in the list because they are imports all the same: a new one is a depen
 | `TlsGetValue`, `Sleep` | The startup code reads its thread-local storage, and waits for its start. |
 | `_fpreset` | The startup code sets the floating-point state on Windows for arm64. |
 | `dyld_stub_binder` | The loader of macOS binds an import with it at the first call. |
-| `chdir`, `close`, `flock`, `mkdir`, `open`, `realpath`, `stat` (Windows: `_chdir`, `_close`, `_fullpath`, `_locking`, `_mkdir`, `_open`, `_stat64i32`) | The host moves into a folder, makes one, resolves an absolute path, and takes a file lock. The library compiles this part of the layer, so these are its imports too. |
 
 ## Constants
 
