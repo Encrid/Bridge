@@ -24,9 +24,9 @@ With `--pack`, it also puts the deliverable into a zip file.
 | `composed(config, values, pick)` | Composes the deliverable of the parts of `pick`, as *The deliverable* tells. With no `pick`, it composes every part. It gives the files of the deliverable. |
 | `prepared(args, here)` | Gives the configuration and the variables, as steps 1 to 8 of *build* tell. |
 | `ready(args, here)` | Does the steps 1 to 10 of *build*, and gives the configuration and the variables. |
-| `made(config, values, tree, part)` | Builds each artifact and writes `package.txt`: step 11 of *build*. It gives the name and the files of each artifact. With a list of parts, it builds the base and the artifacts of those parts. |
-| `build(args, here)` | Does all the steps of a build. With `here`, it stops if the target does not run here. |
-| `main()` | Runs the commands `build` and `pack`. It composes the deliverable, and after a `pack` makes the zip and proves the package. |
+| `made(config, values, tree, part, tests)` | Builds each artifact and writes `package.txt`: step 11 of *build*. It gives the name and the files of each artifact. With a list of parts, it builds the base and the artifacts of those parts. With `tests` false, it skips an artifact with `test = true`. |
+| `build(args, here, tests)` | Does all the steps of a build. With `here`, it stops if the target does not run here. With `tests` false, it builds no test artifact. |
+| `main()` | Runs the commands `build` and `pack`. It builds only the shippable artifacts, composes the deliverable, and after a `pack` makes the zip and proves the package. |
 
 ## build
 
@@ -50,6 +50,8 @@ It builds the base for every part, so the links of each part resolve.
 
 Without `--part`, step 11 builds every artifact.
 `.toolchain/docs/project.toml.md`, *[[artifact]]*, tells the key `part`.
+
+The command `build` and the command `pack` build only the shippable artifacts. Step 11 then skips an artifact with `test = true`, which only `test` builds.
 
 The caches of zig are the variables `ZIG_GLOBAL_CACHE_DIR` and `ZIG_LOCAL_CACHE_DIR` of the environment.
 The commands of the steps and of the cases get them too.

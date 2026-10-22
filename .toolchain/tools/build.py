@@ -195,10 +195,12 @@ def ready(args, here=False):
     return config, values
 
 
-def made(config, values, tree=None, part=None):
+def made(config, values, tree=None, part=None, tests=True):
     done, shipped = [], []
     build_set = None if part is None else {'base'} | set(part)
     for artifact in artifacts(config):
+        if not tests and artifact.get('test'):
+            continue
         if build_set is not None and (artifact.get('part') or 'base') not in build_set:
             continue
         done.append(built(config, values, artifact, tree))
@@ -207,14 +209,14 @@ def made(config, values, tree=None, part=None):
     return done
 
 
-def build(args, here=False):
+def build(args, here=False, tests=True):
     config, values = ready(args, here)
-    return config, values, made(config, values, part=args.part)
+    return config, values, made(config, values, part=args.part, tests=tests)
 
 
 def main():
     args = shared.arguments(pack='--pack')
-    config, values, made = build(args)
+    config, values, made = build(args, tests=False)
     print('\n'.join(paths[0].as_posix() for _, paths in made if paths))
     pick = None if args.part is None else set(args.part)
     kit = composed(config, values, pick)
