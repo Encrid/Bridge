@@ -3089,7 +3089,7 @@ kind = "wasm_text"
 test = true
 part = "wasm"
 folder = "wasm"
-sources = ["src/backends/wasm/sdk/bridge_wasm.wat"]
+sources = ["src/backends/wasm/bridge_wasm.wat"]
 
 [[artifact]]
 name = "adopt"
@@ -4912,7 +4912,7 @@ why = "state_is_path receives a value that points at an entry of the named file,
 [kinds.host_wasm]
 output = "{name}.wasm"
 steps = [
-    { run = ["{wasm_as}", "src/backends/wasm/sdk/bridge_wasm.wat", "{features}", "-o", "{work}.acc.wasm"] },
+    { run = ["{wasm_as}", "src/backends/wasm/bridge_wasm.wat", "{features}", "-o", "{work}.acc.wasm"] },
     { run = ["{zig}", "cc", "-target", "wasm32-freestanding", "{language}", "-Wno-missing-field-initializers", "-O2", "-nostdlib", "-DBRIDGE_ROWS_CHECKED", "{defines}", "{include}", "-Wl,--no-entry", "-o", "{work}.raw.wasm", "{sources}"] },
     { run = ["{wasm_merge}", "{work}.raw.wasm", "main", "{work}.acc.wasm", "acc", "{features}", "-o", "{work}.merged.wasm"] },
     { run = ["{wasm_opt}", "{work}.merged.wasm", "{features}", "-O3", "--remove-exports=acc_*", "--remove-unused-module-elements", "-o", "{output}"] },

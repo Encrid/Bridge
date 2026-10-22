@@ -14,7 +14,7 @@ The wasm_module build runs it between the compile and the merge. It does not run
 
 ## The guard
 
-A module reaches the shared data only through the accessors, which the merge adds: `docs/intern/backends/wasm/sdk/bridge_wasm.wat.md`.
+A module reaches the shared data only through the accessors, which the merge adds: `docs/intern/backends/wasm/bridge_wasm.wat.md`.
 So a compiled module of its own must import no memory and no global.
 `guard` reads the import section of the wasm file, and checks each import:
 

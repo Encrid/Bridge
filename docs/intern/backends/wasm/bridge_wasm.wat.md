@@ -1,4 +1,4 @@
-# src/backends/wasm/sdk/bridge_wasm.wat
+# src/backends/wasm/bridge_wasm.wat
 
 This file holds the accessors a compiled module reaches Bridge's two other memories through.
 A wasm instruction names the memory it loads, and no C compiler emits a load from a memory that is not the module's own.

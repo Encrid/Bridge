@@ -1,5 +1,5 @@
 ;; The accessors a compiled wasm module reaches Bridge's two memories through.
-;; docs/intern/backends/wasm/sdk/bridge_wasm.wat.md.
+;; docs/intern/backends/wasm/bridge_wasm.wat.md.
 ;;
 ;; No C compiler can emit a load from a memory other than the module's own, so these are
 ;; written where a load names its memory. The module build merges this file into the compiled
