@@ -4383,6 +4383,7 @@ path = "src/os/windows/library.c"
 line = 27
 col = 9
 side = "true"
+system = "windows"
 why = "GetFullPathNameW gives zero only for a path it cannot resolve; to_wide has already made the path a valid wide string of at most MAX_PATH-1 characters, so the tests do not force it."
 
 [[branches.exception]]
@@ -4390,6 +4391,7 @@ path = "src/os/windows/library.c"
 line = 27
 col = 17
 side = "true"
+system = "windows"
 why = "The reachable refusal of an over-long path is at to_wide; a wide path that fits yet whose absolute form passes MAX_PATH depends on the working directory, which the tests do not force."
 
 [[branches.exception]]
@@ -4705,6 +4707,7 @@ path = "src/host/config/config_content.c"
 line = 16
 col = 26
 side = "false"
+system = "windows"
 why = "os_path_whole on this host uses _fullpath, which resolves a path lexically and returns null only for an unparseable path, which the tests do not provide."
 
 [[branches.exception]]
@@ -4719,6 +4722,7 @@ path = "src/host/config/config_file.c"
 line = 52
 col = 13
 side = "false"
+system = "windows"
 why = "config_find_whole's key from os_path_whole is null only for an unparseable path, which the tests do not provide."
 
 [[branches.exception]]
@@ -4740,6 +4744,7 @@ path = "src/host/host_walk.c"
 line = 20
 col = 15
 side = "false"
+system = "windows"
 why = "an ignore entry's whole path from os_path_whole is null only for an unparseable path, which the tests do not provide."
 
 [[branches.exception]]
@@ -4747,6 +4752,7 @@ path = "src/host/host_walk.c"
 line = 21
 col = 14
 side = "false"
+system = "windows"
 why = "the ignore path is null only when os_path_whole could not resolve it, which the tests do not force."
 
 [[branches.exception]]
@@ -4754,6 +4760,7 @@ path = "src/host/host_walk.c"
 line = 22
 col = 32
 side = "true"
+system = "windows"
 why = "On this host os_path_whole yields backslash separators, so the character after an ignored prefix is never a forward slash."
 
 [[branches.exception]]
@@ -4866,7 +4873,72 @@ path = "src/os/windows/folder.c"
 line = 22
 col = 9
 side = "false"
+system = "windows"
 why = "os_folder_make's mkdir fails only when the lock folder already exists, and then _stat finds it, so the not-found branch is not reached."
+
+[[branches.exception]]
+path = "src/host/config/config_path.c"
+line = 16
+col = 24
+side = "true"
+system = "posix"
+why = "A colon at the second character marks a Windows drive path; the tests give no such path on this system."
+
+[[branches.exception]]
+path = "src/host/config/config_path.c"
+line = 52
+col = 9
+side = "true"
+system = "posix"
+why = "A backslash separator marks a Windows path; the tests give none on this system, so back is always null."
+
+[[branches.exception]]
+path = "src/host/config/config_path.c"
+line = 52
+col = 18
+side = "true"
+system = "posix"
+why = "config_get_folder tests this backslash operand only when back is non-null, which no posix test path makes, so neither outcome is reached."
+
+[[branches.exception]]
+path = "src/host/config/config_path.c"
+line = 52
+col = 18
+side = "false"
+system = "posix"
+why = "config_get_folder tests this backslash operand only when back is non-null, which no posix test path makes, so neither outcome is reached."
+
+[[branches.exception]]
+path = "src/host/config/config_path.c"
+line = 52
+col = 28
+side = "true"
+system = "posix"
+why = "config_get_folder tests this backslash operand only when back is non-null, which no posix test path makes, so neither outcome is reached."
+
+[[branches.exception]]
+path = "src/host/config/config_path.c"
+line = 52
+col = 28
+side = "false"
+system = "posix"
+why = "config_get_folder tests this backslash operand only when back is non-null, which no posix test path makes, so neither outcome is reached."
+
+[[branches.exception]]
+path = "src/host/host_walk.c"
+line = 22
+col = 53
+side = "true"
+system = "posix"
+why = "On this host os_path_whole yields forward-slash separators, so the character after an ignored prefix is never a backslash."
+
+[[branches.exception]]
+path = "src/os/posix/folder.c"
+line = 22
+col = 9
+side = "false"
+system = "posix"
+why = "os_folder_make's mkdir fails only when the folder already exists, and then stat finds it, so the not-found branch is not reached."
 
 [[branches.exception]]
 path = "src/host/host_look.c"

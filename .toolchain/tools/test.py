@@ -240,7 +240,7 @@ def measured(args):
     hits.unlink(missing_ok=True)
     os.environ['C23_BRANCHES'] = str(hits)
     test(config, values, {name: paths[0] for name, paths in made}, groups, False, False, 1)
-    branches.reported(probes, gaps, hits, config.get('branches', {}).get('exception', []))
+    branches.reported(probes, gaps, hits, config.get('branches', {}).get('exception', []), values['system'])
 
 
 def main():

@@ -324,16 +324,17 @@ BRANCH_SIDE = {'true': 'no case makes this condition true',
                'case': 'no case reaches this case'}
 
 
-def excused(listed, name, line, col, said):
+def excused(listed, system, name, line, col, said):
     for entry in listed:
         if (entry.get('why') and entry.get('line') == line and entry.get('col') == col
-                and BRANCH_SIDE.get(entry.get('side')) == said and fnmatch.fnmatch(name, entry['path'])):
+                and BRANCH_SIDE.get(entry.get('side')) == said and fnmatch.fnmatch(name, entry['path'])
+                and (not entry.get('system') or entry['system'] == system)):
             entry['hits'] = entry.get('hits', 0) + 1
             return True
     return False
 
 
-def reported(probes, gaps, hits, excepted=()):
+def reported(probes, gaps, hits, excepted=(), system=None):
     seen, outcomes, total = joined(probes, hits), [], 0
     for name, rows in probes.items():
         bits = seen.get(name, '0' * (2 * max(1, len(rows))))
@@ -346,10 +347,12 @@ def reported(probes, gaps, hits, excepted=()):
     macros = [(name, row['line'], row['col'], 'this %s is in a macro, and is not measured' % row['kind'])
               for name, rows in gaps.items() for row in rows]
     listed = [dict(entry) for entry in excepted]
-    missed = [fault for fault in outcomes if not excused(listed, *fault)]
+    missed = [fault for fault in outcomes if not excused(listed, system, *fault)]
     exempt = len(outcomes) - len(missed)
     stale = []
     for entry in listed:
+        if entry.get('system') and entry['system'] != system:
+            continue
         where = (entry.get('path', '?'), entry.get('line', 0), entry.get('col', 0))
         if not entry.get('why'):
             stale.append(where + ('this exemption states no reason',))

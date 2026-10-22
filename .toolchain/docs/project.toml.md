@@ -294,6 +294,7 @@ An exception lets a project keep a defensive branch that no case can reach, for 
 | `col` | The column of the branch. |
 | `side` | `true`, `false`, `function` or `case`. |
 | `why` | The reason the branch is unreachable. |
+| `system` | Optional. The system the exemption applies on, for a branch that only one platform has. |
 
 For example:
 
@@ -307,3 +308,4 @@ why = "A wasm32 memory holds at most 65536 pages, which is the reserve, so a gro
 ```
 
 `test --branches` reports an exception that states no reason, or that matches no unreached outcome.
+An exemption with a `system` is applied and checked only on that system.

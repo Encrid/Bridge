@@ -70,6 +70,7 @@ If a line has a different number of bits than the probes of its file, it stops: 
 `[[branches.exception]]` of `project.toml` marks a defensive branch that stays though no test drives it.
 Each exemption names a branch by `path`, `line`, `column` and `side`, and states a `why`.
 The `side` is `true`, `false`, `function` or `case`.
+An exemption can also name a `system`. It applies, and is checked, only on that system, so a platform-only branch gets a platform-only exemption.
 
 `reported` excuses an unreached outcome that an exemption matches, and counts it as exempt, not as missed.
 An exemption with no `why` excuses nothing and is a fault.
@@ -117,5 +118,5 @@ If the output is not JSON, it stops: `the tree of <path> is not JSON`.
 | `probed(config, values)` | Writes the copies with the probes, as *The steps* tells. It gives the probes and the branches that are not measured. |
 | `written(root, where, edits, skips)` | Copies `src` and `include`, and writes the probes of each file. |
 | `joined(probes, hits)` | Gives the bits of each file, joined from all the lines of `hits`. |
-| `excused(listed, name, line, col, said)` | Tells if an exemption of `listed` matches this unreached outcome, and counts the match. |
-| `reported(probes, gaps, hits, excepted)` | Writes the report, as *The report* tells. `excepted` holds the exemptions. |
+| `excused(listed, system, name, line, col, said)` | Tells if an exemption of `listed` matches this unreached outcome on this system, and counts the match. |
+| `reported(probes, gaps, hits, excepted, system)` | Writes the report, as *The report* tells. `excepted` holds the exemptions, and `system` is the system of the build. |
