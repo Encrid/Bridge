@@ -34,11 +34,17 @@ A header gets the probes of each tree that includes it.
 - A condition `c` becomes `c23b_((c), <number>)`. `c23b_` records if `c` was true or false, and gives `c`.
 - After the `:` of a label and after the `{` of a function, `c23b_hit_(<number>);` records that it ran.
 - A file `.c` starts with an array of `_Atomic` bytes, one for each outcome, and these two functions.
-- At its end, a file `.c` includes `stdio.h`, `stdlib.h` and `string.h`, and has a function with the attribute `[[gnu::destructor]]`.
+- At its end, a file `.c` writes with the low-level file calls of the system, with no buffer of `stdio`.
 - A header starts with one block, under a guard of its own, with the same parts under names of its own.
 
-At the end of a program, each such function adds one line to the file that the variable `C23_BRANCHES` names.
-The line is `<path> <bits>`, with one character `0` or `1` for each outcome, and it is written in one call.
+Each program writes one line `<path> <bits>` for each file, to the file that the variable `C23_BRANCHES` names.
+A line has one character, `0` or `1`, for each outcome.
+On Linux and Windows a `[[gnu::destructor]]` of each file writes its line, at the exit of the program and at the close of a library.
+On macOS each file lists itself at load, and one writer for each image writes the lines of the image.
+
+This writer runs with `atexit` at the exit of the program.
+It also runs from `os_lib_close`, which calls the writer of a library before it unmaps the library.
+A destructor of an unmapped library would run at the exit of the program and crash it, so macOS does not use one.
 The probes come before the first line of the file, and `#line 1` keeps the numbers of the lines.
 A file `.c` includes no header before its own lines. Thus its own macros, such as `_POSIX_C_SOURCE`, come first.
 
@@ -88,7 +94,7 @@ If the output is not JSON, it stops: `the tree of <path> is not JSON`.
 
 - A case that crashes, or that stops before its end, writes no line. Its outcomes count as not reached.
 - The measure uses only the target of this machine. The files of a different system, for example `src/posix` on Windows, are measured on a machine of that system.
-- `[[gnu::destructor]]` is an attribute of GNU, which clang has on Linux, macOS and Windows. It replaces `atexit`, because ISO C guarantees only 32 functions for `atexit`.
+- Linux and Windows write with a `[[gnu::destructor]]` of each file. macOS writes with one `atexit` for each image. The destructor of a library that `dlclose` unmaps would run at the exit of the program with its code gone. One `atexit` for each image stays under the 32 functions that ISO C guarantees for `atexit`.
 - A header that two artifacts compile with different macros gets the probes of both.
 
 ## Functions

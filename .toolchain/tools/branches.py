@@ -19,7 +19,10 @@ WRAPPERS = ('ParenExpr', 'ImplicitCastExpr')
 TOPS = ('src/', 'include/')
 SAID = {'function': ['no case calls this function'], 'case': ['no case reaches this case'],
         'condition': ['no case makes this condition false', 'no case makes this condition true']}
-TOP = r'''static _Atomic unsigned char %(p)shits[%(bits)d];
+TOP = r'''#ifdef __APPLE__
+#define C23B_FLUSH_BEFORE_CLOSE
+#endif
+static _Atomic unsigned char %(p)shits[%(bits)d];
 [[maybe_unused]] static bool %(p)s(bool c, unsigned id)
 {
     %(p)shits[2u * id + (c ? 1u : 0u)] = 1;
@@ -30,7 +33,59 @@ TOP = r'''static _Atomic unsigned char %(p)shits[%(bits)d];
     %(p)shits[2u * id + 1u] = 1;
 }
 '''
-WRITER = r'''#include <stdlib.h>
+WRITER = r'''#ifdef __APPLE__
+#ifndef C23B_RT
+#define C23B_RT
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+struct c23b_node {
+    struct c23b_node *next;
+    const char *path;
+    unsigned len;
+    const _Atomic unsigned char *hits;
+    unsigned bits;
+};
+[[gnu::weak]] struct c23b_node *c23b_head;
+[[gnu::weak]] int c23b_armed;
+[[gnu::used, gnu::visibility("default"), gnu::weak]] void c23b_flush(void)
+{
+    const char *path = getenv("C23_BRANCHES");
+    struct c23b_node *node;
+    unsigned char ch;
+    int fd;
+
+    if (!path)
+        return;
+    fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0644);
+    if (fd < 0)
+        return;
+    for (node = c23b_head; node; node = node->next) {
+        (void)!write(fd, node->path, node->len - 1u);
+        ch = ' ';
+        (void)!write(fd, &ch, 1u);
+        for (unsigned i = 0; i < node->bits; i++) {
+            ch = node->hits[i] ? '1' : '0';
+            (void)!write(fd, &ch, 1u);
+        }
+        ch = '\n';
+        (void)!write(fd, &ch, 1u);
+    }
+    close(fd);
+}
+#endif
+static struct c23b_node %(p)snode = {nullptr, "%(name)s", %(name_len)du, %(p)shits, %(bits)du};
+[[gnu::constructor]] static void %(p)sreg(void)
+{
+    %(p)snode.next = c23b_head;
+    c23b_head = &%(p)snode;
+    if (!c23b_armed) {
+        c23b_armed = 1;
+        atexit(c23b_flush);
+    }
+}
+#else
+#include <stdlib.h>
 #include <string.h>
 #ifdef _WIN32
 #include <fcntl.h>
@@ -70,6 +125,7 @@ WRITER = r'''#include <stdlib.h>
 #endif
     (void)%(p)sn;
 }
+#endif
 '''
 
 

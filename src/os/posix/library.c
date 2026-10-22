@@ -19,5 +19,11 @@ void *os_lib_get_symbol(void *lib, const char *name)
 
 void os_lib_close(void *lib)
 {
+#ifdef C23B_FLUSH_BEFORE_CLOSE
+    void (*flush)(void);
+
+    *(void **)&flush = os_lib_get_symbol(lib, "c23b_flush");
+    flush();
+#endif
     dlclose(lib);
 }
