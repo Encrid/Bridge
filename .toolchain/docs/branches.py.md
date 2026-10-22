@@ -90,6 +90,8 @@ zig then writes an error ending with `FileNotFound`, because no object is made. 
 If clang writes a different error, `dumped` stops: `the tree of <path> cannot be read:`, and the errors.
 If the output is not JSON, it stops: `the tree of <path> is not JSON`.
 
+The dump sets `_FORTIFY_SOURCE` to 0. Then a condition in a call that the system would fortify, such as `snprintf`, stays measurable and does not read as a macro.
+
 ## Limits
 
 - A case that crashes, or that stops before its end, writes no line. Its outcomes count as not reached.
