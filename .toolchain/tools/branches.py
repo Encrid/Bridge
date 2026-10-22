@@ -33,7 +33,7 @@ TOP = r'''static _Atomic unsigned char %(p)shits[%(bits)d];
 WRITER = r'''#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-[[gnu::destructor]] static void %(p)swrite(void)
+[[maybe_unused]] static void %(p)swrite(void)
 {
     static char %(p)sline[%(line)d];
     const char *%(p)spath = getenv("C23_BRANCHES");
@@ -48,6 +48,10 @@ WRITER = r'''#include <stdio.h>
     %(p)sline[%(p)sat++] = '\n';
     fwrite(%(p)sline, 1, %(p)sat, %(p)sfile);
     fclose(%(p)sfile);
+}
+[[maybe_unused]] [[gnu::constructor]] static void %(p)ssetup(void)
+{
+    atexit(%(p)swrite);
 }
 '''
 
