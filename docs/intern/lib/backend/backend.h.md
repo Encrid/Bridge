@@ -1,7 +1,7 @@
 # src/lib/backend/backend.h
 
 This header gives `backend_open`, which opens the library of a backend: `docs/intern/lib/backend/backend.c.md`.
-The types of the backend seam, `backend_api_t` among them, are in `include/bridge_backend.h`.
+The types of the backend seam, `backend_api_t` among them, are in `include/lib/bridge_backend.h`.
 
 ## The entries of a backend
 
@@ -30,10 +30,10 @@ An image is the loaded form of a module: compiled bytes on the wasm backend, an 
 Either can be null. A backend that needs the one that it did not get refuses the module by name.
 That refusal, and a library that the operating system cannot open, are failures of the module, as a failed `init` is.
 
-`module_compile` also gets `demands`: `docs/extern/bridge_backend.h.md`, *module_compile*, tells what a backend may do with them.
+`module_compile` also gets `demands`: `docs/extern/lib/bridge_backend.h.md`, *module_compile*, tells what a backend may do with them.
 
 A block is adopted, not created: the backend makes addressable a block that Bridge allocated.
-`docs/extern/bridge_backend.h.md`, *Memory*, tells when Bridge releases a memory.
+`docs/extern/lib/bridge_backend.h.md`, *Memory*, tells when Bridge releases a memory.
 `instance_set_timeout` takes nanoseconds, for the next call only, and the backend changes them to the unit of its engine.
 Only a lifecycle call gets a timeout. A system gets a work limit, which Bridge sets again before each dispatch.
 A backend does not decide when anything runs, find a file, or know what a component, an entity or a barrier is.

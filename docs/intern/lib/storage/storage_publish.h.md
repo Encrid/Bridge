@@ -37,7 +37,7 @@ One module that storage writes for.
 | Field | Content |
 | --- | --- |
 | `r`, `m` | The storage, and the module. |
-| `cell` | Its `column_base`: `docs/extern/bridge_abi.h.md`, *Spans*. |
+| `cell` | Its `column_base`: `docs/extern/lib/bridge_abi.h.md`, *Spans*. |
 | `kept` | After `column_base`, a cell for each type it declared: where it reaches a component that no table keeps. |
 | `rows`, `blocks` | Per table: the row count, and where the ids are in the shared memory. |
 | `stride`, `write`, `kind` | Per type: the size in bytes, the write flag, and the storage kind. |

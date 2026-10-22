@@ -10,7 +10,7 @@ The entity carries a component that the module may write, or it carries nothing.
 A destroy takes each component on the entity with it, whoever declared it, so it is a write to all of them.
 A module with a read grant can find entities in its spans, but it may not remove them.
 
-Storage checks the stake at the barrier, where it knows what the entity carries: `docs/extern/bridge_abi.h.md`, *destroy*.
+Storage checks the stake at the barrier, where it knows what the entity carries: `docs/extern/lib/bridge_abi.h.md`, *destroy*.
 A destroy that fails the check leaves the entity as it was, and storage counts it in `barred` of the module.
 `say_barred` of `src/lib/storage/storage_settle.h` says how many, and the barrier counts as a failure of the module: `docs/intern/lib/schedule/schedule.h.md`, *The failure budget*.
 `storage_let_write` of `src/lib/storage/storage_slots.c` records each type that a module may write, in the set `writable` of the module.

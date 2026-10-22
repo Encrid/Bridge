@@ -1,4 +1,4 @@
-# src/backends/wasm/sdk/bridge_wasm_scratch.h
+# include/backends/wasm/bridge_wasm_scratch.h
 
 This header gives the scratch arena a module stages a statement or a value in before an entry reads it.
 The arena is a region of the private memory, and a module copies a value into it from its own memory.

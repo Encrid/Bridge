@@ -1,7 +1,7 @@
 # src/lib/schema/schema_struct.c
 
 This file reads a struct from its descriptor, a field at a time, and lays it out as C lays it out.
-The layout rule is `docs/extern/bridge_schema.h.md`, *The type set*.
+The layout rule is `docs/extern/lib/bridge_schema.h.md`, *The type set*.
 
 ## A field
 

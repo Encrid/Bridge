@@ -14,7 +14,7 @@ This file finds the `block_layout_t` of the shared block: `docs/intern/lib/block
 | `columns` | A multiple of 16 | The column region: `[budget] columns` bytes. |
 
 A count of `BRIDGE_NONE` gives no sparse set or no direct-indexed component, and its part is empty.
-The layout rounds the length of the block up to a whole number of the largest granule that a backend states: `docs/extern/bridge_backend.h.md`, *Memory*.
+The layout rounds the length of the block up to a whole number of the largest granule that a backend states: `docs/extern/lib/bridge_backend.h.md`, *Memory*.
 
 The layout first refuses `entities`, `persistent` or `columns` above `UINT32_MAX`.
 Then each amount of the budget is below 2^32, so no sum can be past 64 bits.

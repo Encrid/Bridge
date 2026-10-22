@@ -19,7 +19,7 @@ This file runs the barrier: what happens between two phases, in an order that ne
 The header of a module tells how many table ids there are.
 That number is `[budget] tables` and `[budget] sparse_sets`, and 1. It is fixed when the world is made, so one publish is enough.
 
-The barrier stops a module whose span region cannot hold its spans, or the list of an observer: `docs/extern/bridge.h.md`, *The private memory*, and `docs/extern/bridge_abi.h.md`, *observe*.
+The barrier stops a module whose span region cannot hold its spans, or the list of an observer: `docs/extern/lib/bridge.h.md`, *The private memory*, and `docs/extern/lib/bridge_abi.h.md`, *observe*.
 Its record names the size of its spans, and the observer whose list did not fit.
 If its `on_error` is `BRIDGE_FAIL`, the world stops too: `docs/intern/lib/bridge/bridge_stop.c.md`.
 If it ran on, its systems would run over tables that they were not told about.
@@ -41,7 +41,7 @@ A cycle is legal, so nothing refuses it.
 ## The count of a module
 
 Storage that runs out does not stop a world.
-A barrier that has no table or no columns for an entity leaves the entity as it was: `docs/extern/bridge.h.md`, *Running out*.
+A barrier that has no table or no columns for an entity leaves the entity as it was: `docs/extern/lib/bridge.h.md`, *Running out*.
 The barrier then counts as one that the module which asked failed in, beside what its systems did.
 A destroy that the module may not do counts the same way: `src/lib/storage/storage_settle.h` marks both.
 `src/lib/schedule/schedule.h` gives the rules of the counts of a module and of its systems, and `src/lib/schedule/schedule_account.c` settles them in step 8.

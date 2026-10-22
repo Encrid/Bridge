@@ -8,7 +8,7 @@ The type set is `docs/intern/lib/schema/schema.h.md`, *The type set*.
 `schema_set_type` looks for a given type first, then for `bridge_text_t`, and then asks `find` of the source.
 So a field of one of those names never reaches `find`.
 A given type has the alignment of its size.
-`bridge_text_t` has the size and the alignment of `bridge_text_t` of `include/bridge_abi.h`.
+`bridge_text_t` has the size and the alignment of `bridge_text_t` of `include/lib/bridge_abi.h`.
 A declared type has the size and the alignment that `find` gives.
 
 ## Functions

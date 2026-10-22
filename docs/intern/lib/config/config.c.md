@@ -10,7 +10,7 @@ Bridge gives the component its value at `init`, by matching the keys of the sett
 A key that the struct has no field for is refused at `init`, by its name: a typo is not ignored.
 
 The author names the component with the key `config` of the manifest, because only the author knows which struct holds the settings.
-`docs/extern/bridge.h.md`, *The settings of a module*, gives the `config` of a module that has no settings component.
+`docs/extern/lib/bridge.h.md`, *The settings of a module*, gives the `config` of a module that has no settings component.
 A `config` left null is unset and refused: an author who forgot it is told, and is not taken to mean none.
 Settings handed to a module that states `none` are refused.
 A `config` that `init` did not declare as a struct is refused by its name.
@@ -45,7 +45,7 @@ The steps:
 7. If no setting is refused, the second run gives the singleton that value. It records the component as the settings of the module.
 
 The reason of a refusal goes into the error of the load.
-`docs/extern/bridge.h.md`, *The settings of a module*, tells what a reload does with the settings.
+`docs/extern/lib/bridge.h.md`, *The settings of a module*, tells what a reload does with the settings.
 
 ## Functions
 

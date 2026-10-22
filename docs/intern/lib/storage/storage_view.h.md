@@ -5,7 +5,7 @@ It also reads and switches the bit of a toggled row.
 
 ## A tag
 
-A tag is a component with no bytes: `docs/extern/bridge_abi.h.md`, *bridge_kind*, tells how a module declares it and what it gets for it.
+A tag is a component with no bytes: `docs/extern/lib/bridge_abi.h.md`, *bridge_kind*, tells how a module declares it and what it gets for it.
 Storage keeps it in each storage layout as any other component, with no column, no values and no cell:
 
 | Layout | What the tag is |

@@ -1,7 +1,7 @@
 # src/lib/storage/storage_declare.c
 
 This file declares a type: it gives the type its number, its slot if no table keeps it, and its block if it needs one.
-The storage layouts are in `docs/extern/bridge_abi.h.md`, *Storage layouts*.
+The storage layouts are in `docs/extern/lib/bridge_abi.h.md`, *Storage layouts*.
 
 ## A declare
 

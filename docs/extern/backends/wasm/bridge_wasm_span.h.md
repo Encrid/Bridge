@@ -1,4 +1,4 @@
-# src/backends/wasm/sdk/bridge_wasm_span.h
+# include/backends/wasm/bridge_wasm_span.h
 
 This header reads a query's spans from the query list in the private header.
 A span is one matched table: its id and its row count, eight bytes in all.

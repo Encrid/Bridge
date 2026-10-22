@@ -17,7 +17,7 @@ To storage, a type is a size, an alignment and a storage layout, and nothing mor
 
 ## Storage layouts
 
-The author of a component states its storage layout at `declare`: `docs/extern/bridge_abi.h.md`, *Storage layouts*.
+The author of a component states its storage layout at `declare`: `docs/extern/lib/bridge_abi.h.md`, *Storage layouts*.
 Each of the 5 storage layouts has the name of what keeps the component.
 These sections tell how storage keeps each layout, and a tag in each of them:
 

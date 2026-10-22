@@ -4,12 +4,12 @@ This header finds a table by its set, matches the set of a table against terms, 
 
 ## What a system walks
 
-A system walks either tables or one sparse set: `docs/extern/bridge_abi.h.md`, *bridge_term_t*.
+A system walks either tables or one sparse set: `docs/extern/lib/bridge_abi.h.md`, *bridge_term_t*.
 `src/lib/abi/abi_term.c` refuses any other query at `add_system`: `docs/intern/lib/abi/abi_term.c.md`, *What a query may not ask for*.
 
-With a term `BRIDGE_OPTIONAL`, a module reaches a component outside the tables from the row: `docs/extern/bridge_abi.h.md`, *bridge_term_t*.
+With a term `BRIDGE_OPTIONAL`, a module reaches a component outside the tables from the row: `docs/extern/lib/bridge_abi.h.md`, *bridge_term_t*.
 
-A query whose one term that selects is of a sparse set walks the set, with one span: `docs/extern/bridge_abi.h.md`, *Spans*.
+A query whose one term that selects is of a sparse set walks the set, with one span: `docs/extern/lib/bridge_abi.h.md`, *Spans*.
 Its count, ids and base are those of the set, so the same loop as for a table reads it.
 The other terms of the query are optional, and the module reaches them by id.
 

@@ -22,7 +22,7 @@ So a refill can come up short, and then `ids_short` is set: the next `spawn` pas
 
 ## The header
 
-The header is the `bridge_header_t` at offset 0 of the private memory: `docs/extern/bridge_abi.h.md`, *bridge_header_t*.
+The header is the `bridge_header_t` at offset 0 of the private memory: `docs/extern/lib/bridge_abi.h.md`, *bridge_header_t*.
 `block_write_header` writes these fields:
 
 | Field | Value |

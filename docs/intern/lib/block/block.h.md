@@ -19,9 +19,9 @@ A module reaches nine regions with no call, and they do not have the same reader
 | The scratch arena | private | Only its module. |
 | The log ring | private | Its module, and Bridge, which drains the ring. |
 
-Each module has its own private memory, and all modules see one shared memory: `docs/extern/bridge_abi.h.md`, *The memories*.
+Each module has its own private memory, and all modules see one shared memory: `docs/extern/lib/bridge_abi.h.md`, *The memories*.
 The private memory is the library's alone, so the library lays it out from offset 0, with nothing to agree.
-A header at offset 0 tells where the regions are: `docs/extern/bridge_abi.h.md`, *bridge_header_t*, and `docs/intern/lib/block/block_module.c.md`, *The header*.
+A header at offset 0 tells where the regions are: `docs/extern/lib/bridge_abi.h.md`, *bridge_header_t*, and `docs/intern/lib/block/block_module.c.md`, *The header*.
 
 Each other offset into the shared memory is from the start of the shared memory.
 The `(offset, length)` that a component holds into the persistent arena is one of them, so nothing else needs a base.
@@ -51,10 +51,10 @@ A barrier follows each phase, and not each frame.
 So a spawn in one phase is visible in the next phase of the same frame.
 A barrier costs what changed, and a visit to each module: its ids topped up, its failures counted, and its log drained.
 
-A spawn is visible at the next barrier: `docs/extern/bridge_abi.h.md`, *spawn*.
+A spawn is visible at the next barrier: `docs/extern/lib/bridge_abi.h.md`, *spawn*.
 `spawn` gives a usable id at once, but the row does not exist until the barrier, and no query counts it.
-A destroyed entity stays until the barrier too: `docs/extern/bridge_abi.h.md`, *destroy*.
-So the state of the world does not change during a phase, and the systems that run at the same time agree: `docs/extern/bridge.h.md`, *bridge_run_phase*.
+A destroyed entity stays until the barrier too: `docs/extern/lib/bridge_abi.h.md`, *destroy*.
+So the state of the world does not change during a phase, and the systems that run at the same time agree: `docs/extern/lib/bridge.h.md`, *bridge_run_phase*.
 
 ## Types
 

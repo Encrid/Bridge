@@ -5,7 +5,7 @@ Nothing in the pool knows what a job is.
 
 ## The execution model
 
-A phase runs its systems as `docs/extern/bridge.h.md`, *bridge_run_phase*, tells.
+A phase runs its systems as `docs/extern/lib/bridge.h.md`, *bridge_run_phase*, tells.
 In each level, the schedule makes one job of the systems of each module, and one thread runs each job: `docs/intern/lib/schedule/schedule.h.md`, *Levels and jobs*.
 The schedule finds the order a system at a time, and what runs at the same time a module at a time: `src/lib/schedule/schedule.h`.
 
@@ -19,7 +19,7 @@ So one heavy system cannot use more than one core.
 A deployment gets parallel work from more modules whose systems do not conflict, and not from more systems.
 One loop over one component cannot be split between two modules either: both would write it, conflict, and be put in order.
 
-`threads` is the size of the pool, with the caller: `docs/extern/bridge.h.md`, *bridge_config_t*.
+`threads` is the size of the pool, with the caller: `docs/extern/lib/bridge.h.md`, *bridge_config_t*.
 
 ## Types
 

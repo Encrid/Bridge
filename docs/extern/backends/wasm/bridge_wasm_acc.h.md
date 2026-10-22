@@ -1,4 +1,4 @@
-# src/backends/wasm/sdk/bridge_wasm_acc.h
+# include/backends/wasm/bridge_wasm_acc.h
 
 This header declares the host calls a module imports and the accessors that reach its two other memories.
 `docs/intern/backends/wasm/sdk/bridge_wasm.wat.md` gives the accessors; this header names them for C.

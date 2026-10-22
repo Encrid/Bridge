@@ -7,7 +7,7 @@ This file takes the phases of a deployment.
 Bridge ships no phase name, and no default set of names.
 A phase name is a guess about the shape of a frame, and two kinds of program do not want the same phases.
 So each deployment declares its own phases, and a deployment that declares none is refused: Bridge has no phase of its own to run.
-A phase has no order, because the host chooses the order: `docs/extern/bridge.h.md`, *bridge_config_t*.
+A phase has no order, because the host chooses the order: `docs/extern/lib/bridge.h.md`, *bridge_config_t*.
 A phase has no other property either, and a phase that the host never calls does not run.
 
 ## The steps

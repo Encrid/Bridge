@@ -14,12 +14,12 @@ That set holds each type whose last change at this barrier is an attach.
 Storage folds nothing for a change of an entity that is not alive, or that this barrier destroyed already.
 A held id is an id of a block that `spawn` has not handed out: its row is `HELD`.
 An attach or a detach of a held id counts as a fault of the module.
-Storage folds nothing for it: `docs/extern/bridge_abi.h.md`, *attach and detach*.
+Storage folds nothing for it: `docs/extern/lib/bridge_abi.h.md`, *attach and detach*.
 A destroy of a held id goes on to `fold_destroy`, which refuses it: `docs/intern/lib/storage/storage_stake.h.md`.
 
 ## A singleton
 
-A singleton is a component of one value: `docs/extern/bridge_abi.h.md`, *Storage layouts*.
+A singleton is a component of one value: `docs/extern/lib/bridge_abi.h.md`, *Storage layouts*.
 Its block of the column region has the size of the component, and storage takes it at `declare`.
 A `declare` that finds no room for the block fails.
 It has a value or it has none: it cannot have two.
@@ -32,8 +32,8 @@ Storage applies the change at the barrier with the others, in the order it was a
 It tells the observers, and their record has the id 0.
 
 A singleton that gets a value is zero, except for what the attach writes.
-After that, a module reads the value where it is, and a system with a term `BRIDGE_WRITE` writes its fields there: `docs/extern/bridge_abi.h.md`, *Storage layouts*.
-No observer hears such a write: `docs/extern/bridge_abi.h.md`, *observe*.
+After that, a module reads the value where it is, and a system with a term `BRIDGE_WRITE` writes its fields there: `docs/extern/lib/bridge_abi.h.md`, *Storage layouts*.
+No observer hears such a write: `docs/extern/lib/bridge_abi.h.md`, *observe*.
 
 The settings of a module are a singleton: `src/lib/config/config.c` gives it its value with `storage_give_single`, outside a barrier.
 When its last declarer unloads, a singleton has no value, whatever the policy, and its observers hear a leave.

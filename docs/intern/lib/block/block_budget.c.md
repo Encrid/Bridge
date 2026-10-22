@@ -6,7 +6,7 @@ Each amount must be set, and each count that may be none must be a count or none
 ## The budget of a deployment
 
 The budget has two tiers, because two things are sized.
-The deployment states the shared tier in `bridge_budget_t`, and the library reads it when it creates the world: `docs/extern/bridge.h.md`, *bridge_budget_t*.
+The deployment states the shared tier in `bridge_budget_t`, and the library reads it when it creates the world: `docs/extern/lib/bridge.h.md`, *bridge_budget_t*.
 One shared block serves each module, so no single module can size it.
 The budget comes as a struct, because the library reads no file.
 Each module states its own tier when it loads: `docs/intern/lib/module/module_check_fit.c.md`, *The budget of a module*.

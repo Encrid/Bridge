@@ -8,7 +8,7 @@ At an unload or a release, storage destroys or changes one entity at a time, wit
 It tells the observers at once, from what the entity carries and what it will carry.
 `before` holds what the entity carries, and a second set holds what it will carry once the type goes.
 A policy destroys an entity always for `delete`, and for `sweep` when nothing is left.
-The policies are in `docs/extern/bridge_abi.h.md`, *bridge_on_unload*.
+The policies are in `docs/extern/lib/bridge_abi.h.md`, *bridge_on_unload*.
 
 ## Functions
 

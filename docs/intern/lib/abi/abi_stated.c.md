@@ -14,7 +14,7 @@ A field of the declaration that is left at zero is unset, and `declare` refuses 
 - An `on_unload` policy that is unset is refused: `docs/intern/lib/module/module_types.c.md`, *The policies at unload*.
 - A storage layout that is unset is refused.
 
-A tag is the kind `BRIDGE_TAG`, a component with no value: `docs/extern/bridge_abi.h.md`, *bridge_kind*.
+A tag is the kind `BRIDGE_TAG`, a component with no value: `docs/extern/lib/bridge_abi.h.md`, *bridge_kind*.
 
 ## The fingerprint
 

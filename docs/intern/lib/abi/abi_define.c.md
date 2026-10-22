@@ -20,7 +20,7 @@ A backend that checks the shape of an import refuses a module that declares an e
 Bridge defines all the imports right after it makes the instance, before it finds the first function of the module.
 
 A function that Bridge gives to a module gives a status beside its results.
-`docs/extern/bridge_backend.h.md`, *define_func*, tells what a backend does with a status that is not 0.
+`docs/extern/lib/bridge_backend.h.md`, *define_func*, tells what a backend does with a status that is not 0.
 The wasm backend can stop the module, and does it with a trap.
 
 ## The entries

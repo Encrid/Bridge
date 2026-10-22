@@ -22,8 +22,8 @@ The deployment resolves the names because it is the only party that has seen bot
 ## One module, different phases
 
 The maps translate names. They never put two phases of one module into one phase of the deployment.
-A barrier follows each phase, so it stands between the systems of two phases of one module: `docs/extern/bridge.h.md`, *bridge_phase_name_t*.
-In one phase, those systems could conflict in a way that the author never saw, and the author cannot order them: `docs/extern/bridge_abi.h.md`, *Conflicts*.
+A barrier follows each phase, so it stands between the systems of two phases of one module: `docs/extern/lib/bridge.h.md`, *bridge_phase_name_t*.
+In one phase, those systems could conflict in a way that the author never saw, and the author cannot order them: `docs/extern/lib/bridge_abi.h.md`, *Conflicts*.
 Thus Bridge refuses the load for two maps onto one phase.
 `docs/intern/lib/abi/abi_phase.c.md` refuses the other way to merge two phases: a name used as it is, onto which a map puts another name.
 
@@ -31,7 +31,7 @@ Thus Bridge refuses the load for two maps onto one phase.
 
 Bridge refuses the load for a map with no name on one side, and names the place of the map in the table.
 It refuses a name mapped twice and two names mapped to one phase, and names them.
-It also refuses a map to a phase that is not a phase of the deployment, and names it: `docs/extern/bridge.h.md`, *bridge_phase_name_t*.
+It also refuses a map to a phase that is not a phase of the deployment, and names it: `docs/extern/lib/bridge.h.md`, *bridge_phase_name_t*.
 
 ## Functions
 

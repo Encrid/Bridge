@@ -1,7 +1,8 @@
-# src/backends/wasm/sdk/bridge_wasm_log.h
+# include/backends/wasm/bridge_wasm_log.h
 
-`bridge_line_t` is one line of the log, and `bridge_log` writes it.
+`bridge_line_t` is one line of the log, and `BRIDGE_LOG` builds it for `bridge_log` to write.
 A module adds a line into its private ring when the line's level is kept.
+`bridge_line_t` holds the record `size`, the `text` and its `len`, and the arguments `a0` and `a1`.
 
 ## Writing a line
 

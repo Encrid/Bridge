@@ -1,6 +1,6 @@
-# include/bridge_schema.h
+# include/lib/bridge_schema.h
 
-`include/bridge_schema.h` gives the macros that make a type of a module in C, and its descriptor, from one text.
+`include/lib/bridge_schema.h` gives the macros that make a type of a module in C, and its descriptor, from one text.
 The descriptor is the text that Bridge reads to lay the type out as the compiler of the module does.
 
 ## The macros
@@ -28,8 +28,8 @@ A macro holds one statement only: `docs/contributing/coding_style.md`, *H3 - The
 No declaration makes both a type and its descriptor, thus a pair is two macros.
 `name_desc` is a `static const char` array: the name of the type, and `_desc` after it, for example `position_t_desc`.
 Give it to `declare` as `desc`, with `sizeof(name_desc) - 1` as `desc_len`.
-`docs/extern/bridge_abi.h.md`, *declare* tells the other fields of a declaration.
-A module that compiles with `include/bridge_schema.h` is a work based on Bridge: `readme.md`, *License*.
+`docs/extern/lib/bridge_abi.h.md`, *declare* tells the other fields of a declaration.
+A module that compiles with `include/lib/bridge_schema.h` is a work based on Bridge: `readme.md`, *License*.
 
 Write the schema header of a module with these macros.
 A module that shares a component includes the schema header of the module that declares it.
@@ -73,7 +73,7 @@ For example, `Vec3 at;` in `game:Body` is `game:Vec3`, which the module declares
 A tag cannot be the type of a field.
 
 For a struct of another namespace in a component, declare a struct of your own namespace from the same text. It costs one more of `types`.
-`bridge_text_t` is a type of Bridge, and no module declares it: `docs/extern/bridge_abi.h.md`, *alloc*.
+`bridge_text_t` is a type of Bridge, and no module declares it: `docs/extern/lib/bridge_abi.h.md`, *alloc*.
 
 ## Layouts
 
@@ -93,8 +93,8 @@ Then the record of the refusal shows the same fingerprint two times.
 
 ## Messages
 
-`declare` writes this reason when it refuses a descriptor, and the record of the host gives it: `docs/extern/bridge_abi.h.md`, *Messages*.
-Angle brackets mark a part that changes: `docs/extern/bridge.h.md`, *Messages*.
+`declare` writes this reason when it refuses a descriptor, and the record of the host gives it: `docs/extern/lib/bridge_abi.h.md`, *Messages*.
+Angle brackets mark a part that changes: `docs/extern/lib/bridge.h.md`, *Messages*.
 
 - `type '<type>': its descriptor <reason>`
 

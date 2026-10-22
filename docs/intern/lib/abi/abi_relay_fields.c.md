@@ -9,7 +9,7 @@ For each field of the struct as it was, in order:
 
 1. Name the field by its path: the type, then each field, joined by dots, for example `game:Body.at.z`.
 2. Find the field of that name in what the struct becomes. If there is none, record a loss.
-3. Refuse a field of another type: `docs/extern/bridge_abi.h.md`, *At a reload*.
+3. Refuse a field of another type: `docs/extern/lib/bridge_abi.h.md`, *At a reload*.
 4. If the array is now shorter, record its end as a loss.
 5. If the field is a struct that this reload changed, match its fields, element by element.
 6. Else record a run: the elements that both have, from the old offset to the new one.

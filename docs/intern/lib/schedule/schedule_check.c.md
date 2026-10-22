@@ -15,13 +15,13 @@ For system `i`, `check_system` looks only at the systems after `i`, so it checks
 
 `set_levels` must not meet a cycle, since its loop would never end: `docs/intern/lib/schedule/schedule_build.c.md`, *Levels*.
 For two systems of one module, only `before` counts, and not a pair: `docs/intern/lib/schedule/schedule.h.md`, *What orders two systems*.
-`docs/extern/bridge.h.md`, *A load that failed*, gives how each reason ends.
+`docs/extern/lib/bridge.h.md`, *A load that failed*, gives how each reason ends.
 
 ## Limits
 
 A reason cuts each name to a length: a system name to 80 characters.
 A component name is cut to 60 characters, and a phase name to 40.
-The whole reason is cut as `docs/extern/bridge.h.md`, *A load that failed*, tells.
+The whole reason is cut as `docs/extern/lib/bridge.h.md`, *A load that failed*, tells.
 
 ## Functions
 

@@ -34,7 +34,7 @@ Whether the module may destroy the entity is checked at the barrier too: see `sr
 `attach(id, slot, ptr)` carries the value, which is as long as the size that the type was declared with.
 `BRIDGE_ZEROED` as `ptr` asks for a zeroed value: the `zero` of the declared type.
 A tag has no value, so `BRIDGE_ZEROED` is the one `ptr` that a tag takes, and any other is refused.
-`attach` refuses a value outside the scratch arena: `docs/extern/bridge_abi.h.md`, *A change*.
+`attach` refuses a value outside the scratch arena: `docs/extern/lib/bridge_abi.h.md`, *A change*.
 
 `detach(id, slot)` makes the same checks, and carries no value.
 Both refuse a singleton with an id that is not 0, and anything else with the id 0.

@@ -16,7 +16,7 @@ It compares the name with the few phases of the deployment, and refuses a name t
 `bridge_list_modules` tells each loaded module, and whether it still runs.
 It exists because a module that loaded can stop later, past its failure budget, and nothing else says so.
 It also tells why the world stopped: the module that stopped it shows as stopped.
-`docs/extern/bridge.h.md`, *bridge_module_info_t*, tells each cause of a stop.
+`docs/extern/lib/bridge.h.md`, *bridge_module_info_t*, tells each cause of a stop.
 It is a pull, not a record, because the log can drop a record.
 A state must not arrive by a route that can drop it.
 
@@ -28,5 +28,5 @@ It writes at most `max` modules into `out`, and gives the number of all the load
 
 | Function | Result |
 | --- | --- |
-| `bridge_run_phase_now` | Runs the systems of one phase, then its barrier. Its result is in `docs/extern/bridge.h.md`, *bridge_run_phase*. |
+| `bridge_run_phase_now` | Runs the systems of one phase, then its barrier. Its result is in `docs/extern/lib/bridge.h.md`, *bridge_run_phase*. |
 | `bridge_list_modules_now` | Writes up to `max` loaded modules into `out`, each with its state, and gives how many modules are loaded. |

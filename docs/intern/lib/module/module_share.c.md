@@ -10,13 +10,13 @@ A string lives in a component that another module can read under a grant.
 So a reset would make offsets stale that modules hold without having asked for the reset.
 The discipline is allocation for a lifetime, with no record for each object, and the lifetime is that of the module.
 
-`docs/extern/bridge.h.md`, *The reservations*, tells when the share goes back at the unload.
+`docs/extern/lib/bridge.h.md`, *The reservations*, tells when the share goes back at the unload.
 Bridge can know what the module cannot.
 After the components of the module are dropped, Bridge reads each `bridge_text_t` of each row that is left: `docs/intern/lib/module/module_pointed.c.md`.
 If none lies in the share, the share is free for the next load.
 If one does, the whole share stays, and so does the string, which is still readable like any value beside it.
 
-So no offset that a component holds ever becomes stale: `docs/extern/bridge.h.md`, *The reservations*.
+So no offset that a component holds ever becomes stale: `docs/extern/lib/bridge.h.md`, *The reservations*.
 An offset kept anywhere else is good only while the module that allocated it is loaded.
 Examples are an offset in the memory of a module, or in a field that is two integers and not a `bridge_text_t`.
 

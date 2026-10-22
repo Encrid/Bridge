@@ -8,13 +8,13 @@ So the accessors are written by hand in wasm text, where each load and store nam
 
 The module imports three memories: the shared world data, its own private data, and its own linear memory.
 A module holds no shared address: it states a coordinate, and an accessor turns the coordinate into a bounded offset.
-`docs/extern/bridge_abi.h.md`, *Spans* gives the capability table that the accessors read.
+`docs/extern/lib/bridge_abi.h.md`, *Spans* gives the capability table that the accessors read.
 
 ## resolve
 
 `$resolve` maps a coordinate to an offset in the shared memory, or it traps.
 It takes a slot, a packed place, a field, a width, and a flag that tells a store from a load.
-`docs/intern/backends/wasm/sdk/bridge_wasm.h.md`, *The macros* packs the place from a table and a row, or from an id.
+`docs/extern/backends/wasm/bridge_wasm.h.md`, *The macros* packs the place from a table and a row, or from an id.
 `$resolve` reads the capability table from the private header, and branches on the `kind` of the slot:
 
 1. It traps if the slot is past the declared types, or a store names a read-only type.

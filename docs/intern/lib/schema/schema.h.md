@@ -5,7 +5,7 @@ It reads text and gives a layout: who keeps the rows is not its concern, and sto
 
 ## The descriptor
 
-A descriptor is what `BRIDGE_SCHEMA_TEXT` of `include/bridge_schema.h` makes of the body of a type.
+A descriptor is what `BRIDGE_SCHEMA_TEXT` of `include/lib/bridge_schema.h` makes of the body of a type.
 That is the stringification of the preprocessor: the tokens of the body, with one space between them and no comment.
 The descriptor of an enum or of a bitmask begins with the integer type that its author states.
 Both the compiler of the module and `schema_parse` lay out the type from the same text.
@@ -28,7 +28,7 @@ a bitmask     unsigned { name = integer , ... }
 ```
 
 `docs/intern/lib/schema/schema_reader.h.md`, *Constants*, gives the size of each given type.
-`bridge_text_t` is given and not declared: an offset and a length into the persistent arena, as `include/bridge_abi.h` defines it.
+`bridge_text_t` is given and not declared: an offset and a length into the persistent arena, as `include/lib/bridge_abi.h` defines it.
 
 A field of a type that its namespace declared names the type bare: `Vec3 at;` in `game:Body` is `game:Vec3`.
 The `find` function of the source looks for the name in the namespace of the type that the descriptor describes.
@@ -37,7 +37,7 @@ The namespace declared the named type before: a struct, an enum or a bitmask.
 An inline array has one length, written as a number.
 The descriptor is the text before the preprocessor replaces a name, so `char title[N]` reaches Bridge as `N`, and the reader refuses it.
 
-`schema_parse` lays out a struct as C does on every target of a module: `docs/extern/bridge_schema.h.md`, *The type set*.
+`schema_parse` lays out a struct as C does on every target of a module: `docs/extern/lib/bridge_schema.h.md`, *The type set*.
 This is sound because no type of the set is a pointer, holds a pointer, or has the size of a pointer.
 So each type has one size and one alignment on every target.
 

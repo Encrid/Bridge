@@ -5,7 +5,7 @@ It tells whose a name is, where a bare type name is found, and who else declares
 
 ## Whose a component is
 
-`docs/extern/bridge_abi.h.md`, *Grants*, tells which components a module may reach.
+`docs/extern/lib/bridge_abi.h.md`, *Grants*, tells which components a module may reach.
 A name is foreign to a module if it does not start with the namespace of the module and a colon.
 
 The grants let a deployment say what its mod API is, in place of every component that it holds.

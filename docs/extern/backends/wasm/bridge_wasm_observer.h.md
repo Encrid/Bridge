@@ -1,4 +1,4 @@
-# src/backends/wasm/sdk/bridge_wasm_observer.h
+# include/backends/wasm/bridge_wasm_observer.h
 
 This header reads an observer's triggers from the observer list in the private header.
 A trigger records the entity that fired it and the events that matched.

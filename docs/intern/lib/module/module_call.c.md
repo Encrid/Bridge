@@ -5,7 +5,7 @@ It also runs the `shutdown` of a module.
 
 ## The private memory
 
-`docs/extern/bridge_abi.h.md`, *The memories*, tells what the private memory of a module holds.
+`docs/extern/lib/bridge_abi.h.md`, *The memories*, tells what the private memory of a module holds.
 Each module has a private memory of its own, sized from its own config, and not a share of a block.
 A reload makes a new instance with a new private memory, so a reload can state larger sizes.
 `module_take_private` makes the private memory in these steps:

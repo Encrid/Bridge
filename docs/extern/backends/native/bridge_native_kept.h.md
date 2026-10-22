@@ -1,4 +1,4 @@
-# src/backends/native/sdk/bridge_native_kept.h
+# include/backends/native/bridge_native_kept.h
 
 This header reads the components a table does not keep, through real pointers from the two bases.
 It covers a singleton, a direct-indexed component, a sparse set, the bits of a toggle, and an observer's list.

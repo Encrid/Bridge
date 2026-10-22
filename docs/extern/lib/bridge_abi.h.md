@@ -1,6 +1,6 @@
-# include/bridge_abi.h
+# include/lib/bridge_abi.h
 
-`include/bridge_abi.h` is the module seam: Bridge and each module compile it.
+`include/lib/bridge_abi.h` is the module seam: Bridge and each module compile it.
 It gives the eight entries that a module calls, and the layouts that a module reads with plain loads.
 
 ## The layouts
@@ -14,15 +14,15 @@ The compiler adds no padding: a gap is a field `pad`. Write zero into it. Nobody
 
 An enum has the width of its place: 1 byte in `bridge_term_t`, and 4 bytes in each other struct.
 A module in another language cannot include this header. It needs the same layouts, written in its language.
-A module that compiles with `include/bridge_abi.h` is a work based on Bridge: `readme.md`, *License*.
+A module that compiles with `include/lib/bridge_abi.h` is a work based on Bridge: `readme.md`, *License*.
 
 ## BRIDGE_ABI
 
 `BRIDGE_ABI` is the number of the module seam: the version of the layouts and the entries of this header.
 A module states the number that it was built against.
-The host gives it in `abi` of `bridge_module_config_t`: `docs/extern/bridge.h.md`, *bridge_module_config_t*.
+The host gives it in `abi` of `bridge_module_config_t`: `docs/extern/lib/bridge.h.md`, *bridge_module_config_t*.
 A load refuses a module of another number. `abi` of `bridge_header_t` holds the number of Bridge.
-The number changes as `BRIDGE_HOST_ABI` does: `docs/extern/bridge.h.md`, *BRIDGE_HOST_ABI*.
+The number changes as `BRIDGE_HOST_ABI` does: `docs/extern/lib/bridge.h.md`, *BRIDGE_HOST_ABI*.
 
 ## The exports
 
@@ -57,7 +57,7 @@ An offset into a memory counts from the start of that memory.
 Offset 0 of the shared memory is reserved, and its first 8 bytes hold nothing. Thus an offset of 0 says absent.
 
 The private memory holds, in this order: the header at offset 0, the scratch arena, the log ring and the span region.
-The config of the module sizes them: `docs/extern/bridge.h.md`, *The private memory*.
+The config of the module sizes them: `docs/extern/lib/bridge.h.md`, *The private memory*.
 
 ## bridge_header_t
 
@@ -84,7 +84,7 @@ Bridge writes it. The module writes only `scratch_used` and `ring_head`.
 | `place` | The place of the system that runs in its phase, from 0. |
 | `system` | The slot of the system that runs, among the systems or the observers of the module. |
 | `observer` | 1 if an observer runs, and 0 if a system runs. |
-| `log_level` | The `log_level` of the config of the module: `docs/extern/bridge.h.md`, *bridge_module_config_t*. |
+| `log_level` | The `log_level` of the config of the module: `docs/extern/lib/bridge.h.md`, *bridge_module_config_t*. |
 | `observers` | Where the observer slots begin: a `bridge_list_t` for each slot that `observe` gave. |
 | `kept` | Where the kept cells begin: a `uint32_t` for each type that the module declared. |
 | `rows` | Where a `uint32_t` for each table begins: how many rows the table has. |
@@ -123,7 +123,7 @@ The text of a log line stays until the barrier. Count it in `scratch_used`.
 ## The log
 
 A module writes a line of its log into its log ring, with no call. Each barrier gives the lines to the sink of the host.
-`enum bridge_log` names five of the eight levels of a line, with the numbers of `enum bridge_level`: `docs/extern/bridge.h.md`, *bridge_record_t*.
+`enum bridge_log` names five of the eight levels of a line, with the numbers of `enum bridge_level`: `docs/extern/lib/bridge.h.md`, *bridge_record_t*.
 
 | Item | Value |
 | --- | --- |
@@ -141,7 +141,7 @@ A line is a `bridge_log_record_t` of 32 bytes:
 | `place` | `place` of the header, when the module wrote the line. |
 | `system` | `system` of the header, when the module wrote the line. |
 | `observer` | `observer` of the header, when the module wrote the line. |
-| `level` | The level of the line: 0 to 7. Lower is worse. Bridge gives a level above 7 to the sink as 7, with the text of the line. It counts the line at the barrier: `docs/extern/bridge.h.md`, *A phase*. |
+| `level` | The level of the line: 0 to 7. Lower is worse. Bridge gives a level above 7 to the sink as 7, with the text of the line. It counts the line at the barrier: `docs/extern/lib/bridge.h.md`, *A phase*. |
 | `pad` | 2 bytes of padding. |
 | `text` | Where the text of the line is: an offset into the private memory, in the scratch arena. |
 | `len` | How many bytes the text has. |
@@ -204,14 +204,14 @@ It gets `at`: where a `bridge_declaration_t` is, in the scratch arena. It gives 
 
 Zero in `kind`, `on_unload` or `storage` is unset. `declare` refuses it, and each value that is not an item.
 The name of a type has a namespace: `game:Position`. *Grants* tells which namespaces a module can declare.
-`docs/extern/bridge_schema.h.md` tells how to write a descriptor.
+`docs/extern/lib/bridge_schema.h.md` tells how to write a descriptor.
 Bridge lays the type out from its descriptor, and refuses a type whose `size` or `align` is different.
 
 `declare` is idempotent. The first module that declares a type makes it.
 A later module gets a slot of its own for the same type.
 Each module that declares a type states the same descriptor, the same kind and the same storage layout.
 `declare` refuses a different one, but at a reload: *When a type changes*.
-Bridge compares the descriptors byte for byte: `docs/extern/bridge_schema.h.md`, *Layouts*.
+Bridge compares the descriptors byte for byte: `docs/extern/lib/bridge_schema.h.md`, *Layouts*.
 
 ## bridge_kind
 
@@ -244,7 +244,7 @@ A toggled tag gets where its column would begin, and a direct-indexed tag where 
 | `BRIDGE_DELETE` | Bridge destroys each entity that carried the component, with each other component on it. |
 
 The policy of the module that unloads last applies. A component that another loaded module declares stays, with its rows.
-A strip takes no memory and does not fail. A strip that has no room to join two tables leaves the two: `docs/extern/bridge.h.md`, *An unload*.
+A strip takes no memory and does not fail. A strip that has no room to join two tables leaves the two: `docs/extern/lib/bridge.h.md`, *An unload*.
 An id of an entity that a sweep or a delete destroyed is stale: *bridge_entity_t*.
 An entity that must outlive the unload of another module carries a component of the module that holds it.
 
@@ -283,7 +283,7 @@ A system cannot walk a singleton or a direct-indexed component: *bridge_term_t*.
 ## Grants
 
 The name of a component has a namespace, for example `mymod:Explosion`.
-A module has the namespace that its identity names: `docs/extern/bridge.h.md`, *bridge_module_config_t*.
+A module has the namespace that its identity names: `docs/extern/lib/bridge.h.md`, *bridge_module_config_t*.
 A module can always declare, read and write a component of its own namespace.
 For a component of another namespace, it needs a grant: the name of the component in `read` or `write` of its config.
 `read` lets the module declare the component and read it. `write` also lets it write, attach and detach it.
@@ -291,7 +291,7 @@ For a component of another namespace, it needs a grant: the name of the componen
 Bridge checks a grant when a module declares a type, registers a system or an observer, and calls `attach` or `detach`.
 A module can destroy an entity that carries a component that it can write, or that carries nothing: *destroy*.
 An id that `spawn` has not handed out yet is no entity: the entity index does not show it, and no module can destroy it.
-The memory does not enforce a grant: a module can write what it reads. That breaks a rule: *Rules*. The confinement does not catch it: `docs/extern/bridge.h.md`, *Trust and isolation*.
+The memory does not enforce a grant: a module can write what it reads. That breaks a rule: *Rules*. The confinement does not catch it: `docs/extern/lib/bridge.h.md`, *Trust and isolation*.
 
 ## add_system
 
@@ -311,7 +311,7 @@ It gets `at`: where a `bridge_system_statement_t` is, in the scratch arena. It g
 | `before` | Where the slots of the systems that run before this one are, in the scratch arena: `before_count` items of `uint32_t`. |
 | `before_count` | How many slots `before` holds. |
 
-The name of a phase is the name that the module uses: `docs/extern/bridge.h.md`, *bridge_phase_name_t*.
+The name of a phase is the name that the module uses: `docs/extern/lib/bridge.h.md`, *bridge_phase_name_t*.
 A system with no term runs one time in each run of its phase.
 
 Each slot of `before` is a slot that `add_system` gave to an earlier system of the module, in the same phase: *Conflicts*.
@@ -319,7 +319,7 @@ Each slot of `before` is a slot that `add_system` gave to an earlier system of t
 If `before_count` is 0, Bridge does not read `before`.
 
 `init`, `shutdown` and `reload` are reserved names. Each system and observer of a module has a different name.
-The name of a system or of an observer has no `@` and no `:`, so that its full name has one meaning: `docs/extern/bridge.h.md`, *bridge_order_t*.
+The name of a system or of an observer has no `@` and no `:`, so that its full name has one meaning: `docs/extern/lib/bridge.h.md`, *bridge_order_t*.
 
 A system that attaches or detaches a component states it in `changes`.
 An `attach` or a `detach` of a component that the system did not state fails its invocation.
@@ -423,7 +423,7 @@ Two systems of one module that conflict in one phase need an order that their mo
 Without it, the load fails, also if a pair of the deployment orders them.
 `before` makes chains: if `c` names `b`, and `b` names `a`, then `a` runs before `c`.
 
-Two systems of different modules that conflict in one phase need a pair of the deployment, or a chain of pairs: `docs/extern/bridge.h.md`, *bridge_order_t*.
+Two systems of different modules that conflict in one phase need a pair of the deployment, or a chain of pairs: `docs/extern/lib/bridge.h.md`, *bridge_order_t*.
 Else the load that brings the second one fails. `before` does not order such a conflict.
 Two observers that conflict at the barrier follow the same rules.
 
@@ -539,7 +539,7 @@ A destroyed entity stays readable for the rest of the phase.
 The module must be able to write a component that the entity carries, or the entity must carry nothing.
 The barrier checks it against what the entity carried before that barrier.
 An id that a module holds and that `spawn` has not handed out yet cannot be destroyed.
-Else the entity stays as it was, a record counts it, and the module fails at that barrier: `docs/extern/bridge.h.md`, *Failures*.
+Else the entity stays as it was, a record counts it, and the module fails at that barrier: `docs/extern/lib/bridge.h.md`, *Failures*.
 A destroy of a dead id is nothing.
 
 ## attach and detach
@@ -572,7 +572,7 @@ A component keeps a string in a field of the type `bridge_text_t`:
 | `len` | How many bytes the string has. |
 
 A field can have this type in each namespace. No module declares it.
-Bridge reads these fields at an unload. A share that holds a string of a row that stays, stays: `docs/extern/bridge.h.md`, *The reservations*.
+Bridge reads these fields at an unload. A share that holds a string of a row that stays, stays: `docs/extern/lib/bridge.h.md`, *The reservations*.
 
 To change a string, write a string that is not longer over the old bytes, and set `len`.
 A longer string needs a new `alloc`, and the old bytes stay unused.
@@ -603,7 +603,7 @@ Bridge matches the fields by their names:
 | A type that a component of another module has a field of | The reload fails. |
 
 Bridge also lays out again a component with a field of a type that changed.
-A loss needs its name in `losses` of the config: `docs/extern/bridge.h.md`, *The losses*.
+A loss needs its name in `losses` of the config: `docs/extern/lib/bridge.h.md`, *The losses*.
 Else the reload fails, and the record names each loss and how many rows hold it.
 
 A reload can also move a component to another storage layout:
@@ -633,10 +633,10 @@ Bridge does not enforce them: a module that breaks one gets wrong values, and no
 
 ## Messages
 
-An entry that refuses a call writes one of these reasons. The record of the host gives it: `docs/extern/bridge.h.md`, *Messages*.
+An entry that refuses a call writes one of these reasons. The record of the host gives it: `docs/extern/lib/bridge.h.md`, *Messages*.
 In `init`, the reason follows `did not load:`. In `reload`, it follows `was not reloaded:`. In a system, it follows `failed:`.
 
-Angle brackets mark a part that changes: `docs/extern/bridge.h.md`, *Messages*.
+Angle brackets mark a part that changes: `docs/extern/lib/bridge.h.md`, *Messages*.
 For an observer, a reason says `observer` and `an observer` in place of `system` and `a system`.
 Only a system names a phase, so a reason about a phase has no form for an observer.
 
@@ -668,7 +668,7 @@ Only a system names a phase, so a reason about a phase has no form for an observ
 
 `declare is called outside init` also tells a call outside `reload`.
 When other modules declare the type, the reason of a layout ends with `. It is also declared by '<module>'`, and the other modules.
-`docs/extern/bridge_schema.h.md`, *Messages* gives the reasons of a descriptor.
+`docs/extern/lib/bridge_schema.h.md`, *Messages* gives the reasons of a descriptor.
 
 ### At a reload
 

@@ -16,10 +16,10 @@ Two systems conflict in one of two ways:
 
 | Conflict | Condition |
 | --- | --- |
-| Through a column | `docs/extern/bridge_abi.h.md`, *Conflicts*. |
+| Through a column | `docs/extern/lib/bridge_abi.h.md`, *Conflicts*. |
 | Through a change | Both systems attach or detach the same component. The list of changes that each system states beside its terms shows it. |
 
-A change is in the conflict graph because of the order in which a barrier applies the changes: `docs/extern/bridge_abi.h.md`, *Conflicts*.
+A change is in the conflict graph because of the order in which a barrier applies the changes: `docs/extern/lib/bridge_abi.h.md`, *Conflicts*.
 Two modules that attach one component to one entity in one phase leave the value of the module that ran last.
 So the deployment must state which one runs last.
 A change does not conflict with a term: the barrier applies a change after each system of the phase read its terms.
@@ -28,15 +28,15 @@ Every attach and every detach is stated, so two systems that attach one componen
 ## What orders two systems
 
 A pair of `[order]` states that one system runs before another.
-A pair names a system by its full name, for example `game:actors:movement`: `docs/extern/bridge.h.md`, *bridge_order_t*.
+A pair names a system by its full name, for example `game:actors:movement`: `docs/extern/lib/bridge.h.md`, *bridge_order_t*.
 Without the version in the name, an upgrade of a module does not change the pairs of a deployment.
-A deployment can order modules that it does not load: `docs/extern/bridge.h.md`, *bridge_order_t*.
+A deployment can order modules that it does not load: `docs/extern/lib/bridge.h.md`, *bridge_order_t*.
 `schedule_order` refuses the pairs that `docs/intern/lib/schedule/schedule_order.c.md`, *Refusals*, names.
 
 The world keeps the names of the pairs and their closed matrix.
 So a chain of pairs orders two systems also through a name that is not loaded.
 
-A module orders its own systems in `before`: `docs/extern/bridge_abi.h.md`, *add_system*.
+A module orders its own systems in `before`: `docs/extern/lib/bridge_abi.h.md`, *add_system*.
 One author wrote both systems, so their order is in the module.
 Two systems of one module that conflict refuse the load if `before` does not order them, also if a pair orders them.
 `docs/intern/lib/schedule/schedule_build.c.md`, *The steps of a phase*, tells what refuses a pair against `before`.
@@ -78,7 +78,7 @@ The matrix of the names of `[order]` is closed each time the order is built: `n^
 Each system and each observer has its own count of failures.
 The limit is `max_system_failures` of its module, and `-1`, `BRIDGE_NO_LIMIT`, means no limit.
 
-- An invocation changes the count of its system: `docs/extern/bridge.h.md`, *Failures*.
+- An invocation changes the count of its system: `docs/extern/lib/bridge.h.md`, *Failures*.
 - When the count of a system reaches the limit, the barrier that follows stops its module. The record names the system.
 - The module has its own count for what is no system's. A barrier raises it by 1 if an entity that the module changed could not be placed.
 - So does a destroy that it may not do: `docs/intern/lib/block/block_barrier.c.md`, *The count of a module*.

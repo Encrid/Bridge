@@ -20,7 +20,7 @@ So a member that supersedes a shared type does not read another member of the li
 5. It ends each old instance, and each new one takes over, at a single barrier.
 
 A failure before the barrier undoes every new instance, clears the marks, and keeps every old.
-`docs/extern/bridge.h.md`, *bridge_reload*, tells what a caller sees.
+`docs/extern/lib/bridge.h.md`, *bridge_reload*, tells what a caller sees.
 
 ## Functions
 

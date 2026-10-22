@@ -7,11 +7,11 @@ It also refuses a type that is one more than a budget allows.
 ## The descriptor
 
 The schema of a module is a C header.
-One text gives the body of a type to two macros of `include/bridge_schema.h`: one makes the type, and one makes its descriptor.
+One text gives the body of a type to two macros of `include/lib/bridge_schema.h`: one makes the type, and one makes its descriptor.
 So the type and its descriptor cannot be different.
 
 The compiler of the module lays out the type, and the module states its size and its alignment at `declare`.
-Bridge reads only the descriptor, and `src/lib/schema/schema.c` lays the type out from the text as C does: `docs/extern/bridge_schema.h.md`, *The type set*.
+Bridge reads only the descriptor, and `src/lib/schema/schema.c` lays the type out from the text as C does: `docs/extern/lib/bridge_schema.h.md`, *The type set*.
 A declaration whose stated size or alignment is not what the text lays out to is refused, with both.
 
 The layout also gives the fields by name, and they stay in Bridge: a module is held to the size, the alignment and the descriptor.
@@ -32,7 +32,7 @@ A tag has no descriptor, so two tags of one name have one layout.
 
 Two modules that declare one component from the same schema header hand over the same descriptor.
 Each expanded the same macro over the same tokens, so no generator is needed.
-`docs/extern/bridge_schema.h.md`, *Layouts*, tells which edits of the text change the descriptor.
+`docs/extern/lib/bridge_schema.h.md`, *Layouts*, tells which edits of the text change the descriptor.
 
 A module built against another layout of a component is refused when it declares it, and does not read the wrong bytes.
 At a reload, `docs/intern/lib/abi/abi_replace.c.md` compares the descriptors, and lays out the type again where it may.

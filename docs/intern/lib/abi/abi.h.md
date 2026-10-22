@@ -43,7 +43,7 @@ And the last row of a table fills the place of a row that leaves.
 So an immediate destroy moves the row of another entity.
 The offsets that a module holds then become wrong, and no check can find it.
 
-No entry lets a module call another module: `docs/extern/bridge_abi.h.md`, *The exports*.
+No entry lets a module call another module: `docs/extern/lib/bridge_abi.h.md`, *The exports*.
 A module writes data in place of a call, and a system or an observer that subscribes to the data does the work.
 To read and to write a component is not an entry either: a system reads its spans and writes its columns.
 There is no entry for each frame: all the work of a frame is in systems, and each system has a phase.
@@ -70,7 +70,7 @@ A timeout is the one thing that is not the same on each run.
 The same `init` can end on a quiet machine and be stopped on a busy one.
 
 No entry takes a lock.
-Bridge runs one system of a module at a time: `docs/extern/bridge.h.md`, *bridge_run_phase*.
+Bridge runs one system of a module at a time: `docs/extern/lib/bridge.h.md`, *bridge_run_phase*.
 So the block of ids, the share and the queue of a module each have one writer.
 
 ## A refused entry

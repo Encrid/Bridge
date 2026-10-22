@@ -14,13 +14,13 @@ This file gives `declare(at) -> slot`, the entry by which a module declares a ty
 8. Give the slot of the module for the type.
 
 The declaration is copied because a module can put it at any offset, aligned or not.
-`abi_check_name` refuses a name that is empty or too long: `docs/extern/bridge_abi.h.md`, *A declaration*.
+`abi_check_name` refuses a name that is empty or too long: `docs/extern/lib/bridge_abi.h.md`, *A declaration*.
 Step 4 has all its memory before anything is made that would have to be unmade.
 If a piece is missing, the call is refused for want of memory.
 
 ## The slots
 
-`declare` is idempotent: `docs/extern/bridge_abi.h.md`, *declare*.
+`declare` is idempotent: `docs/extern/lib/bridge_abi.h.md`, *declare*.
 A module that declares a type again gets the slot that it has.
 So there is no entry to find a type: `declare` does it.
 

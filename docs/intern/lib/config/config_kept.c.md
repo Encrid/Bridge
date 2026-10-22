@@ -11,7 +11,7 @@ An unload adds an entry when the share of the module stays.
 Each entry is a share that is still held, so `[budget] persistent` bounds the list, and no count does.
 
 After each unload, `config_give_back_free` looks at each entry.
-If `is_kept_held` gives false, the share goes back to the arena, and the entry goes: `docs/extern/bridge.h.md`, *An unload*.
+If `is_kept_held` gives false, the share goes back to the arena, and the entry goes: `docs/extern/lib/bridge.h.md`, *An unload*.
 When an entry goes, the last entry of the list takes its place.
 
 ## The next load

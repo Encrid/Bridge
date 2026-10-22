@@ -1,7 +1,7 @@
 # src/lib/storage/storage_cells.c
 
 This file writes the `column_base` of a module, and the per-table and per-type cells of its capability table.
-A module reads them as `docs/extern/bridge_abi.h.md`, *Spans*, tells.
+A module reads them as `docs/extern/lib/bridge_abi.h.md`, *Spans*, tells.
 
 ## The cells
 

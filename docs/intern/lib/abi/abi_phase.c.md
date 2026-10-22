@@ -4,10 +4,10 @@ This file reads the phase that a system names when the module registers it.
 
 ## The phase of a system
 
-A system names its phase in the words of its module: `docs/extern/bridge_abi.h.md`, *add_system*.
+A system names its phase in the words of its module: `docs/extern/lib/bridge_abi.h.md`, *add_system*.
 Bridge looks for it first among the names that the deployment maps for this module: `docs/intern/lib/module/module_check_phases.c.md`, *The phase names of a module*.
 Then it looks for the name as it is written among the phases of the deployment: `bridge_find_phase`.
-If it finds the name in neither place, Bridge refuses the system: `docs/extern/bridge_abi.h.md`, *add_system and observe*.
+If it finds the name in neither place, Bridge refuses the system: `docs/extern/lib/bridge_abi.h.md`, *add_system and observe*.
 A reason cuts the name of a phase to 40 characters, as the reasons of the schedule do.
 
 ## A name used as it is

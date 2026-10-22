@@ -35,4 +35,4 @@ The level is the level that `say_t` states, and `say_error` states `BRIDGE_ERR`.
 | `say_error` | Hands the sink an error of the library's own, about no module, written as `printf` writes. |
 | `say_about` | Hands the sink a record about a module or one of its systems, written as `printf` writes. |
 | `copy_text` | Gives a copy of the first `n` bytes of a text, with a zero after them. Null if there was not the memory. |
-| `bridge_lacks` | Gives 1, with the record of `docs/extern/bridge.h.md`, *Out of memory*, if `got` is null. Gives 0 if not. |
+| `bridge_lacks` | Gives 1, with the record of `docs/extern/lib/bridge.h.md`, *Out of memory*, if `got` is null. Gives 0 if not. |

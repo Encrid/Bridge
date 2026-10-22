@@ -9,9 +9,9 @@ A host gives `bridge_create` a deployment, and gets a world: the storage, the mo
 The world stays until `bridge_destroy`. A process can have more than one world, and each world is separate.
 
 The three layers are a host, Bridge and the modules. A module runs on a backend, for example native code or WebAssembly.
-`docs/extern/bridge.h.md` tells how a host uses Bridge.
-`docs/extern/bridge_abi.h.md` and `docs/extern/bridge_schema.h.md` tell how a module is written.
-`docs/extern/bridge_backend.h.md` tells how a backend is written.
+`docs/extern/lib/bridge.h.md` tells how a host uses Bridge.
+`docs/extern/lib/bridge_abi.h.md` and `docs/extern/lib/bridge_schema.h.md` tell how a module is written.
+`docs/extern/lib/bridge_backend.h.md` tells how a backend is written.
 
 ## Install
 

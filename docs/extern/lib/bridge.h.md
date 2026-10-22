@@ -1,6 +1,6 @@
-# include/bridge.h
+# include/lib/bridge.h
 
-`include/bridge.h` is the only header that a host needs.
+`include/lib/bridge.h` is the only header that a host needs.
 It gives the seven functions of the library, and the structs that a host gives to them and gets from them.
 
 ## The library
@@ -78,7 +78,7 @@ A deployment gives settings to a backend in `bridge_backend_t`, and to a module 
 Bridge gives the settings to the backend unread. The backend refuses a key that it does not know.
 A name with no folder goes to the search of the operating system.
 On Windows, the folder of a library with a path is also searched for the libraries that it needs.
-`docs/extern/bridge_backend.h.md` tells what the library of a backend holds.
+`docs/extern/lib/bridge_backend.h.md` tells what the library of a backend holds.
 
 A path is a sequence of bytes in UTF-8, on each system.
 
@@ -89,13 +89,13 @@ A backend runs a module either as trusted code or as code that it does not trust
 
 An untrusting backend confines a module to the cells and the arena that it declared, and traps it if it reaches further.
 So the module cannot read or write the memory of the world or of another module.
-The `wasm` backend is one: `docs/extern/bridge_backend.h.md`, *The wasm backend*.
+The `wasm` backend is one: `docs/extern/lib/bridge_backend.h.md`, *The wasm backend*.
 
 A trusting backend runs a module with the access of the host, for the speed of the hardware.
-The native backend trusts its modules: `docs/extern/bridge_backend.h.md`, *The native backend*.
+The native backend trusts its modules: `docs/extern/lib/bridge_backend.h.md`, *The native backend*.
 
 The confinement bounds what a module reaches, not what it does within its reach.
-Bridge does not enforce the grants or the rules there: `docs/extern/bridge_abi.h.md`, *Rules*.
+Bridge does not enforce the grants or the rules there: `docs/extern/lib/bridge_abi.h.md`, *Rules*.
 
 ## bridge_budget_t
 
@@ -166,11 +166,11 @@ Bridge refuses a pair unless it has two different full names of this form.
 A pair can name a system that is not loaded.
 Pairs make chains: if `a` runs before `b`, and `b` before `c`, then `a` runs before `c`, also while `b` is not loaded.
 For a conflict of two systems of two modules, only the pairs and their chains count.
-In one phase, a pair orders its two systems also when they do not conflict: `docs/extern/bridge_abi.h.md`, *Conflicts*.
+In one phase, a pair orders its two systems also when they do not conflict: `docs/extern/lib/bridge_abi.h.md`, *Conflicts*.
 
-A pair can also order two systems of one module, but it does not replace the order that the module states: `docs/extern/bridge_abi.h.md`, *Conflicts*.
+A pair can also order two systems of one module, but it does not replace the order that the module states: `docs/extern/lib/bridge_abi.h.md`, *Conflicts*.
 A pair against that order makes a cycle, and the load or the reload fails.
-`docs/extern/bridge_abi.h.md`, *Conflicts* tells when two systems conflict.
+`docs/extern/lib/bridge_abi.h.md`, *Conflicts* tells when two systems conflict.
 
 ## bridge_config_t
 
@@ -263,7 +263,7 @@ The host states each field: zero is unset, and a load refuses it. A count of an 
 | Field | Content |
 | --- | --- |
 | `identity` | The identity of the module: `namespace:name@version`, for example `tri:triangle@0.1.0`. It has one `:` and one `@`, in this order, and no empty part. At most 127 bytes. |
-| `abi` | The number of the module seam that the module was built against: `docs/extern/bridge_abi.h.md`, *BRIDGE_ABI*. |
+| `abi` | The number of the module seam that the module was built against: `docs/extern/lib/bridge_abi.h.md`, *BRIDGE_ABI*. |
 | `reloadable` | `BRIDGE_TRUE` if the author of the module states that a reload can replace it. |
 | `hot_reload` | `BRIDGE_TRUE` if the deployment lets `bridge_reload` replace the module. It cannot allow what `reloadable` forbids. |
 | `pinned` | `BRIDGE_TRUE` if each system and observer of the module runs on the thread that loaded it. |
@@ -317,7 +317,7 @@ A limit above zero, and some other keys, demand a capability of the backend:
 
 A load refuses a config that demands a capability that its backend does not have. Bridge does not give less than a config asks.
 `BRIDGE_NO_LIMIT` demands nothing, thus the backend can compile the module with no count and no check in it.
-`docs/extern/bridge_backend.h.md`, *backend_capability* tells what each capability promises.
+`docs/extern/lib/bridge_backend.h.md`, *backend_capability* tells what each capability promises.
 
 Bridge sets `work_limit` again before each invocation of a system: it bounds one invocation.
 A timeout bounds one call of the export of its name. `memory_limit` is a ceiling for the life of the instance.
@@ -337,7 +337,7 @@ A stopped module runs no system and no observer, and its components stay. A relo
 
 ### The private memory
 
-`scratch`, `log_ring` and `spans` size the private memory of the module: `docs/extern/bridge_abi.h.md`, *The memories*.
+`scratch`, `log_ring` and `spans` size the private memory of the module: `docs/extern/lib/bridge_abi.h.md`, *The memories*.
 Together they are at most 4 GiB, since an offset into the private memory has 32 bits.
 `spans` holds what each barrier writes for the module: its spans, and a cell for each component it declared in each table.
 
@@ -360,7 +360,7 @@ A string that a component keeps stays good for as long as its row stays.
 ### The settings of a module
 
 The settings of a module fill one component of the module: the struct that `config` names.
-The module declares that struct in its `init`, as a singleton: `docs/extern/bridge_abi.h.md`, *Storage layouts*.
+The module declares that struct in its `init`, as a singleton: `docs/extern/lib/bridge_abi.h.md`, *Storage layouts*.
 After `init`, Bridge writes each setting into the field that its key names. A field that no setting names is zero.
 
 After the load, the component is the state of the module. A system with a grant can change it.
@@ -383,7 +383,7 @@ A setting fills a field by the type of the field:
 
 ### The grants
 
-`read` and `write` are the grants of the module: `docs/extern/bridge_abi.h.md`, *Grants* tells what each allows.
+`read` and `write` are the grants of the module: `docs/extern/lib/bridge_abi.h.md`, *Grants* tells what each allows.
 If two modules can write one component, their systems can conflict. Then the deployment orders them with `order`.
 
 ### A pinned module
@@ -396,7 +396,7 @@ Pinned modules run one after another, since they share one thread.
 
 ### The losses
 
-`losses` names what a reload of the module accepts to lose: `docs/extern/bridge_abi.h.md`, *When a type changes*.
+`losses` names what a reload of the module accepts to lose: `docs/extern/lib/bridge_abi.h.md`, *When a type changes*.
 A name is a component and its field, for example `game:Position.z`, or `game:Body.at.z` one level down.
 For the rows of a toggle that are off, the name is the component alone, for example `game:Shield`.
 A reload fails for a loss that is not in `losses`, and for a name in `losses` that it does not lose.
@@ -431,7 +431,7 @@ The sink of the world gets each record.
 | `len` | How many bytes `text` has. |
 | `barriers` | How many barriers the world had made when the record was made. |
 | `place` | The place of the system in its phase, from 0. Zero in a record of Bridge. |
-| `arg` | The two numbers of a line of a module: `docs/extern/bridge_abi.h.md`, *The log*. Zero in a record of Bridge. |
+| `arg` | The two numbers of a line of a module: `docs/extern/lib/bridge_abi.h.md`, *The log*. Zero in a record of Bridge. |
 | `level` | The severity of the record: 0 to 7. Lower is worse. |
 | `pad` | 3 bytes of padding. |
 
@@ -449,7 +449,7 @@ A line of the log of a module has the `barriers` and the `place` that the module
 | `BRIDGE_DEBUG` | 7: detail. |
 
 `BRIDGE_LEVEL_MOST` is 7: the highest level.
-A module can write each of the eight levels: `docs/extern/bridge_abi.h.md`, *The log*.
+A module can write each of the eight levels: `docs/extern/lib/bridge_abi.h.md`, *The log*.
 
 ### bridge_sink_fn_t
 
@@ -562,7 +562,7 @@ A host that ignores the result can lose a world that stays.
 3. The backend compiles the image, and makes an instance with the memories that the module imports.
 4. Bridge calls `init` under `init_timeout`. `init` declares the types, and registers the systems and the observers.
 5. Bridge finds the export of each system and observer, and `shutdown` and `reload`.
-6. The load fails if the orders make a cycle, or if two systems conflict and nothing orders them. `docs/extern/bridge_abi.h.md`, *Conflicts* tells which order counts.
+6. The load fails if the orders make a cycle, or if two systems conflict and nothing orders them. `docs/extern/lib/bridge_abi.h.md`, *Conflicts* tells which order counts.
 7. Bridge writes the settings into the component that `config` names.
 8. A barrier applies what `init` queued, and writes the spans of the module.
 
@@ -592,7 +592,7 @@ When two modules conflict, the order of the loads decides which load fails. The 
 
 The result is 0 if the module was loaded. Else the result is 1, with a record.
 From the sink, the result is 1, with no record.
-`docs/extern/bridge_abi.h.md`, *bridge_on_unload* tells which components stay, and what becomes of the entities of a component that goes.
+`docs/extern/lib/bridge_abi.h.md`, *bridge_on_unload* tells which components stay, and what becomes of the entities of a component that goes.
 
 ## bridge_reload
 
@@ -793,7 +793,7 @@ Each record of Bridge has the level `BRIDGE_ERR`, unless its group tells another
 - `[budget] cannot be satisfied: the operating system would not give <bytes> bytes, in a reservation of <bytes> bytes`
 - `[budget] cannot be satisfied: the operating system would not give storage <bytes> bytes of its own for the columns it keeps`
 
-The reason of `backend '<backend>': <reason>` is `cannot open backend library '<path>'`, or a reason of `docs/extern/bridge_backend.h.md`, *Messages*.
+The reason of `backend '<backend>': <reason>` is `cannot open backend library '<path>'`, or a reason of `docs/extern/lib/bridge_backend.h.md`, *Messages*.
 The reason of `would not start` and of `cannot adopt` is the text of the backend.
 `bridge_set_order` writes the three `[order]` records of this group too, when a new set does not name two systems, cannot be read, or contradicts itself.
 
@@ -878,9 +878,9 @@ A conflict names the full names of the two systems. A conflict of observers is a
 
 A conflict of two systems of one module ends with `their module states no order of them`.
 A conflict of two systems of two modules ends with `no pair orders them`.
-A reason has at most 255 bytes, so long names can cut its end: `docs/extern/bridge_backend.h.md`, *backend_err_t*.
+A reason has at most 255 bytes, so long names can cut its end: `docs/extern/lib/bridge_backend.h.md`, *backend_err_t*.
 
-`docs/extern/bridge_abi.h.md`, *Messages* gives the refusals of the entries.
+`docs/extern/lib/bridge_abi.h.md`, *Messages* gives the refusals of the entries.
 
 ### The settings
 

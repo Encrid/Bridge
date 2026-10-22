@@ -23,7 +23,7 @@ An entity that carries nothing is in no table, and matches nothing.
 
 So an observer of two terms hears an entity when it comes to carry both, by the attach that completes the pair.
 An entity that gets a component and loses it in one phase is not heard.
-The other cases are in `docs/extern/bridge_abi.h.md`, *observe*.
+The other cases are in `docs/extern/lib/bridge_abi.h.md`, *observe*.
 An observer gets one call for an entity at a barrier, with the events that hold.
 Storage tells the observers in their order: `docs/intern/lib/storage/storage_terms.c.md`, *A record of terms*.
 

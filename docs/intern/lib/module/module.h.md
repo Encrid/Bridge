@@ -34,7 +34,7 @@ What Bridge does depends on the call that failed:
 | `shutdown` | Bridge says the failure, and the teardown continues. |
 | `reload` | Bridge keeps the old instance if it still exists. If not, the module is stopped, and keeps all that it declared. |
 
-`docs/extern/bridge.h.md`, *Failures*, tells what a stopped module runs and keeps.
+`docs/extern/lib/bridge.h.md`, *Failures*, tells what a stopped module runs and keeps.
 `on_error` is stated for each module, and has no default.
 `BRIDGE_FAIL` stops the world: `docs/intern/lib/bridge/bridge_stop.c.md`, *A stopped world*.
 `BRIDGE_SKIP` refuses the load of that one module, and the world continues.
@@ -66,7 +66,7 @@ An artifact that the checks hold before it is touched: all that a load and a rel
 ### module_private_t
 
 The place of each region in the private memory of a module, at a multiple of 8.
-`docs/extern/bridge_abi.h.md`, *The memories*, gives their order.
+`docs/extern/lib/bridge_abi.h.md`, *The memories*, gives their order.
 
 | Field | Content |
 | --- | --- |

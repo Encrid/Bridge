@@ -21,12 +21,12 @@ A module that spawns nothing, keeps no string or queues no change states `BRIDGE
 This file refuses these amounts:
 
 - A `log_level` that is unset, or past `BRIDGE_LEVEL_MOST`, which is 7.
-- A `config` that is null or empty: `docs/extern/bridge.h.md`, *The settings of a module*.
+- A `config` that is null or empty: `docs/extern/lib/bridge.h.md`, *The settings of a module*.
 - More `spawns` than `[budget] entities`. Whether they fit in what is left is found when they are set aside: `src/lib/bridge/bridge_load.c`.
 - Regions of the private memory that an offset of 32 bits cannot reach.
 - A `log_ring` that cannot hold one record of 32 bytes.
 
-A log level is a severity of syslog: `docs/extern/bridge.h.md`, *bridge_record_t*.
+A log level is a severity of syslog: `docs/extern/lib/bridge.h.md`, *bridge_record_t*.
 Zero is unset for `log_level`, as for every key, so the least it can be is 1.
 The log ring has the one floor with a reason.
 A module that can tell nothing is the one legal number that makes a deployment incoherent.

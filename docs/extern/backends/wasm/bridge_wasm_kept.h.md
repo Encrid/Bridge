@@ -1,4 +1,4 @@
-# src/backends/wasm/sdk/bridge_wasm_kept.h
+# include/backends/wasm/bridge_wasm_kept.h
 
 Some components live outside the table rows: a singleton, a sparse set, or a direct-indexed column.
 This header asks the accessors about them, and reads a table's column base from the private header.

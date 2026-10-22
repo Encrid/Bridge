@@ -33,7 +33,7 @@ A term of a component kept elsewhere is stated optional, and is reached from the
 A singleton is on no entity, and is read where it is.
 A direct-indexed component is reached by the id of the entity.
 A component kept in a sparse set is looked for at each row, or its term is the one that selects.
-`docs/extern/bridge_abi.h.md`, *A term*, quotes why Bridge refuses a negated term of a sparse set.
+`docs/extern/lib/bridge_abi.h.md`, *A term*, quotes why Bridge refuses a negated term of a sparse set.
 
 An observer walks nothing, so the rules of what a system walks do not apply to it.
 If the call in progress has a refusal already, `abi_check_term` refuses the term.

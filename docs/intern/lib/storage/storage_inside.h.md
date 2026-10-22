@@ -61,7 +61,7 @@ There is room for a table for each sparse set beside `[budget] tables`, so stora
 
 Storage finds the row of an entity in the set through its own index, `where`.
 Its cell for an entity holds the row plus one, or 0 for none.
-Storage writes a second index for modules in the shared memory, at the offset `sparse` of the world: `docs/extern/bridge_abi.h.md`, *Storage layouts*.
+Storage writes a second index for modules in the shared memory, at the offset `sparse` of the world: `docs/extern/lib/bridge_abi.h.md`, *Storage layouts*.
 When the block of the set moves, storage writes again the cell of each entity in it.
 
 The two indexes take 8 bytes for each entity there may be, for each sparse set.

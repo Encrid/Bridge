@@ -1,4 +1,4 @@
-# src/backends/wasm/sdk/bridge_wasm_toggle.h
+# include/backends/wasm/bridge_wasm_toggle.h
 
 This header reads a toggle's row bit and writes it, by slot, table and row.
 The accessors find the bits word below the column, then test or change the one bit.

@@ -1,6 +1,6 @@
-# include/bridge_backend.h
+# include/lib/bridge_backend.h
 
-`include/bridge_backend.h` is the backend seam: what Bridge asks of a backend, the library that runs modules.
+`include/lib/bridge_backend.h` is the backend seam: what Bridge asks of a backend, the library that runs modules.
 Only Bridge and a backend compile it.
 
 ## The library
@@ -10,9 +10,9 @@ A backend is a shared library that exports the 18 functions of `backend_api_t`, 
 `BACKEND_ENTRY_COUNT` is how many there are: 18.
 `BACKEND_EXPORT` exports a function from the library: a backend in C writes it before each of the 18 functions.
 
-`bridge_create` opens the library that the deployment names, and finds each entry by its name: `docs/extern/bridge.h.md`, *bridge_backend_t*.
+`bridge_create` opens the library that the deployment names, and finds each entry by its name: `docs/extern/lib/bridge.h.md`, *bridge_backend_t*.
 A library that lacks an entry is not a backend, and `bridge_create` refuses the world.
-The structs follow the rules of the host seam: `docs/extern/bridge.h.md`, *The layouts*.
+The structs follow the rules of the host seam: `docs/extern/lib/bridge.h.md`, *The layouts*.
 A backend is a work based on Bridge, since it compiles with this header: `readme.md`, *License*.
 
 The backend owns five kinds of handle, and Bridge never reads into them:
@@ -30,13 +30,13 @@ The backend owns five kinds of handle, and Bridge never reads into them:
 `BACKEND_ABI` is the number of the backend seam: the version of its layouts and its entries.
 `backend_get_abi` gives the number that the backend was built against.
 Bridge calls `backend_get_abi` first, and refuses a library that gives another number, before it asks for another entry.
-The number changes as `BRIDGE_HOST_ABI` does: `docs/extern/bridge.h.md`, *BRIDGE_HOST_ABI*.
+The number changes as `BRIDGE_HOST_ABI` does: `docs/extern/lib/bridge.h.md`, *BRIDGE_HOST_ABI*.
 
 ## backend_err_t
 
 `backend_err_t` is why an entry failed: a text of at most 255 bytes, and a zero after it, in `text`.
 The caller owns it: Bridge gives one to each entry that can fail, and the backend writes the text into it.
-Bridge puts the text into a record for the host: `docs/extern/bridge.h.md`, *Messages*.
+Bridge puts the text into a record for the host: `docs/extern/lib/bridge.h.md`, *Messages*.
 
 ## backend_create
 
@@ -63,7 +63,7 @@ A setting of a backend is a `backend_setting_t`, with a value of one of four kin
 
 The settings are the own settings of the backend, for example a folder for a cache. Bridge gives them unread.
 Refuse a key that the backend does not know, by its name: a key that nobody reads is a fault that nobody finds.
-`backend_setting_t` has the shape of `bridge_setting_t` of the host seam: `docs/extern/bridge.h.md`, *Settings*.
+`backend_setting_t` has the shape of `bridge_setting_t` of the host seam: `docs/extern/lib/bridge.h.md`, *Settings*.
 Each seam header is whole without the other. Bridge asserts that the two have one shape, where it copies one to the other.
 
 ## backend_capability
@@ -80,8 +80,8 @@ Each capability is a promise. State only what the backend keeps.
 | `BACKEND_SIDE_BY_SIDE` | Two instances of one module can exist at one time. | None. |
 | `BACKEND_UNLOAD` | Bridge can take the library out of the process after `backend_destroy`. | None. |
 
-If the backend does not state a capability that the config of a module demands, a load refuses the module: `docs/extern/bridge.h.md`, *The limits*.
-`BACKEND_SIDE_BY_SIDE` decides the order of a reload: `docs/extern/bridge.h.md`, *bridge_reload*.
+If the backend does not state a capability that the config of a module demands, a load refuses the module: `docs/extern/lib/bridge.h.md`, *The limits*.
+`BACKEND_SIDE_BY_SIDE` decides the order of a reload: `docs/extern/lib/bridge.h.md`, *bridge_reload*.
 A backend that brought a runtime with threads of its own into the process does not state `BACKEND_UNLOAD`.
 Bridge reads the capabilities and the shape of a backend once, after `backend_create`.
 
@@ -126,7 +126,7 @@ It gives the image, or null with `err`.
 
 | Field | Content |
 | --- | --- |
-| `bytes` | The image of the module, as the host gave it: `docs/extern/bridge.h.md`, *bridge_artifact_t*. |
+| `bytes` | The image of the module, as the host gave it: `docs/extern/lib/bridge.h.md`, *bridge_artifact_t*. |
 | `len` | How many bytes `bytes` holds. |
 | `path` | The path of the module, or null. |
 | `demands` | The capabilities that the config of the module demands: a mask of items of `enum backend_capability`. |
@@ -189,7 +189,7 @@ It gives 0, or a value that is not 0, with `err`.
 | `ud` | The pointer that the backend gives to `fn` at each call. |
 | `sig` | The signature of the function: a `backend_sig_t`. |
 
-Bridge defines the eight entries of the module seam, in the namespace `bridge`: `docs/extern/bridge_abi.h.md`, *bridge_entries_t*.
+Bridge defines the eight entries of the module seam, in the namespace `bridge`: `docs/extern/lib/bridge_abi.h.md`, *bridge_entries_t*.
 Bridge defines each import before it asks for the first export.
 Bridge states the signature of each import. The backend checks the shape of each export.
 
@@ -223,7 +223,7 @@ A backend that cannot see the type of an export checks nothing.
 `call` runs a function. It gives 0 if the function returned, and then `status` is what the function gave.
 It gives a value that is not 0, with `err`, if the function did not return.
 For example, the function met its timeout or its work limit, or read out of its memory. The process goes on.
-Bridge treats a call that did not return as it treats a status that is not 0: `docs/extern/bridge_abi.h.md`, *The exports*.
+Bridge treats a call that did not return as it treats a status that is not 0: `docs/extern/lib/bridge_abi.h.md`, *The exports*.
 
 ## The order of the calls
 
@@ -242,8 +242,8 @@ For the old instance, it calls as an unload does.
 ## Messages
 
 `bridge_create` writes one of these reasons when a library is not a backend.
-The record is `backend '<backend>': <reason>`: `docs/extern/bridge.h.md`, *The deployment*.
-Angle brackets mark a part that changes: `docs/extern/bridge.h.md`, *Messages*.
+The record is `backend '<backend>': <reason>`: `docs/extern/lib/bridge.h.md`, *The deployment*.
+Angle brackets mark a part that changes: `docs/extern/lib/bridge.h.md`, *Messages*.
 
 - `backend library '<path>' has no entry '<entry>'`
 - `backend library '<path>' is of backend ABI <number>, and this is <number>`

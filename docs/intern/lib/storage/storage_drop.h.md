@@ -5,7 +5,7 @@ A component is dropped when nobody declares it any more, by the policy that its 
 
 ## What unload leaves behind
 
-The policies, and which one applies, are in `docs/extern/bridge_abi.h.md`, *bridge_on_unload*.
+The policies, and which one applies, are in `docs/extern/lib/bridge_abi.h.md`, *bridge_on_unload*.
 For a sweep, an entity has nothing left when it is in no table, in no other sparse set, and has no other direct-indexed value.
 
 A strip never fails, and never costs an entity.

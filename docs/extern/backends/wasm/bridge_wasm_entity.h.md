@@ -1,4 +1,4 @@
-# src/backends/wasm/sdk/bridge_wasm_entity.h
+# include/backends/wasm/bridge_wasm_entity.h
 
 This header reads entities: the id at a row, and the place an id stands for.
 It calls the accessors, which reach the entity index and the who-array of each table.

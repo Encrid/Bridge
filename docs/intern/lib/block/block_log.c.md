@@ -25,9 +25,9 @@ The sink gets a `bridge_record_t` with resolved values: the identity of the modu
 
 ## The levels
 
-A level is a severity of syslog, by its number: `docs/extern/bridge.h.md`, *bridge_record_t*.
-A module names five of them in `include/bridge_abi.h`, as `BRIDGE_LOG_ERR` and the others.
-A host names the same five in `include/bridge.h`, as `BRIDGE_ERR` and the others.
+A level is a severity of syslog, by its number: `docs/extern/lib/bridge.h.md`, *bridge_record_t*.
+A module names five of them in `include/lib/bridge_abi.h`, as `BRIDGE_LOG_ERR` and the others.
+A host names the same five in `include/lib/bridge.h`, as `BRIDGE_ERR` and the others.
 Each header is whole without the other.
 This file holds the two sets of names equal with static assertions, where the level of a module becomes the level of a host.
 
@@ -46,7 +46,7 @@ A module can write a byte above 7 in a line. `send_line` gives the sink `BRIDGE_
 
 A module can write all of its private memory.
 So the drain copies a record out of the ring before it reads it, and checks that the text lies in the scratch arena.
-A text outside the scratch arena reaches the sink as a text of Bridge: `docs/extern/bridge_abi.h.md`, *The log line*.
+A text outside the scratch arena reaches the sink as a text of Bridge: `docs/extern/lib/bridge_abi.h.md`, *The log line*.
 The system is the system of the slot in the record, or the observer of the slot if `observer` is not 0.
 A slot with no system or observer gives null.
 `barriers`, `place`, `arg` and `level` go to the sink as they are.

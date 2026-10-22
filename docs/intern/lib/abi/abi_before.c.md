@@ -12,7 +12,7 @@ A slot can come two times, and then the second time changes nothing.
 
 ## The slots
 
-A slot of `before` names an earlier system of the module: `docs/extern/bridge_abi.h.md`, *add_system*.
+A slot of `before` names an earlier system of the module: `docs/extern/lib/bridge_abi.h.md`, *add_system*.
 An observer has a slot among the observers, so `before` of an observer names observers: `docs/intern/lib/abi/abi_subscribe.c.md`, *The slot*.
 `read_before_slot` refuses a slot that is not below the slot of the new system: no system has it yet, or it is the new one.
 Then it refuses a system of another phase, since the phases have no order: `docs/intern/lib/bridge/bridge_phases.c.md`.
