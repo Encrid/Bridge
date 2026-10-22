@@ -30,28 +30,45 @@ TOP = r'''static _Atomic unsigned char %(p)shits[%(bits)d];
     %(p)shits[2u * id + 1u] = 1;
 }
 '''
-WRITER = r'''#include <stdio.h>
-#include <stdlib.h>
+WRITER = r'''#include <stdlib.h>
 #include <string.h>
-[[maybe_unused]] static void %(p)swrite(void)
+#ifdef _WIN32
+#include <fcntl.h>
+#include <io.h>
+#include <sys/stat.h>
+#else
+#include <fcntl.h>
+#include <unistd.h>
+#endif
+[[gnu::destructor]] static void %(p)swrite(void)
 {
     static char %(p)sline[%(line)d];
     const char *%(p)spath = getenv("C23_BRANCHES");
-    FILE *%(p)sfile = %(p)spath ? fopen(%(p)spath, "ab") : nullptr;
     unsigned %(p)sat = %(name_len)du;
+    int %(p)sfd;
+    int %(p)sn;
 
-    if (!%(p)sfile)
+    if (!%(p)spath)
+        return;
+#ifdef _WIN32
+    %(p)sfd = _open(%(p)spath, _O_WRONLY | _O_CREAT | _O_APPEND | _O_BINARY, _S_IREAD | _S_IWRITE);
+#else
+    %(p)sfd = open(%(p)spath, O_WRONLY | O_CREAT | O_APPEND, 0644);
+#endif
+    if (%(p)sfd < 0)
         return;
     memcpy(%(p)sline, "%(name)s ", %(p)sat);
     for (unsigned %(p)si = 0; %(p)si < %(bits)du; %(p)si++)
         %(p)sline[%(p)sat++] = %(p)shits[%(p)si] ? '1' : '0';
     %(p)sline[%(p)sat++] = '\n';
-    fwrite(%(p)sline, 1, %(p)sat, %(p)sfile);
-    fclose(%(p)sfile);
-}
-[[maybe_unused]] [[gnu::constructor]] static void %(p)ssetup(void)
-{
-    atexit(%(p)swrite);
+#ifdef _WIN32
+    %(p)sn = _write(%(p)sfd, %(p)sline, %(p)sat);
+    _close(%(p)sfd);
+#else
+    %(p)sn = (int)write(%(p)sfd, %(p)sline, %(p)sat);
+    close(%(p)sfd);
+#endif
+    (void)%(p)sn;
 }
 '''
 
