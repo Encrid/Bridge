@@ -21,6 +21,7 @@ Without `--all`, `clean.py` removes each file and each folder of the output fold
 
 Thus the next build does not download zig and the sources again.
 `clean.py` keeps a folder that holds one of these folders, and removes its other files.
+`clean.py` removes a read-only file too, for example a git object in the scratch of the tests. It clears the read-only bit first.
 
 ## distclean
 
@@ -33,6 +34,8 @@ After each of the two actions, `clean.py` writes `cleaned <folder>`.
 
 | Function | Result |
 | --- | --- |
+| `writable(func, path, _)` | Clears the read-only bit of a path, then does the action again. It lets `scrub` remove a read-only file. |
+| `scrub(path)` | Removes a folder with its files, and removes a read-only file in it with `writable`. |
 | `removed(folder, kept)` | Removes each file and each folder of `folder`, but not the folders of `kept` and the folders that hold them. |
 | `main()` | Reads the options, finds the output folder and the folders to keep, and removes the rest. |
 

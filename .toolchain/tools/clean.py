@@ -1,11 +1,23 @@
 # Copyright (C) 2026 Enkrid
 #
 # Under the GNU Affero General Public License, version 3 only: see license.
+import os
 import shutil
+import stat
+import sys
 from pathlib import Path
 
 import shared
 from shared import arguments, die, located
+
+
+def writable(func, path, _):
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+
+def scrub(path):
+    shutil.rmtree(path, **({'onexc': writable} if sys.version_info >= (3, 12) else {'onerror': writable}))
 
 
 def removed(folder, kept):
@@ -15,8 +27,9 @@ def removed(folder, kept):
         if any(path in keep.parents for keep in kept):
             removed(path, kept)
         elif path.is_dir():
-            shutil.rmtree(path)
+            scrub(path)
         else:
+            os.chmod(path, stat.S_IWRITE)
             path.unlink()
 
 
@@ -29,7 +42,7 @@ def main():
     if not build.is_dir():
         return print('nothing to clean: %s is not there' % build.as_posix())
     if args.everything:
-        shutil.rmtree(build)
+        scrub(build)
     else:
         kept = {(shared.HERE / config['zig']['folder']).resolve()}
         kept |= {located(source['into'], values).resolve() for source in config.get('source', [])}

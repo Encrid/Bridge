@@ -27,3 +27,10 @@ run = ["{python}", "{root}/.toolchain/tools/clean.py", "--root", "{case}/p"]
 files = { "{case}/p/.toolchain/project.toml" = "[project]\nname = \"p\"\n" }
 claims = { status = 0, has = ["nothing to clean"] }
 false = { files = { "{case}/p/build/a.txt" = "a" } }
+
+[[case]]
+name = "clean removes a read-only file"
+run = ["{python}", "-c", "import os, stat, subprocess, sys; p = sys.argv[2]; f = os.path.join(p, 'build', 'x', 'ro.txt'); os.makedirs(os.path.dirname(f)); open(f, 'w').close(); os.chmod(f, stat.S_IREAD); subprocess.run([sys.executable, sys.argv[1], '--root', p]); print('gone' if not os.path.exists(f) else 'there')", "{root}/.toolchain/tools/clean.py", "{case}/p"]
+files = { "{case}/p/.toolchain/project.toml" = "[project]\nname = \"p\"\n" }
+claims = { status = 0, line = ["gone"] }
+false = { run = ["{python}", "-c", "import os, stat, sys; p = sys.argv[1]; f = os.path.join(p, 'build', 'x', 'ro.txt'); os.makedirs(os.path.dirname(f)); open(f, 'w').close(); os.chmod(f, stat.S_IREAD); print('gone' if not os.path.exists(f) else 'there')", "{case}/p"] }
