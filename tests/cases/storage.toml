@@ -115,7 +115,7 @@ false = { run = ["{out}/storage{exe}", "ordertwo"] }
 [[case]]
 name = "storage-changes"
 run = ["{out}/storage{exe}", "changes"]
-claims = { output = "tests/storage_changes.txt" }
+claims = { output = "tests/lib/storage/storage_changes.txt" }
 false = { run = ["{out}/storage{exe}", "shape"] }
 
 [[case]]
@@ -127,25 +127,25 @@ false = { run = ["{out}/storage{exe}", "tables"] }
 [[case]]
 name = "storage-tables"
 run = ["{out}/storage{exe}", "tables"]
-claims = { output = "tests/storage_tables.txt" }
+claims = { output = "tests/lib/storage/storage_tables.txt" }
 false = { run = ["{out}/storage{exe}", "stress"] }
 
 [[case]]
 name = "storage-stress"
 run = ["{out}/storage{exe}", "stress"]
-claims = { output = "tests/storage_stress.txt" }
+claims = { output = "tests/lib/storage/storage_stress.txt" }
 false = { run = ["{out}/storage{exe}", "tables"] }
 
 [[case]]
 name = "storage-stress1"
 run = ["{out}/storage{exe}", "stress1"]
-claims = { output = "tests/storage_stress.txt" }
+claims = { output = "tests/lib/storage/storage_stress.txt" }
 false = { run = ["{out}/storage{exe}", "notables"] }
 
 [[case]]
 name = "storage-notables"
 run = ["{out}/storage{exe}", "notables"]
-claims = { output = "tests/storage_notables.txt" }
+claims = { output = "tests/lib/storage/storage_notables.txt" }
 false = { run = ["{out}/storage{exe}", "nocolumns"] }
 
 [[case]]
@@ -157,19 +157,19 @@ false = { run = ["{out}/storage{exe}", "notables"] }
 [[case]]
 name = "storage-nocolumns"
 run = ["{out}/storage{exe}", "nocolumns"]
-claims = { output = "tests/storage_nocolumns.txt" }
+claims = { output = "tests/lib/storage/storage_nocolumns.txt" }
 false = { run = ["{out}/storage{exe}", "scribble"] }
 
 [[case]]
 name = "storage-scribble"
 run = ["{out}/storage{exe}", "scribble"]
-claims = { output = "tests/storage_scribble.txt" }
+claims = { output = "tests/lib/storage/storage_scribble.txt" }
 false = { run = ["{out}/storage{exe}", "strip"] }
 
 [[case]]
 name = "storage-strip"
 run = ["{out}/storage{exe}", "strip"]
-claims = { output = "tests/storage_strip.txt" }
+claims = { output = "tests/lib/storage/storage_strip.txt" }
 false = { run = ["{out}/storage{exe}", "stripfull"] }
 
 [[case]]
@@ -205,7 +205,7 @@ false = { run = ["{out}/storage{exe}", "stripunnamed", "512"] }
 [[case]]
 name = "storage-stripfull"
 run = ["{out}/storage{exe}", "stripfull"]
-claims = { output = "tests/storage_stripfull.txt" }
+claims = { output = "tests/lib/storage/storage_stripfull.txt" }
 false = { run = ["{out}/storage{exe}", "weigh"] }
 
 [[case]]
@@ -218,37 +218,37 @@ false = { run = ["{out}/storage{exe}", "toggle"] }
 [[case]]
 name = "storage-toggle"
 run = ["{out}/storage{exe}", "toggle"]
-claims = { output = "tests/storage_toggle.txt" }
+claims = { output = "tests/lib/storage/storage_toggle.txt" }
 false = { run = ["{out}/storage{exe}", "togglefull"] }
 
 [[case]]
 name = "storage-togglefull"
 run = ["{out}/storage{exe}", "togglefull"]
-claims = { output = "tests/storage_togglefull.txt" }
+claims = { output = "tests/lib/storage/storage_togglefull.txt" }
 false = { run = ["{out}/storage{exe}", "move"] }
 
 [[case]]
 name = "storage-move"
 run = ["{out}/storage{exe}", "move"]
-claims = { output = "tests/storage_move.txt" }
+claims = { output = "tests/lib/storage/storage_move.txt" }
 false = { run = ["{out}/storage{exe}", "layout"] }
 
 [[case]]
 name = "storage-layout"
 run = ["{out}/storage{exe}", "layout"]
-claims = { output = "tests/storage_layout.txt" }
+claims = { output = "tests/lib/storage/storage_layout.txt" }
 false = { run = ["{out}/storage{exe}", "tag"] }
 
 [[case]]
 name = "BRIDGE_TAG-carried-with-no-bytes"
 run = ["{out}/storage{exe}", "tag"]
-claims = { output = "tests/storage_tag.txt" }
+claims = { output = "tests/lib/storage/storage_tag.txt" }
 false = { run = ["{out}/storage{exe}", "single"] }
 
 [[case]]
 name = "BRIDGE_SINGLETON-given-and-read"
 run = ["{out}/storage{exe}", "single"]
-claims = { output = "tests/storage_single.txt" }
+claims = { output = "tests/lib/storage/storage_single.txt" }
 false = { run = ["{out}/storage{exe}", "singlebad1"] }
 
 [[case]]
@@ -272,25 +272,25 @@ false = { run = ["{out}/storage{exe}", "direct"] }
 [[case]]
 name = "storage-direct"
 run = ["{out}/storage{exe}", "direct"]
-claims = { output = "tests/storage_direct.txt" }
+claims = { output = "tests/lib/storage/storage_direct.txt" }
 false = { run = ["{out}/storage{exe}", "directstrip"] }
 
 [[case]]
 name = "storage-directstrip"
 run = ["{out}/storage{exe}", "directstrip"]
-claims = { output = "tests/storage_directstrip.txt" }
+claims = { output = "tests/lib/storage/storage_directstrip.txt" }
 false = { run = ["{out}/storage{exe}", "directsweep"] }
 
 [[case]]
 name = "storage-directsweep"
 run = ["{out}/storage{exe}", "directsweep"]
-claims = { output = "tests/storage_directsweep.txt" }
+claims = { output = "tests/lib/storage/storage_directsweep.txt" }
 false = { run = ["{out}/storage{exe}", "directdelete"] }
 
 [[case]]
 name = "storage-directdelete"
 run = ["{out}/storage{exe}", "directdelete"]
-claims = { output = "tests/storage_directdelete.txt" }
+claims = { output = "tests/lib/storage/storage_directdelete.txt" }
 false = { run = ["{out}/storage{exe}", "directnone"] }
 
 [[case]]
@@ -314,37 +314,37 @@ false = { run = ["{out}/storage{exe}", "sparse"] }
 [[case]]
 name = "storage-sparse"
 run = ["{out}/storage{exe}", "sparse"]
-claims = { output = "tests/storage_sparse.txt" }
+claims = { output = "tests/lib/storage/storage_sparse.txt" }
 false = { run = ["{out}/storage{exe}", "sparsefull"] }
 
 [[case]]
 name = "storage-sparsefull"
 run = ["{out}/storage{exe}", "sparsefull"]
-claims = { output = "tests/storage_sparsefull.txt" }
+claims = { output = "tests/lib/storage/storage_sparsefull.txt" }
 false = { run = ["{out}/storage{exe}", "sparsestrip"] }
 
 [[case]]
 name = "storage-sparsestrip"
 run = ["{out}/storage{exe}", "sparsestrip"]
-claims = { output = "tests/storage_sparsestrip.txt" }
+claims = { output = "tests/lib/storage/storage_sparsestrip.txt" }
 false = { run = ["{out}/storage{exe}", "sparsesweep"] }
 
 [[case]]
 name = "storage-sparsesweep"
 run = ["{out}/storage{exe}", "sparsesweep"]
-claims = { output = "tests/storage_sparsesweep.txt" }
+claims = { output = "tests/lib/storage/storage_sparsesweep.txt" }
 false = { run = ["{out}/storage{exe}", "sparsesweepa"] }
 
 [[case]]
 name = "storage-sparsesweepa"
 run = ["{out}/storage{exe}", "sparsesweepa"]
-claims = { output = "tests/storage_sparsesweepa.txt" }
+claims = { output = "tests/lib/storage/storage_sparsesweepa.txt" }
 false = { run = ["{out}/storage{exe}", "sparsedelete"] }
 
 [[case]]
 name = "storage-sparsedelete"
 run = ["{out}/storage{exe}", "sparsedelete"]
-claims = { output = "tests/storage_sparsedelete.txt" }
+claims = { output = "tests/lib/storage/storage_sparsedelete.txt" }
 false = { run = ["{out}/storage{exe}", "sparsenone"] }
 
 [[case]]
@@ -382,25 +382,25 @@ false = { run = ["{out}/storage{exe}", "stress1"] }
 [[case]]
 name = "bridge_header_t-read-by-a-plain-module"
 run = ["{out}/storage{exe}", "stress1"]
-claims = { output = "tests/storage_stress.txt" }
+claims = { output = "tests/lib/storage/storage_stress.txt" }
 false = { run = ["{out}/storage{exe}", "changes"] }
 
 [[case]]
 name = "bridge_entity_t-index-read-by-a-plain-module"
 run = ["{out}/storage{exe}", "stress1"]
-claims = { output = "tests/storage_stress.txt" }
+claims = { output = "tests/lib/storage/storage_stress.txt" }
 false = { run = ["{out}/storage{exe}", "changes"] }
 
 [[case]]
 name = "bridge_list_t-triggers-of-a-plain-observer"
 run = ["{out}/storage{exe}", "changes"]
-claims = { output = "tests/storage_changes.txt" }
+claims = { output = "tests/lib/storage/storage_changes.txt" }
 false = { run = ["{out}/storage{exe}", "shape"] }
 
 [[case]]
 name = "detach-queued-and-applied-at-the-barrier"
 run = ["{out}/storage{exe}", "changes"]
-claims = { output = "tests/storage_changes.txt" }
+claims = { output = "tests/lib/storage/storage_changes.txt" }
 false = { run = ["{out}/storage{exe}", "shape"] }
 
 [[case]]

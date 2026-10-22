@@ -34,9 +34,9 @@ The 3 programs come from the tree of the tool, so the runs of 2 trees use the sa
 
 | Command | Source | What it measures |
 | --- | --- | --- |
-| `storage measure` | `tests/storage/storage_test_measure.c` | Each operation of storage: its best round, its first round on new tables, and the cost of the call of a module. It also times ten thousand tables and sets that it makes and fills, a barrier with nothing to do, and a stress run. The stress run uses 4 threads, then 1 thread. |
-| `storage weigh` | `tests/storage/storage_test_weigh.c` | An attach and a detach for each size of an entity, and a walk of the same rows in more and more tables. It also weighs a sparse set, a toggle, a direct-indexed component, markers, a singleton, and a toggle that a write switches. |
-| `storage baseline` | `tests/storage/storage_test_baseline.c` | The reads of values: through a query, with a test of a field, and of one value on one entity. |
+| `storage measure` | `tests/lib/storage/storage_test_measure.c` | Each operation of storage: its best round, its first round on new tables, and the cost of the call of a module. It also times ten thousand tables and sets that it makes and fills, a barrier with nothing to do, and a stress run. The stress run uses 4 threads, then 1 thread. |
+| `storage weigh` | `tests/lib/storage/storage_test_weigh.c` | An attach and a detach for each size of an entity, and a walk of the same rows in more and more tables. It also weighs a sparse set, a toggle, a direct-indexed component, markers, a singleton, and a toggle that a write switches. |
+| `storage baseline` | `tests/lib/storage/storage_test_baseline.c` | The reads of values: through a query, with a test of a field, and of one value on one entity. |
 | `flecs_ref` | `tests/reference/flecs_ref.c` and the files `flecs_ref_*.c` | The same operations in flecs. |
 | `entt_ref` | `tests/reference/entt_ref.cpp` | The same operations in EnTT. |
 | `floor` | `tests/reference/floor.c` | A C array by entity, the least that a lookup by id can cost. |
