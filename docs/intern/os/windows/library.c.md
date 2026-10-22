@@ -1,7 +1,7 @@
 # src/os/windows/library.c
 
-This file gives `src/os/os.h` its shared libraries on Windows: a library opened, looked into and closed.
-Each function keeps the contract of `docs/intern/os/os.h.md`, *Functions*.
+This file gives `include/os/os.h` its shared libraries on Windows: a library opened, looked into and closed.
+Each function keeps the contract of `docs/extern/os/os.h.md`, *Functions*.
 
 ## Opening
 

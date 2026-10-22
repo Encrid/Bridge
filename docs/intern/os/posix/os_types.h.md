@@ -1,7 +1,7 @@
 # src/os/posix/os_types.h
 
-This header gives the thread, the mutex and the event of `src/os/os.h` where there are POSIX threads: on Linux and macOS.
-It includes `<pthread.h>` and `src/os/os.h`, and the other files of `src/os/posix` include it.
+This header gives the thread, the mutex and the event of `include/os/os.h` where there are POSIX threads: on Linux and macOS.
+It includes `<pthread.h>` and `include/os/os.h`, and the other files of `src/os/posix` include it.
 
 ## Types
 

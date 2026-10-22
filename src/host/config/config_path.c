@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include "config.h"
-#include "host/os.h"
+#include "os.h"
 
 static bool is_whole(const char *path)
 {

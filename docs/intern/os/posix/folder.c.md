@@ -1,4 +1,4 @@
-# src/os/host/posix/os_folder.c
+# src/os/posix/folder.c
 
 This file gives the folder calls for Linux and macOS.
 

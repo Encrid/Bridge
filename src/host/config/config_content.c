@@ -4,7 +4,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "host.h"
-#include "host/os.h"
+#include "os.h"
 
 static bool add_path(char ***paths, uint32_t *count, char *path)
 {

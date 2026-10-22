@@ -53,4 +53,12 @@ void os_event_set(os_event_t *e);
 
 void os_event_wait(os_event_t *e, uint64_t nanos);
 
+[[nodiscard]] int os_folder_set(const char *folder);
+
+[[nodiscard]] int os_folder_make(const char *folder);
+
+[[nodiscard]] char *os_path_whole(const char *path);
+
+[[nodiscard]] int os_lock(const char *path);
+
 #endif

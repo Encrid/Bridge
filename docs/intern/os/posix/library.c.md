@@ -1,7 +1,7 @@
 # src/os/posix/library.c
 
-This file gives the shared libraries of `src/os/os.h` on Linux and macOS: a library opened, looked into and closed.
-Each function keeps the contract of `docs/intern/os/os.h.md`, *Functions*.
+This file gives the shared libraries of `include/os/os.h` on Linux and macOS: a library opened, looked into and closed.
+Each function keeps the contract of `docs/extern/os/os.h.md`, *Functions*.
 
 ## Opening
 

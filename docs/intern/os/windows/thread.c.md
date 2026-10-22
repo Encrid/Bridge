@@ -1,7 +1,7 @@
 # src/os/windows/thread.c
 
-This file gives `src/os/os.h` its threads and its clock on Windows.
-Each function keeps the contract of `docs/intern/os/os.h.md`, *Functions*.
+This file gives `include/os/os.h` its threads and its clock on Windows.
+Each function keeps the contract of `docs/extern/os/os.h.md`, *Functions*.
 
 ## The clock
 

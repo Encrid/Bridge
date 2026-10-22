@@ -32,7 +32,7 @@ The three layers are a host, Bridge and the modules. A module runs on a backend,
 | `python project.py clean` | Removes what the build made. Keeps what `fetch` downloaded. |
 | `python project.py distclean` | Removes the folder `build`, also what `fetch` downloaded. |
 
-`python tools/deps.py build/<target> --check` compares the imports of the built library with `docs/intern/os/os.h.md`, *The imports*.
+`python tools/deps.py build/<target> --check` compares the imports of the built library with `docs/extern/os/os.h.md`, *The imports*.
 `python tools/reference.py` measures the storage of Bridge beside flecs and EnTT.
 
 ## The host

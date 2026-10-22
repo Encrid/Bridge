@@ -1,7 +1,7 @@
-# src/os/os.h
+# include/os/os.h
 
-This header gives the operating system as Bridge and its backends need it.
-That is address space, shared libraries, threads, the clock, a mutex and an event.
+This header gives the operating system as Bridge, its backends and its host need it.
+That is address space, shared libraries, threads, the clock, a mutex, an event, and the host's folders, paths and locks.
 
 ## The layer
 
@@ -11,7 +11,7 @@ Bridge reaches memory mapping, shared libraries, threads and the clock through t
 The library compiles it, and so does each backend, which is a binary of its own.
 A backend that is a project of its own keeps a copy of the layer.
 
-`src/os/os.h` declares each function once.
+`include/os/os.h` declares each function once.
 `src/os/posix` holds the functions for Linux and macOS, and `src/os/windows` holds the same functions for Windows.
 The build compiles `src/os/{system}/*.c`, where `system` is the key of the target in `.toolchain/toolchain.toml`.
 So no file of the layer asks which platform it is compiled for.
@@ -106,6 +106,20 @@ windows          TlsGetValue
 windows          Sleep
 windows_aarch64  _fpreset
 macos            dyld_stub_binder
+posix            chdir
+posix            close
+posix            flock
+posix            mkdir
+posix            open
+posix            realpath
+posix            stat
+windows          _chdir
+windows          _close
+windows          _fullpath
+windows          _locking
+windows          _mkdir
+windows          _open
+windows          _stat64i32
 ```
 
 ## Why the library imports them
@@ -146,6 +160,7 @@ They are in the list because they are imports all the same: a new one is a depen
 | `TlsGetValue`, `Sleep` | The startup code reads its thread-local storage, and waits for its start. |
 | `_fpreset` | The startup code sets the floating-point state on Windows for arm64. |
 | `dyld_stub_binder` | The loader of macOS binds an import with it at the first call. |
+| `chdir`, `close`, `flock`, `mkdir`, `open`, `realpath`, `stat` (Windows: `_chdir`, `_close`, `_fullpath`, `_locking`, `_mkdir`, `_open`, `_stat64i32`) | The host moves into a folder, makes one, resolves an absolute path, and takes a file lock. The library compiles this part of the layer, so these are its imports too. |
 
 ## Constants
 
@@ -199,3 +214,7 @@ Each function that can fail is `[[nodiscard]]`: the caller must use its result.
 | `os_event_free` | Frees an event that no thread waits for. A null `e` does nothing. |
 | `os_event_set` | Sets an event: one wait, now or later, returns for it. |
 | `os_event_wait` | Waits until the event is set or `nanos` nanoseconds pass, and consumes a set. With `OS_FOREVER` it has no time limit. The core waits with `OS_FOREVER`; a backend watchdog waits with a deadline. |
+| `os_folder_set` | Moves the process into `folder`, so the host runs from the folder of the deployment. Gives 0 on success. |
+| `os_folder_make` | Makes `folder` when it is not there. Gives 0 on success. |
+| `os_path_whole` | Gives the absolute path of `path`, which the caller frees, or `nullptr`. |
+| `os_lock` | Takes an exclusive lock on the file `path`, so one host runs a deployment at a time. Gives 0 on success. |

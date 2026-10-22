@@ -3,23 +3,23 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <direct.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
-#include "../os.h"
+#include "os.h"
 
 int os_folder_set(const char *folder)
 {
-    return (chdir(folder));
+    return (_chdir(folder));
 }
 
 int os_folder_make(const char *folder)
 {
-    struct stat there;
+    struct _stat there;
 
-    if (!mkdir(folder, 0777))
+    if (!_mkdir(folder))
         return (0);
-    if (!stat(folder, &there) && S_ISDIR(there.st_mode))
+    if (!_stat(folder, &there) && (there.st_mode & _S_IFDIR))
         return (0);
     return (-1);
 }

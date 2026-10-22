@@ -1,7 +1,7 @@
 # src/os/windows/mutex.c
 
-This file gives `src/os/os.h` its mutex on Windows: a critical section in memory from `malloc`.
-Each function keeps the contract of `docs/intern/os/os.h.md`, *Functions*.
+This file gives `include/os/os.h` its mutex on Windows: a critical section in memory from `malloc`.
+Each function keeps the contract of `docs/extern/os/os.h.md`, *Functions*.
 
 ## Functions
 

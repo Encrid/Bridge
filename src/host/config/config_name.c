@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include "config.h"
-#include "host/os.h"
+#include "os.h"
 
 static const char *const PRESET[] = { "presets" };
 static const keyed_t PRESETS = { PRESET, 1 };

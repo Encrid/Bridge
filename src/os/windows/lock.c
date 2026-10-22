@@ -8,7 +8,7 @@
 #include <sys/locking.h>
 #include <sys/stat.h>
 
-#include "../os.h"
+#include "os.h"
 
 int os_lock(const char *path)
 {

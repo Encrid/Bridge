@@ -1,7 +1,7 @@
 # src/os/posix/thread.c
 
-This file gives the threads and the clock of `src/os/os.h` on Linux and macOS.
-Each function keeps the contract of `docs/intern/os/os.h.md`, *Functions*.
+This file gives the threads and the clock of `include/os/os.h` on Linux and macOS.
+Each function keeps the contract of `docs/extern/os/os.h.md`, *Functions*.
 
 ## Limits
 

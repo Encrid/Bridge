@@ -1,7 +1,7 @@
 # src/os/windows/event.c
 
-This file gives `src/os/os.h` its event on Windows: an event object that resets itself when a wait returns for it.
-Each function keeps the contract of `docs/intern/os/os.h.md`, *Functions*.
+This file gives `include/os/os.h` its event on Windows: an event object that resets itself when a wait returns for it.
+Each function keeps the contract of `docs/extern/os/os.h.md`, *Functions*.
 
 ## The wait
 

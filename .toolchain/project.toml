@@ -267,7 +267,7 @@ proof = "tests/package/host.c"
 name = "bridge"
 kind = "library"
 sources = ["src/lib/**/*.c", "src/os/{system}/*.c"]
-include = ["include/lib", "src/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+include = ["include/lib", "include/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
 defines = ["BRIDGE_BUILDING"]
 flags = ["{quiet}", "{hidden}", "{system_defines}", "{system_libraries}"]
 
@@ -275,7 +275,7 @@ flags = ["{quiet}", "{hidden}", "{system_defines}", "{system_libraries}"]
 name = "bridge"
 kind = "archive"
 sources = ["src/lib/**/*.c", "src/os/{system}/*.c"]
-include = ["include/lib", "src/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+include = ["include/lib", "include/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
 defines = ["BRIDGE_BUILDING"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
@@ -284,7 +284,7 @@ name = "counted"
 kind = "archive"
 test = true
 sources = ["src/lib/**/*.c"]
-include = ["include/lib", "src/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+include = ["include/lib", "include/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
 defines = ["malloc=counted_malloc", "calloc=counted_calloc", "realloc=counted_realloc", "free=counted_free", "os_reserve=counted_os_reserve"]
 flags = ["{quiet}", "{system_defines}"]
 
@@ -293,7 +293,7 @@ name = "counted_os"
 kind = "archive"
 test = true
 sources = ["src/os/{system}/*.c"]
-include = ["src/os"]
+include = ["include/os"]
 defines = ["malloc=counted_malloc", "calloc=counted_calloc", "realloc=counted_realloc", "free=counted_free", "{counted_system}"]
 flags = ["{quiet}", "{system_defines}"]
 
@@ -303,7 +303,7 @@ kind = "library"
 test = true
 folder = "backends"
 sources = ["tests/backend/tests_abi.c", "tests/backend/tests_backend.c", "tests/backend/tests_memory.c", "tests/backend/tests_define.c", "tests/backend/tests_module.c", "tests/backend/tests_instance.c", "tests/backend/tests_func.c", "tests/backend/tests_load.c", "tests/backend/tests_phase.c", "tests/backend/tests_moves.c", "src/os/{system}/*.c"]
-include = ["include/lib", "src/os", "tests/binding"]
+include = ["include/lib", "include/os", "tests/binding"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 variants = [{ name = "bridge_tests_all" }]
 
@@ -313,7 +313,7 @@ kind = "library"
 test = true
 folder = "backends"
 sources = ["tests/backend/tests_backend.c", "tests/backend/tests_memory.c", "tests/backend/tests_define.c", "tests/backend/tests_module.c", "tests/backend/tests_instance.c", "tests/backend/tests_func.c", "tests/backend/tests_load.c", "tests/backend/tests_phase.c", "tests/backend/tests_moves.c", "tests/support/plain_other_abi.c", "src/os/{system}/*.c"]
-include = ["include/lib", "src/os", "tests/binding"]
+include = ["include/lib", "include/os", "tests/binding"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 
 [[artifact]]
@@ -322,7 +322,7 @@ kind = "library"
 test = true
 folder = "backends"
 sources = ["tests/backend/tests_abi.c", "tests/backend/tests_define.c", "tests/backend/tests_module.c", "tests/backend/tests_instance.c", "tests/backend/tests_func.c", "tests/backend/tests_load.c", "tests/backend/tests_phase.c", "tests/backend/tests_moves.c", "tests/support/plain_refusing_backend.c", "tests/support/plain_refusing_memory.c", "src/os/{system}/*.c"]
-include = ["include/lib", "src/os", "tests/binding"]
+include = ["include/lib", "include/os", "tests/binding"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 
 [[artifact]]
@@ -2788,7 +2788,7 @@ name = "schema"
 kind = "program"
 test = true
 sources = ["tests/schema/*.c", "src/lib/schema/*.c"]
-include = ["include/lib", "src/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+include = ["include/lib", "include/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
 defines = ["BRIDGE_BUILDING"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 
@@ -2797,7 +2797,7 @@ name = "storage"
 kind = "program"
 test = true
 sources = ["tests/storage/*.c", "src/lib/**/*.c", "src/os/{system}/*.c"]
-include = ["include/lib", "src/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+include = ["include/lib", "include/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
 defines = ["BRIDGE_BUILDING", "{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 
@@ -2806,7 +2806,7 @@ name = "storage-counted"
 kind = "program"
 test = true
 sources = ["tests/storage/*.c"]
-include = ["include/lib", "src/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+include = ["include/lib", "include/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
 defines = ["COUNTED", "{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 link = ["{out}/counted.a", "{out}/counted_os.a"]
@@ -2836,7 +2836,7 @@ name = "os"
 kind = "program"
 test = true
 sources = ["tests/os/*.c", "src/os/{system}/*.c"]
-include = ["src/os"]
+include = ["include/os"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 
 [[artifact]]
@@ -2845,7 +2845,7 @@ kind = "library"
 part = "native"
 folder = "backends"
 sources = ["src/backends/native/*.c", "src/os/{system}/*.c"]
-include = ["include/lib", "src/backends/native", "include/backends/native", "src/os"]
+include = ["include/lib", "src/backends/native", "include/backends/native", "include/os"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 
 [[artifact]]
@@ -2854,7 +2854,7 @@ kind = "program"
 test = true
 part = "native"
 sources = ["tests/backends/native/host/*.c", "tests/backends/native/support/host*.c"]
-include = ["include/lib", "src/os", "tests/backends/native/host", "tests/backends/native/support"]
+include = ["include/lib", "include/os", "tests/backends/native/host", "tests/backends/native/support"]
 defines = ["{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 link = ["{out}/bridge{library}"]
@@ -2865,7 +2865,7 @@ kind = "program"
 test = true
 part = "native"
 sources = ["tests/backends/native/direct/*.c", "src/os/{system}/*.c"]
-include = ["include/lib", "src/os", "tests/backends/native/direct"]
+include = ["include/lib", "include/os", "tests/backends/native/direct"]
 defines = ["{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 
@@ -3038,7 +3038,7 @@ kind = "library"
 part = "wasm"
 folder = "backends"
 sources = ["src/backends/wasm/*.c", "src/os/{system}/*.c"]
-include = ["include/lib", "src/backends/wasm", "src/os", "{wasmtime}/include"]
+include = ["include/lib", "src/backends/wasm", "include/os", "{wasmtime}/include"]
 flags = ["{quiet}", "{system_defines}", "{wasmtime}/{wasmtime_link}", "{system_libraries}", "{rpath}"]
 beside = ["{wasmtime}/{wasmtime_runtime}"]
 
@@ -3046,8 +3046,8 @@ beside = ["{wasmtime}/{wasmtime_runtime}"]
 name = "bridge-host"
 kind = "program"
 part = "host"
-sources = ["src/host/**/*.c", "src/os/host/{system}/*.c"]
-include = ["include/lib", "src/host", "src/host/config", "src/host/manifest", "src/host/state", "src/host/toml", "src/host/show", "src/os"]
+sources = ["src/host/**/*.c", "src/os/{system}/*.c"]
+include = ["include/lib", "src/host", "src/host/config", "src/host/manifest", "src/host/state", "src/host/toml", "src/host/show", "include/os"]
 defines = ['LIBRARY_SUFFIX="{library}"']
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 link = ["{out}/bridge{library}"]
@@ -3079,7 +3079,7 @@ kind = "program"
 test = true
 part = "wasm"
 sources = ["tests/backends/wasm/adopt/*.c", "src/os/{system}/*.c"]
-include = ["include/lib", "src/os", "tests/backends/wasm/adopt"]
+include = ["include/lib", "include/os", "tests/backends/wasm/adopt"]
 defines = ['BACKEND_PATH="{out}/backends/bridge_wasm{library}"', 'MODULE_DIR="{out}/wasm"']
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 
@@ -4840,7 +4840,7 @@ side = "true"
 why = "read_own reads a module's own bytes, whose format manifest_find already recognized, so it never fails to find it."
 
 [[branches.exception]]
-path = "src/os/host/windows/os_folder.c"
+path = "src/os/windows/folder.c"
 line = 22
 col = 9
 side = "false"

@@ -7,7 +7,7 @@
 #include <sys/file.h>
 #include <unistd.h>
 
-#include "../os.h"
+#include "os.h"
 
 int os_lock(const char *path)
 {

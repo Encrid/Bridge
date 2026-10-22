@@ -1,7 +1,7 @@
 # src/os/windows/os_types.h
 
-This header gives `src/os/os.h` its thread, its mutex and its event on Windows.
-It defines `WIN32_LEAN_AND_MEAN`, includes `<windows.h>` and `src/os/os.h`, and the other files of `src/os/windows` include it.
+This header gives `include/os/os.h` its thread, its mutex and its event on Windows.
+It defines `WIN32_LEAN_AND_MEAN`, includes `<windows.h>` and `include/os/os.h`, and the other files of `src/os/windows` include it.
 
 ## Types
 

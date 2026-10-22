@@ -1,4 +1,4 @@
-# src/os/host/windows/os_folder.c
+# src/os/windows/folder.c
 
 This file holds the folder calls for Windows.
 

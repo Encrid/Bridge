@@ -1,7 +1,7 @@
 # src/os/posix/mutex.c
 
-This file gives the mutex of `src/os/os.h` on Linux and macOS: a `pthread_mutex_t` in memory from `malloc`.
-Each function keeps the contract of `docs/intern/os/os.h.md`, *Functions*.
+This file gives the mutex of `include/os/os.h` on Linux and macOS: a `pthread_mutex_t` in memory from `malloc`.
+Each function keeps the contract of `docs/extern/os/os.h.md`, *Functions*.
 
 ## Limits
 

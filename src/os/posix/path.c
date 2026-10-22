@@ -5,9 +5,9 @@
 */
 #include <stdlib.h>
 
-#include "../os.h"
+#include "os.h"
 
 char *os_path_whole(const char *path)
 {
-    return (_fullpath(nullptr, path, 0));
+    return (realpath(path, nullptr));
 }

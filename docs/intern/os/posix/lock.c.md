@@ -1,4 +1,4 @@
-# src/os/host/posix/os_lock.c
+# src/os/posix/lock.c
 
 `os_lock` takes the run lock on Linux and macOS.
 

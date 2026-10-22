@@ -9,7 +9,7 @@
 
 #include "config.h"
 #include "file_bytes.h"
-#include "host/os.h"
+#include "os.h"
 
 static char *read_text(const char *path)
 {
