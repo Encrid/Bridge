@@ -232,6 +232,7 @@ A `schedule_pairs_t` holds the pairs of `[order]`: `docs/intern/lib/schedule/sch
 | `systems`, `system_count` | The systems of every module, in the order of registration: `docs/intern/lib/abi/abi_subscribe.c.md`, *The slot*. |
 | `modules`, `module_count`, `max_modules` | The loaded modules, how many, and `[budget] modules`. |
 | `profile` | Whether a phase times each system and observer, from `profile` of the config: `docs/intern/lib/schedule/schedule_dispatch.c.md`, *The time*. |
+| `validate` | Whether a phase checks each column for a write no system declared, from `validate` of the config: `docs/intern/lib/schedule/schedule_dispatch.c.md`, *The check*. |
 
 A world is stopped at a barrier, where nothing is allocated.
 So `stopped_by` and `stopped_stem` point at the two arrays after them.

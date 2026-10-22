@@ -57,6 +57,7 @@ typedef struct {
     uint32_t threads;
     int rounds;
     bool profile;
+    bool validate;
     bridge_budget_t budget;
     held_t *held;
     bridge_backend_t *backends;

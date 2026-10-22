@@ -2659,6 +2659,18 @@ claims = { matches = ["profile max 2, first game:events:poke, second untouched.*
 false = { run = ["{out}/seam{exe}", "bridge_profile-count-only-writes-no-rows"] }
 
 [[case]]
+name = "checks.validate-names-the-system-that-strayed"
+run = ["{out}/seam{exe}", "checks.validate-names-the-system-that-strayed"]
+claims = { matches = ["record\\[4\\] game:scribble@0\\.1\\.0/scribble: system 'scribble' wrote a column that it did not declare to write.*scribble strays 1.*alive"] }
+false = { run = ["{out}/seam{exe}", "checks.validate-off-is-silent"] }
+
+[[case]]
+name = "checks.validate-off-is-silent"
+run = ["{out}/seam{exe}", "checks.validate-off-is-silent"]
+claims = { matches = ["scribble strays 0.*alive"] }
+false = { run = ["{out}/seam{exe}", "checks.validate-names-the-system-that-strayed"] }
+
+[[case]]
 name = "bridge_module_usage-owned-keys-sum-to-the-world"
 run = ["{out}/seam{exe}", "bridge_module_usage-owned-keys-sum-to-the-world"]
 claims = { matches = ["usage mods 2 rows 2 systems match persistent match.*alive"] }

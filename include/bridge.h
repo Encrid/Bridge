@@ -120,6 +120,7 @@ typedef struct {
     uint32_t threads;
     bridge_budget_t budget;
     bool profile;
+    bool validate;
 } bridge_config_t;
 static_assert(sizeof(bridge_config_t) == 128);
 static_assert(alignof(bridge_config_t) == 8);
@@ -136,6 +137,7 @@ static_assert(offsetof(bridge_config_t, order_count) == 48);
 static_assert(offsetof(bridge_config_t, threads) == 52);
 static_assert(offsetof(bridge_config_t, budget) == 56);
 static_assert(offsetof(bridge_config_t, profile) == 120);
+static_assert(offsetof(bridge_config_t, validate) == 121);
 
 typedef struct {
     const char *from;

@@ -71,6 +71,8 @@ void block_barrier(bridge_world_t *w)
     refill_all(w);
     publish_all(w);
     storage_end_publish(w->storage);
+    if (w->validate)
+        storage_validate_baseline(w->storage);
     w->layout_moved = 0;
     schedule_run(w, w->phase_count);
     finish_barrier(w);

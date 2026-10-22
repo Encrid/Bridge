@@ -19,7 +19,7 @@ Nothing of a run may be taken after the caller's arrays are gone.
 
 | Function | Result |
 | --- | --- |
-| `run_alone` | Runs each job of a batch on the calling thread, in order. |
+| `pool_run_alone` | Runs each job of a batch on the calling thread, in order. |
 | `begin_run` | Makes a batch the run in progress, with no job taken, and wakes a worker for each job after the first. |
 | `end_run` | Waits until each job of the run is done, and then leaves no job to take. |
 | `pool_run` | Runs each job of a batch and returns when all ran, with the steps of *A run*. |

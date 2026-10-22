@@ -6,17 +6,11 @@
 #include <string.h>
 
 #include "abi_declare.h"
+#include "hash.h"
 
 uint64_t abi_hash_text(const char *s, size_t n)
 {
-    uint64_t h = 1'469'598'103'934'665'603ull;
-    size_t i = 0;
-
-    while (i < n) {
-        h = (h ^ (uint8_t)s[i]) * 1'099'511'628'211ull;
-        i++;
-    }
-    return (h);
+    return (hash_fnv1a(s, n));
 }
 
 static int check_kind(declaring_t *g)

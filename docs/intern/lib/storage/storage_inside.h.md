@@ -189,6 +189,7 @@ The budget sizes it when the world is made: `docs/intern/lib/block/block_budget.
 | `hash`, `hash_room` | A set to its table, by open addressing. `hash_room` is a power of two, at least 16 and at least twice the table ids. |
 | `sets` | For each table, which types its entities carry: `words` words each. |
 | `columns` | For each table and type, where the column of the type is, and 0 if it has none. |
+| `col_hash` | For each table and type, the last hash of its column, for the checksum pass. Beside `columns`, and with its shape. |
 | `words`, `type_room` | How wide a set is, in 64-bit words and in types. |
 | `terms_room` | `[budget] systems`. |
 | `who` | Which entity is in which row: a twin of the column region, a cell for each 8 bytes of it. |

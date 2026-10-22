@@ -90,4 +90,6 @@ void schedule_run_job(void *arg);
 
 void schedule_gather_jobs(schedule_pass_t *pass);
 
+void schedule_validate_system(bridge_system_t *s);
+
 #endif

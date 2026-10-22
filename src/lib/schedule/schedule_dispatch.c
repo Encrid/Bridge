@@ -28,6 +28,16 @@ static void call_system(module_t *m, bridge_system_t *s)
     s->failed = 1;
 }
 
+static void after_call(module_t *m, bridge_system_t *s, uint64_t start)
+{
+    if (m->w->profile) {
+        s->nanos += os_get_now() - start;
+        s->calls += s->observer;
+    }
+    if (m->w->validate)
+        schedule_validate_system(s);
+}
+
 static void run_system(module_t *m, bridge_system_t *s)
 {
     bridge_header_t *h = (bridge_header_t *)m->priv;
@@ -42,10 +52,7 @@ static void run_system(module_t *m, bridge_system_t *s)
     if (m->w->profile)
         start = os_get_now();
     call_system(m, s);
-    if (m->w->profile) {
-        s->nanos += os_get_now() - start;
-        s->calls += s->observer;
-    }
+    after_call(m, s, start);
     h->system = UINT32_MAX;
     h->observer = 0;
     m->running = nullptr;

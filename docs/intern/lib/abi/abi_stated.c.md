@@ -19,6 +19,7 @@ A tag is the kind `BRIDGE_TAG`, a component with no value: `docs/extern/bridge_a
 ## The fingerprint
 
 The fingerprint of a type is the 64-bit FNV-1a hash of its descriptor, combined by exclusive or with its kind.
+The hash itself is `hash_fnv1a`: `docs/intern/lib/hash.h.md`.
 It names a layout in a record, and decides nothing.
 FNV-1a is not a cryptographic hash, so two different descriptors can have one fingerprint, and they are still two layouts.
 
@@ -26,7 +27,7 @@ FNV-1a is not a cryptographic hash, so two different descriptors can have one fi
 
 | Function | Result |
 | --- | --- |
-| `abi_hash_text` | The 64-bit FNV-1a hash of `n` bytes of text: the fingerprint that names a layout. |
+| `abi_hash_text` | The hash of `n` bytes of text, from `hash_fnv1a`: the fingerprint that names a layout. |
 | `check_kind` | Refuses a name with no namespace, an unset kind, and a tag that states bytes or a descriptor. Sets `bare` to the colon of the name. |
 | `check_policy` | Refuses a name of another namespace that no grant names, and an unset policy or storage layout. |
 | `abi_check_name` | Refuses a name that has 0 bytes, or more than `NAME_MOST`. It checks the names of types, systems and observers. 1 with a refusal. |

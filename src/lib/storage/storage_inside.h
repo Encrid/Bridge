@@ -80,6 +80,7 @@ struct storage {
     uint32_t hash_room;
     uint64_t *sets;
     uint32_t *columns;
+    uint64_t *col_hash;
     uint32_t words;
     uint32_t type_room;
     uint32_t terms_room;

@@ -40,10 +40,17 @@ It adds 1 to `calls` for an observer, since a system runs once a pass and its co
 When `profile` is off, it reads no clock and writes nothing: the cost is one test.
 `src/lib/bridge/bridge_profile.c` gives the counts to a host.
 
+## The check
+
+When `validate` of the world is on, `after_call` checks the columns after the call: `src/lib/schedule/schedule_validate.c`.
+It names a system whose write no term of it declared, as *The culprit* tells.
+When `validate` is off, it makes no check, and the cost is one test.
+
 ## Functions
 
 | Function | Result |
 | --- | --- |
 | `call_system` | Sets the work limit, calls the system, and marks it failed with a reason if the call failed. |
-| `run_system` | Writes which system runs in the header, times the run when `profile` is on, then clears the header. |
+| `after_call` | Times the run when `profile` is on, and checks the columns when `validate` is on. |
+| `run_system` | Writes which system runs in the header, calls it, lets `after_call` run the diagnostics, then clears the header. |
 | `schedule_run_job` | What a thread runs: the systems of one job, in the order the module registered them. |

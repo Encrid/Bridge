@@ -48,6 +48,7 @@ static inline void open_table(storage_t *r, uint32_t t, uint32_t slot,
     }
     memcpy(r->sets + (size_t)t * r->words, set, 8u * r->words);
     memset(get_columns(r, t), 0, 4u * r->type_room);
+    memset(r->col_hash + (size_t)t * r->type_room, 0, 8u * r->type_room);
     name_table(r, t);
     list_table(r, t);
     touch(r, t);
@@ -79,6 +80,7 @@ static inline void free_table(storage_t *r, uint32_t t)
         unname_table(r, t);
     unlist_table(r, t);
     memset(get_columns(r, t), 0, 4u * r->type_room);
+    memset(r->col_hash + (size_t)t * r->type_room, 0, 8u * r->type_room);
     touch(r, t);
     if (tab->set)
         r->set_table[tab->set - 1] = 0;

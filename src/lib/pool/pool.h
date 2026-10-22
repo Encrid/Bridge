@@ -43,6 +43,8 @@ void pool_destroy(pool_t *p);
 
 void pool_run(pool_t *p, const pool_batch_t *batch);
 
+void pool_run_alone(const pool_batch_t *batch);
+
 void pool_run_taken(pool_t *p, int caller);
 
 void pool_work(void *arg);

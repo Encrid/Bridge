@@ -191,6 +191,7 @@ A pair against that order makes a cycle, and the load or the reload fails.
 | `threads` | How many threads run a phase. The thread that calls `bridge_run_phase` counts. Zero is unset. |
 | `budget` | The budget of the world: a `bridge_budget_t`. |
 | `profile` | Whether Bridge times each system and observer for `bridge_profile`. Zero is off, the default. |
+| `validate` | Whether Bridge checks each column for a write no running system declared. Zero is off, the default. |
 
 A phase is a name, and nothing more. Bridge has no phase of its own, thus a deployment declares one at least.
 Each name of a phase is different, and not empty.
@@ -663,6 +664,16 @@ The result is the number of systems and observers. Bridge fills at most `max` it
 The result is -1 if another thread calls while a call of the world runs: *The library*.
 Bridge times a run only while `profile` is on, at the cost of two clock reads for each run.
 The time and the count stay 0 while `profile` is off. A pull never resets a count.
+
+## validate
+
+`validate` of `bridge_config_t` turns on a check of the columns, off by default.
+Only a native module can write a column in place, so only it can write one no running system declared.
+With `validate` on, Bridge hashes each column after each system runs, and compares it to the hash before.
+A column that changed whose type the system holds no write term for draws a warning: `system '<system>' wrote a column that it did not declare to write`.
+Bridge runs the systems one at a time while `validate` is on, so the warning names the one system, and not a set.
+
+The check covers the columns, and not the entity index or the strings. It finds a stray write, not a fault that only a race brings.
 
 ## bridge_usage
 

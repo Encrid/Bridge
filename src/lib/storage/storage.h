@@ -50,6 +50,7 @@ typedef struct {
 
 typedef void (*storage_read_fn_t)(void *ctx, const uint8_t *value);
 typedef void (*storage_visit_fn_t)(storage_t *r, uint32_t index, void *ctx);
+typedef void (*storage_changed_fn_t)(void *ctx, const storage_type_t *type);
 
 [[nodiscard]] storage_t *storage_create(bridge_world_t *w);
 
@@ -74,6 +75,10 @@ void storage_undeclare(storage_t *r, storage_type_t *type);
 void storage_forget(storage_t *r, storage_terms_t *terms);
 
 void storage_apply(storage_t *r);
+
+void storage_validate_scan(storage_t *r, storage_changed_fn_t fn, void *ctx);
+
+void storage_validate_baseline(storage_t *r);
 
 [[nodiscard]] bool storage_make_writable(storage_t *r, module_t *m);
 

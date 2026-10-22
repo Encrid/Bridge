@@ -14,6 +14,8 @@ This file runs a phase: a level at a time, one job for each module, and then it 
 The count comes after the jobs, on that thread, so the world calls the sink of the host only on that thread.
 `schedule_run` runs the levels from 0 to the highest level of the phase.
 
+When `validate` of the world is on, `run_level` runs the jobs one at a time on the caller, with `pool_run_alone`. Then each changed column has one author, which the checksum pass needs: `docs/intern/lib/schedule/schedule_validate.c.md`, *Why a system runs alone*.
+
 ## The count of a system
 
 `count_failure` counts the run of one system, by the rules of `docs/intern/lib/schedule/schedule.h.md`, *The failure budget*.
@@ -29,5 +31,5 @@ The first system of a module that reaches `max_failures` goes in `reached` of th
 | `count_levels` | Gives how many levels a phase has: one more than its highest level. |
 | `count_failure` | Counts what the run of one system came to, and writes a record if it failed. |
 | `account_job` | Calls `count_failure` for each system of a job. |
-| `run_level` | Runs the jobs of one level at the same time, then counts their failures on the thread that asked for the phase. |
+| `run_level` | Runs the jobs of one level at once, or one at a time when `validate` is on, then counts their failures. |
 | `schedule_run` | Runs the systems of one phase, a level at a time. |

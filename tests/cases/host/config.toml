@@ -665,6 +665,7 @@ phases = ["update"]
 rounds = 8
 [checks]
 profile = true
+validate = true
 [content]
 paths = ["config-quiet"]
 [backend]

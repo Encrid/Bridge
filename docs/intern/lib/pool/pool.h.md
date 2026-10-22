@@ -41,5 +41,6 @@ Each thread reads and writes the run in progress only under the lock.
 | `pool_create` | `src/lib/pool/pool.c` | Makes a pool: `docs/intern/lib/pool/pool.c.md`, *Functions*. |
 | `pool_destroy` | `src/lib/pool/pool.c` | Frees a pool: `docs/intern/lib/pool/pool.c.md`, *Functions*. |
 | `pool_run` | `src/lib/pool/pool_run.c` | Runs a batch of jobs: `docs/intern/lib/pool/pool_run.c.md`, *Functions*. |
+| `pool_run_alone` | `src/lib/pool/pool_run.c` | Runs a batch on the calling thread: `docs/intern/lib/pool/pool_run.c.md`, *Functions*. |
 | `pool_run_taken` | `src/lib/pool/pool_job.c` | Runs the jobs that a thread can take: `docs/intern/lib/pool/pool_job.c.md`, *Functions*. |
 | `pool_work` | `src/lib/pool/pool_job.c` | Runs the thread of a worker: `docs/intern/lib/pool/pool_job.c.md`, *Functions*. |

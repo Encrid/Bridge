@@ -286,6 +286,7 @@ struct bridge_world {
     uint32_t module_count;
     uint32_t max_modules;
     bool profile;
+    bool validate;
 };
 
 void module_discard(bridge_world_t *w, module_t *m);

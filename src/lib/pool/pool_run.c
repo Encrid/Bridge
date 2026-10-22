@@ -7,7 +7,7 @@
 
 #include "pool.h"
 
-static void run_alone(const pool_batch_t *batch)
+void pool_run_alone(const pool_batch_t *batch)
 {
     uint32_t i = 0;
 
@@ -50,7 +50,7 @@ static void end_run(pool_t *p)
 void pool_run(pool_t *p, const pool_batch_t *batch)
 {
     if (batch->count < 2 || !p->worker_count) {
-        run_alone(batch);
+        pool_run_alone(batch);
         return;
     }
     begin_run(p, batch);

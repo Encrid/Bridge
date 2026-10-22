@@ -89,6 +89,7 @@ void storage_destroy(storage_t *r)
     free(r->hash);
     free(r->sets);
     free(r->columns);
+    free(r->col_hash);
     free_fold(r);
     free(r);
 }

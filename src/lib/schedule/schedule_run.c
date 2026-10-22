@@ -53,7 +53,10 @@ static void run_level(schedule_pass_t *pass)
 
     schedule_gather_jobs(pass);
     batch.count = pass->count;
-    pool_run(w->pool, &batch);
+    if (w->validate)
+        pool_run_alone(&batch);
+    else
+        pool_run(w->pool, &batch);
     while (k < pass->count) {
         account_job(w, &jobs[k]);
         k++;

@@ -59,6 +59,7 @@ static int start_pool(bridge_world_t *w, const bridge_config_t *cfg)
 static int build_bridge(bridge_world_t *w, const bridge_config_t *cfg)
 {
     w->profile = cfg->profile;
+    w->validate = cfg->validate;
     if (check_config(w, cfg) || bridge_open_backends(w, cfg))
         return (1);
     if (bridge_name_phases(w, cfg))

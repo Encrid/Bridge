@@ -22,9 +22,10 @@ bool storage_make_tables(storage_t *r)
     r->hash = calloc(r->hash_room, sizeof(*r->hash));
     r->sets = calloc(tables * r->words, 8);
     r->columns = calloc(tables * r->type_room, 4);
+    r->col_hash = calloc(tables * r->type_room, 8);
     if (!r->places || !r->tables || !r->table_next || !r->dirty)
         return (false);
-    return (r->hash && r->sets && r->columns);
+    return (r->hash && r->sets && r->columns && r->col_hash);
 }
 
 bool storage_make_fold(storage_t *r)

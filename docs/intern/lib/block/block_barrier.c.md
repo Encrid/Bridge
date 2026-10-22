@@ -9,7 +9,7 @@ This file runs the barrier: what happens between two phases, in an order that ne
 2. Storage applies the queued changes of each module: `src/lib/storage/storage_apply.c`.
 3. Each module gets its ids topped up: `docs/intern/lib/block/block_module.c.md`, *The ids set aside*.
 4. The spans of each running module are published again.
-5. Storage ends the publish, and the layout counts as not moved.
+5. Storage ends the publish, and the layout counts as not moved. When `validate` is on, the columns become the baseline of the next check: `docs/intern/lib/storage/storage_validate.c.md`.
 6. The observers of what changed run in their phase: `docs/intern/lib/abi/abi_system.c.md`, *observe*.
 7. No system or observer is pending any more, and the count of lifecycle calls goes back to 0.
 8. The failure budgets are settled: `src/lib/schedule/schedule_account.c`.

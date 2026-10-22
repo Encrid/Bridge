@@ -16,7 +16,7 @@ Storage puts it in `dirty`, in the hash, and in the lists of the systems: `docs/
 ## A table given back
 
 `free_table` gives the block of the table back to the column region, and removes the table from the hash and from each list.
-It makes the columns of the table 0, marks it touched, and puts its id on the free list.
+It makes the columns of the table 0, clears their hashes, marks it touched, and puts its id on the free list.
 `close_table` makes the record no table, and keeps what a barrier keeps of it: `incoming`, `sized` and `touched`.
 An id given back at this barrier is in `dirty` already, so `open_table` keeps `touched` when it takes the id again.
 

@@ -1965,6 +1965,15 @@ defines = ["BRIDGE_ROWS_CHECKED"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "scribble"
+kind = "library"
+test = true
+folder = "built"
+sources = ["tests/modules/scribble.c"]
+include = ["include", "tests/binding", "tests/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
 name = "fixer"
 kind = "library"
 test = true

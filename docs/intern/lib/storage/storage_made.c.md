@@ -8,7 +8,7 @@ What each budget sizes is in `docs/intern/lib/storage/storage_create.h.md`, *Wha
 
 | Function | What it allocates |
 | --- | --- |
-| `storage_make_tables` | A place for each entity. For each table id: its record, its free link, its place in `dirty`, its set and its columns. The hash. |
+| `storage_make_tables` | A place for each entity. For each table id: its record, its free link, its place in `dirty`, its set, its columns and a hash for each column. The lookup hash. |
 | `storage_make_fold` | For each entity: a set in `work` and in `attached`, its place in `changed`, its flags, and its table to be. The offsets `at`, and 4 more sets. |
 | `storage_make_apart` | For each slot of a sparse set: its type, its table and its index `where`. For each direct-indexed slot: its type and its bits `given`. |
 | `storage_make_terms` | The types and their records. The records of terms, with their lists and their terms. The lists of systems and of observers. |

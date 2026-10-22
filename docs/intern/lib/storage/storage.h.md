@@ -93,10 +93,11 @@ How much of two storage limits the world uses, and the most it has used.
 | `entities`, `entities_peak` | The live entities, and the highest the entity index ever reached. |
 | `tables`, `tables_peak` | The live tables, and the most tables ever made at one time. |
 
-### storage_read_fn_t, storage_visit_fn_t
+### storage_read_fn_t, storage_visit_fn_t, storage_changed_fn_t
 
 A function that storage calls with the bytes of a value.
 A function that storage calls for the index of an entity.
+A function that storage calls with the type of a column that changed.
 
 ### enum storage_moved
 
@@ -122,6 +123,8 @@ How `storage_convert` ended.
 | `storage_add_observer` | Takes the terms of an observer: `docs/intern/lib/storage/storage_terms.c.md`, *Functions*. |
 | `storage_forget` | Forgets a record of terms: `docs/intern/lib/storage/storage_terms.c.md`, *Functions*. |
 | `storage_apply` | Applies the queue of each module: `docs/intern/lib/storage/storage_apply.c.md`, *The steps of a barrier*. |
+| `storage_validate_scan` | Reports to the caller every type with a changed column: `docs/intern/lib/storage/storage_validate.c.md`, *Functions*. |
+| `storage_validate_baseline` | Takes the columns as the baseline of the next check: `docs/intern/lib/storage/storage_validate.c.md`, *Functions*. |
 | `storage_make_writable` | Makes the set `writable` of a module: `docs/intern/lib/storage/storage_slots.c.md`, *Functions*. |
 | `storage_let_write` | Records what a module may write: `docs/intern/lib/storage/storage_slots.c.md`, *Functions*. |
 | `storage_reserve` | Sets ids aside for a module: `docs/intern/lib/storage/storage_ids.c.md`, *Functions*. |
