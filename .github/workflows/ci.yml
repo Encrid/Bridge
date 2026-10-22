@@ -63,3 +63,13 @@ jobs:
         run: python project.py test --break
       - name: Branches
         run: python project.py test --branches
+      - name: Diagnose macos branches crash
+        if: failure() && runner.os == 'macOS'
+        run: |
+          sleep 20
+          echo "== DiagnosticReports =="
+          ls -la ~/Library/Logs/DiagnosticReports/ /Library/Logs/DiagnosticReports/ 2>/dev/null || true
+          for f in ~/Library/Logs/DiagnosticReports/*.ips ~/Library/Logs/DiagnosticReports/*.crash /Library/Logs/DiagnosticReports/*.ips; do
+            echo "===== $f ====="
+            cat "$f" 2>/dev/null || true
+          done
