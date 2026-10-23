@@ -45,6 +45,7 @@ struct c23b_node {
     unsigned len;
     const _Atomic unsigned char *hits;
     unsigned bits;
+    char *line;
 };
 [[gnu::weak]] struct c23b_node *c23b_head;
 [[gnu::weak]] int c23b_armed;
@@ -52,7 +53,6 @@ struct c23b_node {
 {
     const char *path = getenv("C23_BRANCHES");
     struct c23b_node *node;
-    unsigned char ch;
     int fd;
 
     if (!path)
@@ -61,20 +61,21 @@ struct c23b_node {
     if (fd < 0)
         return;
     for (node = c23b_head; node; node = node->next) {
-        (void)!write(fd, node->path, node->len - 1u);
-        ch = ' ';
-        (void)!write(fd, &ch, 1u);
-        for (unsigned i = 0; i < node->bits; i++) {
-            ch = node->hits[i] ? '1' : '0';
-            (void)!write(fd, &ch, 1u);
-        }
-        ch = '\n';
-        (void)!write(fd, &ch, 1u);
+        unsigned at = node->len - 1u;
+
+        for (unsigned i = 0; i < at; i++)
+            node->line[i] = node->path[i];
+        node->line[at++] = ' ';
+        for (unsigned i = 0; i < node->bits; i++)
+            node->line[at++] = node->hits[i] ? '1' : '0';
+        node->line[at++] = '\n';
+        (void)!write(fd, node->line, at);
     }
     close(fd);
 }
 #endif
-static struct c23b_node %(p)snode = {nullptr, "%(name)s", %(name_len)du, %(p)shits, %(bits)du};
+static char %(p)sline[%(line)d];
+static struct c23b_node %(p)snode = {nullptr, "%(name)s", %(name_len)du, %(p)shits, %(bits)du, %(p)sline};
 [[gnu::constructor]] static void %(p)sreg(void)
 {
     %(p)snode.next = c23b_head;

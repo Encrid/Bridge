@@ -41,6 +41,7 @@ Each program writes one line `<path> <bits>` for each file, to the file that the
 A line has one character, `0` or `1`, for each outcome.
 On Linux and Windows a `[[gnu::destructor]]` of each file writes its line, at the exit of the program and at the close of a library.
 On macOS each file lists itself at load, and one writer for each image writes the lines of the image.
+The writer builds each line in a buffer and writes it with one append, so concurrent flushes do not interleave.
 
 This writer runs with `atexit` at the exit of the program.
 It also runs from `os_lib_close`, which calls the writer of a library before it unmaps the library.
