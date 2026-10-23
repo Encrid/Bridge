@@ -33,6 +33,7 @@ The layout allows only the paths of this table.
 | `third_party/<source>/license` | The licence of a source. |
 | `.toolchain/tools/<name>.py` | Needed: one file or more. The tools of the toolchain. |
 | `.toolchain/toolchain.toml` and `.toolchain/header.txt` | The values and the legal notice of the toolchain. |
+| `.toolchain/config/<name>.toml` | A file of the configuration of the project. |
 | `.toolchain/docs/<name>.md` | A document of the toolchain. |
 | `<folder>/.gitkeep`, in `docs/extern`, `docs/intern`, `include` or `src` | An empty file that keeps an empty folder in git. |
 

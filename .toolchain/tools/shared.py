@@ -48,7 +48,10 @@ def merged(into, more, above=''):
 def config(root):
     toolchain, project = [tomllib.loads(path.read_text(encoding='utf-8'))
                           for path in (HERE / '.toolchain' / 'toolchain.toml', root / '.toolchain' / 'project.toml')]
-    return merged(toolchain, project)
+    whole = merged(toolchain, project)
+    for path in sorted((root / '.toolchain' / 'config').glob('*.toml')):
+        merged(whole, tomllib.loads(path.read_text(encoding='utf-8')))
+    return whole
 
 
 def located(text, values):

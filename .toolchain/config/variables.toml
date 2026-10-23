@@ -1,0 +1,14 @@
+[variables]
+own = ["abi=1", "pinned=false", "reloadable=false", "config=none"]
+quiet = ["-Wno-missing-field-initializers"]
+hidden = ["-fvisibility=hidden"]
+binaryen_top = "binaryen-version_133"
+features = ["--enable-multimemory", "--enable-bulk-memory", "--enable-sign-ext", "--enable-nontrapping-float-to-int", "--enable-mutable-globals"]
+acc_wasm = "{out}/wasm/acc.wasm"
+
+[tools]
+wasm_as = "{binaryen}/bin/wasm-as"
+wasm_merge = "{binaryen}/bin/wasm-merge"
+wasm_opt = "{binaryen}/bin/wasm-opt"
+wasm_dis = "{binaryen}/bin/wasm-dis"
+

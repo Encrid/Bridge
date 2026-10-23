@@ -1,14 +1,15 @@
 # .toolchain/project.toml
 
-`.toolchain/project.toml` holds the values of the project.
-zig, the targets, the flags of the compiler and the limits of the style are in `.toolchain/toolchain.toml`.
-The tools read the two files as one configuration.
+`.toolchain/project.toml` holds `[project]` and `[test]`.
+The other values are in the files of `.toolchain/config`, one file for each concern: `artifacts.toml`, `modules.toml`, `targets.toml`, `kinds.toml`, `sources.toml`, `variables.toml`, `package.toml` and `checks.toml`.
+zig, the compiler flags and the limits of the style are in `.toolchain/toolchain.toml`.
+The tools read every file as one configuration.
 
-- A table of `.toolchain/project.toml` adds its keys to the table of `.toolchain/toolchain.toml` that has the same name.
-- If the two files give the same key, the tools stop: `project.toml states <key>, and toolchain.toml states it too`.
-- Thus `.toolchain/project.toml` cannot change a value of `.toolchain/toolchain.toml`. Do not change `.toolchain/toolchain.toml`.
+- A table of a file adds its keys to the table of another file that has the same name.
+- If two files give the same key, the tools stop: `project.toml states <key>, and toolchain.toml states it too`.
+- A file of a project cannot change a value of `.toolchain/toolchain.toml`. Do not change `.toolchain/toolchain.toml`.
 
-Each section of this document gives the keys of one table of `.toolchain/project.toml`.
+Each section of this document gives the keys of one table.
 For example, these lines make a program from the sources of `src`:
 
 ```toml

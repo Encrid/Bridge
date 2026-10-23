@@ -1,0 +1,84 @@
+[targets.x86_64-windows-gnu]
+section = ".bridge"
+system_defines = []
+system_libraries = []
+counted_system = ["WINBASEAPI=", "CreateEventA=counted_create_event", "CreateThread=counted_create_thread", "VirtualAlloc=counted_virtual_alloc"]
+host_resources = ["tests/lib/seam/seam.rc"]
+wasmtime_archive = "wasmtime-v48.0.5-x86_64-mingw-c-api.zip"
+wasmtime_top = "wasmtime-v48.0.5-x86_64-mingw-c-api"
+wasmtime_sha256 = "7842335b4199bb5cdf3031c0d9084db17ab3d0619829726ed19576d48b5b8ead"
+wasmtime_link = "lib/libwasmtime.dll.a"
+wasmtime_runtime = "lib/wasmtime.dll"
+binaryen_archive = "binaryen-version_133-x86_64-windows.tar.gz"
+binaryen_sha256 = "17a2cbeac6b5693c5fbafab3838d3c65fd9c1eb38b05f5baec6c657e8c84995b"
+
+[targets.x86_64-linux-gnu]
+section = ".bridge"
+system_defines = []
+system_libraries = ["-lm", "-lpthread", "-ldl"]
+counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init", "mprotect=counted_mprotect"]
+host_resources = []
+wasmtime_archive = "wasmtime-v48.0.5-x86_64-linux-c-api.tar.xz"
+wasmtime_top = "wasmtime-v48.0.5-x86_64-linux-c-api"
+wasmtime_sha256 = "81fffe5fe895c7f8f84a744f4d4d165dda28793d00ee943ee71fcfb6ab5ed923"
+wasmtime_link = "lib/libwasmtime.so"
+wasmtime_runtime = "lib/libwasmtime.so"
+binaryen_archive = "binaryen-version_133-x86_64-linux.tar.gz"
+binaryen_sha256 = "2dc9c7813f5375db93d96ead4b78222fcc3e2677bbb832297af4797782a37489"
+
+[targets.aarch64-macos]
+section = "__TEXT,.bridge"
+system_defines = ["-D_DARWIN_C_SOURCE"]
+system_libraries = []
+counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init", "mprotect=counted_mprotect"]
+host_resources = []
+wasmtime_archive = "wasmtime-v48.0.5-aarch64-macos-c-api.tar.xz"
+wasmtime_top = "wasmtime-v48.0.5-aarch64-macos-c-api"
+wasmtime_sha256 = "92e74e76ef06ae699beec893cf3268d439da4d05dbca020e8f608ca3f0c1e862"
+wasmtime_link = "lib/libwasmtime.dylib"
+wasmtime_runtime = "lib/libwasmtime.dylib"
+binaryen_archive = "binaryen-version_133-arm64-macos.tar.gz"
+binaryen_sha256 = "ad66da82ac13f163e424b1643f16c6dfcccc98b5966296b43e52d3cab04f84a8"
+
+[targets.aarch64-linux-gnu]
+section = ".bridge"
+system_defines = []
+system_libraries = ["-lm", "-lpthread", "-ldl"]
+counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init", "mprotect=counted_mprotect"]
+host_resources = []
+wasmtime_archive = "wasmtime-v48.0.5-aarch64-linux-c-api.tar.xz"
+wasmtime_top = "wasmtime-v48.0.5-aarch64-linux-c-api"
+wasmtime_sha256 = "3fd35813cf4a922b968fa3dbd12a300ecea032181a895c4ffe7b1f6f2824fca6"
+wasmtime_link = "lib/libwasmtime.so"
+wasmtime_runtime = "lib/libwasmtime.so"
+binaryen_archive = "binaryen-version_133-aarch64-linux.tar.gz"
+binaryen_sha256 = "89c07ea56faf38d0fbecf36ca8ec0721756716185f265b568e133d427f299bf8"
+
+[targets.x86_64-macos]
+section = "__TEXT,.bridge"
+system_defines = ["-D_DARWIN_C_SOURCE"]
+system_libraries = []
+counted_system = ["pthread_create=counted_pthread_create", "pthread_mutex_init=counted_mutex_init", "pthread_cond_init=counted_cond_init", "mprotect=counted_mprotect"]
+host_resources = []
+wasmtime_archive = "wasmtime-v48.0.5-x86_64-macos-c-api.tar.xz"
+wasmtime_top = "wasmtime-v48.0.5-x86_64-macos-c-api"
+wasmtime_sha256 = "47789d6be9ae03d4ba0ff13821e1d069bbaa3a8926bcd4b701482c3149539556"
+wasmtime_link = "lib/libwasmtime.dylib"
+wasmtime_runtime = "lib/libwasmtime.dylib"
+binaryen_archive = "binaryen-version_133-x86_64-macos.tar.gz"
+binaryen_sha256 = "13a9b90be775c6389ce3d1f879cb8627bea56708ba8c122983941d53a8199b95"
+
+[targets.aarch64-windows-gnu]
+section = ".bridge"
+system_defines = []
+system_libraries = []
+counted_system = ["WINBASEAPI=", "CreateEventA=counted_create_event", "CreateThread=counted_create_thread", "VirtualAlloc=counted_virtual_alloc"]
+host_resources = ["tests/lib/seam/seam.rc"]
+wasmtime_archive = "wasmtime-v48.0.5-aarch64-windows-c-api.zip"
+wasmtime_top = "wasmtime-v48.0.5-aarch64-windows-c-api"
+wasmtime_sha256 = "a1b598234681cc04f56f7cb79bcd83f8e001f5545c26ad51363c38102c0065d8"
+wasmtime_link = "lib/wasmtime.dll.lib"
+wasmtime_runtime = "lib/wasmtime.dll"
+binaryen_archive = "binaryen-version_133-arm64-windows.tar.gz"
+binaryen_sha256 = "492a8e1847a0be1554bb9a7f384227981d60bc013aedc02d8ba1372c3943178c"
+

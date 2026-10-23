@@ -1,0 +1,4 @@
+[[artifact]]
+name = "thing"
+kind = "file"
+sources = ["note.txt"]

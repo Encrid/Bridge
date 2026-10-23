@@ -1,0 +1,639 @@
+[module]
+kind = "library"
+test = true
+folder = "built"
+include = ["include/lib", "tests/lib/binding", "tests/lib/modules"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+sources = ["tests/lib/modules/{name}.c"]
+
+[[modules]]
+name = "ok"
+path = true
+
+[[modules]]
+name = "image"
+path = true
+
+[[modules]]
+name = "oob"
+path = true
+
+[[modules]]
+name = "spin"
+path = true
+
+[[modules]]
+name = "grow"
+path = true
+
+[[modules]]
+name = "noinit"
+path = true
+
+[[modules]]
+name = "noreload"
+path = true
+
+[[modules]]
+name = "noshutdown"
+
+[[modules]]
+name = "spare-spanned"
+sources = ["tests/lib/modules/spare.c", "tests/lib/modules/idle.c"]
+defines = ["SPANNED"]
+variants = [{ name = "spare", defines = [] }]
+
+[[modules]]
+name = "undefined"
+sources = ["tests/lib/modules/undefined.c", "tests/lib/modules/idle.c"]
+
+[[modules]]
+name = "insist"
+sources = ["tests/lib/modules/insist.c", "tests/lib/modules/idle.c"]
+
+[[modules]]
+name = "crowd"
+sources = ["tests/lib/modules/crowd.c", "tests/lib/modules/idle.c"]
+
+[[modules]]
+name = "sweeper"
+sources = ["tests/lib/modules/sweeper.c", "tests/lib/modules/idle.c"]
+
+[[modules]]
+name = "stray"
+path = true
+
+[[modules]]
+name = "tmover"
+sources = ["tests/lib/modules/tmover.c", "tests/lib/modules/idle.c"]
+path = true
+
+[[modules]]
+name = "tflood"
+sources = ["tests/lib/modules/tflood.c", "tests/lib/modules/idle.c"]
+path = true
+
+[[modules]]
+name = "tforeign"
+sources = ["tests/lib/modules/tforeign.c", "tests/lib/modules/idle.c"]
+path = true
+
+[[modules]]
+name = "sleep1"
+sources = ["tests/lib/modules/sleep.c", "tests/lib/modules/idle.c"]
+path = true
+variants = [{ name = "sleep2" }]
+
+[[modules]]
+name = "pinned"
+sources = ["tests/lib/modules/pinned.c", "tests/lib/modules/idle.c"]
+path = true
+
+[[modules]]
+name = "setter"
+sources = ["tests/lib/modules/setter.c", "tests/lib/modules/idle.c"]
+path = true
+
+[[modules]]
+name = "reaper-mend"
+sources = ["tests/lib/modules/reaper.c", "tests/lib/modules/idle.c"]
+defines = ["MEND"]
+
+[[modules]]
+name = "sour"
+sources = ["tests/lib/modules/sour.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "keep"
+sources = ["tests/lib/modules/keep.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [{ name = "keep-fail", defines = ["BRIDGE_ROWS_CHECKED", "FAIL_RELOAD"] }]
+
+[[modules]]
+name = "duo"
+sources = ["tests/lib/modules/duo.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "pick"
+sources = ["tests/lib/modules/pick.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "hearer"
+sources = ["tests/lib/modules/hearer.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "swapper"
+sources = ["tests/lib/modules/swapper.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [{ name = "swapper-second", defines = ["BRIDGE_ROWS_CHECKED", "SECOND"] }]
+
+[[modules]]
+name = "writer"
+sources = ["tests/lib/modules/writer.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "collide-struct"
+sources = ["tests/lib/modules/collide.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED", "V=1", "NAME=puviutcw5s5udo"]
+variants = [{ name = "collide-struct-moved", defines = ["BRIDGE_ROWS_CHECKED", "V=2", "NAME=plxytbt2tg4x3m"] }, { name = "collide-struct-rival", defines = ["BRIDGE_ROWS_CHECKED", "V=5", "NAME=plxytbt2tg4x3m"] }, { name = "collide-enum", defines = ["BRIDGE_ROWS_CHECKED", "V=3", "NAME=Eqiwr4en1gbdeg"] }, { name = "collide-enum-moved", defines = ["BRIDGE_ROWS_CHECKED", "V=4", "NAME=En4nwwglif1zfp"] }]
+
+[[modules]]
+name = "marker"
+sources = ["tests/lib/modules/marker.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "reaper"
+sources = ["tests/lib/modules/reaper.c", "tests/lib/modules/idle.c"]
+path = true
+
+[[modules]]
+name = "stamp5"
+sources = ["tests/lib/modules/stamp.c", "tests/lib/modules/idle.c"]
+path = true
+defines = ["VALUE=5", "PHASE=\"update\""]
+variants = [{ name = "stamp9", defines = ["VALUE=9", "PHASE=\"update\""] }, { name = "stampunstated", defines = ["VALUE=1", "PHASE=\"update\"", "UNSTATED"] }, { name = "stamptick", defines = ["VALUE=7", "PHASE=\"tick\""] }]
+
+[[modules]]
+name = "stepper1"
+sources = ["tests/lib/modules/stepper.c"]
+path = true
+defines = ["STEP=1"]
+variants = [{ name = "stepper2", defines = ["STEP=10"] }, { name = "stepper3", defines = ["STEP=10", "FAIL_RELOAD"] }]
+
+[[modules]]
+name = "store"
+sources = ["tests/lib/modules/store/store.c", "tests/lib/modules/store/store_changes.c", "tests/lib/modules/store/store_find.c", "tests/lib/modules/store/store_gone.c", "tests/lib/modules/store/store_half.c", "tests/lib/modules/store/store_heard.c", "tests/lib/modules/store/store_heard_both.c", "tests/lib/modules/store/store_look.c", "tests/lib/modules/store/store_never.c", "tests/lib/modules/store/store_one.c", "tests/lib/modules/store/store_plain.c", "tests/lib/modules/store/store_scribble.c", "tests/lib/modules/store/store_tables.c", "tests/lib/modules/idle.c"]
+path = true
+variants = [{ name = "storebig", defines = ["BIG"] }, { name = "storetab", defines = ["TABLES"] }, { name = "storefat64", defines = ["BIG", "FAT64"] }, { name = "storefat256", defines = ["BIG", "FAT256"] }, { name = "storefat1k", defines = ["BIG", "FAT1K"] }, { name = "storefat4k", defines = ["BIG", "FAT4K"] }]
+
+[[modules]]
+name = "frag1"
+sources = ["tests/lib/modules/frag.c", "tests/lib/modules/idle.c"]
+path = true
+defines = ["SPLIT=1"]
+variants = [{ name = "frag16", defines = ["SPLIT=16"] }, { name = "frag256", defines = ["SPLIT=256"] }, { name = "frag4096", defines = ["SPLIT=4096"] }, { name = "fragtag4096", defines = ["SPLIT=4096", "TAGS"] }]
+
+[[modules]]
+name = "sparse"
+sources = ["tests/lib/modules/sparse/sparse.c", "tests/lib/modules/sparse/sparse_changes.c", "tests/lib/modules/sparse/sparse_half.c", "tests/lib/modules/sparse/sparse_heard.c", "tests/lib/modules/sparse/sparse_look.c", "tests/lib/modules/idle.c"]
+path = true
+variants = [{ name = "sparsebig", defines = ["BIG"] }, { name = "sparsefat", defines = ["FAT"] }, { name = "sparsebad1", defines = ["BAD=1"] }, { name = "sparsebad2", defines = ["BAD=2"] }]
+
+[[modules]]
+name = "full-list"
+sources = ["tests/lib/modules/full_list.c", "tests/lib/modules/idle.c"]
+path = true
+
+[[modules]]
+name = "manymove1"
+sources = ["tests/lib/modules/manymove.c"]
+path = true
+defines = ["KEPT=1"]
+variants = [{ name = "manymove2", defines = ["KEPT=2"] }]
+
+[[modules]]
+name = "move1"
+sources = ["tests/lib/modules/move/move_change.c", "tests/lib/modules/move/move_init.c", "tests/lib/modules/move/move_look.c"]
+path = true
+defines = ["KEPT=1"]
+variants = [{ name = "move2", defines = ["KEPT=2"] }, { name = "move3", defines = ["KEPT=3"] }, { name = "move4", defines = ["KEPT=4"] }, { name = "move5", defines = ["KEPT=5"] }]
+
+[[modules]]
+name = "holder"
+sources = ["tests/lib/modules/holder.c", "tests/lib/modules/idle.c"]
+path = true
+
+[[modules]]
+name = "layout0"
+sources = ["tests/lib/modules/layout/layout_init.c", "tests/lib/modules/layout/layout_look.c", "tests/lib/modules/layout/layout_spawn.c", "tests/lib/modules/layout/layout_values.c"]
+path = true
+defines = ["V=0", "KEPT=1"]
+variants = [{ name = "layout1", defines = ["V=1", "KEPT=1"] }, { name = "layout2", defines = ["V=2", "KEPT=1"] }, { name = "layout3", defines = ["V=3", "KEPT=1"] }, { name = "layout4", defines = ["V=4", "KEPT=1"] }, { name = "layout5", defines = ["V=5", "KEPT=1"] }, { name = "layout6", defines = ["V=6", "KEPT=1"] }, { name = "layout7", defines = ["V=7", "KEPT=1"] }, { name = "layout8", defines = ["V=8", "KEPT=1"] }, { name = "layout9", defines = ["V=9", "KEPT=1"] }, { name = "layout10", defines = ["V=10", "KEPT=1"] }, { name = "layout11", defines = ["V=11", "KEPT=1"] }, { name = "layout12", defines = ["V=12", "KEPT=1"] }, { name = "layout13", defines = ["V=13", "KEPT=1"] }, { name = "layout15", defines = ["V=15", "KEPT=1"] }, { name = "layout16", defines = ["V=16", "KEPT=1"] }, { name = "layout17", defines = ["V=17", "KEPT=1"] }, { name = "layout18", defines = ["V=18", "KEPT=1"] }, { name = "layout20", defines = ["V=20", "KEPT=1"] }, { name = "layout21", defines = ["V=21", "KEPT=1"] }, { name = "layout14", defines = ["V=14", "KEPT=1"] }, { name = "layout0k2", defines = ["V=0", "KEPT=2"] }, { name = "layout1k2", defines = ["V=1", "KEPT=2"] }, { name = "layout2k2", defines = ["V=2", "KEPT=2"] }, { name = "layout0k3", defines = ["V=0", "KEPT=3"] }, { name = "layout1k3", defines = ["V=1", "KEPT=3"] }, { name = "layout2k3", defines = ["V=2", "KEPT=3"] }, { name = "layout0k4", defines = ["V=0", "KEPT=4"] }, { name = "layout1k4", defines = ["V=1", "KEPT=4"] }, { name = "layout2k4", defines = ["V=2", "KEPT=4"] }, { name = "layout0k5", defines = ["V=0", "KEPT=5"] }, { name = "layout1k5", defines = ["V=1", "KEPT=5"] }, { name = "layout2k5", defines = ["V=2", "KEPT=5"] }]
+
+[[modules]]
+name = "tag"
+sources = ["tests/lib/modules/tag/tag.c", "tests/lib/modules/tag/tag_changes.c", "tests/lib/modules/tag/tag_look.c", "tests/lib/modules/tag/tag_look_set.c", "tests/lib/modules/idle.c"]
+path = true
+
+[[modules]]
+name = "single"
+sources = ["tests/lib/modules/single/single.c", "tests/lib/modules/single/single_changes.c", "tests/lib/modules/single/single_look.c", "tests/lib/modules/idle.c"]
+path = true
+variants = [{ name = "singlebad1", defines = ["BAD=1"] }, { name = "singlebad2", defines = ["BAD=2"] }, { name = "singlebad3", defines = ["BAD=3"] }]
+
+[[modules]]
+name = "direct"
+sources = ["tests/lib/modules/direct/direct.c", "tests/lib/modules/direct/direct_changes.c", "tests/lib/modules/direct/direct_half.c", "tests/lib/modules/direct/direct_heard.c", "tests/lib/modules/direct/direct_look.c", "tests/lib/modules/direct/direct_reach.c", "tests/lib/modules/idle.c"]
+path = true
+variants = [{ name = "directbig", defines = ["BIG"] }, { name = "directbad", defines = ["BAD"] }]
+
+[[modules]]
+name = "toggle"
+sources = ["tests/lib/modules/toggle/toggle.c", "tests/lib/modules/toggle/toggle_bits.c", "tests/lib/modules/toggle/toggle_changes.c", "tests/lib/modules/toggle/toggle_find.c", "tests/lib/modules/toggle/toggle_look.c", "tests/lib/modules/idle.c"]
+path = true
+variants = [{ name = "toggle1", defines = ["BIG", "ON=1"] }, { name = "toggle2", defines = ["BIG", "ON=2"] }, { name = "toggle16", defines = ["BIG", "ON=16"] }]
+
+[[modules]]
+name = "weigh1"
+sources = ["tests/lib/modules/weigh/weigh.c", "tests/lib/modules/weigh/weigh_follow.c", "tests/lib/modules/weigh/weigh_read.c", "tests/lib/modules/idle.c"]
+path = true
+defines = ["ON=1"]
+variants = [{ name = "weigh2", defines = ["ON=2"] }, { name = "weigh16", defines = ["ON=16"] }]
+
+[[modules]]
+name = "stress1"
+sources = ["tests/lib/modules/stress/stress.c", "tests/lib/modules/stress/stress_by_id.c", "tests/lib/modules/stress/stress_by_spans.c", "tests/lib/modules/stress/stress_see_first.c", "tests/lib/modules/stress/stress_see_last.c", "tests/lib/modules/stress/stress_work.c", "tests/lib/modules/idle.c"]
+path = true
+defines = ["SEED=1u", "SPACE=\"s1\""]
+variants = [{ name = "stress2", defines = ["SEED=2u", "SPACE=\"s2\""] }, { name = "stress3", defines = ["SEED=3u", "SPACE=\"s3\""] }, { name = "stress4", defines = ["SEED=4u", "SPACE=\"s4\""] }]
+
+[[modules]]
+name = "mover"
+sources = ["tests/lib/modules/mover.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "reader"
+sources = ["tests/lib/modules/reader.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "refs"
+sources = ["tests/lib/modules/refs.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "fp"
+sources = ["tests/lib/modules/fp.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "share1"
+sources = ["tests/lib/modules/share.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0"]
+variants = [{ name = "share2", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=1"] }, { name = "sharew", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "WRITER"] }, { name = "sharebad", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "TRAP"] }, { name = "sharehold0", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "HOLD"] }, { name = "sharehold1", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=1", "HOLD"] }]
+
+[[modules]]
+name = "badterm"
+sources = ["tests/lib/modules/badterm.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "spin3"
+sources = ["tests/lib/modules/spin3.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "flood"
+sources = ["tests/lib/modules/flood.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "reload-takes-marked"
+sources = ["tests/lib/modules/reload_takes.c"]
+defines = ["MARKED"]
+variants = [{ name = "reload-takes", defines = [] }]
+
+[[modules]]
+name = "huge"
+sources = ["tests/lib/modules/huge.c"]
+defines = ["V=1"]
+variants = [{ name = "huge-grown", defines = ["V=2"] }, { name = "huge-direct", defines = ["V=3"] }]
+
+[[modules]]
+name = "alloc-twelve"
+sources = ["tests/lib/modules/alloc_twelve.c"]
+
+[[modules]]
+name = "why"
+sources = ["tests/lib/modules/why.c"]
+defines = ["INIT_STATUS=1"]
+variants = [{ name = "why-reload", defines = ["INIT_STATUS=0"] }]
+
+[[modules]]
+name = "spot"
+sources = ["tests/lib/modules/spot.c"]
+defines = ["EXTRA=0"]
+variants = [{ name = "spot-wide", defines = ["EXTRA=8"] }]
+
+[[modules]]
+name = "nine"
+sources = ["tests/lib/modules/nine.c"]
+variants = [{ name = "nine-wide", defines = ["WIDE"] }]
+
+[[modules]]
+name = "six"
+sources = ["tests/lib/modules/six.c"]
+variants = [{ name = "six-seeded", defines = ["SEEDED"] }]
+
+[[modules]]
+name = "hold"
+sources = ["tests/lib/modules/hold.c", "tests/lib/modules/idle.c"]
+
+[[modules]]
+name = "stick-held"
+sources = ["tests/lib/modules/stick.c", "tests/lib/modules/idle.c"]
+defines = ["TARGET=3"]
+variants = [{ name = "stick-given", defines = ["TARGET=1"] }]
+
+[[modules]]
+name = "guess-zero"
+sources = ["tests/lib/modules/guess.c", "tests/lib/modules/idle.c"]
+defines = ["TARGET=0"]
+variants = [{ name = "guess-far", defines = ["TARGET=4000"] }, { name = "guess-held", defines = ["TARGET=3"] }, { name = "guess-given", defines = ["TARGET=1"] }]
+
+[[modules]]
+name = "places"
+sources = ["tests/lib/modules/places.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [{ name = "places_before", defines = ["BRIDGE_ROWS_CHECKED", "BEFORE"] }]
+
+[[modules]]
+name = "shout-forged"
+sources = ["tests/lib/modules/shout.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED", "FORGED"]
+variants = [{ name = "shout", defines = ["BRIDGE_ROWS_CHECKED"] }]
+
+[[modules]]
+name = "chatty"
+sources = ["tests/lib/modules/chatty.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "rows"
+sources = ["tests/lib/modules/rows.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [{ name = "rows-unchecked", defines = ["BRIDGE_ROWS_UNCHECKED"] }]
+
+[[modules]]
+name = "halver"
+sources = ["tests/lib/modules/halver.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "twostep"
+sources = ["tests/lib/modules/twostep.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [{ name = "twostep_third", defines = ["BRIDGE_ROWS_CHECKED", "THIRD"] }, { name = "twostep_unstated", defines = ["BRIDGE_ROWS_CHECKED", "UNSTATED"] }, { name = "twostep_repeated", defines = ["BRIDGE_ROWS_CHECKED", "THIRD", "REPEATED"] }, { name = "twostep_changing", defines = ["BRIDGE_ROWS_CHECKED", "UNSTATED", "CHANGING"] }]
+
+[[modules]]
+name = "twostep_reloadable"
+sources = ["tests/lib/modules/twostep.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED", "RELOADABLE"]
+variants = [{ name = "twostep_third_reloadable", defines = ["BRIDGE_ROWS_CHECKED", "THIRD", "RELOADABLE"] }]
+
+[[modules]]
+name = "watcher"
+sources = ["tests/lib/modules/watcher.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [{ name = "watcher_change", defines = ["BRIDGE_ROWS_CHECKED", "CHANGE"] }]
+
+[[modules]]
+name = "chain"
+sources = ["tests/lib/modules/chain.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [{ name = "chain_clash", defines = ["BRIDGE_ROWS_CHECKED", "CLASH"] }]
+
+[[modules]]
+name = "badobs"
+sources = ["tests/lib/modules/badobs.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "events"
+sources = ["tests/lib/modules/events.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "scribble"
+
+[[modules]]
+name = "fixer"
+sources = ["tests/lib/modules/fixer.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [{ name = "fixer_watch", defines = ["BRIDGE_ROWS_CHECKED", "WATCH"] }, { name = "fixer_change", defines = ["BRIDGE_ROWS_CHECKED", "CHANGE"] }]
+
+[[modules]]
+name = "nested"
+sources = ["tests/lib/modules/nested.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [{ name = "nested2", defines = ["BRIDGE_ROWS_CHECKED", "LEAVE_OUT_VEC2"] }]
+
+[[modules]]
+name = "namer"
+sources = ["tests/lib/modules/namer.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [{ name = "namer-reader", defines = ["BRIDGE_ROWS_CHECKED", "READER"] }, { name = "namer-blank", defines = ["BRIDGE_ROWS_CHECKED", "READER", "BLANK"] }]
+
+[[modules]]
+name = "spawner"
+sources = ["tests/lib/modules/spawner.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "counter"
+sources = ["tests/lib/modules/counter.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "typer"
+sources = ["tests/lib/modules/typer.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "user"
+sources = ["tests/lib/modules/user.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "hang"
+sources = ["tests/lib/modules/hang.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "hit"
+sources = ["tests/lib/modules/hit/start.c", "tests/lib/modules/hit/walk.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "shield"
+sources = ["tests/lib/modules/shield.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "aim"
+sources = ["tests/lib/modules/aim.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "levels"
+sources = ["tests/lib/modules/levels.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "tagged"
+sources = ["tests/lib/modules/tagged.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "settings"
+sources = ["tests/lib/modules/settings/lifecycle.c", "tests/lib/modules/settings/show.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED", "KEPT=BRIDGE_SINGLETON"]
+variants = [{ name = "settings-wide", defines = ["BRIDGE_ROWS_CHECKED", "KEPT=BRIDGE_SINGLETON", "MORE"] }, { name = "settings-drop", defines = ["BRIDGE_ROWS_CHECKED", "DROP", "KEPT=BRIDGE_SINGLETON"] }, { name = "settings-table", defines = ["BRIDGE_ROWS_CHECKED", "KEPT=BRIDGE_TABLE"] }]
+
+[[modules]]
+name = "kept-unset"
+sources = ["tests/lib/modules/kept.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED", "KEPT=0"]
+variants = [{ name = "kept-none", defines = ["BRIDGE_ROWS_CHECKED", "KEPT=9"] }, { name = "kept-sparse", defines = ["BRIDGE_ROWS_CHECKED", "KEPT=BRIDGE_SPARSE_SET"] }]
+
+[[modules]]
+name = "flaky-always"
+sources = ["tests/lib/modules/flaky.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED", "OF=1", "FAILS=1"]
+variants = [{ name = "flaky-third", defines = ["BRIDGE_ROWS_CHECKED", "OF=3", "FAILS=1"] }, { name = "flaky-twothirds", defines = ["BRIDGE_ROWS_CHECKED", "OF=3", "FAILS=2"] }, { name = "flaky-calm", defines = ["BRIDGE_ROWS_CHECKED", "OF=1", "FAILS=1", "CALM"] }]
+
+[[modules]]
+name = "keeper-strip"
+sources = ["tests/lib/modules/keeper.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED", "PRIVATE_POLICY=BRIDGE_STRIP"]
+variants = [{ name = "keeper-sweep", defines = ["BRIDGE_ROWS_CHECKED", "PRIVATE_POLICY=BRIDGE_SWEEP"] }, { name = "keeper-delete", defines = ["BRIDGE_ROWS_CHECKED", "PRIVATE_POLICY=BRIDGE_DELETE"] }]
+
+[[modules]]
+name = "retype-private"
+sources = ["tests/lib/modules/retype.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED", "WHICH=1"]
+variants = [{ name = "retype-vec2", defines = ["BRIDGE_ROWS_CHECKED", "WHICH=2"] }, { name = "retype-extra", defines = ["BRIDGE_ROWS_CHECKED", "WHICH=3"] }, { name = "retype-settings", defines = ["BRIDGE_ROWS_CHECKED", "WHICH=4"] }]
+
+[[modules]]
+name = "ticker"
+sources = ["tests/lib/modules/ticker.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED", "STEP=1"]
+variants = [{ name = "ticker-ten", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10"] }, { name = "ticker-tag", defines = ["BRIDGE_ROWS_CHECKED", "STEP=1", "TAG"] }, { name = "ticker-wide", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "WIDE"] }, { name = "ticker-fail", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "FAIL_RELOAD"] }, { name = "ticker-noextra", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "NO_EXTRA"] }, { name = "ticker-trip", defines = ["BRIDGE_ROWS_CHECKED", "STEP=1", "TRIP"] }, { name = "ticker-alloc", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "ALLOC"] }]
+
+[[modules]]
+name = "wrong-declare-outside"
+sources = ["tests/lib/modules/wrong/wrong.c", "tests/lib/modules/wrong/wrong_change.c", "tests/lib/modules/wrong/wrong_declare.c", "tests/lib/modules/wrong/wrong_declare_more.c", "tests/lib/modules/wrong/wrong_detach.c", "tests/lib/modules/wrong/wrong_observe.c", "tests/lib/modules/wrong/wrong_state.c", "tests/lib/modules/wrong/wrong_system.c", "tests/lib/modules/wrong/wrong_term.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_outside", "IN_SYSTEM=wrong_do_nothing"]
+variants = [{ name = "wrong-declare-name-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_name_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-no-namespace", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_no_namespace", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-name-zero", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_name_zero", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-kind-unset", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_kind_unset", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-tag-with-bytes", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_tag_with_bytes", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-policy-unset", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_policy_unset", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-size-other", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_size_other", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-phase-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_phase_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-name-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-many-changes", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_many_changes", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-twice", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_twice", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observer-no-term", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observer_no_term", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-events-unset", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_events_unset", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-term-access-unset", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_term_access_unset", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-term-access-other", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_term_access_other", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-term-oper-unset", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_term_oper_unset", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-term-slot-undeclared", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_term_slot_undeclared", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-term-write-ungranted", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_term_write_ungranted", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-change-slot-undeclared", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_change_slot_undeclared", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-change-ungranted", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_change_ungranted", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-alloc-stated-none", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_alloc_stated_none", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-late", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_declare_late"] }, { name = "wrong-system-late", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_system_late"] }, { name = "wrong-observe-late", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_observe_late"] }, { name = "wrong-attach-undeclared", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_undeclared"] }, { name = "wrong-attach-ungranted", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_ungranted"] }, { name = "wrong-attach-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_outside"] }, { name = "wrong-detach-undeclared", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_detach_undeclared"] }, { name = "wrong-attach-tag-value", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_tag_value"] }, { name = "wrong-destroy-zero", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_destroy_zero"] }]
+
+[[modules]]
+name = "wrong-declare-name-empty"
+sources = ["tests/lib/modules/wrong/*.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_name_empty", "IN_SYSTEM=wrong_do_nothing"]
+variants = [{ name = "wrong-declare-name-long", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_name_long", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-name-empty", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_empty", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-name-long", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_long", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-phase-long", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_phase_long", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-name-at", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_at", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observer-name-colon", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observer_name_colon", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-desc-huge", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_desc_huge", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-again", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_again", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-align-other", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_align_other", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-toggle", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_toggle", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-kind-five", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_kind_five", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-tag-with-desc", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_tag_with_desc", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-unload-four", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_unload_four", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-nine-terms", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_nine_terms", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-terms-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_terms_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-change-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_change_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-many-changes", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_many_changes", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-twice", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_twice", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-named-shutdown", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_named_shutdown", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-named-reload", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_named_reload", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-ghost", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_ghost", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-events-eight", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_events_eight", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-detach-id-zero", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_detach_id_zero"] }, { name = "wrong-declare-near-namespace", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_near_namespace", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observer-attaches-unstated", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_entry", "IN_SYSTEM=wrong_spawn_position"] }, { name = "wrong-system-before-own", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_before_own", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-before-other-phase", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_before_other_phase", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-before-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_before_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-before-own", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_before_own", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-before-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_before_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-before-many", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_before_many", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-before-many", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_before_many", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-before-same-phase", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_before_same_phase", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-before-earlier", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_before_earlier", "IN_SYSTEM=wrong_do_nothing"] }]
+
+[[modules]]
+name = "nmover"
+sources = ["tests/backends/native/modules/nmover.c", "tests/backends/native/modules/nidle.c"]
+part = "native"
+path = true
+include = ["include/lib", "include/backends/native", "tests/backends/native/modules"]
+
+[[modules]]
+name = "nflood"
+sources = ["tests/backends/native/modules/nflood.c", "tests/backends/native/modules/nidle.c"]
+part = "native"
+path = true
+include = ["include/lib", "include/backends/native", "tests/backends/native/modules"]
+
+[[modules]]
+name = "nforeign"
+sources = ["tests/backends/native/modules/nforeign.c", "tests/backends/native/modules/nidle.c"]
+part = "native"
+path = true
+include = ["include/lib", "include/backends/native", "tests/backends/native/modules"]
+
+[[modules]]
+name = "nsetter"
+sources = ["tests/backends/native/modules/nsetter.c", "tests/backends/native/modules/nidle.c"]
+part = "native"
+path = true
+include = ["include/lib", "include/backends/native", "tests/backends/native/modules"]
+
+[[modules]]
+name = "nwatcher"
+sources = ["tests/backends/native/modules/nwatcher.c", "tests/backends/native/modules/nidle.c"]
+part = "native"
+path = true
+include = ["include/lib", "include/backends/native", "tests/backends/native/modules"]
+
+[[modules]]
+name = "nstamp5"
+sources = ["tests/backends/native/modules/nstamp.c", "tests/backends/native/modules/nidle.c"]
+part = "native"
+path = true
+include = ["include/lib", "include/backends/native", "tests/backends/native/modules"]
+defines = ["VALUE=5", "PHASE=\"update\""]
+variants = [{ name = "nstamp9", defines = ["VALUE=9", "PHASE=\"update\""] }]
+
+[[modules]]
+name = "nsingle"
+sources = ["tests/backends/native/modules/nsingle/*.c", "tests/backends/native/modules/nidle.c"]
+part = "native"
+path = true
+include = ["include/lib", "include/backends/native", "tests/backends/native/modules"]
+
+[[modules]]
+name = "ntoggle"
+sources = ["tests/backends/native/modules/ntoggle/*.c", "tests/backends/native/modules/nidle.c"]
+part = "native"
+path = true
+include = ["include/lib", "include/backends/native", "tests/backends/native/modules"]
+
+[[modules]]
+name = "ntag"
+sources = ["tests/backends/native/modules/ntag/*.c", "tests/backends/native/modules/nidle.c"]
+part = "native"
+path = true
+include = ["include/lib", "include/backends/native", "tests/backends/native/modules"]
+
+[[modules]]
+name = "ndirect"
+sources = ["tests/backends/native/modules/ndirect/*.c", "tests/backends/native/modules/nidle.c"]
+part = "native"
+path = true
+include = ["include/lib", "include/backends/native", "tests/backends/native/modules"]
+
+[[modules]]
+name = "nsparse"
+sources = ["tests/backends/native/modules/nsparse/*.c", "tests/backends/native/modules/nidle.c"]
+part = "native"
+path = true
+include = ["include/lib", "include/backends/native", "tests/backends/native/modules"]
+
+[[modules]]
+name = "nlayout0"
+sources = ["tests/backends/native/modules/nlayout/*.c"]
+part = "native"
+path = true
+include = ["include/lib", "include/backends/native", "tests/backends/native/modules"]
+defines = ["V=0", "KEPT=1"]
+
+[[modules]]
+name = "nalloc"
+sources = ["tests/backends/native/modules/nalloc.c", "tests/backends/native/modules/nidle.c"]
+part = "native"
+path = true
+include = ["include/lib", "include/backends/native", "tests/backends/native/modules"]
+
+[[modules]]
+name = "nnoinit"
+sources = ["tests/backends/native/modules/nnoinit.c"]
+part = "native"
+path = true
+include = ["include/lib", "include/backends/native", "tests/backends/native/modules"]
+
+[[modules]]
+name = "ncover"
+sources = ["tests/backends/native/modules/ncover.c", "tests/backends/native/modules/nidle.c"]
+part = "native"
+path = true
+include = ["include/lib", "include/backends/native", "tests/backends/native/modules"]
+

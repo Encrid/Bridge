@@ -1,0 +1,14 @@
+[[source]]
+name = "wasmtime"
+url = "https://github.com/bytecodealliance/wasmtime/releases/download/v48.0.5/{wasmtime_archive}"
+sha256 = "{wasmtime_sha256}"
+into = "{build}/third_party/wasmtime/{target}"
+top = "{wasmtime_top}"
+
+[[source]]
+name = "binaryen"
+url = "https://github.com/WebAssembly/binaryen/releases/download/version_133/{binaryen_archive}"
+sha256 = "{binaryen_sha256}"
+into = "{build}/third_party/binaryen/{target}"
+top = "{binaryen_top}"
+

@@ -1,0 +1,1454 @@
+[[artifact]]
+name = "os"
+kind = "archive"
+sources = ["src/os/{system}/*.c"]
+include = ["include/os"]
+flags = ["{quiet}", "{system_defines}"]
+
+[[artifact]]
+name = "bridge"
+kind = "library"
+sources = ["src/lib/**/*.c"]
+link = ["{out}/os.a"]
+include = ["include/lib", "include/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+defines = ["BRIDGE_BUILDING"]
+flags = ["{quiet}", "{hidden}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "bridge"
+kind = "archive"
+sources = ["src/lib/**/*.c", "src/os/{system}/*.c"]
+include = ["include/lib", "include/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+defines = ["BRIDGE_BUILDING"]
+flags = ["{quiet}", "{hidden}", "{system_defines}"]
+
+[[artifact]]
+name = "counted"
+kind = "archive"
+test = true
+sources = ["src/lib/**/*.c"]
+include = ["include/lib", "include/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+defines = ["malloc=counted_malloc", "calloc=counted_calloc", "realloc=counted_realloc", "free=counted_free", "os_reserve=counted_os_reserve"]
+flags = ["{quiet}", "{system_defines}"]
+
+[[artifact]]
+name = "counted_os"
+kind = "archive"
+test = true
+sources = ["src/os/{system}/*.c"]
+include = ["include/os"]
+defines = ["malloc=counted_malloc", "calloc=counted_calloc", "realloc=counted_realloc", "free=counted_free", "{counted_system}"]
+flags = ["{quiet}", "{system_defines}"]
+
+[[artifact]]
+name = "bridge_tests"
+kind = "library"
+test = true
+folder = "backends"
+sources = ["tests/lib/backend/tests_abi.c", "tests/lib/backend/tests_backend.c", "tests/lib/backend/tests_memory.c", "tests/lib/backend/tests_define.c", "tests/lib/backend/tests_module.c", "tests/lib/backend/tests_instance.c", "tests/lib/backend/tests_func.c", "tests/lib/backend/tests_load.c", "tests/lib/backend/tests_phase.c", "tests/lib/backend/tests_moves.c", "src/os/{system}/*.c"]
+include = ["include/lib", "include/os", "tests/lib/binding"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+variants = [{ name = "bridge_tests_all" }]
+
+[[artifact]]
+name = "bridge_plain_other"
+kind = "library"
+test = true
+folder = "backends"
+sources = ["tests/lib/backend/tests_backend.c", "tests/lib/backend/tests_memory.c", "tests/lib/backend/tests_define.c", "tests/lib/backend/tests_module.c", "tests/lib/backend/tests_instance.c", "tests/lib/backend/tests_func.c", "tests/lib/backend/tests_load.c", "tests/lib/backend/tests_phase.c", "tests/lib/backend/tests_moves.c", "tests/lib/support/plain_other_abi.c", "src/os/{system}/*.c"]
+include = ["include/lib", "include/os", "tests/lib/binding"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "bridge_plain_refusing"
+kind = "library"
+test = true
+folder = "backends"
+sources = ["tests/lib/backend/tests_abi.c", "tests/lib/backend/tests_define.c", "tests/lib/backend/tests_module.c", "tests/lib/backend/tests_instance.c", "tests/lib/backend/tests_func.c", "tests/lib/backend/tests_load.c", "tests/lib/backend/tests_phase.c", "tests/lib/backend/tests_moves.c", "tests/lib/support/plain_refusing_backend.c", "tests/lib/support/plain_refusing_memory.c", "src/os/{system}/*.c"]
+include = ["include/lib", "include/os", "tests/lib/binding"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "bridge_hollow"
+kind = "library"
+test = true
+folder = "backends"
+sources = ["tests/lib/support/backend_hollow.c"]
+include = ["include/lib"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "schema"
+kind = "program"
+test = true
+sources = ["tests/lib/schema/*.c", "src/lib/schema/*.c"]
+include = ["include/lib", "include/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+defines = ["BRIDGE_BUILDING"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "storage"
+kind = "program"
+test = true
+sources = ["tests/lib/storage/*.c", "src/lib/**/*.c", "src/os/{system}/*.c"]
+include = ["include/lib", "include/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+defines = ["BRIDGE_BUILDING", "{paths}"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "storage-counted"
+kind = "program"
+test = true
+sources = ["tests/lib/storage/*.c"]
+include = ["include/lib", "include/os", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+defines = ["COUNTED", "{paths}"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+link = ["{out}/counted.a", "{out}/counted_os.a"]
+
+[[artifact]]
+name = "seam"
+kind = "program"
+test = true
+sources = ["tests/lib/seam/*.c", "tests/lib/support/host*.c", "tests/lib/support/{system}/host*.c"]
+include = ["include/lib", "tests/lib/support"]
+defines = ["{paths}"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{host_resources}"]
+link = ["{out}/bridge{library}"]
+
+[[artifact]]
+name = "seam-static"
+kind = "program"
+test = true
+sources = ["tests/lib/seam/*.c", "tests/lib/support/host*.c", "tests/lib/support/{system}/host*.c"]
+include = ["include/lib", "tests/lib/support"]
+defines = ["{paths}"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{host_resources}"]
+link = ["{out}/bridge.a"]
+
+[[artifact]]
+name = "os"
+kind = "program"
+test = true
+sources = ["tests/os/*.c", "src/os/{system}/*.c"]
+include = ["include/os"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "bridge_native"
+kind = "library"
+part = "native"
+folder = "backends"
+sources = ["src/backends/native/*.c"]
+link = ["{out}/os.a"]
+include = ["include/lib", "src/backends/native", "include/backends/native", "include/os"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "native-host"
+kind = "program"
+test = true
+part = "native"
+sources = ["tests/backends/native/host/*.c", "tests/backends/native/support/host*.c"]
+include = ["include/lib", "include/os", "tests/backends/native/host", "tests/backends/native/support"]
+defines = ["{paths}"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+link = ["{out}/bridge{library}"]
+
+[[artifact]]
+name = "native-direct"
+kind = "program"
+test = true
+part = "native"
+sources = ["tests/backends/native/direct/*.c", "src/os/{system}/*.c"]
+include = ["include/lib", "include/os", "tests/backends/native/direct"]
+defines = ["{paths}"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "bridge_wasm"
+kind = "library"
+part = "wasm"
+folder = "backends"
+sources = ["src/backends/wasm/*.c"]
+link = ["{out}/os.a"]
+include = ["include/lib", "src/backends/wasm", "include/os", "{wasmtime}/include"]
+flags = ["{quiet}", "{system_defines}", "{wasmtime}/{wasmtime_link}", "{system_libraries}", "{rpath}"]
+beside = ["{wasmtime}/{wasmtime_runtime}"]
+
+[[artifact]]
+name = "bridge-host"
+kind = "program"
+part = "host"
+sources = ["src/host/**/*.c", "src/os/{system}/*.c"]
+include = ["include/lib", "src/host", "src/host/config", "src/host/manifest", "src/host/state", "src/host/toml", "src/host/show", "include/os"]
+defines = ['LIBRARY_SUFFIX="{library}"']
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+link = ["{out}/bridge{library}"]
+beside = ["{out}/bridge{library}"]
+
+[[artifact]]
+name = "host-unit"
+kind = "program"
+test = true
+part = "host"
+sources = ["tests/host/unit/*.c", "src/host/toml/*.c", "src/host/config/config_value.c"]
+include = ["include/lib", "src/host", "src/host/config", "src/host/manifest", "src/host/state", "src/host/toml", "src/host/show"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "wasm-host"
+kind = "program"
+test = true
+part = "wasm"
+sources = ["tests/backends/wasm/host/*.c", "tests/backends/wasm/support/host*.c", "tests/backends/wasm/support/{system}/host*.c"]
+include = ["include/lib", "tests/backends/wasm/host", "tests/backends/wasm/support"]
+defines = ['BACKEND_PATH="{out}/backends/bridge_wasm{library}"', 'MODULE_DIR="{out}/wasm"']
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+link = ["{out}/bridge{library}"]
+
+[[artifact]]
+name = "wasm-adopt"
+kind = "program"
+test = true
+part = "wasm"
+sources = ["tests/backends/wasm/adopt/*.c", "src/os/{system}/*.c"]
+include = ["include/lib", "include/os", "tests/backends/wasm/adopt"]
+defines = ['BACKEND_PATH="{out}/backends/bridge_wasm{library}"', 'MODULE_DIR="{out}/wasm"']
+flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
+
+[[artifact]]
+name = "acc"
+kind = "wasm_text"
+part = "wasm"
+folder = "wasm"
+sources = ["src/backends/wasm/bridge_wasm.wat"]
+
+[[artifact]]
+name = "adopt"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/adopt.wat"]
+
+[[artifact]]
+name = "big"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/big.wat"]
+
+[[artifact]]
+name = "edges"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/edges.wat"]
+
+[[artifact]]
+name = "trapstart"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/trapstart.wat"]
+
+[[artifact]]
+name = "grow"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/grow.wat"]
+
+[[artifact]]
+name = "host"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/host.wat"]
+
+[[artifact]]
+name = "image"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/image.wat"]
+
+[[artifact]]
+name = "noinit"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/noinit.wat"]
+
+[[artifact]]
+name = "noreload"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/noreload.wat"]
+
+[[artifact]]
+name = "ok"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ok.wat"]
+
+[[artifact]]
+name = "oob"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/oob.wat"]
+
+[[artifact]]
+name = "shape"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/shape.wat"]
+
+[[artifact]]
+name = "shape64"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/shape64.wat"]
+
+[[artifact]]
+name = "spin"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/spin.wat"]
+
+[[artifact]]
+name = "stray"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/stray.wat"]
+
+[[artifact]]
+name = "strayglobal"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/strayglobal.wat"]
+
+[[artifact]]
+name = "mover"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/mover.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "reader"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/reader.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "refs"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/refs.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "fp"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/fp.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "badterm"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/badterm.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "spin3"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/spin3.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "flood"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/flood.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "chatty"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/chatty.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "rows"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/rows.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "halver"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/halver.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "twostep"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/twostep.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "watcher"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/watcher.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "chain"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/chain.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "badobs"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/badobs.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "events"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/events.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "fixer"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/fixer.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "nested"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/nested.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "namer"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/namer.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "spawner"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/spawner.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "counter"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/counter.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "typer"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/typer.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "user"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/user.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "hang"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/hang.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "hit"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/hit/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "shield"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/shield.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "aim"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/aim.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "levels"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/levels.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "tagged"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/tagged.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "rows-unchecked"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/rows.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BRIDGE_ROWS_UNCHECKED"]
+
+[[artifact]]
+name = "nested2"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/nested.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["LEAVE_OUT_VEC2", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "settings"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/settings/*.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["KEPT=BRIDGE_SINGLETON", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "kept-unset"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/kept.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["KEPT=0", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "kept-none"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/kept.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["KEPT=9", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "kept-sparse"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/kept.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["KEPT=BRIDGE_SPARSE_SET", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "namer-reader"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/namer.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["READER", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "flaky-always"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/flaky.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["OF=1", "FAILS=1", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "flaky-third"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/flaky.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["OF=3", "FAILS=1", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "flaky-twothirds"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/flaky.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["OF=3", "FAILS=2", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "flaky-calm"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/flaky.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["OF=1", "FAILS=1", "CALM", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "keeper-strip"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/keeper.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["PRIVATE_POLICY=BRIDGE_STRIP", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "keeper-sweep"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/keeper.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["PRIVATE_POLICY=BRIDGE_SWEEP", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "keeper-delete"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/keeper.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["PRIVATE_POLICY=BRIDGE_DELETE", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "retype-private"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/retype.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["WHICH=1", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "retype-vec2"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/retype.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["WHICH=2", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "retype-extra"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/retype.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["WHICH=3", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "retype-settings"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/retype.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["WHICH=4", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "settings-drop"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/settings/*.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["DROP", "KEPT=BRIDGE_SINGLETON", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "settings-table"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/settings/*.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["KEPT=BRIDGE_TABLE", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "ticker"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ticker.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["STEP=1", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "ticker-ten"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ticker.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["STEP=10", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "ticker-wide"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ticker.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["STEP=10", "WIDE", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "ticker-fail"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ticker.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["STEP=10", "FAIL_RELOAD", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "ticker-noextra"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ticker.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["STEP=10", "NO_EXTRA", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "ticker-trip"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ticker.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["STEP=1", "TRIP", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "ticker-alloc"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/ticker.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["STEP=10", "ALLOC", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "importsshared"
+kind = "wasm_text"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/importsshared.wat"]
+
+[[artifact]]
+name = "breach-slot"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BREACH_SLOT", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-row"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BREACH_ROW", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-field"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BREACH_FIELD", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-readonly"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BREACH_READONLY", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-forge"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BREACH_FORGE", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-sparse"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BREACH_SPARSE", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-direct"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BREACH_DIRECT", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-to-shared"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BREACH_TO_SHARED", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-from-shared"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BREACH_FROM_SHARED", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "breach-ok"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/breach.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["BREACH_OK", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-outside"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_outside", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-name-outside"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_name_outside", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-no-namespace"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_no_namespace", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-name-zero"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_name_zero", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-kind-unset"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_kind_unset", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-tag-with-bytes"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_tag_with_bytes", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-policy-unset"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_policy_unset", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-size-other"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_declare_size_other", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-system-outside"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_system_outside", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-system-phase-outside"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_system_phase_outside", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-system-name-outside"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_system_name_outside", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-system-many-changes"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_system_many_changes", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-system-twice"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_system_twice", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-observer-no-term"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_observer_no_term", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-observe-outside"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_observe_outside", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-observe-events-unset"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_observe_events_unset", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-term-access-unset"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_term_access_unset", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-term-access-other"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_term_access_other", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-term-oper-unset"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_term_oper_unset", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-term-slot-undeclared"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_term_slot_undeclared", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-term-write-ungranted"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_term_write_ungranted", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-change-slot-undeclared"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_change_slot_undeclared", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-change-ungranted"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_change_ungranted", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-alloc-stated-none"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_alloc_stated_none", "IN_SYSTEM=wrong_do_nothing", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-declare-late"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_declare_late", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-system-late"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_system_late", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-observe-late"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_observe_late", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-attach-undeclared"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_undeclared", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-attach-ungranted"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_ungranted", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-attach-outside"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_outside", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-detach-undeclared"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_detach_undeclared", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "wrong-attach-tag-value"
+kind = "wasm_module"
+test = true
+part = "wasm"
+folder = "wasm"
+sources = ["tests/backends/wasm/modules/wrong/*.c", "tests/backends/wasm/modules/idle.c"]
+include = ["include/lib", "include/backends/wasm", "tests/backends/wasm/modules"]
+defines = ["AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_attach_tag_value", "BRIDGE_ROWS_CHECKED"]
+
+[[artifact]]
+name = "hello"
+kind = "host_wasm"
+test = true
+part = "host"
+folder = "fixtures"
+sources = ["tests/host/modules/hello.c"]
+include = ["include/lib", "include/backends/wasm", "tests/host/modules"]
+defines = ['SAY="hello from the host"']
+manifest = ["bridge-host:hello@1.0.0", "{own}"]
+variants = [
+    { name = "plain", unstamped = true },
+    { name = "other", defines = ['SAY="hello from elsewhere"'] },
+    { name = "reacher", defines = ["REACH", 'SAY="reaches"'], manifest = ["bridge-host:reacher@1.0.0", "{own}"] },
+    { name = "debugger", defines = ['SAY="deep"', "SAY_LEVEL=BRIDGE_LOG_DEBUG"], manifest = ["bridge-host:debugger@1.0.0", "{own}"] },
+]
+
+[[artifact]]
+name = "quiet"
+kind = "host_wasm"
+test = true
+part = "host"
+folder = "fixtures"
+sources = ["tests/host/modules/hello.c"]
+include = ["include/lib", "include/backends/wasm", "tests/host/modules"]
+defines = ["ONCE", 'SAY="said once"']
+manifest = ["bridge-host:quiet@1.0.0", "{own}"]
+variants = [
+    { name = "quiet2", defines = ["ONCE", 'SAY="said once, again"'] },
+    { name = "noabi", manifest = ["bridge-host:noabi@1.0.0", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "mute", manifest = ["bridge-host:mute@1.0.0", "abi=1", "reloadable=false", "config=none"] },
+    { name = "swap", defines = ["ONCE", 'SAY="swaps"'], manifest = ["bridge-host:swap@1.0.0", "abi=1", "pinned=false", "reloadable=true", "config=none"] },
+    { name = "swap2", defines = ["ONCE", 'SAY="swapped"'], manifest = ["bridge-host:swap@1.0.0", "abi=1", "pinned=false", "reloadable=true", "config=none"] },
+    { name = "abitwo", manifest = ["bridge-host:abitwo@1.0.0", "abi=2", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "badabi", manifest = ["bridge-host:badabi@1.0.0", "abi=x", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "noconfig", manifest = ["bridge-host:noconfig@1.0.0", "abi=1", "pinned=false", "reloadable=false"] },
+    { name = "noreload", manifest = ["bridge-host:noreload@1.0.0", "abi=1", "pinned=false", "config=none"] },
+    { name = "nocolon", manifest = ["nocolon", "abi=1", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "nocat", manifest = ["has:colon", "abi=1", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "firsteq", manifest = ["x:y@1=v", "abi=1", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "bareword", manifest = ["bw:x@1", "bareword", "abi=1", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "longword", manifest = ["lw:x@1", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"] },
+    { name = "longid", manifest = ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "abi=1"] },
+    { name = "emptyabi", manifest = ["ea:x@1", "abi="] },
+    { name = "longconfig", manifest = ["lc:x@1", "abi=1", "pinned=false", "reloadable=false", "config=cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"] },
+    { name = "badflag", manifest = ["bf:x@1", "abi=1", "pinned=maybe", "reloadable=false", "config=none"] },
+    { name = "negabi", manifest = ["ng:x@1", "abi=-5", "pinned=false", "reloadable=false", "config=none"] },
+    { name = "relfirst", manifest = ["rf:x@1", "abi=1", "reloadable=false", "pinned=false", "config=none"] },
+]
+
+[[artifact]]
+name = "word"
+kind = "host_wasm"
+test = true
+part = "host"
+folder = "fixtures"
+sources = ["tests/host/modules/word.c"]
+include = ["include/lib", "include/backends/wasm", "tests/host/modules"]
+manifest = ["bridge-host:word@1.0.0", "abi=1", "pinned=false", "reloadable=false", "config=bridge-host:Word", "settings=word"]
+variants = [
+    { name = "guest", manifest = ["guest:word@1.0.0", "{own}"] },
+    { name = "owned", manifest = ["bridge-host:owned@1.0.0", "abi=1", "pinned=false", "reloadable=false", "config=bridge-host:Word", "settings=word", 'config.word="its own"'] },
+    { name = "nocomp", manifest = ["bridge-host:nocomp@1.0.0", "abi=1", "pinned=false", "reloadable=false", "config=none", "settings=word"] },
+    { name = "badset", manifest = ["bridge-host:badset@1.0.0", "abi=1", "pinned=false", "reloadable=false", "config=bridge-host:Word", "settings=word", 'config.word=[1, 2]'] },
+    { name = "multi", manifest = ["bridge-host:multi@1.0.0", "abi=1", "pinned=false", "reloadable=false", "config=bridge-host:Word", "settings=w x y z"] },
+    { name = "owns", manifest = ["bridge-host:owns@1.0.0", "abi=1", "pinned=true", "reloadable=true", "config=bridge-host:Word", "settings=own", "scratch=100", "log_level=9", "on_error=@", "spans=1\nx=2", ""] },
+]
+
+[[artifact]]
+name = "knock"
+kind = "host_native"
+test = true
+part = "host"
+folder = "fixtures"
+sources = ["tests/host/modules/knock.c"]
+include = ["include/lib", "include/backends/native", "tests/host/modules"]
+manifest = ["bridge-host:knock@1.0.0", "{own}"]
+variants = [
+    { name = "wait", defines = ["WAIT"], manifest = ["bridge-host:wait@1.0.0", "{own}"] },
+    { name = "pe", target = "x86_64-windows-gnu", manifest = ["bridge-host:pe@1.0.0", "{own}"] },
+    { name = "elf", target = "x86_64-linux-gnu", manifest = ["bridge-host:elf@1.0.0", "{own}"] },
+    { name = "macho", target = "aarch64-macos", manifest = ["bridge-host:macho@1.0.0", "{own}"] },
+]
+
+[[artifact]]
+name = "pe_farhdr"
+kind = "madebin"
+test = true
+part = "host"
+folder = "fixtures"
+sources = ["tests/host/modules/mkbin.py"]
+variants = [
+    { name = "pe_edge" },
+    { name = "pe_nosig" },
+    { name = "pe_notbridge" },
+    { name = "pe_shorttab" },
+    { name = "pe_oob" },
+    { name = "pe_bigsize" },
+    { name = "elf_farshoff" },
+    { name = "elf_badcount" },
+    { name = "elf_badstrndx" },
+    { name = "elf_nobridge" },
+    { name = "elf_oob" },
+    { name = "elf_bigsize" },
+    { name = "elf_nameoob" },
+    { name = "elf_nameedge" },
+    { name = "elf_namesoob" },
+    { name = "macho_oob" },
+    { name = "macho_bigsize" },
+    { name = "macho_notext" },
+    { name = "macho_nosec" },
+    { name = "macho_notseg" },
+    { name = "macho_secoob" },
+    { name = "macho_secedge" },
+    { name = "macho_cmd0" },
+    { name = "macho_manycmd" },
+    { name = "wasm_bigsec" },
+    { name = "wasm_badname" },
+    { name = "wasm_longleb" },
+    { name = "wasm_cutleb" },
+    { name = "wasm_emptyman" },
+    { name = "wasm_nulfirst" },
+]
