@@ -44,7 +44,7 @@ The writer builds each line in a buffer and writes it with one append, so parall
 
 On macOS a coverage build opens each library with `RTLD_NODELETE`, so a closed library stays mapped.
 Then its destructor runs at the exit of the program, with the code of the library still in place.
-`src/os/posix/library.c` adds the flag under the define `C23B_KEEP_LOADED` that the probes set on macOS.
+The host adds the flag where it opens a library, under the define `C23B_KEEP_LOADED` that the probes set on macOS.
 The probes come before the first line of the file, and `#line 1` keeps the numbers of the lines.
 A file `.c` includes no header before its own lines. Thus its own macros, such as `_POSIX_C_SOURCE`, come first.
 
