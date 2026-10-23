@@ -14,6 +14,7 @@ The cases of the options, of the report and of the files of a project run a shor
 | `listed` | An artifact with the name `{named}`. The variable `named` is `{language}`, a list in a text. |
 | `targeted` | The artifact `near-{target}.txt`, and its variant `far-{target}.txt` with the target `nowhere`. The project adds `nowhere`, whose `runs_on` is empty. |
 | `untargeted` | The same artifact and variant, but the variant has no `target`. |
+| `module` | The modules `mod`, `two` and its variant `three`, over the defaults of `[module]`, and the program `pathcheck` that reads their `*_PATH` macros. |
 
 In `built`, `greet` gets its greeting from `defines`.
 `greeter` includes `.toolchain/tests/data/build/built/include/greet.h`, links `greet`, and has `greet` beside it in its folder.
@@ -32,6 +33,7 @@ The variant `plain` is unstamped.
 | a build for debugging | With `--debug`, `package.txt` is in `{case}/out/{target}-debug`. | No `--debug`. |
 | a package in a zip | `build --pack` writes the path of the zip, and the names of the files in it. `greeter_static` has `test = true`, thus no name of the zip starts with `greeter_static/`. | No `--pack`. |
 | a build of a part skips the artifacts of other parts | `build --part main` builds the untagged `greeter`, and not `stamped.txt` of the part `extra`. | No `--part`, thus `stamped.txt` too. |
+| a module over the defaults, with a path | `build` on `module` builds `mod` from the default sources, `two` and its variant `three`, and `pathcheck` with their `*_PATH` macros. | `build` on `copy`. |
 | a variable that [variables] does not have | `--set nowhere=1` stops `build`: `--set nowhere=1: [variables] has no nowhere`. | No `--set`. |
 | a key in project.toml and in toolchain.toml | `build` on `twice` stops: `project.toml states variables.language, and toolchain.toml states it too`. | `build` on `copy`. |
 | a built-in variable in [variables] | `build` on `builtin` stops: `[variables] names a built-in variable or a key of a target: root`. | `build` on `copy`. |

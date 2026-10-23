@@ -111,10 +111,29 @@ def packed(config, values, kit):
 
 
 def artifacts(config):
+    defaults = config.get('module', {})
+    for module in config.get('modules', []):
+        base = dict(defaults, **module)
+        yield base
+        for variant in base.get('variants', []):
+            yield dict(base, **variant)
     for artifact in config.get('artifact', []):
         yield artifact
         for variant in artifact.get('variants', []):
             yield dict(artifact, **variant)
+
+
+def path_defines(config):
+    found = ['BUILT_DIR="{out}/built"', 'BUILT_SUFFIX="{library}"']
+    for artifact in artifacts(config):
+        folder = artifact.get('folder')
+        if artifact.get('kind') != 'library' or folder not in ('built', 'backends'):
+            continue
+        if folder == 'built' and not artifact.get('path'):
+            continue
+        macro = artifact['name'].removeprefix('bridge_').upper().replace('-', '_') + '_PATH'
+        found.append('%s="{out}/%s/%s{library}"' % (macro, folder, artifact['name']))
+    return found
 
 
 def archives(config, values):
@@ -184,7 +203,9 @@ def prepared(args, here=False):
     os.environ['ZIG_GLOBAL_CACHE_DIR'] = str(cache / 'global')
     os.environ['ZIG_LOCAL_CACHE_DIR'] = str(cache / 'local')
     zig = fetch.zig_found(config['zig']) or die('zig %s is neither fetched nor on the path' % config['zig']['version'])
-    return config, shared.variables(config, args, target, zig)
+    values = shared.variables(config, args, target, zig)
+    values['paths'] = path_defines(config)
+    return config, values
 
 
 def ready(args, here=False):

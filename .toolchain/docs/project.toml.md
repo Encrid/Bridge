@@ -37,6 +37,7 @@ The tools give these variables:
 | `{home}` | The name of the target of this machine. |
 | `{python}` | The Python program that runs the tool. |
 | `{zig}` | The zig program. |
+| `{paths}` | The `*_PATH` macros of the test libraries, as `.toolchain/docs/build.py.md`, *Modules*, tells. |
 
 A case has more variables: `docs/contributing/tests.md`, *Variables* gives them.
 Each key of `[targets.<target>]` is also a variable, for example `{exe}`, `{library}` and `{system}`.
@@ -215,6 +216,7 @@ An artifact is a file that the build makes, for example a program, a library or 
 | `variants` | Optional. The variants. Each variant has a `name`, and can have the other keys and `unstamped`. |
 | `test` | Optional. `true` for an artifact that only the tests use. The build makes it, and `package.txt` does not list it. Thus `pack` does not put it into the zip. |
 | `part` | Optional. The name of a part of the project. `--part <name>` acts on the part `<name>`, and repeats. A build makes the base and each named part. The base is the untagged artifacts, and a build always makes it. |
+| `path` | Optional. `true` for a test library that a case loads by a `*_PATH` macro. `.toolchain/docs/build.py.md`, *Modules*, tells it. |
 
 A variant is a copy of the artifact with a different name and some different keys.
 A variant with `unstamped = true` does not do the `section` steps.
@@ -224,6 +226,12 @@ An artifact with a `target` gets the keys of that target and the variable `{targ
 Thus a build for a different target can compile the sources, and not link them.
 If the kind has no `unlinked` steps, the tools stop.
 The command `test` stops if an artifact is not linked.
+
+## [module] and [[modules]]
+
+`[module]` holds the keys shared by the built test modules.
+`[[modules]]` lists each one. A row adds a `name`, what differs from the shared keys, and `path = true` to expose a `*_PATH` macro.
+`.toolchain/docs/build.py.md`, *Modules*, gives the rest.
 
 ## [compose]
 

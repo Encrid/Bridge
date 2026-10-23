@@ -53,6 +53,12 @@ claims = { status = 0, has = ["greet_static.a"], lacks = ["greeter_static"] }
 false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out"] }
 
 [[case]]
+name = "a module over the defaults, with a path"
+run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/module", "--out", "{case}/out"]
+claims = { status = 0, has = ["built/mod", "built/two", "built/three", "pathcheck"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/copy", "--out", "{case}/out"] }
+
+[[case]]
 name = "a variable that [variables] does not have"
 run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/copy", "--out", "{case}/out", "--set", "nowhere=1"]
 claims = { status_not = 0, has = ["--set nowhere=1: [variables] has no nowhere"] }

@@ -18,11 +18,12 @@ With `--pack`, it also puts the deliverable into a zip file.
 | `built(config, values, artifact, tree)` | Builds one artifact. It gives the name of the artifact and its files. |
 | `packaged(config, values, made)` | Writes `package.txt`. |
 | `packed(config, values, kit)` | Writes the zip of the deliverable `kit`. Then it writes the path of the zip and the names in it. |
-| `artifacts(config)` | Gives each artifact, and after it each of its variants. |
+| `artifacts(config)` | Gives each module of `[[modules]]` over the defaults of `[module]`, then each artifact of `[[artifact]]`, and after each one its variants. |
+| `path_defines(config)` | Gives the `*_PATH` macros of the test libraries, for the variable `paths`. |
 | `archives(config, values)` | Gives the path of each shipped archive, from the output folder. |
 | `prove(config, values, pick)` | Proves the package, as *The package proof* tells. It does nothing if `[package]` has no `proof`, or if `pick` leaves out the base. |
 | `composed(config, values, pick)` | Composes the deliverable of the parts of `pick`, as *The deliverable* tells. With no `pick`, it composes every part. It gives the files of the deliverable. |
-| `prepared(args, here)` | Gives the configuration and the variables, as steps 1 to 8 of *build* tell. |
+| `prepared(args, here)` | Gives the configuration and the variables, as steps 1 to 8 of *build* tell. It sets the variable `paths` with `path_defines`. |
 | `ready(args, here)` | Does the steps 1 to 10 of *build*, and gives the configuration and the variables. |
 | `made(config, values, tree, part, tests)` | Builds each artifact and writes `package.txt`: step 11 of *build*. It gives the name and the files of each artifact. With a list of parts, it builds the base and the artifacts of those parts. With `tests` false, it skips an artifact with `test = true`. |
 | `build(args, here, tests)` | Does all the steps of a build. With `here`, it stops if the target does not run here. With `tests` false, it builds no test artifact. |
@@ -85,6 +86,17 @@ Thus a build for one target can make a file for a different target, for example 
 A kind with no `unlinked` steps stops `built` if a file of `link` is not there.
 The message is `<file> is not there, and <name> is linked with it`.
 An artifact that is not linked gives no file. `built` writes `compiled, not linked: <name>: <file> is not there` for it.
+
+## Modules
+
+`[[modules]]` of `project.toml` declares the test modules of the folder `built`.
+Each module is an artifact over the defaults of `[module]`. A row states only what differs: a `name`, and `sources` or `defines` when they are not the defaults.
+A row can carry `variants`, like an artifact.
+
+`path_defines` makes the variable `paths`: a `*_PATH` macro for each test library, and `BUILT_DIR` and `BUILT_SUFFIX`.
+A built module gets a macro only with `path = true`; a backend always gets one.
+The macro is the name in upper case, without a `bridge_` prefix, with `-` as `_`, and `_PATH` at the end.
+Its value is the output path of the artifact. An artifact's `defines` splices `{paths}` to get every macro.
 
 ## Steps
 
