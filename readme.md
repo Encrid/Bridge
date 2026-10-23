@@ -12,6 +12,7 @@ The three layers are a host, Bridge and the modules. A module runs on a backend,
 `docs/extern/lib/bridge.h.md` tells how a host uses Bridge.
 `docs/extern/lib/bridge_abi.h.md` and `docs/extern/lib/bridge_schema.h.md` tell how a module is written.
 `docs/extern/lib/bridge_backend.h.md` tells how a backend is written.
+`architecture.md` diagrams the parts and their relations.
 
 ## Install
 
@@ -34,6 +35,47 @@ The three layers are a host, Bridge and the modules. A module runs on a backend,
 
 `python tools/deps.py build/<target> --check` compares the imports of the built library with `docs/extern/os/os.h.md`, *The imports*.
 `python tools/reference.py` measures the storage of Bridge beside flecs and EnTT.
+
+## Layout
+
+The tree of `src` and `include`, with the role of each folder.
+
+```text
+src/
+  lib/          Bridge library: the orchestrator a host links
+    bridge/     public API + world lifecycle (create, load, reload, run_phase, set_order)
+    storage/    ECS storage: entities; tables, sparse sets, toggles, direct-indexed, singletons
+    block/      the world's shared-memory block, budget, per-module views
+    region/     arena allocator over a reserved region
+    schedule/   system and observer scheduler: conflicts, order, dispatch
+    pool/       worker thread pool
+    module/     per-module record and lifecycle (check, start, call, discard)
+    backend/    opens a backend and resolves its 18-function vtable
+    reload/     hot-reload: re-check configs, move component rows
+    abi/        the module seam: the 8 ABI entries, relayed to a backend
+    schema/     reads and compares type descriptor text, fingerprints types
+    config/     writes a module's config settings into its settings component
+    say/        formats records and calls the host sink
+  host/         bridge-host: the reference host that runs a deployment
+    toml/       TOML parser (the deployment file and its .d/local.toml overlay)
+    config/     parsed TOML to a deployment (world, order, backends, content)
+    manifest/   reads a module's embedded .bridge manifest (elf / macho / wasm)
+    state/      builds a module's config from its manifest and the overlay
+    show/       the --show-config output
+  backends/     the backends a module runs on
+    native/     runs a module as a native shared library, in-process (trusted)
+    wasm/       runs a module as sandboxed core wasm over wasmtime
+  os/           the OS portability seam, behind one header (os.h)
+    posix/      Linux and macOS
+    windows/    Windows
+include/
+  lib/          the seams: bridge.h (host), bridge_backend.h (backend),
+                bridge_abi.h + bridge_schema.h (module)
+  os/           os.h: the portability contract
+  backends/
+    native/     the native module SDK
+    wasm/       the wasm module SDK (with acc)
+```
 
 ## The host
 
