@@ -17,7 +17,7 @@ The words of a sentence of these cases are numbers, for example `1 2 3`, thus a 
 | an item of a list | Two items of 13 words, with no `.`, give no fault. | One item of 26 words. |
 | an item on two lines | The second line of an item starts with two spaces, thus the item has 26 words: `docs/a.md:3: 26 words in a sentence, and 25 is the most`. | The second line starts with no space, thus it starts a paragraph. |
 | a paragraph of 7 sentences | `docs/a.md:3: 7 sentences in a paragraph, and 6 is the most`. | 6 sentences. |
-| a tag that is not in the list | `docs/a.md:3: the tag 'python' is not one of pseudo c toml sh text`. | The tag `sh`. |
+| a tag that is not in the list | `docs/a.md:3: the tag 'python' is not one of pseudo c toml sh text mermaid`. | The tag `sh`. |
 | a title that is not the name | `readme.md:1: the title is not # sample`. | The title is `# sample`. |
 | a readme with no description | A section follows the title: `readme.md:1: no description after the title`. | A description follows the title. |
 | a description of 120 characters | `readme.md:3: 120 characters in the description, and 119 is the most`. | 119 characters. |

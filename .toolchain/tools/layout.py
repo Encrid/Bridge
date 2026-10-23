@@ -11,7 +11,7 @@ NEEDED = (('.github/workflows/ci.yml', '.github/workflows/release.yml', '.github
           + tuple('docs/contributing/%s.md' % guide for guide in GUIDES))
 FOLDERS = ('.toolchain/tools',)
 DOCUMENT = r'docs/(?:extern|intern|tools)/.+\.md'
-ALLOWED = (DOCUMENT + r'|include/.+\.h|src/.+|tools/.+|third_party/[^/]+/(?:[^/]+\.patch|license)'
+ALLOWED = (r'architecture\.md|' + DOCUMENT + r'|include/.+\.h|src/.+|tools/.+|third_party/[^/]+/(?:[^/]+\.patch|license)'
            r'|\.toolchain/tools/[^/]+\.py|\.toolchain/toolchain\.toml|\.toolchain/header\.txt|\.toolchain/docs/[^/]+\.md'
            r'|(?:docs/extern|docs/intern|include)/\.gitkeep')
 SNAKE = re.compile(r'[a-z0-9_]+(?:\.[a-z0-9]+)*')

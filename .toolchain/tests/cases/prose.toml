@@ -59,7 +59,7 @@ false = { files = { "{case}/docs/a.md" = "# a\n\nWord 1.\nWord 2.\nWord 3.\nWord
 name = "a tag that is not in the list"
 run = ["{python}", "{root}/.toolchain/tools/prose.py", "--root", "{case}"]
 files = { "{case}/.toolchain/project.toml" = "", "{case}/docs/a.md" = "# a\n\n```python\nx\n```\n" }
-claims = { status = 1, line = ["docs/a.md:3: the tag 'python' is not one of pseudo c toml sh text"] }
+claims = { status = 1, line = ["docs/a.md:3: the tag 'python' is not one of pseudo c toml sh text mermaid"] }
 false = { files = { "{case}/docs/a.md" = "# a\n\n```sh\nx\n```\n" } }
 
 [[case]]

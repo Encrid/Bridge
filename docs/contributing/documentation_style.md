@@ -66,7 +66,7 @@ A person checks the other rules of STE, for example these rules:
 
 ## Blocks of code
 
-A block of code has a tag: `c`, `toml`, `sh`, `text` or `pseudo`.
+A block of code has a tag: `c`, `toml`, `sh`, `text`, `pseudo` or `mermaid`.
 A block with the tag `pseudo` holds pseudo code.
 
 The pseudo code is a subset of the pseudo code of Cambridge International.

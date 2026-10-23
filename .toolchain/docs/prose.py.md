@@ -49,8 +49,8 @@ The maximum of a sentence in an item of a numbered list is `step`. The maximum o
 
 A block of code starts and ends with a line that starts with three backticks.
 The text after the first three backticks is the tag of the block.
-The tag is `pseudo`, `c`, `toml`, `sh` or `text`.
-The message is `<path>:<line>: the tag '<tag>' is not one of pseudo c toml sh text`.
+The tag is `pseudo`, `c`, `toml`, `sh`, `text` or `mermaid`.
+The message is `<path>:<line>: the tag '<tag>' is not one of pseudo c toml sh text mermaid`.
 
 ## The readme
 

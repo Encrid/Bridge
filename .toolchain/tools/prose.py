@@ -5,7 +5,7 @@ import re
 
 from shared import arguments, config, ours, project_name, report
 
-TAGS = ('pseudo', 'c', 'toml', 'sh', 'text')
+TAGS = ('pseudo', 'c', 'toml', 'sh', 'text', 'mermaid')
 ORDER = {'Table of Contents': 0, 'Security': 1, 'Background': 2, 'Install': 3, 'Usage': 4, 'API': 6, 'Maintainer': 7,
          'Maintainers': 7, 'Thanks': 8, 'Credits': 8, 'Acknowledgements': 8, 'Contributing': 9, 'License': 10}
 EXTRA = 5
