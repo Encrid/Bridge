@@ -29,8 +29,7 @@ The layout allows only the paths of this table.
 | `include/**.h` | The public headers. |
 | `src/**` | The sources, the private headers and the other inputs of a build. |
 | `tools/**` | The tools of the project. |
-| `third_party/<source>/<name>.patch` | A patch of a source. |
-| `third_party/<source>/license` | The licence of a source. |
+| `third_party/**` | Any file. |
 | `.toolchain/tools/<name>.py` | Needed: one file or more. The tools of the toolchain. |
 | `.toolchain/toolchain.toml` and `.toolchain/header.txt` | The values and the legal notice of the toolchain. |
 | `.toolchain/config/<name>.toml` | A file of the configuration of the project. |
@@ -38,6 +37,7 @@ The layout allows only the paths of this table.
 | `<folder>/.gitkeep`, in `docs/extern`, `docs/intern`, `include` or `src` | An empty file that keeps an empty folder in git. |
 
 `layout.py` does not read `tests` and `.toolchain/tests`. Thus they can hold any file.
+`layout.py` makes no check on a file under `third_party`. So `third_party` holds any file, with any name.
 
 The messages are:
 

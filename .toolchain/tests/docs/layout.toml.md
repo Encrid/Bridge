@@ -23,7 +23,7 @@ The project of the case `a full project` has these files, and the document of ea
 
 | Case | Claim | False variant |
 | --- | --- | --- |
-| a full project | `layout.py` writes `no fault in 33 files`, and ends with 0. `ours` leaves out the files of `tests` and of `.toolchain/tests`. | The project also has `notes.txt`. |
+| a full project | `layout.py` writes `no fault in 34 files`, and ends with 0. `ours` leaves out the files of `tests` and of `.toolchain/tests`. | The project also has `notes.txt`. |
 | a path that the layout does not allow | `notes.txt: the layout does not allow this file`. | No `notes.txt`. |
 | a file that the layout needs | A project with no `license`: `license: the layout needs this file`. | The project has `license`. |
 | the folder that the layout needs | A project with no file in `.toolchain/tools`: `.toolchain/tools/: the layout needs this folder`. No line names `src/`. | The project has a file in `.toolchain/tools`. |
@@ -40,3 +40,4 @@ The project of the case `a full project` has these files, and the document of ea
 | a tool without its document | `tools/a.py` has no document: `tools/a.py: no document docs/tools/a.py.md`. | `docs/tools/a.py.md` is there. |
 | a document of a tool that is not there | `docs/tools/gone.py.md` has no file: `docs/tools/gone.py.md: no file has this document`. | `tools/gone.py` is there. |
 | a guide that [check] guides names | `[check] guides` names `timings.md`, so the layout allows `docs/contributing/timings.md`. The output does not name it. | `.toolchain/project.toml` is empty. |
+| third_party holds anything | A compiled file under `third_party` makes no fault. No line names `bridge-host.exe`. | The file is in `bridge`, not under `third_party`. |

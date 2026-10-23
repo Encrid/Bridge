@@ -11,7 +11,7 @@ NEEDED = (('.github/workflows/ci.yml', '.github/workflows/release.yml', '.github
           + tuple('docs/contributing/%s.md' % guide for guide in GUIDES))
 FOLDERS = ('.toolchain/tools',)
 DOCUMENT = r'docs/(?:extern|intern|tools)/.+\.md'
-ALLOWED = (r'architecture\.md|' + DOCUMENT + r'|include/.+\.h|src/.+|tools/.+|third_party/[^/]+/(?:[^/]+\.patch|license)'
+ALLOWED = (r'architecture\.md|' + DOCUMENT + r'|include/.+\.h|src/.+|tools/.+'
            r'|\.toolchain/tools/[^/]+\.py|\.toolchain/toolchain\.toml|\.toolchain/config/[^/]+\.toml'
            r'|\.toolchain/header\.txt|\.toolchain/docs/[^/]+\.md'
            r'|(?:docs/extern|docs/intern|include)/\.gitkeep')
@@ -33,6 +33,8 @@ def faults(root, paths):
               if not any(path.startswith(folder + '/') for path in paths)]
     described = {}
     for path in paths:
+        if path.startswith('third_party/'):
+            continue
         if not allowed.fullmatch(path):
             found.append('%s: the layout does not allow this file' % path)
         if MADE.fullmatch(path.rsplit('/', 1)[-1]):

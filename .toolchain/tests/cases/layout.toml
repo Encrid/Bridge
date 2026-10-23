@@ -153,3 +153,10 @@ run = ["{python}", "{root}/.toolchain/tools/layout.py", "--root", "{case}/projec
 files = { "{case}/project/.toolchain/project.toml" = "[check]\nguides = [\"timings.md\"]\n", "{case}/project/docs/contributing/timings.md" = "" }
 claims = { status = 1, lacks = ["docs/contributing/timings.md"] }
 false = { files = { "{case}/project/.toolchain/project.toml" = "" } }
+
+[[case]]
+name = "third_party holds anything"
+run = ["{python}", "{root}/.toolchain/tools/layout.py", "--root", "{case}/project"]
+files = { "{case}/project/.toolchain/project.toml" = "", "{case}/project/third_party/bridge/bridge-host.exe" = "" }
+claims = { status = 1, lacks = ["bridge-host.exe"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/layout.py", "--root", "{case}/fixed"], files = { "{case}/fixed/.toolchain/project.toml" = "", "{case}/fixed/bridge/bridge-host.exe" = "" } }
