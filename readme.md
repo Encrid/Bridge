@@ -1,10 +1,11 @@
 # Bridge
 
-An orchestrator, written in C, that runs modules over shared ECS storage.
+Bridge is a C library that loads and runs modules over shared ECS storage.
 
 ## Background
 
-Bridge is a library. A host links it, and owns `main`, the loop and each file.
+Bridge is for a program that gains its features from modules at run time, such as a moddable or hostable application or game.
+A host links Bridge and owns `main`, the loop and each file.
 A host gives `bridge_create` a deployment, and gets a world: the storage, the modules loaded onto it, and the threads that run them.
 The world stays until `bridge_destroy`. A process can have more than one world, and each world is separate.
 
