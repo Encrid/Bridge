@@ -9,7 +9,12 @@
 
 void *os_lib_open(const char *path)
 {
-    return (dlopen(path, RTLD_NOW | RTLD_LOCAL));
+    int flags = RTLD_NOW | RTLD_LOCAL;
+
+#ifdef C23B_KEEP_LOADED
+    flags |= RTLD_NODELETE;
+#endif
+    return (dlopen(path, flags));
 }
 
 void *os_lib_get_symbol(void *lib, const char *name)
@@ -19,11 +24,5 @@ void *os_lib_get_symbol(void *lib, const char *name)
 
 void os_lib_close(void *lib)
 {
-#ifdef C23B_FLUSH_BEFORE_CLOSE
-    void (*flush)(void);
-
-    *(void **)&flush = os_lib_get_symbol(lib, "c23b_flush");
-    flush();
-#endif
     dlclose(lib);
 }

@@ -39,13 +39,12 @@ A header gets the probes of each tree that includes it.
 
 Each program writes one line `<path> <bits>` for each file, to the file that the variable `C23_BRANCHES` names.
 A line has one character, `0` or `1`, for each outcome.
-On Linux and Windows a `[[gnu::destructor]]` of each file writes its line, at the exit of the program and at the close of a library.
-On macOS each file lists itself at load, and one writer for each image writes the lines of the image.
-The writer builds each line in a buffer and writes it with one append, so concurrent flushes do not interleave.
+A `[[gnu::destructor]]` of each file writes its line, at the exit of the program and at the close of a library.
+The writer builds each line in a buffer and writes it with one append, so parallel programs do not interleave.
 
-This writer runs with `atexit` at the exit of the program.
-It also runs from `os_lib_close`, which calls the writer of a library before it unmaps the library.
-A destructor of an unmapped library would run at the exit of the program and crash it, so macOS does not use one.
+On macOS a coverage build opens each library with `RTLD_NODELETE`, so a closed library stays mapped.
+Then its destructor runs at the exit of the program, with the code of the library still in place.
+`src/os/posix/library.c` adds the flag under the define `C23B_KEEP_LOADED` that the probes set on macOS.
 The probes come before the first line of the file, and `#line 1` keeps the numbers of the lines.
 A file `.c` includes no header before its own lines. Thus its own macros, such as `_POSIX_C_SOURCE`, come first.
 
@@ -97,7 +96,7 @@ The dump sets `_FORTIFY_SOURCE` to 0. Then a condition in a call that the system
 
 - A case that crashes, or that stops before its end, writes no line. Its outcomes count as not reached.
 - The measure uses only the target of this machine. The files of a different system, for example `src/posix` on Windows, are measured on a machine of that system.
-- Linux and Windows write with a `[[gnu::destructor]]` of each file. macOS writes with one `atexit` for each image. The destructor of a library that `dlclose` unmaps would run at the exit of the program with its code gone. One `atexit` for each image stays under the 32 functions that ISO C guarantees for `atexit`.
+- Every file writes with a `[[gnu::destructor]]`. A destructor of a library that `dlclose` unmaps on macOS would run at the exit of the program with its code gone. So a coverage build opens each library with `RTLD_NODELETE`, which keeps the library mapped, and the destructor runs in place.
 - A header that two artifacts compile with different macros gets the probes of both.
 
 ## Functions
