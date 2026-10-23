@@ -22,6 +22,9 @@ In `built`, `greet` gets its greeting from `defines`.
 `greeter` also compiles `.toolchain/tests/data/build/built/src/<system>/system.c`, and writes `hello from a library, on <system>`.
 The case `greeter` of `built` runs `greeter`. Its false variant runs a copy of `greeter` without the library.
 
+The proof source includes `.toolchain/tests/data/build/built/include/greet.h` and `.toolchain/tests/data/build/built/include/sub/extra.h`.
+So the proof reads a header from a sub-folder of `include`.
+
 The kind `stamped` copies `.toolchain/tests/data/build/built/src/note.txt` to a work file, renames the work file to the output, and adds the section `said`.
 Then it checks that the output contains `{said}`. The default of `said` is `written`, a word of `note.txt`.
 The section holds the items of `manifest` with commas between them: `first,second`.
@@ -32,7 +35,7 @@ The variant `plain` is unstamped.
 | a program linked with a library | `test` on `built` passes the cases `greeter` and `greeter_static`: the archive and its flag work. | `test --break`. |
 | a variant without its section | With `--set said=first,second`, `build` stops: `plain.txt does not hold 'first,second'`. | No `--set`. |
 | a build for debugging | With `--debug`, `package.txt` is in `{case}/out/{target}-debug`. | No `--debug`. |
-| a package in a zip | `build --pack` writes the path of the zip, and the names of the files in it. `greeter_static` has `test = true`, thus no name of the zip starts with `greeter_static/`. | No `--pack`. |
+| a package in a zip | `build --pack` writes the path of the zip, and the names of the files in it. The proof builds with the nested header `include/sub/extra.h`. `greeter_static` has `test = true`, thus no name of the zip starts with `greeter_static/`. | No `--pack`. |
 | a build of a part skips the artifacts of other parts | `build --part main` builds the untagged `greeter`, and not `stamped.txt` of the part `extra`. | No `--part`, thus `stamped.txt` too. |
 | a module over the defaults, with a path | `build` on `module` builds `mod` from the default sources, `two` and its variant `three`, and `pathcheck` with their `*_PATH` macros. | `build` on `copy`. |
 | the files of config merge | `build` on `config` makes `thing`, whose `[[artifact]]` is in a file of `.toolchain/config`, not `project.toml`. | `build` on `copy`. |

@@ -173,6 +173,7 @@ After a `pack`, `prove` reads it, so a project proves that its package is enough
 
 `prove` extracts the zip into `<out>/proof`, so nothing of the source tree is there.
 It builds the proof source as a program, with the headers of the package and each shipped archive, in `<out>/proof/host`.
+It puts the folder `include` and each sub-folder of `include` on the include path. So the proof finds a header in any folder of the package.
 It runs the program if the target runs here, and `shared.run` stops the tool if the program does not end with 0.
 It then writes `package proof: <project> ran`, or `package proof: <project> built` when the target does not run here.
 

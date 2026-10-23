@@ -154,8 +154,11 @@ def prove(config, values, pick):
     zipped = Path(values['build']) / ('%s-%s.zip' % (shared.project_name(config), values['target']))
     with zipfile.ZipFile(zipped) as packing:
         packing.extractall(clean)
+    included = clean / 'include'
+    includes = [included.as_posix()]
+    includes += sorted(sub.as_posix() for sub in included.rglob('*') if sub.is_dir())
     artifact = {'name': 'proof', 'kind': 'program', 'sources': [proof],
-                'include': [(clean / 'include').as_posix()],
+                'include': includes,
                 'link': [(clean / name).as_posix() for name in archives(config, values)]}
     _, made = built(config, dict(values, out=(clean / 'host').as_posix()), artifact)
     if values['target'] == shared.this_target(config['targets']):

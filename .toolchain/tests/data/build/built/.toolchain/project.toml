@@ -8,7 +8,7 @@ said = "written"
 proof = "tests/package/host.c"
 
 [compose.base]
-headers = ["include/*.h"]
+headers = ["include/**/*.h"]
 
 [kinds.stamped]
 output = "{name}.txt"

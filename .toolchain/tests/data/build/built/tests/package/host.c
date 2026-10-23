@@ -4,8 +4,9 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "greet.h"
+#include "extra.h"
 
 int main(void)
 {
-    return (greeting() == nullptr);
+    return ((greeting() == nullptr) + EXTRA_STATUS);
 }
