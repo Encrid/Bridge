@@ -5,4 +5,5 @@
 - The description is a command, with at most 20 words.
 - The message has no body, no trailer and no footer.
 
-The repository merges a pull request only by rebase. Thus each commit of a pull request must obey these rules.
+A pull request into `dev` merges by rebase. Thus each of its commits obeys these rules.
+A pull request from `dev` into `main` merges with a merge commit. The line of that commit is the title of the pull request.

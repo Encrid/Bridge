@@ -3,6 +3,13 @@
 A pull request asks to add a change to the project.
 This document tells how to write a pull request that is easy to review.
 
+## The branches
+
+Make a branch from `dev` for each change, and open the pull request into `dev`.
+GitHub deletes the branch after the merge.
+When `dev` is ready for a release, a pull request from `dev` into `main` adds it to `main`.
+`docs/contributing/commits.md` tells how each pull request merges.
+
 ## Before you open a pull request
 
 1. Make sure that `python project.py check` passes.
