@@ -8,6 +8,14 @@
 #include "bridge_inside.h"
 #include "say.h"
 
+static int take_end(bridge_world_t *w)
+{
+    bool asked = w->end_asked;
+
+    w->end_asked = false;
+    return (asked ? 2 : 0);
+}
+
 int bridge_run_phase_now(bridge_world_t *w, const char *name)
 {
     uint32_t phase;
@@ -25,7 +33,7 @@ int bridge_run_phase_now(bridge_world_t *w, const char *name)
     }
     schedule_run(w, phase);
     block_barrier(w);
-    return (0);
+    return (take_end(w));
 }
 
 int bridge_list_modules_now(bridge_world_t *w, bridge_module_info_t *out,

@@ -33,6 +33,7 @@ static void list_system(schedule_pass_t *pass, schedule_job_t *job,
     s->turn = kind | pass->ordinal;
     s->place = pass->ordinal;
     s->failed = 0;
+    s->ended = 0;
     job->list[job->count] = s;
     job->count++;
     pass->ordinal++;

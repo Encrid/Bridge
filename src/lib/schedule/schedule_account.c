@@ -72,3 +72,14 @@ void schedule_account(bridge_world_t *w)
         m = m->next;
     }
 }
+
+void schedule_note_end(bridge_world_t *w, const bridge_system_t *s)
+{
+    say_t about = { s->m, s, BRIDGE_INFO };
+
+    if (!s->ended)
+        return;
+    w->end_asked = true;
+    say_about(w, &about, "%s '%s' asks for the end of the run",
+        s->observer ? "observer" : "system", s->name);
+}
