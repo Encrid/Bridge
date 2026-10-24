@@ -25,9 +25,9 @@ The three layers are a host, Bridge and the modules. A module runs on a backend,
 | Command | Result |
 | --- | --- |
 | `python project.py fetch` | Downloads what the build needs. |
-| `python project.py build` | Builds the library, and the programs and modules of the tests. |
+| `python project.py build` | Builds the library. |
 | `python project.py pack` | Packs the library and its headers for a release. |
-| `python project.py test` | Runs the tests. |
+| `python project.py test` | Builds the library, and the programs and modules of the tests. Then runs the tests. |
 | `python project.py test --break` | Runs the tests with their claims made false. Each test must fail. |
 | `python project.py test --branches` | Runs the tests on a build with probes. Each branch of the code must run. |
 | `python project.py check` | Checks the project. |

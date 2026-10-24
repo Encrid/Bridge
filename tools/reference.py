@@ -78,9 +78,12 @@ def built(values, out):
     run([zig, 'cc', '-std=c23', *flags, source / 'floor.c', '-o', out / ('floor' + exe)])
 
 
+def tree_of(root, target):
+    return argparse.Namespace(root=Path(root).resolve(), target=target, debug=False, out=None, set=[], part=None)
+
+
 def prepared(root, target):
-    tree = argparse.Namespace(root=Path(root).resolve(), target=target, debug=False, out=None, set=[])
-    _, values = build.prepared(tree, here=True)
+    _, values = build.prepared(tree_of(root, target), here=True)
     return values, Path(values['out']) / ('storage' + values['exe'])
 
 
@@ -184,7 +187,8 @@ def paired(old, new, target):
             run(['git', '-C', tree, 'checkout', '--quiet', '--detach', commit])
         else:
             run(['git', '-C', ROOT, 'worktree', 'add', '--quiet', '--detach', tree, commit])
-        run([sys.executable, ROOT / '.toolchain' / 'tools' / 'build.py', '--root', tree])
+        run([sys.executable, ROOT / '.toolchain' / 'tools' / 'fetch.py', '--root', tree])
+        build.build(tree_of(tree, target), here=True)
         values, ours[side] = prepared(tree, target)
     out = ROOT / 'build' / 'reference'
     fetched(out)
@@ -223,7 +227,7 @@ def main():
         return
     values, ours = prepared(args.root, args.target)
     if not ours.exists():
-        sys.exit('reference.py: %s is not built: run python project.py build' % ours.as_posix())
+        sys.exit('reference.py: %s is not built: run python project.py test' % ours.as_posix())
     out = ROOT / 'build' / 'reference'
     fetched(out)
     built(values, out)
