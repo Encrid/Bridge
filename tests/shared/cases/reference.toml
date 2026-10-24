@@ -2,7 +2,7 @@
 name = "reference.py takes the target of this machine when --target is not given"
 run = ["{python}", "{root}/tools/reference.py", "--root", "{case}"]
 files = { "{case}/.toolchain/project.toml" = "[project]\nname = \"timed\"\n" }
-claims = { status = 1, line = ["reference.py: {case}/build/{target}/scratch/storage{exe} is not built: run python project.py build"] }
+claims = { status = 1, line = ["reference.py: {case}/build/{target}/scratch/storage{exe} is not built: run python project.py test"] }
 false = { run = ["{python}", "{root}/tools/reference.py", "--root", "{case}", "--target", "{triple}"] }
 
 [[case]]

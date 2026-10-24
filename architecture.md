@@ -1,18 +1,10 @@
 ```mermaid
 flowchart TB
-  subgraph hostg["host (src/host)"]
-    direction TB
-    hread["read deployment<br/>(toml, config)"]
-    hmeet["look + meet<br/>(walk content, manifest, state)"]
-    harrive["arrive: trust gate<br/>(load or ask, then ? trust)"]
-    hload["load<br/>(gates, bridge_load)"]
-    hrun["run rounds<br/>(bridge_create, run_phase)"]
-    hread --> hmeet --> harrive --> hload --> hrun
-  end
+  host["host, for example Bridge-Host<br/>reads a deployment, loads, runs rounds"]
 
-  hrun -->|"links, bridge.h"| bridge
+  host -->|"links, bridge.h"| bridge
 
-  subgraph libg["library (src/lib)"]
+  subgraph libg["library (src)"]
     bridge["bridge<br/>public API + world lifecycle"]
     subgraph dmem["storage + memory"]
       storage["storage<br/>ECS: entities; tables, sparse sets,<br/>toggles, direct-indexed, singletons"]
@@ -44,35 +36,27 @@ flowchart TB
     config --> storage
   end
 
-  osg["os (src/os)<br/>posix / windows<br/>mmap, dlopen, threads, lock, fs"]
+  osg["Bridge-OS<br/>os.a + os.h: mmap, dlopen, threads, lock, fs"]
   bridge -->|"os.h"| osg
 
   backend -->|"bridge_backend.h, 18-fn vtable"| nbk
   backend -->|"bridge_backend.h, 18-fn vtable"| wbk
 
-  subgraph bkg["backends (src/backends)"]
-    subgraph nbk["native (trusted, in-process)"]
-      nlife["module_compile = dlopen<br/>instance_create<br/>define_func x8, call"]
-    end
-    subgraph wbk["wasm (sandboxed)"]
-      wlife["compile + instantiate<br/>memory_adopt<br/>define_func x8, call"]
-      wasmtime[["wasmtime"]]
-      wlife -->|"runs on"| wasmtime
-    end
-  end
+  nbk["BB-Native<br/>native backend (trusted, in-process)"]
+  wbk["BB-Wasm<br/>wasm backend (sandboxed)"]
 
   nbk -->|"dlopen"| nmod
   wbk --> wmod
 
-  subgraph modg["modules (external; test ones in tests/lib/modules)"]
+  subgraph modg["modules (external; test ones in tests/modules)"]
     nmod["native module (.so / .dylib / .dll)<br/>exports bridge_* + init/reload/shutdown + systems<br/>.bridge manifest; shared + private memory"]
     wmod["wasm module (core wasm + acc)<br/>exports init/reload/shutdown + systems<br/>.bridge manifest; shared + private memory"]
   end
 
-  hmeet -.->|"reads .bridge manifest"| nmod
+  host -.->|"reads .bridge manifest"| nmod
   nmod -.->|"imports bridge: 8 ABI entries (bridge_abi.h + schema)"| abi
   wmod -.->|"imports bridge: 8 ABI entries (bridge_abi.h + schema)"| abi
-  nmod -.->|"compiles against"| nsdk["include/backends/native"]
-  wmod -.->|"compiles against"| wsdk["include/backends/wasm (+ acc)"]
-  say -.->|"bridge_record_t"| hrun
+  nmod -.->|"compiles against"| nsdk["the SDK of BB-Native"]
+  wmod -.->|"compiles against"| wsdk["the SDK of BB-Wasm (+ acc)"]
+  say -.->|"bridge_record_t"| host
 ```

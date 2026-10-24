@@ -1,15 +1,6 @@
 [package]
 proof = "tests/shared/package/host.c"
+link = ["{bridge_os}/os.a"]
 
 [compose.base]
-headers = ["include/lib/**/*.h", "include/os/**/*.h"]
-
-[compose.native]
-headers = ["include/backends/native/**/*.h"]
-
-[compose.wasm]
-headers = ["include/backends/wasm/**/*.h"]
-
-[compose.host]
-headers = []
-
+headers = ["include/**/*.h"]
