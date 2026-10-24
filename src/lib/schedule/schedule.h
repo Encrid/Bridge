@@ -48,6 +48,7 @@ typedef struct {
 void schedule_run(bridge_world_t *w, uint32_t phase);
 
 void schedule_account(bridge_world_t *w);
+void schedule_note_end(bridge_world_t *w, const bridge_system_t *s);
 
 bool schedule_init_matrix(schedule_matrix_t *m, uint32_t n);
 

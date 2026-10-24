@@ -19,18 +19,22 @@ static bool take_phases(host_t *h)
     return (h->phases != nullptr);
 }
 
-static bool take_counts(host_t *h)
+static bool take_run(host_t *h)
 {
     static const char *const THREADS[] = { "threads" };
     static const char *const ROUNDS[] = { "rounds" };
+    static const char *const LIVE[] = { "live" };
     const value_t *threads = config_find_key(&h->config, THREADS, 1).value;
     const value_t *rounds = config_find_key(&h->config, ROUNDS, 1).value;
+    const value_t *live = config_find_key(&h->config, LIVE, 1).value;
 
     if (threads)
         h->threads = (uint32_t)threads->whole;
     if (rounds)
         h->rounds = (int)rounds->whole;
-    return (threads && rounds);
+    if (live)
+        h->live = live->flag;
+    return (threads && rounds && live);
 }
 
 static bool take_field(host_t *h, const char *field, size_t at, bool wide)
@@ -71,7 +75,7 @@ bool config_world(host_t *h)
 {
     bool taken = take_phases(h);
 
-    taken = take_counts(h) && taken;
+    taken = take_run(h) && taken;
     taken = take_budget(h) && taken;
     take_checks(h);
     return (config_order(h) && taken);

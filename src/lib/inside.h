@@ -84,6 +84,7 @@ typedef struct {
     uint64_t turn;
     int failed;
     char why[256];
+    int ended;
     int64_t failures;
     declared_type_t **changes;
     uint32_t change_count;
@@ -244,6 +245,7 @@ struct bridge_world {
     char **phases;
     uint32_t phase_count;
     uint32_t barriers;
+    bool end_asked;
     uint32_t turns;
     uint32_t parked;
     uint32_t arena_ranges;
