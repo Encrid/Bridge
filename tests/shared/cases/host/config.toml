@@ -467,6 +467,7 @@ line = ["not loaded: config-quiet/quiet.wasm: bridge-host:quiet@1.0.0: not state
 [case.files]
 "{case}/terse-world.toml" = '''
 threads = 1
+live = false
 
 [budget]
 entities = 8192

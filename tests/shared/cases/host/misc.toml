@@ -40,6 +40,7 @@ has = [
 "{case}/sm/junk.txt" = "junk"
 "{case}/sm.toml" = '''
 threads = 1
+live = false
 phases = ["update"]
 rounds = 8
 [budget]

@@ -125,6 +125,7 @@ has = ["not stated: content.load.all"]
 [case.files]
 "{case}/nolworld.toml" = '''
 threads = 1
+live = false
 [budget]
 entities = 8192
 tables = 8

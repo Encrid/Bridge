@@ -141,3 +141,26 @@ paths = ["cq"]
 wasm = "{out}/backends/bridge_wasm"
 native = "{out}/backends/bridge_native"
 '''
+
+[[case]]
+name = "a world that states threads and rounds, and no live"
+run = ["{out}/bridge-host{exe}", "{case}/nolive.toml"]
+
+[case.claims]
+status = 1
+has = ["not stated: live"]
+
+[case.files]
+"{case}/nolive.toml" = '''
+threads = 1
+phases = ["update"]
+rounds = 4
+'''
+
+[case.false.files]
+"{case}/nolive.toml" = '''
+threads = 1
+phases = ["update"]
+rounds = 4
+live = false
+'''
