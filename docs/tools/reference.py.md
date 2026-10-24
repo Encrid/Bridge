@@ -23,7 +23,7 @@ It also gives zig, the folder of the build of the tree, and the keys `exe` and `
 
 ## The steps
 
-1. It stops if the build of the tree has no program `storage` for the target: `python project.py build` makes it.
+1. It stops if the build of the tree has no program `storage` for the target: `python project.py test` makes it.
 2. `fetched` makes sure that `build/reference` of this tree holds each pinned file.
 3. `built` compiles the 3 programs of `tests/shared/reference` of this tree, with `-O2` and `-DNDEBUG`.
 4. Each run writes `==== run <number>`. Then it writes the output of each of the 6 commands of the table, in order.
@@ -119,12 +119,13 @@ changed.
 
 1. It prunes the worktrees of the repository, then makes `build/timing/old` and `build/timing/new`.
 2. It checks out each commit in its worktree, with no branch.
-3. It builds each tree with `.toolchain/tools/build.py --root` of this tree, so with the same zig.
-4. It builds the 3 programs of `tests/shared/reference` of this tree one time.
-5. It makes one run of each tree that it does not count. A scan of the new files can end during it.
-6. It makes 12 runs: old, new, old, new, old, new, then new, old, new, old, new, old.
-7. The first 6 runs are the first pair, and the last 6 are the second pair.
-8. It writes the 4 files of runs and the report into `build/timing/runs/<old>-<new>`, and writes the report.
+3. It fetches the sources of each tree with `.toolchain/tools/fetch.py --root` of this tree.
+4. It builds each tree with `build.build` of this tree, so with the same zig. The build also makes the test artifacts.
+5. It builds the 3 programs of `tests/shared/reference` of this tree one time.
+6. It makes one run of each tree that it does not count. A scan of the new files can end during it.
+7. It makes 12 runs: old, new, old, new, old, new, then new, old, new, old, new, old.
+8. The first 6 runs are the first pair, and the last 6 are the second pair.
+9. It writes the 4 files of runs and the report into `build/timing/runs/<old>-<new>`, and writes the report.
 
 The 2 worktrees have paths of the same length, since the length of a path can move code and data.
 The output of the builds stays out of the report. A failed command stops the tool with its output.
@@ -133,7 +134,7 @@ The output of the builds stays out of the report. A failed command stops the too
 
 | Message | When |
 | --- | --- |
-| `reference.py: <path> is not built: run python project.py build` | The build of the tree has no program `storage` for the target. |
+| `reference.py: <path> is not built: run python project.py test` | The build of the tree has no program `storage` for the target. |
 | `reference.py: <address> did not download: <reason>` | A download failed. The status is 1. |
 | `reference.py: <file> is not the pinned file: its sha256 is <digest>` | A download is not the pinned file. The status is 1. |
 | `reference.py: failed: <command>` | A command ended with a status that is not 0. Its output follows. |
@@ -157,6 +158,8 @@ No case runs these branches. The step of `docs/contributing/timings.md` runs the
 | `downloaded(url, path, digest)` | Downloads a file into `path`, as the section *The downloads* tells. |
 | `fetched(out)` | Makes sure that `out` holds each pinned file, as the section *The downloads* tells. |
 | `built(values, out)` | Compiles `flecs_ref`, `entt_ref` and `floor` into `out`, with the variables of `build.prepared`. |
+| `tree_of(root, target)` | Gives the options of a build of the tree `root` for `target`. |
+| `prepared(root, target)` | Gives the variables of the build of the tree, and the path of its program `storage`. |
 | `measured(number, ours, out, exe)` | Gives the text of one run, with its lines `====`. |
 | `timed(row)` | Gives the text of a row, and the place and the value of each of its times. |
 | `runs(path)` | Gives the times of each run of a file, by key, as the section *The comparison* tells. |
