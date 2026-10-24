@@ -3,3 +3,9 @@ name = "the os layer reserves, commits, and waits with a timeout"
 run = ["{out}/os{exe}"]
 claims = { matches = ["os ok"] }
 false = { run = ["{out}/seam{exe}", "bridge_load-loaded"] }
+
+[[case]]
+name = "the clock of the os layer moves in steps below a microsecond"
+run = ["{out}/clock{exe}", "1000"]
+claims = { line = ["step below 1000 ns"] }
+false = { run = ["{out}/clock{exe}", "1"] }
