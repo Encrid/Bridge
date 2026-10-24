@@ -3,9 +3,11 @@ name = "built"
 
 [variables]
 said = "written"
+outside = "{root}/tests/package/outside.c"
 
 [package]
 proof = "tests/package/host.c"
+link = ["{outside}"]
 
 [compose.base]
 headers = ["include/**/*.h"]

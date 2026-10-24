@@ -23,6 +23,12 @@ claims = { status = 0, line = ["{case}/out/built-{target}.zip", "greet{library}"
 false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out"] }
 
 [[case]]
+name = "the proof links the files of [package] link"
+run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out", "--pack"]
+claims = { status = 0, line = ["package proof: built ran"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out", "--pack", "--set", "outside={case}/none.c"] }
+
+[[case]]
 name = "a pack of a part without the base skips the proof"
 run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/built", "--out", "{case}/out", "--pack", "--part", "extra"]
 claims = { status = 0, has = ["stamped.txt", "{case}/out/built-{target}.zip"], lacks = ["package proof"] }
@@ -111,6 +117,12 @@ name = "a variable that has no value"
 run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/unknown", "--out", "{case}/out"]
 claims = { status_not = 0, has = ["no variable "] }
 false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/unknown", "--out", "{case}/out", "--set", "named=named.txt"] }
+
+[[case]]
+name = "a list variable as the sources"
+run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/spliced", "--out", "{case}/out"]
+claims = { status = 0, line = ["spliced.txt"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/spliced", "--out", "{case}/out", "--set", "inputs=none.txt"] }
 
 [[case]]
 name = "a list variable in a text"
