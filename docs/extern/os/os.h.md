@@ -194,7 +194,7 @@ Each function that can fail is `[[nodiscard]]`: the caller must use its result.
 | `os_thread_start` | Starts a thread that runs `fn(arg)`. Gives `nullptr` on failure. |
 | `os_thread_join` | Waits for a thread to end, and frees what `os_thread_start` gave. |
 | `os_get_thread_id` | Gives a number for the calling thread that no other live thread has. It is never 0. |
-| `os_get_now` | Gives nanoseconds from a clock that only rises. |
+| `os_get_now` | Gives nanoseconds from a clock that only rises. On each target, its step is below a microsecond. |
 | `os_mutex_create` | Makes a mutex. Gives `nullptr` on failure. |
 | `os_mutex_free` | Frees a mutex that no thread holds. A null `m` does nothing. |
 | `os_mutex_lock` | Takes a mutex, and waits while another thread holds it. |

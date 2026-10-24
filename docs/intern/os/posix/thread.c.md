@@ -7,6 +7,11 @@ Each function keeps the contract of `docs/extern/os/os.h.md`, *Functions*.
 
 `os_thread_start` checks the result of `pthread_create`. If that call fails, it frees the record and gives `nullptr`.
 
+## The clock
+
+`os_get_now` reads `CLOCK_MONOTONIC_RAW`. On macOS, `CLOCK_MONOTONIC` moves in whole microseconds, so a shorter span reads as 0 or as 1000 ns.
+The raw clock moves in the ticks of the machine on macOS, and in nanoseconds on Linux.
+
 ## Functions
 
 | Function | Result |
@@ -15,4 +20,4 @@ Each function keeps the contract of `docs/extern/os/os.h.md`, *Functions*.
 | `os_thread_start` | Allocates the record of the thread with `malloc`, keeps `fn` and `arg` in it, and starts the thread with the default attributes. Gives `nullptr` if there is no memory. |
 | `os_thread_join` | Waits for the thread with `pthread_join`, and frees its record. |
 | `os_get_thread_id` | Gives the `pthread_t` of the calling thread as a number, which is never 0 for a thread that runs. |
-| `os_get_now` | Gives the nanoseconds of `CLOCK_MONOTONIC`: its seconds times `OS_SECOND`, plus its nanoseconds. |
+| `os_get_now` | Gives the nanoseconds of `CLOCK_MONOTONIC_RAW`: its seconds times `OS_SECOND`, plus its nanoseconds. |
