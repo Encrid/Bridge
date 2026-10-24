@@ -1,7 +1,7 @@
 [targets.x86_64-windows-gnu]
 system_defines = []
 system_libraries = []
-host_resources = ["tests/lib/seam/seam.rc"]
+host_resources = ["tests/seam/seam.rc"]
 bridge_os_sha256 = "fccad6196552cfa144e591f9bfdb95a7cd48f97540736b4415707b08063f01b7"
 
 [targets.x86_64-linux-gnu]
@@ -31,6 +31,6 @@ bridge_os_sha256 = "599de5467c100451d3284a755c916699c027a2f05977a4847569a875c612
 [targets.aarch64-windows-gnu]
 system_defines = []
 system_libraries = []
-host_resources = ["tests/lib/seam/seam.rc"]
+host_resources = ["tests/seam/seam.rc"]
 bridge_os_sha256 = "5df73ef0903748802bb5fddc34a20aae97ec5d97d18a8ead3f8f55c2383e0f85"
 

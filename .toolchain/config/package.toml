@@ -3,4 +3,4 @@ proof = "tests/shared/package/host.c"
 link = ["{bridge_os}/os.a"]
 
 [compose.base]
-headers = ["include/lib/**/*.h"]
+headers = ["include/**/*.h"]

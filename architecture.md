@@ -4,7 +4,7 @@ flowchart TB
 
   host -->|"links, bridge.h"| bridge
 
-  subgraph libg["library (src/lib)"]
+  subgraph libg["library (src)"]
     bridge["bridge<br/>public API + world lifecycle"]
     subgraph dmem["storage + memory"]
       storage["storage<br/>ECS: entities; tables, sparse sets,<br/>toggles, direct-indexed, singletons"]
@@ -48,7 +48,7 @@ flowchart TB
   nbk -->|"dlopen"| nmod
   wbk --> wmod
 
-  subgraph modg["modules (external; test ones in tests/lib/modules)"]
+  subgraph modg["modules (external; test ones in tests/modules)"]
     nmod["native module (.so / .dylib / .dll)<br/>exports bridge_* + init/reload/shutdown + systems<br/>.bridge manifest; shared + private memory"]
     wmod["wasm module (core wasm + acc)<br/>exports init/reload/shutdown + systems<br/>.bridge manifest; shared + private memory"]
   end

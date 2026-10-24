@@ -1,7 +1,7 @@
 # tools/deps.py
 
 `deps.py` gives the functions that the built library imports from the system.
-With `--check`, it compares them with the list of `docs/extern/lib/bridge.h.md`, *The imports*.
+With `--check`, it compares them with the list of `docs/extern/bridge.h.md`, *The imports*.
 
 ```sh
 python tools/deps.py <folder> [--check]
@@ -32,7 +32,7 @@ The lines come in the order of the libraries, then of the functions.
 
 ## With --check
 
-1. `listed` reads the block `text` of `docs/extern/lib/bridge.h.md`, *The imports*.
+1. `listed` reads the block `text` of `docs/extern/bridge.h.md`, *The imports*.
 2. It keeps each row whose first word is a word of the system of the library, as `SYSTEMS` gives them.
 3. The words are `windows` and `every`; `linux`, `posix` and `every`; or `macos`, `posix` and `every`.
 4. The name of the system and of the processor also counts, for example `windows_aarch64`.
@@ -54,8 +54,8 @@ A folder whose name ends with `-debug` holds a debug build. `deps.py --check` do
 | `deps.py: name the folder of a build` | No argument names a folder. The status is 1. |
 | `deps.py: no library bridge in <folder>` | The folder holds no library. The status is 1. |
 | `deps.py: <file> is for a processor that PROCESSORS does not map: 0x<number>` | The header names a different processor. The status is 1. |
-| `deps.py: docs/extern/lib/bridge.h.md is not there` | `--check` found no file of the list. The status is 1. |
-| `deps.py: docs/extern/lib/bridge.h.md has no block of text under ## The imports` | The file has no list. The status is 1. |
+| `deps.py: docs/extern/bridge.h.md is not there` | `--check` found no file of the list. The status is 1. |
+| `deps.py: docs/extern/bridge.h.md has no block of text under ## The imports` | The file has no list. The status is 1. |
 | `a debug build is not what ships: its imports are not held to the list` | `--check` was given a debug build. The status is 0. |
 
 ## Limits
