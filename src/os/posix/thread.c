@@ -45,6 +45,6 @@ uint64_t os_get_now(void)
 {
     struct timespec t;
 
-    clock_gettime(CLOCK_MONOTONIC, &t);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &t);
     return ((uint64_t)t.tv_sec * OS_SECOND + (uint64_t)t.tv_nsec);
 }
