@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-LIST = ROOT / 'docs' / 'extern' / 'os' / 'os.h.md'
+LIST = ROOT / 'docs' / 'extern' / 'lib' / 'bridge.h.md'
 SYSTEMS = {'windows': ('windows', 'every'), 'linux': ('linux', 'posix', 'every'),
            'macos': ('macos', 'posix', 'every')}
 PROCESSORS = {0x8664: 'x86_64', 0xaa64: 'aarch64', 62: 'x86_64', 183: 'aarch64',

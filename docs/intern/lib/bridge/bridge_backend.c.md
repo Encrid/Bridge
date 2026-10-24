@@ -7,7 +7,7 @@ This file opens the library of one backend of a deployment, and then starts that
 A backend has a name and a library, and no two backends have the same name.
 Bridge opens the library by the path that the deployment states, with `backend_open` of `src/lib/backend/backend.c`.
 A library named by a path is looked for at that path, and what it needs is looked for beside it.
-A bare name is left to the search of the operating system: `src/os/windows/library.c` and `src/os/posix/library.c`.
+A bare name is left to the search of the operating system, through `os_lib_open` of Bridge-OS.
 The world counts the backend as soon as it has its name, so that a world that is refused frees it.
 Then `backend_create` starts the backend with its settings.
 

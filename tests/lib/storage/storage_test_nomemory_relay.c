@@ -6,21 +6,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "os.h"
 #include "storage_test.h"
 
 #ifdef COUNTED
-
-void *counted_os_reserve(size_t reserve, size_t commit)
-{
-    storage_test_allocator_t *allocator = storage_test_get_allocator();
-
-    allocator->asked++;
-    if (allocator->asked != allocator->fail_at)
-        return (os_reserve(reserve, commit));
-    allocator->failed = true;
-    return (nullptr);
-}
 
 static bool relay_one(storage_test_t *t, size_t k)
 {

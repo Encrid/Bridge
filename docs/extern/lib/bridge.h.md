@@ -7,6 +7,10 @@ It gives the seven functions of the library, and the structs that a host gives t
 
 A host links the built library: the shared library or the static library.
 The shared library exports only the seven functions of this header, and `BRIDGE_API` marks each of them.
+
+The shared library holds the os layer of Bridge-OS.
+A program that links the static library `bridge.a` also links `os.a`, from the release of Bridge-OS for its target.
+
 Only the build of the library defines `BRIDGE_BUILDING`. A host does not define it.
 What a host compiles with this header is a work based on Bridge: `readme.md`, *License*.
 
@@ -23,6 +27,137 @@ A record would call the sink on that thread, during the call that runs.
 The refused call gives 1, and `bridge_list_modules`, `bridge_profile`, `bridge_usage` and `bridge_module_usage` give -1.
 Only a call from the sink comes during another call on its thread: *bridge_sink_fn_t*.
 A call that overlaps `bridge_destroy`, or comes after it, is not defined, since the world is gone.
+
+## The imports
+
+The library imports only these functions from the system.
+The first word is where the import is: `every` system, `posix` (Linux and macOS), one system, or one system and one processor, for example `macos_x86_64`.
+`tools/deps.py --check` compares this list with the imports of the built library.
+
+```text
+every            malloc
+every            calloc
+every            realloc
+every            free
+every            strcmp
+every            strncmp
+every            strchr
+every            strpbrk
+every            memchr
+every            strtoll
+every            strtoull
+posix            strlen
+posix            memcpy
+posix            memmove
+posix            snprintf
+posix            vsnprintf
+linux            memset
+linux            bcmp
+macos            memcmp
+macos_aarch64    bzero
+macos_x86_64     __bzero
+macos            __memcpy_chk
+linux            __errno_location
+macos            __error
+windows          _errno
+windows          __stdio_common_vsprintf
+windows          VirtualAlloc
+windows          VirtualFree
+windows          LoadLibraryW
+windows          LoadLibraryExW
+windows          GetFullPathNameW
+windows          MultiByteToWideChar
+windows          wcschr
+windows          GetProcAddress
+windows          FreeLibrary
+windows          CreateThread
+windows          WaitForSingleObject
+windows          CloseHandle
+windows          GetCurrentThreadId
+windows          QueryPerformanceCounter
+windows          QueryPerformanceFrequency
+windows          InitializeCriticalSection
+windows          EnterCriticalSection
+windows          LeaveCriticalSection
+windows          DeleteCriticalSection
+windows          CreateEventA
+windows          SetEvent
+posix            mmap
+posix            mprotect
+posix            munmap
+posix            dlopen
+posix            dlsym
+posix            dlclose
+posix            pthread_create
+posix            pthread_join
+posix            pthread_self
+posix            clock_gettime
+posix            pthread_mutex_init
+posix            pthread_mutex_lock
+posix            pthread_mutex_unlock
+posix            pthread_mutex_destroy
+posix            pthread_cond_init
+posix            pthread_cond_signal
+posix            pthread_cond_wait
+posix            pthread_cond_timedwait
+posix            pthread_cond_destroy
+windows          _initterm
+windows          _initterm_e
+windows          _initialize_onexit_table
+windows          _register_onexit_function
+windows          _execute_onexit_table
+windows          _exit
+windows          abort
+windows          __acrt_iob_func
+windows          __stdio_common_vfprintf
+windows          fwrite
+windows          VirtualProtect
+windows          VirtualQuery
+windows          GetLastError
+windows          TlsGetValue
+windows          Sleep
+windows_aarch64  _fpreset
+macos            dyld_stub_binder
+```
+
+## Why the library imports them
+
+The list holds the imports of the optimized build, which is the build that ships.
+A function of the runtime of the compiler is linked into the library, and is not an import.
+`tools/deps.py --check` refuses an import that is not in the list, and a listed import that nothing imports.
+It does not check a debug build: zig links its checks and its stack traces into that build, and they import more functions.
+
+The C library is the one of the system, which the executable of the host chose.
+On Windows, the build links the C runtime that zig carries.
+Nothing of ours calls the imports of the startup code.
+zig links its startup code into each shared library that it makes, and on Windows that code imports them.
+They are in the list because they are imports all the same: a new one is a dependency that changed.
+
+| Imports | Why |
+| --- | --- |
+| `malloc`, `calloc`, `realloc`, `free` | The library allocates records, their tables and copies of names outside a phase. It allocates nothing in a phase. |
+| `strcmp`, `strncmp`, `strchr`, `strpbrk`, `memchr` | The library compares names of modules, phases, components and settings, and a name up to its namespace. `strchr` finds where a namespace or a version ends. `strpbrk` finds an `@` or a `:` in the name of a system. `memchr` finds a zero byte in a name. |
+| `strtoll`, `strtoull` | The schema reads the constants of a descriptor with them. |
+| `__errno_location`, `__error`, `_errno` | They give `errno` on Linux, macOS and Windows. `strtoll` and `strtoull` set it. |
+| `strlen`, `memcpy`, `memmove` | The library measures names, copies values and names, and closes up a run of a table. The compiler makes them inline on Windows. |
+| `snprintf`, `vsnprintf`, `__stdio_common_vsprintf` | The library writes the text of a record. On Windows, the C runtime gives both functions as `__stdio_common_vsprintf`. |
+| `memset` | The library makes a block zero on Linux. The compiler makes it inline on macOS and Windows. |
+| `bcmp`, `memcmp` | The compiler makes them of a compare of bytes for equality: `bcmp` on Linux, and `memcmp` on macOS. |
+| `bzero`, `__bzero` | The compiler makes them of a block made zero on macOS: `bzero` on aarch64, and `__bzero` on x86_64. |
+| `__memcpy_chk` | The headers of macOS make it of `memcpy`. |
+| `VirtualAlloc`, `VirtualFree`, `mmap`, `mprotect`, `munmap` | The os layer reserves, commits and releases memory. |
+| `LoadLibraryW`, `LoadLibraryExW`, `GetFullPathNameW`, `MultiByteToWideChar`, `wcschr`, `GetProcAddress`, `FreeLibrary`, `dlopen`, `dlsym`, `dlclose` | The os layer opens the library of a backend or of a native module, finds a symbol in it, and closes it. On Windows it makes the path a wide string and finds a folder in it. |
+| `CreateThread`, `WaitForSingleObject`, `CloseHandle`, `pthread_create`, `pthread_join` | The os layer starts and joins a worker thread. On Windows, `WaitForSingleObject` also waits for an event, and `CloseHandle` also closes one. |
+| `GetCurrentThreadId`, `pthread_self` | The os layer gives the thread that runs, for a pinned module. |
+| `QueryPerformanceCounter`, `QueryPerformanceFrequency`, `clock_gettime` | The os layer reads the clock that keeps a deadline, and its unit. |
+| `InitializeCriticalSection`, `EnterCriticalSection`, `LeaveCriticalSection`, `DeleteCriticalSection`, `pthread_mutex_init`, `pthread_mutex_lock`, `pthread_mutex_unlock`, `pthread_mutex_destroy` | The os layer makes, locks, unlocks and frees a mutex. |
+| `CreateEventA`, `SetEvent`, `pthread_cond_init`, `pthread_cond_signal`, `pthread_cond_wait`, `pthread_cond_timedwait`, `pthread_cond_destroy` | The os layer makes, sets, waits for and frees an event. `pthread_cond_timedwait` waits until a deadline. |
+| `_initterm`, `_initterm_e`, `_initialize_onexit_table`, `_register_onexit_function`, `_execute_onexit_table` | The startup code runs the initializers of the library, and keeps the table of what runs at exit. |
+| `_exit`, `abort`, `__acrt_iob_func`, `__stdio_common_vfprintf`, `fwrite` | The startup code ends the process if the start fails, and writes what went wrong. |
+| `VirtualProtect`, `VirtualQuery`, `GetLastError` | The startup code applies the relocations of the library. |
+| `TlsGetValue`, `Sleep` | The startup code reads its thread-local storage, and waits for its start. |
+| `_fpreset` | The startup code sets the floating-point state on Windows for arm64. |
+| `dyld_stub_binder` | The loader of macOS binds an import with it at the first call. |
 
 ## The layouts
 
@@ -89,10 +224,10 @@ A backend runs a module either as trusted code or as code that it does not trust
 
 An untrusting backend confines a module to the cells and the arena that it declared, and traps it if it reaches further.
 So the module cannot read or write the memory of the world or of another module.
-The `wasm` backend is one: `docs/extern/lib/bridge_backend.h.md`, *The wasm backend*.
+The wasm backend of BB-Wasm is one.
 
 A trusting backend runs a module with the access of the host, for the speed of the hardware.
-The native backend trusts its modules: `docs/extern/lib/bridge_backend.h.md`, *The native backend*.
+The native backend of BB-Native trusts its modules.
 
 The confinement bounds what a module reaches, not what it does within its reach.
 Bridge does not enforce the grants or the rules there: `docs/extern/lib/bridge_abi.h.md`, *Rules*.

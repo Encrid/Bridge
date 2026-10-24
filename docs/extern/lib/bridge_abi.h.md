@@ -52,7 +52,7 @@ The value is far from the usual codes of a failure, thus a module that fails doe
 A status of `BRIDGE_END` is no failure. Bridge writes no record of a failure, and the failure budget counts a run that succeeded.
 Bridge writes a record at the level `BRIDGE_INFO` that names the system: `docs/extern/lib/bridge.h.md`, *A phase*.
 `bridge_run_phase` then tells the host: `docs/extern/lib/bridge.h.md`, *bridge_run_phase*.
-The host decides what the end of the run is. `bridge-host` ends the run after the round: `readme.md`, *The host*.
+The host decides what the end of the run is.
 
 `init`, `reload` and `shutdown` do not ask for the end. From them, `BRIDGE_END` is a failure, as each other status that is not 0.
 
