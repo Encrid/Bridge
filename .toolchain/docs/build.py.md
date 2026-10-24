@@ -69,7 +69,7 @@ With `--pack`, it writes the zip with `packed`, and proves the package with `pro
 `built` does these steps for an artifact. `planned` does the steps 1 to 4:
 
 1. If the artifact gives a `target`, it uses the keys of that target and its name as `{target}`.
-2. It replaces the variables of the name, and finds the sources.
+2. It replaces the variables of the name, and finds the sources. In `sources`, an item that is only a list variable gives the patterns of that list.
 3. It stops if no file matches the sources: `no file matches the sources of <name>`.
 4. It sets `{output}`, `{work}`, `{sources}`, `{defines}`, `{include}`, `{flags}`, `{link}` and `{manifest}`.
 5. It makes the folder of the output, and the folder `obj`.
@@ -178,6 +178,9 @@ It runs the program if the target runs here, and `shared.run` stops the tool if 
 It then writes `package proof: <project> ran`, or `package proof: <project> built` when the target does not run here.
 
 `archives` gives the shipped archives that the proof links.
+`[package] link` names more files that the proof links, after the shipped archives.
+Such a file is not in the package, for example an archive of a different project that `[[source]]` fetches.
+`prove` expands each name with the variables of the build, before it gives the proof its own `out`.
 
 ## Limits
 

@@ -1,0 +1,10 @@
+[project]
+name = "spliced"
+
+[variables]
+inputs = [".toolchain/project.toml"]
+
+[[artifact]]
+name = "spliced.txt"
+kind = "file"
+sources = ["{inputs}"]

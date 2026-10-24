@@ -59,7 +59,7 @@ def planned(config, values, artifact, tree=None):
         mine.update(config['targets'][artifact['target']], target=artifact['target'])
     name = expand(artifact['name'], mine)
     mine['name'] = name
-    sources = files(Path(values['root']), [expand(pattern, mine) for pattern in artifact['sources']])
+    sources = files(Path(values['root']), expanded(artifact['sources'], mine))
     if not sources:
         die('no file matches the sources of %s' % name)
     output = Path(values['out']) / artifact.get('folder', '') / expand(kind['output'], mine)
@@ -159,7 +159,8 @@ def prove(config, values, pick):
     includes += sorted(sub.as_posix() for sub in included.rglob('*') if sub.is_dir())
     artifact = {'name': 'proof', 'kind': 'program', 'sources': [proof],
                 'include': includes,
-                'link': [(clean / name).as_posix() for name in archives(config, values)]}
+                'link': [(clean / name).as_posix() for name in archives(config, values)]
+                + expanded(config['package'].get('link', []), values)}
     _, made = built(config, dict(values, out=(clean / 'host').as_posix()), artifact)
     if values['target'] == shared.this_target(config['targets']):
         run([made[0].as_posix()], values['root'])
