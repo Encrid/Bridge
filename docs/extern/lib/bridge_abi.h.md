@@ -27,7 +27,8 @@ The number changes as `BRIDGE_HOST_ABI` does: `docs/extern/lib/bridge.h.md`, *BR
 ## The exports
 
 A module is code that Bridge runs through a backend. How to write a module for a backend is the business of that backend.
-A module exports these functions. Each one takes nothing and gives an `int32_t` status: 0 is a success, and each other value is a failure.
+A module exports these functions. Each one takes nothing and gives an `int32_t` status. 0 is a success.
+Each other value is a failure, except `BRIDGE_END` from a system or an observer: *BRIDGE_END*.
 
 | Export | When Bridge calls it |
 | --- | --- |
@@ -38,10 +39,22 @@ A module exports these functions. Each one takes nothing and gives an `int32_t` 
 | An observer | At a barrier, if an entity triggered it. |
 
 Each module exports `init`, `shutdown` and `reload`. A load fails if one of them is missing.
-A status that is not 0 and a call that did not return are the same failure.
+A status of a failure and a call that did not return are the same failure.
 
 No export runs for each frame. A thing to do in each frame is a system.
 A module does not call another module. It writes data, and the module that subscribes to that data acts.
+
+## BRIDGE_END
+
+`BRIDGE_END` is the status of a system or an observer that asks for the end of the run. Its value is `INT32_MAX`.
+The value is far from the usual codes of a failure, thus a module that fails does not end a run by chance.
+
+A status of `BRIDGE_END` is no failure. Bridge writes no record of a failure, and the failure budget counts a run that succeeded.
+Bridge writes a record at the level `BRIDGE_INFO` that names the system: `docs/extern/lib/bridge.h.md`, *A phase*.
+`bridge_run_phase` then tells the host: `docs/extern/lib/bridge.h.md`, *bridge_run_phase*.
+The host decides what the end of the run is. `bridge-host` ends the run after the round: `readme.md`, *The host*.
+
+`init`, `reload` and `shutdown` do not ask for the end. From them, `BRIDGE_END` is a failure, as each other status that is not 0.
 
 ## The memories
 
