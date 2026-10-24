@@ -142,6 +142,7 @@ One phase that `schedule_run` runs.
 | `schedule_room` | Makes the room of the schedule: `docs/intern/lib/schedule/schedule_account.c.md`, *Functions*. |
 | `schedule_run` | Runs one phase: `docs/intern/lib/schedule/schedule_run.c.md`, *Functions*. |
 | `schedule_account` | Settles the failure budgets: `docs/intern/lib/schedule/schedule_account.c.md`, *Functions*. |
+| `schedule_note_end` | Notes a system that gave `BRIDGE_END`: `docs/intern/lib/schedule/schedule_account.c.md`, *Functions*. |
 | `schedule_init_matrix` | Makes an empty matrix: `docs/intern/lib/schedule/schedule_matrix.c.md`, *Functions*. |
 | `schedule_reaches` | Tells whether `i` runs before `j`: `docs/intern/lib/schedule/schedule_matrix.c.md`, *Functions*. |
 | `schedule_add_edge` | Adds an edge: `docs/intern/lib/schedule/schedule_matrix.c.md`, *Functions*. |
