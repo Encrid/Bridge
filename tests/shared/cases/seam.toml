@@ -2605,6 +2605,30 @@ claims = { matches = ["an error.*a warning.*some information.*a detail.*alive"] 
 false = { run = ["{out}/seam{exe}", "bridge_list_modules-fills-no-more-than-asked"] }
 
 [[case]]
+name = "BRIDGE_END-a-system-asks-for-the-end-of-the-run"
+run = ["{out}/seam{exe}", "BRIDGE_END-a-system-asks-for-the-end-of-the-run"]
+claims = { matches = ["record\\[6\\] test:ender@0.1.0/stop: system 'stop' asks for the end of the run 0 0.*update asks for the end.*update asks for the end.*update asks for the end.*test:ender@0.1.0=RUNNING.*alive"], lacks = ["failed", "present asks for the end"] }
+false = { run = ["{out}/seam{exe}", "module_config.max_system_failures-reached-stops-the-module"] }
+
+[[case]]
+name = "BRIDGE_END-from-init-is-a-failure"
+run = ["{out}/seam{exe}", "BRIDGE_END-from-init-is-a-failure"]
+claims = { matches = ["its init answered 2147483647.*test:ender@0.1.0: not loaded.*alive"], lacks = ["asks for the end"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_END-a-system-asks-for-the-end-of-the-run"] }
+
+[[case]]
+name = "BRIDGE_END-an-observer-asks-for-the-end-of-the-run"
+run = ["{out}/seam{exe}", "BRIDGE_END-an-observer-asks-for-the-end-of-the-run"]
+claims = { matches = ["observer 'stop' asks for the end of the run.*update asks for the end.*view:ender@0.1.0=RUNNING.*alive"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_END-a-system-asks-for-the-end-of-the-run"] }
+
+[[case]]
+name = "BRIDGE_END-at-a-reload-the-next-phase-gives-it"
+run = ["{out}/seam{exe}", "BRIDGE_END-at-a-reload-the-next-phase-gives-it"]
+claims = { matches = ["observer 'stop' asks for the end of the run.*game:marker@0.2.0: reloaded.*update asks for the end.*alive"], lacks = ["present asks for the end"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_END-an-observer-asks-for-the-end-of-the-run"] }
+
+[[case]]
 name = "BRIDGE_LOG_ERR-written-as-severity-3"
 run = ["{out}/seam{exe}", "BRIDGE_LOG_ERR-written-as-severity-3"]
 claims = { matches = ["record.3.: an error.*alive"] }

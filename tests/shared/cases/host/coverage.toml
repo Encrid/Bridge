@@ -108,6 +108,7 @@ run = ["{out}/bridge-host{exe}", "{case}/lcl.toml"]
 status = 1
 has = [
     "rounds: fixed when the world is made: not in the local file",
+    "live: fixed when the world is made: not in the local file",
     "budget.entities: fixed when the world is made: not in the local file",
     "backend.wasm: fixed when the world is made: not in the local file",
     "checks.profile: fixed when the world is made: not in the local file",
@@ -119,6 +120,7 @@ rounds = 1
 '''
 "{case}/lcl.toml.d/local.toml" = '''
 rounds = 1
+live = true
 [budget]
 entities = 1
 [backend]
@@ -175,7 +177,7 @@ paths = ["cq"]
 '''
 
 [[case]]
-name = "a world that states no phases, threads, or one budget, and backends with no arrive"
+name = "a world that states no phases, threads, live, or one budget, and backends with no arrive"
 run = ["{out}/bridge-host{exe}", "{case}/wp.toml"]
 
 [case.claims]
@@ -183,6 +185,7 @@ status = 1
 has = [
     "not stated: phases",
     "not stated: threads",
+    "not stated: live",
     "not stated: budget.entities",
     "not stated: content.arrive.wasm",
 ]
