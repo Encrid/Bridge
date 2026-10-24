@@ -21,6 +21,10 @@ BRIDGE_EXPORT(say) int say(void)
         return (0);
 #endif
     calls++;
+#ifdef END_AT
+    if (calls == END_AT)
+        return (BRIDGE_END);
+#endif
     BRIDGE_LOG(SAY_LEVEL, SAY, calls, 0);
     return (0);
 }

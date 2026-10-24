@@ -611,6 +611,7 @@ run = ["{out}/bridge-host{exe}", "--show-config", "{case}/shown.toml"]
 status = 0
 line = [
     "threads = 1  {root}/tests/host/world.toml:1",
+    "live = false  {root}/tests/host/world.toml:2",
     "module bridge-host:quiet@1.0.0, wasm, config-quiet/quiet.wasm",
     "  pinned = false  its file",
 ]

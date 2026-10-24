@@ -105,6 +105,12 @@ sources = ["tests/lib/modules/sour.c", "tests/lib/modules/offsets_idle.c", "test
 defines = ["BRIDGE_ROWS_CHECKED"]
 
 [[modules]]
+name = "ender"
+sources = ["tests/lib/modules/ender.c", "tests/lib/modules/offsets_idle.c", "tests/lib/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED", "INIT_STATUS=0"]
+variants = [{ name = "ender-init", defines = ["BRIDGE_ROWS_CHECKED", "INIT_STATUS=BRIDGE_END"] }, { name = "ender-heard", defines = ["BRIDGE_ROWS_CHECKED", "HEARD"] }]
+
+[[modules]]
 name = "keep"
 sources = ["tests/lib/modules/keep.c", "tests/lib/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED"]

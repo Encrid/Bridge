@@ -1,4 +1,5 @@
 threads = 1
+live = false
 
 [budget]
 entities = 8192
