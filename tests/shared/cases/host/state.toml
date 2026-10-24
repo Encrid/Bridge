@@ -18,6 +18,7 @@ has = [
 [case.files]
 "{case}/owns.toml" = '''
 threads = 1
+live = false
 phases = ["update"]
 rounds = 8
 [budget]
@@ -119,6 +120,7 @@ hot_reload = false
 "{case}/sk.toml" = '''
 presets = ["ta.toml", "tb.toml"]
 threads = 1
+live = false
 phases = ["update"]
 rounds = 8
 [budget]
