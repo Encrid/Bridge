@@ -26,7 +26,7 @@ So `runs_now` does not test `parked`.
 ## The turn of a system
 
 `list_system` gives each system that runs a number, the ordinal, in the order it lists them in this pass.
-It also sets `failed` of the system to 0.
+It also sets `failed` and `ended` of the system to 0.
 
 | Value | Content |
 | --- | --- |

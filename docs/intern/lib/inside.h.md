@@ -102,6 +102,7 @@ A system and an observer are a query and a function either way, so one record se
 | `place` | Its place in its phase, from 0, at its dispatch: `docs/intern/lib/schedule/schedule_jobs.c.md`, *The turn of a system*. |
 | `turn` | Where it comes among all that ran before the barrier. |
 | `failed`, `why` | How its dispatch ended, said after the join. |
+| `ended` | Whether its dispatch gave `BRIDGE_END`, noted after the join. |
 | `failures` | Its own count of failures. |
 | `changes`, `change_count` | The components that it stated that it attaches or detaches. They lie after the terms, in the same block. |
 | `slot` | Its slot among the systems of its module, or among its observers: what `add_system` or `observe` gave. |
@@ -209,6 +210,7 @@ A `schedule_pairs_t` holds the pairs of `[order]`: `docs/intern/lib/schedule/sch
 | `stopped_why`, `stopped_name` | The two arrays that `stopped_by` and `stopped_stem` point at. |
 | `phases`, `phase_count` | The phases of the deployment, by name. |
 | `barriers` | The count of barriers that ran. |
+| `end_asked` | Whether a system or an observer gave `BRIDGE_END` since the last phase that ran. |
 | `turns` | How many lifecycle calls ran since the last barrier. |
 | `parked` | The systems out of storage while their module reloads. |
 | `arena_ranges` | How many ranges of the arena the modules hold. |
