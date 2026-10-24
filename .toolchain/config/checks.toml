@@ -13,7 +13,7 @@ plugin = "module"
 plugins = "modules"
 
 [[branches.exception]]
-path = "src/lib/storage/storage_spans.c"
+path = "src/storage/storage_spans.c"
 line = 72
 col = 9
 side = "true"

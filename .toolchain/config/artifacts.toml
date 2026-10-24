@@ -1,17 +1,17 @@
 [[artifact]]
 name = "bridge"
 kind = "library"
-sources = ["src/lib/**/*.c"]
+sources = ["src/**/*.c"]
 link = ["{bridge_os}/os.a"]
-include = ["include/lib", "{bridge_os}/include", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+include = ["include", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage"]
 defines = ["BRIDGE_BUILDING"]
 flags = ["{quiet}", "{hidden}", "{system_defines}", "{system_libraries}"]
 
 [[artifact]]
 name = "bridge"
 kind = "archive"
-sources = ["src/lib/**/*.c"]
-include = ["include/lib", "{bridge_os}/include", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+sources = ["src/**/*.c"]
+include = ["include", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage"]
 defines = ["BRIDGE_BUILDING"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
@@ -19,8 +19,8 @@ flags = ["{quiet}", "{hidden}", "{system_defines}"]
 name = "counted"
 kind = "archive"
 test = true
-sources = ["src/lib/**/*.c"]
-include = ["include/lib", "{bridge_os}/include", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+sources = ["src/**/*.c"]
+include = ["include", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage"]
 defines = ["malloc=counted_malloc", "calloc=counted_calloc", "realloc=counted_realloc", "free=counted_free", "os_reserve=counted_os_reserve", "os_commit=counted_os_commit", "os_thread_start=counted_os_thread_start", "os_mutex_create=counted_os_mutex_create", "os_event_create=counted_os_event_create"]
 flags = ["{quiet}", "{system_defines}"]
 
@@ -29,8 +29,8 @@ name = "bridge_tests"
 kind = "library"
 test = true
 folder = "backends"
-sources = ["tests/lib/backend/tests_abi.c", "tests/lib/backend/tests_backend.c", "tests/lib/backend/tests_memory.c", "tests/lib/backend/tests_define.c", "tests/lib/backend/tests_module.c", "tests/lib/backend/tests_instance.c", "tests/lib/backend/tests_func.c", "tests/lib/backend/tests_load.c", "tests/lib/backend/tests_phase.c", "tests/lib/backend/tests_moves.c"]
-include = ["include/lib", "{bridge_os}/include", "tests/lib/binding"]
+sources = ["tests/backend/tests_abi.c", "tests/backend/tests_backend.c", "tests/backend/tests_memory.c", "tests/backend/tests_define.c", "tests/backend/tests_module.c", "tests/backend/tests_instance.c", "tests/backend/tests_func.c", "tests/backend/tests_load.c", "tests/backend/tests_phase.c", "tests/backend/tests_moves.c"]
+include = ["include", "{bridge_os}/include", "tests/binding"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 variants = [{ name = "bridge_tests_all" }]
 link = ["{bridge_os}/os.a"]
@@ -40,8 +40,8 @@ name = "bridge_plain_other"
 kind = "library"
 test = true
 folder = "backends"
-sources = ["tests/lib/backend/tests_backend.c", "tests/lib/backend/tests_memory.c", "tests/lib/backend/tests_define.c", "tests/lib/backend/tests_module.c", "tests/lib/backend/tests_instance.c", "tests/lib/backend/tests_func.c", "tests/lib/backend/tests_load.c", "tests/lib/backend/tests_phase.c", "tests/lib/backend/tests_moves.c", "tests/lib/support/plain_other_abi.c"]
-include = ["include/lib", "{bridge_os}/include", "tests/lib/binding"]
+sources = ["tests/backend/tests_backend.c", "tests/backend/tests_memory.c", "tests/backend/tests_define.c", "tests/backend/tests_module.c", "tests/backend/tests_instance.c", "tests/backend/tests_func.c", "tests/backend/tests_load.c", "tests/backend/tests_phase.c", "tests/backend/tests_moves.c", "tests/support/plain_other_abi.c"]
+include = ["include", "{bridge_os}/include", "tests/binding"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 link = ["{bridge_os}/os.a"]
 
@@ -50,8 +50,8 @@ name = "bridge_plain_refusing"
 kind = "library"
 test = true
 folder = "backends"
-sources = ["tests/lib/backend/tests_abi.c", "tests/lib/backend/tests_define.c", "tests/lib/backend/tests_module.c", "tests/lib/backend/tests_instance.c", "tests/lib/backend/tests_func.c", "tests/lib/backend/tests_load.c", "tests/lib/backend/tests_phase.c", "tests/lib/backend/tests_moves.c", "tests/lib/support/plain_refusing_backend.c", "tests/lib/support/plain_refusing_memory.c"]
-include = ["include/lib", "{bridge_os}/include", "tests/lib/binding"]
+sources = ["tests/backend/tests_abi.c", "tests/backend/tests_define.c", "tests/backend/tests_module.c", "tests/backend/tests_instance.c", "tests/backend/tests_func.c", "tests/backend/tests_load.c", "tests/backend/tests_phase.c", "tests/backend/tests_moves.c", "tests/support/plain_refusing_backend.c", "tests/support/plain_refusing_memory.c"]
+include = ["include", "{bridge_os}/include", "tests/binding"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 link = ["{bridge_os}/os.a"]
 
@@ -60,16 +60,16 @@ name = "bridge_hollow"
 kind = "library"
 test = true
 folder = "backends"
-sources = ["tests/lib/support/backend_hollow.c"]
-include = ["include/lib"]
+sources = ["tests/support/backend_hollow.c"]
+include = ["include"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 
 [[artifact]]
 name = "schema"
 kind = "program"
 test = true
-sources = ["tests/lib/schema/*.c", "src/lib/schema/*.c"]
-include = ["include/lib", "{bridge_os}/include", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+sources = ["tests/schema/*.c", "src/schema/*.c"]
+include = ["include", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage"]
 defines = ["BRIDGE_BUILDING"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 
@@ -77,8 +77,8 @@ flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 name = "storage"
 kind = "program"
 test = true
-sources = ["tests/lib/storage/*.c", "src/lib/**/*.c"]
-include = ["include/lib", "{bridge_os}/include", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+sources = ["tests/storage/*.c", "src/**/*.c"]
+include = ["include", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage"]
 defines = ["BRIDGE_BUILDING", "{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 link = ["{bridge_os}/os.a"]
@@ -87,8 +87,8 @@ link = ["{bridge_os}/os.a"]
 name = "storage-counted"
 kind = "program"
 test = true
-sources = ["tests/lib/storage/*.c"]
-include = ["include/lib", "{bridge_os}/include", "src/lib", "src/lib/abi", "src/lib/backend", "src/lib/block", "src/lib/bridge", "src/lib/config", "src/lib/module", "src/lib/pool", "src/lib/region", "src/lib/reload", "src/lib/say", "src/lib/schedule", "src/lib/schema", "src/lib/storage"]
+sources = ["tests/storage/*.c"]
+include = ["include", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage"]
 defines = ["COUNTED", "{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 link = ["{out}/counted.a", "{bridge_os}/os.a"]
@@ -97,8 +97,8 @@ link = ["{out}/counted.a", "{bridge_os}/os.a"]
 name = "seam"
 kind = "program"
 test = true
-sources = ["tests/lib/seam/*.c", "tests/lib/support/host*.c", "tests/lib/support/{system}/host*.c"]
-include = ["include/lib", "tests/lib/support"]
+sources = ["tests/seam/*.c", "tests/support/host*.c", "tests/support/{system}/host*.c"]
+include = ["include", "tests/support"]
 defines = ["{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{host_resources}"]
 link = ["{out}/bridge{library}"]
@@ -107,8 +107,8 @@ link = ["{out}/bridge{library}"]
 name = "seam-static"
 kind = "program"
 test = true
-sources = ["tests/lib/seam/*.c", "tests/lib/support/host*.c", "tests/lib/support/{system}/host*.c"]
-include = ["include/lib", "tests/lib/support"]
+sources = ["tests/seam/*.c", "tests/support/host*.c", "tests/support/{system}/host*.c"]
+include = ["include", "tests/support"]
 defines = ["{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{host_resources}"]
 link = ["{out}/bridge.a", "{bridge_os}/os.a"]

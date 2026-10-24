@@ -1,19 +1,19 @@
 [[case]]
 name = "allocation-changes"
 run = ["{out}/storage-counted{exe}", "changes"]
-claims = { output = "tests/lib/storage/storage_changes.txt" }
+claims = { output = "tests/storage/storage_changes.txt" }
 false = { run = ["{out}/storage-counted{exe}", "tables"] }
 
 [[case]]
 name = "allocation-tables"
 run = ["{out}/storage-counted{exe}", "tables"]
-claims = { output = "tests/lib/storage/storage_tables.txt" }
+claims = { output = "tests/storage/storage_tables.txt" }
 false = { run = ["{out}/storage-counted{exe}", "strip"] }
 
 [[case]]
 name = "allocation-strip"
 run = ["{out}/storage-counted{exe}", "strip"]
-claims = { output = "tests/lib/storage/storage_strip.txt" }
+claims = { output = "tests/storage/storage_strip.txt" }
 false = { run = ["{out}/storage-counted{exe}", "nomemory"] }
 
 [[case]]
