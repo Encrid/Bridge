@@ -3,6 +3,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdio.h>
 #include <string.h>
 
 #include "cases.h"
@@ -63,6 +64,30 @@ void test_grow_share(host_t *h)
     }
     host_run_frames(h, 2);
     test_say_modules(h);
+    host_close(h);
+}
+
+void test_hoard_shares(host_t *h)
+{
+    bridge_artifact_t a;
+    char identity[32];
+    uint32_t v = 2;
+
+    if (host_open(h))
+        return;
+    test_state_ticker(&a, "game:ticker@0.1.0", "ticker");
+    a.cfg.persistent = 64;
+    host_load(h, &a);
+    load_namer(h);
+    host_run_frames(h, 1);
+    while (v <= 9) {
+        snprintf(identity, sizeof(identity), "game:ticker@0.%u.0", v);
+        test_state_ticker(&a, identity, "ticker");
+        a.cfg.persistent = 64 * v;
+        host_reload(h, &a);
+        v++;
+    }
+    host_run_frames(h, 2);
     host_close(h);
 }
 

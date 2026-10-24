@@ -446,6 +446,8 @@ static const host_case_t TEST_CASES[] = {
         test_grow_share, "sharefromnone", test_set_noting },
     { "bridge_reload-share-grown-twice-past-a-neighbour",
         test_grow_share, "sharechaintwice", test_set_noting },
+    { "bridge_reload-owned-ranges-past-the-cap-clamped",
+        test_hoard_shares, "", test_set_noting },
     { "bridge_reload-failed-gives-back-a-share-grown-in-place",
         test_grow_share, "sharegrowfail", test_set_noting },
     { "bridge_reload-failed-gives-back-a-range-past-a-neighbour",
