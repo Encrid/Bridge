@@ -5,7 +5,7 @@ A case runs a command, and makes claims about its exit status, its output and it
 `python project.py test --break` runs the false variant of each case. Each case must then fail.
 `tests` can also hold other files, for example the data that the cases read. No check reads `tests`.
 
-The tests mirror `src`. `tests/lib`, `tests/backends`, `tests/host` and `tests/os` hold the tests of each part. `tests/shared` holds what serves many parts: the cases, the package proof and the references.
+The tests mirror `src`: `tests/lib` holds the tests of the library. `tests/shared` holds what the tests share: the cases, the package proof and the references.
 
 ## Write a case
 

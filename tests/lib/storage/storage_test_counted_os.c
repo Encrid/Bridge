@@ -6,68 +6,40 @@
 #include "storage_test.h"
 
 #ifdef COUNTED
-    #ifdef _WIN32
-        #include <windows.h>
 
-HANDLE counted_create_event(LPSECURITY_ATTRIBUTES attributes, BOOL manual,
-    BOOL initial, LPCSTR name)
+void *counted_os_reserve(size_t reserve, size_t commit)
 {
     if (storage_test_count_request())
         return (nullptr);
-    return (CreateEventA(attributes, manual, initial, name));
+    return (os_reserve(reserve, commit));
 }
 
-HANDLE counted_create_thread(LPSECURITY_ATTRIBUTES attributes, SIZE_T stack,
-    LPTHREAD_START_ROUTINE start, LPVOID arg, DWORD flags, LPDWORD id)
+int counted_os_commit(void *base, size_t bytes)
+{
+    if (storage_test_count_request())
+        return (-1);
+    return (os_commit(base, bytes));
+}
+
+os_thread_t *counted_os_thread_start(os_thread_fn_t fn, void *arg)
 {
     if (storage_test_count_request())
         return (nullptr);
-    return (CreateThread(attributes, stack, start, arg, flags, id));
+    return (os_thread_start(fn, arg));
 }
 
-LPVOID WINAPI counted_virtual_alloc(LPVOID at, SIZE_T size, DWORD type,
-    DWORD protect)
+os_mutex_t *counted_os_mutex_create(void)
 {
     if (storage_test_count_request())
         return (nullptr);
-    return (VirtualAlloc(at, size, type, protect));
+    return (os_mutex_create());
 }
 
-    #else
-        #include <errno.h>
-        #include <pthread.h>
-        #include <sys/mman.h>
-
-int counted_pthread_create(pthread_t *thread, const pthread_attr_t *attributes,
-    void *(*start)(void *), void *arg)
+os_event_t *counted_os_event_create(void)
 {
     if (storage_test_count_request())
-        return (EAGAIN);
-    return (pthread_create(thread, attributes, start, arg));
+        return (nullptr);
+    return (os_event_create());
 }
 
-int counted_mutex_init(pthread_mutex_t *mutex,
-    const pthread_mutexattr_t *attributes)
-{
-    if (storage_test_count_request())
-        return (ENOMEM);
-    return (pthread_mutex_init(mutex, attributes));
-}
-
-int counted_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attributes)
-{
-    if (storage_test_count_request())
-        return (ENOMEM);
-    return (pthread_cond_init(cond, attributes));
-}
-
-int counted_mprotect(void *at, size_t len, int protect)
-{
-    if (!storage_test_count_request())
-        return (mprotect(at, len, protect));
-    errno = ENOMEM;
-    return (-1);
-}
-
-    #endif
 #endif
