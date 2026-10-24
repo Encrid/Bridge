@@ -1,0 +1,166 @@
+[[case]]
+name = "a native module ends a live run at the round that it chose"
+run = ["{out}/bridge-host{exe}", "{case}/live.toml"]
+
+[case.claims]
+status = 0
+line = ["ended at round 3: a module asked for the end"]
+has = ["record[6] bridge-host:nender@1.0.0/say: system 'say' asks for the end of the run 0 0"]
+lacks = ["ended after"]
+
+[case.folders]
+"{case}/cn" = ["nender"]
+
+[case.files]
+"{case}/live.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+live = true
+[content]
+paths = ["cn"]
+[content.arrive]
+native = "load"
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/live.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+live = false
+[content]
+paths = ["cn"]
+[content.arrive]
+native = "load"
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a wasm module ends a run that is not live at the round that it chose"
+run = ["{out}/bridge-host{exe}", "{case}/end.toml"]
+
+[case.claims]
+status = 0
+line = ["ended at round 3: a module asked for the end"]
+has = ["record[6] bridge-host:wender@1.0.0/say: system 'say' asks for the end of the run 0 0"]
+
+[case.folders]
+"{case}/cw" = ["wender"]
+
+[case.files]
+"{case}/end.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 8
+[content]
+paths = ["cw"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.folders]
+"{case}/cw" = ["hello"]
+
+[[case]]
+name = "a live run goes on through quiet rounds to its limit"
+run = ["{out}/bridge-host{exe}", "{case}/quiet.toml"]
+
+[case.claims]
+status = 0
+line = ["ended after 4 rounds, as many as it was given"]
+
+[case.folders]
+"{case}/cq" = ["quiet"]
+
+[case.files]
+"{case}/quiet.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 4
+live = true
+[content]
+paths = ["cq"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/quiet.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 4
+live = false
+[content]
+paths = ["cq"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "live takes only true or false"
+run = ["{out}/bridge-host{exe}", "{case}/three.toml"]
+
+[case.claims]
+status = 1
+has = ["live: true or false"]
+
+[case.folders]
+"{case}/cq" = ["quiet"]
+
+[case.files]
+"{case}/three.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 4
+live = 3
+[content]
+paths = ["cq"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[case.false.files]
+"{case}/three.toml" = '''
+presets = ["{root}/tests/host/test.toml"]
+phases = ["update"]
+rounds = 4
+live = true
+[content]
+paths = ["cq"]
+[backend]
+wasm = "{out}/backends/bridge_wasm"
+native = "{out}/backends/bridge_native"
+'''
+
+[[case]]
+name = "a world that states threads and rounds, and no live"
+run = ["{out}/bridge-host{exe}", "{case}/nolive.toml"]
+
+[case.claims]
+status = 1
+has = ["not stated: live"]
+
+[case.files]
+"{case}/nolive.toml" = '''
+threads = 1
+phases = ["update"]
+rounds = 4
+'''
+
+[case.false.files]
+"{case}/nolive.toml" = '''
+threads = 1
+phases = ["update"]
+rounds = 4
+live = false
+'''

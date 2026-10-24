@@ -29,9 +29,15 @@ It does this only if `work_limit` of the module is above 0: `-1` is no limit, an
 | --- | --- |
 | The call did not return, for example a trap. | The text of the error of the backend. |
 | An entry refused a request during the call, and set `refused` of the module. | The reason of the module, in `why` of the module. |
-| The call returned a status that is not 0. | That it answered the status. |
+| The call returned a status that is neither 0 nor `BRIDGE_END`. | That it answered the status. |
 
 `src/lib/schedule/schedule_run.c` counts the failure after the level ends.
+
+## The end of the run
+
+A call that returns `BRIDGE_END` is no failure: `call_system` sets `ended` of the system, and gives no reason.
+The thread of the job only marks the system. The thread that asked for the phase writes the record after the level.
+`docs/intern/lib/schedule/schedule_account.c.md`, *The end of the run* tells that step.
 
 ## The time
 
@@ -50,7 +56,7 @@ When `validate` is off, it makes no check, and the cost is one test.
 
 | Function | Result |
 | --- | --- |
-| `call_system` | Sets the work limit, calls the system, and marks it failed with a reason if the call failed. |
+| `call_system` | Sets the work limit, calls the system, and marks it failed with a reason, or ended, by what the call gave. |
 | `after_call` | Times the run when `profile` is on, and checks the columns when `validate` is on. |
 | `run_system` | Writes which system runs in the header, calls it, lets `after_call` run the diagnostics, then clears the header. |
 | `schedule_run_job` | What a thread runs: the systems of one job, in the order the module registered them. |

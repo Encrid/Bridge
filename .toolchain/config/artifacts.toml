@@ -1344,6 +1344,7 @@ variants = [
     { name = "other", defines = ['SAY="hello from elsewhere"'] },
     { name = "reacher", defines = ["REACH", 'SAY="reaches"'], manifest = ["bridge-host:reacher@1.0.0", "{own}"] },
     { name = "debugger", defines = ['SAY="deep"', "SAY_LEVEL=BRIDGE_LOG_DEBUG"], manifest = ["bridge-host:debugger@1.0.0", "{own}"] },
+    { name = "wender", defines = ['SAY="ends"', "END_AT=3"], manifest = ["bridge-host:wender@1.0.0", "{own}"] },
 ]
 
 [[artifact]]
@@ -1408,6 +1409,7 @@ include = ["include/lib", "include/backends/native", "tests/host/modules"]
 manifest = ["bridge-host:knock@1.0.0", "{own}"]
 variants = [
     { name = "wait", defines = ["WAIT"], manifest = ["bridge-host:wait@1.0.0", "{own}"] },
+    { name = "nender", defines = ["END_AT=3"], manifest = ["bridge-host:nender@1.0.0", "{own}"] },
     { name = "pe", target = "x86_64-windows-gnu", manifest = ["bridge-host:pe@1.0.0", "{own}"] },
     { name = "elf", target = "x86_64-linux-gnu", manifest = ["bridge-host:elf@1.0.0", "{own}"] },
     { name = "macho", target = "aarch64-macos", manifest = ["bridge-host:macho@1.0.0", "{own}"] },

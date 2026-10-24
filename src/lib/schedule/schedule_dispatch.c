@@ -22,7 +22,8 @@ static void call_system(module_t *m, bridge_system_t *s)
         s->failed = 1;
         return;
     }
-    if (!status)
+    s->ended = status == BRIDGE_END;
+    if (!status || s->ended)
         return;
     snprintf(s->why, sizeof(s->why), "it answered %d", status);
     s->failed = 1;

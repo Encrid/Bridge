@@ -40,6 +40,7 @@ static void account_job(bridge_world_t *w, const schedule_job_t *job)
 
     while (i < job->count) {
         count_failure(w, job->list[i]);
+        schedule_note_end(w, job->list[i]);
         i++;
     }
 }

@@ -47,15 +47,23 @@ void host_unload(host_t *h, const char *identity)
     printf("%s: %s\n", identity, ended);
 }
 
+static void run_phase(host_t *h, const char *phase)
+{
+    int result = bridge_run_phase(h->w, phase);
+
+    if (result == 1)
+        printf("%s refused\n", phase);
+    if (result == 2)
+        printf("%s asks for the end\n", phase);
+}
+
 void host_run_frames(host_t *h, int count)
 {
     int i = 0;
 
     while (i < count) {
-        if (bridge_run_phase(h->w, "update"))
-            printf("update refused\n");
-        if (bridge_run_phase(h->w, "present"))
-            printf("present refused\n");
+        run_phase(h, "update");
+        run_phase(h, "present");
         i++;
     }
 }

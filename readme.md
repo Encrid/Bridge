@@ -84,6 +84,22 @@ Bridge ships `bridge-host`, a host that runs modules from a deployment file.
 After `python project.py build`, run `bridge-host <config.toml>`, or `bridge-host --show-config <config.toml>` to print the deployment without running it.
 It reads the file and its `.d/local.toml` overlay, reads each module's manifest, loads the modules a backend holds, and runs the phases in rounds.
 
+The deployment file states these keys at its top:
+
+| Key | Value |
+| --- | --- |
+| `phases` | The names of the phases. A round runs them in this order. |
+| `threads` | How many threads run a phase, from 1. |
+| `rounds` | The most rounds of the run, from 0 to 1000000. 0 is no limit. |
+| `live` | `false`: a quiet round ends the run. `true`: a quiet round does not end it. |
+
+A round is quiet if the look finds no change in the content and no phase writes a record.
+The run also ends at the limit of `rounds`, and when Bridge refuses a call.
+A system or an observer that gives `BRIDGE_END` ends the run after its round, with each value of `live`.
+`docs/extern/lib/bridge_abi.h.md`, *BRIDGE_END* tells the status.
+After a run, the host exits with 0, or with 1 if Bridge refused a call or a record is an error.
+`--show-config` prints each of these keys, with the file and the line that state it.
+
 These are its messages.
 
 With no file, or a bad one, it prints its usage:
@@ -151,6 +167,7 @@ Running the rounds:
 - `bridge_create refused`
 - `record[%d] %s/%s: %.*s %u %u`
 - `ended after %d rounds, as many as it was given`
+- `ended at round %d: a module asked for the end`
 - `still loaded:`
 - `destroyed: %d`
 

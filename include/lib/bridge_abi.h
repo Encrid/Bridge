@@ -15,6 +15,8 @@ extern "C" {
 
 constexpr uint32_t BRIDGE_ABI = 1;
 
+constexpr int32_t BRIDGE_END = INT32_MAX;
+
 constexpr char BRIDGE_NAMESPACE[] = "bridge";
 constexpr char BRIDGE_SHARED[] = "shared";
 constexpr char BRIDGE_PRIVATE[] = "private";

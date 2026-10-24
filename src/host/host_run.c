@@ -32,6 +32,7 @@ static void say_loaded(bridge_world_t *w)
 static int run_round(host_t *h, int *did)
 {
     int refused;
+    int result = 0;
 
     *did = look(h, !h->looked);
     if (!h->looked && *did >= 0)
@@ -39,8 +40,13 @@ static int run_round(host_t *h, int *did)
     h->looked = true;
     h->counts.said = 0;
     refused = *did < 0;
-    for (uint32_t p = 0; p < h->phase_count && !refused; p++)
-        refused = bridge_run_phase(h->w, h->phases[p]);
+    for (uint32_t p = 0; p < h->phase_count && !refused; p++) {
+        result = bridge_run_phase(h->w, h->phases[p]);
+        refused = result == 1;
+        if (result == 2)
+            h->ended = true;
+    }
+    h->round++;
     return (refused);
 }
 
@@ -66,9 +72,12 @@ int run(host_t *h)
 
     if (!make_world(h))
         return (1);
-    while (!refused && (did || h->counts.said) && (!h->rounds || left--))
+    while (!refused && !h->ended && (h->live || did || h->counts.said)
+        && (!h->rounds || left--))
         refused = run_round(h, &did);
-    if (!refused && h->rounds && left < 0)
+    if (h->ended)
+        printf("ended at round %d: a module asked for the end\n", h->round);
+    else if (!refused && h->rounds && left < 0)
         printf("ended after %d rounds, as many as it was given\n", h->rounds);
     say_loaded(h->w);
     printf("destroyed: %d\n", bridge_destroy(h->w));

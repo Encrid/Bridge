@@ -56,6 +56,9 @@ typedef struct {
     uint32_t phase_count;
     uint32_t threads;
     int rounds;
+    bool live;
+    bool ended;
+    int round;
     bool profile;
     bool validate;
     bridge_budget_t budget;

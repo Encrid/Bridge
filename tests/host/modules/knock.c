@@ -12,6 +12,10 @@ static const char WHO[] = MANIFEST;
 
 static bool said;
 
+#ifdef END_AT
+static uint32_t rounds;
+#endif
+
 #ifdef WAIT
 
 static void go_on(void)
@@ -30,6 +34,11 @@ BRIDGE_NATIVE(say)
 {
     bridge_line_t line = { "knock", 5, 0, 0 };
 
+#ifdef END_AT
+    rounds++;
+    if (rounds == END_AT)
+        return (BRIDGE_END);
+#endif
 #ifdef WAIT
     if (!said)
         go_on();

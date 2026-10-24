@@ -46,9 +46,9 @@ static void say_under(const config_t *c, const char *top, const char *next)
 
 static void say_world(const host_t *h)
 {
-    static const char *const ONE[] = { "phases", "threads", "rounds" };
+    static const char *const ONE[] = { "phases", "threads", "rounds", "live" };
 
-    for (uint32_t i = 0; i < 3; i++)
+    for (size_t i = 0; i < sizeof(ONE) / sizeof(*ONE); i++)
         say_key(&h->config, &ONE[i], 1);
     say_under(&h->config, "budget", nullptr);
     say_under(&h->config, "backend", nullptr);

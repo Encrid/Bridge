@@ -19,9 +19,9 @@ static const char *check_named(const entry_t *e, const char *const *names,
 const char *config_check_world(const entry_t *e, bool local)
 {
     static const char *const NAMES[] = { "phases", "threads", "rounds",
-        "presets", nullptr };
+        "live", "presets", nullptr };
     static const enum check CHECKS[] = { CHECK_NAMES, CHECK_COUNT,
-        CHECK_ROUNDS, CHECK_NAMES };
+        CHECK_ROUNDS, CHECK_FLAG, CHECK_NAMES };
 
     if (e->depth != 1)
         return ("no key of Bridge-Host's or Bridge's");

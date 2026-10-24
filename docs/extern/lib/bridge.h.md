@@ -722,7 +722,10 @@ A call from a second thread, while the world is busy with a call, gives -1 and w
 4. Bridge counts the failures, and gives the lines of the logs to the sink.
 
 The systems of one module run one after another, and each one from its start to its return.
-The result is 0 if the phase ran, whatever its systems did: a system that failed is a record.
+
+The result is 0 if the phase ran. A system that failed is a record, and does not change the result.
+The result is 2 if the phase ran and a system or an observer gave `BRIDGE_END`: `docs/extern/lib/bridge_abi.h.md`, *BRIDGE_END*.
+An observer that gives it at the barrier of `bridge_load`, `bridge_unload` or `bridge_reload` makes the next call that runs a phase give 2.
 The result is 1, with a record, if Bridge refuses the call: *A call refused*.
 From the sink, the result is 1, with no record.
 
@@ -964,6 +967,10 @@ Rows in a second table make a second span of the same archetype.
 
 The reason of `failed` is `it answered <status>`, the text of the backend, or a refusal of an entry.
 For an observer, a record that names a system names the observer.
+
+This record, at the level `BRIDGE_INFO`, tells that a system gave `BRIDGE_END`:
+
+- `system '<system>' asks for the end of the run`
 
 This record, at the level `BRIDGE_WARN`, counts the lines that a full log ring dropped:
 

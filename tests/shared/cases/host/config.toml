@@ -467,6 +467,7 @@ line = ["not loaded: config-quiet/quiet.wasm: bridge-host:quiet@1.0.0: not state
 [case.files]
 "{case}/terse-world.toml" = '''
 threads = 1
+live = false
 
 [budget]
 entities = 8192
@@ -611,6 +612,7 @@ run = ["{out}/bridge-host{exe}", "--show-config", "{case}/shown.toml"]
 status = 0
 line = [
     "threads = 1  {root}/tests/host/world.toml:1",
+    "live = false  {root}/tests/host/world.toml:2",
     "module bridge-host:quiet@1.0.0, wasm, config-quiet/quiet.wasm",
     "  pinned = false  its file",
 ]
