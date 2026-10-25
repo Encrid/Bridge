@@ -47,6 +47,7 @@ None of them is on the hot path.
 | Field | Content |
 | --- | --- |
 | `name` | The name of the backend in the deployment. |
+| `path` | The path of its library in the deployment, which `close_backends` pins. |
 | `lib` | Its library, opened. |
 | `api` | Its entries, found by name. |
 | `be` | The backend, started with its settings. |
