@@ -16,7 +16,7 @@ enum storage_test_end storage_test_block_offset([[maybe_unused]] storage_test_t 
     printf("offset null %u below %u above %u inside %u\n",
         block_get_offset(&w, nullptr), block_get_offset(&w, buf + 50),
         block_get_offset(&w, buf + 250), block_get_offset(&w, buf + 150));
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }
 
 enum storage_test_end storage_test_index_outside(storage_test_t *t)

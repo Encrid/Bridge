@@ -18,3 +18,10 @@ line = 72
 col = 9
 side = "true"
 why = "Span entries are 8 bytes and p->at is already 8-aligned, so the alignment above never moves it, and write_spans stops the loop when a system's spans pass the end; this guard is reached only by a module that publishes with no systems and a header grown past its spans, which the tests do not load."
+
+[[branches.exception]]
+path = "src/bridge/bridge_destroy.c"
+line = 56
+col = 16
+side = "false"
+why = "os_lib_pin fails only for a library that is not open, or after 64 pins on posix; the world still holds the library open here, and no case pins 64 libraries."

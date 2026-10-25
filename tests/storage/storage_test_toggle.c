@@ -31,7 +31,7 @@ enum storage_test_end storage_test_toggle(storage_test_t *t)
     bridge_artifact_t a = storage_test_state(TOGGLE_PATH, 16, 1 << 20, 4096);
 
     if (storage_test_try_load(t, &a))
-        return (STORAGE_TEST_LEFT);
+        return (STORAGE_TEST_DONE);
     storage_test_run_all(t, TOGGLE_MOVED);
     storage_test_drop(t, "st:A", BRIDGE_STRIP);
     storage_test_run_all(t, TOGGLE_CLOSED_UP);
@@ -46,7 +46,7 @@ enum storage_test_end storage_test_toggle_full(storage_test_t *t)
 
     a.cfg.max_system_failures = 4;
     if (storage_test_try_load(t, &a))
-        return (STORAGE_TEST_LEFT);
+        return (STORAGE_TEST_DONE);
     storage_test_run_all(t, TOGGLE_FULL);
     return (STORAGE_TEST_DONE);
 }
@@ -56,7 +56,7 @@ enum storage_test_end storage_test_tag(storage_test_t *t)
     bridge_artifact_t a = storage_test_state(TAG_PATH, 8, 1 << 21, 4096);
 
     if (storage_test_try_load(t, &a))
-        return (STORAGE_TEST_LEFT);
+        return (STORAGE_TEST_DONE);
     storage_test_run_all(t, TAG);
     printf("columns in use %u bytes\n", t->w->column_space.used);
     return (STORAGE_TEST_DONE);

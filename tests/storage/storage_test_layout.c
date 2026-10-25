@@ -141,6 +141,7 @@ static int relay_held(storage_test_t *t)
 enum storage_test_end storage_test_relay(storage_test_t *t)
 {
     (void)bridge_destroy(t->w);
+    t->w = nullptr;
     t->cfg.budget.sparse_sets = 2;
     t->cfg.budget.direct_indexed = 2;
     relay_all(t, RELAID, sizeof(RELAID) / sizeof(*RELAID));

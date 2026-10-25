@@ -11,6 +11,10 @@ The shared library exports only the seven functions of this header, and `BRIDGE_
 The shared library holds the os layer of Bridge-OS.
 A program that links the static library `bridge.a` also links `os.a`, from the release of Bridge-OS for its target.
 
+A release ships `leaks.toml` for each target, beside the libraries and the headers.
+`leaks.toml` names `bridge_create`, which takes a world, and `bridge_destroy`, which gives it back.
+A host names the file in `[leaks] with`, so that `test --leaks` counts the worlds that its code takes.
+
 Only the build of the library defines `BRIDGE_BUILDING`. A host does not define it.
 What a host compiles with this header is a work based on Bridge: `readme.md`, *License*.
 
@@ -68,6 +72,8 @@ windows          LoadLibraryExW
 windows          GetFullPathNameW
 windows          MultiByteToWideChar
 windows          wcschr
+windows          wcscpy
+windows          GetModuleHandleExW
 windows          GetProcAddress
 windows          FreeLibrary
 windows          CreateThread
@@ -146,7 +152,7 @@ They are in the list because they are imports all the same: a new one is a depen
 | `bzero`, `__bzero` | The compiler makes them of a block made zero on macOS: `bzero` on aarch64, and `__bzero` on x86_64. |
 | `__memcpy_chk` | The headers of macOS make it of `memcpy`. |
 | `VirtualAlloc`, `VirtualFree`, `mmap`, `mprotect`, `munmap` | The os layer reserves, commits and releases memory. |
-| `LoadLibraryW`, `LoadLibraryExW`, `GetFullPathNameW`, `MultiByteToWideChar`, `wcschr`, `GetProcAddress`, `FreeLibrary`, `dlopen`, `dlsym`, `dlclose` | The os layer opens the library of a backend or of a native module, finds a symbol in it, and closes it. On Windows it makes the path a wide string and finds a folder in it. |
+| `LoadLibraryW`, `LoadLibraryExW`, `GetFullPathNameW`, `MultiByteToWideChar`, `wcschr`, `wcscpy`, `GetModuleHandleExW`, `GetProcAddress`, `FreeLibrary`, `dlopen`, `dlsym`, `dlclose` | The os layer opens the library of a backend or of a native module, finds a symbol in it, pins it, and closes it. On Windows it makes the path a wide string and finds a folder in it. |
 | `CreateThread`, `WaitForSingleObject`, `CloseHandle`, `pthread_create`, `pthread_join` | The os layer starts and joins a worker thread. On Windows, `WaitForSingleObject` also waits for an event, and `CloseHandle` also closes one. |
 | `GetCurrentThreadId`, `pthread_self` | The os layer gives the thread that runs, for a pinned module. |
 | `QueryPerformanceCounter`, `QueryPerformanceFrequency`, `clock_gettime` | The os layer reads the clock that keeps a deadline, and its unit. |
@@ -438,6 +444,9 @@ The namespace of a module is the part of its identity before the colon.
 Bridge finds a loaded module by its identity without the version.
 Thus a load refuses a module whose identity without the version is loaded already.
 
+Bridge reads a module config, and what it points to, only during the call of `bridge_load` or `bridge_reload` that gets it.
+Thus the host can free the config when the call returns.
+
 ### The limits
 
 `max_system_failures`, `work_limit`, `memory_limit` and the three timeouts are limits.
@@ -676,7 +685,7 @@ Else the sink gets a record that tells why: *The deployment*.
 1. Bridge calls `shutdown` of each loaded module, in the order that the modules loaded, each under its `shutdown_timeout`.
 2. A `shutdown` that fails is a record, and the destruction continues.
 3. Bridge destroys the modules, the storage, the threads and the backends.
-4. Bridge closes the library of a backend that states `BACKEND_UNLOAD`. Another library stays, and the next world uses it.
+4. Bridge closes the library of each backend. It first pins a library whose backend does not state `BACKEND_UNLOAD`. That library stays, and the next world uses it.
 
 The result is 0 when the world is gone, and for a null `b`.
 The result is 1 if a pinned module is loaded and the call comes from another thread, or if the sink calls it.

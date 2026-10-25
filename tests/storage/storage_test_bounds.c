@@ -20,7 +20,7 @@ enum storage_test_end storage_test_table_full([[maybe_unused]] storage_test_t *t
         .table_room = 4 };
 
     printf("table past the room: %u\n", make_table(&r, set));
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }
 
 enum storage_test_end storage_test_spans_full([[maybe_unused]] storage_test_t *t)
@@ -32,5 +32,5 @@ enum storage_test_end storage_test_spans_full([[maybe_unused]] storage_test_t *t
     const char *list = nullptr;
 
     printf("spans too small: %d\n", storage_publish(&r, &m, &list));
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }

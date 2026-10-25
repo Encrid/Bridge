@@ -1,0 +1,107 @@
+[[case]]
+name = "a case that gives back what it takes"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"]
+claims = { status = 0, line = ["leaks: 1 cases, 1 give back what they take"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "kept"] }
+
+[[case]]
+name = "a case that writes no line"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "silent"]
+claims = { status = 0, line = ["leaks: 1 cases, 1 give back what they take"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "kept"] }
+
+[[case]]
+name = "a case that keeps memory"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "kept"]
+claims = { status = 1, line = ["leaks: kept keeps 1 memory", "leaks: 1 cases, 0 give back what they take"], has = ["cases that do not give back what they take: 1; exemptions that are faults: 0"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }
+
+[[case]]
+name = "a call of realloc with 0 bytes"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "zero"]
+claims = { status = 1, line = ["leaks: zero calls realloc with 0 bytes"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }
+
+[[case]]
+name = "memory that no count took"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "foreign"]
+claims = { status = 1, line = ["leaks: foreign gives back 1 memory that it did not take"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "named"] }
+
+[[case]]
+name = "a function of [leaks] memory takes memory"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "named"]
+claims = { status = 0, line = ["leaks: 1 cases, 1 give back what they take"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "foreign"] }
+
+[[case]]
+name = "a pair keeps a count of its own"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "boxed"]
+claims = { status = 1, line = ["leaks: boxed keeps 1 box_open"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }
+
+[[case]]
+name = "a helper is counted"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "helped"]
+claims = { status = 1, line = ["leaks: helped keeps 1 memory"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }
+
+[[case]]
+name = "a line that does not fit the kinds"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "spoiled"]
+claims = { status = 1, has = ["a line of src/main.c does not match its counts"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }
+
+[[case]]
+name = "a closed library gives its counts"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/opened", "--out", "{case}/out", "--leaks", "-k", "dropped"]
+claims = { status = 0, line = ["leaks: 1 cases, 1 give back what they take"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/opened", "--out", "{case}/out", "--leaks", "-k", "kept"] }
+
+[[case]]
+name = "an exemption excuses a kept resource"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/excused", "--out", "{case}/out", "--leaks"]
+claims = { status = 0, line = ["leaks: 1 cases, 0 give back what they take, 1 exempt"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/badexempt", "--out", "{case}/out", "--leaks"] }
+
+[[case]]
+name = "an exemption for a different system does not apply"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/systemed", "--out", "{case}/out", "--leaks"]
+claims = { status = 1, line = ["leaks: kept keeps 1 memory"], lacks = ["excuses no kept resource"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/excused", "--out", "{case}/out", "--leaks"] }
+
+[[case]]
+name = "an exemption with no reason or no target is a fault"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/badexempt", "--out", "{case}/out", "--leaks"]
+claims = { status = 1, line = ["leaks: kept keeps 1 memory", "leaks: the exemption of kept for memory states no reason", "leaks: the exemption of kept for nothing excuses no kept resource"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/excused", "--out", "{case}/out", "--leaks"] }
+
+[[case]]
+name = "leaks with a false variant"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "--break"]
+claims = { status_not = 0, has = ["--leaks runs each case one time: it takes no --break, --toolchain, --copies, --rounds or --branches"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }
+
+[[case]]
+name = "a file of [leaks] with that is not there"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "--set", "counted=tests/none.toml"]
+claims = { status = 1, has = ["[leaks] with: ", "none.toml is not there"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }
+
+[[case]]
+name = "a take that gives no pointer"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "--set", "counted=tests/misfit_take.toml"]
+claims = { status = 1, has = ["box_count takes a resource, and does not give a pointer"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }
+
+[[case]]
+name = "a give that gets no pointer first"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "--set", "counted=tests/misfit_give.toml"]
+claims = { status = 1, has = ["box_number gives back a resource, and does not get a pointer first"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }
+
+[[case]]
+name = "a counted function with no fixed list of arguments"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "--set", "counted=tests/misfit_list.toml"]
+claims = { status = 1, has = ["box_format takes a list of arguments of no fixed length"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }

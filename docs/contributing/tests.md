@@ -142,6 +142,25 @@ Thus write such a condition outside the macro.
 The probes change the program, thus the run does not judge the claims. It writes the verdicts only for information.
 `.toolchain/docs/branches.py.md` tells how the probes work.
 
+## The leaks
+
+Each case must give back each resource that the code takes, also on the paths of the errors.
+`python project.py test --leaks` builds the project with a count of the resources in each file `.c` of `src`.
+It runs each case one time. Then it writes a line for each case that does not give back what the code took:
+
+- `leaks: <case> keeps <number> <kind>`: at its end, the case holds a resource that the code took.
+- `leaks: <case> gives back <number> <kind> that it did not take`: the code gives back a resource that code with no count took.
+- `leaks: <case> calls realloc with 0 bytes`.
+
+The kind `memory` counts `malloc`, `calloc`, `realloc` and `free`.
+`leaks.toml` of `.toolchain/config` names more functions and pairs, for example `os_reserve` and `os_release`.
+`.toolchain/docs/project.toml.md`, *[leaks]*, gives its keys.
+
+For each line, make the code give the resource back. If a case keeps a resource by design, write an exemption with its reason.
+`.toolchain/docs/project.toml.md`, *[[leaks.exception]]*, tells how.
+The counts change the program, thus the run does not judge the claims. It writes the verdicts only for information.
+`.toolchain/docs/leaks.py.md` tells how the count works.
+
 ## Run the tests
 
 | Command | Result |
@@ -149,6 +168,7 @@ The probes change the program, thus the run does not judge the claims. It writes
 | `python project.py test` | Runs each case. |
 | `python project.py test --break` | Runs the false variant of each case. Each case must fail. |
 | `python project.py test --branches` | Runs each case one time on a build with probes. Each branch must run. |
+| `python project.py test --leaks` | Runs each case one time on a build with counts. Each case must give back what the code takes. |
 | `python project.py test -k <part>` | Runs only the cases whose name contains `<part>`. |
 | `python project.py test --copies <number>` | Runs this number of copies of each case at the same time. Each copy must pass. |
 | `python project.py test --rounds <number>` | Runs all the cases this number of times, one round after the other. |

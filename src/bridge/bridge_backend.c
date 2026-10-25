@@ -64,6 +64,9 @@ static int open_library(bridge_world_t *w, const bridge_backend_t *want,
     if (bridge_lacks(w, o->name, "a backend's name"))
         return (1);
     w->backend_count++;
+    o->path = copy_text(want->library, strlen(want->library));
+    if (bridge_lacks(w, o->path, "the path of a backend's library"))
+        return (1);
     o->lib = backend_open(want->library, &o->api, &opened);
     if (o->lib)
         return (0);

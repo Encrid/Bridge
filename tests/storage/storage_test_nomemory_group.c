@@ -50,6 +50,7 @@ static bool refuse_one(storage_test_t *t, size_t k)
         (void)bridge_reload(t->w, a, 2);
     }
     (void)bridge_destroy(t->w);
+    t->w = nullptr;
     return (allocator->failed);
 }
 
@@ -58,6 +59,7 @@ enum storage_test_end storage_test_refuse_memory_group(storage_test_t *t)
     size_t k = 1;
 
     (void)bridge_destroy(t->w);
+    t->w = nullptr;
     t->cfg.phases = GROUP_PHASES;
     t->cfg.phase_count = 2;
     while (refuse_one(t, k))
@@ -65,7 +67,7 @@ enum storage_test_end storage_test_refuse_memory_group(storage_test_t *t)
     storage_test_get_allocator()->fail_at = 0;
     printf("%s allocations were each answered null in turn\n",
         k > 30 ? "more than thirty" : "TOO FEW");
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }
 
 #endif

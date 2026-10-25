@@ -8,7 +8,7 @@ This file unmakes a world: it shuts down each loaded module, and then gives back
 2. Run the `shutdown` of each module: *The shutdown of the modules*.
 3. Discard each module.
 4. Free the schedule, the shared block with the storage, the threads, and the names of the deployment.
-5. Destroy each backend, and close the library of each backend that states `BACKEND_UNLOAD`.
+5. Destroy each backend, and close the library of each backend: *The libraries of the backends*.
 6. Free the world.
 
 `bridge_destroy` of a null world does nothing and gives 0.
@@ -30,10 +30,13 @@ The world stays whole for a call from the thread that can destroy it.
 ## The libraries of the backends
 
 A backend states `BACKEND_UNLOAD` if its library can go from the process after `backend_destroy`.
-Bridge closes only such a library, and the operating system then decides if it unmaps it.
-A backend that brought in a runtime with threads of its own does not state it, and its library stays in the process.
-The next world finds that library there again.
-A library that opened but never became a backend states nothing, and stays too.
+Bridge closes such a library, and the operating system then decides if it unmaps it.
+
+A backend that brought in a runtime with threads of its own does not state it, and its library must stay in the process.
+So Bridge first pins that library with `os_lib_pin` of Bridge-OS, and then closes the handle of the world.
+The next world finds the library there again, and the handles do not grow with each world.
+A library that opened but never became a backend states nothing, and is pinned too.
+If the pin fails, Bridge keeps the handle of the world open, so that the library stays.
 
 ## Functions
 
@@ -42,5 +45,5 @@ A library that opened but never became a backend states nothing, and stays too.
 | `end_modules` | Runs the `shutdown` of each module in load order, then discards each module. |
 | `free_schedule` | Frees the list of systems, and the room that `schedule_room` made. |
 | `free_names` | Frees what the deployment gave: the names of `[order]` and their matrix, and the phases. |
-| `close_backends` | Destroys each backend, and closes each library whose backend states `BACKEND_UNLOAD`. |
+| `close_backends` | Destroys each backend, pins each library whose backend does not state `BACKEND_UNLOAD`, and closes each library. It also frees the name and the path of each backend. |
 | `bridge_destroy` | Runs the `shutdown` of each loaded module, then frees the world. 0 if the world is gone, 1 if a pinned module refuses the call. |

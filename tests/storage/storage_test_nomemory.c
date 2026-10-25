@@ -40,6 +40,7 @@ static bool refuse_one(storage_test_t *t, size_t k)
     if (!bridge_load(t->w, &a))
         use_module(t->w, a);
     (void)bridge_destroy(t->w);
+    t->w = nullptr;
     return (allocator->failed);
 }
 
@@ -49,6 +50,7 @@ enum storage_test_end storage_test_refuse_memory(storage_test_t *t)
     size_t silent = 0;
 
     (void)bridge_destroy(t->w);
+    t->w = nullptr;
     while (refuse_one(t, k)) {
         silent += !t->said_memory;
         if (t->more && !t->said_memory)
@@ -60,7 +62,7 @@ enum storage_test_end storage_test_refuse_memory(storage_test_t *t)
         k > 40 ? "more than forty" : "TOO FEW");
     if (silent)
         printf("FAIL: %u of them were not said\n", (unsigned)silent);
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }
 
 #endif

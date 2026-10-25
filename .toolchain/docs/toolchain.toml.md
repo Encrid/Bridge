@@ -57,13 +57,13 @@ There are six targets: three operating systems on two types of processor.
 | `archive` | `{name}.a` | `zig build-lib -static` compiles the sources into a static library. It does not report a flag that it does not use. zig does not read the flags after `-cflags`, thus `{strip}` tells it the mode of the build. Without `-fstrip`, zig asks the compiler for CodeView, and each object of a Windows archive holds its own path. |
 | `file` | `{name}` | It copies the one source to the output. |
 
-## [branches]
+## [rewrite]
 
-`dump` is the command that gives the syntax tree of one source as JSON, for `test --branches`.
+`dump` is the command that gives the syntax tree of one source as JSON, for a changed copy of the code.
 It has the variables of the kinds, and `{source}`, the path of the source.
 It does not report a flag that it does not use, since it compiles nothing.
 Its `-o` names a file in the folder `obj`. Without it, zig would leave an empty `a.out` in the root of the project.
-`.toolchain/docs/branches.py.md` tells how the tree is used.
+`.toolchain/docs/rewrite.py.md` tells how the tree is used.
 
 ## [style]
 

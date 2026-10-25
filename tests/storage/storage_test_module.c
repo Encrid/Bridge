@@ -57,6 +57,7 @@ int storage_test_reopen(storage_test_t *t, bridge_sink_fn_t sink,
     const bridge_artifact_t *a)
 {
     (void)bridge_destroy(t->w);
+    t->w = nullptr;
     t->w = bridge_create(&t->cfg, sink, t);
     if (t->w && !bridge_load(t->w, a))
         return (0);

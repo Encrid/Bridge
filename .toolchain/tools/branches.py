@@ -1,22 +1,16 @@
 # Copyright (C) 2026 Enkrid
 #
 # Under the GNU Affero General Public License, version 3 only: see license.
-import concurrent.futures
 import fnmatch
-import json
-import os
-import shutil
-import subprocess
 from pathlib import Path
 
-import build
-from shared import die, expanded
+import rewrite
+from shared import die
 
 DECIDED = {'IfStmt': 0, 'WhileStmt': 0, 'DoStmt': 1, 'ConditionalOperator': 0, 'ForStmt': 2}
 LOGICAL = ('&&', '||')
 UNMEASURED = ('ConstantExpr', 'UnaryExprOrTypeTraitExpr', 'GenericSelectionExpr', 'StaticAssertDecl', 'EnumDecl')
 WRAPPERS = ('ParenExpr', 'ImplicitCastExpr')
-TOPS = ('src/', 'include/')
 SAID = {'function': ['no case calls this function'], 'case': ['no case reaches this case'],
         'condition': ['no case makes this condition false', 'no case makes this condition true']}
 TOP = r'''static _Atomic unsigned char %(p)shits[%(bits)d];
@@ -30,111 +24,21 @@ TOP = r'''static _Atomic unsigned char %(p)shits[%(bits)d];
     %(p)shits[2u * id + 1u] = 1;
 }
 '''
-WRITER = r'''#include <stdlib.h>
-#include <string.h>
-#ifdef _WIN32
-#include <fcntl.h>
-#include <io.h>
-#include <sys/stat.h>
-#else
-#include <fcntl.h>
-#include <unistd.h>
-#endif
-[[gnu::destructor]] static void %(p)swrite(void)
-{
-    static char %(p)sline[%(line)d];
-    const char *%(p)spath = getenv("C23_BRANCHES");
-    unsigned %(p)sat = %(name_len)du;
-    int %(p)sfd;
-    int %(p)sn;
-
-    if (!%(p)spath)
-        return;
-#ifdef _WIN32
-    %(p)sfd = _open(%(p)spath, _O_WRONLY | _O_CREAT | _O_APPEND | _O_BINARY, _S_IREAD | _S_IWRITE);
-#else
-    %(p)sfd = open(%(p)spath, O_WRONLY | O_CREAT | O_APPEND, 0644);
-#endif
-    if (%(p)sfd < 0)
-        return;
-    memcpy(%(p)sline, "%(name)s ", %(p)sat);
-    for (unsigned %(p)si = 0; %(p)si < %(bits)du; %(p)si++)
+FILL = r'''    for (unsigned %(p)si = 0; %(p)si < %(bits)du; %(p)si++)
         %(p)sline[%(p)sat++] = %(p)shits[%(p)si] ? '1' : '0';
-    %(p)sline[%(p)sat++] = '\n';
-#ifdef _WIN32
-    %(p)sn = _write(%(p)sfd, %(p)sline, %(p)sat);
-    _close(%(p)sfd);
-#else
-    %(p)sn = (int)write(%(p)sfd, %(p)sline, %(p)sat);
-    close(%(p)sfd);
-#endif
-    (void)%(p)sn;
-}
-#ifdef __APPLE__
-typedef struct {
-    const char *dli_fname;
-    void *dli_fbase;
-    const char *dli_sname;
-    void *dli_saddr;
-} %(p)sinfo_t;
-extern int %(p)sdladdr(const void *at, %(p)sinfo_t *info) __asm__("_dladdr");
-extern void *%(p)sdlopen(const char *path, int mode) __asm__("_dlopen");
-[[gnu::constructor]] static void %(p)skeep(void)
-{
-    %(p)sinfo_t %(p)sinfo;
-
-    if (%(p)sdladdr((const void *)%(p)shits, &%(p)sinfo) && %(p)sinfo.dli_fname)
-        (void)%(p)sdlopen(%(p)sinfo.dli_fname, 0x1 | 0x10 | 0x80);
-}
-#endif
 '''
-
-
-def tree(values):
-    return Path(values['build']) / 'branches' / 'tree'
-
-
-def marked(node, state):
-    def mark(loc):
-        if not isinstance(loc, dict) or not loc:
-            return
-        for side in ('spellingLoc', 'expansionLoc'):
-            mark(loc.get(side))
-        if 'file' in loc:
-            state[0] = loc['file']
-        loc['_file'] = state[0]
-    mark(node.get('loc'))
-    mark(node.get('range', {}).get('begin'))
-    mark(node.get('range', {}).get('end'))
-    for child in node.get('inner', []):
-        if isinstance(child, dict):
-            marked(child, state)
-
-
-def is_macro(loc):
-    return isinstance(loc, dict) and 'expansionLoc' in loc
-
-
-def owned(loc, root):
-    path = (loc.get('_file') or '').replace('\\', '/')
-    whole = root.as_posix() + '/'
-    if path.lower().startswith(whole.lower()):
-        path = path[len(whole):]
-    while path.startswith('./'):
-        path = path[2:]
-    return path if path.startswith(TOPS) else None
 
 
 def placed(loc, end, root):
     if not loc:
         return None, None
-    if is_macro(loc):
+    if rewrite.is_macro(loc):
         loc = loc['expansionLoc']
         if loc.get('isMacroArgExpansion') or 'offset' not in loc:
-            return 'macro', owned(loc, root)
+            return 'macro', rewrite.owned(loc, root)
     if 'offset' not in loc:
         return None, None
-    return loc['offset'] + (loc.get('tokLen', 0) if end else 0), owned(loc, root)
+    return loc['offset'] + (loc.get('tokLen', 0) if end else 0), rewrite.owned(loc, root)
 
 
 def stripped(node):
@@ -181,7 +85,7 @@ class Probing:
         if kind == 'FunctionDecl':
             return self.function(node, raw, depth)
         joining = kind == 'BinaryOperator' and node.get('opcode') in LOGICAL
-        if inside and (kind in DECIDED or joining) and is_macro(node.get('loc')):
+        if inside and (kind in DECIDED or joining) and rewrite.is_macro(node.get('loc')):
             return self.skip(node.get('loc'), 'condition')
         if inside and kind in DECIDED:
             self.condition(child(raw, DECIDED[kind]), depth)
@@ -224,7 +128,7 @@ class Probing:
         ends = node.get('range', {})
         begin, path = placed(ends.get('begin'), False, self.root)
         end, last = placed(ends.get('end'), True, self.root)
-        if isinstance(begin, int) and path and is_macro(ends.get('begin')):
+        if isinstance(begin, int) and path and rewrite.is_macro(ends.get('begin')):
             named = placed(ends.get('begin'), True, self.root)[0]
             call = self.called(path, named)
             end, last = (call, path) if call != named else (end, last)
@@ -232,7 +136,7 @@ class Probing:
             return self.skip(ends.get('begin') if begin == 'macro' else ends.get('end'), 'condition')
         if not isinstance(begin, int) or not isinstance(end, int) or not path or path != last:
             return
-        end = self.called(path, end) if is_macro(ends.get('end')) else end
+        end = self.called(path, end) if rewrite.is_macro(ends.get('end')) else end
         self.add(path, ('condition', begin, end), ('condition', begin, end, depth))
 
     def called(self, path, at):
@@ -251,28 +155,10 @@ class Probing:
         return start
 
 
-def dumped(command, root):
-    done = subprocess.run(command, cwd=root, capture_output=True)
-    errors = [line for line in done.stderr.decode('utf-8', 'replace').splitlines()
-              if ' error: ' in line and not line.endswith('FileNotFound')]
-    if errors:
-        die('the tree of %s cannot be read:\n%s' % (command[-1], '\n'.join(errors)))
-    try:
-        return json.loads(done.stdout)
-    except ValueError:
-        die('the tree of %s is not JSON' % command[-1])
-
-
-def walked(root, command):
-    found = dumped(command, root)
-    marked(found, [None])
+def walked(root, path, found):
     probing = Probing(root)
     probing.walk(found)
     return probing
-
-
-def placing(text, at):
-    return text.count(b'\n', 0, at) + 1, at - (text.rfind(b'\n', 0, at) + 1) + 1
 
 
 def rewritten(text, path, edits, prefix):
@@ -294,50 +180,37 @@ def rewritten(text, path, edits, prefix):
         last = at
     out += text[last:]
     bits = 2 * max(1, len(rows))
-    values = {'p': prefix, 'bits': bits, 'line': len(path) + bits + 2, 'name': path, 'name_len': len(path) + 1}
+    values = {'p': prefix, 'bits': bits, 'line': len(path) + bits + 2, 'name': path, 'name_len': len(path) + 1,
+              'variable': 'C23_BRANCHES', 'fill': FILL, 'kept': 'hits'}
     if path.endswith('.h'):
         guard = prefix.upper() + 'GUARD'
-        block = '#ifndef %s\n    #define %s\n%s%s#endif\n#line 1\n' % (guard, guard, TOP % values, WRITER % values)
+        block = '#ifndef %s\n    #define %s\n%s%s#endif\n#line 1\n' % (guard, guard, TOP % values,
+                                                                       rewrite.writer(values))
         out = block.encode() + bytes(out)
     else:
-        out = (TOP % values + '#line 1\n').encode() + bytes(out) + b'\n' + (WRITER % values).encode()
-    return out, [dict(zip(('kind', 'line', 'col'), (kind,) + placing(text, at))) for kind, at in rows]
+        out = (TOP % values + '#line 1\n').encode() + bytes(out) + b'\n' + rewrite.writer(values).encode()
+    return out, [dict(zip(('kind', 'line', 'col'), (kind,) + rewrite.placing(text, at))) for kind, at in rows]
 
 
 def probed(config, values):
-    root = Path(values['root'])
-    jobs = {}
-    for artifact in build.artifacts(config):
-        if 'target' in artifact:
-            continue
-        _, mine = build.planned(config, values, artifact)
-        Path(mine['work']).parent.mkdir(parents=True, exist_ok=True)
-        for source in mine['sources']:
-            if source.startswith('src/') and source.endswith('.c') and source not in jobs:
-                jobs[source] = expanded(config['branches']['dump'], dict(mine, source=source))
-    with concurrent.futures.ThreadPoolExecutor(min(8, os.cpu_count() or 1)) as pool:
-        found = list(pool.map(lambda command: walked(root, command), jobs.values()))
     edits, skips = {}, {}
-    for probing in found:
+    for probing in rewrite.each(config, values, walked):
         for path, table in probing.edits.items():
             edits.setdefault(path, {}).update(table)
         for path, table in probing.skips.items():
             skips.setdefault(path, {}).update(table)
-    return written(root, tree(values), edits, skips)
+    return written(Path(values['root']), rewrite.tree(values, 'branches'), edits, skips)
 
 
 def written(root, where, edits, skips):
-    shutil.rmtree(where, ignore_errors=True)
-    for top in ('src', 'include'):
-        if (root / top).is_dir():
-            shutil.copytree(root / top, where / top)
+    rewrite.copied(root, where)
     headers = sorted(path for path in edits if path.endswith('.h'))
     probes = {}
     for path in sorted(edits):
         prefix = 'c23b_h%d_' % headers.index(path) if path in headers else 'c23b_'
         out, probes[path] = rewritten((root / path).read_bytes(), path, edits[path], prefix)
         (where / path).write_bytes(out)
-    gaps = {path: [dict(zip(('kind', 'line', 'col'), (kind,) + placing((root / path).read_bytes(), at)))
+    gaps = {path: [dict(zip(('kind', 'line', 'col'), (kind,) + rewrite.placing((root / path).read_bytes(), at)))
                    for at, kind in sorted(table.items())] for path, table in skips.items()}
     return probes, gaps
 

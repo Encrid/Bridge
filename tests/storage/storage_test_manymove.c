@@ -33,6 +33,7 @@ enum storage_test_end storage_test_move_many(storage_test_t *t)
     bridge_world_t *w;
 
     (void)bridge_destroy(t->w);
+    t->w = nullptr;
     t->cfg.budget.types = 512;
     t->cfg.budget.sparse_sets = 512;
     w = bridge_create(&t->cfg, storage_test_hear, t);
@@ -43,7 +44,7 @@ enum storage_test_end storage_test_move_many(storage_test_t *t)
     printf("reload: %s\n", bridge_reload(w, &a, 1) ? "refused" : "done");
     say_carried(w, "after the reload", 4);
     (void)bridge_destroy(w);
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }
 
 enum storage_test_end storage_test_grow_many(storage_test_t *t)
@@ -52,6 +53,7 @@ enum storage_test_end storage_test_grow_many(storage_test_t *t)
     bridge_world_t *w;
 
     (void)bridge_destroy(t->w);
+    t->w = nullptr;
     t->cfg.budget.types = 512;
     w = bridge_create(&t->cfg, storage_test_hear, t);
     storage_test_load_reloadable(w, &a);
@@ -59,5 +61,5 @@ enum storage_test_end storage_test_grow_many(storage_test_t *t)
     (void)bridge_run_phase(w, "spawn");
     say_carried(w, "after two spawns", 8);
     (void)bridge_destroy(w);
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }

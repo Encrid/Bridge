@@ -13,6 +13,8 @@ from pathlib import Path
 
 import branches
 import build
+import leaks
+import rewrite
 import shared
 from said import checked
 from shared import die, expand, expanded, files, known, located, status
@@ -139,17 +141,19 @@ def made_false(case):
     return merged
 
 
-def tried(config, values, outputs, where, case, broken):
+def tried(config, values, outputs, where, case, broken, counted=False):
     folder = Path(values['out']) / 'cases' / where
     shutil.rmtree(folder, ignore_errors=True)
     folder.mkdir(parents=True, exist_ok=True)
     mine, use = dict(values, case=folder.as_posix(), port=free_port()), made_false(case) if broken else case
+    counting = {'C23_LEAKS': folder.as_posix() + '.leaks'} if counted else {}
     placed(use, outputs, mine)
     root, timeout, helper = values['root'], config['test']['timeout'], use.get('helper')
-    beside = started(expanded(helper['run'], mine), root, timeout) if helper else None
+    beside = started(expanded(helper['run'], mine), root, timeout, environment(counting, mine)) if helper else None
     if helper:
         waited(beside, expand(helper['wait'], mine))
-    running = started(expanded(use['run'], mine), root, timeout, environment(use.get('env', {}), mine))
+    running = started(expanded(use['run'], mine), root, timeout,
+                      environment(dict(counting, **use.get('env', {})), mine))
     scripted(running, use.get('script', []), outputs, mine)
     ends = [ended(running, expand(use.get('stdin', ''), mine))]
     if helper:
@@ -168,12 +172,12 @@ def judged(config, group, broken, run):
     return held, 'as written' if held else 'differs', ends
 
 
-def verdict(config, values, outputs, group, index, case, broken, copies):
+def verdict(config, values, outputs, group, index, case, broken, copies, counted=False):
     count = 1 if case.get('alone') else copies
     where = '%s/%d' % (group, index)
     wheres = [where] if count == 1 else ['%s/%d' % (where, copy) for copy in range(count)]
     with concurrent.futures.ThreadPoolExecutor(count) as pool:
-        runs = list(pool.map(lambda where: tried(config, values, outputs, where, case, broken), wheres))
+        runs = list(pool.map(lambda where: tried(config, values, outputs, where, case, broken, counted), wheres))
     verdicts = [judged(config, group, broken, run) for run in runs]
     bad = [one for one in verdicts if not one[0]]
     if not bad:
@@ -182,12 +186,12 @@ def verdict(config, values, outputs, group, index, case, broken, copies):
     return ok, how + (' in %d of %d copies' % (len(bad), count) if count > 1 else ''), ends
 
 
-def test(config, values, outputs, groups, broken, said, copies):
+def test(config, values, outputs, groups, broken, said, copies, counted=False):
     wrong, texts = [], []
     for group, cases in groups:
         right = 0
         for index, case in enumerate(cases):
-            ok, how, ends = verdict(config, values, outputs, group, index, case, broken, copies)
+            ok, how, ends = verdict(config, values, outputs, group, index, case, broken, copies, counted)
             texts += [said for _, said in ends]
             print('%s%s: %s' % (case['name'], ', made false' if broken else '', how))
             right += ok
@@ -224,28 +228,47 @@ def chosen(groups, part):
     return [(group, cases) for group, cases in found if cases] or die('no case has %s in its name' % part)
 
 
-def measured(args):
-    if args.broken or args.toolchain or args.copies or args.rounds:
-        die('--branches runs each case one time: it takes no --break, --toolchain, --copies or --rounds')
+def changed(args, run, write):
     config, values = build.ready(args, True)
-    values['out'] = (Path(values['build']) / 'branches' / values['target']).as_posix()
-    probes, gaps = branches.probed(config, values)
-    made = build.made(config, values, branches.tree(values))
+    values['out'] = (Path(values['build']) / run / values['target']).as_posix()
+    written = write(config, values)
+    made = build.made(config, values, rewrite.tree(values, run))
     unlinked = [name for name, paths in made if not paths]
     if unlinked:
         die('the cases need what is linked: ' + ' '.join(unlinked))
     groups = groups_of(values, config.get('test', {}).get('cases', 'tests/cases'))
     groups = chosen(groups, args.k) if args.k and groups else groups
+    return config, values, written, {name: paths[0] for name, paths in made}, groups
+
+
+def measured(args):
+    if args.broken or args.toolchain or args.copies or args.rounds:
+        die('--branches runs each case one time: it takes no --break, --toolchain, --copies or --rounds')
+    config, values, (probes, gaps), outputs, groups = changed(args, 'branches', branches.probed)
     hits = Path(values['out']) / 'hits.txt'
     hits.unlink(missing_ok=True)
     os.environ['C23_BRANCHES'] = str(hits)
-    test(config, values, {name: paths[0] for name, paths in made}, groups, False, False, 1)
+    test(config, values, outputs, groups, False, False, 1)
     branches.reported(probes, gaps, hits, config.get('branches', {}).get('exception', []), values['system'])
+
+
+def tallied(args):
+    if args.broken or args.toolchain or args.copies or args.rounds or args.branches:
+        die('--leaks runs each case one time: it takes no --break, --toolchain, --copies, --rounds or --branches')
+    config, values, (files, kinds), outputs, groups = changed(args, 'leaks', leaks.counted)
+    folder = Path(values['out']) / 'cases'
+    shutil.rmtree(folder, ignore_errors=True)
+    test(config, values, outputs, groups, False, False, 1, True)
+    cases = [(case['name'], folder / group / ('%d.leaks' % index)) for group, listed in groups
+             for index, case in enumerate(listed)]
+    leaks.reported(files, kinds, cases, config.get('leaks', {}).get('exception', []), values['system'])
 
 
 def main():
     args = shared.arguments('-k', ('--copies', int), ('--rounds', int), broken='--break', toolchain='--toolchain',
-                            branches='--branches')
+                            branches='--branches', leaks='--leaks')
+    if args.leaks:
+        return tallied(args)
     if args.branches:
         return measured(args)
     if args.toolchain:

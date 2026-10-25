@@ -44,7 +44,7 @@ static int join_sparse(storage_test_t *t, const char *path, uint32_t failures)
 enum storage_test_end storage_test_join_sparse(storage_test_t *t)
 {
     if (join_sparse(t, SPARSE_PATH, 1))
-        return (STORAGE_TEST_LEFT);
+        return (STORAGE_TEST_DONE);
     storage_test_run_all(t, SPARSE_KEPT);
     return (STORAGE_TEST_DONE);
 }
@@ -52,14 +52,14 @@ enum storage_test_end storage_test_join_sparse(storage_test_t *t)
 enum storage_test_end storage_test_fill_sparse(storage_test_t *t)
 {
     if (join_sparse(t, SPARSE_PATH, 4))
-        return (STORAGE_TEST_LEFT);
+        return (STORAGE_TEST_DONE);
     return (STORAGE_TEST_DONE);
 }
 
 enum storage_test_end storage_test_sweep_beside_sparse(storage_test_t *t)
 {
     if (join_sparse(t, SPARSE_PATH, 1))
-        return (STORAGE_TEST_LEFT);
+        return (STORAGE_TEST_DONE);
     storage_test_drop(t, "st:A", BRIDGE_SWEEP);
     storage_test_run(t, "look");
     storage_test_run(t, "look_b");
@@ -73,7 +73,7 @@ enum storage_test_end storage_test_drop_sparse(storage_test_t *t)
         count, t->what);
 
     if (join_sparse(t, v->path, 1))
-        return (STORAGE_TEST_LEFT);
+        return (STORAGE_TEST_DONE);
     storage_test_run(t, "attach_b_half");
     storage_test_drop(t, "st:S", v->policy);
     printf("the entity that was in the set alone is %s\n",
