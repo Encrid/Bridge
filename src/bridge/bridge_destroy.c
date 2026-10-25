@@ -52,9 +52,11 @@ static void close_backends(bridge_world_t *w)
         o = &w->backends[i];
         if (o->be)
             o->api.backend_destroy(o->be);
-        if (o->lib && (o->capabilities & BACKEND_UNLOAD))
+        if (o->lib && ((o->capabilities & BACKEND_UNLOAD)
+            || !os_lib_pin(o->path)))
             os_lib_close(o->lib);
         free(o->name);
+        free(o->path);
         i++;
     }
     free(w->backends);
