@@ -206,8 +206,7 @@ int main(int argc, char **argv)
         return (1);
     }
     end = c->run(&t);
-    if (end == STORAGE_TEST_DONE)
-        (void)bridge_destroy(t.w);
+    (void)bridge_destroy(t.w);
     if (end != STORAGE_TEST_FAILED)
         printf("alive\n");
     return (end == STORAGE_TEST_FAILED);

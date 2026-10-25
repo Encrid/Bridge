@@ -27,5 +27,5 @@ enum storage_test_end storage_test_config_bad_kind(storage_test_t *t)
     (void)t;
     try_bad_kind(0);
     try_bad_kind(SCHEMA_STRUCT + 1);
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }

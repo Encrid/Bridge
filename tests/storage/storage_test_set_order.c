@@ -111,5 +111,5 @@ enum storage_test_end storage_test_set_order(storage_test_t *t)
     report("empty", s, bridge_set_order(&w, nullptr, 0));
     report("alt", s, bridge_set_order(&w, ALT, 2));
     tidy(&w, s);
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }

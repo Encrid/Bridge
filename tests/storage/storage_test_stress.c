@@ -60,6 +60,7 @@ int storage_test_measure_stress(storage_test_t *t, uint32_t threads)
     uint64_t began;
 
     (void)bridge_destroy(t->w);
+    t->w = nullptr;
     t->cfg.threads = threads;
     t->w = bridge_create(&t->cfg, storage_test_hear_nothing, t);
     if (!t->w || load_stress(t->w)) {

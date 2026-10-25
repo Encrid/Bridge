@@ -66,11 +66,7 @@ static void free_phase(bridge_world_t *w, bridge_system_t **s)
 {
     free(s[0]);
     free(s[1]);
-    for (uint32_t k = 0; k < w->order.n; k++)
-        free(w->order.names[k]);
-    free(w->order.names);
-    free(w->order.pairs);
-    free(w->order.reach.bits);
+    schedule_free_pairs(&w->order);
     free(w->build_in);
     free(w->build_bits);
 }
@@ -91,5 +87,5 @@ enum storage_test_end storage_test_order_phase(storage_test_t *t)
     refused = schedule_build(&w, why, sizeof(why));
     printf("%s: %s%s\n", t->what, refused ? "refused: " : "built", why);
     free_phase(&w, s);
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }

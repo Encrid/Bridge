@@ -41,7 +41,7 @@ static int give_direct(storage_test_t *t, const char *path)
 enum storage_test_end storage_test_index_directly(storage_test_t *t)
 {
     if (give_direct(t, DIRECT_PATH))
-        return (STORAGE_TEST_LEFT);
+        return (STORAGE_TEST_DONE);
     storage_test_run_all(t, DIRECT_KEPT);
     return (STORAGE_TEST_DONE);
 }
@@ -65,7 +65,7 @@ enum storage_test_end storage_test_drop_direct(storage_test_t *t)
         DIRECT_DROPPED, count, t->what);
 
     if (give_direct(t, v->path))
-        return (STORAGE_TEST_LEFT);
+        return (STORAGE_TEST_DONE);
     if (strcmp(t->what, "directsweepfree")) {
         storage_test_drop(t, "st:A", BRIDGE_STRIP);
         storage_test_drop(t, "st:D", v->policy);

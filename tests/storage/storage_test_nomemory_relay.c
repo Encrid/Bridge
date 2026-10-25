@@ -30,6 +30,7 @@ static bool relay_one(storage_test_t *t, size_t k)
         (void)bridge_reload(t->w, &a, 1);
     }
     (void)bridge_destroy(t->w);
+    t->w = nullptr;
     return (allocator->failed);
 }
 
@@ -39,6 +40,7 @@ enum storage_test_end storage_test_refuse_relay(storage_test_t *t)
     size_t silent = 0;
 
     (void)bridge_destroy(t->w);
+    t->w = nullptr;
     while (relay_one(t, k)) {
         silent += !t->said_memory;
         if (t->more && !t->said_memory)
@@ -50,7 +52,7 @@ enum storage_test_end storage_test_refuse_relay(storage_test_t *t)
         k > 40 ? "more than forty" : "TOO FEW");
     if (silent)
         printf("FAIL: %u of them were not said\n", (unsigned)silent);
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }
 
 #endif

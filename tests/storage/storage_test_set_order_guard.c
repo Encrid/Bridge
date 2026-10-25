@@ -27,5 +27,5 @@ enum storage_test_end storage_test_set_order_guard(storage_test_t *t)
     printf("guard %s: %d\n", t->what, bridge_set_order(&w, &pair, 1));
     if (owner)
         bridge_leave(&w, owner);
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }
