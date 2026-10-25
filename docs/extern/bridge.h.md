@@ -444,6 +444,9 @@ The namespace of a module is the part of its identity before the colon.
 Bridge finds a loaded module by its identity without the version.
 Thus a load refuses a module whose identity without the version is loaded already.
 
+Bridge reads a module config, and what it points to, only during the call of `bridge_load` or `bridge_reload` that gets it.
+Thus the host can free the config when the call returns.
+
 ### The limits
 
 `max_system_failures`, `work_limit`, `memory_limit` and the three timeouts are limits.
