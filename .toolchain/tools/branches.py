@@ -19,10 +19,7 @@ WRAPPERS = ('ParenExpr', 'ImplicitCastExpr')
 TOPS = ('src/', 'include/')
 SAID = {'function': ['no case calls this function'], 'case': ['no case reaches this case'],
         'condition': ['no case makes this condition false', 'no case makes this condition true']}
-TOP = r'''#ifdef __APPLE__
-#define C23B_KEEP_LOADED
-#endif
-static _Atomic unsigned char %(p)shits[%(bits)d];
+TOP = r'''static _Atomic unsigned char %(p)shits[%(bits)d];
 [[maybe_unused]] static bool %(p)s(bool c, unsigned id)
 {
     %(p)shits[2u * id + (c ? 1u : 0u)] = 1;
@@ -73,6 +70,23 @@ WRITER = r'''#include <stdlib.h>
 #endif
     (void)%(p)sn;
 }
+#ifdef __APPLE__
+typedef struct {
+    const char *dli_fname;
+    void *dli_fbase;
+    const char *dli_sname;
+    void *dli_saddr;
+} %(p)sinfo_t;
+extern int %(p)sdladdr(const void *at, %(p)sinfo_t *info) __asm__("_dladdr");
+extern void *%(p)sdlopen(const char *path, int mode) __asm__("_dlopen");
+[[gnu::constructor]] static void %(p)skeep(void)
+{
+    %(p)sinfo_t %(p)sinfo;
+
+    if (%(p)sdladdr((const void *)%(p)shits, &%(p)sinfo) && %(p)sinfo.dli_fname)
+        (void)%(p)sdlopen(%(p)sinfo.dli_fname, 0x1 | 0x10 | 0x80);
+}
+#endif
 '''
 
 

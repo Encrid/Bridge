@@ -39,3 +39,9 @@ name = "an exemption with no reason or no target is a fault"
 run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/branches/badexempt", "--out", "{case}/out", "--branches"]
 claims = { status = 1, line = ["src/defend.c:10:9: no case makes this condition true", "src/defend.c:10:9: this exemption states no reason", "src/defend.c:12:9: this exemption excuses no unreached outcome"] }
 false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/branches/excused", "--out", "{case}/out", "--branches"] }
+
+[[case]]
+name = "a closed library keeps its outcomes"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/branches/loaded", "--out", "{case}/out", "--branches"]
+claims = { status = 0, line = ["branches: 3 outcomes, 3 reached"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/branches/loaded", "--out", "{case}/out", "--branches", "-k", "one"] }

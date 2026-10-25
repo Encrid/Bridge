@@ -66,3 +66,5 @@ jobs:
         run: python project.py test --break
       - name: Branches
         run: python project.py test --branches
+      - name: Pack
+        run: python project.py pack --target ${{ matrix.target }}
