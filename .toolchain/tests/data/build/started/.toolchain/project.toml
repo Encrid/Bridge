@@ -1,0 +1,7 @@
+[project]
+name = "started"
+
+[[artifact]]
+name = "sizer"
+kind = "program"
+sources = ["src/sizer.c"]

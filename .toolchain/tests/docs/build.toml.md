@@ -18,6 +18,7 @@ The cases of the options, of the report and of the files of a project run a shor
 | `config` | The artifact `thing`, stated in a file of `.toolchain/config` and not in `project.toml`. |
 | `leaky` | The artifact `stamped`, whose section holds `{root}`: the folder of the project. |
 | `archived` | The archive `one`. |
+| `started` | The program `sizer`, which calls `stat`. |
 
 In `built`, `greet` gets its greeting from `defines`.
 `greeter` includes `.toolchain/tests/data/build/built/include/greet.h`, links `greet`, and has `greet` beside it in its folder.
@@ -41,6 +42,8 @@ The variant `plain` is unstamped.
 
 The case of an archive of a release copies `archived` into `{case}/proj`, and runs `build.main` from a short Python program.
 The program puts `[build] cache` in that folder, as in a project. A project in `.toolchain/tests/data/build` does not hold the cache.
+The cases of a release build for a named target: the archive for Windows, and the program for Linux.
+Thus each machine checks a file that holds a path of its machine without the fix.
 
 | Case | Claim | False variant |
 | --- | --- | --- |
@@ -70,6 +73,7 @@ The program puts `[build] cache` in that folder, as in a project. A project in `
 | the files of a project, from git | The program makes `{case}/g` a repository of git, and `shared.repository` writes `True`. `shared.ours` gives `a.txt` and `.gitignore`, but not `tests` or a file that git ignores. | `{case}/g/src/b.txt` is also there. |
 | a package that holds a path of its machine is refused | `build --pack` on `leaky` stops: `stamped.txt` holds the folder of the project. | No `--pack`. |
 | the cache of zig is a path from the folder of the project | `build.prepared` on the template, which holds the cache, sets `ZIG_LOCAL_CACHE_DIR` to `build/zig-cache/local`. | `build.prepared` on `built`, which does not hold the cache: a whole path. |
-| an archive of a release holds no path of its machine | `build --pack` on the copy of `archived` writes its zip, thus `one.a` holds no folder of the machine. On Windows, `one.a` holds one without `-fstrip`. | `--debug`: the debug information of `one.a` holds the folder of the project, thus `pack` stops. |
+| an archive of a release holds no path of its machine | `build --pack --target x86_64-windows-gnu` on the copy of `archived` writes its zip, thus `one.a` holds no folder of the machine. Without `-fstrip`, each object of `one.a` holds its own path. | `--debug`: the debug information of `one.a` holds the folder of the project, thus `pack` stops. |
+| a program of a release holds no path of its machine | `build --pack --target x86_64-linux-gnu` on `started` writes its zip, thus `sizer` holds no folder of the machine. `sizer` links objects that zig builds for glibc, with their debug information. Without `-s`, `sizer` keeps it. | `--debug`: the debug information of `sizer` holds the folder of the project, thus `pack` stops. |
 
 `.toolchain/docs/build.py.md` gives the limits of these cases.
