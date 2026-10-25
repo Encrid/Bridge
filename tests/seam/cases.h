@@ -407,6 +407,7 @@ void test_reload_nothing(host_t *h);
 void test_state_plain_timeout(host_t *h);
 void test_reload_plain(host_t *h);
 void test_configure(host_t *h);
+void test_spoil_config(host_t *h);
 void test_misname_setting(host_t *h);
 void test_mistype_setting(host_t *h);
 void test_overflow_text(host_t *h);
