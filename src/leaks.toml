@@ -1,0 +1,2 @@
+[leaks.pairs]
+bridge_create = "bridge_destroy"
