@@ -32,6 +32,7 @@ The host Bridge-Host and the backends BB-Native and BB-Wasm are repositories of 
 | `python project.py test` | Builds the library, and the programs and modules of the tests. Then runs the tests. |
 | `python project.py test --break` | Runs the tests with their claims made false. Each test must fail. |
 | `python project.py test --branches` | Runs the tests on a build with probes. Each branch of the code must run. |
+| `python project.py test --leaks` | Runs the tests on a build with counts. Each test must give back what the code takes. |
 | `python project.py check` | Checks the project. |
 | `python project.py clean` | Removes what the build made. Keeps what `fetch` downloaded. |
 | `python project.py distclean` | Removes the folder `build`, also what `fetch` downloaded. |

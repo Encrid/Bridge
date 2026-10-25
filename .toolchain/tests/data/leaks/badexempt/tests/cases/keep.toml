@@ -1,0 +1,5 @@
+[[case]]
+name = "kept"
+run = ["{out}/keep{exe}"]
+claims = { status = 0, line = ["kept"] }
+false = { run = ["{out}/keep{exe}", "free"] }
