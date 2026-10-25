@@ -5,8 +5,7 @@
 */
 #include "greet.h"
 #include "extra.h"
-
-const char *outside(void);
+#include "outside.h"
 
 int main(void)
 {

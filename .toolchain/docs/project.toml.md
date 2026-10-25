@@ -215,7 +215,7 @@ An artifact is a file that the build makes, for example a program, a library or 
 | `folder` | Optional. The folder of the artifact, in the output folder of the target. |
 | `target` | Optional. The target of the artifact, if it is not the target of the build. |
 | `variants` | Optional. The variants. Each variant has a `name`, and can have the other keys and `unstamped`. |
-| `test` | Optional. `true` for an artifact that only the tests use. The build makes it, and `package.txt` does not list it. Thus `pack` does not put it into the zip. |
+| `test` | Optional. `true` for an artifact that only the tests use. Only the command `test` makes it, and `package.txt` does not list it. Thus `pack` does not put it into the zip. |
 | `part` | Optional. The name of a part of the project. `--part <name>` acts on the part `<name>`, and repeats. A build makes the base and each named part. The base is the untagged artifacts, and a build always makes it. |
 | `path` | Optional. `true` for a test library that a case loads by a `*_PATH` macro. `.toolchain/docs/build.py.md`, *Modules*, tells it. |
 

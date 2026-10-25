@@ -19,9 +19,11 @@ cache = "build/zig-cache"
 language = ["-std=c23", "-pedantic-errors", "-Wall", "-Wextra", "-Werror"]
 optimize = ["-O2", "-DNDEBUG", "-g0", "-fno-sanitize=undefined", "-fno-stack-protector", "-fno-omit-frame-pointer"]
 float = ["-ffp-contract=on", "-fno-fast-math", "-fno-rounding-math"]
+strip = "-fstrip"
 
 [debug]
 optimize = ["-O0", "-g", "-fsanitize=undefined", "-fno-sanitize=vptr", "-fno-sanitize=function", "-fstack-protector-strong", "-fno-omit-frame-pointer"]
+strip = "-fno-strip"
 
 [targets.x86_64-windows-gnu]
 runs_on = ["Windows", "AMD64"]
@@ -122,7 +124,7 @@ steps = [
 [kinds.archive]
 output = "{name}.a"
 steps = [
-    { run = ["{zig}", "build-lib", "-static", "-target", "{triple}", "-mcpu={cpu}", "-lc", "-femit-bin={output}", "-cflags", "{optimize}", "{float}", "{errno}", "{language}", "-Wno-unused-command-line-argument", "{define}", "{defines}", "{include}", "{flags}", "--", "{sources}"] },
+    { run = ["{zig}", "build-lib", "-static", "-target", "{triple}", "-mcpu={cpu}", "-lc", "{strip}", "-femit-bin={output}", "-cflags", "{optimize}", "{float}", "{errno}", "{language}", "-Wno-unused-command-line-argument", "{define}", "{defines}", "{include}", "{flags}", "--", "{sources}"] },
 ]
 
 [kinds.file]
