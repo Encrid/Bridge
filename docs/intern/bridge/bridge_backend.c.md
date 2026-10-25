@@ -26,6 +26,6 @@ Static assertions hold them to one shape: the same four kinds with the same numb
 | --- | --- |
 | `check_backend` | Refuses a backend with no name or no library, or with the name of a backend before it. 1, with a record, if refused. |
 | `convert_settings` | Gives a new array of the settings of a backend, as the backend seam states them. Null if there is not the memory. |
-| `open_library` | Copies the name of the backend, counts the backend, opens its library and finds its entries. 1, with a record, if it fails. |
+| `open_library` | Copies the name of the backend, counts the backend, copies the path of its library, opens the library and finds its entries. 1, with a record, if it fails. |
 | `start_backend` | Creates the backend with its settings. 1, with a record, if there is not the memory or the backend does not start. |
 | `bridge_open_backend` | Opens the backend `i` of the deployment and starts it. 1, with a record, if one step fails. |

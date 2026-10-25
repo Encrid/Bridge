@@ -676,7 +676,7 @@ Else the sink gets a record that tells why: *The deployment*.
 1. Bridge calls `shutdown` of each loaded module, in the order that the modules loaded, each under its `shutdown_timeout`.
 2. A `shutdown` that fails is a record, and the destruction continues.
 3. Bridge destroys the modules, the storage, the threads and the backends.
-4. Bridge closes the library of a backend that states `BACKEND_UNLOAD`. Another library stays, and the next world uses it.
+4. Bridge closes the library of each backend. It first pins a library whose backend does not state `BACKEND_UNLOAD`. That library stays, and the next world uses it.
 
 The result is 0 when the world is gone, and for a null `b`.
 The result is 1 if a pinned module is loaded and the call comes from another thread, or if the sink calls it.
