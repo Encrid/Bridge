@@ -133,8 +133,8 @@ steps = [
     { copy = ["{sources}", "{output}"] },
 ]
 
-[branches]
-dump = ["{zig}", "cc", "-target", "{triple}", "-mcpu={cpu}", "{optimize}", "{float}", "{errno}", "{language}", "-Wno-unused-command-line-argument", "{define}", "{defines}", "{include}", "{flags}", "-U_FORTIFY_SOURCE", "-D_FORTIFY_SOURCE=0", "-fsyntax-only", "-Xclang", "-ast-dump=json", "-o", "{work}.dump", "{source}"]
+[rewrite]
+dump =["{zig}", "cc", "-target", "{triple}", "-mcpu={cpu}", "{optimize}", "{float}", "{errno}", "{language}", "-Wno-unused-command-line-argument", "{define}", "{defines}", "{include}", "{flags}", "-U_FORTIFY_SOURCE", "-D_FORTIFY_SOURCE=0", "-fsyntax-only", "-Xclang", "-ast-dump=json", "-o", "{work}.dump", "{source}"]
 
 [style]
 columns = 80

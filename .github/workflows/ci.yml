@@ -66,5 +66,7 @@ jobs:
         run: python project.py test --break
       - name: Branches
         run: python project.py test --branches
+      - name: Leaks
+        run: python project.py test --leaks
       - name: Pack
         run: python project.py pack --target ${{ matrix.target }}

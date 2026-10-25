@@ -16,10 +16,11 @@ When `dev` is ready for a release, a pull request from `dev` into `main` adds it
 2. Make sure that `python project.py test` passes.
 3. Make sure that `python project.py test --break` passes: each case fails, as it must.
 4. Make sure that `python project.py test --branches` passes: each branch of the code runs in a case.
-5. Read the full change, and remove each part that the change does not need.
-6. Make sure that the documents describe the change, and that a case checks each new behavior.
+5. Make sure that `python project.py test --leaks` passes: each case gives back what the code takes.
+6. Read the full change, and remove each part that the change does not need.
+7. Make sure that the documents describe the change, and that a case checks each new behavior.
 
-The workflow `ci` runs the four commands again on a machine of each target of `.toolchain/toolchain.toml`.
+The workflow `ci` runs the five commands again on a machine of each target of `.toolchain/toolchain.toml`.
 Then it runs `python project.py pack`, which refuses a package that holds a path of the machine that built it.
 
 ## One purpose

@@ -1,0 +1,18 @@
+[project]
+name = "held"
+
+[variables]
+counted = "tests/leaks.toml"
+
+[leaks]
+with = ["{counted}"]
+
+[[artifact]]
+name = "held"
+kind = "program"
+sources = ["src/*.c", "tests/grab.c"]
+include = ["src"]
+
+[test]
+timeout = 60
+copies = 1

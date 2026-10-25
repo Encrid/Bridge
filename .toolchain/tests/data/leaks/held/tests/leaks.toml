@@ -1,0 +1,5 @@
+[leaks]
+memory = ["grab"]
+
+[leaks.pairs]
+box_open = "box_close"

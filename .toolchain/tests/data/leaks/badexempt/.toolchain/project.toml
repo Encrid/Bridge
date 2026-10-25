@@ -1,0 +1,20 @@
+[project]
+name = "badexempt"
+
+[[artifact]]
+name = "keep"
+kind = "program"
+sources = ["src/*.c"]
+
+[[leaks.exception]]
+case = "kept"
+kind = "memory"
+
+[[leaks.exception]]
+case = "kept"
+kind = "nothing"
+why = "No case keeps a resource of this kind, so this exemption excuses nothing."
+
+[test]
+timeout = 60
+copies = 1
