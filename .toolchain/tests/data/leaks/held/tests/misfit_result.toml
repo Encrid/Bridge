@@ -1,0 +1,2 @@
+[leaks.kinds.note]
+takes = { note_delete = "result" }

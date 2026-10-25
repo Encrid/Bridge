@@ -7,6 +7,9 @@ counted = "tests/leaks.toml"
 [leaks]
 with = ["{counted}"]
 
+[leaks.kinds.note]
+gives = { note_delete = 1 }
+
 [[artifact]]
 name = "held"
 kind = "program"

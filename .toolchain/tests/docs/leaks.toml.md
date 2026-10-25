@@ -5,7 +5,7 @@ Each case runs `test.py` on a project of `.toolchain/tests/data/leaks`, with its
 
 | Project | Content |
 | --- | --- |
-| `held` | The program `held`, from six files of `src` and `tests/grab.c`. Its first argument picks what it does, and each case of the project gives one argument. The case `silent` runs Python, which writes no line. |
+| `held` | The program `held`, from the files of `src` and `tests/grab.c`. Its first argument picks what it does, and each case of the project gives one argument. The case `silent` runs Python, which writes no line. |
 | `opened` | The library `chunk`, which takes memory in `chunk_make` and frees it in `chunk_drop`, and the test program `loader`. `loader` opens the library, calls it and closes it. |
 | `excused` | The program `keep`, which keeps one block of memory, and an exemption of `project.toml` that excuses it. |
 | `badexempt` | The same program, with an exemption that states no reason and an exemption for a kind that no case keeps. |
@@ -19,6 +19,18 @@ The includes and the code of `src/wrapped.c` are in one `#if`. `src/plain.c` use
 `[leaks] with` of `held` names the file of the variable `counted`, which is `tests/leaks.toml` by default.
 That file names `grab` as a function that takes memory, and the pair `box_open` and `box_close`.
 `grab` and `seize` of `tests/grab.c` take memory with no count. The case `named` frees the result of `grab`, and `foreign` frees the result of `seize`.
+
+`tests/grab.c` also holds a small library that the count does not count. It has notes, and parts that `part_new` writes through its second argument.
+It has tickets, which are handles by value, and texts, which `text_fill` fills through a pointer and `text_join` gives back two at a time.
+`note_hand` calls a function of the code, and deletes the note that the function gives it.
+
+`src/kinds.c` uses the library in the cases `tickets`, `stub`, `parts`, `texts` and `hands`, and `tests/leaks.toml` names its kinds.
+`refuse` of `src/kinds.c` and `pool_refuse` of `src/pool.c` give back a note at `result`, because `note_hand` deletes it.
+`project.toml` of `held` names the give `note_delete` again, with a number as its place.
+
+`tickets` drops a ticket that is 0, and `stub` keeps one ticket. `parts` calls `part_new` with a failure, with no place, and with a place.
+`texts` fills a text that is cleared and a text that is not, and deletes a text two times and a null text.
+`hands` hands over two notes, and a call of `refuse` that gives no note.
 
 | Case | Claim | False variant |
 | --- | --- | --- |
@@ -40,3 +52,13 @@ That file names `grab` as a function that takes memory, and the pair `box_open` 
 | a take that gives no pointer | With `tests/misfit_take.toml`, the pair `box_count` gives an `int`, and `test` stops: `box_count takes a resource, and does not give a pointer`. | No `--set`. |
 | a give that gets no pointer first | With `tests/misfit_give.toml`, the give `box_number` gets an `int` first, and `test` stops: `box_number gives back a resource, and does not get a pointer first`. | No `--set`. |
 | a counted function with no fixed list of arguments | With `tests/misfit_list.toml`, `box_format` takes memory and has `...`, and `test` stops: `box_format takes a list of arguments of no fixed length`. | No `--set`. |
+| a kind counts a handle that is not zero | `test` on `tickets` writes that the case is as written, and that 1 case gives back what it takes. | The case `stub`. |
+| a kind keeps a count of its own | `test` on `stub` writes `leaks: stub keeps 1 ticket`, and stops. | The case `tickets`. |
+| a take through an argument counts what the call writes | `test` on `parts` writes that the case is as written, and that 1 case gives back what it takes. | The case `stub`. |
+| a give through an argument counts what the place holds | `test` on `texts` writes that the case is as written, and that 1 case gives back what it takes. | The case `stub`. |
+| a function of the code gives back its result | `test` on `hands` writes that the case is as written, and that 1 case gives back what it takes. | The case `stub`. |
+| a place that is not a place | With `tests/misfit_place.toml`, `part_new` takes at `2`, and `test` stops: `[leaks.kinds.part]: part_new cannot take at 2`. | No `--set`. |
+| a kind with a key that is not known | With `tests/misfit_key.toml`, a kind has the key `hands`, and `test` stops: `[leaks.kinds.note]: a kind has no key hands`. | No `--set`. |
+| a count at a result that a function does not give | With `tests/misfit_result.toml`, `note_delete` takes at `result`, and `test` stops: `note_delete gives no result`. | No `--set`. |
+| a count at an argument that is not there | With `tests/misfit_index.toml`, `note_delete` gives back at `2`, and `test` stops: `note_delete has no argument 2`. | No `--set`. |
+| a take through an argument that is not a pointer | With `tests/misfit_deref.toml`, `ticket_drop` takes at `*1`, and `test` stops: `ticket_drop does not get a pointer as argument 1`. | No `--set`. |

@@ -9,7 +9,7 @@ The tools import it. It does not run alone.
 | --- | --- |
 | `HERE` | The folder of `project.py`, which holds `.toolchain`, zig and the caches of zig. It is the default root. |
 | `NAME` | The pattern of a variable: a name in braces, with an optional separator after a colon. |
-| `KEYS` | The keys that a step, a case, a false variant, a helper, a step of a script, the claims and a source can have. |
+| `KEYS` | The keys that a step, a case, a false variant, a helper, a step of a script, the claims and a source can have. It also gives the keys of a kind of `[leaks.kinds]`. |
 | `SIDES` | The folder of `docs` that holds the documents of a folder: `extern` for `include`, and `intern` for `src`. |
 
 ## Functions

@@ -105,3 +105,63 @@ name = "a counted function with no fixed list of arguments"
 run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "--set", "counted=tests/misfit_list.toml"]
 claims = { status = 1, has = ["box_format takes a list of arguments of no fixed length"] }
 false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }
+
+[[case]]
+name = "a kind counts a handle that is not zero"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "tickets"]
+claims = { status = 0, line = ["tickets: as written", "leaks: 1 cases, 1 give back what they take"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "stub"] }
+
+[[case]]
+name = "a kind keeps a count of its own"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "stub"]
+claims = { status = 1, line = ["leaks: stub keeps 1 ticket"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "tickets"] }
+
+[[case]]
+name = "a take through an argument counts what the call writes"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "parts"]
+claims = { status = 0, line = ["parts: as written", "leaks: 1 cases, 1 give back what they take"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "stub"] }
+
+[[case]]
+name = "a give through an argument counts what the place holds"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "texts"]
+claims = { status = 0, line = ["texts: as written", "leaks: 1 cases, 1 give back what they take"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "stub"] }
+
+[[case]]
+name = "a function of the code gives back its result"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "hands"]
+claims = { status = 0, line = ["hands: as written", "leaks: 1 cases, 1 give back what they take"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "stub"] }
+
+[[case]]
+name = "a place that is not a place"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "--set", "counted=tests/misfit_place.toml"]
+claims = { status = 1, has = ["[leaks.kinds.part]: part_new cannot take at 2"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }
+
+[[case]]
+name = "a kind with a key that is not known"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "--set", "counted=tests/misfit_key.toml"]
+claims = { status = 1, has = ["[leaks.kinds.note]: a kind has no key hands"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }
+
+[[case]]
+name = "a count at a result that a function does not give"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "--set", "counted=tests/misfit_result.toml"]
+claims = { status = 1, has = ["note_delete gives no result"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }
+
+[[case]]
+name = "a count at an argument that is not there"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "--set", "counted=tests/misfit_index.toml"]
+claims = { status = 1, has = ["note_delete has no argument 2"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }
+
+[[case]]
+name = "a take through an argument that is not a pointer"
+run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "--set", "counted=tests/misfit_deref.toml"]
+claims = { status = 1, has = ["ticket_drop does not get a pointer as argument 1"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/test.py", "--root", "{root}/.toolchain/tests/data/leaks/held", "--out", "{case}/out", "--leaks", "-k", "whole"] }

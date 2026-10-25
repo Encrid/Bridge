@@ -3,3 +3,19 @@ memory = ["grab"]
 
 [leaks.pairs]
 box_open = "box_close"
+
+[leaks.kinds.note]
+takes = { note_new = "result", part_new = "result" }
+gives = { note_delete = "1", refuse = "result", pool_refuse = "result" }
+
+[leaks.kinds.part]
+takes = { part_new = "*2" }
+gives = { part_delete = "1" }
+
+[leaks.kinds.ticket]
+takes = { ticket_make = "result" }
+gives = { ticket_drop = "1" }
+
+[leaks.kinds.text]
+takes = { text_fill = "*1" }
+gives = { text_delete = "*1", text_join = ["*1", "*2"] }
