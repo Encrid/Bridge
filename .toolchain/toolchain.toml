@@ -17,7 +17,7 @@ cache = "build/zig-cache"
 
 [variables]
 language = ["-std=c23", "-pedantic-errors", "-Wall", "-Wextra", "-Werror"]
-optimize = ["-O2", "-DNDEBUG", "-g0", "-fno-sanitize=undefined", "-fno-stack-protector", "-fno-omit-frame-pointer"]
+optimize = ["-O2", "-DNDEBUG", "-g0", "-s", "-fno-sanitize=undefined", "-fno-stack-protector", "-fno-omit-frame-pointer"]
 float = ["-ffp-contract=on", "-fno-fast-math", "-fno-rounding-math"]
 strip = "-fstrip"
 

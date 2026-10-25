@@ -189,6 +189,12 @@ false = { run = ["{python}", "-c", "import argparse, os, sys; from pathlib impor
 [[case]]
 name = "an archive of a release holds no path of its machine"
 folders = { "{case}/proj/.toolchain" = [".toolchain/tests/data/build/archived/.toolchain/project.toml"], "{case}/proj/src" = [".toolchain/tests/data/build/archived/src/one.c"] }
-run = ["{python}", "-c", "import sys; from pathlib import Path; sys.path.insert(0, sys.argv[1]); import build, shared; read = shared.config; shared.config = lambda root: (whole := read(root)) | {'build': whole['build'] | {'cache': (Path(root) / whole['build']['cache']).as_posix()}}; sys.argv = ['build.py', '--root', sys.argv[2], '--pack'] + sys.argv[3:]; build.main()", "{root}/.toolchain/tools", "{case}/proj"]
-claims = { status = 0, line = ["{case}/proj/build/archived-{target}.zip", "one.a"] }
-false = { run = ["{python}", "-c", "import sys; from pathlib import Path; sys.path.insert(0, sys.argv[1]); import build, shared; read = shared.config; shared.config = lambda root: (whole := read(root)) | {'build': whole['build'] | {'cache': (Path(root) / whole['build']['cache']).as_posix()}}; sys.argv = ['build.py', '--root', sys.argv[2], '--pack'] + sys.argv[3:]; build.main()", "{root}/.toolchain/tools", "{case}/proj", "--debug"] }
+run = ["{python}", "-c", "import sys; from pathlib import Path; sys.path.insert(0, sys.argv[1]); import build, shared; read = shared.config; shared.config = lambda root: (whole := read(root)) | {'build': whole['build'] | {'cache': (Path(root) / whole['build']['cache']).as_posix()}}; sys.argv = ['build.py', '--root', sys.argv[2], '--pack'] + sys.argv[3:]; build.main()", "{root}/.toolchain/tools", "{case}/proj", "--target", "x86_64-windows-gnu"]
+claims = { status = 0, line = ["{case}/proj/build/archived-x86_64-windows-gnu.zip", "one.a"] }
+false = { run = ["{python}", "-c", "import sys; from pathlib import Path; sys.path.insert(0, sys.argv[1]); import build, shared; read = shared.config; shared.config = lambda root: (whole := read(root)) | {'build': whole['build'] | {'cache': (Path(root) / whole['build']['cache']).as_posix()}}; sys.argv = ['build.py', '--root', sys.argv[2], '--pack'] + sys.argv[3:]; build.main()", "{root}/.toolchain/tools", "{case}/proj", "--target", "x86_64-windows-gnu", "--debug"] }
+
+[[case]]
+name = "a program of a release holds no path of its machine"
+run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/started", "--out", "{case}/out", "--pack", "--target", "x86_64-linux-gnu"]
+claims = { status = 0, line = ["{case}/out/started-x86_64-linux-gnu.zip", "sizer"] }
+false = { run = ["{python}", "{root}/.toolchain/tools/build.py", "--root", "{root}/.toolchain/tests/data/build/started", "--out", "{case}/out", "--pack", "--target", "x86_64-linux-gnu", "--debug"] }

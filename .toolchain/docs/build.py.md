@@ -199,4 +199,4 @@ No case runs these branches.
 
 - A machine on which no target runs. Each machine of the cases runs a target.
 - A machine with no pinned zig. Each case uses the zig of the project that runs it.
-- A proof built for a target that does not run here. Each case packs for the target of its machine.
+- A proof built for a target that does not run here. Each case that packs a proof packs for the target of its machine.
