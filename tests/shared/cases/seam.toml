@@ -1129,6 +1129,18 @@ claims = { matches = ["game:ticker@0.1.0=STOPPED.*game:ticker@0.1.0: unloaded.*m
 false = { run = ["{out}/seam{exe}", "module_config.settings-of-every-kind"] }
 
 [[case]]
+name = "module_config-spoiled-after-each-call-changes-nothing"
+run = ["{out}/seam{exe}", "module_config-spoiled-after-each-call-changes-nothing"]
+claims = { matches = ["view:reader@0.1.0: loaded", "view:reader@0.1.0/sum: sum \\d+ 0", "game:settings@0.1.0: loaded", "vsync width 1 1280.*show: hello 7 0.*show: some/long/path.cfg 0 0.*show: big 2 0", "game:settings@0.2.0: reloaded.*vsync width 1 1280", "alive"] }
+false = { run = ["{out}/seam{exe}", "module_config-spoiled-before-the-call-refused"] }
+
+[[case]]
+name = "module_config-spoiled-before-the-call-refused"
+run = ["{out}/seam{exe}", "module_config-spoiled-before-the-call-refused"]
+claims = { matches = ["a module with the identity 'x+' is refused: an identity has the form namespace:name@version", "alive"] }
+false = { run = ["{out}/seam{exe}", "module_config-spoiled-after-each-call-changes-nothing"] }
+
+[[case]]
 name = "module_config.settings-of-every-kind"
 run = ["{out}/seam{exe}", "module_config.settings-of-every-kind"]
 claims = { matches = ["vsync width 1 1280.*scale mode 150 2.*show: hello 7 0.*show: some/long/path.cfg 0 0.*flags ratio 3 3.*show: big 2 0.*alive"] }
