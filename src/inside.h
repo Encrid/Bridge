@@ -20,6 +20,7 @@ typedef struct declared_type declared_type_t;
 
 typedef struct {
     char *name;
+    char *path;
     void *lib;
     backend_api_t api;
     backend_t *be;
