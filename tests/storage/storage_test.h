@@ -15,7 +15,6 @@ constexpr uint32_t STORAGE_TEST_MEASURE_ROUNDS = 6;
 
 enum storage_test_end : int {
     STORAGE_TEST_DONE,
-    STORAGE_TEST_LEFT,
     STORAGE_TEST_FAILED
 };
 

@@ -81,6 +81,7 @@ enum storage_test_end storage_test_move(storage_test_t *t)
     size_t i = 0;
 
     (void)bridge_destroy(t->w);
+    t->w = nullptr;
     t->cfg.budget.sparse_sets = 1;
     t->cfg.budget.direct_indexed = 1;
     while (i < count) {

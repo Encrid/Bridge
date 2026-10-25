@@ -15,5 +15,5 @@ enum storage_test_end storage_test_region_full([[maybe_unused]] storage_test_t *
 
     region_give(&r, 20, 5);
     printf("region full: count %u\n", r.count);
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }

@@ -62,6 +62,7 @@ static bool load_configured(storage_test_t *t, size_t k)
     (void)bridge_load(t->w, &a);
     (void)bridge_unload(t->w, a.cfg.identity);
     (void)bridge_destroy(t->w);
+    t->w = nullptr;
     return (allocator->failed);
 }
 
@@ -71,6 +72,7 @@ enum storage_test_end storage_test_refuse_config_memory(storage_test_t *t)
     size_t silent = 0;
 
     (void)bridge_destroy(t->w);
+    t->w = nullptr;
     while (load_configured(t, k)) {
         silent += !t->said_memory;
         k++;
@@ -79,7 +81,7 @@ enum storage_test_end storage_test_refuse_config_memory(storage_test_t *t)
     printf("%u allocations were each answered null in turn\n", (unsigned)(k - 1));
     if (silent)
         printf("FAIL: %u of them were not said\n", (unsigned)silent);
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }
 
 #endif

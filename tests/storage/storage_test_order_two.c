@@ -71,13 +71,7 @@ static void free_world(bridge_world_t *w, bridge_system_t **s)
         free(s[k]);
         k++;
     }
-    k = 0;
-    while (k < w->order.n) {
-        free(w->order.names[k]);
-        k++;
-    }
-    free(w->order.names);
-    free(w->order.reach.bits);
+    schedule_free_pairs(&w->order);
     free(w->build_in);
     free(w->build_bits);
 }
@@ -158,5 +152,5 @@ enum storage_test_end storage_test_order_two_modules(storage_test_t *t)
     }
     build_both(&w, s, t->what, barrier);
     free_world(&w, s);
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }

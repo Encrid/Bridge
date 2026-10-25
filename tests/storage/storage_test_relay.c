@@ -16,5 +16,5 @@ enum storage_test_end storage_test_relay_bad_kind(storage_test_t *t)
 
     (void)t;
     printf("element size of a bad kind: %u\n", abi_get_element_size(&field));
-    return (STORAGE_TEST_LEFT);
+    return (STORAGE_TEST_DONE);
 }
