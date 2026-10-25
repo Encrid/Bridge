@@ -11,6 +11,10 @@ The shared library exports only the seven functions of this header, and `BRIDGE_
 The shared library holds the os layer of Bridge-OS.
 A program that links the static library `bridge.a` also links `os.a`, from the release of Bridge-OS for its target.
 
+A release ships `leaks.toml` for each target, beside the libraries and the headers.
+`leaks.toml` names `bridge_create`, which takes a world, and `bridge_destroy`, which gives it back.
+A host names the file in `[leaks] with`, so that `test --leaks` counts the worlds that its code takes.
+
 Only the build of the library defines `BRIDGE_BUILDING`. A host does not define it.
 What a host compiles with this header is a work based on Bridge: `readme.md`, *License*.
 
