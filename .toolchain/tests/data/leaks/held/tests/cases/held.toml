@@ -58,3 +58,33 @@ run = ["{out}/held{exe}"]
 helper = { run = ["{out}/held{exe}", "served"], wait = "ready" }
 claims = { line = ["whole"] }
 false = { run = ["{out}/held{exe}", "kept"] }
+
+[[case]]
+name = "tickets"
+run = ["{out}/held{exe}", "tickets"]
+claims = { status = 0, line = ["tickets"] }
+false = { run = ["{out}/held{exe}"] }
+
+[[case]]
+name = "stub"
+run = ["{out}/held{exe}", "stub"]
+claims = { status = 0, line = ["stub"] }
+false = { run = ["{out}/held{exe}"] }
+
+[[case]]
+name = "parts"
+run = ["{out}/held{exe}", "parts"]
+claims = { status = 0, line = ["parts"] }
+false = { run = ["{out}/held{exe}"] }
+
+[[case]]
+name = "texts"
+run = ["{out}/held{exe}", "texts"]
+claims = { status = 0, line = ["texts"] }
+false = { run = ["{out}/held{exe}"] }
+
+[[case]]
+name = "hands"
+run = ["{out}/held{exe}", "hands"]
+claims = { status = 0, line = ["hands"] }
+false = { run = ["{out}/held{exe}"] }

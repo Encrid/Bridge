@@ -73,6 +73,10 @@ static int served(void)
 
 static int chosen(const char *mode)
 {
+    int done = kinds(mode);
+
+    if (done >= 0)
+        return (done);
     if (!strcmp(mode, "kept"))
         return (malloc(4) == nullptr);
     if (!strcmp(mode, "zero")) {

@@ -7,10 +7,13 @@ import tomllib
 from pathlib import Path
 
 import rewrite
-from shared import die, located
+from shared import die, known, located
 
-BUILT = {'malloc': ('take', 'memory'), 'calloc': ('take', 'memory'), 'realloc': ('move', 'memory'),
-         'free': ('give', 'memory')}
+BUILT = {'malloc': ('take', 'memory', 'result'), 'calloc': ('take', 'memory', 'result'),
+         'realloc': ('move', 'memory', None), 'free': ('give', 'memory', '1')}
+PLACES = {'take': re.compile(r'result|\*[1-9][0-9]*'), 'give': re.compile(r'result|\*?[1-9][0-9]*')}
+VERBS = {'take': 'take', 'give': 'give back'}
+TESTED = '    if (%s__builtin_memcmp(&(%s), &(typeof(%s)){}, sizeof(%s)))\n        %skept[%d]%s;\n'
 PREFIX = 'c23b_l_'
 OPENS = ('if', 'ifdef', 'ifndef')
 DIRECTIVE = re.compile(rb'[ \t]*#[ \t]*(\w+)')
@@ -53,13 +56,29 @@ def listed(config, values):
         if not path.is_file():
             die('[leaks] with: %s is not there' % path.as_posix())
         tables.append(tomllib.loads(path.read_text(encoding='utf-8')).get('leaks', {}))
-    names = dict(BUILT)
+    names = {name: [role + (True,)] for name, role in BUILT.items()}
     for table in tables:
         for take in table.get('memory', []):
-            names[take] = ('take', 'memory')
+            names[take] = [('take', 'memory', 'result', True)]
         for take, give in table.get('pairs', {}).items():
-            names[take], names[give] = ('take', take), ('give', take)
-    return names, list(dict.fromkeys(['memory'] + [take for table in tables for take in table.get('pairs', {})]))
+            names[take], names[give] = [('take', take, 'result', True)], [('give', take, '1', True)]
+    for table in tables:
+        for kind, acts in table.get('kinds', {}).items():
+            kinded(names, kind, acts)
+    return names, list(dict.fromkeys(['memory'] + [kind for table in tables
+                                                   for kind in [*table.get('pairs', {}), *table.get('kinds', {})]]))
+
+
+def kinded(names, kind, acts):
+    known(acts, 'kind', '[leaks.kinds.%s]' % kind)
+    for act in ('take', 'give'):
+        for name, places in acts.get(act + 's', {}).items():
+            for place in map(str, places if isinstance(places, list) else [places]):
+                if not PLACES[act].fullmatch(place):
+                    die('[leaks.kinds.%s]: %s cannot %s at %s' % (kind, name, VERBS[act], place))
+                effects = names.setdefault(name, [])
+                if (act, kind, place, False) not in effects:
+                    effects.append((act, kind, place, False))
 
 
 def plain(kind):
@@ -74,7 +93,9 @@ def declaration(node):
 
 
 def found(root, path, tree, names):
-    used, defined, declared = set(), set(), {}
+    used, defined, declared, ends = set(), set(), {}, {}
+    hands = {name for name, effects in names.items()
+             if any(act == 'give' and place == 'result' for act, _, place, _ in effects)}
 
     def walk(node):
         kind, name = node.get('kind'), node.get('name')
@@ -87,11 +108,14 @@ def found(root, path, tree, names):
             body = any(isinstance(one, dict) and one.get('kind') == 'CompoundStmt' for one in node.get('inner', []))
             if body and rewrite.owned(node.get('loc', {}), root) == path:
                 defined.add(name)
+                end = node.get('range', {}).get('end', {})
+                ends[name] = (end['expansionLoc'] if rewrite.is_macro(end) else end).get('offset', 0)
         for one in node.get('inner', []):
             if isinstance(one, dict) and one:
                 walk(one)
     walk(tree)
-    return path, sorted(used - defined), declared
+    named = used - (defined - hands)
+    return path, sorted(named), declared, {name: ends[name] for name in named & defined}
 
 
 def directive(line):
@@ -118,42 +142,69 @@ def included(text):
     return sum(len(line) + 1 for line in lines[:end + 1])
 
 
-def wrapped(name, role, kinds, declaration):
+def fitted(name, effects, returned, parameters):
+    for act, _, place, strict in effects:
+        if strict and act != 'give' and not returned.endswith('*'):
+            die('%s takes a resource, and does not give a pointer' % name)
+        if strict and act == 'give' and not (parameters and parameters[0].endswith('*')):
+            die('%s gives back a resource, and does not get a pointer first' % name)
+        if place == 'result' and returned == 'void':
+            die('%s gives no result' % name)
+        if place in (None, 'result'):
+            continue
+        number = int(place.lstrip('*'))
+        if number > len(parameters):
+            die('%s has no argument %d' % (name, number))
+        if place.startswith('*') and not parameters[number - 1].endswith('*'):
+            die('%s does not get a pointer as argument %d' % (name, number))
+
+
+def tested(effect, kinds):
+    act, kind, place, _ = effect
+    if place == 'result':
+        value, guard = 'r', ''
+    elif place.startswith('*'):
+        value, guard = '*a%d' % (int(place[1:]) - 1), 'a%d && ' % (int(place[1:]) - 1)
+    else:
+        value, guard = 'a%d' % (int(place) - 1), ''
+    return TESTED % (guard, value, value, value, PREFIX, kinds.index(kind), '++' if act == 'take' else '--')
+
+
+def wrapped(name, effects, kinds, declaration):
     returned, parameters, variadic = declaration
-    act, kind = role
     if variadic:
         die('%s takes a list of arguments of no fixed length' % name)
-    if act != 'give' and not returned.endswith('*'):
-        die('%s takes a resource, and does not give a pointer' % name)
-    if act == 'give' and not (parameters and parameters[0].endswith('*')):
-        die('%s gives back a resource, and does not get a pointer first' % name)
-    slot = kinds.index(kind)
+    fitted(name, effects, returned, parameters)
     arguments = ', '.join('typeof(%s) a%d' % (one, n) for n, one in enumerate(parameters)) or 'void'
     call = '%s(%s)' % (name, ', '.join('a%d' % n for n in range(len(parameters))))
     head = 'static typeof(%s) %s%s(%s)\n{\n' % (returned, PREFIX, name, arguments)
-    if act == 'take':
-        body = ('    typeof(%s) r = %s;\n\n    if (r)\n        %skept[%d]++;\n    return (r);\n'
-                % (returned, call, PREFIX, slot))
-    elif act == 'move':
+    if effects[0][0] == 'move':
         body = ('    typeof(%s) r;\n\n    if (!a1)\n        %skept[%d]++;\n    r = %s;\n    if (!a0 && r)\n'
-                '        %skept[%d]++;\n    return (r);\n' % (returned, PREFIX, len(kinds), call, PREFIX, slot))
-    else:
-        body = '    if (a0)\n        %skept[%d]--;\n    %s%s;\n' % (PREFIX, slot, '' if returned == 'void' else 'return ',
-                                                               call)
-    return head + body + '}\n'
+                '        %skept[%d]++;\n    return (r);\n'
+                % (returned, PREFIX, len(kinds), call, PREFIX, kinds.index(effects[0][1])))
+        return head + body + '}\n'
+    before = ''.join(tested(one, kinds) for one in effects if one[0] == 'give' and one[2] != 'result')
+    after = ''.join(tested(one, kinds) for one in effects if one[0] == 'take' or one[2] == 'result')
+    if returned == 'void':
+        return head + before + '    %s;\n' % call + after + '}\n'
+    return head + before + '    typeof(%s) r = %s;\n\n' % (returned, call) + after + '    return (r);\n}\n'
 
 
-def rewritten(text, path, used, declared, names, kinds):
+def rewritten(text, path, used, ends, declared, names, kinds):
     text = text.rstrip(b'\r\n') + b'\n'
     at = included(text)
     slots = len(kinds) + 1
     values = {'p': PREFIX, 'slots': slots, 'line': len(path) + 2 + 22 * slots, 'name': path,
               'name_len': len(path) + 1, 'variable': 'C23_LEAKS', 'fill': FILL, 'kept': 'kept'}
-    head = ''.join(RENAME % {'p': PREFIX, 'n': name} for name in used)
-    head += '#line %d\n' % (text.count(b'\n', 0, at) + 1)
+    places = {name: max(at, text.index(b'\n', ends[name]) + 1) if name in ends else at for name in used}
+    out, last = b'', 0
+    for where in sorted(set(places.values())):
+        block = ''.join(RENAME % {'p': PREFIX, 'n': name} for name in used if places[name] == where)
+        out += text[last:where] + (block + '#line %d\n' % (text.count(b'\n', 0, where) + 1)).encode()
+        last = where
     tail = ''.join('#pragma pop_macro("%s")\n' % name for name in used) + COUNTS % values
     tail += ''.join(wrapped(name, names[name], kinds, declared[name]) for name in used)
-    return text[:at] + head.encode() + text[at:] + b'\n' + (tail + rewrite.writer(values)).encode()
+    return out + text[last:] + b'\n' + (tail + rewrite.writer(values)).encode()
 
 
 def counted(config, values):
@@ -162,10 +213,10 @@ def counted(config, values):
     files = rewrite.each(config, values, lambda top, path, tree: found(top, path, tree, names))
     rewrite.copied(root, where)
     counting = []
-    for path, used, declared in files:
+    for path, used, declared, ends in files:
         if not used:
             continue
-        (where / path).write_bytes(rewritten((root / path).read_bytes(), path, used, declared, names, kinds))
+        (where / path).write_bytes(rewritten((root / path).read_bytes(), path, used, ends, declared, names, kinds))
         counting.append(path)
     return counting, kinds
 

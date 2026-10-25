@@ -19,7 +19,8 @@ KEYS = {'step': {'run', 'section', 'text', 'contains', 'copy', 'rename'},
         'helper': {'run', 'wait', 'stdin', 'claims'},
         'script': {'wait', 'put', 'remove', 'type'},
         'claims': {'status', 'status_not', 'line', 'has', 'lacks', 'matches', 'matches_not', 'order', 'output', 'files'},
-        'source': {'name', 'url', 'sha256', 'into', 'top', 'patches'}}
+        'source': {'name', 'url', 'sha256', 'into', 'top', 'patches'},
+        'kind': {'takes', 'gives'}}
 SIDES = {'include': 'docs/extern', 'src': 'docs/intern', 'tools': 'docs/tools'}
 
 
