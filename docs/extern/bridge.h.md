@@ -68,6 +68,8 @@ windows          LoadLibraryExW
 windows          GetFullPathNameW
 windows          MultiByteToWideChar
 windows          wcschr
+windows          wcscpy
+windows          GetModuleHandleExW
 windows          GetProcAddress
 windows          FreeLibrary
 windows          CreateThread
@@ -146,7 +148,7 @@ They are in the list because they are imports all the same: a new one is a depen
 | `bzero`, `__bzero` | The compiler makes them of a block made zero on macOS: `bzero` on aarch64, and `__bzero` on x86_64. |
 | `__memcpy_chk` | The headers of macOS make it of `memcpy`. |
 | `VirtualAlloc`, `VirtualFree`, `mmap`, `mprotect`, `munmap` | The os layer reserves, commits and releases memory. |
-| `LoadLibraryW`, `LoadLibraryExW`, `GetFullPathNameW`, `MultiByteToWideChar`, `wcschr`, `GetProcAddress`, `FreeLibrary`, `dlopen`, `dlsym`, `dlclose` | The os layer opens the library of a backend or of a native module, finds a symbol in it, and closes it. On Windows it makes the path a wide string and finds a folder in it. |
+| `LoadLibraryW`, `LoadLibraryExW`, `GetFullPathNameW`, `MultiByteToWideChar`, `wcschr`, `wcscpy`, `GetModuleHandleExW`, `GetProcAddress`, `FreeLibrary`, `dlopen`, `dlsym`, `dlclose` | The os layer opens the library of a backend or of a native module, finds a symbol in it, pins it, and closes it. On Windows it makes the path a wide string and finds a folder in it. |
 | `CreateThread`, `WaitForSingleObject`, `CloseHandle`, `pthread_create`, `pthread_join` | The os layer starts and joins a worker thread. On Windows, `WaitForSingleObject` also waits for an event, and `CloseHandle` also closes one. |
 | `GetCurrentThreadId`, `pthread_self` | The os layer gives the thread that runs, for a pinned module. |
 | `QueryPerformanceCounter`, `QueryPerformanceFrequency`, `clock_gettime` | The os layer reads the clock that keeps a deadline, and its unit. |
