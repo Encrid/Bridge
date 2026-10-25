@@ -16,6 +16,11 @@ defines = ["BRIDGE_BUILDING"]
 flags = ["{quiet}", "{hidden}", "{system_defines}"]
 
 [[artifact]]
+name = "leaks.toml"
+kind = "file"
+sources = ["src/leaks.toml"]
+
+[[artifact]]
 name = "counted"
 kind = "archive"
 test = true
