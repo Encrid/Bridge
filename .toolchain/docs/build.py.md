@@ -17,7 +17,8 @@ With `--pack`, it also puts the deliverable into a zip file.
 | `planned(config, values, artifact, tree)` | Gives the kind and the variables of one artifact, as steps 1 to 4 of *Artifacts* tell. |
 | `built(config, values, artifact, tree)` | Builds one artifact. It gives the name of the artifact and its files. |
 | `packaged(config, values, made)` | Writes `package.txt`. |
-| `packed(config, values, kit)` | Writes the zip of the deliverable `kit`. Then it writes the path of the zip and the names in it. |
+| `leaked(values, kit)` | Stops if a file of the deliverable `kit` holds the folder of the project or of the build, as *The zip* tells. |
+| `packed(config, values, kit)` | Writes the zip of the deliverable `kit`, after `leaked`. Then it writes the path of the zip and the names in it. |
 | `artifacts(config)` | Gives each module of `[[modules]]` over the defaults of `[module]`, then each artifact of `[[artifact]]`, and after each one its variants. |
 | `path_defines(config)` | Gives the `*_PATH` macros of the test libraries, for the variable `paths`. |
 | `archives(config, values)` | Gives the path of each shipped archive, from the output folder. |
@@ -56,6 +57,8 @@ The command `build` and the command `pack` build only the shippable artifacts. S
 
 The caches of zig are the variables `ZIG_GLOBAL_CACHE_DIR` and `ZIG_LOCAL_CACHE_DIR` of the environment.
 The commands of the steps and of the cases get them too.
+When the cache is in the folder of the project, each variable is a path from that folder, since each step runs there.
+Thus an archive that zig makes names its members with no folder of the machine. Else each variable is a whole path.
 `tools` stops if a program is not there: `the tool <name> is not at <path>`.
 
 ## main
@@ -165,6 +168,10 @@ It puts each file of the deliverable `kit` into the zip, at its path from `dist`
 So the zip is the deliverable that `composed` made, and `pack --part` zips the parts that it picks.
 `packed` writes the path of the zip, then the name of each file in the zip.
 
+Before it writes the zip, `packed` reads each file of the deliverable.
+It stops if a file holds the folder of the project or the folder of the build, with `/` or with `\`: `<file> holds <path>, a path of the machine that built it`.
+Thus a package does not depend on the machine that built it, for example a library that names another library by its path.
+
 ## The package proof
 
 `[package] proof` names a source that uses only the package.
@@ -182,11 +189,14 @@ It then writes `package proof: <project> ran`, or `package proof: <project> buil
 Such a file is not in the package, for example an archive of a different project that `[[source]]` fetches.
 `prove` expands each name with the variables of the build, before it gives the proof its own `out`.
 
+`[package] include` names more folders for the include path of the proof, after the folders of the package.
+Such a folder holds headers that the headers of the package include, for example the headers of a different project.
+`prove` expands each folder in the same way.
+
 ## Limits
 
 No case runs these branches.
 
 - A machine on which no target runs. Each machine of the cases runs a target.
 - A machine with no pinned zig. Each case uses the zig of the project that runs it.
-- A `pack` of a project with no `proof` in `[package]`. Each project that a case packs states a proof.
-- A proof built for a target that does not run here. Each case packs for the target of its machine.
+- A proof built for a target that does not run here. Each case that packs a proof packs for the target of its machine.

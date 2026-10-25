@@ -100,7 +100,18 @@ def packaged(config, values, made):
     (out / 'package.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
 
 
+def leaked(values, kit):
+    folders = {Path(values['root']).resolve(), Path(values['build']).resolve()}
+    forms = sorted({form for folder in folders for form in (folder.as_posix(), str(folder))})
+    for name in kit:
+        data = (Path(values['dist']) / name).read_bytes()
+        for form in forms:
+            if form.encode('utf-8') in data:
+                die('%s holds %s, a path of the machine that built it' % (name, form))
+
+
 def packed(config, values, kit):
+    leaked(values, kit)
     dist = Path(values['dist'])
     zipped = Path(values['build']) / ('%s-%s.zip' % (shared.project_name(config), values['target']))
     with zipfile.ZipFile(zipped, 'w', zipfile.ZIP_DEFLATED) as packing:
@@ -157,6 +168,7 @@ def prove(config, values, pick):
     included = clean / 'include'
     includes = [included.as_posix()]
     includes += sorted(sub.as_posix() for sub in included.rglob('*') if sub.is_dir())
+    includes += expanded(config['package'].get('include', []), values)
     artifact = {'name': 'proof', 'kind': 'program', 'sources': [proof],
                 'include': includes,
                 'link': [(clean / name).as_posix() for name in archives(config, values)]
@@ -203,7 +215,8 @@ def prepared(args, here=False):
         die('no target %s; the targets: %s' % (target, ' '.join(config['targets'])))
     if here and target != home:
         die('%s does not run here: build it, and test it where it runs' % target)
-    cache = shared.HERE / config['build']['cache']
+    cache, root = (shared.HERE / config['build']['cache']).resolve(), Path(args.root).resolve()
+    cache = cache.relative_to(root) if cache.is_relative_to(root) else cache
     os.environ['ZIG_GLOBAL_CACHE_DIR'] = str(cache / 'global')
     os.environ['ZIG_LOCAL_CACHE_DIR'] = str(cache / 'local')
     zig = fetch.zig_found(config['zig']) or die('zig %s is neither fetched nor on the path' % config['zig']['version'])

@@ -20,6 +20,7 @@ When `dev` is ready for a release, a pull request from `dev` into `main` adds it
 6. Make sure that the documents describe the change, and that a case checks each new behavior.
 
 The workflow `ci` runs the four commands again on a machine of each target of `.toolchain/toolchain.toml`.
+Then it runs `python project.py pack`, which refuses a package that holds a path of the machine that built it.
 
 ## One purpose
 

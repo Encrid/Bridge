@@ -1,0 +1,20 @@
+[project]
+name = "leaky"
+
+[kinds.stamped]
+output = "{name}.txt"
+steps = [
+    { copy = ["{sources}", "{work}.txt"] },
+    { rename = ["{work}.txt", "{output}"] },
+    { section = "said", text = "{manifest:,}" },
+]
+
+[[artifact]]
+name = "stamped"
+kind = "stamped"
+sources = ["src/note.txt"]
+manifest = ["{root}"]
+
+[test]
+timeout = 60
+copies = 1

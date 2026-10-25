@@ -25,8 +25,9 @@ It is the same in each project, and a project does not change it.
 | Key | Value |
 | --- | --- |
 | `language` | The flags of the language: C23, the pedantic errors, and each warning as an error. |
-| `optimize` | The flags of the optimization. `[debug] optimize` gives the flags of a debug build, with the sanitizer of undefined behaviour. |
+| `optimize` | The flags of the optimization. `-s` tells the linker to drop the debug information, also of the objects that zig builds for the C library. Without it, a Linux program holds the folder of the project. `[debug] optimize` gives the flags of a debug build, with the sanitizer of undefined behaviour. |
 | `float` | The flags of the rules of floating point. |
+| `strip` | The flag of `zig build-lib` for the debug information. `-fstrip` drops it, as `-g0` does for the compiler. `[debug] strip` is `-fno-strip`, which keeps it. |
 
 ## [targets.\<target\>]
 
@@ -53,7 +54,7 @@ There are six targets: three operating systems on two types of processor.
 | --- | --- | --- |
 | `program` | `{name}{exe}` | `zig cc` compiles the sources, and links them with the files of `link`. |
 | `library` | `{name}{library}` | `zig cc -shared` compiles the sources into a shared library. |
-| `archive` | `{name}.a` | `zig build-lib -static` compiles the sources into a static library. It does not report a flag that it does not use. |
+| `archive` | `{name}.a` | `zig build-lib -static` compiles the sources into a static library. It does not report a flag that it does not use. zig does not read the flags after `-cflags`, thus `{strip}` tells it the mode of the build. Without `-fstrip`, zig asks the compiler for CodeView, and each object of a Windows archive holds its own path. |
 | `file` | `{name}` | It copies the one source to the output. |
 
 ## [branches]

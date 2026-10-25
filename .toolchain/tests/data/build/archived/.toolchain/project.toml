@@ -1,0 +1,7 @@
+[project]
+name = "archived"
+
+[[artifact]]
+name = "one"
+kind = "archive"
+sources = ["src/one.c"]

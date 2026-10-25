@@ -42,9 +42,11 @@ A line has one character, `0` or `1`, for each outcome.
 A `[[gnu::destructor]]` of each file writes its line, at the exit of the program and at the close of a library.
 The writer builds each line in a buffer and writes it with one append, so parallel programs do not interleave.
 
-On macOS a coverage build opens each library with `RTLD_NODELETE`, so a closed library stays mapped.
+On macOS, a `[[gnu::constructor]]` of each file opens its own library again, with `RTLD_NOLOAD` and `RTLD_NODELETE`.
+Thus a closed library stays mapped, and it does not matter which code opens and closes it, for example a released library.
 Then its destructor runs at the exit of the program, with the code of the library still in place.
-The host adds the flag where it opens a library, under the define `C23B_KEEP_LOADED` that the probes set on macOS.
+The constructor finds its library with `dladdr`. It declares `dladdr` and `dlopen` with names of its own, so it includes no header.
+
 The probes come before the first line of the file, and `#line 1` keeps the numbers of the lines.
 A file `.c` includes no header before its own lines. Thus its own macros, such as `_POSIX_C_SOURCE`, come first.
 
@@ -96,7 +98,7 @@ The dump sets `_FORTIFY_SOURCE` to 0. Then a condition in a call that the system
 
 - A case that crashes, or that stops before its end, writes no line. Its outcomes count as not reached.
 - The measure uses only the target of this machine. The files of a different system, for example `src/posix` on Windows, are measured on a machine of that system.
-- Every file writes with a `[[gnu::destructor]]`. A destructor of a library that `dlclose` unmaps on macOS would run at the exit of the program with its code gone. So a coverage build opens each library with `RTLD_NODELETE`, which keeps the library mapped, and the destructor runs in place.
+- Every file writes with a `[[gnu::destructor]]`. A destructor of a library that `dlclose` unmaps on macOS would run at the exit of the program with its code gone. So on macOS each file keeps its own library mapped, and the destructor runs in place.
 - A header that two artifacts compile with different macros gets the probes of both.
 
 ## Functions

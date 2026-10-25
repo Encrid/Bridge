@@ -4,10 +4,12 @@ name = "built"
 [variables]
 said = "written"
 outside = "{root}/tests/package/outside.c"
+outside_include = "{root}/tests/package/include"
 
 [package]
 proof = "tests/package/host.c"
 link = ["{outside}"]
+include = ["{outside_include}"]
 
 [compose.base]
 headers = ["include/**/*.h"]
