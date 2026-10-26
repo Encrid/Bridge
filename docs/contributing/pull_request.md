@@ -9,6 +9,25 @@ Make a branch from `dev` for each change, and open the pull request into `dev`.
 GitHub deletes the branch after the merge.
 When `dev` is ready for a release, a pull request from `dev` into `main` adds it to `main`.
 `docs/contributing/commits.md` tells how each pull request merges.
+The rulesets of the repository protect `main` and `dev`: a change comes only through a pull request, after its required checks pass.
+
+## The release
+
+A release is a tag `v<major>.<minor>.<patch>` on a merge commit of `main`, for example `v0.1.1`.
+The Project Owner of `cla.md` decides each release.
+A release comes when the package changes: a header, a library or another file of the zip.
+A change of only the toolchain, the documents or the cases makes no release.
+
+The number follows Semantic Versioning 2.0.0: https://semver.org.
+A fix that keeps the interface increments the patch.
+The tag is annotated, and its message is its name:
+
+```sh
+git tag -a v0.1.1 -m v0.1.1 <commit>
+git push origin v0.1.1
+```
+
+The workflow `release` then makes the release. `.toolchain/docs/workflows.py.md`, *The release*, tells its steps.
 
 ## Before you open a pull request
 
