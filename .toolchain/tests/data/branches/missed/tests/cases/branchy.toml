@@ -1,5 +1,0 @@
-[[case]]
-name = "one"
-run = ["{out}/branchy{exe}", "1"]
-claims = { status = 0, line = ["one"] }
-false = { run = ["{out}/branchy{exe}", "2"] }

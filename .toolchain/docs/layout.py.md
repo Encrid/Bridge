@@ -34,9 +34,10 @@ The layout allows only the paths of this table.
 | `.toolchain/toolchain.toml` and `.toolchain/header.txt` | The values and the legal notice of the toolchain. |
 | `.toolchain/config/<name>.toml` | A file of the configuration of the project. |
 | `.toolchain/docs/<name>.md` | A document of the toolchain. |
+| `.toolchain/presets/<name>/<name>.toml` | A file of a preset. `.toolchain/docs/presets.md` tells the presets. |
 | `<folder>/.gitkeep`, in `docs/extern`, `docs/intern`, `include` or `src` | An empty file that keeps an empty folder in git. |
 
-`layout.py` does not read `tests` and `.toolchain/tests`. Thus they can hold any file.
+`layout.py` does not read `tests`, and does not read `.toolchain/tests` of the repository `my_c23_template`. Thus they can hold any file.
 `layout.py` makes no check on a file under `third_party`. So `third_party` holds any file, with any name.
 
 The messages are:

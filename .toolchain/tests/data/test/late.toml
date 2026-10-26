@@ -1,5 +1,0 @@
-[[case]]
-name = "late"
-run = ["{python}", "-c", "import time; time.sleep(9)"]
-claims = { status = 0 }
-false = { run = ["{python}", "-c", "import sys; sys.exit(1)"] }

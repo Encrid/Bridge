@@ -25,7 +25,7 @@
 | `verdict(config, values, outputs, group, index, case, broken, copies, counted)` | Runs the copies of one case at the same time, and gives their verdict. |
 | `test(config, values, outputs, groups, broken, said, copies, counted)` | Runs all the groups, and writes each verdict. With `said`, it writes `said.txt`. It gives the names of the cases that failed. |
 | `chosen(groups, part)` | Gives only the cases whose name contains `part`. It stops if no case has it: `no case has <part> in its name`. |
-| `groups_of(values, folder)` | Reads and checks the groups of a folder: `tests/cases`, or `.toolchain/tests/cases`. |
+| `groups_of(values, folder)` | Reads and checks the groups of a folder: `tests/cases`, or `.toolchain/tests/cases` of the repository `my_c23_template`. |
 | `changed(args, run, write)` | Does the steps of a changed run, as *A changed run* tells. It gives the config, the variables, what `write` gave, the artifacts and the groups. |
 | `measured(args)` | Runs the command `test --branches`, as *The branches* tells. |
 | `tallied(args)` | Runs the command `test --leaks`, as *The leaks* tells. |
@@ -36,19 +36,20 @@
 With `--leaks`, `main` runs `tallied`, and nothing else. With `--branches`, it runs `measured`, and nothing else.
 Else `main` does these steps:
 
-1. It builds with `build`, which stops if the target does not run on this machine. With `--toolchain`, it only calls `prepared` of `build.py`, and builds nothing. `--part` builds the base and the named parts, and repeats.
+1. It builds with `build`, which stops if the target does not run on this machine. With `--toolchain`, it only calls `prepared` of `build.py`, and builds nothing.
 2. It stops if an artifact is not linked: `the cases need what is linked: <names>`.
-3. It reads the groups of `[test] cases` (the default is `tests/cases`), or of `.toolchain/tests/cases` with `--toolchain`.
+3. It reads the groups of `[test] cases` (the default is `tests/cases`). With `--toolchain`, it reads `.toolchain/tests/cases` of the repository `my_c23_template`.
 4. If there is no case, it writes `no case: <folder> holds no case`, and ends.
 5. With `-k`, it keeps only the cases whose name contains the part.
-6. With `--part`, it keeps only the groups of the named parts. It stops if no group is in them: `no case group is in the parts <names>`.
-7. It runs the groups, one time for each round of `--rounds`. Before each round of 2 rounds or more, it writes `round <n> of <rounds>`.
-8. With no `--break`, `--toolchain`, `-k` or `--part`, it checks the messages of the code with `checked` of `said.py`.
+6. It runs the groups, one time for each round of `--rounds`. Before each round of 2 rounds or more, it writes `round <n> of <rounds>`.
+7. With no `--break`, `--toolchain` or `-k`, it checks the messages of the code with `checked` of `said.py`.
 
 The number of copies is `--copies`, or `[test] copies`. If neither gives it, `main` stops: `.toolchain/project.toml: write [test] copies`.
 
-`main` stops at step 7 if a case failed. Thus step 8 runs only if each case passed.
+`main` stops at step 6 if a case failed. Thus step 7 runs only if each case passed.
 `.toolchain/docs/said.py.md` gives the checks of step 7.
+
+In the repository `my_c23_template`, the workflow `toolchain.yml` runs `fetch`, `test --toolchain` and `test --toolchain --break` on each of the 6 targets of `ci.yml`.
 
 The message of step 1 is `<target> does not run here: build it, and test it where it runs`.
 
