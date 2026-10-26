@@ -16,7 +16,7 @@ The command `check` of `project.py` runs it.
 
 `<tools>` is the names of the tools that failed, in the order of `TOOLS`, with a space between two names.
 
-`TOOLS` names the tools in this order: `layout`, `text`, `prose`, `pseudo`, `xref`, `dup`, `cover`, `licence`, `commits`, `style` and `c23`.
+`TOOLS` names the tools in this order: `layout`, `workflows`, `text`, `prose`, `pseudo`, `xref`, `dup`, `cover`, `licence`, `commits`, `style` and `c23`.
 The document of a tool is `.toolchain/docs/<tool>.py.md`.
 
 `main` runs the tools of the folder `.toolchain/tools` in `HERE`. Thus these tools check the project in the root.

@@ -6,7 +6,7 @@ import sys
 
 from shared import HERE, arguments, die
 
-TOOLS = ('layout', 'text', 'prose', 'pseudo', 'xref', 'dup', 'cover', 'licence', 'commits', 'style', 'c23')
+TOOLS = ('layout', 'workflows', 'text', 'prose', 'pseudo', 'xref', 'dup', 'cover', 'licence', 'commits', 'style', 'c23')
 
 
 def main():

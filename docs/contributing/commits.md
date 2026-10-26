@@ -7,3 +7,4 @@
 
 A pull request into `dev` merges by rebase. Thus each of its commits obeys these rules.
 A pull request from `dev` into `main` merges with a merge commit. The line of that commit is the title of the pull request.
+The settings of the repository give a merge commit the title of its pull request, and no other line.

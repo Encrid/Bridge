@@ -19,7 +19,7 @@ The layout allows only the paths of this table.
 
 | Path | Rule |
 | --- | --- |
-| `.github/workflows/ci.yml`, `.github/workflows/release.yml`, `.github/workflows/cla.yml` | Needed. |
+| `.github/workflows/ci.yml`, `.github/workflows/release.yml`, `.github/workflows/cla.yml` | Needed. `.toolchain/docs/workflows.py.md` tells what they run. |
 | `.gitattributes`, `.gitignore`, `cla.md`, `license` | Needed. |
 | `project.py`, `.toolchain/project.toml`, `readme.md` | Needed. |
 | `architecture.md` | The map of the project. |
