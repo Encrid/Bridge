@@ -35,23 +35,28 @@ def known(table, what, where):
     return table
 
 
-def merged(into, more, above=''):
+def merged(into, more, name, whence, above=()):
     for key, value in more.items():
+        at = above + (key,)
         if isinstance(into.get(key), dict) and isinstance(value, dict):
-            merged(into[key], value, above + key + '.')
+            merged(into[key], value, name, whence, at)
+        elif isinstance(into.get(key), list) and isinstance(value, list) \
+                and all(isinstance(item, dict) for item in into[key] + value):
+            into[key] = into[key] + value
         elif key in into:
-            die('project.toml states %s%s, and toolchain.toml states it too' % (above, key))
+            first = next(whence[at[:n]] for n in range(len(at), 0, -1) if at[:n] in whence)
+            die('%s states %s, and %s states it too' % (name, '.'.join(at), first))
         else:
-            into[key] = value
+            into[key], whence[at] = value, name
     return into
 
 
 def config(root):
-    toolchain, project = [tomllib.loads(path.read_text(encoding='utf-8'))
-                          for path in (HERE / '.toolchain' / 'toolchain.toml', root / '.toolchain' / 'project.toml')]
-    whole = merged(toolchain, project)
-    for path in sorted((root / '.toolchain' / 'config').glob('*.toml')):
-        merged(whole, tomllib.loads(path.read_text(encoding='utf-8')))
+    whole, whence = {}, {}
+    files = [('toolchain.toml', HERE / '.toolchain' / 'toolchain.toml'), ('project.toml', root / '.toolchain' / 'project.toml')]
+    files += [('config/' + path.name, path) for path in sorted((root / '.toolchain' / 'config').glob('*.toml'))]
+    for name, path in files:
+        merged(whole, tomllib.loads(path.read_text(encoding='utf-8')), name, whence)
     return whole
 
 
@@ -135,7 +140,6 @@ def arguments(*valued, **flags):
     ap = argparse.ArgumentParser(prog=Path(sys.argv[0]).name)
     ap.add_argument('--root', type=Path, default=HERE)
     ap.add_argument('--target')
-    ap.add_argument('--part', action='append')
     ap.add_argument('--debug', action='store_true')
     ap.add_argument('--out', type=Path)
     ap.add_argument('--set', action='append', default=[], metavar='NAME=VALUE')

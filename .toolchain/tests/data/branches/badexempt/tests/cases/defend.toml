@@ -1,5 +1,0 @@
-[[case]]
-name = "guarded"
-run = ["{out}/defend{exe}"]
-claims = { status = 0, line = ["ok 1"] }
-false = { run = ["{out}/defend{exe}", "more"] }

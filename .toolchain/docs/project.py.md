@@ -47,13 +47,12 @@ If the command is not in the table, `project.py` stops with the message
 | `--debug` | Replaces each variable that `[debug]` names with the value of `[debug]`. |
 | `--out <folder>` | Puts the output into this folder. The default is the folder `build` of the project. |
 | `--set <name>=<value>` | Sets a key of `[variables]` to the value. You can use this option more than one time. |
-| `--part <name>` | Builds the base and the part `<name>`, and with `test` runs only the groups of that part. It is an option of `build`, `pack` and `test`. |
 | `--pack` | Puts the package into a zip file. The command `pack` gives this option to `.toolchain/tools/build.py`. |
 | `--break` | Runs the false variant of each case. It is an option of `test` only. |
 | `-k <part>` | Runs only the cases whose name contains `<part>`. It is an option of `test` only. |
 | `--copies <number>` | Runs this number of copies of each case at the same time. It is an option of `test` only. |
 | `--rounds <number>` | Runs all the cases this number of times. It is an option of `test` only. |
-| `--toolchain` | Runs the cases of the toolchain, in place of the cases of the project. It is an option of `test` only. |
+| `--toolchain` | Runs the cases of the toolchain, in place of the cases of the project. Only the repository `my_c23_template` has them. It is an option of `test` only. |
 | `--branches` | Builds the project with probes, runs each case one time, and writes each branch that no case reaches. It is an option of `test` only. |
 | `--leaks` | Builds the project with counts, runs each case one time, and writes each case that keeps a resource. It is an option of `test` only. |
 | `--all` | Removes all of the output folder. The command `distclean` gives this option to `.toolchain/tools/clean.py`. |
@@ -94,9 +93,9 @@ zig and its caches stay in the folder of `project.py`.
 
 ## The tests of the toolchain
 
-The cases of the toolchain are in `.toolchain/tests/cases`, and the files that they read are in `.toolchain/tests/data`.
+The cases of the toolchain are only in the repository `my_c23_template`, in `.toolchain/tests/cases`. The files that they read are in `.toolchain/tests/data`.
 `.toolchain/tests/docs` describes each group.
-Run them after each change of the toolchain:
+Run them in that repository after each change of the toolchain:
 
 ```sh
 python project.py test --toolchain

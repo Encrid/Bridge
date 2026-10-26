@@ -156,9 +156,9 @@ def archives(config, values):
     return found
 
 
-def prove(config, values, pick):
+def prove(config, values):
     proof = config.get('package', {}).get('proof')
-    if not proof or (pick is not None and 'base' not in pick):
+    if not proof:
         return
     clean = Path(values['out']) / 'proof'
     shutil.rmtree(clean, ignore_errors=True)
@@ -180,18 +180,18 @@ def prove(config, values, pick):
           'ran' if values['target'] == shared.this_target(config['targets']) else 'built'))
 
 
-def composed(config, values, pick):
+def composed(config, values):
     dist, out, root, kit = Path(values['dist']), Path(values['out']), Path(values['root']), []
     for artifact in artifacts(config):
-        if artifact.get('test') or (pick is not None and (artifact.get('part') or 'base') not in pick):
+        if artifact.get('test'):
             continue
         _, mine = planned(config, values, artifact)
         outs = [Path(mine['output'])] + [Path(file) for file in expanded(artifact.get('beside', []), mine)]
         for path in outs:
             put(dist / path.name, path.read_bytes())
             kit.append(path.name)
-    for part, table in config.get('compose', {}).items():
-        if not isinstance(table, dict) or (pick is not None and part not in pick):
+    for table in config.get('compose', {}).values():
+        if not isinstance(table, dict):
             continue
         for name in files(root, table.get('headers', [])):
             put(dist / name, (root / name).read_bytes())
@@ -233,13 +233,10 @@ def ready(args, here=False):
     return config, values
 
 
-def made(config, values, tree=None, part=None, tests=True):
+def made(config, values, tree=None, tests=True):
     done, shipped = [], []
-    build_set = None if part is None else {'base'} | set(part)
     for artifact in artifacts(config):
         if not tests and artifact.get('test'):
-            continue
-        if build_set is not None and (artifact.get('part') or 'base') not in build_set:
             continue
         done.append(built(config, values, artifact, tree))
         shipped += [] if artifact.get('test') else done[-1][1]
@@ -249,18 +246,17 @@ def made(config, values, tree=None, part=None, tests=True):
 
 def build(args, here=False, tests=True):
     config, values = ready(args, here)
-    return config, values, made(config, values, part=args.part, tests=tests)
+    return config, values, made(config, values, tests=tests)
 
 
 def main():
     args = shared.arguments(pack='--pack')
     config, values, made = build(args, tests=False)
     print('\n'.join(paths[0].as_posix() for _, paths in made if paths))
-    pick = None if args.part is None else set(args.part)
-    kit = composed(config, values, pick)
+    kit = composed(config, values)
     if args.pack:
         packed(config, values, kit)
-        prove(config, values, pick)
+        prove(config, values)
 
 
 if __name__ == '__main__':

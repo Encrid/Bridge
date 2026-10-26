@@ -1,6 +1,0 @@
-[project]
-name = "empty"
-
-[test]
-timeout = 60
-copies = 1

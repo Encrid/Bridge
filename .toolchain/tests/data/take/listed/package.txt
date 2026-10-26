@@ -1,2 +1,0 @@
-package sample
-ba8a9467a6e578430524afdc2e9b0c35707691de4339454cf53efd9ec8f079bc  greeting.txt

@@ -1,5 +1,0 @@
-[[case]]
-name = "fails"
-run = ["{python}", "-c", "import sys; sys.exit(1)"]
-claims = { status = 0 }
-false = { run = ["{python}", "-c", "import sys; sys.exit(2)"] }

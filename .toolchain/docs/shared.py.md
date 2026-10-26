@@ -18,7 +18,7 @@ The tools import it. It does not run alone.
 | --- | --- |
 | `die(why)` | Stops the tool with the message `<tool>: <why>`, where `<tool>` is the file name of the tool. |
 | `known(table, what, where)` | Gives `table`. It stops if `table` has a key that `KEYS[what]` does not have. |
-| `merged(into, more, above)` | Adds the keys of `more` to `into`, as the section *The configuration* tells. |
+| `merged(into, more, name, whence, above)` | Adds the keys of `more`, the file `name`, to `into`, as the section *The configuration* tells. `whence` gives the file of each key. |
 | `config(root)` | Gives the configuration of the project in `root`. |
 | `located(text, values)` | Gives the path of `text` in the root, after it replaces the variables. |
 | `expand(text, values)` | Gives `text` with the value of each variable in place of the variable. |
@@ -43,11 +43,13 @@ The tools import it. It does not run alone.
 `merged` adds each key of a later file to the configuration:
 
 1. If the key names a table in the two files, `merged` merges the two tables in the same way.
-2. Else, if `.toolchain/toolchain.toml` has the key, the tool stops.
-3. Else, the key and its value go into the configuration.
+2. Else, if the key names a list of tables in the two files, `merged` puts the two lists together.
+3. Else, if an earlier file has the key, the tool stops.
+4. Else, the key and its value go into the configuration.
 
-The message names the full key, for example `project.toml states variables.language, and toolchain.toml states it too`.
-Thus a list of tables, for example `[[artifact]]`, comes from one file only.
+In a list of tables, the tables of the earlier file come first.
+The message names the later file, the full key and the earlier file, for example `project.toml states variables.language, and toolchain.toml states it too`.
+The name of a file is its path from `.toolchain`, for example `config/sources.toml`.
 
 ## Variables
 
@@ -73,14 +75,13 @@ A list value in a text needs a separator: `{<name>:<separator>}`. `expand` joins
 
 ## The options
 
-`arguments` reads the options `--root`, `--target`, `--part`, `--debug`, `--out` and `--set`.
+`arguments` reads the options `--root`, `--target`, `--debug`, `--out` and `--set`.
 A tool adds its own options:
 
 - `arguments('--commits')` adds the option `--commits <value>`. Its value is in `args.commits`, or `None` if the option is not given.
 - `arguments(pack='--pack')` adds the option `--pack`, with no value. `args.pack` tells if the option is given.
 
 The default of `--root` is `HERE`. `arguments` makes the root an absolute path.
-`--part` can be given more than one time. `args.part` is the list of its values, or `None`.
 
 ## The legal notice
 
@@ -114,7 +115,7 @@ If `repository` tells that the root is the top folder of a git repository, `ours
 These are the files that git tracks, and the files that git does not ignore.
 Else, `ours` walks the folders of the root, as `.gitignore` tells: it skips `build` at the root, and each `__pycache__`.
 `ours` gives only the files that exist, as paths from the root.
-It leaves out the files of `tests` and of `.toolchain/tests`. Thus no check reads the tests of the project or of the toolchain.
+It leaves out the files of `tests`, and of `.toolchain/tests` in the repository `my_c23_template`. Thus no check reads the tests of the project or of the toolchain.
 
 With `tests=True`, `ours` keeps the files of `tests`, and leaves out only `.toolchain/tests`. The check of the retired words uses it.
 

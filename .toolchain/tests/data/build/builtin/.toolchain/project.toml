@@ -1,5 +1,0 @@
-[project]
-name = "builtin"
-
-[variables]
-root = "here"
