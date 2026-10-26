@@ -328,7 +328,8 @@ A project writes it in `leaks.toml` of `.toolchain/config`.
 | --- | --- |
 | `memory` | The functions that take memory, which the code gives back with `free`. |
 | `pairs` | A table: each key is a function that takes a resource, and its value is the function that gives it back. |
-| `with` | The files that give more `memory` and `pairs`, each in a table `[leaks]`. The variables of the build are replaced in each path. |
+| `kinds` | A table of kinds. Each kind has `takes` and `gives`: tables from the name of a function to a place, or to a list of places. |
+| `with` | The files that give more `memory`, `pairs` and `kinds`, each in a table `[leaks]`. The variables of the build are replaced in each path. |
 
 For example:
 
@@ -341,8 +342,16 @@ os_reserve = "os_release"
 os_lib_open = "os_lib_close"
 ```
 
+A kind names its functions at their places, for example a module that a call writes through its fourth argument:
+
+```toml
+[leaks.kinds.wasmtime_module]
+takes = { wasmtime_module_new = "*4" }
+gives = { wasmtime_module_delete = "1" }
+```
+
 A project that uses a package can name the file of the package: `with = ["{bridge_os}/leaks.toml"]`.
-`.toolchain/docs/leaks.py.md` tells what a function of a pair must give and get.
+`.toolchain/docs/leaks.py.md` tells what a function of a pair must give and get. `.toolchain/docs/leaks.py.md`, *The places*, tells the places of a kind.
 
 ## [[leaks.exception]]
 
@@ -351,7 +360,7 @@ An exception lets a case keep a resource by design, for `test --leaks`.
 | Key | Value |
 | --- | --- |
 | `case` | The name of the case. It can contain `*`. |
-| `kind` | The kind of the resource: `memory`, or the function that takes the resource of a pair. |
+| `kind` | The kind of the resource: `memory`, the function that takes the resource of a pair, or a kind of `kinds`. |
 | `why` | The reason the case keeps the resource. |
 | `system` | The system that the exemption applies on. An exemption with no `system` applies on each system. |
 
