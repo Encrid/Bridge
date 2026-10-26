@@ -13,7 +13,7 @@ FOLDERS = ('.toolchain/tools',)
 DOCUMENT = r'docs/(?:extern|intern|tools)/.+\.md'
 ALLOWED = (r'architecture\.md|' + DOCUMENT + r'|include/.+\.h|src/.+|tools/.+'
            r'|\.toolchain/tools/[^/]+\.py|\.toolchain/toolchain\.toml|\.toolchain/config/[^/]+\.toml'
-           r'|\.toolchain/header\.txt|\.toolchain/docs/[^/]+\.md'
+           r'|\.toolchain/header\.txt|\.toolchain/docs/[^/]+\.md|\.toolchain/presets/[^/]+/[^/]+\.toml'
            r'|(?:docs/extern|docs/intern|include)/\.gitkeep')
 SNAKE = re.compile(r'[a-z0-9_]+(?:\.[a-z0-9]+)*')
 DOTTED = ('.github', '.gitattributes', '.gitignore', '.gitkeep', '.toolchain')

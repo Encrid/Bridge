@@ -1,6 +1,0 @@
-[[case]]
-name = "colour"
-colour = "red"
-run = ["{python}", "-c", ""]
-claims = { status = 0 }
-false = { run = ["{python}", "-c", "import sys; sys.exit(1)"] }

@@ -284,12 +284,8 @@ def main():
     if not groups:
         return print('no case: %s holds no case' % folder)
     groups = chosen(groups, args.k) if args.k else groups
-    if args.part:
-        groups = [(group, cases) for group, cases in groups
-                  if any(group == p or group.startswith(p + '/') for p in args.part)] \
-            or die('no case group is in the parts %s' % ' '.join(args.part))
     copies = args.copies or config['test'].get('copies') or die('.toolchain/project.toml: write [test] copies')
-    own = not (args.broken or args.toolchain or args.k or args.part)
+    own = not (args.broken or args.toolchain or args.k)
     rounds = args.rounds or 1
     for done in range(rounds):
         if rounds > 1:

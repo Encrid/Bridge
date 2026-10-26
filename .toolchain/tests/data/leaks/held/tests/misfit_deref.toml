@@ -1,2 +1,0 @@
-[leaks.kinds.ticket]
-takes = { ticket_drop = "*1" }

@@ -6,7 +6,8 @@ zig, the compiler flags and the limits of the style are in `.toolchain/toolchain
 The tools read every file as one configuration.
 
 - A table of a file adds its keys to the table of another file that has the same name.
-- If two files give the same key, the tools stop: `project.toml states <key>, and toolchain.toml states it too`.
+- If two files give the same list of tables, for example `[[source]]` or `[[artifact]]`, the list holds the tables of the two files.
+- If two files give the same key, the tools stop: `<file> states <key>, and <file> states it too`.
 - A file of a project cannot change a value of `.toolchain/toolchain.toml`. Do not change `.toolchain/toolchain.toml`.
 
 Each section of this document gives the keys of one table.
@@ -216,7 +217,6 @@ An artifact is a file that the build makes, for example a program, a library or 
 | `target` | Optional. The target of the artifact, if it is not the target of the build. |
 | `variants` | Optional. The variants. Each variant has a `name`, and can have the other keys and `unstamped`. |
 | `test` | Optional. `true` for an artifact that only the tests use. Only the command `test` makes it, and `package.txt` does not list it. Thus `pack` does not put it into the zip. |
-| `part` | Optional. The name of a part of the project. `--part <name>` acts on the part `<name>`, and repeats. A build makes the base and each named part. The base is the untagged artifacts, and a build always makes it. |
 | `path` | Optional. `true` for a test library that a case loads by a `*_PATH` macro. `.toolchain/docs/build.py.md`, *Modules*, tells it. |
 
 A variant is a copy of the artifact with a different name and some different keys.
@@ -236,17 +236,18 @@ The command `test` stops if an artifact is not linked.
 
 ## [compose]
 
-`[compose]` tells what the deliverable of each part holds, beside the binaries that the part builds.
+`[compose]` tells what the deliverable holds, beside the artifacts that the build makes.
+Each table of `[compose]`, for example `[compose.base]`, adds its files.
 `.toolchain/docs/build.py.md`, *The deliverable*, tells how `build` composes it.
 
-`[compose.<part>]` has these keys, for the part `<part>`:
+A table of `[compose]` has these keys:
 
 | Key | Value |
 | --- | --- |
-| `headers` | Optional. The patterns of the public headers of the part, from the folder of the project. |
-| `assets` | Optional. The files of the part, from the scratch folder, for example a merged `acc.wasm`. |
+| `headers` | Optional. The patterns of the public headers, from the folder of the project. |
+| `assets` | Optional. The files from the scratch folder, for example a file that a step of a kind makes. |
 
-A part with no table, and a part with empty keys, composes only its binaries.
+With no table, or with empty keys, the deliverable holds only the artifacts and the licences.
 
 ## [test]
 
@@ -257,7 +258,7 @@ A part with no table, and a part with empty keys, composes only its binaries.
 | Key | Value |
 | --- | --- |
 | `unicode` | Optional. The paths of the files that can hold text that is not ASCII. A path can contain `*`. The default is an empty list. |
-| `guides` | Optional. The names of the guides that the project adds to `docs/contributing`, beside the 6 guides of the template, for example `timings.md`. `.toolchain/docs/layout.py.md`, *The paths* allows them. |
+| `guides` | Optional. The names of the guides that the project adds to `docs/contributing`, beside the 6 guides of the repository `my_c23_template`, for example `timings.md`. `.toolchain/docs/layout.py.md`, *The paths* allows them. |
 | `retired` | Optional. A table of the retired words of the project. A key is a retired word, and its value is the word to write, or an empty text. `.toolchain/docs/text.py.md`, *Retired words* tells the check. |
 
 For example:

@@ -1,7 +1,0 @@
-diff --git a/greeting.txt b/greeting.txt
---- a/greeting.txt
-+++ b/greeting.txt
-@@ -1,2 +1,2 @@
- a greeting
--hello
-+hello, patched
