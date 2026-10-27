@@ -255,7 +255,7 @@ A toggled tag gets where its column would begin, and a direct-indexed tag where 
 | --- | --- |
 | `BRIDGE_STRIP` | The entity stays, also with nothing on it. |
 | `BRIDGE_SWEEP` | Bridge destroys an entity with nothing left on it. |
-| `BRIDGE_DELETE` | Bridge destroys each entity that carried the component, with each other component on it. |
+| `BRIDGE_DELETE` | Bridge destroys each entity that carried the component, as *destroy* does. |
 
 The policy of the module that unloads last applies. A component that another loaded module declares stays, with its rows.
 A strip takes no memory and does not fail. A strip that has no room to join two tables leaves the two: `docs/extern/bridge.h.md`, *An unload*.
@@ -263,6 +263,8 @@ An id of an entity that a sweep or a delete destroyed is stale: *bridge_entity_t
 An entity that must outlive the unload of another module carries a component of the module that holds it.
 
 A husk whose last kept component goes is destroyed, whatever the policy: *destroy*, *A husk*.
+A delete leaves a husk where another loaded module keeps a component of `BRIDGE_ON_DESTROY_KEEP` on the entity.
+Without room for the husk, the entity loses only the component, as with `BRIDGE_STRIP`: `docs/extern/bridge.h.md`, *An unload*.
 
 ## bridge_on_destroy
 
@@ -385,7 +387,7 @@ If `before_count` is 0, Bridge does not read `before`.
 
 An observer of A and not B hears an entity with A enter when a module detaches B, and leave when a module attaches B.
 A write in place raises no event. To have a new value heard, attach it.
-An entity that a phase made and destroyed raises nothing.
+An entity that a phase made and destroyed raises nothing, unless it stays as a husk: *A husk*.
 An entity that loses a component and gets it again in one phase raises `BRIDGE_ON_ATTACH`, since it carries a new value.
 A detach of what is not there, and a change of a dead id, raise nothing.
 
@@ -576,16 +578,17 @@ A destroy of a dead id is nothing.
 ### A husk
 
 A husk is an entity that a destroy left with its components of `BRIDGE_ON_DESTROY_KEEP`, and nothing else.
-It is dead for each module, but for the modules that can write a component that it keeps.
+Only a module that can write a component that it keeps can change it.
 Thus a module can release what it holds for an entity, after the app destroyed the entity.
 
-- The barrier of the destroy removes each other component. An observer hears `BRIDGE_ON_LEAVE` when the husk no longer matches its terms.
-- The id names the husk, but only for its kept components.
+- The barrier of the destroy removes each other component. An observer hears `BRIDGE_ON_LEAVE` when the husk no longer matches its terms, and `BRIDGE_ON_ENTER` when the husk matches them and the entity did not.
+- The id names the husk, but only for its kept components. The id stays good, since the husk keeps its generation.
 - An attach to a husk, and a destroy of a husk, is nothing, as for a dead id.
 - A module that can write a kept component can detach it.
 - The barrier that applies the detach of the last kept component destroys the husk. Then a new entity can take its index.
 - A query that names a kept component finds the husk. A query of the other components does not, since the husk carries nothing else.
 - A husk counts among the entities of the world until it goes.
+- The barrier moves the kept components of a husk to another table. Thus a destroy needs room in `tables` and `columns`: `docs/extern/bridge.h.md`, *Running out*.
 
 ## attach and detach
 
@@ -660,6 +663,7 @@ A reload can also move a component to another storage layout:
 | A singleton, to any other | The reload fails: no entity can carry the value. |
 | A toggle, to any other | Bridge carries a row that is off as the others. That is a loss, named by the component alone. |
 
+A reload that states another `on_destroy` for a type fails, also for the one declarer: *bridge_on_destroy*.
 No observer hears a move, since no entity gains or loses a component.
 While the rows move, the type counts two times against `types`, and needs room in two places. Without the room, the reload fails.
 For a change that no rule covers, declare a component of a new name, and copy the values with a system.
