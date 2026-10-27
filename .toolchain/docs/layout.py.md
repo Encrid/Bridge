@@ -23,7 +23,7 @@ The layout allows only the paths of this table.
 | `.gitattributes`, `.gitignore`, `cla.md`, `license` | Needed. |
 | `project.py`, `.toolchain/project.toml`, `readme.md` | Needed. |
 | `architecture.md` | The map of the project. |
-| `docs/contributing/<name>.md`, for each name of `GUIDES`: `agreement`, `coding_style`, `commits`, `documentation_style`, `pull_request` and `tests` | Needed. |
+| `docs/contributing/<name>.md`, for each name of `GUIDES`: `agreement`, `coding_style`, `commits`, `documentation_style`, `needs`, `pull_request` and `tests` | Needed. |
 | `docs/contributing/<name>`, for each name of `[check] guides` | A guide of the project. |
 | `docs/extern/**.md`, `docs/intern/**.md`, `docs/tools/**.md` | The documents of the files. The section *The documents* gives their rules. |
 | `include/**.h` | The public headers. |
