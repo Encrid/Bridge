@@ -66,6 +66,7 @@ Storage holds the rows of a component, and this record is what a load checks.
 | `s` | Its fields or its constants, read from its text. |
 | `kind` | What it is: a struct, an enum, a bitmask or a tag. |
 | `storage` | The storage layout that each declarer stated. |
+| `on_destroy` | What a destroy does to it, an item of `enum bridge_on_destroy` that each declarer states: `docs/intern/abi/abi_on_destroy.c.md`, *One on_destroy for each type*. |
 | `size`, `align` | Its size and its alignment. |
 | `fingerprint` | The fingerprint of its descriptor, which names its layout in a record: `docs/intern/abi/abi_stated.c.md`, *The fingerprint*. |
 | `desc`, `desc_len` | A copy of its descriptor, which a later declaration is compared with: `docs/intern/abi/abi_layout.c.md`, *One layout*. |
@@ -176,6 +177,7 @@ At unload, the ranges go back to the arena if nothing that stays points into the
 `change_t` is one change in the queue of a module: `id`, the component `c`, the `size` of the value, and the operation `op`.
 `size` bytes of value follow it, padded to a multiple of eight.
 A change is 24 bytes.
+The fold of a barrier can write `CHANGE_SKIPPED` into `op`: `docs/intern/storage/storage_change.h.md`, *The fold*.
 
 ### A matrix of reach
 
@@ -252,6 +254,7 @@ So a range given back never asks for memory.
 | `CHANGE_DESTROY` | 1: a queued `destroy`. |
 | `CHANGE_ATTACH` | 2: a queued `attach`. |
 | `CHANGE_DETACH` | 3: a queued `detach`. |
+| `CHANGE_SKIPPED` | 4: a queued attach or destroy of a husk, which the fold did not apply. The barrier writes no value of it. |
 | `TURN_LIFECYCLE` | `1 << 32`: the turns of the lifecycle calls. |
 | `TURN_SYSTEM` | `2 << 32`: the turns of the systems of a phase. |
 | `NAME_MOST` | 127: the longest name, in bytes, that a declared type, a system or an observer can have. |
@@ -265,5 +268,5 @@ The low 32 bits of a turn give that order.
 | Function | Source | Result |
 | --- | --- | --- |
 | `module_discard` | `src/module/module_discard.c` | Frees a module: `docs/intern/module/module_discard.c.md`, *Functions*. |
-| `module_shut_down` | `src/module/module_call.c` | Runs the `shutdown` of a module: `docs/intern/module/module_call.c.md`, *Functions*. |
+| `module_shut_down` | `src/module/module_shutdown.c` | Runs the `shutdown` of a module: `docs/intern/module/module_shutdown.c.md`, *Functions*. |
 | `module_free_type` | `src/module/module_types.c` | Frees a declared type: `docs/intern/module/module_types.c.md`, *Functions*. |

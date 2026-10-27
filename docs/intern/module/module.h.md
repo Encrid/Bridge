@@ -31,7 +31,7 @@ What Bridge does depends on the call that failed:
 | --- | --- |
 | `init` | The module never ran, so the deployment can run without it. `on_error` of the module says what the failure costs. |
 | A system or an observer | Bridge abandons the invocation, counts it and says it. A count that reaches `max_system_failures` stops the module: `src/schedule/schedule_account.c`. |
-| `shutdown` | Bridge says the failure, and the teardown continues. |
+| `shutdown` | Bridge says the failure, and the teardown continues. A load or a reload that fails after its first call gave 0 runs it too: `docs/intern/module/module_shutdown.c.md`. |
 | `reload` | Bridge keeps the old instance if it still exists. If not, the module is stopped, and keeps all that it declared. |
 
 `docs/extern/bridge.h.md`, *Failures*, tells what a stopped module runs and keeps.
@@ -134,3 +134,4 @@ What a module starts from.
 | `module_call` | `src/module/module_call.c` | Calls a lifecycle export: `docs/intern/module/module_call.c.md`, *Functions*. |
 | `module_make_instance` | `src/module/module_instance.c` | Makes the instance of a module: `docs/intern/module/module_instance.c.md`, *Functions*. |
 | `module_start` | `src/module/module_start.c` | Starts a module: `docs/intern/module/module_start.c.md`, *Functions*. |
+| `module_shut_down_new` | `src/module/module_shutdown.c` | Runs the `shutdown` of a new instance that fails: `docs/intern/module/module_shutdown.c.md`, *Functions*. |

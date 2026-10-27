@@ -27,12 +27,18 @@ The other cases are in `docs/extern/bridge_abi.h.md`, *observe*.
 An observer gets one call for an entity at a barrier, with the events that hold.
 Storage tells the observers in their order: `docs/intern/storage/storage_terms.c.md`, *A record of terms*.
 
+A husk is not gone after its destroy, at a barrier or at a delete: it carries the types of `husk_types` that it had.
+Thus an observer whose terms that set still matches hears no leave.
+An observer with a term of `BRIDGE_NOT` can hear the husk enter, when the destroy removes the type of that term.
+An entity that one phase made and destroyed is heard as a husk that enters, if it keeps a type.
+The husk goes at the barrier that leaves it nothing, and each observer that it matched then hears a leave.
+
 ## Functions
 
 | Function | Result |
 | --- | --- |
 | `is_alive` | Gives whether the entity of an id exists. Its index is not 0, storage used it, its place is not `DEAD`, and it has the generation of the id. |
 | `leave_apart` | Takes the entity at `index` out of each sparse set it is in, and takes from it each direct-indexed value. |
-| `kill_entity` | Makes the entity at `index` gone: its row, and its index, which comes back with the next generation. The entity index shows `DEAD`, and the generation goes back to 1 before it reaches `DEAD`. |
+| `kill_entity` | Makes the entity at `index` gone: its row, and its index, which comes back with the next generation. The entity index shows `DEAD`, and the generation goes back to 1 before it reaches `DEAD`. It also clears the bit of the index in `husks`. |
 | `get_owed` | Gives what one observer is owed for an entity, as the table above says, limited to the events it asked for. Each caller gives the set `before` of storage, so it is never null. |
 | `tell_observers` | Calls `heard` of each observer that is owed something for an entity, in the order the observers came. |

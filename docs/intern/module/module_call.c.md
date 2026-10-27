@@ -1,7 +1,6 @@
 # src/module/module_call.c
 
 This file makes the private memory of a module, and calls a lifecycle export of the module.
-It also runs the `shutdown` of a module.
 
 ## The private memory
 
@@ -39,13 +38,6 @@ An entry that refused during the call is the reason of the failure: Bridge knows
 If no entry refused, a trap is the reason, with the text of the backend.
 If the export did not trap, a status that is not 0 is the reason, with the status.
 
-## A shutdown
-
-`module_shut_down` runs the `shutdown` of a module under its `shutdown_timeout`.
-A `shutdown` that fails is said as an error, and the teardown continues.
-Then storage applies what the module asked for, and the log ring of the module is drained, since the ring goes with the module.
-A module whose reload failed after its old instance went has no code left, so Bridge does not call it.
-
 ## Functions
 
 | Function | Result |
@@ -54,4 +46,3 @@ A module whose reload failed after its old instance went has no code left, so Br
 | `module_take_private` | Reserves the private memory of a module and hands it to its backend. Gives 1 with `err`. |
 | `say_trap` | Writes into `err` that the export `name` trapped, with the text of the backend, cut at 200 characters. Gives 1. |
 | `module_call` | Calls a lifecycle export once, under its timeout. Gives 0 if the export gave 0, and 1 with the reason in `err` if not. |
-| `module_shut_down` | Runs the `shutdown` of a module, ends the hold on the ids handed out, applies what it asked for, and drains what it said. |

@@ -40,13 +40,19 @@ A failure after the record leaves storage as it was before the load:
 
 1. Say that the module did not load. If its `on_error` is `fail`, stop the world.
 2. Take its systems and observers out first, because a query must not outlive a component that it names.
-3. Release the ids set aside for it.
-4. Give the share back to the persistent arena.
-5. Release each component that no other module declares, with no policy.
-6. Discard the record, with the queue of what the module asked.
-7. Build the schedule again.
+3. Run its `shutdown`, if its `init` gave 0 and it has one.
+4. Release the ids set aside for it.
+5. Give the share back to the persistent arena.
+6. Release each component that no other module declares, with no policy.
+7. Discard the record, with the queue of what the module asked.
+8. Build the schedule again.
 
-No policy applies in step 5, because no entity can carry a change that was never applied.
+Step 3 runs before step 7 destroys the instance, so the module can undo what its `init` did.
+It comes after step 2, as at an unload, and before steps 4 and 5, since a `shutdown` can spawn and allocate.
+What `init` and `shutdown` queued is never applied, since only step 10 of a load puts the module in the list.
+`docs/intern/module/module_shutdown.c.md`, *A new instance that fails*, tells when step 3 runs, and what a failure of it does.
+
+No policy applies in step 6, because no entity can carry a change that was never applied.
 The schedule without the systems of the module is one that was built before.
 So the rebuild cannot be refused, and it asks for no memory.
 
@@ -55,7 +61,7 @@ So the rebuild cannot be refused, and it asks for no memory.
 | Function | Result |
 | --- | --- |
 | `take_share` | Takes the share of the module of the persistent arena, and records it as the one range of the module, with all of it left. 1, with a record, and the module discarded, if there is no memory to keep track of it. |
-| `fail_load` | Gives the lines that the module wrote, and says that the load failed. Stops the world if the module states `fail` and the failure is not a refusal of the config, and leaves storage as it was. Gives 1. |
+| `fail_load` | Gives the lines that the module wrote, and says that the load failed. Stops the world if the module states `fail` and the failure is not a refusal of the config. Runs the `shutdown` if `init` gave 0 and the module has one, and leaves storage as it was. Gives 1. |
 | `start_loaded` | Sets the ids aside, runs `init`, builds the schedule again, and then writes the settings. 1 if a step fails, 2 if the config is refused, with why in `err`. |
 | `commit_load` | Puts the module at the end of the list, lets the world run it, and runs a barrier. |
 | `bridge_load_now` | Loads a module. 0 if it loaded and the world runs, and 1 if not. |

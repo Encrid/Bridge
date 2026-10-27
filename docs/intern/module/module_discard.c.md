@@ -17,6 +17,8 @@ It also takes the systems and the observers of a module out of storage.
 The order is the order of the backend seam: a memory is released after the last instance that it was handed to.
 An instance can hold the memory for as long as it runs, so the memory is never released before the instance goes.
 
+`module_discard` calls no export of the module. Each caller runs the `shutdown` first, when the instance gets one: `docs/intern/module/module_shutdown.c.md`, *Functions*.
+
 ## The systems
 
 `module_drop_systems` takes each system and observer of the module out of the list of the world, and keeps the order of the others.

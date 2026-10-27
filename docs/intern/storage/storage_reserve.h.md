@@ -6,13 +6,15 @@ It is the first part of `reserve_all`: `docs/intern/storage/storage_room.h.md`, 
 ## A table for each entity
 
 The table of an entity holds what the entity will carry that tables keep, and no more.
-While a type is kept apart, `get_wanted` masks the set of the fold with `in_table` into `masked`.
+While a type is kept apart, `get_wanted` masks the set of the fold with `in_table` into `masked`, through `set_mask`.
 An entity whose table already has that set stays where it is.
 So an attach of a component that an entity has is a value and no move, in whichever table of that set the entity is.
 
 Otherwise storage finds or makes the table of the set, and counts the entity among the rows that table gains.
 An entity that will carry nothing that tables keep goes to no table.
 If storage cannot make the table, it leaves the entity as it was.
+A new husk gets a table in the same way, for the set that it keeps: `docs/intern/storage/storage_husk.h.md`, *The rest of the barrier*.
+Thus a destroy can need a table.
 
 An entity that joins a sparse set counts as a row that the table of the set gains.
 Storage makes that table if no entity is in the set.
