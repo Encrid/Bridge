@@ -9,6 +9,7 @@ This document gives the needs of the project.
 | --- | --- |
 | Fast | The work of each round takes the least time it can. Nothing runs in a round that can run before it, at load. A round makes no copy, takes no lock and makes no allocation that its work does not need. |
 | Scalable | The cost of a round grows only with the work in it, not with the count of modules, entities or mods. Thus the system keeps up as these counts grow. |
+| Future-proof | The project needs minimal to no changes in the long term. |
 | Modular | Each part is its own project and its own module. It can be built, tested, replaced and used alone. The parts meet only through stated contracts, such as components and the C ABI. |
 | Composable | Any set of parts composes in a deployment with no change to a part. |
 | Extensible | A user can extend the project as far as they want. No part forces one way to build. |
