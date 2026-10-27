@@ -519,8 +519,8 @@ A setting fills a field by the type of the field:
 | A `bool` | `BRIDGE_BOOL`. |
 | An integer or a `char` | `BRIDGE_INT`, if the field holds the value. |
 | A `float` or a `double` | `BRIDGE_FLOAT`, or `BRIDGE_INT`. |
-| An enum | `BRIDGE_INT` that the enum holds, or `BRIDGE_STRING`: the name of a constant of the enum. |
-| A bitmask | `BRIDGE_INT` that the bitmask holds. |
+| An enum | `BRIDGE_INT`: the value of a constant of the enum. Or `BRIDGE_STRING`: the name of a constant of the enum. |
+| A bitmask | `BRIDGE_INT` whose each bit is a bit of a constant of the bitmask. |
 | An array of `char` | `BRIDGE_STRING`: the bytes and a zero after them, if they fit. |
 | A `bridge_text_t` | `BRIDGE_STRING`: Bridge copies the text into the share of the module in the persistent arena. |
 | A struct, or another array | No setting fills it. |
@@ -687,6 +687,8 @@ Else the sink gets a record that tells why: *The deployment*.
 3. Bridge destroys the modules, the storage, the threads and the backends.
 4. Bridge closes the library of each backend. It first pins a library whose backend does not state `BACKEND_UNLOAD`. That library stays, and the next world uses it.
 
+Step 3 destroys each husk with the storage. Thus a `shutdown` releases what its module keeps in its components of `BRIDGE_ON_DESTROY_KEEP`.
+
 The result is 0 when the world is gone, and for a null `b`.
 The result is 1 if a pinned module is loaded and the call comes from another thread, or if the sink calls it.
 Then Bridge destroys nothing, and the world stays whole. Call again from the thread that loaded the module, after the sink returns.
@@ -715,6 +717,9 @@ From the sink, the result is 1, with no record.
 A refusal of the config stops nothing. A failure after the module exists stops the world, if `on_error` is `BRIDGE_FAIL`.
 A load that fails leaves the storage as it was.
 
+If the load fails after `init` gave 0, Bridge calls `shutdown` under `shutdown_timeout` before it destroys the instance.
+Thus the module stops what its `init` started. A load that fails because `shutdown` is missing calls none.
+
 The module comes after the modules that loaded before it. A barrier applies what was queued in the order the calls ran.
 When two modules conflict, the order of the loads decides which load fails. The record names the two systems.
 
@@ -733,6 +738,9 @@ When two modules conflict, the order of the loads decides which load fails. The 
 4. Bridge releases the ids that it held ready for the module.
 5. The share of the module goes back to the arena, unless a row that stays holds a string in it.
 6. The backend destroys the instance and the image, and a barrier follows.
+
+Step 3 removes the components of `BRIDGE_ON_DESTROY_KEEP` of the module, also from each husk.
+Thus `shutdown` releases what the module keeps in them: `docs/extern/bridge_abi.h.md`, *bridge_on_destroy*.
 
 The result is 0 if the module was loaded. Else the result is 1, with a record.
 From the sink, the result is 1, with no record.
@@ -772,10 +780,13 @@ A refused rebuild records `no module of the group is reloaded: <reason>`. A list
 From the sink, the result is 1, with no record.
 
 A reload keeps the components, their rows and the entities. Bridge does not write the settings again.
+
+A husk stays through a reload. The new instance finds its husks with a query of its kept components.
 A component that a new instance does not declare goes, as at an unload.
 A new instance runs under the new config, but `persistent` can grow and not shrink.
 If a new config states fewer `spawns`, the module keeps that many ready ids. Bridge takes the others back at the next barrier.
 
+When a reload fails, Bridge calls `shutdown` of each new instance whose `reload` gave 0, before it destroys that instance.
 With `BACKEND_SIDE_BY_SIDE`, a reload that fails keeps the old instance running, as it was.
 Without it, a single reload that fails stops the module, and keeps what it declared. A later reload brings it back.
 
@@ -1047,6 +1058,8 @@ These reasons of `did not load` tell that Bridge cannot write the settings of th
 - `its setting '<key>' is <number>, which the field it names cannot hold`
 - `its setting '<key>' is <number>, which the enum of the field it names cannot hold`
 - `its setting '<key>' is <number>, which the bitmask of the field it names cannot hold`
+- `its setting '<key>' is <number>, which is no constant of the enum of the field it names`
+- `its setting '<key>' is <number>, which has a bit that no constant of the bitmask of the field it names has`
 - `its setting '<key>' is '<text>', which the enum of the field it names has no constant for`
 - `its setting '<key>' is <bytes> bytes of text, and the field it names holds <bytes> with the zero that ends it`
 - `its settings hold <bytes> bytes of text, and its persistent share has <bytes> left`
