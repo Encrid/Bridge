@@ -1,7 +1,7 @@
 # Needs
 
 A need is an aim that each decision of the project meets.
-This document gives the needs of the project, and how to weigh a decision against them.
+This document gives the needs of the project.
 
 ## The needs
 
@@ -15,14 +15,6 @@ This document gives the needs of the project, and how to weigh a decision agains
 | Minimal | The least use of resources, and the least API to learn. The project stays as simple as possible, but it never restricts flexibility or forces one way to build. |
 | Explicit | Each value and each behavior is stated, by the part that knows it. Nothing has a meaning by its absence. When a part cannot give a stated value, it says so. |
 | Portable | The project runs on each platform of the project, and uses what each platform gives. Where a platform lacks a part, a stated fallback runs. No capability of a platform is restricted. |
-
-## How to weigh a decision
-
-1. Write the options of the decision.
-2. For each option, write what it gives in the end, its pros and its cons.
-3. Weigh each option against each need, in a table with one row for each need.
-4. Add the other rules of the project where they apply.
-5. Refuse an option that fails a need. If each option fails a need, the conflict between the needs is the question.
 
 ## The needs of a project
 
