@@ -6,6 +6,7 @@ This file reports how many entities and tables a world holds now, and the most i
 
 The entity index grows to `high` and never shrinks: a freed slot goes on a list and comes back before `high` rises.
 So the peak entities is `high` less the one slot that is no entity. The live entities is that peak less the slots on the free list.
+A husk is on no free list until it goes, so it counts among the live entities.
 Tables keep a live count and a watermark of their own, so this file reads both without a walk.
 
 ## Functions

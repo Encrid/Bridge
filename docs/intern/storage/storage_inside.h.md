@@ -77,12 +77,26 @@ After that, an entity always has its cell.
 
 A cell exists for an entity that has no value, so a bit for each entity tells whether it has one.
 An attach sets the bit and a detach clears it, at the barrier, and storage tells the observers as for any other layout.
-The destroy of an entity clears its bit and its cell, so the next entity at that index has nothing of the old one.
+When an entity goes, storage clears its bit and its cell, so the next entity at that index has nothing of the old one.
 Storage keeps the bits in `given`, and writes a copy for modules in the shared memory, at the offset `direct` of the world.
 The first 4 bytes of the 16 bytes before the cells hold the offset of that copy from the shared base.
 
 `[budget] direct_indexed` gives how many such components there may be, and storage gets their bits when it makes the world.
 The cost is the size of the component for each entity, carried or not: 64 bytes at 400,000 entities is 25.6 MB of `[budget] columns`.
+
+## A husk
+
+A destroy can leave an entity with the components that it keeps, and such an entity is a husk: `docs/extern/bridge_abi.h.md`, *A husk*.
+`husk_types` is the set of the types whose `on_destroy` is `BRIDGE_ON_DESTROY_KEEP` and that a loaded module declares.
+A husk is a live place with its index and its generation, in the table of the types that it keeps, or in none.
+The entity index shows it as any other entity, so a module finds there the types that the husk keeps, and no other type.
+The bit of the entity in `husks` makes it a husk, and only storage reads the bit.
+`docs/intern/storage/storage_husk.h.md` tells what a fold does with a husk, and `docs/intern/storage/storage_husk.c.md` how the set changes.
+
+The mark is not in the entity index.
+Modules read that copy and can write over it, and storage never reads it: *Nothing in the shared block is read back*.
+The mark is not in `place_t` either: a field there makes each place 16 bytes, in place of 12.
+`husks` takes one bit for each of `[budget] entities`, and storage gets it when it makes the world.
 
 ## Nothing in the shared block is read back
 
@@ -93,6 +107,7 @@ Storage keeps these in memory of its own, which no module can reach:
 | Where each entity is: table, row and generation | `places`, by index |
 | Which entity is in which row, for each table | `who`, in step with the column region |
 | Each set, and the offset of each column | `sets` and `columns`, by table |
+| Which entity is a husk | `husks`, by index |
 
 The entity index and the array of ids of each table in the shared block are copies.
 Storage writes them when it places a row, and never reads them.
@@ -121,6 +136,7 @@ What the fold decided of an entity, for the length of one barrier, in `folded`.
 | `DROPPED` | Storage leaves the entity as it was, for want of a table or of columns. |
 | `SHORT` | With `DROPPED`: for want of columns, and not of a table. |
 | `MOVES` | The entity is to have a row that it does not have, and storage finds room for it. |
+| `HUSKED` | A destroy at this barrier left the entity some types of `husk_types`, so it is a husk from this barrier on. |
 
 ### storage_type_t
 
@@ -215,6 +231,8 @@ The budget sizes it when the world is made: `docs/intern/block/block_budget.c.md
 | `apart` | How many declared types no table keeps. While there is none, an entity carries what its table holds, and a barrier looks no further. |
 | `direct_room`, `bit_words`, `direct_type` | `[budget] direct_indexed`, the words of a bit for each entity, and the type of each slot. |
 | `given` | For each direct-indexed slot, a bit for each entity that has a value. |
+| `husk_types` | The types that a destroy leaves on an entity: *A husk*. |
+| `husks` | A bit for each entity, set while the entity is a husk: *A husk*. |
 
 ### row_move_t
 

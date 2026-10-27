@@ -20,13 +20,15 @@ So a member that supersedes a shared type does not read another member of the li
 5. It ends each old instance, and each new one takes over, at a single barrier.
 
 A failure before the barrier undoes every new instance, clears the marks, and keeps every old.
+Each undo first calls the `shutdown` of a new instance whose `reload` gave 0: `docs/intern/reload/reload_fail.c.md`, *The new instance taken out*.
+The member whose start failed is undone at once. Then `group_fail` undoes each member that started, in the order of the list.
 `docs/extern/bridge.h.md`, *bridge_reload*, tells what a caller sees.
 
 ## Functions
 
 | Function | Result |
 | --- | --- |
-| `undo_member` | Drops one member's new instance, and unparks the systems of its old. |
+| `undo_member` | Drops one member's new instance with `reload_undo`, and unparks the systems of its old. |
 | `validate_group` | Checks each member. Refuses an empty list, a non-side-by-side module, or a repeated identity. Marks each old as regrouping. |
 | `start_members` | Grows, records and starts each new instance beside its old. Gives how many started. |
 | `group_fail` | Undoes the started members, clears every mark, frees the list, and gives 1. |

@@ -17,7 +17,7 @@ Any other field is written by the seeder of its kind.
 | `char`, and the integers from `int8_t` to `uint64_t` | `config_seed_integer` | `src/config/config_scalar.c` |
 | `float`, `double` | `config_seed_float` | `src/config/config_scalar.c` |
 | An enum | `config_seed_enum` | `src/config/config_enum.c` |
-| A bitmask | `config_seed_bitmask` | `src/config/config_enum.c` |
+| A bitmask | `config_seed_bitmask` | `src/config/config_bitmask.c` |
 | `bridge_text_t` | `config_seed_text` | `src/config/config_text.c` |
 | A struct | `config_seed_struct`, which refuses | `src/config/config_text.c` |
 

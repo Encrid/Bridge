@@ -1,7 +1,7 @@
 # src/storage/storage_room.h
 
 This header finds room for each row that a barrier adds to a table, before anything moves.
-It is the second step of a barrier, and of a move.
+It is the second step of a barrier, of a move, and of a delete at an unload.
 
 ## Running out
 
@@ -10,6 +10,7 @@ So here it finds a shortage before any row moves: a table past `[budget] tables`
 Then storage drops all the changes asked of that entity at that barrier, and not only some of them.
 The entity keeps the components and the values it had, and no observer hears of it.
 Storage places the other entities as usual.
+A destroy that leaves a husk can be dropped too, since the husk moves to the table of what it keeps.
 
 When a table cannot take all the rows that arrive, it takes as many as it finds room for.
 It asks the column region for half as many rows until a number fits.
@@ -54,4 +55,4 @@ It names who asked, and nothing has begun when it finds the shortage, so nothing
 | `make_room` | Takes room for one more row that table `t` gains. The first time, it sizes the table. Gives false if no room is left. |
 | `room_joins` | For the entity at `index`, takes room in each sparse set that it joins. Gives false at the first set with no room. |
 | `room_one` | Takes room for the entity at `index` where it is to be, or leaves it as it was for want of columns. An entity that gets no new row needs no room. Most of what a barrier sees is an attach to an entity that has the component already. |
-| `reserve_all` | The second step of a barrier and of a move. Finds a table for each changed entity, then room in it and in each sparse set that it joins, before anything moves. |
+| `reserve_all` | The second step of a barrier, of a move and of a delete. Finds a table for each changed entity, then room in it and in each sparse set that it joins, before anything moves. |

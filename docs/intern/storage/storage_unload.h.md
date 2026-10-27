@@ -4,11 +4,14 @@ This header gives what an unload and a release share: the work on one entity at 
 
 ## Outside a barrier
 
-At an unload or a release, storage destroys or changes one entity at a time, with no fold.
+At a strip, a sweep or a release, storage destroys or changes one entity at a time, with no fold.
 It tells the observers at once, from what the entity carries and what it will carry.
 `before` holds what the entity carries, and a second set holds what it will carry once the type goes.
-A policy destroys an entity always for `delete`, and for `sweep` when nothing is left.
+A sweep destroys an entity when nothing is left on it.
+A husk that is left with nothing goes under each policy: `docs/intern/module/module_types.c.md`, *The policies at unload*, tells why.
+
 The policies are in `docs/extern/bridge_abi.h.md`, *bridge_on_unload*.
+A delete works through a fold, as a barrier does, and not here: `docs/intern/storage/storage_husk.c.md`, *A delete at an unload*.
 
 ## Functions
 
@@ -16,6 +19,5 @@ The policies are in `docs/extern/bridge_abi.h.md`, *bridge_on_unload*.
 | --- | --- |
 | `destroy_entity` | Destroys the entity at `index`, and tells its observers what it carried. Gives back its table if it was the last row. The place of a live entity names 0 or a live table. |
 | `sweep_sets` | Gives back the table of each empty sparse set, as the end of a barrier does. |
-| `is_apart` | Gives whether the entity at `index` is in a sparse set, or has a direct-indexed value. |
 | `see_less` | Writes into `before` what the entity at `index` carries, and into `left` the same set without a type. |
-| `is_swept` | Gives whether a policy destroys an entity that is left with `left`. |
+| `is_swept` | Gives whether the entity at `index` goes once it is left with `left`: with nothing left, under `sweep`, or if it is a husk. |

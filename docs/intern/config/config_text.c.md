@@ -17,7 +17,8 @@ A text that lives for less than a phase goes in the scratch arena, and no settin
 
 ## A bridge_text_t
 
-The bytes of the text go into the block of text of the module, after the texts written before it.
+The bytes of the text go into the private copy of the texts, after the texts written before it.
+`config_keep_text` copies them into the block of text of the module only when no setting was refused: `docs/intern/config/config_room.c.md`.
 Each text takes the room that `docs/intern/config/config_room.c.md`, *The room*, gives.
 No zero ends the text: its length tells where it ends.
 The field gets the offset of the bytes and their length.
@@ -38,7 +39,7 @@ No setting fills a field that is a struct, so any setting for one is refused as 
 | Function | Result |
 | --- | --- |
 | `get_text_len` | Gives the length of a text setting, or 0 for a setting that is not text. |
-| `put_text` | Copies the bytes of a text setting into the block of text of the module in the arena. Gives where they are. |
+| `put_text` | Copies the bytes of a text setting into the private copy of the texts. Gives where they will be in the block of text. |
 | `config_seed_text` | Writes a text into a `bridge_text_t`: where its bytes are in the persistent arena, and how many. Gives 1 if it refuses. |
 | `config_seed_struct` | Refuses a setting for a field that is a struct. Gives 1. |
 | `config_seed_array` | Writes a text into a char array: the bytes, inline, and a zero after them. Gives 1 if it refuses. |

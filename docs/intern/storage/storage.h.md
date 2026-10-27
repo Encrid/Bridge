@@ -12,7 +12,7 @@ Each function has the name of a request, as the functions of the backend seam do
 - At an unload, Bridge drops a component that nobody declares any more.
 
 The header does not tell how storage works a barrier: `docs/intern/storage/storage_apply.c.md`, *The steps of a barrier*, tells it.
-To storage, a type is a size, an alignment and a storage layout, and nothing more.
+To storage, a type is a size, an alignment, a storage layout and whether a destroy keeps it, and nothing more.
 `src/schema/schema.c` reads the fields of a type and the constants of an enum from its text, and Bridge keeps them outside storage.
 
 ## Storage layouts
@@ -127,6 +127,7 @@ How `storage_convert` ended.
 | `storage_validate_baseline` | Takes the columns as the baseline of the next check: `docs/intern/storage/storage_validate.c.md`, *Functions*. |
 | `storage_make_writable` | Makes the set `writable` of a module: `docs/intern/storage/storage_slots.c.md`, *Functions*. |
 | `storage_let_write` | Records what a module may write: `docs/intern/storage/storage_slots.c.md`, *Functions*. |
+| `storage_let_keep` | Records whether a destroy keeps a type: `docs/intern/storage/storage_husk.c.md`, *Functions*. |
 | `storage_reserve` | Sets ids aside for a module: `docs/intern/storage/storage_ids.c.md`, *Functions*. |
 | `storage_publish` | Writes what a module reads: `docs/intern/storage/storage_publish.c.md`, *Functions*. |
 | `storage_end_publish` | Forgets which tables changed: `docs/intern/storage/storage_publish.c.md`, *Functions*. |

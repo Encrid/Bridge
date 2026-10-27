@@ -1,6 +1,6 @@
 # src/storage/storage_sets.h
 
-This header compares and hashes sets of types, and gives the set of a table.
+This header compares, masks and hashes sets of types, and gives the set of a table.
 A set is in `docs/intern/storage/storage_set.h.md`, *A set of types*.
 
 ## The hash
@@ -15,5 +15,6 @@ It then folds the high 32 bits into the low 32 bits, and keeps the bits below `h
 | --- | --- |
 | `set_is_same` | Gives whether two sets hold the same types. It compares a word at a time, since a `memcmp` of a length the compiler cannot see is a call. |
 | `set_is_empty` | Gives whether a set holds no type. |
+| `set_mask` | Writes into `to` the types that both `a` and `b` hold, a word at a time. `to` can be `a`. `get_wanted` and `fold_husk` call it. |
 | `hash_set` | Gives the first place of a set in the hash of tables. |
 | `get_set` | Gives which types the entities of table `t` carry. |
