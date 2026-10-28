@@ -13,6 +13,7 @@ void reload_undo(reloading_t *r)
     uint32_t i = 0;
 
     module_drop_systems(w, n);
+    module_shut_down_new(w, n);
     while (i < n->declared_count) {
         was = n->declared[i]->replaces;
         if (was)

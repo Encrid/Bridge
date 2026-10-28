@@ -37,7 +37,7 @@ If the backend gives no `shutdown`, the start fails there, and no `shutdown` run
 
 ## The spans
 
-`column_base` has a cell for each component of the module in each table there may be.
+`column_base` covers each type of the module in each table id there may be: `docs/intern/storage/storage_cells.c.md`, *The cells*.
 So whether the spans of the module hold what a barrier writes is known at the start, and not at some barrier.
 The spans need these bytes:
 
@@ -45,9 +45,9 @@ The spans need these bytes:
 | --- | --- |
 | A query for each system | 8 |
 | A list for each observer | 8 |
-| A cell of `column_base` for each component in each table id, counting 0 | 4 |
+| A cell of `column_base` for each type in each table id, counting 0 | 4 |
 | A row count and a block for each table id | 8 |
-| A `kept`, `stride`, `write` and `kind` cell for each component | 16 |
+| A `kept`, `stride`, `write` and `kind` cell for each type | 16 |
 | An offset and a length for each of `BRIDGE_OWNED_CAP` ranges | 8 |
 | The count of the owned ranges | 4 |
 

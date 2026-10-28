@@ -23,7 +23,7 @@ The refusal then gives the size of the type and the bytes of `[budget] columns`.
 ## A type kept
 
 The type keeps the copy of its descriptor that the parse made.
-It keeps the `on_destroy` of the declaration, which each later declarer states too: `docs/intern/abi/abi_on_destroy.c.md`, *One on_destroy for each type*.
+It keeps the `on_destroy` of the declaration: `docs/intern/abi/abi_on_destroy.c.md`, *One on_destroy for each type*.
 If the type replaces a type at a reload, the old type is marked `superseded`, and the new type keeps it in `replaces`.
 The new type holds each declared type that one of its fields names.
 It counts as a user of each such type, for as long as it is there.

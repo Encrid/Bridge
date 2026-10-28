@@ -11,6 +11,7 @@ This file visits each entity that carries a type, in each storage layout, and co
 | A table, a toggle or a sparse set | The entity of each row of each live table whose set holds the type. |
 
 A type of a sparse set is in the table of that set, so the walk of the tables finds its entities.
+The walk takes the tables in the order of their ids, and the rows of each table from row 0.
 
 ## Functions
 

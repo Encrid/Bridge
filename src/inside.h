@@ -37,6 +37,7 @@ struct declared_type {
     schema_t s;
     enum bridge_kind kind;
     enum bridge_storage storage;
+    enum bridge_on_destroy on_destroy;
     uint32_t size;
     uint32_t align;
     uint64_t fingerprint;
@@ -194,7 +195,8 @@ struct module {
 enum change_op : uint32_t {
     CHANGE_DESTROY = 1,
     CHANGE_ATTACH = 2,
-    CHANGE_DETACH = 3
+    CHANGE_DETACH = 3,
+    CHANGE_SKIPPED = 4
 };
 
 typedef struct {

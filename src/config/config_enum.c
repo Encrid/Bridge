@@ -20,6 +20,15 @@ static bool find_constant(const declared_type_t *of, const char *name,
     return (true);
 }
 
+static bool has_constant(const declared_type_t *of, int64_t value)
+{
+    uint32_t i = 0;
+
+    while (i < of->s.constant_count && of->s.constants[i].value != value)
+        i++;
+    return (i < of->s.constant_count);
+}
+
 static bool fits_enum(const declared_type_t *of, int64_t value)
 {
     enum schema_kind base = of->s.base;
@@ -40,6 +49,10 @@ int config_seed_enum(config_seed_t *seed, const schema_field_t *field,
         return (config_refuse(seed, "its setting '%.80s' is %lld, which "
             "the enum of the field it names cannot hold", s->key,
             (long long)value));
+    if (s->kind == BRIDGE_INT && !has_constant(of, value))
+        return (config_refuse(seed, "its setting '%.80s' is %lld, which is "
+            "no constant of the enum of the field it names", s->key,
+            (long long)value));
     if (s->kind == BRIDGE_STRING && !find_constant(of, s->v.s, &value))
         return (config_refuse(seed, "its setting '%.80s' is '%.60s', which "
             "the enum of the field it names has no constant for", s->key,
@@ -47,21 +60,5 @@ int config_seed_enum(config_seed_t *seed, const schema_field_t *field,
     if (s->kind != BRIDGE_INT && s->kind != BRIDGE_STRING)
         return (config_say_misfit(seed, s, "an enum"));
     memcpy(seed->row + field->offset, &value, of->s.size);
-    return (0);
-}
-
-int config_seed_bitmask(config_seed_t *seed, const schema_field_t *field,
-    const bridge_setting_t *s)
-{
-    const declared_type_t *of = field->type;
-    uint64_t most = UINT64_MAX >> (64 - 8 * of->s.size);
-
-    if (s->kind != BRIDGE_INT)
-        return (config_say_misfit(seed, s, "a bitmask"));
-    if (s->v.i < 0 || (uint64_t)s->v.i > most)
-        return (config_refuse(seed, "its setting '%.80s' is %lld, which "
-            "the bitmask of the field it names cannot hold", s->key,
-            (long long)s->v.i));
-    memcpy(seed->row + field->offset, &s->v.i, of->s.size);
     return (0);
 }

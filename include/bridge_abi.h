@@ -13,7 +13,7 @@
 extern "C" {
     #endif
 
-constexpr uint32_t BRIDGE_ABI = 1;
+constexpr uint32_t BRIDGE_ABI = 2;
 
 constexpr int32_t BRIDGE_END = INT32_MAX;
 
@@ -34,6 +34,11 @@ enum bridge_on_unload : uint32_t {
     BRIDGE_STRIP = 1,
     BRIDGE_SWEEP = 2,
     BRIDGE_DELETE = 3
+};
+
+enum bridge_on_destroy : uint32_t {
+    BRIDGE_ON_DESTROY_REMOVE = 1,
+    BRIDGE_ON_DESTROY_KEEP = 2
 };
 
 enum bridge_storage : uint32_t {
@@ -95,8 +100,9 @@ typedef struct {
     uint32_t desc_len;
     enum bridge_on_unload on_unload;
     enum bridge_storage storage;
+    enum bridge_on_destroy on_destroy;
 } bridge_declaration_t;
-static_assert(sizeof(bridge_declaration_t) == 36);
+static_assert(sizeof(bridge_declaration_t) == 40);
 static_assert(alignof(bridge_declaration_t) == 4);
 static_assert(offsetof(bridge_declaration_t, name) == 0);
 static_assert(offsetof(bridge_declaration_t, name_len) == 4);
@@ -107,6 +113,7 @@ static_assert(offsetof(bridge_declaration_t, desc) == 20);
 static_assert(offsetof(bridge_declaration_t, desc_len) == 24);
 static_assert(offsetof(bridge_declaration_t, on_unload) == 28);
 static_assert(offsetof(bridge_declaration_t, storage) == 32);
+static_assert(offsetof(bridge_declaration_t, on_destroy) == 36);
 
 typedef struct {
     uint32_t name;
@@ -188,8 +195,9 @@ typedef struct {
     uint32_t owned;
     uint32_t arena_lo;
     uint32_t arena_hi;
+    uint32_t changes_left;
 } bridge_header_t;
-static_assert(sizeof(bridge_header_t) == 116);
+static_assert(sizeof(bridge_header_t) == 120);
 static_assert(alignof(bridge_header_t) == 4);
 static_assert(offsetof(bridge_header_t, abi) == 0);
 static_assert(offsetof(bridge_header_t, scratch) == 4);
@@ -220,6 +228,7 @@ static_assert(offsetof(bridge_header_t, kind) == 100);
 static_assert(offsetof(bridge_header_t, owned) == 104);
 static_assert(offsetof(bridge_header_t, arena_lo) == 108);
 static_assert(offsetof(bridge_header_t, arena_hi) == 112);
+static_assert(offsetof(bridge_header_t, changes_left) == 116);
 
 typedef struct {
     uint32_t spans;

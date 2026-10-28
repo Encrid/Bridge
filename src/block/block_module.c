@@ -41,6 +41,7 @@ void block_hand_out(bridge_world_t *w)
 
 static void write_caps(bridge_header_t *h, const bridge_world_t *w)
 {
+    h->kept = h->column_base + 4u * h->types * h->tables;
     h->rows = h->kept + 4u * h->types;
     h->blocks = h->rows + 4u * h->tables;
     h->stride = h->blocks + 4u * h->tables;
@@ -86,9 +87,9 @@ int block_write_header(bridge_world_t *w, module_t *m)
     h->column_base = h->observers + lists;
     h->types = m->declared_count;
     h->tables = storage_count_tables(w->storage);
-    h->kept = h->column_base + 4u * h->types * h->tables;
     h->entity_index = block_get_offset(w, w->index);
     write_caps(h, w);
     write_owned(h, m);
+    block_write_room(m);
     return (h->entity_index == 0);
 }

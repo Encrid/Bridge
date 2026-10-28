@@ -16,8 +16,10 @@
         #define E32_VALUES { E32_LOW = -1, E32_HIGH = 1 }
         #define EU8_VALUES { EU8_LOW, EU8_HIGH }
         #define PAIR_FIELDS { int32_t a; int32_t b; }
+        #define MASK64_VALUES { MASK64_LOW = 1, \
+            MASK64_TOP = 0x8000000000000000 }
         #define SETTINGS_WIDE e16_t e16; e32_t e32; eu8_t eu8; \
-            bridge_text_t names[2]; pair_t pair;
+            bridge_text_t names[2]; pair_t pair; mask64_t mask64;
     #else
         #define SETTINGS_WIDE
     #endif
@@ -49,6 +51,8 @@ BRIDGE_SCHEMA_ENUM_TYPE(eu8_t, uint8_t, EU8_VALUES);
 BRIDGE_SCHEMA_ENUM_DESC(eu8_t, uint8_t, EU8_VALUES);
 BRIDGE_SCHEMA_STRUCT_TYPE(pair_t, PAIR_FIELDS);
 BRIDGE_SCHEMA_STRUCT_DESC(pair_t, PAIR_FIELDS);
+BRIDGE_SCHEMA_BITMASK_TYPE(mask64_t, uint64_t, MASK64_VALUES);
+BRIDGE_SCHEMA_BITMASK_DESC(mask64_t, uint64_t, MASK64_VALUES);
     #endif
 BRIDGE_SCHEMA_STRUCT_TYPE(settings_t, SETTINGS_FIELDS);
 BRIDGE_SCHEMA_STRUCT_DESC(settings_t, SETTINGS_FIELDS);

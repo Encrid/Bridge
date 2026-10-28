@@ -127,7 +127,7 @@ static_assert(offsetof(backend_memory_import_t, ns) == 0);
 static_assert(offsetof(backend_memory_import_t, field) == 8);
 static_assert(offsetof(backend_memory_import_t, memory) == 16);
 
-constexpr uint32_t BACKEND_ABI = 1;
+constexpr uint32_t BACKEND_ABI = 2;
 
 typedef struct {
     const void *bytes;

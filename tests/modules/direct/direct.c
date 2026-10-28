@@ -5,6 +5,7 @@
 */
 #include "direct.h"
 #include "idle.h"
+#include "on_destroy.h"
 
 static void add_changes(const test_api_t *api)
 {
@@ -72,8 +73,8 @@ TEST(init)
 {
     ndirect_a = TEST_COMPONENT(api, "st:A", a_t, BRIDGE_DELETE,
         BRIDGE_TABLE);
-    ndirect_d = TEST_COMPONENT(api, "st:D", d_t, BRIDGE_DELETE,
-        BRIDGE_DIRECT_INDEXED);
+    ndirect_d = TEST_DECLARE_AS(api, BRIDGE_STRUCT, "st:D", d_t,
+        BRIDGE_DELETE, BRIDGE_DIRECT_INDEXED, ON_DESTROY);
     add_changes(api);
     add_readers(api);
 #ifndef BIG

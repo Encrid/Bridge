@@ -24,7 +24,8 @@ The private memory is the library's alone, so the library lays it out from offse
 A header at offset 0 tells where the regions are: `docs/extern/bridge_abi.h.md`, *bridge_header_t*, and `docs/intern/block/block_module.c.md`, *The header*.
 
 `block_write_room` writes `changes_left` of the header: the room of the queue of changes that the module did not use.
-`block_write_header` calls it when the instance starts, `queue_change` after each change, and `empty_queues` at each barrier.
+`block_write_header` calls it when the instance starts, and `queue_change` after each change.
+`empty_queues` calls it at a barrier, for a module whose queue is not empty: `docs/intern/storage/storage_settle.h.md`, *What a module hears*.
 Each of these calls comes after the private memory of the module is made, so the write needs no check.
 
 Each other offset into the shared memory is from the start of the shared memory.

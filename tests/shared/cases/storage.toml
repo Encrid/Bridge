@@ -203,6 +203,30 @@ claims = { matches = ["look: with A: spans, rows 2 6.*'st:B' is stripped, and 3 
 false = { run = ["{out}/storage{exe}", "stripunnamed", "512"] }
 
 [[case]]
+name = "BRIDGE_DELETE-leaves-a-husk-of-each-carrier-that-keeps-a-type"
+run = ["{out}/storage{exe}", "deletehusk"]
+claims = { matches = ["delete st:A.*entity 1 is alive.*entity 6 is alive.*look: with A: spans, rows 0 0.*look_b: with B: spans, rows 1 6.*strip st:B.*entity 1 is gone.*entity 6 is gone.*look_b: with B: spans, rows 0 0.*alive"] }
+false = { run = ["{out}/storage{exe}", "deletefull"] }
+
+[[case]]
+name = "BRIDGE_DELETE-with-no-room-for-a-husk-strips-and-warns"
+run = ["{out}/storage{exe}", "deletefull"]
+claims = { matches = ["'st:A' is deleted, and 6 entities lose only it: \\[budget\\] tables of 1 or \\[budget\\] columns of 67108864 bytes has no room for their husks.*strip st:B.*entity 1 is alive.*entity 6 is alive.*alive"] }
+false = { run = ["{out}/storage{exe}", "deletehusk"] }
+
+[[case]]
+name = "BRIDGE_DELETE-leaves-a-husk-of-a-direct-indexed-type"
+run = ["{out}/storage{exe}", "directhusk"]
+claims = { matches = ["delete st:A.*entity 1 is alive.*entity 2 is gone.*entity 3 is alive.*entity 4 is gone.*entity 5 is alive.*entity 6 is gone.*strip st:D.*entity 1 is gone.*entity 3 is gone.*entity 5 is gone.*alive"] }
+false = { run = ["{out}/storage{exe}", "directdelete"] }
+
+[[case]]
+name = "BRIDGE_DELETE-leaves-a-husk-of-a-sparse-set-type"
+run = ["{out}/storage{exe}", "sparsehusk"]
+claims = { matches = ["delete st:A.*entity 1 is alive.*entity 2 is gone.*entity 7 is alive.*strip st:S.*entity 1 is gone.*entity 7 is alive.*alive"] }
+false = { run = ["{out}/storage{exe}", "sparsedelete"] }
+
+[[case]]
 name = "storage-stripfull"
 run = ["{out}/storage{exe}", "stripfull"]
 claims = { output = "tests/storage/storage_stripfull.txt" }

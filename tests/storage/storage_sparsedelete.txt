@@ -16,13 +16,13 @@ attach_b_half
   heard_s: heard of S: entity, events 7 3
 delete st:S
 never
-  heard_s: heard of S: entity, events 7 4
-  heard_s: heard of S: entity, events 5 4
-  heard_s: heard of S: entity, events 3 4
   heard_s: heard of S: entity, events 1 4
-  heard_both: heard of A and S: entity, events 5 4
-  heard_both: heard of A and S: entity, events 3 4
+  heard_s: heard of S: entity, events 3 4
+  heard_s: heard of S: entity, events 5 4
+  heard_s: heard of S: entity, events 7 4
   heard_both: heard of A and S: entity, events 1 4
+  heard_both: heard of A and S: entity, events 3 4
+  heard_both: heard of A and S: entity, events 5 4
 the entity that was in the set alone is gone
 look
   look: the set walked: spans, rows 0 0

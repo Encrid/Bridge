@@ -49,7 +49,7 @@ false = { run = ["{out}/seam{exe}", "module_config.abi-another-refused"] }
 [[case]]
 name = "module_config.abi-another-refused"
 run = ["{out}/seam{exe}", "module_config.abi-another-refused"]
-claims = { matches = ["module 'test:ok@0.1.0' is refused: it wants ABI 2 and this is ABI 1.*alive"] }
+claims = { matches = ["module 'test:ok@0.1.0' is refused: it wants ABI 3 and this is ABI 2.*alive"] }
 false = { run = ["{out}/seam{exe}", "artifact.backend-not-configured-refused"] }
 
 [[case]]
@@ -79,7 +79,7 @@ false = { run = ["{out}/seam{exe}", "config.abi-another-refused"] }
 [[case]]
 name = "config.abi-another-refused"
 run = ["{out}/seam{exe}", "config.abi-another-refused"]
-claims = { matches = ["the host is of host ABI 2, and this is 1.*bridge_create refused.*alive"] }
+claims = { matches = ["the host is of host ABI 3, and this is 2.*bridge_create refused.*alive"] }
 false = { run = ["{out}/seam{exe}", "config.abi-unset-refused"] }
 
 [[case]]
@@ -217,7 +217,7 @@ false = { run = ["{out}/seam{exe}", "module_config.spans-too-small-refused"] }
 [[case]]
 name = "module_config.spans-rounded-up-to-8-refused"
 run = ["{out}/seam{exe}", "module_config.spans-rounded-up-to-8-refused"]
-claims = { matches = ["its spans of 860 bytes do not hold a column_base of 1 components by \\d+ tables, which with its queries is 864 bytes.*alive"] }
+claims = { matches = ["its spans of 860 bytes do not hold a column_base of 1 types by 64 tables, which with its queries is 864 bytes.*alive"] }
 false = { run = ["{out}/seam{exe}", "module_config.spans-a-multiple-of-8-taken"] }
 
 [[case]]
@@ -397,7 +397,7 @@ false = { run = ["{out}/seam{exe}", "bridge_backend_t-granule-not-a-power-of-two
 [[case]]
 name = "module_config.spans-too-small-refused"
 run = ["{out}/seam{exe}", "module_config.spans-too-small-refused"]
-claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }
+claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 types by 65 tables.*moved 2 1000.*alive"] }
 false = { run = ["{out}/seam{exe}", "budget.columns-used-up-changes-not-applied"] }
 
 [[case]]
@@ -517,7 +517,7 @@ false = { run = ["{out}/seam{exe}", "backend_get_abi-another-refused"] }
 [[case]]
 name = "backend_get_abi-another-refused"
 run = ["{out}/seam{exe}", "backend_get_abi-another-refused"]
-claims = { matches = ["backend 'plain': backend library '[^']*bridge_plain_other[^']*' is of backend ABI 2, and this is 1.*bridge_create refused.*alive"] }
+claims = { matches = ["backend 'plain': backend library '[^']*bridge_plain_other[^']*' is of backend ABI 3, and this is 2.*bridge_create refused.*alive"] }
 false = { run = ["{out}/seam{exe}", "artifact.path-cannot-open"] }
 
 [[case]]
@@ -623,6 +623,20 @@ alone = true
 run = ["{out}/seam{exe}", "config.threads-one-runs-in-turn"]
 claims = { matches = ["on 1 thread.s.[^a-z]*they ran one after the other.*alive"] }
 false = { run = ["{out}/seam{exe}", "module_config.pinned-runs-on-the-loading-thread"] }
+
+[[case]]
+name = "bridge_run_phase-observers-of-one-module-run-one-after-another"
+alone = true
+run = ["{out}/seam{exe}", "bridge_run_phase-observers-of-one-module-run-one-after-another"]
+claims = { matches = ["two naps of one module on 1 thread.s. of 2[^a-z]*they ran one after the other.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.threads-two-run-at-once"] }
+
+[[case]]
+name = "bridge_run_phase-systems-of-one-module-run-one-after-another"
+alone = true
+run = ["{out}/seam{exe}", "bridge_run_phase-systems-of-one-module-run-one-after-another"]
+claims = { matches = ["two naps of one module on 1 thread.s. of 2[^a-z]*they ran one after the other.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.threads-two-run-at-once"] }
 
 [[case]]
 name = "module_config.pinned-runs-on-the-loading-thread"
@@ -1573,6 +1587,12 @@ claims = { matches = ["did not load: its setting 'flags' is 4294967296, which th
 false = { run = ["{out}/seam{exe}", "module_config.setting-enum-as-an-integer-taken"] }
 
 [[case]]
+name = "module_config.setting-bitmask-zero-taken"
+run = ["{out}/seam{exe}", "module_config.setting-bitmask-zero-taken"]
+claims = { matches = ["game:settings@0.1.0: loaded.*game:settings@0.1.0/show: flags ratio 0 3.*alive"], matches_not = ["did not load"] }
+false = { run = ["{out}/seam{exe}", "module_config.setting-bitmask-out-of-range-refused"] }
+
+[[case]]
 name = "bridge_setting_t-kind-zero-refused"
 run = ["{out}/seam{exe}", "bridge_setting_t-kind-zero-refused"]
 claims = { matches = ["did not load: its setting 'vsync' has the kind 0, which is no kind of a setting.*alive"] }
@@ -1649,6 +1669,18 @@ name = "module_config.setting-enum-of-uint8-past-255-refused"
 run = ["{out}/seam{exe}", "module_config.setting-enum-of-uint8-past-255-refused"]
 claims = { matches = ["did not load: its setting 'eu8' is 256, which the enum of the field it names cannot hold.*alive"] }
 false = { run = ["{out}/seam{exe}", "module_config.setting-enums-of-three-bases-taken"] }
+
+[[case]]
+name = "module_config.setting-bitmask-of-64-bits-taken"
+run = ["{out}/seam{exe}", "module_config.setting-bitmask-of-64-bits-taken"]
+claims = { matches = ["game:settings@0.1.0: loaded.*alive"], matches_not = ["did not load"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_INT-bit-63-for-a-bitmask-of-64-bits-refused"] }
+
+[[case]]
+name = "BRIDGE_INT-bit-63-for-a-bitmask-of-64-bits-refused"
+run = ["{out}/seam{exe}", "BRIDGE_INT-bit-63-for-a-bitmask-of-64-bits-refused"]
+claims = { matches = ["did not load: its setting 'mask64' is -9223372036854775808, which the bitmask of the field it names cannot hold.*alive"] }
+false = { run = ["{out}/seam{exe}", "module_config.setting-bitmask-of-64-bits-taken"] }
 
 [[case]]
 name = "module_config.setting-text-into-a-text-array-refused"
@@ -2925,7 +2957,7 @@ false = { run = ["{out}/seam{exe}", "BRIDGE_SPAN_SIZE-what-a-span-takes-of-the-s
 [[case]]
 name = "BRIDGE_SPAN_SIZE-what-a-span-takes-of-the-spans"
 run = ["{out}/seam{exe}", "BRIDGE_SPAN_SIZE-what-a-span-takes-of-the-spans"]
-claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }
+claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 types by 65 tables.*moved 2 1000.*alive"] }
 false = { run = ["{out}/seam{exe}", "BRIDGE_SCHEMA_TEXT-a-descriptor-of-the-type-s-own-text"] }
 
 [[case]]
@@ -3193,6 +3225,18 @@ claims = { matches = ["game:aim@0.1.0/reached: aims 10 5.*game:aim@0.1.0/reached
 false = { run = ["{out}/seam{exe}", "BRIDGE_ON_ENTER-told-with-the-attach-that-made-it"] }
 
 [[case]]
+name = "BRIDGE_OPTIONAL-a-query-of-only-optional-terms-walks-each-table"
+run = ["{out}/seam{exe}", "BRIDGE_OPTIONAL-a-query-of-only-optional-terms-walks-each-table"]
+claims = { matches = ["game:duo@0\\.1\\.0/walk: walked 2 2\\b.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_AND-beside-an-optional-term-walks-only-its-tables"] }
+
+[[case]]
+name = "BRIDGE_AND-beside-an-optional-term-walks-only-its-tables"
+run = ["{out}/seam{exe}", "BRIDGE_AND-beside-an-optional-term-walks-only-its-tables"]
+claims = { matches = ["game:duo@0\\.1\\.0/walk: walked 1 1\\b.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_OPTIONAL-a-query-of-only-optional-terms-walks-each-table"] }
+
+[[case]]
 name = "BRIDGE_ON_ENTER-told-with-the-attach-that-made-it"
 run = ["{out}/seam{exe}", "BRIDGE_ON_ENTER-told-with-the-attach-that-made-it"]
 claims = { matches = ["event 3 1.*alive"] }
@@ -3437,3 +3481,297 @@ name = "bridge_reload-that-closes-a-cycle-refused"
 run = ["{out}/seam{exe}", "bridge_reload-that-closes-a-cycle-refused"]
 claims = { matches = ["module 'game:twostep@0\\.2\\.0' was not reloaded: 'game:twostep:twice' would run before itself in phase 'update': the \\[order\\] pairs and the orders that the modules state make a cycle.*alive"] }
 false = { run = ["{out}/seam{exe}", "bridge_reload-that-closes-no-cycle-taken"] }
+
+[[case]]
+name = "bridge_declaration_t-on_destroy-unset-refused"
+run = ["{out}/seam{exe}", "bridge_declaration_t-on_destroy-unset-refused"]
+claims = { matches = ["did not load: type 'game:Odd': on_destroy is unset.*alive"] }
+false = { run = ["{out}/seam{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "bridge_declaration_t-on_destroy-past-the-last-refused"
+run = ["{out}/seam{exe}", "bridge_declaration_t-on_destroy-past-the-last-refused"]
+claims = { matches = ["did not load: type 'game:Odd': on_destroy is unset.*alive"] }
+false = { run = ["{out}/seam{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "bridge_declaration_t-on_destroy-keep-of-a-singleton-refused"
+run = ["{out}/seam{exe}", "bridge_declaration_t-on_destroy-keep-of-a-singleton-refused"]
+claims = { matches = ["did not load: type 'game:Odd' is a singleton, and a singleton states BRIDGE_ON_DESTROY_REMOVE.*alive"] }
+false = { run = ["{out}/seam{exe}", "declare-of-the-same-type-again-taken"] }
+
+[[case]]
+name = "declare-on_destroy-other-than-its-first-declarer-refused"
+run = ["{out}/seam{exe}", "declare-on_destroy-other-than-its-first-declarer-refused"]
+claims = { matches = ["module 'game:kept@0\\.1\\.0' did not load: type 'game:Position' states on_destroy BRIDGE_ON_DESTROY_KEEP here, and it was declared with BRIDGE_ON_DESTROY_REMOVE.*alive"] }
+false = { run = ["{out}/seam{exe}", "declare-on_destroy-of-its-first-declarer-taken"] }
+
+[[case]]
+name = "declare-on_destroy-of-its-first-declarer-taken"
+run = ["{out}/seam{exe}", "declare-on_destroy-of-its-first-declarer-taken"]
+claims = { matches = ["game:kept@0\\.1\\.0: loaded.*alive"], matches_not = ["did not load"] }
+false = { run = ["{out}/seam{exe}", "declare-on_destroy-other-than-its-first-declarer-refused"] }
+
+[[case]]
+name = "bridge_reload-other-on_destroy-of-its-own-type-refused"
+run = ["{out}/seam{exe}", "bridge_reload-other-on_destroy-of-its-own-type-refused"]
+claims = { matches = ["was not reloaded: type 'game:Tick' states on_destroy BRIDGE_ON_DESTROY_KEEP here, and it was declared with BRIDGE_ON_DESTROY_REMOVE.*tick 103 1.*game:ticker@0\\.1\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-reloaded"] }
+
+[[case]]
+name = "destroy-keeps-a-component-of-BRIDGE_ON_DESTROY_KEEP-on-a-husk"
+run = ["{out}/seam{exe}", "destroy-keeps-a-component-of-BRIDGE_ON_DESTROY_KEEP-on-a-husk"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: e kept 2 7\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_ON_DESTROY_REMOVE-a-destroy-leaves-no-husk"] }
+
+[[case]]
+name = "destroy-removes-each-component-that-the-husk-does-not-keep"
+run = ["{out}/seam{exe}", "destroy-removes-each-component-that-the-husk-does-not-keep"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: e body 2 0\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "attach-to-an-entity-that-is-no-husk-applies"] }
+
+[[case]]
+name = "observe-a-husk-that-no-longer-matches-heard-leave"
+run = ["{out}/seam{exe}", "observe-a-husk-that-no-longer-matches-heard-leave"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: heard body 2 2\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "attach-to-an-entity-that-is-no-husk-applies"] }
+
+[[case]]
+name = "observe-a-husk-that-matches-only-now-heard-enter"
+run = ["{out}/seam{exe}", "observe-a-husk-that-matches-only-now-heard-enter"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: heard lone 2 2\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_ON_DESTROY_REMOVE-a-destroy-leaves-no-husk"] }
+
+[[case]]
+name = "observe-a-husk-that-still-matches-heard-nothing"
+run = ["{out}/seam{exe}", "observe-a-husk-that-still-matches-heard-nothing"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: heard handle 2 0\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_ON_DESTROY_REMOVE-a-destroy-leaves-no-husk"] }
+
+[[case]]
+name = "observe-an-entity-made-and-destroyed-in-one-phase-heard-as-a-husk"
+run = ["{out}/seam{exe}", "observe-an-entity-made-and-destroyed-in-one-phase-heard-as-a-husk"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: heard lone 1 1\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_ON_DESTROY_REMOVE-a-destroy-leaves-no-husk"] }
+
+[[case]]
+name = "observe-a-husk-that-goes-heard-leave"
+run = ["{out}/seam{exe}", "observe-a-husk-that-goes-heard-leave"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: heard handle 5 1\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_ON_DESTROY_REMOVE-a-destroy-leaves-no-husk"] }
+
+[[case]]
+name = "bridge_entity_t-a-husk-keeps-its-index-and-generation"
+run = ["{out}/seam{exe}", "bridge_entity_t-a-husk-keeps-its-index-and-generation"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: e alive 2 1\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_ON_DESTROY_REMOVE-a-destroy-leaves-no-husk"] }
+
+[[case]]
+name = "attach-to-a-husk-is-nothing"
+run = ["{out}/seam{exe}", "attach-to-a-husk-is-nothing"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: e body 3 0\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "attach-to-an-entity-that-is-no-husk-applies"] }
+
+[[case]]
+name = "attach-after-a-destroy-in-one-phase-is-nothing-on-the-husk"
+run = ["{out}/seam{exe}", "attach-after-a-destroy-in-one-phase-is-nothing-on-the-husk"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: g kept 2 4\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "attach-to-an-entity-that-is-no-husk-applies"] }
+
+[[case]]
+name = "destroy-of-a-husk-is-nothing"
+run = ["{out}/seam{exe}", "destroy-of-a-husk-is-nothing"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: e alive 4 1\\b.*alive"], lacks = ["asked to destroy entities"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_ON_DESTROY_REMOVE-a-destroy-leaves-no-husk"] }
+
+[[case]]
+name = "detach-of-the-last-component-of-a-husk-destroys-it"
+run = ["{out}/seam{exe}", "detach-of-the-last-component-of-a-husk-destroys-it"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: e alive 5 0\\b.*entities freed by the detach: 1\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_ON_DESTROY_REMOVE-a-destroy-leaves-no-husk"] }
+
+[[case]]
+name = "destroy-a-husk-found-by-a-query-of-what-it-carries"
+run = ["{out}/seam{exe}", "destroy-a-husk-found-by-a-query-of-what-it-carries"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: found 2 3\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_ON_DESTROY_REMOVE-a-destroy-leaves-no-husk"] }
+
+[[case]]
+name = "bridge_usage-a-husk-counts-among-the-entities"
+run = ["{out}/seam{exe}", "bridge_usage-a-husk-counts-among-the-entities"]
+claims = { matches = ["entities freed by the destroys: 0\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_ON_DESTROY_REMOVE-a-destroy-leaves-no-husk"] }
+
+[[case]]
+name = "bridge_destroy-shutdown-reads-what-each-husk-keeps"
+run = ["{out}/seam{exe}", "bridge_destroy-shutdown-reads-what-each-husk-keeps"]
+claims = { matches = ["husk:husk@0\\.1\\.0/-: release 2 9\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_ON_DESTROY_REMOVE-a-destroy-leaves-no-husk"] }
+
+[[case]]
+name = "BRIDGE_ON_DESTROY_REMOVE-a-destroy-leaves-no-husk"
+run = ["{out}/seam{exe}", "BRIDGE_ON_DESTROY_REMOVE-a-destroy-leaves-no-husk"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: found 2 0\\b.*husk:husk@0\\.1\\.0/look: e alive 2 0\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "destroy-keeps-a-component-of-BRIDGE_ON_DESTROY_KEEP-on-a-husk"] }
+
+[[case]]
+name = "attach-to-an-entity-that-is-no-husk-applies"
+run = ["{out}/seam{exe}", "attach-to-an-entity-that-is-no-husk-applies"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: e body 3 2\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "attach-to-a-husk-is-nothing"] }
+
+[[case]]
+name = "bridge_reload-a-husk-stays-and-the-new-instance-finds-it"
+run = ["{out}/seam{exe}", "bridge_reload-a-husk-stays-and-the-new-instance-finds-it"]
+claims = { matches = ["husk:husk@0\\.2\\.0: reloaded.*husk:husk@0\\.2\\.0/look: found again 1 2\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-finds-no-husk-of-BRIDGE_ON_DESTROY_REMOVE"] }
+
+[[case]]
+name = "bridge_reload-finds-no-husk-of-BRIDGE_ON_DESTROY_REMOVE"
+run = ["{out}/seam{exe}", "bridge_reload-finds-no-husk-of-BRIDGE_ON_DESTROY_REMOVE"]
+claims = { matches = ["husk:husk@0\\.2\\.0: reloaded.*husk:husk@0\\.2\\.0/look: found again 1 0\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-a-husk-stays-and-the-new-instance-finds-it"] }
+
+[[case]]
+name = "bridge_unload-shutdown-reads-what-each-husk-keeps"
+run = ["{out}/seam{exe}", "bridge_unload-shutdown-reads-what-each-husk-keeps"]
+claims = { matches = ["husk:husk@0\\.1\\.0/-: release 2 9\\b.*husk:husk@0\\.1\\.0: unloaded.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_unload-shutdown-of-BRIDGE_ON_DESTROY_REMOVE-reads-no-husk"] }
+
+[[case]]
+name = "bridge_unload-shutdown-of-BRIDGE_ON_DESTROY_REMOVE-reads-no-husk"
+run = ["{out}/seam{exe}", "bridge_unload-shutdown-of-BRIDGE_ON_DESTROY_REMOVE-reads-no-husk"]
+claims = { matches = ["husk:husk@0\\.1\\.0/-: release 0 0\\b.*husk:husk@0\\.1\\.0: unloaded.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_unload-shutdown-reads-what-each-husk-keeps"] }
+
+[[case]]
+name = "BRIDGE_STRIP-a-husk-left-with-nothing-goes-at-the-unload"
+run = ["{out}/seam{exe}", "BRIDGE_STRIP-a-husk-left-with-nothing-goes-at-the-unload"]
+claims = { matches = ["husk:husk@0\\.1\\.0: unloaded.*entities after the unload: 0\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_unload-a-husk-stays-while-another-module-declares-what-it-keeps"] }
+
+[[case]]
+name = "bridge_unload-a-husk-stays-while-another-module-declares-what-it-keeps"
+run = ["{out}/seam{exe}", "bridge_unload-a-husk-stays-while-another-module-declares-what-it-keeps"]
+claims = { matches = ["husk:husk@0\\.1\\.0: unloaded.*entities after the unload: 2\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_STRIP-a-husk-left-with-nothing-goes-at-the-unload"] }
+
+[[case]]
+name = "destroy-that-leaves-a-husk-with-no-table-not-applied"
+run = ["{out}/seam{exe}", "destroy-that-leaves-a-husk-with-no-table-not-applied"]
+claims = { matches = ["module 'husk:husk@0\\.1\\.0': \\[budget\\] tables of 1 is used up. Not applied, of the changes it asked: [0-9]+.*alive"] }
+false = { run = ["{out}/seam{exe}", "destroy-that-leaves-a-husk-with-a-table-applied"] }
+
+[[case]]
+name = "destroy-that-leaves-a-husk-with-a-table-applied"
+run = ["{out}/seam{exe}", "destroy-that-leaves-a-husk-with-a-table-applied"]
+claims = { matches = ["husk:husk@0\\.1\\.0/look: found 2 3\\b.*alive"], lacks = ["is used up"] }
+false = { run = ["{out}/seam{exe}", "destroy-that-leaves-a-husk-with-no-table-not-applied"] }
+
+[[case]]
+name = "BRIDGE_DELETE-leaves-a-husk-for-a-component-that-another-module-keeps"
+run = ["{out}/seam{exe}", "BRIDGE_DELETE-leaves-a-husk-for-a-component-that-another-module-keeps"]
+claims = { matches = ["left 10 5.*game:keeper@0\\.1\\.0: unloaded.*left 0 5.*game:retype@0\\.1\\.0: loaded.*alive"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_DELETE-unload-deletes"] }
+
+[[case]]
+name = "bridge_load-failed-after-init-gave-0-calls-shutdown"
+run = ["{out}/seam{exe}", "bridge_load-failed-after-init-gave-0-calls-shutdown"]
+claims = { matches = ["init wrote this 7 0.*did not load: it is handed 1 settings, and states that it has no config component.*why:settings@0\\.1\\.0/-: shutdown wrote this 3 0.*why:settings@0\\.1\\.0: not loaded.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_load-failed-in-init-calls-no-shutdown"] }
+
+[[case]]
+name = "bridge_load-failed-in-init-calls-no-shutdown"
+run = ["{out}/seam{exe}", "bridge_load-failed-in-init-calls-no-shutdown"]
+claims = { matches = ["init wrote this 7 0.*did not load: its init answered 1.*why:settings@0\\.1\\.0: not loaded.*alive"], matches_not = ["shutdown wrote this"] }
+false = { run = ["{out}/seam{exe}", "bridge_load-failed-after-init-gave-0-calls-shutdown"] }
+
+[[case]]
+name = "bridge_load-shutdown-found-before-the-systems"
+run = ["{out}/seam{exe}", "bridge_load-shutdown-found-before-the-systems"]
+claims = { matches = ["module 'test:noshutdown-ghost@0\\.1\\.0' did not load: no exported function 'module_shutdown'.*alive"] }
+false = { run = ["{out}/seam{exe}", "add_system-of-no-export-refused"] }
+
+[[case]]
+name = "bridge_reload-failed-after-reload-gave-0-calls-the-new-shutdown"
+run = ["{out}/seam{exe}", "bridge_reload-failed-after-reload-gave-0-calls-the-new-shutdown"]
+claims = { matches = ["was not reloaded: it accepts the loss of 'game:Tick\\.n', and loses nothing of that name.*game:ticker@0\\.2\\.0/-: shutdown 10 0.*tick 103 1.*game:ticker@0\\.1\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-reload-answered-nonzero"] }
+
+[[case]]
+name = "bridge_reload-alone-failed-after-reload-gave-0-calls-the-new-shutdown"
+run = ["{out}/seam{exe}", "bridge_reload-alone-failed-after-reload-gave-0-calls-the-new-shutdown"]
+claims = { matches = ["game:ticker@0\\.1\\.0/-: shutdown 1 0.*was not reloaded: it accepts the loss of 'game:Tick\\.n', and loses nothing of that name.*game:ticker@0\\.2\\.0/-: shutdown 10 0.*module 'game:ticker@0\\.1\\.0' is stopped: its reload failed after its old instance had been shut down.*game:ticker@0\\.1\\.0=STOPPED.*alive"] }
+false = { run = ["{out}/seam{exe}", "BACKEND_SIDE_BY_SIDE-lacking-failed-reload-stops-the-module"] }
+
+[[case]]
+name = "bridge_reload-group-failed-calls-the-new-shutdown-of-each-member-that-started"
+run = ["{out}/seam{exe}", "bridge_reload-group-failed-calls-the-new-shutdown-of-each-member-that-started"]
+claims = { matches = ["it accepts the loss of 'game:Shared\\.x', and loses nothing of that name", "game:two@0\\.2\\.0/-: shutdown 0 0.*game:one@0\\.2\\.0/-: shutdown 0 0.*group: not reloaded.*game:one@0\\.1\\.0=RUNNING game:two@0\\.1\\.0=RUNNING.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-group-member-failed-start-changes-nothing"] }
+
+[[case]]
+name = "bridge_load-failed-shutdown-under-shutdown_timeout-teardown-continues"
+run = ["{out}/seam{exe}", "bridge_load-failed-shutdown-under-shutdown_timeout-teardown-continues"]
+claims = { matches = ["module 'test:hang@0\\.1\\.0' did not load: it is handed 1 settings, and states that it has no config component.*module 'test:hang@0\\.1\\.0': its shutdown trapped: the timeout passed. its teardown continues.*test:hang@0\\.1\\.0: not loaded.*alive"] }
+false = { run = ["{out}/seam{exe}", "module_config.shutdown_timeout-shutdown-interrupted"] }
+
+[[case]]
+name = "bridge_load-failed-applies-nothing-that-its-shutdown-queued"
+run = ["{out}/seam{exe}", "bridge_load-failed-applies-nothing-that-its-shutdown-queued"]
+claims = { matches = ["six:seeded@0\\.1\\.0/-: late 77 0.*six:seeded@0\\.1\\.0: not loaded.*six:holder@0\\.1\\.0/show: x 1 0.*alive"], matches_not = ["show: x 77"] }
+false = { run = ["{out}/seam{exe}", "bridge_load-failed-init-log-given"] }
+
+[[case]]
+name = "module_config.setting-enum-of-no-constant-refused"
+run = ["{out}/seam{exe}", "module_config.setting-enum-of-no-constant-refused"]
+claims = { matches = ["did not load: its setting 'mode' is 3, which is no constant of the enum of the field it names.*alive"] }
+false = { run = ["{out}/seam{exe}", "module_config.setting-enum-as-an-integer-taken"] }
+
+[[case]]
+name = "module_config.setting-bitmask-bit-of-no-constant-refused"
+run = ["{out}/seam{exe}", "module_config.setting-bitmask-bit-of-no-constant-refused"]
+claims = { matches = ["did not load: its setting 'flags' is 4, which has a bit that no constant of the bitmask of the field it names has.*alive"] }
+false = { run = ["{out}/seam{exe}", "module_config.setting-bitmask-zero-taken"] }
+
+[[case]]
+name = "module_config.settings-refused-leave-a-kept-text-as-it-was"
+run = ["{out}/seam{exe}", "module_config.settings-refused-leave-a-kept-text-as-it-was"]
+claims = { matches = ["did not load: its setting 'small' is 300, which the field it names cannot hold.*game:other@0\\.1\\.0/show: some/long/path\\.cfg 0 0.*alive"] }
+false = { run = ["{out}/seam{exe}", "module_config.settings-taken-write-a-kept-text-anew"] }
+
+[[case]]
+name = "module_config.settings-taken-write-a-kept-text-anew"
+run = ["{out}/seam{exe}", "module_config.settings-taken-write-a-kept-text-anew"]
+claims = { matches = ["game:settings@0\\.1\\.0: unloaded.*game:settings@0\\.1\\.0: loaded.*game:other@0\\.1\\.0/show: fresh/path\\.cfg 0 0.*alive"], matches_not = ["did not load"] }
+false = { run = ["{out}/seam{exe}", "module_config.settings-refused-leave-a-kept-text-as-it-was"] }
+
+[[case]]
+name = "bridge_header_t-changes_left-the-whole-room-when-the-instance-starts"
+run = ["{out}/seam{exe}", "bridge_header_t-changes_left-the-whole-room-when-the-instance-starts"]
+claims = { matches = ["game:stamp@0\\.1\\.0/-: init left 256 [0-9]+.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_header_t-changes_left-of-a-smaller-room"] }
+
+[[case]]
+name = "bridge_header_t-changes_left-less-each-change-that-it-queues"
+run = ["{out}/seam{exe}", "bridge_header_t-changes_left-less-each-change-that-it-queues"]
+claims = { matches = ["game:stamp@0\\.1\\.0/-: init left [0-9]+ 224\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_header_t-changes_left-of-a-smaller-room"] }
+
+[[case]]
+name = "bridge_header_t-changes_left-the-whole-room-at-each-barrier"
+run = ["{out}/seam{exe}", "bridge_header_t-changes_left-the-whole-room-at-each-barrier"]
+claims = { matches = ["game:stamp@0\\.1\\.0/stamp: stamp left 256 [0-9]+.*game:stamp@0\\.1\\.0/stamp: stamp left 256 [0-9]+.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_header_t-changes_left-of-a-smaller-room"] }
+
+[[case]]
+name = "bridge_header_t-changes_left-lets-a-module-keep-a-change-for-the-next-barrier"
+run = ["{out}/seam{exe}", "bridge_header_t-changes_left-lets-a-module-keep-a-change-for-the-next-barrier"]
+claims = { matches = ["stamp left 256 8\\b.*stamp left 256 8\\b.*alive"], lacks = ["failed", "used up"] }
+false = { run = ["{out}/seam{exe}", "module_config.changes-used-up"] }
+
+[[case]]
+name = "bridge_header_t-changes_left-of-a-smaller-room"
+run = ["{out}/seam{exe}", "bridge_header_t-changes_left-of-a-smaller-room"]
+claims = { matches = ["init left 128 96\\b.*stamp left 128 4\\b.*stamp left 128 4\\b.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_header_t-changes_left-the-whole-room-when-the-instance-starts"] }

@@ -74,17 +74,3 @@ int module_call(module_t *m, const module_call_t *call, backend_err_t *err)
         return (module_fail(err, "its %s answered %d", call->name, status));
     return (0);
 }
-
-void module_shut_down(bridge_world_t *w, module_t *m)
-{
-    module_call_t call = { m->shutdown, "shutdown", m->shutdown_timeout };
-    say_t about = { m, nullptr, BRIDGE_ERR };
-    backend_err_t err = {};
-
-    if (m->instance && module_call(m, &call, &err))
-        say_about(w, &about, "module '%s': %s; its teardown continues",
-            m->identity, err.text);
-    block_hand_out(w);
-    storage_apply(w->storage);
-    block_drain(w, m);
-}

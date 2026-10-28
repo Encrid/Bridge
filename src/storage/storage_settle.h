@@ -62,6 +62,8 @@ static inline void empty_queues(bridge_world_t *w)
         m->changed_now = m->queue_len != 0;
         m->queue_len = 0;
         m->mark_count = 0;
+        if (m->changed_now)
+            block_write_room(m);
         m = m->next;
     }
 }

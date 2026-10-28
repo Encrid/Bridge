@@ -50,6 +50,7 @@ static inline int queue_change(module_t *m, const change_t *ch,
     if (value)
         memcpy(at + sizeof(*ch), value, ch->size);
     m->queue_len += need;
+    block_write_room(m);
     return (0);
 }
 

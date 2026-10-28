@@ -48,7 +48,7 @@ The entity index is the one thing in the shared memory that a module reads and c
 `block_get_offset` gives its offset: `docs/intern/block/block.h.md`, *The regions of the memories*.
 `barriers`, `place`, `system` and `observer` are written before each dispatch: `src/schedule/schedule_dispatch.c`.
 `log_level` is written when the private memory is made: `src/module/module_call.c`.
-`changes_left` is written again after each change and at each barrier: `docs/intern/block/block.h.md`, *The regions of the memories*.
+`changes_left` is written again after each change, and at the next barrier: `docs/intern/block/block.h.md`, *The regions of the memories*.
 
 The span region holds the queries, the lists of the observers, `column_base`, `kept`, the capability table and the spans.
 Its length is the `spans` of the module, and how it is divided is the library's.
@@ -57,7 +57,7 @@ The library divides it again at a barrier, where nothing holds an offset into it
 Both come from the deployment, and not from the module.
 So `spans` is a key whose value an author can only estimate, and a deployment corrects it.
 
-`write_caps` lays the capability table after `kept`: the row counts, the blocks, and the stride, write and kind of each type.
+`write_caps` lays `kept` after `column_base`, and the capability table after `kept`: the row counts, the blocks, and the stride, write and kind of each type.
 It also sets `arena_lo` and `arena_hi` to the bounds of the shared arena that a module may read.
 It writes `entities` too, the value of `[budget] entities`.
 `write_owned` writes the module's owned ranges after the table, up to `BRIDGE_OWNED_CAP` of them.
@@ -70,6 +70,6 @@ It writes nothing if the ranges do not fit in the span region.
 | --- | --- |
 | `block_refill` | Tops up the ids of a module. 1 if the entity ceiling cut them short. |
 | `block_write_header` | Writes the header at offset 0 of the private memory of a module: where its regions begin, and how many of each thing there are. Gives 1 when the entity index is outside the block. |
-| `write_caps` | Lays the capability table and the arena bounds into the header. |
+| `write_caps` | Lays `kept`, the capability table and the arena bounds into the header. |
 | `write_owned` | Writes the owned ranges of the shared arena after the capability table. |
 | `block_hand_out` | Ends the hold on the ids that each loaded module handed out since the last barrier, and on those that it took from its `lender`. |

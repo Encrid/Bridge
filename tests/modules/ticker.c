@@ -5,6 +5,7 @@
 */
 #include "test_offsets.h"
 #include "ticker.h"
+#include "on_destroy.h"
 
 static uint32_t tick;
 static uint32_t ticking;
@@ -29,7 +30,8 @@ static void register_tick(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
 
-    tick = BRIDGE_COMPONENT("game:Tick", tick_t, BRIDGE_DELETE, BRIDGE_TABLE);
+    tick = BRIDGE_DECLARE_AS(BRIDGE_STRUCT, "game:Tick", tick_t,
+        BRIDGE_DELETE, BRIDGE_TABLE, ON_DESTROY);
 #ifdef TAG
     BRIDGE_DECLARE_TAG("game:Flag", BRIDGE_DELETE, BRIDGE_TABLE);
 #endif

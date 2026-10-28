@@ -19,8 +19,10 @@ A module that compiles with `include/bridge_abi.h` is a work based on Bridge: `r
 ## BRIDGE_ABI
 
 `BRIDGE_ABI` is the number of the module seam: the version of the layouts and the entries of this header.
+The number is 2.
 A module states the number that it was built against.
 The host gives it in `abi` of `bridge_module_config_t`: `docs/extern/bridge.h.md`, *bridge_module_config_t*.
+
 A load refuses a module of another number. `abi` of `bridge_header_t` holds the number of Bridge.
 The number changes as `BRIDGE_HOST_ABI` does: `docs/extern/bridge.h.md`, *BRIDGE_HOST_ABI*.
 
@@ -34,7 +36,7 @@ Each other value is a failure, except `BRIDGE_END` from a system or an observer:
 | --- | --- |
 | `init` | One time, in `bridge_load`. It declares the types, registers the systems and the observers, and can make entities. |
 | `reload` | In `bridge_reload`, in the new instance. It declares and registers as `init` did, and the storage stays. |
-| `shutdown` | In `bridge_unload` and in `bridge_destroy`, and in `bridge_reload` for the old instance. |
+| `shutdown` | In `bridge_unload` and in `bridge_destroy`, and in `bridge_reload` for the old instance. Also in `bridge_load` and `bridge_reload` for a new instance whose `init` or `reload` gave 0, when the load or the reload fails. |
 | A system | One time in each run of its phase. |
 | An observer | At a barrier, if an entity triggered it. |
 
@@ -113,9 +115,9 @@ Bridge writes it. The module writes only `scratch_used` and `ring_head`.
 Bridge writes `barriers`, `place`, `system` and `observer` before each dispatch.
 `system` is `0xFFFFFFFF` and `observer` is 0 while no system runs, for example in `init`.
 
-Bridge writes `changes_left` when the instance starts, after each change that the module queues, and at each barrier.
+Bridge writes `changes_left` when the instance starts, after each change that the module queues, and at the barrier that applies the changes.
 A module can read it before an `attach`, a `detach` or a `destroy`.
-Thus the module can do a change that does not fit after the next barrier, and its invocation does not fail.
+Thus the module can wait for the next barrier to make a change that does not fit, and its invocation does not fail.
 
 The arrays from `column_base` to `kind` make the capability table.
 A module names a cell by a coordinate: a slot, a place, and an offset in the cell.
@@ -267,7 +269,8 @@ A strip takes no memory and does not fail. A strip that has no room to join two 
 An id of an entity that a sweep or a delete destroyed is stale: *bridge_entity_t*.
 An entity that must outlive the unload of another module carries a component of the module that holds it.
 
-A husk whose last kept component goes is destroyed, whatever the policy: *destroy*, *A husk*.
+A husk whose last component goes is destroyed, whatever the policy: *destroy*, *A husk*.
+The id of a husk stays good, also after a delete.
 A delete leaves a husk where another loaded module keeps a component of `BRIDGE_ON_DESTROY_KEEP` on the entity.
 Without room for the husk, the entity loses only the component, as with `BRIDGE_STRIP`: `docs/extern/bridge.h.md`, *An unload*.
 
@@ -282,7 +285,7 @@ Without room for the husk, the entity loses only the component, as with `BRIDGE_
 
 A singleton is never destroyed, thus it states `BRIDGE_ON_DESTROY_REMOVE`.
 A module keeps in a component of `BRIDGE_ON_DESTROY_KEEP` what it must release when the entity goes, for example an object of a GPU.
-Its `shutdown` releases what each of these components holds, because an unload and `bridge_destroy` remove them.
+Its `shutdown` releases what each of these components holds, because the unload of the last declarer of a component and `bridge_destroy` remove the component.
 
 ## Storage layouts
 
@@ -388,7 +391,7 @@ If `before_count` is 0, Bridge does not read `before`.
 | --- | --- |
 | `BRIDGE_ON_ENTER` | Did not match the terms, and now matches them. |
 | `BRIDGE_ON_ATTACH` | Matches the terms, and the barrier applied an attach of one of them. |
-| `BRIDGE_ON_LEAVE` | Matched the terms, and no longer matches them, or was destroyed. |
+| `BRIDGE_ON_LEAVE` | Matched the terms, and no longer matches them, or was destroyed and is no husk that matches them. |
 
 An observer of A and not B hears an entity with A enter when a module detaches B, and leave when a module attaches B.
 A write in place raises no event. To have a new value heard, attach it.
@@ -447,6 +450,7 @@ A system walks the rows of tables, or the entries of one sparse set alone. Thus:
 
 Bridge refuses another term at `add_system`, by its number. An observer walks nothing, thus these rules do not apply to it.
 In a walk of tables, a component of a sparse set has a base of 0. The module reaches it by the id of the row, through its kept cell.
+A query whose terms are all of `BRIDGE_OPTIONAL` matches each table, and its walk reads each one.
 
 ## Conflicts
 
@@ -587,13 +591,13 @@ Only a module that can write a component that it keeps can change it.
 Thus a module can release what it holds for an entity, after the app destroyed the entity.
 
 - The barrier of the destroy removes each other component. An observer hears `BRIDGE_ON_LEAVE` when the husk no longer matches its terms, and `BRIDGE_ON_ENTER` when the husk matches them and the entity did not.
-- The id names the husk, but only for its kept components. The id stays good, since the husk keeps its generation.
+- The id names the husk, but only for its components of `BRIDGE_ON_DESTROY_KEEP`. The id stays good, since the husk keeps its generation.
 - An attach to a husk, and a destroy of a husk, is nothing, as for a dead id.
-- A module that can write a kept component can detach it.
-- The barrier that applies the detach of the last kept component destroys the husk. Then a new entity can take its index.
-- A query that names a kept component finds the husk. A query of the other components does not, since the husk carries nothing else.
+- A module that can write a component that the husk carries can detach it.
+- The barrier that applies the detach of the last component of the husk destroys the husk. Then a new entity can take its index.
+- A query that names a component that the husk carries finds the husk. A query of the other components does not, since the husk carries nothing else.
 - A husk counts among the entities of the world until it goes.
-- The barrier moves the kept components of a husk to another table. Thus a destroy needs room in `tables` and `columns`: `docs/extern/bridge.h.md`, *Running out*.
+- The barrier moves what the husk keeps to another table. Thus a destroy needs room in `tables` and `columns`: `docs/extern/bridge.h.md`, *Running out*.
 
 ## attach and detach
 
@@ -724,6 +728,7 @@ Only a system names a phase, so a reason about a phase has no form for an observ
 - `out of memory: there was none for the descriptor of '<type>'`
 
 `declare is called outside init` also tells a call outside `reload`.
+`<item>` is the name of an item of `enum bridge_on_destroy`, for example `BRIDGE_ON_DESTROY_KEEP`.
 When other modules declare the type, the reason of a layout ends with `. It is also declared by '<module>'`, and the other modules.
 `docs/extern/bridge_schema.h.md`, *Messages* gives the reasons of a descriptor.
 

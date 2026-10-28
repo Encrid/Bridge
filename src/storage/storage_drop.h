@@ -19,4 +19,6 @@ void storage_drop_single(storage_t *r, storage_type_t *type);
 uint32_t storage_drop_table(storage_t *r, uint32_t t,
     const storage_type_t *type, enum bridge_on_unload policy);
 
+uint32_t storage_delete_carriers(storage_t *r, storage_type_t *type);
+
 #endif

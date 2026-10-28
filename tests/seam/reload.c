@@ -17,6 +17,8 @@ static const test_reload_t TEST_RELOADS[] = {
     { "reloadfail", "ticker-fail", BRIDGE_TRUE, 32, nullptr },
     { "reloadmove", nullptr, BRIDGE_TRUE, 32, nullptr },
     { "reloaddrop", "ticker-noextra", BRIDGE_TRUE, 32, "retype-extra" },
+    { "reloadkeep", "ticker-keep", BRIDGE_TRUE, 32, nullptr },
+    { "reloadloss", "ticker-ten", BRIDGE_TRUE, 32, nullptr },
     { "maynot", "ticker-ten", BRIDGE_FALSE, 32, nullptr }
 };
 
@@ -54,6 +56,10 @@ void test_reload_ticker(host_t *h)
     host_load(h, &a);
     host_run_frames(h, 2);
     state_next(&a, r);
+    if (!strcmp(h->arg, "reloadloss")) {
+        a.cfg.losses = TEST_TICK_LOSS;
+        a.cfg.loss_count = 1;
+    }
     host_reload(h, &a);
     host_run_frames(h, 2);
     if (r->then)

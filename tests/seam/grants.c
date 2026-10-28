@@ -44,6 +44,15 @@ void test_declare_other_storage(host_t *h)
     host_close(h);
 }
 
+void test_declare_other_on_destroy(host_t *h)
+{
+    if (host_open(h))
+        return;
+    test_load_mover(h);
+    test_load_module(h, "game:kept@0.1.0", h->arg);
+    host_close(h);
+}
+
 void test_declare_ungranted(host_t *h)
 {
     if (host_open(h))

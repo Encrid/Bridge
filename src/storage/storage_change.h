@@ -12,7 +12,8 @@
 enum fold : uint32_t {
     FOLD_SKIP,
     FOLD_APPLY,
-    FOLD_UNHANDED
+    FOLD_UNHANDED,
+    FOLD_HUSK
 };
 
 [[gnu::always_inline]] static inline enum fold foldable(const storage_t *r,
@@ -24,6 +25,8 @@ enum fold : uint32_t {
         return (FOLD_APPLY);
     if (!is_alive(r, ch->id) || r->folded[index] & DESTROYED)
         return (FOLD_SKIP);
+    if (ch->op != CHANGE_DETACH && is_husk(r, index))
+        return (FOLD_HUSK);
     if (ch->op == CHANGE_DESTROY || !is_held(r, index))
         return (FOLD_APPLY);
     return (FOLD_UNHANDED);
@@ -42,7 +45,7 @@ enum fold : uint32_t {
         set_clear(r, get_attached(r, index));
 }
 
-[[gnu::always_inline]] static inline void fold_change(storage_t *r,
+[[gnu::always_inline]] static inline enum fold fold_change(storage_t *r,
     module_t *m, const change_t *ch)
 {
     uint32_t index = (uint32_t)ch->id;
@@ -53,15 +56,25 @@ enum fold : uint32_t {
     if (verdict == FOLD_UNHANDED)
         m->unhanded++;
     if (verdict != FOLD_APPLY)
-        return;
+        return (verdict);
     begin_entity(r, index);
     if (ch->op == CHANGE_DESTROY) {
         fold_destroy(r, m, index);
-        return;
+        return (verdict);
     }
     set_write(get_work(r, index), type, attach);
     if (r->observer_count)
         set_write(get_attached(r, index), type, attach);
+    if (!attach)
+        end_husk(r, index);
+    return (verdict);
+}
+
+static inline void skip_change(module_t *m, uint32_t at)
+{
+    enum change_op op = CHANGE_SKIPPED;
+
+    memcpy(m->queue + at + offsetof(change_t, op), &op, sizeof(op));
 }
 
 [[gnu::always_inline]] static inline void fold_run(storage_t *r, module_t *m,
@@ -71,8 +84,9 @@ enum fold : uint32_t {
 
     while (at < end) {
         memcpy(&ch, m->queue + at, sizeof(ch));
+        if (fold_change(r, m, &ch) == FOLD_HUSK)
+            skip_change(m, at);
         at += (uint32_t)sizeof(ch) + ((ch.size + 7u) & ~7u);
-        fold_change(r, m, &ch);
     }
 }
 

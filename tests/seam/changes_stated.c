@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <string.h>
+
 #include "cases.h"
 
 static void load_stamp(host_t *h, int64_t changes)
@@ -26,6 +28,20 @@ void test_queue_too_few(host_t *h)
 void test_queue_none(host_t *h)
 {
     load_stamp(h, BRIDGE_NONE);
+}
+
+void test_read_room(host_t *h)
+{
+    bridge_artifact_t a;
+
+    if (host_open(h))
+        return;
+    host_state_built(&a, "game:stamp@0.1.0", STAMPLEFT_PATH);
+    a.cfg.spawns = 8;
+    a.cfg.changes = strcmp(h->arg, "less") ? 256 : 128;
+    host_load(h, &a);
+    host_run_frames(h, 2);
+    host_close(h);
 }
 
 void test_change_unstated(host_t *h)

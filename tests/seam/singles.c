@@ -37,17 +37,30 @@ void test_name_many_declarers(host_t *h)
     host_close(h);
 }
 
-void test_two_turns_of_one_module(host_t *h)
+static void run_duo(host_t *h, const char *file)
 {
     bridge_artifact_t a;
 
-    if (host_open(h))
-        return;
-    test_state_guarded(&a, "game:duo@0.1.0", "duo");
+    test_state_guarded(&a, "game:duo@0.1.0", file);
     a.cfg.spawns = 8;
     host_load(h, &a);
     host_run_frames(h, 1);
+}
+
+void test_two_turns_of_one_module(host_t *h)
+{
+    if (host_open(h))
+        return;
+    run_duo(h, "duo");
     test_say_modules(h);
+    host_close(h);
+}
+
+void test_walk_optional(host_t *h)
+{
+    if (host_open(h))
+        return;
+    run_duo(h, h->arg);
     host_close(h);
 }
 

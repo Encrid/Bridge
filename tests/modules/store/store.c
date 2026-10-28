@@ -6,6 +6,7 @@
 #include "store.h"
 #include "measured.h"
 #include "idle.h"
+#include "on_destroy.h"
 
 TEST_MEASURED TEST(spawn)
 {
@@ -40,8 +41,8 @@ TEST(init)
 {
     nstore_a = TEST_COMPONENT(api, "st:A", a_t, BRIDGE_DELETE,
         BRIDGE_TABLE);
-    nstore_b = TEST_COMPONENT(api, "st:B", b_t, BRIDGE_DELETE,
-        BRIDGE_TABLE);
+    nstore_b = TEST_DECLARE_AS(api, BRIDGE_STRUCT, "st:B", b_t,
+        BRIDGE_DELETE, BRIDGE_TABLE, ON_DESTROY);
     add_changes(api);
 #ifdef TABLES
     nstore_add_tables(api);

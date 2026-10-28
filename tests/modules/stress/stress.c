@@ -26,7 +26,8 @@ static void declare_kind(const test_api_t *api, uint32_t k)
         bridge_declaration_t, test_put(api, NAMES[k], len), len,
         BRIDGE_STRUCT, sizeof(v_t), alignof(v_t),
         test_put(api, v_t_desc, sizeof(v_t_desc) - 1),
-        sizeof(v_t_desc) - 1, BRIDGE_DELETE, BRIDGE_TABLE));
+        sizeof(v_t_desc) - 1, BRIDGE_DELETE, BRIDGE_TABLE,
+        BRIDGE_ON_DESTROY_REMOVE));
     term[0].slot = nstress_kinds[k];
     nstress_seeing[k] = api->add_system(api, TEST_STATE(api,
         bridge_system_statement_t, test_put(api, SYSTEMS[k], 4), 4,
