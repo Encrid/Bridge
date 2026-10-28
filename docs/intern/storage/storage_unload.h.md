@@ -20,4 +20,4 @@ A delete works through a fold, as a barrier does, and not here: `docs/intern/sto
 | `destroy_entity` | Destroys the entity at `index`, and tells its observers what it carried. Gives back its table if it was the last row. The place of a live entity names 0 or a live table. |
 | `sweep_sets` | Gives back the table of each empty sparse set, as the end of a barrier does. |
 | `see_less` | Writes into `before` what the entity at `index` carries, and into `left` the same set without a type. |
-| `is_swept` | Gives whether the entity at `index` goes once it is left with `left`: with nothing left, under `sweep`, or if it is a husk. |
+| `is_swept` | Gives whether the entity at `index` goes with the set `left`. It goes if `left` is empty, and the policy is `sweep` or the entity is a husk. |

@@ -60,6 +60,6 @@ When its last declarer unloads, a singleton has no value, whatever the policy, a
 | --- | --- |
 | `foldable` | Gives the verdict of a change, by the table of *The fold*. |
 | `begin_entity` | At the first change of the entity at `index`, counts it among the entities that this barrier changes, and starts its fold. A delete at an unload calls it too. |
-| `fold_change` | Folds one change into what its entity will carry, and gives the verdict of `foldable`. After an attach or a detach, `end_husk` ends a husk that has nothing left. |
+| `fold_change` | Folds one change into what its entity will carry, and gives the verdict of `foldable`. After a detach, `end_husk` ends a husk that has nothing left. |
 | `fold_run` | Folds one run of the queue of a module, from `at` to `end`. Each change has its value after it, padded to 8 bytes. It marks each change of `FOLD_HUSK` with `skip_change`. |
 | `skip_change` | Writes `CHANGE_SKIPPED` into the `op` of the queued change at `at`. |
