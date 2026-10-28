@@ -13,14 +13,10 @@
     uint32_t index)
 {
     const uint64_t *want = get_work(r, index);
-    uint32_t w = 0;
 
     if (!r->apart)
         return (want);
-    while (w < r->words) {
-        r->masked[w] = want[w] & r->in_table[w];
-        w++;
-    }
+    set_mask(r, r->masked, want, r->in_table);
     return (r->masked);
 }
 

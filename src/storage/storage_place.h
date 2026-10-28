@@ -59,6 +59,8 @@ static inline void place_singles(storage_t *r)
         kill_entity(r, index);
         return;
     }
+    if (r->folded[index] & HUSKED)
+        set_put(r->husks, index);
     move_row(r, index, r->dest[index]);
     if (!r->apart)
         return;

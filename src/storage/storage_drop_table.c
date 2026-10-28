@@ -16,10 +16,10 @@ static void sweep_table(storage_t *r, uint32_t t, const storage_type_t *type,
 
     while (tab->live) {
         id = get_who(r, tab)[tab->rows - 1];
-        if (policy == BRIDGE_DELETE || !is_apart(r, (uint32_t)id)) {
+        see_less(r, (uint32_t)id, type, r->masked);
+        if (is_swept(r, (uint32_t)id, policy, r->masked)) {
             destroy_entity(r, (uint32_t)id);
         } else {
-            see_less(r, (uint32_t)id, type, r->masked);
             tell_observers(r, &(seen_t){ id, r->before, r->masked, nullptr });
             move_row(r, (uint32_t)id, 0);
         }
@@ -53,12 +53,10 @@ static void move_rows(storage_t *r, uint32_t t, uint32_t to)
 static uint32_t keep_rows(storage_t *r, uint32_t t, const storage_type_t *type,
     const uint64_t *left)
 {
-    const table_t *tab = &r->tables[t];
-    bool none = set_is_empty(r, left);
-    uint32_t to = none ? 0 : find_table(r, left);
-    uint32_t rows = tab->rows;
+    uint32_t to = find_table(r, left);
+    uint32_t rows = r->tables[t].rows;
 
-    if (none || (to && grow_table(r, to, r->tables[to].rows + rows))) {
+    if (to && grow_table(r, to, r->tables[to].rows + rows)) {
         move_rows(r, t, to);
         return (0);
     }
@@ -73,7 +71,7 @@ uint32_t storage_drop_table(storage_t *r, uint32_t t,
 
     set_copy(r, left, get_set(r, t));
     set_take(left, type->id);
-    if (is_swept(r, policy, left)) {
+    if (set_is_empty(r, left)) {
         sweep_table(r, t, type, policy);
         return (0);
     }

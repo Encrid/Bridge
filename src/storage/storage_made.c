@@ -42,7 +42,11 @@ bool storage_make_fold(storage_t *r)
     r->before = calloc(r->words, 8);
     r->masked = calloc(r->words, 8);
     r->in_table = calloc(r->words, 8);
+    r->husk_types = calloc(r->words, 8);
+    r->husks = calloc(r->bit_words, 8);
     if (!r->work || !r->changed || !r->folded || !r->dest || !r->attached)
+        return (false);
+    if (!r->husk_types || !r->husks)
         return (false);
     return (r->at && r->scratch && r->before && r->masked && r->in_table);
 }

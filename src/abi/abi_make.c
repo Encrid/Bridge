@@ -70,6 +70,7 @@ static void keep_type(declaring_t *g, declared_type_t *c)
     c->s = g->s;
     c->kind = g->d.kind;
     c->storage = g->d.storage;
+    c->on_destroy = g->d.on_destroy;
     c->size = g->d.size;
     c->align = g->d.align;
     c->fingerprint = g->print;

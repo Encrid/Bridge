@@ -68,6 +68,8 @@ static inline module_t *take_next_run(bridge_world_t *w, uint32_t *from,
     uint8_t folded = index < r->high ? r->folded[index] : 0;
     uint32_t to = 0;
 
+    if (ch->op == CHANGE_SKIPPED)
+        return;
     if (folded & DROPPED
         && r->places[index].generation == (uint32_t)(ch->id >> 32))
         m->left[(folded & SHORT) != 0]++;
