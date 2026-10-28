@@ -6,7 +6,7 @@
 #ifndef BRIDGE_SRC_STORAGE_STAKE_H
     #define BRIDGE_SRC_STORAGE_STAKE_H
 
-    #include "storage_fold.h"
+    #include "storage_husk.h"
 
 static inline void set_write(uint64_t *set, uint32_t type, bool put)
 {
@@ -62,7 +62,7 @@ static inline bool is_held(const storage_t *r, uint32_t index)
     module_t *m, uint32_t index)
 {
     if (has_stake(r, m, index))
-        r->folded[index] |= DESTROYED;
+        fold_husk(r, index);
     else
         m->barred++;
 }

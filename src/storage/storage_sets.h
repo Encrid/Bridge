@@ -27,6 +27,17 @@ static inline bool set_is_empty(const storage_t *r, const uint64_t *set)
     return (w == r->words);
 }
 
+static inline void set_mask(const storage_t *r, uint64_t *to,
+    const uint64_t *a, const uint64_t *b)
+{
+    uint32_t w = 0;
+
+    while (w < r->words) {
+        to[w] = a[w] & b[w];
+        w++;
+    }
+}
+
 static inline uint32_t hash_set(const storage_t *r, const uint64_t *set)
 {
     uint64_t h = 1'469'598'103'934'665'603ull;

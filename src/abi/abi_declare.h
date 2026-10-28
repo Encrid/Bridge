@@ -90,6 +90,10 @@ int abi_relay(module_t *m, declared_type_t *was, enum bridge_kind kind,
 
 int abi_check_stated(declaring_t *g);
 
+int abi_check_on_destroy(const declaring_t *g);
+
+int abi_check_same_on_destroy(const declaring_t *g);
+
 int abi_read_layout(declaring_t *g);
 
 int abi_check_size(declaring_t *g, uint32_t size, uint32_t align);

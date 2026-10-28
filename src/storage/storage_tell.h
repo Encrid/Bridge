@@ -50,6 +50,7 @@ static inline void leave_apart(storage_t *r, uint32_t index)
     p->generation = next >= DEAD ? 1 : next;
     p->row = r->free_head;
     r->free_head = index;
+    set_take(r->husks, index);
 }
 
 static inline uint32_t get_owed(const storage_t *r, const storage_terms_t *o,

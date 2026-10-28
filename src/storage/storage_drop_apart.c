@@ -12,7 +12,7 @@ static void drop_cell(storage_t *r, const storage_type_t *type,
     uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
 
     see_less(r, index, type, r->scratch);
-    if (is_swept(r, policy, r->scratch)) {
+    if (is_swept(r, index, policy, r->scratch)) {
         destroy_entity(r, index);
         return;
     }
@@ -39,7 +39,7 @@ static void drop_member(storage_t *r, const storage_type_t *type,
     uint32_t index = (uint32_t)id;
 
     see_less(r, index, type, r->scratch);
-    if (is_swept(r, policy, r->scratch)) {
+    if (is_swept(r, index, policy, r->scratch)) {
         destroy_entity(r, index);
         return;
     }

@@ -63,8 +63,13 @@ static void release_type(bridge_world_t *w, declared_type_t *c,
 void module_release_types(bridge_world_t *w, module_t *m, bool by_policy)
 {
     enum bridge_on_unload policy = 0;
-    uint32_t i = m->declared_count;
+    uint32_t i = 0;
 
+    while (i < m->declared_count) {
+        if (m->declared[i]->declarers == 1)
+            storage_let_keep(w->storage, m->declared[i]->type, false);
+        i++;
+    }
     while (i) {
         i--;
         if (by_policy)

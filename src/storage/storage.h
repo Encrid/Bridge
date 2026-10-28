@@ -84,6 +84,8 @@ void storage_validate_baseline(storage_t *r);
 
 void storage_let_write(storage_t *r, module_t *m, storage_type_t *type);
 
+void storage_let_keep(storage_t *r, const storage_type_t *type, bool keep);
+
 uint32_t storage_reserve(storage_t *r, uint64_t *ids, uint32_t want);
 
 [[nodiscard]] int storage_publish(storage_t *r, module_t *m,

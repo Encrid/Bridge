@@ -19,7 +19,8 @@ enum folded : uint8_t {
     DESTROYED = 2,
     DROPPED = 4,
     SHORT = 8,
-    MOVES = 16
+    MOVES = 16,
+    HUSKED = 32
 };
 
 struct storage_type {
@@ -119,6 +120,8 @@ struct storage {
     uint32_t bit_words;
     storage_type_t **direct_type;
     uint64_t *given;
+    uint64_t *husk_types;
+    uint64_t *husks;
 };
 
 typedef struct {

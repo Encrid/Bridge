@@ -36,6 +36,11 @@ enum bridge_on_unload : uint32_t {
     BRIDGE_DELETE = 3
 };
 
+enum bridge_on_destroy : uint32_t {
+    BRIDGE_ON_DESTROY_REMOVE = 1,
+    BRIDGE_ON_DESTROY_KEEP = 2
+};
+
 enum bridge_storage : uint32_t {
     BRIDGE_TABLE = 1,
     BRIDGE_SPARSE_SET = 2,
@@ -95,8 +100,9 @@ typedef struct {
     uint32_t desc_len;
     enum bridge_on_unload on_unload;
     enum bridge_storage storage;
+    enum bridge_on_destroy on_destroy;
 } bridge_declaration_t;
-static_assert(sizeof(bridge_declaration_t) == 36);
+static_assert(sizeof(bridge_declaration_t) == 40);
 static_assert(alignof(bridge_declaration_t) == 4);
 static_assert(offsetof(bridge_declaration_t, name) == 0);
 static_assert(offsetof(bridge_declaration_t, name_len) == 4);
@@ -107,6 +113,7 @@ static_assert(offsetof(bridge_declaration_t, desc) == 20);
 static_assert(offsetof(bridge_declaration_t, desc_len) == 24);
 static_assert(offsetof(bridge_declaration_t, on_unload) == 28);
 static_assert(offsetof(bridge_declaration_t, storage) == 32);
+static_assert(offsetof(bridge_declaration_t, on_destroy) == 36);
 
 typedef struct {
     uint32_t name;

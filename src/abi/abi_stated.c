@@ -61,7 +61,7 @@ int abi_check_stated(declaring_t *g)
 {
     const char *desc = g->d.kind == BRIDGE_TAG ? "" : g->desc;
 
-    if (check_kind(g) || check_policy(g))
+    if (check_kind(g) || check_policy(g) || abi_check_on_destroy(g))
         return (1);
     g->print = abi_hash_text(desc, g->d.desc_len) ^ g->d.kind;
     return (0);
