@@ -45,6 +45,9 @@ static int find_exports(module_t *m, backend_err_t *err)
     bridge_system_t *s;
     uint32_t i = 0;
 
+    m->shutdown = api->instance_get_func(m->instance, "shutdown", err);
+    if (!m->shutdown)
+        return (1);
     while (i < m->system_count + m->observer_count) {
         s = i < m->system_count ? m->systems[i]
             : m->observers[i - m->system_count];
@@ -53,9 +56,6 @@ static int find_exports(module_t *m, backend_err_t *err)
             return (1);
         i++;
     }
-    m->shutdown = api->instance_get_func(m->instance, "shutdown", err);
-    if (!m->shutdown)
-        return (1);
     return (!api->instance_get_func(m->instance, "reload", err));
 }
 
@@ -78,7 +78,7 @@ int module_start(module_t *m, const module_start_t *st, backend_err_t *err)
 {
     if (module_make_instance(m, st, err) || call_first(m, st, err))
         return (1);
-    if (check_losses(m, err))
+    if (find_exports(m, err))
         return (1);
-    return (find_exports(m, err) || check_spans(m, err));
+    return (check_losses(m, err) || check_spans(m, err));
 }
