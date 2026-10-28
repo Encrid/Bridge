@@ -39,6 +39,7 @@ static int fail_load(bridge_world_t *w, module_t *m, backend_err_t *err,
     if (!config && m->on_error == BRIDGE_FAIL)
         bridge_stop(w, m->identity, "failed");
     module_drop_systems(w, m);
+    module_shut_down_new(w, m);
     storage_release(w->storage, m->ids, m->id_count);
     m->id_count = 0;
     m->id_next = 0;

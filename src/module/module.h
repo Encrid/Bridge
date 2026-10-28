@@ -110,4 +110,6 @@ uint32_t module_count_pointing(const bridge_world_t *w, const range_t *owned,
 [[nodiscard]] int module_start(module_t *m, const module_start_t *st,
     backend_err_t *err);
 
+void module_shut_down_new(bridge_world_t *w, module_t *m);
+
 #endif
