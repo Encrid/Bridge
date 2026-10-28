@@ -450,6 +450,7 @@ A system walks the rows of tables, or the entries of one sparse set alone. Thus:
 
 Bridge refuses another term at `add_system`, by its number. An observer walks nothing, thus these rules do not apply to it.
 In a walk of tables, a component of a sparse set has a base of 0. The module reaches it by the id of the row, through its kept cell.
+A query whose terms are all of `BRIDGE_OPTIONAL` matches each table, and its walk reads each one.
 
 ## Conflicts
 
