@@ -14,7 +14,7 @@ TEST(init)
     api->declare(api, TEST_STATE(api, bridge_declaration_t, name, 9,
         BRIDGE_STRUCT, (uint32_t)sizeof(spot_t) + EXTRA,
         (uint32_t)alignof(spot_t), desc, sizeof(spot_t_desc) - 1,
-        BRIDGE_DELETE, BRIDGE_TABLE));
+        BRIDGE_DELETE, BRIDGE_TABLE, BRIDGE_ON_DESTROY_REMOVE));
     return (0);
 }
 

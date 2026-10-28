@@ -64,3 +64,28 @@ void test_run_in_turn(host_t *h)
 {
     nap_twice(h);
 }
+
+static void nap_in_one_module(host_t *h, const char *path)
+{
+    const test_counts_t *c = test_get_counts(h);
+
+    h->cfg.threads = 2;
+    if (host_open(h))
+        return;
+    test_load_built(h, "test:sleep@0.1.0", path, 1);
+    (void)time_update(h->w);
+    printf("two naps of one module on %u thread(s) of 2\n",
+        test_count_threads(c));
+    say_naps(c, test_count_threads(c));
+    host_close(h);
+}
+
+void test_observe_in_turn(host_t *h)
+{
+    nap_in_one_module(h, SLEEP_HEARD_PATH);
+}
+
+void test_run_own_in_turn(host_t *h)
+{
+    nap_in_one_module(h, SLEEP_TWICE_PATH);
+}

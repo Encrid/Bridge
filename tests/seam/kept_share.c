@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <string.h>
+
 #include "cases.h"
 
 static void load_settings(host_t *h, int64_t persistent)
@@ -52,5 +54,26 @@ void test_keep_for_another(host_t *h)
     a.cfg.persistent = 128;
     host_load(h, &a);
     test_say_modules(h);
+    host_close(h);
+}
+
+void test_keep_text_refused(host_t *h)
+{
+    bridge_setting_t *s = test_get_noted(h)->settings;
+    bridge_artifact_t a;
+
+    h->cfg.budget.persistent = 1024;
+    if (host_open(h))
+        return;
+    test_state_guarded_minting(&a, "game:other@0.1.0", "settings");
+    host_load(h, &a);
+    load_settings(h, 128);
+    host_run_frames(h, 1);
+    host_unload(h, "game:settings@0.1.0");
+    s[5].v.s = "fresh/path.cfg";
+    if (!strcmp(h->arg, "refused"))
+        s[6].v.i = 300;
+    load_settings(h, 128);
+    host_run_frames(h, 1);
     host_close(h);
 }

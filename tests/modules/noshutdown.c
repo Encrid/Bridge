@@ -7,6 +7,11 @@
 
 TEST(init)
 {
+#ifdef GHOST
+    int none = 0;
+
+    TEST_ADD_SYSTEM(api, "ghost", "update", &none, 0, nullptr, 0, nullptr, 0);
+#endif
     return (0);
 }
 

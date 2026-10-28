@@ -146,6 +146,7 @@ void storage_test_run_all(storage_test_t *t, const char *const *phases);
 
 void storage_test_drop(storage_test_t *t, const char *name,
     enum bridge_on_unload policy);
+void storage_test_say_alive(const storage_test_t *t, uint32_t last);
 
 uint64_t storage_test_time_barrier(storage_test_t *t, const char *phase);
 
@@ -207,6 +208,7 @@ enum storage_test_end storage_test_scribble(storage_test_t *t);
 enum storage_test_end storage_test_strip(storage_test_t *t);
 enum storage_test_end storage_test_strip_full(storage_test_t *t);
 enum storage_test_end storage_test_strip_unnamed(storage_test_t *t);
+enum storage_test_end storage_test_delete_husk(storage_test_t *t);
 enum storage_test_end storage_test_tag(storage_test_t *t);
 enum storage_test_end storage_test_toggle(storage_test_t *t);
 enum storage_test_end storage_test_toggle_full(storage_test_t *t);

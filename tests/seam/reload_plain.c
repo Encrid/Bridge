@@ -53,3 +53,20 @@ void test_reload_plain(host_t *h)
         end_failed(h);
     host_close(h);
 }
+
+void test_reload_plain_loss(host_t *h)
+{
+    bridge_artifact_t a;
+
+    if (host_open(h))
+        return;
+    state_ticker(h, &a, "game:ticker@0.1.0", STEPPER1_PATH);
+    host_load(h, &a);
+    host_run_frames(h, 2);
+    state_ticker(h, &a, "game:ticker@0.2.0", STEPPER2_PATH);
+    a.cfg.losses = TEST_TICK_LOSS;
+    a.cfg.loss_count = 1;
+    host_reload(h, &a);
+    test_say_modules(h);
+    host_close(h);
+}

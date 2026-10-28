@@ -54,3 +54,15 @@ void storage_test_drop(storage_test_t *t, const char *name,
     }
     storage_test_run(t, "never");
 }
+
+void storage_test_say_alive(const storage_test_t *t, uint32_t last)
+{
+    uint32_t e = 1;
+    bool alive;
+
+    while (e <= last) {
+        alive = storage_is_alive(t->w->storage, (uint64_t)1 << 32 | e);
+        printf("entity %u is %s\n", e, alive ? "alive" : "gone");
+        e++;
+    }
+}

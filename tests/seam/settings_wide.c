@@ -7,12 +7,13 @@
 
 #include "cases.h"
 
-static bridge_setting_t test_wide[5] = {
+static bridge_setting_t test_wide[6] = {
     { .key = "e16", .kind = BRIDGE_INT, .v = { .i = 1 } },
     { .key = "e32", .kind = BRIDGE_INT, .v = { .i = 1 } },
     { .key = "eu8", .kind = BRIDGE_INT, .v = { .i = 1 } },
     { .key = "names", .kind = BRIDGE_STRING, .v = { .s = "a" } },
-    { .key = "pair", .kind = BRIDGE_INT, .v = { .i = 1 } }
+    { .key = "pair", .kind = BRIDGE_INT, .v = { .i = 1 } },
+    { .key = "mask64", .kind = BRIDGE_INT, .v = { .i = 1 } }
 };
 
 static uint32_t pick_settings(const host_t *h)
@@ -21,10 +22,16 @@ static uint32_t pick_settings(const host_t *h)
         test_wide[2].v.i = -1;
     if (!strcmp(h->arg, "high"))
         test_wide[2].v.i = 256;
+    if (!strcmp(h->arg, "masktop"))
+        test_wide[5].v.i = INT64_MIN;
     if (!strcmp(h->arg, "names"))
         return (4);
     if (!strcmp(h->arg, "pair")) {
         test_wide[3] = test_wide[4];
+        return (4);
+    }
+    if (!strncmp(h->arg, "mask", 4)) {
+        test_wide[3] = test_wide[5];
         return (4);
     }
     return (3);

@@ -79,12 +79,14 @@ static uint32_t declare_marker(const test_api_t *api, const char *name)
 
 #ifdef TAGS
     return (api->declare(api, TEST_STATE(api, bridge_declaration_t,
-        at, len, BRIDGE_TAG, 0, 1, 0, 0, BRIDGE_DELETE, BRIDGE_TABLE)));
+        at, len, BRIDGE_TAG, 0, 1, 0, 0, BRIDGE_DELETE, BRIDGE_TABLE,
+        BRIDGE_ON_DESTROY_REMOVE)));
 #else
     return (api->declare(api, TEST_STATE(api, bridge_declaration_t,
         at, len, BRIDGE_STRUCT, sizeof(m_t), alignof(m_t),
         test_put(api, m_t_desc, sizeof(m_t_desc) - 1),
-        sizeof(m_t_desc) - 1, BRIDGE_DELETE, BRIDGE_TABLE)));
+        sizeof(m_t_desc) - 1, BRIDGE_DELETE, BRIDGE_TABLE,
+        BRIDGE_ON_DESTROY_REMOVE)));
 #endif
 }
 

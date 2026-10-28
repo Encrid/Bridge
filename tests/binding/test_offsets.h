@@ -17,19 +17,22 @@
     #include "test_offsets_span.h"
     #include "test_offsets_toggle.h"
 
-    #define BRIDGE_DECLARE(kind, name, T, on_unload, storage) \
+    #define BRIDGE_DECLARE_AS(kind, name, T, on_unload, storage, on_destroy) \
         bridge_declare(BRIDGE_STATE(bridge_declaration_t, \
             bridge_put(name, sizeof(name) - 1), sizeof(name) - 1, kind, \
             sizeof(T), alignof(T), \
             bridge_put(T##_desc, sizeof(T##_desc) - 1), sizeof(T##_desc) - 1, \
-            on_unload, storage))
+            on_unload, storage, on_destroy))
+    #define BRIDGE_DECLARE(kind, name, T, on_unload, storage) \
+        BRIDGE_DECLARE_AS(kind, name, T, on_unload, storage, \
+            BRIDGE_ON_DESTROY_REMOVE)
     #define BRIDGE_COMPONENT(name, T, on_unload, storage) \
         BRIDGE_DECLARE(BRIDGE_STRUCT, name, T, on_unload, storage)
 
     #define BRIDGE_DECLARE_TAG(name, on_unload, storage) \
         bridge_declare(BRIDGE_STATE(bridge_declaration_t, \
             bridge_put(name, sizeof(name) - 1), sizeof(name) - 1, BRIDGE_TAG, \
-            0, 1, 0, 0, on_unload, storage))
+            0, 1, 0, 0, on_unload, storage, BRIDGE_ON_DESTROY_REMOVE))
 
     #define BRIDGE_ADD_SYSTEM(name, phase, terms, count, changes, \
         change_count, before, before_count) \

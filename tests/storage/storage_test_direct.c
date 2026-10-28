@@ -3,7 +3,6 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
-#include <stdio.h>
 #include <string.h>
 
 #include "storage_test.h"
@@ -25,7 +24,8 @@ static const storage_test_variant_t DIRECT_DROPPED[] = {
     { "directnone", DIRECT_PATH, BRIDGE_DELETE },
     { "directfull", DIRECT_PATH, BRIDGE_DELETE },
     { "directbad", DIRECTBAD_PATH, BRIDGE_DELETE },
-    { "directsweepfree", DIRECT_PATH, BRIDGE_SWEEP }
+    { "directsweepfree", DIRECT_PATH, BRIDGE_SWEEP },
+    { "directhusk", DIRECTHUSK_PATH, BRIDGE_DELETE }
 };
 
 static int give_direct(storage_test_t *t, const char *path)
@@ -46,18 +46,6 @@ enum storage_test_end storage_test_index_directly(storage_test_t *t)
     return (STORAGE_TEST_DONE);
 }
 
-static void say_alive(const storage_test_t *t)
-{
-    uint32_t e = 1;
-    bool alive;
-
-    while (e <= 6) {
-        alive = storage_is_alive(t->w->storage, (uint64_t)1 << 32 | e);
-        printf("entity %u is %s\n", e, alive ? "alive" : "gone");
-        e++;
-    }
-}
-
 enum storage_test_end storage_test_drop_direct(storage_test_t *t)
 {
     constexpr size_t count = sizeof(DIRECT_DROPPED) / sizeof(*DIRECT_DROPPED);
@@ -66,12 +54,16 @@ enum storage_test_end storage_test_drop_direct(storage_test_t *t)
 
     if (give_direct(t, v->path))
         return (STORAGE_TEST_DONE);
-    if (strcmp(t->what, "directsweepfree")) {
+    if (!strcmp(t->what, "directhusk")) {
+        storage_test_drop(t, "st:A", v->policy);
+        storage_test_say_alive(t, 6);
+        storage_test_drop(t, "st:D", BRIDGE_STRIP);
+    } else if (strcmp(t->what, "directsweepfree")) {
         storage_test_drop(t, "st:A", BRIDGE_STRIP);
         storage_test_drop(t, "st:D", v->policy);
     } else
         storage_test_drop(t, "st:A", v->policy);
-    say_alive(t);
+    storage_test_say_alive(t, 6);
     storage_test_run(t, "near");
     return (STORAGE_TEST_DONE);
 }

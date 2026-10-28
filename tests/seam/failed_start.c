@@ -34,6 +34,20 @@ void test_drain_failed_start(host_t *h)
     host_close(h);
 }
 
+void test_shut_failed_load(host_t *h)
+{
+    bridge_artifact_t a;
+
+    if (host_open(h))
+        return;
+    state_why(&a, "why:settings@0.1.0", h->arg);
+    a.cfg.settings = TEST_STRAY;
+    a.cfg.setting_count = 1;
+    host_load(h, &a);
+    test_say_modules(h);
+    host_close(h);
+}
+
 void test_keep_after_failed_reload(host_t *h)
 {
     bridge_artifact_t a;

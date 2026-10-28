@@ -4,6 +4,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include <stdio.h>
+#include <string.h>
 
 #include "cases.h"
 
@@ -29,12 +30,14 @@ void test_fail_unlimited(host_t *h)
 
 static void load_keeper(host_t *h)
 {
+    bool keeps = !strcmp(h->arg, "deletekeep");
     char file[32];
     bridge_artifact_t a;
 
-    snprintf(file, sizeof(file), "keeper-%s", h->arg);
+    snprintf(file, sizeof(file), "keeper-%s", keeps ? "delete" : h->arg);
     test_load_guarded_minting(h, "game:keeper@0.1.0", file);
-    test_state_guarded_minting(&a, "view:counter@0.1.0", "counter");
+    test_state_guarded_minting(&a, "view:counter@0.1.0",
+        keeps ? "counter-keep" : "counter");
     a.cfg.read = TEST_ROSTER;
     a.cfg.read_count = 2;
     a.cfg.spawns = BRIDGE_NONE;

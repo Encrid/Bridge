@@ -47,3 +47,27 @@ void test_reload_group_hold(host_t *h)
     test_say_modules(h);
     host_close(h);
 }
+
+static const char *const TEST_SHARED_LOSS[] = {
+    "game:Shared.x"
+};
+
+void test_reload_group_shut(host_t *h)
+{
+    bridge_artifact_t a[2];
+
+    if (host_open(h))
+        return;
+    group_state(&a[0], "game:one@0.1.0", "share1");
+    group_state(&a[1], "game:two@0.1.0", "share1");
+    host_load(h, &a[0]);
+    host_load(h, &a[1]);
+    host_run_frames(h, 1);
+    group_state(&a[0], "game:one@0.2.0", "share1-said");
+    group_state(&a[1], "game:two@0.2.0", "share1-said");
+    a[1].cfg.losses = TEST_SHARED_LOSS;
+    a[1].cfg.loss_count = 1;
+    host_reload_many(h, a, 2);
+    test_say_modules(h);
+    host_close(h);
+}

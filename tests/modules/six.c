@@ -45,5 +45,11 @@ TEST(init)
 
 TEST(shutdown)
 {
+#ifdef SEEDED
+    six_t late = { 77 };
+
+    TEST_ATTACH(api, 0, six, late);
+    say(api, "late", late.x, 0);
+#endif
     return (0);
 }

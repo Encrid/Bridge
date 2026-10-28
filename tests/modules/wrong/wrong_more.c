@@ -24,7 +24,7 @@ void wrong_declare_align_other(void)
     constexpr uint32_t len = sizeof(position_t_desc) - 1;
     bridge_declaration_t d = { bridge_put("game:Position", 13), 13,
         BRIDGE_STRUCT, 8, 8, bridge_put(position_t_desc, len), len,
-        BRIDGE_STRIP, BRIDGE_TABLE };
+        BRIDGE_STRIP, BRIDGE_TABLE, BRIDGE_ON_DESTROY_REMOVE };
 
     bridge_declare(bridge_put(&d, sizeof(d)));
 }
@@ -153,7 +153,7 @@ void wrong_declare_near_namespace(void)
     bridge_declaration_t d = wrong_state_type();
     bridge_declaration_t e = { bridge_put("game:Odd2", 9), 9, BRIDGE_STRUCT,
         1, 1, bridge_put(desc, sizeof(desc) - 1), sizeof(desc) - 1,
-        BRIDGE_STRIP, BRIDGE_TABLE };
+        BRIDGE_STRIP, BRIDGE_TABLE, BRIDGE_ON_DESTROY_REMOVE };
 
     d.name = bridge_put("gamex:Odd", 9);
     d.name_len = 9;

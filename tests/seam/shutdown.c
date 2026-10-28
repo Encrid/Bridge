@@ -7,13 +7,18 @@
 
 #include "cases.h"
 
+static void state_hang(bridge_artifact_t *a)
+{
+    test_state_guarded_minting(a, "test:hang@0.1.0", "hang");
+    a->cfg.spawns = BRIDGE_NONE;
+    a->cfg.shutdown_timeout = 100 * HOST_MS;
+}
+
 static void load_hang(host_t *h)
 {
     bridge_artifact_t a;
 
-    test_state_guarded_minting(&a, "test:hang@0.1.0", "hang");
-    a.cfg.spawns = BRIDGE_NONE;
-    a.cfg.shutdown_timeout = 100 * HOST_MS;
+    state_hang(&a);
     host_load(h, &a);
 }
 
@@ -33,6 +38,20 @@ void test_time_out_shutdown(host_t *h)
         return;
     load_hang(h);
     host_unload(h, "test:hang@0.1.0");
+    test_say_modules(h);
+    host_close(h);
+}
+
+void test_time_out_failed_load(host_t *h)
+{
+    bridge_artifact_t a;
+
+    if (host_open(h))
+        return;
+    state_hang(&a);
+    a.cfg.settings = TEST_STRAY;
+    a.cfg.setting_count = 1;
+    host_load(h, &a);
     test_say_modules(h);
     host_close(h);
 }
