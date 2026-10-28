@@ -35,6 +35,13 @@ static inline uint32_t block_get_offset(bridge_world_t *w, const void *p)
     return ((uint32_t)(c - w->shared));
 }
 
+static inline void block_write_room(const module_t *m)
+{
+    bridge_header_t *h = (bridge_header_t *)m->priv;
+
+    h->changes_left = m->queue_room - m->queue_len;
+}
+
 [[nodiscard]] int block_create(bridge_world_t *w,
     const bridge_budget_t *budget);
 
