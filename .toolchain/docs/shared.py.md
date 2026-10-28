@@ -25,7 +25,7 @@ The tools import it. It does not run alone.
 | `expanded(items, values)` | Gives the items of a list with the value of each variable. |
 | `files(root, patterns)` | Gives the files of `root` that match the patterns. Each file comes one time, in the order of the patterns. |
 | `status(code)` | Gives an exit status as a decimal number and as a hexadecimal number. |
-| `run(argv, root)` | Runs a command in `root`, and writes its output. It stops the tool if the command fails. |
+| `run(argv, root, env)` | Runs a command in `root`, and writes its output. It gives the command the environment `env`, or the environment of the tool. It stops the tool if the command fails. |
 | `this_target(targets)` | Gives the target whose `runs_on` is this machine, or nothing. |
 | `sha256(data)` | Gives the SHA-256 digest of the bytes, in hexadecimal. |
 | `variables(config, args, target, zig)` | Gives the variables of a build, as the section *Variables* tells. |

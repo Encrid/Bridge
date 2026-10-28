@@ -12,6 +12,8 @@ import shared
 import take
 from shared import die, expand, expanded, files, known, located, run, sha256
 
+CACHES = {'ZIG_GLOBAL_CACHE_DIR': 'global', 'ZIG_LOCAL_CACHE_DIR': 'local'}
+
 
 def tools(config, values):
     for name, path in config.get('tools', {}).items():
@@ -23,9 +25,21 @@ def leb(n):
     return bytes((n >> shift & 0x7f) | (0x80 if n >> shift + 7 else 0) for shift in range(0, max(n.bit_length(), 1), 7))
 
 
+def run_in(step, values):
+    root, folder = Path(values['root']), located(step['cwd'], values)
+    if not folder.is_dir():
+        die('%s is not there, and a step of %s runs in it' % (folder.as_posix(), values['name']))
+    whole = dict(values, sources=[(root / path).as_posix() for path in values['sources']],
+                 include=['-I' + (root / path[2:]).as_posix() for path in values['include']])
+    caches = {name: str(root / os.environ[name]) for name in CACHES}
+    run(expanded(step['run'], whole), folder, dict(os.environ, **caches))
+
+
 def do(step, values, unstamped):
     root = Path(values['root'])
-    if 'run' in step:
+    if 'run' in step and 'cwd' in step:
+        run_in(step, values)
+    elif 'run' in step:
         run(expanded(step['run'], values), values['root'])
     if 'section' in step and not unstamped:
         name = step['section'].encode('utf-8')
@@ -67,8 +81,8 @@ def planned(config, values, artifact, tree=None):
     mine.update(sources=[moved(source, tree) for source in sources], output=output.as_posix(), work=work.as_posix(),
                 defines=['-D' + define for define in expanded(artifact.get('defines', []), mine)],
                 include=['-I' + moved(folder, tree) for folder in expanded(artifact.get('include', []), mine)],
-                flags=expanded(artifact.get('flags', []), mine),
                 link=expanded(artifact.get('link', []), mine), manifest=expanded(artifact.get('manifest', []), mine))
+    mine['flags'] = expanded(kind.get('flags', []) + artifact.get('flags', []), mine)
     return kind, mine
 
 
@@ -193,8 +207,9 @@ def composed(config, values):
     for table in config.get('compose', {}).values():
         if not isinstance(table, dict):
             continue
-        for name in files(root, table.get('headers', [])):
-            put(dist / name, (root / name).read_bytes())
+        start = located(table.get('from', ''), values)
+        for name in files(start, table.get('headers', [])):
+            put(dist / name, (start / name).read_bytes())
             kit.append(name)
         for asset in table.get('assets', []):
             put(dist / Path(asset).name, (out / asset).read_bytes())
@@ -217,8 +232,7 @@ def prepared(args, here=False):
         die('%s does not run here: build it, and test it where it runs' % target)
     cache, root = (shared.HERE / config['build']['cache']).resolve(), Path(args.root).resolve()
     cache = cache.relative_to(root) if cache.is_relative_to(root) else cache
-    os.environ['ZIG_GLOBAL_CACHE_DIR'] = str(cache / 'global')
-    os.environ['ZIG_LOCAL_CACHE_DIR'] = str(cache / 'local')
+    os.environ.update({name: str(cache / leaf) for name, leaf in CACHES.items()})
     zig = fetch.zig_found(config['zig']) or die('zig %s is neither fetched nor on the path' % config['zig']['version'])
     values = shared.variables(config, args, target, zig)
     values['paths'] = path_defines(config)

@@ -11,6 +11,7 @@ With `--pack`, it also puts the deliverable into a zip file.
 | --- | --- |
 | `tools(config, values)` | Finds each program of `[tools]`, and sets its variable. |
 | `leb(n)` | Gives a number as an unsigned LEB128, the format of the numbers of WebAssembly. |
+| `run_in(step, values)` | Runs the command of a step in its folder `cwd`, as *Steps* tells. |
 | `do(step, values, unstamped)` | Does one step of a kind. |
 | `put(path, data)` | Writes a file only if it is not there or is different. |
 | `moved(path, tree)` | Gives the path in `tree` for a path of `src` or of `include`, and else the path. With no tree, it gives the path. |
@@ -52,6 +53,8 @@ The caches of zig are the variables `ZIG_GLOBAL_CACHE_DIR` and `ZIG_LOCAL_CACHE_
 The commands of the steps and of the cases get them too.
 When the cache is in the folder of the project, each variable is a path from that folder, since each step runs there.
 Thus an archive that zig makes names its members with no folder of the machine. Else each variable is a whole path.
+A step with `cwd` gets whole paths: *Steps*.
+
 `tools` stops if a program is not there: `the tool <name> is not at <path>`.
 
 ## main
@@ -67,7 +70,8 @@ With `--pack`, it writes the zip with `packed`, and proves the package with `pro
 1. If the artifact gives a `target`, it uses the keys of that target and its name as `{target}`.
 2. It replaces the variables of the name, and finds the sources. In `sources`, an item that is only a list variable gives the patterns of that list.
 3. It stops if no file matches the sources: `no file matches the sources of <name>`.
-4. It sets `{output}`, `{work}`, `{sources}`, `{defines}`, `{include}`, `{flags}`, `{link}` and `{manifest}`.
+4. It sets `{output}`, `{work}`, `{sources}`, `{defines}`, `{include}`, `{link}` and `{manifest}`, then `{flags}`, which can use them.
+   `{flags}` holds the `flags` of the kind, then the `flags` of the artifact.
 5. It makes the folder of the output, and the folder `obj`.
 6. If a file of `link` is not there, it does the `unlinked` steps of the kind.
 7. Else, it does the `steps` of the kind, and copies the `beside` files into the folder of the output.
@@ -99,6 +103,10 @@ Its value is the output path of the artifact. An artifact's `defines` splices `{
 `do` does the actions of a step in this order: `run`, `section`, `contains`, `copy`, `rename`.
 A step with a key that `KEYS['step']` does not have stops the tool.
 `copy` and `rename` take their paths from the root.
+
+With `cwd`, `run` runs in that folder. `do` then gives the command each source and each folder of `include` as a whole path.
+It also gives the command the caches of zig as whole paths, because a path from the root names a different folder in `cwd`.
+`do` stops if the folder is not there: `<folder> is not there, and a step of <name> runs in it`.
 
 A `section` step adds a custom section of WebAssembly to the end of the output.
 The section is the byte 0, the size of the content, then the content.
@@ -144,12 +152,15 @@ The build makes each artifact in the scratch folder `out`. A built binary is not
 `composed` gathers the deliverable into the folder `dist`, beside `scratch`. It copies into `dist`:
 
 1. the output of each shipped artifact, and its `beside` files, at the top of `dist`,
-2. each header of `headers` of each table of `[compose]`, at its path from the root,
+2. each header of `headers` of each table of `[compose]`, at its path from the folder `from` of the table,
 3. each asset of `assets` of each table of `[compose]`, at the top of `dist`.
 
 It also copies `license`, and `license` of each folder of `third_party`, at their paths from the root.
 `composed` writes the path of each file of the deliverable.
-`.toolchain/docs/project.toml.md`, *[compose]*, tells the keys `headers` and `assets`.
+`.toolchain/docs/project.toml.md`, *[compose]*, tells the keys `from`, `headers` and `assets`.
+
+A program can call `composed` after `prepared` alone, with no step of `ready`.
+Thus `from` can use the variables of `prepared`, but not the variable of a source, of a dependency or of a tool.
 
 ## The zip
 

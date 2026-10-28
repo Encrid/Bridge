@@ -6,7 +6,9 @@ import io
 import re
 import tokenize
 
-from shared import arguments, config, files, header, ours, report
+import build
+import fetch
+from shared import arguments, config, die, files, header, located, ours, report
 
 QUOTED = re.compile(r'"""[\s\S]*?"""|\'\'\'[\s\S]*?\'\'\'|"(?:\\.|[^"\\\n])*"|\'[^\'\n]*\'|#')
 
@@ -48,18 +50,43 @@ def retired(text, words):
     return found
 
 
+def refused(args, settings):
+    lists = settings.get('check', {}).get('refuse', [])
+    if not lists:
+        return []
+    _, values = build.prepared(args)
+    fetch.sources(settings, values, False)
+    names = []
+    for written in lists:
+        path = located(written, values)
+        if not path.is_file():
+            die('[check] refuse: %s is not there' % path.as_posix())
+        names += [(name.strip(), written) for name in path.read_text(encoding='utf-8').splitlines() if name.strip()]
+    return names
+
+
+def called(text, names):
+    return [(text.count('\n', 0, m.start()) + 1, "'%s' is refused by %s" % (name, written))
+            for name, written in names for m in re.finditer(r'(?<!\w)%s *\(' % re.escape(name), text)]
+
+
 def main():
-    root = arguments().root
+    args = arguments()
+    root = args.root
     settings = config(root)
     paths = ours(root)
     unicode = set(files(root, settings.get('check', {}).get('unicode', [])))
     words = settings.get('check', {}).get('retired', {})
     worded = [path for path in ours(root, tests=True) if not path.startswith('.toolchain/')]
+    names = refused(args, settings)
+    code = [path for path in paths if path.startswith(('src/', 'include/')) and path.endswith(('.c', '.h'))]
     legal = notice()
     found = sorted([(path, n, what) for path in paths
                     for n, what in faults(path, (root / path).read_bytes(), legal, path in unicode)]
                    + [(path, n, what) for path in worded
-                      for n, what in retired((root / path).read_text(encoding='utf-8', errors='replace'), words)])
+                      for n, what in retired((root / path).read_text(encoding='utf-8', errors='replace'), words)]
+                   + [(path, n, what) for path in code
+                      for n, what in called((root / path).read_text(encoding='utf-8', errors='replace'), names)])
     report(['%s:%d: %s' % fault for fault in found], len(set(paths) | set(worded)))
 
 
