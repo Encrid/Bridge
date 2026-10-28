@@ -30,8 +30,7 @@ At a reload of the one module that declares it, it is a move: `docs/intern/abi/a
 A declaration of a type that is there already, with the same layout, states the same size and alignment as the type.
 If not, it is refused as a type whose descriptor lays it out another way: `docs/intern/abi/abi_layout.c.md`.
 
-Every declarer states the `on_destroy` of the type, and a declaration that states the other item is refused.
-Unlike a layout, `on_destroy` stays as it is at a reload of the one declarer: `docs/intern/abi/abi_on_destroy.c.md`, *One on_destroy for each type*.
+`docs/intern/abi/abi_on_destroy.c.md`, *One on_destroy for each type*, tells which `on_destroy` a declaration states.
 
 ## The steps
 

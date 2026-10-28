@@ -48,7 +48,7 @@ The entity index is the one thing in the shared memory that a module reads and c
 `block_get_offset` gives its offset: `docs/intern/block/block.h.md`, *The regions of the memories*.
 `barriers`, `place`, `system` and `observer` are written before each dispatch: `src/schedule/schedule_dispatch.c`.
 `log_level` is written when the private memory is made: `src/module/module_call.c`.
-`changes_left` is written again after each change and at each barrier: `docs/intern/block/block.h.md`, *The regions of the memories*.
+`changes_left` is written again after each change, and at the next barrier: `docs/intern/block/block.h.md`, *The regions of the memories*.
 
 The span region holds the queries, the lists of the observers, `column_base`, `kept`, the capability table and the spans.
 Its length is the `spans` of the module, and how it is divided is the library's.

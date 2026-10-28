@@ -25,7 +25,7 @@ A module that declares a type again gets the slot that it has.
 So there is no entry to find a type: `declare` does it.
 
 A new slot keeps three things: the type, the `on_unload` policy that the module stated, and whether the module may write the type.
-Each declarer states the same `on_destroy`, so the type keeps it, and the slot does not.
+The slot does not keep `on_destroy`: `docs/intern/abi/abi_on_destroy.c.md`, *One on_destroy for each type*.
 A module may write a type of its own namespace, and a type that a write grant names.
 If it may, storage records it: that gives the module a stake in an entity that carries the type.
 `storage_let_keep` tells storage whether a destroy keeps the type: `docs/intern/storage/storage_husk.c.md`, *The types that a husk keeps*.

@@ -177,6 +177,7 @@ A pointer and a `size_t` have 8 bytes. The library has no build for a smaller po
 ## BRIDGE_HOST_ABI
 
 `BRIDGE_HOST_ABI` is the number of the host seam: the version of the structs and the functions of this header.
+The number is 2.
 A host gives the number that it was built against in `abi`, the first field of `bridge_config_t`.
 `bridge_create` reads `abi` before any other field, and refuses a different number.
 Until the first release of Bridge, the number stays 1, and the structs can change.
@@ -689,7 +690,7 @@ Else the sink gets a record that tells why: *The deployment*.
 
 Step 3 destroys each husk with the storage. Thus a `shutdown` releases what its module keeps in its components of `BRIDGE_ON_DESTROY_KEEP`.
 
-The result is 0 when the world is gone, and for a null `b`.
+The result is 0 when the world is gone, and for a null `w`.
 The result is 1 if a pinned module is loaded and the call comes from another thread, or if the sink calls it.
 Then Bridge destroys nothing, and the world stays whole. Call again from the thread that loaded the module, after the sink returns.
 A host that ignores the result can lose a world that stays.
@@ -739,7 +740,7 @@ When two modules conflict, the order of the loads decides which load fails. The 
 5. The share of the module goes back to the arena, unless a row that stays holds a string in it.
 6. The backend destroys the instance and the image, and a barrier follows.
 
-Step 3 removes the components of `BRIDGE_ON_DESTROY_KEEP` of the module, also from each husk.
+Step 3 removes each component of `BRIDGE_ON_DESTROY_KEEP` that no other loaded module declares, also from each husk.
 Thus `shutdown` releases what the module keeps in them: `docs/extern/bridge_abi.h.md`, *bridge_on_destroy*.
 
 The result is 0 if the module was loaded. Else the result is 1, with a record.
@@ -781,7 +782,7 @@ From the sink, the result is 1, with no record.
 
 A reload keeps the components, their rows and the entities. Bridge does not write the settings again.
 
-A husk stays through a reload. The new instance finds its husks with a query of its kept components.
+A husk stays through a reload. The new instance finds its husks with a query of its components of `BRIDGE_ON_DESTROY_KEEP`.
 A component that a new instance does not declare goes, as at an unload.
 A new instance runs under the new config, but `persistent` can grow and not shrink.
 If a new config states fewer `spawns`, the module keeps that many ready ids. Bridge takes the others back at the next barrier.
@@ -1103,6 +1104,7 @@ The reason is a reason of `did not load`, or one of these:
 - `'<component>' is stripped, and <count> rows stay in a second table of their archetype: [budget] columns of <bytes> bytes has no room to join them to the first`
 - `'<component>' is deleted, and <count> entities lose only it: [budget] tables of <count> or [budget] columns of <bytes> bytes has no room for their husks`
 
+`bridge_reload` writes the last two when a component that a new instance does not declare goes.
 A share that stays keeps its room, thus Bridge can refuse a later load for want of room.
 A share that stays goes back at a later unload, once no row that stays holds a string in it.
 Rows in a second table make a second span of the same archetype.

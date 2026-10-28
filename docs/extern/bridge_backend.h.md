@@ -28,6 +28,7 @@ The backend owns five kinds of handle, and Bridge never reads into them:
 ## BACKEND_ABI
 
 `BACKEND_ABI` is the number of the backend seam: the version of its layouts and its entries.
+The number is 2.
 `backend_get_abi` gives the number that the backend was built against.
 Bridge calls `backend_get_abi` first, and refuses a library that gives another number, before it asks for another entry.
 The number changes as `BRIDGE_HOST_ABI` does: `docs/extern/bridge.h.md`, *BRIDGE_HOST_ABI*.
@@ -217,7 +218,7 @@ A backend that can stop the module stops it there. Another backend lets the call
 `instance_get_func` gives a function that `call` can run: an export of the instance, by its `name`.
 The export takes nothing, and gives an `int32_t` status.
 It gives null, with `err`, if there is no export of that name, or if the backend sees that the export has another shape.
-At each load and reload, Bridge asks for `init` or `reload`, for each system and observer, and for `shutdown` and `reload`.
+At each load and reload, Bridge asks for `init` or `reload`, then for `shutdown`, for each system and observer, and for `reload`.
 A backend that cannot see the type of an export checks nothing.
 
 `call` runs a function. It gives 0 if the function returned, and then `status` is what the function gave.
@@ -232,7 +233,7 @@ Bridge treats a call that did not return as it treats a status that is not 0: `d
 | `bridge_create` | `backend_get_abi`, `backend_create`, `backend_get_capabilities`, `memory_get_shape`, then `memory_adopt` of the shared memory. |
 | A load | `module_compile`, `memory_adopt` of the private memory, `module_list_imports`, `instance_create`, and `define_func` 8 times. |
 | A load, then | `instance_set_memory_limit`, `instance_get_func` of `init`, `instance_set_timeout`, `call` of `init`, then `instance_get_func` of each export. |
-| A load that fails after `init` gave 0 | The calls of an unload. |
+| A load that fails after `init` gave 0 | The calls of an unload. `instance_set_timeout` and `call` of `shutdown` come only if Bridge found `shutdown`. |
 | A phase | `instance_set_work_limit` and `call` of each system. |
 | An unload | `instance_set_timeout`, `call` of `shutdown`, `instance_destroy`, `module_destroy` and `memory_release`. |
 | `bridge_destroy` | The `shutdown` of each module, the destruction of each module, `memory_release` of the shared memory, then `backend_destroy`. |

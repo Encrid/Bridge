@@ -13,7 +13,8 @@ It says how many entities the module asked to destroy that carry nothing that it
 `say_unhanded` writes an error record for the attaches and detaches of a held id, and says how many storage left undone.
 Each record sets `fault_now` of the module to the words of its fault, so the barrier counts against its budget: `docs/intern/schedule/schedule.h.md`, *The failure budget*.
 `empty_queues` sets `changed_now` of each module that queued something, for the same budget.
-It also calls `block_write_room`, so the header of each module tells the whole room again.
+It also calls `block_write_room` for each module that queued something since the last barrier.
+The header of each other module already shows the whole room.
 
 ## Functions
 
@@ -22,5 +23,5 @@ It also calls `block_write_room`, so the header of each module tells the whole r
 | `say_unapplied` | Tells a module how many of its changes storage did not apply, for want of a table and for want of columns. Then sets the counts to 0. |
 | `say_barred` | Tells a module how many entities it asked to destroy stay as they were. Then sets the count to 0. |
 | `say_unhanded` | Tells a module how many attaches or detaches of a held id storage left undone. Then sets the count to 0. |
-| `empty_queues` | Empties the queue of each module and its marks, writes the room into its header, and records whether the module queued something. |
+| `empty_queues` | Empties the queue of each module and its marks, and records whether the module queued something. It writes the room into the header of each module that did. |
 | `settle_all` | Ends the work of a barrier on rows: empties the queues, forgets the fold, and tells each module what storage did not apply. |
