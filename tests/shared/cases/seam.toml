@@ -217,7 +217,7 @@ false = { run = ["{out}/seam{exe}", "module_config.spans-too-small-refused"] }
 [[case]]
 name = "module_config.spans-rounded-up-to-8-refused"
 run = ["{out}/seam{exe}", "module_config.spans-rounded-up-to-8-refused"]
-claims = { matches = ["its spans of 860 bytes do not hold a column_base of 1 components by \\d+ tables, which with its queries is 864 bytes.*alive"] }
+claims = { matches = ["its spans of 860 bytes do not hold a column_base of 1 types by 64 tables, which with its queries is 864 bytes.*alive"] }
 false = { run = ["{out}/seam{exe}", "module_config.spans-a-multiple-of-8-taken"] }
 
 [[case]]
@@ -397,7 +397,7 @@ false = { run = ["{out}/seam{exe}", "bridge_backend_t-granule-not-a-power-of-two
 [[case]]
 name = "module_config.spans-too-small-refused"
 run = ["{out}/seam{exe}", "module_config.spans-too-small-refused"]
-claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }
+claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 types by 65 tables.*moved 2 1000.*alive"] }
 false = { run = ["{out}/seam{exe}", "budget.columns-used-up-changes-not-applied"] }
 
 [[case]]
@@ -2957,7 +2957,7 @@ false = { run = ["{out}/seam{exe}", "BRIDGE_SPAN_SIZE-what-a-span-takes-of-the-s
 [[case]]
 name = "BRIDGE_SPAN_SIZE-what-a-span-takes-of-the-spans"
 run = ["{out}/seam{exe}", "BRIDGE_SPAN_SIZE-what-a-span-takes-of-the-spans"]
-claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 components by \\d+ tables.*moved 2 1000.*alive"] }
+claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 types by 65 tables.*moved 2 1000.*alive"] }
 false = { run = ["{out}/seam{exe}", "BRIDGE_SCHEMA_TEXT-a-descriptor-of-the-type-s-own-text"] }
 
 [[case]]
