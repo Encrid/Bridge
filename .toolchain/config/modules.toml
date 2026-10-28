@@ -122,6 +122,7 @@ variants = [{ name = "keep-fail", defines = ["BRIDGE_ROWS_CHECKED", "FAIL_RELOAD
 name = "duo"
 sources = ["tests/modules/duo.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [{ name = "duo-walk", defines = ["BRIDGE_ROWS_CHECKED", "FIRST_OPER=BRIDGE_OPTIONAL"] }, { name = "duo-walk-and", defines = ["BRIDGE_ROWS_CHECKED", "FIRST_OPER=BRIDGE_AND"] }]
 
 [[modules]]
 name = "pick"
