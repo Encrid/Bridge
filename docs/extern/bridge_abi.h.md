@@ -108,9 +108,14 @@ Bridge writes it. The module writes only `scratch_used` and `ring_head`.
 | `owned` | Where the owned ranges of the module begin: a count, and then that many ranges of the shared arena. |
 | `arena_lo` | The low bound of the shared arena that the module can read, in the shared memory. |
 | `arena_hi` | The high bound of the shared arena that the module can read, in the shared memory. |
+| `changes_left` | What is left of the room of `changes` until the next barrier, in bytes: `docs/extern/bridge.h.md`, *The reservations*. |
 
 Bridge writes `barriers`, `place`, `system` and `observer` before each dispatch.
 `system` is `0xFFFFFFFF` and `observer` is 0 while no system runs, for example in `init`.
+
+Bridge writes `changes_left` when the instance starts, after each change that the module queues, and at each barrier.
+A module can read it before an `attach`, a `detach` or a `destroy`.
+Thus the module can do a change that does not fit after the next barrier, and its invocation does not fail.
 
 The arrays from `column_base` to `kind` make the capability table.
 A module names a cell by a coordinate: a slot, a place, and an offset in the cell.

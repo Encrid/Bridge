@@ -491,12 +491,12 @@ The author of a module states a value for `spans`, and the deployment can correc
 
 ### The reservations
 
-`spawns`, `persistent` and `changes` reserve room in the shared memory for the module alone.
+`spawns`, `persistent` and `changes` reserve room for the module alone.
 Thus what a module gets does not depend on the modules that ran beside it.
 
 - `spawns`: Bridge sets these ids aside at each barrier. They are entities with no component, and they count against `entities`.
 - `persistent`: the share must fit in one piece of what is left of the arena. A reload can state more, but not less.
-- `changes`: each `attach`, `detach` and `destroy` takes 24 bytes, and an attach also takes its value, rounded up to 8 bytes.
+- `changes`: each `attach`, `detach` and `destroy` takes 24 bytes, and an attach also takes its value, rounded up to 8 bytes. `changes_left` of the header tells how many bytes are left: `docs/extern/bridge_abi.h.md`, *bridge_header_t*.
 
 At an unload, the share of the module goes back to the arena, unless a row that stays holds a string in it.
 A string that a component keeps stays good for as long as its row stays.
@@ -876,7 +876,7 @@ A call from a second thread, while the world is busy with a call, gives -1 and w
 3. The observers of what changed run. What they queue applies at the next barrier.
 4. Bridge counts the failures, and gives the lines of the logs to the sink.
 
-The systems of one module run one after another, and each one from its start to its return.
+The systems and the observers of one module run one after another, and each one from its start to its return.
 
 The result is 0 if the phase ran. A system that failed is a record, and does not change the result.
 The result is 2 if the phase ran and a system or an observer gave `BRIDGE_END`: `docs/extern/bridge_abi.h.md`, *BRIDGE_END*.
