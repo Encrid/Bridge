@@ -50,6 +50,8 @@ jobs:
         with:
           python-version: '3.13'
           architecture: ${{ matrix.architecture }}
+      - name: Runner
+        run: python .toolchain/tools/runner.py --target ${{ matrix.target }} | bash -e
       - name: Fetch
         run: python project.py fetch
       - name: Check

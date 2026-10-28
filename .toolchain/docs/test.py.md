@@ -70,13 +70,15 @@ A file with no case gives no group.
 `tried` runs one case:
 
 1. It empties the folder of the case, `<out>/cases/<group>/<number>`, or `<out>/cases/<group>/<number>/<copy>` for a copy.
-2. It adds the variables `{case}` and `{port}`. `{port}` is a new free port.
+2. It adds the variable `{case}`. If a text of the case holds `{port}`, it adds `{port}` too: a new free port.
 3. With `--break`, it uses the false variant of the case.
 4. It writes the files, and fills the folders of the case.
 5. If the case has a helper, it starts the helper, and waits for its text `wait`.
 6. It starts the command, and does the steps of the script.
 7. It writes `stdin` to the command, and waits for the end of the command.
 8. If the case has a helper, it writes `stdin` of the helper, and waits for the end of the helper.
+
+A case that holds no `{port}` gets no port. In such a case, a value of `[variables]` that holds `{port}` stops `test`: `no variable {port} for <text>`.
 
 With `counted`, the command and the helper get the variable `C23_LEAKS`: the path of the folder of the case, with `.leaks` added.
 `tried` runs each command in the root, with a timer of `[test] timeout` seconds.

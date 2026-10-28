@@ -11,7 +11,8 @@ from shared import die, known, located
 
 BUILT = {'malloc': ('take', 'memory', 'result'), 'calloc': ('take', 'memory', 'result'),
          'realloc': ('move', 'memory', None), 'free': ('give', 'memory', '1')}
-PLACES = {'take': re.compile(r'result|\*[1-9][0-9]*'), 'give': re.compile(r'result|\*?[1-9][0-9]*')}
+PLACES = {'take': re.compile(r'result|\*?[1-9][0-9]*|\*[1-9][0-9]*\.[A-Za-z_]\w*'),
+          'give': re.compile(r'result|\*?[1-9][0-9]*')}
 VERBS = {'take': 'take', 'give': 'give back'}
 TESTED = '    if (%s__builtin_memcmp(&(%s), &(typeof(%s)){}, sizeof(%s)))\n        %skept[%d]%s;\n'
 PREFIX = 'c23b_l_'
@@ -85,17 +86,19 @@ def plain(kind):
     return kind.get('desugaredQualType', kind.get('qualType', ''))
 
 
-def declaration(node):
+def declaration(node, typedefs):
     whole = plain(node.get('type', {}))
+    returned = whole.split('(', 1)[0].strip()
     parameters = [plain(one.get('type', {})) for one in node.get('inner', [])
                   if isinstance(one, dict) and one.get('kind') == 'ParmVarDecl']
-    return whole.split('(', 1)[0].strip(), parameters, '...' in whole
+    return typedefs.get(returned, returned), parameters, '...' in whole
 
 
 def found(root, path, tree, names):
-    used, defined, declared, ends = set(), set(), {}, {}
-    hands = {name for name, effects in names.items()
-             if any(act == 'give' and place == 'result' for act, _, place, _ in effects)}
+    used, defined, declared, ends, typedefs = set(), set(), {}, {}, {}
+    callbacks = {name for name, effects in names.items()
+                 if any((act, place) == ('give', 'result') or (act == 'take' and place[0].isdigit())
+                        for act, _, place, _ in effects)}
 
     def walk(node):
         kind, name = node.get('kind'), node.get('name')
@@ -103,8 +106,10 @@ def found(root, path, tree, names):
             name = node.get('referencedDecl', {}).get('name')
             if name in names and rewrite.owned(node.get('range', {}).get('begin', {}), root) == path:
                 used.add(name)
+        elif kind == 'TypedefDecl':
+            typedefs.setdefault(name, plain(node.get('type', {})))
         elif kind == 'FunctionDecl' and name in names:
-            declared.setdefault(name, declaration(node))
+            declared.setdefault(name, declaration(node, typedefs))
             body = any(isinstance(one, dict) and one.get('kind') == 'CompoundStmt' for one in node.get('inner', []))
             if body and rewrite.owned(node.get('loc', {}), root) == path:
                 defined.add(name)
@@ -114,7 +119,7 @@ def found(root, path, tree, names):
             if isinstance(one, dict) and one:
                 walk(one)
     walk(tree)
-    named = used - (defined - hands)
+    named = used - (defined - callbacks)
     return path, sorted(named), declared, {name: ends[name] for name in named & defined}
 
 
@@ -152,7 +157,7 @@ def fitted(name, effects, returned, parameters):
             die('%s gives no result' % name)
         if place in (None, 'result'):
             continue
-        number = int(place.lstrip('*'))
+        number = int(place.lstrip('*').partition('.')[0])
         if number > len(parameters):
             die('%s has no argument %d' % (name, number))
         if place.startswith('*') and not parameters[number - 1].endswith('*'):
@@ -161,12 +166,10 @@ def fitted(name, effects, returned, parameters):
 
 def tested(effect, kinds):
     act, kind, place, _ = effect
-    if place == 'result':
-        value, guard = 'r', ''
-    elif place.startswith('*'):
-        value, guard = '*a%d' % (int(place[1:]) - 1), 'a%d && ' % (int(place[1:]) - 1)
-    else:
-        value, guard = 'a%d' % (int(place) - 1), ''
+    number, _, field = place.lstrip('*').partition('.')
+    value = 'r' if place == 'result' else 'a%d' % (int(number) - 1)
+    guard = value + ' && ' if place.startswith('*') else ''
+    value = ('(*%s)' % value if guard else value) + ('.' + field if field else '')
     return TESTED % (guard, value, value, value, PREFIX, kinds.index(kind), '++' if act == 'take' else '--')
 
 

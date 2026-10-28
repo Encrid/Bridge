@@ -15,6 +15,7 @@ Each resource has a kind. Functions of the code take a resource of a kind, and f
 
 `.toolchain/docs/project.toml.md`, *[leaks]*, gives the keys.
 A function that takes a resource of a pair gives a pointer. The function that gives it back gets that pointer as its first argument.
+A `typedef` of a pointer is a pointer, for example `typedef struct instance *instance_t`.
 
 A take adds 1 when its value is not zero, and a give subtracts 1 when its value is not zero.
 A value is not zero when one of its bytes is not zero. Examples are a pointer that is not null, a number that is not 0, and a handle with a byte that is not 0.
@@ -31,11 +32,26 @@ A function of a kind takes or gives back a resource at a place:
 | `result` | The result of the function. |
 | `<n>` | The argument `n`, counted from 1. |
 | `*<n>` | The value that the argument `n` points to. The count reads it only when the argument is not null. |
+| `*<n>.<field>` | The field `<field>` of the struct that the argument `n` points to. The count reads it only when the argument is not null. |
 
-- A take is at `result` or at `*<n>`. It counts after the call.
+- A take is at `result`, at `*<n>` or at `*<n>.<field>`. It counts after the call.
+- A take at `<n>` is a callback: a function of `src` that a library calls with a resource at the argument `n`. It counts after the call.
 - A give at `<n>` or at `*<n>` reads its value before the call.
-- A give at `result` is a function of `src` that hands its result to a library, for example a callback that a library calls. It counts after the call.
+- A give at `result` is a callback too: a function of `src` that hands its result to a library. It counts after the call.
 - A function can have several places in a kind, in a list, and it can be in several kinds.
+
+For example, a library writes a new texture into the field `texture` of the struct that argument 2 points to.
+Another library calls a function of the module with a new adapter as argument 2:
+
+```toml
+[leaks.kinds.texture]
+takes = { frame_get = "*2.texture" }
+gives = { texture_release = "1" }
+
+[leaks.kinds.adapter]
+takes = { adapter_got = "2" }
+gives = { adapter_release = "1" }
+```
 
 When a call can leave the value at `*<n>` as it was, the code must clear that value before the call.
 The count reads the value only after the call, because before the call the value can have no defined content.
@@ -46,7 +62,7 @@ The count reads the value only after the call, because before the call the value
 
 1. `listed` reads the counted functions and their kinds.
 2. `rewrite.each` gives a syntax tree for each compiled file `.c` of `src`: `.toolchain/docs/rewrite.py.md`.
-3. In each tree, `found` finds the counted functions that the file uses and does not define, and their declarations.
+3. In each tree, `found` finds the counted functions that the file uses, and their declarations. It skips a function that the file defines, but not a callback.
 4. `rewrite.copied` copies `src` and `include` into `<build>/leaks/tree`.
 5. `rewritten` writes the count into each copy of a file that uses a counted function.
 
@@ -67,8 +83,8 @@ Each later use of the name calls the function that counts, also a use of the nam
 No header sees the new name, because the headers come before the block.
 If the last `#include` is in an `#if` that holds only lines of the preprocessor, the block comes after the `#endif` of that `#if`.
 A `#line` after the block keeps the numbers of the lines.
-A give at `result` that the file defines gets its block after the end of its definition.
-Thus each later use of its name, also a use as a pointer, counts the results that it hands to the library.
+A callback that the file defines gets its block after the end of its definition.
+Thus each later use of its name, also a use as a pointer, counts what the callback gets and hands over.
 
 At the end of the file, `#pragma pop_macro` gives each name its first meaning again. Then the file has these parts:
 
@@ -128,7 +144,8 @@ An exemption that excuses no kept resource is a fault, so a case that gives the 
 - A resource whose value of failure is not 0, for example -1, does not fit a kind.
 - A resource that moves by an assignment, for example into an element of an array, is not counted.
 - A function that gives back many resources at once is not counted. Give each resource back, or write an exemption.
-- A give at `result` counts only the uses of its name after its definition in its file. A call of it by the code also counts as a give.
+- A callback counts only the uses of its name after its definition in its file. A call of it by the code also counts.
+- A field that the struct of a place `*<n>.<field>` does not have stops the build of the copy, with the message of the compiler.
 - A struct whose fields are 0 but whose padding is not 0 counts as a resource. The case then keeps a resource that it does not hold.
 
 ## Functions
@@ -138,8 +155,8 @@ An exemption that excuses no kept resource is a fault, so a case that gives the 
 | `listed(config, values)` | Gives the effects of each counted function, and the list of the kinds. An effect is a role, a kind, a place, and whether the function must fit a pointer. It reads the files of `[leaks] with`. |
 | `kinded(names, kind, acts)` | Adds the effects of one table `[leaks.kinds.<kind>]` to `names`. It stops on a key or a place that does not fit. |
 | `plain(kind)` | Gives a type of the syntax tree with each `typedef` replaced, if the dump gives it. A header can use a name that the end of the file does not know. |
-| `declaration(node)` | Gives the type of the result and the types of the parameters of the declaration of a function. |
-| `found(root, path, tree, names)` | Gives the counted functions that a file uses and does not define, and the declaration of each of them. It also gives the end of the definition of each give at `result` that the file uses. |
+| `declaration(node, typedefs)` | Gives the type of the result and the types of the parameters of the declaration of a function. A result whose type is a name of `typedefs` gets the type of that `typedef`. |
+| `found(root, path, tree, names)` | Gives the counted functions that a file uses, as step 3 of *The steps* tells, and the declaration of each of them. It also gives the end of the definition of each callback that the file defines and uses. |
 | `directive(line)` | Gives the name of the directive of a line, an empty text for a blank line, or `None` for a line of code. |
 | `included(text)` | Gives the byte after the last `#include` of a file, or after the `#endif` of the `#if` that holds it. |
 | `fitted(name, effects, returned, parameters)` | Stops if a place of a function does not fit its declaration. |

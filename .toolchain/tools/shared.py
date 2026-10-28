@@ -13,7 +13,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parents[2]
 NAME = re.compile(r'\{([a-z_][a-z0-9_]*)(?::([^{}]*))?\}')
-KEYS = {'step': {'run', 'section', 'text', 'contains', 'copy', 'rename'},
+KEYS = {'step': {'run', 'cwd', 'section', 'text', 'contains', 'copy', 'rename'},
         'case': {'name', 'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders', 'claims', 'false', 'alone'},
         'false': {'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders'},
         'helper': {'run', 'wait', 'stdin', 'claims'},
@@ -98,8 +98,8 @@ def status(code):
     return '%d (0x%08X)' % (code, code & 0xFFFFFFFF)
 
 
-def run(argv, root):
-    done = subprocess.run(argv, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+def run(argv, root, env=None):
+    done = subprocess.run(argv, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
     said = done.stdout.decode('utf-8', 'replace').replace('\r\n', '\n')
     if done.returncode:
         die('%s\n  ended with %s\n%s' % (' '.join(argv), status(done.returncode), said))

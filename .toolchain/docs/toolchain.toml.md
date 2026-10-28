@@ -61,6 +61,8 @@ There are six targets: three operating systems on two types of processor.
 
 `dump` is the command that gives the syntax tree of one source as JSON, for a changed copy of the code.
 It has the variables of the kinds, and `{source}`, the path of the source.
+Thus `{flags}` gives it the flags that the kind adds, for example the folders of the headers of a source.
+
 It does not report a flag that it does not use, since it compiles nothing.
 Its `-o` names a file in the folder `obj`. Without it, zig would leave an empty `a.out` in the root of the project.
 `.toolchain/docs/rewrite.py.md` tells how the tree is used.

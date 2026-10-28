@@ -7,7 +7,7 @@ It holds the parts that the two runs share.
 ## The steps
 
 1. `sources` finds each artifact that the build makes for this target.
-2. It takes each file `.c` of `src` that such an artifact compiles, with the flags of the first such artifact.
+2. It takes each file `.c` of `src` that such an artifact compiles. It uses the flags of the first such artifact and of its kind.
 3. `each` runs the command `[rewrite] dump` of `toolchain.toml` for each file, 8 files at the same time. It gives each syntax tree to the run.
 4. `copied` copies `src` and `include` into `<build>/<run>/tree`. The run then writes its changes into the copies.
 

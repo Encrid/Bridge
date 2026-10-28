@@ -1,6 +1,6 @@
 # .toolchain/project.toml
 
-`.toolchain/project.toml` holds `[project]` and `[test]`.
+`.toolchain/project.toml` holds `[project]`, `[test]` and `[ci]`.
 The other values are in the files of `.toolchain/config`, one file for each concern: `artifacts.toml`, `modules.toml`, `targets.toml`, `kinds.toml`, `sources.toml`, `variables.toml`, `package.toml`, `checks.toml` and `leaks.toml`.
 zig, the compiler flags and the limits of the style are in `.toolchain/toolchain.toml`.
 The tools read every file as one configuration.
@@ -168,16 +168,22 @@ A kind gives the steps that make an artifact.
 | `output` | The name of the file of an artifact. |
 | `steps` | The steps that make an artifact. |
 | `unlinked` | Optional. The steps when one of the files of `link` is missing. |
+| `flags` | Optional. The flags of the compiler that the kind adds to each of its artifacts. They can contain variables, also the variables of the artifact, for example `{manifest}`. |
 
 A step does one of these actions:
 
 | Key | Action |
 | --- | --- |
-| `run` | Runs a command, in the folder of the project. |
+| `run` | Runs a command, in the folder of the project or in the folder `cwd`. |
+| `cwd` | Optional. The folder where `run` runs. It can hold variables. A relative path is from the folder of the project. |
 | `section`, `text` | The name and the text of the custom section that the step writes into a WebAssembly artifact. |
 | `contains` | Makes sure that the bytes of the artifact contain this text. |
 | `copy` | Copies the first file to the second file. |
 | `rename` | Moves the first file to the second file. |
+
+In a step with `cwd`, `{sources}` and each folder of `{include}` are whole paths, and so are the caches of zig.
+Each other relative path of the command is a path from `cwd`.
+For example, a command that runs in the folder of a library can link it by its bare name.
 
 The steps can use these variables of the artifact:
 
@@ -189,7 +195,7 @@ The steps can use these variables of the artifact:
 | `{sources}` | The files that match the patterns of `sources`. |
 | `{defines}` | Each item of `defines`, after `-D`. |
 | `{include}` | Each folder of `include`, after `-I`. |
-| `{flags}` | The items of `flags`. |
+| `{flags}` | The items of `flags` of the kind, then the items of `flags` of the artifact. |
 | `{link}` | The files of `link`. |
 | `{manifest}` | The items of `manifest`. |
 
@@ -244,32 +250,60 @@ A table of `[compose]` has these keys:
 
 | Key | Value |
 | --- | --- |
-| `headers` | Optional. The patterns of the public headers, from the folder of the project. |
+| `from` | Optional. The folder that the patterns of `headers` start from, for example a folder of a source. A relative path is from the folder of the project. `.toolchain/docs/build.py.md`, *The deliverable*, tells its variables. The default is the folder of the project. |
+| `headers` | Optional. The patterns of the public headers, from the folder `from`. The deliverable keeps the path of each header below that folder. |
 | `assets` | Optional. The files from the scratch folder, for example a file that a step of a kind makes. |
 
 With no table, or with empty keys, the deliverable holds only the artifacts and the licences.
+For example, this table puts the headers of a fetched library into the folder `include/sample` of the deliverable:
+
+```toml
+[compose.sample]
+from = "build/third_party/sample/{target}"
+headers = ["include/sample/*.h"]
+```
 
 ## [test]
 
 `docs/contributing/tests.md`, *The settings* gives the keys of `[test]`.
+
+## [ci]
+
+| Key | Value |
+| --- | --- |
+| `needs` | Optional. What the cases need from a runner of the workflows: `display`, `vulkan` or `gl`. The default is an empty list. `.toolchain/docs/runner.py.md` tells what each need gives on each system. |
+
+For example, the cases of a module that opens a window and draws with Vulkan need these:
+
+```toml
+[ci]
+needs = ["display", "vulkan"]
+```
 
 ## [check]
 
 | Key | Value |
 | --- | --- |
 | `unicode` | Optional. The paths of the files that can hold text that is not ASCII. A path can contain `*`. The default is an empty list. |
-| `guides` | Optional. The names of the guides that the project adds to `docs/contributing`, beside the 6 guides of the repository `my_c23_template`, for example `timings.md`. `.toolchain/docs/layout.py.md`, *The paths* allows them. |
+| `guides` | Optional. The names of the guides that the project adds to `docs/contributing`, beside the 8 guides of the repository `my_c23_template`, for example `timings.md`. `.toolchain/docs/layout.py.md`, *The paths* allows them. |
 | `retired` | Optional. A table of the retired words of the project. A key is a retired word, and its value is the word to write, or an empty text. `.toolchain/docs/text.py.md`, *Retired words* tells the check. |
+| `makes` | Optional. A table: each key is a macro whose call makes a public name of its first argument. The value is the end that the name gets, or an empty text. `.toolchain/docs/cover.py.md`, *The public names* tells the check. |
+| `refuse` | Optional. The paths of the lists of the calls that the code must not make, with one name on each line. A path can hold variables. The default is an empty list. `.toolchain/docs/text.py.md`, *Refused calls* tells the check. |
 
 For example:
 
 ```toml
 [check]
 unicode = ["docs/extern/names.md"]
+refuse = ["{sample}/gaps.txt"]
 
 [check.retired]
 utilise = "use"
 whilst = ""
+
+[check.makes]
+SAMPLE_MAKE_TYPE = ""
+SAMPLE_MAKE_DESC = "_desc"
 ```
 
 ## [[style.exception]]

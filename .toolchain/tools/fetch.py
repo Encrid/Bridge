@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 import urllib.request
+import zipfile
 from pathlib import Path
 
 import shared
@@ -31,8 +32,18 @@ def fetched(url, digest, folder):
     if found != digest:
         path.unlink()
         die('%s is not what the maker publishes: its sha256 is %s' % (path.name, found))
-    shutil.unpack_archive(path, folder)
+    unpacked(path, folder)
     path.unlink()
+
+
+def unpacked(path, folder):
+    if path.suffix != '.zip':
+        return shutil.unpack_archive(path, folder)
+    with zipfile.ZipFile(path) as zipped:
+        for member in zipped.infolist():
+            made = Path(zipped.extract(member, folder))
+            if member.external_attr >> 16 & 0o111:
+                made.chmod(made.stat().st_mode | member.external_attr >> 16 & 0o111)
 
 
 def fetch_zig(zig, home):

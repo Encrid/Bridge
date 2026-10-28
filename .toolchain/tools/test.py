@@ -145,7 +145,9 @@ def tried(config, values, outputs, where, case, broken, counted=False):
     folder = Path(values['out']) / 'cases' / where
     shutil.rmtree(folder, ignore_errors=True)
     folder.mkdir(parents=True, exist_ok=True)
-    mine, use = dict(values, case=folder.as_posix(), port=free_port()), made_false(case) if broken else case
+    mine, use = dict(values, case=folder.as_posix()), made_false(case) if broken else case
+    if '{port}' in str(use):
+        mine['port'] = free_port()
     counting = {'C23_LEAKS': folder.as_posix() + '.leaks'} if counted else {}
     placed(use, outputs, mine)
     root, timeout, helper = values['root'], config['test']['timeout'], use.get('helper')

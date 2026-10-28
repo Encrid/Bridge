@@ -82,7 +82,7 @@ A text of a case can contain variables, for example `{out}`. `test` replaces eac
 | Variable | Value |
 | --- | --- |
 | `{case}` | The folder of the case. |
-| `{port}` | A free port of this machine. Each case gets a new port. |
+| `{port}` | A free port of this machine, for a case that holds `{port}` in a text. Each such case gets a new port. |
 | `{root}` | The folder of the project. |
 | `{out}` | The output folder of the target. It holds the artifacts. |
 | `{target}` | The name of the target. |
