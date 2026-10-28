@@ -47,6 +47,8 @@ int config_check_settings(config_seed_t *seed);
 
 int config_place_text(config_seed_t *seed);
 
+void config_keep_text(const config_seed_t *seed);
+
 int config_seed_setting(config_seed_t *seed, const bridge_setting_t *s);
 
 int config_seed_bool(config_seed_t *seed, const schema_field_t *field,
