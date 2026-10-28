@@ -13,7 +13,7 @@
 extern "C" {
     #endif
 
-constexpr uint32_t BRIDGE_ABI = 1;
+constexpr uint32_t BRIDGE_ABI = 2;
 
 constexpr int32_t BRIDGE_END = INT32_MAX;
 

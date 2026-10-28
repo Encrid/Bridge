@@ -23,7 +23,7 @@ extern "C" {
 
 typedef struct bridge_world bridge_world_t;
 
-constexpr uint32_t BRIDGE_HOST_ABI = 1;
+constexpr uint32_t BRIDGE_HOST_ABI = 2;
 
 static_assert(sizeof(void *) == 8);
 static_assert(sizeof(size_t) == 8);
