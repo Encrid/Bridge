@@ -69,7 +69,7 @@ static int check_spans(const module_t *m, backend_err_t *err)
     if (need <= m->spans_len)
         return (0);
     return (module_fail(err, "its spans of %u bytes do not hold a "
-        "column_base of %u components by %u tables, which with its queries "
+        "column_base of %u types by %u tables, which with its queries "
         "is %llu bytes", m->spans_len, m->declared_count, tables,
         (unsigned long long)need));
 }
