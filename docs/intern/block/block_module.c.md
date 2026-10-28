@@ -41,12 +41,14 @@ The header is the `bridge_header_t` at offset 0 of the private memory: `docs/ext
 | `owned` | After them: the count of owned ranges, then the ranges of the shared arena the module may write. |
 | `arena_lo`, `arena_hi` | The bounds of the shared arena that the module may read. |
 | `entity_index`, `entities` | The offset of the entity index, and `[budget] entities`. |
+| `changes_left` | `queue_room` less `queue_len`, by `block_write_room`. |
 
 Each offset is from the start of the private memory, except `entity_index`.
 The entity index is the one thing in the shared memory that a module reads and cannot find from other values.
 `block_get_offset` gives its offset: `docs/intern/block/block.h.md`, *The regions of the memories*.
 `barriers`, `place`, `system` and `observer` are written before each dispatch: `src/schedule/schedule_dispatch.c`.
 `log_level` is written when the private memory is made: `src/module/module_call.c`.
+`changes_left` is written again after each change and at each barrier: `docs/intern/block/block.h.md`, *The regions of the memories*.
 
 The span region holds the queries, the lists of the observers, `column_base`, `kept`, the capability table and the spans.
 Its length is the `spans` of the module, and how it is divided is the library's.
