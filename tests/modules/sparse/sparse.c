@@ -5,6 +5,7 @@
 */
 #include "sparse.h"
 #include "idle.h"
+#include "on_destroy.h"
 
 static void add_changes(const test_api_t *api)
 {
@@ -76,8 +77,8 @@ TEST(init)
 {
     nsparse_a = TEST_COMPONENT(api, "st:A", a_t, BRIDGE_DELETE,
         BRIDGE_TABLE);
-    nsparse_s = TEST_COMPONENT(api, "st:S", s_t, BRIDGE_DELETE,
-        BRIDGE_SPARSE_SET);
+    nsparse_s = TEST_DECLARE_AS(api, BRIDGE_STRUCT, "st:S", s_t,
+        BRIDGE_DELETE, BRIDGE_SPARSE_SET, ON_DESTROY);
     add_changes(api);
     add_walks(api);
 #if !defined(BIG) && !defined(FAT)

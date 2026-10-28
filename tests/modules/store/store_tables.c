@@ -58,7 +58,8 @@ static void declare_kind(const test_api_t *api, uint32_t k)
         bridge_declaration_t, test_put(api, NAMES[k], len), len,
         BRIDGE_STRUCT, sizeof(t_t), alignof(t_t),
         test_put(api, t_t_desc, sizeof(t_t_desc) - 1),
-        sizeof(t_t_desc) - 1, BRIDGE_DELETE, BRIDGE_TABLE));
+        sizeof(t_t_desc) - 1, BRIDGE_DELETE, BRIDGE_TABLE,
+        BRIDGE_ON_DESTROY_REMOVE));
 }
 
 void nstore_add_tables(const test_api_t *api)

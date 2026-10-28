@@ -89,5 +89,8 @@ BRIDGE_EXPORT(reload) int reload(void)
 
 BRIDGE_EXPORT(shutdown) int shutdown(void)
 {
+#ifdef SAY
+    BRIDGE_LOG(BRIDGE_LOG_INFO, "shutdown", WIDE, 0);
+#endif
     return (0);
 }

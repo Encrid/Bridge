@@ -19,5 +19,6 @@ TEST(reload)
 
 TEST(shutdown)
 {
+    say(api, "shutdown wrote this", 3, 0);
     return (0);
 }

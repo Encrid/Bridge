@@ -4,6 +4,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include <stdio.h>
+#include <string.h>
 
 #include "storage_test.h"
 
@@ -27,7 +28,8 @@ static const storage_test_variant_t SPARSE_DROPS[] = {
     { "sparsedelete", SPARSE_PATH, BRIDGE_DELETE },
     { "sparsenone", SPARSE_PATH, BRIDGE_DELETE },
     { "sparsebad1", SPARSEBAD1_PATH, BRIDGE_DELETE },
-    { "sparsebad2", SPARSEBAD2_PATH, BRIDGE_DELETE }
+    { "sparsebad2", SPARSEBAD2_PATH, BRIDGE_DELETE },
+    { "sparsehusk", SPARSEHUSK_PATH, BRIDGE_DELETE }
 };
 
 static int join_sparse(storage_test_t *t, const char *path, uint32_t failures)
@@ -66,6 +68,17 @@ enum storage_test_end storage_test_sweep_beside_sparse(storage_test_t *t)
     return (STORAGE_TEST_DONE);
 }
 
+static enum storage_test_end husk_sparse(storage_test_t *t,
+    const storage_test_variant_t *v)
+{
+    storage_test_drop(t, "st:A", v->policy);
+    storage_test_say_alive(t, 7);
+    storage_test_drop(t, "st:S", BRIDGE_STRIP);
+    storage_test_say_alive(t, 7);
+    storage_test_run(t, "look");
+    return (STORAGE_TEST_DONE);
+}
+
 enum storage_test_end storage_test_drop_sparse(storage_test_t *t)
 {
     constexpr size_t count = sizeof(SPARSE_DROPS) / sizeof(*SPARSE_DROPS);
@@ -75,6 +88,8 @@ enum storage_test_end storage_test_drop_sparse(storage_test_t *t)
     if (join_sparse(t, v->path, 1))
         return (STORAGE_TEST_DONE);
     storage_test_run(t, "attach_b_half");
+    if (!strcmp(t->what, "sparsehusk"))
+        return (husk_sparse(t, v));
     storage_test_drop(t, "st:S", v->policy);
     printf("the entity that was in the set alone is %s\n",
         storage_is_alive(t->w->storage, (uint64_t)1 << 32 | 7) ? "alive" :

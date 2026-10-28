@@ -14,19 +14,24 @@
         (api)->attach(api, id, slot, \
             test_lend(api, &(value), sizeof(value)))
 
-    #define TEST_DECLARE(api, kind, name, T, on_unload, storage) \
+    #define TEST_DECLARE_AS(api, kind, name, T, on_unload, storage, \
+        on_destroy) \
         (api)->declare(api, TEST_STATE(api, bridge_declaration_t, \
             test_put(api, name, sizeof(name) - 1), sizeof(name) - 1, \
             kind, sizeof(T), alignof(T), \
             test_put(api, T##_desc, sizeof(T##_desc) - 1), \
-            sizeof(T##_desc) - 1, on_unload, storage))
+            sizeof(T##_desc) - 1, on_unload, storage, on_destroy))
+    #define TEST_DECLARE(api, kind, name, T, on_unload, storage) \
+        TEST_DECLARE_AS(api, kind, name, T, on_unload, storage, \
+            BRIDGE_ON_DESTROY_REMOVE)
     #define TEST_COMPONENT(api, name, T, on_unload, storage) \
         TEST_DECLARE(api, BRIDGE_STRUCT, name, T, on_unload, storage)
 
     #define TEST_DECLARE_TAG(api, name, on_unload, storage) \
         (api)->declare(api, TEST_STATE(api, bridge_declaration_t, \
             test_put(api, name, sizeof(name) - 1), sizeof(name) - 1, \
-            BRIDGE_TAG, 0, 1, 0, 0, on_unload, storage))
+            BRIDGE_TAG, 0, 1, 0, 0, on_unload, storage, \
+            BRIDGE_ON_DESTROY_REMOVE))
 
     #define TEST_ADD_SYSTEM(api, name, phase, terms, count, changes, \
         change_count, before, before_count) \

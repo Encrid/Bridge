@@ -25,6 +25,8 @@ BRIDGE_EXPORT(init) int init(void)
         BRIDGE_TABLE);
     BRIDGE_DECLARE(BRIDGE_STRUCT, "game:pair_t", pair_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
+    BRIDGE_DECLARE(BRIDGE_BITMASK, "game:mask64_t", mask64_t, BRIDGE_STRIP,
+        BRIDGE_TABLE);
 #endif
     settings = BRIDGE_COMPONENT("game:Settings", settings_t, BRIDGE_DELETE,
         KEPT);

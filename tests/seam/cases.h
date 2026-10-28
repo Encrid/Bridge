@@ -61,6 +61,14 @@ static const char *const TEST_GAME[] = {
     "game:Marked"
 };
 
+static const char *const TEST_TICK_LOSS[] = {
+    "game:Tick.n"
+};
+
+static const bridge_setting_t TEST_STRAY[] = {
+    { .key = "stray", .kind = BRIDGE_INT, .v = { .i = 1 } }
+};
+
 void test_hear_counts(void *ud, const bridge_record_t *r);
 
 test_counts_t *test_get_counts(const host_t *h);
@@ -167,6 +175,7 @@ void test_share(host_t *h);
 void test_mirror(host_t *h);
 void test_declare_other_layout(host_t *h);
 void test_declare_other_storage(host_t *h);
+void test_declare_other_on_destroy(host_t *h);
 void test_declare_ungranted(host_t *h);
 void test_reach_direct(host_t *h);
 
@@ -234,6 +243,8 @@ void test_chain(host_t *h);
 void test_take_reserved_name(host_t *h);
 void test_run_at_once(host_t *h);
 void test_run_in_turn(host_t *h);
+void test_observe_in_turn(host_t *h);
+void test_run_own_in_turn(host_t *h);
 void test_enter_from_foreign_thread(host_t *h);
 void test_pin(host_t *h);
 void test_call_from_wrong_thread(host_t *h);
@@ -279,6 +290,7 @@ void test_reload_beyond_reach(host_t *h);
 void test_stop_by_spans(host_t *h);
 
 void test_drain_failed_start(host_t *h);
+void test_shut_failed_load(host_t *h);
 
 void test_keep_after_failed_reload(host_t *h);
 
@@ -315,6 +327,7 @@ void test_reload_settings_layout(host_t *h);
 void test_keep_two_shares(host_t *h);
 
 void test_keep_for_another(host_t *h);
+void test_keep_text_refused(host_t *h);
 
 void test_seed_failed_load(host_t *h);
 void test_config_refused_under_fail(host_t *h);
@@ -345,6 +358,7 @@ void test_order_observers(host_t *h);
 void test_reorder_observers(host_t *h);
 void test_queue_too_few(host_t *h);
 void test_queue_none(host_t *h);
+void test_read_room(host_t *h);
 void test_leave_phase_unmapped(host_t *h);
 void test_map_phase(host_t *h);
 void test_map_phase_nowhere(host_t *h);
@@ -372,10 +386,15 @@ void test_end_by_init(host_t *h);
 void test_end_by_observer(host_t *h);
 void test_end_at_a_reload(host_t *h);
 void test_unload_keeper(host_t *h);
+void test_make_husk(host_t *h);
+void test_reload_husk(host_t *h);
+void test_unload_husk(host_t *h);
+void test_crowd_husk(host_t *h);
 void test_unload_declarer(host_t *h);
 void test_destroy_loaded(host_t *h);
 void test_unload_nobody(host_t *h);
 void test_time_out_shutdown(host_t *h);
+void test_time_out_failed_load(host_t *h);
 void test_take_slot(host_t *h);
 void test_reload_ticker(host_t *h);
 void test_reload_tag(host_t *h);
@@ -392,6 +411,7 @@ void test_reload_group_dup(host_t *h);
 void test_reload_group_ghost(host_t *h);
 void test_reload_group_stop(host_t *h);
 void test_reload_group_hold(host_t *h);
+void test_reload_group_shut(host_t *h);
 void test_grow_share(host_t *h);
 void test_hoard_shares(host_t *h);
 void test_repair(host_t *h);
@@ -406,6 +426,7 @@ void test_scan_shares(host_t *h);
 void test_reload_nothing(host_t *h);
 void test_state_plain_timeout(host_t *h);
 void test_reload_plain(host_t *h);
+void test_reload_plain_loss(host_t *h);
 void test_configure(host_t *h);
 void test_spoil_config(host_t *h);
 void test_misname_setting(host_t *h);
