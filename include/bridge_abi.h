@@ -195,8 +195,9 @@ typedef struct {
     uint32_t owned;
     uint32_t arena_lo;
     uint32_t arena_hi;
+    uint32_t changes_left;
 } bridge_header_t;
-static_assert(sizeof(bridge_header_t) == 116);
+static_assert(sizeof(bridge_header_t) == 120);
 static_assert(alignof(bridge_header_t) == 4);
 static_assert(offsetof(bridge_header_t, abi) == 0);
 static_assert(offsetof(bridge_header_t, scratch) == 4);
@@ -227,6 +228,7 @@ static_assert(offsetof(bridge_header_t, kind) == 100);
 static_assert(offsetof(bridge_header_t, owned) == 104);
 static_assert(offsetof(bridge_header_t, arena_lo) == 108);
 static_assert(offsetof(bridge_header_t, arena_hi) == 112);
+static_assert(offsetof(bridge_header_t, changes_left) == 116);
 
 typedef struct {
     uint32_t spans;
