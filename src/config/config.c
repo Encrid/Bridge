@@ -57,7 +57,7 @@ static int seed_all(config_seed_t *seed)
     int refused = 0;
     uint32_t i = 0;
 
-    seed->row = calloc(1, c->size);
+    seed->row = calloc(1, (size_t)c->size + seed->m->text_room);
     if (!seed->row)
         return (config_refuse(seed, "out of memory: there was none for "
             "the row of its settings"));
@@ -66,6 +66,7 @@ static int seed_all(config_seed_t *seed)
         i++;
     }
     if (!refused) {
+        config_keep_text(seed);
         storage_give_single(seed->w->storage, c->type, seed->row, c->size);
         seed->m->config = c;
     }

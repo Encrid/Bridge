@@ -67,3 +67,9 @@ int config_place_text(config_seed_t *seed)
     m->arena_left -= total;
     return (0);
 }
+
+void config_keep_text(const config_seed_t *seed)
+{
+    memcpy(seed->w->shared + seed->m->text_at, seed->row + seed->c->size,
+        seed->text_used);
+}
