@@ -108,9 +108,14 @@ Bridge writes it. The module writes only `scratch_used` and `ring_head`.
 | `owned` | Where the owned ranges of the module begin: a count, and then that many ranges of the shared arena. |
 | `arena_lo` | The low bound of the shared arena that the module can read, in the shared memory. |
 | `arena_hi` | The high bound of the shared arena that the module can read, in the shared memory. |
+| `changes_left` | What is left of the room of `changes` until the next barrier, in bytes: `docs/extern/bridge.h.md`, *The reservations*. |
 
 Bridge writes `barriers`, `place`, `system` and `observer` before each dispatch.
 `system` is `0xFFFFFFFF` and `observer` is 0 while no system runs, for example in `init`.
+
+Bridge writes `changes_left` when the instance starts, after each change that the module queues, and at each barrier.
+A module can read it before an `attach`, a `detach` or a `destroy`.
+Thus the module can do a change that does not fit after the next barrier, and its invocation does not fail.
 
 The arrays from `column_base` to `kind` make the capability table.
 A module names a cell by a coordinate: a slot, a place, and an offset in the cell.
@@ -214,15 +219,16 @@ It gets `at`: where a `bridge_declaration_t` is, in the scratch arena. It gives 
 | `desc_len` | How many bytes the descriptor has, with no zero at its end. |
 | `on_unload` | What the last unload of the type does to its entities: an item of `enum bridge_on_unload`. |
 | `storage` | The storage layout of the type: an item of `enum bridge_storage`. |
+| `on_destroy` | What the destroy of an entity does to the component: an item of `enum bridge_on_destroy`. |
 
-Zero in `kind`, `on_unload` or `storage` is unset. `declare` refuses it, and each value that is not an item.
+Zero in `kind`, `on_unload`, `storage` or `on_destroy` is unset. `declare` refuses it, and each value that is not an item.
 The name of a type has a namespace: `game:Position`. *Grants* tells which namespaces a module can declare.
 `docs/extern/bridge_schema.h.md` tells how to write a descriptor.
 Bridge lays the type out from its descriptor, and refuses a type whose `size` or `align` is different.
 
 `declare` is idempotent. The first module that declares a type makes it.
 A later module gets a slot of its own for the same type.
-Each module that declares a type states the same descriptor, the same kind and the same storage layout.
+Each module that declares a type states the same descriptor, the same kind, the same storage layout and the same `on_destroy`.
 `declare` refuses a different one, but at a reload: *When a type changes*.
 Bridge compares the descriptors byte for byte: `docs/extern/bridge_schema.h.md`, *Layouts*.
 
@@ -254,12 +260,29 @@ A toggled tag gets where its column would begin, and a direct-indexed tag where 
 | --- | --- |
 | `BRIDGE_STRIP` | The entity stays, also with nothing on it. |
 | `BRIDGE_SWEEP` | Bridge destroys an entity with nothing left on it. |
-| `BRIDGE_DELETE` | Bridge destroys each entity that carried the component, with each other component on it. |
+| `BRIDGE_DELETE` | Bridge destroys each entity that carried the component, as *destroy* does. |
 
 The policy of the module that unloads last applies. A component that another loaded module declares stays, with its rows.
 A strip takes no memory and does not fail. A strip that has no room to join two tables leaves the two: `docs/extern/bridge.h.md`, *An unload*.
 An id of an entity that a sweep or a delete destroyed is stale: *bridge_entity_t*.
 An entity that must outlive the unload of another module carries a component of the module that holds it.
+
+A husk whose last kept component goes is destroyed, whatever the policy: *destroy*, *A husk*.
+A delete leaves a husk where another loaded module keeps a component of `BRIDGE_ON_DESTROY_KEEP` on the entity.
+Without room for the husk, the entity loses only the component, as with `BRIDGE_STRIP`: `docs/extern/bridge.h.md`, *An unload*.
+
+## bridge_on_destroy
+
+`enum bridge_on_destroy` tells what the destroy of an entity does to the component.
+
+| Item | The component |
+| --- | --- |
+| `BRIDGE_ON_DESTROY_REMOVE` | Goes with the entity. |
+| `BRIDGE_ON_DESTROY_KEEP` | Stays, and keeps the entity as a husk until a module detaches it: *destroy*, *A husk*. |
+
+A singleton is never destroyed, thus it states `BRIDGE_ON_DESTROY_REMOVE`.
+A module keeps in a component of `BRIDGE_ON_DESTROY_KEEP` what it must release when the entity goes, for example an object of a GPU.
+Its `shutdown` releases what each of these components holds, because an unload and `bridge_destroy` remove them.
 
 ## Storage layouts
 
@@ -369,7 +392,7 @@ If `before_count` is 0, Bridge does not read `before`.
 
 An observer of A and not B hears an entity with A enter when a module detaches B, and leave when a module attaches B.
 A write in place raises no event. To have a new value heard, attach it.
-An entity that a phase made and destroyed raises nothing.
+An entity that a phase made and destroyed raises nothing, unless it stays as a husk: *A husk*.
 An entity that loses a component and gets it again in one phase raises `BRIDGE_ON_ATTACH`, since it carries a new value.
 A detach of what is not there, and a change of a dead id, raise nothing.
 
@@ -503,6 +526,7 @@ It holds where the column of the type is in that table: 0 if the table does not 
 An entity is an id: a `uint64_t` with an index in its low 32 bits and a generation in its high 32 bits.
 An id outlives the row behind it, and a row does not outlive a barrier.
 A new entity can take the index of a destroyed one, with another generation. Thus the old id names nothing.
+A husk keeps its index and its generation until it goes: *destroy*, *A husk*.
 `entity_index` of the header is where the entity index is, in the shared memory: `entities` items of `bridge_entity_t`.
 
 | Field | Content |
@@ -547,6 +571,7 @@ The entity index shows it from that barrier on too. Before it, the generation th
 ## destroy
 
 `destroy` queues the destruction of the entity `id`. The barrier destroys it, with each component on it.
+A component of `BRIDGE_ON_DESTROY_KEEP` stays, and keeps the entity as a husk: *A husk*.
 A destroyed entity stays readable for the rest of the phase.
 
 The module must be able to write a component that the entity carries, or the entity must carry nothing.
@@ -554,6 +579,21 @@ The barrier checks it against what the entity carried before that barrier.
 An id that a module holds and that `spawn` has not handed out yet cannot be destroyed.
 Else the entity stays as it was, a record counts it, and the module fails at that barrier: `docs/extern/bridge.h.md`, *Failures*.
 A destroy of a dead id is nothing.
+
+### A husk
+
+A husk is an entity that a destroy left with its components of `BRIDGE_ON_DESTROY_KEEP`, and nothing else.
+Only a module that can write a component that it keeps can change it.
+Thus a module can release what it holds for an entity, after the app destroyed the entity.
+
+- The barrier of the destroy removes each other component. An observer hears `BRIDGE_ON_LEAVE` when the husk no longer matches its terms, and `BRIDGE_ON_ENTER` when the husk matches them and the entity did not.
+- The id names the husk, but only for its kept components. The id stays good, since the husk keeps its generation.
+- An attach to a husk, and a destroy of a husk, is nothing, as for a dead id.
+- A module that can write a kept component can detach it.
+- The barrier that applies the detach of the last kept component destroys the husk. Then a new entity can take its index.
+- A query that names a kept component finds the husk. A query of the other components does not, since the husk carries nothing else.
+- A husk counts among the entities of the world until it goes.
+- The barrier moves the kept components of a husk to another table. Thus a destroy needs room in `tables` and `columns`: `docs/extern/bridge.h.md`, *Running out*.
 
 ## attach and detach
 
@@ -628,6 +668,7 @@ A reload can also move a component to another storage layout:
 | A singleton, to any other | The reload fails: no entity can carry the value. |
 | A toggle, to any other | Bridge carries a row that is off as the others. That is a loss, named by the component alone. |
 
+A reload that states another `on_destroy` for a type fails, also for the one declarer: *bridge_on_destroy*.
 No observer hears a move, since no entity gains or loses a component.
 While the rows move, the type counts two times against `types`, and needs room in two places. Without the room, the reload fails.
 For a change that no rule covers, declare a component of a new name, and copy the values with a system.
@@ -668,6 +709,8 @@ Only a system names a phase, so a reason about a phase has no form for an observ
 - `it may not declare '<type>': that is another namespace's, and no grant names it`
 - `type '<type>': on_unload is unset`
 - `type '<type>': its storage layout is unset`
+- `type '<type>': on_destroy is unset`
+- `type '<type>' is a singleton, and a singleton states BRIDGE_ON_DESTROY_REMOVE`
 - `type '<type>' is one more than [budget] types of <count>`
 - `type '<type>' is one more than [budget] sparse_sets of <count>`
 - `type '<type>' is one more than [budget] direct_indexed of <count>`
@@ -675,6 +718,7 @@ Only a system names a phase, so a reason about a phase has no form for an observ
 - `type '<type>' is direct-indexed, and [budget] columns of <bytes> bytes has no room for a cell of <bytes> bytes for each of <count> entities`
 - `type '<type>' has another component layout here: fingerprint <fingerprint>, and it was declared with <fingerprint>`
 - `type '<type>' is stated as <layout> here, and it was declared as <layout>`
+- `type '<type>' states on_destroy <item> here, and it was declared with <item>`
 - `out of memory: there was none for what it declares`
 - `out of memory: there was none for type '<type>'`
 - `out of memory: there was none for the descriptor of '<type>'`

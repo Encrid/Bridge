@@ -491,12 +491,12 @@ The author of a module states a value for `spans`, and the deployment can correc
 
 ### The reservations
 
-`spawns`, `persistent` and `changes` reserve room in the shared memory for the module alone.
+`spawns`, `persistent` and `changes` reserve room for the module alone.
 Thus what a module gets does not depend on the modules that ran beside it.
 
 - `spawns`: Bridge sets these ids aside at each barrier. They are entities with no component, and they count against `entities`.
 - `persistent`: the share must fit in one piece of what is left of the arena. A reload can state more, but not less.
-- `changes`: each `attach`, `detach` and `destroy` takes 24 bytes, and an attach also takes its value, rounded up to 8 bytes.
+- `changes`: each `attach`, `detach` and `destroy` takes 24 bytes, and an attach also takes its value, rounded up to 8 bytes. `changes_left` of the header tells how many bytes are left: `docs/extern/bridge_abi.h.md`, *bridge_header_t*.
 
 At an unload, the share of the module goes back to the arena, unless a row that stays holds a string in it.
 A string that a component keeps stays good for as long as its row stays.
@@ -519,8 +519,8 @@ A setting fills a field by the type of the field:
 | A `bool` | `BRIDGE_BOOL`. |
 | An integer or a `char` | `BRIDGE_INT`, if the field holds the value. |
 | A `float` or a `double` | `BRIDGE_FLOAT`, or `BRIDGE_INT`. |
-| An enum | `BRIDGE_INT` that the enum holds, or `BRIDGE_STRING`: the name of a constant of the enum. |
-| A bitmask | `BRIDGE_INT` that the bitmask holds. |
+| An enum | `BRIDGE_INT`: the value of a constant of the enum. Or `BRIDGE_STRING`: the name of a constant of the enum. |
+| A bitmask | `BRIDGE_INT` whose each bit is a bit of a constant of the bitmask. No setting sets bit 63, because `BRIDGE_INT` is signed and a value below 0 is refused. |
 | An array of `char` | `BRIDGE_STRING`: the bytes and a zero after them, if they fit. |
 | A `bridge_text_t` | `BRIDGE_STRING`: Bridge copies the text into the share of the module in the persistent arena. |
 | A struct, or another array | No setting fills it. |
@@ -687,6 +687,8 @@ Else the sink gets a record that tells why: *The deployment*.
 3. Bridge destroys the modules, the storage, the threads and the backends.
 4. Bridge closes the library of each backend. It first pins a library whose backend does not state `BACKEND_UNLOAD`. That library stays, and the next world uses it.
 
+Step 3 destroys each husk with the storage. Thus a `shutdown` releases what its module keeps in its components of `BRIDGE_ON_DESTROY_KEEP`.
+
 The result is 0 when the world is gone, and for a null `b`.
 The result is 1 if a pinned module is loaded and the call comes from another thread, or if the sink calls it.
 Then Bridge destroys nothing, and the world stays whole. Call again from the thread that loaded the module, after the sink returns.
@@ -705,7 +707,7 @@ A host that ignores the result can lose a world that stays.
 2. Bridge makes a record of the module, takes its share of the arena, and sets ids aside.
 3. The backend compiles the image, and makes an instance with the memories that the module imports.
 4. Bridge calls `init` under `init_timeout`. `init` declares the types, and registers the systems and the observers.
-5. Bridge finds the export of each system and observer, and `shutdown` and `reload`.
+5. Bridge finds the export of `shutdown`, then of each system and observer, and of `reload`.
 6. The load fails if the orders make a cycle, or if two systems conflict and nothing orders them. `docs/extern/bridge_abi.h.md`, *Conflicts* tells which order counts.
 7. Bridge writes the settings into the component that `config` names.
 8. A barrier applies what `init` queued, and writes the spans of the module.
@@ -714,6 +716,9 @@ The result is 0 if the module is loaded, its `init` gave 0, and the world can ru
 From the sink, the result is 1, with no record.
 A refusal of the config stops nothing. A failure after the module exists stops the world, if `on_error` is `BRIDGE_FAIL`.
 A load that fails leaves the storage as it was.
+
+If the load fails after `init` gave 0, Bridge calls `shutdown` under `shutdown_timeout` before it destroys the instance.
+Thus the module stops what its `init` started. A load that fails because `shutdown` is missing calls none.
 
 The module comes after the modules that loaded before it. A barrier applies what was queued in the order the calls ran.
 When two modules conflict, the order of the loads decides which load fails. The record names the two systems.
@@ -733,6 +738,9 @@ When two modules conflict, the order of the loads decides which load fails. The 
 4. Bridge releases the ids that it held ready for the module.
 5. The share of the module goes back to the arena, unless a row that stays holds a string in it.
 6. The backend destroys the instance and the image, and a barrier follows.
+
+Step 3 removes the components of `BRIDGE_ON_DESTROY_KEEP` of the module, also from each husk.
+Thus `shutdown` releases what the module keeps in them: `docs/extern/bridge_abi.h.md`, *bridge_on_destroy*.
 
 The result is 0 if the module was loaded. Else the result is 1, with a record.
 From the sink, the result is 1, with no record.
@@ -772,10 +780,13 @@ A refused rebuild records `no module of the group is reloaded: <reason>`. A list
 From the sink, the result is 1, with no record.
 
 A reload keeps the components, their rows and the entities. Bridge does not write the settings again.
+
+A husk stays through a reload. The new instance finds its husks with a query of its kept components.
 A component that a new instance does not declare goes, as at an unload.
 A new instance runs under the new config, but `persistent` can grow and not shrink.
 If a new config states fewer `spawns`, the module keeps that many ready ids. Bridge takes the others back at the next barrier.
 
+When a reload fails, Bridge calls `shutdown` of each new instance whose `reload` gave 0, before it destroys that instance.
 With `BACKEND_SIDE_BY_SIDE`, a reload that fails keeps the old instance running, as it was.
 Without it, a single reload that fails stops the module, and keeps what it declared. A later reload brings it back.
 
@@ -865,7 +876,7 @@ A call from a second thread, while the world is busy with a call, gives -1 and w
 3. The observers of what changed run. What they queue applies at the next barrier.
 4. Bridge counts the failures, and gives the lines of the logs to the sink.
 
-The systems of one module run one after another, and each one from its start to its return.
+The systems and the observers of one module run one after another, and each one from its start to its return.
 
 The result is 0 if the phase ran. A system that failed is a record, and does not change the result.
 The result is 2 if the phase ran and a system or an observer gave `BRIDGE_END`: `docs/extern/bridge_abi.h.md`, *BRIDGE_END*.
@@ -1047,6 +1058,8 @@ These reasons of `did not load` tell that Bridge cannot write the settings of th
 - `its setting '<key>' is <number>, which the field it names cannot hold`
 - `its setting '<key>' is <number>, which the enum of the field it names cannot hold`
 - `its setting '<key>' is <number>, which the bitmask of the field it names cannot hold`
+- `its setting '<key>' is <number>, which is no constant of the enum of the field it names`
+- `its setting '<key>' is <number>, which has a bit that no constant of the bitmask of the field it names has`
 - `its setting '<key>' is '<text>', which the enum of the field it names has no constant for`
 - `its setting '<key>' is <bytes> bytes of text, and the field it names holds <bytes> with the zero that ends it`
 - `its settings hold <bytes> bytes of text, and its persistent share has <bytes> left`
@@ -1080,7 +1093,7 @@ The reason is a reason of `did not load`, or one of these:
 
 ### An unload
 
-`bridge_unload`, `bridge_reload` and `bridge_destroy` write this record when `shutdown` fails:
+`bridge_load`, `bridge_unload`, `bridge_reload` and `bridge_destroy` write this record when `shutdown` fails:
 
 - `module '<module>': <reason>; its teardown continues`
 
@@ -1088,6 +1101,7 @@ The reason is a reason of `did not load`, or one of these:
 
 - `module '<module>' is unloaded and its share of the persistent arena, <bytes> bytes, stays: '<component>' holds a string in it, in this many rows: <count>`
 - `'<component>' is stripped, and <count> rows stay in a second table of their archetype: [budget] columns of <bytes> bytes has no room to join them to the first`
+- `'<component>' is deleted, and <count> entities lose only it: [budget] tables of <count> or [budget] columns of <bytes> bytes has no room for their husks`
 
 A share that stays keeps its room, thus Bridge can refuse a later load for want of room.
 A share that stays goes back at a later unload, once no row that stays holds a string in it.

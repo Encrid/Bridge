@@ -19,6 +19,7 @@ The value is copied at the call, since the scratch arena that holds it is reset 
 
 A module that stated `BRIDGE_NONE` for `changes` has a queue with no room, and each change it asks for is refused.
 `queue_change` refuses a change when the rest of the queue has no room for it: the changes of the module are used up.
+After each change, `queue_change` calls `block_write_room`, so the header tells the module what is left: `docs/extern/bridge_abi.h.md`, *bridge_header_t*.
 
 The first change of a turn puts a mark in the queue: where the changes of that turn begin.
 The barrier uses these marks to keep the order of the calls: `docs/intern/storage/storage_runs.h.md`, *The order of the queues*.
@@ -42,6 +43,6 @@ No other component takes the id 0.
 | --- | --- | --- |
 | `get_scratch` | `src/abi/abi_entry.h` | The `len` bytes at `at` in the scratch arena of the module, or nullptr if they do not lie in it. |
 | `mark_turn` | `src/abi/abi_entry.h` | Marks where the changes of the turn in progress begin in the queue, at the first change of that turn. Refuses with a record if the marks have no room. |
-| `queue_change` | `src/abi/abi_entry.h` | Adds a change to the queue of the module, with a copy of its value after it. 1 if refused. |
+| `queue_change` | `src/abi/abi_entry.h` | Adds a change to the queue of the module, with a copy of its value after it, and writes what is left into the header. 1 if refused. |
 | `is_stated` | `src/abi/abi_entry.h` | Whether the system or the observer that runs states the component among its changes. True for a lifecycle call. |
 | `check_owner` | `src/abi/abi_entry.h` | Refuses a change of a singleton that names an entity, and a change of anything else that names none. 1 if refused. |

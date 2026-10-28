@@ -9,9 +9,9 @@ For each component, its author states at `declare` what becomes of the entities 
 
 | Policy | What happens |
 | --- | --- |
-| `strip` | The component is removed. The entity stays, even with nothing left on it. |
+| `strip` | The component is removed. The entity stays, even with nothing left on it, but a husk with nothing left goes. |
 | `sweep` | The component is removed. An entity left with no component is destroyed. |
-| `delete` | Each entity that has the component is destroyed, with all that is on it. |
+| `delete` | Each entity that has the component is destroyed, as a destroy does. |
 
 No single answer fits, so the author states it.
 An entity has no owner, because several modules put components on one, so it cannot die with the module that spawned it.
@@ -20,7 +20,17 @@ But the author knows what the component is: an attribute of something that exist
 
 `sweep` exists because no module can list every entity: a query needs terms.
 An entity with no component and no id that anybody keeps could never be destroyed, and it would count against `[budget] entities` for ever.
-`delete` takes the components of other modules on those entities with it, and its author states that at `declare`.
+`delete` takes the components of other modules on those entities with it, but those that a destroy keeps.
+Its author states that at `declare`.
+
+A husk is the exception to `strip`: `docs/extern/bridge_abi.h.md`, *A husk*.
+It carries only the components that modules keep, so that they can release what they hold.
+When the last of them goes, no module can write a component of the husk, so no module can detach one or destroy it.
+Its index would never come back, so storage destroys it under each policy.
+
+A `delete` is a destroy, so a component that another loaded module keeps at a destroy stays, on a husk.
+That module can then release what it keeps, after each destroy of the entity, also the destroy of an unload.
+The husk needs room in a table, and an entity with no room loses only the component: `docs/intern/storage/storage_drop.c.md`, *By layout*.
 
 The policy that applies is that of the module that unloads, and only when it is the last to declare the component.
 Two declarers need not agree, because the first to leave drops nothing.
@@ -30,7 +40,12 @@ How storage drops the rows is in `src/storage/storage_drop.c`.
 
 ## The steps
 
-`module_release_types` releases the types of a module from the last declared to the first, because a type is used by what was declared after it.
+`module_release_types` works in two passes.
+The first pass takes each type that only this module declares out of `husk_types`, with `storage_let_keep`.
+Thus a delete in the second pass leaves a husk only for the components that another loaded module keeps.
+The first pass changes no count of declarers, else `delete_type` could free a record before the second pass reaches it.
+
+The second pass releases the types from the last declared to the first, because a type is used by what was declared after it.
 For each type:
 
 1. Lower the count of its declarers by one. If others still declare it, stop.
@@ -51,4 +66,4 @@ It also lets go of the types that its fields name, and each of those goes too wh
 | `unlist_type` | Takes a type out of the list of the world: the last type takes its place. |
 | `delete_type` | Deletes the record of a component, with what storage knows of it and its hold on the types that its fields name. |
 | `release_type` | Stops one declaration of a type. The last declarer applies its policy, and a policy of zero is a load that failed. |
-| `module_release_types` | Stops the declarations of a module, last declared first. With `by_policy` false, no policy applies. |
+| `module_release_types` | Takes each type that only the module declares out of `husk_types`. Then stops the declarations of the module, last declared first. With `by_policy` false, no policy applies. |

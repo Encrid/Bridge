@@ -5,7 +5,7 @@ It also works out the fingerprint of the declaration.
 
 ## What a declaration states
 
-A field of the declaration that is left at zero is unset, and `declare` refuses that for `kind`, `on_unload` and `storage`.
+A field of the declaration that is left at zero is unset, and `declare` refuses that for `kind`, `on_unload`, `storage` and `on_destroy`.
 
 - A name with no namespace is refused.
 - A kind that is unset, or that is not one there is, is refused.
@@ -13,6 +13,7 @@ A field of the declaration that is left at zero is unset, and `declare` refuses 
 - A name of another namespace is refused if no grant names it: `docs/intern/abi/abi_names.c.md`, *Whose a component is*.
 - An `on_unload` policy that is unset is refused: `docs/intern/module/module_types.c.md`, *The policies at unload*.
 - A storage layout that is unset is refused.
+- An unset `on_destroy` is refused, and so is a singleton whose `on_destroy` is not `BRIDGE_ON_DESTROY_REMOVE`: `docs/intern/abi/abi_on_destroy.c.md`, *What a declaration states*.
 
 A tag is the kind `BRIDGE_TAG`, a component with no value: `docs/extern/bridge_abi.h.md`, *bridge_kind*.
 
@@ -31,4 +32,4 @@ FNV-1a is not a cryptographic hash, so two different descriptors can have one fi
 | `check_kind` | Refuses a name with no namespace, an unset kind, and a tag that states bytes or a descriptor. Sets `bare` to the colon of the name. |
 | `check_policy` | Refuses a name of another namespace that no grant names, and an unset policy or storage layout. |
 | `abi_check_name` | Refuses a name that has 0 bytes, or more than `NAME_MOST`. It checks the names of types, systems and observers. 1 with a refusal. |
-| `abi_check_stated` | Refuses a declaration that states what it may not, and works out its fingerprint. 1 with a refusal. |
+| `abi_check_stated` | Refuses a declaration that states what it may not, with `abi_check_on_destroy` last, and works out its fingerprint. 1 with a refusal. |

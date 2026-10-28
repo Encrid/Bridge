@@ -31,4 +31,4 @@ The turn of a system is in `docs/intern/schedule/schedule_jobs.c.md`, *The turn 
 | `find_next_run` | Gives the module whose next run comes first, or `nullptr` when storage took each queue whole. |
 | `take_next_run` | Takes the next run of changes: one module, one turn. Gives the module, and writes where the run begins and ends in its queue. |
 | `is_written` | Gives whether a change is an attach whose value storage writes. The barrier changed its entity, did not destroy it or leave it as it was, and the id has its generation. |
-| `write_value` | Writes the value of one change where its entity has the type. For an entity left as it was, it counts the change for the module. `left[0]` counts for want of a table, and `left[1]` for want of columns. |
+| `write_value` | Passes over a change of `CHANGE_SKIPPED`. Writes the value of each other change where its entity has the type. For an entity left as it was, it counts the change for the module. `left[0]` counts for want of a table, and `left[1]` for want of columns. |

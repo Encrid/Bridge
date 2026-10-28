@@ -8,10 +8,16 @@ A record says that the module was not reloaded, and why. Bridge says it once, an
 Then the new instance goes back out:
 
 1. Take its systems and observers out of storage.
-2. Mark each type that it would have replaced as not replaced. Those rows stay as they are, under the type that they have.
-3. Release what the new instance declared, with no policy.
-4. Give back what the reload added to the share of the persistent arena.
-5. Discard the new record. The ids and the entities are still those of the old record.
+2. Run its `shutdown`, if its `reload` gave 0 and it has one.
+3. Mark each type that it would have replaced as not replaced. Those rows stay as they are, under the type that they have.
+4. Release what the new instance declared, with no policy.
+5. Give back what the reload added to the share of the persistent arena.
+6. Discard the new record. The ids and the entities are still those of the old record.
+
+Step 2 runs before step 6 destroys the new instance, and before step 5, since a `shutdown` can allocate.
+`docs/intern/module/module_shutdown.c.md`, *A new instance that fails*, gives its condition, its timeout and its error.
+The ids and the share of the new record are copies until the swap: `docs/intern/reload/reload_record.c.md`.
+So the `shutdown` takes nothing from the old record, and nothing that it queued is applied.
 
 The schedule without the systems of the new instance was built before, so the rebuild cannot be refused.
 
@@ -33,7 +39,7 @@ A reload with an artifact that works brings the module back over the same rows, 
 
 | Function | Result |
 | --- | --- |
-| `reload_undo` | Takes the new instance back out: its systems, its types, and what the reload added to the share. |
+| `reload_undo` | Takes the new instance back out: its systems, its types, and what the reload added to the share. Runs its `shutdown` first, if its `reload` gave 0 and it has one. |
 | `keep_old` | Puts the systems of the old instance back in storage, as they were. |
 | `stop_old` | Drops the systems of the module and marks it stopped, with what it declared kept. Says so, and calls `bridge_stop` if its `on_error` is `fail`. |
 | `reload_fail` | Gives the lines that the new instance wrote, and says that the reload failed. Takes the new instance out, then keeps the old instance or stops the module. Gives 1. |

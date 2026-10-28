@@ -232,6 +232,7 @@ Bridge treats a call that did not return as it treats a status that is not 0: `d
 | `bridge_create` | `backend_get_abi`, `backend_create`, `backend_get_capabilities`, `memory_get_shape`, then `memory_adopt` of the shared memory. |
 | A load | `module_compile`, `memory_adopt` of the private memory, `module_list_imports`, `instance_create`, and `define_func` 8 times. |
 | A load, then | `instance_set_memory_limit`, `instance_get_func` of `init`, `instance_set_timeout`, `call` of `init`, then `instance_get_func` of each export. |
+| A load that fails after `init` gave 0 | The calls of an unload. |
 | A phase | `instance_set_work_limit` and `call` of each system. |
 | An unload | `instance_set_timeout`, `call` of `shutdown`, `instance_destroy`, `module_destroy` and `memory_release`. |
 | `bridge_destroy` | The `shutdown` of each module, the destruction of each module, `memory_release` of the shared memory, then `backend_destroy`. |

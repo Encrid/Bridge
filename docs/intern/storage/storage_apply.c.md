@@ -16,11 +16,16 @@ What changes is the thing that storage applies the order to:
 5. Values. Storage reads the queues again, and each attach writes its bytes where its entity now is.
 6. Release. Storage empties the queues and forgets the fold: `docs/intern/storage/storage_settle.h.md`, *Functions*. It gives back each table that holds no row: `docs/intern/storage/storage_forget.h.md`, *Functions*.
 
-At the end of the fold, storage knows the set that each changed entity will carry, and whether it is destroyed.
+At the end of the fold, storage knows the final set of each changed entity, whether it is destroyed, and whether it is a husk.
 At the second step, storage finds what it cannot have, while each entity is still where it was: `docs/intern/storage/storage_room.h.md`, *Running out*.
 An entity that storage cannot place stays as it was, and storage tells its module.
 At the fourth step, what both tables hold goes with the entity, and what is new is zero.
 At the fifth step, the last value written stays, because storage writes them in the order they were asked.
+
+A destroy can leave a husk in place of a gone entity: `docs/intern/storage/storage_husk.h.md`, *The rest of the barrier*.
+The fold marks each change of a husk that it passes over, and the fifth step writes no value of such a change.
+The fourth step sets the bit of each new husk in `husks`.
+The third and the fourth step are in `docs/intern/storage/storage_apply.h.md`, since a delete at an unload takes them too.
 
 An entity that gets 5 components in one barrier moves once, into the table of all 5.
 The 4 tables between never exist.
@@ -31,7 +36,5 @@ A change at a time would move the entity 5 times, and leave 4 tables behind.
 | Function | Result |
 | --- | --- |
 | `fold_all` | The first step. Takes each run of the queues in order, and folds it with `fold_run`. |
-| `tell_all` | The third step, when there is an observer. For each changed entity that is not left as it was, gives each observer what it is owed. A destroyed entity has no set after. |
-| `place_all` | The fourth step. Places each changed entity that is not left as it was, with `place_one`. |
 | `write_all` | The fifth step. Takes each run of the queues in order again, and writes the value of each change with `write_value`. |
 | `storage_apply` | Does the 6 steps: `fold_all`, `reserve_all`, `tell_all`, `place_all`, `write_all` and `settle_all`. |

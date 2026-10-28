@@ -17,6 +17,13 @@ A text for a char array, and any other setting, takes no room there.
 If the share has not the room, or the module has no share, the load is refused.
 The refusal gives the bytes of text, and the bytes left in the share.
 
+## The private copy
+
+The settings write their texts into a private copy of the block, which follows the value in its allocation: `docs/intern/config/config.c.md`.
+So no byte of the block changes before each setting passes.
+`config_keep_text` copies the texts into the block when no setting was refused.
+A refusal frees the copy with the value, and the block keeps its old text.
+
 ## Functions
 
 | Function | Result |
@@ -25,3 +32,4 @@ The refusal gives the bytes of text, and the bytes left in the share.
 | `count_text` | Gives how many bytes of the arena all the settings take. |
 | `reuse_kept` | Takes the block that the text of the module had at its last load, if `total` bytes still fit there. |
 | `config_place_text` | Finds where the text of the settings goes, before any is written: the block it had, or the persistent share of the module. Gives 1 if there is no room. |
+| `config_keep_text` | Copies the texts that the settings wrote into the private copy, into their block. |

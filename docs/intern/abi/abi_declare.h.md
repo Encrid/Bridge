@@ -76,6 +76,8 @@ These files check the type, make it, and lay it out again at a reload.
 | `abi_relay_fields` | `src/abi/abi_relay_fields.c` | Matches the fields of a struct: `docs/intern/abi/abi_relay_fields.c.md`, *Functions*. |
 | `abi_relay` | `src/abi/abi_relay.c` | Works out how values carry over: `docs/intern/abi/abi_relay.c.md`, *Functions*. |
 | `abi_check_stated` | `src/abi/abi_stated.c` | Checks what a declaration states: `docs/intern/abi/abi_stated.c.md`, *Functions*. |
+| `abi_check_on_destroy` | `src/abi/abi_on_destroy.c` | Checks the `on_destroy` that a declaration states: `docs/intern/abi/abi_on_destroy.c.md`, *Functions*. 1 with a refusal. |
+| `abi_check_same_on_destroy` | `src/abi/abi_on_destroy.c` | Checks that a declaration agrees with the `on_destroy` of its type: `docs/intern/abi/abi_on_destroy.c.md`, *Functions*. 1 with a refusal. |
 | `abi_read_layout` | `src/abi/abi_layout.c` | Reads and checks the descriptor: `docs/intern/abi/abi_layout.c.md`, *Functions*. |
 | `abi_check_size` | `src/abi/abi_layout.c` | Checks the stated size and alignment: `docs/intern/abi/abi_layout.c.md`, *Functions*. 1 with a refusal. |
 | `abi_replace_type` | `src/abi/abi_replace.c` | Decides what becomes of an earlier type: `docs/intern/abi/abi_replace.c.md`, *Functions*. |

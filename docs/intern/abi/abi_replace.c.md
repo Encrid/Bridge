@@ -30,13 +30,17 @@ At a reload of the one module that declares it, it is a move: `docs/intern/abi/a
 A declaration of a type that is there already, with the same layout, states the same size and alignment as the type.
 If not, it is refused as a type whose descriptor lays it out another way: `docs/intern/abi/abi_layout.c.md`.
 
+Every declarer states the `on_destroy` of the type, and a declaration that states the other item is refused.
+Unlike a layout, `on_destroy` stays as it is at a reload of the one declarer: `docs/intern/abi/abi_on_destroy.c.md`, *One on_destroy for each type*.
+
 ## The steps
 
 1. Find the type of the name that no reload made anew. If there is none, the declaration makes a new type.
-2. It changed if its descriptor or kind is new, or if `abi_names_superseded` gives true: `docs/intern/abi/abi_moved.c.md`, *Functions*.
-3. If it did not change and has the same storage layout, it is the type declared.
-4. Else refuse it, unless this is a reload of its one declarer that may replace it.
-5. If it may, the declaration makes a new type, and keeps the old one in `was`.
+2. Refuse the declaration if it states another `on_destroy` than the type.
+3. It changed if its descriptor or kind is new, or if `abi_names_superseded` gives true: `docs/intern/abi/abi_moved.c.md`, *Functions*.
+4. If it did not change and has the same storage layout, it is the type declared.
+5. Else refuse it, unless this is a reload of its one declarer that may replace it.
+6. If it may, the declaration makes a new type, and keeps the old one in `was`.
 
 The new type takes the rows of the old one if the reload holds.
 The runs that an earlier reload that failed worked out for the old type are not this reload's, so they are freed.

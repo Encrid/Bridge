@@ -25,8 +25,10 @@ A module that declares a type again gets the slot that it has.
 So there is no entry to find a type: `declare` does it.
 
 A new slot keeps three things: the type, the `on_unload` policy that the module stated, and whether the module may write the type.
+Each declarer states the same `on_destroy`, so the type keeps it, and the slot does not.
 A module may write a type of its own namespace, and a type that a write grant names.
 If it may, storage records it: that gives the module a stake in an entity that carries the type.
+`storage_let_keep` tells storage whether a destroy keeps the type: `docs/intern/storage/storage_husk.c.md`, *The types that a husk keeps*.
 The type counts one more declarer, and the world notes in `layout_moved` that a declaration changed.
 
 ## Functions
@@ -36,5 +38,5 @@ The type counts one more declarer, and the world notes in `layout_moved` that a 
 | `read_stated` | Copies the declaration and its name out of the scratch arena. 1 with a refusal, also outside the first call. |
 | `make_slots` | Makes room for one more slot of the module, and for the set of the types that it may write. 1 with a refusal if there is no memory. |
 | `abi_is_writable` | Whether a module may write a type: one of its own namespace, or one that a write grant names. |
-| `take_slot` | The slot of the module for the type: the slot that it had, or a new one. |
+| `take_slot` | The slot of the module for the type: the slot that it had, or a new one. A new slot also calls `storage_let_keep`, with true for a type of `BRIDGE_ON_DESTROY_KEEP`. |
 | `abi_declare` | `declare(at) -> slot`. |

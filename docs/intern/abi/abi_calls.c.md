@@ -22,6 +22,7 @@ In the second, the module is past the `entities` of the deployment: the barrier 
 An id that is already dead is no mistake: two modules can both want the entity gone.
 The barrier looks at the id, and there it finds which module to tell.
 Whether the module may destroy the entity is checked at the barrier too: see `src/storage/storage_stake.h`.
+At the barrier, an entity with a component that a destroy keeps stays as a husk: `docs/intern/storage/storage_husk.h.md`, *A husk in the fold*.
 
 ## attach and detach
 

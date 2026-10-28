@@ -23,6 +23,7 @@ The refusal then gives the size of the type and the bytes of `[budget] columns`.
 ## A type kept
 
 The type keeps the copy of its descriptor that the parse made.
+It keeps the `on_destroy` of the declaration, which each later declarer states too: `docs/intern/abi/abi_on_destroy.c.md`, *One on_destroy for each type*.
 If the type replaces a type at a reload, the old type is marked `superseded`, and the new type keeps it in `replaces`.
 The new type holds each declared type that one of its fields names.
 It counts as a user of each such type, for as long as it is there.
@@ -34,7 +35,7 @@ It counts as a user of each such type, for as long as it is there.
 | `alloc_type` | A new declared type with its name, its zero value, and room for the types its fields name. Also its place among the types of the world. |
 | `say_unmade` | Frees what was had of a type that is not made, with its copied descriptor. Then it refuses the type: for want of memory, or of room in `[budget] columns`. Gives 1. |
 | `hold_named` | Holds each declared type that a field of a type names, and counts the type as one of their users. |
-| `keep_type` | Keeps a made type among the types of the world, and holds each declared type that a field of it names. |
+| `keep_type` | Keeps a made type among the types of the world, with what its declaration stated. It holds each declared type that a field of it names. |
 | `abi_make_type` | Makes the type that a declaration states. 1 with a refusal. |
 
 `alloc_type` gives nullptr, with nothing kept, if there is not the memory for all of it.

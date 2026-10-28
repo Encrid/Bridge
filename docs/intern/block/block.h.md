@@ -23,6 +23,10 @@ Each module has its own private memory, and all modules see one shared memory: `
 The private memory is the library's alone, so the library lays it out from offset 0, with nothing to agree.
 A header at offset 0 tells where the regions are: `docs/extern/bridge_abi.h.md`, *bridge_header_t*, and `docs/intern/block/block_module.c.md`, *The header*.
 
+`block_write_room` writes `changes_left` of the header: the room of the queue of changes that the module did not use.
+`block_write_header` calls it when the instance starts, `queue_change` after each change, and `empty_queues` at each barrier.
+Each of these calls comes after the private memory of the module is made, so the write needs no check.
+
 Each other offset into the shared memory is from the start of the shared memory.
 The `(offset, length)` that a component holds into the persistent arena is one of them, so nothing else needs a base.
 `block_get_offset` gives the offset of a pointer into the shared memory, or 0 if the pointer is null or lies outside it.
@@ -80,6 +84,8 @@ The fields of `block_layout_t`:
 
 | Function | Source | Result |
 | --- | --- | --- |
+| `block_get_offset` | `src/block/block.h` | Gives the offset of a pointer into the shared memory: *The regions of the memories*. |
+| `block_write_room` | `src/block/block.h` | Tells a module what is left of its queue of changes: *The regions of the memories*. |
 | `block_create` | `src/block/block_create.c` | Makes the shared block: `docs/intern/block/block_create.c.md`, *Functions*. |
 | `block_destroy` | `src/block/block_destroy.c` | Gives the shared block back: `docs/intern/block/block_destroy.c.md`, *Functions*. |
 | `block_check_budget` | `src/block/block_budget.c` | Checks the budget of a deployment: `docs/intern/block/block_budget.c.md`, *Functions*. |

@@ -9,15 +9,13 @@ A load and a reload both start a module with it.
 
 1. Make the image, the private memory and the instance: `docs/intern/module/module_instance.c.md`.
 2. Make the first call, `init` for a load or `reload` for a reload.
-3. Refuse a loss that the config accepts and that was not made.
-4. For a load, check the settings of the module: `docs/intern/config/config.c.md`, *The steps*. `src/bridge/bridge_load.c` writes them later.
-5. Find each export that Bridge calls.
-6. Check that the spans hold what a barrier writes for the module.
+3. Find each export that Bridge calls, with `shutdown` first: *The exports*.
+4. Refuse a loss that the config accepts and that was not made.
+5. Check that the spans hold what a barrier writes for the module.
 
 The first call is the one call in which a module can declare and register.
 `init` runs under `init_timeout`, and `reload` under `reload_timeout`.
-The settings are one value of a struct, so they are written after `init` declared the struct.
-A reload leaves them as they are: `docs/extern/bridge.h.md`, *The settings of a module*.
+A start does not touch the settings. A load writes them once, after it builds the schedule: `docs/intern/bridge/bridge_load.c.md`, *The steps of a load*.
 
 ## The losses
 
@@ -32,6 +30,10 @@ Each export that Bridge calls is found once, at the start, and not at its first 
 Each system and each observer is an export of its name.
 `shutdown` and `reload` are found too: the three lifecycle exports are those of every module, and none is left out to mean something.
 The backend sees whether an export has the shape that a call runs, and refuses one that does not: `docs/intern/abi/abi_define.c.md`, *The signatures*.
+
+`shutdown` is found first, right after the first call gives 0, and before each later step that can fail.
+Thus each failure that comes later in a load or a reload can run it: `docs/intern/module/module_shutdown.c.md`, *A new instance that fails*.
+If the backend gives no `shutdown`, the start fails there, and no `shutdown` runs.
 
 ## The spans
 
@@ -59,6 +61,6 @@ So a module that loads also fits at its first barrier.
 | --- | --- |
 | `call_first` | Makes the first call into a module, `init` or `reload`, the one call in which it can declare and register. Gives 1 with `err`. |
 | `check_losses` | Refuses a loss that was accepted and not made. Gives 1 with `err`. |
-| `find_exports` | Finds each export that Bridge calls: each system, each observer, `shutdown` and `reload`. Gives 1 with `err`. |
+| `find_exports` | Finds each export that Bridge calls: `shutdown` first, then each system, each observer and `reload`. Gives 1 with `err`. |
 | `check_spans` | Refuses a module whose spans do not hold what a barrier writes for it. Gives 1 with `err`. |
-| `module_start` | Makes the image, the instance and the private memory, and makes the first call. Gives 0 if the module registered and every export it named is there. |
+| `module_start` | Makes the image, the instance and the private memory, makes the first call, and finds the exports. Gives 0 if every export is there and the losses and the spans pass, and 1 with `err` if not. |

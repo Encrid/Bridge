@@ -1,6 +1,6 @@
 # src/storage/storage_forget.h
 
-This header ends the work of a barrier, or of a move, on rows.
+This header ends the work of a barrier, of a move, or of a delete at an unload, on rows.
 It forgets the fold, and gives back each table that nothing is left in.
 
 ## Functions
