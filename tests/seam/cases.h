@@ -299,6 +299,7 @@ void test_watch_no_room(host_t *h);
 void test_name_many_declarers(host_t *h);
 
 void test_two_turns_of_one_module(host_t *h);
+void test_walk_optional(host_t *h);
 
 void test_pick_sparse(host_t *h);
 

@@ -22,6 +22,37 @@ BRIDGE_EXPORT(second) int second(void)
     return (0);
 }
 
+#ifdef FIRST_OPER
+
+static uint32_t walking;
+
+BRIDGE_EXPORT(walk) int walk(void)
+{
+    uint32_t spans = bridge_count_spans(walking);
+    uint32_t rows = 0;
+    uint32_t s = 0;
+
+    while (s < spans) {
+        rows += bridge_count_rows(bridge_get_span(walking, s));
+        s++;
+    }
+    BRIDGE_LOG(BRIDGE_LOG_INFO, "walked", spans, rows);
+    return (0);
+}
+
+static void add_walk(void)
+{
+    bridge_term_t both[2] = {{ 0, BRIDGE_READ, FIRST_OPER, 0 },
+        { 0, BRIDGE_READ, BRIDGE_OPTIONAL, 0 }};
+
+    both[0].slot = one;
+    both[1].slot = two;
+    walking = BRIDGE_ADD_SYSTEM("walk", "present", both, 2, nullptr, 0,
+        nullptr, 0);
+}
+
+#endif
+
 BRIDGE_EXPORT(init) int init(void)
 {
     int none = 0;
@@ -30,5 +61,8 @@ BRIDGE_EXPORT(init) int init(void)
     two = BRIDGE_DECLARE_TAG("game:Two", BRIDGE_STRIP, BRIDGE_TABLE);
     BRIDGE_ADD_SYSTEM("first", "update", &none, 0, &one, 1, nullptr, 0);
     BRIDGE_ADD_SYSTEM("second", "update", &none, 0, &two, 1, nullptr, 0);
+#ifdef FIRST_OPER
+    add_walk();
+#endif
     return (0);
 }

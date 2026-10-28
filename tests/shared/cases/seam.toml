@@ -3225,6 +3225,18 @@ claims = { matches = ["game:aim@0.1.0/reached: aims 10 5.*game:aim@0.1.0/reached
 false = { run = ["{out}/seam{exe}", "BRIDGE_ON_ENTER-told-with-the-attach-that-made-it"] }
 
 [[case]]
+name = "BRIDGE_OPTIONAL-a-query-of-only-optional-terms-walks-each-table"
+run = ["{out}/seam{exe}", "BRIDGE_OPTIONAL-a-query-of-only-optional-terms-walks-each-table"]
+claims = { matches = ["game:duo@0\\.1\\.0/walk: walked 2 2\\b.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_AND-beside-an-optional-term-walks-only-its-tables"] }
+
+[[case]]
+name = "BRIDGE_AND-beside-an-optional-term-walks-only-its-tables"
+run = ["{out}/seam{exe}", "BRIDGE_AND-beside-an-optional-term-walks-only-its-tables"]
+claims = { matches = ["game:duo@0\\.1\\.0/walk: walked 1 1\\b.*alive"], lacks = ["did not load"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_OPTIONAL-a-query-of-only-optional-terms-walks-each-table"] }
+
+[[case]]
 name = "BRIDGE_ON_ENTER-told-with-the-attach-that-made-it"
 run = ["{out}/seam{exe}", "BRIDGE_ON_ENTER-told-with-the-attach-that-made-it"]
 claims = { matches = ["event 3 1.*alive"] }
