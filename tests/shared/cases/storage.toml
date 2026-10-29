@@ -197,6 +197,30 @@ claims = { matches = ["index 1, killed at generation 4294967294, comes back at g
 false = { run = ["{out}/storage{exe}", "manygrow"] }
 
 [[case]]
+name = "stack-a-call-of-24-MiB-returns-on-a-worker-of-32-MiB"
+run = ["{out}/storage{exe}", "deep", "33554432"]
+claims = { status = 0, matches = ["a call of 6144 frames of 4096 bytes gave [0-9]+ on a worker.*alive"] }
+false = { run = ["{out}/storage{exe}", "deep", "8388608"] }
+
+[[case]]
+name = "table_hash_fill-of-25-gives-the-hash-four-places-for-each-table-id"
+run = ["{out}/storage{exe}", "hashroom", "25"]
+claims = { matches = ["hash room 8 for 2 table ids.*alive"] }
+false = { run = ["{out}/storage{exe}", "hashroom", "50"] }
+
+[[case]]
+name = "table_retry-of-75-asks-three-quarters-of-each-ask-again"
+run = ["{out}/storage{exe}", "asks", "75"]
+claims = { matches = ["asks from 6 rows: 4 3 2 1 0\\s.*alive"] }
+false = { run = ["{out}/storage{exe}", "asks", "50"] }
+
+[[case]]
+name = "table_growth-of-200-doubles-the-room-of-a-table"
+run = ["{out}/storage{exe}", "growth", "200"]
+claims = { matches = ["rooms: 1 2 4 4 8\\s.*alive"] }
+false = { run = ["{out}/storage{exe}", "growth", "150"] }
+
+[[case]]
 name = "BRIDGE_STRIP-of-a-type-in-an-unnamed-table-of-two-types"
 run = ["{out}/storage{exe}", "stripunnamed", "160"]
 claims = { matches = ["look: with A: spans, rows 2 6.*'st:B' is stripped, and 3 rows stay in a second table of their archetype: \\[budget\\] columns of 160 bytes has no room to join them to the first.*strip st:A.*look: with A: spans, rows 0 0.*alive"] }

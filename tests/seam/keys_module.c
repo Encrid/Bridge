@@ -15,6 +15,8 @@ static const test_edit_t TEST_MODULE_EDITS[] = {
     { "max_system_failures=0", offsetof(test_keys_t, max_system_failures),
         8, 0 },
     { "work_limit=0", offsetof(test_keys_t, work_limit), 8, 0 },
+    { "element_limit=0", offsetof(test_keys_t, element_limit), 8, 0 },
+    { "element_limit=-5", offsetof(test_keys_t, element_limit), 8, -5 },
     { "init_timeout=0", offsetof(test_keys_t, init_timeout), 8, 0 },
     { "reload_timeout=0", offsetof(test_keys_t, reload_timeout), 8, 0 },
     { "shutdown_timeout=0", offsetof(test_keys_t, shutdown_timeout), 8, 0 },

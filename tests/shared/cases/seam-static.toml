@@ -73,7 +73,7 @@ false = { run = ["{out}/seam-static{exe}", "config.abi-another-refused"] }
 [[case]]
 name = "static-config.abi-another-refused"
 run = ["{out}/seam-static{exe}", "config.abi-another-refused"]
-claims = { matches = ["the host is of host ABI 3, and this is 2.*bridge_create refused.*alive"] }
+claims = { matches = ["the host is of host ABI 4, and this is 3.*bridge_create refused.*alive"] }
 false = { run = ["{out}/seam-static{exe}", "config.abi-unset-refused"] }
 
 [[case]]

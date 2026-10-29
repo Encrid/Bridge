@@ -51,3 +51,9 @@ name = "allocation-each-refused-in-turn-reloading-a-group"
 run = ["{out}/storage-counted{exe}", "nomemorygroup"]
 claims = { matches = ["more than thirty allocations were each answered null in turn.*alive"], lacks = ["FAIL"] }
 false = { run = ["{out}/storage-counted{exe}", "changes"] }
+
+[[case]]
+name = "schema-takes-the-room-of-its-fields-and-of-its-constants-once"
+run = ["{out}/storage-counted{exe}", "schemaroom"]
+claims = { matches = ["a struct of 20 fields took 21 allocations, and an enum of 20 constants took 21.*alive"] }
+false = { run = ["{out}/storage-counted{exe}", "schemaroom", "1"] }

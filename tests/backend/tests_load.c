@@ -40,4 +40,5 @@ void tests_fill_api(test_api_t *api)
     api->spend = tests_spend;
     api->wait = tests_wait;
     api->grow = tests_grow;
+    api->grow_elements = tests_grow_elements;
 }
