@@ -15,7 +15,7 @@ constexpr int64_t HOST_MS = 1'000'000;
 
 constexpr int64_t HOST_TESTS_KEEPS = 1 << 4 | 1 << 6;
 
-constexpr int64_t HOST_TESTS_KEEPS_ALL = 63;
+constexpr int64_t HOST_TESTS_KEEPS_ALL = 63 | 1 << 7;
 
 constexpr int64_t HOST_TESTS_RESERVES = INT64_C(1) << 32;
 constexpr int64_t HOST_TESTS_GRANULE = 65'536;

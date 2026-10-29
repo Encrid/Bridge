@@ -22,7 +22,7 @@ static void count_sink([[maybe_unused]] void *ud, const bridge_record_t *r)
 void test_set_validate(host_t *h)
 {
     h->cfg.backend_count = 1;
-    h->cfg.validate = true;
+    h->cfg.validate = BRIDGE_TRUE;
     h->sink = count_sink;
 }
 
@@ -30,7 +30,7 @@ void test_scribble(host_t *h)
 {
     strays = 0;
     if (!strcmp(h->arg, "off"))
-        h->cfg.validate = false;
+        h->cfg.validate = BRIDGE_FALSE;
     if (host_open(h))
         return;
     test_load_guarded(h, "game:scribble@0.1.0", "scribble");

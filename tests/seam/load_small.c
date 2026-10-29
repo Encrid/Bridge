@@ -18,6 +18,7 @@ void test_state_small(bridge_artifact_t *a, char *identity, const char *name)
     host_state_guarded(a, identity, name);
     a->cfg.work_limit = 1'000'000;
     a->cfg.memory_limit = 1 << 20;
+    a->cfg.element_limit = 1 << 10;
     a->cfg.init_timeout = 200 * HOST_MS;
     a->cfg.reload_timeout = 200 * HOST_MS;
     a->cfg.shutdown_timeout = 200 * HOST_MS;

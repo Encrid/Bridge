@@ -44,6 +44,7 @@ struct test_api {
     void (*spend)(const test_api_t *api, uint64_t units);
     void (*wait)(const test_api_t *api, uint64_t nanos);
     int (*grow)(const test_api_t *api, uint64_t bytes);
+    int (*grow_elements)(const test_api_t *api, uint64_t elements);
 };
 
 static inline bridge_header_t *test_get_header(const test_api_t *api)

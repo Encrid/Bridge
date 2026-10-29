@@ -11,7 +11,7 @@
 void test_set_profile(host_t *h)
 {
     h->cfg.backend_count = 1;
-    h->cfg.profile = true;
+    h->cfg.profile = BRIDGE_TRUE;
     h->sink = host_print_record;
 }
 

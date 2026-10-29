@@ -26,7 +26,7 @@ static const bridge_setting_t KEEPS[4] = {
 };
 
 static const bridge_setting_t KEEPS_ALL[4] = {
-    { "capabilities", BRIDGE_INT, {}, { .i = 63 } },
+    { "capabilities", BRIDGE_INT, {}, { .i = 63 | 1 << 7 } },
     { "reservation", BRIDGE_INT, {}, { .i = INT64_C(1) << 32 } },
     { "guard", BRIDGE_INT, {}, { .i = 65'536 } },
     { "granule", BRIDGE_INT, {}, { .i = 65'536 } }
@@ -74,6 +74,7 @@ static const storage_test_case_t CASES[] = {
     { "nomemoryconfig", storage_test_refuse_config_memory, &PLAIN },
     { "nomemorythreads", storage_test_refuse_memory, &FOUR_THREADS },
     { "nomemorygroup", storage_test_refuse_memory_group, &BOTH_BACKENDS },
+    { "schemaroom", storage_test_count_room, &PLAIN },
 #endif
     { "shape", storage_test_look_at_shape, &BOTH_BACKENDS },
     { "matrix", storage_test_make_large_matrix, &PLAIN },
@@ -85,6 +86,10 @@ static const storage_test_case_t CASES[] = {
     { "manymove", storage_test_move_many, &PLAIN },
     { "manygrow", storage_test_grow_many, &PLAIN },
     { "generation", storage_test_wrap_generation, &PLAIN },
+    { "deep", storage_test_go_deep, &FOUR_THREADS },
+    { "hashroom", storage_test_size_hash, &ONE_TABLE },
+    { "growth", storage_test_grow_by_share, &ONE_TABLE },
+    { "asks", storage_test_ask_less, &ONE_TABLE },
     { "ordertwo", storage_test_order_two_modules, &PLAIN },
     { "orderchain", storage_test_order_two_modules, &PLAIN },
     { "orderbarrier", storage_test_order_two_modules, &PLAIN },
@@ -184,7 +189,10 @@ static void make_bridge(storage_test_t *t, const storage_test_room_t *room)
         .budget = { .entities = 400'000, .tables = room->tables, .types = 64,
             .systems = 64, .terms = 4, .modules = 4, .persistent = 4096,
             .columns = room->columns, .sparse_sets = room->sparse_sets,
-            .direct_indexed = room->direct_indexed } };
+            .direct_indexed = room->direct_indexed },
+        .profile = BRIDGE_FALSE, .validate = BRIDGE_FALSE, .observer_passes = 1,
+        .stack = 1 << 20, .table_growth = 150, .table_hash_fill = 50,
+        .table_retry = 50 };
 
     t->cfg = cfg;
     if (room->asks_columns && t->more)

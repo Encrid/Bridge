@@ -16,6 +16,8 @@ void test_state_limit(host_t *h)
         a.cfg.work_limit = 1000;
     if (*h->arg == 'm')
         a.cfg.memory_limit = 1 << 20;
+    if (*h->arg == 'e')
+        a.cfg.element_limit = 1000;
     host_load(h, &a);
     host_close(h);
 }
