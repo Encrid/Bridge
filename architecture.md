@@ -39,8 +39,8 @@ flowchart TB
   osg["Bridge-OS<br/>os.a + os.h: mmap, dlopen, threads, lock, fs"]
   bridge -->|"os.h"| osg
 
-  backend -->|"bridge_backend.h, 18-fn vtable"| nbk
-  backend -->|"bridge_backend.h, 18-fn vtable"| wbk
+  backend -->|"bridge_backend.h, 19-fn vtable"| nbk
+  backend -->|"bridge_backend.h, 19-fn vtable"| wbk
 
   nbk["BB-Native<br/>native backend (trusted, in-process)"]
   wbk["BB-Wasm<br/>wasm backend (sandboxed)"]
