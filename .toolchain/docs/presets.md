@@ -7,13 +7,14 @@ The tools then read them as the other files of the configuration. `.toolchain/do
 ## native_module
 
 `native_module` is the preset of a native module of Bridge. Such a module is a shared library that BB-Native loads.
-Bridge-Host reads the manifest of the module.
+Bridge-Host reads the manifest of the module, and its program `{bridge_host}/bridge-host{exe}` runs the cases of the module.
+On Linux and on macOS, the zip of Bridge-Host records the execute bits of that program, and `fetch` keeps them.
 
 | File | Content |
 | --- | --- |
-| `native_sources.toml` | The sources `bridge` and `bb_native`: the release `v0.1.2` of Bridge and the release `v0.1.1` of BB-Native. |
-| `native_targets.toml` | For each target, the section of the manifest, and the sha256 of the two releases. |
-| `native_kinds.toml` | The kind `native_module`. |
+| `native_sources.toml` | The sources `bridge`, `bb_native` and `bridge_host`: the release `v0.2.0` of Bridge, of BB-Native and of Bridge-Host. |
+| `native_targets.toml` | For each target, the section of the manifest, and the sha256 of each release. |
+| `native_kinds.toml` | The variable `native_flags`, and the kind `native_module`. |
 | `native_checks.toml` | `[check.makes]` with the 6 macros of `bridge_schema.h` of Bridge. Each makes a type, or its descriptor `<type>_desc`, from its first argument. |
 
 The kind `native_module` is the kind `library`, with these changes:
@@ -24,8 +25,12 @@ The kind `native_module` is the kind `library`, with these changes:
 - It gives the macro `MANIFEST_SECTION`: the section of the target.
 - After the build, it stops if the module does not hold the manifest.
 
-The folders of the headers, the visibility and the two macros are the `flags` of the kind.
-Thus the syntax tree of `test --branches` and of `test --leaks` gets them too: `.toolchain/docs/rewrite.py.md`.
+The folders of the headers, the visibility and the two macros are the items of the variable `native_flags`.
+The `flags` of the kind name that variable, so the syntax tree of `test --branches` and of `test --leaks` gets them too: `.toolchain/docs/rewrite.py.md`.
+A kind of a project that makes a native module with steps of its own names `{native_flags}` too. Thus the flags stay in one place.
+
+The folder `into` of each source is `build/third_party/<source>/<target>`, a path from the folder of the project.
+Thus a build with `--out`, for example a case that builds a release, finds the sources that `fetch` got.
 
 A source of the module puts the manifest into the section with this line:
 
