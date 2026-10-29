@@ -3111,9 +3111,9 @@ claims = { matches = ["it was handed.* where='somewhere'.*alive"] }
 false = { run = ["{out}/seam{exe}", "BACKEND_IMPORT_OTHER-a-global-nobody-answers"] }
 
 [[case]]
-name = "BACKEND_IMPORT_MEMORY-past-the-first-64-imports-not-lent"
-run = ["{out}/seam{exe}", "BACKEND_IMPORT_MEMORY-past-the-first-64-imports-not-lent"]
-claims = { matches = ["module 'test:crowd@0.1.0' did not load: it was not handed both memories.*alive"] }
+name = "BACKEND_IMPORT_MEMORY-past-the-first-64-imports-lent"
+run = ["{out}/seam{exe}", "BACKEND_IMPORT_MEMORY-past-the-first-64-imports-lent"]
+claims = { matches = ["test:crowd@0\\.1\\.0: loaded.*alive"] }
 false = { run = ["{out}/seam{exe}", "BACKEND_IMPORT_OTHER-a-global-nobody-answers"] }
 
 [[case]]
