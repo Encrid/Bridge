@@ -10,6 +10,7 @@ Then it takes the dependencies with `take.py`.
 | --- | --- |
 | `zig_found(zig)` | Gives the path of the pinned zig, or nothing. |
 | `fetched(url, digest, folder)` | Downloads an archive into an empty folder, checks its digest, and unpacks it. |
+| `unpacked(path, folder)` | Unpacks an archive into a folder, as *Archives* tells. |
 | `fetch_zig(zig, home)` | Downloads the pinned zig for the target of this machine. |
 | `hunks(part)` | Gives each hunk of the part of a patch: its first line, its old lines and its new lines. |
 | `patched(tree, patch)` | Applies a patch to the files of a folder. |
@@ -44,7 +45,11 @@ It stops if the archive does not hold the pinned zig: `the archive holds no zig 
 1. It removes the folder, and makes it again.
 2. It downloads the archive into the folder.
 3. If the archive has a different digest, it removes it and stops: `<archive> is not what the maker publishes`.
-4. It unpacks the archive, and removes the archive.
+4. It unpacks the archive with `unpacked`, and removes the archive.
+
+`unpacked` gives an archive that is not a zip to `shutil.unpack_archive` of Python, which keeps the execute bits of its files.
+Python keeps no mode of the files of a zip. Thus `unpacked` unpacks each file of a zip, then adds the execute bits that the zip records for it.
+So a program of a zip can run on Linux and on macOS. Windows has no execute bit, so the bits change nothing there.
 
 ## Patches
 

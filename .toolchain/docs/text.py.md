@@ -1,6 +1,7 @@
 # .toolchain/tools/text.py
 
 `text.py` checks the characters, the legal notices and the comments of the project.
+It also checks the words and the calls that the project refuses.
 It reads the files that `ours` gives.
 
 ## Functions
@@ -11,6 +12,8 @@ It reads the files that `ours` gives.
 | `python(text, notice)` | Gives the faults of a Python file: its notice, its comments and its string statements. |
 | `faults(path, data, notice, unicode)` | Gives the faults of one file. `unicode` is true if the file can hold characters that are not ASCII. |
 | `retired(text, words)` | Gives a fault for each retired word of `words` in `text`. |
+| `refused(args, settings)` | Gives each name of the files of `[check] refuse`, with the file as the configuration writes it. |
+| `called(text, names)` | Gives a fault for each call of a refused name in `text`. |
 | `main()` | Runs the check. |
 
 ## The characters
@@ -72,6 +75,27 @@ The messages are:
 
 - `<path>:<line>: '<word>' is retired: write '<new>'`
 - `<path>:<line>: '<word>' is retired`, when the table gives no new word
+
+## Refused calls
+
+`[check] refuse` of the configuration names the files that list the calls that the project refuses.
+Each line of such a file is the name of a function. A line with no text names nothing.
+For example, a project names the list of the functions that a library which it links does not implement.
+
+`text.py` reads each file `.c` and `.h` of `src` and of `include`.
+A call is the name, then `(`, with only spaces between them. A letter, a digit or `_` just before the name makes a different name.
+
+A path of `[check] refuse` can hold variables.
+`text.py` makes the variables of the build of this machine with `prepared` of `build.py`. Thus it needs the pinned zig.
+Then it adds the variable of each source with `sources` of `fetch.py`, which stops if a source is not fetched.
+The variable of a dependency or of a tool is not there.
+
+The messages are:
+
+- `<path>:<line>: '<name>' is refused by <file>`. `<file>` is the path as the configuration writes it.
+- `[check] refuse: <path> is not there`, when a file of `[check] refuse` is not there. `<path>` is the path with the values of its variables. Then `text.py` stops.
+
+When a source of a path is not fetched, `text.py` stops with the message of `sources`. Run `fetch`, then `check`.
 
 ## Output
 

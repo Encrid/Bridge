@@ -7,17 +7,19 @@ The command `check` runs it.
 
 | Workflow | When it runs | What it does |
 | --- | --- | --- |
-| `ci.yml` | On each pull request, and on each push to `main`. | On each target, it runs `fetch`, the five commands and `pack`. `docs/contributing/pull_request.md`, *Before you open a pull request*, gives the five commands. |
+| `ci.yml` | On each pull request, and on each push to `main`. | On each target, it prepares the runner with `runner.py`, then runs `fetch`, the five commands and `pack`. `docs/contributing/pull_request.md`, *Before you open a pull request*, gives the five commands. |
 | `cla.yml` | On each pull request, and on each new comment of a pull request. | It runs `cla`, which asks the author to sign `cla.md`, and sets the status `cla`. |
 | `release.yml` | On each push of a tag `v*`. | It makes the release, as *The release* tells. |
 | `toolchain.yml` | Only in the repository `my_c23_template`: on each pull request, and on each push to `main`. | On each target, it runs `fetch`, `test --toolchain` and `test --toolchain --break`. |
+
+The step `Runner` of `ci.yml` and of `release.yml` gives the runner what the cases need: `.toolchain/docs/runner.py.md`.
 
 ## The release
 
 `release.yml` does these steps:
 
 1. It makes a draft release, with the name of the tag.
-2. On each target of its matrix, it runs `fetch`, `test` and `pack --target <target>`. Then it adds the zip of the target to the release.
+2. On each target of its matrix, it prepares the runner with `runner.py`, then runs `fetch`, `test` and `pack --target <target>`. Then it adds the zip of the target to the release.
 3. It writes `sha256.txt`, with the sha256 of each zip, and adds it to the release.
 4. It publishes the release.
 
