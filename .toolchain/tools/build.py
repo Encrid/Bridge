@@ -4,6 +4,7 @@
 import os
 import platform
 import shutil
+import stat
 import zipfile
 from pathlib import Path
 
@@ -54,10 +55,12 @@ def do(step, values, unstamped):
         os.replace(*[root / path for path in expanded(step['rename'], values)])
 
 
-def put(path, data):
+def put(path, source):
+    data = source.read_bytes()
     if not path.is_file() or path.read_bytes() != data:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
+    path.chmod(stat.S_IMODE(source.stat().st_mode) | stat.S_IWUSR)
 
 
 def moved(path, tree):
@@ -102,7 +105,7 @@ def built(config, values, artifact, tree=None):
         return name, []
     besides = [Path(file) for file in expanded(artifact.get('beside', []), mine)]
     for file in besides:
-        put(output.parent / file.name, file.read_bytes())
+        put(output.parent / file.name, file)
     return name, [output] + [output.parent / file.name for file in besides]
 
 
@@ -202,20 +205,20 @@ def composed(config, values):
         _, mine = planned(config, values, artifact)
         outs = [Path(mine['output'])] + [Path(file) for file in expanded(artifact.get('beside', []), mine)]
         for path in outs:
-            put(dist / path.name, path.read_bytes())
+            put(dist / path.name, path)
             kit.append(path.name)
     for table in config.get('compose', {}).values():
         if not isinstance(table, dict):
             continue
         start = located(table.get('from', ''), values)
         for name in files(start, table.get('headers', [])):
-            put(dist / name, (start / name).read_bytes())
+            put(dist / name, start / name)
             kit.append(name)
         for asset in table.get('assets', []):
-            put(dist / Path(asset).name, (out / asset).read_bytes())
+            put(dist / Path(asset).name, out / asset)
             kit.append(Path(asset).name)
     for name in files(root, ['license', 'third_party/*/license']):
-        put(dist / name, (root / name).read_bytes())
+        put(dist / name, root / name)
         kit.append(name)
     kit = list(dict.fromkeys(kit))
     print('\n'.join(kit))
