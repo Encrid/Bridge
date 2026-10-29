@@ -23,9 +23,9 @@ int module_check_identity(bridge_world_t *w, const char *id)
         say_error(w, "a module with no identity is refused");
         return (1);
     }
-    if (strlen(id) > 127) {
+    if (strlen(id) > NAME_MOST) {
         say_error(w, "a module with an identity of %zu bytes is refused: "
-            "an identity has at most 127 bytes", strlen(id));
+            "an identity has at most %u bytes", strlen(id), NAME_MOST);
         return (1);
     }
     if (has_form(id))
