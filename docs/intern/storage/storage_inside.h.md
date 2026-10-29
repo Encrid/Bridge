@@ -202,7 +202,7 @@ The budget sizes it when the world is made: `docs/intern/block/block_budget.c.md
 | `tables`, `table_room` | The tables, by id, and how many ids there may be beside 0: `[budget] tables` plus `[budget] sparse_sets`. |
 | `table_free`, `table_next` | The free list of table ids. |
 | `table_high` | The table ids from `table_high` on were never used. |
-| `hash`, `hash_room` | A set to its table, by open addressing. `hash_room` is a power of two, at least 16 and at least twice the table ids. |
+| `hash`, `hash_room` | A set to its table, by open addressing. `hash_room` is a power of two: `docs/intern/storage/storage_made.c.md`, *The hash of tables*. |
 | `sets` | For each table, which types its entities carry: `words` words each. |
 | `columns` | For each table and type, where the column of the type is, and 0 if it has none. |
 | `col_hash` | For each table and type, the last hash of its column, for the checksum pass. Beside `columns`, and with its shape. |

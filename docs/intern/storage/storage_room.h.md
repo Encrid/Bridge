@@ -1,7 +1,7 @@
 # src/storage/storage_room.h
 
 This header finds room for each row that a barrier adds to a table, before anything moves.
-It is the second step of a barrier, of a move, and of a delete at an unload.
+`reserve_all` of `src/storage/storage_apply.h` uses it: `docs/intern/storage/storage_apply.h.md`, *Functions*.
 
 ## Running out
 
@@ -13,14 +13,14 @@ Storage places the other entities as usual.
 A destroy that leaves a husk can be dropped too, since the husk moves to the table of what it keeps.
 
 When a table cannot take all the rows that arrive, it takes as many as it finds room for.
-It asks the column region for half as many rows until a number fits.
-Then it searches back up, between that number and the last number that did not fit:
+It asks the column region again for `table_retry` percent of the rows of its last ask, until a number fits: `get_retry`.
+Then it searches back up, between that number and its first ask:
 
 ```pseudo
 PROCEDURE size_table(t : U32)
    most <- tables[t].incoming
    WHILE tables[t].incoming > 0 AND NOT grow_table(t, tables[t].rows + tables[t].incoming)
-      tables[t].incoming <- tables[t].incoming DIV 2
+      tables[t].incoming <- get_retry(tables[t].incoming)
    ENDWHILE
    WHILE most - tables[t].incoming > 1
       between <- tables[t].incoming + (most - tables[t].incoming) DIV 2
@@ -34,7 +34,10 @@ PROCEDURE size_table(t : U32)
 ENDPROCEDURE
 ```
 
-With room for 4 rows of 6, the search places 4, where the halving alone places 3.
+With room for 4 rows of 6 and a `table_retry` of 50, the search places 4, where the asks alone place 3.
+The search halves its range at each step. That is a bisection, the strategy of the search, so it is no key.
+`table_retry` sets only the asks before it: `docs/extern/bridge.h.md`, *The tables of storage*.
+
 Storage takes room for the entities in the order of their first change, which is the order the calls ran.
 So the first entities asked are the ones placed, and the same ones on each run.
 
@@ -51,8 +54,8 @@ It names who asked, and nothing has begun when it finds the shortage, so nothing
 
 | Function | Result |
 | --- | --- |
+| `get_retry` | Gives the rows of the next ask, after an ask of `rows` did not fit: `table_retry` percent of them, in 64 bits. Below 100 percent, each ask is smaller, so the asks end at 0. |
 | `size_table` | Finds room in table `t` for all the rows it gains at this barrier, or for as many as the column region holds. Sets `incoming` to that number. |
 | `make_room` | Takes room for one more row that table `t` gains. The first time, it sizes the table. Gives false if no room is left. |
 | `room_joins` | For the entity at `index`, takes room in each sparse set that it joins. Gives false at the first set with no room. |
 | `room_one` | Takes room for the entity at `index` where it is to be, or leaves it as it was for want of columns. An entity that gets no new row needs no room. Most of what a barrier sees is an attach to an entity that has the component already. |
-| `reserve_all` | The second step of a barrier, of a move and of a delete. Finds a table for each changed entity, then room in it and in each sparse set that it joins, before anything moves. |
