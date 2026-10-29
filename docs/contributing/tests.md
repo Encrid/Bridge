@@ -50,6 +50,7 @@ If `tests/cases` holds no case, `test` writes `no case: tests/cases holds no cas
 | `helper` | A second command that runs at the same time. |
 | `files` | The text files that `test` writes before the command starts. The key is the path, and the value is the text. |
 | `folders` | The folders that `test` makes before the command starts. The key is the path. The value is a list of artifacts or files to copy into the folder. |
+| `fail` | The calls that fail in the command. The key is a function, and the value is the number of its call that fails: *Failed calls*. |
 | `claims` | The claims about the command. A case must make one claim or more. |
 | `false` | The false variant of the case. Each case must have one. |
 | `alone` | `true` if the case must not run at the same time as a copy of itself. Such a case runs one time with `--copies`. |
@@ -138,6 +139,7 @@ A condition in an argument or in the body of a macro cannot get a probe. The run
 Thus write such a condition outside the macro.
 
 The probes change the program, thus the run does not judge the claims. It writes the verdicts only for information.
+An outcome counts as soon as a case reaches it, also if the program then ends with `_Exit` or `abort`.
 `.toolchain/docs/branches.py.md` tells how the probes work.
 
 ## The leaks
@@ -158,6 +160,29 @@ For each line, make the code give the resource back. If a case keeps a resource 
 `.toolchain/docs/project.toml.md`, *[[leaks.exception]]*, tells how.
 The counts change the program, thus the run does not judge the claims. It writes the verdicts only for information.
 `.toolchain/docs/leaks.py.md` tells how the count works.
+
+## Failed calls
+
+A case can make a call of the code fail. Thus the case runs the path of the error, for example the branch of `if (!p)`.
+The key `fail` names each function, and the number of its call that fails. The first call has the number 1.
+In this case, the second call of `malloc` gives `nullptr`:
+
+```toml
+[[case]]
+name = "greet writes an error when it has no memory"
+run = ["{out}/greet{exe}", "Ada"]
+fail = { malloc = 2 }
+claims = { status = 1, line = ["greet: no memory"] }
+false = { fail = {} }
+```
+
+`malloc`, `calloc` and `realloc` can always fail. `fail.toml` of `.toolchain/config` names more functions, each with the value that a failed call gives.
+`.toolchain/docs/project.toml.md`, *[fail]*, gives its keys. Only the calls of the code of `src` count, and the files of one program share one count.
+The false variant states no `fail`, or a different number.
+
+`test` runs each case that states `fail` on a copy of the code in which these calls can fail. It judges the claims of the case.
+`test --branches` and `test --leaks` make the calls fail too. Thus a case reaches each `if (!p)`, and gives back what the code took on that path.
+`.toolchain/docs/fail.py.md` tells how a call fails.
 
 ## Run the tests
 

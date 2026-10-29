@@ -60,36 +60,26 @@ The count reads the value only after the call, because before the call the value
 
 `counted` does these steps:
 
-1. `listed` reads the counted functions and their kinds.
+1. `listed` reads the counted functions and their kinds. `listed` of `fail.py` reads the functions that can fail.
 2. `rewrite.each` gives a syntax tree for each compiled file `.c` of `src`: `.toolchain/docs/rewrite.py.md`.
-3. In each tree, `found` finds the counted functions that the file uses, and their declarations. It skips a function that the file defines, but not a callback.
+3. In each tree, `rewrite.found` finds the functions of the two lists that the file uses, and their declarations. It skips a function that the file defines, but not a callback.
 4. `rewrite.copied` copies `src` and `include` into `<build>/leaks/tree`.
-5. `rewritten` writes the count into each copy of a file that uses a counted function.
+5. `rewritten` writes the count and the layer of `fail.py` into each copy of a file that uses such a function.
 
 Then `test.py` builds the copies and runs the cases, and `reported` writes the report: `.toolchain/docs/test.py.md`, *The leaks*.
 
 ## The count in a file
 
-After the last `#include` of a file, a block renames each counted function that the file uses. For `free`, the block is:
-
-```c
-[[maybe_unused]] static typeof(free) c23b_l_free;
-#pragma push_macro("free")
-#undef free
-#define free c23b_l_free
-```
-
-Each later use of the name calls the function that counts, also a use of the name as a pointer.
-No header sees the new name, because the headers come before the block.
-If the last `#include` is in an `#if` that holds only lines of the preprocessor, the block comes after the `#endif` of that `#if`.
-A `#line` after the block keeps the numbers of the lines.
+The count gives each counted function that the file uses the name of a function that counts: `.toolchain/docs/rewrite.py.md`, *The rename*.
 A callback that the file defines gets its block after the end of its definition.
 Thus each later use of its name, also a use as a pointer, counts what the callback gets and hands over.
+The block of the layer of `fail.py` comes before the block of the count, and its end comes after the end of the count.
+Thus the function that counts calls the function of the layer, and a failed call takes nothing.
 
-At the end of the file, `#pragma pop_macro` gives each name its first meaning again. Then the file has these parts:
+At the end of the file, the count writes these parts:
 
 - an array of `_Atomic long long`, with a count for each kind and a count of the calls of `realloc` with 0 bytes;
-- for each counted function, a `static` function that counts and calls it, with the parameters of its declaration and with each `typedef` replaced. It reads the values of the gives before the call, and the values of the takes and of the results after the call;
+- for each counted function, a `static` function that counts and calls it. It reads the values of the gives before the call, and the values of the takes and of the results after the call;
 - the writer of `rewrite.py`: `.toolchain/docs/rewrite.py.md`, *The writer*.
 
 Each program writes one line `<path> <counts>` for each file into the file of the variable `C23_LEAKS`.
@@ -99,13 +89,14 @@ The line has a count for each kind, in the order of `listed`, and then the count
 
 - `<name> takes a resource, and does not give a pointer`
 - `<name> gives back a resource, and does not get a pointer first`
-- `<name> takes a list of arguments of no fixed length`
 - `<name> gives no result`
 - `<name> has no argument <n>`
 - `<name> does not get a pointer as argument <n>`
 - `[leaks] with: <file> is not there`
 - `[leaks.kinds.<kind>]: <name> cannot take at <place>`, or `cannot give back at <place>`
 - `[leaks.kinds.<kind>]: a kind has no key <key>`
+
+`rewrite.signed` can stop `counted` too: `.toolchain/docs/rewrite.py.md`, *The rename*.
 
 ## The report
 
@@ -154,16 +145,11 @@ An exemption that excuses no kept resource is a fault, so a case that gives the 
 | --- | --- |
 | `listed(config, values)` | Gives the effects of each counted function, and the list of the kinds. An effect is a role, a kind, a place, and whether the function must fit a pointer. It reads the files of `[leaks] with`. |
 | `kinded(names, kind, acts)` | Adds the effects of one table `[leaks.kinds.<kind>]` to `names`. It stops on a key or a place that does not fit. |
-| `plain(kind)` | Gives a type of the syntax tree with each `typedef` replaced, if the dump gives it. A header can use a name that the end of the file does not know. |
-| `declaration(node, typedefs)` | Gives the type of the result and the types of the parameters of the declaration of a function. A result whose type is a name of `typedefs` gets the type of that `typedef`. |
-| `found(root, path, tree, names)` | Gives the counted functions that a file uses, as step 3 of *The steps* tells, and the declaration of each of them. It also gives the end of the definition of each callback that the file defines and uses. |
-| `directive(line)` | Gives the name of the directive of a line, an empty text for a blank line, or `None` for a line of code. |
-| `included(text)` | Gives the byte after the last `#include` of a file, or after the `#endif` of the `#if` that holds it. |
 | `fitted(name, effects, returned, parameters)` | Stops if a place of a function does not fit its declaration. |
 | `tested(effect, kinds)` | Gives the line that counts one effect, when its value is not zero. |
 | `wrapped(name, effects, kinds, declaration)` | Gives the `static` function that counts the calls of a function. |
-| `rewritten(text, path, used, ends, declared, names, kinds)` | Gives a file with its count. |
-| `counted(config, values)` | Writes the copies with the counts, as *The steps* tells. It gives the files that count, and the kinds. |
+| `rewritten(text, path, used, ends, declared, names, kinds, outer)` | Gives a file with its count, inside `outer`, the layer of `fail.py`. |
+| `counted(config, values)` | Writes the copies with the counts and the layers, as *The steps* tells. It gives the files that count, and the kinds. |
 | `added(path, files, slots)` | Gives the counts of one case, added kind by kind from the lines of its file. |
 | `excused(listed, system, case, kind)` | Tells if `listed` holds an exemption for this kept resource on this system, and counts the match. |
 | `reported(files, kinds, cases, excepted, system)` | Writes the report, as *The report* tells. `cases` gives the file of the lines of each case. |
