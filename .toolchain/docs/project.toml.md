@@ -1,7 +1,7 @@
 # .toolchain/project.toml
 
 `.toolchain/project.toml` holds `[project]`, `[test]` and `[ci]`.
-The other values are in the files of `.toolchain/config`, one file for each concern: `artifacts.toml`, `modules.toml`, `targets.toml`, `kinds.toml`, `sources.toml`, `variables.toml`, `package.toml`, `checks.toml` and `leaks.toml`.
+The other values are in the files of `.toolchain/config`, one file for each concern: `artifacts.toml`, `modules.toml`, `targets.toml`, `kinds.toml`, `sources.toml`, `variables.toml`, `package.toml`, `checks.toml`, `leaks.toml` and `fail.toml`.
 zig, the compiler flags and the limits of the style are in `.toolchain/toolchain.toml`.
 The tools read every file as one configuration.
 
@@ -409,3 +409,26 @@ why = "A backend library that cannot unload stays open, and the next world uses 
 ```
 
 `test --leaks` reports an exemption that states no reason, or that excuses no kept resource.
+
+## [fail]
+
+`[fail]` names the functions that a case can make fail, in addition to `malloc`, `calloc` and `realloc`: `docs/contributing/tests.md`, *Failed calls*.
+A project writes it in `fail.toml` of `.toolchain/config`.
+
+| Key | Value |
+| --- | --- |
+| `calls` | A table: each key is a function, and its value is the value that a failed call gives, as a text of C. |
+| `with` | The files that give more `calls`, each in a table `[fail]`. A path can hold the variables of the build. |
+
+For example, a project names two functions of a different project, and the file of a package:
+
+```toml
+[fail]
+with = ["{bridge_os}/fail.toml"]
+
+[fail.calls]
+os_commit = "-1"
+os_lib_open = "nullptr"
+```
+
+`.toolchain/docs/fail.py.md` tells how a call fails.
