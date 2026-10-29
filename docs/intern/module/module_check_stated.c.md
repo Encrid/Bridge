@@ -16,7 +16,7 @@ Where "none" is a real answer, it is a value of its own, and there are two, beca
 
 | Value | Meaning | Keys |
 | --- | --- | --- |
-| `BRIDGE_NO_LIMIT`, -1 | A limit stated as none: the module may use all there is. | `max_system_failures`, `work_limit`, `memory_limit`, `init_timeout`, `reload_timeout`, `shutdown_timeout` |
+| `BRIDGE_NO_LIMIT`, -1 | A limit stated as none: the module may use all there is. | `max_system_failures`, `work_limit`, `memory_limit`, `element_limit`, `init_timeout`, `reload_timeout`, `shutdown_timeout` |
 | `BRIDGE_NONE`, -2 | A reservation stated as none: the module gets nothing. | `spawns`, `persistent`, `changes`, `loss_count` |
 
 Each key takes its own "none".
