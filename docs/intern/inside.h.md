@@ -257,7 +257,7 @@ So a range given back never asks for memory.
 | `CHANGE_SKIPPED` | 4: a queued attach or destroy of a husk, which the fold did not apply. The barrier writes no value of it. |
 | `TURN_LIFECYCLE` | `1 << 32`: the turns of the lifecycle calls. |
 | `TURN_SYSTEM` | `2 << 32`: the turns of the systems of a phase. |
-| `NAME_MOST` | 127: the longest name, in bytes, that a declared type, a system or an observer can have. |
+| `NAME_MOST` | 127: the longest name, in bytes, that a declared type, a system or an observer can have, and the longest identity of a module. |
 
 A turn orders all the calls that ran before a barrier.
 The observers of the last barrier come first, then the lifecycle calls, then the systems of the phase, each in the order it ran.
