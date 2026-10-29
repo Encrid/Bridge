@@ -1,7 +1,7 @@
 # src/schema/schema_token.c
 
 This file tells what a token of a descriptor is: a name, an integer, or a given type.
-It also copies a text.
+It also copies a text, and takes the room of the fields or of the constants.
 
 ## Integers
 
@@ -22,3 +22,4 @@ So the test that `end` is on the zero byte also tells that the read took a chara
 | `schema_get_integer` | Reads the token as an integer, and says whether it is below zero. Gives false if it is not an integer, or if the token was cut. |
 | `schema_find_given` | Gives the index in `SCHEMA_GIVEN` of the type that the token names, or -1. |
 | `schema_copy_text` | Gives a copy of a text in memory from `malloc`, or `nullptr` if there is no memory. |
+| `schema_take_room` | Gives zeroed room for one item of `size` bytes for each `mark` of the text, and one more. Gives `nullptr` if there is no memory. |

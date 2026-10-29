@@ -51,7 +51,6 @@ The reading of one descriptor.
 | `cut` | The token was longer than a name may be. |
 | `source` | What `schema_parse` reads. |
 | `out` | The type being laid out. |
-| `room` | How many fields or constants `out` has memory for. |
 | `value`, `below` | The value of the last constant, and whether it is below zero: the next constant counts up from it. |
 
 ### schema_laid_t
