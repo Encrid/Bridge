@@ -177,7 +177,7 @@ A pointer and a `size_t` have 8 bytes. The library has no build for a smaller po
 ## BRIDGE_HOST_ABI
 
 `BRIDGE_HOST_ABI` is the number of the host seam: the version of the structs and the functions of this header.
-The number is 2.
+The number is 3.
 A host gives the number that it was built against in `abi`, the first field of `bridge_config_t`.
 `bridge_create` reads `abi` before any other field, and refuses a different number.
 Until the first release of Bridge, the number stays 1, and the structs can change.
@@ -332,14 +332,54 @@ A pair against that order makes a cycle, and the load or the reload fails.
 | `order_count` | How many pairs `order` holds. Zero is no pair. |
 | `threads` | How many threads run a phase. The thread that calls `bridge_run_phase` counts. Zero is unset. |
 | `budget` | The budget of the world: a `bridge_budget_t`. |
-| `profile` | Whether Bridge times each system and observer for `bridge_profile`. Zero is off, the default. |
-| `validate` | Whether Bridge checks each column for a write no running system declared. Zero is off, the default. |
+| `profile` | Whether Bridge times each system and observer for `bridge_profile`: an item of `enum bridge_flag`. |
+| `validate` | Whether Bridge checks each column for a write no running system declared: an item of `enum bridge_flag`. |
+| `pad3` | 2 bytes of padding. |
+| `observer_passes` | The most barriers that one call runs in a row: *Observer passes*. Zero is unset. |
+| `stack` | The size of the stack of each thread of the world, in bytes: *The threads*. Zero is unset. |
+| `table_growth` | The room that a table asks for when it grows, in percent of its room: *The tables of storage*. Zero is unset. |
+| `table_hash_fill` | The most fill of the hash of the tables, in percent: *The tables of storage*. Zero is unset. |
+| `table_retry` | The rows that a table asks for again, in percent of its last ask: *The tables of storage*. Zero is unset. |
+| `pad4` | 4 bytes of padding. |
 
 A phase is a name, and nothing more. Bridge has no phase of its own, thus a deployment declares one at least.
 Each name of a phase is different, and not empty.
 The host calls the phases in the order that it wants, as often as it wants.
+
+### The threads
+
 The world keeps `threads` minus 1 threads of its own for as long as it exists.
+Each of them has a stack of `stack` bytes at least. The operating system can round the size up to its unit and to its least stack.
 At `threads` of 1, the thread of the host runs all the systems, in an order that never changes.
+
+The thread of the host runs systems too, on the stack that the host gave it.
+A backend that runs a module on a stack of its own needs a bound below `stack`, for example `max_wasm_stack` of BB-Wasm.
+If the operating system cannot start a thread with this stack, `bridge_create` fails: *Out of memory*.
+
+### Observer passes
+
+A barrier runs the observers of what it applied, and what they queue applies at the next barrier: `docs/extern/bridge_abi.h.md`, *observe*.
+`observer_passes` is the most barriers that one call of the world runs in a row.
+After a barrier whose observers queued a change, the next barrier runs at once, until `observer_passes` barriers ran.
+At 1, a call runs one barrier, and a chain of three observers takes three calls. At 3, the chain ends in one call.
+
+Each of these barriers is a whole barrier. It applies the changes, runs the observers, counts the failures and gives the lines of the logs.
+Each one counts in `barriers`.
+
+### The tables of storage
+
+`table_growth`, `table_hash_fill` and `table_retry` tune the tables of storage: the memory that they take against the time that they take.
+
+When a table grows, it asks for its room times `table_growth`, divided by 100: at 150, half as much room again.
+At 100, the table asks only for the rows that it needs. `bridge_create` refuses a `table_growth` below 100.
+The room that a table does not use yet is part of `[budget] columns`, and no other table can take it.
+
+Storage finds the table of an archetype through a hash. `table_hash_fill` is the most part of the places of the hash that the tables fill, in percent.
+It is 1 to 99, since a full hash would not end a search. A lower fill takes more memory, and finds a table in fewer steps.
+
+When `[budget] columns` cannot hold all the new rows of a table at a barrier, the table asks for fewer rows.
+Each new ask is `table_retry` percent of the last one, until one fits. Then a search between that ask and the first looks for more rows that fit.
+A low value finds a fit in few asks when little room is left. A high value leaves a short search when most rows fit. It is 1 to 99.
 
 ## bridge_phase_name_t
 
@@ -361,8 +401,8 @@ A system that names a phase as it is fails to register if a map of its module pu
 
 ## bridge_flag
 
-`enum bridge_flag` is the value of a key that is yes or no.
-A key left at zero is unset, and a load refuses it: Bridge does not take it for no.
+`enum bridge_flag` is the value of a key that is yes or no, of the deployment or of a module.
+A key left at zero is unset, and `bridge_create` or a load refuses it: Bridge does not take it for no.
 
 | Item | Value |
 | --- | --- |
@@ -410,10 +450,10 @@ The host states each field: zero is unset, and a load refuses it. A count of an 
 | `hot_reload` | `BRIDGE_TRUE` if the deployment lets `bridge_reload` replace the module. It cannot allow what `reloadable` forbids. |
 | `pinned` | `BRIDGE_TRUE` if each system and observer of the module runs on the thread that loaded it. |
 | `on_error` | What the loss of the module costs: an item of `enum bridge_on_error`. |
-| `pad0` | 7 bytes of padding. |
+| `element_limit` | The most elements that the reference tables of the module can hold, or `BRIDGE_NO_LIMIT`. |
 | `max_system_failures` | The count of failures of one system or observer at which Bridge stops the module, or `BRIDGE_NO_LIMIT`. |
 | `work_limit` | The work that one invocation of a system can do, in the units of the backend, or `BRIDGE_NO_LIMIT`. |
-| `memory_limit` | The most bytes that the own memory of the module can have, or `BRIDGE_NO_LIMIT`. |
+| `memory_limit` | The most bytes that the own memory of the module can have, or `BRIDGE_NO_LIMIT`. It bounds the memory only, and not the reference tables. |
 | `init_timeout` | The longest time of one call of `init`, in nanoseconds, or `BRIDGE_NO_LIMIT`. |
 | `reload_timeout` | The longest time of one call of `reload`, in nanoseconds, or `BRIDGE_NO_LIMIT`. |
 | `shutdown_timeout` | The longest time of one call of `shutdown`, in nanoseconds, or `BRIDGE_NO_LIMIT`. |
@@ -450,22 +490,25 @@ Thus the host can free the config when the call returns.
 
 ### The limits
 
-`max_system_failures`, `work_limit`, `memory_limit` and the three timeouts are limits.
+`max_system_failures`, `work_limit`, `memory_limit`, `element_limit` and the three timeouts are limits.
 A limit above zero, and some other keys, demand a capability of the backend:
 
 | Key | Capability |
 | --- | --- |
 | `work_limit` above zero | `BACKEND_WORK_LIMIT` |
 | `memory_limit` above zero | `BACKEND_MEMORY_LIMIT` |
+| `element_limit` above zero | `BACKEND_ELEMENT_LIMIT` |
 | A timeout above zero | `BACKEND_TIMEOUT` |
 | `hot_reload` of `BRIDGE_TRUE` | `BACKEND_RELOAD` |
+
+A reference table is a list of references that a backend keeps for a module, for example a table of functions of WebAssembly. It is no table of storage.
 
 A load refuses a config that demands a capability that its backend does not have. Bridge does not give less than a config asks.
 `BRIDGE_NO_LIMIT` demands nothing, thus the backend can compile the module with no count and no check in it.
 `docs/extern/bridge_backend.h.md`, *backend_capability* tells what each capability promises.
 
 Bridge sets `work_limit` again before each invocation of a system: it bounds one invocation.
-A timeout bounds one call of the export of its name. `memory_limit` is a ceiling for the life of the instance.
+A timeout bounds one call of the export of its name. `memory_limit` and `element_limit` are ceilings for the life of the instance.
 A system that never returns, with no work limit, holds `bridge_run_phase` for ever.
 A work limit stops a system at the same place on each run. A timeout can stop a call on a slow machine, and not on a fast one.
 
@@ -809,7 +852,7 @@ A module that Bridge stopped long after its load shows as `BRIDGE_STOPPED`.
 
 ## bridge_profile
 
-`bridge_profile` tells the time of each system and observer. The deployment turns it on with `profile` of `bridge_config_t`.
+`bridge_profile` tells the time of each system and observer. The deployment turns it on with `profile` of `bridge_config_t`, at `BRIDGE_TRUE`.
 
 | Parameter | Content |
 | --- | --- |
@@ -824,7 +867,7 @@ The time and the count stay 0 while `profile` is off. A pull never resets a coun
 
 ## validate
 
-`validate` of `bridge_config_t` turns on a check of the columns, off by default.
+`validate` of `bridge_config_t` at `BRIDGE_TRUE` turns on a check of the columns.
 Only a native module can write a column in place, so only it can write one no running system declared.
 With `validate` on, Bridge hashes each column after each system runs, and compares it to the hash before.
 A column that changed whose type the system holds no write term for draws a warning: `system '<system>' wrote a column that it did not declare to write`.
@@ -866,7 +909,7 @@ A call from a second thread, while the world is busy with a call, gives -1 and w
 
 ## bridge_run_phase
 
-`bridge_run_phase` runs one phase and the barrier after it.
+`bridge_run_phase` runs one phase and the barriers after it.
 
 | Parameter | Content |
 | --- | --- |
@@ -877,6 +920,7 @@ A call from a second thread, while the world is busy with a call, gives -1 and w
 2. At the barrier, Bridge applies the queued changes in the order of the calls, and writes the spans.
 3. The observers of what changed run. What they queue applies at the next barrier.
 4. Bridge counts the failures, and gives the lines of the logs to the sink.
+5. If the observers queued a change, and fewer than `observer_passes` barriers ran, steps 2 to 4 run again.
 
 The systems and the observers of one module run one after another, and each one from its start to its return.
 
@@ -925,6 +969,11 @@ Each record of Bridge has the level `BRIDGE_ERR`, unless its group tells another
 - `abi is unset`
 - `the host is of host ABI <number>, and this is <number>`
 - `threads is unset`
+- `<key> is unset`
+- `<key> is <number>, which is neither BRIDGE_TRUE nor BRIDGE_FALSE`
+- `table_growth is <number>, which is less than 100`
+- `table_hash_fill is <number>, which is not 1 to 99`
+- `table_retry is <number>, which is not 1 to 99`
 - `the deployment configures no backend, and a module is run by one`
 - `backend <index> has no name`
 - `backend <index> has no library`
@@ -953,6 +1002,8 @@ Each record of Bridge has the level `BRIDGE_ERR`, unless its group tells another
 - `[budget] cannot be satisfied: the operating system would not give <bytes> bytes, in a reservation of <bytes> bytes`
 - `[budget] cannot be satisfied: the operating system would not give storage <bytes> bytes of its own for the columns it keeps`
 
+In the records of a key, `<key>` is a key of `bridge_config_t` outside `budget`, for example `profile`.
+The record of a value that is no item is for `profile` and `validate`: *bridge_flag*.
 The reason of `backend '<backend>': <reason>` is `cannot open backend library '<path>'`, or a reason of `docs/extern/bridge_backend.h.md`, *Messages*.
 The reason of `would not start` and of `cannot adopt` is the text of the backend.
 `bridge_set_order` writes the three `[order]` records of this group too, when a new set does not name two systems, cannot be read, or contradicts itself.

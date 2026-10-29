@@ -53,7 +53,7 @@ src/            Bridge library: the orchestrator a host links
   schedule/     system and observer scheduler: conflicts, order, dispatch
   pool/         worker thread pool
   module/       per-module record and lifecycle (check, start, call, discard)
-  backend/      opens a backend and resolves its 18-function vtable
+  backend/      opens a backend and resolves its 19-function vtable
   reload/       hot-reload: re-check configs, move component rows
   abi/          the module seam: the 8 ABI entries, relayed to a backend
   schema/       reads and compares type descriptor text, fingerprints types
