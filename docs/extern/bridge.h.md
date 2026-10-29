@@ -1015,6 +1015,7 @@ The reason is a text of the backend, a refusal of an entry of the module, or one
 
 - `the operating system would not give its private memory of <bytes> bytes`
 - `out of memory: there was none to call its <export> with`
+- `out of memory: there was none for the list of its imports`
 - `its <export> answered <status>`
 - `its <export> <reason>`
 - `its spawns of <count> do not fit under [budget] entities of <count>`

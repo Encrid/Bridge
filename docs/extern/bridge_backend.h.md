@@ -140,7 +140,9 @@ A backend can enforce more than `demands`, and never less.
 
 `module_list_imports` gives how many imports the image makes, and fills at most `max` items of `out`.
 Each item is a `backend_import_t`.
-Bridge reads the imports to know which memories to give to `instance_create`. It gives a `max` of 64.
+Bridge reads each import, to know which memories to give to `instance_create`.
+It calls `module_list_imports` two times. The first call has a `max` of 0 and a null `out`, and gives the count.
+The second call has room for that count of items.
 
 | Field | Content |
 | --- | --- |
@@ -231,7 +233,7 @@ Bridge treats a call that did not return as it treats a status that is not 0: `d
 | When | Bridge calls |
 | --- | --- |
 | `bridge_create` | `backend_get_abi`, `backend_create`, `backend_get_capabilities`, `memory_get_shape`, then `memory_adopt` of the shared memory. |
-| A load | `module_compile`, `memory_adopt` of the private memory, `module_list_imports`, `instance_create`, and `define_func` 8 times. |
+| A load | `module_compile`, `memory_adopt` of the private memory, `module_list_imports` 2 times, `instance_create`, and `define_func` 8 times. |
 | A load, then | `instance_set_memory_limit`, `instance_get_func` of `init`, `instance_set_timeout`, `call` of `init`, then `instance_get_func` of each export. |
 | A load that fails after `init` gave 0 | The calls of an unload. `instance_set_timeout` and `call` of `shutdown` come only if Bridge found `shutdown`. |
 | A phase | `instance_set_work_limit` and `call` of each system. |
