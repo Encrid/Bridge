@@ -24,6 +24,8 @@ A component is the settings of one loaded module at a time.
 After `init`, the component is the live state.
 A change of a setting while the deployment runs is a write of the component, by a module that has the grant.
 It is not a call and not a reload: the config gives the initial value, and the component holds the running state.
+
+So a reload writes no setting again. This stays fixed, and is no key of the deployment: a second write would undo what the systems wrote.
 The settings that are Bridge's own, for example a work limit or a log level, change by a reload.
 To keep a changed setting across a restart, a native module writes a file, and the host reads it back. Bridge never sees it.
 
