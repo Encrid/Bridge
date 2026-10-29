@@ -13,7 +13,7 @@ With `--pack`, it also puts the deliverable into a zip file.
 | `leb(n)` | Gives a number as an unsigned LEB128, the format of the numbers of WebAssembly. |
 | `run_in(step, values)` | Runs the command of a step in its folder `cwd`, as *Steps* tells. |
 | `do(step, values, unstamped)` | Does one step of a kind. |
-| `put(path, data)` | Writes a file only if it is not there or is different. |
+| `put(path, source)` | Writes a copy of `source` only if it is not there or is different. Then it gives the copy the mode of `source`, as *The deliverable* tells. |
 | `moved(path, tree)` | Gives the path in `tree` for a path of `src` or of `include`, and else the path. With no tree, it gives the path. |
 | `planned(config, values, artifact, tree)` | Gives the kind and the variables of one artifact, as steps 1 to 4 of *Artifacts* tell. |
 | `built(config, values, artifact, tree)` | Builds one artifact. It gives the name of the artifact and its files. |
@@ -162,11 +162,15 @@ It also copies `license`, and `license` of each folder of `third_party`, at thei
 A program can call `composed` after `prepared` alone, with no step of `ready`.
 Thus `from` can use the variables of `prepared`, but not the variable of a source, of a dependency or of a tool.
 
+Each file that `composed` copies into `dist` keeps the mode of its source, with `put`. So a program of the deliverable keeps its execute bits.
+`put` also lets the owner write the copy, so a later build can replace it.
+On Windows, a file has no execute bit: the name `<name>.exe` makes a program.
+
 ## The zip
 
 `packed` writes one file, `<build>/<project>-<target>.zip`, in the output folder and not in the folder of the target.
-It puts each file of the deliverable `kit` into the zip, at its path from `dist`.
-So the zip is the deliverable that `composed` made.
+It puts each file of the deliverable `kit` into the zip, at its path from `dist`, with the mode of the file.
+So the zip is the deliverable that `composed` made, and `fetch` gives a program of the zip its execute bits: `.toolchain/docs/fetch.py.md`, *Archives*.
 `packed` writes the path of the zip, then the name of each file in the zip.
 
 Before it writes the zip, `packed` reads each file of the deliverable.
