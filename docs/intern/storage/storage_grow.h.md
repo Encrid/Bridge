@@ -4,8 +4,10 @@ This header gives a table room for more rows: a longer block, and each column mo
 
 ## Growth
 
-A table that needs more rows asks for half as much room again as it had.
-So a table that grows a row at a time does not move each time.
+When rows come to a table that is full, the table takes the room that `table_growth` gives: `docs/extern/bridge.h.md`, *The tables of storage*.
+The product of the room and `table_growth` is in 64 bits, and the room is at most `UINT32_MAX` rows.
+So at 150, a table that grows a row at a time does not move each time.
+
 Where the column region cannot give that much, the table asks for the rows it needs and no more.
 `block_column_regrow` of `src/block/block_column.c` gives the longer block.
 It grows the block where it stands when what follows it is free.
@@ -13,13 +15,13 @@ Otherwise it takes a new block, and copies the old block to its start.
 
 Measured on a table of 64-byte rows, grown a thousand rows at a time to a hundred thousand:
 
-| Growth | Time for each row | Room not used |
+| `table_growth` | Time for each row | Room not used |
 | --- | --- | --- |
-| Half again | 55 to 61 ns | 15% |
-| Twice | 54 to 62 ns | 28% |
-| Only what it needs | 97 to 105 ns | None |
+| 150, half again | 55 to 61 ns | 15% |
+| 200, twice | 54 to 62 ns | 28% |
+| 100, only what it needs | 97 to 105 ns | None |
 
-So growth by a share pays, and the smaller share is as fast, with half the room not used.
+So growth by a share pays, and 150 is as fast as 200, with half the room not used.
 
 ## Moving the columns
 
@@ -38,8 +40,8 @@ The first block of a table has nothing in it, so nothing moves: `place_columns` 
 
 | Function | Result |
 | --- | --- |
-| `take_longer` | Asks for a block with half as much room again as the table had, or for `room` rows if that fails. Writes the room it got, and gives the block or `nullptr`. |
+| `take_longer` | Asks for a block with the room that `table_growth` gives the table, or for `room` rows if that is not more or if it fails. Writes the room it got, and gives the block or `nullptr`. |
 | `move_column` | Moves one column out to its place in the new room, with its bits if it is toggled. Writes the new place of the column. |
 | `move_columns` | Moves `who` to the new block, and each column out to where the new room puts it, the last first. |
 | `place_columns` | Writes where each column of the first block of a table is, and where the bits of a toggled column are. |
-| `grow_table` | Makes room for `room` rows in table `t`, or for half as much again as it had. Gives true if the table has the room, and false with nothing changed if it cannot have it. |
+| `grow_table` | Makes room for `room` rows in table `t`, or for the room that `table_growth` gives it. Gives true if the table has the room, and false with nothing changed if it cannot have it. |

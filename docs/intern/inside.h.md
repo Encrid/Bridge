@@ -8,7 +8,7 @@ After its types, it includes the headers that use them: `src/say/say.h`, `src/sc
 
 ## Nothing is allocated in a phase
 
-A phase and the barrier after it never call the allocator.
+A phase and the barriers after it never call the allocator.
 Each thing that they use got its room when the world was made or when a module loaded, from a number that somebody stated:
 
 | What | When | How much |
@@ -236,8 +236,10 @@ A `schedule_pairs_t` holds the pairs of `[order]`: `docs/intern/schedule/schedul
 | `kept`, `kept_count` | The shares that stay after their module unloaded: `docs/intern/config/config_kept.c.md`, *The list of shares*. |
 | `systems`, `system_count` | The systems of every module, in the order of registration: `docs/intern/abi/abi_subscribe.c.md`, *The slot*. |
 | `modules`, `module_count`, `max_modules` | The loaded modules, how many, and `[budget] modules`. |
-| `profile` | Whether a phase times each system and observer, from `profile` of the config: `docs/intern/schedule/schedule_dispatch.c.md`, *The time*. |
-| `validate` | Whether a phase checks each column for a write no system declared, from `validate` of the config: `docs/intern/schedule/schedule_dispatch.c.md`, *The check*. |
+| `profile` | Whether a phase times each system and observer: true when `profile` of the config is `BRIDGE_TRUE`. `docs/intern/schedule/schedule_dispatch.c.md`, *The time*. |
+| `validate` | Whether a phase checks each column for a write no system declared: true when `validate` of the config is `BRIDGE_TRUE`. `docs/intern/schedule/schedule_dispatch.c.md`, *The check*. |
+| `observer_passes` | From the deployment: how many barriers a call can run: `docs/intern/block/block_barrier.c.md`, *Passes*. |
+| `table_growth`, `table_hash_fill`, `table_retry` | The three keys of the deployment that tune storage: `docs/intern/storage/storage_grow.h.md`, *Growth*, `docs/intern/storage/storage_made.c.md`, *The hash of tables*, and `docs/intern/storage/storage_room.h.md`, *Running out*. |
 
 A world is stopped at a barrier, where nothing is allocated.
 So `stopped_by` and `stopped_stem` point at the two arrays after them.
