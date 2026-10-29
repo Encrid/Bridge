@@ -20,7 +20,7 @@ Bridge opens the library by its path in the deployment: `docs/intern/bridge/brid
 | `module_compile`, `module_destroy` | The image of a module, made from its bytes or its path, and the image destroyed. |
 | `module_list_imports` | The imports of an image, so that an instance gets only the memories that it imports. |
 | `instance_create`, `instance_destroy` | An instance of an image, with its memories, and the instance destroyed. |
-| `instance_set_work_limit`, `instance_set_timeout`, `instance_set_memory_limit` | The limits of an instance. |
+| `instance_set_work_limit`, `instance_set_timeout`, `instance_set_memory_limit`, `instance_set_element_limit` | The limits of an instance. |
 | `define_func` | One entry of the ABI, defined for an instance with its signature. |
 | `instance_get_func` | An export that `call` can run: it takes nothing and gives a status. |
 | `call` | One call of an export: whether it returned, and the status that it gave. |

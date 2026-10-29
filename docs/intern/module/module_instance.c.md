@@ -13,7 +13,7 @@ A module gets the memories that it imports, and no other.
 4. Find the memories that the image imports: *The memories a module imports*.
 5. Make the instance with those memories.
 6. Define the eight imports of the ABI: `docs/intern/abi/abi_define.c.md`, *The signatures*.
-7. Set `memory_limit` on the instance, if it is above 0.
+7. Set `memory_limit` and `element_limit` on the instance, each if it is above 0.
 
 The demands tell the backend which guarantees the config asks for.
 A guarantee can cost something at each instruction, and a backend need not compile in a guarantee that the module declined.

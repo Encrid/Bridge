@@ -12,6 +12,7 @@ A key of the config of a module demands a capability:
 | --- | --- |
 | `work_limit` is above 0 | `BACKEND_WORK_LIMIT` |
 | `memory_limit` is above 0 | `BACKEND_MEMORY_LIMIT` |
+| `element_limit` is above 0 | `BACKEND_ELEMENT_LIMIT` |
 | `init_timeout`, `reload_timeout` or `shutdown_timeout` is above 0 | `BACKEND_TIMEOUT` |
 | `hot_reload` is `BRIDGE_TRUE` | `BACKEND_RELOAD` |
 
