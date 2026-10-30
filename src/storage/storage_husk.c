@@ -7,7 +7,6 @@
 #include "storage_change.h"
 #include "storage_drop.h"
 #include "storage_forget.h"
-#include "storage_room.h"
 
 void storage_let_keep(storage_t *r, const storage_type_t *type, bool keep)
 {

@@ -10,6 +10,7 @@
 #include "storage_test.h"
 
 constexpr uint32_t STORAGE_TEST_GROWS = 5;
+constexpr uint32_t STORAGE_TEST_PAST = 102;
 
 static int reopen(storage_test_t *t)
 {
@@ -43,6 +44,23 @@ enum storage_test_end storage_test_grow_by_share(storage_test_t *t)
         i++;
     }
     printf("\n");
+    return (STORAGE_TEST_DONE);
+}
+
+enum storage_test_end storage_test_grow_past(storage_test_t *t)
+{
+    bridge_artifact_t a = storage_test_state(ONE_MORE_PATH, 1, 4096, 4096);
+    uint32_t i = 0;
+
+    t->cfg.table_growth = (uint32_t)strtoul(t->more, nullptr, 10);
+    if (reopen(t) || bridge_load(t->w, &a))
+        return (STORAGE_TEST_FAILED);
+    while (i < STORAGE_TEST_PAST) {
+        (void)bridge_run_phase(t->w, "spawn");
+        i++;
+    }
+    printf("room %u for %u rows\n", t->w->storage->tables[1].room,
+        t->w->storage->tables[1].rows);
     return (STORAGE_TEST_DONE);
 }
 

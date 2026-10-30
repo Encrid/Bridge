@@ -90,6 +90,7 @@ static const storage_test_case_t CASES[] = {
     { "hashroom", storage_test_size_hash, &ONE_TABLE },
     { "growth", storage_test_grow_by_share, &ONE_TABLE },
     { "asks", storage_test_ask_less, &ONE_TABLE },
+    { "growthpast", storage_test_grow_past, &ONE_TABLE },
     { "ordertwo", storage_test_order_two_modules, &PLAIN },
     { "orderchain", storage_test_order_two_modules, &PLAIN },
     { "orderbarrier", storage_test_order_two_modules, &PLAIN },
