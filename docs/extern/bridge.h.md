@@ -95,6 +95,10 @@ posix            dlopen
 posix            dlsym
 posix            dlclose
 posix            pthread_create
+posix            pthread_attr_init
+posix            pthread_attr_setstacksize
+posix            pthread_attr_destroy
+posix            sysconf
 posix            pthread_join
 posix            pthread_self
 posix            clock_gettime
@@ -105,8 +109,12 @@ posix            pthread_mutex_destroy
 posix            pthread_cond_init
 posix            pthread_cond_signal
 posix            pthread_cond_wait
-posix            pthread_cond_timedwait
+linux            pthread_cond_timedwait
+macos            pthread_cond_timedwait_relative_np
 posix            pthread_cond_destroy
+linux            pthread_condattr_init
+linux            pthread_condattr_setclock
+linux            pthread_condattr_destroy
 windows          _initterm
 windows          _initterm_e
 windows          _initialize_onexit_table
@@ -154,10 +162,12 @@ They are in the list because they are imports all the same: a new one is a depen
 | `VirtualAlloc`, `VirtualFree`, `mmap`, `mprotect`, `munmap` | The os layer reserves, commits and releases memory. |
 | `LoadLibraryW`, `LoadLibraryExW`, `GetFullPathNameW`, `MultiByteToWideChar`, `wcschr`, `wcscpy`, `GetModuleHandleExW`, `GetProcAddress`, `FreeLibrary`, `dlopen`, `dlsym`, `dlclose` | The os layer opens the library of a backend or of a native module, finds a symbol in it, pins it, and closes it. On Windows it makes the path a wide string and finds a folder in it. |
 | `CreateThread`, `WaitForSingleObject`, `CloseHandle`, `pthread_create`, `pthread_join` | The os layer starts and joins a worker thread. On Windows, `WaitForSingleObject` also waits for an event, and `CloseHandle` also closes one. |
+| `pthread_attr_init`, `pthread_attr_setstacksize`, `pthread_attr_destroy`, `sysconf` | The os layer gives a worker thread its stack on Linux and macOS, in whole pages. |
 | `GetCurrentThreadId`, `pthread_self` | The os layer gives the thread that runs, for a pinned module. |
 | `QueryPerformanceCounter`, `QueryPerformanceFrequency`, `clock_gettime` | The os layer reads the clock that keeps a deadline, and its unit. |
 | `InitializeCriticalSection`, `EnterCriticalSection`, `LeaveCriticalSection`, `DeleteCriticalSection`, `pthread_mutex_init`, `pthread_mutex_lock`, `pthread_mutex_unlock`, `pthread_mutex_destroy` | The os layer makes, locks, unlocks and frees a mutex. |
-| `CreateEventA`, `SetEvent`, `pthread_cond_init`, `pthread_cond_signal`, `pthread_cond_wait`, `pthread_cond_timedwait`, `pthread_cond_destroy` | The os layer makes, sets, waits for and frees an event. `pthread_cond_timedwait` waits until a deadline. |
+| `CreateEventA`, `SetEvent`, `pthread_cond_init`, `pthread_cond_signal`, `pthread_cond_wait`, `pthread_cond_timedwait`, `pthread_cond_timedwait_relative_np`, `pthread_cond_destroy` | The os layer makes, sets, waits for and frees an event. `pthread_cond_timedwait` waits until a deadline, and `pthread_cond_timedwait_relative_np` waits for a time on macOS. |
+| `pthread_condattr_init`, `pthread_condattr_setclock`, `pthread_condattr_destroy` | On Linux, the event waits on a clock that only rises. |
 | `_initterm`, `_initterm_e`, `_initialize_onexit_table`, `_register_onexit_function`, `_execute_onexit_table` | The startup code runs the initializers of the library, and keeps the table of what runs at exit. |
 | `_exit`, `abort`, `__acrt_iob_func`, `__stdio_common_vfprintf`, `fwrite` | The startup code ends the process if the start fails, and writes what went wrong. |
 | `VirtualProtect`, `VirtualQuery`, `GetLastError` | The startup code applies the relocations of the library. |
