@@ -276,6 +276,10 @@ The shared memory is at most 4 GiB, since an offset into it has 32 bits.
 A sparse set and a direct-indexed component keep something for each entity, carried or not.
 Thus `bridge_create` takes their room, and `sparse_sets` and `direct_indexed` say how many there can be.
 
+The table ids are `tables`, plus `sparse_sets` when it is a count, plus 1. The hash of the tables has at most 2147483648 places.
+So the table ids are at most 2147483648 times `table_hash_fill`, divided by 100 and rounded down: 1073741824 at a fill of 50.
+`tables` is at most that number, less the sparse sets and 1. `bridge_create` refuses more, with a record.
+
 A type that two modules declare counts once. A reload does not need room for the systems of a module two times.
 While a reload moves the rows of a component to a new layout, the component counts two times against `types`.
 
@@ -1005,6 +1009,7 @@ Each record of Bridge has the level `BRIDGE_ERR`, unless its group tells another
 - `[budget] <key> of <number> is more than an offset of 32 bits can reach`
 - `[budget] types of <number>, rounded up to a multiple of 64, is more than a count of 32 bits holds`
 - `[budget] tables, sparse_sets and types come to <number>, which is more than a count of 32 bits holds`
+- `[budget] tables and sparse_sets come to <count> table ids, and a table_hash_fill of <number> holds at most <count>`
 - `[budget] <key> is <number>, which is neither a count nor none`
 - `[budget] cannot be satisfied: sparse_sets of <number>, with four bytes for each of <number> entities, is more than an offset of 32 bits can reach`
 - `[budget] cannot be satisfied: direct_indexed of <number>, with a bit for each of <number> entities, is more than an offset of 32 bits can reach`
