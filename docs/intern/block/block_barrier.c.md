@@ -8,23 +8,13 @@ This file runs the barrier: what happens between two phases, in an order that ne
 1. Storage ends the hold on each id that a module handed out: `docs/intern/storage/storage_held.c.md`.
 2. Storage applies the queued changes of each module: `src/storage/storage_apply.c`.
 3. Each module gets its ids topped up: `docs/intern/block/block_module.c.md`, *The ids set aside*.
-4. The spans of each running module are published again.
+4. The spans of each running module are published again: `docs/intern/block/block_publish.c.md`.
 5. Storage ends the publish, and the layout counts as not moved. When `validate` is on, the columns become the baseline of the next check: `docs/intern/storage/storage_validate.c.md`.
 6. The observers of what changed run in their phase: `docs/intern/abi/abi_system.c.md`, *observe*.
 7. No system or observer is pending any more, and the count of lifecycle calls goes back to 0.
 8. The failure budgets are settled: `src/schedule/schedule_account.c`.
 9. The log ring of each module is drained to the sink: `docs/intern/block/block_log.c.md`, *The log ring*.
 10. The count of barriers goes up by 1.
-
-The header of a module tells how many table ids there are.
-That number is `[budget] tables` and `[budget] sparse_sets`, and 1. It is fixed when the world is made, so one publish is enough.
-
-The barrier stops a module whose span region cannot hold its spans, or the list of an observer: `docs/extern/bridge.h.md`, *The private memory*, and `docs/extern/bridge_abi.h.md`, *observe*.
-Its record names the size of its spans, and the observer whose list did not fit.
-If its `on_error` is `BRIDGE_FAIL`, the world stops too: `docs/intern/bridge/bridge_stop.c.md`.
-If it ran on, its systems would run over tables that they were not told about.
-A stopped module keeps its components, and storage writes nothing more for it.
-It comes back only as a new record, by a load or a reload, which storage writes as a whole.
 
 ## Passes
 
@@ -61,6 +51,7 @@ A destroy that the module may not do counts the same way: `src/storage/storage_s
 | Function | Result |
 | --- | --- |
 | `refill_all` | Tops up the ids of each module. |
-| `publish_all` | Publishes the spans of each running module, and stops a module whose spans do not fit. |
 | `finish_barrier` | Ends a barrier once its observers ran: no system pending, the failure budgets settled, each log drained, and the barrier counted. |
-| `block_barrier` | Runs the barrier, with the steps of *The steps of a barrier*, and runs it again by the rules of *Passes*. |
+| `run_barrier` | Runs one barrier, with the steps of *The steps of a barrier*. |
+| `has_queued` | Gives whether a module has a change in its queue. |
+| `block_barrier` | Runs a barrier, and runs it again by the rules of *Passes*. |

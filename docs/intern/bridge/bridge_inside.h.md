@@ -12,6 +12,7 @@ Each `_now` function does the work of its public function, once the call has the
 
 | Function | Source | Result |
 | --- | --- | --- |
+| `bridge_take_keys` | `src/bridge/bridge_keys.c` | Refuses and keeps the keys of a deployment: `docs/intern/bridge/bridge_keys.c.md`, *Functions*. |
 | `bridge_open_backends` | `src/bridge/bridge_backends.c` | Opens and starts the backends: `docs/intern/bridge/bridge_backends.c.md`, *Functions*. |
 | `bridge_open_backend` | `src/bridge/bridge_backend.c` | Opens and starts one backend: `docs/intern/bridge/bridge_backend.c.md`, *Functions*. |
 | `bridge_find_phase` | `src/bridge/bridge_phases.c` | Finds a phase by its name: `docs/intern/bridge/bridge_phases.c.md`, *Functions*. |

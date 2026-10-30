@@ -63,6 +63,8 @@ void block_hand_out(bridge_world_t *w);
 
 void block_barrier(bridge_world_t *w);
 
+void block_publish_all(bridge_world_t *w);
+
 [[nodiscard]] void *block_column_regrow(bridge_world_t *w, void *ptr,
     uint32_t old_size, uint32_t new_size);
 

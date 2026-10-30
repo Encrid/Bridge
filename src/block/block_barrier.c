@@ -15,37 +15,6 @@ static void refill_all(bridge_world_t *w)
     }
 }
 
-static void stop_full(bridge_world_t *w, module_t *m, const char *list)
-{
-    const say_t about = { m, nullptr, BRIDGE_ERR };
-
-    m->stopped = 1;
-    if (list) {
-        say_about(w, &about, "module '%s' is stopped: the list of its "
-            "observer '%s' no longer fits in its spans of %u bytes",
-            m->identity, list, m->spans_len);
-    } else {
-        say_about(w, &about, "module '%s' is stopped: what its queries "
-            "match no longer fits in its spans of %u bytes", m->identity,
-            m->spans_len);
-    }
-    if (m->on_error == BRIDGE_FAIL)
-        bridge_stop(w, m->identity, "was stopped");
-}
-
-static void publish_all(bridge_world_t *w)
-{
-    module_t *m = w->modules;
-    const char *list;
-
-    while (m) {
-        list = nullptr;
-        if (!m->stopped && storage_publish(w->storage, m, &list))
-            stop_full(w, m, list);
-        m = m->next;
-    }
-}
-
 static void finish_barrier(bridge_world_t *w)
 {
     module_t *m = w->modules;
@@ -64,16 +33,37 @@ static void finish_barrier(bridge_world_t *w)
     w->barriers++;
 }
 
-void block_barrier(bridge_world_t *w)
+static void run_barrier(bridge_world_t *w)
 {
     block_hand_out(w);
     storage_apply(w->storage);
     refill_all(w);
-    publish_all(w);
+    block_publish_all(w);
     storage_end_publish(w->storage);
     if (w->validate)
         storage_validate_baseline(w->storage);
     w->layout_moved = 0;
     schedule_run(w, w->phase_count);
     finish_barrier(w);
+}
+
+static bool has_queued(const bridge_world_t *w)
+{
+    const module_t *m = w->modules;
+
+    while (m && !m->queue_len)
+        m = m->next;
+    return (m != nullptr);
+}
+
+void block_barrier(bridge_world_t *w)
+{
+    uint32_t passes = 0;
+
+    run_barrier(w);
+    passes++;
+    while (passes < w->observer_passes && has_queued(w)) {
+        run_barrier(w);
+        passes++;
+    }
 }

@@ -121,7 +121,8 @@ void counted_free(void *p);
 
 void *counted_os_reserve(size_t reserve, size_t commit);
 int counted_os_commit(void *base, size_t bytes);
-os_thread_t *counted_os_thread_start(os_thread_fn_t fn, void *arg);
+os_thread_t *counted_os_thread_start(os_thread_fn_t fn, void *arg,
+    size_t stack);
 os_mutex_t *counted_os_mutex_create(void);
 os_event_t *counted_os_event_create(void);
 

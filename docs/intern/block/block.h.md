@@ -96,5 +96,6 @@ The fields of `block_layout_t`:
 | `block_hand_out` | `src/block/block_module.c` | For each module, ends the hold on the ids that it handed out: `docs/intern/block/block_module.c.md`, *Functions*. |
 | `block_drain` | `src/block/block_log.c` | Drains the log ring of a module, and gives back its scratch arena: `docs/intern/block/block_log.c.md`, *The log ring*. |
 | `block_barrier` | `src/block/block_barrier.c` | Runs the barrier: `docs/intern/block/block_barrier.c.md`, *The steps of a barrier*. |
+| `block_publish_all` | `src/block/block_publish.c` | Publishes the spans of each running module: `docs/intern/block/block_publish.c.md`, *Functions*. |
 | `block_column_regrow` | `src/block/block_column.c` | Gives a piece of the column region a new length: `docs/intern/block/block_column.c.md`, *Functions*. |
 | `block_column_free` | `src/block/block_column.c` | Frees a piece of the column region: `docs/intern/block/block_column.c.md`, *Functions*. |

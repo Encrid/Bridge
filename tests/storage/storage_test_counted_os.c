@@ -21,11 +21,12 @@ int counted_os_commit(void *base, size_t bytes)
     return (os_commit(base, bytes));
 }
 
-os_thread_t *counted_os_thread_start(os_thread_fn_t fn, void *arg)
+os_thread_t *counted_os_thread_start(os_thread_fn_t fn, void *arg,
+    size_t stack)
 {
     if (storage_test_count_request())
         return (nullptr);
-    return (os_thread_start(fn, arg));
+    return (os_thread_start(fn, arg, stack));
 }
 
 os_mutex_t *counted_os_mutex_create(void)

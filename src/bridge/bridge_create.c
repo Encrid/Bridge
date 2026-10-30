@@ -40,6 +40,8 @@ static int check_config(bridge_world_t *w, const bridge_config_t *cfg)
             (unsigned)BRIDGE_HOST_ABI);
         return (1);
     }
+    if (bridge_take_keys(w, cfg))
+        return (1);
     w->backends = calloc(backends, sizeof(*w->backends));
     w->phases = calloc(phases, sizeof(*w->phases));
     return (bridge_lacks(w, w->backends && w->phases ? w : nullptr,
@@ -48,18 +50,17 @@ static int check_config(bridge_world_t *w, const bridge_config_t *cfg)
 
 static int start_pool(bridge_world_t *w, const bridge_config_t *cfg)
 {
-    if (!cfg->threads) {
-        say_error(w, "threads is unset");
+    if (!cfg->threads || !cfg->stack) {
+        say_error(w, "%s is unset", cfg->threads ? "stack" : "threads");
         return (1);
     }
-    w->pool = pool_create(cfg->threads - 1, cfg->budget.systems);
+    w->pool = pool_create(cfg->threads - 1, cfg->budget.systems,
+        (size_t)cfg->stack);
     return (bridge_lacks(w, w->pool, "the threads that run a phase"));
 }
 
 static int build_bridge(bridge_world_t *w, const bridge_config_t *cfg)
 {
-    w->profile = cfg->profile;
-    w->validate = cfg->validate;
     if (check_config(w, cfg) || bridge_open_backends(w, cfg))
         return (1);
     if (bridge_name_phases(w, cfg))

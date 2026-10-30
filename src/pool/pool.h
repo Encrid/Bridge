@@ -6,6 +6,7 @@
 #ifndef BRIDGE_SRC_POOL_H
     #define BRIDGE_SRC_POOL_H
 
+    #include <stddef.h>
     #include <stdint.h>
 
     #include "os.h"
@@ -37,7 +38,8 @@ struct pool {
     uint32_t left;
 };
 
-[[nodiscard]] pool_t *pool_create(uint32_t workers, uint32_t most_jobs);
+[[nodiscard]] pool_t *pool_create(uint32_t workers, uint32_t most_jobs,
+    size_t stack);
 
 void pool_destroy(pool_t *p);
 
