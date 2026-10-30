@@ -3,3 +3,17 @@ name = "schema"
 run = ["{out}/schema{exe}"]
 claims = { matches = ["every descriptor read as it should, and every other refused by its word.*alive"] }
 false = { run = ["{out}/storage{exe}", "shape"] }
+
+[[case]]
+name = "schema-takes-the-room-of-its-fields-and-of-its-constants-once"
+run = ["{out}/schema{exe}", "room"]
+fail = { malloc = 41, calloc = 3, realloc = 1 }
+claims = { matches = ["a struct of 20 fields and an enum of 20 constants were read.*alive"] }
+false = { fail = { calloc = 1 } }
+
+[[case]]
+name = "schema-refuses-a-descriptor-whose-room-it-cannot-take"
+run = ["{out}/schema{exe}", "room"]
+fail = { calloc = 1 }
+claims = { matches = ["refused: ran out of memory at '\\{'.*alive"] }
+false = { fail = {} }
