@@ -21,6 +21,8 @@ static int check_limits_kept(const module_check_t *k)
             && check_kept(k, BACKEND_WORK_LIMIT, "work_limit"))
         || (cfg->memory_limit > 0
             && check_kept(k, BACKEND_MEMORY_LIMIT, "memory_limit"))
+        || (cfg->element_limit > 0
+            && check_kept(k, BACKEND_ELEMENT_LIMIT, "element_limit"))
         || (cfg->init_timeout > 0
             && check_kept(k, BACKEND_TIMEOUT, "init_timeout"))
         || (cfg->reload_timeout > 0
