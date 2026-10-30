@@ -20,6 +20,13 @@ void test_pass_chain(host_t *h)
     host_close(h);
 }
 
+void test_fill_tables(host_t *h)
+{
+    h->cfg.table_hash_fill = 1;
+    h->cfg.budget.tables = (uint32_t)strtoul(h->arg, nullptr, 10);
+    host_open_only(h);
+}
+
 void test_grow_elements(host_t *h)
 {
     char identity[64];

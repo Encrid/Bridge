@@ -807,6 +807,12 @@ claims = { matches = ["table_retry is 100, which is not 1 to 99.*bridge_create r
 false = { run = ["{out}/seam{exe}", "config.table_retry-of-99-taken"] }
 
 [[case]]
+name = "budget.tables-past-the-most-of-the-hash-refused"
+run = ["{out}/seam{exe}", "budget.tables-past-the-most-of-the-hash-refused"]
+claims = { matches = ["\\[budget\\] tables and sparse_sets come to 21474837 table ids, and a table_hash_fill of 1 holds at most 21474836.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "budget.tables-under-the-most-of-the-hash-taken"] }
+
+[[case]]
 name = "observer_passes-of-3-ends-a-chain-of-three-in-one-call"
 run = ["{out}/seam{exe}", "observer_passes-of-3-ends-a-chain-of-three-in-one-call"]
 claims = { matches = ["b1 p\\d+ game:chain@0.1.0/got_a: hop A.*b2 p\\d+ game:chain@0.1.0/got_b: hop B.*b3 p\\d+ game:chain@0.1.0/got_c: hop C.*one call.*alive"] }
