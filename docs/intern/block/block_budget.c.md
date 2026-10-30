@@ -48,9 +48,10 @@ A floor that clamps a value would change what the deployment stated, with nobody
 2. Refuse `sparse_sets` or `direct_indexed` that is neither `BRIDGE_NONE` nor a count from 1 to `UINT32_MAX`.
 3. Refuse `types` past `UINT32_MAX` once rounded up to a multiple of 64. Storage keeps a bit for each type.
 4. Refuse `tables`, `sparse_sets` and `types` whose sum and 1 pass `UINT32_MAX`. The column region keeps a range for each.
+5. Refuse table ids past `STORAGE_HASH_MOST` times `table_hash_fill`, divided by 100. The table ids are `tables`, `sparse_sets` and 1.
 
 The first fault ends the check, with one record that names the key.
-Checks 3 and 4 add in 64 bits, and bound the counts that storage holds in 32 bits.
+Checks 3, 4 and 5 add in 64 bits, and bound the counts that storage holds in 32 bits.
 The bounds of the offsets are in one place: `docs/intern/block/block_layout.c.md`, *The limits*.
 
 ## Functions
