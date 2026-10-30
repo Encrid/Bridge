@@ -6,7 +6,7 @@ This file makes and unmakes the pool of threads that a phase runs on.
 
 1. Allocate the pool, a byte for each of `most_jobs` jobs, the lock, the event `done` and the workers.
 2. If one of them is missing, start no worker.
-3. Start the workers one at a time: the event that wakes a worker, then its thread.
+3. Start each worker in turn: the event that wakes it, then its thread, with `stack` bytes of stack.
 4. If a worker does not start, stop.
 5. If not every worker started, destroy the pool and give null.
 
@@ -24,5 +24,5 @@ Then it frees the event `done`, the lock, the workers and the bytes of the taken
 | Function | Result |
 | --- | --- |
 | `start_worker` | Starts worker `i`: its event, then its thread. It counts the worker only when the thread runs. 0, or -1 if it cannot start. |
-| `pool_create` | Makes a pool of `workers` threads that can run `most_jobs` jobs at one time. Null, with what was made unmade, if there was not the memory. |
+| `pool_create` | Makes a pool of `workers` threads, each with a stack of `stack` bytes, that can run `most_jobs` jobs at one time. Null, with what was made unmade, if there was not the memory. |
 | `pool_destroy` | Ends each worker that runs, and frees the pool. A null `p` is nothing to free. |

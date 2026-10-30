@@ -4,6 +4,7 @@
 import fnmatch
 from pathlib import Path
 
+import fail
 import rewrite
 from shared import die
 
@@ -14,18 +15,64 @@ WRAPPERS = ('ParenExpr', 'ImplicitCastExpr')
 SAID = {'function': ['no case calls this function'], 'case': ['no case reaches this case'],
         'condition': ['no case makes this condition false', 'no case makes this condition true']}
 TOP = r'''static _Atomic unsigned char %(p)shits[%(bits)d];
+static _Atomic unsigned char *%(p)sat = %(p)shits;
 [[maybe_unused]] static bool %(p)s(bool c, unsigned id)
 {
-    %(p)shits[2u * id + (c ? 1u : 0u)] = 1;
+    unsigned %(p)sk = 2u * id + (c ? 1u : 0u);
+
+    if (!%(p)sat[%(p)sk])
+        %(p)sat[%(p)sk] = 1;
     return (c);
 }
 [[maybe_unused]] static void %(p)shit_(unsigned id)
 {
-    %(p)shits[2u * id + 1u] = 1;
+    if (!%(p)sat[2u * id + 1u])
+        %(p)sat[2u * id + 1u] = 1;
 }
 '''
-FILL = r'''    for (unsigned %(p)si = 0; %(p)si < %(bits)du; %(p)si++)
-        %(p)sline[%(p)sat++] = %(p)shits[%(p)si] ? '1' : '0';
+MAP = r'''#include <stdlib.h>
+#ifdef _WIN32
+#include <fcntl.h>
+#include <io.h>
+extern void *%(p)smapping(void *file, void *security, unsigned long protect, unsigned long high, unsigned long low,
+    const char *name) __asm__("CreateFileMappingA");
+extern void *%(p)sview(void *mapping, unsigned long access, unsigned long high, unsigned long low, size_t bytes)
+    __asm__("MapViewOfFile");
+#else
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <unistd.h>
+#endif
+[[gnu::constructor]] static void %(p)smap(void)
+{
+    const char *%(p)spath = getenv("C23_BRANCHES");
+    _Atomic unsigned char *%(p)sall = nullptr;
+    int %(p)sfd;
+
+    if (!%(p)spath)
+        return;
+#ifdef _WIN32
+    %(p)sfd = _open(%(p)spath, _O_RDWR | _O_BINARY);
+    if (%(p)sfd < 0)
+        return;
+    %(p)sall = %(p)sview(%(p)smapping((void *)_get_osfhandle(%(p)sfd), nullptr, 4, 0, 0, nullptr), 2, 0, 0, 0);
+    _close(%(p)sfd);
+#else
+    %(p)sfd = open(%(p)spath, O_RDWR);
+    if (%(p)sfd < 0)
+        return;
+    %(p)sall = mmap(nullptr, %(end)du, PROT_READ | PROT_WRITE, MAP_SHARED, %(p)sfd, 0);
+    close(%(p)sfd);
+    if (%(p)sall == MAP_FAILED)
+        %(p)sall = nullptr;
+#endif
+    if (!%(p)sall)
+        return;
+    for (unsigned %(p)si = 0; %(p)si < %(bits)du; %(p)si++)
+        if (%(p)shits[%(p)si])
+            %(p)sall[%(start)du + %(p)si] = 1;
+    %(p)sat = %(p)sall + %(start)du;
+}
 '''
 
 
@@ -161,8 +208,8 @@ def walked(root, path, found):
     return probing
 
 
-def rewritten(text, path, edits, prefix):
-    rows, pieces = [], []
+def rewritten(text, path, edits, prefix, part, outer=(0, '', '')):
+    rows, pieces = [], [((outer[0], -1, 0), outer[1])]
     for edit in sorted(edits.values(), key=lambda one: (one[1], one[0])):
         number = len(rows)
         if edit[0] == 'condition':
@@ -179,54 +226,56 @@ def rewritten(text, path, edits, prefix):
         out += text[last:at] + piece.encode()
         last = at
     out += text[last:]
-    bits = 2 * max(1, len(rows))
-    values = {'p': prefix, 'bits': bits, 'line': len(path) + bits + 2, 'name': path, 'name_len': len(path) + 1,
-              'variable': 'C23_BRANCHES', 'fill': FILL, 'kept': 'hits'}
+    values = {'p': prefix, 'start': part[0], 'bits': part[1], 'end': part[0] + part[1]}
     if path.endswith('.h'):
         guard = prefix.upper() + 'GUARD'
-        block = '#ifndef %s\n    #define %s\n%s%s#endif\n#line 1\n' % (guard, guard, TOP % values,
-                                                                       rewrite.writer(values))
+        block = '#ifndef %s\n    #define %s\n%s%s#endif\n#line 1\n' % (guard, guard, TOP % values, MAP % values)
         out = block.encode() + bytes(out)
     else:
-        out = (TOP % values + '#line 1\n').encode() + bytes(out) + b'\n' + rewrite.writer(values).encode()
+        out = (TOP % values + '#line 1\n').encode() + bytes(out) + b'\n' + (outer[2] + MAP % values).encode()
     return out, [dict(zip(('kind', 'line', 'col'), (kind,) + rewrite.placing(text, at))) for kind, at in rows]
 
 
 def probed(config, values):
-    edits, skips = {}, {}
-    for probing in rewrite.each(config, values, walked):
+    calls, root = fail.listed(config, values), Path(values['root'])
+    edits, skips, outers = {}, {}, {}
+    trees = rewrite.each(config, values, lambda top, path, tree: (walked(top, path, tree),
+                                                                  rewrite.found(top, path, tree, calls)))
+    for probing, (name, used, declared, _) in trees:
         for path, table in probing.edits.items():
             edits.setdefault(path, {}).update(table)
         for path, table in probing.skips.items():
             skips.setdefault(path, {}).update(table)
-    return written(Path(values['root']), rewrite.tree(values, 'branches'), edits, skips)
+        outers[name] = fail.layer((root / name).read_bytes(), used, declared, calls)
+    return written(root, rewrite.tree(values, 'branches'), edits, skips, outers)
 
 
-def written(root, where, edits, skips):
+def written(root, where, edits, skips, outers):
     rewrite.copied(root, where)
     headers = sorted(path for path in edits if path.endswith('.h'))
-    probes = {}
+    probes, (found, _) = {}, parts(edits)
     for path in sorted(edits):
         prefix = 'c23b_h%d_' % headers.index(path) if path in headers else 'c23b_'
-        out, probes[path] = rewritten((root / path).read_bytes(), path, edits[path], prefix)
+        outer = outers.get(path, (0, '', ''))
+        out, probes[path] = rewritten((root / path).read_bytes(), path, edits[path], prefix, found[path], outer)
         (where / path).write_bytes(out)
     gaps = {path: [dict(zip(('kind', 'line', 'col'), (kind,) + rewrite.placing((root / path).read_bytes(), at)))
                    for at, kind in sorted(table.items())] for path, table in skips.items()}
     return probes, gaps
 
 
+def parts(rows):
+    found, size = {}, 0
+    for path in sorted(rows):
+        found[path] = (size, 2 * max(1, len(rows[path])))
+        size += found[path][1]
+    return found, size
+
+
 def joined(probes, hits):
-    seen = {}
-    lines = hits.read_text(encoding='utf-8', errors='replace').splitlines() if hits.is_file() else []
-    for line in lines:
-        name, _, bits = line.partition(' ')
-        if name not in probes:
-            continue
-        if len(bits) != 2 * max(1, len(probes[name])) or set(bits) - set('01'):
-            die('%s: a line of %s does not match its probes' % (hits, name))
-        old = seen.get(name, '0' * len(bits))
-        seen[name] = ''.join('1' if '1' in pair else '0' for pair in zip(old, bits))
-    return seen
+    data, (found, _) = hits.read_bytes(), parts(probes)
+    return {name: ''.join('1' if one else '0' for one in data[start:start + bits])
+            for name, (start, bits) in found.items()}
 
 
 BRANCH_SIDE = {'true': 'no case makes this condition true',
@@ -248,7 +297,7 @@ def excused(listed, system, name, line, col, said):
 def reported(probes, gaps, hits, excepted=(), system=None):
     seen, outcomes, total = joined(probes, hits), [], 0
     for name, rows in probes.items():
-        bits = seen.get(name, '0' * (2 * max(1, len(rows))))
+        bits = seen[name]
         for number, row in enumerate(rows):
             sides = SAID[row['kind']]
             for side, said in zip(range(2 - len(sides), 2), sides):

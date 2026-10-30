@@ -46,11 +46,9 @@ A floor that clamps a value would change what the deployment stated, with nobody
 
 1. Refuse the first of the eight amounts left at 0: `entities`, `persistent`, `columns`, `modules`, `tables`, `types`, `systems`, `terms`.
 2. Refuse `sparse_sets` or `direct_indexed` that is neither `BRIDGE_NONE` nor a count from 1 to `UINT32_MAX`.
-3. Refuse `types` past `UINT32_MAX` once rounded up to a multiple of 64. Storage keeps a bit for each type.
-4. Refuse `tables`, `sparse_sets` and `types` whose sum and 1 pass `UINT32_MAX`. The column region keeps a range for each.
+3. Refuse the counts that storage or its hash of tables cannot hold: `docs/intern/block/block_counts.c.md`, *The checks*.
 
 The first fault ends the check, with one record that names the key.
-Checks 3 and 4 add in 64 bits, and bound the counts that storage holds in 32 bits.
 The bounds of the offsets are in one place: `docs/intern/block/block_layout.c.md`, *The limits*.
 
 ## Functions
@@ -59,6 +57,5 @@ The bounds of the offsets are in one place: `docs/intern/block/block_layout.c.md
 | --- | --- |
 | `is_unset` | Refuses an amount left at 0, by its key. 1 with a record. |
 | `is_miscounted` | Refuses a count that may be none and is neither a count nor `BRIDGE_NONE`. Zero is unset. 1 with a record. |
-| `is_too_many` | Refuses `types`, `tables` and `sparse_sets` whose counts storage cannot hold in 32 bits. 1 with a record. |
 | `has_unset` | Refuses a budget that leaves one of its eight amounts unset, at the first. 1 with a record. |
-| `block_check_budget` | Refuses a budget with a key unset, or a count that is neither a count nor none. 1 with a record. |
+| `block_check_budget` | Refuses a budget with a key unset, a count that is neither a count nor none, or a count that `block_check_counts` refuses. 1 with a record. |

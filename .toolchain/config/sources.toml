@@ -1,5 +1,5 @@
 [[source]]
 name = "bridge_os"
-url = "https://github.com/Encrid/Bridge-OS/releases/download/v0.1.2/bridge-os-{target}.zip"
+url = "https://github.com/Encrid/Bridge-OS/releases/download/v0.2.0/bridge-os-{target}.zip"
 sha256 = "{bridge_os_sha256}"
 into = "{build}/third_party/bridge_os/{target}"

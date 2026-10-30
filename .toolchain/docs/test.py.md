@@ -20,13 +20,13 @@
 | `placed(use, outputs, values)` | Writes the `files` of a case, and fills its `folders`. |
 | `scripted(running, script, outputs, values)` | Does the steps of a script. |
 | `made_false(case)` | Gives the false variant of a case. |
-| `tried(config, values, outputs, where, case, broken, counted)` | Runs one case. With `counted`, it sets the variable `C23_LEAKS` of the case. |
+| `tried(config, values, outputs, where, case, broken, counted, failing)` | Runs one case. With `counted`, it sets the variable `C23_LEAKS` of the case. `failing` gives the variables and the artifacts of the run `fail`, or `None`. |
 | `judged(config, group, broken, run)` | Gives the verdict of one run of a case. |
-| `verdict(config, values, outputs, group, index, case, broken, copies, counted)` | Runs the copies of one case at the same time, and gives their verdict. |
-| `test(config, values, outputs, groups, broken, said, copies, counted)` | Runs all the groups, and writes each verdict. With `said`, it writes `said.txt`. It gives the names of the cases that failed. |
+| `verdict(config, values, outputs, group, index, case, broken, copies, counted, failing)` | Runs the copies of one case at the same time, and gives their verdict. |
+| `test(config, values, outputs, groups, broken, said, copies, counted, failing)` | Runs all the groups, and writes each verdict. With `said`, it writes `said.txt`. It gives the names of the cases that failed. |
 | `chosen(groups, part)` | Gives only the cases whose name contains `part`. It stops if no case has it: `no case has <part> in its name`. |
-| `groups_of(values, folder)` | Reads and checks the groups of a folder: `tests/cases`, or `.toolchain/tests/cases` of the repository `my_c23_template`. |
-| `changed(args, run, write)` | Does the steps of a changed run, as *A changed run* tells. It gives the config, the variables, what `write` gave, the artifacts and the groups. |
+| `groups_of(config, values, folder)` | Reads and checks the groups of a folder: `tests/cases`, or `.toolchain/tests/cases` of the repository `my_c23_template`. |
+| `changed(args, run, write, prepared)` | Does the steps of a changed run, as *A changed run* tells. It gives the config, the variables, what `write` gave, the artifacts and the groups. |
 | `measured(args)` | Runs the command `test --branches`, as *The branches* tells. |
 | `tallied(args)` | Runs the command `test --leaks`, as *The leaks* tells. |
 | `main()` | Runs the command `test`. |
@@ -41,13 +41,15 @@ Else `main` does these steps:
 3. It reads the groups of `[test] cases` (the default is `tests/cases`). With `--toolchain`, it reads `.toolchain/tests/cases` of the repository `my_c23_template`.
 4. If there is no case, it writes `no case: <folder> holds no case`, and ends.
 5. With `-k`, it keeps only the cases whose name contains the part.
-6. It runs the groups, one time for each round of `--rounds`. Before each round of 2 rounds or more, it writes `round <n> of <rounds>`.
-7. With no `--break`, `--toolchain` or `-k`, it checks the messages of the code with `checked` of `said.py`.
+6. If a case states `fail`, it makes the run `fail`: *A changed run*, with `failed` of `fail.py`.
+7. It runs the groups, one time for each round of `--rounds`. Before each round of 2 rounds or more, it writes `round <n> of <rounds>`.
+8. With no `--break`, `--toolchain` or `-k`, it checks the messages of the code with `checked` of `said.py`.
 
+With `--break`, the false variant of a case tells if the case states `fail` at step 6.
 The number of copies is `--copies`, or `[test] copies`. If neither gives it, `main` stops: `.toolchain/project.toml: write [test] copies`.
 
-`main` stops at step 6 if a case failed. Thus step 7 runs only if each case passed.
-`.toolchain/docs/said.py.md` gives the checks of step 7.
+`main` stops at step 7 if a case failed. Thus step 8 runs only if each case passed.
+`.toolchain/docs/said.py.md` gives the checks of step 8.
 
 `.toolchain/docs/workflows.py.md`, *The workflows*, tells which workflow runs the cases of the toolchain on each target.
 
@@ -63,7 +65,8 @@ A file with no case gives no group.
 
 - has a key that a case does not have, or its false variant or its helper has such a key,
 - claims nothing: `<path>: the case <name> claims nothing`,
-- has no false variant: `<path>: the case <name> has no false variant`.
+- has no false variant: `<path>: the case <name> has no false variant`,
+- states a call in `fail`, also in its false variant, that `listed` of `fail.py` does not give: `<path>: the case <name> makes <call> fail, and [fail.calls] does not list it`.
 
 ## A case
 
@@ -81,6 +84,9 @@ A file with no case gives no group.
 A case that holds no `{port}` gets no port. In such a case, a value of `[variables]` that holds `{port}` stops `test`: `no variable {port} for <text>`.
 
 With `counted`, the command and the helper get the variable `C23_LEAKS`: the path of the folder of the case, with `.leaks` added.
+If the case states `fail`, the command gets the variable `C23_FAIL`: `.toolchain/docs/fail.py.md`, *The layer*. Else `tried` removes `C23_FAIL` from the environment of the command.
+With `failing`, a case that states `fail` runs on the build of the run `fail`. Its folder, its `{out}` and its artifacts are those of that run.
+
 `tried` runs each command in the root, with a timer of `[test] timeout` seconds.
 The timer stops a command that does not end in time.
 `placed` and the steps `put` copy each file with its permissions. Thus a copy of a program can run on Linux and on macOS.
@@ -119,9 +125,9 @@ A claim `line` compares full lines. A claim `order` ignores the spaces at the st
 
 ## A changed run
 
-`test --branches` and `test --leaks` run the cases on a changed copy of the code. `changed` does their shared steps:
+`test --branches`, `test --leaks` and the run `fail` of `test` run cases on a changed copy of the code. `changed` does their shared steps:
 
-1. It does the steps 1 to 10 of a build with `ready` of `build.py`.
+1. It does the steps 1 to 10 of a build with `ready` of `build.py`, or it takes `prepared`.
 2. It sets the output folder of the target to `<build>/<run>/<target>`.
 3. It writes the changed copies of the sources, with the function `write` of the run.
 4. It builds the artifacts from these copies, with `made` of `build.py`.
@@ -129,7 +135,8 @@ A claim `line` compares full lines. A claim `order` ignores the spaces at the st
 6. It reads the groups of `tests/cases`. With `-k`, it keeps only the cases whose name contains the part.
 
 `ready` stops at step 1 if the target does not run on this machine.
-Each case of a changed run runs one time. A case that fails does not stop the run, and its verdict is only for information.
+In `test --branches` and in `test --leaks`, each case runs one time. A case that fails does not stop the run, and its verdict is only for information.
+The run `fail` gives `prepared`: the configuration and the variables of step 1 of *main*. Thus `test` prepares the build one time, and `main` judges the cases.
 
 ## The branches
 
@@ -137,7 +144,7 @@ Each case of a changed run runs one time. A case that fails does not stop the ru
 
 1. It stops with one of these options: `--break`, `--toolchain`, `--copies` or `--rounds`.
 2. It does the steps of *A changed run*, with the run `branches` and `probed` of `branches.py`.
-3. It sets the variable `C23_BRANCHES` of the environment to `<build>/branches/<target>/hits.txt`.
+3. It writes `<build>/branches/<target>/hits.bin` with a byte 0 for each outcome. The variable `C23_BRANCHES` names it.
 4. It runs each case one time, and writes its verdict.
 5. It writes the report, with `reported` of `branches.py`.
 

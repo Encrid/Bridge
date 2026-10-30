@@ -11,6 +11,7 @@ The reader skips spaces, tabs, line feeds and carriage returns between tokens.
 At the end of the text, the token is empty.
 
 `word` keeps at most 63 characters and a terminating zero.
+The 63 characters are a rule of the format: `docs/extern/bridge_schema.h.md`, *The type set*. So they are no key: each reader reads a name in one way.
 The reader skips the rest of a longer run, and sets `cut`: `schema_is_name` gives false for such a token.
 
 ## Functions

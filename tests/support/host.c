@@ -36,7 +36,10 @@ void host_init(host_t *h, int argc, char **argv)
     h->backends[1] = (bridge_backend_t){ "plain", TESTS_PATH, HOST_KEEPS, 4 };
     h->phases[0] = "update";
     h->phases[1] = "present";
-    h->cfg = (bridge_config_t){ .abi = BRIDGE_HOST_ABI, .threads = 1 };
+    h->cfg = (bridge_config_t){ .abi = BRIDGE_HOST_ABI, .threads = 1,
+        .profile = BRIDGE_FALSE, .validate = BRIDGE_FALSE, .observer_passes = 1,
+        .stack = 1 << 20, .table_growth = 150, .table_hash_fill = 50,
+        .table_retry = 50 };
     h->cfg.backends = h->backends;
     h->cfg.backend_count = 2;
     h->cfg.phases = h->phases;

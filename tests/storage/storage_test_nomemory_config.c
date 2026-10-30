@@ -3,11 +3,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
-#include <stdio.h>
-
 #include "storage_test.h"
-
-#ifdef COUNTED
 
 static const bridge_setting_t SETTINGS[10] = {
     { .key = "vsync", .kind = BRIDGE_BOOL, .v = { .b = true } },
@@ -37,22 +33,17 @@ static void load_other(bridge_world_t *w, bridge_artifact_t a)
     (void)bridge_load(w, &a);
 }
 
-static bool load_configured(storage_test_t *t, size_t k)
+enum storage_test_end storage_test_configure_live(storage_test_t *t)
 {
-    storage_test_allocator_t *allocator = storage_test_get_allocator();
     bridge_artifact_t a = storage_test_state(BUILT_DIR "/settings" BUILT_SUFFIX, 6, 1 << 20, 1 << 20);
 
-    allocator->asked = 0;
-    allocator->fail_at = k;
-    allocator->failed = false;
-    t->said_memory = 0;
     t->cfg.phases = UPDATE;
     t->cfg.phase_count = 1;
     t->cfg.order = ORDER;
     t->cfg.order_count = 1;
     t->w = bridge_create(&t->cfg, storage_test_hear_memory, t);
     if (!t->w)
-        return (allocator->failed);
+        return (STORAGE_TEST_DONE);
     load_other(t->w, a);
     a.cfg.identity = "game:settings@0.1.0";
     a.cfg.config = "game:Settings";
@@ -61,27 +52,5 @@ static bool load_configured(storage_test_t *t, size_t k)
     a.cfg.persistent = 128;
     (void)bridge_load(t->w, &a);
     (void)bridge_unload(t->w, a.cfg.identity);
-    (void)bridge_destroy(t->w);
-    t->w = nullptr;
-    return (allocator->failed);
-}
-
-enum storage_test_end storage_test_refuse_config_memory(storage_test_t *t)
-{
-    size_t k = 1;
-    size_t silent = 0;
-
-    (void)bridge_destroy(t->w);
-    t->w = nullptr;
-    while (load_configured(t, k)) {
-        silent += !t->said_memory;
-        k++;
-    }
-    storage_test_get_allocator()->fail_at = 0;
-    printf("%u allocations were each answered null in turn\n", (unsigned)(k - 1));
-    if (silent)
-        printf("FAIL: %u of them were not said\n", (unsigned)silent);
     return (STORAGE_TEST_DONE);
 }
-
-#endif

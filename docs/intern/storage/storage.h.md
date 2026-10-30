@@ -109,6 +109,12 @@ How `storage_convert` ended.
 | `STORAGE_NO_ROOM` | Storage changed nothing: there is no room where the rows were to go. |
 | `STORAGE_NO_MEMORY` | Storage changed nothing: it has no memory to hold the values while they move. |
 
+## Constants
+
+| Constant | Value |
+| --- | --- |
+| `STORAGE_HASH_MOST` | 2147483648, 2 to the power 31: the most places of the hash of tables, since `hash_room` is a power of two in 32 bits. |
+
 ## Functions
 
 | Function | Result |

@@ -5,7 +5,8 @@ This file takes a piece from a region, makes a piece longer, and tells the longe
 
 ## A piece taken
 
-A piece comes from the smallest gap that holds it.
+A piece comes from the smallest gap that holds it. Thus the larger gaps stay for the larger pieces.
+The region has this one fit, so the fit is fixed, and is no key.
 If no gap holds it, the piece comes from the space that was never used, after `used`.
 If that space is too short too, the region refuses the request.
 

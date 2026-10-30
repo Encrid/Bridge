@@ -14,8 +14,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parents[2]
 NAME = re.compile(r'\{([a-z_][a-z0-9_]*)(?::([^{}]*))?\}')
 KEYS = {'step': {'run', 'cwd', 'section', 'text', 'contains', 'copy', 'rename'},
-        'case': {'name', 'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders', 'claims', 'false', 'alone'},
-        'false': {'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders'},
+        'case': {'name', 'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders', 'fail', 'claims', 'false', 'alone'},
+        'false': {'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders', 'fail'},
         'helper': {'run', 'wait', 'stdin', 'claims'},
         'script': {'wait', 'put', 'remove', 'type'},
         'claims': {'status', 'status_not', 'line', 'has', 'lacks', 'matches', 'matches_not', 'order', 'output', 'files'},
@@ -58,6 +58,17 @@ def config(root):
     for name, path in files:
         merged(whole, tomllib.loads(path.read_text(encoding='utf-8')), name, whence)
     return whole
+
+
+def tables(config, values, name):
+    own = config.get(name, {})
+    found = [own]
+    for one in own.get('with', []):
+        path = located(one, values)
+        if not path.is_file():
+            die('[%s] with: %s is not there' % (name, path.as_posix()))
+        found.append(tomllib.loads(path.read_text(encoding='utf-8')).get(name, {}))
+    return found
 
 
 def located(text, values):

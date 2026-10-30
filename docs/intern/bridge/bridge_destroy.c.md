@@ -18,6 +18,7 @@ This file unmakes a world: it shuts down each loaded module, and then gives back
 Each `shutdown` runs under the timeout of its module.
 A `shutdown` that fails is said in a record, and the other modules shut down all the same.
 The modules shut down in the order that they loaded. No module depends on another, so no other order means more.
+Thus no key of the deployment states the order.
 
 ## A pinned module
 

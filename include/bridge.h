@@ -23,7 +23,7 @@ extern "C" {
 
 typedef struct bridge_world bridge_world_t;
 
-constexpr uint32_t BRIDGE_HOST_ABI = 2;
+constexpr uint32_t BRIDGE_HOST_ABI = 3;
 
 static_assert(sizeof(void *) == 8);
 static_assert(sizeof(size_t) == 8);
@@ -106,6 +106,12 @@ static_assert(alignof(bridge_order_t) == 8);
 static_assert(offsetof(bridge_order_t, before) == 0);
 static_assert(offsetof(bridge_order_t, after) == 8);
 
+enum bridge_flag : uint8_t {
+    BRIDGE_UNSET = 0,
+    BRIDGE_TRUE = 1,
+    BRIDGE_FALSE = 2
+};
+
 typedef struct {
     uint32_t abi;
     uint32_t pad2;
@@ -119,10 +125,17 @@ typedef struct {
     uint32_t order_count;
     uint32_t threads;
     bridge_budget_t budget;
-    bool profile;
-    bool validate;
+    enum bridge_flag profile;
+    enum bridge_flag validate;
+    uint8_t pad3[2];
+    uint32_t observer_passes;
+    uint64_t stack;
+    uint32_t table_growth;
+    uint32_t table_hash_fill;
+    uint32_t table_retry;
+    uint32_t pad4;
 } bridge_config_t;
-static_assert(sizeof(bridge_config_t) == 128);
+static_assert(sizeof(bridge_config_t) == 152);
 static_assert(alignof(bridge_config_t) == 8);
 static_assert(offsetof(bridge_config_t, abi) == 0);
 static_assert(offsetof(bridge_config_t, pad2) == 4);
@@ -138,6 +151,13 @@ static_assert(offsetof(bridge_config_t, threads) == 52);
 static_assert(offsetof(bridge_config_t, budget) == 56);
 static_assert(offsetof(bridge_config_t, profile) == 120);
 static_assert(offsetof(bridge_config_t, validate) == 121);
+static_assert(offsetof(bridge_config_t, pad3) == 122);
+static_assert(offsetof(bridge_config_t, observer_passes) == 124);
+static_assert(offsetof(bridge_config_t, stack) == 128);
+static_assert(offsetof(bridge_config_t, table_growth) == 136);
+static_assert(offsetof(bridge_config_t, table_hash_fill) == 140);
+static_assert(offsetof(bridge_config_t, table_retry) == 144);
+static_assert(offsetof(bridge_config_t, pad4) == 148);
 
 typedef struct {
     const char *from;
@@ -153,12 +173,6 @@ enum bridge_on_error : uint8_t {
     BRIDGE_SKIP = 2
 };
 
-enum bridge_flag : uint8_t {
-    BRIDGE_UNSET = 0,
-    BRIDGE_TRUE = 1,
-    BRIDGE_FALSE = 2
-};
-
 constexpr int64_t BRIDGE_NO_LIMIT = -1;
 constexpr int64_t BRIDGE_NONE = -2;
 
@@ -171,7 +185,7 @@ typedef struct {
     enum bridge_flag hot_reload;
     enum bridge_flag pinned;
     enum bridge_on_error on_error;
-    uint8_t pad0[8];
+    int64_t element_limit;
     int64_t max_system_failures;
     int64_t work_limit;
     int64_t memory_limit;
@@ -210,7 +224,7 @@ static_assert(offsetof(bridge_module_config_t, reloadable) == 12);
 static_assert(offsetof(bridge_module_config_t, hot_reload) == 13);
 static_assert(offsetof(bridge_module_config_t, pinned) == 14);
 static_assert(offsetof(bridge_module_config_t, on_error) == 15);
-static_assert(offsetof(bridge_module_config_t, pad0) == 16);
+static_assert(offsetof(bridge_module_config_t, element_limit) == 16);
 static_assert(offsetof(bridge_module_config_t, max_system_failures) == 24);
 static_assert(offsetof(bridge_module_config_t, work_limit) == 32);
 static_assert(offsetof(bridge_module_config_t, memory_limit) == 40);

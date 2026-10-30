@@ -50,6 +50,9 @@ void block_destroy(bridge_world_t *w);
 [[nodiscard]] int block_check_budget(bridge_world_t *w,
     const bridge_budget_t *budget);
 
+[[nodiscard]] int block_check_counts(bridge_world_t *w,
+    const bridge_budget_t *budget);
+
 [[nodiscard]] int block_lay_out(bridge_world_t *w,
     const bridge_budget_t *budget, block_layout_t *layout);
 
@@ -62,6 +65,8 @@ void block_drain(bridge_world_t *w, module_t *m);
 void block_hand_out(bridge_world_t *w);
 
 void block_barrier(bridge_world_t *w);
+
+void block_publish_all(bridge_world_t *w);
 
 [[nodiscard]] void *block_column_regrow(bridge_world_t *w, void *ptr,
     uint32_t old_size, uint32_t new_size);

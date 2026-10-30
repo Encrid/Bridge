@@ -24,7 +24,6 @@ typedef struct {
     const char *what;
     const char *more;
     uint32_t said[2];
-    uint32_t said_memory;
     uint64_t called;
 } storage_test_t;
 
@@ -37,6 +36,7 @@ typedef struct {
     int64_t sparse_sets;
     int64_t direct_indexed;
     bool asks_columns;
+    bool makes_world;
 } storage_test_room_t;
 
 typedef struct {
@@ -44,13 +44,6 @@ typedef struct {
     enum storage_test_end (*run)(storage_test_t *t);
     const storage_test_room_t *room;
 } storage_test_case_t;
-
-typedef struct {
-    size_t calls;
-    size_t asked;
-    size_t fail_at;
-    bool failed;
-} storage_test_allocator_t;
 
 typedef struct {
     const char *what;
@@ -110,22 +103,6 @@ void storage_test_hear_memory(void *ud, const bridge_record_t *r);
 
 void storage_test_hear_counts(void *ud, const bridge_record_t *r);
 
-storage_test_allocator_t *storage_test_get_allocator(void);
-
-    #ifdef COUNTED
-
-void *counted_malloc(size_t n);
-void *counted_calloc(size_t n, size_t each);
-void *counted_realloc(void *p, size_t n);
-void counted_free(void *p);
-
-void *counted_os_reserve(size_t reserve, size_t commit);
-int counted_os_commit(void *base, size_t bytes);
-os_thread_t *counted_os_thread_start(os_thread_fn_t fn, void *arg);
-os_mutex_t *counted_os_mutex_create(void);
-os_event_t *counted_os_event_create(void);
-
-    #endif
 
 bridge_artifact_t storage_test_state(const char *path, int64_t spawns,
     uint32_t spans, int64_t changes);
@@ -184,6 +161,11 @@ enum storage_test_end storage_test_count_all(storage_test_t *t);
 enum storage_test_end storage_test_move_many(storage_test_t *t);
 enum storage_test_end storage_test_grow_many(storage_test_t *t);
 enum storage_test_end storage_test_wrap_generation(storage_test_t *t);
+enum storage_test_end storage_test_go_deep(storage_test_t *t);
+enum storage_test_end storage_test_size_hash(storage_test_t *t);
+enum storage_test_end storage_test_grow_by_share(storage_test_t *t);
+enum storage_test_end storage_test_grow_past(storage_test_t *t);
+enum storage_test_end storage_test_ask_less(storage_test_t *t);
 enum storage_test_end storage_test_order_two_modules(storage_test_t *t);
 enum storage_test_end storage_test_order_phase(storage_test_t *t);
 enum storage_test_end storage_test_set_order(storage_test_t *t);
@@ -228,12 +210,9 @@ enum storage_test_end storage_test_stress(storage_test_t *t);
 enum storage_test_end storage_test_measure(storage_test_t *t);
 enum storage_test_end storage_test_weigh(storage_test_t *t);
 enum storage_test_end storage_test_take_baseline(storage_test_t *t);
-    #ifdef COUNTED
-enum storage_test_end storage_test_refuse_memory(storage_test_t *t);
-enum storage_test_end storage_test_refuse_memory_group(storage_test_t *t);
-enum storage_test_end storage_test_refuse_relay(storage_test_t *t);
-bool storage_test_count_request(void);
-enum storage_test_end storage_test_refuse_config_memory(storage_test_t *t);
-    #endif
+enum storage_test_end storage_test_live(storage_test_t *t);
+enum storage_test_end storage_test_relay_live(storage_test_t *t);
+enum storage_test_end storage_test_configure_live(storage_test_t *t);
+enum storage_test_end storage_test_group_live(storage_test_t *t);
 
 #endif

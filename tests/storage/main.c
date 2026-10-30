@@ -26,7 +26,7 @@ static const bridge_setting_t KEEPS[4] = {
 };
 
 static const bridge_setting_t KEEPS_ALL[4] = {
-    { "capabilities", BRIDGE_INT, {}, { .i = 63 } },
+    { "capabilities", BRIDGE_INT, {}, { .i = 63 | 1 << 7 } },
     { "reservation", BRIDGE_INT, {}, { .i = INT64_C(1) << 32 } },
     { "guard", BRIDGE_INT, {}, { .i = 65'536 } },
     { "granule", BRIDGE_INT, {}, { .i = 65'536 } }
@@ -65,16 +65,20 @@ static const storage_test_room_t ONE_SET_TWO_DIRECT = { BACKENDS + 1, 1, 1,
     32'768, 64 << 20, 1, 2, false };
 static const storage_test_room_t ONE_OF_EACH = { BACKENDS + 1, 1, 1, 32'768,
     64 << 20, 1, 1, false };
+static const storage_test_room_t OWN_PLAIN = { BACKENDS + 1, 1, 1, 32'768,
+    64 << 20, BRIDGE_NONE, BRIDGE_NONE, false, true };
+static const storage_test_room_t OWN_FOUR_THREADS = { BACKENDS + 1, 1, 4,
+    32'768, 64 << 20, BRIDGE_NONE, BRIDGE_NONE, false, true };
+static const storage_test_room_t OWN_BOTH_BACKENDS = { BACKENDS, 2, 1, 32'768,
+    64 << 20, BRIDGE_NONE, BRIDGE_NONE, false, true };
 
 static const storage_test_case_t CASES[] = {
-#ifdef COUNTED
-    { "nomemory", storage_test_refuse_memory, &PLAIN },
-    { "nomemoryrelay", storage_test_refuse_relay, &PLAIN },
-    { "nomemoryrelayempty", storage_test_refuse_relay, &PLAIN },
-    { "nomemoryconfig", storage_test_refuse_config_memory, &PLAIN },
-    { "nomemorythreads", storage_test_refuse_memory, &FOUR_THREADS },
-    { "nomemorygroup", storage_test_refuse_memory_group, &BOTH_BACKENDS },
-#endif
+    { "nomemory", storage_test_live, &OWN_PLAIN },
+    { "nomemoryrelay", storage_test_relay_live, &OWN_PLAIN },
+    { "nomemoryrelayempty", storage_test_relay_live, &OWN_PLAIN },
+    { "nomemoryconfig", storage_test_configure_live, &OWN_PLAIN },
+    { "nomemorythreads", storage_test_live, &OWN_FOUR_THREADS },
+    { "nomemorygroup", storage_test_group_live, &OWN_BOTH_BACKENDS },
     { "shape", storage_test_look_at_shape, &BOTH_BACKENDS },
     { "matrix", storage_test_make_large_matrix, &PLAIN },
     { "matrixsmall", storage_test_make_small_matrix, &PLAIN },
@@ -85,6 +89,11 @@ static const storage_test_case_t CASES[] = {
     { "manymove", storage_test_move_many, &PLAIN },
     { "manygrow", storage_test_grow_many, &PLAIN },
     { "generation", storage_test_wrap_generation, &PLAIN },
+    { "deep", storage_test_go_deep, &FOUR_THREADS },
+    { "hashroom", storage_test_size_hash, &ONE_TABLE },
+    { "growth", storage_test_grow_by_share, &ONE_TABLE },
+    { "asks", storage_test_ask_less, &ONE_TABLE },
+    { "growthpast", storage_test_grow_past, &ONE_TABLE },
     { "ordertwo", storage_test_order_two_modules, &PLAIN },
     { "orderchain", storage_test_order_two_modules, &PLAIN },
     { "orderbarrier", storage_test_order_two_modules, &PLAIN },
@@ -184,12 +193,16 @@ static void make_bridge(storage_test_t *t, const storage_test_room_t *room)
         .budget = { .entities = 400'000, .tables = room->tables, .types = 64,
             .systems = 64, .terms = 4, .modules = 4, .persistent = 4096,
             .columns = room->columns, .sparse_sets = room->sparse_sets,
-            .direct_indexed = room->direct_indexed } };
+            .direct_indexed = room->direct_indexed },
+        .profile = BRIDGE_FALSE, .validate = BRIDGE_FALSE, .observer_passes = 1,
+        .stack = 1 << 20, .table_growth = 150, .table_hash_fill = 50,
+        .table_retry = 50 };
 
     t->cfg = cfg;
     if (room->asks_columns && t->more)
         t->cfg.budget.columns = (uint64_t)atoi(t->more);
-    t->w = bridge_create(&t->cfg, storage_test_hear, t);
+    if (!room->makes_world)
+        t->w = bridge_create(&t->cfg, storage_test_hear, t);
     setvbuf(stdout, nullptr, _IONBF, 0);
 }
 
@@ -205,7 +218,7 @@ int main(int argc, char **argv)
     }
     t.more = argc > 2 ? argv[2] : nullptr;
     make_bridge(&t, c->room);
-    if (!t.w) {
+    if (!t.w && !c->room->makes_world) {
         printf("FAIL: bridge_create\n");
         return (1);
     }

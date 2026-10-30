@@ -1,0 +1,2 @@
+[fail]
+with = ["{bridge_os}/fail.toml"]

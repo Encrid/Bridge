@@ -12,8 +12,8 @@ bool storage_make_tables(storage_t *r)
     const bridge_world_t *w = r->w;
     size_t tables = (size_t)r->table_room + 1;
 
-    r->hash_room = 16;
-    while (r->hash_room < tables * 2)
+    r->hash_room = 1;
+    while ((uint64_t)r->hash_room * w->table_hash_fill < tables * 100)
         r->hash_room *= 2;
     r->places = calloc(w->entities, sizeof(*r->places));
     r->tables = calloc(tables, sizeof(*r->tables));

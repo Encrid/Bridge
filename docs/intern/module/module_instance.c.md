@@ -10,10 +10,10 @@ A module gets the memories that it imports, and no other.
 1. Compile the image from the bytes and the path of the artifact, with the demands of the config.
 2. Reserve the private memory: `docs/intern/module/module_call.c.md`, *The private memory*.
 3. Write the header with `block_write_header`, and refuse the module if the entity index is outside the block.
-4. Find the memories that the image imports.
+4. Find the memories that the image imports: *The memories a module imports*.
 5. Make the instance with those memories.
 6. Define the eight imports of the ABI: `docs/intern/abi/abi_define.c.md`, *The signatures*.
-7. Set `memory_limit` on the instance, if it is above 0.
+7. Set `memory_limit` and `element_limit` on the instance, each if it is above 0.
 
 The demands tell the backend which guarantees the config asks for.
 A guarantee can cost something at each instruction, and a backend need not compile in a guarantee that the module declined.
@@ -32,7 +32,13 @@ An import of a memory gets one of the two memories there are:
 | `BRIDGE_NAMESPACE`, `bridge` | `BRIDGE_PRIVATE`, `private` | The private memory of the module. |
 
 Any other import gets nothing from this file.
-Bridge reads at most 64 imports, and hands at most two memories.
+Bridge hands at most two memories, and they can be anywhere in the list of the imports.
+
+So Bridge reads each import, with the two calls of `docs/extern/bridge_backend.h.md`, *module_compile*.
+The second call has room for the count and one item more, so that the size is never 0.
+Bridge reads as many items as the first call counted. An item that the backend did not fill stays zero, and is no memory.
+It frees the room before it makes the instance.
+Without memory for the room, the load fails: `docs/extern/bridge.h.md`, *A load that failed*.
 
 ## Functions
 
@@ -40,5 +46,5 @@ Bridge reads at most 64 imports, and hands at most two memories.
 | --- | --- |
 | `is_text` | Gives whether `len` bytes at `at` are the text `text`. |
 | `lend_memory` | Writes the memory that an import asks for, if it is one of the two there are. Gives how many it wrote. |
-| `lend_memories` | Writes the memories that the image imports. Gives how many. |
+| `create_instance` | Reads each import of the image, and makes the instance with the memories that it imports. Gives the instance, or null with `err`. |
 | `module_make_instance` | Compiles the image of a module, reserves its private memory, and makes its instance with the memories it imports and the ABI. Gives 1 with `err`. |

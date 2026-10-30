@@ -4,6 +4,7 @@
 import concurrent.futures
 import json
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -12,6 +13,14 @@ import build
 from shared import die, expanded
 
 TOPS = ('src/', 'include/')
+OPENS = ('if', 'ifdef', 'ifndef')
+DIRECTIVE = re.compile(rb'[ \t]*#[ \t]*(\w+)')
+NULLABILITY = re.compile(r'\b_(?:Nonnull|Nullable_result|Nullable|Null_unspecified)\b')
+RENAME = '''[[maybe_unused]] static typeof(%(n)s) %(p)s%(n)s;
+#pragma push_macro("%(n)s")
+#undef %(n)s
+#define %(n)s %(p)s%(n)s
+'''
 WRITER = r'''#include <stdlib.h>
 #include <string.h>
 #ifdef _WIN32
@@ -144,6 +153,83 @@ def copied(root, where):
     for top in ('src', 'include'):
         if (root / top).is_dir():
             shutil.copytree(root / top, where / top)
+
+
+def plain(kind):
+    return kind.get('desugaredQualType', kind.get('qualType', ''))
+
+
+def spelled(text):
+    return ' '.join(NULLABILITY.sub('', text).split())
+
+
+def declaration(node, typedefs):
+    whole = plain(node.get('type', {}))
+    returned = whole.split('(', 1)[0].strip()
+    parameters = [one.get('type', {}) for one in node.get('inner', [])
+                  if isinstance(one, dict) and one.get('kind') == 'ParmVarDecl']
+    return (typedefs.get(returned, returned), [plain(one) for one in parameters], '...' in whole,
+            [spelled(one.get('qualType', '')) for one in parameters])
+
+
+def found(root, path, tree, names, callbacks=()):
+    used, defined, declared, ends, typedefs = set(), set(), {}, {}, {}
+
+    def walk(node):
+        kind, name = node.get('kind'), node.get('name')
+        if kind == 'DeclRefExpr':
+            name = node.get('referencedDecl', {}).get('name')
+            if name in names and owned(node.get('range', {}).get('begin', {}), root) == path:
+                used.add(name)
+        elif kind == 'TypedefDecl':
+            typedefs.setdefault(name, plain(node.get('type', {})))
+        elif kind == 'FunctionDecl' and name in names and not node.get('isImplicit'):
+            declared.setdefault(name, declaration(node, typedefs))
+            body = any(isinstance(one, dict) and one.get('kind') == 'CompoundStmt' for one in node.get('inner', []))
+            if body and owned(node.get('loc', {}), root) == path:
+                defined.add(name)
+                end = node.get('range', {}).get('end', {})
+                ends[name] = (end['expansionLoc'] if is_macro(end) else end).get('offset', 0)
+        for one in node.get('inner', []):
+            if isinstance(one, dict) and one:
+                walk(one)
+    walk(tree)
+    named = used - (defined - set(callbacks))
+    return path, sorted(named), declared, {name: ends[name] for name in named & defined}
+
+
+def directive(line):
+    match = DIRECTIVE.match(line)
+    if match:
+        return match.group(1).decode('ascii', 'replace')
+    return '' if not line.strip() else None
+
+
+def included(text):
+    lines = text.split(b'\n')
+    marks = [directive(line) for line in lines]
+    end = max((n for n, mark in enumerate(marks) if mark == 'include'), default=-1)
+    closes, opened = {}, []
+    for n, mark in enumerate(marks):
+        if mark in OPENS:
+            opened.append(n)
+        elif mark == 'endif':
+            closes[opened.pop()] = n
+    for start in sorted((start for start, close in closes.items() if start < end < close), reverse=True):
+        if None in marks[start:closes[start]]:
+            break
+        end = closes[start]
+    return sum(len(line) + 1 for line in lines[:end + 1])
+
+
+def signed(name, declaration, prefix):
+    _, _, variadic, parameters = declaration
+    if variadic:
+        die('%s takes a list of arguments of no fixed length' % name)
+    arguments = ', '.join('typeof(%s) a%d' % (one, n) for n, one in enumerate(parameters)) or 'void'
+    call = '%s(%s)' % (name, ', '.join('a%d' % n for n in range(len(parameters))))
+    result = '%s(%s)' % (name, ', '.join('(%s){}' % one for one in parameters))
+    return 'static typeof(%s) %s%s(%s)\n{\n' % (result, prefix, name, arguments), call
 
 
 def placing(text, at):

@@ -7,6 +7,22 @@
     #define BRIDGE_SRC_STORAGE_APPLY_H
 
     #include "storage_place.h"
+    #include "storage_room.h"
+
+[[gnu::always_inline]] static inline void reserve_all(storage_t *r)
+{
+    uint32_t i = 0;
+
+    while (i < r->changed_count) {
+        reserve_one(r, r->changed[i]);
+        i++;
+    }
+    i = 0;
+    while (i < r->changed_count) {
+        room_one(r, r->changed[i]);
+        i++;
+    }
+}
 
 static inline void tell_all(storage_t *r)
 {

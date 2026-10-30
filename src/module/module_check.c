@@ -82,6 +82,8 @@ int module_check(module_check_t *k)
         k->demands |= BACKEND_WORK_LIMIT;
     if (cfg->memory_limit > 0)
         k->demands |= BACKEND_MEMORY_LIMIT;
+    if (cfg->element_limit > 0)
+        k->demands |= BACKEND_ELEMENT_LIMIT;
     if (cfg->init_timeout > 0 || cfg->reload_timeout > 0
         || cfg->shutdown_timeout > 0)
         k->demands |= BACKEND_TIMEOUT;

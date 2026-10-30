@@ -15,6 +15,7 @@ void test_state_no_limit(host_t *h)
     test_state_small(&a, identity, "ok");
     a.cfg.work_limit = BRIDGE_NO_LIMIT;
     a.cfg.memory_limit = BRIDGE_NO_LIMIT;
+    a.cfg.element_limit = BRIDGE_NO_LIMIT;
     a.cfg.init_timeout = BRIDGE_NO_LIMIT;
     a.cfg.reload_timeout = BRIDGE_NO_LIMIT;
     a.cfg.shutdown_timeout = BRIDGE_NO_LIMIT;

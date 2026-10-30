@@ -75,9 +75,11 @@ zig and its caches stay in the folder of `project.py`.
 - Each case runs in its own empty folder, `<build>/<target>/cases/<group>/<number>`.
 - `test` writes the output of the commands of all the cases into `<build>/<target>/said.txt`, but not with `--break`.
 - `test --branches` puts the sources with the probes into `<build>/branches/tree`, and its build, its cases and the
-  file of the hits `hits.txt` into `<build>/branches/<target>`.
+  file of the hits `hits.bin` into `<build>/branches/<target>`.
 - `test --leaks` puts the sources with the counts into `<build>/leaks/tree`, and its build and its cases into
   `<build>/leaks/<target>`. The lines of a case are in `<build>/leaks/<target>/cases/<group>/<number>.leaks`.
+- For the cases that state `fail`, `test` puts the sources with the layers into `<build>/fail/tree`, and their build and
+  these cases into `<build>/fail/<target>`.
 - The caches of zig are in `build/zig-cache` of the folder of `project.py`. Thus a build does not use a cache of the machine.
 
 `build` writes the path of each artifact.

@@ -39,6 +39,7 @@ void host_state_guarded(bridge_artifact_t *a, const char *identity,
     a->backend = "guarded";
     a->cfg.work_limit = 10'000'000;
     a->cfg.memory_limit = 16 << 20;
+    a->cfg.element_limit = 1 << 16;
     a->cfg.init_timeout = 2000 * HOST_MS;
     a->cfg.reload_timeout = 2000 * HOST_MS;
     a->cfg.shutdown_timeout = 2000 * HOST_MS;

@@ -3,9 +3,9 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include "storage_apply.h"
 #include "storage_convert.h"
 #include "storage_forget.h"
-#include "storage_room.h"
 
 static void fold_in(storage_t *r, uint32_t index)
 {

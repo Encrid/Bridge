@@ -5,10 +5,10 @@ Only Bridge and a backend compile it.
 
 ## The library
 
-A backend is a shared library that exports the 18 functions of `backend_api_t`, by their names.
+A backend is a shared library that exports the 19 functions of `backend_api_t`, by their names.
 `BACKEND_ENTRY_NAMES` gives the names, in the order of the fields of `backend_api_t`.
-`BACKEND_ENTRY_COUNT` is how many there are: 18.
-`BACKEND_EXPORT` exports a function from the library: a backend in C writes it before each of the 18 functions.
+`BACKEND_ENTRY_COUNT` is how many there are: 19.
+`BACKEND_EXPORT` exports a function from the library: a backend in C writes it before each of the 19 functions.
 
 `bridge_create` opens the library that the deployment names, and finds each entry by its name: `docs/extern/bridge.h.md`, *bridge_backend_t*.
 A library that lacks an entry is not a backend, and `bridge_create` refuses the world.
@@ -28,7 +28,7 @@ The backend owns five kinds of handle, and Bridge never reads into them:
 ## BACKEND_ABI
 
 `BACKEND_ABI` is the number of the backend seam: the version of its layouts and its entries.
-The number is 2.
+The number is 3.
 `backend_get_abi` gives the number that the backend was built against.
 Bridge calls `backend_get_abi` first, and refuses a library that gives another number, before it asks for another entry.
 The number changes as `BRIDGE_HOST_ABI` does: `docs/extern/bridge.h.md`, *BRIDGE_HOST_ABI*.
@@ -77,6 +77,7 @@ Each capability is a promise. State only what the backend keeps.
 | `BACKEND_WORK_LIMIT` | The backend counts the work of an invocation, and stops it at its limit. | `work_limit` |
 | `BACKEND_TIMEOUT` | The backend stops a call at its timeout. | A timeout |
 | `BACKEND_MEMORY_LIMIT` | The backend keeps the own memory of a module under a ceiling. | `memory_limit` |
+| `BACKEND_ELEMENT_LIMIT` | The backend keeps the elements of the reference tables of a module under a ceiling. | `element_limit` |
 | `BACKEND_RELOAD` | A reload can replace a module while the world runs. | `hot_reload` |
 | `BACKEND_SIDE_BY_SIDE` | Two instances of one module can exist at one time. | None. |
 | `BACKEND_UNLOAD` | Bridge can take the library out of the process after `backend_destroy`. | None. |
@@ -106,7 +107,8 @@ Each backend maps the shared memory, thus it has the largest `reservation` and `
 The private memory of a module has the shape that the backend of the module needs.
 
 `memory_adopt` makes `len` bytes at `ptr`, which Bridge owns, a memory that the modules of the backend can address.
-It does not allocate. It gives the handle of the memory, or null with `err`.
+The backend takes no bytes for the memory: the bytes stay Bridge's. It can make a handle of its own for them, for example a memory of its engine.
+It gives the handle, or null with `err` when it cannot make one.
 A backend that refuses the shared memory refuses the world. A backend that refuses a private memory fails the load of its module.
 
 `memory_release` gives the handle back, and frees nothing of the block.
@@ -140,7 +142,9 @@ A backend can enforce more than `demands`, and never less.
 
 `module_list_imports` gives how many imports the image makes, and fills at most `max` items of `out`.
 Each item is a `backend_import_t`.
-Bridge reads the imports to know which memories to give to `instance_create`. It gives a `max` of 64.
+Bridge reads each import, to know which memories to give to `instance_create`.
+It calls `module_list_imports` two times. The first call has a `max` of 0 and a null `out`, and gives the count.
+The second call has room for that count of items.
 
 | Field | Content |
 | --- | --- |
@@ -171,11 +175,12 @@ An instance is of the backend of its image. Bridge calls an instance from one th
 | `instance_set_work_limit` | The work that the next invocation can do, in `units` of the backend. |
 | `instance_set_timeout` | The timeout of the next call only, in `nanos` of real time. |
 | `instance_set_memory_limit` | The ceiling of the own memory of the module, in `bytes`. |
+| `instance_set_element_limit` | The ceiling of the elements of the reference tables of the module, in `elements`. |
 
 Bridge sets the work limit before each invocation of a system, since what is left of a limit only goes down.
 Bridge sets the timeout before each call of `init`, `reload` and `shutdown`. The backend converts it to the unit of its clock.
-Bridge sets the memory limit one time, after it made the instance.
-Bridge calls each of the three only for a limit above zero, and only on a backend with the capability.
+Bridge sets the memory limit and the element limit one time, after it made the instance.
+Bridge calls each of the four only for a limit above zero, and only on a backend with the capability.
 
 ## define_func
 
@@ -231,8 +236,8 @@ Bridge treats a call that did not return as it treats a status that is not 0: `d
 | When | Bridge calls |
 | --- | --- |
 | `bridge_create` | `backend_get_abi`, `backend_create`, `backend_get_capabilities`, `memory_get_shape`, then `memory_adopt` of the shared memory. |
-| A load | `module_compile`, `memory_adopt` of the private memory, `module_list_imports`, `instance_create`, and `define_func` 8 times. |
-| A load, then | `instance_set_memory_limit`, `instance_get_func` of `init`, `instance_set_timeout`, `call` of `init`, then `instance_get_func` of each export. |
+| A load | `module_compile`, `memory_adopt` of the private memory, `module_list_imports` 2 times, `instance_create`, and `define_func` 8 times. |
+| A load, then | `instance_set_memory_limit`, `instance_set_element_limit`, `instance_get_func` of `init`, `instance_set_timeout`, `call` of `init`, then `instance_get_func` of each export. |
 | A load that fails after `init` gave 0 | The calls of an unload. `instance_set_timeout` and `call` of `shutdown` come only if Bridge found `shutdown`. |
 | A phase | `instance_set_work_limit` and `call` of each system. |
 | An unload | `instance_set_timeout`, `call` of `shutdown`, `instance_destroy`, `module_destroy` and `memory_release`. |

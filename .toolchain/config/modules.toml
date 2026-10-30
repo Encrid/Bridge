@@ -27,6 +27,10 @@ name = "grow"
 path = true
 
 [[modules]]
+name = "grow_elements"
+path = true
+
+[[modules]]
 name = "noinit"
 path = true
 
@@ -444,6 +448,12 @@ variants = [{ name = "namer-reader", defines = ["BRIDGE_ROWS_CHECKED", "READER"]
 name = "spawner"
 sources = ["tests/modules/spawner.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "one_more"
+sources = ["tests/modules/one_more.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+path = true
 
 [[modules]]
 name = "counter"

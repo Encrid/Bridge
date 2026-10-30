@@ -3,6 +3,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdlib.h>
 #include <string.h>
 
 #include "module.h"
@@ -31,19 +32,28 @@ static uint32_t lend_memory(const module_t *m, const backend_import_t *im,
     return (1);
 }
 
-static uint32_t lend_memories(const module_t *m,
-    backend_memory_import_t *memories)
+static backend_instance_t *create_instance(const module_t *m,
+    backend_err_t *err)
 {
-    backend_import_t imports[64];
-    uint32_t count = m->on->api.module_list_imports(m->image, imports, 64);
+    const backend_api_t *api = &m->on->api;
+    uint32_t count = api->module_list_imports(m->image, nullptr, 0);
+    backend_import_t *imports = calloc((size_t)count + 1, sizeof(*imports));
+    backend_memory_import_t memories[2];
     uint32_t lent = 0;
     uint32_t i = 0;
 
-    while (i < count && i < 64 && lent < 2) {
+    if (!imports) {
+        module_fail(err, "out of memory: there was none for the list of its "
+            "imports");
+        return (nullptr);
+    }
+    (void)api->module_list_imports(m->image, imports, count);
+    while (i < count && lent < 2) {
         lent += lend_memory(m, &imports[i], &memories[lent]);
         i++;
     }
-    return (lent);
+    free(imports);
+    return (api->instance_create(m->image, memories, lent, err));
 }
 
 int module_make_instance(module_t *m, const module_start_t *st,
@@ -52,20 +62,20 @@ int module_make_instance(module_t *m, const module_start_t *st,
     const bridge_artifact_t *a = st->a;
     open_backend_t *o = m->on;
     backend_source_t source = { a->bytes, a->len, a->path, st->demands, 0 };
-    backend_memory_import_t memories[2];
-    uint32_t count;
 
     m->image = o->api.module_compile(o->be, &source, err);
     if (!m->image || module_take_private(m, &a->cfg, err))
         return (1);
     if (block_write_header(m->w, m))
         return (module_fail(err, "the entity index is outside the block"));
-    count = lend_memories(m, memories);
-    m->instance = o->api.instance_create(m->image, memories, count, err);
+    m->instance = create_instance(m, err);
     if (!m->instance || abi_define(m, err))
         return (1);
     if (a->cfg.memory_limit > 0)
         o->api.instance_set_memory_limit(m->instance,
             (uint64_t)a->cfg.memory_limit);
+    if (a->cfg.element_limit > 0)
+        o->api.instance_set_element_limit(m->instance,
+            (uint64_t)a->cfg.element_limit);
     return (0);
 }

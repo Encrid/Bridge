@@ -42,6 +42,7 @@ Then it finds what the config demands of the backend:
 | --- | --- |
 | `BACKEND_WORK_LIMIT` | `work_limit` is above 0. |
 | `BACKEND_MEMORY_LIMIT` | `memory_limit` is above 0. |
+| `BACKEND_ELEMENT_LIMIT` | `element_limit` is above 0. |
 | `BACKEND_TIMEOUT` | `init_timeout`, `reload_timeout` or `shutdown_timeout` is above 0. |
 
 The demands go to the backend when it compiles the module: `docs/intern/module/module_instance.c.md`.

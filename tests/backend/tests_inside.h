@@ -79,6 +79,8 @@ struct backend_instance {
     uint64_t timeout;
     uint64_t memory_limit;
     uint64_t memory;
+    uint64_t element_limit;
+    uint64_t elements;
     backend_func_t *funcs;
 };
 
@@ -138,5 +140,6 @@ void tests_trap(const test_api_t *api);
 void tests_spend(const test_api_t *api, uint64_t units);
 void tests_wait(const test_api_t *api, uint64_t nanos);
 int tests_grow(const test_api_t *api, uint64_t bytes);
+int tests_grow_elements(const test_api_t *api, uint64_t elements);
 
 #endif

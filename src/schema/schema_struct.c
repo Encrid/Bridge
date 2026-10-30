@@ -3,23 +3,12 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
-#include <stdlib.h>
-
 #include "schema_reader.h"
 
 static int add_field(schema_reader_t *r, schema_field_t *field)
 {
     schema_t *out = r->out;
-    uint32_t room = r->room ? r->room * 2 : 8;
-    schema_field_t *more = out->fields;
 
-    if (out->field_count == r->room) {
-        more = realloc(out->fields, room * sizeof(*more));
-        if (!more)
-            return (schema_refuse(r, "ran out of memory at '%s'"));
-        out->fields = more;
-        r->room = room;
-    }
     field->name = schema_copy_text(r->word);
     if (!field->name)
         return (schema_refuse(r, "ran out of memory at '%s'"));
@@ -88,6 +77,9 @@ int schema_parse_struct(schema_reader_t *r)
     schema_t *out = r->out;
     int refused = 0;
 
+    out->fields = schema_take_room(r, ';', sizeof(*out->fields));
+    if (!out->fields)
+        return (schema_refuse(r, "ran out of memory at '%s'"));
     schema_read_next(r);
     while (!refused && !schema_is(r, "}")) {
         refused = read_field(r);

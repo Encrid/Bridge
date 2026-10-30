@@ -12,6 +12,9 @@ Its row is `HELD` until the barrier after `spawn` hands it out: `src/storage/sto
 It counts against `[budget] entities`.
 When no index is left, `storage_reserve` takes fewer ids than asked, and gives how many it took.
 
+The free list gives the index that was freed last first, with no search.
+This order is fixed, and is no key. The Usage promises no order of the ids, and each reused index gets a new generation.
+
 `storage_give_single` writes the value of a singleton outside a barrier, for the settings of a module.
 Index 0 comes to carry the singleton, and storage tells the observers before it writes the value.
 It tells them that only this singleton is attached, so an observer of another singleton hears no `BRIDGE_ON_ATTACH`.

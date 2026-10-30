@@ -6,7 +6,6 @@
 #include "storage_apply.h"
 #include "storage_change.h"
 #include "storage_forget.h"
-#include "storage_room.h"
 #include "storage_runs.h"
 #include "storage_settle.h"
 

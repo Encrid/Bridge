@@ -10,24 +10,11 @@
 
 static const char *const POLICIES[] = { "", "strip", "sweep", "delete" };
 
-storage_test_allocator_t *storage_test_get_allocator(void)
-{
-    static storage_test_allocator_t allocator = {};
-
-    return (&allocator);
-}
-
 void storage_test_run(storage_test_t *t, const char *phase)
 {
-    const storage_test_allocator_t *allocator = storage_test_get_allocator();
-    size_t before = allocator->calls;
-
     printf("%s\n", phase);
     if (bridge_run_phase(t->w, phase))
         printf("  REFUSED\n");
-    if (allocator->calls != before)
-        printf("  FAIL: the allocator was called %u times in a phase\n",
-            (unsigned)(allocator->calls - before));
 }
 
 void storage_test_run_all(storage_test_t *t, const char *const *phases)

@@ -30,7 +30,24 @@ static const test_edit_t TEST_DEPLOYMENT_EDITS[] = {
     { "direct_indexed=no limit",
         offsetof(bridge_config_t, budget.direct_indexed), 8, BRIDGE_NO_LIMIT },
     { "direct_indexed=beyond",
-        offsetof(bridge_config_t, budget.direct_indexed), 8, BEYOND }
+        offsetof(bridge_config_t, budget.direct_indexed), 8, BEYOND },
+    { "profile=0", offsetof(bridge_config_t, profile), 1, 0 },
+    { "profile=3", offsetof(bridge_config_t, profile), 1, 3 },
+    { "validate=0", offsetof(bridge_config_t, validate), 1, 0 },
+    { "validate=3", offsetof(bridge_config_t, validate), 1, 3 },
+    { "stack=0", offsetof(bridge_config_t, stack), 8, 0 },
+    { "table_growth=0", offsetof(bridge_config_t, table_growth), 4, 0 },
+    { "table_growth=99", offsetof(bridge_config_t, table_growth), 4, 99 },
+    { "table_growth=100", offsetof(bridge_config_t, table_growth), 4, 100 },
+    { "table_hash_fill=0", offsetof(bridge_config_t, table_hash_fill), 4, 0 },
+    { "table_hash_fill=99", offsetof(bridge_config_t, table_hash_fill), 4,
+        99 },
+    { "table_hash_fill=100", offsetof(bridge_config_t, table_hash_fill), 4,
+        100 },
+    { "observer_passes=0", offsetof(bridge_config_t, observer_passes), 4, 0 },
+    { "table_retry=0", offsetof(bridge_config_t, table_retry), 4, 0 },
+    { "table_retry=99", offsetof(bridge_config_t, table_retry), 4, 99 },
+    { "table_retry=100", offsetof(bridge_config_t, table_retry), 4, 100 }
 };
 
 void test_put_key(void *key, size_t size, int64_t value)

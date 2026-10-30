@@ -26,7 +26,7 @@ The kind `native_module` is the kind `library`, with these changes:
 - After the build, it stops if the module does not hold the manifest.
 
 The folders of the headers, the visibility and the two macros are the items of the variable `native_flags`.
-The `flags` of the kind name that variable, so the syntax tree of `test --branches` and of `test --leaks` gets them too: `.toolchain/docs/rewrite.py.md`.
+The `flags` of the kind name that variable, so each syntax tree of a changed copy gets them too: `.toolchain/docs/rewrite.py.md`.
 A kind of a project that makes a native module with steps of its own names `{native_flags}` too. Thus the flags stay in one place.
 
 The folder `into` of each source is `build/third_party/<source>/<target>`, a path from the folder of the project.

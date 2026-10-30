@@ -5,13 +5,14 @@ A world loads no module: the host loads each module after `bridge_create`.
 
 ## The parts of a world
 
-1. Read the number of the host seam, then make room for the backends and the phases.
-2. Open and start the backends: `src/bridge/bridge_backends.c`.
-3. Take the phases: `src/bridge/bridge_phases.c`.
-4. Take the pairs of `[order]`: `src/schedule/schedule_order.c`.
-5. Start the threads that run a phase.
-6. Make the shared block and the storage in it: `src/block/block_create.c`.
-7. Make what a dispatch and a schedule are worked out in: `src/schedule/schedule_account.c`.
+1. Read the number of the host seam, then refuse and keep the keys of the world: `src/bridge/bridge_keys.c`.
+2. Make room for the backends and the phases.
+3. Open and start the backends: `src/bridge/bridge_backends.c`.
+4. Take the phases: `src/bridge/bridge_phases.c`.
+5. Take the pairs of `[order]`: `src/schedule/schedule_order.c`.
+6. Start the threads that run a phase.
+7. Make the shared block and the storage in it: `src/block/block_create.c`.
+8. Make what a dispatch and a schedule are worked out in: `src/schedule/schedule_account.c`.
 
 ## When create fails
 
@@ -23,6 +24,8 @@ These are the reasons:
 - There is no memory for the world. Then a record is made without a world, and handed to the sink.
 - The number of the host seam is unset, or is not `BRIDGE_HOST_ABI`.
 - A key of the deployment is unset, for example `threads`.
+- A flag, `profile` or `validate`, is not an item of `enum bridge_flag`.
+- `table_growth` is below 100, or `table_hash_fill` or `table_retry` is not 1 to 99.
 - The deployment has no backend, or no phase.
 - A backend or a phase has no name, or has the name of another.
 - A pair of `[order]` says nothing, or contradicts another pair.
@@ -33,6 +36,7 @@ These are the reasons:
 
 `threads` is the number of threads that run a phase, and it counts the thread that calls `bridge_run_phase`.
 Bridge does not guess it, so an unset `threads` is refused.
+Each worker gets a stack of `stack` bytes. Bridge gives the size to `os_thread_start` of Bridge-OS as it is, and refuses an unset `stack` too.
 The pool has `threads - 1` workers, and room for `[budget] systems` jobs.
 A job is the systems of one module in one level, so there are never more jobs than systems.
 
@@ -54,7 +58,7 @@ After the first release, a change to what a seam lays out or means increments th
 | Function | Result |
 | --- | --- |
 | `make_bridge` | Gives an empty world that knows its sink. If there is not the memory, it hands the sink a record of its own and gives null. |
-| `check_config` | Refuses a number of the host seam that is unset or another, then makes room for the backends and the phases. 1, with a record, if refused. |
-| `start_pool` | Refuses an unset `threads`, and starts the threads that run a phase. 1, with a record, if refused. |
+| `check_config` | Refuses a number of the host seam that is unset or another, and the keys that `bridge_take_keys` refuses. Then makes room for the backends and the phases. 1, with a record, if refused. |
+| `start_pool` | Refuses an unset `threads` or `stack`, and starts the threads that run a phase. 1, with a record, if refused. |
 | `build_bridge` | Makes each part of the world that the deployment states. 1, with a record, at the first part that is refused. |
 | `bridge_create` | Makes a world of a deployment. Gives the world, or null if the deployment cannot start. |

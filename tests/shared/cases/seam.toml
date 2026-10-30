@@ -79,7 +79,7 @@ false = { run = ["{out}/seam{exe}", "config.abi-another-refused"] }
 [[case]]
 name = "config.abi-another-refused"
 run = ["{out}/seam{exe}", "config.abi-another-refused"]
-claims = { matches = ["the host is of host ABI 3, and this is 2.*bridge_create refused.*alive"] }
+claims = { matches = ["the host is of host ABI 4, and this is 3.*bridge_create refused.*alive"] }
 false = { run = ["{out}/seam{exe}", "config.abi-unset-refused"] }
 
 [[case]]
@@ -517,7 +517,7 @@ false = { run = ["{out}/seam{exe}", "backend_get_abi-another-refused"] }
 [[case]]
 name = "backend_get_abi-another-refused"
 run = ["{out}/seam{exe}", "backend_get_abi-another-refused"]
-claims = { matches = ["backend 'plain': backend library '[^']*bridge_plain_other[^']*' is of backend ABI 3, and this is 2.*bridge_create refused.*alive"] }
+claims = { matches = ["backend 'plain': backend library '[^']*bridge_plain_other[^']*' is of backend ABI 4, and this is 3.*bridge_create refused.*alive"] }
 false = { run = ["{out}/seam{exe}", "artifact.path-cannot-open"] }
 
 [[case]]
@@ -733,6 +733,120 @@ name = "config.threads-unset-refused"
 run = ["{out}/seam{exe}", "config.threads-unset-refused"]
 claims = { matches = ["threads is unset.*bridge_create refused.*alive"] }
 false = { run = ["{out}/seam{exe}", "config.threads-four-guarded-instances-hop"] }
+
+[[case]]
+name = "config.profile-unset-refused"
+run = ["{out}/seam{exe}", "config.profile-unset-refused"]
+claims = { matches = ["profile is unset.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.profile-neither-true-nor-false-refused"] }
+
+[[case]]
+name = "config.profile-neither-true-nor-false-refused"
+run = ["{out}/seam{exe}", "config.profile-neither-true-nor-false-refused"]
+claims = { matches = ["profile is 3, which is neither BRIDGE_TRUE nor BRIDGE_FALSE.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.profile-unset-refused"] }
+
+[[case]]
+name = "config.validate-unset-refused"
+run = ["{out}/seam{exe}", "config.validate-unset-refused"]
+claims = { matches = ["validate is unset.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.validate-neither-true-nor-false-refused"] }
+
+[[case]]
+name = "config.validate-neither-true-nor-false-refused"
+run = ["{out}/seam{exe}", "config.validate-neither-true-nor-false-refused"]
+claims = { matches = ["validate is 3, which is neither BRIDGE_TRUE nor BRIDGE_FALSE.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.validate-unset-refused"] }
+
+[[case]]
+name = "config.stack-unset-refused"
+run = ["{out}/seam{exe}", "config.stack-unset-refused"]
+claims = { matches = ["stack is unset.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.table_growth-unset-refused"] }
+
+[[case]]
+name = "config.table_growth-unset-refused"
+run = ["{out}/seam{exe}", "config.table_growth-unset-refused"]
+claims = { matches = ["table_growth is unset.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.table_hash_fill-unset-refused"] }
+
+[[case]]
+name = "config.table_growth-below-100-refused"
+run = ["{out}/seam{exe}", "config.table_growth-below-100-refused"]
+claims = { matches = ["table_growth is 99, which is less than 100.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.table_growth-of-100-taken"] }
+
+[[case]]
+name = "config.table_hash_fill-unset-refused"
+run = ["{out}/seam{exe}", "config.table_hash_fill-unset-refused"]
+claims = { matches = ["table_hash_fill is unset.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.stack-unset-refused"] }
+
+[[case]]
+name = "config.table_hash_fill-of-100-refused"
+run = ["{out}/seam{exe}", "config.table_hash_fill-of-100-refused"]
+claims = { matches = ["table_hash_fill is 100, which is not 1 to 99.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.table_hash_fill-of-99-taken"] }
+
+[[case]]
+name = "config.observer_passes-unset-refused"
+run = ["{out}/seam{exe}", "config.observer_passes-unset-refused"]
+claims = { matches = ["observer_passes is unset.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.table_retry-unset-refused"] }
+
+[[case]]
+name = "config.table_retry-unset-refused"
+run = ["{out}/seam{exe}", "config.table_retry-unset-refused"]
+claims = { matches = ["table_retry is unset.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.observer_passes-unset-refused"] }
+
+[[case]]
+name = "config.table_retry-of-100-refused"
+run = ["{out}/seam{exe}", "config.table_retry-of-100-refused"]
+claims = { matches = ["table_retry is 100, which is not 1 to 99.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "config.table_retry-of-99-taken"] }
+
+[[case]]
+name = "budget.tables-past-the-most-of-the-hash-refused"
+run = ["{out}/seam{exe}", "budget.tables-past-the-most-of-the-hash-refused"]
+claims = { matches = ["\\[budget\\] tables and sparse_sets come to 21474837 table ids, and a table_hash_fill of 1 holds at most 21474836.*bridge_create refused.*alive"] }
+false = { run = ["{out}/seam{exe}", "budget.tables-under-the-most-of-the-hash-taken"] }
+
+[[case]]
+name = "observer_passes-of-3-ends-a-chain-of-three-in-one-call"
+run = ["{out}/seam{exe}", "observer_passes-of-3-ends-a-chain-of-three-in-one-call"]
+claims = { matches = ["b1 p\\d+ game:chain@0.1.0/got_a: hop A.*b2 p\\d+ game:chain@0.1.0/got_b: hop B.*b3 p\\d+ game:chain@0.1.0/got_c: hop C.*one call.*alive"] }
+false = { run = ["{out}/seam{exe}", "observer_passes-of-1-ends-one-hop-in-one-call"] }
+
+[[case]]
+name = "module_config.element_limit-unset-refused"
+run = ["{out}/seam{exe}", "module_config.element_limit-unset-refused"]
+claims = { matches = ["module 'test:ok@0.1.0' is refused: element_limit is unset.*alive"] }
+false = { run = ["{out}/seam{exe}", "module_config.element_limit-negative-refused"] }
+
+[[case]]
+name = "module_config.element_limit-negative-refused"
+run = ["{out}/seam{exe}", "module_config.element_limit-negative-refused"]
+claims = { matches = ["module 'test:ok@0.1.0' is refused: element_limit is -5, which is neither a limit nor BRIDGE_NO_LIMIT.*alive"] }
+false = { run = ["{out}/seam{exe}", "module_config.element_limit-unset-refused"] }
+
+[[case]]
+name = "module_config.element_limit-growth-refused"
+run = ["{out}/seam{exe}", "module_config.element_limit-growth-refused"]
+claims = { matches = ["module 'test:grow_elements@0.1.0' did not load: its init answered 7.*alive"] }
+false = { run = ["{out}/seam{exe}", "module_config.element_limit-no-limit-growth-taken"] }
+
+[[case]]
+name = "instance_set_element_limit-growth-refused"
+run = ["{out}/seam{exe}", "instance_set_element_limit-growth-refused"]
+claims = { matches = ["module 'test:grow_elements@0.1.0' did not load: its init answered 7.*alive"] }
+false = { run = ["{out}/seam{exe}", "module_config.element_limit-no-limit-growth-taken"] }
+
+[[case]]
+name = "BACKEND_ELEMENT_LIMIT-lacking-element-limit-refused"
+run = ["{out}/seam{exe}", "BACKEND_ELEMENT_LIMIT-lacking-element-limit-refused"]
+claims = { matches = ["module 'game:mover@0\\.1\\.0' is refused: it states element_limit, which backend 'plain' cannot keep.*alive"], lacks = ["cannot open"] }
+false = { run = ["{out}/seam{exe}", "BACKEND_MEMORY_LIMIT-lacking-memory-limit-refused"] }
 
 [[case]]
 name = "config.threads-four-guarded-instances-hop"
@@ -3111,9 +3225,9 @@ claims = { matches = ["it was handed.* where='somewhere'.*alive"] }
 false = { run = ["{out}/seam{exe}", "BACKEND_IMPORT_OTHER-a-global-nobody-answers"] }
 
 [[case]]
-name = "BACKEND_IMPORT_MEMORY-past-the-first-64-imports-not-lent"
-run = ["{out}/seam{exe}", "BACKEND_IMPORT_MEMORY-past-the-first-64-imports-not-lent"]
-claims = { matches = ["module 'test:crowd@0.1.0' did not load: it was not handed both memories.*alive"] }
+name = "BACKEND_IMPORT_MEMORY-past-the-first-64-imports-lent"
+run = ["{out}/seam{exe}", "BACKEND_IMPORT_MEMORY-past-the-first-64-imports-lent"]
+claims = { matches = ["test:crowd@0\\.1\\.0: loaded.*alive"] }
 false = { run = ["{out}/seam{exe}", "BACKEND_IMPORT_OTHER-a-global-nobody-answers"] }
 
 [[case]]
