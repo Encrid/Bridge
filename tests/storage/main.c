@@ -65,17 +65,20 @@ static const storage_test_room_t ONE_SET_TWO_DIRECT = { BACKENDS + 1, 1, 1,
     32'768, 64 << 20, 1, 2, false };
 static const storage_test_room_t ONE_OF_EACH = { BACKENDS + 1, 1, 1, 32'768,
     64 << 20, 1, 1, false };
+static const storage_test_room_t OWN_PLAIN = { BACKENDS + 1, 1, 1, 32'768,
+    64 << 20, BRIDGE_NONE, BRIDGE_NONE, false, true };
+static const storage_test_room_t OWN_FOUR_THREADS = { BACKENDS + 1, 1, 4,
+    32'768, 64 << 20, BRIDGE_NONE, BRIDGE_NONE, false, true };
+static const storage_test_room_t OWN_BOTH_BACKENDS = { BACKENDS, 2, 1, 32'768,
+    64 << 20, BRIDGE_NONE, BRIDGE_NONE, false, true };
 
 static const storage_test_case_t CASES[] = {
-#ifdef COUNTED
-    { "nomemory", storage_test_refuse_memory, &PLAIN },
-    { "nomemoryrelay", storage_test_refuse_relay, &PLAIN },
-    { "nomemoryrelayempty", storage_test_refuse_relay, &PLAIN },
-    { "nomemoryconfig", storage_test_refuse_config_memory, &PLAIN },
-    { "nomemorythreads", storage_test_refuse_memory, &FOUR_THREADS },
-    { "nomemorygroup", storage_test_refuse_memory_group, &BOTH_BACKENDS },
-    { "schemaroom", storage_test_count_room, &PLAIN },
-#endif
+    { "nomemory", storage_test_live, &OWN_PLAIN },
+    { "nomemoryrelay", storage_test_relay_live, &OWN_PLAIN },
+    { "nomemoryrelayempty", storage_test_relay_live, &OWN_PLAIN },
+    { "nomemoryconfig", storage_test_configure_live, &OWN_PLAIN },
+    { "nomemorythreads", storage_test_live, &OWN_FOUR_THREADS },
+    { "nomemorygroup", storage_test_group_live, &OWN_BOTH_BACKENDS },
     { "shape", storage_test_look_at_shape, &BOTH_BACKENDS },
     { "matrix", storage_test_make_large_matrix, &PLAIN },
     { "matrixsmall", storage_test_make_small_matrix, &PLAIN },
@@ -198,7 +201,8 @@ static void make_bridge(storage_test_t *t, const storage_test_room_t *room)
     t->cfg = cfg;
     if (room->asks_columns && t->more)
         t->cfg.budget.columns = (uint64_t)atoi(t->more);
-    t->w = bridge_create(&t->cfg, storage_test_hear, t);
+    if (!room->makes_world)
+        t->w = bridge_create(&t->cfg, storage_test_hear, t);
     setvbuf(stdout, nullptr, _IONBF, 0);
 }
 
@@ -214,7 +218,7 @@ int main(int argc, char **argv)
     }
     t.more = argc > 2 ? argv[2] : nullptr;
     make_bridge(&t, c->room);
-    if (!t.w) {
+    if (!t.w && !c->room->makes_world) {
         printf("FAIL: bridge_create\n");
         return (1);
     }

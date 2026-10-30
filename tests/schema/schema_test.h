@@ -98,5 +98,6 @@ int schema_check_constants(const want_constants_t *w);
 int schema_run_structs(void);
 int schema_run_constants(void);
 int schema_run_refusals(void);
+int schema_run_room(void);
 
 #endif
