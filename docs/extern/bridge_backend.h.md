@@ -107,7 +107,8 @@ Each backend maps the shared memory, thus it has the largest `reservation` and `
 The private memory of a module has the shape that the backend of the module needs.
 
 `memory_adopt` makes `len` bytes at `ptr`, which Bridge owns, a memory that the modules of the backend can address.
-It does not allocate. It gives the handle of the memory, or null with `err`.
+The backend takes no bytes for the memory: the bytes stay Bridge's. It can make a handle of its own for them, for example a memory of its engine.
+It gives the handle, or null with `err` when it cannot make one.
 A backend that refuses the shared memory refuses the world. A backend that refuses a private memory fails the load of its module.
 
 `memory_release` gives the handle back, and frees nothing of the block.

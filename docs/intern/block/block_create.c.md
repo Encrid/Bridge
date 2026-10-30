@@ -30,7 +30,7 @@ A private block has the shape of the backend of its module only: `src/module/mod
 ## The adoption
 
 `memory_adopt` takes pages that the library owns already, and asks the backend to make them addressable by a module.
-It does not ask the backend to allocate.
+It asks the backend for no bytes, since the pages stay the library's. The backend may still need a handle of its own, which the Usage allows: `docs/extern/bridge_backend.h.md`, *Memory*.
 So the same region reaches a native module as a pointer, and a wasm module as an import.
 A backend that refuses to adopt the block refuses the world, with a record that names the backend and its reason.
 
