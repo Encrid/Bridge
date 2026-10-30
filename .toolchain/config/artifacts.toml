@@ -21,15 +21,6 @@ kind = "file"
 sources = ["src/leaks.toml"]
 
 [[artifact]]
-name = "counted"
-kind = "archive"
-test = true
-sources = ["src/**/*.c"]
-include = ["include", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage"]
-defines = ["malloc=counted_malloc", "calloc=counted_calloc", "realloc=counted_realloc", "free=counted_free", "os_reserve=counted_os_reserve", "os_commit=counted_os_commit", "os_thread_start=counted_os_thread_start", "os_mutex_create=counted_os_mutex_create", "os_event_create=counted_os_event_create"]
-flags = ["{quiet}", "{system_defines}"]
-
-[[artifact]]
 name = "bridge_tests"
 kind = "library"
 test = true
@@ -87,16 +78,6 @@ include = ["include", "tests/support", "{bridge_os}/include", "src", "src/abi", 
 defines = ["BRIDGE_BUILDING", "{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
 link = ["{bridge_os}/os.a"]
-
-[[artifact]]
-name = "storage-counted"
-kind = "program"
-test = true
-sources = ["tests/storage/*.c", "tests/support/host_copy*.c"]
-include = ["include", "tests/support", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage"]
-defines = ["COUNTED", "{paths}"]
-flags = ["{quiet}", "{system_defines}", "{system_libraries}"]
-link = ["{out}/counted.a", "{bridge_os}/os.a"]
 
 [[artifact]]
 name = "seam"
