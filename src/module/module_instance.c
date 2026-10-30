@@ -74,5 +74,8 @@ int module_make_instance(module_t *m, const module_start_t *st,
     if (a->cfg.memory_limit > 0)
         o->api.instance_set_memory_limit(m->instance,
             (uint64_t)a->cfg.memory_limit);
+    if (a->cfg.element_limit > 0)
+        o->api.instance_set_element_limit(m->instance,
+            (uint64_t)a->cfg.element_limit);
     return (0);
 }

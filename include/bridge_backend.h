@@ -37,7 +37,8 @@ enum backend_capability : uint32_t {
     BACKEND_MEMORY_LIMIT = 1 << 3,
     BACKEND_RELOAD = 1 << 4,
     BACKEND_SIDE_BY_SIDE = 1 << 5,
-    BACKEND_UNLOAD = 1 << 6
+    BACKEND_UNLOAD = 1 << 6,
+    BACKEND_ELEMENT_LIMIT = 1 << 7
 };
 
 enum backend_setting_kind : uint8_t {
@@ -127,7 +128,7 @@ static_assert(offsetof(backend_memory_import_t, ns) == 0);
 static_assert(offsetof(backend_memory_import_t, field) == 8);
 static_assert(offsetof(backend_memory_import_t, memory) == 16);
 
-constexpr uint32_t BACKEND_ABI = 2;
+constexpr uint32_t BACKEND_ABI = 3;
 
 typedef struct {
     const void *bytes;
@@ -182,6 +183,8 @@ typedef struct backend_api {
     void (*instance_set_work_limit)(backend_instance_t *i, uint64_t units);
     void (*instance_set_timeout)(backend_instance_t *i, uint64_t nanos);
     void (*instance_set_memory_limit)(backend_instance_t *i, uint64_t bytes);
+    void (*instance_set_element_limit)(backend_instance_t *i,
+        uint64_t elements);
     int (*define_func)(backend_instance_t *i, const backend_entry_t *entry,
         backend_err_t *err);
     backend_func_t *(*instance_get_func)(backend_instance_t *i,
@@ -189,7 +192,7 @@ typedef struct backend_api {
     int (*call)(backend_func_t *f, int32_t *status, backend_err_t *err);
 } backend_api_t;
 
-constexpr uint32_t BACKEND_ENTRY_COUNT = 18;
+constexpr uint32_t BACKEND_ENTRY_COUNT = 19;
 static const char *const BACKEND_ENTRY_NAMES[BACKEND_ENTRY_COUNT] = {
     "backend_get_abi",
     "backend_create",
@@ -206,6 +209,7 @@ static const char *const BACKEND_ENTRY_NAMES[BACKEND_ENTRY_COUNT] = {
     "instance_set_work_limit",
     "instance_set_timeout",
     "instance_set_memory_limit",
+    "instance_set_element_limit",
     "define_func",
     "instance_get_func",
     "call"
