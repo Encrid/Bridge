@@ -8,6 +8,8 @@
 
     #include "bridge_abi.h"
 
+constexpr uint32_t STORAGE_HASH_MOST = 1u << 31;
+
 typedef struct bridge_world bridge_world_t;
 typedef struct module module_t;
 typedef struct storage storage_t;

@@ -50,6 +50,9 @@ void block_destroy(bridge_world_t *w);
 [[nodiscard]] int block_check_budget(bridge_world_t *w,
     const bridge_budget_t *budget);
 
+[[nodiscard]] int block_check_counts(bridge_world_t *w,
+    const bridge_budget_t *budget);
+
 [[nodiscard]] int block_lay_out(bridge_world_t *w,
     const bridge_budget_t *budget, block_layout_t *layout);
 
