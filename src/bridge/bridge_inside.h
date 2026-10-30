@@ -8,6 +8,9 @@
 
     #include "inside.h"
 
+[[nodiscard]] int bridge_take_keys(bridge_world_t *w,
+    const bridge_config_t *cfg);
+
 [[nodiscard]] int bridge_open_backends(bridge_world_t *w,
     const bridge_config_t *cfg);
 

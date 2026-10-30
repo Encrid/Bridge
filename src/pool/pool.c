@@ -7,7 +7,7 @@
 
 #include "pool.h"
 
-static int start_worker(pool_t *p, uint32_t i)
+static int start_worker(pool_t *p, uint32_t i, size_t stack)
 {
     pool_worker_t *w = &p->workers[i];
 
@@ -15,7 +15,7 @@ static int start_worker(pool_t *p, uint32_t i)
     w->wake = os_event_create();
     if (!w->wake)
         return (-1);
-    w->thread = os_thread_start(pool_work, w);
+    w->thread = os_thread_start(pool_work, w, stack);
     if (!w->thread) {
         os_event_free(w->wake);
         return (-1);
@@ -24,7 +24,7 @@ static int start_worker(pool_t *p, uint32_t i)
     return (0);
 }
 
-pool_t *pool_create(uint32_t workers, uint32_t most_jobs)
+pool_t *pool_create(uint32_t workers, uint32_t most_jobs, size_t stack)
 {
     pool_t *p = calloc(1, sizeof(*p));
     uint32_t i = 0;
@@ -37,7 +37,7 @@ pool_t *pool_create(uint32_t workers, uint32_t most_jobs)
     p->workers = calloc(workers ? workers : 1, sizeof(*p->workers));
     if (!p->taken || !p->lock || !p->done || !p->workers)
         i = workers + 1;
-    while (i < workers && !start_worker(p, i))
+    while (i < workers && !start_worker(p, i, stack))
         i++;
     if (i != workers) {
         pool_destroy(p);

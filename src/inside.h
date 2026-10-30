@@ -292,6 +292,10 @@ struct bridge_world {
     uint32_t max_modules;
     bool profile;
     bool validate;
+    uint32_t observer_passes;
+    uint32_t table_growth;
+    uint32_t table_hash_fill;
+    uint32_t table_retry;
 };
 
 void module_discard(bridge_world_t *w, module_t *m);
