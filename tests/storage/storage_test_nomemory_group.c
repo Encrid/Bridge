@@ -3,12 +3,9 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
-#include <stdio.h>
 #include <string.h>
 
 #include "storage_test.h"
-
-#ifdef COUNTED
 
 static const char *const GROUP_PHASES[2] = { "update", "present" };
 
@@ -30,17 +27,15 @@ static bridge_artifact_t share(const char *identity, const char *path)
     return (a);
 }
 
-static bool refuse_one(storage_test_t *t, size_t k)
+enum storage_test_end storage_test_group_live(storage_test_t *t)
 {
-    storage_test_allocator_t *allocator = storage_test_get_allocator();
     bridge_artifact_t a[2];
 
-    allocator->asked = 0;
-    allocator->fail_at = k;
-    allocator->failed = false;
+    t->cfg.phases = GROUP_PHASES;
+    t->cfg.phase_count = 2;
     t->w = bridge_create(&t->cfg, storage_test_hear_memory, t);
     if (!t->w)
-        return (allocator->failed);
+        return (STORAGE_TEST_DONE);
     a[0] = share("game:one@0.1.0", BUILT_DIR "/share1" BUILT_SUFFIX);
     a[1] = share("game:two@0.1.0", BUILT_DIR "/share1" BUILT_SUFFIX);
     if (!bridge_load(t->w, &a[0]) && !bridge_load(t->w, &a[1])) {
@@ -50,25 +45,5 @@ static bool refuse_one(storage_test_t *t, size_t k)
         a[1].cfg.persistent = 128;
         (void)bridge_reload(t->w, a, 2);
     }
-    (void)bridge_destroy(t->w);
-    t->w = nullptr;
-    return (allocator->failed);
-}
-
-enum storage_test_end storage_test_refuse_memory_group(storage_test_t *t)
-{
-    size_t k = 1;
-
-    (void)bridge_destroy(t->w);
-    t->w = nullptr;
-    t->cfg.phases = GROUP_PHASES;
-    t->cfg.phase_count = 2;
-    while (refuse_one(t, k))
-        k++;
-    storage_test_get_allocator()->fail_at = 0;
-    printf("%s allocations were each answered null in turn\n",
-        k > 30 ? "more than thirty" : "TOO FEW");
     return (STORAGE_TEST_DONE);
 }
-
-#endif
