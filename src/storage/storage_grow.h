@@ -19,11 +19,12 @@ static inline uint8_t *take_longer(storage_t *r, uint32_t t, uint32_t *room,
     uint64_t *len)
 {
     const table_t *tab = &r->tables[t];
+    uint64_t longer = (uint64_t)tab->room * r->w->table_growth / 100;
     uint32_t asked = *room;
     uint8_t *block;
 
-    if (asked < tab->room + tab->room / 2)
-        *room = tab->room + tab->room / 2;
+    if (asked < longer)
+        *room = longer < UINT32_MAX ? (uint32_t)longer : UINT32_MAX;
     block = take_block(r, t, *room, len);
     if (block || *room == asked)
         return (block);

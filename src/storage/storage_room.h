@@ -9,6 +9,11 @@
     #include "storage_grow.h"
     #include "storage_reserve.h"
 
+static inline uint32_t get_retry(const storage_t *r, uint32_t rows)
+{
+    return ((uint32_t)((uint64_t)rows * r->w->table_retry / 100));
+}
+
 static inline void size_table(storage_t *r, uint32_t t)
 {
     table_t *tab = &r->tables[t];
@@ -16,7 +21,7 @@ static inline void size_table(storage_t *r, uint32_t t)
     uint32_t between;
 
     while (tab->incoming && !grow_table(r, t, tab->rows + tab->incoming))
-        tab->incoming /= 2;
+        tab->incoming = get_retry(r, tab->incoming);
     while (most - tab->incoming > 1) {
         between = tab->incoming + (most - tab->incoming) / 2;
         if (grow_table(r, t, tab->rows + between))
@@ -64,21 +69,6 @@ static inline bool room_joins(storage_t *r, uint32_t index)
     }
     if (r->apart && !room_joins(r, index))
         drop_change(r, index, true);
-}
-
-[[gnu::always_inline]] static inline void reserve_all(storage_t *r)
-{
-    uint32_t i = 0;
-
-    while (i < r->changed_count) {
-        reserve_one(r, r->changed[i]);
-        i++;
-    }
-    i = 0;
-    while (i < r->changed_count) {
-        room_one(r, r->changed[i]);
-        i++;
-    }
 }
 
 #endif

@@ -188,6 +188,7 @@ enum storage_test_end storage_test_wrap_generation(storage_test_t *t);
 enum storage_test_end storage_test_go_deep(storage_test_t *t);
 enum storage_test_end storage_test_size_hash(storage_test_t *t);
 enum storage_test_end storage_test_grow_by_share(storage_test_t *t);
+enum storage_test_end storage_test_grow_past(storage_test_t *t);
 enum storage_test_end storage_test_ask_less(storage_test_t *t);
 enum storage_test_end storage_test_count_room(storage_test_t *t);
 enum storage_test_end storage_test_order_two_modules(storage_test_t *t);
