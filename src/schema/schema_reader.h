@@ -36,7 +36,6 @@ typedef struct {
     bool cut;
     const schema_source_t *source;
     schema_t *out;
-    uint32_t room;
     int64_t value;
     bool below;
 } schema_reader_t;
@@ -60,6 +59,8 @@ bool schema_get_integer(const schema_reader_t *r, int64_t *value, bool *below);
 int schema_find_given(const schema_reader_t *r);
 
 char *schema_copy_text(const char *text);
+
+void *schema_take_room(const schema_reader_t *r, char mark, size_t size);
 
 bool schema_fits(enum schema_kind base, int64_t value, bool below);
 

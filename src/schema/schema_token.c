@@ -54,3 +54,15 @@ char *schema_copy_text(const char *text)
         memcpy(copy, text, n);
     return (copy);
 }
+
+void *schema_take_room(const schema_reader_t *r, char mark, size_t size)
+{
+    const char *at = strchr(r->source->text, mark);
+    size_t count = 1;
+
+    while (at) {
+        count++;
+        at = strchr(at + 1, mark);
+    }
+    return (calloc(count, size));
+}

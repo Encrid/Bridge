@@ -74,6 +74,7 @@ A field with what it takes in a row, before the reader places it.
 | `schema_get_integer` | Reads the token as an integer: `docs/intern/schema/schema_token.c.md`, *Functions*. |
 | `schema_find_given` | Finds a given type: `docs/intern/schema/schema_token.c.md`, *Functions*. |
 | `schema_copy_text` | Copies a text: `docs/intern/schema/schema_token.c.md`, *Functions*. |
+| `schema_take_room` | Gives the room of an array, once: `docs/intern/schema/schema_token.c.md`, *Functions*. |
 | `schema_fits` | Whether an integer can hold a value: `docs/intern/schema/schema_value.c.md`, *Functions*. |
 | `schema_set_value` | Gives a constant its value: `docs/intern/schema/schema_value.c.md`, *Functions*. Gives 1 if refused. |
 | `schema_set_type` | Reads the type of a field: `docs/intern/schema/schema_type.c.md`, *Functions*. |
