@@ -44,7 +44,8 @@ class Source:
 
     def silenced(self):
         out = []
-        pattern = re.compile(r'/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\\n])*"|(?<![0-9A-Za-z])\'(?:\\.|[^\'\\\n])*\'', re.S)
+        pattern = re.compile(r'/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\\n])*"|(?<![0-9A-Za-z])(?:u8|[LuU])?\'(?:\\.|[^\'\\\n])*\'',
+                             re.S)
         last = 0
         for m in pattern.finditer(self.text):
             out.append(self.text[last:m.start()])
@@ -54,7 +55,8 @@ class Source:
                 self.comments.append((first, first + body.count('\n'), body))
                 out.append(re.sub(r'[^\n]', ' ', body))
             else:
-                out.append(body[0] + 's' * (len(body) - 2) + body[0])
+                quote = body.index(body[-1])
+                out.append(body[:quote + 1] + 's' * (len(body) - quote - 2) + body[-1])
             last = m.end()
         out.append(self.text[last:])
         lines = ''.join(out).split('\n')

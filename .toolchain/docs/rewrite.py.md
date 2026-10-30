@@ -34,9 +34,15 @@ At the end of the file, `#pragma pop_macro` gives each name its first meaning ag
 `found` takes the declaration that the code writes, and not the declaration that the compiler makes for a builtin such as `malloc`. That one spells its types with names of the compiler, such as `__size_t`.
 
 `signed` gives the start of the function of a new name. It writes the type of each parameter as the declaration spells it, with no nullability mark such as `_Nullable`.
+It also removes the calling conventions `cdecl`, `stdcall`, `fastcall` and `thiscall`, which change nothing on x86_64 and on aarch64.
 Thus a `typedef` keeps its name, also a `typedef` whose type holds a calling convention, such as `LPTHREAD_START_ROUTINE`.
-The result is the type of a call of the function, with an empty value of each type of a parameter, for example `typeof(malloc((size_t){}))`.
 It stops on a function with `...`: `<name> takes a list of arguments of no fixed length`.
+
+The result is the type of a call through a pointer to the function type, with an empty value of each parameter type.
+For example, the result of `malloc` is `typeof(((typeof(malloc) *)nullptr)((size_t){}))`. Thus a builtin that gives `size_t`, such as `fread`, builds too.
+
+A call through a pointer reads no attribute of the declaration. Thus no attribute checks the empty values, for example the alignment of `aligned_alloc`.
+The function of a new name calls its function as `(name)(a0, a1)`. Thus a macro with arguments of the same name does not apply, for example the C23 `memchr` of glibc.
 
 ## The writer
 
@@ -67,7 +73,7 @@ The dump sets `_FORTIFY_SOURCE` to 0. Then a call that the system would fortify,
 ## Limits
 
 - A case that crashes, or that stops before its end, writes no line.
-- A type that a declaration spells with an attribute, such as a calling convention with no `typedef`, stops the build of the copy. So does a type name that the end of the file does not know, for example a `typedef` in a block.
+- A type that a declaration spells with a different attribute, for example `vectorcall` or `noreturn`, stops the build of the copy. So does a type name that the end of the file does not know, for example a `typedef` in a block.
 - Every file of the count writes with a `[[gnu::destructor]]`. A destructor of a library that `dlclose` unmaps on macOS would run at the exit of the program with its code gone. So on macOS each file keeps its own library mapped, and the destructor runs in place.
 
 ## Functions
@@ -83,7 +89,7 @@ The dump sets `_FORTIFY_SOURCE` to 0. Then a call that the system would fortify,
 | `each(config, values, use)` | Gives the result of `use(root, path, tree)` for each file of `sources`, 8 files at the same time. |
 | `copied(root, where)` | Empties `where`, and copies `src` and `include` into it. |
 | `plain(kind)` | Gives a type of the syntax tree with each `typedef` replaced, if the dump gives it. The checks of `leaks.py` read it, for example to find a pointer. |
-| `spelled(text)` | Gives a type as the declaration spells it, with no nullability mark. |
+| `spelled(text)` | Gives a type as the declaration spells it, with no nullability mark and no calling convention that *The rename* names. |
 | `declaration(node, typedefs)` | Gives the type of the result and the types of the parameters of the declaration of a function. A result whose type is a name of `typedefs` gets the type of that `typedef`. It also gives the types of the parameters as the declaration spells them, for `signed`. |
 | `found(root, path, tree, names, callbacks)` | Gives the functions of `names` that a file uses, as *The rename* tells, and the declaration of each of them. It also gives the end of the definition of each function of `callbacks` that the file defines and uses. |
 | `directive(line)` | Gives the name of the directive of a line, an empty text for a blank line, or `None` for a line of code. |
