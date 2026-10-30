@@ -15,7 +15,8 @@ from shared import die, expanded
 TOPS = ('src/', 'include/')
 OPENS = ('if', 'ifdef', 'ifndef')
 DIRECTIVE = re.compile(rb'[ \t]*#[ \t]*(\w+)')
-NULLABILITY = re.compile(r'\b_(?:Nonnull|Nullable_result|Nullable|Null_unspecified)\b')
+NULLABILITY = re.compile(r'\b_(?:Nonnull|Nullable_result|Nullable|Null_unspecified)\b'
+                         r'|__attribute__\(\((?:cdecl|stdcall|fastcall|thiscall)\)\)')
 RENAME = '''[[maybe_unused]] static typeof(%(n)s) %(p)s%(n)s;
 #pragma push_macro("%(n)s")
 #undef %(n)s
@@ -227,8 +228,8 @@ def signed(name, declaration, prefix):
     if variadic:
         die('%s takes a list of arguments of no fixed length' % name)
     arguments = ', '.join('typeof(%s) a%d' % (one, n) for n, one in enumerate(parameters)) or 'void'
-    call = '%s(%s)' % (name, ', '.join('a%d' % n for n in range(len(parameters))))
-    result = '%s(%s)' % (name, ', '.join('(%s){}' % one for one in parameters))
+    call = '(%s)(%s)' % (name, ', '.join('a%d' % n for n in range(len(parameters))))
+    result = '((typeof(%s) *)nullptr)(%s)' % (name, ', '.join('(%s){}' % one for one in parameters))
     return 'static typeof(%s) %s%s(%s)\n{\n' % (result, prefix, name, arguments), call
 
 

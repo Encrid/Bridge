@@ -12,6 +12,10 @@ python .toolchain/tools/style.py [--root <folder>]
 `style.py` checks each file `.c` and `.h` that `ours` gives.
 `[style]` of `.toolchain/toolchain.toml` gives the limits of the rules F3, F4, F5, O3 and C1.
 
+Before the checks, `style.py` hides the text of each comment, each string and each character constant, so no check reads it.
+A character constant can have the prefix `L`, `u`, `U` or `u8`, for example `L'?'`.
+A `'` after a digit or a letter is a digit separator of C23, as in `1'000` and `0xFF'FF`. Only a prefix that stands alone starts a character constant.
+
 ## The checks
 
 | Rule | The check |
@@ -77,7 +81,7 @@ The output follows `.toolchain/docs/shared.py.md`, *The report of a check*.
 
 | Function | Result |
 | --- | --- |
-| `Source(path, text)` | A file of C: its lines, its comments, its directives, and its code without comments and strings. |
+| `Source(path, text)` | A file of C: its lines, its comments, its directives, and its code without comments, strings and character constants. |
 | `tokens_of(code, start, end)` | Gives the tokens of a part of the code, with their positions. |
 | `closing(code, at)` | Gives the position of the bracket that closes the bracket at `at`. |
 | `opening(code, at)` | Gives the position of the bracket that opens the bracket at `at`. |
