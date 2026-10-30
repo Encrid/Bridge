@@ -33,6 +33,9 @@ ENDWHILE
 
 A fill below 100 leaves an empty place, where a search of the hash stops: `docs/intern/storage/storage_named.h.md`, *The hash of tables*.
 
+The budget check keeps the table ids at most `STORAGE_HASH_MOST` times `table_hash_fill`, divided by 100: `docs/intern/block/block_budget.c.md`, *The checks*.
+So the loop ends with `hash_room` at most `STORAGE_HASH_MOST`, and the room never wraps to 0.
+
 ## Functions
 
 | Function | Result |
