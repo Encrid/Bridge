@@ -241,6 +241,7 @@ void test_order_own(host_t *h);
 void test_observe(host_t *h);
 void test_chain(host_t *h);
 void test_pass_chain(host_t *h);
+void test_fill_tables(host_t *h);
 void test_grow_elements(host_t *h);
 void test_take_reserved_name(host_t *h);
 void test_run_at_once(host_t *h);
