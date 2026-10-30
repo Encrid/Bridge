@@ -3,8 +3,6 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
-#include <stdlib.h>
-
 #include "schema_reader.h"
 
 static int set_base(schema_reader_t *r, bool bits)
@@ -29,16 +27,7 @@ static int set_base(schema_reader_t *r, bool bits)
 static int add_constant(schema_reader_t *r)
 {
     schema_t *out = r->out;
-    uint32_t room = r->room ? r->room * 2 : 8;
-    schema_constant_t *more = out->constants;
 
-    if (out->constant_count == r->room) {
-        more = realloc(out->constants, room * sizeof(*more));
-        if (!more)
-            return (schema_refuse(r, "ran out of memory at '%s'"));
-        out->constants = more;
-        r->room = room;
-    }
     out->constants[out->constant_count].name = schema_copy_text(r->word);
     out->constant_count++;
     if (!out->constants[out->constant_count - 1].name)
@@ -77,6 +66,9 @@ int schema_parse_constants(schema_reader_t *r, bool bits)
     schema_read_next(r);
     if (!schema_is(r, "{"))
         return (schema_refuse(r, "says '%s' where its brace belongs"));
+    r->out->constants = schema_take_room(r, ',', sizeof(*r->out->constants));
+    if (!r->out->constants)
+        return (schema_refuse(r, "ran out of memory at '%s'"));
     schema_read_next(r);
     while (!refused && !schema_is(r, "}"))
         refused = read_constant(r, bits);
