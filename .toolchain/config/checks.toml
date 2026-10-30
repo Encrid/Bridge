@@ -24,4 +24,4 @@ path = "src/bridge/bridge_destroy.c"
 line = 56
 col = 16
 side = "false"
-why = "os_lib_pin fails only for a library that is not open, or after 64 pins on posix; the world still holds the library open here, and no case pins 64 libraries."
+why = "If the pin fails, Bridge keeps the handle of the library open, so that the library stays: docs/intern/bridge/bridge_destroy.c.md, The libraries of the backends. A case that makes the pin fail keeps that handle, and test --leaks counts it as a leak."
