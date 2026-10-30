@@ -89,6 +89,7 @@ The fields of `block_layout_t`:
 | `block_write_room` | `src/block/block.h` | Tells a module what is left of its queue of changes: *The regions of the memories*. |
 | `block_create` | `src/block/block_create.c` | Makes the shared block: `docs/intern/block/block_create.c.md`, *Functions*. |
 | `block_destroy` | `src/block/block_destroy.c` | Gives the shared block back: `docs/intern/block/block_destroy.c.md`, *Functions*. |
+| `block_check_counts` | `src/block/block_counts.c` | Checks the counts of a budget against 32 bits and the hash of tables: `docs/intern/block/block_counts.c.md`, *Functions*. |
 | `block_check_budget` | `src/block/block_budget.c` | Checks the budget of a deployment: `docs/intern/block/block_budget.c.md`, *Functions*. |
 | `block_lay_out` | `src/block/block_layout.c` | Lays out the shared block: `docs/intern/block/block_layout.c.md`, *Functions*. |
 | `block_refill` | `src/block/block_module.c` | Tops up the ids of a module: `docs/intern/block/block_module.c.md`, *The ids set aside*. |
