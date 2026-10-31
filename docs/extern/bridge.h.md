@@ -88,6 +88,8 @@ windows          LeaveCriticalSection
 windows          DeleteCriticalSection
 windows          CreateEventA
 windows          SetEvent
+windows_x86_64   RtlMoveMemory
+windows_x86_64   RtlFillMemory
 posix            mmap
 posix            mprotect
 posix            munmap
