@@ -94,7 +94,6 @@ A system and an observer are a query and a function either way, so one record se
 | `named` | The index of `full` among the names of `[order]`: `docs/intern/schedule/schedule_names.c.md`, *The index of a system*. |
 | `phase` | Its phase, or the barrier for an observer: `docs/intern/abi/abi_system.c.md`, *observe*. |
 | `matched` | Its terms, as storage holds them. Null with no terms. |
-| `spans_at` | Where its spans begin in the private memory of its module, as storage last wrote them. |
 | `asked` | What it asked storage for, kept to put a system back as it was after a reload took it out of storage. |
 | `events` | The events that an observer asks for. |
 | `terms` | How many terms it has. |
@@ -241,6 +240,7 @@ A `schedule_pairs_t` holds the pairs of `[order]`: `docs/intern/schedule/schedul
 | `columns`, `columns_len` | Where the column region begins, and its length. |
 | `sparse_sets`, `sparse` | `[budget] sparse_sets`, and where their indexes begin: one after another, each a `u32` for each entity there may be. |
 | `direct_indexed`, `direct` | `[budget] direct_indexed`, and where their bits begin: one after another, each a bit for each entity there may be. |
+| `directory` | Where the table directory begins: `docs/intern/block/block_layout.c.md`. |
 | `arena_space`, `column_space` | What of the arena and of the column region is handed out. |
 | `layout_moved` | Set when a module comes or goes, or when a declaration changes. |
 | `tables` | `[budget] tables`: how many tables may exist at one time. |

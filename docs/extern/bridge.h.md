@@ -547,6 +547,7 @@ Together they are at most 4 GiB, since an offset into the private memory has 32 
 `spans` holds what each barrier writes for the module: its spans, and a cell for each type it declared in each table id.
 
 A load fails if `spans` cannot hold the slots of the module and a cell for each type in each table id.
+The row counts and the blocks of the tables are in the shared memory, so `spans` needs no room for them.
 The count of table ids is `[budget] tables` plus `[budget] sparse_sets` plus 1, and `BRIDGE_NONE` counts as 0.
 Bridge stops a module whose spans no longer hold what its queries match.
 The author of a module states a value for `spans`, and the deployment can correct it. A reload that states more gets more.

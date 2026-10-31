@@ -19,7 +19,7 @@ A module that compiles with `include/bridge_abi.h` is a work based on Bridge: `r
 ## BRIDGE_ABI
 
 `BRIDGE_ABI` is the number of the module seam: the version of the layouts and the entries of this header.
-The number is 2.
+The number is 3.
 A module states the number that it was built against.
 The host gives it in `abi` of `bridge_module_config_t`: `docs/extern/bridge.h.md`, *bridge_module_config_t*.
 
@@ -64,7 +64,7 @@ A module imports each thing from the namespace `BRIDGE_NAMESPACE`, `bridge`. It 
 
 | Constant | Name | Memory |
 | --- | --- | --- |
-| `BRIDGE_SHARED` | `shared` | The shared memory of the world: the entity index, the components and the persistent arena. Each module reads it. |
+| `BRIDGE_SHARED` | `shared` | The shared memory of the world: the entity index, the table directory, the components and the persistent arena. Each module reads it. |
 | `BRIDGE_PRIVATE` | `private` | The private memory of the module: its header, its scratch arena, its log ring and its span region. |
 
 A module gets only the memories that it imports. Only the module and Bridge read its private memory.
@@ -102,8 +102,8 @@ Bridge writes it. The module writes only `scratch_used` and `ring_head`.
 | `log_level` | The `log_level` of the config of the module: `docs/extern/bridge.h.md`, *bridge_module_config_t*. |
 | `observers` | Where the observer slots begin: a `bridge_list_t` for each slot that `observe` gave. |
 | `kept` | Where the kept cells begin: a `uint32_t` for each type that the module declared. |
-| `rows` | Where a `uint32_t` for each table begins: how many rows the table has. |
-| `blocks` | Where a `uint32_t` for each table begins: where the ids of the rows of the table are, in the shared memory. |
+| `rows` | Where a `uint32_t` for each table begins, in the shared memory: how many rows the table has. |
+| `blocks` | Where a `uint32_t` for each table begins, in the shared memory: where the ids of the rows of the table are. |
 | `stride` | Where a `uint32_t` for each declared type begins: the size of the type, in bytes. |
 | `write` | Where a `uint32_t` for each declared type begins: 1 if the module can write the type, and 0 if not. |
 | `kind` | Where a `uint32_t` for each declared type begins: the storage layout of the type, an item of `enum bridge_storage`. |
@@ -119,7 +119,7 @@ Bridge writes `changes_left` when the instance starts, after each change that th
 A module can read it before an `attach`, a `detach` or a `destroy`.
 Thus the module can wait for the next barrier to make a change that does not fit, and its invocation does not fail.
 
-The arrays from `column_base` to `kind` make the capability table.
+The capability table is `column_base`, `kept`, `stride`, `write` and `kind` in the private memory, and `rows` and `blocks` in the shared memory.
 A module names a cell by a coordinate: a slot, a place, and an offset in the cell.
 The place is a table and a row, or an entity id, or nothing for a singleton.
 `column_base`, `kept`, `rows`, `blocks`, `stride`, `write` and `kind` turn the coordinate into an offset into the shared memory.
@@ -484,15 +484,12 @@ A span stays good until the next barrier, and it does not change before then.
 | `spans` | How many spans the query has: how many tables it matches. |
 | `at` | Where the first span is, in the private memory. The spans follow one another. |
 
-Bridge keeps its own copy of each slot, and does not read a slot back.
+Bridge does not read a slot back.
 A module that writes a slot changes only what it reads.
 
-A span has `BRIDGE_SPAN_SIZE` bytes, which is 8. It names one table that the query matches:
-
-| Offset | Content |
-| --- | --- |
-| 0 | A `uint32_t`: the id of the table. |
-| 4 | A `uint32_t`: how many rows the table has. |
+A span has `BRIDGE_SPAN_SIZE` bytes, which is 4: a `uint32_t`, the id of one table that the query matches.
+The table directory holds the row count of each table: `rows` of the header, in the shared memory.
+So a barrier writes a row count once for all modules, and a change of rows writes no span.
 
 A span no longer holds a column. A module names a cell, and the capability table bounds the access.
 
@@ -505,10 +502,10 @@ A query whose one selecting term is a sparse set has one span: its rows are the 
 FOR s <- 0 TO query.spans - 1
    span <- query.at + s * BRIDGE_SPAN_SIZE
    table <- read_u32(span)
-   rows <- read_u32(span + 4)
+   count <- read_shared_u32(rows + table * 4)
    base <- column_base[table * types + slot]
    IF base <> 0 THEN
-      FOR r <- 0 TO rows - 1
+      FOR r <- 0 TO count - 1
          CALL use_value(base + r * stride[slot])
       NEXT r
    ENDIF
@@ -516,12 +513,13 @@ NEXT s
 ```
 
 A barrier writes only what changed. The first barrier after the load of a module writes all of its spans.
+Rows and blocks stay the same until the next barrier, as the spans do.
 
 `column_base` of the header is where a `uint32_t` for each table and each declared type begins.
 The cell of table `T` and slot `s` is at `column_base + 4 * (T * types + s)`.
 It holds where the column of the type is in that table: 0 if the table does not carry it, and `BRIDGE_CARRIED` for a tag.
 
-`stride` holds the size of each type, and `rows` the row count of each table.
+`stride` holds the size of each type. `rows` and `blocks` hold the row count and the block of each table, in the shared memory.
 `write` tells whether the module can write a type, and `kind` gives its storage layout.
 `kept` of the header is where a `uint32_t` for each declared type begins: *Storage layouts*. It is 0 for a type of a table.
 

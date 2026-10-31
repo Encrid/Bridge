@@ -46,7 +46,7 @@ The list of the persistent arena starts empty, and it grows when a module takes 
 
 | Function | Result |
 | --- | --- |
-| `map_block` | Reserves the address space of the shared block, commits the block, and keeps where each part begins. 1 with a record if the operating system does not give it. |
+| `map_block` | Reserves the address space of the shared block, commits the block, and keeps where each part begins, the table directory too. 1 with a record if the operating system does not give it. |
 | `set_limits` | Keeps the amounts of the budget in the world. |
 | `make_storage` | Makes the lists of free gaps of the column region and of the arena, and makes storage. 1 if there is no memory. |
 | `adopt_shared` | Has each backend adopt the shared block, so that each can hand it to the modules it runs. 1 with a record if a backend refuses. |

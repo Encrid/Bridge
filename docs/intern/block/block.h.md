@@ -5,7 +5,7 @@ Storage keeps the rows behind `src/storage/storage.h`.
 
 ## The regions of the memories
 
-A module reaches nine regions with no call, and they do not have the same readers:
+A module reaches ten regions with no call, and they do not have the same readers:
 
 | Region | Memory | Who reads it |
 | --- | --- | --- |
@@ -13,6 +13,7 @@ A module reaches nine regions with no call, and they do not have the same reader
 | The entity index | shared | Each module that follows a reference. |
 | The indexes of the sparse sets | shared | Each module that declared a component kept in a sparse set. |
 | The direct-indexed bits | shared | Each module that declared a direct-indexed component. |
+| The table directory | shared | Each module that reads the rows or the row ids of a table. |
 | The persistent arena | shared | Each module that holds a string in a component. |
 | The query spans | private | Only the module of the spans. |
 | `column_base` | private | Only its module. |
@@ -76,6 +77,7 @@ The fields of `block_layout_t`:
 | `sets` | How many sparse sets there may be. |
 | `direct` | The start of the direct-indexed bits. |
 | `cells` | How many direct-indexed components there may be. |
+| `directory` | The start of the table directory. |
 | `arena` | The start of the persistent arena. |
 | `columns` | The start of the column region. |
 | `len` | The length of the block. |
