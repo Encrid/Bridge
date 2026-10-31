@@ -13,7 +13,7 @@
 extern "C" {
     #endif
 
-constexpr uint32_t BRIDGE_ABI = 2;
+constexpr uint32_t BRIDGE_ABI = 3;
 
 constexpr int32_t BRIDGE_END = INT32_MAX;
 
@@ -259,7 +259,7 @@ static_assert(offsetof(bridge_list_t, at) == 4);
 
 constexpr uint32_t BRIDGE_OWNED_CAP = 8;
 
-constexpr uint32_t BRIDGE_SPAN_SIZE = 8;
+constexpr uint32_t BRIDGE_SPAN_SIZE = 4;
 
 typedef struct {
     uint32_t table;

@@ -79,7 +79,6 @@ typedef struct bridge_system {
     uint32_t named;
     uint32_t phase;
     storage_terms_t *matched;
-    uint32_t spans_at;
     storage_term_t *asked;
     enum bridge_event events;
     uint32_t terms;
@@ -296,6 +295,7 @@ struct bridge_world {
     uint32_t sparse;
     uint32_t direct_indexed;
     uint32_t direct;
+    uint32_t directory;
     region_t arena_space;
     region_t column_space;
     int layout_moved;
