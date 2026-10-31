@@ -5,16 +5,16 @@ This file runs a phase: a level at a time, one job for each module, and then it 
 
 ## A level
 
-`run_level` runs one level in these steps:
+`run_jobs` runs the jobs of a phase from `schedule_find_jobs`, a level at a time, until a job of another phase:
 
-1. `schedule_gather_jobs` makes the jobs of the level.
-2. `pool_run` runs the jobs at the same time, and returns when all of them returned.
-3. `account_job` counts each system of each job, and notes each one that gave `BRIDGE_END`.
+1. `schedule_hand_job` hands each job of the level: `docs/intern/schedule/schedule_jobs.c.md`, *A run of the jobs*.
+2. `schedule_run_batch` runs the handed jobs at the same time with `pool_run`, and returns when all of them returned.
+3. Then `account_job` counts each due system of each handed job, and notes each one that gave `BRIDGE_END`.
 
 The count comes after the jobs, on that thread, so the world calls the sink of the host only on that thread.
-`schedule_run` runs the levels from 0 to the highest level of the phase.
+The barrier runs only the jobs of the observers that something triggered: `docs/intern/schedule/schedule_triggered.c.md`, *A run at the barrier*.
 
-When `validate` of the world is on, `run_level` runs the jobs one at a time on the caller, with `pool_run_alone`. Then each changed column has one author, which the checksum pass needs: `docs/intern/schedule/schedule_validate.c.md`, *Why a system runs alone*.
+When `validate` of the world is on, `schedule_run_batch` runs the jobs one at a time on the caller, with `pool_run_alone`. Then each changed column has one author, which the checksum pass needs: `docs/intern/schedule/schedule_validate.c.md`, *Why a system runs alone*.
 
 ## The count of a system
 
@@ -28,8 +28,8 @@ The first system of a module that reaches `max_failures` goes in `reached` of th
 
 | Function | Result |
 | --- | --- |
-| `count_levels` | Gives how many levels a phase has: one more than its highest level. |
-| `count_failure` | Counts what the run of one system came to, and writes a record if it failed. |
-| `account_job` | Calls `count_failure` and `schedule_note_end` for each system of a job. |
-| `run_level` | Runs the jobs of one level at once, or one at a time when `validate` is on, then counts their failures. |
-| `schedule_run` | Runs the systems of one phase, a level at a time. |
+| `count_failure(w, s)` | Counts what the run of one system came to, and writes a record if it failed. |
+| `account_job(w, job)` | Calls `count_failure` and `schedule_note_end` for each due system of a job. |
+| `run_jobs(pass, first)` | Runs the jobs of a phase from the job `first`, a level at a time, as *A level* tells. |
+| `schedule_run_batch(pass)` | Runs the handed jobs of a level at once, or one at a time when `validate` is on, then counts them. |
+| `schedule_run(w, phase)` | Runs the jobs of one phase, or the jobs of the triggered observers at the barrier. |

@@ -59,4 +59,4 @@ When `validate` is off, it makes no check, and the cost is one test.
 | `call_system` | Sets the work limit, calls the system, and marks it failed with a reason, or ended, by what the call gave. |
 | `after_call` | Times the run when `profile` is on, and checks the columns when `validate` is on. |
 | `run_system` | Writes which system runs in the header, calls it, lets `after_call` run the diagnostics, then clears the header. |
-| `schedule_run_job` | What a thread runs: the systems of one job, in the order the module registered them. |
+| `schedule_run_job` | What a thread runs: the due systems of one job, in the order the module registered them. |

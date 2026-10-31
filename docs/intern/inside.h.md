@@ -98,9 +98,11 @@ A system and an observer are a query and a function either way, so one record se
 | `terms` | How many terms it has. |
 | `fn` | Its function. |
 | `level` | Its level in its phase: a level runs before the next. |
+| `job` | The index of its job in `run_jobs` of the world: `docs/intern/schedule/schedule_commit.c.md`, *The jobs*. |
 | `parked` | Whether it is parked: `docs/intern/schedule/schedule_edges.c.md`, *The systems of a phase*. |
 | `observer` | Whether it is an observer. |
 | `pending`, `pending_count`, `pending_room` | Who triggered it since the last barrier, how many, and the room of the list. |
+| `next_triggered` | The next observer of the list `triggered` of the world: `docs/intern/schedule/schedule_triggered.c.md`, *The list*. |
 | `place` | Its place in its phase, from 0, at its dispatch: `docs/intern/schedule/schedule_jobs.c.md`, *The turn of a system*. |
 | `turn` | Where it comes among all that ran before the barrier. |
 | `failed`, `why` | How its dispatch ended, said after the join. |
@@ -217,7 +219,9 @@ A `schedule_pairs_t` holds the pairs of `[order]`: `docs/intern/schedule/schedul
 | `turns` | How many lifecycle calls ran since the last barrier. |
 | `parked` | The systems out of storage while their module reloads. |
 | `arena_ranges` | How many ranges of the arena the modules hold. |
-| `run_jobs`, `run_handed`, `run_lists`, `run_callers` | What the dispatch of a phase works in, `[budget] systems` long. |
+| `run_jobs`, `run_handed`, `run_lists`, `run_callers` | The jobs of the last build, and what the dispatch of a phase works in, `[budget] systems` long. |
+| `job_count` | How many jobs `run_jobs` holds. |
+| `triggered` | The first observer that something triggered since the last barrier, or `nullptr`. |
 | `build_in`, `build_bits` | What the schedule is made in, when a module comes or goes. |
 | `order` | The names of the pairs of `[order]`, and their closed matrix. |
 | `pool` | The threads that run a phase. |

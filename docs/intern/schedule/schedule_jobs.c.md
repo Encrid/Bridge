@@ -1,31 +1,27 @@
 # src/schedule/schedule_jobs.c
 
-This file makes the jobs of one level of a phase: for each module, its systems that run in the level, in one list.
+This file finds the jobs of a phase, and hands the due systems of one job to the run of its level.
 
-## The jobs of a level
+## A run of the jobs
 
-`schedule_gather_jobs` walks the list `systems` of the world, in its order: `docs/intern/abi/abi_subscribe.c.md`, *The slot*.
-At the first system of a module that has no job yet, `fill_job` makes the next job of the level for that module.
-The job lists each system of the module, from that one on, that runs now.
-A job with no system is not counted.
-The list of each job is one run of `run_lists`, after the list of the job before it.
+A build that passed made the jobs: `docs/intern/schedule/schedule_commit.c.md`, *The jobs*.
+`schedule_find_jobs` finds the first job of a phase by a binary search, since a build sorts the jobs by phase.
+`schedule_hand_job` hands one job to the run of its level in these steps:
 
-A system runs now if all these are true:
+1. It does not hand a job of a stopped module.
+2. It gives each due system of the job its turn and its place, in the order of the job.
+3. It puts the job into `run_handed`, and puts 1 into `run_callers` for a pinned module.
 
-- It is of this phase and of this level.
-- Its module is not stopped.
-- It is a system, or it is an observer that something triggered since the last barrier.
+A system is always due. An observer is due when something triggered it since the last barrier.
+A job at the barrier comes from a triggered observer, so each handed job has a due system.
+`schedule_is_due` of `src/schedule/schedule.h` gives this rule to the turns, to the run and to the count, so the 3 always agree.
 
 A parked system is in the list of the world only while `bridge_reload` runs, and no phase runs then.
-A call from the sink is refused, and a call from another thread may not overlap: `docs/extern/bridge.h.md`.
-So `runs_now` does not test `parked`.
-
-`run_handed` gets a pointer to each job, for `pool_run`.
-`run_callers` gets 1 for the job of a pinned module: the thread that asked for the phase runs that job.
+No build gives a parked system a job.
 
 ## The turn of a system
 
-`list_system` gives each system that runs a number, the ordinal, in the order it lists them in this pass.
+`list_due` gives each due system a number, the ordinal, in the order it hands them in this pass.
 It also sets `failed` and `ended` of the system to 0.
 
 | Value | Content |
@@ -40,8 +36,6 @@ The barrier applies the queues in the order of the turns: `docs/intern/storage/s
 
 | Function | Result |
 | --- | --- |
-| `has_job` | Gives whether a module has a job in the level already. |
-| `runs_now` | Gives whether a system runs in this level of this phase. |
-| `list_system` | Adds a system to a job and gives it its turn and its place. |
-| `fill_job` | Makes the next job of the level for the module of system `i`, with each of its systems from `i` on that runs now. |
-| `schedule_gather_jobs` | Makes the jobs of one level of a phase, one for each module that has a system that runs in it. |
+| `list_due(pass, job)` | Gives each due system of a job its turn and its place. |
+| `schedule_find_jobs(w, phase)` | Gives the index of the first job of the phase, or `job_count` if the phase has no job. |
+| `schedule_hand_job(pass, job)` | Hands a job to the run of its level, as *A run of the jobs* tells. |
