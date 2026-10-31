@@ -109,7 +109,7 @@ Storage keeps these in memory of its own, which no module can reach:
 | Each set, and the offset of each column | `sets` and `columns`, by table |
 | Which entity is a husk | `husks`, by index |
 
-The entity index and the array of ids of each table in the shared block are copies.
+The entity index, the array of ids of each table and the table directory in the shared block are copies.
 Storage writes them when it places a row, and never reads them.
 A module that writes over them misleads itself and the modules that read them after, but it does not change what storage does next.
 The bytes of a component are different: a column in the block is the data.

@@ -32,5 +32,5 @@ The records of the lists follow the spans, so storage also writes the lists when
 | `write_list` | Writes observer `q` of a module its list of the entities that triggered it since the last barrier. Gives 1 if it does not fit. |
 | `storage_publish_lists` | Writes the list of each observer of a module, when the rule above asks for it. Gives 1, with the observer in `full`, if a list does not fit. |
 | `storage_publish` | Writes what a module reads: its `column_base`, its spans and the lists of its observers. Gives 1 if they do not fit; `list` is the observer with no room, or null for the cells and the spans. |
-| `storage_end_publish` | Forgets which tables were touched, after storage wrote for each module. |
+| `storage_end_publish` | Copies the rows and the block of each touched table into the table directory, once, and forgets which tables were touched. |
 | `storage_count_tables` | Gives the count of table ids, with the id 0 of no table: `table_room` plus 1. |

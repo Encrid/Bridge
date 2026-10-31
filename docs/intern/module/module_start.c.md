@@ -46,7 +46,6 @@ The spans need these bytes:
 | A query for each system | 8 |
 | A list for each observer | 8 |
 | A cell of `column_base` for each type in each table id, counting 0 | 4 |
-| A row count and a block for each table id | 8 |
 | A `kept`, `stride`, `write` and `kind` cell for each type | 16 |
 | An offset and a length for each of `BRIDGE_OWNED_CAP` ranges | 8 |
 | The count of the owned ranges | 4 |

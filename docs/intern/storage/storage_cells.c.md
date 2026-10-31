@@ -8,7 +8,6 @@ A module reads them as `docs/extern/bridge_abi.h.md`, *Spans*, tells.
 `column_base` has a row for each table id, 0 included, and a cell in each row for each type that the module declared.
 The cells of a row are in the order the module declared the types.
 A cell holds what `get_handed` gives for the column: its offset from the shared base, 0 for no column, or `BRIDGE_CARRIED`.
-For each table, `write_cells` also writes its row count into `rows`, and its block into `blocks`.
 
 After `column_base`, `kept` has a cell for each type that the module declared.
 It tells where the module reaches a component that no table keeps:
@@ -25,7 +24,7 @@ It tells where the module reaches a component that no table keeps:
 ## What it writes
 
 When `all` of the publish is set, storage writes the header of the module with `block_write_header` of `src/block/block_module.c`.
-It then zeroes the cells, the row counts and the blocks, writes each live table, and fills the per-type cells.
+It then zeroes the cells, writes each live table, and fills the per-type cells.
 Otherwise it writes the row of each touched table, and nothing else.
 A table that storage gave back is touched, and its columns are all 0, so its row becomes 0.
 
