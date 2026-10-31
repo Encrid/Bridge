@@ -13,6 +13,7 @@ static int roll_back(bridge_world_t *w, schedule_pairs_t *saved, char *why,
     say_error(w, "[order] is unchanged: %s", why);
     schedule_free_pairs(&w->order);
     w->order = *saved;
+    schedule_mark_all(w);
     (void)schedule_build(w, why, len);
     return (1);
 }
@@ -32,6 +33,7 @@ int bridge_set_order_now(bridge_world_t *w, const bridge_order_t *pairs,
         w->order = saved;
         return (1);
     }
+    schedule_mark_all(w);
     if (schedule_build(w, why, sizeof(why)))
         return (roll_back(w, &saved, why, sizeof(why)));
     schedule_free_pairs(&saved);

@@ -24,9 +24,11 @@
 | `judged(config, group, broken, run)` | Gives the verdict of one run of a case. |
 | `verdict(config, values, outputs, group, index, case, broken, copies, counted, failing)` | Runs the copies of one case at the same time, and gives their verdict. |
 | `test(config, values, outputs, groups, broken, said, copies, counted, failing)` | Runs all the groups, and writes each verdict. With `said`, it writes `said.txt`. It gives the names of the cases that failed. |
-| `chosen(groups, part)` | Gives only the cases whose name contains `part`. It stops if no case has it: `no case has <part> in its name`. |
+| `chosen(groups, text)` | Gives only the cases whose name contains `text`. It stops if no case has it: `no case has <text> in its name`. |
+| `picked(groups, args)` | Gives only the groups of the parts of `--part`, as *Groups* tells, then only the cases of `-k`, with `chosen`. |
 | `groups_of(config, values, folder)` | Reads and checks the groups of a folder: `tests/cases`, or `.toolchain/tests/cases` of the repository `my_c23_template`. |
 | `changed(args, run, write, prepared)` | Does the steps of a changed run, as *A changed run* tells. It gives the config, the variables, what `write` gave, the artifacts and the groups. |
+| `scoped(args, entries, key, names)` | Gives the exemptions whose `key` matches one of the names, with `*`. With no `--part`, it gives all the exemptions. |
 | `measured(args)` | Runs the command `test --branches`, as *The branches* tells. |
 | `tallied(args)` | Runs the command `test --leaks`, as *The leaks* tells. |
 | `main()` | Runs the command `test`. |
@@ -40,10 +42,10 @@ Else `main` does these steps:
 2. It stops if an artifact is not linked: `the cases need what is linked: <names>`.
 3. It reads the groups of `[test] cases` (the default is `tests/cases`). With `--toolchain`, it reads `.toolchain/tests/cases` of the repository `my_c23_template`.
 4. If there is no case, it writes `no case: <folder> holds no case`, and ends.
-5. With `-k`, it keeps only the cases whose name contains the part.
+5. With `--part`, it keeps only the groups of the named parts. With `-k`, it keeps only the cases whose name contains the text.
 6. If a case states `fail`, it makes the run `fail`: *A changed run*, with `failed` of `fail.py`.
 7. It runs the groups, one time for each round of `--rounds`. Before each round of 2 rounds or more, it writes `round <n> of <rounds>`.
-8. With no `--break`, `--toolchain` or `-k`, it checks the messages of the code with `checked` of `said.py`.
+8. With no `--break`, `--toolchain`, `-k` or `--part`, it checks the messages of the code with `checked` of `said.py`.
 
 With `--break`, the false variant of a case tells if the case states `fail` at step 6.
 The number of copies is `--copies`, or `[test] copies`. If neither gives it, `main` stops: `.toolchain/project.toml: write [test] copies`.
@@ -60,6 +62,7 @@ The message of step 1 is `<target> does not run here: build it, and test it wher
 `groups_of` reads each file `**.toml` of its folder, in the order of the paths.
 The name of a group is the path of its file in `tests/cases`, without `.toml`.
 A group is in a part if the name of the group is the part, or begins with the part and a slash.
+`picked` stops if no group is in the named parts: `no case group is in the parts <parts>`.
 A file with no case gives no group.
 `groups_of` stops if a case:
 
@@ -112,7 +115,7 @@ The case passes only if each copy passes. If copies fail, the verdict of the fir
 For a case that fails, it writes the status and the output of each command.
 After each group, it writes the number of its cases and the number of the cases that passed.
 
-In a run with no `--break`, no `--toolchain` and no `-k`, `test` then writes `<out>/said.txt`.
+In a run with no `--break`, `--toolchain`, `-k` or `--part`, `test` then writes `<out>/said.txt`.
 The file holds the output of each command and of each helper, in the order of the cases.
 `said.py` reads it. A run with `--break` writes no `said.txt`, because a false variant does not run as the project runs.
 If a case failed, `test` stops with the names of the cases that failed, after it writes `said.txt`.
@@ -129,10 +132,13 @@ A claim `line` compares full lines. A claim `order` ignores the spaces at the st
 
 1. It does the steps 1 to 10 of a build with `ready` of `build.py`, or it takes `prepared`.
 2. It sets the output folder of the target to `<build>/<run>/<target>`.
-3. It writes the changed copies of the sources, with the function `write` of the run.
+3. It writes the changed copies of the sources, with the function `write` of the run. With `--part`, `write` gets only the named parts.
 4. It builds the artifacts from these copies, with `made` of `build.py`.
 5. It stops if an artifact is not linked, as step 2 of *main* tells.
-6. It reads the groups of `tests/cases`. With `-k`, it keeps only the cases whose name contains the part.
+6. It reads the groups of `tests/cases`, and keeps the groups and the cases that `picked` gives.
+
+At step 3, `kept` of `build.py` gives `write` the artifacts of the named parts only. Thus the probes, the counts and the layers are only in their sources.
+The parts of their `uses` are built from their own sources, at step 4.
 
 `ready` stops at step 1 if the target does not run on this machine.
 In `test --branches` and in `test --leaks`, each case runs one time. A case that fails does not stop the run, and its verdict is only for information.
@@ -148,6 +154,7 @@ The run `fail` gives `prepared`: the configuration and the variables of step 1 o
 4. It runs each case one time, and writes its verdict.
 5. It writes the report, with `reported` of `branches.py`.
 
+With `--part`, step 5 reads only the exemptions whose `path` matches a file with probes, with `scoped`. Thus an exemption of a different part is no fault.
 The message of step 1 is `--branches runs each case one time: it takes no --break, --toolchain, --copies or --rounds`.
 `.toolchain/docs/branches.py.md` tells what the probes measure, and what the report contains.
 
@@ -161,5 +168,6 @@ The message of step 1 is `--branches runs each case one time: it takes no --brea
 4. It runs each case one time with `counted`, and writes its verdict. Each case gets its own file of lines.
 5. It writes the report, with `reported` of `leaks.py`.
 
+With `--part`, step 5 reads only the exemptions whose `case` matches a case of the run, with `scoped`. Thus an exemption of a different part is no fault.
 The message of step 1 is `--leaks runs each case one time: it takes no --break, --toolchain, --copies, --rounds or --branches`.
 `.toolchain/docs/leaks.py.md` tells what the run counts, and what the report contains.

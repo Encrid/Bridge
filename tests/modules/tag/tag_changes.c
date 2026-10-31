@@ -49,7 +49,7 @@ TEST(flicker)
         turn_low_off((const a_t *)(api->shared_base
             + bases[span[0] * types + ntag_a]),
             test_get_bits(api, bases[span[0] * types + ntag_o]),
-            span[1]);
+            test_count_rows(api, span));
         i++;
     }
     return (0);

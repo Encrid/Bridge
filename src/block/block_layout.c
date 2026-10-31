@@ -57,9 +57,11 @@ static int lay_rest(bridge_world_t *w, const bridge_budget_t *budget,
     block_layout_t *layout)
 {
     uint64_t bits = 8ull * bits_words(budget->entities) * layout->cells;
+    uint64_t ids = (uint64_t)budget->tables + layout->sets + 1;
     uint64_t end;
 
-    layout->arena = (layout->direct + bits + 7u) & ~7ull;
+    layout->directory = (layout->direct + bits + 7u) & ~7ull;
+    layout->arena = layout->directory + 8 * ids;
     layout->columns = (layout->arena + budget->persistent + 15u) & ~15ull;
     end = layout->columns + budget->columns + w->granule - 1;
     layout->len = end / w->granule * w->granule;

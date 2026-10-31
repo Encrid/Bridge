@@ -8,7 +8,6 @@ A module reads them as `docs/extern/bridge_abi.h.md`, *Spans*, tells.
 `column_base` has a row for each table id, 0 included, and a cell in each row for each type that the module declared.
 The cells of a row are in the order the module declared the types.
 A cell holds what `get_handed` gives for the column: its offset from the shared base, 0 for no column, or `BRIDGE_CARRIED`.
-For each table, `write_cells` also writes its row count into `rows`, and its block into `blocks`.
 
 After `column_base`, `kept` has a cell for each type that the module declared.
 It tells where the module reaches a component that no table keeps:
@@ -25,9 +24,13 @@ It tells where the module reaches a component that no table keeps:
 ## What it writes
 
 When `all` of the publish is set, storage writes the header of the module with `block_write_header` of `src/block/block_module.c`.
-It then zeroes the cells, the row counts and the blocks, writes each live table, and fills the per-type cells.
-Otherwise it writes the row of each touched table, and nothing else.
-A table that storage gave back is touched, and its columns are all 0, so its row becomes 0.
+It then zeroes the cells, writes each live table, and fills the per-type cells.
+
+Otherwise it writes the row of each touched table that has `reshaped` set, and only for a module that declares a type of the table.
+`has_declared` of `src/storage/storage_publish.h` tells it, with the set of the table and the second set of `writable`.
+A table that storage gave back keeps its set until it opens again.
+So each module that declared one of its types gets a row of zeros.
+A change of rows alone writes no cell: the table directory holds the rows.
 
 ## Functions
 
@@ -37,4 +40,4 @@ A table that storage gave back is touched, and its columns are all 0, so its row
 | `get_kept` | Gives where a module reaches a component that no table keeps, as the table above says. |
 | `write_slots` | Fills the per-type cells: `kept`, `stride`, the write flag, and `kind`. |
 | `write_every_cell` | Writes the header and the whole capability table of a module. |
-| `storage_publish_cells` | Writes the `column_base` of a module: each table when `all` is set, and otherwise the touched ones. |
+| `storage_publish_cells` | Writes the `column_base` of a module: each table when `all` is set, and otherwise the reshaped tables of which it declares a type. |

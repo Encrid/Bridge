@@ -34,8 +34,9 @@ TEST_MEASURED TEST(look)
     while (i < q->spans) {
         span = test_get_span(api, q, i, 1);
         total = add_values((const s_t *)(api->shared_base
-            + bases[span[0] * types + nsparse_s]), span[1], total);
-        rows += span[1];
+            + bases[span[0] * types + nsparse_s]),
+            test_count_rows(api, span), total);
+        rows += test_count_rows(api, span);
         i++;
     }
     say(api, "the set walked: spans, rows", q->spans, rows);
@@ -54,10 +55,11 @@ static uint32_t add_reached(const test_api_t *api, const uint32_t *span,
         + blocks[span[0]]);
     const a_t *column = (const a_t *)(api->shared_base
         + bases[span[0] * h->types + nsparse_a]);
+    uint32_t count = test_count_rows(api, span);
     uint32_t at;
     uint32_t r = 0;
 
-    while (r < span[1]) {
+    while (r < count) {
         at = index[(uint32_t)who[r]];
         if (at) {
             total += column[r].v + ((const s_t *)(api->shared_base + at))->v;
@@ -84,7 +86,7 @@ TEST_MEASURED TEST(look_b)
         span = test_get_span(api, q, i, 2);
         total = add_reached(api, span, total, &found);
         base = bases[span[0] * types + nsparse_s];
-        rows += span[1];
+        rows += test_count_rows(api, span);
         if (base)
             say(api, "FAIL: a base for a term kept in a sparse set", base,
                 0);

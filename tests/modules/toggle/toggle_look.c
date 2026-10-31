@@ -37,7 +37,7 @@ static void see_words(const test_api_t *api, const uint32_t *span,
     uint32_t base = bases[span[0] * types + ntoggle_t];
     const t_t *column = (const t_t *)(api->shared_base + base);
     const uint64_t *bits = test_get_bits(api, base);
-    const uint32_t count = span[1];
+    const uint32_t count = test_count_rows(api, span);
     const uint32_t whole = count / 64;
     uint64_t word;
     uint32_t w = 0;
@@ -62,7 +62,7 @@ TEST_MEASURED TEST(look)
     while (i < q->spans) {
         span = test_get_span(api, q, i, 1);
         see_words(api, span, &seen);
-        rows += span[1];
+        rows += test_count_rows(api, span);
         i++;
     }
     say(api, "by words: rows, and of them on", rows, seen.on);
@@ -98,7 +98,7 @@ TEST_MEASURED TEST(look_b)
         span = test_get_span(api, q, i, 1);
         base = bases[span[0] * types + ntoggle_t];
         see_rows((const t_t *)(api->shared_base + base),
-            test_get_bits(api, base), span[1], &seen);
+            test_get_bits(api, base), test_count_rows(api, span), &seen);
         i++;
     }
     say(api, "by rows: on, and their sum", seen.on, seen.total);

@@ -38,6 +38,7 @@ rpath = []
 soname = []
 stack = "-Wl,--stack,16777216"
 errno = "-fmath-errno"
+runtime = ["{toolchain}/runtime/windows_x86_64_move.c", "{toolchain}/runtime/windows_x86_64_fill.c", "{toolchain}/runtime/windows_x86_64_compare.c", "{toolchain}/runtime/windows_x86_64_stack.c"]
 
 [targets.x86_64-linux-gnu]
 runs_on = ["Linux", "x86_64"]
@@ -52,6 +53,7 @@ rpath = ["-Wl,-rpath,$ORIGIN"]
 soname = ["-Wl,-soname,{name}{library}"]
 stack = "-Wl,-z,stack-size=16777216"
 errno = "-fmath-errno"
+runtime = []
 
 [targets.aarch64-macos]
 runs_on = ["Darwin", "arm64"]
@@ -66,6 +68,7 @@ rpath = ["-Wl,-rpath,@loader_path"]
 soname = ["-Wl,-install_name,@rpath/{name}{library}"]
 stack = "-Wl,-stack_size,16777216"
 errno = "-fno-math-errno"
+runtime = []
 
 [targets.aarch64-linux-gnu]
 runs_on = ["Linux", "aarch64"]
@@ -80,6 +83,7 @@ rpath = ["-Wl,-rpath,$ORIGIN"]
 soname = ["-Wl,-soname,{name}{library}"]
 stack = "-Wl,-z,stack-size=16777216"
 errno = "-fmath-errno"
+runtime = []
 
 [targets.x86_64-macos]
 runs_on = ["Darwin", "x86_64"]
@@ -94,6 +98,7 @@ rpath = ["-Wl,-rpath,@loader_path"]
 soname = ["-Wl,-install_name,@rpath/{name}{library}"]
 stack = "-Wl,-stack_size,16777216"
 errno = "-fno-math-errno"
+runtime = []
 
 [targets.aarch64-windows-gnu]
 runs_on = ["Windows", "ARM64"]
@@ -108,6 +113,7 @@ rpath = []
 soname = []
 stack = "-Wl,--stack,16777216"
 errno = "-fmath-errno"
+runtime = []
 
 [kinds.program]
 output = "{name}{exe}"
@@ -118,7 +124,7 @@ steps = [
 [kinds.library]
 output = "{name}{library}"
 steps = [
-    { run = ["{zig}", "cc", "-target", "{triple}", "-mcpu={cpu}", "-shared", "{pic}", "{soname}", "{optimize}", "{float}", "{errno}", "{language}", "{define}", "{defines}", "{include}", "{sources}", "{link}", "{flags}", "-o", "{output}"] },
+    { run = ["{zig}", "cc", "-target", "{triple}", "-mcpu={cpu}", "-shared", "{pic}", "{soname}", "{optimize}", "{float}", "{errno}", "{language}", "{define}", "{defines}", "{include}", "{sources}", "{runtime}", "{link}", "{flags}", "-o", "{output}"] },
 ]
 
 [kinds.archive]

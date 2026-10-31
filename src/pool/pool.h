@@ -30,12 +30,12 @@ typedef struct {
 struct pool {
     pool_worker_t *workers;
     uint32_t worker_count;
-    os_mutex_t *lock;
     os_event_t *done;
     int quit;
     pool_batch_t run;
-    uint8_t *taken;
-    uint32_t left;
+    uint32_t *order;
+    _Atomic uint64_t claim;
+    _Atomic uint32_t left;
 };
 
 [[nodiscard]] pool_t *pool_create(uint32_t workers, uint32_t most_jobs,
@@ -47,7 +47,9 @@ void pool_run(pool_t *p, const pool_batch_t *batch);
 
 void pool_run_alone(const pool_batch_t *batch);
 
-void pool_run_taken(pool_t *p, int caller);
+void pool_run_taken(pool_t *p);
+
+void pool_finish_job(pool_t *p);
 
 void pool_work(void *arg);
 

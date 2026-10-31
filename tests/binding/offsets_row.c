@@ -52,7 +52,7 @@ uint32_t acc_resolve(uint32_t slot, uint32_t a, uint32_t b, uint32_t field,
         if (a >= BRIDGE_HEADER(tables))
             acc_trap();
         base = acc_own_32(BRIDGE_HEADER(column_base) + 4u * (a * types + slot));
-        if (!base || b >= acc_own_32(BRIDGE_HEADER(rows) + a * 4u))
+        if (!base || b >= acc_rows(a))
             acc_trap();
         return (base + b * stride + field);
     }
@@ -93,7 +93,7 @@ uint32_t acc_toggle_bits(uint32_t slot, uint32_t table, uint32_t row)
     if (table >= BRIDGE_HEADER(tables))
         acc_trap();
     base = acc_own_32(BRIDGE_HEADER(column_base) + 4u * (table * types + slot));
-    if (!base || row >= acc_own_32(BRIDGE_HEADER(rows) + table * 4u))
+    if (!base || row >= acc_rows(table))
         acc_trap();
     return (acc_peek_32(base - 16u) + (row >> 6) * 8u);
 }

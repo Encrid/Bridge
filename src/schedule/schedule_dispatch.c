@@ -65,7 +65,8 @@ void schedule_run_job(void *arg)
     uint32_t i = 0;
 
     while (i < job->count) {
-        run_system(job->m, job->list[i]);
+        if (schedule_is_due(job->list[i]))
+            run_system(job->m, job->list[i]);
         i++;
     }
 }

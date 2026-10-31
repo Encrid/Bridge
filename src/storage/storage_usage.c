@@ -27,3 +27,12 @@ storage_usage_t storage_usage(const storage_t *r)
     u.tables = r->table_count;
     return (u);
 }
+
+bool storage_is_reshaped(const storage_t *r)
+{
+    uint32_t i = 0;
+
+    while (i < r->dirty_count && !r->tables[r->dirty[i]].reshaped)
+        i++;
+    return (i < r->dirty_count);
+}

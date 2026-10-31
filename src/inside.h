@@ -17,6 +17,7 @@
 
 typedef struct module module_t;
 typedef struct declared_type declared_type_t;
+typedef struct system_use system_use_t;
 
 typedef struct {
     char *name;
@@ -52,6 +53,7 @@ struct declared_type {
     bool superseded;
     storage_run_t *runs;
     uint32_t run_count;
+    system_use_t *uses;
 };
 
 typedef struct {
@@ -64,24 +66,35 @@ typedef struct {
     bool writes;
 } system_term_t;
 
-typedef struct {
+struct system_use {
+    struct bridge_system *s;
+    declared_type_t *type;
+    system_use_t *next;
+};
+
+typedef struct bridge_system {
     module_t *m;
     char *name;
     char *full;
     uint32_t named;
     uint32_t phase;
     storage_terms_t *matched;
-    uint32_t spans_at;
     storage_term_t *asked;
     enum bridge_event events;
     uint32_t terms;
     backend_func_t *fn;
     uint32_t level;
+    uint32_t job;
+    bool fresh;
+    bool dirty;
+    uint32_t at;
+    uint64_t grouped;
     int parked;
     int observer;
     pending_t *pending;
     uint32_t pending_count;
     uint32_t pending_room;
+    struct bridge_system *next_triggered;
     uint32_t place;
     uint64_t turn;
     int failed;
@@ -92,6 +105,8 @@ typedef struct {
     uint32_t change_count;
     uint32_t slot;
     uint64_t *stated_before;
+    system_use_t *use;
+    uint32_t use_count;
     uint64_t calls;
     uint64_t nanos;
     system_term_t term[];
@@ -190,6 +205,10 @@ struct module {
     int refused;
     char why[256];
     module_t *next;
+    module_t *next_work;
+    bool working;
+    bool linked;
+    uint64_t place;
 };
 
 enum change_op : uint32_t {
@@ -256,8 +275,11 @@ struct bridge_world {
     void **run_handed;
     void **run_lists;
     uint8_t *run_callers;
+    uint32_t job_count;
+    bridge_system_t *triggered;
     void **build_in;
     uint64_t *build_bits;
+    uint64_t build_stamp;
     schedule_pairs_t order;
     pool_t *pool;
     uint8_t *shared;
@@ -273,6 +295,7 @@ struct bridge_world {
     uint32_t sparse;
     uint32_t direct_indexed;
     uint32_t direct;
+    uint32_t directory;
     region_t arena_space;
     region_t column_space;
     int layout_moved;
@@ -289,6 +312,9 @@ struct bridge_world {
     uint32_t system_count;
     module_t *modules;
     uint32_t module_count;
+    module_t *work;
+    bool work_mixed;
+    uint64_t places;
     uint32_t max_modules;
     bool profile;
     bool validate;

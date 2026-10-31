@@ -3,7 +3,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
-#include <string.h>
+#include <stdatomic.h>
 
 #include "pool.h"
 
@@ -19,32 +19,33 @@ void pool_run_alone(const pool_batch_t *batch)
 
 static void begin_run(pool_t *p, const pool_batch_t *batch)
 {
+    uint32_t shared = 0;
     uint32_t i = 0;
 
-    os_mutex_lock(p->lock);
-    memset(p->taken, 0, batch->count);
     p->run = *batch;
-    p->left = batch->count;
-    os_mutex_unlock(p->lock);
+    for (uint32_t j = 0; j < batch->count; j++) {
+        if (!batch->caller_only[j]) {
+            p->order[shared] = j;
+            shared++;
+        }
+    }
+    atomic_store_explicit(&p->left, batch->count, memory_order_relaxed);
+    atomic_store_explicit(&p->claim, (uint64_t)shared << 32,
+        memory_order_release);
     while (i < p->worker_count && i + 1 < batch->count) {
         os_event_set(p->workers[i].wake);
         i++;
     }
 }
 
-static void end_run(pool_t *p)
+static void run_pinned(pool_t *p)
 {
-    uint32_t left = 1;
-
-    while (left) {
-        os_event_wait(p->done, OS_FOREVER);
-        os_mutex_lock(p->lock);
-        left = p->left;
-        os_mutex_unlock(p->lock);
+    for (uint32_t i = 0; i < p->run.count; i++) {
+        if (p->run.caller_only[i]) {
+            p->run.fn(p->run.jobs[i]);
+            pool_finish_job(p);
+        }
     }
-    os_mutex_lock(p->lock);
-    p->run.count = 0;
-    os_mutex_unlock(p->lock);
 }
 
 void pool_run(pool_t *p, const pool_batch_t *batch)
@@ -54,6 +55,7 @@ void pool_run(pool_t *p, const pool_batch_t *batch)
         return;
     }
     begin_run(p, batch);
-    pool_run_taken(p, 1);
-    end_run(p);
+    run_pinned(p);
+    pool_run_taken(p);
+    os_event_wait(p->done, OS_FOREVER);
 }

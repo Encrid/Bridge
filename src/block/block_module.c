@@ -29,22 +29,22 @@ int block_refill(bridge_world_t *w, module_t *m)
 
 void block_hand_out(bridge_world_t *w)
 {
-    module_t *m = w->modules;
+    module_t *m = w->work;
 
     while (m) {
         storage_hand_out(w->storage, m->ids, m->id_next);
         if (m->lender)
             storage_hand_out(w->storage, m->lender->ids, m->lender->id_next);
-        m = m->next;
+        m = m->next_work;
     }
 }
 
 static void write_caps(bridge_header_t *h, const bridge_world_t *w)
 {
     h->kept = h->column_base + 4u * h->types * h->tables;
-    h->rows = h->kept + 4u * h->types;
-    h->blocks = h->rows + 4u * h->tables;
-    h->stride = h->blocks + 4u * h->tables;
+    h->rows = w->directory;
+    h->blocks = w->directory + 4u * h->tables;
+    h->stride = h->kept + 4u * h->types;
     h->write = h->stride + 4u * h->types;
     h->kind = h->write + 4u * h->types;
     h->owned = h->kind + 4u * h->types;

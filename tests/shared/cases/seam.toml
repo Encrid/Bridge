@@ -49,7 +49,7 @@ false = { run = ["{out}/seam{exe}", "module_config.abi-another-refused"] }
 [[case]]
 name = "module_config.abi-another-refused"
 run = ["{out}/seam{exe}", "module_config.abi-another-refused"]
-claims = { matches = ["module 'test:ok@0.1.0' is refused: it wants ABI 3 and this is ABI 2.*alive"] }
+claims = { matches = ["module 'test:ok@0.1.0' is refused: it wants ABI 4 and this is ABI 3.*alive"] }
 false = { run = ["{out}/seam{exe}", "artifact.backend-not-configured-refused"] }
 
 [[case]]
@@ -217,7 +217,7 @@ false = { run = ["{out}/seam{exe}", "module_config.spans-too-small-refused"] }
 [[case]]
 name = "module_config.spans-rounded-up-to-8-refused"
 run = ["{out}/seam{exe}", "module_config.spans-rounded-up-to-8-refused"]
-claims = { matches = ["its spans of 860 bytes do not hold a column_base of 1 types by 64 tables, which with its queries is 864 bytes.*alive"] }
+claims = { matches = ["its spans of 348 bytes do not hold a column_base of 1 types by 64 tables, which with its queries is 352 bytes.*alive"] }
 false = { run = ["{out}/seam{exe}", "module_config.spans-a-multiple-of-8-taken"] }
 
 [[case]]
@@ -229,7 +229,7 @@ false = { run = ["{out}/seam{exe}", "module_config.spans-rounded-up-to-8-refused
 [[case]]
 name = "module_config.spans-with-no-room-to-round-the-match-stopped"
 run = ["{out}/seam{exe}", "module_config.spans-with-no-room-to-round-the-match-stopped"]
-claims = { matches = ["module 'test:spare@0.1.0' is stopped: what its queries match no longer fits in its spans of 868 bytes.*test:spare@0.1.0=STOPPED.*alive"] }
+claims = { matches = ["module 'test:spare@0.1.0' is stopped: what its queries match no longer fits in its spans of 356 bytes.*test:spare@0.1.0=STOPPED.*alive"] }
 false = { run = ["{out}/seam{exe}", "module_config.spans-a-multiple-of-8-taken"] }
 
 [[case]]
@@ -247,7 +247,7 @@ false = { run = ["{out}/seam{exe}", "module_config.persistent-rounded-up-to-8-re
 [[case]]
 name = "module_config.spans-outgrown-on_error-fail-stops-the-world"
 run = ["{out}/seam{exe}", "module_config.spans-outgrown-on_error-fail-stops-the-world"]
-claims = { matches = ["no longer fits in its spans of 1160 bytes.*the world has stopped: module 'game:mover@0.1.0' was stopped and its on_error is fail.*alive"] }
+claims = { matches = ["no longer fits in its spans of 640 bytes.*the world has stopped: module 'game:mover@0.1.0' was stopped and its on_error is fail.*alive"] }
 false = { run = ["{out}/seam{exe}", "module_config.spans-outgrown-at-a-barrier"] }
 
 [[case]]
@@ -397,7 +397,7 @@ false = { run = ["{out}/seam{exe}", "bridge_backend_t-granule-not-a-power-of-two
 [[case]]
 name = "module_config.spans-too-small-refused"
 run = ["{out}/seam{exe}", "module_config.spans-too-small-refused"]
-claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 types by 65 tables.*moved 2 1000.*alive"] }
+claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 2 bytes do not hold a column_base of 2 types by 65 tables.*moved 2 1000.*alive"] }
 false = { run = ["{out}/seam{exe}", "budget.columns-used-up-changes-not-applied"] }
 
 [[case]]
@@ -816,6 +816,12 @@ false = { run = ["{out}/seam{exe}", "budget.tables-under-the-most-of-the-hash-ta
 name = "observer_passes-of-3-ends-a-chain-of-three-in-one-call"
 run = ["{out}/seam{exe}", "observer_passes-of-3-ends-a-chain-of-three-in-one-call"]
 claims = { matches = ["b1 p\\d+ game:chain@0.1.0/got_a: hop A.*b2 p\\d+ game:chain@0.1.0/got_b: hop B.*b3 p\\d+ game:chain@0.1.0/got_c: hop C.*one call.*alive"] }
+false = { run = ["{out}/seam{exe}", "observer_passes-of-1-ends-one-hop-in-one-call"] }
+
+[[case]]
+name = "observer_passes-of-3-ends-a-chain-after-a-module-that-queued-nothing"
+run = ["{out}/seam{exe}", "observer_passes-of-3-ends-a-chain-after-a-module-that-queued-nothing"]
+claims = { matches = ["game:twoears@0\\.1\\.0/left_heard: heard.*got_a: hop A.*got_b: hop B.*got_c: hop C.*one call.*alive"] }
 false = { run = ["{out}/seam{exe}", "observer_passes-of-1-ends-one-hop-in-one-call"] }
 
 [[case]]
@@ -2699,7 +2705,7 @@ false = { run = ["{out}/seam{exe}", "module_config.spans-outgrown-at-a-barrier"]
 [[case]]
 name = "module_config.spans-outgrown-at-a-barrier"
 run = ["{out}/seam{exe}", "module_config.spans-outgrown-at-a-barrier"]
-claims = { matches = ["module 'game:mover@0\\.1\\.0' is stopped: what its queries match no longer fits in its spans of 1160 bytes.*alive"] }
+claims = { matches = ["module 'game:mover@0\\.1\\.0' is stopped: what its queries match no longer fits in its spans of 640 bytes.*alive"] }
 false = { run = ["{out}/seam{exe}", "backend_sig_t-what-each-entry-takes-and-answers"] }
 
 [[case]]
@@ -3009,6 +3015,72 @@ claims = { matches = ["b2 p0 game:places@0.1.0/first: at.*b2 p1 game:places@0.1.
 false = { run = ["{out}/seam{exe}", "add_system-before-holds-without-a-conflict"] }
 
 [[case]]
+name = "record.place-of-a-module-after-a-stopped-one"
+run = ["{out}/seam{exe}", "record.place-of-a-module-after-a-stopped-one"]
+claims = { matches = ["is stopped: .*p0 game:places@0\\.1\\.0/first: at.*alive"] }
+false = { run = ["{out}/seam{exe}", "record.place-of-the-systems-of-two-modules"] }
+
+[[case]]
+name = "record.place-of-a-reloaded-module-last-in-its-level"
+run = ["{out}/seam{exe}", "record.place-of-a-reloaded-module-last-in-its-level"]
+claims = { matches = ["game:one@0\\.2\\.0: reloaded.*p1 game:one@0\\.2\\.0/run: saw.*alive", "game:one@0\\.2\\.0: reloaded.*p0 game:two@0\\.1\\.0/run: saw.*alive"] }
+false = { run = ["{out}/seam{exe}", "record.place-of-the-systems-of-two-modules"] }
+
+[[case]]
+name = "record.place-after-a-refused-load"
+run = ["{out}/seam{exe}", "record.place-after-a-refused-load"]
+claims = { matches = ["did not load: .*p0 game:places@0\\.1\\.0/first: at.*p4 game:one@0\\.1\\.0/run: saw.*alive"] }
+false = { run = ["{out}/seam{exe}", "record.place-of-the-systems-of-two-modules"] }
+
+[[case]]
+name = "observe-only-the-triggered-observer-runs"
+run = ["{out}/seam{exe}", "observe-only-the-triggered-observer-runs"]
+claims = { matches = ["p0 game:twoears@0\\.1\\.0/left_heard: heard.*alive"], lacks = ["right_heard"] }
+false = { run = ["{out}/seam{exe}", "observe-each-triggered-observer-runs"] }
+
+[[case]]
+name = "observe-each-triggered-observer-runs"
+run = ["{out}/seam{exe}", "observe-each-triggered-observer-runs"]
+claims = { matches = ["p0 game:twoears@0\\.1\\.0/left_heard: heard.*p1 game:twoears@0\\.1\\.0/right_heard: heard.*alive"] }
+false = { run = ["{out}/seam{exe}", "observe-only-the-triggered-observer-runs"] }
+
+[[case]]
+name = "observe-triggered-observers-of-two-modules-share-a-level"
+run = ["{out}/seam{exe}", "observe-triggered-observers-of-two-modules-share-a-level"]
+claims = { matches = ["p0 game:twoears@0\\.1\\.0/left_heard: heard.*p1 game:ears@0\\.1\\.0/left_heard: heard.*alive"] }
+false = { run = ["{out}/seam{exe}", "observe-only-the-triggered-observer-runs"] }
+
+[[case]]
+name = "barrier-publishes-a-changed-table-to-a-module-that-ran-nothing"
+run = ["{out}/seam{exe}", "barrier-publishes-a-changed-table-to-a-module-that-ran-nothing"]
+claims = { matches = ["game:lurker@0\\.1\\.0/look: rows 1 0.*game:lurker@0\\.1\\.0/look: rows 2 0.*alive"] }
+false = { run = ["{out}/seam{exe}", "barrier-publishes-a-changed-table-in-one-frame"] }
+
+[[case]]
+name = "barrier-publishes-a-changed-table-in-one-frame"
+run = ["{out}/seam{exe}", "barrier-publishes-a-changed-table-in-one-frame"]
+claims = { matches = ["game:lurker@0\\.1\\.0/look: rows 1 0.*alive"], lacks = ["rows 2"] }
+false = { run = ["{out}/seam{exe}", "barrier-publishes-a-changed-table-to-a-module-that-ran-nothing"] }
+
+[[case]]
+name = "barrier-shows-an-idle-module-the-rows-of-a-table-whose-rows-alone-changed"
+run = ["{out}/seam{exe}", "barrier-shows-an-idle-module-the-rows-of-a-table-whose-rows-alone-changed"]
+claims = { matches = ["game:lurker@0\\.1\\.0/look: rows 6 0.*alive"] }
+false = { run = ["{out}/seam{exe}", "barrier-publishes-a-changed-table-to-a-module-that-ran-nothing"] }
+
+[[case]]
+name = "barrier-empties-the-list-of-an-observer-whose-module-ran-nothing"
+run = ["{out}/seam{exe}", "barrier-empties-the-list-of-an-observer-whose-module-ran-nothing"]
+claims = { matches = ["game:lurker@0\\.1\\.0/-: kept 0 0.*unloaded.*alive"] }
+false = { run = ["{out}/seam{exe}", "barrier-keeps-the-list-of-an-observer-until-the-next-barrier"] }
+
+[[case]]
+name = "barrier-keeps-the-list-of-an-observer-until-the-next-barrier"
+run = ["{out}/seam{exe}", "barrier-keeps-the-list-of-an-observer-until-the-next-barrier"]
+claims = { matches = ["game:lurker@0\\.1\\.0/-: kept 1 0.*unloaded.*alive"] }
+false = { run = ["{out}/seam{exe}", "barrier-empties-the-list-of-an-observer-whose-module-ran-nothing"] }
+
+[[case]]
 name = "config.order-pair-orders-two-systems-of-one-module"
 run = ["{out}/seam{exe}", "config.order-pair-orders-two-systems-of-one-module"]
 claims = { matches = ["b1 p0 game:places@0.1.0/second: at.*b1 p1 game:places@0.1.0/first: at.*alive"] }
@@ -3071,8 +3143,8 @@ false = { run = ["{out}/seam{exe}", "BRIDGE_SPAN_SIZE-what-a-span-takes-of-the-s
 [[case]]
 name = "BRIDGE_SPAN_SIZE-what-a-span-takes-of-the-spans"
 run = ["{out}/seam{exe}", "BRIDGE_SPAN_SIZE-what-a-span-takes-of-the-spans"]
-claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 types by 65 tables.*moved 2 1000.*alive"] }
-false = { run = ["{out}/seam{exe}", "BRIDGE_SCHEMA_TEXT-a-descriptor-of-the-type-s-own-text"] }
+claims = { matches = ["game:mover@0\\.1\\.0/count: moved 2 1000.*alive"], lacks = ["is stopped"] }
+false = { run = ["{out}/seam{exe}", "module_config.spans-outgrown-at-a-barrier"] }
 
 [[case]]
 name = "BRIDGE_SCHEMA_TEXT-a-descriptor-of-the-type-s-own-text"
@@ -3577,6 +3649,12 @@ name = "config.order-pair-holds-without-a-conflict"
 run = ["{out}/seam{exe}", "config.order-pair-holds-without-a-conflict"]
 claims = { matches = ["b2 p3 game:places@0.1.0/first: at.*alive"] }
 false = { run = ["{out}/seam{exe}", "record.place-of-the-systems-of-two-modules"] }
+
+[[case]]
+name = "bridge_reload-group-refused-keeps-the-levels"
+run = ["{out}/seam{exe}", "bridge_reload-group-refused-keeps-the-levels"]
+claims = { matches = ["no module of the group is reloaded: .*p3 game:places@0\\.1\\.0/first: at.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-group-schedule-conflict-refused"] }
 
 [[case]]
 name = "config.order-pair-agrees-with-before"

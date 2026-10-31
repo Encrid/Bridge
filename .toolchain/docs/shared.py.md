@@ -9,8 +9,9 @@ The tools import it. It does not run alone.
 | --- | --- |
 | `HERE` | The folder of `project.py`, which holds `.toolchain`, zig and the caches of zig. It is the default root. |
 | `NAME` | The pattern of a variable: a name in braces, with an optional separator after a colon. |
-| `KEYS` | The keys that a step, a case, a false variant, a helper, a step of a script, the claims and a source can have. It also gives the keys of a kind of `[leaks.kinds]`. |
-| `SIDES` | The folder of `docs` that holds the documents of a folder: `extern` for `include`, and `intern` for `src`. |
+| `KEYS` | The keys of a step, a case, a false variant, a helper, a step of a script, the claims, a source and a part. It also gives the keys of a kind of `[leaks.kinds]`. |
+| `TAG` | The pattern of the tag of a release: `v<major>.<minor>.<patch>`, after an optional part in snake_case and `-`. |
+| `SIDES` | The folder of `docs` that holds the documents of a folder: `extern` for `include`, `intern` for `src`, and `tools` for `tools`. |
 
 ## Functions
 
@@ -56,7 +57,7 @@ The name of a file is its path from `.toolchain`, for example `config/sources.to
 
 `variables` gives the values in this order. A later value replaces an earlier value with the same name.
 
-1. The variables that the tools give: `root`, `build`, `home`, `dist`, `out`, `target`, `python` and `zig`.
+1. The variables that the tools give: `root`, `build`, `home`, `dist`, `out`, `target`, `python`, `zig` and `toolchain`.
 2. The keys of the target.
 3. The keys of `[variables]`. The tool stops if a key has a name of step 1 or of step 2.
 4. With `--debug`, the keys of `[debug]`.
@@ -65,6 +66,8 @@ The name of a file is its path from `.toolchain`, for example `config/sources.to
 `build` is `--out`, or `[build] folder` in the root.
 `dist` is `<build>/<target>`, or `<build>/<target>-debug` with `--debug`. It holds the deliverable that the build composes.
 `out` is `<dist>/scratch`. It holds each built artifact, and the scratch of the tests.
+
+`toolchain` is the folder `.toolchain` of the tools that run, and not of the root. Thus a project of the tests, whose root holds no toolchain, still reaches the files of the toolchain.
 The messages are `[variables] names a built-in variable or a key of a target: <names>` and `--set <name>=<value>: [variables] has no <name>`.
 
 ## Expansion
@@ -76,13 +79,18 @@ A list value in a text needs a separator: `{<name>:<separator>}`. `expand` joins
 
 ## The options
 
-`arguments` reads the options `--root`, `--target`, `--debug`, `--out` and `--set`.
+`arguments` reads the options `--root`, `--target`, `--part`, `--tag`, `--debug`, `--out` and `--set`.
 A tool adds its own options:
 
 - `arguments('--commits')` adds the option `--commits <value>`. Its value is in `args.commits`, or `None` if the option is not given.
 - `arguments(pack='--pack')` adds the option `--pack`, with no value. `args.pack` tells if the option is given.
 
 The default of `--root` is `HERE`. `arguments` makes the root an absolute path.
+`--part` can be given more than one time. `args.part` is the list of its values, or `None`.
+
+`--tag <tag>` takes the tag of a release, and matches it with `TAG`.
+A tag `<part>-v<major>.<minor>.<patch>` adds `<part>` to `args.part`. A tag `v<major>.<minor>.<patch>` adds no part.
+`arguments` stops on a different tag: `the tag <tag> is not v<major>.<minor>.<patch> or <part>-v<major>.<minor>.<patch>`.
 
 ## The legal notice
 

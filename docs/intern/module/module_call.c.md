@@ -26,9 +26,10 @@ If `os_reserve` fails, the load fails and says how many bytes it asked for.
 
 1. If the timeout of the call is above 0, set it on the instance, in nanoseconds.
 2. Clear the refusal of the module.
-3. Give the call its turn: `TURN_LIFECYCLE`, and the count of lifecycle calls since the last barrier.
-4. Make room for its marks: `docs/intern/abi/abi_alloc.c.md`, *The marks of the queue*.
-5. Call the export.
+3. Note the module on the work list, if the world lists it: `docs/intern/block/block_work.c.md`.
+4. Give the call its turn: `TURN_LIFECYCLE`, and the count of lifecycle calls since the last barrier.
+5. Make room for its marks: `docs/intern/abi/abi_alloc.c.md`, *The marks of the queue*.
+6. Call the export.
 
 The barrier applies what a lifecycle call changed after the observers of the last barrier, and before the systems of the next phase.
 The lifecycle calls are applied in the order they were made: `src/storage/storage_runs.h`.

@@ -17,8 +17,6 @@ static void write_cells(publish_t *p, uint32_t t)
     uint32_t id;
     uint32_t s = 0;
 
-    p->rows[t] = p->r->tables[t].rows;
-    p->blocks[t] = p->r->tables[t].block;
     while (s < m->declared_count) {
         id = m->declared[s]->type->id;
         row[s] = get_handed(p->r, id, columns[id]);
@@ -62,8 +60,6 @@ static void write_every_cell(publish_t *p)
 
     (void)block_write_header(r->w, m);
     memset(p->cell, 0, 4u * m->declared_count * tables);
-    memset(p->rows, 0, 4u * tables);
-    memset(p->blocks, 0, 4u * tables);
     while (t < r->table_high) {
         if (r->tables[t].live)
             write_cells(p, t);
@@ -75,14 +71,15 @@ static void write_every_cell(publish_t *p)
 void storage_publish_cells(publish_t *p)
 {
     const storage_t *r = p->r;
-    uint32_t i = 0;
+    uint32_t t;
 
     if (p->all) {
         write_every_cell(p);
         return;
     }
-    while (i < r->dirty_count) {
-        write_cells(p, r->dirty[i]);
-        i++;
+    for (uint32_t i = 0; i < r->dirty_count; i++) {
+        t = r->dirty[i];
+        if (r->tables[t].reshaped && has_declared(r, p->m, t))
+            write_cells(p, t);
     }
 }

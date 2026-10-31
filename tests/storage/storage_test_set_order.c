@@ -43,16 +43,13 @@ typedef struct {
 static bridge_system_t *make_sys(module_t *m, declared_type_t *own,
     declared_type_t *other, bool writes)
 {
-    bridge_system_t *s = calloc(1, sizeof(*s) + 2 * sizeof(system_term_t)
-        + sizeof(uint64_t));
+    bridge_system_t *s = storage_test_make_system(m, 2, 0, 1);
 
     if (!s)
         return (nullptr);
-    s->m = m;
-    s->terms = 2;
     s->term[0] = (system_term_t){ own, true };
     s->term[1] = (system_term_t){ other, writes };
-    s->stated_before = (uint64_t *)(void *)&s->term[2];
+    schedule_index_system(s);
     return (s);
 }
 
@@ -88,6 +85,8 @@ static void tidy(bridge_world_t *w, bridge_system_t **s)
     schedule_free_pairs(&w->order);
     free(w->build_in);
     free(w->build_bits);
+    free(w->run_jobs);
+    free(w->run_lists);
 }
 
 enum storage_test_end storage_test_set_order(storage_test_t *t)
@@ -102,10 +101,14 @@ enum storage_test_end storage_test_set_order(storage_test_t *t)
 
     w.build_in = calloc(4, sizeof(*w.build_in));
     w.build_bits = calloc(4 * 2 + 1, sizeof(*w.build_bits));
+    w.run_jobs = calloc(4, sizeof(schedule_job_t));
+    w.run_lists = calloc(4, sizeof(*w.run_lists));
     w.systems = s;
     w.system_count = 4;
-    if (!w.build_in || !w.build_bits || !make_all(&o, s)
-        || schedule_order(&w, BASE, 2) || schedule_build(&w, why, sizeof(why)))
+    if (!w.build_in || !w.build_bits || !w.run_jobs || !w.run_lists
+        || !make_all(&o, s)
+        || schedule_order(&w, BASE, 2) || storage_test_build_all(&w, why,
+            sizeof(why)))
         return (STORAGE_TEST_FAILED);
     report("cycle", s, bridge_set_order(&w, LOOP, 2));
     report("empty", s, bridge_set_order(&w, nullptr, 0));

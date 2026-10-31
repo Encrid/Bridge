@@ -5,7 +5,7 @@ Storage keeps the rows behind `src/storage/storage.h`.
 
 ## The regions of the memories
 
-A module reaches nine regions with no call, and they do not have the same readers:
+A module reaches ten regions with no call, and they do not have the same readers:
 
 | Region | Memory | Who reads it |
 | --- | --- | --- |
@@ -13,6 +13,7 @@ A module reaches nine regions with no call, and they do not have the same reader
 | The entity index | shared | Each module that follows a reference. |
 | The indexes of the sparse sets | shared | Each module that declared a component kept in a sparse set. |
 | The direct-indexed bits | shared | Each module that declared a direct-indexed component. |
+| The table directory | shared | Each module that reads the rows or the row ids of a table. |
 | The persistent arena | shared | Each module that holds a string in a component. |
 | The query spans | private | Only the module of the spans. |
 | `column_base` | private | Only its module. |
@@ -54,7 +55,7 @@ It is the same moment at which the library publishes the spans again, so a span 
 
 A barrier follows each phase, and not each frame.
 So a spawn in one phase is visible in the next phase of the same frame.
-A barrier costs what changed, and a visit to each module: its ids topped up, its failures counted, and its log drained.
+A barrier costs what changed, and a visit to each module of the work list. It tops up its ids, counts its failures, and drains its log.
 
 A spawn is visible at the next barrier: `docs/extern/bridge_abi.h.md`, *spawn*.
 `spawn` gives a usable id at once, but the row does not exist until the barrier, and no query counts it.
@@ -76,6 +77,7 @@ The fields of `block_layout_t`:
 | `sets` | How many sparse sets there may be. |
 | `direct` | The start of the direct-indexed bits. |
 | `cells` | How many direct-indexed components there may be. |
+| `directory` | The start of the table directory. |
 | `arena` | The start of the persistent arena. |
 | `columns` | The start of the column region. |
 | `len` | The length of the block. |
@@ -94,9 +96,16 @@ The fields of `block_layout_t`:
 | `block_lay_out` | `src/block/block_layout.c` | Lays out the shared block: `docs/intern/block/block_layout.c.md`, *Functions*. |
 | `block_refill` | `src/block/block_module.c` | Tops up the ids of a module: `docs/intern/block/block_module.c.md`, *The ids set aside*. |
 | `block_write_header` | `src/block/block_module.c` | Writes the header of a module: `docs/intern/block/block_module.c.md`, *Functions*. |
-| `block_hand_out` | `src/block/block_module.c` | For each module, ends the hold on the ids that it handed out: `docs/intern/block/block_module.c.md`, *Functions*. |
+| `block_hand_out` | `src/block/block_module.c` | For each module of the work list, ends the hold on the ids that it handed out: `docs/intern/block/block_module.c.md`, *Functions*. |
 | `block_drain` | `src/block/block_log.c` | Drains the log ring of a module, and gives back its scratch arena: `docs/intern/block/block_log.c.md`, *The log ring*. |
 | `block_barrier` | `src/block/block_barrier.c` | Runs the barrier: `docs/intern/block/block_barrier.c.md`, *The steps of a barrier*. |
-| `block_publish_all` | `src/block/block_publish.c` | Publishes the spans of each running module: `docs/intern/block/block_publish.c.md`, *Functions*. |
+| `block_publish_all` | `src/block/block_publish.c` | Publishes the spans of the running modules: `docs/intern/block/block_publish.c.md`, *Functions*. |
+| `block_note_work` | `src/block/block_work.c` | Puts a module on the work list: `docs/intern/block/block_work.c.md`, *Functions*. |
+| `block_keep_work` | `src/block/block_work.c` | Takes off the modules with no work left: `docs/intern/block/block_work.c.md`, *Functions*. |
+| `block_drop_work` | `src/block/block_work.c` | Takes a module off the work list: `docs/intern/block/block_work.c.md`, *Functions*. |
+| `block_join_work` | `src/block/block_work.c` | Gives a loaded module its place: `docs/intern/block/block_work.c.md`, *Functions*. |
+| `block_take_place` | `src/block/block_work.c` | Puts a reloaded module in the place of the old one: `docs/intern/block/block_work.c.md`, *Functions*. |
+| `block_sort_list` | `src/block/block_sort.c` | Sorts a list of modules by place: `docs/intern/block/block_sort.c.md`, *Functions*. |
+| `block_sort_work` | `src/block/block_sort.c` | Sorts the work list: `docs/intern/block/block_sort.c.md`, *Functions*. |
 | `block_column_regrow` | `src/block/block_column.c` | Gives a piece of the column region a new length: `docs/intern/block/block_column.c.md`, *Functions*. |
 | `block_column_free` | `src/block/block_column.c` | Frees a piece of the column region: `docs/intern/block/block_column.c.md`, *Functions*. |

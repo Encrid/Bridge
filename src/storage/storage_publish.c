@@ -75,11 +75,16 @@ int storage_publish(storage_t *r, module_t *m, const char **list)
 
 void storage_end_publish(storage_t *r)
 {
-    uint32_t i = 0;
+    uint32_t *rows = (uint32_t *)(void *)(r->w->shared + r->w->directory);
+    uint32_t *blocks = rows + r->table_room + 1;
+    uint32_t t;
 
-    while (i < r->dirty_count) {
-        r->tables[r->dirty[i]].touched = false;
-        i++;
+    for (uint32_t i = 0; i < r->dirty_count; i++) {
+        t = r->dirty[i];
+        rows[t] = r->tables[t].rows;
+        blocks[t] = r->tables[t].block;
+        r->tables[t].touched = false;
+        r->tables[t].reshaped = false;
     }
     r->dirty_count = 0;
 }

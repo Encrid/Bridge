@@ -89,7 +89,7 @@ Put the patches of a source and its licence into `third_party/<source>`.
 | `url` | The address of the archive. A text with no `://` names a file of the project. |
 | `sha256` | The SHA-256 digest of the archive. |
 | `into` | The folder that gets the files, for example `{build}/third_party/<source>`. |
-| `top` | Optional. The folder of the archive that holds the files. |
+| `top` | Optional. The folder of the archive that holds the files. It can hold variables, for example `{target}`. |
 | `patches` | Optional. The patches, as files of the project, in the order that `fetch` applies them. |
 
 For example:
@@ -118,6 +118,19 @@ A patch can end its lines as Windows does or as Linux does.
 If `fetched.txt` holds the digests of the configuration, `fetch` does not download the archive again.
 The commands `build`, `pack` and `test` do not download a source.
 They stop if `fetched.txt` does not hold the digests of the configuration.
+
+The archive of a release of a part has a folder for each target: `.toolchain/docs/workflows.py.md`, *The release*.
+With `top = "{target}"`, one source with one digest takes such an archive for all the targets.
+Its variable is the folder of the target of the build:
+
+```toml
+[[source]]
+name = "sample"
+url = "https://example.org/sample-0.1.0/Sample.zip"
+sha256 = "<digest>"
+into = "{build}/third_party/sample"
+top = "{target}"
+```
 
 ## [[dependency]]
 
@@ -224,6 +237,7 @@ An artifact is a file that the build makes, for example a program, a library or 
 | `variants` | Optional. The variants. Each variant has a `name`, and can have the other keys and `unstamped`. |
 | `test` | Optional. `true` for an artifact that only the tests use. Only the command `test` makes it, and `package.txt` does not list it. Thus `pack` does not put it into the zip. |
 | `path` | Optional. `true` for a test library that a case loads by a `*_PATH` macro. `.toolchain/docs/build.py.md`, *Modules*, tells it. |
+| `part` | Only in a project with parts. The part of the artifact: *[parts]*. |
 
 A variant is a copy of the artifact with a different name and some different keys.
 A variant with `unstamped = true` does not do the `section` steps.
@@ -252,7 +266,9 @@ A table of `[compose]` has these keys:
 | --- | --- |
 | `from` | Optional. The folder that the patterns of `headers` start from, for example a folder of a source. A relative path is from the folder of the project. `.toolchain/docs/build.py.md`, *The deliverable*, tells its variables. The default is the folder of the project. |
 | `headers` | Optional. The patterns of the public headers, from the folder `from`. The deliverable keeps the path of each header below that folder. |
+| `into` | Optional. The folder of the deliverable that gets the headers. It can hold variables. The default is the top of the deliverable. |
 | `assets` | Optional. The files from the scratch folder, for example a file that a step of a kind makes. |
+| `part` | Only in a project with parts. The part of the table: *[parts]*. |
 
 With no table, or with empty keys, the deliverable holds only the artifacts and the licences.
 For example, this table puts the headers of a fetched library into the folder `include/sample` of the deliverable:
@@ -262,6 +278,68 @@ For example, this table puts the headers of a fetched library into the folder `i
 from = "build/third_party/sample/{target}"
 headers = ["include/sample/*.h"]
 ```
+
+This table puts the headers of `include/video` into the folder `include` of the deliverable, so `include/video/<name>.h` becomes `include/<name>.h`:
+
+```toml
+[compose.video]
+from = "include/video"
+headers = ["*.h"]
+into = "include"
+```
+
+## [parts]
+
+A project can have parts, for example a family of modules in one repository.
+Each part builds, tests, packs and releases alone, with `--part <part>`: `.toolchain/docs/project.py.md`, *Parts*.
+`[parts.<part>]` states the part `<part>`. The name `<part>` is in snake_case.
+It is also the name of the folder of the part in `src`, `include`, `docs/extern`, `docs/intern` and `tests/cases`.
+
+| Key | Value |
+| --- | --- |
+| `name` | The name of the zips of the part, in place of `[project] name`, for example `Sample-Video`. |
+| `uses` | The parts whose artifacts the part uses in the output folder, for example a library that it links. A build of the part also makes them, before the artifacts of the part. Write `[]` for a part that uses no part. |
+| `third_party` | The folders of `third_party` whose licence the zip of the part holds. Write `[]` for a part that ships no work of a different maker. |
+| `package` | Optional. The package proof of the part: a table with the keys `proof`, `link` and `include`, as `[package]` has. `.toolchain/docs/build.py.md`, *The package proof*, tells them. |
+
+In a project with parts, each artifact and each table of `[compose]` states its part, with the key `part`.
+A project can put the tables of each part into a file of its own in `.toolchain/config`, for example `video.toml`:
+
+```toml
+[parts.video]
+name = "Sample-Video"
+uses = ["sdl3"]
+third_party = []
+
+[parts.video.package]
+proof = "tests/video/package/proof.c"
+
+[compose.video]
+part = "video"
+from = "include/video"
+headers = ["*.h"]
+into = "include"
+
+[[artifact]]
+name = "sample_video"
+kind = "library"
+part = "video"
+sources = ["src/video/*.c"]
+include = ["include/video"]
+link = ["{out}/SDL3{library}"]
+```
+
+The tools stop with these messages:
+
+- `<name> states no part, and the project has parts`, for an artifact or a table of `[compose]` with no `part`.
+- `<name> states the part <part>, and [parts] does not have it`, also in a project with no `[parts]`.
+- `[parts.<part>] states no <key>`, if `name`, `uses` or `third_party` is not there.
+- `[parts.<part>]: a part has no key <keys>`, for a key that the table above does not give.
+- `no part <part>; the parts: <parts>`, if `--part` or `uses` names a part that `[parts]` does not have.
+- `the uses of the parts make a cycle: <parts>`, if a part uses itself, directly or through a different part.
+
+A project with no `[parts]` states no part, and each command acts on the full project.
+`.toolchain/docs/build.py.md`, *Parts*, tells how the tools check and keep the parts.
 
 ## [test]
 

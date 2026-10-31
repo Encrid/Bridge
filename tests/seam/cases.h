@@ -272,7 +272,19 @@ void test_map_beside_a_named_phase(host_t *h);
 void test_place_before(host_t *h);
 void test_place_paired(host_t *h);
 void test_place_two(host_t *h);
+
+void test_place_after_stop(host_t *h);
+
+void test_place_after_reload(host_t *h);
+
+void test_place_after_refused_load(host_t *h);
+
+void test_heard_triggered(host_t *h);
+void test_rows_of_idle(host_t *h);
+void test_kept_triggers(host_t *h);
 void test_place_reordered(host_t *h);
+
+void test_place_after_refused_group(host_t *h);
 
 void test_take_in_old_shutdown(host_t *h);
 

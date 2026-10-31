@@ -368,6 +368,27 @@ defines = ["BRIDGE_ROWS_CHECKED"]
 variants = [{ name = "places_before", defines = ["BRIDGE_ROWS_CHECKED", "BEFORE"] }]
 
 [[modules]]
+name = "lurker"
+sources = ["tests/modules/lurker.c", "tests/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [{ name = "lurker_rows", defines = ["BRIDGE_ROWS_CHECKED", "ROWS"] }]
+
+[[modules]]
+name = "twoears"
+sources = ["tests/modules/twoears.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [
+    { name = "twoears_both", defines = ["BRIDGE_ROWS_CHECKED", "BOTH"] },
+    { name = "twoears_ears", defines = ["BRIDGE_ROWS_CHECKED", "EARS"] },
+]
+
+[[modules]]
+name = "timed"
+sources = ["tests/modules/timed.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+path = true
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
 name = "shout-forged"
 sources = ["tests/modules/shout.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED", "FORGED"]

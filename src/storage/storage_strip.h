@@ -72,7 +72,7 @@ static inline void strip_table(storage_t *r, uint32_t t,
     if (name)
         name_table(r, t);
     list_table(r, t);
-    touch(r, t);
+    touch(r, t, true);
 }
 
 #endif

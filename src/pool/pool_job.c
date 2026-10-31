@@ -3,42 +3,37 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdatomic.h>
+
 #include "pool.h"
 
-static int take_job(pool_t *p, int caller)
+static int take_job(pool_t *p)
 {
-    int found = -1;
-    uint32_t i = 0;
+    uint64_t claim = atomic_fetch_add_explicit(&p->claim, 1,
+        memory_order_acquire);
 
-    os_mutex_lock(p->lock);
-    while (i < p->run.count && found < 0) {
-        if (!p->taken[i] && (caller || !p->run.caller_only[i])) {
-            p->taken[i] = 1;
-            found = (int)i;
-        }
-        i++;
-    }
-    os_mutex_unlock(p->lock);
-    return (found);
+    if ((uint32_t)claim >= (uint32_t)(claim >> 32))
+        return (-1);
+    return ((int)p->order[(uint32_t)claim]);
 }
 
-static void finish_job(pool_t *p)
+void pool_finish_job(pool_t *p)
 {
-    os_mutex_lock(p->lock);
-    p->left--;
-    if (!p->left)
+    uint32_t left = atomic_fetch_sub_explicit(&p->left, 1,
+        memory_order_acq_rel);
+
+    if (left == 1)
         os_event_set(p->done);
-    os_mutex_unlock(p->lock);
 }
 
-void pool_run_taken(pool_t *p, int caller)
+void pool_run_taken(pool_t *p)
 {
-    int job = take_job(p, caller);
+    int job = take_job(p);
 
     while (job >= 0) {
         p->run.fn(p->run.jobs[job]);
-        finish_job(p);
-        job = take_job(p, caller);
+        pool_finish_job(p);
+        job = take_job(p);
     }
 }
 
@@ -48,7 +43,7 @@ void pool_work(void *arg)
 
     os_event_wait(w->wake, OS_FOREVER);
     while (!w->p->quit) {
-        pool_run_taken(w->p, 0);
+        pool_run_taken(w->p);
         os_event_wait(w->wake, OS_FOREVER);
     }
 }

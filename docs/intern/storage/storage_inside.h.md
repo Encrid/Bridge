@@ -109,7 +109,7 @@ Storage keeps these in memory of its own, which no module can reach:
 | Each set, and the offset of each column | `sets` and `columns`, by table |
 | Which entity is a husk | `husks`, by index |
 
-The entity index and the array of ids of each table in the shared block are copies.
+The entity index, the array of ids of each table and the table directory in the shared block are copies.
 Storage writes them when it places a row, and never reads them.
 A module that writes over them misleads itself and the modules that read them after, but it does not change what storage does next.
 The bytes of a component are different: a column in the block is the data.
@@ -184,6 +184,7 @@ A table.
 | `incoming` | The rows that this barrier adds. Storage finds room for them first. |
 | `live` | The table exists. |
 | `touched` | It changed since storage last wrote what modules read, and it is in `dirty`. |
+| `reshaped` | Its columns moved since the last publish: it was made, given back, grown or stripped. A change of rows alone leaves it unset. |
 | `sized` | Storage found room for this barrier: `incoming` is then how many rows it has room for. |
 | `named` | The hash finds this table for its set. |
 | `set` | The slot of the sparse set that this table keeps, plus one. 0 for the table of an archetype. |

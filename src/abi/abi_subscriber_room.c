@@ -12,6 +12,7 @@
 
 static_assert(alignof(system_term_t) % alignof(uint64_t) == 0);
 static_assert(sizeof(declared_type_t *) % alignof(uint64_t) == 0);
+static_assert(alignof(system_use_t) <= alignof(uint64_t));
 
 void abi_free_subscriber(subscribing_t *g)
 {
@@ -63,15 +64,19 @@ static bool name_system(subscribing_t *g)
     return (s->name && s->full && (!g->events || s->pending));
 }
 
+static size_t get_block_size(const subscribing_t *g)
+{
+    return (sizeof(bridge_system_t) + g->count * sizeof(system_term_t)
+        + g->change_count * sizeof(declared_type_t *)
+        + bits_words(g->slot) * sizeof(uint64_t)
+        + (g->count + g->change_count) * sizeof(system_use_t));
+}
+
 int abi_alloc_subscriber(subscribing_t *g)
 {
-    bridge_system_t *s;
-    size_t size = sizeof(*s) + g->count * sizeof(*s->term)
-        + g->change_count * sizeof(*s->changes)
-        + bits_words(g->slot) * sizeof(*s->stated_before);
+    bridge_system_t *s = calloc(1, get_block_size(g));
     bool had;
 
-    s = calloc(1, size);
     g->s = s;
     g->asked = calloc(g->count + 1, sizeof(*g->asked));
     had = make_room(g);
@@ -79,6 +84,8 @@ int abi_alloc_subscriber(subscribing_t *g)
     if (had && abi_marks(g->m, 1)) {
         s->changes = (declared_type_t **)(void *)&s->term[g->count];
         s->stated_before = (uint64_t *)(void *)&s->changes[g->change_count];
+        s->use = (system_use_t *)(void *)&s->stated_before[
+            bits_words(g->slot)];
         return (0);
     }
     abi_free_subscriber(g);

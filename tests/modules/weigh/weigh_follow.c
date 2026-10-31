@@ -19,11 +19,12 @@ static uint32_t add_followed(const test_api_t *api, const uint32_t *span,
     const l_t *column = (const l_t *)(api->shared_base
         + base[span[0] * h->types + nweigh_link]);
     const bridge_entity_t *e;
+    uint32_t count = test_count_rows(api, span);
     uint64_t id;
     uint32_t at;
     uint32_t r = 0;
 
-    while (r < span[1]) {
+    while (r < count) {
         id = far ? column[r].far : column[r].near;
         e = &index[(uint32_t)id];
         at = 0;

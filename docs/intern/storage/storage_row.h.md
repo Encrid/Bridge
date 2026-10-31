@@ -8,7 +8,7 @@ A row holds the id of its entity, at the start of the block, and a value in each
 Storage writes the id in two places: in `who`, which it reads, and in the block, which is a copy for modules.
 A row that leaves takes the last row into its place, column by column, with the bit of each toggled column.
 The entity of the moved row then gets its new place: in the entity index, or in the indexes of its sparse set.
-Each change marks the table touched.
+Each change marks the table touched, with no change of its columns: `reshaped` stays as it was.
 
 ## Functions
 

@@ -12,6 +12,10 @@ constexpr uint32_t STORAGE_TEST_ROWS = 204'800;
 constexpr uint32_t STORAGE_TEST_WEIGH_ROUNDS = 8;
 constexpr uint32_t STORAGE_TEST_OPS = 10;
 constexpr uint32_t STORAGE_TEST_MEASURE_ROUNDS = 6;
+constexpr uint32_t BOTH_MODULES = 6;
+constexpr uint32_t BOTH_SYSTEMS = 3;
+constexpr uint32_t BOTH_TYPES = 5;
+constexpr uint32_t BOTH_ROOM = 24;
 
 enum storage_test_end : int {
     STORAGE_TEST_DONE,
@@ -143,6 +147,7 @@ void storage_test_say_held(const bridge_world_t *w);
 
 int storage_test_measure_tables(storage_test_t *t);
 int storage_test_measure_stress(storage_test_t *t, uint32_t threads);
+int storage_test_measure_schedule(storage_test_t *t);
 
 int storage_test_weigh_sets(storage_test_t *t);
 int storage_test_weigh_toggles(storage_test_t *t);
@@ -161,7 +166,45 @@ enum storage_test_end storage_test_count_all(storage_test_t *t);
 enum storage_test_end storage_test_move_many(storage_test_t *t);
 enum storage_test_end storage_test_grow_many(storage_test_t *t);
 enum storage_test_end storage_test_wrap_generation(storage_test_t *t);
+typedef struct {
+    bridge_world_t w;
+    bridge_system_t *list[BOTH_ROOM];
+    declared_type_t types[BOTH_TYPES];
+    module_t mods[2 * BOTH_MODULES];
+    char fulls[BOTH_MODULES][BOTH_SYSTEMS][16];
+    char kinds_of[BOTH_TYPES][8];
+    bool current[BOTH_MODULES];
+    bool loaded[BOTH_MODULES];
+    uint32_t levels[BOTH_ROOM];
+    bool marks[BOTH_ROOM][2];
+    char why[256];
+    uint64_t seed;
+    uint32_t builds;
+    uint32_t kinds[3];
+    uint32_t differ;
+} storage_test_both_t;
+
 enum storage_test_end storage_test_go_deep(storage_test_t *t);
+enum storage_test_end storage_test_build_both(storage_test_t *t);
+enum storage_test_end storage_test_publish_cells(storage_test_t *t);
+enum storage_test_end storage_test_publish_reopen(storage_test_t *t);
+uint32_t *storage_test_cell_of(const bridge_world_t *w, const char *identity,
+    uint32_t table);
+uint32_t storage_test_find_table(const bridge_world_t *w);
+int storage_test_load_three(storage_test_t *t, bool with_ok);
+uint32_t storage_test_random(storage_test_both_t *b, uint32_t below);
+void storage_test_add_module(storage_test_both_t *b, uint32_t record);
+void storage_test_drop_module(storage_test_both_t *b, uint32_t record);
+void storage_test_name_both(storage_test_both_t *b);
+void storage_test_pair_names(storage_test_both_t *b, bridge_order_t *pairs,
+    uint32_t count);
+int storage_test_build_once(storage_test_both_t *b);
+void storage_test_set_parked(storage_test_both_t *b, uint32_t record,
+    bool parked);
+bridge_system_t *storage_test_make_system(module_t *m, uint32_t terms,
+    uint32_t changes, uint32_t words);
+int storage_test_build_all(bridge_world_t *w, char *why, size_t why_len);
+enum storage_test_end storage_test_run_pool(storage_test_t *t);
 enum storage_test_end storage_test_size_hash(storage_test_t *t);
 enum storage_test_end storage_test_grow_by_share(storage_test_t *t);
 enum storage_test_end storage_test_grow_past(storage_test_t *t);

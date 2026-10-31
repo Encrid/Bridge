@@ -61,7 +61,7 @@ void test_overflow_spans(host_t *h)
         return;
     test_load_mover(h);
     test_state_reader(&a);
-    a.cfg.spans = 16;
+    a.cfg.spans = 2;
     host_load(h, &a);
     host_run_frames(h, 1);
     host_close(h);

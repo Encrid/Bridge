@@ -65,11 +65,11 @@ static void settle_module(bridge_world_t *w, module_t *m)
 
 void schedule_account(bridge_world_t *w)
 {
-    module_t *m = w->modules;
+    module_t *m = w->work;
 
     while (m) {
         settle_module(w, m);
-        m = m->next;
+        m = m->next_work;
     }
 }
 

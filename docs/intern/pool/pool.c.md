@@ -4,7 +4,7 @@ This file makes and unmakes the pool of threads that a phase runs on.
 
 ## A pool made
 
-1. Allocate the pool, a byte for each of `most_jobs` jobs, the lock, the event `done` and the workers.
+1. Allocate the pool, an index for each of `most_jobs` jobs, the event `done` and the workers.
 2. If one of them is missing, start no worker.
 3. Start each worker in turn: the event that wakes it, then its thread, with `stack` bytes of stack.
 4. If a worker does not start, stop.
@@ -17,7 +17,7 @@ A pool of 0 workers, or for 0 jobs, still allocates one of each, so that each al
 ## A pool unmade
 
 `pool_destroy` sets `quit`, and then, for each worker that runs, sets its event, waits for its thread to end and frees its event.
-Then it frees the event `done`, the lock, the workers and the bytes of the taken jobs.
+Then it frees the event `done`, the workers and the indexes of `order`.
 
 ## Functions
 

@@ -9,6 +9,7 @@ A barrier follows each phase, and the host asks for one phase at a time.
 The schedule has an entry for each phase of the deployment, and one more entry for the barrier, at the index `phase_count`.
 A system is in the entry of its phase, and an observer is in the entry of the barrier: `docs/intern/abi/abi_system.c.md`, *observe*.
 `schedule_build` makes the schedule again when a module loads, reloads or unloads, and when a host sets the order.
+It looks only at the systems that changed, and at the groups that they join: `docs/intern/schedule/schedule_marks.c.md`.
 
 ## Conflicts
 
@@ -39,7 +40,7 @@ So a chain of pairs orders two systems also through a name that is not loaded.
 A module orders its own systems in `before`: `docs/extern/bridge_abi.h.md`, *add_system*.
 One author wrote both systems, so their order is in the module.
 Two systems of one module that conflict refuse the load if `before` does not order them, also if a pair orders them.
-`docs/intern/schedule/schedule_build.c.md`, *The steps of a phase*, tells what refuses a pair against `before`.
+`docs/intern/schedule/schedule_build.c.md`, *The check of an entry*, tells what refuses a pair against `before`.
 For a conflict, the order that a module states counts only between the systems of that module.
 
 Two systems of two modules that conflict in one phase refuse the load that brings the second one.
@@ -48,29 +49,44 @@ The refusal names both systems and the component.
 The order of declaration and the order of load never decide, so nothing depends on which module the host found first.
 Two observers at the barrier follow the same rules.
 
-So an unload, a failed load and a reload take away the order of no two loaded systems that conflict.
+So an unload, a failed load, a reload and a failed group reload take away the order of no two loaded systems that conflict.
 The `schedule_build` after each of them refuses nothing, and its callers drop no reason when they drop its result.
 
 ## Levels and jobs
 
-A phase runs its levels one after the other, and `docs/intern/schedule/schedule_build.c.md`, *Levels*, tells what a level holds.
-In one level, the systems of one module make one job: `docs/intern/schedule/schedule_jobs.c.md`, *The jobs of a level*.
+A phase runs its levels one after the other, and `docs/intern/schedule/schedule_levels.c.md`, *Levels*, tells what a level holds.
+In one level, the systems of one module make one job. A build that passes makes all the jobs: `docs/intern/schedule/schedule_commit.c.md`, *The jobs*.
+A run walks the jobs of its phase: `docs/intern/schedule/schedule_jobs.c.md`, *A run of the jobs*.
+
 One thread runs a job from its start to its end.
 The threads of `src/pool/pool.h` run the jobs of different modules at the same time.
 So the world runs modules in parallel, and the systems of one module one after the other.
 The systems of one module never overlap: they share the private memory of the module.
 
+A load, an unload, a reload, a failed load or reload, and a new `[order]` each change the list `systems` of the world.
+Each of them builds the schedule before the next phase. So the jobs are always those of the last build that passed.
+
 ## Cost
 
-For each phase, the schedule keeps the matrix of who runs before whom, `n` rows of `n` bits for `n` systems: `docs/intern/schedule/schedule_matrix.c.md`, *The matrix*.
-The edges of the pairs join rows with an or: at most `n^3 / 64` word operations at a load, for `n` systems in the phase.
-The order that the modules state keeps the matrix closed, with at most `3 n^3 / 128` more.
-For a phase of a thousand systems, that is at most some forty million operations.
-`set_levels` then gives each system its level, at most `n` passes over the `n^2` edges, so `n^3` comparisons for a chain of `n` systems.
+A build walks the list `systems` of the world a few times for each entry. It numbers the systems, finds the dirty ones and makes the jobs.
+The rest of its work grows with the group of each entry, and not with the world:
+
+- The group of `g` systems costs `g` times `S` tests of a neighbor, for `S` systems in the world: `docs/intern/schedule/schedule_group.c.md`, *Cost*.
+- Its matrix has `g` rows of `g` bits: `docs/intern/schedule/schedule_matrix.c.md`, *The matrix*.
+- The edges of the pairs join rows with an or: at most `g^3 / 64` word operations.
+- The order that the modules state keeps the matrix closed, with at most `3 g^3 / 128` more.
+- `schedule_set_levels` makes at most `g` passes over the `g^2` edges, so `g^3` comparisons for a chain of `g` systems.
+- The conflicts of a fresh system cost one test for each use of its components: `docs/intern/schedule/schedule_unordered.c.md`.
+
+A build after `bridge_set_order` marks each system, so each group is a whole phase.
+For a phase of a thousand systems, the matrix then costs at most some forty million operations.
 None of this runs in a frame.
+
+A phase walks only its own jobs, so its cost grows with its systems. A barrier walks only the jobs of the triggered observers.
 
 `schedule_room` makes the room for the schedule and for a dispatch once, at create, `[budget] systems` wide.
 So a load, a reload and an unload ask for no memory to build the schedule, and a phase allocates nothing.
+The index of the components lies in the blocks of the systems, so it asks for no memory either.
 The matrix of the names of `[order]` is closed each time the order is built: `n^3 / 64` word operations for `n` names.
 
 ## The failure budget
@@ -119,6 +135,8 @@ What one thread runs: the systems that one module has in one level, in the order
 | `m` | The module. |
 | `list` | Its systems, in the room of `run_lists`. |
 | `count` | How many systems. |
+| `phase` | The index of the phase, and `phase_count` for the barrier. |
+| `level` | The level of the systems. |
 
 ### schedule_pass_t
 
@@ -128,9 +146,7 @@ One phase that `schedule_run` runs.
 | --- | --- |
 | `w` | The world. |
 | `phase` | The index of the phase. |
-| `level` | The level that runs. |
-| `count` | How many jobs the level has. |
-| `listed` | How many systems the jobs of the level list. |
+| `count` | How many jobs the level that runs has handed. |
 | `ordinal` | How many systems have a number in this pass. |
 
 ## Functions
@@ -138,7 +154,7 @@ One phase that `schedule_run` runs.
 | Function | Result |
 | --- | --- |
 | `schedule_order` | Takes the pairs of `[order]`: `docs/intern/schedule/schedule_order.c.md`, *Functions*. |
-| `schedule_build` | Builds the schedule: `docs/intern/schedule/schedule_build.c.md`, *The steps of a phase*. |
+| `schedule_build` | Builds the schedule: `docs/intern/schedule/schedule_build.c.md`, *The loop*. |
 | `schedule_room` | Makes the room of the schedule: `docs/intern/schedule/schedule_account.c.md`, *Functions*. |
 | `schedule_run` | Runs one phase: `docs/intern/schedule/schedule_run.c.md`, *Functions*. |
 | `schedule_account` | Settles the failure budgets: `docs/intern/schedule/schedule_account.c.md`, *Functions*. |
@@ -150,7 +166,15 @@ One phase that `schedule_run` runs.
 | `schedule_close_matrix` | Closes a matrix: `docs/intern/schedule/schedule_closure.c.md`, *Functions*. |
 | `schedule_get_cycle` | Finds a system on a cycle: `docs/intern/schedule/schedule_closure.c.md`, *Functions*. |
 | `schedule_find_conflict` | Finds what two systems conflict over: `docs/intern/schedule/schedule_conflict.c.md`, *Functions*. |
-| `schedule_gather_phase` | Lists the systems of a phase: `docs/intern/schedule/schedule_edges.c.md`, *Functions*. |
+| `schedule_gather_group` | Gives the group of a phase: `docs/intern/schedule/schedule_group.c.md`, *Functions*. |
+| `schedule_set_levels` | Gives the levels of a group: `docs/intern/schedule/schedule_levels.c.md`, *Functions*. |
+| `schedule_is_neighbor` | Tells whether two systems are neighbors: `docs/intern/schedule/schedule_marks.c.md`, *Functions*. |
+| `schedule_mark_neighbors` | Marks the neighbors of a system dirty: `docs/intern/schedule/schedule_marks.c.md`, *Functions*. |
+| `schedule_leave_module` | Marks the neighbors of the systems of a module, and takes them out of the index: `docs/intern/schedule/schedule_marks.c.md`, *Functions*. |
+| `schedule_mark_all` | Marks each system for a build of the whole schedule: `docs/intern/schedule/schedule_marks.c.md`, *Functions*. |
+| `schedule_index_system` | Puts a system into the index of the components: `docs/intern/schedule/schedule_uses.c.md`, *Functions*. |
+| `schedule_unindex_system` | Takes the uses of a system out of the index: `docs/intern/schedule/schedule_uses.c.md`, *Functions*. |
+| `schedule_find_unordered` | Finds the first unordered pair of a group: `docs/intern/schedule/schedule_unordered.c.md`, *Functions*. |
 | `schedule_add_stated` | Adds the edges of the pairs: `docs/intern/schedule/schedule_edges.c.md`, *Functions*. |
 | `schedule_find_name` | Finds the index of a full name: `docs/intern/schedule/schedule_names.c.md`, *Functions*. |
 | `schedule_orders` | Tells whether the pairs order two systems: `docs/intern/schedule/schedule_names.c.md`, *Functions*. |
@@ -159,6 +183,15 @@ One phase that `schedule_run` runs.
 | `schedule_join_before` | Joins `t` to the systems before `s`: `docs/intern/schedule/schedule_before.c.md`, *Functions*. |
 | `schedule_is_stated_before` | Tells whether `before` orders two systems: `docs/intern/schedule/schedule_before.c.md`, *Functions*. |
 | `schedule_add_own` | Adds the edges of `before`: `docs/intern/schedule/schedule_edges.c.md`, *Functions*. |
+| `schedule_is_unordered` | Tells whether two systems conflict while nothing orders them: `docs/intern/schedule/schedule_check.c.md`, *Functions*. |
 | `schedule_check_phase` | Refuses a phase that it cannot schedule: `docs/intern/schedule/schedule_check.c.md`, *Functions*. |
 | `schedule_run_job` | Runs one job: `docs/intern/schedule/schedule_dispatch.c.md`, *Functions*. |
-| `schedule_gather_jobs` | Makes the jobs of one level: `docs/intern/schedule/schedule_jobs.c.md`, *Functions*. |
+| `schedule_is_due` | Tells if a system runs in its job now: a system always, an observer when something triggered it. |
+| `schedule_commit_jobs` | Makes the jobs of the last build: `docs/intern/schedule/schedule_commit.c.md`, *Functions*. |
+| `schedule_find_jobs` | Finds the first job of a phase: `docs/intern/schedule/schedule_jobs.c.md`, *Functions*. |
+| `schedule_hand_job` | Gives a job and its due systems to a level: `docs/intern/schedule/schedule_jobs.c.md`, *Functions*. |
+| `schedule_run_batch` | Runs and counts the handed jobs of a level: `docs/intern/schedule/schedule_run.c.md`, *Functions*. |
+| `schedule_trigger` | Lists a triggered observer: `docs/intern/schedule/schedule_triggered.c.md`, *Functions*. |
+| `schedule_untrigger` | Drops the observers of a module from the list: `docs/intern/schedule/schedule_triggered.c.md`, *Functions*. |
+| `schedule_clear_triggered` | Empties the list at the end of a barrier: `docs/intern/schedule/schedule_triggered.c.md`, *Functions*. |
+| `schedule_run_triggered` | Runs the jobs of the triggered observers: `docs/intern/schedule/schedule_triggered.c.md`, *Functions*. |

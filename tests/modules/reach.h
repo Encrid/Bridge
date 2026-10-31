@@ -26,7 +26,7 @@ static inline const uint32_t *get_blocks(const test_api_t *api)
 {
     const bridge_header_t *h = test_get_header(api);
 
-    return ((const uint32_t *)(api->private_base + h->blocks));
+    return ((const uint32_t *)(api->shared_base + h->blocks));
 }
 
 #endif

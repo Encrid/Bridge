@@ -23,7 +23,7 @@ TEST(count)
     uint32_t s = 0;
 
     while (s < q->spans) {
-        line.a0 += test_get_span(api, q, s, 1)[1];
+        line.a0 += test_count_rows(api, test_get_span(api, q, s, 1));
         s++;
     }
     test_log(api, BRIDGE_LOG_INFO, &line);

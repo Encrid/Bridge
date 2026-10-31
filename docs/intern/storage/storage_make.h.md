@@ -19,6 +19,8 @@ Storage puts it in `dirty`, in the hash, and in the lists of the systems: `docs/
 It makes the columns of the table 0, clears their hashes, marks it touched, and puts its id on the free list.
 `close_table` makes the record no table, and keeps what a barrier keeps of it: `incoming`, `sized` and `touched`.
 An id given back at this barrier is in `dirty` already, so `open_table` keeps `touched` when it takes the id again.
+Then a module that declared a type of the old table, and no type of the new one, could keep an old cell.
+So `open_table` sets `layout_moved` when it takes an id that is still touched, and the next publish writes each module whole.
 
 ## Functions
 

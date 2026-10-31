@@ -9,8 +9,9 @@
     #include "storage_set.h"
     #include "storage_sets.h"
 
-static inline void touch(storage_t *r, uint32_t t)
+static inline void touch(storage_t *r, uint32_t t, bool columns)
 {
+    r->tables[t].reshaped |= columns;
     if (r->tables[t].touched)
         return;
     r->tables[t].touched = true;

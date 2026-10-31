@@ -18,7 +18,7 @@ static void look_tables(const test_api_t *api)
 
     while (i < q->spans) {
         span = test_get_span(api, q, i, 2);
-        rows += span[1];
+        rows += test_count_rows(api, span);
         carried += bases[span[0] * types + ntag_m] == BRIDGE_CARRIED;
         i++;
     }
@@ -43,11 +43,11 @@ static void look_toggle(const test_api_t *api)
         span = test_get_span(api, q, i, 2);
         bits = test_get_bits(api, bases[span[0] * types + ntag_o]);
         row = 0;
-        while (row < span[1]) {
+        while (row < test_count_rows(api, span)) {
             on += (uint32_t)(bits[row >> 6] >> (row & 63)) & 1;
             row++;
         }
-        rows += span[1];
+        rows += test_count_rows(api, span);
         i++;
     }
     say(api, "O, a toggle: rows, and of them on", rows, on);

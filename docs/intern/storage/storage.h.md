@@ -132,13 +132,14 @@ How `storage_convert` ended.
 | `storage_validate_scan` | Reports to the caller every type with a changed column: `docs/intern/storage/storage_validate.c.md`, *Functions*. |
 | `storage_validate_baseline` | Takes the columns as the baseline of the next check: `docs/intern/storage/storage_validate.c.md`, *Functions*. |
 | `storage_make_writable` | Makes the set `writable` of a module: `docs/intern/storage/storage_slots.c.md`, *Functions*. |
-| `storage_let_write` | Records what a module may write: `docs/intern/storage/storage_slots.c.md`, *Functions*. |
+| `storage_let_use` | Records what a module declares, and what it may write: `docs/intern/storage/storage_slots.c.md`, *Functions*. |
 | `storage_let_keep` | Records whether a destroy keeps a type: `docs/intern/storage/storage_husk.c.md`, *Functions*. |
 | `storage_reserve` | Sets ids aside for a module: `docs/intern/storage/storage_ids.c.md`, *Functions*. |
 | `storage_publish` | Writes what a module reads: `docs/intern/storage/storage_publish.c.md`, *Functions*. |
 | `storage_end_publish` | Forgets which tables changed: `docs/intern/storage/storage_publish.c.md`, *Functions*. |
 | `storage_count_tables` | Counts the table ids: `docs/intern/storage/storage_publish.c.md`, *Functions*. |
 | `storage_usage` | Tells the live and the peak entities and tables: `docs/intern/storage/storage_usage.c.md`, *Functions*. |
+| `storage_is_reshaped` | Tells if the columns of a table moved: `docs/intern/storage/storage_usage.c.md`, *Functions*. |
 | `storage_count_carriers` | Counts the entities that carry a type: `docs/intern/storage/storage_carriers.c.md`, *Functions*. |
 | `storage_count_off` | Counts the toggled rows that are off: `docs/intern/storage/storage_values.c.md`, *Functions*. |
 | `storage_visit_carriers` | Visits each entity that carries a type: `docs/intern/storage/storage_carriers.c.md`, *Functions*. |

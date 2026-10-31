@@ -84,5 +84,7 @@ enum storage_test_end storage_test_measure(storage_test_t *t)
         return (STORAGE_TEST_FAILED);
     if (storage_test_measure_stress(t, 4) || storage_test_measure_stress(t, 1))
         return (STORAGE_TEST_FAILED);
+    if (storage_test_measure_schedule(t))
+        return (STORAGE_TEST_FAILED);
     return (STORAGE_TEST_DONE);
 }

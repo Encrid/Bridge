@@ -11,9 +11,15 @@
 
 void test_pass_chain(host_t *h)
 {
+    bridge_artifact_t a;
+
     h->cfg.observer_passes = (uint32_t)atoi(h->arg);
     if (host_open(h))
         return;
+    if (strchr(h->arg, 'e')) {
+        group_state(&a, "game:twoears@0.1.0", "twoears");
+        host_load(h, &a);
+    }
     test_load_guarded(h, "game:chain@0.1.0", "chain");
     (void)bridge_run_phase(h->w, "update");
     printf("one call\n");

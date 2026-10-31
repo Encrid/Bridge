@@ -31,12 +31,11 @@ typedef struct {
 
 static bridge_system_t *make_sys(module_t *m, declared_type_t *c)
 {
-    bridge_system_t *s = calloc(1, sizeof(*s) + sizeof(system_term_t));
+    bridge_system_t *s = storage_test_make_system(m, 1, 0, 1);
 
     if (s) {
-        s->m = m;
-        s->terms = 1;
         s->term[0] = (system_term_t){ c, true };
+        schedule_index_system(s);
     }
     return (s);
 }
@@ -46,9 +45,12 @@ static bool setup(phase_world_t *o, bridge_system_t **s, bridge_world_t *w,
 {
     w->build_in = calloc(4, sizeof(*w->build_in));
     w->build_bits = calloc(9, sizeof(*w->build_bits));
+    w->run_jobs = calloc(4, sizeof(schedule_job_t));
+    w->run_lists = calloc(4, sizeof(*w->run_lists));
     s[0] = make_sys(&o->m, &o->a);
     s[1] = make_sys(&o->n, &o->b);
-    if (!w->build_in || !w->build_bits || !s[0] || !s[1]
+    if (!w->build_in || !w->build_bits || !w->run_jobs || !w->run_lists
+        || !s[0] || !s[1]
         || schedule_order(w, cross ? PHASE_PAIR : SAME_PAIRS, cross ? 1 : 3))
         return (false);
     s[0]->full = FA;
@@ -69,6 +71,8 @@ static void free_phase(bridge_world_t *w, bridge_system_t **s)
     schedule_free_pairs(&w->order);
     free(w->build_in);
     free(w->build_bits);
+    free(w->run_jobs);
+    free(w->run_lists);
 }
 
 enum storage_test_end storage_test_order_phase(storage_test_t *t)
@@ -84,7 +88,7 @@ enum storage_test_end storage_test_order_phase(storage_test_t *t)
 
     if (!setup(&o, s, &w, !strcmp(t->what, "orderphases")))
         printf("FAIL: the world of the phases was not made\n");
-    refused = schedule_build(&w, why, sizeof(why));
+    refused = storage_test_build_all(&w, why, sizeof(why));
     printf("%s: %s%s\n", t->what, refused ? "refused: " : "built", why);
     free_phase(&w, s);
     return (STORAGE_TEST_DONE);

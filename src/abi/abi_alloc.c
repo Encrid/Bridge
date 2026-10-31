@@ -63,6 +63,8 @@ bool abi_marks(module_t *m, uint32_t more)
 
 void abi_park(bridge_world_t *w, bridge_system_t *s)
 {
+    schedule_mark_neighbors(w, s);
+    block_note_work(w, s->m);
     if (s->matched)
         storage_forget(w->storage, s->matched);
     s->matched = nullptr;
@@ -83,5 +85,7 @@ void abi_unpark(bridge_world_t *w, bridge_system_t *s)
     else if (s->terms)
         s->matched = storage_add_system(w->storage, s->asked, s->terms);
     s->parked = 0;
+    s->dirty = true;
+    block_note_work(w, s->m);
     w->parked--;
 }

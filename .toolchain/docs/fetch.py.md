@@ -84,6 +84,10 @@ The stamp of a source is the digest of its archive, then the digest of each patc
 
 If the address has no `://`, it is a file of the project, and `sources` makes a `file:` address from it.
 
+`top` can hold variables, for example `{target}`. Then one archive, with one digest, holds the files of each target in a folder of its own.
+The command `fetch` fetches it one time. Each build sets `{<name>}` to the folder of its own target.
+`fetch` applies the patches only to the `top` folder of the target of this machine.
+
 ## Limits
 
 No case runs these branches. The workflows run some of them.

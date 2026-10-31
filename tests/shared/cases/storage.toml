@@ -203,6 +203,36 @@ claims = { status = 0, matches = ["a call of 6144 frames of 4096 bytes gave [0-9
 false = { run = ["{out}/storage{exe}", "deep", "8388608"] }
 
 [[case]]
+name = "pool_run-runs-each-job-once-and-the-jobs-of-the-caller-on-it"
+run = ["{out}/storage{exe}", "pool", "2000"]
+claims = { matches = ["64 of 64 jobs ran 2000 times each, and 0 runs of a job of the caller were on a worker.*alive"] }
+false = { run = ["{out}/storage{exe}", "pool", "1999"] }
+
+[[case]]
+name = "schedule_build-of-the-changed-groups-gives-the-levels-and-the-refusals-of-a-whole-build"
+run = ["{out}/storage{exe}", "both", "2000"]
+claims = { matches = ["both ways: 2000 worlds, 44682 builds, refused 2133 for 2 phases, 137 for a cycle and 5898 for a conflict, 0 differ.*alive"] }
+false = { run = ["{out}/storage{exe}", "both", "1999"] }
+
+[[case]]
+name = "storage-publish-writes-no-cell-when-only-rows-change"
+run = ["{out}/storage{exe}", "cells", "rows"]
+claims = { matches = ["rows 3, cell of store kept, cell of typer kept.*alive"] }
+false = { run = ["{out}/storage{exe}", "cells", "columns"] }
+
+[[case]]
+name = "storage-publish-writes-the-cells-of-a-moved-table-only-for-its-declarers"
+run = ["{out}/storage{exe}", "cells", "columns"]
+claims = { matches = ["rows 0, cell of store written, cell of typer kept.*alive"] }
+false = { run = ["{out}/storage{exe}", "cells", "full"] }
+
+[[case]]
+name = "storage-publish-a-table-id-taken-again-before-a-publish-writes-each-module-whole"
+run = ["{out}/storage{exe}", "reopen", "unpublished"]
+claims = { matches = ["table taken again, cell of typer written.*alive"] }
+false = { run = ["{out}/storage{exe}", "reopen", "published"] }
+
+[[case]]
 name = "table_hash_fill-of-25-gives-the-hash-four-places-for-each-table-id"
 run = ["{out}/storage{exe}", "hashroom", "25"]
 claims = { matches = ["hash room 8 for 2 table ids.*alive"] }
@@ -430,7 +460,7 @@ false = { run = ["{out}/storage{exe}", "measure"] }
 name = "storage-measure"
 alone = true
 run = ["{out}/storage{exe}", "measure"]
-claims = { matches = ["an id handed out +[0-9.]+ ns each.*ten thousand tables made.*the stress run, on 1 thread.*alive"] }
+claims = { matches = ["an id handed out +[0-9.]+ ns each.*ten thousand tables made.*the stress run, on 1 thread.*a phase of a thousand modules, on 1 thread +[0-9.]+ us.*a barrier of a thousand idle modules +[0-9.]+ us.*a barrier after a thousand queued changes +[0-9.]+ us.*a load beside a thousand modules +[0-9.]+ us.*an unload beside a thousand modules +[0-9.]+ us.*a barrier after one changed table beside a thousand modules +[0-9.]+ us.*a phase of a thousand modules, on 6 threads +[0-9.]+ us.*alive"] }
 false = { run = ["{out}/storage{exe}", "stress1"] }
 
 [[case]]
