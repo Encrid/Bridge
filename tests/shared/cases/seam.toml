@@ -3063,6 +3063,12 @@ claims = { matches = ["game:lurker@0\\.1\\.0/look: rows 1 0.*alive"], lacks = ["
 false = { run = ["{out}/seam{exe}", "barrier-publishes-a-changed-table-to-a-module-that-ran-nothing"] }
 
 [[case]]
+name = "barrier-shows-an-idle-module-the-rows-of-a-table-whose-rows-alone-changed"
+run = ["{out}/seam{exe}", "barrier-shows-an-idle-module-the-rows-of-a-table-whose-rows-alone-changed"]
+claims = { matches = ["game:lurker@0\\.1\\.0/look: rows 6 0.*alive"] }
+false = { run = ["{out}/seam{exe}", "barrier-publishes-a-changed-table-to-a-module-that-ran-nothing"] }
+
+[[case]]
 name = "barrier-empties-the-list-of-an-observer-whose-module-ran-nothing"
 run = ["{out}/seam{exe}", "barrier-empties-the-list-of-an-observer-whose-module-ran-nothing"]
 claims = { matches = ["game:lurker@0\\.1\\.0/-: kept 0 0.*unloaded.*alive"] }

@@ -186,6 +186,12 @@ typedef struct {
 
 enum storage_test_end storage_test_go_deep(storage_test_t *t);
 enum storage_test_end storage_test_build_both(storage_test_t *t);
+enum storage_test_end storage_test_publish_cells(storage_test_t *t);
+enum storage_test_end storage_test_publish_reopen(storage_test_t *t);
+uint32_t *storage_test_cell_of(const bridge_world_t *w, const char *identity,
+    uint32_t table);
+uint32_t storage_test_find_table(const bridge_world_t *w);
+int storage_test_load_three(storage_test_t *t, bool with_ok);
 uint32_t storage_test_random(storage_test_both_t *b, uint32_t below);
 void storage_test_add_module(storage_test_both_t *b, uint32_t record);
 void storage_test_drop_module(storage_test_both_t *b, uint32_t record);

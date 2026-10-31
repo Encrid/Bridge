@@ -661,6 +661,8 @@ static const host_case_t TEST_CASES[] = {
         test_rows_of_idle, "2", test_set_counting },
     { "barrier-publishes-a-changed-table-in-one-frame",
         test_rows_of_idle, "1", test_set_counting },
+    { "barrier-shows-an-idle-module-the-rows-of-a-table-whose-rows-alone-changed",
+        test_rows_of_idle, "6", test_set_counting },
     { "barrier-empties-the-list-of-an-observer-whose-module-ran-nothing",
         test_kept_triggers, "present", test_set_counting },
     { "barrier-keeps-the-list-of-an-observer-until-the-next-barrier",
