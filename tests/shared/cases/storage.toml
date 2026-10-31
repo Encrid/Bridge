@@ -430,7 +430,7 @@ false = { run = ["{out}/storage{exe}", "measure"] }
 name = "storage-measure"
 alone = true
 run = ["{out}/storage{exe}", "measure"]
-claims = { matches = ["an id handed out +[0-9.]+ ns each.*ten thousand tables made.*the stress run, on 1 thread.*alive"] }
+claims = { matches = ["an id handed out +[0-9.]+ ns each.*ten thousand tables made.*the stress run, on 1 thread.*a phase of a thousand modules, on 1 thread +[0-9.]+ us.*a barrier of a thousand idle modules +[0-9.]+ us.*a barrier after a thousand queued changes +[0-9.]+ us.*a load beside a thousand modules +[0-9.]+ us.*an unload beside a thousand modules +[0-9.]+ us.*a phase of a thousand modules, on 6 threads +[0-9.]+ us.*alive"] }
 false = { run = ["{out}/storage{exe}", "stress1"] }
 
 [[case]]

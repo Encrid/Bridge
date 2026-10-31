@@ -368,6 +368,12 @@ defines = ["BRIDGE_ROWS_CHECKED"]
 variants = [{ name = "places_before", defines = ["BRIDGE_ROWS_CHECKED", "BEFORE"] }]
 
 [[modules]]
+name = "timed"
+sources = ["tests/modules/timed.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+path = true
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
 name = "shout-forged"
 sources = ["tests/modules/shout.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED", "FORGED"]
