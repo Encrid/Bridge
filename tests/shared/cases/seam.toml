@@ -819,6 +819,12 @@ claims = { matches = ["b1 p\\d+ game:chain@0.1.0/got_a: hop A.*b2 p\\d+ game:cha
 false = { run = ["{out}/seam{exe}", "observer_passes-of-1-ends-one-hop-in-one-call"] }
 
 [[case]]
+name = "observer_passes-of-3-ends-a-chain-after-a-module-that-queued-nothing"
+run = ["{out}/seam{exe}", "observer_passes-of-3-ends-a-chain-after-a-module-that-queued-nothing"]
+claims = { matches = ["game:twoears@0\\.1\\.0/left_heard: heard.*got_a: hop A.*got_b: hop B.*got_c: hop C.*one call.*alive"] }
+false = { run = ["{out}/seam{exe}", "observer_passes-of-1-ends-one-hop-in-one-call"] }
+
+[[case]]
 name = "module_config.element_limit-unset-refused"
 run = ["{out}/seam{exe}", "module_config.element_limit-unset-refused"]
 claims = { matches = ["module 'test:ok@0.1.0' is refused: element_limit is unset.*alive"] }
@@ -3043,6 +3049,30 @@ name = "observe-triggered-observers-of-two-modules-share-a-level"
 run = ["{out}/seam{exe}", "observe-triggered-observers-of-two-modules-share-a-level"]
 claims = { matches = ["p0 game:twoears@0\\.1\\.0/left_heard: heard.*p1 game:ears@0\\.1\\.0/left_heard: heard.*alive"] }
 false = { run = ["{out}/seam{exe}", "observe-only-the-triggered-observer-runs"] }
+
+[[case]]
+name = "barrier-publishes-a-changed-table-to-a-module-that-ran-nothing"
+run = ["{out}/seam{exe}", "barrier-publishes-a-changed-table-to-a-module-that-ran-nothing"]
+claims = { matches = ["game:lurker@0\\.1\\.0/look: rows 1 0.*game:lurker@0\\.1\\.0/look: rows 2 0.*alive"] }
+false = { run = ["{out}/seam{exe}", "barrier-publishes-a-changed-table-in-one-frame"] }
+
+[[case]]
+name = "barrier-publishes-a-changed-table-in-one-frame"
+run = ["{out}/seam{exe}", "barrier-publishes-a-changed-table-in-one-frame"]
+claims = { matches = ["game:lurker@0\\.1\\.0/look: rows 1 0.*alive"], lacks = ["rows 2"] }
+false = { run = ["{out}/seam{exe}", "barrier-publishes-a-changed-table-to-a-module-that-ran-nothing"] }
+
+[[case]]
+name = "barrier-empties-the-list-of-an-observer-whose-module-ran-nothing"
+run = ["{out}/seam{exe}", "barrier-empties-the-list-of-an-observer-whose-module-ran-nothing"]
+claims = { matches = ["game:lurker@0\\.1\\.0/-: kept 0 0.*unloaded.*alive"] }
+false = { run = ["{out}/seam{exe}", "barrier-keeps-the-list-of-an-observer-until-the-next-barrier"] }
+
+[[case]]
+name = "barrier-keeps-the-list-of-an-observer-until-the-next-barrier"
+run = ["{out}/seam{exe}", "barrier-keeps-the-list-of-an-observer-until-the-next-barrier"]
+claims = { matches = ["game:lurker@0\\.1\\.0/-: kept 1 0.*unloaded.*alive"] }
+false = { run = ["{out}/seam{exe}", "barrier-empties-the-list-of-an-observer-whose-module-ran-nothing"] }
 
 [[case]]
 name = "config.order-pair-orders-two-systems-of-one-module"
