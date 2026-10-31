@@ -163,6 +163,7 @@ enum storage_test_end storage_test_move_many(storage_test_t *t);
 enum storage_test_end storage_test_grow_many(storage_test_t *t);
 enum storage_test_end storage_test_wrap_generation(storage_test_t *t);
 enum storage_test_end storage_test_go_deep(storage_test_t *t);
+enum storage_test_end storage_test_run_pool(storage_test_t *t);
 enum storage_test_end storage_test_size_hash(storage_test_t *t);
 enum storage_test_end storage_test_grow_by_share(storage_test_t *t);
 enum storage_test_end storage_test_grow_past(storage_test_t *t);
