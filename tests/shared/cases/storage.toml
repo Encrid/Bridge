@@ -215,6 +215,24 @@ claims = { matches = ["both ways: 2000 worlds, 44682 builds, refused 2133 for 2 
 false = { run = ["{out}/storage{exe}", "both", "1999"] }
 
 [[case]]
+name = "storage-publish-writes-no-cell-when-only-rows-change"
+run = ["{out}/storage{exe}", "cells", "rows"]
+claims = { matches = ["rows 3, cell of store kept, cell of typer kept.*alive"] }
+false = { run = ["{out}/storage{exe}", "cells", "columns"] }
+
+[[case]]
+name = "storage-publish-writes-the-cells-of-a-moved-table-only-for-its-declarers"
+run = ["{out}/storage{exe}", "cells", "columns"]
+claims = { matches = ["rows 0, cell of store written, cell of typer kept.*alive"] }
+false = { run = ["{out}/storage{exe}", "cells", "full"] }
+
+[[case]]
+name = "storage-publish-a-table-id-taken-again-before-a-publish-writes-each-module-whole"
+run = ["{out}/storage{exe}", "reopen", "unpublished"]
+claims = { matches = ["table taken again, cell of typer written.*alive"] }
+false = { run = ["{out}/storage{exe}", "reopen", "published"] }
+
+[[case]]
 name = "table_hash_fill-of-25-gives-the-hash-four-places-for-each-table-id"
 run = ["{out}/storage{exe}", "hashroom", "25"]
 claims = { matches = ["hash room 8 for 2 table ids.*alive"] }

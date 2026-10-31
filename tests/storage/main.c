@@ -92,6 +92,8 @@ static const storage_test_case_t CASES[] = {
     { "deep", storage_test_go_deep, &FOUR_THREADS },
     { "pool", storage_test_run_pool, &FOUR_THREADS },
     { "both", storage_test_build_both, &PLAIN },
+    { "cells", storage_test_publish_cells, &PLAIN },
+    { "reopen", storage_test_publish_reopen, &PLAIN },
     { "hashroom", storage_test_size_hash, &ONE_TABLE },
     { "growth", storage_test_grow_by_share, &ONE_TABLE },
     { "asks", storage_test_ask_less, &ONE_TABLE },
