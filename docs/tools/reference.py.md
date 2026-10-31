@@ -34,7 +34,7 @@ The 3 programs come from the tree of the tool, so the runs of 2 trees use the sa
 
 | Command | Source | What it measures |
 | --- | --- | --- |
-| `storage measure` | `tests/storage/storage_test_measure.c` | Each operation of storage: its best round, its first round on new tables, and the cost of the call of a module. It also times ten thousand tables and sets that it makes and fills, a barrier with nothing to do, and a stress run. The stress run uses 4 threads, then 1 thread. |
+| `storage measure` | `tests/storage/storage_test_measure.c` | Each operation of storage: its best round, its first round on new tables, and the cost of the call of a module. It also times ten thousand tables and sets that it makes and fills, a barrier with nothing to do, and a stress run. The stress run uses 4 threads, then 1 thread. At the end, it loads a thousand modules of one system, and times a phase of them on 1 thread and on 6 threads. It times a barrier with no change, and a barrier after a change of each module. It times a load and an unload beside them. |
 | `storage weigh` | `tests/storage/storage_test_weigh.c` | An attach and a detach for each size of an entity, and a walk of the same rows in more and more tables. It also weighs a sparse set, a toggle, a direct-indexed component, markers, a singleton, and a toggle that a write switches. |
 | `storage baseline` | `tests/storage/storage_test_baseline.c` | The reads of values: through a query, with a test of a field, and of one value on one entity. |
 | `flecs_ref` | `tests/shared/reference/flecs_ref.c` and the files `flecs_ref_*.c` | The same operations in flecs. |
