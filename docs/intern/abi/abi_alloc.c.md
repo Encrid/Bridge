@@ -54,5 +54,5 @@ The places it had are free again, since whatever took them was dropped.
 | `abi_refuse` | Refuses the call in progress, with why, written as `printf` writes. Keeps only the first refusal of a call. Gives 1. |
 | `abi_alloc` | `alloc(len) -> offset`: `len` bytes, rounded up to eight, from the share of the module, or of its `lender`, in the persistent arena. |
 | `abi_marks` | Makes room for the marks of the queue of a module. False if there is no memory. |
-| `abi_park` | Marks the neighbors of a system dirty, and takes the system out of storage, for a reload. |
-| `abi_unpark` | Puts a parked system back in storage: an observer with its listener, a system with its terms. A system with no term stays out of storage. Marks the system dirty. |
+| `abi_park` | Marks the neighbors of a system dirty, puts its module on the work list, and takes the system out of storage, for a reload. |
+| `abi_unpark` | Puts a parked system back in storage: an observer with its listener, a system with its terms. A system with no term stays out of storage. Marks the system dirty, and notes its module: `docs/intern/block/block_work.c.md`. |

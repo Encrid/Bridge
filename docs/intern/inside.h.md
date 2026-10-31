@@ -165,6 +165,9 @@ A system and an observer are a query and a function either way, so one record se
 | `loss_rows` | By loss: how many rows lost something under that name, plus one. Zero if none did. |
 | `refused`, `why` | An entry refused during the call in progress, and why. |
 | `next` | The next loaded module. |
+| `next_work`, `working` | The next module of the work list, and whether the module is on it: `docs/intern/block/block_work.c.md`. |
+| `linked` | Whether the world lists the module among its modules. |
+| `place` | Its rank among the modules: `docs/intern/block/block_sort.c.md`. |
 
 The library keeps here each offset that it acts on, and never reads the offset back from the header.
 `docs/intern/block/block_log.c.md`, *A line handed to the sink*, tells why.
@@ -247,6 +250,8 @@ A `schedule_pairs_t` holds the pairs of `[order]`: `docs/intern/schedule/schedul
 | `kept`, `kept_count` | The shares that stay after their module unloaded: `docs/intern/config/config_kept.c.md`, *The list of shares*. |
 | `systems`, `system_count` | The systems of every module, in the order of registration: `docs/intern/abi/abi_subscribe.c.md`, *The slot*. |
 | `modules`, `module_count`, `max_modules` | The loaded modules, how many, and `[budget] modules`. |
+| `work`, `work_mixed` | The head of the work list, and whether the list needs a sort: `docs/intern/block/block_work.c.md`. |
+| `places` | The place that the next loaded module gets. |
 | `profile` | Whether a phase times each system and observer: true when `profile` of the config is `BRIDGE_TRUE`. `docs/intern/schedule/schedule_dispatch.c.md`, *The time*. |
 | `validate` | Whether a phase checks each column for a write no system declared: true when `validate` of the config is `BRIDGE_TRUE`. `docs/intern/schedule/schedule_dispatch.c.md`, *The check*. |
 | `observer_passes` | From the deployment: how many barriers a call can run: `docs/intern/block/block_barrier.c.md`, *Passes*. |

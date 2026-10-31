@@ -7,12 +7,13 @@ It also takes the systems and the observers of a module out of storage.
 
 `module_discard` frees the parts of a module in this order:
 
-1. Its systems and its observers.
-2. Its instance.
-3. Its image.
-4. Its private memory, as its backend sees it.
-5. The block of its private memory.
-6. Its record.
+1. Its place on the work list: `docs/intern/block/block_work.c.md`.
+2. Its systems and its observers.
+3. Its instance.
+4. Its image.
+5. Its private memory, as its backend sees it.
+6. The block of its private memory.
+7. Its record.
 
 The order is the order of the backend seam: a memory is released after the last instance that it was handed to.
 An instance can hold the memory for as long as it runs, so the memory is never released before the instance goes.

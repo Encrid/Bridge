@@ -21,13 +21,14 @@ So the ids that a module gets, and the rows that its changes land in, are the sa
 The queue of a module is in that order already.
 So each module keeps a mark for each call that queued something: the turn of the call, and where its changes begin in the queue.
 The barrier takes next the run of the module whose next mark has the lowest turn.
+It looks only at the modules of the work list, since each module that queued something ran code: `docs/intern/block/block_work.c.md`.
 The turn of a system is in `docs/intern/schedule/schedule_jobs.c.md`, *The turn of a system*, and a lifecycle call has the kind `TURN_LIFECYCLE`.
 
 ## Functions
 
 | Function | Result |
 | --- | --- |
-| `reset_marks` | Starts each module again at its first mark. |
+| `reset_marks` | Starts each module of the work list again at its first mark. |
 | `find_next_run` | Gives the module whose next run comes first, or `nullptr` when storage took each queue whole. |
 | `take_next_run` | Takes the next run of changes: one module, one turn. Gives the module, and writes where the run begins and ends in its queue. |
 | `is_written` | Gives whether a change is an attach whose value storage writes. The barrier changed its entity, did not destroy it or leave it as it was, and the id has its generation. |
