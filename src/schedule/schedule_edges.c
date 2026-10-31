@@ -3,30 +3,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
-#include <string.h>
-
-#include "bits.h"
 #include "schedule.h"
-
-void schedule_gather_phase(bridge_world_t *w, schedule_phase_t *p)
-{
-    uint32_t i = 0;
-    size_t words;
-
-    p->n = 0;
-    while (i < w->system_count) {
-        if (w->systems[i]->phase == p->phase && !w->systems[i]->parked) {
-            p->in[p->n] = w->systems[i];
-            p->n++;
-        }
-        i++;
-    }
-    p->reach.n = p->n;
-    p->reach.words = bits_words(p->n);
-    p->reach.bits = w->build_bits;
-    words = schedule_get_matrix_words(p->n);
-    memset(p->reach.bits, 0, words * sizeof(*p->reach.bits));
-}
 
 static void add_stated_from(const bridge_world_t *w, schedule_phase_t *p,
     uint32_t i)

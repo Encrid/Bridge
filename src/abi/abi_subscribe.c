@@ -80,6 +80,9 @@ static uint32_t list_system(subscribing_t *g)
         m->observers[m->observer_count++] = g->s;
     else
         m->systems[m->system_count++] = g->s;
+    g->s->fresh = true;
+    g->s->dirty = true;
+    schedule_index_system(g->s);
     return (g->slot);
 }
 
