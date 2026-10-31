@@ -84,7 +84,8 @@ void storage_validate_baseline(storage_t *r);
 
 [[nodiscard]] bool storage_make_writable(storage_t *r, module_t *m);
 
-void storage_let_write(storage_t *r, module_t *m, storage_type_t *type);
+void storage_let_use(const storage_t *r, module_t *m,
+    const storage_type_t *type, bool write);
 
 void storage_let_keep(storage_t *r, const storage_type_t *type, bool keep);
 
@@ -99,7 +100,7 @@ uint32_t storage_count_tables(storage_t *r);
 
 storage_usage_t storage_usage(const storage_t *r);
 
-bool storage_is_dirty(const storage_t *r);
+bool storage_is_reshaped(const storage_t *r);
 
 uint32_t storage_count_carriers(storage_t *r, const storage_type_t *type);
 

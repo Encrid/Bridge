@@ -25,7 +25,7 @@ static void stop_full(bridge_world_t *w, module_t *m, const char *list)
 
 void block_publish_all(bridge_world_t *w)
 {
-    bool all = w->layout_moved || storage_is_dirty(w->storage);
+    bool all = w->layout_moved || storage_is_reshaped(w->storage);
     module_t *m;
     const char *list;
 

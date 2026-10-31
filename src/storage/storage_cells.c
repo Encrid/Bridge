@@ -71,14 +71,15 @@ static void write_every_cell(publish_t *p)
 void storage_publish_cells(publish_t *p)
 {
     const storage_t *r = p->r;
-    uint32_t i = 0;
+    uint32_t t;
 
     if (p->all) {
         write_every_cell(p);
         return;
     }
-    while (i < r->dirty_count) {
-        write_cells(p, r->dirty[i]);
-        i++;
+    for (uint32_t i = 0; i < r->dirty_count; i++) {
+        t = r->dirty[i];
+        if (r->tables[t].reshaped && has_declared(r, p->m, t))
+            write_cells(p, t);
     }
 }

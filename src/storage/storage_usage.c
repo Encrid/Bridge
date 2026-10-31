@@ -28,7 +28,11 @@ storage_usage_t storage_usage(const storage_t *r)
     return (u);
 }
 
-bool storage_is_dirty(const storage_t *r)
+bool storage_is_reshaped(const storage_t *r)
 {
-    return (r->dirty_count != 0);
+    uint32_t i = 0;
+
+    while (i < r->dirty_count && !r->tables[r->dirty[i]].reshaped)
+        i++;
+    return (i < r->dirty_count);
 }

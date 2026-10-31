@@ -71,8 +71,7 @@ static uint32_t take_slot(declaring_t *g)
     m->policy[i] = g->d.on_unload;
     m->declared[i] = c;
     m->may_write[i] = abi_is_writable(m, c);
-    if (m->may_write[i])
-        storage_let_write(m->w->storage, m, c->type);
+    storage_let_use(m->w->storage, m, c->type, m->may_write[i]);
     storage_let_keep(m->w->storage, c->type,
         c->on_destroy == BRIDGE_ON_DESTROY_KEEP);
     c->declarers++;

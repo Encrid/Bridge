@@ -84,6 +84,7 @@ void storage_end_publish(storage_t *r)
         rows[t] = r->tables[t].rows;
         blocks[t] = r->tables[t].block;
         r->tables[t].touched = false;
+        r->tables[t].reshaped = false;
     }
     r->dirty_count = 0;
 }

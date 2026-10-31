@@ -62,6 +62,7 @@ typedef struct {
     uint32_t incoming;
     bool live;
     bool touched;
+    bool reshaped;
     bool sized;
     bool named;
     uint32_t set;
