@@ -17,6 +17,7 @@
 
 typedef struct module module_t;
 typedef struct declared_type declared_type_t;
+typedef struct system_use system_use_t;
 
 typedef struct {
     char *name;
@@ -52,6 +53,7 @@ struct declared_type {
     bool superseded;
     storage_run_t *runs;
     uint32_t run_count;
+    system_use_t *uses;
 };
 
 typedef struct {
@@ -63,6 +65,12 @@ typedef struct {
     declared_type_t *touches;
     bool writes;
 } system_term_t;
+
+struct system_use {
+    struct bridge_system *s;
+    declared_type_t *type;
+    system_use_t *next;
+};
 
 typedef struct bridge_system {
     module_t *m;
@@ -78,6 +86,10 @@ typedef struct bridge_system {
     backend_func_t *fn;
     uint32_t level;
     uint32_t job;
+    bool fresh;
+    bool dirty;
+    uint32_t at;
+    uint64_t grouped;
     int parked;
     int observer;
     pending_t *pending;
@@ -94,6 +106,8 @@ typedef struct bridge_system {
     uint32_t change_count;
     uint32_t slot;
     uint64_t *stated_before;
+    system_use_t *use;
+    uint32_t use_count;
     uint64_t calls;
     uint64_t nanos;
     system_term_t term[];
@@ -262,6 +276,7 @@ struct bridge_world {
     bridge_system_t *triggered;
     void **build_in;
     uint64_t *build_bits;
+    uint64_t build_stamp;
     schedule_pairs_t order;
     pool_t *pool;
     uint8_t *shared;

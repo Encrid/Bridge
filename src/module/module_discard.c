@@ -27,6 +27,7 @@ void module_drop_systems(bridge_world_t *w, module_t *m)
     uint32_t i = 0;
 
     schedule_untrigger(w, m);
+    schedule_leave_module(w, m);
     while (i < w->system_count) {
         s = w->systems[i];
         if (s->m == m)

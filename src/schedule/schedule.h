@@ -70,7 +70,25 @@ uint32_t schedule_get_cycle(const schedule_matrix_t *m);
 const char *schedule_find_conflict(const bridge_system_t *a,
     const bridge_system_t *w, bool *changing);
 
-void schedule_gather_phase(bridge_world_t *w, schedule_phase_t *p);
+void schedule_gather_group(bridge_world_t *w, schedule_phase_t *p);
+
+void schedule_set_levels(schedule_phase_t *p);
+
+bool schedule_is_neighbor(const bridge_world_t *w, const bridge_system_t *s,
+    const bridge_system_t *t);
+
+void schedule_mark_neighbors(bridge_world_t *w, const bridge_system_t *s);
+
+void schedule_leave_module(bridge_world_t *w, const module_t *m);
+
+void schedule_mark_all(bridge_world_t *w);
+
+void schedule_index_system(bridge_system_t *s);
+
+void schedule_unindex_system(bridge_system_t *s);
+
+bool schedule_find_unordered(const schedule_phase_t *p,
+    const bridge_system_t **pair);
 
 void schedule_add_stated(const bridge_world_t *w, schedule_phase_t *p);
 
@@ -89,6 +107,9 @@ bool schedule_is_stated_before(const bridge_system_t *s,
     const bridge_system_t *t);
 
 void schedule_add_own(schedule_phase_t *p);
+
+bool schedule_is_unordered(const schedule_pairs_t *order,
+    const bridge_system_t *s, const bridge_system_t *t);
 
 int schedule_check_phase(schedule_phase_t *p);
 

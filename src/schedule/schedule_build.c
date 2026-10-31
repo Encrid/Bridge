@@ -7,71 +7,56 @@
 
 #include "schedule.h"
 
-static bool raise_after(schedule_phase_t *p, uint32_t i)
+static void number_systems(bridge_world_t *w)
 {
-    uint32_t level = p->in[i]->level;
-    bool raised = false;
-
-    for (uint32_t j = 0; j < p->n; j++) {
-        if (i != j && schedule_reaches(&p->reach, i, j)
-            && p->in[j]->level <= level) {
-            p->in[j]->level = level + 1;
-            raised = true;
-        }
-    }
-    return (raised);
+    for (uint32_t i = 0; i < w->system_count; i++)
+        w->systems[i]->at = i;
 }
 
-static bool raise_all(schedule_phase_t *p)
+static void make_group(bridge_world_t *w, schedule_phase_t *p)
 {
-    bool raised = false;
-
-    for (uint32_t i = 0; i < p->n; i++)
-        raised = raise_after(p, i) || raised;
-    return (raised);
-}
-
-static void set_levels(schedule_phase_t *p, bool refused)
-{
-    bool raised = !refused;
-
-    for (uint32_t i = 0; i < p->n; i++)
-        p->in[i]->level = 0;
-    while (raised)
-        raised = raise_all(p);
-}
-
-static int build_phase(bridge_world_t *w, schedule_phase_t *p)
-{
-    int refused;
-
-    snprintf(p->where, sizeof(p->where), "at the barrier");
-    if (p->phase < w->phase_count)
-        snprintf(p->where, sizeof(p->where), "in phase '%.40s'",
-            w->phases[p->phase]);
-    schedule_gather_phase(w, p);
+    schedule_gather_group(w, p);
     schedule_add_stated(w, p);
     schedule_add_own(p);
-    refused = schedule_check_phase(p);
-    set_levels(p, refused);
+}
+
+static int check_phases(bridge_world_t *w, schedule_phase_t *p)
+{
+    int refused = 0;
+
+    for (p->phase = 0; p->phase <= w->phase_count && !refused; p->phase++) {
+        snprintf(p->where, sizeof(p->where), "at the barrier");
+        if (p->phase < w->phase_count)
+            snprintf(p->where, sizeof(p->where), "in phase '%.40s'",
+                w->phases[p->phase]);
+        make_group(w, p);
+        refused = schedule_check_phase(p);
+    }
     return (refused);
+}
+
+static void set_phase_levels(bridge_world_t *w, schedule_phase_t *p)
+{
+    for (p->phase = 0; p->phase <= w->phase_count; p->phase++) {
+        make_group(w, p);
+        schedule_set_levels(p);
+    }
 }
 
 int schedule_build(bridge_world_t *w, char *why, size_t why_len)
 {
     schedule_phase_t p = { .order = &w->order, .why = why,
         .why_len = why_len };
-    int refused = 0;
 
-    schedule_resolve_names(w);
-    if (schedule_cross_phase(w, why, why_len))
-        return (1);
+    number_systems(w);
     p.in = (bridge_system_t **)w->build_in;
-    while (p.phase <= w->phase_count && !refused) {
-        refused = build_phase(w, &p);
-        p.phase++;
+    if (schedule_cross_phase(w, why, why_len) || check_phases(w, &p))
+        return (1);
+    set_phase_levels(w, &p);
+    for (uint32_t i = 0; i < w->system_count; i++) {
+        w->systems[i]->fresh = false;
+        w->systems[i]->dirty = false;
     }
-    if (!refused)
-        schedule_commit_jobs(w);
-    return (refused);
+    schedule_commit_jobs(w);
+    return (0);
 }
