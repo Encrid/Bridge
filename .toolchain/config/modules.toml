@@ -368,6 +368,12 @@ defines = ["BRIDGE_ROWS_CHECKED"]
 variants = [{ name = "places_before", defines = ["BRIDGE_ROWS_CHECKED", "BEFORE"] }]
 
 [[modules]]
+name = "lurker"
+sources = ["tests/modules/lurker.c", "tests/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [{ name = "lurker_rows", defines = ["BRIDGE_ROWS_CHECKED", "ROWS"] }]
+
+[[modules]]
 name = "twoears"
 sources = ["tests/modules/twoears.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED"]
