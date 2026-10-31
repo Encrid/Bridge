@@ -2,6 +2,7 @@
 #
 # Under the GNU Affero General Public License, version 3 only: see license.
 import concurrent.futures
+import fnmatch
 import os
 import re
 import shutil
@@ -233,22 +234,36 @@ def groups_of(config, values, folder):
     return [(group, cases) for group, cases in found if cases]
 
 
-def chosen(groups, part):
-    found = [(group, [case for case in cases if part in case['name']]) for group, cases in groups]
-    return [(group, cases) for group, cases in found if cases] or die('no case has %s in its name' % part)
+def chosen(groups, text):
+    found = [(group, [case for case in cases if text in case['name']]) for group, cases in groups]
+    return [(group, cases) for group, cases in found if cases] or die('no case has %s in its name' % text)
+
+
+def picked(groups, args):
+    if args.part:
+        groups = [(group, cases) for group, cases in groups
+                  if any(group == part or group.startswith(part + '/') for part in args.part)] \
+            or die('no case group is in the parts %s' % ' '.join(args.part))
+    return chosen(groups, args.k) if args.k else groups
 
 
 def changed(args, run, write, prepared=None):
     config, values = prepared or build.ready(args, True)
     values = dict(values, out=(Path(values['build']) / run / values['target']).as_posix())
-    written = write(config, values)
+    written = write(build.kept(config, set(args.part)) if args.part else config, values)
     made = build.made(config, values, rewrite.tree(values, run))
     unlinked = [name for name, paths in made if not paths]
     if unlinked:
         die('the cases need what is linked: ' + ' '.join(unlinked))
     groups = groups_of(config, values, config.get('test', {}).get('cases', 'tests/cases'))
-    groups = chosen(groups, args.k) if args.k and groups else groups
+    groups = picked(groups, args) if groups else groups
     return config, values, written, {name: paths[0] for name, paths in made}, groups
+
+
+def scoped(args, entries, key, names):
+    if not args.part:
+        return entries
+    return [entry for entry in entries if any(fnmatch.fnmatch(name, entry.get(key, '')) for name in names)]
 
 
 def measured(args):
@@ -259,7 +274,8 @@ def measured(args):
     hits.write_bytes(bytes(branches.parts(probes)[1]))
     os.environ['C23_BRANCHES'] = str(hits)
     test(config, values, outputs, groups, False, False, 1)
-    branches.reported(probes, gaps, hits, config.get('branches', {}).get('exception', []), values['system'])
+    excepted = scoped(args, config.get('branches', {}).get('exception', []), 'path', probes)
+    branches.reported(probes, gaps, hits, excepted, values['system'])
 
 
 def tallied(args):
@@ -271,7 +287,8 @@ def tallied(args):
     test(config, values, outputs, groups, False, False, 1, True)
     cases = [(case['name'], folder / group / ('%d.leaks' % index)) for group, listed in groups
              for index, case in enumerate(listed)]
-    leaks.reported(files, kinds, cases, config.get('leaks', {}).get('exception', []), values['system'])
+    excepted = scoped(args, config.get('leaks', {}).get('exception', []), 'case', [name for name, _ in cases])
+    leaks.reported(files, kinds, cases, excepted, values['system'])
 
 
 def main():
@@ -293,9 +310,9 @@ def main():
     groups = groups_of(config, values, folder)
     if not groups:
         return print('no case: %s holds no case' % folder)
-    groups = chosen(groups, args.k) if args.k else groups
+    groups = picked(groups, args)
     copies = args.copies or config['test'].get('copies') or die('.toolchain/project.toml: write [test] copies')
-    own = not (args.broken or args.toolchain or args.k)
+    own = not (args.broken or args.toolchain or args.k or args.part)
     rounds = args.rounds or 1
     failing = None
     if any((made_false(case) if args.broken else case).get('fail') for _, cases in groups for case in cases):

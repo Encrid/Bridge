@@ -47,13 +47,16 @@ There are six targets: three operating systems on two types of processor.
 | `soname` | The flags that give a shared library its name, without its folder. |
 | `stack` | The flag of the linker for the size of the stack. |
 | `errno` | The flag that tells if a function of the math library sets `errno`. |
+| `runtime` | The sources that each shared library of the target adds to its own: `.toolchain/docs/windows_x86_64.h.md`. Only `x86_64-windows-gnu` has them. Each other target states an empty list. |
+
+`.toolchain/docs/windows_x86_64.h.md`, *Why*, tells why only `x86_64-windows-gnu` needs a runtime.
 
 ## [kinds.\<kind\>]
 
 | Kind | Output | Steps |
 | --- | --- | --- |
 | `program` | `{name}{exe}` | `zig cc` compiles the sources, and links them with the files of `link`. |
-| `library` | `{name}{library}` | `zig cc -shared` compiles the sources into a shared library. |
+| `library` | `{name}{library}` | `zig cc -shared` compiles the sources and `runtime` into a shared library. A program gets no `runtime`. |
 | `archive` | `{name}.a` | `zig build-lib -static` compiles the sources into a static library. It does not report a flag that it does not use. zig does not read the flags after `-cflags`, thus `{strip}` tells it the mode of the build. Without `-fstrip`, zig asks the compiler for CodeView, and each object of a Windows archive holds its own path. |
 | `file` | `{name}` | It copies the one source to the output. |
 

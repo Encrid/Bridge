@@ -35,6 +35,7 @@ The layout allows only the paths of this table.
 | `.toolchain/config/<name>.toml` | A file of the configuration of the project. |
 | `.toolchain/docs/<name>.md` | A document of the toolchain. |
 | `.toolchain/presets/<name>/<name>.toml` | A file of a preset. `.toolchain/docs/presets.md` tells the presets. |
+| `.toolchain/runtime/<name>.c`, `.toolchain/runtime/<name>.h` | A source or a header that the toolchain adds to the shared libraries of a target: `.toolchain/docs/toolchain.toml.md`, *[targets.\<target\>]*. |
 | `<folder>/.gitkeep`, in `docs/extern`, `docs/intern`, `include` or `src` | An empty file that keeps an empty folder in git. |
 
 `layout.py` does not read `tests`, and does not read `.toolchain/tests` of the repository `my_c23_template`. Thus they can hold any file.
@@ -49,6 +50,9 @@ The messages are:
 ## The documents
 
 `shared.document` gives the document of a file: `.toolchain/docs/shared.py.md`, *The documents*.
+Each document keeps the path of its file below the first folder. Thus the documents of a part are in the folders of the part.
+For example, the document of `include/<part>/<name>.h` is `docs/extern/<part>/<name>.h.md`, and the document of `src/<part>/<name>.c` is `docs/intern/<part>/<name>.c.md`.
+`.toolchain/docs/project.toml.md`, *[parts]*, tells the parts of a project.
 
 The first line of a document is `#`, a space, and the path of its file.
 A document of `docs/extern`, of `docs/intern` or of `docs/tools` is a fault if its file is not there.
