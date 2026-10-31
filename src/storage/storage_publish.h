@@ -7,6 +7,7 @@
     #define BRIDGE_SRC_STORAGE_PUBLISH_H
 
     #include "storage_inside.h"
+    #include "storage_sets.h"
 
 typedef struct {
     storage_t *r;
@@ -44,6 +45,20 @@ static inline void lay_private(publish_t *p, uint32_t tables, uint32_t slots)
     p->kind = p->write + m->declared_count;
     p->owned = p->kind + m->declared_count;
     p->at = m->spans + span_bytes(slots, m->declared_count, tables);
+}
+
+static inline bool has_declared(const storage_t *r, const module_t *m,
+    uint32_t t)
+{
+    const uint64_t *set = get_set(r, t);
+    uint64_t met = 0;
+    uint32_t w = 0;
+
+    while (m->writable && w < r->words) {
+        met |= set[w] & m->writable[r->words + w];
+        w++;
+    }
+    return (met != 0);
 }
 
 void storage_publish_cells(publish_t *p);

@@ -34,14 +34,16 @@ uint32_t storage_count_free_direct(const storage_t *r)
 bool storage_make_writable(storage_t *r, module_t *m)
 {
     if (!m->writable)
-        m->writable = calloc(r->words, sizeof(*m->writable));
+        m->writable = calloc(2 * (size_t)r->words, sizeof(*m->writable));
     return (m->writable != nullptr);
 }
 
-void storage_let_write([[maybe_unused]] storage_t *r, module_t *m,
-    storage_type_t *type)
+void storage_let_use(const storage_t *r, module_t *m,
+    const storage_type_t *type, bool write)
 {
-    set_put(m->writable, type->id);
+    set_put(m->writable + r->words, type->id);
+    if (write)
+        set_put(m->writable, type->id);
 }
 
 void storage_undeclare(storage_t *r, storage_type_t *type)

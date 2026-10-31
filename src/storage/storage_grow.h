@@ -96,7 +96,7 @@ static inline bool grow_table(storage_t *r, uint32_t t, uint32_t room)
         move_columns(r, t, &old);
     else
         place_columns(r, t);
-    touch(r, t);
+    touch(r, t, true);
     return (true);
 }
 

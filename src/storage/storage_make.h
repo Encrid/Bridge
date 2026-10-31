@@ -39,6 +39,7 @@ static inline uint32_t take_table_id(storage_t *r)
 static inline void open_table(storage_t *r, uint32_t t, uint32_t slot,
     const uint64_t *set)
 {
+    r->w->layout_moved |= r->tables[t].touched;
     r->tables[t] = (table_t){ .live = true, .touched = r->tables[t].touched };
     if (slot < r->set_room) {
         r->tables[t].set = slot + 1;
@@ -51,7 +52,7 @@ static inline void open_table(storage_t *r, uint32_t t, uint32_t slot,
     memset(r->col_hash + (size_t)t * r->type_room, 0, 8u * r->type_room);
     name_table(r, t);
     list_table(r, t);
-    touch(r, t);
+    touch(r, t, true);
 }
 
 static inline uint32_t make_table(storage_t *r, const uint64_t *set)
@@ -81,7 +82,7 @@ static inline void free_table(storage_t *r, uint32_t t)
     unlist_table(r, t);
     memset(get_columns(r, t), 0, 4u * r->type_room);
     memset(r->col_hash + (size_t)t * r->type_room, 0, 8u * r->type_room);
-    touch(r, t);
+    touch(r, t, true);
     if (tab->set)
         r->set_table[tab->set - 1] = 0;
     else

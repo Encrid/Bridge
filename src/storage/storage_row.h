@@ -42,7 +42,7 @@ static inline uint32_t append_row(storage_t *r, uint32_t t, uint32_t index)
     tab->rows++;
     get_who(r, tab)[row] = id;
     memcpy(r->w->shared + tab->block + 8ull * row, &id, 8);
-    touch(r, t);
+    touch(r, t, false);
     return (row);
 }
 
@@ -75,7 +75,7 @@ static inline uint32_t append_row(storage_t *r, uint32_t t, uint32_t index)
     uint32_t last = tab->rows - 1;
 
     tab->rows = last;
-    touch(r, t);
+    touch(r, t, false);
     if (row == last)
         return;
     fill_row(r, t, row, last);
