@@ -99,6 +99,8 @@ uint32_t storage_count_tables(storage_t *r);
 
 storage_usage_t storage_usage(const storage_t *r);
 
+bool storage_is_dirty(const storage_t *r);
+
 uint32_t storage_count_carriers(storage_t *r, const storage_type_t *type);
 
 uint32_t storage_count_off(storage_t *r, const storage_type_t *type);

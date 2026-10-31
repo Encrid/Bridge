@@ -11,24 +11,24 @@
 
 static inline void reset_marks(bridge_world_t *w)
 {
-    module_t *m = w->modules;
+    module_t *m = w->work;
 
     while (m) {
         m->mark_at = 0;
-        m = m->next;
+        m = m->next_work;
     }
 }
 
 static inline module_t *find_next_run(bridge_world_t *w)
 {
     module_t *first = nullptr;
-    module_t *m = w->modules;
+    module_t *m = w->work;
 
     while (m) {
         if (m->mark_at != m->mark_count && (!first
             || m->marks[m->mark_at].turn < first->marks[first->mark_at].turn))
             first = m;
-        m = m->next;
+        m = m->next_work;
     }
     return (first);
 }

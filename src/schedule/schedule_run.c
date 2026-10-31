@@ -23,6 +23,7 @@ static void count_failure(bridge_world_t *w, bridge_system_t *s)
 
 static void account_job(bridge_world_t *w, const schedule_job_t *job)
 {
+    block_note_work(w, job->m);
     for (uint32_t i = 0; i < job->count; i++) {
         if (!schedule_is_due(job->list[i]))
             continue;

@@ -23,8 +23,10 @@ void abi_hear(void *ctx, uint64_t id, enum bridge_event event)
         s->pending[n].id = id;
         s->pending[n].events = event;
     }
-    if (!n)
+    if (!n) {
         schedule_trigger(s);
+        block_note_work(s->m->w, s->m);
+    }
     s->pending_count++;
 }
 

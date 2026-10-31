@@ -77,6 +77,7 @@ static void free_record(module_t *m)
 
 void module_discard(bridge_world_t *w, module_t *m)
 {
+    block_drop_work(w, m);
     module_drop_systems(w, m);
     if (m->instance)
         m->on->api.instance_destroy(m->instance);

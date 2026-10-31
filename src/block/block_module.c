@@ -29,13 +29,13 @@ int block_refill(bridge_world_t *w, module_t *m)
 
 void block_hand_out(bridge_world_t *w)
 {
-    module_t *m = w->modules;
+    module_t *m = w->work;
 
     while (m) {
         storage_hand_out(w->storage, m->ids, m->id_next);
         if (m->lender)
             storage_hand_out(w->storage, m->lender->ids, m->lender->id_next);
-        m = m->next;
+        m = m->next_work;
     }
 }
 

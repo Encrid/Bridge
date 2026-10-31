@@ -68,6 +68,20 @@ void block_barrier(bridge_world_t *w);
 
 void block_publish_all(bridge_world_t *w);
 
+void block_note_work(bridge_world_t *w, module_t *m);
+
+void block_keep_work(bridge_world_t *w);
+
+void block_drop_work(bridge_world_t *w, const module_t *m);
+
+void block_join_work(bridge_world_t *w, module_t *m);
+
+void block_take_place(bridge_world_t *w, module_t *n, const module_t *old);
+
+module_t *block_sort_list(module_t *list);
+
+void block_sort_work(bridge_world_t *w);
+
 [[nodiscard]] void *block_column_regrow(bridge_world_t *w, void *ptr,
     uint32_t old_size, uint32_t new_size);
 
