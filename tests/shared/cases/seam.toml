@@ -3009,6 +3009,42 @@ claims = { matches = ["b2 p0 game:places@0.1.0/first: at.*b2 p1 game:places@0.1.
 false = { run = ["{out}/seam{exe}", "add_system-before-holds-without-a-conflict"] }
 
 [[case]]
+name = "record.place-of-a-module-after-a-stopped-one"
+run = ["{out}/seam{exe}", "record.place-of-a-module-after-a-stopped-one"]
+claims = { matches = ["is stopped: .*p0 game:places@0\\.1\\.0/first: at.*alive"] }
+false = { run = ["{out}/seam{exe}", "record.place-of-the-systems-of-two-modules"] }
+
+[[case]]
+name = "record.place-of-a-reloaded-module-last-in-its-level"
+run = ["{out}/seam{exe}", "record.place-of-a-reloaded-module-last-in-its-level"]
+claims = { matches = ["game:one@0\\.2\\.0: reloaded.*p1 game:one@0\\.2\\.0/run: saw.*alive", "game:one@0\\.2\\.0: reloaded.*p0 game:two@0\\.1\\.0/run: saw.*alive"] }
+false = { run = ["{out}/seam{exe}", "record.place-of-the-systems-of-two-modules"] }
+
+[[case]]
+name = "record.place-after-a-refused-load"
+run = ["{out}/seam{exe}", "record.place-after-a-refused-load"]
+claims = { matches = ["did not load: .*p0 game:places@0\\.1\\.0/first: at.*p4 game:one@0\\.1\\.0/run: saw.*alive"] }
+false = { run = ["{out}/seam{exe}", "record.place-of-the-systems-of-two-modules"] }
+
+[[case]]
+name = "observe-only-the-triggered-observer-runs"
+run = ["{out}/seam{exe}", "observe-only-the-triggered-observer-runs"]
+claims = { matches = ["p0 game:twoears@0\\.1\\.0/left_heard: heard.*alive"], lacks = ["right_heard"] }
+false = { run = ["{out}/seam{exe}", "observe-each-triggered-observer-runs"] }
+
+[[case]]
+name = "observe-each-triggered-observer-runs"
+run = ["{out}/seam{exe}", "observe-each-triggered-observer-runs"]
+claims = { matches = ["p0 game:twoears@0\\.1\\.0/left_heard: heard.*p1 game:twoears@0\\.1\\.0/right_heard: heard.*alive"] }
+false = { run = ["{out}/seam{exe}", "observe-only-the-triggered-observer-runs"] }
+
+[[case]]
+name = "observe-triggered-observers-of-two-modules-share-a-level"
+run = ["{out}/seam{exe}", "observe-triggered-observers-of-two-modules-share-a-level"]
+claims = { matches = ["p0 game:twoears@0\\.1\\.0/left_heard: heard.*p1 game:ears@0\\.1\\.0/left_heard: heard.*alive"] }
+false = { run = ["{out}/seam{exe}", "observe-only-the-triggered-observer-runs"] }
+
+[[case]]
 name = "config.order-pair-orders-two-systems-of-one-module"
 run = ["{out}/seam{exe}", "config.order-pair-orders-two-systems-of-one-module"]
 claims = { matches = ["b1 p0 game:places@0.1.0/second: at.*b1 p1 game:places@0.1.0/first: at.*alive"] }

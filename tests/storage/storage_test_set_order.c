@@ -88,6 +88,8 @@ static void tidy(bridge_world_t *w, bridge_system_t **s)
     schedule_free_pairs(&w->order);
     free(w->build_in);
     free(w->build_bits);
+    free(w->run_jobs);
+    free(w->run_lists);
 }
 
 enum storage_test_end storage_test_set_order(storage_test_t *t)
@@ -102,9 +104,12 @@ enum storage_test_end storage_test_set_order(storage_test_t *t)
 
     w.build_in = calloc(4, sizeof(*w.build_in));
     w.build_bits = calloc(4 * 2 + 1, sizeof(*w.build_bits));
+    w.run_jobs = calloc(4, sizeof(schedule_job_t));
+    w.run_lists = calloc(4, sizeof(*w.run_lists));
     w.systems = s;
     w.system_count = 4;
-    if (!w.build_in || !w.build_bits || !make_all(&o, s)
+    if (!w.build_in || !w.build_bits || !w.run_jobs || !w.run_lists
+        || !make_all(&o, s)
         || schedule_order(&w, BASE, 2) || schedule_build(&w, why, sizeof(why)))
         return (STORAGE_TEST_FAILED);
     report("cycle", s, bridge_set_order(&w, LOOP, 2));
