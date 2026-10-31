@@ -18,13 +18,9 @@ static void refill_all(bridge_world_t *w)
 static void finish_barrier(bridge_world_t *w)
 {
     module_t *m = w->modules;
-    uint32_t i = 0;
 
     w->turns = 0;
-    while (i < w->system_count) {
-        w->systems[i]->pending_count = 0;
-        i++;
-    }
+    schedule_clear_triggered(w);
     schedule_account(w);
     while (m) {
         block_drain(w, m);

@@ -64,7 +64,7 @@ typedef struct {
     bool writes;
 } system_term_t;
 
-typedef struct {
+typedef struct bridge_system {
     module_t *m;
     char *name;
     char *full;
@@ -77,11 +77,13 @@ typedef struct {
     uint32_t terms;
     backend_func_t *fn;
     uint32_t level;
+    uint32_t job;
     int parked;
     int observer;
     pending_t *pending;
     uint32_t pending_count;
     uint32_t pending_room;
+    struct bridge_system *next_triggered;
     uint32_t place;
     uint64_t turn;
     int failed;
@@ -256,6 +258,8 @@ struct bridge_world {
     void **run_handed;
     void **run_lists;
     uint8_t *run_callers;
+    uint32_t job_count;
+    bridge_system_t *triggered;
     void **build_in;
     uint64_t *build_bits;
     schedule_pairs_t order;

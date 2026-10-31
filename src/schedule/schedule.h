@@ -24,16 +24,21 @@ typedef struct {
     module_t *m;
     bridge_system_t **list;
     uint32_t count;
+    uint32_t phase;
+    uint32_t level;
 } schedule_job_t;
 
 typedef struct {
     bridge_world_t *w;
     uint32_t phase;
-    uint32_t level;
     uint32_t count;
-    uint32_t listed;
     uint32_t ordinal;
 } schedule_pass_t;
+
+static inline bool schedule_is_due(const bridge_system_t *s)
+{
+    return (!s->observer || s->pending_count);
+}
 
 [[nodiscard]] int schedule_order(bridge_world_t *w, const bridge_order_t *order,
     uint32_t count);
@@ -89,7 +94,21 @@ int schedule_check_phase(schedule_phase_t *p);
 
 void schedule_run_job(void *arg);
 
-void schedule_gather_jobs(schedule_pass_t *pass);
+void schedule_commit_jobs(bridge_world_t *w);
+
+uint32_t schedule_find_jobs(const bridge_world_t *w, uint32_t phase);
+
+void schedule_hand_job(schedule_pass_t *pass, schedule_job_t *job);
+
+void schedule_run_batch(schedule_pass_t *pass);
+
+void schedule_trigger(bridge_system_t *s);
+
+void schedule_untrigger(bridge_world_t *w, const module_t *m);
+
+void schedule_clear_triggered(bridge_world_t *w);
+
+void schedule_run_triggered(schedule_pass_t *pass);
 
 void schedule_validate_system(bridge_system_t *s);
 

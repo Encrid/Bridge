@@ -5,19 +5,6 @@
 */
 #include "schedule.h"
 
-static uint32_t count_levels(const bridge_world_t *w, uint32_t phase)
-{
-    uint32_t levels = 0;
-    uint32_t i = 0;
-
-    while (i < w->system_count) {
-        if (w->systems[i]->phase == phase && w->systems[i]->level >= levels)
-            levels = w->systems[i]->level + 1;
-        i++;
-    }
-    return (levels);
-}
-
 static void count_failure(bridge_world_t *w, bridge_system_t *s)
 {
     say_t about = { s->m, s, BRIDGE_ERR };
@@ -36,41 +23,53 @@ static void count_failure(bridge_world_t *w, bridge_system_t *s)
 
 static void account_job(bridge_world_t *w, const schedule_job_t *job)
 {
-    uint32_t i = 0;
-
-    while (i < job->count) {
+    for (uint32_t i = 0; i < job->count; i++) {
+        if (!schedule_is_due(job->list[i]))
+            continue;
         count_failure(w, job->list[i]);
         schedule_note_end(w, job->list[i]);
-        i++;
     }
 }
 
-static void run_level(schedule_pass_t *pass)
+void schedule_run_batch(schedule_pass_t *pass)
 {
     bridge_world_t *w = pass->w;
-    const schedule_job_t *jobs = w->run_jobs;
-    pool_batch_t batch = { schedule_run_job, w->run_handed, w->run_callers };
-    uint32_t k = 0;
+    pool_batch_t batch = { schedule_run_job, w->run_handed, w->run_callers,
+        pass->count };
 
-    schedule_gather_jobs(pass);
-    batch.count = pass->count;
     if (w->validate)
         pool_run_alone(&batch);
     else
         pool_run(w->pool, &batch);
-    while (k < pass->count) {
-        account_job(w, &jobs[k]);
-        k++;
+    for (uint32_t k = 0; k < pass->count; k++)
+        account_job(w, w->run_handed[k]);
+    pass->count = 0;
+}
+
+static void run_jobs(schedule_pass_t *pass, uint32_t first)
+{
+    const bridge_world_t *w = pass->w;
+    schedule_job_t *jobs = w->run_jobs;
+    uint32_t k = first;
+    uint32_t level;
+
+    while (k < w->job_count && jobs[k].phase == pass->phase) {
+        level = jobs[k].level;
+        while (k < w->job_count && jobs[k].phase == pass->phase
+            && jobs[k].level == level) {
+            schedule_hand_job(pass, &jobs[k]);
+            k++;
+        }
+        schedule_run_batch(pass);
     }
 }
 
 void schedule_run(bridge_world_t *w, uint32_t phase)
 {
     schedule_pass_t pass = { .w = w, .phase = phase };
-    uint32_t levels = count_levels(w, phase);
 
-    while (pass.level < levels) {
-        run_level(&pass);
-        pass.level++;
-    }
+    if (phase == w->phase_count)
+        schedule_run_triggered(&pass);
+    else
+        run_jobs(&pass, schedule_find_jobs(w, phase));
 }
