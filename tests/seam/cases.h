@@ -274,6 +274,8 @@ void test_place_paired(host_t *h);
 void test_place_two(host_t *h);
 void test_place_reordered(host_t *h);
 
+void test_place_after_refused_group(host_t *h);
+
 void test_take_in_old_shutdown(host_t *h);
 
 void test_guess(host_t *h);
