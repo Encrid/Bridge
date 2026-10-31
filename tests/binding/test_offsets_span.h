@@ -29,7 +29,7 @@ static inline uint32_t bridge_span_table(uint32_t span)
 
 static inline uint32_t bridge_count_rows(uint32_t span)
 {
-    return (acc_own_32(span + 4u));
+    return (acc_rows(bridge_span_table(span)));
 }
 
 #endif

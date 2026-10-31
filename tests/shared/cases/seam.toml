@@ -49,7 +49,7 @@ false = { run = ["{out}/seam{exe}", "module_config.abi-another-refused"] }
 [[case]]
 name = "module_config.abi-another-refused"
 run = ["{out}/seam{exe}", "module_config.abi-another-refused"]
-claims = { matches = ["module 'test:ok@0.1.0' is refused: it wants ABI 3 and this is ABI 2.*alive"] }
+claims = { matches = ["module 'test:ok@0.1.0' is refused: it wants ABI 4 and this is ABI 3.*alive"] }
 false = { run = ["{out}/seam{exe}", "artifact.backend-not-configured-refused"] }
 
 [[case]]
@@ -217,7 +217,7 @@ false = { run = ["{out}/seam{exe}", "module_config.spans-too-small-refused"] }
 [[case]]
 name = "module_config.spans-rounded-up-to-8-refused"
 run = ["{out}/seam{exe}", "module_config.spans-rounded-up-to-8-refused"]
-claims = { matches = ["its spans of 860 bytes do not hold a column_base of 1 types by 64 tables, which with its queries is 864 bytes.*alive"] }
+claims = { matches = ["its spans of 348 bytes do not hold a column_base of 1 types by 64 tables, which with its queries is 352 bytes.*alive"] }
 false = { run = ["{out}/seam{exe}", "module_config.spans-a-multiple-of-8-taken"] }
 
 [[case]]
@@ -229,7 +229,7 @@ false = { run = ["{out}/seam{exe}", "module_config.spans-rounded-up-to-8-refused
 [[case]]
 name = "module_config.spans-with-no-room-to-round-the-match-stopped"
 run = ["{out}/seam{exe}", "module_config.spans-with-no-room-to-round-the-match-stopped"]
-claims = { matches = ["module 'test:spare@0.1.0' is stopped: what its queries match no longer fits in its spans of 868 bytes.*test:spare@0.1.0=STOPPED.*alive"] }
+claims = { matches = ["module 'test:spare@0.1.0' is stopped: what its queries match no longer fits in its spans of 356 bytes.*test:spare@0.1.0=STOPPED.*alive"] }
 false = { run = ["{out}/seam{exe}", "module_config.spans-a-multiple-of-8-taken"] }
 
 [[case]]
@@ -247,7 +247,7 @@ false = { run = ["{out}/seam{exe}", "module_config.persistent-rounded-up-to-8-re
 [[case]]
 name = "module_config.spans-outgrown-on_error-fail-stops-the-world"
 run = ["{out}/seam{exe}", "module_config.spans-outgrown-on_error-fail-stops-the-world"]
-claims = { matches = ["no longer fits in its spans of 1160 bytes.*the world has stopped: module 'game:mover@0.1.0' was stopped and its on_error is fail.*alive"] }
+claims = { matches = ["no longer fits in its spans of 640 bytes.*the world has stopped: module 'game:mover@0.1.0' was stopped and its on_error is fail.*alive"] }
 false = { run = ["{out}/seam{exe}", "module_config.spans-outgrown-at-a-barrier"] }
 
 [[case]]
@@ -397,7 +397,7 @@ false = { run = ["{out}/seam{exe}", "bridge_backend_t-granule-not-a-power-of-two
 [[case]]
 name = "module_config.spans-too-small-refused"
 run = ["{out}/seam{exe}", "module_config.spans-too-small-refused"]
-claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 types by 65 tables.*moved 2 1000.*alive"] }
+claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 2 bytes do not hold a column_base of 2 types by 65 tables.*moved 2 1000.*alive"] }
 false = { run = ["{out}/seam{exe}", "budget.columns-used-up-changes-not-applied"] }
 
 [[case]]
@@ -2705,7 +2705,7 @@ false = { run = ["{out}/seam{exe}", "module_config.spans-outgrown-at-a-barrier"]
 [[case]]
 name = "module_config.spans-outgrown-at-a-barrier"
 run = ["{out}/seam{exe}", "module_config.spans-outgrown-at-a-barrier"]
-claims = { matches = ["module 'game:mover@0\\.1\\.0' is stopped: what its queries match no longer fits in its spans of 1160 bytes.*alive"] }
+claims = { matches = ["module 'game:mover@0\\.1\\.0' is stopped: what its queries match no longer fits in its spans of 640 bytes.*alive"] }
 false = { run = ["{out}/seam{exe}", "backend_sig_t-what-each-entry-takes-and-answers"] }
 
 [[case]]
@@ -3137,8 +3137,8 @@ false = { run = ["{out}/seam{exe}", "BRIDGE_SPAN_SIZE-what-a-span-takes-of-the-s
 [[case]]
 name = "BRIDGE_SPAN_SIZE-what-a-span-takes-of-the-spans"
 run = ["{out}/seam{exe}", "BRIDGE_SPAN_SIZE-what-a-span-takes-of-the-spans"]
-claims = { matches = ["module 'view:reader@0.1.0' did not load: its spans of 16 bytes do not hold a column_base of 2 types by 65 tables.*moved 2 1000.*alive"] }
-false = { run = ["{out}/seam{exe}", "BRIDGE_SCHEMA_TEXT-a-descriptor-of-the-type-s-own-text"] }
+claims = { matches = ["game:mover@0\\.1\\.0/count: moved 2 1000.*alive"], lacks = ["is stopped"] }
+false = { run = ["{out}/seam{exe}", "module_config.spans-outgrown-at-a-barrier"] }
 
 [[case]]
 name = "BRIDGE_SCHEMA_TEXT-a-descriptor-of-the-type-s-own-text"

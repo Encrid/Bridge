@@ -74,12 +74,18 @@ uint64_t acc_entity(uint64_t id)
     return ((uint64_t)acc_peek_32(rec) << 32 | acc_peek_32(rec + 4u));
 }
 
+uint32_t acc_rows(uint32_t table)
+{
+    if (table >= BRIDGE_HEADER(tables))
+        acc_trap();
+    return (acc_peek_32(BRIDGE_HEADER(rows) + table * 4u));
+}
+
 uint64_t acc_who(uint32_t table, uint32_t row)
 {
-    if (table >= BRIDGE_HEADER(tables)
-        || row >= acc_own_32(BRIDGE_HEADER(rows) + table * 4u))
+    if (row >= acc_rows(table))
         acc_trap();
-    return (acc_peek_64(acc_own_32(BRIDGE_HEADER(blocks) + table * 4u)
+    return (acc_peek_64(acc_peek_32(BRIDGE_HEADER(blocks) + table * 4u)
         + row * 8u));
 }
 

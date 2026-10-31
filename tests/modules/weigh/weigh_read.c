@@ -19,6 +19,7 @@ TEST_MEASURED TEST(walk)
     const uint32_t *span;
     const v_t *column;
     uint32_t total = 0;
+    uint32_t count;
     uint32_t s = 0;
     uint32_t r;
 
@@ -26,8 +27,9 @@ TEST_MEASURED TEST(walk)
         span = test_get_span(api, q, s, 1);
         column = (const v_t *)(api->shared_base
             + bases[span[0] * types + nweigh_value]);
+        count = test_count_rows(api, span);
         r = 0;
-        while (r < span[1]) {
+        while (r < count) {
             total += column[r].v;
             r++;
         }
@@ -62,7 +64,8 @@ TEST_MEASURED TEST(flag)
     while (s < q->spans) {
         span = test_get_span(api, q, s, 1);
         total = add_flagged((const f_t *)(api->shared_base
-            + bases[span[0] * types + nweigh_flag]), span[1], total);
+            + bases[span[0] * types + nweigh_flag]),
+            test_count_rows(api, span), total);
         s++;
     }
     say_read(api, total, q->spans);
@@ -82,7 +85,7 @@ TEST_MEASURED TEST(one)
     while (i < ASKED) {
         q = test_get_query(api, nweigh_which);
         span = test_get_span(api, q, 0, 1);
-        if (q->spans && span[1]) {
+        if (q->spans && test_count_rows(api, span)) {
             total += ((const s_t *)(api->shared_base
                 + bases[span[0] * types + nweigh_single]))->v;
             spans = q->spans;

@@ -43,7 +43,7 @@ false = { run = ["{out}/seam-static{exe}", "module_config.abi-another-refused"] 
 [[case]]
 name = "static-module_config.abi-another-refused"
 run = ["{out}/seam-static{exe}", "module_config.abi-another-refused"]
-claims = { matches = ["module 'test:ok@0.1.0' is refused: it wants ABI 3 and this is ABI 2.*alive"] }
+claims = { matches = ["module 'test:ok@0.1.0' is refused: it wants ABI 4 and this is ABI 3.*alive"] }
 false = { run = ["{out}/seam-static{exe}", "artifact.backend-not-configured-refused"] }
 
 [[case]]
