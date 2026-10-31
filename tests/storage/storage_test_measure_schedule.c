@@ -11,15 +11,17 @@ constexpr uint32_t TIMED_MODULES = 1000;
 constexpr uint32_t TIMED_ROUNDS = 20;
 constexpr uint32_t TIMED_TABLES = 64;
 
-static const char *const TIMED_PHASES[] = { "work", "churn", "idle" };
+static const char *const TIMED_PHASES[] = { "work", "churn", "idle",
+    "spawn" };
 
 static int load_timed(bridge_world_t *w, uint32_t i)
 {
     char identity[32];
-    bridge_artifact_t a = storage_test_state(TIMED_PATH, 4, 4096, 4096);
+    bridge_artifact_t a = storage_test_state(i ? TIMED_PATH : ONE_MORE_PATH, 4,
+        4096, 4096);
 
     snprintf(identity, sizeof(identity), "tm:m%04u@0.1.0", i);
-    a.cfg.identity = identity;
+    a.cfg.identity = i ? identity : "st:more@0.1.0";
     return (bridge_load(w, &a));
 }
 
@@ -31,13 +33,13 @@ static int make_timed(storage_test_t *t, uint32_t threads)
     t->cfg.phases = TIMED_PHASES;
     t->cfg.phase_count = sizeof(TIMED_PHASES) / sizeof(*TIMED_PHASES);
     t->cfg.threads = threads;
-    t->cfg.budget.modules = TIMED_MODULES + 1;
-    t->cfg.budget.systems = 2 * TIMED_MODULES + 2;
+    t->cfg.budget.modules = TIMED_MODULES + 2;
+    t->cfg.budget.systems = 2 * TIMED_MODULES + 3;
     t->cfg.budget.tables = TIMED_TABLES;
     t->w = bridge_create(&t->cfg, storage_test_hear_nothing, t);
-    while (t->w && i < TIMED_MODULES && !load_timed(t->w, i))
+    while (t->w && i <= TIMED_MODULES && !load_timed(t->w, i))
         i++;
-    if (i == TIMED_MODULES)
+    if (i == TIMED_MODULES + 1)
         return (0);
     printf("FAIL: a thousand modules were not loaded\n");
     return (1);
@@ -51,11 +53,11 @@ static uint64_t time_load(storage_test_t *t, bool unload)
 
     for (uint32_t round = 0; round < TIMED_ROUNDS; round++) {
         began = os_get_now();
-        if (load_timed(t->w, TIMED_MODULES))
+        if (load_timed(t->w, TIMED_MODULES + 1))
             printf("FAIL: the module of the load was not loaded\n");
         now = os_get_now() - began;
         began = os_get_now();
-        (void)bridge_unload(t->w, "tm:m1000@0.1.0");
+        (void)bridge_unload(t->w, "tm:m1001@0.1.0");
         now = unload ? os_get_now() - began : now;
         least = !round || now < least ? now : least;
     }
@@ -88,6 +90,8 @@ int storage_test_measure_schedule(storage_test_t *t)
         (double)time_load(t, false) / 1e3);
     printf("an unload beside a thousand modules          %7.1f us\n",
         (double)time_load(t, true) / 1e3);
+    printf("a barrier after one changed table beside a thousand modules"
+        " %7.1f us\n", (double)time_barrier(t, "spawn") / 1e3);
     if (make_timed(t, 6))
         return (1);
     printf("a phase of a thousand modules, on 6 threads  %7.1f us\n",
