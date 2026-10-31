@@ -28,11 +28,18 @@ One loop over one component cannot be split between two modules either: both wou
 | `pool_fn_t` | The function that a job is given to. |
 | `pool_batch_t` | What one run is handed: `count` jobs in `jobs`, the function `fn` that each is given to, and `caller_only`. |
 | `pool_worker_t` | A worker: its pool `p`, the event `wake` that wakes it, and its `thread`. |
-| `pool_t` | The pool, `struct pool`: its `workers` and `worker_count`, its `lock`, its event `done`, `quit`, and the run in progress. |
+| `pool_t` | The pool, `struct pool`: its `workers` and `worker_count`, its event `done`, `quit`, and the run in progress. |
 
 `caller_only` holds a byte for each job of a batch: 1 if the job is the caller's alone.
-The run in progress is `run`, `taken` and `left`: the batch, a byte for each job that a thread took, and the jobs not done.
-Each thread reads and writes the run in progress only under the lock.
+The run in progress is `run`, `order`, `claim` and `left`:
+
+- `run` is the batch.
+- `order` holds the index of each job that a worker may take, in the order of the batch.
+- `claim` is one atomic word of 64 bits. Its high half counts the jobs of `order`. Its low half gives the next one.
+- `left` is the atomic count of the jobs that are not done.
+
+No thread takes a lock. A take adds 1 to `claim`, and a job done takes 1 from `left`.
+`docs/intern/pool/pool_job.c.md`, *A job*, tells why each job runs one time.
 
 ## Functions
 
@@ -42,5 +49,6 @@ Each thread reads and writes the run in progress only under the lock.
 | `pool_destroy` | `src/pool/pool.c` | Frees a pool: `docs/intern/pool/pool.c.md`, *Functions*. |
 | `pool_run` | `src/pool/pool_run.c` | Runs a batch of jobs: `docs/intern/pool/pool_run.c.md`, *Functions*. |
 | `pool_run_alone` | `src/pool/pool_run.c` | Runs a batch on the calling thread: `docs/intern/pool/pool_run.c.md`, *Functions*. |
+| `pool_finish_job` | `src/pool/pool_job.c` | Counts a job as done: `docs/intern/pool/pool_job.c.md`, *Functions*. |
 | `pool_run_taken` | `src/pool/pool_job.c` | Runs the jobs that a thread can take: `docs/intern/pool/pool_job.c.md`, *Functions*. |
 | `pool_work` | `src/pool/pool_job.c` | Runs the thread of a worker: `docs/intern/pool/pool_job.c.md`, *Functions*. |
