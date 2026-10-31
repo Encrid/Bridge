@@ -17,8 +17,7 @@ For each module, storage writes this:
 
 | What | When storage writes it |
 | --- | --- |
-| `column_base` | The cells of each touched table. |
-| A span | Again where it is, if its table was touched. |
+| `column_base` | The cells of each table whose columns moved, if the module declares a type of it. |
 | The spans of the queries | All again, when the tables that one query of the module reads changed: the spans of the queries are one after the other. |
 | The list of an observer | When it has something, or had something at the last barrier. |
 
@@ -56,3 +55,4 @@ One module that storage writes for.
 | `storage_publish_spans` | Writes the spans of a module: `docs/intern/storage/storage_spans.c.md`, *Functions*. |
 | `storage_publish_lists` | Writes the lists of the observers: `docs/intern/storage/storage_publish.c.md`, *Functions*. |
 | `lay_private` | Lays the arrays of the capability table in the private memory, and sets `at` past them. |
+| `has_declared` | Gives whether a module declares a type that table `t` carries, or carried before storage gave it back. False for a module that declared nothing. |

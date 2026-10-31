@@ -15,7 +15,7 @@ Storage checks the stake at the barrier, where it knows what the entity carries:
 With the stake, `fold_husk` decides whether the entity goes or stays as a husk: `docs/intern/storage/storage_husk.h.md`, *A husk in the fold*.
 A destroy that fails the check leaves the entity as it was, and storage counts it in `barred` of the module.
 `say_barred` of `src/storage/storage_settle.h` says how many, and the barrier counts as a failure of the module: `docs/intern/schedule/schedule.h.md`, *The failure budget*.
-`storage_let_write` of `src/storage/storage_slots.c` records each type that a module may write, in the set `writable` of the module.
+`storage_let_use` of `src/storage/storage_slots.c` records each type that a module may write, in the first set of `writable` of the module.
 
 ## Functions
 

@@ -4,10 +4,14 @@ This file publishes the spans of the running modules at a barrier, and stops a m
 
 ## The modules that it publishes
 
-Each module reads the rows and the cells of each table, and not only of the tables that its queries match: `docs/extern/bridge_abi.h.md`, *Spans*.
-So when a table changed, or the layout moved, `block_publish_all` publishes each running module.
-`storage_is_dirty` tells that a table changed: `docs/intern/storage/storage_usage.c.md`.
-Else it publishes only the running modules of the work list, since only their lists and their spans can change: `docs/intern/block/block_work.c.md`.
+A module reads the cells of each table that carries one of its types, not only of the tables of its queries: `docs/extern/bridge_abi.h.md`, *Spans*.
+The row counts and the blocks are in the table directory, which storage writes once for all modules.
+So after a change of rows alone, `block_publish_all` publishes only the running modules of the work list: `docs/intern/block/block_work.c.md`.
+Only their lists and their spans can change.
+
+When the columns of a table moved, or the layout moved, it publishes each running module.
+`storage_is_reshaped` tells that the columns of a table moved: `docs/intern/storage/storage_usage.c.md`.
+A module then gets the cells of such a table only if it declares a type of the table: `docs/intern/storage/storage_cells.c.md`.
 Both walks keep the order of the modules, so the records of stopped modules come in that order.
 
 ## A module that no longer fits

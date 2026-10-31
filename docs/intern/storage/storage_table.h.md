@@ -20,7 +20,7 @@ That table holds the type of the set alone, so after `terms_match` each `BRIDGE_
 
 | Function | Result |
 | --- | --- |
-| `touch` | Sets `touched` of table `t`, and adds the table to `dirty` if `touched` was not set: `docs/intern/storage/storage_inside.h.md`, *table_t*. |
+| `touch` | Sets `touched` of table `t`, and adds the table to `dirty` if `touched` was not set. Sets `reshaped` too when `columns` is true: `docs/intern/storage/storage_inside.h.md`, *table_t*. |
 | `find_table` | Gives the table that the hash finds for a set, or 0. It looks from `hash_set` on, a place at a time. |
 | `terms_match` | Gives whether a set carries each type that the terms must have, and none that they must not have. An optional term does not count. |
 | `terms_read` | Gives whether the spans of a system include table `t`: the set matches, and a sparse set is walked only as described above. |
