@@ -35,7 +35,7 @@ A module that ran no code, queued nothing and has no observer to publish needs n
 It has no id to hand out or to top up, no change to apply, no fault to count, and no log line.
 So steps 1, 2, 3, 8 and 9 walk only the work list: `docs/intern/block/block_work.c.md`.
 A barrier with no change visits no idle module.
-Step 4 visits each running module only after a change of a table or of the layout: `docs/intern/block/block_publish.c.md`.
+Step 4 visits each running module only after a change of the columns of a table or of the layout: `docs/intern/block/block_publish.c.md`.
 
 ## An observer at the barrier
 

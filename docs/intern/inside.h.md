@@ -150,7 +150,7 @@ A system and an observer are a query and a function either way, so one record se
 | `changed_now`, `fault_now` | At this barrier: it changed an entity, and the words of its fault, or null. |
 | `reached` | The system whose count reached the number, if one did. |
 | `left` | How many of its changes this barrier did not apply, by cause: no table, or no columns. |
-| `writable` | The types that it may write, as storage numbers them. |
+| `writable` | 2 sets of types, as storage numbers them: the types that it may write, then the types that it declares. |
 | `barred` | How many entities it asked to destroy at this barrier that carry none of those types. |
 | `unhanded` | The count of the held-id attaches and detaches it asked this barrier. |
 | `config`, `text_at`, `text_room` | The component that its settings seeded, and the place and the room of its settings text. |
