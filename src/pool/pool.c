@@ -31,11 +31,10 @@ pool_t *pool_create(uint32_t workers, uint32_t most_jobs, size_t stack)
 
     if (!p)
         return (nullptr);
-    p->taken = calloc(most_jobs ? most_jobs : 1, 1);
-    p->lock = os_mutex_create();
+    p->order = calloc(most_jobs ? most_jobs : 1, sizeof(*p->order));
     p->done = os_event_create();
     p->workers = calloc(workers ? workers : 1, sizeof(*p->workers));
-    if (!p->taken || !p->lock || !p->done || !p->workers)
+    if (!p->order || !p->done || !p->workers)
         i = workers + 1;
     while (i < workers && !start_worker(p, i, stack))
         i++;
@@ -60,8 +59,7 @@ void pool_destroy(pool_t *p)
         i++;
     }
     os_event_free(p->done);
-    os_mutex_free(p->lock);
     free(p->workers);
-    free(p->taken);
+    free(p->order);
     free(p);
 }

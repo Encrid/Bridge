@@ -1,21 +1,21 @@
 [[case]]
 name = "allocation-changes"
 run = ["{out}/storage{exe}", "changes"]
-fail = { malloc = 107, calloc = 134, realloc = 101, os_reserve = 4, os_thread_start = 1, os_mutex_create = 2, os_event_create = 2 }
+fail = { malloc = 107, calloc = 134, realloc = 101, os_reserve = 4, os_thread_start = 1, os_event_create = 2 }
 claims = { output = "tests/storage/storage_changes.txt" }
 false = { run = ["{out}/storage{exe}", "tables"] }
 
 [[case]]
 name = "allocation-tables"
 run = ["{out}/storage{exe}", "tables"]
-fail = { malloc = 104, calloc = 140, realloc = 90, os_reserve = 4, os_thread_start = 1, os_mutex_create = 2, os_event_create = 2 }
+fail = { malloc = 104, calloc = 140, realloc = 90, os_reserve = 4, os_thread_start = 1, os_event_create = 2 }
 claims = { output = "tests/storage/storage_tables.txt" }
 false = { run = ["{out}/storage{exe}", "strip"] }
 
 [[case]]
 name = "allocation-strip"
 run = ["{out}/storage{exe}", "strip"]
-fail = { malloc = 107, calloc = 134, realloc = 101, os_reserve = 4, os_thread_start = 1, os_mutex_create = 2, os_event_create = 2 }
+fail = { malloc = 107, calloc = 134, realloc = 101, os_reserve = 4, os_thread_start = 1, os_event_create = 2 }
 claims = { output = "tests/storage/storage_strip.txt" }
 false = { run = ["{out}/storage{exe}", "nomemory"] }
 
@@ -661,13 +661,6 @@ name = "os_reserve-4-refused"
 run = ["{out}/storage{exe}", "nomemory"]
 fail = { os_reserve = 4 }
 claims = { line = ["module 'st:store@0.1.0' was not reloaded: the operating system would not give its private memory of 1122432 bytes", "module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept", "the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail", "the world runs again: module 'st:store@0.1.0' is unloaded, and it goes on without it", "alive"] }
-false = { fail = {} }
-
-[[case]]
-name = "os_mutex_create-1-refused"
-run = ["{out}/storage{exe}", "nomemory"]
-fail = { os_mutex_create = 1 }
-claims = { line = ["out of memory: there was none for the threads that run a phase", "alive"] }
 false = { fail = {} }
 
 [[case]]
