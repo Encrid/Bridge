@@ -203,6 +203,12 @@ claims = { status = 0, matches = ["a call of 6144 frames of 4096 bytes gave [0-9
 false = { run = ["{out}/storage{exe}", "deep", "8388608"] }
 
 [[case]]
+name = "pool_run-runs-each-job-once-and-the-jobs-of-the-caller-on-it"
+run = ["{out}/storage{exe}", "pool", "2000"]
+claims = { matches = ["64 of 64 jobs ran 2000 times each, and 0 runs of a job of the caller were on a worker.*alive"] }
+false = { run = ["{out}/storage{exe}", "pool", "1999"] }
+
+[[case]]
 name = "table_hash_fill-of-25-gives-the-hash-four-places-for-each-table-id"
 run = ["{out}/storage{exe}", "hashroom", "25"]
 claims = { matches = ["hash room 8 for 2 table ids.*alive"] }
