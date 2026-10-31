@@ -7,7 +7,7 @@ This file reads the names of `[order]` that the world keeps: `docs/intern/schedu
 Each system has `named`: the index of its full name in the list of the names of the pairs.
 A system that no pair names has the count of names.
 `src/abi/abi_subscriber_room.c` sets `named` first, when the module registers the system.
-`schedule_resolve_names` sets it again at each build, since `bridge_set_order` can change the pairs: `docs/intern/bridge/bridge_order.c.md`.
+`schedule_mark_all` calls `schedule_resolve_names` before the build of a new `[order]`, since `bridge_set_order` changes the pairs: `docs/intern/bridge/bridge_order.c.md`.
 The full name of a system does not change, so its index follows only the pairs.
 
 ## What orders two systems
