@@ -51,6 +51,7 @@ void acc_st_f64(uint32_t slot, uint32_t a, uint32_t b, uint32_t field,
     double v);
 
 uint64_t acc_entity(uint64_t id);
+uint32_t acc_rows(uint32_t table);
 uint64_t acc_who(uint32_t table, uint32_t row);
 uint32_t acc_has(uint32_t slot, uint32_t id);
 uint32_t acc_toggle(uint32_t slot, uint32_t table, uint32_t row);

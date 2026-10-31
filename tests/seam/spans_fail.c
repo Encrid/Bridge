@@ -12,7 +12,7 @@ void test_stop_by_spans(host_t *h)
     if (host_open(h))
         return;
     test_state_module(&a, "game:mover@0.1.0", "mover");
-    a.cfg.spans = 1160;
+    a.cfg.spans = 640;
     a.cfg.on_error = BRIDGE_FAIL;
     host_load(h, &a);
     host_run_frames(h, 2);

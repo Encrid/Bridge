@@ -24,7 +24,7 @@ static uint32_t add_given(const test_api_t *api, const uint32_t *span,
     uint32_t e;
     uint32_t r = 0;
 
-    while (r < span[1]) {
+    while (r < test_count_rows(api, span)) {
         e = (uint32_t)who[r];
         if (given[e >> 6] >> (e & 63) & 1) {
             total += column[r].v + cell[e].v;
@@ -51,7 +51,7 @@ TEST(look_b)
         span = test_get_span(api, q, i, 2);
         total = add_given(api, span, total, &found);
         base = bases[span[0] * types + ndirect_d];
-        rows += span[1];
+        rows += test_count_rows(api, span);
         if (base)
             say(api, "FAIL: a base for a term that is direct-indexed",
                 base, 0);

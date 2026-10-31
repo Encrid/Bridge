@@ -53,6 +53,7 @@ TEST_MEASURED TEST(sum)
     bridge_line_t line = { "rows, spans", 11, 0, q->spans };
     const uint32_t *span;
     const v_t *column;
+    uint32_t count;
     uint32_t s = 0;
     uint32_t r;
 
@@ -60,12 +61,13 @@ TEST_MEASURED TEST(sum)
         span = test_get_span(api, q, s, 1);
         column = (const v_t *)(api->shared_base
             + bases[span[0] * types + value]);
+        count = test_count_rows(api, span);
         r = 0;
-        while (r < span[1]) {
+        while (r < count) {
             line.a0 += column[r].v;
             r++;
         }
-        line.a0 += span[1];
+        line.a0 += count;
         s++;
     }
     test_log(api, BRIDGE_LOG_INFO, &line);

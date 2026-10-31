@@ -32,7 +32,7 @@ static void overwrite_names(const test_api_t *api)
         span = test_get_span(api, q, s, 1);
         who = (uint64_t *)(api->shared_base + blocks[span[0]]);
         row = 0;
-        while (row < span[1]) {
+        while (row < test_count_rows(api, span)) {
             who[row] = nstore_ids[0];
             row++;
         }

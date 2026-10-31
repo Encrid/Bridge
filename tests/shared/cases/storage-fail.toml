@@ -639,7 +639,7 @@ false = { fail = {} }
 name = "os_reserve-1-refused"
 run = ["{out}/storage{exe}", "nomemory"]
 fail = { os_reserve = 1 }
-claims = { line = ["[budget] cannot be satisfied: the operating system would not give 71912976 bytes, in a reservation of 71912976 bytes", "alive"] }
+claims = { line = ["[budget] cannot be satisfied: the operating system would not give 72175120 bytes, in a reservation of 72175120 bytes", "alive"] }
 false = { fail = {} }
 
 [[case]]

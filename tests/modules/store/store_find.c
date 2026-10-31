@@ -23,7 +23,7 @@ static uint32_t count_named(const test_api_t *api, uint64_t id)
         span = test_get_span(api, q, s, 1);
         who = (const uint64_t *)(api->shared_base + blocks[span[0]]);
         row = 0;
-        while (row < span[1]) {
+        while (row < test_count_rows(api, span)) {
             named += who[row] == id;
             row++;
         }
@@ -78,9 +78,10 @@ TEST(look_b)
 
     while (s < q->spans) {
         span = test_get_span(api, q, s, 1);
-        rows += span[1];
+        rows += test_count_rows(api, span);
         sum = add_values((const b_t *)(api->shared_base
-            + bases[span[0] * types + nstore_b]), span[1], sum);
+            + bases[span[0] * types + nstore_b]),
+            test_count_rows(api, span), sum);
         s++;
     }
     say(api, "with B: spans, rows", q->spans, rows);
