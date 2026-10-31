@@ -206,6 +206,10 @@ struct module {
     int refused;
     char why[256];
     module_t *next;
+    module_t *next_work;
+    bool working;
+    bool linked;
+    uint64_t place;
 };
 
 enum change_op : uint32_t {
@@ -308,6 +312,9 @@ struct bridge_world {
     uint32_t system_count;
     module_t *modules;
     uint32_t module_count;
+    module_t *work;
+    bool work_mixed;
+    uint64_t places;
     uint32_t max_modules;
     bool profile;
     bool validate;

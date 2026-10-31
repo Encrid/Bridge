@@ -27,3 +27,8 @@ storage_usage_t storage_usage(const storage_t *r)
     u.tables = r->table_count;
     return (u);
 }
+
+bool storage_is_dirty(const storage_t *r)
+{
+    return (r->dirty_count != 0);
+}

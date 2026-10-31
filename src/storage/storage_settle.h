@@ -56,7 +56,7 @@ static inline void say_unhanded(bridge_world_t *w, module_t *m)
 
 static inline void empty_queues(bridge_world_t *w)
 {
-    module_t *m = w->modules;
+    module_t *m = w->work;
 
     while (m) {
         m->changed_now = m->queue_len != 0;
@@ -64,21 +64,23 @@ static inline void empty_queues(bridge_world_t *w)
         m->mark_count = 0;
         if (m->changed_now)
             block_write_room(m);
-        m = m->next;
+        m = m->next_work;
     }
 }
 
 static inline void settle_all(storage_t *r)
 {
-    module_t *m = r->w->modules;
+    module_t *m;
 
+    block_sort_work(r->w);
+    m = r->w->work;
     empty_queues(r->w);
     forget_all(r);
     while (m) {
         say_unapplied(r->w, m);
         say_barred(r->w, m);
         say_unhanded(r->w, m);
-        m = m->next;
+        m = m->next_work;
     }
 }
 

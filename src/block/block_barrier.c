@@ -7,30 +7,34 @@
 
 static void refill_all(bridge_world_t *w)
 {
-    module_t *m = w->modules;
+    module_t *m = w->work;
 
     while (m) {
         block_refill(w, m);
-        m = m->next;
+        m = m->next_work;
     }
 }
 
 static void finish_barrier(bridge_world_t *w)
 {
-    module_t *m = w->modules;
+    module_t *m;
 
     w->turns = 0;
     schedule_clear_triggered(w);
+    block_sort_work(w);
     schedule_account(w);
+    m = w->work;
     while (m) {
         block_drain(w, m);
-        m = m->next;
+        m = m->next_work;
     }
+    block_keep_work(w);
     w->barriers++;
 }
 
 static void run_barrier(bridge_world_t *w)
 {
+    block_sort_work(w);
     block_hand_out(w);
     storage_apply(w->storage);
     refill_all(w);
@@ -45,10 +49,10 @@ static void run_barrier(bridge_world_t *w)
 
 static bool has_queued(const bridge_world_t *w)
 {
-    const module_t *m = w->modules;
+    const module_t *m = w->work;
 
     while (m && !m->queue_len)
-        m = m->next;
+        m = m->next_work;
     return (m != nullptr);
 }
 

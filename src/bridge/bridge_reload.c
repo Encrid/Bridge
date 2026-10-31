@@ -43,7 +43,6 @@ void reload_swap(reloading_t *r)
     bridge_world_t *w = r->w;
     module_t *old = r->old;
     module_t *n = r->n;
-    module_t **link = &w->modules;
 
     old->lender = n;
     if (r->side_by_side)
@@ -53,10 +52,7 @@ void reload_swap(reloading_t *r)
     old->id_count = 0;
     old->id_next = 0;
     forget_config(n);
-    while (*link != old)
-        link = &(*link)->next;
-    n->next = old->next;
-    *link = n;
+    block_take_place(w, n, old);
     module_discard(w, old);
     (void)schedule_build(w, r->err.text, sizeof(r->err.text));
     w->layout_moved = 1;

@@ -76,6 +76,7 @@ static void commit_load(bridge_world_t *w, module_t *m)
     while (*last)
         last = &(*last)->next;
     *last = m;
+    block_join_work(w, m);
     w->module_count++;
     w->layout_moved = 1;
     bridge_resume(w, m);

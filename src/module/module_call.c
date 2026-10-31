@@ -61,6 +61,7 @@ int module_call(module_t *m, const module_call_t *call, backend_err_t *err)
     if (call->timeout > 0)
         api->instance_set_timeout(m->instance, (uint64_t)call->timeout);
     m->refused = 0;
+    block_note_work(m->w, m);
     m->turn = TURN_LIFECYCLE | m->w->turns++;
     if (!abi_marks(m, 0))
         return (module_fail(err, "out of memory: there was none to call its "
