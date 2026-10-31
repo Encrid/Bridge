@@ -54,11 +54,16 @@ The `schedule_build` after each of them refuses nothing, and its callers drop no
 ## Levels and jobs
 
 A phase runs its levels one after the other, and `docs/intern/schedule/schedule_build.c.md`, *Levels*, tells what a level holds.
-In one level, the systems of one module make one job: `docs/intern/schedule/schedule_jobs.c.md`, *The jobs of a level*.
+In one level, the systems of one module make one job. A build that passes makes all the jobs: `docs/intern/schedule/schedule_commit.c.md`, *The jobs*.
+A run walks the jobs of its phase: `docs/intern/schedule/schedule_jobs.c.md`, *A run of the jobs*.
+
 One thread runs a job from its start to its end.
 The threads of `src/pool/pool.h` run the jobs of different modules at the same time.
 So the world runs modules in parallel, and the systems of one module one after the other.
 The systems of one module never overlap: they share the private memory of the module.
+
+A load, an unload, a reload, a failed load or reload, and a new `[order]` each change the list `systems` of the world.
+Each of them builds the schedule before the next phase. So the jobs are always those of the last build that passed.
 
 ## Cost
 
@@ -68,6 +73,8 @@ The order that the modules state keeps the matrix closed, with at most `3 n^3 / 
 For a phase of a thousand systems, that is at most some forty million operations.
 `set_levels` then gives each system its level, at most `n` passes over the `n^2` edges, so `n^3` comparisons for a chain of `n` systems.
 None of this runs in a frame.
+
+A phase walks only its own jobs, so its cost grows with its systems. A barrier walks only the jobs of the triggered observers.
 
 `schedule_room` makes the room for the schedule and for a dispatch once, at create, `[budget] systems` wide.
 So a load, a reload and an unload ask for no memory to build the schedule, and a phase allocates nothing.
@@ -119,6 +126,8 @@ What one thread runs: the systems that one module has in one level, in the order
 | `m` | The module. |
 | `list` | Its systems, in the room of `run_lists`. |
 | `count` | How many systems. |
+| `phase` | The index of the phase, and `phase_count` for the barrier. |
+| `level` | The level of the systems. |
 
 ### schedule_pass_t
 
@@ -128,9 +137,7 @@ One phase that `schedule_run` runs.
 | --- | --- |
 | `w` | The world. |
 | `phase` | The index of the phase. |
-| `level` | The level that runs. |
-| `count` | How many jobs the level has. |
-| `listed` | How many systems the jobs of the level list. |
+| `count` | How many jobs the level that runs has handed. |
 | `ordinal` | How many systems have a number in this pass. |
 
 ## Functions
@@ -161,4 +168,12 @@ One phase that `schedule_run` runs.
 | `schedule_add_own` | Adds the edges of `before`: `docs/intern/schedule/schedule_edges.c.md`, *Functions*. |
 | `schedule_check_phase` | Refuses a phase that it cannot schedule: `docs/intern/schedule/schedule_check.c.md`, *Functions*. |
 | `schedule_run_job` | Runs one job: `docs/intern/schedule/schedule_dispatch.c.md`, *Functions*. |
-| `schedule_gather_jobs` | Makes the jobs of one level: `docs/intern/schedule/schedule_jobs.c.md`, *Functions*. |
+| `schedule_is_due` | Tells if a system runs in its job now: a system always, an observer when something triggered it. |
+| `schedule_commit_jobs` | Makes the jobs of the last build: `docs/intern/schedule/schedule_commit.c.md`, *Functions*. |
+| `schedule_find_jobs` | Finds the first job of a phase: `docs/intern/schedule/schedule_jobs.c.md`, *Functions*. |
+| `schedule_hand_job` | Gives a job and its due systems to a level: `docs/intern/schedule/schedule_jobs.c.md`, *Functions*. |
+| `schedule_run_batch` | Runs and counts the handed jobs of a level: `docs/intern/schedule/schedule_run.c.md`, *Functions*. |
+| `schedule_trigger` | Lists a triggered observer: `docs/intern/schedule/schedule_triggered.c.md`, *Functions*. |
+| `schedule_untrigger` | Drops the observers of a module from the list: `docs/intern/schedule/schedule_triggered.c.md`, *Functions*. |
+| `schedule_clear_triggered` | Empties the list at the end of a barrier: `docs/intern/schedule/schedule_triggered.c.md`, *Functions*. |
+| `schedule_run_triggered` | Runs the jobs of the triggered observers: `docs/intern/schedule/schedule_triggered.c.md`, *Functions*. |

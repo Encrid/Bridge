@@ -46,6 +46,9 @@ Systems and observers have slots of their own.
 The system is also put among the systems of the world, in the order of registration.
 Thus the systems of one module are in the order of their slots there.
 
+A module registers only in its `init` or its `reload`, and one module starts at a time. A drop keeps the order of the others.
+So the systems of one module are next to each other in the list of the world.
+
 ## Functions
 
 | Function | Result |

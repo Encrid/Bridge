@@ -35,6 +35,9 @@ First `build_phase` writes in `where` the phase or the barrier, as each reason n
 All of them use the room of `build_in` and `build_bits`, and only the levels stay in the systems.
 The loop stops at the first refused phase, and `why` then says why.
 
+A build that passes then makes the jobs with `schedule_commit_jobs`: `docs/intern/schedule/schedule_commit.c.md`.
+A refused build keeps the jobs of the last build that passed.
+
 ## Functions
 
 | Function | Result |
