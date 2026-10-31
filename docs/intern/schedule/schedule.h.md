@@ -48,7 +48,7 @@ The refusal names both systems and the component.
 The order of declaration and the order of load never decide, so nothing depends on which module the host found first.
 Two observers at the barrier follow the same rules.
 
-So an unload, a failed load and a reload take away the order of no two loaded systems that conflict.
+So an unload, a failed load, a reload and a failed group reload take away the order of no two loaded systems that conflict.
 The `schedule_build` after each of them refuses nothing, and its callers drop no reason when they drop its result.
 
 ## Levels and jobs
