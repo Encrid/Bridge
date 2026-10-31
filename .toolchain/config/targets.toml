@@ -2,35 +2,35 @@
 system_defines = []
 system_libraries = []
 host_resources = ["tests/seam/seam.rc"]
-bridge_os_sha256 = "6739e884ddb04b85ae075cf410ba1e5d92c2a563182acd176baf110b8bd0b4db"
+bridge_os_sha256 = "fe89b1dc13813417c1f11827163287d292cbe0658c0eeeece275e02bebc3506f"
 
 [targets.x86_64-linux-gnu]
 system_defines = []
 system_libraries = ["-lm", "-lpthread", "-ldl"]
 host_resources = []
-bridge_os_sha256 = "36726d787d3f7bbdcf2ce64d33111fd0ad77cfd6d0ce01557aa48d3de68889b7"
+bridge_os_sha256 = "040d8e2ff61aa742de13cded0e1fdb9506d152b310c467e83ea4c922229db441"
 
 [targets.aarch64-macos]
 system_defines = ["-D_DARWIN_C_SOURCE"]
 system_libraries = []
 host_resources = []
-bridge_os_sha256 = "44d723ac3ba6607a941925382d282b972a789d054251442c0b0494e9ed9f1233"
+bridge_os_sha256 = "17fc2b42748bbb94e7a73a808965374008a83472a4bc930d45093d54d2242393"
 
 [targets.aarch64-linux-gnu]
 system_defines = []
 system_libraries = ["-lm", "-lpthread", "-ldl"]
 host_resources = []
-bridge_os_sha256 = "56fc140bc4ac70b25267758b981eb05950bb9ebacede418c5cfd1015daa00fe9"
+bridge_os_sha256 = "867f3e8bb2311559cc410f8ecf78a07701704709419dfeb1888d620e4319773e"
 
 [targets.x86_64-macos]
 system_defines = ["-D_DARWIN_C_SOURCE"]
 system_libraries = []
 host_resources = []
-bridge_os_sha256 = "eeb06b9f73c3683870e527847824b54f36237b5811c85bbf4183a2b4a22409d4"
+bridge_os_sha256 = "6ee6ce000bb0bd7ce9b4ac65259694236a978c82cdc74d41949950ee938f37fa"
 
 [targets.aarch64-windows-gnu]
 system_defines = []
 system_libraries = []
 host_resources = ["tests/seam/seam.rc"]
-bridge_os_sha256 = "6d10dd4ea5d76b3ad2a620db8e7013f35c51fc48d21190760069421065774d11"
+bridge_os_sha256 = "9375de9f9fc939ed7a9bb6fbe4369e1f8b0efa889675de917abdb4ce034df4fa"
 
