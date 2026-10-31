@@ -9,7 +9,8 @@ It builds them both again from the whole set, and keeps nothing of the old set: 
 
 The call is all or nothing. `bridge_set_order_now` keeps the old `schedule_pairs_t` by value, zeroes the world's own, and builds the new set into it.
 `schedule_order` refuses a pair that does not fit, and leaves the old set to go back to.
-`schedule_build` then refuses a schedule that cannot be made, and `roll_back` puts the old set back.
+`schedule_mark_all` marks each system, since the new pairs can order any two: `docs/intern/schedule/schedule_marks.c.md`, *The whole schedule*.
+`schedule_build` then refuses a schedule that cannot be made, and `roll_back` puts the old set back and marks each system again.
 The build of the old set cannot fail, since it is the set that built before, and a build takes no memory.
 
 A refusal keeps the old order and the old schedule. The world is the same as before the call.

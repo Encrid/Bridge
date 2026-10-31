@@ -10,7 +10,10 @@ This file registers a system or an observer: it reads what the module stated, ha
 4. Read its terms, one by one: `docs/intern/abi/abi_term.c.md`.
 5. If Bridge refuses a change, a slot of `before` or a term, free what it had, and give 1.
 6. Hand the terms to storage, and list the system among those of the world and of its module.
-7. Give its slot.
+7. Mark the system fresh and dirty, and put it into the index of the components.
+8. Give its slot.
+
+Step 7 makes the next build check the system and give its group its levels: `docs/intern/schedule/schedule_marks.c.md`.
 
 ## The changes
 
@@ -56,5 +59,5 @@ So the systems of one module are next to each other in the list of the world.
 | `read_changes` | Reads what a system or an observer attaches or detaches. 1 with a refusal. |
 | `read_term` | Reads term `i`: what storage is asked, and what the conflict graph reads of it. 1 with a refusal. |
 | `hand_over` | Hands the terms of a system or an observer to storage, and fills in the system, also its slot. |
-| `list_system` | Puts a system among the systems of the world, and among the systems or the observers of its module. Gives its slot there. |
+| `list_system` | Puts a system among the systems of the world, and among the systems or the observers of its module. Marks it fresh and dirty, and puts it into the index of the components. Gives its slot there. |
 | `abi_subscribe` | Registers a system or an observer, and gives its slot in `r`. 1 with a refusal. |

@@ -23,6 +23,8 @@ An instance can hold the memory for as long as it runs, so the memory is never r
 
 `module_drop_systems` takes each system and observer of the module out of the list of the world, and keeps the order of the others.
 First, `schedule_untrigger` takes its observers off the list of the triggered observers.
+Then `schedule_leave_module` marks the neighbors of each of its systems dirty, and takes each system out of the index of the components.
+Both run before the first system is freed, since they read the list of the world: `docs/intern/schedule/schedule_marks.c.md`.
 A system leaves storage with its terms.
 A parked system also lowers the count of parked systems of the world.
 

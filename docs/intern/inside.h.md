@@ -33,6 +33,7 @@ None of them is on the hot path.
 | `declared_type_t` | A component or another declared type, by its namespaced name. |
 | `pending_t` | Who triggered an observer since the last barrier, and how: `id` and `events`. |
 | `system_term_t` | What the conflict graph reads of a term: `touches`, the component or null where the term reads nothing, and `writes`. |
+| `system_use_t` | One use of a component by a system in the index: its system `s`, its `type`, and the `next` use of the type. |
 | `bridge_system_t` | A system or an observer. |
 | `module_mark_t` | Where the changes of one turn begin in the queue of a module: `turn` and `at`. |
 | `module_t` | A loaded module. |
@@ -77,6 +78,7 @@ Storage holds the rows of a component, and this record is what a load checks.
 | `replaces` | At a reload, the type of this name whose rows become the rows of this type when the reload holds. |
 | `superseded` | That another type of this name will take the place of this type. |
 | `runs`, `run_count` | On the type that is superseded, which bytes of its value are which bytes of the value of its successor. |
+| `uses` | The first use of it by a system, or `nullptr`: `docs/intern/schedule/schedule_uses.c.md`, *The index*. |
 
 `runs` is null if the bytes are the same: `docs/intern/abi/abi_relay_run.c.md`, *A run*.
 
@@ -99,7 +101,10 @@ A system and an observer are a query and a function either way, so one record se
 | `fn` | Its function. |
 | `level` | Its level in its phase: a level runs before the next. |
 | `job` | The index of its job in `run_jobs` of the world: `docs/intern/schedule/schedule_commit.c.md`, *The jobs*. |
-| `parked` | Whether it is parked: `docs/intern/schedule/schedule_edges.c.md`, *The systems of a phase*. |
+| `fresh`, `dirty` | The marks that the next build looks at: `docs/intern/schedule/schedule_marks.c.md`, *The marks*. |
+| `at` | Its place in `systems` of the world at the last build. |
+| `grouped` | The stamp of the last group that held it: `docs/intern/schedule/schedule_group.c.md`, *The steps*. |
+| `parked` | Whether a reload parked it: `docs/intern/abi/abi_alloc.c.md`, *A parked system*. |
 | `observer` | Whether it is an observer. |
 | `pending`, `pending_count`, `pending_room` | Who triggered it since the last barrier, how many, and the room of the list. |
 | `next_triggered` | The next observer of the list `triggered` of the world: `docs/intern/schedule/schedule_triggered.c.md`, *The list*. |
@@ -111,6 +116,7 @@ A system and an observer are a query and a function either way, so one record se
 | `changes`, `change_count` | The components that it stated that it attaches or detaches. They lie after the terms, in the same block. |
 | `slot` | Its slot among the systems of its module, or among its observers: what `add_system` or `observe` gave. |
 | `stated_before` | The order that its module states, as bits: `docs/intern/schedule/schedule_before.c.md`, *The bits*. They lie after the changes, in the same block. |
+| `use`, `use_count` | Its uses of components in the index: `docs/intern/schedule/schedule_uses.c.md`, *The index*. They lie after the bits of `stated_before`, in the same block. |
 | `calls`, `nanos` | The profile: how many times an observer ran, and the nanoseconds it or a system spent, both since its load. Written only while `profile` is on. |
 | `term` | Its `terms` terms, as the conflict graph reads them. |
 
@@ -223,6 +229,7 @@ A `schedule_pairs_t` holds the pairs of `[order]`: `docs/intern/schedule/schedul
 | `job_count` | How many jobs `run_jobs` holds. |
 | `triggered` | The first observer that something triggered since the last barrier, or `nullptr`. |
 | `build_in`, `build_bits` | What the schedule is made in, when a module comes or goes. |
+| `build_stamp` | The stamp of the last group of a build: `docs/intern/schedule/schedule_group.c.md`, *The steps*. |
 | `order` | The names of the pairs of `[order]`, and their closed matrix. |
 | `pool` | The threads that run a phase. |
 | `shared`, `shared_len`, `shared_reserve` | The shared block, its length, and the address space reserved for it. |
