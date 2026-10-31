@@ -17,8 +17,6 @@ static void write_cells(publish_t *p, uint32_t t)
     uint32_t id;
     uint32_t s = 0;
 
-    p->rows[t] = p->r->tables[t].rows;
-    p->blocks[t] = p->r->tables[t].block;
     while (s < m->declared_count) {
         id = m->declared[s]->type->id;
         row[s] = get_handed(p->r, id, columns[id]);
@@ -62,8 +60,6 @@ static void write_every_cell(publish_t *p)
 
     (void)block_write_header(r->w, m);
     memset(p->cell, 0, 4u * m->declared_count * tables);
-    memset(p->rows, 0, 4u * tables);
-    memset(p->blocks, 0, 4u * tables);
     while (t < r->table_high) {
         if (r->tables[t].live)
             write_cells(p, t);

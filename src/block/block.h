@@ -13,6 +13,7 @@ typedef struct {
     uint64_t sparse;
     uint64_t sets;
     uint64_t direct;
+    uint64_t directory;
     uint64_t cells;
     uint64_t arena;
     uint64_t columns;

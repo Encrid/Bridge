@@ -42,9 +42,9 @@ void block_hand_out(bridge_world_t *w)
 static void write_caps(bridge_header_t *h, const bridge_world_t *w)
 {
     h->kept = h->column_base + 4u * h->types * h->tables;
-    h->rows = h->kept + 4u * h->types;
-    h->blocks = h->rows + 4u * h->tables;
-    h->stride = h->blocks + 4u * h->tables;
+    h->rows = w->directory;
+    h->blocks = w->directory + 4u * h->tables;
+    h->stride = h->kept + 4u * h->types;
     h->write = h->stride + 4u * h->types;
     h->kind = h->write + 4u * h->types;
     h->owned = h->kind + 4u * h->types;

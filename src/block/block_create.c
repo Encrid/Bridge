@@ -24,6 +24,7 @@ static int map_block(bridge_world_t *w, const block_layout_t *layout)
     w->sparse_sets = (uint32_t)layout->sets;
     w->direct = (uint32_t)layout->direct;
     w->direct_indexed = (uint32_t)layout->cells;
+    w->directory = (uint32_t)layout->directory;
     w->arena = (uint32_t)layout->arena;
     w->columns = (uint32_t)layout->columns;
     return (0);
