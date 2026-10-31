@@ -3579,6 +3579,12 @@ claims = { matches = ["b2 p3 game:places@0.1.0/first: at.*alive"] }
 false = { run = ["{out}/seam{exe}", "record.place-of-the-systems-of-two-modules"] }
 
 [[case]]
+name = "bridge_reload-group-refused-keeps-the-levels"
+run = ["{out}/seam{exe}", "bridge_reload-group-refused-keeps-the-levels"]
+claims = { matches = ["no module of the group is reloaded: .*p3 game:places@0\\.1\\.0/first: at.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_reload-group-schedule-conflict-refused"] }
+
+[[case]]
 name = "config.order-pair-agrees-with-before"
 run = ["{out}/seam{exe}", "config.order-pair-agrees-with-before"]
 claims = { matches = ["game:twostep@0.1.0/show: x 3 0.*alive"] }

@@ -127,6 +127,8 @@ static const host_case_t TEST_CASES[] = {
         test_order_pair_beside_before, "twostep", test_set_counting },
     { "config.order-pair-holds-without-a-conflict",
         test_place_paired, "", test_set_counting },
+    { "bridge_reload-group-refused-keeps-the-levels",
+        test_place_after_refused_group, "", test_set_counting },
     { "bridge_reload-that-closes-a-cycle-refused",
         test_reload_into_cycle, "twostep_third_reloadable", test_set_guarded },
     { "bridge_reload-that-closes-no-cycle-taken",
