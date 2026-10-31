@@ -71,5 +71,7 @@ int schedule_build(bridge_world_t *w, char *why, size_t why_len)
         refused = build_phase(w, &p);
         p.phase++;
     }
+    if (!refused)
+        schedule_commit_jobs(w);
     return (refused);
 }
