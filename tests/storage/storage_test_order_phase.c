@@ -46,9 +46,12 @@ static bool setup(phase_world_t *o, bridge_system_t **s, bridge_world_t *w,
 {
     w->build_in = calloc(4, sizeof(*w->build_in));
     w->build_bits = calloc(9, sizeof(*w->build_bits));
+    w->run_jobs = calloc(4, sizeof(schedule_job_t));
+    w->run_lists = calloc(4, sizeof(*w->run_lists));
     s[0] = make_sys(&o->m, &o->a);
     s[1] = make_sys(&o->n, &o->b);
-    if (!w->build_in || !w->build_bits || !s[0] || !s[1]
+    if (!w->build_in || !w->build_bits || !w->run_jobs || !w->run_lists
+        || !s[0] || !s[1]
         || schedule_order(w, cross ? PHASE_PAIR : SAME_PAIRS, cross ? 1 : 3))
         return (false);
     s[0]->full = FA;
@@ -69,6 +72,8 @@ static void free_phase(bridge_world_t *w, bridge_system_t **s)
     schedule_free_pairs(&w->order);
     free(w->build_in);
     free(w->build_bits);
+    free(w->run_jobs);
+    free(w->run_lists);
 }
 
 enum storage_test_end storage_test_order_phase(storage_test_t *t)

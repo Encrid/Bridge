@@ -74,6 +74,8 @@ static void free_world(bridge_world_t *w, bridge_system_t **s)
     schedule_free_pairs(&w->order);
     free(w->build_in);
     free(w->build_bits);
+    free(w->run_jobs);
+    free(w->run_lists);
 }
 
 static void build_in_order(bridge_world_t *w, bridge_system_t **s,
@@ -140,7 +142,10 @@ enum storage_test_end storage_test_order_two_modules(storage_test_t *t)
 
     w.build_in = calloc(4, sizeof(*w.build_in));
     w.build_bits = calloc(4 * 2 + 1, sizeof(*w.build_bits));
-    if (!w.build_in || !w.build_bits || !make_four(&o, s)
+    w.run_jobs = calloc(4, sizeof(schedule_job_t));
+    w.run_lists = calloc(4, sizeof(*w.run_lists));
+    if (!w.build_in || !w.build_bits || !w.run_jobs || !w.run_lists
+        || !make_four(&o, s)
         || schedule_order(&w, cycle ? ORDER_PAIRS : CHAIN_PAIRS, 2))
         printf("FAIL: the world of the order was not made\n");
     while (k < 4 && s[k]) {

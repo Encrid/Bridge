@@ -60,7 +60,9 @@ static bool fill_world(bridge_world_t *w, bridge_system_t **list, module_t *m,
     w->system_count = CHAIN_SYSTEMS;
     w->build_in = calloc(CHAIN_SYSTEMS, sizeof(*w->build_in));
     w->build_bits = calloc(CHAIN_SYSTEMS * 2 + 1, sizeof(*w->build_bits));
-    return (w->build_in && w->build_bits);
+    w->run_jobs = calloc(CHAIN_SYSTEMS, sizeof(schedule_job_t));
+    w->run_lists = calloc(CHAIN_SYSTEMS, sizeof(*w->run_lists));
+    return (w->build_in && w->build_bits && w->run_jobs && w->run_lists);
 }
 
 static void free_all(bridge_world_t *w, bridge_system_t **list)
@@ -73,6 +75,8 @@ static void free_all(bridge_world_t *w, bridge_system_t **list)
     }
     free(w->build_in);
     free(w->build_bits);
+    free(w->run_jobs);
+    free(w->run_lists);
 }
 
 enum storage_test_end storage_test_count_levels([[maybe_unused]] storage_test_t *t)
