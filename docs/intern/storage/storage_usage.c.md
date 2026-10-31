@@ -1,6 +1,7 @@
 # src/storage/storage_usage.c
 
 This file reports how many entities and tables a world holds now, and the most it has held, for `bridge_usage`.
+It also tells the publish whether a table changed.
 
 ## What it counts
 
@@ -15,3 +16,4 @@ Tables keep a live count and a watermark of their own, so this file reads both w
 | --- | --- |
 | `free_entities` | Walks the free list of the index and counts the slots on it. |
 | `storage_usage` | Gives a world's entities and tables, each as a live count and a peak. |
+| `storage_is_dirty` | Gives whether a table changed since the last publish: `docs/intern/block/block_publish.c.md`. |

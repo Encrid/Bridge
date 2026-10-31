@@ -63,5 +63,5 @@ So the rebuild cannot be refused, and it asks for no memory.
 | `take_share` | Takes the share of the module of the persistent arena, and records it as the one range of the module, with all of it left. 1, with a record, and the module discarded, if there is no memory to keep track of it. |
 | `fail_load` | Gives the lines that the module wrote, and says that the load failed. Stops the world if the module states `fail` and the failure is not a refusal of the config. Runs the `shutdown` if `init` gave 0 and the module has one, and leaves storage as it was. Gives 1. |
 | `start_loaded` | Sets the ids aside, runs `init`, builds the schedule again, and then writes the settings. 1 if a step fails, 2 if the config is refused, with why in `err`. |
-| `commit_load` | Puts the module at the end of the list, lets the world run it, and runs a barrier. |
+| `commit_load` | Puts the module at the end of the list, notes it on the work list, lets the world run it, and runs a barrier. |
 | `bridge_load_now` | Loads a module. 0 if it loaded and the world runs, and 1 if not. |

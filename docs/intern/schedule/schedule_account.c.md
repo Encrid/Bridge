@@ -24,7 +24,8 @@ If an allocation fails, `bridge_lacks` writes a record and the function gives 1.
 ## The settlement at a barrier
 
 `src/block/block_barrier.c` calls `schedule_account` at the end of each barrier, after the observers ran.
-`schedule_account` settles each module, in the order of the list of modules.
+`schedule_account` settles each module of the work list, in the order of the modules: `docs/intern/block/block_work.c.md`.
+A module without work has no fault, no change and no system that reached its limit, so its settlement would change nothing.
 For one module, `settle_module` does these steps:
 
 1. If `fault_now` is set, it adds 1 to `failures`, the count of the module.
@@ -53,5 +54,5 @@ An observer at the barrier of a load, an unload or a reload sets `end_asked` too
 | `schedule_room` | Allocates the room of a dispatch and of a schedule, `[budget] systems` wide. Gives 0, or 1 with a record if there is no memory. |
 | `say_stopped` | Writes the record that a module is stopped: by the system that reached the limit, or by its own count. |
 | `settle_module` | Counts the barrier of one module against its budget, and stops the module if a count reached the limit. |
-| `schedule_account` | Settles each module at a barrier. |
+| `schedule_account` | Settles each module of the work list at a barrier. |
 | `schedule_note_end` | Sets `end_asked` of the world, with a record, if `ended` of the system is set. |

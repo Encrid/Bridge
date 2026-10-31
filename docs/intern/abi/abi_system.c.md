@@ -47,6 +47,6 @@ An id that finds nothing was removed or destroyed, and that is how a module read
 
 | Function | Result |
 | --- | --- |
-| `abi_hear` | Adds a change that an observer is owed to the list of who triggered it. At the first change since the last barrier, it puts the observer on the list of `schedule_trigger`. Storage calls it. |
+| `abi_hear` | Adds a change that an observer is owed to the list of who triggered it. At the first change since the last barrier, it puts the observer on the list of `schedule_trigger`, and its module on the work list. Storage calls it. |
 | `abi_add_system` | `add_system(at) -> slot`. |
 | `abi_observe` | `observe(at) -> slot`. |

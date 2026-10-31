@@ -139,6 +139,7 @@ How `storage_convert` ended.
 | `storage_end_publish` | Forgets which tables changed: `docs/intern/storage/storage_publish.c.md`, *Functions*. |
 | `storage_count_tables` | Counts the table ids: `docs/intern/storage/storage_publish.c.md`, *Functions*. |
 | `storage_usage` | Tells the live and the peak entities and tables: `docs/intern/storage/storage_usage.c.md`, *Functions*. |
+| `storage_is_dirty` | Tells if a table is dirty: `docs/intern/storage/storage_usage.c.md`, *Functions*. |
 | `storage_count_carriers` | Counts the entities that carry a type: `docs/intern/storage/storage_carriers.c.md`, *Functions*. |
 | `storage_count_off` | Counts the toggled rows that are off: `docs/intern/storage/storage_values.c.md`, *Functions*. |
 | `storage_visit_carriers` | Visits each entity that carries a type: `docs/intern/storage/storage_carriers.c.md`, *Functions*. |
