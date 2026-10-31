@@ -72,6 +72,7 @@ static uint32_t start_members(bridge_world_t *w, reloading_t *reloads,
 static int group_fail(bridge_world_t *w, reloading_t *reloads, uint32_t done,
     uint32_t count)
 {
+    char why[256] = "";
     uint32_t i = 0;
 
     if (!count)
@@ -84,6 +85,7 @@ static int group_fail(bridge_world_t *w, reloading_t *reloads, uint32_t done,
     for (i = 0; i < count; i++)
         if (reloads[i].old)
             reloads[i].old->regrouping = false;
+    (void)schedule_build(w, why, sizeof(why));
     free(reloads);
     return (1);
 }
