@@ -143,6 +143,7 @@ void storage_test_say_held(const bridge_world_t *w);
 
 int storage_test_measure_tables(storage_test_t *t);
 int storage_test_measure_stress(storage_test_t *t, uint32_t threads);
+int storage_test_measure_schedule(storage_test_t *t);
 
 int storage_test_weigh_sets(storage_test_t *t);
 int storage_test_weigh_toggles(storage_test_t *t);
