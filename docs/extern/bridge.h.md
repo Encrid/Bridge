@@ -82,10 +82,6 @@ windows          CloseHandle
 windows          GetCurrentThreadId
 windows          QueryPerformanceCounter
 windows          QueryPerformanceFrequency
-windows          InitializeCriticalSection
-windows          EnterCriticalSection
-windows          LeaveCriticalSection
-windows          DeleteCriticalSection
 windows          CreateEventA
 windows          SetEvent
 windows_x86_64   RtlMoveMemory
@@ -132,6 +128,10 @@ windows          VirtualQuery
 windows          GetLastError
 windows          TlsGetValue
 windows          Sleep
+windows          InitializeCriticalSection
+windows          EnterCriticalSection
+windows          LeaveCriticalSection
+windows          DeleteCriticalSection
 windows_aarch64  _fpreset
 macos            dyld_stub_binder
 ```
@@ -167,13 +167,14 @@ They are in the list because they are imports all the same: a new one is a depen
 | `pthread_attr_init`, `pthread_attr_setstacksize`, `pthread_attr_destroy`, `sysconf` | The os layer gives a worker thread its stack on Linux and macOS, in whole pages. |
 | `GetCurrentThreadId`, `pthread_self` | The os layer gives the thread that runs, for a pinned module. |
 | `QueryPerformanceCounter`, `QueryPerformanceFrequency`, `clock_gettime` | The os layer reads the clock that keeps a deadline, and its unit. |
-| `InitializeCriticalSection`, `EnterCriticalSection`, `LeaveCriticalSection`, `DeleteCriticalSection`, `pthread_mutex_init`, `pthread_mutex_lock`, `pthread_mutex_unlock`, `pthread_mutex_destroy` | The os layer makes, locks, unlocks and frees a mutex. |
+| `pthread_mutex_init`, `pthread_mutex_lock`, `pthread_mutex_unlock`, `pthread_mutex_destroy` | The os layer makes, locks, unlocks and frees the mutex of an event on Linux and macOS. |
 | `CreateEventA`, `SetEvent`, `pthread_cond_init`, `pthread_cond_signal`, `pthread_cond_wait`, `pthread_cond_timedwait`, `pthread_cond_timedwait_relative_np`, `pthread_cond_destroy` | The os layer makes, sets, waits for and frees an event. `pthread_cond_timedwait` waits until a deadline, and `pthread_cond_timedwait_relative_np` waits for a time on macOS. |
 | `pthread_condattr_init`, `pthread_condattr_setclock`, `pthread_condattr_destroy` | On Linux, the event waits on a clock that only rises. |
 | `_initterm`, `_initterm_e`, `_initialize_onexit_table`, `_register_onexit_function`, `_execute_onexit_table` | The startup code runs the initializers of the library, and keeps the table of what runs at exit. |
 | `_exit`, `abort`, `__acrt_iob_func`, `__stdio_common_vfprintf`, `fwrite` | The startup code ends the process if the start fails, and writes what went wrong. |
 | `VirtualProtect`, `VirtualQuery`, `GetLastError` | The startup code applies the relocations of the library. |
 | `TlsGetValue`, `Sleep` | The startup code reads its thread-local storage, and waits for its start. |
+| `InitializeCriticalSection`, `EnterCriticalSection`, `LeaveCriticalSection`, `DeleteCriticalSection` | The startup code guards its list of the functions that free thread-local storage. |
 | `_fpreset` | The startup code sets the floating-point state on Windows for arm64. |
 | `dyld_stub_binder` | The loader of macOS binds an import with it at the first call. |
 
