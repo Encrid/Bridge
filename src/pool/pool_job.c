@@ -19,7 +19,10 @@ static int take_job(pool_t *p)
 
 void pool_finish_job(pool_t *p)
 {
-    if (atomic_fetch_sub_explicit(&p->left, 1, memory_order_acq_rel) == 1)
+    uint32_t left = atomic_fetch_sub_explicit(&p->left, 1,
+        memory_order_acq_rel);
+
+    if (left == 1)
         os_event_set(p->done);
 }
 
