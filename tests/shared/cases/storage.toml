@@ -209,6 +209,12 @@ claims = { matches = ["64 of 64 jobs ran 2000 times each, and 0 runs of a job of
 false = { run = ["{out}/storage{exe}", "pool", "1999"] }
 
 [[case]]
+name = "schedule_build-of-the-changed-groups-gives-the-levels-and-the-refusals-of-a-whole-build"
+run = ["{out}/storage{exe}", "both", "2000"]
+claims = { matches = ["both ways: 2000 worlds, 44682 builds, refused 2133 for 2 phases, 137 for a cycle and 5898 for a conflict, 0 differ.*alive"] }
+false = { run = ["{out}/storage{exe}", "both", "1999"] }
+
+[[case]]
 name = "table_hash_fill-of-25-gives-the-hash-four-places-for-each-table-id"
 run = ["{out}/storage{exe}", "hashroom", "25"]
 claims = { matches = ["hash room 8 for 2 table ids.*alive"] }

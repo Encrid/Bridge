@@ -31,12 +31,11 @@ typedef struct {
 
 static bridge_system_t *make_sys(module_t *m, declared_type_t *c)
 {
-    bridge_system_t *s = calloc(1, sizeof(*s) + sizeof(system_term_t));
+    bridge_system_t *s = storage_test_make_system(m, 1, 0, 1);
 
     if (s) {
-        s->m = m;
-        s->terms = 1;
         s->term[0] = (system_term_t){ c, true };
+        schedule_index_system(s);
     }
     return (s);
 }
@@ -89,7 +88,7 @@ enum storage_test_end storage_test_order_phase(storage_test_t *t)
 
     if (!setup(&o, s, &w, !strcmp(t->what, "orderphases")))
         printf("FAIL: the world of the phases was not made\n");
-    refused = schedule_build(&w, why, sizeof(why));
+    refused = storage_test_build_all(&w, why, sizeof(why));
     printf("%s: %s%s\n", t->what, refused ? "refused: " : "built", why);
     free_phase(&w, s);
     return (STORAGE_TEST_DONE);
