@@ -26,7 +26,7 @@ BRIDGE_EXPORT(poke) int poke(void)
 
 BRIDGE_EXPORT(any) int any(void)
 {
-    uint32_t count = bridge_count_triggers(watching);
+    uint32_t count = bridge_get_trigger_count(watching);
     uint32_t trigger;
     uint64_t id;
     uint64_t e;
@@ -35,13 +35,13 @@ BRIDGE_EXPORT(any) int any(void)
     while (i < count) {
         trigger = bridge_get_trigger(watching, i);
         id = bridge_get_trigger_id(trigger);
-        e = bridge_find(id);
+        e = bridge_get_location(id);
         BRIDGE_LOG(BRIDGE_LOG_INFO, "event",
             bridge_get_trigger_events(trigger),
             (bridge_is_alive(id)
-                    && bridge_base(marked, bridge_entity_table(e)))
-                ? BRIDGE_GET(marked_t, by, marked, bridge_entity_table(e),
-                    bridge_entity_row(e)) : 0xdead);
+                    && bridge_has_column(marked, bridge_get_entity_table(e)))
+                ? BRIDGE_GET(marked_t, by, marked, bridge_get_entity_table(e),
+                    bridge_get_entity_row(e)) : 0xdead);
         i++;
     }
     return (0);

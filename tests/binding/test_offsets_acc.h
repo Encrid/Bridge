@@ -12,7 +12,8 @@
 
     #define BRIDGE_EXPORT(name) TEST_EXPORT
 
-    #define BRIDGE_HEADER(field) acc_own_32(offsetof(bridge_header_t, field))
+    #define BRIDGE_HEADER(field) \
+        acc_get_own_32(offsetof(bridge_header_t, field))
 
 TEST_EXPORT void test_keep_table(const test_api_t *api);
 const test_api_t *test_get_table(void);
@@ -27,44 +28,46 @@ void bridge_detach(uint64_t id, uint32_t slot);
 uint32_t bridge_alloc(uint32_t len);
 
 void acc_trap(void);
-uint32_t acc_resolve(uint32_t slot, uint32_t a, uint32_t b, uint32_t field,
+uint32_t acc_get_cell(uint32_t slot, uint32_t a, uint32_t b, uint32_t field,
     uint32_t width, uint32_t store);
-uint32_t acc_toggle_bits(uint32_t slot, uint32_t table, uint32_t row);
+uint32_t acc_get_toggle_bits(uint32_t slot, uint32_t table, uint32_t row);
 
-int32_t acc_ld_i8(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
-uint32_t acc_ld_u8(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
-int32_t acc_ld_i16(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
-uint32_t acc_ld_u16(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
-uint32_t acc_ld_32(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
-uint64_t acc_ld_64(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
-float acc_ld_f32(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
-double acc_ld_f64(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
-void acc_st_8(uint32_t slot, uint32_t a, uint32_t b, uint32_t field, uint32_t v);
-void acc_st_16(uint32_t slot, uint32_t a, uint32_t b, uint32_t field,
+int32_t acc_get_i8(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
+uint32_t acc_get_u8(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
+int32_t acc_get_i16(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
+uint32_t acc_get_u16(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
+uint32_t acc_get_32(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
+uint64_t acc_get_64(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
+float acc_get_f32(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
+double acc_get_f64(uint32_t slot, uint32_t a, uint32_t b, uint32_t field);
+void acc_set_8(uint32_t slot, uint32_t a, uint32_t b, uint32_t field,
     uint32_t v);
-void acc_st_32(uint32_t slot, uint32_t a, uint32_t b, uint32_t field,
+void acc_set_16(uint32_t slot, uint32_t a, uint32_t b, uint32_t field,
     uint32_t v);
-void acc_st_64(uint32_t slot, uint32_t a, uint32_t b, uint32_t field,
+void acc_set_32(uint32_t slot, uint32_t a, uint32_t b, uint32_t field,
+    uint32_t v);
+void acc_set_64(uint32_t slot, uint32_t a, uint32_t b, uint32_t field,
     uint64_t v);
-void acc_st_f32(uint32_t slot, uint32_t a, uint32_t b, uint32_t field, float v);
-void acc_st_f64(uint32_t slot, uint32_t a, uint32_t b, uint32_t field,
+void acc_set_f32(uint32_t slot, uint32_t a, uint32_t b, uint32_t field,
+    float v);
+void acc_set_f64(uint32_t slot, uint32_t a, uint32_t b, uint32_t field,
     double v);
 
-uint64_t acc_entity(uint64_t id);
-uint32_t acc_rows(uint32_t table);
-uint64_t acc_who(uint32_t table, uint32_t row);
+uint64_t acc_get_location(uint64_t id);
+uint32_t acc_get_rows(uint32_t table);
+uint64_t acc_get_entity(uint32_t table, uint32_t row);
 uint32_t acc_has(uint32_t slot, uint32_t id);
-uint32_t acc_toggle(uint32_t slot, uint32_t table, uint32_t row);
-void acc_toggle_set(uint32_t slot, uint32_t table, uint32_t row, uint32_t on);
+uint32_t acc_is_on(uint32_t slot, uint32_t table, uint32_t row);
+void acc_set_toggle(uint32_t slot, uint32_t table, uint32_t row, uint32_t on);
 
-uint32_t acc_own_32(uint32_t at);
-uint64_t acc_own_64(uint32_t at);
-void acc_own_st(uint32_t at, uint32_t v);
-uint32_t acc_peek_32(uint32_t at);
-uint64_t acc_peek_64(uint32_t at);
+uint32_t acc_get_own_32(uint32_t at);
+uint64_t acc_get_own_64(uint32_t at);
+void acc_set_own_32(uint32_t at, uint32_t v);
+uint32_t acc_get_shared_32(uint32_t at);
+uint64_t acc_get_shared_64(uint32_t at);
 
-void acc_to_private(uint32_t to, const void *from, uint32_t len);
-void acc_to_shared(uint32_t to, const void *from, uint32_t len);
-void acc_from_shared(void *to, uint32_t from, uint32_t len);
+void acc_copy_to_private(uint32_t to, const void *from, uint32_t len);
+void acc_copy_to_shared(uint32_t to, const void *from, uint32_t len);
+void acc_copy_from_shared(void *to, uint32_t from, uint32_t len);
 
 #endif

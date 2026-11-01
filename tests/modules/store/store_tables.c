@@ -43,7 +43,7 @@ TEST(see)
     uint32_t s = 0;
 
     while (s < q->spans) {
-        rows += test_count_rows(api, test_get_span(api, q, s, 1));
+        rows += test_get_rows(api, test_get_span(api, q, s, 1));
         s++;
     }
     say(api, "the first kind: spans, rows", q->spans, rows);

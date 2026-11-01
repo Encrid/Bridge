@@ -11,12 +11,12 @@ uint32_t husk_heard[3];
 
 static uint32_t count_rows(uint32_t query)
 {
-    uint32_t spans = bridge_count_spans(query);
+    uint32_t spans = bridge_get_span_count(query);
     uint32_t rows = 0;
     uint32_t s = 0;
 
     while (s < spans) {
-        rows += bridge_count_rows(bridge_get_span(query, s));
+        rows += bridge_get_rows(bridge_get_span(query, s));
         s++;
     }
     return (rows);
@@ -24,11 +24,13 @@ static uint32_t count_rows(uint32_t query)
 
 uint32_t husk_get_value(uint64_t id, uint32_t slot)
 {
-    uint64_t e = bridge_find(id);
+    uint64_t e = bridge_get_location(id);
 
-    if (!bridge_is_alive(id) || !bridge_base(slot, bridge_entity_table(e)))
+    if (!bridge_is_alive(id)
+        || !bridge_has_column(slot, bridge_get_entity_table(e)))
         return (0);
-    return (acc_ld_32(slot, bridge_entity_table(e), bridge_entity_row(e), 0));
+    return (acc_get_32(slot, bridge_get_entity_table(e),
+        bridge_get_entity_row(e), 0));
 }
 
 static void say_first(uint32_t frame)

@@ -18,7 +18,7 @@ static void say_first_a(const test_api_t *api, const bridge_query_t *q)
     const uint32_t *span = test_get_span(api, q, 0, 1);
     uint32_t s = 0;
 
-    while (!test_count_rows(api, span)) {
+    while (!test_get_rows(api, span)) {
         span = test_get_span(api, q, s + 1, 1);
         s++;
     }
@@ -38,8 +38,8 @@ static void say_with_a(const test_api_t *api)
 
     while (s < q->spans) {
         span = test_get_span(api, q, s, 1);
-        rows += test_count_rows(api, span);
-        empty += !test_count_rows(api, span);
+        rows += test_get_rows(api, span);
+        empty += !test_get_rows(api, span);
         if (!bases[span[0] * types + nstore_a])
             say(api, "FAIL: a matched term with no base", s, 0);
         s++;
@@ -62,7 +62,7 @@ static void say_without_b(const test_api_t *api)
 
     while (s < q->spans) {
         span = test_get_span(api, q, s, 2);
-        rows += test_count_rows(api, span);
+        rows += test_get_rows(api, span);
         if (bases[span[0] * types + nstore_b])
             say(api, "FAIL: a NOT term with a base", s, 0);
         s++;
@@ -82,9 +82,9 @@ static void say_maybe_b(const test_api_t *api)
 
     while (s < q->spans) {
         span = test_get_span(api, q, s, 2);
-        rows += test_count_rows(api, span);
+        rows += test_get_rows(api, span);
         if (bases[span[0] * types + nstore_b])
-            have += test_count_rows(api, span);
+            have += test_get_rows(api, span);
         s++;
     }
     say(api, "with A and maybe B: spans, rows", q->spans, rows);

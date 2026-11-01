@@ -61,7 +61,7 @@ TEST_MEASURED TEST(sum)
         span = test_get_span(api, q, s, 1);
         column = (const v_t *)(api->shared_base
             + bases[span[0] * types + value]);
-        count = test_count_rows(api, span);
+        count = test_get_rows(api, span);
         r = 0;
         while (r < count) {
             line.a0 += column[r].v;

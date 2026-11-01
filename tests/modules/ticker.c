@@ -13,7 +13,7 @@ static uint32_t ticking;
 BRIDGE_EXPORT(advance) int advance(void)
 {
     uint32_t span = bridge_get_span(ticking, 0);
-    uint32_t table = bridge_span_table(span);
+    uint32_t table = bridge_get_span_table(span);
 
     BRIDGE_SET(tick_t, n, tick, table, 0,
         BRIDGE_GET(tick_t, n, tick, table, 0) + STEP);

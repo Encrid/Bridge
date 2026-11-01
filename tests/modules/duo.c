@@ -28,12 +28,12 @@ static uint32_t walking;
 
 BRIDGE_EXPORT(walk) int walk(void)
 {
-    uint32_t spans = bridge_count_spans(walking);
+    uint32_t spans = bridge_get_span_count(walking);
     uint32_t rows = 0;
     uint32_t s = 0;
 
     while (s < spans) {
-        rows += bridge_count_rows(bridge_get_span(walking, s));
+        rows += bridge_get_rows(bridge_get_span(walking, s));
         s++;
     }
     BRIDGE_LOG(BRIDGE_LOG_INFO, "walked", spans, rows);
