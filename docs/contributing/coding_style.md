@@ -119,7 +119,7 @@ For example, a call to `malloc()`, a call to `allocate_user()` and a call to `cr
 ### F2 - The names of the functions
 
 The name of a function tells the task of the function, and contains a verb.
-For example, `voyals_nb()` and `dijkstra()` are bad names. `get_voyals_number()` and `search_shortest_path()` are better names.
+For example, `voyals_nb()` and `dijkstra()` are bad names. `get_voyals_number()` and `get_shortest_path()` are better names.
 Each name of a function is in English and in snake case.
 You can use an abbreviation if it makes the name much shorter and keeps its meaning.
 
