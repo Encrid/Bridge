@@ -60,7 +60,7 @@ TEST(stamp)
         span = test_get_span(api, q, s, 1);
         who = (const uint64_t *)(api->shared_base + blocks[span[0]]);
         row = 0;
-        while (row < test_count_rows(api, span)) {
+        while (row < test_get_rows(api, span)) {
             TEST_ATTACH(api, who[row], marked, m);
             row++;
         }

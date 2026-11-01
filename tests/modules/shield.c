@@ -15,21 +15,21 @@ static uint32_t counting;
 
 static void lower_span(uint32_t span)
 {
-    uint32_t count = bridge_count_rows(span);
-    uint32_t table = bridge_span_table(span);
+    uint32_t count = bridge_get_rows(span);
+    uint32_t table = bridge_get_span_table(span);
     uint32_t strength;
     uint32_t r = 0;
 
     while (r < count) {
         strength = BRIDGE_GET(shield_t, strength, shield, table, r);
-        bridge_turn(shield, table, r, strength % 3 != 0);
+        bridge_set_toggle(shield, table, r, strength % 3 != 0);
         r++;
     }
 }
 
 BRIDGE_EXPORT(lower) int lower(void)
 {
-    uint32_t spans = bridge_count_spans(lowering);
+    uint32_t spans = bridge_get_span_count(lowering);
     uint32_t s = 0;
 
     while (s < spans) {
@@ -41,8 +41,8 @@ BRIDGE_EXPORT(lower) int lower(void)
 
 static uint32_t add_span(uint32_t span, uint32_t *on, uint32_t *sum)
 {
-    uint32_t count = bridge_count_rows(span);
-    uint32_t table = bridge_span_table(span);
+    uint32_t count = bridge_get_rows(span);
+    uint32_t table = bridge_get_span_table(span);
     uint32_t r = 0;
 
     while (r < count) {
@@ -57,7 +57,7 @@ static uint32_t add_span(uint32_t span, uint32_t *on, uint32_t *sum)
 
 BRIDGE_EXPORT(count) int count(void)
 {
-    uint32_t spans = bridge_count_spans(counting);
+    uint32_t spans = bridge_get_span_count(counting);
     uint32_t rows = 0;
     uint32_t on = 0;
     uint32_t sum = 0;

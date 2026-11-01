@@ -8,8 +8,8 @@
 
 static uint32_t add_hits(uint32_t span, uint32_t *sum)
 {
-    uint32_t count = bridge_count_rows(span);
-    uint32_t table = bridge_span_table(span);
+    uint32_t count = bridge_get_rows(span);
+    uint32_t table = bridge_get_span_table(span);
     uint64_t id;
     uint32_t r = 0;
 
@@ -23,7 +23,7 @@ static uint32_t add_hits(uint32_t span, uint32_t *sum)
 
 BRIDGE_EXPORT(walked) int walked(void)
 {
-    uint32_t spans = bridge_count_spans(hits);
+    uint32_t spans = bridge_get_span_count(hits);
     uint32_t rows = 0;
     uint32_t sum = 0;
     uint32_t s = 0;
@@ -38,8 +38,8 @@ BRIDGE_EXPORT(walked) int walked(void)
 
 static uint32_t add_reached(uint32_t span, uint32_t *found, uint32_t *sum)
 {
-    uint32_t count = bridge_count_rows(span);
-    uint32_t table = bridge_span_table(span);
+    uint32_t count = bridge_get_rows(span);
+    uint32_t table = bridge_get_span_table(span);
     uint64_t id;
     uint32_t r = 0;
 
@@ -56,7 +56,7 @@ static uint32_t add_reached(uint32_t span, uint32_t *found, uint32_t *sum)
 
 BRIDGE_EXPORT(reached) int reached(void)
 {
-    uint32_t spans = bridge_count_spans(bodies);
+    uint32_t spans = bridge_get_span_count(bodies);
     uint32_t rows = 0;
     uint32_t found = 0;
     uint32_t sum = 0;

@@ -10,33 +10,33 @@
 
 static inline uint64_t bridge_get_entity(uint32_t table, uint32_t row)
 {
-    return (acc_who(table, row));
+    return (acc_get_entity(table, row));
 }
 
-static inline uint64_t bridge_find(uint64_t id)
+static inline uint64_t bridge_get_location(uint64_t id)
 {
-    return (acc_entity(id));
+    return (acc_get_location(id));
 }
 
 static inline int bridge_is_alive(uint64_t id)
 {
-    return (id != 0 && acc_entity(id) != UINT64_MAX);
+    return (id != 0 && acc_get_location(id) != UINT64_MAX);
 }
 
-static inline uint32_t bridge_entity_table(uint64_t at)
+static inline uint32_t bridge_get_entity_table(uint64_t at)
 {
     return ((uint32_t)(at >> 32));
 }
 
-static inline uint32_t bridge_entity_row(uint64_t at)
+static inline uint32_t bridge_get_entity_row(uint64_t at)
 {
     return ((uint32_t)at);
 }
 
-static inline uint32_t bridge_base(uint32_t slot, uint32_t table)
+static inline int bridge_has_column(uint32_t slot, uint32_t table)
 {
-    return (acc_own_32(BRIDGE_HEADER(column_base)
-        + (table * BRIDGE_HEADER(types) + slot) * 4u));
+    return (acc_get_own_32(BRIDGE_HEADER(column_base)
+        + (table * BRIDGE_HEADER(types) + slot) * 4u) != 0);
 }
 
 #endif

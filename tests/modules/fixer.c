@@ -21,17 +21,17 @@ static uint32_t seeing;
 
 BRIDGE_EXPORT(fix) int fix(void)
 {
-    uint32_t count = bridge_count_triggers(fixing);
+    uint32_t count = bridge_get_trigger_count(fixing);
     uint64_t id;
     uint64_t e;
     uint32_t i = 0;
 
     while (i < count) {
         id = bridge_get_trigger_id(bridge_get_trigger(fixing, i));
-        e = bridge_find(id);
+        e = bridge_get_location(id);
         if (bridge_is_alive(id))
-            BRIDGE_SET(marked_t, by, marked, bridge_entity_table(e),
-                bridge_entity_row(e), 5u);
+            BRIDGE_SET(marked_t, by, marked, bridge_get_entity_table(e),
+                bridge_get_entity_row(e), 5u);
         i++;
     }
     return (0);
@@ -40,7 +40,7 @@ BRIDGE_EXPORT(fix) int fix(void)
 #ifdef WATCH
 BRIDGE_EXPORT(seen) int seen(void)
 {
-    BRIDGE_LOG(BRIDGE_LOG_INFO, "seen", bridge_count_triggers(seeing), 0);
+    BRIDGE_LOG(BRIDGE_LOG_INFO, "seen", bridge_get_trigger_count(seeing), 0);
     return (0);
 }
 #endif

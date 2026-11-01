@@ -12,7 +12,7 @@ static uint32_t hearing;
 
 BRIDGE_EXPORT(heard) int heard(void)
 {
-    BRIDGE_LOG(BRIDGE_LOG_INFO, "heard", bridge_count_triggers(hearing),
+    BRIDGE_LOG(BRIDGE_LOG_INFO, "heard", bridge_get_trigger_count(hearing),
         BRIDGE_GET(marked_t, by, single, 0, 0));
     return (0);
 }

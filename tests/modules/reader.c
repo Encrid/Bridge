@@ -13,8 +13,8 @@ static uint32_t summing;
 
 static uint32_t add_span(uint32_t span, float *total)
 {
-    uint32_t count = bridge_count_rows(span);
-    uint32_t table = bridge_span_table(span);
+    uint32_t count = bridge_get_rows(span);
+    uint32_t table = bridge_get_span_table(span);
     uint32_t r = 0;
 
     while (r < count) {
@@ -26,7 +26,7 @@ static uint32_t add_span(uint32_t span, float *total)
 
 BRIDGE_EXPORT(sum) int sum(void)
 {
-    uint32_t spans = bridge_count_spans(summing);
+    uint32_t spans = bridge_get_span_count(summing);
     uint32_t rows = 0;
     uint32_t s = 0;
     float total = 0.0f;

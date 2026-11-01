@@ -18,7 +18,7 @@ static uint32_t seeing;
 
 BRIDGE_EXPORT(seen) int seen(void)
 {
-    uint32_t count = bridge_count_triggers(seeing);
+    uint32_t count = bridge_get_trigger_count(seeing);
     uint32_t trigger;
     uint64_t id;
     uint64_t e;
@@ -27,13 +27,13 @@ BRIDGE_EXPORT(seen) int seen(void)
     while (i < count) {
         trigger = bridge_get_trigger(seeing, i);
         id = bridge_get_trigger_id(trigger);
-        e = bridge_find(id);
+        e = bridge_get_location(id);
         BRIDGE_LOG(BRIDGE_LOG_INFO, "seen",
             bridge_get_trigger_events(trigger),
             (bridge_is_alive(id)
-                    && bridge_base(marked, bridge_entity_table(e)))
-                ? BRIDGE_GET(marked_t, by, marked, bridge_entity_table(e),
-                    bridge_entity_row(e)) : 0xdead);
+                    && bridge_has_column(marked, bridge_get_entity_table(e)))
+                ? BRIDGE_GET(marked_t, by, marked, bridge_get_entity_table(e),
+                    bridge_get_entity_row(e)) : 0xdead);
         i++;
     }
     return (0);

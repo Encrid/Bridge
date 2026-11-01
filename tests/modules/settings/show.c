@@ -13,7 +13,7 @@ static void say_title(void)
     uint32_t i = 0;
 
     while (i < sizeof(text)) {
-        text[i] = (char)acc_ld_u8(settings, 0, 0,
+        text[i] = (char)acc_get_u8(settings, 0, 0,
             (uint32_t)offsetof(settings_t, title) + i);
         i++;
     }
@@ -30,7 +30,8 @@ static void say_path(void)
 
     if (len > sizeof(text))
         len = sizeof(text);
-    acc_from_shared(text, BRIDGE_GET(settings_t, path.at, settings, 0, 0), len);
+    acc_copy_from_shared(text,
+        BRIDGE_GET(settings_t, path.at, settings, 0, 0), len);
     bridge_log(BRIDGE_LOG_INFO, &(bridge_line_t){ text, len, 0, 0 });
 }
 

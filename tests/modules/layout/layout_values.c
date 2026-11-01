@@ -51,7 +51,7 @@ static uint32_t collect_columns(const test_api_t *api, const x_t **out,
         span = test_get_span(api, q, i, 1);
         base = bases[span[0] * types + x_slot];
         r = 0;
-        while (r < test_count_rows(api, span) && n < room) {
+        while (r < test_get_rows(api, span) && n < room) {
             out[n] = (const x_t *)(api->shared_base + base) + r;
             n++;
             r++;

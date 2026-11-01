@@ -30,7 +30,7 @@ TEST(move)
         p = (position_t *)(api->shared_base
             + bases[span[0] * types + position]);
         r = 0;
-        while (r < test_count_rows(api, span)) {
+        while (r < test_get_rows(api, span)) {
             p[r].x += 1.0f;
             r++;
         }
@@ -46,7 +46,7 @@ TEST(tally)
     uint32_t s = 0;
 
     while (s < q->spans) {
-        line.a1 += test_count_rows(api, test_get_span(api, q, s, 1));
+        line.a1 += test_get_rows(api, test_get_span(api, q, s, 1));
         s++;
     }
     test_log(api, BRIDGE_LOG_INFO, &line);

@@ -31,7 +31,7 @@ void ntag_look_set(const test_api_t *api)
 
     while (i < q->spans) {
         span = test_get_span(api, q, i, 1);
-        rows += test_count_rows(api, span);
+        rows += test_get_rows(api, span);
         carried += bases[span[0] * types + ntag_p] == BRIDGE_CARRIED;
         i++;
     }
