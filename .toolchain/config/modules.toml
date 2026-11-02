@@ -41,7 +41,7 @@ path = true
 [[modules]]
 name = "noshutdown"
 sources = ["tests/modules/noshutdown.c"]
-variants = [{ name = "noshutdown-ghost", defines = ["GHOST"] }]
+variants = [{ name = "noshutdown-ghost", defines = ["GHOST"] }, { name = "shutdown-ghost", defines = ["GHOST", "SHUTDOWN"] }]
 
 [[modules]]
 name = "spare-spanned"
@@ -73,11 +73,13 @@ path = true
 name = "tmover"
 sources = ["tests/modules/tmover.c", "tests/modules/idle.c"]
 path = true
+variants = [{ name = "tmover-still", defines = ["STILL"] }, { name = "tmover-marked", defines = ["MARKED"] }]
 
 [[modules]]
 name = "tflood"
 sources = ["tests/modules/tflood.c", "tests/modules/idle.c"]
 path = true
+variants = [{ name = "tflood-fits", defines = ["FITS"] }]
 
 [[modules]]
 name = "tforeign"
@@ -170,7 +172,7 @@ name = "stamp5"
 sources = ["tests/modules/stamp.c", "tests/modules/idle.c"]
 path = true
 defines = ["VALUE=5", "PHASE=\"update\""]
-variants = [{ name = "stamp9", defines = ["VALUE=9", "PHASE=\"update\""] }, { name = "stampunstated", defines = ["VALUE=1", "PHASE=\"update\"", "UNSTATED"] }, { name = "stamptick", defines = ["VALUE=7", "PHASE=\"tick\""] }, { name = "stampleft", defines = ["VALUE=6", "PHASE=\"update\"", "LEFT"] }]
+variants = [{ name = "stamp9", defines = ["VALUE=9", "PHASE=\"update\""] }, { name = "stampunstated", defines = ["VALUE=1", "PHASE=\"update\"", "UNSTATED"] }, { name = "stampstated", defines = ["VALUE=1", "PHASE=\"update\""] }, { name = "stamptick", defines = ["VALUE=7", "PHASE=\"tick\""] }, { name = "stampleft", defines = ["VALUE=6", "PHASE=\"update\"", "LEFT"] }]
 
 [[modules]]
 name = "stepper1"
@@ -270,6 +272,7 @@ variants = [{ name = "stress2", defines = ["SEED=2u", "SPACE=\"s2\""] }, { name 
 name = "mover"
 sources = ["tests/modules/mover.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [{ name = "mover-undefined", defines = ["BRIDGE_ROWS_CHECKED", "MARKER=test_refuse_define"] }, { name = "mover-lone", defines = ["BRIDGE_ROWS_CHECKED", "MARKER=test_import_shared_only"] }, { name = "mover-unanswered", defines = ["BRIDGE_ROWS_CHECKED", "MARKER=test_answer_nothing"] }, { name = "mover-wide", defines = ["BRIDGE_ROWS_CHECKED", "MARKER=test_expect_wide"] }, { name = "mover-narrow", defines = ["BRIDGE_ROWS_CHECKED", "MARKER=test_expect_narrow"] }, { name = "mover-no-answer", defines = ["BRIDGE_ROWS_CHECKED", "MARKER=test_expect_no_answer"] }]
 
 [[modules]]
 name = "reader"
@@ -295,7 +298,8 @@ variants = [{ name = "share2", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=1"] }, { 
 [[modules]]
 name = "badterm"
 sources = ["tests/modules/badterm.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
-defines = ["BRIDGE_ROWS_CHECKED"]
+defines = ["BRIDGE_ROWS_CHECKED", "BADTERM_OPER=4"]
+variants = [{ name = "badterm-known", defines = ["BRIDGE_ROWS_CHECKED", "BADTERM_OPER=3"] }]
 
 [[modules]]
 name = "spin3"
@@ -414,7 +418,7 @@ defines = ["BRIDGE_ROWS_CHECKED"]
 name = "twostep"
 sources = ["tests/modules/twostep.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED"]
-variants = [{ name = "twostep_third", defines = ["BRIDGE_ROWS_CHECKED", "THIRD"] }, { name = "twostep_unstated", defines = ["BRIDGE_ROWS_CHECKED", "UNSTATED"] }, { name = "twostep_repeated", defines = ["BRIDGE_ROWS_CHECKED", "THIRD", "REPEATED"] }, { name = "twostep_changing", defines = ["BRIDGE_ROWS_CHECKED", "UNSTATED", "CHANGING"] }]
+variants = [{ name = "twostep_third", defines = ["BRIDGE_ROWS_CHECKED", "THIRD"] }, { name = "twostep_unstated", defines = ["BRIDGE_ROWS_CHECKED", "UNSTATED"] }, { name = "twostep_repeated", defines = ["BRIDGE_ROWS_CHECKED", "THIRD", "REPEATED"] }, { name = "twostep_changing", defines = ["BRIDGE_ROWS_CHECKED", "UNSTATED", "CHANGING"] }, { name = "twostep_third_unstated", defines = ["BRIDGE_ROWS_CHECKED", "THIRD", "AGAIN_UNSTATED"] }]
 
 [[modules]]
 name = "twostep_reloadable"
@@ -438,11 +442,13 @@ variants = [{ name = "chain_clash", defines = ["BRIDGE_ROWS_CHECKED", "CLASH"] }
 name = "badobs"
 sources = ["tests/modules/badobs.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED"]
+variants = [{ name = "badobs-seen", defines = ["BRIDGE_ROWS_CHECKED", "SEEN"] }]
 
 [[modules]]
 name = "events"
 sources = ["tests/modules/events.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
-defines = ["BRIDGE_ROWS_CHECKED"]
+defines = ["BRIDGE_ROWS_CHECKED", "TOLD_ENTER=BRIDGE_ON_ENTER", "TOLD_ATTACH=BRIDGE_ON_ATTACH"]
+variants = [{ name = "events-enter", defines = ["BRIDGE_ROWS_CHECKED", "TOLD_ENTER=BRIDGE_ON_ENTER", "TOLD_ATTACH=0"] }, { name = "events-attach", defines = ["BRIDGE_ROWS_CHECKED", "TOLD_ENTER=0", "TOLD_ATTACH=BRIDGE_ON_ATTACH"] }]
 
 [[modules]]
 name = "scribble"
@@ -451,13 +457,13 @@ name = "scribble"
 name = "fixer"
 sources = ["tests/modules/fixer.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED"]
-variants = [{ name = "fixer_watch", defines = ["BRIDGE_ROWS_CHECKED", "WATCH"] }, { name = "fixer_change", defines = ["BRIDGE_ROWS_CHECKED", "CHANGE"] }]
+variants = [{ name = "fixer_watch", defines = ["BRIDGE_ROWS_CHECKED", "WATCH"] }, { name = "fixer_watch_before", defines = ["BRIDGE_ROWS_CHECKED", "WATCH", "BEFORE"] }, { name = "fixer_change", defines = ["BRIDGE_ROWS_CHECKED", "CHANGE"] }]
 
 [[modules]]
 name = "nested"
 sources = ["tests/modules/nested.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED"]
-variants = [{ name = "nested2", defines = ["BRIDGE_ROWS_CHECKED", "LEAVE_OUT_VEC2"] }]
+variants = [{ name = "nested2", defines = ["BRIDGE_ROWS_CHECKED", "LEAVE_OUT_VEC2"] }, { name = "nested-no-team", defines = ["BRIDGE_ROWS_CHECKED", "LEAVE_OUT_TEAM"] }, { name = "nested-no-flags", defines = ["BRIDGE_ROWS_CHECKED", "LEAVE_OUT_FLAGS"] }, { name = "nested-wide-team", defines = ["BRIDGE_ROWS_CHECKED", "WIDE_TEAM_TYPE"] }, { name = "nested-wide-team-desc", defines = ["BRIDGE_ROWS_CHECKED", "WIDE_TEAM_DESC"] }, { name = "nested-wide-flags", defines = ["BRIDGE_ROWS_CHECKED", "WIDE_FLAGS_TYPE"] }, { name = "nested-wide-flags-desc", defines = ["BRIDGE_ROWS_CHECKED", "WIDE_FLAGS_DESC"] }]
 
 [[modules]]
 name = "namer"
@@ -562,7 +568,7 @@ variants = [{ name = "retype-vec2", defines = ["BRIDGE_ROWS_CHECKED", "WHICH=2"]
 name = "ticker"
 sources = ["tests/modules/ticker.c", "tests/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED", "STEP=1"]
-variants = [{ name = "ticker-ten", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10"] }, { name = "ticker-tag", defines = ["BRIDGE_ROWS_CHECKED", "STEP=1", "TAG"] }, { name = "ticker-wide", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "WIDE"] }, { name = "ticker-fail", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "FAIL_RELOAD"] }, { name = "ticker-noextra", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "NO_EXTRA"] }, { name = "ticker-trip", defines = ["BRIDGE_ROWS_CHECKED", "STEP=1", "TRIP"] }, { name = "ticker-alloc", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "ALLOC"] }, { name = "ticker-keep", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "HUSK"] }]
+variants = [{ name = "ticker-ten", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10"] }, { name = "ticker-tag", defines = ["BRIDGE_ROWS_CHECKED", "STEP=1", "TAG"] }, { name = "ticker-tag-struct", defines = ["BRIDGE_ROWS_CHECKED", "STEP=1", "TAG_STRUCT"] }, { name = "ticker-wide", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "WIDE"] }, { name = "ticker-fail", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "FAIL_RELOAD"] }, { name = "ticker-noextra", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "NO_EXTRA"] }, { name = "ticker-trip", defines = ["BRIDGE_ROWS_CHECKED", "STEP=1", "TRIP"] }, { name = "ticker-alloc", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "ALLOC"] }, { name = "ticker-keep", defines = ["BRIDGE_ROWS_CHECKED", "STEP=10", "HUSK"] }]
 
 [[modules]]
 name = "wrong-declare-outside"
@@ -574,4 +580,4 @@ variants = [{ name = "wrong-declare-name-outside", defines = ["BRIDGE_ROWS_CHECK
 name = "wrong-declare-name-empty"
 sources = ["tests/modules/wrong/*.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_name_empty", "IN_SYSTEM=wrong_do_nothing"]
-variants = [{ name = "wrong-declare-name-long", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_name_long", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-name-empty", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_empty", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-name-long", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_long", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-phase-long", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_phase_long", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-name-at", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_at", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observer-name-colon", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observer_name_colon", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-desc-huge", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_desc_huge", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-again", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_again", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-align-other", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_align_other", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-toggle", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_toggle", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-kind-five", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_kind_five", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-tag-with-desc", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_tag_with_desc", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-unload-four", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_unload_four", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-on-destroy-unset", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_on_destroy_unset", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-on-destroy-three", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_on_destroy_three", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-singleton-keep", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_singleton_keep", "IN_SYSTEM=wrong_do_nothing"] },{ name = "wrong-observe-nine-terms", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_nine_terms", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-terms-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_terms_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-change-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_change_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-many-changes", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_many_changes", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-twice", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_twice", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-named-shutdown", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_named_shutdown", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-named-reload", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_named_reload", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-ghost", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_ghost", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-events-eight", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_events_eight", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-detach-id-zero", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_detach_id_zero"] }, { name = "wrong-declare-near-namespace", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_near_namespace", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observer-attaches-unstated", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_entry", "IN_SYSTEM=wrong_spawn_position"] }, { name = "wrong-system-before-own", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_before_own", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-before-other-phase", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_before_other_phase", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-before-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_before_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-before-own", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_before_own", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-before-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_before_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-before-many", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_before_many", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-before-many", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_before_many", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-before-same-phase", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_before_same_phase", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-before-earlier", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_before_earlier", "IN_SYSTEM=wrong_do_nothing"] }]
+variants = [{ name = "wrong-declare-name-long", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_name_long", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-name-empty", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_empty", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-name-long", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_long", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-phase-long", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_phase_long", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-phase-short", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_phase_short", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-name-at", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_name_at", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observer-name-colon", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observer_name_colon", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-desc-huge", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_desc_huge", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-again", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_again", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-align-other", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_align_other", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-toggle", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_toggle", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-kind-five", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_kind_five", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-tag-with-desc", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_tag_with_desc", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-unload-four", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_unload_four", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-on-destroy-unset", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_on_destroy_unset", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-on-destroy-three", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_on_destroy_three", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-declare-singleton-keep", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_singleton_keep", "IN_SYSTEM=wrong_do_nothing"] },{ name = "wrong-observe-nine-terms", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_nine_terms", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-terms-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_terms_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-change-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_change_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-many-changes", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_many_changes", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-twice", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_twice", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-named-shutdown", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_named_shutdown", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-named-reload", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_named_reload", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-ghost", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_ghost", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-events-eight", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_events_eight", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-detach-id-zero", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_do_nothing", "IN_SYSTEM=wrong_detach_id_zero"] }, { name = "wrong-declare-near-namespace", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_declare_near_namespace", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observer-attaches-unstated", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_entry", "IN_SYSTEM=wrong_spawn_position"] }, { name = "wrong-system-before-own", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_before_own", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-before-other-phase", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_before_other_phase", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-before-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_before_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-before-own", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_before_own", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-before-outside", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_before_outside", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-before-many", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_before_many", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-before-many", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_before_many", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-system-before-same-phase", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_system_before_same_phase", "IN_SYSTEM=wrong_do_nothing"] }, { name = "wrong-observe-before-earlier", defines = ["BRIDGE_ROWS_CHECKED", "AT_INIT=wrong_observe_before_earlier", "IN_SYSTEM=wrong_do_nothing"] }]

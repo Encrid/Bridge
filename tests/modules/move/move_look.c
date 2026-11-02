@@ -55,11 +55,11 @@ static void add_columns(const test_api_t *api, bridge_line_t *line)
         column = (const x_t *)(api->shared_base
             + bases[span[0] * types + x_slot]);
         r = 0;
-        while (r < test_count_rows(api, span)) {
+        while (r < test_get_rows(api, span)) {
             line->a1 += column[r].v;
             r++;
         }
-        line->a0 += test_count_rows(api, span);
+        line->a0 += test_get_rows(api, span);
         i++;
     }
 }

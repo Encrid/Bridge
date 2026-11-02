@@ -17,7 +17,7 @@ static inline uint32_t bridge_take_scratch(uint32_t len)
 
     if (used > room || len > room - used)
         acc_trap();
-    acc_own_st(offsetof(bridge_header_t, scratch_used), used + len);
+    acc_set_own_32(offsetof(bridge_header_t, scratch_used), used + len);
     return (BRIDGE_HEADER(scratch) + used);
 }
 
@@ -25,7 +25,7 @@ static inline uint32_t bridge_put(const void *bytes, uint32_t len)
 {
     uint32_t at = bridge_take_scratch(len);
 
-    acc_to_private(at, bytes, len);
+    acc_copy_to_private(at, bytes, len);
     return (at);
 }
 
@@ -36,7 +36,7 @@ static inline uint32_t bridge_lend(const void *bytes, uint32_t len)
 
     if (used > room || len > room - used)
         acc_trap();
-    acc_to_private(BRIDGE_HEADER(scratch) + used, bytes, len);
+    acc_copy_to_private(BRIDGE_HEADER(scratch) + used, bytes, len);
     return (BRIDGE_HEADER(scratch) + used);
 }
 

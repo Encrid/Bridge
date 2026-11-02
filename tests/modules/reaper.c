@@ -22,7 +22,7 @@ static void destroy_rows(const test_api_t *api, const uint32_t *span)
         + blocks[span[0]]);
     uint32_t row = 0;
 
-    while (row < test_count_rows(api, span)) {
+    while (row < test_get_rows(api, span)) {
         api->destroy(api, who[row]);
         row++;
     }
@@ -53,7 +53,7 @@ TEST(reap)
 #else
         destroy_rows(api, span);
 #endif
-        line.a0 += test_count_rows(api, span);
+        line.a0 += test_get_rows(api, span);
         s++;
     }
 #ifdef MEND

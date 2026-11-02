@@ -14,9 +14,15 @@ static uint32_t marked;
 static uint32_t moving;
 static uint32_t counting;
 
+#ifdef MARKER
+TEST_EXPORT void MARKER(void)
+{
+}
+#endif
+
 BRIDGE_EXPORT(move) int move(void)
 {
-    uint32_t spans = bridge_count_spans(moving);
+    uint32_t spans = bridge_get_span_count(moving);
     uint32_t span;
     uint32_t count;
     uint32_t table;
@@ -25,8 +31,8 @@ BRIDGE_EXPORT(move) int move(void)
 
     while (s < spans) {
         span = bridge_get_span(moving, s);
-        count = bridge_count_rows(span);
-        table = bridge_span_table(span);
+        count = bridge_get_rows(span);
+        table = bridge_get_span_table(span);
         r = 0;
         while (r < count) {
             BRIDGE_SET(position_t, x, position, table, r,
@@ -40,12 +46,12 @@ BRIDGE_EXPORT(move) int move(void)
 
 BRIDGE_EXPORT(count) int count(void)
 {
-    uint32_t spans = bridge_count_spans(counting);
+    uint32_t spans = bridge_get_span_count(counting);
     uint32_t rows = 0;
     uint32_t s = 0;
 
     while (s < spans) {
-        rows += bridge_count_rows(bridge_get_span(counting, s));
+        rows += bridge_get_rows(bridge_get_span(counting, s));
         s++;
     }
     BRIDGE_LOG(BRIDGE_LOG_INFO, "moved", spans, rows);

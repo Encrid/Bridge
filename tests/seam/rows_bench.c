@@ -75,7 +75,7 @@ void test_bench(host_t *h)
     h->cfg.budget.columns = 64 << 20;
     bench_build(h, "rows", true);
     bench_build(h, "rows", false);
-    bench_build(h, "rows-unchecked", true);
-    bench_build(h, "rows-unchecked", false);
+    bench_build(h, h->arg, true);
+    bench_build(h, h->arg, false);
     printf("alive\n");
 }

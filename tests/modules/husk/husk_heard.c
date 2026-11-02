@@ -7,7 +7,7 @@
 
 static void count_events(uint32_t observer, uint32_t event, uint32_t *n)
 {
-    uint32_t count = bridge_count_triggers(observer);
+    uint32_t count = bridge_get_trigger_count(observer);
     uint32_t i = 0;
 
     while (i < count) {

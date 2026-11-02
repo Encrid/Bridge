@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdlib.h>
+
 #include "cases.h"
 
 static void load_namer(host_t *h, int64_t persistent)
@@ -20,22 +22,12 @@ static void load_namer(host_t *h, int64_t persistent)
 
 void test_keep_string(host_t *h)
 {
-    load_namer(h, 64);
-}
-
-void test_keep_string_no_room(host_t *h)
-{
-    load_namer(h, 4);
-}
-
-void test_keep_string_too_big(host_t *h)
-{
-    load_namer(h, 1 << 20);
+    load_namer(h, strtol(h->arg, nullptr, 10));
 }
 
 void test_use_up_terms(host_t *h)
 {
-    h->cfg.budget.terms = 1;
+    h->cfg.budget.terms = (uint32_t)strtol(h->arg, nullptr, 10);
     if (host_open(h))
         return;
     test_load_reader(h);

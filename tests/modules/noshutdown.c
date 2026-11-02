@@ -19,3 +19,10 @@ TEST(reload)
 {
     return (0);
 }
+
+#ifdef SHUTDOWN
+TEST(shutdown)
+{
+    return (0);
+}
+#endif

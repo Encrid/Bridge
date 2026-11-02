@@ -4,6 +4,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "cases.h"
@@ -37,7 +38,7 @@ void test_run_two(host_t *h)
         both[1] = open_one(h, &which[1]);
     if (!both[1])
         return;
-    test_start_elsewhere(&e, both[1], 30);
+    test_start_elsewhere(&e, both[1], (int)strtol(h->arg, nullptr, 10));
     host_run_frames_unsaid(both[0], 50);
     test_join_elsewhere(&e);
     printf("two worlds: sums %u and %u\n", c->last_sum[0], c->last_sum[1]);
@@ -61,7 +62,7 @@ static bool mint_run(host_t *h)
     (void)bridge_load(w, &a);
     a.cfg.identity = "test:spawn2@0.1.0";
     (void)bridge_load(w, &a);
-    while (f < 20) {
+    while (f < strtol(h->arg, nullptr, 10)) {
         (void)bridge_run_phase(w, "update");
         f++;
     }

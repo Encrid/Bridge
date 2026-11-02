@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdlib.h>
+
 #include "cases.h"
 
 static const bridge_order_t TEST_PAIRS[2] = {
@@ -28,26 +30,9 @@ static void load_three(host_t *h)
 
 void test_order(host_t *h)
 {
-    h->cfg.order = &TEST_PAIRS[0];
-    h->cfg.order_count = 1;
-    load_three(h);
-}
+    char *count = nullptr;
 
-void test_reorder(host_t *h)
-{
-    h->cfg.order = &TEST_PAIRS[1];
-    h->cfg.order_count = 1;
+    h->cfg.order = &TEST_PAIRS[strtol(h->arg, &count, 10)];
+    h->cfg.order_count = (uint32_t)strtol(count, nullptr, 10);
     load_three(h);
-}
-
-void test_leave_unordered(host_t *h)
-{
-    load_three(h);
-}
-
-void test_order_in_a_cycle(host_t *h)
-{
-    h->cfg.order = TEST_PAIRS;
-    h->cfg.order_count = 2;
-    host_open_only(h);
 }

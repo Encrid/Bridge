@@ -10,6 +10,18 @@
 
 constexpr uint32_t ENTITIES = 1000;
 
+#ifdef STILL
+constexpr float STEP = 0.0f;
+#else
+constexpr float STEP = 1.0f;
+#endif
+
+#ifdef MARKED
+constexpr uint32_t TALLY_TERMS = 2;
+#else
+constexpr uint32_t TALLY_TERMS = 1;
+#endif
+
 static uint32_t position;
 static uint32_t marked;
 static uint32_t moving;
@@ -30,8 +42,8 @@ TEST(move)
         p = (position_t *)(api->shared_base
             + bases[span[0] * types + position]);
         r = 0;
-        while (r < test_count_rows(api, span)) {
-            p[r].x += 1.0f;
+        while (r < test_get_rows(api, span)) {
+            p[r].x += STEP;
             r++;
         }
         s++;
@@ -46,7 +58,7 @@ TEST(tally)
     uint32_t s = 0;
 
     while (s < q->spans) {
-        line.a1 += test_count_rows(api, test_get_span(api, q, s, 1));
+        line.a1 += test_get_rows(api, test_get_span(api, q, s, 1));
         s++;
     }
     test_log(api, BRIDGE_LOG_INFO, &line);
@@ -71,17 +83,21 @@ static void populate(const test_api_t *api)
 
 TEST(init)
 {
-    bridge_term_t terms[1] = {{ 0, BRIDGE_WRITE, BRIDGE_AND, 0 }};
+    bridge_term_t terms[2] = {
+        { 0, BRIDGE_WRITE, BRIDGE_AND, 0 },
+        { 0, BRIDGE_READ, BRIDGE_AND, 0 }
+    };
 
     position = TEST_COMPONENT(api, "game:Position", position_t,
         BRIDGE_DELETE, BRIDGE_TABLE);
     marked = TEST_COMPONENT(api, "game:Marked", marked_t,
         BRIDGE_STRIP, BRIDGE_TABLE);
     terms[0].slot = position;
+    terms[1].slot = marked;
     moving = TEST_ADD_SYSTEM(api, "move", "update", terms, 1,
         nullptr, 0, nullptr, 0);
     terms[0].access = BRIDGE_READ;
-    tallying = TEST_ADD_SYSTEM(api, "tally", "present", terms, 1,
+    tallying = TEST_ADD_SYSTEM(api, "tally", "present", terms, TALLY_TERMS,
         nullptr, 0, nullptr, 0);
     populate(api);
     return (0);

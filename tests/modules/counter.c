@@ -25,7 +25,7 @@ static bool handed;
 
 static uint64_t get_listed(uint32_t table, uint32_t i)
 {
-    return (acc_ld_64(roster, table, 0,
+    return (acc_get_64(roster, table, 0,
         (uint32_t)offsetof(roster_t, ids) + 8u * i));
 }
 
@@ -35,9 +35,9 @@ static uint32_t count_alive(void)
     uint32_t alive = 0;
     uint32_t i = 0;
 
-    if (!bridge_count_spans(listing))
+    if (!bridge_get_span_count(listing))
         return (0);
-    table = bridge_span_table(bridge_get_span(listing, 0));
+    table = bridge_get_span_table(bridge_get_span(listing, 0));
     while (i < LISTED) {
         alive += bridge_is_alive(get_listed(table, i));
         i++;
@@ -47,12 +47,12 @@ static uint32_t count_alive(void)
 
 BRIDGE_EXPORT(count) int count(void)
 {
-    uint32_t spans = bridge_count_spans(counting);
+    uint32_t spans = bridge_get_span_count(counting);
     uint32_t rows = 0;
     uint32_t s = 0;
 
     while (s < spans) {
-        rows += bridge_count_rows(bridge_get_span(counting, s));
+        rows += bridge_get_rows(bridge_get_span(counting, s));
         s++;
     }
     BRIDGE_LOG(BRIDGE_LOG_INFO, "left", rows, count_alive());
@@ -65,9 +65,9 @@ BRIDGE_EXPORT(rosters) int rosters(void)
     uint32_t table;
     uint32_t i = 0;
 
-    if (!HANDLES || handed || !bridge_count_spans(listing))
+    if (!HANDLES || handed || !bridge_get_span_count(listing))
         return (0);
-    table = bridge_span_table(bridge_get_span(listing, 0));
+    table = bridge_get_span_table(bridge_get_span(listing, 0));
     while (i < LISTED) {
         BRIDGE_ATTACH(get_listed(table, i), handle, mark);
         i++;

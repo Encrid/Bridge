@@ -57,7 +57,7 @@ static void turn_off(const test_api_t *api, const uint32_t *span)
     uint64_t *bits = test_get_bits(api, base);
     uint32_t r = 0;
 
-    while (r < test_count_rows(api, span)) {
+    while (r < test_get_rows(api, span)) {
         if (column[r].v == 102)
             bits[r >> 6] &= ~((uint64_t)1 << (r & 63));
         r++;

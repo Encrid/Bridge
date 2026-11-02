@@ -95,7 +95,7 @@ int schema_say_failed(const char *text, const char *what);
 int schema_check_struct(const want_struct_t *w);
 int schema_check_constants(const want_constants_t *w);
 
-int schema_run_structs(void);
+int schema_run_structs(const char *first);
 int schema_run_constants(void);
 int schema_run_refusals(void);
 int schema_run_room(void);

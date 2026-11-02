@@ -2,7 +2,7 @@
 name = "schema"
 run = ["{out}/schema{exe}"]
 claims = { matches = ["every descriptor read as it should, and every other refused by its word.*alive"] }
-false = { run = ["{out}/storage{exe}", "shape"] }
+false = { run = ["{out}/schema{exe}", "{ float x; double y; }"] }
 
 [[case]]
 name = "schema-takes-the-room-of-its-fields-and-of-its-constants-once"

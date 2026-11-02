@@ -13,7 +13,7 @@ static uint32_t counting;
 
 BRIDGE_EXPORT(count) int count(void)
 {
-    uint32_t spans = bridge_count_spans(counting);
+    uint32_t spans = bridge_get_span_count(counting);
     uint32_t rows = 0;
     uint32_t carried = 0;
     uint32_t span;
@@ -21,7 +21,7 @@ BRIDGE_EXPORT(count) int count(void)
 
     while (s < spans) {
         span = bridge_get_span(counting, s);
-        rows += bridge_count_rows(span);
+        rows += bridge_get_rows(span);
         carried += 1;
         s++;
     }

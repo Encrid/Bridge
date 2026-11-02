@@ -27,18 +27,18 @@ static inline void bridge_log(uint32_t level, const bridge_line_t *line)
     if (level > BRIDGE_HEADER(log_level))
         return;
     head = BRIDGE_HEADER(ring_head);
-    acc_own_st(offsetof(bridge_header_t, ring_head), head + 1u);
+    acc_set_own_32(offsetof(bridge_header_t, ring_head), head + 1u);
     if (head - BRIDGE_HEADER(ring_tail) >= BRIDGE_HEADER(ring_len))
         return;
     at = BRIDGE_HEADER(ring) + (head % BRIDGE_HEADER(ring_len)) * size;
-    acc_own_st(at, BRIDGE_HEADER(barriers));
-    acc_own_st(at + 4u, BRIDGE_HEADER(place));
-    acc_own_st(at + 8u, BRIDGE_HEADER(system));
-    acc_own_st(at + 12u, (level & 0xffu) << 8 | (BRIDGE_HEADER(observer) & 0xffu));
-    acc_own_st(at + 16u, bridge_put(line->text, line->len));
-    acc_own_st(at + 20u, line->len);
-    acc_own_st(at + 24u, line->a0);
-    acc_own_st(at + 28u, line->a1);
+    acc_set_own_32(at, BRIDGE_HEADER(barriers));
+    acc_set_own_32(at + 4u, BRIDGE_HEADER(place));
+    acc_set_own_32(at + 8u, BRIDGE_HEADER(system));
+    acc_set_own_32(at + 12u, (level & 0xffu) << 8 | (BRIDGE_HEADER(observer) & 0xffu));
+    acc_set_own_32(at + 16u, bridge_put(line->text, line->len));
+    acc_set_own_32(at + 20u, line->len);
+    acc_set_own_32(at + 24u, line->a0);
+    acc_set_own_32(at + 28u, line->a1);
 }
 
 #endif

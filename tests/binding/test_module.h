@@ -67,7 +67,7 @@ static inline const bridge_query_t *test_get_query(
     return ((const bridge_query_t *)queries + query);
 }
 
-static inline uint32_t test_count_rows(const test_api_t *api,
+static inline uint32_t test_get_rows(const test_api_t *api,
     const uint32_t *span)
 {
     const uint32_t *rows = (const uint32_t *)(api->shared_base

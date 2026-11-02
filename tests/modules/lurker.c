@@ -16,11 +16,11 @@ BRIDGE_EXPORT(saw) int saw(void)
 
 BRIDGE_EXPORT(look) int look(void)
 {
-    uint32_t spans = bridge_count_spans(looking);
+    uint32_t spans = bridge_get_span_count(looking);
     uint32_t rows = 0;
 
     for (uint32_t s = 0; s < spans; s++)
-        rows += bridge_count_rows(bridge_get_span(looking, s));
+        rows += bridge_get_rows(bridge_get_span(looking, s));
     BRIDGE_LOG(BRIDGE_LOG_INFO, "rows", rows, 0);
     return (0);
 }
@@ -28,7 +28,7 @@ BRIDGE_EXPORT(look) int look(void)
 BRIDGE_EXPORT(shutdown) int shutdown(void)
 {
 #ifndef ROWS
-    BRIDGE_LOG(BRIDGE_LOG_INFO, "kept", bridge_count_triggers(seeing), 0);
+    BRIDGE_LOG(BRIDGE_LOG_INFO, "kept", bridge_get_trigger_count(seeing), 0);
 #endif
     return (0);
 }

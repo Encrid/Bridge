@@ -4,6 +4,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include <stdio.h>
+#include <string.h>
 
 #include "cases.h"
 
@@ -31,7 +32,8 @@ void test_call_with_nulls(host_t *h)
     printf("bridge_unload with no identity: %d\n",
         bridge_unload(h->w, nullptr));
     test_state_guarded(&a, "game:loose@0.1.0", "mover");
-    a.backend = nullptr;
+    if (strcmp(h->arg, "kept"))
+        a.backend = nullptr;
     host_load(h, &a);
     host_close(h);
 }
@@ -47,7 +49,8 @@ void test_hot_reload_unkept(host_t *h)
     host_state_plain(&a, "test:ok@0.1.0", nullptr);
     host_name_module(&a, "ok");
     a.cfg.reloadable = BRIDGE_TRUE;
-    a.cfg.hot_reload = BRIDGE_TRUE;
+    if (strcmp(h->arg, "unstated"))
+        a.cfg.hot_reload = BRIDGE_TRUE;
     host_load(h, &a);
     host_close(h);
 }
@@ -62,7 +65,7 @@ void test_repair_fails_again(host_t *h)
     a.cfg.on_error = BRIDGE_FAIL;
     host_load(h, &a);
     host_unload(h, "game:thing");
-    test_state_guarded_minting(&a, "game:thing@0.2.0", "badobs");
+    test_state_guarded_minting(&a, "game:thing@0.2.0", h->arg);
     a.cfg.on_error = BRIDGE_FAIL;
     host_load(h, &a);
     test_say_modules(h);
@@ -80,7 +83,7 @@ void test_reload_into_conflict(host_t *h)
     a.cfg.reloadable = BRIDGE_TRUE;
     a.cfg.hot_reload = BRIDGE_TRUE;
     host_load(h, &a);
-    test_state_guarded(&a, "game:thing@0.2.0", "writer");
+    test_state_guarded(&a, "game:thing@0.2.0", h->arg);
     a.cfg.reloadable = BRIDGE_TRUE;
     a.cfg.hot_reload = BRIDGE_TRUE;
     host_reload(h, &a);
@@ -129,7 +132,8 @@ void test_reload_then_stop(host_t *h)
     a.cfg.read = TEST_GAME;
     a.cfg.read_count = 2;
     a.cfg.max_system_failures = 1;
-    a.cfg.on_error = BRIDGE_FAIL;
+    if (strcmp(h->arg, "kept"))
+        a.cfg.on_error = BRIDGE_FAIL;
     host_load(h, &a);
     test_state_guarded(&a, "game:marker@0.1.0", "marker");
     a.cfg.reloadable = BRIDGE_TRUE;

@@ -13,7 +13,7 @@ static uint32_t reading;
 BRIDGE_EXPORT(read) int read(void)
 {
     uint32_t span = bridge_get_span(reading, 0);
-    uint32_t table = bridge_span_table(span);
+    uint32_t table = bridge_get_span_table(span);
 
     BRIDGE_LOG(BRIDGE_LOG_INFO, "body",
         (uint32_t)BRIDGE_GET(body_t, at.y, body, table, 0),
@@ -33,10 +33,14 @@ BRIDGE_EXPORT(init) int init(void)
     BRIDGE_DECLARE(BRIDGE_STRUCT, "game:vec2_t", vec2_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
 #endif
+#ifndef LEAVE_OUT_TEAM
     BRIDGE_DECLARE(BRIDGE_ENUM, "game:team_t", team_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
+#endif
+#ifndef LEAVE_OUT_FLAGS
     BRIDGE_DECLARE(BRIDGE_BITMASK, "game:flags_t", flags_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
+#endif
     body = BRIDGE_COMPONENT("game:Body", body_t, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = body;
     reading = BRIDGE_ADD_SYSTEM("read", "update", terms, 1, nullptr, 0,

@@ -39,7 +39,7 @@ void test_reload_settings_layout(host_t *h)
         return;
     load_nine(h, "nine:first@0.1.0", "nine", WIDTHS);
     load_nine(h, "nine:second@0.1.0", "nine", WIDTHS + 1);
-    state_nine(&a, "nine:first@0.2.0", "nine-wide", WIDTHS);
+    state_nine(&a, "nine:first@0.2.0", h->arg, WIDTHS);
     host_reload(h, &a);
     host_run_frames(h, 1);
     load_nine(h, "nine:second@0.1.0", "nine-wide", WIDTHS + 1);

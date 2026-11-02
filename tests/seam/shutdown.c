@@ -3,22 +3,23 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdlib.h>
 #include <string.h>
 
 #include "cases.h"
 
-static void state_hang(bridge_artifact_t *a)
+static void state_hang(bridge_artifact_t *a, const char *file)
 {
-    test_state_guarded_minting(a, "test:hang@0.1.0", "hang");
+    test_state_guarded_minting(a, "test:hang@0.1.0", file);
     a->cfg.spawns = BRIDGE_NONE;
     a->cfg.shutdown_timeout = 100 * HOST_MS;
 }
 
-static void load_hang(host_t *h)
+static void load_hang(host_t *h, const char *file)
 {
     bridge_artifact_t a;
 
-    state_hang(&a);
+    state_hang(&a, file);
     host_load(h, &a);
 }
 
@@ -27,7 +28,7 @@ void test_destroy_loaded(host_t *h)
     if (host_open(h))
         return;
     test_load_guarded_minting(h, "game:ticker@0.1.0", "ticker");
-    load_hang(h);
+    load_hang(h, h->arg);
     host_run_frames(h, 1);
     host_close(h);
 }
@@ -36,7 +37,7 @@ void test_time_out_shutdown(host_t *h)
 {
     if (host_open(h))
         return;
-    load_hang(h);
+    load_hang(h, h->arg);
     host_unload(h, "test:hang@0.1.0");
     test_say_modules(h);
     host_close(h);
@@ -48,7 +49,7 @@ void test_time_out_failed_load(host_t *h)
 
     if (host_open(h))
         return;
-    state_hang(&a);
+    state_hang(&a, h->arg);
     a.cfg.settings = TEST_STRAY;
     a.cfg.setting_count = 1;
     host_load(h, &a);
@@ -58,7 +59,7 @@ void test_time_out_failed_load(host_t *h)
 
 void test_take_slot(host_t *h)
 {
-    h->cfg.budget.modules = 1;
+    h->cfg.budget.modules = (uint32_t)strtol(h->arg, nullptr, 10);
     if (host_open(h))
         return;
     test_load_guarded_minting(h, "game:twostep@0.1.0", "twostep");
@@ -80,7 +81,7 @@ void test_state_plain_timeout(host_t *h)
         a.cfg.init_timeout = 100 * HOST_MS;
     else if (!strcmp(h->arg, "reload"))
         a.cfg.reload_timeout = 100 * HOST_MS;
-    else
+    else if (strcmp(h->arg, "none"))
         a.cfg.shutdown_timeout = 100 * HOST_MS;
     host_load(h, &a);
     host_close(h);

@@ -14,8 +14,8 @@ static uint32_t moving;
 
 static void move_span(uint32_t span)
 {
-    uint32_t count = bridge_count_rows(span);
-    uint32_t table = bridge_span_table(span);
+    uint32_t count = bridge_get_rows(span);
+    uint32_t table = bridge_get_span_table(span);
     uint32_t r = 0;
 
     while (r < count) {
@@ -27,7 +27,7 @@ static void move_span(uint32_t span)
 
 BRIDGE_EXPORT(move) int move(void)
 {
-    uint32_t spans = bridge_count_spans(moving);
+    uint32_t spans = bridge_get_span_count(moving);
     uint32_t s = 0;
 
     while (s < spans) {

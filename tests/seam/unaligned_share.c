@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdlib.h>
+
 #include "cases.h"
 
 static void load_ten(host_t *h, const char *identity, int64_t persistent)
@@ -20,7 +22,7 @@ void test_alloc_unaligned_share(host_t *h)
     h->cfg.budget.persistent = 100;
     if (host_open(h))
         return;
-    load_ten(h, "ten:big@0.1.0", 88);
+    load_ten(h, "ten:big@0.1.0", strtoll(h->arg, nullptr, 10));
     load_ten(h, "ten:small@0.1.0", 12);
     test_say_modules(h);
     host_close(h);

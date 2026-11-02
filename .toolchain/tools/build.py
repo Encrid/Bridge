@@ -201,36 +201,37 @@ def prove(config, values):
           'ran' if values['target'] == shared.this_target(config['targets']) else 'built'))
 
 
-def composed(config, values):
-    dist, out, root, kit = Path(values['dist']), Path(values['out']), Path(values['root']), []
+def composed(config, values, leave):
+    dist, out, root, kit = Path(values['dist']), Path(values['out']), Path(values['root']), {}
     for artifact in artifacts(config):
         if artifact.get('test'):
             continue
         _, mine = planned(config, values, artifact)
         outs = [Path(mine['output'])] + [Path(file) for file in expanded(artifact.get('beside', []), mine)]
         for path in outs:
-            put(dist / path.name, path)
-            kit.append(path.name)
+            kit[path.name] = path
     for table in config.get('compose', {}).values():
         if not isinstance(table, dict):
             continue
         start, into = located(table.get('from', ''), values), expand(table.get('into', ''), values)
         for name in files(start, table.get('headers', [])):
-            put(dist / into / name, start / name)
-            kit.append((Path(into) / name).as_posix())
+            kit[(Path(into) / name).as_posix()] = start / name
         for asset in table.get('assets', []):
-            put(dist / Path(asset).name, out / asset)
-            kit.append(Path(asset).name)
+            kit[Path(asset).name] = out / asset
     named = ['third_party/%s/license' % folder for folder in config.get('third_party', ['*'])]
     missing = [name for name in named if '*' not in name and not (root / name).is_file()]
     if missing:
         die('%s is not there, and the deliverable needs it' % missing[0])
     for name in files(root, ['license'] + named):
-        put(dist / name, root / name)
-        kit.append(name)
-    kit = list(dict.fromkeys(kit))
+        kit[name] = root / name
+    if leave is not None:
+        if leave not in kit:
+            die('--leave %s: the deliverable holds no %s' % (leave, leave))
+        del kit[leave]
+    for name, source in kit.items():
+        put(dist / name, source)
     print('\n'.join(kit))
-    return kit
+    return list(kit)
 
 
 def part_table(config, part):
@@ -350,13 +351,13 @@ def build(args, here=False, tests=True):
 
 
 def main():
-    args = shared.arguments(pack='--pack', join='--join')
+    args = shared.arguments('--leave', pack='--pack', join='--join')
     if args.join:
         return joined(args)
     config, values, made = build(args, tests=False)
     print('\n'.join(paths[0].as_posix() for _, paths in made if paths))
     for view in views(config, args.part):
-        kit = composed(view, values)
+        kit = composed(view, values, args.leave)
         if args.pack:
             packed(view, values, kit)
             prove(view, values)

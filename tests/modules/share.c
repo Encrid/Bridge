@@ -17,7 +17,7 @@ static uint32_t doing;
 
 BRIDGE_EXPORT(run) int run(void)
 {
-    uint32_t spans = bridge_count_spans(doing);
+    uint32_t spans = bridge_get_span_count(doing);
     uint32_t rows = 0;
     uint32_t sum = 0;
     uint32_t table;
@@ -28,8 +28,8 @@ BRIDGE_EXPORT(run) int run(void)
 
     while (s < spans) {
         span = bridge_get_span(doing, s);
-        table = bridge_span_table(span);
-        count = bridge_count_rows(span);
+        table = bridge_get_span_table(span);
+        count = bridge_get_rows(span);
         r = 0;
         while (r < count) {
             sum += BRIDGE_GET(shared_t, x, shared, table, r);

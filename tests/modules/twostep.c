@@ -22,6 +22,8 @@ constexpr uint32_t CHANGE_COUNT = 0;
 #ifdef THIRD
     #ifdef REPEATED
 constexpr uint32_t AGAIN_BEFORE_COUNT = 2;
+    #elif defined(AGAIN_UNSTATED)
+constexpr uint32_t AGAIN_BEFORE_COUNT = 0;
     #else
 constexpr uint32_t AGAIN_BEFORE_COUNT = 1;
     #endif
@@ -37,7 +39,7 @@ static uint32_t adding_again;
 
 static uint32_t get_first_table(uint32_t query)
 {
-    return (bridge_span_table(bridge_get_span(query, 0)));
+    return (bridge_get_span_table(bridge_get_span(query, 0)));
 }
 
 BRIDGE_EXPORT(twice) int twice(void)

@@ -27,14 +27,14 @@ BRIDGE_EXPORT(cull) int cull(void)
 
 static bool is_mirrored(uint32_t i)
 {
-    uint64_t e = bridge_find(ids[i]);
+    uint64_t e = bridge_get_location(ids[i]);
     bool dead = i % 3 < round && i % 3 < 2;
 
     if (dead)
         return (!bridge_is_alive(ids[i]));
     return (bridge_is_alive(ids[i])
-        && BRIDGE_GET(position_t, x, position, bridge_entity_table(e),
-            bridge_entity_row(e)) == (float)i);
+        && BRIDGE_GET(position_t, x, position, bridge_get_entity_table(e),
+            bridge_get_entity_row(e)) == (float)i);
 }
 
 BRIDGE_EXPORT(check) int check(void)

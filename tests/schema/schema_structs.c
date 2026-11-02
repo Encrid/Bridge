@@ -74,12 +74,16 @@ static const want_struct_t SCHEMA_STRUCTS[] = {
         SCHEMA_VEC2, 2 }
 };
 
-int schema_run_structs(void)
+int schema_run_structs(const char *first)
 {
     constexpr size_t count = sizeof(SCHEMA_STRUCTS) / sizeof(*SCHEMA_STRUCTS);
+    want_struct_t want = SCHEMA_STRUCTS[0];
     int failed = 0;
-    size_t i = 0;
+    size_t i = 1;
 
+    if (first)
+        want.text = first;
+    failed += schema_check_struct(&want);
     while (i < count) {
         failed += schema_check_struct(&SCHEMA_STRUCTS[i]);
         i++;

@@ -19,14 +19,15 @@ BRIDGE_EXPORT(say) int say(void)
     uint32_t table;
     uint32_t len;
 
-    if (!bridge_count_spans(saying))
+    if (!bridge_get_span_count(saying))
         return (0);
     span = bridge_get_span(saying, 0);
-    table = bridge_span_table(span);
+    table = bridge_get_span_table(span);
     len = BRIDGE_GET(name_t, text.len, name, table, 0);
     if (len > sizeof(text))
         len = sizeof(text);
-    acc_from_shared(text, BRIDGE_GET(name_t, text.at, name, table, 0), len);
+    acc_copy_from_shared(text,
+        BRIDGE_GET(name_t, text.at, name, table, 0), len);
     bridge_log(BRIDGE_LOG_INFO, &(bridge_line_t){ text, len, 0, 0 });
     return (0);
 }
@@ -42,7 +43,7 @@ BRIDGE_EXPORT(init) int init(void)
         nullptr, 0);
 #ifndef READER
     n.text.at = bridge_alloc(n.text.len);
-    acc_to_shared(n.text.at, HELLO, n.text.len);
+    acc_copy_to_shared(n.text.at, HELLO, n.text.len);
     BRIDGE_ATTACH(bridge_spawn(), name, n);
 #endif
 #ifdef BLANK

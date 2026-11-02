@@ -55,7 +55,7 @@ TEST_MEASURED TEST(flicker)
         span = test_get_span(api, q, i, 1);
         base = bases[span[0] * types + ntoggle_t];
         switch_rows((const t_t *)(api->shared_base + base),
-            test_get_bits(api, base), test_count_rows(api, span));
+            test_get_bits(api, base), test_get_rows(api, span));
         i++;
     }
     return (0);
@@ -75,7 +75,7 @@ TEST(combine)
     while (i < q->spans) {
         span = test_get_span(api, q, i, 1);
         bits = test_get_bits(api, bases[span[0] * types + ntoggle_t]);
-        count = test_count_rows(api, span);
+        count = test_get_rows(api, span);
         r = 0;
         while (r < count) {
             bits[r >> 6] |= (uint64_t)1 << (r & 63);

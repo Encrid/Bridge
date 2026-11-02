@@ -12,9 +12,34 @@ constexpr int64_t PAST = 1ll << 32;
 
 static const test_edit_t TEST_DEPLOYMENT_EDITS[] = {
     { "backends=0", offsetof(bridge_config_t, backend_count), 4, 0 },
+    { "backends=1", offsetof(bridge_config_t, backend_count), 4, 1 },
+    { "abi=0", offsetof(bridge_config_t, abi), 4, 0 },
+    { "abi=this", offsetof(bridge_config_t, abi), 4, BRIDGE_HOST_ABI },
+    { "abi=next", offsetof(bridge_config_t, abi), 4, BRIDGE_HOST_ABI + 1 },
+    { "phases=0", offsetof(bridge_config_t, phase_count), 4, 0 },
+    { "phases=1", offsetof(bridge_config_t, phase_count), 4, 1 },
     { "entities=0", offsetof(bridge_config_t, budget.entities), 8, 0 },
+    { "entities=4096", offsetof(bridge_config_t, budget.entities), 8, 4096 },
+    { "entities=past", offsetof(bridge_config_t, budget.entities), 8, PAST },
+    { "tables=0", offsetof(bridge_config_t, budget.tables), 4, 0 },
+    { "tables=64", offsetof(bridge_config_t, budget.tables), 4, 64 },
+    { "types=0", offsetof(bridge_config_t, budget.types), 4, 0 },
+    { "types=64", offsetof(bridge_config_t, budget.types), 4, 64 },
+    { "systems=0", offsetof(bridge_config_t, budget.systems), 4, 0 },
+    { "systems=128", offsetof(bridge_config_t, budget.systems), 4, 128 },
+    { "terms=0", offsetof(bridge_config_t, budget.terms), 4, 0 },
+    { "terms=8", offsetof(bridge_config_t, budget.terms), 4, 8 },
     { "modules=0", offsetof(bridge_config_t, budget.modules), 4, 0 },
     { "persistent=0", offsetof(bridge_config_t, budget.persistent), 8, 0 },
+    { "persistent=4096", offsetof(bridge_config_t, budget.persistent), 8,
+        4096 },
+    { "persistent=4294967295", offsetof(bridge_config_t, budget.persistent), 8,
+        UINT32_MAX },
+    { "columns=0", offsetof(bridge_config_t, budget.columns), 8, 0 },
+    { "columns=1048576", offsetof(bridge_config_t, budget.columns), 8,
+        1048576 },
+    { "direct_indexed=8", offsetof(bridge_config_t, budget.direct_indexed),
+        8, 8 },
     { "sparse_sets=0", offsetof(bridge_config_t, budget.sparse_sets), 8, 0 },
     { "sparse_sets=-5", offsetof(bridge_config_t, budget.sparse_sets), 8,
         -5 },
@@ -91,7 +116,10 @@ void test_edit_backend(host_t *h)
 
 void test_edit_phases(host_t *h)
 {
-    h->phases[1] = strcmp(h->arg, "twice") ? nullptr : h->phases[0];
+    if (!strcmp(h->arg, "nameless"))
+        h->phases[1] = nullptr;
+    if (!strcmp(h->arg, "twice"))
+        h->phases[1] = h->phases[0];
     if (!strcmp(h->arg, "empty"))
         h->phases[1] = "";
     host_open_only(h);

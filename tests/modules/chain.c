@@ -36,7 +36,7 @@ BRIDGE_EXPORT(got_a) int got_a(void)
     link_t link = { 2 };
 
     BRIDGE_LOG(BRIDGE_LOG_INFO, "hop A", 0, 0);
-    if (bridge_count_triggers(on_a))
+    if (bridge_get_trigger_count(on_a))
         BRIDGE_ATTACH(entity, b, link);
     return (0);
 }
@@ -46,7 +46,7 @@ BRIDGE_EXPORT(got_b) int got_b(void)
     link_t link = { 3 };
 
     BRIDGE_LOG(BRIDGE_LOG_INFO, "hop B", 0, 0);
-    if (bridge_count_triggers(on_b))
+    if (bridge_get_trigger_count(on_b))
         BRIDGE_ATTACH(entity, c, link);
     return (0);
 }

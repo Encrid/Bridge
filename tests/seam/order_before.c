@@ -3,19 +3,27 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <string.h>
+
 #include "cases.h"
 
 static const bridge_order_t TEST_PAIR_AGAINST_BEFORE[1] = {
     { "game:twostep:again", "game:twostep:twice" }
 };
 
+static const bridge_order_t TEST_PAIR_ALONG_BEFORE[1] = {
+    { "game:twostep:twice", "game:twostep:again" }
+};
+
 static const bridge_order_t TEST_PAIR_BESIDE_BEFORE[1] = {
     { "game:twostep:twice", "game:twostep:more" }
 };
 
-void test_order_pair_against_before(host_t *h)
+void test_order_pair_and_before(host_t *h)
 {
-    h->cfg.order = TEST_PAIR_AGAINST_BEFORE;
+    bool along = !strcmp(h->arg, "along");
+
+    h->cfg.order = along ? TEST_PAIR_ALONG_BEFORE : TEST_PAIR_AGAINST_BEFORE;
     h->cfg.order_count = 1;
     if (host_open(h))
         return;

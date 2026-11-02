@@ -4,6 +4,8 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include "cases.h"
@@ -54,22 +56,10 @@ static void nap_twice(host_t *h)
     host_close(h);
 }
 
-void test_run_at_once(host_t *h)
-{
-    h->cfg.threads = 2;
-    nap_twice(h);
-}
-
-void test_run_in_turn(host_t *h)
-{
-    nap_twice(h);
-}
-
 static void nap_in_one_module(host_t *h, const char *path)
 {
     const test_counts_t *c = test_get_counts(h);
 
-    h->cfg.threads = 2;
     if (host_open(h))
         return;
     test_load_built(h, "test:sleep@0.1.0", path, 1);
@@ -80,12 +70,15 @@ static void nap_in_one_module(host_t *h, const char *path)
     host_close(h);
 }
 
-void test_observe_in_turn(host_t *h)
+void test_nap(host_t *h)
 {
-    nap_in_one_module(h, SLEEP_HEARD_PATH);
-}
+    char *modules = nullptr;
 
-void test_run_own_in_turn(host_t *h)
-{
-    nap_in_one_module(h, SLEEP_TWICE_PATH);
+    h->cfg.threads = (uint32_t)strtoul(h->arg, &modules, 10);
+    if (!strcmp(modules, " heard"))
+        nap_in_one_module(h, SLEEP_HEARD_PATH);
+    else if (!strcmp(modules, " twice"))
+        nap_in_one_module(h, SLEEP_TWICE_PATH);
+    else
+        nap_twice(h);
 }

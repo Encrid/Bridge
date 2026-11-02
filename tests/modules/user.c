@@ -13,7 +13,7 @@ static uint32_t reading;
 BRIDGE_EXPORT(read) int read(void)
 {
     uint32_t span = bridge_get_span(reading, 0);
-    uint32_t table = bridge_span_table(span);
+    uint32_t table = bridge_get_span_table(span);
 
     BRIDGE_LOG(BRIDGE_LOG_INFO, "body",
         (uint32_t)BRIDGE_GET(body_t, at.y, body, table, 0),

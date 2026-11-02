@@ -39,11 +39,17 @@ void test_load_mover(host_t *h)
     test_load_module(h, "game:mover@0.1.0", "mover");
 }
 
-void test_state_reader(bridge_artifact_t *a)
+void test_state_reader_as(bridge_artifact_t *a, const char *identity,
+    const char *file)
 {
-    test_state_module(a, "view:reader@0.1.0", "reader");
+    test_state_module(a, identity, file);
     a->cfg.read = TEST_MOVER_GRANTS;
     a->cfg.read_count = 2;
+}
+
+void test_state_reader(bridge_artifact_t *a)
+{
+    test_state_reader_as(a, "view:reader@0.1.0", "reader");
 }
 
 void test_load_reader(host_t *h)

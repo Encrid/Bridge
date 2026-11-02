@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <string.h>
+
 #include "cases.h"
 
 static const char *const TEST_READER_GRANTS[] = {
@@ -30,7 +32,8 @@ void test_run_plain(host_t *h)
 
     if (host_open(h))
         return;
-    test_state_plain(&a, "game:mover@0.1.0", TMOVER_PATH);
+    test_state_plain(&a, "game:mover@0.1.0",
+        strcmp(h->arg, "marked") ? TMOVER_PATH : TMOVER_MARKED_PATH);
     host_load(h, &a);
     host_run_frames_unsaid(h->w, 2);
     host_close(h);
@@ -40,9 +43,12 @@ void test_run_mixed(host_t *h)
 {
     bridge_artifact_t a;
 
+    if (!strcmp(h->arg, "other"))
+        h->backends[1].library = PLAIN_OTHER_PATH;
     if (host_open(h))
         return;
-    test_state_plain(&a, "game:mover@0.1.0", TMOVER_PATH);
+    test_state_plain(&a, "game:mover@0.1.0",
+        strcmp(h->arg, "still") ? TMOVER_PATH : TMOVER_STILL_PATH);
     host_load(h, &a);
     test_state_reader_limited(&a);
     host_load(h, &a);
@@ -56,7 +62,8 @@ void test_refuse_entry(host_t *h)
 
     if (host_open(h))
         return;
-    test_state_plain(&a, "test:flood@0.1.0", TFLOOD_PATH);
+    test_state_plain(&a, "test:flood@0.1.0",
+        strcmp(h->arg, "fits") ? TFLOOD_PATH : TFLOOD_FITS_PATH);
     host_load(h, &a);
     (void)bridge_run_phase(h->w, "update");
     host_close(h);

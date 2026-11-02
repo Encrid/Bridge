@@ -120,8 +120,8 @@ A module can read it before an `attach`, a `detach` or a `destroy`.
 Thus the module can wait for the next barrier to make a change that does not fit, and its invocation does not fail.
 
 The capability table is `column_base`, `kept`, `stride`, `write` and `kind` in the private memory, and `rows` and `blocks` in the shared memory.
-A module names a cell by a coordinate: a slot, a place, and an offset in the cell.
-The place is a table and a row, or an entity id, or nothing for a singleton.
+A module names a cell by a coordinate: a slot, a location, and an offset in the cell.
+The location is a table and a row, or an entity id, or nothing for a singleton.
 `column_base`, `kept`, `rows`, `blocks`, `stride`, `write` and `kind` turn the coordinate into an offset into the shared memory.
 A backend that does not trust a module reads a cell only through them, and stops a module that reaches past what it declared.
 

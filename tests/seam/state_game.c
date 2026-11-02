@@ -11,8 +11,8 @@ void test_state_guarded(bridge_artifact_t *a, const char *identity,
     const char *file)
 {
     bool few = !strncmp(file, "twostep", 7) || !strncmp(file, "chain", 5)
-        || !strcmp(file, "events") || !strcmp(file, "nested")
-        || !strcmp(file, "nested2") || !strcmp(file, "scribble");
+        || !strncmp(file, "events", 6) || !strncmp(file, "nested", 6)
+        || !strcmp(file, "scribble");
 
     host_state_guarded(a, identity, file);
     if (few)

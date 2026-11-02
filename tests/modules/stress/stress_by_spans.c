@@ -22,7 +22,7 @@ static uint32_t sum_spans(const test_api_t *api, const bridge_query_t *q,
         span = test_get_span(api, q, s, 1);
         column = (const v_t *)(api->shared_base
             + bases[span[0] * types + slot]);
-        count = test_count_rows(api, span);
+        count = test_get_rows(api, span);
         *rows += count;
         r = 0;
         while (r < count) {

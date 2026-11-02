@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdlib.h>
+
 #include "cases.h"
 
 static void load_built(host_t *h, const char *file, const char *config,
@@ -23,21 +25,21 @@ static void load_built(host_t *h, const char *file, const char *config,
 
 void test_name_missing_config(host_t *h)
 {
-    load_built(h, "settings", "game:Nope", 64);
+    load_built(h, "settings", h->arg, 64);
 }
 
 void test_state_small_arena(host_t *h)
 {
-    load_built(h, "settings", "game:Settings", 8);
+    load_built(h, "settings", "game:Settings", strtol(h->arg, nullptr, 10));
 }
 
 void test_leave_no_room(host_t *h)
 {
-    h->cfg.budget.columns = 16;
+    h->cfg.budget.columns = strtoull(h->arg, nullptr, 10);
     load_built(h, "settings", "game:Settings", 64);
 }
 
 void test_configure_table(host_t *h)
 {
-    load_built(h, "settings-table", "game:Settings", 64);
+    load_built(h, h->arg, "game:Settings", 64);
 }
