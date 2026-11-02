@@ -29,8 +29,10 @@ void test_seed_failed_load(host_t *h)
 {
     if (host_open(h))
         return;
-    load_six(h, "six:holder@0.1.0", "six");
-    host_run_frames(h, 1);
+    if (strcmp(h->arg, "alone")) {
+        load_six(h, "six:holder@0.1.0", "six");
+        host_run_frames(h, 1);
+    }
     load_six(h, "six:seeded@0.1.0", "six-seeded");
     host_run_frames(h, 1);
     host_close(h);
@@ -40,7 +42,7 @@ void test_config_refused_under_fail(host_t *h)
 {
     bridge_artifact_t a;
 
-    test_get_noted(h)->settings[0].key = "vsynk";
+    test_get_noted(h)->settings[0].key = h->arg;
     if (host_open(h))
         return;
     test_state_configured(h, &a, "game:settings@0.1.0");

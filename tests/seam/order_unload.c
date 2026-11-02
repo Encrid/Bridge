@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <string.h>
+
 #include "cases.h"
 
 static const bridge_order_t TEST_CHAIN_PAIRS[2] = {
@@ -41,30 +43,21 @@ static void load_counter(host_t *h)
     host_load(h, &a);
 }
 
-void test_order_chain_unloaded(host_t *h)
+void test_order_unloaded(host_t *h)
 {
-    h->cfg.order = TEST_CHAIN_PAIRS;
-    h->cfg.order_count = 2;
-    if (host_open(h))
-        return;
-    test_load_guarded(h, "game:mover@0.1.0", "mover");
-    load_counter(h);
-    load_halver(h);
-    host_unload(h, "view:counter@0.1.0");
-    test_load_game_reader(h);
-    host_close(h);
-}
+    bool chain = !strcmp(h->arg, "chain");
 
-void test_order_through_a_module(host_t *h)
-{
-    h->cfg.order = TEST_THROUGH_PAIRS;
+    h->cfg.order = chain ? TEST_CHAIN_PAIRS : TEST_THROUGH_PAIRS;
     h->cfg.order_count = 2;
     if (host_open(h))
         return;
     test_load_guarded(h, "game:mover@0.1.0", "mover");
-    test_load_guarded(h, "game:twostep@0.1.0", "twostep");
+    if (chain)
+        load_counter(h);
+    else
+        test_load_guarded(h, "game:twostep@0.1.0", "twostep");
     load_halver(h);
-    host_unload(h, "game:twostep@0.1.0");
+    host_unload(h, chain ? "view:counter@0.1.0" : "game:twostep@0.1.0");
     test_load_game_reader(h);
     host_close(h);
 }

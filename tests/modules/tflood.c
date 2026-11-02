@@ -6,7 +6,11 @@
 #include "test_module.h"
 #include "idle.h"
 
+#ifdef FITS
+constexpr uint32_t SPAWNS = 1000;
+#else
 constexpr uint32_t SPAWNS = 100'000;
+#endif
 
 TEST(flood)
 {

@@ -13,7 +13,7 @@ void test_place_after_stop(host_t *h)
 
     if (host_open(h))
         return;
-    test_state_guarded_minting(&a, "test:flaky@0.1.0", "flaky-always");
+    test_state_guarded_minting(&a, "test:flaky@0.1.0", h->arg);
     a.cfg.spawns = BRIDGE_NONE;
     a.cfg.on_error = BRIDGE_SKIP;
     host_load(h, &a);
@@ -25,7 +25,13 @@ void test_place_after_stop(host_t *h)
 void test_place_after_reload(host_t *h)
 {
     bridge_artifact_t a[2];
+    bridge_artifact_t *reloaded = &a[0];
+    const char *identity = "game:one@0.2.0";
 
+    if (!strcmp(h->arg, "two")) {
+        reloaded = &a[1];
+        identity = "game:two@0.2.0";
+    }
     if (host_open(h))
         return;
     group_state(&a[0], "game:one@0.1.0", "share1");
@@ -33,8 +39,8 @@ void test_place_after_reload(host_t *h)
     host_load(h, &a[0]);
     host_load(h, &a[1]);
     host_run_frames_unsaid(h->w, 1);
-    group_state(&a[0], "game:one@0.2.0", "share1");
-    host_reload(h, &a[0]);
+    group_state(reloaded, identity, "share1");
+    host_reload(h, reloaded);
     host_run_frames_unsaid(h->w, 1);
     host_close(h);
 }
@@ -47,9 +53,9 @@ void test_place_after_refused_load(host_t *h)
         return;
     test_load_guarded(h, "game:places@0.1.0", "places");
     test_load_guarded(h, "game:other@0.1.0", "places");
-    group_state(&a[0], "game:one@0.1.0", "sharew");
+    group_state(&a[0], "game:one@0.1.0", h->arg);
     host_load(h, &a[0]);
-    group_state(&a[1], "game:two@0.1.0", "sharew");
+    group_state(&a[1], "game:two@0.1.0", h->arg);
     host_load(h, &a[1]);
     host_run_frames_unsaid(h->w, 1);
     host_close(h);

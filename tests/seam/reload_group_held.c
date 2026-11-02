@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <string.h>
+
 #include "cases.h"
 
 void test_reload_group_stop(host_t *h)
@@ -16,7 +18,8 @@ void test_reload_group_stop(host_t *h)
     sour.cfg.read = TEST_GAME;
     sour.cfg.read_count = 2;
     sour.cfg.max_system_failures = 1;
-    sour.cfg.on_error = BRIDGE_FAIL;
+    if (strcmp(h->arg, "kept"))
+        sour.cfg.on_error = BRIDGE_FAIL;
     host_load(h, &sour);
     group_state(&a[1], "game:one@0.1.0", "share1");
     host_load(h, &a[1]);
@@ -41,7 +44,7 @@ void test_reload_group_hold(host_t *h)
     host_load(h, &a[1]);
     host_run_frames(h, 1);
     group_state(&a[0], "game:one@0.2.0", "share2");
-    group_state(&a[1], "game:two@0.2.0", "sharehold1");
+    group_state(&a[1], "game:two@0.2.0", h->arg);
     host_reload_many(h, a, 2);
     host_run_frames(h, 1);
     test_say_modules(h);
@@ -65,8 +68,10 @@ void test_reload_group_shut(host_t *h)
     host_run_frames(h, 1);
     group_state(&a[0], "game:one@0.2.0", "share1-said");
     group_state(&a[1], "game:two@0.2.0", "share1-said");
-    a[1].cfg.losses = TEST_SHARED_LOSS;
-    a[1].cfg.loss_count = 1;
+    if (strcmp(h->arg, "lossless")) {
+        a[1].cfg.losses = TEST_SHARED_LOSS;
+        a[1].cfg.loss_count = 1;
+    }
     host_reload_many(h, a, 2);
     test_say_modules(h);
     host_close(h);

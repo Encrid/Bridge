@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdio.h>
+
 #include "cases.h"
 
 void test_give_up(host_t *h)
@@ -12,7 +14,7 @@ void test_give_up(host_t *h)
     if (host_open(h))
         return;
     test_load_guarded_minting(h, "game:twostep@0.1.0", "twostep");
-    test_state_guarded_minting(&a, "test:flaky@0.1.0", "flaky-always");
+    test_state_guarded_minting(&a, "test:flaky@0.1.0", h->arg);
     a.cfg.spawns = BRIDGE_NONE;
     a.cfg.on_error = BRIDGE_FAIL;
     host_load(h, &a);
@@ -42,15 +44,10 @@ static void run_flaky(host_t *h, const char *file, int frames, int64_t limit)
 
 void test_forgive(host_t *h)
 {
-    run_flaky(h, "flaky-third", 12, 3);
-}
+    char file[32] = "";
+    int frames = 0;
+    long long limit = 0;
 
-void test_forgive_too_little(host_t *h)
-{
-    run_flaky(h, "flaky-twothirds", 12, 3);
-}
-
-void test_fail_beside_clean(host_t *h)
-{
-    run_flaky(h, "flaky-calm", 5, 3);
+    (void)sscanf(h->arg, "%31s %d %lld", file, &frames, &limit);
+    run_flaky(h, file, frames, limit);
 }

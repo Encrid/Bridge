@@ -4,6 +4,8 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "cases.h"
 
@@ -14,12 +16,12 @@ test_counts_t *test_get_counts(const host_t *h)
     return (l->counts);
 }
 
-static void load_pinned(host_t *h)
+static void load_pinned(host_t *h, enum bridge_flag pinned)
 {
     bridge_artifact_t a;
 
     host_state_built(&a, "test:pinned@0.1.0", PINNED_PATH);
-    a.cfg.pinned = BRIDGE_TRUE;
+    a.cfg.pinned = pinned;
     host_load(h, &a);
 }
 
@@ -27,12 +29,12 @@ void test_pin(host_t *h)
 {
     const test_counts_t *c = test_get_counts(h);
 
-    h->cfg.threads = 4;
+    h->cfg.threads = (uint32_t)strtoul(h->arg, nullptr, 10);
     if (host_open(h))
         return;
     test_load_built(h, "test:sleep1@0.1.0", SLEEP1_PATH, BRIDGE_NONE);
     test_load_built(h, "test:sleep2@0.1.0", SLEEP2_PATH, BRIDGE_NONE);
-    load_pinned(h);
+    load_pinned(h, BRIDGE_TRUE);
     host_run_frames_unsaid(h->w, 3);
     printf("the others used %u thread(s)\n", test_count_threads(c));
     printf("pinned: %u of its %u calls were on the thread that loaded it\n",
@@ -54,11 +56,14 @@ void test_call_from_wrong_thread(host_t *h)
     h->cfg.threads = 4;
     if (host_open(h))
         return;
-    load_pinned(h);
+    load_pinned(h, strcmp(h->arg, "unpinned") ? BRIDGE_TRUE : BRIDGE_FALSE);
     printf("from another thread: %s\n",
         call_elsewhere(h->w, 0) ? "refused" : "ran");
-    printf("destroy from another thread: %s\n",
-        call_elsewhere(h->w, -1) ? "refused" : "done");
+    if (!call_elsewhere(h->w, -1)) {
+        printf("destroy from another thread: done\nalive\n");
+        return;
+    }
+    printf("destroy from another thread: refused\n");
     printf("destroy from the thread that loaded it: %s\n",
         bridge_destroy(h->w) ? "refused" : "done");
     printf("alive\n");

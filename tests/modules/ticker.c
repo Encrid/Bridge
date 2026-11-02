@@ -35,6 +35,9 @@ static void register_tick(void)
 #ifdef TAG
     BRIDGE_DECLARE_TAG("game:Flag", BRIDGE_DELETE, BRIDGE_TABLE);
 #endif
+#ifdef TAG_STRUCT
+    BRIDGE_COMPONENT("game:Flag", extra_t, BRIDGE_DELETE, BRIDGE_TABLE);
+#endif
     terms[0].slot = tick;
     ticking = BRIDGE_ADD_SYSTEM("advance", "update", terms, 1, nullptr, 0,
         nullptr, 0);

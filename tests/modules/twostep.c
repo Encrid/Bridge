@@ -22,6 +22,8 @@ constexpr uint32_t CHANGE_COUNT = 0;
 #ifdef THIRD
     #ifdef REPEATED
 constexpr uint32_t AGAIN_BEFORE_COUNT = 2;
+    #elif defined(AGAIN_UNSTATED)
+constexpr uint32_t AGAIN_BEFORE_COUNT = 0;
     #else
 constexpr uint32_t AGAIN_BEFORE_COUNT = 1;
     #endif

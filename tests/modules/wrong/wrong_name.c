@@ -59,3 +59,12 @@ void wrong_system_phase_long(void)
     s.phase_len = 128;
     bridge_add_system(bridge_put(&s, sizeof(s)));
 }
+
+void wrong_system_phase_short(void)
+{
+    bridge_system_statement_t s = wrong_state_system();
+
+    s.phase = put_long_name();
+    s.phase_len = 39;
+    bridge_add_system(bridge_put(&s, sizeof(s)));
+}

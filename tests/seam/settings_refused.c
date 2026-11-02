@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdlib.h>
+
 #include "cases.h"
 
 static void load_settings(host_t *h)
@@ -19,7 +21,7 @@ static void load_settings(host_t *h)
 
 void test_misname_setting(host_t *h)
 {
-    test_get_noted(h)->settings[0].key = "vsynk";
+    test_get_noted(h)->settings[0].key = h->arg;
     load_settings(h);
 }
 
@@ -27,19 +29,21 @@ void test_mistype_setting(host_t *h)
 {
     bridge_setting_t *scale = &test_get_noted(h)->settings[2];
 
-    scale->kind = BRIDGE_STRING;
-    scale->v.s = "fast";
+    if (*h->arg) {
+        scale->kind = BRIDGE_STRING;
+        scale->v.s = h->arg;
+    }
     load_settings(h);
 }
 
 void test_overflow_text(host_t *h)
 {
-    test_get_noted(h)->settings[4].v.s = "twenty characters...";
+    test_get_noted(h)->settings[4].v.s = h->arg;
     load_settings(h);
 }
 
 void test_overflow_integer(host_t *h)
 {
-    test_get_noted(h)->settings[6].v.i = 300;
+    test_get_noted(h)->settings[6].v.i = strtol(h->arg, nullptr, 10);
     load_settings(h);
 }

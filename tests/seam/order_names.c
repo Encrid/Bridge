@@ -3,6 +3,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdlib.h>
 #include <string.h>
 
 #include "cases.h"
@@ -25,6 +26,8 @@ static const char *pick_name(const char *arg)
         return ("game:a:b:c");
     if (!strcmp(arg, "empty"))
         return ("game::move");
+    if (!strcmp(arg, "three"))
+        return ("game:mover:move");
     memset(test_long_name, 'o', sizeof(test_long_name) - 1);
     memcpy(test_long_name, "game:mover:", 11);
     return (test_long_name);
@@ -33,10 +36,11 @@ static const char *pick_name(const char *arg)
 void test_order_two_pairs(host_t *h)
 {
     bridge_order_t pairs[2] = {
-        { "move", "game:twostep:twice" },
+        { "game:mover:move", "game:twostep:twice" },
         { "game:mover:move", "game:twostep:twice" }
     };
 
+    pairs[strtoul(h->arg, nullptr, 10)].before = "move";
     h->cfg.order = pairs;
     h->cfg.order_count = 2;
     host_open_only(h);
@@ -58,15 +62,15 @@ void test_order_unnamed(host_t *h)
 void test_order_no_array(host_t *h)
 {
     h->cfg.order = nullptr;
-    h->cfg.order_count = 2;
+    h->cfg.order_count = (uint32_t)strtoul(h->arg, nullptr, 10);
     host_open_only(h);
 }
 
-void test_order_too_many(host_t *h)
+void test_order_counted(host_t *h)
 {
     bridge_order_t pair = { "game:mover:move", "game:twostep:twice" };
 
     h->cfg.order = &pair;
-    h->cfg.order_count = 0x80000000u;
+    h->cfg.order_count = (uint32_t)strtoul(h->arg, nullptr, 10);
     host_open_only(h);
 }

@@ -3,6 +3,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdlib.h>
 #include <string.h>
 
 #include "cases.h"
@@ -26,6 +27,11 @@ static const test_edit_t TEST_MODULE_EDITS[] = {
     { "spans=0", offsetof(test_keys_t, spans), 4, 0 },
     { "spawns=0", offsetof(test_keys_t, spawns), 8, 0 },
     { "spawns=5000", offsetof(test_keys_t, spawns), 8, 5000 },
+    { "memory_limit=0", offsetof(test_keys_t, memory_limit), 8, 0 },
+    { "memory_limit=-7", offsetof(test_keys_t, memory_limit), 8, -7 },
+    { "memory_limit=2097152", offsetof(test_keys_t, memory_limit), 8, 1 << 21 },
+    { "log_level=0", offsetof(test_keys_t, log_level), 1, 0 },
+    { "log_level=4", offsetof(test_keys_t, log_level), 1, BRIDGE_LOG_WARN },
     { "persistent=0", offsetof(test_keys_t, persistent), 8, 0 },
     { "changes=0", offsetof(test_keys_t, changes), 8, 0 },
     { "changes=beyond", offsetof(test_keys_t, changes), 8, 1ll << 33 },
@@ -63,7 +69,7 @@ void test_load_twice(host_t *h)
     if (host_open(h))
         return;
     test_load_small(h, "ok");
-    test_load_small(h, "ok");
+    test_load_small(h, h->arg);
     host_close(h);
 }
 
@@ -78,7 +84,7 @@ void test_spawn_past_entities(host_t *h)
     a.cfg.spawns = 3000;
     host_load(h, &a);
     test_state_small(&a, identity, "image");
-    a.cfg.spawns = 3000;
+    a.cfg.spawns = strtol(h->arg, nullptr, 10);
     host_load(h, &a);
     host_close(h);
 }
@@ -93,7 +99,7 @@ void test_edit_phase_names(host_t *h)
     if (host_open(h))
         return;
     test_state_small(&a, identity, "ok");
-    names[1].from = *h->arg ? names[1].from : nullptr;
+    names[1].from = *h->arg ? h->arg : nullptr;
     a.cfg.phases = names;
     a.cfg.phase_count = 2;
     host_load(h, &a);
@@ -118,26 +124,28 @@ static void edit_phases(const host_t *h, bridge_phase_name_t *names,
 {
     names[0] = (bridge_phase_name_t){ "tick", "update" };
     names[1] = (bridge_phase_name_t){ "tock", "update" };
+    a->cfg.phases = names;
+    a->cfg.phase_count = 2;
     if (!strcmp(h->arg, "phase=from-empty"))
         names[0].from = "";
     if (!strcmp(h->arg, "phase=to-null"))
         names[0].to = nullptr;
     if (!strcmp(h->arg, "phase=to-empty"))
         names[0].to = "";
-    a->cfg.phases = names;
-    a->cfg.phase_count = 2;
+    if (!strcmp(h->arg, "phase=one-to-one"))
+        a->cfg.phase_count = 1;
 }
 
 static void edit_more(const host_t *h, bridge_artifact_t *a,
     bridge_phase_name_t *names)
 {
-    if (!strcmp(h->arg, "identity=empty"))
-        a->cfg.identity = "";
-    if (!strcmp(h->arg, "config=empty"))
-        a->cfg.config = "";
-    if (!strcmp(h->arg, "log_ring=past")) {
+    if (!strncmp(h->arg, "identity=", 9))
+        a->cfg.identity = h->arg + 9;
+    if (!strncmp(h->arg, "config=", 7))
+        a->cfg.config = h->arg + 7;
+    if (!strncmp(h->arg, "log_ring=", 9)) {
         a->cfg.scratch = 1024;
-        a->cfg.log_ring = 4'294'966'140u;
+        a->cfg.log_ring = (uint32_t)strtoul(h->arg + 9, nullptr, 10);
     }
     if (!strcmp(h->arg, "timeouts=nolimit")) {
         a->cfg.init_timeout = BRIDGE_NO_LIMIT;
@@ -156,11 +164,11 @@ void test_edit_module_more(host_t *h)
     if (host_open(h))
         return;
     test_state_small(&a, identity, "ok");
-    if (!strcmp(h->arg, "reload=refused")) {
+    if (!strncmp(h->arg, "reload=", 7)) {
         a.cfg.reloadable = BRIDGE_TRUE;
         a.cfg.hot_reload = BRIDGE_TRUE;
         host_load(h, &a);
-        a.cfg.log_ring = 8;
+        a.cfg.log_ring = (uint32_t)strtoul(h->arg + 7, nullptr, 10);
         host_reload(h, &a);
         host_close(h);
         return;

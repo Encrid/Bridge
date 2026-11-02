@@ -4,6 +4,8 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "cases.h"
 
@@ -33,6 +35,7 @@ static int churn_three(host_t *h)
 void test_churn(host_t *h)
 {
     test_noted_t *more = test_get_noted(h);
+    int rounds = (int)strtol(h->arg, nullptr, 10);
     int refused = 0;
     int i = 0;
 
@@ -40,13 +43,13 @@ void test_churn(host_t *h)
     if (host_open(h))
         return;
     more->quiet = true;
-    while (i < 200) {
+    while (i < rounds) {
         refused += churn_three(h);
         i++;
     }
     more->quiet = false;
-    printf("churned 200 times, %d loads refused, %u records of the index "
-        "out of step\n", refused, more->out_of_step);
+    printf("churned %d times, %d loads refused, %u records of the index "
+        "out of step\n", rounds, refused, more->out_of_step);
     test_say_modules(h);
     host_close(h);
 }
@@ -55,7 +58,7 @@ void test_drop_configured(host_t *h)
 {
     if (host_open(h))
         return;
-    test_reload_settings(h, true);
+    test_reload_settings(h, !strcmp(h->arg, "drop"));
     test_load_spawnless(h, "game:retype@0.1.0", "retype-settings");
     host_close(h);
 }

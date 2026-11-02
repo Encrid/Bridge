@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdio.h>
+
 #include "cases.h"
 
 static void load_mapped(host_t *h, const bridge_phase_name_t *names,
@@ -22,36 +24,17 @@ static void load_mapped(host_t *h, const bridge_phase_name_t *names,
     host_close(h);
 }
 
-void test_leave_phase_unmapped(host_t *h)
-{
-    load_mapped(h, nullptr, 0);
-}
-
 void test_map_phase(host_t *h)
 {
-    bridge_phase_name_t tick = { "tick", "update" };
+    char to[2][16] = { "", "" };
+    int count = sscanf(h->arg, "%15s %15s", to[0], to[1]);
+    bridge_phase_name_t one = { "tick", to[0] };
+    bridge_phase_name_t two[2] = { { "tock", to[0] }, { "tick", to[1] } };
 
-    load_mapped(h, &tick, 1);
-}
-
-void test_map_phase_second(host_t *h)
-{
-    bridge_phase_name_t tick = { "tick", "present" };
-
-    load_mapped(h, &tick, 1);
-}
-
-void test_map_phase_nowhere(host_t *h)
-{
-    bridge_phase_name_t tick = { "tick", "nowhere" };
-
-    load_mapped(h, &tick, 1);
-}
-
-void test_map_two_phases(host_t *h)
-{
-    bridge_phase_name_t names[2] = { { "tock", "update" },
-        { "tick", "present" } };
-
-    load_mapped(h, names, 2);
+    if (count == 2)
+        load_mapped(h, two, 2);
+    else if (count == 1)
+        load_mapped(h, &one, 1);
+    else
+        load_mapped(h, nullptr, 0);
 }

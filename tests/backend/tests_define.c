@@ -22,6 +22,34 @@ static const tests_shape_t TESTS_SHAPES[TESTS_ENTRIES] = {
     { { I }, 1, I }
 };
 
+typedef struct {
+    const char *marker;
+    enum tests_entry entry;
+    tests_shape_t shape;
+} tests_reshape_t;
+
+static const tests_reshape_t TESTS_RESHAPES[3] = {
+    { "test_expect_wide", TESTS_DECLARE, { { L }, 1, I } },
+    { "test_expect_narrow", TESTS_ATTACH, { { I, I, I }, 3, 0 } },
+    { "test_expect_no_answer", TESTS_SPAWN, { {}, 0, 0 } }
+};
+
+uint32_t tests_find_reshape(void *lib)
+{
+    uint32_t k = 0;
+
+    while (k < 3 && !os_lib_get_symbol(lib, TESTS_RESHAPES[k].marker))
+        k++;
+    return (k < 3 ? k + 1 : 0);
+}
+
+static const tests_shape_t *find_shape(const backend_module_t *m, uint32_t k)
+{
+    if (m->reshaped && TESTS_RESHAPES[m->reshaped - 1].entry == k)
+        return (&TESTS_RESHAPES[m->reshaped - 1].shape);
+    return (&TESTS_SHAPES[k]);
+}
+
 static bool is_shaped(const tests_shape_t *shape, const backend_sig_t *sig)
 {
     uint32_t results = shape->result ? 1 : 0;
@@ -50,13 +78,14 @@ BACKEND_EXPORT int define_func(backend_instance_t *i,
         k++;
     if (k == TESTS_ENTRIES || strcmp(entry->ns, BRIDGE_NAMESPACE))
         return (0);
-    if (!is_shaped(&TESTS_SHAPES[k], entry->sig)) {
+    if (!is_shaped(find_shape(i->m, k), entry->sig)) {
         snprintf(err->text, sizeof(err->text), "the entry '%.100s' is "
             "declared with another signature than bridge_abi.h states",
             entry->field);
         return (-1);
     }
-    i->fns[k] = entry->fn;
+    if (!i->m->unanswered)
+        i->fns[k] = entry->fn;
     i->uds[k] = entry->ud;
     return (0);
 }
