@@ -29,7 +29,7 @@ def python(text, notice):
 
 
 def faults(path, data, notice, unicode):
-    text = data.decode('utf-8', 'replace')
+    text = data.decode('utf-8', 'replace').replace('\r\n', '\n')
     found = [] if unicode else [(n, 'a character that is not ASCII')
                                 for n, line in enumerate(data.split(b'\n'), 1) if not line.isascii()]
     if path.endswith('.py'):
