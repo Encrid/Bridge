@@ -17,7 +17,7 @@ int main(int argc, char **argv)
         printf("alive\n");
         return (failed);
     }
-    failed = schema_run_structs();
+    failed = schema_run_structs(argc > 1 ? argv[1] : nullptr);
     failed += schema_run_constants();
     failed += schema_run_refusals();
     printf("%s\n", failed ? "FAIL" : "every descriptor read as it should, "
