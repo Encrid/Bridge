@@ -4,13 +4,25 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "cases.h"
 
 void test_configure(host_t *h)
 {
+    const char *value = strchr(h->arg, '=');
+    bridge_setting_t *s = test_get_noted(h)->settings;
     bridge_artifact_t a;
 
+    while (value && strncmp(s->key, h->arg, (size_t)(value - h->arg)))
+        s++;
+    if (value && s->kind == BRIDGE_BOOL)
+        s->v.b = atoll(value + 1) != 0;
+    if (value && s->kind == BRIDGE_INT)
+        s->v.i = atoll(value + 1);
+    if (value && s->kind == BRIDGE_FLOAT)
+        s->v.f = strtod(value + 1, nullptr);
     if (host_open(h))
         return;
     test_state_configured(h, &a, "game:settings@0.1.0");
@@ -27,6 +39,8 @@ void test_configure_twice(host_t *h)
         return;
     test_state_configured(h, &a, "game:settings@0.1.0");
     host_load(h, &a);
+    if (*h->arg)
+        host_unload(h, h->arg);
     test_state_configured(h, &a, "game:other@0.1.0");
     host_load(h, &a);
     host_close(h);
@@ -44,10 +58,11 @@ void test_reseed(host_t *h)
     host_load(h, &a);
     host_run_frames(h, 1);
     host_unload(h, "game:settings@0.1.0");
+    test_get_noted(h)->settings[5].v.s = h->arg;
     host_load(h, &a);
     host_run_frames(h, 1);
     printf("settings text %s\n", more->path_count == 2 && at[0] == at[1]
-        ? "written to the same place" : "MOVED");
+        ? "written to the same place" : "not written to the same place");
     host_close(h);
 }
 
@@ -75,6 +90,6 @@ void test_reload_configured(host_t *h)
 {
     if (host_open(h))
         return;
-    test_reload_settings(h, false);
+    test_reload_settings(h, !strcmp(h->arg, "drop"));
     host_close(h);
 }

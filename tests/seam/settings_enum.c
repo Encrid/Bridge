@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdlib.h>
+
 #include "cases.h"
 
 static void load_named(host_t *h, const char *config, int64_t persistent)
@@ -24,22 +26,22 @@ void test_overflow_enum(host_t *h)
     bridge_setting_t *mode = &test_get_noted(h)->settings[3];
 
     mode->kind = BRIDGE_INT;
-    mode->v.i = 200;
+    mode->v.i = strtol(h->arg, nullptr, 10);
     load_named(h, "game:Settings", 64);
 }
 
 void test_misname_constant(host_t *h)
 {
-    test_get_noted(h)->settings[3].v.s = "Sometimes";
+    test_get_noted(h)->settings[3].v.s = h->arg;
     load_named(h, "game:Settings", 64);
 }
 
 void test_state_no_config(host_t *h)
 {
-    load_named(h, BRIDGE_NO_CONFIG, 64);
+    load_named(h, h->arg, 64);
 }
 
 void test_leave_config_unset(host_t *h)
 {
-    load_named(h, nullptr, 64);
+    load_named(h, *h->arg ? h->arg : nullptr, 64);
 }

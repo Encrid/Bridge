@@ -4,6 +4,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "cases.h"
@@ -14,21 +15,21 @@ static int64_t get_next_share(const char *what)
         return (16);
     if (!strcmp(what, "shareless"))
         return (8);
-    if (!strcmp(what, "sharebig"))
+    if (!strcmp(what, "sharebig") || !strcmp(what, "sharefromnonebig"))
         return (1 << 20);
     return (64);
 }
 
 static int64_t get_first_share(const char *what)
 {
-    return (strcmp(what, "sharefromnone") ? 16 : BRIDGE_NONE);
+    return (strncmp(what, "sharefromnone", 13) ? 16 : BRIDGE_NONE);
 }
 
 static const char *get_next_file(const char *what)
 {
     if (strstr(what, "fail"))
         return ("ticker-fail");
-    if (!strcmp(what, "sharechaintwice"))
+    if (!strncmp(what, "sharechaintwice", 15))
         return ("ticker-ten");
     return ("ticker-alloc");
 }
@@ -57,9 +58,9 @@ void test_grow_share(host_t *h)
     test_state_ticker(&a, "game:ticker@0.2.0", get_next_file(h->arg));
     a.cfg.persistent = get_next_share(h->arg);
     host_reload(h, &a);
-    if (!strcmp(h->arg, "sharechaintwice")) {
+    if (!strncmp(h->arg, "sharechaintwice", 15)) {
         test_state_ticker(&a, "game:ticker@0.3.0", "ticker-ten");
-        a.cfg.persistent = 128;
+        a.cfg.persistent = strcmp(h->arg, "sharechaintwicebig") ? 128 : 1 << 20;
         host_reload(h, &a);
     }
     host_run_frames(h, 2);
@@ -71,6 +72,7 @@ void test_hoard_shares(host_t *h)
 {
     bridge_artifact_t a;
     char identity[32];
+    uint32_t last = (uint32_t)strtoul(h->arg, nullptr, 10);
     uint32_t v = 2;
 
     if (host_open(h))
@@ -80,7 +82,7 @@ void test_hoard_shares(host_t *h)
     host_load(h, &a);
     load_namer(h);
     host_run_frames(h, 1);
-    while (v <= 9) {
+    while (v <= last) {
         snprintf(identity, sizeof(identity), "game:ticker@0.%u.0", v);
         test_state_ticker(&a, identity, "ticker");
         a.cfg.persistent = 64 * v;
@@ -132,7 +134,8 @@ void test_scan_shares(host_t *h)
     a.cfg.persistent = 64;
     host_load(h, &a);
     host_run_frames(h, 1);
-    host_unload(h, "game:ticker@0.1.0");
+    if (strcmp(h->arg, "kept"))
+        host_unload(h, "game:ticker@0.1.0");
     test_state_guarded_minting(&a, "game:ticker@0.2.0", "ticker");
     a.cfg.persistent = 64;
     host_load(h, &a);

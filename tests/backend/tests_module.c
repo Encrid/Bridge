@@ -64,6 +64,9 @@ BACKEND_EXPORT backend_module_t *module_compile([[maybe_unused]] backend_t *b,
     m->crowd = os_lib_get_symbol(lib, "test_import_crowd") != nullptr;
     m->insists = os_lib_get_symbol(lib, "test_enter_after_refusal") != nullptr;
     m->undefined = os_lib_get_symbol(lib, "test_refuse_define") != nullptr;
+    m->lone = os_lib_get_symbol(lib, "test_import_shared_only") != nullptr;
+    m->unanswered = os_lib_get_symbol(lib, "test_answer_nothing") != nullptr;
+    m->reshaped = tests_find_reshape(lib);
     return (m);
 }
 
@@ -71,6 +74,8 @@ static uint32_t count_imports(const backend_module_t *m)
 {
     if (m->crowd)
         return (TESTS_CROWD + 2);
+    if (m->lone)
+        return (1);
     return (m->stray ? 6 : 2);
 }
 

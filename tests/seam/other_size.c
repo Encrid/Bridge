@@ -20,7 +20,7 @@ void test_declare_other_size(host_t *h)
         return;
     load_spot(h, "five:second@0.1.0", "spot-wide");
     load_spot(h, "five:first@0.1.0", "spot");
-    load_spot(h, "five:second@0.1.0", "spot-wide");
+    load_spot(h, "five:second@0.1.0", h->arg);
     test_say_modules(h);
     host_close(h);
 }

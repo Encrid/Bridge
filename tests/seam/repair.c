@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdlib.h>
+
 #include "cases.h"
 
 void test_repair(host_t *h)
@@ -11,7 +13,7 @@ void test_repair(host_t *h)
 
     if (host_open(h))
         return;
-    test_state_ticker(&a, "game:ticker@0.1.0", "ticker-trip");
+    test_state_ticker(&a, "game:ticker@0.1.0", h->arg);
     a.cfg.on_error = BRIDGE_FAIL;
     host_load(h, &a);
     host_run_frames(h, 4);
@@ -30,7 +32,7 @@ void test_repair_by_load(host_t *h)
 
     if (host_open(h))
         return;
-    test_state_guarded_minting(&a, "game:thing@0.1.0", "badobs");
+    test_state_guarded_minting(&a, "game:thing@0.1.0", h->arg);
     a.cfg.on_error = BRIDGE_FAIL;
     host_load(h, &a);
     test_load_guarded_minting(h, "game:other@0.1.0", "twostep");
@@ -49,7 +51,7 @@ void test_allow_not_reloadable(host_t *h)
     if (host_open(h))
         return;
     test_state_guarded_minting(&a, "game:twostep@0.1.0", "twostep");
-    a.cfg.hot_reload = BRIDGE_TRUE;
+    a.cfg.hot_reload = (enum bridge_flag)strtol(h->arg, nullptr, 10);
     host_load(h, &a);
     host_close(h);
 }
@@ -58,7 +60,7 @@ void test_leave_reload_out(host_t *h)
 {
     if (host_open(h))
         return;
-    test_load_spawnless(h, "test:noreload@0.1.0", "noreload");
+    test_load_spawnless(h, "test:noreload@0.1.0", h->arg);
     host_close(h);
 }
 
@@ -66,6 +68,6 @@ void test_leave_shutdown_out(host_t *h)
 {
     if (host_open(h))
         return;
-    test_load_spawnless(h, "test:noshutdown@0.1.0", "noshutdown");
+    test_load_spawnless(h, "test:noshutdown@0.1.0", h->arg);
     host_close(h);
 }

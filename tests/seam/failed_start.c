@@ -57,7 +57,7 @@ void test_keep_after_failed_reload(host_t *h)
     test_load_guarded(h, "game:mover@0.1.0", "mover");
     state_why(&a, "game:keep@0.1.0", "keep");
     host_load(h, &a);
-    state_why(&a, "game:keep@0.2.0", "keep-fail");
+    state_why(&a, "game:keep@0.2.0", h->arg);
     host_reload(h, &a);
     host_run_frames(h, 1);
     test_say_modules(h);

@@ -4,6 +4,7 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "cases.h"
 
@@ -45,6 +46,19 @@ void test_load_named(host_t *h)
     host_close(h);
 }
 
+void test_load_short(host_t *h)
+{
+    char identity[64];
+    bridge_artifact_t a;
+
+    if (host_open(h))
+        return;
+    test_state_small(&a, identity, "ok");
+    a.len -= (size_t)strtol(h->arg, nullptr, 10);
+    host_load(h, &a);
+    host_close(h);
+}
+
 void test_stop(host_t *h)
 {
     char identity[64];
@@ -55,7 +69,7 @@ void test_stop(host_t *h)
     test_load_small(h, "oob");
     test_load_small(h, "ok");
     test_state_small(&a, identity, "oob");
-    a.cfg.on_error = BRIDGE_FAIL;
+    a.cfg.on_error = (enum bridge_on_error)strtol(h->arg, nullptr, 10);
     host_load(h, &a);
     test_load_small(h, "ok");
     host_close(h);

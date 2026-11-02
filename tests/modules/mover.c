@@ -14,6 +14,12 @@ static uint32_t marked;
 static uint32_t moving;
 static uint32_t counting;
 
+#ifdef MARKER
+TEST_EXPORT void MARKER(void)
+{
+}
+#endif
+
 BRIDGE_EXPORT(move) int move(void)
 {
     uint32_t spans = bridge_get_span_count(moving);

@@ -3,6 +3,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdlib.h>
 #include <string.h>
 
 #include "cases.h"
@@ -20,14 +21,12 @@ static void load_stamp(host_t *h, int64_t changes)
     host_close(h);
 }
 
-void test_queue_too_few(host_t *h)
+void test_queue_changes(host_t *h)
 {
-    load_stamp(h, 16);
-}
-
-void test_queue_none(host_t *h)
-{
-    load_stamp(h, BRIDGE_NONE);
+    if (!strcmp(h->arg, "none"))
+        load_stamp(h, BRIDGE_NONE);
+    else
+        load_stamp(h, strtol(h->arg, nullptr, 10));
 }
 
 void test_read_room(host_t *h)
@@ -48,7 +47,8 @@ void test_change_unstated(host_t *h)
 {
     if (host_open(h))
         return;
-    test_load_built(h, "game:stamp@0.1.0", STAMPUNSTATED_PATH, 8);
+    test_load_built(h, "game:stamp@0.1.0",
+        strcmp(h->arg, "stated") ? STAMPUNSTATED_PATH : STAMPSTATED_PATH, 8);
     test_load_watcher(h);
     host_run_frames_unsaid(h->w, 2);
     host_close(h);
@@ -61,6 +61,6 @@ void test_hop_threads(host_t *h)
         return;
     test_load_guarded(h, "game:mover@0.1.0", "mover");
     test_load_game_reader(h);
-    host_run_frames_unsaid(h->w, 50);
+    host_run_frames_unsaid(h->w, (int)strtol(h->arg, nullptr, 10));
     host_close(h);
 }

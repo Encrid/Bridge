@@ -3,6 +3,9 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdio.h>
+#include <string.h>
+
 #include "cases.h"
 
 void test_skip_init(host_t *h)
@@ -10,7 +13,7 @@ void test_skip_init(host_t *h)
     if (host_open(h))
         return;
     test_load_guarded_minting(h, "game:twostep@0.1.0", "twostep");
-    test_load_guarded_minting(h, "game:badobs@0.1.0", "badobs");
+    test_load_guarded_minting(h, "game:badobs@0.1.0", h->arg);
     host_run_frames(h, 1);
     test_say_modules(h);
     host_close(h);
@@ -20,7 +23,7 @@ void test_refuse_load(host_t *h)
 {
     if (host_open(h))
         return;
-    test_load_guarded_minting(h, "game:badterm@0.1.0", "badterm");
+    test_load_guarded_minting(h, "game:badterm@0.1.0", h->arg);
     test_load_guarded_minting(h, "game:fp@0.1.0", "fp");
     test_say_modules(h);
     host_close(h);
@@ -28,10 +31,13 @@ void test_refuse_load(host_t *h)
 
 static void fail_always(host_t *h, enum bridge_on_error on_error)
 {
+    const char *flaky = strchr(h->arg, ' ') + 1;
+    char first[32];
     bridge_artifact_t a;
 
-    test_load_guarded_minting(h, "game:twostep@0.1.0", "twostep");
-    test_state_guarded_minting(&a, "test:flaky@0.1.0", "flaky-always");
+    snprintf(first, sizeof(first), "%.*s", (int)(flaky - 1 - h->arg), h->arg);
+    test_load_guarded_minting(h, "game:twostep@0.1.0", first);
+    test_state_guarded_minting(&a, "test:flaky@0.1.0", flaky);
     a.cfg.spawns = BRIDGE_NONE;
     a.cfg.on_error = on_error;
     host_load(h, &a);

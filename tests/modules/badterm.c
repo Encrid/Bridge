@@ -14,7 +14,9 @@ BRIDGE_EXPORT(any) int any(void)
 
 BRIDGE_EXPORT(init) int init(void)
 {
-    bridge_term_t terms[1] = {{ 0, BRIDGE_READ, (enum bridge_oper)4, 0 }};
+    bridge_term_t terms[1] = {
+        { 0, BRIDGE_READ, (enum bridge_oper)BADTERM_OPER, 0 },
+    };
 
     terms[0].slot = BRIDGE_COMPONENT("game:Position", position_t,
         BRIDGE_STRIP, BRIDGE_TABLE);

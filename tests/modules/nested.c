@@ -33,10 +33,14 @@ BRIDGE_EXPORT(init) int init(void)
     BRIDGE_DECLARE(BRIDGE_STRUCT, "game:vec2_t", vec2_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
 #endif
+#ifndef LEAVE_OUT_TEAM
     BRIDGE_DECLARE(BRIDGE_ENUM, "game:team_t", team_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
+#endif
+#ifndef LEAVE_OUT_FLAGS
     BRIDGE_DECLARE(BRIDGE_BITMASK, "game:flags_t", flags_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
+#endif
     body = BRIDGE_COMPONENT("game:Body", body_t, BRIDGE_DELETE, BRIDGE_TABLE);
     terms[0].slot = body;
     reading = BRIDGE_ADD_SYSTEM("read", "update", terms, 1, nullptr, 0,

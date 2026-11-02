@@ -3,6 +3,7 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdlib.h>
 #include <string.h>
 
 #include "cases.h"
@@ -33,7 +34,8 @@ void test_keep_two_shares(host_t *h)
     host_unload(h, "game:settings@0.1.0");
     load_settings(h, 128);
     host_unload(h, "game:settings@0.1.0");
-    host_unload(h, "game:other@0.1.0");
+    if (strcmp(h->arg, "kept"))
+        host_unload(h, "game:other@0.1.0");
     load_settings(h, 1024);
     test_say_modules(h);
     host_close(h);
@@ -51,7 +53,7 @@ void test_keep_for_another(host_t *h)
     load_settings(h, 128);
     host_unload(h, "game:settings@0.1.0");
     test_state_configured(h, &a, "game:third@0.1.0");
-    a.cfg.persistent = 128;
+    a.cfg.persistent = strtoll(h->arg, nullptr, 10);
     host_load(h, &a);
     test_say_modules(h);
     host_close(h);

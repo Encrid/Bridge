@@ -57,6 +57,9 @@ struct backend_module {
     bool crowd;
     bool insists;
     bool undefined;
+    bool lone;
+    bool unanswered;
+    uint32_t reshaped;
 };
 
 struct backend_func {
@@ -128,6 +131,7 @@ static inline void tests_take_memories(test_api_t *api,
 }
 
 void tests_fill_api(test_api_t *api);
+uint32_t tests_find_reshape(void *lib);
 
 uint64_t tests_spawn(const test_api_t *api);
 void tests_destroy(const test_api_t *api, uint64_t id);

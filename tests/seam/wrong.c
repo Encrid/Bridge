@@ -16,7 +16,7 @@ static const char *const TEST_THING_NEAR[] = {
     "gamex:Odd"
 };
 
-void test_do_wrong(host_t *h)
+static void do_wrong(host_t *h, int64_t persistent)
 {
     bridge_artifact_t a;
 
@@ -31,7 +31,18 @@ void test_do_wrong(host_t *h)
     }
     if (!strcmp(h->arg, "wrong-observer-attaches-unstated"))
         a.cfg.spawns = 4;
+    a.cfg.persistent = persistent;
     host_load(h, &a);
     host_run_frames(h, 1);
     host_close(h);
+}
+
+void test_do_wrong(host_t *h)
+{
+    do_wrong(h, BRIDGE_NONE);
+}
+
+void test_do_wrong_kept(host_t *h)
+{
+    do_wrong(h, 64);
 }

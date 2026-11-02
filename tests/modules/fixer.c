@@ -13,6 +13,14 @@ constexpr uint32_t CHANGE_COUNT = 1;
 constexpr uint32_t CHANGE_COUNT = 0;
 #endif
 
+#ifdef WATCH
+    #ifdef BEFORE
+constexpr uint32_t SEEN_BEFORE_COUNT = 1;
+    #else
+constexpr uint32_t SEEN_BEFORE_COUNT = 0;
+    #endif
+#endif
+
 static uint32_t marked;
 static uint32_t fixing;
 #ifdef WATCH
@@ -57,7 +65,7 @@ BRIDGE_EXPORT(init) int init(void)
 #ifdef WATCH
     terms[0].access = BRIDGE_READ;
     seeing = BRIDGE_OBSERVER("seen", BRIDGE_ON_ENTER, terms, 1, nullptr, 0,
-        nullptr, 0);
+        &fixing, SEEN_BEFORE_COUNT);
 #endif
     return (0);
 }

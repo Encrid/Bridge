@@ -3,6 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <string.h>
+
 #include "cases.h"
 
 void test_stop_by_spans(host_t *h)
@@ -13,7 +15,7 @@ void test_stop_by_spans(host_t *h)
         return;
     test_state_module(&a, "game:mover@0.1.0", "mover");
     a.cfg.spans = 640;
-    a.cfg.on_error = BRIDGE_FAIL;
+    a.cfg.on_error = strcmp(h->arg, "fail") ? BRIDGE_SKIP : BRIDGE_FAIL;
     host_load(h, &a);
     host_run_frames(h, 2);
     test_say_modules(h);

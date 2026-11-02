@@ -3,6 +3,9 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
+#include <stdlib.h>
+#include <string.h>
+
 #include "cases.h"
 
 static void reap(host_t *h, bool may_write)
@@ -22,14 +25,9 @@ static void reap(host_t *h, bool may_write)
     host_close(h);
 }
 
-void test_reap_with_read(host_t *h)
+void test_reap(host_t *h)
 {
-    reap(h, false);
-}
-
-void test_reap_with_write(host_t *h)
-{
-    reap(h, true);
+    reap(h, !strcmp(h->arg, "write"));
 }
 
 void test_enter_from_foreign_thread(host_t *h)
@@ -43,6 +41,6 @@ void test_enter_from_foreign_thread(host_t *h)
 
 void test_state_no_threads(host_t *h)
 {
-    h->cfg.threads = 0;
+    h->cfg.threads = (uint32_t)strtol(h->arg, nullptr, 10);
     host_open_only(h);
 }

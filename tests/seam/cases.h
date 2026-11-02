@@ -21,6 +21,8 @@ void test_load_module(host_t *h, const char *identity, const char *file);
 
 void test_load_mover(host_t *h);
 
+void test_state_reader_as(bridge_artifact_t *a, const char *identity,
+    const char *file);
 void test_state_reader(bridge_artifact_t *a);
 
 void test_load_reader(host_t *h);
@@ -158,18 +160,14 @@ void test_set_counting(host_t *h);
 void test_set_noting(host_t *h);
 
 void test_load_named(host_t *h);
+void test_load_short(host_t *h);
 void test_create_no_sink(host_t *h);
 void test_stop(host_t *h);
 void test_state_no_limit(host_t *h);
 void test_state_other_abi(host_t *h);
-void test_name_no_backend(host_t *h);
-void test_open_no_library(host_t *h);
-void test_state_other_host_abi(host_t *h);
-void test_state_no_host_abi(host_t *h);
-void test_leave_unset(host_t *h);
-void test_leave_level_unset(host_t *h);
+void test_name_backend(host_t *h);
+void test_open_backend_library(host_t *h);
 void test_leave_flag_unset(host_t *h);
-void test_state_negative(host_t *h);
 void test_state_other_none(host_t *h);
 void test_share(host_t *h);
 void test_mirror(host_t *h);
@@ -191,22 +189,11 @@ void test_spend_work(host_t *h);
 void test_spawn_to_ceiling(host_t *h);
 void test_fill_ring(host_t *h);
 void test_overflow_spans(host_t *h);
-void test_state_bad_level(host_t *h);
-void test_log_warnings(host_t *h);
+void test_state_log_level(host_t *h);
 void test_state_big_private(host_t *h);
 void test_state_no_spawns(host_t *h);
 void test_run_unknown_phase(host_t *h);
 void test_keep_string(host_t *h);
-void test_keep_string_no_room(host_t *h);
-void test_keep_string_too_big(host_t *h);
-void test_leave_phases_unset(host_t *h);
-void test_leave_columns_unset(host_t *h);
-void test_leave_tables_unset(host_t *h);
-void test_leave_types_unset(host_t *h);
-void test_leave_systems_unset(host_t *h);
-void test_leave_terms_unset(host_t *h);
-void test_state_beyond_reach(host_t *h);
-void test_state_too_big(host_t *h);
 void test_use_up_types(host_t *h);
 void test_use_up_systems(host_t *h);
 void test_use_up_terms(host_t *h);
@@ -215,26 +202,20 @@ void test_bench(host_t *h);
 void test_run_plain(host_t *h);
 void test_run_mixed(host_t *h);
 void test_state_limit(host_t *h);
-void test_state_no_path(host_t *h);
 void test_state_no_bytes(host_t *h);
-void test_name_no_library(host_t *h);
+void test_state_library(host_t *h);
 void test_refuse_entry(host_t *h);
 void test_leave_libraries(host_t *h);
 void test_open_other_seam(host_t *h);
 void test_state_unknown_setting(host_t *h);
 void test_order(host_t *h);
-void test_reorder(host_t *h);
-void test_leave_unordered(host_t *h);
-void test_order_in_a_cycle(host_t *h);
-void test_order_pair_against_before(host_t *h);
+void test_order_pair_and_before(host_t *h);
 void test_order_pair_beside_before(host_t *h);
 void test_reload_into_cycle(host_t *h);
 
 void test_order_unnamed(host_t *h);
 
-void test_order_chain_unloaded(host_t *h);
-
-void test_order_through_a_module(host_t *h);
+void test_order_unloaded(host_t *h);
 
 void test_load_by_identity(host_t *h);
 void test_order_own(host_t *h);
@@ -244,10 +225,7 @@ void test_pass_chain(host_t *h);
 void test_fill_tables(host_t *h);
 void test_grow_elements(host_t *h);
 void test_take_reserved_name(host_t *h);
-void test_run_at_once(host_t *h);
-void test_run_in_turn(host_t *h);
-void test_observe_in_turn(host_t *h);
-void test_run_own_in_turn(host_t *h);
+void test_nap(host_t *h);
 void test_enter_from_foreign_thread(host_t *h);
 void test_pin(host_t *h);
 void test_call_from_wrong_thread(host_t *h);
@@ -267,11 +245,9 @@ void test_run_guarded(host_t *h, const char *identity, const char *file,
     int frames);
 
 void test_tell_places(host_t *h);
-void test_map_onto_a_named_phase(host_t *h);
-void test_map_beside_a_named_phase(host_t *h);
-void test_place_before(host_t *h);
-void test_place_paired(host_t *h);
+void test_map_named_phase(host_t *h);
 void test_place_two(host_t *h);
+void test_place_after_refused_group(host_t *h);
 
 void test_place_after_stop(host_t *h);
 
@@ -282,10 +258,6 @@ void test_place_after_refused_load(host_t *h);
 void test_heard_triggered(host_t *h);
 void test_rows_of_idle(host_t *h);
 void test_kept_triggers(host_t *h);
-void test_place_reordered(host_t *h);
-
-void test_place_after_refused_group(host_t *h);
-
 void test_take_in_old_shutdown(host_t *h);
 
 void test_guess(host_t *h);
@@ -300,7 +272,7 @@ void test_round_spans(host_t *h);
 
 void test_alloc_unaligned_share(host_t *h);
 
-void test_reload_beyond_reach(host_t *h);
+void test_reload_persistent(host_t *h);
 
 void test_stop_by_spans(host_t *h);
 
@@ -309,7 +281,7 @@ void test_shut_failed_load(host_t *h);
 
 void test_keep_after_failed_reload(host_t *h);
 
-void test_watch_no_room(host_t *h);
+void test_watch_spans(host_t *h);
 
 void test_name_many_declarers(host_t *h);
 
@@ -360,31 +332,22 @@ void test_mend_after_fault(host_t *h);
 
 void test_order_two_pairs(host_t *h);
 void test_order_no_array(host_t *h);
-void test_order_too_many(host_t *h);
+void test_order_counted(host_t *h);
 
 void test_log_out_of_range(host_t *h);
 
-void test_reserve_too_much(host_t *h);
+void test_reserve_size(host_t *h);
 
 void test_state_shape(host_t *h);
 void test_conflict_at_barrier(host_t *h);
 void test_conflict_own_observers(host_t *h);
 void test_conflict_changes_at_barrier(host_t *h);
-void test_order_observers(host_t *h);
-void test_reorder_observers(host_t *h);
-void test_queue_too_few(host_t *h);
-void test_queue_none(host_t *h);
+void test_queue_changes(host_t *h);
 void test_read_room(host_t *h);
-void test_leave_phase_unmapped(host_t *h);
 void test_map_phase(host_t *h);
-void test_map_phase_nowhere(host_t *h);
 void test_change_unstated(host_t *h);
-void test_conflict_by_change(host_t *h);
-void test_order_changes(host_t *h);
-void test_order_changes_loaded_last(host_t *h);
-void test_tell_both(host_t *h);
-void test_reap_with_read(host_t *h);
-void test_reap_with_write(host_t *h);
+void test_stamp_twice(host_t *h);
+void test_reap(host_t *h);
 void test_nest(host_t *h);
 void test_run_two(host_t *h);
 void test_mint(host_t *h);
@@ -394,11 +357,8 @@ void test_reach_budget(host_t *h);
 void test_stop_by_failing(host_t *h);
 void test_give_up(host_t *h);
 void test_forgive(host_t *h);
-void test_forgive_too_little(host_t *h);
-void test_fail_beside_clean(host_t *h);
 void test_fail_unlimited(host_t *h);
-void test_end_by_system(host_t *h);
-void test_end_by_init(host_t *h);
+void test_run_ender(host_t *h);
 void test_end_by_observer(host_t *h);
 void test_end_at_a_reload(host_t *h);
 void test_unload_keeper(host_t *h);
@@ -418,13 +378,9 @@ void test_reload_while_stopped(host_t *h);
 
 void group_state(bridge_artifact_t *a, const char *identity, const char *file);
 void test_reload_group(host_t *h);
-void test_reload_group_outside(host_t *h);
-void test_reload_group_start(host_t *h);
-void test_reload_group_cycle(host_t *h);
 void test_reload_group_plain(host_t *h);
 void test_reload_group_empty(host_t *h);
-void test_reload_group_dup(host_t *h);
-void test_reload_group_ghost(host_t *h);
+void test_reload_group_named(host_t *h);
 void test_reload_group_stop(host_t *h);
 void test_reload_group_hold(host_t *h);
 void test_reload_group_shut(host_t *h);
@@ -471,16 +427,14 @@ void test_edit_module(host_t *h);
 
 void test_edit_module_more(host_t *h);
 
-void test_map_phase_second(host_t *h);
-void test_map_two_phases(host_t *h);
 void test_load_twice(host_t *h);
 void test_spawn_past_entities(host_t *h);
 void test_edit_phase_names(host_t *h);
 void test_do_wrong(host_t *h);
+void test_do_wrong_kept(host_t *h);
 void test_outgrow_spans(host_t *h);
 void test_log_levels(host_t *h);
 void test_tag_entities(host_t *h);
-void test_take_scratch_past(host_t *h);
 void test_list_fewer(host_t *h);
 void test_hand_settings(host_t *h);
 void test_refuse_essential(host_t *h);
