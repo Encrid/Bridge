@@ -50,6 +50,7 @@ If the command is not in the table, `project.py` stops with the message
 | `--debug` | Replaces each variable that `[debug]` names with the value of `[debug]`. |
 | `--out <folder>` | Puts the output into this folder. The default is the folder `build` of the project. |
 | `--set <name>=<value>` | Sets a key of `[variables]` to the value. You can use this option more than one time. |
+| `--leave <name>` | Leaves the file `<name>` out of the deliverable and out of its zip: `.toolchain/docs/build.py.md`, *The deliverable*. It is an option of `build` and `pack`. |
 | `--pack` | Puts the package into a zip file. The command `pack` gives this option to `.toolchain/tools/build.py`. |
 | `--join` | Joins the zips of the targets. The command `join` gives this option to `.toolchain/tools/build.py`. |
 | `--break` | Runs the false variant of each case. It is an option of `test` only. |

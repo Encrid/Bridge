@@ -25,7 +25,7 @@ With `--pack`, it also puts the deliverable into a zip file. With `--join`, it j
 | `path_defines(config)` | Gives the `*_PATH` macros of the test libraries, for the variable `paths`. |
 | `archives(config, values)` | Gives the path of each shipped archive, from the output folder. |
 | `prove(config, values)` | Proves the package, as *The package proof* tells. It does nothing if `[package]` has no `proof`. |
-| `composed(config, values)` | Composes the deliverable, as *The deliverable* tells. It gives the files of the deliverable. |
+| `composed(config, values, leave)` | Composes the deliverable, as *The deliverable* tells. It gives the files of the deliverable. `leave` is the value of `--leave`, or `None`. |
 | `part_table(config, part)` | Gives the table `[parts.<part>]`, as *Parts* tells. It stops if the part or a part of its `uses` is not there, or if the table is not complete. |
 | `owned(config)` | Stops if an artifact or a table of `[compose]` does not state its part as *Parts* tells. |
 | `needed(config, parts)` | Gives `parts`, and each part that they use, directly or through a different part. |
@@ -69,7 +69,7 @@ A step with `cwd` gets whole paths: *Steps*.
 
 With `--join`, `main` only joins the zips: *The join*.
 Else `main` builds, then writes the path of each artifact.
-Then for each configuration of `views`, it composes the deliverable with `composed`.
+Then for each configuration of `views`, it composes the deliverable with `composed`, and gives it the value of `--leave`.
 With `--pack`, it then writes the zip with `packed`, and proves the package with `prove`.
 Thus a project with parts gets a deliverable, a zip and a proof for each part.
 
@@ -170,6 +170,11 @@ The deliverable of a part holds only the licences of the folders of its `third_p
 `composed` stops if such a folder has no licence: `third_party/<folder>/license is not there, and the deliverable needs it`.
 `composed` writes the path of each file of the deliverable.
 `.toolchain/docs/project.toml.md`, *[compose]*, tells the keys `from`, `headers`, `into` and `assets`.
+
+With `--leave <name>`, `composed` does not copy the file `<name>` into `dist`, and does not write its path.
+`<name>` is a path that `composed` writes, for example `license`.
+`composed` stops if the deliverable holds no such file: `--leave <name>: the deliverable holds no <name>`.
+Thus the false variant of a case can make a zip that lacks one file.
 
 A program can call `composed` after `prepared` alone, with no step of `ready`.
 Thus `from` and `into` can use the variables of `prepared`, but not the variable of a source, of a dependency or of a tool.
