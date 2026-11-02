@@ -29,6 +29,7 @@ With `Bob`, the output has no line `hello, Ada`. Thus the claims of the false va
 - A case checks one behavior. Its name tells the behavior.
 - Each behavior that a document describes has a case.
 - The false variant changes the command or its input. It cannot change the claims.
+- The false variant runs the code that does the behavior, with one input changed. A command that the program refuses before that code runs is not a false variant, for example an unknown name.
 - A case writes its files only into its folder, `{case}`.
 
 ## Groups
