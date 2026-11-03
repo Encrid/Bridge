@@ -123,6 +123,8 @@ struct storage {
     uint64_t *given;
     uint64_t *husk_types;
     uint64_t *husks;
+    module_t **heap;
+    uint32_t heap_count;
 };
 
 typedef struct {
