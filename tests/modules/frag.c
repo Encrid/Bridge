@@ -4,7 +4,6 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "test_module.h"
-#include "measured.h"
 #include "idle.h"
 #include "frag.h"
 #include "reach.h"
@@ -45,7 +44,7 @@ TEST(fill)
     return (0);
 }
 
-TEST_MEASURED TEST(sum)
+TEST(sum)
 {
     const bridge_query_t *q = test_get_query(api, reading);
     const uint32_t *bases = get_column_bases(api);
