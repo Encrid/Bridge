@@ -4,7 +4,6 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "weigh.h"
-#include "measured.h"
 #include "reach.h"
 
 uint32_t nweigh_value;
@@ -37,7 +36,7 @@ static uint32_t add_followed(const test_api_t *api, const uint32_t *span,
     return (total);
 }
 
-TEST_MEASURED static int follow(const test_api_t *api, bool far)
+static int follow(const test_api_t *api, bool far)
 {
     const bridge_query_t *q = test_get_query(api, nweigh_linked);
     uint32_t total = 0;

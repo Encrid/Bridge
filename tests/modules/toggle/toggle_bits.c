@@ -4,7 +4,6 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "toggle.h"
-#include "measured.h"
 #include "reach.h"
 
 uint32_t ntoggle_writing;
@@ -42,7 +41,7 @@ static void switch_rows([[maybe_unused]] const t_t *column, uint64_t *bits,
     }
 }
 
-TEST_MEASURED TEST(flicker)
+TEST(flicker)
 {
     const bridge_query_t *q = test_get_query(api, ntoggle_writing);
     const uint32_t *bases = get_column_bases(api);

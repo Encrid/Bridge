@@ -4,7 +4,6 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "sparse.h"
-#include "measured.h"
 #include "reach.h"
 
 uint32_t nsparse_in_set;
@@ -21,7 +20,7 @@ static uint32_t add_values(const s_t *column, uint32_t count, uint32_t total)
     return (total);
 }
 
-TEST_MEASURED TEST(look)
+TEST(look)
 {
     const bridge_query_t *q = test_get_query(api, nsparse_in_set);
     const uint32_t *bases = get_column_bases(api);
@@ -70,7 +69,7 @@ static uint32_t add_reached(const test_api_t *api, const uint32_t *span,
     return (total);
 }
 
-TEST_MEASURED TEST(look_b)
+TEST(look_b)
 {
     const bridge_query_t *q = test_get_query(api, nsparse_in_table);
     const uint32_t *bases = get_column_bases(api);

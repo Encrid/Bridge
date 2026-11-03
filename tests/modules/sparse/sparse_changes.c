@@ -4,7 +4,6 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "sparse.h"
-#include "measured.h"
 
 uint32_t nsparse_a;
 uint32_t nsparse_s;
@@ -22,7 +21,7 @@ TEST(spawn)
     return (0);
 }
 
-TEST_MEASURED TEST(attach_b)
+TEST(attach_b)
 {
     s_t value;
     uint32_t i = 0;
@@ -35,7 +34,7 @@ TEST_MEASURED TEST(attach_b)
     return (0);
 }
 
-TEST_MEASURED TEST(detach_b)
+TEST(detach_b)
 {
     uint32_t i = 0;
 

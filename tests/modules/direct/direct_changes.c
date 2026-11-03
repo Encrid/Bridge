@@ -4,7 +4,6 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "direct.h"
-#include "measured.h"
 
 uint32_t ndirect_a;
 uint32_t ndirect_d;
@@ -37,7 +36,7 @@ TEST(spawn)
     return (0);
 }
 
-TEST_MEASURED TEST(attach_b)
+TEST(attach_b)
 {
     d_t value;
     uint32_t i = 0;
@@ -50,7 +49,7 @@ TEST_MEASURED TEST(attach_b)
     return (0);
 }
 
-TEST_MEASURED TEST(detach_b)
+TEST(detach_b)
 {
     uint32_t i = 0;
 

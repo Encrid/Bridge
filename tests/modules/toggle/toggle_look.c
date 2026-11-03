@@ -4,7 +4,6 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "toggle.h"
-#include "measured.h"
 #include "reach.h"
 
 uint32_t ntoggle_reading;
@@ -51,7 +50,7 @@ static void see_words(const test_api_t *api, const uint32_t *span,
     }
 }
 
-TEST_MEASURED TEST(look)
+TEST(look)
 {
     const bridge_query_t *q = test_get_query(api, ntoggle_reading);
     const uint32_t *span;
@@ -84,7 +83,7 @@ static void see_rows(const t_t *restrict column, const uint64_t *restrict bits,
     }
 }
 
-TEST_MEASURED TEST(look_b)
+TEST(look_b)
 {
     const bridge_query_t *q = test_get_query(api, ntoggle_reading);
     const uint32_t *bases = get_column_bases(api);

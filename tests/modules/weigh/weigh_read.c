@@ -4,14 +4,13 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "weigh.h"
-#include "measured.h"
 #include "reach.h"
 
 uint32_t nweigh_walking;
 uint32_t nweigh_flagged;
 volatile uint32_t nweigh_which;
 
-TEST_MEASURED TEST(walk)
+TEST(walk)
 {
     const bridge_query_t *q = test_get_query(api, nweigh_walking);
     const uint32_t *bases = get_column_bases(api);
@@ -52,7 +51,7 @@ static uint32_t add_flagged(const f_t *column, uint32_t count,
     return (total);
 }
 
-TEST_MEASURED TEST(flag)
+TEST(flag)
 {
     const bridge_query_t *q = test_get_query(api, nweigh_flagged);
     const uint32_t *bases = get_column_bases(api);
@@ -72,7 +71,7 @@ TEST_MEASURED TEST(flag)
     return (0);
 }
 
-TEST_MEASURED TEST(one)
+TEST(one)
 {
     const uint32_t *bases = get_column_bases(api);
     uint32_t types = test_get_header(api)->types;

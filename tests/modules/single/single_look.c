@@ -4,7 +4,6 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "single.h"
-#include "measured.h"
 
 volatile uint32_t nsingle_which;
 
@@ -20,7 +19,7 @@ TEST(look)
     return (0);
 }
 
-TEST_MEASURED TEST(one)
+TEST(one)
 {
     const g_t *value;
     uint32_t total = 0;
