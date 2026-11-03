@@ -56,8 +56,8 @@ On Windows, the constructor declares `CreateFileMappingA` and `MapViewOfFile` it
 ## Macros
 
 - An end of a condition in a macro with no arguments, such as `UINT32_MAX`, gets its probe after the name of the macro.
-- A condition that starts with a call of a macro, such as `ckd_add(...)`, gets its probe around the full call.
-- A condition in an argument or in the body of a macro cannot get a probe. The report writes it as not measured.
+- If a condition starts or ends in a call of a macro, its probe starts or ends at the edge of the full call. This is also true for an argument, such as `y` in `x == SAME(y)`.
+- If a condition holds only a part of a call, it cannot get a probe. An example is `x == y` in `x == PICK(y) + 1`, with `#define PICK(c) c ? 0 : 1`. The report writes it as not measured, at the name of the call.
 
 ## The report
 
@@ -92,6 +92,7 @@ An exemption that matches no unreached outcome is a fault, so a branch that a ca
 - A probe that runs before the constructor of its file keeps its outcome only if the constructor runs later.
 - The measure uses only the target of this machine. The files of a different system, for example `src/posix` on Windows, are measured on a machine of that system.
 - A header that two artifacts compile with different macros gets the probes of both.
+- A probe holds the full text of each call that it touches. Thus an operator at an edge of a body, such as `&&` in `#define AND(a) a &&`, breaks the build of the copy. A parenthesis in a string or in a character constant of an argument does the same.
 
 ## Functions
 
@@ -101,11 +102,14 @@ An exemption that matches no unreached outcome is a fault, so a branch that a ca
 | `stripped(node)` | Gives the node in parentheses, a cast and `!`. |
 | `is_logical(node)` | Tells if a node is `&&` or `||`. |
 | `child(raw, index)` | Gives a child of a node, or `None`. |
+| `traced(top)` | Gives the parent of each node under `top`. For each call of a macro, it gives the nodes with an end in the call, and the tokens of those ends. |
 | `Probing` | Finds the probes of one syntax tree. |
 | `Probing.walk(node, inside, depth)` | Walks the tree. `inside` tells that the node is in the body of a function. |
-| `Probing.function(node, raw, depth)` | Adds the probe of a function, and walks its body. |
+| `Probing.function(node, raw, depth)` | Adds the probe of a function, traces its body with `traced`, and walks it. |
 | `Probing.label(node, raw)` | Adds the probe of a `case` or a `default`. |
-| `Probing.condition(node, depth)` | Adds the probe of a condition, or of each part of a test with `&&` or `||`. |
+| `Probing.condition(node, depth)` | Adds the probe of a condition, or of each part of a test with `&&` or `||`. A condition that holds only a part of a call is not measured. |
+| `Probing.edge(loc, end)` | Gives the byte and the path of an end of a condition, as `placed`. An end in an argument of a macro goes to the name of the call. |
+| `Probing.partial(node)` | Tells if a condition leaves out a node of a call that it touches. A node that holds the condition does not count if its tokens in the call are all in the condition. |
 | `Probing.called(path, at)` | Gives the end of the call of a macro whose name ends at `at`, or `at` if no parenthesis follows. |
 | `Probing.add(path, key, edit)` | Keeps one probe of a file. |
 | `Probing.skip(loc, kind)` | Keeps a branch that cannot get a probe. |

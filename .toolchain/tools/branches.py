@@ -107,12 +107,29 @@ def child(raw, index):
     return one if isinstance(one, dict) and one else None
 
 
+def traced(top):
+    parents, calls, stack = {}, {}, [(top, None)]
+    while stack:
+        node, parent = stack.pop()
+        parents[node.get('id')] = parent
+        for side in ('begin', 'end'):
+            loc = node.get('range', {}).get(side)
+            if rewrite.is_macro(loc):
+                call = (loc['expansionLoc'].get('_file'), loc['expansionLoc'].get('offset'))
+                token = (loc.get('spellingLoc', {}).get('_file'), loc.get('spellingLoc', {}).get('offset'))
+                calls.setdefault(call, {}).setdefault(node.get('id'), set()).add(token)
+        stack.extend((one, node.get('id')) for one in node.get('inner', []) if isinstance(one, dict) and one)
+    return parents, calls
+
+
 class Probing:
     def __init__(self, root):
         self.root = root
         self.edits = {}
         self.skips = {}
         self.texts = {}
+        self.parents = {}
+        self.calls = {}
 
     def add(self, path, key, edit):
         self.edits.setdefault(path, {})[key] = edit
@@ -132,8 +149,6 @@ class Probing:
         if kind == 'FunctionDecl':
             return self.function(node, raw, depth)
         joining = kind == 'BinaryOperator' and node.get('opcode') in LOGICAL
-        if inside and (kind in DECIDED or joining) and rewrite.is_macro(node.get('loc')):
-            return self.skip(node.get('loc'), 'condition')
         if inside and kind in DECIDED:
             self.condition(child(raw, DECIDED[kind]), depth)
         elif inside and joining:
@@ -155,6 +170,7 @@ class Probing:
             return
         named = placed(node.get('loc'), False, self.root)[0]
         self.add(path, ('function', at), ('function', at + 1, named if isinstance(named, int) else at))
+        self.parents, self.calls = traced(body)
         self.walk(body, True, depth + 1)
 
     def label(self, node, raw):
@@ -173,18 +189,30 @@ class Probing:
         if not isinstance(node, dict) or not node or is_logical(node):
             return
         ends = node.get('range', {})
-        begin, path = placed(ends.get('begin'), False, self.root)
-        end, last = placed(ends.get('end'), True, self.root)
-        if isinstance(begin, int) and path and rewrite.is_macro(ends.get('begin')):
-            named = placed(ends.get('begin'), True, self.root)[0]
-            call = self.called(path, named)
-            end, last = (call, path) if call != named else (end, last)
-        if 'macro' in (begin, end):
-            return self.skip(ends.get('begin') if begin == 'macro' else ends.get('end'), 'condition')
+        begin, path = self.edge(ends.get('begin'), False)
+        end, last = self.edge(ends.get('end'), True)
+        if 'macro' in (begin, end) or self.partial(node):
+            return self.skip(ends.get('begin') if rewrite.is_macro(ends.get('begin')) else ends.get('end'), 'condition')
         if not isinstance(begin, int) or not isinstance(end, int) or not path or path != last:
             return
         end = self.called(path, end) if rewrite.is_macro(ends.get('end')) else end
         self.add(path, ('condition', begin, end), ('condition', begin, end, depth))
+
+    def edge(self, loc, end):
+        at, path = placed(loc, end, self.root)
+        if at == 'macro' and 'offset' in loc['expansionLoc']:
+            return placed(loc['expansionLoc'], end, self.root)
+        return at, path
+
+    def partial(self, node):
+        inner, held = traced(node)
+        mine = {call: set().union(*found.values()) for call, found in held.items()}
+        above, at = set(), self.parents.get(node.get('id'))
+        while at:
+            above.add(at)
+            at = self.parents.get(at)
+        return any(one not in inner and (one not in above or not seen <= mine[call])
+                   for call in mine for one, seen in self.calls[call].items())
 
     def called(self, path, at):
         text = self.texts.setdefault(path, (self.root / path).read_bytes())
