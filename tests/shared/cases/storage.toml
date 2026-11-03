@@ -59,6 +59,12 @@ claims = { matches = ["refused: out of memory: there was none for the mark of it
 false = { run = ["{out}/storage{exe}", "shape"] }
 
 [[case]]
+name = "storage-the-runs-of-a-barrier-go-by-turn-and-a-tie-by-load-order"
+run = ["{out}/storage{exe}", "runs", "abccb=a"]
+claims = { matches = ["rows: a0 b1 c2 c3 a4 b4\nalive"] }
+false = { run = ["{out}/storage{exe}", "runs", "aabbcc"] }
+
+[[case]]
 name = "relay-a-field-of-a-kind-past-the-element-table-takes-the-type-size"
 run = ["{out}/storage{exe}", "relaybadkind"]
 claims = { matches = ["element size of a bad kind: 42.*alive"] }
