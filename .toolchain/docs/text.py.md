@@ -3,6 +3,7 @@
 `text.py` checks the characters, the legal notices and the comments of the project.
 It also checks the words and the calls that the project refuses.
 It reads the files that `ours` gives.
+It reads the line ends of Windows and of Linux.
 
 ## Functions
 
