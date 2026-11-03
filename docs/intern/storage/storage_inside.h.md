@@ -234,6 +234,7 @@ The budget sizes it when the world is made: `docs/intern/block/block_budget.c.md
 | `given` | For each direct-indexed slot, a bit for each entity that has a value. |
 | `husk_types` | The types that a destroy leaves on an entity: *A husk*. |
 | `husks` | A bit for each entity, set while the entity is a husk: *A husk*. |
+| `heap`, `heap_count` | The heap of the modules whose runs a barrier takes, and its length: `docs/intern/storage/storage_runs.h.md`, *The heap of the runs*. |
 
 ### row_move_t
 

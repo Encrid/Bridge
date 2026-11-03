@@ -20,6 +20,7 @@ Each thing that they use got its room when the world was made or when a module l
 | The queue of changes of a module | At load | `changes` bytes. |
 | The list of who triggered an observer | At load | As many records as the `spans` of the module can publish. |
 | The marks that order the queues | When a module gets a system, and before a lifecycle call | One for each system of the module. |
+| The heap that orders the runs of a barrier | At create | `[budget] modules` long. |
 
 A load, a reload and an unload of a module allocate, and so do the creation and the destruction of a world.
 They allocate the record of the module, of each of its systems and of each of its types, and the rooms above.
