@@ -65,6 +65,7 @@ static void free_fold(storage_t *r)
     free(r->in_table);
     free(r->husk_types);
     free(r->husks);
+    free(r->heap);
     free(r->set_type);
     free(r->set_table);
     free(r->where);
