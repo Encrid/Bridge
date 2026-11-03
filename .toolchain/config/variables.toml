@@ -1,3 +1,4 @@
 [variables]
 quiet = ["-Wno-missing-field-initializers"]
 hidden = ["-fvisibility=hidden"]
+aligned = ["-falign-functions=64", "-falign-loops=64"]
