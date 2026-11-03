@@ -42,7 +42,7 @@ Storage takes room for the entities in the order of their first change, which is
 So the first entities asked are the ones placed, and the same ones on each run.
 
 An entity left as it was is a failure of each module that asked a change of it, each for its own changes.
-`write_value` of `src/storage/storage_runs.h` counts them, and `say_unapplied` of `src/storage/storage_settle.h` says them.
+`write_value` of `src/storage/storage_write.h` counts them, and `say_unapplied` of `src/storage/storage_settle.h` says them.
 The barrier then counts against the budget of the module: `docs/intern/schedule/schedule.h.md`, *The failure budget*.
 Two modules that changed one entity both hear of it, since both lost what they asked.
 

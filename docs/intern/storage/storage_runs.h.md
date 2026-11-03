@@ -1,7 +1,6 @@
 # src/storage/storage_runs.h
 
 This header takes the queues a run at a time, in the order the calls that filled them ran.
-It also writes the values that the changes carry.
 
 ## The order of the queues
 
@@ -50,5 +49,3 @@ Only loaded modules are on the work list, and no load goes past that number: `do
 | `sink_run` | Moves an entry of the heap down, past each entry below it that comes first. |
 | `reset_marks` | Starts each module of the work list again at its first mark, and makes a heap of the modules that have marks. |
 | `take_next_run` | Takes the next run of changes: one module, one turn. Gives the module, or `nullptr` when storage took each queue whole. Writes where the run begins and ends in its queue. |
-| `is_written` | Gives whether a change is an attach whose value storage writes. The barrier changed its entity, did not destroy it or leave it as it was, and the id has its generation. |
-| `write_value` | Passes over a change of `CHANGE_SKIPPED`. Writes the value of each other change where its entity has the type. For an entity left as it was, it counts the change for the module. `left[0]` counts for want of a table, and `left[1]` for want of columns. |

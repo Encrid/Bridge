@@ -30,7 +30,7 @@ A destroy of a held id goes on to `fold_destroy`, which refuses it: `docs/intern
 The fold applies nothing of a change of `FOLD_HUSK`: `docs/intern/storage/storage_husk.h.md`, *A husk in the fold*.
 `fold_run` also writes `CHANGE_SKIPPED` into the `op` of that change in the queue, with `skip_change`.
 The pass of the values reads the queue again, and there an attach after the destroy of a husk looks like an attach before it.
-The mark tells the two apart, and `write_value` passes over the marked change: `docs/intern/storage/storage_runs.h.md`, *Functions*.
+The mark tells the two apart, and `write_value` passes over the marked change: `docs/intern/storage/storage_write.h.md`, *Functions*.
 A change of `FOLD_SKIP` needs no mark: its entity is dead or destroyed, so its value has no place.
 
 ## A singleton

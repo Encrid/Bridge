@@ -8,6 +8,7 @@
 #include "storage_forget.h"
 #include "storage_runs.h"
 #include "storage_settle.h"
+#include "storage_write.h"
 
 static void fold_all(storage_t *r)
 {

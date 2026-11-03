@@ -10,7 +10,7 @@ An entity that storage leaves as it was gets the flag `DROPPED`.
 It also gets `SHORT` when columns are short, and not a table.
 
 Such an entity is a failure of the modules that asked its changes: `docs/intern/storage/storage_room.h.md`, *Running out*.
-`write_value` of `src/storage/storage_runs.h` counts it, where it writes the value of the change.
+`write_value` of `src/storage/storage_write.h` counts it, where it writes the value of the change.
 
 ## Functions
 

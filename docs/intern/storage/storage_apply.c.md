@@ -13,7 +13,7 @@ What changes is the thing that storage applies the order to:
 2. Room. Storage finds or makes the table of each final set, and finds room in it for each row that arrives.
 3. Observers. For each changed entity, storage compares what it carried with what it will carry. The difference is what an observer is owed.
 4. Placement. Each changed entity moves once, to the table it will be in, or storage destroys it.
-5. Values. Storage reads the queues again, and each attach writes its bytes where its entity now is.
+5. Values. Storage reads the queues again, and each attach writes its bytes where its entity now is: `docs/intern/storage/storage_write.h.md`, *Functions*.
 6. Release. Storage empties the queues and forgets the fold: `docs/intern/storage/storage_settle.h.md`, *Functions*. It gives back each table that holds no row: `docs/intern/storage/storage_forget.h.md`, *Functions*.
 
 At the end of the fold, storage knows the final set of each changed entity, whether it is destroyed, and whether it is a husk.
