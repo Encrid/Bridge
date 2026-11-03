@@ -67,7 +67,7 @@ def fetched(out):
 
 def built(values, out):
     zig, exe = values['zig'], values['exe']
-    flags = ['-target', values['target'], '-O2', '-DNDEBUG']
+    flags = ['-target', values['target'], '-O2', '-DNDEBUG', *values['aligned']]
     windows = ['-lws2_32', '-ldbghelp'] if values['system'] == 'windows' else []
     source = ROOT / 'tests' / 'shared' / 'reference'
     compiled = [zig, 'cc', '-std=c23', *flags, '-c', out / 'flecs' / 'flecs.c']
@@ -194,7 +194,7 @@ def paired(old, new, target):
         values, ours[side] = prepared(tree, target)
     out = ROOT / 'build' / 'reference'
     fetched(out)
-    built(values, out)
+    built(prepared(ROOT, target)[0], out)
     for side in ('old', 'new'):
         measured(0, ours[side], out, values['exe'])
     texts = {'old1': [], 'new1': [], 'old2': [], 'new2': []}
@@ -232,7 +232,7 @@ def main():
         sys.exit('reference.py: %s is not built: run python project.py test' % ours.as_posix())
     out = ROOT / 'build' / 'reference'
     fetched(out)
-    built(values, out)
+    built(prepared(ROOT, args.target)[0], out)
     for time in range(args.times):
         print(measured(time + 1, ours, out, values['exe']), end='', flush=True)
 
