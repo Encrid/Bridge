@@ -70,10 +70,12 @@ def built(values, out):
     flags = ['-target', values['target'], '-O2', '-DNDEBUG']
     windows = ['-lws2_32', '-ldbghelp'] if values['system'] == 'windows' else []
     source = ROOT / 'tests' / 'shared' / 'reference'
-    if not (out / 'flecs.o').exists():
-        run([zig, 'cc', '-std=c23', *flags, '-c', out / 'flecs' / 'flecs.c', '-o', out / 'flecs.o'])
+    compiled = [zig, 'cc', '-std=c23', *flags, '-c', out / 'flecs' / 'flecs.c']
+    flecs = out / ('flecs-%s.o' % shared.sha256(' '.join(str(c) for c in compiled).encode())[:16])
+    if not flecs.exists():
+        run([*compiled, '-o', flecs])
     run([zig, 'cc', '-std=c23', *flags, '-I', out / 'flecs', *sorted(source.glob('flecs_ref*.c')),
-         out / 'flecs.o', '-o', out / ('flecs_ref' + exe), *windows])
+         flecs, '-o', out / ('flecs_ref' + exe), *windows])
     run([zig, 'c++', '-std=c++23', *flags, '-I', out, source / 'entt_ref.cpp', '-o', out / ('entt_ref' + exe)])
     run([zig, 'cc', '-std=c23', *flags, source / 'floor.c', '-o', out / ('floor' + exe)])
 
