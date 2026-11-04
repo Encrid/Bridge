@@ -63,7 +63,7 @@ static inline bool room_joins(storage_t *r, uint32_t index)
 
     if ((r->folded[index] & (DESTROYED | DROPPED | MOVES)) != MOVES)
         return;
-    if (t && t != r->places[index].table && !make_room(r, t)) {
+    if (t && t != r->index[index].table && !make_room(r, t)) {
         drop_change(r, index, true);
         return;
     }

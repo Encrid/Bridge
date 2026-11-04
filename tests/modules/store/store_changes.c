@@ -4,14 +4,13 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "store.h"
-#include "measured.h"
 
 uint32_t nstore_a;
 uint32_t nstore_b;
 uint32_t nstore_c;
 uint64_t nstore_ids[COUNT];
 
-TEST_MEASURED TEST(attach_a)
+TEST(attach_a)
 {
     uint32_t i = 0;
 
@@ -22,7 +21,7 @@ TEST_MEASURED TEST(attach_a)
     return (0);
 }
 
-TEST_MEASURED TEST(attach_b)
+TEST(attach_b)
 {
     uint32_t i = 0;
 
@@ -33,7 +32,7 @@ TEST_MEASURED TEST(attach_b)
     return (0);
 }
 
-TEST_MEASURED TEST(detach_b)
+TEST(detach_b)
 {
     uint32_t i = 0;
 
@@ -44,7 +43,7 @@ TEST_MEASURED TEST(detach_b)
     return (0);
 }
 
-TEST_MEASURED TEST(destroy)
+TEST(destroy)
 {
     uint32_t i = 0;
 
@@ -55,7 +54,7 @@ TEST_MEASURED TEST(destroy)
     return (0);
 }
 
-TEST_MEASURED TEST(attach_both)
+TEST(attach_both)
 {
     uint32_t i = 0;
 

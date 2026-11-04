@@ -67,13 +67,15 @@ def fetched(out):
 
 def built(values, out):
     zig, exe = values['zig'], values['exe']
-    flags = ['-target', values['target'], '-O2', '-DNDEBUG']
+    flags = ['-target', values['target'], '-O2', '-DNDEBUG', *values['aligned']]
     windows = ['-lws2_32', '-ldbghelp'] if values['system'] == 'windows' else []
     source = ROOT / 'tests' / 'shared' / 'reference'
-    if not (out / 'flecs.o').exists():
-        run([zig, 'cc', '-std=c23', *flags, '-c', out / 'flecs' / 'flecs.c', '-o', out / 'flecs.o'])
+    compiled = [zig, 'cc', '-std=c23', *flags, '-c', out / 'flecs' / 'flecs.c']
+    flecs = out / ('flecs-%s.o' % shared.sha256(' '.join(str(c) for c in compiled).encode())[:16])
+    if not flecs.exists():
+        run([*compiled, '-o', flecs])
     run([zig, 'cc', '-std=c23', *flags, '-I', out / 'flecs', *sorted(source.glob('flecs_ref*.c')),
-         out / 'flecs.o', '-o', out / ('flecs_ref' + exe), *windows])
+         flecs, '-o', out / ('flecs_ref' + exe), *windows])
     run([zig, 'c++', '-std=c++23', *flags, '-I', out, source / 'entt_ref.cpp', '-o', out / ('entt_ref' + exe)])
     run([zig, 'cc', '-std=c23', *flags, source / 'floor.c', '-o', out / ('floor' + exe)])
 
@@ -192,7 +194,7 @@ def paired(old, new, target):
         values, ours[side] = prepared(tree, target)
     out = ROOT / 'build' / 'reference'
     fetched(out)
-    built(values, out)
+    built(prepared(ROOT, target)[0], out)
     for side in ('old', 'new'):
         measured(0, ours[side], out, values['exe'])
     texts = {'old1': [], 'new1': [], 'old2': [], 'new2': []}
@@ -230,7 +232,7 @@ def main():
         sys.exit('reference.py: %s is not built: run python project.py test' % ours.as_posix())
     out = ROOT / 'build' / 'reference'
     fetched(out)
-    built(values, out)
+    built(prepared(ROOT, args.target)[0], out)
     for time in range(args.times):
         print(measured(time + 1, ours, out, values['exe']), end='', flush=True)
 

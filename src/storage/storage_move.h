@@ -68,7 +68,7 @@ static inline void give_cell(storage_t *r, uint32_t slot, uint32_t index,
 [[gnu::always_inline]] static inline void move_row(storage_t *r,
     uint32_t index, uint32_t to)
 {
-    const place_t *p = &r->places[index];
+    const bridge_entity_t *p = &r->index[index];
     row_move_t move = { index, p->table, p->row, to, 0 };
 
     if (move.from == to)

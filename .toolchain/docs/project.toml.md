@@ -293,21 +293,23 @@ into = "include"
 A project can have parts, for example a family of modules in one repository.
 Each part builds, tests, packs and releases alone, with `--part <part>`: `.toolchain/docs/project.py.md`, *Parts*.
 `[parts.<part>]` states the part `<part>`. The name `<part>` is in snake_case.
-It is also the name of the folder of the part in `src`, `include`, `docs/extern`, `docs/intern` and `tests/cases`.
+Its key `folder` gives the folder of the part in `src`, `include`, `docs/extern`, `docs/intern`, `tests` and `tests/cases`.
 
 | Key | Value |
 | --- | --- |
 | `name` | The name of the zips of the part, in place of `[project] name`, for example `Sample-Video`. |
+| `folder` | The folder of the part under each folder of the project, for example `video` or `media/video`. Each segment is in snake_case. |
 | `uses` | The parts whose artifacts the part uses in the output folder, for example a library that it links. A build of the part also makes them, before the artifacts of the part. Write `[]` for a part that uses no part. |
 | `third_party` | The folders of `third_party` whose licence the zip of the part holds. Write `[]` for a part that ships no work of a different maker. |
 | `package` | Optional. The package proof of the part: a table with the keys `proof`, `link` and `include`, as `[package]` has. `.toolchain/docs/build.py.md`, *The package proof*, tells them. |
 
 In a project with parts, each artifact and each table of `[compose]` states its part, with the key `part`.
-A project can put the tables of each part into a file of its own in `.toolchain/config`, for example `video.toml`:
+A project can put the tables of each part into its own file in `.toolchain/config` or in a folder of it, for example `video.toml`:
 
 ```toml
 [parts.video]
 name = "Sample-Video"
+folder = "video"
 uses = ["sdl3"]
 third_party = []
 
@@ -333,7 +335,7 @@ The tools stop with these messages:
 
 - `<name> states no part, and the project has parts`, for an artifact or a table of `[compose]` with no `part`.
 - `<name> states the part <part>, and [parts] does not have it`, also in a project with no `[parts]`.
-- `[parts.<part>] states no <key>`, if `name`, `uses` or `third_party` is not there.
+- `[parts.<part>] states no <key>`, if `name`, `folder`, `uses` or `third_party` is not there.
 - `[parts.<part>]: a part has no key <keys>`, for a key that the table above does not give.
 - `no part <part>; the parts: <parts>`, if `--part` or `uses` names a part that `[parts]` does not have.
 - `the uses of the parts make a cycle: <parts>`, if a part uses itself, directly or through a different part.

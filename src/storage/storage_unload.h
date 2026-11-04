@@ -12,8 +12,8 @@
 
 static inline void destroy_entity(storage_t *r, uint32_t index)
 {
-    uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
-    uint32_t from = r->places[index].table;
+    uint64_t id = (uint64_t)r->index[index].generation << 32 | index;
+    uint32_t from = r->index[index].table;
 
     get_carried(r, index, r->before);
     tell_observers(r, &(seen_t){ id, r->before, nullptr, nullptr });

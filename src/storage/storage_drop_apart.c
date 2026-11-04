@@ -9,7 +9,7 @@
 static void drop_cell(storage_t *r, const storage_type_t *type,
     enum bridge_on_unload policy, uint32_t index)
 {
-    uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
+    uint64_t id = (uint64_t)r->index[index].generation << 32 | index;
 
     see_less(r, index, type, r->scratch);
     if (is_swept(r, index, policy, r->scratch)) {

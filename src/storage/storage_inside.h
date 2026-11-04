@@ -49,12 +49,6 @@ struct storage_terms {
 };
 
 typedef struct {
-    uint32_t table;
-    uint32_t row;
-    uint32_t generation;
-} place_t;
-
-typedef struct {
     uint32_t rows;
     uint32_t room;
     uint32_t block;
@@ -70,7 +64,7 @@ typedef struct {
 
 struct storage {
     bridge_world_t *w;
-    place_t *places;
+    bridge_entity_t *index;
     uint32_t high;
     uint32_t free_head;
     table_t *tables;
@@ -123,6 +117,8 @@ struct storage {
     uint64_t *given;
     uint64_t *husk_types;
     uint64_t *husks;
+    module_t **heap;
+    uint32_t heap_count;
 };
 
 typedef struct {

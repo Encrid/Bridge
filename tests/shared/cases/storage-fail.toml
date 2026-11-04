@@ -1,21 +1,21 @@
 [[case]]
 name = "allocation-changes"
 run = ["{out}/storage{exe}", "changes"]
-fail = { malloc = 107, calloc = 134, realloc = 101, os_reserve = 4, os_thread_start = 1, os_event_create = 2 }
+fail = { malloc = 107, calloc = 135, realloc = 101, os_reserve = 4, os_thread_start = 1, os_event_create = 2 }
 claims = { output = "tests/storage/storage_changes.txt" }
 false = { run = ["{out}/storage{exe}", "tables"] }
 
 [[case]]
 name = "allocation-tables"
 run = ["{out}/storage{exe}", "tables"]
-fail = { malloc = 104, calloc = 140, realloc = 90, os_reserve = 4, os_thread_start = 1, os_event_create = 2 }
+fail = { malloc = 104, calloc = 141, realloc = 90, os_reserve = 4, os_thread_start = 1, os_event_create = 2 }
 claims = { output = "tests/storage/storage_tables.txt" }
 false = { run = ["{out}/storage{exe}", "strip"] }
 
 [[case]]
 name = "allocation-strip"
 run = ["{out}/storage{exe}", "strip"]
-fail = { malloc = 107, calloc = 134, realloc = 101, os_reserve = 4, os_thread_start = 1, os_event_create = 2 }
+fail = { malloc = 107, calloc = 135, realloc = 101, os_reserve = 4, os_thread_start = 1, os_event_create = 2 }
 claims = { output = "tests/storage/storage_strip.txt" }
 false = { run = ["{out}/storage{exe}", "nomemory"] }
 
@@ -422,7 +422,7 @@ false = { fail = {} }
 name = "calloc-45-refused"
 run = ["{out}/storage{exe}", "nomemory"]
 fail = { calloc = 45 }
-claims = { line = ["out of memory: there was none for what a dispatch and a schedule are worked out in", "alive"] }
+claims = { line = ["out of memory: there was none for storage, as [budget] sizes it", "alive"] }
 false = { fail = {} }
 
 [[case]]
@@ -464,7 +464,7 @@ false = { fail = {} }
 name = "calloc-51-refused"
 run = ["{out}/storage{exe}", "nomemory"]
 fail = { calloc = 51 }
-claims = { line = ["out of memory: there was none for a module's record", "alive"] }
+claims = { line = ["out of memory: there was none for what a dispatch and a schedule are worked out in", "alive"] }
 false = { fail = {} }
 
 [[case]]
@@ -482,31 +482,31 @@ claims = { line = ["out of memory: there was none for a module's record", "alive
 false = { fail = {} }
 
 [[case]]
-name = "calloc-55-refused"
+name = "calloc-54-refused"
 run = ["{out}/storage{exe}", "nomemory"]
-fail = { calloc = 55 }
+fail = { calloc = 54 }
 claims = { line = ["out of memory: there was none for a module's record", "alive"] }
 false = { fail = {} }
 
 [[case]]
-name = "calloc-58-refused"
+name = "calloc-56-refused"
 run = ["{out}/storage{exe}", "nomemory"]
-fail = { calloc = 58 }
-claims = { line = ["module 'st:store@0.1.0' did not load: out of memory: there was none for the list of its imports", "the world has stopped: module 'st:store@0.1.0' failed and its on_error is fail", "alive"] }
+fail = { calloc = 56 }
+claims = { line = ["out of memory: there was none for a module's record", "alive"] }
 false = { fail = {} }
 
 [[case]]
 name = "calloc-59-refused"
 run = ["{out}/storage{exe}", "nomemory"]
 fail = { calloc = 59 }
-claims = { line = ["module 'st:store@0.1.0' did not load: out of memory: there was none for what it declares", "the world has stopped: module 'st:store@0.1.0' failed and its on_error is fail", "alive"] }
+claims = { line = ["module 'st:store@0.1.0' did not load: out of memory: there was none for the list of its imports", "the world has stopped: module 'st:store@0.1.0' failed and its on_error is fail", "alive"] }
 false = { fail = {} }
 
 [[case]]
-name = "calloc-61-refused"
+name = "calloc-60-refused"
 run = ["{out}/storage{exe}", "nomemory"]
-fail = { calloc = 61 }
-claims = { line = ["module 'st:store@0.1.0' did not load: out of memory: there was none for type 'st:A'", "the world has stopped: module 'st:store@0.1.0' failed and its on_error is fail", "alive"] }
+fail = { calloc = 60 }
+claims = { line = ["module 'st:store@0.1.0' did not load: out of memory: there was none for what it declares", "the world has stopped: module 'st:store@0.1.0' failed and its on_error is fail", "alive"] }
 false = { fail = {} }
 
 [[case]]
@@ -524,10 +524,10 @@ claims = { line = ["module 'st:store@0.1.0' did not load: out of memory: there w
 false = { fail = {} }
 
 [[case]]
-name = "calloc-68-refused"
+name = "calloc-64-refused"
 run = ["{out}/storage{exe}", "nomemory"]
-fail = { calloc = 68 }
-claims = { line = ["module 'st:store@0.1.0' did not load: out of memory: there was none for system 'spawn'", "the world has stopped: module 'st:store@0.1.0' failed and its on_error is fail", "alive"] }
+fail = { calloc = 64 }
+claims = { line = ["module 'st:store@0.1.0' did not load: out of memory: there was none for type 'st:A'", "the world has stopped: module 'st:store@0.1.0' failed and its on_error is fail", "alive"] }
 false = { fail = {} }
 
 [[case]]
@@ -538,30 +538,37 @@ claims = { line = ["module 'st:store@0.1.0' did not load: out of memory: there w
 false = { fail = {} }
 
 [[case]]
-name = "calloc-122-refused"
+name = "calloc-70-refused"
 run = ["{out}/storage{exe}", "nomemory"]
-fail = { calloc = 122 }
+fail = { calloc = 70 }
+claims = { line = ["module 'st:store@0.1.0' did not load: out of memory: there was none for system 'spawn'", "the world has stopped: module 'st:store@0.1.0' failed and its on_error is fail", "alive"] }
+false = { fail = {} }
+
+[[case]]
+name = "calloc-123-refused"
+run = ["{out}/storage{exe}", "nomemory"]
+fail = { calloc = 123 }
 claims = { line = ["module 'st:store@0.1.0' did not load: out of memory: there was none for observer 'heard_a'", "the world has stopped: module 'st:store@0.1.0' failed and its on_error is fail", "alive"] }
 false = { fail = {} }
 
 [[case]]
-name = "calloc-137-refused"
+name = "calloc-138-refused"
 run = ["{out}/storage{exe}", "nomemory"]
-fail = { calloc = 137 }
+fail = { calloc = 138 }
 claims = { line = ["out of memory: there was none for a module's record", "with A: spans, rows", "first A", "with A and not B: spans, rows", "with A and maybe B: spans, rows", "of them with B: rows", "alive"] }
-false = { fail = {} }
-
-[[case]]
-name = "calloc-141-refused"
-run = ["{out}/storage{exe}", "nomemory"]
-fail = { calloc = 141 }
-claims = { line = ["out of memory: there was none for a reloaded module's record", "with A: spans, rows", "first A", "with A and not B: spans, rows", "with A and maybe B: spans, rows", "of them with B: rows", "alive"] }
 false = { fail = {} }
 
 [[case]]
 name = "calloc-142-refused"
 run = ["{out}/storage{exe}", "nomemory"]
 fail = { calloc = 142 }
+claims = { line = ["out of memory: there was none for a reloaded module's record", "with A: spans, rows", "first A", "with A and not B: spans, rows", "with A and maybe B: spans, rows", "of them with B: rows", "alive"] }
+false = { fail = {} }
+
+[[case]]
+name = "calloc-143-refused"
+run = ["{out}/storage{exe}", "nomemory"]
+fail = { calloc = 143 }
 claims = { line = ["module 'st:store@0.1.0' was not reloaded: out of memory: there was none for the list of its imports", "module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept", "the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail", "the world runs again: module 'st:store@0.1.0' is unloaded, and it goes on without it", "alive"] }
 false = { fail = {} }
 
@@ -713,30 +720,30 @@ claims = { line = ["module 'st:store@0.1.0' was not reloaded: out of memory: the
 false = { fail = {} }
 
 [[case]]
-name = "calloc-60-refused-laying-out-again"
+name = "calloc-61-refused-laying-out-again"
 run = ["{out}/storage{exe}", "nomemoryrelay"]
-fail = { calloc = 60 }
+fail = { calloc = 61 }
 claims = { line = ["module 'st:store@0.1.0' did not load: type 'st:switch_t': its descriptor ran out of memory at '{'", "the world has stopped: module 'st:store@0.1.0' failed and its on_error is fail", "alive"] }
 false = { fail = {} }
 
 [[case]]
-name = "calloc-85-refused-laying-out-again"
+name = "calloc-86-refused-laying-out-again"
 run = ["{out}/storage{exe}", "nomemoryrelay"]
-fail = { calloc = 85 }
+fail = { calloc = 86 }
 claims = { line = ["module 'st:store@0.1.0' was not reloaded: out of memory: there was none for what it declares", "module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept", "the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail", "alive"] }
-false = { fail = {} }
-
-[[case]]
-name = "calloc-94-refused-laying-out-again"
-run = ["{out}/storage{exe}", "nomemoryrelay"]
-fail = { calloc = 94 }
-claims = { line = ["module 'st:store@0.1.0' was not reloaded: out of memory: there was none to carry across the values of what it keeps another way, 1 of its components", "module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept", "the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail", "alive"] }
 false = { fail = {} }
 
 [[case]]
 name = "calloc-95-refused-laying-out-again"
 run = ["{out}/storage{exe}", "nomemoryrelay"]
 fail = { calloc = 95 }
+claims = { line = ["module 'st:store@0.1.0' was not reloaded: out of memory: there was none to carry across the values of what it keeps another way, 1 of its components", "module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept", "the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail", "alive"] }
+false = { fail = {} }
+
+[[case]]
+name = "calloc-96-refused-laying-out-again"
+run = ["{out}/storage{exe}", "nomemoryrelay"]
+fail = { calloc = 96 }
 claims = { line = ["module 'st:store@0.1.0' was not reloaded: out of memory: there was none to carry across the values of what it keeps another way, 1 of its components", "module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept", "the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail", "alive"] }
 false = { fail = {} }
 
@@ -748,9 +755,9 @@ claims = { line = ["module 'st:store@0.1.0' was not reloaded: out of memory: the
 false = { fail = {} }
 
 [[case]]
-name = "calloc-87-refused-laying-out-a-type-no-row-carries"
+name = "calloc-88-refused-laying-out-a-type-no-row-carries"
 run = ["{out}/storage{exe}", "nomemoryrelayempty"]
-fail = { calloc = 87 }
+fail = { calloc = 88 }
 claims = { line = ["module 'st:store@0.1.0' was not reloaded: out of memory: there was none to work out how 'st:X' is laid out again", "module 'st:store@0.1.0' is stopped: its reload failed after its old instance had been shut down. What it declared is kept", "the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail", "alive"] }
 false = { fail = {} }
 
@@ -790,16 +797,16 @@ claims = { line = ["out of memory: there was none for a share that stays: the ar
 false = { fail = {} }
 
 [[case]]
-name = "calloc-81-refused-seeding-settings"
+name = "calloc-82-refused-seeding-settings"
 run = ["{out}/storage{exe}", "nomemoryconfig"]
-fail = { calloc = 81 }
+fail = { calloc = 82 }
 claims = { line = ["out of memory: there was none for a module's share of the persistent arena", "no module 'game:settings@0.1.0' is loaded, so none is unloaded", "alive"] }
 false = { fail = {} }
 
 [[case]]
-name = "calloc-86-refused-seeding-settings"
+name = "calloc-87-refused-seeding-settings"
 run = ["{out}/storage{exe}", "nomemoryconfig"]
-fail = { calloc = 86 }
+fail = { calloc = 87 }
 claims = { line = ["module 'game:settings@0.1.0' did not load: out of memory: there was none for the row of its settings", "no module 'game:settings@0.1.0' is loaded, so none is unloaded", "alive"] }
 false = { fail = {} }
 
@@ -860,44 +867,44 @@ claims = { line = ["module 'game:one@0.1.0' is not reloaded: out of memory: ther
 false = { fail = {} }
 
 [[case]]
-name = "calloc-83-refused-reloading-a-group"
+name = "calloc-84-refused-reloading-a-group"
 run = ["{out}/storage{exe}", "nomemorygroup"]
-fail = { calloc = 83 }
+fail = { calloc = 84 }
 claims = { line = ["out of memory: there was none for a group reload's records", "alive"] }
 false = { fail = {} }
 
 [[case]]
-name = "calloc-90-refused-reloading-a-group"
+name = "calloc-91-refused-reloading-a-group"
 run = ["{out}/storage{exe}", "nomemorygroup"]
-fail = { calloc = 90 }
+fail = { calloc = 91 }
 claims = { line = ["out of memory: there was none for a module's record", "alive"] }
-false = { fail = {} }
-
-[[case]]
-name = "calloc-92-refused-reloading-a-group"
-run = ["{out}/storage{exe}", "nomemorygroup"]
-fail = { calloc = 92 }
-claims = { line = ["module 'game:one@0.1.0' is not reloaded: out of memory: there was none for the list of its imports", "alive"] }
 false = { fail = {} }
 
 [[case]]
 name = "calloc-93-refused-reloading-a-group"
 run = ["{out}/storage{exe}", "nomemorygroup"]
 fail = { calloc = 93 }
-claims = { line = ["module 'game:one@0.1.0' is not reloaded: out of memory: there was none for what it declares", "alive"] }
+claims = { line = ["module 'game:one@0.1.0' is not reloaded: out of memory: there was none for the list of its imports", "alive"] }
 false = { fail = {} }
 
 [[case]]
-name = "calloc-112-refused-reloading-a-group"
+name = "calloc-94-refused-reloading-a-group"
 run = ["{out}/storage{exe}", "nomemorygroup"]
-fail = { calloc = 112 }
-claims = { line = ["no module of the group is reloaded: out of memory: there was none to carry across the values of what it keeps another way, 2 of its components", "alive"] }
+fail = { calloc = 94 }
+claims = { line = ["module 'game:one@0.1.0' is not reloaded: out of memory: there was none for what it declares", "alive"] }
 false = { fail = {} }
 
 [[case]]
 name = "calloc-113-refused-reloading-a-group"
 run = ["{out}/storage{exe}", "nomemorygroup"]
 fail = { calloc = 113 }
+claims = { line = ["no module of the group is reloaded: out of memory: there was none to carry across the values of what it keeps another way, 2 of its components", "alive"] }
+false = { fail = {} }
+
+[[case]]
+name = "calloc-114-refused-reloading-a-group"
+run = ["{out}/storage{exe}", "nomemorygroup"]
+fail = { calloc = 114 }
 claims = { line = ["no module of the group is reloaded: out of memory: there was none to carry across the values of what it keeps another way, 2 of its components", "alive"] }
 false = { fail = {} }
 

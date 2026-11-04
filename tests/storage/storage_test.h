@@ -149,6 +149,12 @@ int storage_test_measure_tables(storage_test_t *t);
 int storage_test_measure_stress(storage_test_t *t, uint32_t threads);
 int storage_test_measure_schedule(storage_test_t *t);
 
+const char *storage_test_name_timed(char *identity, size_t len, uint32_t i);
+int storage_test_load_timed(bridge_world_t *w, uint32_t i);
+module_t *storage_test_find_timed(const bridge_world_t *w, uint32_t i);
+int storage_test_make_timed(storage_test_t *t, uint32_t modules,
+    uint32_t threads);
+
 int storage_test_weigh_sets(storage_test_t *t);
 int storage_test_weigh_toggles(storage_test_t *t);
 int storage_test_weigh_direct(storage_test_t *t);
@@ -216,6 +222,7 @@ enum storage_test_end storage_test_set_order_guard(storage_test_t *t);
 enum storage_test_end storage_test_config_bad_kind(storage_test_t *t);
 enum storage_test_end storage_test_relay_bad_kind(storage_test_t *t);
 enum storage_test_end storage_test_fill_marks(storage_test_t *t);
+enum storage_test_end storage_test_runs(storage_test_t *t);
 enum storage_test_end storage_test_region_full(storage_test_t *t);
 enum storage_test_end storage_test_table_full(storage_test_t *t);
 enum storage_test_end storage_test_spans_full(storage_test_t *t);

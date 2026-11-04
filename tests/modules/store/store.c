@@ -4,11 +4,10 @@
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
 #include "store.h"
-#include "measured.h"
 #include "idle.h"
 #include "on_destroy.h"
 
-TEST_MEASURED TEST(spawn)
+TEST(spawn)
 {
     uint32_t i = 0;
 

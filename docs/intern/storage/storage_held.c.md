@@ -15,4 +15,4 @@ The module that holds such an id can still hand it out.
 
 | Function | Result |
 | --- | --- |
-| `storage_hand_out` | Ends the hold on each id of `ids`: an id with the row `HELD` gets the row 0, and its entry in the entity index. |
+| `storage_hand_out` | Ends the hold on each id of `ids`. An id with the row `HELD` in `index` gets the row 0, and so does its item in the entity index in the block. |

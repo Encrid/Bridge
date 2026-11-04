@@ -65,6 +65,7 @@ static void free_fold(storage_t *r)
     free(r->in_table);
     free(r->husk_types);
     free(r->husks);
+    free(r->heap);
     free(r->set_type);
     free(r->set_table);
     free(r->where);
@@ -84,7 +85,7 @@ void storage_destroy(storage_t *r)
     free(r->term_opers);
     free(r->systems);
     free(r->observers);
-    free(r->places);
+    free(r->index);
     free(r->tables);
     free(r->table_next);
     free(r->dirty);

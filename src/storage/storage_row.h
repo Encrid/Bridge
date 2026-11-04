@@ -15,7 +15,7 @@
 static inline void place_row(storage_t *r, uint32_t index, uint32_t t,
     uint32_t row)
 {
-    place_t *p = &r->places[index];
+    bridge_entity_t *p = &r->index[index];
 
     p->table = t;
     p->row = row;
@@ -36,7 +36,7 @@ static inline void seat_row(storage_t *r, const table_t *tab, uint32_t index,
 static inline uint32_t append_row(storage_t *r, uint32_t t, uint32_t index)
 {
     table_t *tab = &r->tables[t];
-    uint64_t id = (uint64_t)r->places[index].generation << 32 | index;
+    uint64_t id = (uint64_t)r->index[index].generation << 32 | index;
     uint32_t row = tab->rows;
 
     tab->rows++;

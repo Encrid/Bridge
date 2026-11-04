@@ -14,13 +14,14 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parents[2]
 NAME = re.compile(r'\{([a-z_][a-z0-9_]*)(?::([^{}]*))?\}')
 KEYS = {'step': {'run', 'cwd', 'section', 'text', 'contains', 'copy', 'rename'},
-        'case': {'name', 'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders', 'fail', 'claims', 'false', 'alone'},
-        'false': {'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders', 'fail'},
+        'case': {'name', 'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders', 'fail', 'claims', 'false', 'alone',
+                 'ignore'},
+        'false': {'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders', 'fail', 'ignore'},
         'helper': {'run', 'wait', 'stdin', 'claims'},
-        'script': {'wait', 'put', 'remove', 'type'},
+        'script': {'wait', 'put', 'remove', 'type', 'close', 'signal', 'pause'},
         'claims': {'status', 'status_not', 'line', 'has', 'lacks', 'matches', 'matches_not', 'order', 'output', 'files'},
         'source': {'name', 'url', 'sha256', 'into', 'top', 'patches'},
-        'part': {'name', 'uses', 'third_party', 'package'},
+        'part': {'name', 'folder', 'uses', 'third_party', 'package'},
         'kind': {'takes', 'gives'}}
 SIDES = {'include': 'docs/extern', 'src': 'docs/intern', 'tools': 'docs/tools'}
 TAG = re.compile(r'(?:([a-z0-9_]+)-)?v\d+\.\d+\.\d+')
@@ -56,7 +57,8 @@ def merged(into, more, name, whence, above=()):
 def config(root):
     whole, whence = {}, {}
     files = [('toolchain.toml', HERE / '.toolchain' / 'toolchain.toml'), ('project.toml', root / '.toolchain' / 'project.toml')]
-    files += [('config/' + path.name, path) for path in sorted((root / '.toolchain' / 'config').glob('*.toml'))]
+    where = root / '.toolchain' / 'config'
+    files += [('config/' + path.relative_to(where).as_posix(), path) for path in sorted(where.rglob('*.toml'))]
     for name, path in files:
         merged(whole, tomllib.loads(path.read_text(encoding='utf-8')), name, whence)
     return whole

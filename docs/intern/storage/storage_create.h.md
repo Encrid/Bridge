@@ -10,7 +10,7 @@ Storage allocates all of it when Bridge makes the world, and nothing after: not 
 
 | Budget | What it sizes in storage |
 | --- | --- |
-| `[budget] entities` | The places of the entities, the fold, and each other thing that storage keeps for an entity. |
+| `[budget] entities` | The items of `index`, the fold, and each other thing that storage keeps for an entity. |
 | `[budget] tables` | The record of each table, its set, and the hash that finds it. |
 | `[budget] columns` | The rows, and `who`, which tells which entity is in which row. |
 | `[budget] types` | How wide a set is. With `tables`, the offset of the column of each type in each table. |

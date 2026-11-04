@@ -46,7 +46,7 @@ static inline void add_singles(const storage_t *r, uint64_t *set)
 [[gnu::always_inline]] static inline void get_carried(const storage_t *r,
     uint32_t index, uint64_t *set)
 {
-    uint32_t t = r->places[index].table;
+    uint32_t t = r->index[index].table;
 
     if (t)
         set_copy(r, set, get_set(r, t));

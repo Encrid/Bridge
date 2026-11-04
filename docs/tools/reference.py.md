@@ -25,11 +25,12 @@ It also gives zig, the folder of the build of the tree, and the keys `exe` and `
 
 1. It stops if the build of the tree has no program `storage` for the target: `python project.py test` makes it.
 2. `fetched` makes sure that `build/reference` of this tree holds each pinned file.
-3. `built` compiles the 3 programs of `tests/shared/reference` of this tree, with `-O2` and `-DNDEBUG`.
+3. `built` compiles the 3 programs of `tests/shared/reference`, with `-O2`, `-DNDEBUG` and the flags of `aligned`.
 4. Each run writes `==== run <number>`. Then it writes the output of each of the 6 commands of the table, in order.
 5. Before the output of a command, it writes `====` and the command, for example `==== storage measure`.
 
-The 3 programs come from the tree of the tool, so the runs of 2 trees use the same programs.
+The 3 programs come from the tree of the tool, with its zig and its variable `aligned`.
+Thus the runs of 2 trees use the same programs.
 `storage` runs in its folder of the build. The 3 other programs run in the current folder.
 
 | Command | Source | What it measures |
@@ -56,7 +57,10 @@ Each program ends with the `exe` of the target. For a target whose `system` is `
 `PINNED` gives the address of each folder at its tag, and the sha256 of each file.
 No maker publishes these digests. Each one is of a download of 2026-10-18.
 `git hash-object` of each download gave the blob id that GitHub gives for the file at its tag.
-`built` compiles `flecs.c` one time, into `build/reference/flecs.o`.
+
+`built` compiles `flecs.c` one time for each command, into `build/reference/flecs-<digest>.o`.
+`<digest>` is the first 16 characters of the sha256 of the command before its `-o`.
+Thus a change of zig or of a flag compiles it again.
 
 ## The downloads
 
@@ -147,7 +151,7 @@ The output of the builds stays out of the report. A failed command stops the too
 No case runs these branches. The step of `docs/contributing/timings.md` runs them.
 
 - The download of the pinned files from their addresses. A case does not use the network.
-- The run of the 6 commands, with its lines `====` and `--times`. The controls need the pinned files.
+- The run of the 6 commands of `measured`, with its lines `====`. The controls need the pinned files.
 - The option `--pair`. The controls need the pinned files, and its 14 runs take more than 120 s.
 
 ## Functions
@@ -157,7 +161,7 @@ No case runs these branches. The step of `docs/contributing/timings.md` runs the
 | `run(command, **more)` | Runs a command, and gives its output. It stops the tool if the command fails. |
 | `downloaded(url, path, digest)` | Downloads a file into `path`, as the section *The downloads* tells. |
 | `fetched(out)` | Makes sure that `out` holds each pinned file, as the section *The downloads* tells. |
-| `built(values, out)` | Compiles `flecs_ref`, `entt_ref` and `floor` into `out`, with the variables of `build.prepared`. |
+| `built(values, out)` | Compiles `flecs_ref`, `entt_ref` and `floor` into `out`, with zig, the target and `aligned` of `values`. |
 | `tree_of(root, target)` | Gives the options of a build of the tree `root` for `target`. |
 | `prepared(root, target)` | Gives the variables of the build of the tree, and the path of its program `storage`. |
 | `measured(number, ours, out, exe)` | Gives the text of one run, with its lines `====`. |

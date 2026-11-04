@@ -112,6 +112,7 @@ static const storage_test_case_t CASES[] = {
     { "configbadkind", storage_test_config_bad_kind, &PLAIN },
     { "relaybadkind", storage_test_relay_bad_kind, &PLAIN },
     { "marks", storage_test_fill_marks, &PLAIN },
+    { "runs", storage_test_runs, &PLAIN },
     { "regionfull", storage_test_region_full, &PLAIN },
     { "tablefull", storage_test_table_full, &PLAIN },
     { "spansfull", storage_test_spans_full, &PLAIN },
