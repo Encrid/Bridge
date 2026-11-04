@@ -9,6 +9,7 @@ import shutil
 import socket
 import subprocess
 import threading
+import time
 import tomllib
 from pathlib import Path
 
@@ -18,6 +19,7 @@ import fail
 import leaks
 import rewrite
 import shared
+import signals
 from said import checked
 from shared import die, expand, expanded, files, known, located, status
 
@@ -37,9 +39,8 @@ def free_port():
         return free.getsockname()[1]
 
 
-def started(argv, root, timeout, env=None):
-    proc = subprocess.Popen(argv, cwd=root, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT, env=env)
+def started(argv, root, timeout, env=None, use=None):
+    proc = signals.started(argv, root, env, use or {})
     late = threading.Event()
 
     def stop():
@@ -72,7 +73,8 @@ def ended(running, text):
         running['proc'].stdin.close()
     except OSError:
         pass
-    running['said'].append(running['proc'].stdout.read())
+    if not running['proc'].stdout.closed:
+        running['said'].append(running['proc'].stdout.read())
     code = running['proc'].wait()
     running['watch'].cancel()
     said = b''.join(running['said']).decode('utf-8', 'replace').replace('\r', '')
@@ -125,7 +127,7 @@ def placed(use, outputs, values):
 
 def scripted(running, script, outputs, values):
     for step in script:
-        if not waited(running, expand(known(step, 'script', 'a case')['wait'], values)):
+        if 'wait' in step and not waited(running, expand(step['wait'], values)):
             return
         for path, item in step.get('put', {}).items():
             shutil.copy(source_of(item, outputs, values), located(path, values))
@@ -133,6 +135,12 @@ def scripted(running, script, outputs, values):
             located(path, values).unlink()
         if 'type' in step:
             typed(running, expand(step['type'], values) + '\n')
+        if 'close' in step:
+            running['proc'].stdout.close()
+        if 'signal' in step:
+            signals.sent(running['proc'], step['signal'])
+        if 'pause' in step:
+            time.sleep(step['pause'])
 
 
 def made_false(case):
@@ -160,7 +168,7 @@ def tried(config, values, outputs, where, case, broken, counted=False, failing=N
     if helper:
         waited(beside, expand(helper['wait'], mine))
     running = started(expanded(use['run'], mine), root, timeout,
-                      environment({**counting, 'C23_FAIL': plan, **use.get('env', {})}, mine))
+                      environment({**counting, 'C23_FAIL': plan, **use.get('env', {})}, mine), use)
     scripted(running, use.get('script', []), outputs, mine)
     ends = [ended(running, expand(use.get('stdin', ''), mine))]
     if helper:
@@ -223,6 +231,8 @@ def groups_of(config, values, folder):
             known(case, 'case', path)
             known(case.get('false', {}), 'false', path)
             known(case.get('helper', {}), 'helper', path)
+            signals.allowed(case, path)
+            signals.allowed(made_false(case), path)
             if not case.get('claims'):
                 die('%s: the case %s claims nothing' % (path, case['name']))
             if 'false' not in case:
@@ -239,10 +249,11 @@ def chosen(groups, text):
     return [(group, cases) for group, cases in found if cases] or die('no case has %s in its name' % text)
 
 
-def picked(groups, args):
+def picked(config, groups, args):
     if args.part:
+        folders = [config['parts'][part]['folder'] for part in args.part]
         groups = [(group, cases) for group, cases in groups
-                  if any(group == part or group.startswith(part + '/') for part in args.part)] \
+                  if any(group == folder or group.startswith(folder + '/') for folder in folders)] \
             or die('no case group is in the parts %s' % ' '.join(args.part))
     return chosen(groups, args.k) if args.k else groups
 
@@ -256,7 +267,7 @@ def changed(args, run, write, prepared=None):
     if unlinked:
         die('the cases need what is linked: ' + ' '.join(unlinked))
     groups = groups_of(config, values, config.get('test', {}).get('cases', 'tests/cases'))
-    groups = picked(groups, args) if groups else groups
+    groups = picked(config, groups, args) if groups else groups
     return config, values, written, {name: paths[0] for name, paths in made}, groups
 
 
@@ -310,7 +321,7 @@ def main():
     groups = groups_of(config, values, folder)
     if not groups:
         return print('no case: %s holds no case' % folder)
-    groups = picked(groups, args)
+    groups = picked(config, groups, args)
     copies = args.copies or config['test'].get('copies') or die('.toolchain/project.toml: write [test] copies')
     own = not (args.broken or args.toolchain or args.k or args.part)
     rounds = args.rounds or 1

@@ -560,7 +560,6 @@ This code obeys the rule:
 ```c
 constexpr double PI = 3.14159265358979323846;
 #define DELTA(a, b, c) ((b) * (b) - 4 * (a) * (c))
-#define POSITION_FIELDS { float x; float y; }
 ```
 
 This code breaks the rule:
@@ -569,6 +568,28 @@ This code breaks the rule:
 #define PI 3.14159265358979323846
 #define LOOP_COUNTER 0
 #define PRINT_NEXT(num) {num++; printf("%d", num);}
+```
+
+### H4 - The macros of a text
+
+Write a macro of a text like a type.
+The line of `#define` ends with the opening brace.
+Each field or value is on its own line, 4 spaces deeper than `#define`.
+The closing brace is alone on the last line, at the depth of `#define`.
+
+This code obeys the rule:
+
+```c
+#define POSITION_FIELDS { \
+    float x; \
+    float y; \
+}
+```
+
+This code breaks the rule:
+
+```c
+#define POSITION_FIELDS { float x; float y; }
 ```
 
 ## C23

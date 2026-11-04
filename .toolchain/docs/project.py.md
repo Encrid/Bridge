@@ -77,7 +77,7 @@ With `--part <part>`, each command acts on that part:
 | --- | --- |
 | `build` | Builds the artifacts of the part, and of each part that the part needs through `uses`. |
 | `pack` | Builds as `build` does. Then it writes the zip of the part, and runs the package proof of the part. |
-| `test` | Builds as `build` does, also the test artifacts. Then it runs only the groups of `tests/cases/<part>`. |
+| `test` | Builds as `build` does, also the test artifacts. Then it runs only the groups of `tests/cases/<folder>`, with the folder of the part: `.toolchain/docs/project.toml.md`, *[parts]*. |
 | `join` | Joins `<build>/<name>-<target>.zip` of each target into `<build>/<name>.zip`, with a folder for each target. |
 
 With `--branches`, with `--leaks`, and for the cases that state `fail`, `test` changes only the sources of the named parts.

@@ -5,8 +5,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-COMMANDS = {'fetch': ['fetch.py'], 'build': ['build.py'], 'pack': ['build.py', '--pack'], 'test': ['test.py'],
-            'check': ['check.py'], 'clean': ['clean.py'], 'distclean': ['clean.py', '--all'], 'cla': ['cla.py']}
+COMMANDS = {'fetch': ['fetch.py'], 'build': ['build.py'], 'pack': ['build.py', '--pack'], 'join': ['build.py', '--join'],
+            'test': ['test.py'], 'check': ['check.py'], 'clean': ['clean.py'], 'distclean': ['clean.py', '--all'],
+            'cla': ['cla.py']}
 
 
 def main():

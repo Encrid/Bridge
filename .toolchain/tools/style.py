@@ -225,6 +225,16 @@ def check_lines(src):
             src.say('V3', n, 'the pointer symbol stands apart from the name it belongs to')
 
 
+def check_text_macro(src, first, last, name):
+    lines = [src.directives[n].rstrip().removesuffix('\\').rstrip() for n in range(first, last + 1)]
+    indent = len(lines[0]) - len(lines[0].lstrip())
+    items = [re.sub(r'\([^()]*\)|\[[^\[\]]*\]', '', x) for x in lines[1:-1]]
+    if not lines[0].endswith('{') or len(lines) < 3 or lines[-1] != ' ' * indent + '}' \
+            or any(len(x) - len(x.lstrip()) != indent + 4 for x in lines[1:-1]) \
+            or any(not x.strip() or x.count(';') + x.count(',') > 1 for x in items):
+        src.say('H4', first, "the macro '%s' does not put each item of its text on its own line" % name)
+
+
 def check_file(src, functions):
     path = Path(src.path)
     notice = HEADER.match(src.text)
@@ -268,6 +278,8 @@ def check_file(src, functions):
                 src.say('H3', n, "the macro '%s' is a constant" % name)
             whole = ' '.join(body.replace('\\', ' ').split())
             fields = not takes and whole.startswith('{') and whole.endswith('}')
+            if fields:
+                check_text_macro(src, n, more, name)
             if ';' in re.sub(r'"[^"]*"', '', body) and not fields:
                 src.say('H3', n, "the macro '%s' is more than one statement" % name)
             if path.suffix == '.c':
@@ -566,6 +578,7 @@ PROVES = {
     'C3': 'int f(void)\n{\n    goto out;\n    return (0);\n}\n',
     'G4': 'int counter;\n',
     'H3': '#define LOOP_COUNTER 0\n',
+    'H4': '#define POSITION_FIELDS { float x; float y; }\n',
     'F2': 'static inline int doIt(void)\n{\n    return (0);\n}\n',
     'G2': 'static inline int f(void)\n{\n    return (0);\n}\nstatic inline int g(void)\n{\n    return (1);\n}\n',
     'G3': '#ifdef A\n#define B(x) (x)\n#endif\n',
@@ -577,7 +590,7 @@ PROVES_IN_C = {
 }
 CLEAN = ('static int add_them(int first, int second)\n{\n    int sum = first + second;\n\n'
          '    if (sum < 0)\n        return (0);\n    for (int i = 0; i < 2; i++) {\n        sum += i;\n    }\n'
-         '    return (sum);\n}\n')
+         '    return (sum);\n}\n\n#define POSITION_FIELDS { \\\n    float x; \\\n    float y; \\\n}\n')
 
 
 def self_test():

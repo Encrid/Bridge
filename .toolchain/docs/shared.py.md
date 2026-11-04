@@ -41,7 +41,8 @@ The tools import it. It does not run alone.
 
 ## The configuration
 
-`config` reads `.toolchain/toolchain.toml` of `HERE`, then `.toolchain/project.toml` of the root, then each `.toolchain/config/*.toml` of the root, in the order of the names.
+`config` reads `.toolchain/toolchain.toml` of `HERE`, then `.toolchain/project.toml` of the root.
+Then it reads each `.toml` file of `.toolchain/config` and of its folders, in the order of their paths.
 `merged` adds each key of a later file to the configuration:
 
 1. If the key names a table in the two files, `merged` merges the two tables in the same way.
@@ -51,7 +52,7 @@ The tools import it. It does not run alone.
 
 In a list of tables, the tables of the earlier file come first.
 The message names the later file, the full key and the earlier file, for example `project.toml states variables.language, and toolchain.toml states it too`.
-The name of a file is its path from `.toolchain`, for example `config/sources.toml`.
+The name of a file is its path from `.toolchain`, for example `config/sources.toml` or `config/media/video.toml`.
 
 ## Variables
 

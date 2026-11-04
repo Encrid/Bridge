@@ -42,7 +42,7 @@ A `'` after a digit or a letter is a digit separator of C23, as in `1'000` and `
 | C1 | The branches of each chain of `if` and `else`, and the depth of the levels. |
 | C2, C3 | Each rule. |
 | H1 | The items of a header. A person checks the includes. |
-| H2, H3 | Each rule. |
+| H2, H3, H4 | Each rule. |
 
 For C1, `if`, `while`, `for`, `switch` and `do` are levels, and an `else if` is not a new level.
 For L1, a comma that joins two statements makes a line with more than one statement.
@@ -92,7 +92,8 @@ The output follows `.toolchain/docs/shared.py.md`, *The report of a check*.
 | `file_scope(src)` | Gives the functions and the statements of the file scope. |
 | `blank_lines(src, first, last)` | Gives the empty lines from `first` to `last`. |
 | `check_lines(src)` | Checks each line: F3, L2, L3 and V3. |
-| `check_file(src, functions)` | Checks the file: G1, F6, O3, G2, G3, V1, H1, H2 and H3. |
+| `check_text_macro(src, first, last, name)` | Checks the lines `first` to `last` of a macro of a text: H4. |
+| `check_file(src, functions)` | Checks the file: G1, F6, O3, G2, G3, V1, H1, H2, H3 and H4. |
 | `check_outside(src, statements, functions, declared)` | Checks the file scope: V1, H1, G4, F5 and G5. |
 | `check_parameters(src, line, params, name)` | Checks the parameters of a function: F5. |
 | `check_function(src, f)` | Checks the body of a function: F2, F4, F5, L1, L2, L4, L5, L6, V1, C1, C2 and C3. |
