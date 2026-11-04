@@ -24,7 +24,7 @@
     uint32_t index)
 {
     const uint64_t *want = get_wanted(r, index);
-    uint32_t from = r->places[index].table;
+    uint32_t from = r->index[index].table;
     uint32_t t = 0;
 
     if (from && set_is_same(r, want, get_set(r, from))) {

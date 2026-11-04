@@ -17,7 +17,7 @@ enum storage_test_end storage_test_wrap_generation(storage_test_t *t)
     if (storage_reserve(r, &id, 1) != 1)
         return (STORAGE_TEST_FAILED);
     index = (uint32_t)id;
-    r->places[index].generation = UINT32_MAX - 1;
+    r->index[index].generation = UINT32_MAX - 1;
     id = (uint64_t)(UINT32_MAX - 1) << 32 | index;
     storage_release(r, &id, 1);
     (void)storage_reserve(r, &id, 1);

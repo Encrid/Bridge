@@ -32,7 +32,7 @@ static inline void tell_all(storage_t *r)
 
     while (r->observer_count && i < r->changed_count) {
         index = r->changed[i];
-        seen.id = (uint64_t)r->places[index].generation << 32 | index;
+        seen.id = (uint64_t)r->index[index].generation << 32 | index;
         seen.after = get_work(r, index);
         if (r->folded[index] & DESTROYED)
             seen.after = nullptr;

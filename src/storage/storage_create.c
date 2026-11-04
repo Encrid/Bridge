@@ -85,7 +85,7 @@ void storage_destroy(storage_t *r)
     free(r->term_opers);
     free(r->systems);
     free(r->observers);
-    free(r->places);
+    free(r->index);
     free(r->tables);
     free(r->table_next);
     free(r->dirty);

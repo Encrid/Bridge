@@ -37,7 +37,7 @@ The husk goes at the barrier that leaves it nothing, and each observer that it m
 
 | Function | Result |
 | --- | --- |
-| `is_alive` | Gives whether the entity of an id exists. Its index is not 0, storage used it, its place is not `DEAD`, and it has the generation of the id. |
+| `is_alive` | Gives whether the entity of an id exists. Its index is not 0, storage used it, its table in `index` is not `DEAD`, and it has the generation of the id. |
 | `leave_apart` | Takes the entity at `index` out of each sparse set it is in, and takes from it each direct-indexed value. |
 | `kill_entity` | Makes the entity at `index` gone: its row, and its index, which comes back with the next generation. The entity index shows `DEAD`, and the generation goes back to 1 before it reaches `DEAD`. It also clears the bit of the index in `husks`. |
 | `get_owed` | Gives what one observer is owed for an entity, as the table above says, limited to the events it asked for. Each caller gives the set `before` of storage, so it is never null. |

@@ -36,13 +36,13 @@ static inline bool has_apart_stake(const storage_t *r, const module_t *m,
 
 static inline bool is_held(const storage_t *r, uint32_t index)
 {
-    return (!r->places[index].table && r->places[index].row == HELD);
+    return (!r->index[index].table && r->index[index].row == HELD);
 }
 
 [[gnu::always_inline]] static inline bool has_stake(const storage_t *r,
     const module_t *m, uint32_t index)
 {
-    uint32_t t = r->places[index].table;
+    uint32_t t = r->index[index].table;
     const uint64_t *set = get_set(r, t);
     uint64_t written = 0;
     uint32_t w = 0;

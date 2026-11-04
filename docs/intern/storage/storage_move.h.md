@@ -6,7 +6,7 @@ This header moves an entity from one table to another, gives and takes a direct-
 
 `move_row` moves the entity at `index` to table `to`, which has room for it.
 It adds a row at the end of `to`, and writes each column of that row.
-Then it takes the old row out of its table, and records the new place of the entity.
+Then it takes the old row out of its table, and records the new table and row of the entity.
 What the entity carried that `to` also holds goes with it, and what it did not carry is zero.
 A toggled component is on when the entity gets it, and it keeps its bit when it moves.
 Table 0 is no table: a move to 0 only takes the row out, and a move from 0 only adds one.
