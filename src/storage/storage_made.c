@@ -15,7 +15,7 @@ bool storage_make_tables(storage_t *r)
     r->hash_room = 1;
     while ((uint64_t)r->hash_room * w->table_hash_fill < tables * 100)
         r->hash_room *= 2;
-    r->places = calloc(w->entities, sizeof(*r->places));
+    r->index = calloc(w->entities, sizeof(*r->index));
     r->tables = calloc(tables, sizeof(*r->tables));
     r->table_next = calloc(tables, sizeof(*r->table_next));
     r->dirty = calloc(tables, sizeof(*r->dirty));
@@ -23,7 +23,7 @@ bool storage_make_tables(storage_t *r)
     r->sets = calloc(tables * r->words, 8);
     r->columns = calloc(tables * r->type_room, 4);
     r->col_hash = calloc(tables * r->type_room, 8);
-    if (!r->places || !r->tables || !r->table_next || !r->dirty)
+    if (!r->index || !r->tables || !r->table_next || !r->dirty)
         return (false);
     return (r->hash && r->sets && r->columns && r->col_hash);
 }

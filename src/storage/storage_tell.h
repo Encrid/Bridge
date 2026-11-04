@@ -13,9 +13,9 @@ static inline bool is_alive(const storage_t *r, uint64_t id)
 {
     uint32_t index = (uint32_t)id;
 
-    if (!index || index >= r->high || r->places[index].table == DEAD)
+    if (!index || index >= r->high || r->index[index].table == DEAD)
         return (false);
-    return (r->places[index].generation == (uint32_t)(id >> 32));
+    return (r->index[index].generation == (uint32_t)(id >> 32));
 }
 
 static inline void leave_apart(storage_t *r, uint32_t index)
@@ -38,7 +38,7 @@ static inline void leave_apart(storage_t *r, uint32_t index)
 [[gnu::always_inline]] static inline void kill_entity(storage_t *r,
     uint32_t index)
 {
-    place_t *p = &r->places[index];
+    bridge_entity_t *p = &r->index[index];
     uint32_t next = p->generation + 1;
 
     if (r->apart)

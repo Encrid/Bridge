@@ -88,14 +88,14 @@ The cost is the size of the component for each entity, carried or not: 64 bytes 
 
 A destroy can leave an entity with the components that it keeps, and such an entity is a husk: `docs/extern/bridge_abi.h.md`, *A husk*.
 `husk_types` is the set of the types whose `on_destroy` is `BRIDGE_ON_DESTROY_KEEP` and that a loaded module declares.
-A husk is a live place with its index and its generation, in the table of the types that it keeps, or in none.
+A husk is a live entity with its index and its generation, in the table of the types that it keeps, or in none.
 The entity index shows it as any other entity, so a module finds there the types that the husk keeps, and no other type.
 The bit of the entity in `husks` makes it a husk, and only storage reads the bit.
 `docs/intern/storage/storage_husk.h.md` tells what a fold does with a husk, and `docs/intern/storage/storage_husk.c.md` how the set changes.
 
 The mark is not in the entity index.
 Modules read that copy and can write over it, and storage never reads it: *Nothing in the shared block is read back*.
-The mark is not in `place_t` either: a field there makes each place 16 bytes, in place of 12.
+The mark is not in `index` either: a field there makes each item 16 bytes, in place of the 12 of `bridge_entity_t`.
 `husks` takes one bit for each of `[budget] entities`, and storage gets it when it makes the world.
 
 ## Nothing in the shared block is read back
@@ -104,7 +104,7 @@ Storage keeps these in memory of its own, which no module can reach:
 
 | Data | Where |
 | --- | --- |
-| Where each entity is: table, row and generation | `places`, by index |
+| Where each entity is: table, row and generation | `index`, by index |
 | Which entity is in which row, for each table | `who`, in step with the column region |
 | Each set, and the offset of each column | `sets` and `columns`, by table |
 | Which entity is a husk | `husks`, by index |
@@ -119,8 +119,8 @@ A module that writes a term it has does what the term is for.
 
 | Constant | Content |
 | --- | --- |
-| `DEAD` | `0xffffffff`. The table of a place whose entity is gone, and the generation that the entity index shows for it. |
-| `HELD` | `0xffffffff`. The row of a place in table 0 whose id a block holds and `spawn` has not handed out. |
+| `DEAD` | `0xffffffff`. The table in `index` of an entity that is gone, and the generation that the entity index in the block shows for it. |
+| `HELD` | `0xffffffff`. The row in `index` of an entity in table 0 whose id a block holds and `spawn` has not handed out. |
 | `COLUMN` | 16. The multiple at which each column and each block begins, and the bytes before a toggled column or direct-indexed cells. |
 
 ## Types
@@ -167,11 +167,6 @@ The terms of one system or observer, `struct storage_terms`.
 | `used` | This record of the `[budget] systems` records is taken. |
 | `events`, `heard`, `ctx` | An observer: what `storage_listener_t` gave. |
 
-### place_t
-
-Where an entity is: `table`, `row` and `generation`.
-For a free place, `table` is `DEAD` and `row` is the next free index.
-
 ### table_t
 
 A table.
@@ -197,9 +192,9 @@ The budget sizes it when the world is made: `docs/intern/block/block_budget.c.md
 | Field | Content |
 | --- | --- |
 | `w` | The world. |
-| `places` | Where each entity is, by index. Never the copy in the block. |
+| `index` | Where each entity is, by index, as items of `bridge_entity_t`. Never the copy in the block. |
 | `high` | The indexes from `high` on were never used. |
-| `free_head` | The first free index. The free indexes make a list through `row` of their places. |
+| `free_head` | The first free index. The free indexes make a list through the `row` of their items in `index`, whose `table` is `DEAD`. |
 | `tables`, `table_room` | The tables, by id, and how many ids there may be beside 0: `[budget] tables` plus `[budget] sparse_sets`. |
 | `table_free`, `table_next` | The free list of table ids. |
 | `table_high` | The table ids from `table_high` on were never used. |

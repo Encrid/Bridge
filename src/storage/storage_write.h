@@ -18,7 +18,7 @@
         return (false);
     if (folded & (DESTROYED | DROPPED))
         return (false);
-    return (r->places[index].generation == (uint32_t)(ch->id >> 32));
+    return (r->index[index].generation == (uint32_t)(ch->id >> 32));
 }
 
 [[gnu::always_inline]] static inline void write_value(storage_t *r,
@@ -31,7 +31,7 @@
     if (ch->op == CHANGE_SKIPPED)
         return;
     if (folded & DROPPED
-        && r->places[index].generation == (uint32_t)(ch->id >> 32))
+        && r->index[index].generation == (uint32_t)(ch->id >> 32))
         m->left[(folded & SHORT) != 0]++;
     if (is_written(r, ch))
         to = get_value(r, index, ch->c->type);

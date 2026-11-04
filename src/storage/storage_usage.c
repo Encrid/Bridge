@@ -12,7 +12,7 @@ static uint32_t free_entities(const storage_t *r)
 
     while (index) {
         count++;
-        index = r->places[index].row;
+        index = r->index[index].row;
     }
     return (count);
 }

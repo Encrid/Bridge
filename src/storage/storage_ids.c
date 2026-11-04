@@ -12,14 +12,14 @@ static uint32_t take_index(storage_t *r)
     uint32_t index = r->free_head;
 
     if (index) {
-        r->free_head = r->places[index].row;
+        r->free_head = r->index[index].row;
         return (index);
     }
     if (r->high >= r->w->entities)
         return (0);
     index = r->high;
     r->high++;
-    r->places[index].generation = 1;
+    r->index[index].generation = 1;
     return (index);
 }
 
@@ -27,10 +27,10 @@ uint32_t storage_reserve(storage_t *r, uint64_t *ids, uint32_t want)
 {
     uint32_t count = 0;
     uint32_t index = count < want ? take_index(r) : 0;
-    place_t *p;
+    bridge_entity_t *p;
 
     while (index) {
-        p = &r->places[index];
+        p = &r->index[index];
         p->table = 0;
         p->row = HELD;
         ids[count] = (uint64_t)p->generation << 32 | index;

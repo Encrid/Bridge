@@ -23,12 +23,12 @@ static inline uint32_t get_sparse_value(const storage_t *r, uint32_t index,
 static inline uint32_t get_table_value(const storage_t *r, uint32_t index,
     const storage_type_t *type)
 {
-    uint32_t t = r->places[index].table;
+    uint32_t t = r->index[index].table;
     uint32_t column = t ? get_columns(r, t)[type->id] : 0;
 
     if (!column)
         return (0);
-    return (column + r->places[index].row * type->size);
+    return (column + r->index[index].row * type->size);
 }
 
 [[gnu::always_inline]] static inline uint32_t get_value(const storage_t *r,
