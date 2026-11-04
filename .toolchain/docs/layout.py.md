@@ -32,7 +32,7 @@ The layout allows only the paths of this table.
 | `third_party/**` | Any file. |
 | `.toolchain/tools/<name>.py` | Needed: one file or more. The tools of the toolchain. |
 | `.toolchain/toolchain.toml` and `.toolchain/header.txt` | The values and the legal notice of the toolchain. |
-| `.toolchain/config/<name>.toml` | A file of the configuration of the project. |
+| `.toolchain/config/<path>.toml` | A file of the configuration of the project, also in a folder of `.toolchain/config`. |
 | `.toolchain/docs/<name>.md` | A document of the toolchain. |
 | `.toolchain/presets/<name>/<name>.toml` | A file of a preset. `.toolchain/docs/presets.md` tells the presets. |
 | `.toolchain/runtime/<name>.c`, `.toolchain/runtime/<name>.h` | A source or a header that the toolchain adds to the shared libraries of a target: `.toolchain/docs/toolchain.toml.md`, *[targets.\<target\>]*. |
@@ -51,7 +51,7 @@ The messages are:
 
 `shared.document` gives the document of a file: `.toolchain/docs/shared.py.md`, *The documents*.
 Each document keeps the path of its file below the first folder. Thus the documents of a part are in the folders of the part.
-For example, the document of `include/<part>/<name>.h` is `docs/extern/<part>/<name>.h.md`, and the document of `src/<part>/<name>.c` is `docs/intern/<part>/<name>.c.md`.
+For example, the document of `include/<folder>/<name>.h` is `docs/extern/<folder>/<name>.h.md`, and the document of `src/<folder>/<name>.c` is `docs/intern/<folder>/<name>.c.md`.
 `.toolchain/docs/project.toml.md`, *[parts]*, tells the parts of a project.
 
 The first line of a document is `#`, a space, and the path of its file.

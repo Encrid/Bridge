@@ -2,7 +2,7 @@ name: release
 
 on:
   push:
-    tags: ['v*']
+    tags: ['v*', '*-v*']
 
 permissions: {}
 
@@ -48,6 +48,8 @@ jobs:
     timeout-minutes: 60
     permissions:
       contents: write
+    env:
+      TAG: ${{ github.ref_name }}
     defaults:
       run:
         shell: bash
@@ -63,14 +65,11 @@ jobs:
         run: python .toolchain/tools/runner.py --target ${{ matrix.target }} | bash -e
       - name: Fetch
         run: python project.py fetch
-      - name: Test
-        run: python project.py test
       - name: Pack
-        run: python project.py pack --target ${{ matrix.target }}
+        run: python project.py pack --target ${{ matrix.target }} --tag "$TAG"
       - name: Upload
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.ref_name }}
           REPO: ${{ github.repository }}
         run: gh release upload "$TAG" build/*.zip --repo "$REPO"
 
@@ -81,6 +80,12 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
       - name: Publish the release with the digests of its archives
         env:
           GH_TOKEN: ${{ github.token }}
@@ -88,6 +93,15 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           gh release download "$TAG" --repo "$REPO" --dir assets --pattern '*.zip'
-          (cd assets && sha256sum *.zip > sha256.txt)
-          gh release upload "$TAG" assets/sha256.txt --repo "$REPO"
-          gh release edit "$TAG" --repo "$REPO" --draft=false
+          joined=$(python project.py join --tag "$TAG" --out assets)
+          if [ -z "$joined" ]; then
+            (cd assets && sha256sum *.zip > sha256.txt)
+            gh release upload "$TAG" assets/sha256.txt --repo "$REPO"
+            gh release edit "$TAG" --repo "$REPO" --draft=false
+            exit 0
+          fi
+          name=$(basename "$joined" .zip)
+          for zip in assets/"$name"-*.zip; do gh release delete-asset "$TAG" "${zip#assets/}" --repo "$REPO" --yes; done
+          (cd assets && sha256sum "$name.zip" > sha256.txt)
+          gh release upload "$TAG" "$joined" assets/sha256.txt --repo "$REPO"
+          gh release edit "$TAG" --repo "$REPO" --title "$name v${TAG##*-v}" --draft=false --latest=false

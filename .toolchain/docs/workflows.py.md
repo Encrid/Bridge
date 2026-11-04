@@ -7,11 +7,12 @@ The command `check` runs it.
 
 | Workflow | When it runs | What it does |
 | --- | --- | --- |
-| `ci.yml` | On each pull request, and on each push to `main`. | On each target, it prepares the runner with `runner.py`, then runs `fetch`, the five commands and `pack`. `docs/contributing/pull_request.md`, *Before you open a pull request*, gives the five commands. |
+| `ci.yml` | On each pull request. | On each target, it prepares the runner with `runner.py`, then runs `fetch`, the five commands and `pack`. `docs/contributing/pull_request.md`, *Before you open a pull request*, gives the five commands. |
 | `cla.yml` | On each pull request, and on each new comment of a pull request. | It runs `cla`, which asks the author to sign `cla.md`, and sets the status `cla`. |
 | `release.yml` | On each push of a tag `v*` or `*-v*`. | It makes the release of the project or of a part, as *The release* tells. |
-| `toolchain.yml` | Only in the repository `my_c23_template`: on each pull request, and on each push to `main`. | On each target, it runs `fetch`, `test --toolchain` and `test --toolchain --break`. |
+| `toolchain.yml` | Only in the repository `my_c23_template`: on each pull request. | On each target, it runs `fetch`, `test --toolchain` and `test --toolchain --break`. |
 
+No workflow runs on the push of a branch. A change reaches `dev` or `main` only through a pull request, and the pull request runs the workflows.
 The step `Runner` of `ci.yml` and of `release.yml` gives the runner what the cases need: `.toolchain/docs/runner.py.md`.
 
 ## The release
@@ -21,7 +22,7 @@ It gives the tag to the tools with `--tag`. A tag `<part>-v<major>.<minor>.<patc
 `release.yml` does these steps:
 
 1. It makes a draft release, with the name of the tag.
-2. On each target of its matrix, it prepares the runner with `runner.py`, then runs `fetch`, `test` and `pack --target <target>`.
+2. On each target of its matrix, it prepares the runner with `runner.py`, then runs `fetch` and `pack --target <target>`. It runs no test, because the pull request from `dev` into `main` tested the tree of the tag.
 3. On each target, it adds the zip of the target to the draft.
 4. It runs `join`, which joins the zips of the targets of the part of the tag. For the tag of the project, `join` joins nothing.
 5. For the tag of the project, it adds `sha256.txt`, with the sha256 of each zip, to the draft.

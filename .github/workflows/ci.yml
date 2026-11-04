@@ -1,8 +1,6 @@
 name: ci
 
 on:
-  push:
-    branches: [main]
   pull_request:
 
 permissions:
@@ -56,12 +54,9 @@ jobs:
         run: python project.py fetch
       - name: Check
         env:
-          BASE: ${{ github.event.pull_request.base.sha || format('{0}~1', github.sha) }}
-          HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: |
-          range="$HEAD"
-          if git rev-parse -q --verify "$BASE^{commit}" > /dev/null; then range="$BASE..$HEAD"; fi
-          python project.py check --commits "$range"
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: python project.py check --commits "$BASE..$HEAD"
       - name: Test
         run: python project.py test
       - name: Break

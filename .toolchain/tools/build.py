@@ -240,7 +240,7 @@ def part_table(config, part):
         if name not in parts:
             die('no part %s; the parts: %s' % (name, ' '.join(parts)))
     table = known(parts[part], 'part', '[parts.%s]' % part)
-    missing = [key for key in ('name', 'uses', 'third_party') if key not in table]
+    missing = [key for key in ('name', 'folder', 'uses', 'third_party') if key not in table]
     if missing:
         die('[parts.%s] states no %s' % (part, missing[0]))
     return table
