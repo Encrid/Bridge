@@ -36,7 +36,7 @@ These are the reasons:
 
 `threads` is the number of threads that run a phase, and it counts the thread that calls `bridge_run_phase`.
 Bridge does not guess it, so an unset `threads` is refused.
-Each worker gets a stack of `stack` bytes. Bridge gives the size to `os_thread_start` of Bridge-OS as it is, and refuses an unset `stack` too.
+Each worker gets a stack of `stack` bytes. Bridge gives the size to `os_thread_start` of mosl as it is, and refuses an unset `stack` too.
 The pool has `threads - 1` workers, and room for `[budget] systems` jobs.
 A job is the systems of one module in one level, so there are never more jobs than systems.
 

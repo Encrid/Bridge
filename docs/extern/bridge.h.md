@@ -8,8 +8,8 @@ It gives the seven functions of the library, and the structs that a host gives t
 A host links the built library: the shared library or the static library.
 The shared library exports only the seven functions of this header, and `BRIDGE_API` marks each of them.
 
-The shared library holds the os layer of Bridge-OS.
-A program that links the static library `bridge.a` also links `os.a`, from the release of Bridge-OS for its target.
+The shared library holds the os layer, mosl.
+A program that links the static library `bridge.a` also links `os.a`, from the release of mosl for its target.
 
 A release ships `leaks.toml` for each target, beside the libraries and the headers.
 `leaks.toml` names `bridge_create`, which takes a world, and `bridge_destroy`, which gives it back.
