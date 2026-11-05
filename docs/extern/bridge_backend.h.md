@@ -28,10 +28,10 @@ The backend owns five kinds of handle, and Bridge never reads into them:
 ## BACKEND_ABI
 
 `BACKEND_ABI` is the number of the backend seam: the version of its layouts and its entries.
-The number is 3.
+The number is 1.
 `backend_get_abi` gives the number that the backend was built against.
 Bridge calls `backend_get_abi` first, and refuses a library that gives another number, before it asks for another entry.
-The number changes as `BRIDGE_HOST_ABI` does: `docs/extern/bridge.h.md`, *BRIDGE_HOST_ABI*.
+The number follows the rule of `docs/extern/bridge.h.md`, *BRIDGE_HOST_ABI*.
 
 ## backend_err_t
 
