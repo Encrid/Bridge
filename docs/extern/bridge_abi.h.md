@@ -19,18 +19,18 @@ A module that compiles with `include/bridge_abi.h` is a work based on Bridge: `r
 ## BRIDGE_ABI
 
 `BRIDGE_ABI` is the number of the module seam: the version of the layouts and the entries of this header.
-The number is 3.
+The number is 1.
 A module states the number that it was built against.
 The host gives it in `abi` of `bridge_module_config_t`: `docs/extern/bridge.h.md`, *bridge_module_config_t*.
 
 A load refuses a module of another number. `abi` of `bridge_header_t` holds the number of Bridge.
-The number changes as `BRIDGE_HOST_ABI` does: `docs/extern/bridge.h.md`, *BRIDGE_HOST_ABI*.
+The number follows the rule of `docs/extern/bridge.h.md`, *BRIDGE_HOST_ABI*.
 
 ## The exports
 
 A module is code that Bridge runs through a backend. How to write a module for a backend is the business of that backend.
 A module exports these functions. Each one takes nothing and gives an `int32_t` status. 0 is a success.
-Each other value is a failure, except `BRIDGE_END` from a system or an observer: *BRIDGE_END*.
+Each other value is a failure, except `BRIDGE_END` from a system or an observer, and `BRIDGE_AGAIN` from a system: *BRIDGE_END* and *BRIDGE_AGAIN*.
 
 | Export | When Bridge calls it |
 | --- | --- |
@@ -57,6 +57,17 @@ Bridge writes a record at the level `BRIDGE_INFO` that names the system: `docs/e
 The host decides what the end of the run is.
 
 `init`, `reload` and `shutdown` do not ask for the end. From them, `BRIDGE_END` is a failure, as each other status that is not 0.
+
+## BRIDGE_AGAIN
+
+`BRIDGE_AGAIN` is the status of a system that asks for its phase again. Its value is `INT32_MAX - 1`.
+Thus a host can run a fixed phase some times in one round, and the steps of the modules of that phase take turns.
+
+A status of `BRIDGE_AGAIN` is no failure, as a status of `BRIDGE_END` is.
+Bridge writes a record at the level `BRIDGE_INFO` that names the system: `docs/extern/bridge.h.md`, *A phase*.
+`bridge_run_phase` then tells the host, and the host decides if it runs the phase again: `docs/extern/bridge.h.md`, *bridge_run_phase*.
+
+Only a system asks for its phase again. From an observer, and from `init`, `reload` and `shutdown`, `BRIDGE_AGAIN` is a failure, as each other status that is not 0.
 
 ## The memories
 
