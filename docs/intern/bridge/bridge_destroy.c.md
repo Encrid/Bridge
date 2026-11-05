@@ -34,7 +34,7 @@ A backend states `BACKEND_UNLOAD` if its library can go from the process after `
 Bridge closes such a library, and the operating system then decides if it unmaps it.
 
 A backend that brought in a runtime with threads of its own does not state it, and its library must stay in the process.
-So Bridge first pins that library with `os_lib_pin` of Bridge-OS, and then closes the handle of the world.
+So Bridge first pins that library with `os_lib_pin` of mosl, and then closes the handle of the world.
 The next world finds the library there again, and the handles do not grow with each world.
 A library that opened but never became a backend states nothing, and is pinned too.
 If the pin fails, Bridge keeps the handle of the world open, so that the library stays.

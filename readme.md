@@ -20,7 +20,7 @@ The host Bridge-Host and the backends BB-Native and BB-Wasm are repositories of 
 ## Install
 
 1. Install Python 3.11 or a later version.
-2. Run `python project.py fetch`. It downloads zig, the compiler of the build, and the os layer of Bridge-OS.
+2. Run `python project.py fetch`. It downloads zig, the compiler of the build, and the os layer, mosl.
 
 ## Usage
 

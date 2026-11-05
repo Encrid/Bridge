@@ -3,7 +3,7 @@
 This header gives the inside of the library: what a world, a module, a system and a declared type are.
 Nothing here crosses a seam.
 
-The header includes `include/bridge.h`, `include/bridge_abi.h`, `src/backend/backend.h`, `os.h` of Bridge-OS, `src/pool/pool.h`, `src/region/region.h`, `src/schema/schema.h` and `src/storage/storage.h` first.
+The header includes `include/bridge.h`, `include/bridge_abi.h`, `src/backend/backend.h`, `os.h` of mosl, `src/pool/pool.h`, `src/region/region.h`, `src/schema/schema.h` and `src/storage/storage.h` first.
 After its types, it includes the headers that use them: `src/say/say.h`, `src/schedule/schedule.h`, `src/bridge/bridge_inside.h`, `src/block/block.h` and `src/abi/abi.h`.
 
 ## Nothing is allocated in a phase
