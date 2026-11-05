@@ -73,10 +73,15 @@ void schedule_account(bridge_world_t *w)
     }
 }
 
-void schedule_note_end(bridge_world_t *w, const bridge_system_t *s)
+void schedule_note_asks(bridge_world_t *w, const bridge_system_t *s)
 {
     say_t about = { s->m, s, BRIDGE_INFO };
 
+    if (s->again) {
+        w->again_asked = true;
+        say_about(w, &about, "system '%s' asks for its phase again",
+            s->name);
+    }
     if (!s->ended)
         return;
     w->end_asked = true;

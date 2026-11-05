@@ -18,6 +18,7 @@ static void list_due(schedule_pass_t *pass, const schedule_job_t *job)
         s->place = pass->ordinal;
         s->failed = 0;
         s->ended = 0;
+        s->again = 0;
         pass->ordinal++;
     }
 }

@@ -100,6 +100,7 @@ typedef struct bridge_system {
     int failed;
     char why[256];
     int ended;
+    int again;
     int64_t failures;
     declared_type_t **changes;
     uint32_t change_count;
@@ -268,6 +269,7 @@ struct bridge_world {
     uint32_t phase_count;
     uint32_t barriers;
     bool end_asked;
+    bool again_asked;
     uint32_t turns;
     uint32_t parked;
     uint32_t arena_ranges;
