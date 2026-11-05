@@ -190,11 +190,12 @@ A pointer and a `size_t` have 8 bytes. The library has no build for a smaller po
 ## BRIDGE_HOST_ABI
 
 `BRIDGE_HOST_ABI` is the number of the host seam: the version of the structs and the functions of this header.
-The number is 3.
+The number is 1.
 A host gives the number that it was built against in `abi`, the first field of `bridge_config_t`.
 `bridge_create` reads `abi` before any other field, and refuses a different number.
-Until the first release of Bridge, the number stays 1, and the structs can change.
-After the first release, a change to a struct or to a meaning of this header increments the number.
+
+Each number of a seam of Bridge is 1 while its seam is not complete. Until then, a change of the seam keeps the 1.
+When a seam is complete, its number changes at each change of a struct or of a meaning of the seam.
 
 ## Settings
 
@@ -943,8 +944,13 @@ A call from a second thread, while the world is busy with a call, gives -1 and w
 The systems and the observers of one module run one after another, and each one from its start to its return.
 
 The result is 0 if the phase ran. A system that failed is a record, and does not change the result.
+
 The result is 2 if the phase ran and a system or an observer gave `BRIDGE_END`: `docs/extern/bridge_abi.h.md`, *BRIDGE_END*.
-An observer that gives it at the barrier of `bridge_load`, `bridge_unload` or `bridge_reload` makes the next call that runs a phase give 2.
+The result is 3 if the phase ran and a system gave `BRIDGE_AGAIN`: `docs/extern/bridge_abi.h.md`, *BRIDGE_AGAIN*.
+If one run gives both, the result is 3, and Bridge keeps the end. The next call that runs a phase gives 2 if no system asks again.
+Thus no request is lost: the steps of the round end first, and then the end comes.
+
+An observer that gives `BRIDGE_END` at the barrier of `bridge_load`, `bridge_unload` or `bridge_reload` makes the next call that runs a phase give 2.
 The result is 1, with a record, if Bridge refuses the call: *A call refused*.
 From the sink, the result is 1, with no record.
 
@@ -1202,9 +1208,10 @@ The reason of `failed` is `it answered <status>`, the text of the backend, or a 
 For an observer, a record that names a system names the observer.
 The records of this group name a system or an observer by the name that its module gave, and not by its full name: *bridge_order_t*.
 
-This record, at the level `BRIDGE_INFO`, tells that a system gave `BRIDGE_END`:
+These records, at the level `BRIDGE_INFO`, tell that a system gave `BRIDGE_END` or `BRIDGE_AGAIN`:
 
 - `system '<system>' asks for the end of the run`
+- `system '<system>' asks for its phase again`
 
 This record, at the level `BRIDGE_WARN`, counts the lines that a full log ring dropped:
 

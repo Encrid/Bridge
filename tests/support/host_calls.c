@@ -55,6 +55,8 @@ static void run_phase(host_t *h, const char *phase)
         printf("%s refused\n", phase);
     if (result == 2)
         printf("%s asks for the end\n", phase);
+    if (result == 3)
+        printf("%s asks again\n", phase);
 }
 
 void host_run_frames(host_t *h, int count)

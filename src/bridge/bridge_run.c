@@ -12,6 +12,10 @@ static int take_end(bridge_world_t *w)
 {
     bool asked = w->end_asked;
 
+    if (w->again_asked) {
+        w->again_asked = false;
+        return (3);
+    }
     w->end_asked = false;
     return (asked ? 2 : 0);
 }

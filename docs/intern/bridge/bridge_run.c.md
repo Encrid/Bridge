@@ -11,7 +11,8 @@ A phase with no system runs nothing.
 A phase is a string, and `bridge_run_phase` takes its name each time.
 It compares the name with the few phases of the deployment, and refuses a name that is not one of them, by that name.
 
-After the barrier, `take_end` gives 2 and clears `end_asked` of the world, if a system or an observer gave `BRIDGE_END`.
+After the barrier, `take_end` gives 3 and clears `again_asked` of the world, if a system gave `BRIDGE_AGAIN`. It keeps `end_asked`.
+Else it gives 2 and clears `end_asked`, if a system or an observer gave `BRIDGE_END`, in this phase or before.
 Thus a module tells the host that the run is done, and the host decides what that means.
 
 ## What is loaded
@@ -31,6 +32,6 @@ It writes at most `max` modules into `out`, and gives the number of all the load
 
 | Function | Result |
 | --- | --- |
-| `take_end` | Gives 2 and clears `end_asked` if it is set, and else 0. |
+| `take_end` | Gives 3 if `again_asked` is set, else 2 if `end_asked` is set, and else 0. It clears the flag that it gives. |
 | `bridge_run_phase_now` | Runs the systems of one phase, then its barrier. Its result is in `docs/extern/bridge.h.md`, *bridge_run_phase*. |
 | `bridge_list_modules_now` | Writes up to `max` loaded modules into `out`, each with its state, and gives how many modules are loaded. |

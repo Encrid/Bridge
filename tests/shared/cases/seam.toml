@@ -49,7 +49,7 @@ false = { run = ["{out}/seam{exe}", "instance_get_func-export-init-without-argum
 [[case]]
 name = "module_config.abi-another-refused"
 run = ["{out}/seam{exe}", "module_config.abi-another-refused"]
-claims = { matches = ["module 'test:ok@0.1.0' is refused: it wants ABI 4 and this is ABI 3.*alive"] }
+claims = { matches = ["module 'test:ok@0.1.0' is refused: it wants ABI 2 and this is ABI 1.*alive"] }
 false = { run = ["{out}/seam{exe}", "BRIDGE_ABI-stated-and-loaded"] }
 
 [[case]]
@@ -79,7 +79,7 @@ false = { run = ["{out}/seam{exe}", "BRIDGE_NO_LIMIT-for-a-limit-loaded"] }
 [[case]]
 name = "config.abi-another-refused"
 run = ["{out}/seam{exe}", "config.abi-another-refused"]
-claims = { matches = ["the host is of host ABI 4, and this is 3.*bridge_create refused.*alive"] }
+claims = { matches = ["the host is of host ABI 2, and this is 1.*bridge_create refused.*alive"] }
 false = { run = ["{out}/seam{exe}", "BRIDGE_HOST_ABI-stated-and-created"] }
 
 [[case]]
@@ -517,7 +517,7 @@ false = { run = ["{out}/seam{exe}", "BACKEND_UNLOAD-unstated-library-kept"] }
 [[case]]
 name = "backend_get_abi-another-refused"
 run = ["{out}/seam{exe}", "backend_get_abi-another-refused"]
-claims = { matches = ["backend 'plain': backend library '[^']*bridge_plain_other[^']*' is of backend ABI 4, and this is 3.*bridge_create refused.*alive"] }
+claims = { matches = ["backend 'plain': backend library '[^']*bridge_plain_other[^']*' is of backend ABI 2, and this is 1.*bridge_create refused.*alive"] }
 false = { run = ["{out}/seam{exe}", "backend_get_abi-this-one-taken"] }
 
 [[case]]
@@ -2797,6 +2797,30 @@ name = "BRIDGE_END-at-a-reload-the-next-phase-gives-it"
 run = ["{out}/seam{exe}", "BRIDGE_END-at-a-reload-the-next-phase-gives-it"]
 claims = { matches = ["observer 'stop' asks for the end of the run.*game:marker@0.2.0: reloaded.*update asks for the end.*alive"], lacks = ["present asks for the end"] }
 false = { run = ["{out}/seam{exe}", "BRIDGE_END-at-a-load-with-no-reload"] }
+
+[[case]]
+name = "BRIDGE_AGAIN-a-system-asks-for-its-phase-again"
+run = ["{out}/seam{exe}", "BRIDGE_AGAIN-a-system-asks-for-its-phase-again"]
+claims = { matches = ["record\\[6\\] test:again@0.1.0/stop: system 'stop' asks for its phase again 0 0.*update asks again.*update asks again.*update asks again.*test:again@0.1.0=RUNNING.*alive"], lacks = ["failed", "present asks again", "asks for the end"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_AGAIN-from-init-is-a-failure"] }
+
+[[case]]
+name = "BRIDGE_AGAIN-from-init-is-a-failure"
+run = ["{out}/seam{exe}", "BRIDGE_AGAIN-from-init-is-a-failure"]
+claims = { matches = ["its init answered 2147483646.*test:again@0.1.0: not loaded.*alive"], lacks = ["asks for its phase again"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_AGAIN-a-system-asks-for-its-phase-again"] }
+
+[[case]]
+name = "BRIDGE_AGAIN-from-an-observer-is-a-failure"
+run = ["{out}/seam{exe}", "BRIDGE_AGAIN-from-an-observer-is-a-failure"]
+claims = { matches = ["observer 'stop' failed: it answered 2147483646.*alive"], lacks = ["asks for its phase again", "update asks again"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_END-an-observer-asks-for-the-end-of-the-run"] }
+
+[[case]]
+name = "BRIDGE_AGAIN-with-BRIDGE_END-gives-3-then-2"
+run = ["{out}/seam{exe}", "BRIDGE_AGAIN-with-BRIDGE_END-gives-3-then-2"]
+claims = { matches = ["asks for the end of the run.*asks for its phase again.*update asks again.*present asks for the end.*alive"], lacks = ["update asks for the end"] }
+false = { run = ["{out}/seam{exe}", "BRIDGE_AGAIN-with-no-BRIDGE_AGAIN-gives-2"] }
 
 [[case]]
 name = "BRIDGE_LOG_ERR-written-as-severity-3"

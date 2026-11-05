@@ -115,8 +115,8 @@ defines = ["BRIDGE_ROWS_CHECKED"]
 [[modules]]
 name = "ender"
 sources = ["tests/modules/ender.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
-defines = ["BRIDGE_ROWS_CHECKED", "INIT_STATUS=0"]
-variants = [{ name = "ender-init", defines = ["BRIDGE_ROWS_CHECKED", "INIT_STATUS=BRIDGE_END"] }, { name = "ender-heard", defines = ["BRIDGE_ROWS_CHECKED", "HEARD"] }]
+defines = ["BRIDGE_ROWS_CHECKED", "INIT_STATUS=0", "STOP_STATUS=BRIDGE_END"]
+variants = [{ name = "ender-init", defines = ["BRIDGE_ROWS_CHECKED", "INIT_STATUS=BRIDGE_END", "STOP_STATUS=BRIDGE_END"] }, { name = "ender-heard", defines = ["BRIDGE_ROWS_CHECKED", "HEARD", "STOP_STATUS=BRIDGE_END"] }, { name = "again", defines = ["BRIDGE_ROWS_CHECKED", "INIT_STATUS=0", "STOP_STATUS=BRIDGE_AGAIN"] }, { name = "again-init", defines = ["BRIDGE_ROWS_CHECKED", "INIT_STATUS=BRIDGE_AGAIN", "STOP_STATUS=BRIDGE_END"] }, { name = "again-heard", defines = ["BRIDGE_ROWS_CHECKED", "HEARD", "STOP_STATUS=BRIDGE_AGAIN"] }]
 
 [[modules]]
 name = "keep"
