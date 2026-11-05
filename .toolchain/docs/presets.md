@@ -6,7 +6,7 @@ The tools then read them as the other files of the configuration. `.toolchain/do
 
 ## native_module
 
-`native_module` is the preset of a native module of Bridge. Such a module is a shared library that BB-Native loads.
+`native_module` is the preset of a native module that runs on Bridge. Such a module is a shared library that BB-Native loads.
 Bridge-Host reads the manifest of the module, and its program `{bridge_host}/bridge-host{exe}` runs the cases of the module.
 On Linux and on macOS, the zip of Bridge-Host records the execute bits of that program, and `fetch` keeps them.
 
