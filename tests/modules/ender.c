@@ -9,7 +9,7 @@
 
 BRIDGE_EXPORT(stop) int stop(void)
 {
-    return (BRIDGE_END);
+    return (STOP_STATUS);
 }
 
 #ifdef HEARD
