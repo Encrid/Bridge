@@ -22,7 +22,7 @@ No build gives a parked system a job.
 ## The turn of a system
 
 `list_due` gives each due system a number, the ordinal, in the order it hands them in this pass.
-It also sets `failed` and `ended` of the system to 0.
+It also sets `failed`, `ended` and `again` of the system to 0.
 
 | Value | Content |
 | --- | --- |

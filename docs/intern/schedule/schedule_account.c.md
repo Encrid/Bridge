@@ -1,7 +1,7 @@
 # src/schedule/schedule_account.c
 
 This file gives the room in which a dispatch and a schedule work, and the settlement of the failure budgets at a barrier.
-It also notes each system that gave `BRIDGE_END`.
+It also notes each system that gave `BRIDGE_END` or `BRIDGE_AGAIN`.
 The rules of the budget are in `docs/intern/schedule/schedule.h.md`, *The failure budget*.
 
 ## The room
@@ -41,10 +41,11 @@ If the module states `BRIDGE_FAIL`, `bridge_stop` stops the world too.
 
 ## The end of the run
 
-`account_job` calls `schedule_note_end` for each system after its level, on the thread that asked for the phase.
-If `ended` of the system is set, `schedule_note_end` sets `end_asked` of the world.
-Its record, at the level `BRIDGE_INFO`, names the system or the observer.
-`bridge_run_phase` takes `end_asked` after its barrier: `docs/intern/bridge/bridge_run.c.md`, *A phase run*.
+`account_job` calls `schedule_note_asks` for each system after its level, on the thread that asked for the phase.
+If `ended` of the system is set, `schedule_note_asks` sets `end_asked` of the world.
+If `again` of the system is set, it sets `again_asked` of the world.
+Each record, at the level `BRIDGE_INFO`, names the system or the observer.
+`bridge_run_phase` takes `again_asked` and `end_asked` after its barrier: `docs/intern/bridge/bridge_run.c.md`, *A phase run*.
 An observer at the barrier of a load, an unload or a reload sets `end_asked` too, and the next phase that runs takes it.
 
 ## Functions
@@ -55,4 +56,4 @@ An observer at the barrier of a load, an unload or a reload sets `end_asked` too
 | `say_stopped` | Writes the record that a module is stopped: by the system that reached the limit, or by its own count. |
 | `settle_module` | Counts the barrier of one module against its budget, and stops the module if a count reached the limit. |
 | `schedule_account` | Settles each module of the work list at a barrier. |
-| `schedule_note_end` | Sets `end_asked` of the world, with a record, if `ended` of the system is set. |
+| `schedule_note_asks` | Sets `end_asked` or `again_asked` of the world, with a record, if `ended` or `again` of the system is set. |
