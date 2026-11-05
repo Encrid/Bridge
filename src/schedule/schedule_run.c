@@ -28,7 +28,7 @@ static void account_job(bridge_world_t *w, const schedule_job_t *job)
         if (!schedule_is_due(job->list[i]))
             continue;
         count_failure(w, job->list[i]);
-        schedule_note_end(w, job->list[i]);
+        schedule_note_asks(w, job->list[i]);
     }
 }
 

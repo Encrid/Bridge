@@ -23,7 +23,8 @@ static void call_system(module_t *m, bridge_system_t *s)
         return;
     }
     s->ended = status == BRIDGE_END;
-    if (!status || s->ended)
+    s->again = status == BRIDGE_AGAIN && !s->observer;
+    if (!status || s->ended || s->again)
         return;
     snprintf(s->why, sizeof(s->why), "it answered %d", status);
     s->failed = 1;
