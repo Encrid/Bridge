@@ -36,7 +36,7 @@ flowchart TB
     config --> storage
   end
 
-  osg["Bridge-OS<br/>os.a + os.h: mmap, dlopen, threads, lock, fs"]
+  osg["mosl<br/>os.a + os.h: mmap, dlopen, threads, lock, fs"]
   bridge -->|"os.h"| osg
 
   backend -->|"bridge_backend.h, 19-fn vtable"| nbk
