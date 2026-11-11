@@ -134,6 +134,7 @@ A system and an observer are a query and a function either way, so one record se
 | `ring`, `ring_len`, `ring_tail` | The start of the log ring, how many records it holds, and how many records were drained. |
 | `spans`, `spans_len` | The span region: the query slots, the lists of the observers, `column_base` and the spans. |
 | `had_triggers`, `spans_end` | What storage last wrote in the span region: that the list of an observer was not empty, and where the spans end. |
+| `spans_peak` | The high-water of the span region at a barrier, which `bridge_module_usage` reports. A new instance starts at 0. |
 | `declared`, `policy`, `may_write`, `declared_count` | By slot: the component, what the module stated for unload, and whether its grants let it write the component. |
 | `systems`, `system_count`, `observers`, `observer_count` | Its systems and its observers, by slot. |
 | `work_limit` | The work limit set before each dispatch. |

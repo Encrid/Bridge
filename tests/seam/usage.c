@@ -51,12 +51,23 @@ static void say_most(host_t *h)
 
 static void say_max(host_t *h)
 {
-    bridge_module_usage_row_t rows[2] = { { "untouched", 0, 0, 0, 0, 0 },
-        { "untouched", 0, 0, 0, 0, 0 } };
+    bridge_module_usage_row_t rows[2] = { { "untouched", 0, 0, 0, 0, 0, 0, 0 },
+        { "untouched", 0, 0, 0, 0, 0, 0, 0 } };
     int n = bridge_module_usage(h->w, rows, 1);
 
     printf("usage max %d, first %s, second %s\n", n, rows[0].identity,
         rows[1].identity);
+}
+
+static void say_spans(host_t *h)
+{
+    bridge_module_usage_row_t rows[8] = {};
+    int n = bridge_module_usage(h->w, rows, 8);
+    int fit = 0;
+
+    for (int i = 0; i < n && i < 8; i++)
+        fit += rows[i].spans_peak > 0 && rows[i].spans_peak <= rows[i].spans;
+    printf("usage spans rows %d fit %d\n", n, fit);
 }
 
 void test_usage(host_t *h)
@@ -75,6 +86,8 @@ void test_usage(host_t *h)
         printf("usage count %d\n", bridge_module_usage(h->w, nullptr, 0));
     else if (!strcmp(h->arg, "max"))
         say_max(h);
+    else if (!strcmp(h->arg, "spans"))
+        say_spans(h);
     else
         say_world(h);
     host_close(h);

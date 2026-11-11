@@ -1053,6 +1053,8 @@ static const host_case_t TEST_CASES[] = {
         test_usage, "count", test_set_usage },
     { "bridge_module_usage-into-fewer-rows-than-there-are",
         test_usage, "max", test_set_usage },
+    { "bridge_module_usage-spans-peak-fits-in-spans",
+        test_usage, "spans", test_set_usage },
     { "bridge_usage-from-another-thread-during-a-call-refused",
         test_call_from_sink, "bridge_usage", test_set_calling_elsewhere },
     { "bridge_module_usage-from-another-thread-during-a-call-refused",
