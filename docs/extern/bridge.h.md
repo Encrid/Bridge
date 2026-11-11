@@ -530,6 +530,8 @@ A timeout bounds one call of the export of its name. `memory_limit` and `element
 A system that never returns, with no work limit, holds `bridge_run_phase` for ever.
 A work limit stops a system at the same place on each run. A timeout can stop a call on a slow machine, and not on a fast one.
 
+Thus a deployment that must give the same results on each machine sets each timeout to `BRIDGE_NO_LIMIT`.
+
 ### Failures
 
 Bridge counts each system and each observer alone against `max_system_failures`.
@@ -545,12 +547,20 @@ A stopped module runs no system and no observer, and its components stay. A relo
 
 `scratch`, `log_ring` and `spans` size the private memory of the module: `docs/extern/bridge_abi.h.md`, *The memories*.
 Together they are at most 4 GiB, since an offset into the private memory has 32 bits.
-`spans` holds what each barrier writes for the module: its spans, and a cell for each type it declared in each table id.
+`spans` holds what each barrier writes for the module.
+That is a cell for each type it declared in each table id, the spans of its queries, and the lists of its observers.
 
 A load fails if `spans` cannot hold the slots of the module and a cell for each type in each table id.
 The row counts and the blocks of the tables are in the shared memory, so `spans` needs no room for them.
 The count of table ids is `[budget] tables` plus `[budget] sparse_sets` plus 1, and `BRIDGE_NONE` counts as 0.
 Bridge stops a module whose spans no longer hold what its queries match.
+
+A list of an observer holds one entry of 16 bytes for each entity that it hears at a barrier.
+Each entry comes from a change that the barrier applies, or from an entity that an unload, a reload or a release changed.
+Each change takes 24 bytes or more of `changes` of the module that queued it: *The reservations*.
+Thus the `changes` of the modules that an observer hears bound its list at a barrier.
+A module that makes many changes can spread them over barriers with `changes_left`, and a system with a query walks many entities with no list.
+
 The author of a module states a value for `spans`, and the deployment can correct it. A reload that states more gets more.
 
 ### The reservations
