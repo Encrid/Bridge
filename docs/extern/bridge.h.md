@@ -705,8 +705,8 @@ The counts are the sum since the module loaded. A host reads them twice and subt
 
 ## bridge_module_usage_row_t
 
-`bridge_module_usage_row_t` is what one module uses of the budget, as `bridge_module_usage` tells it.
-Each number is the module's own, so the rows sum to the world total of the same key.
+`bridge_module_usage_row_t` is what one module uses of the budget and of its span region, as `bridge_module_usage` tells it.
+Each number of the budget is the module's own, so the rows sum to the world total of the same key.
 
 | Field | Content |
 | --- | --- |
@@ -715,6 +715,8 @@ Each number is the module's own, so the rows sum to the world total of the same 
 | `systems` | The systems that the module registered. |
 | `observers` | The observers that the module registered. |
 | `entities` | The entity ids that the module holds. |
+| `spans` | The size of the span region of the module, in bytes: *The private memory*. |
+| `spans_peak` | The most bytes of the span region that one barrier wrote for the module, since its load or its reload. 0 before its first barrier. |
 | `pad` | 4 bytes of padding. |
 
 ## bridge_create
@@ -914,7 +916,8 @@ If another thread runs a call of the world, this one changes nothing and gives -
 
 ## bridge_module_usage
 
-`bridge_module_usage` tells what each loaded module uses of the four keys that one module owns.
+`bridge_module_usage` tells what each loaded module uses of the four keys that one module owns, and of its span region.
+A deployment compares `spans_peak` with `spans` to correct `spans` of a module: *The private memory*.
 
 | Parameter | Content |
 | --- | --- |

@@ -2901,6 +2901,12 @@ claims = { matches = ["most entities used 0 most [1-9][0-9]* kept yes.*alive"] }
 false = { run = ["{out}/seam{exe}", "bridge_module_usage-owned-keys-sum-to-the-world"] }
 
 [[case]]
+name = "bridge_module_usage-spans-peak-fits-in-spans"
+run = ["{out}/seam{exe}", "bridge_module_usage-spans-peak-fits-in-spans"]
+claims = { matches = ["usage spans rows 2 fit 2.*alive"] }
+false = { run = ["{out}/seam{exe}", "bridge_module_usage-count-only-writes-no-rows"] }
+
+[[case]]
 name = "bridge_module_usage-count-only-writes-no-rows"
 run = ["{out}/seam{exe}", "bridge_module_usage-count-only-writes-no-rows"]
 claims = { matches = ["usage count 2.*alive"] }

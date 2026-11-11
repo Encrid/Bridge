@@ -139,6 +139,7 @@ struct module {
     uint32_t spans_len;
     bool had_triggers;
     uint32_t spans_end;
+    uint32_t spans_peak;
     declared_type_t **declared;
     enum bridge_on_unload *policy;
     bool *may_write;

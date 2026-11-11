@@ -18,6 +18,8 @@ int bridge_module_usage_now(bridge_world_t *w, bridge_module_usage_row_t *out,
             out[count].systems = m->system_count;
             out[count].observers = m->observer_count;
             out[count].entities = m->id_count;
+            out[count].spans = m->spans_len;
+            out[count].spans_peak = m->spans_peak;
             out[count].pad = 0;
         }
         count++;
