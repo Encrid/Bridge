@@ -51,6 +51,21 @@ void test_reload_group_hold(host_t *h)
     host_close(h);
 }
 
+void test_shut_down_backwards(host_t *h)
+{
+    bridge_artifact_t a[2];
+    bool swapped = !strcmp(h->arg, "swapped");
+
+    if (host_open(h))
+        return;
+    group_state(&a[0], "game:one@0.1.0", "share1-said");
+    group_state(&a[1], "game:two@0.1.0", "share1-said");
+    host_load(h, &a[swapped ? 1 : 0]);
+    host_load(h, &a[swapped ? 0 : 1]);
+    host_run_frames(h, 1);
+    host_close(h);
+}
+
 static const char *const TEST_SHARED_LOSS[] = {
     "game:Shared.x"
 };

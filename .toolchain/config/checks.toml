@@ -14,7 +14,7 @@ plugins = "modules"
 
 [[branches.exception]]
 path = "src/bridge/bridge_destroy.c"
-line = 56
+line = 60
 col = 16
 side = "false"
 why = "If the pin fails, Bridge keeps the handle of the library open, so that the library stays: docs/intern/bridge/bridge_destroy.c.md, The libraries of the backends. A case that makes the pin fail keeps that handle, and test --leaks counts it as a leak."
