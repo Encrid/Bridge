@@ -11,15 +11,11 @@
 
 static void end_modules(bridge_world_t *w)
 {
-    module_t *done = nullptr;
-    module_t *m;
+    module_t *m = w->modules;
 
-    while (done != w->modules) {
-        m = w->modules;
-        while (m->next != done)
-            m = m->next;
+    while (m) {
         module_shut_down(w, m);
-        done = m;
+        m = m->next;
     }
     while (w->modules) {
         m = w->modules;

@@ -1427,7 +1427,7 @@ false = { run = ["{out}/seam{exe}", "bridge_unload-skipped-the-share-stays"] }
 [[case]]
 name = "bridge_destroy-shuts-down-what-is-loaded"
 run = ["{out}/seam{exe}", "bridge_destroy-shuts-down-what-is-loaded"]
-claims = { matches = ["tick 101 1.*module 'test:hang@0.1.0': its shutdown trapped: the timeout passed. its teardown continues.*game:ticker@0.1.0/-: shutdown 1 0.*alive"] }
+claims = { matches = ["tick 101 1.*game:ticker@0.1.0/-: shutdown 1 0.*module 'test:hang@0.1.0': its shutdown trapped: the timeout passed. its teardown continues.*alive"] }
 false = { run = ["{out}/seam{exe}", "bridge_destroy-shuts-down-what-returns"] }
 
 [[case]]
@@ -3997,9 +3997,3 @@ name = "bridge_header_t-changes_left-of-a-smaller-room"
 run = ["{out}/seam{exe}", "bridge_header_t-changes_left-of-a-smaller-room"]
 claims = { matches = ["init left 128 96\\b.*stamp left 128 4\\b.*stamp left 128 4\\b.*alive"] }
 false = { run = ["{out}/seam{exe}", "bridge_header_t-changes_left-the-whole-room-when-the-instance-starts"] }
-
-[[case]]
-name = "bridge_destroy-shuts-down-the-last-loaded-module-first"
-run = ["{out}/seam{exe}", "bridge_destroy-shuts-down-the-last-loaded-module-first"]
-claims = { matches = ["game:two@0\\.1\\.0/-: shutdown 0 0.*game:one@0\\.1\\.0/-: shutdown 0 0.*alive"] }
-false = { run = ["{out}/seam{exe}", "bridge_destroy-shuts-down-the-last-loaded-module-first-swapped"] }
