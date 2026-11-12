@@ -387,6 +387,8 @@ void test_reload_group_named(host_t *h);
 void test_reload_group_stop(host_t *h);
 void test_reload_group_hold(host_t *h);
 void test_reload_group_shut(host_t *h);
+
+void test_shut_down_backwards(host_t *h);
 void test_grow_share(host_t *h);
 void test_hoard_shares(host_t *h);
 void test_repair(host_t *h);

@@ -16,6 +16,8 @@ This document gives the needs of the project.
 | Minimal | The least use of resources, and the least API to learn. The project stays as simple as possible, but it never restricts flexibility or forces one way to build. |
 | Explicit | Each value and each behavior is stated, by the part that knows it. Nothing has a meaning by its absence. When a part cannot give a stated value, it says so. |
 | Portable | The project runs on each platform of the project, and uses what each platform gives. Where a platform lacks a part, a stated fallback runs. No capability of a platform is restricted. |
+| Deterministic | The same inputs, settings and calls give the same results in the same order, on each run, each machine and each platform. No result depends on the time, on the order of the threads or on an address of memory. Each limit that changes a result is a stated value. A refused allocation gives a stated failure, not another result. A measure of time is no result. |
+| Control | Each value and each behavior that can be a setting is a setting, not a constant of the code. A user changes it with no change of the code. A limit or a feature that costs time or memory is a setting. Where a setting has a default, the project states it. |
 
 ## The needs of a project
 

@@ -338,16 +338,20 @@ typedef struct {
     uint32_t systems;
     uint32_t observers;
     uint32_t entities;
+    uint32_t spans;
+    uint32_t spans_peak;
     uint32_t pad;
 } bridge_module_usage_row_t;
-static_assert(sizeof(bridge_module_usage_row_t) == 32);
+static_assert(sizeof(bridge_module_usage_row_t) == 40);
 static_assert(alignof(bridge_module_usage_row_t) == 8);
 static_assert(offsetof(bridge_module_usage_row_t, identity) == 0);
 static_assert(offsetof(bridge_module_usage_row_t, persistent) == 8);
 static_assert(offsetof(bridge_module_usage_row_t, systems) == 16);
 static_assert(offsetof(bridge_module_usage_row_t, observers) == 20);
 static_assert(offsetof(bridge_module_usage_row_t, entities) == 24);
-static_assert(offsetof(bridge_module_usage_row_t, pad) == 28);
+static_assert(offsetof(bridge_module_usage_row_t, spans) == 28);
+static_assert(offsetof(bridge_module_usage_row_t, spans_peak) == 32);
+static_assert(offsetof(bridge_module_usage_row_t, pad) == 36);
 
 BRIDGE_API [[nodiscard]] bridge_world_t *bridge_create(
     const bridge_config_t *cfg, bridge_sink_fn_t sink, void *ud);
