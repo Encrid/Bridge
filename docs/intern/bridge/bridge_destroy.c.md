@@ -43,7 +43,7 @@ If the pin fails, Bridge keeps the handle of the world open, so that the library
 
 | Function | Result |
 | --- | --- |
-| `end_modules` | Runs the `shutdown` of each module from the last loaded to the first, then discards each module. Each pass walks the list up to the last module that has not stopped, so the list stays whole while each `shutdown` runs. |
+| `end_modules` | Runs the `shutdown` of each module in load order, then discards each module. |
 | `free_schedule` | Frees the list of systems, and the room that `schedule_room` made. |
 | `free_names` | Frees what the deployment gave: the names of `[order]` and their matrix, and the phases. |
 | `close_backends` | Destroys each backend, pins each library whose backend does not state `BACKEND_UNLOAD`, and closes each library. It also frees the name and the path of each backend. |
