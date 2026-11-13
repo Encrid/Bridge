@@ -65,7 +65,7 @@ For a workflow with a matrix, `main` writes these faults:
 - `<path>: <name> is not a target of the project`, for each name that `[project] targets` does not have.
 
 The targets of the project are those of `[project] targets`: `.toolchain/docs/project.toml.md`, *[project]*.
-The matrix of `.github/workflows/toolchain.yml` must name each target of `.toolchain/toolchain.toml` instead, because it tests the toolchain on each target.
+The matrix of the workflow `toolchain.yml` of `.github/workflows` must name each target of `.toolchain/toolchain.toml` instead, because it tests the toolchain on each target.
 Its fault for a name is then `<path>: <name> is not a target of the toolchain`.
 
 Thus a new target of `.toolchain/toolchain.toml` needs a line in each matrix.
