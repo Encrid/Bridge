@@ -260,20 +260,15 @@ def chosen(groups, text):
     return [(group, cases) for group, cases in found if cases] or die('no case has %s in its name' % text)
 
 
-def held(group, folder):
-    return group == folder or group.startswith(folder + '/')
-
-
 def owner(config, group):
-    found = [(len(table['folder']), part) for part, table in config.get('parts', {}).items()
-             if held(group, table['folder'])]
-    return ' %s ' % max(found)[1] if found else False
+    found = shared.part_of(config, group)
+    return ' %s ' % found if found else False
 
 
 def picked(config, groups, args):
     if args.part:
         folders = [config['parts'][part]['folder'] for part in args.part]
-        groups = [(group, cases) for group, cases in groups if any(held(group, folder) for folder in folders)] \
+        groups = [(group, cases) for group, cases in groups if any(shared.held(group, folder) for folder in folders)] \
             or die('no case group is in the parts %s' % ' '.join(args.part))
     return chosen(groups, args.k) if args.k else groups
 
@@ -300,13 +295,15 @@ def scoped(args, entries, key, names):
 def measured(args):
     if args.broken or args.toolchain or args.copies or args.rounds:
         die('--branches runs each case one time: it takes no --break, --toolchain, --copies or --rounds')
-    config, values, (probes, gaps), outputs, groups = changed(args, 'branches', branches.probed)
+    named = args.part or []
+    config, values, (probes, gaps), outputs, groups = changed(
+        args, 'branches', lambda config, values: branches.probed(config, values, named))
     hits = Path(values['out']) / 'hits.bin'
     hits.write_bytes(bytes(branches.parts(probes)[1]))
     os.environ['C23_BRANCHES'] = str(hits)
     test(config, values, outputs, groups, False, False, 1)
     excepted = scoped(args, config.get('branches', {}).get('exception', []), 'path', probes)
-    branches.reported(probes, gaps, hits, excepted, values['system'])
+    branches.reported(probes, gaps, hits, excepted, values['system'], named)
 
 
 def tallied(args):
