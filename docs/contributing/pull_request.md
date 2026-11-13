@@ -32,14 +32,20 @@ The workflow `release` then makes the release. `.toolchain/docs/workflows.py.md`
 ## Before you open a pull request
 
 1. Make sure that `python project.py check` passes.
-2. Make sure that `python project.py test` passes.
-3. Make sure that `python project.py test --break` passes: each case fails, as it must.
-4. Make sure that `python project.py test --branches` passes: each branch of the code runs in a case.
-5. Make sure that `python project.py test --leaks` passes: each case gives back what the code takes.
-6. Read the full change, and remove each part that the change does not need.
-7. Make sure that the documents describe the change, and that a case checks each new behavior.
+2. Make sure that the 4 test commands pass for the parts of the change. Give each one `--part <part>` for each part that the change touches, and for each part that uses such a part.
+   - `python project.py test`.
+   - `python project.py test --break`: each case fails, as it must.
+   - `python project.py test --branches`: each branch of the code runs in a case.
+   - `python project.py test --leaks`: each case gives back what the code takes.
+3. If the change touches a file that belongs to no part, write in the description which parts the change reaches. Then run the 4 commands for these parts.
+4. In a project with no part, run the 4 commands with no `--part`.
+5. Read the full change, and remove each part that the change does not need.
+6. Make sure that the documents describe the change, and that a case checks each new behavior.
 
-The workflow `ci` runs the five commands again on a machine of each target of `.toolchain/toolchain.toml`.
+The 4 commands run for the whole project when `dev` goes into `main`.
+The workflow `ci` runs `check` and the 4 commands again on a machine of each target of the project: `[project] targets` of `.toolchain/project.toml`.
+On a pull request into `dev`, it runs the 4 commands only for the parts of the change and their users: `.toolchain/docs/scope.py.md`.
+A change of a file of no part runs them for the whole project there.
 Then it runs `python project.py pack`, which refuses a package that holds a path of the machine that built it.
 
 ## One purpose

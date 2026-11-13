@@ -77,7 +77,13 @@ jobs:
           HEAD: ${{ github.event.pull_request.head.sha }}
         run: python project.py check --commits "$BASE..$HEAD"
       - name: Gate
-        run: python project.py ${{ matrix.gate.run }}
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          INTO: ${{ github.base_ref }}
+        run: |
+          git diff --name-only "$BASE...$HEAD" > "$RUNNER_TEMP/changed.txt"
+          python project.py ${{ matrix.gate.run }} $(python .toolchain/tools/scope.py --changed "$RUNNER_TEMP/changed.txt" --into "$INTO")
       - name: Pack
         if: matrix.gate.name == 'test'
         run: python project.py pack --target ${{ matrix.platform.target }}
