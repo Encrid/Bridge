@@ -21,7 +21,7 @@ A file of a part is in the folder of the part, or is its readme or its config fi
 ## The scope
 
 1. A part that uses a changed part joins. Then a part that uses a joined part joins, until no part joins.
-2. The tool writes nothing for a project with no part, for a path of no part, or for an empty list.
+2. The tool writes nothing for a project with no part, a path of no part, or an empty list.
 3. It writes nothing with `--into main` too, since each test command runs for the whole project when `dev` goes into `main`.
 
 The messages are `name the list of the changed paths with --changed` and `cannot read the list <path>`.
