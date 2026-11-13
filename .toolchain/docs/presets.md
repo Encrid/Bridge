@@ -1,7 +1,7 @@
 # .toolchain/presets
 
 A preset holds the files of the configuration for one kind of project, for example a module of a backend.
-Only the repository `my_c23_template` has `.toolchain/presets`. A project copies the files of its preset into `.toolchain/config`.
+Only the repository `mc23t` has `.toolchain/presets`. A project copies the files of its preset into `.toolchain/config`.
 The tools then read them as the other files of the configuration. `.toolchain/docs/project.toml.md` tells how the files merge.
 
 ## native_module
@@ -12,12 +12,12 @@ On Linux and on macOS, the zip of Bridge-Host records the execute bits of that p
 
 | File | Content |
 | --- | --- |
-| `native_sources.toml` | The sources `bridge`, `bb_native` and `bridge_host`: the release `v0.4.0` of Bridge, of BB-Native and of Bridge-Host. |
+| `native_sources.toml` | The sources `bridge`, `bb_native` and `bridge_host`: the release `v0.5.0` of Bridge, of BB-Native and of Bridge-Host. |
 | `native_targets.toml` | For each target, the section of the manifest, and the sha256 of each release. |
 | `native_kinds.toml` | The variable `native_flags`, and the kind `native_module`. |
 | `native_checks.toml` | `[check.makes]` with the 6 macros of `bridge_schema.h` of Bridge. Each makes a type, or its descriptor `<type>_desc`, from its first argument. |
 
-The kind `native_module` is the kind `library`, with these changes:
+The kind `native_module` is the kind `library`, with its step `each`, and with these changes:
 
 - It includes the headers of the two sources.
 - It hides each name that the module does not export, with `-fvisibility=hidden`.

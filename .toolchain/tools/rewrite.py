@@ -15,9 +15,10 @@ from shared import die, expanded
 TOPS = ('src/', 'include/')
 OPENS = ('if', 'ifdef', 'ifndef')
 DIRECTIVE = re.compile(rb'[ \t]*#[ \t]*(\w+)')
+POINTER = re.compile(r'(.+?)\(\s*\*\s*\)\s*\((.*)\)')
 NULLABILITY = re.compile(r'\b_(?:Nonnull|Nullable_result|Nullable|Null_unspecified)\b'
                          r'|__attribute__\(\((?:cdecl|stdcall|fastcall|thiscall)\)\)')
-RENAME = '''[[maybe_unused]] static typeof(%(n)s) %(p)s%(n)s;
+RENAME = '''[[maybe_unused]] static typeof(*%(n)s) %(p)s%(n)s;
 #pragma push_macro("%(n)s")
 #undef %(n)s
 #define %(n)s %(p)s%(n)s
@@ -25,8 +26,10 @@ RENAME = '''[[maybe_unused]] static typeof(%(n)s) %(p)s%(n)s;
 WRITER = r'''#include <stdlib.h>
 #include <string.h>
 #ifdef _WIN32
+#include <errno.h>
 #include <fcntl.h>
 #include <io.h>
+#include <share.h>
 #include <sys/stat.h>
 #else
 #include <fcntl.h>
@@ -43,7 +46,9 @@ WRITER = r'''#include <stdlib.h>
     if (!%(p)spath)
         return;
 #ifdef _WIN32
-    %(p)sfd = _open(%(p)spath, _O_WRONLY | _O_CREAT | _O_APPEND | _O_BINARY, _S_IREAD | _S_IWRITE);
+    do
+        %(p)sfd = _sopen(%(p)spath, _O_WRONLY | _O_CREAT | _O_APPEND | _O_BINARY, _SH_DENYRW, _S_IREAD | _S_IWRITE);
+    while (%(p)sfd < 0 && errno == EACCES);
 #else
     %(p)sfd = open(%(p)spath, O_WRONLY | O_CREAT | O_APPEND, 0644);
 #endif
@@ -129,6 +134,15 @@ def dumped(command, root):
     return found
 
 
+def stood_in(artifact, mine):
+    folder = Path(mine['work'] + '.inputs')
+    names = [Path(file).name for file in build.read(artifact, mine)]
+    for name in names:
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / name).write_bytes(b'\0')
+    return ['--embed-dir=' + folder.as_posix()] if names else []
+
+
 def sources(config, values):
     jobs = {}
     for artifact in build.artifacts(config):
@@ -136,9 +150,12 @@ def sources(config, values):
             continue
         _, mine = build.planned(config, values, artifact)
         Path(mine['work']).parent.mkdir(parents=True, exist_ok=True)
+        mine['inputs'] = stood_in(artifact, mine)
         for source in mine['sources']:
             if source.startswith('src/') and source.endswith('.c') and source not in jobs:
-                jobs[source] = expanded(config['rewrite']['dump'], dict(mine, source=source))
+                jobs[source] = expanded(config['rewrite']['dump'], dict(mine, source=source)), set()
+            if source in jobs and 'part' in artifact:
+                jobs[source][1].add(artifact['part'])
     return jobs
 
 
@@ -146,7 +163,8 @@ def each(config, values, use):
     root = Path(values['root'])
     jobs = sources(config, values)
     with concurrent.futures.ThreadPoolExecutor(min(8, os.cpu_count() or 1)) as pool:
-        return list(pool.map(lambda job: use(root, job[0], dumped(job[1], root)), jobs.items()))
+        return list(pool.map(lambda job: (use(root, job[0], dumped(job[1][0], root)), sorted(job[1][1])),
+                             jobs.items()))
 
 
 def copied(root, where):
@@ -173,17 +191,41 @@ def declaration(node, typedefs):
             [spelled(one.get('qualType', '')) for one in parameters])
 
 
+def split_top(text):
+    parts, depth, start = [], 0, 0
+    for n, char in enumerate(text):
+        depth += (char == '(') - (char == ')')
+        if char == ',' and not depth:
+            parts.append(text[start:n].strip())
+            start = n + 1
+    parts.append(text[start:].strip())
+    return [part for part in parts if part and part != 'void']
+
+
+def pointed(node):
+    match = POINTER.fullmatch(spelled(plain(node.get('type', {}))))
+    if not match:
+        return None
+    parameters = split_top(match.group(2))
+    return (match.group(1).strip(), parameters, '...' in parameters, parameters)
+
+
 def found(root, path, tree, names, callbacks=()):
     used, defined, declared, ends, typedefs = set(), set(), {}, {}, {}
 
     def walk(node):
         kind, name = node.get('kind'), node.get('name')
         if kind == 'DeclRefExpr':
-            name = node.get('referencedDecl', {}).get('name')
+            referenced = node.get('referencedDecl', {})
+            name = referenced.get('name') if referenced.get('kind') in ('FunctionDecl', 'VarDecl') else None
+            if referenced.get('kind') == 'VarDecl' and name not in declared:
+                name = None
             if name in names and owned(node.get('range', {}).get('begin', {}), root) == path:
                 used.add(name)
         elif kind == 'TypedefDecl':
             typedefs.setdefault(name, plain(node.get('type', {})))
+        elif kind == 'VarDecl' and name in names and pointed(node):
+            declared.setdefault(name, pointed(node))
         elif kind == 'FunctionDecl' and name in names and not node.get('isImplicit'):
             declared.setdefault(name, declaration(node, typedefs))
             body = any(isinstance(one, dict) and one.get('kind') == 'CompoundStmt' for one in node.get('inner', []))
@@ -229,7 +271,7 @@ def signed(name, declaration, prefix):
         die('%s takes a list of arguments of no fixed length' % name)
     arguments = ', '.join('typeof(%s) a%d' % (one, n) for n, one in enumerate(parameters)) or 'void'
     call = '(%s)(%s)' % (name, ', '.join('a%d' % n for n in range(len(parameters))))
-    result = '((typeof(%s) *)nullptr)(%s)' % (name, ', '.join('(%s){}' % one for one in parameters))
+    result = '((typeof(*%s) *)nullptr)(%s)' % (name, ', '.join('(%s){}' % one for one in parameters))
     return 'static typeof(%s) %s%s(%s)\n{\n' % (result, prefix, name, arguments), call
 
 

@@ -5,30 +5,35 @@ import re
 
 from shared import arguments, config, document, ours, report
 
-GUIDES = ('agreement', 'coding_style', 'commits', 'decisions', 'documentation_style', 'needs', 'pull_request', 'tests')
-NEEDED = (('.github/workflows/ci.yml', '.github/workflows/release.yml', '.github/workflows/cla.yml', '.gitattributes',
+GUIDES = ('agreement', 'coding_style', 'coding_style_cxx', 'commits', 'decisions', 'documentation_style', 'needs', 'pull_request', 'tests')
+NEEDED = (('.github/workflows/ci.yml', '.github/workflows/release.yml', '.github/workflows/cla.yml',
+           '.github/workflows/warm.yml', '.gitattributes',
            '.gitignore', 'cla.md', 'license', 'project.py', '.toolchain/project.toml', 'readme.md')
           + tuple('docs/contributing/%s.md' % guide for guide in GUIDES))
 FOLDERS = ('.toolchain/tools',)
 DOCUMENT = r'docs/(?:extern|intern|tools)/.+\.md'
-ALLOWED = (r'architecture\.md|' + DOCUMENT + r'|include/.+\.h|src/.+|tools/.+'
+ALLOWED = (r'architecture\.md|\.github/workflows/toolchain\.yml|' + DOCUMENT + r'|include/.+\.(h|hpp)|src/.+|tools/.+'
            r'|\.toolchain/tools/[^/]+\.py|\.toolchain/toolchain\.toml|\.toolchain/config/.+\.toml'
-           r'|\.toolchain/header\.txt|\.toolchain/docs/[^/]+\.md|\.toolchain/presets/[^/]+/[^/]+\.toml'
-           r'|\.toolchain/runtime/[^/]+\.[ch]|(?:docs/extern|docs/intern|include)/\.gitkeep')
+           r'|\.toolchain/header\.txt|\.toolchain/graph\.zig|\.toolchain/docs/[^/]+\.md|\.toolchain/presets/[^/]+/[^/]+\.toml'
+           r'|\.toolchain/runtime/[^/]+\.[ch]|(?:docs/extern|docs/intern|include)/\.gitkeep'
+           r'|docs/(?!contributing/|extern/|intern/|tools/).+')
 SNAKE = re.compile(r'[a-z0-9_]+(?:\.[a-z0-9]+)*')
 DOTTED = ('.github', '.gitattributes', '.gitignore', '.gitkeep', '.toolchain')
 MADE = re.compile(r'.*\.(?:o|obj|a|so|dll|dylib|exe|gch|d|pyc)|.*~|#.*#|a\.out')
 
 
-def guides(root):
-    if not (root / '.toolchain' / 'project.toml').is_file():
-        return ()
-    return tuple('docs/contributing/%s' % name for name in config(root).get('check', {}).get('guides', []))
+def own(root):
+    settings = config(root)
+    guides = tuple('docs/contributing/%s' % name for name in settings.get('check', {}).get('guides', []))
+    readmes = tuple('docs/usage/%s.md' % part['folder'] for part in settings.get('parts', {}).values()
+                    if 'folder' in part)
+    return guides, readmes
 
 
 def faults(root, paths):
-    allowed = re.compile('|'.join(map(re.escape, NEEDED + guides(root))) + '|' + ALLOWED)
-    found = ['%s: the layout needs this file' % path for path in NEEDED if path not in paths]
+    guides, readmes = own(root)
+    allowed = re.compile('|'.join(map(re.escape, NEEDED + guides)) + '|' + ALLOWED)
+    found = ['%s: the layout needs this file' % path for path in NEEDED + readmes if path not in paths]
     found += ['%s/: the layout needs this folder' % folder for folder in FOLDERS
               if not any(path.startswith(folder + '/') for path in paths)]
     described = {}

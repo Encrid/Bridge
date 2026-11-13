@@ -15,8 +15,8 @@ It does not check `license` and `cla.md`, because they are legal texts.
 | `documents(root)` | Gives the path and the lines of each document that `prose.py` and `pseudo.py` check. |
 | `blocks(lines)` | Gives the first line, the last line and the tag of each block of code. `pseudo.py` uses it too. |
 | `units(lines)` | Gives each paragraph, each item of a list and each cell of a table, with its first line. |
-| `faults(lines, limits)` | Gives the faults of a document. |
-| `readme(lines, name, most)` | Gives the faults of the readme. |
+| `faults(lines, limits, tags)` | Gives the faults of a document. `tags` is the list of the tags of the blocks of code. |
+| `readme(lines, name, most, needed)` | Gives the faults of a readme whose title is `name`, and which needs the sections of `needed`. |
 | `main()` | Runs the check. |
 
 ## The limits
@@ -49,8 +49,8 @@ The maximum of a sentence in an item of a numbered list is `step`. The maximum o
 
 A block of code starts and ends with a line that starts with three backticks.
 The text after the first three backticks is the tag of the block.
-The tag is `pseudo`, `c`, `toml`, `sh`, `text` or `mermaid`.
-The message is `<path>:<line>: the tag '<tag>' is not one of pseudo c toml sh text mermaid`.
+The tag is one of `[prose] tags` of `.toolchain/toolchain.toml`, or one of `[check] tags` of the configuration.
+The message is `<path>:<line>: the tag '<tag>' is not one of <tags>`. `<tags>` is the list of these tags, with a space between 2 tags.
 
 ## The readme
 
@@ -62,6 +62,10 @@ Standard Readme is a specification of the readme of a project: https://github.co
 3. The description has at most `[prose] description` characters.
 4. The sections follow the order of Standard Readme. A section starts with `##`.
 5. The readme has the sections Install, Usage, Contributing and License.
+
+The readme of a part, `docs/usage/<folder>.md`, follows the same rules, with 2 changes.
+Its title is `# <name>` with the `name` of the part. It needs only the sections Install and Usage.
+Its messages start with its path in place of `readme.md`.
 
 The order is Table of Contents, Security, Background, Install, Usage, the extra sections, API, Maintainers, Thanks, Contributing and License.
 A section can also have the title Maintainer, Credits or Acknowledgements, as Standard Readme allows.

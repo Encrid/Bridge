@@ -1,5 +1,6 @@
 [project]
 name = "Bridge"
+targets = ["x86_64-windows-gnu", "x86_64-linux-gnu", "aarch64-macos", "aarch64-linux-gnu", "x86_64-macos", "aarch64-windows-gnu"]
 
 [test]
 cases = "tests/shared/cases"

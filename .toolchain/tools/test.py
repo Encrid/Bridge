@@ -33,10 +33,20 @@ def environment(changes, values):
     return env
 
 
-def free_port():
-    with socket.socket() as free:
-        free.bind(('127.0.0.1', 0))
+def bound(kind, port):
+    with socket.socket(socket.AF_INET, kind) as free:
+        try:
+            free.bind(('127.0.0.1', port))
+        except OSError:
+            return 0
         return free.getsockname()[1]
+
+
+def free_port():
+    port = 0
+    while port == 0:
+        port = bound(socket.SOCK_STREAM, bound(socket.SOCK_DGRAM, 0))
+    return port
 
 
 def started(argv, root, timeout, env=None, use=None):
@@ -151,7 +161,7 @@ def made_false(case):
     return merged
 
 
-def tried(config, values, outputs, where, case, broken, counted=False, failing=None):
+def tried(config, values, outputs, where, case, broken, counted=False, failing=None, part=False):
     use = made_false(case) if broken else case
     values, outputs = failing if failing and use.get('fail') else (values, outputs)
     folder = Path(values['out']) / 'cases' / where
@@ -168,7 +178,8 @@ def tried(config, values, outputs, where, case, broken, counted=False, failing=N
     if helper:
         waited(beside, expand(helper['wait'], mine))
     running = started(expanded(use['run'], mine), root, timeout,
-                      environment({**counting, 'C23_FAIL': plan, **use.get('env', {})}, mine), use)
+                      environment({**counting, 'C23_FAIL': plan, 'C23_FAIL_PART': plan and part, **use.get('env', {})},
+                                  mine), use)
     scripted(running, use.get('script', []), outputs, mine)
     ends = [ended(running, expand(use.get('stdin', ''), mine))]
     if helper:
@@ -192,8 +203,8 @@ def verdict(config, values, outputs, group, index, case, broken, copies, counted
     where = '%s/%d' % (group, index)
     wheres = [where] if count == 1 else ['%s/%d' % (where, copy) for copy in range(count)]
     with concurrent.futures.ThreadPoolExecutor(count) as pool:
-        runs = list(pool.map(lambda where: tried(config, values, outputs, where, case, broken, counted, failing),
-                             wheres))
+        runs = list(pool.map(lambda where: tried(config, values, outputs, where, case, broken, counted, failing,
+                                                 owner(config, group)), wheres))
     verdicts = [judged(config, group, broken, run) for run in runs]
     bad = [one for one in verdicts if not one[0]]
     if not bad:
@@ -249,11 +260,20 @@ def chosen(groups, text):
     return [(group, cases) for group, cases in found if cases] or die('no case has %s in its name' % text)
 
 
+def held(group, folder):
+    return group == folder or group.startswith(folder + '/')
+
+
+def owner(config, group):
+    found = [(len(table['folder']), part) for part, table in config.get('parts', {}).items()
+             if held(group, table['folder'])]
+    return ' %s ' % max(found)[1] if found else False
+
+
 def picked(config, groups, args):
     if args.part:
         folders = [config['parts'][part]['folder'] for part in args.part]
-        groups = [(group, cases) for group, cases in groups
-                  if any(group == folder or group.startswith(folder + '/') for folder in folders)] \
+        groups = [(group, cases) for group, cases in groups if any(held(group, folder) for folder in folders)] \
             or die('no case group is in the parts %s' % ' '.join(args.part))
     return chosen(groups, args.k) if args.k else groups
 
