@@ -93,6 +93,11 @@ def layer(text, used, declared, calls, parts):
     return at, block + '#line %d\n' % (text.count(b'\n', 0, at) + 1), tail
 
 
+def wrapped(text, outer):
+    at, block, tail = outer
+    return text[:at] + block.encode() + text[at:] + b'\n' + tail.encode()
+
+
 def failed(config, values):
     calls = listed(config, values)
     root, where = Path(values['root']), rewrite.tree(values, 'fail')
@@ -102,5 +107,4 @@ def failed(config, values):
         if not used:
             continue
         text = (root / path).read_bytes()
-        at, block, tail = layer(text, used, declared, calls, parts)
-        (where / path).write_bytes(text[:at] + block.encode() + text[at:] + b'\n' + tail.encode())
+        (where / path).write_bytes(wrapped(text, layer(text, used, declared, calls, parts)))

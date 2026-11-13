@@ -80,6 +80,16 @@ def picked(whole):
     return {name: row for name, row in whole['targets'].items() if name in names}
 
 
+def held(path, folder):
+    return path == folder or path.startswith(folder + '/')
+
+
+def part_of(config, path):
+    found = [(len(table['folder']), part) for part, table in config.get('parts', {}).items()
+             if held(path, table['folder'])]
+    return max(found)[1] if found else None
+
+
 def tables(config, values, name):
     own = config.get(name, {})
     found = [own]

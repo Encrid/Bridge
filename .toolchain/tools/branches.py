@@ -6,7 +6,7 @@ from pathlib import Path
 
 import fail
 import rewrite
-from shared import die
+from shared import die, part_of
 
 DECIDED = {'IfStmt': 0, 'WhileStmt': 0, 'DoStmt': 1, 'ConditionalOperator': 0, 'ForStmt': 2}
 LOGICAL = ('&&', '||')
@@ -264,7 +264,12 @@ def rewritten(text, path, edits, prefix, part, outer=(0, '', '')):
     return out, [dict(zip(('kind', 'line', 'col'), (kind,) + rewrite.placing(text, at))) for kind, at in rows]
 
 
-def probed(config, values):
+def mine(config, path, named):
+    top, _, inner = path.partition('/')
+    return not named or (top in ('src', 'include') and part_of(config, inner) in named)
+
+
+def probed(config, values, named=()):
     calls, root = fail.listed(config, values), Path(values['root'])
     edits, skips, outers = {}, {}, {}
     trees = rewrite.each(config, values, lambda top, path, tree: (walked(top, path, tree),
@@ -275,6 +280,8 @@ def probed(config, values):
         for path, table in probing.skips.items():
             skips.setdefault(path, {}).update(table)
         outers[name] = fail.layer((root / name).read_bytes(), used, declared, calls, parts)
+    edits = {path: table for path, table in edits.items() if mine(config, path, named)}
+    skips = {path: table for path, table in skips.items() if mine(config, path, named)}
     return written(root, rewrite.tree(values, 'branches'), edits, skips, outers)
 
 
@@ -287,6 +294,9 @@ def written(root, where, edits, skips, outers):
         outer = outers.get(path, (0, '', ''))
         out, probes[path] = rewritten((root / path).read_bytes(), path, edits[path], prefix, found[path], outer)
         (where / path).write_bytes(out)
+    for path, outer in outers.items():
+        if path not in edits and outer[2]:
+            (where / path).write_bytes(fail.wrapped((root / path).read_bytes(), outer))
     gaps = {path: [dict(zip(('kind', 'line', 'col'), (kind,) + rewrite.placing((root / path).read_bytes(), at)))
                    for at, kind in sorted(table.items())] for path, table in skips.items()}
     return probes, gaps
@@ -322,7 +332,9 @@ def excused(listed, system, name, line, col, said):
     return False
 
 
-def reported(probes, gaps, hits, excepted=(), system=None):
+def reported(probes, gaps, hits, excepted=(), system=None, named=()):
+    if named:
+        print('branches: measured parts %s' % ', '.join(named))
     seen, outcomes, total = joined(probes, hits), [], 0
     for name, rows in probes.items():
         bits = seen[name]

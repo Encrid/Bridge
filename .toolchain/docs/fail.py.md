@@ -73,5 +73,6 @@ A loaded call that no case states calls its function as always.
 | --- | --- |
 | `listed(config, values)` | Gives each function that can fail, with its failure value. It reads the files of `[fail] with`. |
 | `loaded_calls(calls, used, source, declared)` | Gives the loaded calls of a file: the listed functions that the text `source` names, and that the file does not call. |
+| `wrapped(text, outer)` | Gives the bytes of a file with its layer: the block at its byte, and the end after the text. |
 | `layer(text, used, declared, calls, parts)` | Gives the layer of a file: the byte where its block starts, the block, and the end of the file. `used` names the functions of `calls` that the file uses, and `declared` gives their declarations. `parts` names the parts of the file. |
 | `failed(config, values)` | Writes the copy of the run `fail`, as *The runs* tells. |

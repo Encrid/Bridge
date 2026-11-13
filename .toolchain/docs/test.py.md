@@ -26,8 +26,7 @@
 | `verdict(config, values, outputs, group, index, case, broken, copies, counted, failing)` | Runs the copies of one case at the same time, and gives their verdict. |
 | `test(config, values, outputs, groups, broken, said, copies, counted, failing)` | Runs all the groups, and writes each verdict. With `said`, it writes `said.txt`. It gives the names of the cases that failed. |
 | `chosen(groups, text)` | Gives only the cases whose name contains `text`. It stops if no case has it: `no case has <text> in its name`. |
-| `held(group, folder)` | Whether a group is in the folder of a part, as *Groups* tells. |
-| `owner(config, group)` | Gives the part of a group, with a space before and after it, or `False`. With nested folders, the longest folder wins. |
+| `owner(config, group)` | Gives the part of a group from `part_of` of `shared.py`, with a space before and after it, or `False`. |
 | `picked(config, groups, args)` | Gives only the groups of the parts of `--part`, as *Groups* tells, then only the cases of `-k`, with `chosen`. |
 | `groups_of(config, values, folder)` | Reads and checks the groups of a folder: `tests/cases`, or `.toolchain/tests/cases` of the repository `mc23t`. |
 | `changed(args, run, write, prepared)` | Does the steps of a changed run, as *A changed run* tells. It gives the config, the variables, what `write` gave, the artifacts and the groups. |
@@ -164,7 +163,8 @@ The run `fail` gives `prepared`: the configuration and the variables of step 1 o
 4. It runs each case one time, and writes its verdict.
 5. It writes the report, with `reported` of `branches.py`.
 
-With `--part`, step 5 reads only the exemptions whose `path` matches a file with probes, with `scoped`. Thus an exemption of a different part is no fault.
+With `--part`, step 2 gives the named parts to `probed`, so only their files get probes: `.toolchain/docs/branches.py.md`, *The files of the named parts*.
+Step 5 then reads only the exemptions whose `path` matches a file with probes, with `scoped`. Thus an exemption of a different part is no fault.
 The message of step 1 is `--branches runs each case one time: it takes no --break, --toolchain, --copies or --rounds`.
 `.toolchain/docs/branches.py.md` tells what the probes measure, and what the report contains.
 
