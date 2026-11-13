@@ -7,7 +7,8 @@
 | Function | Result |
 | --- | --- |
 | `environment(changes, values)` | Gives the environment of a command, with the changes of `env`. |
-| `free_port()` | Gives a free port of this machine. |
+| `bound(kind, port)` | Binds a socket of a kind, TCP or UDP, on `127.0.0.1` and a port. It gives the bound port, or 0 if the system refuses the port. Port 0 asks the system for a free port. |
+| `free_port()` | Gives a port of this machine that is free for TCP and for UDP. UDP gives a free port, and TCP must accept the same number. Else it tries again. |
 | `started(argv, root, timeout, env, use)` | Starts a command with `started` of `signals.py`, with a timer that stops it after `timeout` seconds. `use` is the case, or nothing for a helper. |
 | `waited(running, text)` | Reads the output until a line contains the text. It gives false if the output ends first. |
 | `typed(running, text)` | Writes a text to the command. |
@@ -20,13 +21,15 @@
 | `placed(use, outputs, values)` | Writes the `files` of a case, and fills its `folders`. |
 | `scripted(running, script, outputs, values)` | Does the steps of a script. |
 | `made_false(case)` | Gives the false variant of a case. |
-| `tried(config, values, outputs, where, case, broken, counted, failing)` | Runs one case. With `counted`, it sets the variable `C23_LEAKS` of the case. `failing` gives the variables and the artifacts of the run `fail`, or `None`. |
+| `tried(config, values, outputs, where, case, broken, counted, failing, part)` | Runs one case. With `counted`, it sets the variable `C23_LEAKS` of the case. `failing` gives the variables and the artifacts of the run `fail`, or `None`. `part` is the part of the case, or `False`. |
 | `judged(config, group, broken, run)` | Gives the verdict of one run of a case. |
 | `verdict(config, values, outputs, group, index, case, broken, copies, counted, failing)` | Runs the copies of one case at the same time, and gives their verdict. |
 | `test(config, values, outputs, groups, broken, said, copies, counted, failing)` | Runs all the groups, and writes each verdict. With `said`, it writes `said.txt`. It gives the names of the cases that failed. |
 | `chosen(groups, text)` | Gives only the cases whose name contains `text`. It stops if no case has it: `no case has <text> in its name`. |
+| `held(group, folder)` | Whether a group is in the folder of a part, as *Groups* tells. |
+| `owner(config, group)` | Gives the part of a group, with a space before and after it, or `False`. With nested folders, the longest folder wins. |
 | `picked(config, groups, args)` | Gives only the groups of the parts of `--part`, as *Groups* tells, then only the cases of `-k`, with `chosen`. |
-| `groups_of(config, values, folder)` | Reads and checks the groups of a folder: `tests/cases`, or `.toolchain/tests/cases` of the repository `my_c23_template`. |
+| `groups_of(config, values, folder)` | Reads and checks the groups of a folder: `tests/cases`, or `.toolchain/tests/cases` of the repository `mc23t`. |
 | `changed(args, run, write, prepared)` | Does the steps of a changed run, as *A changed run* tells. It gives the config, the variables, what `write` gave, the artifacts and the groups. |
 | `scoped(args, entries, key, names)` | Gives the exemptions whose `key` matches one of the names, with `*`. With no `--part`, it gives all the exemptions. |
 | `measured(args)` | Runs the command `test --branches`, as *The branches* tells. |
@@ -39,8 +42,9 @@ With `--leaks`, `main` runs `tallied`, and nothing else. With `--branches`, it r
 Else `main` does these steps:
 
 1. It builds with `build`, which stops if the target does not run on this machine. With `--toolchain`, it only calls `prepared` of `build.py`, and builds nothing.
+   With `--toolchain`, the configuration has each target of `.toolchain/toolchain.toml`, so a test of the toolchain runs on each target.
 2. It stops if an artifact is not linked: `the cases need what is linked: <names>`.
-3. It reads the groups of `[test] cases` (the default is `tests/cases`). With `--toolchain`, it reads `.toolchain/tests/cases` of the repository `my_c23_template`.
+3. It reads the groups of `[test] cases` (the default is `tests/cases`). With `--toolchain`, it reads `.toolchain/tests/cases` of the repository `mc23t`.
 4. If there is no case, it writes `no case: <folder> holds no case`, and ends.
 5. With `--part`, it keeps only the groups of the named parts. With `-k`, it keeps only the cases whose name contains the text.
 6. If a case states `fail`, it makes the run `fail`: *A changed run*, with `failed` of `fail.py`.
@@ -91,6 +95,8 @@ A case that holds no `{port}` gets no port. In such a case, a value of `[variabl
 
 With `counted`, the command and the helper get the variable `C23_LEAKS`: the path of the folder of the case, with `.leaks` added.
 If the case states `fail`, the command gets the variable `C23_FAIL`: `.toolchain/docs/fail.py.md`, *The layer*. Else `tried` removes `C23_FAIL` from the environment of the command.
+
+The command also gets `C23_FAIL_PART`, the part that `owner` gives for the group of the case. With no such part, `tried` removes `C23_FAIL_PART` too.
 With `failing`, a case that states `fail` runs on the build of the run `fail`. Its folder, its `{out}` and its artifacts are those of that run.
 
 `tried` runs each command in the root, with a timer of `[test] timeout` seconds.
@@ -141,6 +147,7 @@ A claim `line` compares full lines. A claim `order` ignores the spaces at the st
 6. It reads the groups of `tests/cases`, and keeps the groups and the cases that `picked` gives.
 
 At step 3, `kept` of `build.py` gives `write` the artifacts of the named parts only. Thus the probes, the counts and the layers are only in their sources.
+The scope of `fail` does not come from this step: each layer refuses calls only for the cases of its parts.
 The parts of their `uses` are built from their own sources, at step 4.
 
 `ready` stops at step 1 if the target does not run on this machine.

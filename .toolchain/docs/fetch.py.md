@@ -21,8 +21,8 @@ Then it takes the dependencies with `take.py`.
 
 `main` does these steps:
 
-1. It reads the options and the configuration.
-2. It stops if no target runs on this machine: `fetch runs on a machine of a target`.
+1. It reads the options and the configuration. With `--toolchain`, the configuration has each target of `.toolchain/toolchain.toml`, as for a test of the toolchain.
+2. It stops if no target of the project runs on this machine: `fetch runs on a machine of a target`.
 3. If the pinned zig is not there, it downloads zig. Then it writes the path of zig.
 4. It makes the variables, with the target of this machine.
 5. It fetches each source.
@@ -46,6 +46,9 @@ It stops if the archive does not hold the pinned zig: `the archive holds no zig 
 2. It downloads the archive into the folder.
 3. If the archive has a different digest, it removes it and stops: `<archive> is not what the maker publishes`.
 4. It unpacks the archive with `unpacked`, and removes the archive.
+
+After `fetched`, `sources` stops if the source states a `top` whose folder the archive does not have: `<source>: the archive has no folder <top>`.
+Thus a release with no folder for a target stops the fetch, and not the build later.
 
 `unpacked` gives an archive that is not a zip to `shutil.unpack_archive` of Python, which keeps the execute bits of its files.
 Python keeps no mode of the files of a zip. Thus `unpacked` unpacks each file of a zip, then adds the execute bits that the zip records for it.

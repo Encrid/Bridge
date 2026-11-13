@@ -548,7 +548,8 @@ def exceptions():
 
 
 def ours():
-    return sorted(path for path in shared.ours(ROOT) if path.endswith(('.c', '.h')))
+    return sorted(path for path in shared.ours(ROOT)
+                  if path.endswith(('.c', '.h')) and not path.startswith('third_party/'))
 
 
 def prototypes():

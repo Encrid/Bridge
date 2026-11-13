@@ -12,6 +12,7 @@ The tools import it. It does not run alone.
 | `KEYS` | The keys of a step, a case, a false variant, a helper, a step of a script, the claims, a source and a part. It also gives the keys of a kind of `[leaks.kinds]`. |
 | `TAG` | The pattern of the tag of a release: `v<major>.<minor>.<patch>`, after an optional part in snake_case and `-`. |
 | `SIDES` | The folder of `docs` that holds the documents of a folder: `extern` for `include`, `intern` for `src`, and `tools` for `tools`. |
+| `UNSET` | The reason of each variable that the tools give with no value on this host: *Variables*. |
 
 ## Functions
 
@@ -20,7 +21,8 @@ The tools import it. It does not run alone.
 | `die(why)` | Stops the tool with the message `<tool>: <why>`, where `<tool>` is the file name of the tool. |
 | `known(table, what, where)` | Gives `table`. It stops if `table` has a key that `KEYS[what]` does not have. |
 | `merged(into, more, name, whence, above)` | Adds the keys of `more`, the file `name`, to `into`, as the section *The configuration* tells. `whence` gives the file of each key. |
-| `config(root)` | Gives the configuration of the project in `root`. |
+| `config(root, every)` | Gives the configuration of the project in `root`. It keeps only the targets of `[project] targets`, unless `every` is set. |
+| `picked(whole)` | Gives the targets of `[project] targets`, or stops with a fault of `.toolchain/docs/project.toml.md`, *[project]*. |
 | `tables(config, values, name)` | Gives the table `[<name>]` of the configuration, then the table `[<name>]` of each file of its key `with`. It replaces the variables in each path, and stops if a file is not there. |
 | `located(text, values)` | Gives the path of `text` in the root, after it replaces the variables. |
 | `expand(text, values)` | Gives `text` with the value of each variable in place of the variable. |
@@ -29,6 +31,7 @@ The tools import it. It does not run alone.
 | `status(code)` | Gives an exit status as a decimal number and as a hexadecimal number. |
 | `run(argv, root, env)` | Runs a command in `root`, and writes its output. It gives the command the environment `env`, or the environment of the tool. It stops the tool if the command fails. |
 | `this_target(targets)` | Gives the target whose `runs_on` is this machine, or nothing. |
+| `macos_sdk()` | Gives the path of the SDK of macOS and no reason, or no path and the reason, as the section *Variables* tells. |
 | `sha256(data)` | Gives the SHA-256 digest of the bytes, in hexadecimal. |
 | `variables(config, args, target, zig)` | Gives the variables of a build, as the section *Variables* tells. |
 | `arguments(*valued, **flags)` | Reads the options of the command line. Each item of `valued` adds an option that has a value. An item can be a pair of the option and the type of its value, for example `('--copies', int)`. Each item of `flags` adds an option that has no value. |
@@ -41,7 +44,7 @@ The tools import it. It does not run alone.
 
 ## The configuration
 
-`config` reads `.toolchain/toolchain.toml` of `HERE`, then `.toolchain/project.toml` of the root.
+`config` reads `.toolchain/toolchain.toml` of `HERE`, then `.toolchain/project.toml` of the root, if the root has it.
 Then it reads each `.toml` file of `.toolchain/config` and of its folders, in the order of their paths.
 `merged` adds each key of a later file to the configuration:
 
@@ -58,7 +61,7 @@ The name of a file is its path from `.toolchain`, for example `config/sources.to
 
 `variables` gives the values in this order. A later value replaces an earlier value with the same name.
 
-1. The variables that the tools give: `root`, `build`, `home`, `dist`, `out`, `target`, `python`, `zig` and `toolchain`.
+1. The variables that the tools give: `root`, `build`, `home`, `dist`, `out`, `target`, `python`, `zig`, `toolchain` and `macos_sdk`.
 2. The keys of the target.
 3. The keys of `[variables]`. The tool stops if a key has a name of step 1 or of step 2.
 4. With `--debug`, the keys of `[debug]`.
@@ -71,12 +74,24 @@ The name of a file is its path from `.toolchain`, for example `config/sources.to
 `toolchain` is the folder `.toolchain` of the tools that run, and not of the root. Thus a project of the tests, whose root holds no toolchain, still reaches the files of the toolchain.
 The messages are `[variables] names a built-in variable or a key of a target: <names>` and `--set <name>=<value>: [variables] has no <name>`.
 
+`macos_sdk` is the output of `xcrun --show-sdk-path` on a macOS host. It has no value in each other case, and `UNSET` keeps the reason:
+
+| Case | Reason |
+| --- | --- |
+| The host is not a Mac | `this host is not a Mac` |
+| `xcrun` does not start | `xcrun did not start` |
+| `xcrun` fails, or gives no path | `xcrun gave no path` |
+
+Thus a build of a macOS target on another host works, until a text uses `{macos_sdk}`.
+
 ## Expansion
 
 `expand` replaces each variable of a text with its value. If the value contains variables, `expand` replaces them too.
 A list value in a text needs a separator: `{<name>:<separator>}`. `expand` joins the items with the separator.
 `expanded` replaces a list variable that is a full item of a list with all its items.
 `expand` stops the tool if a variable has no value, or if a list value in a text has no separator.
+
+A variable that `UNSET` names stops the tool with its reason: `{macos_sdk} needs a macOS host with xcrun: <reason>`.
 
 ## The options
 
@@ -125,7 +140,7 @@ If `repository` tells that the root is the top folder of a git repository, `ours
 These are the files that git tracks, and the files that git does not ignore.
 Else, `ours` walks the folders of the root, as `.gitignore` tells: it skips `build` at the root, and each `__pycache__`.
 `ours` gives only the files that exist, as paths from the root.
-It leaves out the files of `tests`, and of `.toolchain/tests` in the repository `my_c23_template`. Thus no check reads the tests of the project or of the toolchain.
+It leaves out the files of `tests`, and of `.toolchain/tests` in the repository `mc23t`. Thus no check reads the tests of the project or of the toolchain.
 
 With `tests=True`, `ours` keeps the files of `tests`, and leaves out only `.toolchain/tests`. The check of the retired words uses it.
 

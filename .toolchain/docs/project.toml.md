@@ -1,7 +1,8 @@
 # .toolchain/project.toml
 
 `.toolchain/project.toml` holds `[project]`, `[test]` and `[ci]`.
-The other values are in the files of `.toolchain/config`, one file for each concern: `artifacts.toml`, `modules.toml`, `targets.toml`, `kinds.toml`, `sources.toml`, `variables.toml`, `package.toml`, `checks.toml`, `leaks.toml` and `fail.toml`.
+The other values are in the files of `.toolchain/config`, one file for each concern.
+The files are `artifacts.toml`, `modules.toml`, `targets.toml`, `kinds.toml`, `sources.toml`, `variables.toml`, `package.toml`, `checks.toml`, `leaks.toml`, `fail.toml` and `build.toml`.
 zig, the compiler flags and the limits of the style are in `.toolchain/toolchain.toml`.
 The tools read every file as one configuration.
 
@@ -9,6 +10,7 @@ The tools read every file as one configuration.
 - If two files give the same list of tables, for example `[[source]]` or `[[artifact]]`, the list holds the tables of the two files.
 - If two files give the same key, the tools stop: `<file> states <key>, and <file> states it too`.
 - A file of a project cannot change a value of `.toolchain/toolchain.toml`. Do not change `.toolchain/toolchain.toml`.
+- `[project] targets` picks the targets of the project from `.toolchain/toolchain.toml`. It changes no value of that file.
 
 Each section of this document gives the keys of one table.
 For example, these lines make a program from the sources of `src`:
@@ -39,6 +41,7 @@ The tools give these variables:
 | `{home}` | The name of the target of this machine. |
 | `{python}` | The Python program that runs the tool. |
 | `{zig}` | The zig program. |
+| `{macos_sdk}` | The SDK of macOS that `xcrun --show-sdk-path` gives on a macOS host. A text that uses it on another host, or when `xcrun` gives no path, stops the tool. |
 | `{paths}` | The `*_PATH` macros of the test libraries, as `.toolchain/docs/build.py.md`, *Modules*, tells. |
 
 A case has more variables: `docs/contributing/tests.md`, *Variables* gives them.
@@ -61,8 +64,20 @@ They also stop if a list variable is a part of a text, and has no separator.
 | Key | Value |
 | --- | --- |
 | `name` | The name of the project. The title of `readme.md`, `package.txt` and the zip of `pack` take it. |
+| `targets` | The targets of the project: a list of names of `[targets]` of `.toolchain/toolchain.toml`, for example `["x86_64-windows-gnu", "x86_64-linux-gnu"]`. |
 
 If `name` is empty, the tools that need it stop: `.toolchain/project.toml: write the name of the project in [project] name`.
+
+The tools see only the targets of `targets`. Thus a build, a fetch, the matrices of the workflows and the zips of a release have only these targets.
+A port to one more target is one more name in `targets`, and one more row in each matrix: `.toolchain/docs/workflows.py.md`, *The check*.
+Each project states its targets. A folder with no `.toolchain/project.toml` is no project, and the tools see each target there.
+The tools stop with these faults:
+
+- `.toolchain/project.toml: write the targets of the project in [project] targets`, if the project has no `targets`.
+- `[project] targets: <name> is not a target of the toolchain`, for a name that `[targets]` does not have.
+- `[project] targets: <name> comes 2 times`, for a name 2 times in the list.
+
+`test --toolchain` and `fetch --toolchain` see each target of `.toolchain/toolchain.toml`, because they test the toolchain itself.
 
 ## [variables]
 
@@ -180,6 +195,7 @@ A kind gives the steps that make an artifact.
 | --- | --- |
 | `output` | The name of the file of an artifact. |
 | `steps` | The steps that make an artifact. |
+| `each` | Optional. One step that runs once for each source, before `steps`: *Each source*. |
 | `unlinked` | Optional. The steps when one of the files of `link` is missing. |
 | `flags` | Optional. The flags of the compiler that the kind adds to each of its artifacts. They can contain variables, also the variables of the artifact, for example `{manifest}`. |
 
@@ -194,7 +210,7 @@ A step does one of these actions:
 | `copy` | Copies the first file to the second file. |
 | `rename` | Moves the first file to the second file. |
 
-In a step with `cwd`, `{sources}` and each folder of `{include}` are whole paths, and so are the caches of zig.
+In a step with `cwd`, `{sources}`, each folder of `{include}`, `{output}`, `{objects}` and `{link}` are whole paths, and so are the caches of zig.
 Each other relative path of the command is a path from `cwd`.
 For example, a command that runs in the folder of a library can link it by its bare name.
 
@@ -204,18 +220,43 @@ The steps can use these variables of the artifact:
 | --- | --- |
 | `{name}` | The name of the artifact. |
 | `{output}` | The file of the artifact. |
-| `{work}` | The start of the name of a temporary file. |
+| `{work}` | The start of the name of a temporary file: `{out}/obj/` and the path of `{output}` in `{out}`. Thus 2 artifacts with 1 name have their own files. |
 | `{sources}` | The files that match the patterns of `sources`. |
 | `{defines}` | Each item of `defines`, after `-D`. |
 | `{include}` | Each folder of `include`, after `-I`. |
 | `{flags}` | The items of `flags` of the kind, then the items of `flags` of the artifact. |
 | `{link}` | The files of `link`. |
 | `{manifest}` | The items of `manifest`. |
+| `{objects}` | With `each`, the object of each source. |
+
+### Each source
+
+With `each`, the kind compiles each source alone. Then its `steps` make the artifact from `{objects}`.
+`each` is one step with `run`. Its command can use the variables of the artifact, and these 3 variables:
+
+| Variable | Value |
+| --- | --- |
+| `{source}` | The source. |
+| `{object}` | The file of the object of the source. |
+| `{deps}` | The file where the compiler writes the headers that the source reads, for example after `-MD -MF`. |
+
+With the runner `zig`, each source is a step of the graph.
+Then a change of one source or of its headers runs only its own step and the `steps` of its artifact.
+`.toolchain/docs/build.py.md`, *The runner zig*, tells the graph.
+A kind with no `each` is one step of the graph, and a header is no input of it.
 
 ## [targets.\<target\>]
 
-`.toolchain/toolchain.toml` gives six targets, and `.toolchain/docs/toolchain.toml.md` describes their keys.
+`.toolchain/toolchain.toml` gives six targets, and `.toolchain/docs/toolchain.toml.md` describes their keys. `[project] targets` picks the targets of the project.
 `.toolchain/project.toml` can add more keys to a target. Each key of a target is a variable.
+
+## [build]
+
+A project writes `[build]` in `build.toml` of `.toolchain/config`.
+
+| Key | Value |
+| --- | --- |
+| `runner` | Optional. `zig` or `mpbt`. The default is `zig`. `.toolchain/docs/build.py.md`, *The runners* tells each one. |
 
 ## [[artifact]]
 
@@ -230,6 +271,7 @@ An artifact is a file that the build makes, for example a program, a library or 
 | `defines` | Optional. The macros, without `-D`. |
 | `flags` | Optional. More flags of the compiler, for example `-fvisibility=hidden` or `-lm`. They come after the sources and the files of `link`. They can contain variables. |
 | `link` | Optional. The files that the artifact links. |
+| `inputs` | Optional. The files that another artifact of the build makes, which the sources read, for example with `#embed`. `{inputs}` holds each folder after `--embed-dir=`, the search path of `#embed`, and `zig build` makes each one before this artifact. An input is no file of `link`, and the deliverable does not hold it. |
 | `beside` | Optional. The files to copy into the folder of the artifact. |
 | `manifest` | Optional. A list of texts for the steps. |
 | `folder` | Optional. The folder of the artifact, in the output folder of the target. |
@@ -294,6 +336,7 @@ A project can have parts, for example a family of modules in one repository.
 Each part builds, tests, packs and releases alone, with `--part <part>`: `.toolchain/docs/project.py.md`, *Parts*.
 `[parts.<part>]` states the part `<part>`. The name `<part>` is in snake_case.
 Its key `folder` gives the folder of the part in `src`, `include`, `docs/extern`, `docs/intern`, `tests` and `tests/cases`.
+Each part has a readme, `docs/usage/<folder>.md`, and the release of the part holds it as `readme.md`.
 
 | Key | Value |
 | --- | --- |
@@ -351,7 +394,7 @@ A project with no `[parts]` states no part, and each command acts on the full pr
 
 | Key | Value |
 | --- | --- |
-| `needs` | Optional. What the cases need from a runner of the workflows: `display`, `vulkan` or `gl`. The default is an empty list. `.toolchain/docs/runner.py.md` tells what each need gives on each system. |
+| `needs` | Optional. The needs of the cases of a runner of the workflows, for example a display. Each name is a need that the project declares. The default is an empty list. `.toolchain/docs/runner.py.md`, *The needs*, tells the tables of a need. |
 
 For example, the cases of a module that opens a window and draws with Vulkan need these:
 
@@ -365,7 +408,8 @@ needs = ["display", "vulkan"]
 | Key | Value |
 | --- | --- |
 | `unicode` | Optional. The paths of the files that can hold text that is not ASCII. A path can contain `*`. The default is an empty list. |
-| `guides` | Optional. The names of the guides that the project adds to `docs/contributing`, beside the 8 guides of the repository `my_c23_template`, for example `timings.md`. `.toolchain/docs/layout.py.md`, *The paths* allows them. |
+| `guides` | Optional. The names of the guides that the project adds to `docs/contributing`, beside the guides of the repository `mc23t`, for example `timings.md`. `.toolchain/docs/layout.py.md`, *The paths* allows them. |
+| `tags` | Optional. The tags of blocks of code that the project adds to `[prose] tags` of `.toolchain/toolchain.toml`, for example `python`. `.toolchain/docs/prose.py.md`, *Blocks of code* tells the check. |
 | `retired` | Optional. A table of the retired words of the project. A key is a retired word, and its value is the word to write, or an empty text. `.toolchain/docs/text.py.md`, *Retired words* tells the check. |
 | `makes` | Optional. A table: each key is a macro whose call makes a public name of its first argument. The value is the end that the name gets, or an empty text. `.toolchain/docs/cover.py.md`, *The public names* tells the check. |
 | `refuse` | Optional. The paths of the lists of the calls that the code must not make, with one name on each line. A path can hold variables. The default is an empty list. `.toolchain/docs/text.py.md`, *Refused calls* tells the check. |
@@ -406,6 +450,26 @@ why = "The table of the grammar is one long function."
 ```
 
 The check of the style reports an exception that excuses nothing.
+
+## [[dup.exception]]
+
+An exception lets a group of documents share passages, for `.toolchain/tools/dup.py`.
+A project writes it in `checks.toml` of `.toolchain/config`.
+
+| Key | Value |
+| --- | --- |
+| `paths` | The paths of the documents. A path can contain `*`. |
+| `why` | The reason the documents share passages. |
+
+For example:
+
+```toml
+[[dup.exception]]
+paths = ["docs/contributing/coding_style.md", "docs/contributing/coding_style_cxx.md"]
+why = "Each coding guide states each of its rules in full, for a reader of one language."
+```
+
+`.toolchain/docs/dup.py.md`, *Exceptions*, tells the faults of an exception.
 
 ## [[branches.exception]]
 

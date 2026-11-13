@@ -269,12 +269,12 @@ def probed(config, values):
     edits, skips, outers = {}, {}, {}
     trees = rewrite.each(config, values, lambda top, path, tree: (walked(top, path, tree),
                                                                   rewrite.found(top, path, tree, calls)))
-    for probing, (name, used, declared, _) in trees:
+    for (probing, (name, used, declared, _)), parts in trees:
         for path, table in probing.edits.items():
             edits.setdefault(path, {}).update(table)
         for path, table in probing.skips.items():
             skips.setdefault(path, {}).update(table)
-        outers[name] = fail.layer((root / name).read_bytes(), used, declared, calls)
+        outers[name] = fail.layer((root / name).read_bytes(), used, declared, calls, parts)
     return written(root, rewrite.tree(values, 'branches'), edits, skips, outers)
 
 
