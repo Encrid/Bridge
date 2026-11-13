@@ -21,7 +21,7 @@ Then it takes the dependencies with `take.py`.
 
 `main` does these steps:
 
-1. It reads the options and the configuration. With `--toolchain`, the configuration has each target of `.toolchain/toolchain.toml`, as for a test of the toolchain.
+1. It reads the options and the configuration. With `--toolchain`, it fetches for each target of the toolchain: `.toolchain/docs/project.toml.md`, *[project]*.
 2. It stops if no target of the project runs on this machine: `fetch runs on a machine of a target`.
 3. If the pinned zig is not there, it downloads zig. Then it writes the path of zig.
 4. It makes the variables, with the target of this machine.
