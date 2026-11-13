@@ -11,7 +11,7 @@ The tool writes one line with `--part <part>` for each part, in the order of the
 
 ## The part of a path
 
-The rule is that of a file of a part: a file in the folder of the part, the readme of the part, or the config file of the part.
+A file of a part is in the folder of the part, or is its readme or its config file.
 
 1. A path under `src/`, `include/`, `docs/extern/`, `docs/intern/`, `tests/cases/` or `tests/` loses that prefix. The first prefix that matches wins.
 2. `docs/usage/<folder>.md` gives the folder of the readme.
@@ -20,8 +20,8 @@ The rule is that of a file of a part: a file in the folder of the part, the read
 
 ## The scope
 
-1. Each part that uses a changed part joins, and so does each part that uses one of them, until no part joins.
-2. The tool writes nothing when the project has no part, when a path belongs to no part, or when the list holds no path.
+1. A part that uses a changed part joins. Then a part that uses a joined part joins, until no part joins.
+2. The tool writes nothing for a project with no part, for a path of no part, or for an empty list.
 3. It writes nothing with `--into main` too, since each test command runs for the whole project when `dev` goes into `main`.
 
 The messages are `name the list of the changed paths with --changed` and `cannot read the list <path>`.
