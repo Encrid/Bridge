@@ -58,8 +58,11 @@ def tests(settings, root, found, group, path):
 
 def claimed(settings, root, names):
     found = groups(settings, root)
-    named = [group for group in found if group['name'] in names]
-    return lambda path: any(tests(settings, root, found, group, path) for group in named)
+
+    def measured(path):
+        testers = [group['name'] for group in found if tests(settings, root, found, group, path)]
+        return bool(testers) and all(name in names for name in testers)
+    return measured
 
 
 def scoped(settings, root, paths, into):

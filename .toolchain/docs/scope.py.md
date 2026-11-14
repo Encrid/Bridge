@@ -59,6 +59,6 @@ A project with no case group gives nothing.
 | `scoped(settings, root, paths, into)` | Gives the sorted names of the groups of the scope. |
 | `groups(settings, root)` | Gives each group of `[test] cases` that has a case: its name, its file, its `code`, its `whole` and its part. |
 | `tests(settings, root, found, group, path)` | Tells if a group tests a path. `found` holds each group of the project. |
-| `claimed(settings, root, names)` | Gives the function that tells if a named group tests a file: `.toolchain/docs/branches.py.md`, *The files of the named groups*. |
+| `claimed(settings, root, names)` | Gives the function that tells if the named groups hold each group that tests a file: `.toolchain/docs/branches.py.md`, *The files of the named groups*. |
 | `owner(settings, root, path)` | Gives the part of one path, or `None`. |
 | `stated(root, path)` | Gives the part that a config file states alone, or `None`. |
