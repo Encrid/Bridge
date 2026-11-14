@@ -11,9 +11,91 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
+  gate:
+    name: ${{ matrix.gate.name }} (${{ matrix.platform.target }})
     strategy:
       fail-fast: false
+      matrix:
+        platform:
+          - target: x86_64-linux-gnu
+            runner: ubuntu-latest
+            architecture: x64
+          - target: aarch64-linux-gnu
+            runner: ubuntu-24.04-arm
+            architecture: arm64
+          - target: aarch64-macos
+            runner: macos-latest
+            architecture: arm64
+          - target: x86_64-macos
+            runner: macos-15-intel
+            architecture: x64
+          - target: x86_64-windows-gnu
+            runner: windows-latest
+            architecture: x64
+          - target: aarch64-windows-gnu
+            runner: windows-11-arm
+            architecture: arm64
+        gate:
+          - name: test
+            run: test
+          - name: break
+            run: test --break
+          - name: branches
+            run: test --branches
+          - name: leaks
+            run: test --leaks
+    runs-on: ${{ matrix.platform.runner }}
+    timeout-minutes: 60
+    env:
+      PYTHONUNBUFFERED: '1'
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+          architecture: ${{ matrix.platform.architecture }}
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: build/zig-cache/global
+          key: zig-${{ hashFiles('.toolchain/toolchain.toml') }}-${{ matrix.platform.target }}
+      - name: Runner
+        run: |
+          python .toolchain/tools/runner.py --target ${{ matrix.platform.target }} > "$RUNNER_TEMP/runner.sh"
+          bash -e "$RUNNER_TEMP/runner.sh"
+      - name: Fetch
+        run: python project.py fetch
+      - name: Check
+        if: matrix.gate.name == 'test'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: python project.py check --commits "$BASE..$HEAD"
+      - name: Gate
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          INTO: ${{ github.base_ref }}
+        run: |
+          git diff --name-only "$BASE...$HEAD" > "$RUNNER_TEMP/changed.txt"
+          groups=$(python .toolchain/tools/scope.py --changed "$RUNNER_TEMP/changed.txt" --into "$INTO")
+          if [ -z "$groups" ]; then
+            echo "no case group tests this change"
+          else
+            python project.py ${{ matrix.gate.run }} $groups
+          fi
+      - name: Pack
+        if: matrix.gate.name == 'test'
+        run: python project.py pack --target ${{ matrix.platform.target }}
+  check:
+    needs: gate
+    if: always()
+    strategy:
       matrix:
         include:
           - target: x86_64-linux-gnu
@@ -34,36 +116,10 @@ jobs:
           - target: aarch64-windows-gnu
             runner: windows-11-arm
             architecture: arm64
-    runs-on: ${{ matrix.runner }}
-    timeout-minutes: 60
-    defaults:
-      run:
-        shell: bash
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-          fetch-depth: 0
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
-        with:
-          python-version: '3.13'
-          architecture: ${{ matrix.architecture }}
-      - name: Runner
-        run: python .toolchain/tools/runner.py --target ${{ matrix.target }} | bash -e
-      - name: Fetch
-        run: python project.py fetch
-      - name: Check
+      - name: Gates
         env:
-          BASE: ${{ github.event.pull_request.base.sha }}
-          HEAD: ${{ github.event.pull_request.head.sha }}
-        run: python project.py check --commits "$BASE..$HEAD"
-      - name: Test
-        run: python project.py test
-      - name: Break
-        run: python project.py test --break
-      - name: Branches
-        run: python project.py test --branches
-      - name: Leaks
-        run: python project.py test --leaks
-      - name: Pack
-        run: python project.py pack --target ${{ matrix.target }}
+          RESULT: ${{ needs.gate.result }}
+        run: test "$RESULT" = success

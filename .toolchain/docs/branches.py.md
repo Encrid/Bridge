@@ -23,10 +23,27 @@ The measure does not probe a constant part: `static_assert`, `sizeof`, `_Generic
 1. `rewrite.each` gives the syntax tree of each file `.c` of `src` that the build compiles: `.toolchain/docs/rewrite.py.md`, *The steps*.
 2. In each syntax tree, `walked` finds the conditions, the labels and the functions of `src` and `include`.
 3. `rewrite.found` finds the functions of `listed` of `fail.py` that the file uses, and `fail.layer` gives the layer.
-4. `written` copies `src` and `include` into `<build>/branches/tree`, and writes the probes and the layers into the copies.
+4. With `--part`, `mine` keeps only the probes and the gaps of the files of the named parts. With `--group`, it keeps only those of the code of the named groups.
+5. `written` copies `src` and `include` into `<build>/branches/tree`, and writes the probes and the layers into the copies.
 
 A header gets the probes of each tree that includes it.
 `test.py` then builds the copies, runs the cases and calls `reported`: `.toolchain/docs/test.py.md`, *The branches*.
+
+## The files of the named parts
+
+With `--part`, a file gets probes only if it belongs to a named part. `part_of` of `shared.py` gives the part of the file, from its path after `src/` or `include/`.
+A file of a different part, or of no part, compiles with no probes. Its own part measures it, and so does a run with no `--part`.
+Thus a part that compiles a source or includes a header of a different part does not get the outcomes of that code.
+
+A source with no probes still gets its layer of fail, so a case with `fail` acts as in a run with no `--part`.
+The report then starts with `branches: measured parts <part>, <part>`.
+
+## The files of the named groups
+
+With `--group`, a file gets probes only if each group that tests it is named: `.toolchain/docs/scope.py.md`, *The code of a group*.
+Some groups test a file together, for example each group of a part with no `code`. A run of only one of them does not judge that file.
+Thus the cases of a group must reach each branch of the code that the group tests. A group does not get the outcomes of the code of a different group.
+A source with no probes still gets its layer of fail.
 
 ## The probes
 
@@ -115,9 +132,10 @@ An exemption that matches no unreached outcome is a fault, so a branch that a ca
 | `Probing.skip(loc, kind)` | Keeps a branch that cannot get a probe. |
 | `walked(root, path, tree)` | Gives the probes of the syntax tree of one file and of its headers. |
 | `rewritten(text, path, edits, prefix, part, outer)` | Gives a file with its probes and its layer `outer`, and the line and column of each probe. `part` gives the first byte and the number of bytes of the file in the file of the hits. |
-| `probed(config, values)` | Writes the copies with the probes and the layers, as *The steps* tells. It gives the probes and the branches that are not measured. |
-| `written(root, where, edits, skips, outers)` | Copies `src` and `include` with `rewrite.copied`, and writes the probes and the layer of each file. `outers` gives the layer of each file. |
+| `mine(config, path, named, claimed)` | Tells if a file gets probes: each file with no `named`, else only a file of a part of `named`. With `claimed`, the file must also pass that function. |
+| `probed(config, values, named)` | Writes the copies with the probes and the layers, as *The steps* tells. It gives the probes and the branches that are not measured. `named` holds the parts of `--part`, and `claimed` is the function of `--group`. |
+| `written(root, where, edits, skips, outers)` | Copies `src` and `include` with `rewrite.copied`, and writes the probes and the layer of each file. `outers` gives the layer of each file. A source with a layer and no probes gets its layer with `wrapped` of `fail.py`. |
 | `parts(rows)` | Gives the first byte and the number of bytes of each file in the file of the hits, and the size of that file. `rows` gives the probes of each file. |
 | `joined(probes, hits)` | Gives the bits of each file, from its part of the file `hits`. |
 | `excused(listed, system, name, line, col, said)` | Tells if an exemption of `listed` matches this unreached outcome on this system, and counts the match. |
-| `reported(probes, gaps, hits, excepted, system)` | Writes the report, as *The report* tells. `excepted` holds the exemptions, and `system` is the system of the build. |
+| `reported(probes, gaps, hits, excepted, system, named)` | Writes the report, as *The report* tells. `excepted` holds the exemptions, and `system` is the system of the build. With `named`, it first names the measured parts. |

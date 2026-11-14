@@ -27,7 +27,7 @@ void test_hand_settings(host_t *h)
         settings[2].v.f = 2.5;
     if (!strcmp(h->arg, "string"))
         settings[3].v.s = "elsewhere";
-    h->backends[1].library = PLAIN_REFUSING_PATH;
+    h->backends[1].library = BRIDGE_PLAIN_REFUSING_PATH;
     h->backends[1].settings = settings;
     h->backends[1].setting_count = 4;
     host_open_only(h);

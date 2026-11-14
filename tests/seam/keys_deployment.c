@@ -104,13 +104,13 @@ void test_edit_backend(host_t *h)
     if (!strcmp(h->arg, "twice"))
         h->backends[1].name = h->backends[0].name;
     if (!strcmp(h->arg, "hollow"))
-        h->backends[1].library = HOLLOW_PATH;
+        h->backends[1].library = BRIDGE_HOLLOW_PATH;
     if (!strcmp(h->arg, "refusing"))
-        h->backends[1] = (bridge_backend_t){ "plain", PLAIN_REFUSING_PATH };
+        h->backends[1] = (bridge_backend_t){ "plain", BRIDGE_PLAIN_REFUSING_PATH };
     if (!strcmp(h->arg, "module"))
         h->backends[1].library = OK_PATH;
     if (!strcmp(h->arg, "untold"))
-        h->backends[1] = (bridge_backend_t){ "plain", TESTS_PATH };
+        h->backends[1] = (bridge_backend_t){ "plain", BRIDGE_TESTS_PATH };
     host_open_only(h);
 }
 

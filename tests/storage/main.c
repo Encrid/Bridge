@@ -33,8 +33,8 @@ static const bridge_setting_t KEEPS_ALL[4] = {
 };
 
 static const bridge_backend_t BACKENDS[2] = {
-    { "guarded", TESTS_ALL_PATH, KEEPS_ALL, 4 },
-    { "tests", TESTS_PATH, KEEPS, 4 }
+    { "guarded", BRIDGE_TESTS_ALL_PATH, KEEPS_ALL, 4 },
+    { "tests", BRIDGE_TESTS_PATH, KEEPS, 4 }
 };
 
 static const storage_test_room_t PLAIN = { BACKENDS + 1, 1, 1, 32'768,

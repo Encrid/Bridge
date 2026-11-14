@@ -4,7 +4,7 @@ This document gives the style of the C code of the project.
 With the style, each file looks as if one person wrote it.
 Thus it is easier to read the code, to debug it, to maintain it, to reuse it and to test it.
 
-The style is a convention of syntax only. Code that obeys the style can still be incorrect.
+Most rules of the style are conventions of syntax. Code that obeys the style can still be incorrect.
 Obey the style from the first line. That is easier than a change of finished code.
 If no rule decides a choice, select the option that makes the code clearer.
 Do not write unclear code that this document does not name.
@@ -83,10 +83,12 @@ Indent each directive of the preprocessor by its level. Each level is 4 spaces.
 `#if`, `#ifdef` and `#ifndef` open a level, and `#endif` closes it. `#else` and `#elif` are at the level of their `#if`.
 Do not put a space between `#` and the name of the directive.
 
+Only a directive takes these levels. A line of code keeps the level of its code, L2.
+
 ```c
 #ifndef WIN32
     #if defined(__i386__) || defined(__x86_64__)
-        constexpr size_t PAGE_SIZE = 4096;
+constexpr size_t PAGE_SIZE = 4096;
     #else
         #error "Unknown architecture"
     #endif
@@ -183,7 +185,7 @@ This code breaks the rule:
 phys_addr_t alloc_frame();
 ```
 
-A function has at most 4 arguments. A variadic function is permitted. Its `...` counts as one argument.
+A function has at most 4 arguments. A variadic function is allowed. Its `...` counts as one argument.
 Give a structure to a function through a pointer, and not as a copy.
 
 ### F6 - The comments
@@ -435,7 +437,7 @@ int* a;
 
 ## C - The control structures
 
-Each control structure is permitted, if no rule refuses it.
+Each control structure is allowed, if no rule refuses it.
 
 ### C1 - The conditional branches
 
@@ -525,6 +527,100 @@ This code breaks the rule:
 ```c
 int counter;
 unsigned int get_obj_size(void const *object);
+```
+
+### A3 - The atomics
+
+Use the atomic types of `<stdatomic.h>` by their names, for example `atomic_uint_least32_t` or `atomic_size_t`.
+Do not write the keyword `_Atomic`. C++ has no keyword `_Atomic`, and a header of C can also be a header of C++.
+
+Use an atomic value only through a function of `<stdatomic.h>` whose name ends with `_explicit`. Give the memory order in each call.
+An operator on an atomic value is refused, for example `count++` or `count = 1`.
+If a function has an `_explicit` form, use that form.
+`atomic_init`, `atomic_thread_fence`, `atomic_signal_fence` and `atomic_is_lock_free` have no such form, and are allowed.
+
+A thread, a mutex or an event comes from the OS layer of the project, and never from `<threads.h>`.
+
+This code obeys the rule:
+
+```c
+typedef struct {
+    atomic_uint_least32_t claim;
+} pool_t;
+
+uint32_t pool_claim(pool_t *pool)
+{
+    return (atomic_fetch_add_explicit(&pool->claim, 1, memory_order_relaxed));
+}
+```
+
+This code breaks the rule:
+
+```c
+pool->claim++;
+atomic_fetch_add(&pool->claim, 1);
+```
+
+### A4 - The extensions of the compiler
+
+Use an extension of the compiler only if this rule names it.
+Each other extension is refused, also an extension that this rule does not name.
+
+| Extension | Rule |
+| --- | --- |
+| `__builtin_align_up` and `__builtin_align_down` | Allowed, to align a pointer or a size. |
+| `__builtin_convertvector` | Allowed, to convert each element of a vector. |
+| `__builtin_add_overflow`, `__builtin_sub_overflow` and `__builtin_mul_overflow` | Allowed, to compute and to detect an overflow. They replace `<stdckdint.h>`, which some targets lack. |
+| `__builtin_popcountg`, `__builtin_clzg` and `__builtin_ctzg` | Allowed, to count bits. They replace `<stdbit.h>`, which macOS and Windows lack. |
+| `[[gnu::cold]]`, `[[gnu::hot]]`, `[[gnu::noinline]]` and `[[gnu::always_inline]]` | Allowed. They only guide the compiler. |
+| `[[gnu::format(...)]]` and `[[gnu::nonnull]]` | Allowed. They add a check. |
+| `[[gnu::visibility("hidden")]]` and `[[gnu::visibility("default")]]` | Allowed. |
+| `[[clang::ext_vector_type(...)]]` and `[[clang::matrix_type(...)]]` | Allowed, for the vector and matrix types. |
+| `__builtin_assume` and `__builtin_unreachable` | Refused. A false condition gives undefined behavior. Examine the condition with `if` or with `assert`. |
+| `[[gnu::constructor]]` and `[[gnu::destructor]]` | Refused. Code runs before or after `main`, G4. |
+| `[[gnu::packed]]` | Refused. It changes the layout of a structure. |
+| `[[gnu::weak]]` | Refused. The linker selects the function of a call. |
+
+This code obeys the rule:
+
+```c
+[[gnu::cold]] void report_failure(char const *reason);
+```
+
+This code breaks the rule:
+
+```c
+[[gnu::constructor]] void setup(void);
+```
+
+### A5 - The instructions of a processor
+
+The intrinsics of a family of processors are allowed, for example `<immintrin.h>` or `<arm_neon.h>`.
+Put each use behind `#if` on a macro of the processor, for example `__x86_64__` or `__aarch64__`.
+Each such `#if` has an `#else` with the portable code, so that each target builds.
+Do not write `asm`. The compiler does not examine its instructions.
+
+This code obeys the rule:
+
+```c
+#if defined(__x86_64__)
+    #include <emmintrin.h>
+#endif
+
+void fill_bytes(uint8_t *to, uint8_t byte)
+{
+#if defined(__x86_64__)
+    _mm_storeu_si128((__m128i *)to, _mm_set1_epi8((char)byte));
+#else
+    memset(to, byte, 16);
+#endif
+}
+```
+
+This code breaks the rule:
+
+```c
+asm("pause");
 ```
 
 ## H - The headers

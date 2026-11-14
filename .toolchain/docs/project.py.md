@@ -46,6 +46,7 @@ If the command is not in the table, `project.py` stops with the message
 | `--root <folder>` | Uses the project in this folder. The default is the folder of `project.py`. |
 | `--target <target>` | Builds for this target. The default is the target of this machine. |
 | `--part <part>` | Acts on this part only: *Parts*. You can use this option more than one time. It is an option of `build`, `pack`, `test` and `join`. |
+| `--group <group>` | Runs only this case group. You can use this option more than one time. It is an option of `test`. |
 | `--tag <tag>` | Takes the part from the tag of a release: a tag `<part>-v<major>.<minor>.<patch>` gives `--part <part>`, and a tag `v<major>.<minor>.<patch>` gives no part. |
 | `--debug` | Replaces each variable that `[debug]` names with the value of `[debug]`. |
 | `--out <folder>` | Puts the output into this folder. The default is the folder `build` of the project. |
@@ -57,7 +58,7 @@ If the command is not in the table, `project.py` stops with the message
 | `-k <text>` | Runs only the cases whose name contains `<text>`. It is an option of `test` only. |
 | `--copies <number>` | Runs this number of copies of each case at the same time. It is an option of `test` only. |
 | `--rounds <number>` | Runs all the cases this number of times. It is an option of `test` only. |
-| `--toolchain` | Runs the cases of the toolchain, in place of the cases of the project. Only the repository `my_c23_template` has them. It is an option of `test` only. |
+| `--toolchain` | Runs the cases of the toolchain, in place of the cases of the project. Only the repository `mc23t` has them. It is an option of `test` only. |
 | `--branches` | Builds the project with probes, runs each case one time, and writes each branch that no case reaches. It is an option of `test` only. |
 | `--leaks` | Builds the project with counts, runs each case one time, and writes each case that keeps a resource. It is an option of `test` only. |
 | `--all` | Removes all of the output folder. The command `distclean` gives this option to `.toolchain/tools/clean.py`. |
@@ -122,7 +123,7 @@ The workflow `release.yml` gives `--tag` in place of `--part`: `.toolchain/docs/
 
 ## The tests of the toolchain
 
-The cases of the toolchain are only in the repository `my_c23_template`, in `.toolchain/tests/cases`. The files that they read are in `.toolchain/tests/data`.
+The cases of the toolchain are only in the repository `mc23t`, in `.toolchain/tests/cases`. The files that they read are in `.toolchain/tests/data`.
 `.toolchain/tests/docs` describes each group.
 Run them in that repository after each change of the toolchain:
 
