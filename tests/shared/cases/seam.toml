@@ -1,3 +1,5 @@
+code = ["include/**", "src/abi/**", "src/backend/**", "src/bits.h", "src/block/**", "src/bridge/bridge_backend.c", "src/bridge/bridge_backends.c", "src/bridge/bridge_calls.c", "src/bridge/bridge_check.c", "src/bridge/bridge_create.c", "src/bridge/bridge_destroy.c", "src/bridge/bridge_inside.h", "src/bridge/bridge_keys.c", "src/bridge/bridge_load.c", "src/bridge/bridge_module_usage.c", "src/bridge/bridge_phases.c", "src/bridge/bridge_profile.c", "src/bridge/bridge_reload.c", "src/bridge/bridge_run.c", "src/bridge/bridge_stop.c", "src/bridge/bridge_unload.c", "src/bridge/bridge_usage.c", "src/config/**", "src/hash.h", "src/inside.h", "src/leaks.toml", "src/module/**", "src/pool/**", "src/region/**", "src/reload/**", "src/say/**", "src/schedule/**", "src/schema/**", "src/storage/**", "tests/backend/**", "tests/binding/**", "tests/modules/**", "tests/schema/schema_test.h", "tests/seam/**", "tests/shared/**", "tests/storage/storage_test.h", "tests/support/**", ".toolchain/config/**", ".toolchain/project.toml"]
+
 [[case]]
 name = "attach-many-values-through-little-scratch"
 run = ["{out}/seam{exe}", "attach-many-values-through-little-scratch"]
