@@ -14,7 +14,7 @@ With `--pack`, it also puts the deliverable into a zip file. With `--join`, it j
 | `run_in(step, values)` | Runs the command of a step in its folder `cwd`, as *Steps* tells. |
 | `do(step, values, unstamped)` | Does one step of a kind. |
 | `put(path, source)` | Writes a copy of `source` only if it is not there or is different. Then it gives the copy the mode of `source`, as *The deliverable* tells. |
-| `moved(path, tree)` | Gives the path in `tree` for a path of `src` or of `include`, and else the path. With no tree, it gives the path. |
+| `moved(path, tree)` | Gives the path in `tree` for a path of `src` or of `include`, and for each other path that `tree` holds. Else it gives the path. With no tree, it gives the path. |
 | `planned(config, values, artifact, tree)` | Gives the kind and the variables of one artifact, as steps 1 to 4 of *Artifacts* tell. |
 | `built(config, values, artifact, tree)` | Builds one artifact with the runner `mpbt`. It gives the name of the artifact and its files. |
 | `wrote(name, output)` | Stops if the steps of an artifact did not write its output. |

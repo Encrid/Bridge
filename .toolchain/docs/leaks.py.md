@@ -1,7 +1,10 @@
 # .toolchain/tools/leaks.py
 
 `leaks.py` counts the resources that the code takes and gives back, for `test --leaks`.
-Each case must give back each resource that the code of `src` takes: `docs/contributing/tests.md`, *The leaks*.
+Each case must give back each resource that the code takes: `docs/contributing/tests.md`, *The leaks*.
+The count is in each file `.c` of `src`, and in each test source: `.toolchain/docs/rewrite.py.md`, *The test sources*.
+Thus a test that frees a block of the code gives it back, and a test that takes a block must free it.
+A test source gets no layer of `fail`: `.toolchain/docs/fail.py.md`.
 
 ## What it counts
 

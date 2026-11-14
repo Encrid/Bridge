@@ -72,7 +72,7 @@ def put(path, source):
 
 
 def moved(path, tree):
-    if tree and path.split('/', 1)[0] in ('src', 'include'):
+    if tree and (path.split('/', 1)[0] in ('src', 'include') or (Path(tree) / path).exists()):
         return (Path(tree) / path).as_posix()
     return path
 

@@ -143,14 +143,15 @@ def counted(config, values):
                         for act, _, place, _ in effects)}
     root, where = Path(values['root']), rewrite.tree(values, 'leaks')
     files = rewrite.each(config, values, lambda top, path, tree: rewrite.found(top, path, tree, {**calls, **names},
-                                                                              callbacks))
-    rewrite.copied(root, where)
+                                                                              callbacks), True)
+    rewrite.copied(root, where, [path for (path, _, _, _), _ in files])
     counting = []
     for (path, used, declared, ends), parts in files:
         if not used:
             continue
         text = (root / path).read_bytes()
-        outer = fail.layer(text, [name for name in used if name in calls], declared, calls, parts)
+        failing = [name for name in used if name in calls and path.startswith('src/')]
+        outer = fail.layer(text, failing, declared, calls, parts)
         (where / path).write_bytes(rewritten(text, path, [name for name in used if name in names], ends, declared,
                                              names, kinds, outer))
         counting.append(path)
