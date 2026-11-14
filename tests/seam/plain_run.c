@@ -44,7 +44,7 @@ void test_run_mixed(host_t *h)
     bridge_artifact_t a;
 
     if (!strcmp(h->arg, "other"))
-        h->backends[1].library = PLAIN_OTHER_PATH;
+        h->backends[1].library = BRIDGE_PLAIN_OTHER_PATH;
     if (host_open(h))
         return;
     test_state_plain(&a, "game:mover@0.1.0",

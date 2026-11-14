@@ -1,15 +1,15 @@
 [zig]
-version = "0.17.0"
+version = "0.17.1"
 folder = "build/zig"
 url = "https://ziglang.org/download/{version}/zig-{host}-{version}.{format}"
 
 [zig.archives]
-x86_64-windows-gnu = { host = "x86_64-windows", format = "zip", sha256 = "b5663f69581dcf391293fbf16c06cb80d81d806545ce618b4d0bab7f0eb8c428" }
-x86_64-linux-gnu = { host = "x86_64-linux", format = "tar.xz", sha256 = "1cbe9df9f27e6b78d14ccbca43b6703a404ef79ef1c463de901d7f088d4e2026" }
-aarch64-macos = { host = "aarch64-macos", format = "tar.xz", sha256 = "b607e9b9234790a008116ae5bdb71c6243b84b9fb42a53a9e70fde41c06c536a" }
-aarch64-linux-gnu = { host = "aarch64-linux", format = "tar.xz", sha256 = "9e8d11661d4ae3bd57702a3832781e23ad151dde5798e16a5ccd503f65234ff8" }
-x86_64-macos = { host = "x86_64-macos", format = "tar.xz", sha256 = "4f9a1c5269aa17ebda5e6d3c2b89d6cbf36f7d2b22a0306e9ab98f25f95529c6" }
-aarch64-windows-gnu = { host = "aarch64-windows", format = "zip", sha256 = "0a59d91fa1cb40cf068e9b0954434ce973500c7a2ea749f1e01af62cdab52d26" }
+x86_64-windows-gnu = { host = "x86_64-windows", format = "zip", sha256 = "b03f477a1943673e02aca0f570e8030dffd536ce1f45cbc4d3326ec31159562e" }
+x86_64-linux-gnu = { host = "x86_64-linux", format = "tar.xz", sha256 = "3581863e3cbcfd0fce0efc682ce7e9e93da96668a977791d356a26d2a7e9b17a" }
+aarch64-macos = { host = "aarch64-macos", format = "tar.xz", sha256 = "75f1bc7a1e9852f17ec9a0c1895f767c4ec56d46bc8a834920eece1d0359dd8d" }
+aarch64-linux-gnu = { host = "aarch64-linux", format = "tar.xz", sha256 = "a1546d5646eb184437918d6635ca6b762a0e889eac09cef720ee7a1ed3fe7795" }
+x86_64-macos = { host = "x86_64-macos", format = "tar.xz", sha256 = "9af07b20319fbd0c92ee46ad23e81d6a782b1aaea2cfb8dcbff35f1d2c7ddbb7" }
+aarch64-windows-gnu = { host = "aarch64-windows", format = "zip", sha256 = "4789895bdb1e312a2ea73b2a7c0a0cc8d2ab62ba6976e834a7c54cf443377c15" }
 
 [build]
 folder = "build"
@@ -117,20 +117,23 @@ runtime = []
 
 [kinds.program]
 output = "{name}{exe}"
+each = { run = ["{zig}", "cc", "-c", "-target", "{triple}", "-mcpu={cpu}", "{optimize}", "{float}", "{errno}", "{language}", "-Wno-unused-command-line-argument", "{define}", "{defines}", "{include}", "{inputs}", "{flags}", "{source}", "-MD", "-MF", "{deps}", "-o", "{object}"] }
 steps = [
-    { run = ["{zig}", "cc", "-target", "{triple}", "-mcpu={cpu}", "{optimize}", "{float}", "{errno}", "{language}", "{define}", "{defines}", "{include}", "{sources}", "{link}", "{flags}", "{rpath}", "-o", "{output}", "{stack}"] },
+    { run = ["{zig}", "cc", "-target", "{triple}", "-mcpu={cpu}", "{optimize}", "{float}", "{errno}", "{language}", "-Wno-unused-command-line-argument", "{objects}", "{link}", "{flags}", "{rpath}", "-o", "{output}", "{stack}"] },
 ]
 
 [kinds.library]
 output = "{name}{library}"
+each = { run = ["{zig}", "cc", "-c", "-target", "{triple}", "-mcpu={cpu}", "{pic}", "{optimize}", "{float}", "{errno}", "{language}", "-Wno-unused-command-line-argument", "{define}", "{defines}", "{include}", "{inputs}", "{flags}", "{source}", "-MD", "-MF", "{deps}", "-o", "{object}"] }
 steps = [
-    { run = ["{zig}", "cc", "-target", "{triple}", "-mcpu={cpu}", "-shared", "{pic}", "{soname}", "{optimize}", "{float}", "{errno}", "{language}", "{define}", "{defines}", "{include}", "{sources}", "{runtime}", "{link}", "{flags}", "-o", "{output}"] },
+    { run = ["{zig}", "cc", "-target", "{triple}", "-mcpu={cpu}", "-shared", "{pic}", "{soname}", "{optimize}", "{float}", "{errno}", "{language}", "-Wno-unused-command-line-argument", "{define}", "{defines}", "{include}", "{inputs}", "{objects}", "{runtime}", "{link}", "{flags}", "-o", "{output}"] },
 ]
 
 [kinds.archive]
 output = "{name}.a"
+each = { run = ["{zig}", "cc", "-c", "-target", "{triple}", "-mcpu={cpu}", "{optimize}", "{float}", "{errno}", "{language}", "-Wno-unused-command-line-argument", "{define}", "{defines}", "{include}", "{inputs}", "{flags}", "{source}", "-MD", "-MF", "{deps}", "-o", "{object}"] }
 steps = [
-    { run = ["{zig}", "build-lib", "-static", "-target", "{triple}", "-mcpu={cpu}", "-lc", "{strip}", "-femit-bin={output}", "-cflags", "{optimize}", "{float}", "{errno}", "{language}", "-Wno-unused-command-line-argument", "{define}", "{defines}", "{include}", "{flags}", "--", "{sources}"] },
+    { run = ["{zig}", "build-lib", "-static", "-target", "{triple}", "-mcpu={cpu}", "{strip}", "-femit-bin={output}", "{objects}"] },
 ]
 
 [kinds.file]
@@ -140,7 +143,7 @@ steps = [
 ]
 
 [rewrite]
-dump =["{zig}", "cc", "-target", "{triple}", "-mcpu={cpu}", "{optimize}", "{float}", "{errno}", "{language}", "-Wno-unused-command-line-argument", "{define}", "{defines}", "{include}", "{flags}", "-U_FORTIFY_SOURCE", "-D_FORTIFY_SOURCE=0", "-fsyntax-only", "-Xclang", "-ast-dump=json", "-o", "{work}.dump", "{source}"]
+dump =["{zig}", "cc", "-target", "{triple}", "-mcpu={cpu}", "{optimize}", "{float}", "{errno}", "{language}", "-Wno-unused-command-line-argument", "{define}", "{defines}", "{include}", "{inputs}", "{flags}", "-U_FORTIFY_SOURCE", "-D_FORTIFY_SOURCE=0", "-fsyntax-only", "-Xclang", "-ast-dump=json", "-o", "{work}.dump", "{source}"]
 
 [style]
 columns = 80
@@ -151,7 +154,19 @@ branches = 3
 depth = 2
 
 [prose]
+tags = ["pseudo", "c", "cpp", "toml", "sh", "text", "mermaid"]
 sentence = 25
 step = 20
 paragraph = 6
 description = 119
+
+[dup]
+words = 8
+
+[said]
+own = 6
+
+[commits]
+types = ["feat", "fix", "refactor", "chore", "docs", "test", "build", "perf", "style", "ci", "revert"]
+words = 20
+

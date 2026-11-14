@@ -3,6 +3,7 @@
 # Under the GNU Affero General Public License, version 3 only: see license.
 import base64
 import datetime
+import hashlib
 import json
 import os
 import sys
@@ -12,7 +13,7 @@ import urllib.request
 from shared import die
 
 SENTENCE = 'I have read cla.md and I sign it.'
-BRANCH, RECORD = 'cla-signatures', 'signatures.json'
+BRANCH, RECORD, PAGE, TRIES = 'cla-signatures', 'signatures.json', 100, 3
 ASK = '''Thank you for this pull request.
 Before we can merge it, @%s must sign the agreement cla.md at the root of this repository.
 The agreement is a licence. You keep the copyright of your work.
@@ -32,7 +33,7 @@ def decide(author, signed, by=None, said=None):
     return 'ask', False, '%s has not signed cla.md' % author
 
 
-def call(method, path, body=None):
+def call(method, path, body=None, empty=(404,)):
     request = urllib.request.Request(
         'https://api.github.com/repos/%s%s' % (os.environ['GITHUB_REPOSITORY'], path), method=method,
         data=json.dumps(body).encode() if body is not None else None,
@@ -42,9 +43,14 @@ def call(method, path, body=None):
         with urllib.request.urlopen(request) as answer:
             return json.loads(answer.read() or b'null')
     except urllib.error.HTTPError as wrong:
-        if wrong.code == 404:
+        if wrong.code in empty:
             return None
         die('%s %s answered %d: %s' % (method, path, wrong.code, wrong.read().decode('utf-8', 'replace')))
+
+
+def agreement():
+    with open('cla.md', 'rb') as text:
+        return hashlib.sha256(text.read()).hexdigest()
 
 
 def signatures():
@@ -54,31 +60,48 @@ def signatures():
     return json.loads(base64.b64decode(found['content'])), found['sha']
 
 
-def record(signed, version, author, number):
+def record(user, digest, number):
     if call('GET', '/git/ref/heads/%s' % BRANCH) is None:
         default = call('GET', '')['default_branch']
         tip = call('GET', '/git/ref/heads/%s' % default)['object']['sha']
         call('POST', '/git/refs', {'ref': 'refs/heads/' + BRANCH, 'sha': tip})
-    signed = signed + [{'name': author, 'day': datetime.date.today().isoformat(), 'pull_request': number}]
-    body = {'message': 'docs: record the agreement of %s' % author, 'branch': BRANCH,
-            'content': base64.b64encode((json.dumps(signed, indent=2) + '\n').encode()).decode()}
-    if version:
-        body['sha'] = version
-    call('PUT', '/contents/' + RECORD, body)
+    item = {'name': user['login'], 'id': user['id'], 'cla': digest, 'day': datetime.date.today().isoformat(),
+            'pull_request': number}
+    for _ in range(TRIES):
+        signed, version = signatures()
+        body = {'message': 'docs: record the agreement of %s' % user['login'], 'branch': BRANCH,
+                'content': base64.b64encode((json.dumps(signed + [item], indent=2) + '\n').encode()).decode()}
+        if version:
+            body['sha'] = version
+        if call('PUT', '/contents/' + RECORD, body, (404, 409)) is not None:
+            return
+    die('%s changed %d times during the record: run the workflow cla again' % (RECORD, TRIES))
+
+
+def asked(number, question):
+    page = 1
+    while True:
+        comments = call('GET', '/issues/%d/comments?per_page=%d&page=%d' % (number, PAGE, page)) or []
+        if any(question in one['body'] for one in comments):
+            return True
+        if len(comments) < PAGE:
+            return False
+        page += 1
 
 
 def main():
     event = json.load(open(os.environ['GITHUB_EVENT_PATH'], encoding='utf-8'))
     pull = event.get('pull_request') or call('GET', '/pulls/%d' % event['issue']['number'])
     comment = event.get('comment', {})
-    author, number, tip = pull['user']['login'], pull['number'], pull['head']['sha']
-    signed, version = signatures()
-    what, passes, why = decide(author, [one['name'] for one in signed], comment.get('user', {}).get('login'),
-                               comment.get('body'))
+    user, number, tip = pull['user'], pull['number'], pull['head']['sha']
+    digest = agreement()
+    signed, _ = signatures()
+    names = [user['login']] if any(one.get('id') == user['id'] and one.get('cla') == digest for one in signed) else []
+    what, passes, why = decide(user['login'], names, comment.get('user', {}).get('login'), comment.get('body'))
     if what == 'record':
-        record(signed, version, author, number)
-    question = ASK % (author, SENTENCE)
-    if what == 'ask' and not any(question in one['body'] for one in call('GET', '/issues/%d/comments?per_page=100' % number) or []):
+        record(user, digest, number)
+    question = ASK % (user['login'], SENTENCE)
+    if what == 'ask' and not asked(number, question):
         call('POST', '/issues/%d/comments' % number, {'body': question})
     call('POST', '/statuses/' + tip, {'state': 'success' if passes else 'failure', 'context': 'cla', 'description': why})
     print(why)

@@ -18,3 +18,7 @@ line = 56
 col = 16
 side = "false"
 why = "If the pin fails, Bridge keeps the handle of the library open, so that the library stays: docs/intern/bridge/bridge_destroy.c.md, The libraries of the backends. A case that makes the pin fail keeps that handle, and test --leaks counts it as a leak."
+
+[[dup.exception]]
+paths = ["docs/contributing/coding_style.md", "docs/contributing/coding_style_cxx.md"]
+why = "Each coding guide states each of its rules in full, for a reader of one language."

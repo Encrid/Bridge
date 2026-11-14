@@ -12,10 +12,12 @@ This document tells how to write the documents of the project.
 | `docs/extern/<path>.md` | The document of `include/<path>`, for the users of the project. |
 | `docs/intern/<path>.md` | The document of `src/<path>`, for the developers of the project. |
 | `docs/tools/<path>.md` | The document of `tools/<path>`, for the developers of the project. |
+| `docs/usage/<folder>.md` | The readme of the part `<folder>`, for the users of the part. The release of the part holds it as `readme.md`. |
 | `.toolchain/docs/<name>.md` | The document of a part of the toolchain. |
 
 Each file of `include`, of `src` and of `tools` has its document.
 No other file is in `docs/extern`, `docs/intern` or `docs/tools`.
+`docs` can hold any other folder, with any file: a project organizes its other documents as it wants. The rules of STE apply to each `.md` of `docs`.
 The first line of the document of a file is `#`, a space, and the path of the file, for example `# src/parse.c`.
 
 ## The readme
@@ -66,7 +68,7 @@ A person checks the other rules of STE, for example these rules:
 
 ## Blocks of code
 
-A block of code has a tag: `c`, `toml`, `sh`, `text`, `pseudo` or `mermaid`.
+A block of code has a tag: `c`, `cpp`, `toml`, `sh`, `text`, `pseudo` or `mermaid`.
 A block with the tag `pseudo` holds pseudo code.
 
 The pseudo code is a subset of the pseudo code of Cambridge International.
@@ -98,15 +100,16 @@ ENDFUNCTION
 A path in a code span names a file of the project. The check refuses a path that names no file.
 To cite a section of a different document, write its path in a code span, a comma, and its heading between two asterisks.
 To cite a section of the same document, write its heading between two asterisks.
+A coding guide can also cite one of its rules by the identifier of the rule, for example A4.
 
 ```text
-`docs/contributing/coding_style.md`, *The legal notice*
+`docs/contributing/coding_style.md`, *G1 - The legal notice*
 *The readme*
 ```
 
 ## The messages of the code
 
-`readme.md` or a document of `docs/extern` quotes each message of the code.
+The readme of the project, the readme of a part in `docs/usage`, or a document of `docs/extern` quotes each message of the code.
 `docs/contributing/tests.md`, *The messages of the code*, names the functions that write them.
 In a quote, write `<name>` in place of a conversion such as `%s`.
 

@@ -16,7 +16,15 @@ With `--pack`, it also puts the deliverable into a zip file. With `--join`, it j
 | `put(path, source)` | Writes a copy of `source` only if it is not there or is different. Then it gives the copy the mode of `source`, as *The deliverable* tells. |
 | `moved(path, tree)` | Gives the path in `tree` for a path of `src` or of `include`, and else the path. With no tree, it gives the path. |
 | `planned(config, values, artifact, tree)` | Gives the kind and the variables of one artifact, as steps 1 to 4 of *Artifacts* tell. |
-| `built(config, values, artifact, tree)` | Builds one artifact. It gives the name of the artifact and its files. |
+| `built(config, values, artifact, tree)` | Builds one artifact with the runner `mpbt`. It gives the name of the artifact and its files. |
+| `wrote(name, output)` | Stops if the steps of an artifact did not write its output. |
+| `compiled(kind, mine)` | Runs the step `each` of the kind once for each source, and sets `{objects}`: *Each source*. |
+| `specified(config, values, artifact, tree)` | Writes the spec of one artifact for the runner `zig`, and gives its path and its values. |
+| `arg(kind, value, prefix)` | Gives one argument of a step of the graph: `.toolchain/docs/graph.zig.md`. |
+| `marked(item, source, number)` | Gives the argument of the graph for one item of the step `each`: the source, `{object}`, `{deps}`, or a text. |
+| `graphed(config, values, chosen, tree)` | Builds the artifacts of `chosen` with the runner `zig`: *The runner zig*. It gives the name and the files of each artifact. |
+| `one(spec)` | Does the steps of one artifact from its spec, as `build.py --one` asks. |
+| `runner(config)` | Gives `[build] runner`, or `zig`. It stops on a different value. |
 | `packaged(config, values, made)` | Writes `package.txt`. |
 | `leaked(values, kit)` | Stops if a file of the deliverable `kit` holds the folder of the project or of the build, as *The zip* tells. |
 | `packed(config, values, kit)` | Writes the zip of the deliverable `kit`, after `leaked`. Then it writes the path of the zip and the names in it. |
@@ -53,7 +61,7 @@ With `--pack`, it also puts the deliverable into a zip file. With `--join`, it j
 8. It makes the variables, and checks the parts. With `--part`, it keeps the parts of `needed`. `prepared` does the steps 1 to 8.
 9. It checks that each source is fetched.
 10. It finds the tools, and takes the dependencies.
-11. It builds each artifact, and writes `package.txt`.
+11. It builds each artifact with the runner of `[build] runner`, and writes `package.txt`.
 
 The command `build` and the command `pack` build only the shippable artifacts. Step 11 then skips an artifact with `test = true`, which only `test` builds.
 
@@ -73,6 +81,41 @@ Then for each configuration of `views`, it composes the deliverable with `compos
 With `--pack`, it then writes the zip with `packed`, and proves the package with `prove`.
 Thus a project with parts gets a deliverable, a zip and a proof for each part.
 
+## The runners
+
+`[build] runner` names the runner of the build: `.toolchain/docs/project.toml.md`, *[build]*.
+The 2 runners make the same files.
+
+| Runner | Work |
+| --- | --- |
+| `mpbt` | `built` makes each artifact in its turn, and does each of its steps each time. |
+| `zig` | `graphed` writes a graph of steps for `zig build`. zig runs only the steps whose inputs changed, and runs the steps that do not wait for each other at the same time. |
+
+`runner` stops on a different value: `[build] runner: <value> is not a runner: mpbt zig`.
+
+## The runner zig
+
+`graphed` writes the graph `{out}/obj/graph.json`, and runs `zig build` with `.toolchain/graph.zig`, `-Dgraph=<graph>` and `--prefix {out}`.
+`.toolchain/docs/graph.zig.md` tells the form of the graph.
+`graph.zig` is the same file for each project, so zig builds it only once for each version of zig on a machine.
+For each artifact, `specified` writes `{work}.json`: the values of the artifact, and its steps with their variables replaced.
+It writes the spec only when its text changes, because zig runs a step again when an input has a new time of change.
+The graph has these steps:
+
+1. For each source of a kind with `each`, the command of `each`. Its input is the source, and its output is `{object}`.
+   `{deps}` names the headers of the source, and zig takes them as inputs too.
+2. For each artifact, `python build.py --one <spec>`. Its inputs are the spec, the objects, and the files of `{sources}`, `{link}` and `{runtime}`.
+   Its output is `{output}`. Each folder of `{inputs}` is an input too, after the prefix of the item.
+3. For each artifact, a step that copies its output to its path in `{out}`.
+
+A file of `link` that a different artifact of the build makes is the output of the step of that artifact. Thus the step waits for it.
+zig hashes the content of each input. A step whose command and inputs did not change does not run again: zig gives its output from its cache.
+
+`build.py --one` runs `one`. It does the steps of the kind in order with `do`, as the runner `mpbt` does, with `{output}` at the file that zig gives.
+After `zig build`, `graphed` copies the files of `beside`.
+A step that fails stops `zig build`. Then `run` writes the command `zig build`, its status and its output, which names the command that failed.
+The first `zig build` of a version of zig on a machine takes longer, because zig builds its build runner into its global cache.
+
 ## Artifacts
 
 `built` does these steps for an artifact. `planned` does the steps 1 to 4:
@@ -80,11 +123,18 @@ Thus a project with parts gets a deliverable, a zip and a proof for each part.
 1. If the artifact gives a `target`, it uses the keys of that target and its name as `{target}`.
 2. It replaces the variables of the name, and finds the sources. In `sources`, an item that is only a list variable gives the patterns of that list.
 3. It stops if no file matches the sources: `no file matches the sources of <name>`.
-4. It sets `{output}`, `{work}`, `{sources}`, `{defines}`, `{include}`, `{link}` and `{manifest}`, then `{flags}`, which can use them.
+4. It sets `{output}`, then `{work}`, `{sources}`, `{defines}`, `{include}`, `{link}` and `{manifest}`, then `{flags}`, which can use them.
    `{flags}` holds the `flags` of the kind, then the `flags` of the artifact.
+   With `inputs`, it also sets `{inputs}`: a folder after `--embed-dir=` for each file of the key.
+   A file that is not there stops the build before it: `<file> is not there, and <name> reads it`.
 5. It makes the folder of the output, and the folder `obj`.
-6. If a file of `link` is not there, it does the `unlinked` steps of the kind.
-7. Else, it does the `steps` of the kind, and copies the `beside` files into the folder of the output.
+6. With `each`, `compiled` runs the step `each` for each source: *Each source*.
+7. If a file of `link` is not there, it does the `unlinked` steps of the kind.
+8. Else, it does the `steps` of the kind, and copies the `beside` files into the folder of the output.
+
+The runner `zig` does the steps 6 to 8 in the graph: *The runner zig*.
+There, a file of `link` that a different artifact of the build makes counts as there.
+With `inputs`, each input is an input of the step: `zig build` makes it before, and runs the step again when it changes.
 
 With a tree, step 4 changes each path that is in `src` or in `include`, for the sources and the folders of `include`.
 It gives the copy of the path in the tree.
@@ -92,6 +142,9 @@ It gives the copy of the path in the tree.
 
 An artifact with a `target` stays in the output folder of the build.
 Thus a build for one target can make a file for a different target, for example a library for each system.
+
+The `steps` of a kind must write `{output}`. Else the build stops: `the steps of <name> wrote no <output>`.
+The `unlinked` steps write no `{output}`.
 
 A kind with no `unlinked` steps stops `built` if a file of `link` is not there.
 The message is `<file> is not there, and <name> is linked with it`.
@@ -103,10 +156,17 @@ An artifact that is not linked gives no file. `built` writes `compiled, not link
 Each module is an artifact over the defaults of `[module]`. A row states only what differs: a `name`, and `sources` or `defines` when they are not the defaults.
 A row can carry `variants`, like an artifact.
 
-`path_defines` makes the variable `paths`: a `*_PATH` macro for each test library, and `BUILT_DIR` and `BUILT_SUFFIX`.
-A built module gets a macro only with `path = true`; a backend always gets one.
-The macro is the name in upper case, without a `bridge_` prefix, with `-` as `_`, and `_PATH` at the end.
+`path_defines` makes the variable `paths`: a `*_PATH` macro for each library with `path = true`, and `BUILT_DIR` and `BUILT_SUFFIX`.
+The library can be in any `folder`, or in none.
+The macro is the name of the artifact in upper case, with `-` as `_`, and `_PATH` at the end.
 Its value is the output path of the artifact. An artifact's `defines` splices `{paths}` to get every macro.
+
+## Each source
+
+With the runner `mpbt`, `compiled` runs the step `each` of the kind once for each source, in the order of `{sources}`.
+`{object}` is `{work}/<number>.o`, and `{deps}` is the same path with `.d` in place of `.o`. `<number>` is the place of the source, from 0.
+Each of these paths is from the root when `{out}` is in the root, as the caches of zig are. Thus an archive names its members with no folder of the machine.
+`{objects}` then gives the objects in the same order.
 
 ## Steps
 
@@ -114,7 +174,7 @@ Its value is the output path of the artifact. An artifact's `defines` splices `{
 A step with a key that `KEYS['step']` does not have stops the tool.
 `copy` and `rename` take their paths from the root.
 
-With `cwd`, `run` runs in that folder. `do` then gives the command each source and each folder of `include` as a whole path.
+With `cwd`, `run` runs in that folder, with the whole paths of `.toolchain/docs/project.toml.md`, *[kinds.\<kind\>]*.
 It also gives the command the caches of zig as whole paths, because a path from the root names a different folder in `cwd`.
 `do` stops if the folder is not there: `<folder> is not there, and a step of <name> runs in it`.
 
@@ -167,6 +227,7 @@ The build makes each artifact in the scratch folder `out`. A built binary is not
 
 It also copies `license`, and `license` of each folder of `third_party`, at their paths from the root.
 The deliverable of a part holds only the licences of the folders of its `third_party`.
+The deliverable of a part also holds its readme, `docs/usage/<folder>.md`, as `readme.md` at its top.
 `composed` stops if such a folder has no licence: `third_party/<folder>/license is not there, and the deliverable needs it`.
 `composed` writes the path of each file of the deliverable.
 `.toolchain/docs/project.toml.md`, *[compose]*, tells the keys `from`, `headers`, `into` and `assets`.
@@ -243,7 +304,8 @@ Thus a part can link a library of a part that it uses, also when the file of the
 - the artifacts and the tables of `[compose]` of the part, with `kept`,
 - the name of the part as `[project] name`,
 - `[parts.<part>.package]` as `[package]`,
-- the `third_party` of the part.
+- the `third_party` of the part,
+- the path of the readme of the part.
 
 `views` gives the configuration of each part of `--part`. With no `--part`, it gives the configuration of each part of `[parts]`.
 `composed`, `packed` and `prove` use a configuration of `views` as the configuration of a project. Thus they treat a part as a project.
@@ -258,7 +320,7 @@ The release of a part puts the zips of all the targets into one zip: `.toolchain
 3. It writes `<build>/<name>.zip`. Each file of `<build>/<name>-<target>.zip` goes into the folder `<target>`, with its mode.
 4. It writes the path of `<build>/<name>.zip`.
 
-The targets are the targets of the toolchain. With no `--part`, `joined` joins nothing and writes nothing.
+The targets are the targets of the project, from `[project] targets`. With no `--part`, `joined` joins nothing and writes nothing.
 
 ## Limits
 

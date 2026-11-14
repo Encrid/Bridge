@@ -27,19 +27,33 @@ git tag -a v0.1.1 -m v0.1.1 <commit>
 git push origin v0.1.1
 ```
 
+In a project with parts, each part has its own releases and its own numbers: `.toolchain/docs/project.toml.md`, *[parts]*.
+The tag of a release of a part is `<part>-v<major>.<minor>.<patch>`, for example `video-v0.1.1`.
+Such a project makes no tag `v<major>.<minor>.<patch>`. A release of a part comes when the package of the part changes.
+
+```sh
+git tag -a video-v0.1.1 -m video-v0.1.1 <commit>
+git push origin video-v0.1.1
+```
+
 The workflow `release` then makes the release. `.toolchain/docs/workflows.py.md`, *The release*, tells its steps.
 
 ## Before you open a pull request
 
 1. Make sure that `python project.py check` passes.
-2. Make sure that `python project.py test` passes.
-3. Make sure that `python project.py test --break` passes: each case fails, as it must.
-4. Make sure that `python project.py test --branches` passes: each branch of the code runs in a case.
-5. Make sure that `python project.py test --leaks` passes: each case gives back what the code takes.
-6. Read the full change, and remove each part that the change does not need.
-7. Make sure that the documents describe the change, and that a case checks each new behavior.
+2. Make sure that the 4 test commands pass for the case groups that test the change. `python .toolchain/tools/scope.py --changed <file> --into dev` reads the list of the changed paths in `<file>`, and writes `--group <group>` for each such group. Give these options to each command.
+   - `python project.py test`.
+   - `python project.py test --break`: each case fails, as it must.
+   - `python project.py test --branches`: each branch of the code runs in a case.
+   - `python project.py test --leaks`: each case gives back what the code takes.
+3. If no group tests the change, run no case.
+4. Read the full change, and remove each part that the change does not need.
+5. Make sure that the documents describe the change, and that a case checks each new behavior.
 
-The workflow `ci` runs the five commands again on a machine of each target of `.toolchain/toolchain.toml`.
+A test belongs to the code that it tests. A change does not run the cases of the code that it uses, or of the code that uses it.
+When `dev` goes into `main`, the 4 commands run only for the groups that state `whole = true`.
+The workflow `ci` runs `check` and the 4 commands again on a machine of each target of the project: `[project] targets` of `.toolchain/project.toml`.
+On each pull request, it runs the 4 commands only for the groups that `scope.py` gives: `.toolchain/docs/scope.py.md`.
 Then it runs `python project.py pack`, which refuses a package that holds a path of the machine that built it.
 
 ## One purpose

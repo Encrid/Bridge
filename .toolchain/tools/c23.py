@@ -27,7 +27,7 @@ SILENT = re.compile(r'''/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])
 
 
 def main():
-    paths, found = ours(), []
+    paths, found = [path for path in ours() if not path.startswith('third_party/')], []
     for path in paths:
         text = (ROOT / path).read_text(encoding='utf-8')
         code = SILENT.sub(lambda m: re.sub(r'[^\n]', ' ', m.group(0)), text)

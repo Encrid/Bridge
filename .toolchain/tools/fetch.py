@@ -93,14 +93,16 @@ def sources(config, values, fetching):
             die('%s is not fetched as project.toml states: run fetch' % source['name'])
         url = expand(source['url'], values)
         fetched(url if '://' in url else located(url, values).as_uri(), stamp.split(' ')[0], into)
+        if 'top' in source and not tree.is_dir():
+            die('%s: the archive has no folder %s' % (source['name'], expand(source['top'], values)))
         for patch in patches:
             patched(tree, patch)
         (into / 'fetched.txt').write_text(stamp, encoding='utf-8')
 
 
 def main():
-    args = shared.arguments()
-    config = shared.config(args.root)
+    args = shared.arguments(toolchain='--toolchain')
+    config = shared.config(args.root, args.toolchain)
     home = shared.this_target(config['targets']) or die('fetch runs on a machine of a target')
     zig = zig_found(config['zig']) or fetch_zig(config['zig'], home)
     print(zig)

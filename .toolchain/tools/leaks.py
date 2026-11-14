@@ -18,6 +18,7 @@ VERBS = {'take': 'take', 'give': 'give back'}
 TESTED = '    if (%s__builtin_memcmp(&(%s), &(typeof(%s)){}, sizeof(%s)))\n        %skept[%d]%s;\n'
 PREFIX = 'c23b_l_'
 COUNT = re.compile(r'-?[0-9]+')
+QUALIFIED = re.compile(r'(\s*\b(?:const|volatile|restrict|__restrict|__restrict__)\b)+$')
 COUNTS = r'''static _Atomic long long %(p)skept[%(slots)d];
 static unsigned %(p)snumber(char *line, unsigned at, long long n, bool spaced)
 {
@@ -70,11 +71,15 @@ def kinded(names, kind, acts):
                     effects.append((act, kind, place, False))
 
 
+def pointer(kind):
+    return QUALIFIED.sub('', kind).endswith('*')
+
+
 def fitted(name, effects, returned, parameters):
     for act, _, place, strict in effects:
-        if strict and act != 'give' and not returned.endswith('*'):
+        if strict and act != 'give' and not pointer(returned):
             die('%s takes a resource, and does not give a pointer' % name)
-        if strict and act == 'give' and not (parameters and parameters[0].endswith('*')):
+        if strict and act == 'give' and not (parameters and pointer(parameters[0])):
             die('%s gives back a resource, and does not get a pointer first' % name)
         if place == 'result' and returned == 'void':
             die('%s gives no result' % name)
@@ -83,7 +88,7 @@ def fitted(name, effects, returned, parameters):
         number = int(place.lstrip('*').partition('.')[0])
         if number > len(parameters):
             die('%s has no argument %d' % (name, number))
-        if place.startswith('*') and not parameters[number - 1].endswith('*'):
+        if place.startswith('*') and not pointer(parameters[number - 1]):
             die('%s does not get a pointer as argument %d' % (name, number))
 
 
@@ -141,11 +146,11 @@ def counted(config, values):
                                                                               callbacks))
     rewrite.copied(root, where)
     counting = []
-    for path, used, declared, ends in files:
+    for (path, used, declared, ends), parts in files:
         if not used:
             continue
         text = (root / path).read_bytes()
-        outer = fail.layer(text, [name for name in used if name in calls], declared, calls)
+        outer = fail.layer(text, [name for name in used if name in calls], declared, calls, parts)
         (where / path).write_bytes(rewritten(text, path, [name for name in used if name in names], ends, declared,
                                              names, kinds, outer))
         counting.append(path)

@@ -4,22 +4,20 @@
 import re
 import subprocess
 
-from shared import arguments, die, report, repository
+from shared import arguments, config, die, report, repository
 
-TYPES = ('feat', 'fix', 'refactor', 'chore', 'docs', 'test', 'build', 'perf', 'style', 'ci', 'revert')
 LINE = re.compile(r'(\w+)(?:\([^()\s]+\))?: (\S.*)')
-MOST = 20
 
 
-def faults(message):
+def faults(message, rules):
     line = LINE.fullmatch(message.split('\n')[0])
     found = ['the message has more than 1 line'] if '\n' in message else []
     if not line:
         found.append('the line is not type(scope): description')
-    elif line.group(1) not in TYPES:
+    elif line.group(1) not in rules['types']:
         found.append('the type %s is not in the list' % line.group(1))
-    if line and len(line.group(2).split()) > MOST:
-        found.append('the description has %d words, and %d is the most' % (len(line.group(2).split()), MOST))
+    if line and len(line.group(2).split()) > rules['words']:
+        found.append('the description has %d words, and %d is the most' % (len(line.group(2).split()), rules['words']))
     return found
 
 
@@ -34,7 +32,8 @@ def main():
     if done.returncode:
         die('git log %s: %s' % (' '.join(span), done.stderr.strip()))
     commits = [entry.strip('\n').partition('\n') for entry in done.stdout.split('\0') if entry.strip()]
-    report(['%s: %s' % (name, fault) for name, _, message in commits for fault in faults(message.strip())],
+    rules = config(args.root)['commits']
+    report(['%s: %s' % (name, fault) for name, _, message in commits for fault in faults(message.strip(), rules)],
            len(commits), 'commits')
 
 

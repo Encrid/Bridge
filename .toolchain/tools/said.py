@@ -8,7 +8,6 @@ from shared import arguments, config, die, ours, report, this_target, variables
 
 SPEC = r'%[-+ #0]*(?:\*|\d+)?(?:\.(?:\*|\d+))?(?:hh|h|ll|l|z|j|t)?[diouxXcsfgeEp]'
 LITERAL = r'"((?:[^"\\\n]|\\.)*)"'
-OWN = 6
 
 
 def called(text, at):
@@ -50,14 +49,15 @@ def checked(root, out):
     written = said.read_text(encoding='utf-8')
     files = sorted(ours(root))
     quoted = '\n'.join((root / path).read_text(encoding='utf-8') for path in files
-                       if path == 'readme.md' or path.startswith('docs/extern/'))
-    writers = config(root).get('test', {}).get('writers', [])
+                       if path == 'readme.md' or path.startswith(('docs/extern/', 'docs/usage/')))
+    settings = config(root)
+    writers = settings.get('test', {}).get('writers', [])
     code = [path for path in files if writers and path.startswith(('src/', 'include/')) and path.endswith(('.c', '.h'))]
     found, count = [], 0
     for path in code:
         for line, message in messages((root / path).read_text(encoding='utf-8'), writers):
             wanted, own = pattern(message)
-            if own < OWN:
+            if own < settings['said']['own']:
                 continue
             count += 1
             if not re.search(wanted, written):

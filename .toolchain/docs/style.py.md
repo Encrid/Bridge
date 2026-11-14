@@ -21,7 +21,7 @@ A `'` after a digit or a letter is a digit separator of C23, as in `1'000` and `
 | Rule | The check |
 | --- | --- |
 | O1, O4 | `.toolchain/tools/layout.py` checks them, because they apply to each file of the project. |
-| O2 | `style.py` reads only the files `.c` and `.h`. A person checks the other files of `src`. |
+| O2 | `style.py` reads only the files `.c` and `.h`, and none of `third_party`, whose code has its own style. A person checks the other files of `src`. |
 | O3 | The number of the functions of a file. |
 | G1 | The legal notice of `.toolchain/header.txt`, between `/*` and `*/`, with each line after `** `. |
 | G2 | One empty line after each function that is not at the end of the file. |

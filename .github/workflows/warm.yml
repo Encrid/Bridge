@@ -1,0 +1,58 @@
+name: warm
+
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  warm:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-linux-gnu
+            runner: ubuntu-latest
+            architecture: x64
+          - target: aarch64-linux-gnu
+            runner: ubuntu-24.04-arm
+            architecture: arm64
+          - target: aarch64-macos
+            runner: macos-latest
+            architecture: arm64
+          - target: x86_64-macos
+            runner: macos-15-intel
+            architecture: x64
+          - target: x86_64-windows-gnu
+            runner: windows-latest
+            architecture: x64
+          - target: aarch64-windows-gnu
+            runner: windows-11-arm
+            architecture: arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.13'
+          architecture: ${{ matrix.architecture }}
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: build/zig-cache/global
+          key: zig-${{ hashFiles('.toolchain/toolchain.toml') }}-${{ matrix.target }}
+      - name: Fetch
+        run: python project.py fetch
+      - name: Build
+        run: python project.py build --target ${{ matrix.target }}

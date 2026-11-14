@@ -13,7 +13,7 @@ At the end of a run that is not `--break`, `test.py` calls `checked` of `said.py
 ## The checks
 
 1. A case wrote the message: the output of the cases has a line that matches the message.
-2. A document quotes the message: a document of `docs/extern` or `readme.md` has a line that matches the message.
+2. A document quotes the message: `readme.md`, or a document of `docs/extern` or `docs/usage`, has a matching line.
 
 `said.py` reads the output of the cases in `<out>/said.txt`. `test.py` writes this file in each run that is not a run with `--break`.
 `<out>` is the output folder of the target, as `.toolchain/docs/project.py.md`, *Output* tells.
@@ -33,7 +33,7 @@ For example, this line of a document matches the format `"no file %s\n"`:
 ```
 
 The own characters of a format are the characters that are not in a conversion.
-`said.py` does not check a format with less than 6 own characters, for example `"%s\n"`. Such a format has no words to find.
+`said.py` does not check a format with fewer own characters than `[said] own` of `.toolchain/toolchain.toml`, for example `"%s\n"`. Such a format has no words to find.
 
 ## Output
 

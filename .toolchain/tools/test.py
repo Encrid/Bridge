@@ -18,6 +18,7 @@ import build
 import fail
 import leaks
 import rewrite
+import scope
 import shared
 import signals
 from said import checked
@@ -33,10 +34,20 @@ def environment(changes, values):
     return env
 
 
-def free_port():
-    with socket.socket() as free:
-        free.bind(('127.0.0.1', 0))
+def bound(kind, port):
+    with socket.socket(socket.AF_INET, kind) as free:
+        try:
+            free.bind(('127.0.0.1', port))
+        except OSError:
+            return 0
         return free.getsockname()[1]
+
+
+def free_port():
+    port = 0
+    while port == 0:
+        port = bound(socket.SOCK_STREAM, bound(socket.SOCK_DGRAM, 0))
+    return port
 
 
 def started(argv, root, timeout, env=None, use=None):
@@ -151,7 +162,7 @@ def made_false(case):
     return merged
 
 
-def tried(config, values, outputs, where, case, broken, counted=False, failing=None):
+def tried(config, values, outputs, where, case, broken, counted=False, failing=None, part=False):
     use = made_false(case) if broken else case
     values, outputs = failing if failing and use.get('fail') else (values, outputs)
     folder = Path(values['out']) / 'cases' / where
@@ -168,7 +179,8 @@ def tried(config, values, outputs, where, case, broken, counted=False, failing=N
     if helper:
         waited(beside, expand(helper['wait'], mine))
     running = started(expanded(use['run'], mine), root, timeout,
-                      environment({**counting, 'C23_FAIL': plan, **use.get('env', {})}, mine), use)
+                      environment({**counting, 'C23_FAIL': plan, 'C23_FAIL_PART': plan and part, **use.get('env', {})},
+                                  mine), use)
     scripted(running, use.get('script', []), outputs, mine)
     ends = [ended(running, expand(use.get('stdin', ''), mine))]
     if helper:
@@ -192,8 +204,8 @@ def verdict(config, values, outputs, group, index, case, broken, copies, counted
     where = '%s/%d' % (group, index)
     wheres = [where] if count == 1 else ['%s/%d' % (where, copy) for copy in range(count)]
     with concurrent.futures.ThreadPoolExecutor(count) as pool:
-        runs = list(pool.map(lambda where: tried(config, values, outputs, where, case, broken, counted, failing),
-                             wheres))
+        runs = list(pool.map(lambda where: tried(config, values, outputs, where, case, broken, counted, failing,
+                                                 owner(config, group)), wheres))
     verdicts = [judged(config, group, broken, run) for run in runs]
     bad = [one for one in verdicts if not one[0]]
     if not bad:
@@ -249,12 +261,21 @@ def chosen(groups, text):
     return [(group, cases) for group, cases in found if cases] or die('no case has %s in its name' % text)
 
 
+def owner(config, group):
+    found = shared.part_of(config, group)
+    return ' %s ' % found if found else False
+
+
 def picked(config, groups, args):
     if args.part:
         folders = [config['parts'][part]['folder'] for part in args.part]
-        groups = [(group, cases) for group, cases in groups
-                  if any(group == folder or group.startswith(folder + '/') for folder in folders)] \
+        groups = [(group, cases) for group, cases in groups if any(shared.held(group, folder) for folder in folders)] \
             or die('no case group is in the parts %s' % ' '.join(args.part))
+    if args.group:
+        missing = [name for name in args.group if name not in dict(groups)]
+        if missing:
+            die('no case group %s' % missing[0])
+        groups = [(group, cases) for group, cases in groups if group in args.group]
     return chosen(groups, args.k) if args.k else groups
 
 
@@ -272,7 +293,7 @@ def changed(args, run, write, prepared=None):
 
 
 def scoped(args, entries, key, names):
-    if not args.part:
+    if not (args.part or args.group):
         return entries
     return [entry for entry in entries if any(fnmatch.fnmatch(name, entry.get(key, '')) for name in names)]
 
@@ -280,13 +301,18 @@ def scoped(args, entries, key, names):
 def measured(args):
     if args.broken or args.toolchain or args.copies or args.rounds:
         die('--branches runs each case one time: it takes no --break, --toolchain, --copies or --rounds')
-    config, values, (probes, gaps), outputs, groups = changed(args, 'branches', branches.probed)
+    named = args.part or []
+    config, values, (probes, gaps), outputs, groups = changed(
+        args, 'branches', lambda config, values: branches.probed(
+            config, values, named, args.group and scope.claimed(config, Path(values['root']), args.group)))
     hits = Path(values['out']) / 'hits.bin'
     hits.write_bytes(bytes(branches.parts(probes)[1]))
     os.environ['C23_BRANCHES'] = str(hits)
     test(config, values, outputs, groups, False, False, 1)
     excepted = scoped(args, config.get('branches', {}).get('exception', []), 'path', probes)
-    branches.reported(probes, gaps, hits, excepted, values['system'])
+    if args.group:
+        print('branches: measured the code of the groups %s' % ', '.join(args.group))
+    branches.reported(probes, gaps, hits, excepted, values['system'], named)
 
 
 def tallied(args):
@@ -323,7 +349,7 @@ def main():
         return print('no case: %s holds no case' % folder)
     groups = picked(config, groups, args)
     copies = args.copies or config['test'].get('copies') or die('.toolchain/project.toml: write [test] copies')
-    own = not (args.broken or args.toolchain or args.k or args.part)
+    own = not (args.broken or args.toolchain or args.k or args.part or args.group)
     rounds = args.rounds or 1
     failing = None
     if any((made_false(case) if args.broken else case).get('fail') for _, cases in groups for case in cases):

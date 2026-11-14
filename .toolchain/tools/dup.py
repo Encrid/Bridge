@@ -2,12 +2,12 @@
 #
 # Under the GNU Affero General Public License, version 3 only: see license.
 import collections
+import fnmatch
 import re
 
 import prose
-from shared import arguments, report
+from shared import arguments, config, report
 
-RUN = 8
 CITATION = re.compile(r'`[^`\n]*\.md`(?:,\s*\*[^*\n]+\*)?')
 PUNCTUATION = re.compile(r'[^a-z0-9]')
 JOIN = '\x01'
@@ -43,38 +43,64 @@ def quoted(places):
     return all(spans) and len(set(spans)) == len(spans)
 
 
-def shared_runs(units_by_file):
+def shared_runs(units_by_file, size):
     grams = collections.defaultdict(dict)
     for name, found in sorted(units_by_file.items()):
         for line, words, held in found:
-            for i in range(len(words) - RUN + 1):
-                span = held[i] if len(set(held[i:i + RUN])) == 1 else ''
-                grams[' '.join(words[i:i + RUN])].setdefault((name, line), set()).add(span)
+            for i in range(len(words) - size + 1):
+                span = held[i] if len(set(held[i:i + size])) == 1 else ''
+                grams[' '.join(words[i:i + size])].setdefault((name, line), set()).add(span)
 
     def shared(words, i):
-        return len({name for name, _ in grams[' '.join(words[i:i + RUN])]}) > 1
+        return len({name for name, _ in grams[' '.join(words[i:i + size])]}) > 1
 
     runs = {}
     for name, found in sorted(units_by_file.items()):
         for line, words, _ in found:
             i = 0
-            while i <= len(words) - RUN:
+            while i <= len(words) - size:
                 if not shared(words, i):
                     i += 1
                     continue
                 end = i
-                while end < len(words) - RUN and shared(words, end + 1):
+                while end < len(words) - size and shared(words, end + 1):
                     end += 1
                 places = {}
                 for k in range(i, end + 1):
-                    for place, spans in grams[' '.join(words[k:k + RUN])].items():
+                    for place, spans in grams[' '.join(words[k:k + size])].items():
                         places.setdefault(place, set()).update(spans)
-                run = ' '.join(words[i:end + RUN])
+                run = ' '.join(words[i:end + size])
                 runs[(run, tuple(sorted(places)))] = places
                 i = end + 1
     kept = [(run, set(places)) for (run, _), places in runs.items() if not quoted(places)]
     return [(run, sorted(places)) for run, places in kept
             if not any(run != other and ' %s ' % run in ' %s ' % other and places <= more for other, more in kept)]
+
+
+def excused(places, exceptions):
+    names = {name for name, _ in places}
+    found = False
+    for exception in exceptions:
+        if all(any(fnmatch.fnmatch(name, path) for path in exception['paths']) for name in names):
+            exception['excused'] += 1
+            found = True
+    return found
+
+
+def exceptions(settings):
+    listed = settings['dup'].get('exception', [])
+    return [{'paths': entry.get('paths', []), 'why': entry.get('why', ''), 'excused': 0} for entry in listed]
+
+
+def stale(exceptions):
+    found = []
+    for exception in exceptions:
+        named = ', '.join(exception['paths'])
+        if not exception['why']:
+            found.append("the exception for '%s' states no reason" % named)
+        if not exception['excused']:
+            found.append("the exception for '%s' excuses nothing" % named)
+    return found
 
 
 def scopes(documents):
@@ -84,13 +110,15 @@ def scopes(documents):
 
 def main():
     root = arguments().root
+    settings = config(root)
     documents = prose.documents(root)
+    listed = exceptions(settings)
     faults = []
     for scope in scopes(documents):
-        found = shared_runs({path: units(lines) for path, lines in scope.items()})
+        found = shared_runs({path: units(lines) for path, lines in scope.items()}, settings['dup']['words'])
         faults += ['%s: %s' % (', '.join('%s:%d' % place for place in places), run)
-                   for run, places in sorted(found, key=lambda item: item[1])]
-    report(faults, len(documents), 'documents')
+                   for run, places in sorted(found, key=lambda item: item[1]) if not excused(places, listed)]
+    report(faults + stale(listed), len(documents), 'documents')
 
 
 if __name__ == '__main__':

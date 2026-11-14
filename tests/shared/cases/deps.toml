@@ -1,3 +1,5 @@
+code = ["include/**", "src/abi/abi.h", "src/abi/abi_declare.h", "src/abi/abi_subscribe.h", "src/backend/backend.h", "src/bridge/bridge_inside.h", "src/config/config.h", "src/inside.h", "src/leaks.toml", "src/module/module.h", "src/pool/pool.h", "src/region/region.h", "src/reload/reload.h", "src/say/say.h", "src/schema/schema.h", "src/schema/schema_reader.h", "src/storage/storage.h", "src/storage/storage_convert.h", "src/storage/storage_create.h", "src/storage/storage_drop.h", "src/storage/storage_inside.h", "tests/backend/**", "tests/binding/**", "tests/modules/**", "tests/schema/schema_test.h", "tests/seam/cases.h", "tests/seam/seam.manifest", "tests/seam/seam.rc", "tests/shared/**", "tests/storage/storage_test.h", "tests/support/backend_hollow.c", "tests/support/host.h", "tests/support/host_copy.h", "tests/support/plain_other_abi.c", "tests/support/plain_refusing_backend.c", "tests/support/plain_refusing_memory.c", "tests/support/posix/**", "tests/support/windows/**", "tools/deps.py", ".toolchain/config/**", ".toolchain/project.toml"]
+
 [[case]]
 name = "deps"
 alone = true

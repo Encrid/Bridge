@@ -26,9 +26,9 @@ void test_leave_libraries(host_t *h)
         printf("FAIL: the world was not created and destroyed\n");
         exit(1);
     }
-    if (host_is_library_loaded(TESTS_ALL_PATH))
+    if (host_is_library_loaded(BRIDGE_TESTS_ALL_PATH))
         guarded = "still loaded";
-    if (host_is_library_loaded(TESTS_PATH))
+    if (host_is_library_loaded(BRIDGE_TESTS_PATH))
         plain = "STILL LOADED";
     printf("the guarded backend's library is %s, the plain backend's is %s\n",
         guarded, plain);
@@ -38,7 +38,7 @@ void test_leave_libraries(host_t *h)
 void test_open_other_seam(host_t *h)
 {
     if (!strcmp(h->arg, "other"))
-        h->backends[1].library = PLAIN_OTHER_PATH;
+        h->backends[1].library = BRIDGE_PLAIN_OTHER_PATH;
     host_open_only(h);
 }
 
