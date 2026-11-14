@@ -1,21 +1,21 @@
 [[case]]
 name = "reference.py takes the target of this machine when --target is not given"
 run = ["{python}", "{root}/tools/reference.py", "--root", "{case}"]
-files = { "{case}/.toolchain/project.toml" = "[project]\nname = \"timed\"\n" }
+files = { "{case}/.toolchain/project.toml" = "[project]\nname = \"timed\"\ntargets = [\"x86_64-windows-gnu\", \"x86_64-linux-gnu\", \"aarch64-macos\", \"aarch64-linux-gnu\", \"x86_64-macos\", \"aarch64-windows-gnu\"]\n" }
 claims = { status = 1, line = ["reference.py: {case}/build/{target}/scratch/storage{exe} is not built: run python project.py test"] }
 false = { run = ["{python}", "{root}/tools/reference.py", "--root", "{case}", "--target", "{triple}"] }
 
 [[case]]
 name = "reference.py refuses a target that [targets] does not name"
 run = ["{python}", "{root}/tools/reference.py", "--root", "{case}", "--target", "{triple}"]
-files = { "{case}/.toolchain/project.toml" = "[project]\nname = \"timed\"\n" }
+files = { "{case}/.toolchain/project.toml" = "[project]\nname = \"timed\"\ntargets = [\"x86_64-windows-gnu\", \"x86_64-linux-gnu\", \"aarch64-macos\", \"aarch64-linux-gnu\", \"x86_64-macos\", \"aarch64-windows-gnu\"]\n" }
 claims = { status = 1, has = ["reference.py: no target {triple}; the targets: "] }
 false = { run = ["{python}", "{root}/tools/reference.py", "--root", "{case}"] }
 
 [[case]]
 name = "reference.py refuses a target that does not run on this machine"
 run = ["{python}", "{root}/tools/reference.py", "--root", "{case}", "--target", "nowhere"]
-files = { "{case}/.toolchain/project.toml" = "[project]\nname = \"timed\"\n\n[targets.nowhere]\nruns_on = []\n" }
+files = { "{case}/.toolchain/project.toml" = "[project]\nname = \"timed\"\ntargets = [\"x86_64-windows-gnu\", \"x86_64-linux-gnu\", \"aarch64-macos\", \"aarch64-linux-gnu\", \"x86_64-macos\", \"aarch64-windows-gnu\", \"nowhere\"]\n\n[targets.nowhere]\nruns_on = []\n" }
 claims = { status = 1, line = ["reference.py: nowhere does not run here: build it, and test it where it runs"] }
 false = { run = ["{python}", "{root}/tools/reference.py", "--root", "{case}", "--target", "{target}"] }
 

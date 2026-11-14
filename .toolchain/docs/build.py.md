@@ -156,9 +156,9 @@ An artifact that is not linked gives no file. `built` writes `compiled, not link
 Each module is an artifact over the defaults of `[module]`. A row states only what differs: a `name`, and `sources` or `defines` when they are not the defaults.
 A row can carry `variants`, like an artifact.
 
-`path_defines` makes the variable `paths`: a `*_PATH` macro for each test library, and `BUILT_DIR` and `BUILT_SUFFIX`.
-A built module gets a macro only with `path = true`; a backend always gets one.
-The macro is the name in upper case, without a `bridge_` prefix, with `-` as `_`, and `_PATH` at the end.
+`path_defines` makes the variable `paths`: a `*_PATH` macro for each library with `path = true`, and `BUILT_DIR` and `BUILT_SUFFIX`.
+The library can be in any `folder`, or in none.
+The macro is the name of the artifact in upper case, with `-` as `_`, and `_PATH` at the end.
 Its value is the output path of the artifact. An artifact's `defines` splices `{paths}` to get every macro.
 
 ## Each source

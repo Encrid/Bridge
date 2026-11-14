@@ -24,9 +24,13 @@ Then it takes the dependencies with `take.py`.
 1. It reads the options and the configuration. With `--toolchain`, it fetches for each target of the toolchain: `.toolchain/docs/project.toml.md`, *[project]*.
 2. It stops if no target of the project runs on this machine: `fetch runs on a machine of a target`.
 3. If the pinned zig is not there, it downloads zig. Then it writes the path of zig.
-4. It makes the variables, with the target of this machine.
-5. It fetches each source.
-6. It takes the dependencies with `take.py`.
+4. For each target that this machine builds, it makes the variables of the target, and fetches each source.
+5. It takes the dependencies with `take.py`, for the target of this machine.
+
+The targets that this machine builds are those whose `built_on` is the target of this machine: `built_by` of `shared.py`.
+A machine that is no host builds only its own target.
+A source whose `url` or `into` names `{target}` thus gets one archive for each such target. A source that is the same for each target is fetched one time, since its `fetched.txt` holds the same digests.
+A source with one `into` and a `top` that names `{target}` gets its patches only in the `top` of the first target.
 
 ## zig
 

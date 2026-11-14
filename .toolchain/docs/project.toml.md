@@ -64,12 +64,14 @@ They also stop if a list variable is a part of a text, and has no separator.
 | Key | Value |
 | --- | --- |
 | `name` | The name of the project. The title of `readme.md`, `package.txt` and the zip of `pack` take it. |
-| `targets` | The targets of the project: a list of names of `[targets]` of `.toolchain/toolchain.toml`, for example `["x86_64-windows-gnu", "x86_64-linux-gnu"]`. |
+| `targets` | The targets of the project: a list of names of `[targets]` of `.toolchain/toolchain.toml`, for example `["x86_64-windows-gnu", "x86_64-linux-gnu"]`. A target that the project adds is named in the list too. |
 
 If `name` is empty, the tools that need it stop: `.toolchain/project.toml: write the name of the project in [project] name`.
 
-The tools see only the targets of `targets`. Thus a build, a fetch, the matrices of the workflows and the zips of a release have only these targets.
-A port to one more target is one more name in `targets`, and one more row in each matrix: `.toolchain/docs/workflows.py.md`, *The check*.
+The tools see only the targets of `targets`. Thus a build, a fetch and the zips of a release have only these targets.
+A port to one more target is one more name in `targets`. Its key `built_on` names the host that builds it: `.toolchain/docs/toolchain.toml.md`, *[targets.\<target\>]*.
+Each matrix of the workflows has one row for each host of the project: `.toolchain/docs/workflows.py.md`, *The check*.
+
 Each project states its targets. A folder with no `.toolchain/project.toml` is no project, and the tools see each target there.
 The tools stop with these faults:
 
@@ -488,7 +490,7 @@ For example:
 
 ```toml
 [[branches.exception]]
-path = "src/backends/wasm/wasm_own.c"
+path = "src/own.c"
 line = 23
 col = 9
 side = "true"
@@ -529,7 +531,7 @@ takes = { wasmtime_module_new = "*4" }
 gives = { wasmtime_module_delete = "1" }
 ```
 
-A project that uses a package can name the file of the package: `with = ["{bridge_os}/leaks.toml"]`.
+A project that uses a package can name the file of the package: `with = ["{package}/leaks.toml"]`.
 `.toolchain/docs/leaks.py.md` tells what a function of a pair must give and get. `.toolchain/docs/leaks.py.md`, *The places*, tells the places of a kind.
 
 ## [[leaks.exception]]
@@ -568,7 +570,7 @@ For example, a project names two functions of a different project, and the file 
 
 ```toml
 [fail]
-with = ["{bridge_os}/fail.toml"]
+with = ["{package}/fail.toml"]
 
 [fail.calls]
 os_commit = "-1"

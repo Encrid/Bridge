@@ -27,6 +27,7 @@ strip = "-fno-strip"
 
 [targets.x86_64-windows-gnu]
 runs_on = ["Windows", "AMD64"]
+built_on = "x86_64-windows-gnu"
 system = "windows"
 triple = "x86_64-windows.win10...win11_dt-gnu"
 cpu = "x86_64"
@@ -42,6 +43,7 @@ runtime = ["{toolchain}/runtime/windows_x86_64_move.c", "{toolchain}/runtime/win
 
 [targets.x86_64-linux-gnu]
 runs_on = ["Linux", "x86_64"]
+built_on = "x86_64-linux-gnu"
 system = "posix"
 triple = "x86_64-linux.5.10.0...6.19.0-gnu.2.31.0"
 cpu = "x86_64"
@@ -57,6 +59,7 @@ runtime = []
 
 [targets.aarch64-macos]
 runs_on = ["Darwin", "arm64"]
+built_on = "x86_64-linux-gnu"
 system = "posix"
 triple = "aarch64-macos.13.0.0...15.6.0"
 cpu = "apple_m1"
@@ -72,6 +75,7 @@ runtime = []
 
 [targets.aarch64-linux-gnu]
 runs_on = ["Linux", "aarch64"]
+built_on = "x86_64-linux-gnu"
 system = "posix"
 triple = "aarch64-linux.5.10.0...6.19.0-gnu.2.31.0"
 cpu = "generic"
@@ -87,6 +91,7 @@ runtime = []
 
 [targets.x86_64-macos]
 runs_on = ["Darwin", "x86_64"]
+built_on = "x86_64-linux-gnu"
 system = "posix"
 triple = "x86_64-macos.13.0.0...15.6.0"
 cpu = "core2"
@@ -102,6 +107,7 @@ runtime = []
 
 [targets.aarch64-windows-gnu]
 runs_on = ["Windows", "ARM64"]
+built_on = "x86_64-windows-gnu"
 system = "windows"
 triple = "aarch64-windows.win10...win11_dt-gnu"
 cpu = "generic"

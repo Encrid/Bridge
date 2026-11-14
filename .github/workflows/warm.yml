@@ -20,21 +20,9 @@ jobs:
           - target: x86_64-linux-gnu
             runner: ubuntu-latest
             architecture: x64
-          - target: aarch64-linux-gnu
-            runner: ubuntu-24.04-arm
-            architecture: arm64
-          - target: aarch64-macos
-            runner: macos-latest
-            architecture: arm64
-          - target: x86_64-macos
-            runner: macos-15-intel
-            architecture: x64
           - target: x86_64-windows-gnu
             runner: windows-latest
             architecture: x64
-          - target: aarch64-windows-gnu
-            runner: windows-11-arm
-            architecture: arm64
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     defaults:
@@ -55,4 +43,8 @@ jobs:
       - name: Fetch
         run: python project.py fetch
       - name: Build
-        run: python project.py build --target ${{ matrix.target }}
+        run: |
+          targets=$(python .toolchain/tools/hosts.py --host ${{ matrix.target }})
+          for target in $targets; do
+            python project.py build --target "$target"
+          done
