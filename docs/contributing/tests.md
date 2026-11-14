@@ -165,6 +165,8 @@ An outcome counts as soon as a case reaches it, also if the program then ends wi
 
 Each case must give back each resource that the code takes, also on the paths of the errors.
 `python project.py test --leaks` builds the project with a count of the resources in each file `.c` of `src`.
+The count is also in each test source that a program, a library or an archive compiles.
+So a test frees each block that it takes, and each block that the code gives to it.
 It runs each case one time. Then it writes a line for each case that does not give back what the code took:
 
 - `leaks: <case> keeps <number> <kind>`: at its end, the case holds a resource that the code took.

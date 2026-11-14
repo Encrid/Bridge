@@ -14,6 +14,13 @@ It holds the parts that these runs share.
 
 `test.py` then builds the copies, and runs the cases: `.toolchain/docs/test.py.md`.
 
+## The test sources
+
+A test source is a file `.c` of `tests` that an artifact of the kind `program`, `library` or `archive` compiles.
+Only the run of the leaks asks for the test sources: `.toolchain/docs/leaks.py.md`, *What it counts*.
+`copied` then copies the whole folder of each test source, so that a copy still finds a header beside it.
+A source of a different kind, for example a module of a kind of the project, gets no copy and no count.
+
 ## The rename
 
 A run can give a function that a file uses a new name, after the last `#include` of the file. For `free` and the count of `leaks.py`, the block is:
@@ -102,12 +109,12 @@ The build of the copies embeds the files that the run builds.
 | `tree(values, run)` | Gives the folder of the copies of a run, `<build>/<run>/tree`. |
 | `marked(node, state)` | Gives each location of a syntax tree the file that it is in. The dump writes a file only when it changes. |
 | `is_macro(loc)` | Tells if a location comes from a macro. |
-| `owned(loc, root)` | Gives the path of a location in `src` or in `include`, or `None`. |
+| `owned(loc, root, tops)` | Gives the path of a location in `src` or in `include`, or `None`. With `tops` at `None`, it gives the path of a location in any folder of the project. |
 | `dumped(command, root)` | Runs the command `dump`, and gives the syntax tree, with the file of each location. |
 | `stood_in(artifact, mine)` | Writes a file of 1 zero byte for each file of `inputs`, and gives the flag `--embed-dir` of their folder, or no flag. |
-| `sources(config, values)` | Gives each file `.c` of `src` that an artifact of this target compiles, with its command `dump` and the set of its parts. |
-| `each(config, values, use)` | Gives the result of `use(root, path, tree)` and the sorted parts of the file, for each file of `sources`, 8 files at the same time. |
-| `copied(root, where)` | Empties `where`, and copies `src` and `include` into it. |
+| `sources(config, values, tests)` | Gives each file `.c` of `src` that an artifact of this target compiles, with its command `dump` and the set of its parts. With `tests`, it gives the test sources too: *The test sources*. |
+| `each(config, values, use, tests)` | Gives the result of `use(root, path, tree)` and the sorted parts of the file, for each file of `sources`, 8 files at the same time. |
+| `copied(root, where, more)` | Empties `where`, and copies `src` and `include` into it. It also copies the folder of each path of `more` that is not in them. |
 | `plain(kind)` | Gives a type of the syntax tree with each `typedef` replaced, if the dump gives it. The checks of `leaks.py` read it, for example to find a pointer. |
 | `spelled(text)` | Gives a type as the declaration spells it, with no nullability mark and no calling convention that *The rename* names. |
 | `declaration(node, typedefs)` | Gives the type of the result and the types of the parameters of the declaration of a function. A result whose type is a name of `typedefs` gets the type of that `typedef`. It also gives the types of the parameters as the declaration spells them, for `signed`. |
