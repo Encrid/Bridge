@@ -68,10 +68,8 @@ They also stop if a list variable is a part of a text, and has no separator.
 
 If `name` is empty, the tools that need it stop: `.toolchain/project.toml: write the name of the project in [project] name`.
 
-The tools see only the targets of `targets`. Thus a build, a fetch and the zips of a release have only these targets.
-A port to one more target is one more name in `targets`. Its key `built_on` names the host that builds it: `.toolchain/docs/toolchain.toml.md`, *[targets.\<target\>]*.
-Each matrix of the workflows has one row for each host of the project: `.toolchain/docs/workflows.py.md`, *The check*.
-
+The tools see only the targets of `targets`. Thus a build, a fetch, the matrices of the workflows and the zips of a release have only these targets.
+A port to one more target is one more name in `targets`, and one more row in each matrix: `.toolchain/docs/workflows.py.md`, *The check*.
 Each project states its targets. A folder with no `.toolchain/project.toml` is no project, and the tools see each target there.
 The tools stop with these faults:
 

@@ -20,9 +20,21 @@ jobs:
           - target: x86_64-linux-gnu
             runner: ubuntu-latest
             architecture: x64
+          - target: aarch64-linux-gnu
+            runner: ubuntu-24.04-arm
+            architecture: arm64
+          - target: aarch64-macos
+            runner: macos-latest
+            architecture: arm64
+          - target: x86_64-macos
+            runner: macos-15-intel
+            architecture: x64
           - target: x86_64-windows-gnu
             runner: windows-latest
             architecture: x64
+          - target: aarch64-windows-gnu
+            runner: windows-11-arm
+            architecture: arm64
         gate:
           - name: test
             run: test
@@ -71,15 +83,15 @@ jobs:
           INTO: ${{ github.base_ref }}
         run: |
           git diff --name-only "$BASE...$HEAD" > "$RUNNER_TEMP/changed.txt"
-          parts=$(python .toolchain/tools/scope.py --changed "$RUNNER_TEMP/changed.txt" --into "$INTO")
-          python project.py ${{ matrix.gate.run }} $parts
+          groups=$(python .toolchain/tools/scope.py --changed "$RUNNER_TEMP/changed.txt" --into "$INTO")
+          if [ -z "$groups" ]; then
+            echo "no case group tests this change"
+          else
+            python project.py ${{ matrix.gate.run }} $groups
+          fi
       - name: Pack
         if: matrix.gate.name == 'test'
-        run: |
-          targets=$(python .toolchain/tools/hosts.py --host ${{ matrix.platform.target }})
-          for target in $targets; do
-            python project.py pack --target "$target"
-          done
+        run: python project.py pack --target ${{ matrix.platform.target }}
   check:
     needs: gate
     if: always()
@@ -89,9 +101,21 @@ jobs:
           - target: x86_64-linux-gnu
             runner: ubuntu-latest
             architecture: x64
+          - target: aarch64-linux-gnu
+            runner: ubuntu-24.04-arm
+            architecture: arm64
+          - target: aarch64-macos
+            runner: macos-latest
+            architecture: arm64
+          - target: x86_64-macos
+            runner: macos-15-intel
+            architecture: x64
           - target: x86_64-windows-gnu
             runner: windows-latest
             architecture: x64
+          - target: aarch64-windows-gnu
+            runner: windows-11-arm
+            architecture: arm64
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

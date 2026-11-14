@@ -264,12 +264,14 @@ def rewritten(text, path, edits, prefix, part, outer=(0, '', '')):
     return out, [dict(zip(('kind', 'line', 'col'), (kind,) + rewrite.placing(text, at))) for kind, at in rows]
 
 
-def mine(config, path, named):
+def mine(config, path, named, claimed=None):
     top, _, inner = path.partition('/')
+    if claimed and not claimed(path):
+        return False
     return not named or (top in ('src', 'include') and part_of(config, inner) in named)
 
 
-def probed(config, values, named=()):
+def probed(config, values, named=(), claimed=None):
     calls, root = fail.listed(config, values), Path(values['root'])
     edits, skips, outers = {}, {}, {}
     trees = rewrite.each(config, values, lambda top, path, tree: (walked(top, path, tree),
@@ -280,8 +282,8 @@ def probed(config, values, named=()):
         for path, table in probing.skips.items():
             skips.setdefault(path, {}).update(table)
         outers[name] = fail.layer((root / name).read_bytes(), used, declared, calls, parts)
-    edits = {path: table for path, table in edits.items() if mine(config, path, named)}
-    skips = {path: table for path, table in skips.items() if mine(config, path, named)}
+    edits = {path: table for path, table in edits.items() if mine(config, path, named, claimed)}
+    skips = {path: table for path, table in skips.items() if mine(config, path, named, claimed)}
     return written(root, rewrite.tree(values, 'branches'), edits, skips, outers)
 
 

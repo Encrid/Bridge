@@ -27,10 +27,10 @@
 | `test(config, values, outputs, groups, broken, said, copies, counted, failing)` | Runs all the groups, and writes each verdict. With `said`, it writes `said.txt`. It gives the names of the cases that failed. |
 | `chosen(groups, text)` | Gives only the cases whose name contains `text`. It stops if no case has it: `no case has <text> in its name`. |
 | `owner(config, group)` | Gives the part of a group from `part_of` of `shared.py`, with a space before and after it, or `False`. |
-| `picked(config, groups, args)` | Gives only the groups of the parts of `--part`, as *Groups* tells, then only the cases of `-k`, with `chosen`. |
+| `picked(config, groups, args)` | Gives only the groups of the parts of `--part` and the groups of `--group`, as *Groups* tells, then only the cases of `-k`, with `chosen`. |
 | `groups_of(config, values, folder)` | Reads and checks the groups of a folder: `tests/cases`, or `.toolchain/tests/cases` of the repository `mc23t`. |
 | `changed(args, run, write, prepared)` | Does the steps of a changed run, as *A changed run* tells. It gives the config, the variables, what `write` gave, the artifacts and the groups. |
-| `scoped(args, entries, key, names)` | Gives the exemptions whose `key` matches one of the names, with `*`. With no `--part`, it gives all the exemptions. |
+| `scoped(args, entries, key, names)` | Gives the exemptions whose `key` matches one of the names, with `*`. With no `--part` and no `--group`, it gives all the exemptions. |
 | `measured(args)` | Runs the command `test --branches`, as *The branches* tells. |
 | `tallied(args)` | Runs the command `test --leaks`, as *The leaks* tells. |
 | `main()` | Runs the command `test`. |
@@ -45,10 +45,10 @@ Else `main` does these steps:
 2. It stops if an artifact is not linked: `the cases need what is linked: <names>`.
 3. It reads the groups of `[test] cases` (the default is `tests/cases`). With `--toolchain`, it reads `.toolchain/tests/cases` of the repository `mc23t`.
 4. If there is no case, it writes `no case: <folder> holds no case`, and ends.
-5. With `--part`, it keeps only the groups of the named parts. With `-k`, it keeps only the cases whose name contains the text.
+5. With `--part`, it keeps only the groups of the named parts. With `--group`, it keeps only the named groups. With `-k`, it keeps only the cases whose name contains the text.
 6. If a case states `fail`, it makes the run `fail`: *A changed run*, with `failed` of `fail.py`.
 7. It runs the groups, one time for each round of `--rounds`. Before each round of 2 rounds or more, it writes `round <n> of <rounds>`.
-8. With no `--break`, `--toolchain`, `-k` or `--part`, it checks the messages of the code with `checked` of `said.py`.
+8. With no `--break`, `--toolchain`, `-k`, `--part` or `--group`, it checks the messages of the code with `checked` of `said.py`.
 
 With `--break`, the false variant of a case tells if the case states `fail` at step 6.
 The number of copies is `--copies`, or `[test] copies`. If neither gives it, `main` stops: `.toolchain/project.toml: write [test] copies`.
@@ -68,6 +68,10 @@ The name of a group is the path of its file in `tests/cases`, without `.toml`.
 A group is in a part if its name is the folder of the part, or begins with the folder and a slash.
 The folder of a part is its key `folder`: `.toolchain/docs/project.toml.md`, *[parts]*.
 `picked` stops if no group is in the named parts: `no case group is in the parts <parts>`.
+
+`--group <group>` names one group, and the option can be given more than one time. `picked` stops if a named group is not there: `no case group <group>`.
+A group can state the code that it tests: `.toolchain/docs/scope.py.md`, *The code of a group*.
+
 A file with no case gives no group.
 `groups_of` stops if a case:
 
@@ -123,7 +127,7 @@ The case passes only if each copy passes. If copies fail, the verdict of the fir
 For a case that fails, it writes the status and the output of each command.
 After each group, it writes the number of its cases and the number of the cases that passed.
 
-In a run with no `--break`, `--toolchain`, `-k` or `--part`, `test` then writes `<out>/said.txt`.
+In a run with no `--break`, `--toolchain`, `-k`, `--part` or `--group`, `test` then writes `<out>/said.txt`.
 The file holds the output of each command and of each helper, in the order of the cases.
 `said.py` reads it. A run with `--break` writes no `said.txt`, because a false variant does not run as the project runs.
 If a case failed, `test` stops with the names of the cases that failed, after it writes `said.txt`.
@@ -164,6 +168,10 @@ The run `fail` gives `prepared`: the configuration and the variables of step 1 o
 5. It writes the report, with `reported` of `branches.py`.
 
 With `--part`, step 2 gives the named parts to `probed`, so only their files get probes: `.toolchain/docs/branches.py.md`, *The files of the named parts*.
+
+With `--group`, step 2 gives `claimed` of `scope.py` to `probed`: `.toolchain/docs/branches.py.md`, *The files of the named groups*.
+Step 5 then first writes `branches: measured the code of the groups <groups>`.
+
 Step 5 then reads only the exemptions whose `path` matches a file with probes, with `scoped`. Thus an exemption of a different part is no fault.
 The message of step 1 is `--branches runs each case one time: it takes no --break, --toolchain, --copies or --rounds`.
 `.toolchain/docs/branches.py.md` tells what the probes measure, and what the report contains.

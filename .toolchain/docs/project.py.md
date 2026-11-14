@@ -46,6 +46,7 @@ If the command is not in the table, `project.py` stops with the message
 | `--root <folder>` | Uses the project in this folder. The default is the folder of `project.py`. |
 | `--target <target>` | Builds for this target. The default is the target of this machine. |
 | `--part <part>` | Acts on this part only: *Parts*. You can use this option more than one time. It is an option of `build`, `pack`, `test` and `join`. |
+| `--group <group>` | Runs only this case group. You can use this option more than one time. It is an option of `test`. |
 | `--tag <tag>` | Takes the part from the tag of a release: a tag `<part>-v<major>.<minor>.<patch>` gives `--part <part>`, and a tag `v<major>.<minor>.<patch>` gives no part. |
 | `--debug` | Replaces each variable that `[debug]` names with the value of `[debug]`. |
 | `--out <folder>` | Puts the output into this folder. The default is the folder `build` of the project. |

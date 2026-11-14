@@ -80,14 +80,6 @@ def picked(whole):
     return {name: row for name, row in whole['targets'].items() if name in names}
 
 
-def hosts(config):
-    return sorted({row.get('built_on', name) for name, row in config['targets'].items()})
-
-
-def built_by(config, host):
-    return [name for name, row in config['targets'].items() if row.get('built_on', name) == host]
-
-
 def held(path, folder):
     return path == folder or path.startswith(folder + '/')
 
@@ -206,6 +198,7 @@ def arguments(*valued, **flags):
     ap.add_argument('--root', type=Path, default=HERE)
     ap.add_argument('--target')
     ap.add_argument('--part', action='append')
+    ap.add_argument('--group', action='append')
     ap.add_argument('--tag')
     ap.add_argument('--debug', action='store_true')
     ap.add_argument('--out', type=Path)

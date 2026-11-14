@@ -23,8 +23,6 @@ The tools import it. It does not run alone.
 | `merged(into, more, name, whence, above)` | Adds the keys of `more`, the file `name`, to `into`, as the section *The configuration* tells. `whence` gives the file of each key. |
 | `config(root, every)` | Gives the configuration of the project in `root`. It keeps only the targets of `[project] targets`, unless `every` is set. |
 | `picked(whole)` | Gives the targets of `[project] targets`, or stops with a fault of `.toolchain/docs/project.toml.md`, *[project]*. |
-| `hosts(config)` | Gives the hosts of a configuration: each value of `built_on` of its targets, in the order of the names. A target with no `built_on` is its own host. |
-| `built_by(config, host)` | Gives the targets of a configuration that a host builds, in the order of `[targets]`. |
 | `held(path, folder)` | Tells if a path is the folder of a part, or is in it. |
 | `part_of(config, path)` | Gives the part whose folder holds the path, or `None`. With nested folders, the longest folder wins. |
 | `tables(config, values, name)` | Gives the table `[<name>]` of the configuration, then the table `[<name>]` of each file of its key `with`. It replaces the variables in each path, and stops if a file is not there. |
@@ -99,14 +97,14 @@ A variable that `UNSET` names stops the tool with its reason: `{macos_sdk} needs
 
 ## The options
 
-`arguments` reads the options `--root`, `--target`, `--part`, `--tag`, `--debug`, `--out` and `--set`.
+`arguments` reads the options `--root`, `--target`, `--part`, `--group`, `--tag`, `--debug`, `--out` and `--set`.
 A tool adds its own options:
 
 - `arguments('--commits')` adds the option `--commits <value>`. Its value is in `args.commits`, or `None` if the option is not given.
 - `arguments(pack='--pack')` adds the option `--pack`, with no value. `args.pack` tells if the option is given.
 
 The default of `--root` is `HERE`. `arguments` makes the root an absolute path.
-`--part` can be given more than one time. `args.part` is the list of its values, or `None`.
+`--part` can be given more than one time. `args.part` is the list of its values, or `None`. `--group` and `args.group` act the same way.
 
 `--tag <tag>` takes the tag of a release, and matches it with `TAG`.
 A tag `<part>-v<major>.<minor>.<patch>` adds `<part>` to `args.part`. A tag `v<major>.<minor>.<patch>` adds no part.
