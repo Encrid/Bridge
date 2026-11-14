@@ -312,13 +312,11 @@ def ranked(config):
 def path_defines(config):
     found = ['BUILT_DIR="{out}/built"', 'BUILT_SUFFIX="{library}"']
     for artifact in artifacts(config):
-        folder = artifact.get('folder')
-        if artifact.get('kind') != 'library' or folder not in ('built', 'backends'):
+        if artifact.get('kind') != 'library' or not artifact.get('path'):
             continue
-        if folder == 'built' and not artifact.get('path'):
-            continue
-        macro = artifact['name'].removeprefix('bridge_').upper().replace('-', '_') + '_PATH'
-        found.append('%s="{out}/%s/%s{library}"' % (macro, folder, artifact['name']))
+        macro = artifact['name'].upper().replace('-', '_') + '_PATH'
+        place = '/'.join(part for part in (artifact.get('folder'), artifact['name']) if part)
+        found.append('%s="{out}/%s{library}"' % (macro, place))
     return found
 
 

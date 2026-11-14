@@ -106,6 +106,8 @@ def main():
     home = shared.this_target(config['targets']) or die('fetch runs on a machine of a target')
     zig = zig_found(config['zig']) or fetch_zig(config['zig'], home)
     print(zig)
+    for target in shared.built_by(config, home) or [home]:
+        sources(config, shared.variables(config, args, target, zig), True)
     values = shared.variables(config, args, home, zig)
     sources(config, values, True)
     take.take(config, values)

@@ -37,7 +37,7 @@ The layout allows only the paths of this table.
 | `.toolchain/toolchain.toml` and `.toolchain/header.txt` | The values and the legal notice of the toolchain. |
 | `.toolchain/config/<path>.toml` | A file of the configuration of the project, also in a folder of `.toolchain/config`. |
 | `.toolchain/docs/<name>.md` | A document of the toolchain. |
-| `.toolchain/presets/<name>/<name>.toml` | A file of a preset. `.toolchain/docs/presets.md` tells the presets. |
+| `.toolchain/presets/<name>/<name>.toml`, `.toolchain/presets/<name>/<name>.md` | A file of a preset: a file of the configuration, or a guide. `.toolchain/docs/presets.md` tells the presets. |
 | `.toolchain/runtime/<name>.c`, `.toolchain/runtime/<name>.h` | A source or a header that the toolchain adds to the shared libraries of a target: `.toolchain/docs/toolchain.toml.md`, *[targets.\<target\>]*. |
 | `<folder>/.gitkeep`, in `docs/extern`, `docs/intern`, `include` or `src` | An empty file that keeps an empty folder in git. |
 
