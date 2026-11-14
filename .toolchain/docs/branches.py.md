@@ -40,7 +40,8 @@ The report then starts with `branches: measured parts <part>, <part>`.
 
 ## The files of the named groups
 
-With `--group`, a file gets probes only if a named group tests it: `.toolchain/docs/scope.py.md`, *The code of a group*.
+With `--group`, a file gets probes only if each group that tests it is named: `.toolchain/docs/scope.py.md`, *The code of a group*.
+Some groups test a file together, for example each group of a part with no `code`. A run of only one of them does not judge that file.
 Thus the cases of a group must reach each branch of the code that the group tests. A group does not get the outcomes of the code of a different group.
 A source with no probes still gets its layer of fail.
 
