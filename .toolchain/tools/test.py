@@ -18,6 +18,7 @@ import build
 import fail
 import leaks
 import rewrite
+import scope
 import shared
 import signals
 from said import checked
@@ -270,6 +271,11 @@ def picked(config, groups, args):
         folders = [config['parts'][part]['folder'] for part in args.part]
         groups = [(group, cases) for group, cases in groups if any(shared.held(group, folder) for folder in folders)] \
             or die('no case group is in the parts %s' % ' '.join(args.part))
+    if args.group:
+        missing = [name for name in args.group if name not in dict(groups)]
+        if missing:
+            die('no case group %s' % missing[0])
+        groups = [(group, cases) for group, cases in groups if group in args.group]
     return chosen(groups, args.k) if args.k else groups
 
 
@@ -287,7 +293,7 @@ def changed(args, run, write, prepared=None):
 
 
 def scoped(args, entries, key, names):
-    if not args.part:
+    if not (args.part or args.group):
         return entries
     return [entry for entry in entries if any(fnmatch.fnmatch(name, entry.get(key, '')) for name in names)]
 
@@ -297,12 +303,15 @@ def measured(args):
         die('--branches runs each case one time: it takes no --break, --toolchain, --copies or --rounds')
     named = args.part or []
     config, values, (probes, gaps), outputs, groups = changed(
-        args, 'branches', lambda config, values: branches.probed(config, values, named))
+        args, 'branches', lambda config, values: branches.probed(
+            config, values, named, args.group and scope.claimed(config, Path(values['root']), args.group)))
     hits = Path(values['out']) / 'hits.bin'
     hits.write_bytes(bytes(branches.parts(probes)[1]))
     os.environ['C23_BRANCHES'] = str(hits)
     test(config, values, outputs, groups, False, False, 1)
     excepted = scoped(args, config.get('branches', {}).get('exception', []), 'path', probes)
+    if args.group:
+        print('branches: measured the code of the groups %s' % ', '.join(args.group))
     branches.reported(probes, gaps, hits, excepted, values['system'], named)
 
 
@@ -340,7 +349,7 @@ def main():
         return print('no case: %s holds no case' % folder)
     groups = picked(config, groups, args)
     copies = args.copies or config['test'].get('copies') or die('.toolchain/project.toml: write [test] copies')
-    own = not (args.broken or args.toolchain or args.k or args.part)
+    own = not (args.broken or args.toolchain or args.k or args.part or args.group)
     rounds = args.rounds or 1
     failing = None
     if any((made_false(case) if args.broken else case).get('fail') for _, cases in groups for case in cases):

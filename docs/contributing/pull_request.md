@@ -41,20 +41,19 @@ The workflow `release` then makes the release. `.toolchain/docs/workflows.py.md`
 ## Before you open a pull request
 
 1. Make sure that `python project.py check` passes.
-2. Make sure that the 4 test commands pass for the parts of the change. Give each one `--part <part>` for each part that the change touches, and for each part that uses such a part.
+2. Make sure that the 4 test commands pass for the case groups that test the change. `python .toolchain/tools/scope.py --changed <file> --into dev` reads the list of the changed paths in `<file>`, and writes `--group <group>` for each such group. Give these options to each command.
    - `python project.py test`.
    - `python project.py test --break`: each case fails, as it must.
    - `python project.py test --branches`: each branch of the code runs in a case.
    - `python project.py test --leaks`: each case gives back what the code takes.
-3. If the change touches a file that belongs to no part, write in the description which parts the change reaches. Then run the 4 commands for these parts.
-4. In a project with no part, run the 4 commands with no `--part`.
-5. Read the full change, and remove each part that the change does not need.
-6. Make sure that the documents describe the change, and that a case checks each new behavior.
+3. If no group tests the change, run no case.
+4. Read the full change, and remove each part that the change does not need.
+5. Make sure that the documents describe the change, and that a case checks each new behavior.
 
-The 4 commands run for the whole project when `dev` goes into `main`.
-The workflow `ci` runs `check` and the 4 commands again on each host of the project: `.toolchain/docs/project.toml.md`, *[project]*.
-On a pull request into `dev`, it runs the 4 commands only for the parts of the change and their users: `.toolchain/docs/scope.py.md`.
-A change of a file of no part runs them for the whole project there.
+A test belongs to the code that it tests. A change does not run the cases of the code that it uses, or of the code that uses it.
+When `dev` goes into `main`, the 4 commands run only for the groups that state `whole = true`.
+The workflow `ci` runs `check` and the 4 commands again on a machine of each target of the project: `[project] targets` of `.toolchain/project.toml`.
+On each pull request, it runs the 4 commands only for the groups that `scope.py` gives: `.toolchain/docs/scope.py.md`.
 Then it runs `python project.py pack`, which refuses a package that holds a path of the machine that built it.
 
 ## One purpose
