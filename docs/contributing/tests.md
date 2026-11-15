@@ -73,6 +73,7 @@ rows = [
 - `--copies` does not copy a table.
 
 `test` writes one line for each row, as for a case: `<row>: <verdict>`. It counts each row as a case.
+A test program that reads its arguments becomes a program of a table with `rows.h`: `.toolchain/docs/rows.h.md`.
 `-k` chooses the rows whose name contains its text. `test` then gives only their inputs to the command.
 
 ## Its own process

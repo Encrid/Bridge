@@ -7,6 +7,7 @@ import os
 import re
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 import build
@@ -121,17 +122,33 @@ def owned(loc, root, tops=TOPS):
     return path if tops is None or path.startswith(tops) else None
 
 
+def held(path):
+    whole = bytearray()
+    with open(path, 'rb') as file:
+        for part in iter(lambda: file.read(1 << 26), b''):
+            whole += part
+    return whole
+
+
 def dumped(command, root):
-    done = subprocess.run(command, cwd=root, capture_output=True)
+    folder = (Path(root) / command[command.index('-o') + 1]).parent
+    folder.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(dir=folder, suffix='.tree', delete=False) as out:
+        done = subprocess.run(command, cwd=root, stdout=out, stderr=subprocess.PIPE)
+    tree = Path(out.name)
     errors = [line for line in done.stderr.decode('utf-8', 'replace').splitlines()
               if ' error: ' in line and not line.endswith('FileNotFound')]
-    if errors:
-        die('the tree of %s cannot be read:\n%s' % (command[-1], '\n'.join(errors)))
     try:
-        found = json.loads(done.stdout)
+        if errors:
+            die('the tree of %s cannot be read:\n%s' % (command[-1], '\n'.join(errors)))
+        found = json.loads(held(tree))
+        marked(found, [None])
     except ValueError:
         die('the tree of %s is not JSON' % command[-1])
-    marked(found, [None])
+    except MemoryError:
+        die('the tree of %s needs more memory than this machine has free' % command[-1])
+    finally:
+        tree.unlink(missing_ok=True)
     return found
 
 

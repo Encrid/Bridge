@@ -44,9 +44,10 @@ At each call of a listed function, the layer reads the turn.
 
 - If the turn is not the turn that the file read last, the file reads its numbers again, as its constructor does.
 - If the turn is not the turn of the count of the function, the count starts again at 0. The turn of a count is a `[[gnu::weak]]` variable with hidden visibility, as the count is.
-- When the layer makes a call fail in a turn that is not 0, it sets the variable `C23_FAILED` of the environment to `1`.
+- When the layer makes a call fail, it looks for ` told=0` in `C23_FAIL`, and writes `1` in place of the `0`.
+  It changes 1 byte of the text, and calls no function that changes the environment. Thus a call can fail on any thread.
 
-Thus a case that states `fail` runs as before: its turn stays 0, and nothing sets `C23_FAILED`.
+Thus a case that states `fail` runs as before: its turn stays 0, and its `C23_FAIL` holds no ` told=0`.
 
 ## The loaded calls
 

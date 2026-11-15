@@ -29,9 +29,6 @@ static int c23b_fmine(const char *parts)
 
     return (!part || strstr(parts, part) != nullptr);
 }
-#ifndef _WIN32
-extern int putenv(char *text);
-#endif
 static long long c23b_ft;
 static void c23b_fread(void);
 static void c23b_fturn(_Atomic long long *count, long long *counted)
@@ -49,15 +46,11 @@ static void c23b_fturn(_Atomic long long *count, long long *counted)
 }
 static void c23b_ftold(void)
 {
-    static char told[] = "C23_FAILED=1";
+    char *all = getenv("C23_FAIL");
+    char *at = all ? strstr(all, " told=0") : nullptr;
 
-    if (!c23b_ft)
-        return;
-#ifdef _WIN32
-    _putenv(told);
-#else
-    putenv(told);
-#endif
+    if (at)
+        at[6] = '1';
 }
 '''
 COUNT = ('[[gnu::weak, gnu::visibility("hidden")]] _Atomic long long c23b_fc_%(n)s;\n'
