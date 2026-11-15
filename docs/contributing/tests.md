@@ -70,7 +70,7 @@ rows = [
 - `test --break` starts the command 1 time with the false input of each row. Each row must then fail.
 - `test` then runs the table in the reverse order. A row must answer the same in each order. A row that needs the state that a different row left fails: `differs in the reverse order`.
 - If the program ends before it answers each row, the first row with no answer fails, and each row after it. `test` names that first row.
-- `--copies` does not copy a table.
+- `test` runs the copies of a table at the same time, as it does for a case: *Run the tests*. Each copy has a folder of its own, and a row must pass in each copy. The run in the reverse order has one copy.
 
 `test` writes one line for each row, as for a case: `<row>: <verdict>`. It counts each row as a case.
 A test program that reads its arguments becomes a program of a table with `rows.h`: `.toolchain/docs/rows.h.md`.
