@@ -21,13 +21,19 @@
 | `placed(use, outputs, values)` | Writes the `files` of a case, and fills its `folders`. |
 | `scripted(running, script, outputs, values)` | Does the steps of a script. |
 | `made_false(case)` | Gives the false variant of a case. |
-| `tried(config, values, outputs, where, case, broken, counted, failing, part)` | Runs one case. With `counted`, it sets the variable `C23_LEAKS` of the case. `failing` gives the variables and the artifacts of the run `fail`, or `None`. `part` is the part of the case, or `False`. |
+| `typed_rows(use, broken, order, values)` | Gives the text that `test` writes to the command of a table. It is the input of each row of `order`, each on one line. With `broken`, it is the false input. |
+| `tried(config, values, outputs, where, case, broken, counted, failing, part, order)` | Runs one case. With `order`, the case is a table, and the command gets the inputs of its rows in that order. With `counted`, it sets the variable `C23_LEAKS` of the case. `failing` gives the variables and the artifacts of the run `fail`, or `None`. `part` is the part of the case, or `False`. |
 | `judged(config, group, broken, run)` | Gives the verdict of one run of a case. |
+| `answered(config, group, broken, run, rows, order)` | Gives the verdict of each row of a table from one run, as *A table* tells. |
+| `tabled(config, values, outputs, group, index, case, broken, counted, failing)` | Runs a table in its order, and then in the reverse order. It gives the verdict of each row, and the output of the run that failed. |
 | `verdict(config, values, outputs, group, index, case, broken, copies, counted, failing)` | Runs the copies of one case at the same time, and gives their verdict. |
 | `test(config, values, outputs, groups, broken, said, copies, counted, failing)` | Runs all the groups, and writes each verdict. With `said`, it writes `said.txt`. It gives the names of the cases that failed. |
-| `chosen(groups, text)` | Gives only the cases whose name contains `text`. It stops if no case has it: `no case has <text> in its name`. |
+| `narrowed(case, text)` | Gives a case whose name contains `text`, or a table with only its rows whose name contains it, or nothing. |
+| `chosen(groups, text)` | Gives only the cases and the rows whose name contains `text`. It stops if no case has it: `no case has <text> in its name`. |
 | `owner(config, group)` | Gives the part of a group from `part_of` of `shared.py`, with a space before and after it, or `False`. |
 | `picked(config, groups, args)` | Gives only the groups of the parts of `--part` and the groups of `--group`, as *Groups* tells, then only the cases of `-k`, with `chosen`. |
+| `rowed(case, path)` | Checks the rows of a table, and stops at a fault: *A table*. |
+| `ruled(path, cases)` | Stops for a group that breaks a rule of `[test] tables`: `docs/contributing/tests.md`, *Its own process*. |
 | `groups_of(config, values, folder)` | Reads and checks the groups of a folder: `tests/cases`, or `.toolchain/tests/cases` of the repository `mc23t`. |
 | `changed(args, run, write, prepared)` | Does the steps of a changed run, as *A changed run* tells. It gives the config, the variables, what `write` gave, the artifacts and the groups. |
 | `scoped(args, entries, key, names)` | Gives the exemptions whose `key` matches one of the names, with `*`. With no `--part` and no `--group`, it gives all the exemptions. |
@@ -46,11 +52,11 @@ Else `main` does these steps:
 3. It reads the groups of `[test] cases` (the default is `tests/cases`). With `--toolchain`, it reads `.toolchain/tests/cases` of the repository `mc23t`.
 4. If there is no case, it writes `no case: <folder> holds no case`, and ends.
 5. With `--part`, it keeps only the groups of the named parts. With `--group`, it keeps only the named groups. With `-k`, it keeps only the cases whose name contains the text.
-6. If a case states `fail`, it makes the run `fail`: *A changed run*, with `failed` of `fail.py`.
+6. If a case states `fail` or `sweep`, it makes the run `fail`: *A changed run*, with `failed` of `fail.py`.
 7. It runs the groups, one time for each round of `--rounds`. Before each round of 2 rounds or more, it writes `round <n> of <rounds>`.
 8. With no `--break`, `--toolchain`, `-k`, `--part` or `--group`, it checks the messages of the code with `checked` of `said.py`.
 
-With `--break`, the false variant of a case tells if the case states `fail` at step 6.
+With `--break`, the false variant of a case tells if the case states `fail` or `sweep` at step 6.
 The number of copies is `--copies`, or `[test] copies`. If neither gives it, `main` stops: `.toolchain/project.toml: write [test] copies`.
 
 `main` stops at step 7 if a case failed. Thus step 8 runs only if each case passed.
@@ -79,7 +85,10 @@ A file with no case gives no group.
 - holds a step or a value of `ignore` that `allowed` of `signals.py` refuses, also in its false variant: `.toolchain/docs/signals.py.md`, *The checks*,
 - claims nothing: `<path>: the case <name> claims nothing`,
 - has no false variant: `<path>: the case <name> has no false variant`,
+- states a `process` that is no reason: `<path>: the case <name> states the process <word>, and a process is status, signal, helper, command, state`,
 - states a call in `fail`, also in its false variant, that `listed` of `fail.py` does not give: `<path>: the case <name> makes <call> fail, and [fail.calls] does not list it`.
+
+With `tables = true` in `[test]`, `groups_of` then gives the cases of each file to `ruled`.
 
 ## A case
 
@@ -99,8 +108,8 @@ A case that holds no `{port}` gets no port. In such a case, a value of `[variabl
 With `counted`, the command and the helper get the variable `C23_LEAKS`: the path of the folder of the case, with `.leaks` added.
 If the case states `fail`, the command gets the variable `C23_FAIL`: `.toolchain/docs/fail.py.md`, *The layer*. Else `tried` removes `C23_FAIL` from the environment of the command.
 
-The command also gets `C23_FAIL_PART`, the part that `owner` gives for the group of the case. With no such part, `tried` removes `C23_FAIL_PART` too.
-With `failing`, a case that states `fail` runs on the build of the run `fail`. Its folder, its `{out}` and its artifacts are those of that run.
+A case that states `fail` or `sweep` also gives the command `C23_FAIL_PART`, the part that `owner` gives for the group of the case. With no such part, `tried` removes `C23_FAIL_PART` too.
+With `failing`, a case that states `fail` or `sweep` runs on the build of the run `fail`. Its folder, its `{out}` and its artifacts are those of that run.
 
 `tried` runs each command in the root, with a timer of `[test] timeout` seconds.
 The timer stops a command that does not end in time.
@@ -108,6 +117,42 @@ The timer stops a command that does not end in time.
 
 `made_false` makes the false variant: the keys of `false` replace the keys of the case.
 For `files` and for `folders`, each path of `false` replaces only that path.
+
+## A table
+
+A case with `rows` is a table. `docs/contributing/tests.md`, *Tables*, gives its rules.
+
+`rowed` stops for a table that it cannot run:
+
+| Fault | Message |
+| --- | --- |
+| The table has no `claims`. | `<file>: the case <name> claims nothing` |
+| The table has a key `false`, `stdin` or `script`. | `<file>: the table <name> has rows, and a table has no key <key>` |
+| `rows` is empty. | `<file>: the table <name> has no row` |
+| A row has a key that no row has. | `<file>: a row has no key <key>` |
+| A row has no `name`, `in`, `claims` or `false`. | `<file>: a row of the table <name> has no key <key>` |
+| A row claims a thing of the whole run, such as `status`. | `<file>: a claim of a row has no key <key>` |
+| A row has no claim. | `<file>: the row <name> claims nothing` |
+
+`tabled` runs the command with `tried`, which writes the inputs with `typed_rows`.
+`answered` cuts the output at each empty line. An answer is the text before an empty line; a text after the last empty line is no answer.
+It gives each row its verdict:
+
+| The run | The verdict of a row | The row |
+| --- | --- | --- |
+| The command does not end in time. | `did not end in <timeout> seconds` | fails |
+| The command gave more answers than the table has rows. | `is one of <rows> rows, and the command gave <answers> answers` | fails |
+| A claim of the case is false. | `is in a run that differs` | fails |
+| The command gave no answer to the row, and it is the first such row. | `has no answer: the command ended at this row` | fails |
+| The command gave no answer to the row. | `has no answer` | fails |
+| The command answered the row. | The verdict of its claims on its answer, as *Verdicts* tells. | as for a case |
+
+`tabled` runs a table of 2 rows or more a second time, with the rows in the reverse order.
+It does so only if each row passed, in a run with no `--break` that counts no leaks.
+The second run has the folder `<number>/reverse`.
+A row that fails then gets ` in the reverse order` after its verdict, and the table shows the output of that run.
+
+`test` counts each row as a case. `narrowed` keeps the rows of `-k`.
 
 ## Verdicts
 

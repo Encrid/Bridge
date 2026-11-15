@@ -29,11 +29,43 @@ static int c23b_fmine(const char *parts)
 
     return (!part || strstr(parts, part) != nullptr);
 }
+#ifndef _WIN32
+extern int putenv(char *text);
+#endif
+static long long c23b_ft;
+static void c23b_fread(void);
+static void c23b_fturn(_Atomic long long *count, long long *counted)
+{
+    long long now = c23b_fget(" turn=");
+
+    if (now != c23b_ft) {
+        c23b_ft = now;
+        c23b_fread();
+    }
+    if (now != *counted) {
+        *counted = now;
+        *count = 0;
+    }
+}
+static void c23b_ftold(void)
+{
+    static char told[] = "C23_FAILED=1";
+
+    if (!c23b_ft)
+        return;
+#ifdef _WIN32
+    _putenv(told);
+#else
+    putenv(told);
+#endif
+}
 '''
-COUNT = '[[gnu::weak, gnu::visibility("hidden")]] _Atomic long long c23b_fc_%(n)s;\nstatic long long c23b_fs_%(n)s;\n'
+COUNT = ('[[gnu::weak, gnu::visibility("hidden")]] _Atomic long long c23b_fc_%(n)s;\n'
+         '[[gnu::weak, gnu::visibility("hidden")]] long long c23b_fg_%(n)s;\nstatic long long c23b_fs_%(n)s;\n')
 READ = '    c23b_fs_%(n)s = c23b_fget(" %(n)s=");\n'
 MINE = '[[gnu::constructor]] static void c23b_fread(void)\n{\n    if (!c23b_fmine("%s"))\n        return;\n'
-WRAP = '    if (++c23b_fc_%(n)s == c23b_fs_%(n)s)\n        return (%(v)s);\n    return (%(c)s);\n}\n'
+WRAP = ('    c23b_fturn(&c23b_fc_%(n)s, &c23b_fg_%(n)s);\n    if (++c23b_fc_%(n)s == c23b_fs_%(n)s) {\n'
+        '        c23b_ftold();\n        return (%(v)s);\n    }\n    return (%(c)s);\n}\n')
 
 
 def listed(config, values):
@@ -53,8 +85,11 @@ def loaded_calls(calls, used, source, declared):
 
 def loader_wrap(name, call, result, loaded, declared):
     out = ['    void *c23b_fp;',
-           '    if (++c23b_fc_%s == c23b_fs_%s)' % (name, name),
+           '    c23b_fturn(&c23b_fc_%s, &c23b_fg_%s);' % (name, name),
+           '    if (++c23b_fc_%s == c23b_fs_%s) {' % (name, name),
+           '        c23b_ftold();',
            '        return (nullptr);',
+           '    }',
            '    c23b_fp = (void *)(%s);' % call]
     for item in loaded:
         out += ['    if (a1 && !strcmp((const char *)a1, "%s")) {' % item,
