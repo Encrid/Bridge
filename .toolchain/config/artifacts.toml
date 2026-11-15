@@ -78,7 +78,7 @@ name = "pool"
 kind = "program"
 test = true
 sources = ["tests/pool/*.c", "src/pool/*.c"]
-include = ["{bridge_os}/include", "src/pool", "tests/pool"]
+include = ["{bridge_os}/include", "src/pool", "tests/pool", "{toolchain}/runtime"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{aligned}"]
 link = ["{bridge_os}/os.a"]
 
@@ -87,7 +87,7 @@ name = "region"
 kind = "program"
 test = true
 sources = ["tests/region/*.c", "src/region/*.c"]
-include = ["src/region"]
+include = ["src/region", "{toolchain}/runtime"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{aligned}"]
 
 [[artifact]]
@@ -104,7 +104,7 @@ name = "storage"
 kind = "program"
 test = true
 sources = ["tests/storage/*.c", "tests/support/host_copy*.c", "src/**/*.c"]
-include = ["include", "tests/support", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage"]
+include = ["include", "tests/support", "{toolchain}/runtime", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage"]
 defines = ["BRIDGE_BUILDING", "{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{aligned}"]
 link = ["{bridge_os}/os.a"]
