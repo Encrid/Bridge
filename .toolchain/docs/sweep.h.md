@@ -8,7 +8,8 @@ An artifact with `test = true` gets the header with `{toolchain}/runtime` in its
 
 | Function | Result |
 | --- | --- |
-| `sweep_refuse(call, at)` | Starts a new turn. In that turn, the call number `at` of the function `call` fails, and each count of the calls starts again at 0. |
+| `sweep_plan(calls)` | Starts a new turn. `calls` is a text of `<function>=<number>`, with a space between 2 of them. In that turn, each named call fails, and each count of the calls starts again at 0. An empty text makes no call fail. |
+| `sweep_refuse(call, at)` | Calls `sweep_plan` for 1 function: it starts a new turn. In that turn, the call number `at` of the function `call` fails, and each count of the calls starts again at 0. |
 | `sweep_is_refused()` | Tells if a call failed in the turn. |
 
 ## A sweep
@@ -31,10 +32,11 @@ Thus 1 run of the program reaches the path of the error of each `malloc` of the 
 
 ## How it works
 
-`sweep_refuse` writes the variable `C23_FAIL` of the environment: ` turn=<turn> <call>=<at>`. It removes the variable `C23_FAILED`.
+`sweep_plan` writes the variable `C23_FAIL` of the environment: ` turn=<turn> <calls> told=0`.
 The layer of `fail.py` reads the turn at each call. A new turn makes it read the numbers again, and start its counts again: `.toolchain/docs/fail.py.md`, *The turn*.
-`sweep_is_refused` reads the variable `C23_FAILED`, which the layer sets for a failed call of the turn.
+`sweep_is_refused` tells if the text holds ` told=1`, which the layer writes for a failed call of the turn.
 
 The variables of the environment reach each library of the program. Thus a sweep also refuses the calls of a shared library.
-A program calls `sweep_refuse` from 1 source file only: the count of the turns is in that file.
+A program calls `sweep_plan` and `sweep_refuse` from 1 source file only: the count of the turns is in that file.
+It calls them only when no other thread runs the code, because the call changes the environment.
 On a build with no layer, no call fails, and the loop ends after its first turn.
