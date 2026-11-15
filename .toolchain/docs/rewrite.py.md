@@ -89,6 +89,8 @@ If clang writes a different error, `dumped` stops: `the tree of <path> cannot be
 If the output is not JSON, it stops: `the tree of <path> is not JSON`.
 
 The dump sets `_FORTIFY_SOURCE` to 0. Then a call that the system would fortify, such as `snprintf`, does not read as a macro.
+Without that macro, the headers of macOS declare a function such as `sprintf` as deprecated, which the compile of the file does not see.
+Thus the dump has `-Wno-deprecated-declarations`: the dump reads the tree, and only the compile judges a deprecated function.
 
 The run builds the files of `inputs` after the dump, so they do not exist yet.
 zig gives an `#embed` of a file that does not exist no bytes and no error, and an empty array is an error of `-pedantic-errors`.
