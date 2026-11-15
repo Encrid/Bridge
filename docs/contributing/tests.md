@@ -5,6 +5,19 @@ A case runs a command, and makes claims about its exit status, its output and it
 `python project.py test --break` runs the false variant of each case. Each case must then fail.
 `tests` can also hold other files, for example the data that the cases read. No check reads `tests`.
 
+## Test a part
+
+A test is for a part, and it can reach each outcome of the part. Do not write a test for each outcome.
+
+1. A test program tests one part. It reads a table, and gives one answer for each row: *Tables*.
+2. The rows come from what the code must do. Write one row for each class of inputs that the code treats in one way. Write one row for each edge between two classes. Do not take the rows from the lines of the code.
+3. `test --branches` measures the table: *The branches*.
+4. A case has its own process only if it needs one: *Its own process*.
+5. A sweep tests the calls that fail for one reason, such as no memory: *A sweep*.
+
+A row that runs a branch does not check it: only a claim checks it.
+Thus each row claims what the code must give, also at an edge. For example, a limit of 10 gets a row with 10 and a row with 11.
+
 ## Write a case
 
 1. Select a behavior that a document of the project describes.
@@ -26,11 +39,65 @@ false = { run = ["{out}/greet{exe}", "Bob"] }
 
 With `Bob`, the output has no line `hello, Ada`. Thus the claims of the false variant are false, and the case can fail.
 
-- A case checks one behavior. Its name tells the behavior.
-- Each behavior that a document describes has a case.
+- A case or a row checks one behavior. Its name tells the behavior.
+- Each behavior that a document describes has a case or a row.
 - The false variant changes the command or its input. It cannot change the claims.
 - The false variant runs the code that does the behavior, with one input changed. A command that the program refuses before that code runs is not a false variant, for example an unknown name.
 - A case writes its files only into its folder, `{case}`.
+
+## Tables
+
+A case can hold a table: the key `rows`. Each row is one behavior. `test` starts the command 1 time for the whole table.
+
+For example, the program `greet` reads one name on each line, and answers each one:
+
+```toml
+[[case]]
+name = "greet"
+run = ["{out}/greet{exe}"]
+claims = { status = 0 }
+rows = [
+    { name = "greet writes the name that it gets", in = "Ada", claims = { line = ["hello, Ada"] }, false = "Bob" },
+    { name = "greet refuses an empty name", in = "", claims = { line = ["greet: no name"] }, false = "Ada" },
+]
+```
+
+- A row has a name, its input `in`, its claims, and its false input `false`. A row needs each one.
+- `test` writes the input of each row on one line of the standard input of the command, in the order of the table. Thus an input is one line.
+- The program answers each line with one line or more, and then writes one empty line. Thus an answer holds no empty line. The program ends when its input ends.
+- `test` judges the claims of a row on the answer to that row. A row claims `line`, `has`, `lacks`, `matches`, `matches_not` or `order`.
+- The claims of the case are for the whole run. A table needs them, as each case does.
+- `test --break` starts the command 1 time with the false input of each row. Each row must then fail.
+- `test` then runs the table in the reverse order. A row must answer the same in each order. A row that needs the state that a different row left fails: `differs in the reverse order`.
+- If the program ends before it answers each row, the first row with no answer fails, and each row after it. `test` names that first row.
+- `--copies` does not copy a table.
+
+`test` writes one line for each row, as for a case: `<row>: <verdict>`. It counts each row as a case.
+`-k` chooses the rows whose name contains its text. `test` then gives only their inputs to the command.
+
+## Its own process
+
+A case with no `rows` starts a process for one behavior. It states why, with the key `process`:
+
+| `process` | The reason |
+| --- | --- |
+| `status` | The behavior is how the command ends: its status, an abort, or a kill. |
+| `signal` | The case sends a signal to the command. |
+| `helper` | The case runs a helper beside the command. |
+| `command` | The behavior is in what the command gets when it starts: its arguments, its environment or its files. |
+| `state` | The behavior needs a process that did nothing before. |
+
+`test` stops for a different word: `<file>: the case <name> states the process <word>, and a process is status, signal, helper, command, state`.
+
+With `tables = true` in `[test]`, `test` also stops for a group that breaks one of these rules:
+
+| Fault | Message |
+| --- | --- |
+| A case with no `rows` states no `process`. | `<file>: the case <name> has its own process and states no reason: write process, or make it a row of a table` |
+| A table states `process`. | `<file>: the table <name> states process, and only a case with no rows has its own process` |
+| 3 cases or more have one command, and each one makes one call of the same function fail. | `<file>: <count> cases refuse the calls of <function> one after the other, from the case <name>: write a sweep` |
+
+A project states `tables = true` when its cases follow *Test a part*.
 
 ## Groups
 
@@ -57,9 +124,12 @@ A change runs only the groups that test a changed file: `.toolchain/docs/scope.p
 | `helper` | A second command that runs at the same time. |
 | `files` | The text files that `test` writes before the command starts. The key is the path, and the value is the text. |
 | `folders` | The folders that `test` makes before the command starts. The key is the path. The value is a list of artifacts or files to copy into the folder. |
+| `sweep` | The functions whose calls the command refuses one after the other: *A sweep*. |
 | `fail` | The calls that fail in the command. The key is a function, and the value is the number of its call that fails: *Failed calls*. |
 | `claims` | The claims about the command. A case must make one claim or more. |
 | `false` | The false variant of the case. Each case must have one. |
+| `rows` | The rows of a table: *Tables*. A case with `rows` has no `false`, no `stdin` and no `script`. |
+| `process` | The reason why a case with no `rows` has its own process: *Its own process*. |
 | `alone` | `true` if the case must not run at the same time as a copy of itself. Such a case runs one time with `--copies`. |
 
 Each case starts in an empty folder, `{case}`. The command runs in the folder of the project.
@@ -153,7 +223,8 @@ It runs each case one time. Then it writes a line for each branch that no case r
 - a `case` or a `default` that no case reaches;
 - a function that no case calls.
 
-For each line, write a case that runs the branch, or remove the branch.
+For each line, find the class of inputs or the edge that the table of the part lacks, and add its row.
+If no input can run the branch, remove the branch. Do not write a case only to run a line.
 A condition in an argument or in the body of a macro cannot get a probe. The run writes it, and stops.
 Thus write such a condition outside the macro.
 
@@ -212,6 +283,41 @@ A listed function that the file only names in a text fails by its own name with 
 For example, `"socket"` is a text of a call of `GetProcAddress`, and `fail = { socket = 1 }` fails that call.
 `.toolchain/docs/fail.py.md` tells how a call fails.
 
+## A sweep
+
+A test program can refuse each call of the code in 1 run: the first call, then the second, until the code runs whole.
+The case states `sweep`, with each function that the program refuses. Each one is a function that a case can make fail.
+
+```toml
+[[case]]
+name = "each refused malloc of greet gives an error"
+run = ["{out}/greet-unit{exe}"]
+sweep = ["malloc"]
+claims = { status = 0, line = ["2 refused calls, then greeted"] }
+false = { run = ["{out}/greet-unit{exe}", "short"] }
+```
+
+The program includes `sweep.h` of `.toolchain/runtime`. Its artifact has `{toolchain}/runtime` in `include`.
+
+```c
+unsigned at = 0;
+
+do {
+    at++;
+    sweep_refuse("malloc", at);
+    greeted = greet("Ada");
+} while (sweep_is_refused());
+```
+
+- `sweep_refuse` makes the call number `at` of the function fail, and starts each count again.
+- `sweep_is_refused` tells if a call failed since then. When no call failed, the code made fewer calls than `at`, and the sweep is done.
+- In each turn, the program checks what the code must do when the call fails, and writes a line that the case claims.
+- `test` runs a case with `sweep` on the copy of the code in which calls can fail, as a case with `fail`. It refuses the calls only in the programs of the part of the case.
+- `test --leaks` counts the whole run. Thus the code gives back what it took in each turn.
+
+Use a sweep for the calls that fail for one reason, such as no memory. Use `fail` for one call whose failure is a behavior of its own.
+`.toolchain/docs/sweep.h.md` tells how a sweep works.
+
 ## Run the tests
 
 | Command | Result |
@@ -239,6 +345,7 @@ A case that fails in some copies writes the number of these copies, for example 
 | `copies` | The number of copies of each case that run at the same time. `--copies` replaces it. |
 | `rule` | The rules of the groups. Each `[[test.rule]]` has `lacks` and `exempt`. |
 | `writers` | The functions that write the messages of the code, for example `fprintf`. |
+| `tables` | Optional. `true` makes `test` refuse a case that breaks a rule of *Its own process*. The default is `false`. |
 
 A rule adds a claim to each case: the output does not contain the text `lacks`.
 The rule does not apply to the groups of `exempt`.

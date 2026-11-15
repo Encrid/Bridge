@@ -106,6 +106,8 @@ The graph has these steps:
    `{deps}` names the headers of the source, and zig takes them as inputs too.
 2. For each artifact, `python build.py --one <spec>`. Its inputs are the spec, the objects, and the files of `{sources}`, `{link}` and `{runtime}`.
    Its output is `{output}`. Each folder of `{inputs}` is an input too, after the prefix of the item.
+   The files of `{sources}` and of `{runtime}` are inputs of the kind `input`, and no arguments.
+   Windows refuses a command of more than 32767 characters.
 3. For each artifact, a step that copies its output to its path in `{out}`.
 
 A file of `link` that a different artifact of the build makes is the output of the step of that artifact. Thus the step waits for it.

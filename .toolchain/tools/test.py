@@ -162,9 +162,13 @@ def made_false(case):
     return merged
 
 
-def tried(config, values, outputs, where, case, broken, counted=False, failing=None, part=False):
+def typed_rows(use, broken, order, values):
+    return ''.join(expand(use['rows'][at]['false' if broken else 'in'], values) + '\n' for at in order)
+
+
+def tried(config, values, outputs, where, case, broken, counted=False, failing=None, part=False, order=None):
     use = made_false(case) if broken else case
-    values, outputs = failing if failing and use.get('fail') else (values, outputs)
+    values, outputs = failing if failing and (use.get('fail') or use.get('sweep')) else (values, outputs)
     folder = Path(values['out']) / 'cases' / where
     shutil.rmtree(folder, ignore_errors=True)
     folder.mkdir(parents=True, exist_ok=True)
@@ -179,10 +183,12 @@ def tried(config, values, outputs, where, case, broken, counted=False, failing=N
     if helper:
         waited(beside, expand(helper['wait'], mine))
     running = started(expanded(use['run'], mine), root, timeout,
-                      environment({**counting, 'C23_FAIL': plan, 'C23_FAIL_PART': plan and part, **use.get('env', {})},
+                      environment({**counting, 'C23_FAIL': plan, 'C23_FAIL_PART': bool(plan or use.get('sweep')) and part,
+                                   **use.get('env', {})},
                                   mine), use)
     scripted(running, use.get('script', []), outputs, mine)
-    ends = [ended(running, expand(use.get('stdin', ''), mine))]
+    typing = expand(use.get('stdin', ''), mine) if order is None else typed_rows(use, broken, order, mine)
+    ends = [ended(running, typing)]
     if helper:
         ends.append(ended(beside, expand(helper.get('stdin', ''), mine)))
     return ends, [use.get('claims', {})] + ([helper.get('claims', {})] if helper else []), mine
@@ -197,6 +203,42 @@ def judged(config, group, broken, run):
     if broken:
         return not held, 'still as written' if held else 'fails, as it must', ends
     return held, 'as written' if held else 'differs', ends
+
+
+def answered(config, group, broken, run, rows, order):
+    ends, claims, mine = run
+    code, said = ends[0]
+    lacks = [rule['lacks'] for rule in config['test'].get('rule', []) if group not in rule.get('exempt', [])]
+    blocks = said.split('\n\n')[:-1]
+    if any(end is None for end, _ in ends):
+        return [(False, 'did not end in %d seconds' % config['test']['timeout'])] * len(rows)
+    if len(blocks) > len(rows):
+        return [(False, 'is one of %d rows, and the command gave %d answers' % (len(rows), len(blocks)))] * len(rows)
+    if not all(holds(claim, lacks, end, text, mine) for claim, (end, text) in zip(claims, ends)):
+        return [(False, 'is in a run that differs')] * len(rows)
+    found = [(False, 'has no answer')] * len(rows)
+    for place, at in enumerate(order[:len(blocks) + 1]):
+        if place == len(blocks):
+            found[at] = (False, 'has no answer: the command ended at this row')
+            continue
+        held = holds(rows[at]['claims'], lacks, code, blocks[place], mine)
+        found[at] = (not held, 'still as written' if held else 'fails, as it must') if broken \
+            else (held, 'as written' if held else 'differs')
+    return found
+
+
+def tabled(config, values, outputs, group, index, case, broken, counted=False, failing=None):
+    rows, where, part = case['rows'], '%s/%d' % (group, index), owner(config, group)
+    forward = list(range(len(rows)))
+    run = tried(config, values, outputs, where, case, broken, counted, failing, part, forward)
+    found = answered(config, group, broken, run, rows, forward)
+    if broken or counted or len(rows) < 2 or not all(ok for ok, _ in found):
+        return found, run[0]
+    again = tried(config, values, outputs, where + '/reverse', case, broken, counted, failing, part, forward[::-1])
+    back = answered(config, group, broken, again, rows, forward[::-1])
+    if all(ok for ok, _ in back):
+        return found, run[0]
+    return [(ok, how if ok else how + ' in the reverse order') for ok, how in back], again[0]
 
 
 def verdict(config, values, outputs, group, index, case, broken, copies, counted=False, failing=None):
@@ -217,22 +259,64 @@ def verdict(config, values, outputs, group, index, case, broken, copies, counted
 def test(config, values, outputs, groups, broken, said, copies, counted=False, failing=None):
     wrong, texts = [], []
     for group, cases in groups:
-        right = 0
+        right, count = 0, 0
         for index, case in enumerate(cases):
-            ok, how, ends = verdict(config, values, outputs, group, index, case, broken, copies, counted, failing)
+            if 'rows' in case:
+                found, ends = tabled(config, values, outputs, group, index, case, broken, counted, failing)
+                named = [(row['name'], ok, how) for row, (ok, how) in zip(case['rows'], found)]
+            else:
+                ok, how, ends = verdict(config, values, outputs, group, index, case, broken, copies, counted, failing)
+                named = [(case['name'], ok, how)]
             texts += [said for _, said in ends]
-            print('%s%s: %s' % (case['name'], ', made false' if broken else '', how))
-            right += ok
-            if not ok:
-                wrong.append(case['name'])
+            for name, ok, how in named:
+                print('%s%s: %s' % (name, ', made false' if broken else '', how))
+            right += sum(ok for _, ok, _ in named)
+            count += len(named)
+            wrong += [name for name, ok, _ in named if not ok]
+            if not all(ok for _, ok, _ in named):
                 for whose, (code, said) in zip(('', 'the helper '), ends):
                     print('  %sended with %s, and printed:\n%s' % (whose, 'no status' if code is None else status(code),
                                                                   said.rstrip()))
-        print('%s: %d claims made false: %d cases failed' % (group, len(cases), right) if broken else
-              '%s: %d cases: %d as written' % (group, len(cases), right))
+        print('%s: %d claims made false: %d cases failed' % (group, count, right) if broken else
+              '%s: %d cases: %d as written' % (group, count, right))
     if said:
         (Path(values['out']) / 'said.txt').write_text('\n'.join(texts), encoding='utf-8', newline='\n')
     return wrong
+
+
+def rowed(case, path):
+    for key in ('false', 'stdin', 'script'):
+        if key in case:
+            die('%s: the table %s has rows, and a table has no key %s' % (path, case['name'], key))
+    if not case['rows']:
+        die('%s: the table %s has no row' % (path, case['name']))
+    for row in case['rows']:
+        known(row, 'row', path)
+        missing = [key for key in ('name', 'in', 'claims', 'false') if key not in row]
+        if missing:
+            die('%s: a row of the table %s has no key %s' % (path, case['name'], missing[0]))
+        if not known(row['claims'], 'claim of a row', path):
+            die('%s: the row %s claims nothing' % (path, row['name']))
+
+
+PROCESS = ('status', 'signal', 'helper', 'command', 'state')
+
+
+def ruled(path, cases):
+    by_hand = {}
+    for case in cases:
+        if 'rows' in case and 'process' in case:
+            die('%s: the table %s states process, and only a case with no rows has its own process'
+                % (path, case['name']))
+        if 'rows' not in case and 'process' not in case:
+            die('%s: the case %s has its own process and states no reason: write process, or make it a row of a table'
+                % (path, case['name']))
+        if len(case.get('fail', {})) == 1:
+            by_hand.setdefault((tuple(case['run']), *case['fail']), []).append(case['name'])
+    for (_, call), names in by_hand.items():
+        if len(names) > 2:
+            die('%s: %d cases refuse the calls of %s one after the other, from the case %s: write a sweep'
+                % (path, len(names), call, names[0]))
 
 
 def groups_of(config, values, folder):
@@ -247,17 +331,31 @@ def groups_of(config, values, folder):
             signals.allowed(made_false(case), path)
             if not case.get('claims'):
                 die('%s: the case %s claims nothing' % (path, case['name']))
-            if 'false' not in case:
+            if 'rows' in case:
+                rowed(case, path)
+            elif 'false' not in case:
                 die('%s: the case %s has no false variant' % (path, case['name']))
-            for call in {**case.get('fail', {}), **case['false'].get('fail', {})}:
+            if case.get('process', PROCESS[0]) not in PROCESS:
+                die('%s: the case %s states the process %s, and a process is %s'
+                    % (path, case['name'], case['process'], ', '.join(PROCESS)))
+            for call in [*case.get('fail', {}), *case.get('false', {}).get('fail', {}), *case.get('sweep', [])]:
                 if call not in calls:
                     die('%s: the case %s makes %s fail, and [fail.calls] does not list it' % (path, case['name'], call))
+        if config.get('test', {}).get('tables'):
+            ruled(path, cases)
         found.append((Path(path).relative_to(folder).with_suffix('').as_posix(), cases))
     return [(group, cases) for group, cases in found if cases]
 
 
+def narrowed(case, text):
+    if 'rows' not in case or text in case['name']:
+        return case if text in case['name'] else None
+    rows = [row for row in case['rows'] if text in row['name']]
+    return dict(case, rows=rows) if rows else None
+
+
 def chosen(groups, text):
-    found = [(group, [case for case in cases if text in case['name']]) for group, cases in groups]
+    found = [(group, [one for one in (narrowed(case, text) for case in cases) if one]) for group, cases in groups]
     return [(group, cases) for group, cases in found if cases] or die('no case has %s in its name' % text)
 
 
@@ -352,7 +450,8 @@ def main():
     own = not (args.broken or args.toolchain or args.k or args.part or args.group)
     rounds = args.rounds or 1
     failing = None
-    if any((made_false(case) if args.broken else case).get('fail') for _, cases in groups for case in cases):
+    if any(use.get('fail') or use.get('sweep') for use in ((made_false(case) if args.broken else case)
+                                                            for _, cases in groups for case in cases)):
         _, mine, _, outputs, _ = changed(args, 'fail', fail.failed, (config, values))
         failing = mine, outputs
     for done in range(rounds):
