@@ -10,6 +10,8 @@
 
 constexpr size_t POOL_TEST_STACK = 1 << 18;
 
+void pool_test_start(void);
+void pool_test_rounds(uint32_t workers, uint32_t rounds, const char *flags);
 int pool_test_meet(uint32_t workers);
 
 #endif

@@ -3,11 +3,10 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "storage_test.h"
+#include "sweep.h"
 
 static const char *const PHASES[] = {
     "spawn", "attach_a", "attach_b", "detach_b", "destroy", "attach_b_half",
@@ -215,12 +214,37 @@ static void make_bridge(storage_test_t *t, const storage_test_room_t *room)
     setvbuf(stdout, nullptr, _IONBF, 0);
 }
 
+static int sweep_case(const char *what, const char *call)
+{
+    const storage_test_case_t *c = find_case(what);
+    storage_test_t t;
+    unsigned at = 0;
+
+    if (!c)
+        return (printf("FAIL: no case '%s'\n", what), 1);
+    do {
+        at++;
+        sweep_refuse(call, at);
+        t = (storage_test_t){ .what = what };
+        make_bridge(&t, c->room);
+        (void)c->run(&t);
+        (void)bridge_destroy(t.w);
+        if (sweep_is_refused())
+            printf("-- %s %u refused\n", call, at);
+    } while (sweep_is_refused());
+    sweep_refuse(call, 0);
+    printf("%u refused calls of %s\nalive\n", at - 1, call);
+    return (0);
+}
+
 int main(int argc, char **argv)
 {
     storage_test_t t = { .what = argc > 1 ? argv[1] : "" };
     const storage_test_case_t *c = find_case(t.what);
     enum storage_test_end end;
 
+    if (argc > 3 && !strcmp(t.what, "sweep"))
+        return (sweep_case(argv[2], argv[3]));
     if (!c) {
         printf("FAIL: no case '%s'\n", t.what);
         return (1);
