@@ -65,6 +65,15 @@ include = ["include"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{aligned}"]
 
 [[artifact]]
+name = "say"
+kind = "program"
+test = true
+sources = ["tests/say/*.c", "src/say/*.c"]
+include = ["include", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage"]
+defines = ["BRIDGE_BUILDING"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{aligned}"]
+
+[[artifact]]
 name = "schema"
 kind = "program"
 test = true
