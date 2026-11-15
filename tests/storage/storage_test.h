@@ -265,4 +265,12 @@ enum storage_test_end storage_test_relay_live(storage_test_t *t);
 enum storage_test_end storage_test_configure_live(storage_test_t *t);
 enum storage_test_end storage_test_group_live(storage_test_t *t);
 
+storage_type_t *storage_test_find_type(const bridge_world_t *w,
+    const char *name);
+void storage_test_count_value(void *ctx, const uint8_t *value);
+enum storage_test_end storage_test_call_on_rows(storage_test_t *t);
+enum storage_test_end storage_test_call_on_ids(storage_test_t *t);
+enum storage_test_end storage_test_call_on_tables(storage_test_t *t);
+enum storage_test_end storage_test_call_on_direct(storage_test_t *t);
+
 #endif
