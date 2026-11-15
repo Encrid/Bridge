@@ -227,18 +227,36 @@ def answered(config, group, broken, run, rows, order):
     return found
 
 
-def tabled(config, values, outputs, group, index, case, broken, counted=False, failing=None):
-    rows, where, part = case['rows'], '%s/%d' % (group, index), owner(config, group)
-    forward = list(range(len(rows)))
-    run = tried(config, values, outputs, where, case, broken, counted, failing, part, forward)
-    found = answered(config, group, broken, run, rows, forward)
-    if broken or counted or len(rows) < 2 or not all(ok for ok, _ in found):
-        return found, run[0]
-    again = tried(config, values, outputs, where + '/reverse', case, broken, counted, failing, part, forward[::-1])
-    back = answered(config, group, broken, again, rows, forward[::-1])
+def joined(founds, count):
+    rows = []
+    for verdicts in zip(*founds):
+        bad = [one for one in verdicts if not one[0]]
+        several = bad and count > 1
+        rows.append((False, '%s in %d of %d copies' % (bad[0][1], len(bad), count)) if several else (bad or verdicts)[0])
+    return rows
+
+
+def raced(config, values, outputs, group, where, case, broken, count, counted, failing, order):
+    wheres = [where] if count == 1 else ['%s/%d' % (where, copy) for copy in range(count)]
+    with concurrent.futures.ThreadPoolExecutor(count) as pool:
+        runs = list(pool.map(lambda place: tried(config, values, outputs, place, case, broken, counted, failing,
+                                                 owner(config, group), order), wheres))
+    founds = [answered(config, group, broken, run, case['rows'], order) for run in runs]
+    failed = [run for run, found in zip(runs, founds) if not all(ok for ok, _ in found)]
+    return joined(founds, count), (failed or runs)[0][0]
+
+
+def tabled(config, values, outputs, group, index, case, broken, copies, counted=False, failing=None):
+    where, forward = '%s/%d' % (group, index), list(range(len(case['rows'])))
+    count = 1 if case.get('alone') else copies
+    found, ends = raced(config, values, outputs, group, where, case, broken, count, counted, failing, forward)
+    if broken or counted or len(forward) < 2 or not all(ok for ok, _ in found):
+        return found, ends
+    back, again = raced(config, values, outputs, group, where + '/reverse', case, broken, 1, counted, failing,
+                        forward[::-1])
     if all(ok for ok, _ in back):
-        return found, run[0]
-    return [(ok, how if ok else how + ' in the reverse order') for ok, how in back], again[0]
+        return found, ends
+    return [(ok, how if ok else how + ' in the reverse order') for ok, how in back], again
 
 
 def verdict(config, values, outputs, group, index, case, broken, copies, counted=False, failing=None):
@@ -262,7 +280,7 @@ def test(config, values, outputs, groups, broken, said, copies, counted=False, f
         right, count = 0, 0
         for index, case in enumerate(cases):
             if 'rows' in case:
-                found, ends = tabled(config, values, outputs, group, index, case, broken, counted, failing)
+                found, ends = tabled(config, values, outputs, group, index, case, broken, copies, counted, failing)
                 named = [(row['name'], ok, how) for row, (ok, how) in zip(case['rows'], found)]
             else:
                 ok, how, ends = verdict(config, values, outputs, group, index, case, broken, copies, counted, failing)

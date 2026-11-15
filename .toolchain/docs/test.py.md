@@ -25,7 +25,9 @@
 | `tried(config, values, outputs, where, case, broken, counted, failing, part, order)` | Runs one case. With `order`, the case is a table, and the command gets the inputs of its rows in that order. With `counted`, it sets the variable `C23_LEAKS` of the case. `failing` gives the variables and the artifacts of the run `fail`, or `None`. `part` is the part of the case, or `False`. |
 | `judged(config, group, broken, run)` | Gives the verdict of one run of a case. |
 | `answered(config, group, broken, run, rows, order)` | Gives the verdict of each row of a table from one run, as *A table* tells. |
-| `tabled(config, values, outputs, group, index, case, broken, counted, failing)` | Runs a table in its order, and then in the reverse order. It gives the verdict of each row, and the output of the run that failed. |
+| `joined(founds, count)` | Gives one verdict for each row from the verdicts of the copies of a table, as *A table* tells. |
+| `raced(config, values, outputs, group, where, case, broken, count, counted, failing, order)` | Runs `count` copies of a table at the same time, with the rows in `order`. It gives the verdict of each row, and the output of the first copy that failed. |
+| `tabled(config, values, outputs, group, index, case, broken, copies, counted, failing)` | Runs the copies of a table in its order, and then the table in the reverse order. It gives the verdict of each row, and the output of the run that failed. |
 | `verdict(config, values, outputs, group, index, case, broken, copies, counted, failing)` | Runs the copies of one case at the same time, and gives their verdict. |
 | `test(config, values, outputs, groups, broken, said, copies, counted, failing)` | Runs all the groups, and writes each verdict. With `said`, it writes `said.txt`. It gives the names of the cases that failed. |
 | `narrowed(case, text)` | Gives a case whose name contains `text`, or a table with only its rows whose name contains it, or nothing. |
@@ -134,7 +136,7 @@ A case with `rows` is a table. `docs/contributing/tests.md`, *Tables*, gives its
 | A row claims a thing of the whole run, such as `status`. | `<file>: a claim of a row has no key <key>` |
 | A row has no claim. | `<file>: the row <name> claims nothing` |
 
-`tabled` runs the command with `tried`, which writes the inputs with `typed_rows`.
+`tabled` runs the command with `raced` and `tried`. `tried` writes the inputs with `typed_rows`.
 `answered` cuts the output at each empty line. An answer is the text before an empty line; a text after the last empty line is no answer.
 It gives each row its verdict:
 
@@ -147,7 +149,13 @@ It gives each row its verdict:
 | The command gave no answer to the row. | `has no answer` | fails |
 | The command answered the row. | The verdict of its claims on its answer, as *Verdicts* tells. | as for a case |
 
-`tabled` runs a table of 2 rows or more a second time, with the rows in the reverse order.
+`raced` runs the copies of a table at the same time, in threads, as `verdict` does for a case.
+The number of copies is `[test] copies` or `--copies`, or one copy if the table has `alone = true`.
+The folder of a copy is `<number>/<copy>`. A row passes only if it passes in each copy.
+If a row fails in copies, `joined` gives it the verdict of the first copy in which it failed.
+That verdict ends with `in <failed> of <copies> copies`.
+
+`tabled` runs a table of 2 rows or more a second time, with the rows in the reverse order. That run has one copy.
 It does so only if each row passed, in a run with no `--break` that counts no leaks.
 The second run has the folder `<number>/reverse`.
 A row that fails then gets ` in the reverse order` after its verdict, and the table shows the output of that run.
