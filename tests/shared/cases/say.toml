@@ -1,0 +1,32 @@
+code = ["include/**", "src/abi/abi.h", "src/abi/abi_declare.h", "src/abi/abi_subscribe.h", "src/backend/backend.h", "src/bridge/bridge_inside.h", "src/config/config.h", "src/inside.h", "src/leaks.toml", "src/module/module.h", "src/pool/pool.h", "src/region/region.h", "src/reload/reload.h", "src/say/**", "src/schema/schema.h", "src/schema/schema_reader.h", "src/storage/storage.h", "src/storage/storage_convert.h", "src/storage/storage_create.h", "src/storage/storage_drop.h", "src/storage/storage_inside.h", "tests/backend/**", "tests/binding/**", "tests/modules/**", "tests/say/**", "tests/schema/schema_test.h", "tests/seam/cases.h", "tests/seam/seam.manifest", "tests/seam/seam.rc", "tests/shared/**", "tests/storage/storage_test.h", "tests/support/backend_hollow.c", "tests/support/host.h", "tests/support/host_copy.h", "tests/support/plain_other_abi.c", "tests/support/plain_refusing_backend.c", "tests/support/plain_refusing_memory.c", "tests/support/posix/**", "tests/support/windows/**", ".toolchain/config/**", ".toolchain/project.toml"]
+
+[[case]]
+name = "say_error-sends-a-record-of-the-library-with-the-level-of-an-error"
+run = ["{out}/say{exe}", "error"]
+claims = { status = 0, line = ["3 none none 4: a text of 7"] }
+false = { run = ["{out}/say{exe}", "about"] }
+
+[[case]]
+name = "say_about-names-the-module-the-system-and-the-level"
+run = ["{out}/say{exe}", "about"]
+claims = { status = 0, line = ["4 game:mod@1.0.0 tick 4: a text of 7"] }
+false = { run = ["{out}/say{exe}", "error"] }
+
+[[case]]
+name = "copy_text-copies-the-first-bytes-and-ends-them"
+run = ["{out}/say{exe}", "copy"]
+claims = { status = 0, line = ["a text"] }
+false = { fail = { malloc = 1 } }
+
+[[case]]
+name = "copy_text-with-no-memory-gives-nothing"
+run = ["{out}/say{exe}", "copy"]
+fail = { malloc = 1 }
+claims = { status = 0, line = ["no copy"] }
+false = { fail = {} }
+
+[[case]]
+name = "bridge_lacks-tells-what-had-no-memory-and-nothing-for-a-block"
+run = ["{out}/say{exe}", "lacks"]
+claims = { status = 0, order = ["3 none none 4: out of memory: there was none for a table", "0 1"] }
+false = { run = ["{out}/say{exe}", "copy"] }
