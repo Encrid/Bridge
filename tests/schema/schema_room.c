@@ -26,7 +26,8 @@ static bool read_many(enum bridge_kind kind, const char *start,
     }
     strcat(text, "}");
     if (schema_parse(&source, &s)) {
-        printf("refused: %s\n", why);
+        printf("%s refused: %s\n", kind == BRIDGE_STRUCT ? "struct" : "enum",
+            why);
         return (false);
     }
     schema_free(&s);

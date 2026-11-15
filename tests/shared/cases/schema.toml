@@ -17,5 +17,26 @@ false = { fail = { calloc = 1 } }
 name = "schema-refuses-a-descriptor-whose-room-it-cannot-take"
 run = ["{out}/schema{exe}", "room"]
 fail = { calloc = 1 }
-claims = { matches = ["refused: ran out of memory at '\\{'.*alive"] }
+claims = { matches = ["struct refused: ran out of memory at '\\{'.*alive"] }
 false = { fail = {} }
+
+[[case]]
+name = "schema-refuses-an-enum-whose-room-it-cannot-take"
+run = ["{out}/schema{exe}", "room"]
+fail = { calloc = 2 }
+claims = { matches = ["enum refused: ran out of memory at '\\{'.*alive"] }
+false = { fail = { calloc = 1 } }
+
+[[case]]
+name = "schema-refuses-a-struct-with-no-memory-for-the-name-of-a-field"
+run = ["{out}/schema{exe}", "room"]
+fail = { malloc = 1 }
+claims = { matches = ["struct refused: ran out of memory at 'a'.*alive"] }
+false = { fail = {} }
+
+[[case]]
+name = "schema-refuses-an-enum-with-no-memory-for-the-name-of-a-constant"
+run = ["{out}/schema{exe}", "room"]
+fail = { malloc = 21 }
+claims = { matches = ["enum refused: ran out of memory at 'A'.*alive"] }
+false = { fail = { malloc = 1 } }
