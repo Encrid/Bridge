@@ -78,14 +78,20 @@ def typed(running, text):
         pass
 
 
-def ended(running, text):
+def fed(running, text):
     typed(running, text)
     try:
         running['proc'].stdin.close()
     except OSError:
         pass
+
+
+def ended(running, text):
+    feed = threading.Thread(target=fed, args=(running, text))
+    feed.start()
     if not running['proc'].stdout.closed:
         running['said'].append(running['proc'].stdout.read())
+    feed.join()
     code = running['proc'].wait()
     running['watch'].cancel()
     said = b''.join(running['said']).decode('utf-8', 'replace').replace('\r', '')

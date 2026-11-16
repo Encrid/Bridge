@@ -64,6 +64,7 @@ rows = [
 
 - A row has a name, its input `in`, its claims, and its false input `false`. A row needs each one.
 - `test` writes the input of each row on one line of the standard input of the command, in the order of the table. Thus an input is one line.
+- `test` reads the answers while it writes the inputs. Thus a table can be longer than a pipe holds.
 - The program answers each line with one line or more, and then writes one empty line. Thus an answer holds no empty line. The program ends when its input ends.
 - `test` judges the claims of a row on the answer to that row. A row claims `line`, `has`, `lacks`, `matches`, `matches_not` or `order`.
 - The claims of the case are for the whole run. A table needs them, as each case does.
