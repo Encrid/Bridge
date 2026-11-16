@@ -71,6 +71,7 @@ rows = [
 - `test --break` starts the command 1 time with the false input of each row. Each row must then fail.
 - `test` then runs the table in the reverse order. A row must answer the same in each order. A row that needs the state that a different row left fails: `differs in the reverse order`.
 - If the program ends before it answers each row, the first row with no answer fails, and each row after it. `test` names that first row.
+- The time of `[test] timeout` is for one row: it starts again when the program answers a row. If a row does not answer in time, each row of the table fails.
 - `test` runs the copies of a table at the same time, as it does for a case: *Run the tests*. Each copy has a folder of its own, and a row must pass in each copy. The run in the reverse order has one copy.
 
 `test` writes one line for each row, as for a case: `<row>: <verdict>`. It counts each row as a case.
@@ -343,7 +344,7 @@ A case that fails in some copies writes the number of these copies, for example 
 
 | Key | Value |
 | --- | --- |
-| `timeout` | The maximum time of a case, in seconds. A case fails if its command does not end in time, also with `--break`. |
+| `timeout` | The maximum time of a case, in seconds. A case fails if its command does not end in time, also with `--break`. For a table, it is the maximum time of each row: *Tables*. |
 | `copies` | The number of copies of each case that run at the same time. `--copies` replaces it. |
 | `rule` | The rules of the groups. Each `[[test.rule]]` has `lacks` and `exempt`. |
 | `writers` | The functions that write the messages of the code, for example `fprintf`. |
