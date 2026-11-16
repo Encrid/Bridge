@@ -23,6 +23,7 @@ A line of the input is one row. `rows_run` cuts it into words at each space and 
 - The words are the arguments of the entry: `words[0]` is `row`, and `words[1]` is the first word of the line, as for `main`.
 - The word `""` is an empty argument.
 - After the entry returns, `rows_run` writes `status <result>`, and then one empty line. Thus a row claims its status as a line: `status 0`.
+- The line `status <result>` is the last line of the answer. Thus the file of a row that claims `output` ends with that line.
 - The entry starts each row from a clean state: it sets again each variable that a row before it changed.
 - An entry that calls `exit` ends the program, and each row after it has no answer. Such a behavior needs a case of its own.
 

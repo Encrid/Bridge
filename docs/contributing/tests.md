@@ -66,7 +66,8 @@ rows = [
 - `test` writes the input of each row on one line of the standard input of the command, in the order of the table. Thus an input is one line.
 - `test` reads the answers while it writes the inputs. Thus a table can be longer than a pipe holds.
 - The program answers each line with one line or more, and then writes one empty line. Thus an answer holds no empty line. The program ends when its input ends.
-- `test` judges the claims of a row on the answer to that row. A row claims `line`, `has`, `lacks`, `matches`, `matches_not` or `order`.
+- `test` judges the claims of a row on the answer to that row. A row claims `line`, `has`, `lacks`, `matches`, `matches_not`, `order` or `output`.
+- For a row, `output` claims that the lines of the answer are the same as the text of the file.
 - The claims of the case are for the whole run. A table needs them, as each case does.
 - `test --break` starts the command 1 time with the false input of each row. Each row must then fail.
 - `test` then runs the table in the reverse order. A row must answer the same in each order. A row that needs the state that a different row left fails: `differs in the reverse order`.

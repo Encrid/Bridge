@@ -2,6 +2,9 @@
 
 `shared.py` holds what more than one tool uses.
 The tools import it. It does not run alone.
+When a tool imports it, `shared.py` sets the output and the errors of the tool to UTF-8.
+Thus a tool writes each character on each system, also into a file or a pipe.
+A tool that reads the output of a tool reads it as UTF-8.
 
 ## Constants
 

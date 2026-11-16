@@ -141,6 +141,12 @@ def holds(claims, lacks, code, said, values):
                     for path, text in claims.get('files', {}).items())])
 
 
+def claimed(claims, lacks, code, answer, values):
+    rest = {key: claim for key, claim in claims.items() if key != 'output'}
+    return holds(rest, lacks, code, answer, values) \
+        and ('output' not in claims or same(located(claims['output'], values), answer + '\n'))
+
+
 def source_of(item, outputs, values):
     name = expand(item, values)
     return outputs[name] if name in outputs else Path(values['root']) / name
@@ -242,7 +248,7 @@ def answered(config, group, broken, run, rows, order):
         if place == len(blocks):
             found[at] = (False, 'has no answer: the command ended at this row')
             continue
-        held = holds(rows[at]['claims'], lacks, code, blocks[place], mine)
+        held = claimed(rows[at]['claims'], lacks, code, blocks[place], mine)
         found[at] = (not held, 'still as written' if held else 'fails, as it must') if broken \
             else (held, 'as written' if held else 'differs')
     return found
