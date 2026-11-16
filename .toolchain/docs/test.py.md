@@ -12,7 +12,8 @@
 | `started(argv, root, timeout, env, use)` | Starts a command with `started` of `signals.py`, with a timer that stops it after `timeout` seconds. `use` is the case, or nothing for a helper. |
 | `waited(running, text)` | Reads the output until a line contains the text. It gives false if the output ends first. |
 | `typed(running, text)` | Writes a text to the command. |
-| `ended(running, text)` | Writes the text, closes the input, and waits for the end of the command. It gives the status and the output. It reads no output that a step closed. |
+| `fed(running, text)` | Writes the text with `typed`, and closes the input. |
+| `ended(running, text)` | Starts `fed` on a thread of its own, reads the output, and waits for the end of the command. It gives the status and the output. It reads no output that a step closed. |
 | `ordered(wanted, lines)` | Tells if the lines have each wanted line, in order. |
 | `holding(path, text)` | Tells if a file is there and contains the text. |
 | `same(path, said)` | Tells if a file is there and holds the same text as the output. |
