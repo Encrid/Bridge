@@ -62,6 +62,7 @@ BRIDGE_EXPORT(init) int init(void)
     bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
     int none = 0;
 
+    started = 0;
     a = BRIDGE_COMPONENT("game:LinkA", link_t, BRIDGE_STRIP, BRIDGE_TABLE);
     b = BRIDGE_COMPONENT("game:LinkB", link_t, BRIDGE_STRIP, BRIDGE_TABLE);
     c = BRIDGE_COMPONENT("game:LinkC", link_t, BRIDGE_STRIP, BRIDGE_TABLE);

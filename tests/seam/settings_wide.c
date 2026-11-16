@@ -7,7 +7,7 @@
 
 #include "cases.h"
 
-static bridge_setting_t test_wide[6] = {
+static const bridge_setting_t TEST_WIDE[6] = {
     { .key = "e16", .kind = BRIDGE_INT, .v = { .i = 1 } },
     { .key = "e32", .kind = BRIDGE_INT, .v = { .i = 1 } },
     { .key = "eu8", .kind = BRIDGE_INT, .v = { .i = 1 } },
@@ -16,22 +16,22 @@ static bridge_setting_t test_wide[6] = {
     { .key = "mask64", .kind = BRIDGE_INT, .v = { .i = 1 } }
 };
 
-static uint32_t pick_settings(const host_t *h)
+static uint32_t pick_settings(const host_t *h, bridge_setting_t *wide)
 {
     if (!strcmp(h->arg, "low"))
-        test_wide[2].v.i = -1;
+        wide[2].v.i = -1;
     if (!strcmp(h->arg, "high"))
-        test_wide[2].v.i = 256;
+        wide[2].v.i = 256;
     if (!strcmp(h->arg, "masktop"))
-        test_wide[5].v.i = INT64_MIN;
+        wide[5].v.i = INT64_MIN;
     if (!strcmp(h->arg, "names"))
         return (4);
     if (!strcmp(h->arg, "pair")) {
-        test_wide[3] = test_wide[4];
+        wide[3] = wide[4];
         return (4);
     }
     if (!strncmp(h->arg, "mask", 4)) {
-        test_wide[3] = test_wide[5];
+        wide[3] = wide[5];
         return (4);
     }
     return (3);
@@ -40,13 +40,16 @@ static uint32_t pick_settings(const host_t *h)
 void test_state_wide(host_t *h)
 {
     bridge_artifact_t a;
-    uint32_t count = pick_settings(h);
+    bridge_setting_t wide[6];
+    uint32_t count = 0;
 
+    memcpy(wide, TEST_WIDE, sizeof(wide));
+    count = pick_settings(h, wide);
     if (host_open(h))
         return;
     test_state_guarded_minting(&a, "game:settings@0.1.0", "settings-wide");
     a.cfg.config = "game:Settings";
-    a.cfg.settings = test_wide;
+    a.cfg.settings = wide;
     a.cfg.setting_count = count;
     a.cfg.persistent = 64;
     host_load(h, &a);

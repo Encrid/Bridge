@@ -30,6 +30,7 @@ BRIDGE_EXPORT(init) int init(void)
 {
     int none = 0;
 
+    passes = 0;
     BRIDGE_ADD_SYSTEM("trip", "update", &none, 0, nullptr, 0, nullptr, 0);
 #ifdef CALM
     BRIDGE_ADD_SYSTEM("calm", "present", &none, 0, nullptr, 0, nullptr, 0);
