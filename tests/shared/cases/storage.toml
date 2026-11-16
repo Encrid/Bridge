@@ -8,201 +8,6 @@ claims = { status = 0, matches = ["a call of 6144 frames of 4096 bytes gave [0-9
 false = { run = ["{out}/storage{exe}", "deep", "8388608"] }
 
 [[case]]
-name = "storage-changes"
-run = ["{out}/storage{exe}", "changes"]
-claims = { output = "tests/storage/storage_changes.txt" }
-false = { run = ["{out}/storage{exe}", "shape"] }
-
-[[case]]
-name = "storage-tables"
-run = ["{out}/storage{exe}", "tables"]
-claims = { output = "tests/storage/storage_tables.txt" }
-false = { run = ["{out}/storage{exe}", "stress"] }
-
-[[case]]
-name = "storage-stress"
-run = ["{out}/storage{exe}", "stress"]
-claims = { output = "tests/storage/storage_stress.txt" }
-false = { run = ["{out}/storage{exe}", "tables"] }
-
-[[case]]
-name = "storage-stress1"
-run = ["{out}/storage{exe}", "stress1"]
-claims = { output = "tests/storage/storage_stress.txt" }
-false = { run = ["{out}/storage{exe}", "notables"] }
-
-[[case]]
-name = "storage-notables"
-run = ["{out}/storage{exe}", "notables"]
-claims = { output = "tests/storage/storage_notables.txt" }
-false = { run = ["{out}/storage{exe}", "nocolumns"] }
-
-[[case]]
-name = "storage-nocolumns"
-run = ["{out}/storage{exe}", "nocolumns"]
-claims = { output = "tests/storage/storage_nocolumns.txt" }
-false = { run = ["{out}/storage{exe}", "scribble"] }
-
-[[case]]
-name = "storage-scribble"
-run = ["{out}/storage{exe}", "scribble"]
-claims = { output = "tests/storage/storage_scribble.txt" }
-false = { run = ["{out}/storage{exe}", "strip"] }
-
-[[case]]
-name = "storage-strip"
-run = ["{out}/storage{exe}", "strip"]
-claims = { output = "tests/storage/storage_strip.txt" }
-false = { run = ["{out}/storage{exe}", "stripfull"] }
-
-[[case]]
-name = "storage-stripfull"
-run = ["{out}/storage{exe}", "stripfull"]
-claims = { output = "tests/storage/storage_stripfull.txt" }
-false = { run = ["{out}/storage{exe}", "weigh"] }
-
-[[case]]
-name = "storage-weigh"
-alone = true
-run = ["{out}/storage{exe}", "weigh"]
-claims = { matches = ["an entity of 4096 bytes.*in    1 table.*in 4096 tables.*a sparse set.*of 4096 bytes.*a toggle, one row in 16 on.*direct-indexed.*in no order.*as tags.*a singleton read.*a toggled row switched.*alive"], lacks = ["FAIL"] }
-false = { run = ["{out}/storage{exe}", "toggle"] }
-
-[[case]]
-name = "storage-toggle"
-run = ["{out}/storage{exe}", "toggle"]
-claims = { output = "tests/storage/storage_toggle.txt" }
-false = { run = ["{out}/storage{exe}", "togglefull"] }
-
-[[case]]
-name = "storage-togglefull"
-run = ["{out}/storage{exe}", "togglefull"]
-claims = { output = "tests/storage/storage_togglefull.txt" }
-false = { run = ["{out}/storage{exe}", "move"] }
-
-[[case]]
-name = "storage-move"
-run = ["{out}/storage{exe}", "move"]
-claims = { output = "tests/storage/storage_move.txt" }
-false = { run = ["{out}/storage{exe}", "layout"] }
-
-[[case]]
-name = "storage-layout"
-run = ["{out}/storage{exe}", "layout"]
-claims = { output = "tests/storage/storage_layout.txt" }
-false = { run = ["{out}/storage{exe}", "tag"] }
-
-[[case]]
-name = "BRIDGE_TAG-carried-with-no-bytes"
-run = ["{out}/storage{exe}", "tag"]
-claims = { output = "tests/storage/storage_tag.txt" }
-false = { run = ["{out}/storage{exe}", "single"] }
-
-[[case]]
-name = "BRIDGE_SINGLETON-given-and-read"
-run = ["{out}/storage{exe}", "single"]
-claims = { output = "tests/storage/storage_single.txt" }
-false = { run = ["{out}/storage{exe}", "singlebad1"] }
-
-[[case]]
-name = "storage-direct"
-run = ["{out}/storage{exe}", "direct"]
-claims = { output = "tests/storage/storage_direct.txt" }
-false = { run = ["{out}/storage{exe}", "directstrip"] }
-
-[[case]]
-name = "storage-directstrip"
-run = ["{out}/storage{exe}", "directstrip"]
-claims = { output = "tests/storage/storage_directstrip.txt" }
-false = { run = ["{out}/storage{exe}", "directsweep"] }
-
-[[case]]
-name = "storage-directsweep"
-run = ["{out}/storage{exe}", "directsweep"]
-claims = { output = "tests/storage/storage_directsweep.txt" }
-false = { run = ["{out}/storage{exe}", "directdelete"] }
-
-[[case]]
-name = "storage-directdelete"
-run = ["{out}/storage{exe}", "directdelete"]
-claims = { output = "tests/storage/storage_directdelete.txt" }
-false = { run = ["{out}/storage{exe}", "directnone"] }
-
-[[case]]
-name = "storage-sparse"
-run = ["{out}/storage{exe}", "sparse"]
-claims = { output = "tests/storage/storage_sparse.txt" }
-false = { run = ["{out}/storage{exe}", "sparsefull"] }
-
-[[case]]
-name = "storage-sparsefull"
-run = ["{out}/storage{exe}", "sparsefull"]
-claims = { output = "tests/storage/storage_sparsefull.txt" }
-false = { run = ["{out}/storage{exe}", "sparsestrip"] }
-
-[[case]]
-name = "storage-sparsestrip"
-run = ["{out}/storage{exe}", "sparsestrip"]
-claims = { output = "tests/storage/storage_sparsestrip.txt" }
-false = { run = ["{out}/storage{exe}", "sparsesweep"] }
-
-[[case]]
-name = "storage-sparsesweep"
-run = ["{out}/storage{exe}", "sparsesweep"]
-claims = { output = "tests/storage/storage_sparsesweep.txt" }
-false = { run = ["{out}/storage{exe}", "sparsesweepa"] }
-
-[[case]]
-name = "storage-sparsesweepa"
-run = ["{out}/storage{exe}", "sparsesweepa"]
-claims = { output = "tests/storage/storage_sparsesweepa.txt" }
-false = { run = ["{out}/storage{exe}", "sparsedelete"] }
-
-[[case]]
-name = "storage-sparsedelete"
-run = ["{out}/storage{exe}", "sparsedelete"]
-claims = { output = "tests/storage/storage_sparsedelete.txt" }
-false = { run = ["{out}/storage{exe}", "sparsenone"] }
-
-[[case]]
-name = "storage-baseline"
-alone = true
-run = ["{out}/storage{exe}", "baseline"]
-claims = { matches = ["read in order.*in no order.*204800 of them on.*found through its query.*alive"], lacks = ["FAIL"] }
-false = { run = ["{out}/storage{exe}", "measure"] }
-
-[[case]]
-name = "storage-measure"
-alone = true
-run = ["{out}/storage{exe}", "measure"]
-claims = { matches = ["an id handed out +[0-9.]+ ns each.*ten thousand tables made.*the stress run, on 1 thread.*a phase of a thousand modules, on 1 thread +[0-9.]+ us.*a barrier of a thousand idle modules +[0-9.]+ us.*a barrier after a thousand queued changes +[0-9.]+ us.*a load beside a thousand modules +[0-9.]+ us.*an unload beside a thousand modules +[0-9.]+ us.*a barrier after one changed table beside a thousand modules +[0-9.]+ us.*a phase of a thousand modules, on 6 threads +[0-9.]+ us.*alive"] }
-false = { run = ["{out}/storage{exe}", "stress1"] }
-
-[[case]]
-name = "bridge_header_t-read-by-a-plain-module"
-run = ["{out}/storage{exe}", "stress1"]
-claims = { output = "tests/storage/storage_stress.txt" }
-false = { run = ["{out}/storage{exe}", "changes"] }
-
-[[case]]
-name = "bridge_entity_t-index-read-by-a-plain-module"
-run = ["{out}/storage{exe}", "stress1"]
-claims = { output = "tests/storage/storage_stress.txt" }
-false = { run = ["{out}/storage{exe}", "changes"] }
-
-[[case]]
-name = "bridge_list_t-triggers-of-a-plain-observer"
-run = ["{out}/storage{exe}", "changes"]
-claims = { output = "tests/storage/storage_changes.txt" }
-false = { run = ["{out}/storage{exe}", "shape"] }
-
-[[case]]
-name = "detach-queued-and-applied-at-the-barrier"
-run = ["{out}/storage{exe}", "changes"]
-claims = { output = "tests/storage/storage_changes.txt" }
-false = { run = ["{out}/storage{exe}", "shape"] }
-
-[[case]]
 name = "storage"
 run = ["{out}/storage{exe}"]
 claims = { status = 0 }
@@ -270,4 +75,44 @@ rows = [
     { name = "storage-the-calls-on-rows-read-each-value-and-find-each-changed-column", in = "callsrows", claims = { matches = ["values of st:A read: 6; rows with st:T off: 3; with st:A off: 0.*columns changed with no write: 0; after value_a: 1.*alive"] }, false = "ordersamephase" },
     { name = "storage-the-values-of-a-type-are-read-in-each-live-table-that-has-it", in = "callstables", claims = { matches = ["values of st:B read: 3 in 2 tables; values of st:A read: 3 after the entities of st:B left, in 1 tables.*alive"] }, false = "ordersamephase" },
     { name = "storage-the-values-of-a-direct-indexed-type-are-read-by-index-and-a-type-too-large-is-refused", in = "callsdirect", claims = { matches = ["values of st:D read by index: 3.*a direct-indexed type of 8192 bytes for each entity: refused.*alive"] }, false = "ordersamephase" },
+    { name = "storage-changes", in = "changes", claims = { output = "tests/storage/storage_changes.txt" }, false = "shape" },
+    { name = "storage-tables", in = "tables", claims = { output = "tests/storage/storage_tables.txt" }, false = "stress" },
+    { name = "storage-stress", in = "stress", claims = { output = "tests/storage/storage_stress.txt" }, false = "tables" },
+    { name = "storage-stress1", in = "stress1", claims = { output = "tests/storage/storage_stress.txt" }, false = "notables" },
+    { name = "storage-notables", in = "notables", claims = { output = "tests/storage/storage_notables.txt" }, false = "nocolumns" },
+    { name = "storage-nocolumns", in = "nocolumns", claims = { output = "tests/storage/storage_nocolumns.txt" }, false = "scribble" },
+    { name = "storage-scribble", in = "scribble", claims = { output = "tests/storage/storage_scribble.txt" }, false = "strip" },
+    { name = "storage-strip", in = "strip", claims = { output = "tests/storage/storage_strip.txt" }, false = "stripfull" },
+    { name = "storage-stripfull", in = "stripfull", claims = { output = "tests/storage/storage_stripfull.txt" }, false = "weigh" },
+    { name = "storage-toggle", in = "toggle", claims = { output = "tests/storage/storage_toggle.txt" }, false = "togglefull" },
+    { name = "storage-togglefull", in = "togglefull", claims = { output = "tests/storage/storage_togglefull.txt" }, false = "move" },
+    { name = "storage-move", in = "move", claims = { output = "tests/storage/storage_move.txt" }, false = "layout" },
+    { name = "storage-layout", in = "layout", claims = { output = "tests/storage/storage_layout.txt" }, false = "tag" },
+    { name = "BRIDGE_TAG-carried-with-no-bytes", in = "tag", claims = { output = "tests/storage/storage_tag.txt" }, false = "single" },
+    { name = "BRIDGE_SINGLETON-given-and-read", in = "single", claims = { output = "tests/storage/storage_single.txt" }, false = "singlebad1" },
+    { name = "storage-direct", in = "direct", claims = { output = "tests/storage/storage_direct.txt" }, false = "directstrip" },
+    { name = "storage-directstrip", in = "directstrip", claims = { output = "tests/storage/storage_directstrip.txt" }, false = "directsweep" },
+    { name = "storage-directsweep", in = "directsweep", claims = { output = "tests/storage/storage_directsweep.txt" }, false = "directdelete" },
+    { name = "storage-directdelete", in = "directdelete", claims = { output = "tests/storage/storage_directdelete.txt" }, false = "directnone" },
+    { name = "storage-sparse", in = "sparse", claims = { output = "tests/storage/storage_sparse.txt" }, false = "sparsefull" },
+    { name = "storage-sparsefull", in = "sparsefull", claims = { output = "tests/storage/storage_sparsefull.txt" }, false = "sparsestrip" },
+    { name = "storage-sparsestrip", in = "sparsestrip", claims = { output = "tests/storage/storage_sparsestrip.txt" }, false = "sparsesweep" },
+    { name = "storage-sparsesweep", in = "sparsesweep", claims = { output = "tests/storage/storage_sparsesweep.txt" }, false = "sparsesweepa" },
+    { name = "storage-sparsesweepa", in = "sparsesweepa", claims = { output = "tests/storage/storage_sparsesweepa.txt" }, false = "sparsedelete" },
+    { name = "storage-sparsedelete", in = "sparsedelete", claims = { output = "tests/storage/storage_sparsedelete.txt" }, false = "sparsenone" },
+    { name = "bridge_header_t-read-by-a-plain-module", in = "stress1", claims = { output = "tests/storage/storage_stress.txt" }, false = "changes" },
+    { name = "bridge_entity_t-index-read-by-a-plain-module", in = "stress1", claims = { output = "tests/storage/storage_stress.txt" }, false = "changes" },
+    { name = "bridge_list_t-triggers-of-a-plain-observer", in = "changes", claims = { output = "tests/storage/storage_changes.txt" }, false = "shape" },
+    { name = "detach-queued-and-applied-at-the-barrier", in = "changes", claims = { output = "tests/storage/storage_changes.txt" }, false = "shape" },
+]
+
+[[case]]
+name = "storage-alone"
+run = ["{out}/storage{exe}"]
+alone = true
+claims = { status = 0 }
+rows = [
+    { name = "storage-weigh", in = "weigh", claims = { matches = ["an entity of 4096 bytes.*in    1 table.*in 4096 tables.*a sparse set.*of 4096 bytes.*a toggle, one row in 16 on.*direct-indexed.*in no order.*as tags.*a singleton read.*a toggled row switched.*alive"], lacks = ["FAIL"] }, false = "toggle" },
+    { name = "storage-baseline", in = "baseline", claims = { matches = ["read in order.*in no order.*204800 of them on.*found through its query.*alive"], lacks = ["FAIL"] }, false = "measure" },
+    { name = "storage-measure", in = "measure", claims = { matches = ["an id handed out +[0-9.]+ ns each.*ten thousand tables made.*the stress run, on 1 thread.*a phase of a thousand modules, on 1 thread +[0-9.]+ us.*a barrier of a thousand idle modules +[0-9.]+ us.*a barrier after a thousand queued changes +[0-9.]+ us.*a load beside a thousand modules +[0-9.]+ us.*an unload beside a thousand modules +[0-9.]+ us.*a barrier after one changed table beside a thousand modules +[0-9.]+ us.*a phase of a thousand modules, on 6 threads +[0-9.]+ us.*alive"] }, false = "stress1" },
 ]

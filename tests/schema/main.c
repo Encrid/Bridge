@@ -6,10 +6,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "rows.h"
 #include "schema_test.h"
 
-int main(int argc, char **argv)
+static int run(int argc, char **argv)
 {
+    const char *first = argc > 2 ? "{ float x; double y; }" : nullptr;
     int failed;
 
     if (argc > 1 && !strcmp(argv[1], "room")) {
@@ -17,11 +19,16 @@ int main(int argc, char **argv)
         printf("alive\n");
         return (failed);
     }
-    failed = schema_run_structs(argc > 1 ? argv[1] : nullptr);
+    failed = schema_run_structs(first);
     failed += schema_run_constants();
     failed += schema_run_refusals();
     printf("%s\n", failed ? "FAIL" : "every descriptor read as it should, "
         "and every other refused by its word");
     printf("alive\n");
     return (failed != 0);
+}
+
+int main(int argc, char **argv)
+{
+    return (argc > 1 ? run(argc, argv) : rows_run(run));
 }

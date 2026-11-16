@@ -63,3 +63,4 @@ attach_a
   -: the world has stopped: module 'st:store@0.1.0' was stopped and its on_error is fail 0 0
   REFUSED
 alive
+status 0

@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "rows.h"
 #include "say.h"
 
 static void write_record(void *ud, const bridge_record_t *r)
@@ -33,7 +34,7 @@ static void run_lacks(bridge_world_t *w)
     printf("%d %d\n", got, none);
 }
 
-int main(int argc, char **argv)
+static int run(int argc, char **argv)
 {
     static bridge_world_t w;
     static module_t m;
@@ -56,4 +57,9 @@ int main(int argc, char **argv)
     if (!strcmp(mode, "lacks"))
         run_lacks(&w);
     return (0);
+}
+
+int main(int argc, char **argv)
+{
+    return (argc > 1 ? run(argc, argv) : rows_run(run));
 }

@@ -16,34 +16,6 @@ claims = { matches = ["the guarded backend's library is still loaded, the plain 
 false = { run = ["{out}/seam{exe}", "BACKEND_UNLOAD-unstated-library-kept"] }
 
 [[case]]
-name = "config.threads-two-run-at-once"
-alone = true
-run = ["{out}/seam{exe}", "config.threads-two-run-at-once"]
-claims = { matches = ["on 2 thread.s.[^a-z]*they ran at once.*alive"] }
-false = { run = ["{out}/seam{exe}", "config.threads-one-runs-in-turn"] }
-
-[[case]]
-name = "config.threads-one-runs-in-turn"
-alone = true
-run = ["{out}/seam{exe}", "config.threads-one-runs-in-turn"]
-claims = { matches = ["on 1 thread.s.[^a-z]*they ran one after the other.*alive"] }
-false = { run = ["{out}/seam{exe}", "config.threads-two-run-at-once"] }
-
-[[case]]
-name = "bridge_run_phase-observers-of-one-module-run-one-after-another"
-alone = true
-run = ["{out}/seam{exe}", "bridge_run_phase-observers-of-one-module-run-one-after-another"]
-claims = { matches = ["two naps of one module on 1 thread.s. of 2[^a-z]*they ran one after the other.*alive"] }
-false = { run = ["{out}/seam{exe}", "config.threads-two-run-at-once"] }
-
-[[case]]
-name = "bridge_run_phase-systems-of-one-module-run-one-after-another"
-alone = true
-run = ["{out}/seam{exe}", "bridge_run_phase-systems-of-one-module-run-one-after-another"]
-claims = { matches = ["two naps of one module on 1 thread.s. of 2[^a-z]*they ran one after the other.*alive"] }
-false = { run = ["{out}/seam{exe}", "config.threads-two-run-at-once"] }
-
-[[case]]
 name = "seam"
 run = ["{out}/seam{exe}"]
 claims = { status = 0 }
@@ -609,4 +581,16 @@ rows = [
     { name = "bridge_header_t-changes_left-the-whole-room-at-each-barrier", in = "bridge_header_t-changes_left-the-whole-room-at-each-barrier", claims = { matches = ["game:stamp@0\\.1\\.0/stamp: stamp left 256 [0-9]+.*game:stamp@0\\.1\\.0/stamp: stamp left 256 [0-9]+.*alive"] }, false = "bridge_header_t-changes_left-of-a-smaller-room" },
     { name = "bridge_header_t-changes_left-lets-a-module-keep-a-change-for-the-next-barrier", in = "bridge_header_t-changes_left-lets-a-module-keep-a-change-for-the-next-barrier", claims = { matches = ["stamp left 256 8\\b.*stamp left 256 8\\b.*alive"], lacks = ["failed", "used up"] }, false = "bridge_header_t-changes_left-of-a-smaller-room" },
     { name = "bridge_header_t-changes_left-of-a-smaller-room", in = "bridge_header_t-changes_left-of-a-smaller-room", claims = { matches = ["init left 128 96\\b.*stamp left 128 4\\b.*stamp left 128 4\\b.*alive"] }, false = "bridge_header_t-changes_left-the-whole-room-when-the-instance-starts" },
+]
+
+[[case]]
+name = "seam-alone"
+run = ["{out}/seam{exe}"]
+alone = true
+claims = { status = 0 }
+rows = [
+    { name = "config.threads-two-run-at-once", in = "config.threads-two-run-at-once", claims = { matches = ["on 2 thread.s.[^a-z]*they ran at once.*alive"] }, false = "config.threads-one-runs-in-turn" },
+    { name = "config.threads-one-runs-in-turn", in = "config.threads-one-runs-in-turn", claims = { matches = ["on 1 thread.s.[^a-z]*they ran one after the other.*alive"] }, false = "config.threads-two-run-at-once" },
+    { name = "bridge_run_phase-observers-of-one-module-run-one-after-another", in = "bridge_run_phase-observers-of-one-module-run-one-after-another", claims = { matches = ["two naps of one module on 1 thread.s. of 2[^a-z]*they ran one after the other.*alive"] }, false = "config.threads-two-run-at-once" },
+    { name = "bridge_run_phase-systems-of-one-module-run-one-after-another", in = "bridge_run_phase-systems-of-one-module-run-one-after-another", claims = { matches = ["two naps of one module on 1 thread.s. of 2[^a-z]*they ran one after the other.*alive"] }, false = "config.threads-two-run-at-once" },
 ]

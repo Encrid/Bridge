@@ -9,3 +9,4 @@ destroy
 look
   see: the first kind: spans, rows 0 0
 alive
+status 0

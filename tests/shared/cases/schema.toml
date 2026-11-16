@@ -1,42 +1,15 @@
 code = ["include/**", "src/abi/abi.h", "src/abi/abi_declare.h", "src/abi/abi_subscribe.h", "src/backend/backend.h", "src/bridge/bridge_inside.h", "src/inside.h", "src/leaks.toml", "src/module/module.h", "src/reload/reload.h", "src/schema/**", "tests/backend/**", "tests/binding/**", "tests/modules/**", "tests/schema/**", "tests/seam/cases.h", "tests/seam/seam.manifest", "tests/seam/seam.rc", "tests/shared/**", "tests/support/backend_hollow.c", "tests/support/host.h", "tests/support/host_copy.h", "tests/support/plain_other_abi.c", "tests/support/plain_refusing_backend.c", "tests/support/plain_refusing_memory.c", "tests/support/posix/**", "tests/support/windows/**", ".toolchain/config/**", ".toolchain/project.toml"]
 
 [[case]]
-name = "schema"
+name = "schema-rows"
 run = ["{out}/schema{exe}"]
-claims = { matches = ["every descriptor read as it should, and every other refused by its word.*alive"] }
-false = { run = ["{out}/schema{exe}", "{ float x; double y; }"] }
-
-[[case]]
-name = "schema-takes-the-room-of-its-fields-and-of-its-constants-once"
-run = ["{out}/schema{exe}", "room"]
-fail = { malloc = 41, calloc = 3, realloc = 1 }
-claims = { matches = ["a struct of 20 fields and an enum of 20 constants were read.*alive"] }
-false = { fail = { calloc = 1 } }
-
-[[case]]
-name = "schema-refuses-a-descriptor-whose-room-it-cannot-take"
-run = ["{out}/schema{exe}", "room"]
-fail = { calloc = 1 }
-claims = { matches = ["struct refused: ran out of memory at '\\{'.*alive"] }
-false = { fail = {} }
-
-[[case]]
-name = "schema-refuses-an-enum-whose-room-it-cannot-take"
-run = ["{out}/schema{exe}", "room"]
-fail = { calloc = 2 }
-claims = { matches = ["enum refused: ran out of memory at '\\{'.*alive"] }
-false = { fail = { calloc = 1 } }
-
-[[case]]
-name = "schema-refuses-a-struct-with-no-memory-for-the-name-of-a-field"
-run = ["{out}/schema{exe}", "room"]
-fail = { malloc = 1 }
-claims = { matches = ["struct refused: ran out of memory at 'a'.*alive"] }
-false = { fail = {} }
-
-[[case]]
-name = "schema-refuses-an-enum-with-no-memory-for-the-name-of-a-constant"
-run = ["{out}/schema{exe}", "room"]
-fail = { malloc = 21 }
-claims = { matches = ["enum refused: ran out of memory at 'A'.*alive"] }
-false = { fail = { malloc = 1 } }
+sweep = ["calloc", "malloc", "realloc"]
+claims = { status = 0 }
+rows = [
+    { name = "schema", in = "all", claims = { matches = ["every descriptor read as it should, and every other refused by its word.*alive"] }, false = "all other" },
+    { name = "schema-takes-the-room-of-its-fields-and-of-its-constants-once", in = "+refuse malloc=41,calloc=3,realloc=1 room", claims = { matches = ["a struct of 20 fields and an enum of 20 constants were read.*alive"] }, false = "+refuse calloc=1 room" },
+    { name = "schema-refuses-a-descriptor-whose-room-it-cannot-take", in = "+refuse calloc=1 room", claims = { matches = ["struct refused: ran out of memory at '\\{'.*alive"] }, false = "room" },
+    { name = "schema-refuses-an-enum-whose-room-it-cannot-take", in = "+refuse calloc=2 room", claims = { matches = ["enum refused: ran out of memory at '\\{'.*alive"] }, false = "+refuse calloc=1 room" },
+    { name = "schema-refuses-a-struct-with-no-memory-for-the-name-of-a-field", in = "+refuse malloc=1 room", claims = { matches = ["struct refused: ran out of memory at 'a'.*alive"] }, false = "room" },
+    { name = "schema-refuses-an-enum-with-no-memory-for-the-name-of-a-constant", in = "+refuse malloc=21 room", claims = { matches = ["enum refused: ran out of memory at 'A'.*alive"] }, false = "+refuse malloc=1 room" },
+]

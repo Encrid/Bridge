@@ -80,3 +80,4 @@ look
   look: with A and maybe B: spans, rows 0 0
   look: of them with B: rows 0 0
 alive
+status 0

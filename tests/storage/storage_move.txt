@@ -120,3 +120,4 @@ a table to a sparse set
   -: the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
   storage: st:X is a table, carried by 3
 alive
+status 0

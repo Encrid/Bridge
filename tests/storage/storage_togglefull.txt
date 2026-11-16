@@ -9,3 +9,4 @@ look
   look: by words: rows, and of them on 4 2
   look: by words: the sum of those on, and spans 24 1
 alive
+status 0

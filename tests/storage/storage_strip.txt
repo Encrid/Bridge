@@ -80,3 +80,4 @@ look_b
 find
   find: alive and found through the index with A, and named in a span 0 0
 alive
+status 0
