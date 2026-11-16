@@ -29,7 +29,6 @@ void host_init(host_t *h, int argc, char **argv)
         .columns = 1 << 20, .sparse_sets = BRIDGE_NONE,
         .direct_indexed = BRIDGE_NONE };
 
-    setvbuf(stdout, nullptr, _IONBF, 0);
     *h = (host_t){ .what = argc > 1 ? argv[1] : "" };
     h->backends[0] = (bridge_backend_t){ "guarded", BRIDGE_TESTS_ALL_PATH,
         HOST_KEEPS_ALL, 4 };

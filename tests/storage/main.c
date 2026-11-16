@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "storage_test.h"
-#include "sweep.h"
+#include "rows.h"
 
 static const char *const PHASES[] = {
     "spawn", "attach_a", "attach_b", "detach_b", "destroy", "attach_b_half",
@@ -211,7 +211,6 @@ static void make_bridge(storage_test_t *t, const storage_test_room_t *room)
         t->cfg.budget.columns = (uint64_t)atoi(t->more);
     if (!room->makes_world)
         t->w = bridge_create(&t->cfg, storage_test_hear, t);
-    setvbuf(stdout, nullptr, _IONBF, 0);
 }
 
 static int sweep_case(const char *what, const char *call)
@@ -237,7 +236,7 @@ static int sweep_case(const char *what, const char *call)
     return (0);
 }
 
-int main(int argc, char **argv)
+static int run(int argc, char **argv)
 {
     storage_test_t t = { .what = argc > 1 ? argv[1] : "" };
     const storage_test_case_t *c = find_case(t.what);
@@ -260,4 +259,10 @@ int main(int argc, char **argv)
     if (end != STORAGE_TEST_FAILED)
         printf("alive\n");
     return (end == STORAGE_TEST_FAILED);
+}
+
+int main(int argc, char **argv)
+{
+    setvbuf(stdout, nullptr, _IONBF, 0);
+    return (argc > 1 ? run(argc, argv) : rows_run(run));
 }

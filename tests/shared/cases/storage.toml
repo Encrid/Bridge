@@ -1,130 +1,17 @@
 code = ["include/**", "src/abi/**", "src/backend/**", "src/bits.h", "src/block/**", "src/bridge/bridge_backend.c", "src/bridge/bridge_backends.c", "src/bridge/bridge_calls.c", "src/bridge/bridge_check.c", "src/bridge/bridge_create.c", "src/bridge/bridge_destroy.c", "src/bridge/bridge_inside.h", "src/bridge/bridge_keys.c", "src/bridge/bridge_load.c", "src/bridge/bridge_order.c", "src/bridge/bridge_phases.c", "src/bridge/bridge_reload.c", "src/bridge/bridge_run.c", "src/bridge/bridge_stop.c", "src/bridge/bridge_unload.c", "src/hash.h", "src/inside.h", "src/leaks.toml", "src/module/module.h", "src/module/module_call.c", "src/module/module_check.c", "src/module/module_check_backend.c", "src/module/module_check_fit.c", "src/module/module_check_phases.c", "src/module/module_check_stated.c", "src/module/module_discard.c", "src/module/module_identity.c", "src/module/module_instance.c", "src/module/module_record.c", "src/module/module_say.c", "src/module/module_share.c", "src/module/module_shutdown.c", "src/module/module_start.c", "src/module/module_types.c", "src/reload/reload.h", "src/reload/reload_check.c", "src/reload/reload_fail.c", "src/reload/reload_record.c", "src/reload/reload_rows.c", "src/reload/reload_share.c", "src/schedule/schedule.h", "src/schedule/schedule_account.c", "src/schedule/schedule_before.c", "src/schedule/schedule_bits.h", "src/schedule/schedule_build.c", "src/schedule/schedule_check.c", "src/schedule/schedule_closure.c", "src/schedule/schedule_commit.c", "src/schedule/schedule_conflict.c", "src/schedule/schedule_cross.c", "src/schedule/schedule_dispatch.c", "src/schedule/schedule_edges.c", "src/schedule/schedule_group.c", "src/schedule/schedule_jobs.c", "src/schedule/schedule_levels.c", "src/schedule/schedule_marks.c", "src/schedule/schedule_matrix.c", "src/schedule/schedule_names.c", "src/schedule/schedule_order.c", "src/schedule/schedule_run.c", "src/schedule/schedule_triggered.c", "src/schedule/schedule_unordered.c", "src/schedule/schedule_uses.c", "src/storage/**", "tests/backend/**", "tests/binding/**", "tests/modules/**", "tests/seam/cases.h", "tests/seam/seam.manifest", "tests/seam/seam.rc", "tests/shared/**", "tests/storage/**", "tests/support/backend_hollow.c", "tests/support/host.h", "tests/support/host_copy.c", "tests/support/host_copy.h", "tests/support/host_copy_block.c", "tests/support/plain_other_abi.c", "tests/support/plain_refusing_backend.c", "tests/support/plain_refusing_memory.c", "tests/support/posix/**", "tests/support/windows/**", ".toolchain/config/**", ".toolchain/project.toml"]
 
 [[case]]
-name = "block-the-offset-of-a-pointer-outside-the-block-is-zero"
-run = ["{out}/storage{exe}", "blockoffset"]
-claims = { matches = ["offset null 0 below 0 above 0 inside 50.*alive"] }
-false = { run = ["{out}/storage{exe}", "ordersamephase"] }
-
-[[case]]
-name = "block-a-module-whose-entity-index-is-outside-the-block-is-refused"
-run = ["{out}/storage{exe}", "indexoutside"]
-claims = { matches = ["the entity index is outside the block.*alive"] }
-false = { run = ["{out}/storage{exe}", "ordersamephase"] }
-
-[[case]]
-name = "storage-a-table-past-the-room-is-refused"
-run = ["{out}/storage{exe}", "tablefull"]
-claims = { matches = ["table past the room: 0.*alive"] }
-false = { run = ["{out}/storage{exe}", "ordersamephase"] }
-
-[[case]]
-name = "storage-a-span-region-past-the-spans-is-refused"
-run = ["{out}/storage{exe}", "spansfull"]
-claims = { matches = ["spans too small: 1.*alive"] }
-false = { run = ["{out}/storage{exe}", "ordersamephase"] }
-
-[[case]]
-name = "bridge-a-new-order-replaces-the-whole-set-or-the-old-set-stays"
-run = ["{out}/storage{exe}", "setorder"]
-claims = { matches = ["contradicts itself.*cycle: refused 0 1 2 3.*is unchanged.*no pair orders them.*empty: refused 0 1 2 3.*alt: ok 0 1 0 1.*alive"] }
-false = { run = ["{out}/storage{exe}", "ordersamephase"] }
-
-[[case]]
-name = "bridge-set-order-is-refused-when-the-world-has-stopped"
-run = ["{out}/storage{exe}", "setorderstopped"]
-claims = { matches = ["the world has stopped: a module stopped it.*guard setorderstopped: 1.*alive"] }
-false = { run = ["{out}/storage{exe}", "ordersamephase"] }
-
-[[case]]
-name = "bridge-set-order-is-refused-from-a-second-caller"
-run = ["{out}/storage{exe}", "setorderbusy"]
-claims = { matches = ["guard setorderbusy: 1.*alive"] }
-false = { run = ["{out}/storage{exe}", "ordersamephase"] }
-
-[[case]]
-name = "bridge-set-order-is-refused-from-a-reentrant-call"
-run = ["{out}/storage{exe}", "setorderreentrant"]
-claims = { matches = ["guard setorderreentrant: 1.*alive"] }
-false = { run = ["{out}/storage{exe}", "ordersamephase"] }
-
-[[case]]
-name = "region-a-give-into-a-full-list-of-gaps-keeps-the-piece-out"
-run = ["{out}/storage{exe}", "regionfull"]
-claims = { matches = ["region full: count 2.*alive"] }
-false = { run = ["{out}/storage{exe}", "ordersamephase"] }
-
-[[case]]
-name = "storage-marks-full-refused"
-run = ["{out}/storage{exe}", "marks"]
-claims = { matches = ["refused: out of memory: there was none for the mark of its queue.*alive"] }
-false = { run = ["{out}/storage{exe}", "shape"] }
-
-[[case]]
-name = "storage-the-runs-of-a-barrier-go-by-turn-and-a-tie-by-load-order"
-run = ["{out}/storage{exe}", "runs", "abccb=a"]
-claims = { matches = ["rows: a0 b1 c2 c3 a4 b4\nalive"] }
-false = { run = ["{out}/storage{exe}", "runs", "aabbcc"] }
-
-[[case]]
-name = "relay-a-field-of-a-kind-past-the-element-table-takes-the-type-size"
-run = ["{out}/storage{exe}", "relaybadkind"]
-claims = { matches = ["element size of a bad kind: 42.*alive"] }
-false = { run = ["{out}/storage{exe}", "ordersamephase"] }
-
-[[case]]
-name = "order-a-pair-of-two-phases-is-refused"
-run = ["{out}/storage{exe}", "orderphases"]
-claims = { matches = ["orderphases: refused: the \\[order\\] pair of 'game:m:a' and 'game:n:b' orders nothing: they run in different phases"] }
-false = { run = ["{out}/storage{exe}", "ordersamephase"] }
-
-[[case]]
-name = "order-a-pair-of-one-phase-builds"
-run = ["{out}/storage{exe}", "ordersamephase"]
-claims = { matches = ["ordersamephase: built"], lacks = ["refused"] }
-false = { run = ["{out}/storage{exe}", "orderphases"] }
-
-[[case]]
-name = "order-a-cycle-of-pairs-and-before-refused-in-each-load-order"
-run = ["{out}/storage{exe}", "ordertwo"]
-claims = { matches = ["game:m loaded first: refused: 'game:m:m1' would run before itself.*cycle\\s+game:n loaded first: refused: 'game:n:n1' would run before itself.*cycle\\s+alive"] }
-false = { run = ["{out}/storage{exe}", "orderchain"] }
-
-[[case]]
-name = "order-a-chain-of-pairs-keeps-the-before-of-two-modules"
-run = ["{out}/storage{exe}", "orderchain"]
-claims = { matches = ["game:m loaded first: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+game:n loaded first: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+alive"] }
-false = { run = ["{out}/storage{exe}", "ordertwo"] }
-
-[[case]]
-name = "order-a-chain-of-pairs-keeps-the-before-of-two-modules-at-the-barrier"
-run = ["{out}/storage{exe}", "orderbarrier"]
-claims = { matches = ["game:m loaded first, at the barrier: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+game:n loaded first, at the barrier: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+alive"] }
-false = { run = ["{out}/storage{exe}", "ordercyclebarrier"] }
-
-[[case]]
-name = "order-a-cycle-of-pairs-and-before-at-the-barrier-refused"
-run = ["{out}/storage{exe}", "ordercyclebarrier"]
-claims = { matches = ["game:m loaded first, at the barrier: refused: 'game:m:m1' would run before itself at the barrier: the \\[order\\] pairs.*game:n loaded first, at the barrier: refused: 'game:n:n1' would run before itself at the barrier.*alive"] }
-false = { run = ["{out}/storage{exe}", "orderbarrier"] }
-
-[[case]]
-name = "order-before-holds-whatever-the-order-of-the-list-of-systems"
-run = ["{out}/storage{exe}", "orderreversed"]
-claims = { matches = ["game:m loaded first, the systems of each module reversed: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+game:n loaded first, the systems of each module reversed: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+alive"] }
-false = { run = ["{out}/storage{exe}", "ordertwo"] }
+name = "stack-a-call-of-24-MiB-returns-on-a-worker-of-32-MiB"
+process = "status"
+run = ["{out}/storage{exe}", "deep", "33554432"]
+claims = { status = 0, matches = ["a call of 6144 frames of 4096 bytes gave [0-9]+ on a worker.*alive"] }
+false = { run = ["{out}/storage{exe}", "deep", "8388608"] }
 
 [[case]]
 name = "storage-changes"
 run = ["{out}/storage{exe}", "changes"]
 claims = { output = "tests/storage/storage_changes.txt" }
 false = { run = ["{out}/storage{exe}", "shape"] }
-
-[[case]]
-name = "storage-shape"
-run = ["{out}/storage{exe}", "shape"]
-claims = { matches = ["the shared block reserves more than it uses: yes.*a plain module's private block reserves what it uses: yes.*the shared block is whole guarded pages: yes.*a plain module's private block is not rounded to one: yes.*alive"] }
-false = { run = ["{out}/storage{exe}", "tables"] }
 
 [[case]]
 name = "storage-tables"
@@ -151,12 +38,6 @@ claims = { output = "tests/storage/storage_notables.txt" }
 false = { run = ["{out}/storage{exe}", "nocolumns"] }
 
 [[case]]
-name = "change-of-a-stale-id-beside-a-dropped-change-of-its-index"
-run = ["{out}/storage{exe}", "notablesstale"]
-claims = { matches = ["respawn_half.*stale.*\\[budget\\] tables of 1 is used up. Not applied, of the changes it asked: 3 .*stale ids whose index a live id took 3 .*look: with A: spans, rows 1 3.*alive"] }
-false = { run = ["{out}/storage{exe}", "notables"] }
-
-[[case]]
 name = "storage-nocolumns"
 run = ["{out}/storage{exe}", "nocolumns"]
 claims = { output = "tests/storage/storage_nocolumns.txt" }
@@ -173,120 +54,6 @@ name = "storage-strip"
 run = ["{out}/storage{exe}", "strip"]
 claims = { output = "tests/storage/storage_strip.txt" }
 false = { run = ["{out}/storage{exe}", "stripfull"] }
-
-[[case]]
-name = "BRIDGE_STRIP-second-strip-of-an-unnamed-table"
-run = ["{out}/storage{exe}", "stripfulltwice"]
-claims = { matches = ["'st:B' is stripped, and 3 rows stay in a second table of their archetype.*strip st:A.*look: with A: spans, rows 0 0.*alive"] }
-false = { run = ["{out}/storage{exe}", "stripfull"] }
-
-[[case]]
-name = "BRIDGE_SWEEP-keeps-entities-with-a-direct-type-beside-free-slots"
-run = ["{out}/storage{exe}", "directsweepfree"]
-claims = { matches = ["sweep st:A.*entity 1 is alive.*entity 2 is gone.*entity 3 is alive.*entity 4 is gone.*entity 5 is alive.*entity 6 is gone.*near: by id: alive, and of them given D 3 3.*alive"] }
-false = { run = ["{out}/storage{exe}", "directsweep"] }
-
-[[case]]
-name = "table-of-65-types-grown-in-a-second-barrier"
-run = ["{out}/storage{exe}", "manygrow"]
-claims = { matches = ["after two spawns: 65 types, 65 of them carried by each of the 8 entities.*alive"] }
-false = { run = ["{out}/storage{exe}", "manymove"] }
-
-[[case]]
-name = "entity-generation-after-the-last-wraps-to-1"
-run = ["{out}/storage{exe}", "generation"]
-claims = { matches = ["index 1, killed at generation 4294967294, comes back at generation 1.*alive"] }
-false = { run = ["{out}/storage{exe}", "manygrow"] }
-
-[[case]]
-name = "stack-a-call-of-24-MiB-returns-on-a-worker-of-32-MiB"
-run = ["{out}/storage{exe}", "deep", "33554432"]
-claims = { status = 0, matches = ["a call of 6144 frames of 4096 bytes gave [0-9]+ on a worker.*alive"] }
-false = { run = ["{out}/storage{exe}", "deep", "8388608"] }
-
-[[case]]
-name = "pool_run-runs-each-job-once-and-the-jobs-of-the-caller-on-it"
-run = ["{out}/storage{exe}", "pool", "2000"]
-claims = { matches = ["64 of 64 jobs ran 2000 times each, and 0 runs of a job of the caller were on a worker.*alive"] }
-false = { run = ["{out}/storage{exe}", "pool", "1999"] }
-
-[[case]]
-name = "schedule_build-of-the-changed-groups-gives-the-levels-and-the-refusals-of-a-whole-build"
-run = ["{out}/storage{exe}", "both", "2000"]
-claims = { matches = ["both ways: 2000 worlds, 44682 builds, refused 2133 for 2 phases, 137 for a cycle and 5898 for a conflict, 0 differ.*alive"] }
-false = { run = ["{out}/storage{exe}", "both", "1999"] }
-
-[[case]]
-name = "storage-publish-writes-no-cell-when-only-rows-change"
-run = ["{out}/storage{exe}", "cells", "rows"]
-claims = { matches = ["rows 3, cell of store kept, cell of typer kept.*alive"] }
-false = { run = ["{out}/storage{exe}", "cells", "columns"] }
-
-[[case]]
-name = "storage-publish-writes-the-cells-of-a-moved-table-only-for-its-declarers"
-run = ["{out}/storage{exe}", "cells", "columns"]
-claims = { matches = ["rows 0, cell of store written, cell of typer kept.*alive"] }
-false = { run = ["{out}/storage{exe}", "cells", "full"] }
-
-[[case]]
-name = "storage-publish-a-table-id-taken-again-before-a-publish-writes-each-module-whole"
-run = ["{out}/storage{exe}", "reopen", "unpublished"]
-claims = { matches = ["table taken again, cell of typer written.*alive"] }
-false = { run = ["{out}/storage{exe}", "reopen", "published"] }
-
-[[case]]
-name = "table_hash_fill-of-25-gives-the-hash-four-places-for-each-table-id"
-run = ["{out}/storage{exe}", "hashroom", "25"]
-claims = { matches = ["hash room 8 for 2 table ids.*alive"] }
-false = { run = ["{out}/storage{exe}", "hashroom", "50"] }
-
-[[case]]
-name = "table_retry-of-75-asks-three-quarters-of-each-ask-again"
-run = ["{out}/storage{exe}", "asks", "75"]
-claims = { matches = ["asks from 6 rows: 4 3 2 1 0\\s.*alive"] }
-false = { run = ["{out}/storage{exe}", "asks", "50"] }
-
-[[case]]
-name = "table_growth-past-32-bits-asks-only-for-the-rows-that-come"
-run = ["{out}/storage{exe}", "growthpast", "4294967295"]
-claims = { matches = ["room 102 for 102 rows.*alive"] }
-false = { run = ["{out}/storage{exe}", "growthpast", "150"] }
-
-[[case]]
-name = "table_growth-of-200-doubles-the-room-of-a-table"
-run = ["{out}/storage{exe}", "growth", "200"]
-claims = { matches = ["rooms: 1 2 4 4 8\\s.*alive"] }
-false = { run = ["{out}/storage{exe}", "growth", "150"] }
-
-[[case]]
-name = "BRIDGE_STRIP-of-a-type-in-an-unnamed-table-of-two-types"
-run = ["{out}/storage{exe}", "stripunnamed", "160"]
-claims = { matches = ["look: with A: spans, rows 2 6.*'st:B' is stripped, and 3 rows stay in a second table of their archetype: \\[budget\\] columns of 160 bytes has no room to join them to the first.*strip st:A.*look: with A: spans, rows 0 0.*alive"] }
-false = { run = ["{out}/storage{exe}", "stripunnamed", "512"] }
-
-[[case]]
-name = "BRIDGE_DELETE-leaves-a-husk-of-each-carrier-that-keeps-a-type"
-run = ["{out}/storage{exe}", "deletehusk"]
-claims = { matches = ["delete st:A.*entity 1 is alive.*entity 6 is alive.*look: with A: spans, rows 0 0.*look_b: with B: spans, rows 1 6.*strip st:B.*entity 1 is gone.*entity 6 is gone.*look_b: with B: spans, rows 0 0.*alive"] }
-false = { run = ["{out}/storage{exe}", "deletefull"] }
-
-[[case]]
-name = "BRIDGE_DELETE-with-no-room-for-a-husk-strips-and-warns"
-run = ["{out}/storage{exe}", "deletefull"]
-claims = { matches = ["'st:A' is deleted, and 6 entities lose only it: \\[budget\\] tables of 1 or \\[budget\\] columns of 67108864 bytes has no room for their husks.*strip st:B.*entity 1 is alive.*entity 6 is alive.*alive"] }
-false = { run = ["{out}/storage{exe}", "deletehusk"] }
-
-[[case]]
-name = "BRIDGE_DELETE-leaves-a-husk-of-a-direct-indexed-type"
-run = ["{out}/storage{exe}", "directhusk"]
-claims = { matches = ["delete st:A.*entity 1 is alive.*entity 2 is gone.*entity 3 is alive.*entity 4 is gone.*entity 5 is alive.*entity 6 is gone.*strip st:D.*entity 1 is gone.*entity 3 is gone.*entity 5 is gone.*alive"] }
-false = { run = ["{out}/storage{exe}", "directdelete"] }
-
-[[case]]
-name = "BRIDGE_DELETE-leaves-a-husk-of-a-sparse-set-type"
-run = ["{out}/storage{exe}", "sparsehusk"]
-claims = { matches = ["delete st:A.*entity 1 is alive.*entity 2 is gone.*entity 7 is alive.*strip st:S.*entity 1 is gone.*entity 7 is alive.*alive"] }
-false = { run = ["{out}/storage{exe}", "sparsedelete"] }
 
 [[case]]
 name = "storage-stripfull"
@@ -338,24 +105,6 @@ claims = { output = "tests/storage/storage_single.txt" }
 false = { run = ["{out}/storage{exe}", "singlebad1"] }
 
 [[case]]
-name = "BRIDGE_SINGLETON-walked-refused"
-run = ["{out}/storage{exe}", "singlebad1"]
-claims = { matches = ["did not load: term 0 of system 'by': 'st:G' is a singleton, and is on no entity a system walks.*alive"] }
-false = { run = ["{out}/storage{exe}", "singlebad2"] }
-
-[[case]]
-name = "attach-singleton-to-an-id-refused"
-run = ["{out}/storage{exe}", "singlebad2"]
-claims = { matches = ["attach: 'st:G' is a singleton, and its id is 0.*alive"] }
-false = { run = ["{out}/storage{exe}", "singlebad3"] }
-
-[[case]]
-name = "attach-to-id-zero-refused"
-run = ["{out}/storage{exe}", "singlebad3"]
-claims = { matches = ["attach: the id 0 is no entity, and 'st:A' is not a singleton.*alive"] }
-false = { run = ["{out}/storage{exe}", "direct"] }
-
-[[case]]
 name = "storage-direct"
 run = ["{out}/storage{exe}", "direct"]
 claims = { output = "tests/storage/storage_direct.txt" }
@@ -378,24 +127,6 @@ name = "storage-directdelete"
 run = ["{out}/storage{exe}", "directdelete"]
 claims = { output = "tests/storage/storage_directdelete.txt" }
 false = { run = ["{out}/storage{exe}", "directnone"] }
-
-[[case]]
-name = "budget.direct_indexed-none-refused"
-run = ["{out}/storage{exe}", "directnone"]
-claims = { matches = ["did not load: type 'st:D' is one more than .budget. direct_indexed of 0.*alive"] }
-false = { run = ["{out}/storage{exe}", "directfull"] }
-
-[[case]]
-name = "budget.columns-no-room-for-direct-indexed-refused"
-run = ["{out}/storage{exe}", "directfull"]
-claims = { matches = ["did not load: type 'st:D' is direct-indexed, and .budget. columns of 1024 bytes has no room for a cell of 4 bytes for each of 400000 entities.*alive"] }
-false = { run = ["{out}/storage{exe}", "directbad"] }
-
-[[case]]
-name = "BRIDGE_DIRECT_INDEXED-as-second-term-refused"
-run = ["{out}/storage{exe}", "directbad"]
-claims = { matches = ["did not load: term 1 of system 'both': 'st:D' is direct-indexed, and does not select what a system walks.*alive"] }
-false = { run = ["{out}/storage{exe}", "sparse"] }
 
 [[case]]
 name = "storage-sparse"
@@ -432,24 +163,6 @@ name = "storage-sparsedelete"
 run = ["{out}/storage{exe}", "sparsedelete"]
 claims = { output = "tests/storage/storage_sparsedelete.txt" }
 false = { run = ["{out}/storage{exe}", "sparsenone"] }
-
-[[case]]
-name = "budget.sparse_sets-none-refused"
-run = ["{out}/storage{exe}", "sparsenone"]
-claims = { matches = ["did not load: type 'st:S' is one more than .budget. sparse_sets of 0.*alive"] }
-false = { run = ["{out}/storage{exe}", "sparsebad1"] }
-
-[[case]]
-name = "BRIDGE_SPARSE_SET-as-second-term-refused"
-run = ["{out}/storage{exe}", "sparsebad1"]
-claims = { matches = ["did not load: term 1 of system 'both': 'st:S' is kept in a sparse set, and does not select the rows of a table.*alive"] }
-false = { run = ["{out}/storage{exe}", "sparsebad2"] }
-
-[[case]]
-name = "BRIDGE_NOT-of-a-sparse-set-refused"
-run = ["{out}/storage{exe}", "sparsebad2"]
-claims = { matches = ["did not load: term 0 of system 'without': 'st:S' is kept in a sparse set, and a system cannot walk the entities that are not in it.*alive"] }
-false = { run = ["{out}/storage{exe}", "baseline"] }
 
 [[case]]
 name = "storage-baseline"
@@ -490,91 +203,71 @@ claims = { output = "tests/storage/storage_changes.txt" }
 false = { run = ["{out}/storage{exe}", "shape"] }
 
 [[case]]
-name = "memory_get_shape-the-block-reserved-as-asked"
-run = ["{out}/storage{exe}", "shape"]
-claims = { matches = ["the shared block reserves more than it uses: yes.*a plain module's private block reserves what it uses: yes.*the shared block is whole guarded pages: yes.*a plain module's private block is not rounded to one: yes.*alive"] }
-false = { run = ["{out}/storage{exe}", "changes"] }
-
-[[case]]
-name = "schedule_init_matrix-too-large-not-made"
-run = ["{out}/storage{exe}", "matrix"]
-claims = { matches = ["a matrix for 4294967233 systems: not made, 67108864 words a row.*alive"] }
-false = { run = ["{out}/storage{exe}", "matrixsmall"] }
-
-[[case]]
-name = "bridge_log_record_t-place-and-slot-past-16-bits"
-run = ["{out}/storage{exe}", "widerecord"]
-claims = { matches = ["barriers 7 place 70000 system far.*alive"] }
-false = { run = ["{out}/storage{exe}", "matrix"] }
-
-[[case]]
-name = "bridge_query_t-at-that-a-module-writes-is-not-read"
-run = ["{out}/storage{exe}", "pointaway"]
-claims = { matches = ["outside spans \\[\\d+, \\d+\\): wrote 0 at \\d+.*alive"] }
-false = { run = ["{out}/storage{exe}", "shape"] }
-
-[[case]]
-name = "bridge_budget_t-types-past-a-count-of-32-bits-refused"
-run = ["{out}/storage{exe}", "manytypes"]
-claims = { matches = ["types of 4294967295, rounded up to a multiple of 64, is more than a count of 32 bits holds.*the budget was refused.*alive"] }
-false = { run = ["{out}/storage{exe}", "manyall"] }
-
-[[case]]
-name = "bridge_budget_t-tables-sparse_sets-and-types-past-a-count-of-32-bits-refused"
-run = ["{out}/storage{exe}", "manyall"]
-claims = { matches = ["tables, sparse_sets and types come to \\d+, which is more than a count of 32 bits holds.*the budget was refused.*alive"] }
-false = { run = ["{out}/storage{exe}", "manytypes"] }
-
-[[case]]
-name = "bridge_reload-65-replaced-types-carried-across"
-run = ["{out}/storage{exe}", "manymove"]
-claims = { matches = ["reload: done.*after the reload: 65 types, 65 of them carried by each of the 4 entities.*alive"] }
-false = { run = ["{out}/storage{exe}", "shape"] }
-
-[[case]]
-name = "storage_give_single-tells-only-its-type-attached"
-run = ["{out}/storage{exe}", "twosingles"]
-claims = { matches = ["A observer heard ON_ATTACH when B got its value: 0\\s.*alive"] }
-false = { run = ["{out}/storage{exe}", "shape"] }
-
-[[case]]
-name = "observer-list-past-the-spans-names-the-observer"
-run = ["{out}/storage{exe}", "fulllist"]
-claims = { matches = ["is stopped: the list of its observer 'heard' no longer fits in its spans of 256 bytes.*alive"] }
-false = { run = ["{out}/storage{exe}", "shape"] }
-
-[[case]]
-name = "schedule_build-levels-of-a-chain-in-two-rounds"
-run = ["{out}/storage{exe}", "levels"]
-claims = { matches = ["levels: 100 systems in one phase, built: set_levels tested reach 19800 times, last level 99.*alive"] }
-false = { run = ["{out}/storage{exe}", "shape"] }
-
-[[case]]
-name = "bridge_reload-share-grown-within-eight-bytes-takes-no-range"
-run = ["{out}/storage{exe}", "ranges"]
-claims = { matches = ["ranges: 2 when loaded, reload done, 2 after it, 0 after the unloads.*alive"] }
-false = { run = ["{out}/storage{exe}", "levels"] }
-
-[[case]]
-name = "storage-the-calls-on-ids-answer-for-each-state-of-an-id"
-run = ["{out}/storage{exe}", "callsids"]
-claims = { matches = ["at the start: 0 entities of a peak of 0, 0 tables.*values of a singleton read: 0 with no value, 1 with a value.*after 4 ids, 2 of them released: 2 entities of a peak of 4, 0 tables.*alive: no id 0, an id beyond the last 0, a handed id 1, a released id 0.*alive"] }
-false = { run = ["{out}/storage{exe}", "ordersamephase"] }
-
-[[case]]
-name = "storage-the-calls-on-rows-read-each-value-and-find-each-changed-column"
-run = ["{out}/storage{exe}", "callsrows"]
-claims = { matches = ["values of st:A read: 6; rows with st:T off: 3; with st:A off: 0.*columns changed with no write: 0; after value_a: 1.*alive"] }
-false = { run = ["{out}/storage{exe}", "ordersamephase"] }
-
-[[case]]
-name = "storage-the-values-of-a-type-are-read-in-each-live-table-that-has-it"
-run = ["{out}/storage{exe}", "callstables"]
-claims = { matches = ["values of st:B read: 3 in 2 tables; values of st:A read: 3 after the entities of st:B left, in 1 tables.*alive"] }
-false = { run = ["{out}/storage{exe}", "ordersamephase"] }
-
-[[case]]
-name = "storage-the-values-of-a-direct-indexed-type-are-read-by-index-and-a-type-too-large-is-refused"
-run = ["{out}/storage{exe}", "callsdirect"]
-claims = { matches = ["values of st:D read by index: 3.*a direct-indexed type of 8192 bytes for each entity: refused.*alive"] }
-false = { run = ["{out}/storage{exe}", "ordersamephase"] }
+name = "storage"
+run = ["{out}/storage{exe}"]
+claims = { status = 0 }
+rows = [
+    { name = "block-the-offset-of-a-pointer-outside-the-block-is-zero", in = "blockoffset", claims = { matches = ["offset null 0 below 0 above 0 inside 50.*alive"] }, false = "ordersamephase" },
+    { name = "block-a-module-whose-entity-index-is-outside-the-block-is-refused", in = "indexoutside", claims = { matches = ["the entity index is outside the block.*alive"] }, false = "ordersamephase" },
+    { name = "storage-a-table-past-the-room-is-refused", in = "tablefull", claims = { matches = ["table past the room: 0.*alive"] }, false = "ordersamephase" },
+    { name = "storage-a-span-region-past-the-spans-is-refused", in = "spansfull", claims = { matches = ["spans too small: 1.*alive"] }, false = "ordersamephase" },
+    { name = "bridge-a-new-order-replaces-the-whole-set-or-the-old-set-stays", in = "setorder", claims = { matches = ["contradicts itself.*cycle: refused 0 1 2 3.*is unchanged.*no pair orders them.*empty: refused 0 1 2 3.*alt: ok 0 1 0 1.*alive"] }, false = "ordersamephase" },
+    { name = "bridge-set-order-is-refused-when-the-world-has-stopped", in = "setorderstopped", claims = { matches = ["the world has stopped: a module stopped it.*guard setorderstopped: 1.*alive"] }, false = "ordersamephase" },
+    { name = "bridge-set-order-is-refused-from-a-second-caller", in = "setorderbusy", claims = { matches = ["guard setorderbusy: 1.*alive"] }, false = "ordersamephase" },
+    { name = "bridge-set-order-is-refused-from-a-reentrant-call", in = "setorderreentrant", claims = { matches = ["guard setorderreentrant: 1.*alive"] }, false = "ordersamephase" },
+    { name = "region-a-give-into-a-full-list-of-gaps-keeps-the-piece-out", in = "regionfull", claims = { matches = ["region full: count 2.*alive"] }, false = "ordersamephase" },
+    { name = "storage-marks-full-refused", in = "marks", claims = { matches = ["refused: out of memory: there was none for the mark of its queue.*alive"] }, false = "shape" },
+    { name = "storage-the-runs-of-a-barrier-go-by-turn-and-a-tie-by-load-order", in = "runs abccb=a", claims = { matches = ["rows: a0 b1 c2 c3 a4 b4\nalive"] }, false = "runs aabbcc" },
+    { name = "relay-a-field-of-a-kind-past-the-element-table-takes-the-type-size", in = "relaybadkind", claims = { matches = ["element size of a bad kind: 42.*alive"] }, false = "ordersamephase" },
+    { name = "order-a-pair-of-two-phases-is-refused", in = "orderphases", claims = { matches = ["orderphases: refused: the \\[order\\] pair of 'game:m:a' and 'game:n:b' orders nothing: they run in different phases"] }, false = "ordersamephase" },
+    { name = "order-a-pair-of-one-phase-builds", in = "ordersamephase", claims = { matches = ["ordersamephase: built"], lacks = ["refused"] }, false = "orderphases" },
+    { name = "order-a-cycle-of-pairs-and-before-refused-in-each-load-order", in = "ordertwo", claims = { matches = ["game:m loaded first: refused: 'game:m:m1' would run before itself.*cycle\\s+game:n loaded first: refused: 'game:n:n1' would run before itself.*cycle\\s+alive"] }, false = "orderchain" },
+    { name = "order-a-chain-of-pairs-keeps-the-before-of-two-modules", in = "orderchain", claims = { matches = ["game:m loaded first: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+game:n loaded first: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+alive"] }, false = "ordertwo" },
+    { name = "order-a-chain-of-pairs-keeps-the-before-of-two-modules-at-the-barrier", in = "orderbarrier", claims = { matches = ["game:m loaded first, at the barrier: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+game:n loaded first, at the barrier: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+alive"] }, false = "ordercyclebarrier" },
+    { name = "order-a-cycle-of-pairs-and-before-at-the-barrier-refused", in = "ordercyclebarrier", claims = { matches = ["game:m loaded first, at the barrier: refused: 'game:m:m1' would run before itself at the barrier: the \\[order\\] pairs.*game:n loaded first, at the barrier: refused: 'game:n:n1' would run before itself at the barrier.*alive"] }, false = "orderbarrier" },
+    { name = "order-before-holds-whatever-the-order-of-the-list-of-systems", in = "orderreversed", claims = { matches = ["game:m loaded first, the systems of each module reversed: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+game:n loaded first, the systems of each module reversed: built\\s+game:m:m1 at level 0\\s+game:m:m2 at level 1\\s+game:n:n1 at level 2\\s+game:n:n2 at level 3\\s+alive"] }, false = "ordertwo" },
+    { name = "storage-shape", in = "shape", claims = { matches = ["the shared block reserves more than it uses: yes.*a plain module's private block reserves what it uses: yes.*the shared block is whole guarded pages: yes.*a plain module's private block is not rounded to one: yes.*alive"] }, false = "tables" },
+    { name = "change-of-a-stale-id-beside-a-dropped-change-of-its-index", in = "notablesstale", claims = { matches = ["respawn_half.*stale.*\\[budget\\] tables of 1 is used up. Not applied, of the changes it asked: 3 .*stale ids whose index a live id took 3 .*look: with A: spans, rows 1 3.*alive"] }, false = "notables" },
+    { name = "BRIDGE_STRIP-second-strip-of-an-unnamed-table", in = "stripfulltwice", claims = { matches = ["'st:B' is stripped, and 3 rows stay in a second table of their archetype.*strip st:A.*look: with A: spans, rows 0 0.*alive"] }, false = "stripfull" },
+    { name = "BRIDGE_SWEEP-keeps-entities-with-a-direct-type-beside-free-slots", in = "directsweepfree", claims = { matches = ["sweep st:A.*entity 1 is alive.*entity 2 is gone.*entity 3 is alive.*entity 4 is gone.*entity 5 is alive.*entity 6 is gone.*near: by id: alive, and of them given D 3 3.*alive"] }, false = "directsweep" },
+    { name = "table-of-65-types-grown-in-a-second-barrier", in = "manygrow", claims = { matches = ["after two spawns: 65 types, 65 of them carried by each of the 8 entities.*alive"] }, false = "manymove" },
+    { name = "entity-generation-after-the-last-wraps-to-1", in = "generation", claims = { matches = ["index 1, killed at generation 4294967294, comes back at generation 1.*alive"] }, false = "manygrow" },
+    { name = "pool_run-runs-each-job-once-and-the-jobs-of-the-caller-on-it", in = "pool 2000", claims = { matches = ["64 of 64 jobs ran 2000 times each, and 0 runs of a job of the caller were on a worker.*alive"] }, false = "pool 1999" },
+    { name = "schedule_build-of-the-changed-groups-gives-the-levels-and-the-refusals-of-a-whole-build", in = "both 2000", claims = { matches = ["both ways: 2000 worlds, 44682 builds, refused 2133 for 2 phases, 137 for a cycle and 5898 for a conflict, 0 differ.*alive"] }, false = "both 1999" },
+    { name = "storage-publish-writes-no-cell-when-only-rows-change", in = "cells rows", claims = { matches = ["rows 3, cell of store kept, cell of typer kept.*alive"] }, false = "cells columns" },
+    { name = "storage-publish-writes-the-cells-of-a-moved-table-only-for-its-declarers", in = "cells columns", claims = { matches = ["rows 0, cell of store written, cell of typer kept.*alive"] }, false = "cells full" },
+    { name = "storage-publish-a-table-id-taken-again-before-a-publish-writes-each-module-whole", in = "reopen unpublished", claims = { matches = ["table taken again, cell of typer written.*alive"] }, false = "reopen published" },
+    { name = "table_hash_fill-of-25-gives-the-hash-four-places-for-each-table-id", in = "hashroom 25", claims = { matches = ["hash room 8 for 2 table ids.*alive"] }, false = "hashroom 50" },
+    { name = "table_retry-of-75-asks-three-quarters-of-each-ask-again", in = "asks 75", claims = { matches = ["asks from 6 rows: 4 3 2 1 0\\s.*alive"] }, false = "asks 50" },
+    { name = "table_growth-past-32-bits-asks-only-for-the-rows-that-come", in = "growthpast 4294967295", claims = { matches = ["room 102 for 102 rows.*alive"] }, false = "growthpast 150" },
+    { name = "table_growth-of-200-doubles-the-room-of-a-table", in = "growth 200", claims = { matches = ["rooms: 1 2 4 4 8\\s.*alive"] }, false = "growth 150" },
+    { name = "BRIDGE_STRIP-of-a-type-in-an-unnamed-table-of-two-types", in = "stripunnamed 160", claims = { matches = ["look: with A: spans, rows 2 6.*'st:B' is stripped, and 3 rows stay in a second table of their archetype: \\[budget\\] columns of 160 bytes has no room to join them to the first.*strip st:A.*look: with A: spans, rows 0 0.*alive"] }, false = "stripunnamed 512" },
+    { name = "BRIDGE_DELETE-leaves-a-husk-of-each-carrier-that-keeps-a-type", in = "deletehusk", claims = { matches = ["delete st:A.*entity 1 is alive.*entity 6 is alive.*look: with A: spans, rows 0 0.*look_b: with B: spans, rows 1 6.*strip st:B.*entity 1 is gone.*entity 6 is gone.*look_b: with B: spans, rows 0 0.*alive"] }, false = "deletefull" },
+    { name = "BRIDGE_DELETE-with-no-room-for-a-husk-strips-and-warns", in = "deletefull", claims = { matches = ["'st:A' is deleted, and 6 entities lose only it: \\[budget\\] tables of 1 or \\[budget\\] columns of 67108864 bytes has no room for their husks.*strip st:B.*entity 1 is alive.*entity 6 is alive.*alive"] }, false = "deletehusk" },
+    { name = "BRIDGE_DELETE-leaves-a-husk-of-a-direct-indexed-type", in = "directhusk", claims = { matches = ["delete st:A.*entity 1 is alive.*entity 2 is gone.*entity 3 is alive.*entity 4 is gone.*entity 5 is alive.*entity 6 is gone.*strip st:D.*entity 1 is gone.*entity 3 is gone.*entity 5 is gone.*alive"] }, false = "directdelete" },
+    { name = "BRIDGE_DELETE-leaves-a-husk-of-a-sparse-set-type", in = "sparsehusk", claims = { matches = ["delete st:A.*entity 1 is alive.*entity 2 is gone.*entity 7 is alive.*strip st:S.*entity 1 is gone.*entity 7 is alive.*alive"] }, false = "sparsedelete" },
+    { name = "BRIDGE_SINGLETON-walked-refused", in = "singlebad1", claims = { matches = ["did not load: term 0 of system 'by': 'st:G' is a singleton, and is on no entity a system walks.*alive"] }, false = "singlebad2" },
+    { name = "attach-singleton-to-an-id-refused", in = "singlebad2", claims = { matches = ["attach: 'st:G' is a singleton, and its id is 0.*alive"] }, false = "singlebad3" },
+    { name = "attach-to-id-zero-refused", in = "singlebad3", claims = { matches = ["attach: the id 0 is no entity, and 'st:A' is not a singleton.*alive"] }, false = "direct" },
+    { name = "budget.direct_indexed-none-refused", in = "directnone", claims = { matches = ["did not load: type 'st:D' is one more than .budget. direct_indexed of 0.*alive"] }, false = "directfull" },
+    { name = "budget.columns-no-room-for-direct-indexed-refused", in = "directfull", claims = { matches = ["did not load: type 'st:D' is direct-indexed, and .budget. columns of 1024 bytes has no room for a cell of 4 bytes for each of 400000 entities.*alive"] }, false = "directbad" },
+    { name = "BRIDGE_DIRECT_INDEXED-as-second-term-refused", in = "directbad", claims = { matches = ["did not load: term 1 of system 'both': 'st:D' is direct-indexed, and does not select what a system walks.*alive"] }, false = "sparse" },
+    { name = "budget.sparse_sets-none-refused", in = "sparsenone", claims = { matches = ["did not load: type 'st:S' is one more than .budget. sparse_sets of 0.*alive"] }, false = "sparsebad1" },
+    { name = "BRIDGE_SPARSE_SET-as-second-term-refused", in = "sparsebad1", claims = { matches = ["did not load: term 1 of system 'both': 'st:S' is kept in a sparse set, and does not select the rows of a table.*alive"] }, false = "sparsebad2" },
+    { name = "BRIDGE_NOT-of-a-sparse-set-refused", in = "sparsebad2", claims = { matches = ["did not load: term 0 of system 'without': 'st:S' is kept in a sparse set, and a system cannot walk the entities that are not in it.*alive"] }, false = "baseline" },
+    { name = "memory_get_shape-the-block-reserved-as-asked", in = "shape", claims = { matches = ["the shared block reserves more than it uses: yes.*a plain module's private block reserves what it uses: yes.*the shared block is whole guarded pages: yes.*a plain module's private block is not rounded to one: yes.*alive"] }, false = "changes" },
+    { name = "schedule_init_matrix-too-large-not-made", in = "matrix", claims = { matches = ["a matrix for 4294967233 systems: not made, 67108864 words a row.*alive"] }, false = "matrixsmall" },
+    { name = "bridge_log_record_t-place-and-slot-past-16-bits", in = "widerecord", claims = { matches = ["barriers 7 place 70000 system far.*alive"] }, false = "matrix" },
+    { name = "bridge_query_t-at-that-a-module-writes-is-not-read", in = "pointaway", claims = { matches = ["outside spans \\[\\d+, \\d+\\): wrote 0 at \\d+.*alive"] }, false = "shape" },
+    { name = "bridge_budget_t-types-past-a-count-of-32-bits-refused", in = "manytypes", claims = { matches = ["types of 4294967295, rounded up to a multiple of 64, is more than a count of 32 bits holds.*the budget was refused.*alive"] }, false = "manyall" },
+    { name = "bridge_budget_t-tables-sparse_sets-and-types-past-a-count-of-32-bits-refused", in = "manyall", claims = { matches = ["tables, sparse_sets and types come to \\d+, which is more than a count of 32 bits holds.*the budget was refused.*alive"] }, false = "manytypes" },
+    { name = "bridge_reload-65-replaced-types-carried-across", in = "manymove", claims = { matches = ["reload: done.*after the reload: 65 types, 65 of them carried by each of the 4 entities.*alive"] }, false = "shape" },
+    { name = "storage_give_single-tells-only-its-type-attached", in = "twosingles", claims = { matches = ["A observer heard ON_ATTACH when B got its value: 0\\s.*alive"] }, false = "shape" },
+    { name = "observer-list-past-the-spans-names-the-observer", in = "fulllist", claims = { matches = ["is stopped: the list of its observer 'heard' no longer fits in its spans of 256 bytes.*alive"] }, false = "shape" },
+    { name = "schedule_build-levels-of-a-chain-in-two-rounds", in = "levels", claims = { matches = ["levels: 100 systems in one phase, built: set_levels tested reach 19800 times, last level 99.*alive"] }, false = "shape" },
+    { name = "bridge_reload-share-grown-within-eight-bytes-takes-no-range", in = "ranges", claims = { matches = ["ranges: 2 when loaded, reload done, 2 after it, 0 after the unloads.*alive"] }, false = "levels" },
+    { name = "storage-the-calls-on-ids-answer-for-each-state-of-an-id", in = "callsids", claims = { matches = ["at the start: 0 entities of a peak of 0, 0 tables.*values of a singleton read: 0 with no value, 1 with a value.*after 4 ids, 2 of them released: 2 entities of a peak of 4, 0 tables.*alive: no id 0, an id beyond the last 0, a handed id 1, a released id 0.*alive"] }, false = "ordersamephase" },
+    { name = "storage-the-calls-on-rows-read-each-value-and-find-each-changed-column", in = "callsrows", claims = { matches = ["values of st:A read: 6; rows with st:T off: 3; with st:A off: 0.*columns changed with no write: 0; after value_a: 1.*alive"] }, false = "ordersamephase" },
+    { name = "storage-the-values-of-a-type-are-read-in-each-live-table-that-has-it", in = "callstables", claims = { matches = ["values of st:B read: 3 in 2 tables; values of st:A read: 3 after the entities of st:B left, in 1 tables.*alive"] }, false = "ordersamephase" },
+    { name = "storage-the-values-of-a-direct-indexed-type-are-read-by-index-and-a-type-too-large-is-refused", in = "callsdirect", claims = { matches = ["values of st:D read by index: 3.*a direct-indexed type of 8192 bytes for each entity: refused.*alive"] }, false = "ordersamephase" },
+]
