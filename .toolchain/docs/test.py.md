@@ -20,6 +20,7 @@
 | `holding(path, text)` | Tells if a file is there and contains the text. |
 | `same(path, said)` | Tells if a file is there and holds the same text as the output. |
 | `holds(claims, lacks, code, said, values)` | Tells if each claim is true. |
+| `claimed(claims, lacks, code, answer, values)` | Tells if each claim of a row is true on its answer, as *A table* tells. |
 | `source_of(item, outputs, values)` | Gives the file of an artifact, or a file of the project. |
 | `placed(use, outputs, values)` | Writes the `files` of a case, and fills its `folders`. |
 | `scripted(running, script, outputs, values)` | Does the steps of a script. |
@@ -141,7 +142,10 @@ A case with `rows` is a table. `docs/contributing/tests.md`, *Tables*, gives its
 
 `tabled` runs the command with `raced` and `tried`. `tried` writes the inputs with `typed_rows`.
 `answered` cuts the output at each empty line. An answer is the text before an empty line; a text after the last empty line is no answer.
-It gives each row its verdict:
+
+`claimed` judges the claims of a row on its answer with `holds`. The answer has no line end after its last line.
+For the claim `output`, `claimed` adds that line end, and compares the answer with the text of the file. Thus the file of a row is the lines of its answer, each with its line end.
+`answered` gives each row its verdict:
 
 | The run | The verdict of a row | The row |
 | --- | --- | --- |
