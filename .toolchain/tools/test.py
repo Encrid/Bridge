@@ -50,6 +50,12 @@ def free_port():
     return port
 
 
+def watched(timeout, stop):
+    watch = threading.Timer(timeout, stop)
+    watch.start()
+    return watch
+
+
 def started(argv, root, timeout, env=None, use=None):
     proc = signals.started(argv, root, env, use or {})
     late = threading.Event()
@@ -57,9 +63,8 @@ def started(argv, root, timeout, env=None, use=None):
     def stop():
         late.set()
         proc.kill()
-    watch = threading.Timer(timeout, stop)
-    watch.start()
-    return {'proc': proc, 'late': late, 'watch': watch, 'said': []}
+    return {'proc': proc, 'late': late, 'watch': watched(timeout, stop), 'said': [],
+            'again': lambda: watched(timeout, stop)}
 
 
 def waited(running, text):
@@ -86,9 +91,19 @@ def fed(running, text):
         pass
 
 
-def ended(running, text):
+def paced(running):
+    for line in iter(running['proc'].stdout.readline, b''):
+        running['said'].append(line)
+        if not line.strip():
+            running['watch'].cancel()
+            running['watch'] = running['again']()
+
+
+def ended(running, text, rows=False):
     feed = threading.Thread(target=fed, args=(running, text))
     feed.start()
+    if rows:
+        paced(running)
     if not running['proc'].stdout.closed:
         running['said'].append(running['proc'].stdout.read())
     feed.join()
@@ -194,7 +209,7 @@ def tried(config, values, outputs, where, case, broken, counted=False, failing=N
                                   mine), use)
     scripted(running, use.get('script', []), outputs, mine)
     typing = expand(use.get('stdin', ''), mine) if order is None else typed_rows(use, broken, order, mine)
-    ends = [ended(running, typing)]
+    ends = [ended(running, typing, order is not None)]
     if helper:
         ends.append(ended(beside, expand(helper.get('stdin', ''), mine)))
     return ends, [use.get('claims', {})] + ([helper.get('claims', {})] if helper else []), mine

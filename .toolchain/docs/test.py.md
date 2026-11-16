@@ -9,11 +9,13 @@
 | `environment(changes, values)` | Gives the environment of a command, with the changes of `env`. |
 | `bound(kind, port)` | Binds a socket of a kind, TCP or UDP, on `127.0.0.1` and a port. It gives the bound port, or 0 if the system refuses the port. Port 0 asks the system for a free port. |
 | `free_port()` | Gives a port of this machine that is free for TCP and for UDP. UDP gives a free port, and TCP must accept the same number. Else it tries again. |
-| `started(argv, root, timeout, env, use)` | Starts a command with `started` of `signals.py`, with a timer that stops it after `timeout` seconds. `use` is the case, or nothing for a helper. |
+| `watched(timeout, stop)` | Starts a timer that calls `stop` after `timeout` seconds, and gives it. |
+| `started(argv, root, timeout, env, use)` | Starts a command with `started` of `signals.py`, with a timer of `watched` that stops it after `timeout` seconds. `use` is the case, or nothing for a helper. |
 | `waited(running, text)` | Reads the output until a line contains the text. It gives false if the output ends first. |
 | `typed(running, text)` | Writes a text to the command. |
 | `fed(running, text)` | Writes the text with `typed`, and closes the input. |
-| `ended(running, text)` | Starts `fed` on a thread of its own, reads the output, and waits for the end of the command. It gives the status and the output. It reads no output that a step closed. |
+| `paced(running)` | Reads the output line by line. At each empty line, which ends the answer to a row, it starts the timer again. |
+| `ended(running, text, rows)` | Starts `fed` on a thread of its own, reads the output, and waits for the end of the command. With `rows`, it reads the output with `paced`. It gives the status and the output. It reads no output that a step closed. |
 | `ordered(wanted, lines)` | Tells if the lines have each wanted line, in order. |
 | `holding(path, text)` | Tells if a file is there and contains the text. |
 | `same(path, said)` | Tells if a file is there and holds the same text as the output. |
@@ -114,7 +116,7 @@ If the case states `fail`, the command gets the variable `C23_FAIL`: `.toolchain
 A case that states `fail` or `sweep` also gives the command `C23_FAIL_PART`, the part that `owner` gives for the group of the case. With no such part, `tried` removes `C23_FAIL_PART` too.
 With `failing`, a case that states `fail` or `sweep` runs on the build of the run `fail`. Its folder, its `{out}` and its artifacts are those of that run.
 
-`tried` runs each command in the root, with a timer of `[test] timeout` seconds.
+`tried` runs each command in the root, with a timer of `[test] timeout` seconds. For a table, the timer starts again at each answer: the time is for one row.
 The timer stops a command that does not end in time.
 `placed` and the steps `put` copy each file with its permissions. Thus a copy of a program can run on Linux and on macOS.
 
@@ -143,7 +145,7 @@ It gives each row its verdict:
 
 | The run | The verdict of a row | The row |
 | --- | --- | --- |
-| The command does not end in time. | `did not end in <timeout> seconds` | fails |
+| A row does not answer in time, or the command does not end in time after its last answer. | `did not end in <timeout> seconds` | fails |
 | The command gave more answers than the table has rows. | `is one of <rows> rows, and the command gave <answers> answers` | fails |
 | A claim of the case is false. | `is in a run that differs` | fails |
 | The command gave no answer to the row, and it is the first such row. | `has no answer: the command ended at this row` | fails |
