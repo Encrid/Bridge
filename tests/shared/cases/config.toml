@@ -1,27 +1,6 @@
 code = ["include/**", "src/abi/**", "src/backend/**", "src/bits.h", "src/block/**", "src/bridge/bridge_backend.c", "src/bridge/bridge_backends.c", "src/bridge/bridge_calls.c", "src/bridge/bridge_check.c", "src/bridge/bridge_create.c", "src/bridge/bridge_destroy.c", "src/bridge/bridge_inside.h", "src/bridge/bridge_keys.c", "src/bridge/bridge_load.c", "src/bridge/bridge_phases.c", "src/bridge/bridge_reload.c", "src/bridge/bridge_run.c", "src/bridge/bridge_stop.c", "src/bridge/bridge_unload.c", "src/config/**", "src/hash.h", "src/inside.h", "src/leaks.toml", "src/module/**", "src/reload/reload.h", "src/reload/reload_check.c", "src/reload/reload_record.c", "src/reload/reload_rows.c", "src/reload/reload_share.c", "src/schedule/schedule.h", "src/schedule/schedule_account.c", "src/schedule/schedule_before.c", "src/schedule/schedule_bits.h", "src/schedule/schedule_build.c", "src/schedule/schedule_check.c", "src/schedule/schedule_closure.c", "src/schedule/schedule_commit.c", "src/schedule/schedule_conflict.c", "src/schedule/schedule_cross.c", "src/schedule/schedule_dispatch.c", "src/schedule/schedule_edges.c", "src/schedule/schedule_group.c", "src/schedule/schedule_jobs.c", "src/schedule/schedule_levels.c", "src/schedule/schedule_marks.c", "src/schedule/schedule_matrix.c", "src/schedule/schedule_names.c", "src/schedule/schedule_order.c", "src/schedule/schedule_run.c", "src/schedule/schedule_triggered.c", "src/schedule/schedule_unordered.c", "src/schedule/schedule_uses.c", "tests/backend/**", "tests/binding/**", "tests/modules/**", "tests/seam/**", "tests/shared/**", "tests/support/**", ".toolchain/config/**", ".toolchain/project.toml"]
 
 [[case]]
-name = "each-calloc-refused-seeding-settings"
-run = ["{out}/storage{exe}", "sweep", "nomemoryconfig", "calloc"]
-sweep = ["calloc"]
-claims = { status = 0, order = ["-- calloc 81 refused", "out of memory: there was none for a module's share of the persistent arena", "no module 'game:settings@0.1.0' is loaded, so none is unloaded", "-- calloc 82 refused", "-- calloc 86 refused", "module 'game:settings@0.1.0' did not load: out of memory: there was none for the row of its settings", "no module 'game:settings@0.1.0' is loaded, so none is unloaded", "-- calloc 87 refused", "alive"] }
-false = { run = ["{out}/storage{exe}", "sweep", "nomemoryconfig", "malloc"] }
-
-[[case]]
-name = "each-malloc-refused-seeding-settings"
-run = ["{out}/storage{exe}", "sweep", "nomemoryconfig", "malloc"]
-sweep = ["malloc"]
-claims = { status = 0, order = ["-- malloc 3 refused", "out of memory: there was none for the order a deployment states", "-- malloc 4 refused", "out of memory: there was none for the order a deployment states", "-- malloc 5 refused", "-- malloc 10 refused", "out of memory: there was none for a module's record", "-- malloc 11 refused", "-- malloc 41 refused", "out of memory: there was none for a share that stays: the arena loses its bytes", "-- malloc 42 refused", "out of memory: there was none for a share that stays: the arena loses its bytes", "-- malloc 43 refused", "alive"] }
-false = { run = ["{out}/storage{exe}", "sweep", "nomemoryconfig", "realloc"] }
-
-[[case]]
-name = "each-realloc-refused-seeding-settings"
-run = ["{out}/storage{exe}", "sweep", "nomemoryconfig", "realloc"]
-sweep = ["realloc"]
-claims = { status = 0, order = ["-- realloc 16 refused", "out of memory: there was none for a module's share of the persistent arena", "no module 'game:settings@0.1.0' is loaded, so none is unloaded", "-- realloc 17 refused", "-- realloc 30 refused", "out of memory: there was none for a share that stays: the arena loses its bytes", "-- realloc 31 refused", "alive"] }
-false = { run = ["{out}/storage{exe}", "sweep", "nomemoryconfig", "calloc"] }
-
-[[case]]
 name = "config-seam"
 run = ["{out}/seam{exe}"]
 claims = { status = 0 }
@@ -91,4 +70,15 @@ run = ["{out}/storage{exe}"]
 claims = { status = 0 }
 rows = [
     { name = "config-a-setting-of-a-kind-past-the-seeder-table-refused", in = "configbadkind", claims = { matches = ["kind 0: its setting 'setting' is a bool, and the field it names is of a type no setting fills.*kind 17: .*of a type no setting fills.*alive"] }, false = "ordersamephase" },
+]
+
+[[case]]
+name = "config-sweeps"
+run = ["{out}/storage{exe}"]
+sweep = ["calloc", "malloc", "realloc"]
+claims = { status = 0 }
+rows = [
+    { name = "each-calloc-refused-seeding-settings", in = "sweep nomemoryconfig calloc", claims = { order = ["-- calloc 81 refused", "out of memory: there was none for a module's share of the persistent arena", "no module 'game:settings@0.1.0' is loaded, so none is unloaded", "-- calloc 82 refused", "-- calloc 86 refused", "module 'game:settings@0.1.0' did not load: out of memory: there was none for the row of its settings", "no module 'game:settings@0.1.0' is loaded, so none is unloaded", "-- calloc 87 refused", "alive"], line = ["status 0"] }, false = "sweep nomemoryconfig malloc" },
+    { name = "each-malloc-refused-seeding-settings", in = "sweep nomemoryconfig malloc", claims = { order = ["-- malloc 3 refused", "out of memory: there was none for the order a deployment states", "-- malloc 4 refused", "out of memory: there was none for the order a deployment states", "-- malloc 5 refused", "-- malloc 10 refused", "out of memory: there was none for a module's record", "-- malloc 11 refused", "-- malloc 41 refused", "out of memory: there was none for a share that stays: the arena loses its bytes", "-- malloc 42 refused", "out of memory: there was none for a share that stays: the arena loses its bytes", "-- malloc 43 refused", "alive"], line = ["status 0"] }, false = "sweep nomemoryconfig realloc" },
+    { name = "each-realloc-refused-seeding-settings", in = "sweep nomemoryconfig realloc", claims = { order = ["-- realloc 16 refused", "out of memory: there was none for a module's share of the persistent arena", "no module 'game:settings@0.1.0' is loaded, so none is unloaded", "-- realloc 17 refused", "-- realloc 30 refused", "out of memory: there was none for a share that stays: the arena loses its bytes", "-- realloc 31 refused", "alive"], line = ["status 0"] }, false = "sweep nomemoryconfig calloc" },
 ]

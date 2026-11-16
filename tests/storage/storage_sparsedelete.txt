@@ -35,3 +35,4 @@ look
   look: the set walked: spans, rows 0 0
   look: the set walked: the sum of its values 0 0
 alive
+status 0

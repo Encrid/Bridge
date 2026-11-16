@@ -32,3 +32,4 @@ near
   near: by id: alive, and of them given D 6 0
   near: by id: the sum of D 0 0
 alive
+status 0

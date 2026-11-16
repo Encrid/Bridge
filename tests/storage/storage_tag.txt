@@ -25,3 +25,4 @@ look
   look: W, a singleton: what its cell holds 1 0
 columns in use 240 bytes
 alive
+status 0
