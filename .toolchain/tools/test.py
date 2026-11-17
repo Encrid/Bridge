@@ -344,7 +344,7 @@ def rowed(case, path):
             die('%s: the row %s claims nothing' % (path, row['name']))
 
 
-PROCESS = ('status', 'signal', 'helper', 'command', 'state')
+PROCESS = ('status', 'signal', 'helper', 'command', 'state', 'script')
 
 
 def ruled(path, cases):
@@ -383,6 +383,8 @@ def groups_of(config, values, folder):
             if case.get('process', PROCESS[0]) not in PROCESS:
                 die('%s: the case %s states the process %s, and a process is %s'
                     % (path, case['name'], case['process'], ', '.join(PROCESS)))
+            if case.get('process') == 'script' and 'script' not in case and 'stdin' not in case:
+                die('%s: the case %s states the process script, and it has no script and no stdin' % (path, case['name']))
             for call in [*case.get('fail', {}), *case.get('false', {}).get('fail', {}), *case.get('sweep', [])]:
                 if call not in calls:
                     die('%s: the case %s makes %s fail, and [fail.calls] does not list it' % (path, case['name'], call))
