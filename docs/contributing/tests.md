@@ -90,8 +90,10 @@ A case with no `rows` starts a process for one behavior. It states why, with the
 | `helper` | The case runs a helper beside the command. |
 | `command` | The behavior is in what the command gets when it starts: its arguments, its environment or its files. |
 | `state` | The behavior needs a process that did nothing before. |
+| `script` | The case talks to the command while it runs: it has the key `script` or the key `stdin`. A table has none of the 2 keys. |
 
-`test` stops for a different word: `<file>: the case <name> states the process <word>, and a process is status, signal, helper, command, state`.
+`test` stops for a different word: `<file>: the case <name> states the process <word>, and a process is status, signal, helper, command, state, script`.
+`test` also stops for `script` on a case with no `script` and no `stdin`: `<file>: the case <name> states the process script, and it has no script and no stdin`.
 
 With `tables = true` in `[test]`, `test` also stops for a group that breaks one of these rules:
 

@@ -91,7 +91,8 @@ A file with no case gives no group.
 - holds a step or a value of `ignore` that `allowed` of `signals.py` refuses, also in its false variant: `.toolchain/docs/signals.py.md`, *The checks*,
 - claims nothing: `<path>: the case <name> claims nothing`,
 - has no false variant: `<path>: the case <name> has no false variant`,
-- states a `process` that is no reason: `<path>: the case <name> states the process <word>, and a process is status, signal, helper, command, state`,
+- states a `process` that is no reason: `<path>: the case <name> states the process <word>, and a process is status, signal, helper, command, state, script`,
+- states the process `script` with no key `script` and no key `stdin`: `<path>: the case <name> states the process script, and it has no script and no stdin`,
 - states a call in `fail`, also in its false variant, that `listed` of `fail.py` does not give: `<path>: the case <name> makes <call> fail, and [fail.calls] does not list it`.
 
 With `tables = true` in `[test]`, `groups_of` then gives the cases of each file to `ruled`.
