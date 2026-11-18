@@ -226,6 +226,7 @@ void test_fill_tables(host_t *h);
 void test_grow_elements(host_t *h);
 void test_take_reserved_name(host_t *h);
 void test_nap(host_t *h);
+void test_lanes(host_t *h);
 void test_enter_from_foreign_thread(host_t *h);
 void test_pin(host_t *h);
 void test_call_from_wrong_thread(host_t *h);
@@ -247,6 +248,7 @@ void test_run_guarded(host_t *h, const char *identity, const char *file,
 void test_tell_places(host_t *h);
 void test_map_named_phase(host_t *h);
 void test_place_two(host_t *h);
+void test_reorder_live(host_t *h);
 void test_place_after_refused_group(host_t *h);
 
 void test_place_after_stop(host_t *h);
