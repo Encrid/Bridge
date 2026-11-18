@@ -45,6 +45,22 @@ void test_place_two(host_t *h)
     host_close(h);
 }
 
+void test_reorder_live(host_t *h)
+{
+    const bridge_order_t *pair = strcmp(h->arg, "paired") ? nullptr
+        : TEST_PAIR_OF_PLACES;
+
+    if (host_open(h))
+        return;
+    test_load_guarded(h, "game:places@0.1.0", "places");
+    test_load_guarded(h, "game:other@0.1.0", "places");
+    host_run_frames_unsaid(h->w, 1);
+    printf("bridge_set_order between two phases gives %d\n",
+        bridge_set_order(h->w, pair, pair ? 1 : 0));
+    host_run_frames_unsaid(h->w, 1);
+    host_close(h);
+}
+
 void test_place_after_refused_group(host_t *h)
 {
     bridge_artifact_t a[2];
