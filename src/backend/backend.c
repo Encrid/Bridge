@@ -8,13 +8,17 @@
 #include "backend.h"
 #include "os.h"
 
+static const char *const ENTRY_NAMES[BACKEND_ENTRY_COUNT] = {
+    BACKEND_ENTRY_NAMES(BACKEND_ENTRY_TEXT)
+};
+
 static uint32_t find_entries(void *lib, backend_api_t *api)
 {
     void **slots = (void **)api;
     uint32_t i = 0;
 
     while (i < BACKEND_ENTRY_COUNT) {
-        slots[i] = os_lib_get_symbol(lib, BACKEND_ENTRY_NAMES[i]);
+        slots[i] = os_lib_get_symbol(lib, ENTRY_NAMES[i]);
         if (!slots[i])
             return (i);
         if (!i && api->backend_get_abi() != BACKEND_ABI)
@@ -27,7 +31,7 @@ static uint32_t find_entries(void *lib, backend_api_t *api)
 static void say_stopped(const char *path, const backend_api_t *api,
     uint32_t at, backend_err_t *err)
 {
-    const char *entry = BACKEND_ENTRY_NAMES[at];
+    const char *entry = ENTRY_NAMES[at];
 
     if (at || !api->backend_get_abi) {
         snprintf(err->text, sizeof(err->text),

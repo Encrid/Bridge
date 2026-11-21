@@ -194,6 +194,10 @@ def variables(config, args, target, zig):
         if name not in own:
             die('--set %s: [variables] has no %s' % (setting, name))
         values[name] = value
+    jobs = str(values['jobs'])
+    if not jobs.isdigit() or int(jobs) < 1:
+        die('[variables] jobs is %s, and it must be a whole number above 0' % jobs)
+    values['jobs'] = min(int(jobs), os.cpu_count() or 1)
     return values
 
 

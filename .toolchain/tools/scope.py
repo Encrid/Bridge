@@ -2,16 +2,19 @@
 #
 # Under the GNU Affero General Public License, version 3 only: see license.
 import fnmatch
+import subprocess
 import sys
 import tomllib
 
-from shared import arguments, config, die, part_of
+from shared import arguments, config, die, part_of, repository
 
 TOPS = ('src/', 'include/', 'tests/')
 CONFIG = '.toolchain/config/'
 CODE = TOPS + ('tools/',)
 BUILT = (CONFIG, '.toolchain/tools/', '.toolchain/runtime/')
-FILES = ('.toolchain/toolchain.toml', '.toolchain/project.toml', '.toolchain/graph.zig', 'project.py')
+PROJECT = '.toolchain/project.toml'
+FILES = ('.toolchain/toolchain.toml', PROJECT, '.toolchain/graph.zig', 'project.py')
+CHECKED = ('check', 'dup', 'prose', 'style')
 
 
 def stated(root, path):
@@ -27,6 +30,26 @@ def owner(settings, root, path):
         return stated(root, path)
     top = next((top for top in TOPS if path.startswith(top)), None)
     return part_of(settings, path[len(top):]) if top else None
+
+
+def git(root, *argv):
+    done = subprocess.run(['git', '-C', str(root)] + list(argv), capture_output=True)
+    return None if done.returncode else done.stdout
+
+
+def checked_only(root, into):
+    if not repository(root):
+        return False
+    base = git(root, 'merge-base', 'HEAD', 'origin/' + into) or git(root, 'merge-base', 'HEAD', into)
+    before = base and git(root, 'show', base.decode('ascii').strip() + ':' + PROJECT)
+    if not before:
+        return False
+    try:
+        tables = [tomllib.loads(text) for text in (before.decode('utf-8'), (root / PROJECT).read_text(encoding='utf-8'))]
+    except (OSError, UnicodeDecodeError, ValueError):
+        return False
+    kept = [{name: value for name, value in table.items() if name not in CHECKED} for table in tables]
+    return kept[0] == kept[1]
 
 
 def groups(settings, root):
@@ -52,7 +75,7 @@ def tests(settings, root, found, group, path):
         return any(fnmatch.fnmatch(path, pattern) for pattern in group['code'])
     if group['whole']:
         return False
-    built = path.startswith(CODE + (CONFIG,)) or path == '.toolchain/project.toml'
+    built = path.startswith(CODE + (CONFIG,)) or path == PROJECT
     return built and owner(settings, root, path) == group['part']
 
 
@@ -67,11 +90,13 @@ def claimed(settings, root, names):
 
 def scoped(settings, root, paths, into):
     found = groups(settings, root)
-    wholes = [group['name'] for group in found if group['whole']]
+    wholes = [group['name'] for group in found if group['whole']] or [group['name'] for group in found]
     if not found or into == 'main':
         return wholes
     picked = set()
     for path in paths:
+        if path == PROJECT and checked_only(root, into):
+            continue
         mine = [group['name'] for group in found if tests(settings, root, found, group, path)]
         if not mine and path.startswith(CODE):
             die('%s: no case group tests this file' % path)

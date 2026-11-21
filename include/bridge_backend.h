@@ -193,27 +193,27 @@ typedef struct backend_api {
 } backend_api_t;
 
 constexpr uint32_t BACKEND_ENTRY_COUNT = 19;
-static const char *const BACKEND_ENTRY_NAMES[BACKEND_ENTRY_COUNT] = {
-    "backend_get_abi",
-    "backend_create",
-    "backend_destroy",
-    "backend_get_capabilities",
-    "memory_get_shape",
-    "memory_adopt",
-    "memory_release",
-    "module_compile",
-    "module_list_imports",
-    "module_destroy",
-    "instance_create",
-    "instance_destroy",
-    "instance_set_work_limit",
-    "instance_set_timeout",
-    "instance_set_memory_limit",
-    "instance_set_element_limit",
-    "define_func",
-    "instance_get_func",
-    "call"
-};
+    #define BACKEND_ENTRY_NAMES(X) \
+        X("backend_get_abi") \
+        X("backend_create") \
+        X("backend_destroy") \
+        X("backend_get_capabilities") \
+        X("memory_get_shape") \
+        X("memory_adopt") \
+        X("memory_release") \
+        X("module_compile") \
+        X("module_list_imports") \
+        X("module_destroy") \
+        X("instance_create") \
+        X("instance_destroy") \
+        X("instance_set_work_limit") \
+        X("instance_set_timeout") \
+        X("instance_set_memory_limit") \
+        X("instance_set_element_limit") \
+        X("define_func") \
+        X("instance_get_func") \
+        X("call")
+    #define BACKEND_ENTRY_TEXT(name) name,
 static_assert(sizeof(backend_api_t) == BACKEND_ENTRY_COUNT * sizeof(void *));
 
     #ifdef __cplusplus

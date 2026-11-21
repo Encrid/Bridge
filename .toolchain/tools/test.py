@@ -4,9 +4,11 @@
 import concurrent.futures
 import fnmatch
 import os
+import platform
 import re
 import shutil
 import socket
+import stat
 import subprocess
 import threading
 import time
@@ -17,6 +19,7 @@ import branches
 import build
 import fail
 import leaks
+import locks
 import rewrite
 import scope
 import shared
@@ -152,15 +155,56 @@ def source_of(item, outputs, values):
     return outputs[name] if name in outputs else Path(values['root']) / name
 
 
+def cleared(folder):
+    if not folder.exists():
+        return
+    for path in folder.rglob('*'):
+        if os.name == 'nt' and path.is_file() and not os.access(path, os.W_OK):
+            os.chmod(path, stat.S_IWRITE)
+    shutil.rmtree(folder)
+
+
+def put(source, target, values):
+    target.unlink(missing_ok=True)
+    if Path(source).resolve().is_relative_to(Path(values['build'])):
+        try:
+            os.link(source, target)
+            return True
+        except OSError:
+            pass
+    shutil.copy(source, target)
+    return False
+
+
+def stamp(path):
+    try:
+        found = os.stat(path)
+    except OSError:
+        return None
+    return found.st_size, found.st_mtime_ns
+
+
+def sources_of(item, outputs, values):
+    name = expand(item, values)
+    if '*' not in name:
+        return [source_of(item, outputs, values)]
+    found = sorted(path for path in Path(values['root']).glob(name) if path.is_file())
+    return found or shared.die('%s: no file matches the pattern' % name)
+
+
 def placed(use, outputs, values):
+    linked = {}
     for folder, held in use.get('folders', {}).items():
         located(folder, values).mkdir(parents=True, exist_ok=True)
         for item in held:
-            source = source_of(item, outputs, values)
-            shutil.copy(source, located(folder, values) / source.name)
+            for source in sources_of(item, outputs, values):
+                if put(source, located(folder, values) / source.name, values):
+                    linked[Path(source)] = stamp(source)
     for path, text in use.get('files', {}).items():
         located(path, values).parent.mkdir(parents=True, exist_ok=True)
+        located(path, values).unlink(missing_ok=True)
         located(path, values).write_text(expand(text, values), encoding='utf-8', newline='\n')
+    return linked
 
 
 def scripted(running, script, outputs, values):
@@ -168,6 +212,7 @@ def scripted(running, script, outputs, values):
         if 'wait' in step and not waited(running, expand(step['wait'], values)):
             return
         for path, item in step.get('put', {}).items():
+            located(path, values).unlink(missing_ok=True)
             shutil.copy(source_of(item, outputs, values), located(path, values))
         for path in step.get('remove', []):
             located(path, values).unlink()
@@ -197,14 +242,14 @@ def tried(config, values, outputs, where, case, broken, counted=False, failing=N
     use = made_false(case) if broken else case
     values, outputs = failing if failing and (use.get('fail') or use.get('sweep')) else (values, outputs)
     folder = Path(values['out']) / 'cases' / where
-    shutil.rmtree(folder, ignore_errors=True)
+    cleared(folder)
     folder.mkdir(parents=True, exist_ok=True)
     mine = dict(values, case=folder.as_posix())
     if '{port}' in str(use):
         mine['port'] = free_port()
     counting = {'C23_LEAKS': folder.as_posix() + '.leaks'} if counted else {}
     plan = ''.join(' %s=%s' % pair for pair in use.get('fail', {}).items()) or False
-    placed(use, outputs, mine)
+    linked = placed(use, outputs, mine)
     root, timeout, helper = values['root'], config['test']['timeout'], use.get('helper')
     beside = started(expanded(helper['run'], mine), root, timeout, environment(counting, mine)) if helper else None
     if helper:
@@ -218,11 +263,14 @@ def tried(config, values, outputs, where, case, broken, counted=False, failing=N
     ends = [ended(running, typing, order is not None)]
     if helper:
         ends.append(ended(beside, expand(helper.get('stdin', ''), mine)))
+    mine[WROTE] = sorted(path.as_posix() for path, was in linked.items() if stamp(path) != was)
     return ends, [use.get('claims', {})] + ([helper.get('claims', {})] if helper else []), mine
 
 
 def judged(config, group, broken, run):
     ends, claims, mine = run
+    if mine[WROTE]:
+        return False, 'wrote into the build output %s' % ', '.join(mine[WROTE]), ends
     lacks = [rule['lacks'] for rule in config['test'].get('rule', []) if group not in rule.get('exempt', [])]
     if any(code is None for code, _ in ends):
         return False, 'did not end in %d seconds' % config['test']['timeout'], ends
@@ -235,6 +283,8 @@ def judged(config, group, broken, run):
 def answered(config, group, broken, run, rows, order):
     ends, claims, mine = run
     code, said = ends[0]
+    if mine[WROTE]:
+        return [(False, 'wrote into the build output %s' % ', '.join(mine[WROTE]))] * len(rows)
     lacks = [rule['lacks'] for rule in config['test'].get('rule', []) if group not in rule.get('exempt', [])]
     blocks = said.split('\n\n')[:-1]
     if any(end is None for end, _ in ends):
@@ -301,32 +351,152 @@ def verdict(config, values, outputs, group, index, case, broken, copies, counted
     return ok, how + (' in %d of %d copies' % (len(bad), count) if count > 1 else ''), ends
 
 
-def test(config, values, outputs, groups, broken, said, copies, counted=False, failing=None):
-    wrong, texts = [], []
-    for group, cases in groups:
-        right, count = 0, 0
-        for index, case in enumerate(cases):
-            if 'rows' in case:
-                found, ends = tabled(config, values, outputs, group, index, case, broken, copies, counted, failing)
-                named = [(row['name'], ok, how) for row, (ok, how) in zip(case['rows'], found)]
-            else:
-                ok, how, ends = verdict(config, values, outputs, group, index, case, broken, copies, counted, failing)
-                named = [(case['name'], ok, how)]
-            texts += [said for _, said in ends]
-            for name, ok, how in named:
-                print('%s%s: %s' % (name, ', made false' if broken else '', how))
-            right += sum(ok for _, ok, _ in named)
-            count += len(named)
-            wrong += [name for name, ok, _ in named if not ok]
-            if not all(ok for _, ok, _ in named):
-                for whose, (code, said) in zip(('', 'the helper '), ends):
-                    print('  %sended with %s, and printed:\n%s' % (whose, 'no status' if code is None else status(code),
-                                                                  said.rstrip()))
-        print('%s: %d claims made false: %d cases failed' % (group, count, right) if broken else
-              '%s: %d cases: %d as written' % (group, count, right))
+WROTE = 'the outputs that a case wrote'
+WAIT = 0.2
+USE = re.compile(r'[A-Za-z0-9_-]+')
+
+
+def uses_of(config, values, running):
+    table = config.get('test', {}).get('uses', {})
+    if not table:
+        return {}
+    if not isinstance(table, dict):
+        die('[test] uses: write a table of the uses')
+    root = Path(values['root'])
+    paths = files(root, [top + '**/*' for top in scope.CODE + scope.BUILT]) + files(root, list(scope.FILES))
+    found, named = scope.groups(config, root), {}
+    run = [group for group in found if group['name'] in running]
+    for name, patterns in sorted(table.items()):
+        if not USE.fullmatch(name):
+            die('[test] uses: %s is not a name of letters, digits, _ and -' % name)
+        if not (isinstance(patterns, list) and all(isinstance(pattern, str) for pattern in patterns)):
+            die('[test] uses: %s is a list of patterns' % name)
+        if not patterns:
+            die('[test] uses: %s has no pattern' % name)
+        for pattern in patterns:
+            if not any(fnmatch.fnmatch(path, pattern) for path in paths):
+                die('[test] uses: %s matches no file' % pattern)
+        mine = [path for path in paths if any(fnmatch.fnmatch(path, pattern) for pattern in patterns)]
+        for group in run:
+            whole = group['whole'] and group['code'] is None
+            if whole or any(scope.tests(config, root, found, group, path) for path in mine):
+                named.setdefault(group['name'], []).append(name)
+    return named
+
+
+def test(config, values, outputs, groups, broken, said, copies, counted=False, failing=None, workers=1):
+    wrong, texts, uses = [], [], uses_of(config, values, {group for group, _ in groups})
+    jobs = [[(group, index, case, concurrent.futures.Future()) for index, case in enumerate(cases)]
+            for group, cases in groups]
+    lanes, stop, room = lanes_of(jobs, uses), threading.Event(), Room(floor_of(config))
+
+    def ran(lane):
+        for group, index, case, future in lane:
+            if stop.is_set():
+                return
+            try:
+                with room, locks.held(uses.get(group, []), group):
+                    future.set_result(one(config, values, outputs, group, index, case, broken, copies, counted,
+                                          failing))
+            except BaseException as error:
+                future.set_exception(error)
+
+    with concurrent.futures.ThreadPoolExecutor(workers) as pool:
+        for lane in lanes:
+            pool.submit(ran, lane)
+        try:
+            for (group, _), mine in zip(groups, jobs):
+                right, count = 0, 0
+                for *_, future in mine:
+                    named, ends = future.result()
+                    texts += [said for _, said in ends]
+                    told(named, ends, broken)
+                    right += sum(ok for _, ok, _ in named)
+                    count += len(named)
+                    wrong += [name for name, ok, _ in named if not ok]
+                print('%s: %d claims made false: %d cases failed' % (group, count, right) if broken else
+                      '%s: %d cases: %d as written' % (group, count, right))
+        except BaseException:
+            stop.set()
+            raise
     if said:
         (Path(values['out']) / 'said.txt').write_text('\n'.join(texts), encoding='utf-8', newline='\n')
     return wrong
+
+
+def free_memory():
+    if os.name == 'nt':
+        import ctypes
+
+        class Status(ctypes.Structure):
+            _fields_ = [('length', ctypes.c_ulong), ('load', ctypes.c_ulong)] + [
+                (name, ctypes.c_ulonglong) for name in ('phys', 'free_phys', 'commit', 'free_commit', 'virtual',
+                                                        'free_virtual', 'free_extended')]
+        status = Status(length=ctypes.sizeof(Status))
+        return status.free_commit if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(status)) else None
+    if platform.system() == 'Darwin':
+        try:
+            said = subprocess.run(['vm_stat'], capture_output=True, text=True, check=True).stdout
+            size = int(re.search(r'page size of (\d+)', said).group(1))
+        except (OSError, subprocess.CalledProcessError, AttributeError):
+            return None
+        return size * sum(int(n) for n in re.findall(r'Pages (?:free|inactive|speculative|purgeable):\s+(\d+)', said))
+    try:
+        with open('/proc/meminfo', encoding='ascii') as info:
+            return next(int(line.split()[1]) * 1024 for line in info if line.startswith('MemAvailable:'))
+    except (OSError, StopIteration, ValueError):
+        return None
+
+
+def floor_of(config):
+    floor = config['test'].get('memory_floor', 2 << 30)
+    if not (isinstance(floor, int) and not isinstance(floor, bool) and floor >= 0):
+        die('[test] memory_floor is a count of bytes, 0 or more')
+    return floor
+
+
+class Room:
+    def __init__(self, floor):
+        self.floor, self.busy, self.gate = floor, 0, threading.Condition()
+
+    def __enter__(self):
+        with self.gate:
+            while self.floor and self.busy and (free_memory() or self.floor) < self.floor:
+                self.gate.wait(WAIT)
+            self.busy += 1
+
+    def __exit__(self, *_):
+        with self.gate:
+            self.busy -= 1
+            self.gate.notify_all()
+
+
+def lanes_of(jobs, uses):
+    shared, free = {}, []
+    for job in (job for mine in jobs for job in mine):
+        key = tuple(sorted(uses.get(job[0], [])))
+        if key:
+            shared.setdefault(key, []).append(job)
+        else:
+            free.append([job])
+    return list(shared.values()) + free
+
+
+def one(config, values, outputs, group, index, case, broken, copies, counted, failing):
+    if 'rows' in case:
+        found, ends = tabled(config, values, outputs, group, index, case, broken, copies, counted, failing)
+        return [(row['name'], ok, how) for row, (ok, how) in zip(case['rows'], found)], ends
+    ok, how, ends = verdict(config, values, outputs, group, index, case, broken, copies, counted, failing)
+    return [(case['name'], ok, how)], ends
+
+
+def told(named, ends, broken):
+    for name, ok, how in named:
+        print('%s%s: %s' % (name, ', made false' if broken else '', how))
+    if not all(ok for _, ok, _ in named):
+        for whose, (code, said) in zip(('', 'the helper '), ends):
+            print('  %sended with %s, and printed:\n%s' % (whose, 'no status' if code is None else status(code),
+                                                          said.rstrip()))
 
 
 def rowed(case, path):
@@ -453,11 +623,18 @@ def measured(args):
     hits = Path(values['out']) / 'hits.bin'
     hits.write_bytes(bytes(branches.parts(probes)[1]))
     os.environ['C23_BRANCHES'] = str(hits)
-    test(config, values, outputs, groups, False, False, 1)
+    test(config, values, outputs, groups, False, False, 1, workers=workers_of(args, config))
     excepted = scoped(args, config.get('branches', {}).get('exception', []), 'path', probes)
     if args.group:
         print('branches: measured the code of the groups %s' % ', '.join(args.group))
     branches.reported(probes, gaps, hits, excepted, values['system'], named)
+
+
+def workers_of(args, config):
+    count = args.workers if args.workers is not None else config.get('test', {}).get('workers', os.cpu_count() or 1)
+    if not (isinstance(count, int) and not isinstance(count, bool) and count > 0):
+        die('[test] workers and --workers are a count of 1 or more')
+    return count
 
 
 def tallied(args):
@@ -465,8 +642,8 @@ def tallied(args):
         die('--leaks runs each case one time: it takes no --break, --toolchain, --copies, --rounds or --branches')
     config, values, (files, kinds), outputs, groups = changed(args, 'leaks', leaks.counted)
     folder = Path(values['out']) / 'cases'
-    shutil.rmtree(folder, ignore_errors=True)
-    test(config, values, outputs, groups, False, False, 1, True)
+    cleared(folder)
+    test(config, values, outputs, groups, False, False, 1, True, workers=workers_of(args, config))
     cases = [(case['name'], folder / group / ('%d.leaks' % index)) for group, listed in groups
              for index, case in enumerate(listed)]
     excepted = scoped(args, config.get('leaks', {}).get('exception', []), 'case', [name for name, _ in cases])
@@ -474,8 +651,10 @@ def tallied(args):
 
 
 def main():
-    args = shared.arguments('-k', ('--copies', int), ('--rounds', int), broken='--break', toolchain='--toolchain',
-                            branches='--branches', leaks='--leaks')
+    args = shared.arguments('-k', ('--copies', int), ('--rounds', int), ('--workers', int), broken='--break', toolchain='--toolchain',
+                            branches='--branches', leaks='--leaks', built='--build')
+    if args.built and (args.toolchain or args.branches or args.leaks or args.broken):
+        die('--build builds each artifact and runs no case: it takes no --toolchain, --branches, --leaks or --break')
     if args.leaks:
         return tallied(args)
     if args.branches:
@@ -488,6 +667,8 @@ def main():
     unlinked = [name for name, paths in made if not paths]
     if unlinked:
         die('the cases need what is linked: ' + ' '.join(unlinked))
+    if args.built:
+        return print('built %d artifacts' % len(made))
     folder = '.toolchain/tests/cases' if args.toolchain else config.get('test', {}).get('cases', 'tests/cases')
     groups = groups_of(config, values, folder)
     if not groups:
@@ -505,7 +686,7 @@ def main():
         if rounds > 1:
             print('round %d of %d' % (done + 1, rounds))
         wrong = test(config, values, {name: paths[0] for name, paths in made}, groups, args.broken, own, copies,
-                     failing=failing)
+                     failing=failing, workers=workers_of(args, config))
         if wrong:
             die(('still as written with their claims made false: ' if args.broken else 'not as written: ')
                 + ', '.join(wrong))

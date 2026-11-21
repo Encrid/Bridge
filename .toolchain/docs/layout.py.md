@@ -7,7 +7,7 @@ It reads the files that `ours` gives, so no rule of `layout.py` applies to a fil
 
 | Function | Result |
 | --- | --- |
-| `own(root)` | Gives the paths of the guides that `[check] guides` of the configuration adds, and the path of the readme of each part. |
+| `own(root)` | Checks the parts with `owned` of `build.py`. Gives the paths of the guides that `[check] guides` of the configuration adds, and the path of the readme of each part. |
 | `faults(root, paths)` | Gives the faults of the tree. |
 | `main()` | Runs the check. |
 
@@ -83,6 +83,12 @@ The messages are:
 
 - `<path>: '<name>' is not in snake_case`
 - `<path>: a compiled or temporary file`
+
+## The parts
+
+Before it reads the tree, `layout.py` checks `[parts]` and the key `part` of each artifact with `owned` of `build.py`.
+Thus `python project.py check` stops for each message of `.toolchain/docs/project.toml.md`, *[parts]*, before a build does.
+For example, it stops with `layout.py: no part <part>; the parts: <parts>` for a part in `uses` that the project does not state.
 
 ## Output
 

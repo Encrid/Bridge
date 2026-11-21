@@ -66,8 +66,9 @@ The count reads the value only after the call, because before the call the value
 `counted` does these steps:
 
 1. `listed` reads the counted functions and their kinds. `listed` of `fail.py` reads the functions that can fail.
-2. `rewrite.each` gives a syntax tree for each compiled file `.c` of `src`: `.toolchain/docs/rewrite.py.md`.
+2. `rewrite.each` gives a syntax tree for each compiled file `.c` of `src`, one tree for each different command: `.toolchain/docs/rewrite.py.md`.
 3. In each tree, `rewrite.found` finds the functions of the two lists that the file uses, and their declarations. It skips a function that the file defines, but not a callback.
+   `rewrite.united` joins the trees of a file.
 4. `rewrite.copied` copies `src` and `include` into `<build>/leaks/tree`.
 5. `rewritten` writes the count and the layer of `fail.py` into each copy of a file that uses such a function.
 
@@ -84,11 +85,17 @@ Thus the function that counts calls the function of the layer, and a failed call
 At the end of the file, the count writes these parts:
 
 - an array of `_Atomic long long`, with a count for each kind and a count of the calls of `realloc` with 0 bytes;
+- a function `c23b_l_held`, which tells if a byte of a value is not 0;
 - for each counted function, a `static` function that counts and calls it. It reads the values of the gives before the call, and the values of the takes and of the results after the call;
 - the writer of `rewrite.py`: `.toolchain/docs/rewrite.py.md`, *The writer*.
 
 Each program writes one line `<path> <counts>` for each file into the file of the variable `C23_LEAKS`.
 The line has a count for each kind, in the order of `listed`, and then the count of the calls of `realloc` with 0 bytes.
+`c23_counts_keep` of `.toolchain/runtime/counts.h` writes the line: `.toolchain/docs/counts.h.md`.
+
+Under `__wasm__`, the counts are in a chunk in the section `c23l`, with their number and the path of the file.
+The file has no writer. The host of the module writes the line of each chunk at the end of each instance: `.toolchain/docs/outcomes.h.md`, *A host of wasm modules*.
+`c23b_l_held` reads the bytes with a loop, so the count needs no library of C.
 
 `counted` stops if a counted function does not fit its kind:
 
@@ -132,6 +139,7 @@ An exemption that excuses no kept resource is a fault, so a case that gives the 
 ## Limits
 
 - A program that does not end normally writes no line, so its counts are lost: `.toolchain/docs/rewrite.py.md`, *Limits*.
+- The counts of a wasm module reach the file of the leaks only at the end of an instance, through its host.
 - Code before the last `#include` of a file is not counted.
 - A function of a header that calls a counted function is not counted.
 - The code of `tests`, of a different project and of a third party is not counted. If it frees memory that counted code took, the case keeps it.

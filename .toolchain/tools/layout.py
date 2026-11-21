@@ -3,6 +3,7 @@
 # Under the GNU Affero General Public License, version 3 only: see license.
 import re
 
+import build
 from shared import arguments, config, document, ours, report
 
 GUIDES = ('agreement', 'coding_style', 'coding_style_cxx', 'commits', 'decisions', 'documentation_style', 'needs', 'pull_request', 'tests')
@@ -24,6 +25,7 @@ MADE = re.compile(r'.*\.(?:o|obj|a|so|dll|dylib|exe|gch|d|pyc)|.*~|#.*#|a\.out')
 
 def own(root):
     settings = config(root)
+    build.owned(settings)
     guides = tuple('docs/contributing/%s' % name for name in settings.get('check', {}).get('guides', []))
     readmes = tuple('docs/usage/%s.md' % part['folder'] for part in settings.get('parts', {}).values()
                     if 'folder' in part)

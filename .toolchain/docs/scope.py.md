@@ -35,9 +35,20 @@ A project with no such group runs no case there. `check` and the package proof o
 ## The scope
 
 For a pull request into a different branch than `main`, each changed path gives the groups that test it.
-A file of the copy of the toolchain that no group tests gives the groups of the whole. The cases of the toolchain run in the repository `mc23t`.
+A file of the copy of the toolchain that no group tests gives the groups of the whole.
+The cases of the toolchain run in the repository `mc23t`.
+
+A project with no group of the whole takes each of its groups in their place. A file of the toolchain, for example its flags, can change each artifact.
+A pull request into `main` does the same.
+
 A file of `src`, `include`, `tests` or `tools` that no group tests stops the tool. Thus no code is left with no test.
 Each other path gives no group: a document and a workflow change no code.
+
+Only `check` reads the tables `[check]`, `[dup]`, `[prose]` and `[style]` of `.toolchain/project.toml`, and no case reads them.
+So a change of `.toolchain/project.toml` gives no group when the file differs from its form at the base only in these 4 tables.
+The base is the last commit that the branch shares with `origin/<branch>`, or with `<branch>` if no such commit exists.
+The file gives its groups as each other file of the toolchain does when the project is not a repository of its own.
+It does the same when git does not give the base, or the file at the base.
 
 A part that uses a changed part gives no group. Its groups test its own code.
 
@@ -60,5 +71,7 @@ A project with no case group gives nothing.
 | `groups(settings, root)` | Gives each group of `[test] cases` that has a case: its name, its file, its `code`, its `whole` and its part. |
 | `tests(settings, root, found, group, path)` | Tells if a group tests a path. `found` holds each group of the project. |
 | `claimed(settings, root, names)` | Gives the function that tells if the named groups hold each group that tests a file: `.toolchain/docs/branches.py.md`, *The files of the named groups*. |
+| `checked_only(root, into)` | Tells if `.toolchain/project.toml` differs from its form at the base only in the tables `[check]`, `[dup]`, `[prose]` and `[style]`. |
+| `git(root, *argv)` | Runs git in the project, and gives its output, or `None` if git fails. |
 | `owner(settings, root, path)` | Gives the part of one path, or `None`. |
 | `stated(root, path)` | Gives the part that a config file states alone, or `None`. |

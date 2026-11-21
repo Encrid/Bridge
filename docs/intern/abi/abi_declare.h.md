@@ -53,7 +53,8 @@ These files check the type, make it, and lay it out again at a reload.
 
 | Constant | Value |
 | --- | --- |
-| `ABI_STORAGE_NAMES` | The name of each storage layout as a refusal says it, by `enum bridge_storage`: a table, a sparse set, a toggle, direct-indexed, a singleton. |
+| `ABI_STORAGE_COUNT` | 6: the count of the names of `ABI_STORAGE_NAMES`. |
+| `ABI_STORAGE_NAMES` | The name of each storage layout as a refusal says it, by `enum bridge_storage`: a table, a sparse set, a toggle, direct-indexed, a singleton. `src/abi/abi_moved.c` defines it. |
 
 ## Functions
 

@@ -95,7 +95,9 @@ The 2 runners make the same files.
 
 ## The runner zig
 
-`graphed` writes the graph `{out}/obj/graph.json`, and runs `zig build` with `.toolchain/graph.zig`, `-Dgraph=<graph>` and `--prefix {out}`.
+`graphed` writes the graph `{out}/obj/graph.json`, and runs `zig build` with `-j<jobs>`, `.toolchain/graph.zig`, `-Dgraph=<graph>` and `--prefix {out}`.
+`-j<jobs>` limits the steps that run at the same time: `.toolchain/docs/toolchain.toml.md`, *The jobs*.
+
 `.toolchain/docs/graph.zig.md` tells the form of the graph.
 `graph.zig` is the same file for each project, so zig builds it only once for each version of zig on a machine.
 For each artifact, `specified` writes `{work}.json`: the values of the artifact, and its steps with their variables replaced.
@@ -104,13 +106,13 @@ The graph has these steps:
 
 1. For each source of a kind with `each`, the command of `each`. Its input is the source, and its output is `{object}`.
    `{deps}` names the headers of the source, and zig takes them as inputs too.
-2. For each artifact, `python build.py --one <spec>`. Its inputs are the spec, the objects, and the files of `{sources}`, `{link}` and `{runtime}`.
+2. For each artifact, `python build.py --one <spec>`. Its inputs are the spec, the objects, and the files of `{sources}`, `{link}`, `{archives}` and `{runtime}`.
    Its output is `{output}`. Each folder of `{inputs}` is an input too, after the prefix of the item.
    The files of `{sources}` and of `{runtime}` are inputs of the kind `input`, and no arguments.
    Windows refuses a command of more than 32767 characters.
 3. For each artifact, a step that copies its output to its path in `{out}`.
 
-A file of `link` that a different artifact of the build makes is the output of the step of that artifact. Thus the step waits for it.
+A file of `link` or of `archives` that a different artifact of the build makes is the output of the step of that artifact. Thus the step waits for it.
 zig hashes the content of each input. A step whose command and inputs did not change does not run again: zig gives its output from its cache.
 
 `build.py --one` runs `one`. It does the steps of the kind in order with `do`, as the runner `mpbt` does, with `{output}` at the file that zig gives.
@@ -125,13 +127,14 @@ The first `zig build` of a version of zig on a machine takes longer, because zig
 1. If the artifact gives a `target`, it uses the keys of that target and its name as `{target}`.
 2. It replaces the variables of the name, and finds the sources. In `sources`, an item that is only a list variable gives the patterns of that list.
 3. It stops if no file matches the sources: `no file matches the sources of <name>`.
-4. It sets `{output}`, then `{work}`, `{sources}`, `{defines}`, `{include}`, `{link}` and `{manifest}`, then `{flags}`, which can use them.
+4. It sets `{output}`, then `{work}`, `{sources}`, `{defines}`, `{include}`, `{link}`, `{archives}` and `{manifest}`, then `{flags}`, which can use them.
    `{flags}` holds the `flags` of the kind, then the `flags` of the artifact.
+   For the build of a changed copy, `tree` names its folder. Then it sets `{tree}`, and `{flags}` also holds the `probed` of the kind.
    With `inputs`, it also sets `{inputs}`: a folder after `--embed-dir=` for each file of the key.
    A file that is not there stops the build before it: `<file> is not there, and <name> reads it`.
 5. It makes the folder of the output, and the folder `obj`.
 6. With `each`, `compiled` runs the step `each` for each source: *Each source*.
-7. If a file of `link` is not there, it does the `unlinked` steps of the kind.
+7. If a file of `link` or of `archives` is not there, it does the `unlinked` steps of the kind.
 8. Else, it does the `steps` of the kind, and copies the `beside` files into the folder of the output.
 
 The runner `zig` does the steps 6 to 8 in the graph: *The runner zig*.

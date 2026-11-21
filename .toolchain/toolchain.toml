@@ -11,6 +11,10 @@ aarch64-linux-gnu = { host = "aarch64-linux", format = "tar.xz", sha256 = "a1546
 x86_64-macos = { host = "x86_64-macos", format = "tar.xz", sha256 = "9af07b20319fbd0c92ee46ad23e81d6a782b1aaea2cfb8dcbff35f1d2c7ddbb7" }
 aarch64-windows-gnu = { host = "aarch64-windows", format = "zip", sha256 = "4789895bdb1e312a2ea73b2a7c0a0cc8d2ab62ba6976e834a7c54cf443377c15" }
 
+[fetch]
+archives = "build/archives"
+timeout = 60
+
 [build]
 folder = "build"
 cache = "build/zig-cache"
@@ -18,12 +22,15 @@ cache = "build/zig-cache"
 [variables]
 language = ["-std=c23", "-pedantic-errors", "-Wall", "-Wextra", "-Werror"]
 optimize = ["-O2", "-DNDEBUG", "-g0", "-s", "-fno-sanitize=undefined", "-fno-stack-protector", "-fno-omit-frame-pointer"]
-float = ["-ffp-contract=on", "-fno-fast-math", "-fno-rounding-math"]
+float = ["-ffp-contract=off", "-fno-fast-math", "-fno-rounding-math"]
 strip = "-fstrip"
+debug_info = "-g0"
+jobs = 8
 
 [debug]
 optimize = ["-O0", "-g", "-fsanitize=undefined", "-fno-sanitize=vptr", "-fno-sanitize=function", "-fstack-protector-strong", "-fno-omit-frame-pointer"]
 strip = "-fno-strip"
+debug_info = "-g"
 
 [targets.x86_64-windows-gnu]
 runs_on = ["Windows", "AMD64"]
