@@ -542,6 +542,8 @@ A barrier that applies all the changes of the module subtracts 1, down to zero.
 
 When a count gets to `max_system_failures`, Bridge stops the module at the next barrier.
 A stopped module runs no system and no observer, and its components stay. A reload brings it back, and an unload removes it.
+The barrier that stops the module gives its log lines to the sink of the host after the record of the stop.
+These include the lines that a system or an observer wrote before it failed. A full log ring drops lines, and a record counts them: *Running out*.
 
 ### The private memory
 
