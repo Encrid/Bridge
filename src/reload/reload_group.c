@@ -49,24 +49,26 @@ static int validate_group(bridge_world_t *w, reloading_t *reloads,
 static uint32_t start_members(bridge_world_t *w, reloading_t *reloads,
     uint32_t count)
 {
-    module_start_t st;
     uint32_t i = 0;
 
     while (i < count) {
-        st = (module_start_t){ reloads[i].a, reloads[i].demands, "reload" };
         if (reload_grow_share(&reloads[i]) || reload_make_record(&reloads[i]))
             return (i);
         reload_take_cursors(&reloads[i]);
         reload_retire(&reloads[i]);
         reloads[i].n->reloads = reloads[i].old;
-        if (module_start(reloads[i].n, &st, &reloads[i].err)) {
-            reload_refuse(&reloads[i], "%s", reloads[i].err.text);
-            undo_member(w, &reloads[i]);
-            return (i);
-        }
+        if (module_start(reloads[i].n, &(module_start_t){ reloads[i].a,
+            reloads[i].demands, "reload" }, &reloads[i].err))
+            break;
         i++;
     }
-    return (count);
+    if (i < count) {
+        if (reloads[i].n->priv)
+            block_drain(w, reloads[i].n);
+        reload_refuse(&reloads[i], "%s", reloads[i].err.text);
+        undo_member(w, &reloads[i]);
+    }
+    return (i);
 }
 
 static int group_fail(bridge_world_t *w, reloading_t *reloads, uint32_t done,

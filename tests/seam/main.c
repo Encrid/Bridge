@@ -1013,6 +1013,8 @@ static const host_case_t TEST_CASES[] = {
         test_reload_group, "share2 share2 three", test_set_guarded },
     { "bridge_reload-group-member-failed-start-changes-nothing",
         test_reload_group, "share2 sharebad", test_set_guarded },
+    { "bridge_reload-group-member-failed-start-log-given",
+        test_reload_group, "share2 sharebad-said", test_set_guarded },
     { "bridge_reload-group-failed-calls-the-new-shutdown-of-each-member-that-started",
         test_reload_group_shut, "", test_set_guarded },
     { "bridge_reload-group-with-no-stated-loss-reloaded",
