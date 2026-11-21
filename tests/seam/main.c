@@ -239,6 +239,8 @@ static const host_case_t TEST_CASES[] = {
         test_edit_module, "on_error=0", test_set_small },
     { "module_config.max_system_failures-reached-stops-the-module",
         test_reach_budget, "twostep flaky-always", test_set_noting },
+    { "module_config.max_system_failures-lines-of-the-stop-reach-the-sink",
+        test_reach_budget, "twostep flaky-always", test_set_noting },
     { "module_config.max_system_failures-not-reached-runs",
         test_reach_budget, "twostep flaky-third", test_set_noting },
     { "module_config.max_system_failures-one-in-three-forgiven",
