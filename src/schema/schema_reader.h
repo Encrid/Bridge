@@ -15,20 +15,7 @@ typedef struct {
 } schema_given_t;
 
 constexpr uint32_t SCHEMA_GIVEN_COUNT = 12;
-static const schema_given_t SCHEMA_GIVEN[SCHEMA_GIVEN_COUNT] = {
-    { "bool", SCHEMA_BOOL, 1 },
-    { "char", SCHEMA_CHAR, 1 },
-    { "int8_t", SCHEMA_I8, 1 },
-    { "uint8_t", SCHEMA_U8, 1 },
-    { "int16_t", SCHEMA_I16, 2 },
-    { "uint16_t", SCHEMA_U16, 2 },
-    { "int32_t", SCHEMA_I32, 4 },
-    { "uint32_t", SCHEMA_U32, 4 },
-    { "int64_t", SCHEMA_I64, 8 },
-    { "uint64_t", SCHEMA_U64, 8 },
-    { "float", SCHEMA_F32, 4 },
-    { "double", SCHEMA_F64, 8 }
-};
+extern const schema_given_t SCHEMA_GIVEN[SCHEMA_GIVEN_COUNT];
 
 typedef struct {
     const char *at;

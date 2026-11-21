@@ -14,6 +14,50 @@ POINT = 'c23b_fp_'
 LOADERS = ('GetProcAddress', 'dlsym')
 STATE = r'''#pragma clang diagnostic ignored "-Wcast-function-type-mismatch"
 #include <stddef.h>
+#ifdef __wasm__
+extern char c23b_plan[];
+static char *c23b_ffind(const char *all, const char *key)
+{
+    for (; *all; all++) {
+        size_t n = 0;
+
+        while (key[n] && all[n] == key[n])
+            n++;
+        if (!key[n])
+            return ((char *)all);
+    }
+    return (nullptr);
+}
+static long long c23b_fget(const char *key)
+{
+    const char *at = c23b_ffind(c23b_plan, key);
+    long long n = 0;
+
+    while (at && *key) {
+        at++;
+        key++;
+    }
+    while (at && *at >= '0' && *at <= '9')
+        n = 10 * n + (*at++ - '0');
+    return (n);
+}
+static int c23b_fmine(const char *parts)
+{
+    const char *part = c23b_plan;
+
+    while (*part)
+        part++;
+    return (!part[1] || c23b_ffind(parts, part + 1) != nullptr);
+}
+static long long c23b_ft = -1;
+static void c23b_ftold(void)
+{
+    char *at = c23b_ffind(c23b_plan, " told=0");
+
+    if (at)
+        at[6] = '1';
+}
+#else
 #include <stdlib.h>
 #include <string.h>
 static long long c23b_fget(const char *key)
@@ -30,6 +74,15 @@ static int c23b_fmine(const char *parts)
     return (!part || strstr(parts, part) != nullptr);
 }
 static long long c23b_ft;
+static void c23b_ftold(void)
+{
+    char *all = getenv("C23_FAIL");
+    char *at = all ? strstr(all, " told=0") : nullptr;
+
+    if (at)
+        at[6] = '1';
+}
+#endif
 static void c23b_fread(void);
 static void c23b_fturn(_Atomic long long *count, long long *counted)
 {
@@ -44,19 +97,11 @@ static void c23b_fturn(_Atomic long long *count, long long *counted)
         *count = 0;
     }
 }
-static void c23b_ftold(void)
-{
-    char *all = getenv("C23_FAIL");
-    char *at = all ? strstr(all, " told=0") : nullptr;
-
-    if (at)
-        at[6] = '1';
-}
 '''
 COUNT = ('[[gnu::weak, gnu::visibility("hidden")]] _Atomic long long c23b_fc_%(n)s;\n'
          '[[gnu::weak, gnu::visibility("hidden")]] long long c23b_fg_%(n)s;\nstatic long long c23b_fs_%(n)s;\n')
 READ = '    c23b_fs_%(n)s = c23b_fget(" %(n)s=");\n'
-MINE = '[[gnu::constructor]] static void c23b_fread(void)\n{\n    if (!c23b_fmine("%s"))\n        return;\n'
+MINE = '#ifndef __wasm__\n[[gnu::constructor]]\n#endif\nstatic void c23b_fread(void)\n{\n    if (!c23b_fmine("%s"))\n        return;\n'
 WRAP = ('    c23b_fturn(&c23b_fc_%(n)s, &c23b_fg_%(n)s);\n    if (++c23b_fc_%(n)s == c23b_fs_%(n)s) {\n'
         '        c23b_ftold();\n        return (%(v)s);\n    }\n    return (%(c)s);\n}\n')
 
@@ -129,7 +174,7 @@ def wrapped(text, outer):
 def failed(config, values):
     calls = listed(config, values)
     root, where = Path(values['root']), rewrite.tree(values, 'fail')
-    files = rewrite.each(config, values, lambda top, path, tree: rewrite.found(top, path, tree, calls))
+    files = rewrite.united(rewrite.each(config, values, lambda top, path, tree: rewrite.found(top, path, tree, calls)))
     rewrite.copied(root, where)
     for (path, used, declared, _), parts in files:
         if not used:

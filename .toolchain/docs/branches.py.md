@@ -20,13 +20,14 @@ The measure does not probe a constant part: `static_assert`, `sizeof`, `_Generic
 
 `probed` does these steps:
 
-1. `rewrite.each` gives the syntax tree of each file `.c` of `src` that the build compiles: `.toolchain/docs/rewrite.py.md`, *The steps*.
+1. `rewrite.each` gives a syntax tree for each command that compiles a file `.c` of `src`: `.toolchain/docs/rewrite.py.md`, *The steps*.
 2. In each syntax tree, `walked` finds the conditions, the labels and the functions of `src` and `include`.
-3. `rewrite.found` finds the functions of `listed` of `fail.py` that the file uses, and `fail.layer` gives the layer.
+3. `rewrite.found` finds the functions of `listed` of `fail.py` that the file uses. `rewrite.united` joins the trees of a file, and `fail.layer` gives the layer.
 4. With `--part`, `mine` keeps only the probes and the gaps of the files of the named parts. With `--group`, it keeps only those of the code of the named groups.
 5. `written` copies `src` and `include` into `<build>/branches/tree`, and writes the probes and the layers into the copies.
 
 A header gets the probes of each tree that includes it.
+A file that 2 artifacts compile with different flags, for example a different `defines`, gets the probes of both trees.
 `test.py` then builds the copies, runs the cases and calls `reported`: `.toolchain/docs/test.py.md`, *The branches*.
 
 ## The files of the named parts
@@ -50,7 +51,8 @@ A source with no probes still gets its layer of fail.
 - A condition `c` becomes `c23b_((c), <number>)`. `c23b_` records if `c` was true or false, and gives `c`.
 - After the `:` of a label and after the `{` of a function, `c23b_hit_(<number>);` records that it ran.
 - A file `.c` starts with an array of `_Atomic` bytes, one for each outcome, a pointer to the bytes, and these two functions.
-- At its end, a file `.c` has a `[[gnu::constructor]]` that maps its part of the file of the hits: *The hits*.
+- At its end, a file `.c` has a `[[gnu::constructor]]` that gives its bytes to the file of the hits: *The hits*.
+- In a wasm module, the array is in a chunk of the module, and the file has no constructor: *A wasm module*.
 - A file `.c` also gets its layer: `.toolchain/docs/fail.py.md`, *The layer*. Thus a case that states `fail` reaches the branch of the failed call.
 - A header starts with one block, under a guard of its own, with the same parts under names of its own.
 
@@ -62,13 +64,28 @@ A file `.c` includes no header before its own lines. Thus its own macros, such a
 The file of the hits holds one byte for each outcome of each file, in the order of the paths. `parts` gives the part of each file.
 `test.py` writes the file with a byte 0 for each outcome, and the variable `C23_BRANCHES` names it.
 
-The constructor of a file maps the part of the file into memory, with `mmap` on Linux and on macOS, and with `MapViewOfFile` on Windows.
-It copies the bytes that the probes set before it ran, and then the pointer of the probes points to the mapped part.
+The constructor of a file calls `c23_outcomes_keep` of `.toolchain/runtime/outcomes.h` with its bytes, its first byte and its number of bytes.
+`c23_outcomes_keep` maps the file of the hits into memory, and sets the byte of each outcome that the probes set before the constructor ran.
+Then the pointer of the probes points to the mapped part: `.toolchain/docs/outcomes.h.md`.
 A probe sets the byte of its outcome to 1 only the first time that the outcome is reached. After that, the probe only reads the byte.
 
 The system keeps the bytes of a mapped file when the program ends. Thus an outcome stays, also when the program ends with `_Exit` or `abort`.
 Each program, and each library that a program opens, maps the same file. Thus the file holds the outcomes of all the programs of the cases.
-On Windows, the constructor declares `CreateFileMappingA` and `MapViewOfFile` itself, so `windows.h` does not come into the file.
+
+`test.py` writes the file of the hits only before the cases run. During the cases, each write goes through the mapping of `c23_outcomes_keep`.
+A probe writes into the mapping, after the constructor of its file. A host of wasm modules gives each chunk to `c23_outcomes_keep`.
+
+## A wasm module
+
+In a wasm module, the probes cannot map a file or read the environment. Thus they choose the target with `__wasm__`, which clang defines for wasm.
+The tree of a wasm source comes from the command `dump` of its kind, with the flags of wasm: `.toolchain/docs/presets.md`, *wasm_module*.
+
+- The bytes of a file are in a chunk in the section `c23b` of the module. The chunk also tells where the bytes go in the file of the hits.
+- The end of the file has no constructor and includes no header.
+- The kind adds `c23b_area.c` of the tree to the module, and exports its address as the global `c23b_outcomes`: `.toolchain/docs/rewrite.py.md`, *The area*.
+
+At the end of each instance, a host of the module gives each chunk to `c23_outcomes_keep`: `.toolchain/docs/outcomes.h.md`, *A host of wasm modules*.
+A module holds only the chunks of its own files, so its memory grows only with its own outcomes.
 
 ## Macros
 
@@ -107,7 +124,8 @@ An exemption that matches no unreached outcome is a fault, so a branch that a ca
 ## Limits
 
 - A probe that runs before the constructor of its file keeps its outcome only if the constructor runs later.
-- The measure uses only the target of this machine. The files of a different system, for example `src/posix` on Windows, are measured on a machine of that system.
+- The measure uses only the target of this machine and wasm. The files of a different system, for example `src/posix` on Windows, are measured on a machine of that system.
+- A wasm module gives its outcomes only through a host that reads its area. If the process of the host ends before the end of an instance, the outcomes of that instance are lost.
 - A header that two artifacts compile with different macros gets the probes of both.
 - A probe holds the full text of each call that it touches. Thus an operator at an edge of a body, such as `&&` in `#define AND(a) a &&`, breaks the build of the copy. A parenthesis in a string or in a character constant of an argument does the same.
 
@@ -131,7 +149,7 @@ An exemption that matches no unreached outcome is a fault, so a branch that a ca
 | `Probing.add(path, key, edit)` | Keeps one probe of a file. |
 | `Probing.skip(loc, kind)` | Keeps a branch that cannot get a probe. |
 | `walked(root, path, tree)` | Gives the probes of the syntax tree of one file and of its headers. |
-| `rewritten(text, path, edits, prefix, part, outer)` | Gives a file with its probes and its layer `outer`, and the line and column of each probe. `part` gives the first byte and the number of bytes of the file in the file of the hits. |
+| `rewritten(text, path, edits, prefix, part, outer)` | Gives a file with its probes and its layer `outer`, and the line and column of each probe. `part` gives the first byte and the number of bytes of the file in the file of the hits. The chunk of a wasm module holds them too. |
 | `mine(config, path, named, claimed)` | Tells if a file gets probes: each file with no `named`, else only a file of a part of `named`. With `claimed`, the file must also pass that function. |
 | `probed(config, values, named)` | Writes the copies with the probes and the layers, as *The steps* tells. It gives the probes and the branches that are not measured. `named` holds the parts of `--part`, and `claimed` is the function of `--group`. |
 | `written(root, where, edits, skips, outers)` | Copies `src` and `include` with `rewrite.copied`, and writes the probes and the layer of each file. `outers` gives the layer of each file. A source with a layer and no probes gets its layer with `wrapped` of `fail.py`. |

@@ -83,7 +83,7 @@ The tools stop with these faults:
 
 Each key of `[variables]` is a variable.
 A key must not have the name of a variable that the tools give, or of a key of a target.
-`.toolchain/toolchain.toml` gives the keys `language`, `optimize` and `float`.
+`.toolchain/toolchain.toml` gives the keys `language`, `optimize`, `float` and `jobs`.
 With `--debug`, each key of `[debug]` in `.toolchain/toolchain.toml` replaces the variable with the same name.
 `--set <name>=<value>` replaces the value of a key of `[variables]`.
 
@@ -210,7 +210,7 @@ A step does one of these actions:
 | `copy` | Copies the first file to the second file. |
 | `rename` | Moves the first file to the second file. |
 
-In a step with `cwd`, `{sources}`, each folder of `{include}`, `{output}`, `{objects}` and `{link}` are whole paths, and so are the caches of zig.
+In a step with `cwd`, `{sources}`, each folder of `{include}`, `{output}`, `{objects}`, `{link}` and `{archives}` are whole paths, and so are the caches of zig.
 Each other relative path of the command is a path from `cwd`.
 For example, a command that runs in the folder of a library can link it by its bare name.
 
@@ -226,6 +226,7 @@ The steps can use these variables of the artifact:
 | `{include}` | Each folder of `include`, after `-I`. |
 | `{flags}` | The items of `flags` of the kind, then the items of `flags` of the artifact. |
 | `{link}` | The files of `link`. |
+| `{archives}` | The files of `archives`. |
 | `{manifest}` | The items of `manifest`. |
 | `{objects}` | With `each`, the object of each source. |
 
@@ -271,6 +272,7 @@ An artifact is a file that the build makes, for example a program, a library or 
 | `defines` | Optional. The macros, without `-D`. |
 | `flags` | Optional. More flags of the compiler, for example `-fvisibility=hidden` or `-lm`. They come after the sources and the files of `link`. They can contain variables. |
 | `link` | Optional. The files that the artifact links. |
+| `archives` | Optional. The static libraries that a kind links apart from `link`, with `{archives}`. Of the kinds of the toolchain, only `wasm_module` uses `{archives}`: it links the archives into the module, and merges the accessors of `link`. `zig build` makes each archive that a different artifact makes before this artifact, as for `link`. |
 | `inputs` | Optional. The files that another artifact of the build makes, which the sources read, for example with `#embed`. `{inputs}` holds each folder after `--embed-dir=`, the search path of `#embed`, and `zig build` makes each one before this artifact. An input is no file of `link`, and the deliverable does not hold it. |
 | `beside` | Optional. The files to copy into the folder of the artifact. |
 | `manifest` | Optional. A list of texts for the steps. |
@@ -383,6 +385,7 @@ The tools stop with these messages:
 - `no part <part>; the parts: <parts>`, if `--part` or `uses` names a part that `[parts]` does not have.
 - `the uses of the parts make a cycle: <parts>`, if a part uses itself, directly or through a different part.
 
+`python project.py check` stops with these messages too: `.toolchain/docs/layout.py.md`, *The parts*.
 A project with no `[parts]` states no part, and each command acts on the full project.
 `.toolchain/docs/build.py.md`, *Parts*, tells how the tools check and keep the parts.
 

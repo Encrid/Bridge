@@ -15,34 +15,31 @@ BUILT = {'malloc': ('take', 'memory', 'result'), 'calloc': ('take', 'memory', 'r
 PLACES = {'take': re.compile(r'result|\*?[1-9][0-9]*|\*[1-9][0-9]*\.[A-Za-z_]\w*'),
           'give': re.compile(r'result|\*?[1-9][0-9]*')}
 VERBS = {'take': 'take', 'give': 'give back'}
-TESTED = '    if (%s__builtin_memcmp(&(%s), &(typeof(%s)){}, sizeof(%s)))\n        %skept[%d]%s;\n'
 PREFIX = 'c23b_l_'
+TESTED = '    if (%s' + PREFIX + 'held(&(%s), sizeof(%s)))\n        %skept[%d]%s;\n'
 COUNT = re.compile(r'-?[0-9]+')
 QUALIFIED = re.compile(r'(\s*\b(?:const|volatile|restrict|__restrict|__restrict__)\b)+$')
-COUNTS = r'''static _Atomic long long %(p)skept[%(slots)d];
-static unsigned %(p)snumber(char *line, unsigned at, long long n, bool spaced)
+COUNTS = r'''#ifdef __wasm__
+[[gnu::section("c23l"), gnu::used]] static struct {
+    unsigned slots;
+    unsigned length;
+    _Atomic long long kept[%(slots)d];
+    char path[%(size)d];
+} %(p)schunk = { %(slots)du, %(length)du, {}, "%(name)s" };
+static _Atomic long long *const %(p)skept = %(p)schunk.kept;
+#else
+static _Atomic long long %(p)skept[%(slots)d];
+#endif
+[[maybe_unused]] static bool %(p)sheld(const void *at, typeof(sizeof(0)) size)
 {
-    char digits[24];
-    unsigned long long left = n < 0 ? 0ull - (unsigned long long)n : (unsigned long long)n;
-    unsigned count = 0;
+    const unsigned char *byte = at;
 
-    if (spaced)
-        line[at++] = ' ';
-    if (n < 0)
-        line[at++] = '-';
-    do {
-        digits[count++] = (char)('0' + left %% 10u);
-        left /= 10u;
-    } while (left);
-    while (count)
-        line[at++] = digits[--count];
-    return (at);
+    for (typeof(sizeof(0)) i = 0; i < size; i++)
+        if (byte[i])
+            return (true);
+    return (false);
 }
 '''
-FILL = r'''    for (unsigned %(p)si = 0; %(p)si < %(slots)du; %(p)si++)
-        %(p)sat = %(p)snumber(%(p)sline, %(p)sat, %(p)skept[%(p)si], %(p)si > 0u);
-'''
-
 
 def listed(config, values):
     tables = shared.tables(config, values, 'leaks')
@@ -98,7 +95,7 @@ def tested(effect, kinds):
     value = 'r' if place == 'result' else 'a%d' % (int(number) - 1)
     guard = value + ' && ' if place.startswith('*') else ''
     value = ('(*%s)' % value if guard else value) + ('.' + field if field else '')
-    return TESTED % (guard, value, value, value, PREFIX, kinds.index(kind), '++' if act == 'take' else '--')
+    return TESTED % (guard, value, value, PREFIX, kinds.index(kind), '++' if act == 'take' else '--')
 
 
 def wrapped(name, effects, kinds, declaration):
@@ -121,8 +118,7 @@ def rewritten(text, path, used, ends, declared, names, kinds, outer=(0, '', ''))
     text = text.rstrip(b'\r\n') + b'\n'
     at = rewrite.included(text)
     slots = len(kinds) + 1
-    values = {'p': PREFIX, 'slots': slots, 'line': len(path) + 2 + 22 * slots, 'name': path,
-              'name_len': len(path) + 1, 'variable': 'C23_LEAKS', 'fill': FILL, 'kept': 'kept'}
+    values = {'p': PREFIX, 'slots': slots, 'name': path, 'length': len(path), 'size': len(path) + 1, 'kept': 'kept'}
     places = {name: max(at, text.index(b'\n', ends[name]) + 1) if name in ends else at for name in used}
     out, last = b'', 0
     for where in sorted(set(places.values()) | {at}):
@@ -142,8 +138,8 @@ def counted(config, values):
                  if any((act, place) == ('give', 'result') or (act == 'take' and place[0].isdigit())
                         for act, _, place, _ in effects)}
     root, where = Path(values['root']), rewrite.tree(values, 'leaks')
-    files = rewrite.each(config, values, lambda top, path, tree: rewrite.found(top, path, tree, {**calls, **names},
-                                                                              callbacks), True)
+    files = rewrite.united(rewrite.each(config, values, lambda top, path, tree: rewrite.found(
+        top, path, tree, {**calls, **names}, callbacks), True))
     rewrite.copied(root, where, [path for (path, _, _, _), _ in files])
     counting = []
     for (path, used, declared, ends), parts in files:

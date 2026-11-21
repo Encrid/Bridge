@@ -9,7 +9,7 @@ What it may say, and how a type is laid out, is `docs/intern/schema/schema.h.md`
 | Constant | Content |
 | --- | --- |
 | `SCHEMA_GIVEN_COUNT` | 12: how many types a field can be without its namespace declaring them. |
-| `SCHEMA_GIVEN` | Those 12 types, as a `static const` array of `schema_given_t`. |
+| `SCHEMA_GIVEN` | Those 12 types, as an array of `schema_given_t`. `src/schema/schema_constants.c` defines it. |
 
 The alignment of a given type is its size.
 

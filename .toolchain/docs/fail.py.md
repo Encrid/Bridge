@@ -49,6 +49,19 @@ At each call of a listed function, the layer reads the turn.
 
 Thus a case that states `fail` runs as before: its turn stays 0, and its `C23_FAIL` holds no ` told=0`.
 
+## A wasm module
+
+A wasm module has no environment. Thus under `__wasm__` the layer reads its plan from the area of the module: `.toolchain/docs/rewrite.py.md`, *The area*.
+wasm-ld calls the constructors at the start of each export of a module with no entry. Thus under `__wasm__` the function that reads the numbers is not a constructor.
+
+- The plan holds the value of `C23_FAIL`, a byte 0, the value of `C23_FAIL_PART`, and a byte 0: `.toolchain/docs/outcomes.h.md`, *The plan*.
+- The host of the module writes the plan before `init`: `.toolchain/docs/outcomes.h.md`, *A host of wasm modules*.
+- With no plan, the area holds only bytes 0. Thus no call fails. A wasm source can call a listed function, such as `malloc`, also with a host that writes no plan.
+- The layer reads the plan at the first call of a listed function, and at each new turn.
+- It reads the texts with loops of its own, and includes no header but `stddef.h`. Thus it needs no library of C.
+
+A number of the plan is the digits after `<function>=`.
+
 ## The loaded calls
 
 A loader gives a pointer for the name of its second argument: `GetProcAddress` on Windows, and `dlsym` on Linux and macOS.
@@ -81,6 +94,9 @@ A loaded call that no case states calls its function as always.
 - A call before the last `#include` of its file cannot fail, and a call in a function of a header cannot fail.
 - Only the calls of the files `.c` of `src` count. A call in `tests` or in a different project does not count.
 - A listed function that no file of `src` calls never fails. Thus a case can state the functions of each system, for example `CreateThread` and `pthread_create`.
+- A call of a wasm module fails only with a host that writes the plan into the area of the module.
+- A wasm module cannot run a sweep. The layer writes ` told=1` only into the plan in the memory of the module.
+  The steps of the host do not read the plan back: `.toolchain/docs/outcomes.h.md`, *The steps of the host*. Thus `.toolchain/docs/sweep.h.md` cannot see a failed call.
 
 ## Functions
 
@@ -90,4 +106,4 @@ A loaded call that no case states calls its function as always.
 | `loaded_calls(calls, used, source, declared)` | Gives the loaded calls of a file: the listed functions that the text `source` names, and that the file does not call. |
 | `wrapped(text, outer)` | Gives the bytes of a file with its layer: the block at its byte, and the end after the text. |
 | `layer(text, used, declared, calls, parts)` | Gives the layer of a file: the byte where its block starts, the block, and the end of the file. `used` names the functions of `calls` that the file uses, and `declared` gives their declarations. `parts` names the parts of the file. |
-| `failed(config, values)` | Writes the copy of the run `fail`, as *The runs* tells. |
+| `failed(config, values)` | Writes the copy of the run `fail`, as *The runs* tells. It joins the trees of a file with `rewrite.united`. |

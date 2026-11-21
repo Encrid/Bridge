@@ -8,7 +8,7 @@ The types of the backend seam, `backend_api_t` among them, are in `include/bridg
 A backend is a library of its own that runs the modules of a world.
 Bridge opens the library by its path in the deployment: `docs/intern/bridge/bridge_backend.c.md`, *A backend of the deployment*.
 `docs/intern/backend/backend.c.md` tells how Bridge finds the entries and checks the number of the backend seam.
-`backend_api_t` holds the entries in the order of `BACKEND_ENTRY_NAMES`.
+`backend_api_t` holds the entries in the order of the names of `BACKEND_ENTRY_NAMES`.
 
 | Entry | What Bridge asks for |
 | --- | --- |
