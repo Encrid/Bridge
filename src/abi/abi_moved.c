@@ -5,6 +5,15 @@
 */
 #include "abi_declare.h"
 
+const char *const ABI_STORAGE_NAMES[ABI_STORAGE_COUNT] = {
+    "",
+    "a table",
+    "a sparse set",
+    "a toggle",
+    "direct-indexed",
+    "a singleton"
+};
+
 bool abi_names_superseded(const declared_type_t *c)
 {
     uint32_t k = 0;

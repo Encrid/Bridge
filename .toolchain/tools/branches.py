@@ -14,8 +14,17 @@ UNMEASURED = ('ConstantExpr', 'UnaryExprOrTypeTraitExpr', 'GenericSelectionExpr'
 WRAPPERS = ('ParenExpr', 'ImplicitCastExpr')
 SAID = {'function': ['no case calls this function'], 'case': ['no case reaches this case'],
         'condition': ['no case makes this condition false', 'no case makes this condition true']}
-TOP = r'''static _Atomic unsigned char %(p)shits[%(bits)d];
+TOP = r'''#ifdef __wasm__
+[[gnu::section("c23b"), gnu::used]] static struct {
+    unsigned bits;
+    unsigned start;
+    _Atomic unsigned char hits[%(bits)d];
+} %(p)schunk = { %(bits)du, %(start)du, {} };
+static _Atomic unsigned char *%(p)sat = %(p)schunk.hits;
+#else
+static _Atomic unsigned char %(p)shits[%(bits)d];
 static _Atomic unsigned char *%(p)sat = %(p)shits;
+#endif
 [[maybe_unused]] static bool %(p)s(bool c, unsigned id)
 {
     unsigned %(p)sk = 2u * id + (c ? 1u : 0u);
@@ -30,49 +39,16 @@ static _Atomic unsigned char *%(p)sat = %(p)shits;
         %(p)sat[2u * id + 1u] = 1;
 }
 '''
-MAP = r'''#include <stdlib.h>
-#ifdef _WIN32
-#include <fcntl.h>
-#include <io.h>
-extern void *%(p)smapping(void *file, void *security, unsigned long protect, unsigned long high, unsigned long low,
-    const char *name) __asm__("CreateFileMappingA");
-extern void *%(p)sview(void *mapping, unsigned long access, unsigned long high, unsigned long low, size_t bytes)
-    __asm__("MapViewOfFile");
-#else
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <unistd.h>
-#endif
+MAP = r'''#ifndef __wasm__
+#include "%(runtime)s/outcomes.h"
 [[gnu::constructor]] static void %(p)smap(void)
 {
-    const char *%(p)spath = getenv("C23_BRANCHES");
-    _Atomic unsigned char *%(p)sall = nullptr;
-    int %(p)sfd;
+    _Atomic unsigned char *%(p)sall = c23_outcomes_keep((const unsigned char *)%(p)shits, %(start)du, %(bits)du);
 
-    if (!%(p)spath)
-        return;
-#ifdef _WIN32
-    %(p)sfd = _open(%(p)spath, _O_RDWR | _O_BINARY);
-    if (%(p)sfd < 0)
-        return;
-    %(p)sall = %(p)sview(%(p)smapping((void *)_get_osfhandle(%(p)sfd), nullptr, 4, 0, 0, nullptr), 2, 0, 0, 0);
-    _close(%(p)sfd);
-#else
-    %(p)sfd = open(%(p)spath, O_RDWR);
-    if (%(p)sfd < 0)
-        return;
-    %(p)sall = mmap(nullptr, %(end)du, PROT_READ | PROT_WRITE, MAP_SHARED, %(p)sfd, 0);
-    close(%(p)sfd);
-    if (%(p)sall == MAP_FAILED)
-        %(p)sall = nullptr;
-#endif
-    if (!%(p)sall)
-        return;
-    for (unsigned %(p)si = 0; %(p)si < %(bits)du; %(p)si++)
-        if (%(p)shits[%(p)si])
-            %(p)sall[%(start)du + %(p)si] = 1;
-    %(p)sat = %(p)sall + %(start)du;
+    if (%(p)sall)
+        %(p)sat = %(p)sall;
 }
+#endif
 '''
 
 
@@ -254,7 +230,7 @@ def rewritten(text, path, edits, prefix, part, outer=(0, '', '')):
         out += text[last:at] + piece.encode()
         last = at
     out += text[last:]
-    values = {'p': prefix, 'start': part[0], 'bits': part[1], 'end': part[0] + part[1]}
+    values = {'p': prefix, 'start': part[0], 'bits': part[1], 'runtime': rewrite.RUNTIME}
     if path.endswith('.h'):
         guard = prefix.upper() + 'GUARD'
         block = '#ifndef %s\n    #define %s\n%s%s#endif\n#line 1\n' % (guard, guard, TOP % values, MAP % values)
@@ -276,11 +252,12 @@ def probed(config, values, named=(), claimed=None):
     edits, skips, outers = {}, {}, {}
     trees = rewrite.each(config, values, lambda top, path, tree: (walked(top, path, tree),
                                                                   rewrite.found(top, path, tree, calls)))
-    for (probing, (name, used, declared, _)), parts in trees:
+    for (probing, _), _ in trees:
         for path, table in probing.edits.items():
             edits.setdefault(path, {}).update(table)
         for path, table in probing.skips.items():
             skips.setdefault(path, {}).update(table)
+    for (name, used, declared, _), parts in rewrite.united([(found, parts) for (_, found), parts in trees]):
         outers[name] = fail.layer((root / name).read_bytes(), used, declared, calls, parts)
     edits = {path: table for path, table in edits.items() if mine(config, path, named, claimed)}
     skips = {path: table for path, table in skips.items() if mine(config, path, named, claimed)}

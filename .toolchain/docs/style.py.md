@@ -26,13 +26,13 @@ A `'` after a digit or a letter is a digit separator of C23, as in `1'000` and `
 | G1 | The legal notice of `.toolchain/header.txt`, between `/*` and `*/`, with each line after `** `. |
 | G2 | One empty line after each function that is not at the end of the file. |
 | G3 | The level of each directive, and no space after `#`. |
-| G4 | Each global variable that `const` or `constexpr` does not mark. |
+| G4 | Each global variable that `const` or `constexpr` does not mark. For a pointer, the `const` of the variable is after the last `*` before its name. |
 | G5 | Each function of a file `.c` that is not `static`, if no header of the project declares it. The section *G5* gives the exceptions. |
 | F1 | No program checks it. |
 | F2 | The snake case. A person checks the verb. |
 | F3 | The columns of each line. A tab moves the next character to the next multiple of 8 columns. |
 | F4 | The lines between the line of the opening bracket and the line of the closing bracket. |
-| F5 | `void` in a declaration with no argument, and the number of the arguments. A `...` is one argument. |
+| F5 | `void` in a declaration with no argument, and the number of the arguments. A `...` is one argument. A declaration counts its arguments too when `__attribute__((...))` follows them. A declaration with `__asm__(...)` or `__asm(...)` after its arguments names a symbol of the system, and `style.py` does not count its arguments. |
 | F6 | Each comment that is not the legal notice. |
 | L1 | Each line with more than one statement or assignment, an assignment in a condition, and a condition with its statement. |
 | L2, L3, L4, L5, L6 | Each rule. |
@@ -41,11 +41,12 @@ A `'` after a digit or a letter is a digit separator of C23, as in `1'000` and `
 | V3 | The `*` of each pointer. |
 | C1 | The branches of each chain of `if` and `else`, and the depth of the levels. |
 | C2, C3 | Each rule. |
-| H1 | The items of a header. A person checks the includes. |
+| H1 | The items of a header. Each variable that a header gives a value to has `constexpr`. Each type that a file `.c` declares, also with a variable, and also after a qualifier, a storage class or `alignas`, for example `static const struct {`. This includes a declaration with no body, such as `struct p;`, and a type in a function, such as `sizeof(struct { int a; })`. A variable of a named type declares no type. A person checks the includes. |
 | H2, H3, H4 | Each rule. |
 
 For C1, `if`, `while`, `for`, `switch` and `do` are levels, and an `else if` is not a new level.
 For L1, a comma that joins two statements makes a line with more than one statement.
+For G4, V1 and H1, `style.py` checks each variable of a declaration. This includes a variable that the declaration of its `struct`, `enum` or `union` declares.
 
 ## G5
 
@@ -62,6 +63,8 @@ Before it reads the files, `style.py` checks itself:
 
 1. For each rule that it checks, it reads a short text that breaks the rule. The rule must find a fault in the text.
 2. It reads a short clean text. No rule but G1, H1 and H2 can find a fault in it.
+3. It reads a short clean header. No rule but G1 and H2 can find a fault in it. The header holds a function `static inline` with an assignment, a macro with an assignment, declarations `extern` and variables `constexpr`.
+4. It reads a short clean source. No rule but G1 can find a fault in it. The source holds variables of a named type, `static_assert`, and a function that gives a `struct`.
 
 If the self-test fails, `style.py` stops: `the checker itself: <faults>`.
 
@@ -95,7 +98,7 @@ The output follows `.toolchain/docs/shared.py.md`, *The report of a check*.
 | `check_text_macro(src, first, last, name)` | Checks the lines `first` to `last` of a macro of a text: H4. |
 | `check_file(src, functions)` | Checks the file: G1, F6, O3, G2, G3, V1, H1, H2, H3 and H4. |
 | `check_outside(src, statements, functions, declared)` | Checks the file scope: V1, H1, G4, F5 and G5. |
-| `check_parameters(src, line, params, name)` | Checks the parameters of a function: F5. |
+| `check_parameters(src, line, params, name, foreign)` | Checks the parameters of a function: F5. With `foreign`, the declaration names a symbol of the system, and the check does not count the parameters. |
 | `check_function(src, f)` | Checks the body of a function: F2, F4, F5, L1, L2, L4, L5, L6, V1, C1, C2 and C3. |
 | `check(path, text, declared)` | Gives the faults of one file. `declared` holds the names that the headers of the project declare. |
 | `exceptions()` | Gives the exceptions of `[[style.exception]]`. |

@@ -40,6 +40,47 @@ A source of the module puts the manifest into the section with this line:
 [[gnu::section(MANIFEST_SECTION), gnu::used, gnu::retain]] static const char WHO[] = MANIFEST;
 ```
 
+## wasm_module
+
+`wasm_module` is the preset of a wasm module that runs on Bridge. BB-Wasm loads such a module, and runs it in its sandbox.
+
+| File | Content |
+| --- | --- |
+| `wasm_sources.toml` | The sources `binaryen`, the release `version_133` of binaryen, and `bb_wasm`, the release `v0.7.0` of BB-Wasm. |
+| `wasm_targets.toml` | For each target, the archive of binaryen, and the sha256 of each release. |
+| `wasm_kinds.toml` | The variables `wasm_simd`, `wasm_compile` and `wasm_features`, the programs of binaryen in `[tools]`, and the kinds `wasm_text`, `wasm_module` and `wasm_library`. |
+
+The headers of BB-Wasm include `bridge_abi.h` of Bridge, so a project of wasm modules also takes the source `bridge` of `native_module`.
+An artifact of the kind `wasm_module` names the accessors in `link`, for example `{bb_wasm}/acc.wasm`, and the headers in `include`: `{bridge}/include` and `{bb_wasm}/include`.
+
+The kind `wasm_module` makes a module in 6 steps:
+
+1. zig compiles the sources for `wasm32-freestanding`, with no library of C, into `<name>.raw.wasm`. It links the files of `archives`.
+2. `.toolchain/tools/wasm_guard.py` checks the imports of that module: `.toolchain/docs/wasm_guard.py.md`.
+3. `wasm-opt` optimizes the code of the module with `-O3`.
+4. `wasm-merge` merges the accessors of `link` into the module, under the name `acc`.
+5. `wasm-opt` removes the exports of the accessors and each part that nothing uses. It runs no other pass, so each accessor keeps the body that BB-Wasm checks at load.
+6. It writes the items of `manifest` into the custom section `bridge:manifest`, with a zero byte after each item. Bridge-Host reads the manifest there.
+
+`wasm_compile` holds the flags of the target and of the language of step 1: `-target wasm32-freestanding`, `{language}`, `-Wno-missing-field-initializers`, `-O2`, `{float}`, `{wasm_simd}` and `-nostdlib`.
+The step 1 and the command `dump` of the kind both use it. Thus the syntax tree of a changed copy sees the code as the module compiles it, also the code under `__wasm__`.
+
+In the build of the tree of a run, the key `probed` of the kind adds 2 flags to step 1: `.toolchain/docs/toolchain.toml.md`, *[kinds.\<kind\>]*.
+
+- `{tree}/c23b_area.c` holds the area of the probes: `.toolchain/docs/rewrite.py.md`, *The area*.
+- `-Wl,--export=c23b_outcomes` exports the address of the area as a global, for the host: `.toolchain/docs/outcomes.h.md`, *A host of wasm modules*.
+
+A normal build gets neither, so a module of a normal build has no export of the probes. zig refuses `--export-if-defined`, so the area comes with the flag that exports it.
+
+The kind `wasm_library` makes a static library `<name>.a` for `wasm32-freestanding`, which a wasm module links.
+Its step `each` compiles each source with `wasm_compile`, `{flags}`, `{defines}` and `{include}`, as step 1 of `wasm_module` does.
+Then `zig build-lib -static` makes the library from the objects, with `{strip}`. The library has its own command `dump`, the same as the one of `wasm_module`.
+A module names the library in `archives`, for example `archives = ["{out}/convex.a"]`.
+
+With `{float}`, the code of a library or of a module joins no product and no sum. Each command has `{flags}` after `wasm_compile`, so an artifact can override that: `.toolchain/docs/toolchain.toml.md`, *The rules of floating point*.
+
+The kind `wasm_text` makes a module from wasm text with `wasm-as`. It holds no accessor, so it is for a test or for the accessors themselves.
+
 ## engine
 
 `engine` is the preset of a project of the engine. Such a project does its work in rounds, and its parts are modules.

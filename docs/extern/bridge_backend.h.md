@@ -6,8 +6,11 @@ Only Bridge and a backend compile it.
 ## The library
 
 A backend is a shared library that exports the 19 functions of `backend_api_t`, by their names.
-`BACKEND_ENTRY_NAMES` gives the names, in the order of the fields of `backend_api_t`.
+`BACKEND_ENTRY_NAMES(X)` gives the names, in the order of the fields of `backend_api_t`: it calls the macro `X` with each name, as a string.
+`BACKEND_ENTRY_TEXT(name)` gives a name and a comma, so `{ BACKEND_ENTRY_NAMES(BACKEND_ENTRY_TEXT) }` makes an array of the names in 1 source.
+The header gives the list as a macro, and not as an array. A header gives a value to no global variable: `docs/contributing/coding_style.md`, *H1 - The contents of a header*.
 `BACKEND_ENTRY_COUNT` is how many there are: 19.
+
 `BACKEND_EXPORT` exports a function from the library: a backend in C writes it before each of the 19 functions.
 
 `bridge_create` opens the library that the deployment names, and finds each entry by its name: `docs/extern/bridge.h.md`, *bridge_backend_t*.

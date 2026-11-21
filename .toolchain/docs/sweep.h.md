@@ -40,3 +40,4 @@ The variables of the environment reach each library of the program. Thus a sweep
 A program calls `sweep_plan` and `sweep_refuse` from 1 source file only: the count of the turns is in that file.
 It calls them only when no other thread runs the code, because the call changes the environment.
 On a build with no layer, no call fails, and the loop ends after its first turn.
+A sweep needs the environment, so it cannot run in a wasm module: `.toolchain/docs/fail.py.md`, *Limits*.

@@ -1,12 +1,12 @@
 # src/backend/backend.c
 
-This file opens the library of a backend and finds its eighteen entries by name.
+This file opens the library of a backend and finds its 19 entries by name.
 `docs/intern/backend/backend.h.md`, *The entries of a backend*, tells what each entry is for.
 
 ## The steps
 
 1. Open the library with `os_lib_open`. If it does not open, refuse it by its path.
-2. Find each entry by its name, in the order of `BACKEND_ENTRY_NAMES`.
+2. Find each entry by its name, in the order of `ENTRY_NAMES`, the array that this file makes from `BACKEND_ENTRY_NAMES`.
 3. After the first entry, compare the number that it gives with `BACKEND_ABI`.
 4. If an entry is missing or the number is another, write why in `err`, and close the library.
 

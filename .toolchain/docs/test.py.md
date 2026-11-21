@@ -22,7 +22,11 @@
 | `holds(claims, lacks, code, said, values)` | Tells if each claim is true. |
 | `claimed(claims, lacks, code, answer, values)` | Tells if each claim of a row is true on its answer, as *A table* tells. |
 | `source_of(item, outputs, values)` | Gives the file of an artifact, or a file of the project. |
-| `placed(use, outputs, values)` | Writes the `files` of a case, and fills its `folders`. |
+| `placed(use, outputs, values)` | Fills the `folders` of a case with `put`, and then writes its `files`. It removes a file first, so that it never writes into a linked file. It gives the stamp of each file that it linked. |
+| `put(source, target, values)` | Places a file: a link to a file of the build folder, or else a copy. It removes the target first, and tells if it made a link. |
+| `stamp(path)` | Gives the size and the time of the last write of a file, or nothing if it is not there. |
+| `sources_of(item, outputs, values)` | Gives the files of 1 item of `folders`: the artifact or the file, or each file of the project that a pattern with `*` matches. It stops the run if a pattern matches no file. |
+| `cleared(folder)` | Removes a folder with all its files, also a file that is read-only on Windows, such as an object of git. It changes the mode of no other file, so a link keeps the mode of its build output. |
 | `scripted(running, script, outputs, values)` | Does the steps of a script. |
 | `made_false(case)` | Gives the false variant of a case. |
 | `typed_rows(use, broken, order, values)` | Gives the text that `test` writes to the command of a table. It is the input of each row of `order`, each on one line. With `broken`, it is the false input. |
@@ -33,7 +37,12 @@
 | `raced(config, values, outputs, group, where, case, broken, count, counted, failing, order)` | Runs `count` copies of a table at the same time, with the rows in `order`. It gives the verdict of each row, and the output of the first copy that failed. |
 | `tabled(config, values, outputs, group, index, case, broken, copies, counted, failing)` | Runs the copies of a table in its order, and then the table in the reverse order. It gives the verdict of each row, and the output of the run that failed. |
 | `verdict(config, values, outputs, group, index, case, broken, copies, counted, failing)` | Runs the copies of one case at the same time, and gives their verdict. |
-| `test(config, values, outputs, groups, broken, said, copies, counted, failing)` | Runs all the groups, and writes each verdict. With `said`, it writes `said.txt`. It gives the names of the cases that failed. |
+| `uses_of(config, values, running)` | Gives the uses of each group of `running`, as *The uses* tells. It stops for each fault of *The uses*. |
+| `test(config, values, outputs, groups, broken, said, copies, counted, failing, workers)` | Runs the cases of all the groups with `workers` threads, as *The workers* tells, and writes each verdict. With `said`, it writes `said.txt`. It gives the names of the cases that failed. |
+| `lanes_of(jobs, uses)` | Gives the lanes of the cases. The cases of the groups with the same uses are 1 lane. Each case of a group with no use is 1 lane. |
+| `one(config, values, outputs, group, index, case, broken, copies, counted, failing)` | Runs one case or table, and gives the name, the verdict and the outputs of each case or row. |
+| `told(named, ends, broken)` | Writes the verdict of each case or row, and the output of a run that failed. |
+| `workers_of(args, config)` | Gives `--workers`, or `[test] workers`, or the count of the processors. It stops if the count is not 1 or more: `[test] workers and --workers are a count of 1 or more`. |
 | `narrowed(case, text)` | Gives a case whose name contains `text`, or a table with only its rows whose name contains it, or nothing. |
 | `chosen(groups, text)` | Gives only the cases and the rows whose name contains `text`. It stops if no case has it: `no case has <text> in its name`. |
 | `owner(config, group)` | Gives the part of a group from `part_of` of `shared.py`, with a space before and after it, or `False`. |
@@ -64,6 +73,7 @@ Else `main` does these steps:
 
 With `--break`, the false variant of a case tells if the case states `fail` or `sweep` at step 6.
 The number of copies is `--copies`, or `[test] copies`. If neither gives it, `main` stops: `.toolchain/project.toml: write [test] copies`.
+The number of workers is `--workers`, or `[test] workers`, or the count of the processors: *The workers*.
 
 `main` stops at step 7 if a case failed. Thus step 8 runs only if each case passed.
 `.toolchain/docs/said.py.md` gives the checks of step 8.
@@ -101,7 +111,7 @@ With `tables = true` in `[test]`, `groups_of` then gives the cases of each file 
 
 `tried` runs one case:
 
-1. It empties the folder of the case, `<out>/cases/<group>/<number>`, or `<out>/cases/<group>/<number>/<copy>` for a copy.
+1. It empties the folder of the case, `<out>/cases/<group>/<number>`, or `<out>/cases/<group>/<number>/<copy>` for a copy, with `cleared`.
 2. It adds the variable `{case}`. If a text of the case holds `{port}`, it adds `{port}` too: a new free port.
 3. With `--break`, it uses the false variant of the case.
 4. It writes the files, and fills the folders of the case.
@@ -121,6 +131,14 @@ With `failing`, a case that states `fail` or `sweep` runs on the build of the ru
 `tried` runs each command in the root, with a timer of `[test] timeout` seconds. For a table, the timer starts again at each answer: the time is for one row.
 The timer stops a command that does not end in time.
 `placed` and the steps `put` copy each file with its permissions. Thus a copy of a program can run on Linux and on macOS.
+
+`placed` links each file of the build folder, for example an artifact or a fetched program, in place of a copy. A link is the same file, so it keeps the permissions too.
+On Windows, a new copy of a program costs a scan of the antivirus at its first load. A link costs no copy and no new scan.
+If the system refuses a link, for example across 2 disks, `placed` copies the file.
+
+A link shares its bytes with the build output. A case that opens a placed file for a write changes the output for each later case. A replace by a rename is safe.
+So `tried` takes the stamp of each linked file again when the case ends. If a stamp changed, the case fails: `wrote into the build output <paths>`.
+The step `put` of a script removes its target first, as `placed` does.
 
 `made_false` makes the false variant: the keys of `false` replace the keys of the case.
 For `files` and for `folders`, each path of `false` replaces only that path.
@@ -250,3 +268,39 @@ The message of step 1 is `--branches runs each case one time: it takes no --brea
 With `--part`, step 5 reads only the exemptions whose `case` matches a case of the run, with `scoped`. Thus an exemption of a different part is no fault.
 The message of step 1 is `--leaks runs each case one time: it takes no --break, --toolchain, --copies, --rounds or --branches`.
 `.toolchain/docs/leaks.py.md` tells what the run counts, and what the report contains.
+
+## The workers
+
+`test` runs the cases of all the groups in a pool of threads. The number of threads is the number of workers.
+
+The cases of the groups with the same uses are 1 lane, which runs its cases one after the other. Each case of a group with no use is a lane of its own.
+A worker runs 1 lane at a time. Thus the cases of the groups with no use run at the same time.
+The cases of 1 lane hold only 1 worker, also when they wait for a use.
+
+Each case takes the locks of the uses of its group: *The uses*. Thus 2 lanes that share a use take turns, for example `gpu` and `gpu display`.
+
+`test` writes the verdicts in the order of the groups, and of the cases in each group. It writes the line of a group after its last case.
+Thus the output of a run with many workers has the same lines in the same order as a run with 1 worker.
+With `--workers 1`, the cases run one after the other.
+
+A case can share a thing of the machine that no use names, for example the clipboard. It can then fail when another case runs at the same time. Such a case gets a use.
+
+## The uses
+
+A use is a resource of the machine that 2 runs must not share at the same time, for example the GPU or the display.
+`[test] uses` of `.toolchain/project.toml` maps the name of each use to patterns of paths of the code.
+A group has a use when it tests a file that a pattern of the use matches.
+A group of the whole with no `code` has each use.
+The rule of a tested file is the rule of `tests` of `scope.py`: `.toolchain/docs/scope.py.md`, *The code of a group*.
+
+Before each case, `test` takes the lock of each use of its group, in the order of the names. It gives them back after the case. `locks.py` holds the locks: `.toolchain/docs/locks.py.md`.
+Thus the runs of 2 clones on 1 machine go on at the same time. Only the cases of the groups that share a use take turns.
+While a group waits, `test` writes `<group>: waits for the use <name>, which another run holds`.
+
+`test` stops for each of these faults of `[test] uses`:
+
+- `[test] uses: write a table of the uses`: `uses` is not a table.
+- `[test] uses: <name> is not a name of letters, digits, _ and -`: the name of a use is also the name of its file.
+- `[test] uses: <name> is a list of patterns`: the value of a use is not a list of texts.
+- `[test] uses: <name> has no pattern`: the list is empty.
+- `[test] uses: <pattern> matches no file`: no file of the code, of `.toolchain/config`, `.toolchain/tools` or `.toolchain/runtime`, and no file of the project, such as `.toolchain/project.toml`, matches the pattern.

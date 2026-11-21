@@ -2,9 +2,12 @@
 #
 # Under the GNU Affero General Public License, version 3 only: see license.
 import hashlib
+import http.client
+import os
 import re
 import shutil
 import subprocess
+import urllib.error
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -21,19 +24,61 @@ def zig_found(zig):
     return Path(path).as_posix() if version == zig['version'] else None
 
 
-def fetched(url, digest, folder):
-    shutil.rmtree(folder, ignore_errors=True)
+def fetched(url, digest, folder, fetch):
+    archive = kept(url, digest, shared.HERE / fetch['archives'] / digest, fetch['timeout'])
+    if folder.exists():
+        shutil.rmtree(folder)
     folder.mkdir(parents=True)
+    unpacked(archive, folder)
+
+
+def kept(url, digest, folder, timeout):
     path = folder / url.rsplit('/', 1)[1]
-    with urllib.request.urlopen(url) as got, open(path, 'wb') as f:
-        shutil.copyfileobj(got, f)
-    with open(path, 'rb') as f:
-        found = hashlib.file_digest(f, 'sha256').hexdigest()
-    if found != digest:
-        path.unlink()
-        die('%s is not what the maker publishes: its sha256 is %s' % (path.name, found))
-    unpacked(path, folder)
-    path.unlink()
+    part = path.with_name(path.name + '.part')
+    folder.mkdir(parents=True, exist_ok=True)
+    with open(folder / 'lock', 'a+b') as lock:
+        held(lock)
+        while not path.is_file():
+            had = part.stat().st_size if part.is_file() else 0
+            if not downloaded(url, part, had, timeout):
+                now = part.stat().st_size if part.is_file() else 0
+                if now == had:
+                    die('%s stops at %d bytes: run fetch again' % (path.name, now))
+                continue
+            with open(part, 'rb') as f:
+                found = hashlib.file_digest(f, 'sha256').hexdigest()
+            if found != digest:
+                part.unlink()
+                die('%s is not what the maker publishes: its sha256 is %s' % (path.name, found))
+            part.replace(path)
+    return path
+
+
+def downloaded(url, part, had, timeout):
+    asked = urllib.request.Request(url, headers={'Range': 'bytes=%d-' % had} if had else {})
+    try:
+        with urllib.request.urlopen(asked, timeout=timeout) as got, open(part, 'ab' if got.getcode() == 206 else 'wb') as f:
+            shutil.copyfileobj(got, f)
+        return True
+    except urllib.error.HTTPError as error:
+        if error.code != 416:
+            raise
+        return True
+    except (OSError, http.client.HTTPException):
+        return False
+
+
+def held(lock):
+    if os.name != 'nt':
+        import fcntl
+        return fcntl.flock(lock, fcntl.LOCK_EX)
+    import msvcrt
+    lock.seek(0)
+    while True:
+        try:
+            return msvcrt.locking(lock.fileno(), msvcrt.LK_LOCK, 1)
+        except OSError:
+            pass
 
 
 def unpacked(path, folder):
@@ -46,10 +91,11 @@ def unpacked(path, folder):
                 made.chmod(made.stat().st_mode | member.external_attr >> 16 & 0o111)
 
 
-def fetch_zig(zig, home):
+def fetch_zig(config, home):
+    zig = config['zig']
     archive = zig['archives'].get(home) or die('zig is fetched on a machine that runs a target')
     url = zig['url'].format(version=zig['version'], host=archive['host'], format=archive['format'])
-    fetched(url, archive['sha256'], shared.HERE / zig['folder'])
+    fetched(url, archive['sha256'], shared.HERE / zig['folder'], config['fetch'])
     return zig_found(zig) or die('the archive holds no zig %s' % zig['version'])
 
 
@@ -92,7 +138,7 @@ def sources(config, values, fetching):
         if not fetching:
             die('%s is not fetched as project.toml states: run fetch' % source['name'])
         url = expand(source['url'], values)
-        fetched(url if '://' in url else located(url, values).as_uri(), stamp.split(' ')[0], into)
+        fetched(url if '://' in url else located(url, values).as_uri(), stamp.split(' ')[0], into, config['fetch'])
         if 'top' in source and not tree.is_dir():
             die('%s: the archive has no folder %s' % (source['name'], expand(source['top'], values)))
         for patch in patches:
@@ -104,7 +150,7 @@ def main():
     args = shared.arguments(toolchain='--toolchain')
     config = shared.config(args.root, args.toolchain)
     home = shared.this_target(config['targets']) or die('fetch runs on a machine of a target')
-    zig = zig_found(config['zig']) or fetch_zig(config['zig'], home)
+    zig = zig_found(config['zig']) or fetch_zig(config, home)
     print(zig)
     values = shared.variables(config, args, home, zig)
     sources(config, values, True)

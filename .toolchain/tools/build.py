@@ -39,7 +39,8 @@ def run_in(step, values):
     whole = dict(values, sources=[(root / path).as_posix() for path in values['sources']],
                  include=['-I' + (root / path[2:]).as_posix() for path in values['include']],
                  output=(root / values['output']).as_posix(), objects=[(root / path).as_posix() for path in values['objects']],
-                 link=[(root / path).as_posix() for path in values['link']])
+                 link=[(root / path).as_posix() for path in values['link']],
+                 archives=[(root / path).as_posix() for path in values['archives']])
     caches = {name: str(root / os.environ[name]) for name in CACHES}
     run(expanded(step['run'], whole), folder, dict(os.environ, **caches))
 
@@ -92,10 +93,14 @@ def planned(config, values, artifact, tree=None):
     mine.update(sources=[moved(source, tree) for source in sources], output=output.as_posix(), work=work.as_posix(),
                 defines=['-D' + define for define in expanded(artifact.get('defines', []), mine)],
                 include=['-I' + moved(folder, tree) for folder in expanded(artifact.get('include', []), mine)],
-                link=expanded(artifact.get('link', []), mine), manifest=expanded(artifact.get('manifest', []), mine),
+                link=expanded(artifact.get('link', []), mine), archives=expanded(artifact.get('archives', []), mine),
+                manifest=expanded(artifact.get('manifest', []), mine),
                 objects=[])
     mine['inputs'] = ['--embed-dir=' + folder for folder in dict.fromkeys(Path(file).parent.as_posix() for file in read(artifact, mine))]
-    mine['flags'] = expanded(kind.get('flags', []) + artifact.get('flags', []), mine)
+    if tree:
+        mine['tree'] = Path(tree).as_posix()
+    mine['flags'] = expanded(kind.get('flags', []) + (kind.get('probed', []) if tree else []) + artifact.get('flags', []),
+                             mine)
     return kind, mine
 
 
@@ -111,7 +116,7 @@ def built(config, values, artifact, tree=None):
             die('%s is not there, and %s reads it' % (file, name))
     output.parent.mkdir(parents=True, exist_ok=True)
     work.parent.mkdir(parents=True, exist_ok=True)
-    missing = [file for file in mine['link'] if not Path(file).is_file()]
+    missing = [file for file in mine['link'] + mine['archives'] if not Path(file).is_file()]
     if missing and 'unlinked' not in kind:
         die('%s is not there, and %s is linked with it' % (missing[0], name))
     if missing:
@@ -199,8 +204,9 @@ def graphed(config, values, chosen, tree=None):
     steps, done = [], []
     for index, (artifact, kind, mine, spec) in enumerate(plans):
         name = mine['name']
-        links = [Path(file).resolve() for file in mine['link']]
-        missing = [file for file, path in zip(mine['link'], links) if path not in makers and not path.is_file()]
+        links = [Path(file).resolve() for file in mine['link'] + mine['archives']]
+        missing = [file for file, path in zip(mine['link'] + mine['archives'], links)
+                   if path not in makers and not path.is_file()]
         if missing and 'unlinked' not in kind:
             die('%s is not there, and %s is linked with it' % (missing[0], name))
         if missing:
@@ -230,7 +236,7 @@ def graphed(config, values, chosen, tree=None):
     if not graph.is_file() or graph.read_text(encoding='utf-8') != text:
         graph.write_text(text, encoding='utf-8')
     caches = {name: str(root / os.environ[name]) for name in CACHES}
-    run([values['zig'], 'build', '--build-file', (shared.HERE / '.toolchain' / 'graph.zig').as_posix(),
+    run([values['zig'], 'build', '-j%d' % values['jobs'], '--build-file', (shared.HERE / '.toolchain' / 'graph.zig').as_posix(),
          '--prefix', out.as_posix(), '-Dgraph=' + graph.as_posix()], values['root'], dict(os.environ, **caches))
     found = []
     for artifact, mine, missing in done:
@@ -254,9 +260,10 @@ def one(spec, files):
     shared.UNSET.update(held['unset'])
     sys.stdout = open(mine['work'] + '.said', 'w', encoding='utf-8')
     count = len(mine['sources']) if 'each' in kind else 0
-    linked = 0 if files[-2] == 'unlinked' else len(mine['link'])
+    linked = 0 if files[-2] == 'unlinked' else len(mine['link']) + len(mine['archives'])
     folders = files[count + linked:count + linked + held['inputs']]
-    mine.update(objects=files[:count], link=files[count:count + linked], output=files[-1],
+    joined = files[count:count + linked]
+    mine.update(objects=files[:count], link=joined[:len(mine['link'])], archives=joined[len(mine['link']):], output=files[-1],
                 inputs=['--embed-dir=' + folder for folder in folders])
     for step in kind[files[-2]]:
         do(known(step, 'step', held['kind_name']), mine, held['unstamped'])

@@ -188,6 +188,14 @@ phys_addr_t alloc_frame();
 A function has at most 4 arguments. A variadic function is allowed. Its `...` counts as one argument.
 Give a structure to a function through a pointer, and not as a copy.
 
+A declaration that names a symbol of the system with `__asm__` is an exception. The system fixes its arguments.
+Thus the rule does not count them. The declaration names each fixed argument, and gives `...` only for a variadic function:
+
+```c
+void *map_view(void *mapping, unsigned long access, unsigned long offset_high,
+    unsigned long offset_low, size_t size) __asm__("MapViewOfFile");
+```
+
 ### F6 - The comments
 
 No file has a comment that is not the legal notice.
@@ -636,8 +644,26 @@ A header holds only these items:
 - functions `static inline`.
 
 These items are only in headers.
+Thus a source declares no type, also not with a variable, not with no body such as `struct point;`, and not in a function.
+A header gives a value to a global variable only if `constexpr` marks the variable.
 A header includes a different header only if it is necessary.
 The attributes of a function are in the brackets of C23, for example `[[nodiscard]]` and `[[maybe_unused]]`.
+
+This code in a source obeys the rule. A header declares `struct point`:
+
+```c
+#include "point.h"
+
+static const struct point ORIGIN = {};
+```
+
+This code in a source breaks the rule:
+
+```c
+static const struct {
+    int x;
+} ORIGIN = {};
+```
 
 ### H2 - The include guard
 

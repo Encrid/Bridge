@@ -18,7 +18,7 @@ The step `Runner` of `ci.yml` and of `release.yml` gives the runner what the cas
 
 ## The jobs of ci.yml
 
-The job `gate` has a job for each target and each gate: `test`, `test --break`, `test --branches` and `test --leaks`. Thus a job runs 1 gate, and stays far under its limit of 60 minutes.
+The job `gate` has a job for each target and each gate: `test`, `test --break`, `test --branches` and `test --leaks`. Thus a job runs 1 gate, under its limit of 60 minutes. A project whose whole scope takes longer raises `timeout-minutes` in its copy of `ci.yml`.
 Each such job prepares its runner with `runner.py`, then runs `fetch` and its gate. The job of `test` also runs `check` before its gate, and `pack` after it.
 
 The gate runs only for the groups that `scope.py` gives for the pull request: `.toolchain/docs/scope.py.md`. A pull request into `main` runs it for the groups that state `whole = true`.
@@ -33,6 +33,13 @@ The job `check` has a job for each target, with the name `check (<target>, <runn
 Each such job waits for all the jobs of `gate`, and passes only if each of them passed.
 
 ## The cache of zig
+
+The checkout of `ci.yml` and of `warm.yml` keeps the folder `build`: it states `clean: false`, and the step `Clean` then runs `git clean -ffdx -- . ':!/build/'`.
+Thus each other file that git does not track goes. A runner that keeps its workspace keeps its caches of zig, its fetched sources and its outputs.
+
+zig hashes the content of each input, and `fetch` checks the stamp of each source. Thus a kept cache or source gives the same result as a new one.
+A hosted runner of GitHub starts each job with an empty workspace, so it keeps nothing, and `actions/cache` gives it the global cache.
+`release.yml` cleans its whole workspace, so that a release comes from no kept file.
 
 The jobs of `ci.yml`, `release.yml` and `warm.yml` keep the global cache of zig with `actions/cache`.
 Its folder is `[build] cache` of `.toolchain/toolchain.toml`.

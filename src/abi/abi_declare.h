@@ -43,14 +43,8 @@ typedef struct {
     const char *path;
 } relay_at_t;
 
-static const char *const ABI_STORAGE_NAMES[] = {
-    "",
-    "a table",
-    "a sparse set",
-    "a toggle",
-    "direct-indexed",
-    "a singleton"
-};
+constexpr uint32_t ABI_STORAGE_COUNT = 6;
+extern const char *const ABI_STORAGE_NAMES[ABI_STORAGE_COUNT];
 
 uint64_t abi_hash_text(const char *s, size_t n);
 

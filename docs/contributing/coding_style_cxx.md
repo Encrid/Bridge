@@ -247,6 +247,15 @@ phys_addr_t alloc_frame();
 A function has at most 4 arguments. A variadic function is allowed. Its `...` counts as one argument.
 Give a structure to a function through a pointer, and not as a copy.
 
+A declaration that names a symbol of the system with `__asm__` is an exception. The system fixes its arguments.
+Thus the rule does not count them. The declaration names each fixed argument, and gives `...` only for a variadic function:
+
+```cpp
+extern "C" void *map_view(void *mapping, unsigned long access,
+    unsigned long offset_high, unsigned long offset_low, size_t size)
+    __asm__("MapViewOfFile");
+```
+
 These points also hold:
 
 - A parameter has no default value. Each call writes each argument.
