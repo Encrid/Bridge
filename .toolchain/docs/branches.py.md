@@ -113,10 +113,10 @@ If an outcome is not reached, or a branch is not measured, it stops: `outcomes n
 
 `[[branches.exception]]` of `project.toml` marks a defensive branch that stays though no test drives it.
 Each exemption names a branch by `path`, `line`, `column` and `side`, and states a `why`.
-The `side` is `true`, `false`, `function` or `case`.
+The `side` is `true`, `false`, `function`, `case` or `macro`. The side `macro` excuses a branch in the body of a macro, which no probe measures, for example a macro of a third party.
 An exemption can also name a `system`. It applies, and is checked, only on that system, so a platform-only branch gets a platform-only exemption.
 
-`reported` excuses an unreached outcome that an exemption matches, and counts it as exempt, not as missed.
+`reported` excuses an unreached outcome, or a branch in a macro, that an exemption matches, and counts it as exempt, not as missed.
 An exemption with no `why` excuses nothing and is a fault.
 An exemption that matches no unreached outcome is a fault, so a branch that a case reaches again loses its exemption.
 `.toolchain/docs/project.toml.md`, *[[branches.exception]]*.

@@ -35,6 +35,7 @@ It is the same in each project, and a project does not change it.
 | `optimize` | The flags of the optimization. `-s` tells the linker to drop the debug information, also of the objects that zig builds for the C library. Without it, a Linux program holds the folder of the project. `[debug] optimize` gives the flags of a debug build, with the sanitizer of undefined behaviour. |
 | `float` | The flags of the rules of floating point: `-ffp-contract=off`, `-fno-fast-math` and `-fno-rounding-math`. *The rules of floating point* tells why. |
 | `strip` | The flag of `zig build-lib` for the debug information. `-fstrip` drops it, as `-g0` does for the compiler. `[debug] strip` is `-fno-strip`, which keeps it. |
+| `debug_info` | The flag of the compiler for the debug information, for the kinds that do not take `optimize`, such as the kinds of wasm. It is `-g0`, so an object of a release holds no folder of the machine. `[debug] debug_info` is `-g`. |
 | `jobs` | The most jobs that a tool runs at the same time: *The jobs*. The default is 8. |
 
 ## The jobs

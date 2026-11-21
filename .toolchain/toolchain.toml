@@ -24,11 +24,13 @@ language = ["-std=c23", "-pedantic-errors", "-Wall", "-Wextra", "-Werror"]
 optimize = ["-O2", "-DNDEBUG", "-g0", "-s", "-fno-sanitize=undefined", "-fno-stack-protector", "-fno-omit-frame-pointer"]
 float = ["-ffp-contract=off", "-fno-fast-math", "-fno-rounding-math"]
 strip = "-fstrip"
+debug_info = "-g0"
 jobs = 8
 
 [debug]
 optimize = ["-O0", "-g", "-fsanitize=undefined", "-fno-sanitize=vptr", "-fno-sanitize=function", "-fstack-protector-strong", "-fno-omit-frame-pointer"]
 strip = "-fno-strip"
+debug_info = "-g"
 
 [targets.x86_64-windows-gnu]
 runs_on = ["Windows", "AMD64"]

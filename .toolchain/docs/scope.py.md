@@ -35,7 +35,12 @@ A project with no such group runs no case there. `check` and the package proof o
 ## The scope
 
 For a pull request into a different branch than `main`, each changed path gives the groups that test it.
-A file of the copy of the toolchain that no group tests gives the groups of the whole. The cases of the toolchain run in the repository `mc23t`.
+A file of the copy of the toolchain that no group tests gives the groups of the whole.
+The cases of the toolchain run in the repository `mc23t`.
+
+A project with no group of the whole takes each of its groups in their place. A file of the toolchain, for example its flags, can change each artifact.
+A pull request into `main` does the same.
+
 A file of `src`, `include`, `tests` or `tools` that no group tests stops the tool. Thus no code is left with no test.
 Each other path gives no group: a document and a workflow change no code.
 

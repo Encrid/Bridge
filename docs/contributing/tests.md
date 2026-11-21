@@ -114,7 +114,7 @@ If `tests/cases` holds no case, `test` writes `no case: tests/cases holds no cas
 In a project with parts, the groups of a part are in `tests/cases/<folder>`, with the folder of the part: `.toolchain/docs/project.toml.md`, *[parts]*.
 
 A group states the code that it tests with the key `code`, a list of patterns at the top of its file. A group with no `code` tests the code of its part, or of its project if the project has no part.
-A group that tests the project as a whole states `whole = true`, and runs when `dev` goes into `main`.
+A group that tests the project as a whole states `whole = true`, and runs when `dev` goes into `main`. In a project with no such group, each group runs then.
 A change runs only the groups that test a changed file: `.toolchain/docs/scope.py.md`.
 
 ## The keys of a case
@@ -337,6 +337,7 @@ Use a sweep for the calls that fail for one reason, such as no memory. Use `fail
 | `python project.py test --group <group>` | Runs only the named group. You can use this option more than one time. |
 | `python project.py test --part <part>` | Builds the part and the parts that it uses, then runs only the groups in `tests/cases/<folder>`, with the folder of the part. |
 | `python project.py test --copies <number>` | Runs this number of copies of each case at the same time. Each copy must pass. |
+| `python project.py test --build` | Builds each artifact, the test ones too, and runs no case. |
 | `python project.py test --workers <number>` | Runs this number of cases at the same time. With 1, the cases run one after the other. |
 | `python project.py test --rounds <number>` | Runs all the cases this number of times, one round after the other. |
 
@@ -351,6 +352,7 @@ A case that fails in some copies writes the number of these copies, for example 
 | --- | --- |
 | `timeout` | The maximum time of a case, in seconds. A case fails if its command does not end in time, also with `--break`. For a table, it is the maximum time of each row: *Tables*. |
 | `copies` | The number of copies of each case that run at the same time. `--copies` replaces it. |
+| `memory_floor` | Optional. The bytes of memory that must stay free when a case starts, while another case of the run runs. The default is 2 GiB, and 0 turns the wait off: `.toolchain/docs/test.py.md`, *The workers*. |
 | `workers` | Optional. The number of cases that run at the same time. The default is the count of the processors. `--workers` replaces it: `.toolchain/docs/test.py.md`, *The workers*. |
 | `rule` | The rules of the groups. Each `[[test.rule]]` has `lacks` and `exempt`. |
 | `writers` | The functions that write the messages of the code, for example `fprintf`. |
