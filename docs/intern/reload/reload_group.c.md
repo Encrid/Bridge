@@ -24,7 +24,9 @@ Then `group_fail` builds the schedule again, so each level is the level of the l
 A refused build, or a move of rows that failed after a build, leaves other levels, and the next phase would run them.
 
 Each undo first calls the `shutdown` of a new instance whose `reload` gave 0: `docs/intern/reload/reload_fail.c.md`, *The new instance taken out*.
-The member whose start failed is undone at once. Then `group_fail` undoes each member that started, in the order of the list.
+
+The member whose start failed is undone at once. First, the log ring of its new instance is drained, when that instance has its private memory. Then a record says why, and the undo follows.
+A member whose `reload` failed gets no `shutdown`, so only this step gives its lines. Then `group_fail` undoes each member that started, in the order of the list.
 `docs/extern/bridge.h.md`, *bridge_reload*, tells what a caller sees.
 
 ## Functions
@@ -33,6 +35,6 @@ The member whose start failed is undone at once. Then `group_fail` undoes each m
 | --- | --- |
 | `undo_member` | Drops one member's new instance with `reload_undo`, and unparks the systems of its old. |
 | `validate_group` | Checks each member. Refuses an empty list, a non-side-by-side module, or a repeated identity. Marks each old as regrouping. |
-| `start_members` | Grows, records and starts each new instance beside its old. Gives how many started. |
+| `start_members` | Grows, records and starts each new instance beside its old. At the first start that fails, it gives the lines of that instance to the sink, refuses the member and undoes it. Gives how many started. |
 | `group_fail` | Undoes the started members, clears every mark, builds the schedule again, frees the list, and gives 1. |
 | `bridge_reload_group_now` | Validates, starts, checks the schedule, moves the rows, then commits at one barrier. |

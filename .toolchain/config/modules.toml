@@ -293,7 +293,7 @@ defines = ["BRIDGE_ROWS_CHECKED"]
 name = "share1"
 sources = ["tests/modules/share.c", "tests/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0"]
-variants = [{ name = "share2", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=1"] }, { name = "sharew", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "WRITER"] }, { name = "sharebad", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "TRAP"] }, { name = "sharehold0", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "HOLD"] }, { name = "sharehold1", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=1", "HOLD"] }, { name = "share1-said", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "SAY"] }]
+variants = [{ name = "share2", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=1"] }, { name = "sharew", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "WRITER"] }, { name = "sharebad", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "TRAP"] }, { name = "sharehold0", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "HOLD"] }, { name = "sharehold1", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=1", "HOLD"] }, { name = "share1-said", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "SAY"] }, { name = "sharebad-said", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "TRAP", "SAY"] }]
 
 [[modules]]
 name = "badterm"
