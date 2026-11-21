@@ -51,7 +51,7 @@ The workflow `release` then makes the release. `.toolchain/docs/workflows.py.md`
 5. Make sure that the documents describe the change, and that a case checks each new behavior.
 
 A test belongs to the code that it tests. A change does not run the cases of the code that it uses, or of the code that uses it.
-When `dev` goes into `main`, the 4 commands run only for the groups that state `whole = true`.
+When `dev` goes into `main`, the 4 commands run only for the groups that state `whole = true`, or for each group if no group states it.
 The workflow `ci` runs `check` and the 4 commands again on a machine of each target of the project: `[project] targets` of `.toolchain/project.toml`.
 On each pull request, it runs the 4 commands only for the groups that `scope.py` gives: `.toolchain/docs/scope.py.md`.
 Then it runs `python project.py pack`, which refuses a package that holds a path of the machine that built it.

@@ -483,7 +483,7 @@ An exception lets a project keep a defensive branch that no case can reach, for 
 | `path` | The path of the file. It can contain `*`. |
 | `line` | The line of the branch. |
 | `col` | The column of the branch. |
-| `side` | `true`, `false`, `function` or `case`. |
+| `side` | `true`, `false`, `function`, `case` or `macro`: `.toolchain/docs/branches.py.md`, *Exemptions*. |
 | `why` | The reason the branch is unreachable. |
 | `system` | Optional. The system the exemption applies on, for a branch that only one platform has. |
 

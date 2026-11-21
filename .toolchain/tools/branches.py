@@ -299,12 +299,17 @@ BRANCH_SIDE = {'true': 'no case makes this condition true',
                'false': 'no case makes this condition false',
                'function': 'no case calls this function',
                'case': 'no case reaches this case'}
+MACRO = 'is in a macro, and is not measured'
+
+
+def sided(side, said):
+    return BRANCH_SIDE.get(side) == said or (side == 'macro' and said.endswith(MACRO))
 
 
 def excused(listed, system, name, line, col, said):
     for entry in listed:
         if (entry.get('why') and entry.get('line') == line and entry.get('col') == col
-                and BRANCH_SIDE.get(entry.get('side')) == said and fnmatch.fnmatch(name, entry['path'])
+                and sided(entry.get('side'), said) and fnmatch.fnmatch(name, entry['path'])
                 and (not entry.get('system') or entry['system'] == system)):
             entry['hits'] = entry.get('hits', 0) + 1
             return True
@@ -323,11 +328,12 @@ def reported(probes, gaps, hits, excepted=(), system=None, named=()):
                 total += 1
                 if bits[2 * number + side] == '0':
                     outcomes.append((name, row['line'], row['col'], said))
-    macros = [(name, row['line'], row['col'], 'this %s is in a macro, and is not measured' % row['kind'])
+    gapped = [(name, row['line'], row['col'], 'this %s %s' % (row['kind'], MACRO))
               for name, rows in gaps.items() for row in rows]
     listed = [dict(entry) for entry in excepted]
     missed = [fault for fault in outcomes if not excused(listed, system, *fault)]
-    exempt = len(outcomes) - len(missed)
+    macros = [fault for fault in gapped if not excused(listed, system, *fault)]
+    exempt = len(outcomes) - len(missed) + len(gapped) - len(macros)
     stale = []
     for entry in listed:
         if entry.get('system') and entry['system'] != system:

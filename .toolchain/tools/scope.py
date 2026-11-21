@@ -90,7 +90,7 @@ def claimed(settings, root, names):
 
 def scoped(settings, root, paths, into):
     found = groups(settings, root)
-    wholes = [group['name'] for group in found if group['whole']]
+    wholes = [group['name'] for group in found if group['whole']] or [group['name'] for group in found]
     if not found or into == 'main':
         return wholes
     picked = set()
