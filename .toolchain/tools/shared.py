@@ -15,7 +15,9 @@ HERE = Path(__file__).resolve().parents[2]
 NAME = re.compile(r'\{([a-z_][a-z0-9_]*)(?::([^{}]*))?\}')
 KEYS = {'step': {'run', 'cwd', 'section', 'text', 'contains', 'copy', 'rename'},
         'case': {'name', 'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders', 'fail', 'claims', 'false', 'alone',
-                 'ignore'},
+                 'ignore', 'rows', 'sweep', 'process'},
+        'row': {'name', 'in', 'claims', 'false'},
+        'claim of a row': {'line', 'has', 'lacks', 'matches', 'matches_not', 'order', 'output'},
         'false': {'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders', 'fail', 'ignore'},
         'helper': {'run', 'wait', 'stdin', 'claims'},
         'script': {'wait', 'put', 'remove', 'type', 'close', 'signal', 'pause'},
@@ -26,6 +28,8 @@ KEYS = {'step': {'run', 'cwd', 'section', 'text', 'contains', 'copy', 'rename'},
 SIDES = {'include': 'docs/extern', 'src': 'docs/intern', 'tools': 'docs/tools'}
 TAG = re.compile(r'(?:([a-z0-9_]+)-)?v\d+\.\d+\.\d+')
 UNSET = {}
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
 
 
 def die(why):

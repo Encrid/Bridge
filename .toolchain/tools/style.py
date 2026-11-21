@@ -27,7 +27,7 @@ BASE = (r'void|char|short|int|long|float|double|bool|auto|size_t|ptrdiff_t|signe
 ANY = BASE + r'|[A-Za-z_]\w*'
 QUALIFIER = r'static|const|constexpr|volatile|register|thread_local|extern|inline'
 DECLARES = re.compile(r'(?:\[\[[^\]]*\]\]\s*)*(?:(?:%s)\s+)*(?:%s)\b(?:\s+(?:%s|const|long|int|char))*'
-                      r'(?:[\s*]|const\b)*(?:\(\s*\*\s*)?(?P<name>[A-Za-z_]\w*)\s*'
+                      r'(?:[\s*]|(?:const|restrict|volatile)\b)*(?:\(\s*\*\s*)?(?P<name>[A-Za-z_]\w*)\s*'
                       r'(?:\)\s*\([^)]*\)\s*)?(?:\[[^\]]*\]\s*)*(?:=|,|\Z)'
                       % (QUALIFIER, ANY, BASE))
 HEADER = re.compile(r'/\*\n' + shared.header('**') + r'\*/\n')

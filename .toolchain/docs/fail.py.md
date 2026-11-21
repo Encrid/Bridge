@@ -23,6 +23,7 @@ Each function is in the list one time. `listed` stops if a table names a functio
 - When the count is the number that the case states, that function gives the failure value, and does not call its function. Else it calls its function.
 - The count is a `[[gnu::weak]]` variable with hidden visibility. Thus the files of one program or of one library share one count, on each system.
 - A `[[gnu::constructor]]` reads the number of each such function from the variable `C23_FAIL` of the environment. A function with no number never fails.
+- At each call, the layer reads the turn of `C23_FAIL`: *The turn*.
 - The layer holds the parts of the artifacts that compile the file, as a text with a space before and after each name.
   The constructor reads `C23_FAIL` only if the variable `C23_FAIL_PART` is not set, or if the text holds its value. Else no call of the file fails.
 
@@ -33,6 +34,20 @@ For each call that the key `fail` of the case states, `C23_FAIL` holds a space, 
 `layer` stops if a listed function that a file uses has no result: `<name> gives no result`.
 It also stops where `signed` of `rewrite.py` stops: `.toolchain/docs/rewrite.py.md`, *The rename*.
 `listed` stops if a file of `[fail] with` is not there: `[fail] with: <file> is not there`.
+
+## The turn
+
+A test program can change the calls that fail during its run: `.toolchain/docs/sweep.h.md`.
+For that, `C23_FAIL` can hold a space, then `turn=<number>`. With no turn, the turn is 0.
+
+At each call of a listed function, the layer reads the turn.
+
+- If the turn is not the turn that the file read last, the file reads its numbers again, as its constructor does.
+- If the turn is not the turn of the count of the function, the count starts again at 0. The turn of a count is a `[[gnu::weak]]` variable with hidden visibility, as the count is.
+- When the layer makes a call fail, it looks for ` told=0` in `C23_FAIL`, and writes `1` in place of the `0`.
+  It changes 1 byte of the text, and calls no function that changes the environment. Thus a call can fail on any thread.
+
+Thus a case that states `fail` runs as before: its turn stays 0, and its `C23_FAIL` holds no ` told=0`.
 
 ## The loaded calls
 

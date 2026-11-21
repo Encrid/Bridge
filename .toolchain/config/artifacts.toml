@@ -65,11 +65,37 @@ include = ["include"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{aligned}"]
 
 [[artifact]]
+name = "say"
+kind = "program"
+test = true
+sources = ["tests/say/*.c", "src/say/*.c"]
+include = ["include", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage", "{toolchain}/runtime"]
+defines = ["BRIDGE_BUILDING"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{aligned}"]
+
+[[artifact]]
+name = "pool"
+kind = "program"
+test = true
+sources = ["tests/pool/*.c", "src/pool/*.c"]
+include = ["{bridge_os}/include", "src/pool", "tests/pool", "{toolchain}/runtime"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{aligned}"]
+link = ["{bridge_os}/os.a"]
+
+[[artifact]]
+name = "region"
+kind = "program"
+test = true
+sources = ["tests/region/*.c", "src/region/*.c"]
+include = ["src/region", "{toolchain}/runtime"]
+flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{aligned}"]
+
+[[artifact]]
 name = "schema"
 kind = "program"
 test = true
 sources = ["tests/schema/*.c", "src/schema/*.c"]
-include = ["include", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage"]
+include = ["include", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage", "{toolchain}/runtime"]
 defines = ["BRIDGE_BUILDING"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{aligned}"]
 
@@ -78,7 +104,7 @@ name = "storage"
 kind = "program"
 test = true
 sources = ["tests/storage/*.c", "tests/support/host_copy*.c", "src/**/*.c"]
-include = ["include", "tests/support", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage"]
+include = ["include", "tests/support", "{toolchain}/runtime", "{bridge_os}/include", "src", "src/abi", "src/backend", "src/block", "src/bridge", "src/config", "src/module", "src/pool", "src/region", "src/reload", "src/say", "src/schedule", "src/schema", "src/storage"]
 defines = ["BRIDGE_BUILDING", "{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{aligned}"]
 link = ["{bridge_os}/os.a"]
@@ -88,7 +114,7 @@ name = "seam"
 kind = "program"
 test = true
 sources = ["tests/seam/*.c", "tests/support/host*.c", "tests/support/{system}/host*.c"]
-include = ["include", "tests/support"]
+include = ["include", "tests/support", "{toolchain}/runtime"]
 defines = ["{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{aligned}"]
 link = ["{out}/bridge{library}", "{host_resources}"]
@@ -98,7 +124,7 @@ name = "seam-static"
 kind = "program"
 test = true
 sources = ["tests/seam/*.c", "tests/support/host*.c", "tests/support/{system}/host*.c"]
-include = ["include", "tests/support"]
+include = ["include", "tests/support", "{toolchain}/runtime"]
 defines = ["{paths}"]
 flags = ["{quiet}", "{system_defines}", "{system_libraries}", "{aligned}"]
 link = ["{out}/bridge.a", "{bridge_os}/os.a", "{host_resources}"]

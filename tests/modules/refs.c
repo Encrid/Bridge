@@ -59,6 +59,7 @@ BRIDGE_EXPORT(init) int init(void)
     position_t p = { 0.0f, 0.0f };
     uint32_t i = 0;
 
+    round = 0;
     position = BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_DELETE,
         BRIDGE_TABLE);
     BRIDGE_ADD_SYSTEM("cull", "update", nullptr, 0, nullptr, 0, nullptr, 0);

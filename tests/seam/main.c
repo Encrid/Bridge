@@ -3,9 +3,8 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
-#include <string.h>
-
 #include "cases.h"
+#include "rows.h"
 
 static const host_case_t TEST_CASES[] = {
     { "bridge_value_t-a-value-of-each-kind",
@@ -159,6 +158,14 @@ static const host_case_t TEST_CASES[] = {
         test_nap, "2 heard", test_set_counting },
     { "bridge_run_phase-systems-of-one-module-run-one-after-another",
         test_nap, "2 twice", test_set_counting },
+    { "config.threads-one-and-four-give-the-same-bits",
+        test_lanes, "lane3", test_set_counting },
+    { "config.threads-other-seed-gives-other-bits",
+        test_lanes, "lane3-seeded", test_set_counting },
+    { "bridge_set_order-between-two-phases-orders-the-next-phase",
+        test_reorder_live, "paired", test_set_counting },
+    { "bridge_set_order-same-set-keeps-the-order",
+        test_reorder_live, "empty", test_set_counting },
     { "config.threads-unset-refused",
         test_state_no_threads, "0", test_set_counting },
     { "config.profile-unset-refused",
@@ -231,6 +238,8 @@ static const host_case_t TEST_CASES[] = {
     { "module_config.on_error-unset-refused",
         test_edit_module, "on_error=0", test_set_small },
     { "module_config.max_system_failures-reached-stops-the-module",
+        test_reach_budget, "twostep flaky-always", test_set_noting },
+    { "module_config.max_system_failures-lines-of-the-stop-reach-the-sink",
         test_reach_budget, "twostep flaky-always", test_set_noting },
     { "module_config.max_system_failures-not-reached-runs",
         test_reach_budget, "twostep flaky-third", test_set_noting },
@@ -1004,6 +1013,8 @@ static const host_case_t TEST_CASES[] = {
         test_reload_group, "share2 share2 three", test_set_guarded },
     { "bridge_reload-group-member-failed-start-changes-nothing",
         test_reload_group, "share2 sharebad", test_set_guarded },
+    { "bridge_reload-group-member-failed-start-log-given",
+        test_reload_group, "share2 sharebad-said", test_set_guarded },
     { "bridge_reload-group-failed-calls-the-new-shutdown-of-each-member-that-started",
         test_reload_group_shut, "", test_set_guarded },
     { "bridge_reload-group-with-no-stated-loss-reloaded",
@@ -1789,7 +1800,7 @@ static void fill_kept(test_kept_t *kept)
     memcpy(kept->noted.settings, TEST_SETTINGS, sizeof(TEST_SETTINGS));
 }
 
-int main(int argc, char **argv)
+static int run(int argc, char **argv)
 {
     constexpr size_t count = sizeof(TEST_CASES) / sizeof(*TEST_CASES);
     test_kept_t kept;
@@ -1799,4 +1810,10 @@ int main(int argc, char **argv)
     fill_kept(&kept);
     h.kept = &kept;
     return (host_run(&h, TEST_CASES, count));
+}
+
+int main(int argc, char **argv)
+{
+    setvbuf(stdout, nullptr, _IONBF, 0);
+    return (argc > 1 ? run(argc, argv) : rows_run(run));
 }

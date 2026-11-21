@@ -4,7 +4,8 @@ This file handles a reload that failed: it takes the new instance back out, and 
 
 ## The new instance taken out
 
-A record says that the module was not reloaded, and why. Bridge says it once, and does not try the reload again.
+First, Bridge gives the lines that the new instance wrote to the sink of the host, if the instance has its private memory.
+Then a record says that the module was not reloaded, and why. Bridge says it once, and does not try the reload again.
 Then the new instance goes back out:
 
 1. Take its systems and observers out of storage.

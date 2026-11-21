@@ -46,6 +46,10 @@ static void register_all(void)
 
 BRIDGE_EXPORT(init) int init(void)
 {
+    husk_frame = 0;
+    husk_heard[0] = 0;
+    husk_heard[1] = 0;
+    husk_heard[2] = 0;
     declare_both();
 #ifndef TWIN
     register_all();

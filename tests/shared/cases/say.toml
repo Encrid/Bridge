@@ -1,0 +1,14 @@
+code = ["include/**", "src/abi/abi.h", "src/abi/abi_declare.h", "src/abi/abi_subscribe.h", "src/backend/backend.h", "src/bridge/bridge_inside.h", "src/inside.h", "src/leaks.toml", "src/module/module.h", "src/reload/reload.h", "src/say/**", "tests/backend/**", "tests/binding/**", "tests/modules/**", "tests/say/**", "tests/seam/cases.h", "tests/seam/seam.manifest", "tests/seam/seam.rc", "tests/shared/**", "tests/support/backend_hollow.c", "tests/support/host.h", "tests/support/host_copy.h", "tests/support/plain_other_abi.c", "tests/support/plain_refusing_backend.c", "tests/support/plain_refusing_memory.c", "tests/support/posix/**", "tests/support/windows/**", ".toolchain/config/**", ".toolchain/project.toml"]
+
+[[case]]
+name = "say"
+run = ["{out}/say{exe}"]
+sweep = ["malloc"]
+claims = { status = 0 }
+rows = [
+    { name = "say_error-sends-a-record-of-the-library-with-the-level-of-an-error", in = "error", claims = { line = ["3 none none 4: a text of 7", "status 0"] }, false = "about" },
+    { name = "say_about-names-the-module-the-system-and-the-level", in = "about", claims = { line = ["4 game:mod@1.0.0 tick 4: a text of 7", "status 0"] }, false = "error" },
+    { name = "copy_text-copies-the-first-bytes-and-ends-them", in = "copy", claims = { line = ["a text", "status 0"] }, false = "+refuse malloc=1 copy" },
+    { name = "copy_text-with-no-memory-gives-nothing", in = "+refuse malloc=1 copy", claims = { line = ["no copy", "status 0"] }, false = "copy" },
+    { name = "bridge_lacks-tells-what-had-no-memory-and-nothing-for-a-block", in = "lacks", claims = { order = ["3 none none 4: out of memory: there was none for a table", "0 1"], line = ["status 0"] }, false = "copy" },
+]

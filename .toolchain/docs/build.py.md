@@ -14,7 +14,7 @@ With `--pack`, it also puts the deliverable into a zip file. With `--join`, it j
 | `run_in(step, values)` | Runs the command of a step in its folder `cwd`, as *Steps* tells. |
 | `do(step, values, unstamped)` | Does one step of a kind. |
 | `put(path, source)` | Writes a copy of `source` only if it is not there or is different. Then it gives the copy the mode of `source`, as *The deliverable* tells. |
-| `moved(path, tree)` | Gives the path in `tree` for a path of `src` or of `include`, and else the path. With no tree, it gives the path. |
+| `moved(path, tree)` | Gives the path in `tree` for a path of `src` or of `include`, and for each other path that `tree` holds. Else it gives the path. With no tree, it gives the path. |
 | `planned(config, values, artifact, tree)` | Gives the kind and the variables of one artifact, as steps 1 to 4 of *Artifacts* tell. |
 | `built(config, values, artifact, tree)` | Builds one artifact with the runner `mpbt`. It gives the name of the artifact and its files. |
 | `wrote(name, output)` | Stops if the steps of an artifact did not write its output. |
@@ -106,6 +106,8 @@ The graph has these steps:
    `{deps}` names the headers of the source, and zig takes them as inputs too.
 2. For each artifact, `python build.py --one <spec>`. Its inputs are the spec, the objects, and the files of `{sources}`, `{link}` and `{runtime}`.
    Its output is `{output}`. Each folder of `{inputs}` is an input too, after the prefix of the item.
+   The files of `{sources}` and of `{runtime}` are inputs of the kind `input`, and no arguments.
+   Windows refuses a command of more than 32767 characters.
 3. For each artifact, a step that copies its output to its path in `{out}`.
 
 A file of `link` that a different artifact of the build makes is the output of the step of that artifact. Thus the step waits for it.

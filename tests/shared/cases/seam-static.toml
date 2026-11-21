@@ -1,115 +1,28 @@
-code = ["include/**", "src/abi/abi.h", "src/abi/abi_alloc.c", "src/abi/abi_declare.h", "src/abi/abi_define.c", "src/abi/abi_subscribe.h", "src/backend/**", "src/bits.h", "src/block/block.h", "src/block/block_barrier.c", "src/block/block_budget.c", "src/block/block_counts.c", "src/block/block_create.c", "src/block/block_destroy.c", "src/block/block_layout.c", "src/block/block_log.c", "src/block/block_module.c", "src/block/block_publish.c", "src/block/block_sort.c", "src/block/block_work.c", "src/bridge/bridge_backend.c", "src/bridge/bridge_backends.c", "src/bridge/bridge_calls.c", "src/bridge/bridge_check.c", "src/bridge/bridge_create.c", "src/bridge/bridge_destroy.c", "src/bridge/bridge_inside.h", "src/bridge/bridge_keys.c", "src/bridge/bridge_load.c", "src/bridge/bridge_phases.c", "src/bridge/bridge_stop.c", "src/config/config.c", "src/config/config.h", "src/inside.h", "src/leaks.toml", "src/module/module.h", "src/module/module_call.c", "src/module/module_check.c", "src/module/module_check_backend.c", "src/module/module_check_fit.c", "src/module/module_check_phases.c", "src/module/module_check_stated.c", "src/module/module_discard.c", "src/module/module_identity.c", "src/module/module_instance.c", "src/module/module_record.c", "src/module/module_say.c", "src/module/module_share.c", "src/module/module_shutdown.c", "src/module/module_start.c", "src/module/module_types.c", "src/pool/pool.c", "src/pool/pool.h", "src/pool/pool_run.c", "src/region/region.h", "src/region/region_take.c", "src/reload/reload.h", "src/say/**", "src/schedule/schedule_account.c", "src/schedule/schedule_bits.h", "src/schedule/schedule_build.c", "src/schedule/schedule_check.c", "src/schedule/schedule_closure.c", "src/schedule/schedule_commit.c", "src/schedule/schedule_cross.c", "src/schedule/schedule_edges.c", "src/schedule/schedule_group.c", "src/schedule/schedule_levels.c", "src/schedule/schedule_marks.c", "src/schedule/schedule_matrix.c", "src/schedule/schedule_names.c", "src/schedule/schedule_order.c", "src/schedule/schedule_run.c", "src/schedule/schedule_triggered.c", "src/schedule/schedule_unordered.c", "src/schema/schema.h", "src/schema/schema_reader.h", "src/storage/storage.h", "src/storage/storage_apply.c", "src/storage/storage_apply.h", "src/storage/storage_cells.c", "src/storage/storage_convert.h", "src/storage/storage_create.c", "src/storage/storage_create.h", "src/storage/storage_drop.h", "src/storage/storage_forget.h", "src/storage/storage_held.c", "src/storage/storage_ids.c", "src/storage/storage_inside.h", "src/storage/storage_made.c", "src/storage/storage_publish.c", "src/storage/storage_publish.h", "src/storage/storage_runs.h", "src/storage/storage_settle.h", "src/storage/storage_spans.c", "src/storage/storage_unload.h", "tests/backend/**", "tests/binding/**", "tests/modules/**", "tests/schema/schema_test.h", "tests/seam/**", "tests/shared/**", "tests/storage/storage_test.h", "tests/support/**", ".toolchain/config/**", ".toolchain/project.toml"]
+code = ["include/**", "src/abi/abi.h", "src/abi/abi_alloc.c", "src/abi/abi_declare.h", "src/abi/abi_define.c", "src/abi/abi_subscribe.h", "src/backend/**", "src/bits.h", "src/block/block.h", "src/block/block_barrier.c", "src/block/block_budget.c", "src/block/block_counts.c", "src/block/block_create.c", "src/block/block_destroy.c", "src/block/block_layout.c", "src/block/block_log.c", "src/block/block_module.c", "src/block/block_publish.c", "src/block/block_sort.c", "src/block/block_work.c", "src/bridge/bridge_backend.c", "src/bridge/bridge_backends.c", "src/bridge/bridge_calls.c", "src/bridge/bridge_check.c", "src/bridge/bridge_create.c", "src/bridge/bridge_destroy.c", "src/bridge/bridge_inside.h", "src/bridge/bridge_keys.c", "src/bridge/bridge_load.c", "src/bridge/bridge_phases.c", "src/bridge/bridge_stop.c", "src/inside.h", "src/leaks.toml", "src/module/module.h", "src/module/module_call.c", "src/module/module_check.c", "src/module/module_check_backend.c", "src/module/module_check_fit.c", "src/module/module_check_phases.c", "src/module/module_check_stated.c", "src/module/module_discard.c", "src/module/module_identity.c", "src/module/module_instance.c", "src/module/module_record.c", "src/module/module_say.c", "src/module/module_share.c", "src/module/module_shutdown.c", "src/module/module_start.c", "src/module/module_types.c", "src/reload/reload.h", "src/schedule/schedule_account.c", "src/schedule/schedule_bits.h", "src/schedule/schedule_build.c", "src/schedule/schedule_check.c", "src/schedule/schedule_closure.c", "src/schedule/schedule_commit.c", "src/schedule/schedule_cross.c", "src/schedule/schedule_edges.c", "src/schedule/schedule_group.c", "src/schedule/schedule_levels.c", "src/schedule/schedule_marks.c", "src/schedule/schedule_matrix.c", "src/schedule/schedule_names.c", "src/schedule/schedule_order.c", "src/schedule/schedule_run.c", "src/schedule/schedule_triggered.c", "src/schedule/schedule_unordered.c", "tests/backend/**", "tests/binding/**", "tests/modules/**", "tests/seam/**", "tests/shared/**", "tests/support/**", ".toolchain/config/**", ".toolchain/project.toml"]
+whole = true
 
 [[case]]
-name = "static-bridge_load-loaded"
-run = ["{out}/seam-static{exe}", "bridge_load-loaded"]
-claims = { matches = ["test:ok@0.1.0: loaded.*alive"] }
-false = { run = ["{out}/seam-static{exe}", "bridge_load-init-trapped"] }
-
-[[case]]
-name = "static-BRIDGE_NO_LIMIT-stated-for-every-limit"
-run = ["{out}/seam-static{exe}", "BRIDGE_NO_LIMIT-stated-for-every-limit"]
-claims = { matches = ["test:ok@0.1.0: loaded.*alive"] }
-false = { run = ["{out}/seam-static{exe}", "BRIDGE_NO_LIMIT-but-one-limit-none-refused"] }
-
-[[case]]
-name = "static-bridge_load-init-trapped"
-run = ["{out}/seam-static{exe}", "bridge_load-init-trapped"]
-claims = { matches = ["module 'test:oob@0.1.0' did not load: its init trapped: the module asked for it.*alive"] }
-false = { run = ["{out}/seam-static{exe}", "module_config.init_timeout-init-interrupted"] }
-
-[[case]]
-name = "static-module_config.init_timeout-init-interrupted"
-run = ["{out}/seam-static{exe}", "module_config.init_timeout-init-interrupted"]
-claims = { matches = ["module 'test:spin@0.1.0' did not load: its init trapped: the timeout passed.*alive"] }
-false = { run = ["{out}/seam-static{exe}", "module_config.memory_limit-growth-refused"] }
-
-[[case]]
-name = "static-module_config.memory_limit-growth-refused"
-run = ["{out}/seam-static{exe}", "module_config.memory_limit-growth-refused"]
-claims = { matches = ["module 'test:grow@0.1.0' did not load: its init answered 7.*alive"] }
-false = { run = ["{out}/seam-static{exe}", "instance_get_func-no-such-export-refused"] }
-
-[[case]]
-name = "static-instance_get_func-no-such-export-refused"
-run = ["{out}/seam-static{exe}", "instance_get_func-no-such-export-refused"]
-claims = { matches = ["module 'test:noinit@0.1.0' did not load: no exported function 'module_init'.*alive"] }
-false = { run = ["{out}/seam-static{exe}", "bridge_load-loaded"] }
-
-[[case]]
-name = "static-bridge_load-no-init-export"
-run = ["{out}/seam-static{exe}", "bridge_load-no-init-export"]
-claims = { matches = ["module 'test:noinit@0.1.0' did not load: no exported function 'module_init'.*alive"] }
-false = { run = ["{out}/seam-static{exe}", "instance_get_func-export-init-without-arguments"] }
-
-[[case]]
-name = "static-module_config.abi-another-refused"
-run = ["{out}/seam-static{exe}", "module_config.abi-another-refused"]
-claims = { matches = ["module 'test:ok@0.1.0' is refused: it wants ABI 2 and this is ABI 1.*alive"] }
-false = { run = ["{out}/seam-static{exe}", "BRIDGE_ABI-stated-and-loaded"] }
-
-[[case]]
-name = "static-artifact.backend-not-configured-refused"
-run = ["{out}/seam-static{exe}", "artifact.backend-not-configured-refused"]
-claims = { matches = ["module 'test:ok@0.1.0' is refused: no backend named 'plain'.*alive"] }
-false = { run = ["{out}/seam-static{exe}", "artifact.backend-configured-loaded"] }
-
-[[case]]
-name = "static-module_config.log_level-unset-refused"
-run = ["{out}/seam-static{exe}", "module_config.log_level-unset-refused"]
-claims = { matches = ["module 'test:ok@0.1.0' is refused: log_level is unset.*alive"], lacks = [": loaded"] }
-false = { run = ["{out}/seam-static{exe}", "module_config.log_level-stated-loaded"] }
-
-[[case]]
-name = "static-module_config.memory_limit-unset-refused"
-run = ["{out}/seam-static{exe}", "module_config.memory_limit-unset-refused"]
-claims = { matches = ["module 'test:ok@0.1.0' is refused: memory_limit is unset.*alive"] }
-false = { run = ["{out}/seam-static{exe}", "module_config.memory_limit-stated-loaded"] }
-
-[[case]]
-name = "static-BRIDGE_NONE-for-a-limit-refused"
-run = ["{out}/seam-static{exe}", "BRIDGE_NONE-for-a-limit-refused"]
-claims = { matches = ["module 'test:ok@0.1.0' is refused: spawns is -1, which is neither an amount nor BRIDGE_NONE.*module 'test:ok@0.1.0' is refused: work_limit is -2, which is neither a limit nor BRIDGE_NO_LIMIT.*alive"], lacks = [": loaded"] }
-false = { run = ["{out}/seam-static{exe}", "BRIDGE_NO_LIMIT-for-a-limit-loaded"] }
-
-[[case]]
-name = "static-config.abi-another-refused"
-run = ["{out}/seam-static{exe}", "config.abi-another-refused"]
-claims = { matches = ["the host is of host ABI 2, and this is 1.*bridge_create refused.*alive"] }
-false = { run = ["{out}/seam-static{exe}", "BRIDGE_HOST_ABI-stated-and-created"] }
-
-[[case]]
-name = "static-config.abi-unset-refused"
-run = ["{out}/seam-static{exe}", "config.abi-unset-refused"]
-claims = { matches = ["abi is unset.*bridge_create refused.*alive"] }
-false = { run = ["{out}/seam-static{exe}", "BRIDGE_HOST_ABI-stated-and-created"] }
-
-[[case]]
-name = "static-BRIDGE_UNSET-flag-refused"
-run = ["{out}/seam-static{exe}", "BRIDGE_UNSET-flag-refused"]
-claims = { matches = ["module 'test:ok@0.1.0' is refused: pinned is unset.*module 'test:ok@0.1.0' is refused: hot_reload is 3, which is neither BRIDGE_TRUE nor BRIDGE_FALSE.*alive"], lacks = [": loaded"] }
-false = { run = ["{out}/seam-static{exe}", "module_config.pinned-stated-loaded"] }
-
-[[case]]
-name = "static-module_config.memory_limit-negative-refused"
-run = ["{out}/seam-static{exe}", "module_config.memory_limit-negative-refused"]
-claims = { matches = ["module 'test:ok@0.1.0' is refused: memory_limit is -7, which is neither a limit nor BRIDGE_NO_LIMIT.*alive"], lacks = [": loaded"] }
-false = { run = ["{out}/seam-static{exe}", "module_config.memory_limit-stated-loaded"] }
-
-[[case]]
-name = "static-module_config.on_error-fail-stops-and-skip-does-not"
-run = ["{out}/seam-static{exe}", "module_config.on_error-fail-stops-and-skip-does-not"]
-claims = { matches = ["test:ok@0.1.0: loaded.*the world has stopped: module 'test:oob@0.1.0' failed and its on_error is fail.*test:ok@0.1.0: not loaded.*alive"] }
-false = { run = ["{out}/seam-static{exe}", "module_config.on_error-skip-twice-stops-nothing"] }
-
-[[case]]
-name = "static-backend.library-cannot-open-refused"
-run = ["{out}/seam-static{exe}", "backend.library-cannot-open-refused"]
-claims = { matches = ["backend 'guarded': cannot open backend library 'no-such-backend-library'.*bridge_create refused.*alive"] }
-false = { run = ["{out}/seam-static{exe}", "backend.library-that-opens-taken"] }
-
-[[case]]
-name = "static-bridge_create-no-sink-refused"
-run = ["{out}/seam-static{exe}", "bridge_create-no-sink-refused"]
-claims = { matches = ["refused: no sink.*alive"] }
-false = { run = ["{out}/seam-static{exe}", "bridge_create-a-sink-created"] }
+name = "seam-static"
+run = ["{out}/seam-static{exe}"]
+claims = { status = 0 }
+rows = [
+    { name = "static-bridge_load-loaded", in = "bridge_load-loaded", claims = { matches = ["test:ok@0.1.0: loaded.*alive"] }, false = "bridge_load-init-trapped" },
+    { name = "static-BRIDGE_NO_LIMIT-stated-for-every-limit", in = "BRIDGE_NO_LIMIT-stated-for-every-limit", claims = { matches = ["test:ok@0.1.0: loaded.*alive"] }, false = "BRIDGE_NO_LIMIT-but-one-limit-none-refused" },
+    { name = "static-bridge_load-init-trapped", in = "bridge_load-init-trapped", claims = { matches = ["module 'test:oob@0.1.0' did not load: its init trapped: the module asked for it.*alive"] }, false = "module_config.init_timeout-init-interrupted" },
+    { name = "static-module_config.init_timeout-init-interrupted", in = "module_config.init_timeout-init-interrupted", claims = { matches = ["module 'test:spin@0.1.0' did not load: its init trapped: the timeout passed.*alive"] }, false = "module_config.memory_limit-growth-refused" },
+    { name = "static-module_config.memory_limit-growth-refused", in = "module_config.memory_limit-growth-refused", claims = { matches = ["module 'test:grow@0.1.0' did not load: its init answered 7.*alive"] }, false = "instance_get_func-no-such-export-refused" },
+    { name = "static-instance_get_func-no-such-export-refused", in = "instance_get_func-no-such-export-refused", claims = { matches = ["module 'test:noinit@0.1.0' did not load: no exported function 'module_init'.*alive"] }, false = "bridge_load-loaded" },
+    { name = "static-bridge_load-no-init-export", in = "bridge_load-no-init-export", claims = { matches = ["module 'test:noinit@0.1.0' did not load: no exported function 'module_init'.*alive"] }, false = "instance_get_func-export-init-without-arguments" },
+    { name = "static-module_config.abi-another-refused", in = "module_config.abi-another-refused", claims = { matches = ["module 'test:ok@0.1.0' is refused: it wants ABI 2 and this is ABI 1.*alive"] }, false = "BRIDGE_ABI-stated-and-loaded" },
+    { name = "static-artifact.backend-not-configured-refused", in = "artifact.backend-not-configured-refused", claims = { matches = ["module 'test:ok@0.1.0' is refused: no backend named 'plain'.*alive"] }, false = "artifact.backend-configured-loaded" },
+    { name = "static-module_config.log_level-unset-refused", in = "module_config.log_level-unset-refused", claims = { matches = ["module 'test:ok@0.1.0' is refused: log_level is unset.*alive"], lacks = [": loaded"] }, false = "module_config.log_level-stated-loaded" },
+    { name = "static-module_config.memory_limit-unset-refused", in = "module_config.memory_limit-unset-refused", claims = { matches = ["module 'test:ok@0.1.0' is refused: memory_limit is unset.*alive"] }, false = "module_config.memory_limit-stated-loaded" },
+    { name = "static-BRIDGE_NONE-for-a-limit-refused", in = "BRIDGE_NONE-for-a-limit-refused", claims = { matches = ["module 'test:ok@0.1.0' is refused: spawns is -1, which is neither an amount nor BRIDGE_NONE.*module 'test:ok@0.1.0' is refused: work_limit is -2, which is neither a limit nor BRIDGE_NO_LIMIT.*alive"], lacks = [": loaded"] }, false = "BRIDGE_NO_LIMIT-for-a-limit-loaded" },
+    { name = "static-config.abi-another-refused", in = "config.abi-another-refused", claims = { matches = ["the host is of host ABI 2, and this is 1.*bridge_create refused.*alive"] }, false = "BRIDGE_HOST_ABI-stated-and-created" },
+    { name = "static-config.abi-unset-refused", in = "config.abi-unset-refused", claims = { matches = ["abi is unset.*bridge_create refused.*alive"] }, false = "BRIDGE_HOST_ABI-stated-and-created" },
+    { name = "static-BRIDGE_UNSET-flag-refused", in = "BRIDGE_UNSET-flag-refused", claims = { matches = ["module 'test:ok@0.1.0' is refused: pinned is unset.*module 'test:ok@0.1.0' is refused: hot_reload is 3, which is neither BRIDGE_TRUE nor BRIDGE_FALSE.*alive"], lacks = [": loaded"] }, false = "module_config.pinned-stated-loaded" },
+    { name = "static-module_config.memory_limit-negative-refused", in = "module_config.memory_limit-negative-refused", claims = { matches = ["module 'test:ok@0.1.0' is refused: memory_limit is -7, which is neither a limit nor BRIDGE_NO_LIMIT.*alive"], lacks = [": loaded"] }, false = "module_config.memory_limit-stated-loaded" },
+    { name = "static-module_config.on_error-fail-stops-and-skip-does-not", in = "module_config.on_error-fail-stops-and-skip-does-not", claims = { matches = ["test:ok@0.1.0: loaded.*the world has stopped: module 'test:oob@0.1.0' failed and its on_error is fail.*test:ok@0.1.0: not loaded.*alive"] }, false = "module_config.on_error-skip-twice-stops-nothing" },
+    { name = "static-backend.library-cannot-open-refused", in = "backend.library-cannot-open-refused", claims = { matches = ["backend 'guarded': cannot open backend library 'no-such-backend-library'.*bridge_create refused.*alive"] }, false = "backend.library-that-opens-taken" },
+    { name = "static-bridge_create-no-sink-refused", in = "bridge_create-no-sink-refused", claims = { matches = ["refused: no sink.*alive"] }, false = "bridge_create-a-sink-created" },
+]

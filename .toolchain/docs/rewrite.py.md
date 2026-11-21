@@ -14,6 +14,13 @@ It holds the parts that these runs share.
 
 `test.py` then builds the copies, and runs the cases: `.toolchain/docs/test.py.md`.
 
+## The test sources
+
+A test source is a file `.c` of `tests` that an artifact of the kind `program`, `library` or `archive` compiles.
+Only the run of the leaks asks for the test sources: `.toolchain/docs/leaks.py.md`, *What it counts*.
+`copied` then copies the whole folder of each test source, so that a copy still finds a header beside it.
+A source of a different kind, for example a module of a kind of the project, gets no copy and no count.
+
 ## The rename
 
 A run can give a function that a file uses a new name, after the last `#include` of the file. For `free` and the count of `leaks.py`, the block is:
@@ -81,7 +88,12 @@ zig then writes an error ending with `FileNotFound`, because no object is made. 
 If clang writes a different error, `dumped` stops: `the tree of <path> cannot be read:`, and the errors.
 If the output is not JSON, it stops: `the tree of <path> is not JSON`.
 
+`dumped` gives the output of the command to a file of its own in the folder of `<work>`. It reads the tree from that file, and removes it. Thus no pipe holds a tree.
+If the machine has no memory for a tree, it stops: `the tree of <path> needs more memory than this machine has free`.
+
 The dump sets `_FORTIFY_SOURCE` to 0. Then a call that the system would fortify, such as `snprintf`, does not read as a macro.
+Without that macro, the headers of macOS declare a function such as `sprintf` as deprecated, which the compile of the file does not see.
+Thus the dump has `-Wno-deprecated-declarations`: the dump reads the tree, and only the compile judges a deprecated function.
 
 The run builds the files of `inputs` after the dump, so they do not exist yet.
 zig gives an `#embed` of a file that does not exist no bytes and no error, and an empty array is an error of `-pedantic-errors`.
@@ -102,12 +114,13 @@ The build of the copies embeds the files that the run builds.
 | `tree(values, run)` | Gives the folder of the copies of a run, `<build>/<run>/tree`. |
 | `marked(node, state)` | Gives each location of a syntax tree the file that it is in. The dump writes a file only when it changes. |
 | `is_macro(loc)` | Tells if a location comes from a macro. |
-| `owned(loc, root)` | Gives the path of a location in `src` or in `include`, or `None`. |
+| `owned(loc, root, tops)` | Gives the path of a location in `src` or in `include`, or `None`. With `tops` at `None`, it gives the path of a location in any folder of the project. |
+| `held(path)` | Reads a file in parts of 64 MiB, and gives its bytes. One read of a larger file fails on Windows. |
 | `dumped(command, root)` | Runs the command `dump`, and gives the syntax tree, with the file of each location. |
 | `stood_in(artifact, mine)` | Writes a file of 1 zero byte for each file of `inputs`, and gives the flag `--embed-dir` of their folder, or no flag. |
-| `sources(config, values)` | Gives each file `.c` of `src` that an artifact of this target compiles, with its command `dump` and the set of its parts. |
-| `each(config, values, use)` | Gives the result of `use(root, path, tree)` and the sorted parts of the file, for each file of `sources`, 8 files at the same time. |
-| `copied(root, where)` | Empties `where`, and copies `src` and `include` into it. |
+| `sources(config, values, tests)` | Gives each file `.c` of `src` that an artifact of this target compiles, with its command `dump` and the set of its parts. With `tests`, it gives the test sources too: *The test sources*. |
+| `each(config, values, use, tests)` | Gives the result of `use(root, path, tree)` and the sorted parts of the file, for each file of `sources`, 8 files at the same time. |
+| `copied(root, where, more)` | Empties `where`, and copies `src` and `include` into it. It also copies the folder of each path of `more` that is not in them. |
 | `plain(kind)` | Gives a type of the syntax tree with each `typedef` replaced, if the dump gives it. The checks of `leaks.py` read it, for example to find a pointer. |
 | `spelled(text)` | Gives a type as the declaration spells it, with no nullability mark and no calling convention that *The rename* names. |
 | `declaration(node, typedefs)` | Gives the type of the result and the types of the parameters of the declaration of a function. A result whose type is a name of `typedefs` gets the type of that `typedef`. It also gives the types of the parameters as the declaration spells them, for `signed`. |

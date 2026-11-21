@@ -21,6 +21,8 @@ pub fn build(b: *std.Build) void {
                 run.addArg(value);
             } else if (std.mem.eql(u8, kind, "file")) {
                 run.addPrefixedFileArg(prefix, .{ .cwd_relative = value });
+            } else if (std.mem.eql(u8, kind, "input")) {
+                run.addFileInput(.{ .cwd_relative = value });
             } else if (std.mem.eql(u8, kind, "made")) {
                 run.addPrefixedFileArg(prefix, made.get(value).?);
             } else if (std.mem.eql(u8, kind, "folder")) {

@@ -7,12 +7,14 @@ import os
 import re
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 import build
 from shared import die, expanded
 
 TOPS = ('src/', 'include/')
+TESTED = ('program', 'library', 'archive')
 OPENS = ('if', 'ifdef', 'ifndef')
 DIRECTIVE = re.compile(rb'[ \t]*#[ \t]*(\w+)')
 POINTER = re.compile(r'(.+?)\(\s*\*\s*\)\s*\((.*)\)')
@@ -110,27 +112,43 @@ def is_macro(loc):
     return isinstance(loc, dict) and 'expansionLoc' in loc
 
 
-def owned(loc, root):
+def owned(loc, root, tops=TOPS):
     path = (loc.get('_file') or '').replace('\\', '/')
     whole = root.as_posix() + '/'
     if path.lower().startswith(whole.lower()):
         path = path[len(whole):]
     while path.startswith('./'):
         path = path[2:]
-    return path if path.startswith(TOPS) else None
+    return path if tops is None or path.startswith(tops) else None
+
+
+def held(path):
+    whole = bytearray()
+    with open(path, 'rb') as file:
+        for part in iter(lambda: file.read(1 << 26), b''):
+            whole += part
+    return whole
 
 
 def dumped(command, root):
-    done = subprocess.run(command, cwd=root, capture_output=True)
+    folder = (Path(root) / command[command.index('-o') + 1]).parent
+    folder.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(dir=folder, suffix='.tree', delete=False) as out:
+        done = subprocess.run(command, cwd=root, stdout=out, stderr=subprocess.PIPE)
+    tree = Path(out.name)
     errors = [line for line in done.stderr.decode('utf-8', 'replace').splitlines()
               if ' error: ' in line and not line.endswith('FileNotFound')]
-    if errors:
-        die('the tree of %s cannot be read:\n%s' % (command[-1], '\n'.join(errors)))
     try:
-        found = json.loads(done.stdout)
+        if errors:
+            die('the tree of %s cannot be read:\n%s' % (command[-1], '\n'.join(errors)))
+        found = json.loads(held(tree))
+        marked(found, [None])
     except ValueError:
         die('the tree of %s is not JSON' % command[-1])
-    marked(found, [None])
+    except MemoryError:
+        die('the tree of %s needs more memory than this machine has free' % command[-1])
+    finally:
+        tree.unlink(missing_ok=True)
     return found
 
 
@@ -143,7 +161,7 @@ def stood_in(artifact, mine):
     return ['--embed-dir=' + folder.as_posix()] if names else []
 
 
-def sources(config, values):
+def sources(config, values, tests=False):
     jobs = {}
     for artifact in build.artifacts(config):
         if 'target' in artifact:
@@ -151,27 +169,30 @@ def sources(config, values):
         _, mine = build.planned(config, values, artifact)
         Path(mine['work']).parent.mkdir(parents=True, exist_ok=True)
         mine['inputs'] = stood_in(artifact, mine)
+        tops = ('src/', 'tests/') if tests and artifact['kind'] in TESTED else ('src/',)
         for source in mine['sources']:
-            if source.startswith('src/') and source.endswith('.c') and source not in jobs:
+            if source.startswith(tops) and source.endswith('.c') and source not in jobs:
                 jobs[source] = expanded(config['rewrite']['dump'], dict(mine, source=source)), set()
             if source in jobs and 'part' in artifact:
                 jobs[source][1].add(artifact['part'])
     return jobs
 
 
-def each(config, values, use):
+def each(config, values, use, tests=False):
     root = Path(values['root'])
-    jobs = sources(config, values)
+    jobs = sources(config, values, tests)
     with concurrent.futures.ThreadPoolExecutor(min(8, os.cpu_count() or 1)) as pool:
         return list(pool.map(lambda job: (use(root, job[0], dumped(job[1][0], root)), sorted(job[1][1])),
                              jobs.items()))
 
 
-def copied(root, where):
+def copied(root, where, more=()):
     shutil.rmtree(where, ignore_errors=True)
     for top in ('src', 'include'):
         if (root / top).is_dir():
             shutil.copytree(root / top, where / top)
+    for folder in sorted({Path(path).parent.as_posix() for path in more if not path.startswith(TOPS)}):
+        shutil.copytree(root / folder, where / folder, dirs_exist_ok=True)
 
 
 def plain(kind):
@@ -220,7 +241,7 @@ def found(root, path, tree, names, callbacks=()):
             name = referenced.get('name') if referenced.get('kind') in ('FunctionDecl', 'VarDecl') else None
             if referenced.get('kind') == 'VarDecl' and name not in declared:
                 name = None
-            if name in names and owned(node.get('range', {}).get('begin', {}), root) == path:
+            if name in names and owned(node.get('range', {}).get('begin', {}), root, None) == path:
                 used.add(name)
         elif kind == 'TypedefDecl':
             typedefs.setdefault(name, plain(node.get('type', {})))
@@ -229,7 +250,7 @@ def found(root, path, tree, names, callbacks=()):
         elif kind == 'FunctionDecl' and name in names and not node.get('isImplicit'):
             declared.setdefault(name, declaration(node, typedefs))
             body = any(isinstance(one, dict) and one.get('kind') == 'CompoundStmt' for one in node.get('inner', []))
-            if body and owned(node.get('loc', {}), root) == path:
+            if body and owned(node.get('loc', {}), root, None) == path:
                 defined.add(name)
                 end = node.get('range', {}).get('end', {})
                 ends[name] = (end['expansionLoc'] if is_macro(end) else end).get('offset', 0)

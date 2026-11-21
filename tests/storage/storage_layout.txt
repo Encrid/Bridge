@@ -363,3 +363,4 @@ a field added, and the singleton made a table
   reload: refused
   -: the world has stopped: module 'st:store@0.1.0' could not be reloaded and its on_error is fail 0 0
 alive
+status 0

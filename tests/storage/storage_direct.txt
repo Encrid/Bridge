@@ -55,3 +55,4 @@ look_b
   look_b: the table walked: rows, and of them given D 0 0
   look_b: the table walked: the sum of A and D where both 0 0
 alive
+status 0

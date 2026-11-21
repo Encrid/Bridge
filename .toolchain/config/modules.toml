@@ -293,7 +293,7 @@ defines = ["BRIDGE_ROWS_CHECKED"]
 name = "share1"
 sources = ["tests/modules/share.c", "tests/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0"]
-variants = [{ name = "share2", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=1"] }, { name = "sharew", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "WRITER"] }, { name = "sharebad", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "TRAP"] }, { name = "sharehold0", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "HOLD"] }, { name = "sharehold1", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=1", "HOLD"] }, { name = "share1-said", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "SAY"] }]
+variants = [{ name = "share2", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=1"] }, { name = "sharew", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "WRITER"] }, { name = "sharebad", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "TRAP"] }, { name = "sharehold0", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "HOLD"] }, { name = "sharehold1", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=1", "HOLD"] }, { name = "share1-said", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "SAY"] }, { name = "sharebad-said", defines = ["BRIDGE_ROWS_CHECKED", "WIDE=0", "TRAP", "SAY"] }]
 
 [[modules]]
 name = "badterm"
@@ -474,6 +474,17 @@ variants = [{ name = "namer-reader", defines = ["BRIDGE_ROWS_CHECKED", "READER"]
 [[modules]]
 name = "spawner"
 sources = ["tests/modules/spawner.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED"]
+
+[[modules]]
+name = "lane1"
+sources = ["tests/modules/lane.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
+defines = ["BRIDGE_ROWS_CHECKED", "LANE=1u", "SEED=0u", "LANE_SPACE=\"lane1\""]
+variants = [{ name = "lane2", defines = ["BRIDGE_ROWS_CHECKED", "LANE=2u", "SEED=0u", "LANE_SPACE=\"lane2\""] }, { name = "lane3", defines = ["BRIDGE_ROWS_CHECKED", "LANE=3u", "SEED=0u", "LANE_SPACE=\"lane3\""] }, { name = "lane3-seeded", defines = ["BRIDGE_ROWS_CHECKED", "LANE=3u", "SEED=1u", "LANE_SPACE=\"lane3\""] }]
+
+[[modules]]
+name = "bits"
+sources = ["tests/modules/bits.c", "tests/modules/offsets_idle.c", "tests/binding/offsets_*.c"]
 defines = ["BRIDGE_ROWS_CHECKED"]
 
 [[modules]]

@@ -45,7 +45,7 @@ static bool keep_counted(const test_listener_t *l, const bridge_record_t *r)
         c->last_sum[l->which] = r->arg[0];
     if (l->which >= 0)
         return (true);
-    if (c->minting >= 0 && is_text(r, "ids")) {
+    if (c->minting >= 0 && (is_text(r, "ids") || is_text(r, "bit"))) {
         keep_ids(c, r);
         return (true);
     }

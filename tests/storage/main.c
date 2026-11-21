@@ -3,11 +3,10 @@
 **
 ** Under the GNU Affero General Public License, version 3 only: see license.
 */
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "storage_test.h"
+#include "rows.h"
 
 static const char *const PHASES[] = {
     "spawn", "attach_a", "attach_b", "detach_b", "destroy", "attach_b_half",
@@ -80,6 +79,10 @@ static const storage_test_case_t CASES[] = {
     { "nomemorythreads", storage_test_live, &OWN_FOUR_THREADS },
     { "nomemorygroup", storage_test_group_live, &OWN_BOTH_BACKENDS },
     { "shape", storage_test_look_at_shape, &BOTH_BACKENDS },
+    { "callsrows", storage_test_call_on_rows, &PLAIN },
+    { "callsids", storage_test_call_on_ids, &PLAIN },
+    { "callstables", storage_test_call_on_tables, &PLAIN },
+    { "callsdirect", storage_test_call_on_direct, &DIRECT },
     { "matrix", storage_test_make_large_matrix, &PLAIN },
     { "matrixsmall", storage_test_make_small_matrix, &PLAIN },
     { "widerecord", storage_test_drain_wide_record, &PLAIN },
@@ -208,15 +211,39 @@ static void make_bridge(storage_test_t *t, const storage_test_room_t *room)
         t->cfg.budget.columns = (uint64_t)atoi(t->more);
     if (!room->makes_world)
         t->w = bridge_create(&t->cfg, storage_test_hear, t);
-    setvbuf(stdout, nullptr, _IONBF, 0);
 }
 
-int main(int argc, char **argv)
+static int sweep_case(const char *what, const char *call)
+{
+    const storage_test_case_t *c = find_case(what);
+    storage_test_t t;
+    unsigned at = 0;
+
+    if (!c)
+        return (printf("FAIL: no case '%s'\n", what), 1);
+    do {
+        at++;
+        sweep_refuse(call, at);
+        t = (storage_test_t){ .what = what };
+        make_bridge(&t, c->room);
+        (void)c->run(&t);
+        (void)bridge_destroy(t.w);
+        if (sweep_is_refused())
+            printf("-- %s %u refused\n", call, at);
+    } while (sweep_is_refused());
+    sweep_refuse(call, 0);
+    printf("%u refused calls of %s\nalive\n", at - 1, call);
+    return (0);
+}
+
+static int run(int argc, char **argv)
 {
     storage_test_t t = { .what = argc > 1 ? argv[1] : "" };
     const storage_test_case_t *c = find_case(t.what);
     enum storage_test_end end;
 
+    if (argc > 3 && !strcmp(t.what, "sweep"))
+        return (sweep_case(argv[2], argv[3]));
     if (!c) {
         printf("FAIL: no case '%s'\n", t.what);
         return (1);
@@ -232,4 +259,10 @@ int main(int argc, char **argv)
     if (end != STORAGE_TEST_FAILED)
         printf("alive\n");
     return (end == STORAGE_TEST_FAILED);
+}
+
+int main(int argc, char **argv)
+{
+    setvbuf(stdout, nullptr, _IONBF, 0);
+    return (argc > 1 ? run(argc, argv) : rows_run(run));
 }

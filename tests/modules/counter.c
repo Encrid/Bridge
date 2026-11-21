@@ -80,6 +80,7 @@ BRIDGE_EXPORT(init) int init(void)
 {
     bridge_term_t terms[1] = {{ 0, BRIDGE_READ, BRIDGE_AND, 0 }};
 
+    handed = false;
     position = BRIDGE_COMPONENT("game:Position", position_t, BRIDGE_STRIP,
         BRIDGE_TABLE);
     roster = BRIDGE_COMPONENT("game:Roster", roster_t, BRIDGE_STRIP,

@@ -62,3 +62,4 @@ look
   look: by words: rows, and of them on 0 0
   look: by words: the sum of those on, and spans 0 0
 alive
+status 0

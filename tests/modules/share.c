@@ -81,6 +81,9 @@ BRIDGE_EXPORT(init) int init(void)
 BRIDGE_EXPORT(reload) int reload(void)
 {
 #ifdef TRAP
+#ifdef SAY
+    BRIDGE_LOG(BRIDGE_LOG_INFO, "the reload failed", WIDE, 0);
+#endif
     return (1);
 #else
     return (declare());

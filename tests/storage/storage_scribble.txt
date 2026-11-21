@@ -45,3 +45,4 @@ look
 find
   find: alive and found through the index with A, and named in a span 3 3
 alive
+status 0

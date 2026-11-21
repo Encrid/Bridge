@@ -72,7 +72,7 @@ def put(path, source):
 
 
 def moved(path, tree):
-    if tree and path.split('/', 1)[0] in ('src', 'include'):
+    if tree and (path.split('/', 1)[0] in ('src', 'include') or (Path(tree) / path).exists()):
         return (Path(tree) / path).as_posix()
     return path
 
@@ -217,7 +217,7 @@ def graphed(config, values, chosen, tree=None):
         args += [arg('made', makers[path]) if path in makers else arg('file', path.as_posix()) for path in ([] if missing else links)]
         args += [arg('folder', maker) for maker in inputs]
         inputs = [(root / source).as_posix() for source in mine['sources']] + expanded(mine.get('runtime', []), mine)
-        args += [arg('file', Path(root / item).as_posix()) for item in inputs]
+        args += [arg('input', Path(root / item).as_posix()) for item in inputs]
         args += [arg('text', 'unlinked' if missing else 'steps'), arg('output', Path(mine['output']).name)]
         step = {'name': 'a%d' % index, 'program': Path(sys.executable).as_posix(), 'cwd': root.as_posix(), 'args': args}
         if not missing:

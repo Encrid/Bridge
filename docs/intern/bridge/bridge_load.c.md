@@ -38,7 +38,7 @@ If there is no memory to keep track of the share, a record says so, and the reco
 
 A failure after the record leaves storage as it was before the load:
 
-1. Say that the module did not load. If its `on_error` is `fail`, stop the world.
+1. Give the lines that the module wrote to the sink of the host. Say that the module did not load. If its `on_error` is `fail`, stop the world.
 2. Take its systems and observers out first, because a query must not outlive a component that it names.
 3. Run its `shutdown`, if its `init` gave 0 and it has one.
 4. Release the ids set aside for it.
@@ -47,6 +47,7 @@ A failure after the record leaves storage as it was before the load:
 7. Discard the record, with the queue of what the module asked.
 8. Build the schedule again.
 
+Step 1 gives the lines only if the module has its private memory, because its log ring is in it.
 Step 3 runs before step 7 destroys the instance, so the module can undo what its `init` did.
 It comes after step 2, as at an unload, and before steps 4 and 5, since a `shutdown` can spawn and allocate.
 What `init` and `shutdown` queued is never applied, since only step 10 of a load puts the module in the list.
