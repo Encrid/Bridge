@@ -9,16 +9,10 @@
     #include <stddef.h>
     #include <stdint.h>
 
+    #include "bridge_export.h"
+
     #ifdef __cplusplus
 extern "C" {
-    #endif
-
-    #if defined(BRIDGE_BUILDING) && defined(_WIN32)
-        #define BRIDGE_API [[gnu::dllexport]]
-    #elif defined(BRIDGE_BUILDING)
-        #define BRIDGE_API [[gnu::visibility("default")]]
-    #else
-        #define BRIDGE_API
     #endif
 
 typedef struct bridge_world bridge_world_t;

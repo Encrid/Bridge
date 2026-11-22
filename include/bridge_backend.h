@@ -9,6 +9,8 @@
     #include <stddef.h>
     #include <stdint.h>
 
+    #include "bridge_export.h"
+
     #ifdef __cplusplus
 extern "C" {
     #endif
@@ -215,6 +217,10 @@ constexpr uint32_t BACKEND_ENTRY_COUNT = 19;
         X("call")
     #define BACKEND_ENTRY_TEXT(name) name,
 static_assert(sizeof(backend_api_t) == BACKEND_ENTRY_COUNT * sizeof(void *));
+
+BRIDGE_API [[nodiscard]] void *backend_open(const char *path,
+    backend_api_t *api, backend_err_t *err);
+BRIDGE_API void backend_close(void *lib);
 
     #ifdef __cplusplus
 }
