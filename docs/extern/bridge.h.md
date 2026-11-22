@@ -197,6 +197,12 @@ A host gives the number that it was built against in `abi`, the first field of `
 Each number of a seam of Bridge is 1 while its seam is not complete. Until then, a change of the seam keeps the 1.
 When a seam is complete, its number changes at each change of a struct or of a meaning of the seam.
 
+## BRIDGE_IDENTITY_MOST
+
+`BRIDGE_IDENTITY_MOST` is the most bytes of the identity of a module, with no end byte: 127.
+`bridge_load` and `bridge_reload` refuse a module with a longer identity: *A call refused*.
+Thus a host that reads an identity, for example from a manifest, can refuse it first with the same limit.
+
 ## Settings
 
 A setting is a key and a value of one of four kinds: a `bridge_setting_t`.
@@ -462,7 +468,7 @@ The host states each field: zero is unset, and a load refuses it. A count of an 
 
 | Field | Content |
 | --- | --- |
-| `identity` | The identity of the module: `namespace:name@version`, for example `tri:triangle@0.1.0`. It has one `:` and one `@`, in this order, and no empty part. At most 127 bytes. |
+| `identity` | The identity of the module: `namespace:name@version`, for example `tri:triangle@0.1.0`. It has one `:` and one `@`, in this order, and no empty part. At most `BRIDGE_IDENTITY_MOST` bytes. |
 | `abi` | The number of the module seam that the module was built against: `docs/extern/bridge_abi.h.md`, *BRIDGE_ABI*. |
 | `reloadable` | `BRIDGE_TRUE` if the author of the module states that a reload can replace it. |
 | `hot_reload` | `BRIDGE_TRUE` if the deployment lets `bridge_reload` replace the module. It cannot allow what `reloadable` forbids. |
