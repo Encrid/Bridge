@@ -1,12 +1,13 @@
 # include/bridge.h
 
-`include/bridge.h` is the only header that a host needs.
-It gives the 11 functions of the library, and the structs that a host gives to them and gets from them.
+`include/bridge.h` is the header that a host needs, with `include/bridge_export.h`, which it includes.
+It gives the 11 functions of the library for a host, and the structs that a host gives to them and gets from them.
 
 ## The library
 
 A host links the built library: the shared library or the static library.
-The shared library exports only the 11 functions of this header, and `BRIDGE_API` marks each of them.
+The shared library exports the 11 functions of this header and the 2 functions of `include/bridge_backend.h`: `docs/extern/bridge_backend.h.md`, *backend_open*.
+`BRIDGE_API` of `include/bridge_export.h` marks each of them.
 
 The shared library holds the os layer, mosl.
 A program that links the static library `bridge.a` also links `os.a`, from the release of mosl for its target.

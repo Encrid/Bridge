@@ -5,7 +5,7 @@
 */
 #include <stdio.h>
 
-#include "backend.h"
+#include "bridge_backend.h"
 #include "os.h"
 
 static const char *const ENTRY_NAMES[BACKEND_ENTRY_COUNT] = {
@@ -59,4 +59,9 @@ void *backend_open(const char *path, backend_api_t *api, backend_err_t *err)
     say_stopped(path, api, found, err);
     os_lib_close(lib);
     return (nullptr);
+}
+
+void backend_close(void *lib)
+{
+    os_lib_close(lib);
 }

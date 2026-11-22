@@ -1,7 +1,8 @@
 # include/bridge_backend.h
 
 `include/bridge_backend.h` is the backend seam: what Bridge asks of a backend, the library that runs modules.
-Only Bridge and a backend compile it.
+Only Bridge, a backend and the tests of a backend compile it.
+It also gives `backend_open` and `backend_close`, so that the test of a backend opens its library as Bridge does: *backend_open*.
 
 ## The library
 
@@ -35,6 +36,27 @@ The number is 1.
 `backend_get_abi` gives the number that the backend was built against.
 Bridge calls `backend_get_abi` first, and refuses a library that gives another number, before it asks for another entry.
 The number follows the rule of `docs/extern/bridge.h.md`, *BRIDGE_HOST_ABI*.
+
+## backend_open
+
+`backend_open(path, api, err)` opens the library of a backend at `path`, and fills `api` with its 19 entries, in the order of `BACKEND_ENTRY_NAMES`.
+`bridge_create` opens each backend of the deployment with it. The test of a backend calls it too, so its library meets the same checks.
+
+1. It opens the library. If the library does not open, it refuses it.
+2. It finds `backend_get_abi`, and calls it. If the number is not `BACKEND_ABI`, it refuses the library, and asks for no other entry.
+3. It finds each other entry by its name. If one is missing, it refuses the library.
+
+It gives the library, or null when it refuses. Then `err` holds why, the library is closed, and `api` is not whole.
+These are the texts of `err`:
+
+- `cannot open backend library '<path>'`
+- `backend library '<path>' has no entry '<entry>'`
+- `backend library '<path>' is of backend ABI <number>, and this is <number>`
+
+## backend_close
+
+`backend_close(lib)` closes a library that `backend_open` gave. After it, no entry of `api` can be called.
+`bridge_destroy` closes each backend with it, unless it keeps the library in the process: `docs/extern/bridge.h.md`, *bridge_destroy*.
 
 ## backend_err_t
 

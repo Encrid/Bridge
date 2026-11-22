@@ -8,7 +8,7 @@
 
     #include "bridge.h"
     #include "bridge_abi.h"
-    #include "backend.h"
+    #include "bridge_backend.h"
     #include "os.h"
     #include "pool.h"
     #include "region.h"
