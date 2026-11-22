@@ -36,7 +36,7 @@ static inline int mark_turn(module_t *m)
 static inline int queue_change(module_t *m, const change_t *ch,
     const void *value)
 {
-    uint32_t need = (uint32_t)sizeof(*ch) + ((ch->size + 7u) & ~7u);
+    uint32_t need = BRIDGE_CHANGE_BYTES(ch->size);
     uint8_t *at = m->queue + m->queue_len;
 
     if (!m->queue_room)

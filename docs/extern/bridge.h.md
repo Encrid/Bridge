@@ -1,12 +1,13 @@
 # include/bridge.h
 
-`include/bridge.h` is the only header that a host needs.
-It gives the 11 functions of the library, and the structs that a host gives to them and gets from them.
+`include/bridge.h` is the header that a host needs, with `include/bridge_export.h`, which it includes.
+It gives the 11 functions of the library for a host, and the structs that a host gives to them and gets from them.
 
 ## The library
 
 A host links the built library: the shared library or the static library.
-The shared library exports only the 11 functions of this header, and `BRIDGE_API` marks each of them.
+The shared library exports the 11 functions of this header and the 2 functions of `include/bridge_backend.h`: `docs/extern/bridge_backend.h.md`, *backend_open*.
+`BRIDGE_API` of `include/bridge_export.h` marks each of them.
 
 The shared library holds the os layer, mosl.
 A program that links the static library `bridge.a` also links `os.a`, from the release of mosl for its target.
@@ -196,6 +197,12 @@ A host gives the number that it was built against in `abi`, the first field of `
 
 Each number of a seam of Bridge is 1 while its seam is not complete. Until then, a change of the seam keeps the 1.
 When a seam is complete, its number changes at each change of a struct or of a meaning of the seam.
+
+## BRIDGE_IDENTITY_MOST
+
+`BRIDGE_IDENTITY_MOST` is the most bytes of the identity of a module, with no end byte: 127.
+`bridge_load` and `bridge_reload` refuse a module with a longer identity: *A call refused*.
+Thus a host that reads an identity, for example from a manifest, can refuse it first with the same limit.
 
 ## Settings
 
@@ -462,7 +469,7 @@ The host states each field: zero is unset, and a load refuses it. A count of an 
 
 | Field | Content |
 | --- | --- |
-| `identity` | The identity of the module: `namespace:name@version`, for example `tri:triangle@0.1.0`. It has one `:` and one `@`, in this order, and no empty part. At most 127 bytes. |
+| `identity` | The identity of the module: `namespace:name@version`, for example `tri:triangle@0.1.0`. It has one `:` and one `@`, in this order, and no empty part. At most `BRIDGE_IDENTITY_MOST` bytes. |
 | `abi` | The number of the module seam that the module was built against: `docs/extern/bridge_abi.h.md`, *BRIDGE_ABI*. |
 | `reloadable` | `BRIDGE_TRUE` if the author of the module states that a reload can replace it. |
 | `hot_reload` | `BRIDGE_TRUE` if the deployment lets `bridge_reload` replace the module. It cannot allow what `reloadable` forbids. |
@@ -572,7 +579,7 @@ Thus what a module gets does not depend on the modules that ran beside it.
 
 - `spawns`: Bridge sets these ids aside at each barrier. They are entities with no component, and they count against `entities`.
 - `persistent`: the share must fit in one piece of what is left of the arena. A reload can state more, but not less.
-- `changes`: each `attach`, `detach` and `destroy` takes 24 bytes, and an attach also takes its value, rounded up to 8 bytes. `changes_left` of the header tells how many bytes are left: `docs/extern/bridge_abi.h.md`, *bridge_header_t*.
+- `changes`: each `attach`, `detach` and `destroy` takes 24 bytes, and an attach also takes its value, rounded up to 8 bytes. `BRIDGE_CHANGE_BYTES` gives these bytes, and `changes_left` of the header tells how many bytes are left: `docs/extern/bridge_abi.h.md`, *bridge_header_t*.
 
 At an unload, the share of the module goes back to the arena, unless a row that stays holds a string in it.
 A string that a component keeps stays good for as long as its row stays.
@@ -760,7 +767,7 @@ Else the sink gets a record that tells why: *The deployment*.
 | --- | --- |
 | `w` | The world, or null. |
 
-1. Bridge calls `shutdown` of each loaded module, in the order that the modules loaded, each under its `shutdown_timeout`.
+1. Bridge calls `shutdown` of each loaded module, each under its `shutdown_timeout`.
 2. A `shutdown` that fails is a record, and the destruction continues.
 3. Bridge destroys the modules, the storage, the threads and the backends.
 4. Bridge closes the library of each backend. It first pins a library whose backend does not state `BACKEND_UNLOAD`. That library stays, and the next world uses it.

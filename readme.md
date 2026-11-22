@@ -60,7 +60,8 @@ src/            Bridge library: the orchestrator a host links
   config/       writes a module's config settings into its settings component
   say/          formats records and calls the host sink
 include/        the seams: bridge.h (host), bridge_backend.h (backend),
-                bridge_abi.h + bridge_schema.h (module)
+                bridge_abi.h + bridge_schema.h (module),
+                bridge_export.h (the export mark of bridge.h and bridge_backend.h)
 ```
 
 ## Contributing

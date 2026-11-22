@@ -3,7 +3,7 @@
 This header gives the inside of the library: what a world, a module, a system and a declared type are.
 Nothing here crosses a seam.
 
-The header includes `include/bridge.h`, `include/bridge_abi.h`, `src/backend/backend.h`, `os.h` of mosl, `src/pool/pool.h`, `src/region/region.h`, `src/schema/schema.h` and `src/storage/storage.h` first.
+The header includes `include/bridge.h`, `include/bridge_abi.h`, `include/bridge_backend.h`, `os.h` of mosl, `src/pool/pool.h`, `src/region/region.h`, `src/schema/schema.h` and `src/storage/storage.h` first.
 After its types, it includes the headers that use them: `src/say/say.h`, `src/schedule/schedule.h`, `src/bridge/bridge_inside.h`, `src/block/block.h` and `src/abi/abi.h`.
 
 ## Nothing is allocated in a phase
@@ -189,7 +189,8 @@ At unload, the ranges go back to the arena if nothing that stays points into the
 
 `change_t` is one change in the queue of a module: `id`, the component `c`, the `size` of the value, and the operation `op`.
 `size` bytes of value follow it, padded to a multiple of eight.
-A change is 24 bytes.
+A change is `BRIDGE_CHANGE_HEAD` bytes of `include/bridge_abi.h`, 24, and a `static_assert` checks it.
+`BRIDGE_CHANGE_BYTES` gives the bytes of a change with its value, and each step of the queue uses it.
 The fold of a barrier can write `CHANGE_SKIPPED` into `op`: `docs/intern/storage/storage_change.h.md`, *The fold*.
 
 ### A matrix of reach
@@ -279,7 +280,7 @@ So a range given back never asks for memory.
 | `CHANGE_SKIPPED` | 4: a queued attach or destroy of a husk, which the fold did not apply. The barrier writes no value of it. |
 | `TURN_LIFECYCLE` | `1 << 32`: the turns of the lifecycle calls. |
 | `TURN_SYSTEM` | `2 << 32`: the turns of the systems of a phase. |
-| `NAME_MOST` | 127: the longest name, in bytes, that a declared type, a system or an observer can have, and the longest identity of a module. |
+| `NAME_MOST` | 127: the longest name, in bytes, that a declared type, a system or an observer can have. The longest identity of a module is `BRIDGE_IDENTITY_MOST` of `include/bridge.h`. |
 
 A turn orders all the calls that ran before a barrier.
 The observers of the last barrier come first, then the lifecycle calls, then the systems of the phase, each in the order it ran.

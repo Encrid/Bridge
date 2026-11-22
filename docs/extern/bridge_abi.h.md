@@ -130,6 +130,11 @@ Bridge writes `changes_left` when the instance starts, after each change that th
 A module can read it before an `attach`, a `detach` or a `destroy`.
 Thus the module can wait for the next barrier to make a change that does not fit, and its invocation does not fail.
 
+`BRIDGE_CHANGE_HEAD` is the bytes that each change takes of `changes_left`: 24.
+`BRIDGE_CHANGE_BYTES(n)` is the bytes of a change with a value of `n` bytes: `BRIDGE_CHANGE_HEAD`, and `n` rounded up to a multiple of 8.
+A `detach` and a `destroy` take `BRIDGE_CHANGE_BYTES(0)`. An `attach` takes `BRIDGE_CHANGE_BYTES` of the size of its value.
+A change fits while its bytes are at most `changes_left`.
+
 The capability table is `column_base`, `kept`, `stride`, `write` and `kind` in the private memory, and `rows` and `blocks` in the shared memory.
 A module names a cell by a coordinate: a slot, a location, and an offset in the cell.
 The location is a table and a row, or an entity id, or nothing for a singleton.

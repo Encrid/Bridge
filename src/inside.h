@@ -8,7 +8,7 @@
 
     #include "bridge.h"
     #include "bridge_abi.h"
-    #include "backend.h"
+    #include "bridge_backend.h"
     #include "os.h"
     #include "pool.h"
     #include "region.h"
@@ -226,6 +226,7 @@ typedef struct {
     uint32_t size;
     enum change_op op;
 } change_t;
+static_assert(sizeof(change_t) == BRIDGE_CHANGE_HEAD);
 
 constexpr uint64_t TURN_LIFECYCLE = 1ull << 32;
 constexpr uint64_t TURN_SYSTEM = 2ull << 32;

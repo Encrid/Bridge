@@ -42,6 +42,32 @@ void test_open_other_seam(host_t *h)
     host_open_only(h);
 }
 
+static const char *pick_library(const char *arg)
+{
+    if (!strcmp(arg, "other"))
+        return (BRIDGE_PLAIN_OTHER_PATH);
+    if (!strcmp(arg, "hollow"))
+        return (BRIDGE_HOLLOW_PATH);
+    if (!strcmp(arg, "none"))
+        return ("no-such-backend-library");
+    return (BRIDGE_TESTS_PATH);
+}
+
+void test_open_backend_alone(host_t *h)
+{
+    backend_api_t api = {};
+    backend_err_t err = {};
+    void *lib = backend_open(pick_library(h->arg), &api, &err);
+
+    if (!lib) {
+        printf("backend_open: refused: %s\n", err.text);
+        return;
+    }
+    printf("backend_open: opened, backend ABI %u, %s\n",
+        api.backend_get_abi(), api.call ? "each entry" : "an entry missing");
+    backend_close(lib);
+}
+
 void test_state_unknown_setting(host_t *h)
 {
     bridge_setting_t setting = { .key = h->arg, .kind = BRIDGE_STRING,

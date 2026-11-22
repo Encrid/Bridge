@@ -86,7 +86,7 @@ static inline void skip_change(module_t *m, uint32_t at)
         memcpy(&ch, m->queue + at, sizeof(ch));
         if (fold_change(r, m, &ch) == FOLD_HUSK)
             skip_change(m, at);
-        at += (uint32_t)sizeof(ch) + ((ch.size + 7u) & ~7u);
+        at += BRIDGE_CHANGE_BYTES(ch.size);
     }
 }
 

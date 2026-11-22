@@ -207,6 +207,7 @@ void test_state_library(host_t *h);
 void test_refuse_entry(host_t *h);
 void test_leave_libraries(host_t *h);
 void test_open_other_seam(host_t *h);
+void test_open_backend_alone(host_t *h);
 void test_state_unknown_setting(host_t *h);
 void test_order(host_t *h);
 void test_order_pair_and_before(host_t *h);
