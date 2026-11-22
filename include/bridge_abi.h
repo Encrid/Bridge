@@ -231,6 +231,10 @@ static_assert(offsetof(bridge_header_t, arena_lo) == 108);
 static_assert(offsetof(bridge_header_t, arena_hi) == 112);
 static_assert(offsetof(bridge_header_t, changes_left) == 116);
 
+constexpr uint32_t BRIDGE_CHANGE_HEAD = 24;
+    #define BRIDGE_CHANGE_BYTES(n) \
+        (BRIDGE_CHANGE_HEAD + (((uint32_t)(n) + 7u) & ~7u))
+
 typedef struct {
     uint32_t spans;
     uint32_t at;

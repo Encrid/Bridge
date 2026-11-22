@@ -36,7 +36,7 @@ TEST(stamp)
     uint32_t start = get_left(api);
     uint32_t made = 0;
 
-    while (get_left(api) >= 32) {
+    while (get_left(api) >= BRIDGE_CHANGE_BYTES(sizeof(marked_t))) {
         TEST_ATTACH(api, who[0], marked, m);
         made++;
     }

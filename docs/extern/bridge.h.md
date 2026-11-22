@@ -578,7 +578,7 @@ Thus what a module gets does not depend on the modules that ran beside it.
 
 - `spawns`: Bridge sets these ids aside at each barrier. They are entities with no component, and they count against `entities`.
 - `persistent`: the share must fit in one piece of what is left of the arena. A reload can state more, but not less.
-- `changes`: each `attach`, `detach` and `destroy` takes 24 bytes, and an attach also takes its value, rounded up to 8 bytes. `changes_left` of the header tells how many bytes are left: `docs/extern/bridge_abi.h.md`, *bridge_header_t*.
+- `changes`: each `attach`, `detach` and `destroy` takes 24 bytes, and an attach also takes its value, rounded up to 8 bytes. `BRIDGE_CHANGE_BYTES` gives these bytes, and `changes_left` of the header tells how many bytes are left: `docs/extern/bridge_abi.h.md`, *bridge_header_t*.
 
 At an unload, the share of the module goes back to the arena, unless a row that stays holds a string in it.
 A string that a component keeps stays good for as long as its row stays.

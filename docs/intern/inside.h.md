@@ -189,7 +189,8 @@ At unload, the ranges go back to the arena if nothing that stays points into the
 
 `change_t` is one change in the queue of a module: `id`, the component `c`, the `size` of the value, and the operation `op`.
 `size` bytes of value follow it, padded to a multiple of eight.
-A change is 24 bytes.
+A change is `BRIDGE_CHANGE_HEAD` bytes of `include/bridge_abi.h`, 24, and a `static_assert` checks it.
+`BRIDGE_CHANGE_BYTES` gives the bytes of a change with its value, and each step of the queue uses it.
 The fold of a barrier can write `CHANGE_SKIPPED` into `op`: `docs/intern/storage/storage_change.h.md`, *The fold*.
 
 ### A matrix of reach
