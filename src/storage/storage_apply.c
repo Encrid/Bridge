@@ -37,7 +37,7 @@ static void write_all(storage_t *r)
         while (at < end) {
             memcpy(&ch, m->queue + at, sizeof(ch));
             write_value(r, m, &ch, m->queue + at + sizeof(ch));
-            at += (uint32_t)sizeof(ch) + ((ch.size + 7u) & ~7u);
+            at += BRIDGE_CHANGE_BYTES(ch.size);
         }
         m = take_next_run(r, &at, &end);
     }

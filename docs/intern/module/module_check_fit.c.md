@@ -15,7 +15,7 @@ It also states what the shared block sets aside for it alone, so that what it ma
 | `changes` | The bytes of `attach`, `detach` and `destroy` that it may queue between two barriers. |
 
 A barrier sets aside the ids of `spawns`, and they count against `[budget] entities`: `docs/intern/block/block_module.c.md`, *The ids set aside*.
-A change takes 24 bytes in the queue, and an attach takes its value too, to a multiple of 8.
+A change takes 24 bytes in the queue, and an attach takes its value too, to a multiple of 8: `BRIDGE_CHANGE_BYTES` of `include/bridge_abi.h`.
 A module that spawns nothing, keeps no string or queues no change states `BRIDGE_NONE` for that key.
 
 This file refuses these amounts:

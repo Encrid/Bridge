@@ -13,7 +13,7 @@ An offset that a module hands over must lie in the scratch arena: `docs/intern/b
 ## The queue
 
 The queue of a module is as long as the module stated in `changes`, and it is made when the module loads.
-A change on the queue is a `change_t` of 24 bytes, then its value, padded to a multiple of eight bytes.
+A change on the queue is a `change_t` of 24 bytes, then its value, padded to a multiple of eight bytes. `BRIDGE_CHANGE_BYTES` gives that size.
 The value is copied at the call, since the scratch arena that holds it is reset before the barrier applies the change.
 `queue_change` asks for no memory: `docs/intern/inside.h.md`, *Nothing is allocated in a phase*.
 
