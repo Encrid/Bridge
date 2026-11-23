@@ -3,7 +3,7 @@
 # Under the GNU Affero General Public License, version 3 only: see license.
 import re
 
-from shared import arguments, config, ours, project_name, report
+from shared import arguments, config, ours, report
 
 ORDER = {'Table of Contents': 0, 'Security': 1, 'Background': 2, 'Install': 3, 'Usage': 4, 'API': 6, 'Maintainer': 7,
          'Maintainers': 7, 'Thanks': 8, 'Credits': 8, 'Acknowledgements': 8, 'Contributing': 9, 'License': 10}
@@ -75,7 +75,7 @@ def faults(lines, limits, tags):
 
 
 def readme(lines, name, most, needed):
-    found = [] if lines[0] == '# ' + name else [(1, 'the title is not # ' + name)]
+    found = [] if not name or lines[0] == '# ' + name else [(1, 'the title is not # ' + name)]
     rest = [(n, line) for n, line in enumerate(lines[1:], 2) if line.strip()]
     if not rest or rest[0][1].startswith('#'):
         found.append((1, 'no description after the title'))
@@ -100,16 +100,18 @@ def main():
     parts = {'docs/usage/%s.md' % part['folder']: part['name'] for part in settings.get('parts', {}).values()
              if 'folder' in part and 'name' in part}
     tags = settings['prose']['tags'] + settings.get('check', {}).get('tags', [])
+    name = settings.get('project', {}).get('name')
     found = []
     for path, lines in read:
         found += [(path, n, what) for n, what in faults(lines, settings['prose'], tags)]
         if path == 'readme.md':
-            found += [(path, n, what) for n, what in readme(lines, project_name(settings),
-                                                           settings['prose']['description'], NEEDED)]
+            found += [(path, n, what) for n, what in readme(lines, name, settings['prose']['description'], NEEDED)]
         if path in parts:
             found += [(path, n, what) for n, what in readme(lines, parts[path], settings['prose']['description'],
                                                            PART_NEEDED)]
-    report(['%s:%d: %s' % fault for fault in sorted(found)], len(read))
+    unnamed = [] if name or 'readme.md' not in dict(read) else [
+        '.toolchain/project.toml: write the name of the project in [project] name']
+    report(unnamed + ['%s:%d: %s' % fault for fault in sorted(found)], len(read))
 
 
 if __name__ == '__main__':

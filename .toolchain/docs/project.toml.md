@@ -67,6 +67,7 @@ They also stop if a list variable is a part of a text, and has no separator.
 | `targets` | The targets of the project: a list of names of `[targets]` of `.toolchain/toolchain.toml`, for example `["x86_64-windows-gnu", "x86_64-linux-gnu"]`. A target that the project adds is named in the list too. |
 
 If `name` is empty, the tools that need it stop: `.toolchain/project.toml: write the name of the project in [project] name`.
+`prose.py` writes the same line as a fault, and still reads each document.
 
 The tools see only the targets of `targets`. Thus a build, a fetch, the matrices of the workflows and the zips of a release have only these targets.
 A port to one more target is one more name in `targets`, and one more row in each matrix: `.toolchain/docs/workflows.py.md`, *The check*.

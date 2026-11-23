@@ -10,11 +10,26 @@ import build
 import fetch
 from shared import arguments, config, die, files, header, located, ours, report
 
+DEFINED = {ast.FunctionDef: 'function', ast.AsyncFunctionDef: 'function', ast.ClassDef: 'class'}
 QUOTED = re.compile(r'"""[\s\S]*?"""|\'\'\'[\s\S]*?\'\'\'|"(?:\\.|[^"\\\n])*"|\'[^\'\n]*\'|#')
 
 
 def notice():
     return re.compile(header('#'))
+
+
+def again(tree):
+    found = []
+    for node in ast.walk(tree):
+        for body in (getattr(node, field, None) for field in ('body', 'orelse', 'finalbody')):
+            first = {}
+            for child in body if isinstance(body, list) else []:
+                if type(child) in DEFINED and child.name in first:
+                    found.append((child.lineno, 'the %s %s is defined again, first at line %d'
+                                  % (DEFINED[type(child)], child.name, first[child.name])))
+                if type(child) in DEFINED:
+                    first.setdefault(child.name, child.lineno)
+    return found
 
 
 def python(text, notice):
@@ -23,9 +38,10 @@ def python(text, notice):
     found = [] if start else [(1, 'the file does not start with the legal notice')]
     found += [(token.start[0], 'a comment') for token in tokenize.generate_tokens(io.StringIO(text).readline)
               if token.type == tokenize.COMMENT and token.start[0] > last]
-    return found + [(node.lineno, 'a string statement') for node in ast.walk(ast.parse(text))
-                    if isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant)
-                    and isinstance(node.value.value, str)]
+    tree = ast.parse(text)
+    return found + again(tree) + [(node.lineno, 'a string statement') for node in ast.walk(tree)
+                                  if isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant)
+                                  and isinstance(node.value.value, str)]
 
 
 def faults(path, data, notice, unicode):

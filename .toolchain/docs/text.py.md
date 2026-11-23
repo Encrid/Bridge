@@ -10,7 +10,8 @@ It reads the line ends of Windows and of Linux.
 | Function | Result |
 | --- | --- |
 | `notice()` | Gives the pattern of the legal notice of a Python file, from `shared.header`. |
-| `python(text, notice)` | Gives the faults of a Python file: its notice, its comments and its string statements. |
+| `again(tree)` | Gives a fault for each function or class that a body of `tree` defines again. |
+| `python(text, notice)` | Gives the faults of a Python file: its notice, its comments, its string statements, and the faults of `again`. |
 | `faults(path, data, notice, unicode)` | Gives the faults of one file. `unicode` is true if the file can hold characters that are not ASCII. |
 | `retired(text, words)` | Gives a fault for each retired word of `words` in `text`. |
 | `refused(args, settings)` | Gives each name of the files of `[check] refuse`, with the file as the configuration writes it. |
@@ -50,6 +51,16 @@ The messages are:
 - `<path>:1: the file does not start with the legal notice`
 - `<path>:<line>: a comment`
 - `<path>:<line>: a string statement`
+
+A body of a Python file defines each function and each class at most 1 time.
+A body is the module, or the body of a class or of a function.
+Each branch of a statement is a body too, for example the `else` of an `if`.
+Thus a file can define a function in each branch of an `if`, for example 1 for each system.
+A second definition hides the first, so a call can run code that its author did not read.
+`<line>` is the line of the second definition, and `<first>` is the line of the first:
+
+- `<path>:<line>: the function <name> is defined again, first at line <first>`
+- `<path>:<line>: the class <name> is defined again, first at line <first>`
 
 ## The TOML and YAML files
 
