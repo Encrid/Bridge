@@ -57,7 +57,7 @@ The message is `<path>:<line>: the tag '<tag>' is not one of <tags>`. `<tags>` i
 Standard Readme is a specification of the readme of a project: https://github.com/RichardLitt/standard-readme.
 `readme` checks these rules of Standard Readme:
 
-1. The first line is `# <name>`. `<name>` comes from `shared.project_name`.
+1. The first line is `# <name>`. `<name>` is `[project] name` of `.toolchain/project.toml`.
 2. The description is the first line with text after the title. It is not a heading.
 3. The description has at most `[prose] description` characters.
 4. The sections follow the order of Standard Readme. A section starts with `##`.
@@ -66,6 +66,9 @@ Standard Readme is a specification of the readme of a project: https://github.co
 The readme of a part, `docs/usage/<folder>.md`, follows the same rules, with 2 changes.
 Its title is `# <name>` with the `name` of the part. It needs only the sections Install and Usage.
 Its messages start with its path in place of `readme.md`.
+
+If `[project] name` is empty and the project has `readme.md`, `prose.py` writes the line of an empty name of `.toolchain/docs/project.toml.md` as a fault.
+It skips rule 1, since no title can match, and checks the other rules and each document.
 
 The order is Table of Contents, Security, Background, Install, Usage, the extra sections, API, Maintainers, Thanks, Contributing and License.
 A section can also have the title Maintainer, Credits or Acknowledgements, as Standard Readme allows.
