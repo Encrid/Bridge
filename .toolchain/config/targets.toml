@@ -2,41 +2,41 @@
 system_defines = []
 system_libraries = []
 host_resources = ["tests/seam/seam.rc"]
-bridge_os_sha256 = "fe89b1dc13813417c1f11827163287d292cbe0658c0eeeece275e02bebc3506f"
+bridge_os_sha256 = "3f32ce6246cfa32385a6bddae5b12f52732a978f02f44b190560677d3d480149"
 aligned = ["-falign-functions=64", "-falign-loops=64"]
 
 [targets.x86_64-linux-gnu]
 system_defines = []
 system_libraries = ["-lm", "-lpthread", "-ldl"]
 host_resources = []
-bridge_os_sha256 = "040d8e2ff61aa742de13cded0e1fdb9506d152b310c467e83ea4c922229db441"
+bridge_os_sha256 = "554a7e34df7f8d7c4fd3850a535a63eda8ae89522f191df8f5239a1f53f6e9aa"
 aligned = ["-falign-functions=64", "-falign-loops=64"]
 
 [targets.aarch64-macos]
 system_defines = ["-D_DARWIN_C_SOURCE"]
 system_libraries = []
 host_resources = []
-bridge_os_sha256 = "17fc2b42748bbb94e7a73a808965374008a83472a4bc930d45093d54d2242393"
+bridge_os_sha256 = "b79fad98572bb661c4368ae8fe004e8f7f25a1b54d9bbcee865a831a5096b974"
 aligned = ["-falign-functions=64", "-falign-loops=64"]
 
 [targets.aarch64-linux-gnu]
 system_defines = []
 system_libraries = ["-lm", "-lpthread", "-ldl"]
 host_resources = []
-bridge_os_sha256 = "867f3e8bb2311559cc410f8ecf78a07701704709419dfeb1888d620e4319773e"
+bridge_os_sha256 = "84689c241634d4098b4bacf578b8190d081c841338eb3eac213da6159a78ff09"
 aligned = ["-falign-functions=64", "-falign-loops=64"]
 
 [targets.x86_64-macos]
 system_defines = ["-D_DARWIN_C_SOURCE"]
 system_libraries = []
 host_resources = []
-bridge_os_sha256 = "6ee6ce000bb0bd7ce9b4ac65259694236a978c82cdc74d41949950ee938f37fa"
+bridge_os_sha256 = "e13f074a4cbe6e30817ff0bc6583fab6daf0126d1a8d088374fa17258db36b86"
 aligned = ["-falign-functions=64", "-falign-loops=64"]
 
 [targets.aarch64-windows-gnu]
 system_defines = []
 system_libraries = []
 host_resources = ["tests/seam/seam.rc"]
-bridge_os_sha256 = "9375de9f9fc939ed7a9bb6fbe4369e1f8b0efa889675de917abdb4ce034df4fa"
+bridge_os_sha256 = "3cf790d8109715ce7634aa6c539a9e0e6e6a3c7ada958646d385ab852853019b"
 aligned = ["-falign-functions=64"]
 
