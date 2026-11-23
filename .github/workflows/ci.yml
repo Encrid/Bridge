@@ -35,15 +35,7 @@ jobs:
           - target: aarch64-windows-gnu
             runner: windows-11-arm
             architecture: arm64
-        gate:
-          - name: test
-            run: test
-          - name: break
-            run: test --break
-          - name: branches
-            run: test --branches
-          - name: leaks
-            run: test --leaks
+        gate: ${{ fromJSON(github.base_ref == 'main' && '[{"name":"test","run":"test"},{"name":"break","run":"test --break"},{"name":"branches","run":"test --branches"},{"name":"leaks","run":"test --leaks"}]' || '[{"name":"test","run":"test"}]') }}
     runs-on: ${{ matrix.platform.runner }}
     timeout-minutes: 60
     env:

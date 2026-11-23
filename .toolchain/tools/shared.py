@@ -8,17 +8,19 @@ import platform
 import re
 import subprocess
 import sys
+import threading
 import tomllib
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parents[2]
+WAIT = 0.2
 NAME = re.compile(r'\{([a-z_][a-z0-9_]*)(?::([^{}]*))?\}')
 KEYS = {'step': {'run', 'cwd', 'section', 'text', 'contains', 'copy', 'rename'},
-        'case': {'name', 'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders', 'fail', 'claims', 'false', 'alone',
-                 'ignore', 'rows', 'sweep', 'process'},
+        'case': {'name', 'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders', 'fail', 'fail_parts', 'hold', 'claims', 'false', 'alone',
+                 'ignore', 'rows', 'sweep', 'process', 'systems'},
         'row': {'name', 'in', 'claims', 'false'},
         'claim of a row': {'line', 'has', 'lacks', 'matches', 'matches_not', 'order', 'output'},
-        'false': {'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders', 'fail', 'ignore'},
+        'false': {'run', 'env', 'stdin', 'script', 'helper', 'files', 'folders', 'fail', 'fail_parts', 'hold', 'ignore'},
         'helper': {'run', 'wait', 'stdin', 'claims'},
         'script': {'wait', 'put', 'remove', 'type', 'close', 'signal', 'pause'},
         'claims': {'status', 'status_not', 'line', 'has', 'lacks', 'matches', 'matches_not', 'order', 'output', 'files'},
@@ -197,8 +199,68 @@ def variables(config, args, target, zig):
     jobs = str(values['jobs'])
     if not jobs.isdigit() or int(jobs) < 1:
         die('[variables] jobs is %s, and it must be a whole number above 0' % jobs)
-    values['jobs'] = min(int(jobs), os.cpu_count() or 1)
+    values['jobs'] = jobs_of(config, int(jobs))
     return values
+
+
+def jobs_of(config, most):
+    each = config.get('build', {}).get('job_memory', 3 << 29)
+    if not (isinstance(each, int) and not isinstance(each, bool) and each > 0):
+        die('[build] job_memory is a count of bytes above 0')
+    free = free_memory()
+    return max(1, min(most, os.cpu_count() or 1, most if free is None else free // each))
+
+
+def free_memory():
+    said = os.environ.get('C23_FREE_MEMORY')
+    if said is not None:
+        return int(said) if said.isdigit() else die('C23_FREE_MEMORY is %s, and it must be a count of bytes' % said)
+    if os.name == 'nt':
+        import ctypes
+
+        class Status(ctypes.Structure):
+            _fields_ = [('length', ctypes.c_ulong), ('load', ctypes.c_ulong)] + [
+                (name, ctypes.c_ulonglong) for name in ('phys', 'free_phys', 'commit', 'free_commit', 'virtual',
+                                                        'free_virtual', 'free_extended')]
+        status = Status(length=ctypes.sizeof(Status))
+        if not ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(status)):
+            return None
+        return min(status.free_phys, status.free_commit)
+    if platform.system() == 'Darwin':
+        try:
+            said = subprocess.run(['vm_stat'], capture_output=True, text=True, check=True).stdout
+            size = int(re.search(r'page size of (\d+)', said).group(1))
+        except (OSError, subprocess.CalledProcessError, AttributeError):
+            return None
+        return size * sum(int(n) for n in re.findall(r'Pages (?:free|inactive|speculative|purgeable):\s+(\d+)', said))
+    try:
+        with open('/proc/meminfo', encoding='ascii') as info:
+            return next(int(line.split()[1]) * 1024 for line in info if line.startswith('MemAvailable:'))
+    except (OSError, StopIteration, ValueError):
+        return None
+
+
+def floor_of(config):
+    floor = config['test'].get('memory_floor', 2 << 30)
+    if not (isinstance(floor, int) and not isinstance(floor, bool) and floor >= 0):
+        die('[test] memory_floor is a count of bytes, 0 or more')
+    return floor
+
+
+class Room:
+    def __init__(self, floor):
+        self.floor, self.busy, self.gate = floor, 0, threading.Condition()
+
+    def __enter__(self):
+        with self.gate:
+            while self.floor and self.busy and (free_memory() or self.floor) < self.floor:
+                self.gate.wait(WAIT)
+            self.busy += 1
+
+    def __exit__(self, *_):
+        with self.gate:
+            self.busy -= 1
+            self.gate.notify_all()
 
 
 def arguments(*valued, **flags):
@@ -248,6 +310,14 @@ def document(path):
 def repository(root):
     top = subprocess.run(['git', '-C', str(root), 'rev-parse', '--show-toplevel'], capture_output=True, text=True)
     return not top.returncode and Path(top.stdout.strip()).resolve() == Path(root).resolve()
+
+
+def base(root, branch):
+    for name in ('origin/' + branch, branch):
+        done = subprocess.run(['git', '-C', str(root), 'merge-base', 'HEAD', name], capture_output=True, text=True)
+        if not done.returncode:
+            return done.stdout.strip()
+    return None
 
 
 def ours(root, tests=False):

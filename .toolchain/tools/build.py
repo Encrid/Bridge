@@ -163,7 +163,8 @@ def specified(config, values, artifact, tree=None):
     spec = Path(mine['work'] + '.json')
     spec.parent.mkdir(parents=True, exist_ok=True)
     Path(mine['output']).parent.mkdir(parents=True, exist_ok=True)
-    text = json.dumps({'kind': kind, 'kind_name': artifact['kind'], 'values': mine, 'unset': shared.UNSET,
+    stated = {name: value for name, value in mine.items() if name != 'jobs'}
+    text = json.dumps({'kind': kind, 'kind_name': artifact['kind'], 'values': stated, 'unset': shared.UNSET,
                        'unstamped': artifact.get('unstamped', False), 'inputs': len(read(artifact, mine))},
                       sort_keys=True)
     if not spec.is_file() or spec.read_text(encoding='utf-8') != text:

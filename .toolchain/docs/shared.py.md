@@ -39,11 +39,16 @@ A tool that reads the output of a tool reads it as UTF-8.
 | `macos_sdk()` | Gives the path of the SDK of macOS and no reason, or no path and the reason, as the section *Variables* tells. |
 | `sha256(data)` | Gives the SHA-256 digest of the bytes, in hexadecimal. |
 | `variables(config, args, target, zig)` | Gives the variables of a build, as the section *Variables* tells. |
+| `jobs_of(config, most)` | Gives the jobs of a run, as `.toolchain/docs/toolchain.toml.md` tells in its section on the jobs. |
+| `free_memory()` | Gives the bytes of memory that the machine can still give, as *The free memory* tells. |
+| `floor_of(config)` | Gives `[test] memory_floor`, or 2 GiB. It stops if the value is not a count of bytes: `[test] memory_floor is a count of bytes, 0 or more`. |
+| `Room(floor)` | Lets a job start only when the free memory is at least the floor, or when no other job of the room runs. |
 | `arguments(*valued, **flags)` | Reads the options of the command line. Each item of `valued` adds an option that has a value. An item can be a pair of the option and the type of its value, for example `('--copies', int)`. Each item of `flags` adds an option that has no value. |
 | `header(mark)` | Gives a pattern for the lines of `.toolchain/header.txt`, each one after `mark`, as the section *The legal notice* tells. |
 | `project_name(config)` | Gives `[project] name`, as the section *The name of the project* tells. |
 | `document(path)` | Gives the document of a file, as the section *The documents* tells. |
 | `repository(root)` | Tells if the root is the top folder of a git repository. |
+| `base(root, branch)` | Gives the base of `HEAD` against a branch, as the section *The files of the project* tells. |
 | `ours(root, tests)` | Gives the files of the project, as the section *The files of the project* tells. |
 | `report(faults, count, items)` | Writes the faults of a check, and ends the check, as the section *The report of a check* tells. |
 
@@ -153,6 +158,9 @@ With `tests=True`, `ours` keeps the files of `tests`, and leaves out only `.tool
 Thus a project in a folder of a different repository, for example a case in `build`, is not a repository.
 The check of the commits also uses `repository`.
 
+`base(root, branch)` gives the last commit that `HEAD` shares with `origin/<branch>`, or with `<branch>` if git gives no such commit.
+It gives `None` if git gives neither. The check of the commits and the scope use it.
+
 ## The report of a check
 
 Each check tool ends with `report`. `faults` is the list of the faults, one line for each fault.
@@ -165,3 +173,12 @@ Each check tool ends with `report`. `faults` is the list of the faults, one line
 A check gives its faults in the order of the paths and of the lines, unless its document gives another order.
 
 For example, the check of the commits gives `items='commits'`, and writes `no fault in 12 commits`.
+
+## The free memory
+
+On Windows, `free_memory` gives the least of the free physical memory and of the free commit of `GlobalMemoryStatusEx`.
+On Linux, it gives `MemAvailable` of `/proc/meminfo`. On macOS, it gives the free, inactive, speculative and purgeable pages of `vm_stat`.
+It gives nothing on another system.
+
+When the variable `C23_FREE_MEMORY` holds a count of bytes, `free_memory` gives that count, so a case can set the free memory.
+If the variable holds something else, the tool stops: `C23_FREE_MEMORY is <value>, and it must be a count of bytes`.

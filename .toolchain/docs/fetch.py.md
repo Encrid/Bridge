@@ -9,6 +9,7 @@ Then it takes the dependencies with `take.py`.
 | Function | Result |
 | --- | --- |
 | `zig_found(zig)` | Gives the path of the pinned zig, or nothing. |
+| `archives(fetch)` | Gives the folder of the archives: *The shared archives*. `fetch` is the table `[fetch]` of `toolchain.toml`. |
 | `fetched(url, digest, folder, fetch)` | Gets an archive with `kept`, and unpacks it into an empty folder. `fetch` is the table `[fetch]` of `toolchain.toml`. |
 | `kept(url, digest, folder, timeout)` | Gives the path of the archive in the shared folder `folder`. It downloads the archive first if it is not there, as *The shared archives* tells. |
 | `downloaded(url, part, had, timeout)` | Downloads the bytes of the address after the first `had` bytes, into the file `part`. It tells if the download came to its end. |
@@ -51,14 +52,18 @@ It stops if the archive does not hold the pinned zig: `the archive holds no zig 
 
 ## The shared archives
 
-`[fetch] archives` of `toolchain.toml` names the folder of the archives, from the folder of `project.py`.
-Each archive is in the folder of its digest, in that folder. Thus each project and each case of this machine uses the same archive, and downloads it 1 time.
+`[fetch] archives` of `toolchain.toml` names the folder of the archives, from the folder of the main checkout of the project.
+Each archive is in the folder of its digest, in that folder. Thus each worktree of a checkout, and each case that it runs, uses the same archive, and downloads it 1 time.
+
+`archives` gives that folder. If git names the folder of `project.py` as the top of a worktree, the main checkout holds the common folder of git.
+Else the main checkout is the folder of `project.py`.
+Thus a project in a folder of another repository, and not at its top, keeps its own archives.
 
 `kept` does these steps:
 
 1. It holds the lock of the folder of the digest. Thus 2 processes do not download 1 archive at the same time. The system frees the lock when a process ends, also when a process is killed.
 2. If the archive is there, it gives it.
-3. Else it downloads the archive into the file `<archive>.part`. If that file holds bytes already, it asks the server only for the next bytes. Thus a killed download goes on. If the server sends all the bytes, it writes the file again.
+3. Else it writes `downloading <archive> from byte <count>` to the standard error, and downloads the archive into the file `<archive>.part`. If that file holds bytes already, it asks the server only for the next bytes. Thus a killed download goes on. If the server sends all the bytes, it writes the file again.
 4. If the download stops before its end, it goes on from the new end. If the download gives no new byte, it stops: `<archive> stops at <count> bytes: run fetch again`.
 5. If the file has a different digest, it removes the file and stops: `<archive> is not what the maker publishes`.
 6. It renames the file to the archive. Thus the folder holds an archive only after its digest is checked.

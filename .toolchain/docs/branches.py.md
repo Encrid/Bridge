@@ -119,6 +119,11 @@ An exemption can also name a `system`. It applies, and is checked, only on that 
 `reported` excuses an unreached outcome, or a branch in a macro, that an exemption matches, and counts it as exempt, not as missed.
 An exemption with no `why` excuses nothing and is a fault.
 An exemption that matches no unreached outcome is a fault, so a branch that a case reaches again loses its exemption.
+
+An exemption with `may_reach = true` is for a branch that some runs reach and others do not, by an order outside the code. An example is the order of the callbacks of a library against the rounds.
+It excuses the branch when a run does not reach it, and it is no fault when a run reaches it. Its `why` names that order.
+
+It must still name a branch of the code: `this exemption names no outcome`. A `may_reach` that is not `true` or `false` is a fault: `may_reach is true or false`.
 `.toolchain/docs/project.toml.md`, *[[branches.exception]]*.
 
 ## Limits

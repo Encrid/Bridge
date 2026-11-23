@@ -2,9 +2,9 @@
 #
 # Under the GNU Affero General Public License, version 3 only: see license.
 import concurrent.futures
+import copy
 import fnmatch
 import os
-import platform
 import re
 import shutil
 import socket
@@ -35,6 +35,13 @@ def environment(changes, values):
         if value is not False:
             env[name] = expand(str(value), values)
     return env
+
+
+def common_env(config):
+    table = config.get('test', {}).get('env', {})
+    if not (isinstance(table, dict) and all(isinstance(value, str) or value is False for value in table.values())):
+        die('[test] env: write a table of names, each with a text or false')
+    return table
 
 
 def bound(kind, port):
@@ -207,13 +214,39 @@ def placed(use, outputs, values):
     return linked
 
 
+def renamed(source, target):
+    if os.name == 'nt':
+        import ctypes
+        from ctypes import wintypes as w
+
+        name = os.path.abspath(target)
+
+        class Rename(ctypes.Structure):
+            _fields_ = [('flags', w.DWORD), ('root', w.HANDLE), ('length', w.DWORD), ('name', w.WCHAR * (len(name) + 1))]
+        k = ctypes.WinDLL('kernel32', use_last_error=True)
+        k.CreateFileW.restype = w.HANDLE
+        k.CreateFileW.argtypes = [w.LPCWSTR, w.DWORD, w.DWORD, ctypes.c_void_p, w.DWORD, w.DWORD, w.HANDLE]
+        k.SetFileInformationByHandle.argtypes = [w.HANDLE, ctypes.c_int, ctypes.c_void_p, w.DWORD]
+        k.CloseHandle.argtypes = [w.HANDLE]
+        info = Rename(3, None, 2 * len(name), name)
+        handle = k.CreateFileW(os.path.abspath(source), 0x10000, 7, None, 3, 0, None)
+        done = handle not in (None, w.HANDLE(-1).value) and k.SetFileInformationByHandle(
+            handle, 22, ctypes.byref(info), ctypes.sizeof(info))
+        if handle not in (None, w.HANDLE(-1).value):
+            k.CloseHandle(handle)
+        if done:
+            return
+    os.replace(source, target)
+
+
 def scripted(running, script, outputs, values):
     for step in script:
         if 'wait' in step and not waited(running, expand(step['wait'], values)):
             return
         for path, item in step.get('put', {}).items():
-            located(path, values).unlink(missing_ok=True)
-            shutil.copy(source_of(item, outputs, values), located(path, values))
+            spare = Path(values['case'] + '.put')
+            shutil.copy(source_of(item, outputs, values), spare)
+            renamed(spare, located(path, values))
         for path in step.get('remove', []):
             located(path, values).unlink()
         if 'type' in step:
@@ -224,6 +257,29 @@ def scripted(running, script, outputs, values):
             signals.sent(running['proc'], step['signal'])
         if 'pause' in step:
             time.sleep(step['pause'])
+
+
+def expanded_hold(hold, values):
+    return dict(hold, **{key: expand(hold[key], values) for key in ('file', 'call', 'until') if isinstance(hold[key], str)})
+
+
+def held(hold, values):
+    return ' hold@%(file)s@%(call)s=%(at)d until@%(until)s=1 @times=%(times)d' % expanded_hold(hold, values) if hold else ''
+
+
+def hold_checked(hold, name, path, calls, values):
+    if not isinstance(hold, dict) or set(hold) != {'file', 'call', 'at', 'until', 'times'}:
+        die('%s: the case %s states hold, and a hold has exactly the keys file, call, at, until and times' % (path, name))
+    hold, root = expanded_hold(hold, values), Path(values['root'])
+    for key in ('call', 'until'):
+        if hold[key] not in calls:
+            die('%s: the case %s holds at %s %s, and [fail.calls] does not list it' % (path, name, key, hold[key]))
+    if not (isinstance(hold['file'], str) and hold['file'].endswith('.c') and ' ' not in hold['file']
+            and (root / hold['file']).is_file()):
+        die('%s: the case %s holds in %s, and the file of a hold is a C file of the project' % (path, name, hold['file']))
+    for key in ('at', 'times'):
+        if not (isinstance(hold[key], int) and not isinstance(hold[key], bool) and hold[key] >= 1):
+            die('%s: the case %s states the hold %s %s, and it is a count of 1 or more' % (path, name, key, hold[key]))
 
 
 def made_false(case):
@@ -240,7 +296,7 @@ def typed_rows(use, broken, order, values):
 
 def tried(config, values, outputs, where, case, broken, counted=False, failing=None, part=False, order=None):
     use = made_false(case) if broken else case
-    values, outputs = failing if failing and (use.get('fail') or use.get('sweep')) else (values, outputs)
+    values, outputs = failing if failing and (use.get('fail') or use.get('sweep') or use.get('hold')) else (values, outputs)
     folder = Path(values['out']) / 'cases' / where
     cleared(folder)
     folder.mkdir(parents=True, exist_ok=True)
@@ -248,14 +304,17 @@ def tried(config, values, outputs, where, case, broken, counted=False, failing=N
     if '{port}' in str(use):
         mine['port'] = free_port()
     counting = {'C23_LEAKS': folder.as_posix() + '.leaks'} if counted else {}
-    plan = ''.join(' %s=%s' % pair for pair in use.get('fail', {}).items()) or False
+    plan = ''.join(' %s=%s' % pair for pair in use.get('fail', {}).items()) + held(use.get('hold'), mine) or False
+    part = ''.join(' %s ' % name for name in use['fail_parts']) if 'fail_parts' in use else part
     linked = placed(use, outputs, mine)
     root, timeout, helper = values['root'], config['test']['timeout'], use.get('helper')
-    beside = started(expanded(helper['run'], mine), root, timeout, environment(counting, mine)) if helper else None
+    common = common_env(config)
+    beside = started(expanded(helper['run'], mine), root, timeout, environment({**common, **counting}, mine)) \
+        if helper else None
     if helper:
         waited(beside, expand(helper['wait'], mine))
     running = started(expanded(use['run'], mine), root, timeout,
-                      environment({**counting, 'C23_FAIL': plan, 'C23_FAIL_PART': bool(plan or use.get('sweep')) and part,
+                      environment({**common, **counting, 'C23_FAIL': plan, 'C23_FAIL_PART': bool(plan or use.get('sweep')) and part,
                                    **use.get('env', {})},
                                   mine), use)
     scripted(running, use.get('script', []), outputs, mine)
@@ -352,7 +411,6 @@ def verdict(config, values, outputs, group, index, case, broken, copies, counted
 
 
 WROTE = 'the outputs that a case wrote'
-WAIT = 0.2
 USE = re.compile(r'[A-Za-z0-9_-]+')
 
 
@@ -388,7 +446,7 @@ def test(config, values, outputs, groups, broken, said, copies, counted=False, f
     wrong, texts, uses = [], [], uses_of(config, values, {group for group, _ in groups})
     jobs = [[(group, index, case, concurrent.futures.Future()) for index, case in enumerate(cases)]
             for group, cases in groups]
-    lanes, stop, room = lanes_of(jobs, uses), threading.Event(), Room(floor_of(config))
+    lanes, stop, room = lanes_of(jobs, uses), threading.Event(), shared.Room(shared.floor_of(config))
 
     def ran(lane):
         for group, index, case, future in lane:
@@ -396,19 +454,24 @@ def test(config, values, outputs, groups, broken, said, copies, counted=False, f
                 return
             try:
                 with room, locks.held(uses.get(group, []), group):
-                    future.set_result(one(config, values, outputs, group, index, case, broken, copies, counted,
-                                          failing))
+                    start = time.monotonic()
+                    found = one(config, values, outputs, group, index, case, broken, copies, counted, failing)
+                    future.set_result((found, time.monotonic() - start))
             except BaseException as error:
                 future.set_exception(error)
 
+    slow, begun, took = slow_of(config), time.monotonic(), []
+    common_env(config)
     with concurrent.futures.ThreadPoolExecutor(workers) as pool:
         for lane in lanes:
             pool.submit(ran, lane)
         try:
             for (group, _), mine in zip(groups, jobs):
-                right, count = 0, 0
-                for *_, future in mine:
-                    named, ends = future.result()
+                right, count, spent = 0, 0, 0.0
+                for _, _, case, future in mine:
+                    (named, ends), seconds = future.result()
+                    took.append((seconds, group, case['name']))
+                    spent += seconds
                     texts += [said for _, said in ends]
                     told(named, ends, broken)
                     right += sum(ok for _, ok, _ in named)
@@ -416,59 +479,32 @@ def test(config, values, outputs, groups, broken, said, copies, counted=False, f
                     wrong += [name for name, ok, _ in named if not ok]
                 print('%s: %d claims made false: %d cases failed' % (group, count, right) if broken else
                       '%s: %d cases: %d as written' % (group, count, right))
+                print('%s: its cases took %.1f s' % (group, spent))
         except BaseException:
             stop.set()
             raise
+    timed(slow, took, time.monotonic() - begun)
     if said:
         (Path(values['out']) / 'said.txt').write_text('\n'.join(texts), encoding='utf-8', newline='\n')
     return wrong
 
 
-def free_memory():
-    if os.name == 'nt':
-        import ctypes
-
-        class Status(ctypes.Structure):
-            _fields_ = [('length', ctypes.c_ulong), ('load', ctypes.c_ulong)] + [
-                (name, ctypes.c_ulonglong) for name in ('phys', 'free_phys', 'commit', 'free_commit', 'virtual',
-                                                        'free_virtual', 'free_extended')]
-        status = Status(length=ctypes.sizeof(Status))
-        return status.free_commit if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(status)) else None
-    if platform.system() == 'Darwin':
-        try:
-            said = subprocess.run(['vm_stat'], capture_output=True, text=True, check=True).stdout
-            size = int(re.search(r'page size of (\d+)', said).group(1))
-        except (OSError, subprocess.CalledProcessError, AttributeError):
-            return None
-        return size * sum(int(n) for n in re.findall(r'Pages (?:free|inactive|speculative|purgeable):\s+(\d+)', said))
-    try:
-        with open('/proc/meminfo', encoding='ascii') as info:
-            return next(int(line.split()[1]) * 1024 for line in info if line.startswith('MemAvailable:'))
-    except (OSError, StopIteration, ValueError):
-        return None
+def slow_of(config):
+    slow = config.get('test', {}).get('slow', 10)
+    if isinstance(slow, bool) or not isinstance(slow, (int, float)) or slow < 0:
+        die('[test] slow is a count of seconds, 0 or more')
+    return slow
 
 
-def floor_of(config):
-    floor = config['test'].get('memory_floor', 2 << 30)
-    if not (isinstance(floor, int) and not isinstance(floor, bool) and floor >= 0):
-        die('[test] memory_floor is a count of bytes, 0 or more')
-    return floor
-
-
-class Room:
-    def __init__(self, floor):
-        self.floor, self.busy, self.gate = floor, 0, threading.Condition()
-
-    def __enter__(self):
-        with self.gate:
-            while self.floor and self.busy and (free_memory() or self.floor) < self.floor:
-                self.gate.wait(WAIT)
-            self.busy += 1
-
-    def __exit__(self, *_):
-        with self.gate:
-            self.busy -= 1
-            self.gate.notify_all()
+def timed(slow, took, seconds):
+    took = sorted(took, key=lambda one: -one[0])
+    print('the %d slowest cases:' % min(10, len(took)))
+    for spent, group, name in took[:10]:
+        print('  %.1f s %s: %s' % (spent, group, name))
+    for spent, group, name in took:
+        if spent > slow:
+            print('a slow case: %s: %s took %.1f s, above [test] slow of %s s' % (group, name, spent, slow))
+    print('the run of the cases took %.1f s' % seconds)
 
 
 def lanes_of(jobs, uses):
@@ -536,6 +572,7 @@ def ruled(path, cases):
 
 def groups_of(config, values, folder):
     root, found, calls = Path(values['root']), [], fail.listed(config, values)
+    systems = {target.get('system') for target in config['targets'].values()}
     for path in files(root, [folder + '/**/*.toml']):
         cases = tomllib.loads((root / path).read_text(encoding='utf-8')).get('case', [])
         for case in cases:
@@ -555,12 +592,31 @@ def groups_of(config, values, folder):
                     % (path, case['name'], case['process'], ', '.join(PROCESS)))
             if case.get('process') == 'script' and 'script' not in case and 'stdin' not in case:
                 die('%s: the case %s states the process script, and it has no script and no stdin' % (path, case['name']))
+            for named in (case.get('fail_parts'), case.get('false', {}).get('fail_parts')):
+                if named is not None and (not named or any(name not in config.get('parts', {}) for name in named)):
+                    die('%s: the case %s states fail_parts %s, and each must name a part of the project'
+                        % (path, case['name'], ' '.join(named) or 'with no part'))
             for call in [*case.get('fail', {}), *case.get('false', {}).get('fail', {}), *case.get('sweep', [])]:
                 if call not in calls:
                     die('%s: the case %s makes %s fail, and [fail.calls] does not list it' % (path, case['name'], call))
+                if calls[call] == '':
+                    die('%s: the case %s makes %s fail, and %s gives no result, so no case can make it fail'
+                        % (path, case['name'], call, call))
+            for hold in (case.get('hold'), case.get('false', {}).get('hold')):
+                if hold is not None:
+                    hold_checked(hold, case['name'], path, calls, values)
+            if 'systems' in case and not (isinstance(case['systems'], list) and case['systems']
+                                          and all(system in systems for system in case['systems'])):
+                die('%s: the case %s states systems %s, and each must be the system of a target: %s'
+                    % (path, case['name'], case['systems'], ' '.join(sorted(systems))))
         if config.get('test', {}).get('tables'):
             ruled(path, cases)
-        found.append((Path(path).relative_to(folder).with_suffix('').as_posix(), cases))
+        group = Path(path).relative_to(folder).with_suffix('').as_posix()
+        mine = [case for case in cases if values.get('system') in case.get('systems', [values.get('system')])]
+        if len(mine) < len(cases):
+            print('%s: %d cases for another system: %s' % (group, len(cases) - len(mine),
+                                                           ', '.join(case['name'] for case in cases if case not in mine)))
+        found.append((group, mine))
     return [(group, cases) for group, cases in found if cases]
 
 
@@ -663,7 +719,9 @@ def main():
         config, values = build.prepared(args, True)
         made = []
     else:
+        start = time.monotonic()
         config, values, made = build.build(args, True)
+        print('the build took %.1f s' % (time.monotonic() - start))
     unlinked = [name for name, paths in made if not paths]
     if unlinked:
         die('the cases need what is linked: ' + ' '.join(unlinked))
@@ -678,9 +736,13 @@ def main():
     own = not (args.broken or args.toolchain or args.k or args.part or args.group)
     rounds = args.rounds or 1
     failing = None
-    if any(use.get('fail') or use.get('sweep') for use in ((made_false(case) if args.broken else case)
+    if any(use.get('fail') or use.get('sweep') or use.get('hold') for use in ((made_false(case) if args.broken else case)
                                                             for _, cases in groups for case in cases)):
-        _, mine, _, outputs, _ = changed(args, 'fail', fail.failed, (config, values))
+        wider = copy.copy(args)
+        if args.part:
+            wider.part = sorted(set(args.part) | {name for _, cases in groups for case in cases
+                                                  for use in (case, made_false(case)) for name in use.get('fail_parts', [])})
+        _, mine, _, outputs, _ = changed(wider, 'fail', fail.failed, (config, values))
         failing = mine, outputs
     for done in range(rounds):
         if rounds > 1:

@@ -17,7 +17,7 @@ It is the same in each project, and a project does not change it.
 
 | Key | Value |
 | --- | --- |
-| `archives` | The folder of the archives that `fetch` downloads, from the folder of `project.py`: `.toolchain/docs/fetch.py.md`, *The shared archives*. |
+| `archives` | The folder of the archives that `fetch` downloads: `.toolchain/docs/fetch.py.md`, *The shared archives*. |
 | `timeout` | The seconds that a download waits for its next bytes. |
 
 ## [build]
@@ -26,6 +26,7 @@ It is the same in each project, and a project does not change it.
 | --- | --- |
 | `folder` | The default output folder, in the root. |
 | `cache` | The folder of the caches of zig, from the folder of `project.py`. |
+| `job_memory` | The memory of 1 job, in bytes: *The jobs*. The default is 1610612736, 1.5 GiB. |
 
 ## [variables] and [debug]
 
@@ -42,9 +43,13 @@ It is the same in each project, and a project does not change it.
 
 `jobs` limits the jobs that run at the same time: the steps of `zig build`, and the syntax trees of `rewrite.py`.
 `build.py` gives it to `zig build` as `-j<jobs>`: `.toolchain/docs/build.py.md`, *The runner zig*. `each` of `rewrite.py` runs that many trees at the same time.
-Each job takes memory. Thus a machine that runs several builds or test runs at the same time sets fewer jobs, for example `--set jobs=2`.
 
-The tools use the least of `jobs` and of the count of processors of the machine.
+The tools use the least of 3 counts, and at least 1 job.
+The 3 counts are `jobs`, the processors of the machine, and the free memory divided by `[build] job_memory`.
+The free memory is `free_memory` of `.toolchain/docs/shared.py.md`, when the run starts. Thus a machine that runs other builds or test runs runs fewer jobs, and no setting changes.
+
+The default of `job_memory` is the largest compile that a run measured, 1.36 GB, rounded up to 1.5 GiB.
+With no measure of the memory, the tools use the least of `jobs` and of the count of processors.
 If `jobs` is not a whole number above 0, the tools stop: `[variables] jobs is <jobs>, and it must be a whole number above 0`.
 
 The default 8 is the limit that `rewrite.py` had before the setting, so a machine with 8 processors or fewer runs as before.
