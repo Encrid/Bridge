@@ -258,7 +258,7 @@ def probed(config, values, named=(), claimed=None):
         for path, table in probing.skips.items():
             skips.setdefault(path, {}).update(table)
     for (name, used, declared, _), parts in rewrite.united([(found, parts) for (_, found), parts in trees]):
-        outers[name] = fail.layer((root / name).read_bytes(), used, declared, calls, parts)
+        outers[name] = fail.layer((root / name).read_bytes(), used, declared, calls, parts, Path(name).as_posix())
     edits = {path: table for path, table in edits.items() if mine(config, path, named, claimed)}
     skips = {path: table for path, table in skips.items() if mine(config, path, named, claimed)}
     return written(root, rewrite.tree(values, 'branches'), edits, skips, outers)
@@ -319,15 +319,16 @@ def excused(listed, system, name, line, col, said):
 def reported(probes, gaps, hits, excepted=(), system=None, named=()):
     if named:
         print('branches: measured parts %s' % ', '.join(named))
-    seen, outcomes, total = joined(probes, hits), [], 0
+    seen, outcomes, every = joined(probes, hits), [], []
     for name, rows in probes.items():
         bits = seen[name]
         for number, row in enumerate(rows):
             sides = SAID[row['kind']]
             for side, said in zip(range(2 - len(sides), 2), sides):
-                total += 1
+                every.append((name, row['line'], row['col'], said))
                 if bits[2 * number + side] == '0':
                     outcomes.append((name, row['line'], row['col'], said))
+    total = len(every)
     gapped = [(name, row['line'], row['col'], 'this %s %s' % (row['kind'], MACRO))
               for name, rows in gaps.items() for row in rows]
     listed = [dict(entry) for entry in excepted]
@@ -339,9 +340,14 @@ def reported(probes, gaps, hits, excepted=(), system=None, named=()):
         if entry.get('system') and entry['system'] != system:
             continue
         where = (entry.get('path', '?'), entry.get('line', 0), entry.get('col', 0))
-        if not entry.get('why'):
+        reach = entry.get('may_reach', False)
+        if not isinstance(reach, bool):
+            stale.append(where + ('may_reach is true or false',))
+        elif not entry.get('why'):
             stale.append(where + ('this exemption states no reason',))
-        elif not entry.get('hits'):
+        elif reach and not entry.get('hits') and not any(excused([dict(entry)], system, *one) for one in every):
+            stale.append(where + ('this exemption names no outcome',))
+        elif not reach and not entry.get('hits'):
             stale.append(where + ('this exemption excuses no unreached outcome',))
     for fault in sorted(missed + macros + stale):
         print('%s:%d:%d: %s' % fault)

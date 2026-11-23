@@ -102,6 +102,7 @@ The 2 runners make the same files.
 `graph.zig` is the same file for each project, so zig builds it only once for each version of zig on a machine.
 For each artifact, `specified` writes `{work}.json`: the values of the artifact, and its steps with their variables replaced.
 It writes the spec only when its text changes, because zig runs a step again when an input has a new time of change.
+The spec holds each value but `jobs`, since `jobs` follows the free memory of each run and changes no output.
 The graph has these steps:
 
 1. For each source of a kind with `each`, the command of `each`. Its input is the source, and its output is `{object}`.

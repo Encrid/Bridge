@@ -7,6 +7,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import urllib.error
 import urllib.request
 import zipfile
@@ -24,8 +25,16 @@ def zig_found(zig):
     return Path(path).as_posix() if version == zig['version'] else None
 
 
+def archives(fetch):
+    asked = ['git', 'rev-parse', '--path-format=absolute', '--show-toplevel', '--git-common-dir']
+    said = subprocess.run(asked, cwd=shared.HERE, capture_output=True, text=True) if shutil.which('git') else None
+    top, common = (said.stdout.split('\n') + ['', ''])[:2] if said and said.returncode == 0 else ('', '')
+    own = top and Path(top).resolve() == shared.HERE.resolve()
+    return (Path(common).parent if own else shared.HERE) / fetch['archives']
+
+
 def fetched(url, digest, folder, fetch):
-    archive = kept(url, digest, shared.HERE / fetch['archives'] / digest, fetch['timeout'])
+    archive = kept(url, digest, archives(fetch) / digest, fetch['timeout'])
     if folder.exists():
         shutil.rmtree(folder)
     folder.mkdir(parents=True)
@@ -40,6 +49,7 @@ def kept(url, digest, folder, timeout):
         held(lock)
         while not path.is_file():
             had = part.stat().st_size if part.is_file() else 0
+            print('downloading %s from byte %d' % (path.name, had), file=sys.stderr, flush=True)
             if not downloaded(url, part, had, timeout):
                 now = part.stat().st_size if part.is_file() else 0
                 if now == had:

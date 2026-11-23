@@ -147,7 +147,7 @@ def counted(config, values):
             continue
         text = (root / path).read_bytes()
         failing = [name for name in used if name in calls and path.startswith('src/')]
-        outer = fail.layer(text, failing, declared, calls, parts)
+        outer = fail.layer(text, failing, declared, calls, parts, Path(path).as_posix())
         (where / path).write_bytes(rewritten(text, path, [name for name in used if name in names], ends, declared,
                                              names, kinds, outer))
         counting.append(path)

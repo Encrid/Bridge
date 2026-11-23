@@ -10,6 +10,8 @@
 `[fail.calls]` adds more functions, and each file of `[fail] with` adds more: `.toolchain/docs/project.toml.md`, *[fail]*.
 A failure value is a text of C, for example `nullptr`, `-1` or `false`. Each file that calls the function must compile it.
 
+A function with no result has the empty text as its value. No case can make it fail, and a case can hold it or wait for it: *The hold*.
+
 Each function is in the list one time. `listed` stops if a table names a function of the list again: `[fail.calls] lists <name> two times`.
 
 `fail` of a case also fails a call through a pointer variable that `[fail.calls]` lists: `.toolchain/docs/rewrite.py.md`, *The pointer variables*.
@@ -29,9 +31,16 @@ Each function is in the list one time. `listed` stops if a table names a functio
 
 For each call that the key `fail` of the case states, `C23_FAIL` holds a space, then `<function>=<number>`.
 `C23_FAIL_PART` holds the part of the case, with a space before and after it. Thus a case refuses calls only in the programs of its own part, in each run.
+
+A case that states `fail_parts` names the parts itself, and `C23_FAIL_PART` holds each of them, with a space before and after each name.
+Thus a case of a program can refuse the calls of a library of another part that the program links. The files of 1 program share 1 count, so the number counts the calls of each named part.
+The constructor reads `C23_FAIL` if the text of the file holds 1 of the names.
+A run with `--part` also builds the layer for each part that a chosen case names in `fail_parts`.
 `test.py` gives the variables to the command of the case: `.toolchain/docs/test.py.md`, *A case*.
 
-`layer` stops if a listed function that a file uses has no result: `<name> gives no result`.
+`layer` stops if a listed function that a file uses has no result and a value: `<name> gives no result, so its value in [fail.calls] is the empty text`.
+It stops if such a function has a result and the empty text: `<name> gives a result, so its value in [fail.calls] is not the empty text`.
+It stops if the path of the file holds a space: `<path> holds a space, and the layer names each file in a key of C23_FAIL`.
 It also stops where `signed` of `rewrite.py` stops: `.toolchain/docs/rewrite.py.md`, *The rename*.
 `listed` stops if a file of `[fail] with` is not there: `[fail] with: <file> is not there`.
 
@@ -48,6 +57,22 @@ At each call of a listed function, the layer reads the turn.
   It changes 1 byte of the text, and calls no function that changes the environment. Thus a call can fail on any thread.
 
 Thus a case that states `fail` runs as before: its turn stays 0, and its `C23_FAIL` holds no ` told=0`.
+
+## The hold
+
+A case can make 1 call wait for calls on another thread: the key `hold` of a case, `.toolchain/docs/test.py.md`, *A case*.
+Thus a case can give 2 threads the same order in each run, with no wait of a time.
+
+`C23_FAIL` then holds ` hold@<file>@<function>=<at> until@<until>=1 @times=<times>`.
+
+- Call `<at>` of `<function>` in `<file>` waits. The count of a hold is a `static` variable of the file, so the calls of other files do not count.
+- The count of the releases is a `[[gnu::weak]]` variable with hidden visibility, so the files of 1 program share it.
+- Each call of `<until>` in a file of the layer adds 1 to it, after the call returns. A call that the layer makes fail adds nothing, since it never runs. A call that runs adds 1, also when it gives an error.
+- The held call goes on when the count of the releases is `<times>` or more. Thus a release that comes before the hold also counts.
+- The wait gives the processor to another thread on each turn: `SwitchToThread` on Windows, and `sched_yield` on the other systems.
+- Under `__wasm__` there is no hold, since a module has 1 thread.
+
+If the releases never reach `<times>`, the case waits until its timeout, and fails.
 
 ## A wasm module
 

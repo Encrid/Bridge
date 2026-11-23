@@ -9,8 +9,10 @@ python .toolchain/tools/commits.py [--root <folder>] [--commits <range>]
 With `--commits <range>`, `commits.py` checks each commit that `git log <range>` gives, also each merge commit.
 The workflow `ci` gives the range of the pull request.
 
-Without `--commits`, `commits.py` checks the last commit, `HEAD`, when `shared.repository` gives true and the repository has a commit.
-Else it has no commit to check, and it passes. Thus a copy of the project without git passes.
+Without `--commits`, `commits.py` checks the commits of the branch, when `shared.repository` gives true and the repository has a commit.
+These are the commits of `git log <base>..HEAD`, and `shared.base` gives the base of the branch against `dev`.
+If git gives no base, or the base is `HEAD`, `commits.py` checks only the last commit, `HEAD`. Thus a commit on `dev` checks only itself.
+With no repository, or a repository with no commit, it has no commit to check, and it passes. Thus a copy of the project without git passes.
 
 ## The checks
 

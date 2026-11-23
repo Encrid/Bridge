@@ -486,6 +486,7 @@ An exception lets a project keep a defensive branch that no case can reach, for 
 | `side` | `true`, `false`, `function`, `case` or `macro`: `.toolchain/docs/branches.py.md`, *Exemptions*. |
 | `why` | The reason the branch is unreachable. |
 | `system` | Optional. The system the exemption applies on, for a branch that only one platform has. |
+| `may_reach` | Optional, `true` or `false`. `true` for a branch that some runs reach, by an order outside the code: `.toolchain/docs/branches.py.md`, *Exemptions*. |
 
 For example:
 
@@ -564,7 +565,7 @@ A project writes it in `fail.toml` of `.toolchain/config`.
 
 | Key | Value |
 | --- | --- |
-| `calls` | A table: each key is a function, and its value is the value that a failed call gives, as a text of C. |
+| `calls` | A table: each key is a function, and its value is the value that a failed call gives, as a text of C. `.toolchain/docs/fail.py.md`, *The calls*, tells the value of a `void` function. |
 | `with` | The files that give more `calls`, each in a table `[fail]`. A path can hold the variables of the build. |
 
 For example, a project names two functions of a different project, and the file of a package:

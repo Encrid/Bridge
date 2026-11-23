@@ -4,8 +4,9 @@
 import re
 import subprocess
 
-from shared import arguments, config, die, report, repository
+from shared import arguments, base, config, die, report, repository
 
+BRANCH = 'dev'
 LINE = re.compile(r'(\w+)(?:\([^()\s]+\))?: (\S.*)')
 
 
@@ -26,7 +27,10 @@ def main():
     head = subprocess.run(['git', '-C', str(args.root), 'rev-parse', '--verify', '-q', 'HEAD'], capture_output=True)
     if args.commits is None and not (repository(args.root) and head.returncode == 0):
         return report([], 0, 'commits')
+    since = base(args.root, BRANCH) if args.commits is None else None
     span = [args.commits] if args.commits is not None else ['-1', 'HEAD']
+    if since and since != head.stdout.decode('ascii').strip():
+        span = [since + '..HEAD']
     done = subprocess.run(['git', '-C', str(args.root), 'log', '-z', '--format=%h%n%B'] + span,
                           capture_output=True, text=True, encoding='utf-8')
     if done.returncode:
