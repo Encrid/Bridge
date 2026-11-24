@@ -10,7 +10,7 @@ A test source gets no layer of `fail`: `.toolchain/docs/fail.py.md`.
 
 Each resource has a kind. Functions of the code take a resource of a kind, and functions give it back.
 
-- The kind `memory`: `malloc` and `calloc` take it, `free` gives it back, and `realloc` changes a block of it.
+- The kind `memory`: `malloc`, `calloc`, `aligned_alloc`, `strdup` and `strndup` take it, `free` gives it back, and `realloc` changes a block of it.
 - Each function of `[leaks] memory` also takes memory, for example a function of a different project whose result the code frees.
 - Each pair of `[leaks.pairs]` is a kind, with the name of the function that takes it.
 - Each table `[leaks.kinds.<kind>]` is a kind. Its `takes` and `gives` name the functions that take and give back a resource of the kind, each at a place: *The places*.

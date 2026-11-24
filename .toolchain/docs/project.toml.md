@@ -505,7 +505,7 @@ An exemption with a `system` is applied and checked only on that system.
 
 ## [leaks]
 
-`[leaks]` names the functions that `test --leaks` counts, in addition to `malloc`, `calloc`, `realloc` and `free`.
+`[leaks]` names the functions that `test --leaks` counts, in addition to `malloc`, `calloc`, `realloc`, `aligned_alloc`, `strdup`, `strndup` and `free`.
 A project writes it in `leaks.toml` of `.toolchain/config`.
 
 | Key | Value |
@@ -561,7 +561,7 @@ why = "A backend library that cannot unload stays open, and the next world uses 
 
 ## [fail]
 
-`[fail]` names the functions that a case can make fail, in addition to `malloc`, `calloc` and `realloc`: `docs/contributing/tests.md`, *Failed calls*.
+`[fail]` names the functions that a case can make fail, in addition to `malloc`, `calloc`, `realloc`, `aligned_alloc`, `strdup` and `strndup`: `docs/contributing/tests.md`, *Failed calls*.
 A project writes it in `fail.toml` of `.toolchain/config`.
 
 | Key | Value |

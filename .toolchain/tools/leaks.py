@@ -10,7 +10,7 @@ import rewrite
 import shared
 from shared import die, known
 
-BUILT = {'malloc': ('take', 'memory', 'result'), 'calloc': ('take', 'memory', 'result'),
+BUILT = {**dict.fromkeys(('malloc', 'calloc', 'aligned_alloc', 'strdup', 'strndup'), ('take', 'memory', 'result')),
          'realloc': ('move', 'memory', None), 'free': ('give', 'memory', '1')}
 PLACES = {'take': re.compile(r'result|\*?[1-9][0-9]*|\*[1-9][0-9]*\.[A-Za-z_]\w*'),
           'give': re.compile(r'result|\*?[1-9][0-9]*')}
