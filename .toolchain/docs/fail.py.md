@@ -5,8 +5,8 @@
 ## The calls
 
 `listed` gives the functions that can fail, each with its failure value.
-`malloc`, `calloc` and `realloc` are always in the list, with the value `nullptr`, and so are the two loaders,
-`GetProcAddress` and `dlsym`, with `nullptr`.
+`malloc`, `calloc`, `realloc`, `aligned_alloc`, `strdup` and `strndup` are always in the list, with the value `nullptr`.
+The two loaders `GetProcAddress` and `dlsym` are always in the list too, with `nullptr`.
 `[fail.calls]` adds more functions, and each file of `[fail] with` adds more: `.toolchain/docs/project.toml.md`, *[fail]*.
 A failure value is a text of C, for example `nullptr`, `-1` or `false`. Each file that calls the function must compile it.
 

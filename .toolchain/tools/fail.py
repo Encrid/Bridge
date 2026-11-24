@@ -6,8 +6,8 @@ from pathlib import Path
 import rewrite
 from shared import die, tables
 
-BUILT = {'malloc': 'nullptr', 'calloc': 'nullptr', 'realloc': 'nullptr',
-         'GetProcAddress': 'nullptr', 'dlsym': 'nullptr'}
+BUILT = {'malloc': 'nullptr', 'calloc': 'nullptr', 'realloc': 'nullptr', 'aligned_alloc': 'nullptr',
+         'strdup': 'nullptr', 'strndup': 'nullptr', 'GetProcAddress': 'nullptr', 'dlsym': 'nullptr'}
 PREFIX = 'c23b_f_'
 STAND = 'c23b_ft_'
 POINT = 'c23b_fp_'
